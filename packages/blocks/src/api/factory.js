@@ -285,23 +285,6 @@ export const isContainerGroupBlock = ( name ) =>
 	name === getGroupingBlockName();
 
 /**
- * Determines whether the provided Blocks are of the same type
- * (eg: all `core/paragraph`).
- *
- * @param  {Array}  blocksArray the Block definitions
- *
- * @return {boolean} whether or not the given Blocks pass the criteria
- */
-export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
-	if ( ! blocksArray.length ) {
-		return false;
-	}
-	const sourceName = blocksArray[ 0 ].name;
-
-	return every( blocksArray, [ 'name', sourceName ] );
-};
-
-/**
  * Returns an array of block types that the set of blocks received as argument
  * can be transformed into.
  *

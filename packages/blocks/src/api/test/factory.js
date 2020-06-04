@@ -16,7 +16,6 @@ import {
 	findTransform,
 	isWildcardBlockTransform,
 	isContainerGroupBlock,
-	isBlockSelectionOfSameType,
 } from '../factory';
 import {
 	getBlockType,
@@ -1826,49 +1825,6 @@ describe( 'block factory', () => {
 		it( 'should return false when passed block name does not match the registered "Grouping" Block', () => {
 			setGroupingBlockName( 'registered-grouping-block' );
 			expect( isContainerGroupBlock( 'core/group' ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isBlockSelectionOfSameType', () => {
-		it( 'should return false when all blocks do not match the name of the first block', () => {
-			const blocks = [
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/another-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-			];
-
-			expect( isBlockSelectionOfSameType( blocks ) ).toBe( false );
-		} );
-
-		it( 'should return true when all blocks match the name of the first block', () => {
-			const blocks = [
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-			];
-
-			expect( isBlockSelectionOfSameType( blocks ) ).toBe( true );
 		} );
 	} );
 } );
