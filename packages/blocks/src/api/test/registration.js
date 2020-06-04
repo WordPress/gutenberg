@@ -315,7 +315,6 @@ describe( 'blocks', () => {
 			const blockName = 'core/test-block-with-null-server-values';
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					description: null,
 					icon: null,
 					category: null,
 					parent: null,

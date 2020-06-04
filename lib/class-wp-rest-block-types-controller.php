@@ -353,8 +353,8 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 				),
 				'description'   => array(
 					'description' => __( 'Description of block type.', 'gutenberg' ),
-					'type'        => array( 'string', 'null' ),
-					'default'     => null,
+					'type'        => 'string',
+					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
