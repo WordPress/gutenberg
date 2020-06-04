@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  */
 import { useState } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { TabPanel } from '@wordpress/components';
+import { TabPanel, VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
@@ -92,6 +92,11 @@ function InserterMenu( {
 			</div>
 			{ showInserterHelpPanel && (
 				<div className="block-editor-inserter__tips">
+					<VisuallyHidden>
+						<h2 className="block-editor-inserter__tips-title">
+							{ __( 'Tips for using the block editor:' ) }
+						</h2>
+					</VisuallyHidden>
 					<Tips />
 				</div>
 			) }
