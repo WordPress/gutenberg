@@ -9,7 +9,7 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
 /**
  * WordPress dependencies
  */
-import { createRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 
 /**
  * Module Constants
@@ -18,7 +18,7 @@ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const isRTL = () => document.documentElement.dir === 'rtl';
 
 function DatePicker( { currentDate, isInvalidDate, onChange } ) {
-	const nodeRef = createRef();
+	const nodeRef = useRef();
 
 	/*
 	 * Todo: We should remove this function ASAP.
