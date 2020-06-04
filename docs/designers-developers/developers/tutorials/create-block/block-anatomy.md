@@ -32,13 +32,13 @@ registerBlockType( 'create-block/gutenpride', {
 
 The first parameter in the **registerBlockType** function is the block name, this should match exactly to the name registered in the PHP file.
 
-The second parameter to the function is the block object. See the [block registration documentation](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/) for full details.
+The second parameter to the function is the block object. See the [block registration documentation](/docs/designers-developers/developers/block-api/block-registration.md) for full details.
 
 The **title** is the title of the block shown in the Inserter.
 
 The **icon** is the icon shown in the Inserter. The icon property expects any Dashicon name as a string, see [list of available icons](https://developer.wordpress.org/resource/dashicons/). You can also provide an SVG object, but for now it's easiest to just pick a Dashicon name.
 
-The **category** specified is a string and must be one of: \"common, formatting, layout, widgets, or embed\". You can create your own custom category name, [see documentation for details](https://developer.wordpress.org/block-editor/designers-developers/developers/filters/block-filters/#managing-block-categories). For this tutorial, I specified "widgets" as the category.
+The **category** specified is a string and must be one of: "common, formatting, layout, widgets, or embed". You can create your own custom category name, [see documentation for details](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories). For this tutorial, I specified "widgets" as the category.
 
 The last two block object properties are **edit** and **save**, these are the key parts of a block. Both properties should be defined as functions.
 

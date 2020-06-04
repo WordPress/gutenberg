@@ -5,7 +5,7 @@ This tutorial covers the basic structure of building a block, and the general co
 
 ## Additional Components
 
-The block editor provides a [components package](/packages/packages-components/) which contains numerous prebuilt components you can use to build your block.
+The block editor provides a [components package](/packages/components/README.md) which contains numerous prebuilt components you can use to build your block.
 
 You can visually browse the compoents and what their implementation looks like using the Storybook tool published at https://wordpress.github.io/gutenberg
 

@@ -122,7 +122,7 @@ To open the developer tools in Firefox, use the menu selecting Web Developer : T
 
 Try running `npm run start` that will start the watch process for automatic rebuilds. If you then make an update to `src/index.js` file, you will see the build run, and if you reload the WordPress editor you'll see the change.
 
-For more info, see the build section of the [Getting Started with JavaScript tutorial](https://developer.wordpress.org/block-editor/tutorials/javascript/js-build-setup/) in the WordPress Handbook.
+For more info, see the build section of the [Getting Started with JavaScript tutorial](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md) in the WordPress Handbook.
 
 ## Summary
 

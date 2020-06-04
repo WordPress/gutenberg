@@ -19,17 +19,17 @@ Add this to the `index.js` file within the `registerBlockType` function in `inde
 
 To repeat, when the block loads it will look at the saved content for the block, look for the div tag, take the text portion — the part in between the open and close div tags —  and store the content in an `attributes.message` variable.
 
-For more details and other examples see the [Block Attributes documentation](https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/).
+For more details and other examples see the [Block Attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md).
 
 ## Edit and Save
 
-The **attributes** are passed to the `edit` and `save` functions, along with a  **setAttributes** parameters for setting the values after the user enters. Additional parameters are also passed in to this functions, see [the edit/save documentation](https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/) for more details.
+The **attributes** are passed to the `edit` and `save` functions, along with a  **setAttributes** parameters for setting the values after the user enters. Additional parameters are also passed in to this functions, see [the edit/save documentation](/docs/designers-developers/developers/block-api/block-edit-save.md) for more details.
 
 The attributes is a JavaScript object containing the values of each attribute, or default values if defined. The setAttributes is a function to update an attribute. If you are familiar with React, this is similar to state and setState.
 
 ## TextControl Component
 
-For this example block, the component we are going to use is the **TextControl** component, it is similar to an HTML text input field. You can see [documentation for TextControl component](https://developer.wordpress.org/block-editor/components/text-control/) and a complete list of components in the handbook. You can also browse an [interactive set of components in this Storybook](https://wordpress.github.io/gutenberg/).
+For this example block, the component we are going to use is the **TextControl** component, it is similar to an HTML text input field. You can see [documentation for TextControl component](/packages/components/src/text-control/README.md) and a complete list of components in the handbook. You can also browse an [interactive set of components in this Storybook](https://wordpress.github.io/gutenberg/).
 
 The component is added similar to an HTML tag, setting a label, the `value` is set to the `attributes.message` and the `onChange` function uses the `setAttributes` to update the url attribute value.
 
