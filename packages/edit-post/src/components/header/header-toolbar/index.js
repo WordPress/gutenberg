@@ -68,50 +68,30 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<ToolbarItem>
-				{ ( itemProps ) => (
-					<Button
-						{ ...itemProps }
-						className="edit-post-header-toolbar__inserter-toggle"
-						isPrimary
-						isPressed={ isInserterOpen }
-						onClick={ onToggleInserter }
-						disabled={ ! isInserterEnabled }
-						icon={ plus }
-						label={ _x(
-							'Add block',
-							'Generic label for block inserter button'
-						) }
-					/>
+			<ToolbarItem
+				as={ Button }
+				className="edit-post-header-toolbar__inserter-toggle"
+				isPrimary
+				isPressed={ isInserterOpen }
+				onClick={ onToggleInserter }
+				disabled={ ! isInserterEnabled }
+				icon={ plus }
+				label={ _x(
+					'Add block',
+					'Generic label for block inserter button'
 				) }
-			</ToolbarItem>
-			{ isLargeViewport && (
-				<ToolbarItem>
-					{ ( itemProps ) => <ToolSelector { ...itemProps } /> }
-				</ToolbarItem>
-			) }
-			<ToolbarItem>
-				{ ( itemProps ) => <EditorHistoryUndo { ...itemProps } /> }
-			</ToolbarItem>
-			<ToolbarItem>
-				{ ( itemProps ) => <EditorHistoryRedo { ...itemProps } /> }
-			</ToolbarItem>
-			<ToolbarItem>
-				{ ( itemProps ) => (
-					<TableOfContents
-						hasOutlineItemsDisabled={ isTextModeEnabled }
-						{ ...itemProps }
-					/>
-				) }
-			</ToolbarItem>
-			<ToolbarItem>
-				{ ( itemProps ) => (
-					<BlockNavigationDropdown
-						isDisabled={ isTextModeEnabled }
-						{ ...itemProps }
-					/>
-				) }
-			</ToolbarItem>
+			/>
+			{ isLargeViewport && <ToolbarItem as={ ToolSelector } /> }
+			<ToolbarItem as={ EditorHistoryUndo } />
+			<ToolbarItem as={ EditorHistoryRedo } />
+			<ToolbarItem
+				as={ TableOfContents }
+				hasOutlineItemsDisabled={ isTextModeEnabled }
+			/>
+			<ToolbarItem
+				as={ BlockNavigationDropdown }
+				isDisabled={ isTextModeEnabled }
+			/>
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />
