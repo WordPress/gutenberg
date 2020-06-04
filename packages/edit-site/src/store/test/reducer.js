@@ -99,15 +99,6 @@ describe( 'state', () => {
 			).toEqual( 2 );
 		} );
 
-		it( 'should update when a template is added', () => {
-			expect(
-				templateId( 1, {
-					type: 'ADD_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( 2 );
-		} );
-
 		it( 'should update when a page is set', () => {
 			expect(
 				templateId( 1, {
@@ -152,14 +143,6 @@ describe( 'state', () => {
 			expect(
 				templateType( undefined, {
 					type: 'SET_TEMPLATE',
-				} )
-			).toEqual( 'wp_template' );
-		} );
-
-		it( 'should update when a template is added', () => {
-			expect(
-				templateType( undefined, {
-					type: 'ADD_TEMPLATE',
 				} )
 			).toEqual( 'wp_template' );
 		} );

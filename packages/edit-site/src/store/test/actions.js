@@ -32,7 +32,7 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'addTemplate', () => {
-		it( 'should yield the DISPATCH control to create the template and return the ADD_TEMPLATE action', () => {
+		it( 'should yield the DISPATCH control to create the template and return the SET_TEMPLATE action', () => {
 			const template = { slug: 'index' };
 			const newTemplate = { id: 1 };
 
@@ -45,7 +45,7 @@ describe( 'actions', () => {
 			} );
 			expect( it.next( newTemplate ) ).toEqual( {
 				value: {
-					type: 'ADD_TEMPLATE',
+					type: 'SET_TEMPLATE',
 					templateId: newTemplate.id,
 				},
 				done: true,

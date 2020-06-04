@@ -107,7 +107,6 @@ export function homeTemplateId( state ) {
 export function templateId( state, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
-		case 'ADD_TEMPLATE':
 		case 'SET_PAGE':
 			return action.templateId;
 	}
@@ -143,7 +142,6 @@ export function templatePartId( state, action ) {
 export function templateType( state, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
-		case 'ADD_TEMPLATE':
 		case 'SET_PAGE':
 			return 'wp_template';
 		case 'SET_TEMPLATE_PART':

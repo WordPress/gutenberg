@@ -66,7 +66,7 @@ export function* addTemplate( template ) {
 		template
 	);
 	return {
-		type: 'ADD_TEMPLATE',
+		type: 'SET_TEMPLATE',
 		templateId: newTemplate.id,
 	};
 }
