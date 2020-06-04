@@ -25,7 +25,7 @@ function BlockCompare( {
 	convertor,
 	convertButtonText,
 } ) {
-	const getDifference = ( originalContent, newContent ) => {
+	function getDifference( originalContent, newContent ) {
 		const difference = diffChars( originalContent, newContent );
 
 		return difference.map( ( item, pos ) => {
@@ -40,9 +40,9 @@ function BlockCompare( {
 				</span>
 			);
 		} );
-	};
+	}
 
-	const getConvertedContent = ( convertedBlock ) => {
+	function getConvertedContent( convertedBlock ) {
 		// The convertor may return an array of items or a single item
 		const newBlocks = castArray( convertedBlock );
 
@@ -58,7 +58,7 @@ function BlockCompare( {
 			rawContent: newContent.join( '' ),
 			renderedContent,
 		};
-	};
+	}
 
 	const original = {
 		rawContent: block.originalContent,
