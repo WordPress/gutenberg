@@ -18,7 +18,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 *
 	 * @return string Path without the prefix or the original value.
 	 */
-	function gutenberg_remove_block_asset_path_prefix( $asset_handle_or_path ) {
+	function remove_block_asset_path_prefix( $asset_handle_or_path ) {
 		$path_prefix = 'file:';
 		if ( strpos( $asset_handle_or_path, $path_prefix ) !== 0 ) {
 			return $asset_handle_or_path;
@@ -40,7 +40,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 *
 	 * @return string Generated asset name for the block's field.
 	 */
-	function gutenberg_generate_block_asset_handle( $block_name, $field_name ) {
+	function generate_block_asset_handle( $block_name, $field_name ) {
 		$field_mappings = array(
 			'editorScript' => 'editor-script',
 			'script'       => 'script',
@@ -71,12 +71,12 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			return false;
 		}
 		$script_handle = $metadata[ $field_name ];
-		$script_path   = gutenberg_remove_block_asset_path_prefix( $metadata[ $field_name ] );
+		$script_path   = remove_block_asset_path_prefix( $metadata[ $field_name ] );
 		if ( $script_handle === $script_path ) {
 			return $script_handle;
 		}
 
-		$script_handle     = gutenberg_generate_block_asset_handle( $metadata['name'], $field_name );
+		$script_handle     = generate_block_asset_handle( $metadata['name'], $field_name );
 		$script_asset_path = realpath(
 			dirname( $metadata['file'] ) . '/' .
 			substr_replace( $script_path, '.asset.php', - strlen( '.js' ) )
@@ -88,7 +88,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 				$field_name,
 				$metadata['name']
 			);
-			_doing_it_wrong( __METHOD__, $message, '5.5.0' );
+			_doing_it_wrong( __FUNCTION__, $message, '5.5.0' );
 			return false;
 		}
 		$script_asset = require( $script_asset_path );
@@ -119,12 +119,12 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			return false;
 		}
 		$style_handle = $metadata[ $field_name ];
-		$style_path   = gutenberg_remove_block_asset_path_prefix( $metadata[ $field_name ] );
+		$style_path   = remove_block_asset_path_prefix( $metadata[ $field_name ] );
 		if ( $style_handle === $style_path ) {
 			return $style_handle;
 		}
 
-		$style_handle = gutenberg_generate_block_asset_handle( $metadata['name'], $field_name );
+		$style_handle = generate_block_asset_handle( $metadata['name'], $field_name );
 		$block_dir    = dirname( $metadata['file'] );
 		$result       = wp_register_style(
 			$style_handle,

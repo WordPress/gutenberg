@@ -8,35 +8,35 @@
 class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 
 	function test_does_not_remove_block_asset_path_prefix() {
-		$result = gutenberg_remove_block_asset_path_prefix( 'script-handle' );
+		$result = remove_block_asset_path_prefix( 'script-handle' );
 
 		$this->assertSame( 'script-handle', $result );
 	}
 
 	function test_removes_block_asset_path_prefix() {
-		$result = gutenberg_remove_block_asset_path_prefix( 'file:./block.js' );
+		$result = remove_block_asset_path_prefix( 'file:./block.js' );
 
 		$this->assertSame( './block.js', $result );
 	}
 
 	function test_generate_block_asset_handle() {
-		$block_name = 'my-namespace/my-block';
+		$block_name = 'unit-tests/my-block';
 
 		$this->assertSame(
-			'my-namespace-my-block-editor-script',
-			gutenberg_generate_block_asset_handle( $block_name, 'editorScript' )
+			'unit-tests-my-block-editor-script',
+			generate_block_asset_handle( $block_name, 'editorScript' )
 		);
 		$this->assertSame(
-			'my-namespace-my-block-script',
-			gutenberg_generate_block_asset_handle( $block_name, 'script' )
+			'unit-tests-my-block-script',
+			generate_block_asset_handle( $block_name, 'script' )
 		);
 		$this->assertSame(
-			'my-namespace-my-block-editor-style',
-			gutenberg_generate_block_asset_handle( $block_name, 'editorStyle' )
+			'unit-tests-my-block-editor-style',
+			generate_block_asset_handle( $block_name, 'editorStyle' )
 		);
 		$this->assertSame(
-			'my-namespace-my-block-style',
-			gutenberg_generate_block_asset_handle( $block_name, 'style' )
+			'unit-tests-my-block-style',
+			generate_block_asset_handle( $block_name, 'style' )
 		);
 	}
 
@@ -53,6 +53,20 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 		$this->assertFalse( $result );
 	}
 
+	/**
+	 * @expectedIncorrectUsage register_block_script_handle
+	 */
+	function test_missing_asset_file_register_block_script_handle() {
+		$metadata = array(
+			'file'   => __FILE__,
+			'name'   => 'unit-tests/test-block',
+			'script' => 'file:./fixtures/missing-asset.js',
+		);
+		$result   = register_block_script_handle( $metadata, 'script' );
+
+		$this->assertFalse( $result );
+	}
+
 	function test_handle_passed_register_block_script_handle() {
 		$metadata = array(
 			'editorScript' => 'test-script-handle',
@@ -62,15 +76,26 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 		$this->assertSame( 'test-script-handle', $result );
 	}
 
+	function test_success_register_block_script_handle() {
+		$metadata = array(
+			'file'   => __FILE__,
+			'name'   => 'unit-tests/test-block',
+			'script' => 'file:./fixtures/block.js',
+		);
+		$result   = register_block_script_handle( $metadata, 'script' );
+
+		$this->assertSame( 'unit-tests-test-block-script', $result );
+	}
+
 	function test_field_not_found_register_block_style_handle() {
-		$result = register_block_script_handle( array(), 'style' );
+		$result = register_block_style_handle( array(), 'style' );
 
 		$this->assertFalse( $result );
 	}
 
 	function test_empty_value_found_register_block_style_handle() {
 		$metadata = array( 'style' => '' );
-		$result   = register_block_script_handle( $metadata, 'style' );
+		$result   = register_block_style_handle( $metadata, 'style' );
 
 		$this->assertFalse( $result );
 	}
@@ -79,9 +104,20 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 		$metadata = array(
 			'style' => 'test-style-handle',
 		);
-		$result   = register_block_script_handle( $metadata, 'style' );
+		$result   = register_block_style_handle( $metadata, 'style' );
 
 		$this->assertSame( 'test-style-handle', $result );
+	}
+
+	function test_success_register_block_style_handle() {
+		$metadata = array(
+			'file'  => __FILE__,
+			'name'  => 'unit-tests/test-block',
+			'style' => 'file:./fixtures/block.css',
+		);
+		$result   = register_block_style_handle( $metadata, 'style' );
+
+		$this->assertSame( 'unit-tests-test-block-style', $result );
 	}
 
 	/**
