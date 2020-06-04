@@ -118,7 +118,7 @@ With the above in place, create a new post to load the editor and check the you 
 
 It is a good skill to learn and get comfortable using the web console. This is where JavaScript errors are shown and a nice way to test out snippets of JavaScript. See [Firefox Developer Tools documentation](https://developer.mozilla.org/en-US/docs/Tools).
 
-To open the developer tools in Firefox, use the menu selecting Web Developer : Toggle Tools, or the keyboard shortcuts on Windows is Ctrl+Shift+I, or on Mac Cmd+Shift+I. For me on Linux, the F12 key also works. You can then click Console to view logs.
+To open the developer tools in Firefox, use the menu selecting Web Developer : Toggle Tools, on Chrome, select More Tools -> Developers Tools. For both browers, the keyboard shortcut on Windows is Ctrl+Shift+I, or on Mac Cmd+Shift+I. On Windows & Linux, the F12 key also works. You can then click Console to view logs.
 
 Try running `npm run start` that will start the watch process for automatic rebuilds. If you then make an update to `src/index.js` file, you will see the build run, and if you reload the WordPress editor you'll see the change.
 
