@@ -7,7 +7,8 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { color, reduceMotion, rtl } from '../../utils/style-mixins';
+import NumberControl from '../../number-control';
+import { color, reduceMotion, rtl, space } from '../../utils/style-mixins';
 
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
 
@@ -298,18 +299,17 @@ export const Tooltip = styled.span`
 	) }
 `;
 
-export const InputNumber = styled.input`
+export const InputNumber = styled( NumberControl )`
 	box-sizing: border-box;
 	display: inline-block;
 	margin-top: 0;
-	min-width: 54px;
-	max-width: 120px;
+	width: ${ space( 8 ) };
 
 	input[type='number']& {
 		${ rangeHeight };
 	}
 
-	${ rtl( { marginLeft: 16 } ) }
+	${ rtl( { marginLeft: space( 2 ) } ) }
 `;
 
 export const ActionRightWrapper = styled.span`

@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
-	FilterControl,
+	FilterPresetControl,
 	FocalPointPicker,
 	PanelBody,
 	PanelRow,
@@ -409,7 +409,7 @@ function CoverEdit( {
 					title={ __( 'Filters' ) }
 					initialOpen={ !! backgroundFilter }
 				>
-					<FilterControl
+					<FilterPresetControl
 						filters={ {
 							grayscale: false,
 							hue: false,

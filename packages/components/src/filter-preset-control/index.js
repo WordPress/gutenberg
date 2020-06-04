@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+import {
+	useDisclosureState,
+	Disclosure,
+	DisclosureContent,
+} from 'reakit/Disclosure';
+
 /**
  * WordPress dependencies
  */
@@ -13,6 +19,12 @@ import { useState } from '@wordpress/element';
 import Button from '../button';
 import FilterControl from '../filter-control';
 import SelectControl from '../select-control';
+import {
+	Root,
+	SelectControlWrapper,
+	ControlWrapper,
+} from './styles/filter-preset-control-styles';
+import { useControlledState } from '../utils/hooks';
 
 const { createStyles } = FilterControl;
 
@@ -20,7 +32,7 @@ const presets = [
 	{
 		label: 'None',
 		value: 'none',
-		filters: undefined,
+		filters: {},
 	},
 	{
 		label: 'Vivid',
@@ -52,11 +64,16 @@ const presets = [
 	},
 ];
 
-function FilterPresetControl( { onChange = noop, value, ...props } ) {
-	const [ __state, setState ] = useState( value || {} );
-	const [ preset, setPreset ] = useState( 'none' );
-	const [ isControlVisible, setIsControlVisible ] = useState( false );
-	const state = value || __state;
+function FilterPresetControl( {
+	onChange = noop,
+	value,
+	preset: presetProp = 'none',
+	showControls = false,
+	...props
+} ) {
+	const [ controlledState, setControlledState ] = useControlledState( value );
+	const [ preset, setPreset ] = useState( presetProp );
+	const disclosure = useDisclosureState( { visible: showControls } );
 
 	const getPreset = ( val ) => {
 		return presets.find( ( p ) => p.value === val );
@@ -66,44 +83,55 @@ function FilterPresetControl( { onChange = noop, value, ...props } ) {
 		const nextPreset = getPreset( next );
 		handleOnFilterChange( nextPreset.filters );
 		setPreset( next );
+
+		if ( next === 'none' ) {
+			disclosure.setVisible( false );
+		}
+
+		if ( next === 'custom' ) {
+			disclosure.setVisible( true );
+		}
 	};
 
 	const handleOnFilterChange = ( next ) => {
 		const styles = createStyles( next );
 
-		setState( next );
+		setControlledState( next );
 		onChange( next, { styles } );
 
+		if ( preset !== 'custom' ) {
+			setPreset( 'custom' );
+		}
+
 		if ( ! value ) {
-			setState( next );
+			setControlledState( next );
 		}
 	};
 
-	const buttonLabel = isControlVisible ? 'Hide Controls' : 'Show Controls';
+	const buttonLabel = disclosure.visible ? 'Hide Controls' : 'Show Controls';
 
 	return (
-		<div>
-			<SelectControl
-				label="Preset"
-				options={ presets }
-				value={ preset }
-				onChange={ handleOnPresetChange }
-			/>
-			<Button
-				isTertiary
-				isSmall
-				onClick={ () => setIsControlVisible( ! isControlVisible ) }
-			>
+		<Root>
+			<SelectControlWrapper>
+				<SelectControl
+					className="hello"
+					label="Preset"
+					options={ presets }
+					value={ preset }
+					onChange={ handleOnPresetChange }
+				/>
+			</SelectControlWrapper>
+			<Disclosure { ...disclosure } as={ Button } isTertiary isSmall>
 				{ buttonLabel }
-			</Button>
-			<div style={ { display: isControlVisible ? 'block' : 'none' } }>
+			</Disclosure>
+			<DisclosureContent { ...disclosure } as={ ControlWrapper }>
 				<FilterControl
 					{ ...props }
-					value={ state }
+					value={ controlledState }
 					onChange={ handleOnFilterChange }
 				/>
-			</div>
-		</div>
+			</DisclosureContent>
+		</Root>
 	);
 }
 

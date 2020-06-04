@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Custom hooks for "controlled" components to track and consolidate internal
@@ -23,16 +23,14 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * @return {[*, Function]} The controlled value and the value setter.
  */
 export function useControlledState( initialState ) {
-	const [ state, setState ] = useState( initialState );
-	const lastInitialStateRef = useRef( initialState );
+	const [ internalState, setInternalState ] = useState( initialState );
+	const state = initialState || internalState;
 
-	useEffect( () => {
-		// Update the internal state if the incoming value changes.
-		if ( initialState !== lastInitialStateRef.current ) {
-			lastInitialStateRef.current = initialState;
-			setState( initialState );
+	const setState = ( nextState ) => {
+		if ( initialState === undefined ) {
+			setInternalState( nextState );
 		}
-	}, [ initialState ] );
+	};
 
 	return [ state, setState ];
 }

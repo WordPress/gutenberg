@@ -45,6 +45,7 @@ export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
 export { default as FilterControl } from './filter-control';
+export { default as FilterPresetControl } from './filter-preset-control';
 export { default as Flex } from './flex';
 export { default as FlexBlock } from './flex/block';
 export { default as FlexItem } from './flex/item';

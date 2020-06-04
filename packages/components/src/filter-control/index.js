@@ -8,13 +8,14 @@ import { pickBy, noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import RangeControl from '../range-control';
 import { createStyles } from './utils';
+import { useControlledState } from '../utils/hooks';
 import { interpolate } from '../utils/interpolate';
 import { Root } from './styles/filter-control-styles';
 
@@ -33,9 +34,9 @@ function FilterControl(
 	{ className, filters = defaultFilters, value, onChange = noop, ...props },
 	ref
 ) {
-	const [ __state, setState ] = useState( value || {} );
+	const [ controlledState, setControlledState ] = useControlledState( value );
 	const filterOptions = { ...defaultFilters, ...filters };
-	const state = value || __state;
+	const state = controlledState || {};
 
 	const classes = classnames( 'components-filter-control', className );
 
@@ -48,7 +49,7 @@ function FilterControl(
 		onChange( nextState, { styles } );
 
 		if ( ! value ) {
-			setState( nextState );
+			setControlledState( nextState );
 		}
 	};
 
