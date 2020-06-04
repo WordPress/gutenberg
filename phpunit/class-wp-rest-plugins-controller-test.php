@@ -725,7 +725,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertCount( 11, $properties );
+		$this->assertCount( 12, $properties );
 		$this->assertArrayHasKey( 'plugin', $properties );
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'name', $properties );
@@ -737,6 +737,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'network_only', $properties );
 		$this->assertArrayHasKey( 'requires_wp', $properties );
 		$this->assertArrayHasKey( 'requires_php', $properties );
+		$this->assertArrayHasKey( 'text_domain', $properties );
 	}
 
 	/**
@@ -759,6 +760,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( false, $data['network_only'] );
 		$this->assertEquals( '5.6.0', $data['requires_php'] );
 		$this->assertEquals( '5.4.0', $data['requires_wp'] );
+		$this->assertEquals( 'test-plugin', $data['text_domain'] );
 	}
 
 	/**
@@ -850,6 +852,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
  * Version: 1.5.4
  * Author: WordPress.org
  * Author URI: https://wordpress.org/
+ * Text Domain: test-plugin
  * Requires PHP: 5.6.0
  * Requires at least: 5.4.0{$network}
  */

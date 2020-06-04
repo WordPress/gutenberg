@@ -537,6 +537,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			'network_only' => $item['Network'],
 			'requires_wp'  => $item['RequiresWP'],
 			'requires_php' => $item['RequiresPHP'],
+			'text_domain'  => $item['TextDomain'],
 		);
 
 		$data = $this->add_additional_fields_to_object( $data, $request );
@@ -800,6 +801,12 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'text_domain'  => array(
+					'description' => __( 'The plugin\'s text domain.', 'gutenberg' ),
+					'type'        => 'string',
+					'readonly'    => true,
+					'context'     => array( 'view', 'edit' ),
 				),
 			),
 		);
