@@ -163,6 +163,52 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 200, $response->get_status() );
 	}
 
+	/**
+	 * @group ms-required
+	 */
+	public function test_get_items_excludes_network_only_plugin_if_not_active() {
+		$this->create_test_plugin( true );
+		$this->enable_plugins_menu_item();
+		wp_set_current_user( self::$admin );
+
+		$response = rest_do_request( self::BASE );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) );
+		$this->assertCount( 0, $items );
+	}
+
+	/**
+	 * @group ms-excluded
+	 */
+	public function test_get_items_does_not_exclude_network_only_plugin_if_not_active_on_single_site() {
+		$this->create_test_plugin( true );
+		wp_set_current_user( self::$admin );
+
+		$response = rest_do_request( self::BASE );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) );
+		$this->assertCount( 1, $items );
+		$this->check_get_plugin_data( array_shift( $items ), true );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_get_items_does_not_exclude_network_only_plugin_if_not_active_but_has_network_caps() {
+		$this->create_test_plugin( true );
+		$this->enable_plugins_menu_item();
+		wp_set_current_user( self::$super_admin );
+
+		$response = rest_do_request( self::BASE );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) );
+		$this->assertCount( 1, $items );
+		$this->check_get_plugin_data( array_shift( $items ), true );
+	}
+
 	public function test_get_item() {
 		$this->create_test_plugin();
 		wp_set_current_user( self::$super_admin );
@@ -719,6 +765,21 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'network-active', $response->get_data()['status'] );
 	}
 
+	/**
+	 * @group ms-required
+	 */
+	public function test_prepare_item_network_only() {
+		$this->create_test_plugin( true );
+
+		$item          = get_plugins()[ self::PLUGIN_FILE ];
+		$item['_file'] = self::PLUGIN_FILE;
+
+		$endpoint = new WP_REST_Plugins_Controller();
+		$response = $endpoint->prepare_item_for_response( $item, new WP_REST_Request( 'GET', self::BASE . '/' . self::PLUGIN ) );
+
+		$this->check_get_plugin_data( $response->get_data(), true );
+	}
+
 	public function test_get_item_schema() {
 		$request    = new WP_REST_Request( 'OPTIONS', self::BASE );
 		$response   = rest_get_server()->dispatch( $request );
@@ -745,9 +806,10 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 * @since 5.5.0
 	 *
-	 * @param array $data Prepared plugin data.
+	 * @param array $data         Prepared plugin data.
+	 * @param bool  $network_only Whether the plugin is network only.
 	 */
-	protected function check_get_plugin_data( $data ) {
+	protected function check_get_plugin_data( $data, $network_only = false ) {
 		$this->assertEquals( 'test-plugin/test-plugin.php', $data['plugin'] );
 		$this->assertEquals( '1.5.4', $data['version'] );
 		$this->assertEquals( 'inactive', $data['status'] );
@@ -757,7 +819,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'https://wordpress.org/', $data['author_uri'] );
 		$this->assertEquals( "My 'Cool' Plugin", $data['description']['raw'] );
 		$this->assertEquals( 'My &#8216;Cool&#8217; Plugin <cite>By <a href="https://wordpress.org/">WordPress.org</a>.</cite>', $data['description']['rendered'] );
-		$this->assertEquals( false, $data['network_only'] );
+		$this->assertEquals( $network_only, $data['network_only'] );
 		$this->assertEquals( '5.6.0', $data['requires_php'] );
 		$this->assertEquals( '5.4.0', $data['requires_wp'] );
 		$this->assertEquals( 'test-plugin', $data['text_domain'] );
