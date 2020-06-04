@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -104,31 +104,40 @@ function PostAuthorEdit( {
 		avatarSize = attributes.avatarSize;
 	}
 
-	const blockClassNames = classnames( 'wp-block-post-author', {
-		[ `has-text-align-${ align }` ]: align,
-	} );
+	const classNames = useMemo( () => {
+		return {
+			block: classnames( 'wp-block-post-author', {
+				[ `has-text-align-${ align }` ]: align,
+			} ),
+			name: classnames( 'wp-block-post-author__name', {
+				[ fontSize.class ]: fontSize.class,
+			} ),
+			bio: classnames( 'wp-block-post-author__bio', {
+				[ bioFontSize.class ]: bioFontSize.class,
+			} ),
+			byline: classnames( 'wp-block-post-author__byline', {
+				[ bylineFontSize.class ]: bylineFontSize.class,
+			} ),
+		};
+	}, [ align, fontSize.class, bioFontSize.class, bylineFontSize.class ] );
 
-	const authorClassNames = classnames( 'wp-block-post-author__name', {
-		[ fontSize.class ]: fontSize.class,
-	} );
-
-	const bioClassNames = classnames( 'wp-block-post-author__bio', {
-		[ bioFontSize.class ]: bioFontSize.class,
-	} );
-
-	const bylineClassNames = classnames( 'wp-block-post-author__byline', {
-		[ bylineFontSize.class ]: bylineFontSize.class,
-	} );
-
-	const authorInlineStyles = {
-		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-	};
-	const bioInlineStyles = {
-		fontSize: bioFontSize.size ? bioFontSize.size + 'px' : undefined,
-	};
-	const bylineInlineStyles = {
-		fontSize: bylineFontSize.size ? bylineFontSize.size + 'px' : undefined,
-	};
+	const inlineStyles = useMemo( () => {
+		return {
+			name: {
+				fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+			},
+			bio: {
+				fontSize: bioFontSize.size
+					? bioFontSize.size + 'px'
+					: undefined,
+			},
+			byline: {
+				fontSize: bylineFontSize.size
+					? bylineFontSize.size + 'px'
+					: undefined,
+			},
+		};
+	}, [ fontSize.size, bioFontSize.size, bylineFontSize.size ] );
 
 	return (
 		<>
@@ -224,7 +233,7 @@ function PostAuthorEdit( {
 
 			<TextColor>
 				<BackgroundColor>
-					<div ref={ ref } className={ blockClassNames }>
+					<div ref={ ref } className={ classNames.block }>
 						{ showAvatar && authorDetails && (
 							<div className="wp-block-post-author__avatar">
 								<img
@@ -240,26 +249,26 @@ function PostAuthorEdit( {
 							{ ( ! RichText.isEmpty( byline ) ||
 								isSelected ) && (
 								<RichText
-									className={ bylineClassNames }
+									className={ classNames.byline }
 									multiline={ false }
 									placeholder={ __( 'Write byline …' ) }
 									value={ byline }
 									onChange={ ( value ) =>
 										setAttributes( { byline: value } )
 									}
-									style={ bylineInlineStyles }
+									style={ inlineStyles.byline }
 								/>
 							) }
 							<p
-								className={ authorClassNames }
-								style={ authorInlineStyles }
+								className={ classNames.name }
+								style={ inlineStyles.name }
 							>
 								{ authorDetails?.name }
 							</p>
 							{ showBio && (
 								<p
-									className={ bioClassNames }
-									style={ bioInlineStyles }
+									className={ classNames.bio }
+									style={ inlineStyles.bio }
 								>
 									{ authorDetails?.description }
 								</p>
