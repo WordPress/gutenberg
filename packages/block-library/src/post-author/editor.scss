@@ -15,11 +15,19 @@
 .wp-block-post-author__content {
 	flex-grow: 1;
 	flex-basis: 0;
+	// To fix unknown space added in editor
+	margin-bottom: -$grid-unit-10;
 }
 
 .block-editor__container .wp-block-post-author__avatar img,
 .edit-site-visual-editor .wp-block-post-author__avatar img {
 	margin: 0;
+}
+
+.block-editor__container .wp-block-post-author__avatar,
+.edit-site-visual-editor .wp-block-post-author__avatar {
+	// To fix unknown space added in editor
+	margin-bottom: -$grid-unit-10;
 }
 
 .block-editor__container .wp-block-post-author__name,
