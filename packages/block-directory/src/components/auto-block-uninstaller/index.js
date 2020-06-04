@@ -37,11 +37,8 @@ export default function AutoBlockUninstaller() {
 	);
 
 	const shouldRemoveBlockTypes = useSelect( ( select ) => {
-		select( 'core/block-editor' ).getBlocks();
-		const { isCurrentPostPublished, isSavingPost } = select(
-			'core/editor'
-		);
-		return ! isCurrentPostPublished() && isSavingPost();
+		const { isAutosavingPost, isSavingPost } = select( 'core/editor' );
+		return isSavingPost() && ! isAutosavingPost();
 	} );
 
 	const unusedBlockTypes = useSelect(
