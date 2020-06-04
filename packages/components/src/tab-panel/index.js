@@ -8,7 +8,7 @@ import { partial, noop, find } from 'lodash';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -32,13 +32,13 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 const TabPanel = ( {
 	className,
 	children,
-	instanceId,
 	tabs,
 	initialTabName,
 	orientation = 'horizontal',
 	activeClass = 'is-active',
 	onSelect = noop,
 } ) => {
+	const instanceId = useInstanceId( TabPanel );
 	const [ selected, setSelected ] = useState(
 		initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null )
 	);
@@ -96,4 +96,4 @@ const TabPanel = ( {
 	);
 };
 
-export default withInstanceId( TabPanel );
+export default TabPanel;
