@@ -18,14 +18,14 @@ describe( 'state', () => {
 	describe( 'downloadableBlocks()', () => {
 		it( 'should update state to reflect active search', () => {
 			const initialState = {};
-			const blockName = 'Awesome Block';
+			const filterValue = 'Awesome Block';
 
 			const state = downloadableBlocks( initialState, {
 				type: 'FETCH_DOWNLOADABLE_BLOCKS',
-				filterValue: blockName,
+				filterValue,
 			} );
 
-			expect( state[ blockName ].isRequesting ).toEqual( true );
+			expect( state[ filterValue ].isRequesting ).toEqual( true );
 		} );
 
 		it( 'should update state to reflect search results have returned', () => {
