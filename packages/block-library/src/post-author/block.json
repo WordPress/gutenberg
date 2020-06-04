@@ -1,6 +1,6 @@
 {
 	"name": "core/post-author",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"align": {
 			"type": "string"

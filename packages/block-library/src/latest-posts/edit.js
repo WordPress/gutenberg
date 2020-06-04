@@ -21,7 +21,7 @@ import {
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
 import {
 	InspectorControls,
@@ -47,12 +47,16 @@ import {
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
+const USERS_LIST_QUERY = {
+	per_page: -1,
+};
 
 class LatestPostsEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
 			categoriesList: [],
+			authorList: [],
 		};
 	}
 
@@ -71,6 +75,19 @@ class LatestPostsEdit extends Component {
 					this.setState( { categoriesList: [] } );
 				}
 			} );
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/users`, USERS_LIST_QUERY ),
+		} )
+			.then( ( authorList ) => {
+				if ( this.isStillMounted ) {
+					this.setState( { authorList } );
+				}
+			} )
+			.catch( () => {
+				if ( this.isStillMounted ) {
+					this.setState( { authorList: [] } );
+				}
+			} );
 	}
 
 	componentWillUnmount() {
@@ -86,17 +103,19 @@ class LatestPostsEdit extends Component {
 			defaultImageWidth,
 			defaultImageHeight,
 		} = this.props;
-		const { categoriesList } = this.state;
+		const { categoriesList, authorList } = this.state;
 		const {
 			displayFeaturedImage,
 			displayPostContentRadio,
 			displayPostContent,
 			displayPostDate,
+			displayAuthor,
 			postLayout,
 			columns,
 			order,
 			orderBy,
 			categories,
+			selectedAuthor,
 			postsToShow,
 			excerptLength,
 			featuredImageAlign,
@@ -178,6 +197,13 @@ class LatestPostsEdit extends Component {
 
 				<PanelBody title={ __( 'Post meta settings' ) }>
 					<ToggleControl
+						label={ __( 'Display author name' ) }
+						checked={ displayAuthor }
+						onChange={ ( value ) =>
+							setAttributes( { displayAuthor: value } )
+						}
+					/>
+					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
 						onChange={ ( value ) =>
@@ -258,6 +284,14 @@ class LatestPostsEdit extends Component {
 						categorySuggestions={ categorySuggestions }
 						onCategoryChange={ selectCategories }
 						selectedCategories={ categories }
+						onAuthorChange={ ( value ) =>
+							setAttributes( {
+								selectedAuthor:
+									'' !== value ? Number( value ) : undefined,
+							} )
+						}
+						authorList={ authorList }
+						selectedAuthorId={ selectedAuthor }
 					/>
 
 					{ postLayout === 'grid' && (
@@ -333,6 +367,7 @@ class LatestPostsEdit extends Component {
 						'wp-block-latest-posts__list': true,
 						'is-grid': postLayout === 'grid',
 						'has-dates': displayPostDate,
+						'has-author': displayAuthor,
 						[ `columns-${ columns }` ]: postLayout === 'grid',
 					} ) }
 				>
@@ -343,6 +378,9 @@ class LatestPostsEdit extends Component {
 							'trim',
 						] );
 						let excerpt = post.excerpt.rendered;
+						const currentAuthor = authorList.find(
+							( author ) => author.id === post.author
+						);
 
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
@@ -411,6 +449,15 @@ class LatestPostsEdit extends Component {
 										__( '(no title)' )
 									) }
 								</a>
+								{ displayAuthor && (
+									<div className="wp-block-latest-posts__post-author">
+										{ sprintf(
+											/* translators: byline. %s: current author. */
+											__( 'by %s' ),
+											currentAuthor.name
+										) }
+									</div>
+								) }
 								{ displayPostDate && post.date_gmt && (
 									<time
 										dateTime={ format(
@@ -455,6 +502,7 @@ export default withSelect( ( select, props ) => {
 		order,
 		orderBy,
 		categories,
+		selectedAuthor,
 	} = props.attributes;
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
@@ -466,6 +514,7 @@ export default withSelect( ( select, props ) => {
 	const latestPostsQuery = pickBy(
 		{
 			categories: catIds,
+			author: selectedAuthor,
 			order,
 			orderby: orderBy,
 			per_page: postsToShow,

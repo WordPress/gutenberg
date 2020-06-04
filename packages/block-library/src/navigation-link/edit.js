@@ -29,7 +29,6 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
-	__experimentalBlockNavigationEditor as BlockNavigationEditor,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
@@ -199,12 +198,6 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockNavigationEditor
-				value={ label }
-				onChange={ ( labelValue ) =>
-					setAttributes( { label: labelValue } )
-				}
-			/>
 			<Block.li
 				className={ classnames( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
