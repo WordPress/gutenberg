@@ -600,7 +600,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error
 	 */
 	protected function plugin_status_permission_check( $plugin, $new_status, $current_status ) {
-		if ( ( 'network-active' === $current_status || 'network-active' === $new_status ) && ! current_user_can( 'manage_network_plugins' ) ) {
+		if ( is_multisite() && ( 'network-active' === $current_status || 'network-active' === $new_status ) && ! current_user_can( 'manage_network_plugins' ) ) {
 			return new WP_Error(
 				'rest_cannot_manage_network_plugins',
 				__( 'Sorry, you do not have permission to manage network plugins.', 'gutenberg' ),
