@@ -63,6 +63,10 @@ export const settings = {
 			'data-align': attributes.align,
 		};
 	},
+	prePublishAction() {
+		// Upload edited files as new files before publish, and replace the id
+		// and src before sending the post content to the server.
+	},
 	transforms,
 	edit,
 	save,

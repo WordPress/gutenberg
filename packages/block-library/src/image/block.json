@@ -68,6 +68,10 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"rotate": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"supports": {

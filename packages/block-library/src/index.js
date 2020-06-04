@@ -46,7 +46,7 @@ import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
-import * as richImage from './rich-image';
+// import * as richImage from './rich-image';
 import * as rss from './rss';
 import * as search from './search';
 import * as group from './group';
@@ -218,6 +218,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				].forEach( registerBlock );
 
 				// Attach rich image tools to the image and cover blocks.
-				richImage.registerBlock();
+				// richImage.registerBlock();
 		  }
 		: undefined;

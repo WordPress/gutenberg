@@ -10,6 +10,7 @@ import { calculatePreferedImageSize } from './utils';
 
 export default function useImageSize( ref, src, dependencies ) {
 	const [ state, setState ] = useState( {
+		image: null,
 		imageWidth: null,
 		imageHeight: null,
 		imageWidthWithinContainer: null,
@@ -31,6 +32,7 @@ export default function useImageSize( ref, src, dependencies ) {
 			);
 
 			setState( {
+				image,
 				imageWidth: image.width,
 				imageHeight: image.height,
 				imageWidthWithinContainer: width,

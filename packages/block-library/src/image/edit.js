@@ -17,6 +17,7 @@ import {
 	TextControl,
 	ToolbarGroup,
 	withNotices,
+	Button,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -36,7 +37,7 @@ import {
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import { image as icon } from '@wordpress/icons';
+import { image as icon, rotateRight } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -110,6 +111,7 @@ export function ImageEdit( {
 		height,
 		linkTarget,
 		sizeSlug,
+		rotate,
 	},
 	setAttributes,
 	isSelected,
@@ -162,6 +164,7 @@ export function ImageEdit( {
 				id: undefined,
 				title: undefined,
 				caption: undefined,
+				rotate: 0,
 			} );
 			return;
 		}
@@ -189,6 +192,7 @@ export function ImageEdit( {
 				width: undefined,
 				height: undefined,
 				sizeSlug: DEFAULT_SIZE_SLUG,
+				rotate: 0,
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size"
@@ -370,6 +374,16 @@ export function ImageEdit( {
 					/>
 				</ToolbarGroup>
 			) }
+			{ url && (
+				<ToolbarGroup>
+					<Button
+						icon={ rotateRight }
+						className="components-toolbar__control"
+						label={ __( 'Rotate' ) }
+						onClick={ onRotate }
+					/>
+				</ToolbarGroup>
+			) }
 		</BlockControls>
 	);
 	const src = isExternal ? url : undefined;
@@ -402,7 +416,63 @@ export function ImageEdit( {
 		imageHeightWithinContainer,
 		imageWidth,
 		imageHeight,
+		image: imageEl,
 	} = useImageSize( ref, url, [ align ] );
+	const [ editedUrl, setEditedUrl ] = useState();
+
+	useEffect( () => {
+		if ( ! imageEl ) {
+			return;
+		}
+
+		let angle = rotate % 360;
+
+		if ( angle < 0 ) {
+			angle += 360;
+		}
+
+		if ( angle === 0 ) {
+			setEditedUrl();
+			return;
+		}
+
+		const canvas = document.createElement( 'canvas' );
+
+		let translateX = 0;
+		let translateY = 0;
+
+		if ( angle % 180 ) {
+			canvas.width = imageEl.height;
+			canvas.height = imageEl.width;
+		} else {
+			canvas.width = imageEl.width;
+			canvas.height = imageEl.height;
+		}
+
+		if ( angle === 90 || angle === 180 ) {
+			translateX = canvas.width;
+		}
+
+		if ( angle === 270 || angle === 180 ) {
+			translateY = canvas.height;
+		}
+
+		const context = canvas.getContext( '2d' );
+
+		context.translate( translateX, translateY );
+		context.rotate( ( angle * Math.PI ) / 180 );
+		context.drawImage( imageEl, 0, 0 );
+
+		canvas.toBlob( ( blob ) => {
+			setEditedUrl( URL.createObjectURL( blob ) );
+		} );
+	}, [ rotate, imageEl ] );
+
+	function onRotate() {
+		setAttributes( {
+			rotate: ( rotate + 90 ) % 360,
+		} );
+	}
 
 	if ( ! url ) {
 		return (
@@ -501,7 +571,7 @@ export function ImageEdit( {
 		<>
 			{ inspectorControls }
 			<img
-				src={ url }
+				src={ editedUrl || url }
 				alt={ defaultedAlt }
 				onClick={ onImageClick }
 				onError={ () => onImageError() }
