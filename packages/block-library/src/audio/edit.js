@@ -38,12 +38,6 @@ function AudioEdit( {
 	isSelected,
 	noticeUI,
 } ) {
-	// constructor() {
-	// 	super( ...arguments );
-	// 	this.toggleAttribute = this.toggleAttribute.bind( this );
-	// 	this.onSelectURL = this.onSelectURL.bind( this );
-	// 	this.onUploadError = this.onUploadError.bind( this );
-	// }
 	const { id, autoplay, caption, loop, preload, src } = attributes;
 
 	const mediaUpload = useSelect( ( select ) => {
