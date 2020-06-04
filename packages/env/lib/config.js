@@ -265,7 +265,6 @@ module.exports = {
  *
  * @param {?string} sourceString The source string. See README.md for documentation on valid source string patterns.
  * @param {Object} options
- * @param {boolean} options.hasTests Whether or not a `testsPath` is required. Only the 'core' source needs this.
  * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  *
  * @return {?WPSource} A source object.
