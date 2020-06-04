@@ -137,9 +137,19 @@ $media-to-text: 12px;
 .imageWithFocalPoint {
 	overflow: hidden;
 	width: 100%;
+	height: 100%;
 	position: relative;
 }
 
 .imageFill {
 	height: 200px;
+}
+
+.mediaImageContainer {
+	height: 100%;
+	flex-direction: row;
+}
+
+.mediaAreaPadding {
+	width: $media-to-text;
 }

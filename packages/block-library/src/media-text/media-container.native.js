@@ -167,18 +167,26 @@ class MediaContainer extends Component {
 			isSelected,
 			isMediaSelected,
 			imageFill,
+			verticalAlignment,
+			mediaWidth,
+			shouldStack,
 		} = this.props;
 		const { isUploadFailed, retryMessage } = params;
 		const focalPointValues =
 			imageFill && ! focalPoint ? { x: 0.5, y: 0.5 } : focalPoint;
+		const verticalAligment =
+			styles[
+				`is-vertically-aligned-${ verticalAlignment || 'center' }`
+			];
 
 		return (
 			<View
 				style={ [
-					imageFill && {
-						height: styles.imageFill.height,
-					},
 					imageFill && styles.imageWithFocalPoint,
+					imageFill &&
+						shouldStack && {
+							height: styles.imageFill.height,
+						},
 				] }
 			>
 				<TouchableWithoutFeedback
@@ -187,8 +195,14 @@ class MediaContainer extends Component {
 					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
-					<View style={ { flex: 1 } }>
+					<View
+						style={ [
+							styles.mediaImageContainer,
+							verticalAligment,
+						] }
+					>
 						<Image
+							align="center"
 							alt={ mediaAlt }
 							focalPoint={ imageFill && focalPointValues }
 							isSelected={ isMediaSelected && isMediaSelected }
@@ -200,6 +214,7 @@ class MediaContainer extends Component {
 							openMediaOptions={ openMediaOptions }
 							retryMessage={ retryMessage }
 							url={ mediaUrl }
+							width={ mediaWidth }
 						/>
 					</View>
 				</TouchableWithoutFeedback>
@@ -297,49 +312,43 @@ class MediaContainer extends Component {
 
 		if ( mediaUrl ) {
 			return (
-				<View>
-					<MediaUpload
-						onSelect={ this.onSelectMediaUploadOption }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ mediaId }
-						render={ ( { open, getMediaOptions } ) => {
-							onSetOpenPickerRef( open );
+				<MediaUpload
+					onSelect={ this.onSelectMediaUploadOption }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ mediaId }
+					render={ ( { open, getMediaOptions } ) => {
+						onSetOpenPickerRef( open );
 
-							return (
-								<View style={ { flex: 1 } }>
-									{ getMediaOptions() }
+						return (
+							<>
+								{ getMediaOptions() }
 
-									<MediaUploadProgress
-										coverUrl={ coverUrl }
-										mediaId={ mediaId }
-										onUpdateMediaProgress={
-											this.updateMediaProgress
-										}
-										onFinishMediaUploadWithSuccess={
-											this.finishMediaUploadWithSuccess
-										}
-										onFinishMediaUploadWithFailure={
-											this.finishMediaUploadWithFailure
-										}
-										onMediaUploadStateReset={
-											this.mediaUploadStateReset
-										}
-										renderContent={ ( params ) => {
-											return (
-												<View style={ styles.content }>
-													{ this.renderContent(
-														params,
-														open
-													) }
-												</View>
-											);
-										} }
-									/>
-								</View>
-							);
-						} }
-					/>
-				</View>
+								<MediaUploadProgress
+									coverUrl={ coverUrl }
+									mediaId={ mediaId }
+									onUpdateMediaProgress={
+										this.updateMediaProgress
+									}
+									onFinishMediaUploadWithSuccess={
+										this.finishMediaUploadWithSuccess
+									}
+									onFinishMediaUploadWithFailure={
+										this.finishMediaUploadWithFailure
+									}
+									onMediaUploadStateReset={
+										this.mediaUploadStateReset
+									}
+									renderContent={ ( params ) => {
+										return this.renderContent(
+											params,
+											open
+										);
+									} }
+								/>
+							</>
+						);
+					} }
+				/>
 			);
 		}
 		return this.renderPlaceholder();

@@ -93,14 +93,6 @@ const ImageComponent = ( {
 		return <Icon icon={ icon } { ...iconStyle } />;
 	};
 
-	const alignToFlex = {
-		left: 'flex-start',
-		center: 'center',
-		right: 'flex-end',
-		full: 'center',
-		wide: 'center',
-	};
-
 	const iconPlaceholderStyles = usePreferredColorSchemeStyle(
 		styles.iconPlaceholder,
 		styles.iconPlaceholderDark
@@ -111,12 +103,16 @@ const ImageComponent = ( {
 		styles.iconUploadDark
 	);
 
+	const placeholderStyles = usePreferredColorSchemeStyle(
+		styles.imageContainerUpload,
+		styles.imageContainerUploadDark
+	);
+
 	const customWidth =
 		imageData?.width < containerSize?.width ? imageData?.width : '100%';
 
 	const imageContainerStyles = [
 		styles.imageContent,
-		focalPoint && styles.imageWithFocalPoint,
 		{
 			width:
 				imageData && imageWidth > 0 && imageWidth < containerSize?.width
@@ -129,35 +125,39 @@ const ImageComponent = ( {
 					? imageHeight
 					: undefined,
 		},
+		focalPoint &&
+			imageData && {
+				width: imageWidth || '100%',
+				...styles.imageWithFocalPoint,
+			},
 	];
-
-	const placeholderStyles = usePreferredColorSchemeStyle(
-		styles.imageContainerUpload,
-		styles.imageContainerUploadDark
-	);
 
 	const imageStyles = [
 		{
 			aspectRatio: imageData?.aspectRatio,
 			opacity: isUploadInProgress ? 0.3 : 1,
 		},
-		focalPoint &&
+		focalPoint && [
 			getImageWithFocalPointStyles(
 				focalPoint,
 				containerSize,
 				imageData
 			),
+			containerSize?.height > imageWidth && { height: '100%' },
+		],
 	];
 
 	return (
 		<View
-			style={ {
-				flex: 1,
+			style={ [
+				{
+					flex: 1,
+				},
 				// only set alignItems if an image exists because alignItems causes the placeholder
 				// to disappear when an aligned image can't be downloaded
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
-				alignItems: imageData && align && alignToFlex[ align ],
-			} }
+				imageData && align && { alignItems: align },
+			] }
 			onLayout={ onContainerLayout }
 		>
 			<View

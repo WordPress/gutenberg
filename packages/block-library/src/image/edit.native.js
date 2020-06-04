@@ -399,6 +399,14 @@ export class ImageEdit extends React.Component {
 			);
 		}
 
+		const alignToFlex = {
+			left: 'flex-start',
+			center: 'center',
+			right: 'flex-end',
+			full: 'center',
+			wide: 'center',
+		};
+
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<>
 				<TouchableWithoutFeedback
@@ -432,7 +440,7 @@ export class ImageEdit extends React.Component {
 							} ) => {
 								return (
 									<Image
-										align={ align }
+										align={ align && alignToFlex[ align ] }
 										alt={ alt }
 										height={ height }
 										isSelected={

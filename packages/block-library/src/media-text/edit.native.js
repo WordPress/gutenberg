@@ -178,8 +178,8 @@ class MediaTextEdit extends Component {
 		this.openPickerRef = openPicker;
 	}
 
-	renderMediaArea() {
-		const { isMediaSelected } = this.state;
+	renderMediaArea( shouldStack ) {
+		const { isMediaSelected, containerWidth } = this.state;
 		const { attributes, isSelected } = this.props;
 		const {
 			mediaAlt,
@@ -190,7 +190,13 @@ class MediaTextEdit extends Component {
 			mediaWidth,
 			imageFill,
 			focalPoint,
+			verticalAlignment,
 		} = attributes;
+
+		const mediaAreaWidth =
+			( mediaWidth && ! shouldStack
+				? ( containerWidth * mediaWidth ) / 100
+				: containerWidth ) - styles.mediaAreaPadding.width;
 
 		return (
 			<MediaContainer
@@ -202,16 +208,18 @@ class MediaTextEdit extends Component {
 				onSelectMedia={ this.onSelectMedia }
 				onSetOpenPickerRef={ this.onSetOpenPickerRef }
 				onWidthChange={ this.onWidthChange }
+				mediaWidth={ mediaAreaWidth }
 				{ ...{
 					mediaAlt,
 					mediaId,
 					mediaType,
 					mediaUrl,
 					mediaPosition,
-					mediaWidth,
 					imageFill,
 					focalPoint,
 					isSelected,
+					verticalAlignment,
+					shouldStack,
 				} }
 			/>
 		);
@@ -345,9 +353,15 @@ class MediaTextEdit extends Component {
 					onLayout={ this.onLayoutChange }
 				>
 					<View
-						style={ { width: widthString, ...mediaContainerStyle } }
+						style={ [
+							{ flex: 1 },
+							( shouldStack || ! imageFill ) && {
+								width: widthString,
+							},
+							mediaContainerStyle,
+						] }
 					>
-						{ this.renderMediaArea() }
+						{ this.renderMediaArea( shouldStack ) }
 					</View>
 					<View
 						style={ {
