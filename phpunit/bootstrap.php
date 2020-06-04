@@ -70,12 +70,11 @@ function fail_if_died( $message ) {
 }
 tests_add_filter( 'wp_die_handler', 'fail_if_died' );
 
-function _enable_gutenberg_experiments() {
-	return array(
+$GLOBALS['wp_tests_options'] = array(
+	'gutenberg-experiments' => array(
 		'gutenberg-block-directory' => '1',
-	);
-}
-tests_add_filter( 'pre_option_gutenberg-experiments', '_enable_gutenberg_experiments' );
+	),
+);
 
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
