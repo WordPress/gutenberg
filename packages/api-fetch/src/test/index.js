@@ -4,12 +4,6 @@
 import apiFetch from '../';
 
 /**
- * External dependencies
- */
-import getGlobal from 'globalthis';
-import 'isomorphic-fetch';
-
-/**
  * Mock return value for a successful fetch JSON return value.
  *
  * @return {Promise} Mock return value.
@@ -20,18 +14,19 @@ const DEFAULT_FETCH_MOCK_RETURN = Promise.resolve( {
 } );
 
 describe( 'apiFetch', () => {
-	const originalFetch = getGlobal().fetch;
+	/*global globalThis*/
+	const originalFetch = globalThis.fetch;
 
 	beforeEach( () => {
-		getGlobal().fetch = jest.fn();
+		globalThis.fetch = jest.fn();
 	} );
 
 	afterAll( () => {
-		getGlobal().fetch = originalFetch;
+		globalThis.fetch = originalFetch;
 	} );
 
 	it( 'should call the API properly', () => {
-		getGlobal().fetch.mockReturnValue(
+		globalThis.fetch.mockReturnValue(
 			Promise.resolve( {
 				status: 200,
 				json() {
@@ -46,7 +41,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should fetch with non-JSON body', () => {
-		getGlobal().fetch.mockReturnValue( DEFAULT_FETCH_MOCK_RETURN );
+		globalThis.fetch.mockReturnValue( DEFAULT_FETCH_MOCK_RETURN );
 
 		const body = 'FormData';
 
@@ -56,7 +51,7 @@ describe( 'apiFetch', () => {
 			body,
 		} );
 
-		expect( getGlobal().fetch ).toHaveBeenCalledWith(
+		expect( globalThis.fetch ).toHaveBeenCalledWith(
 			'/wp/v2/media?_locale=user',
 			{
 				credentials: 'include',
@@ -70,7 +65,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should fetch with a JSON body', () => {
-		getGlobal().fetch.mockReturnValue( DEFAULT_FETCH_MOCK_RETURN );
+		globalThis.fetch.mockReturnValue( DEFAULT_FETCH_MOCK_RETURN );
 
 		apiFetch( {
 			path: '/wp/v2/posts',
@@ -81,7 +76,7 @@ describe( 'apiFetch', () => {
 			data: {},
 		} );
 
-		expect( getGlobal().fetch ).toHaveBeenCalledWith(
+		expect( globalThis.fetch ).toHaveBeenCalledWith(
 			'/wp/v2/posts?_locale=user',
 			{
 				body: '{}',
@@ -96,7 +91,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should respect developer-provided options', () => {
-		getGlobal().fetch.mockReturnValue( DEFAULT_FETCH_MOCK_RETURN );
+		globalThis.fetch.mockReturnValue( DEFAULT_FETCH_MOCK_RETURN );
 
 		apiFetch( {
 			path: '/wp/v2/posts',
@@ -105,7 +100,7 @@ describe( 'apiFetch', () => {
 			credentials: 'omit',
 		} );
 
-		expect( getGlobal().fetch ).toHaveBeenCalledWith(
+		expect( globalThis.fetch ).toHaveBeenCalledWith(
 			'/wp/v2/posts?_locale=user',
 			{
 				body: '{}',
@@ -120,7 +115,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return the error message properly', () => {
-		getGlobal().fetch.mockReturnValue(
+		globalThis.fetch.mockReturnValue(
 			Promise.resolve( {
 				status: 400,
 				json() {
@@ -141,7 +136,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return invalid JSON error if no json response', () => {
-		getGlobal().fetch.mockReturnValue(
+		globalThis.fetch.mockReturnValue(
 			Promise.resolve( {
 				status: 200,
 			} )
@@ -156,7 +151,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return invalid JSON error if response is not valid', () => {
-		getGlobal().fetch.mockReturnValue(
+		globalThis.fetch.mockReturnValue(
 			Promise.resolve( {
 				status: 200,
 				json() {
@@ -174,7 +169,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return offline error when fetch errors', () => {
-		getGlobal().fetch.mockReturnValue( Promise.reject() );
+		globalThis.fetch.mockReturnValue( Promise.reject() );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
 			expect( body ).toEqual( {
@@ -185,7 +180,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return null if response has no content status code', () => {
-		getGlobal().fetch.mockReturnValue(
+		globalThis.fetch.mockReturnValue(
 			Promise.resolve( {
 				status: 204,
 			} )
@@ -197,7 +192,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should not try to parse the response', () => {
-		getGlobal().fetch.mockReturnValue(
+		globalThis.fetch.mockReturnValue(
 			Promise.resolve( {
 				status: 200,
 			} )
@@ -213,7 +208,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should not try to parse the error', () => {
-		getGlobal().fetch.mockReturnValue(
+		globalThis.fetch.mockReturnValue(
 			Promise.resolve( {
 				status: 400,
 			} )
@@ -235,7 +230,7 @@ describe( 'apiFetch', () => {
 
 		apiFetch( { path: '/random' } );
 
-		expect( getGlobal().fetch ).not.toHaveBeenCalled();
+		expect( globalThis.fetch ).not.toHaveBeenCalled();
 
 		expect( customFetchHandler ).toHaveBeenCalledWith( {
 			path: '/random?_locale=user',

@@ -20,12 +20,6 @@ import {
 } from './utils/response';
 
 /**
- * External dependencies
- */
-import getGlobal from 'globalthis';
-import 'isomorphic-fetch';
-
-/**
  * Default set of header values which should be sent with every request unless
  * explicitly provided through apiFetch options.
  *
@@ -81,7 +75,8 @@ const defaultFetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const responsePromise = getGlobal().fetch( url || path, {
+	/*global globalThis*/
+	const responsePromise = globalThis.fetch( url || path, {
 		...DEFAULT_OPTIONS,
 		...remainingOptions,
 		body,
