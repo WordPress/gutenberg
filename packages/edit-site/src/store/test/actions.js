@@ -54,7 +54,7 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'removeTemplate', () => {
-		it( 'should yield the API_FETCH control, yield the SELECT control to set the page by yielding the DISPATCH control for the SET_PAGE action, and return the REMOVE_TEMPLATE action', () => {
+		it( 'should yield the API_FETCH control and yield the SELECT control to set the page by yielding the DISPATCH control for the SET_PAGE action', () => {
 			const templateId = 1;
 			const page = { path: '/' };
 
@@ -73,15 +73,11 @@ describe( 'actions', () => {
 				args: [],
 			} );
 			expect( it.next( page ).value ).toEqual( {
-				type: 'DISPATCH',
-				storeKey: 'core/edit-site',
-				actionName: 'setPage',
-				args: [ page ],
-			} );
-			expect( it.next() ).toEqual( {
 				value: {
-					type: 'REMOVE_TEMPLATE',
-					templateId,
+					type: 'DISPATCH',
+					storeKey: 'core/edit-site',
+					actionName: 'setPage',
+					args: [ page ],
 				},
 				done: true,
 			} );

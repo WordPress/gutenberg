@@ -83,15 +83,11 @@ export function* removeTemplate( templateId ) {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	yield dispatch(
+	return dispatch(
 		'core/edit-site',
 		'setPage',
 		yield select( 'core/edit-site', 'getPage' )
 	);
-	return {
-		type: 'REMOVE_TEMPLATE',
-		templateId,
-	};
 }
 
 /**
