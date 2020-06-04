@@ -69,14 +69,20 @@ const fetchAllMiddleware = async ( options, next ) => {
 
 	// Iteratively fetch all remaining pages until no "next" header is found.
 	let mergedResults = [].concat( results );
+	let pagedRequests = [];
 	for ( let nextPage = 2; nextPage <= totalPages; nextPage++ ) {
-		const nextResponse = await apiFetch( {
+		const nextRequest = apiFetch( {
 			...modifyQuery( options, {
 				per_page: 100,
 				page: nextPage,
 			} ),
 			parse: false,
 		} );
+		pagedRequests = [ ...pagedRequests, nextRequest ];
+	}
+	const responses = await Promise.all( pagedRequests );
+
+	for ( const nextResponse of responses ) {
 		const nextResults = await parseResponse( nextResponse );
 		mergedResults = mergedResults.concat( nextResults );
 	}
