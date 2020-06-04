@@ -47,11 +47,12 @@ function BlockSelectionButton( {
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
 			);
-			return { index, name, attributes, isBlockMovingMode };
+			const blockMovingMode = isBlockMovingMode();
+			return { index, name, attributes, blockMovingMode };
 		},
 		[ clientId, rootClientId ]
 	);
-	const { index, name, attributes, isBlockMovingMode } = selected;
+	const { index, name, attributes, blockMovingMode } = selected;
 	const { setNavigationMode, removeBlock } = useDispatch(
 		'core/block-editor'
 	);
@@ -82,7 +83,7 @@ function BlockSelectionButton( {
 	const classNames = classnames(
 		'block-editor-block-list__block-selection-button',
 		{
-			'is-navigate-mode': !! isBlockMovingMode(),
+			'is-block-moving-mode': !! blockMovingMode,
 		}
 	);
 
