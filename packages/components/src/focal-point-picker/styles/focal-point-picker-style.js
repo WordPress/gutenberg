@@ -12,7 +12,7 @@ import { color } from '../../utils/style-mixins';
 
 export const MediaWrapper = styled.div`
 	background-color: transparent;
-	border: 1px solid ${color( 'lightGray.500' )};
+	border: 1px solid ${ color( 'lightGray.500' ) };
 	box-sizing: border-box;
 	height: 200px;
 	padding: 14px;
@@ -45,7 +45,7 @@ export const MediaContainer = styled.div`
 `;
 
 export const MediaPlaceholder = styled.div`
-	background: ${color( 'lightGray.300' )};
+	background: ${ color( 'lightGray.300' ) };
 	box-sizing: border-box;
 	height: 170px;
 	max-width: 280px;
@@ -74,11 +74,11 @@ export const GridView = styled.div`
 	transition: opacity 120ms linear;
 	z-index: 1;
 
-	${( { isActive } ) =>
+	${ ( { isActive } ) =>
 		isActive &&
 		`
 		opacity: 1;
-	`}
+	` }
 `;
 
 export const GridLine = styled.div`

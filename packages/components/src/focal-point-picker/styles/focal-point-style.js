@@ -44,5 +44,5 @@ export const PointerIconPathOutline = styled( Path )`
 `;
 
 export const PointerIconPathFill = styled( Path )`
-	fill: ${color( 'ui.brand' )};
+	fill: ${ color( 'ui.brand' ) };
 `;
