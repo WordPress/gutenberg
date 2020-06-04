@@ -96,7 +96,7 @@ export default function Edit( { attributes, className, isSelected, setAttributes
 
 With that in place, rebuild and reload and when you are not editing the message is displayed as it would be for the view, when you click into the block you see the text field.
 
-## An Better Solution
+## A Better Solution
 
 Replacing the Placeholder and TextControl when it is selected or not is jarring and not an ideal situation for this block. This was mainly used to illustrate what can be done depending on your block. It is important to think about the author's experience using the block.
 
