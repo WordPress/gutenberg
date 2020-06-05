@@ -9,7 +9,7 @@ There are two primary uses for dynamic blocks:
 
 For many dynamic blocks, the `save` callback function should be returned as `null`, which tells the editor to save only the [block attributes](/docs/designers-developers/developers/block-api/block-attributes.md) to the database.  These attributes are then passed into the server-side rendering callback, so you can decide how to display the block on the front end of your site. When you return `null`, the editor will skip the block markup validation process, avoiding issues with frequently-changing markup.
 
-If you are using [InnerBlocks](/docs\designers-developers\developers\tutorials\block-tutorial\nested-blocks-inner-blocks.md) in a dynamic block you will need to save the `InnerBlocks` in the `save` callback function using `<InnerBlocks.Content/>`
+If you are using [InnerBlocks](/docs/designers-developers/developers/tutorials/block-tutorial/nested-blocks-inner-blocks.md) in a dynamic block you will need to save the `InnerBlocks` in the `save` callback function using `<InnerBlocks.Content/>`
 
 You can also save an HTML representation of the block. If you provide a server-side rendering callback, this HTML will be replaced with the output of your callback, but will be rendered if your block is deactivated or your render callback is removed.
 
