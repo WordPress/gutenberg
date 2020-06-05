@@ -29,7 +29,7 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 	</Button>
 );
 
-const TabPanel = ( {
+export default function TabPanel( {
 	className,
 	children,
 	tabs,
@@ -37,8 +37,8 @@ const TabPanel = ( {
 	orientation = 'horizontal',
 	activeClass = 'is-active',
 	onSelect = noop,
-} ) => {
-	const instanceId = useInstanceId( TabPanel );
+} ) {
+	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
 	const [ selected, setSelected ] = useState(
 		initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null )
 	);
@@ -53,7 +53,7 @@ const TabPanel = ( {
 	};
 
 	const selectedTab = find( tabs, { name: selected } );
-	const selectedId = instanceId + '-' + selectedTab.name;
+	const selectedId = `${ instanceId }-${ selectedTab.name }`;
 
 	return (
 		<div className={ className }>
@@ -72,8 +72,8 @@ const TabPanel = ( {
 								[ activeClass ]: tab.name === selected,
 							}
 						) }
-						tabId={ instanceId + '-' + tab.name }
-						aria-controls={ instanceId + '-' + tab.name + '-view' }
+						tabId={ `${ instanceId }-${ tab.name }` }
+						aria-controls={ `${ instanceId }-${ tab.name }-view` }
 						selected={ tab.name === selected }
 						key={ tab.name }
 						onClick={ partial( handleClick, tab.name ) }
@@ -86,7 +86,7 @@ const TabPanel = ( {
 				<div
 					aria-labelledby={ selectedId }
 					role="tabpanel"
-					id={ selectedId + '-view' }
+					id={ `${ selectedId }-view` }
 					className="components-tab-panel__tab-content"
 				>
 					{ children( selectedTab ) }
@@ -94,6 +94,4 @@ const TabPanel = ( {
 			) }
 		</div>
 	);
-};
-
-export default TabPanel;
+}
