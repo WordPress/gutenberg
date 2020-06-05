@@ -268,7 +268,7 @@ class MediaContainer extends Component {
 								},
 							] }
 						>
-							{ ! showVideo && (
+							{ showVideo && (
 								<View style={ styles.videoPlayer }>
 									<VideoPlayer
 										isSelected={ isSelected }
@@ -278,7 +278,7 @@ class MediaContainer extends Component {
 									/>
 								</View>
 							) }
-							{ showVideo && (
+							{ ! showVideo && (
 								<View style={ videoPlaceholderStyles }>
 									<View style={ styles.modalIcon }>
 										{ isUploadFailed
