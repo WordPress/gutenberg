@@ -132,14 +132,20 @@ export class UnsupportedBlockEdit extends Component {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ __(
-							"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
-						) }
+						{ __DEV__ ?
+							__(
+								"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser." 
+							)
+							:
+							__(
+								'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' 
+							)
+						}
 					</Text>
 				</View>
 				{
 					// eslint-disable-next-line no-undef
-					//__DEV__  && ( Temporarely removing dev flag
+					__DEV__  &&
 					<>
 						<BottomSheet.Cell
 							label={ __( 'Edit block in web browser' ) }
