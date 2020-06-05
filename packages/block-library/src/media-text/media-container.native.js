@@ -117,12 +117,21 @@ class MediaContainer extends Component {
 	}
 
 	getIcon( iconType ) {
+		const { mediaType, getStylesFromColorScheme } = this.props;
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+				iconStyle =
+					mediaType === MEDIA_TYPE_IMAGE
+						? styles.iconRetry
+						: getStylesFromColorScheme(
+								styles.iconRetryVideo,
+								styles.iconRetryVideoDark
+						  );
+
+				return <Icon icon={ SvgIconRetry } { ...iconStyle } />;
 			case ICON_TYPE.PLACEHOLDER:
-				iconStyle = this.props.getStylesFromColorScheme(
+				iconStyle = getStylesFromColorScheme(
 					styles.iconPlaceholder,
 					styles.iconPlaceholderDark
 				);
@@ -161,23 +170,19 @@ class MediaContainer extends Component {
 	renderImage( params, openMediaOptions ) {
 		const { isUploadInProgress } = this.state;
 		const {
+			aligmentStyles,
 			focalPoint,
+			imageFill,
+			isMediaSelected,
+			isSelected,
 			mediaAlt,
 			mediaUrl,
-			isSelected,
-			isMediaSelected,
-			imageFill,
-			verticalAlignment,
 			mediaWidth,
 			shouldStack,
 		} = this.props;
 		const { isUploadFailed, retryMessage } = params;
 		const focalPointValues =
 			imageFill && ! focalPoint ? { x: 0.5, y: 0.5 } : focalPoint;
-		const verticalAligment =
-			styles[
-				`is-vertically-aligned-${ verticalAlignment || 'center' }`
-			];
 
 		return (
 			<View
@@ -196,10 +201,7 @@ class MediaContainer extends Component {
 					disabled={ ! isSelected }
 				>
 					<View
-						style={ [
-							styles.mediaImageContainer,
-							verticalAligment,
-						] }
+						style={ [ styles.mediaImageContainer, aligmentStyles ] }
 					>
 						<Image
 							align="center"
@@ -223,7 +225,12 @@ class MediaContainer extends Component {
 	}
 
 	renderVideo( params, openMediaOptions ) {
-		const { mediaUrl, isSelected, getStylesFromColorScheme } = this.props;
+		const {
+			aligmentStyles,
+			mediaUrl,
+			isSelected,
+			getStylesFromColorScheme,
+		} = this.props;
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
 		const showVideo =
@@ -233,46 +240,61 @@ class MediaContainer extends Component {
 			styles.videoPlaceholder,
 			styles.videoPlaceholderDark
 		);
+		const retryVideoTextStyles = [
+			styles.uploadFailedText,
+			getStylesFromColorScheme(
+				styles.uploadFailedTextVideo,
+				styles.uploadFailedTextVideoDark
+			),
+		];
 
 		return (
-			<TouchableWithoutFeedback
-				accessible={ ! isSelected }
-				onPress={ this.onMediaPressed }
-				onLongPress={ openMediaOptions }
-				disabled={ ! isSelected }
-			>
-				<View aspectRatio={ VIDEO_ASPECT_RATIO }>
-					{ showVideo && (
-						<View style={ styles.videoContainer }>
-							<VideoPlayer
-								isSelected={ isSelected }
-								style={ styles.video }
-								source={ { uri: mediaUrl } }
-								paused={ true }
-							/>
-						</View>
-					) }
-					{ ! showVideo && (
-						<View style={ videoPlaceholderStyles }>
-							<View style={ styles.modalIcon }>
-								{ isUploadFailed
-									? this.getIcon( ICON_TYPE.RETRY )
-									: this.getIcon( ICON_TYPE.PLACEHOLDER ) }
-							</View>
-							{ isUploadFailed && (
-								<Text
-									style={ [
-										styles.uploadFailedText,
-										styles.uploadFailedTextVideo,
-									] }
-								>
-									{ retryMessage }
-								</Text>
+			<View style={ styles.mediaVideo }>
+				<TouchableWithoutFeedback
+					accessible={ ! isSelected }
+					onPress={ this.onMediaPressed }
+					onLongPress={ openMediaOptions }
+					disabled={ ! isSelected }
+				>
+					<View style={ [ styles.videoContainer, aligmentStyles ] }>
+						<View
+							style={ [
+								styles.videoContent,
+								{
+									aspectRatio: VIDEO_ASPECT_RATIO,
+								},
+							] }
+						>
+							{ ! showVideo && (
+								<View style={ styles.videoPlayer }>
+									<VideoPlayer
+										isSelected={ isSelected }
+										style={ styles.video }
+										source={ { uri: mediaUrl } }
+										paused={ true }
+									/>
+								</View>
+							) }
+							{ showVideo && (
+								<View style={ videoPlaceholderStyles }>
+									<View style={ styles.modalIcon }>
+										{ isUploadFailed
+											? this.getIcon( ICON_TYPE.RETRY )
+											: this.getIcon(
+													ICON_TYPE.PLACEHOLDER
+											  ) }
+									</View>
+									{ isUploadFailed && (
+										<Text style={ retryVideoTextStyles }>
+											{ retryMessage }
+										</Text>
+									) }
+								</View>
 							) }
 						</View>
-					) }
-				</View>
-			</TouchableWithoutFeedback>
+					</View>
+				</TouchableWithoutFeedback>
+			</View>
 		);
 	}
 
