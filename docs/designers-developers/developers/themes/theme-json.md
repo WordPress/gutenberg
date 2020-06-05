@@ -250,25 +250,69 @@ The list of features that are currently supported are:
   },
   "core/paragraph": {
     "styles": {
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      },
       "color": {
         "background": <value>,
         "text": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
       }
     }
   },
   "core/heading/h1": {
     "styles": {
+      "color": {
+        "background": <value>,
+        "text": <value>
+      },
       "typography": {
         "fontSize": <value>,
         "lineHeight": <value>
       },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      }
+    }
+  },
+  "core/heading/h3": {
+    "styles": {
       "color": {
         "background": <value>,
         "text": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      }
+    }
+  },
+  "core/heading/h1": {
+    "styles": {
+      "color": {
+        "background": <value>,
+        "text": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      }
+    }
+  },
+  "core/heading/h6": {
+    "styles": {
+      "color": {
+        "background": <value>,
+        "text": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
       }
     }
   },
