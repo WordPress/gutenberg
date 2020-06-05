@@ -296,6 +296,6 @@ function RangeControl(
 	);
 }
 
-const ForwaredComponent = forwardRef( RangeControl );
+const ForwardedComponent = forwardRef( RangeControl );
 
-export default ForwaredComponent;
+export default ForwardedComponent;
