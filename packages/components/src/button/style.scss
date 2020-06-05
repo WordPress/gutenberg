@@ -196,29 +196,40 @@
 
 	// Link buttons that are red to indicate destructive behavior.
 	&.is-link.is-destructive {
-	  color: #b52727;
+		color: $alert-red;
 	}
 
 	/**
-	 * Buttons that indicate destructive actions.
+	 * Destructive buttons.
 	 */
 
 	&.is-destructive {
 		color: $alert-red;
 		box-shadow: inset 0 0 0 $border-width $alert-red;
 
-		&.is-secondary {
-		  	box-shadow: inset 0 0 0 $border-width darken($alert-red, 15%);
-		}
-
-		&:hover:not(:disabled),
-		&:active:not(:disabled) {
+		&:hover:not(:disabled) {
 			color: darken($alert-red, 20%);
-		  	box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
 		}
 
 		&:focus:not(:disabled) {
-		  	color: $blue-medium-900;
+			color: $blue-medium-900;
+			box-shadow: 0 0 0 $border-width-focus $blue-dark-900;
+		}
+
+		&:active:not(:disabled) {
+			background: $light-gray-tertiary;
+			color: color($theme-color shade(10%));
+			box-shadow: inset 0 0 0 $border-width $dark-gray-200;
+		}
+
+		&:disabled,
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:hover {
+			color: lighten($medium-gray-text, 5%);
+			background: lighten($light-gray-tertiary, 5%);
+			transform: none;
+			box-shadow: inset 0 0 0 $border-width $dark-gray-200;
 		}
 	}
 
