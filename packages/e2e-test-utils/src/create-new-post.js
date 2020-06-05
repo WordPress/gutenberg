@@ -12,6 +12,11 @@ import { visitAdminPage } from './visit-admin-page';
  * Creates new post.
  *
  * @param {Object} obj Object to create new post, along with tips enabling option.
+ * @param {string} [obj.postType] Post type of the new post.
+ * @param {string} [obj.title] Title of the new post.
+ * @param {string} [obj.content] Content of the new post.
+ * @param {string} [obj.excerpt] Excerpt of the new post.
+ * @param {boolean} [obj.showWelcomeGuide] Whether to show the welcome guide.
  */
 export async function createNewPost( {
 	postType,

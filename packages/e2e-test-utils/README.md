@@ -107,6 +107,11 @@ Creates new post.
 _Parameters_
 
 -   _obj_ `Object`: Object to create new post, along with tips enabling option.
+-   _obj.postType_ `[string]`: Post type of the new post.
+-   _obj.title_ `[string]`: Title of the new post.
+-   _obj.content_ `[string]`: Content of the new post.
+-   _obj.excerpt_ `[string]`: Excerpt of the new post.
+-   _obj.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
 <a name="createURL" href="#createURL">#</a> **createURL**
 
