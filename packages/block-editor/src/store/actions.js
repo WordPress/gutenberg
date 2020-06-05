@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { castArray, first, get, includes, last, some } from 'lodash';
 
 /**
@@ -274,9 +275,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 			...block,
 			attributes: {
 				...attributes,
-				className: `${
-					className || ''
-				} is-style-${ blockStyle }`.trim(),
+				className: classnames( className, `is-style-${ blockStyle }` ),
 			},
 		};
 	} );
