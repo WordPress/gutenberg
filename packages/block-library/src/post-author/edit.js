@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
+import { forEach, groupBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -19,6 +19,8 @@ import {
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+
+const DEFAULT_CONTRAST_CHECK_FONT_SIZE = 12;
 
 function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 	const { postType, postId } = context;
@@ -45,6 +47,26 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 
 	const { editEntityRecord } = useDispatch( 'core' );
 
+	// Need font size in number form for named presets to be used in contrastCheckers.
+	const { fontSizes } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
+	const fontSizeIndex = useMemo( () => groupBy( fontSizes, 'slug' ), [
+		fontSizes,
+	] );
+	const contrastCheckFontSize = useMemo(
+		() =>
+			// Custom size if set.
+			attributes.style?.typography?.fontSize ||
+			// Size of preset/named value if set.
+			fontSizeIndex[ attributes.fontSize ]?.[ 0 ].size ||
+			DEFAULT_CONTRAST_CHECK_FONT_SIZE,
+		[
+			attributes.style?.typography?.fontSize,
+			attributes.fontSize,
+			fontSizeIndex,
+		]
+	);
 	const ref = useRef();
 	const {
 		TextColor,
@@ -61,7 +83,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				{
 					backgroundColor: true,
 					textColor: true,
-					// fontSize: fontSize.size,
+					fontSize: contrastCheckFontSize,
 				},
 			],
 			colorDetector: { targetRef: ref },
@@ -69,8 +91,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				initialOpen: true,
 			},
 		},
-		// [ fontSize.size ]
-		[]
+		[ contrastCheckFontSize ]
 	);
 
 	const { align, showAvatar, showBio, byline } = attributes;
