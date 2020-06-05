@@ -134,6 +134,29 @@ const registerBlock = ( block ) => {
 	} );
 };
 
+/**
+ * Function to register a block variations e.g. social icons different types.
+ *
+ * @param {Object} block The block which variations will be registered.
+ *
+ */
+const registerBlockVariations = ( block ) => {
+	const { metadata, settings, name } = block;
+
+	settings.variations.forEach( ( v ) => {
+		registerBlockType( `${ name }-${ v.name }`, {
+			...metadata,
+			name: `${ name }-${ v.name }`,
+			...settings,
+			icon: v.icon(),
+			title: v.title,
+			initialAttributes: {
+				service: v.name,
+			},
+		} );
+	} );
+};
+
 // only enable code block for development
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
@@ -202,6 +225,7 @@ export const registerCoreBlocks = () => {
 		iOSOnly( pullquote ),
 	].forEach( registerBlock );
 
+	registerBlockVariations( socialLink );
 	setDefaultBlockName( paragraph.name );
 	setFreeformContentHandlerName( classic.name );
 	setUnregisteredTypeHandlerName( missing.name );

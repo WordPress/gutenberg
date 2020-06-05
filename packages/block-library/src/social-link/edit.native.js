@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { View, Platform } from 'react-native';
+import { View, Platform, Clipboard } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { InspectorControls, BlockControls } from '@wordpress/block-editor';
+import { BlockControls } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
 import {
 	PanelBody,
@@ -14,65 +14,116 @@ import {
 	ToolbarGroup,
 	BottomSheet,
 	ToolbarButton,
+	UnsupportedFooterControl,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { link } from '@wordpress/icons';
-import { prependHTTP } from '@wordpress/url';
-import { withSelect } from '@wordpress/data';
+import { link, Icon } from '@wordpress/icons';
+import { prependHTTP, isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { getIconBySite, getNameBySite } from './social-list';
+import styles from './editor.scss';
 
-const SocialLinkEdit = ( {
-	attributes,
-	setAttributes,
-	isSelected,
-	editorSidebarOpened,
-} ) => {
-	const { url, service } = attributes;
+const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
+	const { url, service, label } = attributes;
+
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
 
-	const IconComponent = getIconBySite( service );
+	const IconComponent = getIconBySite( service )();
 	const socialLinkName = getNameBySite( service );
 
 	useEffect( () => {
 		setAttributes( { url: prependHTTP( url ) } );
-	}, [ ! isLinkSheetVisible && ! editorSidebarOpened && url ] );
+	}, [ ! isLinkSheetVisible && url ] );
+
+	useEffect( () => {
+		if ( ! url && isLinkSheetVisible ) {
+			getURLFromClipboard();
+		}
+	}, [ isLinkSheetVisible ] );
 
 	function onChangeURL( value ) {
 		setAttributes( { url: value } );
 	}
 
+	function onChangeLabel( value ) {
+		setAttributes( { label: value } );
+	}
+
+	async function getURLFromClipboard() {
+		const clipboardText = await Clipboard.getString();
+
+		if ( ! clipboardText ) {
+			return;
+		}
+		// Check if pasted text is URL
+		if ( ! isURL( clipboardText ) ) {
+			return;
+		}
+
+		setAttributes( { url: clipboardText } );
+	}
+
 	function getLinkSettings( isCompatibleWithSettings = true ) {
 		return (
-			<PanelBody
-				title={ isCompatibleWithSettings && __( 'Link Settings' ) }
-			>
-				<TextControl
-					icon={ link }
-					label={ sprintf(
-						// translators: %s: social link name e.g: "Instagram".
-						__( 'Add %s link' ),
-						socialLinkName
-					) }
-					value={ url || '' }
-					valuePlaceholder={ __( 'Add URL' ) }
-					onChange={ onChangeURL }
-					onSubmit={ () => setIsLinkSheetVisible( false ) }
-					autoCapitalize="none"
-					autoCorrect={ false }
-					// eslint-disable-next-line jsx-a11y/no-autofocus
-					autoFocus={
-						! isCompatibleWithSettings && Platform.OS === 'ios'
+			<>
+				<PanelBody
+					title={
+						isCompatibleWithSettings &&
+						sprintf(
+							/* translators: %s: name of the social service. */
+							__( '%s label' ),
+							socialLinkName
+						)
 					}
-					keyboardType="url"
-				/>
-			</PanelBody>
+					style={
+						! isCompatibleWithSettings && styles.linkSettingsPanel
+					}
+				>
+					<TextControl
+						label={ __( 'URL' ) }
+						value={ url || '' }
+						valuePlaceholder={ __( 'Add URL' ) }
+						onChange={ onChangeURL }
+						onSubmit={ () => setIsLinkSheetVisible( false ) }
+						autoCapitalize="none"
+						autoCorrect={ false }
+						// eslint-disable-next-line jsx-a11y/no-autofocus
+						autoFocus={ Platform.OS === 'ios' }
+						keyboardType="url"
+					/>
+					<TextControl
+						label={ __( 'Link label' ) }
+						value={ label || '' }
+						valuePlaceholder={ __( 'None' ) }
+						onChange={ onChangeLabel }
+					/>
+				</PanelBody>
+				<PanelBody
+					style={
+						! isCompatibleWithSettings && styles.linkSettingsPanel
+					}
+				>
+					<UnsupportedFooterControl
+						label={ __(
+							'Briefly describe the link to help screen reader user'
+						) }
+					></UnsupportedFooterControl>
+				</PanelBody>
+			</>
 		);
 	}
+
+	const activeIcon =
+		styles[ `wp-social-link-${ service }` ] || styles[ `wp-social-link` ];
+	const inactiveIcon = usePreferredColorSchemeStyle(
+		styles.inactiveIcon,
+		styles.inactiveIconDark
+	);
+	const { backgroundColor, color, stroke } = url ? activeIcon : inactiveIcon;
 
 	return (
 		<View>
@@ -99,18 +150,11 @@ const SocialLinkEdit = ( {
 			>
 				{ getLinkSettings( false ) }
 			</BottomSheet>
-			<InspectorControls>{ getLinkSettings() }</InspectorControls>
-			<IconComponent />
+			<View style={ [ styles.iconContainer, { backgroundColor } ] }>
+				<Icon icon={ IconComponent } style={ { stroke, color } } />
+			</View>
 		</View>
 	);
 };
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-
-		return {
-			editorSidebarOpened: isEditorSidebarOpened(),
-		};
-	} ),
-] )( SocialLinkEdit );
+export default SocialLinkEdit;

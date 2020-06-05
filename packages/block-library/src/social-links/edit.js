@@ -6,8 +6,6 @@ import {
 	InnerBlocks,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
@@ -24,7 +22,7 @@ const TEMPLATE = [
 	[ 'core/social-link', { service: 'youtube' } ],
 ];
 
-function SocialLinksEdit( { shouldDelete, onDelete } ) {
+export function SocialLinksEdit() {
 	return (
 		<InnerBlocks
 			allowedBlocks={ ALLOWED_BLOCKS }
@@ -33,26 +31,8 @@ function SocialLinksEdit( { shouldDelete, onDelete } ) {
 			__experimentalMoverDirection={ 'horizontal' }
 			__experimentalTagName={ Block.ul }
 			__experimentalAppenderTagName="li"
-			onDeleteBlock={ shouldDelete ? onDelete : undefined }
 		/>
 	);
 }
 
-export default compose(
-	withSelect( ( select, { clientId } ) => {
-		const { getBlockCount } = select( 'core/block-editor' );
-
-		return {
-			shouldDelete: getBlockCount( clientId ) === 1,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId } ) => {
-		const { removeBlock } = dispatch( 'core/block-editor' );
-
-		return {
-			onDelete: () => {
-				removeBlock( clientId );
-			},
-		};
-	} )
-)( SocialLinksEdit );
+export default SocialLinksEdit;

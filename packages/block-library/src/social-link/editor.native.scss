@@ -1,0 +1,23 @@
+@import "./socials-with-bg.scss";
+
+.linkSettingsPanel {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.iconContainer {
+	height: 36px;
+	width: 36px;
+	border-radius: 18px;
+	align-items: center;
+	justify-content: center;
+}
+
+.inactiveIcon {
+	background-color: $light-quaternary;
+	color: $white;
+}
+
+.inactiveIconDark {
+	background-color: $dark-quaternary;
+}
