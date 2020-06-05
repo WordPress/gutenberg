@@ -80,8 +80,8 @@ function post_author_build_css_font_sizes( $attributes ) {
 
 	$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
 	$has_custom_font_size = array_key_exists( 'style', $attributes )
-		&& array_key_exists( 'typography', $attributes['style'] )
-		&& array_key_exists( 'fontSize', $attributes['style']['typography'] );
+	&& array_key_exists( 'typography', $attributes['style'] )
+	&& array_key_exists( 'fontSize', $attributes['style']['typography'] );
 
 	if ( $has_named_font_size ) {
 		// Add the font size class.
@@ -97,9 +97,9 @@ function post_author_build_css_font_sizes( $attributes ) {
 /**
  * Renders the `core/post-author` block on the server.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
+ * @param  array    $attributes Block attributes.
+ * @param  string   $content    Block default content.
+ * @param  WP_Block $block      Block instance.
  * @return string Returns the rendered author block.
  */
 function render_block_core_post_author( $attributes, $content, $block ) {
@@ -131,22 +131,22 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
 	$style_attribute = ( $colors['background']['inline_styles'] || $font_sizes['inline_styles'] )
-		? sprintf( ' style="%s"', esc_attr( $colors['background']['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
-		: '';
+	? sprintf( ' style="%s"', esc_attr( $colors['background']['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
+	: '';
 
 	// Add text colors on content for higher specificty.  Prevents theme override for has-background-color.
 	$content_class_attribute = sprintf( ' class="wp-block-post-author__content %s"', esc_attr( implode( ' ', $colors['text']['css_classes'] ) ) );
 	$content_style_attribute = ( $colors['text']['inline_styles'] )
-		? sprintf( ' style="%s"', esc_attr( $colors['text']['inline_styles'] ) )
-		: '';
+	? sprintf( ' style="%s"', esc_attr( $colors['text']['inline_styles'] ) )
+	: '';
 
 	return sprintf( '<div %1$s %2$s>', $class_attribute, $style_attribute ) .
-		( ! empty( $attributes['showAvatar'] ) ? '<div class="wp-block-post-author__avatar">' . $avatar . '</div>' : '' ) .
-		sprintf( '<div %1$s %2$s>', $content_class_attribute, $content_style_attribute ) .
-			( ! empty( $byline ) ? '<p class="wp-block-post-author__byline">' . $byline . '</p>' : '' ) .
-			'<p class="wp-block-post-author__name">' . get_the_author_meta( 'display_name', $author_id ) . '</p>' .
-			( ! empty( $attributes['showBio'] ) ? '<p class="wp-block-post-author__bio">' . get_the_author_meta( 'user_description', $author_id ) . '</p>' : '' ) .
-		'</div>' .
+	( ! empty( $attributes['showAvatar'] ) ? '<div class="wp-block-post-author__avatar">' . $avatar . '</div>' : '' ) .
+	sprintf( '<div %1$s %2$s>', $content_class_attribute, $content_style_attribute ) .
+	( ! empty( $byline ) ? '<p class="wp-block-post-author__byline">' . $byline . '</p>' : '' ) .
+	'<p class="wp-block-post-author__name">' . get_the_author_meta( 'display_name', $author_id ) . '</p>' .
+	( ! empty( $attributes['showBio'] ) ? '<p class="wp-block-post-author__bio">' . get_the_author_meta( 'user_description', $author_id ) . '</p>' : '' ) .
+	'</div>' .
 	'</div>';
 }
 
