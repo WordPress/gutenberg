@@ -16,6 +16,7 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  *
  * @param {Object} props Component properties.
  * @param {string} [props.className] An optional class name added to the row.
+ * @param {WPElement} props.children Children to be rendered.
  *
  * @example
  * <caption>ES5</caption>

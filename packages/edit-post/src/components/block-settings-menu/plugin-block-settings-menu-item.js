@@ -37,6 +37,8 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * @param {WPBlockTypeIconRender} [props.icon] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
  * @param {string} props.label The menu item text.
  * @param {Function} props.onClick Callback function to be executed when the user click the menu item.
+ * @param {boolean} [props.small] Whether to render the label or not.
+ * @param {string} [props.role] The ARIA role for the menu item.
  *
  * @example
  * <caption>ES5</caption>
