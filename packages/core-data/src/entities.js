@@ -64,18 +64,6 @@ export const defaultEntities = [
 		plural: 'users',
 	},
 	{
-		name: 'menu',
-		kind: 'root',
-		baseURL: '/__experimental/menus',
-		plural: 'menus',
-	},
-	{
-		name: 'menu-item',
-		kind: 'root',
-		baseURL: '/__experimental/menu-items',
-		plural: 'menu-items',
-	},
-	{
 		name: 'comment',
 		kind: 'root',
 		baseURL: '/wp/v2/comments',
