@@ -60,16 +60,15 @@ function post_author_build_css_colors( $attributes ) {
  */
 function post_author_build_css_font_sizes( $attributes ) {
 	// CSS classes.
-	$font_sizes   = array(
+	$font_sizes = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
 
-
 	$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
 	$has_custom_font_size = array_key_exists( 'style', $attributes )
-		&& array_key_exists( 'typography', $attributes['style'])
-		&& array_key_exists( 'fontSize', $attributes['style']['typography']);
+		&& array_key_exists( 'typography', $attributes['style'] )
+		&& array_key_exists( 'fontSize', $attributes['style']['typography'] );
 
 	if ( $has_named_font_size ) {
 		// Add the font size class.
@@ -122,7 +121,7 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
-		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles']) )
+		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
 		: '';
 
 	return sprintf( '<div %1$s %2$s>', $class_attribute, $style_attribute ) .
