@@ -92,10 +92,8 @@ function InserterMenu( {
 			</div>
 			{ showInserterHelpPanel && (
 				<div className="block-editor-inserter__tips">
-					<VisuallyHidden>
-						<h2 className="block-editor-inserter__tips-title">
-							{ __( 'Tips for using the block editor:' ) }
-						</h2>
+					<VisuallyHidden as="h2">
+						{ __( 'A tip for using the block editor' ) }
 					</VisuallyHidden>
 					<Tips />
 				</div>
