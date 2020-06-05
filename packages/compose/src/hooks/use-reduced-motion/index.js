@@ -12,13 +12,20 @@ const IS_IE =
 	typeof window !== 'undefined' &&
 	window.navigator.userAgent.indexOf( 'Trident' ) >= 0;
 
+/** @type {boolean} */
+let forceReducedMotion = false;
+try {
+	// @ts-ignore
+	forceReducedMotion = process.env.FORCE_REDUCED_MOTION;
+} catch {}
+
 /**
  * Hook returning whether the user has a preference for reduced motion.
  *
- * @return {boolean} Reduced motion preference value.
+ * @type {() => boolean} Reduced motion preference value.
  */
 const useReducedMotion =
-	process.env.FORCE_REDUCED_MOTION || IS_IE
+	forceReducedMotion || IS_IE
 		? () => true
 		: () => useMediaQuery( '(prefers-reduced-motion: reduce)' );
 
