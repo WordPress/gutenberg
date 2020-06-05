@@ -135,7 +135,7 @@ describe( 'actions', () => {
 				type: 'API_FETCH',
 			} );
 
-			expect( generator.next( { success: true } ).value ).toEqual( {
+			expect( generator.next( true ).value ).toEqual( {
 				type: 'REMOVE_INSTALLED_BLOCK_TYPE',
 				item,
 			} );
