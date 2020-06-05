@@ -12,6 +12,24 @@
 		"parent": null
 	},
 	{
+		"title": "Architecture",
+		"slug": "index",
+		"markdown_source": "../docs/architecture/index.md",
+		"parent": "principles"
+	},
+	{
+		"title": "Modularity",
+		"slug": "modularity",
+		"markdown_source": "../docs/architecture/modularity.md",
+		"parent": "index"
+	},
+	{
+		"title": "Performance",
+		"slug": "performance",
+		"markdown_source": "../docs/architecture/performance.md",
+		"parent": "index"
+	},
+	{
 		"title": "Key Concepts",
 		"slug": "key-concepts",
 		"markdown_source": "../docs/designers-developers/key-concepts.md",
@@ -628,24 +646,6 @@
 		"slug": "3-apply-format",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/format-api/3-apply-format.md",
 		"parent": "format-api"
-	},
-	{
-		"title": "Architecture",
-		"slug": "index",
-		"markdown_source": "../docs/architecture/index.md",
-		"parent": null
-	},
-	{
-		"title": "Modularity",
-		"slug": "modularity",
-		"markdown_source": "../docs/architecture/modularity.md",
-		"parent": "index"
-	},
-	{
-		"title": "Performance",
-		"slug": "performance",
-		"markdown_source": "../docs/architecture/performance.md",
-		"parent": "index"
 	},
 	{
 		"title": "Component Reference",

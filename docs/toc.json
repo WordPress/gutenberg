@@ -2,6 +2,10 @@
 	{ "docs/readme.md": [] },
 
 	{ "docs/contributors/principles.md": [
+		{ "docs/architecture/index.md": [
+			{ "docs/architecture/modularity.md": [] },
+			{ "docs/architecture/performance.md": [] }
+		] },
 		{ "docs/designers-developers/key-concepts.md": [] },
 		{ "docs/designers-developers/glossary.md": [] },
 		{ "docs/designers-developers/faq.md": [] },
@@ -124,10 +128,6 @@
 			{ "docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md": [] },
 			{ "docs/designers-developers/developers/tutorials/format-api/3-apply-format.md": [] }
 		] }
-	] },
-	{ "docs/architecture/index.md": [
-		{ "docs/architecture/modularity.md": [] },
-		{ "docs/architecture/performance.md": [] }
 	] },
 	{ "packages/components/README.md": "{{components}}" },
 	{ "docs/designers-developers/developers/data/README.md": [
