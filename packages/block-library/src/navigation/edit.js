@@ -113,7 +113,7 @@ function Navigation( {
 	);
 
 	// Builds navigation links from default Pages.
-	const navLinkBlocksFromPages = useMemo( () => {
+	const buildNavLinkBlocksFromPages = useMemo( () => {
 		if ( ! pages ) {
 			return null;
 		}
@@ -134,7 +134,7 @@ function Navigation( {
 	const menuItems = getMenuItems( selectedCreateActionOption?.key );
 
 	// Builds navigation links from selected Menu's items.
-	const navLinkBlocksFromMenuItems = useMemo( () => {
+	const buildNavLinkBlocksFromMenuItems = useMemo( () => {
 		if ( ! menuItems ) {
 			return null;
 		}
@@ -191,12 +191,12 @@ function Navigation( {
 	}
 
 	function handleCreateFromExistingPages() {
-		updateNavItemBlocks( navLinkBlocksFromPages );
+		updateNavItemBlocks( buildNavLinkBlocksFromPages );
 		selectBlock( clientId );
 	}
 
 	function handleCreateFromExistingMenu() {
-		updateNavItemBlocks( navLinkBlocksFromMenuItems );
+		updateNavItemBlocks( buildNavLinkBlocksFromMenuItems );
 		selectBlock( clientId );
 	}
 
@@ -217,7 +217,7 @@ function Navigation( {
 		if (
 			hasMenus &&
 			selectedCreateActionOption &&
-			navLinkBlocksFromMenuItems?.length
+			buildNavLinkBlocksFromMenuItems?.length
 		) {
 			return handleCreateFromExistingMenu();
 		}
