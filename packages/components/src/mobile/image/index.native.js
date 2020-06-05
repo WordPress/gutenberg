@@ -150,9 +150,7 @@ const ImageComponent = ( {
 	return (
 		<View
 			style={ [
-				{
-					flex: 1,
-				},
+				{ flex: 1 },
 				// only set alignItems if an image exists because alignItems causes the placeholder
 				// to disappear when an aligned image can't be downloaded
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
@@ -187,8 +185,8 @@ const ImageComponent = ( {
 				) : (
 					<Image
 						style={ containerSize && imageStyles }
-						resizeMethod={ ! focalPoint && 'scale' }
 						source={ { uri: url } }
+						{ ...( ! focalPoint && { resizeMethod: 'scale' } ) }
 					/>
 				) }
 

@@ -201,7 +201,10 @@ class MediaContainer extends Component {
 					disabled={ ! isSelected }
 				>
 					<View
-						style={ [ styles.mediaImageContainer, aligmentStyles ] }
+						style={ [
+							styles.mediaImageContainer,
+							! isUploadInProgress && aligmentStyles,
+						] }
 					>
 						<Image
 							align="center"
@@ -216,7 +219,7 @@ class MediaContainer extends Component {
 							openMediaOptions={ openMediaOptions }
 							retryMessage={ retryMessage }
 							url={ mediaUrl }
-							width={ mediaWidth }
+							width={ ! isUploadInProgress && mediaWidth }
 						/>
 					</View>
 				</TouchableWithoutFeedback>
