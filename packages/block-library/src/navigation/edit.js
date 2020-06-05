@@ -248,25 +248,35 @@ function Navigation( {
 		}
 	}
 
-	const dropDownOptions = [
-		{
-			id: CREATE_PLACEHOLDER_VALUE,
-			name: __( 'Select where to start from…' ),
-		},
-		...( hasMenus ? menus : [] ),
-		{
-			id: CREATE_EMPTY_OPTION_VALUE,
-			name: __( 'Create empty menu' ),
-		},
-		...( hasPages
-			? [
-					{
-						id: CREATE_FROM_PAGES_OPTION_VALUE,
-						name: __( 'New from all top-level pages' ),
-					},
-			  ]
-			: [] ),
-	];
+	const dropDownOptions = useMemo(
+		() => [
+			{
+				id: CREATE_PLACEHOLDER_VALUE,
+				name: __( 'Select where to start from…' ),
+			},
+			...( hasMenus ? menus : [] ),
+			{
+				id: CREATE_EMPTY_OPTION_VALUE,
+				name: __( 'Create empty menu' ),
+			},
+			...( hasPages
+				? [
+						{
+							id: CREATE_FROM_PAGES_OPTION_VALUE,
+							name: __( 'New from all top-level pages' ),
+						},
+				  ]
+				: [] ),
+		],
+		[
+			CREATE_PLACEHOLDER_VALUE,
+			CREATE_EMPTY_OPTION_VALUE,
+			CREATE_FROM_PAGES_OPTION_VALUE,
+			hasMenus,
+			menus,
+			hasPages,
+		]
+	);
 
 	function shouldDisableCreateButton() {
 		// If there is no key at all then disable.
