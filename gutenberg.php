@@ -161,3 +161,16 @@ function gutenberg_rest_nonce() {
 	exit( wp_create_nonce( 'wp_rest' ) );
 }
 add_action( 'wp_ajax_gutenberg_rest_nonce', 'gutenberg_rest_nonce' );
+
+
+/**
+ * Exposes the site icon url to the Gutenberg editor through the WordPress REST API.
+ */
+function register_site_icon_url_setting() {
+	register_setting('general', 'site_icon_url', array(
+		'default' => get_site_icon_url(),
+		'show_in_rest' => true
+	));
+}
+
+add_action( 'rest_api_init', 'register_site_icon_url_setting' );
