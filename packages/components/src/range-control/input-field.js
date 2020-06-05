@@ -61,8 +61,8 @@ export default function InputField( {
 		handleOnCommit( event );
 	};
 
-	const handleOnChange = ( event ) => {
-		setValue( event.target.value );
+	const handleOnChange = ( nextValue, { event } ) => {
+		setValue( nextValue );
 
 		/**
 		 * Prevent submitting if changes are invalid.
@@ -94,6 +94,7 @@ export default function InputField( {
 			aria-label={ label }
 			className="components-range-control__number"
 			inputMode="decimal"
+			isDragEnabled={ false }
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
 			onKeyDown={ handleOnKeyDown }

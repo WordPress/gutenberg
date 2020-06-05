@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Custom hooks for "controlled" components to track and consolidate internal
@@ -19,20 +19,19 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * Unlike the basic useState hook, useControlledState's state can
  * be updated if a new incoming prop value is changed.
  *
- * @param {any} initialState The initial state value.
+ * @param {any} controlledState The initial state value.
  * @return {[*, Function]} The controlled value and the value setter.
  */
-export function useControlledState( initialState ) {
-	const [ state, setState ] = useState( initialState );
-	const lastInitialStateRef = useRef( initialState );
+export function useControlledState( controlledState ) {
+	const [ internalState, setInternalState ] = useState( controlledState );
+	const hasControlledState = controlledState !== undefined;
 
-	useEffect( () => {
-		// Update the internal state if the incoming value changes.
-		if ( initialState !== lastInitialStateRef.current ) {
-			setState( initialState );
-			lastInitialStateRef.current = initialState;
+	const state = hasControlledState ? controlledState : internalState;
+	const setState = ( nextState ) => {
+		if ( ! hasControlledState ) {
+			setInternalState( nextState );
 		}
-	}, [ initialState ] );
+	};
 
 	return [ state, setState ];
 }
