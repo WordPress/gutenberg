@@ -233,7 +233,7 @@ The list of features that are currently supported are:
           "value": <preset value>
         },
         { <more font sizes> }
-    ],
+      ],
       "gradient": [
         {
           "slug": <preset slug>,
@@ -269,110 +269,54 @@ The list of features that are currently supported are:
       "typography": {
         "fontSize": <value>,
         "lineHeight": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/heading/h3": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/heading/h1": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/heading/h6": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
       }
     }
   },
   "core/heading/h2": {
     "styles": {
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      },
       "color": {
         "background": <value>,
         "text": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
       }
     }
   },
   "core/heading/h3": {
     "styles": {
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      },
       "color": {
         "background": <value>,
         "text": <value>
-      }
-    }
-  },
-  "core/heading/h4": {
-    "styles": {
+      },
       "typography": {
         "fontSize": <value>,
         "lineHeight": <value>
-      },
-      "color": {
-        "background": <value>,
-        "text": <value>
       }
     }
   },
   "core/heading/h5": {
     "styles": {
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      },
       "color": {
         "background": <value>,
         "text": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
       }
     }
   },
   "core/heading/h6": {
     "styles": {
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      },
       "color": {
         "background": <value>,
         "text": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
       }
     }
   },
