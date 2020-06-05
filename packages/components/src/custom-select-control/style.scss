@@ -16,6 +16,12 @@
 	position: relative;
 	text-align: left;
 
+	// For all button sizes allow sufficient space for the
+	// dropdown "arrow" icon to display.
+	&.components-custom-select-control__button {
+		padding-right: $icon-size;
+	}
+
 	&:focus:not(:disabled) {
 		border-color: $theme-color;
 		box-shadow: 0 0 0 ($border-width-focus - $border-width) $theme-color;
@@ -55,6 +61,8 @@
 	display: flex;
 	list-style-type: none;
 	padding: 10px 5px 10px 25px;
+	cursor: default;
+
 
 	&.is-highlighted {
 		background: $light-gray-500;

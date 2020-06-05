@@ -14,6 +14,7 @@
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
 		{ "path": "packages/is-shallow-equal" },
+		{ "path": "packages/lazy-import" },
 		{ "path": "packages/prettier-config" },
 		{ "path": "packages/primitives" },
 		{ "path": "packages/priority-queue" },
