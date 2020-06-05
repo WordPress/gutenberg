@@ -19,7 +19,7 @@
 	// For all button sizes allow sufficient space for the
 	// dropdown "arrow" icon to display.
 	&.components-custom-select-control__button {
-		padding-right: $icon_width;
+		padding-right: $icon-size;
 	}
 
 	&:focus:not(:disabled) {
