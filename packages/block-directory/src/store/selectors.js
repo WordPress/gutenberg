@@ -55,10 +55,7 @@ export function getInstalledBlockTypes( state ) {
  * @return {boolean} Whether its currently installing
  */
 export function isInstalling( state, blockId ) {
-	if ( ! state.blockManagement.isInstalling[ blockId ] ) {
-		return false;
-	}
-	return state.blockManagement.isInstalling[ blockId ];
+	return state.blockManagement.isInstalling[ blockId ] || false;
 }
 
 /**
