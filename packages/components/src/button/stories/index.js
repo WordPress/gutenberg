@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text, number } from '@storybook/addon-knobs';
+import { text, number, boolean } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -43,6 +43,18 @@ export const tertiary = () => {
 	const label = text( 'Label', 'Tertiary Button' );
 
 	return <Button isTertiary>{ label }</Button>;
+};
+
+export const isDestructive = () => {
+	const label = text( 'Label', 'Destructive Button' );
+	const isSmall = boolean( 'isSmall', false );
+	const disabled = boolean( 'disabled', false );
+
+	return (
+		<Button isDestructive isSmall={ isSmall } disabled={ disabled }>
+			{ label }
+		</Button>
+	);
 };
 
 export const small = () => {
