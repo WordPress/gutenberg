@@ -297,6 +297,11 @@ add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_cont
  * deferring to block render mechanics to enqueue scripts, thereby ensuring only
  * blocks of the content have their assets enqueued.
  *
+ * This can be removed once minimum support for the plugin is outside the range
+ * of the version associated with closure of the following ticket.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50328
+ *
  * @see WP_Block::render
  */
 remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
