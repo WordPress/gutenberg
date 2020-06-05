@@ -30,24 +30,6 @@
 		},
 		"customTextColor": {
 			"type": "string"
-		},
-		"fontSize": {
-			"type": "string"
-		},
-		"customFontSize": {
-			"type": "number"
-		},
-		"bioFontSize": {
-			"type": "string"
-		},
-		"customBioFontSize": {
-			"type": "number"
-		},
-		"bylineFontSize": {
-			"type": "string"
-		},
-		"customBylineFontSize": {
-			"type": "number"
 		}
 	},
 	"context": [
@@ -55,6 +37,7 @@
 		"postId"
 	],
 	"supports": {
-		"html": false
+		"html": false,
+		"__experimentalFontSize": true
 	}
 }

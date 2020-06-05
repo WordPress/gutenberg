@@ -11,29 +11,16 @@ import { useRef, useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
-	FontSizePicker,
 	InspectorControls,
 	RichText,
 	__experimentalUseColors,
 	BlockColorsStyleSelector,
-	withFontSizes,
 } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-function PostAuthorEdit( {
-	isSelected,
-	fontSize,
-	setFontSize,
-	bylineFontSize,
-	setBylineFontSize,
-	bioFontSize,
-	setBioFontSize,
-	context,
-	attributes,
-	setAttributes,
-} ) {
+function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 	const { postType, postId } = context;
 
 	const { authorId, authorDetails, authors } = useSelect(
@@ -74,7 +61,7 @@ function PostAuthorEdit( {
 				{
 					backgroundColor: true,
 					textColor: true,
-					fontSize: fontSize.size,
+					// fontSize: fontSize.size,
 				},
 			],
 			colorDetector: { targetRef: ref },
@@ -82,7 +69,8 @@ function PostAuthorEdit( {
 				initialOpen: true,
 			},
 		},
-		[ fontSize.size ]
+		// [ fontSize.size ]
+		[]
 	);
 
 	const { align, showAvatar, showBio, byline } = attributes;
@@ -102,35 +90,8 @@ function PostAuthorEdit( {
 			block: classnames( 'wp-block-post-author', {
 				[ `has-text-align-${ align }` ]: align,
 			} ),
-			name: classnames( 'wp-block-post-author__name', {
-				[ fontSize.class ]: fontSize.class,
-			} ),
-			bio: classnames( 'wp-block-post-author__bio', {
-				[ bioFontSize.class ]: bioFontSize.class,
-			} ),
-			byline: classnames( 'wp-block-post-author__byline', {
-				[ bylineFontSize.class ]: bylineFontSize.class,
-			} ),
 		};
-	}, [ align, fontSize.class, bioFontSize.class, bylineFontSize.class ] );
-
-	const inlineStyles = useMemo( () => {
-		return {
-			name: {
-				fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-			},
-			bio: {
-				fontSize: bioFontSize.size
-					? bioFontSize.size + 'px'
-					: undefined,
-			},
-			byline: {
-				fontSize: bylineFontSize.size
-					? bylineFontSize.size + 'px'
-					: undefined,
-			},
-		};
-	}, [ fontSize.size, bioFontSize.size, bylineFontSize.size ] );
+	}, [ align ] );
 
 	return (
 		<>
@@ -178,33 +139,6 @@ function PostAuthorEdit( {
 						}
 					/>
 				</PanelBody>
-
-				<div>
-					{ ! RichText.isEmpty( byline ) && (
-						<PanelBody title={ __( 'Byline text settings' ) }>
-							<FontSizePicker
-								value={ bylineFontSize.size }
-								onChange={ setBylineFontSize }
-							/>
-						</PanelBody>
-					) }
-
-					<PanelBody title={ __( 'Author text settings' ) }>
-						<FontSizePicker
-							value={ fontSize.size }
-							onChange={ setFontSize }
-						/>
-					</PanelBody>
-
-					{ showBio && (
-						<PanelBody title={ __( 'Bio text settings' ) }>
-							<FontSizePicker
-								value={ bioFontSize.size }
-								onChange={ setBioFontSize }
-							/>
-						</PanelBody>
-					) }
-				</div>
 			</InspectorControls>
 
 			{ InspectorControlsColorPanel }
@@ -244,27 +178,20 @@ function PostAuthorEdit( {
 							{ ( ! RichText.isEmpty( byline ) ||
 								isSelected ) && (
 								<RichText
-									className={ classNames.byline }
+									className="wp-block-post-author__byline"
 									multiline={ false }
 									placeholder={ __( 'Write byline …' ) }
 									value={ byline }
 									onChange={ ( value ) =>
 										setAttributes( { byline: value } )
 									}
-									style={ inlineStyles.byline }
 								/>
 							) }
-							<p
-								className={ classNames.name }
-								style={ inlineStyles.name }
-							>
+							<p className="wp-block-post-author__name">
 								{ authorDetails?.name }
 							</p>
 							{ showBio && (
-								<p
-									className={ classNames.bio }
-									style={ inlineStyles.bio }
-								>
+								<p className="wp-block-post-author__bio">
 									{ authorDetails?.description }
 								</p>
 							) }
@@ -276,8 +203,4 @@ function PostAuthorEdit( {
 	);
 }
 
-export default withFontSizes(
-	'fontSize',
-	'bylineFontSize',
-	'bioFontSize'
-)( PostAuthorEdit );
+export default PostAuthorEdit;

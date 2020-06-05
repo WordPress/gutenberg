@@ -60,57 +60,29 @@ function post_author_build_css_colors( $attributes ) {
  */
 function post_author_build_css_font_sizes( $attributes ) {
 	// CSS classes.
-	$name_font_sizes   = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-	$bio_font_sizes    = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-	$byline_font_sizes = array(
+	$font_sizes   = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
 
+
 	$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
-	$has_custom_font_size = array_key_exists( 'customFontSize', $attributes );
+	$has_custom_font_size = array_key_exists( 'style', $attributes )
+		&& array_key_exists( 'typography', $attributes['style'])
+		&& array_key_exists( 'fontSize', $attributes['style']['typography']);
 
 	if ( $has_named_font_size ) {
 		// Add the font size class.
-		$name_font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
+		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$name_font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['customFontSize'] );
+		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['style']['typography']['fontSize'] );
 	}
 
 	$has_named_bio_font_size  = array_key_exists( 'bioFontSize', $attributes );
 	$has_custom_bio_font_size = array_key_exists( 'customBioFontSize', $attributes );
 
-	if ( $has_named_bio_font_size ) {
-		// Add the font size class.
-		$bio_font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['bioFontSize'] );
-	} elseif ( $has_custom_bio_font_size ) {
-		// Add the custom font size inline style.
-		$bio_font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['customBioFontSize'] );
-	}
-
-	$has_named_byline_font_size  = array_key_exists( 'bylineFontSize', $attributes );
-	$has_custom_byline_font_size = array_key_exists( 'customBylineFontSize', $attributes );
-
-	if ( $has_named_byline_font_size ) {
-		// Add the font size class.
-		$byline_font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['bylineFontSize'] );
-	} elseif ( $has_custom_byline_font_size ) {
-		// Add the custom font size inline style.
-		$byline_font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['customBylineFontSize'] );
-	}
-
-	return array(
-		'name'   => $name_font_sizes,
-		'bio'    => $bio_font_sizes,
-		'byline' => $byline_font_sizes,
-	);
+	return $font_sizes;
 }
 
 /**
@@ -141,6 +113,7 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 	$font_sizes = post_author_build_css_font_sizes( $attributes );
 	$classes    = array_merge(
 		$colors['css_classes'],
+		$font_sizes['css_classes'],
 		array( 'wp-block-post-author' ),
 		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
@@ -148,23 +121,16 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 	);
 
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
-	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
-
-	$name_class_attribute = sprintf( ' class="wp-block-post-author__name %s"', esc_attr( implode( ' ', $font_sizes['name']['css_classes'] ) ) );
-	$name_style_attribute = $font_sizes['name']['inline_styles'] ? sprintf( 'style="%s"', esc_attr( $font_sizes['name']['inline_styles'] ) ) : '';
-
-	$bio_class_attribute = sprintf( ' class="wp-block-post-author__bio %s"', esc_attr( implode( ' ', $font_sizes['bio']['css_classes'] ) ) );
-	$bio_style_attribute = $font_sizes['bio']['inline_styles'] ? sprintf( 'style="%s"', esc_attr( $font_sizes['bio']['inline_styles'] ) ) : '';
-
-	$byline_class_attribute = sprintf( ' class="wp-block-post-author__byline %s"', esc_attr( implode( ' ', $font_sizes['byline']['css_classes'] ) ) );
-	$byline_style_attribute = $font_sizes['byline']['inline_styles'] ? sprintf( 'style="%s"', esc_attr( $font_sizes['byline']['inline_styles'] ) ) : '';
+	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
+		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles']) )
+		: '';
 
 	return sprintf( '<div %1$s %2$s>', $class_attribute, $style_attribute ) .
 		( ! empty( $attributes['showAvatar'] ) ? '<div class="wp-block-post-author__avatar">' . $avatar . '</div>' : '' ) .
 		'<div class="wp-block-post-author__content">' .
-			( ! empty( $byline ) ? sprintf( '<p %1$s %2$s>', $byline_class_attribute, $byline_style_attribute ) . $byline . '</p>' : '' ) .
-			sprintf( '<p %1$s %2$s>', $name_class_attribute, $name_style_attribute ) . get_the_author_meta( 'display_name', $author_id ) . '</p>' .
-			( ! empty( $attributes['showBio'] ) ? sprintf( '<p %1$s %2$s>', $bio_class_attribute, $bio_style_attribute ) . get_the_author_meta( 'user_description', $author_id ) . '</p>' : '' ) .
+			( ! empty( $byline ) ? '<p class="wp-block-post-author__byline">' . $byline . '</p>' : '' ) .
+			'<p class="wp-block-post-author__name">' . get_the_author_meta( 'display_name', $author_id ) . '</p>' .
+			( ! empty( $attributes['showBio'] ) ? '<p class="wp-block-post-author__bio">' . get_the_author_meta( 'user_description', $author_id ) . '</p>' : '' ) .
 		'</div>' .
 	'</div>';
 }
