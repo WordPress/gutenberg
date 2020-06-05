@@ -266,7 +266,8 @@ extension RNReactNativeGutenbergBridge {
             Gutenberg.EventName.updateHtml,
             Gutenberg.EventName.mediaUpload,
             Gutenberg.EventName.setFocusOnTitle,
-            Gutenberg.EventName.mediaAppend
+            Gutenberg.EventName.mediaAppend,
+            Gutenberg.EventName.updateTheme
         ]
     }
 

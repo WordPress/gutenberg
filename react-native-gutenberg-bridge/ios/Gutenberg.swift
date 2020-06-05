@@ -70,6 +70,15 @@ public class Gutenberg: NSObject {
             initialProps["capabilities"] = capabilities
         }
 
+        let editorTheme = dataSource.gutenbergEditorTheme()
+        if let colors = editorTheme?.colors {
+            initialProps["colors"] = colors
+        }
+
+        if let gradients = editorTheme?.gradients {
+            initialProps["gradients"] = gradients
+        }
+
         return initialProps
     }
 
@@ -129,6 +138,21 @@ public class Gutenberg: NSObject {
         let url = sourceURL(for: bridge)
         return !(url?.isFileURL ?? true)
     }
+
+    public func updateTheme(_ editorTheme: GutenbergEditorTheme?) {
+
+        var themeUpdates = [String : Any]()
+
+        if let colors = editorTheme?.colors {
+            themeUpdates["colors"] = colors
+        }
+
+        if let gradients = editorTheme?.gradients {
+            themeUpdates["gradients"] = gradients
+        }
+
+        bridgeModule.sendEventIfNeeded(name: EventName.updateTheme, body:themeUpdates)
+    }
 }
 
 extension Gutenberg: RCTBridgeDelegate {
@@ -154,6 +178,7 @@ extension Gutenberg {
         static let mediaUpload = "mediaUpload"
         static let setFocusOnTitle = "setFocusOnTitle"
         static let mediaAppend = "mediaAppend"
+        static let updateTheme = "updateTheme"
     }
     
     public enum MediaUploadState: Int {

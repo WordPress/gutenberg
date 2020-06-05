@@ -75,6 +75,10 @@ export function subscribeAndroidModalClosed( callback ) {
 	return isAndroid ? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback ) : undefined;
 }
 
+export function subscribeUpdateTheme( callback ) {
+	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+}
+
 export function subscribePreferredColorScheme( callback ) {
 	return gutenbergBridgeEvents.addListener( 'preferredColorScheme', callback );
 }
