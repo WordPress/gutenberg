@@ -4,7 +4,7 @@
  *
  * For example, by default, each element in the dataset should have an `id` and
  * `parent` property where the `parent` property indicates a relationship between
- * the current item and another item with a matching `id` propertys.
+ * the current item and another item with a matching `id` properties.
  *
  * This is useful for building linked lists of data from flat data structures.
  *
