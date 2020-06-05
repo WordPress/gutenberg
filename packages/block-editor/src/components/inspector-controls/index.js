@@ -10,9 +10,9 @@ import { useBlockEditContext } from '../block-edit/context';
 
 const { Fill, Slot } = createSlotFill( 'InspectorControls' );
 
-function InspectorControls() {
+function InspectorControls( { children } ) {
 	const { isSelected } = useBlockEditContext();
-	return isSelected ? <Fill /> : null;
+	return isSelected ? <Fill>{ children }</Fill> : null;
 }
 
 InspectorControls.Slot = Slot;

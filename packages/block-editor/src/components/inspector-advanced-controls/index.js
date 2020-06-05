@@ -11,9 +11,9 @@ import { useBlockEditContext } from '../block-edit/context';
 const name = 'InspectorAdvancedControls';
 const { Fill, Slot } = createSlotFill( name );
 
-function InspectorAdvancedControls() {
+function InspectorAdvancedControls( { children } ) {
 	const { isSelected } = useBlockEditContext();
-	return isSelected ? <Fill /> : null;
+	return isSelected ? <Fill>{ children }</Fill> : null;
 }
 
 InspectorAdvancedControls.slotName = name;
