@@ -18,7 +18,7 @@ import { useControlledState } from '../utils/hooks';
  *
  * @param {number|null} value The value to clamp
  * @param {number} min The minimum value
- * @param {number} max The maxinum value
+ * @param {number} max The maximum value
  * @return {number} A (float) number
  */
 export function floatClamp( value, min, max ) {
