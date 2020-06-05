@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import { isValueDefined } from './values';
 
 /**
  * Custom hooks for "controlled" components to track and consolidate internal
@@ -24,7 +28,7 @@ import { useState } from '@wordpress/element';
  */
 export function useControlledState( controlledState ) {
 	const [ internalState, setInternalState ] = useState( controlledState );
-	const hasControlledState = controlledState !== undefined;
+	const hasControlledState = isValueDefined( controlledState );
 
 	const state = hasControlledState ? controlledState : internalState;
 	const setState = ( nextState ) => {

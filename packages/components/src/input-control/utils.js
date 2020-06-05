@@ -53,16 +53,3 @@ export function useDragCursor( isDragging, dragDirection ) {
 
 	return dragCursor;
 }
-
-/**
- * Determines if a value is empty, null, or undefined.
- *
- * @param {any} value The value to check.
- * @return {boolean} Whether value is empty.
- */
-export function isValueEmpty( value ) {
-	const isNullish = typeof value === 'undefined' || value === null;
-	const isEmptyString = value === '';
-
-	return isNullish || isEmptyString;
-}

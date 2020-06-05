@@ -10,10 +10,8 @@ import classnames from 'classnames';
 import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
 import { CSS_UNITS, hasUnits } from './utils';
 
-/**
- * Renders a `select` if there are multiple units.
- * Otherwise, renders a non-selectable label.
- */
+// Renders a `select` if there are multiple units.
+// Otherwise, renders a non-selectable label.
 export default function UnitSelectControl( {
 	className,
 	isTabbable = true,

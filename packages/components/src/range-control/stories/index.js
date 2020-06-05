@@ -13,6 +13,7 @@ import { useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import RangeControl from '../index';
+import { color } from '../../utils/colors';
 
 export default { title: 'Components/RangeControl', component: RangeControl };
 
@@ -28,17 +29,20 @@ const DefaultExample = () => {
 	const [ value, setValue ] = useState( undefined );
 
 	const props = {
-		allowReset: boolean( 'allowReset', false ),
-		disabled: boolean( 'disabled', false ),
-		label: text( 'label', 'Range Label' ),
-		help: text( 'help', '' ),
-		min: number( 'min', 0 ),
-		max: number( 'max', 100 ),
-		step: number( 'step', 1 ),
-		marks: boolean( 'marks', false ),
-		showTooltip: boolean( 'showTooltip', false ),
-		beforeIcon: text( 'beforeIcon', '' ),
 		afterIcon: text( 'afterIcon', '' ),
+		allowReset: boolean( 'allowReset', false ),
+		beforeIcon: text( 'beforeIcon', '' ),
+		color: text( 'color', color( 'ui.brand' ) ),
+		disabled: boolean( 'disabled', false ),
+		help: text( 'help', '' ),
+		label: text( 'label', 'Range Label' ),
+		marks: boolean( 'marks', false ),
+		max: number( 'max', 100 ),
+		min: number( 'min', 0 ),
+		showTooltip: boolean( 'showTooltip', false ),
+		step: number( 'step', 1 ),
+		railColor: text( 'railColor', null ),
+		trackColor: text( 'trackColor', null ),
 		withInputField: boolean( 'withInputField', true ),
 		value,
 		onChange: setValue,

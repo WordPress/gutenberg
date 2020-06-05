@@ -13,13 +13,12 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { Input } from './styles/number-control-styles';
-import { getValue } from './utils';
-import { isValueEmpty } from '../input-control/utils';
 import {
 	inputControlActionTypes,
 	composeStateReducers,
 } from '../input-control/state';
 import { useRTL } from '../utils/style-mixins';
+import { isValueEmpty } from '../utils/values';
 import { add, roundClamp, subtract } from '../utils/math';
 
 export function NumberControl(
@@ -41,7 +40,6 @@ export function NumberControl(
 	},
 	ref
 ) {
-	const initialValue = getValue( valueProp, min, max );
 	const baseValue = clamp( 0, min, max );
 	const isRtl = useRTL();
 
@@ -171,7 +169,7 @@ export function NumberControl(
 			min={ min }
 			ref={ ref }
 			type={ typeProp }
-			value={ initialValue }
+			value={ valueProp }
 			__unstableStateReducer={ composeStateReducers(
 				numberControlStateReducer,
 				stateReducer

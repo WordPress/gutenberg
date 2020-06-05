@@ -48,7 +48,7 @@ export default function InputField( {
 		}
 
 		setValue( nextValue );
-		onChange( event );
+		onChange( nextValue );
 	};
 
 	const handleOnBlur = ( event ) => {

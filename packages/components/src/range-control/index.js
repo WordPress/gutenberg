@@ -18,18 +18,14 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { color } from '../utils/colors';
-import {
-	floatClamp,
-	useControlledRangeValue,
-	useDebouncedHoverInteraction,
-} from './utils';
+import { floatClamp, useControlledRangeValue } from './utils';
+import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
 import {
 	ActionRightWrapper,
 	AfterIconWrapper,
 	BeforeIconWrapper,
-	InputRange,
 	Root,
 	Track,
 	ThumbWrapper,
@@ -75,12 +71,11 @@ function RangeControl(
 ) {
 	const isRTL = useRTL();
 
-	const sliderValue = valueProp !== undefined ? valueProp : initialPosition;
-
 	const [ value, setValue ] = useControlledRangeValue( {
 		min,
 		max,
-		value: sliderValue,
+		value: valueProp,
+		initialValue: initialPosition,
 	} );
 	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -122,9 +117,12 @@ function RangeControl(
 	const describedBy = !! help ? `${ id }__help` : undefined;
 	const enableTooltip = showTooltipProp !== false && isFinite( value );
 
-	const handleOnChange = ( event ) => {
+	const handleOnRangeChange = ( event ) => {
 		const nextValue = parseFloat( event.target.value );
+		handleOnChange( nextValue );
+	};
 
+	const handleOnChange = ( nextValue ) => {
 		if ( isNaN( nextValue ) ) {
 			handleOnReset();
 			return;
@@ -176,13 +174,6 @@ function RangeControl(
 		handleShowTooltip();
 	};
 
-	const hoverInteractions = useDebouncedHoverInteraction( {
-		onShow: handleShowTooltip,
-		onHide: handleHideTooltip,
-		onMouseMove,
-		onMouseLeave,
-	} );
-
 	const offsetStyle = {
 		[ isRTL ? 'right' : 'left' ]: fillValueOffset,
 	};
@@ -207,22 +198,21 @@ function RangeControl(
 				>
 					<InputRange
 						{ ...props }
-						{ ...hoverInteractions }
-						aria-describedby={ describedBy }
-						aria-label={ label }
-						aria-hidden={ false }
-						className="components-range-control__slider"
+						describedBy={ describedBy }
 						disabled={ disabled }
 						id={ id }
+						isShiftStepEnabled={ isShiftStepEnabled }
+						label={ label }
 						max={ max }
 						min={ min }
 						onBlur={ handleOnBlur }
-						onChange={ handleOnChange }
+						onChange={ handleOnRangeChange }
 						onFocus={ handleOnFocus }
+						onMouseMove={ onMouseMove }
+						onMouseLeave={ onMouseLeave }
 						ref={ setRef }
+						shiftStep={ shiftStep }
 						step={ step }
-						tabIndex={ 0 }
-						type="range"
 						value={ inputSliderValue }
 					/>
 					<RangeRail
