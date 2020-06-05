@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import NumberControl from '../../number-control';
-import { color, reduceMotion, rtl } from '../../utils/style-mixins';
+import { color, reduceMotion, rtl, space } from '../../utils/style-mixins';
 
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
 
@@ -25,17 +25,20 @@ export const Root = styled.span`
 	width: 100%;
 `;
 
+const wrapperColor = ( { color: colorProp = color( 'ui.borderFocus' ) } ) => {
+	return css( { color: colorProp } );
+};
 const wrapperMargin = ( { marks } ) =>
 	css( { marginBottom: marks ? 16 : null } );
 
 export const Wrapper = styled.span`
 	box-sizing: border-box;
-	color: ${ color( 'blue.medium.focus' ) };
 	display: block;
 	padding-top: 15px;
 	position: relative;
 	width: 100%;
 
+	${ wrapperColor };
 	${ rangeHeight };
 	${ wrapperMargin };
 
@@ -54,10 +57,15 @@ export const AfterIconWrapper = styled.span`
 	${ rtl( { marginLeft: 16 } ) }
 `;
 
-const disabledRailBackgroundColor = ( { disabled } ) => {
-	if ( ! disabled ) return '';
+const railBackgroundColor = ( { disabled, railColor } ) => {
+	let background = railColor || null;
+
+	if ( disabled ) {
+		background = color( 'lightGray.400' );
+	}
+
 	return css( {
-		backgroundColor: color( 'lightGray.400' ),
+		background,
 	} );
 };
 
@@ -73,13 +81,18 @@ export const Rail = styled.span`
 	margin-top: 14px;
 	top: 0;
 
-	${ disabledRailBackgroundColor };
+	${ railBackgroundColor };
 `;
 
-const disabledBackgroundColor = ( { disabled } ) => {
-	if ( ! disabled ) return '';
+const trackBackgroundColor = ( { disabled, trackColor } ) => {
+	let background = trackColor || 'currentColor';
+
+	if ( disabled ) {
+		background = color( 'lightGray.800' );
+	}
+
 	return css( {
-		backgroundColor: color( 'lightGray.800' ),
+		background,
 	} );
 };
 
@@ -94,7 +107,7 @@ export const Track = styled.span`
 	margin-top: 14px;
 	top: 0;
 
-	${ disabledBackgroundColor };
+	${ trackBackgroundColor };
 `;
 
 export const MarksWrapper = styled.span`
@@ -105,9 +118,15 @@ export const MarksWrapper = styled.span`
 	user-select: none;
 `;
 
-const markFill = ( { isFilled } ) => {
+const markFill = ( { disabled, isFilled } ) => {
+	let backgroundColor = isFilled ? 'currentColor' : color( 'lightGray.600' );
+
+	if ( disabled ) {
+		backgroundColor = color( 'lightGray.800' );
+	}
+
 	return css( {
-		backgroundColor: isFilled ? 'currentColor' : color( 'lightGray.600' ),
+		backgroundColor,
 	} );
 };
 
@@ -120,7 +139,6 @@ export const Mark = styled.span`
 	width: 1px;
 
 	${ markFill };
-	${ disabledBackgroundColor };
 `;
 
 const markLabelFill = ( { isFilled } ) => {
@@ -162,11 +180,11 @@ export const ThumbWrapper = styled.span`
 const thumbFocus = ( { isFocused } ) => {
 	return css( {
 		borderColor: isFocused
-			? color( 'blue.medium.focus' )
+			? color( 'ui.borderFocus' )
 			: color( 'darkGray.200' ),
 		boxShadow: isFocused
 			? `
-				0 0 0 1px ${ color( 'blue.medium.focus' ) }
+				0 0 0 1px ${ color( 'ui.borderFocus' ) }
 			`
 			: `
 				0 0 0 rgba(0, 0, 0, 0)
@@ -280,9 +298,16 @@ export const Tooltip = styled.span`
 `;
 
 export const InputNumber = styled( NumberControl )`
-	width: 64px;
+	box-sizing: border-box;
+	display: inline-block;
+	margin-top: 0;
+	width: ${ space( 8 ) };
 
-	${ rtl( { marginLeft: 16 } ) }
+	input[type='number']& {
+		${ rangeHeight };
+	}
+
+	${ rtl( { marginLeft: space( 2 ) } ) }
 `;
 
 export const ActionRightWrapper = styled.span`

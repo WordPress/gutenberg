@@ -33,7 +33,7 @@ const DefaultExample = () => {
 		label: text( 'label', 'Range Label' ),
 		help: text( 'help', '' ),
 		min: number( 'min', 0 ),
-		max: number( 'max', 10 ),
+		max: number( 'max', 100 ),
 		step: number( 'step', 1 ),
 		marks: boolean( 'marks', false ),
 		showTooltip: boolean( 'showTooltip', false ),

@@ -19,7 +19,6 @@ import { useControlledState } from '../utils/hooks';
  * @param {number|null} value The value to clamp
  * @param {number} min The minimum value
  * @param {number} max The maxinum value
- *
  * @return {number} A (float) number
  */
 export function floatClamp( value, min, max ) {
@@ -32,6 +31,12 @@ export function floatClamp( value, min, max ) {
 
 /**
  * Hook to store a clamped value, derived from props.
+ *
+ * @param {Object} props Properties for the hook.
+ * @param {number} props.min The minimum value.
+ * @param {number} props.max The maximum value.
+ * @param {number} props.value The current value.
+ * @return {[*, Function]} The controlled value and the value setter.
  */
 export function useControlledRangeValue( { min, max, value: valueProp } ) {
 	const [ value, setValue ] = useControlledState(
@@ -55,12 +60,20 @@ export function useControlledRangeValue( { min, max, value: valueProp } ) {
 /**
  * Hook to encapsulate the debouncing "hover" to better handle the showing
  * and hiding of the Tooltip.
+ *
+ * @param {Object} props Properties for the hook.
+ * @param {Function} props.onHide Callback function on hide.
+ * @param {Function} props.onMouseLeave Callback function on a mouseleave event.
+ * @param {Function} props.onMouseMove Callback function on a mousemove event.
+ * @param {Function} props.onShow Callback function on show.
+ * @param {number} props.timeout Timeout duration for hover interaction.
+ * @return {Object} Bound properties for use on a React.Node.
  */
 export function useDebouncedHoverInteraction( {
-	onShow = noop,
 	onHide = noop,
-	onMouseMove = noop,
 	onMouseLeave = noop,
+	onMouseMove = noop,
+	onShow = noop,
 	timeout = 300,
 } ) {
 	const [ show, setShow ] = useState( false );
