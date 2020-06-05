@@ -183,9 +183,9 @@ function BlockListBlock( {
 					<>
 						{ blockEdit }
 						{ mode === 'html' && (
-							<block.Div __unstableIsHtml>
+							<block.div __unstableIsHtml>
 								<BlockHtml clientId={ clientId } />
-							</block.Div>
+							</block.div>
 						) }
 					</>
 				) }
@@ -198,16 +198,16 @@ function BlockListBlock( {
 					</block.div>
 				) }
 				{ ! isValid && (
-					<block.Div>
+					<block.div>
 						<BlockInvalidWarning clientId={ clientId } />
 						<div>{ getSaveElement( blockType, attributes ) }</div>
-					</block.Div>
+					</block.div>
 				) }
 			</BlockCrashBoundary>
 			{ !! hasError && (
-				<block.Div>
+				<block.div>
 					<BlockCrashWarning />
-				</block.Div>
+				</block.div>
 			) }
 		</BlockListBlockContext.Provider>
 	);

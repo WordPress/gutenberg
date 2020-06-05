@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { first, last, omit, upperFirst } from 'lodash';
+import { first, last, omit } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
@@ -21,7 +21,6 @@ import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from '../use-moving-animation';
 import { Context, SetBlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
-import ELEMENTS from './block-wrapper-elements';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 function higherOrderComponent( Component ) {
@@ -249,8 +248,6 @@ export const block = createHigherOrderComponent(
 	'block'
 );
 
-ELEMENTS.forEach( ( element ) => {
-	const ElementBlock = block( element );
-	block[ element ] = ElementBlock;
-	block[ upperFirst( element ) ] = ElementBlock;
-} );
+for ( const tagName in animated ) {
+	block[ tagName ] = block( tagName );
+}
