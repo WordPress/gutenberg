@@ -248,7 +248,7 @@ function Navigation( {
 		}
 	}
 
-	const dropDownOptions = useMemo(
+	const createActionOptions = useMemo(
 		() => [
 			{
 				id: CREATE_PLACEHOLDER_VALUE,
@@ -339,20 +339,22 @@ function Navigation( {
 								hideLabelFromVision={ true }
 								value={
 									selectedCreateActionOption ||
-									dropDownOptions[ 0 ]
+									createActionOptions[ 0 ]
 								}
 								onChange={ ( { selectedItem } ) => {
 									setSelectedCreateActionOption(
 										selectedItem
 									);
 								} }
-								options={ dropDownOptions.map( ( option ) => {
-									return {
-										name: option.name,
-										key: option.id,
-										disabled: option.disabled,
-									};
-								} ) }
+								options={ createActionOptions.map(
+									( option ) => {
+										return {
+											name: option.name,
+											key: option.id,
+											disabled: option.disabled,
+										};
+									}
+								) }
 							/>
 							<Button
 								isSecondary
