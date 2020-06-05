@@ -55,7 +55,7 @@ Generally speaking, the following labels are very useful for triaging issues and
 ### Release specific triage
 Here are some guidelines to follow when doing triage specifically around the time of a release. This is important to differentiate compared to general triage so problematic, release blocking bugs are properly identified and solutions are found.
 
-* If a bug is introduced in a release candidate (RC) and it's going to break many workflows, add it to the RC milestone and flag in the #core-editor channel in WordPress.org slack.
+* If a bug is introduced in a release candidate (RC) and it's going to break many workflows, add it to the version milestone and flag in the #core-editor channel in WordPress.org slack.
 * If a bug was introduced in the most recent version, and a next RC hasn’t yet happened, ideally the developers can push to fix it prior to RC! The amount of push for a fix should scale proportional to the potential of breakage. In this case, add to the RC milestone and, if deemed urgent, ping in the #core-editor channel in WordPress.org slack. 
 * If a bug wasn’t introduced in the most recent version, do not add a milestone. Instead, use labels like “[Priority] High” if it’s a pressing issue, and if needed you can call attention to it in the weekly core meetings. 
 
