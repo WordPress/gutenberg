@@ -508,7 +508,6 @@ export default compose( [
 			'getEntityRecords',
 			[ 'postType', 'page', filterDefaultPages ],
 		];
-		const menusSelect = [ 'core', 'getEntityRecords', [ 'root', 'menu' ] ];
 
 		const menuItemsSelect = [
 			'core',
@@ -525,6 +524,8 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
+		const menusQuery = { per_page: -1 };
+
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
@@ -534,7 +535,14 @@ export default compose( [
 				'page',
 				filterDefaultPages
 			),
-			menus: select( 'core' ).getEntityRecords( 'root', 'menu' ),
+			// menus: select( 'core' ).getEntityRecords( 'root', 'menu' ),
+			menus: select( 'core' ).getMenus( menusQuery ),
+			isRequestingMenus: select( 'core' ).isResolving( 'getMenus', [
+				menusQuery,
+			] ),
+			hasResolvedMenus: select(
+				'core'
+			).hasFinishedResolution( 'getMenus', [ menusQuery ] ),
 			getMenuItems: ( menuId ) => {
 				if ( ! menuId ) {
 					return false;
@@ -554,18 +562,13 @@ export default compose( [
 			isRequestingPages: select( 'core/data' ).isResolving(
 				...pagesSelect
 			),
-			isRequestingMenus: select( 'core/data' ).isResolving(
-				...menusSelect
-			),
 			isRequestingMenuItems: () => {
 				return select( 'core/data' ).isResolving( ...menuItemsSelect );
 			},
 			hasResolvedPages: select( 'core/data' ).hasFinishedResolution(
 				...pagesSelect
 			),
-			hasResolvedMenus: select( 'core/data' ).hasFinishedResolution(
-				...menusSelect
-			),
+
 			checkHasResolvedMenuItems: ( menuId ) => {
 				return select( 'core/data' ).hasFinishedResolution(
 					'core',
