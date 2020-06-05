@@ -276,6 +276,8 @@ describe( 'Searching for a link', () => {
 			fauxEntitySuggestions.length
 		);
 
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+
 		// Sanity check that a search suggestion shows up corresponding to the data
 		expect( firstSearchResultItemHTML ).toEqual(
 			expect.stringContaining( firstFauxSuggestion.title )
@@ -566,6 +568,8 @@ describe( 'Default search suggestions', () => {
 		// it should match any url that's like ?p= and also include a URL option
 		expect( searchResultElements ).toHaveLength( 5 );
 
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+
 		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 	} );
 
@@ -615,6 +619,34 @@ describe( 'Default search suggestions', () => {
 		expect( searchResultLabel.innerHTML ).toBe( 'Recently updated' );
 
 		expect( searchResultElements ).toHaveLength( 3 );
+	} );
+
+	it( 'should not display initial suggestions when there are no recently updated pages/posts', async () => {
+		const noResults = [];
+		// Force API returning empty results for recently updated Pages.
+		mockFetchSearchSuggestions.mockImplementation( () =>
+			Promise.resolve( noResults )
+		);
+
+		act( () => {
+			render( <LinkControl showInitialSuggestions />, container );
+		} );
+
+		await eventLoopTick();
+
+		const searchInput = getURLInput();
+
+		const searchResultElements = getSearchResults();
+
+		const searchResultLabel = container.querySelector(
+			'.block-editor-link-control__search-results-label'
+		);
+
+		expect( searchResultLabel ).toBeFalsy();
+
+		expect( searchResultElements ).toHaveLength( 0 );
+
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
 	} );
 } );
 

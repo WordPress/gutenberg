@@ -79,13 +79,16 @@ $tree-item-height: 36px;
 		height: $button-size;
 	}
 
-	.block-editor-button-block-appender {
-		outline: none;
-		background: none;
-		padding: $grid-unit-10;
-		padding: 6px;
-		margin-left: 0.8em;
-		width: calc(100% - 0.8em);
+	.block-editor-inserter__toggle {
+		background: $dark-gray-primary;
+		color: $white;
+		height: $grid-unit-30;
+		margin: 6px 6px 6px 0.8em;
+		min-width: $grid-unit-30;
+
+		&:active {
+			color: $white;
+		}
 	}
 }
 

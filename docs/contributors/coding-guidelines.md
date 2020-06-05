@@ -452,11 +452,11 @@ Documenting a function component should be treated the same as any other functio
  * @example
  *
  * ```jsx
- * <BlockTitle name="my-plugin/my-block" />
+ * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
  * ```
  *
- * @param {Object}  props      Component props.
- * @param {?string} props.name Block name.
+ * @param {Object} props
+ * @param {string} props.clientId Client ID of block.
  *
  * @return {?string} Block title.
  */

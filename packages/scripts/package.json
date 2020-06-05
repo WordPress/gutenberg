@@ -50,7 +50,7 @@
 		"css-loader": "^3.5.2",
 		"decompress-zip": "^0.2.2",
 		"dir-glob": "^3.0.1",
-		"eslint": "^6.8.0",
+		"eslint": "^7.1.0",
 		"eslint-plugin-markdown": "^1.0.2",
 		"got": "^10.7.0",
 		"ignore-emit-webpack-plugin": "^2.0.2",

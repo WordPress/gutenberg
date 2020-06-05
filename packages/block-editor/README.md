@@ -186,7 +186,23 @@ _Related_
 
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
-Undocumented declaration.
+Renders the block's configured title as a string, or empty if the title
+cannot be determined.
+
+_Usage_
+
+```jsx
+<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+```
+
+_Parameters_
+
+-   _props_ `Object`: 
+-   _props.clientId_ `string`: Client ID of block.
+
+_Returns_
+
+-   `?string`: Block title.
 
 <a name="BlockToolbar" href="#BlockToolbar">#</a> **BlockToolbar**
 
