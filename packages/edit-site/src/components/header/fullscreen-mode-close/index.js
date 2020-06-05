@@ -2,11 +2,22 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useEntityProp } from '@wordpress/core-data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
 function FullscreenModeClose( { icon } ) {
+	const [ siteIconURL ] = useEntityProp( 'root', 'site', 'site_icon_url' );
+	
+	const isRequestingSiteIcon = useSelect( ( select ) => {
+		return ! select( 'core/data' ).hasFinishedResolution(
+			'core',
+			'getEntityRecord',
+			[ 'root', 'site', undefined ]
+		);
+	}, [] );
+
 	const isActive = useSelect( ( select ) => {
 		return select( 'core/edit-site' ).isFeatureActive( 'fullscreenMode' );
 	}, [] );
@@ -15,7 +26,8 @@ function FullscreenModeClose( { icon } ) {
 		return null;
 	}
 
-	const buttonIcon = icon || wordpress;
+	const shouldDisplaySiteIcon = siteIconURL || isRequestingSiteIcon;
+	const buttonIcon = shouldDisplaySiteIcon ? null : icon || wordpress;
 
 	return (
 		<Button
@@ -24,7 +36,16 @@ function FullscreenModeClose( { icon } ) {
 			iconSize={ 36 }
 			href="index.php"
 			label={ __( 'Back' ) }
-		/>
+		>
+			{ /* TODO: Properly style site icon */ }
+			{ siteIconURL && (
+				<img
+					src={ siteIconURL }
+					alt="site-icon"
+					style={ { width: '36px', height: 'auto' } }
+				/>
+			) }
+		</Button>
 	);
 }
 
