@@ -43,7 +43,7 @@ function AudioEdit( {
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return getSettings().mediaUpload;
-	} );
+	}, [] );
 
 	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
