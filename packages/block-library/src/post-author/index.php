@@ -78,9 +78,6 @@ function post_author_build_css_font_sizes( $attributes ) {
 		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['style']['typography']['fontSize'] );
 	}
 
-	$has_named_bio_font_size  = array_key_exists( 'bioFontSize', $attributes );
-	$has_custom_bio_font_size = array_key_exists( 'customBioFontSize', $attributes );
-
 	return $font_sizes;
 }
 
