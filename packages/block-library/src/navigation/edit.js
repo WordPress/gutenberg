@@ -77,9 +77,10 @@ function Navigation( {
 	// HOOKS
 	//
 	const ref = useRef();
-	const [ selectedDropDownOption, setSelectedDropDownOption ] = useState(
-		null
-	);
+	const [
+		selectedCreateActionOption,
+		setSelectedCreateActionOption,
+	] = useState( null );
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
@@ -130,7 +131,7 @@ function Navigation( {
 		);
 	}, [ pages ] );
 
-	const menuItems = getMenuItems( selectedDropDownOption?.key );
+	const menuItems = getMenuItems( selectedCreateActionOption?.key );
 
 	// Builds navigation links from selected Menu's items.
 	const navLinkBlocksFromMenuItems = useMemo( () => {
@@ -200,7 +201,7 @@ function Navigation( {
 	}
 
 	function handleCreate() {
-		const { key } = selectedDropDownOption;
+		const { key } = selectedCreateActionOption;
 
 		// Explicity request to create empty.
 		if ( key === CREATE_EMPTY_OPTION_VALUE ) {
@@ -215,7 +216,7 @@ function Navigation( {
 		// Create from WP Menu (if exists and not empty).
 		if (
 			hasMenus &&
-			selectedDropDownOption &&
+			selectedCreateActionOption &&
 			navLinkBlocksFromMenuItems?.length
 		) {
 			return handleCreateFromExistingMenu();
@@ -269,23 +270,23 @@ function Navigation( {
 
 	function shouldDisableCreateButton() {
 		// If there is no key at all then disable.
-		if ( ! selectedDropDownOption?.key ) {
+		if ( ! selectedCreateActionOption?.key ) {
 			return true;
 		}
 
 		// Always disable if the default "placeholder" option is selected.
-		if ( selectedDropDownOption.key === CREATE_PLACEHOLDER_VALUE ) {
+		if ( selectedCreateActionOption.key === CREATE_PLACEHOLDER_VALUE ) {
 			return true;
 		}
 
 		// Always enable if Create Empty is selected.
-		if ( selectedDropDownOption.key === CREATE_EMPTY_OPTION_VALUE ) {
+		if ( selectedCreateActionOption.key === CREATE_EMPTY_OPTION_VALUE ) {
 			return false;
 		}
 
 		// Enable if Pages option selected and we have Pages available.
 		if (
-			selectedDropDownOption.key === CREATE_FROM_PAGES_OPTION_VALUE &&
+			selectedCreateActionOption.key === CREATE_FROM_PAGES_OPTION_VALUE &&
 			hasResolvedPages
 		) {
 			return false;
@@ -293,12 +294,12 @@ function Navigation( {
 
 		// Only "menu" options use an integer based key.
 		const selectedOptionIsMenu = Number.isInteger(
-			selectedDropDownOption.key
+			selectedCreateActionOption.key
 		);
 
 		const menuItemsResolved =
 			selectedOptionIsMenu &&
-			getHasResolvedMenuItems( selectedDropDownOption.key );
+			getHasResolvedMenuItems( selectedCreateActionOption.key );
 
 		return ! menuItemsResolved;
 	}
@@ -327,11 +328,13 @@ function Navigation( {
 								) }
 								hideLabelFromVision={ true }
 								value={
-									selectedDropDownOption ||
+									selectedCreateActionOption ||
 									dropDownOptions[ 0 ]
 								}
 								onChange={ ( { selectedItem } ) => {
-									setSelectedDropDownOption( selectedItem );
+									setSelectedCreateActionOption(
+										selectedItem
+									);
 								} }
 								options={ dropDownOptions.map( ( option ) => {
 									return {
@@ -345,7 +348,7 @@ function Navigation( {
 								isSecondary
 								className="wp-block-navigation-placeholder__button"
 								onClick={ () => {
-									if ( ! selectedDropDownOption ) {
+									if ( ! selectedCreateActionOption ) {
 										return;
 									}
 									handleCreate();
