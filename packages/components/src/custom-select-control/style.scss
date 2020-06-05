@@ -1,3 +1,5 @@
+$icon_width: 24px;
+
 .components-custom-select-control {
 	position: relative;
 }
@@ -15,6 +17,12 @@
 	min-width: 130px;
 	position: relative;
 	text-align: left;
+
+	// For all button sizes allow sufficient space for the
+	// dropdown "arrow" icon to display.
+	&.components-custom-select-control__button {
+		padding-right: $icon_width;
+	}
 
 	&:focus:not(:disabled) {
 		border-color: $theme-color;
