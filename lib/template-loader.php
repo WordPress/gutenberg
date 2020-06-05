@@ -319,6 +319,29 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 		}
 	}
 
+	// If we haven't found any template post by here, it means that this theme doesn't even come with a fallback
+	// `index.html` block template. We create one so that people that are trying to access the editor are greeted
+	// with a blank page rather than an error.
+	if( ! $current_template_post && ( is_admin() || defined( 'REST_REQUEST' ) ) ) {
+		// 'index' is the ultimate fallback template. If even this template doesn't exist, we create an empty one for it.
+		$current_template_post = array(
+			//'post_content' => $file_contents,
+			'post_title'   => 'index',
+			'post_status'  => 'auto-draft',
+			'post_type'    => 'wp_template',
+			'post_name'    => 'index',
+		);
+		if ( is_admin() || defined( 'REST_REQUEST' ) ) {
+			$current_template_post = get_post(
+				wp_insert_post( $current_template_post )
+			);
+		} else {
+			$current_template_post = new WP_Post(
+				(object) $current_template_post
+			);
+		}
+	}
+
 	if ( $current_template_post ) {
 		$template_part_ids = array();
 		if ( is_admin() ) {
