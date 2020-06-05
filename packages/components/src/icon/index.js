@@ -61,6 +61,8 @@ function Icon( { icon = null, size, ...additionalProps } ) {
 
 	if ( isValidElement( icon ) ) {
 		return cloneElement( icon, {
+			height: iconSize,
+			width: iconSize,
 			size: iconSize,
 			...additionalProps,
 		} );
