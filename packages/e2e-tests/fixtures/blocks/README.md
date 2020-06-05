@@ -68,7 +68,7 @@ the attributes are serialized correctly.
 
 The process for updating fixtures for existing tests is similar to that for creating them:
 
-First delete files (2) through (4), then run the command to regenerate the files:
+Run the command to regenerate the files:
 ```sh
 npm run fixtures:regenerate test/integration/full-content/full-content.test.js
 ```
