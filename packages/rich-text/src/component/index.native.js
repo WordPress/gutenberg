@@ -408,11 +408,7 @@ export class RichText extends Component {
 		const record = this.getRecord();
 		addMention()
 			.then( ( mentionUserId ) => {
-				let stringToInsert = `@${ mentionUserId }`;
-				if ( this.isIOS ) {
-					stringToInsert += ' ';
-				}
-				this.insertString( record, stringToInsert );
+				this.insertString( record, `@${ mentionUserId } ` );
 			} )
 			.catch( () => {} );
 	}
@@ -741,7 +737,7 @@ export class RichText extends Component {
 			parentBlockStyles,
 			withoutInteractiveFormatting,
 			capabilities,
-			disableEditingMenu=false,
+			disableEditingMenu = false,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -850,7 +846,12 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ disableEditingMenu === false && isMentionsSupported( capabilities ) ? [ '@' ] : [] }
+					triggerKeyCodes={
+						disableEditingMenu === false &&
+						isMentionsSupported( capabilities )
+							? [ '@' ]
+							: []
+					}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
