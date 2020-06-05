@@ -1605,7 +1605,8 @@ describe( 'block factory', () => {
 					index % 2 ? 'core/text-block' : 'core/image-block',
 					{
 						value: `block-value-${ index + 1 }`,
-					} );
+					}
+				);
 			} );
 
 			const transformedBlocks = switchToBlockType(
@@ -1663,7 +1664,7 @@ describe( 'block factory', () => {
 			const blocks = times( numOfBlocksToGroup, ( index ) => {
 				return createBlock( 'core/text-block', {
 					value: `block-value-${ index + 1 }`,
-					} );
+				} );
 			} );
 
 			const transformedBlocks = switchToBlockType(
