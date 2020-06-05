@@ -105,6 +105,16 @@ export const disabledLink = () => {
 	);
 };
 
+export const destructiveLink = () => {
+	const label = text( 'Label', 'Destructive Link' );
+
+	return (
+		<Button isDestructive isLink>
+			{ label }
+		</Button>
+	);
+};
+
 export const icon = () => {
 	const usedIcon = text( 'Icon', 'ellipsis' );
 	const label = text( 'Label', 'More' );
