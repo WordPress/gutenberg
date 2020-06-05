@@ -137,11 +137,9 @@ function useMovingAnimation(
 
 			ref.current.style.transformOrigin = 'center';
 			ref.current.style.transform =
-				x === 0 && y === 0
-					? undefined
-					: `translate3d(${ x }px,${ y }px,0)`;
+				x === 0 && y === 0 ? null : `translate3d(${ x }px,${ y }px,0)`;
 			ref.current.style.zIndex =
-				! isSelected || ( x === 0 && y === 0 ) ? undefined : '1';
+				! isSelected || ( x === 0 && y === 0 ) ? null : '1';
 		},
 	} );
 }
