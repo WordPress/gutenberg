@@ -55,6 +55,8 @@
 	display: flex;
 	list-style-type: none;
 	padding: 10px 5px 10px 25px;
+	cursor: default;
+
 
 	&.is-highlighted {
 		background: $light-gray-500;
