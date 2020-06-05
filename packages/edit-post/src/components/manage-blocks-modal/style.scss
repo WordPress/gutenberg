@@ -1,6 +1,6 @@
 .edit-post-manage-blocks-modal {
 	@include break-small() {
-		height: calc(100% - #{ $header-height } - #{ $header-height });
+		height: 90%;
 	}
 }
 
