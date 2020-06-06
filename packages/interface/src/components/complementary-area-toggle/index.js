@@ -32,10 +32,13 @@ function ComplementaryAreaToggle( {
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
 		'core/interface'
 	);
+	const componentProps = { ...props };
+	if ( ComponentToUse !== Button ) {
+		componentProps.isSelected = isSelected;
+	}
 	return (
 		<ComponentToUse
 			icon={ selectedIcon && isSelected ? selectedIcon : icon }
-			isSelected={ isSelected }
 			onClick={ () => {
 				if ( isSelected ) {
 					disableComplementaryArea( scope );
@@ -43,7 +46,7 @@ function ComplementaryAreaToggle( {
 					enableComplementaryArea( scope, identifier );
 				}
 			} }
-			{ ...omit( props, [ 'name' ] ) }
+			{ ...omit( componentProps, [ 'name' ] ) }
 		/>
 	);
 }
