@@ -71,16 +71,16 @@ A unique feature to the Gutenberg documentation is the `codetabs` toggle, this a
 
 Here is an example `codetabs` section:
 
-		{% codetabs %}
-		{% ESNext %}
-		```js
-			// ESNext code here
-		```
-		{% ES5 %}
-		```js
-			// ES5 code here
-		```
-		{% end %}
+	{% codetabs %}
+	{% ESNext %}
+	```js
+		// ESNext code here
+	```
+	{% ES5 %}
+	```js
+		// ES5 code here
+	```
+	{% end %}
 
 The preferred format for code examples is ESNext, which should also be the default viewed. The example placed first in source will be shown as the default.
 
