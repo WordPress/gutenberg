@@ -42,6 +42,7 @@ const CONDITIONS = {
 	'<': 'max-width',
 };
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * @callback EvaluatorFunc
  *
@@ -50,6 +51,7 @@ const CONDITIONS = {
  *
  * @return {boolean}
  */
+/* eslint-enable jsdoc/valid-types */
 
 /**
  * Object mapping media query operators to a function that given a breakpointValue and a width evaluates if the operator matches the values.
