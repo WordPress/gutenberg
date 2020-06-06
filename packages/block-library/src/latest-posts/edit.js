@@ -51,85 +51,6 @@ const USERS_LIST_QUERY = {
 
 const LatestPostsEdit = ( { attributes, setAttributes, className } ) => {
 	const {
-		defaultImageWidth,
-		defaultImageHeight,
-		imageSizeOptions,
-		categoriesList,
-		authorList,
-		latestPosts,
-	} = useSelect( ( select ) => {
-		const { getEntityRecords, getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
-		const { imageSizes, imageDimensions } = getSettings();
-		const catIds =
-			categories && categories.length > 0
-				? categories.map( ( cat ) => cat.id )
-				: [];
-		const latestPostsQuery = pickBy(
-			{
-				categories: catIds,
-				author: selectedAuthor,
-				order,
-				orderby: orderBy,
-				per_page: postsToShow,
-			},
-			( value ) => ! isUndefined( value )
-		);
-
-		const posts = getEntityRecords( 'postType', 'post', latestPostsQuery );
-
-		return {
-			defaultImageWidth: get(
-				imageDimensions,
-				[ featuredImageSizeSlug, 'width' ],
-				0
-			),
-			defaultImageHeight: get(
-				imageDimensions,
-				[ featuredImageSizeSlug, 'height' ],
-				0
-			),
-			imageSizeOptions: imageSizes
-				.filter( ( { slug } ) => slug !== 'full' )
-				.map( ( { name, slug } ) => ( { value: slug, label: name } ) ),
-			latestPosts: ! Array.isArray( posts )
-				? posts
-				: posts.map( ( post ) => {
-						if ( post.featured_media ) {
-							const image = getMedia( post.featured_media );
-							let url = get(
-								image,
-								[
-									'media_details',
-									'sizes',
-									featuredImageSizeSlug,
-									'source_url',
-								],
-								null
-							);
-							if ( ! url ) {
-								url = get( image, 'source_url', null );
-							}
-							return { ...post, featuredImageSourceUrl: url };
-						}
-						return post;
-				  } ),
-			categoriesList:
-				select( 'core' ).getEntityRecords(
-					'taxonomy',
-					'category',
-					CATEGORIES_LIST_QUERY
-				) || [],
-			authorList:
-				select( 'core' ).getEntityRecords(
-					'root',
-					'user',
-					USERS_LIST_QUERY
-				) || [],
-		};
-	}, [] );
-
-	const {
 		displayFeaturedImage,
 		displayPostContentRadio,
 		displayPostContent,
@@ -148,6 +69,103 @@ const LatestPostsEdit = ( { attributes, setAttributes, className } ) => {
 		featuredImageSizeWidth,
 		featuredImageSizeHeight,
 	} = attributes;
+
+	const {
+		defaultImageWidth,
+		defaultImageHeight,
+		imageSizeOptions,
+		categoriesList,
+		authorList,
+		latestPosts,
+	} = useSelect(
+		( select ) => {
+			const { getEntityRecords, getMedia } = select( 'core' );
+			const { getSettings } = select( 'core/block-editor' );
+			const { imageSizes, imageDimensions } = getSettings();
+			const catIds =
+				categories && categories.length > 0
+					? categories.map( ( cat ) => cat.id )
+					: [];
+			const latestPostsQuery = pickBy(
+				{
+					categories: catIds,
+					author: selectedAuthor,
+					order,
+					orderby: orderBy,
+					per_page: postsToShow,
+				},
+				( value ) => ! isUndefined( value )
+			);
+
+			const posts = getEntityRecords(
+				'postType',
+				'post',
+				latestPostsQuery
+			);
+
+			return {
+				defaultImageWidth: get(
+					imageDimensions,
+					[ featuredImageSizeSlug, 'width' ],
+					0
+				),
+				defaultImageHeight: get(
+					imageDimensions,
+					[ featuredImageSizeSlug, 'height' ],
+					0
+				),
+				imageSizeOptions: imageSizes
+					.filter( ( { slug } ) => slug !== 'full' )
+					.map( ( { name, slug } ) => ( {
+						value: slug,
+						label: name,
+					} ) ),
+				latestPosts: ! Array.isArray( posts )
+					? posts
+					: posts.map( ( post ) => {
+							if ( post.featured_media ) {
+								const image = getMedia( post.featured_media );
+								let url = get(
+									image,
+									[
+										'media_details',
+										'sizes',
+										featuredImageSizeSlug,
+										'source_url',
+									],
+									null
+								);
+								if ( ! url ) {
+									url = get( image, 'source_url', null );
+								}
+								return { ...post, featuredImageSourceUrl: url };
+							}
+							return post;
+					  } ),
+				categoriesList:
+					select( 'core' ).getEntityRecords(
+						'taxonomy',
+						'category',
+						CATEGORIES_LIST_QUERY
+					) || [],
+				authorList:
+					select( 'core' ).getEntityRecords(
+						'root',
+						'user',
+						USERS_LIST_QUERY
+					) || [],
+			};
+		},
+		[
+			featuredImageSizeSlug,
+			postsToShow,
+			order,
+			orderBy,
+			categories,
+			selectedAuthor,
+		]
+	);
+
 	const categorySuggestions = categoriesList.reduce(
 		( accumulator, category ) => ( {
 			...accumulator,
