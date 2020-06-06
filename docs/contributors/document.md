@@ -63,6 +63,29 @@ To create links that work in all contexts, you should use absolute path links wi
 
 This way they will be properly handled in all three aforementioned contexts.
 
+### Code Examples
+
+The code example in markdown should be wrapped in three tick marks <code>```</code> and can additionally include a language specifier. See this [Github documentation around fenced code blocks](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks).
+
+A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `ESNext` and `ES5` code samples. For example, [on this block tutorial page](/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md).
+
+Here is an example `codetabs` section:
+
+		{% codetabs %}
+		{% ESNext %}
+		```js
+			// ESNext code here
+		```
+		{% ES5 %}
+		```js
+			// ES5 code here
+		```
+		{% endtab %}
+
+The preferred format for code examples is ESNext, which should also be the default viewed, when placed first in source it will show as the default.
+
+Note: not all code examples are required to include ES5 code. The guidance is to include `ES5` code for beginner tutorials, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem is in ESNext.
+
 ## Resources
 
 - [Copy Guidelines](/docs/contributors/copy-guide.md) for writing instructions, documentations, or other contributions to Gutenberg project.
