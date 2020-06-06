@@ -84,6 +84,11 @@ const fetchReusableBlocks = once( () => {
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
  *
+ * @param {Object} props                                   Component props.
+ * @param {string} [props.getBlockInsertionParentClientId] Client ID of the parent.
+ * @param {string} [props.getInserterItems]                Inserter items for parent.
+ * @param {string} [props.getSelectedBlockName]            Name of selected block or null.
+ *
  * @return {WPCompleter} A blocks completer.
  */
 export function createBlockCompleter( {
