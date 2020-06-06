@@ -125,7 +125,7 @@ function useMovingAnimation(
 		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
-		onFrame: ( { x, y } ) => {
+		onFrame( { x, y } ) {
 			if (
 				adjustScrolling &&
 				scrollContainer.current &&
