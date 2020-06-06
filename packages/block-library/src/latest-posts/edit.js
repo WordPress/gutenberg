@@ -143,17 +143,13 @@ const LatestPostsEdit = ( { attributes, setAttributes, className } ) => {
 							return post;
 					  } ),
 				categoriesList:
-					select( 'core' ).getEntityRecords(
+					getEntityRecords(
 						'taxonomy',
 						'category',
 						CATEGORIES_LIST_QUERY
 					) || [],
 				authorList:
-					select( 'core' ).getEntityRecords(
-						'root',
-						'user',
-						USERS_LIST_QUERY
-					) || [],
+					getEntityRecords( 'root', 'user', USERS_LIST_QUERY ) || [],
 			};
 		},
 		[
