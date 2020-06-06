@@ -17,7 +17,13 @@ const {
 const DEBOUNCE_TIMEOUT = 250;
 
 /**
- * Hook that creates a showMover state, as well as debounced show/hide callbacks
+ * Hook that creates a showMover state, as well as debounced show/hide callbacks.
+ *
+ * @param {Object} props Component props.
+ * @param {Object} props.ref Element reference.
+ * @param {boolean} props.isFocused Does component have current focus.
+ * @param {number} [props.debounceTimeout=250] Debounce timeout in milliseconds.
+ * @param {Function} [props.onChange=noop] Callback function.
  */
 export function useDebouncedShowMovers( {
 	ref,
@@ -89,6 +95,11 @@ export function useDebouncedShowMovers( {
 /**
  * Hook that provides a showMovers state and gesture events for DOM elements
  * that interact with the showMovers state.
+ *
+ * @param {Object} props Component props
+ * @param {Object} props.ref Element reference.
+ * @param {number} [props.debounceTimeout=250] Debounce timeout in milliseconds.
+ * @param {Function} [props.onChange=noop] Callback function.
  */
 export function useShowMoversGestures( {
 	ref,
