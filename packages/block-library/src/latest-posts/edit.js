@@ -27,7 +27,7 @@ import {
 	BlockControls,
 	__experimentalImageSizeControl as ImageSizeControl,
 } from '@wordpress/block-editor';
-import { withSelect, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
 
 /**
@@ -45,25 +45,87 @@ import {
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
+const USERS_LIST_QUERY = {
+	per_page: -1,
+};
 
-const LatestPostsEdit = ( {
-	attributes,
-	setAttributes,
-	imageSizeOptions,
-	latestPosts,
-	defaultImageWidth,
-	className,
-	defaultImageHeight,
-} ) => {
-	const { categoriesList, authorList } = useSelect( ( select ) => {
+const LatestPostsEdit = ( { attributes, setAttributes, className } ) => {
+	const {
+		defaultImageWidth,
+		defaultImageHeight,
+		imageSizeOptions,
+		categoriesList,
+		authorList,
+		latestPosts,
+	} = useSelect( ( select ) => {
+		const { getEntityRecords, getMedia } = select( 'core' );
+		const { getSettings } = select( 'core/block-editor' );
+		const { imageSizes, imageDimensions } = getSettings();
+		const catIds =
+			categories && categories.length > 0
+				? categories.map( ( cat ) => cat.id )
+				: [];
+		const latestPostsQuery = pickBy(
+			{
+				categories: catIds,
+				author: selectedAuthor,
+				order,
+				orderby: orderBy,
+				per_page: postsToShow,
+			},
+			( value ) => ! isUndefined( value )
+		);
+
+		const posts = getEntityRecords( 'postType', 'post', latestPostsQuery );
+
 		return {
+			defaultImageWidth: get(
+				imageDimensions,
+				[ featuredImageSizeSlug, 'width' ],
+				0
+			),
+			defaultImageHeight: get(
+				imageDimensions,
+				[ featuredImageSizeSlug, 'height' ],
+				0
+			),
+			imageSizeOptions: imageSizes
+				.filter( ( { slug } ) => slug !== 'full' )
+				.map( ( { name, slug } ) => ( { value: slug, label: name } ) ),
+			latestPosts: ! Array.isArray( posts )
+				? posts
+				: posts.map( ( post ) => {
+						if ( post.featured_media ) {
+							const image = getMedia( post.featured_media );
+							let url = get(
+								image,
+								[
+									'media_details',
+									'sizes',
+									featuredImageSizeSlug,
+									'source_url',
+								],
+								null
+							);
+							if ( ! url ) {
+								url = get( image, 'source_url', null );
+							}
+							return { ...post, featuredImageSourceUrl: url };
+						}
+						return post;
+				  } ),
 			categoriesList:
 				select( 'core' ).getEntityRecords(
 					'taxonomy',
 					'category',
 					CATEGORIES_LIST_QUERY
 				) || [],
-			authorList: select( 'core' ).getAuthors() || [],
+			authorList:
+				select( 'core' ).getEntityRecords(
+					'root',
+					'user',
+					USERS_LIST_QUERY
+				) || [],
 		};
 	}, [] );
 
@@ -450,71 +512,4 @@ const LatestPostsEdit = ( {
 	);
 };
 
-export default withSelect( ( select, props ) => {
-	const {
-		featuredImageSizeSlug,
-		postsToShow,
-		order,
-		orderBy,
-		categories,
-		selectedAuthor,
-	} = props.attributes;
-	const { getEntityRecords, getMedia } = select( 'core' );
-	const { getSettings } = select( 'core/block-editor' );
-	const { imageSizes, imageDimensions } = getSettings();
-	const catIds =
-		categories && categories.length > 0
-			? categories.map( ( cat ) => cat.id )
-			: [];
-	const latestPostsQuery = pickBy(
-		{
-			categories: catIds,
-			author: selectedAuthor,
-			order,
-			orderby: orderBy,
-			per_page: postsToShow,
-		},
-		( value ) => ! isUndefined( value )
-	);
-
-	const posts = getEntityRecords( 'postType', 'post', latestPostsQuery );
-	const imageSizeOptions = imageSizes
-		.filter( ( { slug } ) => slug !== 'full' )
-		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
-
-	return {
-		defaultImageWidth: get(
-			imageDimensions,
-			[ featuredImageSizeSlug, 'width' ],
-			0
-		),
-		defaultImageHeight: get(
-			imageDimensions,
-			[ featuredImageSizeSlug, 'height' ],
-			0
-		),
-		imageSizeOptions,
-		latestPosts: ! Array.isArray( posts )
-			? posts
-			: posts.map( ( post ) => {
-					if ( post.featured_media ) {
-						const image = getMedia( post.featured_media );
-						let url = get(
-							image,
-							[
-								'media_details',
-								'sizes',
-								featuredImageSizeSlug,
-								'source_url',
-							],
-							null
-						);
-						if ( ! url ) {
-							url = get( image, 'source_url', null );
-						}
-						return { ...post, featuredImageSourceUrl: url };
-					}
-					return post;
-			  } ),
-	};
-} )( LatestPostsEdit );
+export default LatestPostsEdit;
