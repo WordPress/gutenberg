@@ -135,19 +135,19 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 							},
 						] }
 					/>
-					<MenuGroup>
-						<MenuItem
-							isDisabled={ isDisabled }
-							onClick={ () => {
-								this.setState( {
-									aspect: 1,
-								} );
-								onClose();
-							} }
-						>
-							{ __( 'Square' ) }
-						</MenuItem>
-					</MenuGroup>
+					<AspectGroup
+						isDisabled={ isDisabled }
+						onClick={ ( aspect ) => {
+							onClick( aspect );
+							onClose();
+						} }
+						aspectRatios={ [
+							{
+								label: __( 'Square' ),
+								aspect: 1,
+							},
+						] }
+					/>
 				</>
 			) }
 		</DropdownMenu>
