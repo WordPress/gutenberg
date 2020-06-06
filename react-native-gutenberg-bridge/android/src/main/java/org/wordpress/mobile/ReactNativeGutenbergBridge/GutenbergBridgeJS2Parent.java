@@ -39,6 +39,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onMediaFileUploadFailed(int mediaId);
     }
 
+    interface ReplaceUnsupportedBlockCallback {
+        void replaceUnsupportedBlock(String content, String blockId);
+    }
+
     interface StarterPageTemplatesTooltipShownCallback {
         void onRequestStarterPageTemplatesTooltipShown(boolean tooltipShown);
     }
@@ -142,6 +146,11 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestMediaEditor(MediaUploadCallback mediaUploadCallback, String mediaUrl);
 
     void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties);
+
+    void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
+                                                     String content,
+                                                     String blockId,
+                                                     String blockName);
 
     void onAddMention(Consumer<String> onSuccess);
     

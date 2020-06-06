@@ -42,6 +42,7 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
@@ -80,6 +81,8 @@ public class WPAndroidGlueCode {
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
     private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
+    private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
+    private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
     private boolean mIsEditorMounted;
 
@@ -173,6 +176,10 @@ public class WPAndroidGlueCode {
         void onGutenbergUserEvent(GutenbergUserEvent event, Map<String, Object> properties);
     }
 
+    public interface OnGutenbergDidRequestUnsupportedBlockFallbackListener {
+        void gutenbergDidRequestUnsupportedBlockFallback(UnsupportedBlock unsupportedBlock);
+    }
+    
     public interface OnStarterPageTemplatesTooltipShownEventListener {
         void onSetStarterPageTemplatesTooltipShown(boolean tooltipShown);
         boolean onRequestStarterPageTemplatesTooltipShown();
@@ -348,7 +355,18 @@ public class WPAndroidGlueCode {
                 mOnLogGutenbergUserEventListener.onGutenbergUserEvent(event, eventProperties.toHashMap());
             }
 
-            @Override public void onAddMention(Consumer<String> onSuccess) {
+            @Override
+            public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
+                                                                    String content,
+                                                                    String blockId,
+                                                                    String blockName) {
+                mReplaceUnsupportedBlockCallback = replaceUnsupportedBlockCallback;
+                mOnGutenbergDidRequestUnsupportedBlockFallbackListener.
+                        gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, content));
+            }
+
+            @Override 
+            public void onAddMention(Consumer<String> onSuccess) {
                 mAddMentionUtil.getMention(onSuccess);
             }
 
@@ -461,6 +479,7 @@ public class WPAndroidGlueCode {
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
+                                  OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
                                   AddMentionUtil addMentionUtil,
                                   OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
                                   boolean isDarkMode) {
@@ -475,6 +494,7 @@ public class WPAndroidGlueCode {
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
         mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
+        mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
         mAddMentionUtil = addMentionUtil;
         mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
 
@@ -815,6 +835,13 @@ public class WPAndroidGlueCode {
     public void clearMediaFileURL(final int mediaId) {
         if (isMediaUploadCallbackRegistered()) {
             mPendingMediaUploadCallback.onUploadMediaFileClear(mediaId);
+        }
+    }
+
+    public void replaceUnsupportedBlock(String content, String blockId) {
+        if (mReplaceUnsupportedBlockCallback != null) {
+            mReplaceUnsupportedBlockCallback.replaceUnsupportedBlock(content, blockId);
+            mReplaceUnsupportedBlockCallback = null;
         }
     }
 

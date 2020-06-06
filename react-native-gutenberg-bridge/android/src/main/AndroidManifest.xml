@@ -2,4 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.wordpress.mobile.ReactNativeGutenbergBridge">
 
+    <application>
+        <activity
+            android:name=".GutenbergWebViewActivity"
+            android:theme="@style/Base.GutenbergWebView" />
+    </application>
+
 </manifest>
