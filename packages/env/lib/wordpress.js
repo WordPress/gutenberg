@@ -189,7 +189,7 @@ async function setupWordPressDirectories( config ) {
 	}
 
 	const checkedPaths = {};
-	for ( const { coreSource } in Object.values( config.env ) ) {
+	for ( const { coreSource } of Object.values( config.env ) ) {
 		if ( coreSource && ! checkedPaths[ coreSource.path ] ) {
 			await createUploadsDir( coreSource.path );
 			checkedPaths[ coreSource.path ] = true;

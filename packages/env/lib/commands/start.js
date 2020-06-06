@@ -67,7 +67,7 @@ module.exports = async function start( { spinner, debug } ) {
 		...downloadSources( config, spinner ),
 	] );
 
-	await setupWordPressDirectories();
+	await setupWordPressDirectories( config );
 
 	spinner.text = 'Starting WordPress.';
 
@@ -116,7 +116,7 @@ module.exports = async function start( { spinner, debug } ) {
  * @param {Object} spinner The spinner object to show progress.
  * @return {Promise[]} An array of promises for the downlad tasks.
  */
-async function downloadSources( config, spinner ) {
+function downloadSources( config, spinner ) {
 	const progresses = {};
 	const getProgressSetter = ( id ) => ( progress ) => {
 		progresses[ id ] = progress;
@@ -134,26 +134,24 @@ async function downloadSources( config, spinner ) {
 	const sources = [];
 	const addedSources = {};
 	const addSource = ( source ) => {
-		if ( source.url && ! addedSources[ source.url ] ) {
+		if ( source && source.url && ! addedSources[ source.url ] ) {
 			sources.push( source );
 			addedSources[ source.url ] = true;
 		}
 	};
 
-	for ( const env in Object.values( config.env ) ) {
+	for ( const env of Object.values( config.env ) ) {
 		env.pluginSources.forEach( addSource );
 		env.themeSources.forEach( addSource );
-		addSource( config.enev.coreSource );
+		addSource( config.env.coreSource );
 	}
 
-	await Promise.all(
-		sources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				config,
-			} )
-		)
+	return sources.map( ( source ) =>
+		downloadSource( source, {
+			onProgress: getProgressSetter( source.basename ),
+			spinner,
+			config,
+		} )
 	);
 }
 

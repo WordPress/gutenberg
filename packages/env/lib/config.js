@@ -72,7 +72,7 @@ module.exports = {
 	async readConfig( configPath ) {
 		const configDirectoryPath = path.dirname( configPath );
 		const workDirectoryPath = path.resolve(
-			getHomeDirectory(),
+			await getHomeDirectory(),
 			md5( configPath )
 		);
 
