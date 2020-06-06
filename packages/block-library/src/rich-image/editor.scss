@@ -6,8 +6,8 @@
 		position: absolute;
 		z-index: 1;
 		left: 50%;
-		top: calc(50% - #{ $grid-unit-60 });
-		transform: translate(-50%, -50%);
+		top: calc( 50% - #{$grid-unit-60} );
+		transform: translate( -50%, -50% );
 	}
 
 	img {
@@ -16,11 +16,11 @@
 	}
 
 	&.richimage__working__flipv img {
-		transform: scale(1, -1);
+		transform: scale( 1, -1 );
 	}
 
 	&.richimage__working__fliph img {
-		transform: scale(-1, 1);
+		transform: scale( -1, 1 );
 	}
 }
 
@@ -65,7 +65,8 @@
 }
 
 // Make the toolbar dropdowns blend in.
-.components-toolbar.richimage-toolbar__dropdown { // Needs specificity.
+.components-toolbar.richimage-toolbar__dropdown {
+	// Needs specificity.
 	padding: 0;
 	border-left: none;
 	border-right: none;
@@ -84,14 +85,4 @@
 .richimage-toolbar__dropdown,
 .richimage-toolbar__control {
 	padding: 6px;
-}
-
-.richimage__aspect-title {
-	display: inline-flex;
-	align-items: center;
-	text-align: left;
-	min-height: 36px;
-	height: auto;
-	padding: 6px 12px 6px 40px;
-	font-weight: bold;
 }

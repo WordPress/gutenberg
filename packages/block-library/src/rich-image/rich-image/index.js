@@ -310,10 +310,9 @@ class RichImage extends Component {
 									>
 										{ ( { onClose } ) => (
 											<Fragment>
-												<MenuGroup>
-													<div className="richimage__aspect-title">
-														{ __( 'Landscape' ) }
-													</div>
+												<MenuGroup
+													label={ __( 'Landscape' ) }
+												>
 													{ [
 														{
 															title: __(
@@ -359,10 +358,9 @@ class RichImage extends Component {
 														)
 													) }
 												</MenuGroup>
-												<MenuGroup>
-													<div className="richimage__aspect-title">
-														{ __( 'Portrait' ) }
-													</div>
+												<MenuGroup
+													label={ __( 'Portrait' ) }
+												>
 													{ [
 														{
 															title: __(
