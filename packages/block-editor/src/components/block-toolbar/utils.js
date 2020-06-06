@@ -19,9 +19,9 @@ const DEBOUNCE_TIMEOUT = 250;
 /**
  * Hook that creates a showMover state, as well as debounced show/hide callbacks.
  *
- * @param {Object}    props                     Component props.
- * @param {Object}    props.ref                  Element reference.
- * @param {boolean}   props.isFocused            Whether the component has current focus.
+ * @param {Object}   props                       Component props.
+ * @param {Object}   props.ref                   Element reference.
+ * @param {boolean}  props.isFocused             Whether the component has current focus.
  * @param {number}   [props.debounceTimeout=250] Debounce timeout in milliseconds.
  * @param {Function} [props.onChange=noop]       Callback function.
  */
