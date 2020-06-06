@@ -75,7 +75,7 @@ function RangeControl(
 		min,
 		max,
 		value: valueProp,
-		initialValue: initialPosition,
+		initial: initialPosition,
 	} );
 	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 	const [ isFocused, setIsFocused ] = useState( false );

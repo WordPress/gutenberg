@@ -34,20 +34,21 @@ const defaultInputProps = {
 };
 
 function useUniqueId( idProp ) {
-	const instanceId = useInstanceId( BoxControl );
-	const id = `inspector-box-control-${ instanceId }`;
+	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
 
-	return idProp || id;
+	return idProp || instanceId;
 }
 export default function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
-	values: valuesProp = DEFAULT_VALUES,
+	values: valuesProp,
 	units,
 } ) {
-	const [ values, setValues ] = useControlledState( valuesProp );
+	const [ values, setValues ] = useControlledState( valuesProp, {
+		initial: DEFAULT_VALUES,
+	} );
 
 	const [ isDirty, setIsDirty ] = useState( false );
 	const [ isLinked, setIsLinked ] = useState( ! isValuesMixed( values ) );

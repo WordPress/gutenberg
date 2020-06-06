@@ -12,7 +12,6 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { useControlledState } from '../utils/hooks';
-import { isValueDefined } from '../utils/values';
 
 /**
  * A float supported clamp function for a specific value.
@@ -37,39 +36,32 @@ export function floatClamp( value, min, max ) {
  * @param {number} props.min The minimum value.
  * @param {number} props.max The maximum value.
  * @param {number} props.value The current value.
- * @param {number} props.initialValue The preferred initial value.
+ * @param {number} props.initial The preferred initial value.
  * @return {[*, Function]} The controlled value and the value setter.
  */
 export function useControlledRangeValue( {
 	min,
 	max,
 	value: valueProp,
-	initialValue,
+	initial,
 } ) {
-	const [ value, setValue ] = useControlledState(
-		floatClamp( valueProp, min, max )
+	const [ state, setInternalState ] = useControlledState(
+		floatClamp( valueProp, min, max ),
+		{ initial, fallback: null }
 	);
 
-	const setClampValue = useCallback(
+	const setState = useCallback(
 		( nextValue ) => {
 			if ( nextValue === null ) {
-				setValue( null );
+				setInternalState( null );
 			} else {
-				setValue( floatClamp( nextValue, min, max ) );
+				setInternalState( floatClamp( nextValue, min, max ) );
 			}
 		},
 		[ min, max ]
 	);
-	const controlledValue = isValueDefined( value ) ? value : initialValue;
-	const state = isValueDefined( controlledValue )
-		? controlledValue
-		: /**
-		   * input[type="range"] requires a null value in order to position
-		   * the range slider in the center
-		   */
-		  null;
 
-	return [ state, setClampValue ];
+	return [ state, setState ];
 }
 
 /**
