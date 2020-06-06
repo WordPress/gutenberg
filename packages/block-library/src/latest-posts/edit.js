@@ -487,7 +487,7 @@ const LatestPostsEdit = ( { attributes, setAttributes, className } ) => {
 									__( '(no title)' )
 								) }
 							</a>
-							{ displayAuthor && (
+							{ displayAuthor && currentAuthor && (
 								<div className="wp-block-latest-posts__post-author">
 									{ sprintf(
 										/* translators: byline. %s: current author. */

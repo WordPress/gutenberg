@@ -52,6 +52,7 @@ function ToolbarButton( {
 					disabled={ isDisabled }
 					data-experimental-toolbar-item
 					{ ...extraProps }
+					{ ...props }
 				>
 					{ children }
 				</Button>
@@ -65,6 +66,7 @@ function ToolbarButton( {
 	return (
 		<ToolbarItem
 			className={ classnames( 'components-toolbar-button', className ) }
+			{ ...extraProps }
 			{ ...props }
 		>
 			{ ( toolbarItemProps ) => (
