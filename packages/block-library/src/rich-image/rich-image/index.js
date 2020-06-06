@@ -13,7 +13,7 @@ import {
 	BlockControls,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { Fragment, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	ToolbarGroup,
 	ToolbarButton,
@@ -141,7 +141,7 @@ class RichImage extends Component {
 		} );
 
 		return (
-			<Fragment>
+			<>
 				{ noticeUI }
 
 				<div className={ classes }>
@@ -309,7 +309,7 @@ class RichImage extends Component {
 										toggleProps={ toggleProps }
 									>
 										{ ( { onClose } ) => (
-											<Fragment>
+											<>
 												<MenuGroup
 													label={ __( 'Landscape' ) }
 												>
@@ -421,7 +421,7 @@ class RichImage extends Component {
 														{ __( 'Square' ) }
 													</MenuItem>
 												</MenuGroup>
-											</Fragment>
+											</>
 										) }
 									</DropdownMenu>
 								) }
@@ -441,7 +441,7 @@ class RichImage extends Component {
 						</ToolbarGroup>
 					</BlockControls>
 				) }
-			</Fragment>
+			</>
 		);
 	}
 }
