@@ -2,30 +2,40 @@
  * External dependencies
  */
 import React from 'react';
-
+import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
-
+import { createSlotFill, BottomSheetConsumer } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { ifBlockEditSelected } from '../block-edit/context';
+import { useBlockEditContext } from '../block-edit/context';
 import { BlockSettingsButton } from '../block-settings';
 
 const { Fill, Slot } = createSlotFill( 'InspectorControls' );
 
 const FillWithSettingsButton = ( { children, ...props } ) => {
+	const { isSelected } = useBlockEditContext();
+	if ( ! isSelected ) {
+		return null;
+	}
+
 	return (
 		<>
-			<Fill { ...props }>{ children }</Fill>
+			<Fill { ...props }>
+				{
+					<BottomSheetConsumer>
+						{ () => <View>{ children }</View> }
+					</BottomSheetConsumer>
+				}
+			</Fill>
 			{ React.Children.count( children ) > 0 && <BlockSettingsButton /> }
 		</>
 	);
 };
 
-const InspectorControls = ifBlockEditSelected( FillWithSettingsButton );
+const InspectorControls = FillWithSettingsButton;
 
 InspectorControls.Slot = Slot;
 

@@ -1,6 +1,6 @@
 # Documentation
 /docs                                           @chrisvanpatten @ajitbohra
-/docs/designers-developers/developers           @youknowriad @chrisvanpatten @mkaz @ajitbohra
+/docs/designers-developers/developers           @chrisvanpatten @mkaz @ajitbohra
 /docs/designers-developers/designers            @chrisvanpatten @mkaz @ajitbohra
 
 # Data
@@ -8,27 +8,38 @@
 /packages/core-data                             @youknowriad @nerrad
 /packages/data                                  @youknowriad @nerrad @coderkevin
 /packages/redux-routine                         @youknowriad @nerrad
+/packages/data-controls                         @nerrad
 
 # Blocks
-/packages/block-library                         @Soean @ajitbohra @jorgefilipecosta @talldan
+/packages/block-library                         @Soean @ajitbohra @talldan
 /packages/block-library/src/gallery             @mkevins @pinarol
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
 
 # Editor
 /packages/annotations                           @atimmer @ellatrix
-/packages/autop                                 @aduth
+/packages/autop
 /packages/block-editor                          @youknowriad @ellatrix
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
-/packages/blocks                                @youknowriad @ellatrix @aduth
+/packages/blocks                                @youknowriad @ellatrix
 /packages/edit-post
 /packages/editor
-/packages/list-reusable-blocks                  @youknowriad @noisysocks
+/packages/list-reusable-blocks                  @youknowriad
 /packages/shortcode
+/packages/block-directory
+/packages/interface
+/packages/media-utils
+/packages/server-side-render
 
 # Widgets
 /packages/edit-widgets                          @youknowriad
+
+# Navigation
+/packages/edit-navigation
+
+# Full Site Editing
+/packages/edit-site                             @youknowriad
 
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
@@ -36,7 +47,7 @@
 /docs/tool                                      @youknowriad @chrisvanpatten @ajitbohra @nosolosw
 /packages/babel-plugin-import-jsx-pragma        @gziolo @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
-/packages/babel-preset-default                  @youknowriad @gziolo @ntwb @nerrad @ajitbohra
+/packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @gziolo @ntwb @nerrad @ajitbohra
 /packages/create-block                          @gziolo
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
@@ -50,47 +61,58 @@
 /packages/library-export-default-webpack-plugin @gziolo @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @youknowriad @ntwb @nerrad @ajitbohra
-/packages/scripts                               @youknowriad @gziolo @ntwb @nerrad @ajitbohra
+/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
+/packages/dependency-extraction-webpack-plugin  @gziolo
+/packages/prettier-config                       @ntwb @gziolo
 
 # UI Components
-/packages/components                            @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @chrisvanpatten
-/packages/compose                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta
-/packages/element                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta
-/packages/notices                               @ajitbohra @jaymanpandya @jorgefilipecosta
-/packages/nux                                   @ajitbohra @jaymanpandya @jorgefilipecosta @noisysocks
-/packages/viewport                              @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta
+/packages/components                            @youknowriad @ajitbohra @jaymanpandya @chrisvanpatten
+/packages/compose                               @youknowriad @ajitbohra @jaymanpandya
+/packages/element                               @youknowriad @ajitbohra @jaymanpandya
+/packages/notices                               @ajitbohra @jaymanpandya
+/packages/nux                                   @ajitbohra @jaymanpandya
+/packages/viewport                              @ajitbohra @jaymanpandya
+/packages/base-styles
+/packages/icons
+/packages/primitives
 
 # Utilities
-/packages/a11y                                  @youknowriad @aduth
-/packages/blob                                  @aduth
+/packages/a11y                                  @youknowriad
+/packages/blob
 /packages/date
-/packages/deprecated                            @aduth
+/packages/deprecated                            @youknowriad
 /packages/dom                                   @ellatrix
-/packages/dom-ready                             @aduth
+/packages/dom-ready
 /packages/escape-html
 /packages/html-entities
 /packages/i18n                                  @swissspidy
-/packages/is-shallow-equal                      @aduth
+/packages/is-shallow-equal
 /packages/keycodes                              @talldan @ellatrix
-/packages/priority-queue                        @youknowriad @aduth
-/packages/token-list                            @aduth
-/packages/url                                   @talldan @aduth
-/packages/wordcount                             @aduth
+/packages/priority-queue                        @youknowriad
+/packages/token-list
+/packages/url                                   @talldan
+/packages/wordcount
+/packages/warning
+/packages/keyboard-shortcuts
 
 # Extensibility
 /packages/hooks                                 @gziolo @adamsilverstein
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
-/packages/rich-text                             @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
-/packages/block-editor/src/components/rich-text @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
+/packages/format-library                        @ellatrix @daniloercoli @sergioestevao @etoledom
+/packages/rich-text                             @ellatrix @daniloercoli @sergioestevao @etoledom
+/packages/block-editor/src/components/rich-text @ellatrix @daniloercoli @sergioestevao @etoledom
+
+# Project Management
+/.github                                        @youknowriad @mapk @karmatosed
+/packages/project-management-automation
 
 # wp-env
-/packages/env                                   @epiqueras @noahtallen @noisysocks
+/packages/env                                   @epiqueras @noahtallen
 
 # PHP
-/lib                                            @timothybjacobs
+/lib                                            @timothybjacobs @spacedmonkey
 
 # Native (Unowned)
 *.native.js                                     @ghost
@@ -99,6 +121,3 @@
 *.native.scss                                   @ghost
 *.android.scss                                  @ghost
 *.ios.scss                                      @ghost
-
-# Project Management
-/.github                                        @youknowriad @mapk @karmatosed

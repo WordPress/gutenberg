@@ -24,9 +24,6 @@ export const settings = {
 	icon,
 	keywords: [ __( 'movie' ) ],
 	transforms,
-	supports: {
-		align: true,
-	},
 	edit,
 	save,
 };

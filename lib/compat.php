@@ -14,7 +14,8 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 *
 	 * @since 7.9.0
 	 *
-	 * @param string $path Path to the folder where the `block.json` file is located.
+	 * @param string $file_or_folder Path to the JSON file with metadata definition for
+	 *     the block or path to the folder where the `block.json` file is located.
 	 * @param array  $args {
 	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
 	 *     ones described below are supported by default. Default empty array.
@@ -23,8 +24,10 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * }
 	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
 	 */
-	function register_block_type_from_metadata( $path, $args = array() ) {
-		$file = trailingslashit( $path ) . 'block.json';
+	function register_block_type_from_metadata( $file_or_folder, $args = array() ) {
+		$file = ( substr( $file_or_folder, -10 ) !== 'block.json' ) ?
+			trailingslashit( $file_or_folder ) . 'block.json' :
+			$file_or_folder;
 		if ( ! file_exists( $file ) ) {
 			return false;
 		}
@@ -43,20 +46,6 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		);
 	}
 }
-
-/**
- * Extends block editor settings to determine whether to use drop cap feature.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_drop_cap( $settings ) {
-	$settings['__experimentalDisableDropCap'] = false;
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_drop_cap' );
-
 
 /**
  * Extends block editor settings to include a list of image dimensions per size.
@@ -169,9 +158,136 @@ function gutenberg_get_post_from_context() {
 	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
 		return null;
 	}
+
+	_deprecated_function( __FUNCTION__, '8.1.0' );
+
 	if ( ! in_the_loop() ) {
 		rewind_posts();
 		the_post();
 	}
 	return get_post();
 }
+
+/**
+ * Filters default block categories to substitute legacy category names with new
+ * block categories.
+ *
+ * This can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50278
+ *
+ * @param array[] $default_categories Array of block categories.
+ *
+ * @return array[] Filtered block categories.
+ */
+function gutenberg_replace_default_block_categories( $default_categories ) {
+	$substitution = array(
+		'common'     => array(
+			'slug'  => 'text',
+			'title' => __( 'Text', 'gutenberg' ),
+			'icon'  => null,
+		),
+		'formatting' => array(
+			'slug'  => 'media',
+			'title' => __( 'Media', 'gutenberg' ),
+			'icon'  => null,
+		),
+		'layout'     => array(
+			'slug'  => 'design',
+			'title' => __( 'Design', 'gutenberg' ),
+			'icon'  => null,
+		),
+	);
+
+	// Loop default categories to perform in-place substitution by legacy slug.
+	foreach ( $default_categories as $i => $default_category ) {
+		$slug = $default_category['slug'];
+		if ( isset( $substitution[ $slug ] ) ) {
+			$default_categories[ $i ] = $substitution[ $slug ];
+			unset( $substitution[ $slug ] );
+		}
+	}
+
+	/*
+	 * At this point, `$substitution` should contain only the categories which
+	 * could not be in-place substituted with a default category, likely in the
+	 * case that core has since been updated to use the default categories.
+	 * Check to verify they exist.
+	 */
+	$default_category_slugs = wp_list_pluck( $default_categories, 'slug' );
+	foreach ( $substitution as $i => $substitute_category ) {
+		if ( in_array( $substitute_category['slug'], $default_category_slugs, true ) ) {
+			unset( $substitution[ $i ] );
+		}
+	}
+
+	/*
+	 * Any substitutes remaining should be appended, as they are not yet
+	 * assigned in the default categories array.
+	 */
+	return array_merge( $default_categories, array_values( $substitution ) );
+}
+add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
+
+/**
+ * Shim that hooks into `pre_render_block` so as to override `render_block` with
+ * a function that assigns block context.
+ *
+ * This can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/49927
+ *
+ * @param string|null $pre_render   The pre-rendered content. Defaults to null.
+ * @param array       $parsed_block The parsed block being rendered.
+ *
+ * @return string String of rendered HTML.
+ */
+function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
+	global $post, $wp_query;
+
+	/*
+	 * If a non-null value is provided, a filter has run at an earlier priority
+	 * and has already handled custom rendering and should take precedence.
+	 */
+	if ( null !== $pre_render ) {
+		return $pre_render;
+	}
+
+	$source_block = $parsed_block;
+
+	/** This filter is documented in src/wp-includes/blocks.php */
+	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
+
+	$context = array(
+		'postId'   => $post->ID,
+
+		/*
+		 * The `postType` context is largely unnecessary server-side, since the
+		 * ID is usually sufficient on its own. That being said, since a block's
+		 * manifest is expected to be shared between the server and the client,
+		 * it should be included to consistently fulfill the expectation.
+		 */
+		'postType' => $post->post_type,
+
+		'query'    => array( 'categoryIds' => array() ),
+	);
+
+	if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
+		foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
+			$context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
+		}
+	}
+
+	/**
+	 * Filters the default context provided to a rendered block.
+	 *
+	 * @param array $context      Default context.
+	 * @param array $parsed_block Block being rendered, filtered by `render_block_data`.
+	 */
+	$context = apply_filters( 'render_block_context', $context, $parsed_block );
+
+	$block = new WP_Block( $parsed_block, $context );
+
+	return $block->render();
+}
+add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );

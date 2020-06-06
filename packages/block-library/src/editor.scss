@@ -17,6 +17,7 @@
 @import "./classic/editor.scss";
 @import "./gallery/editor.scss";
 @import "./group/editor.scss";
+@import "./heading/editor.scss";
 @import "./html/editor.scss";
 @import "./image/editor.scss";
 @import "./latest-comments/editor.scss";
@@ -32,6 +33,7 @@
 @import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
 @import "./quote/editor.scss";
+@import "./rich-image/editor.scss";
 @import "./rss/editor.scss";
 @import "./search/editor.scss";
 @import "./separator/editor.scss";
@@ -46,6 +48,7 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
+@import "./widget-area/editor.scss";
 
 /**
  * Import styles from internal editor components used by the blocks.
@@ -61,7 +64,7 @@
 
 // Provide every block with a default base margin. This margin provides a consistent spacing
 // between blocks in the editor.
-.editor-styles-wrapper .block-editor-block-list__block {
+.block-editor-block-list__block {
 	margin-top: $default-block-margin;
 	margin-bottom: $default-block-margin;
 }

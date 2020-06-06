@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "1.6.0",
+	"version": "1.8.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,13 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"!((src|build|build-module)/components/**)"
+	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",
@@ -28,12 +33,15 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
+		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interface": "file:../interface",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
@@ -41,7 +49,8 @@
 		"@wordpress/url": "file:../url",
 		"file-saver": "^2.0.2",
 		"jszip": "^3.2.2",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.15",
+		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

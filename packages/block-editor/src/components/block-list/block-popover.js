@@ -17,7 +17,7 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BlockBreadcrumb from './breadcrumb';
+import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { BlockNodes } from './root-container';
@@ -64,7 +64,7 @@ function BlockPopover( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
-	const [ blockNodes ] = useContext( BlockNodes );
+	const blockNodes = useContext( BlockNodes );
 
 	const showEmptyBlockSideInserter =
 		! isNavigationMode && isEmptyDefaultBlock && isValid;
@@ -201,7 +201,7 @@ function BlockPopover( {
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
-				<BlockBreadcrumb
+				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
 					moverDirection={ moverDirection }

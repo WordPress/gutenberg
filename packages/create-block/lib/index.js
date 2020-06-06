@@ -13,7 +13,11 @@ const CLIError = require( './cli-error' );
 const log = require( './log' );
 const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
-const { getDefaultValues, getPrompts } = require( './templates' );
+const {
+	getBlockTemplate,
+	getDefaultValues,
+	getPrompts,
+} = require( './templates' );
 
 const commandName = `wp-create-block`;
 program
@@ -24,13 +28,13 @@ program
 			'it is used as the block slug used for its identification, the output ' +
 			'location for scaffolded files, and the name of the WordPress plugin.' +
 			'The rest of the configuration is set to all default values unless ' +
-			'overriden with some of the options listed below.'
+			'overridden with some of the options listed below.'
 	)
 	.version( version )
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'template type name, allowed values: "es5", "esnext"',
+		'block template type name, allowed values: "es5", "esnext"',
 		'esnext'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
@@ -41,14 +45,21 @@ program
 	.action(
 		async (
 			slug,
-			{ category, namespace, shortDescription, template, title }
+			{
+				category,
+				namespace,
+				shortDescription: description,
+				template: templateName,
+				title,
+			}
 		) => {
 			await checkSystemRequirements( engines );
 			try {
-				const defaultValues = getDefaultValues( template );
+				const blockTemplate = await getBlockTemplate( templateName );
+				const defaultValues = getDefaultValues( blockTemplate );
 				const optionsValues = pickBy( {
 					category,
-					description: shortDescription,
+					description,
 					namespace,
 					title,
 				} );
@@ -60,14 +71,14 @@ program
 						title: startCase( slug ),
 						...optionsValues,
 					};
-					await scaffold( template, answers );
+					await scaffold( blockTemplate, answers );
 				} else {
-					const propmpts = getPrompts( template ).filter(
+					const prompts = getPrompts( blockTemplate ).filter(
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
-					const answers = await inquirer.prompt( propmpts );
-					await scaffold( template, {
+					const answers = await inquirer.prompt( prompts );
+					await scaffold( blockTemplate, {
 						...defaultValues,
 						...optionsValues,
 						...answers,
@@ -83,7 +94,7 @@ program
 			}
 		}
 	)
-	.on( '--help', function() {
+	.on( '--help', () => {
 		log.info( '' );
 		log.info( 'Examples:' );
 		log.info( `  $ ${ commandName }` );

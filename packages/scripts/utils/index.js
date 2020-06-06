@@ -13,8 +13,10 @@ const {
 const {
 	getWebpackArgs,
 	hasBabelConfig,
+	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPrettierConfig,
+	hasPostCSSConfig,
 } = require( './config' );
 const {
 	buildWordPress,
@@ -36,9 +38,11 @@ module.exports = {
 	hasBabelConfig,
 	hasArgInCLI,
 	hasFileArgInCLI,
+	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPackageProp,
 	hasPrettierConfig,
+	hasPostCSSConfig,
 	hasProjectFile,
 	downloadWordPressZip,
 	mergeYAMLConfigs,

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "4.17.0",
+	"version": "4.19.0",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,6 +21,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/compose": "file:../compose",

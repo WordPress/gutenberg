@@ -17,7 +17,7 @@ describe( 'generated className', () => {
 	const blockSettings = {
 		name: 'chicken/ribs',
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 

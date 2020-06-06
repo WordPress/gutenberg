@@ -12,7 +12,7 @@ import { MediaPlaceholder } from '@wordpress/block-editor';
 
 ...
 
-	edit: ( { attributes, setAttributes } ) {
+	edit: ( { attributes, setAttributes } ) => {
 		const mediaPlaceholder = <MediaPlaceholder
 			onSelect = {
 				( el ) => {
@@ -158,6 +158,14 @@ The argument of the callback is an object containing the following properties:
 An object or an array of objects that contain media ID (`id` property) to be selected by default when opening the media library.
 
 - Type: `Object|Array`
+- Required: No
+- Platform: Web
+
+### onSelectURL
+
+Callback called when urls can be configured. No media insertion from url will be available if not set.
+
+- Type: `Function`
 - Required: No
 - Platform: Web
 

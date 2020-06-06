@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import Notices from '../notices';
 import MenusEditor from '../menus-editor';
 import MenuLocationsEditor from '../menu-locations-editor';
 
@@ -22,7 +23,7 @@ export default function Layout( { blockEditorSettings } ) {
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<FocusReturnProvider>
-						{ /* <Notices /> */ }
+						<Notices />
 						<TabPanel
 							className="edit-navigation-layout__tab-panel"
 							tabs={ [

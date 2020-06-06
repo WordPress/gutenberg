@@ -70,9 +70,9 @@ $block-inserter-tabs-height: 44px;
 	position: relative;
 
 	input[type="search"].block-editor-inserter__search-input {
+		@include input-control;
 		display: block;
 		padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
-		border-radius: $radius-block-ui;
 		background: $light-gray-200;
 		border: none;
 		width: 100%;
@@ -87,6 +87,10 @@ $block-inserter-tabs-height: 44px;
 		&:focus {
 			background: $white;
 			box-shadow: 0 0 0 $border-width-focus $theme-color;
+		}
+
+		&::placeholder {
+			color: $dark-gray-400;
 		}
 	}
 }
@@ -135,7 +139,7 @@ $block-inserter-tabs-height: 44px;
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 500;
-	margin-right: $grid-unit-10;
+	margin: 0 $grid-unit-10 0 0;
 }
 
 .block-editor-inserter__block-list {
@@ -170,9 +174,13 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__no-results {
-	font-style: italic;
-	padding: 24px;
+	padding: $grid-unit-40;
+	margin-top: $grid-unit-40 * 2;
 	text-align: center;
+}
+
+.block-editor-inserter__no-results-icon {
+	fill: $light-gray-800;
 }
 
 .block-editor-inserter__child-blocks {
@@ -261,4 +269,10 @@ $block-inserter-tabs-height: 44px;
 	&.is-placeholder {
 		min-height: 100px;
 	}
+}
+
+.block-editor-inserter__patterns-item-title {
+	padding: $grid-unit-05;
+	font-size: 12px;
+	text-align: center;
 }

@@ -1,4 +1,8 @@
-# 3.1.0 (Unreleased)
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+# 3.1.0 (2019-06-03)
 
 - The `@wordpress/nux` package has been deprecated. Please use the `Guide` component in `@wordpress/components` to show a user guide.
 

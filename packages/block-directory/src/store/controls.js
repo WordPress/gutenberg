@@ -1,109 +1,56 @@
 /**
- * External dependencies
+ * Loads a JavaScript file.
+ *
+ * @param {string} asset The url for this file.
+ *
+ * @return {Promise} Promise which will resolve when the asset is loaded.
  */
-import { forEach } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { createRegistryControl } from '@wordpress/data';
-import wpApiFetch from '@wordpress/api-fetch';
-
-/**
- * Calls a selector using the current state.
- *
- * @param {string} storeName    Store name.
- * @param {string} selectorName Selector name.
- * @param {Array}  args         Selector arguments.
- *
- * @return {Object} Control descriptor.
- */
-export function select( storeName, selectorName, ...args ) {
-	return {
-		type: 'SELECT',
-		storeName,
-		selectorName,
-		args,
-	};
-}
-
-/**
- * Calls a dispatcher using the current state.
- *
- * @param {string} storeName      Store name.
- * @param {string} dispatcherName Dispatcher name.
- * @param {Array}  args           Selector arguments.
- *
- * @return {Object} Control descriptor.
- */
-export function dispatch( storeName, dispatcherName, ...args ) {
-	return {
-		type: 'DISPATCH',
-		storeName,
-		dispatcherName,
-		args,
-	};
-}
-
-/**
- * Trigger an API Fetch request.
- *
- * @param {Object} request API Fetch Request Object.
- *
- * @return {Object} Control descriptor.
- */
-export function apiFetch( request ) {
-	return {
-		type: 'API_FETCH',
-		request,
-	};
-}
-
-/**
- * Loads JavaScript
- *
- * @param {Array}    asset   The url for the JavaScript.
- * @param {Function} onLoad  Callback function on success.
- * @param {Function} onError Callback function on failure.
- */
-const loadScript = ( asset, onLoad, onError ) => {
-	if ( ! asset ) {
-		return;
+export const loadScript = ( asset ) => {
+	if ( ! asset || ! /\.js$/.test( asset ) ) {
+		return Promise.reject( new Error( 'No script found.' ) );
 	}
-	const existing = document.querySelector( `script[src="${ asset.src }"]` );
-	if ( existing ) {
-		existing.parentNode.removeChild( existing );
-	}
-	const script = document.createElement( 'script' );
-	script.src = typeof asset === 'string' ? asset : asset.src;
-	script.onload = onLoad;
-	script.onerror = onError;
-	document.body.appendChild( script );
+	return new Promise( ( resolve, reject ) => {
+		const existing = document.querySelector( `script[src="${ asset }"]` );
+		if ( existing ) {
+			existing.parentNode.removeChild( existing );
+		}
+		const script = document.createElement( 'script' );
+		script.src = asset;
+		script.onload = () => resolve( true );
+		script.onerror = () => reject( new Error( 'Error loading script.' ) );
+		document.body.appendChild( script );
+	} );
 };
 
 /**
- * Loads CSS file.
+ * Loads a CSS file.
  *
- * @param {*} asset the url for the CSS file.
+ * @param {string} asset The url for this file.
+ *
+ * @return {Promise} Promise which will resolve when the asset is added.
  */
-const loadStyle = ( asset ) => {
-	if ( ! asset ) {
-		return;
+export const loadStyle = ( asset ) => {
+	if ( ! asset || ! /\.css$/.test( asset ) ) {
+		return Promise.reject( new Error( 'No style found.' ) );
 	}
-	const link = document.createElement( 'link' );
-	link.rel = 'stylesheet';
-	link.href = typeof asset === 'string' ? asset : asset.src;
-	document.body.appendChild( link );
+	return new Promise( ( resolve, reject ) => {
+		const link = document.createElement( 'link' );
+		link.rel = 'stylesheet';
+		link.href = asset;
+		link.onload = () => resolve( true );
+		link.onerror = () => reject( new Error( 'Error loading style.' ) );
+		document.body.appendChild( link );
+	} );
 };
 
 /**
  * Load the asset files for a block
  *
- * @param {Array} assets A collection of URL for the assets.
+ * @param {Array} assets A collection of URLs for the assets.
  *
  * @return {Object} Control descriptor.
  */
-export function* loadAssets( assets ) {
+export function loadAssets( assets ) {
 	return {
 		type: 'LOAD_ASSETS',
 		assets,
@@ -111,52 +58,14 @@ export function* loadAssets( assets ) {
 }
 
 const controls = {
-	SELECT: createRegistryControl(
-		( registry ) => ( { storeName, selectorName, args } ) => {
-			return registry.select( storeName )[ selectorName ]( ...args );
-		}
-	),
-	DISPATCH: createRegistryControl(
-		( registry ) => ( { storeName, dispatcherName, args } ) => {
-			return registry.dispatch( storeName )[ dispatcherName ]( ...args );
-		}
-	),
-	API_FETCH( { request } ) {
-		return wpApiFetch( { ...request } );
-	},
 	LOAD_ASSETS( { assets } ) {
-		return new Promise( ( resolve, reject ) => {
-			if ( Array.isArray( assets ) ) {
-				let scriptsCount = 0;
+		const scripts = assets.map( ( asset ) =>
+			asset.match( /\.js$/ ) !== null
+				? loadScript( asset )
+				: loadStyle( asset )
+		);
 
-				forEach( assets, ( asset ) => {
-					if ( asset.match( /\.js$/ ) !== null ) {
-						scriptsCount++;
-						loadScript(
-							asset,
-							() => {
-								scriptsCount--;
-								if ( scriptsCount === 0 ) {
-									return resolve( scriptsCount );
-								}
-							},
-							reject
-						);
-					} else {
-						loadStyle( asset );
-					}
-				} );
-			} else {
-				loadScript(
-					assets.editor_script,
-					() => {
-						return resolve( 0 );
-					},
-					reject
-				);
-				loadStyle( assets.style );
-			}
-		} );
+		return Promise.all( scripts );
 	},
 };
 

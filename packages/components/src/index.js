@@ -11,10 +11,12 @@ export {
 } from '@wordpress/primitives';
 
 // Components
+export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export { default as Animate } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
+export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
 export { default as Card } from './card';
@@ -42,6 +44,9 @@ export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
+export { default as Flex } from './flex';
+export { default as FlexBlock } from './flex/block';
+export { default as FlexItem } from './flex/item';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
@@ -54,6 +59,7 @@ export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
+export { default as __experimentalInputControl } from './input-control';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
@@ -91,9 +97,15 @@ export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
+export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
+export {
+	default as __experimentalTreeGrid,
+	TreeGridRow as __experimentalTreeGridRow,
+	TreeGridCell as __experimentalTreeGridCell,
+} from './tree-grid';
 export { default as TreeSelect } from './tree-select';
 export { default as __experimentalUnitControl } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';

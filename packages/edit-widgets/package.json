@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.15.0",
+	"version": "0.17.0",
 	"private": true,
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
@@ -20,6 +20,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"!((src|build|build-module)/components/**)"
+	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/block-editor": "file:../block-editor",
@@ -33,9 +37,13 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
 		"@wordpress/interface": "file:../interface",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"classnames": "^2.2.5",
 		"lodash": "^4.17.15",
 		"rememo": "^3.0.0"
 	},

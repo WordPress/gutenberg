@@ -46,6 +46,10 @@
 		align-items: center;
 		align-content: space-between;
 
+		.editor-entities-saved-states__save-button {
+			margin: auto;
+		}
+
 		.components-button.has-icon {
 			position: absolute;
 			right: $grid-unit-10;
@@ -54,17 +58,7 @@
 
 	.entities-saved-states__text-prompt {
 		border-bottom: $border-width solid $light-gray-500;
-
-		h2 {
-			padding: $grid-unit-20;
-			padding-bottom: $grid-unit-15;
-			margin: 0;
-			font-size: $big-font-size;
-		}
-	}
-
-	.editor-entities-saved-states__save-button {
-		display: block;
-		margin: $grid-unit-15 auto;
+		padding: $grid-unit-20;
+		padding-bottom: $grid-unit-05;
 	}
 }

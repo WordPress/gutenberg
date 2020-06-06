@@ -193,7 +193,7 @@ function isSameTranslation( a, b ) {
 	);
 }
 
-module.exports = function() {
+module.exports = () => {
 	const strings = {};
 	let nplurals = 2,
 		baseData;
