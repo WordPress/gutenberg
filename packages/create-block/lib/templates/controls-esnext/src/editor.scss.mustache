@@ -1,9 +1,14 @@
 /**
- * The following styles get applied inside the editor only.
- *
- * Replace them with your own styles or remove the file completely.
+ * Note that these styles are loaded *after* common styles, so that
+ * editor-specific styles using the same selectors will take precedence.
  */
-
+.wp-block-gutenberg-examples-example-04-controls-esnext {
+	color: #fff;
+	background: #00a8db;
+	border: 2px solid #0D72B2;
+	padding: 20px;
+	font-family: sans-serif;
+}
 .wp-block-{{namespace}}-{{slug}} {
 	border: 1px dotted red;
 }

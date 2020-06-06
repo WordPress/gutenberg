@@ -1,9 +1,26 @@
 /**
- * The following styles get applied both on the front of your site
- * and in the editor.
- *
- * Replace them with your own styles or remove the file completely.
+ * Note that these styles are loaded *before* editor styles, so that
+ * editor-specific styles using the same selectors will take precedence.
  */
+.wp-block-gutenberg-examples-example-04-controls-esnext {
+	color: #fff;
+	background: #00a8db;
+	border: 2px solid #0D72B2;
+	padding: 20px;
+	font-family: sans-serif;
+}
+
+.gutenberg-examples-align-left {
+	text-align: left;
+}
+
+.gutenberg-examples-align-center {
+	text-align: center;
+}
+
+.gutenberg-examples-align-right {
+	text-align: right;
+}
 
 .wp-block-{{namespace}}-{{slug}} {
 	background-color: theme(button);

@@ -56,12 +56,14 @@ const predefinedBlockTemplates = {
 		],
 		wpScriptsEnabled: true,
 	},
-	esnextControls: {
+	'controls-esnext': {
 		defaultValues: {
-			// namespace,
-			slug: 'esnext-controls',
-			title: 'ESNext Controls Example',
-			description: 'Example of controls block – build step required.',
+			slug: 'controls-esnext',
+			title: 'Controls ESNext',
+			description:
+				'Example block written with ESNext standard and JSX support – build step required.',
+			dashicon: 'universal-access-alt',
+			category: 'layout',
 		},
 	},
 };
