@@ -58,7 +58,7 @@ const POPOVER_PROPS = { position: 'bottom right' };
 function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 	return (
 		<MenuGroup label={ label }>
-			{ aspectRatios.map( ( { label: aspectLabel, aspect } ) => (
+			{ aspectRatios.map( ( { title, aspect } ) => (
 				<MenuItem
 					key={ aspect }
 					isDisabled={ isDisabled }
@@ -66,7 +66,7 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 						onClick( aspect );
 					} }
 				>
-					{ aspectLabel }
+					{ title }
 				</MenuItem>
 			) ) }
 		</MenuGroup>
@@ -92,19 +92,19 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 						} }
 						aspectRatios={ [
 							{
-								label: __( '16:10' ),
+								title: __( '16:10' ),
 								aspect: 16 / 10,
 							},
 							{
-								label: __( '16:9' ),
+								title: __( '16:9' ),
 								aspect: 16 / 9,
 							},
 							{
-								label: __( '4:3' ),
+								title: __( '4:3' ),
 								aspect: 4 / 3,
 							},
 							{
-								label: __( '3:2' ),
+								title: __( '3:2' ),
 								aspect: 3 / 2,
 							},
 						] }
@@ -118,19 +118,19 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 						} }
 						aspectRatios={ [
 							{
-								label: __( '10:16' ),
+								title: __( '10:16' ),
 								aspect: 10 / 16,
 							},
 							{
-								label: __( '9:16' ),
+								title: __( '9:16' ),
 								aspect: 9 / 16,
 							},
 							{
-								label: __( '3:4' ),
+								title: __( '3:4' ),
 								aspect: 3 / 4,
 							},
 							{
-								label: __( '2:3' ),
+								title: __( '2:3' ),
 								aspect: 2 / 3,
 							},
 						] }
@@ -143,7 +143,7 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 						} }
 						aspectRatios={ [
 							{
-								label: __( 'Square' ),
+								title: __( 'Square' ),
 								aspect: 1,
 							},
 						] }
