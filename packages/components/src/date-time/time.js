@@ -31,7 +31,7 @@ class TimePicker extends Component {
 			year: '',
 			hours: '',
 			minutes: '',
-			am: true,
+			am: '',
 			date: null,
 		};
 		this.changeDate = this.changeDate.bind( this );
@@ -89,7 +89,8 @@ class TimePicker extends Component {
 		const month = selected.format( 'MM' );
 		const year = selected.format( 'YYYY' );
 		const minutes = selected.format( 'mm' );
-		const am = selected.format( 'A' );
+		//const am = selected.format( 'A' );
+		const am = selected.format( 'A' ) === __( 'AM' ) ? 'AM' : 'PM';
 		const hours = selected.format( is12Hour ? 'hh' : 'HH' );
 		const date = currentTime ? moment( currentTime ) : moment();
 		this.setState( { day, month, year, minutes, hours, am, date } );
@@ -115,9 +116,7 @@ class TimePicker extends Component {
 			? date
 					.clone()
 					.hours(
-						am === __( 'AM' )
-							? value % 12
-							: ( ( value % 12 ) + 12 ) % 24
+						am === 'AM' ? value % 12 : ( ( value % 12 ) + 12 ) % 24
 					)
 			: date.clone().hours( value );
 		this.changeDate( newDate );
@@ -186,7 +185,7 @@ class TimePicker extends Component {
 				return;
 			}
 			let newDate;
-			if ( value === __( 'PM' ) ) {
+			if ( value === 'PM' ) {
 				newDate = date
 					.clone()
 					.hours( ( ( parseInt( hours, 10 ) % 12 ) + 12 ) % 24 );
@@ -338,17 +337,17 @@ class TimePicker extends Component {
 						{ is12Hour && (
 							<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
 								<Button
-									isPrimary={ am === __( 'AM' ) }
-									isSecondary={ am !== __( 'AM' ) }
-									onClick={ this.updateAmPm( __( 'AM' ) ) }
+									isPrimary={ am === 'AM' }
+									isSecondary={ am !== 'AM' }
+									onClick={ this.updateAmPm( 'AM' ) }
 									className="components-datetime__time-am-button"
 								>
 									{ __( 'AM' ) }
 								</Button>
 								<Button
-									isPrimary={ am === __( 'PM' ) }
-									isSecondary={ am !== __( 'PM' ) }
-									onClick={ this.updateAmPm( __( 'PM' ) ) }
+									isPrimary={ am === 'PM' }
+									isSecondary={ am !== 'PM' }
+									onClick={ this.updateAmPm( 'PM' ) }
 									className="components-datetime__time-pm-button"
 								>
 									{ __( 'PM' ) }
