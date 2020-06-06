@@ -80,7 +80,7 @@ Here is an example `codetabs` section:
 		```js
 			// ES5 code here
 		```
-		{% endtab %}
+		{% end %}
 
 The preferred format for code examples is ESNext, which should also be the default viewed, when placed first in source it will show as the default.
 
