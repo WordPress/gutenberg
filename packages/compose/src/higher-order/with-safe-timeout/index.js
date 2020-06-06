@@ -14,18 +14,28 @@ import { Component } from '@wordpress/element';
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
 
 /**
- * A higher-order component used to provide and manage delayed function calls
- * that ought to be bound to a component's lifecycle.
- *
- * @param {WPComponent} OriginalComponent Component requiring setTimeout
- *
- * @return {WPComponent} Wrapped component.
+ * @typedef SafeTimoutProps
+ * @property {SetTimeout} setTimeout Safe setTimout function
+ * @property {(id: number) => void} clearTimeout Safe setTimout function
  */
-const withSafeTimeout = createHigherOrderComponent( ( OriginalComponent ) => {
+
+/**
+ * @callback SetTimeout
+ * @param {() => void} fn
+ * @param {number} delay
+ * @return {number} TimeoutID
+ */
+
+/** @type {import('../../types').MapComponentFunction<SafeTimoutProps>} */
+const mapSafeTimeout = ( OriginalComponent ) => {
 	return class WrappedComponent extends Component {
 		constructor() {
+			// @ts-ignore
 			super( ...arguments );
+
+			/** @type {number[]} */
 			this.timeouts = [];
+
 			this.setTimeout = this.setTimeout.bind( this );
 			this.clearTimeout = this.clearTimeout.bind( this );
 		}
@@ -34,6 +44,10 @@ const withSafeTimeout = createHigherOrderComponent( ( OriginalComponent ) => {
 			this.timeouts.forEach( clearTimeout );
 		}
 
+		/**
+		 * @param {() => void} fn
+		 * @param {number} delay
+		 */
 		setTimeout( fn, delay ) {
 			const id = setTimeout( () => {
 				fn();
@@ -43,6 +57,9 @@ const withSafeTimeout = createHigherOrderComponent( ( OriginalComponent ) => {
 			return id;
 		}
 
+		/**
+		 * @param {number} id
+		 */
 		clearTimeout( id ) {
 			clearTimeout( id );
 			this.timeouts = without( this.timeouts, id );
@@ -58,6 +75,20 @@ const withSafeTimeout = createHigherOrderComponent( ( OriginalComponent ) => {
 			);
 		}
 	};
-}, 'withSafeTimeout' );
+};
+
+/**
+ * A higher-order component used to provide and manage delayed function calls
+ * that ought to be bound to a component's lifecycle.
+ *
+ * @template Props
+ * @param {import('react').ComponentType<P extends Props>} OriginalComponent Component requiring setTimeout
+ *
+ * @return {import('react').ComponentType<>} Wrapped component.
+ */
+const withSafeTimeout = createHigherOrderComponent(
+	mapSafeTimeout,
+	'withSafeTimeout'
+);
 
 export default withSafeTimeout;
