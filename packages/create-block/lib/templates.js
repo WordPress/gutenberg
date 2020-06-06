@@ -32,17 +32,16 @@ const predefinedBlockTemplates = {
 	},
 	esnextEditable: {
 		defaultValues: {
-			namespace,
+			// namespace,
 			slug: 'esnext-editable',
 			title: 'ESNext Editable Example',
-			description:
-				'Example of editable block – build step required.',
-			dashicon,
-			category,
-			author,
-			license,
-			licenseURI,
-			version,
+			description: 'Example of editable block – build step required.',
+			// dashicon,
+			// category,
+			// author,
+			// license,
+			// licenseURI,
+			// version,
 		},
 		outputFiles: [
 			'.editorconfig',
@@ -56,8 +55,15 @@ const predefinedBlockTemplates = {
 			'readme.txt',
 		],
 		wpScriptsEnabled: true,
-
-	}
+	},
+	esnextControls: {
+		defaultValues: {
+			// namespace,
+			slug: 'esnext-controls',
+			title: 'ESNext Controls Example',
+			description: 'Example of controls block – build step required.',
+		},
+	},
 };
 
 const getOutputTemplates = async ( name ) => {
