@@ -6,13 +6,14 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useEffect, useState } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { InputRange as BaseInputRange } from './styles/range-control-styles';
 import { useDebouncedHoverInteraction } from './utils';
+import { useJumpStep } from '../utils/hooks';
 
 function InputRange(
 	{
@@ -64,26 +65,6 @@ function InputRange(
 			value={ value }
 		/>
 	);
-}
-
-function useJumpStep( { isShiftStepEnabled, shiftStep, step } ) {
-	const [ isShiftKey, setIsShiftKey ] = useState( false );
-
-	useEffect( () => {
-		const handleShiftKeyToggle = ( event ) => {
-			setIsShiftKey( event.shiftKey );
-		};
-
-		window.addEventListener( 'keydown', handleShiftKeyToggle );
-		window.addEventListener( 'keyup', handleShiftKeyToggle );
-
-		return () => {
-			window.removeEventListener( 'keydown', handleShiftKeyToggle );
-			window.removeEventListener( 'keyup', handleShiftKeyToggle );
-		};
-	}, [] );
-
-	return isShiftStepEnabled && isShiftKey ? shiftStep : step;
 }
 
 const ForwardedComponent = forwardRef( InputRange );
