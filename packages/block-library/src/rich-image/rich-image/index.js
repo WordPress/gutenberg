@@ -55,6 +55,105 @@ const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.1;
 const POPOVER_PROPS = { position: 'bottom right' };
 
+function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
+	return (
+		<MenuGroup label={ label }>
+			{ aspectRatios.map( ( { label: aspectLabel, aspect } ) => (
+				<MenuItem
+					key={ aspect }
+					isDisabled={ isDisabled }
+					onClick={ () => {
+						onClick( aspect );
+					} }
+				>
+					{ aspectLabel }
+				</MenuItem>
+			) ) }
+		</MenuGroup>
+	);
+}
+
+function AspectMenu( { isDisabled, onClick, toggleProps } ) {
+	return (
+		<DropdownMenu
+			icon={ <AspectIcon /> }
+			label={ __( 'Aspect Ratio' ) }
+			popoverProps={ POPOVER_PROPS }
+			toggleProps={ toggleProps }
+		>
+			{ ( { onClose } ) => (
+				<>
+					<AspectGroup
+						label={ __( 'Landscape' ) }
+						isDisabled={ isDisabled }
+						onClick={ ( aspect ) => {
+							onClick( aspect );
+							onClose();
+						} }
+						aspectRatios={ [
+							{
+								label: __( '16:10' ),
+								aspect: 16 / 10,
+							},
+							{
+								label: __( '16:9' ),
+								aspect: 16 / 9,
+							},
+							{
+								label: __( '4:3' ),
+								aspect: 4 / 3,
+							},
+							{
+								label: __( '3:2' ),
+								aspect: 3 / 2,
+							},
+						] }
+					/>
+					<AspectGroup
+						label={ __( 'Portrait' ) }
+						isDisabled={ isDisabled }
+						onClick={ ( aspect ) => {
+							onClick( aspect );
+							onClose();
+						} }
+						aspectRatios={ [
+							{
+								label: __( '10:16' ),
+								aspect: 10 / 16,
+							},
+							{
+								label: __( '9:16' ),
+								aspect: 9 / 16,
+							},
+							{
+								label: __( '3:4' ),
+								aspect: 3 / 4,
+							},
+							{
+								label: __( '2:3' ),
+								aspect: 2 / 3,
+							},
+						] }
+					/>
+					<MenuGroup>
+						<MenuItem
+							isDisabled={ isDisabled }
+							onClick={ () => {
+								this.setState( {
+									aspect: 1,
+								} );
+								onClose();
+							} }
+						>
+							{ __( 'Square' ) }
+						</MenuItem>
+					</MenuGroup>
+				</>
+			) }
+		</DropdownMenu>
+	);
+}
+
 class RichImage extends Component {
 	constructor( props ) {
 		super( props );
@@ -302,128 +401,15 @@ class RichImage extends Component {
 						<ToolbarGroup>
 							<ToolbarItem>
 								{ ( toggleProps ) => (
-									<DropdownMenu
-										icon={ <AspectIcon /> }
-										label={ __( 'Aspect Ratio' ) }
-										popoverProps={ POPOVER_PROPS }
+									<AspectMenu
 										toggleProps={ toggleProps }
-									>
-										{ ( { onClose } ) => (
-											<>
-												<MenuGroup
-													label={ __( 'Landscape' ) }
-												>
-													{ [
-														{
-															title: __(
-																'16:10'
-															),
-															aspect: 16 / 10,
-														},
-														{
-															title: __( '16:9' ),
-															aspect: 16 / 9,
-														},
-														{
-															title: __( '4:3' ),
-															aspect: 4 / 3,
-														},
-														{
-															title: __( '3:2' ),
-															aspect: 3 / 2,
-														},
-													].map(
-														( {
-															title,
-															aspect: newAspect,
-														} ) => (
-															<MenuItem
-																key={
-																	newAspect
-																}
-																isDisabled={
-																	inProgress
-																}
-																onClick={ () => {
-																	this.setState(
-																		{
-																			aspect: newAspect,
-																		}
-																	);
-																	onClose();
-																} }
-															>
-																{ title }
-															</MenuItem>
-														)
-													) }
-												</MenuGroup>
-												<MenuGroup
-													label={ __( 'Portrait' ) }
-												>
-													{ [
-														{
-															title: __(
-																'10:16'
-															),
-															aspect: 10 / 16,
-														},
-														{
-															title: __( '9:16' ),
-															aspect: 9 / 16,
-														},
-														{
-															title: __( '3:4' ),
-															aspect: 3 / 4,
-														},
-														{
-															title: __( '2:3' ),
-															aspect: 2 / 3,
-														},
-													].map(
-														( {
-															title,
-															aspect: newAspect,
-														} ) => (
-															<MenuItem
-																key={
-																	newAspect
-																}
-																isDisabled={
-																	inProgress
-																}
-																onClick={ () => {
-																	this.setState(
-																		{
-																			aspect: newAspect,
-																		}
-																	);
-																	onClose();
-																} }
-															>
-																{ title }
-															</MenuItem>
-														)
-													) }
-												</MenuGroup>
-												<MenuGroup>
-													<MenuItem
-														isDisabled={
-															inProgress
-														}
-														onClick={ () => {
-															this.setState( {
-																aspect: 1,
-															} );
-															onClose();
-														} }
-													>
-														{ __( 'Square' ) }
-													</MenuItem>
-												</MenuGroup>
-											</>
-										) }
-									</DropdownMenu>
+										isDisabled={ inProgress }
+										onClick={ ( newAspect ) => {
+											this.setState( {
+												aspect: newAspect,
+											} );
+										} }
+									/>
 								) }
 							</ToolbarItem>
 						</ToolbarGroup>
