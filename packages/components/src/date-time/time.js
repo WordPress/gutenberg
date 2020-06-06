@@ -115,7 +115,7 @@ class TimePicker extends Component {
 			? date
 					.clone()
 					.hours(
-						am === 'AM' ? value % 12 : ( ( value % 12 ) + 12 ) % 24
+						am === __( 'AM' ) ? value % 12 : ( ( value % 12 ) + 12 ) % 24
 					)
 			: date.clone().hours( value );
 		this.changeDate( newDate );
@@ -184,7 +184,7 @@ class TimePicker extends Component {
 				return;
 			}
 			let newDate;
-			if ( value === 'PM' ) {
+			if ( value === __( 'PM' ) ) {
 				newDate = date
 					.clone()
 					.hours( ( ( parseInt( hours, 10 ) % 12 ) + 12 ) % 24 );
@@ -336,17 +336,17 @@ class TimePicker extends Component {
 						{ is12Hour && (
 							<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
 								<Button
-									isPrimary={ am === 'AM' }
-									isSecondary={ am !== 'AM' }
-									onClick={ this.updateAmPm( 'AM' ) }
+									isPrimary={ am === __( 'AM' ) }
+									isSecondary={ am !== __( 'AM' ) }
+									onClick={ this.updateAmPm( __( 'AM' ) ) }
 									className="components-datetime__time-am-button"
 								>
 									{ __( 'AM' ) }
 								</Button>
 								<Button
-									isPrimary={ am === 'PM' }
-									isSecondary={ am !== 'PM' }
-									onClick={ this.updateAmPm( 'PM' ) }
+									isPrimary={ am === __( 'PM' ) }
+									isSecondary={ am !== __('PM') }
+									onClick={ this.updateAmPm( __('PM') ) }
 									className="components-datetime__time-pm-button"
 								>
 									{ __( 'PM' ) }
