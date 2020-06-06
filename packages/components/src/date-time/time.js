@@ -115,7 +115,9 @@ class TimePicker extends Component {
 			? date
 					.clone()
 					.hours(
-						am === __( 'AM' ) ? value % 12 : ( ( value % 12 ) + 12 ) % 24
+						am === __( 'AM' )
+							? value % 12
+							: ( ( value % 12 ) + 12 ) % 24
 					)
 			: date.clone().hours( value );
 		this.changeDate( newDate );
@@ -345,8 +347,8 @@ class TimePicker extends Component {
 								</Button>
 								<Button
 									isPrimary={ am === __( 'PM' ) }
-									isSecondary={ am !== __('PM') }
-									onClick={ this.updateAmPm( __('PM') ) }
+									isSecondary={ am !== __( 'PM' ) }
+									onClick={ this.updateAmPm( __( 'PM' ) ) }
 									className="components-datetime__time-pm-button"
 								>
 									{ __( 'PM' ) }
