@@ -8,6 +8,7 @@ import { shallow } from 'enzyme';
  */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { DOWN } from '@wordpress/keycodes';
+import { ToolbarButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -186,7 +187,7 @@ describe( 'BlockSwitcher', () => {
 						isOpen: false,
 					} )
 				);
-				const iconButtonClosed = toggleClosed.find( 'ToolbarButton' );
+				const iconButtonClosed = toggleClosed.find( ToolbarButton );
 
 				iconButtonClosed.simulate( 'keydown', mockKeyDown );
 
@@ -200,7 +201,7 @@ describe( 'BlockSwitcher', () => {
 						isOpen: true,
 					} )
 				);
-				const iconButtonOpen = toggleOpen.find( 'ToolbarButton' );
+				const iconButtonOpen = toggleOpen.find( ToolbarButton );
 
 				iconButtonOpen.simulate( 'keydown', mockKeyDown );
 
