@@ -239,6 +239,9 @@ function selector( select ) {
 /**
  * Handles selection and navigation across blocks. This component should be
  * wrapped around BlockList.
+ *
+ * @param {Object}    props          Component properties.
+ * @param {WPElement} props.children Children to be rendered
  */
 export default function WritingFlow( { children } ) {
 	const container = useRef();
