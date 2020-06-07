@@ -6,7 +6,7 @@ import { uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, renderToString } from '@wordpress/element';
+import { useState, renderToString, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -44,7 +44,7 @@ const MediaReplaceFlow = ( {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings().mediaUpload;
 	}, [] );
-	const editMediaButtonRef = ToolbarButton.ref;
+	const editMediaButtonRef = useRef();
 	const errorNoticeID = uniqueId(
 		'block-editor/media-replace-flow/error-notice/'
 	);
@@ -111,6 +111,7 @@ const MediaReplaceFlow = ( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarGroup className="media-replace-flow">
 					<ToolbarButton
+						ref={ editMediaButtonRef }
 						aria-expanded={ isOpen }
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }

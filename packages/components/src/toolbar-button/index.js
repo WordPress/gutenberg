@@ -5,7 +5,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useContext, useRef } from '@wordpress/element';
+import { useContext, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -14,18 +14,19 @@ import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
 
-function ToolbarButton( {
-	containerClassName,
-	className,
-	extraProps,
-	children,
-	title,
-	isActive,
-	isDisabled,
-	...props
-} ) {
-	ToolbarButton.ref = useRef();
-
+function ToolbarButton(
+	{
+		containerClassName,
+		className,
+		extraProps,
+		children,
+		title,
+		isActive,
+		isDisabled,
+		...props
+	},
+	ref
+) {
 	const accessibleToolbarState = useContext( ToolbarContext );
 	if ( ! accessibleToolbarState ) {
 		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
@@ -34,7 +35,7 @@ function ToolbarButton( {
 		return (
 			<ToolbarButtonContainer className={ containerClassName }>
 				<Button
-					ref={ ToolbarButton.ref }
+					ref={ ref }
 					icon={ props.icon }
 					label={ title }
 					shortcut={ props.shortcut }
@@ -69,10 +70,10 @@ function ToolbarButton( {
 			className={ classnames( 'components-toolbar-button', className ) }
 			{ ...extraProps }
 			{ ...props }
+			ref={ ref }
 		>
 			{ ( toolbarItemProps ) => (
 				<Button
-					ref={ ToolbarButton.ref }
 					label={ title }
 					isPressed={ isActive }
 					disabled={ isDisabled }
@@ -85,4 +86,4 @@ function ToolbarButton( {
 	);
 }
 
-export default ToolbarButton;
+export default forwardRef( ToolbarButton );
