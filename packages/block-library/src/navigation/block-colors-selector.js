@@ -20,7 +20,10 @@ const ColorSelectorSVGIcon = () => (
 /**
  * Color Selector Icon component.
  *
- * @param {Object} colorControlProps colorControl properties.
+ * @param {Object} props           Component properties.
+ * @param {Object} props.style     Style object.
+ * @param {string} props.className Class name for component.
+ *
  * @return {*} React Icon component.
  */
 const ColorSelectorIcon = ( { style, className } ) => {
@@ -39,7 +42,10 @@ const ColorSelectorIcon = ( { style, className } ) => {
 /**
  * Renders the Colors Selector Toolbar with the icon button.
  *
- * @param {Object} colorControlProps colorControl properties.
+ * @param {Object} props                 Component properties.
+ * @param {Object} props.TextColor       Text color component that wraps icon.
+ * @param {Object} props.BackgroundColor Background color componnet that wraps icon.
+ *
  * @return {*} React toggle button component.
  */
 const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( {

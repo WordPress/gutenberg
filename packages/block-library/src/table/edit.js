@@ -458,7 +458,7 @@ export class TableEdit extends Component {
 	 * Renders a table section.
 	 *
 	 * @param {Object} options
-	 * @param {string} options.type Section type: head, body, or foot.
+	 * @param {string} options.name Section type: head, body, or foot.
 	 * @param {Array}  options.rows The rows to render.
 	 *
 	 * @return {Object} React element for the section.
