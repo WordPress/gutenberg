@@ -241,7 +241,7 @@ function selector( select ) {
  * wrapped around BlockList.
  *
  * @param {Object}    props          Component properties.
- * @param {WPElement} props.children Children to be rendered
+ * @param {WPElement} props.children Children to be rendered.
  */
 export default function WritingFlow( { children } ) {
 	const container = useRef();

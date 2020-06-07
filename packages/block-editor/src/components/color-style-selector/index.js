@@ -44,7 +44,7 @@ const ColorSelectorIcon = ( { style, className } ) => {
  *
  * @param {Object} props                 Component properties.
  * @param {Object} props.TextColor       Text color component that wraps icon.
- * @param {Object} props.BackgroundColor Background color componnet that wraps icon.
+ * @param {Object} props.BackgroundColor Background color component that wraps icon.
  *
  * @return {*} React toggle button component.
  */
