@@ -6,11 +6,14 @@ import { createSlotFill } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { ifBlockEditSelected } from '../block-edit/context';
+import { useBlockEditContext } from '../block-edit/context';
 
 const { Fill, Slot } = createSlotFill( 'InspectorControls' );
 
-const InspectorControls = ifBlockEditSelected( Fill );
+function InspectorControls( { children } ) {
+	const { isSelected } = useBlockEditContext();
+	return isSelected ? <Fill>{ children }</Fill> : null;
+}
 
 InspectorControls.Slot = Slot;
 

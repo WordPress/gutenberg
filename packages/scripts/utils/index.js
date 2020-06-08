@@ -18,16 +18,10 @@ const {
 	hasPrettierConfig,
 	hasPostCSSConfig,
 } = require( './config' );
-const {
-	buildWordPress,
-	downloadWordPressZip,
-	mergeYAMLConfigs,
-} = require( './env' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
 
 module.exports = {
-	buildWordPress,
 	fromProjectRoot,
 	fromConfigRoot,
 	getArgFromCLI,
@@ -44,7 +38,5 @@ module.exports = {
 	hasPrettierConfig,
 	hasPostCSSConfig,
 	hasProjectFile,
-	downloadWordPressZip,
-	mergeYAMLConfigs,
 	spawnScript,
 };

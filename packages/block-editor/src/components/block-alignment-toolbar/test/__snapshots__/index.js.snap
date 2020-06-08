@@ -60,5 +60,10 @@ exports[`BlockAlignmentToolbar should match snapshot 1`] = `
   }
   isCollapsed={true}
   label="Change alignment"
+  popoverProps={
+    Object {
+      "isAlternate": true,
+    }
+  }
 />
 `;

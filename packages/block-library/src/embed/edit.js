@@ -175,6 +175,7 @@ export function getEmbedEditComponent(
 				cannotEmbed,
 				themeSupportsResponsive,
 				tryAgain,
+				insertBlocksAfter,
 			} = this.props;
 
 			if ( fetching ) {
@@ -241,6 +242,7 @@ export function getEmbedEditComponent(
 						isSelected={ isSelected }
 						icon={ icon }
 						label={ label }
+						insertBlocksAfter={ insertBlocksAfter }
 					/>
 				</>
 			);

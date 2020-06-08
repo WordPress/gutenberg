@@ -5,6 +5,9 @@
 		"level": {
 			"type": "number",
 			"default": 1
+		},
+		"align": {
+			"type": "string"
 		}
 	},
 	"supports": {

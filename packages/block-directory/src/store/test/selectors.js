@@ -7,6 +7,7 @@ import {
 	getErrorNotices,
 	getErrorNoticeForBlock,
 	getInstalledBlockTypes,
+	isInstalling,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -80,6 +81,29 @@ describe( 'selectors', () => {
 		it( 'should get an empty array if no matching query is found', () => {
 			const blocks = getDownloadableBlocks( state, 'not-found' );
 			expect( blocks ).toEqual( [] );
+		} );
+	} );
+
+	describe( 'isInstalling', () => {
+		const BLOCK_1_ID = 'box-block-id';
+		const BLOCK_2_ID = 'image-slider-id';
+
+		const state = {
+			blockManagement: {
+				isInstalling: {
+					[ BLOCK_1_ID ]: true,
+					[ BLOCK_2_ID ]: false,
+				},
+			},
+		};
+
+		it( 'it should reflect that the block is installing', () => {
+			expect( isInstalling( state, BLOCK_1_ID ) ).toBeTruthy();
+		} );
+
+		it( 'it should reflect that the block is not installing', () => {
+			expect( isInstalling( state, 'not-in-state' ) ).toBeFalsy();
+			expect( isInstalling( state, BLOCK_2_ID ) ).toBeFalsy();
 		} );
 	} );
 } );
