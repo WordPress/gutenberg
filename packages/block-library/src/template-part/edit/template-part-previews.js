@@ -8,11 +8,7 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
 import { Icon } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import useAsyncList from './use-async-list';
+import { useAsyncList } from '@wordpress/compose';
 
 /**
  * External dependencies

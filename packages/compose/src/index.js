@@ -21,3 +21,4 @@ export { default as useMediaQuery } from './hooks/use-media-query';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';
 export { default as useViewportMatch } from './hooks/use-viewport-match';
 export { default as useResizeObserver } from './hooks/use-resize-observer';
+export { default as useAsyncList } from './hooks/use-async-list';

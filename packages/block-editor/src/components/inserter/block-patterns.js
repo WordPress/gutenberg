@@ -11,12 +11,11 @@ import { parse, cloneBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf, _x } from '@wordpress/i18n';
-
+import { useAsyncList } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
-import useAsyncList from './use-async-list';
 import InserterPanel from './panel';
 import { searchItems } from './search-items';
 import InserterNoResults from './no-results';
