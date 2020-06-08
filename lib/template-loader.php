@@ -330,15 +330,9 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 			'post_type'    => 'wp_template',
 			'post_name'    => 'index',
 		);
-		if ( is_admin() || defined( 'REST_REQUEST' ) ) {
-			$current_template_post = get_post(
-				wp_insert_post( $current_template_post )
-			);
-		} else {
-			$current_template_post = new WP_Post(
-				(object) $current_template_post
-			);
-		}
+		$current_template_post = get_post(
+			wp_insert_post( $current_template_post )
+		);
 	}
 
 	if ( $current_template_post ) {
