@@ -5,7 +5,7 @@
 }
 
 .block-editor-block-styles__item {
-	width: calc(50% - #{ $grid-unit-05 });
+	width: 100%;
 	margin: $grid-unit-05 0;
 	flex-shrink: 0;
 	cursor: pointer;
@@ -52,6 +52,5 @@
 }
 
 .block-editor-block-styles__item-label {
-	text-align: center;
 	padding: 4px 2px;
 }

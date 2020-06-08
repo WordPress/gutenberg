@@ -151,20 +151,6 @@ export class BlockSwitcher extends Component {
 						{ ( hasBlockStyles ||
 							possibleBlockTransformations.length !== 0 ) && (
 							<div className="block-editor-block-switcher__container">
-								{ hasBlockStyles && (
-									<MenuGroup>
-										<div className="block-editor-block-switcher__label">
-											{ __( 'Styles' ) }
-										</div>
-										<BlockStyles
-											clientId={ blocks[ 0 ].clientId }
-											onSwitch={ onClose }
-											onHoverClassName={
-												this.onHoverClassName
-											}
-										/>
-									</MenuGroup>
-								) }
 								{ possibleBlockTransformations.length !== 0 && (
 									<MenuGroup>
 										<div className="block-editor-block-switcher__label">
@@ -185,6 +171,20 @@ export class BlockSwitcher extends Component {
 												onTransform( blocks, item.id );
 												onClose();
 											} }
+										/>
+									</MenuGroup>
+								) }
+								{ hasBlockStyles && (
+									<MenuGroup>
+										<div className="block-editor-block-switcher__label">
+											{ __( 'Styles' ) }
+										</div>
+										<BlockStyles
+											clientId={ blocks[ 0 ].clientId }
+											onSwitch={ onClose }
+											onHoverClassName={
+												this.onHoverClassName
+											}
 										/>
 									</MenuGroup>
 								) }
