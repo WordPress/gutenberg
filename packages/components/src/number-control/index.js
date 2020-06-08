@@ -17,8 +17,9 @@ import {
 	composeStateReducers,
 } from '../input-control/state';
 import { useRTL } from '../utils/style-mixins';
-import { add, roundClamp } from '../utils/math';
+import { add, subtract, roundClamp } from '../utils/math';
 import { useJumpStep } from '../utils/hooks';
+import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
 	{
@@ -40,6 +41,7 @@ export function NumberControl(
 	ref
 ) {
 	const isRtl = useRTL();
+	const baseValue = roundClamp( 0, min, max, step );
 
 	const jumpStep = useJumpStep( {
 		step,
@@ -61,7 +63,41 @@ export function NumberControl(
 	 */
 	const numberControlStateReducer = ( state, action ) => {
 		const { type, payload } = action;
+		const event = payload?.event;
 		const currentValue = state.value;
+
+		/**
+		 * Handles custom UP and DOWN Keyboard events
+		 */
+		if (
+			type === inputControlActionTypes.PRESS_UP ||
+			type === inputControlActionTypes.PRESS_DOWN
+		) {
+			const enableShift = event.shiftKey && isShiftStepEnabled;
+
+			const incrementalValue = enableShift
+				? parseFloat( shiftStep ) * parseFloat( step )
+				: parseFloat( step );
+			let nextValue = isValueEmpty( currentValue )
+				? baseValue
+				: currentValue;
+
+			if ( event?.preventDefault ) {
+				event.preventDefault();
+			}
+
+			if ( type === inputControlActionTypes.PRESS_UP ) {
+				nextValue = add( nextValue, incrementalValue );
+			}
+
+			if ( type === inputControlActionTypes.PRESS_DOWN ) {
+				nextValue = subtract( nextValue, incrementalValue );
+			}
+
+			nextValue = roundClamp( nextValue, min, max, incrementalValue );
+
+			state.value = nextValue;
+		}
 
 		/**
 		 * Handles drag to update events
