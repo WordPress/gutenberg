@@ -22,6 +22,17 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
+function translateToolbarButtonProps( { label, isPressed, ...props } ) {
+	return { title: label, isActive: isPressed, ...props };
+}
+
+function getFillsProps( fills ) {
+	return orderBy(
+		fills.map( ( [ { props } ] ) => translateToolbarButtonProps( props ) ),
+		'label'
+	);
+}
+
 const FormatToolbar = () => {
 	return (
 		<div className="block-editor-format-toolbar">
@@ -45,12 +56,7 @@ const FormatToolbar = () => {
 											'More rich text controls'
 										) }
 										toggleProps={ toggleProps }
-										controls={ orderBy(
-											fills.map(
-												( [ { props } ] ) => props
-											),
-											'title'
-										) }
+										controls={ getFillsProps( fills ) }
 										popoverProps={ POPOVER_PROPS }
 									/>
 								) }
