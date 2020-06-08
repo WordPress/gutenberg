@@ -248,7 +248,7 @@
 		"design-system:dev": "echo \"Please use storybook:dev instead.\"",
 		"playground:build": "npm run storybook:build",
 		"playground:dev": "echo \"Please use storybook:dev instead.\"",
-		"env": "wp-scripts env",
+		"env": "packages/env/bin/wp-env",
 		"wp-env": "packages/env/bin/wp-env"
 	},
 	"husky": {
