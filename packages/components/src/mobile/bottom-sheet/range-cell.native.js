@@ -84,12 +84,13 @@ class BottomSheetRangeCell extends Component {
 			return Math.min( Math.max( text, minimumValue ), maximumValue );
 		}
 		return Math.min(
-			Math.max(
-				text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' ),
-				minimumValue
-			),
+			Math.max( this.removeNonDigit( text ), minimumValue ),
 			maximumValue
 		);
+	}
+
+	removeNonDigit( text ) {
+		return text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' );
 	}
 
 	updateValue( value ) {
@@ -106,7 +107,10 @@ class BottomSheetRangeCell extends Component {
 
 	onChangeText( textValue ) {
 		const value = this.validateInput( textValue );
-		this.setState( { inputValue: textValue, sliderValue: value } );
+		this.setState( {
+			inputValue: this.removeNonDigit( textValue ),
+			sliderValue: value,
+		} );
 		this.updateValue( value );
 	}
 
@@ -226,6 +230,7 @@ class BottomSheetRangeCell extends Component {
 						keyboardType="number-pad"
 						returnKeyType="done"
 						defaultValue={ `${ inputValue }` }
+						value={ inputValue }
 					/>
 				</View>
 			</Cell>
