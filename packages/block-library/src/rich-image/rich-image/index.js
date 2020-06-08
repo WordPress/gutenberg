@@ -13,7 +13,7 @@ import {
 	BlockControls,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	rotateLeft as rotateLeftIcon,
 	rotateRight as rotateRightIcon,
@@ -162,7 +162,7 @@ function RichImage( props ) {
 		setAttributes,
 		noticeOperations,
 	} = props;
-	const [ isCrop, setIsCrop ] = useState( false );
+	const [ isCropping, setIsCropping ] = useState( false );
 	const [ inProgress, setIsProgress ] = useState( null );
 	const [ imageSize, setImageSize ] = useState( {
 		naturalHeight: 0,
@@ -172,11 +172,14 @@ function RichImage( props ) {
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
 	const [ zoom, setZoom ] = useState( 1 );
 	const [ aspect, setAspect ] = useState( 4 / 3 );
-	const isEditing = ! isCrop && isSelected && url;
+	const isEditing = ! isCropping && isSelected && url;
 
-	if ( ! isSelected ) {
-		return <OriginalBlock { ...props } />;
-	}
+	// Cancel cropping on deselect.
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsCropping( false );
+		}
+	}, [ isSelected ] );
 
 	function adjustImage( action, attrs ) {
 		setIsProgress( action );
@@ -185,7 +188,7 @@ function RichImage( props ) {
 		richImageRequest( id, action, attrs )
 			.then( ( response ) => {
 				setIsProgress( null );
-				setIsCrop( false );
+				setIsCropping( false );
 
 				if ( response.mediaID && response.mediaID !== id ) {
 					setAttributes( {
@@ -201,7 +204,7 @@ function RichImage( props ) {
 					)
 				);
 				setIsProgress( null );
-				setIsCrop( false );
+				setIsCropping( false );
 			} );
 	}
 
@@ -228,7 +231,7 @@ function RichImage( props ) {
 						<Spinner />
 					</div>
 				) }
-				{ isCrop ? (
+				{ isCropping ? (
 					<Block.div className="richimage__crop-controls">
 						<div
 							className="richimage__crop-area"
@@ -339,14 +342,14 @@ function RichImage( props ) {
 							icon={ cropIcon }
 							label={ __( 'Crop' ) }
 							onClick={ () => {
-								setIsCrop( ! isCrop );
+								setIsCropping( ( prev ) => ! prev );
 								setCrop( DEFAULT_CROP );
 							} }
 						/>
 					</ToolbarGroup>
 				</BlockControls>
 			) }
-			{ isCrop && (
+			{ isCropping && (
 				<BlockControls>
 					<ToolbarGroup>
 						<div className="richimage__crop-icon">
@@ -370,7 +373,7 @@ function RichImage( props ) {
 						</ToolbarButton>
 						<ToolbarButton
 							onClick={ () => {
-								setIsCrop( false );
+								setIsCropping( false );
 							} }
 						>
 							{ __( 'Cancel' ) }
