@@ -212,6 +212,7 @@ export class Inserter extends Component {
 	 * @param {Object}   options
 	 * @param {Function} options.onClose Callback to invoke when dropdown is
 	 *                                   closed.
+	 * @param {boolean}  options.isOpen  Whether dropdown is currently open.
 	 *
 	 * @return {WPElement} Dropdown content element.
 	 */

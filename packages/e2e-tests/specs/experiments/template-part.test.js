@@ -54,16 +54,8 @@ describe( 'Template Part', () => {
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'Header Template Part 123' );
 
-			// Save it, without saving the front page template.
+			// Save it.
 			await page.click( '.edit-site-save-button__button' );
-			const reviewChangesButton = await page.waitForSelector(
-				'.entities-saved-states__review-changes-button'
-			);
-			await reviewChangesButton.click();
-			const [ frontPageCheckbox ] = await page.$x(
-				'//strong[contains(text(),"Front Page")]/../preceding-sibling::span/input'
-			);
-			await frontPageCheckbox.click();
 			await page.click( '.editor-entities-saved-states__save-button' );
 			await page.waitForSelector(
 				'.edit-site-save-button__button:not(.is-busy)'

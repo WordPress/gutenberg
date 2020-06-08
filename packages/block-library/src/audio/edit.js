@@ -22,6 +22,7 @@ import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -37,6 +38,7 @@ function AudioEdit( {
 	onReplace,
 	isSelected,
 	noticeUI,
+	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
 
@@ -190,6 +192,9 @@ function AudioEdit( {
 							setAttributes( { caption: value } )
 						}
 						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						}
 					/>
 				) }
 			</Block.figure>
