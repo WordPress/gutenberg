@@ -33,7 +33,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isRequestingDownloadableBlocks', () => {
-		it( 'should return false if there are no calls pending', () => {
+		it( 'should return false if no requests have been made for the block', () => {
 			const filterValue = 'Awesome Block';
 
 			const state = {
@@ -47,13 +47,34 @@ describe( 'selectors', () => {
 			expect( isRequesting ).toEqual( false );
 		} );
 
-		it( 'should return true if at least one call is pending', () => {
+		it( 'should return false if there are no pending requests for the block', () => {
+			const filterValue = 'Awesome Block';
+
+			const state = {
+				downloadableBlocks: {
+					[ filterValue ]: {
+						isRequesting: false,
+					},
+				},
+			};
+			const isRequesting = isRequestingDownloadableBlocks(
+				state,
+				filterValue
+			);
+
+			expect( isRequesting ).toEqual( false );
+		} );
+
+		it( 'should return true if the block has a pending request', () => {
 			const filterValue = 'Awesome Block';
 
 			const state = {
 				downloadableBlocks: {
 					[ filterValue ]: {
 						isRequesting: true,
+					},
+					'previous-search-keyword': {
+						isRequesting: false,
 					},
 				},
 			};
