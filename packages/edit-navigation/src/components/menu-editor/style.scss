@@ -51,12 +51,11 @@
 
 .block-editor-block-navigation-leaf {
 	> :first-child {
-		padding-left: $grid-unit-20;
+		padding-left: 0;
 	}
-	> :last-child {
-		padding-right: $grid-unit-20;
+	> :first-child button {
+		padding-left: 0;
 	}
-
 }
 
 .edit-navigation-menu-editor__navigation-structure-panel {
