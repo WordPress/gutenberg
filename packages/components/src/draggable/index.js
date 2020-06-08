@@ -12,7 +12,7 @@ import { withSafeTimeout } from '@wordpress/compose';
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
 const cloneHeightTransformationBreakpoint = 700;
-const clonePadding = 20;
+const clonePadding = 0;
 
 class Draggable extends Component {
 	constructor() {
