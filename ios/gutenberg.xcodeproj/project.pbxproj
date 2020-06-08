@@ -11,6 +11,7 @@
 		05908C6EA5B80A39F74C4FEF /* Pods_gutenberg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E210A05B5C8829E0B3BE83 /* Pods_gutenberg.framework */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		1E4F2E752459E6F200EB73E7 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E85944D2449D85A006CC6A0 /* WebViewController.swift */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D16E6881FA4F8E400B85C8A /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D16E6891FA4F8E400B85C8A /* libReact.a */; };
 		2DCD954D1E0B4F2C00145EB5 /* gutenbergTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* gutenbergTests.m */; };
@@ -60,6 +61,7 @@
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = gutenberg/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = gutenberg/Info.plist; sourceTree = "<group>"; };
+		1E85944D2449D85A006CC6A0 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WebViewController.swift; path = gutenberg/WebViewController.swift; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* gutenberg-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gutenberg-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* gutenberg-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gutenberg-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -159,6 +161,7 @@
 				F15198372100DC3C000F6E97 /* gutenberg-Bridging-Header.h */,
 				F15198392100DC3D000F6E97 /* AppDelegate.swift */,
 				7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */,
+				1E85944D2449D85A006CC6A0 /* WebViewController.swift */,
 				FF9A6F1621FA8E2500D36D14 /* MediaPickCoordinator.swift */,
 				FF6836C722035EAB00A0C562 /* MediaUploadCoordinator.swift */,
 				F151983A2100DC3D000F6E97 /* MediaProvider.swift */,
@@ -653,6 +656,7 @@
 				FF83DAA92226905A00A34C93 /* CustomImageLoader.swift in Sources */,
 				FF9A6F4121FA8E2500D36D14 /* MediaPickCoordinator.swift in Sources */,
 				F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */,
+				1E4F2E752459E6F200EB73E7 /* WebViewController.swift in Sources */,
 				FF6836C822035EAB00A0C562 /* MediaUploadCoordinator.swift in Sources */,
 				7EC7328F21907E3F00FED2E6 /* GutenbergViewController.swift in Sources */,
 			);
