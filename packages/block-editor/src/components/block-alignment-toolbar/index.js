@@ -13,11 +13,6 @@ import {
 	stretchWide,
 } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import { withBlockEditContext } from '../block-edit/context';
-
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
 		icon: positionLeft,
@@ -88,11 +83,6 @@ export function BlockAlignmentToolbar( {
 }
 
 export default compose(
-	withBlockEditContext( ( { clientId } ) => {
-		return {
-			clientId,
-		};
-	} ),
 	withSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		const settings = getSettings();
