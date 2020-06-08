@@ -325,7 +325,6 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 	if( ! $current_template_post && ( is_admin() || defined( 'REST_REQUEST' ) ) ) {
 		// 'index' is the ultimate fallback template. If even this template doesn't exist, we create an empty one for it.
 		$current_template_post = array(
-			//'post_content' => $file_contents,
 			'post_title'   => 'index',
 			'post_status'  => 'auto-draft',
 			'post_type'    => 'wp_template',
