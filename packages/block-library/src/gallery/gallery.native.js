@@ -50,6 +50,7 @@ export const Gallery = ( props ) => {
 		isSelected,
 		isNarrow,
 		onFocus,
+		insertBlocksAfter,
 	} = props;
 
 	const {
@@ -143,6 +144,7 @@ export const Gallery = ( props ) => {
 				}
 				onFocus={ focusGalleryCaption }
 				onBlur={ onBlur } // always assign onBlur as props
+				insertBlocksAfter= { insertBlocksAfter }
 			/>
 		</View>
 	);
