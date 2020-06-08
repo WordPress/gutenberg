@@ -18,6 +18,7 @@ export const FocalPointWrapper = styled.div`
 	box-sizing: border-box;
 	cursor: grab;
 	height: 30px;
+	margin: -15px 0 0 -15px;
 	opacity: 0.8;
 	position: absolute;
 	user-select: none;
@@ -33,9 +34,9 @@ export const FocalPointWrapper = styled.div`
 export const PointerIconSVG = styled( SVG )`
 	display: block;
 	height: 100%;
-	left: -15px;
+	left: 0;
 	position: absolute;
-	top: -15px;
+	top: 0;
 	width: 100%;
 `;
 

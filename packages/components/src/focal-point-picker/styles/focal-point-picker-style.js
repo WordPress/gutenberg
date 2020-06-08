@@ -12,10 +12,7 @@ import { color } from '../../utils/style-mixins';
 
 export const MediaWrapper = styled.div`
 	background-color: transparent;
-	border: 1px solid ${ color( 'lightGray.500' ) };
 	box-sizing: border-box;
-	height: 200px;
-	padding: 14px;
 	text-align: center;
 	width: 100%;
 `;
@@ -23,6 +20,7 @@ export const MediaWrapper = styled.div`
 export const MediaContainer = styled.div`
 	align-items: center;
 	box-sizing: border-box;
+	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.2 );
 	cursor: pointer;
 	display: inline-flex;
 	justify-content: center;
