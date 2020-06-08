@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, flow } from 'lodash';
+import { castArray, flow, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -64,12 +64,14 @@ export function BlockSettingsDropdown( {
 
 	const [ hasCopied, setHasCopied ] = useState();
 	const updateSelection = useCallback(
-		async ( clientIdsPromise ) => {
-			const ids = await clientIdsPromise;
-			if ( ids && ids[ 0 ] ) {
-				__experimentalSelectBlock( ids[ 0 ] );
-			}
-		},
+		__experimentalSelectBlock
+			? async ( clientIdsPromise ) => {
+					const ids = await clientIdsPromise;
+					if ( ids && ids[ 0 ] ) {
+						__experimentalSelectBlock( ids[ 0 ] );
+					}
+			  }
+			: noop,
 		[ __experimentalSelectBlock ]
 	);
 
