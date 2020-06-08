@@ -151,6 +151,110 @@ describe( 'NumberControl', () => {
 
 			expect( spy ).toHaveBeenCalled();
 		} );
+
+		it( 'should increment by step on key UP press', () => {
+			act( () => {
+				render( <StatefulNumberControl value={ 5 } />, container );
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP } );
+			} );
+
+			expect( input.value ).toBe( '6' );
+		} );
+
+		it( 'should increment from a negative value', () => {
+			act( () => {
+				render( <StatefulNumberControl value={ -5 } />, container );
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP } );
+			} );
+
+			expect( input.value ).toBe( '-4' );
+		} );
+
+		it( 'should increment by shiftStep on key UP + shift press', () => {
+			act( () => {
+				render(
+					<StatefulNumberControl value={ 5 } shiftStep={ 10 } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			} );
+
+			expect( input.value ).toBe( '20' );
+		} );
+
+		it( 'should increment by custom shiftStep on key UP + shift press', () => {
+			act( () => {
+				render(
+					<StatefulNumberControl value={ 5 } shiftStep={ 100 } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			} );
+
+			expect( input.value ).toBe( '100' );
+		} );
+
+		it( 'should increment but be limited by max on shiftStep', () => {
+			act( () => {
+				render(
+					<StatefulNumberControl
+						value={ 5 }
+						shiftStep={ 100 }
+						max={ 99 }
+					/>,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			} );
+
+			expect( input.value ).toBe( '99' );
+		} );
+
+		it( 'should not increment by shiftStep if disabled', () => {
+			act( () => {
+				render(
+					<StatefulNumberControl
+						value={ 5 }
+						shiftStep={ 100 }
+						isShiftStepEnabled={ false }
+					/>,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			} );
+
+			expect( input.value ).toBe( '6' );
+		} );
 	} );
 
 	describe( 'Key DOWN interactions', () => {
@@ -170,6 +274,107 @@ describe( 'NumberControl', () => {
 			} );
 
 			expect( spy ).toHaveBeenCalled();
+		} );
+
+		it( 'should decrement by step on key DOWN press', () => {
+			act( () => {
+				render( <StatefulNumberControl value={ 5 } />, container );
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN } );
+			} );
+
+			expect( input.value ).toBe( '4' );
+		} );
+
+		it( 'should decrement from a negative value', () => {
+			act( () => {
+				render( <StatefulNumberControl value={ -5 } />, container );
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN } );
+			} );
+
+			expect( input.value ).toBe( '-6' );
+		} );
+
+		it( 'should decrement by shiftStep on key DOWN + shift press', () => {
+			act( () => {
+				render( <StatefulNumberControl value={ 5 } />, container );
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			} );
+
+			expect( input.value ).toBe( '0' );
+		} );
+
+		it( 'should decrement by custom shiftStep on key DOWN + shift press', () => {
+			act( () => {
+				render(
+					<StatefulNumberControl value={ 5 } shiftStep={ 100 } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			} );
+
+			expect( input.value ).toBe( '-100' );
+		} );
+
+		it( 'should decrement but be limited by min on shiftStep', () => {
+			act( () => {
+				render(
+					<StatefulNumberControl
+						value={ 5 }
+						shiftStep={ 100 }
+						min={ 4 }
+					/>,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			} );
+
+			expect( input.value ).toBe( '4' );
+		} );
+
+		it( 'should not decrement by shiftStep if disabled', () => {
+			act( () => {
+				render(
+					<StatefulNumberControl
+						value={ 5 }
+						shiftStep={ 100 }
+						isShiftStepEnabled={ false }
+					/>,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			} );
+
+			expect( input.value ).toBe( '4' );
 		} );
 	} );
 } );
