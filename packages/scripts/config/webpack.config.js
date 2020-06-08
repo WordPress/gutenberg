@@ -5,6 +5,7 @@ const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const IgnoreEmitPlugin = require( 'ignore-emit-webpack-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 const path = require( 'path' );
 
 /**
@@ -73,6 +74,19 @@ const config = {
 				default: false,
 			},
 		},
+		minimizer: [
+			new TerserPlugin( {
+				cache: true,
+				parallel: true,
+				sourceMap: ! isProduction,
+				terserOptions: {
+					output: {
+						comments: /translators:/i,
+					},
+				},
+				extractComments: false,
+			} ),
+		],
 	},
 	module: {
 		rules: [

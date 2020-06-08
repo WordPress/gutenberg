@@ -13,6 +13,10 @@
 
 -   The PostCSS loader now gives preference to a `postcss.config.js` configuration file if present.
 
+### Enhancements
+
+-   Update webpack configuration to preserve translator comments in minified output.
+
 ### Bug fix
 
 -   Update webpack configuration to not run the Sass loader on CSS files. It's now limited to .scss and .sass files.
