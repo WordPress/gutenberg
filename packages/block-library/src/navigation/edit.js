@@ -565,16 +565,12 @@ export default compose( [
 				} );
 			},
 			getIsRequestingMenuItems: ( menuId ) => {
-				return select( 'core/data' ).isResolving(
-					'core',
-					'getMenuItems',
-					[
-						{
-							menus: menuId,
-							per_page: -1,
-						},
-					]
-				);
+				return select( 'core' ).isResolving( 'getMenuItems', [
+					{
+						menus: menuId,
+						per_page: -1,
+					},
+				] );
 			},
 			getHasResolvedMenuItems: ( menuId ) => {
 				return select( 'core' ).hasFinishedResolution( 'getMenuItems', [
