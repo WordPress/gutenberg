@@ -16,8 +16,6 @@ The Block Editor surface API has evolved at different velocities, and it's now a
 
 This describes the current efforts to consolidate the various APIs into a single point – a `experimental-theme.json` file that should be located inside the root of the theme directory.
 
-When this file is present a few Block Editor mechanisms are activated.
-
 ### Presets become CSS Custom Properties
 
 Presets such as [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), and [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) will be enqueued as CSS Custom Properties for themes to use.
@@ -98,7 +96,7 @@ Some of the functions are context-dependant. Take, as an example, the drop cap:
 }
 ```
 
-In the example above, we aim to encapsulate that the drop cap should be disabled globally but enabled in the paragraph context. The drop cap in the Image block context wouldn't make sense based on the current implementation so would be ignored, but it could be used by plugins that extend its functionality.
+In the example above, we aim to encapsulate that the drop cap should be disabled globally but enabled in the paragraph context. Based on the current implementation, the drop cap in the Image block context wouldn't make sense so it would be ignored (but it could be used by plugins that extend its functionality).
 
 ## Current Status
 
@@ -159,16 +157,29 @@ If the `experimental-theme.json` contains any presets, these will take precedenc
 
 Each block will declare which style properties it exposes. This has been coined as "implicit style attributes" of the block. These properties are then used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
 
-The list of properties that are currently exposed via this method are:
+#### Color Properties
 
-| Context | Text's Color | Background's Color | Background's Gradient | Font Size | Line Height |
-| --- | --- | --- | --- | --- | --- |
-| Global | - | Yes | - | - | - |
-| Paragraph | Yes | Yes | - | Yes | Yes |
-| Heading [1] | Yes | Yes | - | Yes | Yes |
-| Group | Yes | Yes | Yes | - | - |
-| Columns | Yes | Yes | Yes | - | - |
-| Media & text | Yes | Yes | Yes | - | - |
+| Context | Background | Gradient | Link | Text |
+| --- | --- | --- | --- | --- |
+| Global | Yes | - | - | - |
+| Paragraph | Yes | - | Yes | Yes |
+| Heading [1] | Yes | - | Yes | Yes |
+| Group | Yes | Yes | Yes | Yes |
+| Columns | Yes | Yes | Yes | Yes |
+| Media & text | Yes | Yes | Yes | Yes |
+
+[1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
+
+#### Typography Properties
+
+| Context | Font Size | Line Height |
+| --- | --- | --- |
+| Global | - | - |
+| Paragraph | Yes | Yes |
+| Heading [1] | Yes | Yes |
+| Group | - | - |
+| Columns | - | - |
+| Media & text | - | - |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 
@@ -245,13 +256,14 @@ The list of features that are currently supported are:
     "styles: {
       "color: {
         "background": <value>
-			}
+      }
     }
   },
   "core/paragraph": {
     "styles": {
       "color": {
         "background": <value>,
+        "link": <value>,
         "text": <value>
       },
       "typography": {
@@ -264,6 +276,7 @@ The list of features that are currently supported are:
     "styles": {
       "color": {
         "background": <value>,
+        "link": <value>,
         "text": <value>
       },
       "typography": {
@@ -276,6 +289,7 @@ The list of features that are currently supported are:
     "styles": {
       "color": {
         "background": <value>,
+        "link": <value>,
         "text": <value>
       },
       "typography": {
@@ -288,6 +302,20 @@ The list of features that are currently supported are:
     "styles": {
       "color": {
         "background": <value>,
+        "link": <value>,
+        "text": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      }
+    }
+  },
+  "core/heading/h4": {
+    "styles": {
+      "color": {
+        "background": <value>,
+        "link": <value>,
         "text": <value>
       },
       "typography": {
@@ -300,6 +328,7 @@ The list of features that are currently supported are:
     "styles": {
       "color": {
         "background": <value>,
+        "link": <value>,
         "text": <value>
       },
       "typography": {
@@ -312,6 +341,7 @@ The list of features that are currently supported are:
     "styles": {
       "color": {
         "background": <value>,
+        "link": <value>,
         "text": <value>
       },
       "typography": {
@@ -325,6 +355,7 @@ The list of features that are currently supported are:
       "color": {
         "background": <value>,
         "gradient": <value>,
+        "link": <value>,
         "text": <value>
       }
     }
@@ -334,6 +365,7 @@ The list of features that are currently supported are:
         "color": {
           "background": <value>,
           "gradient": <value>,
+          "link": <value>,
           "text": <value>
         }
       }
@@ -343,6 +375,7 @@ The list of features that are currently supported are:
         "color": {
           "background": <value>,
           "gradient": <value>,
+          "link": <value>,
           "text": <value>
         }
       }
