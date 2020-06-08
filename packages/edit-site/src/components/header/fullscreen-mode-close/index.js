@@ -9,7 +9,7 @@ import { wordpress } from '@wordpress/icons';
 
 function FullscreenModeClose( { icon } ) {
 	const [ siteIconURL ] = useEntityProp( 'root', 'site', 'site_icon_url' );
-	
+
 	const isRequestingSiteIcon = useSelect( ( select ) => {
 		return ! select( 'core/data' ).hasFinishedResolution(
 			'core',
