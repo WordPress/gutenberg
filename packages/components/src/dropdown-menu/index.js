@@ -166,7 +166,8 @@ function DropdownMenu( {
 												indexOfSet > 0 &&
 												indexOfControl === 0,
 											'is-active': control.isActive,
-										}
+										},
+										control.className
 									) }
 									icon={ control.icon }
 									aria-checked={

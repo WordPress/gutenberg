@@ -62,7 +62,7 @@
 				background: transparent;
 			}
 
-			&::before {
+			&:not(:active)::before {
 				background: $dark-gray-primary;
 			}
 		}

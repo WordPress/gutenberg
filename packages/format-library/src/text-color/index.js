@@ -63,9 +63,7 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 	return (
 		<>
 			<RichTextToolbarButton
-				key={ isActive ? 'text-color' : 'text-color-not-active' }
 				className="format-library-text-color-button"
-				name={ isActive ? 'text-color' : undefined }
 				icon={
 					<>
 						<Icon icon={ textColorIcon } />
@@ -84,6 +82,7 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 						? enableIsAddingColor
 						: () => onChange( removeFormat( value, name ) )
 				}
+				isActive={ isActive }
 			/>
 			{ isAddingColor && (
 				<InlineColorUI

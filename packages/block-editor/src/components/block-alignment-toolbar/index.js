@@ -65,6 +65,7 @@ export function BlockAlignmentToolbar( {
 	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+	const hasActive = controls.some( ( control ) => control === value );
 
 	return (
 		<ToolbarGroup
@@ -75,6 +76,7 @@ export function BlockAlignmentToolbar( {
 					: defaultAlignmentControl.icon
 			}
 			label={ __( 'Change alignment' ) }
+			toggleProps={ hasActive ? { className: 'is-pressed' } : undefined }
 			controls={ enabledControls.map( ( control ) => {
 				return {
 					...BLOCK_ALIGNMENTS_CONTROLS[ control ],

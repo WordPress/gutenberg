@@ -54,6 +54,11 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
       "position": "bottom right",
     }
   }
+  toggleProps={
+    Object {
+      "className": "is-pressed",
+    }
+  }
 />
 `;
 
@@ -124,6 +129,11 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
     Object {
       "isAlternate": true,
       "position": "bottom right",
+    }
+  }
+  toggleProps={
+    Object {
+      "className": "is-pressed",
     }
   }
 />
