@@ -4,7 +4,8 @@
 	{ "docs/contributors/principles.md": [
 		{ "docs/architecture/index.md": [
 			{ "docs/architecture/modularity.md": [] },
-			{ "docs/architecture/performance.md": [] }
+			{ "docs/architecture/performance.md": [] },
+			{ "docs/architecture/automated-testing.md": [] }
 		] },
 		{ "docs/designers-developers/key-concepts.md": [] },
 		{ "docs/designers-developers/glossary.md": [] },

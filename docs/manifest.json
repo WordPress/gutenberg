@@ -30,6 +30,12 @@
 		"parent": "index"
 	},
 	{
+		"title": "Automated Testing",
+		"slug": "automated-testing",
+		"markdown_source": "../docs/architecture/automated-testing.md",
+		"parent": "index"
+	},
+	{
 		"title": "Key Concepts",
 		"slug": "key-concepts",
 		"markdown_source": "../docs/designers-developers/key-concepts.md",
