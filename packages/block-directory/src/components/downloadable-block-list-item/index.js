@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import DownloadableBlockAuthorInfo from '../downloadable-block-author-info';
@@ -6,7 +11,12 @@ import DownloadableBlockHeader from '../downloadable-block-header';
 import DownloadableBlockInfo from '../downloadable-block-info';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 
-function DownloadableBlockListItem( { item, onClick } ) {
+export default function DownloadableBlockListItem( { item, onClick } ) {
+	const isLoading = useSelect(
+		( select ) => select( 'core/block-directory' ).isInstalling( item.id ),
+		[ item ]
+	);
+
 	const {
 		icon,
 		title,
@@ -30,6 +40,7 @@ function DownloadableBlockListItem( { item, onClick } ) {
 						title={ title }
 						rating={ rating }
 						ratingCount={ ratingCount }
+						isLoading={ isLoading }
 					/>
 				</header>
 				<section className="block-directory-downloadable-block-list-item__body">
@@ -54,5 +65,3 @@ function DownloadableBlockListItem( { item, onClick } ) {
 		</li>
 	);
 }
-
-export default DownloadableBlockListItem;
