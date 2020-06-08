@@ -6,15 +6,17 @@ import { isEmpty, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	ButtonGroup,
 	SelectControl,
 	TextControl,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-const ImageSizeControl = ( {
+const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
+
+export default function ImageSizeControl( {
 	imageWidth,
 	imageHeight,
 	imageSizeOptions = [],
@@ -24,12 +26,12 @@ const ImageSizeControl = ( {
 	height,
 	onChange,
 	onChangeImage = noop,
-} ) => {
-	const updateDimensions = ( nextWidth, nextHeight ) => {
+} ) {
+	function updateDimensions( nextWidth, nextHeight ) {
 		return () => {
 			onChange( { width: nextWidth, height: nextHeight } );
 		};
-	};
+	}
 
 	return (
 		<>
@@ -51,7 +53,7 @@ const ImageSizeControl = ( {
 							type="number"
 							className="block-editor-image-size-control__width"
 							label={ __( 'Width' ) }
-							value={ width || imageWidth || '' }
+							value={ width ?? imageWidth ?? '' }
 							min={ 1 }
 							onChange={ ( value ) =>
 								onChange( { width: parseInt( value, 10 ) } )
@@ -61,7 +63,7 @@ const ImageSizeControl = ( {
 							type="number"
 							className="block-editor-image-size-control__height"
 							label={ __( 'Height' ) }
-							value={ height || imageHeight || '' }
+							value={ height ?? imageHeight ?? '' }
 							min={ 1 }
 							onChange={ ( value ) =>
 								onChange( {
@@ -71,8 +73,8 @@ const ImageSizeControl = ( {
 						/>
 					</div>
 					<div className="block-editor-image-size-control__row">
-						<ButtonGroup aria-label={ __( 'Image Size' ) }>
-							{ [ 25, 50, 75, 100 ].map( ( scale ) => {
+						<ButtonGroup aria-label={ __( 'Image size presets' ) }>
+							{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
 								const scaledWidth = Math.round(
 									imageWidth * ( scale / 100 )
 								);
@@ -108,6 +110,4 @@ const ImageSizeControl = ( {
 			) }
 		</>
 	);
-};
-
-export default ImageSizeControl;
+}

@@ -7,6 +7,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
+	subscribeReplaceBlock,
 	subscribeUpdateTheme,
 } from 'react-native-gutenberg-bridge';
 
@@ -34,8 +35,6 @@ const postTypeEntities = [
 	...postTypeEntity,
 	transientEdits: {
 		blocks: true,
-		selectionStart: true,
-		selectionEnd: true,
 	},
 	mergedEdits: {
 		meta: true,
@@ -82,6 +81,12 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
+		this.subscriptionParentReplaceBlock = subscribeReplaceBlock(
+			( payload ) => {
+				this.replaceBlockAction( payload.html, payload.clientId );
+			}
+		);
+
 		this.subscriptionParentMediaAppend = subscribeMediaAppend(
 			( payload ) => {
 				const blockName = 'core/' + payload.mediaType;
@@ -122,6 +127,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentUpdateHtml ) {
 			this.subscriptionParentUpdateHtml.remove();
+		}
+
+		if ( this.subscriptionParentReplaceBlock ) {
+			this.subscriptionParentReplaceBlock.remove();
 		}
 
 		if ( this.subscriptionParentMediaAppend ) {
@@ -179,6 +188,11 @@ class NativeEditorProvider extends Component {
 		this.props.resetEditorBlocksWithoutUndoLevel( parsed );
 	}
 
+	replaceBlockAction( html, blockClientId ) {
+		const parsed = parse( html );
+		this.props.replaceBlock( blockClientId, parsed );
+	}
+
 	toggleMode() {
 		const { mode, switchMode } = this.props;
 		// refresh html content first
@@ -232,9 +246,12 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
-		const { updateSettings, clearSelectedBlock, insertBlock } = dispatch(
-			'core/block-editor'
-		);
+		const {
+			updateSettings,
+			clearSelectedBlock,
+			insertBlock,
+			replaceBlock,
+		} = dispatch( 'core/block-editor' );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 
@@ -255,6 +272,7 @@ export default compose( [
 			switchMode( mode ) {
 				switchEditorMode( mode );
 			},
+			replaceBlock,
 		};
 	} ),
 ] )( NativeEditorProvider );

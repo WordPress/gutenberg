@@ -16,6 +16,8 @@ import {
 	withColors,
 	PanelColorSettings,
 } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
@@ -103,6 +105,7 @@ class PullQuoteEdit extends Component {
 			setAttributes,
 			isSelected,
 			className,
+			insertBlocksAfter,
 		} = this.props;
 
 		const { value, citation } = attributes;
@@ -165,6 +168,11 @@ class PullQuoteEdit extends Component {
 								className="wp-block-pullquote__citation"
 								__unstableMobileNoFocusOnMount
 								textAlign="center"
+								__unstableOnSplitAtEnd={ () =>
+									insertBlocksAfter(
+										createBlock( 'core/paragraph' )
+									)
+								}
 							/>
 						) }
 					</BlockQuote>

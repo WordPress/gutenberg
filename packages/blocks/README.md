@@ -632,8 +632,10 @@ Registers a new block collection to group blocks in the same namespace in the in
 
 _Parameters_
 
--   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace
--   _settings_ `Object`: An object composed of a title to show in the inserter, and an icon to show in the inserter
+-   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace.
+-   _settings_ `Object`: The block collection settings.
+-   _settings.title_ `string`: The title to display in the block inserter.
+-   _settings.icon_ `[Object]`: The icon to display in the block inserter.
 
 <a name="registerBlockStyle" href="#registerBlockStyle">#</a> **registerBlockStyle**
 

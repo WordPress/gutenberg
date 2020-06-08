@@ -15,7 +15,10 @@ import {
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 } from '@wordpress/editor';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalToolbarItem as ToolbarItem,
+} from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 
 function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
@@ -65,7 +68,8 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<Button
+			<ToolbarItem
+				as={ Button }
 				className="edit-post-header-toolbar__inserter-toggle"
 				isPrimary
 				isPressed={ isInserterOpen }
@@ -77,11 +81,17 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 					'Generic label for block inserter button'
 				) }
 			/>
-			<ToolSelector />
-			<EditorHistoryUndo />
-			<EditorHistoryRedo />
-			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
-			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
+			{ isLargeViewport && <ToolbarItem as={ ToolSelector } /> }
+			<ToolbarItem as={ EditorHistoryUndo } />
+			<ToolbarItem as={ EditorHistoryRedo } />
+			<ToolbarItem
+				as={ TableOfContents }
+				hasOutlineItemsDisabled={ isTextModeEnabled }
+			/>
+			<ToolbarItem
+				as={ BlockNavigationDropdown }
+				isDisabled={ isTextModeEnabled }
+			/>
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />
