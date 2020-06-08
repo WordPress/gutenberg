@@ -29,7 +29,7 @@
 		"clipboard": "^2.0.1",
 		"lodash": "^4.17.15",
 		"mousetrap": "^1.6.5",
-		"react-resize-aware": "^3.0.0"
+		"react-resize-aware": "^3.0.1"
 	},
 	"publishConfig": {
 		"access": "public"

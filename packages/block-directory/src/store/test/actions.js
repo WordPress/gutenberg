@@ -22,6 +22,7 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: true,
 			} );
 
@@ -31,10 +32,7 @@ describe( 'actions', () => {
 
 			expect( generator.next( { success: true } ).value ).toEqual( {
 				type: 'ADD_INSTALLED_BLOCK_TYPE',
-				item: {
-					id: item.id,
-					name: item.name,
-				},
+				item,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -51,6 +49,7 @@ describe( 'actions', () => {
 
 			expect( generator.next( [ item ] ).value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: false,
 			} );
 
@@ -76,6 +75,7 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: false,
 			} );
 
@@ -96,6 +96,7 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: true,
 			} );
 
@@ -115,6 +116,7 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: false,
 			} );
 

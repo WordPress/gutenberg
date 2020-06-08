@@ -63,7 +63,7 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
 		await openDocumentSettingsSidebar();
-		await page.click( '[aria-label="Image Size"] button' );
+		await page.click( '[aria-label="Image size presets"] button' );
 
 		const regex2 = new RegExp(
 			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"large"} -->\\s*<figure class="wp-block-image size-large is-resized"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
@@ -97,5 +97,16 @@ describe( 'Image', () => {
 		expect(
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '12' );
+	} );
+
+	it( 'should keep caption after upload', async () => {
+		await insertBlock( 'Image' );
+		await page.keyboard.type( '1' );
+		const filename1 = await upload( '.wp-block-image input[type="file"]' );
+
+		const regex = new RegExp(
+			`<!-- wp:image {"id":\\d+,"sizeSlug":"large"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/><figcaption>1</figcaption></figure>\\s*<!-- \\/wp:image -->`
+		);
+		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 } );

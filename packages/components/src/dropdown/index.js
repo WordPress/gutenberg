@@ -103,7 +103,6 @@ class Dropdown extends Component {
 						expandOnMobile={ expandOnMobile }
 						headerTitle={ headerTitle }
 						focusOnMount={ focusOnMount }
-						isAlternate
 						{ ...popoverProps }
 						className={ classnames(
 							'components-dropdown__content',

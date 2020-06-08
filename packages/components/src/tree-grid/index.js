@@ -36,7 +36,12 @@ function getRowFocusables( rowElement ) {
 }
 
 /**
+ * Renders both a table and tbody element, used to create a tree hierarchy.
+ *
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/tree-grid/README.md
+ *
+ * @param {Object}    props          Component props.
+ * @param {WPElement} props.children Children to be rendered
  */
 export default function TreeGrid( { children, ...props } ) {
 	const onKeyDown = useCallback( ( event ) => {

@@ -68,6 +68,7 @@ export default function QueryControls( {
 		),
 		onCategoryChange && (
 			<FormTokenField
+				key="query-controls-categories-select"
 				label={ __( 'Categories' ) }
 				value={
 					selectedCategories &&

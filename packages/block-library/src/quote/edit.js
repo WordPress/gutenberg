@@ -22,6 +22,7 @@ export default function QuoteEdit( {
 	mergeBlocks,
 	onReplace,
 	className,
+	insertBlocksAfter,
 } ) {
 	const { align, value, citation } = attributes;
 
@@ -89,6 +90,9 @@ export default function QuoteEdit( {
 						}
 						className="wp-block-quote__citation"
 						textAlign={ align }
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						}
 					/>
 				) }
 			</BlockQuotation>
