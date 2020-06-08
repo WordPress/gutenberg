@@ -34,6 +34,7 @@ const wrapperMargin = ( { marks } ) =>
 export const Wrapper = styled.span`
 	box-sizing: border-box;
 	display: block;
+	flex: 1;
 	padding-top: 15px;
 	position: relative;
 	width: 100%;
