@@ -75,8 +75,28 @@ export function subscribeAndroidModalClosed( callback ) {
 	return isAndroid ? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback ) : undefined;
 }
 
+export function subscribeUpdateTheme( callback ) {
+	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+}
+
 export function subscribePreferredColorScheme( callback ) {
 	return gutenbergBridgeEvents.addListener( 'preferredColorScheme', callback );
+}
+
+/**
+ * @callback FnReplaceBlockCompletion
+ * @param {string} html the HTML to replace the block.
+ * @param {string} clientId the clientId of the block to be replaced.
+ */
+
+/**
+ * Subscribe a listener to replace a single block.
+ *
+ * @param {FnReplaceBlockCompletion} callback the completion callback.
+ * @return {EmitterSubscription} An EmitterSubscription.
+ */
+export function subscribeReplaceBlock( callback ) {
+	return gutenbergBridgeEvents.addListener( 'replaceBlock', callback );
 }
 
 /**
@@ -91,6 +111,19 @@ export function subscribePreferredColorScheme( callback ) {
  */
 export function requestMediaPicker( source, filter, multiple, callback ) {
 	RNReactNativeGutenbergBridge.requestMediaPickFrom( source, filter, multiple, callback );
+}
+
+/**
+ * Request to render an unsuported block.
+ *
+ * A way to show unsupported blocks to the user is to render it on a web view.
+ *
+ * @param {string} htmlContent Raw html content of the block.
+ * @param {string} blockClientId the clientId of the block.
+ * @param {string} blockName the user-facing, localized block name.
+ */
+export function requestUnsupportedBlockFallback( htmlContent, blockClientId, blockName ) {
+	RNReactNativeGutenbergBridge.requestUnsupportedBlockFallback( htmlContent, blockClientId, blockName );
 }
 
 export function requestMediaImport( url, callback ) {

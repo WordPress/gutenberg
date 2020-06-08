@@ -1,6 +1,6 @@
 {
 	"name": "core/code",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"content": {
 			"type": "string",

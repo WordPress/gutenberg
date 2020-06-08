@@ -70,6 +70,15 @@ public class Gutenberg: NSObject {
             initialProps["capabilities"] = capabilities
         }
 
+        let editorTheme = dataSource.gutenbergEditorTheme()
+        if let colors = editorTheme?.colors {
+            initialProps["colors"] = colors
+        }
+
+        if let gradients = editorTheme?.gradients {
+            initialProps["gradients"] = gradients
+        }
+
         return initialProps
     }
 
@@ -86,19 +95,27 @@ public class Gutenberg: NSObject {
     }
 
     public func requestHTML() {
-        bridgeModule.sendEvent(withName: EventName.requestHTML, body: nil)
+        sendEvent(.requestGetHtml)
     }
 
     public func toggleHTMLMode() {
-        bridgeModule.sendEvent(withName: EventName.toggleHTMLMode, body: nil)
+        sendEvent(.toggleHTMLMode)
     }
     
     public func setTitle(_ title: String) {
-        bridgeModule.sendEvent(withName: EventName.setTitle, body: ["title": title])
+        sendEvent(.setTitle, body: ["title": title])
     }
     
     public func updateHtml(_ html: String) {
-        bridgeModule.sendEvent(withName: EventName.updateHtml, body: ["html": html])
+        sendEvent(.updateHtml, body: ["html": html])
+    }
+
+    public func replace(block: Block) {
+        sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
+    }
+
+    private func sendEvent(_ event: RNReactNativeGutenbergBridge.EventName, body: [String: Any]? = nil) {
+        bridgeModule.sendEvent(withName: event.rawValue, body: body)
     }
     
     public func mediaUploadUpdate(id: Int32, state: MediaUploadState, progress: Float, url: URL?, serverID: Int32?) {
@@ -109,7 +126,7 @@ public class Gutenberg: NSObject {
         if let serverID = serverID {
             data["mediaServerId"] = serverID
         }
-        bridgeModule.sendEventIfNeeded(name: EventName.mediaUpload, body: data)
+        bridgeModule.sendEventIfNeeded(.mediaUpload, body: data)
     }
 
     public func appendMedia(id: Int32, url: URL, type: MediaType) {
@@ -118,16 +135,31 @@ public class Gutenberg: NSObject {
             "mediaUrl" : url.absoluteString,
             "mediaType": type.rawValue,
         ]
-        bridgeModule.sendEventIfNeeded(name: EventName.mediaAppend, body: data)
+        bridgeModule.sendEventIfNeeded(.mediaAppend, body: data)
     }
 
     public func setFocusOnTitle() {
-        bridgeModule.sendEventIfNeeded(name: EventName.setFocusOnTitle, body: nil)
+        bridgeModule.sendEventIfNeeded(.setFocusOnTitle, body: nil)
     }
 
     private var isPackagerRunning: Bool {
         let url = sourceURL(for: bridge)
         return !(url?.isFileURL ?? true)
+    }
+
+    public func updateTheme(_ editorTheme: GutenbergEditorTheme?) {
+
+        var themeUpdates = [String : Any]()
+
+        if let colors = editorTheme?.colors {
+            themeUpdates["colors"] = colors
+        }
+
+        if let gradients = editorTheme?.gradients {
+            themeUpdates["gradients"] = gradients
+        }
+
+        bridgeModule.sendEventIfNeeded(.updateTheme, body:themeUpdates)
     }
 }
 
@@ -145,17 +177,6 @@ extension Gutenberg: RCTBridgeDelegate {
 }
 
 extension Gutenberg {
-    
-    enum EventName {
-        static let requestHTML = "requestGetHtml"
-        static let setTitle = "setTitle"
-        static let toggleHTMLMode = "toggleHTMLMode"
-        static let updateHtml = "updateHtml"
-        static let mediaUpload = "mediaUpload"
-        static let setFocusOnTitle = "setFocusOnTitle"
-        static let mediaAppend = "mediaAppend"
-    }
-    
     public enum MediaUploadState: Int {
         case uploading = 1
         case succeeded = 2

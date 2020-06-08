@@ -42,9 +42,11 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,6 +81,8 @@ public class WPAndroidGlueCode {
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
     private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
+    private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
+    private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
     private boolean mIsEditorMounted;
 
@@ -93,6 +97,7 @@ public class WPAndroidGlueCode {
     private WeakReference<View> mLastFocusedView = null;
     private RequestExecutor mRequestExecutor;
     private AddMentionUtil mAddMentionUtil;
+    private @Nullable Bundle mEditorTheme = null;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
@@ -102,6 +107,8 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_TRANSLATIONS = "translations";
     public static final String PROP_NAME_CAPABILITIES = "capabilities";
     public static final String PROP_NAME_CAPABILITIES_MENTIONS = "mentions";
+    private static final String PROP_NAME_COLORS = "colors";
+    private static final String PROP_NAME_GRADIENTS = "gradients";
 
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
@@ -169,6 +176,10 @@ public class WPAndroidGlueCode {
         void onGutenbergUserEvent(GutenbergUserEvent event, Map<String, Object> properties);
     }
 
+    public interface OnGutenbergDidRequestUnsupportedBlockFallbackListener {
+        void gutenbergDidRequestUnsupportedBlockFallback(UnsupportedBlock unsupportedBlock);
+    }
+    
     public interface OnStarterPageTemplatesTooltipShownEventListener {
         void onSetStarterPageTemplatesTooltipShown(boolean tooltipShown);
         boolean onRequestStarterPageTemplatesTooltipShown();
@@ -273,6 +284,7 @@ public class WPAndroidGlueCode {
                     // use mMediaUrlToAddAfterMounting
                     dispatchOneMediaToAddAtATimeIfAvailable();
                 }
+                refreshEditorTheme();
             }
 
             @Override
@@ -343,7 +355,18 @@ public class WPAndroidGlueCode {
                 mOnLogGutenbergUserEventListener.onGutenbergUserEvent(event, eventProperties.toHashMap());
             }
 
-            @Override public void onAddMention(Consumer<String> onSuccess) {
+            @Override
+            public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
+                                                                    String content,
+                                                                    String blockId,
+                                                                    String blockName) {
+                mReplaceUnsupportedBlockCallback = replaceUnsupportedBlockCallback;
+                mOnGutenbergDidRequestUnsupportedBlockFallbackListener.
+                        gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, content));
+            }
+
+            @Override 
+            public void onAddMention(Consumer<String> onSuccess) {
                 mAddMentionUtil.getMention(onSuccess);
             }
 
@@ -374,7 +397,7 @@ public class WPAndroidGlueCode {
     }
 
     private ImagePipelineConfig getImagePipelineConfig(OkHttpClient client) {
-        return  OkHttpImagePipelineConfigFactory
+        return OkHttpImagePipelineConfigFactory
                 .newBuilder(mReactRootView.getContext(), client).build();
     }
 
@@ -391,7 +414,8 @@ public class WPAndroidGlueCode {
                              boolean isDarkMode,
                              Consumer<Exception> exceptionLogger,
                              Consumer<String> breadcrumbLogger,
-                             @Nullable Boolean isSiteUsingWpComRestApi) {
+                             @Nullable Boolean isSiteUsingWpComRestApi,
+                             @Nullable Bundle editorTheme) {
         mIsDarkMode = isDarkMode;
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
@@ -430,12 +454,23 @@ public class WPAndroidGlueCode {
         }
         initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
 
+        Serializable colors = editorTheme != null ? editorTheme.getSerializable(PROP_NAME_COLORS) : null;
+        if (colors != null) {
+            initialProps.putSerializable(PROP_NAME_COLORS, colors);
+        }
+
+        Serializable gradients = editorTheme != null ? editorTheme.getSerializable(PROP_NAME_GRADIENTS) : null;
+        if (gradients != null) {
+            initialProps.putSerializable(PROP_NAME_GRADIENTS, gradients);
+        }
+
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
         mReactRootView.setAppProperties(initialProps);
     }
 
-    public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+    public void attachToContainer(ViewGroup viewGroup,
+                                  OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                                   OnReattachQueryListener onReattachQueryListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
@@ -444,6 +479,7 @@ public class WPAndroidGlueCode {
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
+                                  OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
                                   AddMentionUtil addMentionUtil,
                                   OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
                                   boolean isDarkMode) {
@@ -458,6 +494,7 @@ public class WPAndroidGlueCode {
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
         mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
+        mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
         mAddMentionUtil = addMentionUtil;
         mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
 
@@ -556,6 +593,25 @@ public class WPAndroidGlueCode {
             mIsDarkMode = isDarkMode;
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
                                                 .setPreferredColorScheme(isDarkMode);
+        }
+    }
+
+    public void updateTheme(@Nullable Bundle editorTheme) {
+        if (mIsEditorMounted) {
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
+                                                .updateTheme(editorTheme);
+        } else {
+            // Editor hasn't mounted yet. Save theme and load once editor loads
+            AppLog.d(AppLog.T.EDITOR, "Editor theme not applied reason: Editor not mounted");
+            mEditorTheme = editorTheme;
+        }
+    }
+
+    private void refreshEditorTheme() {
+        if (mEditorTheme != null) {
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
+                                                .updateTheme(mEditorTheme);
+            mEditorTheme = null;
         }
     }
 
@@ -779,6 +835,13 @@ public class WPAndroidGlueCode {
     public void clearMediaFileURL(final int mediaId) {
         if (isMediaUploadCallbackRegistered()) {
             mPendingMediaUploadCallback.onUploadMediaFileClear(mediaId);
+        }
+    }
+
+    public void replaceUnsupportedBlock(String content, String blockId) {
+        if (mReplaceUnsupportedBlockCallback != null) {
+            mReplaceUnsupportedBlockCallback.replaceUnsupportedBlock(content, blockId);
+            mReplaceUnsupportedBlockCallback = null;
         }
     }
 

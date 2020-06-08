@@ -1,6 +1,9 @@
 1.29.1
 ------
 * Revert Creating undo levels less frequently
+1.30.0
+------
+* [**] Adds editor support for theme defined colors and theme defined gradients on cover and button blocks.
 
 1.29.0
 ------

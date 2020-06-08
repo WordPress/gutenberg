@@ -1,6 +1,6 @@
 {
 	"name": "core/paragraph",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -28,10 +28,16 @@
 	},
 	"supports": {
 		"className": false,
-		"__unstablePasteTextInline": true,
 		"lightBlockWrapper": true,
 		"__experimentalColor": true,
+		"__experimentalFontSize": true,
 		"__experimentalLineHeight": true,
-		"__experimentalFontSize": true
+		"__experimentalFeatures": {
+			"typography": {
+				"dropCap": true
+			}
+		},
+		"__experimentalSelector": "p",
+		"__unstablePasteTextInline": true
 	}
 }
