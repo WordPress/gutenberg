@@ -158,13 +158,14 @@ export class BlockSwitcher extends Component {
 										</div>
 										<BlockTypesList
 											items={ possibleBlockTransformations.map(
-												( destinationBlockType ) => ( {
-													id:
-														destinationBlockType.name,
-													icon:
-														destinationBlockType.icon,
-													title:
-														destinationBlockType.title,
+												( {
+													name,
+													icon: destinationBlockTypeIcon,
+													title,
+												} ) => ( {
+													id: name,
+													icon: destinationBlockTypeIcon,
+													title,
 												} )
 											) }
 											onSelect={ ( item ) => {

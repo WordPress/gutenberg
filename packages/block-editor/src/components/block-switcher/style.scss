@@ -86,6 +86,10 @@
 		min-width: 300px;
 		max-width: 340px;
 		width: 50%;
+
+		.block-editor-block-styles__item-preview {
+			display: none;
+		}
 	}
 
 	.block-editor-block-switcher__label {

@@ -1,19 +1,14 @@
 .block-editor-block-types-list__list-item {
 	display: block;
-	width: 33.33%;
 	padding: 0;
 	margin: 0;
 }
 
 .components-button.block-editor-block-types-list__item {
-	display: flex;
-	flex-direction: column;
 	width: 100%;
 	font-size: $default-font-size;
 	color: $dark-gray-700;
-	padding: $grid-unit-10;
-	align-items: stretch;
-	justify-content: center;
+	align-items: center;
 	cursor: pointer;
 	background: transparent;
 	word-break: break-word;
@@ -47,7 +42,9 @@
 }
 
 .block-editor-block-types-list__item-icon {
-	padding: 12px 20px;
+	margin-right: 8px;
+	display: flex;
+	height: auto;
 	border-radius: $radius-block-ui;
 	color: $dark-gray-primary;
 	transition: all 0.05s ease-in-out;
@@ -65,6 +62,5 @@
 }
 
 .block-editor-block-types-list__item-title {
-	padding: 4px 2px 8px;
 	font-size: 12px;
 }
