@@ -126,6 +126,15 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		};
 	}, [ attributes.bioRatio, attributes.bylineRatio ] );
 
+	// Set initial ratios to use for reset values.
+	const initialAttributes = useMemo( () => {
+		const { bylineRatio, bioRatio } = attributes;
+		return {
+			bylineRatio,
+			bioRatio,
+		};
+	}, [] );
+
 	return (
 		<>
 			<InspectorControls>
@@ -180,6 +189,8 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						min={ 0.1 }
 						max={ 1.5 }
 						step={ 0.1 }
+						allowReset
+						resetFallbackValue={ initialAttributes.bylineRatio }
 					/>
 					<RangeControl
 						label={ __( 'Relative bio size' ) }
@@ -190,6 +201,8 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						min={ 0.1 }
 						max={ 1.5 }
 						step={ 0.1 }
+						allowReset
+						resetFallbackValue={ initialAttributes.bioRatio }
 					/>
 				</PanelBody>
 			</InspectorControls>
