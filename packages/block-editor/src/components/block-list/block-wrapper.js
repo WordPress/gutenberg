@@ -252,8 +252,9 @@ const BlockComponent = forwardRef(
 				onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
 				// Only allow selection to be started from a selected block.
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
-				onMouseOver={ onMouseOver }
-				onMouseOut={ onMouseOut }
+				// No need to have these listeners for hover class in edit mode.
+				onMouseOver={ isNavigationMode ? onMouseOver : undefined }
+				onMouseOut={ isNavigationMode ? onMouseOut : undefined }
 				tabIndex="0"
 				style={ {
 					...( wrapperProps ? wrapperProps.style : {} ),
