@@ -11,11 +11,11 @@ function FullscreenModeClose( { icon } ) {
 	const [ siteIconURL ] = useEntityProp( 'root', 'site', 'site_icon_url' );
 
 	const isRequestingSiteIcon = useSelect( ( select ) => {
-		return ! select( 'core/data' ).hasFinishedResolution(
-			'core',
-			'getEntityRecord',
-			[ 'root', 'site', undefined ]
-		);
+		return select( 'core/data' ).isResolving( 'core', 'getEntityRecord', [
+			'root',
+			'site',
+			undefined,
+		] );
 	}, [] );
 
 	const isActive = useSelect( ( select ) => {
