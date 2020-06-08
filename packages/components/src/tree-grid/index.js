@@ -160,3 +160,4 @@ export default function TreeGrid( { children, ...props } ) {
 
 export { default as TreeGridRow } from './row';
 export { default as TreeGridCell } from './cell';
+export { default as TreeGridItem } from './item';
