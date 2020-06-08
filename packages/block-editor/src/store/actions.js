@@ -2,19 +2,17 @@
  * External dependencies
  */
 import { castArray, first, get, includes, last, some } from 'lodash';
-
 /**
  * WordPress dependencies
  */
 import {
-	getDefaultBlockName,
-	createBlock,
-	hasBlockSupport,
 	cloneBlock,
+	createBlock,
+	getDefaultBlockName,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
-
 /**
  * Internal dependencies
  */
@@ -32,7 +30,7 @@ function* ensureDefaultBlock() {
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
 	if ( count === 0 ) {
-		yield insertDefaultBlock();
+		return yield insertDefaultBlock();
 	}
 }
 
@@ -166,6 +164,7 @@ export function* selectPreviousBlock( clientId ) {
 	if ( previousBlockClientId ) {
 		yield selectBlock( previousBlockClientId, -1 );
 	}
+	return previousBlockClientId;
 }
 
 /**
@@ -596,8 +595,15 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		return;
 	}
 
+	let previousBlockId;
 	if ( selectPrevious ) {
-		yield selectPreviousBlock( clientIds[ 0 ] );
+		previousBlockId = yield selectPreviousBlock( clientIds[ 0 ] );
+	} else {
+		previousBlockId = yield select(
+			'core/block-editor',
+			'getPreviousBlockClientId',
+			clientIds[ 0 ]
+		);
 	}
 
 	yield {
@@ -607,7 +613,8 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
-	yield* ensureDefaultBlock();
+	const defaultBlockId = yield* ensureDefaultBlock();
+	return previousBlockId || defaultBlockId;
 }
 
 /**
@@ -888,8 +895,9 @@ export function* setNavigationMode( isNavigationMode = true ) {
  * Generator that triggers an action used to duplicate a list of blocks.
  *
  * @param {string[]} clientIds
+ * @param {boolean} updateSelection
  */
-export function* duplicateBlocks( clientIds ) {
+export function* duplicateBlocks( clientIds, updateSelection = true ) {
 	if ( ! clientIds && ! clientIds.length ) {
 		return;
 	}
@@ -908,7 +916,7 @@ export function* duplicateBlocks( clientIds ) {
 		return;
 	}
 	const blockNames = blocks.map( ( block ) => block.name );
-	// Return early if blocks don't support multipe  usage.
+	// Return early if blocks don't support multiple usage.
 	if (
 		some(
 			blockNames,
@@ -925,13 +933,19 @@ export function* duplicateBlocks( clientIds ) {
 		rootClientId
 	);
 	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
-	yield insertBlocks( clonedBlocks, lastSelectedIndex + 1, rootClientId );
-	if ( clonedBlocks.length > 1 ) {
+	yield insertBlocks(
+		clonedBlocks,
+		lastSelectedIndex + 1,
+		rootClientId,
+		updateSelection
+	);
+	if ( clonedBlocks.length > 1 && updateSelection ) {
 		yield multiSelect(
 			first( clonedBlocks ).clientId,
 			last( clonedBlocks ).clientId
 		);
 	}
+	return last( clonedBlocks ).clientId;
 }
 
 /**
@@ -963,7 +977,7 @@ export function* insertBeforeBlock( clientId ) {
 		clientId,
 		rootClientId
 	);
-	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
+	return yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
 }
 
 /**
@@ -995,7 +1009,7 @@ export function* insertAfterBlock( clientId ) {
 		clientId,
 		rootClientId
 	);
-	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
+	return yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
 }
 
 /**

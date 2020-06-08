@@ -1,20 +1,25 @@
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import TreeGridItem from './item';
 
-export default function TreeGridCell( {
+export default forwardRef( function TreeGridCell( {
 	children,
 	withoutGridItem = false,
 	...props
-} ) {
+}, ref ) {
 	return (
 		<td { ...props } role="gridcell">
 			{ withoutGridItem ? (
 				children
 			) : (
-				<TreeGridItem>{ children }</TreeGridItem>
+				<TreeGridItem ref={ ref }>{ children }</TreeGridItem>
 			) }
 		</td>
 	);
-}
+} );

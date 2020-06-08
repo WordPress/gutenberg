@@ -15,6 +15,8 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreHorizontal } from '@wordpress/icons';
+
+import { useState, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 
 /**
@@ -33,7 +35,7 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function BlockSettingsDropdown( { clientIds, ...props } ) {
+export function BlockSettingsDropdown( { clientIds, selectBlock, ...props } ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
@@ -56,8 +58,19 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 		};
 	}, [] );
 
+	const [ hasCopied, setHasCopied ] = useState();
+	const updateSelection = useCallback(
+		async ( clientIdPromise ) => {
+			const clientId = await clientIdPromise;
+			if ( clientId ) {
+				selectBlock( clientId );
+			}
+		},
+		[ selectBlock ]
+	);
+
 	return (
-		<BlockActions clientIds={ clientIds }>
+		<BlockActions clientIds={ clientIds } updateSelection={ ! selectBlock }>
 			{ ( {
 				canDuplicate,
 				canInsertDefaultBlock,
@@ -103,7 +116,11 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 								</ClipboardButton>
 								{ canDuplicate && (
 									<MenuItem
-										onClick={ flow( onClose, onDuplicate ) }
+										onClick={ flow(
+											onClose,
+											onDuplicate,
+											updateSelection
+										) }
 										shortcut={ shortcuts.duplicate }
 									>
 										{ __( 'Duplicate' ) }
@@ -145,7 +162,11 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 							<MenuGroup>
 								{ ! isLocked && (
 									<MenuItem
-										onClick={ flow( onClose, onRemove ) }
+										onClick={ flow(
+											onClose,
+											onRemove,
+											updateSelection
+										) }
 										shortcut={ shortcuts.remove }
 									>
 										{ _n(
