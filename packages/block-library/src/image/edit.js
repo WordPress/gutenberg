@@ -426,10 +426,7 @@ export function ImageEdit( {
 		return (
 			<>
 				{ controls }
-				<Block.figure>
-					{ mediaPlaceholder }
-					{ captionField }
-				</Block.figure>
+				<Block.div>{ mediaPlaceholder }</Block.div>
 			</>
 		);
 	}
