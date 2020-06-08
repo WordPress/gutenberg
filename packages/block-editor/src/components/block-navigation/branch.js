@@ -30,14 +30,15 @@ export default function BlockNavigationBranch( props ) {
 
 	const isTreeRoot = ! parentBlockClientId;
 	const filteredBlocks = compact( blocks );
-	// Add +1 to the rowCount to take the block appender into account.
-	const rowCount = showAppender
-		? filteredBlocks.length + 1
-		: filteredBlocks.length;
-	const hasAppender =
+	const itemHasAppender = ( parentClientId ) =>
 		showAppender &&
 		! isTreeRoot &&
-		selectedBlockClientId === parentBlockClientId;
+		selectedBlockClientId === parentClientId;
+	const hasAppender = itemHasAppender( parentBlockClientId );
+	// Add +1 to the rowCount to take the block appender into account.
+	const rowCount = hasAppender
+		? filteredBlocks.length + 1
+		: filteredBlocks.length;
 	const appenderPosition = rowCount;
 
 	return (
@@ -50,6 +51,9 @@ export default function BlockNavigationBranch( props ) {
 					? [ ...terminatedLevels, level ]
 					: terminatedLevels;
 				const updatedPath = [ ...path, position ];
+				const hasNestedBlocks =
+					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
+				const hasNestedAppender = itemHasAppender( clientId );
 
 				return (
 					<Fragment key={ clientId }>
@@ -64,18 +68,20 @@ export default function BlockNavigationBranch( props ) {
 							terminatedLevels={ terminatedLevels }
 							path={ updatedPath }
 						/>
-						<BlockNavigationBranch
-							blocks={ innerBlocks }
-							selectedBlockClientId={ selectedBlockClientId }
-							selectBlock={ selectBlock }
-							showAppender={ showAppender }
-							showBlockMovers={ showBlockMovers }
-							showNestedBlocks={ showNestedBlocks }
-							parentBlockClientId={ clientId }
-							level={ level + 1 }
-							terminatedLevels={ updatedTerminatedLevels }
-							path={ updatedPath }
-						/>
+						{ ( hasNestedBlocks || hasNestedAppender ) && (
+							<BlockNavigationBranch
+								blocks={ innerBlocks }
+								selectedBlockClientId={ selectedBlockClientId }
+								selectBlock={ selectBlock }
+								showAppender={ showAppender }
+								showBlockMovers={ showBlockMovers }
+								showNestedBlocks={ showNestedBlocks }
+								parentBlockClientId={ clientId }
+								level={ level + 1 }
+								terminatedLevels={ updatedTerminatedLevels }
+								path={ updatedPath }
+							/>
+						) }
 					</Fragment>
 				);
 			} ) }
