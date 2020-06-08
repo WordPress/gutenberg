@@ -192,18 +192,20 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						allowReset
 						resetFallbackValue={ initialAttributes.bylineRatio }
 					/>
-					<RangeControl
-						label={ __( 'Relative bio size' ) }
-						value={ attributes.bioRatio }
-						onChange={ ( ratio ) =>
-							setAttributes( { bioRatio: ratio } )
-						}
-						min={ 0.1 }
-						max={ 1.5 }
-						step={ 0.1 }
-						allowReset
-						resetFallbackValue={ initialAttributes.bioRatio }
-					/>
+					{ showBio && (
+						<RangeControl
+							label={ __( 'Relative bio size' ) }
+							value={ attributes.bioRatio }
+							onChange={ ( ratio ) =>
+								setAttributes( { bioRatio: ratio } )
+							}
+							min={ 0.1 }
+							max={ 1.5 }
+							step={ 0.1 }
+							allowReset
+							resetFallbackValue={ initialAttributes.bioRatio }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 
