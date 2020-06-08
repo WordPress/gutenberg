@@ -19,6 +19,11 @@ import {
 } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import BlockPreview from '../block-preview';
+
+/**
  * Returns the active style from the given className.
  *
  * @param {Array} styles Block style variations.
@@ -143,7 +148,24 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	);
 }
 
-function BlockStyleItem( { style, isActive, onBlur, onHover, onSelect } ) {
+function BlockStyleItem( {
+	genericPreviewBlock,
+	style,
+	isActive,
+	onBlur,
+	onHover,
+	onSelect,
+	styleClassName,
+} ) {
+	const previewBlocks = useMemo( () => {
+		return {
+			...genericPreviewBlock,
+			attributes: {
+				...genericPreviewBlock.attributes,
+				className: styleClassName,
+			},
+		};
+	}, [ genericPreviewBlock, styleClassName ] );
 	return (
 		<div
 			key={ style.name }
@@ -163,6 +185,9 @@ function BlockStyleItem( { style, isActive, onBlur, onHover, onSelect } ) {
 			tabIndex="0"
 			aria-label={ style.label || style.name }
 		>
+			<div className="block-editor-block-styles__item-preview">
+				<BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />
+			</div>
 			<div className="block-editor-block-styles__item-label">
 				{ style.label || style.name }
 			</div>
