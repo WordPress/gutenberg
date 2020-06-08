@@ -41,6 +41,13 @@ export function subtract( ...args ) {
 	} );
 }
 
+/**
+ * Determines the decimal position of a number value.
+ *
+ * @param {number} value The number to evaluate.
+ *
+ * @return {number} The number of decimal places.
+ */
 function getPrecision( value ) {
 	const split = ( value + '' ).split( '.' );
 	return split[ 1 ] !== undefined ? split[ 1 ].length : 0;
