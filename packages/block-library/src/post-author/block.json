@@ -30,6 +30,14 @@
 		},
 		"customTextColor": {
 			"type": "string"
+		},
+		"bylineRatio": {
+			"type": "number",
+			"default": 0.5
+		},
+		"bioRatio": {
+			"type": "number",
+			"default": 0.7
 		}
 	},
 	"context": [

@@ -16,7 +16,12 @@ import {
 	__experimentalUseColors,
 	BlockColorsStyleSelector,
 } from '@wordpress/block-editor';
-import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
+import {
+	PanelBody,
+	SelectControl,
+	ToggleControl,
+	RangeControl,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -114,6 +119,13 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		};
 	}, [ align ] );
 
+	const inlineStyles = useMemo( () => {
+		return {
+			bio: { fontSize: attributes.bioRatio + 'em' },
+			byline: { fontSize: attributes.bylineRatio + 'em' },
+		};
+	}, [ attributes.bioRatio, attributes.bylineRatio ] );
+
 	return (
 		<>
 			<InspectorControls>
@@ -158,6 +170,26 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						onChange={ () =>
 							setAttributes( { showBio: ! showBio } )
 						}
+					/>
+					<RangeControl
+						label={ __( 'Relative byline size' ) }
+						value={ attributes.bylineRatio }
+						onChange={ ( ratio ) =>
+							setAttributes( { bylineRatio: ratio } )
+						}
+						min={ 0.1 }
+						max={ 1.5 }
+						step={ 0.1 }
+					/>
+					<RangeControl
+						label={ __( 'Relative bio size' ) }
+						value={ attributes.bioRatio }
+						onChange={ ( ratio ) =>
+							setAttributes( { bioRatio: ratio } )
+						}
+						min={ 0.1 }
+						max={ 1.5 }
+						step={ 0.1 }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -206,13 +238,17 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 									onChange={ ( value ) =>
 										setAttributes( { byline: value } )
 									}
+									style={ inlineStyles.byline }
 								/>
 							) }
 							<p className="wp-block-post-author__name">
 								{ authorDetails?.name }
 							</p>
 							{ showBio && (
-								<p className="wp-block-post-author__bio">
+								<p
+									className="wp-block-post-author__bio"
+									style={ inlineStyles.bio }
+								>
 									{ authorDetails?.description }
 								</p>
 							) }
