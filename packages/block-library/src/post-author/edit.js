@@ -187,7 +187,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 							setAttributes( { bylineRatio: ratio } )
 						}
 						min={ 0.1 }
-						max={ 1.5 }
+						max={ 1 }
 						step={ 0.1 }
 						allowReset
 						resetFallbackValue={ initialAttributes.bylineRatio }
@@ -200,7 +200,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 								setAttributes( { bioRatio: ratio } )
 							}
 							min={ 0.1 }
-							max={ 1.5 }
+							max={ 1 }
 							step={ 0.1 }
 							allowReset
 							resetFallbackValue={ initialAttributes.bioRatio }
