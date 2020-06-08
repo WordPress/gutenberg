@@ -13,7 +13,7 @@ import {
 	BlockControls,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { Fragment, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	rotateLeft,
 	rotateRight,
@@ -31,6 +31,8 @@ import {
 	withNotices,
 	RangeControl,
 	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
@@ -53,6 +55,105 @@ const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.1;
 const POPOVER_PROPS = { position: 'bottom right' };
 
+function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
+	return (
+		<MenuGroup label={ label }>
+			{ aspectRatios.map( ( { title, aspect } ) => (
+				<MenuItem
+					key={ aspect }
+					isDisabled={ isDisabled }
+					onClick={ () => {
+						onClick( aspect );
+					} }
+				>
+					{ title }
+				</MenuItem>
+			) ) }
+		</MenuGroup>
+	);
+}
+
+function AspectMenu( { isDisabled, onClick, toggleProps } ) {
+	return (
+		<DropdownMenu
+			icon={ aspectRatio }
+			label={ __( 'Aspect Ratio' ) }
+			popoverProps={ POPOVER_PROPS }
+			toggleProps={ toggleProps }
+		>
+			{ ( { onClose } ) => (
+				<>
+					<AspectGroup
+						label={ __( 'Landscape' ) }
+						isDisabled={ isDisabled }
+						onClick={ ( aspect ) => {
+							onClick( aspect );
+							onClose();
+						} }
+						aspectRatios={ [
+							{
+								title: __( '16:10' ),
+								aspect: 16 / 10,
+							},
+							{
+								title: __( '16:9' ),
+								aspect: 16 / 9,
+							},
+							{
+								title: __( '4:3' ),
+								aspect: 4 / 3,
+							},
+							{
+								title: __( '3:2' ),
+								aspect: 3 / 2,
+							},
+						] }
+					/>
+					<AspectGroup
+						label={ __( 'Portrait' ) }
+						isDisabled={ isDisabled }
+						onClick={ ( aspect ) => {
+							onClick( aspect );
+							onClose();
+						} }
+						aspectRatios={ [
+							{
+								title: __( '10:16' ),
+								aspect: 10 / 16,
+							},
+							{
+								title: __( '9:16' ),
+								aspect: 9 / 16,
+							},
+							{
+								title: __( '3:4' ),
+								aspect: 3 / 4,
+							},
+							{
+								title: __( '2:3' ),
+								aspect: 2 / 3,
+							},
+						] }
+					/>
+					<AspectGroup
+						isDisabled={ isDisabled }
+						onClick={ ( aspect ) => {
+							onClick( aspect );
+							onClose();
+						} }
+						aspectRatios={ [
+							{
+								title: __( 'Square' ),
+								aspect: 1,
+							},
+						] }
+					/>
+				</>
+			) }
+		</DropdownMenu>
+	);
+}
+
 class RichImage extends Component {
 	constructor( props ) {
 		super( props );
@@ -66,7 +167,6 @@ class RichImage extends Component {
 			position: { x: 0, y: 0 },
 			zoom: 1,
 			aspect: 4 / 3,
-			isPortrait: false,
 		};
 
 		this.adjustImage = this.adjustImage.bind( this );
@@ -124,7 +224,6 @@ class RichImage extends Component {
 			zoom,
 			aspect,
 			imageSize,
-			isPortrait,
 		} = this.state;
 		const { url } = attributes;
 		const isEditing = ! isCrop && isSelected && url;
@@ -139,7 +238,7 @@ class RichImage extends Component {
 		} );
 
 		return (
-			<Fragment>
+			<>
 				{ noticeUI }
 
 				<div className={ classes }>
@@ -167,7 +266,7 @@ class RichImage extends Component {
 									maxZoom={ MAX_ZOOM }
 									crop={ position }
 									zoom={ zoom }
-									aspect={ isPortrait ? 1 / aspect : aspect }
+									aspect={ aspect }
 									onCropChange={ ( newPosition ) => {
 										this.setState( {
 											position: newPosition,
@@ -300,67 +399,17 @@ class RichImage extends Component {
 						<ToolbarGroup>
 							<ToolbarItem>
 								{ ( toggleProps ) => (
-									<DropdownMenu
-										icon={ aspectRatio }
-										label={ __( 'Aspect Ratio' ) }
-										popoverProps={ POPOVER_PROPS }
+									<AspectMenu
 										toggleProps={ toggleProps }
-										controls={ [
-											{
-												title: __( '16:10' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 16 / 10,
-													} ),
-											},
-											{
-												title: __( '16:9' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 16 / 9,
-													} ),
-											},
-											{
-												title: __( '4:3' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 4 / 3,
-													} ),
-											},
-											{
-												title: __( '3:2' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 3 / 2,
-													} ),
-											},
-											{
-												title: __( '1:1' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 1,
-													} ),
-											},
-										] }
+										isDisabled={ inProgress }
+										onClick={ ( newAspect ) => {
+											this.setState( {
+												aspect: newAspect,
+											} );
+										} }
 									/>
 								) }
 							</ToolbarItem>
-							<ToolbarButton
-								className="richimage-toolbar__dropdown"
-								disabled={ inProgress }
-								icon="image-rotate-right"
-								label={ __( 'Orientation' ) }
-								onClick={ () =>
-									this.setState( ( prev ) => ( {
-										isPortrait: ! prev.isPortrait,
-									} ) )
-								}
-							/>
 						</ToolbarGroup>
 						<ToolbarGroup>
 							<ToolbarButton onClick={ this.cropImage }>
@@ -376,7 +425,7 @@ class RichImage extends Component {
 						</ToolbarGroup>
 					</BlockControls>
 				) }
-			</Fragment>
+			</>
 		);
 	}
 }
