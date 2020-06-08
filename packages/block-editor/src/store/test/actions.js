@@ -46,12 +46,12 @@ describe( 'actions', () => {
 
 	describe( 'updateBlockAttributes', () => {
 		it( 'should return the UPDATE_BLOCK_ATTRIBUTES action', () => {
-			const clientId = 'myclientid';
+			const clientIds = [ 'myclientid' ];
 			const attributes = {};
-			const result = updateBlockAttributes( clientId, attributes );
+			const result = updateBlockAttributes( clientIds, attributes );
 			expect( result ).toEqual( {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId,
+				clientIds,
 				attributes,
 			} );
 		} );

@@ -97,18 +97,18 @@ export function receiveBlocks( blocks ) {
 }
 
 /**
- * Returns an action object used in signalling that the block attributes with
- * the specified client ID has been updated.
+ * Returns an action object used in signalling that the multiple blocks'
+ * attributes with the specified client IDs have been updated.
  *
- * @param {string} clientId   Block client ID.
- * @param {Object} attributes Block attributes to be merged.
+ * @param {string|string[]} clientIds  Block client IDs.
+ * @param {Object}          attributes Block attributes to be merged.
  *
  * @return {Object} Action object.
  */
-export function updateBlockAttributes( clientId, attributes ) {
+export function updateBlockAttributes( clientIds, attributes ) {
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
-		clientId,
+		clientIds: castArray( clientIds ),
 		attributes,
 	};
 }

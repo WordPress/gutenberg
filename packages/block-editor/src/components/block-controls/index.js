@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../block-edit/context';
+import useDisplayBlockControls from '../use-display-block-controls';
 
 const { Fill, Slot } = createSlotFill( 'BlockControls' );
 
@@ -26,8 +26,7 @@ function BlockControlsSlot( props ) {
 }
 
 function BlockControlsFill( { controls, children } ) {
-	const { isSelected } = useBlockEditContext();
-	if ( ! isSelected ) {
+	if ( ! useDisplayBlockControls() ) {
 		return null;
 	}
 
