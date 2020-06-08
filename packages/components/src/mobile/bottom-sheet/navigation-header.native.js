@@ -39,7 +39,9 @@ function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
 				onPress={ leftButtonOnPress }
 				accessibilityRole={ 'button' }
 				accessibilityLabel={ __( 'Go back' ) }
-				accessibilityHint={ __( 'Navigates to the previous subsheet' ) }
+				accessibilityHint={ __(
+					'Navigates to the previous content sheet'
+				) }
 			>
 				<View style={ styles.bottomSheetBackButton }>
 					{ isIOS ? (

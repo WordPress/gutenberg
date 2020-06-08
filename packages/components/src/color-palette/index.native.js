@@ -24,7 +24,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
 import { colorsUtils } from '../mobile/color-settings/utils';
-import { performLayoutAnimation } from '../mobile/utils';
+import { performLayoutAnimation } from '../mobile/layout-animation';
 
 const ANIMATION_DURATION = 200;
 
@@ -69,15 +69,17 @@ function ColorPalette( {
 		! isGradientSegment || isCustomGradientColor;
 
 	const accessibilityHint = isGradientSegment
-		? __( 'Navigates to customize gradient' )
+		? __( 'Navigates to customize the gradient' )
 		: __( 'Navigates to custom color picker' );
-	const customText = isIOS ? __( 'Custom' ) : __( 'CUSTOM' );
+	const customText = __( 'Custom' );
 
 	useEffect( () => {
 		if ( scrollViewRef.current ) {
 			if ( isSelectedCustom() ) {
 				scrollViewRef.current.scrollToEnd();
-			} else scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
+			} else {
+				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
+			}
 		}
 	}, [ currentSegment ] );
 
@@ -168,6 +170,10 @@ function ColorPalette( {
 		}
 	}
 
+	function onScroll( { nativeEvent } ) {
+		scrollPosition = nativeEvent.contentOffset.x;
+	}
+
 	const verticalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.verticalSeparator,
 		styles.verticalSeparatorDark
@@ -186,9 +192,7 @@ function ColorPalette( {
 			showsHorizontalScrollIndicator={ false }
 			keyboardShouldPersistTaps="always"
 			disableScrollViewPanResponder
-			onScroll={ ( { nativeEvent } ) =>
-				( scrollPosition = nativeEvent.contentOffset.x )
-			}
+			onScroll={ onScroll }
 			onContentSizeChange={ onContentSizeChange }
 			onScrollBeginDrag={ () => shouldEnableBottomSheetScroll( false ) }
 			onScrollEndDrag={ () => shouldEnableBottomSheetScroll( true ) }
@@ -243,7 +247,9 @@ function ColorPalette( {
 								style={ styles.colorIndicator }
 							/>
 							<Text style={ customTextStyle }>
-								{ customText }
+								{ isIOS
+									? customText
+									: customText.toUpperCase() }
 							</Text>
 						</View>
 					</TouchableWithoutFeedback>

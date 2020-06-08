@@ -36,7 +36,7 @@ import ColorCell from './color-cell';
 import RadioCell from './radio-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import { BottomSheetProvider } from './bottom-sheet-context';
-import { performLayoutAnimation } from '../utils';
+import { performLayoutAnimation } from '../layout-animation';
 
 class BottomSheet extends Component {
 	constructor() {

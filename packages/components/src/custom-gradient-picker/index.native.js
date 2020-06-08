@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { colorsUtils } from '../mobile/color-settings/utils';
-import { performLayoutAnimation } from '../mobile/utils';
+import { performLayoutAnimation } from '../mobile/layout-animation';
 import { getGradientParsed } from './utils';
 import { serializeGradient } from './serializer';
 import {

@@ -19,7 +19,7 @@ import CustomGradientPicker from '../../custom-gradient-picker';
 import NavigationHeader from '../bottom-sheet/navigation-header';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
-import { performLayoutAnimation } from '../utils';
+import { performLayoutAnimation } from '../layout-animation';
 
 import styles from './style.scss';
 
@@ -102,7 +102,9 @@ function ColorSettings( {
 	function onCustomPress() {
 		if ( isSolidSegment ) {
 			onCustomScreenToggle( true );
-		} else onCustomGradientScreenToggle( true );
+		} else {
+			onCustomGradientScreenToggle( true );
+		}
 	}
 
 	function setColor( color ) {

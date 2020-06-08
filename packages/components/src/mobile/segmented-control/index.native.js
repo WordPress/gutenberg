@@ -19,7 +19,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { performLayoutAnimation } from '../utils';
+import { performLayoutAnimation } from '../layout-animation';
 import styles from './style.scss';
 
 const ANIMATION_DURATION = 200;
@@ -116,7 +116,7 @@ const SegmentedControls = ( {
 		performLayoutAnimation( ANIMATION_DURATION );
 		setActiveSegmentIndex( index );
 		segmentHandler( segment );
-		performSwatchAnimation( index, segment );
+		performSwatchAnimation( index );
 	}
 
 	function segmentOnLayout( event, index ) {

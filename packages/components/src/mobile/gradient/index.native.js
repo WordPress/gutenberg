@@ -112,4 +112,3 @@ function Gradient( {
 }
 
 export default Gradient;
-export { getGradientBaseColors };

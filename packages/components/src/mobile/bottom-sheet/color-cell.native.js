@@ -22,7 +22,7 @@ export default function BottomSheetColorCell( props ) {
 				__( 'Double tap to go to color settings' )
 			}
 			editable={ false }
-			value={ withColorIndicator && ! color && 'Default' }
+			value={ withColorIndicator && ! color && __( 'Default' ) }
 		>
 			{ withColorIndicator && color && (
 				<ColorIndicator color={ color } style={ styles.colorCircle } />
