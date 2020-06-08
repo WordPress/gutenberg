@@ -152,8 +152,7 @@ export default function BlockNavigationBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							updateSelection={ false }
-							selectBlock={ selectBlock }
+							__experimentalSelectBlock={ selectBlock }
 						/>
 					) }
 				</TreeGridCell>

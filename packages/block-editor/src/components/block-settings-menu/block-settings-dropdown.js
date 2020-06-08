@@ -35,7 +35,11 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function BlockSettingsDropdown( { clientIds, selectBlock, ...props } ) {
+export function BlockSettingsDropdown( {
+	clientIds,
+	__experimentalSelectBlock,
+	...props
+} ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
@@ -60,17 +64,20 @@ export function BlockSettingsDropdown( { clientIds, selectBlock, ...props } ) {
 
 	const [ hasCopied, setHasCopied ] = useState();
 	const updateSelection = useCallback(
-		async ( clientIdPromise ) => {
-			const clientId = await clientIdPromise;
-			if ( clientId ) {
-				selectBlock( clientId );
+		async ( clientIdsPromise ) => {
+			const ids = await clientIdsPromise;
+			if ( ids && ids[ 0 ] ) {
+				__experimentalSelectBlock( ids[ 0 ] );
 			}
 		},
-		[ selectBlock ]
+		[ __experimentalSelectBlock ]
 	);
 
 	return (
-		<BlockActions clientIds={ clientIds } updateSelection={ ! selectBlock }>
+		<BlockActions
+			clientIds={ clientIds }
+			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
+		>
 			{ ( {
 				canDuplicate,
 				canInsertDefaultBlock,

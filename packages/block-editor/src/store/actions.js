@@ -163,8 +163,8 @@ export function* selectPreviousBlock( clientId ) {
 
 	if ( previousBlockClientId ) {
 		yield selectBlock( previousBlockClientId, -1 );
+		return [ previousBlockClientId ];
 	}
-	return previousBlockClientId;
 }
 
 /**
@@ -182,6 +182,7 @@ export function* selectNextBlock( clientId ) {
 
 	if ( nextBlockClientId ) {
 		yield selectBlock( nextBlockClientId );
+		return [ nextBlockClientId ];
 	}
 }
 
@@ -614,7 +615,7 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
 	const defaultBlockId = yield* ensureDefaultBlock();
-	return previousBlockId || defaultBlockId;
+	return [ previousBlockId || defaultBlockId ];
 }
 
 /**
@@ -945,7 +946,7 @@ export function* duplicateBlocks( clientIds, updateSelection = true ) {
 			last( clonedBlocks ).clientId
 		);
 	}
-	return last( clonedBlocks ).clientId;
+	return clonedBlocks.map( ( block ) => block.clientId );
 }
 
 /**
