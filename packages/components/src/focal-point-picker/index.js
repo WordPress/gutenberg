@@ -59,6 +59,16 @@ export class FocalPointPicker extends Component {
 				isDragging: false,
 			} );
 		}
+		/**
+		 * Handles cases where the incoming value changes.
+		 * An example is the values resetting based on an UNDO action.
+		 */
+		if (
+			this.props.value.x !== this.state.percentages.x ||
+			this.props.value.y !== this.state.percentages.y
+		) {
+			this.setState( { percentages: this.props.value } );
+		}
 	}
 	componentWillUnmount() {
 		document.removeEventListener( 'mouseup', this.handleOnMouseUp );
