@@ -16,9 +16,10 @@ import { useControlledState } from '../utils/hooks';
 /**
  * A float supported clamp function for a specific value.
  *
- * @param {number|null} value The value to clamp
- * @param {number} min The minimum value
- * @param {number} max The maximum value
+ * @param {number|null} value The value to clamp.
+ * @param {number}      min   The minimum value.
+ * @param {number}      max   The maximum value.
+ *
  * @return {number} A (float) number
  */
 export function floatClamp( value, min, max ) {
@@ -32,11 +33,12 @@ export function floatClamp( value, min, max ) {
 /**
  * Hook to store a clamped value, derived from props.
  *
- * @param {Object} props Properties for the hook.
- * @param {number} props.min The minimum value.
- * @param {number} props.max The maximum value.
- * @param {number} props.value The current value.
- * @param {number} props.initial The preferred initial value.
+ * @param {Object} settings         Hook settings.
+ * @param {number} settings.min     The minimum value.
+ * @param {number} settings.max     The maximum value.
+ * @param {number} settings.value  	The current value.
+ * @param {any}    settings.initial The initial value.
+ *
  * @return {[*, Function]} The controlled value and the value setter.
  */
 export function useControlledRangeValue( {
@@ -68,12 +70,13 @@ export function useControlledRangeValue( {
  * Hook to encapsulate the debouncing "hover" to better handle the showing
  * and hiding of the Tooltip.
  *
- * @param {Object} props Properties for the hook.
- * @param {Function} props.onHide Callback function on hide.
- * @param {Function} props.onMouseLeave Callback function on a mouseleave event.
- * @param {Function} props.onMouseMove Callback function on a mousemove event.
- * @param {Function} props.onShow Callback function on show.
- * @param {number} props.timeout Timeout duration for hover interaction.
+ * @param {Object}   settings                     Hook settings.
+ * @param {Function} [settings.onShow=noop]       A callback function invoked when the element is shown.
+ * @param {Function} [settings.onHide=noop]       A callback function invoked when the element is hidden.
+ * @param {Function} [settings.onMouseMove=noop]  A callback function invoked when the mouse is moved.
+ * @param {Function} [settings.onMouseLeave=noop] A callback function invoked when the mouse is moved out of the element.
+ * @param {number}   [settings.timeout=300]       Timeout before the element is shown or hidden.
+ *
  * @return {Object} Bound properties for use on a React.Node.
  */
 export function useDebouncedHoverInteraction( {

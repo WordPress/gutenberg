@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "8.2.1",
+	"version": "8.3.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -248,7 +248,6 @@
 		"design-system:dev": "echo \"Please use storybook:dev instead.\"",
 		"playground:build": "npm run storybook:build",
 		"playground:dev": "echo \"Please use storybook:dev instead.\"",
-		"preenv": "npm run check-engines",
 		"env": "wp-scripts env",
 		"wp-env": "packages/env/bin/wp-env"
 	},

@@ -7,10 +7,13 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
 import { redo as redoIcon } from '@wordpress/icons';
+import { forwardRef } from '@wordpress/element';
 
-function EditorHistoryRedo( { hasRedo, redo } ) {
+function EditorHistoryRedo( { hasRedo, redo, innerRef, ...props } ) {
 	return (
 		<Button
+			{ ...props }
+			ref={ innerRef }
 			icon={ redoIcon }
 			label={ __( 'Redo' ) }
 			shortcut={ displayShortcut.primaryShift( 'z' ) }
@@ -24,7 +27,7 @@ function EditorHistoryRedo( { hasRedo, redo } ) {
 	);
 }
 
-export default compose( [
+const EnhancedEditorHistoryRedo = compose( [
 	withSelect( ( select ) => ( {
 		hasRedo: select( 'core/editor' ).hasEditorRedo(),
 	} ) ),
@@ -32,3 +35,7 @@ export default compose( [
 		redo: dispatch( 'core/editor' ).redo,
 	} ) ),
 ] )( EditorHistoryRedo );
+
+export default forwardRef( ( props, ref ) => (
+	<EnhancedEditorHistoryRedo { ...props } innerRef={ ref } />
+) );
