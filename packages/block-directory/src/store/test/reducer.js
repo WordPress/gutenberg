@@ -58,36 +58,6 @@ describe( 'state', () => {
 			expect( state ).toHaveProperty( query );
 			expect( state[ query ].results ).toHaveLength( 1 );
 		} );
-
-		it( 'should set query to reflect its pending status', () => {
-			const filterValue = 'Awesome Block';
-
-			// Simulate a second call.
-			const stateAfterRequest = downloadableBlocks(
-				{},
-				{
-					type: 'FETCH_DOWNLOADABLE_BLOCKS',
-					filterValue,
-				}
-			);
-
-			expect( stateAfterRequest[ filterValue ].isRequesting ).toEqual(
-				true
-			);
-
-			const stateAfterResponse = downloadableBlocks(
-				{},
-				{
-					type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-					filterValue,
-					downloadableBlocks: [],
-				}
-			);
-
-			expect( stateAfterResponse[ filterValue ].isRequesting ).toEqual(
-				false
-			);
-		} );
 	} );
 
 	describe( 'blockManagement()', () => {
