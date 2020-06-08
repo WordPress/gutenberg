@@ -7,6 +7,7 @@ import { clamp } from 'lodash';
  * Parses and retrieves a number value.
  *
  * @param {any} value The incoming value.
+ *
  * @return {number} The parsed number value.
  */
 export function getNumber( value ) {
@@ -18,7 +19,8 @@ export function getNumber( value ) {
 /**
  * Safely adds 2 values.
  *
- * @param {number|string} args Values to add together
+ * @param {number|string} args Values to add together.
+ *
  * @return {number} The sum of values.
  */
 export function add( ...args ) {
@@ -28,7 +30,8 @@ export function add( ...args ) {
 /**
  * Safely subtracts 2 values.
  *
- * @param {number|string} args Values to subtract together
+ * @param {number|string} args Values to subtract together.
+ *
  * @return {number} The difference of the 2 values.
  */
 export function subtract( ...args ) {
@@ -50,6 +53,7 @@ function getPrecision( value ) {
  * @param {number} min The minimum range.
  * @param {number} max The maximum range.
  * @param {number} step A multiplier for the value.
+ *
  * @return {number} The rounded and clamped value.
  */
 export function roundClamp(
@@ -78,6 +82,7 @@ export function roundClamp(
  * @property {number} min The minimum range.
  * @property {number} max The maximum range.
  * @property {number} step A multiplier for the value.
+ *
  * @return {string} The rounded and clamped value.
  */
 export function roundClampString( ...args ) {
