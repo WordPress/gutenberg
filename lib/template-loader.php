@@ -322,12 +322,12 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 	// If we haven't found any template post by here, it means that this theme doesn't even come with a fallback
 	// `index.html` block template. We create one so that people that are trying to access the editor are greeted
 	// with a blank page rather than an error.
-	if( ! $current_template_post && ( is_admin() || defined( 'REST_REQUEST' ) ) ) {
+	if ( ! $current_template_post && ( is_admin() || defined( 'REST_REQUEST' ) ) ) {
 		$current_template_post = array(
-			'post_title'   => 'index',
-			'post_status'  => 'auto-draft',
-			'post_type'    => 'wp_template',
-			'post_name'    => 'index',
+			'post_title'  => 'index',
+			'post_status' => 'auto-draft',
+			'post_type'   => 'wp_template',
+			'post_name'   => 'index',
 		);
 		$current_template_post = get_post(
 			wp_insert_post( $current_template_post )
