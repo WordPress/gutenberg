@@ -35,6 +35,11 @@ const transforms = {
 			transform: ( attributes ) =>
 				createBlock( 'core/paragraph', attributes ),
 		},
+		{
+			type: 'block',
+			blocks: [ 'core/code' ],
+			transform: ( attributes ) => createBlock( 'core/code', attributes ),
+		},
 	],
 };
 

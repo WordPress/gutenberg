@@ -15,6 +15,14 @@ import {
 } from '@wordpress/block-editor';
 import { Fragment, Component } from '@wordpress/element';
 import {
+	rotateLeft,
+	rotateRight,
+	flipHorizontal,
+	flipVertical,
+	crop,
+	aspectRatio,
+} from '@wordpress/icons';
+import {
 	ToolbarGroup,
 	ToolbarButton,
 	__experimentalToolbarItem as ToolbarItem,
@@ -31,14 +39,6 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import richImageRequest from './api';
-import {
-	RotateLeftIcon,
-	RotateRightIcon,
-	FlipHorizontalIcon,
-	FlipVerticalIcon,
-	CropIcon,
-	AspectIcon,
-} from './icon';
 
 const ROTATE_STEP = 90;
 const DEFAULT_CROP = {
@@ -102,13 +102,11 @@ class RichImage extends Component {
 	}
 
 	cropImage() {
-		const { crop } = this.state;
-
 		this.adjustImage( 'crop', {
-			cropX: crop.x,
-			cropY: crop.y,
-			cropWidth: crop.width,
-			cropHeight: crop.height,
+			cropX: this.state.crop.x,
+			cropY: this.state.crop.y,
+			cropWidth: this.state.crop.width,
+			cropHeight: this.state.crop.height,
 		} );
 	}
 
@@ -214,13 +212,13 @@ class RichImage extends Component {
 							<ToolbarItem>
 								{ ( toggleProps ) => (
 									<DropdownMenu
-										icon={ <RotateLeftIcon /> }
+										icon={ rotateLeft }
 										label={ __( 'Rotate' ) }
 										popoverProps={ POPOVER_PROPS }
 										toggleProps={ toggleProps }
 										controls={ [
 											{
-												icon: <RotateLeftIcon />,
+												icon: rotateLeft,
 												title: __( 'Rotate left' ),
 												isDisabled: inProgress,
 												onClick: () =>
@@ -232,7 +230,7 @@ class RichImage extends Component {
 													),
 											},
 											{
-												icon: <RotateRightIcon />,
+												icon: rotateRight,
 												title: __( 'Rotate right' ),
 												isDisabled: inProgress,
 												onClick: () =>
@@ -250,13 +248,13 @@ class RichImage extends Component {
 							<ToolbarItem>
 								{ ( toggleProps ) => (
 									<DropdownMenu
-										icon={ <FlipVerticalIcon /> }
+										icon={ flipVertical }
 										label={ __( 'Flip' ) }
 										popoverProps={ POPOVER_PROPS }
 										toggleProps={ toggleProps }
 										controls={ [
 											{
-												icon: <FlipVerticalIcon />,
+												icon: flipVertical,
 												title: __( 'Flip vertical' ),
 												isDisabled: inProgress,
 												onClick: () =>
@@ -265,7 +263,7 @@ class RichImage extends Component {
 													} ),
 											},
 											{
-												icon: <FlipHorizontalIcon />,
+												icon: flipHorizontal,
 												title: __( 'Flip horizontal' ),
 												isDisabled: inProgress,
 												onClick: () =>
@@ -279,7 +277,7 @@ class RichImage extends Component {
 							</ToolbarItem>
 							<ToolbarButton
 								disabled={ inProgress }
-								icon={ <CropIcon /> }
+								icon={ crop }
 								label={ __( 'Crop' ) }
 								onClick={ () =>
 									this.setState( {
@@ -296,14 +294,14 @@ class RichImage extends Component {
 					<BlockControls>
 						<ToolbarGroup>
 							<div className="richimage__crop-icon">
-								<Icon icon={ CropIcon } />
+								<Icon icon={ crop } />
 							</div>
 						</ToolbarGroup>
 						<ToolbarGroup>
 							<ToolbarItem>
 								{ ( toggleProps ) => (
 									<DropdownMenu
-										icon={ <AspectIcon /> }
+										icon={ aspectRatio }
 										label={ __( 'Aspect Ratio' ) }
 										popoverProps={ POPOVER_PROPS }
 										toggleProps={ toggleProps }

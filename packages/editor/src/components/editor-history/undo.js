@@ -7,10 +7,13 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
 import { undo as undoIcon } from '@wordpress/icons';
+import { forwardRef } from '@wordpress/element';
 
-function EditorHistoryUndo( { hasUndo, undo } ) {
+function EditorHistoryUndo( { hasUndo, undo, innerRef, ...props } ) {
 	return (
 		<Button
+			{ ...props }
+			ref={ innerRef }
 			icon={ undoIcon }
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
@@ -24,7 +27,7 @@ function EditorHistoryUndo( { hasUndo, undo } ) {
 	);
 }
 
-export default compose( [
+const EnhancedEditorHistoryUndo = compose( [
 	withSelect( ( select ) => ( {
 		hasUndo: select( 'core/editor' ).hasEditorUndo(),
 	} ) ),
@@ -32,3 +35,7 @@ export default compose( [
 		undo: dispatch( 'core/editor' ).undo,
 	} ) ),
 ] )( EditorHistoryUndo );
+
+export default forwardRef( ( props, ref ) => (
+	<EnhancedEditorHistoryUndo { ...props } innerRef={ ref } />
+) );

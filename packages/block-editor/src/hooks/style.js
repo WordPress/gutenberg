@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { has, get } from 'lodash';
+import { has, get, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,6 +42,20 @@ const typographySupportKeys = [
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
 
+const VARIABLE_REFERENCE_PREFIX = 'var:';
+const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+function compileStyleValue( uncompiledValue ) {
+	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+		const variable = uncompiledValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return uncompiledValue;
+}
+
 /**
  * Returns the inline styles to add depending on the style object
  *
@@ -56,12 +70,13 @@ export function getInlineStyles( styles = {} ) {
 		background: [ 'color', 'gradient' ],
 		backgroundColor: [ 'color', 'background' ],
 		color: [ 'color', 'text' ],
+		'--wp--style--color--link': [ 'color', 'link' ],
 	};
 
 	const output = {};
 	Object.entries( mappings ).forEach( ( [ styleKey, objectKey ] ) => {
 		if ( has( styles, objectKey ) ) {
-			output[ styleKey ] = get( styles, objectKey );
+			output[ styleKey ] = compileStyleValue( get( styles, objectKey ) );
 		}
 	} );
 
