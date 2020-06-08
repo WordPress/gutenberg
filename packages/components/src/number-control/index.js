@@ -105,7 +105,9 @@ export function NumberControl(
 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
 			const { delta, shiftKey } = payload;
 			const [ x, y ] = delta;
-			const modifier = shiftKey ? shiftStep : 1;
+			const modifier = shiftKey
+				? parseFloat( shiftStep ) * parseFloat( step )
+				: parseFloat( step );
 
 			let directionModifier;
 			let directionBaseValue;
