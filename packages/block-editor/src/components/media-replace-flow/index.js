@@ -16,6 +16,7 @@ import {
 	ToolbarGroup,
 	Button,
 	Dropdown,
+	withFilters,
 } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
@@ -194,4 +195,5 @@ export default compose( [
 			removeNotice,
 		};
 	} ),
+	withFilters( 'editor.MediaReplaceFlow' ),
 ] )( MediaReplaceFlow );
