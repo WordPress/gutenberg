@@ -29,7 +29,6 @@ import { useBlockNavigationContext } from './context';
 
 export default function BlockNavigationBlock( {
 	block,
-	onClick,
 	isSelected,
 	selectBlock,
 	position,
@@ -94,7 +93,7 @@ export default function BlockNavigationBlock( {
 						/>
 						<BlockNavigationBlockContents
 							block={ block }
-							onClick={ onClick }
+							onClick={ () => selectBlock( block.clientId ) }
 							isSelected={ isSelected }
 							position={ position }
 							siblingCount={ siblingCount }
