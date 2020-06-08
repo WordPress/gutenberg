@@ -257,7 +257,9 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 
 		expect( transformed[ 0 ] ).toBe( '<p>' );
 
-		let firstExpectedBlock = createBlock( 'test/gallery', { ids: [ 4, 5, 6 ] } );
+		let firstExpectedBlock = createBlock( 'test/gallery', {
+			ids: [ 4, 5, 6 ],
+		} );
 		// clientId will always be random.
 		firstExpectedBlock.clientId = transformed[ 1 ].clientId;
 		expect( transformed[ 1 ] ).toEqual( firstExpectedBlock );
@@ -287,7 +289,9 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 
 		expect( reverseTransformed[ 2 ] ).toBe( '</p>\n<p>' );
 
-		secondExpectedBlock = createBlock( 'test/gallery', { ids: [ 4, 5, 6 ] } );
+		secondExpectedBlock = createBlock( 'test/gallery', {
+			ids: [ 4, 5, 6 ],
+		} );
 		// clientId will always be random.
 		secondExpectedBlock.clientId = reverseTransformed[ 3 ].clientId;
 		expect( reverseTransformed[ 3 ] ).toEqual( secondExpectedBlock );
