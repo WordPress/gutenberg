@@ -5,11 +5,6 @@ import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
 
 /**
- * WordPress dependencies
- */
-import { UP, DOWN } from '@wordpress/keycodes';
-
-/**
  * Internal dependencies
  */
 import UnitControl from '../';
@@ -88,86 +83,6 @@ describe( 'UnitControl', () => {
 			} );
 
 			expect( state ).toBe( '62px' );
-		} );
-
-		it( 'should increment value on UP press', () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
-
-			act( () => {
-				render(
-					<UnitControl value={ state } onChange={ setState } />,
-					container
-				);
-			} );
-
-			const input = getInput();
-
-			act( () => {
-				Simulate.keyDown( input, { keyCode: UP } );
-			} );
-
-			expect( state ).toBe( '51px' );
-		} );
-
-		it( 'should increment value on UP + SHIFT press, with step', () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
-
-			act( () => {
-				render(
-					<UnitControl value={ state } onChange={ setState } />,
-					container
-				);
-			} );
-
-			const input = getInput();
-
-			act( () => {
-				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
-			} );
-
-			expect( state ).toBe( '60px' );
-		} );
-
-		it( 'should decrement value on DOWN press', () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
-
-			act( () => {
-				render(
-					<UnitControl value={ state } onChange={ setState } />,
-					container
-				);
-			} );
-
-			const input = getInput();
-
-			act( () => {
-				Simulate.keyDown( input, { keyCode: DOWN } );
-			} );
-
-			expect( state ).toBe( '49px' );
-		} );
-
-		it( 'should decrement value on DOWN + SHIFT press, with step', () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
-
-			act( () => {
-				render(
-					<UnitControl value={ state } onChange={ setState } />,
-					container
-				);
-			} );
-
-			const input = getInput();
-
-			act( () => {
-				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
-			} );
-
-			expect( state ).toBe( '40px' );
 		} );
 	} );
 
