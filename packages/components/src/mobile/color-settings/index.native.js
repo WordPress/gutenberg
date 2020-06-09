@@ -125,7 +125,7 @@ function ColorSettings( {
 			return (
 				<SegmentedControls
 					segments={ segments }
-					segmentHandler={ ( item ) => setCurrentSegment( item ) }
+					segmentHandler={ setCurrentSegment }
 					selectedIndex={ segments.indexOf( currentSegment ) }
 					addonLeft={
 						currentValue && (

@@ -192,6 +192,7 @@ function ColorPalette( {
 			showsHorizontalScrollIndicator={ false }
 			keyboardShouldPersistTaps="always"
 			disableScrollViewPanResponder
+			scrollEventThrottle={ 16 }
 			onScroll={ onScroll }
 			onContentSizeChange={ onContentSizeChange }
 			onScrollBeginDrag={ () => shouldEnableBottomSheetScroll( false ) }
