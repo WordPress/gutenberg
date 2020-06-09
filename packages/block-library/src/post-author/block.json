@@ -38,6 +38,10 @@
 	],
 	"supports": {
 		"html": false,
-		"__experimentalFontSize": true
+		"__experimentalFontSize": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
+		}
 	}
 }
