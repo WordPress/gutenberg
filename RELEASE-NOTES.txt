@@ -1,6 +1,7 @@
 1.30.0
 ------
 * [**] Adds editor support for theme defined colors and theme defined gradients on cover and button blocks.
+* [*] Support for breaking out of captions/citation authors by pressing enter on the following blocks: image, video, gallery, quote, and pullquote.
 
 1.29.1
 ------
