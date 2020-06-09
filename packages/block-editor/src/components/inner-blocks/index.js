@@ -113,11 +113,7 @@ function UncontrolledInnerBlocks( props ) {
 		return blockList;
 	}
 
-	return (
-		<div className="block-editor-inner-blocks" ref={ forwardedRef }>
-			{ blockList }
-		</div>
-	);
+	return <div className="block-editor-inner-blocks">{ blockList }</div>;
 }
 
 /**
