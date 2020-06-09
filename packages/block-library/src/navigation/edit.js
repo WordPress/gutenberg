@@ -121,6 +121,7 @@ function Navigation( {
 	);
 
 	const isRequestingEntities = isRequestingPages || isRequestingMenus;
+	const selectedCreateActionOptionKey = selectedCreateActionOption?.key;
 
 	// Builds navigation links from default Pages.
 	const buildNavLinkBlocksFromPages = useMemo( () => {
@@ -141,7 +142,7 @@ function Navigation( {
 		);
 	}, [ pages ] );
 
-	const menuItems = getMenuItems( selectedCreateActionOption?.key );
+	const menuItems = getMenuItems( selectedCreateActionOptionKey );
 
 	// Builds navigation links from selected Menu's items.
 	const buildNavLinkBlocksFromMenuItems = useMemo( () => {
@@ -294,7 +295,7 @@ function Navigation( {
 
 	function shouldDisableCreateButton() {
 		// If there is no key at all then disable.
-		if ( ! selectedCreateActionOption?.key ) {
+		if ( ! selectedCreateActionOptionKey ) {
 			return true;
 		}
 
@@ -363,7 +364,7 @@ function Navigation( {
 									onChange={ ( { selectedItem } ) => {
 										if (
 											selectedItem?.key ===
-											selectedCreateActionOption?.key
+											selectedCreateActionOptionKey
 										) {
 											return;
 										}
