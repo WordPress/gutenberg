@@ -23,3 +23,8 @@ body.is-dragging-components-draggable {
 		display: none;
 	}
 }
+
+// This is only for testing.
+.is-dragging.is-selected {
+	display: none !important;
+}
