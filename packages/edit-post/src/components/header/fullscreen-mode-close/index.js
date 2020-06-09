@@ -60,6 +60,7 @@ function FullscreenModeClose() {
 				post_type: postType.slug,
 			} ) }
 			label={ get( postType, [ 'labels', 'view_items' ], __( 'Back' ) ) }
+			showTooltip
 		>
 			{ buttonIcon }
 		</Button>

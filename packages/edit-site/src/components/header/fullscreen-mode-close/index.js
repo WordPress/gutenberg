@@ -47,6 +47,7 @@ function FullscreenModeClose( { icon } ) {
 			className="edit-site-fullscreen-mode-close has-icon"
 			href="index.php"
 			label={ __( 'Back' ) }
+			showTooltip
 		>
 			{ buttonIcon }
 		</Button>
