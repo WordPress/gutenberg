@@ -44,7 +44,7 @@ function FullscreenModeClose( { icon } ) {
 
 	return (
 		<Button
-			className="edit-site-fullscreen-mode-close"
+			className="edit-site-fullscreen-mode-close has-icon"
 			href="index.php"
 			label={ __( 'Back' ) }
 		>
