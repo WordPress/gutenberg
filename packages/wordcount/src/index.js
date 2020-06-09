@@ -37,7 +37,7 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
  * @return {WPWordCountSettings} The combined settings object to be used.
  */
 function loadSettings( type, userSettings ) {
-	const settings = extend( defaultSettings, userSettings );
+	const settings = extend( {}, defaultSettings, userSettings );
 
 	settings.shortcodes = settings.l10n?.shortcodes ?? [];
 
