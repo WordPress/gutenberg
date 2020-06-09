@@ -29,7 +29,7 @@ After checking that everything looks good, you just need to push the changes:
 git push --tags
 ```
 
-# Release Checklist
+# Release Checklist Template
 
 Just copy this checklist and replace all occurrences of `X.XX.X` with the applicable release number, when we are ready to
 cut a new release.
@@ -38,6 +38,10 @@ cut a new release.
 <!-- wp:heading {"level":1} -->
 <h1>Gutenberg Mobile X.XX.X – Release Scenario</h1>
 <!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This checklist is based on the <a href="https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/docs/Releasing.md#release-checklist">Release Checklist Template</a>. If you need a checklist for a new gutenberg-mobile release, please copy from that template.</p>
+<!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
 <p>+mobilegutenberg</p>
