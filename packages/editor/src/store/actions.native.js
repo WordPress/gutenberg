@@ -25,3 +25,17 @@ export function togglePostTitleSelection( isSelected = true ) {
 export function* autosave() {
 	RNReactNativeGutenbergBridge.editorDidAutosave();
 }
+
+/**
+ * Returns an action object to set the clipboard data.
+ *
+ * @param {Object} clipboard Stored clipboard data.
+ *
+ * @return {Object} Action object.
+ */
+export function updateClipboard( clipboard ) {
+	return {
+		type: 'UPDATE_CLIPBOARD',
+		clipboard,
+	};
+}

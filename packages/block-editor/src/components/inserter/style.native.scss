@@ -78,3 +78,13 @@
 .columnPadding {
 	padding: $panel-padding;
 }
+
+.clipboardBlock {
+	background-color: transparent;
+	border-width: 1px;
+	border-color: $light-gray-400;
+}
+
+.clipboardBlockDark {
+	border-color: $gray-70;
+}

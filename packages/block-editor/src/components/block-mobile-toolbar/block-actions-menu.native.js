@@ -7,11 +7,15 @@ import { partial, first, castArray, last, compact } from 'lodash';
  * WordPress dependencies
  */
 import { ToolbarButton, Picker } from '@wordpress/components';
-import { getBlockType, getDefaultBlockName } from '@wordpress/blocks';
+import {
+	getBlockType,
+	getDefaultBlockName,
+	serialize,
+} from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { moreHorizontalMobile, trash, cog } from '@wordpress/icons';
+import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
@@ -31,12 +35,15 @@ const BlockActionsMenu = ( {
 	blockTitle,
 	isEmptyDefaultBlock,
 	anchorNodeRef,
+	getBlocksByClientId,
+	selectedBlockClientId,
+	updateClipboard,
+	duplicateBlock,
 } ) => {
 	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ], blockTitle };
 
 	const {
-		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
 		actionTitle: {
 			backward: backwardButtonTitle,
 			forward: forwardButtonTitle,
@@ -48,7 +55,6 @@ const BlockActionsMenu = ( {
 		// translators: %s: block title e.g: "Paragraph".
 		label: sprintf( __( 'Remove %s' ), blockTitle ),
 		value: 'deleteOption',
-		icon: trash,
 		separated: true,
 		disabled: isEmptyDefaultBlock,
 	};
@@ -58,14 +64,12 @@ const BlockActionsMenu = ( {
 		// translators: %s: block title e.g: "Paragraph".
 		label: sprintf( __( '%s Settings' ), blockTitle ),
 		value: 'settingsOption',
-		icon: cog,
 	};
 
 	const backwardButtonOption = {
 		id: 'backwardButtonOption',
 		label: backwardButtonTitle,
 		value: 'backwardButtonOption',
-		icon: backwardButtonIcon,
 		disabled: isFirst,
 	};
 
@@ -73,18 +77,31 @@ const BlockActionsMenu = ( {
 		id: 'forwardButtonOption',
 		label: forwardButtonTitle,
 		value: 'forwardButtonOption',
-		icon: forwardButtonIcon,
 		disabled: isLast,
+	};
+
+	const copyButtonOption = {
+		id: 'copyButtonOption',
+		label: __( 'Copy' ),
+		value: 'copyButtonOption',
+	};
+
+	const duplicateButtonOption = {
+		id: 'duplicateButtonOption',
+		label: __( 'Duplicate' ),
+		value: 'duplicateButtonOption',
 	};
 
 	const options = compact( [
 		wrapBlockMover && backwardButtonOption,
 		wrapBlockMover && forwardButtonOption,
 		wrapBlockSettings && settingsOption,
+		copyButtonOption,
+		duplicateButtonOption,
 		deleteOption,
 	] );
 
-	function onPickerSelect( value ) {
+	async function onPickerSelect( value ) {
 		switch ( value ) {
 			case deleteOption.value:
 				onDelete();
@@ -97,6 +114,14 @@ const BlockActionsMenu = ( {
 				break;
 			case backwardButtonOption.value:
 				onMoveUp();
+				break;
+			case copyButtonOption.value:
+				const copyBlock = getBlocksByClientId( selectedBlockClientId );
+				const copySerialized = serialize( copyBlock );
+				updateClipboard( copySerialized );
+				break;
+			case duplicateButtonOption.value:
+				duplicateBlock();
 				break;
 		}
 	}
@@ -133,6 +158,7 @@ const BlockActionsMenu = ( {
 				destructiveButtonIndex={ options.length }
 				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform.OS !== 'ios' }
+				leftAlign={ true }
 				anchor={
 					anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined
 				}
@@ -149,6 +175,8 @@ export default compose(
 			getBlockOrder,
 			getBlockName,
 			getBlock,
+			getBlocksByClientId,
+			getSelectedBlockClientIds,
 		} = select( 'core/block-editor' );
 		const normalizedClientIds = castArray( clientIds );
 		const block = getBlock( normalizedClientIds );
@@ -177,18 +205,25 @@ export default compose(
 			rootClientId,
 			blockTitle,
 			isEmptyDefaultBlock,
+			getBlocksByClientId,
+			selectedBlockClientId: getSelectedBlockClientIds(),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp } = dispatch(
+		const { moveBlocksDown, moveBlocksUp, duplicateBlocks } = dispatch(
 			'core/block-editor'
 		);
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+		const { updateClipboard } = dispatch( 'core/editor' );
 
 		return {
 			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
 			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
+			updateClipboard,
+			duplicateBlock() {
+				return duplicateBlocks( clientIds );
+			},
 		};
 	} ),
 	withInstanceId

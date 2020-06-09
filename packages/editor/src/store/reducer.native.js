@@ -49,6 +49,23 @@ export const postTitle = combineReducers( {
 	},
 } );
 
+/**
+ * Reducer returning the clipboard state.
+ *
+ * @param {Object}  state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function clipboard( state = null, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_CLIPBOARD':
+			return action.clipboard;
+	}
+
+	return state;
+}
+
 export default optimist(
 	combineReducers( {
 		postId,
@@ -62,5 +79,6 @@ export default optimist(
 		template,
 		isReady,
 		editorSettings,
+		clipboard,
 	} )
 );
