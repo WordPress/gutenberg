@@ -12,9 +12,6 @@ const { hasSameCoreSource } = require( './wordpress' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
- */
-
-/**
  * @typedef {import('./config').WPServiceConfig} WPServiceConfig
  */
 
@@ -22,6 +19,9 @@ const { hasSameCoreSource } = require( './wordpress' );
  * Gets the volume mounts for an individual service.
  *
  * @param {WPServiceConfig} config The service config to get the mounts from.
+ * @param {string} wordpressDefault The default internal path for the WordPress
+ *                                  source code (such as tests-wordpress).
+ *
  * @return {string[]} An array of volumes to mount in string format.
  */
 function getMounts( config, wordpressDefault = 'wordpress' ) {
