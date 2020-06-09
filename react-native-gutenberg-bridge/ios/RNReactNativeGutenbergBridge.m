@@ -23,6 +23,6 @@ RCT_EXTERN_METHOD(requestUnsupportedBlockFallback:(NSString *)content blockId:(N
 RCT_EXTERN_METHOD(addMention:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)rejecter)
 RCT_EXTERN_METHOD(requestStarterPageTemplatesTooltipShown:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(setStarterPageTemplatesTooltipShown:(BOOL)tooltipShown)
-RCT_EXTERN_METHOD(acknowledgeConnecton:(NSString *)token)
+RCT_EXTERN_METHOD(acknowledgeConnecton)
 
 @end

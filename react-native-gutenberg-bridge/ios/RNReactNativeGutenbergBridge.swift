@@ -198,13 +198,9 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    public func acknowledgeConnecton(_ token: String?) {
+    public func acknowledgeConnecton() {
 
         guard !connectionEstablished else { return } // We have an established connection no need to trigger a new one.
-        guard let token = token, token == handshakeToken.uuidString else {
-            sendEvent(withName: RNReactNativeGutenbergBridge.EventName.handshake.rawValue, body: handshakeToken.uuidString)
-            return
-        }
 
         connectionEstablished = true
         queuedEventProcessQueue.async { // replay the triggered events in order on a synchronized queue as the array is mutating
@@ -217,18 +213,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
     public override func sendEvent(withName name: String!, body: Any!) {
 
-        if connectionEstablished {
-            super.sendEvent(withName: name, body: body)
-        } else {
-            let event = GutenbergEvent(name: name, body: body)
-            queueEvent(event)
-            super.sendEvent(withName: RNReactNativeGutenbergBridge.EventName.handshake.rawValue, body: handshakeToken.uuidString)
-        }
-    }
-
-    func queueEvent(_ event:GutenbergEvent) {
-        queuedEventProcessQueue.async { // adding on a synchronized queue as the array might mutate by another process.
-            self.queuedEvents.append(event)
+        queuedEventProcessQueue.async { // checking on a synchronized queue as the array might mutate by another process.
+            if self.connectionEstablished && self.queuedEvents.count == 0 {
+                super.sendEvent(withName: name, body: body)
+            } else {
+                let event = GutenbergEvent(name: name, body: body)
+                self.queuedEvents.append(event)
+            }
         }
     }
 

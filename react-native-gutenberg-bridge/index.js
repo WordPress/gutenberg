@@ -83,10 +83,6 @@ export function subscribePreferredColorScheme( callback ) {
 	return gutenbergBridgeEvents.addListener( 'preferredColorScheme', callback );
 }
 
-export function subscribeHandshake( callback ) {
-	return gutenbergBridgeEvents.addListener( 'handshake', callback );
-}
-
 /**
  * @callback FnReplaceBlockCompletion
  * @param {string} html the HTML to replace the block.
