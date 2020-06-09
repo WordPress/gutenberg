@@ -1,9 +1,18 @@
+struct GutenbergEvent {
+    let name: String
+    let body: Any
+}
+
 @objc (RNReactNativeGutenbergBridge)
 public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     weak var delegate: GutenbergBridgeDelegate?
     weak var dataSource: GutenbergBridgeDataSource?
     private var isJSLoading = true
     private var hasObservers = false
+    private var connectionEstablished = false
+    private let handshakeToken = UUID()
+    private var queuedEvents = [GutenbergEvent]()
+    private let queuedEventProcessQueue = DispatchQueue(label:"LockingQueue")
 
     // MARK: - Messaging methods
 
@@ -188,6 +197,41 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
+    @objc
+    public func acknowledgeConnecton(_ token: String?) {
+
+        guard !connectionEstablished else { return } // We have an established connection no need to trigger a new one.
+        guard let token = token, token == handshakeToken.uuidString else {
+            sendEvent(withName: RNReactNativeGutenbergBridge.EventName.handshake.rawValue, body: handshakeToken.uuidString)
+            return
+        }
+
+        connectionEstablished = true
+        queuedEventProcessQueue.async { // replay the triggered events in order on a synchronized queue as the array is mutating
+            while (self.queuedEvents.count > 0) {
+                let event = self.queuedEvents.removeFirst()
+                self.sendEvent(withName: event.name, body: event.body)
+            }
+        }
+    }
+
+    public override func sendEvent(withName name: String!, body: Any!) {
+
+        if connectionEstablished {
+            super.sendEvent(withName: name, body: body)
+        } else {
+            let event = GutenbergEvent(name: name, body: body)
+            queueEvent(event)
+            super.sendEvent(withName: RNReactNativeGutenbergBridge.EventName.handshake.rawValue, body: handshakeToken.uuidString)
+        }
+    }
+
+    func queueEvent(_ event:GutenbergEvent) {
+        queuedEventProcessQueue.async { // adding on a synchronized queue as the array might mutate by another process.
+            self.queuedEvents.append(event)
+        }
+    }
+
     private func shouldLog(with level: Int) -> Bool {
         return level >= RCTGetLogThreshold().rawValue
     }
@@ -267,6 +311,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
 extension RNReactNativeGutenbergBridge {
     enum EventName: String, CaseIterable {
+        case handshake
         case requestGetHtml
         case setTitle
         case toggleHTMLMode
