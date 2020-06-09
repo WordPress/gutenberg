@@ -475,7 +475,10 @@ function CoverEdit( {
 		<>
 			{ controls }
 			<Block.div className={ classes } data-url={ url } style={ style }>
-				<BoxControlVisualizer values={ styleAttribute?.padding } />
+				<BoxControlVisualizer
+					values={ styleAttribute?.spacing?.padding }
+					showValues={ styleAttribute?.visualizers?.padding }
+				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
 					onResizeStart={ () => {

@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+import { useHover } from 'react-use-gesture';
+
+/**
  * Internal dependencies
  */
 import BaseTooltip from '../tooltip';
@@ -8,12 +14,22 @@ export default function BoxUnitControl( {
 	isFirst,
 	isLast,
 	isOnly,
+	onHoverOn = noop,
+	onHoverOff = noop,
 	label,
 	value,
 	...props
 } ) {
+	const bindHoverGesture = useHover( ( { event, ...state } ) => {
+		if ( state.hovering ) {
+			onHoverOn( event, state );
+		} else {
+			onHoverOff( event, state );
+		}
+	} );
+
 	return (
-		<UnitControlWrapper aria-label={ label }>
+		<UnitControlWrapper aria-label={ label } { ...bindHoverGesture() }>
 			<Tooltip text={ label }>
 				<UnitControl
 					className="component-box-control__unit-control"
