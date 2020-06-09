@@ -9,6 +9,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
 	subscribeUpdateTheme,
+	subscribeHandshake,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -110,9 +111,22 @@ class NativeEditorProvider extends Component {
 				this.props.updateSettings( theme );
 			}
 		);
+
+		// This should always be last in the list of subscribers
+		this.subscriptionParentHandshake = subscribeHandshake( ( token ) => {
+			// Acknowledge that the token was recieved and the bridge is able to accept events.
+			RNReactNativeGutenbergBridge.acknowledgeConnecton( token );
+		} );
+
+		// Let the native side know that the bridge is open. This will trigger a new handshake if one was already attempted.
+		RNReactNativeGutenbergBridge.acknowledgeConnecton( undefined );
 	}
 
 	componentWillUnmount() {
+		if ( this.subscriptionParentHandshake ) {
+			this.subscriptionParentHandshake.remove();
+		}
+
 		if ( this.subscriptionParentGetHtml ) {
 			this.subscriptionParentGetHtml.remove();
 		}

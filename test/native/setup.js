@@ -15,6 +15,7 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		subscribeMediaAppend: jest.fn(),
 		subscribeAndroidModalClosed: jest.fn(),
 		subscribeUpdateTheme: jest.fn(),
+		subscribeHandshake: jest.fn(),
 		subscribePreferredColorScheme: () => 'light',
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
