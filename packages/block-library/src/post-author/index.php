@@ -24,7 +24,9 @@ function post_author_build_css_colors( $attributes ) {
 
 	// Text color.
 	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
+	$has_custom_text_color = array_key_exists( 'style', $attributes )
+	&& array_key_exists( 'color', $attributes['style'] )
+	&& array_key_exists( 'text', $attributes['style']['color'] );
 
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
@@ -42,10 +44,18 @@ function post_author_build_css_colors( $attributes ) {
 
 	// Background color.
 	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
+	$has_custom_background_color = array_key_exists( 'style', $attributes )
+	&& array_key_exists( 'color', $attributes['style'] )
+	&& array_key_exists( 'background', $attributes['style']['color'] );
+
+	// Gradient color.
+	$has_named_gradient  = array_key_exists( 'gradient', $attributes );
+	$has_custom_gradient = array_key_exists( 'style', $attributes )
+	&& array_key_exists( 'color', $attributes['style'] )
+	&& array_key_exists( 'gradient', $attributes['style']['color'] );
 
 	// If has background color.
-	if ( $has_custom_background_color || $has_named_background_color ) {
+	if ( $has_custom_background_color || $has_named_background_color || $has_named_gradient || $has_custom_gradient ) {
 		// Add has-background-color class.
 		$background_colors['css_classes'][] = 'has-background-color';
 	}
@@ -55,7 +65,11 @@ function post_author_build_css_colors( $attributes ) {
 		$background_colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
-		$background_colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
+		$background_colors['inline_styles'] .= sprintf( 'background-color: %s;',  $attributes['style']['color']['background'] );
+	} elseif( $has_named_gradient ) {
+		$background_colors['css_classes'][] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
+	} elseif( $has_custom_gradient ) {
+		$background_colors['inline_styles'] .= sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
 	}
 
 	return array(
