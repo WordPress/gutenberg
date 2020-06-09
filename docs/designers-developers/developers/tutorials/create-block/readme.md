@@ -7,17 +7,19 @@ The tutorial includes setting up your development environment, tools, and gettin
 
 ## Quick Start
 
-The `@wordpress/create-block` package exists to create the necessary block scaffolding to get you started. See [create-block package documentation](https://www.npmjs.com/package/@wordpress/create-block) for additional features. This quick start assumes you have a development environment with node installed, and a WordPress site. From your plugins directory, to create your block run:
+The `@wordpress/create-block` package exists to create the necessary block scaffolding to get you started. See [create-block package documentation](https://www.npmjs.com/package/@wordpress/create-block) for additional features. This quick start assumes you have a development environment with node installed, and a WordPress site.
+
+From your plugins directory, to create your block run:
 
 ```bash
 npx @wordpress/create-block starter-block
-cd starter-block
-npm run build
 ```
 
-The above commands create a new directory called `starter-block`, installs the necessary files and builds the block plugin.
+The above command will ask you a few questions to customize, then will create a new directory called `starter-block`, installs the necessary files, and builds the block plugin.
 
-If you ran from within your WordPress sites plugin directory, you can add and activate it from your WordPress site. After activated, go to the block editor and use the inserter to search and add your new block.
+You now need to activate the plugin from inside wp-admin plugins page.
+
+After activated, go to the block editor and use the inserter to search and add your new block.
 
 ## Table of Contents
 

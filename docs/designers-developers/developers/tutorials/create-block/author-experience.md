@@ -16,19 +16,19 @@ import { Placeholder, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit( { attributes, className, setAttributes } ) {
-    return (
-        <div className={ className }>
+		return (
+				<div className={ className }>
 			<Placeholder
-			  label="Gutenpride Block"
-			  instructions="Add your message"
+				label="Gutenpride Block"
+				instructions="Add your message"
 			>
-			  <TextControl
-			    value={ attributes.message }
-			    onChange={ ( val ) => setAttributes( { message: val } ) }
-			  />
+				<TextControl
+					value={ attributes.message }
+					onChange={ ( val ) => setAttributes( { message: val } ) }
+				/>
 			</Placeholder>
-        </div>
-    );
+				</div>
+		);
 }
 ```
 
@@ -39,22 +39,28 @@ The placeholder looks ok, for a simple text message it may or may not be what yo
 For this we can use a ternary function, to display content based on a value being set or not. A ternary function is an inline if-else statement, using the syntax:
 
 ```js
-  ( clause ) ? ( doIfTrue ) : ( doIfFalse )
+	( clause ) ? ( doIfTrue ) : ( doIfFalse )
 ```
 
-This can be used inside a block to control what shows when a parameter is set or not. A simple case that checks if the `message` is set might look like:
+This can be used inside a block to control what shows when a parameter is set or not. A simple case that displays a `message` if set, otherwise show the form element:
 
 ```jsx
-  return (
-    <div>
-      { attributes.message ?
-        <div> Message: { attributes.message }</div> :
-        <div> No Message <TextField/> </div>
-      }
-  );
+	return (
+		<div>
+			{ attributes.message ?
+				<div>Message: { attributes.message }</div> :
+				<div>
+					<p>No Message.</p>
+					<TextControl
+						value={ attributes.message }
+						onChange={ ( val ) => setAttributes( { message: val } ) }
+					/>
+				</div>
+			}
+	);
 ```
 
-If we only used the above check, as soon as we type anything, the textfield would disappear since the message would be set. So we need to pair with the `isSelected` parameter.
+There is a problem with the above, if we only use the `attributes.message` check, as soon as we type in the text field it would disappear since the message would then be set to a value. So we need to pair with an additional `isSelected` parameter.
 
 The `isSelected` parameter is passed in to the `edit` function and is set to true if the block is selected in the editor (currently editing) otherwise set to false (editing elsewhere).
 
@@ -73,24 +79,24 @@ import { Placeholder, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit( { attributes, className, isSelected, setAttributes } ) {
-    return (
-        <div>
-        { attributes.message && !isSelected ?
-            <div className={ className }>
-                { attributes.message }
-            </div> :
-			<Placeholder
-			  label="Gutenpride Block"
-			  instructions="Add your message"
-			>
-			  <TextControl
-			    value={ attributes.message }
-			    onChange={ ( val ) => setAttributes( { message: val } ) }
-			  />
-            </Placeholder>
-        }
-        </div>
-    );
+		return (
+			<div className={ className }>
+				{ attributes.message && !isSelected ?
+					<div>
+						{ attributes.message }
+					</div> :
+					<Placeholder
+						label="Gutenpride Block"
+						instructions="Add your message"
+					>
+						<TextControl
+							value={ attributes.message }
+							onChange={ ( val ) => setAttributes( { message: val } ) }
+						/>
+					</Placeholder>
+				}
+			</div>
+		);
 }
 ```
 
@@ -98,9 +104,9 @@ With that in place, rebuild and reload and when you are not editing the message 
 
 ## A Better Solution
 
-Replacing the Placeholder and TextControl when it is selected or not is jarring and not an ideal situation for this block. This was mainly used to illustrate what can be done depending on your block. It is important to think about the author's experience using the block.
+The switching between a Placeholder and input control works well with a visual element like an image or video, but for the text example in this block we can do better.
 
-The simpler and better solution is to modify the editor.css to include the proper style for the textfield, this will give the stylized text while typing.
+The simpler and better solution is to modify the `editor.css` to include the proper stylized text while typing.
 
 Update `editor.css` to:
 
@@ -115,15 +121,14 @@ The edit function can simply be:
 
 ```jsx
 import { TextControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 export default function Edit( { attributes, className, setAttributes } ) {
-    return (
-        <TextControl
-            className={ className }
-            value={ attributes.message }
-            onChange={ ( val ) => setAttributes( { message: val } ) }
-        />
-    );
+	return (
+		<TextControl
+			className={ className }
+			value={ attributes.message }
+			onChange={ ( val ) => setAttributes( { message: val } ) }
+		/>
+	);
 }
 ```
