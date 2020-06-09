@@ -3,6 +3,7 @@
  */
 import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { VisuallyHidden } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -28,7 +29,7 @@ function QuickInserterList( {
 	onSelectBlockPattern,
 	onHover,
 } ) {
-	const showBlockTypes = useMemo(
+	const shownBlockTypes = useMemo(
 		() => blockTypes.slice( 0, SHOWN_BLOCK_TYPES ),
 		[ blockTypes ]
 	);
@@ -37,28 +38,42 @@ function QuickInserterList( {
 		[ blockTypes ]
 	);
 	return (
-		<div className="block-editor-inserter__quick-inserter__results">
-			{ ! showBlockTypes.length && ! shownBlockPatterns.length && (
+		<div className="block-editor-inserter__quick-inserter-results">
+			{ ! shownBlockTypes.length && ! shownBlockPatterns.length && (
 				<InserterNoResults />
 			) }
 
-			{ !! showBlockTypes.length && (
-				<InserterPanel title={ __( 'Blocks' ) }>
+			{ !! shownBlockTypes.length && (
+				<InserterPanel
+					title={
+						<VisuallyHidden>{ __( 'Blocks' ) }</VisuallyHidden>
+					}
+				>
 					<BlockTypesList
-						items={ showBlockTypes }
+						items={ shownBlockTypes }
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
 					/>
 				</InserterPanel>
 			) }
 
+			{ !! shownBlockTypes.length && !! shownBlockPatterns.length && (
+				<div className="block-editor-inserter__quick-inserter-separator" />
+			) }
+
 			{ !! shownBlockPatterns.length && (
-				<InserterPanel title={ __( 'Patterns' ) }>
-					<BlockPatternsList
-						shownPatterns={ shownBlockPatterns }
-						blockPatterns={ shownBlockPatterns }
-						onClickPattern={ onSelectBlockPattern }
-					/>
+				<InserterPanel
+					title={
+						<VisuallyHidden>{ __( 'Blocks' ) }</VisuallyHidden>
+					}
+				>
+					<div className="block-editor-inserter__quick-inserter-patterns">
+						<BlockPatternsList
+							shownPatterns={ shownBlockPatterns }
+							blockPatterns={ shownBlockPatterns }
+							onClickPattern={ onSelectBlockPattern }
+						/>
+					</div>
 				</InserterPanel>
 			) }
 		</div>
