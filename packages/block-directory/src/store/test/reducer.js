@@ -17,7 +17,7 @@ import { blockTypeInstalled, downloadableBlock } from './fixtures';
 describe( 'state', () => {
 	describe( 'downloadableBlocks()', () => {
 		it( 'should update state to reflect active search', () => {
-			const initialState = {};
+			const initialState = deepFreeze( {} );
 			const filterValue = 'Awesome Block';
 
 			const state = downloadableBlocks( initialState, {
@@ -30,11 +30,11 @@ describe( 'state', () => {
 
 		it( 'should update state to reflect search results have returned', () => {
 			const query = downloadableBlock.title;
-			const initialState = {
+			const initialState = deepFreeze( {
 				[ query ]: {
 					isRequesting: true,
 				},
-			};
+			} );
 
 			const state = downloadableBlocks( initialState, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
@@ -47,14 +47,12 @@ describe( 'state', () => {
 
 		it( "should set user's search term and save results", () => {
 			const query = downloadableBlock.title;
-			const state = downloadableBlocks(
-				{},
-				{
-					type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-					filterValue: query,
-					downloadableBlocks: [ downloadableBlock ],
-				}
-			);
+			const initialState = deepFreeze( {} );
+			const state = downloadableBlocks( initialState, {
+				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
+				filterValue: query,
+				downloadableBlocks: [ downloadableBlock ],
+			} );
 			expect( state ).toHaveProperty( query );
 			expect( state[ query ].results ).toHaveLength( 1 );
 		} );
