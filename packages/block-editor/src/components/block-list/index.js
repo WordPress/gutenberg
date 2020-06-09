@@ -38,6 +38,7 @@ function BlockList(
 		const {
 			getBlockOrder,
 			getBlockDropTarget,
+			getBlockListSettings,
 			isMultiSelecting,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
@@ -52,6 +53,8 @@ function BlockList(
 			isMultiSelecting: isMultiSelecting(),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+			moverDirection: getBlockListSettings( rootClientId )
+				?.__experimentalMoverDirection,
 			hasMultiSelection: hasMultiSelection(),
 			enableAnimation:
 				! isTyping() &&
@@ -65,6 +68,7 @@ function BlockList(
 		isMultiSelecting,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
+		moverDirection,
 		hasMultiSelection,
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
@@ -74,6 +78,10 @@ function BlockList(
 		element: ref,
 		rootClientId,
 	} );
+
+	const isAppenderDropTarget =
+		blockDropTarget.rootClientId === rootClientId &&
+		blockDropTarget.blockIndex === blockClientIds.length;
 
 	return (
 		<Container
@@ -90,6 +98,10 @@ function BlockList(
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
+				const isDropTarget =
+					blockDropTarget.rootClientId === rootClientId &&
+					blockDropTarget.blockIndex === index;
+
 				return (
 					<AsyncModeProvider
 						key={ clientId }
@@ -104,12 +116,12 @@ function BlockList(
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }
 							enableAnimation={ enableAnimation }
-							className={
-								blockDropTarget.rootClientId === rootClientId &&
-								blockDropTarget.blockIndex === index
-									? 'is-drop-target'
-									: undefined
-							}
+							className={ classnames( {
+								'is-drop-target': isDropTarget,
+								'is-dropping-horizontally':
+									isDropTarget &&
+									moverDirection === 'horizontal',
+							} ) }
 						/>
 					</AsyncModeProvider>
 				);
@@ -118,12 +130,11 @@ function BlockList(
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={
-					blockDropTarget.rootClientId === rootClientId &&
-					blockDropTarget.blockIndex === blockClientIds.length
-						? 'is-drop-target'
-						: undefined
-				}
+				className={ classnames( {
+					'is-drop-target': isAppenderDropTarget,
+					'is-dropping-horizontally':
+						isAppenderDropTarget && moverDirection === 'horizontal',
+				} ) }
 			/>
 		</Container>
 	);
