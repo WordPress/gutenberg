@@ -96,6 +96,11 @@
 			opacity: 1;
 		}
 	}
+}
+
+.block-editor-block-list__layout .block-editor-block-list__block,
+.block-editor-block-list__layout .block-list-appender {
+	position: relative;
 
 	// Between-blocks dropzone line indicator.
 	&.is-drop-target::before {
@@ -110,7 +115,6 @@
 		border-top: 4px solid var(--wp-admin-theme-color);
 	}
 }
-
 
 /**
  * Cross-Block Selection
