@@ -89,13 +89,13 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
 						'crop_x'      => array(
-							'description' => __( 'Crop x offset percentage', 'gutenberg' ),
+							'description' => __( 'Crop offset percentage from left', 'gutenberg' ),
 							'type'        => 'number',
 							'minimum'     => 0,
 							'required'    => true,
 						),
 						'crop_y'      => array(
-							'description' => __( 'Crop y offset percentage', 'gutenberg' ),
+							'description' => __( 'Crop offset percentage from top', 'gutenberg' ),
 							'type'        => 'number',
 							'minimum'     => 0,
 							'required'    => true,
