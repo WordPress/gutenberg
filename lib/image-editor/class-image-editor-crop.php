@@ -12,30 +12,30 @@
  */
 class Image_Editor_Crop extends Image_Editor_Modifier {
 	/**
-	 * Pixels from the left for the crop.
+	 * Distance from the left for the crop.
 	 *
-	 * @var integer
+	 * @var float
 	 */
 	private $crop_x = 0;
 
 	/**
-	 * Pixels from the top for the crop.
+	 * Distance from the top for the crop.
 	 *
-	 * @var integer
+	 * @var float
 	 */
 	private $crop_y = 0;
 
 	/**
-	 * Width in pixels for the crop.
+	 * Width of the crop.
 	 *
-	 * @var integer
+	 * @var float
 	 */
 	private $width = 0;
 
 	/**
-	 * Height in pixels for the crop.
+	 * Height of the crop.
 	 *
-	 * @var integer
+	 * @var float
 	 */
 	private $height = 0;
 
@@ -44,10 +44,10 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 	 *
 	 * Will populate object properties from the provided arguments.
 	 *
-	 * @param integer $crop_x Pixels from the left for the crop.
-	 * @param integer $crop_y Pixels from the top for the crop.
-	 * @param integer $width  Width in pixels for the crop.
-	 * @param integer $height Height in pixels for the crop.
+	 * @param float $crop_x Percentage from the left for the crop.
+	 * @param float $crop_y Percentage from the top for the crop.
+	 * @param float $width  Percentage width for the crop.
+	 * @param float $height Percentage height for the crop.
 	 */
 	public function __construct( $crop_x, $crop_y, $width, $height ) {
 		$this->crop_x = floatval( $crop_x );
