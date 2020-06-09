@@ -1147,6 +1147,26 @@ export function isDraggingBlocks( state = false, action ) {
 }
 
 /**
+ *
+ * @param {*} state
+ * @param {*} action
+ */
+export function blockDropTarget( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_DROP_TARGET':
+			const { rootClientId, blockIndex } = action;
+			return {
+				rootClientId,
+				blockIndex,
+			};
+		case 'STOP_DRAGGING_BLOCKS':
+			return {};
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning whether the caret is within formatted text.
  *
  * @param {boolean} state  Current state.
@@ -1625,6 +1645,7 @@ export default combineReducers( {
 	blocks,
 	isTyping,
 	isDraggingBlocks,
+	blockDropTarget,
 	isCaretWithinFormattedText,
 	selectionStart,
 	selectionEnd,

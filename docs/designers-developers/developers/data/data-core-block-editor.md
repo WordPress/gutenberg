@@ -115,6 +115,19 @@ _Returns_
 
 -   `number`: Number of blocks in the post.
 
+<a name="getBlockDropTarget" href="#getBlockDropTarget">#</a> **getBlockDropTarget**
+
+Returns an object with the root client id and index representing the
+position a user is dragging a block over.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether user is dragging blocks.
+
 <a name="getBlockHierarchyRootClientId" href="#getBlockHierarchyRootClientId">#</a> **getBlockHierarchyRootClientId**
 
 Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -1245,6 +1258,20 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+
+<a name="setBlockDropTarget" href="#setBlockDropTarget">#</a> **setBlockDropTarget**
+
+Returns an action object used in signalling that the user is dragging a
+block over a particular position in a block list.
+
+_Parameters_
+
+-   _rootClientId_ `(undefined|string)`: The clientId representing the block list the block is being hovered over.
+-   _blockIndex_ `number`: The index representing the position the block is being hovered over.
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 

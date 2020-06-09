@@ -37,6 +37,7 @@ function BlockList(
 	function selector( select ) {
 		const {
 			getBlockOrder,
+			getBlockDropTarget,
 			isMultiSelecting,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
@@ -47,6 +48,7 @@ function BlockList(
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
+			blockDropTarget: getBlockDropTarget(),
 			isMultiSelecting: isMultiSelecting(),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
@@ -59,6 +61,7 @@ function BlockList(
 
 	const {
 		blockClientIds,
+		blockDropTarget,
 		isMultiSelecting,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
@@ -67,7 +70,7 @@ function BlockList(
 	} = useSelect( selector, [ rootClientId ] );
 
 	const Container = rootClientId ? __experimentalTagName : RootContainer;
-	const targetClientId = useBlockDropZone( {
+	useBlockDropZone( {
 		element: ref,
 		rootClientId,
 	} );
@@ -102,7 +105,8 @@ function BlockList(
 							index={ index }
 							enableAnimation={ enableAnimation }
 							className={
-								clientId === targetClientId
+								blockDropTarget.rootClientId === rootClientId &&
+								blockDropTarget.blockIndex === index
 									? 'is-drop-target'
 									: undefined
 							}
@@ -115,7 +119,10 @@ function BlockList(
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
 				className={
-					targetClientId === null ? 'is-drop-target' : undefined
+					blockDropTarget.rootClientId === rootClientId &&
+					blockDropTarget.blockIndex === blockClientIds.length
+						? 'is-drop-target'
+						: undefined
 				}
 			/>
 		</Container>
