@@ -1,6 +1,6 @@
 # Edit navigation
 
-Edit Navigation Page Module for WordPress. It provides an alternative UI for editing navigation menus, one that leverages Gutenberg blocks.
+Edit Navigation page module for WordPress - a Gutenberg-based UI for editing navigation menus.
 
 > This package is meant to be used only with WordPress core. Feel free to use it in your own project but please keep in mind that it might never get fully documented.
 
