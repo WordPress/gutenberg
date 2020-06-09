@@ -190,9 +190,9 @@ function RichImage( props ) {
 				setIsProgress( null );
 				setIsCropping( false );
 
-				if ( response.mediaID && response.mediaID !== id ) {
+				if ( response.media_id && response.media_id !== id ) {
 					setAttributes( {
-						id: response.mediaID,
+						id: response.media_id,
 						url: response.url,
 					} );
 				}
@@ -210,10 +210,10 @@ function RichImage( props ) {
 
 	function cropImage() {
 		adjustImage( 'crop', {
-			cropX: crop.x,
-			cropY: crop.y,
-			cropWidth: crop.width,
-			cropHeight: crop.height,
+			crop_x: crop.x,
+			crop_y: crop.y,
+			crop_width: crop.width,
+			crop_height: crop.height,
 		} );
 	}
 

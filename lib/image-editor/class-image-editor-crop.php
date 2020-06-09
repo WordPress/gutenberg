@@ -65,10 +65,10 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 	 * @return array Updated metadata.
 	 */
 	public function apply_to_meta( $meta ) {
-		$meta['cropX']      = $this->crop_x;
-		$meta['cropY']      = $this->crop_y;
-		$meta['cropWidth']  = $this->width;
-		$meta['cropHeight'] = $this->height;
+		$meta['crop_x']      = $this->crop_x;
+		$meta['crop_y']      = $this->crop_y;
+		$meta['crop_width']  = $this->width;
+		$meta['crop_height'] = $this->height;
 
 		return $meta;
 	}
@@ -101,8 +101,8 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 	 * @return string Filename for the edited image.
 	 */
 	public static function get_filename( $meta ) {
-		if ( isset( $meta['cropWidth'] ) && $meta['cropWidth'] > 0 ) {
-			$target_file = sprintf( 'crop-%d-%d-%d-%d', round( $meta['cropX'], 2 ), round( $meta['cropY'], 2 ), round( $meta['cropWidth'], 2 ), round( $meta['cropHeight'], 2 ) );
+		if ( isset( $meta['crop_width'] ) && $meta['crop_width'] > 0 ) {
+			$target_file = sprintf( 'crop-%d-%d-%d-%d', round( $meta['crop_x'], 2 ), round( $meta['crop_y'], 2 ), round( $meta['crop_width'], 2 ), round( $meta['crop_height'], 2 ) );
 
 			// We need to change the original name to include the crop. This way if it's cropped again we won't clash.
 			$meta['original_name'] = $target_file;

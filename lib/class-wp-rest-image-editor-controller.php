@@ -29,7 +29,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 */
 	public function __construct() {
 		$this->namespace = '__experimental';
-		$this->rest_base = '/richimage/(?P<mediaID>[\d]+)';
+		$this->rest_base = '/richimage/(?P<media_id>[\d]+)';
 		$this->editor    = new Image_Editor();
 	}
 
@@ -86,22 +86,22 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'crop_image' ),
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
-						'cropX'      => array(
+						'crop_x'      => array(
 							'type'     => 'number',
 							'minimum'  => 0,
 							'required' => true,
 						),
-						'cropY'      => array(
+						'crop_y'      => array(
 							'type'     => 'number',
 							'minimum'  => 0,
 							'required' => true,
 						),
-						'cropWidth'  => array(
+						'crop_width'  => array(
 							'type'     => 'number',
 							'minimum'  => 1,
 							'required' => true,
 						),
-						'cropHeight' => array(
+						'crop_height' => array(
 							'type'     => 'number',
 							'minimum'  => 1,
 							'required' => true,
@@ -124,7 +124,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function permission_callback( $request ) {
 		$params = $request->get_params();
 
-		if ( ! current_user_can( 'edit_post', $params['mediaID'] ) ) {
+		if ( ! current_user_can( 'edit_post', $params['media_id'] ) ) {
 			return new WP_Error( 'rest_cannot_edit_image', __( 'Sorry, you are not allowed to edit images.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 
@@ -145,7 +145,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 
 		$modifier = new Image_Editor_Rotate( $params['angle'] );
 
-		return $this->editor->modify_image( $params['mediaID'], $modifier );
+		return $this->editor->modify_image( $params['media_id'], $modifier );
 	}
 
 	/**
@@ -162,7 +162,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 
 		$modifier = new Image_Editor_Flip( $params['direction'] );
 
-		return $this->editor->modify_image( $params['mediaID'], $modifier );
+		return $this->editor->modify_image( $params['media_id'], $modifier );
 	}
 
 	/**
@@ -177,8 +177,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function crop_image( $request ) {
 		$params = $request->get_params();
 
-		$modifier = new Image_Editor_Crop( $params['cropX'], $params['cropY'], $params['cropWidth'], $params['cropHeight'] );
+		$modifier = new Image_Editor_Crop( $params['crop_x'], $params['crop_y'], $params['crop_width'], $params['crop_height'] );
 
-		return $this->editor->modify_image( $params['mediaID'], $modifier );
+		return $this->editor->modify_image( $params['media_id'], $modifier );
 	}
 }
