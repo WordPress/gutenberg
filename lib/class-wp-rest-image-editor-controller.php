@@ -68,7 +68,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
 						'direction' => array(
-							'type'     => 'enum',
+							'type'     => 'string',
 							'enum'     => array( 'vertical', 'horizontal' ),
 							'required' => true,
 						),
@@ -87,22 +87,22 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
 						'cropX'      => array(
-							'type'     => 'float',
+							'type'     => 'number',
 							'minimum'  => 0,
 							'required' => true,
 						),
 						'cropY'      => array(
-							'type'     => 'float',
+							'type'     => 'number',
 							'minimum'  => 0,
 							'required' => true,
 						),
 						'cropWidth'  => array(
-							'type'     => 'float',
+							'type'     => 'number',
 							'minimum'  => 1,
 							'required' => true,
 						),
 						'cropHeight' => array(
-							'type'     => 'float',
+							'type'     => 'number',
 							'minimum'  => 1,
 							'required' => true,
 						),
