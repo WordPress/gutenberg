@@ -48,7 +48,7 @@ function loadSettings( type, userSettings ) {
 		);
 	}
 
-	settings.type = type || settings.l10n?.type;
+	settings.type = type;
 
 	if (
 		settings.type !== 'characters_excluding_spaces' &&
