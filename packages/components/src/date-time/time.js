@@ -89,7 +89,7 @@ class TimePicker extends Component {
 		const month = selected.format( 'MM' );
 		const year = selected.format( 'YYYY' );
 		const minutes = selected.format( 'mm' );
-		const am = selected.format( 'A' ) === __( 'AM' ) ? 'AM' : 'PM';
+		const am = selected.format( 'H' ) <= 11 ? 'AM' : 'PM';
 		const hours = selected.format( is12Hour ? 'hh' : 'HH' );
 		const date = currentTime ? moment( currentTime ) : moment();
 		this.setState( { day, month, year, minutes, hours, am, date } );
