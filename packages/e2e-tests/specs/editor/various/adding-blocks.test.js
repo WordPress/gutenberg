@@ -8,7 +8,6 @@ import {
 	pressKeyTimes,
 	setBrowserViewport,
 	closeGlobalBlockInserter,
-	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -67,7 +66,6 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 		await page.keyboard.press( 'Backspace' );
-		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'Backspace' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
