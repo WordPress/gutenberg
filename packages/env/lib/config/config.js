@@ -55,7 +55,7 @@ const readRawConfigFile = require( './read-raw-config-file' );
  *
  * @param {string} configPath Path to the .wp-env.json file.
  *
- * @return {WPConfig} A wp-env config object.
+ * @return {WPConfig} A parsed and validated wp-env config object.
  */
 async function readConfig( configPath ) {
 	const configDirectoryPath = path.dirname( configPath );
@@ -76,22 +76,6 @@ async function readConfig( configPath ) {
 			'.wp-env.override.json',
 			configPath.replace( /\.wp-env\.json$/, '.wp-env.override.json' )
 		) ) || {};
-
-	// A handy merge function which lets us deep-merge the wp-config values
-	// instead of overwriting them. This is for merging environment
-	const mergeWpServiceConfigs = ( ...configs ) => {
-		// Returns an array of nested values in the config object. For example,
-		// an array of all the wp-config objects.
-		const getNestedValues = ( key, defaultValue = {} ) =>
-			configs.map( ( config ) => config[ key ] || defaultValue );
-
-		return {
-			...Object.assign( {}, ...configs ),
-			config: {
-				...Object.assign( {}, ...getNestedValues( 'config' ) ),
-			},
-		};
-	};
 
 	// Configuration applicable to all environments.
 	const defaultWpServiceConfig = mergeWpServiceConfigs(
@@ -170,6 +154,30 @@ async function readConfig( configPath ) {
 		workDirectoryPath,
 		env,
 	} );
+}
+
+/**
+ * Deep-merges the values in the given service environment. This allows us to
+ * merge the wp-config.php values instead of overwriting them. Note that this
+ * merges configs before they have been validated, so the passed config shape
+ * will not match the WPServiceConfig type.
+ *
+ * @param {Object[]} configs Array of raw service config objects to merge.
+ *
+ * @return {Object} The merged configuration object.
+ */
+function mergeWpServiceConfigs( ...configs ) {
+	// Returns an array of nested values in the config object. For example,
+	// an array of all the wp-config objects.
+	const getNestedValues = ( key, defaultValue = {} ) =>
+		configs.map( ( config ) => config[ key ] || defaultValue );
+
+	return {
+		...Object.assign( {}, ...configs ),
+		config: {
+			...Object.assign( {}, ...getNestedValues( 'config' ) ),
+		},
+	};
 }
 
 async function getDefaultBaseConfig( configPath ) {
