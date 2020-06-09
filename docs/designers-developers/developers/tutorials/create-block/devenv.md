@@ -13,9 +13,9 @@ The tools needed for development are **Node** and **NPM**. **Nodejs** is a runti
 
 The tools are used to convert the JavaScript we are going to write into a format that browsers can run. This is called transpiling or the build step.
 
-You can [download Nodejs](https://nodejs.org/en/download/) directly from the main website and install.
+You can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, installers are available for Windows and Mac, and binaries available for Linux.
 
-Alternatively, if you use a package manager, a node package is avilable for most package managers.
+An alternative installation, if you use a package manager, nodejs is available for most package managers.
 
 On Mac, [Homebrew](https://brew.sh/) is a popular package manager, if you use Homebrew install using: `brew install nodejs`
 
