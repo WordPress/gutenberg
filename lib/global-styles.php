@@ -281,6 +281,7 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
 		'background'       => array( '__experimentalColor', 'gradients' ),
 		'line-height'      => array( '__experimentalLineHeight' ),
 		'font-size'        => array( '__experimentalFontSize' ),
+		'padding'          => array( '__experimentalPadding' ),
 	);
 
 	$supported_features = array();
@@ -381,6 +382,7 @@ function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
 		'background-color'         => array( 'color', 'background' ),
 		'color'                    => array( 'color', 'text' ),
 		'--wp--style--color--link' => array( 'color', 'link' ),
+		'padding'                  => array( 'spacing', 'padding' ),
 	);
 
 	$result = array();

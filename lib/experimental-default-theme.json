@@ -167,5 +167,12 @@
 				"dropCap": false
 			}
 		}
+	},
+	"core/cover": {
+		"styles": {
+			"spacing": {
+				"padding": "var(--wp--preset--padding--unit-20)"
+			}
+		}
 	}
 }
