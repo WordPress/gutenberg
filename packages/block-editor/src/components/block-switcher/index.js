@@ -187,39 +187,42 @@ export class BlockSwitcher extends Component {
 												this.onHoverClassName
 											}
 										/>
+										{ hoveredClassName !== null && (
+											<div className="block-editor-block-switcher__preview">
+												<div className="block-editor-block-switcher__preview-title">
+													{ __( 'Preview' ) }
+												</div>
+												<BlockPreview
+													viewportWidth={ 500 }
+													blocks={
+														hoveredBlockType.example
+															? getBlockFromExample(
+																	hoveredBlock.name,
+																	{
+																		attributes: {
+																			...hoveredBlockType
+																				.example
+																				.attributes,
+																			className: hoveredClassName,
+																		},
+																		innerBlocks:
+																			hoveredBlockType
+																				.example
+																				.innerBlocks,
+																	}
+															  )
+															: cloneBlock(
+																	hoveredBlock,
+																	{
+																		className: hoveredClassName,
+																	}
+															  )
+													}
+												/>
+											</div>
+										) }
 									</MenuGroup>
 								) }
-							</div>
-						) }
-						{ hoveredClassName !== null && (
-							<div className="block-editor-block-switcher__preview">
-								<div className="block-editor-block-switcher__preview-title">
-									{ __( 'Preview' ) }
-								</div>
-								<BlockPreview
-									viewportWidth={ 500 }
-									blocks={
-										hoveredBlockType.example
-											? getBlockFromExample(
-													hoveredBlock.name,
-													{
-														attributes: {
-															...hoveredBlockType
-																.example
-																.attributes,
-															className: hoveredClassName,
-														},
-														innerBlocks:
-															hoveredBlockType
-																.example
-																.innerBlocks,
-													}
-											  )
-											: cloneBlock( hoveredBlock, {
-													className: hoveredClassName,
-											  } )
-									}
-								/>
 							</div>
 						) }
 					</>
