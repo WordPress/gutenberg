@@ -161,6 +161,7 @@ export function ImageEdit( {
 				alt: undefined,
 				id: undefined,
 				title: undefined,
+				caption: undefined,
 			} );
 			return;
 		}
@@ -175,9 +176,9 @@ export function ImageEdit( {
 			}
 		}
 
-		// If a caption text was meanwhile written by the user, make sure the
-		// text is not overwritten by another caption.
-		if ( caption ) {
+		// If a caption text was meanwhile written by the user,
+		// make sure the text is not overwritten by empty captions.
+		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
 			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
 		}
 
@@ -403,33 +404,11 @@ export function ImageEdit( {
 		imageHeight,
 	} = useImageSize( ref, url, [ align ] );
 
-	let captionField;
-
-	if ( ! RichText.isEmpty( caption ) || isSelected ) {
-		captionField = (
-			<RichText
-				tagName="figcaption"
-				placeholder={ __( 'Write caption…' ) }
-				value={ caption }
-				unstableOnFocus={ onFocusCaption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
-				isSelected={ captionFocused }
-				inlineToolbar
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
-				}
-			/>
-		);
-	}
-
 	if ( ! url ) {
 		return (
 			<>
 				{ controls }
-				<Block.figure>
-					{ mediaPlaceholder }
-					{ captionField }
-				</Block.figure>
+				<Block.div>{ mediaPlaceholder }</Block.div>
 			</>
 		);
 	}
@@ -617,7 +596,22 @@ export function ImageEdit( {
 			{ controls }
 			<Block.figure ref={ ref } className={ classes }>
 				{ img }
-				{ captionField }
+				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						tagName="figcaption"
+						placeholder={ __( 'Write caption…' ) }
+						value={ caption }
+						unstableOnFocus={ onFocusCaption }
+						onChange={ ( value ) =>
+							setAttributes( { caption: value } )
+						}
+						isSelected={ captionFocused }
+						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						}
+					/>
+				) }
 				{ mediaPlaceholder }
 			</Block.figure>
 		</>
