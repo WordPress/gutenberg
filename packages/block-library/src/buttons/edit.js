@@ -22,6 +22,13 @@ import { name as buttonBlockName } from '../button/';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
+const ORIENTATION_OPTIONS = [
+	{ label: __( 'Horizontal' ), value: 'horizontal' },
+	{
+		label: __( 'Vertical' ),
+		value: 'vertical',
+	},
+];
 
 // Inside buttons block alignment options are not supported.
 const alignmentHooksSetting = {
@@ -47,13 +54,7 @@ function ButtonsEdit( { attributes: { orientation }, setAttributes } ) {
 					<RadioControl
 						label={ __( 'Orientation' ) }
 						selected={ orientation }
-						options={ [
-							{ label: __( 'Horizontal' ), value: 'horizontal' },
-							{
-								label: __( 'Vertical' ),
-								value: 'vertical',
-							},
-						] }
+						options={ ORIENTATION_OPTIONS }
 						onChange={ ( value ) =>
 							setAttributes( {
 								orientation: value,
