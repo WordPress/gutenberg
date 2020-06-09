@@ -166,6 +166,7 @@ function BlockStyleItem( {
 			},
 		};
 	}, [ genericPreviewBlock, styleClassName ] );
+
 	return (
 		<div
 			key={ style.name }
