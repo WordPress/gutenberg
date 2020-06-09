@@ -5,6 +5,8 @@
         "isValid": true,
         "attributes": {
 			"avatarSize": 48,
+			"bioRatio": 0.7,
+			"bylineRatio": 0.5,
 			"showAvatar": true
 		},
         "innerBlocks": [],
