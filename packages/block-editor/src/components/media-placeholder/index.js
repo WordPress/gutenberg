@@ -116,10 +116,10 @@ export class MediaPlaceholder extends Component {
 			multiple,
 			onError,
 			onSelect,
-			onFilesUpload = noop,
+			onFilesPreUpload = noop,
 		} = this.props;
 
-		onFilesUpload( files );
+		onFilesPreUpload( files );
 		let setMedia;
 		if ( multiple ) {
 			if ( addToGallery ) {
