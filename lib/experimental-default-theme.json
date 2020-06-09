@@ -122,44 +122,6 @@
 					"slug": "vivid-cyan-blue-to-vivid-purple",
 					"value": "linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)"
 				}
-			],
-			"padding": [
-				{
-					"slug": "unit",
-					"value": 8
-				},
-				{
-					"slug": "unit-05",
-					"value": "calc(0.5 * var(--wp--preset--padding--unit))"
-				},
-				{
-					"slug": "unit-10",
-					"value": "calc(1 * var(--wp--preset--padding--unit))"
-				},
-				{
-					"slug": "unit-15",
-					"value": "calc(1.5 * var(--wp--preset--padding--unit))"
-				},
-				{
-					"slug": "unit-20",
-					"value": "calc(2 * var(--wp--preset--padding--unit))"
-				},
-				{
-					"slug": "unit-30",
-					"value": "calc(3 * var(--wp--preset--padding--unit))"
-				},
-				{
-					"slug": "unit-40",
-					"value": "calc(4 * var(--wp--preset--padding--unit))"
-				},
-				{
-					"slug": "unit-50",
-					"value": "calc(5 * var(--wp--preset--padding--unit))"
-				},
-				{
-					"slug": "unit-60",
-					"value": "calc(6 * var(--wp--preset--padding--unit))"
-				}
 			]
 		},
 		"features": {
@@ -171,7 +133,7 @@
 	"core/cover": {
 		"styles": {
 			"spacing": {
-				"padding": "var(--wp--preset--padding--unit-20)"
+				"padding": 16
 			}
 		}
 	}
