@@ -52,6 +52,14 @@ const CREATE_EMPTY_OPTION_VALUE = '__CREATE_EMPTY__';
 const CREATE_FROM_PAGES_OPTION_VALUE = '__CREATE_FROM_PAGES__';
 const CREATE_PLACEHOLDER_VALUE = '__CREATE_PLACEHOLDER__';
 
+function LoadingSpinner() {
+	return (
+		<>
+			<Spinner /> { __( 'Loading…' ) }
+		</>
+	);
+}
+
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
@@ -111,6 +119,8 @@ function Navigation( {
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
+
+	const isRequestingEntities = isRequestingPages || isRequestingMenus;
 
 	// Builds navigation links from default Pages.
 	const buildNavLinkBlocksFromPages = useMemo( () => {
@@ -227,6 +237,10 @@ function Navigation( {
 	}
 
 	function buildPlaceholderInstructionText() {
+		if ( isRequestingEntities ) {
+			return '';
+		}
+
 		if ( hasMenus && hasPages ) {
 			return __(
 				'Create a navigation from all existing pages, or choose a menu.'
@@ -324,66 +338,72 @@ function Navigation( {
 					label={ __( 'Navigation' ) }
 					instructions={ buildPlaceholderInstructionText() }
 				>
-					<div
-						ref={ ref }
-						className="wp-block-navigation-placeholder__actions"
-					>
-						<>
-							<CustomSelectControl
-								className={ classnames( {
-									'has-menus': hasMenus,
-								} ) }
-								label={ __(
-									'Select to create from Pages, existing Menu or empty'
-								) }
-								hideLabelFromVision={ true }
-								value={
-									selectedCreateActionOption ||
-									createActionOptions[ 0 ]
-								}
-								onChange={ ( { selectedItem } ) => {
-									if (
-										selectedItem?.key ===
-										selectedCreateActionOption?.key
-									) {
-										return;
+					{ isRequestingEntities ? (
+						<div ref={ ref }>
+							<LoadingSpinner />
+						</div>
+					) : (
+						<div
+							ref={ ref }
+							className="wp-block-navigation-placeholder__actions"
+						>
+							<>
+								<CustomSelectControl
+									className={ classnames( {
+										'has-menus': hasMenus,
+									} ) }
+									label={ __(
+										'Select to create from Pages, existing Menu or empty'
+									) }
+									hideLabelFromVision={ true }
+									value={
+										selectedCreateActionOption ||
+										createActionOptions[ 0 ]
 									}
-									setSelectedCreateActionOption(
-										selectedItem
-									);
-								} }
-								options={ createActionOptions.map(
-									( option ) => {
-										return {
-											name: option.name,
-											key: option.id,
-											disabled: option.disabled,
-										};
-									}
-								) }
-							/>
-							<Button
-								isSecondary
-								className="wp-block-navigation-placeholder__button"
-								onClick={ () => {
-									if ( ! selectedCreateActionOption ) {
-										return;
-									}
-									handleCreate();
-								} }
-								disabled={ shouldDisableCreateButton() }
-							>
-								{ __( 'Create' ) }
-							</Button>
-						</>
-					</div>
+									onChange={ ( { selectedItem } ) => {
+										if (
+											selectedItem?.key ===
+											selectedCreateActionOption?.key
+										) {
+											return;
+										}
+										setSelectedCreateActionOption(
+											selectedItem
+										);
+									} }
+									options={ createActionOptions.map(
+										( option ) => {
+											return {
+												name: option.name,
+												key: option.id,
+												disabled: option.disabled,
+											};
+										}
+									) }
+								/>
+								<Button
+									isSecondary
+									className="wp-block-navigation-placeholder__button"
+									onClick={ () => {
+										if ( ! selectedCreateActionOption ) {
+											return;
+										}
+										handleCreate();
+									} }
+									disabled={ shouldDisableCreateButton() }
+								>
+									{ __( 'Create' ) }
+								</Button>
+							</>
+						</div>
+					) }
 				</Placeholder>
 			</Block.div>
 		);
 	}
 
 	const blockInlineStyles = {
-		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+		fontSize: fontSize.size ? fontSize.size + "px" : undefined,
 	};
 
 	const blockClassNames = classnames( className, {
@@ -467,12 +487,9 @@ function Navigation( {
 						className={ blockClassNames }
 						style={ blockInlineStyles }
 					>
-						{ ! hasExistingNavItems &&
-							( isRequestingPages || isRequestingMenus ) && (
-								<>
-									<Spinner /> { __( 'Loading Navigation…' ) }{ ' ' }
-								</>
-							) }
+						{ ! hasExistingNavItems && isRequestingEntities && (
+							<LoadingSpinner />
+						) }
 						<InnerBlocks
 							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
