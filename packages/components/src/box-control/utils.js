@@ -70,6 +70,15 @@ export function getAllValue( values = {} ) {
 		: '';
 	const unit = mode( allUnits );
 
+	/**
+	 * The isNumber check is important. On reset actions, the incoming value
+	 * may be null or an empty string.
+	 *
+	 * Also, the value may also be zero (0), which is considered a valid unit value.
+	 *
+	 * isNumber() is more specific for these cases, rather than relying on a
+	 * simple truthy check.
+	 */
 	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
 
 	return allValue;
@@ -95,7 +104,7 @@ export function isValuesMixed( values = {} ) {
  *
  * @return {boolean} Whether values are mixed.
  */
-export function isValuesDefined( values = {} ) {
+export function isValuesDefined( values ) {
 	return (
 		values !== undefined &&
 		! isEmpty( Object.values( values ).filter( Boolean ) )
