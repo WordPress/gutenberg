@@ -27,7 +27,7 @@ registerPlugin( 'edit-site', {
 						icon="download"
 						onClick={ () =>
 							apiFetch( {
-								path: '/edit-site/v1/export',
+								path: '/__experimental/edit-site/v1/export',
 								parse: false,
 							} )
 								.then( ( res ) => res.blob() )

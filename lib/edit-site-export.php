@@ -9,7 +9,7 @@
  * Output a ZIP file with an export of the current templates
  * and template parts from the site editor, and close the connection.
  */
-function edit_site_export() {
+function gutenberg_edit_site_export() {
 	// Create ZIP file and directories.
 	$filename = tempnam( get_temp_dir(), 'edit-site-export' );
 	$zip      = new ZipArchive();
@@ -50,11 +50,11 @@ add_action(
 	'rest_api_init',
 	function () {
 		register_rest_route(
-			'edit-site/v1',
+			'__experimental/edit-site/v1',
 			'/export',
 			array(
 				'methods'             => 'GET',
-				'callback'            => 'edit_site_export',
+				'callback'            => 'gutenberg_edit_site_export',
 				'permission_callback' => function () {
 					return current_user_can( 'edit_theme_options' );
 				},
