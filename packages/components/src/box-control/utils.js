@@ -88,6 +88,13 @@ export function isValuesMixed( values = {} ) {
 	return isMixed;
 }
 
+/**
+ * Checks to determine if values are defined.
+ *
+ * @param {Object} values Box values.
+ *
+ * @return {boolean} Whether values are mixed.
+ */
 export function isValuesDefined( values = {} ) {
 	return (
 		values !== undefined &&
