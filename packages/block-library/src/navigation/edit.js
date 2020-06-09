@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, useState, useRef } from '@wordpress/element';
+import { useMemo, useState, useRef, useCallback } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -293,25 +293,25 @@ function Navigation( {
 		]
 	);
 
-	function shouldDisableCreateButton() {
+	const shouldDisableCreateButton = useCallback( () => {
 		// If there is no key at all then disable.
 		if ( ! selectedCreateActionOptionKey ) {
 			return true;
 		}
 
 		// Always disable if the default "placeholder" option is selected.
-		if ( selectedCreateActionOption.key === CREATE_PLACEHOLDER_VALUE ) {
+		if ( selectedCreateActionOptionKey === CREATE_PLACEHOLDER_VALUE ) {
 			return true;
 		}
 
 		// Always enable if Create Empty is selected.
-		if ( selectedCreateActionOption.key === CREATE_EMPTY_OPTION_VALUE ) {
+		if ( selectedCreateActionOptionKey === CREATE_EMPTY_OPTION_VALUE ) {
 			return false;
 		}
 
 		// Enable if Pages option selected and we have Pages available.
 		if (
-			selectedCreateActionOption.key === CREATE_FROM_PAGES_OPTION_VALUE &&
+			selectedCreateActionOptionKey === CREATE_FROM_PAGES_OPTION_VALUE &&
 			hasResolvedPages
 		) {
 			return false;
@@ -319,15 +319,21 @@ function Navigation( {
 
 		// Only "menu" options use an integer based key.
 		const selectedOptionIsMenu = Number.isInteger(
-			selectedCreateActionOption.key
+			selectedCreateActionOptionKey
 		);
 
 		const menuItemsResolved =
 			selectedOptionIsMenu &&
-			getHasResolvedMenuItems( selectedCreateActionOption.key );
+			getHasResolvedMenuItems( selectedCreateActionOptionKey );
 
 		return ! menuItemsResolved;
-	}
+	}, [
+		selectedCreateActionOptionKey,
+		hasResolvedPages,
+		CREATE_PLACEHOLDER_VALUE,
+		CREATE_EMPTY_OPTION_VALUE,
+		CREATE_FROM_PAGES_OPTION_VALUE,
+	] );
 
 	// If we don't have existing items then show the Placeholder
 	if ( ! hasExistingNavItems ) {
