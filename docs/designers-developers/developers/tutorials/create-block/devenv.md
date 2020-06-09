@@ -11,15 +11,17 @@ The three main pieces needed for the development environment are:
 
 The tools needed for development are **Node** and **NPM**. **Nodejs** is a runtime environment that allows running JavaScript outside of the browser. NPM is the Node Package Manager, it is used for installing dependencies and running scripts. The script `npx` is installed with `npm` and is used to run packages not yet installed, we will use this to bootstrap a block.
 
-The tools are used to take the JavaScript we are going to write, which is in a syntax that the browser can not run, and transpile it into a syntax it can. This is called the build step.
+The tools are used to convert the JavaScript we are going to write into a format that browsers can run. This is called transpiling or the build step.
 
-You can [download Nodejs](https://nodejs.org/) directly from the main website and install. It also packaged for most package managers.
+You can [download Nodejs](https://nodejs.org/en/download/) directly from the main website and install.
 
-On Mac, I recommend using [Homebrew package tool](https://brew.sh/) and install is: `brew install node`js
+Alternatively, if you use a package manager, a node package is avilable for most package managers.
 
-On Windows, you can use Chocolatey package manager and install using: `choco install nodejs`
+On Mac, [Homebrew](https://brew.sh/) is a popular package manager, if you use Homebrew install using: `brew install nodejs`
 
-NPM usually comes bundled with the above installs. On Ubuntu, or Debian, NPM is bundled separately and you can install using: `apt install nodejs npm`
+On Windows, [Chocolatey](https://chocolatey.org/packages) is a popular package manager, if you use Chocolatey install using: `choco install nodejs`
+
+If you use Linux, you should confirm NPM is also installed. In some systems it is bundled separately and you may need to explicitly install it. For example, on Ubuntu, or Debian systems you can install using: `apt install nodejs npm`
 
 However you install Nodejs, the important part is being able to use them in your terminal. Open a terminal command-line and be able to run `node -v` and `npm -v` to confirm they are installed.
 
