@@ -1,26 +1,22 @@
 /**
  * External dependencies
  */
-import { forEach, groupBy } from 'lodash';
+import { forEach } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalUseColors,
-	BlockColorsStyleSelector,
 } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-const DEFAULT_CONTRAST_CHECK_FONT_SIZE = 12;
 
 function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 	const { postType, postId } = context;
@@ -46,53 +42,6 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 	);
 
 	const { editEntityRecord } = useDispatch( 'core' );
-
-	// Need font size in number form for named presets to be used in contrastCheckers.
-	const { fontSizes } = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
-	);
-	const fontSizeIndex = useMemo( () => groupBy( fontSizes, 'slug' ), [
-		fontSizes,
-	] );
-	const contrastCheckFontSize = useMemo(
-		() =>
-			// Custom size if set.
-			attributes.style?.typography?.fontSize ||
-			// Size of preset/named value if set.
-			fontSizeIndex[ attributes.fontSize ]?.[ 0 ].size ||
-			DEFAULT_CONTRAST_CHECK_FONT_SIZE,
-		[
-			attributes.style?.typography?.fontSize,
-			attributes.fontSize,
-			fontSizeIndex,
-		]
-	);
-	const ref = useRef();
-	const {
-		TextColor,
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		ColorPanel,
-	} = __experimentalUseColors(
-		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'background-color' },
-		],
-		{
-			contrastCheckers: [
-				{
-					backgroundColor: true,
-					textColor: true,
-					fontSize: contrastCheckFontSize,
-				},
-			],
-			colorDetector: { targetRef: ref },
-			colorPanelProps: {
-				initialOpen: true,
-			},
-		},
-		[ contrastCheckFontSize ]
-	);
 
 	const { align, showAvatar, showBio, byline } = attributes;
 
@@ -162,8 +111,6 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			{ InspectorControlsColorPanel }
-
 			<BlockControls>
 				<AlignmentToolbar
 					value={ align }
@@ -171,55 +118,44 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						setAttributes( { align: nextAlign } );
 					} }
 				/>
-				<BlockColorsStyleSelector
-					TextColor={ TextColor }
-					BackgroundColor={ BackgroundColor }
-				>
-					{ ColorPanel }
-				</BlockColorsStyleSelector>
 			</BlockControls>
 
-			<TextColor>
-				<BackgroundColor>
-					<div ref={ ref } className={ classNames.block }>
-						{ showAvatar && authorDetails && (
-							<div className="wp-block-post-author__avatar">
-								<img
-									width={ attributes.avatarSize }
-									src={
-										authorDetails.avatar_urls[
-											attributes.avatarSize
-										]
-									}
-									alt={ authorDetails.name }
-								/>
-							</div>
-						) }
-						<div className="wp-block-post-author__content">
-							{ ( ! RichText.isEmpty( byline ) ||
-								isSelected ) && (
-								<RichText
-									className="wp-block-post-author__byline"
-									multiline={ false }
-									placeholder={ __( 'Write byline …' ) }
-									value={ byline }
-									onChange={ ( value ) =>
-										setAttributes( { byline: value } )
-									}
-								/>
-							) }
-							<p className="wp-block-post-author__name">
-								{ authorDetails?.name }
-							</p>
-							{ showBio && (
-								<p className="wp-block-post-author__bio">
-									{ authorDetails?.description }
-								</p>
-							) }
-						</div>
+			<div className={ classNames.block }>
+				{ showAvatar && authorDetails && (
+					<div className="wp-block-post-author__avatar">
+						<img
+							width={ attributes.avatarSize }
+							src={
+								authorDetails.avatar_urls[
+									attributes.avatarSize
+								]
+							}
+							alt={ authorDetails.name }
+						/>
 					</div>
-				</BackgroundColor>
-			</TextColor>
+				) }
+				<div className="wp-block-post-author__content">
+					{ ( ! RichText.isEmpty( byline ) || isSelected ) && (
+						<RichText
+							className="wp-block-post-author__byline"
+							multiline={ false }
+							placeholder={ __( 'Write byline …' ) }
+							value={ byline }
+							onChange={ ( value ) =>
+								setAttributes( { byline: value } )
+							}
+						/>
+					) }
+					<p className="wp-block-post-author__name">
+						{ authorDetails?.name }
+					</p>
+					{ showBio && (
+						<p className="wp-block-post-author__bio">
+							{ authorDetails?.description }
+						</p>
+					) }
+				</div>
+			</div>
 		</>
 	);
 }
