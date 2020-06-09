@@ -207,15 +207,27 @@ function gutenberg_edit_site_init( $hook ) {
 	);
 
 	// Initialize editor.
-	wp_add_inline_script(
-		'wp-edit-site',
-		sprintf(
-			'wp.domReady( function() {
-				wp.editSite.initialize( "edit-site-editor", %s );
-			} );',
-			wp_json_encode( gutenberg_experiments_editor_settings( $settings ) )
-		)
-	);
+	$editor_settings = wp_json_encode( gutenberg_experiments_editor_settings( $settings ) );
+	if ( defined( 'GUTENBERG_HMR' ) && GUTENBERG_HMR ) {
+		wp_add_inline_script(
+			'wp-edit-site',
+			sprintf(
+				'wp.editorSettings = %s;',
+				$editor_settings
+			)
+		);
+		wp_enqueue_script( 'edit-site-hot', 'http://localhost:8081/main.js', array( 'wp-edit-site' ), null );
+	} else {
+			wp_add_inline_script(
+				'wp-edit-site',
+				sprintf(
+					'wp.domReady( function() {
+						wp.editSite.initialize( "edit-site-editor", %s );
+					} );',
+					$editor_settings
+				)
+			);
+	}
 
 	wp_add_inline_script(
 		'wp-blocks',
