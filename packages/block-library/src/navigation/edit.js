@@ -237,7 +237,7 @@ function Navigation( {
 		return handleCreateEmpty();
 	}
 
-	function buildPlaceholderInstructionText() {
+	const buildPlaceholderInstructionText = useCallback( () => {
 		if ( isRequestingEntities ) {
 			return '';
 		}
@@ -261,7 +261,7 @@ function Navigation( {
 				'Create a navigation from all existing pages, or create empty.'
 			);
 		}
-	}
+	}, [ isRequestingEntities, hasMenus, hasPages ] );
 
 	const createActionOptions = useMemo(
 		() => [
