@@ -122,9 +122,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function permission_callback( $request ) {
-		$params = $request->get_params();
-
-		if ( ! current_user_can( 'edit_post', $params['media_id'] ) ) {
+		if ( ! current_user_can( 'edit_post', $request['media_id'] ) ) {
 			return new WP_Error( 'rest_cannot_edit_image', __( 'Sorry, you are not allowed to edit images.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 
@@ -141,11 +139,9 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
 	 */
 	public function rotate_image( $request ) {
-		$params = $request->get_params();
+		$modifier = new Image_Editor_Rotate( $request['angle'] );
 
-		$modifier = new Image_Editor_Rotate( $params['angle'] );
-
-		return $this->editor->modify_image( $params['media_id'], $modifier );
+		return $this->editor->modify_image( $request['media_id'], $modifier );
 	}
 
 	/**
@@ -158,11 +154,9 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
 	 */
 	public function flip_image( $request ) {
-		$params = $request->get_params();
+		$modifier = new Image_Editor_Flip( $request['direction'] );
 
-		$modifier = new Image_Editor_Flip( $params['direction'] );
-
-		return $this->editor->modify_image( $params['media_id'], $modifier );
+		return $this->editor->modify_image( $request['media_id'], $modifier );
 	}
 
 	/**
@@ -175,10 +169,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
 	 */
 	public function crop_image( $request ) {
-		$params = $request->get_params();
+		$modifier = new Image_Editor_Crop( $request['crop_x'], $request['crop_y'], $request['crop_width'], $request['crop_height'] );
 
-		$modifier = new Image_Editor_Crop( $params['crop_x'], $params['crop_y'], $params['crop_width'], $params['crop_height'] );
-
-		return $this->editor->modify_image( $params['media_id'], $modifier );
+		return $this->editor->modify_image( $request['media_id'], $modifier );
 	}
 }
