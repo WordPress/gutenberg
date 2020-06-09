@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useRegistry, useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	Tooltip,
 	DropdownMenu,
@@ -16,6 +16,7 @@ import { Icon, home, plus, undo } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { findTemplate } from '../../utils';
 import TemplatePreview from './template-preview';
 import ThemePreview from './theme-preview';
 
@@ -46,11 +47,9 @@ function TemplateLabel( { template, homeId } ) {
 }
 
 export default function TemplateSwitcher( {
-	templatePartIds,
 	page,
 	activeId,
 	activeTemplatePartId,
-	homeId,
 	isTemplatePart,
 	onActiveIdChange,
 	onActiveTemplatePartIdChange,
@@ -70,51 +69,63 @@ export default function TemplateSwitcher( {
 		setThemePreviewVisible( () => false );
 	};
 
+	const registry = useRegistry();
+	const [ homeId, setHomeId ] = useState();
+
+	useEffect( () => {
+		findTemplate(
+			'/',
+			registry.__experimentalResolveSelect( 'core' ).getEntityRecords
+		).then(
+			( newHomeId ) => setHomeId( newHomeId ),
+			() => setHomeId( null )
+		);
+	}, [ registry ] );
+
 	const { currentTheme, template, templateParts } = useSelect(
 		( select ) => {
-			const { getCurrentTheme, getEntityRecord } = select( 'core' );
+			const {
+				getCurrentTheme,
+				getEntityRecord,
+				getEntityRecords,
+			} = select( 'core' );
+
 			const _template = getEntityRecord(
 				'postType',
 				'wp_template',
 				activeId
 			);
+
 			return {
 				currentTheme: getCurrentTheme(),
-				template: {
-					label: _template ? (
-						<TemplateLabel
-							template={ _template }
-							homeId={ homeId }
-						/>
-					) : (
-						__( 'Loading…' )
-					),
-					value: activeId,
-					slug: _template ? _template.slug : __( 'Loading…' ),
-					content: _template?.content,
-				},
-				templateParts: templatePartIds.map( ( id ) => {
-					const templatePart = getEntityRecord(
-						'postType',
-						'wp_template_part',
-						id
-					);
-					return {
-						label: templatePart ? (
-							<TemplateLabel template={ templatePart } />
-						) : (
-							__( 'Loading…' )
-						),
-						value: id,
-						slug: templatePart
-							? templatePart.slug
-							: __( 'Loading…' ),
-					};
-				} ),
+				template: _template,
+				templateParts: _template
+					? getEntityRecords( 'postType', 'wp_template_part', {
+							resolved: true,
+							template: _template.slug,
+					  } )
+					: null,
 			};
 		},
-		[ activeId, templatePartIds, homeId ]
+		[ activeId ]
 	);
+
+	const templateItem = {
+		label: template ? (
+			<TemplateLabel template={ template } homeId={ homeId } />
+		) : (
+			__( 'Loading…' )
+		),
+		value: activeId,
+		slug: template ? template.slug : __( 'Loading…' ),
+		content: template?.content,
+	};
+
+	const templatePartItems = templateParts?.map( ( templatePart ) => ( {
+		label: <TemplateLabel template={ templatePart } />,
+		value: templatePart.id,
+		slug: templatePart.slug,
+	} ) );
 
 	const overwriteSlug =
 		TEMPLATE_OVERRIDES[ page.type ] &&
@@ -125,10 +136,10 @@ export default function TemplateSwitcher( {
 			slug: overwriteSlug,
 			title: overwriteSlug,
 			status: 'publish',
-			content: template.content.raw,
+			content: templateItem.content.raw,
 		} );
 	const revertToParent = async () => {
-		onRemoveTemplate( template.value );
+		onRemoveTemplate( activeId );
 	};
 	return (
 		<>
@@ -141,8 +152,8 @@ export default function TemplateSwitcher( {
 				label={ __( 'Switch Template' ) }
 				toggleProps={ {
 					children: ( isTemplatePart
-						? templateParts
-						: [ template ]
+						? templatePartItems
+						: [ templateItem ]
 					).find(
 						( choice ) =>
 							choice.value ===
@@ -156,10 +167,10 @@ export default function TemplateSwitcher( {
 							<MenuItem
 								onClick={ () => onActiveIdChange( activeId ) }
 							>
-								{ template.label }
+								{ templateItem.label }
 							</MenuItem>
 							{ overwriteSlug &&
-								overwriteSlug !== template.slug && (
+								overwriteSlug !== templateItem.slug && (
 									<MenuItem
 										icon={ plus }
 										onClick={ overwriteTemplate }
@@ -167,7 +178,7 @@ export default function TemplateSwitcher( {
 										{ __( 'Overwrite Template' ) }
 									</MenuItem>
 								) }
-							{ overwriteSlug === template.slug && (
+							{ overwriteSlug === templateItem.slug && (
 								<MenuItem
 									icon={ undo }
 									onClick={ revertToParent }
@@ -178,7 +189,7 @@ export default function TemplateSwitcher( {
 						</MenuGroup>
 						<MenuGroup label={ __( 'Template Parts' ) }>
 							<MenuItemsChoice
-								choices={ templateParts }
+								choices={ templatePartItems }
 								value={
 									isTemplatePart
 										? activeTemplatePartId
