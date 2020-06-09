@@ -1,0 +1,37 @@
+$noticeColor: #121212;
+
+/*.notice {
+	background-color: $noticeColor;
+	border-radius: 4px;
+	left: 12px;
+	padding: 12px 16px;
+	position: absolute;
+	top: -36px;
+}
+*/
+.noticeShadow {
+	color: $black;
+}
+
+.text {
+    color: $white;
+    align-self: center;
+}
+
+.list {
+	position: absolute;
+	margin-left: auto;
+	margin-right: auto;
+    top: 0;
+    flex-direction: column;
+    z-index: 102;
+}
+
+.notice {
+    height: 30;
+    background-color: $noticeColor;
+    justify-content: center;
+   // flex-grow: 1;
+    //flex-shrink: 1;
+   // flex-basis: 1;
+}

@@ -14,6 +14,7 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
+	NoticeList,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -155,6 +156,7 @@ export class BlockList extends Component {
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
+			notices,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -221,7 +223,7 @@ export class BlockList extends Component {
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
 				/>
-
+				{ notices?.count > 0 && <NoticeList notices/> }
 				{ this.shouldShowInnerBlockAppender() && (
 					<View
 						style={ {
@@ -330,6 +332,9 @@ export default compose( [
 		const isFloatingToolbarVisible =
 			!! selectedBlockClientId && hasRootInnerBlocks;
 
+		const { getNotices } = select( 'core/editor' );
+		const notices = getNotices();
+	
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -338,6 +343,7 @@ export default compose( [
 			isRootList: rootClientId === undefined,
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
+			notices,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
