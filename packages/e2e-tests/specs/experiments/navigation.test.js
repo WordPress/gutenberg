@@ -217,8 +217,12 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 }
 
 async function selectDropDownOption( optionText ) {
+	const buttonText = 'Select where to start from…';
+	await page.waitForXPath(
+		`//button[text()="${ buttonText }"][not(@disabled)]`
+	);
 	const [ dropdownToggle ] = await page.$x(
-		'//button[text()="Select where to start from…"][not(@disabled)]'
+		`//button[text()="${ buttonText }"][not(@disabled)]`
 	);
 	await dropdownToggle.click();
 
@@ -228,12 +232,15 @@ async function selectDropDownOption( optionText ) {
 }
 
 async function clickCreateButton() {
+	const buttonText = 'Create';
 	// Wait for button to become available
-	await page.waitForXPath( '//button[text()="Create"][not(@disabled)]' );
+	await page.waitForXPath(
+		`//button[text()="${ buttonText }"][not(@disabled)]`
+	);
 
 	// Then locate...
 	const [ createNavigationButton ] = await page.$x(
-		'//button[text()="Create"][not(@disabled)]'
+		`//button[text()="${ buttonText }"][not(@disabled)]`
 	);
 
 	// Then click
@@ -290,9 +297,14 @@ describe( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			const [ dropdownToggle ] = await page.$x(
-				'//button[text()="Select where to start from…"][not(@disabled)]'
+			const dropdownButtonText = 'Select where to start from…';
+			await page.waitForXPath(
+				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
 			);
+			const [ dropdownToggle ] = await page.$x(
+				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			);
+
 			await dropdownToggle.click();
 
 			const dropDownItemsLength = await page.$$eval(
@@ -373,8 +385,12 @@ describe( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
+			const dropdownButtonText = 'Select where to start from…';
+			await page.waitForXPath(
+				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			);
 			const [ dropdownToggle ] = await page.$x(
-				'//button[text()="Select where to start from…"][not(@disabled)]'
+				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
 			);
 			await dropdownToggle.click();
 
