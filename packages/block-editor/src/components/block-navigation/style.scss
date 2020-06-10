@@ -31,6 +31,8 @@ $tree-item-height: 36px;
 		width: calc(100% - 0.8em);
 		height: auto;
 		padding: $grid-unit-15 6px;
+		margin-top: auto;
+		margin-bottom: auto;
 		text-align: left;
 		color: $dark-gray-600;
 		border-radius: 2px;
@@ -84,6 +86,10 @@ $tree-item-height: 36px;
 			min-width: 24px;
 			padding: 0;
 		}
+	}
+
+	.block-editor-block-navigation-block__menu-cell {
+		padding-top: $grid-unit-10;
 	}
 
 	.block-editor-block-navigation-block__mover-cell-alignment-wrapper {
@@ -159,7 +165,7 @@ $tree-item-height: 36px;
 		background: $dark-gray-primary;
 		color: $white;
 		height: $grid-unit-30;
-		margin: 6px 6px 6px 0.8em;
+		margin: 6px 6px 6px 1px;
 		min-width: $grid-unit-30;
 
 		&:active {
@@ -181,6 +187,10 @@ $tree-item-height: 36px;
 		display: flex;
 	}
 
+	.block-editor-block-navigation-block__contents-container {
+		min-height: 56px;
+	}
+
 	.block-editor-block-navigator-descender-line {
 		position: relative;
 		flex-shrink: 0;
@@ -199,7 +209,7 @@ $tree-item-height: 36px;
 			content: "";
 			display: block;
 			position: absolute;
-			top: -1px;
+			top: 1px;
 			bottom: -2px;
 			right: -1px;
 			border-right: 2px solid $light-gray-900;
