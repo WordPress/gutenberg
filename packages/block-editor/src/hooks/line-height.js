@@ -2,13 +2,12 @@
  * WordPress dependencies
  */
 import { hasBlockSupport } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import LineHeightControl from '../components/line-height-control';
-import useEditorFeature from '../components/use-editor-feature';
-
 import { cleanEmptyObject } from './utils';
 
 export const LINE_HEIGHT_SUPPORT_KEY = '__experimentalLineHeight';
@@ -57,9 +56,11 @@ export function LineHeightEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsLineHeightDisabled( { name: blockName } = {} ) {
-	const isDisabled = useEditorFeature(
-		'__experimentalDisableCustomLineHeight'
-	);
+	const isDisabled = useSelect( ( select ) => {
+		const editorSettings = select( 'core/block-editor' ).getSettings();
+
+		return editorSettings.__experimentalDisableCustomLineHeight;
+	} );
 
 	return (
 		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) || isDisabled
