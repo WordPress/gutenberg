@@ -537,11 +537,15 @@ class ButtonEdit extends Component {
 	}
 }
 
+const GradientButton = ( props ) => {
+	const { gradientValue } = __experimentalUseGradient();
+	return <ButtonEdit { ...props } gradientValue={ gradientValue } />;
+};
+
 export default compose( [
 	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
-		const { gradientValue } = __experimentalUseGradient();
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const {
 			getSelectedBlockClientId,
@@ -554,7 +558,6 @@ export default compose( [
 		const numOfButtons = getBlockCount( parentId );
 
 		return {
-			gradientValue,
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
 			numOfButtons,
@@ -567,4 +570,4 @@ export default compose( [
 			},
 		};
 	} ),
-] )( ButtonEdit );
+] )( GradientButton );
