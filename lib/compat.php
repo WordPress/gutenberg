@@ -148,25 +148,65 @@ function gutenberg_add_dom_rect_polyfill( $scripts ) {
 add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
 
 /**
- * Sets the current post for usage in template blocks.
+ * Filters default block categories to substitute legacy category names with new
+ * block categories.
  *
- * @return WP_Post|null The post if any, or null otherwise.
+ * This can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50278
+ *
+ * @param array[] $default_categories Array of block categories.
+ *
+ * @return array[] Filtered block categories.
  */
-function gutenberg_get_post_from_context() {
-	// TODO: Without this temporary fix, an infinite loop can occur where
-	// posts with post content blocks render themselves recursively.
-	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
-		return null;
+function gutenberg_replace_default_block_categories( $default_categories ) {
+	$substitution = array(
+		'common'     => array(
+			'slug'  => 'text',
+			'title' => __( 'Text', 'gutenberg' ),
+			'icon'  => null,
+		),
+		'formatting' => array(
+			'slug'  => 'media',
+			'title' => __( 'Media', 'gutenberg' ),
+			'icon'  => null,
+		),
+		'layout'     => array(
+			'slug'  => 'design',
+			'title' => __( 'Design', 'gutenberg' ),
+			'icon'  => null,
+		),
+	);
+
+	// Loop default categories to perform in-place substitution by legacy slug.
+	foreach ( $default_categories as $i => $default_category ) {
+		$slug = $default_category['slug'];
+		if ( isset( $substitution[ $slug ] ) ) {
+			$default_categories[ $i ] = $substitution[ $slug ];
+			unset( $substitution[ $slug ] );
+		}
 	}
 
-	_deprecated_function( __FUNCTION__, '8.1.0' );
-
-	if ( ! in_the_loop() ) {
-		rewind_posts();
-		the_post();
+	/*
+	 * At this point, `$substitution` should contain only the categories which
+	 * could not be in-place substituted with a default category, likely in the
+	 * case that core has since been updated to use the default categories.
+	 * Check to verify they exist.
+	 */
+	$default_category_slugs = wp_list_pluck( $default_categories, 'slug' );
+	foreach ( $substitution as $i => $substitute_category ) {
+		if ( in_array( $substitute_category['slug'], $default_category_slugs, true ) ) {
+			unset( $substitution[ $i ] );
+		}
 	}
-	return get_post();
+
+	/*
+	 * Any substitutes remaining should be appended, as they are not yet
+	 * assigned in the default categories array.
+	 */
+	return array_merge( $default_categories, array_values( $substitution ) );
 }
+add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
 
 /**
  * Shim that hooks into `pre_render_block` so as to override `render_block` with

@@ -42,6 +42,7 @@ function DropdownMenu( {
 	popoverProps,
 	toggleProps,
 	menuProps,
+	disableOpenOnArrowDown = false,
 	// The following props exist for backward compatibility.
 	menuLabel,
 	position,
@@ -87,6 +88,10 @@ function DropdownMenu( {
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
+					if ( disableOpenOnArrowDown ) {
+						return;
+					}
+
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
 						event.stopPropagation();

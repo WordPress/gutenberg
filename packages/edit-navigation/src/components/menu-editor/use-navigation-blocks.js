@@ -1,124 +1,59 @@
 /**
  * External dependencies
  */
-import { groupBy, sortBy } from 'lodash';
+import { keyBy, groupBy, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import batchSave from './batch-save';
-import useDebouncedValue from './use-debounced-value';
-import PromiseQueue from './promise-queue';
+import { flattenBlocks } from './helpers';
 
-export default function useNavigationBlocks( menuId ) {
-	// menuItems is an array of menu item objects.
-	const query = { menus: menuId, per_page: -1 };
-	const menuItems = useSelect(
-		( select ) => select( 'core' ).getMenuItems( query ),
-		[ menuId ]
-	);
-
-	// Data model
+export default function useNavigationBlocks( menuItems ) {
 	const [ blocks, setBlocks ] = useState( [] );
 	const menuItemsRef = useRef( {} );
 
 	// Refresh our model whenever menuItems change
 	useEffect( () => {
-		if ( menuItems ) {
-			const [
-				navigationBlock,
-				clientIdToMenuItemMapping,
-			] = menuItemsToNavigationBlock( menuItems );
-			setBlocks( [ navigationBlock ] );
-			menuItemsRef.current = clientIdToMenuItemMapping;
-		}
+		const [ innerBlocks, clientIdToMenuItemMapping ] = menuItemsToBlocks(
+			menuItems,
+			blocks[ 0 ]?.innerBlocks,
+			menuItemsRef.current
+		);
+
+		const navigationBlock = blocks[ 0 ]
+			? { ...blocks[ 0 ], innerBlocks }
+			: createBlock( 'core/navigation', {}, innerBlocks );
+
+		setBlocks( [ navigationBlock ] );
+		menuItemsRef.current = clientIdToMenuItemMapping;
 	}, [ menuItems ] );
 
-	// When a new block is added, let's create a draft menuItem for it.
-	// The batch save endpoint expects all the menu items to have a valid id already.
-	// PromiseQueue is used in order to
-	// 1) limit the amount of requests processed at the same time
-	// 2) save the menu only after all requests are finalized
-
-	// Let's debounce so that we don't call `getAllClientIds` on every keystroke
-	const debouncedBlocks = useDebouncedValue( blocks, 800 );
-	const promiseQueueRef = useRef( new PromiseQueue() );
-	const enqueuedBlocksIds = useRef( [] );
-	useEffect( () => {
-		for ( const clientId of getAllClientIds( debouncedBlocks ) ) {
-			// Menu item was already created
-			if ( clientId in menuItemsRef.current ) {
-				continue;
-			}
-			// Already in the queue
-			if ( enqueuedBlocksIds.current.includes( clientId ) ) {
-				continue;
-			}
-			enqueuedBlocksIds.current.push( clientId );
-			promiseQueueRef.current.enqueue( () =>
-				createDraftMenuItem( clientId ).then( ( menuItem ) => {
-					menuItemsRef.current[ clientId ] = menuItem;
-					enqueuedBlocksIds.current.splice(
-						enqueuedBlocksIds.current.indexOf( clientId )
-					);
-				} )
-			);
-		}
-	}, [ debouncedBlocks ] );
-
-	// Save handler
-	const { receiveEntityRecords } = useDispatch( 'core' );
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		'core/notices'
-	);
-
-	const saveBlocks = async () => {
-		const result = await batchSave( menuId, menuItemsRef, blocks[ 0 ] );
-
-		if ( result.success ) {
-			createSuccessNotice( __( 'Navigation saved.' ), {
-				type: 'snackbar',
-			} );
-			receiveEntityRecords( 'root', 'menuItem', [], query, true );
-		} else {
-			createErrorNotice( __( 'There was an error.' ), {
-				type: 'snackbar',
-			} );
-		}
-	};
-
-	return [
+	return {
 		blocks,
 		setBlocks,
-		() => promiseQueueRef.current.then( saveBlocks ),
-	];
+		menuItemsRef,
+	};
 }
 
-async function createDraftMenuItem() {
-	return apiFetch( {
-		path: `/__experimental/menu-items`,
-		method: 'POST',
-		data: {
-			title: 'Placeholder',
-			url: 'Placeholder',
-			menu_order: 0,
-		},
-	} );
-}
+const menuItemsToBlocks = (
+	menuItems,
+	prevBlocks = [],
+	prevClientIdToMenuItemMapping = {}
+) => {
+	const blocksByMenuId = mapBlocksByMenuId(
+		prevBlocks,
+		prevClientIdToMenuItemMapping
+	);
 
-const menuItemsToNavigationBlock = ( menuItems ) => {
 	const itemsByParentID = groupBy( menuItems, 'parent' );
 	const clientIdToMenuItemMapping = {};
-	const menuItemsToTreeOfLinkBlocks = ( items ) => {
+	const menuItemsToTreeOfBlocks = ( items ) => {
 		const innerBlocks = [];
 		if ( ! items ) {
 			return;
@@ -128,11 +63,15 @@ const menuItemsToNavigationBlock = ( menuItems ) => {
 		for ( const item of sortedItems ) {
 			let menuItemInnerBlocks = [];
 			if ( itemsByParentID[ item.id ]?.length ) {
-				menuItemInnerBlocks = menuItemsToTreeOfLinkBlocks(
+				menuItemInnerBlocks = menuItemsToTreeOfBlocks(
 					itemsByParentID[ item.id ]
 				);
 			}
-			const linkBlock = menuItemToLinkBlock( item, menuItemInnerBlocks );
+			const linkBlock = menuItemToLinkBlock(
+				item,
+				menuItemInnerBlocks,
+				blocksByMenuId[ item.id ]
+			);
 			clientIdToMenuItemMapping[ linkBlock.clientId ] = item;
 			innerBlocks.push( linkBlock );
 		}
@@ -140,25 +79,36 @@ const menuItemsToNavigationBlock = ( menuItems ) => {
 	};
 
 	// menuItemsToTreeOfLinkBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
-	const innerBlocks = menuItemsToTreeOfLinkBlocks(
-		itemsByParentID[ 0 ] || []
-	);
-	const navigationBlock = createBlock( 'core/navigation', {}, innerBlocks );
-	return [ navigationBlock, clientIdToMenuItemMapping ];
+	const blocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
+	return [ blocks, clientIdToMenuItemMapping ];
 };
 
-function menuItemToLinkBlock( menuItem, innerBlocks = [] ) {
-	return createBlock(
-		'core/navigation-link',
-		{
-			label: menuItem.title.rendered,
-			url: menuItem.url,
-		},
-		innerBlocks
-	);
+function menuItemToLinkBlock(
+	menuItem,
+	innerBlocks = [],
+	existingBlock = null
+) {
+	const attributes = {
+		label: menuItem.title.rendered,
+		url: menuItem.url,
+	};
+
+	if ( existingBlock ) {
+		return {
+			...existingBlock,
+			attributes,
+			innerBlocks,
+		};
+	}
+	return createBlock( 'core/navigation-link', attributes, innerBlocks );
 }
 
-const getAllClientIds = ( blocks ) =>
-	blocks.flatMap( ( item ) =>
-		[ item.clientId ].concat( getAllClientIds( item.innerBlocks || [] ) )
-	);
+const mapBlocksByMenuId = ( blocks, menuItemsByClientId ) => {
+	const blocksByClientId = keyBy( flattenBlocks( blocks ), 'clientId' );
+	const blocksByMenuId = {};
+	for ( const clientId in menuItemsByClientId ) {
+		const menuItem = menuItemsByClientId[ clientId ];
+		blocksByMenuId[ menuItem.id ] = blocksByClientId[ clientId ];
+	}
+	return blocksByMenuId;
+};

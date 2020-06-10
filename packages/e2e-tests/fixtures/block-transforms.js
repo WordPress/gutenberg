@@ -221,6 +221,10 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Latest Posts',
 		availableTransforms: [ 'Group' ],
 	},
+	'core__latest-posts__displayAuthor': {
+		originalBlock: 'Latest Posts',
+		availableTransforms: [ 'Group' ],
+	},
 	'core__latest-posts__displayPostDate': {
 		originalBlock: 'Latest Posts',
 		availableTransforms: [ 'Group' ],
@@ -274,7 +278,7 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	core__preformatted: {
 		originalBlock: 'Preformatted',
-		availableTransforms: [ 'Group', 'Paragraph' ],
+		availableTransforms: [ 'Group', 'Paragraph', 'Code' ],
 	},
 	core__pullquote: {
 		originalBlock: 'Pullquote',

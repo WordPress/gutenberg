@@ -167,12 +167,6 @@ describe( 'Multi-entity editor states', () => {
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
 		await visitSiteEditor();
-		expect( await openEntitySavePanel() ).toBe( true );
-
-		await saveAllEntities();
-		await visitSiteEditor();
-
-		// Unable to open the save panel implies that no entities are dirty.
 		expect( await openEntitySavePanel() ).toBe( false );
 	} );
 

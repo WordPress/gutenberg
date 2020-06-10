@@ -53,7 +53,7 @@
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",
 		"react-use-gesture": "^7.0.15",
-		"reakit": "^1.0.2",
+		"reakit": "^1.0.4",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^7.0.2"

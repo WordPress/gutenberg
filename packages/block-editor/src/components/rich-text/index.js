@@ -385,6 +385,7 @@ function RichTextWrapper(
 			__unstableMarkAutomaticChange,
 			multiline,
 			splitValue,
+			onSplitAtEnd,
 		]
 	);
 

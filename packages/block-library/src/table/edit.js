@@ -39,6 +39,7 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -457,7 +458,7 @@ export class TableEdit extends Component {
 	 * Renders a table section.
 	 *
 	 * @param {Object} options
-	 * @param {string} options.type Section type: head, body, or foot.
+	 * @param {string} options.name Section type: head, body, or foot.
 	 * @param {Array}  options.rows The rows to render.
 	 *
 	 * @return {Object} React element for the section.
@@ -538,6 +539,7 @@ export class TableEdit extends Component {
 			backgroundColor,
 			setBackgroundColor,
 			setAttributes,
+			insertBlocksAfter,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, caption, head, body, foot } = attributes;
@@ -663,6 +665,9 @@ export class TableEdit extends Component {
 						// Deselect the selected table cell when the caption is focused.
 						unstableOnFocus={ () =>
 							this.setState( { selectedCell: null } )
+						}
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
 						}
 					/>
 				</figure>
