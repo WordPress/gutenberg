@@ -1012,18 +1012,6 @@ export function isDraggingBlocks( state ) {
 }
 
 /**
- * Returns an object with the root client id and index representing the
- * position a user is dragging a block over.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether user is dragging blocks.
- */
-export function getBlockDropTarget( state ) {
-	return state.blockDropTarget;
-}
-
-/**
  * Returns true if the caret is within formatted text, or false otherwise.
  *
  * @param {Object} state Global application state.

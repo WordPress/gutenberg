@@ -37,7 +37,6 @@ function BlockList(
 	function selector( select ) {
 		const {
 			getBlockOrder,
-			getBlockDropTarget,
 			getBlockListSettings,
 			isMultiSelecting,
 			getSelectedBlockClientId,
@@ -49,7 +48,6 @@ function BlockList(
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
-			blockDropTarget: getBlockDropTarget(),
 			isMultiSelecting: isMultiSelecting(),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
@@ -64,7 +62,6 @@ function BlockList(
 
 	const {
 		blockClientIds,
-		blockDropTarget,
 		isMultiSelecting,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
@@ -74,14 +71,12 @@ function BlockList(
 	} = useSelect( selector, [ rootClientId ] );
 
 	const Container = rootClientId ? __experimentalTagName : RootContainer;
-	useBlockDropZone( {
+	const dropTargetIndex = useBlockDropZone( {
 		element: ref,
 		rootClientId,
 	} );
 
-	const isAppenderDropTarget =
-		blockDropTarget.rootClientId === rootClientId &&
-		blockDropTarget.blockIndex === blockClientIds.length;
+	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
 		<Container
@@ -98,9 +93,7 @@ function BlockList(
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
-				const isDropTarget =
-					blockDropTarget.rootClientId === rootClientId &&
-					blockDropTarget.blockIndex === index;
+				const isDropTarget = dropTargetIndex === index;
 
 				return (
 					<AsyncModeProvider

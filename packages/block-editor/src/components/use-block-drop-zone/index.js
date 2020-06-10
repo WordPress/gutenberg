@@ -8,7 +8,7 @@ import {
 	findTransform,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useCallback, useState } from '@wordpress/element';
 
 function getNearestBlockIndex( elements, position, orientation ) {
 	const { x, y } = position;
@@ -115,10 +115,11 @@ export default function useBlockDropZone( {
 	element,
 	rootClientId: targetRootClientId,
 } ) {
+	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
+
 	function selector( select ) {
 		const {
 			getBlockIndex,
-			getBlockDropTarget,
 			getBlockListSettings,
 			getClientIdsOfDescendants,
 			getSettings,
@@ -126,7 +127,6 @@ export default function useBlockDropZone( {
 		} = select( 'core/block-editor' );
 		return {
 			getBlockIndex,
-			targetBlockIndex: getBlockDropTarget().blockIndex,
 			moverDirection: getBlockListSettings( targetRootClientId )
 				?.__experimentalMoverDirection,
 			getClientIdsOfDescendants,
@@ -137,7 +137,6 @@ export default function useBlockDropZone( {
 
 	const {
 		getBlockIndex,
-		targetBlockIndex,
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
 		isLockedAll,
@@ -147,7 +146,6 @@ export default function useBlockDropZone( {
 		insertBlocks,
 		updateBlockAttributes,
 		moveBlockToPosition,
-		setBlockDropTarget,
 	} = useDispatch( 'core/block-editor' );
 
 	const onFilesDrop = useCallback(
@@ -274,7 +272,11 @@ export default function useBlockDropZone( {
 				return;
 			}
 
-			setBlockDropTarget( targetRootClientId, targetIndex );
+			setTargetBlockIndex( targetIndex );
 		}
 	}, [ position ] );
+
+	if ( position ) {
+		return targetBlockIndex;
+	}
 }

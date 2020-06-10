@@ -708,25 +708,6 @@ export function stopDraggingBlocks() {
 }
 
 /**
- * Returns an action object used in signalling that the user is dragging a
- * block over a particular position in a block list.
- *
- * @param {undefined|string} rootClientId The clientId representing the block
- *                                        list the block is being hovered over.
- * @param {number}           blockIndex   The index representing the position
- *                                        the block is being hovered over.
- *
- * @return {Object} Action object.
- */
-export function setBlockDropTarget( rootClientId, blockIndex ) {
-	return {
-		type: 'SET_BLOCK_DROP_TARGET',
-		rootClientId,
-		blockIndex,
-	};
-}
-
-/**
  * Returns an action object used in signalling that the caret has entered formatted text.
  *
  * @return {Object} Action object.
