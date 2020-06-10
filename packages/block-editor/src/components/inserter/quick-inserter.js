@@ -86,7 +86,6 @@ function QuickInserter( {
 	isAppender,
 	selectBlockOnInsert,
 } ) {
-	const [ isFiltered, setIsFiltered ] = useState( false );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [
 		destinationRootClientId,
@@ -107,7 +106,8 @@ function QuickInserter( {
 	const [ patterns, onSelectBlockPattern ] = usePatternsState(
 		onInsertBlocks
 	);
-	const showPatterns = ! destinationRootClientId && patterns.length;
+	const showPatterns =
+		! destinationRootClientId && patterns.length && !! filterValue;
 	const showSearch =
 		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
 		blockTypes.length > SEARCH_THRESHOLD;
@@ -132,19 +132,17 @@ function QuickInserter( {
 				<InserterSearchForm
 					onChange={ ( value ) => {
 						setFilterValue( value );
-						setIsFiltered( true );
 					} }
 				/>
 			) }
-			{ ( ! showSearch || isFiltered ) && (
-				<QuickInserterList
-					blockTypes={ filteredBlockTypes }
-					blockPatterns={ showPatterns ? filteredBlockPatterns : [] }
-					onSelectBlockPattern={ onSelectBlockPattern }
-					onSelectBlockType={ onSelectBlockType }
-					onHover={ onToggleInsertionPoint }
-				/>
-			) }
+
+			<QuickInserterList
+				blockTypes={ filteredBlockTypes }
+				blockPatterns={ showPatterns ? filteredBlockPatterns : [] }
+				onSelectBlockPattern={ onSelectBlockPattern }
+				onSelectBlockType={ onSelectBlockType }
+				onHover={ onToggleInsertionPoint }
+			/>
 		</div>
 	);
 }
