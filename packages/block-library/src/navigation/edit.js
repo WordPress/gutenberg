@@ -410,7 +410,7 @@ function Navigation( {
 	}
 
 	const blockInlineStyles = {
-		fontSize: fontSize.size ? fontSize.size + "px" : undefined,
+		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 	};
 
 	const blockClassNames = classnames( className, {
