@@ -75,6 +75,7 @@ function BlockTypesList( {
 						onBlur={ () => onHover( null ) }
 						isDisabled={ item.isDisabled }
 						title={ item.title }
+						role={ item.role }
 					/>
 				);
 			} ) }

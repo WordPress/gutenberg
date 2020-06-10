@@ -173,6 +173,7 @@ export class BlockSwitcher extends Component {
 														id: name,
 														icon: destinationBlockTypeIcon,
 														title,
+														role: 'menuitem', // this is to prevent scroll containers from scrolling (NavigableContainer internal check).
 													} )
 												) }
 												onSelect={ ( item ) => {
