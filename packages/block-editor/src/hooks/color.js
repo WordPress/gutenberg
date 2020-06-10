@@ -180,9 +180,12 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
-	const { colors, gradients, __experimentalEnableLinkColor } = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings();
-	}, [] );
+	const { colors, gradients, __experimentalEnableLinkColor } = useSelect(
+		( select ) => {
+			return select( 'core/block-editor' ).getSettings();
+		},
+		[]
+	);
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -311,7 +314,8 @@ export function ColorEdit( props ) {
 						? onChangeGradient
 						: undefined,
 				},
-				...( __experimentalEnableLinkColor && hasLinkColorSupport( blockName )
+				...( __experimentalEnableLinkColor &&
+				hasLinkColorSupport( blockName )
 					? [
 							{
 								label: __( 'Link Color' ),
