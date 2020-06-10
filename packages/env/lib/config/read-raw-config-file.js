@@ -44,6 +44,8 @@ module.exports = async function readRawConfigFile( name, configPath ) {
  * version.
  *
  * @param {Object} rawConfig config right after being read from a file.
+ * @return {Object} Same config with any old-format values converted into the
+ *                  shape of the currently expected format.
  */
 function withBackCompat( rawConfig ) {
 	// Convert testsPort into new env.tests format.
@@ -51,9 +53,7 @@ function withBackCompat( rawConfig ) {
 		rawConfig.env = {
 			...( rawConfig.env || {} ),
 			tests: {
-				...( rawConfig.env && rawConfig.env.tests
-					? rawConfig.env.tests
-					: {} ),
+				...( rawConfig?.env?.tests || {} ),
 				port: rawConfig.testsPort,
 			},
 		};

@@ -220,7 +220,7 @@ function hasSameCoreSource( envs ) {
 	for ( const env in envs ) {
 		// If one does not have a core source but the other does.
 		if (
-			( ! env.coreSource && env.coreSource ) ||
+			( ! coreSource && env.coreSource ) ||
 			( coreSource && ! env.coreSource )
 		) {
 			return false;

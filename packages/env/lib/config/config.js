@@ -57,7 +57,7 @@ const readRawConfigFile = require( './read-raw-config-file' );
  *
  * @return {WPConfig} A parsed and validated wp-env config object.
  */
-async function readConfig( configPath ) {
+module.exports = async function readConfig( configPath ) {
 	const configDirectoryPath = path.dirname( configPath );
 	const workDirectoryPath = path.resolve(
 		await getHomeDirectory(),
@@ -68,7 +68,7 @@ async function readConfig( configPath ) {
 	// source type which was automatically detected.
 	const baseConfig =
 		( await readRawConfigFile( '.wp-env.json', configPath ) ) ||
-		getDefaultBaseConfig();
+		getDefaultBaseConfig( configPath );
 
 	// Overriden .wp-env.json on a per-user case.
 	const overrideConfig =
@@ -124,8 +124,7 @@ async function readConfig( configPath ) {
 		] ),
 	];
 
-	const getEnvConfig = ( config, envName ) =>
-		config.env && config.env[ envName ] ? config.env[ envName ] : {};
+	const getEnvConfig = ( config, envName ) => config.env?.[ envName ] || {};
 
 	// Merge each of the specified environment-level overrides.
 	const env = allEnvs.reduce( ( result, environment ) => {
@@ -154,7 +153,7 @@ async function readConfig( configPath ) {
 		workDirectoryPath,
 		env,
 	} );
-}
+};
 
 /**
  * Deep-merges the values in the given service environment. This allows us to
@@ -172,14 +171,24 @@ function mergeWpServiceConfigs( ...configs ) {
 	const getNestedValues = ( key, defaultValue = {} ) =>
 		configs.map( ( config ) => config[ key ] || defaultValue );
 
-	return {
+	const mergedConfig = {
 		...Object.assign( {}, ...configs ),
-		config: {
-			...Object.assign( {}, ...getNestedValues( 'config' ) ),
-		},
+		config: Object.assign( {}, ...getNestedValues( 'config' ) ),
+		mappings: Object.assign( {}, ...getNestedValues( 'mappings' ) ),
 	};
+
+	delete mergedConfig.env;
+	return mergedConfig;
 }
 
+/**
+ * Detects basic config options to use if the .wp-env.json config file does not
+ * exist. For example, if the local directory contains a plugin, that will be
+ * added to the default plugin sources.
+ *
+ * @param {string} configPath A path to the config file for the source to detect.
+ * @return {Object} Basic config options for the detected source type.
+ */
 async function getDefaultBaseConfig( configPath ) {
 	const configDirectoryPath = path.dirname( configPath );
 	const type = await detectDirectoryType( configDirectoryPath );
@@ -213,11 +222,8 @@ function withOverrides( config ) {
 		getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) ||
 		config.env.tests.port;
 
-	const updateEnvUrl = (
-		configKey,
-		environments = [ 'development', 'tests' ]
-	) => {
-		environments.forEach( ( envKey ) => {
+	const updateEnvUrl = ( configKey ) => {
+		[ 'development', 'tests' ].forEach( ( envKey ) => {
 			try {
 				const baseUrl = new URL(
 					config.env[ envKey ].config[ configKey ]
@@ -305,8 +311,3 @@ async function getHomeDirectory() {
 function md5( data ) {
 	return crypto.createHash( 'md5' ).update( data ).digest( 'hex' );
 }
-
-module.exports = {
-	ValidationError,
-	readConfig,
-};

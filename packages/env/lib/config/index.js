@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-const { ValidationError, readConfig } = require( './config' );
+const readConfig = require( './config' );
+const { ValidationError } = require( './validate-config' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
