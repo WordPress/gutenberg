@@ -12,10 +12,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	enableExperimentalFeatures,
-	disableExperimentalFeatures,
-} from '../../experimental-features';
+import { useExperimentalFeatures } from '../../experimental-features';
 import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Multi-entity save flow', () => {
@@ -54,18 +51,15 @@ describe( 'Multi-entity save flow', () => {
 			expect( element ).toBeNull();
 		}
 	};
-	// Setup & Teardown.
-	const requiredExperiments = [
+
+	useExperimentalFeatures( [
 		'#gutenberg-full-site-editing',
 		'#gutenberg-full-site-editing-demo',
-	];
+	] );
+
 	beforeAll( async () => {
-		await enableExperimentalFeatures( requiredExperiments );
 		await trashExistingPosts( 'wp_template' );
 		await trashExistingPosts( 'wp_template_part' );
-	} );
-	afterAll( async () => {
-		await disableExperimentalFeatures( requiredExperiments );
 	} );
 
 	describe( 'Post Editor', () => {

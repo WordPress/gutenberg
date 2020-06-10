@@ -18,6 +18,7 @@ export { default as __experimentalUseDragging } from './hooks/use-dragging';
 export { default as useInstanceId } from './hooks/use-instance-id';
 export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
 export { default as useMediaQuery } from './hooks/use-media-query';
+export { default as usePrevious } from './hooks/use-previous';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';
 export { default as useViewportMatch } from './hooks/use-viewport-match';
 export { default as useResizeObserver } from './hooks/use-resize-observer';

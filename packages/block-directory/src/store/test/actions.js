@@ -1,148 +1,129 @@
 /**
- * WordPress dependencies
- */
-import * as blockFunctions from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
-import { downloadBlock, installBlock } from '../actions';
-import * as controls from '../controls';
-
-const ACTIONS = {
-	apiFetch: 'API_FETCH',
-	addInstalledBlockType: 'ADD_INSTALLED_BLOCK_TYPE',
-	removeInstalledBlockType: 'REMOVE_INSTALLED_BLOCK_TYPE',
-};
-
-jest.mock( '@wordpress/blocks' );
+import { installBlockType } from '../actions';
 
 describe( 'actions', () => {
-	const item = { id: 'block/block', name: 'Test Block' };
-	const blockPlugin = {
-		assets: [ 'http://www.wordpress.org/plugins/fakeasset.js' ],
-	};
-	const getBlockTypeMock = jest.spyOn( blockFunctions, 'getBlockTypes' );
-	jest.spyOn( controls, 'apiFetch' );
-	jest.spyOn( controls, 'loadAssets' );
-
-	afterEach( () => {
-		jest.clearAllMocks();
-	} );
-
-	afterAll( () => {
-		jest.resetAllMocks();
-	} );
-
-	const callsTheApi = ( generator ) => {
-		return expect( generator.next( { success: true } ).value.type ).toEqual(
-			ACTIONS.apiFetch
-		);
+	const item = {
+		id: 'block/block',
+		name: 'Test Block',
+		assets: [ 'script.js' ],
 	};
 
-	const expectTest = ( hasCall, noCall ) => {
-		expect( hasCall ).toHaveBeenCalledTimes( 1 );
-		expect( noCall ).toHaveBeenCalledTimes( 0 );
-	};
-
-	const expectSuccess = ( onSuccess, onError ) => {
-		expectTest( onSuccess, onError );
-	};
-
-	const expectError = ( onSuccess, onError ) => {
-		expectTest( onError, onSuccess );
-	};
-
-	describe( 'downloadBlock', () => {
-		it( 'should throw error if the plugin has no assets', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
-
-			const generator = downloadBlock(
-				{
-					assets: [],
-				},
-				onSuccess,
-				onError
-			);
-
-			// Move onto the onError callback
-			generator.next();
-
-			expectError( onSuccess, onError );
-		} );
-
-		it( 'should call on success function', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
-
-			// The block is registered
-			getBlockTypeMock.mockReturnValue( [ item ] );
-
-			const generator = downloadBlock( blockPlugin, onSuccess, onError );
-
-			// Trigger the loading of assets
-			generator.next();
-
-			// Trigger the block check via getBlockTypes
-			generator.next();
-
-			expectSuccess( onSuccess, onError );
-		} );
-
-		it( 'should call on error when no blocks are returned', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
-
-			// The block is not registered
-			getBlockTypeMock.mockReturnValue( [] );
-
-			const generator = downloadBlock( blockPlugin, onSuccess, onError );
-
-			// Trigger the loading of assets
-			generator.next();
-
-			//Complete
-			generator.next();
-
-			expectError( onSuccess, onError );
-		} );
-	} );
-
-	describe( 'installBlock', () => {
+	describe( 'installBlockType', () => {
 		it( 'should install a block successfully', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
+			const generator = installBlockType( item );
 
-			const generator = installBlock( item, onSuccess, onError );
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+				notice: false,
+			} );
 
-			// It triggers API_FETCH that wraps @wordpress/api-fetch
-			callsTheApi( generator );
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: true,
+			} );
 
-			// It triggers ADD_INSTALLED_BLOCK_TYPE
-			expect( generator.next( { success: true } ).value.type ).toEqual(
-				ACTIONS.addInstalledBlockType
-			);
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+			} );
 
-			// Move on to success
-			generator.next();
+			expect( generator.next( { success: true } ).value ).toEqual( {
+				type: 'ADD_INSTALLED_BLOCK_TYPE',
+				item,
+			} );
 
-			expectSuccess( onSuccess, onError );
+			expect( generator.next().value ).toEqual( {
+				type: 'LOAD_ASSETS',
+				assets: item.assets,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				args: [],
+				selectorName: 'getBlockTypes',
+				storeKey: 'core/blocks',
+				type: 'SELECT',
+			} );
+
+			expect( generator.next( [ item ] ).value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: false,
+			} );
+
+			expect( generator.next() ).toEqual( {
+				value: true,
+				done: true,
+			} );
 		} );
 
-		it( 'should trigger error state when error is thrown', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
+		it( 'should set an error if the plugin has no assets', () => {
+			const generator = installBlockType( { ...item, assets: [] } );
 
-			const generator = installBlock( item, onSuccess, onError );
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+				notice: false,
+			} );
 
-			// It triggers API_FETCH that wraps @wordpress/api-fetch
-			callsTheApi( generator );
+			expect( generator.next().value ).toMatchObject( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+			} );
 
-			// Move on to error
-			generator.next();
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: false,
+			} );
 
-			expectError( onSuccess, onError );
+			expect( generator.next() ).toEqual( {
+				value: false,
+				done: true,
+			} );
+		} );
+
+		it( "should set an error if the plugin can't install", () => {
+			const generator = installBlockType( item );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+				notice: false,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: true,
+			} );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+			} );
+
+			const apiError = {
+				code: 'plugins_api_failed',
+				message: 'Plugin not found.',
+				data: null,
+			};
+			expect( generator.next( apiError ).value ).toMatchObject( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: false,
+			} );
+
+			expect( generator.next() ).toEqual( {
+				value: false,
+				done: true,
+			} );
 		} );
 	} );
 } );

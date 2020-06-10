@@ -63,7 +63,7 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
 		await openDocumentSettingsSidebar();
-		await page.click( '[aria-label="Image Size"] button' );
+		await page.click( '[aria-label="Image size presets"] button' );
 
 		const regex2 = new RegExp(
 			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"large"} -->\\s*<figure class="wp-block-image size-large is-resized"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`

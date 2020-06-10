@@ -1,4 +1,4 @@
-export default function( node ) {
+export default function headRemover( node ) {
 	if (
 		node.nodeName !== 'SCRIPT' &&
 		node.nodeName !== 'NOSCRIPT' &&

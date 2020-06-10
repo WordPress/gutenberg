@@ -23,17 +23,11 @@ export function getStablePath( path ) {
 			// [ 'b=1', 'c=2', 'a=5' ]
 			.split( '&' )
 			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
-			.map( function( entry ) {
-				return entry.split( '=' );
-			} )
+			.map( ( entry ) => entry.split( '=' ) )
 			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
-			.sort( function( a, b ) {
-				return a[ 0 ].localeCompare( b[ 0 ] );
-			} )
+			.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
 			// [ 'a=5', 'b=1', 'c=2' ]
-			.map( function( pair ) {
-				return pair.join( '=' );
-			} )
+			.map( ( pair ) => pair.join( '=' ) )
 			// 'a=5&b=1&c=2'
 			.join( '&' )
 	);

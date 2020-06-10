@@ -1,6 +1,6 @@
 {
 	"name": "core/navigation",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"orientation": {
 			"type": "string"
