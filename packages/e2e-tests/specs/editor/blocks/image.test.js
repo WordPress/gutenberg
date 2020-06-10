@@ -98,15 +98,4 @@ describe( 'Image', () => {
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '12' );
 	} );
-
-	it( 'should keep caption after upload', async () => {
-		await insertBlock( 'Image' );
-		await page.keyboard.type( '1' );
-		const filename1 = await upload( '.wp-block-image input[type="file"]' );
-
-		const regex = new RegExp(
-			`<!-- wp:image {"id":\\d+,"sizeSlug":"large"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/><figcaption>1</figcaption></figure>\\s*<!-- \\/wp:image -->`
-		);
-		expect( await getEditedPostContent() ).toMatch( regex );
-	} );
 } );

@@ -155,8 +155,8 @@ function gutenberg_edit_site_init( $hook ) {
 
 		$current_template = gutenberg_find_template_post_and_parts( $template_type );
 		if ( isset( $current_template ) ) {
-			$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
-			$template_part_ids = $template_part_ids + $current_template['template_part_ids'];
+			$template_ids[ $template_type ] = $current_template['template_post']->ID;
+			$template_part_ids              = $template_part_ids + $current_template['template_part_ids'];
 		}
 	}
 

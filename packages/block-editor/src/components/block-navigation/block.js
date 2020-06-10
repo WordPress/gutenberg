@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
+import {
+	__experimentalTreeGridCell as TreeGridCell,
+	__experimentalTreeGridItem as TreeGridItem,
+} from '@wordpress/components';
+
 import { moreVertical } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
@@ -71,7 +75,7 @@ export default function BlockNavigationBlock( {
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-block__contents-cell"
-				colSpan={ hasRenderedMovers ? undefined : 3 }
+				colSpan={ hasRenderedMovers ? undefined : 2 }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-block__contents-container">
@@ -96,32 +100,37 @@ export default function BlockNavigationBlock( {
 			</TreeGridCell>
 			{ hasRenderedMovers && (
 				<>
-					<TreeGridCell className={ moverCellClassName }>
-						{ ( { ref, tabIndex, onFocus } ) => (
-							<BlockMoverUpButton
-								__experimentalOrientation="vertical"
-								clientIds={ [ clientId ] }
-								ref={ ref }
-								tabIndex={ tabIndex }
-								onFocus={ onFocus }
-							/>
-						) }
-					</TreeGridCell>
-					<TreeGridCell className={ moverCellClassName }>
-						{ ( { ref, tabIndex, onFocus } ) => (
-							<BlockMoverDownButton
-								__experimentalOrientation="vertical"
-								clientIds={ [ clientId ] }
-								ref={ ref }
-								tabIndex={ tabIndex }
-								onFocus={ onFocus }
-							/>
-						) }
+					<TreeGridCell
+						className={ moverCellClassName }
+						withoutGridItem
+					>
+						<TreeGridItem>
+							{ ( { ref, tabIndex, onFocus } ) => (
+								<BlockMoverUpButton
+									__experimentalOrientation="vertical"
+									clientIds={ [ clientId ] }
+									ref={ ref }
+									tabIndex={ tabIndex }
+									onFocus={ onFocus }
+								/>
+							) }
+						</TreeGridItem>
+						<TreeGridItem>
+							{ ( { ref, tabIndex, onFocus } ) => (
+								<BlockMoverDownButton
+									__experimentalOrientation="vertical"
+									clientIds={ [ clientId ] }
+									ref={ ref }
+									tabIndex={ tabIndex }
+									onFocus={ onFocus }
+								/>
+							) }
+						</TreeGridItem>
 					</TreeGridCell>
 				</>
 			) }
 
-			{ withBlockNavigationBlockSettings && level > 1 && (
+			{ withBlockNavigationBlockSettings && (
 				<TreeGridCell
 					className={ blockNavigationBlockSettingsClassName }
 				>

@@ -148,27 +148,6 @@ function gutenberg_add_dom_rect_polyfill( $scripts ) {
 add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
 
 /**
- * Sets the current post for usage in template blocks.
- *
- * @return WP_Post|null The post if any, or null otherwise.
- */
-function gutenberg_get_post_from_context() {
-	// TODO: Without this temporary fix, an infinite loop can occur where
-	// posts with post content blocks render themselves recursively.
-	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
-		return null;
-	}
-
-	_deprecated_function( __FUNCTION__, '8.1.0' );
-
-	if ( ! in_the_loop() ) {
-		rewind_posts();
-		the_post();
-	}
-	return get_post();
-}
-
-/**
  * Filters default block categories to substitute legacy category names with new
  * block categories.
  *

@@ -100,5 +100,6 @@ require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
 require dirname( __FILE__ ) . '/edit-site-page.php';
+require dirname( __FILE__ ) . '/edit-site-export.php';
 require dirname( __FILE__ ) . '/editor-features.php';
 require dirname( __FILE__ ) . '/global-styles.php';
