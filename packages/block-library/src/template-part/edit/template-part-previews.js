@@ -167,7 +167,8 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 			'postType',
 			'wp_template_part',
 			{
-				status: [ 'publish', 'auto-draft' ],
+				status: [ 'publish' ],
+				per_page: -1,
 			}
 		);
 	}, [] );
