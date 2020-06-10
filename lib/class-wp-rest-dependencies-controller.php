@@ -216,7 +216,8 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 				'href' => rest_url( $base ),
 			),
 			'deps'       => array(
-				'href' => rest_url( trailingslashit( $base ) . '?dependency=' . $dependency->handle ),
+				'href'       => add_query_arg( 'dependency', $dependency->handle, rest_url( trailingslashit( $base ) ) ),
+				'embeddable' => true,
 			),
 		);
 
