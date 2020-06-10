@@ -118,6 +118,7 @@ class EditorProvider extends Component {
 				'__experimentalDisableCustomLineHeight',
 				'__experimentalEnableCustomSpacing',
 				'__experimentalEnableLegacyWidgetBlock',
+				'__experimentalEnableLinkColor',
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalFeatures',
