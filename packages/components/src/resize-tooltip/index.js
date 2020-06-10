@@ -14,11 +14,13 @@ import { forwardRef, useCallback, useState } from '@wordpress/element';
  */
 import Label from './label';
 import { useResizeLabel, VARIANTS } from './utils';
-import { Root } from './styles/resizable-visualizer.styles';
+import { Root } from './styles/resize-tooltip.styles';
 
-function Visualizer(
+function ResizeTooltip(
 	{
+		axis,
 		className,
+		isEnabled = true,
 		fadeTimeout = 180,
 		labelRef,
 		onMove = noop,
@@ -41,12 +43,15 @@ function Visualizer(
 	);
 
 	const { isActive, label, resizeListener } = useResizeLabel( {
+		axis,
 		fadeTimeout,
 		onMove: handleOnMove,
 		onResize,
 		showPx,
 		variant,
 	} );
+
+	if ( ! isEnabled ) return null;
 
 	const classes = classnames( 'components-resizable-visualizer', className );
 
@@ -56,6 +61,7 @@ function Visualizer(
 			<Label
 				fadeTimeout={ fadeTimeout }
 				isActive={ isActive }
+				isEnabled={ isEnabled }
 				label={ label }
 				ref={ labelRef }
 				position={ tooltipPosition }
@@ -66,6 +72,6 @@ function Visualizer(
 	);
 }
 
-const ForwardedComponent = forwardRef( Visualizer );
+const ForwardedComponent = forwardRef( ResizeTooltip );
 
 export default ForwardedComponent;

@@ -12,11 +12,11 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ResizableBox from '../../resizable-box';
-import ResizableVisualizer from '../';
+import ResizeTooltip from '../';
 
 export default {
-	title: 'Components/ResizableVisualizer',
-	component: ResizableVisualizer,
+	title: 'Components/ResizeTooltip',
+	component: ResizeTooltip,
 };
 
 const Example = ( props ) => {
@@ -63,7 +63,7 @@ export const _default = () => {
 
 	return (
 		<Example>
-			<ResizableVisualizer { ...props } />
+			<ResizeTooltip { ...props } />
 			<div
 				style={ {
 					background: '#eee',

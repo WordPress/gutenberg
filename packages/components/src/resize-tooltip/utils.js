@@ -29,6 +29,7 @@ export const VARIANTS = {
  * based on current resize width x height values.
  *
  * @param {Object} props
+ * @param {string} props.axis Only shows the label corresponding to the axis.
  * @param {number} props.fadeTimeout Duration (ms) before deactivating the resize label.
  * @param {Function} props.onMove Callback when a resize occurs. Provides onMouseEvent event callback.
  * @param {boolean} props.onResize Callback when a resize occurs. Provides { width, height } callback.
@@ -38,6 +39,7 @@ export const VARIANTS = {
  * @return {UseResizeLabelProps} Properties for hook.
  */
 export function useResizeLabel( {
+	axis,
 	fadeTimeout = 200,
 	onMove = noop,
 	onResize = noop,
@@ -154,6 +156,7 @@ export function useResizeLabel( {
 	}, [ width, height, isActive, isRendered ] );
 
 	const label = getSizeLabel( {
+		axis,
 		moveX,
 		moveY,
 		width,
@@ -173,6 +176,7 @@ export function useResizeLabel( {
  * Gets the resize label based on width and height values (as well as recent changes).
  *
  * @param {Object} props
+ * @param {string} props.axis Only shows the label corresponding to the axis.
  * @param {number} props.height Height value.
  * @param {boolean} props.moveX Recent width (x axis) changes.
  * @param {boolean} props.moveY Recent width (y axis) changes.
@@ -183,6 +187,7 @@ export function useResizeLabel( {
  * @return {undefined | string} The rendered label.
  */
 function getSizeLabel( {
+	axis,
 	height,
 	moveX = false,
 	moveY = false,
@@ -208,16 +213,16 @@ function getSizeLabel( {
 	 * Otherwise, only width or height will be displayed.
 	 * The `PX` unit will be added, if specified by the `showPx` prop.
 	 */
-	if ( moveX && moveY ) {
+	if ( moveX && moveY && ! axis ) {
 		// Width x Height changes...
 		label = `${ width } x ${ height }`;
-	} else if ( moveY ) {
+	} else if ( moveY && axis !== 'x' ) {
 		// Height changes...
 		label = `${ height }`;
 		if ( showPx ) {
 			label = `${ label } PX`;
 		}
-	} else if ( moveX ) {
+	} else if ( moveX && axis !== 'y' ) {
 		// Width changes...
 		label = `${ width }`;
 		if ( showPx ) {

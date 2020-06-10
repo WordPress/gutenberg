@@ -12,7 +12,7 @@ import { Fragment, forwardRef, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { VARIANTS } from './utils';
-import { TooltipWrapper, Tooltip } from './styles/resizable-visualizer.styles';
+import { TooltipWrapper, Tooltip } from './styles/resize-tooltip.styles';
 
 const CURSOR_OFFSET_TOP = 12;
 

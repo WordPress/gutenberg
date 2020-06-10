@@ -82,6 +82,7 @@ export { default as __experimentalRadioGroup } from './radio-group';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
+export { default as ResizeTooltip } from './resize-tooltip';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';

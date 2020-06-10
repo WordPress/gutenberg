@@ -1,34 +1,34 @@
-# ResizableVisualizer
+# ResizeTooltip
 
-ResizableVisualizer displays the dimensions of an element whenever the width or height of the element changes.
+ResizeTooltip displays the dimensions of an element whenever the width or height of the element changes.
 
 ## Usage
 
 ```jsx
-import { ResizableVisualizer } from '@wordpress/components';
+import { ResizeTooltip } from '@wordpress/components';
 
 const Example = () => {
 	return (
 		<div style={ { position: 'relative' } }>
-			<ResizableVisualizer />
+			<ResizeTooltip />
 			...
 		</div>
 	);
 };
 ```
 
-Be sure that the parent element containing `<ResizableVisualizer />` has the `position` style property defined. This is important as `<ResizableVisualizer />` uses `position` based techniques to determine size changes.
+Be sure that the parent element containing `<ResizeTooltip />` has the `position` style property defined. This is important as `<ResizeTooltip />` uses `position` based techniques to determine size changes.
 
 ### Variants
 
-`<ResizableVisualizer />` has two style variants;
+`<ResizeTooltip />` has two style variants;
 
 -   `cursor`
 -   `corner`
 
 ##### `cursor`
 
-The `cursor` variant (default) renders the dimensions label right above the mouse cursor.
+The `cursor` variant (default) renders the dimensions label right above the mosuse cursor.
 
 ##### `corner`
 
@@ -39,6 +39,14 @@ The `corner` variant renders the dimensions label in the top-right corner of the
 
 ## Props
 
+### axis
+
+Limits the label to render corresponding to the axis. By default, the label will automatically render based on both `x` and `y` changes.
+
+-   Type: `String`
+-   Required: No
+-   Values: `x` | `y`
+
 ### fadeTimeout
 
 Duration (in `ms`) before the label disappears after resize event.
@@ -46,6 +54,14 @@ Duration (in `ms`) before the label disappears after resize event.
 -   Type: `Number`
 -   Required: No
 -   Default: `180`
+
+### isEnabled
+
+Determines if the label can render.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
 
 ### labelRef
 
@@ -83,6 +99,7 @@ The style variant for the label.
 -   Type: `String`
 -   Required: No
 -   Default: `cursor`
+-   Values: `corner` |`cursor`
 
 ### zIndex
 
