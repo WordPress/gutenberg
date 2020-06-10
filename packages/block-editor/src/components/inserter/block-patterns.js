@@ -10,6 +10,8 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, _x } from '@wordpress/i18n';
+import { VisuallyHidden } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -24,6 +26,8 @@ import usePatternsState from './hooks/use-patterns-state';
 function BlockPattern( { pattern, onClick } ) {
 	const { content, viewportWidth } = pattern;
 	const blocks = useMemo( () => parse( content ), [ content ] );
+	const instanceId = useInstanceId( BlockPattern );
+	const descriptionId = `block-editor-inserter__patterns-item-description-${ instanceId }`;
 
 	return (
 		<div
@@ -37,11 +41,15 @@ function BlockPattern( { pattern, onClick } ) {
 			} }
 			tabIndex={ 0 }
 			aria-label={ pattern.title }
+			aria-describedby={ descriptionId }
 		>
 			<BlockPreview blocks={ blocks } viewportWidth={ viewportWidth } />
 			<div className="block-editor-inserter__patterns-item-title">
 				{ pattern.title }
 			</div>
+			<VisuallyHidden id={ descriptionId }>
+				{ pattern.description }
+			</VisuallyHidden>
 		</div>
 	);
 }
