@@ -116,7 +116,6 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentWillUnmount() {
-
 		if ( this.subscriptionParentGetHtml ) {
 			this.subscriptionParentGetHtml.remove();
 		}
