@@ -163,23 +163,48 @@ function gutenberg_rest_nonce() {
 add_action( 'wp_ajax_gutenberg_rest_nonce', 'gutenberg_rest_nonce' );
 
 /**
- * Prints TinyMCE scripts when we're outside of the block editor.
- * Otherwise, use the default TinyMCE script printing behavior.
+ * Prints TinyMCE scripts when we're outside of the block editor using
+ * the default behavior by calling to the default action function from core.
+ * Otherwise, when in the block editor, only print TinyMCE support scripts.
+ *
+ * Support scripts include translations and a full list of the URIs of
+ * TinyMCE JS scripts that need to be loaded for the full dependency.
+ *
+ * Under some compression settings, TinyMCE may be split into two
+ * separate scripts, so we handle that programatically here by checking
+ * the `deps` list on the WP_Dependency instance for wp-tinymce.
  *
  * @since 7.9.1
  */
 function gutenberg_print_tinymce_scripts() {
 	$current_screen = get_current_screen();
 	if ( ! $current_screen->is_block_editor() ) {
-		// maybe also need to check a setting/feature flag? Put this behind phase 2?
 		wp_print_tinymce_scripts();
 	} else {
-		echo "<!-- Skipping TinyMCE in favor of loading async -->";
+		// Otherwise we're in the block editor and should only print support scripts.
+
+		// Translations
 		echo "<script type='text/javascript'>\n" .
 			"window.wpMceTranslation = function() {\n" .
 				_WP_Editors::wp_mce_translation() .
-			"\n};\n</script>\n";
+			"\n};\n";
+
+		// Full list of TinyMCE JS scripts to load in order
+		$wp_scripts  = wp_scripts();
+		$tinymce_dep = $wp_scripts->registered['wp-tinymce'];
+
+		echo "window.wpTinyMCEOrderedScriptURIs = [];\n";
+
+		foreach ( $tinymce_dep->deps as $handle ) {
+			$url = $wp_scripts->get_url( $handle );
+			echo "window.wpTinyMCEOrderedScriptURIs.push( \"$url\");\n";
+		}
+
+		$url = $wp_scripts->get_url( $tinymce_dep->handle );
+		echo "window.wpTinyMCEOrderedScriptURIs.push( \"$url\" );\n" .
+			'</script>';
 	}
 }
+
 remove_action( 'print_tinymce_scripts', 'wp_print_tinymce_scripts' );
 add_action( 'print_tinymce_scripts', 'gutenberg_print_tinymce_scripts' );
