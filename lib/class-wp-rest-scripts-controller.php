@@ -13,7 +13,7 @@ class WP_REST_Scripts_Controller extends WP_REST_Dependencies_Controller {
 	 * WP_REST_Scripts_Controller constructor.
 	 */
 	public function __construct() {
-		$this->namespace               = 'wp/v2';
+		$this->namespace               = '__experimental';
 		$this->rest_base               = 'scripts';
 		$this->editor_block_dependency = 'editor_script';
 		$this->block_dependency        = 'script';

@@ -13,7 +13,7 @@ class WP_REST_Styles_Controller extends WP_REST_Dependencies_Controller {
 	 * WP_REST_Styles_Controller constructor.
 	 */
 	public function __construct() {
-		$this->namespace               = 'wp/v2';
+		$this->namespace               = '__experimental';
 		$this->rest_base               = 'styles';
 		$this->editor_block_dependency = 'editor_style';
 		$this->block_dependency        = 'style';
