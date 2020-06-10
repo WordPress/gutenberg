@@ -8,7 +8,6 @@ export { default as BlockIcon } from './block-icon';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export * from './colors';
 export * from './gradients';
-export * from './gradients/with-gradient';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as InnerBlocks } from './inner-blocks';
