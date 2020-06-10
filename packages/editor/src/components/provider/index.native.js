@@ -9,7 +9,6 @@ import RNReactNativeGutenbergBridge, {
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
 	subscribeUpdateTheme,
-	subscribeHandshake,
 } from 'react-native-gutenberg-bridge';
 
 /**
