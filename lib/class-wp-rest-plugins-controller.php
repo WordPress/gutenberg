@@ -358,7 +358,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 		$response = $this->prepare_item_for_response( $data, $request );
 		$response->set_status( 201 );
-		$response->header( 'Location', rest_url( $this->namespace . '/' . $this->rest_base . '/' . substr( $file, 0, - 4 ) ) );
+		$response->header( 'Location', rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, substr( $file, 0, - 4 ) ) ) );
 
 		return $response;
 	}
@@ -549,9 +549,25 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$data = $this->add_additional_fields_to_object( $data, $request );
 
 		$response = new WP_REST_Response( $data );
-		$response->add_link( 'self', rest_url( $this->namespace . '/' . $this->rest_base . '/' . substr( $item['_file'], 0, - 4 ) ) );
+		$response->add_links( $this->prepare_links( $item ) );
 
 		return $response;
+	}
+
+	/**
+	 * Prepares links for the request.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param array $item The plugin item.
+	 * @return array[]
+	 */
+	protected function prepare_links( $item ) {
+		return array(
+			'self' => array(
+				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, substr( $item['_file'], 0, - 4 ) ) ),
+			),
+		);
 	}
 
 	/**

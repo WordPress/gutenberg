@@ -749,6 +749,9 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = $endpoint->prepare_item_for_response( $item, new WP_REST_Request( 'GET', self::BASE . '/' . self::PLUGIN ) );
 
 		$this->check_get_plugin_data( $response->get_data() );
+		$links = $response->get_links();
+		$this->assertArrayHasKey( 'self', $links );
+		$this->assertEquals( rest_url( self::BASE . '/' . self::PLUGIN ), $links['self'][0]['href'] );
 	}
 
 	/**
