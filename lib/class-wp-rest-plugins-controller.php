@@ -301,16 +301,23 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$result = $upgrader->install( $api->download_link );
 
 		if ( is_wp_error( $result ) ) {
+			$result->add_data( array( 'status' => 500 ) );
+
 			return $result;
 		}
 
 		// This should be the same as $result above.
 		if ( is_wp_error( $skin->result ) ) {
+			$skin->result->add_data( array( 'status' => 500 ) );
+
 			return $skin->result;
 		}
 
 		if ( $skin->get_errors()->has_errors() ) {
-			return $skin->get_errors();
+			$error = $skin->get_errors();
+			$error->add_data( array( 'status' => 500 ) );
+
+			return $error;
 		}
 
 		if ( is_null( $result ) ) {
@@ -495,6 +502,8 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$deleted  = delete_plugins( array( $request['plugin'] ) );
 
 		if ( is_wp_error( $deleted ) ) {
+			$deleted->add_data( array( 'status' => 500 ) );
+
 			return $deleted;
 		}
 
@@ -663,9 +672,8 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		}
 
 		$network_activate = 'network-active' === $new_status;
-		$activated        = activate_plugin( $plugin, '', $network_activate );
 
-		if ( ! $network_activate && is_network_only_plugin( $plugin ) && is_multisite() ) {
+		if ( is_multisite() && ! $network_activate && is_network_only_plugin( $plugin ) ) {
 			return new WP_Error(
 				'rest_network_only_plugin',
 				__( 'Network only plugin must be network activated.', 'gutenberg' ),
@@ -673,7 +681,11 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			);
 		}
 
+		$activated = activate_plugin( $plugin, '', $network_activate );
+
 		if ( is_wp_error( $activated ) ) {
+			$activated->add_data( array( 'status' => 500 ) );
+
 			return $activated;
 		}
 
@@ -744,7 +756,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			return true;
 		}
 
-		return new WP_Error( 'fs_unavailable', __( 'The filesystem is currently unavailable for managing plugins.', 'gutenberg' ) );
+		return new WP_Error( 'fs_unavailable', __( 'The filesystem is currently unavailable for managing plugins.', 'gutenberg' ), array( 'status' => 500 ) );
 	}
 
 	/**
