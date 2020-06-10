@@ -111,7 +111,14 @@ Heading label for BoxControl.
 
 ### onChange
 
-A function that receives the values of the inputs.
+A callback function when an input value changes.
+
+-   Type: `Function`
+-   Required: Yes
+
+### onChangeShowVisualizer
+
+A callback function for visualizer changes, based on input hover interactions.
 
 -   Type: `Function`
 -   Required: Yes
