@@ -199,14 +199,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
     @objc
     public func acknowledgeConnecton() {
-
-        guard !connectionEstablished else { return } // We have an established connection no need to trigger a new one.
-
+        guard !connectionEstablished else { return } // We have an established connection no need to continue.
         connectionEstablished = true
-        queuedEventProcessQueue.async { // replay the triggered events in order on a synchronized queue as the array is mutating
+        queuedEventProcessQueue.async { // replay the triggered events in order on a synchronized queue as the array is mutating.
             while (self.queuedEvents.count > 0) {
                 let event = self.queuedEvents.removeFirst()
-                self.sendEvent(withName: event.name, body: event.body)
+                super.sendEvent(withName: event.name, body: event.body) // execute this on super as we want to avoid logic in self.
             }
         }
     }
