@@ -46,6 +46,7 @@ export function useResizeLabel( {
 	showPx = false,
 	variant = VARIANTS.cursor,
 } ) {
+	const [ isDragging, setIsDragging ] = useState( false );
 	const [ isActive, setIsActive ] = useState( false );
 	/**
 	 * The width/height values derive from this special useResizeAwere hook.
@@ -108,11 +109,13 @@ export function useResizeLabel( {
 			if ( moveTimeoutRef.current ) {
 				clearTimeout( moveTimeoutRef.current );
 			}
+			setIsDragging( true );
 			setMoveX( false );
 			setMoveY( false );
 		};
 
 		const handleOnMouseUp = () => {
+			setIsDragging( false );
 			setIsActive( false );
 
 			if ( moveTimeoutRef.current ) {
@@ -126,14 +129,7 @@ export function useResizeLabel( {
 		};
 
 		const handleOnMouseMove = ( event ) => {
-			/**
-			 * Handles edge cases where a movement event occurs when the primary
-			 * mouse button is let go during a move event.
-			 */
-			if ( event.which !== 1 && isActive ) {
-				handleOnMouseUp();
-				return;
-			}
+			if ( ! isDragging ) return;
 
 			if ( width !== widthRef.current || height !== heightRef.current ) {
 				widthRef.current = width;
@@ -144,16 +140,16 @@ export function useResizeLabel( {
 			}
 		};
 
-		window.addEventListener( 'mousedown', handleOnMouseDown );
-		window.addEventListener( 'mousemove', handleOnMouseMove );
-		window.addEventListener( 'mouseup', handleOnMouseUp );
+		document.addEventListener( 'mousedown', handleOnMouseDown );
+		document.addEventListener( 'mousemove', handleOnMouseMove );
+		document.addEventListener( 'mouseup', handleOnMouseUp );
 
 		return () => {
-			window.removeEventListener( 'mousedown', handleOnMouseDown );
-			window.removeEventListener( 'mousemove', handleOnMouseMove );
-			window.removeEventListener( 'mouseup', handleOnMouseUp );
+			document.removeEventListener( 'mousedown', handleOnMouseDown );
+			document.removeEventListener( 'mousemove', handleOnMouseMove );
+			document.removeEventListener( 'mouseup', handleOnMouseUp );
 		};
-	}, [ width, height, isActive, isRendered ] );
+	}, [ width, height, isActive, isRendered, isDragging ] );
 
 	const label = getSizeLabel( {
 		axis,

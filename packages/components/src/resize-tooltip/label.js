@@ -32,7 +32,11 @@ function Label(
 	const tooltipWidth = tooltipRef.current?.clientWidth || 0;
 	const tooltipHeight = tooltipRef.current?.clientHeight || 0;
 
-	const showLabel = isActive && label;
+	if ( ! label ) {
+		return null;
+	}
+
+	const showLabel = isActive;
 
 	const isCorner = variant === VARIANTS.corner;
 	const isCursor = variant === VARIANTS.cursor;
