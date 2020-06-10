@@ -332,13 +332,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const {
-			attributes,
-			isSelected,
-			image,
-			imageSizes,
-			insertBlocksAfter,
-		} = this.props;
+		const { attributes, isSelected, image, imageSizes } = this.props;
 		const {
 			align,
 			url,
@@ -625,7 +619,7 @@ export class ImageEdit extends React.Component {
 						}
 						onFocus={ this.onFocusCaption }
 						onBlur={ this.props.onBlur } // always assign onBlur as props
-						insertBlocksAfter={ insertBlocksAfter }
+						insertBlocksAfter={ this.props.insertBlocksAfter }
 					/>
 				</View>
 			</TouchableWithoutFeedback>
