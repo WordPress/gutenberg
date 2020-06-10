@@ -23,6 +23,7 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		requestMediaPicker: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
 		subscribeReplaceBlock: jest.fn(),
+		acknowledgeConnecton: jest.fn(),
 		mediaSources: {
 			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 			deviceCamera: 'DEVICE_CAMERA',
