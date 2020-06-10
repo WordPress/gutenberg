@@ -127,6 +127,67 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->check_get_plugin_data( array_shift( $items ) );
 	}
 
+	public function test_get_items_search() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$super_admin );
+
+		$request = new WP_REST_Request( 'GET', self::BASE );
+		$request->set_query_params( array( 'search' => 'testeroni' ) );
+		$response = rest_do_request( $request );
+		$this->assertCount( 0, $response->get_data() );
+
+		$request = new WP_REST_Request( 'GET', self::BASE );
+		$request->set_query_params( array( 'search' => 'Cool' ) );
+		$response = rest_do_request( $request );
+		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+	}
+
+	public function test_get_items_status() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$super_admin );
+
+		$request = new WP_REST_Request( 'GET', self::BASE );
+		$request->set_query_params( array( 'status' => 'inactive' ) );
+		$response = rest_do_request( $request );
+		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+
+		$request = new WP_REST_Request( 'GET', self::BASE );
+		$request->set_query_params( array( 'status' => 'active' ) );
+		$response = rest_do_request( $request );
+		$this->assertCount( 0, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+	}
+
+	public function test_get_items_status_multiple() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$super_admin );
+
+		$request = new WP_REST_Request( 'GET', self::BASE );
+		$request->set_query_params( array( 'status' => array( 'inactive', 'active' ) ) );
+		$response = rest_do_request( $request );
+
+		$this->assertGreaterThan( 1, count( wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ), 'NOT' ) ) );
+		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_get_items_status_network_active() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$super_admin );
+
+		$request = new WP_REST_Request( 'GET', self::BASE );
+		$request->set_query_params( array( 'status' => 'network-active' ) );
+		$response = rest_do_request( $request );
+		$this->assertCount( 0, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+
+		activate_plugin( self::PLUGIN_FILE, '', true );
+		$request = new WP_REST_Request( 'GET', self::BASE );
+		$request->set_query_params( array( 'status' => 'network-active' ) );
+		$response = rest_do_request( $request );
+		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+	}
+
 	public function test_get_items_logged_out() {
 		$response = rest_do_request( self::BASE );
 		$this->assertEquals( 401, $response->get_status() );

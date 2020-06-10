@@ -140,7 +140,12 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			}
 
 			$data['_file'] = $file;
-			$plugins[]     = $this->prepare_response_for_collection( $this->prepare_item_for_response( $data, $request ) );
+
+			if ( ! $this->does_plugin_match_request( $request, $data ) ) {
+				continue;
+			}
+
+			$plugins[] = $this->prepare_response_for_collection( $this->prepare_item_for_response( $data, $request ) );
 		}
 
 		return new WP_REST_Response( $plugins );
@@ -558,7 +563,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		 *
 		 * @param WP_REST_Response $response The response object.
 		 * @param array            $item     The plugin item from {@see get_plugin_data()}.
-		 * @param WP_REST_Request $request   The request object.
+		 * @param WP_REST_Request  $request  The request object.
 		 */
 		return apply_filters( 'rest_prepare_plugin', $response, $item, $request );
 	}
@@ -722,11 +727,50 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	/**
 	 * Sanitizes the "plugin" parameter to be a proper plugin file with ".php" appended.
 	 *
+	 * @since 5.5.0
+	 *
 	 * @param string $file The plugin file parameter.
 	 * @return string
 	 */
 	public function sanitize_plugin_param( $file ) {
 		return plugin_basename( sanitize_text_field( $file . '.php' ) );
+	}
+
+	/**
+	 * Checks if the plugin matches the requested parameters.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param WP_REST_Request $request The request to require the plugin matches against.
+	 * @param array           $item    The plugin item.
+	 *
+	 * @return bool
+	 */
+	protected function does_plugin_match_request( $request, $item ) {
+		$search = $request['search'];
+
+		if ( $search ) {
+			$matched_search = false;
+
+			foreach ( $item as $field ) {
+				if ( is_string( $field ) && false !== strpos( strip_tags( $field ), $search ) ) {
+					$matched_search = true;
+					break;
+				}
+			}
+
+			if ( ! $matched_search ) {
+				return false;
+			}
+		}
+
+		$status = $request['status'];
+
+		if ( $status && ! in_array( $this->get_plugin_status( $item['_file'] ), $status, true ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -884,8 +928,21 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @return array Query parameters for the collection.
 	 */
 	public function get_collection_params() {
-		return array(
-			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+		$query_params = parent::get_collection_params();
+
+		$query_params['context']['default'] = 'view';
+
+		$query_params['status'] = array(
+			'description' => __( 'Limits results to plugins with the given status.', 'gutenberg' ),
+			'type'        => 'array',
+			'items'       => array(
+				'type' => 'string',
+				'enum' => is_multisite() ? array( 'inactive', 'active', 'network-active' ) : array( 'inactive', 'active' ),
+			),
 		);
+
+		unset( $query_params['page'], $query_params['per_page'] );
+
+		return $query_params;
 	}
 }
