@@ -13,17 +13,9 @@ The tools needed for development are **Node** and **NPM**. **Nodejs** is a runti
 
 The tools are used to convert the JavaScript we are going to write into a format that browsers can run. This is called transpiling or the build step.
 
-You can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, installers are available for Windows and Mac, and binaries available for Linux.
+You can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
 
-An alternative installation, if you use a package manager, nodejs is available for most package managers.
-
-On Mac, [Homebrew](https://brew.sh/) is a popular package manager, if you use Homebrew install using: `brew install nodejs`
-
-On Windows, [Chocolatey](https://chocolatey.org/packages) is a popular package manager, if you use Chocolatey install using: `choco install nodejs`
-
-If you use Linux, you should confirm NPM is also installed. In some systems it is bundled separately and you may need to explicitly install it. For example, on Ubuntu, or Debian systems you can install using: `apt install nodejs npm`
-
-However you install Nodejs, the important part is being able to use them in your terminal. Open a terminal command-line and be able to run `node -v` and `npm -v` to confirm they are installed.
+The important part after installing is being able to use them in your terminal. Open a terminal command-line and be able to run `node -v` and `npm -v` to confirm they are installed.
 
 
 ## WordPress Development Site
