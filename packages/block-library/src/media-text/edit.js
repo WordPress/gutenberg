@@ -8,8 +8,8 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
@@ -17,7 +17,6 @@ import {
 	InspectorControls,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
-import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	TextareaControl,
@@ -56,22 +55,9 @@ const applyWidthConstraints = ( width ) =>
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 
-class MediaTextEdit extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onSelectMedia = this.onSelectMedia.bind( this );
-		this.onWidthChange = this.onWidthChange.bind( this );
-		this.commitWidthChange = this.commitWidthChange.bind( this );
-		this.state = {
-			mediaWidth: null,
-		};
-		this.onSetHref = this.onSetHref.bind( this );
-	}
-
-	onSelectMedia( media ) {
-		const { setAttributes } = this.props;
-		const { linkDestination, href } = this.props.attributes;
+function attributesFromMedia( { setAttributes, attributes } ) {
+	return ( media ) => {
+		const { linkDestination, href } = attributes;
 
 		let mediaType;
 		let src;
@@ -122,228 +108,201 @@ class MediaTextEdit extends Component {
 			href: newHref,
 			focalPoint: undefined,
 		} );
-	}
+	};
+}
 
-	onWidthChange( width ) {
-		this.setState( {
-			mediaWidth: applyWidthConstraints( width ),
-		} );
-	}
+function MediaTextEdit( {
+	attributes,
+	className,
+	isSelected,
+	setAttributes,
+	clientId,
+} ) {
+	const {
+		mediaAlt,
+		mediaId,
+		mediaPosition,
+		mediaType,
+		mediaUrl,
+		mediaWidth,
+		verticalAlignment,
+		imageFill,
+		focalPoint,
+		isStackedOnMobile,
+		rel,
+		href,
+		linkTarget,
+		linkClass,
+		linkDestination,
+	} = attributes;
 
-	onSetHref( props ) {
-		this.props.setAttributes( props );
-	}
+	const image = useSelect(
+		( select ) => {
+			const { getMedia } = select( 'core' );
+			return {
+				image: mediaId && isSelected ? getMedia( mediaId ) : null,
+			};
+		},
+		[ clientId ]
+	);
 
-	commitWidthChange( width ) {
-		const { setAttributes } = this.props;
+	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
 
+	const onSelectMedia = attributesFromMedia( { setAttributes, attributes } );
+
+	const onSetHref = ( props ) => {
+		setAttributes( props );
+	};
+
+	const onWidthChange = ( width ) => {
+		setTemporaryMediaWidth( applyWidthConstraints( width ) );
+	};
+	const commitWidthChange = ( width ) => {
 		setAttributes( {
 			mediaWidth: applyWidthConstraints( width ),
 		} );
-		this.setState( {
-			mediaWidth: null,
-		} );
-	}
+		setTemporaryMediaWidth( applyWidthConstraints( width ) );
+	};
 
-	renderMediaArea() {
-		const { attributes, isSelected } = this.props;
-		const {
-			mediaAlt,
-			mediaId,
-			mediaPosition,
-			mediaType,
-			mediaUrl,
-			mediaWidth,
-			imageFill,
-			focalPoint,
-			isStackedOnMobile,
-		} = attributes;
-		return (
-			<MediaContainer
-				className="wp-block-media-text__media"
-				onSelectMedia={ this.onSelectMedia }
-				onWidthChange={ this.onWidthChange }
-				commitWidthChange={ this.commitWidthChange }
-				{ ...{
-					mediaAlt,
-					mediaId,
-					mediaType,
-					mediaUrl,
-					mediaPosition,
-					mediaWidth,
-					imageFill,
-					focalPoint,
-					isSelected,
-					isStackedOnMobile,
-				} }
+	const classNames = classnames( className, {
+		'has-media-on-the-right': 'right' === mediaPosition,
+		'is-selected': isSelected,
+		'is-stacked-on-mobile': isStackedOnMobile,
+		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		'is-image-fill': imageFill,
+	} );
+	const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
+	const gridTemplateColumns =
+		'right' === mediaPosition
+			? `1fr ${ widthString }`
+			: `${ widthString } 1fr`;
+	const style = {
+		gridTemplateColumns,
+		msGridColumns: gridTemplateColumns,
+	};
+	const toolbarControls = [
+		{
+			icon: pullLeft,
+			title: __( 'Show media on left' ),
+			isActive: mediaPosition === 'left',
+			onClick: () => setAttributes( { mediaPosition: 'left' } ),
+		},
+		{
+			icon: pullRight,
+			title: __( 'Show media on right' ),
+			isActive: mediaPosition === 'right',
+			onClick: () => setAttributes( { mediaPosition: 'right' } ),
+		},
+	];
+	const onMediaAltChange = ( newMediaAlt ) => {
+		setAttributes( { mediaAlt: newMediaAlt } );
+	};
+	const onVerticalAlignmentChange = ( alignment ) => {
+		setAttributes( { verticalAlignment: alignment } );
+	};
+	const mediaTextGeneralSettings = (
+		<PanelBody title={ __( 'Media & Text settings' ) }>
+			<ToggleControl
+				label={ __( 'Stack on mobile' ) }
+				checked={ isStackedOnMobile }
+				onChange={ () =>
+					setAttributes( {
+						isStackedOnMobile: ! isStackedOnMobile,
+					} )
+				}
 			/>
-		);
-	}
-
-	render() {
-		const {
-			attributes,
-			className,
-			isSelected,
-			setAttributes,
-			image,
-		} = this.props;
-		const {
-			isStackedOnMobile,
-			mediaAlt,
-			mediaPosition,
-			mediaType,
-			mediaWidth,
-			verticalAlignment,
-			mediaUrl,
-			imageFill,
-			focalPoint,
-			rel,
-			href,
-			linkTarget,
-			linkClass,
-			linkDestination,
-		} = attributes;
-
-		const temporaryMediaWidth = this.state.mediaWidth;
-		const classNames = classnames( className, {
-			'has-media-on-the-right': 'right' === mediaPosition,
-			'is-selected': isSelected,
-			'is-stacked-on-mobile': isStackedOnMobile,
-			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-			'is-image-fill': imageFill,
-		} );
-		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
-		const gridTemplateColumns =
-			'right' === mediaPosition
-				? `1fr ${ widthString }`
-				: `${ widthString } 1fr`;
-		const style = {
-			gridTemplateColumns,
-			msGridColumns: gridTemplateColumns,
-		};
-		const toolbarControls = [
-			{
-				icon: pullLeft,
-				title: __( 'Show media on left' ),
-				isActive: mediaPosition === 'left',
-				onClick: () => setAttributes( { mediaPosition: 'left' } ),
-			},
-			{
-				icon: pullRight,
-				title: __( 'Show media on right' ),
-				isActive: mediaPosition === 'right',
-				onClick: () => setAttributes( { mediaPosition: 'right' } ),
-			},
-		];
-		const onMediaAltChange = ( newMediaAlt ) => {
-			setAttributes( { mediaAlt: newMediaAlt } );
-		};
-		const onVerticalAlignmentChange = ( alignment ) => {
-			setAttributes( { verticalAlignment: alignment } );
-		};
-		const mediaTextGeneralSettings = (
-			<PanelBody title={ __( 'Media & Text settings' ) }>
+			{ mediaType === 'image' && (
 				<ToggleControl
-					label={ __( 'Stack on mobile' ) }
-					checked={ isStackedOnMobile }
+					label={ __( 'Crop image to fill entire column' ) }
+					checked={ imageFill }
 					onChange={ () =>
 						setAttributes( {
-							isStackedOnMobile: ! isStackedOnMobile,
+							imageFill: ! imageFill,
 						} )
 					}
 				/>
-				{ mediaType === 'image' && (
-					<ToggleControl
-						label={ __( 'Crop image to fill entire column' ) }
-						checked={ imageFill }
-						onChange={ () =>
-							setAttributes( {
-								imageFill: ! imageFill,
-							} )
-						}
-					/>
-				) }
-				{ imageFill && (
-					<FocalPointPicker
-						label={ __( 'Focal point picker' ) }
-						url={ mediaUrl }
-						value={ focalPoint }
-						onChange={ ( value ) =>
-							setAttributes( { focalPoint: value } )
-						}
-					/>
-				) }
-				{ mediaType === 'image' && (
-					<TextareaControl
-						label={ __( 'Alt text (alternative text)' ) }
-						value={ mediaAlt }
-						onChange={ onMediaAltChange }
-						help={
-							<>
-								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-									{ __(
-										'Describe the purpose of the image'
-									) }
-								</ExternalLink>
-								{ __(
-									'Leave empty if the image is purely decorative.'
-								) }
-							</>
-						}
-					/>
-				) }
-			</PanelBody>
-		);
+			) }
+			{ imageFill && (
+				<FocalPointPicker
+					label={ __( 'Focal point picker' ) }
+					url={ mediaUrl }
+					value={ focalPoint }
+					onChange={ ( value ) =>
+						setAttributes( { focalPoint: value } )
+					}
+				/>
+			) }
+			{ mediaType === 'image' && (
+				<TextareaControl
+					label={ __( 'Alt text (alternative text)' ) }
+					value={ mediaAlt }
+					onChange={ onMediaAltChange }
+					help={
+						<>
+							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+								{ __( 'Describe the purpose of the image' ) }
+							</ExternalLink>
+							{ __(
+								'Leave empty if the image is purely decorative.'
+							) }
+						</>
+					}
+				/>
+			) }
+		</PanelBody>
+	);
 
-		return (
-			<>
-				<InspectorControls>
-					{ mediaTextGeneralSettings }
-				</InspectorControls>
-				<BlockControls>
-					<ToolbarGroup controls={ toolbarControls } />
-					<BlockVerticalAlignmentToolbar
-						onChange={ onVerticalAlignmentChange }
-						value={ verticalAlignment }
-					/>
-					{ mediaType === 'image' && (
-						<ToolbarGroup>
-							<ImageURLInputUI
-								url={ href || '' }
-								onChangeUrl={ this.onSetHref }
-								linkDestination={ linkDestination }
-								mediaType={ mediaType }
-								mediaUrl={ image && image.source_url }
-								mediaLink={ image && image.link }
-								linkTarget={ linkTarget }
-								linkClass={ linkClass }
-								rel={ rel }
-							/>
-						</ToolbarGroup>
-					) }
-				</BlockControls>
-				<div className={ classNames } style={ style }>
-					{ this.renderMediaArea() }
-					<InnerBlocks
-						template={ TEMPLATE }
-						templateInsertUpdatesSelection={ false }
-					/>
-				</div>
-			</>
-		);
-	}
+	return (
+		<>
+			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
+			<BlockControls>
+				<ToolbarGroup controls={ toolbarControls } />
+				<BlockVerticalAlignmentToolbar
+					onChange={ onVerticalAlignmentChange }
+					value={ verticalAlignment }
+				/>
+				{ mediaType === 'image' && (
+					<ToolbarGroup>
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ onSetHref }
+							linkDestination={ linkDestination }
+							mediaType={ mediaType }
+							mediaUrl={ image && image.source_url }
+							mediaLink={ image && image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
+						/>
+					</ToolbarGroup>
+				) }
+			</BlockControls>
+			<div className={ classNames } style={ style }>
+				<MediaContainer
+					className="wp-block-media-text__media"
+					onSelectMedia={ onSelectMedia }
+					onWidthChange={ onWidthChange }
+					commitWidthChange={ commitWidthChange }
+					{ ...{
+						mediaAlt,
+						mediaId,
+						mediaType,
+						mediaUrl,
+						mediaPosition,
+						mediaWidth,
+						imageFill,
+						focalPoint,
+						isSelected,
+						isStackedOnMobile,
+					} }
+				/>
+				<InnerBlocks
+					template={ TEMPLATE }
+					templateInsertUpdatesSelection={ false }
+				/>
+			</div>
+		</>
+	);
 }
 
-export default compose( [
-	withSelect( ( select, props ) => {
-		const { getMedia } = select( 'core' );
-		const {
-			attributes: { mediaId },
-			isSelected,
-		} = props;
-		return {
-			image: mediaId && isSelected ? getMedia( mediaId ) : null,
-		};
-	} ),
-] )( MediaTextEdit );
+export default MediaTextEdit;
