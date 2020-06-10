@@ -16,7 +16,7 @@ import { layout } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import useTemplatePartPost from './use-template-part-post';
+import useTemplatePartPost from '../use-template-part-post';
 import TemplatePartPreviews from './template-part-previews';
 
 const HELP_PHRASES = {
