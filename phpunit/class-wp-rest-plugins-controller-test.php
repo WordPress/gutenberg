@@ -680,7 +680,9 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$this->skip_on_filesystem_error( $response );
 		$this->assertNotWPError( $response->as_error() );
-		$this->assertEquals( 204, $response->get_status() );
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertTrue( $response->get_data()['deleted'] );
+		$this->assertEquals( 'test-plugin/test-plugin.php', $response->get_data()['previous']['plugin'] );
 		$this->assertFileNotExists( WP_PLUGIN_DIR . '/' . self::PLUGIN_FILE );
 	}
 

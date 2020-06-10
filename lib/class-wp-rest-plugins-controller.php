@@ -500,13 +500,19 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			return $filesystem_available;
 		}
 
-		$deleted = delete_plugins( array( $request['plugin'] ) );
+		$prepared = $this->prepare_item_for_response( $data, $request );
+		$deleted  = delete_plugins( array( $request['plugin'] ) );
 
 		if ( is_wp_error( $deleted ) ) {
 			return $deleted;
 		}
 
-		return new WP_REST_Response( null, 204 );
+		return new WP_REST_Response(
+			array(
+				'deleted'  => true,
+				'previous' => $prepared->get_data(),
+			)
+		);
 	}
 
 	/**
