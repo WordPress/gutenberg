@@ -431,7 +431,6 @@ class GalleryEdit extends Component {
 					onDeselectImage={ this.onDeselectImage }
 					onSetImageAttributes={ this.setImageAttributes }
 					onFocusGalleryCaption={ this.onFocusGalleryCaption }
-					insertBlocksAfter={ insertBlocksAfter }
 				/>
 			</>
 		);
