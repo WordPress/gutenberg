@@ -109,14 +109,14 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 					className="wp-block-template-part__placeholder-input"
 				/>
 			</div>
-			<div className="wp-block-template-part__help-phrase">
+			<div className="wp-block-template-part__placeholder-help-phrase">
 				{ help || helpPhrase }
 			</div>
 			<Button
 				isPrimary
 				disabled={ ! slug || ! theme || postId }
 				onClick={ onCreate }
-				className="wp-block-template-part__create-button"
+				className="wp-block-template-part__placeholder-create-button"
 			>
 				{ __( 'Create' ) }
 			</Button>
@@ -145,7 +145,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 	return (
 		<Placeholder icon={ layout } label={ __( 'Template Part' ) }>
 			<TabPanel
-				className="wp-block-template-part__tabs"
+				className="wp-block-template-part__placeholder-tabs"
 				tabs={ [
 					{
 						name: 'select',

@@ -1,5 +1,5 @@
 
-.wp-block-template-part__tabs {
+.wp-block-template-part__placeholder-tabs {
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
@@ -31,11 +31,11 @@
 		}
 	}
 
-	.wp-block-template-part__help-phrase {
+	.wp-block-template-part__placeholder-help-phrase {
 		padding: 0 $grid-unit-15 $grid-unit-15;
 	}
 
-	.wp-block-template-part__create-button {
+	.wp-block-template-part__placeholder-create-button {
 		align-self: flex-start;
 	}
 
