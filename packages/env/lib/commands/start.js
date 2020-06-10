@@ -64,7 +64,7 @@ module.exports = async function start( { spinner, debug } ) {
 			config: config.dockerComposeConfigPath,
 			log: config.debug,
 		} ),
-		...downloadSources( config, spinner ),
+		downloadSources( config, spinner ),
 	] );
 
 	await setupWordPressDirectories( config );

@@ -80,13 +80,14 @@ module.exports = function buildDockerComposeConfig( config ) {
 	//
 	// https://github.com/WordPress/gutenberg/issues/21164
 	if ( hasSameCoreSource( [ config.env.development, config.env.tests ] ) ) {
+		const wpSource = config.env.development.coreSource;
 		testsMounts.shift(); // Remove normal core mount.
 		testsMounts.unshift(
 			...[
-				`${ config.coreSource.testsPath }:/var/www/html`,
-				...( config.coreSource.type === 'local'
+				`${ wpSource.testsPath }:/var/www/html`,
+				...( wpSource.type === 'local'
 					? fs
-							.readdirSync( config.coreSource.path )
+							.readdirSync( wpSource.path )
 							.filter(
 								( filename ) =>
 									filename !== 'wp-config.php' &&
@@ -96,7 +97,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 							.map(
 								( filename ) =>
 									`${ path.join(
-										config.coreSource.path,
+										wpSource.path,
 										filename
 									) }:/var/www/html/${ filename }`
 							)

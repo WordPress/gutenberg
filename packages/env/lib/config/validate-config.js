@@ -23,13 +23,16 @@ class ValidationError extends Error {}
 const HOME_PATH_PREFIX = `~${ path.sep }`;
 
 /**
- * Parses and validates a config object.
+ * Parses and validates a config object. Takes environment-level configuration
+ * in the format specified in .wp-env.json, validates it, and converts it into
+ * the format used internally. For example, `plugins: string[]` will be parsed
+ * into `pluginSources: WPSource[]`.
  *
- * @param {Object} config A raw config object to parse
+ * @param {Object} config A config object to validate.
  * @param {Object} options
  * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
- * @param {string} options.environment Environment name for the service we are parsing.
- * @return {WPServiceConfig} validated and parsed service-level configuration.
+ * @param {string} options.environment       Environment name for the service we are parsing.
+ * @return {WPServiceConfig} Validated and parsed environment-level configuration.
  */
 function validateConfig( config, options ) {
 	if ( config.core !== null && typeof config.core !== 'string' ) {
@@ -77,7 +80,7 @@ function validateConfig( config, options ) {
 	for ( const [ wpDir, localDir ] of Object.entries( config.mappings ) ) {
 		if ( ! localDir || typeof localDir !== 'string' ) {
 			throw new ValidationError(
-				`Invalid .wp-env.json: "mapping.${ wpDir }" should be a string.`
+				`Invalid .wp-env.json: "mappings.${ wpDir }" should be a string.`
 			);
 		}
 	}

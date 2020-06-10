@@ -18,22 +18,22 @@ const readRawConfigFile = require( './read-raw-config-file' );
  * wp-env configuration.
  *
  * @typedef WPConfig
- * @property {string}      name                     Name of the environment.
- * @property {string}      configDirectoryPath      Path to the .wp-env.json file.
- * @property {string}      workDirectoryPath        Path to the work directory located in ~/.wp-env.
- * @property {string}      dockerComposeConfigPath  Path to the docker-compose.yml file.
- * @property {Object.<string, WPServiceConfig>} env Specific config for different services.
- * @property {boolean}     debug                    True if debug mode is enabled.
+ * @property {string}                           name                    Name of the environment.
+ * @property {string}                           configDirectoryPath     Path to the .wp-env.json file.
+ * @property {string}                           workDirectoryPath       Path to the work directory located in ~/.wp-env.
+ * @property {string}                           dockerComposeConfigPath Path to the docker-compose.yml file.
+ * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
+ * @property {boolean}                          debug                   True if debug mode is enabled.
  */
 
 /**
- * Base-level config for any particular service. (development/tests/etc)
+ * Base-level config for any particular environment. (development/tests/etc)
  *
  * @typedef WPServiceConfig
  * @property {?WPSource}                 coreSource    The WordPress installation to load in the environment.
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
- * @property {number}                    port          The port on which to start the development WordPress environment.
+ * @property {number}                    port          The port to use.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
  */
@@ -270,8 +270,8 @@ function getNumberFromEnvVariable( varName ) {
 /**
  * Gets the `wp-env` home directory in which generated files are created.
  *
- * By default, '~/.wp-env/'. On Linux, '~/wp-env/'. Can be overriden with the
- * WP_ENV_HOME environment variable.
+ * By default: '~/.wp-env/'. On Linux with snap packages: '~/wp-env/'. Can be
+ * overriden with the WP_ENV_HOME environment variable.
  *
  * @return {Promise<string>} The absolute path to the `wp-env` home directory.
  */
@@ -283,7 +283,8 @@ async function getHomeDirectory() {
 
 	/**
 	 * Installing docker with Snap Packages on Linux is common, but does not
-	 * support hidden directories. Therefore we use a public directory on Linux.
+	 * support hidden directories. Therefore we use a public directory when
+	 * snap packages exist.
 	 *
 	 * @see https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325
 	 */

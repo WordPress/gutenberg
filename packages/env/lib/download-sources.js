@@ -22,14 +22,14 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
  */
 
 /**
- * Download each source for each environment. If the same source is used in multiple
- * environments, it will only be downloaded once.
+ * Download each source for each environment. If the same source is used in
+ * multiple environments, it will only be downloaded once.
  *
- * @param {Config} config The wp-env configuration object.
+ * @param {Config} config  The wp-env configuration object.
  * @param {Object} spinner The spinner object to show progress.
- * @return {Promise[]} An array of promises for the downlad tasks.
+ * @return {Promise} Returns a promise which resolves when the downloads finish.
  */
-module.exports = async function downloadSources( config, spinner ) {
+module.exports = function downloadSources( config, spinner ) {
 	const progresses = {};
 	const getProgressSetter = ( id ) => ( progress ) => {
 		progresses[ id ] = progress;
@@ -59,11 +59,13 @@ module.exports = async function downloadSources( config, spinner ) {
 		addSource( config.env.coreSource );
 	}
 
-	return sources.map( ( source ) =>
-		downloadSource( source, {
-			onProgress: getProgressSetter( source.basename ),
-			spinner,
-		} )
+	return Promise.all(
+		sources.map( ( source ) =>
+			downloadSource( source, {
+				onProgress: getProgressSetter( source.basename ),
+				spinner,
+			} )
+		)
 	);
 };
 
