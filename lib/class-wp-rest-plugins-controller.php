@@ -551,7 +551,16 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$response = new WP_REST_Response( $data );
 		$response->add_links( $this->prepare_links( $item ) );
 
-		return $response;
+		/**
+		 * Filters the plugin data for a response.
+		 *
+		 * @since 5.5.0
+		 *
+		 * @param WP_REST_Response $response The response object.
+		 * @param array            $item     The plugin item from {@see get_plugin_data()}.
+		 * @param WP_REST_Request $request   The request object.
+		 */
+		return apply_filters( 'rest_prepare_plugin', $response, $item, $request );
 	}
 
 	/**
