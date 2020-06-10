@@ -119,7 +119,7 @@ class Image_Editor {
 	private function get_image_as_json( $id ) {
 		return array(
 			'media_id' => $id,
-			'url'     => wp_get_attachment_image_url( $id, 'original' ),
+			'url'      => wp_get_attachment_image_url( $id, 'original' ),
 		);
 	}
 
