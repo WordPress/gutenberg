@@ -15,7 +15,7 @@ import { useAsyncList } from '@wordpress/compose';
  */
 import { groupBy } from 'lodash';
 
-function TemplatePartPlaceholder() {
+function PreviewPlaceholder() {
 	return (
 		<div className="wp-block-template-part__placeholder-preview-item is-placeholder" />
 	);
@@ -99,7 +99,7 @@ function TemplatePartsByTheme( { templateParts, setAttributes } ) {
 						setAttributes={ setAttributes }
 					/>
 				) : (
-					<TemplatePartPlaceholder key={ templatePart.id } />
+					<PreviewPlaceholder key={ templatePart.id } />
 				);
 			} ) }
 		</PanelGroup>
@@ -155,7 +155,7 @@ function TemplatePartSearchResults( {
 					setAttributes={ setAttributes }
 				/>
 			) : (
-				<TemplatePartPlaceholder key={ templatePart.id } />
+				<PreviewPlaceholder key={ templatePart.id } />
 			) }
 		</PanelGroup>
 	) );
