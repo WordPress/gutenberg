@@ -111,13 +111,7 @@ function attributesFromMedia( { setAttributes, attributes } ) {
 	};
 }
 
-function MediaTextEdit( {
-	attributes,
-	className,
-	isSelected,
-	setAttributes,
-	clientId,
-} ) {
+function MediaTextEdit( { attributes, className, isSelected, setAttributes } ) {
 	const {
 		mediaAlt,
 		mediaId,
@@ -143,7 +137,7 @@ function MediaTextEdit( {
 				image: mediaId && isSelected ? getMedia( mediaId ) : null,
 			};
 		},
-		[ clientId ]
+		[ isSelected, mediaId ]
 	);
 
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
