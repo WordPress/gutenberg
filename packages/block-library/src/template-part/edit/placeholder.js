@@ -153,7 +153,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				tabs={ [
 					{
 						name: 'select',
-						/* translators: Select tab of template part creation palceholder */
+						/* translators: Select tab of template part creation placeholder. */
 						title: __( 'Select from existing' ),
 					},
 					{
