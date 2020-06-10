@@ -743,9 +743,9 @@ async function releasePlugin( isRC = true ) {
 	);
 
 	abortMessage =
-		'Aborting! Make sure to ' + isRC
-			? 'remove'
-			: 'reset' + ' the remote release branch and remove the git tag.';
+		'Aborting! Make sure to ' +
+		( isRC ? 'remove' : 'reset' ) +
+		' the remote release branch and remove the git tag.';
 
 	// Creating the GitHub Release
 	const release = await runGithubReleaseStep(

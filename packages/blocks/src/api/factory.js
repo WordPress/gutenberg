@@ -285,23 +285,6 @@ export const isContainerGroupBlock = ( name ) =>
 	name === getGroupingBlockName();
 
 /**
- * Determines whether the provided Blocks are of the same type
- * (eg: all `core/paragraph`).
- *
- * @param  {Array}  blocksArray the Block definitions
- *
- * @return {boolean} whether or not the given Blocks pass the criteria
- */
-export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
-	if ( ! blocksArray.length ) {
-		return false;
-	}
-	const sourceName = blocksArray[ 0 ].name;
-
-	return every( blocksArray, [ 'name', sourceName ] );
-};
-
-/**
  * Returns an array of block types that the set of blocks received as argument
  * can be transformed into.
  *
@@ -406,17 +389,6 @@ export function switchToBlockType( blocks, name ) {
 	const isMultiBlock = blocksArray.length > 1;
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
-
-	// Unless it's a Grouping Block then for multi block selections
-	// check that all Blocks are of the same type otherwise
-	// we can't run a conversion
-	if (
-		! isContainerGroupBlock( name ) &&
-		isMultiBlock &&
-		! isBlockSelectionOfSameType( blocksArray )
-	) {
-		return null;
-	}
 
 	// Find the right transformation by giving priority to the "to"
 	// transformation.

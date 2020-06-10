@@ -36,33 +36,27 @@ export default function Header( {
 	const {
 		deviceType,
 		hasFixedToolbar,
-		homeTemplateId,
 		templateId,
 		templatePartId,
 		templateType,
-		templatePartIds,
 		page,
 		showOnFront,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
 			isFeatureActive,
-			getHomeTemplateId,
 			getTemplateId,
 			getTemplatePartId,
 			getTemplateType,
-			getTemplatePartIds,
 			getPage,
 			getShowOnFront,
 		} = select( 'core/edit-site' );
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			homeTemplateId: getHomeTemplateId(),
 			templateId: getTemplateId(),
 			templatePartId: getTemplatePartId(),
 			templateType: getTemplateType(),
-			templatePartIds: getTemplatePartIds(),
 			page: getPage(),
 			showOnFront: getShowOnFront(),
 		};
@@ -116,11 +110,9 @@ export default function Header( {
 						/
 					</div>
 					<TemplateSwitcher
-						templatePartIds={ templatePartIds }
 						page={ page }
 						activeId={ templateId }
 						activeTemplatePartId={ templatePartId }
-						homeId={ homeTemplateId }
 						isTemplatePart={ templateType === 'wp_template_part' }
 						onActiveIdChange={ setTemplate }
 						onActiveTemplatePartIdChange={ setTemplatePart }

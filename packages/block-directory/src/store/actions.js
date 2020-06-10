@@ -65,7 +65,7 @@ export function* installBlockType( block ) {
 		if ( ! Array.isArray( assets ) || ! assets.length ) {
 			throw new Error( __( 'Block has no assets.' ) );
 		}
-		yield setIsInstalling( true );
+		yield setIsInstalling( block.id, true );
 		const response = yield apiFetch( {
 			path: '__experimental/block-directory/install',
 			data: {
@@ -87,7 +87,7 @@ export function* installBlockType( block ) {
 	} catch ( error ) {
 		yield setErrorNotice( id, error.message || __( 'An error occurred.' ) );
 	}
-	yield setIsInstalling( false );
+	yield setIsInstalling( block.id, false );
 	return success;
 }
 
@@ -108,13 +108,15 @@ export function addInstalledBlockType( item ) {
 /**
  * Returns an action object used to indicate install in progress
  *
+ * @param {string} blockId
  * @param {boolean} isInstalling
  *
  * @return {Object} Action object.
  */
-export function setIsInstalling( isInstalling ) {
+export function setIsInstalling( blockId, isInstalling ) {
 	return {
 		type: 'SET_INSTALLING_BLOCK',
+		blockId,
 		isInstalling,
 	};
 }

@@ -47,6 +47,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/url": "file:../url",
+		"downloadjs": "^1.4.7",
 		"file-saver": "^2.0.2",
 		"jszip": "^3.2.2",
 		"lodash": "^4.17.15",

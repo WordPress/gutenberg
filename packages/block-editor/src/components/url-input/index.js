@@ -152,7 +152,6 @@ class URLInput extends Component {
 		this.isUpdatingSuggestions = true;
 
 		this.setState( {
-			showSuggestions: true,
 			selectedSuggestion: null,
 			loading: true,
 		} );
@@ -173,6 +172,7 @@ class URLInput extends Component {
 				this.setState( {
 					suggestions,
 					loading: false,
+					showSuggestions: !! suggestions.length,
 				} );
 
 				if ( !! suggestions.length ) {
