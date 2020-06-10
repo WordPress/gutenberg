@@ -59,6 +59,7 @@ function ResizeTooltip(
 		<Root aria-hidden="true" className={ classes } ref={ ref } { ...props }>
 			{ resizeListener }
 			<Label
+				aria-hidden={ props[ 'aria-hidden' ] }
 				fadeTimeout={ fadeTimeout }
 				isActive={ isActive }
 				isEnabled={ isEnabled }

@@ -24,6 +24,7 @@ function Label(
 		position = { x: 0, y: 0 },
 		variant = VARIANTS.cursor,
 		zIndex = 1000,
+		...props
 	},
 	ref
 ) {
@@ -81,6 +82,7 @@ function Label(
 				ref={ tooltipRef }
 				isActive={ showLabel }
 				style={ style }
+				{ ...props }
 			>
 				<Tooltip
 					className="components-resizable-visualizer__tooltip"
