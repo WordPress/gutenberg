@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
 import {
@@ -56,7 +56,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 		[ help ]
 	);
 
-	const helpPhrase = useMemo( () => {
+	const getHelpPhrase = () => {
 		if ( ! slug || ! theme ) {
 			return HELP_PHRASES.initial;
 		} else if ( postId ) {
@@ -64,7 +64,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 		}
 
 		return HELP_PHRASES.available;
-	}, [ slug, theme, postId ] );
+	};
 
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const onCreate = useCallback( async () => {
@@ -110,7 +110,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				/>
 			</div>
 			<div className="wp-block-template-part__placeholder-help-phrase">
-				{ help || helpPhrase }
+				{ help || getHelpPhrase() }
 			</div>
 			<Button
 				isPrimary
