@@ -35,6 +35,7 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -158,10 +159,9 @@ function RichImage( props ) {
 		isSelected,
 		attributes: { id, url },
 		originalBlock: OriginalBlock,
-		noticeUI,
 		setAttributes,
-		noticeOperations,
 	} = props;
+	const { createErrorNotice } = useDispatch( 'core/notices' );
 	const [ isCropping, setIsCropping ] = useState( false );
 	const [ inProgress, setIsProgress ] = useState( null );
 	const [ imageSize, setImageSize ] = useState( {
@@ -183,7 +183,6 @@ function RichImage( props ) {
 
 	function adjustImage( action, attrs ) {
 		setIsProgress( action );
-		noticeOperations.removeAllNotices();
 
 		richImageRequest( id, action, attrs )
 			.then( ( response ) => {
@@ -198,10 +197,14 @@ function RichImage( props ) {
 				}
 			} )
 			.catch( () => {
-				noticeOperations.createErrorNotice(
+				createErrorNotice(
 					__(
 						'Unable to perform the image modification. Please check your media storage.'
-					)
+					),
+					{
+						id: 'image-editing-error',
+						type: 'snackbar',
+					}
 				);
 				setIsProgress( null );
 				setIsCropping( false );
@@ -224,7 +227,6 @@ function RichImage( props ) {
 
 	return (
 		<>
-			{ noticeUI }
 			<div className={ classes }>
 				{ inProgress && (
 					<div className="richimage__working-spinner">
