@@ -27,7 +27,7 @@
 	top: -$grid-unit-10;
 	bottom: -$grid-unit-10;
 	border-radius: $radius-block-ui;
-	border: 3px solid theme(primary);
+	border: 3px solid var(--wp-theme-color);
 }
 
 .block-list-appender > .block-editor-inserter {

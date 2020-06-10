@@ -21,7 +21,7 @@
 	width: 8px;
 	height: 8px;
 	display: block;
-	background: $theme-color;
+	background: var(--wp-theme-color);
 	border-radius: 50%;
 }
 

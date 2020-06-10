@@ -10,7 +10,7 @@
 	padding: 0 $grid-unit-10 0 $grid-unit-15;
 
 	&:focus:not(:disabled) {
-		box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+		box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-theme-color);
 	}
 
 	svg {

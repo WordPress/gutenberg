@@ -93,7 +93,7 @@ $input-size: 300px;
 
 	&:focus,
 	&.is-selected {
-		background: color(theme(primary) shade(15%));
+		background: var(--wp-theme-color-darker-20);
 		color: $white;
 		outline: none;
 	}

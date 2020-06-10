@@ -82,7 +82,7 @@
 
 		.components-form-token-field__token-text {
 			background: transparent;
-			color: theme(secondary);
+			color: var(--wp-theme-color-secondary);
 		}
 
 		.components-form-token-field__remove-token {
