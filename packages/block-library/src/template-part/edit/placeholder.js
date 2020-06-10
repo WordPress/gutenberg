@@ -89,10 +89,6 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 		setAttributes( nextAttributes );
 	}, [ postId, slug, theme ] );
 
-	const selectTemplate = ( selection ) => {
-		setAttributes( selection );
-	};
-
 	const [ filterValue, setFilterValue ] = useState( '' );
 
 	const createTab = (
@@ -139,7 +135,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 
 			<div className="wp-block-template-part__placeholder-preview-container">
 				<TemplatePartPreviews
-					selectTemplate={ selectTemplate }
+					setAttributes={ setAttributes }
 					filterValue={ filterValue }
 				/>
 			</div>

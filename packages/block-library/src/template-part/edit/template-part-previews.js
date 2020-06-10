@@ -21,7 +21,7 @@ function TemplatePartPlaceholder() {
 	);
 }
 
-function TemplatePartItem( { templatePart, selectTemplate } ) {
+function TemplatePartItem( { templatePart, setAttributes } ) {
 	const { id, slug, theme } = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
@@ -30,7 +30,7 @@ function TemplatePartItem( { templatePart, selectTemplate } ) {
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 
 	const onClick = useCallback( () => {
-		selectTemplate( { postId: id, slug, theme } );
+		setAttributes( { postId: id, slug, theme } );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
@@ -80,7 +80,7 @@ function PanelGroup( { title, icon, children } ) {
 	);
 }
 
-function TemplatePartsByTheme( { templateParts, selectTemplate } ) {
+function TemplatePartsByTheme( { templateParts, setAttributes } ) {
 	const templatePartsByTheme = useMemo( () => {
 		return Object.values( groupBy( templateParts, 'meta.theme' ) );
 	}, [ templateParts ] );
@@ -96,7 +96,7 @@ function TemplatePartsByTheme( { templateParts, selectTemplate } ) {
 					<TemplatePartItem
 						key={ templatePart.id }
 						templatePart={ templatePart }
-						selectTemplate={ selectTemplate }
+						setAttributes={ setAttributes }
 					/>
 				) : (
 					<TemplatePartPlaceholder key={ templatePart.id } />
@@ -108,7 +108,7 @@ function TemplatePartsByTheme( { templateParts, selectTemplate } ) {
 
 function TemplatePartSearchResults( {
 	templateParts,
-	selectTemplate,
+	setAttributes,
 	filterValue,
 } ) {
 	const filteredTPs = useMemo( () => {
@@ -152,7 +152,7 @@ function TemplatePartSearchResults( {
 				<TemplatePartItem
 					key={ templatePart.id }
 					templatePart={ templatePart }
-					selectTemplate={ selectTemplate }
+					setAttributes={ setAttributes }
 				/>
 			) : (
 				<TemplatePartPlaceholder key={ templatePart.id } />
@@ -161,7 +161,7 @@ function TemplatePartSearchResults( {
 	) );
 }
 
-export default function TemplateParts( { selectTemplate, filterValue } ) {
+export default function TemplateParts( { setAttributes, filterValue } ) {
 	const templateParts = useSelect( ( select ) => {
 		return select( 'core' ).getEntityRecords(
 			'postType',
@@ -180,7 +180,7 @@ export default function TemplateParts( { selectTemplate, filterValue } ) {
 		return (
 			<TemplatePartSearchResults
 				templateParts={ templateParts }
-				selectTemplate={ selectTemplate }
+				setAttributes={ setAttributes }
 				filterValue={ filterValue }
 			/>
 		);
@@ -189,7 +189,7 @@ export default function TemplateParts( { selectTemplate, filterValue } ) {
 	return (
 		<TemplatePartsByTheme
 			templateParts={ templateParts }
-			selectTemplate={ selectTemplate }
+			setAttributes={ setAttributes }
 		/>
 	);
 }
