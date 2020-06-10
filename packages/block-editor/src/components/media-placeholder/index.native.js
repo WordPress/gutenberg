@@ -86,6 +86,10 @@ function MediaPlaceholder( props ) {
 	let mediaUploadPickerTitle;
 	if ( isImage ) {
 		mediaUploadPickerTitle = __( 'Choose Image From' );
+	} else if ( isVideo ) {
+		mediaUploadPickerTitle = __( 'Choose Video From' );
+	} else {
+		mediaUploadPickerTitle = __( 'Choose Image or Video From' );
 	}
 
 	let accessibilityHint = __( 'Double tap to select' );
