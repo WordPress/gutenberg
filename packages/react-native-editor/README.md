@@ -11,7 +11,6 @@ For a developer experience closer to the one the project maintainers current hav
 * git
 * [nvm](https://github.com/creationix/nvm)
 * Node.js and npm (use nvm to install them)
-* yarn (`npm install -g yarn`)
 * [AndroidStudio](https://developer.android.com/studio/) to be able to compile the Android version of the app
 * [Xcode](https://developer.apple.com/xcode/) to be able to compile the iOS app
 * CocoaPods(`sudo gem install cocoapods`) needed to fetch React and third-party dependencies.
@@ -37,13 +36,13 @@ Before running the demo app, you need to download and install the project depend
 
 ```
 nvm install --latest-npm
-yarn install
+npm install
 ```
 
 ## Run
 
 ```
-yarn start
+npm run native start
 ```
 
 Runs the packager (Metro) in development mode. The packager stays running to serve the app bundle to the clients that request it.
@@ -51,7 +50,7 @@ Runs the packager (Metro) in development mode. The packager stays running to ser
 With the packager running, open another terminal window and use the following command to compile and run the Android app:
 
 ```
-yarn android
+npm run native android
 ```
 
 The app should now open in a connected device or a running emulator and fetch the JavaScript code from the running packager.
@@ -59,7 +58,7 @@ The app should now open in a connected device or a running emulator and fetch th
 To compile and run the iOS variant of the app using the _default_ simulator device, use:
 
 ```
-yarn ios
+npm run native ios
 ```
 
 which will attempt to open your app in the iOS Simulator if you're on a Mac and have it installed.
@@ -69,13 +68,13 @@ which will attempt to open your app in the iOS Simulator if you're on a Mac and 
 To compile and run the app using a different device simulator, use:
 
 ```
-yarn ios --simulator="DEVICE_NAME"
+npm run native ios --simulator="DEVICE_NAME"
 ```
 
 For example, if you'd like to run in an iPhone Xs Max, try:
 
 ```
-yarn ios --simulator="iPhone Xs Max"
+npm run native ios --simulator="iPhone Xs Max"
 ```
 
 To see a list of all of your available iOS devices, use `xcrun simctl list devices`.
@@ -99,7 +98,7 @@ One of the extensions we are using is the [React Native Tools](https://marketpla
 Use the following command to run the test suite:
 
 ```
-yarn test
+npm run native test
 ```
 
 It will run the [jest](https://github.com/facebook/jest) test runner on your tests. The tests are running on the desktop against Node.js.
@@ -107,7 +106,7 @@ It will run the [jest](https://github.com/facebook/jest) test runner on your tes
 To run the tests with debugger support, start it with the following CLI command:
 
 ```
-yarn test:debug
+npm run native test:debug
 ```
 
 Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to sprinkle `debugger` statements anywhere in the code that you'd like the debugger to break.
@@ -126,13 +125,13 @@ This repository uses Appium to run UI tests. The tests live in `__device-tests__
 
 Then, to run the UI tests on iOS: 
 
-`yarn test:e2e:ios:local`
+`npm run native test:e2e:ios:local`
 
 and for Android:
 
-`yarn test:e2e:android:local`
+`npm run native test:e2e:android:local`
 
-To run a single test instead of the entire suite, use `yarn device-tests:local`. Here's an example that runs only `gutenberg-editor-paragraph.test`:
+To run a single test instead of the entire suite, use `npm run native device-tests:local`. Here's an example that runs only `gutenberg-editor-paragraph.test`:
 
 `TEST_RN_PLATFORM=ios yarn device-tests:local gutenberg-editor-paragraph.test`
 
