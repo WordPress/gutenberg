@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { has, get } from 'lodash';
+import { has, get, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,14 +17,21 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
+import SpacingPanelControl from '../components/spacing-panel-control';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { LINE_HEIGHT_SUPPORT_KEY, LineHeightEdit } from './line-height';
 import { FONT_SIZE_SUPPORT_KEY, FontSizeEdit } from './font-size';
+import {
+	PADDING_SUPPORT_KEY,
+	PaddingEdit,
+	paddingStyleMappings,
+} from './padding';
 
 const styleSupportKeys = [
 	COLOR_SUPPORT_KEY,
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
+	PADDING_SUPPORT_KEY,
 ];
 
 const typographySupportKeys = [
@@ -35,6 +42,20 @@ const typographySupportKeys = [
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
 
+const VARIABLE_REFERENCE_PREFIX = 'var:';
+const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+function compileStyleValue( uncompiledValue ) {
+	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+		const variable = uncompiledValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return uncompiledValue;
+}
+
 /**
  * Returns the inline styles to add depending on the style object
  *
@@ -43,19 +64,27 @@ const hasStyleSupport = ( blockType ) =>
  */
 export function getInlineStyles( styles = {} ) {
 	const mappings = {
+		...paddingStyleMappings,
 		lineHeight: [ 'typography', 'lineHeight' ],
 		fontSize: [ 'typography', 'fontSize' ],
 		background: [ 'color', 'gradient' ],
 		backgroundColor: [ 'color', 'background' ],
 		color: [ 'color', 'text' ],
+		'--wp--style--color--link': [ 'color', 'link' ],
 	};
 
 	const output = {};
-	Object.entries( mappings ).forEach( ( [ styleKey, objectKey ] ) => {
-		if ( has( styles, objectKey ) ) {
-			output[ styleKey ] = get( styles, objectKey );
+	Object.entries( mappings ).forEach(
+		( [ styleKey, ...otherObjectKeys ] ) => {
+			const [ objectKeys ] = otherObjectKeys;
+
+			if ( has( styles, objectKeys ) ) {
+				output[ styleKey ] = compileStyleValue(
+					get( styles, objectKeys )
+				);
+			}
 		}
-	} );
+	);
 
 	return output;
 }
@@ -144,6 +173,11 @@ export const withBlockControls = createHigherOrderComponent(
 			hasBlockSupport( blockName, key )
 		);
 
+		const hasPaddingSupport = hasBlockSupport(
+			blockName,
+			PADDING_SUPPORT_KEY
+		);
+
 		return [
 			Platform.OS === 'web' && hasTypographySupport && (
 				<InspectorControls key="typography">
@@ -155,6 +189,11 @@ export const withBlockControls = createHigherOrderComponent(
 			),
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
+			hasPaddingSupport && (
+				<SpacingPanelControl key="spacing">
+					<PaddingEdit { ...props } />
+				</SpacingPanelControl>
+			),
 		];
 	},
 	'withToolbarControls'

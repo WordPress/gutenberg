@@ -12,6 +12,30 @@
 		"parent": null
 	},
 	{
+		"title": "Architecture",
+		"slug": "index",
+		"markdown_source": "../docs/architecture/index.md",
+		"parent": "principles"
+	},
+	{
+		"title": "Modularity",
+		"slug": "modularity",
+		"markdown_source": "../docs/architecture/modularity.md",
+		"parent": "index"
+	},
+	{
+		"title": "Performance",
+		"slug": "performance",
+		"markdown_source": "../docs/architecture/performance.md",
+		"parent": "index"
+	},
+	{
+		"title": "Automated Testing",
+		"slug": "automated-testing",
+		"markdown_source": "../docs/architecture/automated-testing.md",
+		"parent": "index"
+	},
+	{
 		"title": "Key Concepts",
 		"slug": "key-concepts",
 		"markdown_source": "../docs/designers-developers/key-concepts.md",
@@ -231,6 +255,12 @@
 		"title": "Block-based Themes (Experimental)",
 		"slug": "block-based-themes",
 		"markdown_source": "../docs/designers-developers/developers/themes/block-based-themes.md",
+		"parent": "themes"
+	},
+	{
+		"title": "Themes & Block Editor: experimental theme.json",
+		"slug": "theme-json",
+		"markdown_source": "../docs/designers-developers/developers/themes/theme-json.md",
 		"parent": "themes"
 	},
 	{
@@ -630,6 +660,12 @@
 		"parent": null
 	},
 	{
+		"title": "AlignmentMatrixControl",
+		"slug": "alignment-matrix-control",
+		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "AnglePickerControl",
 		"slug": "angle-picker-control",
 		"markdown_source": "../packages/components/src/angle-picker-control/README.md",
@@ -651,6 +687,12 @@
 		"title": "BaseControl",
 		"slug": "base-control",
 		"markdown_source": "../packages/components/src/base-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "BoxControl",
+		"slug": "box-control",
+		"markdown_source": "../packages/components/src/box-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -762,6 +804,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Flex",
+		"slug": "flex",
+		"markdown_source": "../packages/components/src/flex/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "FocalPointPicker",
 		"slug": "focal-point-picker",
 		"markdown_source": "../packages/components/src/focal-point-picker/README.md",
@@ -861,6 +909,12 @@
 		"title": "Icon",
 		"slug": "icon",
 		"markdown_source": "../packages/components/src/icon/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "InputControl",
+		"slug": "input-control",
+		"markdown_source": "../packages/components/src/input-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1053,6 +1107,12 @@
 		"title": "Tooltip",
 		"slug": "tooltip",
 		"markdown_source": "../packages/components/src/tooltip/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TreeGrid",
+		"slug": "tree-grid",
+		"markdown_source": "../packages/components/src/tree-grid/README.md",
 		"parent": "components"
 	},
 	{
@@ -1452,6 +1512,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/lazy-import",
+		"slug": "packages-lazy-import",
+		"markdown_source": "../packages/lazy-import/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/library-export-default-webpack-plugin",
 		"slug": "packages-library-export-default-webpack-plugin",
 		"markdown_source": "../packages/library-export-default-webpack-plugin/README.md",
@@ -1491,6 +1557,12 @@
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/postcss-plugins-preset",
+		"slug": "packages-postcss-plugins-preset",
+		"markdown_source": "../packages/postcss-plugins-preset/README.md",
 		"parent": "packages"
 	},
 	{

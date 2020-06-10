@@ -12,6 +12,7 @@ export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
+export { default as DropdownMenu } from './dropdown-menu';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as __experimentalToolbarContext } from './toolbar-context';
@@ -62,7 +63,7 @@ export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
-export { default as LinearGradient } from './mobile/linear-gradient';
+export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
 
 // Utils
@@ -73,3 +74,5 @@ export {
 	useGlobalStyles,
 	withGlobalStyles,
 } from './mobile/global-styles-context';
+
+export * from './mobile/site-capabilities';

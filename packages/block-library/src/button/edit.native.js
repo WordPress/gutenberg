@@ -18,12 +18,13 @@ import {
 	withColors,
 	InspectorControls,
 	BlockControls,
-	SETTINGS_DEFAULTS,
+	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
 	ToggleControl,
 	PanelBody,
+	PanelActions,
 	RangeControl,
 	ToolbarGroup,
 	ToolbarButton,
@@ -174,20 +175,16 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes } = this.props;
+		const { backgroundColor, attributes, gradientValue } = this.props;
 		const { gradient, customGradient } = attributes;
-		const defaultGradients = SETTINGS_DEFAULTS.gradients;
 
 		if ( customGradient || gradient ) {
-			return (
-				customGradient ||
-				defaultGradients.find(
-					( defaultGradient ) => defaultGradient.slug === gradient
-				).gradient
-			);
+			return customGradient || gradientValue;
 		}
+		const colorAndStyleProps = getColorAndStyleProps( attributes );
 		return (
-			getColorAndStyleProps( attributes ).style?.backgroundColor ||
+			colorAndStyleProps.style?.backgroundColor ||
+			colorAndStyleProps.style?.background ||
 			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
 			backgroundColor.color ||
 			styles.defaultButton.backgroundColor
@@ -196,8 +193,10 @@ class ButtonEdit extends Component {
 
 	getTextColor() {
 		const { textColor, attributes } = this.props;
+		const colorAndStyleProps = getColorAndStyleProps( attributes );
+
 		return (
-			getColorAndStyleProps( attributes ).style?.color ||
+			colorAndStyleProps.style?.color ||
 			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
 			textColor.color ||
 			styles.defaultButton.color
@@ -325,9 +324,6 @@ class ButtonEdit extends Component {
 					autoFocus={
 						! isCompatibleWithSettings && Platform.OS === 'ios'
 					}
-					separatorType={
-						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
-					}
 					keyboardType="url"
 				/>
 				<ToggleControl
@@ -335,9 +331,6 @@ class ButtonEdit extends Component {
 					label={ __( 'Open in new tab' ) }
 					checked={ linkTarget === '_blank' }
 					onChange={ this.onChangeOpenInNewTab }
-					separatorType={
-						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
-					}
 				/>
 				<TextControl
 					icon={ ! isCompatibleWithSettings && LinkRelIcon }
@@ -348,9 +341,6 @@ class ButtonEdit extends Component {
 					onSubmit={ this.dismissSheet }
 					autoCapitalize="none"
 					autoCorrect={ false }
-					separatorType={
-						isCompatibleWithSettings ? 'none' : 'fullWidth'
-					}
 					keyboardType="url"
 				/>
 			</>
@@ -441,6 +431,13 @@ class ButtonEdit extends Component {
 		const backgroundColor = this.getBackgroundColor();
 		const textColor = this.getTextColor();
 
+		const actions = [
+			{
+				label: __( 'Remove link' ),
+				onPress: this.onClearSettings,
+			},
+		];
+
 		return (
 			<View onLayout={ this.onLayout }>
 				{ this.getPlaceholderWidth( placeholderText ) }
@@ -474,7 +471,7 @@ class ButtonEdit extends Component {
 						placeholderTextColor={
 							styles.placeholderTextColor.color
 						}
-						identifier="content"
+						identifier="text"
 						tagName="p"
 						minWidth={ minWidth }
 						maxWidth={ maxWidth }
@@ -514,13 +511,10 @@ class ButtonEdit extends Component {
 					onClose={ this.onHideLinkSettings }
 					hideHeader
 				>
-					{ this.getLinkSettings( url, rel, linkTarget ) }
-					<BottomSheet.Cell
-						label={ __( 'Remove link' ) }
-						labelStyle={ styles.clearLinkButton }
-						separatorType={ 'none' }
-						onPress={ this.onClearSettings }
-					/>
+					<PanelBody style={ styles.linkSettingsPanel }>
+						{ this.getLinkSettings( url, rel, linkTarget ) }
+					</PanelBody>
+					<PanelActions actions={ actions } />
 				</BottomSheet>
 
 				<ColorEdit { ...this.props } />
@@ -532,7 +526,6 @@ class ButtonEdit extends Component {
 							maximumValue={ MAX_BORDER_RADIUS_VALUE }
 							value={ borderRadiusValue }
 							onChange={ this.onChangeBorderRadius }
-							separatorType="none"
 						/>
 					</PanelBody>
 					<PanelBody title={ __( 'Link Settings' ) }>
@@ -548,6 +541,7 @@ export default compose( [
 	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
+		const { gradientValue } = __experimentalUseGradient();
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const {
 			getSelectedBlockClientId,
@@ -560,6 +554,7 @@ export default compose( [
 		const numOfButtons = getBlockCount( parentId );
 
 		return {
+			gradientValue,
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
 			numOfButtons,

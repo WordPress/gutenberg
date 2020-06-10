@@ -49,32 +49,58 @@
 	}
 }
 
+.block-editor-block-navigation-leaf {
+	> :first-child {
+		padding-left: 0;
+	}
+	> :first-child button {
+		padding-left: 0;
+	}
+}
+
 .edit-navigation-menu-editor__navigation-structure-panel {
-	// IE11 requires the column to be explicity declared.
+	// IE11 requires the column to be explicitly declared.
 	grid-column: 1;
 
 	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
 	-ms-grid-row-align: start;
+
+	.components-card__header {
+		font-weight: bold;
+		border-bottom: 0;
+		padding-top: $grid-unit-30 !important;
+		padding-bottom: $grid-unit-30 !important;
+	}
 }
 
-.edit-navigation-menu-editor__block-editor-panel {
+.edit-navigation-menu-editor__navigation-structure-header {
+	font-weight: bold;
+}
+
+.edit-navigation-menu-editor__block-editor-area {
 	@include break-medium {
-		// IE11 requires the column to be explicity declared.
+		// IE11 requires the column to be explicitly declared.
 		// Only shift this into the second column on desktop.
 		grid-column: 2;
 	}
 
-	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
-	-ms-grid-row-align: start;
+	.components-card__footer,
+	.components-card__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.edit-navigation-menu-editor__block-editor-area-header-text {
+		flex-grow: 1;
+		font-weight: bold;
+	}
 }
 
 .components-panel__header-actions {
-	margin-top: $grid-unit-20;
-	padding-bottom: $grid-unit-20;
 	margin-bottom: $grid-unit-60;
 	width: 100%;
 	text-align: right;
-	border-bottom: 1px solid $light-gray-300;
 }
 
 .components-panel__footer-actions {

@@ -1,6 +1,6 @@
 {
 	"name": "core/quote",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"value": {
 			"type": "string",

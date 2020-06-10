@@ -1,56 +1,45 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { BlockIcon } from '@wordpress/block-editor';
 import BlockRatings from '../block-ratings';
+import DownloadableBlockIcon from '../downloadable-block-icon';
 
 function DownloadableBlockHeader( {
 	icon,
 	title,
 	rating,
 	ratingCount,
+	isLoading,
 	onClick,
 } ) {
 	return (
 		<div className="block-directory-downloadable-block-header__row">
-			{ icon.match( /\.(jpeg|jpg|gif|png)(?:\?.*)?$/ ) !== null ? (
-				<img
-					src={ icon }
-					alt={ sprintf(
-						// translators: %s: Name of the plugin e.g: "Akismet".
-						__( '%s block icon' ),
-						title
-					) }
-				/>
-			) : (
-				<span>
-					<BlockIcon icon={ icon } showColors />
-				</span>
-			) }
+			<DownloadableBlockIcon icon={ icon } title={ title } />
 
 			<div className="block-directory-downloadable-block-header__column">
-				<span
-					role="heading"
-					className="block-directory-downloadable-block-header__title"
-				>
+				<h2 className="block-directory-downloadable-block-header__title">
 					{ title }
-				</span>
+				</h2>
 				<BlockRatings rating={ rating } ratingCount={ ratingCount } />
 			</div>
 			<Button
-				isDefault
+				isSecondary
+				isBusy={ isLoading }
+				disabled={ isLoading }
 				onClick={ ( event ) => {
 					event.preventDefault();
-					onClick();
+					if ( ! isLoading ) {
+						onClick();
+					}
 				} }
 			>
-				{ __( 'Add block' ) }
+				{ isLoading ? __( 'Adding…' ) : __( 'Add block' ) }
 			</Button>
 		</div>
 	);

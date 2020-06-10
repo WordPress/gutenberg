@@ -15,7 +15,7 @@ import { useRef, forwardRef } from '@wordpress/element';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import RootContainer from './root-container';
-import useBlockDropZone from '../block-drop-zone';
+import useBlockDropZone from '../use-block-drop-zone';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -27,7 +27,6 @@ function BlockList(
 	{
 		className,
 		rootClientId,
-		isDraggable,
 		renderAppender,
 		__experimentalTagName = 'div',
 		__experimentalAppenderTagName,
@@ -96,9 +95,8 @@ function BlockList(
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							isDraggable={ isDraggable }
 							isMultiSelecting={ isMultiSelecting }
-							// This prop is explicitely computed and passed down
+							// This prop is explicitly computed and passed down
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }

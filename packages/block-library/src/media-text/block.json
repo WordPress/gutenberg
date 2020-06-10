@@ -1,6 +1,6 @@
 {
 	"name": "core/media-text",
-	"category": "layout",
+	"category": "media",
 	"attributes": {
 		"align": {
 			"type": "string",
@@ -75,6 +75,17 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"html": false,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
 		}
 	}
 }

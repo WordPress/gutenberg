@@ -9,6 +9,7 @@ import { find, isEmpty, each, map } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useCallback } from '@wordpress/element';
 import {
+	ToolbarButton,
 	Button,
 	NavigableMenu,
 	MenuItem,
@@ -100,7 +101,7 @@ const ImageURLInputUI = ( {
 
 		if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
 			if ( ! isEmpty( newRel ) ) {
-				each( NEW_TAB_REL, function( relVal ) {
+				each( NEW_TAB_REL, ( relVal ) => {
 					const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
 					newRel = newRel.replace( regExp, '' );
 				} );
@@ -261,7 +262,7 @@ const ImageURLInputUI = ( {
 
 	return (
 		<>
-			<Button
+			<ToolbarButton
 				icon={ linkIcon }
 				className="components-toolbar__control"
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }

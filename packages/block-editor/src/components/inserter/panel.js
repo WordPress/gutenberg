@@ -7,9 +7,9 @@ function InserterPanel( { title, icon, children } ) {
 	return (
 		<>
 			<div className="block-editor-inserter__panel-header">
-				<span className="block-editor-inserter__panel-title">
+				<h2 className="block-editor-inserter__panel-title">
 					{ title }
-				</span>
+				</h2>
 				<Icon icon={ icon } />
 			</div>
 			<div className="block-editor-inserter__panel-content">

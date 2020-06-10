@@ -14,7 +14,10 @@ import { EditorProvider } from '@wordpress/editor';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { SlotFillProvider } from '@wordpress/components';
+import {
+	SlotFillProvider,
+	SiteCapabilitiesContext,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -42,7 +45,9 @@ class Editor extends Component {
 		hasFixedToolbar,
 		focusMode,
 		hiddenBlockTypes,
-		blockTypes
+		blockTypes,
+		colors,
+		gradients
 	) {
 		settings = {
 			...settings,
@@ -65,6 +70,14 @@ class Editor extends Component {
 				defaultAllowedBlockTypes,
 				...hiddenBlockTypes
 			);
+		}
+
+		if ( colors !== undefined ) {
+			settings.colors = colors;
+		}
+
+		if ( gradients !== undefined ) {
+			settings.gradients = gradients;
 		}
 
 		return settings;
@@ -100,6 +113,8 @@ class Editor extends Component {
 			blockTypes,
 			post,
 			postType,
+			colors,
+			gradients,
 			...props
 		} = this.props;
 
@@ -108,7 +123,9 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			hiddenBlockTypes,
-			blockTypes
+			blockTypes,
+			colors,
+			gradients
 		);
 
 		const normalizedPost = post || {
@@ -129,15 +146,19 @@ class Editor extends Component {
 
 		return (
 			<SlotFillProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
+				<SiteCapabilitiesContext.Provider
+					value={ this.props.capabilities }
 				>
-					<Layout setTitleRef={ this.setTitleRef } />
-				</EditorProvider>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ normalizedPost }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<Layout setTitleRef={ this.setTitleRef } />
+					</EditorProvider>
+				</SiteCapabilitiesContext.Provider>
 			</SlotFillProvider>
 		);
 	}

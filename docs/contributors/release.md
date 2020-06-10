@@ -8,35 +8,35 @@ To release Gutenberg, you need commit access to the [WordPress.org plugin reposi
 
 ### Schedule
 
-We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date.
+We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date (the day when _the release candidate_ is to be tagged).
 
-On the date of the current milestone, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new release candidate can be published.
+- **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
 
-The date in the milestone is the date of **tagging the release candidate**. On this date, all remaining PRs on the milestone are moved automatically to the next release.
-
-Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
-
-Two days after the first release candidate, the stable version is created based on the last release candidate and any necessary regression fixes.
-
-Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a performance audit should be published.
+- **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](./testing-overview.md#performance-testing) is published.
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
 ### Release Tool
 
-The plugin release process is entirely automated. To release the RC version of the plugin, run the following command and follow the instructions: (Note that at the time of writing, the tool doesn't support releasing multiple consecutive RC releases)
+> Note that at the time of writing, the tool doesn't support releasing consecutive RC releases. However, it is possible to use the tool for patch releases following the first stable release.
+
+The plugin release process is entirely automated. To release the RC version of the plugin, run the following command and follow the instructions:
 
 ```bash
-./bin/commander.js rc
+./bin/plugin/cli.js rc
 ```
 
 To release a stable version, run:
 
 ```bash
-./bin/commander.js stable
+./bin/plugin/cli.js stable
 ```
 
-It is possible to run the "stable" release CLI in a consecutive way to release patch releases following the first stable release.
+During the release process, you'll be asked to provide:
+
+- A changelog: prepare one beforehand by following the instructions below.
+- A [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line): have one ready beforehand by visiting [this page](https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages), if you haven't got one yet.
+- User and password for your GitHub account: if 2FA is enabled for your account (it should), you need to provide a personal access token instead of password (you can use the one necessary for the release).
 
 ### Manual Release Process
 
@@ -56,17 +56,17 @@ Releasing the first release candidate for this milestone (`x.x`) involves:
 To generate a changelog for a release, use the changelog generator tool:
 
 ```
-node bin/changelog.js
+npm run changelog
 ```
 
-By default, this will search for and organize all pull requests associated with the milestone for the current version of the project. Notably, this assumes a release candidate version has already been tagged and published.
+By default, this will search for and organize all pull requests associated with the milestone for the next version of the project. 
 
-To override the default behavior, you can pass one or both of the following values as environment variables:
+To override the default behavior, you can pass one or both of the following options:
 
-- `MILESTONE`: Provide the title of the milestone for which the changelog should be generated. This should exactly match the title as shown on [the milestones page](https://github.com/WordPress/gutenberg/milestones).
-  - Example: `MILESTONE="Gutenberg 8.1" npm run changelog`
-- `GITHUB_TOKEN`: Provide a [GitHub personal access token](https://github.com/settings/tokens) for authenticating requests. This should only be necessary if you run the script frequently enough to been blocked by [rate limiting](https://developer.github.com/v3/#rate-limiting).
-  - Example: `GITHUB_TOKEN=... npm run changelog`
+- `--milestone <milestone>`: Provide the title of the milestone for which the changelog should be generated. This should exactly match the title as shown on [the milestones page](https://github.com/WordPress/gutenberg/milestones).
+  - Example: `npm run changelog --milestone="Gutenberg 8.1"`
+- `--token <token>`: Provide a [GitHub personal access token](https://github.com/settings/tokens) for authenticating requests. This should only be necessary if you run the script frequently enough to been blocked by [rate limiting](https://developer.github.com/v3/#rate-limiting).
+  - Example: `npm run changelog --token="..."`
 
 The script will output a generated changelog, grouped by pull request label. _Note that this is intended to be a starting point for release notes_. You will still want to manually review and curate the changelog entries.
 
@@ -233,7 +233,7 @@ The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wor
 
 ### Synchronizing WordPress Trunk
 
-For each Gutenberg plugin release, WordPress trunk should be synchronized with this release. This involves the following steps that are automated with `./bin/commander npm-stable` command:
+For each Gutenberg plugin release, WordPress trunk should be synchronized with this release. This involves the following steps that are automated with `./bin/plugin/cli npm-stable` command:
 
 **Note:** The WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, this happens between the first `beta` and the first `RC` of the WordPress release cycle. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
 
@@ -244,7 +244,7 @@ For each Gutenberg plugin release, WordPress trunk should be synchronized with t
 4. Check out all the files from the release branch: `git checkout release/x.x -- .`.
 5. Commit all changes to the `wp/trunk` branch with `git commit -m "Merge changes published in the Gutenberg plugin vX.X release"` and push to the repository.
 6. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch.
-Aassuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version.
+Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version.
 
 Now, the branch is ready to be used to publish the npm packages.
 

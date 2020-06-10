@@ -93,11 +93,23 @@ function get_template_hierachy( $template_type ) {
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
 	global $_wp_current_template_id, $_wp_current_template_content;
 
-	$current_template_post = gutenberg_find_template_post( $templates );
+	$current_template = gutenberg_find_template_post_and_parts( $type, $templates );
 
-	if ( $current_template_post ) {
-		$_wp_current_template_id      = $current_template_post->ID;
-		$_wp_current_template_content = empty( $current_template_post->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post->post_content;
+	if ( $current_template ) {
+		$_wp_current_template_id      = $current_template['template_post']->ID;
+		$_wp_current_template_content = empty( $current_template['template_post']->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template['template_post']->post_content;
+
+		if ( isset( $_GET['_wp-find-template'] ) ) {
+			wp_send_json_success( $current_template['template_post'] );
+		}
+	} else {
+		if ( 'index' === $type ) {
+			if ( isset( $_GET['_wp-find-template'] ) ) {
+				wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
+			}
+		} else {
+			return false; // So that the template loader keeps looking for templates.
+		}
 	}
 
 	// Add hooks for template canvas.
@@ -119,9 +131,10 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  * @access private
  *
  * @param array $block The root block to start traversing from.
+ * @return int[] A list of template parts IDs for the given block.
  */
 function create_auto_draft_for_template_part_block( $block ) {
-	global $_wp_current_template_part_ids;
+	$template_part_ids = array();
 
 	if ( 'core/template-part' === $block['blockName'] ) {
 		if ( isset( $block['attrs']['postId'] ) ) {
@@ -179,28 +192,38 @@ function create_auto_draft_for_template_part_block( $block ) {
 				);
 			}
 		}
-
-		if ( isset( $_wp_current_template_part_ids ) ) {
-			$_wp_current_template_part_ids[ $block['attrs']['slug'] ] = $template_part_id;
-		} else {
-			$_wp_current_template_part_ids = array( $block['attrs']['slug'] => $template_part_id );
-		}
+		$template_part_ids[ $block['attrs']['slug'] ] = $template_part_id;
 	}
 
 	foreach ( $block['innerBlocks'] as $inner_block ) {
-		create_auto_draft_for_template_part_block( $inner_block );
+		$template_part_ids = array_merge( $template_part_ids, create_auto_draft_for_template_part_block( $inner_block ) );
 	}
+	return $template_part_ids;
 }
 
 /**
- * Return the correct 'wp_template' post for the current template hierarchy.
+ * Return the correct 'wp_template' post and template part IDs for the current template.
  *
- * @param string[] $template_hierarchy The current template hierarchy, ordered by priority.
- * @return WP_Post|null A template post object, or null if none could be found.
+ * Accepts an optional $template_hierarchy argument as a hint.
+ *
+ * @param string   $template_type      The current template type.
+ * @param string[] $template_hierarchy (optional) The current template hierarchy, ordered by priority.
+ * @return null|array {
+ *  @type WP_Post|null template_post A template post object, or null if none could be found.
+ *  @type int[] A list of template parts IDs for the template.
+ * }
  */
-function gutenberg_find_template_post( $template_hierarchy ) {
-	if ( ! $template_hierarchy ) {
+function gutenberg_find_template_post_and_parts( $template_type, $template_hierarchy = array() ) {
+	if ( ! $template_type ) {
 		return null;
+	}
+
+	if ( empty( $template_hierarchy ) ) {
+		if ( 'index' === $template_type ) {
+			$template_hierarchy = get_template_hierachy( 'index' );
+		} else {
+			$template_hierarchy = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
+		}
 	}
 
 	$slugs = array_map(
@@ -257,20 +280,37 @@ function gutenberg_find_template_post( $template_hierarchy ) {
 	// If there is, use it instead.
 	if ( isset( $higher_priority_block_template_path ) ) {
 		$post_name             = basename( $higher_priority_block_template_path, '.html' );
+		$file_contents         = file_get_contents( $higher_priority_block_template_path );
 		$current_template_post = array(
-			'post_content' => file_get_contents( $higher_priority_block_template_path ),
+			'post_content' => $file_contents,
 			'post_title'   => $post_name,
 			'post_status'  => 'auto-draft',
 			'post_type'    => 'wp_template',
 			'post_name'    => $post_name,
 		);
-		if ( is_admin() ) {
-			// Only create auto-draft of block template for editing
-			// in admin screens, similarly to how we do it for new
-			// posts in the editor.
-			$current_template_post = get_post(
-				wp_insert_post( $current_template_post )
+		if ( is_admin() || defined( 'REST_REQUEST' ) ) {
+			$template_query        = new WP_Query(
+				array(
+					'post_type'      => 'wp_template',
+					'post_status'    => 'auto-draft',
+					'name'           => $post_name,
+					'posts_per_page' => 1,
+					'no_found_rows'  => true,
+				)
 			);
+			$current_template_post = $template_query->have_posts() ? $template_query->next_post() : $current_template_post;
+
+			// Only create auto-draft of block template for editing
+			// in admin screens, when necessary, because the underlying
+			// file has changed.
+			if ( is_array( $current_template_post ) || $current_template_post->post_content !== $file_contents ) {
+				if ( ! is_array( $current_template_post ) ) {
+					$current_template_post->post_content = $file_contents;
+				}
+				$current_template_post = get_post(
+					wp_insert_post( $current_template_post )
+				);
+			}
 		} else {
 			$current_template_post = new WP_Post(
 				(object) $current_template_post
@@ -278,21 +318,32 @@ function gutenberg_find_template_post( $template_hierarchy ) {
 		}
 	}
 
-	if ( isset( $_GET['_wp-find-template'] ) ) {
-		if ( $current_template_post ) {
-			wp_send_json_success( $current_template_post );
-		} else {
-			wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
-		}
+	// If we haven't found any template post by here, it means that this theme doesn't even come with a fallback
+	// `index.html` block template. We create one so that people that are trying to access the editor are greeted
+	// with a blank page rather than an error.
+	if ( ! $current_template_post && ( is_admin() || defined( 'REST_REQUEST' ) ) ) {
+		$current_template_post = array(
+			'post_title'  => 'index',
+			'post_status' => 'auto-draft',
+			'post_type'   => 'wp_template',
+			'post_name'   => 'index',
+		);
+		$current_template_post = get_post(
+			wp_insert_post( $current_template_post )
+		);
 	}
 
 	if ( $current_template_post ) {
-		if ( is_admin() ) {
+		$template_part_ids = array();
+		if ( is_admin() || defined( 'REST_REQUEST' ) ) {
 			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
-				create_auto_draft_for_template_part_block( $block );
+				$template_part_ids = array_merge( $template_part_ids, create_auto_draft_for_template_part_block( $block ) );
 			}
 		}
-		return $current_template_post;
+		return array(
+			'template_post'     => $current_template_post,
+			'template_part_ids' => $template_part_ids,
+		);
 	}
 	return null;
 }

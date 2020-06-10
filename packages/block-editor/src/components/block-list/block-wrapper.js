@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { first, last, omit } from 'lodash';
-import { animated } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
@@ -18,13 +17,16 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../utils/dom';
-import useMovingAnimation from './moving-animation';
+import useMovingAnimation from '../use-moving-animation';
 import { Context, SetBlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
-import ELEMENTS from './block-elements';
+import ELEMENTS from './block-wrapper-elements';
 
 const BlockComponent = forwardRef(
-	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
+	(
+		{ children, tagName: TagName = 'div', __unstableIsHtml, ...props },
+		wrapper
+	) => {
 		const onSelectionStart = useContext( Context );
 		const setBlockNodes = useContext( SetBlockNodes );
 		const {
@@ -130,7 +132,7 @@ const BlockComponent = forwardRef(
 		}, [ isSelected, isMultiSelecting, isNavigationMode ] );
 
 		// Block Reordering animation
-		const animationStyle = useMovingAnimation(
+		useMovingAnimation(
 			wrapper,
 			isSelected || isPartOfMultiSelection,
 			isSelected || isFirstMultiSelected,
@@ -188,10 +190,9 @@ const BlockComponent = forwardRef(
 		const htmlSuffix =
 			mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
-		const Animated = animated[ tagName ];
 
 		const blockWrapper = (
-			<Animated
+			<TagName
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
@@ -216,11 +217,10 @@ const BlockComponent = forwardRef(
 				style={ {
 					...( wrapperProps ? wrapperProps.style : {} ),
 					...( props.style || {} ),
-					...animationStyle,
 				} }
 			>
 				{ children }
-			</Animated>
+			</TagName>
 		);
 
 		// For aligned blocks, provide a wrapper element so the block can be
