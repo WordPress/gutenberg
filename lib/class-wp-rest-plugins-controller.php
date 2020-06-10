@@ -53,6 +53,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 							'type'        => 'string',
 							'required'    => true,
 							'description' => __( 'WordPress.org plugin directory slug.', 'gutenberg' ),
+							'pattern'     => '[\w\-]+',
 						),
 						'status' => array(
 							'description' => __( 'The plugin activation status.', 'gutenberg' ),
@@ -91,18 +92,8 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 					'plugin'  => array(
 						'type'              => 'string',
 						'pattern'           => self::PATTERN,
-						'validate_callback' => static function ( $file ) {
-							if ( ! is_string( $file ) || ! preg_match( '/' . self::PATTERN . '/u', $file ) ) {
-								return false;
-							}
-
-							$validated = validate_file( plugin_basename( $file ) );
-
-							return 0 === $validated;
-						},
-						'sanitize_callback' => static function ( $file ) {
-							return plugin_basename( sanitize_text_field( $file . '.php' ) );
-						},
+						'validate_callback' => array( $this, 'validate_plugin_param' ),
+						'sanitize_callback' => array( $this, 'sanitize_plugin_param' ),
 					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
@@ -687,6 +678,34 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks that the "plugin" parameter is a valid path.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param string $file The plugin file parameter.
+	 * @return bool
+	 */
+	public function validate_plugin_param( $file ) {
+		if ( ! is_string( $file ) || ! preg_match( '/' . self::PATTERN . '/u', $file ) ) {
+			return false;
+		}
+
+		$validated = validate_file( plugin_basename( $file ) );
+
+		return 0 === $validated;
+	}
+
+	/**
+	 * Sanitizes the "plugin" parameter to be a proper plugin file with ".php" appended.
+	 *
+	 * @param string $file The plugin file parameter.
+	 * @return string
+	 */
+	public function sanitize_plugin_param( $file ) {
+		return plugin_basename( sanitize_text_field( $file . '.php' ) );
 	}
 
 	/**
