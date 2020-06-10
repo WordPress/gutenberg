@@ -7,11 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useCallback,
-	useContext,
-} from '@wordpress/element';
+import { useState, useCallback, useContext } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
