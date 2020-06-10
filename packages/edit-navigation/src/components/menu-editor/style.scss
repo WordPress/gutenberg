@@ -49,13 +49,28 @@
 	}
 }
 
-.edit-navigation-menu-editor__navigation-structure-card,
+.block-editor-block-navigation-leaf {
+	> :first-child {
+		padding-left: 0;
+	}
+	> :first-child button {
+		padding-left: 0;
+	}
+}
+
 .edit-navigation-menu-editor__navigation-structure-panel {
 	// IE11 requires the column to be explicitly declared.
 	grid-column: 1;
 
 	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
 	-ms-grid-row-align: start;
+
+	.components-card__header {
+		font-weight: bold;
+		border-bottom: 0;
+		padding-top: $grid-unit-30 !important;
+		padding-bottom: $grid-unit-30 !important;
+	}
 }
 
 .edit-navigation-menu-editor__navigation-structure-header {

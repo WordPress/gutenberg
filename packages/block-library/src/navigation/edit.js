@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, Fragment, useRef } from '@wordpress/element';
+import { useMemo, useState, useRef, useCallback } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -33,6 +33,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	ToolbarGroup,
+	CustomSelectControl,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -42,9 +43,22 @@ import { navigation as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
+import createDataTree from './create-data-tree';
+
+// Constants
+const CREATE_EMPTY_OPTION_VALUE = '__CREATE_EMPTY__';
+const CREATE_FROM_PAGES_OPTION_VALUE = '__CREATE_FROM_PAGES__';
+const CREATE_PLACEHOLDER_VALUE = '__CREATE_PLACEHOLDER__';
+
+function LoadingSpinner() {
+	return (
+		<>
+			<Spinner /> { __( 'Loading…' ) }
+		</>
+	);
+}
 
 function Navigation( {
 	selectedBlockHasDescendants,
@@ -55,8 +69,13 @@ function Navigation( {
 	hasResolvedPages,
 	isImmediateParentOfSelectedBlock,
 	isRequestingPages,
+	getHasResolvedMenuItems,
+	hasResolvedMenus,
+	isRequestingMenus,
 	isSelected,
 	pages,
+	menus,
+	getMenuItems,
 	setAttributes,
 	setFontSize,
 	updateNavItemBlocks,
@@ -65,8 +84,11 @@ function Navigation( {
 	//
 	// HOOKS
 	//
-
 	const ref = useRef();
+	const [
+		selectedCreateActionOption,
+		setSelectedCreateActionOption,
+	] = useState( null );
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
@@ -98,8 +120,11 @@ function Navigation( {
 		clientId
 	);
 
+	const isRequestingEntities = isRequestingPages || isRequestingMenus;
+	const selectedCreateActionOptionKey = selectedCreateActionOption?.key;
+
 	// Builds navigation links from default Pages.
-	const defaultPagesNavigationItems = useMemo( () => {
+	const buildNavLinkBlocksFromPages = useMemo( () => {
 		if ( ! pages ) {
 			return null;
 		}
@@ -116,6 +141,47 @@ function Navigation( {
 			} )
 		);
 	}, [ pages ] );
+
+	const menuItems = getMenuItems( selectedCreateActionOptionKey );
+
+	// Builds navigation links from selected Menu's items.
+	const buildNavLinkBlocksFromMenuItems = useMemo( () => {
+		if ( ! menuItems ) {
+			return null;
+		}
+
+		function initialiseBlocks( nodes ) {
+			return nodes.map( ( { title, type, link: url, id, children } ) => {
+				const innerBlocks =
+					children && children.length
+						? initialiseBlocks( children )
+						: [];
+
+				return createBlock(
+					'core/navigation-link',
+					{
+						type,
+						id,
+						url,
+						label: ! title.rendered
+							? __( '(no title)' )
+							: escape( title.rendered ),
+						opensInNewTab: false,
+					},
+					innerBlocks
+				);
+			} );
+		}
+
+		const menuTree = createDataTree( menuItems );
+
+		const menuBlocksTree = initialiseBlocks( menuTree );
+
+		return menuBlocksTree;
+	}, [ menuItems ] );
+
+	const hasPages = !! ( hasResolvedPages && pages?.length );
+	const hasMenus = !! ( hasResolvedMenus && menus?.length );
 
 	//
 	// HANDLERS
@@ -136,19 +202,141 @@ function Navigation( {
 	}
 
 	function handleCreateFromExistingPages() {
-		updateNavItemBlocks( defaultPagesNavigationItems );
+		updateNavItemBlocks( buildNavLinkBlocksFromPages );
 		selectBlock( clientId );
 	}
 
-	const hasPages = hasResolvedPages && pages && pages.length;
+	function handleCreateFromExistingMenu() {
+		updateNavItemBlocks( buildNavLinkBlocksFromMenuItems );
+		selectBlock( clientId );
+	}
 
-	const blockInlineStyles = {
-		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-	};
+	function handleCreate() {
+		const { key } = selectedCreateActionOption;
 
-	// If we don't have existing items or the User hasn't
-	// indicated they want to automatically add top level Pages
-	// then show the Placeholder
+		// Explicity request to create empty.
+		if ( key === CREATE_EMPTY_OPTION_VALUE ) {
+			return handleCreateEmpty();
+		}
+
+		// Create from Pages.
+		if ( hasPages && key === CREATE_FROM_PAGES_OPTION_VALUE ) {
+			return handleCreateFromExistingPages();
+		}
+
+		// Create from WP Menu (if exists and not empty).
+		if (
+			hasMenus &&
+			selectedCreateActionOption &&
+			buildNavLinkBlocksFromMenuItems?.length
+		) {
+			return handleCreateFromExistingMenu();
+		}
+
+		// Default to empty menu
+		return handleCreateEmpty();
+	}
+
+	const buildPlaceholderInstructionText = useCallback( () => {
+		if ( isRequestingEntities ) {
+			return '';
+		}
+
+		if ( hasMenus && hasPages ) {
+			return __(
+				'Create a navigation from all existing pages, or choose a menu.'
+			);
+		}
+
+		if ( ! hasMenus && ! hasPages ) {
+			return __( 'Create an empty navigation.' );
+		}
+
+		if ( hasMenus && ! hasPages ) {
+			return __( 'Create a navigation from a menu or create empty.' );
+		}
+
+		if ( ! hasMenus && hasPages ) {
+			return __(
+				'Create a navigation from all existing pages, or create empty.'
+			);
+		}
+	}, [ isRequestingEntities, hasMenus, hasPages ] );
+
+	const createActionOptions = useMemo(
+		() => [
+			{
+				id: CREATE_PLACEHOLDER_VALUE,
+				name: __( 'Select where to start from…' ),
+			},
+			...( hasMenus ? menus : [] ),
+			{
+				id: CREATE_EMPTY_OPTION_VALUE,
+				name: __( 'Create empty menu' ),
+				className: 'is-create-empty-option',
+			},
+			...( hasPages
+				? [
+						{
+							id: CREATE_FROM_PAGES_OPTION_VALUE,
+							name: __( 'New from all top-level pages' ),
+						},
+				  ]
+				: [] ),
+		],
+		[
+			CREATE_PLACEHOLDER_VALUE,
+			CREATE_EMPTY_OPTION_VALUE,
+			CREATE_FROM_PAGES_OPTION_VALUE,
+			hasMenus,
+			menus,
+			hasPages,
+		]
+	);
+
+	const shouldDisableCreateButton = useCallback( () => {
+		// If there is no key at all then disable.
+		if ( ! selectedCreateActionOptionKey ) {
+			return true;
+		}
+
+		// Always disable if the default "placeholder" option is selected.
+		if ( selectedCreateActionOptionKey === CREATE_PLACEHOLDER_VALUE ) {
+			return true;
+		}
+
+		// Always enable if Create Empty is selected.
+		if ( selectedCreateActionOptionKey === CREATE_EMPTY_OPTION_VALUE ) {
+			return false;
+		}
+
+		// Enable if Pages option selected and we have Pages available.
+		if (
+			selectedCreateActionOptionKey === CREATE_FROM_PAGES_OPTION_VALUE &&
+			hasResolvedPages
+		) {
+			return false;
+		}
+
+		// Only "menu" options use an integer based key.
+		const selectedOptionIsMenu = Number.isInteger(
+			selectedCreateActionOptionKey
+		);
+
+		const menuItemsResolved =
+			selectedOptionIsMenu &&
+			getHasResolvedMenuItems( selectedCreateActionOptionKey );
+
+		return ! menuItemsResolved;
+	}, [
+		selectedCreateActionOptionKey,
+		hasResolvedPages,
+		CREATE_PLACEHOLDER_VALUE,
+		CREATE_EMPTY_OPTION_VALUE,
+		CREATE_FROM_PAGES_OPTION_VALUE,
+	] );
+
+	// If we don't have existing items then show the Placeholder
 	if ( ! hasExistingNavItems ) {
 		return (
 			<Block.div>
@@ -156,35 +344,74 @@ function Navigation( {
 					className="wp-block-navigation-placeholder"
 					icon={ icon }
 					label={ __( 'Navigation' ) }
-					instructions={ __(
-						'Create a Navigation from all existing pages, or create an empty one.'
-					) }
+					instructions={ buildPlaceholderInstructionText() }
 				>
-					<div
-						ref={ ref }
-						className="wp-block-navigation-placeholder__buttons"
-					>
-						<Button
-							isPrimary
-							className="wp-block-navigation-placeholder__button"
-							onClick={ handleCreateFromExistingPages }
-							disabled={ ! hasPages }
+					{ isRequestingEntities ? (
+						<div ref={ ref }>
+							<LoadingSpinner />
+						</div>
+					) : (
+						<div
+							ref={ ref }
+							className="wp-block-navigation-placeholder__actions"
 						>
-							{ __( 'Create from all top-level pages' ) }
-						</Button>
-
-						<Button
-							isLink
-							className="wp-block-navigation-placeholder__button"
-							onClick={ handleCreateEmpty }
-						>
-							{ __( 'Create empty' ) }
-						</Button>
-					</div>
+							<>
+								<CustomSelectControl
+									className={ classnames( {
+										'has-menus': hasMenus,
+									} ) }
+									label={ __(
+										'Select to create from Pages, existing Menu or empty'
+									) }
+									hideLabelFromVision={ true }
+									value={
+										selectedCreateActionOption ||
+										createActionOptions[ 0 ]
+									}
+									onChange={ ( { selectedItem } ) => {
+										if (
+											selectedItem?.key ===
+											selectedCreateActionOptionKey
+										) {
+											return;
+										}
+										setSelectedCreateActionOption(
+											selectedItem
+										);
+									} }
+									options={ createActionOptions.map(
+										( option ) => {
+											return {
+												...option,
+												key: option.id,
+											};
+										}
+									) }
+								/>
+								<Button
+									isSecondary
+									className="wp-block-navigation-placeholder__button"
+									onClick={ () => {
+										if ( ! selectedCreateActionOption ) {
+											return;
+										}
+										handleCreate();
+									} }
+									disabled={ shouldDisableCreateButton() }
+								>
+									{ __( 'Create' ) }
+								</Button>
+							</>
+						</div>
+					) }
 				</Placeholder>
 			</Block.div>
 		);
 	}
+
+	const blockInlineStyles = {
+		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+	};
 
 	const blockClassNames = classnames( className, {
 		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
@@ -194,7 +421,7 @@ function Navigation( {
 
 	// UI State: rendered Block UI
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<Toolbar
 					icon={
@@ -243,9 +470,6 @@ function Navigation( {
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
-				<PanelBody title={ __( 'Navigation Structure' ) }>
-					<BlockNavigationList clientId={ clientId } />
-				</PanelBody>
 				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
@@ -270,10 +494,8 @@ function Navigation( {
 						className={ blockClassNames }
 						style={ blockInlineStyles }
 					>
-						{ ! hasExistingNavItems && isRequestingPages && (
-							<>
-								<Spinner /> { __( 'Loading Navigation…' ) }{ ' ' }
-							</>
+						{ ! hasExistingNavItems && isRequestingEntities && (
+							<LoadingSpinner />
 						) }
 						<InnerBlocks
 							ref={ ref }
@@ -303,7 +525,7 @@ function Navigation( {
 					</Block.nav>
 				</BackgroundColor>
 			</TextColor>
-		</Fragment>
+		</>
 	);
 }
 
@@ -338,6 +560,8 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
+		const menusQuery = { per_page: -1 };
+
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
@@ -347,9 +571,50 @@ export default compose( [
 				'page',
 				filterDefaultPages
 			),
+			menus: select( 'core' ).getMenus( menusQuery ),
+			isRequestingMenus: select( 'core' ).isResolving( 'getMenus', [
+				menusQuery,
+			] ),
+			hasResolvedMenus: select(
+				'core'
+			).hasFinishedResolution( 'getMenus', [ menusQuery ] ),
+			getMenuItems: ( menuId ) => {
+				if ( ! menuId ) {
+					return false;
+				}
+
+				// If the option is a placeholder or doesn't have a valid
+				// id then reject
+				if ( ! Number.isInteger( menuId ) ) {
+					return false;
+				}
+
+				return select( 'core' ).getMenuItems( {
+					menus: menuId,
+					per_page: -1,
+				} );
+			},
+			getIsRequestingMenuItems: ( menuId ) => {
+				return select( 'core' ).isResolving( 'getMenuItems', [
+					{
+						menus: menuId,
+						per_page: -1,
+					},
+				] );
+			},
+			getHasResolvedMenuItems: ( menuId ) => {
+				return select( 'core' ).hasFinishedResolution( 'getMenuItems', [
+					{
+						menus: menuId,
+						per_page: -1,
+					},
+				] );
+			},
+
 			isRequestingPages: select( 'core/data' ).isResolving(
 				...pagesSelect
 			),
+
 			hasResolvedPages: select( 'core/data' ).hasFinishedResolution(
 				...pagesSelect
 			),
@@ -358,6 +623,9 @@ export default compose( [
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			updateNavItemBlocks( blocks ) {
+				if ( blocks?.length === 0 ) {
+					return false;
+				}
 				dispatch( 'core/block-editor' ).replaceInnerBlocks(
 					clientId,
 					blocks

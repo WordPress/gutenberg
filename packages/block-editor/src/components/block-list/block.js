@@ -229,6 +229,7 @@ const applyWithSelect = withSelect(
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
+			getMultiSelectedBlockClientIds,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -247,6 +248,7 @@ const applyWithSelect = withSelect(
 		// the state. It happens now because the order in withSelect rendering
 		// is not correct.
 		const { name, attributes, isValid } = block || {};
+		const isFirstMultiSelected = isFirstMultiSelectedBlock( clientId );
 
 		// Do not add new properties here, use `useSelect` instead to avoid
 		// leaking new props to the public API (editor.BlockListBlock filter).
@@ -255,9 +257,12 @@ const applyWithSelect = withSelect(
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId ),
-			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
+			isFirstMultiSelected,
 			isLastMultiSelected:
 				getLastMultiSelectedBlockClientId() === clientId,
+			multiSelectedClientIds: isFirstMultiSelected
+				? getMultiSelectedBlockClientIds()
+				: undefined,
 
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if
@@ -301,8 +306,16 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( newAttributes ) {
-			const { clientId } = ownProps;
-			updateBlockAttributes( clientId, newAttributes );
+			const {
+				clientId,
+				isFirstMultiSelected,
+				multiSelectedClientIds,
+			} = ownProps;
+			const clientIds = isFirstMultiSelected
+				? multiSelectedClientIds
+				: [ clientId ];
+
+			updateBlockAttributes( clientIds, newAttributes );
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;

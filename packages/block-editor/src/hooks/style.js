@@ -74,11 +74,17 @@ export function getInlineStyles( styles = {} ) {
 	};
 
 	const output = {};
-	Object.entries( mappings ).forEach( ( [ styleKey, objectKey ] ) => {
-		if ( has( styles, objectKey ) ) {
-			output[ styleKey ] = compileStyleValue( get( styles, objectKey ) );
+	Object.entries( mappings ).forEach(
+		( [ styleKey, ...otherObjectKeys ] ) => {
+			const [ objectKeys ] = otherObjectKeys;
+
+			if ( has( styles, objectKeys ) ) {
+				output[ styleKey ] = compileStyleValue(
+					get( styles, objectKeys )
+				);
+			}
 		}
-	} );
+	);
 
 	return output;
 }

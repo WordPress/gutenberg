@@ -19,6 +19,7 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
+import BlockDraggable from '../block-draggable';
 import { useShowMoversGestures, useToggleBlockHighlight } from './utils';
 
 export default function BlockToolbar( { hideDragHandle } ) {
@@ -28,7 +29,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		blockType,
 		hasFixedToolbar,
 		isValid,
-		mode,
+		isVisual,
 		moverDirection,
 	} = useSelect( ( select ) => {
 		const { getBlockType } = select( 'core/blocks' );
@@ -56,14 +57,12 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 			rootClientId: blockRootClientId,
-			isValid:
-				selectedBlockClientIds.length === 1
-					? isBlockValid( selectedBlockClientIds[ 0 ] )
-					: null,
-			mode:
-				selectedBlockClientIds.length === 1
-					? getBlockMode( selectedBlockClientIds[ 0 ] )
-					: null,
+			isValid: selectedBlockClientIds.every( ( id ) =>
+				isBlockValid( id )
+			),
+			isVisual: selectedBlockClientIds.every(
+				( id ) => getBlockMode( id ) === 'visual'
+			),
 			moverDirection: __experimentalMoverDirection,
 		};
 	}, [] );
@@ -93,18 +92,12 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		return null;
 	}
 
-	const shouldShowVisualToolbar = isValid && mode === 'visual';
+	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
-
-	const animatedMoverStyles = {
-		opacity: shouldShowMovers ? 1 : 0,
-		transform: shouldShowMovers ? 'translateX(0px)' : 'translateX(100%)',
-	};
 
 	const classes = classnames(
 		'block-editor-block-toolbar',
-		shouldShowMovers && 'is-showing-movers',
-		! displayHeaderToolbar && 'has-responsive-movers'
+		shouldShowMovers && 'is-showing-movers'
 	);
 
 	return (
@@ -119,33 +112,34 @@ export default function BlockToolbar( { hideDragHandle } ) {
 					</div>
 				) }
 
-				<div
-					className="block-editor-block-toolbar__mover-trigger-container"
-					{ ...showMoversGestures }
-				>
-					<div
-						className="block-editor-block-toolbar__mover-trigger-wrapper"
-						style={ animatedMoverStyles }
-					>
-						<BlockMover
-							clientIds={ blockClientIds }
-							__experimentalOrientation={ moverDirection }
-							hideDragHandle={ hideDragHandle }
-						/>
-					</div>
-				</div>
-
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<div
-						{ ...showMoversGestures }
-						className="block-editor-block-toolbar__block-switcher-wrapper"
+					<BlockDraggable
+						clientIds={ blockClientIds }
+						cloneClassname="block-editor-block-toolbar__drag-clone"
 					>
-						<BlockSwitcher clientIds={ blockClientIds } />
-					</div>
+						{ ( {
+							isDraggable,
+							onDraggableStart,
+							onDraggableEnd,
+						} ) => (
+							<div
+								{ ...showMoversGestures }
+								className="block-editor-block-toolbar__block-switcher-wrapper"
+								draggable={ isDraggable && ! hideDragHandle }
+								onDragStart={ onDraggableStart }
+								onDragEnd={ onDraggableEnd }
+							>
+								<BlockSwitcher clientIds={ blockClientIds } />
+								<BlockMover
+									clientIds={ blockClientIds }
+									__experimentalOrientation={ moverDirection }
+								/>
+							</div>
+						) }
+					</BlockDraggable>
 				) }
 			</div>
-
-			{ shouldShowVisualToolbar && ! isMultiToolbar && (
+			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot
 						bubblesVirtually

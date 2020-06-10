@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useSpring, interpolate } from 'react-spring/web.cjs';
+import { useSpring } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
@@ -46,8 +46,6 @@ const getAbsolutePosition = ( element ) => {
  * @param {boolean} adjustScrolling          Adjust the scroll position to the current block.
  * @param {boolean} enableAnimation          Enable/Disable animation.
  * @param {*}       triggerAnimationOnChange Variable used to trigger the animation if it changes.
- *
- * @return {Object} Style object.
  */
 function useMovingAnimation(
 	ref,
@@ -115,7 +113,7 @@ function useMovingAnimation(
 		setTransform( newTransform );
 	}, [ triggerAnimationOnChange ] );
 
-	const animationProps = useSpring( {
+	useSpring( {
 		from: {
 			x: transform.x,
 			y: transform.y,
@@ -127,37 +125,23 @@ function useMovingAnimation(
 		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
-		onFrame: ( props ) => {
+		onFrame( { x, y } ) {
 			if (
 				adjustScrolling &&
 				scrollContainer.current &&
 				! prefersReducedMotion &&
-				props.y
+				y
 			) {
-				scrollContainer.current.scrollTop =
-					transform.scrollTop + props.y;
+				scrollContainer.current.scrollTop = transform.scrollTop + y;
 			}
+
+			ref.current.style.transformOrigin = 'center';
+			ref.current.style.transform =
+				x === 0 && y === 0 ? null : `translate3d(${ x }px,${ y }px,0)`;
+			ref.current.style.zIndex =
+				! isSelected || ( x === 0 && y === 0 ) ? null : '1';
 		},
 	} );
-
-	// Dismiss animations if disabled.
-	return prefersReducedMotion
-		? {}
-		: {
-				transformOrigin: 'center',
-				transform: interpolate(
-					[ animationProps.x, animationProps.y ],
-					( x, y ) =>
-						x === 0 && y === 0
-							? undefined
-							: `translate3d(${ x }px,${ y }px,0)`
-				),
-				zIndex: interpolate(
-					[ animationProps.x, animationProps.y ],
-					( x, y ) =>
-						! isSelected || ( x === 0 && y === 0 ) ? undefined : `1`
-				),
-		  };
 }
 
 export default useMovingAnimation;
