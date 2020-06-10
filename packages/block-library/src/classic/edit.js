@@ -5,6 +5,11 @@ import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
 
+/**
+ * Internal dependencies
+ */
+import LazyLoadTinyMCE from './lazy';
+
 const { wp } = window;
 
 function isTmceEmpty( editor ) {
@@ -23,7 +28,7 @@ function isTmceEmpty( editor ) {
 	return /^\n?$/.test( body.innerText || body.textContent );
 }
 
-export default class ClassicEdit extends Component {
+class ClassicEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.initialize = this.initialize.bind( this );
@@ -216,3 +221,11 @@ export default class ClassicEdit extends Component {
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
+
+const LazyClassicEdit = ( props ) => (
+	<LazyLoadTinyMCE>
+		<ClassicEdit { ...props } />
+	</LazyLoadTinyMCE>
+);
+
+export default LazyClassicEdit;

@@ -1,89 +1,39 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
-/**
- * External dependencies
- */
-import { noop } from 'lodash';
+const loadTinyMCEScripts = async () =>
+	window.wpTinyMCEOrderedScriptURIs.reduce(
+		async ( previousPromise, uri ) => {
+			// we need to serially load depenendencies as each could depend on the previous
+			await previousPromise;
+			return new Promise( ( resolve, reject ) => {
+				const scriptElement = document.createElement( 'script' );
+				scriptElement.type = 'application/javascript';
+				scriptElement.src = uri;
+				scriptElement.onload = resolve;
+				scriptElement.onerror = reject;
+				document.head.appendChild( scriptElement );
+			} );
+		},
+		Promise.resolve()
+	);
 
-export default class LazyLoad extends Component {
-	static loadedScripts = new Set();
-	static loadedStyles = new Set();
-	static defaultProps = {
-		scripts: [],
-		styles: [],
-		placeholder: null,
-		onLoaded: () => Promise.resolve(),
-		onError: noop,
-	};
-
-	state = {
-		loaded: false,
-	};
-
-	loadScripts = async () => {
-		const scriptsToLoad = this.props.scripts.filter(
-			( script ) => ! this.loadedScripts.has( script )
-		);
-
-		if ( scriptsToLoad.length === 0 ) {
-			return Promise.resolve();
-		}
-
-		await new Promise( ( resolve, reject ) => {
-			const scriptElement = document.createElement( 'script' );
-			// can't use load-scripts.php, so this would need to be replaced
-			scriptElement.src = `/wp-admin/load-scripts.php?load=${ scriptsToLoad.join(
-				','
-			) }`;
-			scriptElement.onload = resolve;
-			scriptElement.onerror = reject;
-			document.head.appendChild( scriptElement );
+const LazyLoadTinyMCE = ( { children, placeholder } ) => {
+	const [ isLoaded, setIsLoaded ] = useState( false );
+	useEffect( () => {
+		loadTinyMCEScripts().then( () => {
+			window.wpMceTranslation();
+			setIsLoaded( true );
 		} );
+	}, [] );
 
-		scriptsToLoad.forEach( ( script ) => this.loadedScripts.add( script ) );
-	};
+	return isLoaded ? children : placeholder;
+};
 
-	loadStyles = async () => {
-		const stylesToLoad = this.props.styles.filter(
-			( style ) => ! this.loadedStyles.has( style )
-		);
+LazyLoadTinyMCE.defaultProps = {
+	placeholder: null,
+};
 
-		if ( stylesToLoad.length === 0 ) {
-			return Promise.resolve();
-		}
-
-		await new Promise( ( resolve, reject ) => {
-			const linkElement = document.createElement( 'link' );
-			linkElement.rel = 'stylesheet';
-			// can't use load-styles.php, so this would need to be replaced
-			linkElement.href = `/wp-admin/load-styles.php?load=${ stylesToLoad.join(
-				','
-			) }`;
-			linkElement.onload = resolve;
-			linkElement.onerror = reject;
-			document.head.appendChild( linkElement );
-		} );
-
-		stylesToLoad.forEach( ( style ) => this.loadedStyles.add( style ) );
-	};
-
-	componentDidMount() {
-		Promise.all( [ this.loadScripts(), this.loadStyles() ] )
-			.then( this.props.onLoaded )
-			.then( () => {
-				this.setState( { loaded: true } );
-			} )
-			.catch( this.props.onError );
-	}
-
-	render() {
-		if ( this.state.loaded ) {
-			return this.props.children;
-		}
-
-		return this.props.placeholder;
-	}
-}
+export default LazyLoadTinyMCE;
