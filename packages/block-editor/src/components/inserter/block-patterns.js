@@ -12,6 +12,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
