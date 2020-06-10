@@ -10,7 +10,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     private var isJSLoading = true
     private var hasObservers = false
     private var connectionEstablished = false
-    private let handshakeToken = UUID()
     private var queuedEvents = [GutenbergEvent]()
     private let queuedEventProcessQueue = DispatchQueue(label:"LockingQueue")
 
@@ -300,7 +299,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
 extension RNReactNativeGutenbergBridge {
     enum EventName: String, CaseIterable {
-        case handshake
         case requestGetHtml
         case setTitle
         case toggleHTMLMode

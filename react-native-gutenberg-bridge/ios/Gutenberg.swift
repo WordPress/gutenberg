@@ -88,11 +88,6 @@ public class Gutenberg: NSObject {
         super.init()
         bridgeModule.dataSource = dataSource
         logThreshold = isPackagerRunning ? .trace : .error
-
-        // This async call is here to mimic an event coming in before the editor is ready the timing seems to be a good point where some go through and some do not.
-        DispatchQueue.main.asyncAfter(wallDeadline: .now() + .milliseconds(1)) {
-            self.setTitle("🌉")
-        }
     }
 
     public func invalidate() {
