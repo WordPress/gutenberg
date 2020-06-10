@@ -4,6 +4,7 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
 const { get, escapeRegExp, compact } = require( 'lodash' );
 const { basename, sep } = require( 'path' );
@@ -44,6 +45,19 @@ module.exports = {
 		// Only concatenate modules in production, when not analyzing bundles.
 		concatenateModules:
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+		minimizer: [
+			new TerserPlugin( {
+				cache: true,
+				parallel: true,
+				sourceMap: mode !== 'production',
+				terserOptions: {
+					output: {
+						comments: /translators:/i,
+					},
+				},
+				extractComments: false,
+			} ),
+		],
 	},
 	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
