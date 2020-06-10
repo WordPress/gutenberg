@@ -384,7 +384,7 @@
 .block-editor-block-list__block-popover-inserter {
 	.block-editor-inserter__toggle.components-button {
 		// Fade it in after a delay.
-		animation: block-editor-inserter__toggle__fade-in-animation-delayed 1.2s ease;
+		animation: block-editor-inserter__toggle__fade-in-animation-delayed 0.3s ease;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
 	}
