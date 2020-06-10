@@ -216,6 +216,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'POST', '/__experimental/menus/' . $this->menu_id );
 		$request->set_param( 'name', 'New Name' );
 		$request->set_param( 'description', 'New Description' );
+		$request->set_param( 'auto_add', true );
 		$request->set_param(
 			'meta',
 			array(
@@ -227,6 +228,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data = $response->get_data();
 		$this->assertEquals( 'New Name', $data['name'] );
 		$this->assertEquals( 'New Description', $data['description'] );
+		$this->assertEquals( true, $data['auto_add'] );
 		$this->assertEquals( 'new-name', $data['slug'] );
 		$this->assertEquals( 'just meta', $data['meta']['test_single_menu'] );
 		$this->assertFalse( isset( $data['meta']['test_cat_meta'] ) );
@@ -286,7 +288,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 6, count( $properties ) );
+		$this->assertEquals( 7, count( $properties ) );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'meta', $properties );
