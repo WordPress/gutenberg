@@ -8,9 +8,15 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
+import {
+	PanelBody,
+	ResizableBox,
+	ResizeTooltip,
+	RangeControl,
+} from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 const MIN_SPACER_HEIGHT = 20;
 const MAX_SPACER_HEIGHT = 500;
@@ -22,11 +28,27 @@ const SpacerEdit = ( {
 	onResizeStart,
 	onResizeStop,
 } ) => {
+	const [ isResizing, setIsResizing ] = useState( false );
 	const { height } = attributes;
 	const updateHeight = ( value ) => {
 		setAttributes( {
 			height: value,
 		} );
+	};
+
+	const handleOnResizeStart = ( ...args ) => {
+		onResizeStart( ...args );
+		setIsResizing( true );
+	};
+
+	const handleOnResizeStop = ( event, direction, elt, delta ) => {
+		onResizeStop();
+		const spacerHeight = Math.min(
+			parseInt( height + delta.height, 10 ),
+			MAX_SPACER_HEIGHT
+		);
+		updateHeight( spacerHeight );
+		setIsResizing( false );
 	};
 
 	return (
@@ -52,17 +74,12 @@ const SpacerEdit = ( {
 					bottomLeft: false,
 					topLeft: false,
 				} }
-				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					onResizeStop();
-					const spacerHeight = Math.min(
-						parseInt( height + delta.height, 10 ),
-						MAX_SPACER_HEIGHT
-					);
-					updateHeight( spacerHeight );
-				} }
+				onResizeStart={ handleOnResizeStart }
+				onResizeStop={ handleOnResizeStop }
 				showHandle={ isSelected }
-			/>
+			>
+				<ResizeTooltip axis="y" isEnabled={ isResizing } />
+			</ResizableBox>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
 					<RangeControl
