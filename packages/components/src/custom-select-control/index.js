@@ -138,6 +138,7 @@ export default function CustomSelectControl( {
 								index,
 								key: item.key,
 								className: classnames(
+									item.className,
 									'components-custom-select-control__item',
 									{
 										'is-highlighted':
