@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { select, text } from '@storybook/addon-knobs';
+import { boolean, number, select, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -49,14 +49,17 @@ const Example = ( props ) => {
 };
 
 export const _default = () => {
-	const content = text( 'Example: Content', 'Resize' );
 	const props = {
+		fadeTimeout: number( 'fadeTimeout', 180 ),
+		showPx: boolean( 'showPx', true ),
 		variant: select(
 			'variant',
 			{ cursor: 'cursor', corner: 'corner' },
 			'cursor'
 		),
 	};
+
+	const content = text( 'Example: Content', 'Resize' );
 
 	return (
 		<Example>

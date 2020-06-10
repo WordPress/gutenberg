@@ -6,7 +6,7 @@ import { Portal } from 'reakit/Portal';
 /**
  * WordPress dependencies
  */
-import { Fragment, useRef } from '@wordpress/element';
+import { Fragment, forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,14 +16,17 @@ import { TooltipWrapper, Tooltip } from './styles/resizable-visualizer.styles';
 
 const CURSOR_OFFSET_TOP = 12;
 
-function Label( {
-	fadeTimeout = 180,
-	isActive = false,
-	label,
-	position = { x: 0, y: 0 },
-	variant = VARIANTS.cursor,
-	zIndex = 1000,
-} ) {
+function Label(
+	{
+		fadeTimeout = 180,
+		isActive = false,
+		label,
+		position = { x: 0, y: 0 },
+		variant = VARIANTS.cursor,
+		zIndex = 1000,
+	},
+	ref
+) {
 	const tooltipRef = useRef();
 	const tooltipWidth = tooltipRef.current?.clientWidth || 0;
 	const tooltipHeight = tooltipRef.current?.clientHeight || 0;
@@ -74,14 +77,22 @@ function Label( {
 		<WrapperComponent>
 			<TooltipWrapper
 				aria-hidden="true"
+				className="components-resizable-visualizer__tooltip-wrapper"
 				ref={ tooltipRef }
 				isActive={ showLabel }
 				style={ style }
 			>
-				<Tooltip>{ label }</Tooltip>
+				<Tooltip
+					className="components-resizable-visualizer__tooltip"
+					ref={ ref }
+				>
+					{ label }
+				</Tooltip>
 			</TooltipWrapper>
 		</WrapperComponent>
 	);
 }
 
-export default Label;
+const ForwardedComponent = forwardRef( Label );
+
+export default ForwardedComponent;
