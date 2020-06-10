@@ -273,6 +273,7 @@ function Navigation( {
 			{
 				id: CREATE_EMPTY_OPTION_VALUE,
 				name: __( 'Create empty menu' ),
+				className: 'is-create-empty-option',
 			},
 			...( hasPages
 				? [
@@ -381,9 +382,8 @@ function Navigation( {
 									options={ createActionOptions.map(
 										( option ) => {
 											return {
-												name: option.name,
+												...option,
 												key: option.id,
-												disabled: option.disabled,
 											};
 										}
 									) }
@@ -410,7 +410,7 @@ function Navigation( {
 	}
 
 	const blockInlineStyles = {
-		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+		fontSize: fontSize.size ? fontSize.size + "px" : undefined,
 	};
 
 	const blockClassNames = classnames( className, {

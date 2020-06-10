@@ -208,7 +208,7 @@
 		padding: 10px 25px;
 
 		// Creates a faux divider between the menu options if present
-		&:nth-last-child(2) {
+		&.is-create-empty-option {
 			position: relative; // positioning context for pseudo
 			margin-top: 20px;
 
