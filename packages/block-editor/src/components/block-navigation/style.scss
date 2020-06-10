@@ -222,7 +222,7 @@ $tree-item-height: 36px;
 
 		// Make the last vertical line half-height.
 		&.has-item.is-last-row {
-			height: 22px;
+			height: 26px;
 		}
 
 		// Draw a horizontal line using border-bottom.
@@ -230,7 +230,7 @@ $tree-item-height: 36px;
 			content: "";
 			display: block;
 			position: absolute;
-			top: 22px;
+			top: 26px;
 			left: 100%;
 			width: 5px;
 			border-bottom: 2px solid $light-gray-900;
