@@ -7,7 +7,6 @@ import { render } from '@testing-library/react';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -24,16 +23,15 @@ jest.mock( '@wordpress/core-data' );
 
 describe( 'FullscreenModeClose', () => {
 	describe( 'when in full screen mode', () => {
-		useSelect.mockImplementation( ( cb ) => {
-			return cb( () => ( {
-				isResolving: () => false,
-				isFeatureActive: () => true,
-			} ) );
-		} );
-
 		it( 'should display a user uploaded site icon if it exists', () => {
-			useEntityProp.mockImplementation( () => {
-				return [ 'https://fakeUrl.com' ];
+			useSelect.mockImplementation( ( cb ) => {
+				return cb( () => ( {
+					isResolving: () => false,
+					isFeatureActive: () => true,
+					getEntityRecord: () => ( {
+						site_icon_url: 'https://fakeUrl.com',
+					} ),
+				} ) );
 			} );
 
 			const { getByAltText } = render( <FullscreenModeClose /> );
@@ -43,8 +41,14 @@ describe( 'FullscreenModeClose', () => {
 		} );
 
 		it( 'should display a default site icon if no user uploaded site icon exists', () => {
-			useEntityProp.mockImplementation( () => {
-				return [ undefined ];
+			useSelect.mockImplementation( ( cb ) => {
+				return cb( () => ( {
+					isResolving: () => false,
+					isFeatureActive: () => true,
+					getEntityRecord: () => ( {
+						site_icon_url: '',
+					} ),
+				} ) );
 			} );
 
 			const { container, queryByAltText } = render(

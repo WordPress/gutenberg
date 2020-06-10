@@ -2,25 +2,30 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEntityProp } from '@wordpress/core-data';
 import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
 function FullscreenModeClose( { icon } ) {
-	const [ siteIconURL ] = useEntityProp( 'root', 'site', 'site_icon_url' );
+	const { isActive, isRequestingSiteIcon, siteIconUrl } = useSelect(
+		( select ) => {
+			const { isFeatureActive } = select( 'core/edit-site' );
+			const { getEntityRecord } = select( 'core' );
+			const { isResolving } = select( 'core/data' );
+			const siteData = getEntityRecord( 'root', 'site', undefined ) || {};
 
-	const isRequestingSiteIcon = useSelect( ( select ) => {
-		return select( 'core/data' ).isResolving( 'core', 'getEntityRecord', [
-			'root',
-			'site',
-			undefined,
-		] );
-	}, [] );
-
-	const isActive = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).isFeatureActive( 'fullscreenMode' );
-	}, [] );
+			return {
+				isActive: isFeatureActive( 'fullscreenMode' ),
+				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+					'root',
+					'site',
+					undefined,
+				] ),
+				siteIconUrl: siteData.site_icon_url,
+			};
+		},
+		[]
+	);
 
 	if ( ! isActive ) {
 		return null;
@@ -28,12 +33,12 @@ function FullscreenModeClose( { icon } ) {
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
-	if ( siteIconURL ) {
+	if ( siteIconUrl ) {
 		buttonIcon = (
 			<img
-				className="edit-site-fullscreen-mode-close_site-icon"
-				src={ siteIconURL }
 				alt="site-icon"
+				className="edit-site-fullscreen-mode-close_site-icon"
+				src={ siteIconUrl }
 			/>
 		);
 	} else if ( isRequestingSiteIcon ) {
