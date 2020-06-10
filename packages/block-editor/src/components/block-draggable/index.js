@@ -5,7 +5,41 @@ import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 
-const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
+const SCROLL_INTERVAL_MS = 50;
+const PIXELS_PER_SECOND_PER_DISTANCE = 5;
+const VELOCITY_MULTIPLIER =
+	PIXELS_PER_SECOND_PER_DISTANCE * ( SCROLL_INTERVAL_MS / 1000 );
+
+function startScrollingY( nodeRef, velocityRef ) {
+	return setInterval( () => {
+		if ( nodeRef.current && velocityRef.current ) {
+			const newTop = nodeRef.current.scrollTop + velocityRef.current;
+
+			nodeRef.current.scroll( {
+				top: newTop,
+				// behavior: 'smooth' // seems to hurt performance, better to use a small scroll interval
+			} );
+		}
+	}, SCROLL_INTERVAL_MS );
+}
+
+// @see https://stackoverflow.com/questions/35939886/find-first-scrollable-parent
+function getVerticalScrollParent( node ) {
+	if ( node === null ) {
+		return null;
+	}
+
+	// @todo - remove this hack and get a real reference to the scroll parent
+	return node.closest( '.interface-interface-skeleton__content' );
+}
+
+const BlockDraggable = ( {
+	children,
+	clientIds,
+	cloneClassname,
+	onDragStart,
+	onDragEnd,
+} ) => {
 	const { srcRootClientId, index, isDraggable } = useSelect(
 		( select ) => {
 			const {
@@ -30,6 +64,14 @@ const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
+
+	// @todo - do this for horizontal scroll
+	const dragStartY = useRef( null );
+	const velocityY = useRef( null );
+	const scrollParentY = useRef( null );
+
+	const scrollEditorInterval = useRef( null );
+
 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
 		'core/block-editor'
 	);
@@ -39,6 +81,11 @@ const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 		return () => {
 			if ( isDragging.current ) {
 				stopDraggingBlocks();
+			}
+
+			if ( scrollEditorInterval.current ) {
+				clearInterval( scrollEditorInterval.current );
+				scrollEditorInterval.current = null;
 			}
 		};
 	}, [] );
@@ -60,13 +107,41 @@ const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 			cloneClassname={ cloneClassname }
 			elementId={ blockElementId }
 			transferData={ transferData }
-			onDragStart={ () => {
+			onDragStart={ ( clientX, clientY ) => {
 				startDraggingBlocks();
 				isDragging.current = true;
+				dragStartY.current = clientY;
+
+				// find nearest parent(s) to scroll
+				scrollParentY.current = getVerticalScrollParent(
+					document.getElementById( blockElementId )
+				);
+				scrollEditorInterval.current = startScrollingY(
+					scrollParentY,
+					velocityY
+				);
+				if ( onDragStart ) {
+					onDragStart();
+				}
+			} }
+			onDragOver={ ( event ) => {
+				const distanceY = event.clientY - dragStartY.current;
+				velocityY.current = VELOCITY_MULTIPLIER * distanceY;
 			} }
 			onDragEnd={ () => {
 				stopDraggingBlocks();
 				isDragging.current = false;
+				dragStartY.current = null;
+				scrollParentY.current = null;
+
+				if ( scrollEditorInterval.current ) {
+					clearInterval( scrollEditorInterval.current );
+					scrollEditorInterval.current = null;
+				}
+
+				if ( onDragEnd ) {
+					onDragEnd();
+				}
 			} }
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {

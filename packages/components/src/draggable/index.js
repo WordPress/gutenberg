@@ -61,6 +61,10 @@ class Draggable extends Component {
 		// Update cursor coordinates.
 		this.cursorLeft = event.clientX;
 		this.cursorTop = event.clientY;
+
+		const { onDragOver = noop } = this.props;
+
+		this.props.setTimeout( onDragOver.bind( this, event ) );
 	}
 
 	/**
@@ -150,7 +154,9 @@ class Draggable extends Component {
 		document.body.classList.add( 'is-dragging-components-draggable' );
 		document.addEventListener( 'dragover', this.onDragOver );
 
-		this.props.setTimeout( onDragStart );
+		this.props.setTimeout(
+			onDragStart.bind( this, event.clientX, event.clientY )
+		);
 	}
 
 	/**
@@ -164,6 +170,9 @@ class Draggable extends Component {
 			this.cloneWrapper.parentNode.removeChild( this.cloneWrapper );
 			this.cloneWrapper = null;
 		}
+
+		this.cursorLeft = null;
+		this.cursorTop = null;
 
 		// Reset cursor.
 		document.body.classList.remove( 'is-dragging-components-draggable' );
