@@ -13,10 +13,19 @@ The tools needed for development are **Node** and **NPM**. **Nodejs** is a runti
 
 The tools are used to convert the JavaScript we are going to write into a format that browsers can run. This is called transpiling or the build step.
 
-You can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
+You can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, the LTS (long term support) version is recommened. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
 
 The important part after installing is being able to use them in your terminal. Open a terminal command-line and be able to run `node -v` and `npm -v` to confirm they are installed.
 
+```
+> node -v
+v12.18.0
+
+> npm -v
+6.14.4
+```
+
+The minimum version for node is >= 10.x and for npm >= 6.9x, using the current LTS version will always be supported.
 
 ## WordPress Development Site
 
