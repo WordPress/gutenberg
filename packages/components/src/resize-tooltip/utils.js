@@ -103,8 +103,6 @@ export function useResizeLabel( {
 	}, [ width, height ] );
 
 	useEffect( () => {
-		if ( ! isRendered ) return;
-
 		const handleOnMouseDown = () => {
 			if ( moveTimeoutRef.current ) {
 				clearTimeout( moveTimeoutRef.current );
