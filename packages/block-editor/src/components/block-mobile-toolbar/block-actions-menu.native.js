@@ -39,6 +39,7 @@ const BlockActionsMenu = ( {
 	selectedBlockClientId,
 	updateClipboard,
 	duplicateBlock,
+	removeBlocks,
 } ) => {
 	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ], blockTitle };
@@ -86,6 +87,12 @@ const BlockActionsMenu = ( {
 		value: 'copyButtonOption',
 	};
 
+	const cutButtonOption = {
+		id: 'cutButtonOption',
+		label: __( 'Cut' ),
+		value: 'cutButtonOption',
+	};
+
 	const duplicateButtonOption = {
 		id: 'duplicateButtonOption',
 		label: __( 'Duplicate' ),
@@ -97,6 +104,7 @@ const BlockActionsMenu = ( {
 		wrapBlockMover && forwardButtonOption,
 		wrapBlockSettings && settingsOption,
 		copyButtonOption,
+		cutButtonOption,
 		duplicateButtonOption,
 		deleteOption,
 	] );
@@ -117,8 +125,12 @@ const BlockActionsMenu = ( {
 				break;
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
-				const copySerialized = serialize( copyBlock );
-				updateClipboard( copySerialized );
+				updateClipboard( serialize( copyBlock ) );
+				break;
+			case cutButtonOption.value:
+				const cutBlock = getBlocksByClientId( selectedBlockClientId );
+				updateClipboard( serialize( cutBlock ) );
+				removeBlocks( selectedBlockClientId );
 				break;
 			case duplicateButtonOption.value:
 				duplicateBlock();
@@ -210,9 +222,12 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp, duplicateBlocks } = dispatch(
-			'core/block-editor'
-		);
+		const {
+			moveBlocksDown,
+			moveBlocksUp,
+			duplicateBlocks,
+			removeBlocks,
+		} = dispatch( 'core/block-editor' );
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 		const { updateClipboard } = dispatch( 'core/editor' );
 
@@ -224,6 +239,7 @@ export default compose(
 			duplicateBlock() {
 				return duplicateBlocks( clientIds );
 			},
+			removeBlocks,
 		};
 	} ),
 	withInstanceId
