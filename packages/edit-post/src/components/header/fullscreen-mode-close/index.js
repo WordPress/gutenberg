@@ -7,33 +7,33 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEntityProp } from '@wordpress/core-data';
 import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
 
 function FullscreenModeClose() {
-	const [ siteIconURL ] = useEntityProp( 'root', 'site', 'site_icon_url' );
+	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
+		( select ) => {
+			const { getCurrentPostType } = select( 'core/editor' );
+			const { isFeatureActive } = select( 'core/edit-post' );
+			const { isResolving } = select( 'core/data' );
+			const { getEntityRecord, getPostType } = select( 'core' );
+			const siteData = getEntityRecord( 'root', 'site', undefined ) || {};
 
-	const isRequestingSiteIcon = useSelect( ( select ) => {
-		return select( 'core/data' ).isResolving( 'core', 'getEntityRecord', [
-			'root',
-			'site',
-			undefined,
-		] );
-	}, [] );
-
-	const { isActive, postType } = useSelect( ( select ) => {
-		const { getCurrentPostType } = select( 'core/editor' );
-		const { isFeatureActive } = select( 'core/edit-post' );
-		const { getPostType } = select( 'core' );
-
-		return {
-			isActive: isFeatureActive( 'fullscreenMode' ),
-			postType: getPostType( getCurrentPostType() ),
-		};
-	}, [] );
+			return {
+				isActive: isFeatureActive( 'fullscreenMode' ),
+				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+					'root',
+					'site',
+					undefined,
+				] ),
+				postType: getPostType( getCurrentPostType() ),
+				siteIconUrl: siteData.site_icon_url,
+			};
+		},
+		[]
+	);
 
 	if ( ! isActive || ! postType ) {
 		return null;
@@ -41,12 +41,12 @@ function FullscreenModeClose() {
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
-	if ( siteIconURL ) {
+	if ( siteIconUrl ) {
 		buttonIcon = (
 			<img
-				className="edit-post-fullscreen-mode-close_site-icon"
-				src={ siteIconURL }
 				alt="site-icon"
+				className="edit-post-fullscreen-mode-close_site-icon"
+				src={ siteIconUrl }
 			/>
 		);
 	} else if ( isRequestingSiteIcon ) {
