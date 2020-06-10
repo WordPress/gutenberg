@@ -124,7 +124,8 @@ module.exports = async function readConfig( configPath ) {
 		] ),
 	];
 
-	const getEnvConfig = ( config, envName ) => config.env?.[ envName ] || {};
+	const getEnvConfig = ( config, envName ) =>
+		config.env ? config.env[ envName ] : {};
 
 	// Merge each of the specified environment-level overrides.
 	const env = allEnvs.reduce( ( result, environment ) => {
