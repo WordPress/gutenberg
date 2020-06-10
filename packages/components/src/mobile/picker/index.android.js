@@ -52,15 +52,16 @@ export default class Picker extends Component {
 	}
 
 	render() {
-		const { options, leftAlign, hideCancelButton } = this.props;
+		const { options, leftAlign, hideCancelButton, title } = this.props;
 		const { isVisible } = this.state;
 
 		return (
 			<BottomSheet
+				title={ title }
 				isVisible={ isVisible }
 				onClose={ this.onClose }
 				style={ { paddingBottom: 20 } }
-				hideHeader
+				hideHeader={ title === undefined }
 			>
 				<View>
 					{ options.map( ( option, index ) => (

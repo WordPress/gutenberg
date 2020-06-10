@@ -309,11 +309,11 @@ class BottomSheet extends Component {
 		const getHeader = () => (
 			<View>
 				<View style={ styles.head }>
-					<View style={ { flex: 1 } }>{ leftButton }</View>
+					<View>{ leftButton }</View>
 					<View style={ styles.titleContainer }>
 						<Text style={ styles.title }>{ title }</Text>
 					</View>
-					<View style={ { flex: 1 } }>{ rightButton }</View>
+					<View>{ rightButton }</View>
 				</View>
 				<View style={ styles.separator } />
 			</View>

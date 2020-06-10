@@ -59,16 +59,17 @@
 }
 
 .title {
-	color: $dark-gray-600;
-	font-size: 18px;
+	color: $gray-darken-10;
+	font-size: 17px;
 	font-weight: 600;
-	text-align: center;
 }
 
 .titleContainer {
 	justify-content: center;
-	flex: 2;
-	align-content: center;
+	flex: 1;
+	align-content: flex-start;
+	padding-left: $panel-padding;
+	padding-right: $panel-padding;
 }
 
 // Button

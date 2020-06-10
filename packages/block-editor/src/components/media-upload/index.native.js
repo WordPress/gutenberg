@@ -154,8 +154,11 @@ export class MediaUpload extends React.Component {
 	}
 
 	render() {
+		const { pickerTitle } = this.props;
+
 		const getMediaOptions = () => (
 			<Picker
+				title={ pickerTitle }
 				hideCancelButton
 				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }

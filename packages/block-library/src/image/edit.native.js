@@ -627,6 +627,7 @@ export class ImageEdit extends React.Component {
 
 		return (
 			<MediaUpload
+				pickerTitle={ __( 'Replace Image From' ) }
 				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {

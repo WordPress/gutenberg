@@ -83,6 +83,11 @@ function MediaPlaceholder( props ) {
 		}
 	}
 
+	let mediaUploadPickerTitle;
+	if ( isImage ) {
+		mediaUploadPickerTitle = __( 'Choose Image From' );
+	}
+
 	let accessibilityHint = __( 'Double tap to select' );
 	if ( isImage ) {
 		accessibilityHint = __( 'Double tap to select an image' );
@@ -140,6 +145,7 @@ function MediaPlaceholder( props ) {
 	return (
 		<View style={ { flex: 1 } }>
 			<MediaUpload
+				pickerTitle={ mediaUploadPickerTitle }
 				allowedTypes={ allowedTypes }
 				onSelect={ setMedia }
 				__experimentalOnlyMediaLibrary={
