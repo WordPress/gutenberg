@@ -37,7 +37,6 @@ describe( 'templates', () => {
 			// re-added after saving and reloading the editor.
 			await page.click( '.editor-post-title__input' );
 			await page.keyboard.press( 'ArrowDown' );
-			await pressKeyWithModifier( 'shift', 'Tab' );
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();
@@ -50,7 +49,6 @@ describe( 'templates', () => {
 			// re-added after saving and reloading the editor.
 			await page.type( '.editor-post-title__input', 'My Empty Book' );
 			await page.keyboard.press( 'ArrowDown' );
-			await pressKeyWithModifier( 'shift', 'Tab' );
 			await pressKeyWithModifier( 'primary', 'A' );
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
@@ -102,7 +100,6 @@ describe( 'templates', () => {
 			await page.type( '.editor-post-title__input', 'My Image Format' );
 			await clickBlockAppender();
 			await page.keyboard.press( 'Backspace' );
-			await pressKeyWithModifier( 'shift', 'Tab' );
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();

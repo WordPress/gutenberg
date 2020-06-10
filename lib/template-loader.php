@@ -134,67 +134,66 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  * @return int[] A list of template parts IDs for the given block.
  */
 function create_auto_draft_for_template_part_block( $block ) {
-	if ( 'core/template-part' !== $block['blockName'] ) {
-		return array();
-	}
+	$template_part_ids = array();
 
-	if ( isset( $block['attrs']['postId'] ) ) {
-		// Template part is customized.
-		$template_part_id = $block['attrs']['postId'];
-	} else {
-		// A published post might already exist if this template part
-		// was customized elsewhere or if it's part of a customized
-		// template. We also check if an auto-draft was already created
-		// because preloading can make this run twice, so, different code
-		// paths can end up with different posts for the same template part.
-		// E.g. The server could send back post ID 1 to the client, preload,
-		// and create another auto-draft. So, if the client tries to resolve the
-		// post ID from the slug and theme, it won't match with what the server sent.
-		$template_part_query = new WP_Query(
-			array(
-				'post_type'      => 'wp_template_part',
-				'post_status'    => array( 'publish', 'auto-draft' ),
-				'name'           => $block['attrs']['slug'],
-				'meta_key'       => 'theme',
-				'meta_value'     => $block['attrs']['theme'],
-				'posts_per_page' => 1,
-				'no_found_rows'  => true,
-			)
-		);
-		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
-		if ( $template_part_post ) {
-			$template_part_id = $template_part_post->ID;
+	if ( 'core/template-part' === $block['blockName'] ) {
+		if ( isset( $block['attrs']['postId'] ) ) {
+			// Template part is customized.
+			$template_part_id = $block['attrs']['postId'];
 		} else {
-			// Template part is not customized, get it from a file and make an auto-draft for it.
-			$template_part_file_path =
-			get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
-			if ( ! file_exists( $template_part_file_path ) ) {
-				if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
-					$template_part_file_path =
-						dirname( __FILE__ ) . '/demo-block-template-parts/' . $block['attrs']['slug'] . '.html';
-					if ( ! file_exists( $template_part_file_path ) ) {
-						return;
-					}
-				} else {
-					return;
-				}
-			}
-			$template_part_id = wp_insert_post(
+			// A published post might already exist if this template part
+			// was customized elsewhere or if it's part of a customized
+			// template. We also check if an auto-draft was already created
+			// because preloading can make this run twice, so, different code
+			// paths can end up with different posts for the same template part.
+			// E.g. The server could send back post ID 1 to the client, preload,
+			// and create another auto-draft. So, if the client tries to resolve the
+			// post ID from the slug and theme, it won't match with what the server sent.
+			$template_part_query = new WP_Query(
 				array(
-					'post_content' => file_get_contents( $template_part_file_path ),
-					'post_title'   => $block['attrs']['slug'],
-					'post_status'  => 'auto-draft',
-					'post_type'    => 'wp_template_part',
-					'post_name'    => $block['attrs']['slug'],
-					'meta_input'   => array(
-						'theme' => $block['attrs']['theme'],
-					),
+					'post_type'      => 'wp_template_part',
+					'post_status'    => array( 'publish', 'auto-draft' ),
+					'name'           => $block['attrs']['slug'],
+					'meta_key'       => 'theme',
+					'meta_value'     => $block['attrs']['theme'],
+					'posts_per_page' => 1,
+					'no_found_rows'  => true,
 				)
 			);
+			$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
+			if ( $template_part_post ) {
+				$template_part_id = $template_part_post->ID;
+			} else {
+				// Template part is not customized, get it from a file and make an auto-draft for it.
+				$template_part_file_path =
+				get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
+				if ( ! file_exists( $template_part_file_path ) ) {
+					if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
+						$template_part_file_path =
+							dirname( __FILE__ ) . '/demo-block-template-parts/' . $block['attrs']['slug'] . '.html';
+						if ( ! file_exists( $template_part_file_path ) ) {
+							return;
+						}
+					} else {
+						return;
+					}
+				}
+				$template_part_id = wp_insert_post(
+					array(
+						'post_content' => file_get_contents( $template_part_file_path ),
+						'post_title'   => $block['attrs']['slug'],
+						'post_status'  => 'auto-draft',
+						'post_type'    => 'wp_template_part',
+						'post_name'    => $block['attrs']['slug'],
+						'meta_input'   => array(
+							'theme' => $block['attrs']['theme'],
+						),
+					)
+				);
+			}
 		}
+		$template_part_ids[ $block['attrs']['slug'] ] = $template_part_id;
 	}
-
-	$template_part_ids = array( $block['attrs']['slug'] => $template_part_id );
 
 	foreach ( $block['innerBlocks'] as $inner_block ) {
 		$template_part_ids = array_merge( $template_part_ids, create_auto_draft_for_template_part_block( $inner_block ) );
@@ -317,6 +316,21 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 				(object) $current_template_post
 			);
 		}
+	}
+
+	// If we haven't found any template post by here, it means that this theme doesn't even come with a fallback
+	// `index.html` block template. We create one so that people that are trying to access the editor are greeted
+	// with a blank page rather than an error.
+	if ( ! $current_template_post && ( is_admin() || defined( 'REST_REQUEST' ) ) ) {
+		$current_template_post = array(
+			'post_title'  => 'index',
+			'post_status' => 'auto-draft',
+			'post_type'   => 'wp_template',
+			'post_name'   => 'index',
+		);
+		$current_template_post = get_post(
+			wp_insert_post( $current_template_post )
+		);
 	}
 
 	if ( $current_template_post ) {

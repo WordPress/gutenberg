@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -26,7 +26,12 @@ import {
 	Header,
 	HeaderControlWrapper,
 } from './styles/box-control-styles';
-import { DEFAULT_VALUES, isValuesMixed } from './utils';
+import {
+	DEFAULT_VALUES,
+	DEFAULT_VISUALIZER_VALUES,
+	isValuesMixed,
+	isValuesDefined,
+} from './utils';
 import { useControlledState } from '../utils/hooks';
 
 const defaultInputProps = {
@@ -43,17 +48,21 @@ export default function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
+	onChangeShowVisualizer = noop,
 	label = __( 'Box Control' ),
-	values: valuesProp = DEFAULT_VALUES,
+	values: valuesProp,
 	units,
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp );
+	const inputValues = values || DEFAULT_VALUES;
+	const hasInitialValue = isValuesDefined( valuesProp );
 
-	const [ isDirty, setIsDirty ] = useState( false );
-	const [ isLinked, setIsLinked ] = useState( ! isValuesMixed( values ) );
+	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
+	const [ isLinked, setIsLinked ] = useState(
+		! hasInitialValue || ! isValuesMixed( inputValues )
+	);
+
 	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
-
-	const initialValuesRef = useRef( values );
 
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
@@ -73,8 +82,16 @@ export default function BoxControl( {
 		setIsDirty( true );
 	};
 
+	const handleOnHoverOn = ( next = {} ) => {
+		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
+	};
+
+	const handleOnHoverOff = ( next = {} ) => {
+		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
+	};
+
 	const handleOnReset = () => {
-		const initialValues = initialValuesRef.current;
+		const initialValues = DEFAULT_VALUES;
 
 		onChange( initialValues );
 		setValues( initialValues );
@@ -85,9 +102,11 @@ export default function BoxControl( {
 		...inputProps,
 		onChange: handleOnChange,
 		onFocus: handleOnFocus,
+		onHoverOn: handleOnHoverOn,
+		onHoverOff: handleOnHoverOff,
 		isLinked,
 		units,
-		values,
+		values: inputValues,
 	};
 
 	return (
