@@ -35,17 +35,25 @@ const loadTinyMCEScripts = async () => {
 };
 
 const LazyLoadTinyMCE = ( { children, placeholder } ) => {
-	const [ isLoaded, setIsLoaded ] = useState( false );
+	/**
+	 * TinyMCE has already been loaded. This happens on page-load
+	 * when a the post type has custom metaboxes or, more commonly,
+	 * when TinyMCE was already lazily-loaded for another instance
+	 * of the classic block.
+	 *
+	 * In this case there's nothing to lazily load, so we can go ahead
+	 * and set `isLoaded` to true.
+	 */
+	const isTinyMCEAlreadyLoaded = typeof window.tinymce !== 'undefined';
+
+	const [ isLoaded, setIsLoaded ] = useState( isTinyMCEAlreadyLoaded );
 	useEffect( () => {
-		loadTinyMCEScripts().then( ( loadedCount ) => {
-			if ( loadedCount > 0 ) {
-				/**
-				 * In the case when all the dependencies have already been loaded
-				 * for another instance of the classic block, we don't need to re-init
-				 * the translations, so we can safely skip it if the loaded count is 0.
-				 */
-				window.wpMceTranslation();
-			}
+		if ( isLoaded ) {
+			return;
+		}
+
+		loadTinyMCEScripts().then( () => {
+			window.wpMceTranslation();
 			setIsLoaded( true );
 		} );
 	}, [] );
