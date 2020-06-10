@@ -86,31 +86,24 @@ function TemplatePartsByTheme( { templateParts, selectTemplate } ) {
 	}, [ templateParts ] );
 	const currentShownTPs = useAsyncList( templateParts );
 
-	return (
-		<>
-			{ templatePartsByTheme.length &&
-				templatePartsByTheme.map( ( templatePartList ) => (
-					<PanelGroup
-						key={ templatePartList[ 0 ].meta.theme }
-						title={ templatePartList[ 0 ].meta.theme }
-					>
-						{ templatePartList.map( ( templatePart ) => {
-							return currentShownTPs.includes( templatePart ) ? (
-								<TemplatePartItem
-									key={ templatePart.id }
-									templatePart={ templatePart }
-									selectTemplate={ selectTemplate }
-								/>
-							) : (
-								<TemplatePartPlaceholder
-									key={ templatePart.id }
-								/>
-							);
-						} ) }
-					</PanelGroup>
-				) ) }
-		</>
-	);
+	return templatePartsByTheme.map( ( templatePartList ) => (
+		<PanelGroup
+			key={ templatePartList[ 0 ].meta.theme }
+			title={ templatePartList[ 0 ].meta.theme }
+		>
+			{ templatePartList.map( ( templatePart ) => {
+				return currentShownTPs.includes( templatePart ) ? (
+					<TemplatePartItem
+						key={ templatePart.id }
+						templatePart={ templatePart }
+						selectTemplate={ selectTemplate }
+					/>
+				) : (
+					<TemplatePartPlaceholder key={ templatePart.id } />
+				);
+			} ) }
+		</PanelGroup>
+	) );
 }
 
 function TemplatePartSearchResults( {
@@ -153,26 +146,19 @@ function TemplatePartSearchResults( {
 
 	const currentShownTPs = useAsyncList( filteredTPs );
 
-	return (
-		<>
-			{ filteredTPs.map( ( templatePart ) => (
-				<PanelGroup
+	return filteredTPs.map( ( templatePart ) => (
+		<PanelGroup key={ templatePart.id } title={ templatePart.meta.theme }>
+			{ currentShownTPs.includes( templatePart ) ? (
+				<TemplatePartItem
 					key={ templatePart.id }
-					title={ templatePart.meta.theme }
-				>
-					{ currentShownTPs.includes( templatePart ) ? (
-						<TemplatePartItem
-							key={ templatePart.id }
-							templatePart={ templatePart }
-							selectTemplate={ selectTemplate }
-						/>
-					) : (
-						<TemplatePartPlaceholder key={ templatePart.id } />
-					) }
-				</PanelGroup>
-			) ) }
-		</>
-	);
+					templatePart={ templatePart }
+					selectTemplate={ selectTemplate }
+				/>
+			) : (
+				<TemplatePartPlaceholder key={ templatePart.id } />
+			) }
+		</PanelGroup>
+	) );
 }
 
 export default function TemplateParts( { selectTemplate, filterValue } ) {
