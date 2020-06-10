@@ -103,16 +103,25 @@ class PostTitle extends Component {
 				accessibilityLabel={
 					isEmpty( title )
 						? /* translators: accessibility text. empty post title. */
-						  __( 'Post title. Empty' )
+						  __( 'Title. Empty' )
 						: sprintf(
 								/* translators: accessibility text. %s: text content of the post title. */
-								__( 'Post title. %s' ),
+								__( 'Title. %s' ),
 								title
 						  )
 				}
+				accessibilityHint={ __( 'Update the title.' ) }
 			>
 				<RichText
 					setRef={ this.setRef }
+					accessibilityLabel={
+						isEmpty( title )
+							? /* translators: accessibility text. empty post title. */
+							  __( 'Title. Empty' )
+							: /* translators: accessibility text. Name of the form field. */
+							  __( 'Title.' )
+					}
+					accessibilityHint={ __( 'Update the title.' ) }
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }

@@ -739,6 +739,8 @@ export class RichText extends Component {
 			formatTypes,
 			parentBlockStyles,
 			withoutInteractiveFormatting,
+			accessibilityLabel,
+			accessibilityHint,
 			capabilities,
 			disableEditingMenu = false,
 		} = this.props;
@@ -809,6 +811,7 @@ export class RichText extends Component {
 				? maxWidth
 				: this.state.width;
 
+
 		return (
 			<View>
 				{ children &&
@@ -819,6 +822,8 @@ export class RichText extends Component {
 						onFocus: () => {},
 					} ) }
 				<RCTAztecView
+					accessibilityLabel={ accessibilityLabel }
+					accessibilityHint={ accessibilityHint }
 					ref={ ( ref ) => {
 						this._editor = ref;
 
