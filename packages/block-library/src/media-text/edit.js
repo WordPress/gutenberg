@@ -55,7 +55,7 @@ const applyWidthConstraints = ( width ) =>
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 
-function attributesFromMedia( { setAttributes, attributes } ) {
+function attributesFromMedia( { attributes, setAttributes } ) {
 	return ( media ) => {
 		const { linkDestination, href } = attributes;
 
@@ -113,21 +113,21 @@ function attributesFromMedia( { setAttributes, attributes } ) {
 
 function MediaTextEdit( { attributes, className, isSelected, setAttributes } ) {
 	const {
+		focalPoint,
+		href,
+		imageFill,
+		isStackedOnMobile,
+		linkClass,
+		linkDestination,
+		linkTarget,
 		mediaAlt,
 		mediaId,
 		mediaPosition,
 		mediaType,
 		mediaUrl,
 		mediaWidth,
-		verticalAlignment,
-		imageFill,
-		focalPoint,
-		isStackedOnMobile,
 		rel,
-		href,
-		linkTarget,
-		linkClass,
-		linkDestination,
+		verticalAlignment,
 	} = attributes;
 
 	const image = useSelect(
@@ -142,7 +142,7 @@ function MediaTextEdit( { attributes, className, isSelected, setAttributes } ) {
 
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
 
-	const onSelectMedia = attributesFromMedia( { setAttributes, attributes } );
+	const onSelectMedia = attributesFromMedia( { attributes, setAttributes } );
 
 	const onSetHref = ( props ) => {
 		setAttributes( props );
@@ -278,16 +278,16 @@ function MediaTextEdit( { attributes, className, isSelected, setAttributes } ) {
 					onWidthChange={ onWidthChange }
 					commitWidthChange={ commitWidthChange }
 					{ ...{
-						mediaAlt,
-						mediaId,
-						mediaType,
-						mediaUrl,
-						mediaPosition,
-						mediaWidth,
-						imageFill,
 						focalPoint,
+						imageFill,
 						isSelected,
 						isStackedOnMobile,
+						mediaAlt,
+						mediaId,
+						mediaPosition,
+						mediaType,
+						mediaUrl,
+						mediaWidth,
 					} }
 				/>
 				<InnerBlocks

@@ -48,7 +48,7 @@ function ResizableBoxContainer( { isSelected, isStackedOnMobile, ...props } ) {
 	);
 }
 
-function ToolbarEditButton( { onSelectMedia, mediaUrl, mediaId } ) {
+function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
 	return (
 		<BlockControls>
 			<MediaReplaceFlow
@@ -63,10 +63,10 @@ function ToolbarEditButton( { onSelectMedia, mediaUrl, mediaId } ) {
 }
 
 function PlaceholderContainer( {
-	onSelectMedia,
 	className,
-	noticeUI,
 	noticeOperations,
+	noticeUI,
+	onSelectMedia,
 } ) {
 	const onUploadError = ( message ) => {
 		noticeOperations.removeAllNotices();
@@ -91,21 +91,21 @@ function PlaceholderContainer( {
 
 function MediaContainer( props ) {
 	const {
-		mediaPosition,
-		mediaUrl,
-		mediaType,
-		mediaWidth,
+		className,
 		commitWidthChange,
-		onWidthChange,
-		toggleSelection,
+		focalPoint,
+		imageFill,
 		isSelected,
 		isStackedOnMobile,
-		className,
-		imageFill,
-		focalPoint,
-		mediaId,
 		mediaAlt,
+		mediaId,
+		mediaPosition,
+		mediaType,
+		mediaUrl,
+		mediaWidth,
 		onSelectMedia,
+		onWidthChange,
+		toggleSelection,
 	} = props;
 
 	if ( mediaType && mediaUrl ) {
