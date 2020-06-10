@@ -13,7 +13,7 @@ import { useAsyncList } from '@wordpress/compose';
 /**
  * External dependencies
  */
-import { groupBy } from 'lodash';
+import { groupBy, uniq } from 'lodash';
 
 function PreviewPlaceholder() {
 	return (
@@ -163,7 +163,7 @@ function TemplatePartSearchResults( {
 
 export default function TemplateParts( { setAttributes, filterValue } ) {
 	const templateParts = useSelect( ( select ) => {
-		return select( 'core' ).getEntityRecords(
+		const publishedTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template_part',
 			{
@@ -171,6 +171,22 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 				per_page: -1,
 			}
 		);
+		const resolvedTemplateParts = select( 'core' ).getEntityRecords(
+			'postType',
+			'wp_template_part',
+			{
+				resolved: true,
+				per_page: -1,
+			}
+		);
+		const combinedTemplateParts = [];
+		if ( publishedTemplateParts ) {
+			combinedTemplateParts.push( ...publishedTemplateParts );
+		}
+		if ( resolvedTemplateParts ) {
+			combinedTemplateParts.push( ...resolvedTemplateParts );
+		}
+		return uniq( combinedTemplateParts );
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {
