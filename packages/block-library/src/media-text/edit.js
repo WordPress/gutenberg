@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -78,13 +77,9 @@ function attributesFromMedia( { attributes, setAttributes } ) {
 		if ( mediaType === 'image' ) {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src =
-				get( media, [ 'sizes', 'large', 'url' ] ) ||
-				get( media, [
-					'media_details',
-					'sizes',
-					'large',
-					'source_url',
-				] );
+				media.sizes?.large?.url ||
+				// eslint-disable-next-line camelcase
+				media.media_details?.sizes?.large?.source_url;
 		}
 
 		let newHref = href;
