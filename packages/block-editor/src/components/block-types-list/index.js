@@ -15,7 +15,15 @@ function BlockTypesList( {
 	children,
 } ) {
 	const normalizedItems = items.reduce( ( result, item ) => {
-		const { variations = [] } = item;
+		const {
+			id: itemId,
+			icon: itemIcon,
+			title: itemTitle,
+			description: itemDescription,
+			example: itemExample,
+			initialAttributes,
+			variations = [],
+		} = item;
 		const hasDefaultVariation = variations.some(
 			( { isDefault } ) => isDefault
 		);
@@ -29,21 +37,30 @@ function BlockTypesList( {
 		if ( variations.length ) {
 			result = result.concat(
 				variations.map( ( variation ) => {
+					const {
+						name,
+						icon,
+						title,
+						description,
+						example,
+						attributes,
+						innerBlocks,
+					} = variation;
 					return {
 						...item,
-						id: `${ item.id }-${ variation.name }`,
-						icon: variation.icon || item.icon,
-						title: variation.title || item.title,
-						description: variation.description || item.description,
+						id: `${ itemId }-${ name }`,
+						icon: icon || itemIcon,
+						title: title || itemTitle,
+						description: description || itemDescription,
 						// If `example` is explicitly undefined for the variation, the preview will not be shown.
 						example: variation.hasOwnProperty( 'example' )
-							? variation.example
-							: item.example,
+							? example
+							: itemExample,
 						initialAttributes: {
-							...item.initialAttributes,
-							...variation.attributes,
+							...initialAttributes,
+							...attributes,
 						},
-						innerBlocks: variation.innerBlocks,
+						innerBlocks,
 					};
 				} )
 			);
@@ -60,11 +77,12 @@ function BlockTypesList( {
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-editor-block-types-list">
 			{ normalizedItems.map( ( item ) => {
+				const { id, icon, isDisabled, title, role } = item;
 				return (
 					<InserterListItem
-						key={ item.id }
-						className={ getBlockMenuDefaultClassName( item.id ) }
-						icon={ item.icon }
+						key={ id }
+						className={ getBlockMenuDefaultClassName( id ) }
+						icon={ icon }
 						onClick={ () => {
 							onSelect( item );
 							onHover( null );
@@ -73,9 +91,9 @@ function BlockTypesList( {
 						onMouseEnter={ () => onHover( item ) }
 						onMouseLeave={ () => onHover( null ) }
 						onBlur={ () => onHover( null ) }
-						isDisabled={ item.isDisabled }
-						title={ item.title }
-						role={ item.role }
+						isDisabled={ isDisabled }
+						title={ title }
+						role={ role }
 					/>
 				);
 			} ) }
