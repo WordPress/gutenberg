@@ -18,7 +18,7 @@ import {
 	withColors,
 	InspectorControls,
 	BlockControls,
-	__experimentalUseGradient,
+	withGradient,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -536,11 +536,6 @@ class ButtonEdit extends Component {
 		);
 	}
 }
-
-const withGradient = ( WrappedComponent ) => ( props ) => {
-	const { gradientValue } = __experimentalUseGradient();
-	return <WrappedComponent { ...props } gradientValue={ gradientValue } />;
-};
 
 export default compose( [
 	withInstanceId,
