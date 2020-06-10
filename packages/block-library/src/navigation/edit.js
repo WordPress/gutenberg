@@ -249,7 +249,7 @@ function Navigation( {
 		}
 
 		if ( ! hasMenus && ! hasPages ) {
-			return __( 'Create an empty Navigation.' );
+			return __( 'Create an empty navigation.' );
 		}
 
 		if ( hasMenus && ! hasPages ) {
