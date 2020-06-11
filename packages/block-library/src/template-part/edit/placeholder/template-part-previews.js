@@ -13,7 +13,7 @@ import { useAsyncList } from '@wordpress/compose';
 /**
  * External dependencies
  */
-import { groupBy, uniq } from 'lodash';
+import { groupBy, uniq, deburr } from 'lodash';
 
 function PreviewPlaceholder() {
 	return (
@@ -113,21 +113,23 @@ function TemplatePartSearchResults( {
 } ) {
 	const filteredTPs = useMemo( () => {
 		// Filter based on value.
-		const lowerFilterValue = filterValue.toLowerCase();
+		// Remove diacritics and convert to lowercase to normalize.
+		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
 		const searchResults = templateParts.filter(
 			( { slug, meta: { theme } } ) =>
-				slug.toLowerCase().includes( lowerFilterValue ) ||
-				theme.toLowerCase().includes( lowerFilterValue )
+				slug.toLowerCase().includes( normalizedFilterValue ) ||
+				// Since diacritics can be used in theme names, remove them for the comparison.
+				deburr( theme ).toLowerCase().includes( normalizedFilterValue )
 		);
 		// Order based on value location.
 		searchResults.sort( ( a, b ) => {
 			// First prioritize index found in slug.
 			const indexInSlugA = a.slug
 				.toLowerCase()
-				.indexOf( lowerFilterValue );
+				.indexOf( normalizedFilterValue );
 			const indexInSlugB = b.slug
 				.toLowerCase()
-				.indexOf( lowerFilterValue );
+				.indexOf( normalizedFilterValue );
 			if ( indexInSlugA !== -1 && indexInSlugB !== -1 ) {
 				return indexInSlugA - indexInSlugB;
 			} else if ( indexInSlugA !== -1 ) {
@@ -136,9 +138,14 @@ function TemplatePartSearchResults( {
 				return 1;
 			}
 			// Second prioritize index found in theme.
+			// Since diacritics can be used in theme names, remove them for the comparison.
 			return (
-				a.meta.theme.toLowerCase().indexOf( lowerFilterValue ) -
-				b.meta.theme.toLowerCase().indexOf( lowerFilterValue )
+				deburr( a.meta.theme )
+					.toLowerCase()
+					.indexOf( normalizedFilterValue ) -
+				deburr( b.meta.theme )
+					.toLowerCase()
+					.indexOf( normalizedFilterValue )
 			);
 		} );
 		return searchResults;
