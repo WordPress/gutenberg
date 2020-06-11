@@ -38,27 +38,19 @@ describe( 'deleteEntityRecord', () => {
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 		const fulfillment = deleteEntityRecord( 'postType', 'post', post );
-		fulfillment.next();
 
-		// delete start action
-		expect( fulfillment.next( entities ).value.type ).toBe(
-			'DELETE_ENTITY_RECORD_START'
-		);
+		// Trigger generator
+		fulfillment.next();
 
 		// remove items
-		fulfillment.next();
+		fulfillment.next( entities );
 
 		// delete api call
-		const { value: apiFetchAction } = fulfillment.next();
+		const { value: apiFetchAction } = fulfillment.next( entities );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts/10',
 			method: 'DELETE',
 		} );
-
-		// delete finish
-		expect( fulfillment.next().value.type ).toBe(
-			'DELETE_ENTITY_RECORD_FINISH'
-		);
 	} );
 } );
 
