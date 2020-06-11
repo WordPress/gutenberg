@@ -94,7 +94,7 @@ describe( 'Template Part', () => {
 		const createNewButtonSelector =
 			'//button[contains(text(), "Create new")]';
 		const disabledButtonSelector =
-			'.wp-block-template-part__create-button[disabled]';
+			'.wp-block-template-part__placeholder-create-button[disabled]';
 
 		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
