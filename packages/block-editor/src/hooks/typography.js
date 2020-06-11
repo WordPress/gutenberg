@@ -30,9 +30,8 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 export function TypographyPanel( props ) {
 	const isDisabled = useIsTypographyDisabled( props );
 	const isSupported = hasTypographySupport( props.name );
-	const shouldRender = isSupported && ! isDisabled;
 
-	if ( ! shouldRender ) return null;
+	if ( isDisabled || ! isSupported ) return null;
 
 	return (
 		<InspectorControls>
@@ -59,5 +58,5 @@ function useIsTypographyDisabled( props = {} ) {
 		useIsLineHeightDisabled( props ),
 	];
 
-	return configs.filter( Boolean ) === configs.length;
+	return configs.filter( Boolean ).length === configs.length;
 }
