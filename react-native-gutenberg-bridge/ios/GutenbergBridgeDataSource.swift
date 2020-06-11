@@ -41,6 +41,9 @@ public protocol GutenbergBridgeDataSource: class {
     func gutenbergMediaSources() -> [Gutenberg.MediaSource]
 
     func gutenbergCapabilities() -> [String: Bool]?
+
+    /// Asks the delegate for a list of theme colors
+    func gutenbergEditorTheme() -> GutenbergEditorTheme?
 }
 
 public extension GutenbergBridgeDataSource {
@@ -51,4 +54,9 @@ public extension GutenbergBridgeDataSource {
     func gutenbergPostType() -> String {
         return "post"
     }
+}
+
+public protocol GutenbergEditorTheme {
+    var colors: [[String: String]]? { get }
+    var gradients: [[String: String]]? { get }
 }

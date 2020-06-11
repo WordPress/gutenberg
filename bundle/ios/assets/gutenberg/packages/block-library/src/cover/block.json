@@ -1,6 +1,6 @@
 {
 	"name": "core/cover",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"url": {
 			"type": "string"
@@ -48,6 +48,7 @@
 	"supports": {
 		"align": true,
 		"html": false,
-		"lightBlockWrapper": true
+		"lightBlockWrapper": true,
+		"__experimentalPadding": true
 	}
 }

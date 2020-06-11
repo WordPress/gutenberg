@@ -1,6 +1,6 @@
 {
 	"name": "core/button",
-	"category": "layout",
+	"category": "design",
 	"parent": [
 		"core/buttons"
 	],
