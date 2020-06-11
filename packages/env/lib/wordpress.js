@@ -77,10 +77,10 @@ async function configureWordPress( environment, config ) {
 
 	const port = config.env[ environment ].port;
 
-	// Install WordPress. This command needs to complete before running any
-	// of the other setup commands. Note that we do not remove the service here
-	// here. That saves several seconds since the service needs to be running
-	// for the next command anyways.
+	// Install WordPress. If this is not done as a separate docker-compose run
+	// command, install will not complete successfully. Note that we do not
+	// remove the service here. That saves several seconds since the service
+	// needs to be running for the next command anyways.
 	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
 		[
@@ -97,7 +97,12 @@ async function configureWordPress( environment, config ) {
 		options
 	);
 
-	const setupCommands = [];
+	// These commands will be run in sequence on the container. Start by
+	// installing WordPress.
+	const setupCommands = [
+		// `wp core install --url=localhost:${ port } --title=${ config.name } --admin_user=admin -admin_password=password --admin_email=wordpress@example.com --skip-email`,
+		// 'sleep 10s',
+	];
 
 	// Set wp-config.php values.
 	for ( const [ key, value ] of Object.entries(
@@ -140,9 +145,10 @@ async function configureWordPress( environment, config ) {
 		);
 	}
 
+	const commands = setupCommands.join( ' && ' );
 	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
-		`bash -c ${ setupCommands.join( ' && ' ) }`,
+		`bash -c ${ commands }`,
 		{
 			...options,
 			commandOptions: [ '--rm' ],
@@ -201,7 +207,7 @@ async function setupWordPressDirectories( config ) {
 
 async function createUploadsDir( corePath ) {
 	// Ensure the tests uploads folder is writeable for travis,
-	// creating the folder if necessary. @TODO move elsewhere.
+	// creating the folder if necessary.
 	const uploadPath = path.join( corePath, 'wp-content/uploads' );
 	await fs.mkdir( uploadPath, { recursive: true } );
 	await fs.chmod( uploadPath, 0o0767 );
@@ -210,7 +216,7 @@ async function createUploadsDir( corePath ) {
 /**
  * Returns true if all given environment configs have the same core source.
  *
- * @param {WPServiceConfig} envs An array of environments to check.
+ * @param {WPServiceConfig[]} envs An array of environments to check.
  *
  * @return {boolean} True if all the environments have the same core source.
  */
@@ -218,25 +224,24 @@ function hasSameCoreSource( envs ) {
 	if ( envs.length < 2 ) {
 		return true;
 	}
-	const coreSource = envs[ 0 ].coreSource;
-	for ( const env of envs ) {
-		// If one does not have a core source but the other does.
-		if (
-			( ! coreSource && env.coreSource ) ||
-			( coreSource && ! env.coreSource )
-		) {
-			return false;
-		}
-		// If both have core sources but the paths are different.
-		if (
-			coreSource &&
-			env.coreSource &&
-			coreSource.path !== env.coreSource.path
-		) {
-			return false;
-		}
+	return ! envs.some( ( env ) =>
+		areCoreSourcesDifferent( envs[ 0 ].coreSource, env.coreSource )
+	);
+}
+
+function areCoreSourcesDifferent( coreSource1, coreSource2 ) {
+	if (
+		( ! coreSource1 && coreSource2 ) ||
+		( coreSource1 && ! coreSource2 )
+	) {
+		return true;
 	}
-	return true;
+
+	if ( coreSource1 && coreSource2 && coreSource1.path !== coreSource2.path ) {
+		return true;
+	}
+
+	return false;
 }
 
 /**

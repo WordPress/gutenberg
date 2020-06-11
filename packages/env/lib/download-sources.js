@@ -56,7 +56,7 @@ module.exports = function downloadSources( config, spinner ) {
 	for ( const env of Object.values( config.env ) ) {
 		env.pluginSources.forEach( addSource );
 		env.themeSources.forEach( addSource );
-		addSource( config.env.coreSource );
+		addSource( env.coreSource );
 	}
 
 	return Promise.all(
