@@ -124,7 +124,7 @@ export function useResizeLabel( {
 			moveTimeoutRef.current = setTimeout( () => {
 				setMoveX( false );
 				setMoveY( false );
-			}, fadeTimeout * 2 );
+			}, fadeTimeout );
 		};
 
 		const handleOnMouseMove = ( event ) => {
@@ -136,9 +136,9 @@ export function useResizeLabel( {
 				setIsActive( true );
 			}
 
-			if ( position !== POSITIONS.cursor ) return;
-
-			onMove( event );
+			if ( position === POSITIONS.cursor ) {
+				onMove( event );
+			}
 		};
 
 		document.addEventListener( 'mousedown', handleOnMouseDown );

@@ -6,7 +6,7 @@ import { Portal } from 'reakit/Portal';
 /**
  * WordPress dependencies
  */
-import { Fragment, forwardRef, useRef } from '@wordpress/element';
+import { Fragment, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,7 +20,7 @@ import {
 } from './styles/resize-tooltip.styles';
 
 const CORNER_OFFSET = 4;
-const CURSOR_OFFSET_TOP = 12;
+const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
 
 function Label(
 	{
@@ -35,15 +35,7 @@ function Label(
 	ref
 ) {
 	const isRTL = useRTL();
-	const tooltipRef = useRef();
-	const tooltipWidth = tooltipRef.current?.clientWidth || 0;
-	const tooltipHeight = tooltipRef.current?.clientHeight || 0;
-
-	if ( ! label ) {
-		return null;
-	}
-
-	const showLabel = isActive;
+	const showLabel = !! label;
 
 	const isBottom = position === POSITIONS.bottom;
 	const isCorner = position === POSITIONS.corner;
@@ -51,18 +43,27 @@ function Label(
 
 	const { x, y } = cursorPosition;
 
+	if ( ! showLabel ) return null;
+
 	let style = {
+		opacity: showLabel ? 1 : null,
 		transitionDelay: ! isActive ? `${ fadeTimeout }ms` : null,
 		zIndex,
 	};
+
+	let labelStyle = {};
 
 	if ( isBottom ) {
 		style = {
 			...style,
 			position: 'absolute',
-			bottom: ( tooltipHeight + CURSOR_OFFSET_TOP ) * -1,
+			bottom: CURSOR_OFFSET_TOP * -1,
 			left: '50%',
 			transform: 'translate(-50%, 0)',
+		};
+
+		labelStyle = {
+			transform: `translate(0, 100%)`,
 		};
 	}
 
@@ -83,9 +84,11 @@ function Label(
 			top: 0,
 			left: 0,
 			right: null,
-			transform: `translate(${ x - tooltipWidth / 2 }px, ${
-				y - tooltipHeight - CURSOR_OFFSET_TOP
-			}px)`,
+			transform: `translate(${ x }px, ${ y }px)`,
+		};
+
+		labelStyle = {
+			transform: `translate(-50%, calc(-100% - ${ CURSOR_OFFSET_TOP }px))`,
 		};
 	}
 
@@ -102,13 +105,13 @@ function Label(
 				aria-hidden="true"
 				className="components-resizable-tooltip__tooltip-wrapper"
 				isActive={ showLabel }
-				ref={ tooltipRef }
+				ref={ ref }
 				style={ style }
 				{ ...props }
 			>
 				<Tooltip
 					className="components-resizable-tooltip__tooltip"
-					ref={ ref }
+					style={ labelStyle }
 				>
 					<LabelText>{ label }</LabelText>
 				</Tooltip>

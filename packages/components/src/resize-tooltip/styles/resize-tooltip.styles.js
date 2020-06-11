@@ -27,12 +27,6 @@ export const TooltipWrapper = styled.div`
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 120ms linear;
-
-	${ ( { isActive } ) =>
-		isActive &&
-		`
-	opacity: 1;
-` }
 `;
 
 export const Tooltip = styled.div`
@@ -42,6 +36,7 @@ export const Tooltip = styled.div`
 	box-sizing: border-box;
 	color: ${ color( 'ui.textDark' ) };
 	padding: 2px 4px;
+	position: relative;
 `;
 
 export const LabelText = styled( Text )`
