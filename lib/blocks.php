@@ -296,3 +296,190 @@ if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_a
 	}
 	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_editor_block_styles_assets' );
 }
+
+/**
+ * Renders the classNames and styles for blocks
+ *
+ * @param string $block_content Output of the current block.
+ * @param array $block Block Object.
+ * @return string New block output.
+ */
+function gutenberg_experimental_apply_classnames_and_styles( $block_content, $block ) {
+	// Don't filter template part blocks since we filter the blocks in each template
+	// part individually.
+	if ( 'core/template-part' == $block[ 'blockName' ] ) {
+		return $block_content;
+	}
+
+	// TODO: Check for supports: _experimental* before adding any of this to a block.
+
+	if ( isset( $block['attrs'] ) ) {
+		$colors     = gutenberg_experimental_build_css_colors( $block['attrs'] );
+		$font_sizes = gutenberg_experimental_build_css_font_sizes( $block['attrs'] );
+
+		$extra_classes    = array_merge(
+			$colors['background']['css_classes'],
+			$colors['text']['css_classes'],
+			$font_sizes['css_classes'],
+			isset( $block['attrs']['className'] ) ? array( $block['attrs']['className'] ) : array(),
+			isset( $block['attrs']['itemsJustification'] ) ? array( 'items-justified-' . $block['attrs']['itemsJustification'] ) : array(),
+			isset( $block['attrs']['align'] ) ? array( 'has-text-align-' . $block['attrs']['align'] ) : array()
+		);
+		$extra_styles = (
+			$colors['text']['inline_styles'] ||
+			$colors['background']['inline_styles'] ||
+			$font_sizes['inline_styles']
+		) ? esc_attr( $colors['text']['inline_styles'] ) .
+		  	esc_attr( $colors['background']['inline_styles'] ) .
+			esc_attr( $font_sizes['inline_styles'] )
+		: '';
+
+		$dom = new DOMDocument( '1.0', 'utf-8' );
+		@$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT );
+		$xpath = new DOMXPath( $dom );
+		$block_root = $xpath->query( "/*" )[0];
+
+		if ( empty( $block_root ) ) {
+			return $block_content;
+		}
+
+		// Merge and dedupe new and existing classes and styles
+		$new_classes = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . implode( ' ', $extra_classes ) ) ) );
+		$new_styles = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'style' ) . ' ' ) . $extra_styles ) ) );
+
+		// Apply new styles and classes
+		if ( ! empty( $new_classes ) ) {
+			$block_root->setAttribute( 'class', $new_classes );
+		}
+
+		if ( ! empty( $new_styles ) ) {
+			$block_root->setAttribute( 'style', $new_styles );
+		}
+
+		return $dom->saveHtml();
+	}
+
+	return $block_content;
+}
+add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles', 10, 2 );
+
+/**
+ * Build an array with CSS classes and inline styles defining the colors
+ * which will be applied to the navigation markup in the front-end.
+ *
+ * @param  array $attributes Navigation block attributes.
+ * @return array Colors CSS classes and inline styles.
+ */
+function gutenberg_experimental_build_css_colors( $attributes ) {
+	$text_colors       = array(
+		'css_classes'   => array(),
+		'inline_styles' => '',
+	);
+	$background_colors = array(
+		'css_classes'   => array(),
+		'inline_styles' => '',
+	);
+
+	// Text color.
+	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
+	$has_custom_text_color = array_key_exists( 'style', $attributes )
+	&& array_key_exists( 'color', $attributes['style'] )
+	&& array_key_exists( 'text', $attributes['style']['color'] );
+
+	// If has text color.
+	if ( $has_custom_text_color || $has_named_text_color ) {
+		// Add has-text-color class.
+		$text_colors['css_classes'][] = 'has-text-color';
+	}
+
+	if ( $has_named_text_color ) {
+		// Add the color class.
+		$text_colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
+	} elseif ( $has_custom_text_color ) {
+		// Add the custom color inline style.
+		$text_colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['style']['color']['text'] );
+	}
+
+	// Link colors.
+	$has_link_color = array_key_exists( 'style', $attributes )
+	&& array_key_exists( 'color', $attributes['style'] )
+	&& array_key_exists( 'link', $attributes['style']['color'] );
+
+	if ( $has_link_color ) {
+		$text_colors['css_classes'][] = 'has-link-color';
+		// If link is a named color.
+		if ( strpos( $attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
+			// Get the name from the string and add proper styles.
+			$index_to_splice               = strrpos( $attributes['style']['color']['link'], '|' ) + 1;
+			$link_color_name               = substr( $attributes['style']['color']['link'], $index_to_splice );
+			$text_colors['inline_styles'] .= sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
+		} else {
+			$text_colors['inline_styles'] .= sprintf( '--wp--style--color--link: %s;', $attributes['style']['color']['link'] );
+		}
+	}
+	// Background color.
+	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
+	$has_custom_background_color = array_key_exists( 'style', $attributes )
+	&& array_key_exists( 'color', $attributes['style'] )
+	&& array_key_exists( 'background', $attributes['style']['color'] );
+
+	// Gradient color.
+	$has_named_gradient  = array_key_exists( 'gradient', $attributes );
+	$has_custom_gradient = array_key_exists( 'style', $attributes )
+	&& array_key_exists( 'color', $attributes['style'] )
+	&& array_key_exists( 'gradient', $attributes['style']['color'] );
+
+	// If has background color.
+	if ( $has_custom_background_color || $has_named_background_color || $has_named_gradient || $has_custom_gradient ) {
+		// Add has-background-color class.
+		$background_colors['css_classes'][] = 'has-background-color';
+	}
+
+	if ( $has_named_background_color ) {
+		// Add the background-color class.
+		$background_colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
+	} elseif ( $has_custom_background_color ) {
+		// Add the custom background-color inline style.
+		$background_colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
+	} elseif ( $has_named_gradient ) {
+		$background_colors['css_classes'][] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
+	} elseif ( $has_custom_gradient ) {
+		$background_colors['inline_styles'] .= sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
+	}
+
+	return array(
+		'text'       => $text_colors,
+		'background' => $background_colors,
+	);
+}
+
+/**
+ * Build an array with CSS classes and inline styles defining the font sizes
+ * which will be applied to the navigation markup in the front-end.
+ *
+ * @param  array $attributes Navigation block attributes.
+ * @return array Font size CSS classes and inline styles.
+ */
+function gutenberg_experimental_build_css_font_sizes( $attributes ) {
+	// CSS classes.
+	$font_sizes = array(
+		'css_classes'   => array(),
+		'inline_styles' => '',
+	);
+
+	$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
+	$has_custom_font_size = array_key_exists( 'style', $attributes )
+	&& array_key_exists( 'typography', $attributes['style'] )
+	&& array_key_exists( 'fontSize', $attributes['style']['typography'] );
+
+	if ( $has_named_font_size ) {
+		// Add the font size class.
+		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
+	} elseif ( $has_custom_font_size ) {
+		// Add the custom font size inline style.
+		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['style']['typography']['fontSize'] );
+	}
+
+	return $font_sizes;
+}
+
