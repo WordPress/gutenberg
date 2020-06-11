@@ -105,6 +105,8 @@ $radius-round-rectangle: 4px;
 $radius-round: 50%;
 $radius-block-ui: 2px;
 
+// Ideally this is not repeated on all built styles
+// But until we drop IE11 support, it's need to generate fallback colors.
 :root {
 	--wp-admin-theme-color: theme(primary);
 	--wp-admin-theme-color-secondary: theme(secondary);
