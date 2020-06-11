@@ -112,7 +112,7 @@ const BlockActionsMenu = ( {
 	] );
 
 	const displayNotice = ( message ) => {
-		removeAllNotices();
+		//removeAllNotices();
 		createInfoNotice( message );
 	};
 
