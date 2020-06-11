@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	Button,
@@ -31,6 +31,8 @@ export default function MenusEditor( { blockEditorSettings } ) {
 	const [ hasCompletedFirstLoad, setHasCompletedFirstLoad ] = useState(
 		false
 	);
+
+	const { deleteMenu } = useDispatch( 'core' );
 
 	useEffect( () => {
 		if ( ! hasCompletedFirstLoad && hasLoadedMenus ) {
@@ -114,16 +116,8 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				<NavigationEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
-					onDeleteMenu={ ( deletedMenu ) => {
-						const newStateMenus = stateMenus.filter( ( menu ) => {
-							return menu.id !== deletedMenu;
-						} );
-						setStateMenus( newStateMenus );
-						if ( newStateMenus.length ) {
-							setMenuId( newStateMenus[ 0 ].id );
-						} else {
-							setMenuId();
-						}
+					onDeleteMenu={ async () => {
+						await deleteMenu( menuId, '' );
 					} }
 				/>
 			) }
