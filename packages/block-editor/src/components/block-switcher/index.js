@@ -156,6 +156,7 @@ export class BlockSwitcher extends Component {
 									<NavigableToolbar
 										orientation="vertical"
 										className="block-editor-block-switcher-toolbar"
+										role="menu"
 										/* translators: accessibility text for the block toolbar */
 										aria-label={ __( 'Block switcher' ) }
 									>
