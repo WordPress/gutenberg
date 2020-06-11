@@ -44,7 +44,6 @@ describe( 'PanelBody', () => {
 			const panelBody = shallow(
 				<PanelBody title="Some Text" initialOpen={ false } />
 			);
-			expect( panelBody.state( 'opened' ) ).toBe( false );
 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( false );
 		} );
 
@@ -56,7 +55,6 @@ describe( 'PanelBody', () => {
 					initialOpen={ false }
 				/>
 			);
-			expect( panelBody.state( 'opened' ) ).toBe( false );
 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
 		} );
 
