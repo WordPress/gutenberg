@@ -49,21 +49,6 @@ export function updateClipboard( clipboard ) {
  * @return {Object} Action object.
  */
 export function createInfoNotice( message ) {
-	const noticeToAdd = { status: 'info', content: message, id: uuid() };
-	return {
-		type: 'CREATE_NOTICE',
-		notice: noticeToAdd,
-	};
-}
-
-/**
- * Returns an action object to create an info notice.
- *
- * @param {Object} message The displayed message of the notice.
- *
- * @return {Object} Action object.
- */
-export function createInfoNotice( message ) {
 	const notice = { status: 'info', content: message, id: uuid() };
 	return {
 		type: 'CREATE_NOTICE',
