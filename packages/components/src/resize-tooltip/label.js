@@ -89,7 +89,7 @@ function Label(
 		};
 	}
 
-	/**
+	/*
 	 * For "cursor" POSITIONS, we need to "Portal" the Tooltip to the document
 	 * body root for more consistent style rendering.
 	 * https://reakit.io/docs/portal/

@@ -48,28 +48,28 @@ export function useResizeLabel( {
 	showPx = false,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
-	/**
+	/*
 	 * The width/height values derive from this special useResizeAware hook.
 	 * This custom hook uses injects an iFrame into the element, allowing it
 	 * to tap into the onResize (window) callback events.
 	 */
 	const [ resizeListener, sizes ] = useResizeAware();
 
-	/**
+	/*
 	 * The moveX and moveY values are used to track whether the label should
 	 * display width, height, or width x height.
 	 */
 	const [ moveX, setMoveX ] = useState( false );
 	const [ moveY, setMoveY ] = useState( false );
 
-	/**
+	/*
 	 * Cached dimension values to check for width/height updates from the
 	 * sizes property from useResizeAware()
 	 */
 	const heightRef = useRef( height );
 	const widthRef = useRef( width );
 
-	/**
+	/*
 	 * This timeout is used with setMoveX and setMoveY to determine of
 	 * both width and height values have changed at (roughly) the same time.
 	 */
@@ -92,7 +92,7 @@ export function useResizeLabel( {
 	};
 
 	useEffect( () => {
-		/**
+		/*
 		 * On the initial render of useResizeAware, the height and width values are
 		 * null. They are calculated then set using via an internal useEffect hook.
 		 */
@@ -105,7 +105,7 @@ export function useResizeLabel( {
 
 		if ( ! didWidthChange && ! didHeightChange ) return;
 
-		/**
+		/*
 		 * After the initial render, the useResizeAware will set the first
 		 * width and height values. We'll sync those values with our
 		 * width and height refs. However, we shouldn't render our Tooltip
@@ -117,7 +117,7 @@ export function useResizeLabel( {
 			return;
 		}
 
-		/**
+		/*
 		 * After the first cycle, we can track width and height changes.
 		 */
 		if ( didWidthChange ) {
@@ -137,7 +137,7 @@ export function useResizeLabel( {
 		}
 	}, [ width, height, isCursor ] );
 
-	/**
+	/*
 	 * Drag even handling for position = 'cursor'
 	 */
 	useEffect( () => {
@@ -223,7 +223,7 @@ function getSizeLabel( {
 } ) {
 	if ( ! moveX && ! moveY ) return null;
 
-	/**
+	/*
 	 * Corner position...
 	 * We want the label to appear like width x height.
 	 */
@@ -231,7 +231,7 @@ function getSizeLabel( {
 		return `${ width } x ${ height }`;
 	}
 
-	/**
+	/*
 	 * Other POSITIONS...
 	 * The label will combine both width x height values if both
 	 * values have recently been changed.
