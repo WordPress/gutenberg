@@ -78,14 +78,14 @@ export function useResizeLabel( {
 
 	const { width, height } = sizes;
 
-	/**
-	 * On the initial render of useResizeAware, the height and width values are
-	 * null. They are calculated then set using via an internal useEffect hook.
-	 */
-	const isRendered = width !== null && height !== null;
-
 	useEffect( () => {
-		if ( width === null ) return;
+		/**
+		 * On the initial render of useResizeAware, the height and width values are
+		 * null. They are calculated then set using via an internal useEffect hook.
+		 */
+		const isRendered = width !== null || height !== null;
+
+		if ( ! isRendered ) return;
 
 		const didWidthChange = width !== widthRef.current;
 		const didHeightChange = height !== heightRef.current;
@@ -148,7 +148,7 @@ export function useResizeLabel( {
 			document.removeEventListener( 'mousemove', handleOnMouseMove );
 			document.removeEventListener( 'mouseup', handleOnMouseUp );
 		};
-	}, [ width, height, isActive, isRendered, isDragging ] );
+	}, [ width, height, isActive, isDragging ] );
 
 	const label = getSizeLabel( {
 		axis,
