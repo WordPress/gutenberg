@@ -14,8 +14,8 @@ import {
 	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { compose, useViewportMatch } from '@wordpress/compose';
-import { withDispatch } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -105,8 +105,9 @@ function MediaContainer( props ) {
 		mediaWidth,
 		onSelectMedia,
 		onWidthChange,
-		toggleSelection,
 	} = props;
+
+	const { toggleSelection } = useDispatch( 'core/block-editor' );
 
 	if ( mediaType && mediaUrl ) {
 		const onResizeStart = () => {
@@ -163,13 +164,4 @@ function MediaContainer( props ) {
 	return <PlaceholderContainer { ...props } />;
 }
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( 'core/block-editor' );
-
-		return {
-			toggleSelection,
-		};
-	} ),
-	withNotices,
-] )( MediaContainer );
+export default withNotices( MediaContainer );
