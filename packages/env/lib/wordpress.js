@@ -72,15 +72,13 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
 async function configureWordPress( environment, config ) {
 	const options = {
 		config: config.dockerComposeConfigPath,
+		commandOptions: [ '--rm' ],
 		log: config.debug,
 	};
 
 	const port = config.env[ environment ].port;
 
-	// Install WordPress. If this is not done as a separate docker-compose run
-	// command, install will not complete successfully. Note that we do not
-	// remove the service here. That saves several seconds since the service
-	// needs to be running for the next command anyways.
+	// Install WordPress.
 	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
 		[
