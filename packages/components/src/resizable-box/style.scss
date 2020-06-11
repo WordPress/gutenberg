@@ -22,7 +22,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	height: $resize-handler-size;
 	border: 2px solid $white;
 	border-radius: 50%;
-	background: var(--wp-theme-color);
+	background: var(--wp-admin-theme-color);
 	cursor: inherit;
 	position: absolute;
 	top: calc(50% - #{ceil($resize-handler-size / 2)});
@@ -36,7 +36,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	width: 7px;
 	height: 7px;
 	border: 2px solid $white;
-	background: var(--wp-theme-color);
+	background: var(--wp-admin-theme-color);
 	cursor: inherit;
 	position: absolute;
 	top: calc(50% - 4px);

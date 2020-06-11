@@ -71,13 +71,13 @@ $toggle-border-width: 2px;
 
 	// Checked state.
 	&.is-checked .components-form-toggle__track {
-		background-color: var(--wp-theme-color-toggle);
-		border: $toggle-border-width solid var(--wp-theme-color-toggle);
+		background-color: var(--wp-admin-theme-color-toggle);
+		border: $toggle-border-width solid var(--wp-admin-theme-color-toggle);
 		border: #{ $toggle-height / 2 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
 	}
 
 	&__input:focus + .components-form-toggle__track {
-		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) var(--wp-theme-color);
+		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
@@ -92,8 +92,8 @@ $toggle-border-width: 2px;
 		}
 
 		&::before {
-			background-color: var(--wp-theme-color-toggle);
-			border: $toggle-border-width solid var(--wp-theme-color-toggle);
+			background-color: var(--wp-admin-theme-color-toggle);
+			border: $toggle-border-width solid var(--wp-admin-theme-color-toggle);
 		}
 	}
 

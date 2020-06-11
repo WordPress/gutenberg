@@ -106,14 +106,14 @@ $radius-round: 50%;
 $radius-block-ui: 2px;
 
 :root {
-	--wp-theme-color: theme(primary);
-	--wp-theme-color-secondary: theme(secondary);
-	--wp-theme-color-toggle: theme(toggle);
+	--wp-admin-theme-color: theme(primary);
+	--wp-admin-theme-color-secondary: theme(secondary);
+	--wp-admin-theme-color-toggle: theme(toggle);
 
 	// Ideally this are computed and not their own variables but due to Current CSS limitation
 	// We need these.
-	--wp-theme-color-darker-20: theme(primaryDarker20);
-	--wp-theme-color-darker-10: theme(primaryDarker10);
-	--wp-theme-color-lighter-10: theme(primaryLighter10);
-	--wp-theme-color-lighter-40: theme(primaryLighter40);
+	--wp-admin-theme-color-darker-20: theme(primaryDarker20);
+	--wp-admin-theme-color-darker-10: theme(primaryDarker10);
+	--wp-admin-theme-color-lighter-10: theme(primaryLighter10);
+	--wp-admin-theme-color-lighter-40: theme(primaryLighter40);
 }
