@@ -239,7 +239,7 @@ function getSizeLabel( {
 	 * Otherwise, only width or height will be displayed.
 	 * The `PX` unit will be added, if specified by the `showPx` prop.
 	 */
-	const labelUnit = showPx ? ' PX' : '';
+	const labelUnit = showPx ? ' px' : '';
 
 	if ( axis ) {
 		if ( axis === 'x' && moveX ) {
