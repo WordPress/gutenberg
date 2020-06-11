@@ -46,7 +46,6 @@ import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
-import * as richImage from './rich-image';
 import * as rss from './rss';
 import * as search from './search';
 import * as group from './group';
@@ -187,7 +186,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				const {
 					__experimentalEnableLegacyWidgetBlock,
 					__experimentalEnableFullSiteEditing,
-					__experimentalEnableRichImageEditing,
 				} = settings;
 
 				[
@@ -217,10 +215,5 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 						  ]
 						: [] ),
 				].forEach( registerBlock );
-
-				if ( __experimentalEnableRichImageEditing ) {
-					// Attach rich image tools to the image block.
-					richImage.registerBlock();
-				}
 		  }
 		: undefined;
