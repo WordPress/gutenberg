@@ -43,9 +43,9 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 	 */
 	public function apply_to_meta( $meta ) {
 		if ( $this->is_vertical() ) {
-			$meta['flipv'] = ! $meta['flipv'];
+			$meta['flip_vertical'] = ! $meta['flip_vertical'];
 		} elseif ( $this->is_horizontal() ) {
-			$meta['flipH'] = ! $meta['flipH'];
+			$meta['flip_horizontal'] = ! $meta['flip_horizontal'];
 		}
 
 		return $meta;
@@ -96,12 +96,12 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 	public static function get_filename( $meta ) {
 		$parts = array();
 
-		if ( $meta['flipH'] ) {
-			$parts[] = 'fliph';
+		if ( $meta['flip_horizontal'] ) {
+			$parts[] = 'flip_horizontal';
 		}
 
-		if ( $meta['flipv'] ) {
-			$parts[] = 'flipv';
+		if ( $meta['flip_vertical'] ) {
+			$parts[] = 'flip_vertical';
 		}
 
 		if ( count( $parts ) > 0 ) {
@@ -120,8 +120,8 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 	 */
 	public static function get_default_meta() {
 		return array(
-			'flipH' => false,
-			'flipv' => false,
+			'flip_horizontal' => false,
+			'flip_vertical'   => false,
 		);
 	}
 }
