@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { map, flowRight, omit, forEach, filter } from 'lodash';
+import {
+	map,
+	flowRight,
+	omit,
+	forEach,
+	filter,
+	keyBy,
+	toPlainObject,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -154,10 +162,11 @@ const queries = ( state = {}, action ) => {
 			return receiveQueries( state, action );
 		case 'REMOVE_ITEMS':
 			const newState = { ...state };
+			const removedItems = keyBy( toPlainObject( action.items ) );
 			forEach( newState, ( queryItems, key ) => {
 				if ( newState[ key ] ) {
 					newState[ key ] = filter( queryItems, ( queryId ) => {
-						return ! action.items.includes( queryId );
+						return !! removedItems[ queryId ] === false;
 					} );
 				}
 			} );

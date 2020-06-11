@@ -153,16 +153,7 @@ export function* deleteEntityRecord( kind, name, recordId ) {
 		return;
 	}
 
-	yield {
-		type: 'DELETE_ENTITY_RECORD_START',
-		kind,
-		name,
-		recordId,
-	};
-
-	yield removeItems( kind, name, Number( recordId ) );
-
-	let error;
+	yield removeItems( kind, name, recordId, true );
 
 	try {
 		let path = `${ entity.baseURL }/${ recordId }`;
@@ -176,10 +167,8 @@ export function* deleteEntityRecord( kind, name, recordId ) {
 			method: 'DELETE',
 		} );
 	} catch ( _error ) {
-		error = _error;
-
 		const persistedRecord = yield select(
-			'getEntityRecord',
+			'getEditedEntityRecord',
 			kind,
 			name,
 			recordId
@@ -193,14 +182,6 @@ export function* deleteEntityRecord( kind, name, recordId ) {
 			false
 		);
 	}
-
-	yield {
-		type: 'DELETE_ENTITY_RECORD_FINISH',
-		kind,
-		name,
-		recordId,
-		error,
-	};
 }
 
 /**

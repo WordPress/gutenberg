@@ -21,18 +21,19 @@ export function receiveItems( items ) {
  * Returns an action object used in signalling that entity records have been
  * deleted and they need to be removed from entities state.
  *
- * @param {string} kind            Kind of the removed entities.
- * @param {string} name            Name of the removed entities.
- * @param {Array|Object} records   Records removed.
+ * @param {string} kind             Kind of the removed entities.
+ * @param {string} name             Name of the removed entities.
+ * @param {Array|Object} records    Records removed.
+ * @param {boolean} invalidateCache Controls whether we want to invalidate the cache.
  * @return {Object} Action object.
  */
-export function removeItems( kind, name, records ) {
+export function removeItems( kind, name, records, invalidateCache = false ) {
 	return {
 		type: 'REMOVE_ITEMS',
 		items: castArray( records ),
 		kind,
 		name,
-		invalidateCache: false,
+		invalidateCache,
 	};
 }
 
