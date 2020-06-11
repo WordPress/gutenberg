@@ -78,7 +78,11 @@ const SpacerEdit = ( {
 				onResizeStop={ handleOnResizeStop }
 				showHandle={ isSelected }
 			>
-				<ResizeTooltip axis="y" isEnabled={ isResizing } />
+				<ResizeTooltip
+					axis="y"
+					isEnabled={ isResizing }
+					position="cursor"
+				/>
 			</ResizableBox>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
