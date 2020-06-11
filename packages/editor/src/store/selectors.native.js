@@ -75,5 +75,5 @@ export function getClipboard( state ) {
  * @return {Object} Current notice data.
  */
 export function getNotices( state ) {
-	return state.notices;
+	return state.notices?.notices;
 }
