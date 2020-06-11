@@ -5,34 +5,27 @@ import { useState, useEffect } from '@wordpress/element';
 
 const alreadyLoadedURIs = new Set();
 
-const loadTinyMCEScripts = async () => {
-	let count;
-	await window.wpTinyMCEOrderedScriptURIs.reduce(
-		( previousPromise, uri ) => {
-			if ( alreadyLoadedURIs.has( uri ) ) {
-				// if the dependency has already been loaded, skip it
-				return previousPromise;
-			}
+const loadTinyMCEScripts = () =>
+	window.wpTinyMCEOrderedScriptURIs.reduce( ( previousPromise, uri ) => {
+		if ( alreadyLoadedURIs.has( uri ) ) {
+			// if the dependency has already been loaded, skip it
+			return previousPromise;
+		}
 
-			// we need to serially load depenendencies as each could depend on the previous
-			return previousPromise.then( () =>
-				new Promise( ( resolve, reject ) => {
-					const scriptElement = document.createElement( 'script' );
-					scriptElement.type = 'application/javascript';
-					scriptElement.src = uri;
-					scriptElement.onload = resolve;
-					scriptElement.onerror = reject;
-					document.head.appendChild( scriptElement );
-				} ).then( () => {
-					count++;
-					alreadyLoadedURIs.add( uri );
-				} )
-			);
-		},
-		Promise.resolve()
-	);
-	return count;
-};
+		// we need to serially load depenendencies as each could depend on the previous
+		return previousPromise.then( () =>
+			new Promise( ( resolve, reject ) => {
+				const scriptElement = document.createElement( 'script' );
+				scriptElement.type = 'application/javascript';
+				scriptElement.src = uri;
+				scriptElement.onload = resolve;
+				scriptElement.onerror = reject;
+				document.head.appendChild( scriptElement );
+			} ).then( () => {
+				alreadyLoadedURIs.add( uri );
+			} )
+		);
+	}, Promise.resolve() );
 
 const LazyLoadTinyMCE = ( { children, placeholder } ) => {
 	/**
@@ -49,6 +42,7 @@ const LazyLoadTinyMCE = ( { children, placeholder } ) => {
 	const [ isLoaded, setIsLoaded ] = useState( isTinyMCEAlreadyLoaded );
 	useEffect( () => {
 		if ( isLoaded ) {
+			// no dependencies to load if it's already loaded!
 			return;
 		}
 
@@ -56,7 +50,7 @@ const LazyLoadTinyMCE = ( { children, placeholder } ) => {
 			window.wpMceTranslation();
 			setIsLoaded( true );
 		} );
-	}, [] );
+	}, [ isLoaded ] );
 
 	return isLoaded ? children : placeholder;
 };

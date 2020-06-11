@@ -243,6 +243,36 @@ add_filter( 'rest_index', 'register_site_icon_url' );
 add_theme_support( 'widgets-block-editor' );
 
 
+function gutenberg_does_post_have_classic_block( $post ) {
+	$parsed = parse_blocks( $post->post_content );
+
+	function check_for_classic_block_recursive( $block ) {
+		$block_name = $block['blockName'];
+		if ( is_null( $block_name ) || 'core/freeform' == $block_name ) {
+			return true;
+		}
+		if ( empty( $block->children ) ) {
+			return false;
+		}
+
+		foreach ( $block->children as $child ) {
+			if ( check_for_classic_block_recursive( $child ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	foreach ( $parsed as $block ) {
+		if ( check_for_classic_block_recursive( $block ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /**
  * Prints TinyMCE scripts when we're outside of the block editor using
  * the default behavior by calling to the default action function from core.
@@ -258,7 +288,7 @@ add_theme_support( 'widgets-block-editor' );
  * @since 7.9.1
  */
 function gutenberg_print_tinymce_scripts() {
-	global $wp_meta_boxes, $post_type;
+	global $wp_meta_boxes, $post_type, $post;
 	$current_screen = get_current_screen();
 
 	if ( ! $current_screen->is_block_editor() ) {
@@ -282,6 +312,12 @@ function gutenberg_print_tinymce_scripts() {
 				}
 			}
 		}
+	}
+
+	if ( gutenberg_does_post_have_classic_block( $post ) ) {
+		// if the classic block is already used then we cannot delay loading TinyMCE
+		wp_print_tinymce_scripts();
+		return;
 	}
 
 	// Otherwise we're in the block editor and should only print support scripts.
@@ -310,13 +346,3 @@ function gutenberg_print_tinymce_scripts() {
 
 remove_action( 'print_tinymce_scripts', 'wp_print_tinymce_scripts' );
 add_action( 'print_tinymce_scripts', 'gutenberg_print_tinymce_scripts' );
-
-// function gutenberg_print_tinymce_when_meta_boxes_are_present( $post_type, $position, $post ) {
-// 	global $wp_meta_boxes;
-
-// 	if ( ! empty( $wp_meta_boxes ) ) {
-// 		wp_print_tinymce_scripts();
-// 	}
-// }
-
-// add_action( 'do_meta_boxes', 'gutenberg_print_tinymce_when_meta_boxes_are_present', 10, 3 );
