@@ -135,11 +135,15 @@ function useMovingAnimation(
 				scrollContainer.current.scrollTop = transform.scrollTop + y;
 			}
 
-			ref.current.style.transformOrigin = 'center';
-			ref.current.style.transform =
-				x === 0 && y === 0 ? null : `translate3d(${ x }px,${ y }px,0)`;
-			ref.current.style.zIndex =
-				! isSelected || ( x === 0 && y === 0 ) ? null : '1';
+			if ( ref.current ) {
+				ref.current.style.transformOrigin = 'center';
+				ref.current.style.transform =
+					x === 0 && y === 0
+						? null
+						: `translate3d(${ x }px,${ y }px,0)`;
+				ref.current.style.zIndex =
+					! isSelected || ( x === 0 && y === 0 ) ? null : '1';
+			}
 		},
 	} );
 }
