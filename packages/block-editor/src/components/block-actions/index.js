@@ -22,6 +22,7 @@ function BlockActions( {
 	onRemove,
 	onUngroup,
 	blocks,
+	onCopy,
 } ) {
 	return children( {
 		canDuplicate,
@@ -34,6 +35,7 @@ function BlockActions( {
 		onRemove,
 		onUngroup,
 		blocks,
+		onCopy,
 	} );
 }
 
@@ -80,6 +82,7 @@ export default compose( [
 			duplicateBlocks,
 			insertAfterBlock,
 			insertBeforeBlock,
+			flashBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
@@ -128,6 +131,10 @@ export default compose( [
 				}
 
 				replaceBlocks( clientIds, innerBlocks );
+			},
+			onCopy() {
+				const [ { clientId: selectedBlockClientId } ] = blocks;
+				flashBlock( selectedBlockClientId );
 			},
 		};
 	} ),
