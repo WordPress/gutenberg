@@ -26,19 +26,19 @@ class NoticeList extends Component {
         super( ...arguments );
         this.state = { noticeArray: [] }
     }
-    
+
     render() {
-        const { notices, onRemove = noop, className, children } = this.props;
-        const removeNotice = ( id ) => () => onRemove( id );
+        const { notices, removeNotice, className, children } = this.props;
+        const remove = ( id ) => () => removeNotice( id );
     
         return (
-            <View style={ styles.list }>
+            <View style={ styles.list } key={ notices.lenght }>
                 { children }
                 { [ ...notices ].reverse().map( ( notice ) => (
                     <Notice
                         { ...notice }
                         key={ notice.id }
-                        onRemove={ removeNotice( notice.id ) }
+                        onNoticeHidden={ remove( notice.id ) }
                     >
                     
                     </Notice>
