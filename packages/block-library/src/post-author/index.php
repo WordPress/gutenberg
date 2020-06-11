@@ -73,8 +73,8 @@ function post_author_build_css_colors( $attributes ) {
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color || $has_named_gradient || $has_custom_gradient ) {
-		// Add has-background-color class.
-		$background_colors['css_classes'][] = 'has-background-color';
+		// Add has-background class.
+		$background_colors['css_classes'][] = 'has-background';
 	}
 
 	if ( $has_named_background_color ) {
