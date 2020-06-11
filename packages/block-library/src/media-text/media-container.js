@@ -137,7 +137,6 @@ function MediaContainer( props ) {
 		return (
 			<ResizableBoxContainer
 				className="editor-media-container__resizer"
-				style={ backgroundStyles }
 				size={ { width: mediaWidth + '%' } }
 				minWidth="10%"
 				maxWidth="100%"
