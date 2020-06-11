@@ -6,12 +6,12 @@ const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const inquirer = require( 'inquirer' );
-const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
  * Promisified dependencies
  */
 const rimraf = util.promisify( require( 'rimraf' ) );
+const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
  * Internal dependencies
