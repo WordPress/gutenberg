@@ -133,10 +133,12 @@ export function useResizeLabel( {
 			if ( width !== widthRef.current || height !== heightRef.current ) {
 				widthRef.current = width;
 				heightRef.current = height;
-
-				onMove( event );
 				setIsActive( true );
 			}
+
+			if ( position !== POSITIONS.cursor ) return;
+
+			onMove( event );
 		};
 
 		document.addEventListener( 'mousedown', handleOnMouseDown );
@@ -148,7 +150,7 @@ export function useResizeLabel( {
 			document.removeEventListener( 'mousemove', handleOnMouseMove );
 			document.removeEventListener( 'mouseup', handleOnMouseUp );
 		};
-	}, [ width, height, isActive, isDragging ] );
+	}, [ width, height, isActive, isDragging, position ] );
 
 	const label = getSizeLabel( {
 		axis,
