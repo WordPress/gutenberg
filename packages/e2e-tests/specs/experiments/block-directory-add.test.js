@@ -47,6 +47,24 @@ const MOCK_BLOCK1 = {
 	humanized_updated: '5 months ago',
 };
 
+const MOCK_PLUGIN = {
+	plugin: 'block-directory-test-block',
+	status: 'active',
+	name: 'Block Directory',
+	plugin_uri: '',
+	author: 'No Author',
+	author_uri: '',
+	description: {
+		raw: 'This plugin is useful for the block.',
+		rendered: 'This plugin is useful for the block.',
+	},
+	version: '1.0',
+	network_only: false,
+	requires_wp: '',
+	requires_php: '',
+	text_domain: 'block-directory-test-block',
+};
+
 const MOCK_BLOCK2 = {
 	...MOCK_BLOCK1,
 	name: 'block-directory-test-block/secondary-block',
@@ -89,7 +107,7 @@ const MOCK_BLOCKS_RESPONSES = [
 	{
 		// Mock response for install
 		match: ( request ) => matchUrl( request.url(), INSTALL_URLS ),
-		onRequestMatch: createJSONResponse( { success: true } ),
+		onRequestMatch: createJSONResponse( MOCK_PLUGIN ),
 	},
 	{
 		// Mock the response for the js asset once it gets injected
