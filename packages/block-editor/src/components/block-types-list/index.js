@@ -15,15 +15,7 @@ function BlockTypesList( {
 	children,
 } ) {
 	const normalizedItems = items.reduce( ( result, item ) => {
-		const {
-			id: itemId,
-			icon: itemIcon,
-			title: itemTitle,
-			description: itemDescription,
-			example: itemExample,
-			initialAttributes,
-			variations = [],
-		} = item;
+		const { variations = [] } = item;
 		const hasDefaultVariation = variations.some(
 			( { isDefault } ) => isDefault
 		);
@@ -37,30 +29,21 @@ function BlockTypesList( {
 		if ( variations.length ) {
 			result = result.concat(
 				variations.map( ( variation ) => {
-					const {
-						name,
-						icon,
-						title,
-						description,
-						example,
-						attributes,
-						innerBlocks,
-					} = variation;
 					return {
 						...item,
-						id: `${ itemId }-${ name }`,
-						icon: icon || itemIcon,
-						title: title || itemTitle,
-						description: description || itemDescription,
+						id: `${ item.id }-${ variation.name }`,
+						icon: variation.icon || item.icon,
+						title: variation.title || item.title,
+						description: variation.description || item.description,
 						// If `example` is explicitly undefined for the variation, the preview will not be shown.
 						example: variation.hasOwnProperty( 'example' )
-							? example
-							: itemExample,
+							? variation.example
+							: item.example,
 						initialAttributes: {
-							...initialAttributes,
-							...attributes,
+							...item.initialAttributes,
+							...variation.attributes,
 						},
-						innerBlocks,
+						innerBlocks: variation.innerBlocks,
 					};
 				} )
 			);
