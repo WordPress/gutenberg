@@ -199,33 +199,41 @@ function gutenberg_experimental_global_styles_get_core() {
 function gutenberg_experimental_global_styles_get_theme_presets() {
 	$theme_presets = array();
 
-	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
-	if ( is_array( $theme_colors ) ) {
-		foreach ( $theme_colors as $color ) {
-			$theme_presets['global']['presets']['color'][] = array(
-				'slug'  => $color['slug'],
-				'value' => $color['color'],
-			);
+	$editor_color_palette_support = get_theme_support( 'editor-color-palette' );
+	if ( is_array( $editor_color_palette_support ) and count( $editor_color_palette_support ) >= 1 ) {
+		$theme_colors = $editor_color_palette_support[0];
+		if ( is_array( $theme_colors ) ) {
+			foreach ( $theme_colors as $color ) {
+				$theme_presets['global']['presets']['color'][] = array(
+					'slug'  => $color['slug'],
+					'value' => $color['color'],
+				);
+			}
 		}
 	}
 
-	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[0];
-	if ( is_array( $theme_gradients ) ) {
-		foreach ( $theme_gradients as $gradient ) {
-			$theme_presets['global']['presets']['gradient'][] = array(
-				'slug'  => $gradient['slug'],
-				'value' => $gradient['gradient'],
-			);
+	$editor_gradient_preset_support = get_theme_support( 'editor-gradient-presets' );
+	if ( is_array( $editor_gradient_preset_support ) and count( $editor_gradient_preset_support ) >= 1 ) {
+		$theme_gradients = $editor_gradient_preset_support[0];
+		if ( is_array( $theme_gradients ) ) {
+			foreach ( $theme_gradients as $gradient ) {
+				$theme_presets['global']['presets']['gradient'][] = array(
+					'slug'  => $gradient['slug'],
+					'value' => $gradient['gradient'],
+				);
+			}
 		}
 	}
-
-	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[0];
-	if ( is_array( $theme_font_sizes ) ) {
-		foreach ( $theme_font_sizes as $font_size ) {
-			$theme_presets['global']['presets']['font-size'][] = array(
-				'slug'  => $font_size['slug'],
-				'value' => $font_size['size'],
-			);
+	$editor_font_size_support = get_theme_support( 'editor-font-sizes' );
+	if ( is_array( $editor_font_size_support ) and count( $editor_font_size_support ) >= 1 ) {
+		$theme_font_sizes = $editor_font_size_support[0];
+		if ( is_array( $theme_font_sizes ) ) {
+			foreach ( $theme_font_sizes as $font_size ) {
+				$theme_presets['global']['presets']['font-size'][] = array(
+					'slug'  => $font_size['slug'],
+					'value' => $font_size['size'],
+				);
+			}
 		}
 	}
 
