@@ -108,6 +108,7 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
 			( theme ) => {
+				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
 				if ( theme.colors === undefined ) {
 					theme.colors = SETTINGS_DEFAULTS.colors;
 				}
