@@ -156,6 +156,7 @@ export default compose(
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 			getSettings,
+			canInsertBlockType,
 		} = select( 'core/block-editor' );
 		const { getChildBlockNames, getBlockType } = select( 'core/blocks' );
 		const { getClipboard } = select( 'core/editor' );
@@ -176,20 +177,22 @@ export default compose(
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 		} = getSettings();
 		const clipboard = getClipboard();
-		const clipboardBlock = clipboard
-			? rawHandler( { HTML: clipboard } )[ 0 ]
-			: null;
+		const clipboardBlock =
+			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
+		const shouldAddClipboardBlock =
+			clipboardBlock &&
+			canInsertBlockType( clipboardBlock.name, destinationRootClientId );
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: clipboard
+			items: shouldAddClipboardBlock
 				? [
 						{
-							id: 'clipboard',
 							...pick( getBlockType( clipboardBlock.name ), [
 								'name',
 								'icon',
 							] ),
+							id: 'clipboard',
 							initialAttributes: clipboardBlock.attributes,
 							innerBlocks: clipboardBlock.innerBlocks,
 						},
