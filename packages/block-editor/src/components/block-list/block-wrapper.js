@@ -190,7 +190,7 @@ const BlockComponent = forwardRef(
 			mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
 
-		const blockWrapper = (
+		return (
 			<TagName
 				// Overrideable props.
 				aria-label={ blockLabel }
@@ -220,8 +220,6 @@ const BlockComponent = forwardRef(
 				{ children }
 			</TagName>
 		);
-
-		return blockWrapper;
 	}
 );
 
