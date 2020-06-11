@@ -129,7 +129,7 @@ const BlockActionsMenu = ( {
 				updateClipboard( serialize( copyBlock ) );
 				createInfoNotice(
 					// translators: displayed right after the block is copied.
-					__( 'Copied!' )
+					__( 'Block copied' )
 				);
 				break;
 			case cutButtonOption.value:
@@ -138,7 +138,7 @@ const BlockActionsMenu = ( {
 				removeBlocks( selectedBlockClientId );
 				createInfoNotice(
 					// translators: displayed right after the block is cut.
-					__( 'Cut!' )
+					__( 'Block cut' )
 				);
 				break;
 			case duplicateButtonOption.value:

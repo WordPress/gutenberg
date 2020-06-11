@@ -66,7 +66,7 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 						{
 							translateY: animationValue.interpolate( {
 								inputRange: [ 0, 1 ],
-								outputRange: [ visible ? 4 : -8, -8 ],
+								outputRange: [ visible ? 0 : -30, 0 ],
 							} ),
 						},
 					],
