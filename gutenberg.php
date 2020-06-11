@@ -169,6 +169,9 @@ add_action( 'wp_ajax_gutenberg_rest_nonce', 'gutenberg_rest_nonce' );
  * endpoint when https://github.com/WordPress/gutenberg/pull/19967 is complete.
  *
  * @since 8.2.1
+ *
+ * @param WP_REST_Response $response Response data served by the WordPress REST index endpoint.
+ * @return WP_REST_Response
  */
 function register_site_icon_url( $response ) {
 	$data                  = $response->data;
