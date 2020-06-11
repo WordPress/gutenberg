@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -127,12 +127,18 @@ function QuickInserter( {
 		[ filterValue, patterns ]
 	);
 
-	const onExpand = useSelect(
+	const setInsererIsOpened = useSelect(
 		( select ) =>
 			select( 'core/block-editor' ).getSettings()
-				.__experimentalOnExpandInserter,
+				.__experimentalSetIsInserterOpened,
 		[]
 	);
+
+	useEffect( () => {
+		if ( setInsererIsOpened ) {
+			setInsererIsOpened( false );
+		}
+	}, [ setInsererIsOpened ] );
 
 	return (
 		<div className="block-editor-inserter__quick-inserter">
@@ -152,10 +158,10 @@ function QuickInserter( {
 				onHover={ onToggleInsertionPoint }
 			/>
 
-			{ onExpand && (
+			{ setInsererIsOpened && (
 				<Button
 					className="block-editor-inserter__quick-inserter-expand"
-					onClick={ onExpand }
+					onClick={ () => setInsererIsOpened( true ) }
 				>
 					{ __( 'Browse all' ) }
 				</Button>
