@@ -126,12 +126,8 @@ function MediaTextEdit( { attributes, className, isSelected, setAttributes } ) {
 	} = attributes;
 
 	const image = useSelect(
-		( select ) => {
-			const { getMedia } = select( 'core' );
-			return {
-				image: mediaId && isSelected ? getMedia( mediaId ) : null,
-			};
-		},
+		( select ) =>
+			mediaId && isSelected ? select( 'core' ).getMedia( mediaId ) : null,
 		[ isSelected, mediaId ]
 	);
 
