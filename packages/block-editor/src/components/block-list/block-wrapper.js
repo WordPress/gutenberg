@@ -65,7 +65,6 @@ const BlockComponent = forwardRef(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
-		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
 		// Provide the selected node, or the first and last nodes of a multi-
@@ -203,8 +202,7 @@ const BlockComponent = forwardRef(
 				className={ classnames(
 					className,
 					props.className,
-					wrapperProps && wrapperProps.className,
-					! isAligned && 'wp-block'
+					wrapperProps && wrapperProps.className
 				) }
 				data-block={ clientId }
 				data-type={ name }
@@ -222,19 +220,6 @@ const BlockComponent = forwardRef(
 				{ children }
 			</TagName>
 		);
-
-		// For aligned blocks, provide a wrapper element so the block can be
-		// positioned relative to the block column.
-		if ( isAligned ) {
-			const alignmentWrapperProps = {
-				'data-align': wrapperProps[ 'data-align' ],
-			};
-			return (
-				<div className="wp-block" { ...alignmentWrapperProps }>
-					{ blockWrapper }
-				</div>
-			);
-		}
 
 		return blockWrapper;
 	}
