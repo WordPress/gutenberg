@@ -702,7 +702,9 @@ export class RichText extends Component {
 		const {
 			color: defaultColor,
 			textDecorationColor: defaultTextDecorationColor,
+			fontSize: defaultFontSize,
 			fontFamily: defaultFontFamily,
+			lineHeight: defaultLineHeight,
 		} = getStylesFromColorScheme( styles.richText, styles.richTextDark );
 
 		let selection = null;
@@ -813,10 +815,17 @@ export class RichText extends Component {
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={
-						this.props.fontSize || ( style && style.fontSize )
+						this.props.fontSize ||
+						( style && style.fontSize ) ||
+						defaultFontSize
 					}
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
+					lineHeight={
+						this.props.lineHeight ||
+						( style && style.lineHeight ) ||
+						defaultLineHeight
+					}
 					disableEditingMenu={ this.props.disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
