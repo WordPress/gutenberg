@@ -41,7 +41,7 @@ export const POSITIONS = {
  */
 export function useResizeLabel( {
 	axis,
-	fadeTimeout = 200,
+	fadeTimeout = 180,
 	onMove = noop,
 	onResize = noop,
 	position = POSITIONS.cursor,

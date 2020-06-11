@@ -96,14 +96,14 @@ function Label(
 		<WrapperComponent>
 			<TooltipWrapper
 				aria-hidden="true"
-				className="components-resizable-visualizer__tooltip-wrapper"
-				ref={ tooltipRef }
+				className="components-resizable-tooltip__tooltip-wrapper"
 				isActive={ showLabel }
+				ref={ tooltipRef }
 				style={ style }
 				{ ...props }
 			>
 				<Tooltip
-					className="components-resizable-visualizer__tooltip"
+					className="components-resizable-tooltip__tooltip"
 					ref={ ref }
 				>
 					{ label }

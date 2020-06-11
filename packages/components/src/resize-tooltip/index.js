@@ -20,8 +20,8 @@ function ResizeTooltip(
 	{
 		axis,
 		className,
-		isEnabled = true,
 		fadeTimeout = 180,
+		isEnabled = true,
 		labelRef,
 		onMove = noop,
 		onResize = noop,
@@ -53,7 +53,7 @@ function ResizeTooltip(
 
 	if ( ! isEnabled ) return null;
 
-	const classes = classnames( 'components-resizable-visualizer', className );
+	const classes = classnames( 'components-resize-tooltip', className );
 
 	return (
 		<Root aria-hidden="true" className={ classes } ref={ ref } { ...props }>
@@ -65,8 +65,8 @@ function ResizeTooltip(
 				isActive={ isActive }
 				isEnabled={ isEnabled }
 				label={ label }
-				ref={ labelRef }
 				position={ position }
+				ref={ labelRef }
 				zIndex={ zIndex }
 			/>
 		</Root>

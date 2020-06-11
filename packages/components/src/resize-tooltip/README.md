@@ -33,11 +33,11 @@ The `bottom` position renders the dimensions label at the bottom-center of the (
 
 ##### `cursor`
 
-The `cursor` position (default) renders the dimensions label right above the mouse cursor.
+The `cursor` position renders the dimensions label right above the mouse cursor.
 
 ##### `corner`
 
-The `corner` position renders the dimensions label in the top-right corner of the (parent) element.
+The `corner` position (default) renders the dimensions label in the top-right corner of the (parent) element.
 
 ## Props
 
