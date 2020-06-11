@@ -223,7 +223,7 @@ export class BlockList extends Component {
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
 				/>
-				{ notices?.length > 0 && <NoticeList notices={ notices }/> }
+				<NoticeList/>
 				{ this.shouldShowInnerBlockAppender() && (
 					<View
 						style={ {
