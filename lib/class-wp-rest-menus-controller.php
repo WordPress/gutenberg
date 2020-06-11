@@ -77,7 +77,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		}
 
 		$nav_term           = wp_get_nav_menu_object( $term );
-		$nav_term->auto_add = $this->handle_auto_add( $nav_term );
+		$nav_term->auto_add = $this->get_menu_auto_add( $nav_term->term_id );
 
 		return $nav_term;
 	}
@@ -159,7 +159,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$nav_menu = wp_get_nav_menu_object( $term );
 		$response = parent::prepare_item_for_response( $nav_menu, $request );
 
-		$nav_menu->auto_add = $this->handle_auto_add( $nav_menu );
+		$nav_menu->auto_add = $this->get_menu_auto_add( $nav_menu->term_id );
 		$fields             = $this->get_fields_for_response( $request );
 
 		if ( in_array( 'auto_add', $fields, true ) ) {
@@ -285,7 +285,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			return $locations_update;
 		}
 
-		$this->handle_auto_add( $term, $request );
+		$this->handle_auto_add( $term->id, $request );
 
 		$fields_update = $this->update_additional_fields_for_object( $term, $request );
 
@@ -373,11 +373,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			return $locations_update;
 		}
 
-		$auto_add_update = $this->handle_auto_add( $term, $request );
-
-		if ( is_wp_error( $auto_add_update ) ) {
-			return $auto_add_update;
-		}
+		$this->handle_auto_add( $term->term_id, $request );
 
 		$fields_update = $this->update_additional_fields_for_object( $term, $request );
 
@@ -449,6 +445,21 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	}
 
 	/**
+	 * Returns the value of a menu's auto_add
+	 *
+	 * @param int             $menu_id The menu id to update the location form.
+	 *
+	 * @return Boolean        The value of auto_add.
+	 */
+	function get_menu_auto_add( $menu_id ) {
+		$nav_menu_option = (array) get_option( 'nav_menu_options' );
+		if ( ! in_array( $menu_id, $nav_menu_option['auto_add'], true ) ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Updates the menu's auto add from a REST request. The body of this function
 	 * replicates the behavior of `wp_nav_menu_update_menu_items`
 	 * in `src/wp-admin/includes/nav-menu.php`.
@@ -456,21 +467,18 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 * @param int             $term The menu id to update the location form.
 	 * @param WP_REST_Request $request The request object with menu and locations data.
 	 *
-	 * @return true|WP_Error WP_Error on an error assigning any of the locations, otherwise null.
+	 * @return Boolean|Null   Return the value of auto_add or null if the auto_add
+	 *                        is not present in the request.
 	 */
-	function handle_auto_add( $term, $request = false ) {
-		$menu_id         = $term->term_id;
+	function handle_auto_add( $menu_id, $request ) {
 		$nav_menu_option = (array) get_option( 'nav_menu_options' );
 
 		if ( ! isset( $nav_menu_option['auto_add'] ) ) {
 			$nav_menu_option['auto_add'] = array();
 		}
 
-		if ( ! $request ) {
-			if ( ! in_array( $menu_id, $nav_menu_option['auto_add'], true ) ) {
-				return false;
-			}
-			return true;
+		if ( ! isset( $request['auto_add'] ) ) {
+			return null;
 		}
 
 		$auto_add = $request->get_param( 'auto_add' );
@@ -489,8 +497,9 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		// Remove non-existent/deleted menus.
 		$nav_menu_option['auto_add'] = array_intersect( $nav_menu_option['auto_add'], wp_get_nav_menus( array( 'fields' => 'ids' ) ) );
 		update_option( 'nav_menu_options', $nav_menu_option );
+		do_action( 'wp_update_nav_menu', $menu_id );
 
-		return true;
+		return $auto_add;
 	}
 
 	/**
@@ -551,6 +560,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			'description' => __( 'Whether to automatically add top level pages to this menu.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'boolean',
+			'default'     => false,
 		);
 
 		return $schema;
