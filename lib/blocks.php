@@ -315,22 +315,22 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 	if ( isset( $block['attrs'] ) ) {
 		$colors     = gutenberg_experimental_build_css_colors( $block['attrs'] );
-		$font_sizes = gutenberg_experimental_build_css_font_sizes( $block['attrs'] );
+		$typography = gutenberg_experimental_build_css_typography( $block['attrs'] );
 
 		$extra_classes    = array_merge(
 			$colors['background']['css_classes'],
 			$colors['text']['css_classes'],
-			$font_sizes['css_classes'],
+			$typography['css_classes'],
 			isset( $block['attrs']['className'] ) ? array( $block['attrs']['className'] ) : array(),
 			isset( $block['attrs']['align'] ) ? array( 'has-text-align-' . $block['attrs']['align'] ) : array()
 		);
 		$extra_styles = (
 			$colors['text']['inline_styles'] ||
 			$colors['background']['inline_styles'] ||
-			$font_sizes['inline_styles']
+			$typography['inline_styles']
 		) ? esc_attr( $colors['text']['inline_styles'] ) .
 		  	esc_attr( $colors['background']['inline_styles'] ) .
-			esc_attr( $font_sizes['inline_styles'] )
+			esc_attr( $typography['inline_styles'] )
 		: '';
 
 		$dom = new DOMDocument( '1.0', 'utf-8' );
@@ -430,8 +430,8 @@ function gutenberg_experimental_build_css_colors( $attributes ) {
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color || $has_named_gradient || $has_custom_gradient ) {
-		// Add has-background-color class.
-		$background_colors['css_classes'][] = 'has-background-color';
+		// Add has-background class.
+		$background_colors['css_classes'][] = 'has-background';
 	}
 
 	if ( $has_named_background_color ) {
@@ -459,9 +459,9 @@ function gutenberg_experimental_build_css_colors( $attributes ) {
  * @param  array $attributes block attributes.
  * @return array Font size CSS classes and inline styles.
  */
-function gutenberg_experimental_build_css_font_sizes( $attributes ) {
+function gutenberg_experimental_build_css_typography( $attributes ) {
 	// CSS classes.
-	$font_sizes = array(
+	$typography = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
@@ -473,12 +473,20 @@ function gutenberg_experimental_build_css_font_sizes( $attributes ) {
 
 	if ( $has_named_font_size ) {
 		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
+		$typography['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['style']['typography']['fontSize'] );
+		$typography['inline_styles'] .= sprintf( 'font-size: %spx;', $attributes['style']['typography']['fontSize'] );
 	}
 
-	return $font_sizes;
+	$has_line_height = array_key_exists( 'style', $attributes )
+	&& array_key_exists( 'typography', $attributes['style'] )
+	&& array_key_exists( 'lineHeight', $attributes['style']['typography'] );
+
+	if ( $has_line_height ) {
+		$typography['inline_styles'] .= sprintf( 'line-height: %s;', $attributes['style']['typography']['lineHeight'] );
+	}
+
+	return $typography;
 }
 

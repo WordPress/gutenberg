@@ -13,7 +13,9 @@
 	"supports": {
 		"html": false,
 		"lightBlockWrapper": true,
-		"__experimentalColor": true,
+		"__experimentalColor": {
+			"gradients": true
+		},
 		"__experimentalFontSize": true,
 		"__experimentalLineHeight": true
 	}
