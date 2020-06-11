@@ -228,6 +228,7 @@ const BlockComponent = forwardRef(
 		}
 
 		return (
+			// eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
 			<TagName
 				// Overrideable props.
 				aria-label={ blockLabel }
