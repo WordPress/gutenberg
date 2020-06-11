@@ -24,6 +24,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
+import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -107,6 +108,14 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
 			( theme ) => {
+				if ( theme.colors === undefined ) {
+					theme.colors = SETTINGS_DEFAULTS.colors;
+				}
+
+				if ( theme.gradients === undefined ) {
+					theme.gradients = SETTINGS_DEFAULTS.gradients;
+				}
+
 				this.props.updateSettings( theme );
 			}
 		);
