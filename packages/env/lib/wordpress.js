@@ -97,33 +97,38 @@ async function configureWordPress( environment, config ) {
 		options
 	);
 
-	// These commands will be run in sequence on the container. Start by
-	// installing WordPress.
-	const setupCommands = [
-		// `wp core install --url=localhost:${ port } --title=${ config.name } --admin_user=admin -admin_password=password --admin_email=wordpress@example.com --skip-email`,
-		// 'sleep 10s',
-	];
-
 	// Set wp-config.php values.
 	for ( const [ key, value ] of Object.entries(
 		config.env[ environment ].config
 	) ) {
-		setupCommands.push(
-			`wp config set ${ key } ${ value }${
-				typeof value !== 'string' ? ' --raw' : ''
-			}`
+		const command = [ 'wp', 'config', 'set', key, value ];
+		if ( typeof value !== 'string' ) {
+			command.push( '--raw' );
+		}
+		await dockerCompose.run(
+			environment === 'development' ? 'cli' : 'tests-cli',
+			command,
+			options
 		);
 	}
 
 	// Activate all plugins.
 	for ( const pluginSource of config.env[ environment ].pluginSources ) {
-		setupCommands.push( `wp plugin activate ${ pluginSource.basename }` );
+		await dockerCompose.run(
+			environment === 'development' ? 'cli' : 'tests-cli',
+			`wp plugin activate ${ pluginSource.basename }`,
+			options
+		);
 	}
 
 	// Activate the first theme.
 	const [ themeSource ] = config.env[ environment ].themeSources;
 	if ( themeSource ) {
-		setupCommands.push( `wp theme activate ${ themeSource.basename }` );
+		await dockerCompose.run(
+			environment === 'development' ? 'cli' : 'tests-cli',
+			`wp theme activate ${ themeSource.basename }`,
+			options
+		);
 	}
 
 	// Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
@@ -131,27 +136,16 @@ async function configureWordPress( environment, config ) {
 	// we load it too early, then some things (like MULTISITE) will be defined
 	// before wp-phpunit has a chance to configure them. To avoid this, create a
 	// copy of wp-config.php for phpunit which doesn't require wp-settings.php.
-	setupCommands.push(
-		'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php'
-	);
-
-	if ( config.debug ) {
-		// Disable reason: We are logging information in debug mode.
-		// eslint-disable-next-line no-console
-		console.log(
-			`\n${ [ 'Running these setup commands:', ...setupCommands ].join(
-				'\n\t'
-			) }`
-		);
-	}
-
-	const commands = setupCommands.join( ' && ' );
-	await dockerCompose.run(
-		environment === 'development' ? 'cli' : 'tests-cli',
-		`bash -c ${ commands }`,
+	await dockerCompose.exec(
+		environment === 'development' ? 'wordpress' : 'tests-wordpress',
+		[
+			'sh',
+			'-c',
+			'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php',
+		],
 		{
-			...options,
-			commandOptions: [ '--rm' ],
+			config: config.dockerComposeConfigPath,
+			log: config.debug,
 		}
 	);
 }
