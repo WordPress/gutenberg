@@ -25,8 +25,6 @@ const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
 function Label(
 	{
 		cursorPosition = { x: 0, y: 0 },
-		fadeTimeout = 180,
-		isActive = false,
 		label,
 		position = POSITIONS.corner,
 		zIndex = 1000,
@@ -35,6 +33,7 @@ function Label(
 	ref
 ) {
 	const isRTL = useRTL();
+
 	const showLabel = !! label;
 
 	const isBottom = position === POSITIONS.bottom;
@@ -47,7 +46,6 @@ function Label(
 
 	let style = {
 		opacity: showLabel ? 1 : null,
-		transitionDelay: ! isActive ? `${ fadeTimeout }ms` : null,
 		zIndex,
 	};
 

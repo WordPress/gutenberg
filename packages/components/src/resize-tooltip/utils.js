@@ -9,7 +9,7 @@ import useResizeAware from 'react-resize-aware';
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
 
-const { clearTimeout } = window;
+const { clearTimeout, setTimeout } = window;
 
 export const POSITIONS = {
 	bottom: 'bottom',
@@ -48,7 +48,6 @@ export function useResizeLabel( {
 	showPx = false,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
-	const [ isActive, setIsActive ] = useState( false );
 	/**
 	 * The width/height values derive from this special useResizeAwere hook.
 	 * This custom hook uses injects an iFrame into the element, allowing it
@@ -77,6 +76,20 @@ export function useResizeLabel( {
 	const moveTimeoutRef = useRef();
 
 	const { width, height } = sizes;
+	const isCursor = position === POSITIONS.cursor;
+
+	const unsetMoveXY = () => {
+		setMoveX( false );
+		setMoveY( false );
+	};
+
+	const debounceUnsetMoveXY = () => {
+		if ( moveTimeoutRef.current ) {
+			clearTimeout( moveTimeoutRef.current );
+		}
+
+		moveTimeoutRef.current = setTimeout( unsetMoveXY, fadeTimeout );
+	};
 
 	useEffect( () => {
 		/**
@@ -92,53 +105,70 @@ export function useResizeLabel( {
 
 		if ( ! didWidthChange && ! didHeightChange ) return;
 
+		/**
+		 * After the initial render, the useResizeAware will set the first
+		 * width and height values. We'll sync those values with our
+		 * width and height refs. However, we shouldn't render our Tooltip
+		 * label on this first cycle.
+		 */
+		if ( width && ! widthRef.current && height && ! heightRef.current ) {
+			widthRef.current = width;
+			heightRef.current = height;
+			return;
+		}
+
+		/**
+		 * After the first cycle, we can track width and height changes.
+		 */
 		if ( didWidthChange ) {
 			setMoveX( true );
+			widthRef.current = width;
 		}
 
 		if ( didHeightChange ) {
 			setMoveY( true );
+			heightRef.current = height;
 		}
 
 		onResize( { width, height } );
-	}, [ width, height ] );
 
+		if ( ! isCursor ) {
+			debounceUnsetMoveXY();
+		}
+	}, [ width, height, isCursor ] );
+
+	/**
+	 * Drag even handling for position = 'cursor'
+	 */
 	useEffect( () => {
-		const handleOnMouseDown = () => {
+		const clearMoveTimeout = () => {
 			if ( moveTimeoutRef.current ) {
 				clearTimeout( moveTimeoutRef.current );
 			}
+		};
+
+		const handleOnMouseDown = () => {
+			if ( ! isCursor ) return;
+
 			setIsDragging( true );
-			setMoveX( false );
-			setMoveY( false );
+			clearMoveTimeout();
+			unsetMoveXY();
 		};
 
 		const handleOnMouseUp = () => {
+			if ( ! isCursor ) return;
+
 			setIsDragging( false );
-			setIsActive( false );
-
-			if ( moveTimeoutRef.current ) {
-				clearTimeout( moveTimeoutRef.current );
-			}
-
-			moveTimeoutRef.current = setTimeout( () => {
-				setMoveX( false );
-				setMoveY( false );
-			}, fadeTimeout );
+			debounceUnsetMoveXY();
 		};
 
 		const handleOnMouseMove = ( event ) => {
-			if ( ! isDragging ) return;
+			if ( ! isDragging || ! isCursor ) return;
 
-			if ( width !== widthRef.current || height !== heightRef.current ) {
-				widthRef.current = width;
-				heightRef.current = height;
-				setIsActive( true );
-			}
-
-			if ( position === POSITIONS.cursor ) {
+			if ( isCursor ) {
 				onMove( event );
 			}
+			clearMoveTimeout();
 		};
 
 		document.addEventListener( 'mousedown', handleOnMouseDown );
@@ -150,7 +180,7 @@ export function useResizeLabel( {
 			document.removeEventListener( 'mousemove', handleOnMouseMove );
 			document.removeEventListener( 'mouseup', handleOnMouseUp );
 		};
-	}, [ width, height, isActive, isDragging, position ] );
+	}, [ isDragging, isCursor ] );
 
 	const label = getSizeLabel( {
 		axis,
@@ -163,7 +193,6 @@ export function useResizeLabel( {
 	} );
 
 	return {
-		isActive,
 		label,
 		resizeListener,
 	};
@@ -192,7 +221,7 @@ function getSizeLabel( {
 	showPx = false,
 	width,
 } ) {
-	let label;
+	if ( ! moveX && ! moveY ) return null;
 
 	/**
 	 * Corner position...
@@ -210,22 +239,26 @@ function getSizeLabel( {
 	 * Otherwise, only width or height will be displayed.
 	 * The `PX` unit will be added, if specified by the `showPx` prop.
 	 */
-	if ( moveX && moveY && ! axis ) {
-		// Width x Height changes...
-		label = `${ width } x ${ height }`;
-	} else if ( moveY && axis !== 'x' ) {
-		// Height changes...
-		label = `${ height }`;
-		if ( showPx ) {
-			label = `${ label } PX`;
+	const labelUnit = showPx ? ' PX' : '';
+
+	if ( axis ) {
+		if ( axis === 'x' && moveX ) {
+			return `${ width }${ labelUnit }`;
 		}
-	} else if ( moveX && axis !== 'y' ) {
-		// Width changes...
-		label = `${ width }`;
-		if ( showPx ) {
-			label = `${ label } PX`;
+		if ( axis === 'y' && moveY ) {
+			return `${ height }${ labelUnit }`;
 		}
 	}
 
-	return label;
+	if ( moveX && moveY ) {
+		return `${ width } x ${ height }`;
+	}
+	if ( moveX ) {
+		return `${ width }${ labelUnit }`;
+	}
+	if ( moveY ) {
+		return `${ height }${ labelUnit }`;
+	}
+
+	return null;
 }
