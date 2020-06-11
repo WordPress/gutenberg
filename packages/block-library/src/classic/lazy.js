@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 const alreadyLoadedURIs = new Set();
 
@@ -27,7 +29,7 @@ const loadTinyMCEScripts = () =>
 		);
 	}, Promise.resolve() );
 
-const LazyLoadTinyMCE = ( { children, placeholder } ) => {
+const LazyLoadTinyMCE = ( { children } ) => {
 	/**
 	 * TinyMCE has already been loaded. This happens on page-load
 	 * when a the post type has custom metaboxes or, more commonly,
@@ -46,17 +48,16 @@ const LazyLoadTinyMCE = ( { children, placeholder } ) => {
 			return;
 		}
 
+		speak( __( 'The classic block is loading.' ) );
+
 		loadTinyMCEScripts().then( () => {
 			window.wpMceTranslation();
 			setIsLoaded( true );
+			speak( __( 'The classic block has finished loading.' ) );
 		} );
 	}, [ isLoaded ] );
 
-	return isLoaded ? children : placeholder;
-};
-
-LazyLoadTinyMCE.defaultProps = {
-	placeholder: null,
+	return isLoaded ? children : null;
 };
 
 export default LazyLoadTinyMCE;
