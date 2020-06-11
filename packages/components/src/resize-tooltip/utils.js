@@ -49,7 +49,7 @@ export function useResizeLabel( {
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	/**
-	 * The width/height values derive from this special useResizeAwere hook.
+	 * The width/height values derive from this special useResizeAware hook.
 	 * This custom hook uses injects an iFrame into the element, allowing it
 	 * to tap into the onResize (window) callback events.
 	 */
