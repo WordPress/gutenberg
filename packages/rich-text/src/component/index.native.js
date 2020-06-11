@@ -811,7 +811,6 @@ export class RichText extends Component {
 				? maxWidth
 				: this.state.width;
 
-
 		return (
 			<View>
 				{ children &&
