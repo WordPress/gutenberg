@@ -278,3 +278,15 @@ $block-inserter-tabs-height: 44px;
 		padding: 0;
 	}
 }
+
+.block-editor-inserter__quick-inserter-expand.components-button {
+	display: block;
+	background: $dark-gray-primary;
+	color: $white;
+	width: 100%;
+	height: ($button-size + $grid-unit-10);
+
+	&:hover {
+		color: $white;
+	}
+}

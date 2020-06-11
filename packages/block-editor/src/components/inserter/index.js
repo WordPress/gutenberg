@@ -119,6 +119,9 @@ class Inserter extends Component {
 			isAppender,
 			showInserterHelpPanel,
 			__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+
+			// This prop is experimental to give some time for the quick inserter to mature
+			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
 		} = this.props;
 

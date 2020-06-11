@@ -46,6 +46,7 @@ class Editor extends Component {
 		blockTypes,
 		preferredStyleVariations,
 		__experimentalLocalAutosaveInterval,
+		__experimentalOnExpandInserter,
 		updatePreferredStyleVariations
 	) {
 		settings = {
@@ -57,6 +58,9 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			__experimentalLocalAutosaveInterval,
+
+			// This is marked as experimental to give time for the quick inserter to mature.
+			__experimentalOnExpandInserter,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -91,6 +95,7 @@ class Editor extends Component {
 			blockTypes,
 			preferredStyleVariations,
 			__experimentalLocalAutosaveInterval,
+			onExpandInserter,
 			updatePreferredStyleVariations,
 			...props
 		} = this.props;
@@ -107,6 +112,7 @@ class Editor extends Component {
 			blockTypes,
 			preferredStyleVariations,
 			__experimentalLocalAutosaveInterval,
+			onExpandInserter,
 			updatePreferredStyleVariations
 		);
 
@@ -169,6 +175,8 @@ export default compose( [
 		const { updatePreferredStyleVariations } = dispatch( 'core/edit-post' );
 		return {
 			updatePreferredStyleVariations,
+			onExpandInserter: () =>
+				dispatch( 'core/edit-post' ).setIsInserterOpened( true ),
 		};
 	} ),
 ] )( Editor );
