@@ -11,23 +11,26 @@ import { Fragment, forwardRef, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { VARIANTS } from './utils';
+import { POSITIONS } from './utils';
+import { useRTL } from '../utils/style-mixins';
 import { TooltipWrapper, Tooltip } from './styles/resize-tooltip.styles';
 
+const CORNER_OFFSET = 4;
 const CURSOR_OFFSET_TOP = 12;
 
 function Label(
 	{
+		cursorPosition = { x: 0, y: 0 },
 		fadeTimeout = 180,
 		isActive = false,
 		label,
-		position = { x: 0, y: 0 },
-		variant = VARIANTS.cursor,
+		position = POSITIONS.corner,
 		zIndex = 1000,
 		...props
 	},
 	ref
 ) {
+	const isRTL = useRTL();
 	const tooltipRef = useRef();
 	const tooltipWidth = tooltipRef.current?.clientWidth || 0;
 	const tooltipHeight = tooltipRef.current?.clientHeight || 0;
@@ -38,23 +41,34 @@ function Label(
 
 	const showLabel = isActive;
 
-	const isCorner = variant === VARIANTS.corner;
-	const isCursor = variant === VARIANTS.cursor;
+	const isBottom = position === POSITIONS.bottom;
+	const isCorner = position === POSITIONS.corner;
+	const isCursor = position === POSITIONS.cursor;
 
-	const { x, y } = position;
+	const { x, y } = cursorPosition;
 
 	let style = {
 		transitionDelay: ! isActive ? `${ fadeTimeout }ms` : null,
 		zIndex,
 	};
 
+	if ( isBottom ) {
+		style = {
+			...style,
+			position: 'absolute',
+			bottom: ( tooltipHeight + CURSOR_OFFSET_TOP ) * -1,
+			left: '50%',
+			transform: 'translate(-50%, 0)',
+		};
+	}
+
 	if ( isCorner ) {
 		style = {
 			...style,
 			position: 'absolute',
-			top: 4,
-			right: 4,
-			left: null,
+			top: CORNER_OFFSET,
+			right: isRTL ? null : CORNER_OFFSET,
+			left: isRTL ? CORNER_OFFSET : null,
 		};
 	}
 
@@ -72,7 +86,7 @@ function Label(
 	}
 
 	/**
-	 * For "cursor" variants, we need to "Portal" the Tooltip to the document
+	 * For "cursor" POSITIONS, we need to "Portal" the Tooltip to the document
 	 * body root for more consistent style rendering.
 	 * https://reakit.io/docs/portal/
 	 */

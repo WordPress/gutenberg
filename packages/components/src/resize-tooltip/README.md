@@ -19,23 +19,25 @@ const Example = () => {
 
 Be sure that the parent element containing `<ResizeTooltip />` has the `position` style property defined. This is important as `<ResizeTooltip />` uses `position` based techniques to determine size changes.
 
-### Variants
+### Positions
 
-`<ResizeTooltip />` has two style variants;
+`<ResizeTooltip />` has three positions;
 
+-   `bottom`
+-   `corner` (Default)
 -   `cursor`
--   `corner`
+
+##### `bottom`
+
+The `bottom` position renders the dimensions label at the bottom-center of the (parent) element.
 
 ##### `cursor`
 
-The `cursor` variant (default) renders the dimensions label right above the mosuse cursor.
+The `cursor` position (default) renders the dimensions label right above the mouse cursor.
 
 ##### `corner`
 
-The `corner` variant renders the dimensions label in the top-right corner of the (parent) element.
-
-    	fadeTimeout = 180,
-    	labelRef,
+The `corner` position renders the dimensions label in the top-right corner of the (parent) element.
 
 ## Props
 
@@ -84,6 +86,15 @@ Callback function when the (observed) element resizes.
 -   Type: `Function`
 -   Required: No
 
+### position
+
+The positions for the label.
+
+-   Type: `String`
+-   Required: No
+-   Default: `cursor`
+-   Values: `bottom` | `corner` |`cursor`
+
 ### showPx
 
 Renders a `PX` unit suffix after the width or height value in the label.
@@ -91,15 +102,6 @@ Renders a `PX` unit suffix after the width or height value in the label.
 -   Type: `Boolean`
 -   Required: No
 -   Default: `true`
-
-### variant
-
-The style variant for the label.
-
--   Type: `String`
--   Required: No
--   Default: `cursor`
--   Values: `corner` |`cursor`
 
 ### zIndex
 

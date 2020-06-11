@@ -13,7 +13,7 @@ import { forwardRef, useCallback, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Label from './label';
-import { useResizeLabel, VARIANTS } from './utils';
+import { useResizeLabel, POSITIONS } from './utils';
 import { Root } from './styles/resize-tooltip.styles';
 
 function ResizeTooltip(
@@ -25,8 +25,8 @@ function ResizeTooltip(
 		labelRef,
 		onMove = noop,
 		onResize = noop,
+		position = POSITIONS.corner,
 		showPx = true,
-		variant = VARIANTS.cursor,
 		zIndex = 1000,
 		...props
 	},
@@ -39,7 +39,7 @@ function ResizeTooltip(
 			setTooltipPosition( { x: event.clientX, y: event.clientY } );
 			onMove( event );
 		},
-		[ onMove, variant ]
+		[ onMove, position ]
 	);
 
 	const { isActive, label, resizeListener } = useResizeLabel( {
@@ -48,7 +48,7 @@ function ResizeTooltip(
 		onMove: handleOnMove,
 		onResize,
 		showPx,
-		variant,
+		position,
 	} );
 
 	if ( ! isEnabled ) return null;
@@ -60,13 +60,13 @@ function ResizeTooltip(
 			{ resizeListener }
 			<Label
 				aria-hidden={ props[ 'aria-hidden' ] }
+				cursorPosition={ tooltipPosition }
 				fadeTimeout={ fadeTimeout }
 				isActive={ isActive }
 				isEnabled={ isEnabled }
 				label={ label }
 				ref={ labelRef }
-				position={ tooltipPosition }
-				variant={ variant }
+				position={ position }
 				zIndex={ zIndex }
 			/>
 		</Root>

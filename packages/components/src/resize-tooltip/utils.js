@@ -11,7 +11,8 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 
 const { clearTimeout } = window;
 
-export const VARIANTS = {
+export const POSITIONS = {
+	bottom: 'bottom',
 	cursor: 'cursor',
 	corner: 'corner',
 };
@@ -33,8 +34,8 @@ export const VARIANTS = {
  * @param {number} props.fadeTimeout Duration (ms) before deactivating the resize label.
  * @param {Function} props.onMove Callback when a resize occurs. Provides onMouseEvent event callback.
  * @param {boolean} props.onResize Callback when a resize occurs. Provides { width, height } callback.
+ * @param {string} props.position Adjusts label value.
  * @param {boolean} props.showPx Whether to add `PX` to the label.
- * @param {string} props.variant Adjusts label value.
  *
  * @return {UseResizeLabelProps} Properties for hook.
  */
@@ -43,8 +44,8 @@ export function useResizeLabel( {
 	fadeTimeout = 200,
 	onMove = noop,
 	onResize = noop,
+	position = POSITIONS.cursor,
 	showPx = false,
-	variant = VARIANTS.cursor,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const [ isActive, setIsActive ] = useState( false );
@@ -156,7 +157,7 @@ export function useResizeLabel( {
 		width,
 		height,
 		showPx,
-		variant,
+		position,
 	} );
 
 	return {
@@ -174,8 +175,8 @@ export function useResizeLabel( {
  * @param {number} props.height Height value.
  * @param {boolean} props.moveX Recent width (x axis) changes.
  * @param {boolean} props.moveY Recent width (y axis) changes.
+ * @param {string} props.position Adjusts label value.
  * @param {boolean} props.showPx Whether to add `PX` to the label.
- * @param {string} props.variant Adjusts label value.
  * @param {number} props.width Width value.
  *
  * @return {undefined | string} The rendered label.
@@ -185,22 +186,22 @@ function getSizeLabel( {
 	height,
 	moveX = false,
 	moveY = false,
+	position = POSITIONS.cursor,
 	showPx = false,
-	variant = VARIANTS.cursor,
 	width,
 } ) {
 	let label;
 
 	/**
-	 * Corner variant...
+	 * Corner position...
 	 * We want the label to appear like width x height.
 	 */
-	if ( variant === VARIANTS.corner ) {
+	if ( position === POSITIONS.corner ) {
 		return `${ width } x ${ height }`;
 	}
 
 	/**
-	 * Other variants...
+	 * Other POSITIONS...
 	 * The label will combine both width x height values if both
 	 * values have recently been changed.
 	 *

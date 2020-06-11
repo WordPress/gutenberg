@@ -51,12 +51,12 @@ const Example = ( props ) => {
 export const _default = () => {
 	const props = {
 		fadeTimeout: number( 'fadeTimeout', 180 ),
-		showPx: boolean( 'showPx', true ),
-		variant: select(
-			'variant',
-			{ cursor: 'cursor', corner: 'corner' },
+		position: select(
+			'position',
+			{ bottom: 'bottom', cursor: 'cursor', corner: 'corner' },
 			'cursor'
 		),
+		showPx: boolean( 'showPx', true ),
 	};
 
 	const content = text( 'Example: Content', 'Resize' );
