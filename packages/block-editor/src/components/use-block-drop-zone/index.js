@@ -42,7 +42,7 @@ import { useEffect, useCallback, useState } from '@wordpress/element';
  *
  * @return {number|undefined} The block index that's closest to the drag position.
  */
-function getNearestBlockIndex( elements, position, orientation ) {
+export function getNearestBlockIndex( elements, position, orientation ) {
 	const { x, y } = position;
 	const isHorizontal = orientation === 'horizontal';
 
