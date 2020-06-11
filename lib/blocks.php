@@ -322,7 +322,6 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 			$colors['text']['css_classes'],
 			$font_sizes['css_classes'],
 			isset( $block['attrs']['className'] ) ? array( $block['attrs']['className'] ) : array(),
-			isset( $block['attrs']['itemsJustification'] ) ? array( 'items-justified-' . $block['attrs']['itemsJustification'] ) : array(),
 			isset( $block['attrs']['align'] ) ? array( 'has-text-align-' . $block['attrs']['align'] ) : array()
 		);
 		$extra_styles = (
