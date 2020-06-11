@@ -13,7 +13,11 @@ import { Fragment, forwardRef, useRef } from '@wordpress/element';
  */
 import { POSITIONS } from './utils';
 import { useRTL } from '../utils/style-mixins';
-import { TooltipWrapper, Tooltip } from './styles/resize-tooltip.styles';
+import {
+	TooltipWrapper,
+	Tooltip,
+	LabelText,
+} from './styles/resize-tooltip.styles';
 
 const CORNER_OFFSET = 4;
 const CURSOR_OFFSET_TOP = 12;
@@ -106,7 +110,7 @@ function Label(
 					className="components-resizable-tooltip__tooltip"
 					ref={ ref }
 				>
-					{ label }
+					<LabelText>{ label }</LabelText>
 				</Tooltip>
 			</TooltipWrapper>
 		</WrapperComponent>

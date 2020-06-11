@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
+import Text from '../../text';
 import { color } from '../../utils/style-mixins';
 
 export const Root = styled.div`
@@ -40,6 +41,9 @@ export const Tooltip = styled.div`
 	box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.2 );
 	box-sizing: border-box;
 	color: ${ color( 'ui.textDark' ) };
-	font-size: 13px;
 	padding: 2px 4px;
+`;
+
+export const LabelText = styled( Text )`
+	font-size: 13px;
 `;
