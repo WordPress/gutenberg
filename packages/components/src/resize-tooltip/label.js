@@ -24,7 +24,8 @@ const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
 
 function Label(
 	{
-		cursorPosition = { x: 0, y: 0 },
+		cursorX: x = 0,
+		cursorY: y = 0,
 		label,
 		position = POSITIONS.corner,
 		zIndex = 1000,
@@ -39,8 +40,6 @@ function Label(
 	const isBottom = position === POSITIONS.bottom;
 	const isCorner = position === POSITIONS.corner;
 	const isCursor = position === POSITIONS.cursor;
-
-	const { x, y } = cursorPosition;
 
 	if ( ! showLabel ) return null;
 

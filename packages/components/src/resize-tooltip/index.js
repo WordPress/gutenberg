@@ -32,11 +32,13 @@ function ResizeTooltip(
 	},
 	ref
 ) {
-	const [ tooltipPosition, setTooltipPosition ] = useState( { x: 0, y: 0 } );
+	const [ cursorX, setCursorX ] = useState( 0 );
+	const [ cursorY, setCursorY ] = useState( 0 );
 
 	const handleOnMove = useCallback(
 		( event ) => {
-			setTooltipPosition( { x: event.clientX, y: event.clientY } );
+			setCursorX( event.clientX );
+			setCursorY( event.clientY );
 			onMove( event );
 		},
 		[ onMove, position ]
@@ -60,7 +62,8 @@ function ResizeTooltip(
 			{ resizeListener }
 			<Label
 				aria-hidden={ props[ 'aria-hidden' ] }
-				cursorPosition={ tooltipPosition }
+				cursorX={ cursorX }
+				cursorY={ cursorY }
 				fadeTimeout={ fadeTimeout }
 				isActive={ isActive }
 				isVisible={ isVisible }
