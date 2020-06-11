@@ -153,7 +153,9 @@ export function* deleteEntityRecord( kind, name, recordId ) {
 		return;
 	}
 
-	yield removeItems( kind, name, recordId, true );
+	// surprisingly clearing the cache - the last argument
+	// will reset the state with data which was deleted
+	yield removeItems( kind, name, recordId, false );
 
 	try {
 		let path = `${ entity.baseURL }/${ recordId }`;
