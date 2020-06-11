@@ -10,6 +10,38 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useCallback, useState } from '@wordpress/element';
 
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
+/**
+ * @typedef  {Object} WPBlockDragPosition
+ * @property {number} x The horizontal position of a the block being dragged.
+ * @property {number} y The vertical position of the block being dragged.
+ */
+
+/**
+ * The orientation of a block list.
+ *
+ * @typedef {'horizontal'|'vertical'|undefined} WPBlockListOrientation
+ */
+
+/**
+ * Given a list of block DOM elements finds the index that a block should be dropped
+ * at.
+ *
+ * This function works for both horizontal and vertical block lists and uses the following
+ * terms for its variables:
+ *
+ * - Lateral, meaning the axis running horizontally when a block list is vertical or vice-versa.
+ * - Forward, meaning the axis running vertically when a block list is vertical and horizontally
+ * when a block list is horizontal.
+ *
+ *
+ * @param {Element[]}              elements    Array of DOM elements that represent each block in a block list.
+ * @param {WPBlockDragPosition}    position    The position of the item being dragged.
+ * @param {WPBlockListOrientation} orientation The orientation of a block list.
+ *
+ * @return {number|undefined} The block index that's closest to the drag position.
+ */
 function getNearestBlockIndex( elements, position, orientation ) {
 	const { x, y } = position;
 	const isHorizontal = orientation === 'horizontal';
@@ -87,7 +119,14 @@ function getNearestBlockIndex( elements, position, orientation ) {
 	return candidateIndex;
 }
 
-const parseDropEvent = ( event ) => {
+/**
+ * Retrieve the data for a block drop event.
+ *
+ * @param {WPSyntheticEvent} event The drop event.
+ *
+ * @return {Object} An object with block drag and drop data.
+ */
+function parseDropEvent( event ) {
 	let result = {
 		srcRootClientId: null,
 		srcClientId: null,
@@ -109,8 +148,21 @@ const parseDropEvent = ( event ) => {
 	}
 
 	return result;
-};
+}
 
+/**
+ * @typedef  {Object} WPBlockDropZoneConfig
+ * @property {Object} element      A React ref object pointing to the block list's DOM element.
+ * @property {string} rootClientId The root client id for the block list.
+ */
+
+/**
+ * A React hook that can be used to make a block list handle drag and drop.
+ *
+ * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
+ *
+ * @return {number|undefined} The block index that's closest to the drag position.
+ */
 export default function useBlockDropZone( {
 	element,
 	rootClientId: targetRootClientId,
