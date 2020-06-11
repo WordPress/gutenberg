@@ -156,7 +156,6 @@ export class BlockList extends Component {
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
-			notices,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -223,7 +222,7 @@ export class BlockList extends Component {
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
 				/>
-				<NoticeList/>
+				<NoticeList />
 				{ this.shouldShowInnerBlockAppender() && (
 					<View
 						style={ {
@@ -332,9 +331,6 @@ export default compose( [
 		const isFloatingToolbarVisible =
 			!! selectedBlockClientId && hasRootInnerBlocks;
 
-		const { getNotices } = select( 'core/editor' );
-		const notices = getNotices();
-	
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -343,7 +339,6 @@ export default compose( [
 			isRootList: rootClientId === undefined,
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
-			notices,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

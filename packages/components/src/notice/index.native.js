@@ -13,7 +13,6 @@ import {
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
@@ -21,12 +20,17 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  */
 import styles from './style.scss';
 
-const Notice = ( { onNoticeHidden, content } ) => {
+const Notice = ( { onNoticeHidden, content, id } ) => {
 	const [ visible, setVisible ] = useState( true );
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
+	const timer = useRef( null );
 
 	useEffect( () => {
 		startAnimation();
+
+		return () => {
+			clearTimeout( timer?.current );
+		};
 	}, [ visible ] );
 
 	const onHide = () => {
@@ -41,34 +45,38 @@ const Notice = ( { onNoticeHidden, content } ) => {
 			delay: visible ? 500 : 0,
 			easing: Easing.out( Easing.quad ),
 		} ).start( () => {
+			if ( visible && onNoticeHidden ) {
+				timer.current = setTimeout( () => {
+					onNoticeHidden( id );
+				}, 3000 );
+			}
+
 			if ( ! visible && onNoticeHidden ) {
-				onNoticeHidden();
+				onNoticeHidden( id );
 			}
 		} );
 	};
-
-    console.log(content);
 
 	return (
 		<>
 			<Animated.View
 				style={ {
 					opacity: animationValue,
-					/*transform: [
+					transform: [
 						{
 							translateY: animationValue.interpolate( {
 								inputRange: [ 0, 1 ],
 								outputRange: [ visible ? 4 : -8, -8 ],
 							} ),
 						},
-					],*/
+					],
 				} }
 			>
 				<TouchableWithoutFeedback onPress={ onHide }>
 					<View
 						style={ [
-                            styles.notice,
-                            { width: Dimensions.get( 'window' ).width },
+							styles.notice,
+							{ width: Dimensions.get( 'window' ).width },
 							{
 								shadowColor: styles.noticeShadow.color,
 								shadowOffset: {
@@ -81,14 +89,12 @@ const Notice = ( { onNoticeHidden, content } ) => {
 							},
 						] }
 					>
-						<Text style={ styles.text }>
-							{ content }
-						</Text>
+						<Text style={ styles.text }>{ content }</Text>
 					</View>
 				</TouchableWithoutFeedback>
 			</Animated.View>
 		</>
-    );
+	);
 };
 
 export default Notice;

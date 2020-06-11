@@ -39,7 +39,6 @@ const BlockActionsMenu = ( {
 	selectedBlockClientId,
 	updateClipboard,
 	createInfoNotice,
-	removeAllNotices,
 	duplicateBlock,
 	removeBlocks,
 } ) => {
@@ -111,11 +110,6 @@ const BlockActionsMenu = ( {
 		deleteOption,
 	] );
 
-	const displayNotice = ( message ) => {
-		//removeAllNotices();
-		createInfoNotice( message );
-	};
-
 	async function onPickerSelect( value ) {
 		switch ( value ) {
 			case deleteOption.value:
@@ -133,18 +127,18 @@ const BlockActionsMenu = ( {
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
 				updateClipboard( serialize( copyBlock ) );
-				displayNotice(
-                    // translators: displayed right after the block is copied.
-                    __( 'Copied!' )
+				createInfoNotice(
+					// translators: displayed right after the block is copied.
+					__( 'Copied!' )
 				);
 				break;
 			case cutButtonOption.value:
 				const cutBlock = getBlocksByClientId( selectedBlockClientId );
 				updateClipboard( serialize( cutBlock ) );
 				removeBlocks( selectedBlockClientId );
-				displayNotice(
-                    // translators: displayed right after the block is cut.
-                    __( 'Cut!' )
+				createInfoNotice(
+					// translators: displayed right after the block is cut.
+					__( 'Cut!' )
 				);
 				break;
 			case duplicateButtonOption.value:
@@ -244,7 +238,7 @@ export default compose(
 			removeBlocks,
 		} = dispatch( 'core/block-editor' );
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-		const { updateClipboard, createInfoNotice, removeAllNotices } = dispatch( 'core/editor' );
+		const { updateClipboard, createInfoNotice } = dispatch( 'core/editor' );
 
 		return {
 			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
@@ -252,7 +246,6 @@ export default compose(
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			updateClipboard,
 			createInfoNotice,
-			removeAllNotices,
 			duplicateBlock() {
 				return duplicateBlocks( clientIds );
 			},

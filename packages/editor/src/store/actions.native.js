@@ -63,7 +63,7 @@ export function createInfoNotice( message ) {
  */
 export function removeAllNotices() {
 	return {
-		type: 'REMOVE_ALL_NOTICES'
+		type: 'REMOVE_ALL_NOTICES',
 	};
 }
 
