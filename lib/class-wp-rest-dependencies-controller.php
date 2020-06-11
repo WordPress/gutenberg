@@ -173,14 +173,19 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 *
 	 * @param WP_REST_Request $request Request.
 	 *
-	 * @return bool|true|WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function get_items_permissions_check( $request ) {
-		if ( $this->check_handle( $request['dependency'] ) ) {
+		$check = $this->check_read_permission( $request['dependency'] );
+		if ( is_wp_error( $check ) ) {
+			return $check;
+		} else if ( true === $check ) {
+			return $check;
+		} else if (  current_user_can( 'manage_options' ) ) {
 			return true;
 		}
 
-		return current_user_can( 'manage_options' );
+		return new WP_Error( 'rest_handle_cannot_view', __( 'Sorry, you are not allowed to manage dependencies.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 	}
 
 	/**
@@ -191,11 +196,16 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 * @return bool|true|WP_Error
 	 */
 	public function get_item_permissions_check( $request ) {
-		if ( $this->check_handle( $request['handle'] ) ) {
+		$check = $this->check_read_permission( $request['handle'] );
+		if ( is_wp_error( $check ) ) {
+			return $check;
+		} else if ( true === $check ) {
+			return $check;
+		} else if (  current_user_can( 'manage_options' ) ) {
 			return true;
 		}
 
-		return current_user_can( 'manage_options' );
+		return new WP_Error( 'rest_handle_cannot_view', __( 'Sorry, you are not allowed to manage dependencies.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 	}
 
 	/**
@@ -244,17 +254,20 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 *
 	 * @param string $handle script / style handle.
 	 *
-	 * @return bool
+	 * @return bool|WP_Error
 	 */
-	protected function check_handle( $handle ) {
-
+	protected function check_read_permission( $handle ) {
 		if ( ! $handle ) {
-			return false;
+			return new WP_Error( 'rest_handle_empty', __( 'Empty handle.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		// All core assets should be public.
 		if ( in_array( $handle, $this->get_core_assets(), true ) ) {
 			return true;
+		}
+
+		if ( ! $this->object->query( $handle, 'registered' ) ) {
+			return new WP_Error( 'rest_handle_invalid', __( 'Invalid handle.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		// All block public assets should also be public.
@@ -264,7 +277,14 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 
 		// All block edit assets should check if user is logged in and has the ability to using the editor.
 		if ( in_array( $handle, $this->block_asset( $this->editor_block_dependency ), true ) ) {
-			return current_user_can( 'edit_posts' );
+			if ( current_user_can( 'edit_posts' ) ) {
+				return true;
+			}
+			foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+				if ( current_user_can( $post_type->cap->edit_posts ) ) {
+					return true;
+				}
+			}
 		}
 
 		return false;
