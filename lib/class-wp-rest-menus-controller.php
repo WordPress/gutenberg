@@ -447,9 +447,9 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	/**
 	 * Returns the value of a menu's auto_add
 	 *
-	 * @param int             $menu_id The menu id to update the location form.
+	 * @param int $menu_id The menu id to update the location form.
 	 *
-	 * @return Boolean        The value of auto_add.
+	 * @return Boolean The value of auto_add.
 	 */
 	function get_menu_auto_add( $menu_id ) {
 		$nav_menu_option = (array) get_option( 'nav_menu_options' );
@@ -464,7 +464,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 * replicates the behavior of `wp_nav_menu_update_menu_items`
 	 * in `src/wp-admin/includes/nav-menu.php`.
 	 *
-	 * @param int             $term The menu id to update the location form.
+	 * @param int             $menu_id The menu id to update the location form.
 	 * @param WP_REST_Request $request The request object with menu and locations data.
 	 *
 	 * @return Boolean|Null   Return the value of auto_add or null if the auto_add
