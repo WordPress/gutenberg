@@ -40,6 +40,8 @@ import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as legacyWidget from './legacy-widget';
 import * as list from './list';
+import * as checklist from './checklist';
+import * as checklistItem from './checklist-item';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
@@ -117,6 +119,8 @@ export const registerCoreBlocks = () => {
 		heading,
 		gallery,
 		list,
+		checklist,
+		checklistItem,
 		quote,
 
 		// Register all remaining core blocks.

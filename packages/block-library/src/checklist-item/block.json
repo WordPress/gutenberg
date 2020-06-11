@@ -1,0 +1,19 @@
+{
+	"name": "core/checklist-item",
+	"category": "common",
+	"attributes": {
+		"value": {
+			"type": "string",
+			"source": "html",
+			"selector": ".wp-block-checklist-item__value",
+			"default": ""
+		},
+		"checked": {
+			"type": "boolean",
+			"source": "attribute",
+			"selector": ".wp-block-checklist-item__checked",
+			"attribute": "checked",
+			"default": false
+		}
+	}
+}
