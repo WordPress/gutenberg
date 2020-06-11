@@ -80,7 +80,7 @@ const SpacerEdit = ( {
 			>
 				<ResizeTooltip
 					axis="y"
-					isEnabled={ isResizing }
+					isVisible={ isResizing }
 					position="cursor"
 				/>
 			</ResizableBox>

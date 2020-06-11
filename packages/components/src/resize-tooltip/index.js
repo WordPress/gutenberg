@@ -21,7 +21,7 @@ function ResizeTooltip(
 		axis,
 		className,
 		fadeTimeout = 180,
-		isEnabled = true,
+		isVisible = true,
 		labelRef,
 		onMove = noop,
 		onResize = noop,
@@ -51,7 +51,7 @@ function ResizeTooltip(
 		position,
 	} );
 
-	if ( ! isEnabled ) return null;
+	if ( ! isVisible ) return null;
 
 	const classes = classnames( 'components-resize-tooltip', className );
 
@@ -63,7 +63,7 @@ function ResizeTooltip(
 				cursorPosition={ tooltipPosition }
 				fadeTimeout={ fadeTimeout }
 				isActive={ isActive }
-				isEnabled={ isEnabled }
+				isVisible={ isVisible }
 				label={ label }
 				position={ position }
 				ref={ labelRef }

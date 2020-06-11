@@ -57,7 +57,7 @@ Duration (in `ms`) before the label disappears after resize event.
 -   Required: No
 -   Default: `180`
 
-### isEnabled
+### isVisible
 
 Determines if the label can render.
 
