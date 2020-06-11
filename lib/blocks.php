@@ -364,9 +364,9 @@ add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles'
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
- * which will be applied to the navigation markup in the front-end.
+ * which will be applied to the block markup in the front-end.
  *
- * @param  array $attributes Navigation block attributes.
+ * @param  array $attributes block attributes.
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_experimental_build_css_colors( $attributes ) {
@@ -454,9 +454,9 @@ function gutenberg_experimental_build_css_colors( $attributes ) {
 
 /**
  * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the navigation markup in the front-end.
+ * which will be applied to the block markup in the front-end.
  *
- * @param  array $attributes Navigation block attributes.
+ * @param  array $attributes block attributes.
  * @return array Font size CSS classes and inline styles.
  */
 function gutenberg_experimental_build_css_font_sizes( $attributes ) {
