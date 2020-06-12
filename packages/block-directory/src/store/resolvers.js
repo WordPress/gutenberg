@@ -36,7 +36,7 @@ export default {
 
 			yield receiveDownloadableBlocks( blocks, filterValue );
 		} catch ( error ) {
-			if ( error.code === 'rest_user_cannot_view' ) {
+			if ( error.code === 'rest_block_directory_cannot_view' ) {
 				yield setInstallBlocksPermission( false );
 			}
 		}
