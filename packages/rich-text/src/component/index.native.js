@@ -740,7 +740,6 @@ export class RichText extends Component {
 			parentBlockStyles,
 			withoutInteractiveFormatting,
 			accessibilityLabel,
-			accessibilityHint,
 			capabilities,
 			disableEditingMenu = false,
 		} = this.props;
@@ -822,7 +821,6 @@ export class RichText extends Component {
 					} ) }
 				<RCTAztecView
 					accessibilityLabel={ accessibilityLabel }
-					accessibilityHint={ accessibilityHint }
 					ref={ ( ref ) => {
 						this._editor = ref;
 
