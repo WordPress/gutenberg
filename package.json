@@ -181,6 +181,7 @@
 		"source-map-loader": "0.2.4",
 		"sprintf-js": "1.1.1",
 		"style-loader": "1.0.0",
+		"stylelint-config-wordpress": "17.0.0",
 		"typescript": "3.8.3",
 		"uuid": "7.0.2",
 		"webpack": "4.42.0",
