@@ -14,7 +14,6 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
-	NoticeList,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -222,7 +221,6 @@ export class BlockList extends Component {
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
 				/>
-				{ isRootList && <NoticeList /> }
 				{ this.shouldShowInnerBlockAppender() && (
 					<View
 						style={ {

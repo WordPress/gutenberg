@@ -78,10 +78,7 @@ const FloatingToolbar = ( {
 
 	return (
 		!! opacity && (
-			<Animated.View
-				style={ [ styles.floatingToolbar, animationStyle ] }
-				pointerEvents={ ! showFloatingToolbar ? 'none' : 'auto' }
-			>
+			<Animated.View style={ [ styles.floatingToolbar, animationStyle ] }>
 				{ showNavUpButton && (
 					<Toolbar passedStyle={ styles.toolbar }>
 						<ToolbarButton
