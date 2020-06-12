@@ -199,7 +199,7 @@ function gutenberg_experimental_global_styles_get_core() {
 function gutenberg_experimental_global_styles_get_theme_presets() {
 	$theme_presets = array();
 
-	$theme_colors = gutenberg_experimental_get( get_theme_support( 'editor-color-palette' ), ['0'] );
+	$theme_colors = gutenberg_experimental_get( get_theme_support( 'editor-color-palette' ), array( '0' ) );
 	foreach ( $theme_colors as $color ) {
 		$theme_presets['global']['presets']['color'][] = array(
 			'slug'  => $color['slug'],
@@ -207,7 +207,7 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
 		);
 	}
 
-	$theme_gradients = gutenberg_experimental_get( get_theme_support( 'editor-gradient-presets' ), ['0'] );
+	$theme_gradients = gutenberg_experimental_get( get_theme_support( 'editor-gradient-presets' ), array( '0' ) );
 	foreach ( $theme_gradients as $gradient ) {
 		$theme_presets['global']['presets']['gradient'][] = array(
 			'slug'  => $gradient['slug'],
@@ -215,7 +215,7 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
 		);
 	}
 
-	$theme_font_sizes = gutenberg_experimental_get( get_theme_support( 'editor-font-sizes' ), ['0'] );
+	$theme_font_sizes = gutenberg_experimental_get( get_theme_support( 'editor-font-sizes' ), array( '0' ) );
 	foreach ( $theme_font_sizes as $font_size ) {
 		$theme_presets['global']['presets']['font-size'][] = array(
 			'slug'  => $font_size['slug'],
