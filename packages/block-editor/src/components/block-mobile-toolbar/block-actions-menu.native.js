@@ -122,7 +122,7 @@ const BlockActionsMenu = ( {
 		deleteOption,
 	] );
 
-	async function onPickerSelect( value ) {
+	function onPickerSelect( value ) {
 		switch ( value ) {
 			case deleteOption.value:
 				onDelete();
