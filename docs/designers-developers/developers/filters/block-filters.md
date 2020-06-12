@@ -221,6 +221,30 @@ Used to modify the block's `edit` component. It receives the original block `Blo
 _Example:_
 
 {% codetabs %}
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
+const { Fragment } = wp.element;
+const { InspectorControls } = wp.blockEditor;
+const { PanelBody } = wp.components;
+
+const withInspectorControls =  createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		return (
+			<Fragment>
+				<BlockEdit { ...props } />
+				<InspectorControls>
+					<PanelBody>
+						My custom control
+					</PanelBody>
+				</InspectorControls>
+			</Fragment>
+		);
+	};
+}, "withInspectorControl" );
+
+wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
+```
 {% ES5 %}
 ```js
 var el = wp.element.createElement;
@@ -249,30 +273,6 @@ var withInspectorControls = wp.compose.createHigherOrderComponent( function( Blo
 
 wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
 ```
-{% ESNext %}
-```js
-const { createHigherOrderComponent } = wp.compose;
-const { Fragment } = wp.element;
-const { InspectorControls } = wp.blockEditor;
-const { PanelBody } = wp.components;
-
-const withInspectorControls =  createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
-		return (
-			<Fragment>
-				<BlockEdit { ...props } />
-				<InspectorControls>
-					<PanelBody>
-						My custom control
-					</PanelBody>
-				</InspectorControls>
-			</Fragment>
-		);
-	};
-}, "withInspectorControl" );
-
-wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
-```
 {% end %}
 
 #### `editor.BlockListBlock`
@@ -282,8 +282,19 @@ Used to modify the block's wrapper component containing the block's `edit` compo
 _Example:_
 
 {% codetabs %}
-{% ES5 %}
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
 
+const withClientIdClassName = createHigherOrderComponent( ( BlockListBlock ) => {
+	return ( props ) => {
+		return <BlockListBlock { ...props } className={ "block-" + props.clientId } />;
+	};
+}, 'withClientIdClassName' );
+
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
+```
+{% ES5 %}
 ```js
 var el = wp.element.createElement;
 
@@ -305,21 +316,7 @@ var withClientIdClassName = wp.compose.createHigherOrderComponent( function( Blo
 }, 'withClientIdClassName' );
 
 wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
-
 ```
-{% ESNext %}
-```js
-const { createHigherOrderComponent } = wp.compose;
-
-const withClientIdClassName = createHigherOrderComponent( ( BlockListBlock ) => {
-	return ( props ) => {
-		return <BlockListBlock { ...props } className={ "block-" + props.clientId } />;
-	};
-}, 'withClientIdClassName' );
-
-wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
-```
-
 {% end %}
 
 ## Removing Blocks
@@ -329,13 +326,6 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-nam
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
 {% codetabs %}
-{% ES5 %}
-```js
-// my-plugin.js
-wp.domReady( function() {
-	wp.blocks.unregisterBlockType( 'core/verse' );
-} );
-```
 {% ESNext %}
 ```js
 // my-plugin.js
@@ -344,6 +334,13 @@ import domReady from '@wordpress/dom-ready'
 
 domReady( function() {
 	unregisterBlockType( 'core/verse' );
+} );
+```
+{% ES5 %}
+```js
+// my-plugin.js
+wp.domReady( function() {
+	wp.blocks.unregisterBlockType( 'core/verse' );
 } );
 ```
 {% end %}
@@ -436,6 +433,7 @@ You can also display an icon with your block category by setting an `icon` attri
 You can also set a custom icon in SVG format. To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
 
 To set an SVG icon for the category shown in the previous example, add the following example JavaScript code to the editor calling `wp.blocks.updateCategory` e.g:
+
 ```js
 ( function() {
 	var el = wp.element.createElement;
