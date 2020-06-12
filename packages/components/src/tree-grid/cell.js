@@ -8,11 +8,10 @@ import { forwardRef } from '@wordpress/element';
  */
 import TreeGridItem from './item';
 
-export default forwardRef( function TreeGridCell( {
-	children,
-	withoutGridItem = false,
-	...props
-}, ref ) {
+export default forwardRef( function TreeGridCell(
+	{ children, withoutGridItem = false, ...props },
+	ref
+) {
 	return (
 		<td { ...props } role="gridcell">
 			{ withoutGridItem ? (
