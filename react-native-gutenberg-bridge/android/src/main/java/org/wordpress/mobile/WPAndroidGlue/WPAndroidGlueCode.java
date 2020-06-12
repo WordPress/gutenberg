@@ -43,7 +43,7 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
 import java.io.Serializable;
@@ -767,8 +767,7 @@ public class WPAndroidGlueCode {
                 mPendingMediaUploadCallback.onUploadMediaFileSelected(rnMediaList);
 
                 for (Media mediaToAppend : mediaList.subList(1, mediaList.size())) {
-                    sendOrDeferAppendMediaSignal(mediaToAppend.getId(), mediaToAppend.getUrl(),
-                            mediaToAppend.getType(), mediaToAppend.getCaption());
+                    sendOrDeferAppendMediaSignal(mediaToAppend);
                 }
             } else {
                 rnMediaList.addAll(mediaList);
@@ -777,25 +776,24 @@ public class WPAndroidGlueCode {
         } else {
             // This case is for media that is shared from the device
             for (Media mediaToAppend : mediaList) {
-                sendOrDeferAppendMediaSignal(mediaToAppend.getId(), mediaToAppend.getUrl(),
-                        mediaToAppend.getType(), mediaToAppend.getCaption());
+                sendOrDeferAppendMediaSignal(mediaToAppend);
             }
         }
 
         mAppendsMultipleSelectedToSiblingBlocks = false;
     }
 
-    private void sendOrDeferAppendMediaSignal(final int mediaId, final String mediaUri, final String mediaType, final String caption) {
+    private void sendOrDeferAppendMediaSignal(Media media) {
         // if editor is mounted, let's append the media file
         if (mIsEditorMounted) {
-            if (!TextUtils.isEmpty(mediaUri) && mediaId > 0) {
+            if (!TextUtils.isEmpty(media.getUrl()) && media.getId() > 0) {
                 // send signal to JS
-                appendNewMediaBlock(mediaId, mediaUri, mediaType);
+                appendNewMediaBlock(media.getId(), media.getUrl(), media.getType());
             }
         } else {
             // save the URL, we'll add it once Editor is mounted
             synchronized (WPAndroidGlueCode.this) {
-                mMediaToAddAfterMounting.put(mediaId, new Media(mediaId, mediaUri, mediaType, caption));
+                mMediaToAddAfterMounting.put(media.getId(), media);
             }
         }
     }

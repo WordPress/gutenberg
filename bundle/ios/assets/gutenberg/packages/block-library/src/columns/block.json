@@ -14,7 +14,8 @@
 		"html": false,
 		"lightBlockWrapper": true,
 		"__experimentalColor": {
-			"gradients": true
+			"gradients": true,
+			"linkColor": true
 		}
 	}
 }
