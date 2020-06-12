@@ -1,0 +1,27 @@
+$noticeColor: #121212;
+
+.noticeShadow {
+	color: $black;
+}
+
+.text {
+	color: $white;
+	align-self: center;
+}
+
+.list {
+	position: absolute;
+	margin-left: auto;
+	margin-right: auto;
+	top: 0;
+	flex-direction: column;
+	z-index: 102;
+	align-items: center;
+	align-self: center;
+}
+
+.notice {
+	height: 30;
+	background-color: $noticeColor;
+	justify-content: center;
+}

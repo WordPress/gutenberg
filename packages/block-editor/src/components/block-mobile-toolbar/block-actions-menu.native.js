@@ -41,6 +41,7 @@ const BlockActionsMenu = ( {
 	getBlocksByClientId,
 	selectedBlockClientId,
 	updateClipboard,
+	createInfoNotice,
 	duplicateBlock,
 	removeBlocks,
 	pasteBlock,
@@ -139,11 +140,19 @@ const BlockActionsMenu = ( {
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
 				updateClipboard( serialize( copyBlock ) );
+				createInfoNotice(
+					// translators: displayed right after the block is copied.
+					__( 'Block copied' )
+				);
 				break;
 			case cutButtonOption.value:
 				const cutBlock = getBlocksByClientId( selectedBlockClientId );
 				updateClipboard( serialize( cutBlock ) );
 				removeBlocks( selectedBlockClientId );
+				createInfoNotice(
+					// translators: displayed right after the block is cut.
+					__( 'Block cut' )
+				);
 				break;
 			case pasteButtonOption.value:
 				pasteBlock();
@@ -264,7 +273,9 @@ export default compose(
 				replaceBlocks,
 			} = dispatch( 'core/block-editor' );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-			const { updateClipboard } = dispatch( 'core/editor' );
+			const { updateClipboard, createInfoNotice } = dispatch(
+				'core/editor'
+			);
 			const { getBlockSelectionEnd, getBlock } = select(
 				'core/block-editor'
 			);
@@ -275,6 +286,7 @@ export default compose(
 				openGeneralSidebar: () =>
 					openGeneralSidebar( 'edit-post/block' ),
 				updateClipboard,
+				createInfoNotice,
 				duplicateBlock() {
 					return duplicateBlocks( clientIds );
 				},

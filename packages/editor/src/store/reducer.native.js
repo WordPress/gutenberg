@@ -66,6 +66,26 @@ export function clipboard( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the notices state.
+ *
+ * @param {Object}  state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function notices( state = [], action ) {
+	switch ( action.type ) {
+		case 'CREATE_NOTICE':
+			return [ ...state, action.notice ];
+		case 'REMOVE_ALL_NOTICES':
+			return [];
+		case 'REMOVE_NOTICE':
+			return state.filter( ( notice ) => notice.id !== action.id );
+	}
+	return state;
+}
+
 export default optimist(
 	combineReducers( {
 		postId,
@@ -80,5 +100,6 @@ export default optimist(
 		isReady,
 		editorSettings,
 		clipboard,
+		notices,
 	} )
 );

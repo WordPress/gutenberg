@@ -2,6 +2,7 @@
  * External dependencies
  */
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+import { v4 as uuid } from 'uuid';
 
 export * from './actions.js';
 
@@ -37,5 +38,45 @@ export function updateClipboard( clipboard ) {
 	return {
 		type: 'UPDATE_CLIPBOARD',
 		clipboard,
+	};
+}
+
+/**
+ * Returns an action object to create an info notice.
+ *
+ * @param {Object} message The displayed message of the notice.
+ *
+ * @return {Object} Action object.
+ */
+export function createInfoNotice( message ) {
+	const notice = { status: 'info', content: message, id: uuid() };
+	return {
+		type: 'CREATE_NOTICE',
+		notice,
+	};
+}
+
+/**
+ * Returns an action object to remove all notices.
+ *
+ * @return {Object} Action object.
+ */
+export function removeAllNotices() {
+	return {
+		type: 'REMOVE_ALL_NOTICES',
+	};
+}
+
+/**
+ * Returns an action object to remove a notice by id.
+ *
+ * @param {Object} id The id of the notice to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeNotice( id ) {
+	return {
+		type: 'REMOVE_NOTICE',
+		id,
 	};
 }
