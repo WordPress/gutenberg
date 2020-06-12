@@ -102,7 +102,7 @@ function buildNavLinkBlocksFromPages( pages ) {
 	);
 }
 
-function shouldDisableCreateButton(
+function getIsCreateButtonDisabled(
 	selectedCreateOption,
 	hasResolvedPages,
 	hasResolvedMenuItems
@@ -316,7 +316,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 							isSecondary
 							className="wp-block-navigation-placeholder__button"
 							onClick={ onCreateButtonClick }
-							disabled={ shouldDisableCreateButton(
+							disabled={ getIsCreateButtonDisabled(
 								selectedCreateOption,
 								hasResolvedPages,
 								hasResolvedMenuItems
