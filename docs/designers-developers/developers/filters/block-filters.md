@@ -324,7 +324,7 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-nam
 
 ## Removing Blocks
 
-### Using a blacklist
+### Using a deny list
 
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
@@ -354,21 +354,21 @@ and load this script in the Editor
 <?php
 // my-plugin.php
 
-function my_plugin_blacklist_blocks() {
+function my_plugin_deny_list_blocks() {
 	wp_enqueue_script(
-		'my-plugin-blacklist-blocks',
+		'my-plugin-deny-list-blocks',
 		plugins_url( 'my-plugin.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-dom-ready', 'wp-edit-post' )
 	);
 }
-add_action( 'enqueue_block_editor_assets', 'my_plugin_blacklist_blocks' );
+add_action( 'enqueue_block_editor_assets', 'my_plugin_deny_list_blocks' );
 ```
 
 **Important:** When unregistering a block, there can be a [race condition](https://en.wikipedia.org/wiki/Race_condition) on which code runs first: registering the block, or unregistering the block. You want your unregister code to run last. The way to do that is specify the component that is registering the block as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
 
-### Using a whitelist
+### Using an allow list
 
-If you want to disable all blocks except a whitelisted list, you can adapt the script above like so:
+If you want to disable all blocks except an allow list, you can adapt the script above like so:
 
 ```js
 // my-plugin.js
