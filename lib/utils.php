@@ -10,15 +10,16 @@
  * It is equivalent to want lodash get provides for JavaScript and is useful to have something similar
  * in php so functions that do the same thing on the client and sever can have identical code.
  *
- * @param array $array  An array from where we want to retrieve some information from.
- * @param array $path   An array containing the path we want to retrieve.
+ * @param array $array    An array from where we want to retrieve some information from.
+ * @param array $path     An array containing the path we want to retrieve.
+ * @param array $default  The return value if $array or $path is not expected input type.
  *
  * @return array Containing a set of css rules.
  */
-function gutenberg_experimental_get( $array, $path ) {
-	// Confirm an array is passed in to avoid notice warnings.
-	if ( ! is_array( $array ) ) {
-		return array();
+function gutenberg_experimental_get( $array, $path, $default = array() ) {
+	// Confirm input values are expected type to avoid notice warnings.
+	if ( ! is_array( $array ) || ! is_array( $path ) ) {
+		return $default;
 	}
 
 	$path_length = count( $path );
