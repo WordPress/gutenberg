@@ -11,6 +11,9 @@ import {
 	getBlockType,
 	getDefaultBlockName,
 	serialize,
+	rawHandler,
+	createBlock,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -41,6 +44,8 @@ const BlockActionsMenu = ( {
 	createInfoNotice,
 	duplicateBlock,
 	removeBlocks,
+	pasteBlock,
+	isPasteEnabled,
 } ) => {
 	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ], blockTitle };
@@ -94,6 +99,13 @@ const BlockActionsMenu = ( {
 		value: 'cutButtonOption',
 	};
 
+	const pasteButtonOption = {
+		id: 'pasteButtonOption',
+		label: __( 'Paste' ),
+		value: 'pasteButtonOption',
+		disabled: ! isPasteEnabled,
+	};
+
 	const duplicateButtonOption = {
 		id: 'duplicateButtonOption',
 		label: __( 'Duplicate' ),
@@ -106,11 +118,12 @@ const BlockActionsMenu = ( {
 		wrapBlockSettings && settingsOption,
 		copyButtonOption,
 		cutButtonOption,
+		pasteButtonOption,
 		duplicateButtonOption,
 		deleteOption,
 	] );
 
-	async function onPickerSelect( value ) {
+	function onPickerSelect( value ) {
 		switch ( value ) {
 			case deleteOption.value:
 				onDelete();
@@ -140,6 +153,9 @@ const BlockActionsMenu = ( {
 					// translators: displayed right after the block is cut.
 					__( 'Block cut' )
 				);
+				break;
+			case pasteButtonOption.value:
+				pasteBlock();
 				break;
 			case duplicateButtonOption.value:
 				duplicateBlock();
@@ -198,7 +214,9 @@ export default compose(
 			getBlock,
 			getBlocksByClientId,
 			getSelectedBlockClientIds,
+			canInsertBlockType,
 		} = select( 'core/block-editor' );
+		const { getClipboard } = select( 'core/editor' );
 		const normalizedClientIds = castArray( clientIds );
 		const block = getBlock( normalizedClientIds );
 		const blockName = getBlockName( normalizedClientIds );
@@ -220,6 +238,13 @@ export default compose(
 		const isEmptyDefaultBlock =
 			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
 
+		const clipboard = getClipboard();
+		const clipboardBlock =
+			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
+		const isPasteEnabled =
+			clipboardBlock &&
+			canInsertBlockType( clipboardBlock.name, rootClientId );
+
 		return {
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
@@ -228,29 +253,67 @@ export default compose(
 			isEmptyDefaultBlock,
 			getBlocksByClientId,
 			selectedBlockClientId: getSelectedBlockClientIds(),
+			currentIndex: firstIndex,
+			isPasteEnabled,
+			clipboardBlock,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const {
-			moveBlocksDown,
-			moveBlocksUp,
-			duplicateBlocks,
-			removeBlocks,
-		} = dispatch( 'core/block-editor' );
-		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-		const { updateClipboard, createInfoNotice } = dispatch( 'core/editor' );
+	withDispatch(
+		(
+			dispatch,
+			{ clientIds, rootClientId, currentIndex, clipboardBlock },
+			{ select }
+		) => {
+			const {
+				moveBlocksDown,
+				moveBlocksUp,
+				duplicateBlocks,
+				removeBlocks,
+				insertBlock,
+				replaceBlocks,
+			} = dispatch( 'core/block-editor' );
+			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+			const { updateClipboard, createInfoNotice } = dispatch(
+				'core/editor'
+			);
+			const { getBlockSelectionEnd, getBlock } = select(
+				'core/block-editor'
+			);
 
-		return {
-			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
-			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
-			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
-			updateClipboard,
-			createInfoNotice,
-			duplicateBlock() {
-				return duplicateBlocks( clientIds );
-			},
-			removeBlocks,
-		};
-	} ),
+			return {
+				onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
+				onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
+				openGeneralSidebar: () =>
+					openGeneralSidebar( 'edit-post/block' ),
+				updateClipboard,
+				createInfoNotice,
+				duplicateBlock() {
+					return duplicateBlocks( clientIds );
+				},
+				removeBlocks,
+				pasteBlock: () => {
+					const canReplaceBlock = isUnmodifiedDefaultBlock(
+						getBlock( getBlockSelectionEnd() )
+					);
+
+					if ( ! canReplaceBlock ) {
+						const insertedBlock = createBlock(
+							clipboardBlock.name,
+							clipboardBlock.attributes,
+							clipboardBlock.innerBlocks
+						);
+
+						insertBlock(
+							insertedBlock,
+							currentIndex + 1,
+							rootClientId
+						);
+					} else {
+						replaceBlocks( clientIds, clipboardBlock );
+					}
+				},
+			};
+		}
+	),
 	withInstanceId
 )( BlockActionsMenu );
