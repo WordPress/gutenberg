@@ -31,9 +31,9 @@ export default function ClipboardButton( {
 			return;
 		}
 
-		if ( hasCopied ) {
+		if ( hasCopied && typeof onCopy === 'function' ) {
 			onCopy();
-		} else {
+		} else if ( typeof onFinishCopy === 'function' ) {
 			onFinishCopy();
 		}
 

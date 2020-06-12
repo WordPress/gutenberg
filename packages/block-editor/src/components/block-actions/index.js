@@ -85,7 +85,6 @@ export default function BlockActions( { clientIds, children } ) {
 			}
 			replaceBlocks( clientIds, newBlocks );
 		},
-
 		onUngroup() {
 			if ( ! blocks.length ) {
 				return;

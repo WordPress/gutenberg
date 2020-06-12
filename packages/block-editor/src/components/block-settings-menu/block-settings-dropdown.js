@@ -98,7 +98,6 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 									role="menuitem"
 									className="components-menu-item__button"
 									onCopy={ onCopy }
-									onFinishCopy={ onClose }
 								>
 									{ __( 'Copy' ) }
 								</ClipboardButton>
