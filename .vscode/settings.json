@@ -11,9 +11,6 @@
         "**/bundle/android/App.js.map": true,
         "**/bundle/ios/App.js": true,
         "**/bundle/ios/App.js.map": true,
-        "**/gutenberg/packages/**/build": true,
-        "**/gutenberg/packages/**/build-modules": true,
-        "**/gutenberg/packages/**/build-types": true,
         "**/i18n-cache/data": true,
         "**/symlinked-packages": true
     },
