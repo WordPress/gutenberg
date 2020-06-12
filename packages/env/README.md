@@ -337,8 +337,6 @@ On the tests instance, `cwd` is still mapped as a plugin, but no theme is mapped
 
 This gives you a lot of power to change the options appliciable to each environment.
 
-On the tests in
-
 ## .wp-env.override.json
 
 Any fields here will take precedence over .wp-env.json. This file is useful, when ignored from version control, to persist local development overrides. Note that options like `plugins` and `themes` are not merged. As a result, if you set `plugins` in your override file, this will override all of the plugins listed in the base-level config. The only keys whch are merged are `config` and `mappings`. This means that you can set your own wp-config values without loosing any of the default values.
