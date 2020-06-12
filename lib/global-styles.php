@@ -380,7 +380,7 @@ function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
 	$result = array();
 
 	foreach ( $mappings as $key => $path ) {
-		$value = gutenberg_experimental_get( $styles, $path );
+		$value = gutenberg_experimental_get( $styles, $path, null );
 		if ( null !== $value ) {
 			$result[ $key ] = $value;
 		}
