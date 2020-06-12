@@ -73,7 +73,7 @@ registerBlockType( 'myguten/simple', {
 	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
-	edit: () => {
+	edit: function() {
 		return el(
 			'p',
 			{ style: { color: 'red' } },
@@ -81,7 +81,7 @@ registerBlockType( 'myguten/simple', {
 		);
 	},
 
-	save: () => {
+	save: function() {
 		return el(
 			'p',
 			{ style: { color: 'red' } },
