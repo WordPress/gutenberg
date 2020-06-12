@@ -21,13 +21,20 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import styles from './style.scss';
 
 const Notice = ( { onNoticeHidden, content, id } ) => {
+	const [ width, setWidth ] = useState( Dimensions.get( 'window' ).width );
 	const [ visible, setVisible ] = useState( true );
-	const animationValue = useRef( new Animated.Value( 0 ) ).current;
+
+	const animationValue = useRef( new Animated.Value( 1 ) ).current;
 	const timer = useRef( null );
+
+	const onDimensionsChange = () => {
+		setWidth( Dimensions.get( 'window' ).width );
+	};
+
+	Dimensions.addEventListener( 'change', onDimensionsChange );
 
 	useEffect( () => {
 		startAnimation();
-
 		return () => {
 			clearTimeout( timer?.current );
 		};
@@ -76,8 +83,8 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 					<View
 						style={ [
 							styles.notice,
-							{ width: Dimensions.get( 'window' ).width },
 							{
+								width,
 								shadowColor: styles.noticeShadow.color,
 								shadowOffset: {
 									width: 0,
