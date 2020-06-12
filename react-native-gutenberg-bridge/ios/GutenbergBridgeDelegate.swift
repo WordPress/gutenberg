@@ -23,10 +23,10 @@ public struct Block {
 }
 
 public struct ContentInfo {
-    public let characters: Int
-    public let words: Int
-    public let paragraphs: Int
-    public let blocks: Int
+    public let characterCount: Int
+    public let wordCount: Int
+    public let paragraphCount: Int
+    public let blockCount: Int
 }
 
 public typealias MediaPickerDidPickMediaCallback = (_ media: [MediaInfo]?) -> Void
