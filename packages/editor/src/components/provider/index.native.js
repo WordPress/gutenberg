@@ -15,6 +15,7 @@ import RNReactNativeGutenbergBridge, {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { count as wordCount } from '@wordpress/wordcount';
 import {
 	parse,
 	serialize,
@@ -171,10 +172,16 @@ class NativeEditorProvider extends Component {
 		const hasChanges =
 			title !== this.post.title.raw || html !== this.post.content.raw;
 
+		let contentInfo = {};
+		contentInfo["characters"] = wordCount( html, "characters_including_spaces");
+		contentInfo["words"] =  wordCount( html, "words");
+		contentInfo["paragraphs"] = this.props.paragraphCount;
+		contentInfo["blocks"] = this.props.blockCount;
 		RNReactNativeGutenbergBridge.provideToNative_Html(
 			html,
 			title,
-			hasChanges
+			hasChanges,
+			contentInfo
 		);
 
 		if ( hasChanges ) {
@@ -231,6 +238,7 @@ export default compose( [
 			getBlockCount,
 			getBlockIndex,
 			getSelectedBlockClientId,
+			getGlobalBlockCount,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -242,6 +250,7 @@ export default compose( [
 			getEditedPostContent,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getBlockCount( rootClientId ),
+			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
