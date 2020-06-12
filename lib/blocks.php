@@ -318,18 +318,15 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 		$typography = gutenberg_experimental_build_css_typography( $block['attrs'] );
 
 		$extra_classes    = array_merge(
-			$colors['background']['css_classes'],
-			$colors['text']['css_classes'],
+			$colors['css_classes'],
 			$typography['css_classes'],
 			isset( $block['attrs']['className'] ) ? array( $block['attrs']['className'] ) : array(),
 			isset( $block['attrs']['align'] ) ? array( 'has-text-align-' . $block['attrs']['align'] ) : array()
 		);
 		$extra_styles = (
-			$colors['text']['inline_styles'] ||
-			$colors['background']['inline_styles'] ||
+			$colors['inline_styles'] ||
 			$typography['inline_styles']
-		) ? esc_attr( $colors['text']['inline_styles'] ) .
-		  	esc_attr( $colors['background']['inline_styles'] ) .
+		) ? esc_attr( $colors['inline_styles'] ) .
 			esc_attr( $typography['inline_styles'] )
 		: '';
 
@@ -370,11 +367,7 @@ add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles'
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_experimental_build_css_colors( $attributes ) {
-	$text_colors       = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-	$background_colors = array(
+	$color_settings       = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
@@ -388,15 +381,15 @@ function gutenberg_experimental_build_css_colors( $attributes ) {
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
 		// Add has-text-color class.
-		$text_colors['css_classes'][] = 'has-text-color';
+		$color_settings['css_classes'][] = 'has-text-color';
 	}
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$text_colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
+		$color_settings['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
-		$text_colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['style']['color']['text'] );
+		$color_settings['inline_styles'] .= sprintf( 'color: %s;', $attributes['style']['color']['text'] );
 	}
 
 	// Link colors.
@@ -405,15 +398,15 @@ function gutenberg_experimental_build_css_colors( $attributes ) {
 	&& array_key_exists( 'link', $attributes['style']['color'] );
 
 	if ( $has_link_color ) {
-		$text_colors['css_classes'][] = 'has-link-color';
+		$color_settings['css_classes'][] = 'has-link-color';
 		// If link is a named color.
 		if ( strpos( $attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
 			// Get the name from the string and add proper styles.
 			$index_to_splice               = strrpos( $attributes['style']['color']['link'], '|' ) + 1;
 			$link_color_name               = substr( $attributes['style']['color']['link'], $index_to_splice );
-			$text_colors['inline_styles'] .= sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
+			$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
 		} else {
-			$text_colors['inline_styles'] .= sprintf( '--wp--style--color--link: %s;', $attributes['style']['color']['link'] );
+			$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link: %s;', $attributes['style']['color']['link'] );
 		}
 	}
 	// Background color.
@@ -431,25 +424,22 @@ function gutenberg_experimental_build_css_colors( $attributes ) {
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color || $has_named_gradient || $has_custom_gradient ) {
 		// Add has-background class.
-		$background_colors['css_classes'][] = 'has-background';
+		$color_settings['css_classes'][] = 'has-background';
 	}
 
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
-		$background_colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
+		$color_settings['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
-		$background_colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
+		$color_settings['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
 	} elseif ( $has_named_gradient ) {
-		$background_colors['css_classes'][] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
+		$color_settings['css_classes'][] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
 	} elseif ( $has_custom_gradient ) {
-		$background_colors['inline_styles'] .= sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
+		$color_settings['inline_styles'] .= sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
 	}
 
-	return array(
-		'text'       => $text_colors,
-		'background' => $background_colors,
-	);
+	return $color_settings;
 }
 
 /**
