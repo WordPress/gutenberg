@@ -14,7 +14,7 @@
  * @param array $path     An array containing the path we want to retrieve.
  * @param array $default  The return value if $array or $path is not expected input type.
  *
- * @return array An array matching the path specified
+ * @return array An array matching the path specified.
  */
 function gutenberg_experimental_get( $array, $path, $default = array() ) {
 	// Confirm input values are expected type to avoid notice warnings.
