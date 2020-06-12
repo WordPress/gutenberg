@@ -26,7 +26,7 @@ warning () {
 	echo -e "\n${YELLOW_BOLD}$1${COLOR_RESET}\n"
 }
 
-status "💃 Time to build Gutenberg 🕺"
+status "💃 Time to build the Gutenberg plugin ZIP file 🕺"
 
 if [ -z "$NO_CHECKS" ]; then
 	# Make sure there are no changes in the working tree. Release builds should be
