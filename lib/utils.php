@@ -16,6 +16,9 @@
  * @return array Containing a set of css rules.
  */
 function gutenberg_experimental_get( $array, $path ) {
+	// Confirm an array is passed in to avoid notice warnings.
+	if ( ! is_array( $array ) ) { return array(); }
+
 	$path_length = count( $path );
 	for ( $i = 0; $i < $path_length; ++$i ) {
 		if ( empty( $array[ $path[ $i ] ] ) ) {
