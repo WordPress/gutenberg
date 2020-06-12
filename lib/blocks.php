@@ -301,13 +301,13 @@ if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_a
  * Renders the classNames and styles for blocks
  *
  * @param string $block_content Output of the current block.
- * @param array $block Block Object.
+ * @param array  $block Block Object.
  * @return string New block output.
  */
 function gutenberg_experimental_apply_classnames_and_styles( $block_content, $block ) {
 	// Don't filter template part blocks since we filter the blocks in each template
 	// part individually.
-	if ( 'core/template-part' == $block[ 'blockName' ] ) {
+	if ( 'core/template-part' == $block['blockName'] ) {
 		return $block_content;
 	}
 
@@ -327,13 +327,13 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 		$colors     = gutenberg_experimental_build_css_colors( $block['attrs'], $supports );
 		$typography = gutenberg_experimental_build_css_typography( $block['attrs'], $supports );
 
-		$extra_classes    = array_merge(
+		$extra_classes = array_merge(
 			$colors['css_classes'],
 			$typography['css_classes'],
 			isset( $block['attrs']['className'] ) ? array( $block['attrs']['className'] ) : array(),
 			isset( $block['attrs']['align'] ) ? array( 'has-text-align-' . $block['attrs']['align'] ) : array()
 		);
-		$extra_styles = (
+		$extra_styles  = (
 			$colors['inline_styles'] ||
 			$typography['inline_styles']
 		) ? esc_attr( $colors['inline_styles'] ) .
@@ -342,8 +342,8 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 		$dom = new DOMDocument( '1.0', 'utf-8' );
 		@$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT );
-		$xpath = new DOMXPath( $dom );
-		$block_root = $xpath->query( "/*" )[0];
+		$xpath      = new DOMXPath( $dom );
+		$block_root = $xpath->query( '/*' )[0];
 
 		if ( empty( $block_root ) ) {
 			return $block_content;
@@ -351,7 +351,7 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 		// Merge and dedupe new and existing classes and styles
 		$new_classes = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . implode( ' ', $extra_classes ) ) ) );
-		$new_styles = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'style' ) . ' ' ) . $extra_styles ) ) );
+		$new_styles  = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'style' ) . ' ' ) . $extra_styles ) ) );
 
 		// Apply new styles and classes
 		if ( ! empty( $new_classes ) ) {
@@ -378,14 +378,14 @@ add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles'
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
-	$color_settings       = array(
+	$color_settings = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
 
 	// Text Colors.
 	// Check support for text colors.
-	if( in_array( 'color', $supports ) ) {
+	if ( in_array( 'color', $supports ) ) {
 		$has_named_text_color  = array_key_exists( 'textColor', $attributes );
 		$has_custom_text_color = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
@@ -404,7 +404,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 	}
 
 	// Link Colors.
-	if( in_array( 'link-color', $supports ) ) {
+	if ( in_array( 'link-color', $supports ) ) {
 		$has_link_color = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
 		&& array_key_exists( 'link', $attributes['style']['color'] );
@@ -414,8 +414,8 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 			// If link is a named color.
 			if ( strpos( $attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
 				// Get the name from the string and add proper styles.
-				$index_to_splice               = strrpos( $attributes['style']['color']['link'], '|' ) + 1;
-				$link_color_name               = substr( $attributes['style']['color']['link'], $index_to_splice );
+				$index_to_splice                  = strrpos( $attributes['style']['color']['link'], '|' ) + 1;
+				$link_color_name                  = substr( $attributes['style']['color']['link'], $index_to_splice );
 				$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
 			} else {
 				$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link: %s;', $attributes['style']['color']['link'] );
@@ -424,7 +424,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 	}
 
 	// Background Colors.
-	if( in_array( 'background-color', $supports ) ) {
+	if ( in_array( 'background-color', $supports ) ) {
 		$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
 		$has_custom_background_color = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
@@ -479,7 +479,7 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 	);
 
 	// Font Size
-	if( in_array( 'font-size', $supports ) ) {
+	if ( in_array( 'font-size', $supports ) ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
 		$has_custom_font_size = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'typography', $attributes['style'] )
