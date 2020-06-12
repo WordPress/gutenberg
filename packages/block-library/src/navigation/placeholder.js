@@ -29,6 +29,14 @@ const CREATE_EMPTY_OPTION_VALUE = '__CREATE_EMPTY__';
 const CREATE_FROM_PAGES_OPTION_VALUE = '__CREATE_FROM_PAGES__';
 const CREATE_PLACEHOLDER_VALUE = '__CREATE_PLACEHOLDER__';
 
+/**
+ * Get instruction text for the Placeholder component.
+ *
+ * @param {boolean} hasMenus Flag that indicates if there are menus.
+ * @param {boolean} hasPages Flag that indicates if there are pages.
+ *
+ * @return {string} Text to display as the placeholder instructions.
+ */
 function getPlaceholderInstructions( hasMenus, hasPages ) {
 	if ( hasMenus && hasPages ) {
 		return __(
@@ -45,6 +53,14 @@ function getPlaceholderInstructions( hasMenus, hasPages ) {
 	return __( 'Create an empty navigation.' );
 }
 
+/**
+ * Return the menu id if the user has one selected.
+ *
+ * @param {Object} selectedCreateOption An object containing details of
+ *                                      the selected create option.
+ *
+ * @return {number|undefined} The menu id.
+ */
 function getSelectedMenu( selectedCreateOption ) {
 	const optionKey = selectedCreateOption?.key;
 	return optionKey !== undefined && Number.isInteger( optionKey )
@@ -52,10 +68,17 @@ function getSelectedMenu( selectedCreateOption ) {
 		: undefined;
 }
 
-function initialiseBlocks( nodes ) {
+/**
+ * A recursive function that maps menu item nodes to blocks.
+ *
+ * @param {Object[]} nodes An array of menu items.
+ *
+ * @return {WPBlock[]} An array of blocks.
+ */
+function mapMenuItemsToBlocks( nodes ) {
 	return nodes.map( ( { title, type, link: url, id, children } ) => {
 		const innerBlocks =
-			children && children.length ? initialiseBlocks( children ) : [];
+			children && children.length ? mapMenuItemsToBlocks( children ) : [];
 
 		return createBlock(
 			'core/navigation-link',
@@ -73,18 +96,30 @@ function initialiseBlocks( nodes ) {
 	} );
 }
 
-// Builds navigation links from selected Menu's items.
-function buildNavLinkBlocksFromMenuItems( menuItems ) {
+/**
+ * Convert a flat menu item structure to a nested blocks structure.
+ *
+ * @param {Object[]} menuItems An array of menu items.
+ *
+ * @return {WPBlock[]} An array of blocks.
+ */
+function convertMenuItemsToBlocks( menuItems ) {
 	if ( ! menuItems ) {
 		return null;
 	}
 
 	const menuTree = createDataTree( menuItems );
-	return initialiseBlocks( menuTree );
+	return mapMenuItemsToBlocks( menuTree );
 }
 
-// Builds navigation links from default Pages.
-function buildNavLinkBlocksFromPages( pages ) {
+/**
+ * Convert pages to blocks.
+ *
+ * @param {Object[]} pages An array of pages.
+ *
+ * @return {WPBlock[]} An array of blocks.
+ */
+function convertPagesToBlocks( pages ) {
 	if ( ! pages ) {
 		return null;
 	}
@@ -102,6 +137,16 @@ function buildNavLinkBlocksFromPages( pages ) {
 	);
 }
 
+/**
+ * Returns a value that indicates whether the create button should be disabled.
+ *
+ * @param {Object}  selectedCreateOption An object containing details of
+ *                                       the selected create option.
+ * @param {boolean} hasResolvedPages     Indicates whether pages have loaded.
+ * @param {boolean} hasResolvedMenuItems Indicates whether menu items have loaded.
+ *
+ * @return {boolean} A value that indicates whether the create button is disabled.
+ */
 function getIsCreateButtonDisabled(
 	selectedCreateOption,
 	hasResolvedPages,
@@ -247,7 +292,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		}
 
 		if ( hasPages && key === CREATE_FROM_PAGES_OPTION_VALUE ) {
-			const blocks = buildNavLinkBlocksFromPages( pages );
+			const blocks = convertPagesToBlocks( pages );
 			const selectNavigationBlock = true;
 			onCreate( blocks, selectNavigationBlock );
 			return;
@@ -261,7 +306,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 			return;
 		}
 
-		const blocks = buildNavLinkBlocksFromMenuItems( menuItems );
+		const blocks = convertMenuItemsToBlocks( menuItems );
 		const selectNavigationBlock = true;
 		onCreate( blocks, selectNavigationBlock );
 	} );
