@@ -173,10 +173,10 @@ class NativeEditorProvider extends Component {
 			title !== this.post.title.raw || html !== this.post.content.raw;
 
 		let contentInfo = {};
-		contentInfo["characters"] = wordCount( html, "characters_including_spaces");
-		contentInfo["words"] =  wordCount( html, "words");
-		contentInfo["paragraphs"] = this.props.paragraphCount;
-		contentInfo["blocks"] = this.props.blockCount;
+		contentInfo["characterCount"] = wordCount( html, "characters_including_spaces");
+		contentInfo["wordCount"] =  wordCount( html, "words");
+		contentInfo["paragraphCount"] = this.props.paragraphCount;
+		contentInfo["blockCount"] = this.props.blockCount;
 		RNReactNativeGutenbergBridge.provideToNative_Html(
 			html,
 			title,
