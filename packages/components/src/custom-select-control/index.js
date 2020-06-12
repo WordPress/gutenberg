@@ -66,7 +66,7 @@ export default function CustomSelectControl( {
 	onChange: onSelectedItemChange,
 	value,
 } ) {
-	const valueIndex = items.findIndex( ( item ) => item === value );
+	const valueIndex = items.findIndex( ( item ) => item.key === value.key );
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -151,7 +151,7 @@ export default function CustomSelectControl( {
 							} ) }
 							aria-selected={ index === valueIndex }
 						>
-							{ item === value && (
+							{ item.key === value.key && (
 								<Icon
 									icon={ check }
 									className="components-custom-select-control__item-icon"
