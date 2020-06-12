@@ -74,22 +74,14 @@ export function clipboard( state = null, action ) {
  *
  * @return {Object} Updated state.
  */
-export function notices( state = { notices: [] }, action ) {
+export function notices( state = [], action ) {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':
-			return {
-				notices: [ ...state.notices, action.notice ],
-			};
+			return [ ...state, action.notice ];
 		case 'REMOVE_ALL_NOTICES':
-			return {
-				notices: [],
-			};
+			return [];
 		case 'REMOVE_NOTICE':
-			return {
-				notices: state.notices.filter(
-					( notice ) => notice.id !== action.id
-				),
-			};
+			return state.filter( ( notice ) => notice.id !== action.id );
 	}
 	return state;
 }
