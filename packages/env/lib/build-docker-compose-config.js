@@ -79,7 +79,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 	// - *                    <- $wordpress/*
 	//
 	// https://github.com/WordPress/gutenberg/issues/21164
-	if ( hasSameCoreSource( [ config.env.development, config.env.tests ] ) ) {
+	if (
+		config.env.development.coreSource &&
+		hasSameCoreSource( [ config.env.development, config.env.tests ] )
+	) {
 		const wpSource = config.env.development.coreSource;
 		testsMounts.shift(); // Remove normal core mount.
 		testsMounts.unshift(
