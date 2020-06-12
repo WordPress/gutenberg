@@ -465,11 +465,12 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 		'inline_styles' => '',
 	);
 
-	$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
-	$has_custom_font_size = array_key_exists( 'style', $attributes )
-	&& array_key_exists( 'typography', $attributes['style'] )
-	&& array_key_exists( 'fontSize', $attributes['style']['typography'] );
-
+	if( in_array( 'font-size', $supports ) ) {
+		$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
+		$has_custom_font_size = array_key_exists( 'style', $attributes )
+		&& array_key_exists( 'typography', $attributes['style'] )
+		&& array_key_exists( 'fontSize', $attributes['style']['typography'] );
+	}
 	if ( $has_named_font_size ) {
 		// Add the font size class.
 		$typography['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
@@ -478,10 +479,11 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 		$typography['inline_styles'] .= sprintf( 'font-size: %spx;', $attributes['style']['typography']['fontSize'] );
 	}
 
-	$has_line_height = array_key_exists( 'style', $attributes )
-	&& array_key_exists( 'typography', $attributes['style'] )
-	&& array_key_exists( 'lineHeight', $attributes['style']['typography'] );
-
+	if ( in_array( 'line-height', $supports ) ) {
+		$has_line_height = array_key_exists( 'style', $attributes )
+		&& array_key_exists( 'typography', $attributes['style'] )
+		&& array_key_exists( 'lineHeight', $attributes['style']['typography'] );
+	}
 	if ( $has_line_height ) {
 		$typography['inline_styles'] .= sprintf( 'line-height: %s;', $attributes['style']['typography']['lineHeight'] );
 	}
