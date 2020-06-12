@@ -36,6 +36,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
+import ImageEditor from './image-editor';
 
 /**
  * Module constants
@@ -79,9 +80,19 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const { maxWidth, isRTL, imageSizes } = useSelect( ( select ) => {
+	const {
+		maxWidth,
+		isRTL,
+		imageSizes,
+		__experimentalEnableRichImageEditing,
+	} = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		return pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] );
+		return pick( getSettings(), [
+			'imageSizes',
+			'isRTL',
+			'maxWidth',
+			'__experimentalEnableRichImageEditing',
+		] );
 	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -366,6 +377,19 @@ export default function Image( {
 			>
 				{ img }
 			</ResizableBox>
+		);
+	}
+
+	if ( __experimentalEnableRichImageEditing ) {
+		img = (
+			<ImageEditor
+				id={ id }
+				url={ url }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+			>
+				{ img }
+			</ImageEditor>
 		);
 	}
 
