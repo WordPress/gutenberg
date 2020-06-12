@@ -94,12 +94,6 @@ exports[`Slot bubblesVirtually true should unmount two slots with the same name 
 </div>
 `;
 
-exports[`Slot should not break without a Provider 1`] = `
-<div>
-  <div />
-</div>
-`;
-
 exports[`Slot should re-render Slot when not bubbling virtually 1`] = `
 <div>
   <div>
