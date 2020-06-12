@@ -21,6 +21,11 @@ import {
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import PluginHeaderToolbar from '../plugin-header-toolbar';
+
 function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 	const {
 		hasFixedToolbar,
@@ -68,35 +73,52 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<ToolbarItem
-				as={ Button }
-				className="edit-post-header-toolbar__inserter-toggle"
-				isPrimary
-				isPressed={ isInserterOpen }
-				onClick={ onToggleInserter }
-				disabled={ ! isInserterEnabled }
-				icon={ plus }
-				label={ _x(
-					'Add block',
-					'Generic label for block inserter button'
-				) }
+			<PluginHeaderToolbar.Slot
+				fillProps={ {
+					hasFixedToolbar,
+					isLargeViewport,
+					displayBlockToolbar,
+				} }
 			/>
-			{ isLargeViewport && <ToolbarItem as={ ToolSelector } /> }
-			<ToolbarItem as={ EditorHistoryUndo } />
-			<ToolbarItem as={ EditorHistoryRedo } />
-			<ToolbarItem
-				as={ TableOfContents }
-				hasOutlineItemsDisabled={ isTextModeEnabled }
-			/>
-			<ToolbarItem
-				as={ BlockNavigationDropdown }
-				isDisabled={ isTextModeEnabled }
-			/>
-			{ displayBlockToolbar && (
-				<div className="edit-post-header-toolbar__block-toolbar">
-					<BlockToolbar hideDragHandle />
-				</div>
-			) }
+			<PluginHeaderToolbar>
+				{ ( fillProps ) => {
+					return (
+						<>
+							<ToolbarItem
+								as={ Button }
+								className="edit-post-header-toolbar__inserter-toggle"
+								isPrimary
+								isPressed={ isInserterOpen }
+								onClick={ onToggleInserter }
+								disabled={ ! isInserterEnabled }
+								icon={ plus }
+								label={ _x(
+									'Add block',
+									'Generic label for block inserter button'
+								) }
+							/>
+							{ fillProps.isLargeViewport && (
+								<ToolbarItem as={ ToolSelector } />
+							) }
+							<ToolbarItem as={ EditorHistoryUndo } />
+							<ToolbarItem as={ EditorHistoryRedo } />
+							<ToolbarItem
+								as={ TableOfContents }
+								hasOutlineItemsDisabled={ isTextModeEnabled }
+							/>
+							<ToolbarItem
+								as={ BlockNavigationDropdown }
+								isDisabled={ isTextModeEnabled }
+							/>
+							{ fillProps.displayBlockToolbar && (
+								<div className="edit-post-header-toolbar__block-toolbar">
+									<BlockToolbar hideDragHandle />
+								</div>
+							) }
+						</>
+					);
+				} }
+			</PluginHeaderToolbar>
 		</NavigableToolbar>
 	);
 }
