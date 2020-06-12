@@ -13,6 +13,7 @@ const crypto = require( 'crypto' );
 const detectDirectoryType = require( './detect-directory-type' );
 const { validateConfig, ValidationError } = require( './validate-config' );
 const readRawConfigFile = require( './read-raw-config-file' );
+const parseConfig = require( './parse-config' );
 
 /**
  * wp-env configuration.
@@ -68,7 +69,7 @@ module.exports = async function readConfig( configPath ) {
 	// source type which was automatically detected.
 	const baseConfig =
 		( await readRawConfigFile( '.wp-env.json', configPath ) ) ||
-		getDefaultBaseConfig( configPath );
+		( await getDefaultBaseConfig( configPath ) );
 
 	// Overriden .wp-env.json on a per-user case.
 	const overrideConfig =
@@ -100,6 +101,8 @@ module.exports = async function readConfig( configPath ) {
 		overrideConfig
 	);
 
+	validateConfig( defaultWpServiceConfig );
+
 	// Configuration specific to each environment. Will be merged with any
 	// other specified environments.
 	const environmentDefaults = {
@@ -125,24 +128,34 @@ module.exports = async function readConfig( configPath ) {
 	];
 
 	const getEnvConfig = ( config, envName ) =>
-		config.env ? config.env[ envName ] : {};
+		config.env && config.env[ envName ] ? config.env[ envName ] : {};
 
 	// Merge each of the specified environment-level overrides.
+	const allPorts = new Set(); // Keep track of unique ports for validation.
 	const env = allEnvs.reduce( ( result, environment ) => {
-		result[ environment ] = validateConfig(
-			mergeWpServiceConfigs(
-				defaultWpServiceConfig,
-				getEnvConfig( environmentDefaults, environment ),
-				getEnvConfig( baseConfig, environment ),
-				getEnvConfig( overrideConfig, environment )
+		result[ environment ] = parseConfig(
+			validateConfig(
+				mergeWpServiceConfigs(
+					defaultWpServiceConfig,
+					getEnvConfig( environmentDefaults, environment ),
+					getEnvConfig( baseConfig, environment ),
+					getEnvConfig( overrideConfig, environment )
+				),
+				environment
 			),
 			{
 				workDirectoryPath,
-				environment,
 			}
 		);
+		allPorts.add( result[ environment ].port );
 		return result;
 	}, {} );
+
+	if ( allPorts.size !== allEnvs.length ) {
+		throw new ValidationError(
+			'Invalid .wp-env.json: Each port value must be unique.'
+		);
+	}
 
 	return withOverrides( {
 		name: path.basename( configDirectoryPath ),
@@ -169,13 +182,25 @@ module.exports = async function readConfig( configPath ) {
 function mergeWpServiceConfigs( ...configs ) {
 	// Returns an array of nested values in the config object. For example,
 	// an array of all the wp-config objects.
-	const getNestedValues = ( key, defaultValue = {} ) =>
-		configs.map( ( config ) => config[ key ] || defaultValue );
+	const mergeNestedObjs = ( key ) =>
+		Object.assign(
+			{},
+			...configs.map( ( config ) => {
+				if ( ! config[ key ] ) {
+					return {};
+				} else if ( typeof config[ key ] === 'object' ) {
+					return config[ key ];
+				}
+				throw new ValidationError(
+					`Invalid .wp-env.json: "${ key }" must be an object.`
+				);
+			} )
+		);
 
 	const mergedConfig = {
 		...Object.assign( {}, ...configs ),
-		config: Object.assign( {}, ...getNestedValues( 'config' ) ),
-		mappings: Object.assign( {}, ...getNestedValues( 'mappings' ) ),
+		config: mergeNestedObjs( 'config' ),
+		mappings: mergeNestedObjs( 'mappings' ),
 	};
 
 	delete mergedConfig.env;

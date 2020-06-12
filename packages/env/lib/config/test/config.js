@@ -8,8 +8,8 @@ const os = require( 'os' );
 /**
  * Internal dependencies
  */
-const { readConfig, ValidationError } = require( '../lib/config' );
-const detectDirectoryType = require( '../lib/detect-directory-type' );
+const { readConfig, ValidationError } = require( '..' );
+const detectDirectoryType = require( '../detect-directory-type' );
 
 jest.mock( 'fs', () => ( {
 	promises: {
@@ -18,7 +18,7 @@ jest.mock( 'fs', () => ( {
 	},
 } ) );
 
-jest.mock( '../lib/detect-directory-type', () => jest.fn() );
+jest.mock( '../detect-directory-type', () => jest.fn() );
 
 describe( 'readConfig', () => {
 	beforeEach( () => {
@@ -55,9 +55,10 @@ describe( 'readConfig', () => {
 		);
 		detectDirectoryType.mockImplementation( () => 'core' );
 		const config = await readConfig( '.wp-env.json' );
-		expect( config.coreSource ).not.toBeNull();
-		expect( config.pluginSources ).toHaveLength( 0 );
-		expect( config.themeSources ).toHaveLength( 0 );
+		expect( config.env.development.coreSource ).not.toBeNull();
+		expect( config.env.tests.coreSource ).not.toBeNull();
+		expect( config.env.development.pluginSources ).toHaveLength( 0 );
+		expect( config.env.development.themeSources ).toHaveLength( 0 );
 	} );
 
 	it( 'should infer a plugin config when ran from a plugin directory', async () => {
@@ -66,9 +67,10 @@ describe( 'readConfig', () => {
 		);
 		detectDirectoryType.mockImplementation( () => 'plugin' );
 		const config = await readConfig( '.wp-env.json' );
-		expect( config.coreSource ).toBeNull();
-		expect( config.pluginSources ).toHaveLength( 1 );
-		expect( config.themeSources ).toHaveLength( 0 );
+		expect( config.env.development.coreSource ).toBeNull();
+		expect( config.env.development.pluginSources ).toHaveLength( 1 );
+		expect( config.env.tests.pluginSources ).toHaveLength( 1 );
+		expect( config.env.development.themeSources ).toHaveLength( 0 );
 	} );
 
 	it( 'should infer a theme config when ran from a theme directory', async () => {
@@ -77,9 +79,12 @@ describe( 'readConfig', () => {
 		);
 		detectDirectoryType.mockImplementation( () => 'theme' );
 		const config = await readConfig( '.wp-env.json' );
-		expect( config.coreSource ).toBeNull();
-		expect( config.pluginSources ).toHaveLength( 0 );
-		expect( config.themeSources ).toHaveLength( 1 );
+		expect( config.env.development.coreSource ).toBeNull();
+		expect( config.env.tests.coreSource ).toBeNull();
+		expect( config.env.development.themeSources ).toHaveLength( 1 );
+		expect( config.env.tests.themeSources ).toHaveLength( 1 );
+		expect( config.env.development.pluginSources ).toHaveLength( 0 );
+		expect( config.env.tests.pluginSources ).toHaveLength( 0 );
 	} );
 
 	it( "should throw a validation error if 'core' is not a string", async () => {
@@ -130,7 +135,26 @@ describe( 'readConfig', () => {
 			)
 		);
 		const config = await readConfig( '.wp-env.json' );
-		expect( config ).toMatchObject( {
+		expect( config.env.development ).toMatchObject( {
+			pluginSources: [
+				{
+					type: 'local',
+					path: expect.stringMatching( /^\/.*relative$/ ),
+					basename: 'relative',
+				},
+				{
+					type: 'local',
+					path: expect.stringMatching( /^\/.*parent$/ ),
+					basename: 'parent',
+				},
+				{
+					type: 'local',
+					path: expect.stringMatching( /^\/.*home$/ ),
+					basename: 'home',
+				},
+			],
+		} );
+		expect( config.env.tests ).toMatchObject( {
 			pluginSources: [
 				{
 					type: 'local',
@@ -156,7 +180,14 @@ describe( 'readConfig', () => {
 			Promise.resolve( JSON.stringify( { core: './relative' } ) )
 		);
 		const config = await readConfig( '.wp-env.json' );
-		expect( config ).toMatchObject( {
+		expect( config.env.development ).toMatchObject( {
+			coreSource: {
+				type: 'local',
+				path: expect.stringMatching( /^\/.*relative$/ ),
+				testsPath: expect.stringMatching( /^\/.*tests-relative$/ ),
+			},
+		} );
+		expect( config.env.tests ).toMatchObject( {
 			coreSource: {
 				type: 'local',
 				path: expect.stringMatching( /^\/.*relative$/ ),
@@ -178,7 +209,7 @@ describe( 'readConfig', () => {
 			)
 		);
 		const config = await readConfig( '.wp-env.json' );
-		expect( config ).toMatchObject( {
+		const matchObj = {
 			pluginSources: [
 				{
 					type: 'git',
@@ -202,7 +233,9 @@ describe( 'readConfig', () => {
 					basename: 'gutenberg',
 				},
 			],
-		} );
+		};
+		expect( config.env.tests ).toMatchObject( matchObj );
+		expect( config.env.development ).toMatchObject( matchObj );
 	} );
 
 	it( 'should parse wordpress.org sources', async () => {
@@ -219,7 +252,7 @@ describe( 'readConfig', () => {
 			)
 		);
 		const config = await readConfig( '.wp-env.json' );
-		expect( config ).toMatchObject( {
+		const matchObj = {
 			pluginSources: [
 				{
 					type: 'zip',
@@ -249,7 +282,9 @@ describe( 'readConfig', () => {
 					basename: 'twentytwenty',
 				},
 			],
-		} );
+		};
+		expect( config.env.development ).toMatchObject( matchObj );
+		expect( config.env.tests ).toMatchObject( matchObj );
 	} );
 
 	it( 'should throw a validaton error if there is an unknown source', async () => {
@@ -278,8 +313,8 @@ describe( 'readConfig', () => {
 				} )
 			)
 		);
-		const { mappings } = await readConfig( '.wp-env.json' );
-		expect( mappings ).toMatchObject( {
+		const config = await readConfig( '.wp-env.json' );
+		const matchObj = {
 			test: {
 				type: 'local',
 				path: expect.stringMatching( /^\/.*relative$/ ),
@@ -290,7 +325,9 @@ describe( 'readConfig', () => {
 				path: expect.stringMatching( /^\/.*gutenberg$/ ),
 				basename: 'gutenberg',
 			},
-		} );
+		};
+		expect( config.env.development.mappings ).toMatchObject( matchObj );
+		expect( config.env.development.mappings ).toMatchObject( matchObj );
 	} );
 
 	it( 'should throw a validaton error if there is an invalid mapping', async () => {
@@ -322,7 +359,7 @@ describe( 'readConfig', () => {
 		} catch ( error ) {
 			expect( error ).toBeInstanceOf( ValidationError );
 			expect( error.message ).toContain(
-				'Invalid .wp-env.json: "mapping.test" should be a string.'
+				'Invalid .wp-env.json: "mappings.test" should be a string.'
 			);
 		}
 	} );
@@ -350,16 +387,17 @@ describe( 'readConfig', () => {
 		readFile.mockImplementation( () =>
 			Promise.resolve( JSON.stringify( { mappings: {} } ) )
 		);
-		const { mappings } = await readConfig( '.wp-env.json' );
-		expect( mappings ).toEqual( {} );
+		const config = await readConfig( '.wp-env.json' );
+		expect( config.env.development.mappings ).toEqual( {} );
+		expect( config.env.tests.mappings ).toEqual( {} );
 	} );
 
 	it( 'should throw a validaton error if the ports are not numbers', async () => {
 		expect.assertions( 10 );
 		await testPortNumberValidation( 'port', 'string' );
-		await testPortNumberValidation( 'testsPort', [] );
+		await testPortNumberValidation( 'testsPort', [], 'env.tests.' );
 		await testPortNumberValidation( 'port', {} );
-		await testPortNumberValidation( 'testsPort', false );
+		await testPortNumberValidation( 'testsPort', false, 'env.tests.' );
 		await testPortNumberValidation( 'port', null );
 	} );
 
@@ -373,7 +411,7 @@ describe( 'readConfig', () => {
 		} catch ( error ) {
 			expect( error ).toBeInstanceOf( ValidationError );
 			expect( error.message ).toContain(
-				'Invalid .wp-env.json: "testsPort" and "port" must be different.'
+				'Invalid .wp-env.json: Each port value must be unique.'
 			);
 		}
 	} );
@@ -383,14 +421,21 @@ describe( 'readConfig', () => {
 			Promise.resolve(
 				JSON.stringify( {
 					port: 1000,
+					testsPort: 2000,
 				} )
 			)
 		);
 		const config = await readConfig( '.wp-env.json' );
 		// Custom port is overriden while testsPort gets the deault value.
 		expect( config ).toMatchObject( {
-			port: 1000,
-			testsPort: 8889,
+			env: {
+				development: {
+					port: 1000,
+				},
+				tests: {
+					port: 2000,
+				},
+			},
 		} );
 	} );
 
@@ -444,8 +489,14 @@ describe( 'readConfig', () => {
 
 		const config = await readConfig( '.wp-env.json' );
 		expect( config ).toMatchObject( {
-			port: 4000,
-			testsPort: 3000,
+			env: {
+				development: {
+					port: 4000,
+				},
+				tests: {
+					port: 3000,
+				},
+			},
 		} );
 
 		process.env.WP_ENV_PORT = oldPort;
@@ -459,8 +510,14 @@ describe( 'readConfig', () => {
 
 		const config = await readConfig( '.wp-env.json' );
 		expect( config ).toMatchObject( {
-			port: 8888,
-			testsPort: 8889,
+			env: {
+				development: {
+					port: 8888,
+				},
+				tests: {
+					port: 8889,
+				},
+			},
 		} );
 	} );
 
@@ -531,18 +588,23 @@ describe( 'readConfig', () => {
  * Tests that readConfig will throw errors when invalid port numbers are passed.
  *
  * @param {string} portName The name of the port to test ('port' or 'testsPort')
- * @param {any} value A value which should throw an error.
+ * @param {any}    value    A value which should throw an error.
+ * @param {string} envText  Env text which prefixes the error.
  */
-async function testPortNumberValidation( portName, value ) {
+async function testPortNumberValidation( portName, value, envText = '' ) {
 	readFile.mockImplementation( () =>
 		Promise.resolve( JSON.stringify( { [ portName ]: value } ) )
 	);
 	try {
 		await readConfig( '.wp-env.json' );
 	} catch ( error ) {
+		// Useful for debugging:
+		if ( ! ( error instanceof ValidationError ) ) {
+			throw error;
+		}
 		expect( error ).toBeInstanceOf( ValidationError );
 		expect( error.message ).toContain(
-			`Invalid .wp-env.json: "${ portName }" must be an integer.`
+			`Invalid .wp-env.json: "${ envText }port" must be an integer.`
 		);
 	}
 	jest.clearAllMocks();

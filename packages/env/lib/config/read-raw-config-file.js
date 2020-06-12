@@ -49,7 +49,7 @@ module.exports = async function readRawConfigFile( name, configPath ) {
  */
 function withBackCompat( rawConfig ) {
 	// Convert testsPort into new env.tests format.
-	if ( rawConfig.testsPort ) {
+	if ( rawConfig.testsPort !== undefined ) {
 		rawConfig.env = {
 			...( rawConfig.env || {} ),
 			tests: {
@@ -60,5 +60,6 @@ function withBackCompat( rawConfig ) {
 			},
 		};
 	}
+	delete rawConfig.testsPort;
 	return rawConfig;
 }
