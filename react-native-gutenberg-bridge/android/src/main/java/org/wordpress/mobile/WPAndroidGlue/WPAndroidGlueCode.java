@@ -41,7 +41,8 @@ import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadEventEmitter;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -67,6 +68,7 @@ public class WPAndroidGlueCode {
     private ReactContext mReactContext;
     private RNReactNativeGutenbergBridgePackage mRnReactNativeGutenbergBridgePackage;
     private MediaSelectedCallback mMediaSelectedCallback;
+    private DeferredEventEmitter mDeferredEventEmitter = new DeferredEventEmitter();
     private boolean mMediaPickedByUserOnBlock;
 
     /**
@@ -277,6 +279,8 @@ public class WPAndroidGlueCode {
             @Override
             public void editorDidMount(ReadableArray unsupportedBlockNames) {
                 mOnEditorMountListener.onEditorDidMount(unsupportedBlockNames.toArrayList());
+                mDeferredEventEmitter.setEmitter(mRnReactNativeGutenbergBridgePackage
+                        .getRNReactNativeGutenbergBridgeModule());
                 mIsEditorMounted = true;
                 if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
                     setFocusOnTitle();
@@ -815,27 +819,19 @@ public class WPAndroidGlueCode {
     }
 
     public void mediaFileUploadProgress(final int mediaId, final float progress) {
-        if (isMediaUploadCallbackRegistered()) {
-            mPendingMediaUploadCallback.onMediaFileUploadProgress(mediaId, progress);
-        }
+        mDeferredEventEmitter.onMediaFileUploadProgress(mediaId, progress);
     }
 
     public void mediaFileUploadFailed(final int mediaId) {
-        if (isMediaUploadCallbackRegistered()) {
-            mPendingMediaUploadCallback.onMediaFileUploadFailed(mediaId);
-        }
+        mDeferredEventEmitter.onMediaFileUploadFailed(mediaId);
     }
 
     public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
-        if (isMediaUploadCallbackRegistered()) {
-            mPendingMediaUploadCallback.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId);
-        }
+        mDeferredEventEmitter.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId);
     }
 
     public void clearMediaFileURL(final int mediaId) {
-        if (isMediaUploadCallbackRegistered()) {
-            mPendingMediaUploadCallback.onUploadMediaFileClear(mediaId);
-        }
+        mDeferredEventEmitter.onUploadMediaFileClear(mediaId);
     }
 
     public void replaceUnsupportedBlock(String content, String blockId) {
