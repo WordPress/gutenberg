@@ -1,6 +1,7 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import android.os.Bundle;
+import android.util.Pair;
 
 import androidx.annotation.Nullable;
 
@@ -30,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext mReactContext;
@@ -77,6 +80,14 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     private boolean mIsDarkMode;
 
+
+    /**
+     * Used for storing deferred actions prior to editor mounting
+     */
+    private Queue<Pair<String, WritableMap>> mPendingActions = new ConcurrentLinkedQueue<>();
+
+    private boolean mEditorDidMount = false;
+
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
             GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent, boolean isDarkMode) {
         super(reactContext);
@@ -90,12 +101,33 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         return "RNReactNativeGutenbergBridge";
     }
 
-
     @Override
     public Map<String, Object> getConstants() {
         final HashMap<String, Object> constants = new HashMap<>();
         constants.put("isInitialColorSchemeDark", mIsDarkMode);
         return constants;
+    }
+
+    /** This will queue actions to JS when the editor has not yet mounted. When the editor mounts, the events will be
+     *  flushed. If the editor has already mounted, this will directly call emitToJS. This is useful for critical
+     *  messages that have required actions, such as upload completion events.
+     *
+     * @param eventName the name of the JS event
+     * @param data the JS event data (can be null)
+     */
+    private void queueActionToJS(String eventName, @Nullable WritableMap data) {
+        if (!mEditorDidMount) {
+            mPendingActions.add(new Pair<>(eventName, data));
+        } else {
+            emitToJS(eventName, data);
+        }
+    }
+
+    private void flushActionQueueToJS() {
+        while (0 < mPendingActions.size()) {
+            final Pair<String, WritableMap> action = mPendingActions.remove();
+            emitToJS(action.first, action.second);
+        }
     }
 
     private void emitToJS(String eventName, @Nullable WritableMap data) {
@@ -162,6 +194,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     @ReactMethod
     public void editorDidMount(ReadableArray unsupportedBlockNames) {
+        mEditorDidMount = true;
+        flushActionQueueToJS();
         mGutenbergBridgeJS2Parent.editorDidMount(unsupportedBlockNames);
     }
 
@@ -370,7 +404,15 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         if (mediaServerId != MEDIA_SERVER_ID_UNKNOWN) {
             writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_SERVER_ID, mediaServerId);
         }
-        emitToJS(EVENT_NAME_MEDIA_UPLOAD, writableMap);
+        if (isCriticalMessage(state)) {
+            queueActionToJS(EVENT_NAME_MEDIA_UPLOAD, writableMap);
+        } else {
+            emitToJS(EVENT_NAME_MEDIA_UPLOAD, writableMap);
+        }
+    }
+
+    private boolean isCriticalMessage(int state) {
+        return state == MEDIA_UPLOAD_STATE_SUCCEEDED || state == MEDIA_UPLOAD_STATE_FAILED;
     }
 
     public void toggleEditorMode() {
