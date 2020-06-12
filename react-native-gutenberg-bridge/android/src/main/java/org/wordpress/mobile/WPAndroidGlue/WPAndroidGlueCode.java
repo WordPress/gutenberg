@@ -92,6 +92,7 @@ public class WPAndroidGlueCode {
     private String mTitle = "";
     private boolean mTitleInitialized;
     private boolean mContentChanged;
+    private ReadableMap mContentInfo;
     private boolean mShouldUpdateContent;
     private CountDownLatch mGetContentCountDownLatch;
     private WeakReference<View> mLastFocusedView = null;
@@ -185,6 +186,12 @@ public class WPAndroidGlueCode {
         boolean onRequestStarterPageTemplatesTooltipShown();
     }
 
+    public interface OnContentInfoReceivedListener {
+        void onContentInfoFailed();
+        void onEditorNotReady();
+        void onContentInfoReceived(HashMap<String, Object> contentInfo);
+    }
+
     public void mediaSelectionCancelled() {
         mAppendsMultipleSelectedToSiblingBlocks = false;
     }
@@ -198,6 +205,8 @@ public class WPAndroidGlueCode {
                 // This code is called twice. When getTitle and getContent are called.
                 // Make sure mContentChanged has the correct value (true) if one of the call returned with changes.
                 mContentChanged = mContentChanged || changed;
+
+                mContentInfo = contentInfo;
 
                 // Gutenberg mobile sends us html response even without we asking for it so, check if the latch is there.
                 //  This is probably an indication of a bug on the RN side of things though.
@@ -728,6 +737,38 @@ public class WPAndroidGlueCode {
         }
 
         return "";
+    }
+
+    public boolean triggerGetContentInfo(OnContentInfoReceivedListener onContentInfoReceivedListener) {
+        if (mReactContext != null && (mGetContentCountDownLatch == null || mGetContentCountDownLatch.getCount() == 0)) {
+            if (!mIsEditorMounted) {
+                onContentInfoReceivedListener.onEditorNotReady();
+                return false;
+            }
+
+            mGetContentCountDownLatch = new CountDownLatch(1);
+
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
+
+            new Thread(new Runnable() {
+                @Override public void run() {
+                    try {
+                        mGetContentCountDownLatch.await(5, TimeUnit.SECONDS);
+                        if (mContentInfo == null) {
+                            onContentInfoReceivedListener.onContentInfoFailed();
+                        } else {
+                            onContentInfoReceivedListener.onContentInfoReceived(mContentInfo.toHashMap());
+                        }
+                    } catch (InterruptedException ie) {
+                        onContentInfoReceivedListener.onContentInfoFailed();
+                    }
+                }
+            }).start();
+
+            return true;
+        }
+
+        return false;
     }
 
     private String getMediaType(final boolean isVideo) {
