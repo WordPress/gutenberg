@@ -13,6 +13,7 @@ class GutenbergViewController: UIViewController {
         return mediaUploadCoordinator
     }()
     fileprivate var longPressGesture: UILongPressGestureRecognizer!
+    fileprivate var contentInfo: ContentInfo?
     
     override func loadView() {
         view = gutenberg.rootView
@@ -62,13 +63,16 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidMount(unsupportedBlockNames: [String]) {
         print("gutenbergDidMount(unsupportedBlockNames: \(unsupportedBlockNames))")
+        gutenberg.requestHTML()
     }
 
-    func gutenbergDidProvideHTML(title: String, html: String, changed: Bool) {
+    func gutenbergDidProvideHTML(title: String, html: String, changed: Bool, contentInfo: ContentInfo?) {
         print("didProvideHTML:")
         print("↳ Content changed: \(changed)")
         print("↳ Title: \(title)")
         print("↳ HTML: \(html)")
+        print("↳ Content Info: \(contentInfo)")
+        self.contentInfo = contentInfo
     }
 
     func gutenbergDidRequestMedia(from source: Gutenberg.MediaSource, filter: [Gutenberg.MediaType], allowMultipleSelection: Bool, with callback: @escaping MediaPickerDidPickMediaCallback) {
@@ -298,7 +302,9 @@ extension GutenbergViewController {
     func showMoreSheet() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
-
+        if let contentInfo = contentInfo {
+            alert.title = "\(contentInfo.words) words, \(contentInfo.characters) characters"
+        }
         let cancelAction = UIAlertAction(title: "Keep Editing", style: .cancel)
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(updateHtmlAction)

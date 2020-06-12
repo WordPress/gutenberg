@@ -3,7 +3,7 @@
 
 @interface RCT_EXTERN_MODULE(RNReactNativeGutenbergBridge, NSObject)
 
-RCT_EXTERN_METHOD(provideToNative_Html:(NSString *)html title:(NSString *)title changed:(BOOL)changed)
+RCT_EXTERN_METHOD(provideToNative_Html:(NSString *)html title:(NSString *)title changed:(BOOL)changed contentInfo:(NSDictionary *)info)
 RCT_EXTERN_METHOD(requestMediaPickFrom:(NSString *)source filter:(NSArray<NSString *> *)filter allowMultipleSelection:(BOOL)allowMultipleSelection callback:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(getOtherMediaOptions:(NSArray<NSString *> *)filter callback:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(mediaUploadSync)

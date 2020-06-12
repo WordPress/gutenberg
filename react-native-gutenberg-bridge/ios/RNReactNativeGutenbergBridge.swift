@@ -8,9 +8,16 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     // MARK: - Messaging methods
 
     @objc
-    func provideToNative_Html(_ html: String, title: String, changed: Bool) {
+    func provideToNative_Html(_ html: String, title: String, changed: Bool, contentInfo: [String:Int]) {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidProvideHTML(title: title, html: html, changed: changed)
+            var info: ContentInfo?
+            if  let characters = contentInfo["characters"],
+                let words = contentInfo["words"],
+                let paragraphs = contentInfo["paragraphs"],
+                let blocks = contentInfo["blocks"] {
+                info = ContentInfo(characters: characters, words: words, paragraphs: paragraphs, blocks: blocks)
+            }
+            self.delegate?.gutenbergDidProvideHTML(title: title, html: html, changed: changed, contentInfo: info)
         }
     }
     
