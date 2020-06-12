@@ -322,8 +322,8 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 			return $block_content;
 		}
 
-		$colors     = gutenberg_experimental_build_css_colors( $block['attrs'] );
-		$typography = gutenberg_experimental_build_css_typography( $block['attrs'] );
+		$colors     = gutenberg_experimental_build_css_colors( $block['attrs'], $supports );
+		$typography = gutenberg_experimental_build_css_typography( $block['attrs'], $supports );
 
 		$extra_classes    = array_merge(
 			$colors['css_classes'],
@@ -374,24 +374,23 @@ add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles'
  * @param  array $attributes block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function gutenberg_experimental_build_css_colors( $attributes ) {
+function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 	$color_settings       = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
 
-	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_custom_text_color = array_key_exists( 'style', $attributes )
-	&& array_key_exists( 'color', $attributes['style'] )
-	&& array_key_exists( 'text', $attributes['style']['color'] );
-
-	// If has text color.
+	// Text colors.
+	if( in_array( 'color', $supports ) ) {
+		$has_named_text_color  = array_key_exists( 'textColor', $attributes );
+		$has_custom_text_color = array_key_exists( 'style', $attributes )
+		&& array_key_exists( 'color', $attributes['style'] )
+		&& array_key_exists( 'text', $attributes['style']['color'] );
+	}
 	if ( $has_custom_text_color || $has_named_text_color ) {
 		// Add has-text-color class.
 		$color_settings['css_classes'][] = 'has-text-color';
 	}
-
 	if ( $has_named_text_color ) {
 		// Add the color class.
 		$color_settings['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
@@ -401,47 +400,49 @@ function gutenberg_experimental_build_css_colors( $attributes ) {
 	}
 
 	// Link colors.
-	$has_link_color = array_key_exists( 'style', $attributes )
-	&& array_key_exists( 'color', $attributes['style'] )
-	&& array_key_exists( 'link', $attributes['style']['color'] );
-
+	if( in_array( 'link-color', $supports ) ) {
+		$has_link_color = array_key_exists( 'style', $attributes )
+		&& array_key_exists( 'color', $attributes['style'] )
+		&& array_key_exists( 'link', $attributes['style']['color'] );
+	}
 	if ( $has_link_color ) {
 		$color_settings['css_classes'][] = 'has-link-color';
-		// If link is a named color.
-		if ( strpos( $attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
-			// Get the name from the string and add proper styles.
-			$index_to_splice               = strrpos( $attributes['style']['color']['link'], '|' ) + 1;
-			$link_color_name               = substr( $attributes['style']['color']['link'], $index_to_splice );
-			$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
-		} else {
-			$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link: %s;', $attributes['style']['color']['link'] );
-		}
 	}
-	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_custom_background_color = array_key_exists( 'style', $attributes )
-	&& array_key_exists( 'color', $attributes['style'] )
-	&& array_key_exists( 'background', $attributes['style']['color'] );
+	// If link is a named color.
+	if ( strpos( $attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
+		// Get the name from the string and add proper styles.
+		$index_to_splice               = strrpos( $attributes['style']['color']['link'], '|' ) + 1;
+		$link_color_name               = substr( $attributes['style']['color']['link'], $index_to_splice );
+		$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
+	} else {
+		$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link: %s;', $attributes['style']['color']['link'] );
+	}
 
-	// Gradient color.
-	$has_named_gradient  = array_key_exists( 'gradient', $attributes );
-	$has_custom_gradient = array_key_exists( 'style', $attributes )
-	&& array_key_exists( 'color', $attributes['style'] )
-	&& array_key_exists( 'gradient', $attributes['style']['color'] );
-
-	// If has background color.
+	// Background color & gradient.
+	if( in_array( 'background-color', $supports ) ) {
+		$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
+		$has_custom_background_color = array_key_exists( 'style', $attributes )
+		&& array_key_exists( 'color', $attributes['style'] )
+		&& array_key_exists( 'background', $attributes['style']['color'] );
+	}
+	if ( in_array( 'background', $supports ) ) {
+		$has_named_gradient  = array_key_exists( 'gradient', $attributes );
+		$has_custom_gradient = array_key_exists( 'style', $attributes )
+		&& array_key_exists( 'color', $attributes['style'] )
+		&& array_key_exists( 'gradient', $attributes['style']['color'] );
+	}
 	if ( $has_custom_background_color || $has_named_background_color || $has_named_gradient || $has_custom_gradient ) {
 		// Add has-background class.
 		$color_settings['css_classes'][] = 'has-background';
 	}
-
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
 		$color_settings['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
 		$color_settings['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
-	} elseif ( $has_named_gradient ) {
+	}
+	if ( $has_named_gradient ) {
 		$color_settings['css_classes'][] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
 	} elseif ( $has_custom_gradient ) {
 		$color_settings['inline_styles'] .= sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
@@ -457,7 +458,7 @@ function gutenberg_experimental_build_css_colors( $attributes ) {
  * @param  array $attributes block attributes.
  * @return array Font size CSS classes and inline styles.
  */
-function gutenberg_experimental_build_css_typography( $attributes ) {
+function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 	// CSS classes.
 	$typography = array(
 		'css_classes'   => array(),
