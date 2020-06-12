@@ -93,6 +93,7 @@ function useSlotRegistry() {
 			slots,
 			fills,
 			registerSlot,
+			updateSlot,
 			unregisterSlot,
 			registerFill,
 			unregisterFill,
