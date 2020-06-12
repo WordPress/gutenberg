@@ -32,7 +32,7 @@ class NoticeList extends Component {
 
 		return (
 			<View style={ styles.list } key={ notices.lenght }>
-				{ [ ...notices ].reverse().map( ( notice ) => (
+				{ notices.reverse().map( ( notice ) => (
 					<Notice
 						{ ...notice }
 						key={ notice.id }
