@@ -286,16 +286,16 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 
 		const { key } = selectedCreateOption;
 
-		if ( key === CREATE_EMPTY_OPTION_VALUE ) {
-			const blocks = [ createBlock( 'core/navigation-link' ) ];
-			onCreate( blocks );
-		}
-
-		if ( hasPages && key === CREATE_FROM_PAGES_OPTION_VALUE ) {
+		if ( key === CREATE_FROM_PAGES_OPTION_VALUE && hasPages ) {
 			const blocks = convertPagesToBlocks( pages );
 			const selectNavigationBlock = true;
 			onCreate( blocks, selectNavigationBlock );
 			return;
+		}
+
+		if ( key === CREATE_EMPTY_OPTION_VALUE || ! menuItems?.length ) {
+			const blocks = [ createBlock( 'core/navigation-link' ) ];
+			onCreate( blocks );
 		}
 
 		// Infer that the user selected a menu to create from.
