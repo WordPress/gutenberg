@@ -157,6 +157,10 @@ _Returns_
 
 -   `WPComponent`: The component to be rendered.
 
+<a name="PluginHeaderToolbar" href="#PluginHeaderToolbar">#</a> **PluginHeaderToolbar**
+
+Undocumented declaration.
+
 <a name="PluginMoreMenuItem" href="#PluginMoreMenuItem">#</a> **PluginMoreMenuItem**
 
 Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to as a button or link depending on the props provided.
