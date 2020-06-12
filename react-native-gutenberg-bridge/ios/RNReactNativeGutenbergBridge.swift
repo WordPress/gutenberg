@@ -9,10 +9,16 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     weak var dataSource: GutenbergBridgeDataSource?
     private var isJSLoading = true
     private var hasObservers = false
-    private var connectionEstablished = false
     private var queuedEvents = [GutenbergEvent]()
-    private let queuedEventProcessQueue = DispatchQueue(label:"LockingQueue")
 
+    public override init() {
+        super.init()
+        NotificationCenter.default.addObserver(forName: Notification.Name("RCTContentDidAppearNotification"), object: nil, queue: nil) { (_) in
+            DispatchQueue.main.async {
+                self.connectionEstablished()
+            }
+        }
+    }
     // MARK: - Messaging methods
 
     @objc
@@ -95,7 +101,9 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     @objc
     func mediaUploadSync() {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaUploadSync()
+            if self.hasObservers {
+                self.delegate?.gutenbergDidRequestMediaUploadSync()
+            }
         }
     }
 
@@ -196,22 +204,18 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
-    @objc
-    public func acknowledgeConnecton() {
-        guard !connectionEstablished else { return } // We have an established connection no need to continue.
-        connectionEstablished = true
-        queuedEventProcessQueue.async { // replay the triggered events in order on a synchronized queue as the array is mutating.
-            while (self.queuedEvents.count > 0) {
-                let event = self.queuedEvents.removeFirst()
-                super.sendEvent(withName: event.name, body: event.body) // execute this on super as we want to avoid logic in self.
-            }
+    public func connectionEstablished() {
+        guard !hasObservers else { return } // We have an established connection no need to continue.
+        hasObservers = true
+        while (self.queuedEvents.count > 0) {
+            let event = self.queuedEvents.removeFirst()
+            super.sendEvent(withName: event.name, body: event.body) // execute this on super as we want to avoid logic in self.
         }
     }
 
     public override func sendEvent(withName name: String!, body: Any!) {
-
-        queuedEventProcessQueue.async { // checking on a synchronized queue as the array might mutate by another process.
-            if self.connectionEstablished && self.queuedEvents.count == 0 {
+        DispatchQueue.main.async {
+            if self.hasObservers && self.queuedEvents.count == 0 {
                 super.sendEvent(withName: name, body: body)
             } else {
                 let event = GutenbergEvent(name: name, body: body)
@@ -222,16 +226,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
     private func shouldLog(with level: Int) -> Bool {
         return level >= RCTGetLogThreshold().rawValue
-    }
-
-    override public func startObserving() {
-        super.startObserving()
-        hasObservers = true
-    }
-
-    override public func stopObserving() {
-        super.stopObserving()
-        hasObservers = false
     }
 
     @objc
