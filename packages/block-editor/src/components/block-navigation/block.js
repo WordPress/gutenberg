@@ -9,10 +9,13 @@ import classnames from 'classnames';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
+	MenuGroup,
+	MenuItem,
 } from '@wordpress/components';
-
+import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useState, useRef, useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -30,7 +33,7 @@ import { useBlockNavigationContext } from './context';
 export default function BlockNavigationBlock( {
 	block,
 	isSelected,
-	selectBlock,
+	onClick,
 	position,
 	level,
 	rowCount,
@@ -41,6 +44,9 @@ export default function BlockNavigationBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
+	const { selectBlock: selectEditorBlock } = useDispatch(
+		'core/block-editor'
+	);
 	const { clientId } = block;
 
 	// Subtract 1 from rowCount, as it includes the block appender.
@@ -93,7 +99,7 @@ export default function BlockNavigationBlock( {
 						/>
 						<BlockNavigationBlockContents
 							block={ block }
-							onClick={ () => selectBlock( block.clientId ) }
+							onClick={ () => onClick( block.clientId ) }
 							isSelected={ isSelected }
 							position={ position }
 							siblingCount={ siblingCount }
@@ -151,8 +157,18 @@ export default function BlockNavigationBlock( {
 								onFocus,
 							} }
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ selectBlock }
-						/>
+							__experimentalSelectBlock={ onClick }
+						>
+							<MenuGroup>
+								<MenuItem
+									onClick={ () => {
+										selectEditorBlock( clientId );
+									} }
+								>
+									{ __( 'Go to block' ) }
+								</MenuItem>
+							</MenuGroup>
+						</BlockSettingsDropdown>
 					) }
 				</TreeGridCell>
 			) }

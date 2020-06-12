@@ -16,7 +16,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { moreHorizontal } from '@wordpress/icons';
 
-import { useState, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 
 /**
@@ -38,6 +38,7 @@ const POPOVER_PROPS = {
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
+	children,
 	...props
 } ) {
 	const blockClientIds = castArray( clientIds );
@@ -62,7 +63,6 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 
-	const [ hasCopied, setHasCopied ] = useState();
 	const updateSelection = useCallback(
 		__experimentalSelectBlock
 			? async ( clientIdsPromise ) => {
@@ -168,6 +168,7 @@ export function BlockSettingsDropdown( {
 								fillProps={ { onClose } }
 								clientIds={ clientIds }
 							/>
+							{ children }
 							<MenuGroup>
 								{ ! isLocked && (
 									<MenuItem
