@@ -121,7 +121,7 @@ class PostTitle extends Component {
 							: /* translators: accessibility text. Name of the form field. */
 							  __( 'Title.' )
 					}
-					accessibilityHint={ __( 'Update the title.' ) }
+					accessibilityHint={ __( 'Updates the title.' ) }
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
