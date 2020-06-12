@@ -47,7 +47,7 @@ export default function BlockNavigationBlock( {
 	const siblingCount = rowCount - 1;
 	const hasSiblings = siblingCount > 1;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
-	const hasVisibleMovers = isHovered || isSelected || isFocused;
+	const hasVisibleMovers = isHovered || isFocused;
 	const moverCellClassName = classnames(
 		'block-editor-block-navigation-block__mover-cell',
 		{ 'is-visible': hasVisibleMovers }
