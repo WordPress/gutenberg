@@ -44,7 +44,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
     private ReactNativeHost createReactNativeHost() {
         mRnReactNativeGutenbergBridgePackage = new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
             @Override
-            public void responseHtml(String title, String html, boolean changed) {
+            public void responseHtml(String title, String html, boolean changed, ReadableMap contentInfo) {
             }
 
             @Override

@@ -192,7 +192,7 @@ public class WPAndroidGlueCode {
     protected List<ReactPackage> getPackages() {
         mRnReactNativeGutenbergBridgePackage = new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
             @Override
-            public void responseHtml(String title, String html, boolean changed) {
+            public void responseHtml(String title, String html, boolean changed, ReadableMap contentInfo) {
                 mContentHtml = html;
                 mTitle = title;
                 // This code is called twice. When getTitle and getContent are called.
