@@ -48,6 +48,9 @@ jobs:
     - name: Bundle iOS
       run: npm run native test:e2e:bundle:ios
 
+    - name: Switch Xcode Version
+      run: sudo xcode-select --switch /Applications/Xcode_11.4.1.app
+
     - name: Build (if needed)
       run: test -e packages/react-native-editor/ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || SKIP_BUNDLING=true npm run native test:e2e:build-app:ios
 
