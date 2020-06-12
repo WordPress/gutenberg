@@ -165,7 +165,7 @@ export default function ImageEditor( {
 } ) {
 	const { createErrorNotice } = useDispatch( 'core/notices' );
 	const [ isCropping, setIsCropping ] = useState( false );
-	const [ inProgress, setIsProgress ] = useState( null );
+	const [ inProgress, setInProgress ] = useState( null );
 	const [ imageSize, setImageSize ] = useState( {
 		naturalHeight: 0,
 		naturalWidth: 0,
@@ -183,11 +183,11 @@ export default function ImageEditor( {
 	}, [ isSelected ] );
 
 	function adjustImage( action, attrs ) {
-		setIsProgress( action );
+		setInProgress( action );
 
 		richImageRequest( id, action, attrs )
 			.then( ( response ) => {
-				setIsProgress( null );
+				setInProgress( null );
 				setIsCropping( false );
 
 				if ( response.media_id && response.media_id !== id ) {
@@ -207,7 +207,7 @@ export default function ImageEditor( {
 						type: 'snackbar',
 					}
 				);
-				setIsProgress( null );
+				setInProgress( null );
 				setIsCropping( false );
 			} );
 	}
