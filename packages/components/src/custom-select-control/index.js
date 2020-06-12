@@ -66,7 +66,7 @@ export default function CustomSelectControl( {
 	onChange: onSelectedItemChange,
 	value,
 } ) {
-	const valueIndex = items.findIndex( ( item ) => item.key === value.key );
+	const valueIndex = items.findIndex( ( item ) => item.key === value?.key );
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -75,7 +75,7 @@ export default function CustomSelectControl( {
 		isOpen,
 		highlightedIndex,
 	} = useSelect( {
-		initialSelectedItem: items[ valueIndex ],
+		initialSelectedItem: items[ valueIndex >= 0 ? valueIndex : 0 ],
 		items,
 		itemToString,
 		onSelectedItemChange,
@@ -93,6 +93,7 @@ export default function CustomSelectControl( {
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
+	const selectedItem = value ? value : items[ 0 ];
 
 	return (
 		<div
@@ -124,7 +125,7 @@ export default function CustomSelectControl( {
 					isSmall: true,
 				} ) }
 			>
-				{ itemToString( value ) }
+				{ itemToString( selectedItem ) }
 				<Icon
 					icon={ chevronDown }
 					className="components-custom-select-control__button-icon"
@@ -148,10 +149,10 @@ export default function CustomSelectControl( {
 									}
 								),
 								style: item.style,
+								'aria-selected': index === valueIndex,
 							} ) }
-							aria-selected={ index === valueIndex }
 						>
-							{ item.key === value.key && (
+							{ item.key === selectedItem.key && (
 								<Icon
 									icon={ check }
 									className="components-custom-select-control__item-icon"
