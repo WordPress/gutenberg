@@ -23,7 +23,7 @@ const stateReducer = (
 	{ type, changes, props: { items } }
 ) => {
 	const selectedItemIndex = items.findIndex(
-		( item ) => item.key === selectedItem.key
+		( item ) => item.key === selectedItem?.key
 	);
 	if ( changes.highlightedIndex < 0 ) {
 		changes.highlightedIndex = selectedItemIndex;
