@@ -32,7 +32,6 @@
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/postcss-themes": "file:../postcss-themes",
 		"autoprefixer": "^9.4.5",
-		"postcss-color-function": "^4.0.1",
 		"postcss-custom-properties": "^9.1.1"
 	},
 	"publishConfig": {

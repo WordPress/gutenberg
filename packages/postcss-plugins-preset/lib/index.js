@@ -7,5 +7,4 @@ module.exports = [
 	require( 'postcss-custom-properties' )(),
 	require( '@wordpress/postcss-themes' )( adminColorSchemes ),
 	require( 'autoprefixer' )( { grid: true } ),
-	require( 'postcss-color-function' ),
 ];
