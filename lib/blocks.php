@@ -312,9 +312,10 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 	}
 
 	if ( isset( $block['attrs'] ) ) {
+		// Check what style features the block supports.
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 		$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
-
+		// Return early if nothing is supported.
 		if ( sizeof( $supports ) === 0 ) {
 			return $block_content;
 		}
@@ -369,6 +370,7 @@ add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles'
  * which will be applied to the block markup in the front-end.
  *
  * @param  array $attributes block attributes.
+ * @param  array $supports style features the block attributes.
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
@@ -457,6 +459,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
  * which will be applied to the block markup in the front-end.
  *
  * @param  array $attributes block attributes.
+ * @param  array $supports style features the block attributes.
  * @return array Font size CSS classes and inline styles.
  */
 function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
