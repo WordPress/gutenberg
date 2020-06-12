@@ -64,6 +64,7 @@
 		"puppeteer": "npm:puppeteer-core@3.0.0",
 		"read-pkg-up": "^1.0.1",
 		"resolve-bin": "^0.4.0",
+		"rimraf": "^3.0.2",
 		"sass-loader": "^8.0.2",
 		"source-map-loader": "^0.2.4",
 		"stylelint": "^9.10.1",
