@@ -34,9 +34,35 @@ function myguten_block_init() {
 add_action( 'init', 'myguten_block_init' );
 ```
 
-In your code, you can include the i18n functions. The most common function is **__** (a double underscore) which provides translation of a simple string. Here is a basic static block example, this is in a file called `block.js`:
+In your code, you can include the i18n functions. The most common function is **__** (a double underscore) which provides translation of a simple string. Here is a basic block example:
 
 {% codetabs %}
+{% ESNext %}
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockType } from '@wordpress/blocks';
+
+registerBlockType( 'myguten/simple', {
+	title: __( 'Simple Block', 'myguten' ),
+	category: 'widgets',
+
+	edit: () => {
+		return (
+			<p style="color:red">
+				{ __( 'Hello World', 'myguten' ) }
+			</p>
+		);
+	},
+
+	save: () => {
+		return (
+			<p style="color:red">
+				{ __( 'Hello World', 'myguten' ) }
+			</p>
+		);
+	},
+} );
+```
 {% ES5 %}
 ```js
 const { __ } = wp.i18n;
@@ -60,32 +86,6 @@ registerBlockType( 'myguten/simple', {
 			'p',
 			{ style: { color: 'red' } },
 			__( 'Hello World', 'myguten' )
-		);
-	},
-} );
-```
-{% ESNext %}
-```js
-import { __ } from '@wordpress/i18n';
-import { registerBlockType } from '@wordpress/blocks';
-
-registerBlockType( 'myguten/simple', {
-	title: __( 'Simple Block', 'myguten' ),
-	category: 'widgets',
-
-	edit: () => {
-		return (
-			<p style="color:red">
-				{ __( 'Hello World', 'myguten' ) }
-			</p>
-		);
-	},
-
-	save: () => {
-		return (
-			<p style="color:red">
-				{ __( 'Hello World', 'myguten' ) }
-			</p>
 		);
 	},
 } );

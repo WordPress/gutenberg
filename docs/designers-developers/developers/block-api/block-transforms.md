@@ -46,26 +46,7 @@ A transformation of type `block` is an object that takes the following parameter
 To declare this transformation we add the following code into the heading block configuration, which uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
 
 {% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: function ( attributes ) {
-                return createBlock( 'core/heading', {
-                    content: attributes.content,
-                } );
-            },
-        },
-    ]
-},
-```
-
 {% ESNext %}
-
 ```js
 transforms: {
     from: [
@@ -81,7 +62,22 @@ transforms: {
     ]
 },
 ```
-
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: function ( attributes ) {
+                return createBlock( 'core/heading', {
+                    content: attributes.content,
+                } );
+            },
+        },
+    ]
+},
+```
 {% end %}
 
 **Example: blocks that have InnerBlocks**
@@ -89,28 +85,7 @@ transforms: {
 A block with InnerBlocks can also be transformed from and to another block with InnerBlocks.
 
 {% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'some/block-with-innerblocks' ],
-            transform: function( attributes, innerBlocks ) {
-                return createBlock(
-                    'some/other-block-with-innerblocks',
-                    attributes,
-                    innerBlocks
-                );
-            },
-        },
-    ],
-},
-```
-
 {% ESNext %}
-
 ```js
 transforms: {
     to: [
@@ -128,7 +103,24 @@ transforms: {
     ],
 },
 ```
-
+{% ES5 %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'some/block-with-innerblocks' ],
+            transform: function( attributes, innerBlocks ) {
+                return createBlock(
+                    'some/other-block-with-innerblocks',
+                    attributes,
+                    innerBlocks
+                );
+            },
+        },
+    ],
+},
+```
 {% end %}
 
 ### Enter
@@ -147,9 +139,19 @@ A transformation of type `enter` is an object that takes the following parameter
 To create a separator block when the user types the hypen three times and then hits the ENTER key we can use the following code:
 
 {% codetabs %}
-
+{% ESNext %}
+```js
+transforms = {
+    from: [
+        {
+            type: 'enter',
+            regExp: /^-{3,}$/,
+            transform: () => createBlock( 'core/separator' ),
+        },
+    ]
+}
+```
 {% ES5 %}
-
 ```js
 transforms = {
     from: [
@@ -163,21 +165,6 @@ transforms = {
     ]
 }
 ```
-
-{% ESNext %}
-
-```js
-transforms = {
-    from: [
-        {
-            type: 'enter',
-            regExp: /^-{3,}$/,
-            transform: () => createBlock( 'core/separator' ),
-        },
-    ]
-}
-```
-
 {% end %}
 
 ### Files
@@ -196,8 +183,32 @@ A transformation of type `files` is an object that takes the following parameter
 To create a File block when the user drops a file into the editor we can use the following code:
 
 {% codetabs %}
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'files',
+            isMatch: ( files ) => files.length === 1,
+            // By defining a lower priority than the default of 10,
+            // we make that the File block to be created as a fallback,
+            // if no other transform is found.
+            priority: 15,
+            transform: ( files ) => {
+                const file = files[ 0 ];
+                const blobURL = createBlobURL( file );
+                // File will be uploaded in componentDidMount()
+                return createBlock( 'core/file', {
+                    href: blobURL,
+                    fileName: file.name,
+                    textLinkHref: blobURL,
+                } );
+            },
+        },
+    ];
+}
+```
 {% ES5 %}
-
 ```js
 transforms: {
     from: [
@@ -224,34 +235,6 @@ transforms: {
     ];
 }
 ```
-
-{% ESNext %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'files',
-            isMatch: ( files ) => files.length === 1,
-            // By defining a lower priority than the default of 10,
-            // we make that the File block to be created as a fallback,
-            // if no other transform is found.
-            priority: 15,
-            transform: ( files ) => {
-                const file = files[ 0 ];
-                const blobURL = createBlobURL( file );
-                // File will be uploaded in componentDidMount()
-                return createBlock( 'core/file', {
-                    href: blobURL,
-                    fileName: file.name,
-                    textLinkHref: blobURL,
-                } );
-            },
-        },
-    ];
-}
-```
-
 {% end %}
 
 ### Prefix
@@ -270,26 +253,7 @@ A transformation of type `prefix` is an object that takes the following paramete
 If we want to create a custom block when the user types the question mark, we could use this code:
 
 {% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'prefix',
-            prefix: '?',
-            transform: function( content ) {
-                return createBlock( 'my-plugin/question', {
-                    content,
-                } );
-            },
-        },
-    ];
-}
-```
-
 {% ESNext %}
-
 ```js
 transforms: {
     from: [
@@ -305,7 +269,22 @@ transforms: {
     ];
 }
 ```
-
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'prefix',
+            prefix: '?',
+            transform: function( content ) {
+                return createBlock( 'my-plugin/question', {
+                    content,
+                } );
+            },
+        },
+    ];
+}
+```
 {% end %}
 
 ### Raw
@@ -326,8 +305,25 @@ A transformation of type `raw` is an object that takes the following parameters:
 If we want to create an Embed block when the user pastes some URL in the editor, we could use this code:
 
 {% codetabs %}
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'raw',
+            isMatch: ( node ) =>
+                node.nodeName === 'P' &&
+                /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
+            transform: ( node ) => {
+                return createBlock( 'core/embed', {
+                    url: node.textContent.trim(),
+                } );
+            },
+        },
+    ],
+}
+```
 {% ES5 %}
-
 ```js
 transforms: {
     from: [
@@ -346,27 +342,6 @@ transforms: {
     ],
 }
 ```
-
-{% ESNext %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'raw',
-            isMatch: ( node ) =>
-                node.nodeName === 'P' &&
-                /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
-            transform: ( node ) => {
-                return createBlock( 'core/embed', {
-                    url: node.textContent.trim(),
-                } );
-            },
-        },
-    ],
-}
-```
-
 {% end %}
 
 ### Shortcode
@@ -386,8 +361,41 @@ A transformation of type `shortcode` is an object that takes the following param
 An existing shortcode can be transformed into its block counterpart.
 
 {% codetabs %}
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            tag: 'caption',
+            attributes: {
+                url: {
+                    type: 'string',
+                    source: 'attribute',
+                    attribute: 'src',
+                    selector: 'img',
+                },
+                align: {
+                    type: 'string',
+                    // The shortcode function will extract
+                    // the shortcode atts into a value
+                    // to be sourced in the block's comment.
+                    shortcode: ( { named: { align = 'alignnone' } } ) => {
+                        return align.replace( 'align', '' );
+                    },
+                },
+            },
+            // Prevent the shortcode to be converted
+            // into this block when it doesn't
+            // have the proper ID.
+            isMatch( { named: { id } } ) {
+                return id === 'my-id';
+            },
+        },
+    ]
+},
+```
 {% ES5 %}
-
 ```js
 transforms: {
     from: [
@@ -422,41 +430,4 @@ transforms: {
     ]
 },
 ```
-
-{% ESNext %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'shortcode',
-            tag: 'caption',
-            attributes: {
-                url: {
-                    type: 'string',
-                    source: 'attribute',
-                    attribute: 'src',
-                    selector: 'img',
-                },
-                align: {
-                    type: 'string',
-                    // The shortcode function will extract
-                    // the shortcode atts into a value
-                    // to be sourced in the block's comment.
-                    shortcode: ( { named: { align = 'alignnone' } } ) => {
-                        return align.replace( 'align', '' );
-                    },
-                },
-            },
-            // Prevent the shortcode to be converted
-            // into this block when it doesn't
-            // have the proper ID.
-            isMatch( { named: { id } } ) {
-                return id === 'my-id';
-            },
-        },
-    ]
-},
-```
-
 {% end %}
