@@ -313,7 +313,15 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 	// TODO: Check for supports: _experimental* before adding any of this to a block.
 
+
 	if ( isset( $block['attrs'] ) ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+		$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
+
+		if ( sizeof( $supports ) === 0 ) {
+			return $block_content;
+		}
+
 		$colors     = gutenberg_experimental_build_css_colors( $block['attrs'] );
 		$typography = gutenberg_experimental_build_css_typography( $block['attrs'] );
 
