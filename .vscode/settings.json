@@ -7,8 +7,7 @@
     // Use 'prettier-eslint' instead of 'prettier'. Other settings will only be fallbacks in case they could not be inferred from eslint rules.
     "prettier.eslintIntegration": true,
     "search.exclude": {
-        "**/bundle/android": true,
-        "**/bundle/ios": true,
+        "**/bundle/": true,
         "**/gutenber/packages/**/build": true,
         "**/gutenber/packages/**/build-modules": true,
         "**/gutenber/packages/**/build-types": true,
