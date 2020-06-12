@@ -31,7 +31,12 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 		setWidth( Dimensions.get( 'window' ).width );
 	};
 
-	Dimensions.addEventListener( 'change', onDimensionsChange );
+	useEffect( () => {
+		Dimensions.addEventListener( 'change', onDimensionsChange );
+		return () => {
+			Dimensions.removeEventListener( 'change', onDimensionsChange );
+		};
+	}, [] );
 
 	useEffect( () => {
 		startAnimation();
