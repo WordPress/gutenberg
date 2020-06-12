@@ -1,3 +1,7 @@
+1.31.0
+------
+* [*] [iOS] Show content structure (word, paragraph, block, characters counts).
+
 1.30.0
 ------
 * [**] Adds editor support for theme defined colors and theme defined gradients on cover and button blocks.
