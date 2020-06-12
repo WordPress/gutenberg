@@ -311,9 +311,6 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 		return $block_content;
 	}
 
-	// TODO: Check for supports: _experimental* before adding any of this to a block.
-
-
 	if ( isset( $block['attrs'] ) ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 		$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
@@ -380,68 +377,72 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 		'inline_styles' => '',
 	);
 
-	// Text colors.
+	// Text Colors.
+	// Check support and attributes.
 	if( in_array( 'color', $supports ) ) {
 		$has_named_text_color  = array_key_exists( 'textColor', $attributes );
 		$has_custom_text_color = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
 		&& array_key_exists( 'text', $attributes['style']['color'] );
 	}
+	// Apply required generic class.
 	if ( $has_custom_text_color || $has_named_text_color ) {
-		// Add has-text-color class.
 		$color_settings['css_classes'][] = 'has-text-color';
 	}
+	// Apply color class or inline style.
 	if ( $has_named_text_color ) {
-		// Add the color class.
 		$color_settings['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
-		// Add the custom color inline style.
 		$color_settings['inline_styles'] .= sprintf( 'color: %s;', $attributes['style']['color']['text'] );
 	}
 
-	// Link colors.
+	// Link Colors.
+	// Check support and attributes.
 	if( in_array( 'link-color', $supports ) ) {
 		$has_link_color = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
 		&& array_key_exists( 'link', $attributes['style']['color'] );
 	}
+	// Apply required class and style.
 	if ( $has_link_color ) {
 		$color_settings['css_classes'][] = 'has-link-color';
-	}
-	// If link is a named color.
-	if ( strpos( $attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
-		// Get the name from the string and add proper styles.
-		$index_to_splice               = strrpos( $attributes['style']['color']['link'], '|' ) + 1;
-		$link_color_name               = substr( $attributes['style']['color']['link'], $index_to_splice );
-		$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
-	} else {
-		$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link: %s;', $attributes['style']['color']['link'] );
+		// If link is a named color.
+		if ( strpos( $attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
+			// Get the name from the string and add proper styles.
+			$index_to_splice               = strrpos( $attributes['style']['color']['link'], '|' ) + 1;
+			$link_color_name               = substr( $attributes['style']['color']['link'], $index_to_splice );
+			$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
+		} else {
+			$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link: %s;', $attributes['style']['color']['link'] );
+		}
 	}
 
-	// Background color & gradient.
+	// Background Color & Gradients.
+	// Check background color support and attributes.
 	if( in_array( 'background-color', $supports ) ) {
 		$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
 		$has_custom_background_color = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
 		&& array_key_exists( 'background', $attributes['style']['color'] );
 	}
+	// Check gradient support and attributes.
 	if ( in_array( 'background', $supports ) ) {
 		$has_named_gradient  = array_key_exists( 'gradient', $attributes );
 		$has_custom_gradient = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
 		&& array_key_exists( 'gradient', $attributes['style']['color'] );
 	}
+	// Apply shared classes and styles.
 	if ( $has_custom_background_color || $has_named_background_color || $has_named_gradient || $has_custom_gradient ) {
-		// Add has-background class.
 		$color_settings['css_classes'][] = 'has-background';
 	}
+	// Apply background color classes or styles.
 	if ( $has_named_background_color ) {
-		// Add the background-color class.
 		$color_settings['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
-		// Add the custom background-color inline style.
 		$color_settings['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
 	}
+	// Apply gradient classes or styles.
 	if ( $has_named_gradient ) {
 		$color_settings['css_classes'][] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
 	} elseif ( $has_custom_gradient ) {
@@ -465,25 +466,27 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 		'inline_styles' => '',
 	);
 
+	// Font Size
 	if( in_array( 'font-size', $supports ) ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
 		$has_custom_font_size = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'typography', $attributes['style'] )
 		&& array_key_exists( 'fontSize', $attributes['style']['typography'] );
 	}
+	// Apply required class or style.
 	if ( $has_named_font_size ) {
-		// Add the font size class.
 		$typography['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
 		$typography['inline_styles'] .= sprintf( 'font-size: %spx;', $attributes['style']['typography']['fontSize'] );
 	}
 
+	// Line Height.
 	if ( in_array( 'line-height', $supports ) ) {
 		$has_line_height = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'typography', $attributes['style'] )
 		&& array_key_exists( 'lineHeight', $attributes['style']['typography'] );
 	}
+	// Add the style (no classes for line-height).
 	if ( $has_line_height ) {
 		$typography['inline_styles'] .= sprintf( 'line-height: %s;', $attributes['style']['typography']['lineHeight'] );
 	}
