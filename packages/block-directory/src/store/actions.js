@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { apiFetch, select } from '@wordpress/data-controls';
+import { apiFetch, dispatch, select } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -92,6 +92,34 @@ export function* installBlockType( block ) {
 }
 
 /**
+ * Action triggered to uninstall a block plugin.
+ *
+ * @param {Object} block The blockType object.
+ */
+export function* uninstallBlockType( block ) {
+	const { id } = block;
+	try {
+		const response = yield apiFetch( {
+			path: '__experimental/block-directory/uninstall',
+			data: {
+				slug: id,
+			},
+			method: 'DELETE',
+		} );
+		if ( response !== true ) {
+			throw new Error( __( 'Unable to uninstall this block.' ) );
+		}
+		yield removeInstalledBlockType( block );
+	} catch ( error ) {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			error.message || __( 'An error occurred.' )
+		);
+	}
+}
+
+/**
  * Returns an action object used to add a newly installed block type.
  *
  * @param {Object} item The block item with the block id and name.
@@ -101,6 +129,20 @@ export function* installBlockType( block ) {
 export function addInstalledBlockType( item ) {
 	return {
 		type: 'ADD_INSTALLED_BLOCK_TYPE',
+		item,
+	};
+}
+
+/**
+ * Returns an action object used to remove a newly installed block type.
+ *
+ * @param {string} item The block item with the block id and name.
+ *
+ * @return {Object} Action object.
+ */
+export function removeInstalledBlockType( item ) {
+	return {
+		type: 'REMOVE_INSTALLED_BLOCK_TYPE',
 		item,
 	};
 }

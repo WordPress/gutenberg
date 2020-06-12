@@ -105,7 +105,7 @@ git push origin release/x.x
 
 1. Run `git fetch --tags`.
 2. Check out the tag for this release, you should run `git checkout vx.x.0-rc.1`.
-3. Run `./bin/build-plugin-zip.sh` from the root of project. This packages a zip file with a release build of `gutenberg.zip`.
+3. Run `npm run build:plugin-zip` from the root of project. This packages a zip file with a release build of `gutenberg.zip`.
 
 ##### Publish the Release on GitHub
 
@@ -171,7 +171,7 @@ Creating a release involves:
 
 1. Run `git fetch --tags`.
 2. Check out the tag for this release, you should run `git checkout vx.x.0`.
-3. Run `./bin/build-plugin-zip.sh` from the root of project. This packages a zip file with a release build of `gutenberg.zip`.
+3. Run `npm run build:plugin-zip` from the root of project. This packages a zip file with a release build of `gutenberg.zip`.
 
 ##### Publish the Release on GitHub
 

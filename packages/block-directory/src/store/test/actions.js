@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { installBlockType } from '../actions';
+import { installBlockType, uninstallBlockType } from '../actions';
 
 describe( 'actions', () => {
 	const item = {
@@ -122,6 +122,50 @@ describe( 'actions', () => {
 
 			expect( generator.next() ).toEqual( {
 				value: false,
+				done: true,
+			} );
+		} );
+	} );
+
+	describe( 'uninstallBlockType', () => {
+		it( 'should uninstall a block successfully', () => {
+			const generator = uninstallBlockType( item );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+			} );
+
+			expect( generator.next( true ).value ).toEqual( {
+				type: 'REMOVE_INSTALLED_BLOCK_TYPE',
+				item,
+			} );
+
+			expect( generator.next() ).toEqual( {
+				value: undefined,
+				done: true,
+			} );
+		} );
+
+		it( "should set a global notice if the plugin can't uninstall", () => {
+			const generator = uninstallBlockType( item );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+			} );
+
+			const apiError = {
+				code: 'could_not_remove_plugin',
+				message: 'Could not fully remove the plugin .',
+				data: null,
+			};
+			expect( generator.next( apiError ).value ).toMatchObject( {
+				type: 'DISPATCH',
+				actionName: 'createErrorNotice',
+				storeKey: 'core/notices',
+			} );
+
+			expect( generator.next() ).toEqual( {
+				value: undefined,
 				done: true,
 			} );
 		} );
