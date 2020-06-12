@@ -49,12 +49,11 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 			toValue: visible ? 1 : 0,
 			duration: visible ? 300 : 150,
 			useNativeDriver: true,
-			delay: visible ? 500 : 0,
 			easing: Easing.out( Easing.quad ),
 		} ).start( () => {
 			if ( visible && onNoticeHidden ) {
 				timer.current = setTimeout( () => {
-					onNoticeHidden( id );
+					onHide();
 				}, 3000 );
 			}
 
@@ -68,12 +67,11 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 		<>
 			<Animated.View
 				style={ {
-					opacity: animationValue,
 					transform: [
 						{
 							translateY: animationValue.interpolate( {
 								inputRange: [ 0, 1 ],
-								outputRange: [ visible ? 0 : -30, 0 ],
+								outputRange: [ -30, 0 ],
 							} ),
 						},
 					],
