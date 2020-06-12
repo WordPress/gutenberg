@@ -291,7 +291,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"core"`     | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
 | `"plugins"`  | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                             |
 | `"themes"`   | `string[]`     | `[]`                                   | A list of themes to install in the environment. The first theme in the list will be activated.                            |
-| `"port"`     | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
+| `"port"`     | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'. |
 | `"config"`   | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                               |
 | `"mappings"` | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                            |
 
@@ -308,7 +308,7 @@ Several types of strings can be passed into the `core`, `plugins`, `themes`, and
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
 
-Additionally, the key `env` is available to override any of the above options on an individual-environment basis. For example, take following `.wp-env.json` file:
+Additionally, the key `env` is available to override any of the above options on an individual-environment basis. For example, take the following `.wp-env.json` file:
 
 ```json
 {
@@ -339,7 +339,7 @@ This gives you a lot of power to change the options appliciable to each environm
 
 ## .wp-env.override.json
 
-Any fields here will take precedence over .wp-env.json. This file is useful, when ignored from version control, to persist local development overrides. Note that options like `plugins` and `themes` are not merged. As a result, if you set `plugins` in your override file, this will override all of the plugins listed in the base-level config. The only keys whch are merged are `config` and `mappings`. This means that you can set your own wp-config values without loosing any of the default values.
+Any fields here will take precedence over .wp-env.json. This file is useful when ignored from version control, to persist local development overrides. Note that options like `plugins` and `themes` are not merged. As a result, if you set `plugins` in your override file, this will override all of the plugins listed in the base-level config. The only keys which are merged are `config` and `mappings`. This means that you can set your own wp-config values without losing any of the default values.
 
 ## Default wp-config values.
 
