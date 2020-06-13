@@ -1,0 +1,36 @@
+{
+	"name": "@wordpress/block-collab",
+	"version": "1.0.0-prerelease",
+	"description": "Make the block editor real-time collaborative.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"editor",
+		"blocks",
+		"collaborative"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-collab/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/block-collab"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "^7.9.2",
+		"@wordpress/element": "file:../element",
+		"lodash": "^4.17.15",
+		"y-webrtc": "^10.1.5",
+		"yjs": "^13.2.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
