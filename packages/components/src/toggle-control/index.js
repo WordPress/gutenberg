@@ -30,7 +30,14 @@ class ToggleControl extends Component {
 	}
 
 	render() {
-		const { label, checked, help, instanceId, className } = this.props;
+		const {
+			label,
+			checked,
+			help,
+			instanceId,
+			className,
+			disabled,
+		} = this.props;
 		const id = `inspector-toggle-control-${ instanceId }`;
 
 		let describedBy, helpLabel;
@@ -45,6 +52,9 @@ class ToggleControl extends Component {
 				help={ helpLabel }
 				className={ classnames(
 					'components-toggle-control',
+					{
+						'is-disabled': disabled,
+					},
 					className
 				) }
 			>
@@ -53,6 +63,7 @@ class ToggleControl extends Component {
 					checked={ checked }
 					onChange={ this.onChange }
 					aria-describedby={ describedBy }
+					disabled={ disabled }
 				/>
 				<label
 					htmlFor={ id }

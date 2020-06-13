@@ -1,14 +1,26 @@
-.components-toggle-control .components-base-control__field {
-	display: flex;
-	margin-bottom: $grid-unit-05 * 3;
-	line-height: initial;
-	align-items: center;
-
-	.components-form-toggle {
-		margin-right: $grid-unit-20;
+.components-toggle-control {
+	&.is-disabled {
+		.components-form-toggle__thumb,
+		.components-form-toggle .components-form-toggle__track {
+			background: $light-gray-500;
+			border-color: $light-gray-900;
+		}
+		svg {
+			color: $light-gray-900;
+		}
 	}
+	.components-base-control__field {
+		display: flex;
+		margin-bottom: $grid-unit-05 * 3;
+		line-height: initial;
+		align-items: center;
 
-	.components-toggle-control__label {
-		display: block;
+		.components-form-toggle {
+			margin-right: $grid-unit-20;
+		}
+
+		.components-toggle-control__label {
+			display: block;
+		}
 	}
 }
