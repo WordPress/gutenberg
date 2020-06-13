@@ -13,6 +13,7 @@ import {
 	useRef,
 	useState,
 	useMemo,
+	useLayoutEffect,
 } from '@wordpress/element';
 import {
 	BACKSPACE,
@@ -1072,7 +1073,7 @@ function RichText( {
 		}
 	}, Object.values( prepareProps ) );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		applyRecord( record.current, { domOnly: true } );
 
 		didMount.current = true;
