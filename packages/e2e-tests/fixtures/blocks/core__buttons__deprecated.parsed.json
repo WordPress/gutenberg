@@ -1,7 +1,9 @@
 [
     {
         "blockName": "core/buttons",
-        "attrs": {},
+        "attrs": {
+            "align": "center"
+        },
         "innerBlocks": [
             {
                 "blockName": "core/button",
@@ -22,9 +24,9 @@
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-buttons\">\n\t\n\n\t\n</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-buttons aligncenter\">\n\t\n\n\t\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-buttons\">\n\t",
+            "\n<div class=\"wp-block-buttons aligncenter\">\n\t",
             null,
             "\n\n\t",
             null,

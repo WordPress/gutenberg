@@ -25,13 +25,11 @@ const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
 function ButtonsEdit( {
 	isSelected,
-	attributes,
 	onDelete,
 	onAddNextButton,
 	shouldDelete,
 	isInnerButtonSelected,
 } ) {
-	const { align } = attributes;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
@@ -69,7 +67,6 @@ function ButtonsEdit( {
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}
 				__experimentalMoverDirection="horizontal"
-				horizontalAlignment={ align }
 				onDeleteBlock={ shouldDelete ? onDelete : undefined }
 				onAddBlock={ onAddNextButton }
 				parentWidth={ maxWidth }

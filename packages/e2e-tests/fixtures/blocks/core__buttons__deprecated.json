@@ -3,7 +3,9 @@
         "clientId": "_clientId_0",
         "name": "core/buttons",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "className": "aligncenter"
+        },
         "innerBlocks": [
             {
                 "clientId": "_clientId_0",
@@ -26,6 +28,6 @@
                 "originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">second</a></div>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-buttons\">\n\t\n\n\t\n</div>"
+        "originalContent": "<div class=\"wp-block-buttons aligncenter\">\n\t\n\n\t\n</div>"
     }
 ]
