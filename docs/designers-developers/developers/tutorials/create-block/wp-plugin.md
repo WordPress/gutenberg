@@ -4,9 +4,11 @@ A new block in the WordPress block editor is added by creating a WordPress plugi
 
 ## WordPress Plugin
 
-A WordPress plugin is a set of files in a directory within the sites `wp-content/plugins` directory. For this example, we will use the `create-block` package to generate the necessary plugin files.
+A WordPress plugin is a set of files in a directory within the site's `wp-content/plugins` directory. For this example, we will use the `create-block` package to generate the necessary plugin files.
 
-From the command-line, change to your WordPress installs plugin directory and run:
+If you do not plan to use `wp-env` change to your local WordPress plugin directory; if you do plan to use `wp-env` start from any directory for your project.
+
+Run the following command to generate plugin files:
 
 ```
 npx @wordpress/create-block gutenpride
@@ -30,7 +32,15 @@ The script created a PHP file `gutenpride.php` that is the main plugin file. At 
  */
 ```
 
-This is all that is needed to stub out a plugin, it won't do anything. However, it is good to get the basics in place and build up from there. The plugin should be listed on the Plugins admin page and can be activated.
+The generated plugin should now be listed on the Plugins admin page in your WordPress install. If you are using `wp-env`, see [Development Enviornment setup](devenv.md), then you should now run:
+
+```
+wp-env start
+```
+
+This will start your local WordPress site and use the current directory as your plugin, go to https://localhost:8888/wp-admin/ to confirm.
+
+To login, the default username is "admin" and password is "password", no quotes.
 
 For more on creating a WordPress plugin see [Plugin Basics](https://developer.wordpress.org/plugins/plugin-basics/), and [Plugin Header requirements](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/) for explanation and additional fields you can include in your plugin
 header.
