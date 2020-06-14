@@ -1,5 +1,5 @@
 
-# ES6 Syntax
+# ESNext Syntax
 
 A brief aside to discuss JavaScript.
 

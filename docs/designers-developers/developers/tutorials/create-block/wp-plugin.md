@@ -1,8 +1,8 @@
-# Create a Block: WordPress Plugin
+# WordPress Plugin
 
 A new block in the WordPress block editor is added by creating a WordPress plugin, installing, and activating the plugin. This page covers the details of a WordPress plugin if you are not already familiar.
 
-## WordPress Plugin
+## Plugin Details
 
 A WordPress plugin is a set of files in a directory within the site's `wp-content/plugins` directory. For this example, we will use the `create-block` package to generate the necessary plugin files.
 
@@ -137,5 +137,3 @@ For more info, see the build section of the [Getting Started with JavaScript tut
 ## Summary
 
 Hopefully, at this point, you have your plugin created and activated. We have the package.json with the `@wordpress/scripts` dependency, that defines the build and start scripts. The basic block is in place and can be added to the editor.
-
-The next lessons will explain the structure of a block and then how we can do something a little more interesting with it.
