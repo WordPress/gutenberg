@@ -43,9 +43,9 @@ Edit the style.css to the following, note the classname given to a block is pref
 
 With that updated, you can reload the post, for CSS changes you don't need to rebuild, so refresh and if you are using a browser that supports color fonts (Firefox) then you will see it styled.
 
-## Use Sass for Style
+## Use Sass for Style (optional)
 
-The wp-scripts package does provide support for using the Sass/Scss languages to generate CSS. See the [Sass language site](https://sass-lang.com/) to learn more.
+The wp-scripts package does provide support for using the Sass/Scss languages, to generate CSS, added in @wordpress/scripts v9.1.0. See the [Sass language site](https://sass-lang.com/) to learn more about Sass.
 
 To use Sass, you need to import a `editor.scss` or `style.scss` in the `index.js` JavaScript file and it will build and output the generated file in the build directory. Note: You need to update the enqueing functions in PHP to load from the correct location.
 
