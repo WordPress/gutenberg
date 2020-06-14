@@ -118,7 +118,7 @@ export class PostPublishButton extends Component {
 			( ! isPublishable && ! forceIsDirty );
 
 		let publishStatus;
-		if ( ! hasPublishAction ) {
+		if ( ! isPublished && ! isBeingScheduled && ! hasPublishAction ) {
 			publishStatus = 'pending';
 		} else if ( visibility === 'private' ) {
 			publishStatus = 'private';

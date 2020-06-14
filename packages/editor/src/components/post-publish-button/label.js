@@ -27,14 +27,14 @@ export function PublishButtonLabel( {
 		return __( 'Scheduling…' );
 	}
 
-	if ( ! hasPublishAction ) {
-		return hasNonPostEntityChanges
-			? __( 'Submit for Review…' )
-			: __( 'Submit for Review' );
-	} else if ( isPublished ) {
+	if ( isPublished ) {
 		return hasNonPostEntityChanges ? __( 'Update…' ) : __( 'Update' );
 	} else if ( isBeingScheduled ) {
 		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
+	} else if ( ! hasPublishAction ) {
+		return hasNonPostEntityChanges
+			? __( 'Submit for Review…' )
+			: __( 'Submit for Review' );
 	}
 
 	return __( 'Publish' );
