@@ -48,7 +48,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		'{{namespace}}-{{slug}}-block-editor',
 		plugins_url( $editor_css, __FILE__ ),
 		array(),
-		filemtime( "$dir/$editor_css" )
+		$script_asset['version']
 	);
 
 	$style_css = 'build/style.css';
@@ -56,7 +56,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		'{{namespace}}-{{slug}}-block',
 		plugins_url( $style_css, __FILE__ ),
 		array(),
-		filemtime( "$dir/$style_css" )
+		$script_asset['version']
 	);
 
 	register_block_type( '{{namespace}}/{{slug}}', array(
