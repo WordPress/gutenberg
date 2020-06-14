@@ -36,23 +36,31 @@ The WordPress [wp-env package](https://www.npmjs.com/package/@wordpress/env) let
 The `wp-env` package requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
 
-After confirming that the prerequisites are installed, you can install wp-env globally from the command-line running:
+After confirming that the prerequisites are installed, install `wp-env` globally from the command-line using:
 
 ```bash
 npm -g install @wordpress/env
 ```
 
+This will be used in the next [Plugin step](wp-plugin.ms). To confirm it is installed and available, run:
+
+```
+wp-env --version
+> 1.4.0
+```
+
 ### Alternatives
 
-If you are just starting out, using [Local by Flywheel](https://localbyflywheel.com/) might be easier, since it does not require the additional Docker install and setup. Local is a single application you download and install and tends to be much simpler than alternatives. You will need to know where the plugin directory is installed. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`
+A block is just a plugin, so any WordPress environment can be used for development. A couple of alternatives that might be easier, since they do not require Docker install and setup.
 
-You can use [WampServer](http://www.wampserver.com/en/) or
+* [Local by Flywheel](https://localbyflywheel.com/) - Local is a single application you download and install. You will need to know where the plugin directory is located after install. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`
+
+* [WampServer](http://www.wampserver.com/en/) or
 [MAMP](https://www.mamp.info/) environments, both are quite similar to
 Local, combining a web server, PHP, and database. However these tools
-are not WordPress specific, so if you are not already using them, you might as
-well use Local.
+are not WordPress specific, so if you are not already using them, Local might be an easier option
 
-You can also work remotely on a server, this might be easy to setup the server since most hosts have a WordPress already installed. However, this may require development time since it may require syncing files, or editing the directly on the server.
+* Remote server - you could work on remote server that is easy to setup, since most hosts have a standard WordPress install. However, this may require additonal development time to sync to the server.
 
 The important part is having a WordPress site installed, and know where and how to update files in the plugins directory.
 
