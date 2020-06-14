@@ -7,7 +7,7 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -20,6 +20,7 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useBlockCollab } from '@wordpress/block-collab';
 
 /**
  * Internal dependencies
@@ -276,7 +277,20 @@ export default compose( [
 			isPostTitleSelected: isPostTitleSelected && isPostTitleSelected(),
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
+	createHigherOrderComponent(
+		( WrappedComponent ) => ( props ) => (
+			<WrappedComponent
+				{ ...props }
+				{ ...( props.settings.__experimentalCollaborativeEditing &&
+					useBlockCollab(
+						props.post.id,
+						props.post.collaborative_editing_secret
+					) ) }
+			/>
+		),
+		'withCollaborativeEditingExperiment'
+	),
+	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			setupEditor,
 			updatePostLock,
@@ -292,9 +306,13 @@ export default compose( [
 			setupEditor,
 			updatePostLock,
 			createWarningNotice,
-			resetEditorBlocks,
+			resetEditorBlocks( blocks, options ) {
+				if ( ownProps.setBlocks ) ownProps.setBlocks( blocks );
+				resetEditorBlocks( blocks, options );
+			},
 			updateEditorSettings,
 			resetEditorBlocksWithoutUndoLevel( blocks, options ) {
+				if ( ownProps.setBlocks ) ownProps.setBlocks( blocks );
 				resetEditorBlocks( blocks, {
 					...options,
 					__unstableShouldCreateUndoLevel: false,

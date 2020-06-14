@@ -29,6 +29,7 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
+		"@wordpress/block-collab": "file:../block-collab",
 		"@wordpress/block-directory": "file:../block-directory",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
