@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find, isNil, pickBy, startsWith } from 'lodash';
+import { find, isNil, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,7 +42,7 @@ import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
-import withFormatTypes from './with-format-types';
+import { useFormatTypes } from './use-format-types';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
@@ -137,46 +137,53 @@ function fixPlaceholderSelection( defaultView ) {
 	selection.collapseToStart();
 }
 
-function RichText( {
-	tagName: TagName = 'div',
-	value = '',
-	selectionStart,
-	selectionEnd,
-	children,
-	allowedFormats,
-	withoutInteractiveFormatting,
-	formatTypes,
-	style,
-	className,
-	placeholder,
-	disabled,
-	preserveWhiteSpace,
-	onPaste,
-	format = 'string',
-	onDelete,
-	onEnter,
-	onSelectionChange,
-	onChange,
-	unstableOnFocus: onFocus,
-	setFocusedElement,
-	instanceId,
-	__unstableMultilineTag: multilineTag,
-	__unstableMultilineRootTag: multilineRootTag,
-	__unstableDisableFormats: disableFormats,
-	__unstableDidAutomaticChange: didAutomaticChange,
-	__unstableInputRule: inputRule,
-	__unstableMarkAutomaticChange: markAutomaticChange,
-	__unstableAllowPrefixTransformations: allowPrefixTransformations,
-	__unstableUndo: undo,
-	__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
-	__unstableOnEnterFormattedText: onEnterFormattedText,
-	__unstableOnExitFormattedText: onExitFormattedText,
-	__unstableOnCreateUndoLevel: onCreateUndoLevel,
-	__unstableIsSelected: isSelected,
-	forwardedRef: ref,
-	...remainingProps
-} ) {
+function RichText(
+	{
+		tagName: TagName = 'div',
+		value = '',
+		selectionStart,
+		selectionEnd,
+		children,
+		allowedFormats,
+		withoutInteractiveFormatting,
+		style,
+		className,
+		placeholder,
+		disabled,
+		preserveWhiteSpace,
+		onPaste,
+		format = 'string',
+		onDelete,
+		onEnter,
+		onSelectionChange,
+		onChange,
+		unstableOnFocus: onFocus,
+		setFocusedElement,
+		instanceId,
+		clientId,
+		identifier,
+		__unstableMultilineTag: multilineTag,
+		__unstableMultilineRootTag: multilineRootTag,
+		__unstableDisableFormats: disableFormats,
+		__unstableDidAutomaticChange: didAutomaticChange,
+		__unstableInputRule: inputRule,
+		__unstableMarkAutomaticChange: markAutomaticChange,
+		__unstableAllowPrefixTransformations: allowPrefixTransformations,
+		__unstableUndo: undo,
+		__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
+		__unstableOnEnterFormattedText: onEnterFormattedText,
+		__unstableOnExitFormattedText: onExitFormattedText,
+		__unstableOnCreateUndoLevel: onCreateUndoLevel,
+		__unstableIsSelected: isSelected,
+		...remainingProps
+	},
+	ref
+) {
 	const [ activeFormats = [], setActiveFormats ] = useState();
+	const { formatTypes, dependencies, functions } = useFormatTypes( {
+		clientId,
+		identifier,
+	} );
 
 	// For backward compatibility, fall back to tagName if it's a string.
 	// tagName can now be a component for light blocks.
@@ -213,7 +220,7 @@ function RichText( {
 		}
 
 		const prepare = createPrepareEditableTree(
-			remainingProps,
+			functions,
 			'format_value_functions'
 		);
 
@@ -307,7 +314,7 @@ function RichText( {
 			multilineWrapperTags:
 				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			prepareEditableTree: createPrepareEditableTree(
-				remainingProps,
+				functions,
 				'format_prepare_functions'
 			),
 			__unstableDomOnly: domOnly,
@@ -913,7 +920,7 @@ function RichText( {
 		applyRecord( newRecord );
 
 		const { start, end, activeFormats: newActiveFormats = [] } = newRecord;
-		const changeHandlers = pickBy( remainingProps, ( v, key ) =>
+		const changeHandlers = pickBy( functions, ( v, key ) =>
 			key.startsWith( 'format_on_change_functions_' )
 		);
 
@@ -1075,15 +1082,11 @@ function RichText( {
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
-	const prefix = 'format_prepare_props_';
-	const predicate = ( v, key ) => key.startsWith( prefix );
-	const prepareProps = pickBy( remainingProps, predicate );
-
 	useEffect( () => {
 		if ( didMount.current ) {
 			applyFromProps();
 		}
-	}, Object.values( prepareProps ) );
+	}, dependencies );
 
 	useLayoutEffect( () => {
 		applyRecord( record.current, { domOnly: true } );
@@ -1105,16 +1108,12 @@ function RichText( {
 		applyRecord( record.current );
 	}
 
-	const ariaProps = pickBy( remainingProps, ( v, key ) =>
-		startsWith( key, 'aria-' )
-	);
-
 	const editableProps = {
 		// Overridable props.
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		...ariaProps,
+		...remainingProps,
 		ref,
 		style: style ? { ...style, whiteSpace } : defaultStyle,
 		className: classnames( 'rich-text', className ),
@@ -1170,12 +1169,8 @@ function RichText( {
 	);
 }
 
-const RichTextWrapper = withFormatTypes( RichText );
-
 /**
  * Renders a rich content input, providing users with the option to format the
  * content.
  */
-export default forwardRef( ( props, ref ) => {
-	return <RichTextWrapper { ...props } forwardedRef={ ref } />;
-} );
+export default forwardRef( RichText );
