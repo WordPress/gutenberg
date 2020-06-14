@@ -65,7 +65,7 @@ const config = {
 		splitChunks: {
 			cacheGroups: {
 				style: {
-					test: /style\.(sc|sa|c)ss$/,
+					test: /[\\/]style\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
 					automaticNameDelimiter: '-',
