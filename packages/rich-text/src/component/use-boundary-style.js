@@ -7,7 +7,7 @@ import { useEffect } from '@wordpress/element';
  * Calculates and renders the format boundary style when the active formats
  * change.
  */
-export function BoundaryStyle( { activeFormats, forwardedRef } ) {
+export function useBoundaryStyle( { activeFormats, ref } ) {
 	useEffect( () => {
 		// There's no need to recalculate the boundary styles if no formats are
 		// active, because no boundary styles will be visible.
@@ -16,7 +16,7 @@ export function BoundaryStyle( { activeFormats, forwardedRef } ) {
 		}
 
 		const boundarySelector = '*[data-rich-text-format-boundary]';
-		const element = forwardedRef.current.querySelector( boundarySelector );
+		const element = ref.current.querySelector( boundarySelector );
 
 		if ( ! element ) {
 			return;
@@ -45,5 +45,4 @@ export function BoundaryStyle( { activeFormats, forwardedRef } ) {
 			globalStyle.innerHTML = style;
 		}
 	}, [ activeFormats ] );
-	return null;
 }
