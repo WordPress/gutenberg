@@ -43,8 +43,8 @@ import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
 import withFormatTypes from './with-format-types';
-import { useBoundaryStyle } from './boundary-style';
-import { useInlineWarning } from './inline-warning';
+import { useBoundaryStyle } from './use-boundary-style';
+import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
@@ -316,7 +316,7 @@ function RichText( {
 	 *
 	 * @param {ClipboardEvent} event The paste event.
 	 */
-	function _onPaste( event ) {
+	function handlePaste( event ) {
 		if ( ! isSelected ) {
 			event.preventDefault();
 			return;
@@ -357,7 +357,7 @@ function RichText( {
 		window.console.log( 'Received plain text:\n\n', plainText );
 
 		if ( disableFormats ) {
-			_onChange( insert( record.current, plainText ) );
+			handleChange( insert( record.current, plainText ) );
 			return;
 		}
 
@@ -377,7 +377,7 @@ function RichText( {
 		);
 
 		if ( transformed !== record.current ) {
-			_onChange( transformed );
+			handleChange( transformed );
 			return;
 		}
 
@@ -404,7 +404,7 @@ function RichText( {
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
-				onChange: _onChange,
+				onChange: handleChange,
 				html,
 				plainText,
 				files,
@@ -448,7 +448,7 @@ function RichText( {
 
 		// Always handle full content deletion ourselves.
 		if ( start === 0 && end !== 0 && end === text.length ) {
-			_onChange( remove( currentValue ) );
+			handleChange( remove( currentValue ) );
 			event.preventDefault();
 			return;
 		}
@@ -469,7 +469,7 @@ function RichText( {
 			}
 
 			if ( newValue ) {
-				_onChange( newValue );
+				handleChange( newValue );
 				event.preventDefault();
 				return;
 			}
@@ -508,7 +508,7 @@ function RichText( {
 
 		onEnter( {
 			value: removeEditorOnlyFormats( createRecord() ),
-			onChange: _onChange,
+			onChange: handleChange,
 			shiftKey: event.shiftKey,
 		} );
 	}
@@ -547,7 +547,7 @@ function RichText( {
 			return;
 		}
 
-		_onChange(
+		handleChange(
 			indentListItems( currentValue, { type: multilineRootTag } )
 		);
 		event.preventDefault();
@@ -680,7 +680,7 @@ function RichText( {
 		setActiveFormats( newActiveFormats );
 	}
 
-	function onKeyDown( event ) {
+	function handleKeyDown( event ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
@@ -711,7 +711,7 @@ function RichText( {
 	 *
 	 * @param {WPSyntheticEvent} event Synthetic input event.
 	 */
-	function onInput( event ) {
+	function handleInput( event ) {
 		// Do not trigger a change if characters are being composed. Browsers
 		// will usually emit a final `input` event when the characters are
 		// composed.
@@ -753,7 +753,7 @@ function RichText( {
 			formats: oldActiveFormats,
 		} );
 
-		_onChange( change, { withoutHistory: true } );
+		handleChange( change, { withoutHistory: true } );
 
 		// Create an undo level when input stops for over a second.
 		getWin().clearTimeout( timeout.current );
@@ -781,26 +781,29 @@ function RichText( {
 
 		if ( transformed !== change ) {
 			createUndoLevel();
-			_onChange( { ...transformed, activeFormats: oldActiveFormats } );
+			handleChange( { ...transformed, activeFormats: oldActiveFormats } );
 			markAutomaticChange();
 		}
 	}
 
-	function onCompositionStart() {
+	function handleCompositionStart() {
 		isComposing.current = true;
 		// Do not update the selection when characters are being composed as
 		// this rerenders the component and might distroy internal browser
 		// editing state.
-		getDoc().removeEventListener( 'selectionchange', _onSelectionChange );
+		getDoc().removeEventListener(
+			'selectionchange',
+			handleSelectionChange
+		);
 	}
 
-	function onCompositionEnd() {
+	function handleCompositionEnd() {
 		isComposing.current = false;
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
-		onInput( { inputType: 'insertText' } );
+		handleInput( { inputType: 'insertText' } );
 		// Tracking selection changes can be resumed.
-		getDoc().addEventListener( 'selectionchange', _onSelectionChange );
+		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
 	}
 
 	const didMount = useRef( false );
@@ -812,7 +815,7 @@ function RichText( {
 	 *
 	 * @param {Event|WPSyntheticEvent|DOMHighResTimeStamp} event
 	 */
-	function _onSelectionChange( event ) {
+	function handleSelectionChange( event ) {
 		if ( ! ref.current ) {
 			return;
 		}
@@ -841,7 +844,7 @@ function RichText( {
 		// Fallback mechanism for IE11, which doesn't support the input event.
 		// Any input results in a selection change.
 		if ( text !== oldRecord.text ) {
-			onInput();
+			handleInput();
 			return;
 		}
 
@@ -895,7 +898,7 @@ function RichText( {
 	 * @param {boolean} $2.withoutHistory If true, no undo level will be
 	 *                                    created.
 	 */
-	function _onChange( newRecord, { withoutHistory } = {} ) {
+	function handleChange( newRecord, { withoutHistory } = {} ) {
 		if ( disableFormats ) {
 			newRecord.formats = Array( newRecord.text.length );
 			newRecord.replacements = Array( newRecord.text.length );
@@ -932,7 +935,7 @@ function RichText( {
 	 *
 	 * @param {WPSyntheticEvent} event Synthetic mousedown or touchstart event.
 	 */
-	function onPointerDown( event ) {
+	function handlePointerDown( event ) {
 		const { target } = event;
 
 		// If the child element has no text content, it must be an object.
@@ -971,7 +974,7 @@ function RichText( {
 	 *
 	 * @private
 	 */
-	function _onFocus() {
+	function handleFocus() {
 		if ( onFocus ) {
 			onFocus();
 		}
@@ -1007,9 +1010,9 @@ function RichText( {
 		// frame. The event listener for selection changes may be added too late
 		// at this point, but this focus event is still too early to calculate
 		// the selection.
-		rafId.current = getWin().requestAnimationFrame( _onSelectionChange );
+		rafId.current = getWin().requestAnimationFrame( handleSelectionChange );
 
-		getDoc().addEventListener( 'selectionchange', _onSelectionChange );
+		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
 
 		if ( setFocusedElement ) {
 			deprecated( 'wp.blockEditor.RichText setFocusedElement prop', {
@@ -1019,8 +1022,11 @@ function RichText( {
 		}
 	}
 
-	function onBlur() {
-		getDoc().removeEventListener( 'selectionchange', _onSelectionChange );
+	function handleBlur() {
+		getDoc().removeEventListener(
+			'selectionchange',
+			handleSelectionChange
+		);
 	}
 
 	function applyFromProps() {
@@ -1081,7 +1087,7 @@ function RichText( {
 		return () => {
 			getDoc().removeEventListener(
 				'selectionchange',
-				_onSelectionChange
+				handleSelectionChange
 			);
 			getWin().cancelAnimationFrame( rafId.current );
 			getWin().clearTimeout( timeout.current );
@@ -1106,22 +1112,22 @@ function RichText( {
 		ref,
 		style: style ? { ...style, whiteSpace } : defaultStyle,
 		className: classnames( 'rich-text', className ),
-		onPaste: _onPaste,
-		onInput,
-		onCompositionStart,
-		onCompositionEnd,
-		onKeyDown,
-		onFocus: _onFocus,
-		onBlur,
-		onMouseDown: onPointerDown,
-		onTouchStart: onPointerDown,
+		onPaste: handlePaste,
+		onInput: handleInput,
+		onCompositionStart: handleCompositionStart,
+		onCompositionEnd: handleCompositionEnd,
+		onKeyDown: handleKeyDown,
+		onFocus: handleFocus,
+		onBlur: handleBlur,
+		onMouseDown: handlePointerDown,
+		onTouchStart: handlePointerDown,
 		// Selection updates must be done at these events as they
 		// happen before the `selectionchange` event. In some cases,
 		// the `selectionchange` event may not even fire, for
 		// example when the window receives focus again on click.
-		onKeyUp: _onSelectionChange,
-		onMouseUp: _onSelectionChange,
-		onTouchEnd: _onSelectionChange,
+		onKeyUp: handleSelectionChange,
+		onMouseUp: handleSelectionChange,
+		onTouchEnd: handleSelectionChange,
 		// Do not set the attribute if disabled.
 		contentEditable: disabled ? undefined : true,
 		suppressContentEditableWarning: ! disabled,
@@ -1139,7 +1145,7 @@ function RichText( {
 						withoutInteractiveFormatting
 					}
 					value={ record.current }
-					onChange={ _onChange }
+					onChange={ handleChange }
 					onFocus={ focus }
 					formatTypes={ formatTypes }
 				/>
@@ -1148,7 +1154,7 @@ function RichText( {
 				children( {
 					isSelected,
 					value: record.current,
-					onChange: _onChange,
+					onChange: handleChange,
 					onFocus: focus,
 					editableProps,
 					editableTagName: TagName,
