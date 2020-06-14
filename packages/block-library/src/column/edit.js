@@ -45,7 +45,7 @@ function ColumnEdit( {
 	const updateAlignment = ( value ) => {
 		// Update own alignment.
 		setAttributes( { verticalAlignment: value } );
-		// Reset Parent Columns Block
+		// Reset parent Columns block.
 		updateBlockAttributes( rootClientId, {
 			verticalAlignment: null,
 		} );
