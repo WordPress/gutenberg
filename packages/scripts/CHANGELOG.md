@@ -16,6 +16,7 @@
 ### Bug fix
 
 -   Update webpack configuration to not run the Sass loader on CSS files. It's now limited to .scss and .sass files.
+-   During rebuilds, all webpack assets that are not used anymore will be removed automatically.
 
 ## 10.0.0 (2020-05-28)
 
