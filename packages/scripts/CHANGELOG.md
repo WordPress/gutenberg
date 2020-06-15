@@ -16,6 +16,7 @@
 ### Bug Fixes
 
 -   Update webpack configuration to not run the Sass loader on CSS files. It's now limited to .scss and .sass files.
+-   During rebuilds, all webpack assets that are not used anymore will be removed automatically.
 -   Fix broken `style.(sc|sa|c)ss` handling in the `build` and `start` scripts ([#23127](https://github.com/WordPress/gutenberg/pull/23127)).
 
 ## 10.0.0 (2020-05-28)
