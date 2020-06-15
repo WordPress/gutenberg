@@ -2,7 +2,7 @@
  * Gets the all format objects at the start of the selection.
  *
  * @param {Object}        value                Value to inspect.
- * @param {Array<Object>} value.formats        Formats object data values.
+ * @param {Array<Array>}  value.formats        Formats object data values.
  * @param {number}        value.start          Index to start from.
  * @param {number}        value.end            Index to end.
  * @param {Array}         value.activeFormats  Array to return if there are active formats.
