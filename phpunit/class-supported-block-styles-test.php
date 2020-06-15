@@ -65,8 +65,23 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		return substr( $split_arr, 0, $end_index );
 	}
 
-	private $block_content = '<div class="wp-block-example foo-bar-class" style="test:style;">So say we all.</div>';
+	/**
+	 * Runs assertions that the rendered output has expected class/style attrs.
+	 *
+	 * @param array  $block Block to render.
+	 * @param string $expected_classes Expected output class attr string.
+	 * @param string $expected_styles Expected output styles attr string.
+	 */
+	private function assert_styles_and_classes_match( $block, $expected_classes, $expected_styles ) {
+		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
+		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
 
+		$this->assertEquals( $expected_classes, $class_list );
+		$this->assertEquals( $expected_styles, $style_list );
+	}
+
+	private $block_content = '<div class="wp-block-example foo-bar-class" style="test:style;">So say we all.</div>';
 
 	function test_named_color_support() {
 		$block_type_settings = array(
@@ -82,21 +97,18 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'attrs'        => array(
 				'textColor'       => 'red',
 				'backgroundColor' => 'black',
+				// The following should not be applied (subcatagories of color support).
+				'gradient'        => 'some-gradient',
 			),
 			'innerBlock'   => array(),
 			'innerContent' => array(),
 			'innerHTML'    => array(),
 		);
 
-		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
-
 		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-red-color has-background has-black-background-color';
 		$expected_styles  = 'test:style; ';
 
-		$this->assertEquals( $expected_classes, $class_list );
-		$this->assertEquals( $expected_styles, $style_list );
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	function test_custom_color_support() {
@@ -115,6 +127,9 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 					'color' => array(
 						'text'       => '#000',
 						'background' => '#fff',
+						// The following should not be applied (subcatagories of color support).
+						'gradient'   => 'some-gradient',
+						'style'      => array( 'color' => array( 'link' => '#fff' ) ),
 					),
 				),
 			),
@@ -123,15 +138,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-
 		$expected_styles  = 'test:style; color: #000;background-color: #fff;';
 		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background';
 
-		$this->assertEquals( $expected_styles, $style_list );
-		$this->assertEquals( $expected_classes, $class_list );
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	function test_named_link_color_support() {
@@ -155,15 +165,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
-
 		$expected_classes = 'wp-block-example foo-bar-class has-link-color';
 		$expected_styles  = 'test:style; --wp--style--color--link:var(--wp--preset--color--red);';
 
-		$this->assertEquals( $expected_classes, $class_list );
-		$this->assertEquals( $expected_styles, $style_list );
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	function test_custom_link_color_support() {
@@ -187,15 +192,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
-
 		$expected_classes = 'wp-block-example foo-bar-class has-link-color';
 		$expected_styles  = 'test:style; --wp--style--color--link: #fff;';
 
-		$this->assertEquals( $expected_classes, $class_list );
-		$this->assertEquals( $expected_styles, $style_list );
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	function test_named_gradient_support() {
@@ -219,15 +219,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
-
 		$expected_classes = 'wp-block-example foo-bar-class has-background has-red-gradient-background';
 		$expected_styles  = 'test:style; ';
 
-		$this->assertEquals( $expected_classes, $class_list );
-		$this->assertEquals( $expected_styles, $style_list );
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	function test_custom_gradient_support() {
@@ -251,24 +246,16 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
-
 		$expected_classes = 'wp-block-example foo-bar-class has-background';
 		$expected_styles  = 'test:style; background: some-gradient-style;';
 
-		$this->assertEquals( $expected_classes, $class_list );
-		$this->assertEquals( $expected_styles, $style_list );
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	function test_color_unsupported() {
 		$block_type_settings = array(
-			'attributes' => array(
-				'textColor' => array(
-					'type' => 'string',
-				),
-			),
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -281,6 +268,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 					'color' => array(
 						'text'       => '#000',
 						'background' => '#fff',
+						'link'       => '#ggg',
+						'gradient'   => 'some-gradient',
 					),
 				),
 			),
@@ -289,14 +278,9 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-
 		$expected_classes = 'wp-block-example foo-bar-class';
 		$expected_styles  = 'test:style;';
 
-		$this->assertEquals( $expected_styles, $style_list );
-		$this->assertEquals( $expected_classes, $class_list );
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 }
