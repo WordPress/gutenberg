@@ -128,4 +128,34 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected_styles, $style_list );
 	}
+
+	function test_unsupported_color_attrs_not_applied_on_render() {
+		$block_type_settings = array(
+			'attributes' => array(
+				'textColor' => array(
+					'type' => 'string'
+				),
+			)
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array( 'textColor' => 'red', 'backgroundColor' => 'black', 'style' => array( 'color' => array( 'text' => '#000', 'background' => '#fff' ) ) ),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+		$block_content = '<div>So say we all.</div>';
+
+		$styled_block = apply_filters( 'render_block', $block_content, $block );
+		$style_list = $this->get_attribute_from_block( 'style', $styled_block );
+		$class_list = $this->get_attribute_from_block( 'class', $styled_block );
+
+		$expected_classes = '';
+		$expected_styles = '';
+
+		$this->assertEquals( $expected_styles, $style_list );
+		$this->assertEquals( $expected_classes, $class_list );
+	}
 }
