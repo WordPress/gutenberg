@@ -1,7 +1,7 @@
 buildscript {
     ext {
         gradlePluginVersion = '3.4.2'
-        kotlinVersion = '1.3.11'
+        kotlinVersion = '1.3.61'
         supportLibVersion = '28.0.0'
         tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
