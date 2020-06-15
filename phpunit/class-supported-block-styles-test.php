@@ -65,20 +65,19 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		return substr( $split_arr, 0, $end_index );
 	}
 
-	function test_supported_color_classes_applied_on_render() {
+	private $block_content = '<div class="wp-block-example foo-bar-class" style="test:style;">So say we all.</div>';
+
+
+	function test_named_color_support() {
 		$block_type_settings = array(
-			'attributes' => array(
-				'textColor' => array(
-					'type' => 'string',
-				),
-			),
+			'attributes' => array(),
 			'supports'   => array(
 				'__experimentalColor' => true,
 			),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
-		$block         = array(
+		$block = array(
 			'blockName'    => 'core/example',
 			'attrs'        => array(
 				'textColor'       => 'red',
@@ -88,30 +87,25 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerContent' => array(),
 			'innerHTML'    => array(),
 		);
-		$block_content = '<div class="my-block foo-bar-class" style="test:style;">So say we all.</div>';
 
-		$styled_block = apply_filters( 'render_block', $block_content, $block );
+		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
 		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 
-		$expected_classes = 'my-block foo-bar-class has-text-color has-red-color has-background has-black-background-color';
+		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-red-color has-background has-black-background-color';
 
 		$this->assertEquals( $expected_classes, $class_list );
 	}
 
-	function test_supported_color_styles_applied_on_render() {
+	function test_custom_color_support() {
 		$block_type_settings = array(
-			'attributes' => array(
-				'textColor' => array(
-					'type' => 'string',
-				),
-			),
+			'attributes' => array(),
 			'supports'   => array(
 				'__experimentalColor' => true,
 			),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
-		$block         = array(
+		$block = array(
 			'blockName'    => 'core/example',
 			'attrs'        => array(
 				'style' => array(
@@ -125,20 +119,83 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerContent' => array(),
 			'innerHTML'    => array(),
 		);
-		$block_content = '<div class="my-block foo-bar-class" style="test:style;">So say we all.</div>';
 
-		$styled_block = apply_filters( 'render_block', $block_content, $block );
+		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
 		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
 		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 
-		$expected_styles = 'test:style; color: #000;background-color: #fff;';
-		$expected_classes = 'my-block foo-bar-class has-text-color has-background';
+		$expected_styles  = 'test:style; color: #000;background-color: #fff;';
+		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background';
 
 		$this->assertEquals( $expected_styles, $style_list );
 		$this->assertEquals( $expected_classes, $class_list );
 	}
 
-	function test_unsupported_color_attrs_not_applied_on_render() {
+	function test_named_link_color_support() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(
+				'__experimentalColor' => array(
+					'linkColor' => true,
+				),
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array( 'color' => array( 'link' => 'var:preset|color|red' ) ),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
+		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+
+		$expected_classes = 'wp-block-example foo-bar-class has-link-color';
+		$expected_styles  = 'test:style; --wp--style--color--link:var(--wp--preset--color--red);';
+
+		$this->assertEquals( $expected_classes, $class_list );
+		$this->assertEquals( $expected_styles, $style_list );
+	}
+
+	function test_custom_link_color_support() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(
+				'__experimentalColor' => array(
+					'linkColor' => true,
+				),
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array( 'color' => array( 'link' => '#fff' ) ),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
+		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+
+		$expected_classes = 'wp-block-example foo-bar-class has-link-color';
+		$expected_styles  = 'test:style; --wp--style--color--link: #fff;';
+
+		$this->assertEquals( $expected_classes, $class_list );
+		$this->assertEquals( $expected_styles, $style_list );
+	}
+
+	function test_color_unsupported() {
 		$block_type_settings = array(
 			'attributes' => array(
 				'textColor' => array(
@@ -148,7 +205,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
-		$block         = array(
+		$block = array(
 			'blockName'    => 'core/example',
 			'attrs'        => array(
 				'textColor'       => 'red',
@@ -164,13 +221,12 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerContent' => array(),
 			'innerHTML'    => array(),
 		);
-		$block_content = '<div class="my-block foo-bar-class" style="test:style;">So say we all.</div>';
 
-		$styled_block = apply_filters( 'render_block', $block_content, $block );
+		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
 		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
 		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 
-		$expected_classes = 'my-block foo-bar-class';
+		$expected_classes = 'wp-block-example foo-bar-class';
 		$expected_styles  = 'test:style;';
 
 		$this->assertEquals( $expected_styles, $style_list );
