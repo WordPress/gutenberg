@@ -24,7 +24,6 @@ function startScrollingY( nodeRef, velocityRef ) {
 	}, SCROLL_INTERVAL_MS );
 }
 
-// @see https://stackoverflow.com/questions/35939886/find-first-scrollable-parent
 function getVerticalScrollParent( node ) {
 	if ( node === null ) {
 		return null;
