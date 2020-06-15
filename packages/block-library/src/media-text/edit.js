@@ -54,10 +54,11 @@ const applyWidthConstraints = ( width ) =>
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 
-function attributesFromMedia( { attributes, setAttributes } ) {
+function attributesFromMedia( {
+	attributes: { linkDestination, href },
+	setAttributes,
+} ) {
 	return ( media ) => {
-		const { linkDestination, href } = attributes;
-
 		let mediaType;
 		let src;
 		// for media selections originated from a file upload.
