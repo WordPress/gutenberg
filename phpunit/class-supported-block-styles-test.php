@@ -283,4 +283,78 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
+
+	function test_named_font_size() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(
+				'__experimentalFontSize' => true,
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'fontSize' => 'large',
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'wp-block-example foo-bar-class has-large-font-size';
+		$expected_styles  = 'test:style; ';
+
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	function test_custom_font_size() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(
+				'__experimentalFontSize' => true,
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array( 'typography' => array( 'fontSize' => '10' ) ),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'wp-block-example foo-bar-class ';
+		$expected_styles  = 'test:style; font-size: 10px;';
+
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	function test_font_size_unsupported() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'fontSize' => 'large',
+				'style' => array( 'typography' => array( 'fontSize' => '10' ) ),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'wp-block-example foo-bar-class';
+		$expected_styles  = 'test:style;';
+
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
 }
