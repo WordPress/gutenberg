@@ -18,17 +18,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 * Sets up each test method.
 	 */
 	public function setUp() {
-		global $post;
-
 		parent::setUp();
-
-		$args = array(
-			'post_content' => 'example',
-			'post_excerpt' => '',
-		);
-
-		$post = $this->factory()->post->create_and_get( $args );
-		setup_postdata( $post );
 	}
 
 	/**
@@ -139,10 +129,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$styled_block = apply_filters( 'render_block', $block_content, $block );
 		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 
 		$expected_styles = 'test:style; color: #000;background-color: #fff;';
+		$expected_classes = 'my-block foo-bar-class has-text-color has-background';
 
 		$this->assertEquals( $expected_styles, $style_list );
+		$this->assertEquals( $expected_classes, $class_list );
 	}
 
 	function test_unsupported_color_attrs_not_applied_on_render() {
