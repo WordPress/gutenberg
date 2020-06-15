@@ -59,17 +59,17 @@ export default function BlockNavigationBlock( {
 		{ 'is-visible': hasVisibleMovers }
 	);
 	const {
-		__experimentalFeatures: withBlockNavigationBlockSettings,
+		__experimentalFeatures: withExperimentalFeatures,
 	} = useBlockNavigationContext();
 	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
 	useEffect( () => {
-		if ( isSelected ) {
+		if ( withExperimentalFeatures && isSelected ) {
 			cellRef.current.focus();
 		}
-	}, [ isSelected ] );
+	}, [ withExperimentalFeatures, isSelected ] );
 
 	return (
 		<BlockNavigationLeaf
@@ -143,7 +143,7 @@ export default function BlockNavigationBlock( {
 				</>
 			) }
 
-			{ withBlockNavigationBlockSettings && (
+			{ withExperimentalFeatures && (
 				<TreeGridCell
 					className={ blockNavigationBlockSettingsClassName }
 				>
