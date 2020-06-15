@@ -73,52 +73,36 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<PluginHeaderToolbar.Slot
-				fillProps={ {
-					hasFixedToolbar,
-					isLargeViewport,
-					displayBlockToolbar,
-				} }
+			<ToolbarItem
+				as={ Button }
+				className="edit-post-header-toolbar__inserter-toggle"
+				isPrimary
+				isPressed={ isInserterOpen }
+				onClick={ onToggleInserter }
+				disabled={ ! isInserterEnabled }
+				icon={ plus }
+				label={ _x(
+					'Add block',
+					'Generic label for block inserter button'
+				) }
 			/>
-			<PluginHeaderToolbar>
-				{ ( fillProps ) => {
-					return (
-						<>
-							<ToolbarItem
-								as={ Button }
-								className="edit-post-header-toolbar__inserter-toggle"
-								isPrimary
-								isPressed={ isInserterOpen }
-								onClick={ onToggleInserter }
-								disabled={ ! isInserterEnabled }
-								icon={ plus }
-								label={ _x(
-									'Add block',
-									'Generic label for block inserter button'
-								) }
-							/>
-							{ fillProps.isLargeViewport && (
-								<ToolbarItem as={ ToolSelector } />
-							) }
-							<ToolbarItem as={ EditorHistoryUndo } />
-							<ToolbarItem as={ EditorHistoryRedo } />
-							<ToolbarItem
-								as={ TableOfContents }
-								hasOutlineItemsDisabled={ isTextModeEnabled }
-							/>
-							<ToolbarItem
-								as={ BlockNavigationDropdown }
-								isDisabled={ isTextModeEnabled }
-							/>
-							{ fillProps.displayBlockToolbar && (
-								<div className="edit-post-header-toolbar__block-toolbar">
-									<BlockToolbar hideDragHandle />
-								</div>
-							) }
-						</>
-					);
-				} }
-			</PluginHeaderToolbar>
+			{ isLargeViewport && <ToolbarItem as={ ToolSelector } /> }
+			<ToolbarItem as={ EditorHistoryUndo } />
+			<ToolbarItem as={ EditorHistoryRedo } />
+			<ToolbarItem
+				as={ TableOfContents }
+				hasOutlineItemsDisabled={ isTextModeEnabled }
+			/>
+			<ToolbarItem
+				as={ BlockNavigationDropdown }
+				isDisabled={ isTextModeEnabled }
+			/>
+			{ isLargeViewport && <PluginHeaderToolbar.Slot /> }
+			{ displayBlockToolbar && (
+				<div className="edit-post-header-toolbar__block-toolbar">
+					<BlockToolbar hideDragHandle />
+				</div>
+			) }
 		</NavigableToolbar>
 	);
 }

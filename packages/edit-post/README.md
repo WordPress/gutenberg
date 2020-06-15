@@ -159,7 +159,63 @@ _Returns_
 
 <a name="PluginHeaderToolbar" href="#PluginHeaderToolbar">#</a> **PluginHeaderToolbar**
 
-Undocumented declaration.
+Renders a button and association dropdown in the header toolbar
+
+_Usage_
+
+```js
+// Using ES5 syntax
+var el = wp.element.createElement;
+var __ = wp.i18n.__;
+var registerPlugin = wp.plugins.registerPlugin;
+var PluginHeaderToolbar = wp.editPost.PluginDocumentSettingPanel;
+
+function MyHeaderToolbarPlugin() {
+	return el(
+		PluginHeaderToolbar,
+		{
+			className: 'plugin-header-toolbar-button',
+			contentClassName: 'plugin-header-toolbar-content',
+			position: 'bottom left',
+         renderContent: function() { return el( <div>Rendered Content</div>)}
+		},
+	);
+}
+
+registerPlugin( 'my-header-toolbar-plugin', {
+		render: MyHeaderToolbarPlugin
+} );
+```
+
+```jsx
+// Using ESNext syntax
+const { registerPlugin } = wp.plugins;
+const { PluginHeaderToolbar } = wp.editPost;
+
+const MyHeaderToolbarPlugin = () => (
+		<PluginHeaderToolbar
+         className="plugin-header-toolbar-button"
+         classContentName="plugin-header-toolbar-content"
+         position="bottom left"
+         renderContent={() => <div>Rendered Content</div>}
+       />
+);
+
+ registerPlugin( 'my-header-toolbar-plugin', { render: MyDocumentSettingTest } );
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _renderContent_ `WPComponent`: The component to render as the UI for the dropdown.
+-   _props.className_ `[string]`: Optional. The class name for the button.
+-   _props.contentClassName_ `[string]`: Optional. The class name of the dropdown item.
+-   _props.position_ `[string]`: Optional. The title of the panel
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+
+_Returns_
+
+-   `WPComponent`: The component to be rendered.
 
 <a name="PluginMoreMenuItem" href="#PluginMoreMenuItem">#</a> **PluginMoreMenuItem**
 
