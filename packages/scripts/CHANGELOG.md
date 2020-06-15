@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.0.0 (2020-06-15)
+
 ### Breaking Changes
 
 -   The `env` family of scripts has been removed. Finally, exceeded in functionality and replaced by [`wp-env`](https://www.npmjs.com/package/@wordpress/env).
