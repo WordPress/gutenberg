@@ -307,7 +307,7 @@ if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_a
 function gutenberg_experimental_apply_classnames_and_styles( $block_content, $block ) {
 	// Don't filter template part blocks since we filter the blocks in each template
 	// part individually.
-	if ( 'core/template-part' == $block['blockName'] ) {
+	if ( 'core/template-part' === $block['blockName'] ) {
 		return $block_content;
 	}
 
@@ -385,7 +385,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 
 	// Text Colors.
 	// Check support for text colors.
-	if ( in_array( 'color', $supports ) ) {
+	if ( in_array( 'color', $supports, true ) ) {
 		$has_named_text_color  = array_key_exists( 'textColor', $attributes );
 		$has_custom_text_color = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
@@ -404,7 +404,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 	}
 
 	// Link Colors.
-	if ( in_array( 'link-color', $supports ) ) {
+	if ( in_array( 'link-color', $supports, true ) ) {
 		$has_link_color = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
 		&& array_key_exists( 'link', $attributes['style']['color'] );
@@ -424,7 +424,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 	}
 
 	// Background Colors.
-	if ( in_array( 'background-color', $supports ) ) {
+	if ( in_array( 'background-color', $supports, true ) ) {
 		$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
 		$has_custom_background_color = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
@@ -443,7 +443,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 	}
 
 	// Gradients.
-	if ( in_array( 'background', $supports ) ) {
+	if ( in_array( 'background', $supports, true ) ) {
 		$has_named_gradient  = array_key_exists( 'gradient', $attributes );
 		$has_custom_gradient = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'color', $attributes['style'] )
@@ -479,7 +479,7 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 	);
 
 	// Font Size.
-	if ( in_array( 'font-size', $supports ) ) {
+	if ( in_array( 'font-size', $supports, true ) ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
 		$has_custom_font_size = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'typography', $attributes['style'] )
@@ -494,7 +494,7 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 	}
 
 	// Line Height.
-	if ( in_array( 'line-height', $supports ) ) {
+	if ( in_array( 'line-height', $supports, true ) ) {
 		$has_line_height = array_key_exists( 'style', $attributes )
 		&& array_key_exists( 'typography', $attributes['style'] )
 		&& array_key_exists( 'lineHeight', $attributes['style']['typography'] );

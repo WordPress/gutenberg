@@ -83,6 +83,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 	/**
 	 * Example block content to test with.
+	 *
+	 * @var string
 	 */
 	private $block_content = '<div class="wp-block-example foo-bar-class" style="test:style;">So say we all.</div>';
 
