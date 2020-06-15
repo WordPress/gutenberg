@@ -7,8 +7,7 @@
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-		"scripts",
-		"reusable-scripts"
+		"scripts"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/scripts/README.md",
 	"repository": {
