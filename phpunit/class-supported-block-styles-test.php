@@ -62,6 +62,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$this->registered_block_names[] = $name;
 	}
 
+	private function get_attribute_from_block( $attribute, $block ) {
+		$pos = strpos( $block, $attribute . '="' );
+		$split_arr = substr( $block, $pos + strlen( $attribute ) + 2 );
+		$pos2 = strpos( $split_arr, '"' );
+		return substr( $split_arr, 0, $pos2 );
+	}
+
 	function test_supported_styles_applied_on_render() {
 		$block_type_settings = array(
 			'attributes' => array(
@@ -85,9 +92,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_content = '<div>So say we all.</div>';
 
 		$styled_block = apply_filters( 'render_block', $block_content, $block );
+		$class_list = $this->get_attribute_from_block( 'class', $styled_block );
 
-		$expected_output = '<div class="has-text-color has-red-color">So say we all.</div>';
+		$expected_classes = 'has-text-color has-red-color';
 
-		$this->assertEquals( $expected_output, $styled_block );
+		$this->assertEquals( $expected_classes, $class_list );
 	}
 }
