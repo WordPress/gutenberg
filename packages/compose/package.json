@@ -6,8 +6,10 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"React",
-		"hoc"
+		"gutenberg",
+		"react",
+		"hoc",
+		"hooks"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/compose/README.md",
 	"repository": {

@@ -5,7 +5,10 @@
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
-		"wordpress"
+		"wordpress",
+		"gutenberg",
+		"editor",
+		"site"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-site/README.md",
 	"repository": {

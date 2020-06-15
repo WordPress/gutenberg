@@ -6,6 +6,7 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"server-side",
 		"render"
 	],

@@ -6,9 +6,10 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"postcss",
 		"css",
-		"postcss-plugin",
+		"plugin",
 		"colors",
 		"themes"
 	],

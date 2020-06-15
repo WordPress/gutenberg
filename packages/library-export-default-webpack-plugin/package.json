@@ -6,8 +6,10 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"webpack",
-		"webpack-plugin"
+		"plugin",
+		"export"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/library-export-default-webpack-plugin/README.md",
 	"repository": {

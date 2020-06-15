@@ -6,7 +6,8 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"a11y",
+		"gutenberg",
+		"accessibility",
 		"aria-live"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/a11y/README.md",

@@ -6,6 +6,7 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"block directory"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-directory/README.md",

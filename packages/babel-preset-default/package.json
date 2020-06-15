@@ -6,9 +6,9 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"babel",
-		"preset",
-		"default"
+		"preset"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/babel-preset-default/README.md",
 	"repository": {
