@@ -47,7 +47,7 @@ const MOCK_BLOCK1 = {
 	humanized_updated: '5 months ago',
 };
 
-const MOCK_PLUGIN = {
+const MOCK_INSTALLED_BLOCK_PLUGIN_DETAILS = {
 	plugin: 'block-directory-test-block',
 	status: 'active',
 	name: 'Block Directory',
@@ -143,7 +143,7 @@ const MOCK_BLOCKS_RESPONSES = [
 	{
 		// Mock response for install
 		match: ( request ) => matchUrl( request.url(), INSTALL_URLS ),
-		onRequestMatch: createJSONResponse( MOCK_PLUGIN ),
+		onRequestMatch: createJSONResponse( MOCK_INSTALLED_BLOCK_PLUGIN_DETAILS ),
 	},
 	{
 		// Mock the response for the js asset once it gets injected
