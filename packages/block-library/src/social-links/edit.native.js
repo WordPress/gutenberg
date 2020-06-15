@@ -39,19 +39,30 @@ function SocialLinksEdit( {
 	isInnerIconSelected,
 	innerBlocks,
 	replaceInnerBlocks,
+	attributes,
 } ) {
 	const [ initialCreation, setInitialCreation ] = useState( true );
+	const [ savedInnerBlocks, setSavedInnerBlocks ] = useState( [] );
+	const { align } = attributes;
 	const shouldRenderFooterAppender = isSelected || isInnerIconSelected;
 	const { marginLeft: spacing } = styles.spacing;
 
 	useEffect( () => {
-		if ( ! shouldRenderFooterAppender && initialCreation ) {
+		if ( ! shouldRenderFooterAppender ) {
 			replaceInnerBlocks(
 				clientId,
 				innerBlocks.filter( ( block ) => block.attributes.url ),
 				false
 			);
 			setInitialCreation( false );
+			if ( ! initialCreation ) {
+				setSavedInnerBlocks( innerBlocks );
+			}
+		} else if (
+			shouldRenderFooterAppender &&
+			savedInnerBlocks.length > 0
+		) {
+			replaceInnerBlocks( clientId, savedInnerBlocks, false );
 		}
 	}, [ shouldRenderFooterAppender ] );
 
@@ -73,6 +84,7 @@ function SocialLinksEdit( {
 			onDeleteBlock={ shouldDelete ? onDelete : undefined }
 			marginVertical={ spacing }
 			marginHorizontal={ spacing }
+			horizontalAlignment={ align }
 		/>
 	);
 }

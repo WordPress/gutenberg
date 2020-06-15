@@ -46,7 +46,7 @@ const BlockSelectionButton = ( {
 					rootBlockIcon && [
 						<Icon
 							key="parent-icon"
-							size={ 20 }
+							size={ 24 }
 							icon={ rootBlockIcon.src }
 							fill={ styles.icon.color }
 						/>,

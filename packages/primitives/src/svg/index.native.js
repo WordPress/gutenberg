@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Svg } from 'react-native-svg';
+import { Animated } from 'react-native';
 
 /**
  * Internal dependencies
@@ -19,6 +20,8 @@ export {
 	LinearGradient,
 	Stop,
 } from 'react-native-svg';
+
+const AnimatedSvg = Animated.createAnimatedComponent( Svg );
 
 export const SVG = ( { className = '', isPressed, ...props } ) => {
 	const colorScheme = props.colorScheme || 'light';
@@ -39,7 +42,7 @@ export const SVG = ( { className = '', isPressed, ...props } ) => {
 	const appliedProps = { ...props, style: styleValues };
 
 	return (
-		<Svg
+		<AnimatedSvg
 			//We want to re-render when style color is changed
 			key={ appliedProps.style.color }
 			height="100%"

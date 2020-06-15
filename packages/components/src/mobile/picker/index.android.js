@@ -10,6 +10,7 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -60,10 +61,9 @@ export default class Picker extends Component {
 				isVisible={ isVisible }
 				onClose={ this.onClose }
 				style={ { paddingBottom: 20 } }
-				hideHeader={ ! title }
-				title={ title }
+				hideHeader
 			>
-				<View>
+				<PanelBody title={ title } style={ styles.panelBody }>
 					{ options.map( ( option, index ) => (
 						<>
 							{ options.length > 1 && option.separated && (
@@ -90,7 +90,7 @@ export default class Picker extends Component {
 							separatorType={ 'none' }
 						/>
 					) }
-				</View>
+				</PanelBody>
 			</BottomSheet>
 		);
 	}

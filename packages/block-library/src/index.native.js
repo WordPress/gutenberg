@@ -143,18 +143,20 @@ const registerBlock = ( block ) => {
 const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;
 
-	settings.variations.forEach( ( v ) => {
-		registerBlockType( `${ name }-${ v.name }`, {
-			...metadata,
-			name: `${ name }-${ v.name }`,
-			...settings,
-			icon: v.icon(),
-			title: v.title,
-			initialAttributes: {
-				service: v.name,
-			},
+	settings.variations
+		.sort( ( a, b ) => ( a.title < b.title ? -1 : 1 ) )
+		.forEach( ( v ) => {
+			registerBlockType( `${ name }-${ v.name }`, {
+				...metadata,
+				name: `${ name }-${ v.name }`,
+				...settings,
+				icon: v.icon(),
+				title: v.title,
+				initialAttributes: {
+					service: v.name,
+				},
+			} );
 		} );
-	} );
 };
 
 // only enable code block for development
@@ -164,13 +166,13 @@ const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
 
-// Hide the Classic block
+// Hide the Classic block and SocialIcon block
 addFilter(
 	'blocks.registerBlockType',
 	'core/react-native-editor',
 	( settings, name ) => {
 		if (
-			name === 'core/freeform' &&
+			( name === 'core/freeform' || name === 'core/social-link' ) &&
 			hasBlockSupport( settings, 'inserter', true )
 		) {
 			settings.supports = {
