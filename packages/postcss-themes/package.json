@@ -10,6 +10,7 @@
 		"postcss",
 		"css",
 		"plugin",
+		"postcss-plugin",
 		"colors",
 		"themes"
 	],
