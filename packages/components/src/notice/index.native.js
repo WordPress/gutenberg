@@ -24,7 +24,7 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 	const [ width, setWidth ] = useState( Dimensions.get( 'window' ).width );
 	const [ visible, setVisible ] = useState( true );
 
-	const animationValue = useRef( new Animated.Value( 1 ) ).current;
+	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const timer = useRef( null );
 
 	const onDimensionsChange = () => {

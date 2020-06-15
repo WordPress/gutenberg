@@ -17,7 +17,11 @@ import {
 	FloatingToolbar,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView, NoticeList } from '@wordpress/components';
+import {
+	HTMLTextInput,
+	KeyboardAvoidingView,
+	NoticeList,
+} from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
 
 /**
