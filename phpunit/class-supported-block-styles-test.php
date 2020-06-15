@@ -98,12 +98,12 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerContent' => array(),
 			'innerHTML'    => array(),
 		);
-		$block_content = '<div>So say we all.</div>';
+		$block_content = '<div class="my-block foo-bar-class" style="test:style;">So say we all.</div>';
 
 		$styled_block = apply_filters( 'render_block', $block_content, $block );
 		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 
-		$expected_classes = 'has-text-color has-red-color has-background has-black-background-color';
+		$expected_classes = 'my-block foo-bar-class has-text-color has-red-color has-background has-black-background-color';
 
 		$this->assertEquals( $expected_classes, $class_list );
 	}
@@ -135,12 +135,12 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerContent' => array(),
 			'innerHTML'    => array(),
 		);
-		$block_content = '<div>So say we all.</div>';
+		$block_content = '<div class="my-block foo-bar-class" style="test:style;">So say we all.</div>';
 
 		$styled_block = apply_filters( 'render_block', $block_content, $block );
 		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
 
-		$expected_styles = 'color: #000;background-color: #fff;';
+		$expected_styles = 'test:style; color: #000;background-color: #fff;';
 
 		$this->assertEquals( $expected_styles, $style_list );
 	}
@@ -171,14 +171,14 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerContent' => array(),
 			'innerHTML'    => array(),
 		);
-		$block_content = '<div>So say we all.</div>';
+		$block_content = '<div class="my-block foo-bar-class" style="test:style;">So say we all.</div>';
 
 		$styled_block = apply_filters( 'render_block', $block_content, $block );
 		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
 		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 
-		$expected_classes = '';
-		$expected_styles  = '';
+		$expected_classes = 'my-block foo-bar-class';
+		$expected_styles  = 'test:style;';
 
 		$this->assertEquals( $expected_styles, $style_list );
 		$this->assertEquals( $expected_classes, $class_list );
