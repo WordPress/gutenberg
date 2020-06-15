@@ -9,6 +9,7 @@
 		"gutenberg",
 		"webpack",
 		"plugin",
+		"webpack-plugin",
 		"export"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/library-export-default-webpack-plugin/README.md",
