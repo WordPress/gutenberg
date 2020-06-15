@@ -345,7 +345,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'blockName'    => 'core/example',
 			'attrs'        => array(
 				'fontSize' => 'large',
-				'style' => array( 'typography' => array( 'fontSize' => '10' ) ),
+				'style'    => array( 'typography' => array( 'fontSize' => '10' ) ),
 			),
 			'innerBlock'   => array(),
 			'innerContent' => array(),
@@ -362,7 +362,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes' => array(),
 			'supports'   => array(
-				'__experimentalLineHeight' => true
+				'__experimentalLineHeight' => true,
 			),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
@@ -402,6 +402,83 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$expected_classes = 'wp-block-example foo-bar-class';
 		$expected_styles  = 'test:style;';
+
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	function test_all_supported() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(
+				'__experimentalColor'      => array(
+					'gradients' => true,
+					'linkColor' => true,
+				),
+				'__experimentalFontSize'   => true,
+				'__experimentalLineHeight' => true,
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array(
+					'color'      => array(
+						'text'       => '#000',
+						'background' => '#fff',
+						'gradient'   => 'some-gradient',
+						'style'      => array( 'color' => array( 'link' => '#fff' ) ),
+					),
+					'typography' => array(
+						'lineHeight' => '20',
+						'fontSize'   => '10',
+					),
+				),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background';
+		$expected_styles  = 'test:style; color: #000;background-color: #fff;background: some-gradient;font-size: 10px;line-height: 20;';
+
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	function test_one_supported() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(
+				'__experimentalFontSize' => true,
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array(
+					'color'      => array(
+						'text'       => '#000',
+						'background' => '#fff',
+						'gradient'   => 'some-gradient',
+						'style'      => array( 'color' => array( 'link' => '#fff' ) ),
+					),
+					'typography' => array(
+						'lineHeight' => '20',
+						'fontSize'   => '10',
+					),
+				),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'wp-block-example foo-bar-class ';
+		$expected_styles  = 'test:style; font-size: 10px;';
 
 		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
