@@ -8,7 +8,8 @@
 		"wordpress",
 		"gutenberg",
 		"babel",
-		"preset"
+		"preset",
+		"babel-preset"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/babel-preset-default/README.md",
 	"repository": {

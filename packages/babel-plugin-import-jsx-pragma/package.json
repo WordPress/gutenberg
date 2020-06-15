@@ -9,6 +9,7 @@
 		"gutenberg",
 		"babel",
 		"plugin",
+		"babel-plugin",
 		"jsx",
 		"pragma",
 		"react"

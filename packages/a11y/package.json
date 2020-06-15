@@ -8,6 +8,7 @@
 		"wordpress",
 		"gutenberg",
 		"accessibility",
+		"a11y",
 		"aria-live"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/a11y/README.md",
