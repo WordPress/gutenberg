@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.14.0 (2020-06-15)
+
 ### Enhancements
 
 - Update `esnext` (default) template to leverage CSS import in JavaScript support added to `@wordpress/scripts` ([#22727](https://github.com/WordPress/gutenberg/pull/22727/files)).
