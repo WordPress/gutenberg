@@ -74,6 +74,7 @@ export default function CustomSelectControl( {
 		getItemProps,
 		isOpen,
 		highlightedIndex,
+		selectedItem,
 	} = useSelect( {
 		initialSelectedItem: items[ valueIndex >= 0 ? valueIndex : 0 ],
 		items,
@@ -93,7 +94,7 @@ export default function CustomSelectControl( {
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
-	const selectedItem = value ? value : items[ 0 ];
+	const selectedItemValue = value ? value : selectedItem;
 
 	return (
 		<div
@@ -125,7 +126,7 @@ export default function CustomSelectControl( {
 					isSmall: true,
 				} ) }
 			>
-				{ itemToString( selectedItem ) }
+				{ itemToString( selectedItemValue ) }
 				<Icon
 					icon={ chevronDown }
 					className="components-custom-select-control__button-icon"
@@ -152,7 +153,7 @@ export default function CustomSelectControl( {
 								'aria-selected': index === valueIndex,
 							} ) }
 						>
-							{ item.key === selectedItem.key && (
+							{ item.key === selectedItemValue.key && (
 								<Icon
 									icon={ check }
 									className="components-custom-select-control__item-icon"
