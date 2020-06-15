@@ -59,6 +59,18 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter {
         }
     }
 
+    /** This will optimistically emit events to JS (i.e. when the editor has mounted). If the editor has not mounted,
+     *  this will silently drop the message. This is useful to send non-critical messages in a safe way.
+     *
+     * @param eventName the name of the JS event
+     * @param data the JS event data (can be null)
+     */
+    private void emitOrDrop(String eventName, @Nullable WritableMap data) {
+        if (mJSEventEmitter != null) {
+            mJSEventEmitter.emitToJS(eventName, data);
+        }
+    }
+
     private void flushActionQueueToJS() {
         while (0 < mPendingActions.size()) {
             final Pair<String, WritableMap> action = mPendingActions.remove();
@@ -82,7 +94,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter {
         if (isCriticalMessage(state)) {
             queueActionToJS(EVENT_NAME_MEDIA_UPLOAD, writableMap);
         } else {
-            mJSEventEmitter.emitToJS(EVENT_NAME_MEDIA_UPLOAD, writableMap);
+            emitOrDrop(EVENT_NAME_MEDIA_UPLOAD, writableMap);
         }
     }
 

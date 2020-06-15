@@ -22,7 +22,6 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.StarterPageTemplatesTooltipShownCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.WPAndroidGlue.DeferredEventEmitter;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
