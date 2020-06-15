@@ -63,13 +63,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	}
 
 	private function get_attribute_from_block( $attribute, $block ) {
-		$pos = strpos( $block, $attribute . '="' );
-		$split_arr = substr( $block, $pos + strlen( $attribute ) + 2 );
-		$pos2 = strpos( $split_arr, '"' );
-		return substr( $split_arr, 0, $pos2 );
+		$start_index = strpos( $block, $attribute . '="' ) + strlen( $attribute ) + 2;
+		$split_arr = substr( $block, $start_index );
+		$end_index = strpos( $split_arr, '"' );
+		return substr( $split_arr, 0, $end_index );
 	}
 
-	function test_supported_styles_applied_on_render() {
+	function test_supported_color_classes_applied_on_render() {
 		$block_type_settings = array(
 			'attributes' => array(
 				'textColor' => array(
@@ -84,7 +84,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$block = array(
 			'blockName'    => 'core/example',
-			'attrs'        => array( 'textColor' => 'red' ),
+			'attrs'        => array( 'textColor' => 'red', 'backgroundColor' => 'black' ),
 			'innerBlock'   => array(),
 			'innerContent' => array(),
 			'innerHTML'    => array(),
@@ -94,8 +94,38 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$styled_block = apply_filters( 'render_block', $block_content, $block );
 		$class_list = $this->get_attribute_from_block( 'class', $styled_block );
 
-		$expected_classes = 'has-text-color has-red-color';
+		$expected_classes = 'has-text-color has-red-color has-background has-black-background-color';
 
 		$this->assertEquals( $expected_classes, $class_list );
+	}
+
+	function test_supported_color_styles_applied_on_render() {
+		$block_type_settings = array(
+			'attributes' => array(
+				'textColor' => array(
+					'type' => 'string'
+				),
+			),
+			'supports' => array(
+				'__experimentalColor' => true
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array( 'style' => array( 'color' => array( 'text' => '#000', 'background' => '#fff' ) ) ),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+		$block_content = '<div>So say we all.</div>';
+
+		$styled_block = apply_filters( 'render_block', $block_content, $block );
+		$style_list = $this->get_attribute_from_block( 'style', $styled_block );
+
+		$expected_styles = 'color: #000;background-color: #fff;';
+
+		$this->assertEquals( $expected_styles, $style_list );
 	}
 }
