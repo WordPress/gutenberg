@@ -144,6 +144,7 @@ class EditorProvider extends Component {
 				'imageDimensions',
 				'isRTL',
 				'maxWidth',
+				'lineHeight',
 				'onUpdateDefaultBlockStyles',
 				'styles',
 				'template',

@@ -480,6 +480,7 @@ _Properties_
 -   _fontSizes_ `Array`: Available font sizes
 -   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
 -   _imageSizes_ `Array`: Available image sizes
+-   _lineHeight_ `Array`: Available line height values
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed

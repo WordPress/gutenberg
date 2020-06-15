@@ -18,6 +18,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {Array} fontSizes Available font sizes
  * @property {boolean} disableCustomFontSizes Whether or not the custom font sizes are disabled
  * @property {Array} imageSizes Available image sizes
+ * @property {Array} lineHeight Available line height values
  * @property {number} maxWidth Max width to constraint resizing
  * @property {boolean|Array} allowedBlockTypes Allowed block types
  * @property {boolean} hasFixedToolbar Whether or not the editor toolbar is fixed
@@ -129,6 +130,12 @@ export const SETTINGS_DEFAULTS = {
 		{ slug: 'medium', name: __( 'Medium' ) },
 		{ slug: 'large', name: __( 'Large' ) },
 		{ slug: 'full', name: __( 'Full Size' ) },
+	],
+
+	lineHeight: [
+		{ slug: 'small', name: __( 'Small' ), value: 0.8 },
+		{ slug: 'regular', name: __( 'Regular' ), value: 1.2 },
+		{ slug: 'large', name: __( 'Large' ), value: 1.6 },
 	],
 
 	// This is current max width of the block inner area
