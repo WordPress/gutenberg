@@ -357,4 +357,52 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
+
+	function test_line_height() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(
+				'__experimentalLineHeight' => true
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array( 'typography' => array( 'lineHeight' => '10' ) ),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'wp-block-example foo-bar-class ';
+		$expected_styles  = 'test:style; line-height: 10;';
+
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	function test_line_height_unsupported() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array( 'typography' => array( 'lineHeight' => '10' ) ),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'wp-block-example foo-bar-class';
+		$expected_styles  = 'test:style;';
+
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
 }
