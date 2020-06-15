@@ -34,11 +34,6 @@ import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
 import BlockTransformationsMenu from './block-switcher-block-transformations-menu';
 
-const POPOVER_PROPS = {
-	position: 'bottom right',
-	isAlternate: true,
-};
-
 export class BlockSwitcher extends Component {
 	constructor() {
 		super( ...arguments );
@@ -151,10 +146,14 @@ export class BlockSwitcher extends Component {
 				<ToolbarItem>
 					{ ( toggleProps ) => (
 						<DropdownMenu
-							popoverProps={ POPOVER_PROPS }
 							className="block-editor-block-switcher"
-							// contentClassName="block-editor-block-switcher__popover"
 							label={ blockSwitcherLabel }
+							popoverProps={ {
+								position: 'bottom right',
+								isAlternate: true,
+								className:
+									'block-editor-block-switcher__popover',
+							} }
 							icon={
 								<BlockIcon
 									icon={ icon }
