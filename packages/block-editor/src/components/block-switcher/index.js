@@ -13,6 +13,7 @@ import {
 	ToolbarGroup,
 	__experimentalToolbarItem as ToolbarItem,
 	MenuGroup,
+	Popover,
 } from '@wordpress/components';
 import {
 	getBlockType,
@@ -32,7 +33,7 @@ import { layout } from '@wordpress/icons';
 import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
-import BlockTransformationsMenu from './block-switcher-block-transformations-menu';
+import BlockTransformationsMenu from './block-transformations-menu';
 
 export class BlockSwitcher extends Component {
 	constructor() {
@@ -102,30 +103,36 @@ export class BlockSwitcher extends Component {
 			);
 		}
 
-		// todo check if move/rename elsewhere
-		const PreviewBlock = (
-			<div className="block-editor-block-switcher__preview">
-				<div className="block-editor-block-switcher__preview-title">
-					{ __( 'Preview' ) }
-				</div>
-				<BlockPreview
-					viewportWidth={ 500 }
-					blocks={
-						hoveredBlockType.example
-							? getBlockFromExample( hoveredBlock.name, {
-									attributes: {
-										...hoveredBlockType.example.attributes,
+		const PreviewBlockPopover = (
+			<Popover
+				className="block-editor-block-switcher__preview__popover"
+				position="middle right"
+			>
+				<div className="block-editor-block-switcher__preview">
+					<div className="block-editor-block-switcher__preview-title">
+						{ __( 'Preview' ) }
+					</div>
+					<BlockPreview
+						viewportWidth={ 500 }
+						blocks={
+							hoveredBlockType.example
+								? getBlockFromExample( hoveredBlock.name, {
+										attributes: {
+											...hoveredBlockType.example
+												.attributes,
+											className: hoveredClassName,
+										},
+										innerBlocks:
+											hoveredBlockType.example
+												.innerBlocks,
+								  } )
+								: cloneBlock( hoveredBlock, {
 										className: hoveredClassName,
-									},
-									innerBlocks:
-										hoveredBlockType.example.innerBlocks,
-							  } )
-							: cloneBlock( hoveredBlock, {
-									className: hoveredClassName,
-							  } )
-					}
-				/>
-			</div>
+								  } )
+						}
+					/>
+				</div>
+			</Popover>
 		);
 
 		const blockSwitcherLabel =
@@ -164,49 +171,46 @@ export class BlockSwitcher extends Component {
 							toggleProps={ toggleProps }
 							menuProps={ { orientation: 'both' } }
 						>
-							{ ( { onClose } ) => (
-								<>
-									{ ( hasBlockStyles ||
-										hasPossibleBlockTransformations ) && (
-										<div className="block-editor-block-switcher__container">
-											{ hasPossibleBlockTransformations && (
-												<BlockTransformationsMenu
-													possibleBlockTransformations={
-														possibleBlockTransformations
+							{ ( { onClose } ) =>
+								( hasBlockStyles ||
+									hasPossibleBlockTransformations ) && (
+									<div className="block-editor-block-switcher__container">
+										{ hasPossibleBlockTransformations && (
+											<BlockTransformationsMenu
+												possibleBlockTransformations={
+													possibleBlockTransformations
+												}
+												onSelect={ ( name ) => {
+													onTransform( blocks, name );
+													onClose();
+												} }
+											/>
+										) }
+										{ hasBlockStyles && (
+											<MenuGroup>
+												<div className="block-editor-block-switcher__label">
+													{ __( 'Styles' ) }
+												</div>
+												<BlockStyles
+													clientId={
+														hoveredBlock.clientId
 													}
-													onSelect={ ( name ) => {
-														onTransform(
-															blocks,
-															name
-														);
-														onClose();
-													} }
+													onSwitch={ onClose }
+													onHoverClassName={
+														this.onHoverClassName
+													}
+													role="menuitem"
 												/>
-											) }
-											{ hasBlockStyles && (
-												<MenuGroup>
-													<div className="block-editor-block-switcher__label">
-														{ __( 'Styles' ) }
-													</div>
-													<BlockStyles
-														clientId={
-															hoveredBlock.clientId
-														}
-														onSwitch={ onClose }
-														onHoverClassName={
-															this
-																.onHoverClassName
-														}
-														role="menuitem"
-													/>
-													{ hoveredClassName !==
-														null && PreviewBlock }
-												</MenuGroup>
-											) }
-										</div>
-									) }
-								</>
-							) }
+												{ /* { hoveredClassName !==
+															null &&
+															PreviewBlock } */ }
+											</MenuGroup>
+										) }
+										{ hoveredClassName !== null &&
+											PreviewBlockPopover }
+									</div>
+								)
+							}
 						</DropdownMenu>
 					) }
 				</ToolbarItem>
