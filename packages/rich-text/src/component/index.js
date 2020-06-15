@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find, isNil, pickBy } from 'lodash';
+import { find, isNil } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -95,19 +95,12 @@ const defaultStyle = { whiteSpace };
 
 const EMPTY_ACTIVE_FORMATS = [];
 
-function createPrepareEditableTree( props, prefix ) {
-	const fns = Object.keys( props ).reduce( ( accumulator, key ) => {
-		if ( key.startsWith( prefix ) ) {
-			accumulator.push( props[ key ] );
-		}
-
-		return accumulator;
-	}, [] );
-
+function createPrepareEditableTree( fns ) {
 	return ( value ) =>
-		fns.reduce( ( accumulator, fn ) => {
-			return fn( accumulator, value.text );
-		}, value.formats );
+		fns.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
 }
 
 /**
@@ -180,7 +173,13 @@ function RichText(
 	ref
 ) {
 	const [ activeFormats = [], setActiveFormats ] = useState();
-	const { formatTypes, dependencies, functions } = useFormatTypes( {
+	const {
+		formatTypes,
+		prepareHandlers,
+		valueHandlers,
+		changeHandlers,
+		dependencies,
+	} = useFormatTypes( {
 		clientId,
 		identifier,
 	} );
@@ -219,10 +218,7 @@ function RichText(
 			return string;
 		}
 
-		const prepare = createPrepareEditableTree(
-			functions,
-			'format_value_functions'
-		);
+		const prepare = createPrepareEditableTree( valueHandlers );
 
 		const result = create( {
 			html: string,
@@ -313,10 +309,7 @@ function RichText(
 			multilineTag,
 			multilineWrapperTags:
 				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			prepareEditableTree: createPrepareEditableTree(
-				functions,
-				'format_prepare_functions'
-			),
+			prepareEditableTree: createPrepareEditableTree( prepareHandlers ),
 			__unstableDomOnly: domOnly,
 			placeholder,
 		} );
@@ -920,9 +913,6 @@ function RichText(
 		applyRecord( newRecord );
 
 		const { start, end, activeFormats: newActiveFormats = [] } = newRecord;
-		const changeHandlers = pickBy( functions, ( v, key ) =>
-			key.startsWith( 'format_on_change_functions_' )
-		);
 
 		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
 			changeHandler( newRecord.formats, newRecord.text );

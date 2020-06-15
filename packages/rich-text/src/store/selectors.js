@@ -4,6 +4,10 @@
 import createSelector from 'rememo';
 import { find } from 'lodash';
 
+export function getKeyedFormatTypes( state ) {
+	return state.formatTypes;
+}
+
 /**
  * Returns all the available format types.
  *

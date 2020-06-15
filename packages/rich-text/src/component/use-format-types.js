@@ -1,144 +1,109 @@
 /**
- * External dependencies
- */
-import { mapKeys } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect, __unstableUseDispatchWithMap } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 
 function formatTypesSelector( select ) {
 	return select( 'core/rich-text' ).getFormatTypes();
 }
 
 /**
- * This higher-order component provides RichText with the `formatTypes` prop
- * and its derived props from experimental format type settings.
+ * This hook provides RichText with the `formatTypes` and its derived props from
+ * experimental format type settings.
  *
- * @param {WPComponent} RichText The rich text component to add props for.
- *
- * @return {WPComponent} New enhanced component.
+ * @param {Object} $0            Options
+ * @param {string} $0.clientId   Block client ID.
+ * @param {string} $0.identifier Block attribute.
  */
 export function useFormatTypes( { clientId, identifier } ) {
 	const formatTypes = useSelect( formatTypesSelector, [] );
-	const selectProps = useSelect(
-		( select ) => {
-			return formatTypes.reduce( ( acc, settings ) => {
-				if (
-					! settings.__experimentalGetPropsForEditableTreePreparation
-				) {
-					return acc;
+	const keyedSelected = useSelect(
+		( select ) =>
+			formatTypes.reduce( ( accumulator, type ) => {
+				if ( type.__experimentalGetPropsForEditableTreePreparation ) {
+					accumulator[
+						type.name
+					] = type.__experimentalGetPropsForEditableTreePreparation(
+						select,
+						{
+							richTextIdentifier: identifier,
+							blockClientId: clientId,
+						}
+					);
 				}
 
-				const selectPrefix = `format_prepare_props_(${ settings.name })_`;
-				return {
-					...acc,
-					...mapKeys(
-						settings.__experimentalGetPropsForEditableTreePreparation(
-							select,
-							{
-								richTextIdentifier: identifier,
-								blockClientId: clientId,
-							}
-						),
-						( value, key ) => selectPrefix + key
-					),
-				};
-			}, {} );
-		},
+				return accumulator;
+			}, {} ),
 		[ formatTypes, clientId, identifier ]
 	);
-	const dispatchProps = __unstableUseDispatchWithMap(
-		( dispatch ) => {
-			return formatTypes.reduce( ( acc, settings ) => {
-				if (
-					! settings.__experimentalGetPropsForEditableTreeChangeHandler
-				) {
-					return acc;
+	const keyedDispatchers = __unstableUseDispatchWithMap(
+		( dispatch ) =>
+			formatTypes.reduce( ( accumulator, type ) => {
+				if ( type.__experimentalGetPropsForEditableTreeChangeHandler ) {
+					accumulator[
+						type.name
+					] = type.__experimentalGetPropsForEditableTreeChangeHandler(
+						dispatch,
+						{
+							richTextIdentifier: identifier,
+							blockClientId: clientId,
+						}
+					);
 				}
 
-				const dispatchPrefix = `format_on_change_props_(${ settings.name })_`;
-				return {
-					...acc,
-					...mapKeys(
-						settings.__experimentalGetPropsForEditableTreeChangeHandler(
-							dispatch,
-							{
-								richTextIdentifier: identifier,
-								blockClientId: clientId,
-							}
-						),
-						( value, key ) => dispatchPrefix + key
-					),
-				};
-			}, {} );
-		},
+				return accumulator;
+			}, {} ),
 		[ formatTypes, clientId, identifier ]
 	);
-	const functions = useMemo( () => {
-		return formatTypes.reduce( ( acc, settings ) => {
-			if ( ! settings.__experimentalCreatePrepareEditableTree ) {
-				return acc;
-			}
 
-			const args = {
-				richTextIdentifier: identifier,
-				blockClientId: clientId,
-			};
-			const combined = {
-				...selectProps,
-				...dispatchProps,
-			};
+	const prepareHandlers = [];
+	const valueHandlers = [];
+	const changeHandlers = [];
+	const dependencies = [];
 
-			const { name } = settings;
-			const selectPrefix = `format_prepare_props_(${ name })_`;
-			const dispatchPrefix = `format_on_change_props_(${ name })_`;
-			const propsByPrefix = Object.keys( combined ).reduce(
-				( accumulator, key ) => {
-					if ( key.startsWith( selectPrefix ) ) {
-						accumulator[ key.slice( selectPrefix.length ) ] =
-							combined[ key ];
-					}
-
-					if ( key.startsWith( dispatchPrefix ) ) {
-						accumulator[ key.slice( dispatchPrefix.length ) ] =
-							combined[ key ];
-					}
-
-					return accumulator;
-				},
-				{}
+	formatTypes.forEach( ( type ) => {
+		if ( type.__experimentalCreatePrepareEditableTree ) {
+			const selected = keyedSelected[ type.name ];
+			const handler = type.__experimentalCreatePrepareEditableTree(
+				selected,
+				{
+					richTextIdentifier: identifier,
+					blockClientId: clientId,
+				}
 			);
 
-			if ( settings.__experimentalCreateOnChangeEditableValue ) {
-				return {
-					...acc,
-					[ `format_value_functions_(${ name })` ]: settings.__experimentalCreatePrepareEditableTree(
-						propsByPrefix,
-						args
-					),
-					[ `format_on_change_functions_(${ name })` ]: settings.__experimentalCreateOnChangeEditableValue(
-						propsByPrefix,
-						args
-					),
-				};
+			if ( type.__experimentalCreateOnChangeEditableValue ) {
+				valueHandlers.push( handler );
+			} else {
+				prepareHandlers.push( handler );
 			}
 
-			return {
-				...acc,
-				[ `format_prepare_functions_(${ name })` ]: settings.__experimentalCreatePrepareEditableTree(
-					propsByPrefix,
-					args
-				),
-			};
-		}, {} );
-	}, [ formatTypes, clientId, identifier, selectProps, dispatchProps ] );
+			for ( const key in selected ) {
+				dependencies.push( selected[ key ] );
+			}
+		}
+
+		if ( type.__experimentalCreateOnChangeEditableValue ) {
+			changeHandlers.push(
+				type.__experimentalCreateOnChangeEditableValue(
+					{
+						...( keyedSelected[ type.name ] || {} ),
+						...( keyedDispatchers[ type.name ] || {} ),
+					},
+					{
+						richTextIdentifier: identifier,
+						blockClientId: clientId,
+					}
+				)
+			);
+		}
+	} );
 
 	return {
-		dependencies: Object.values( selectProps ),
-		functions,
 		formatTypes,
+		prepareHandlers,
+		valueHandlers,
+		changeHandlers,
+		dependencies,
 	};
 }
