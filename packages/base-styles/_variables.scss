@@ -104,18 +104,3 @@ $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $b
 $radius-round-rectangle: 4px;
 $radius-round: 50%;
 $radius-block-ui: 2px;
-
-// Ideally this is not repeated on all built styles
-// But until we drop IE11 support, it's need to generate fallback colors.
-:root {
-	--wp-admin-theme-color: theme(primary);
-	--wp-admin-theme-color-secondary: theme(secondary);
-	--wp-admin-theme-color-toggle: theme(toggle);
-
-	// Ideally this are computed and not their own variables but due to Current CSS limitation
-	// We need these.
-	--wp-admin-theme-color-darker-20: theme(primaryDarker20);
-	--wp-admin-theme-color-darker-10: theme(primaryDarker10);
-	--wp-admin-theme-color-lighter-10: theme(primaryLighter10);
-	--wp-admin-theme-color-lighter-40: theme(primaryLighter40);
-}
