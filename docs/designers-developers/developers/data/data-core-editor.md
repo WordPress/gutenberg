@@ -1359,6 +1359,7 @@ _Parameters_
 -   _post_ `Object`: Post object.
 -   _edits_ `Object`: Initial edited attributes object.
 -   _template_ `?Array`: Block Template.
+-   _setBlocks_ `?Function`: Optional callback called with parsed blocks.
 
 <a name="setupEditorState" href="#setupEditorState">#</a> **setupEditorState**
 

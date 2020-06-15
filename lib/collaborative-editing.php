@@ -75,3 +75,22 @@ function gutenberg_rest_api_init_collaborative_editing() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_rest_api_init_collaborative_editing' );
+
+/**
+ * Enqueues collaborative editing admin scripts.
+ *
+ * @param string $hook Page.
+ */
+function gutenberg_admin_enqueue_scripts_collaborative_editing( $hook ) {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-collaborative-editing' ) ) {
+		return;
+	}
+
+	if ( 'post-new.php' === $hook || 'post.php' === $hook ) {
+		wp_add_inline_script(
+			'wp-block-collab',
+			'wp.blockCollab.addBlockSelections()'
+		);
+	}
+}
+add_action( 'admin_enqueue_scripts', 'gutenberg_admin_enqueue_scripts_collaborative_editing' );

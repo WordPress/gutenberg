@@ -80,7 +80,8 @@ class EditorProvider extends Component {
 		props.setupEditor(
 			props.post,
 			props.initialEdits,
-			props.settings.template
+			props.settings.template,
+			props.setBlocks
 		);
 
 		if ( props.settings.autosave ) {
@@ -277,19 +278,23 @@ export default compose( [
 			isPostTitleSelected: isPostTitleSelected && isPostTitleSelected(),
 		};
 	} ),
-	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) => (
+	createHigherOrderComponent( ( WrappedComponent ) => {
+		const CollaborativeEditingExperimentWrapper = ( props ) => (
 			<WrappedComponent
 				{ ...props }
-				{ ...( props.settings.__experimentalCollaborativeEditing &&
-					useBlockCollab(
-						props.post.id,
-						props.post.collaborative_editing_secret
-					) ) }
+				{ ...useBlockCollab(
+					props.post.id,
+					props.post.collaborative_editing_secret
+				) }
 			/>
-		),
-		'withCollaborativeEditingExperiment'
-	),
+		);
+		return ( props ) =>
+			props.settings.__experimentalCollaborativeEditing ? (
+				<CollaborativeEditingExperimentWrapper { ...props } />
+			) : (
+				<WrappedComponent { ...props } />
+			);
+	}, 'withCollaborativeEditingExperiment' ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			setupEditor,
@@ -308,11 +313,21 @@ export default compose( [
 			createWarningNotice,
 			resetEditorBlocks( blocks, options ) {
 				if ( ownProps.setBlocks ) ownProps.setBlocks( blocks );
+				if ( ownProps.setSelf )
+					ownProps.setSelf( {
+						selectionStart: options.selectionStart,
+						selectionEnd: options.selectionEnd,
+					} );
 				resetEditorBlocks( blocks, options );
 			},
 			updateEditorSettings,
 			resetEditorBlocksWithoutUndoLevel( blocks, options ) {
 				if ( ownProps.setBlocks ) ownProps.setBlocks( blocks );
+				if ( ownProps.setSelf )
+					ownProps.setSelf( {
+						selectionStart: options.selectionStart,
+						selectionEnd: options.selectionEnd,
+					} );
 				resetEditorBlocks( blocks, {
 					...options,
 					__unstableShouldCreateUndoLevel: false,
