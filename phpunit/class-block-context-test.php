@@ -196,33 +196,4 @@ class Block_Context_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( array( 'example' => 'ok' ), $provided_context[0] );
 	}
-
-	function test_supported_styles_applied_on_render() {
-		$block_type_settings = array(
-			'attributes' => array(
-				'textColor' => array(
-					'type' => 'string'
-				),
-			),
-			'supports' => array(
-				'__experimentalColor' => true
-			),
-		);
-		$this->register_block_type( 'core/example', $block_type_settings );
-
-		$block = array(
-			'blockName'    => 'core/example',
-			'attrs'        => array( 'textColor' => 'red' ),
-			'innerBlock'   => array(),
-			'innerContent' => array(),
-			'innerHTML'    => array(),
-		);
-		$block_content = '<div>So say we all.</div>';
-
-		$styled_block = apply_filters( 'render_block', $block_content, $block );
-
-		$expected_output = '<div class="has-text-color has-red-color">So say we all.</div>';
-
-		$this->assertEquals( $expected_output, $styled_block );
-	}
 }
