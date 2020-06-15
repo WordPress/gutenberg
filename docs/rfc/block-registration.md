@@ -90,6 +90,12 @@ To register a new block type, start by creating a `block.json` file. This file:
 			"message": "This is a notice!"
 		},
 	},
+	"providesContext": {
+		"my-plugin/message": "message"
+	},
+	"context": [
+		"groupId"
+	],
 	"editorScript": "file:./build/index.js",
 	"script": "file:./build/script.js",
 	"editorStyle": "file:./build/index.css",
