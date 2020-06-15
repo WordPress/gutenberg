@@ -349,11 +349,11 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 			return $block_content;
 		}
 
-		// Merge and dedupe new and existing classes and styles
+		// Merge and dedupe new and existing classes and styles.
 		$new_classes = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . implode( ' ', $extra_classes ) ) ) );
 		$new_styles  = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'style' ) . ' ' ) . $extra_styles ) ) );
 
-		// Apply new styles and classes
+		// Apply new styles and classes.
 		if ( ! empty( $new_classes ) ) {
 			$block_root->setAttribute( 'class', $new_classes );
 		}
@@ -478,7 +478,7 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 		'inline_styles' => '',
 	);
 
-	// Font Size
+	// Font Size.
 	if ( in_array( 'font-size', $supports ) ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
 		$has_custom_font_size = array_key_exists( 'style', $attributes )
