@@ -12,10 +12,11 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import ImageEditor from "./image-editor";
 
 const { name } = metadata;
 
-export { metadata, name };
+export { metadata, name , ImageEditor };
 
 export const settings = {
 	title: __( 'Image' ),
