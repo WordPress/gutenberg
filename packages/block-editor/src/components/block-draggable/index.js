@@ -128,9 +128,13 @@ const BlockDraggable = ( {
 			onDragOver={ ( event ) => {
 				const distanceY = event.clientY - dragStartY.current;
 				if ( distanceY > SCROLL_INACTIVE_DISTANCE_PX ) {
-					velocityY.current = VELOCITY_MULTIPLIER * ( distanceY - SCROLL_INACTIVE_DISTANCE_PX );
+					velocityY.current =
+						VELOCITY_MULTIPLIER *
+						( distanceY - SCROLL_INACTIVE_DISTANCE_PX );
 				} else if ( distanceY < -SCROLL_INACTIVE_DISTANCE_PX ) {
-					velocityY.current = VELOCITY_MULTIPLIER * ( distanceY + SCROLL_INACTIVE_DISTANCE_PX );
+					velocityY.current =
+						VELOCITY_MULTIPLIER *
+						( distanceY + SCROLL_INACTIVE_DISTANCE_PX );
 				} else {
 					velocityY.current = 0;
 				}
