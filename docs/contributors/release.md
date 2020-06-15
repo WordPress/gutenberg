@@ -8,23 +8,19 @@ To release Gutenberg, you need commit access to the [WordPress.org plugin reposi
 
 ### Schedule
 
-We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date.
+We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date (the day when _the release candidate_ is to be tagged).
 
-On the date of the current milestone, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new release candidate can be published.
+- **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
 
-The date in the milestone is the date of **tagging the release candidate**. On this date, all remaining PRs on the milestone are moved automatically to the next release.
-
-Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
-
-Two days after the first release candidate, the stable version is created based on the last release candidate and any necessary regression fixes.
-
-Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](./testing-overview.md#performance-testing) should be published.
+- **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](./testing-overview.md#performance-testing) is published.
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
 ### Release Tool
 
-The plugin release process is entirely automated. To release the RC version of the plugin, run the following command and follow the instructions: (Note that at the time of writing, the tool doesn't support releasing multiple consecutive RC releases)
+> Note that at the time of writing, the tool doesn't support releasing consecutive RC releases. However, it is possible to use the tool for patch releases following the first stable release.
+
+The plugin release process is entirely automated. To release the RC version of the plugin, run the following command and follow the instructions:
 
 ```bash
 ./bin/plugin/cli.js rc
@@ -36,7 +32,11 @@ To release a stable version, run:
 ./bin/plugin/cli.js stable
 ```
 
-It is possible to run the "stable" release CLI in a consecutive way to release patch releases following the first stable release.
+During the release process, you'll be asked to provide:
+
+- A changelog: prepare one beforehand by following the instructions below.
+- A [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line): have one ready beforehand by visiting [this page](https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages), if you haven't got one yet.
+- User and password for your GitHub account: if 2FA is enabled for your account (it should), you need to provide a personal access token instead of password (you can use the one necessary for the release).
 
 ### Manual Release Process
 
@@ -105,7 +105,7 @@ git push origin release/x.x
 
 1. Run `git fetch --tags`.
 2. Check out the tag for this release, you should run `git checkout vx.x.0-rc.1`.
-3. Run `./bin/build-plugin-zip.sh` from the root of project. This packages a zip file with a release build of `gutenberg.zip`.
+3. Run `npm run build:plugin-zip` from the root of project. This packages a zip file with a release build of `gutenberg.zip`.
 
 ##### Publish the Release on GitHub
 
@@ -171,7 +171,7 @@ Creating a release involves:
 
 1. Run `git fetch --tags`.
 2. Check out the tag for this release, you should run `git checkout vx.x.0`.
-3. Run `./bin/build-plugin-zip.sh` from the root of project. This packages a zip file with a release build of `gutenberg.zip`.
+3. Run `npm run build:plugin-zip` from the root of project. This packages a zip file with a release build of `gutenberg.zip`.
 
 ##### Publish the Release on GitHub
 

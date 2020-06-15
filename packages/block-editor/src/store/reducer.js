@@ -211,7 +211,7 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
 		lastAction !== undefined &&
 		lastAction.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
-		action.clientId === lastAction.clientId &&
+		isEqual( action.clientIds, lastAction.clientIds ) &&
 		hasSameKeys( action.attributes, lastAction.attributes )
 	);
 }
@@ -293,11 +293,18 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			break;
 		}
 		case 'UPDATE_BLOCK':
-		case 'UPDATE_BLOCK_ATTRIBUTES':
 			newState.cache = {
 				...newState.cache,
 				...fillKeysWithEmptyObject(
 					getBlocksWithParentsClientIds( [ action.clientId ] )
+				),
+			};
+			break;
+		case 'UPDATE_BLOCK_ATTRIBUTES':
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					getBlocksWithParentsClientIds( action.clientIds )
 				),
 			};
 			break;
@@ -810,40 +817,45 @@ export const blocks = flow(
 					},
 				};
 
-			case 'UPDATE_BLOCK_ATTRIBUTES':
-				// Ignore updates if block isn't known
-				if ( ! state[ action.clientId ] ) {
+			case 'UPDATE_BLOCK_ATTRIBUTES': {
+				// Avoid a state change if none of the block IDs are known.
+				if ( action.clientIds.every( ( id ) => ! state[ id ] ) ) {
 					return state;
 				}
 
-				// Consider as updates only changed values
-				const nextAttributes = reduce(
-					action.attributes,
-					( result, value, key ) => {
-						if ( value !== result[ key ] ) {
-							result = getMutateSafeObject(
-								state[ action.clientId ],
-								result
-							);
-							result[ key ] = value;
-						}
+				const next = action.clientIds.reduce(
+					( accumulator, id ) => ( {
+						...accumulator,
+						[ id ]: reduce(
+							action.attributes,
+							( result, value, key ) => {
+								// Consider as updates only changed values.
+								if ( value !== result[ key ] ) {
+									result = getMutateSafeObject(
+										state[ id ],
+										result
+									);
+									result[ key ] = value;
+								}
 
-						return result;
-					},
-					state[ action.clientId ]
+								return result;
+							},
+							state[ id ]
+						),
+					} ),
+					{}
 				);
 
-				// Skip update if nothing has been changed. The reference will
-				// match the original block if `reduce` had no changed values.
-				if ( nextAttributes === state[ action.clientId ] ) {
+				if (
+					action.clientIds.every(
+						( id ) => next[ id ] === state[ id ]
+					)
+				) {
 					return state;
 				}
 
-				// Otherwise replace attributes in state
-				return {
-					...state,
-					[ action.clientId ]: nextAttributes,
-				};
+				return { ...state, ...next };
+			}
 
 			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				if ( ! action.blocks ) {
@@ -1541,7 +1553,13 @@ export function lastBlockAttributesChange( state, action ) {
 			return { [ action.clientId ]: action.updates.attributes };
 
 		case 'UPDATE_BLOCK_ATTRIBUTES':
-			return { [ action.clientId ]: action.attributes };
+			return action.clientIds.reduce(
+				( accumulator, id ) => ( {
+					...accumulator,
+					[ id ]: action.attributes,
+				} ),
+				{}
+			);
 	}
 
 	return null;

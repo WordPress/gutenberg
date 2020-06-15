@@ -1,12 +1,19 @@
 /**
  * Internal dependencies
  */
-import { downloadableBlock } from './fixtures';
+import {
+	blockList,
+	blockTypeInstalled,
+	blockTypeUnused,
+	downloadableBlock,
+} from './fixtures';
 import {
 	getDownloadableBlocks,
 	getErrorNotices,
 	getErrorNoticeForBlock,
 	getInstalledBlockTypes,
+	getNewBlockTypes,
+	getUnusedBlockTypes,
 	isInstalling,
 } from '../selectors';
 
@@ -21,6 +28,76 @@ describe( 'selectors', () => {
 			};
 			const installedBlockTypes = getInstalledBlockTypes( state );
 			expect( installedBlockTypes ).toEqual( blockTypes );
+		} );
+	} );
+
+	describe( 'getNewBlockTypes', () => {
+		it( 'should retrieve the block types that are installed and in the post content', () => {
+			getNewBlockTypes.registry = {
+				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
+			};
+			const state = {
+				blockManagement: {
+					installedBlockTypes: [
+						blockTypeInstalled,
+						blockTypeUnused,
+					],
+				},
+			};
+			const blockTypes = getNewBlockTypes( state );
+			expect( blockTypes ).toHaveLength( 1 );
+			expect( blockTypes[ 0 ] ).toEqual( blockTypeInstalled );
+		} );
+
+		it( 'should return an empty array if no blocks are used', () => {
+			getNewBlockTypes.registry = {
+				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
+			};
+			const state = {
+				blockManagement: {
+					installedBlockTypes: [
+						blockTypeInstalled,
+						blockTypeUnused,
+					],
+				},
+			};
+			const blockTypes = getNewBlockTypes( state );
+			expect( blockTypes ).toHaveLength( 0 );
+		} );
+	} );
+
+	describe( 'getUnusedBlockTypes', () => {
+		it( 'should retrieve the block types that are installed but not used', () => {
+			getUnusedBlockTypes.registry = {
+				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
+			};
+			const state = {
+				blockManagement: {
+					installedBlockTypes: [
+						blockTypeInstalled,
+						blockTypeUnused,
+					],
+				},
+			};
+			const blockTypes = getUnusedBlockTypes( state );
+			expect( blockTypes ).toHaveLength( 1 );
+			expect( blockTypes[ 0 ] ).toEqual( blockTypeUnused );
+		} );
+
+		it( 'should return all block types if no blocks are used', () => {
+			getUnusedBlockTypes.registry = {
+				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
+			};
+			const state = {
+				blockManagement: {
+					installedBlockTypes: [
+						blockTypeInstalled,
+						blockTypeUnused,
+					],
+				},
+			};
+			const blockTypes = getUnusedBlockTypes( state );
+			expect( blockTypes ).toHaveLength( 2 );
 		} );
 	} );
 

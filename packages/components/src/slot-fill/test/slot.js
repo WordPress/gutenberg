@@ -300,6 +300,22 @@ describe( 'Slot', () => {
 				);
 				expect( container ).toMatchSnapshot();
 			} );
+
+			it( 'should not break without a Provider', () => {
+				const { container } = render(
+					<>
+						<div>
+							<Slot
+								name="chicken"
+								bubblesVirtually={ bubblesVirtually }
+							/>
+						</div>
+						<Fill name="chicken" />
+					</>
+				);
+
+				expect( container ).toMatchSnapshot();
+			} );
 		}
 	);
 } );
