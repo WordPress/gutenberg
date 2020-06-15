@@ -16,7 +16,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { moreHorizontal } from '@wordpress/icons';
 
-import { useCallback } from '@wordpress/element';
+import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 
 /**
@@ -168,7 +168,11 @@ export function BlockSettingsDropdown( {
 								fillProps={ { onClose } }
 								clientIds={ clientIds }
 							/>
-							{ children }
+							{ typeof children === 'function'
+								? children( { onClose } )
+								: Children.map( ( child ) =>
+										cloneElement( child, { onClose } )
+								  ) }
 							<MenuGroup>
 								{ ! isLocked && (
 									<MenuItem

@@ -159,15 +159,21 @@ export default function BlockNavigationBlock( {
 							disableOpenOnArrowDown
 							__experimentalSelectBlock={ onClick }
 						>
-							<MenuGroup>
-								<MenuItem
-									onClick={ () => {
-										selectEditorBlock( clientId );
-									} }
-								>
-									{ __( 'Go to block' ) }
-								</MenuItem>
-							</MenuGroup>
+							{ ( { onClose } ) => (
+								<MenuGroup>
+									<MenuItem
+										onClick={ async () => {
+											// If clientId is already selected, it won't be focused (see block-wrapper.js)
+											// This removes the selection first to ensure the focus will always switch.
+											await selectEditorBlock( null );
+											await selectEditorBlock( clientId );
+											onClose();
+										} }
+									>
+										{ __( 'Go to block' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
 						</BlockSettingsDropdown>
 					) }
 				</TreeGridCell>
