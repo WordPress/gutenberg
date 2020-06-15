@@ -251,8 +251,9 @@ Once the command is finished, you can start the second part: publishing the npm 
 1. Update your local `wp/trunk` branch with the latest changes pushed to GitHub.
 2. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled. 
 3. From the `wp/trunk` branch, run the script `npm run publish:prod`.
-   1. When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
-   2. You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
+   - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
+   - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
+   - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via `lerna publish from-packages`.
 4. Cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `master` branch of Gutenberg.
 
 Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`.
