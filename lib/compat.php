@@ -461,3 +461,20 @@ add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_cont
  * @see WP_Block::render
  */
 remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
+
+
+/**
+ * Extends block editor settings to include a list of values for padding.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_add_line_height_presets( $settings ) {
+	list( $editor_line_height ) = (array) get_theme_support( 'editor-line-height' );
+	if ( false !== $editor_line_height ) {
+		$settings['lineHeight'] = $editor_line_height;
+	}
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_add_line_height_presets' );
