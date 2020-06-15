@@ -2,7 +2,7 @@
 
 This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
-To release Gutenberg, you need commit access to the [WordPress.org plugin repository][plugin repository]. 🙂
+To release Gutenberg, you need commit access to the [WordPress.org plugin repository][plugin repository] as well as being part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
 
 ## Plugin Releases
 
