@@ -7,6 +7,8 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
+	subscribeReplaceBlock,
+	subscribeUpdateTheme,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -21,7 +23,7 @@ import {
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { doAction } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -33,8 +35,6 @@ const postTypeEntities = [
 	...postTypeEntity,
 	transientEdits: {
 		blocks: true,
-		selectionStart: true,
-		selectionEnd: true,
 	},
 	mergedEdits: {
 		meta: true,
@@ -81,6 +81,12 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
+		this.subscriptionParentReplaceBlock = subscribeReplaceBlock(
+			( payload ) => {
+				this.replaceBlockAction( payload.html, payload.clientId );
+			}
+		);
+
 		this.subscriptionParentMediaAppend = subscribeMediaAppend(
 			( payload ) => {
 				const blockName = 'core/' + payload.mediaType;
@@ -96,6 +102,12 @@ class NativeEditorProvider extends Component {
 					indexAfterSelected || this.props.blockCount;
 
 				this.props.insertBlock( newBlock, insertionIndex );
+			}
+		);
+
+		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
+			( theme ) => {
+				this.props.updateSettings( theme );
 			}
 		);
 	}
@@ -117,8 +129,16 @@ class NativeEditorProvider extends Component {
 			this.subscriptionParentUpdateHtml.remove();
 		}
 
+		if ( this.subscriptionParentReplaceBlock ) {
+			this.subscriptionParentReplaceBlock.remove();
+		}
+
 		if ( this.subscriptionParentMediaAppend ) {
 			this.subscriptionParentMediaAppend.remove();
+		}
+
+		if ( this.subscriptionParentUpdateTheme ) {
+			this.subscriptionParentUpdateTheme.remove();
 		}
 	}
 
@@ -137,14 +157,16 @@ class NativeEditorProvider extends Component {
 	}
 
 	serializeToNativeAction() {
+		const title = this.props.title;
+		let html;
+
 		if ( this.props.mode === 'text' ) {
 			// The HTMLTextInput component does not update the store when user is doing changes
-			// Let's request a store update when parent is asking for it
-			doAction( 'native-editor.persist-html', 'core/editor' );
+			// Let's request the HTML from the component's state directly
+			html = applyFilters( 'native.persist-html' );
+		} else {
+			html = serialize( this.props.blocks );
 		}
-
-		const html = serialize( this.props.blocks );
-		const title = this.props.title;
 
 		const hasChanges =
 			title !== this.post.title.raw || html !== this.post.content.raw;
@@ -164,6 +186,11 @@ class NativeEditorProvider extends Component {
 	updateHtmlAction( html ) {
 		const parsed = parse( html );
 		this.props.resetEditorBlocksWithoutUndoLevel( parsed );
+	}
+
+	replaceBlockAction( html, blockClientId ) {
+		const parsed = parse( html );
+		this.props.replaceBlock( blockClientId, parsed );
 	}
 
 	toggleMode() {
@@ -219,13 +246,17 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
-		const { clearSelectedBlock, insertBlock } = dispatch(
-			'core/block-editor'
-		);
+		const {
+			updateSettings,
+			clearSelectedBlock,
+			insertBlock,
+			replaceBlock,
+		} = dispatch( 'core/block-editor' );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 
 		return {
+			updateSettings,
 			addEntities,
 			clearSelectedBlock,
 			insertBlock,
@@ -241,6 +272,7 @@ export default compose( [
 			switchMode( mode ) {
 				switchEditorMode( mode );
 			},
+			replaceBlock,
 		};
 	} ),
 ] )( NativeEditorProvider );

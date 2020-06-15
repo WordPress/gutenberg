@@ -16,10 +16,33 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 /**
  * Internal dependencies
  */
-const { hasBabelConfig } = require( '../utils' );
+const { hasBabelConfig, hasPostCSSConfig } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
+
+const cssLoaders = [
+	{
+		loader: MiniCSSExtractPlugin.loader,
+	},
+	{
+		loader: require.resolve( 'css-loader' ),
+		options: {
+			sourceMap: ! isProduction,
+		},
+	},
+	{
+		loader: require.resolve( 'postcss-loader' ),
+		options: {
+			// Provide a fallback configuration if there's not
+			// one explicitly available in the project.
+			...( ! hasPostCSSConfig() && {
+				ident: 'postcss',
+				plugins: postcssPlugins,
+			} ),
+		},
+	},
+];
 
 const config = {
 	mode,
@@ -88,25 +111,15 @@ const config = {
 				use: [ '@svgr/webpack', 'url-loader' ],
 			},
 			{
-				test: /\.(sc|sa|c)ss$/,
+				test: /\.css$/,
+				exclude: /node_modules/,
+				use: cssLoaders,
+			},
+			{
+				test: /\.(sc|sa)ss$/,
 				exclude: /node_modules/,
 				use: [
-					{
-						loader: MiniCSSExtractPlugin.loader,
-					},
-					{
-						loader: require.resolve( 'css-loader' ),
-						options: {
-							sourceMap: ! isProduction,
-						},
-					},
-					{
-						loader: require.resolve( 'postcss-loader' ),
-						options: {
-							ident: 'postcss',
-							plugins: postcssPlugins,
-						},
-					},
+					...cssLoaders,
 					{
 						loader: require.resolve( 'sass-loader' ),
 						options: {

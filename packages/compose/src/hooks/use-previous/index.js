@@ -18,7 +18,7 @@ export default function usePrevious( value ) {
 	// inferred based on the initial useRef argument, which is undefined.
 	// https://github.com/WordPress/gutenberg/pull/22597#issuecomment-633588366
 	/* eslint-disable jsdoc/no-undefined-types */
-	const ref = useRef( /** @type {T|undefined} */ undefined );
+	const ref = useRef( /** @type {T|undefined} */ ( undefined ) );
 	/* eslint-enable jsdoc/no-undefined-types */
 
 	// Store current value in ref.

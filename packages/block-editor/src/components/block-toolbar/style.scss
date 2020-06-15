@@ -66,6 +66,27 @@
 	}
 }
 
+.block-editor-block-toolbar__block-parent-selector-wrapper {
+	position: absolute;
+	top: -1px;
+	left: -1px;
+	opacity: 0;
+	transition: all 60ms linear;
+	z-index: -1; // This makes it slide out from underneath the toolbar.
+
+	@include reduce-motion("transition");
+
+	.is-showing-movers & {
+		opacity: 1;
+		transform: translateY(-($block-toolbar-height + $grid-unit-15));
+	}
+
+	// Hide the Parent button in Top Toolbar mode.
+	.edit-post-header-toolbar__block-toolbar & {
+		display: none;
+	}
+}
+
 .block-editor-block-toolbar__mover-switcher-container {
 	display: flex;
 }
@@ -112,4 +133,3 @@
 		@include reduce-motion("transition");
 	}
 }
-

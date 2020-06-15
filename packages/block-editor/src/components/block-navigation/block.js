@@ -48,10 +48,9 @@ export default function BlockNavigationBlock( {
 		{ 'is-visible': hasVisibleMovers }
 	);
 	const {
-		__experimentalWithEllipsisMenu: withEllipsisMenu,
-		__experimentalWithEllipsisMenuMinLevel: ellipsisMenuMinLevel,
+		__experimentalFeatures: withBlockNavigationBlockSettings,
 	} = useBlockNavigationContext();
-	const ellipsisMenuClassName = classnames(
+	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
@@ -74,7 +73,7 @@ export default function BlockNavigationBlock( {
 				className="block-editor-block-navigation-block__contents-cell"
 				colSpan={ hasRenderedMovers ? undefined : 3 }
 			>
-				{ ( props ) => (
+				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-block__contents-container">
 						<DescenderLines
 							level={ level }
@@ -88,7 +87,9 @@ export default function BlockNavigationBlock( {
 							position={ position }
 							siblingCount={ siblingCount }
 							level={ level }
-							{ ...props }
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
 						/>
 					</div>
 				) }
@@ -96,33 +97,44 @@ export default function BlockNavigationBlock( {
 			{ hasRenderedMovers && (
 				<>
 					<TreeGridCell className={ moverCellClassName }>
-						{ ( props ) => (
+						{ ( { ref, tabIndex, onFocus } ) => (
 							<BlockMoverUpButton
 								__experimentalOrientation="vertical"
 								clientIds={ [ clientId ] }
-								{ ...props }
+								ref={ ref }
+								tabIndex={ tabIndex }
+								onFocus={ onFocus }
 							/>
 						) }
 					</TreeGridCell>
 					<TreeGridCell className={ moverCellClassName }>
-						{ ( props ) => (
+						{ ( { ref, tabIndex, onFocus } ) => (
 							<BlockMoverDownButton
 								__experimentalOrientation="vertical"
 								clientIds={ [ clientId ] }
-								{ ...props }
+								ref={ ref }
+								tabIndex={ tabIndex }
+								onFocus={ onFocus }
 							/>
 						) }
 					</TreeGridCell>
 				</>
 			) }
 
-			{ withEllipsisMenu && level >= ellipsisMenuMinLevel && (
-				<TreeGridCell className={ ellipsisMenuClassName }>
-					{ ( props ) => (
+			{ withBlockNavigationBlockSettings && level > 1 && (
+				<TreeGridCell
+					className={ blockNavigationBlockSettingsClassName }
+				>
+					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
 							clientIds={ [ clientId ] }
 							icon={ moreVertical }
-							{ ...props }
+							toggleProps={ {
+								ref,
+								tabIndex,
+								onFocus,
+							} }
+							disableOpenOnArrowDown
 						/>
 					) }
 				</TreeGridCell>

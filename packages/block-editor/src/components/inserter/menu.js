@@ -1,17 +1,16 @@
 /**
  * External dependencies
  */
-import { includes, pick } from 'lodash';
+import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { TabPanel } from '@wordpress/components';
+import { TabPanel, VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,6 +20,7 @@ import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
 import InserterBlockList from './block-list';
 import BlockPatterns from './block-patterns';
+import useInsertionPoint from './hooks/use-insertion-point';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -34,48 +34,27 @@ function InserterMenu( {
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const {
+	const [
 		destinationRootClientId,
-		hasPatterns,
-		getSelectedBlock,
-		getBlockIndex,
-		getBlockSelectionEnd,
-		getBlockOrder,
-	} = useSelect(
+		onInsertBlocks,
+		onToggleInsertionPoint,
+	] = useInsertionPoint( {
+		rootClientId,
+		clientId,
+		isAppender,
+		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
+	} );
+	const { hasPatterns } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				getBlockRootClientId,
-				getBlockSelectionEnd: _getBlockSelectionEnd,
-			} = select( 'core/block-editor' );
-
-			let destRootClientId = rootClientId;
-			if ( ! destRootClientId && ! clientId && ! isAppender ) {
-				const end = _getBlockSelectionEnd();
-				if ( end ) {
-					destRootClientId = getBlockRootClientId( end ) || undefined;
-				}
-			}
+			const { getSettings } = select( 'core/block-editor' );
 			return {
 				hasPatterns: !! getSettings().__experimentalBlockPatterns
 					?.length,
-				destinationRootClientId: destRootClientId,
-				...pick( select( 'core/block-editor' ), [
-					'getSelectedBlock',
-					'getBlockIndex',
-					'getBlockSelectionEnd',
-					'getBlockOrder',
-				] ),
 			};
 		},
 		[ isAppender, clientId, rootClientId ]
 	);
-	const {
-		replaceBlocks,
-		insertBlocks,
-		showInsertionPoint,
-		hideInsertionPoint,
-	} = useDispatch( 'core/block-editor' );
+
 	const showPatterns = ! destinationRootClientId && hasPatterns;
 	const onKeyDown = ( event ) => {
 		if (
@@ -89,55 +68,14 @@ function InserterMenu( {
 		}
 	};
 
-	// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
-	// This breaks the withDispatch not containing any logic rule.
-	// Since it's a function only called when the event handlers are called,
-	// it's fine to extract it.
-	// eslint-disable-next-line no-restricted-syntax
-	function getInsertionIndex() {
-		// If the clientId is defined, we insert at the position of the block.
-		if ( clientId ) {
-			return getBlockIndex( clientId, destinationRootClientId );
-		}
-
-		// If there a selected block, we insert after the selected block.
-		const end = getBlockSelectionEnd();
-		if ( ! isAppender && end ) {
-			return getBlockIndex( end, destinationRootClientId ) + 1;
-		}
-
-		// Otherwise, we insert at the end of the current rootClientId
-		return getBlockOrder( destinationRootClientId ).length;
-	}
-
-	const onInsertBlocks = ( blocks ) => {
-		const selectedBlock = getSelectedBlock();
-		if (
-			! isAppender &&
-			selectedBlock &&
-			isUnmodifiedDefaultBlock( selectedBlock )
-		) {
-			replaceBlocks( selectedBlock.clientId, blocks );
-		} else {
-			insertBlocks(
-				blocks,
-				getInsertionIndex(),
-				destinationRootClientId,
-				__experimentalSelectBlockOnInsert
-			);
-		}
-
+	const onInsert = ( blocks ) => {
+		onInsertBlocks( blocks );
 		onSelect();
 	};
 
 	const onHover = ( item ) => {
+		onToggleInsertionPoint( !! item );
 		setHoveredItem( item );
-		if ( item ) {
-			const index = getInsertionIndex();
-			showInsertionPoint( destinationRootClientId, index );
-		} else {
-			hideInsertionPoint();
-		}
 	};
 
 	const blocksTab = (
@@ -146,17 +84,17 @@ function InserterMenu( {
 				<div className="block-editor-inserter__scrollable">
 					<InserterBlockList
 						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertBlocks }
+						onInsert={ onInsert }
 						onHover={ onHover }
-						__experimentalSelectBlockOnInsert={
-							__experimentalSelectBlockOnInsert
-						}
 						filterValue={ filterValue }
 					/>
 				</div>
 			</div>
 			{ showInserterHelpPanel && (
 				<div className="block-editor-inserter__tips">
+					<VisuallyHidden as="h2">
+						{ __( 'A tip for using the block editor' ) }
+					</VisuallyHidden>
 					<Tips />
 				</div>
 			) }
@@ -165,10 +103,7 @@ function InserterMenu( {
 
 	const patternsTab = (
 		<div className="block-editor-inserter__scrollable">
-			<BlockPatterns
-				onInsert={ onInsertBlocks }
-				filterValue={ filterValue }
-			/>
+			<BlockPatterns onInsert={ onInsert } filterValue={ filterValue } />
 		</div>
 	);
 

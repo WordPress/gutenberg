@@ -6,6 +6,7 @@
 
 ### New Feature
 
+-   Add support for running interactive commands. Examples: `wp-env run cli wp shell` and `wp-env run cli bash`.
 -   View php and WordPress log output with the new `wp-env logs` command.
 -   Clean up your local environment with the new `wp-env destroy` command.
 -   Expose Docker service for running phpunit commands.

@@ -1,11 +1,13 @@
 .components-font-size-picker__controls {
 	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	margin-bottom: $grid-unit-30;
 
 	// Apply the same height as the isSmall Reset button.
 	.components-font-size-picker__number {
+		@include input-control;
 		display: inline-block;
 		font-weight: 500;
 		height: 30px;
@@ -31,7 +33,6 @@
 	// Allow the font-size picker dropdown to grow in width.
 	.components-font-size-picker__select {
 		margin-right: $grid-unit-10;
-		flex-grow: 1;
 	}
 
 	.components-color-palette__clear {

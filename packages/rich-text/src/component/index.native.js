@@ -6,7 +6,7 @@
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
 import { addMention } from 'react-native-gutenberg-bridge';
-import { get, pickBy, debounce } from 'lodash';
+import { get, pickBy } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -88,14 +88,13 @@ export class RichText extends Component {
 		this.formatToValue = memize( this.formatToValue.bind( this ), {
 			maxSize: 1,
 		} );
-		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
+
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
 			this
 		);
 		this.valueToFormat = this.valueToFormat.bind( this );
-		this.willTrimSpaces = this.willTrimSpaces.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
 		this.insertString = this.insertString.bind( this );
 		this.state = {
@@ -179,7 +178,7 @@ export class RichText extends Component {
 	}
 
 	onFormatChange( record ) {
-		const { start, end, activeFormats = [] } = record;
+		const { start = 0, end = 0, activeFormats = [] } = record;
 		const changeHandlers = pickBy( this.props, ( v, key ) =>
 			key.startsWith( 'format_on_change_functions_' )
 		);
@@ -277,7 +276,7 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
-		this.debounceCreateUndoLevel();
+
 		const refresh = this.value !== contentWithoutRootTag;
 		this.value = contentWithoutRootTag;
 
@@ -647,29 +646,6 @@ export class RichText extends Component {
 		}
 	}
 
-	willTrimSpaces( html ) {
-		const { tagName } = this.props;
-
-		// aztec won't trim spaces in a case of <pre> block, so we are excluding it
-		if ( tagName === 'pre' ) {
-			return false;
-		}
-
-		// regex for detecting spaces around block element html tags
-		const blockHtmlElements =
-			'(div|br|blockquote|ul|ol|li|p|pre|h1|h2|h3|h4|h5|h6|iframe|hr)';
-		const leadingOrTrailingSpaces = new RegExp(
-			`(\\s+)<\/?${ blockHtmlElements }>|<\/?${ blockHtmlElements }>(\\s+)`,
-			'g'
-		);
-		const matches = html.match( leadingOrTrailingSpaces );
-		if ( matches && matches.length > 0 ) {
-			return true;
-		}
-
-		return false;
-	}
-
 	getHtmlToRender( record, tagName ) {
 		// Save back to HTML from React tree
 		let value = this.valueToFormat( record );
@@ -739,51 +715,30 @@ export class RichText extends Component {
 
 			// On AztecAndroid, setting the caret to an out-of-bounds position will crash the editor so, let's check for some cases.
 			if ( ! this.isIOS ) {
-				// Aztec performs some html text cleanup while parsing it so, its internal representation gets out-of-sync with the
-				// representation of the format-lib on the RN side. We need to avoid trying to set the caret position because it may
-				// be outside the text bounds and crash Aztec, at least on Android.
-				if ( this.willTrimSpaces( html ) ) {
-					// the html will get trimmed by the cleaning up functions in Aztec and caret position will get out-of-sync.
-					// So, skip forcing it, let Aztec just do its best and just log the fact.
+				// The following regular expression is used in Aztec here:
+				// https://github.com/wordpress-mobile/AztecEditor-Android/blob/b1fad439d56fa6d4aa0b78526fef355c59d00dd3/aztec/src/main/kotlin/org/wordpress/aztec/AztecParser.kt#L656
+				const brBeforeParaMatches = html.match( /(<br>)+<\/p>$/g );
+				if ( brBeforeParaMatches ) {
 					console.warn(
-						'RichText value will be trimmed for spaces! Avoiding setting the caret position manually.'
+						'Oops, BR tag(s) at the end of content. Aztec will remove them, adapting the selection...'
 					);
-					selection = null;
-				} else if (
-					this.props.selectionStart > record.text.length ||
-					this.props.selectionEnd > record.text.length
-				) {
-					console.warn(
-						'Oops, selection will land outside the text, skipping setting it...'
-					);
-					selection = null;
-				} else {
-					// The following regular expression is used in Aztec here:
-					// https://github.com/wordpress-mobile/AztecEditor-Android/blob/b1fad439d56fa6d4aa0b78526fef355c59d00dd3/aztec/src/main/kotlin/org/wordpress/aztec/AztecParser.kt#L656
-					const brBeforeParaMatches = html.match( /(<br>)+<\/p>$/g );
-					if ( brBeforeParaMatches ) {
-						console.warn(
-							'Oops, BR tag(s) at the end of content. Aztec will remove them, adapting the selection...'
-						);
-						const count = (
-							brBeforeParaMatches[ 0 ].match( /br/g ) || []
-						).length;
-						if ( count > 0 ) {
-							let newSelectionStart =
-								this.props.selectionStart - count;
-							if ( newSelectionStart < 0 ) {
-								newSelectionStart = 0;
-							}
-							let newSelectionEnd =
-								this.props.selectionEnd - count;
-							if ( newSelectionEnd < 0 ) {
-								newSelectionEnd = 0;
-							}
-							selection = {
-								start: newSelectionStart,
-								end: newSelectionEnd,
-							};
+					const count = (
+						brBeforeParaMatches[ 0 ].match( /br/g ) || []
+					).length;
+					if ( count > 0 ) {
+						let newSelectionStart =
+							this.props.selectionStart - count;
+						if ( newSelectionStart < 0 ) {
+							newSelectionStart = 0;
 						}
+						let newSelectionEnd = this.props.selectionEnd - count;
+						if ( newSelectionEnd < 0 ) {
+							newSelectionEnd = 0;
+						}
+						selection = {
+							start: newSelectionStart,
+							end: newSelectionEnd,
+						};
 					}
 				}
 			}
@@ -882,29 +837,34 @@ export class RichText extends Component {
 							onFocus={ () => {} }
 						/>
 						<BlockFormatControls>
-							{ // eslint-disable-next-line no-undef
-							__DEV__ && isMentionsSupported( capabilities ) && (
-								<Toolbar>
-									<ToolbarButton
-										title={ __( 'Insert mention' ) }
-										icon={ <Icon icon={ atSymbol } /> }
-										onClick={ () => {
-											addMention()
-												.then( ( mentionUserId ) => {
-													let stringToInsert = `@${ mentionUserId }`;
-													if ( this.isIOS ) {
-														stringToInsert += ' ';
-													}
-													this.insertString(
-														record,
-														stringToInsert
-													);
-												} )
-												.catch( () => {} );
-										} }
-									/>
-								</Toolbar>
-							) }
+							{
+								// eslint-disable-next-line no-undef
+								__DEV__ && isMentionsSupported( capabilities ) && (
+									<Toolbar>
+										<ToolbarButton
+											title={ __( 'Insert mention' ) }
+											icon={ <Icon icon={ atSymbol } /> }
+											onClick={ () => {
+												addMention()
+													.then(
+														( mentionUserId ) => {
+															let stringToInsert = `@${ mentionUserId }`;
+															if ( this.isIOS ) {
+																stringToInsert +=
+																	' ';
+															}
+															this.insertString(
+																record,
+																stringToInsert
+															);
+														}
+													)
+													.catch( () => {} );
+											} }
+										/>
+									</Toolbar>
+								)
+							}
 						</BlockFormatControls>
 					</>
 				) }

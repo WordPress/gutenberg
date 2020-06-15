@@ -52,7 +52,18 @@ describe( 'Gallery', () => {
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 
-	it( 'when initially added the media library shows the Create Gallery view', async () => {
+	// Disable reason:
+	// This test would be good to enable, but the media modal contains an
+	// invalid role, which is causing Axe tests to fail:
+	// https://core.trac.wordpress.org/ticket/50273
+	//
+	// Attempts to add an Axe exception for the media modal haven't proved
+	// successful:
+	// https://github.com/WordPress/gutenberg/pull/22719
+	//
+	// This test could be re-enabled once the trac ticket is solved.
+	// eslint-disable-next-line jest/no-disabled-tests
+	it.skip( 'when initially added the media library shows the Create Gallery view', async () => {
 		await insertBlock( 'Gallery' );
 		await clickButton( 'Media Library' );
 		await page.waitForSelector( '.media-frame' );
@@ -67,10 +78,5 @@ describe( 'Gallery', () => {
 
 		expect( mediaLibraryHeaderText ).toBe( 'Create Gallery' );
 		expect( mediaLibraryButtonText ).toBe( 'Create a new gallery' );
-
-		// Unfortunately the Media Library has invalid HTML.
-		// Axe tests fail with the following error:
-		// `List element has direct children with a role that is not allowed: checkbox.`
-		await expect( page ).not.toPassAxeTests();
 	} );
 } );

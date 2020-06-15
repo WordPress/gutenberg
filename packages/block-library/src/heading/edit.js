@@ -4,24 +4,22 @@
 import classnames from 'classnames';
 
 /**
- * Internal dependencies
- */
-import HeadingToolbar from './heading-toolbar';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, __experimentalText as Text } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
 	BlockControls,
-	InspectorControls,
 	RichText,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { Platform } from '@wordpress/element';
+import { ToolbarGroup } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import HeadingLevelDropdown from './heading-level-dropdown';
 
 function HeadingEdit( {
 	attributes,
@@ -36,14 +34,14 @@ function HeadingEdit( {
 	return (
 		<>
 			<BlockControls>
-				<HeadingToolbar
-					minLevel={ Platform.OS === 'web' ? 2 : 1 }
-					maxLevel={ Platform.OS === 'web' ? 5 : 7 }
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
+				<ToolbarGroup>
+					<HeadingLevelDropdown
+						selectedLevel={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+				</ToolbarGroup>
 				<AlignmentToolbar
 					value={ align }
 					onChange={ ( nextAlign ) => {
@@ -51,22 +49,6 @@ function HeadingEdit( {
 					} }
 				/>
 			</BlockControls>
-			{ Platform.OS === 'web' && (
-				<InspectorControls>
-					<PanelBody title={ __( 'Heading settings' ) }>
-						<Text variant="label">{ __( 'Level' ) }</Text>
-						<HeadingToolbar
-							isCollapsed={ false }
-							minLevel={ 1 }
-							maxLevel={ 7 }
-							selectedLevel={ level }
-							onChange={ ( newLevel ) =>
-								setAttributes( { level: newLevel } )
-							}
-						/>
-					</PanelBody>
-				</InspectorControls>
-			) }
 			<RichText
 				identifier="content"
 				tagName={ Block[ tagName ] }
