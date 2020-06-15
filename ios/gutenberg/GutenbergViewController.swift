@@ -303,7 +303,7 @@ extension GutenbergViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
         if let contentInfo = contentInfo {
-            alert.title = "\(contentInfo.blockCount) block(s), \(contentInfo.wordCount) word(s), \(contentInfo.characterCount) character(s)"
+            alert.title = "Content Structure\nBlocks: \(contentInfo.blockCount), Words: \(contentInfo.wordCount), Characters: \(contentInfo.characterCount)"
         }
         let cancelAction = UIAlertAction(title: "Keep Editing", style: .cancel)
         alert.addAction(toggleHTMLModeAction)
