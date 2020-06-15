@@ -109,7 +109,7 @@ describe( 'actions', () => {
 				message: 'Plugin not found.',
 				data: null,
 			};
-			expect( generator.next( apiError ).value ).toMatchObject( {
+			expect( generator.throw( apiError ).value ).toMatchObject( {
 				type: 'SET_ERROR_NOTICE',
 				blockId: item.id,
 			} );
