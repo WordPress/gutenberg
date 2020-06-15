@@ -82,7 +82,12 @@ const useGenericPreviewBlock = ( block, type ) =>
 		[ type.example ? block.name : block, type ]
 	);
 
-function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
+function BlockStyles( {
+	clientId,
+	onSwitch = noop,
+	onHoverClassName = noop,
+	role,
+} ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
@@ -141,6 +146,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						onHover={ () => onHoverClassName( styleClassName ) }
 						style={ style }
 						styleClassName={ styleClassName }
+						role={ role }
 					/>
 				);
 			} ) }
@@ -156,6 +162,7 @@ function BlockStyleItem( {
 	onHover,
 	onSelect,
 	styleClassName,
+	role,
 } ) {
 	const previewBlocks = useMemo( () => {
 		return {
@@ -182,7 +189,7 @@ function BlockStyleItem( {
 			} }
 			onMouseEnter={ onHover }
 			onMouseLeave={ onBlur }
-			role="button"
+			role={ role || 'button' }
 			tabIndex="0"
 			aria-label={ style.label || style.name }
 		>
