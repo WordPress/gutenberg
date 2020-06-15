@@ -131,6 +131,12 @@ export const SETTINGS_DEFAULTS = {
 		{ slug: 'full', name: __( 'Full Size' ) },
 	],
 
+	padding: [
+		{ slug: 'small', name: __( 'Small' ), value: 4 },
+		{ slug: 'regular', name: __( 'Regular' ), value: 14 },
+		{ slug: 'large', name: __( 'Large' ), value: 23 },
+	],
+
 	// This is current max width of the block inner area
 	// It's used to constraint image resizing and this value could be overridden later by themes
 	maxWidth: 580,
