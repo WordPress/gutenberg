@@ -40,6 +40,10 @@ const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
 const DEFAULT_CONTROL = 'center';
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
+const POPOVER_PROPS = {
+	isAlternate: true,
+};
+
 export function BlockAlignmentToolbar( {
 	value,
 	onChange,
@@ -63,6 +67,7 @@ export function BlockAlignmentToolbar( {
 
 	return (
 		<ToolbarGroup
+			popoverProps={ POPOVER_PROPS }
 			isCollapsed={ isCollapsed }
 			icon={
 				activeAlignmentControl

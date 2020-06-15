@@ -82,7 +82,7 @@ function ButtonBlockAppender(
 
 				if ( isToggleButton ) {
 					inserterButton = (
-						<Tooltip text={ label }> { inserterButton } </Tooltip>
+						<Tooltip text={ label }>{ inserterButton }</Tooltip>
 					);
 				}
 				return inserterButton;

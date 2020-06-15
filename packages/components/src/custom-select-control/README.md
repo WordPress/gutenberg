@@ -93,7 +93,7 @@ The label for the control.
 #### options
 
 The options that can be chosen from.
-- Type: `Array<{ key: String, name: String, style: ?{}, ...rest }>`
+- Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
 - Required: Yes
 
 #### onChange

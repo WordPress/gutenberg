@@ -15,7 +15,6 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreHorizontal } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 
 /**
@@ -57,8 +56,6 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 		};
 	}, [] );
 
-	const [ hasCopied, setHasCopied ] = useState();
-
 	return (
 		<BlockActions clientIds={ clientIds }>
 			{ ( {
@@ -69,6 +66,7 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 				onInsertAfter,
 				onInsertBefore,
 				onRemove,
+				onCopy,
 				blocks,
 			} ) => (
 				<DropdownMenu
@@ -99,14 +97,9 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 									text={ () => serialize( blocks ) }
 									role="menuitem"
 									className="components-menu-item__button"
-									onCopy={ () => {
-										setHasCopied( true );
-									} }
-									onFinishCopy={ () => setHasCopied( false ) }
+									onCopy={ onCopy }
 								>
-									{ hasCopied
-										? __( 'Copied!' )
-										: __( 'Copy' ) }
+									{ __( 'Copy' ) }
 								</ClipboardButton>
 								{ canDuplicate && (
 									<MenuItem

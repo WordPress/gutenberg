@@ -12,7 +12,7 @@ import CompactList from '../../components/compact-list';
 
 export default function InstalledBlocksPrePublishPanel() {
 	const newBlockTypes = useSelect( ( select ) =>
-		select( 'core/block-directory' ).getInstalledBlockTypes()
+		select( 'core/block-directory' ).getNewBlockTypes()
 	);
 
 	if ( ! newBlockTypes.length ) {
