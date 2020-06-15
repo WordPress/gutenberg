@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+- Fix an error reported by ESLint by improving JSDoc comment in ESNext template in `src/edit.js` file ([#23164](https://github.com/WordPress/gutenberg/pull/23164)).
+
 ## 0.14.0 (2020-06-15)
 
 ### Enhancements
