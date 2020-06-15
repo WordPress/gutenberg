@@ -145,6 +145,7 @@ class EditorProvider extends Component {
 				'isRTL',
 				'maxWidth',
 				'onUpdateDefaultBlockStyles',
+				'padding',
 				'styles',
 				'template',
 				'templateLock',
