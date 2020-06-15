@@ -84,7 +84,8 @@
 		],
 		"html": false,
 		"__experimentalColor": {
-			"gradients": true
+			"gradients": true,
+			"linkColor": true
 		}
 	}
 }
