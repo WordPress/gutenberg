@@ -10,13 +10,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     @objc
     func provideToNative_Html(_ html: String, title: String, changed: Bool, contentInfo: [String:Int]) {
         DispatchQueue.main.async {
-            var info: ContentInfo?
-            if  let characters = contentInfo["characterCount"],
-                let words = contentInfo["wordCount"],
-                let paragraphs = contentInfo["paragraphCount"],
-                let blocks = contentInfo["blockCount"] {
-                info = ContentInfo(characterCount: characters, wordCount: words, paragraphCount: paragraphs, blockCount: blocks)
-            }
+            let info = ContentInfo.decode(from: contentInfo)            
             self.delegate?.gutenbergDidProvideHTML(title: title, html: html, changed: changed, contentInfo: info)
         }
     }

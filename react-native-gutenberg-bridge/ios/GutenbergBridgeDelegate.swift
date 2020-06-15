@@ -29,6 +29,19 @@ public struct ContentInfo {
     public let blockCount: Int
 }
 
+extension ContentInfo {
+
+    static func decode(from dict: [String: Int]) -> ContentInfo? {
+        guard  let characters = dict["characterCount"],
+            let words = dict["wordCount"],
+            let paragraphs = dict["paragraphCount"],
+            let blocks = dict["blockCount"] else {
+                return nil
+        }
+        return ContentInfo(characterCount: characters, wordCount: words, paragraphCount: paragraphs, blockCount: blocks)
+    }
+}
+
 public typealias MediaPickerDidPickMediaCallback = (_ media: [MediaInfo]?) -> Void
 public typealias MediaImportCallback = (_ media: MediaInfo?) -> Void
 
