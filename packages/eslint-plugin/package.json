@@ -6,7 +6,9 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"eslint"
+		"gutenberg",
+		"eslint",
+		"plugin"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/eslint-plugin/README.md",
 	"repository": {

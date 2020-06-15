@@ -6,9 +6,9 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"media",
-		"upload",
-		"media-upload"
+		"upload"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/master/packages/media-utils/README.md",
 	"repository": {

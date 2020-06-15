@@ -6,6 +6,9 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
+		"babel",
+		"plugin",
 		"babel-plugin",
 		"jsx",
 		"pragma",

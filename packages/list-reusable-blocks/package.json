@@ -5,6 +5,8 @@
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
+		"wordpress",
+		"gutenberg",
 		"templates",
 		"reusable blocks"
 	],
