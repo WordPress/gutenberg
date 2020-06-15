@@ -347,10 +347,11 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 			'description'      => 'description',
 			'keywords'         => 'keywords',
 			'parent'           => 'parent',
-			'styles'           => 'styleVariations',
-			'text_domain'      => 'textDomain',
-			'context'          => 'context',
+			'styles'           => 'styles',
+			'textdomain'       => 'textdomain',
+			'example'          => 'example',
 			'provides_context' => 'providesContext',
+			'use_context'      => 'context',
 		);
 
 		foreach ( $extra_fields as $key => $extra_field ) {

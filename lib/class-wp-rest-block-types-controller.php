@@ -239,30 +239,30 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 
 		$schema       = $this->get_item_schema();
 		$extra_fields = array(
-			'name',
-			'title',
-			'description',
-			'icon',
-			'category',
-			'keywords',
-			'parent',
-			'supports',
-			'styles',
-			'textdomain',
-			'example',
-			'editor_script',
-			'script',
-			'editor_style',
-			'style',
-			'provides_context',
-			'use_context',
+			'name'             => 'name',
+			'title'            => 'title',
+			'description'      => 'description',
+			'icon'             => 'icon',
+			'category'         => 'category',
+			'keywords'         => 'keywords',
+			'parent'           => 'parent',
+			'supports'         => 'supports',
+			'styles'           => 'styles',
+			'textdomain'       => 'textdomain',
+			'example'          => 'example',
+			'editor_script'    => 'editor_script',
+			'script'           => 'script',
+			'editor_style'     => 'editor_style',
+			'style'            => 'style',
+			'provides_context' => 'providesContext',
+			'use_context'      => 'context',
 		);
-		foreach ( $extra_fields as $extra_field ) {
+		foreach ( $extra_fields as $key => $extra_field ) {
 			if ( rest_is_field_included( $key, $fields ) ) {
 				if ( isset( $block_type->$extra_field ) ) {
 					$field = $block_type->$extra_field;
-				} elseif ( array_key_exists( 'default', $schema['properties'][ $extra_field ] ) ) {
-					$field = $schema['properties'][ $extra_field ]['default'];
+				} elseif ( array_key_exists( 'default', $schema['properties'][ $key ] ) ) {
+					$field = $schema['properties'][ $key ]['default'];
 				} else {
 					$field = '';
 				}
@@ -439,14 +439,14 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
 				),
-				'textdomain'    => array(
+				'textdomain'       => array(
 					'description' => __( 'Public text domain.', 'gutenberg' ),
 					'type'        => array( 'string', 'null' ),
 					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'parent'        => array(
+				'parent'           => array(
 					'description' => __( 'Parent blocks.', 'gutenberg' ),
 					'type'        => array( 'array', 'null' ),
 					'items'       => array(
@@ -466,7 +466,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'example'       => array(
+				'example'          => array(
 					'description'          => __( 'Block example.', 'gutenberg' ),
 					'type'                 => array( 'object', 'null' ),
 					'default'              => null,
@@ -474,6 +474,8 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'additionalProperties' => array(
 						'type' => 'object',
 					),
+					'context'              => array( 'embed', 'view', 'edit' ),
+					'readonly'             => true,
 				),
 				'provides_context' => array(
 					'description'          => __( 'Context provided by blocks of this type.', 'gutenberg' ),
@@ -486,7 +488,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
 				),
-				'use_context'       => array(
+				'use_context'      => array(
 					'description' => __( 'Context values inherited by blocks of this type.', 'gutenberg' ),
 					'type'        => 'array',
 					'default'     => array(),
