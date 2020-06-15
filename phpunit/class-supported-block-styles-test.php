@@ -90,10 +90,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
 		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
 
 		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-red-color has-background has-black-background-color';
+		$expected_styles  = 'test:style; ';
 
 		$this->assertEquals( $expected_classes, $class_list );
+		$this->assertEquals( $expected_styles, $style_list );
 	}
 
 	function test_custom_color_support() {
@@ -190,6 +193,70 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$expected_classes = 'wp-block-example foo-bar-class has-link-color';
 		$expected_styles  = 'test:style; --wp--style--color--link: #fff;';
+
+		$this->assertEquals( $expected_classes, $class_list );
+		$this->assertEquals( $expected_styles, $style_list );
+	}
+
+	function test_named_gradient_support() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(
+				'__experimentalColor' => array(
+					'gradients' => true,
+				),
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'gradient' => 'red',
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
+		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+
+		$expected_classes = 'wp-block-example foo-bar-class has-background has-red-gradient-background';
+		$expected_styles  = 'test:style; ';
+
+		$this->assertEquals( $expected_classes, $class_list );
+		$this->assertEquals( $expected_styles, $style_list );
+	}
+
+	function test_custom_gradient_support() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(
+				'__experimentalColor' => array(
+					'gradients' => true,
+				),
+			),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array( 'color' => array( 'gradient' => 'some-gradient-style' ) ),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
+		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+
+		$expected_classes = 'wp-block-example foo-bar-class has-background';
+		$expected_styles  = 'test:style; background: some-gradient-style;';
 
 		$this->assertEquals( $expected_classes, $class_list );
 		$this->assertEquals( $expected_styles, $style_list );
