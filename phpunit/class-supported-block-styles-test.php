@@ -62,10 +62,16 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$this->registered_block_names[] = $name;
 	}
 
+	/**
+	 * Retrieves attribute such as 'class' or 'style' from the rendered block string.
+	 *
+	 * @param string $attribute Name of attribute to get.
+	 * @param string $block String of rendered block to check.
+	 */
 	private function get_attribute_from_block( $attribute, $block ) {
 		$start_index = strpos( $block, $attribute . '="' ) + strlen( $attribute ) + 2;
-		$split_arr = substr( $block, $start_index );
-		$end_index = strpos( $split_arr, '"' );
+		$split_arr   = substr( $block, $start_index );
+		$end_index   = strpos( $split_arr, '"' );
 		return substr( $split_arr, 0, $end_index );
 	}
 
@@ -73,18 +79,21 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes' => array(
 				'textColor' => array(
-					'type' => 'string'
+					'type' => 'string',
 				),
 			),
-			'supports' => array(
-				'__experimentalColor' => true
+			'supports'   => array(
+				'__experimentalColor' => true,
 			),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
-		$block = array(
+		$block         = array(
 			'blockName'    => 'core/example',
-			'attrs'        => array( 'textColor' => 'red', 'backgroundColor' => 'black' ),
+			'attrs'        => array(
+				'textColor'       => 'red',
+				'backgroundColor' => 'black',
+			),
 			'innerBlock'   => array(),
 			'innerContent' => array(),
 			'innerHTML'    => array(),
@@ -92,7 +101,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_content = '<div>So say we all.</div>';
 
 		$styled_block = apply_filters( 'render_block', $block_content, $block );
-		$class_list = $this->get_attribute_from_block( 'class', $styled_block );
+		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 
 		$expected_classes = 'has-text-color has-red-color has-background has-black-background-color';
 
@@ -103,18 +112,25 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes' => array(
 				'textColor' => array(
-					'type' => 'string'
+					'type' => 'string',
 				),
 			),
-			'supports' => array(
-				'__experimentalColor' => true
+			'supports'   => array(
+				'__experimentalColor' => true,
 			),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
-		$block = array(
+		$block         = array(
 			'blockName'    => 'core/example',
-			'attrs'        => array( 'style' => array( 'color' => array( 'text' => '#000', 'background' => '#fff' ) ) ),
+			'attrs'        => array(
+				'style' => array(
+					'color' => array(
+						'text'       => '#000',
+						'background' => '#fff',
+					),
+				),
+			),
 			'innerBlock'   => array(),
 			'innerContent' => array(),
 			'innerHTML'    => array(),
@@ -122,7 +138,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_content = '<div>So say we all.</div>';
 
 		$styled_block = apply_filters( 'render_block', $block_content, $block );
-		$style_list = $this->get_attribute_from_block( 'style', $styled_block );
+		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
 
 		$expected_styles = 'color: #000;background-color: #fff;';
 
@@ -133,15 +149,24 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes' => array(
 				'textColor' => array(
-					'type' => 'string'
+					'type' => 'string',
 				),
-			)
+			),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
-		$block = array(
+		$block         = array(
 			'blockName'    => 'core/example',
-			'attrs'        => array( 'textColor' => 'red', 'backgroundColor' => 'black', 'style' => array( 'color' => array( 'text' => '#000', 'background' => '#fff' ) ) ),
+			'attrs'        => array(
+				'textColor'       => 'red',
+				'backgroundColor' => 'black',
+				'style'           => array(
+					'color' => array(
+						'text'       => '#000',
+						'background' => '#fff',
+					),
+				),
+			),
 			'innerBlock'   => array(),
 			'innerContent' => array(),
 			'innerHTML'    => array(),
@@ -149,11 +174,11 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_content = '<div>So say we all.</div>';
 
 		$styled_block = apply_filters( 'render_block', $block_content, $block );
-		$style_list = $this->get_attribute_from_block( 'style', $styled_block );
-		$class_list = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 
 		$expected_classes = '';
-		$expected_styles = '';
+		$expected_styles  = '';
 
 		$this->assertEquals( $expected_styles, $style_list );
 		$this->assertEquals( $expected_classes, $class_list );
