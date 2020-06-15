@@ -16,6 +16,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {Array} colors Palette colors
  * @property {boolean} disableCustomColors Whether or not the custom colors are disabled
  * @property {Array} fontSizes Available font sizes
+ * @property {Array} padding Available padding values
  * @property {boolean} disableCustomFontSizes Whether or not the custom font sizes are disabled
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing

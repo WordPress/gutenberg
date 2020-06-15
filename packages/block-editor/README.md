@@ -478,6 +478,7 @@ _Properties_
 -   _colors_ `Array`: Palette colors
 -   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
 -   _fontSizes_ `Array`: Available font sizes
+-   _padding_ `Array`: Available padding values
 -   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
