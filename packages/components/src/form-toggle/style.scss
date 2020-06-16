@@ -71,8 +71,8 @@ $toggle-border-width: 2px;
 
 	// Checked state.
 	&.is-checked .components-form-toggle__track {
-		background-color: var(--wp-admin-theme-color-toggle);
-		border: $toggle-border-width solid var(--wp-admin-theme-color-toggle);
+		background-color: var(--wp-admin-theme-color);
+		border: $toggle-border-width solid var(--wp-admin-theme-color);
 		border: #{ $toggle-height / 2 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
 	}
 
@@ -92,8 +92,8 @@ $toggle-border-width: 2px;
 		}
 
 		&::before {
-			background-color: var(--wp-admin-theme-color-toggle);
-			border: $toggle-border-width solid var(--wp-admin-theme-color-toggle);
+			background-color: var(--wp-admin-theme-color);
+			border: $toggle-border-width solid var(--wp-admin-theme-color);
 		}
 	}
 
