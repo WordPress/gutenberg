@@ -75,7 +75,7 @@
 			right: $border-width;
 
 			// 2px outside.
-			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 
 			// Show a light color for dark themes.
@@ -107,7 +107,7 @@
 		right: 0;
 		left: 0;
 		top: -$default-block-margin / 2;
-		border-top: 4px solid $blue-medium-focus;
+		border-top: 4px solid var(--wp-admin-theme-color);
 	}
 }
 
@@ -140,7 +140,7 @@
 
 		&::after { // Everything else.
 			// 2px outside.
-			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 			transition: box-shadow 0.2s ease-out;
 			@include reduce-motion("transition");
@@ -328,7 +328,7 @@
 	height: $border-width-focus;
 	left: 0;
 	right: 0;
-	background: theme(primary);
+	background: var(--wp-admin-theme-color);
 }
 
 // This is the clickable plus.
@@ -600,7 +600,7 @@
 
 		// When button is focused, it receives a box-shadow instead of the border.
 		&:focus {
-			box-shadow: 0 0 0 $border-width-focus $theme-color;
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 		}
 	}
 }
