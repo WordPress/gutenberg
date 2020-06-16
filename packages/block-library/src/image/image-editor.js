@@ -156,25 +156,43 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 	);
 }
 
-function getStyles( edits ) {
+function flattenEdits( edits ) {
+	let crop = null;
 	let angle = 0;
 	let horizontal = false;
 	let vertical = false;
+
 	edits.forEach( ( { action, options } ) => {
 		if ( action === 'rotate' ) {
-			angle += horizontal !== vertical ? -options.angle : options.angle;
+			angle += horizontal === vertical ? options.angle : -options.angle;
 		} else if ( action === 'flip' ) {
 			horizontal = options.horizontal ? ! horizontal : horizontal;
 			vertical = options.vertical ? ! vertical : vertical;
+		} else if ( action === 'crop' ) {
+			crop = options; // TODO: When intermediate crops are previewed, update this accordingly
 		}
 	} );
+
+	return {
+		crop,
+		rotate: { angle },
+		flip: { horizontal, vertical },
+	};
+}
+
+function normalizeAngle( angle ) {
+	return angle < 0 ? ( angle % 360 ) + 360 : angle % 360;
+}
+
+function getStyles( edits ) {
+	const attrs = flattenEdits( edits );
 
 	const styles = {
 		transition: 'transform 1s',
 		transform: [
-			`rotateX( ${ vertical ? 180 : 0 }deg )`,
-			`rotateY( ${ horizontal ? 180 : 0 }deg )`,
-			`rotateZ( ${ angle }deg )`,
+			`rotateX( ${ attrs.flip.vertical ? 180 : 0 }deg )`,
+			`rotateY( ${ attrs.flip.horizontal ? 180 : 0 }deg )`,
+			`rotateZ( ${ attrs.rotate.angle }deg )`,
 		].join( ' ' ),
 	};
 
@@ -211,35 +229,8 @@ export default function ImageEditor( {
 	async function adjustImage() {
 		setInProgress( true );
 
-		const attrs = {
-			crop: null,
-			flip: {
-				horizontal: false,
-				vertical: false,
-			},
-			rotate: {
-				angle: 0,
-			},
-		};
-
-		edits.forEach( ( { action, options } ) => {
-			if ( action === 'rotate' ) {
-				const angle =
-					attrs.flip.horizontal === attrs.flip.vertical
-						? options.angle
-						: -options.angle;
-				attrs.rotate.angle = ( attrs.rotate.angle + angle + 360 ) % 360;
-			} else if ( action === 'flip' ) {
-				attrs.flip.horizontal = options.horizontal
-					? ! attrs.flip.horizontal
-					: attrs.flip.horizontal;
-				attrs.flip.vertical = options.vertical
-					? ! attrs.flip.vertical
-					: attrs.flip.vertical;
-			} else if ( action === 'crop' ) {
-				attrs.crop = options; // TODO: When intermediate crops are previewed, update this accordingly
-			}
-		} );
+		const attrs = flattenEdits( edits );
+		attrs.rotate.angle = normalizeAngle( attrs.rotate.angle );
 
 		// Noop cases that result in an identical image.
 		if (
