@@ -1,0 +1,28 @@
+
+
+name: Create Block
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: npm install, build, and test
+      run: |
+        npm ci
+        npx wp-create-block esnext-test --no-wp-scripts
+        cd esnext-test
+        ../node_modules/.bin/wp-scripts format-js
+        ../node_modules/.bin/wp-scripts build
+        ../node_modules/.bin/wp-scripts lint-style
+        ../node_modules/.bin/wp-scripts lint-js
+      env:
+        CI: true
