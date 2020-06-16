@@ -22,8 +22,8 @@
 	}
 
 	&:focus:not(:disabled) {
-		border-color: $theme-color;
-		box-shadow: 0 0 0 ($border-width-focus - $border-width) $theme-color;
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
 	}
 
 	&-icon {
