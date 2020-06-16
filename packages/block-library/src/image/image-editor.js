@@ -46,9 +46,9 @@ const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.1;
 const POPOVER_PROPS = { position: 'bottom right' };
 
-function richImageRequest( id, action, attrs ) {
+function richImageRequest( id, attrs ) {
 	return apiFetch( {
-		path: `__experimental/richimage/${ id }/${ action }`,
+		path: `__experimental/richimage/${ id }/apply`,
 		headers: {
 			'Content-type': 'application/json',
 		},
@@ -208,34 +208,76 @@ export default function ImageEditor( {
 		}
 	}, [ isSelected ] );
 
-	function adjustImage( action, attrs ) {
+	async function adjustImage() {
 		setInProgress( true );
 
-		richImageRequest( id, action, attrs )
-			.then( ( response ) => {
-				setInProgress( false );
-				setIsCropping( false );
+		const attrs = {
+			crop: null,
+			flip: {
+				horizontal: false,
+				vertical: false,
+			},
+			rotate: {
+				angle: 0,
+			},
+		};
 
-				if ( response.media_id && response.media_id !== id ) {
-					setAttributes( {
-						id: response.media_id,
-						url: response.url,
-					} );
+		edits.forEach( ( { action, options } ) => {
+			if ( action === 'rotate' ) {
+				const angle =
+					attrs.flip.horizontal === attrs.flip.vertical
+						? options.angle
+						: -options.angle;
+				attrs.rotate.angle = ( attrs.rotate.angle + angle + 360 ) % 360;
+			} else if ( action === 'flip' ) {
+				attrs.flip.horizontal = options.horizontal
+					? ! attrs.flip.horizontal
+					: attrs.flip.horizontal;
+				attrs.flip.vertical = options.vertical
+					? ! attrs.flip.vertical
+					: attrs.flip.vertical;
+			} else if ( action === 'crop' ) {
+				attrs.crop = options; // TODO: When intermediate crops are previewed, update this accordingly
+			}
+		} );
+
+		// Noop cases that result in an identical image.
+		if (
+			attrs.crop === null &&
+			( ( attrs.flip.horizontal &&
+				attrs.flip.vertical &&
+				attrs.rotate.angle === 180 ) ||
+				( ! attrs.flip.horizontal &&
+					! attrs.flip.vertical &&
+					attrs.rotate.angle === 0 ) )
+		) {
+			setInProgress( false );
+			setIsCropping( false );
+			return;
+		}
+
+		try {
+			const response = await richImageRequest( id, attrs );
+			if ( response.mediaID && response.mediaID !== id ) {
+				setAttributes( {
+					id: response.mediaID,
+					url: response.url,
+				} );
+			}
+		} catch ( e ) {
+			createErrorNotice(
+				__(
+					'Unable to perform the image modification. Please check your media storage.'
+				),
+				{
+					id: 'image-editing-error',
+					type: 'snackbar',
 				}
-			} )
-			.catch( () => {
-				createErrorNotice(
-					__(
-						'Unable to perform the image modification. Please check your media storage.'
-					),
-					{
-						id: 'image-editing-error',
-						type: 'snackbar',
-					}
-				);
-				setInProgress( false );
-				setIsCropping( false );
-			} );
+			);
+		}
+
+		setInProgress( false );
+		setIsCropping( false );
 	}
 
 	function rotateImage( angle ) {
@@ -329,73 +371,83 @@ export default function ImageEditor( {
 			</div>
 			<BlockControls>
 				{ ! isCropping && (
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									icon={ rotateLeftIcon }
-									label={ __( 'Rotate' ) }
-									popoverProps={ POPOVER_PROPS }
-									toggleProps={ toggleProps }
-									controls={ [
-										{
-											icon: rotateLeftIcon,
-											title: __( 'Rotate left' ),
-											isDisabled: inProgress,
-											onClick() {
-												rotateImage( -ROTATE_STEP );
+					<>
+						<ToolbarGroup>
+							<ToolbarItem>
+								{ ( toggleProps ) => (
+									<DropdownMenu
+										icon={ rotateLeftIcon }
+										label={ __( 'Rotate' ) }
+										popoverProps={ POPOVER_PROPS }
+										toggleProps={ toggleProps }
+										controls={ [
+											{
+												icon: rotateLeftIcon,
+												title: __( 'Rotate left' ),
+												isDisabled: inProgress,
+												onClick() {
+													rotateImage( -ROTATE_STEP );
+												},
 											},
-										},
-										{
-											icon: rotateRightIcon,
-											title: __( 'Rotate right' ),
-											isDisabled: inProgress,
-											onClick() {
-												rotateImage( ROTATE_STEP );
+											{
+												icon: rotateRightIcon,
+												title: __( 'Rotate right' ),
+												isDisabled: inProgress,
+												onClick() {
+													rotateImage( ROTATE_STEP );
+												},
 											},
-										},
-									] }
-								/>
-							) }
-						</ToolbarItem>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									icon={ flipVerticalIcon }
-									label={ __( 'Flip' ) }
-									popoverProps={ POPOVER_PROPS }
-									toggleProps={ toggleProps }
-									controls={ [
-										{
-											icon: flipVerticalIcon,
-											title: __( 'Flip vertical' ),
-											isDisabled: inProgress,
-											onClick() {
-												flipImage( 'vertical' );
+										] }
+									/>
+								) }
+							</ToolbarItem>
+							<ToolbarItem>
+								{ ( toggleProps ) => (
+									<DropdownMenu
+										icon={ flipVerticalIcon }
+										label={ __( 'Flip' ) }
+										popoverProps={ POPOVER_PROPS }
+										toggleProps={ toggleProps }
+										controls={ [
+											{
+												icon: flipVerticalIcon,
+												title: __( 'Flip vertical' ),
+												isDisabled: inProgress,
+												onClick() {
+													flipImage( 'vertical' );
+												},
 											},
-										},
-										{
-											icon: flipHorizontalIcon,
-											title: __( 'Flip horizontal' ),
-											isDisabled: inProgress,
-											onClick() {
-												flipImage( 'horizontal' );
+											{
+												icon: flipHorizontalIcon,
+												title: __( 'Flip horizontal' ),
+												isDisabled: inProgress,
+												onClick() {
+													flipImage( 'horizontal' );
+												},
 											},
-										},
-									] }
-								/>
-							) }
-						</ToolbarItem>
-						<ToolbarButton
-							disabled={ inProgress }
-							icon={ cropIcon }
-							label={ __( 'Crop' ) }
-							onClick={ () => {
-								setIsCropping( ( prev ) => ! prev );
-								setCrop( DEFAULT_CROP );
-							} }
-						/>
-					</ToolbarGroup>
+										] }
+									/>
+								) }
+							</ToolbarItem>
+							<ToolbarButton
+								disabled={ inProgress }
+								icon={ cropIcon }
+								label={ __( 'Crop' ) }
+								onClick={ () => {
+									setIsCropping( ( prev ) => ! prev );
+									setCrop( DEFAULT_CROP );
+								} }
+							/>
+						</ToolbarGroup>
+						<ToolbarGroup>
+							<ToolbarButton onClick={ adjustImage }>
+								{ __( 'Apply' ) }
+							</ToolbarButton>
+							<ToolbarButton onClick={ () => setEdits( [] ) }>
+								{ __( 'Cancel' ) }
+							</ToolbarButton>
+						</ToolbarGroup>
+					</>
 				) }
 				{ isCropping && (
 					<>
