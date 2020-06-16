@@ -15,7 +15,7 @@ import java.util.Map;
 
 public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
-    void responseHtml(String title, String html, boolean changed);
+    void responseHtml(String title, String html, boolean changed, ReadableMap contentInfo);
 
     void editorDidMount(ReadableArray unsupportedBlockNames);
 
