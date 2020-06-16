@@ -7,7 +7,6 @@ import {
 	TextControl,
 	CustomSelectControl,
 } from '@wordpress/components';
-import { ZERO } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -26,20 +25,6 @@ const CUSTOM_OPTION = {
 };
 
 export default function LineHeightControl( { presetValues, value, onChange } ) {
-	const handleOnKeyDown = ( event ) => {
-		const { keyCode } = event;
-
-		if ( keyCode === ZERO ) {
-			/**
-			 * Prevents the onChange callback from firing, which prevents
-			 * the logic from assuming the change was triggered from
-			 * an input arrow CLICK.
-			 */
-			event.preventDefault();
-			onChange( 0 );
-		}
-	};
-
 	const handleOnChange = ( nextValue ) => onChange( Number( nextValue ) );
 
 	const handlePresetSelection = ( { selectedItem } ) =>
@@ -71,7 +56,6 @@ export default function LineHeightControl( { presetValues, value, onChange } ) {
 			<TextControl
 				className={ 'block-editor-line-height-control__custom' }
 				autoComplete="off"
-				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnChange }
 				label={ __( 'Custom' ) }
 				step={ STEP }
