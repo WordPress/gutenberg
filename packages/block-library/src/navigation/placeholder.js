@@ -16,7 +16,13 @@ import {
 	Placeholder,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { forwardRef, useCallback, useMemo, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useCallback,
+	useMemo,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { navigation as icon } from '@wordpress/icons';
 
@@ -137,50 +143,10 @@ function convertPagesToBlocks( pages ) {
 	);
 }
 
-/**
- * Returns a value that indicates whether the create button should be disabled.
- *
- * @param {Object}  selectedCreateOption An object containing details of
- *                                       the selected create option.
- * @param {boolean} hasResolvedPages     Indicates whether pages have loaded.
- * @param {boolean} hasResolvedMenuItems Indicates whether menu items have loaded.
- *
- * @return {boolean} A value that indicates whether the create button is disabled.
- */
-function getIsCreateButtonDisabled(
-	selectedCreateOption,
-	hasResolvedPages,
-	hasResolvedMenuItems
-) {
-	// If there is no key at all then disable.
-	if ( ! selectedCreateOption ) {
-		return true;
-	}
-
-	const optionKey = selectedCreateOption?.key;
-
-	// Always disable if the default "placeholder" option is selected.
-	if ( optionKey === CREATE_PLACEHOLDER_VALUE ) {
-		return true;
-	}
-
-	// Always enable if Create Empty is selected.
-	if ( optionKey === CREATE_EMPTY_OPTION_VALUE ) {
-		return false;
-	}
-
-	// Enable if Pages option selected and we have Pages available.
-	if ( optionKey === CREATE_FROM_PAGES_OPTION_VALUE && hasResolvedPages ) {
-		return false;
-	}
-
-	// Enable if a menu is selected and menu items have loaded.
-	const selectedMenu = getSelectedMenu( selectedCreateOption );
-	return selectedMenu === undefined || ! hasResolvedMenuItems;
-}
-
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedCreateOption, setSelectedCreateOption ] = useState();
+
+	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
 
 	const {
 		pages,
@@ -285,31 +251,49 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		}
 
 		const { key } = selectedCreateOption;
+		switch ( key ) {
+			case CREATE_PLACEHOLDER_VALUE:
+				// Do nothing.
+				return;
 
-		if ( key === CREATE_FROM_PAGES_OPTION_VALUE && hasPages ) {
-			const blocks = convertPagesToBlocks( pages );
+			case CREATE_EMPTY_OPTION_VALUE: {
+				const blocks = [ createBlock( 'core/navigation-link' ) ];
+				onCreate( blocks );
+				return;
+			}
+
+			case CREATE_FROM_PAGES_OPTION_VALUE: {
+				const blocks = convertPagesToBlocks( pages );
+				const selectNavigationBlock = true;
+				onCreate( blocks, selectNavigationBlock );
+				return;
+			}
+
+			// The default case indicates that a menu was selected.
+			default:
+				// If we have menu items, create the block right away.
+				if ( hasResolvedMenuItems ) {
+					const blocks = convertMenuItemsToBlocks( menuItems );
+					const selectNavigationBlock = true;
+					onCreate( blocks, selectNavigationBlock );
+					return;
+				}
+
+				// Otherwise, create the block when resolution finishes.
+				setIsCreatingFromMenu( true );
+		}
+	} );
+
+	useEffect( () => {
+		// If the user selected a menu but we had to wait for menu items to
+		// finish resolving, then create the block once resolution finishes.
+		if ( isCreatingFromMenu && hasResolvedMenuItems ) {
+			const blocks = convertMenuItemsToBlocks( menuItems );
 			const selectNavigationBlock = true;
 			onCreate( blocks, selectNavigationBlock );
-			return;
+			setIsCreatingFromMenu( false );
 		}
-
-		if ( key === CREATE_EMPTY_OPTION_VALUE || ! menuItems?.length ) {
-			const blocks = [ createBlock( 'core/navigation-link' ) ];
-			onCreate( blocks );
-		}
-
-		// Infer that the user selected a menu to create from.
-		// If either there's no selected menu or menu items are undefined
-		// this is undefined behavior, do nothing.
-		const selectedMenu = getSelectedMenu( selectedCreateOption );
-		if ( selectedMenu === undefined || menuItems === undefined ) {
-			return;
-		}
-
-		const blocks = convertMenuItemsToBlocks( menuItems );
-		const selectNavigationBlock = true;
-		onCreate( blocks, selectNavigationBlock );
-	} );
+	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
 
 	return (
 		<Placeholder
@@ -349,6 +333,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 									return;
 								}
 								setSelectedCreateOption( selectedItem );
+								setIsCreatingFromMenu( false );
 							} }
 							options={ createOptions.map( ( option ) => {
 								return {
@@ -360,12 +345,13 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						<Button
 							isSecondary
 							className="wp-block-navigation-placeholder__button"
+							disabled={
+								! selectedCreateOption ||
+								selectedCreateOption.key ===
+									CREATE_PLACEHOLDER_VALUE
+							}
+							isBusy={ isCreatingFromMenu }
 							onClick={ onCreateButtonClick }
-							disabled={ getIsCreateButtonDisabled(
-								selectedCreateOption,
-								hasResolvedPages,
-								hasResolvedMenuItems
-							) }
 						>
 							{ __( 'Create' ) }
 						</Button>
