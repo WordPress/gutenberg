@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { TextControl, CustomSelectControl } from '@wordpress/components';
+import {
+	Button,
+	TextControl,
+	CustomSelectControl,
+} from '@wordpress/components';
 import { ZERO } from '@wordpress/keycodes';
 
 /**
@@ -101,6 +105,15 @@ export default function LineHeightControl( {
 				value={ value }
 				min={ 0 }
 			/>
+			<Button
+				className={ 'block-editor-line-height-control__reset' }
+				disabled={ value === undefined }
+				onClick={ () => onChange( undefined ) }
+				isSmall
+				isSecondary
+			>
+				{ __( 'Reset' ) }
+			</Button>
 		</div>
 	);
 }

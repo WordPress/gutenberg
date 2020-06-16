@@ -16,9 +16,15 @@
 	.block-editor-line-height-control__custom {
 		max-width: 54px;
 		height: 53px;
+		margin-right: 8px;
 
 		.components-base-control__label {
 			margin-bottom: 5px;
 		}
+	}
+
+	.block-editor-line-height-control__reset {
+		height: 30px;
+		margin-top: 23px;
 	}
 }
