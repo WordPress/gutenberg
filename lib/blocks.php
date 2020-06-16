@@ -341,7 +341,9 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 		: '';
 
 		$dom = new DOMDocument( '1.0', 'utf-8' );
+		// @codingStandardsIgnoreStart
 		@$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT );
+		// @codingStandardsIgnoreEnd
 		$xpath      = new DOMXPath( $dom );
 		$block_root = $xpath->query( '/*' )[0];
 
