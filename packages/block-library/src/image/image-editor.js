@@ -257,6 +257,7 @@ export default function ImageEditor( {
 					id: response.media_id,
 					url: response.url,
 				} );
+				setEdits( [] );
 			}
 		} catch ( e ) {
 			createErrorNotice(
