@@ -63,7 +63,9 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 		list.remove( 'is-style-' + activeStyle.name );
 	}
 
-	list.add( 'is-style-' + newStyle.name );
+	if ( ! newStyle.isDefault ) {
+		list.add( 'is-style-' + newStyle.name );
+	}
 
 	return list.value;
 }
@@ -77,7 +79,7 @@ const useGenericPreviewBlock = ( block, type ) =>
 						innerBlocks: type.example.innerBlocks,
 				  } )
 				: cloneBlock( block ),
-		[ block, type ]
+		[ type.example ? block.name : block, type ]
 	);
 
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {

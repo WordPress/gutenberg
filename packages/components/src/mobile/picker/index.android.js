@@ -9,11 +9,22 @@ import { View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BottomSheet from '../bottom-sheet';
+import styles from './styles.scss';
+
+function Separator() {
+	const separatorStyle = usePreferredColorSchemeStyle(
+		styles.separator,
+		styles.separatorDark
+	);
+
+	return <View style={ separatorStyle } />;
+}
 
 export default class Picker extends Component {
 	constructor() {
@@ -35,30 +46,43 @@ export default class Picker extends Component {
 	}
 
 	onCellPress( value ) {
-		this.props.onChange( value );
+		const { onChange } = this.props;
+		onChange( value );
 		this.onClose();
 	}
 
 	render() {
+		const { options, leftAlign, hideCancelButton } = this.props;
+		const { isVisible } = this.state;
+
 		return (
 			<BottomSheet
-				isVisible={ this.state.isVisible }
+				isVisible={ isVisible }
 				onClose={ this.onClose }
 				style={ { paddingBottom: 20 } }
 				hideHeader
 			>
 				<View>
-					{ this.props.options.map( ( option, index ) => (
-						<BottomSheet.Cell
-							icon={ option.icon }
-							key={ index }
-							leftAlign={ this.props.leftAlign }
-							label={ option.label }
-							separatorType={ 'none' }
-							onPress={ () => this.onCellPress( option.value ) }
-						/>
+					{ options.map( ( option, index ) => (
+						<>
+							{ options.length > 1 && option.separated && (
+								<Separator />
+							) }
+							<BottomSheet.Cell
+								icon={ option.icon }
+								key={ index }
+								leftAlign={ leftAlign }
+								label={ option.label }
+								separatorType={ 'none' }
+								onPress={ () =>
+									this.onCellPress( option.value )
+								}
+								disabled={ option.disabled }
+								style={ option.disabled && styles.disabled }
+							/>
+						</>
 					) ) }
-					{ ! this.props.hideCancelButton && (
+					{ ! hideCancelButton && (
 						<BottomSheet.Cell
 							label={ __( 'Cancel' ) }
 							onPress={ this.onClose }

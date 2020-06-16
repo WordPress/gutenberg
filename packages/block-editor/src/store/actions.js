@@ -97,18 +97,18 @@ export function receiveBlocks( blocks ) {
 }
 
 /**
- * Returns an action object used in signalling that the block attributes with
- * the specified client ID has been updated.
+ * Returns an action object used in signalling that the multiple blocks'
+ * attributes with the specified client IDs have been updated.
  *
- * @param {string} clientId   Block client ID.
- * @param {Object} attributes Block attributes to be merged.
+ * @param {string|string[]} clientIds  Block client IDs.
+ * @param {Object}          attributes Block attributes to be merged.
  *
  * @return {Object} Action object.
  */
-export function updateBlockAttributes( clientId, attributes ) {
+export function updateBlockAttributes( clientIds, attributes ) {
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
-		clientId,
+		clientIds: castArray( clientIds ),
 		attributes,
 	};
 }
@@ -274,8 +274,9 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 			...block,
 			attributes: {
 				...attributes,
-				className: `${ className ||
-					'' } is-style-${ blockStyle }`.trim(),
+				className: `${
+					className || ''
+				} is-style-${ blockStyle }`.trim(),
 			},
 		};
 	} );
@@ -871,7 +872,7 @@ export function* setNavigationMode( isNavigationMode = true ) {
 	if ( isNavigationMode ) {
 		speak(
 			__(
-				'You are currently in navigation mode. Navigate blocks using the Tab key. To exit navigation mode and edit the selected block, press Enter.'
+				'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
 			)
 		);
 	} else {
@@ -1008,5 +1009,37 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
 		type: 'TOGGLE_BLOCK_HIGHLIGHT',
 		clientId,
 		isHighlighted,
+	};
+}
+
+/**
+ * Yields action objects used in signalling that the block corresponding to the
+ * given clientId should appear to "flash" by rhythmically highlighting it.
+ *
+ * @param {string} clientId Target block client ID.
+ */
+export function* flashBlock( clientId ) {
+	yield toggleBlockHighlight( clientId, true );
+	yield {
+		type: 'SLEEP',
+		duration: 150,
+	};
+	yield toggleBlockHighlight( clientId, false );
+}
+
+/**
+ * Returns an action object that sets whether the block has controlled innerblocks.
+ *
+ * @param {string} clientId The block's clientId.
+ * @param {boolean} hasControlledInnerBlocks True if the block's inner blocks are controlled.
+ */
+export function setHasControlledInnerBlocks(
+	clientId,
+	hasControlledInnerBlocks
+) {
+	return {
+		type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+		hasControlledInnerBlocks,
+		clientId,
 	};
 }

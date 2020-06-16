@@ -16,18 +16,54 @@ function gutenberg_reregister_core_block_types() {
 		return;
 	}
 
+	$block_folders = array(
+		'audio',
+		'button',
+		'buttons',
+		'classic',
+		'code',
+		'column',
+		'columns',
+		'file',
+		'gallery',
+		'group',
+		'heading',
+		'html',
+		'image',
+		'list',
+		'media-text',
+		'missing',
+		'more',
+		'navigation-link',
+		'nextpage',
+		'paragraph',
+		'preformatted',
+		'pullquote',
+		'quote',
+		'separator',
+		'social-links',
+		'spacer',
+		'subhead',
+		'table',
+		'text-columns',
+		'verse',
+		'video',
+		'widget-area',
+	);
+
 	$block_names = array(
 		'archives.php'        => 'core/archives',
 		'block.php'           => 'core/block',
 		'calendar.php'        => 'core/calendar',
 		'categories.php'      => 'core/categories',
+		'cover.php'           => 'core/cover',
 		'latest-comments.php' => 'core/latest-comments',
 		'latest-posts.php'    => 'core/latest-posts',
 		'legacy-widget.php'   => 'core/legacy-widget',
 		'navigation.php'      => 'core/navigation',
 		'rss.php'             => 'core/rss',
-		'shortcode.php'       => 'core/shortcode',
 		'search.php'          => 'core/search',
+		'shortcode.php'       => 'core/shortcode',
 		'social-link.php'     => 'core/social-link',
 		'tag-cloud.php'       => 'core/tag-cloud',
 	);
@@ -36,16 +72,19 @@ function gutenberg_reregister_core_block_types() {
 		$block_names = array_merge(
 			$block_names,
 			array(
-				'post-title.php'          => 'core/post-title',
-				'post-content.php'        => 'core/post-content',
 				'post-author.php'         => 'core/post-author',
 				'post-comments.php'       => 'core/post-comments',
 				'post-comments-count.php' => 'core/post-comments-count',
 				'post-comments-form.php'  => 'core/post-comments-form',
+				'post-content.php'        => 'core/post-content',
 				'post-date.php'           => 'core/post-date',
 				'post-excerpt.php'        => 'core/post-excerpt',
 				'post-featured-image.php' => 'core/post-featured-image',
 				'post-tags.php'           => 'core/post-tags',
+				'post-title.php'          => 'core/post-title',
+				'query.php'               => 'core/query',
+				'query-loop.php'          => 'core/query-loop',
+				'query-pagination.php'    => 'core/query-pagination',
 				'site-title.php'          => 'core/site-title',
 				'template-part.php'       => 'core/template-part',
 			)
@@ -53,6 +92,27 @@ function gutenberg_reregister_core_block_types() {
 	}
 
 	$registry = WP_Block_Type_Registry::get_instance();
+
+	foreach ( $block_folders as $folder_name ) {
+		$block_json_file = $blocks_dir . '/' . $folder_name . '/block.json';
+		if ( ! file_exists( $block_json_file ) ) {
+			return;
+		}
+
+		// Ideally, all paths to block metadata files should be listed in
+		// WordPress core. In this place we should rather use filter
+		// to replace paths with overrides defined by the plugin.
+		$metadata = json_decode( file_get_contents( $block_json_file ), true );
+		if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
+			return false;
+		}
+
+		if ( $registry->is_registered( $metadata['name'] ) ) {
+			$registry->unregister( $metadata['name'] );
+		}
+
+		register_block_type_from_metadata( $block_json_file );
+	}
 
 	foreach ( $block_names as $file => $block_names ) {
 		if ( ! file_exists( $blocks_dir . $file ) ) {

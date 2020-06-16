@@ -12,7 +12,7 @@ import { withSafeTimeout } from '@wordpress/compose';
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
 const cloneHeightTransformationBreakpoint = 700;
-const clonePadding = 20;
+const clonePadding = 0;
 
 class Draggable extends Component {
 	constructor() {
@@ -47,18 +47,16 @@ class Draggable extends Component {
 	 * @param  {Object} event The non-custom DragEvent.
 	 */
 	onDragOver( event ) {
-		this.cloneWrapper.style.top = `${ parseInt(
-			this.cloneWrapper.style.top,
-			10
-		) +
+		this.cloneWrapper.style.top = `${
+			parseInt( this.cloneWrapper.style.top, 10 ) +
 			event.clientY -
-			this.cursorTop }px`;
-		this.cloneWrapper.style.left = `${ parseInt(
-			this.cloneWrapper.style.left,
-			10
-		) +
+			this.cursorTop
+		}px`;
+		this.cloneWrapper.style.left = `${
+			parseInt( this.cloneWrapper.style.left, 10 ) +
 			event.clientX -
-			this.cursorLeft }px`;
+			this.cursorLeft
+		}px`;
 
 		// Update cursor coordinates.
 		this.cursorLeft = event.clientX;
@@ -76,7 +74,12 @@ class Draggable extends Component {
 	 * @param  {Object} event The non-custom DragEvent.
 	 */
 	onDragStart( event ) {
-		const { elementId, transferData, onDragStart = noop } = this.props;
+		const {
+			cloneClassname,
+			elementId,
+			transferData,
+			onDragStart = noop,
+		} = this.props;
 		const element = document.getElementById( elementId );
 		if ( ! element ) {
 			event.preventDefault();
@@ -108,8 +111,12 @@ class Draggable extends Component {
 		clone.id = `clone-${ elementId }`;
 		this.cloneWrapper = document.createElement( 'div' );
 		this.cloneWrapper.classList.add( cloneWrapperClass );
-		this.cloneWrapper.style.width = `${ elementRect.width +
-			clonePadding * 2 }px`;
+		if ( cloneClassname ) {
+			this.cloneWrapper.classList.add( cloneClassname );
+		}
+		this.cloneWrapper.style.width = `${
+			elementRect.width + clonePadding * 2
+		}px`;
 
 		if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
 			// Scale down clone if original element is larger than 700px.
@@ -120,10 +127,12 @@ class Draggable extends Component {
 			this.cloneWrapper.style.left = `${ event.clientX }px`;
 		} else {
 			// Position clone right over the original element (20px padding).
-			this.cloneWrapper.style.top = `${ elementTopOffset -
-				clonePadding }px`;
-			this.cloneWrapper.style.left = `${ elementLeftOffset -
-				clonePadding }px`;
+			this.cloneWrapper.style.top = `${
+				elementTopOffset - clonePadding
+			}px`;
+			this.cloneWrapper.style.left = `${
+				elementLeftOffset - clonePadding
+			}px`;
 		}
 
 		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze

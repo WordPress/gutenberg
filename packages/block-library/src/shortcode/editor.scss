@@ -23,3 +23,8 @@
 		margin-right: $grid-unit-10;
 	}
 }
+
+.block-editor .blocks-shortcode__textarea,
+.blocks-shortcode__textarea {
+	@include input-control;
+}

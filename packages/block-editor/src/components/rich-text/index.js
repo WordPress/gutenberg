@@ -117,6 +117,7 @@ function RichTextWrapper(
 		onRemove,
 		onMerge,
 		onSplit,
+		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
 		// To do: find a better way to implicitly inherit props.
@@ -302,11 +303,15 @@ function RichTextWrapper(
 				blocks.push( onSplitMiddle() );
 			}
 
-			// If there's pasted blocks, append a block with the content after the
-			// caret. Otherwise, do append and empty block if there is no
-			// `onSplitMiddle` prop, but if there is and the content is empty, the
-			// middle block is enough to set focus in.
-			if ( hasPastedBlocks || ! onSplitMiddle || ! isEmpty( after ) ) {
+			// If there's pasted blocks, append a block with non empty content
+			/// after the caret. Otherwise, do append an empty block if there
+			// is no `onSplitMiddle` prop, but if there is and the content is
+			// empty, the middle block is enough to set focus in.
+			if (
+				hasPastedBlocks
+					? ! isEmpty( after )
+					: ! onSplitMiddle || ! isEmpty( after )
+			) {
 				blocks.push(
 					onSplit(
 						toHTMLString( {
@@ -360,11 +365,17 @@ function RichTextWrapper(
 				} else {
 					onChange( insertLineSeparator( value ) );
 				}
-			} else if ( shiftKey || ! canSplit ) {
+			} else if ( shiftKey || ( ! canSplit && ! onSplitAtEnd ) ) {
 				if ( ! disableLineBreaks ) {
 					onChange( insert( value, '\n' ) );
 				}
-			} else {
+			} else if ( onSplitAtEnd && ! canSplit ) {
+				const { text, start, end } = value;
+
+				if ( start === end && end === text.length ) {
+					onSplitAtEnd();
+				}
+			} else if ( canSplit ) {
 				splitValue( value );
 			}
 		},
@@ -374,6 +385,7 @@ function RichTextWrapper(
 			__unstableMarkAutomaticChange,
 			multiline,
 			splitValue,
+			onSplitAtEnd,
 		]
 	);
 
@@ -563,7 +575,8 @@ function RichTextWrapper(
 				value,
 				onChange,
 				onFocus,
-				Editable,
+				editableProps,
+				editableTagName: TagName,
 			} ) => (
 				<>
 					{ children && children( { value, onChange, onFocus } ) }
@@ -582,7 +595,8 @@ function RichTextWrapper(
 						isSelected={ nestedIsSelected }
 					>
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
-							<Editable
+							<TagName
+								{ ...editableProps }
 								aria-autocomplete={
 									listBoxId ? 'list' : undefined
 								}
@@ -590,7 +604,10 @@ function RichTextWrapper(
 								aria-activedescendant={ activeId }
 								start={ startAttr }
 								reversed={ reversed }
-								onKeyDown={ onKeyDown }
+								onKeyDown={ ( event ) => {
+									onKeyDown( event );
+									editableProps.onKeyDown( event );
+								} }
 							/>
 						) }
 					</Autocomplete>

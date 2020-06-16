@@ -22,7 +22,7 @@ function gutenberg_examples_01_register_block() {
 
 	wp_register_script(
 		'gutenberg-examples-01-esnext',
-		plugins_url( 'build/block.js', __FILE__ ),
+		plugins_url( 'build/index.js', __FILE__ ),
 		$asset_file['dependencies'],
 		$asset_file['version']
 	);
@@ -61,7 +61,7 @@ const blockStyle = {
 registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 	title: 'Example: Basic (esnext)',
 	icon: 'universal-access-alt',
-	category: 'layout',
+	category: 'design',
 	example: {},
 	edit() {
 		return <div style={ blockStyle }>Hello World, step 1 (from the editor).</div>;
@@ -85,7 +85,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 	blocks.registerBlockType( 'gutenberg-examples/example-01-basic', {
 		title: 'Example: Basic',
 		icon: 'universal-access-alt',
-		category: 'layout',
+		category: 'design',
 		example: {},
 		edit: function() {
 			return el(

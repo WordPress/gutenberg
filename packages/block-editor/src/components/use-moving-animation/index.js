@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useSpring, interpolate } from 'react-spring/web.cjs';
+import { useSpring } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
@@ -46,8 +46,6 @@ const getAbsolutePosition = ( element ) => {
  * @param {boolean} adjustScrolling          Adjust the scroll position to the current block.
  * @param {boolean} enableAnimation          Enable/Disable animation.
  * @param {*}       triggerAnimationOnChange Variable used to trigger the animation if it changes.
- *
- * @return {Object} Style object.
  */
 function useMovingAnimation(
 	ref,
@@ -77,9 +75,13 @@ function useMovingAnimation(
 		}
 	}, [ triggeredAnimation ] );
 	useLayoutEffect( () => {
+		if ( ! previous ) {
+			return;
+		}
+
 		scrollContainer.current = getScrollContainer( ref.current );
 		if ( prefersReducedMotion ) {
-			if ( adjustScrolling && scrollContainer.current && previous ) {
+			if ( adjustScrolling && scrollContainer.current ) {
 				// if the animation is disabled and the scroll needs to be adjusted,
 				// just move directly to the final scroll position
 				ref.current.style.transform = 'none';
@@ -95,14 +97,13 @@ function useMovingAnimation(
 		ref.current.style.transform = 'none';
 		const destination = getAbsolutePosition( ref.current );
 		const newTransform = {
-			x: previous ? previous.left - destination.left : 0,
-			y: previous ? previous.top - destination.top : 0,
-			scrollTop:
-				previous && scrollContainer.current
-					? scrollContainer.current.scrollTop -
-					  previous.top +
-					  destination.top
-					: 0,
+			x: previous.left - destination.left,
+			y: previous.top - destination.top,
+			scrollTop: scrollContainer.current
+				? scrollContainer.current.scrollTop -
+				  previous.top +
+				  destination.top
+				: 0,
 		};
 		ref.current.style.transform =
 			newTransform.x === 0 && newTransform.y === 0
@@ -112,7 +113,7 @@ function useMovingAnimation(
 		setTransform( newTransform );
 	}, [ triggerAnimationOnChange ] );
 
-	const animationProps = useSpring( {
+	useSpring( {
 		from: {
 			x: transform.x,
 			y: transform.y,
@@ -124,37 +125,27 @@ function useMovingAnimation(
 		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
-		onFrame: ( props ) => {
+		onFrame( { x, y } ) {
 			if (
 				adjustScrolling &&
 				scrollContainer.current &&
 				! prefersReducedMotion &&
-				props.y
+				y
 			) {
-				scrollContainer.current.scrollTop =
-					transform.scrollTop + props.y;
+				scrollContainer.current.scrollTop = transform.scrollTop + y;
+			}
+
+			if ( ref.current ) {
+				ref.current.style.transformOrigin = 'center';
+				ref.current.style.transform =
+					x === 0 && y === 0
+						? null
+						: `translate3d(${ x }px,${ y }px,0)`;
+				ref.current.style.zIndex =
+					! isSelected || ( x === 0 && y === 0 ) ? null : '1';
 			}
 		},
 	} );
-
-	// Dismiss animations if disabled.
-	return prefersReducedMotion
-		? {}
-		: {
-				transformOrigin: 'center',
-				transform: interpolate(
-					[ animationProps.x, animationProps.y ],
-					( x, y ) =>
-						x === 0 && y === 0
-							? undefined
-							: `translate3d(${ x }px,${ y }px,0)`
-				),
-				zIndex: interpolate(
-					[ animationProps.x, animationProps.y ],
-					( x, y ) =>
-						! isSelected || ( x === 0 && y === 0 ) ? undefined : `1`
-				),
-		  };
 }
 
 export default useMovingAnimation;

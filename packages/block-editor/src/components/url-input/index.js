@@ -152,7 +152,6 @@ class URLInput extends Component {
 		this.isUpdatingSuggestions = true;
 
 		this.setState( {
-			showSuggestions: true,
 			selectedSuggestion: null,
 			loading: true,
 		} );
@@ -173,6 +172,7 @@ class URLInput extends Component {
 				this.setState( {
 					suggestions,
 					loading: false,
+					showSuggestions: !! suggestions.length,
 				} );
 
 				if ( !! suggestions.length ) {
@@ -379,7 +379,6 @@ class URLInput extends Component {
 			instanceId,
 			className,
 			isFullWidth,
-			hasBorder,
 			__experimentalRenderSuggestions: renderSuggestions,
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
@@ -422,7 +421,6 @@ class URLInput extends Component {
 				id={ id }
 				className={ classnames( 'block-editor-url-input', className, {
 					'is-full-width': isFullWidth,
-					'has-border': hasBorder,
 				} ) }
 			>
 				<input

@@ -16,7 +16,7 @@ const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-w
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const {
 	camelCaseDash,
-} = require( '@wordpress/dependency-extraction-webpack-plugin/util' );
+} = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
 
 /**
  * Internal dependencies

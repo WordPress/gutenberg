@@ -11,6 +11,7 @@
 
 	// Animate appearance.
 	.block-list-appender__toggle {
+		padding: 0;
 		opacity: 1;
 		transform: scale(1);
 		transition: all 0.1s ease;
@@ -26,7 +27,7 @@
 	top: -$grid-unit-10;
 	bottom: -$grid-unit-10;
 	border-radius: $radius-block-ui;
-	border: 3px solid theme(primary);
+	border: 3px solid var(--wp-admin-theme-color);
 }
 
 .block-list-appender > .block-editor-inserter {

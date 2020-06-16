@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.17.0",
+	"version": "2.20.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"blocks"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-library/README.md",
@@ -41,6 +42,7 @@
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
+		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
@@ -55,6 +57,7 @@
 		"lodash": "^4.17.15",
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",
+		"react-easy-crop": "^3.0.0",
 		"tinycolor2": "^1.4.1"
 	},
 	"publishConfig": {

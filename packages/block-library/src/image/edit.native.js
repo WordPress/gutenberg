@@ -28,7 +28,6 @@ import {
 	CycleSelectControl,
 	Icon,
 	PanelBody,
-	PanelActions,
 	TextControl,
 	ToggleControl,
 	ToolbarButton,
@@ -66,11 +65,7 @@ import SvgIconRetry from './icon-retry';
 import SvgIconCustomize from './icon-customize';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import {
-	LINK_DESTINATION_CUSTOM,
-	LINK_DESTINATION_NONE,
-	DEFAULT_SIZE_SLUG,
-} from './constants';
+import { LINK_DESTINATION_CUSTOM, DEFAULT_SIZE_SLUG } from './constants';
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
@@ -110,7 +105,6 @@ export class ImageEdit extends React.Component {
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
-		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 	}
@@ -280,17 +274,6 @@ export class ImageEdit extends React.Component {
 		} );
 	}
 
-	onClearSettings() {
-		this.props.setAttributes( {
-			alt: '',
-			linkDestination: LINK_DESTINATION_NONE,
-			href: undefined,
-			linkTarget: undefined,
-			sizeSlug: DEFAULT_SIZE_SLUG,
-			rel: undefined,
-		} );
-	}
-
 	onSelectMediaUploadOption( media ) {
 		const { id, url } = this.props.attributes;
 
@@ -365,13 +348,6 @@ export class ImageEdit extends React.Component {
 			sizeSlug,
 		} = attributes;
 
-		const actions = [
-			{
-				label: __( 'Clear All Settings' ),
-				onPress: this.onClearSettings,
-			},
-		];
-
 		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
 			value: slug,
 			name,
@@ -435,7 +411,6 @@ export class ImageEdit extends React.Component {
 						onChangeValue={ this.updateAlt }
 					/>
 				</PanelBody>
-				<PanelActions actions={ actions } />
 			</InspectorControls>
 		);
 
@@ -647,6 +622,7 @@ export class ImageEdit extends React.Component {
 						}
 						onFocus={ this.onFocusCaption }
 						onBlur={ this.props.onBlur } // always assign onBlur as props
+						insertBlocksAfter={ this.props.insertBlocksAfter }
 					/>
 				</View>
 			</TouchableWithoutFeedback>

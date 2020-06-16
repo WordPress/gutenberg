@@ -12,7 +12,7 @@ import {
  *
  * @return {string} return current color scheme.
  */
-const usePreferredColorScheme = function() {
+function usePreferredColorScheme() {
 	const [ currentColorScheme, setCurrentColorScheme ] = useState(
 		isInitialColorSchemeDark ? 'dark' : 'light'
 	);
@@ -25,6 +25,6 @@ const usePreferredColorScheme = function() {
 		} );
 	} );
 	return currentColorScheme;
-};
+}
 
 export default usePreferredColorScheme;

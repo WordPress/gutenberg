@@ -16,14 +16,14 @@ import { useControlledState } from '../utils/hooks';
 /**
  * A float supported clamp function for a specific value.
  *
- * @param {number|null} value The value to clamp
- * @param {number} min The minimum value
- * @param {number} max The maxinum value
+ * @param {number|null} value The value to clamp.
+ * @param {number}      min   The minimum value.
+ * @param {number}      max   The maximum value.
  *
  * @return {number} A (float) number
  */
 export function floatClamp( value, min, max ) {
-	if ( ! isFinite( value ) ) {
+	if ( typeof value !== 'number' ) {
 		return null;
 	}
 
@@ -32,6 +32,11 @@ export function floatClamp( value, min, max ) {
 
 /**
  * Hook to store a clamped value, derived from props.
+ *
+ * @param {Object} settings       Hook settings.
+ * @param {number} settings.min   The minimum value.
+ * @param {number} settings.max   The maximum value.
+ * @param {number} settings.value The current value.
  */
 export function useControlledRangeValue( { min, max, value: valueProp } ) {
 	const [ value, setValue ] = useControlledState(
@@ -55,6 +60,13 @@ export function useControlledRangeValue( { min, max, value: valueProp } ) {
 /**
  * Hook to encapsulate the debouncing "hover" to better handle the showing
  * and hiding of the Tooltip.
+ *
+ * @param {Object}   settings                     Hook settings.
+ * @param {Function} [settings.onShow=noop]       A callback function invoked when the element is shown.
+ * @param {Function} [settings.onHide=noop]       A callback function invoked when the element is hidden.
+ * @param {Function} [settings.onMouseMove=noop]  A callback function invoked when the mouse is moved.
+ * @param {Function} [settings.onMouseLeave=noop] A callback function invoked when the mouse is moved out of the element.
+ * @param {number}   [settings.timeout=300]       Timeout before the element is shown or hidden.
  */
 export function useDebouncedHoverInteraction( {
 	onShow = noop,

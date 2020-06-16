@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/components",
-	"version": "9.5.0",
+	"version": "9.8.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"components"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/components/README.md",
@@ -43,7 +44,6 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
 		"classnames": "^2.2.5",
-		"clipboard": "^2.0.1",
 		"dom-scroll-into-view": "^1.2.1",
 		"downshift": "^4.0.5",
 		"gradient-parser": "^0.1.5",
@@ -53,7 +53,8 @@
 		"re-resizable": "^6.0.0",
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",
-		"reakit": "^1.0.0-rc.2",
+		"react-use-gesture": "^7.0.15",
+		"reakit": "^1.0.4",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^7.0.2"

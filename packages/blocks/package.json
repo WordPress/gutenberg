@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "6.15.0",
+	"version": "6.18.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"blocks"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/blocks/README.md",
@@ -20,6 +21,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"!((src|build|build-module)/api/**)"
+	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/autop": "file:../autop",

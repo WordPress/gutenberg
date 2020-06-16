@@ -1,20 +1,12 @@
 .interface-pinned-items {
-	display: none;
-
-	@include break-small() {
-		display: flex;
-	}
+	display: flex;
 
 	.components-button {
-		margin-left: 4px;
-
-		&.is-pressed {
-			margin-left: 5px;
-		}
+		margin-left: $grid-unit-05;
 
 		svg {
-			max-width: 24px;
-			max-height: 24px;
+			max-width: $icon-size;
+			max-height: $icon-size;
 		}
 	}
 }

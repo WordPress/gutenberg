@@ -20,7 +20,7 @@ import {
 	RangeControl,
 	ToolbarButton,
 	ToolbarGroup,
-	LinearGradient,
+	Gradient,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -324,7 +324,7 @@ const Cover = ( {
 
 			<View pointerEvents="none" style={ overlayStyles }>
 				{ gradientValue && (
-					<LinearGradient
+					<Gradient
 						gradientValue={ gradientValue }
 						style={ styles.background }
 					/>

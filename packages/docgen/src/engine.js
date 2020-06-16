@@ -1,11 +1,11 @@
 /**
- * External dependencies.
+ * External dependencies
  */
 const babel = require( '@babel/core' );
 const { flatten } = require( 'lodash' );
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
