@@ -103,9 +103,14 @@ export default compose(
 			true
 		);
 		const innerBlocks = getBlocks( clientId );
+		const activeInnerBlocks = innerBlocks.filter(
+			( block ) => block.attributes?.url
+		);
 
 		return {
-			shouldDelete: getBlockCount( clientId ) === 1,
+			shouldDelete:
+				getBlockCount( clientId ) === 1 ||
+				activeInnerBlocks.length === 1,
 			isInnerIconSelected: selectedBlockParents[ 0 ] === clientId,
 			innerBlocks,
 		};
@@ -117,7 +122,7 @@ export default compose(
 
 		return {
 			onDelete: () => {
-				removeBlock( clientId );
+				removeBlock( clientId, false );
 			},
 			replaceInnerBlocks,
 		};

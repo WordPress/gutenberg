@@ -32,6 +32,7 @@ import { prependHTTP } from '@wordpress/url';
 import { getIconBySite, getNameBySite } from './social-list';
 import styles from './editor.scss';
 
+const ANIMATION_DELAY = 300;
 const ANIMATION_DURATION = 400;
 
 const SocialLinkEdit = ( {
@@ -49,17 +50,10 @@ const SocialLinkEdit = ( {
 		styles.inactiveIconDark
 	);
 
-	const iconColors = url ? activeIcon : inactiveIcon;
-
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
+	const [ isValue, setIsValue ] = useState( !! url );
 
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
-
-	const [ activeColors, setActiveColors ] = useState( {
-		backgroundColor: iconColors.backgroundColor,
-		color: iconColors.color,
-		stroke: iconColors.stroke,
-	} );
 
 	const IconComponent = getIconBySite( service )();
 	const socialLinkName = getNameBySite( service );
@@ -74,23 +68,29 @@ const SocialLinkEdit = ( {
 		setAttributes( { url: prependHTTP( url ) } );
 	}, [ ! isLinkSheetVisible && url ] );
 
-	const interpolateBgColor = animatedValue.interpolate( {
-		inputRange: [ 0, 1 ],
-		outputRange: [
-			inactiveIcon.backgroundColor,
-			activeIcon.backgroundColor,
-		],
-	} );
+	const interpolationColors = {
+		backgroundColor: animatedValue.interpolate( {
+			inputRange: [ 0, 1 ],
+			outputRange: [
+				inactiveIcon.backgroundColor,
+				activeIcon.backgroundColor,
+			],
+		} ),
+		color: animatedValue.interpolate( {
+			inputRange: [ 0, 1 ],
+			outputRange: [ inactiveIcon.color, activeIcon.color ],
+		} ),
+		stroke: '',
+	};
 
-	const interpolateColor = animatedValue.interpolate( {
-		inputRange: [ 0, 1 ],
-		outputRange: [ inactiveIcon.color, activeIcon.color ],
-	} );
+	const { backgroundColor, color, stroke } = isValue
+		? activeIcon
+		: interpolationColors;
 
 	function onChangeURL( value ) {
 		if ( value === '' ) {
-			const { backgroundColor, stroke, color } = inactiveIcon;
-			setActiveColors( { backgroundColor, stroke, color } );
+			setIsValue( false );
+			animatedValue.setValue( 0 );
 		}
 		setAttributes( { url: value } );
 	}
@@ -101,28 +101,19 @@ const SocialLinkEdit = ( {
 
 	function animateColors() {
 		Animated.sequence( [
-			Animated.delay( ANIMATION_DURATION ),
+			Animated.delay( ANIMATION_DELAY ),
 			Animated.timing( animatedValue, {
 				toValue: 1,
 				duration: ANIMATION_DURATION,
 				easing: Easing.circle,
 			} ),
-		] ).start();
+		] ).start( () => setIsValue( true ) );
 	}
 
 	function onCloseSettingsSheet() {
-		if (
-			url &&
-			activeColors.backgroundColor !== activeIcon.backgroundColor
-		) {
-			setActiveColors( {
-				backgroundColor: interpolateBgColor,
-				color: interpolateColor,
-				stroke: iconColors.stroke,
-			} );
+		if ( url ) {
 			animateColors();
 		}
-
 		setIsLinkSheetVisible( false );
 	}
 
@@ -188,8 +179,6 @@ const SocialLinkEdit = ( {
 			</>
 		);
 	}
-
-	const { backgroundColor, color, stroke } = activeColors;
 
 	return (
 		<View>
