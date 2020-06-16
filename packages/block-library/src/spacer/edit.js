@@ -81,7 +81,7 @@ const SpacerEdit = ( {
 				<ResizeTooltip
 					axis="y"
 					isVisible={ isResizing }
-					position="cursor"
+					position="bottom"
 				/>
 			</ResizableBox>
 			<InspectorControls>

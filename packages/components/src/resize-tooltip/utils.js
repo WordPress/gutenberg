@@ -19,7 +19,6 @@ export const POSITIONS = {
 /**
  * @typedef {Object} UseResizeLabelProps
  *
- * @property {boolean} isActive The visibility of the label.
  * @property {undefined|string} label The label value.
  * @property {Function} resizeListener Element to be rendered for resize listening events.
  */
@@ -52,6 +51,13 @@ export function useResizeLabel( {
 	const [ resizeListener, sizes ] = useResizeAware();
 
 	/*
+	 * Indicates if the x/y axis is preferred.
+	 * If set, we will avoid resetting the moveX and moveY values.
+	 * This will allow for the preferred axis values to persist in the label.
+	 */
+	const isAxisControlled = !! axis;
+
+	/*
 	 * The moveX and moveY values are used to track whether the label should
 	 * display width, height, or width x height.
 	 */
@@ -74,6 +80,11 @@ export function useResizeLabel( {
 	const { width, height } = sizes;
 
 	const unsetMoveXY = () => {
+		/*
+		 * If axis is controlled, we will avoid resetting the moveX and moveY values.
+		 * This will allow for the preferred axis values to persist in the label.
+		 */
+		if ( isAxisControlled ) return;
 		setMoveX( false );
 		setMoveY( false );
 	};
@@ -131,12 +142,12 @@ export function useResizeLabel( {
 
 	const label = getSizeLabel( {
 		axis,
+		height,
 		moveX,
 		moveY,
-		width,
-		height,
-		showPx,
 		position,
+		showPx,
+		width,
 	} );
 
 	return {

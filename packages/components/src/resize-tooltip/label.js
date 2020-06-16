@@ -74,7 +74,7 @@ function Label(
 				className="components-resizable-tooltip__tooltip"
 				style={ labelStyle }
 			>
-				<LabelText>{ label }</LabelText>
+				<LabelText as="span">{ label }</LabelText>
 			</Tooltip>
 		</TooltipWrapper>
 	);

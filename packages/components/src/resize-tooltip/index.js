@@ -31,7 +31,7 @@ function ResizeTooltip(
 	},
 	ref
 ) {
-	const { isActive, label, resizeListener } = useResizeLabel( {
+	const { label, resizeListener } = useResizeLabel( {
 		axis,
 		fadeTimeout,
 		onResize,
@@ -49,7 +49,6 @@ function ResizeTooltip(
 			<Label
 				aria-hidden={ props[ 'aria-hidden' ] }
 				fadeTimeout={ fadeTimeout }
-				isActive={ isActive }
 				isVisible={ isVisible }
 				label={ label }
 				position={ position }
