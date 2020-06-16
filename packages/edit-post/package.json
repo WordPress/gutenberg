@@ -52,6 +52,7 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/warning": "file:../warning",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.15",
 		"memize": "^1.1.0",

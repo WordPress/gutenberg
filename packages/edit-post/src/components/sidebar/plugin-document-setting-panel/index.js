@@ -9,6 +9,7 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 import { withDispatch, withSelect } from '@wordpress/data';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -104,9 +105,12 @@ const PluginDocumentSettingFill = ( {
  */
 const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {
+		if ( undefined !== ownProps.name ) {
+			warning( 'PluginDocumentSettingPanel requires a name property' );
+		}
 		return {
 			icon: ownProps.icon || context.icon,
-			panelName: ownProps.name || context.name,
+			panelName: `${ context.name }/${ ownProps.name }`,
 		};
 	} ),
 	withSelect( ( select, { panelName } ) => {
