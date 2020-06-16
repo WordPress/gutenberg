@@ -592,7 +592,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 
 		$schema['properties']['auto_add'] = array(
 			'description' => __( 'Whether to automatically add top level pages to this menu.', 'gutenberg' ),
-			'context'     => array( 'edit', 'embed' ),
+			'context'     => array( 'view', 'edit' ),
 			'type'        => 'boolean',
 		);
 
