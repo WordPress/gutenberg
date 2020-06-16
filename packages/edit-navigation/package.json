@@ -1,12 +1,15 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
-		"wordpress"
+		"wordpress",
+		"gutenberg",
+		"editor",
+		"navigation"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-navigation/README.md",
 	"repository": {

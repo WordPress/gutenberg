@@ -31,8 +31,8 @@
 
 	&:not(:disabled) {
 		&:hover {
-			border-color: $theme-color;
-			color: $theme-color !important;
+			border-color: var(--wp-admin-theme-color);
+			color: var(--wp-admin-theme-color) !important;
 		}
 
 		&.is-active {

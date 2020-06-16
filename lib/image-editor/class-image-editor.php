@@ -46,7 +46,7 @@ class Image_Editor {
 	 *
 	 * @param integer               $media_id Media id.
 	 * @param Image_Editor_Modifier $modifier Modifier to apply to the image.
-	 * @return array|WP_Error If successful image JSON containing the mediaId and url of modified image, otherwise WP_Error.
+	 * @return array|WP_Error If successful image JSON containing the media_id and url of modified image, otherwise WP_Error.
 	 */
 	public function modify_image( $media_id, $modifier ) {
 		// Get image information.
@@ -118,8 +118,8 @@ class Image_Editor {
 	 */
 	private function get_image_as_json( $id ) {
 		return array(
-			'mediaID' => $id,
-			'url'     => wp_get_attachment_image_url( $id, 'original' ),
+			'media_id' => $id,
+			'url'      => wp_get_attachment_image_url( $id, 'original' ),
 		);
 	}
 
