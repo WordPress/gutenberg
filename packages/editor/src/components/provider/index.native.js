@@ -252,7 +252,7 @@ export default compose( [
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
-			blockCount: getBlockCount( rootClientId ),
+			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
 		};
 	} ),
