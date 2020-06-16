@@ -36,9 +36,12 @@ export const Tooltip = styled.div`
 	box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.2 );
 	box-sizing: border-box;
 	color: ${ color( 'ui.textDark' ) };
-	padding: 4px 8px;
+	padding: 4px 6px;
 	position: relative;
 `;
+
+// TODO: Resolve need to use &&& to increase specificity
+// https://github.com/WordPress/gutenberg/issues/18483
 
 export const LabelText = styled( Text )`
 	&&& {
