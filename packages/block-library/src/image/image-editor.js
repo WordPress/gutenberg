@@ -184,6 +184,18 @@ function normalizeAngle( angle ) {
 	return angle < 0 ? ( angle % 360 ) + 360 : angle % 360;
 }
 
+function isNoOp( attrs ) {
+	const identity =
+		! attrs.flip.horizontal &&
+		! attrs.flip.vertical &&
+		attrs.rotate.angle === 0;
+	const inverse =
+		attrs.flip.horizontal &&
+		attrs.flip.vertical &&
+		attrs.rotate.angle === 180;
+	return attrs.crop === null && ( identity || inverse );
+}
+
 function getStyles( edits ) {
 	const attrs = flattenEdits( edits );
 
@@ -232,16 +244,7 @@ export default function ImageEditor( {
 		const attrs = flattenEdits( edits );
 		attrs.rotate.angle = normalizeAngle( attrs.rotate.angle );
 
-		// Noop cases that result in an identical image.
-		if (
-			attrs.crop === null &&
-			( ( attrs.flip.horizontal &&
-				attrs.flip.vertical &&
-				attrs.rotate.angle === 180 ) ||
-				( ! attrs.flip.horizontal &&
-					! attrs.flip.vertical &&
-					attrs.rotate.angle === 0 ) )
-		) {
+		if ( isNoOp( attrs ) ) {
 			setInProgress( false );
 			setIsCropping( false );
 			return;
