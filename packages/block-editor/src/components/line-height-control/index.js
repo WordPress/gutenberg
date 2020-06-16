@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { TextControl } from '@wordpress/components';
+import { TextControl, CustomSelectControl } from '@wordpress/components';
 import { ZERO } from '@wordpress/keycodes';
 
 /**
@@ -15,7 +15,11 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
-export default function LineHeightControl( { value: lineHeight, onChange } ) {
+export default function LineHeightControl( {
+	presetValues,
+	value: lineHeight,
+	onChange,
+} ) {
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const handleOnKeyDown = ( event ) => {
@@ -63,13 +67,33 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 
 	const value = isDefined ? lineHeight : RESET_VALUE;
 
+	const options = presetValues.map( ( presetValue ) => ( {
+		key: presetValue.slug,
+		name: presetValue.name,
+		value: presetValue.value,
+	} ) );
+
+	const handlePresetSelection = ( { selectedItem } ) =>
+		onChange( selectedItem.value );
+
 	return (
 		<div className="block-editor-line-height-control">
+			{ presetValues?.length > 0 && (
+				<CustomSelectControl
+					className={ 'block-editor-line-height-control__select' }
+					label={ __( 'Line Height' ) }
+					options={ options }
+					value={ options.find(
+						( option ) => option.value === value
+					) }
+					onChange={ handlePresetSelection }
+				/>
+			) }
 			<TextControl
 				autoComplete="off"
 				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnChange }
-				label={ __( 'Line height' ) }
+				label={ __( 'Custom' ) }
 				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
 				type="number"

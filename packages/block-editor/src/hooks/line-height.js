@@ -24,6 +24,9 @@ export function LineHeightEdit( props ) {
 		attributes: { style },
 	} = props;
 	const isDisabled = useIsLineHeightDisabled( props );
+	const { lineHeight: presetValues } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
 
 	if ( isDisabled ) {
 		return null;
@@ -43,6 +46,7 @@ export function LineHeightEdit( props ) {
 	};
 	return (
 		<LineHeightControl
+			presetValues={ presetValues }
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
 		/>
