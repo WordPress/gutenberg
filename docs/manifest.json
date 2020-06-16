@@ -1062,6 +1062,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "StyledScopeProvider",
+		"slug": "styled-scope-provider",
+		"markdown_source": "../packages/components/src/styled-scope-provider/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TabPanel",
 		"slug": "tab-panel",
 		"markdown_source": "../packages/components/src/tab-panel/README.md",
