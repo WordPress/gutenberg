@@ -85,15 +85,6 @@ figure.wp-block-image:not(.wp-block) {
 
 	img {
 		opacity: 0.6;
-		transition: all 0.4s ease; // Make flips smooth.
-	}
-
-	&.richimage__working__flipv img {
-		transform: scale(1, -1);
-	}
-
-	&.richimage__working__fliph img {
-		transform: scale(-1, 1);
 	}
 }
 
