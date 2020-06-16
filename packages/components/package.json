@@ -32,6 +32,7 @@
 		"@emotion/styled": "^10.0.23",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
