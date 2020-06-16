@@ -438,9 +438,8 @@
 	}
 }
 
-@mixin admin-scheme($color-primary, $color-secondary) {
+@mixin admin-scheme($color-primary) {
 	--wp-admin-theme-color: #{$color-primary};
-	--wp-admin-theme-color-secondary: #{$color-secondary};
 
 	// Ideally, we should limit these computed variables,
 	// because we can"t compute colors based on CSS variables.
@@ -453,36 +452,36 @@
 
 @mixin wordpress-admin-schemes() {
 	body.admin-color-light {
-		@include admin-scheme(#0085ba, #c75726);
+		@include admin-scheme(#0085ba);
 	}
 
 	body.admin-color-blue {
-		@include admin-scheme(#82b4cb, #d9ab59);
+		@include admin-scheme(#82b4cb);
 	}
 
 	body.admin-color-coffee {
-		@include admin-scheme(#c2a68c, #9fa47b);
+		@include admin-scheme(#c2a68c);
 	}
 
 	body.admin-color-ectoplasm {
-		@include admin-scheme(#a7b656, #c77430);
+		@include admin-scheme(#a7b656);
 	}
 
 	body.admin-color-midnight {
-		@include admin-scheme(#e14d43, #77a6b9);
+		@include admin-scheme(#e14d43);
 	}
 
 	body.admin-color-ocean {
-		@include admin-scheme(#a3b9a2, #a89d8a);
+		@include admin-scheme(#a3b9a2);
 	}
 
 	body.admin-color-sunrise {
-		@include admin-scheme(#d1864a, #c8b03c);
+		@include admin-scheme(#d1864a);
 	}
 }
 
 // It is important to include these styles in all built stylesheets
 // This allows to CSS variables post CSS plugin to generate fallbacks.
 :root {
-	@include admin-scheme(#007cba, #11a0d2);
+	@include admin-scheme(#007cba);
 }
