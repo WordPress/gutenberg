@@ -5,6 +5,11 @@ import { Svg } from 'react-native-svg';
 import { Animated } from 'react-native';
 
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import styles from './style.scss';
@@ -21,7 +26,9 @@ export {
 	Stop,
 } from 'react-native-svg';
 
-const AnimatedSvg = Animated.createAnimatedComponent( Svg );
+const AnimatedSvg = Animated.createAnimatedComponent(
+	forwardRef( ( props, ref ) => <Svg ref={ ref } { ...props } /> )
+);
 
 export const SVG = ( { className = '', isPressed, ...props } ) => {
 	const colorScheme = props.colorScheme || 'light';
