@@ -6,7 +6,7 @@
 
 ### Bug Fix
 
-- Fix errors reported by CSS linter in ESNext template by using hex colors in CSS files ([#23164](https://github.com/WordPress/gutenberg/pull/23164)).
+- Fix errors reported by CSS linter in ESNext template by using hex colors in CSS files ([#23188](https://github.com/WordPress/gutenberg/pull/23188)).
 
 ## 0.14.1 (2020-06-15)
 
