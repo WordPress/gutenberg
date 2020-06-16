@@ -66,6 +66,27 @@ function isValidFocusableArea( element ) {
 	return !! img && isVisible( img );
 }
 
+// todo jsdoc
+// todo tests
+function getChildrenElementsToSkip( elements ) {
+	return Array.from( elements ).reduce( ( res, element ) => {
+		return element.getAttribute( 'data-skipchildrenfocus' ) === null
+			? res
+			: skipChildrenElements( element, res );
+	}, [] );
+}
+
+// todo jsdoc
+// todo tests
+function skipChildrenElements( element, final ) {
+	if ( element.childNodes.lenght === 0 ) return;
+	element.childNodes.forEach( ( el ) => {
+		final.push( el );
+		skipChildrenElements( el, final );
+	} );
+	return final;
+}
+
 /**
  * Returns all focusable elements within a given context.
  *
@@ -76,8 +97,13 @@ function isValidFocusableArea( element ) {
 export function find( context ) {
 	const elements = context.querySelectorAll( SELECTOR );
 
+	const childrenElementsToSkip = getChildrenElementsToSkip( elements );
+
 	return Array.from( elements ).filter( ( element ) => {
-		if ( ! isVisible( element ) ) {
+		if (
+			! isVisible( element ) ||
+			childrenElementsToSkip.includes( element )
+		) {
 			return false;
 		}
 
