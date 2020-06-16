@@ -13,7 +13,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
     public override init() {
         super.init()
-        NotificationCenter.default.addObserver(forName: Notification.Name("RCTContentDidAppearNotification"), object: nil, queue: nil) { (_) in
+        NotificationCenter.default.addObserver(forName: .RCTContentDidAppear, object: nil, queue: nil) { (_) in
             DispatchQueue.main.async {
                 self.connectionEstablished()
             }
