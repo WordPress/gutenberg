@@ -44,6 +44,8 @@ const ICON_TYPE = {
 	RETRY: 'retry',
 };
 
+const DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
+
 export { imageFillStyles } from './media-container.js';
 
 class MediaContainer extends Component {
@@ -181,8 +183,9 @@ class MediaContainer extends Component {
 			shouldStack,
 		} = this.props;
 		const { isUploadFailed, retryMessage } = params;
-		const focalPointValues =
-			imageFill && ! focalPoint ? { x: 0.5, y: 0.5 } : focalPoint;
+		const focalPointValues = ! focalPoint
+			? DEFAULT_FOCAL_POINT
+			: focalPoint;
 
 		return (
 			<View

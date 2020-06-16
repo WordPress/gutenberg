@@ -87,6 +87,9 @@ export class ImageEdit extends React.Component {
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
+		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
+			this
+		);
 	}
 
 	componentDidMount() {
@@ -151,6 +154,17 @@ export class ImageEdit extends React.Component {
 		return {
 			isCaptionSelected: props.isSelected && state.isCaptionSelected,
 		};
+	}
+
+	accessibilityLabelCreator( caption ) {
+		return isEmpty( caption )
+			? /* translators: accessibility text. Empty image caption. */
+			  'Image caption. Empty'
+			: sprintf(
+					/* translators: accessibility text. %s: image caption. */
+					__( 'Image caption. %s' ),
+					caption
+			  );
 	}
 
 	onImagePressed() {
@@ -388,7 +402,7 @@ export class ImageEdit extends React.Component {
 
 		if ( ! url ) {
 			return (
-				<View style={ { flex: 1 } }>
+				<View style={ styles.content }>
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						onSelect={ this.onSelectMediaUploadOption }
@@ -415,7 +429,7 @@ export class ImageEdit extends React.Component {
 					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
-					<View style={ { flex: 1 } }>
+					<View style={ styles.content }>
 						{ getInspectorControls() }
 						{ getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
@@ -467,16 +481,7 @@ export class ImageEdit extends React.Component {
 					clientId={ this.props.clientId }
 					isSelected={ this.state.isCaptionSelected }
 					accessible={ true }
-					accessibilityLabelCreator={ ( caption ) =>
-						isEmpty( caption )
-							? /* translators: accessibility text. Empty image caption. */
-							  'Image caption. Empty'
-							: sprintf(
-									/* translators: accessibility text. %s: image caption. */
-									__( 'Image caption. %s' ),
-									caption
-							  )
-					}
+					accessibilityLabelCreator={ this.accessibilityLabelCreator }
 					onFocus={ this.onFocusCaption }
 					onBlur={ this.props.onBlur } // always assign onBlur as props
 				/>

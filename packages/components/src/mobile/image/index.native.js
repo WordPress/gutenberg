@@ -75,7 +75,13 @@ const ImageComponent = ( {
 
 	const onContainerLayout = ( event ) => {
 		const { height, width } = event.nativeEvent.layout;
-		setContainerSize( { width, height } );
+
+		if (
+			containerSize?.width !== width ||
+			containerSize?.height !== height
+		) {
+			setContainerSize( { width, height } );
+		}
 	};
 
 	const getIcon = ( iconType ) => {

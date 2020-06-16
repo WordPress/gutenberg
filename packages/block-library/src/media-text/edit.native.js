@@ -67,6 +67,7 @@ class MediaTextEdit extends Component {
 		this.onMediaSelected = this.onMediaSelected.bind( this );
 		this.onReplaceMedia = this.onReplaceMedia.bind( this );
 		this.onSetOpenPickerRef = this.onSetOpenPickerRef.bind( this );
+		this.onSetImageFill = this.onSetImageFill.bind( this );
 
 		this.state = {
 			mediaWidth: null,
@@ -178,6 +179,31 @@ class MediaTextEdit extends Component {
 		this.openPickerRef = openPicker;
 	}
 
+	onSetImageFill() {
+		const { attributes, setAttributes } = this.props;
+		const { imageFill } = attributes;
+
+		setAttributes( {
+			imageFill: ! imageFill,
+		} );
+	}
+
+	getControls() {
+		const { attributes } = this.props;
+		const { imageFill } = attributes;
+
+		return (
+			<InspectorControls>
+				<PanelBody title={ __( 'Media & Text settings' ) }>
+					<ToggleControl
+						label={ __( 'Crop image to fill entire column' ) }
+						checked={ imageFill }
+						onChange={ this.onSetImageFill }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		);
+	}
 	renderMediaArea( shouldStack ) {
 		const { isMediaSelected, containerWidth } = this.state;
 		const { attributes, isSelected } = this.props;
@@ -193,9 +219,10 @@ class MediaTextEdit extends Component {
 			verticalAlignment,
 		} = attributes;
 		const mediaAreaWidth =
-			( mediaWidth && ! shouldStack
-				? ( containerWidth * mediaWidth ) / 100
-				: containerWidth ) - styles.mediaAreaPadding.width;
+			mediaWidth && ! shouldStack
+				? ( containerWidth * mediaWidth ) / 100 -
+				  styles.mediaAreaPadding.width
+				: containerWidth;
 		const aligmentStyles =
 			styles[
 				`is-vertically-aligned-${ verticalAlignment || 'center' }`
@@ -282,15 +309,20 @@ class MediaTextEdit extends Component {
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
 
-		const mediaContainerStyle = shouldStack
-			? {
-					...( mediaPosition === 'left' && styles.mediaStackLeft ),
-					...( mediaPosition === 'right' && styles.mediaStackRight ),
-			  }
-			: {
-					...( mediaPosition === 'left' && styles.mediaLeft ),
-					...( mediaPosition === 'right' && styles.mediaRight ),
-			  };
+		const mediaContainerStyle = [
+			{ flex: 1 },
+			shouldStack
+				? {
+						...( mediaPosition === 'left' &&
+							styles.mediaStackLeft ),
+						...( mediaPosition === 'right' &&
+							styles.mediaStackRight ),
+				  }
+				: {
+						...( mediaPosition === 'left' && styles.mediaLeft ),
+						...( mediaPosition === 'right' && styles.mediaRight ),
+				  },
+		];
 
 		const toolbarControls = [
 			{
@@ -311,25 +343,9 @@ class MediaTextEdit extends Component {
 			setAttributes( { verticalAlignment: alignment } );
 		};
 
-		const controls = (
-			<InspectorControls>
-				<PanelBody title={ __( 'Media & Text settings' ) }>
-					<ToggleControl
-						label={ __( 'Crop image to fill entire column' ) }
-						checked={ imageFill }
-						onChange={ () =>
-							setAttributes( {
-								imageFill: ! imageFill,
-							} )
-						}
-					/>
-				</PanelBody>
-			</InspectorControls>
-		);
-
 		return (
 			<>
-				{ mediaType === MEDIA_TYPE_IMAGE && controls }
+				{ mediaType === MEDIA_TYPE_IMAGE && this.getControls() }
 				<BlockControls>
 					{ ( isMediaSelected || mediaType === MEDIA_TYPE_VIDEO ) && (
 						<ToolbarGroup>
@@ -357,7 +373,6 @@ class MediaTextEdit extends Component {
 				>
 					<View
 						style={ [
-							{ flex: 1 },
 							( shouldStack || ! imageFill ) && {
 								width: widthString,
 							},
