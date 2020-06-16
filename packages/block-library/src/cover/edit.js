@@ -303,22 +303,25 @@ function CoverEdit( {
 		<>
 			<BlockControls>
 				{ hasBackground && (
-					<BlockAlignmentMatrixToolbar
-						label={ __( 'Change content position' ) }
-						value={ contentPosition }
-						onChange={ ( nextPosition ) =>
-							setAttributes( { contentPosition: nextPosition } )
-						}
-					/>
-				) }
-				{ hasBackground && (
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*,video/*"
-						onSelect={ onSelectMedia }
-					/>
+					<>
+						<BlockAlignmentMatrixToolbar
+							label={ __( 'Change content position' ) }
+							value={ contentPosition }
+							onChange={ ( nextPosition ) =>
+								setAttributes( {
+									contentPosition: nextPosition,
+								} )
+							}
+						/>
+
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ url }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="image/*,video/*"
+							onSelect={ onSelectMedia }
+						/>
+					</>
 				) }
 			</BlockControls>
 			<InspectorControls>
