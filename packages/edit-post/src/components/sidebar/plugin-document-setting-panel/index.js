@@ -106,7 +106,7 @@ const PluginDocumentSettingFill = ( {
 const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {
 		if ( undefined !== ownProps.name ) {
-			warning( 'PluginDocumentSettingPanel requires a name property' );
+			warning( 'PluginDocumentSettingPanel requires a name property.' );
 		}
 		return {
 			icon: ownProps.icon || context.icon,
