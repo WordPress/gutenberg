@@ -14,7 +14,7 @@
 		margin-bottom: 0;
 		margin-left: 0;
 		margin-right: $grid-unit-10;
-		margin-top: 5px;
+		margin-top: $grid-unit-10;
 		width: 54px;
 
 		// Show the reset button as disabled until a value is entered.
@@ -37,7 +37,7 @@
 
 	.components-color-palette__clear {
 		height: 30px;
-		margin-top: 23px;
+		margin-top: 26px;
 	}
 }
 
