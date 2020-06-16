@@ -258,7 +258,7 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
 		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
 	}
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
+	if ( count( $block_template_files ) === 0 && gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
 		$demo_block_template_files = glob( dirname( __FILE__ ) . '/demo-block-templates/*.html' );
 		$demo_block_template_files = is_array( $demo_block_template_files ) ? $demo_block_template_files : array();
 		$block_template_files      = array_merge( $block_template_files, $demo_block_template_files );
