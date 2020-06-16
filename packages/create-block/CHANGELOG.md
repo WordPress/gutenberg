@@ -2,11 +2,17 @@
 
 ## Unreleased
 
+## 0.14.2 (2020-06-16)
+
+### Bug Fix
+
+- Fix errors reported by CSS linter in ESNext template by using hex colors in CSS files ([#23164](https://github.com/WordPress/gutenberg/pull/23164)).
+
 ## 0.14.1 (2020-06-15)
 
 ### Bug Fix
 
-- Fix an error reported by ESLint by improving JSDoc comment in ESNext template in `src/edit.js` file ([#23164](https://github.com/WordPress/gutenberg/pull/23164)).
+- Fix an error reported by JavaScript linter by improving JSDoc comment in ESNext template in `src/edit.js` file ([#23164](https://github.com/WordPress/gutenberg/pull/23164)).
 
 ## 0.14.0 (2020-06-15)
 
