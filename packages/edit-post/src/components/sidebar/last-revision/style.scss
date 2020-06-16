@@ -1,8 +1,9 @@
 // Needs specificity, because this panel is just a button
 .components-panel__body.is-opened.edit-post-last-revision__panel {
 	padding: 0;
+	height: $grid-unit-60;
 }
 
 .editor-post-last-revision__title.components-button {
-	padding: #{ $panel-padding - 3px } $panel-padding;	// subtract extra height of dashicon
+	padding: $panel-padding;
 }

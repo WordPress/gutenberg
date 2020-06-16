@@ -1,20 +1,6 @@
-.components-panel__header.edit-post-sidebar__panel-tabs {
-	justify-content: flex-start;
-	padding-left: 0;
-	padding-right: $grid-unit-05;
-	border-top: 0;
-
-	ul {
-		display: flex;
-	}
-	li {
-		margin: 0;
-	}
-}
-
 .components-button.edit-post-sidebar__panel-tab {
 	border-radius: 0;
-	height: 50px - $border-width;
+	height: $grid-unit-60;
 	background: transparent;
 	border: none;
 	box-shadow: none;
@@ -23,7 +9,7 @@
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 400;
-	color: $dark-gray-900;
+	color: $dark-gray-primary;
 
 	// This pseudo-element "duplicates" the tab label and sets the text to bold.
 	// This ensures that the tab doesn't change width when selected.
