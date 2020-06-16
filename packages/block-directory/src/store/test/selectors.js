@@ -87,21 +87,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getErrorNotices', () => {
-		const state = {
-			errorNotices: {
-				'block/has-error': 'Error notice',
-			},
-		};
-
-		it( 'should retrieve all error notices', () => {
-			const errorNotices = getErrorNotices( state );
-			expect( errorNotices ).toEqual( {
-				'block/has-error': 'Error notice',
-			} );
-		} );
-	} );
-
 	describe( 'getNewBlockTypes', () => {
 		it( 'should retrieve the block types that are installed and in the post content', () => {
 			getNewBlockTypes.registry = {
@@ -169,6 +154,21 @@ describe( 'selectors', () => {
 			};
 			const blockTypes = getUnusedBlockTypes( state );
 			expect( blockTypes ).toHaveLength( 2 );
+		} );
+	} );
+
+	describe( 'getErrorNotices', () => {
+		const state = {
+			errorNotices: {
+				'block/has-error': 'Error notice',
+			},
+		};
+
+		it( 'should retrieve all error notices', () => {
+			const errorNotices = getErrorNotices( state );
+			expect( errorNotices ).toEqual( {
+				'block/has-error': 'Error notice',
+			} );
 		} );
 	} );
 
