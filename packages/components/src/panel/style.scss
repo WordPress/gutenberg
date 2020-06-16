@@ -26,7 +26,7 @@
 	}
 
 	&.is-opened {
-		padding: $panel-padding;
+		padding: $grid-unit-20;
 	}
 }
 
@@ -63,7 +63,7 @@
 	@include reduce-motion("transition");
 }
 .components-panel__body.is-opened > .components-panel__body-title {
-	margin: -1 * $panel-padding;
+	margin: -1 * $grid-unit-20;
 	margin-bottom: 5px;
 }
 

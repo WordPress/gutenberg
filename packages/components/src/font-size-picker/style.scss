@@ -1,5 +1,5 @@
 .components-font-size-picker__controls {
-	max-width: $sidebar-width - ( 2 * $panel-padding );
+	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
