@@ -182,6 +182,7 @@ class NativeEditorProvider extends Component {
 		const hasChanges =
 			title !== this.post.title.raw || html !== this.post.content.raw;
 
+		// Variable to store the content structure metrics.
 		const contentInfo = {};
 		contentInfo.characterCount = wordCount(
 			html,
