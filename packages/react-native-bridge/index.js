@@ -77,11 +77,30 @@ export function subscribeAndroidModalClosed( callback ) {
 		: undefined;
 }
 
+export function subscribeUpdateTheme( callback ) {
+	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+}
+
 export function subscribePreferredColorScheme( callback ) {
 	return gutenbergBridgeEvents.addListener(
 		'preferredColorScheme',
 		callback
 	);
+}
+
+/**
+ * @callback FnReplaceBlockCompletion
+ * @param {string} html the HTML to replace the block.
+ * @param {string} clientId the clientId of the block to be replaced.
+ */
+
+/**
+ * Subscribe a listener to replace a single block.
+ *
+ * @param {FnReplaceBlockCompletion} callback the completion callback.
+ */
+export function subscribeReplaceBlock( callback ) {
+	return gutenbergBridgeEvents.addListener( 'replaceBlock', callback );
 }
 
 /**
@@ -100,6 +119,27 @@ export function requestMediaPicker( source, filter, multiple, callback ) {
 		filter,
 		multiple,
 		callback
+	);
+}
+
+/**
+ * Request to render an unsuported block.
+ *
+ * A way to show unsupported blocks to the user is to render it on a web view.
+ *
+ * @param {string} htmlContent Raw html content of the block.
+ * @param {string} blockClientId the clientId of the block.
+ * @param {string} blockName the user-facing, localized block name.
+ */
+export function requestUnsupportedBlockFallback(
+	htmlContent,
+	blockClientId,
+	blockName
+) {
+	RNReactNativeGutenbergBridge.requestUnsupportedBlockFallback(
+		htmlContent,
+		blockClientId,
+		blockName
 	);
 }
 
@@ -162,6 +202,22 @@ export function fetchRequest( path ) {
 
 export function logUserEvent( event, properties ) {
 	return RNReactNativeGutenbergBridge.logUserEvent( event, properties );
+}
+
+export function addMention() {
+	return RNReactNativeGutenbergBridge.addMention();
+}
+
+export function requestStarterPageTemplatesTooltipShown( callback ) {
+	return RNReactNativeGutenbergBridge.requestStarterPageTemplatesTooltipShown(
+		callback
+	);
+}
+
+export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
+	return RNReactNativeGutenbergBridge.setStarterPageTemplatesTooltipShown(
+		tooltipShown
+	);
 }
 
 export default RNReactNativeGutenbergBridge;

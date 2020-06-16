@@ -19,5 +19,9 @@ RCT_EXTERN_METHOD(fetchRequest:(NSString *)path resolver:(RCTPromiseResolveBlock
 RCT_EXTERN_METHOD(requestImageFullscreenPreview:(NSString *)currentImageUrlString originalImageUrlString:(NSString *)originalImageUrlString)
 RCT_EXTERN_METHOD(requestMediaEditor:(NSString *)mediaUrl callback:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(logUserEvent:(NSString *)event properties:(NSDictionary *)properties)
+RCT_EXTERN_METHOD(requestUnsupportedBlockFallback:(NSString *)content blockId:(NSString *)blockId blockName:(NSString *)blockName)
+RCT_EXTERN_METHOD(addMention:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)rejecter)
+RCT_EXTERN_METHOD(requestStarterPageTemplatesTooltipShown:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(setStarterPageTemplatesTooltipShown:(BOOL)tooltipShown)
 
 @end

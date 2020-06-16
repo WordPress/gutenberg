@@ -24,6 +24,8 @@ class GutenbergViewController: UIViewController {
         gutenberg.delegate = self
         navigationController?.navigationBar.isTranslucent = false
         registerLongPressGestureRecognizer()
+
+        _ = try! FallbackJavascriptInjection(blockHTML: "Hello", userId: "1")
     }
 
     @objc func moreButtonPressed(sender: UIBarButtonItem) {
@@ -45,6 +47,7 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+
     func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
         completion(Result.success([:]))
     }
@@ -194,6 +197,45 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent) {
         print("Gutenberg loged user event")
     }
+
+    func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) {
+        print("Requesting Fallback for \(block)")
+        let controller = try! WebViewController(block: block, userId: "0")
+        controller.delegate = self
+        present(UINavigationController(rootViewController: controller), animated: true)
+    }
+
+    func gutenbergDidRequestMention(callback: @escaping (Result<String, NSError>) -> Void) {
+        callback(.success("matt"))
+    }
+
+    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {
+        return false;
+    }
+
+    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
+        print("Gutenberg requested setting tooltip flag")
+    }
+}
+
+extension GutenbergViewController: GutenbergWebDelegate {
+    func webController(controller: GutenbergWebSingleBlockViewController, didPressSave block: Block) {
+        gutenberg.replace(block: block)
+        dismiss(webController: controller)
+    }
+
+    func webControllerDidPressClose(controller: GutenbergWebSingleBlockViewController) {
+        dismiss(webController: controller)
+    }
+
+    func webController(controller: GutenbergWebSingleBlockViewController, didLog log: String) {
+        print("WebView: \(log)")
+    }
+
+    private func dismiss(webController: GutenbergWebSingleBlockViewController) {
+        webController.cleanUp()
+        dismiss(animated: true)
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
@@ -213,8 +255,16 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
+    func gutenbergCapabilities() -> [String : Bool]? {
+        return ["mentions": true]
+    }
+
     func aztecAttachmentDelegate() -> TextViewAttachmentDelegate {
         return ExampleAttachmentDelegate()
+    }
+
+    func gutenbergEditorTheme() -> GutenbergEditorTheme? {
+        return nil
     }
 }
 

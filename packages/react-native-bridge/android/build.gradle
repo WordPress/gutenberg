@@ -1,8 +1,10 @@
 buildscript {
     def buildGutenbergMobileJSBundle =
             System.getenv('SUPPRESS_GUTENBERG_MOBILE_JS_BUNDLE_BUILD').asBoolean()
-                    ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
+            ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
                     && rootProject.ext.buildGutenbergMobileJSBundle)
+
+    ext.kotlinVersion = '1.3.61'
 
     repositories {
         jcenter()
@@ -16,21 +18,23 @@ buildscript {
     }
 
     dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.android.tools.build:gradle:3.4.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 
         if (buildGutenbergMobileJSBundle) {
-            classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+            classpath "com.moowork.gradle:gradle-node-plugin:1.3.1"
         }
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'kotlin-android'
 
 def buildGutenbergMobileJSBundle =
         System.getenv('SUPPRESS_GUTENBERG_MOBILE_JS_BUNDLE_BUILD').asBoolean()
-                ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
+        ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
                 && rootProject.ext.buildGutenbergMobileJSBundle)
 
 def tempFolder = "${System.getenv('TMPDIR')}/jsbundle/${System.getenv('VERSION')}"
@@ -142,10 +146,14 @@ repositories {
 dependencies {
     implementation project(':@wordpress_react-native-aztec')
 
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+
     implementation "org.wordpress:utils:1.22"
 
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:2.0.0'
+
+    implementation 'com.google.android.material:material:1.1.0'
 
     if (rootProject.ext.buildGutenbergFromSource) {
         println "using gutenberg from source"
@@ -175,12 +183,83 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
+boolean isBundleUpToDate() {
+    return project.hasProperty('isBundleUpToDate') && isBundleUpToDate
+}
+
 if (buildGutenbergMobileJSBundle) {
-    task buildJSBundle(type: NpmTask) {
-        args = ['run', 'bundle:android']
+    def bundleName = 'index.android.bundle'
+    def jsRootDir = '../..'
+
+    task bundleUpToDateCheck {
+        description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
+If they are changed, the isBundleUpToDate flag is switched to false. That flag is used by other tasks.")
+
+        def isRelevantFile = { it.name.endsWithAny('.js', '.css') || it.name == 'package.json' }
+        def inputFiles = {
+            def jsFiles = []
+            def dirs = []
+            file(jsRootDir).eachDir { dir ->
+                if (dir.name != 'node_modules'
+                        && dir.name != 'bundle'
+                        && dir.name != 'gutenberg'
+                        && !dir.name.startsWith('symlinked')) {
+                    dirs << dir
+                }
+            }
+            file("$jsRootDir/gutenberg").eachDir { dir ->
+                if (dir.name != 'node_modules') {
+                    dirs << dir
+                }
+            }
+
+            dirs.forEach { dir ->
+                file(dir).eachFileRecurse {
+                    if (isRelevantFile(it)) {
+                        jsFiles << it
+                    }
+                }
+            }
+
+            def jsRootDirFiles = file(jsRootDir).listFiles().findAll {
+                isRelevantFile(it)
+            }
+            def gutenbergRootDirFiles = file("$jsRootDir/gutenberg").listFiles().findAll {
+                isRelevantFile(it)
+            }
+            return jsFiles + jsRootDirFiles + gutenbergRootDirFiles
+        }
+        inputs.files(inputFiles())
+
+        // We cannot use the bundle file itself as an output because it does not yet exist when this
+        // task finishes. Nevertheless, we have to declare something as an output because only tasks
+        // with outputs are run incrementally, so we're declaring a file that does not exist as the
+        // output. Since that file never exists, that "output" will always be considered "up-to-date".
+        outputs.file("nonexistentfile")
+
+        // The bundle file can only be up-to-date if a bundle file exists. If this task runs, that
+        // means some of the inputs have changed, and the isBundleUpToDate flag is set back to false
+        // because the bundle should be rebuilt.
+        project.ext.isBundleUpToDate = file("$buildAssetsFolder/$bundleName").exists()
+        doLast {
+            project.ext.isBundleUpToDate = false
+        }
+    }
+
+    yarn_install.dependsOn bundleUpToDateCheck
+    yarn_install.onlyIf { !isBundleUpToDate() }
+
+    task buildJSBundle(type: YarnTask) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
+        args = ['bundle:android']
     }
 
     task backupHermesDebugAAR(type: Copy) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         def origFileName = 'hermes-debug.aar'
         def origWithPath = hermesOriginalPath + origFileName
         from origWithPath
@@ -191,6 +270,9 @@ if (buildGutenbergMobileJSBundle) {
     }
 
     task backupHermesReleaseAAR(type: Copy) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         def origFileName = 'hermes-release.aar'
         def origWithPath = hermesOriginalPath + origFileName
         from origWithPath
@@ -201,16 +283,24 @@ if (buildGutenbergMobileJSBundle) {
     }
 
     task copyJSBundle(type: Copy) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         def origFileName = 'App.js'
-        // TODO: this is specific to WPAndroid, make it more generic
-        def origWithPath = "../../../../bundle/android/${origFileName}"
-        def target = 'index.android.bundle'
+        def origWithPath = "../../bundle/android/${origFileName}"
         from origWithPath
         into buildAssetsFolder
-        rename origFileName, target
+        rename origFileName, bundleName
         doLast {
             println "Done copying the Android JS bundle to assets folder"
         }
+    }
+
+    task cleanupNodeModulesFolder(type: Delete) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
+        delete '../../node_modules'
     }
 
     task resetExtractedRNTools(type: Delete) {
@@ -218,12 +308,11 @@ if (buildGutenbergMobileJSBundle) {
         delete nodeFolder, npmFolder, yarnFolder
     }
 
-    if (buildGutenbergMobileJSBundle) {
-        preBuild.dependsOn(backupHermesDebugAAR)
-        backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
-        backupHermesReleaseAAR.dependsOn(copyJSBundle)
-        copyJSBundle.dependsOn(buildJSBundle)
-        buildJSBundle.dependsOn(npm_install)
-        nodeSetup.dependsOn(resetExtractedRNTools)
-    }
+    preBuild.dependsOn(cleanupNodeModulesFolder)
+    cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
+    backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
+    backupHermesReleaseAAR.dependsOn(copyJSBundle)
+    copyJSBundle.dependsOn(buildJSBundle)
+    buildJSBundle.dependsOn(yarn_install)
+    nodeSetup.dependsOn(resetExtractedRNTools)
 }
