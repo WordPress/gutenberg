@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useCallback, useState } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,7 +23,6 @@ function ResizeTooltip(
 		fadeTimeout = 180,
 		isVisible = true,
 		labelRef,
-		onMove = noop,
 		onResize = noop,
 		position = POSITIONS.corner,
 		showPx = true,
@@ -32,22 +31,9 @@ function ResizeTooltip(
 	},
 	ref
 ) {
-	const [ cursorX, setCursorX ] = useState( 0 );
-	const [ cursorY, setCursorY ] = useState( 0 );
-
-	const handleOnMove = useCallback(
-		( event ) => {
-			setCursorX( event.clientX );
-			setCursorY( event.clientY );
-			onMove( event );
-		},
-		[ onMove, position ]
-	);
-
 	const { isActive, label, resizeListener } = useResizeLabel( {
 		axis,
 		fadeTimeout,
-		onMove: handleOnMove,
 		onResize,
 		showPx,
 		position,
@@ -62,8 +48,6 @@ function ResizeTooltip(
 			{ resizeListener }
 			<Label
 				aria-hidden={ props[ 'aria-hidden' ] }
-				cursorX={ cursorX }
-				cursorY={ cursorY }
 				fadeTimeout={ fadeTimeout }
 				isActive={ isActive }
 				isVisible={ isVisible }

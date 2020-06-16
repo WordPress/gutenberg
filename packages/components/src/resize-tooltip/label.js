@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { Portal } from 'reakit/Portal';
-
-/**
  * WordPress dependencies
  */
-import { Fragment, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,14 +18,7 @@ const CORNER_OFFSET = 4;
 const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
 
 function Label(
-	{
-		cursorX: x = 0,
-		cursorY: y = 0,
-		label,
-		position = POSITIONS.corner,
-		zIndex = 1000,
-		...props
-	},
+	{ label, position = POSITIONS.corner, zIndex = 1000, ...props },
 	ref
 ) {
 	const isRTL = useRTL();
@@ -39,7 +27,6 @@ function Label(
 
 	const isBottom = position === POSITIONS.bottom;
 	const isCorner = position === POSITIONS.corner;
-	const isCursor = position === POSITIONS.cursor;
 
 	if ( ! showLabel ) return null;
 
@@ -74,46 +61,22 @@ function Label(
 		};
 	}
 
-	if ( isCursor ) {
-		style = {
-			...style,
-			position: 'fixed',
-			top: 0,
-			left: 0,
-			right: null,
-			transform: `translate(${ x }px, ${ y }px)`,
-		};
-
-		labelStyle = {
-			transform: `translate(-50%, calc(-100% - ${ CURSOR_OFFSET_TOP }px))`,
-		};
-	}
-
-	/*
-	 * For "cursor" POSITIONS, we need to "Portal" the Tooltip to the document
-	 * body root for more consistent style rendering.
-	 * https://reakit.io/docs/portal/
-	 */
-	const WrapperComponent = isCursor ? Portal : Fragment;
-
 	return (
-		<WrapperComponent>
-			<TooltipWrapper
-				aria-hidden="true"
-				className="components-resizable-tooltip__tooltip-wrapper"
-				isActive={ showLabel }
-				ref={ ref }
-				style={ style }
-				{ ...props }
+		<TooltipWrapper
+			aria-hidden="true"
+			className="components-resizable-tooltip__tooltip-wrapper"
+			isActive={ showLabel }
+			ref={ ref }
+			style={ style }
+			{ ...props }
+		>
+			<Tooltip
+				className="components-resizable-tooltip__tooltip"
+				style={ labelStyle }
 			>
-				<Tooltip
-					className="components-resizable-tooltip__tooltip"
-					style={ labelStyle }
-				>
-					<LabelText>{ label }</LabelText>
-				</Tooltip>
-			</TooltipWrapper>
-		</WrapperComponent>
+				<LabelText>{ label }</LabelText>
+			</Tooltip>
+		</TooltipWrapper>
 	);
 }
 

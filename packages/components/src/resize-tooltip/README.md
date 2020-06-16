@@ -25,15 +25,10 @@ Be sure that the parent element containing `<ResizeTooltip />` has the `position
 
 -   `bottom`
 -   `corner` (Default)
--   `cursor`
 
 ##### `bottom`
 
 The `bottom` position renders the dimensions label at the bottom-center of the (parent) element.
-
-##### `cursor`
-
-The `cursor` position renders the dimensions label right above the mouse cursor.
 
 ##### `corner`
 
@@ -92,8 +87,8 @@ The positions for the label.
 
 -   Type: `String`
 -   Required: No
--   Default: `cursor`
--   Values: `bottom` | `corner` |`cursor`
+-   Default: `corner`
+-   Values: `bottom` | `corner`
 
 ### showPx
 

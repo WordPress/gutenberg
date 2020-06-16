@@ -53,7 +53,7 @@ export const _default = () => {
 		fadeTimeout: number( 'fadeTimeout', 180 ),
 		position: select(
 			'position',
-			{ bottom: 'bottom', cursor: 'cursor', corner: 'corner' },
+			{ bottom: 'bottom', corner: 'corner' },
 			'cursor'
 		),
 		showPx: boolean( 'showPx', true ),

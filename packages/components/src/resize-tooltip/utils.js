@@ -13,7 +13,6 @@ const { clearTimeout, setTimeout } = window;
 
 export const POSITIONS = {
 	bottom: 'bottom',
-	cursor: 'cursor',
 	corner: 'corner',
 };
 
@@ -32,7 +31,6 @@ export const POSITIONS = {
  * @param {Object} props
  * @param {string} props.axis Only shows the label corresponding to the axis.
  * @param {number} props.fadeTimeout Duration (ms) before deactivating the resize label.
- * @param {Function} props.onMove Callback when a resize occurs. Provides onMouseEvent event callback.
  * @param {boolean} props.onResize Callback when a resize occurs. Provides { width, height } callback.
  * @param {string} props.position Adjusts label value.
  * @param {boolean} props.showPx Whether to add `PX` to the label.
@@ -42,12 +40,10 @@ export const POSITIONS = {
 export function useResizeLabel( {
 	axis,
 	fadeTimeout = 180,
-	onMove = noop,
 	onResize = noop,
-	position = POSITIONS.cursor,
+	position = POSITIONS.corner,
 	showPx = false,
 } ) {
-	const [ isDragging, setIsDragging ] = useState( false );
 	/*
 	 * The width/height values derive from this special useResizeAware hook.
 	 * This custom hook uses injects an iFrame into the element, allowing it
@@ -76,7 +72,6 @@ export function useResizeLabel( {
 	const moveTimeoutRef = useRef();
 
 	const { width, height } = sizes;
-	const isCursor = position === POSITIONS.cursor;
 
 	const unsetMoveXY = () => {
 		setMoveX( false );
@@ -131,56 +126,8 @@ export function useResizeLabel( {
 		}
 
 		onResize( { width, height } );
-
-		if ( ! isCursor ) {
-			debounceUnsetMoveXY();
-		}
-	}, [ width, height, isCursor ] );
-
-	/*
-	 * Drag even handling for position = 'cursor'
-	 */
-	useEffect( () => {
-		const clearMoveTimeout = () => {
-			if ( moveTimeoutRef.current ) {
-				clearTimeout( moveTimeoutRef.current );
-			}
-		};
-
-		const handleOnMouseDown = () => {
-			if ( ! isCursor ) return;
-
-			setIsDragging( true );
-			clearMoveTimeout();
-			unsetMoveXY();
-		};
-
-		const handleOnMouseUp = () => {
-			if ( ! isCursor ) return;
-
-			setIsDragging( false );
-			debounceUnsetMoveXY();
-		};
-
-		const handleOnMouseMove = ( event ) => {
-			if ( ! isDragging || ! isCursor ) return;
-
-			if ( isCursor ) {
-				onMove( event );
-			}
-			clearMoveTimeout();
-		};
-
-		document.addEventListener( 'mousedown', handleOnMouseDown );
-		document.addEventListener( 'mousemove', handleOnMouseMove );
-		document.addEventListener( 'mouseup', handleOnMouseUp );
-
-		return () => {
-			document.removeEventListener( 'mousedown', handleOnMouseDown );
-			document.removeEventListener( 'mousemove', handleOnMouseMove );
-			document.removeEventListener( 'mouseup', handleOnMouseUp );
-		};
-	}, [ isDragging, isCursor ] );
+		debounceUnsetMoveXY();
+	}, [ width, height ] );
 
 	const label = getSizeLabel( {
 		axis,
@@ -217,7 +164,7 @@ function getSizeLabel( {
 	height,
 	moveX = false,
 	moveY = false,
-	position = POSITIONS.cursor,
+	position = POSITIONS.corner,
 	showPx = false,
 	width,
 } ) {
