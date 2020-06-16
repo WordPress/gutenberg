@@ -1,3 +1,43 @@
 .block-collab-add-block-selections__block.is-peer-selected {
 	outline: 1px dashed #000;
 }
+
+.block-collab-add-block-selections--caret {
+	background: #eee;
+	position: relative;
+}
+
+.block-collab-add-block-selections--caret.is-collapsed {
+	background: none;
+}
+
+.block-collab-add-block-selections--caret::before {
+	background: #2e3d48;
+	bottom: 0;
+	content: "";
+	font-size: 1em;
+	left: -1px;
+	position: absolute;
+	top: 0;
+	width: 2px;
+}
+
+.block-collab-add-block-selections--caret.is-at-end::before {
+	left: auto;
+	right: -1px;
+}
+
+.block-collab-add-block-selections--caret::after {
+	background-color: #2e3d48;
+	content: "";
+	height: 8px;
+	left: -4px;
+	position: absolute;
+	top: -8px;
+	width: 8px;
+}
+
+.block-collab-add-block-selections--caret.is-at-end::after {
+	left: auto;
+	right: -4px;
+}

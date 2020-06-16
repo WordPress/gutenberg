@@ -8,6 +8,7 @@ import { WebrtcProvider } from 'y-webrtc';
  * WordPress dependencies
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ import { useState, useRef, useEffect } from '@wordpress/element';
 import setYDocBlocks from './set-y-doc-blocks';
 import yDocBlocksToArray from './y-doc-blocks-to-array';
 
-export const instances = {};
+const instances = {};
 
 /**
  * Connects to the block collaboration room of the given ID,
@@ -40,6 +41,9 @@ export default function useBlockCollab( id, password ) {
 		_setBlocks( newBlocks );
 	} );
 
+	const setAddBlockSelectionsState = useDispatch(
+		'core/block-collab/add-block-selections'
+	)?.setState;
 	useEffect( () => {
 		// We share instances between hook instances for the same document,
 		// because we need to reuse the same `yDoc` and provider.
@@ -62,7 +66,6 @@ export default function useBlockCollab( id, password ) {
 				} ),
 			};
 		}
-		const localYjsChangeSymbol = Symbol( 'localYjsChangeSymbol' );
 
 		// Keep peer list in sync.
 		instances[ instanceKey ].provider.on( 'peers', ( newPeers ) => {
@@ -80,10 +83,11 @@ export default function useBlockCollab( id, password ) {
 							instances[ instanceKey ].peers.has( peerId ) &&
 							instances[ instanceKey ].peers.delete( peerId )
 					);
-				}, localYjsChangeSymbol );
+				} );
 		} );
 
 		// Create setters that broadcast changes to peers.
+		const localYjsChangeSymbol = Symbol( 'localYjsChangeSymbol' );
 		setSetSelf( () => ( self ) => {
 			instances[ instanceKey ].yDoc.transact( () => {
 				instances[ instanceKey ].peers.set(
@@ -110,16 +114,18 @@ export default function useBlockCollab( id, password ) {
 
 		// Set changes from peers.
 		const maybeSetPeers = ( event, transaction ) => {
-			if ( transaction.origin !== localYjsChangeSymbol )
-				setPeers(
-					Object.values(
-						instances[ instanceKey ].peers.toJSON()
-					).filter(
-						( peer ) =>
-							peer.peerId !==
-							instances[ instanceKey ].provider.room.peerId
-					)
+			if ( transaction.origin !== localYjsChangeSymbol ) {
+				const newPeers = Object.values(
+					instances[ instanceKey ].peers.toJSON()
+				).filter(
+					( peer ) =>
+						peer.peerId !==
+						instances[ instanceKey ].provider.room.peerId
 				);
+				setPeers( newPeers );
+				if ( setAddBlockSelectionsState )
+					setAddBlockSelectionsState( newPeers );
+			}
 		};
 		const maybeSetBlocks = ( event, transaction ) => {
 			if ( transaction.origin !== localYjsChangeSymbol )
