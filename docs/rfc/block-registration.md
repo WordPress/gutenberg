@@ -6,7 +6,7 @@ This RFC is intended to serve both as a specification and as documentation for t
 
 Behind any block type registration is some abstract concept of a unit of content. This content type can be described without consideration of any particular technology. In much the same way, we should be able to describe the core constructs of a block type in a way which can be interpreted in any runtime.
 
-In more practical terms, an implementation should fulfill requirements that...
+In more practical terms, an implementation should fulfill requirements that:
 
 * A block type registration should be declarative and context-agnostic. Any runtime (PHP, JS, or other) should be able to interpret the basics of a block type (see "Block API" in the sections below) and should be able to fetch or retrieve the definitions of the context-specific implementation details. The following things should be made possible:
   * Fetching the available block types through REST APIs.
@@ -16,7 +16,7 @@ In more practical terms, an implementation should fulfill requirements that...
 
 It can statically analyze the files of any plugin to retrieve blocks and their properties.
 * It should not require a build tool compilation step (e.g. Babel, Webpack) to author code which would be referenced in a block type definition.
-* There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions. It practical terms, it means that the editor should be able to be loaded without enqueuing all the assets (scripts and styles) of all block types. What it needs is the basic metadata (`title`, `description`, `category`, `icon`, etc...) to start with. It should be fine to defer loading all other code (`edit`, `save`, `transforms`, and other JavaScript implementations) until it is explicitly used (inserted into the post content).
+* There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions. It practical terms, it means that the editor should be able to be loaded without enqueuing all the assets (scripts and styles) of all block types. What it needs is the basic metadata (`title`, `description`, `category`, `icon`, etc…) to start with. It should be fine to defer loading all other code (`edit`, `save`, `transforms`, and other JavaScript implementations) until it is explicitly used (inserted into the post content).
 
 ## References
 
@@ -64,12 +64,12 @@ To register a new block type, start by creating a `block.json` file. This file:
 {
 	"name": "my-plugin/notice",
 	"title": "Notice",
-	"category": "common",
+	"category": "text",
 	"parent": [ "core/group" ],
 	"icon": "star",
-	"description": "Shows warning, error or success notices  ...",
+	"description": "Shows warning, error or success notices…",
 	"keywords": [ "alert", "message" ],
-	"textDomain": "my-plugin",
+	"textdomain": "my-plugin",
 	"attributes": {
 		"message": {
 			"type": "string",
@@ -81,14 +81,19 @@ To register a new block type, start by creating a `block.json` file. This file:
 		"align": true,
 		"lightBlockWrapper": true
 	},
-	"styleVariations": [
+	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },
 		{ "name": "other", "label": "Other" }
 	],
-	"editorScript": "build/editor.js",
-	"script": "build/main.js",
-	"editorStyle": "build/editor.css",
-	"style": "build/style.css"
+	"example": {
+		"attributes": {
+			"message": "This is a notice!"
+		},
+	},
+	"editorScript": "file:./build/index.js",
+	"script": "file:./build/script.js",
+	"editorStyle": "file:./build/index.css",
+	"style": "file:./build/style.css"
 }
 ```
 
@@ -134,7 +139,7 @@ This is the display title for your block, which can be translated with our trans
 * Property: `category`
 
 ```json
-{ "category": "common" }
+{ "category": "text" }
 ```
 
 Blocks are grouped into categories to help users browse and discover them.
@@ -149,7 +154,7 @@ The core provided categories are:
 
 Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
 
-An implementation should expect and tolerate unknown categories, providing some reasonable fallback behavior (e.g. a "common" category).
+An implementation should expect and tolerate unknown categories, providing some reasonable fallback behavior (e.g. a "text" category).
 
 ### Parent
 
@@ -210,10 +215,10 @@ Sometimes a block could have aliases that help users discover it while searching
 * Type: `string`
 * Optional
 * Localized: No
-* Property: `textDomain`
+* Property: `textdomain`
 
 ```json
-{ "textDomain": "my-plugin" }
+{ "textdomain": "my-plugin" }
 ```
 
 The [gettext](https://www.gnu.org/software/gettext/) text domain of the plugin/block. More information can be found in the [Text Domain](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#text-domains) section of the [How to Internationalize your Plugin](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/) page.
@@ -264,11 +269,10 @@ See the [the attributes documentation](/docs/designers-developers/developers/blo
 * Optional
 * Localized: Yes (`label` only)
 * Property: `styles`
-* Alias: `styleVariations`
 
 ```json
 {
-	"styleVariations": [
+	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },
 		{ "name": "other", "label": "Other" }
 	]
@@ -279,6 +283,27 @@ Block styles can be used to provide alternative styles to block. It works by add
 
 Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
 
+### Example
+
+ *   Type: `object`
+ *   Optional
+ *   Localized: No
+ *   Property: `example`
+
+ ```json
+{
+	"example": {
+		"attributes": {
+			"message": "This is a notice!"
+		}
+	}
+}
+ ```
+
+ It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
+
+ See the [the example documentation](/docs/designers-developers/developers/block-api/block-registration.md#example-optional) for more details.
+
 ### Editor Script
 
 * Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
@@ -287,7 +312,7 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 * Property: `editorScript`
 
 ```json
-{ "editorScript": "build/editor.js" }
+{ "editorScript": "file:./build/index.js" }
 ```
 
 Block type editor script definition. It will only be enqueued in the context of the editor.
@@ -300,7 +325,7 @@ Block type editor script definition. It will only be enqueued in the context of 
 * Property: `script`
 
 ```json
-{ "script": "build/main.js" }
+{ "script": "file:./build/script.js" }
 ```
 
 Block type frontend script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
@@ -313,7 +338,7 @@ Block type frontend script definition. It will be enqueued both in the editor an
 * Property: `editorStyle`
 
 ```json
-{ "editorStyle": "build/editor.css" }
+{ "editorStyle": "file:./build/index.css" }
 ```
 
 Block type editor style definition. It will only be enqueued in the context of the editor.
@@ -326,7 +351,7 @@ Block type editor style definition. It will only be enqueued in the context of t
 * Property: `style`
 
 ```json
-{ "style": "build/style.css" }
+{ "style": "file:./build/style.css" }
 ```
 
 Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
@@ -362,18 +387,23 @@ In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/
 
 ### `WPDefinedAsset`
 
-The `WPDefinedAsset` type is a subtype of string, where the value must represent an absolute or relative path to a JavaScript or CSS file.
+The `WPDefinedAsset` type is a subtype of string, where the value represents a path to a JavaScript or CSS file relative to where `block.json` file is located. The path provided must be prefixed with `file:`. This approach is based on how npm handles [local paths](https://docs.npmjs.com/files/package.json#local-paths) for packages.
+
+An alternative would be a script or style handle name referencing a registered asset using WordPress helpers.
 
 **Example:**
 
 In `block.json`:
 ```json
-{ "editorScript": "build/editor.js" }
+{
+	"editorScript": "file:./build/index.js",
+	"editorStyle": "my-editor-style-handle"
+}
 ```
 
 #### WordPress context
 
-In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file.
+In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file and use file paths rather than asset handles.
 
 That's why, the `WPDefinedAsset` type has to offer a way to mirror also the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings.
 
@@ -394,7 +424,7 @@ build/
 
 In `block.json`:
 ```json
-{ "editorScript": "build/index.js" }
+{ "editorScript": "file:./build/index.js" }
 ```
 
 In `build/index.asset.php`:
@@ -414,7 +444,7 @@ return array(
 
 Localized properties are automatically wrapped in `_x` function calls on the backend and the frontend of WordPress. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle when it defines metadata definition.
 
-WordPress string discovery automatically translates these strings using the `textDomain` property specified in the `block.json` file.
+WordPress string discovery automatically translates these strings using the `textdomain` property specified in the `block.json` file.
 
 **Example:**
 
@@ -423,7 +453,7 @@ WordPress string discovery automatically translates these strings using the `tex
 	"title": "My block",
 	"description": "My block is fantastic",
 	"keywords": [ "fantastic" ],
-	"textDomain": "my-plugin"
+	"textdomain": "my-plugin"
 }
 ```
 
@@ -455,7 +485,7 @@ Implementation should follow the existing [get_plugin_data](https://codex.wordpr
 There is also a new API method proposed `register_block_type_from_metadata` that aims to simplify the block type registration on the server from metadata stored in the `block.json` file. This function is going to handle also all necessary work to make internationalization work seamlessly for metadata defined.
 
 This function takes two params:
-- `$path` (`string`) – path to the folder where the `block.json` file is located.
+- `$path` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
 - `$args` (`array`) –  an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
   - `$render_callback` (`callable`) – callback used to render blocks of this block type.
 

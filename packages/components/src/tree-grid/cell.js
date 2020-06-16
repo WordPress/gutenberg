@@ -1,12 +1,20 @@
 /**
  * Internal dependencies
  */
-import RovingTabIndexItem from './roving-tab-index-item';
+import TreeGridItem from './item';
 
-export default function TreeGridCell( { children, ...props } ) {
+export default function TreeGridCell( {
+	children,
+	withoutGridItem = false,
+	...props
+} ) {
 	return (
 		<td { ...props } role="gridcell">
-			<RovingTabIndexItem>{ children }</RovingTabIndexItem>
+			{ withoutGridItem ? (
+				children
+			) : (
+				<TreeGridItem>{ children }</TreeGridItem>
+			) }
 		</td>
 	);
 }

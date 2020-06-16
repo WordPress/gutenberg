@@ -24,6 +24,7 @@ const BlockCaption = ( {
 	isSelected,
 	shouldDisplay,
 	text,
+	insertBlocksAfter,
 } ) => (
 	<View style={ [ styles.container, shouldDisplay && styles.padding ] }>
 		<Caption
@@ -35,6 +36,7 @@ const BlockCaption = ( {
 			onFocus={ onFocus }
 			shouldDisplay={ shouldDisplay }
 			value={ text }
+			insertBlocksAfter={ insertBlocksAfter }
 		/>
 	</View>
 );

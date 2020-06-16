@@ -41,7 +41,9 @@
 }
 
 // Style this the same as the block buttons in the library.
-// Needs specificiity to override the icon button.
+// Needs specificity to override the icon button.
+.block-editor-block-toolbar .components-toolbar-group .components-button.block-editor-block-switcher__no-switcher-icon.has-icon.has-icon,
+.block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__no-switcher-icon.has-icon.has-icon,
 .block-editor-block-toolbar .components-toolbar-group .components-button.block-editor-block-switcher__toggle.has-icon.has-icon,
 .block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__toggle.has-icon.has-icon {
 	padding: 0;
@@ -89,8 +91,11 @@
 	}
 
 	.block-editor-block-switcher__label {
-		margin-bottom: $grid-unit-10;
+		margin-bottom: $grid-unit-15;
 		color: $medium-gray-text;
+		text-transform: uppercase;
+		font-size: 11px;
+		font-weight: 500;
 	}
 
 	@include break-medium {
@@ -134,8 +139,11 @@
 }
 
 .block-editor-block-switcher__preview-title {
-	margin-bottom: 10px;
-	color: $dark-gray-300;
+	margin-bottom: $grid-unit-15;
+	color: $medium-gray-text;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
 }
 
 // The block switcher in the contextual toolbar should be bigger.
@@ -149,6 +157,7 @@
 		width: $grid-unit-60;
 	}
 
+	.components-button.block-editor-block-switcher__no-switcher-icon,
 	.components-button.block-editor-block-switcher__toggle {
 		.block-editor-block-icon,
 		.block-editor-block-switcher__transform {

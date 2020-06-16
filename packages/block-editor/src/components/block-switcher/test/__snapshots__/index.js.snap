@@ -2,7 +2,7 @@
 
 exports[`BlockSwitcher should render disabled block switcher with multi block of different types when no transforms 1`] = `
 <ToolbarGroup>
-  <ToolbarButton
+  <ForwardRef(ToolbarButton)
     className="block-editor-block-switcher__no-switcher-icon"
     disabled={true}
     icon={

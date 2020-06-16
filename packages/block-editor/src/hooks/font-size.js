@@ -98,16 +98,16 @@ function addEditProps( settings ) {
  */
 export function FontSizeEdit( props ) {
 	const {
-		name: blockName,
 		attributes: { fontSize, style },
 		setAttributes,
 	} = props;
+	const isDisabled = useIsFontSizeDisabled( props );
 
 	const { fontSizes } = useSelect( ( select ) =>
 		select( 'core/block-editor' ).getSettings()
 	);
 
-	if ( ! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ) {
+	if ( isDisabled ) {
 		return null;
 	}
 
@@ -133,6 +133,23 @@ export function FontSizeEdit( props ) {
 
 	return (
 		<FontSizePicker value={ fontSizeObject.size } onChange={ onChange } />
+	);
+}
+
+/**
+ * Custom hook that checks if font-size settings have been disabled.
+ *
+ * @param {string} name The name of the block.
+ * @return {boolean} Whether setting is disabled.
+ */
+export function useIsFontSizeDisabled( { name: blockName } = {} ) {
+	const { fontSizes } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
+	const hasFontSizes = fontSizes.length;
+
+	return (
+		! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) || ! hasFontSizes
 	);
 }
 

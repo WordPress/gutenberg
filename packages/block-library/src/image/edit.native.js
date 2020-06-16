@@ -484,6 +484,7 @@ export class ImageEdit extends React.Component {
 					accessibilityLabelCreator={ this.accessibilityLabelCreator }
 					onFocus={ this.onFocusCaption }
 					onBlur={ this.props.onBlur } // always assign onBlur as props
+					insertBlocksAfter={ this.props.insertBlocksAfter }
 				/>
 			</>
 		);

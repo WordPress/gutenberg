@@ -10,15 +10,20 @@
 .components-custom-select-control__button {
 	border: 1px solid $medium-gray-text;
 	border-radius: $radius-block-ui;
-	display: inline;
 	min-height: 30px;
 	min-width: 130px;
 	position: relative;
 	text-align: left;
 
+	// For all button sizes allow sufficient space for the
+	// dropdown "arrow" icon to display.
+	&.components-custom-select-control__button {
+		padding-right: $icon-size;
+	}
+
 	&:focus:not(:disabled) {
-		border-color: $theme-color;
-		box-shadow: 0 0 0 ($border-width-focus - $border-width) $theme-color;
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
 	}
 
 	&-icon {
@@ -55,6 +60,8 @@
 	display: flex;
 	list-style-type: none;
 	padding: 10px 5px 10px 25px;
+	cursor: default;
+
 
 	&.is-highlighted {
 		background: $light-gray-500;

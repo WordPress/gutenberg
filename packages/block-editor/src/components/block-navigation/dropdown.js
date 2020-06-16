@@ -5,7 +5,7 @@ import { Button, Dropdown, SVG, Path } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { useCallback } from '@wordpress/element';
+import { useCallback, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,7 +23,13 @@ const MenuIcon = (
 	</SVG>
 );
 
-function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
+function BlockNavigationDropdownToggle( {
+	isEnabled,
+	onToggle,
+	isOpen,
+	innerRef,
+	...props
+} ) {
 	useShortcut(
 		'core/edit-post/toggle-block-navigation',
 		useCallback( onToggle, [ onToggle ] ),
@@ -42,6 +48,8 @@ function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
 
 	return (
 		<Button
+			{ ...props }
+			ref={ innerRef }
 			icon={ MenuIcon }
 			aria-expanded={ isOpen }
 			onClick={ isEnabled ? onToggle : undefined }
@@ -53,7 +61,10 @@ function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
 	);
 }
 
-function BlockNavigationDropdown( { isDisabled, __experimentalFeatures } ) {
+function BlockNavigationDropdown(
+	{ isDisabled, __experimentalFeatures, ...props },
+	ref
+) {
 	const hasBlocks = useSelect(
 		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
 		[]
@@ -64,9 +75,12 @@ function BlockNavigationDropdown( { isDisabled, __experimentalFeatures } ) {
 		<Dropdown
 			contentClassName="block-editor-block-navigation__popover"
 			position="bottom right"
-			renderToggle={ ( toggleProps ) => (
+			renderToggle={ ( { isOpen, onToggle } ) => (
 				<BlockNavigationDropdownToggle
-					{ ...toggleProps }
+					{ ...props }
+					innerRef={ ref }
+					isOpen={ isOpen }
+					onToggle={ onToggle }
 					isEnabled={ isEnabled }
 				/>
 			) }
@@ -80,4 +94,4 @@ function BlockNavigationDropdown( { isDisabled, __experimentalFeatures } ) {
 	);
 }
 
-export default BlockNavigationDropdown;
+export default forwardRef( BlockNavigationDropdown );

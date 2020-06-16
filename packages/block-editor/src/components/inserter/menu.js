@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  */
 import { useState } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { TabPanel } from '@wordpress/components';
+import { TabPanel, VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
@@ -81,17 +81,18 @@ function InserterMenu( {
 	const blocksTab = (
 		<>
 			<div className="block-editor-inserter__block-list">
-				<div className="block-editor-inserter__scrollable">
-					<InserterBlockList
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsert }
-						onHover={ onHover }
-						filterValue={ filterValue }
-					/>
-				</div>
+				<InserterBlockList
+					rootClientId={ destinationRootClientId }
+					onInsert={ onInsert }
+					onHover={ onHover }
+					filterValue={ filterValue }
+				/>
 			</div>
 			{ showInserterHelpPanel && (
 				<div className="block-editor-inserter__tips">
+					<VisuallyHidden as="h2">
+						{ __( 'A tip for using the block editor' ) }
+					</VisuallyHidden>
 					<Tips />
 				</div>
 			) }
@@ -99,9 +100,7 @@ function InserterMenu( {
 	);
 
 	const patternsTab = (
-		<div className="block-editor-inserter__scrollable">
-			<BlockPatterns onInsert={ onInsert } filterValue={ filterValue } />
-		</div>
+		<BlockPatterns onInsert={ onInsert } filterValue={ filterValue } />
 	);
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
