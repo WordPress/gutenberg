@@ -60,12 +60,11 @@ function BlockTypesList( {
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-editor-block-types-list">
 			{ normalizedItems.map( ( item ) => {
-				const { id, icon, isDisabled, title, role } = item;
 				return (
 					<InserterListItem
-						key={ id }
-						className={ getBlockMenuDefaultClassName( id ) }
-						icon={ icon }
+						key={ item.id }
+						className={ getBlockMenuDefaultClassName( item.id ) }
+						icon={ item.icon }
 						onClick={ () => {
 							onSelect( item );
 							onHover( null );
@@ -74,9 +73,8 @@ function BlockTypesList( {
 						onMouseEnter={ () => onHover( item ) }
 						onMouseLeave={ () => onHover( null ) }
 						onBlur={ () => onHover( null ) }
-						isDisabled={ isDisabled }
-						title={ title }
-						role={ role }
+						isDisabled={ item.isDisabled }
+						title={ item.title }
 					/>
 				);
 			} ) }
