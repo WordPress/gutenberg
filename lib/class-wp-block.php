@@ -107,8 +107,8 @@ class WP_Block {
 
 		$this->available_context = $available_context;
 
-		if ( ! empty( $this->block_type->requiresContext ) ) {
-			foreach ( $this->block_type->requiresContext as $context_name ) {
+		if ( ! empty( $this->block_type->usesContext ) ) {
+			foreach ( $this->block_type->usesContext as $context_name ) {
 				if ( array_key_exists( $context_name, $this->available_context ) ) {
 					$this->context[ $context_name ] = $this->available_context[ $context_name ];
 				}

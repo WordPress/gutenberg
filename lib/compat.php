@@ -169,7 +169,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		$property_mappings = array(
 			'title'           => 'title',
 			'category'        => 'category',
-			'context'         => 'requiresContext',
+			'context'         => 'usesContext',
 			'providesContext' => 'providesContext',
 			'parent'          => 'parent',
 			'icon'            => 'icon',
