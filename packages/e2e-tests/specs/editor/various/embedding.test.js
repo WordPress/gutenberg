@@ -61,7 +61,7 @@ const MOCK_EMBED_IMAGE_SUCCESS_RESPONSE = {
 };
 
 const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
-	url: 'https://twitter.com/thatbunty',
+	url: 'https://twitter.com/wordpress',
 	html: false,
 	provider_name: 'Embed Provider',
 	version: '1.0',
@@ -134,7 +134,7 @@ const MOCK_RESPONSES = [
 		onRequestMatch: createJSONResponse( MOCK_CANT_EMBED_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://twitter.com/thatbunty' ),
+		match: createEmbeddingMatcher( 'https://twitter.com/wordpress' ),
 		onRequestMatch: createJSONResponse( MOCK_BAD_EMBED_PROVIDER_RESPONSE ),
 	},
 	{
@@ -193,10 +193,10 @@ describe( 'Embedding content', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/embed' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://twitter.com/thatbunty' );
+		await page.keyboard.type( 'https://twitter.com/wordpress' );
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector(
-			'input[value="https://twitter.com/thatbunty"]'
+			'input[value="https://twitter.com/wordpress"]'
 		);
 
 		// WordPress content that can be embedded. Should render valid figure
