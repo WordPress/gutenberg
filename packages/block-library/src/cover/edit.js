@@ -302,13 +302,15 @@ function CoverEdit( {
 	const controls = (
 		<>
 			<BlockControls>
-				<BlockAlignmentMatrixToolbar
-					label={ __( 'Change content position' ) }
-					value={ contentPosition }
-					onChange={ ( nextPosition ) =>
-						setAttributes( { contentPosition: nextPosition } )
-					}
-				/>
+				{ hasBackground && (
+					<BlockAlignmentMatrixToolbar
+						label={ __( 'Change content position' ) }
+						value={ contentPosition }
+						onChange={ ( nextPosition ) =>
+							setAttributes( { contentPosition: nextPosition } )
+						}
+					/>
+				) }
 				{ hasBackground && (
 					<MediaReplaceFlow
 						mediaId={ id }
