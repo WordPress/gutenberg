@@ -248,7 +248,6 @@ export default compose( [
 		const { getEditorMode } = select( 'core/edit-post' );
 
 		const {
-			getBlockCount,
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
