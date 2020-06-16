@@ -88,6 +88,7 @@ export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { default as Spinner } from './spinner';
+export { default as __experimentalStyledScopeProvider } from './styled-scope-provider';
 export { default as TabPanel } from './tab-panel';
 export { default as __experimentalText } from './text';
 export { default as TextControl } from './text-control';

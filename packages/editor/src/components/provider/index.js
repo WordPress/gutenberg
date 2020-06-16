@@ -7,6 +7,7 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
+import { __experimentalStyledScopeProvider as StyledScopeProvider } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -217,7 +218,7 @@ class EditorProvider extends Component {
 		);
 
 		return (
-			<>
+			<StyledScopeProvider scope="html body #editor">
 				<EditorStyles styles={ settings.styles } />
 				<EntityProvider kind="root" type="site">
 					<EntityProvider
@@ -242,7 +243,7 @@ class EditorProvider extends Component {
 						</BlockContextProvider>
 					</EntityProvider>
 				</EntityProvider>
-			</>
+			</StyledScopeProvider>
 		);
 	}
 }
