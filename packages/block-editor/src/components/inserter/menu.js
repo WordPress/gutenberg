@@ -119,18 +119,21 @@ function InserterMenu( {
 			onKeyDown={ onKeyDown }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterSearchForm onChange={ setFilterValue } />
-				{ showPatterns && (
-					<InserterTabs>
-						{ ( tab ) => {
-							if ( tab.name === 'blocks' ) {
-								return blocksTab;
-							}
-							return patternsTab;
-						} }
-					</InserterTabs>
-				) }
-				{ ! showPatterns && blocksTab }
+				{ /* the following div is necessary to fix the sticky position of the search form */ }
+				<div className="block-editor-inserter__content">
+					<InserterSearchForm onChange={ setFilterValue } />
+					{ showPatterns && (
+						<InserterTabs>
+							{ ( tab ) => {
+								if ( tab.name === 'blocks' ) {
+									return blocksTab;
+								}
+								return patternsTab;
+							} }
+						</InserterTabs>
+					) }
+					{ ! showPatterns && blocksTab }
+				</div>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<div className="block-editor-inserter__preview-container">
