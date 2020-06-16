@@ -91,8 +91,11 @@
 	}
 
 	.block-editor-block-switcher__label {
-		margin-bottom: $grid-unit-10;
+		margin-bottom: $grid-unit-15;
 		color: $medium-gray-text;
+		text-transform: uppercase;
+		font-size: 11px;
+		font-weight: 500;
 	}
 
 	@include break-medium {
@@ -136,8 +139,11 @@
 }
 
 .block-editor-block-switcher__preview-title {
-	margin-bottom: 10px;
-	color: $dark-gray-300;
+	margin-bottom: $grid-unit-15;
+	color: $medium-gray-text;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
 }
 
 // The block switcher in the contextual toolbar should be bigger.
