@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Multi-block selection should copy and paste individual blocks 1`] = `
+exports[`Copy/cut/paste of whole blocks should copy and paste individual blocks 1`] = `
 "<!-- wp:paragraph -->
 <p>Here is a unique string so we can test copying.</p>
 <!-- /wp:paragraph -->
@@ -10,7 +10,7 @@ exports[`Multi-block selection should copy and paste individual blocks 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Multi-block selection should copy and paste individual blocks 2`] = `
+exports[`Copy/cut/paste of whole blocks should copy and paste individual blocks 2`] = `
 "<!-- wp:paragraph -->
 <p>Here is a unique string so we can test copying.</p>
 <!-- /wp:paragraph -->
@@ -24,13 +24,13 @@ exports[`Multi-block selection should copy and paste individual blocks 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Multi-block selection should cut and paste individual blocks 1`] = `
+exports[`Copy/cut/paste of whole blocks should cut and paste individual blocks 1`] = `
 "<!-- wp:paragraph -->
 <p>2</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Multi-block selection should cut and paste individual blocks 2`] = `
+exports[`Copy/cut/paste of whole blocks should cut and paste individual blocks 2`] = `
 "<!-- wp:paragraph -->
 <p>2</p>
 <!-- /wp:paragraph -->
@@ -40,7 +40,23 @@ exports[`Multi-block selection should cut and paste individual blocks 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Multi-block selection should respect inline copy when text is selected 1`] = `
+exports[`Copy/cut/paste of whole blocks should respect inline copy in places like input fields and textareas 1`] = `
+"<!-- wp:shortcode -->
+[my-shortcode]
+<!-- /wp:shortcode -->"
+`;
+
+exports[`Copy/cut/paste of whole blocks should respect inline copy in places like input fields and textareas 2`] = `
+"<!-- wp:shortcode -->
+[my-shortcode]
+<!-- /wp:shortcode -->
+
+<!-- wp:paragraph -->
+<p>Pasted: e]</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Copy/cut/paste of whole blocks should respect inline copy when text is selected 1`] = `
 "<!-- wp:paragraph -->
 <p>First block</p>
 <!-- /wp:paragraph -->
@@ -50,7 +66,7 @@ exports[`Multi-block selection should respect inline copy when text is selected 
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Multi-block selection should respect inline copy when text is selected 2`] = `
+exports[`Copy/cut/paste of whole blocks should respect inline copy when text is selected 2`] = `
 "<!-- wp:paragraph -->
 <p>First block</p>
 <!-- /wp:paragraph -->

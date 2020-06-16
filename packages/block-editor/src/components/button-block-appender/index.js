@@ -52,31 +52,40 @@ function ButtonBlockAppender(
 					);
 				}
 				const isToggleButton = ! hasSingleBlockType;
-				return (
-					<Tooltip text={ label }>
-						<Button
-							ref={ ref }
-							onFocus={ onFocus }
-							tabIndex={ tabIndex }
-							className={ classnames(
-								className,
-								'block-editor-button-block-appender'
-							) }
-							onClick={ onToggle }
-							aria-haspopup={
-								isToggleButton ? 'true' : undefined
-							}
-							aria-expanded={
-								isToggleButton ? isOpen : undefined
-							}
-							disabled={ disabled }
-							label={ label }
-						>
+
+				let inserterButton = (
+					<Button
+						ref={ ref }
+						onFocus={ onFocus }
+						tabIndex={ tabIndex }
+						className={ classnames(
+							className,
+							'block-editor-button-block-appender'
+						) }
+						onClick={ onToggle }
+						aria-haspopup={ isToggleButton ? 'true' : undefined }
+						aria-expanded={ isToggleButton ? isOpen : undefined }
+						disabled={ disabled }
+						label={ label }
+					>
+						{ ! hasSingleBlockType && (
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
-							<Icon icon={ create } />
-						</Button>
-					</Tooltip>
+						) }
+						<Icon icon={ create } />
+						{ hasSingleBlockType && (
+							<span className="block-editor-button-block-appender__label">
+								{ label }{ ' ' }
+							</span>
+						) }
+					</Button>
 				);
+
+				if ( isToggleButton ) {
+					inserterButton = (
+						<Tooltip text={ label }>{ inserterButton }</Tooltip>
+					);
+				}
+				return inserterButton;
 			} }
 			isAppender
 		/>

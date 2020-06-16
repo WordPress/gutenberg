@@ -107,7 +107,6 @@
 		right: 0;
 		left: 0;
 		top: -$default-block-margin / 2;
-		border-radius: $radius-block-ui;
 		border-top: 4px solid $blue-medium-focus;
 	}
 }
@@ -123,6 +122,7 @@
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
 	.is-navigate-mode & .block-editor-block-list__block.is-selected,
+	.is-navigate-mode & .block-editor-block-list__block.is-hovered,
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-multi-selected {
 
@@ -161,8 +161,11 @@
 			}
 		}
 	}
-}
 
+	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
+		box-shadow: 0 0 0 1px $light-gray-ui;
+	}
+}
 
 /**
  * Block styles and alignments
@@ -385,7 +388,7 @@
 .block-editor-block-list__block-popover-inserter {
 	.block-editor-inserter__toggle.components-button {
 		// Fade it in after a delay.
-		animation: block-editor-inserter__toggle__fade-in-animation-delayed 1.2s ease;
+		animation: block-editor-inserter__toggle__fade-in-animation-delayed 0.3s ease;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
 	}
@@ -486,8 +489,85 @@
 	background-color: $white;
 
 	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
+	.block-editor-block-toolbar .components-toolbar,
+	.block-editor-block-toolbar__mover-switcher-container {
 		border-right-color: $dark-gray-primary;
+	}
+
+	.block-editor-block-toolbar__mover-switcher-container {
+		border-right-style: solid;
+		border-right-width: $border-width;
+	}
+
+	// Adjust the mover control to fit as a unit next to the block switcher.
+	.block-editor-block-toolbar__block-switcher-wrapper {
+		// Adjust the focus rectangle for the switcher.
+		.block-editor-block-switcher__no-switcher-icon::before,
+		.block-editor-block-switcher__toggle::before {
+			width: $grid-unit-60 - $grid-unit-10 - $grid-unit-15;
+		}
+
+		// Adjust the positioning of the icon to better balance the new unit.
+		.block-editor-block-icon svg {
+			margin-left: 10px;
+		}
+
+		.block-editor-block-switcher:last-child .block-editor-block-icon svg {
+			margin-left: auto;
+		}
+
+		.components-toolbar,
+		.components-toolbar-group {
+			border-right: none;
+		}
+	}
+
+	.block-editor-block-mover {
+		margin-left: -$grid-unit-15;
+		width: $button-size;
+
+		&.is-horizontal {
+			width: $block-toolbar-height;
+		}
+
+		// Needs specificity to override a first-child rule.
+		.components-button.has-icon.block-editor-block-mover-button.block-editor-block-mover-button {
+			min-width: $button-size;
+			width: $button-size;
+			cursor: grab;
+
+			&:active {
+				cursor: grabbing;
+			}
+		}
+
+		&.is-horizontal .components-button.has-icon.block-editor-block-mover-button.block-editor-block-mover-button {
+			min-width: $block-toolbar-height/2;
+			width: $block-toolbar-height/2;
+		}
+	}
+
+	.block-editor-block-mover:not(.is-horizontal) {
+
+		.block-editor-block-mover-button {
+			> svg {
+				margin-left: 2px;
+			}
+
+			&.is-up-button svg {
+				margin-top: 3px;
+			}
+
+			&.is-down-button svg {
+				margin-bottom: 3px;
+			}
+
+			&:focus::before {
+				left: 0 !important;
+				min-width: 0;
+				width: 28px;
+			}
+		}
 	}
 }
 
@@ -496,9 +576,9 @@
  * Block Label for Navigation/Selection Mode
  */
 
-.block-editor-block-list__breadcrumb {
+.block-editor-block-list__block-selection-button {
 	display: block;
-	z-index: z-index(".block-editor-block-list__breadcrumb");
+	z-index: z-index(".block-editor-block-list__block-selection-button");
 
 	// The button here has a special style to appear as a toolbar.
 	.components-button {
@@ -581,14 +661,14 @@
 		}
 
 		// Position the block toolbar.
-		.block-editor-block-list__breadcrumb,
+		.block-editor-block-list__block-selection-button,
 		.block-editor-block-contextual-toolbar {
 			margin-bottom: $grid-unit-15;
 			margin-left: - $block-toolbar-height;
 		}
 
 		.block-editor-block-contextual-toolbar[data-align="full"],
-		.block-editor-block-list__breadcrumb[data-align="full"] {
+		.block-editor-block-list__block-selection-button[data-align="full"] {
 			margin-left: 0;
 		}
 	}

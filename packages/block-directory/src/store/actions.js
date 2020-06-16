@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { apiFetch, select } from '@wordpress/data-controls';
+import { apiFetch, dispatch, select } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -53,29 +53,27 @@ export function setInstallBlocksPermission( hasPermission ) {
 /**
  * Action triggered to install a block plugin.
  *
- * @param {Object} item The block item returned by search.
+ * @param {Object} block The block item returned by search.
  *
  * @return {boolean} Whether the block was successfully installed & loaded.
  */
-export function* installBlockType( { id, name, assets } ) {
+export function* installBlockType( block ) {
+	const { id, assets } = block;
 	let success = false;
 	yield clearErrorNotice( id );
 	try {
 		if ( ! Array.isArray( assets ) || ! assets.length ) {
 			throw new Error( __( 'Block has no assets.' ) );
 		}
-		yield setIsInstalling( true );
-		const response = yield apiFetch( {
+		yield setIsInstalling( block.id, true );
+		yield apiFetch( {
 			path: '__experimental/block-directory/install',
 			data: {
-				slug: id,
+				slug: block.id,
 			},
 			method: 'POST',
 		} );
-		if ( response.success !== true ) {
-			throw new Error( __( 'Unable to install this block.' ) );
-		}
-		yield addInstalledBlockType( { id, name } );
+		yield addInstalledBlockType( block );
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
@@ -86,8 +84,36 @@ export function* installBlockType( { id, name, assets } ) {
 	} catch ( error ) {
 		yield setErrorNotice( id, error.message || __( 'An error occurred.' ) );
 	}
-	yield setIsInstalling( false );
+	yield setIsInstalling( block.id, false );
 	return success;
+}
+
+/**
+ * Action triggered to uninstall a block plugin.
+ *
+ * @param {Object} block The blockType object.
+ */
+export function* uninstallBlockType( block ) {
+	const { id } = block;
+	try {
+		const response = yield apiFetch( {
+			path: '__experimental/block-directory/uninstall',
+			data: {
+				slug: id,
+			},
+			method: 'DELETE',
+		} );
+		if ( response !== true ) {
+			throw new Error( __( 'Unable to uninstall this block.' ) );
+		}
+		yield removeInstalledBlockType( block );
+	} catch ( error ) {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			error.message || __( 'An error occurred.' )
+		);
+	}
 }
 
 /**
@@ -105,15 +131,31 @@ export function addInstalledBlockType( item ) {
 }
 
 /**
+ * Returns an action object used to remove a newly installed block type.
+ *
+ * @param {string} item The block item with the block id and name.
+ *
+ * @return {Object} Action object.
+ */
+export function removeInstalledBlockType( item ) {
+	return {
+		type: 'REMOVE_INSTALLED_BLOCK_TYPE',
+		item,
+	};
+}
+
+/**
  * Returns an action object used to indicate install in progress
  *
+ * @param {string} blockId
  * @param {boolean} isInstalling
  *
  * @return {Object} Action object.
  */
-export function setIsInstalling( isInstalling ) {
+export function setIsInstalling( blockId, isInstalling ) {
 	return {
 		type: 'SET_INSTALLING_BLOCK',
+		blockId,
 		isInstalling,
 	};
 }

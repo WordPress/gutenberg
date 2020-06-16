@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { installBlockType } from '../actions';
+import { installBlockType, uninstallBlockType } from '../actions';
 
 describe( 'actions', () => {
 	const item = {
@@ -22,6 +22,7 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: true,
 			} );
 
@@ -31,10 +32,7 @@ describe( 'actions', () => {
 
 			expect( generator.next( { success: true } ).value ).toEqual( {
 				type: 'ADD_INSTALLED_BLOCK_TYPE',
-				item: {
-					id: item.id,
-					name: item.name,
-				},
+				item,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -51,6 +49,7 @@ describe( 'actions', () => {
 
 			expect( generator.next( [ item ] ).value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: false,
 			} );
 
@@ -76,6 +75,7 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: false,
 			} );
 
@@ -96,6 +96,7 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: true,
 			} );
 
@@ -108,18 +109,63 @@ describe( 'actions', () => {
 				message: 'Plugin not found.',
 				data: null,
 			};
-			expect( generator.next( apiError ).value ).toMatchObject( {
+			expect( generator.throw( apiError ).value ).toMatchObject( {
 				type: 'SET_ERROR_NOTICE',
 				blockId: item.id,
 			} );
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
 				isInstalling: false,
 			} );
 
 			expect( generator.next() ).toEqual( {
 				value: false,
+				done: true,
+			} );
+		} );
+	} );
+
+	describe( 'uninstallBlockType', () => {
+		it( 'should uninstall a block successfully', () => {
+			const generator = uninstallBlockType( item );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+			} );
+
+			expect( generator.next( true ).value ).toEqual( {
+				type: 'REMOVE_INSTALLED_BLOCK_TYPE',
+				item,
+			} );
+
+			expect( generator.next() ).toEqual( {
+				value: undefined,
+				done: true,
+			} );
+		} );
+
+		it( "should set a global notice if the plugin can't uninstall", () => {
+			const generator = uninstallBlockType( item );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+			} );
+
+			const apiError = {
+				code: 'could_not_remove_plugin',
+				message: 'Could not fully remove the plugin .',
+				data: null,
+			};
+			expect( generator.next( apiError ).value ).toMatchObject( {
+				type: 'DISPATCH',
+				actionName: 'createErrorNotice',
+				storeKey: 'core/notices',
+			} );
+
+			expect( generator.next() ).toEqual( {
+				value: undefined,
 				done: true,
 			} );
 		} );

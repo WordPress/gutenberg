@@ -48,7 +48,7 @@ export const downloadableBlocks = (
 export const blockManagement = (
 	state = {
 		installedBlockTypes: [],
-		isInstalling: false,
+		isInstalling: {},
 	},
 	action
 ) => {
@@ -71,7 +71,10 @@ export const blockManagement = (
 		case 'SET_INSTALLING_BLOCK':
 			return {
 				...state,
-				isInstalling: action.isInstalling,
+				isInstalling: {
+					...state.isInstalling,
+					[ action.blockId ]: action.isInstalling,
+				},
 			};
 	}
 	return state;

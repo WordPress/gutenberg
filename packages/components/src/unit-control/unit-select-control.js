@@ -13,6 +13,14 @@ import { CSS_UNITS, hasUnits } from './utils';
 /**
  * Renders a `select` if there are multiple units.
  * Otherwise, renders a non-selectable label.
+ *
+ * @param {Object}   props                     Component props.
+ * @param {string}   [props.className]         Class to set on the `select` element.
+ * @param {boolean}  [props.isTabbable=true]   Whether the control can be focused via keyboard navigation.
+ * @param {Array}    [props.options=CSS_UNITS] Available units to select from.
+ * @param {Function} [props.onChange=noop]     A callback function invoked when the value is changed.
+ * @param {string}   [props.size="default"]    Size of the control option. Supports "default" and "small".
+ * @param {string}   [props.value="px"]        Current unit.
  */
 export default function UnitSelectControl( {
 	className,

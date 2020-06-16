@@ -70,7 +70,7 @@ describe( 'state', () => {
 		it( 'should return false if last action was not updating block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
@@ -88,14 +88,14 @@ describe( 'state', () => {
 		it( 'should return false if not updating the same block', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 				attributes: {
 					foo: 20,
 				},
@@ -109,14 +109,14 @@ describe( 'state', () => {
 		it( 'should return false if not updating the same block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					bar: 20,
 				},
@@ -130,7 +130,7 @@ describe( 'state', () => {
 		it( 'should return false if no previous action', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
@@ -145,14 +145,14 @@ describe( 'state', () => {
 		it( 'should return true if updating the same block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 20,
 				},
@@ -169,7 +169,7 @@ describe( 'state', () => {
 			registerBlockType( 'core/test-block', {
 				save: noop,
 				edit: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 		} );
@@ -183,13 +183,13 @@ describe( 'state', () => {
 				registerBlockType( 'core/test-parent-block', {
 					save: noop,
 					edit: noop,
-					category: 'common',
+					category: 'text',
 					title: 'test parent block',
 				} );
 				registerBlockType( 'core/test-child-block', {
 					save: noop,
 					edit: noop,
-					category: 'common',
+					category: 'text',
 					title: 'test child block 1',
 					attributes: {
 						attr: {
@@ -1640,7 +1640,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1666,7 +1666,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1692,7 +1692,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1718,7 +1718,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							moreUpdated: true,
 						},
@@ -1739,7 +1739,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1765,7 +1765,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1792,7 +1792,7 @@ describe( 'state', () => {
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1826,7 +1826,7 @@ describe( 'state', () => {
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: false,
 						},
@@ -1850,7 +1850,7 @@ describe( 'state', () => {
 					);
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: false,
 						},
@@ -1858,7 +1858,7 @@ describe( 'state', () => {
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1882,14 +1882,14 @@ describe( 'state', () => {
 					);
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: false,
 						},
 					} );
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -2605,7 +2605,7 @@ describe( 'state', () => {
 
 			const state = lastBlockAttributesChange( original, {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 				attributes: {
 					food: 'banana',
 				},

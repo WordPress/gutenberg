@@ -7,6 +7,8 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
+	subscribeReplaceBlock,
+	subscribeUpdateTheme,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -22,6 +24,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
+import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -33,8 +36,6 @@ const postTypeEntities = [
 	...postTypeEntity,
 	transientEdits: {
 		blocks: true,
-		selectionStart: true,
-		selectionEnd: true,
 	},
 	mergedEdits: {
 		meta: true,
@@ -81,6 +82,12 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
+		this.subscriptionParentReplaceBlock = subscribeReplaceBlock(
+			( payload ) => {
+				this.replaceBlockAction( payload.html, payload.clientId );
+			}
+		);
+
 		this.subscriptionParentMediaAppend = subscribeMediaAppend(
 			( payload ) => {
 				const blockName = 'core/' + payload.mediaType;
@@ -96,6 +103,21 @@ class NativeEditorProvider extends Component {
 					indexAfterSelected || this.props.blockCount;
 
 				this.props.insertBlock( newBlock, insertionIndex );
+			}
+		);
+
+		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
+			( theme ) => {
+				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
+				if ( theme.colors === undefined ) {
+					theme.colors = SETTINGS_DEFAULTS.colors;
+				}
+
+				if ( theme.gradients === undefined ) {
+					theme.gradients = SETTINGS_DEFAULTS.gradients;
+				}
+
+				this.props.updateSettings( theme );
 			}
 		);
 	}
@@ -117,8 +139,16 @@ class NativeEditorProvider extends Component {
 			this.subscriptionParentUpdateHtml.remove();
 		}
 
+		if ( this.subscriptionParentReplaceBlock ) {
+			this.subscriptionParentReplaceBlock.remove();
+		}
+
 		if ( this.subscriptionParentMediaAppend ) {
 			this.subscriptionParentMediaAppend.remove();
+		}
+
+		if ( this.subscriptionParentUpdateTheme ) {
+			this.subscriptionParentUpdateTheme.remove();
 		}
 	}
 
@@ -166,6 +196,11 @@ class NativeEditorProvider extends Component {
 	updateHtmlAction( html ) {
 		const parsed = parse( html );
 		this.props.resetEditorBlocksWithoutUndoLevel( parsed );
+	}
+
+	replaceBlockAction( html, blockClientId ) {
+		const parsed = parse( html );
+		this.props.replaceBlock( blockClientId, parsed );
 	}
 
 	toggleMode() {
@@ -221,13 +256,17 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
-		const { clearSelectedBlock, insertBlock } = dispatch(
-			'core/block-editor'
-		);
+		const {
+			updateSettings,
+			clearSelectedBlock,
+			insertBlock,
+			replaceBlock,
+		} = dispatch( 'core/block-editor' );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 
 		return {
+			updateSettings,
 			addEntities,
 			clearSelectedBlock,
 			insertBlock,
@@ -243,6 +282,7 @@ export default compose( [
 			switchMode( mode ) {
 				switchEditorMode( mode );
 			},
+			replaceBlock,
 		};
 	} ),
 ] )( NativeEditorProvider );

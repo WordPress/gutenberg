@@ -299,6 +299,11 @@ function LinkControl( {
 				? results[ 0 ].concat( results[ 1 ] )
 				: results[ 0 ];
 
+		// If displaying initial suggestions just return plain results.
+		if ( args.isInitialSuggestions ) {
+			return results;
+		}
+
 		// Here we append a faux suggestion to represent a "CREATE" option. This
 		// is detected in the rendering of the search results and handled as a
 		// special case. This is currently necessary because the suggestions

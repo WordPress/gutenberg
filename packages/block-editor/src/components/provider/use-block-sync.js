@@ -106,6 +106,8 @@ export default function useBlockSync( {
 	// have been made. This lets us inform the data source of changes. This
 	// is an effect so that the subscriber can run synchronously without
 	// waiting for React renders for changes.
+	const onInputRef = useRef( onInput );
+	const onChangeRef = useRef( onChange );
 	useEffect( () => {
 		const {
 			getSelectionStart,
@@ -118,7 +120,17 @@ export default function useBlockSync( {
 		let isPersistent = isLastBlockChangePersistent();
 		let previousAreBlocksDifferent = false;
 
+		onInputRef.current = onInput;
+		onChangeRef.current = onChange;
 		const unsubscribe = registry.subscribe( () => {
+			// Sometimes, subscriptions might trigger with stale callbacks
+			// before they are cleaned up. Avoid running them.
+			if (
+				onInputRef.current !== onInput ||
+				onChangeRef.current !== onChange
+			)
+				return;
+
 			// Sometimes, when changing block lists, lingering subscriptions
 			// might trigger before they are cleaned up. If the block for which
 			// the subscription runs is no longer in the store, this would clear
