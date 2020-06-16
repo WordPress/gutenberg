@@ -38,5 +38,5 @@ In order to access the panels using function such as `wp.data.dispatch( 'core/ed
 To programmatically toggle the custom panel added in the example above, use the following:
 
 ```js
-wp.data.dispatch('core/edit-post').toggleEditorPanelToggle('plugin-document-setting-panel-demo/custom-panel');
+wp.data.dispatch( 'core/edit-post' ).toggleEditorPanelToggle( 'plugin-document-setting-panel-demo/custom-panel' );
 ```
