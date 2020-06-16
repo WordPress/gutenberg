@@ -13,8 +13,8 @@ import {
 import { BottomSheet, ColorSettings } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useRef, useCallback } from '@wordpress/element';
-import { View, Animated, Easing } from 'react-native';
+import { useRef, useCallback, useState } from '@wordpress/element';
+import { View, Animated } from 'react-native';
 /**
  * Internal dependencies
  */
@@ -48,19 +48,21 @@ const BottomSheetScreen = ( { children, setHeight } ) => {
 
 const Stack = createStackNavigator();
 
+let snaps = [ 1, 1, 1, 0 ];
+
 function BottomSheetSettings( {
 	editorSidebarOpened,
 	closeGeneralSidebar,
 	...props
 } ) {
-	const heightValue = useRef( new Animated.Value( 1 ) ).current;
+	const [ height, setHeightValue ] = useState( 1 );
 	const setHeight = ( maxHeight ) => {
-		if ( heightValue !== maxHeight + 20 ) {
-			Animated.timing( heightValue, {
-				toValue: maxHeight + 20,
-				duration: 300,
-				easing: Easing.ease,
-			} ).start();
+		const bHei = maxHeight + 20;
+		if ( height !== bHei ) {
+			if ( snaps[ 0 ] === 1 ) {
+				snaps = [ bHei, 0.75 * bHei, 0.5 * bHei, 0 ];
+			}
+			setHeightValue( maxHeight + 20 );
 		}
 	};
 
@@ -75,16 +77,16 @@ function BottomSheetSettings( {
 			<ColorSettings defaultSettings={ defaultSettings } />
 		</BottomSheetScreen>
 	) );
-
 	return (
 		<BottomSheet
 			isVisible={ editorSidebarOpened }
 			onClose={ closeGeneralSidebar }
 			hideHeader
 			contentStyle={ styles.content }
+			snapPoints={ snaps }
 			{ ...props }
 		>
-			<Animated.View style={ { height: heightValue } }>
+			<Animated.View style={ { height } }>
 				<NavigationContainer>
 					<Stack.Navigator
 						screenOptions={ {

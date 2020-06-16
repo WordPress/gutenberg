@@ -5,15 +5,12 @@ import {
 	Text,
 	View,
 	Platform,
-	PanResponder,
 	Dimensions,
-	ScrollView,
 	Keyboard,
 	StatusBar,
-	TouchableHighlight,
 	LayoutAnimation,
+	Modal as RNModal,
 } from 'react-native';
-import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 
@@ -35,7 +32,19 @@ import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import ColorCell from './color-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
-import { BottomSheetProvider } from './bottom-sheet-context';
+
+import BottomSheetReanimated from 'reanimated-bottom-sheet';
+
+const windowHeight = Dimensions.get( 'window' ).height;
+
+const defaultSnapPoints = [
+	windowHeight * 0.6,
+	windowHeight * 0.5,
+	windowHeight * 0.25,
+	0,
+];
+
+const defaultInitialSnap = 2;
 
 const ANIMATION_DURATION = 300;
 
@@ -61,6 +70,7 @@ class BottomSheet extends Component {
 		this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
+		this.renderContent = this.renderContent.bind( this );
 
 		this.state = {
 			safeAreaBottomInset: 0,
@@ -265,47 +275,33 @@ class BottomSheet extends Component {
 		);
 	}
 
+	renderContent() {
+		const { getStylesFromColorScheme, children } = this.props;
+		const backgroundStyle = getStylesFromColorScheme(
+			styles.background,
+			styles.backgroundDark
+		);
+
+		return <View style={ backgroundStyle }>{ children }</View>;
+	}
+
 	render() {
 		const {
 			title = '',
 			isVisible,
 			leftButton,
 			rightButton,
-			hideHeader,
 			style = {},
-			contentStyle = {},
 			getStylesFromColorScheme,
-			onDismiss,
-			children,
-			...rest
+			snapPoints = defaultSnapPoints,
+			initialSnap = defaultInitialSnap,
 		} = this.props;
-		const {
-			maxHeight,
-			bounces,
-			safeAreaBottomInset,
-			isScrolling,
-			scrollEnabled,
-			isMaxHeightSet,
-			extraProps,
-			currentScreen,
-		} = this.state;
+		const { safeAreaBottomInset } = this.state;
 
-		const panResponder = PanResponder.create( {
-			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
-				// 'swiping-to-close' option is temporarily and partially disabled
-				//	on Android ( swipe / drag is still available in the top most area - near drag indicator)
-				if ( Platform.OS === 'ios' ) {
-					// Activates swipe down over child Touchables if the swipe is long enough.
-					// With this we can adjust sensibility on the swipe vs tap gestures.
-					if ( gestureState.dy > 3 && ! bounces ) {
-						gestureState.dy = 0;
-						return true;
-					}
-				}
-				return false;
-			},
-		} );
-
+		const backgroundStyle = getStylesFromColorScheme(
+			styles.background,
+			styles.backgroundDark
+		);
 		const getHeader = () => (
 			<View>
 				<View style={ styles.head }>
@@ -318,91 +314,29 @@ class BottomSheet extends Component {
 				<View style={ styles.separator } />
 			</View>
 		);
-
-		const backgroundStyle = getStylesFromColorScheme(
-			styles.background,
-			styles.backgroundDark
-		);
-
 		return (
-			<Modal
-				isVisible={ isVisible }
-				style={ styles.bottomModal }
-				animationInTiming={ 600 }
-				animationOutTiming={ 300 }
-				backdropTransitionInTiming={ 50 }
-				backdropTransitionOutTiming={ 50 }
-				backdropOpacity={ 0.2 }
-				onBackdropPress={ this.onCloseBottomSheet }
-				onBackButtonPress={ this.onHardwareButtonPress }
-				onSwipe={ this.onCloseBottomSheet }
-				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
-				onModalHide={
-					Platform.OS === 'android' ? onDismiss : undefined
-				}
-				swipeDirection="down"
-				onMoveShouldSetResponder={
-					scrollEnabled &&
-					panResponder.panHandlers.onMoveShouldSetResponder
-				}
-				onMoveShouldSetResponderCapture={
-					scrollEnabled &&
-					panResponder.panHandlers.onMoveShouldSetResponderCapture
-				}
-				onAccessibilityEscape={ this.onCloseBottomSheet }
-				{ ...rest }
-			>
-				<KeyboardAvoidingView
-					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ {
-						...backgroundStyle,
-						borderColor: 'rgba(0, 0, 0, 0.1)',
-						...style,
-					} }
-					keyboardVerticalOffset={ -safeAreaBottomInset }
-				>
-					<View style={ styles.dragIndicator } />
-					{ ! hideHeader && getHeader() }
-					<ScrollView
-						disableScrollViewPanResponder
-						bounces={ bounces }
-						onScroll={ this.onScroll }
-						onScrollBeginDrag={ () => this.isScrolling( true ) }
-						onScrollEndDrag={ () => this.isScrolling( false ) }
-						scrollEventThrottle={ 16 }
-						style={ isMaxHeightSet ? { maxHeight } : {} }
-						contentContainerStyle={ [
-							styles.content,
-							hideHeader && styles.emptyHeader,
-							contentStyle,
-						] }
-						scrollEnabled={ scrollEnabled }
-						automaticallyAdjustContentInsets={ false }
+			<RNModal visible={ isVisible } transparent={ true }>
+				<View style={ { flex: 1 } }>
+					<KeyboardAvoidingView
+						behavior={ Platform.OS === 'ios' && 'padding' }
+						style={ {
+							...backgroundStyle,
+							borderColor: 'rgba(0, 0, 0, 0.1)',
+							...style,
+							flex: 1,
+						} }
+						keyboardVerticalOffset={ -safeAreaBottomInset }
 					>
-						<BottomSheetProvider
-							value={ {
-								shouldEnableBottomSheetScroll: this
-									.onShouldEnableScroll,
-								shouldDisableBottomSheetMaxHeight: this
-									.onShouldSetBottomSheetMaxHeight,
-								isBottomSheetContentScrolling: isScrolling,
-								onCloseBottomSheet: this
-									.onHandleClosingBottomSheet,
-								onHardwareButtonPress: this
-									.onHandleHardwareButtonPress,
-								onReplaceSubsheet: this.onReplaceSubsheet,
-								extraProps,
-								currentScreen,
-							} }
-						>
-							<TouchableHighlight accessible={ false }>
-								<>{ children }</>
-							</TouchableHighlight>
-						</BottomSheetProvider>
-						<View style={ { height: safeAreaBottomInset } } />
-					</ScrollView>
-				</KeyboardAvoidingView>
-			</Modal>
+						<BottomSheetReanimated
+							snapPoints={ snapPoints }
+							initialSnap={ initialSnap }
+							renderContent={ this.renderContent }
+							renderHeader={ getHeader }
+							onCloseEnd={ this.onCloseBottomSheet }
+						/>
+					</KeyboardAvoidingView>
+				</View>
+			</RNModal>
 		);
 	}
 }
