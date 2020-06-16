@@ -23,6 +23,12 @@
 	@supports (position: sticky) {
 		flex-basis: 100%;
 	}
+
+	// These have to be explicitly set in order for them to be animatable.
+	margin: auto;
+	width: 100%;
+	transition: width 0.1s ease;
+	@include reduce-motion("transition");
 }
 
 .editor-styles-wrapper {
