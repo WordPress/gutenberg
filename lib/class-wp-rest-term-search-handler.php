@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: WP_REST_Category_Search_Handler class
+ * REST API: WP_REST_Terms_Search_Handler class
  *
  * @package WordPress
  * @subpackage REST_API
@@ -8,13 +8,13 @@
  */
 
 /**
- * Core class representing a search handler for categories in the REST API.
+ * Core class representing a search handler for term in the REST API.
  *
  * @since 5.5.0
  *
  * @see WP_REST_Search_Handler
  */
-class WP_REST_Category_Search_Handler extends WP_REST_Search_Handler {
+class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 
 	/**
 	 * Constructor.
@@ -22,7 +22,17 @@ class WP_REST_Category_Search_Handler extends WP_REST_Search_Handler {
 	 * @since 5.0.0
 	 */
 	public function __construct() {
-		$this->type = 'category';
+		$this->type = 'term';
+
+		// Support all public post types except attachments.
+		$this->subtypes = array_values(
+			get_taxonomies(
+				array(
+					'public'   => true,
+				),
+				'names'
+			)
+		);
 	}
 
 	/**
@@ -38,21 +48,26 @@ class WP_REST_Category_Search_Handler extends WP_REST_Search_Handler {
 	public function search_items( WP_REST_Request $request ) {
 
 		if ( ! empty( $request['search'] ) ) {
-			$category_search = $request['search'];
+			$term_search = $request['search'];
 		}
 
-		$category_search = apply_filters( 'rest_category_search_query', $category_search, $request );
+		$term_search = apply_filters( 'rest_term_search_query', $term_search, $request );
 
-		$categories = get_categories(
+		$taxonomies = $request[ WP_REST_Search_Controller::PROP_SUBTYPE ];
+		if ( in_array( WP_REST_Search_Controller::TYPE_ANY, $taxonomies, true ) ) {
+			$taxonomies = $this->subtypes;
+		}
+
+		$terms = get_terms(
 			array(
-				'get'        => 'all',
-				'name__like' => $category_search,
+				'taxonomy'   => $taxonomies,
+				'name__like' => $term_search,
 			)
 		);
 
 		$found_ids = array();
-		foreach ( $categories as $category ) {
-			$found_ids[] = $category->term_id;
+		foreach ( $terms as $term ) {
+			$found_ids[] = $term->term_id;
 		}
 
 		return array(
@@ -71,7 +86,7 @@ class WP_REST_Category_Search_Handler extends WP_REST_Search_Handler {
 	 * @return array Associative array containing all fields for the item.
 	 */
 	public function prepare_item( $id, array $fields ) {
-		$category = get_category( $id );
+		$term = get_term( $id );
 
 		$data = array();
 
@@ -79,13 +94,13 @@ class WP_REST_Category_Search_Handler extends WP_REST_Search_Handler {
 			$data[ WP_REST_Search_Controller::PROP_ID ] = (int) $id;
 		}
 		if ( in_array( WP_REST_Search_Controller::PROP_TITLE, $fields, true ) ) {
-			$data[ WP_REST_Search_Controller::PROP_TITLE ] = $category->name;
+			$data[ WP_REST_Search_Controller::PROP_TITLE ] = $term->name;
 		}
 		if ( in_array( WP_REST_Search_Controller::PROP_URL, $fields, true ) ) {
-			$data[ WP_REST_Search_Controller::PROP_URL ] = get_category_link( $id );
+			$data[ WP_REST_Search_Controller::PROP_URL ] = get_term_link( $id );
 		}
 		if ( in_array( WP_REST_Search_Controller::PROP_TYPE, $fields, true ) ) {
-			$data[ WP_REST_Search_Controller::PROP_TYPE ] = $this->type;
+			$data[ WP_REST_Search_Controller::PROP_TYPE ] = $term->taxonomy;
 		}
 
 		return $data;

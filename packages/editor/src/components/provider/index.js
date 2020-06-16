@@ -42,7 +42,7 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
  * @return {Promise<Object[]>} List of suggestions
  */
 const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
-	const posts = await apiFetch( {
+	const posts = apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
 			per_page: perPage,
@@ -50,15 +50,15 @@ const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
 		} ),
 	} );
 
-	const categories = await apiFetch( {
+	const terms = apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
 			per_page: perPage,
-			type: 'category',
+			type: 'term',
 		} ),
 	} );
 
-	const formats = await apiFetch( {
+	const formats = apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
 			per_page: perPage,
@@ -66,7 +66,7 @@ const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
 		} ),
 	} );
 
-	return Promise.all( [ posts, categories, formats ] ).then( ( results ) => {
+	return Promise.all( [ posts, terms, formats ] ).then( ( results ) => {
 		return map( flatten( results ), ( post ) => ( {
 			id: post.id,
 			url: post.url,
