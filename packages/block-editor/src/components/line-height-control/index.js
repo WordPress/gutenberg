@@ -12,24 +12,13 @@ import { ZERO } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import {
-	BASE_DEFAULT_VALUE,
-	RESET_VALUE,
-	STEP,
-	isLineHeightDefined,
-} from './utils';
+import { RESET_VALUE, STEP } from './utils';
 
-export default function LineHeightControl( {
-	presetValues,
-	value: lineHeight,
-	onChange,
-} ) {
-	const isDefined = isLineHeightDefined( lineHeight );
-
+export default function LineHeightControl( { presetValues, value, onChange } ) {
 	const handleOnKeyDown = ( event ) => {
 		const { keyCode } = event;
 
-		if ( keyCode === ZERO && ! isDefined ) {
+		if ( keyCode === ZERO ) {
 			/**
 			 * Prevents the onChange callback from firing, which prevents
 			 * the logic from assuming the change was triggered from
@@ -40,45 +29,16 @@ export default function LineHeightControl( {
 		}
 	};
 
-	const handleOnChange = ( nextValue ) => {
-		// Set the next value without modification if lineHeight has been defined
-		if ( isDefined ) {
-			onChange( nextValue );
-			return;
-		}
+	const handleOnChange = ( nextValue ) => onChange( nextValue );
 
-		// Otherwise...
-		/**
-		 * The following logic handles the initial up/down arrow CLICK of the
-		 * input element. This is so that the next values (from an undefined value state)
-		 * are more better suited for line-height rendering.
-		 */
-		let adjustedNextValue = nextValue;
-
-		switch ( nextValue ) {
-			case `${ STEP }`:
-				// Increment by step value
-				adjustedNextValue = BASE_DEFAULT_VALUE + STEP;
-				break;
-			case '0':
-				// Decrement by step value
-				adjustedNextValue = BASE_DEFAULT_VALUE - STEP;
-				break;
-		}
-
-		onChange( adjustedNextValue );
-	};
-
-	const value = isDefined ? lineHeight : RESET_VALUE;
+	const handlePresetSelection = ( { selectedItem } ) =>
+		onChange( selectedItem.value );
 
 	const options = presetValues.map( ( presetValue ) => ( {
 		key: presetValue.slug,
 		name: presetValue.name,
 		value: presetValue.value,
 	} ) );
-
-	const handlePresetSelection = ( { selectedItem } ) =>
-		onChange( selectedItem.value );
 
 	return (
 		<div className="block-editor-line-height-control">
@@ -99,10 +59,9 @@ export default function LineHeightControl( {
 				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnChange }
 				label={ __( 'Custom' ) }
-				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
 				type="number"
-				value={ value }
+				value={ value || RESET_VALUE }
 				min={ 0 }
 			/>
 			<Button

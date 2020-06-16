@@ -1,4 +1,3 @@
-export const BASE_DEFAULT_VALUE = 1.5;
 export const STEP = 0.1;
 /**
  * There are varying value types within LineHeightControl:
@@ -11,14 +10,3 @@ export const STEP = 0.1;
  * in order to be considered "controlled" by props (rather than internal state).
  */
 export const RESET_VALUE = '';
-
-/**
- * Determines if the lineHeight attribute has been properly defined.
- *
- * @param {any} lineHeight The value to check.
- *
- * @return {boolean} Whether the lineHeight attribute is valid.
- */
-export function isLineHeightDefined( lineHeight ) {
-	return lineHeight !== undefined && lineHeight !== RESET_VALUE;
-}
