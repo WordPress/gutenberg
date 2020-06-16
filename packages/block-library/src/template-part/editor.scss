@@ -64,11 +64,11 @@
 		border: $border-width solid transparent;
 
 		&:hover {
-			border: $border-width solid $theme-color;
+			border: $border-width solid $blue-wordpress-700;
 		}
 
 		&:focus {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $blue-wordpress-700;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
@@ -96,7 +96,7 @@
 	}
 
 	.wp-block-template-part__placeholder-panel-group-title {
-		color: $theme-color;
+		color: $blue-wordpress-700;
 		text-transform: uppercase;
 		font-size: 11px;
 		font-weight: 500;
