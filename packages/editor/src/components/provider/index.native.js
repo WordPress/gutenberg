@@ -238,7 +238,7 @@ class NativeEditorProvider extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
