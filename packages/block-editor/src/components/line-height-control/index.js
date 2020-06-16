@@ -14,6 +14,17 @@ import { ZERO } from '@wordpress/keycodes';
  */
 import { RESET_VALUE, STEP } from './utils';
 
+const DEFAULT_OPTION = {
+	key: 'default',
+	name: __( 'Default' ),
+	value: undefined,
+};
+const CUSTOM_OPTION = {
+	key: 'custom',
+	name: __( 'Custom' ),
+	value: 'custom',
+};
+
 export default function LineHeightControl( { presetValues, value, onChange } ) {
 	const handleOnKeyDown = ( event ) => {
 		const { keyCode } = event;
@@ -34,11 +45,14 @@ export default function LineHeightControl( { presetValues, value, onChange } ) {
 	const handlePresetSelection = ( { selectedItem } ) =>
 		onChange( selectedItem.value );
 
-	const options = presetValues.map( ( presetValue ) => ( {
-		key: presetValue.slug,
-		name: presetValue.name,
-		value: presetValue.value,
-	} ) );
+	const options = [
+		DEFAULT_OPTION,
+		...presetValues.map( ( presetValue ) => ( {
+			key: presetValue.slug,
+			name: presetValue.name,
+			value: presetValue.value,
+		} ) ),
+	];
 
 	return (
 		<div className="block-editor-line-height-control">
@@ -47,9 +61,10 @@ export default function LineHeightControl( { presetValues, value, onChange } ) {
 					className={ 'block-editor-line-height-control__preset' }
 					label={ __( 'Line Height' ) }
 					options={ options }
-					value={ options.find(
-						( option ) => option.value === value
-					) }
+					value={
+						options.find( ( option ) => option.value === value ) ||
+						CUSTOM_OPTION
+					}
 					onChange={ handlePresetSelection }
 				/>
 			) }
