@@ -95,6 +95,10 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		if ( is_wp_error( $check ) ) {
 			return $check;
 		}
+		$check = $this->check_set_auto_add_permission( $request );
+		if ( is_wp_error( $check ) ) {
+			return $check;
+		}
 
 		return parent::create_item_permissions_check( $request );
 	}
@@ -111,6 +115,10 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		if ( is_wp_error( $check ) ) {
 			return $check;
 		}
+		$check = $this->check_set_auto_add_permission( $request );
+		if ( is_wp_error( $check ) ) {
+			return $check;
+		}
 
 		return parent::update_item_permissions_check( $request );
 	}
@@ -120,7 +128,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 *
 	 * @param WP_REST_Request $request The request object with post and locations data.
 	 *
-	 * @return bool Whether the current user can assign the provided terms.
+	 * @return bool|WP_Error Whether the current user can assign the provided terms.
 	 */
 	protected function check_assign_locations_permission( $request ) {
 		if ( ! isset( $request['locations'] ) ) {
@@ -148,6 +156,25 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	}
 
 	/**
+	 * Checks whether current user can set auto add pages.
+	 *
+	 * @param WP_REST_Request $request The request object with post and locations data.
+	 *
+	 * @return bool|WP_Error Whether the current user can assign the provided terms.
+	 */
+	protected function check_set_auto_add_permission( $request ) {
+		if ( ! isset( $request['auto_add'] ) ) {
+			return true;
+		}
+
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
+			return new WP_Error( 'rest_cannot_set_auto_add', __( 'Sorry, you are not allowed to set auto add pages.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+		}
+
+		return true;
+	}
+
+	/**
 	 * Prepares a single term output for response.
 	 *
 	 * @param obj             $term    Term object.
@@ -159,14 +186,23 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$nav_menu = wp_get_nav_menu_object( $term );
 		$response = parent::prepare_item_for_response( $nav_menu, $request );
 
-		$nav_menu->auto_add = $this->get_menu_auto_add( $nav_menu->term_id );
-		$fields             = $this->get_fields_for_response( $request );
+		$fields = $this->get_fields_for_response( $request );
+		$data   = $response->get_data();
 
 		if ( in_array( 'auto_add', $fields, true ) ) {
-			$response->data['auto_add'] = $nav_menu->auto_add;
+			$auto_add         = $this->get_menu_auto_add( $nav_menu->term_id );
+			$data['auto_add'] = $auto_add;
 		}
 
-		return $response;
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
+
+		$response = rest_ensure_response( $data );
+		$response->add_links( $this->prepare_links( $term ) );
+
+		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php */
+		return apply_filters( "rest_prepare_{$this->taxonomy}", $response, $term, $request );
 	}
 
 	/**
@@ -452,7 +488,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 * @return Boolean The value of auto_add.
 	 */
 	function get_menu_auto_add( $menu_id ) {
-		$nav_menu_option = (array) get_option( 'nav_menu_options' );
+		$nav_menu_option = (array) get_option( 'nav_menu_options', array( 'auto_add' => array() ) );
 		if ( ! in_array( $menu_id, $nav_menu_option['auto_add'], true ) ) {
 			return false;
 		}
@@ -460,9 +496,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	}
 
 	/**
-	 * Updates the menu's auto add from a REST request. The body of this function
-	 * replicates the behavior of `wp_nav_menu_update_menu_items`
-	 * in `src/wp-admin/includes/nav-menu.php`.
+	 * Updates the menu's auto add from a REST request.
 	 *
 	 * @param int             $menu_id The menu id to update the location form.
 	 * @param WP_REST_Request $request The request object with menu and locations data.
@@ -471,17 +505,17 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 *                        is not present in the request.
 	 */
 	function handle_auto_add( $menu_id, $request ) {
-		$nav_menu_option = (array) get_option( 'nav_menu_options' );
+		if ( ! isset( $request['auto_add'] ) ) {
+			return true;
+		}
+
+		$nav_menu_option = (array) get_option( 'nav_menu_options', array( 'auto_add' => array() ) );
 
 		if ( ! isset( $nav_menu_option['auto_add'] ) ) {
 			$nav_menu_option['auto_add'] = array();
 		}
 
-		if ( ! isset( $request['auto_add'] ) ) {
-			return null;
-		}
-
-		$auto_add = $request->get_param( 'auto_add' );
+		$auto_add = (bool) $request['auto_add'];
 
 		if ( $auto_add ) {
 			if ( ! in_array( $menu_id, $nav_menu_option['auto_add'], true ) ) {
@@ -494,12 +528,12 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			}
 		}
 
-		// Remove non-existent/deleted menus.
-		$nav_menu_option['auto_add'] = array_intersect( $nav_menu_option['auto_add'], wp_get_nav_menus( array( 'fields' => 'ids' ) ) );
-		update_option( 'nav_menu_options', $nav_menu_option );
+		$update = update_option( 'nav_menu_options', $nav_menu_option );
+
+		/** This action is documented in wp-includes/nav-menu.php */
 		do_action( 'wp_update_nav_menu', $menu_id );
 
-		return $auto_add;
+		return $update;
 	}
 
 	/**
@@ -558,9 +592,8 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 
 		$schema['properties']['auto_add'] = array(
 			'description' => __( 'Whether to automatically add top level pages to this menu.', 'gutenberg' ),
-			'context'     => array( 'view', 'edit', 'embed' ),
+			'context'     => array( 'edit', 'embed' ),
 			'type'        => 'boolean',
-			'default'     => false,
 		);
 
 		return $schema;
