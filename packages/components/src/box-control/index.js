@@ -128,7 +128,7 @@ export default function BoxControl( {
 						onClick={ handleOnReset }
 						disabled={ ! isDirty }
 					>
-						Reset
+						{ __( 'Reset' ) }
 					</Button>
 				</FlexItem>
 			</Header>

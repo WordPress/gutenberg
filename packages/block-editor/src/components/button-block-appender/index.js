@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
-import { Icon, create } from '@wordpress/icons';
+import { Icon, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -71,7 +71,7 @@ function ButtonBlockAppender(
 						{ ! hasSingleBlockType && (
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
 						) }
-						<Icon icon={ create } />
+						<Icon icon={ plus } />
 						{ hasSingleBlockType && (
 							<span className="block-editor-button-block-appender__label">
 								{ label }{ ' ' }
@@ -82,7 +82,7 @@ function ButtonBlockAppender(
 
 				if ( isToggleButton ) {
 					inserterButton = (
-						<Tooltip text={ label }> { inserterButton } </Tooltip>
+						<Tooltip text={ label }>{ inserterButton }</Tooltip>
 					);
 				}
 				return inserterButton;
