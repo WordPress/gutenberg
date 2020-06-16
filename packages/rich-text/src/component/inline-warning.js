@@ -3,10 +3,10 @@
  */
 import { useEffect } from '@wordpress/element';
 
-export function useInlineWarning( { ref } ) {
+export function InlineWarning( { forwardedRef } ) {
 	useEffect( () => {
 		if ( process.env.NODE_ENV === 'development' ) {
-			const target = ref.current;
+			const target = forwardedRef.current;
 			const { defaultView } = target.ownerDocument;
 			const computedStyle = defaultView.getComputedStyle( target );
 
@@ -18,4 +18,5 @@ export function useInlineWarning( { ref } ) {
 			}
 		}
 	}, [] );
+	return null;
 }

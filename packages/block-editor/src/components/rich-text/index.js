@@ -575,8 +575,7 @@ function RichTextWrapper(
 				value,
 				onChange,
 				onFocus,
-				editableProps,
-				editableTagName: TagName,
+				Editable,
 			} ) => (
 				<>
 					{ children && children( { value, onChange, onFocus } ) }
@@ -595,8 +594,7 @@ function RichTextWrapper(
 						isSelected={ nestedIsSelected }
 					>
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
-							<TagName
-								{ ...editableProps }
+							<Editable
 								aria-autocomplete={
 									listBoxId ? 'list' : undefined
 								}
@@ -604,10 +602,7 @@ function RichTextWrapper(
 								aria-activedescendant={ activeId }
 								start={ startAttr }
 								reversed={ reversed }
-								onKeyDown={ ( event ) => {
-									onKeyDown( event );
-									editableProps.onKeyDown( event );
-								} }
+								onKeyDown={ onKeyDown }
 							/>
 						) }
 					</Autocomplete>
