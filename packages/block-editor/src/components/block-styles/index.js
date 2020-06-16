@@ -192,7 +192,6 @@ function BlockStyleItem( {
 			role={ role || 'button' }
 			tabIndex="0"
 			aria-label={ style.label || style.name }
-			data-skipchildrenfocus
 		>
 			<div className="block-editor-block-styles__item-preview">
 				<BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />

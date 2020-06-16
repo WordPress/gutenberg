@@ -48,6 +48,18 @@ function isVisible( element ) {
 }
 
 /**
+ * Returns true if the specified element should be skipped from focusable elements.
+ * For now it checks if tabindex attribute is set to -1.
+ *
+ * @param {Element} element DOM element to test.
+ *
+ * @return {boolean} Whether element should be skipped from focusable elements.
+ */
+function skipFocus( element ) {
+	return element.getAttribute( 'tabindex' ) === '-1';
+}
+
+/**
  * Returns true if the specified area element is a valid focusable element, or
  * false otherwise. Area is only focusable if within a map where a named map
  * referenced by an image somewhere in the document.
@@ -66,27 +78,6 @@ function isValidFocusableArea( element ) {
 	return !! img && isVisible( img );
 }
 
-// todo jsdoc
-// todo tests
-function getChildrenElementsToSkip( elements ) {
-	return Array.from( elements ).reduce( ( res, element ) => {
-		return element.getAttribute( 'data-skipchildrenfocus' ) === null
-			? res
-			: skipChildrenElements( element, res );
-	}, [] );
-}
-
-// todo jsdoc
-// todo tests
-function skipChildrenElements( element, final ) {
-	if ( element.childNodes.lenght === 0 ) return;
-	element.childNodes.forEach( ( el ) => {
-		final.push( el );
-		skipChildrenElements( el, final );
-	} );
-	return final;
-}
-
 /**
  * Returns all focusable elements within a given context.
  *
@@ -97,13 +88,8 @@ function skipChildrenElements( element, final ) {
 export function find( context ) {
 	const elements = context.querySelectorAll( SELECTOR );
 
-	const childrenElementsToSkip = getChildrenElementsToSkip( elements );
-
 	return Array.from( elements ).filter( ( element ) => {
-		if (
-			! isVisible( element ) ||
-			childrenElementsToSkip.includes( element )
-		) {
+		if ( ! isVisible( element ) || skipFocus( element ) ) {
 			return false;
 		}
 
