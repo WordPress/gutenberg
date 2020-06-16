@@ -252,9 +252,9 @@ export default function ImageEditor( {
 
 		try {
 			const response = await richImageRequest( id, attrs );
-			if ( response.mediaID && response.mediaID !== id ) {
+			if ( response.media_id && response.media_id !== id ) {
 				setAttributes( {
-					id: response.mediaID,
+					id: response.media_id,
 					url: response.url,
 				} );
 			}
