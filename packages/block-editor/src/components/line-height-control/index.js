@@ -36,14 +36,14 @@ export default function LineHeightControl( { presetValues, value, onChange } ) {
 			 * an input arrow CLICK.
 			 */
 			event.preventDefault();
-			onChange( '0' );
+			onChange( 0 );
 		}
 	};
 
-	const handleOnChange = ( nextValue ) => onChange( nextValue );
+	const handleOnChange = ( nextValue ) => onChange( Number( nextValue ) );
 
 	const handlePresetSelection = ( { selectedItem } ) =>
-		onChange( selectedItem.value );
+		onChange( Number( selectedItem.value ) );
 
 	const options = [
 		DEFAULT_OPTION,
