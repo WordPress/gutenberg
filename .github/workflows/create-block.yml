@@ -20,14 +20,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
-    - name: npm install, build, and test
+    - name: npm install, build, format and lint
       run: |
         npm ci
-        npx wp-create-block esnext-test --no-wp-scripts
-        cd esnext-test
-        ../node_modules/.bin/wp-scripts format-js
-        ../node_modules/.bin/wp-scripts build
-        ../node_modules/.bin/wp-scripts lint-style
-        ../node_modules/.bin/wp-scripts lint-js
+        npm run test:create-block
       env:
         CI: true
