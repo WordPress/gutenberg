@@ -391,6 +391,7 @@ export default function Image( {
 				naturalHeight={ naturalHeight }
 				width={ width }
 				height={ height }
+				clientWidth={ clientWidth }
 			>
 				{ img }
 			</ImageEditor>

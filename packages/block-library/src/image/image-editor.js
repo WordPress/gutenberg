@@ -165,6 +165,7 @@ export default function ImageEditor( {
 	naturalHeight,
 	width,
 	height,
+	clientWidth,
 	children,
 } ) {
 	const { createErrorNotice } = useDispatch( 'core/notices' );
@@ -239,11 +240,11 @@ export default function ImageEditor( {
 						<div
 							className="richimage__crop-area"
 							style={ {
-								paddingBottom: `${
-									( 100 * naturalHeight ) / naturalWidth
-								}%`,
 								width,
-								height,
+								height:
+									height ||
+									( clientWidth * naturalHeight ) /
+										naturalWidth,
 							} }
 						>
 							<Cropper
