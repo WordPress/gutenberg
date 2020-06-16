@@ -8,7 +8,7 @@
 	display: inline-block;
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
-	font-weight: 400;
+	font-weight: 500;
 	color: $dark-gray-primary;
 
 	// This pseudo-element "duplicates" the tab label and sets the text to bold.
@@ -27,8 +27,8 @@
 	&.is-active {
 		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
 		box-shadow: inset 0 0 0 $border-width-focus transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
-		font-weight: 600;
 		position: relative;
+		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
 
 		// This border appears in Windows High Contrast mode instead of the box-shadow.
 		&::before {
