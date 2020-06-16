@@ -31,7 +31,7 @@ import { ifNotResolved } from './utils';
  */
 export function* getAuthors() {
 	const users = yield apiFetch( {
-		path: '/wp/v2/users/?who=authors&per_page=-1',
+		path: '/wp/v2/users/?who=authors&per_page=100',
 	} );
 	yield receiveUserQuery( 'authors', users );
 }

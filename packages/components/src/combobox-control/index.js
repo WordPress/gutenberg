@@ -18,6 +18,7 @@ export default function ComboboxControl( {
 	onInputValueChange: onInputValueChange,
 	onChange: onSelectedItemChange,
 	value: _selectedItem,
+	initialSelectedItem,
 } ) {
 	const {
 		getLabelProps,
@@ -30,12 +31,11 @@ export default function ComboboxControl( {
 		highlightedIndex,
 		selectedItem,
 	} = useCombobox( {
-		initialSelectedItem: items[ 0 ],
 		items,
 		itemToString,
 		onInputValueChange,
 		onSelectedItemChange,
-		selectedItem: _selectedItem,
+		selectedItem: _selectedItem || initialSelectedItem,
 	} );
 	const menuProps = getMenuProps( {
 		className: 'components-combobox-control__menu',
@@ -51,6 +51,8 @@ export default function ComboboxControl( {
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
+	/* eslint-disable no-console */
+	console.log( 'ComboboxControl initialSelectedItem', initialSelectedItem );
 	return (
 		<div
 			className={ classnames( 'components-combobox-control', className ) }

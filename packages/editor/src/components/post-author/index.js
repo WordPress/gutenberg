@@ -6,7 +6,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-
+import NewPostAuthor from './new';
 /**
  * Internal dependencies
  */
@@ -34,19 +34,11 @@ export class PostAuthor extends Component {
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<PostAuthorCheck>
-				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
-				<select
-					id={ selectId }
-					value={ postAuthor }
-					onChange={ this.setAuthorId }
-					className="editor-post-author__select"
-				>
-					{ authors.map( ( author ) => (
-						<option key={ author.id } value={ author.id }>
-							{ decodeEntities( author.name ) }
-						</option>
-					) ) }
-				</select>
+				<NewPostAuthor
+					postAuthor={ postAuthor }
+					authors={ authors }
+					instanceId={ instanceId }
+				/>
 			</PostAuthorCheck>
 		);
 		/* eslint-enable jsx-a11y/no-onchange */
