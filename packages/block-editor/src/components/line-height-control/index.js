@@ -80,7 +80,7 @@ export default function LineHeightControl( {
 		<div className="block-editor-line-height-control">
 			{ presetValues?.length > 0 && (
 				<CustomSelectControl
-					className={ 'block-editor-line-height-control__select' }
+					className={ 'block-editor-line-height-control__preset' }
 					label={ __( 'Line Height' ) }
 					options={ options }
 					value={ options.find(
@@ -90,6 +90,7 @@ export default function LineHeightControl( {
 				/>
 			) }
 			<TextControl
+				className={ 'block-editor-line-height-control__custom' }
 				autoComplete="off"
 				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnChange }

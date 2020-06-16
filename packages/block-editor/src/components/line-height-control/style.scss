@@ -1,8 +1,24 @@
 .block-editor-line-height-control {
-	margin-bottom: 24px;
+	max-width: $sidebar-width - ( 2 * $panel-padding );
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	margin-bottom: $grid-unit-30;
 
-	input {
-		display: block;
-		max-width: 60px;
+	.block-editor-line-height-control__preset {
+		margin-right: $grid-unit-10;
+	}
+
+	.components-base-control.block-editor-line-height-control__custom {
+		margin-bottom: 0;
+	}
+
+	.block-editor-line-height-control__custom {
+		max-width: 54px;
+		height: 53px;
+
+		.components-base-control__label {
+			margin-bottom: 5px;
+		}
 	}
 }
