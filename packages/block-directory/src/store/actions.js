@@ -66,14 +66,15 @@ export function* installBlockType( block ) {
 			throw new Error( __( 'Block has no assets.' ) );
 		}
 		yield setIsInstalling( block.id, true );
-		yield apiFetch( {
-			path: '__experimental/block-directory/install',
+		const response = yield apiFetch( {
+			path: '__experimental/plugins',
 			data: {
 				slug: block.id,
+				status: 'active',
 			},
 			method: 'POST',
 		} );
-		yield addInstalledBlockType( block );
+		yield addInstalledBlockType( { ...block, plugin: response.plugin } );
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
@@ -94,18 +95,19 @@ export function* installBlockType( block ) {
  * @param {Object} block The blockType object.
  */
 export function* uninstallBlockType( block ) {
-	const { id } = block;
+	const plugin = block.plugin.replace( '.php', '' );
 	try {
-		const response = yield apiFetch( {
-			path: '__experimental/block-directory/uninstall',
+		yield apiFetch( {
+			path: `__experimental/plugins/${ plugin }`,
 			data: {
-				slug: id,
+				status: 'inactive',
 			},
+			method: 'PUT',
+		} );
+		yield apiFetch( {
+			path: `__experimental/plugins/${ plugin }`,
 			method: 'DELETE',
 		} );
-		if ( response !== true ) {
-			throw new Error( __( 'Unable to uninstall this block.' ) );
-		}
 		yield removeInstalledBlockType( block );
 	} catch ( error ) {
 		yield dispatch(

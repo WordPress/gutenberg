@@ -10,6 +10,13 @@ describe( 'actions', () => {
 		assets: [ 'script.js' ],
 	};
 
+	const plugin = {
+		plugin: 'block/block.php',
+		status: 'active',
+		name: 'Test Block',
+		version: '1.0.0',
+	};
+
 	describe( 'installBlockType', () => {
 		it( 'should install a block successfully', () => {
 			const generator = installBlockType( item );
@@ -28,11 +35,16 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
+				request: {
+					path: '__experimental/plugins',
+					method: 'POST',
+				},
 			} );
 
-			expect( generator.next( { success: true } ).value ).toEqual( {
+			const itemWithPlugin = { ...item, plugin: plugin.plugin };
+			expect( generator.next( plugin ).value ).toEqual( {
 				type: 'ADD_INSTALLED_BLOCK_TYPE',
-				item,
+				item: itemWithPlugin,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -102,6 +114,10 @@ describe( 'actions', () => {
 
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
+				request: {
+					path: '__experimental/plugins',
+					method: 'POST',
+				},
 			} );
 
 			const apiError = {
@@ -128,16 +144,32 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'uninstallBlockType', () => {
-		it( 'should uninstall a block successfully', () => {
-			const generator = uninstallBlockType( item );
+		const itemWithPlugin = { ...item, plugin: plugin.plugin };
 
+		it( 'should uninstall a block successfully', () => {
+			const generator = uninstallBlockType( itemWithPlugin );
+
+			// First the deactivation step
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
+				request: {
+					path: '__experimental/plugins/block/block',
+					method: 'PUT',
+				},
 			} );
 
-			expect( generator.next( true ).value ).toEqual( {
+			// Then the deletion step
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+				request: {
+					path: '__experimental/plugins/block/block',
+					method: 'DELETE',
+				},
+			} );
+
+			expect( generator.next().value ).toEqual( {
 				type: 'REMOVE_INSTALLED_BLOCK_TYPE',
-				item,
+				item: itemWithPlugin,
 			} );
 
 			expect( generator.next() ).toEqual( {
@@ -146,19 +178,32 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( "should set a global notice if the plugin can't uninstall", () => {
-			const generator = uninstallBlockType( item );
+		it( "should set a global notice if the plugin can't be deleted", () => {
+			const generator = uninstallBlockType( itemWithPlugin );
 
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
+				request: {
+					path: '__experimental/plugins/block/block',
+					method: 'PUT',
+				},
+			} );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+				request: {
+					path: '__experimental/plugins/block/block',
+					method: 'DELETE',
+				},
 			} );
 
 			const apiError = {
-				code: 'could_not_remove_plugin',
-				message: 'Could not fully remove the plugin .',
+				code: 'rest_cannot_delete_active_plugin',
+				message:
+					'Cannot delete an active plugin. Please deactivate it first.',
 				data: null,
 			};
-			expect( generator.next( apiError ).value ).toMatchObject( {
+			expect( generator.throw( apiError ).value ).toMatchObject( {
 				type: 'DISPATCH',
 				actionName: 'createErrorNotice',
 				storeKey: 'core/notices',
