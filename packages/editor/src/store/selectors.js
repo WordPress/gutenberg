@@ -16,6 +16,7 @@ import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -545,7 +546,8 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
-		! isEditedPostEmpty( state )
+		! isEditedPostEmpty( state ) ||
+		Platform.OS === 'native'
 	);
 }
 
