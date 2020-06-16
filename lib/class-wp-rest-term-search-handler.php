@@ -28,7 +28,7 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 		$this->subtypes = array_values(
 			get_taxonomies(
 				array(
-					'public'   => true,
+					'public' => true,
 				),
 				'names'
 			)
