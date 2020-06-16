@@ -6,8 +6,11 @@ $tree-item-height: 36px;
 }
 
 .block-editor-block-navigation__label {
-	margin: 0 0 $grid-unit-10;
-	color: $dark-gray-300;
+	margin: 0 0 $grid-unit-15;
+	color: $medium-gray-text;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
 }
 
 .block-editor-block-navigation__container {

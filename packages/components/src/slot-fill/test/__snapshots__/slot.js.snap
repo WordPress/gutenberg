@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Slot bubblesVirtually false should not break without a Provider 1`] = `
+<div>
+  <div />
+</div>
+`;
+
 exports[`Slot bubblesVirtually false should subsume another slot by the same name 1`] = `
 <div>
   <div
@@ -34,6 +40,14 @@ exports[`Slot bubblesVirtually false should unmount two slots with the same name
   <div
     data-position="second"
   />
+</div>
+`;
+
+exports[`Slot bubblesVirtually true should not break without a Provider 1`] = `
+<div>
+  <div>
+    <div />
+  </div>
 </div>
 `;
 

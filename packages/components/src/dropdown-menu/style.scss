@@ -82,6 +82,10 @@
 		margin-top: 0;
 		border-top: $border-width solid $light-gray-secondary;
 		padding: $grid-unit-15;
+
+		.is-alternate & {
+			border-color: $dark-gray-primary;
+		}
 	}
 }
 
