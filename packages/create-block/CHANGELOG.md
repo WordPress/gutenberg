@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.14.1 (2020-06-15)
+
+### Bug Fix
+
+- Fix an error reported by ESLint by improving JSDoc comment in ESNext template in `src/edit.js` file ([#23164](https://github.com/WordPress/gutenberg/pull/23164)).
+
+## 0.14.0 (2020-06-15)
+
 ### Enhancements
 
 - Update `esnext` (default) template to leverage CSS import in JavaScript support added to `@wordpress/scripts` ([#22727](https://github.com/WordPress/gutenberg/pull/22727/files)).
