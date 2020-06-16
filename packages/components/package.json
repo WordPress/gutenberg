@@ -26,6 +26,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
+		"@emotion/cache": "^10.0.29",
 		"@emotion/core": "^10.0.22",
 		"@emotion/css": "^10.0.22",
 		"@emotion/native": "^10.0.22",
@@ -56,6 +57,7 @@
 		"react-use-gesture": "^7.0.15",
 		"reakit": "^1.0.4",
 		"rememo": "^3.0.0",
+		"stylis-plugin-extra-scope": "^0.2.1",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^7.0.2"
 	},
