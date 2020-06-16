@@ -156,6 +156,31 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 	);
 }
 
+function getStyles( edits ) {
+	let angle = 0;
+	let horizontal = false;
+	let vertical = false;
+	edits.forEach( ( { action, options } ) => {
+		if ( action === 'rotate' ) {
+			angle += horizontal !== vertical ? -options.angle : options.angle;
+		} else if ( action === 'flip' ) {
+			horizontal = options.horizontal ? ! horizontal : horizontal;
+			vertical = options.vertical ? ! vertical : vertical;
+		}
+	} );
+
+	const styles = {
+		transition: 'transform 1s',
+		transform: [
+			`rotateX( ${ vertical ? 180 : 0 }deg )`,
+			`rotateY( ${ horizontal ? 180 : 0 }deg )`,
+			`rotateZ( ${ angle }deg )`,
+		].join( ' ' ),
+	};
+
+	return styles;
+}
+
 export default function ImageEditor( {
 	id,
 	url,
@@ -165,7 +190,7 @@ export default function ImageEditor( {
 } ) {
 	const { createErrorNotice } = useDispatch( 'core/notices' );
 	const [ isCropping, setIsCropping ] = useState( false );
-	const [ inProgress, setInProgress ] = useState( null );
+	const [ inProgress, setInProgress ] = useState( false );
 	const [ imageSize, setImageSize ] = useState( {
 		naturalHeight: 0,
 		naturalWidth: 0,
@@ -174,6 +199,7 @@ export default function ImageEditor( {
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
 	const [ zoom, setZoom ] = useState( 1 );
 	const [ aspect, setAspect ] = useState( 4 / 3 );
+	const [ edits, setEdits ] = useState( [] );
 
 	// Cancel cropping on deselect.
 	useEffect( () => {
@@ -183,11 +209,11 @@ export default function ImageEditor( {
 	}, [ isSelected ] );
 
 	function adjustImage( action, attrs ) {
-		setInProgress( action );
+		setInProgress( true );
 
 		richImageRequest( id, action, attrs )
 			.then( ( response ) => {
-				setInProgress( null );
+				setInProgress( false );
 				setIsCropping( false );
 
 				if ( response.media_id && response.media_id !== id ) {
@@ -207,28 +233,56 @@ export default function ImageEditor( {
 						type: 'snackbar',
 					}
 				);
-				setInProgress( null );
+				setInProgress( false );
 				setIsCropping( false );
 			} );
 	}
 
-	function cropImage() {
-		adjustImage( 'crop', {
-			crop_x: crop.x,
-			crop_y: crop.y,
-			crop_width: crop.width,
-			crop_height: crop.height,
-		} );
+	function rotateImage( angle ) {
+		setEdits( ( prev ) => [
+			...prev,
+			{
+				action: 'rotate',
+				options: { angle },
+			},
+		] );
 	}
 
-	const classes = classnames( {
-		richimage__working: inProgress !== null,
-		[ 'richimage__working__' + inProgress ]: inProgress !== null,
-	} );
+	function flipImage( direction ) {
+		setEdits( ( prev ) => [
+			...prev,
+			{
+				action: 'flip',
+				options: {
+					horizontal: direction === 'horizontal',
+					vertical: direction === 'vertical',
+				},
+			},
+		] );
+	}
+
+	function cropImage() {
+		setEdits( ( prev ) => [
+			...prev,
+			{
+				action: 'crop',
+				options: {
+					crop_x: crop.x,
+					crop_y: crop.y,
+					crop_width: crop.width,
+					crop_height: crop.height,
+				},
+			},
+		] );
+	}
 
 	return (
 		<>
-			<div className={ classes }>
+			<div
+				className={ classnames( {
+					richimage__working: inProgress,
+				} ) }
+			>
 				{ inProgress && (
 					<div className="richimage__working-spinner">
 						<Spinner />
@@ -270,7 +324,7 @@ export default function ImageEditor( {
 						/>
 					</div>
 				) : (
-					children
+					<div style={ getStyles( edits ) }>{ children }</div>
 				) }
 			</div>
 			<BlockControls>
@@ -289,9 +343,7 @@ export default function ImageEditor( {
 											title: __( 'Rotate left' ),
 											isDisabled: inProgress,
 											onClick() {
-												adjustImage( 'rotate', {
-													angle: -ROTATE_STEP,
-												} );
+												rotateImage( -ROTATE_STEP );
 											},
 										},
 										{
@@ -299,9 +351,7 @@ export default function ImageEditor( {
 											title: __( 'Rotate right' ),
 											isDisabled: inProgress,
 											onClick() {
-												adjustImage( 'rotate', {
-													angle: ROTATE_STEP,
-												} );
+												rotateImage( ROTATE_STEP );
 											},
 										},
 									] }
@@ -320,20 +370,16 @@ export default function ImageEditor( {
 											icon: flipVerticalIcon,
 											title: __( 'Flip vertical' ),
 											isDisabled: inProgress,
-											onClick: () => {
-												adjustImage( 'flip', {
-													direction: 'vertical',
-												} );
+											onClick() {
+												flipImage( 'vertical' );
 											},
 										},
 										{
 											icon: flipHorizontalIcon,
 											title: __( 'Flip horizontal' ),
 											isDisabled: inProgress,
-											onClick: () => {
-												adjustImage( 'flip', {
-													direction: 'horizontal',
-												} );
+											onClick() {
+												flipImage( 'horizontal' );
 											},
 										},
 									] }
