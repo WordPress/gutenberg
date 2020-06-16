@@ -122,6 +122,11 @@
 					"slug": "vivid-cyan-blue-to-vivid-purple",
 					"value": "linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)"
 				}
+			],
+			"line-height": [
+				{ "slug": "small", "value": 0.8 },
+				{ "slug": "regular", "value": 1.2 },
+				{ "slug": "large", "value": 1.6 }
 			]
 		},
 		"features": {

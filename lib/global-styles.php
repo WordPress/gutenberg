@@ -223,6 +223,14 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
 		);
 	}
 
+	$theme_line_height = gutenberg_experimental_get( get_theme_support( 'editor-line-height' ), array( '0' ) );
+	foreach ( $theme_line_height as $line_height ) {
+		$theme_presets['global']['presets']['line-height'][] = array(
+			'slug'  => $line_height['slug'],
+			'value' => $line_height['value'],
+		);
+	}
+
 	return $theme_presets;
 }
 
