@@ -245,6 +245,19 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		[ menus, hasMenus, hasPages ]
 	);
 
+	const createFromMenu = useCallback( () => {
+		// If an empty menu was selected, create an empty block.
+		if ( ! menuItems.length ) {
+			const blocks = [ createBlock( 'core/navigation-link' ) ];
+			onCreate( blocks );
+			return;
+		}
+
+		const blocks = convertMenuItemsToBlocks( menuItems );
+		const selectNavigationBlock = true;
+		onCreate( blocks, selectNavigationBlock );
+	} );
+
 	const onCreateButtonClick = useCallback( () => {
 		if ( ! selectedCreateOption ) {
 			return;
@@ -273,9 +286,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 			default:
 				// If we have menu items, create the block right away.
 				if ( hasResolvedMenuItems ) {
-					const blocks = convertMenuItemsToBlocks( menuItems );
-					const selectNavigationBlock = true;
-					onCreate( blocks, selectNavigationBlock );
+					createFromMenu();
 					return;
 				}
 
@@ -288,9 +299,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		// If the user selected a menu but we had to wait for menu items to
 		// finish resolving, then create the block once resolution finishes.
 		if ( isCreatingFromMenu && hasResolvedMenuItems ) {
-			const blocks = convertMenuItemsToBlocks( menuItems );
-			const selectNavigationBlock = true;
-			onCreate( blocks, selectNavigationBlock );
+			createFromMenu();
 			setIsCreatingFromMenu( false );
 		}
 	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
