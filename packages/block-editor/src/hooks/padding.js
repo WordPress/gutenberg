@@ -11,6 +11,7 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
  */
 import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
+import { useSelect } from '@wordpress/data';
 
 export const PADDING_SUPPORT_KEY = '__experimentalPadding';
 
@@ -29,6 +30,9 @@ export function PaddingEdit( props ) {
 	} = props;
 
 	const units = useCustomUnits();
+	const { padding } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
 
 	if ( ! hasBlockSupport( blockName, PADDING_SUPPORT_KEY ) ) {
 		return null;
@@ -64,6 +68,7 @@ export function PaddingEdit( props ) {
 		web: (
 			<>
 				<BoxControl
+					presetValues={ padding }
 					values={ style?.spacing?.padding }
 					onChange={ onChange }
 					onChangeShowVisualizer={ onChangeShowVisualizer }
