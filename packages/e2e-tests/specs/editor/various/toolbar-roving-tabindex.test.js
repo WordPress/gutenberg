@@ -84,4 +84,16 @@ describe( 'Toolbar roving tabindex', () => {
 		await wrapCurrentBlockWithGroup();
 		await testGroupKeyboardNavigation( 'Block: Image' );
 	} );
+
+	it( 'ensures table block toolbar uses roving tabindex', async () => {
+		await insertBlock( 'Table' );
+		await testBlockToolbarKeyboardNavigation( 'Block: Table' );
+		// Move focus to the first toolbar item
+		await page.keyboard.press( 'Home' );
+		await expectLabelToHaveFocus( 'Change block type or style' );
+		await page.click( '.blocks-table__placeholder-button' );
+		await testBlockToolbarKeyboardNavigation( 'Block: Table' );
+		await wrapCurrentBlockWithGroup();
+		await testGroupKeyboardNavigation( 'Block: Table' );
+	} );
 } );
