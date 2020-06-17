@@ -22,7 +22,6 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.StarterPageTemplatesTooltipShownCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
 import java.io.Serializable;
@@ -156,8 +155,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void provideToNative_Html(String html, String title, boolean changed) {
-        mGutenbergBridgeJS2Parent.responseHtml(title, html, changed);
+    public void provideToNative_Html(String html, String title, boolean changed, ReadableMap contentInfo) {
+        mGutenbergBridgeJS2Parent.responseHtml(title, html, changed, contentInfo);
     }
 
     @ReactMethod

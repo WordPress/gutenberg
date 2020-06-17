@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.29.1",
+  "version": "1.30.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -155,6 +155,7 @@
     "emotion-theming": "^10.0.27",
     "fast-average-color": "^4.3.0",
     "gettext-parser": "^4.0.2",
+    "gradient-parser": "0.1.5",
     "hpq": "^1.2.0",
     "jed": "^1.1.1",
     "jest-serializer-enzyme": "^1.0.0",
