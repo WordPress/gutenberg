@@ -67,7 +67,7 @@
 
 
 // We double the max-width for it to fit both the preview & content but we keep the min width the same for the border to work.
-.components-popover.block-editor-block-switcher__popover .components-popover__content {
+.components-popover.block-editor-block-switcher__popover .components-popover__content > div {
 	min-width: 300px;
 	max-width: calc(340px * 2);
 	display: flex;
@@ -81,9 +81,7 @@
 	.components-menu-group + .components-menu-group {
 		border-color: $light-gray-secondary;
 	}
-}
 
-.block-editor-block-switcher__popover .components-popover__content {
 	.block-editor-block-switcher__container {
 		min-width: 300px;
 		max-width: 340px;
@@ -103,7 +101,8 @@
 
 		.block-editor-block-switcher__preview {
 			border-left: $border-width solid $light-gray-500;
-			box-shadow: $shadow-popover;
+			margin-top: -$grid-unit-15;
+			margin-bottom: -$grid-unit-15;
 			background: $white;
 			width: 300px;
 			height: auto;
