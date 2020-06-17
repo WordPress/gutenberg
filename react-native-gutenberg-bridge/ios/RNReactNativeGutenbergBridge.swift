@@ -1,6 +1,6 @@
 struct GutenbergEvent {
     let name: String
-    let body: Any
+    let body: Any?
 }
 
 @objc (RNReactNativeGutenbergBridge)
@@ -214,7 +214,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
-    public override func sendEvent(withName name: String!, body: Any!) {
+    public override func sendEvent(withName name: String, body: Any?) {
         DispatchQueue.main.async {
             if self.hasObservers && self.queuedEvents.count == 0 {
                 super.sendEvent(withName: name, body: body)
