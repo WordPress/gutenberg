@@ -236,7 +236,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$this->assertArrayHasKey( 'style', $properties );
 		$this->assertArrayHasKey( 'parent', $properties );
 		$this->assertArrayHasKey( 'example', $properties );
-		$this->assertArrayHasKey( 'use_context', $properties );
+		$this->assertArrayHasKey( 'uses_context', $properties );
 		$this->assertArrayHasKey( 'provides_context', $properties );
 	}
 
@@ -351,7 +351,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 			'textdomain'       => 'textdomain',
 			'example'          => 'example',
 			'provides_context' => 'providesContext',
-			'use_context'      => 'context',
+			'uses_context'     => 'context',
 		);
 
 		foreach ( $extra_fields as $key => $extra_field ) {

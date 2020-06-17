@@ -255,7 +255,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			'editor_style'     => 'editor_style',
 			'style'            => 'style',
 			'provides_context' => 'providesContext',
-			'use_context'      => 'context',
+			'uses_context'     => 'context',
 		);
 		foreach ( $extra_fields as $key => $extra_field ) {
 			if ( rest_is_field_included( $key, $fields ) ) {
@@ -488,7 +488,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
 				),
-				'use_context'      => array(
+				'uses_context'     => array(
 					'description' => __( 'Context values inherited by blocks of this type.', 'gutenberg' ),
 					'type'        => 'array',
 					'default'     => array(),
