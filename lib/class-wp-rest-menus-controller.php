@@ -485,7 +485,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 *
 	 * @param int $menu_id The menu id to update the location form.
 	 *
-	 * @return Boolean The value of auto_add.
+	 * @return bool The value of auto_add.
 	 */
 	function get_menu_auto_add( $menu_id ) {
 		$nav_menu_option = (array) get_option( 'nav_menu_options', array( 'auto_add' => array() ) );
