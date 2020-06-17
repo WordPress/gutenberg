@@ -1,3 +1,5 @@
 .block-editor-block-parent-selector {
 	background: $white;
+	border: $border-width solid $dark-gray-primary;
+	border-radius: $radius-block-ui;
 }
