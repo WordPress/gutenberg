@@ -30,11 +30,13 @@
 	margin-top: $panel-padding / 2;
 }
 
+.handler {
+	border-top-right-radius: 8px;
+	border-top-left-radius: 8px;
+}
 
 .background {
 	background-color: $white;
-	border-top-right-radius: 8px;
-	border-top-left-radius: 8px;
 	width: 100%;
 	max-width: 512;
 	padding-bottom: 0;

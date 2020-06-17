@@ -8,16 +8,22 @@ import {
 	Dimensions,
 	Keyboard,
 	StatusBar,
-	LayoutAnimation,
 	Modal as RNModal,
+	ScrollView,
+	TouchableOpacity,
 } from 'react-native';
 import SafeArea from 'react-native-safe-area';
 import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
+import Animated from 'react-native-reanimated';
+/**
+ * Internal dependencies
+ */
+import { BottomSheetProvider } from './bottom-sheet-context';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
@@ -38,15 +44,13 @@ import BottomSheetReanimated from 'reanimated-bottom-sheet';
 const windowHeight = Dimensions.get( 'window' ).height;
 
 const defaultSnapPoints = [
-	windowHeight * 0.6,
+	windowHeight * 0.8,
 	windowHeight * 0.5,
 	windowHeight * 0.25,
 	0,
 ];
 
 const defaultInitialSnap = 2;
-
-const ANIMATION_DURATION = 300;
 
 class BottomSheet extends Component {
 	constructor() {
@@ -67,29 +71,33 @@ class BottomSheet extends Component {
 		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
 			this
 		);
-		this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 		this.renderContent = this.renderContent.bind( this );
-
+		this.openEnd = this.openEnd.bind( this );
+		this.closeStart = this.closeStart.bind( this );
+		this.renderHandler = this.renderHandler.bind( this );
+		this.onOverlayPress = this.onOverlayPress.bind( this );
 		this.state = {
 			safeAreaBottomInset: 0,
 			bounces: false,
 			maxHeight: 0,
 			keyboardHeight: 0,
-			scrollEnabled: true,
+			scrollEnabled: false,
 			isScrolling: false,
 			onCloseBottomSheet: null,
 			onHardwareButtonPress: null,
 			isMaxHeightSet: true,
-			currentScreen: '',
 			extraProps: {},
 		};
+
+		this.bottomSheetRef = createRef();
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
 			this.onSafeAreaInsetsUpdate
 		);
 		Dimensions.addEventListener( 'change', this.onDimensionsChange );
+		this.overlayOpacity = new Animated.Value( 1 );
 	}
 
 	keyboardWillShow( e ) {
@@ -145,14 +153,6 @@ class BottomSheet extends Component {
 		);
 		this.keyboardWillShowListener.remove();
 		this.keyboardDidHideListener.remove();
-	}
-
-	componentDidUpdate( prevProps ) {
-		const { isVisible } = this.props;
-
-		if ( ! prevProps.isVisible && isVisible ) {
-			this.setState( { currentScreen: '' } );
-		}
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -257,54 +257,18 @@ class BottomSheet extends Component {
 		return onClose();
 	}
 
-	onReplaceSubsheet( destination, extraProps, callback ) {
-		LayoutAnimation.configureNext(
-			LayoutAnimation.create(
-				ANIMATION_DURATION,
-				LayoutAnimation.Types.easeInEaseOut,
-				LayoutAnimation.Properties.opacity
-			)
-		);
-
-		this.setState(
-			{
-				currentScreen: destination,
-				extraProps: extraProps || {},
-			},
-			callback
-		);
+	onOverlayPress() {
+		const { snapPoints = defaultSnapPoints } = this.props;
+		if ( this.bottomSheetRef.current ) {
+			this.bottomSheetRef.current.snapTo( snapPoints.length - 1 );
+		}
 	}
 
-	renderContent() {
-		const { getStylesFromColorScheme, children } = this.props;
-		const backgroundStyle = getStylesFromColorScheme(
-			styles.background,
-			styles.backgroundDark
-		);
-
-		return <View style={ backgroundStyle }>{ children }</View>;
-	}
-
-	render() {
-		const {
-			title = '',
-			isVisible,
-			leftButton,
-			rightButton,
-			style = {},
-			getStylesFromColorScheme,
-			snapPoints = defaultSnapPoints,
-			initialSnap = defaultInitialSnap,
-		} = this.props;
-		const { safeAreaBottomInset } = this.state;
-
-		const backgroundStyle = getStylesFromColorScheme(
-			styles.background,
-			styles.backgroundDark
-		);
-		const getHeader = () => (
+	getHeader() {
+		const { title = '', leftButton, rightButton } = this.props;
+		return (
 			<View>
-				<View style={ styles.head }>
+				<View>
 					<View style={ { flex: 1 } }>{ leftButton }</View>
 					<View style={ styles.titleContainer }>
 						<Text style={ styles.title }>{ title }</Text>
@@ -314,28 +278,126 @@ class BottomSheet extends Component {
 				<View style={ styles.separator } />
 			</View>
 		);
+	}
+
+	renderHandler() {
+		const { getStylesFromColorScheme } = this.props;
+
+		const backgroundStyle = getStylesFromColorScheme(
+			styles.background,
+			styles.backgroundDark
+		);
+
+		return (
+			<View style={ [ styles.handler, backgroundStyle ] }>
+				<View style={ styles.dragIndicator } />
+			</View>
+		);
+	}
+
+	renderContent() {
+		const {
+			getStylesFromColorScheme,
+			children,
+			hideHeader,
+			contentStyle,
+		} = this.props;
+		const { scrollEnabled } = this.state;
+		const backgroundStyle = getStylesFromColorScheme(
+			styles.background,
+			styles.backgroundDark
+		);
+
+		return (
+			<View style={ [ { height: '100%' }, backgroundStyle ] }>
+				{ ! hideHeader && this.getHeader() }
+				<ScrollView
+					disableScrollViewPanResponder
+					showsHorizontalScrollIndicator={ false }
+					showsVerticalScrollIndicator={ false }
+					contentContainerStyle={ [ styles.content, contentStyle ] }
+					scrollEnabled={ scrollEnabled }
+					automaticallyAdjustContentInsets={ false }
+				>
+					<BottomSheetProvider
+						value={ {
+							shouldEnableBottomSheetScroll: this
+								.onShouldEnableScroll,
+							shouldDisableBottomSheetMaxHeight: this
+								.onShouldSetBottomSheetMaxHeight,
+							onCloseBottomSheet: this.onHandleClosingBottomSheet,
+							onHardwareButtonPress: this
+								.onHandleHardwareButtonPress,
+						} }
+					>
+						{ children }
+					</BottomSheetProvider>
+				</ScrollView>
+			</View>
+		);
+	}
+
+	openEnd() {
+		this.onShouldEnableScroll( true );
+	}
+
+	closeStart() {
+		this.onShouldEnableScroll( false );
+	}
+
+	render() {
+		const {
+			isVisible,
+			style = {},
+			snapPoints = defaultSnapPoints,
+			initialSnap = defaultInitialSnap,
+		} = this.props;
+		const { safeAreaBottomInset, scrollEnabled } = this.state;
+
 		return (
 			<RNModal visible={ isVisible } transparent={ true }>
-				<View style={ { flex: 1 } }>
-					<KeyboardAvoidingView
-						behavior={ Platform.OS === 'ios' && 'padding' }
+				<KeyboardAvoidingView
+					behavior={ Platform.OS === 'ios' && 'padding' }
+					style={ {
+						...style,
+						flex: 1,
+					} }
+					keyboardVerticalOffset={ -safeAreaBottomInset }
+				>
+					<Animated.View
 						style={ {
-							...backgroundStyle,
-							borderColor: 'rgba(0, 0, 0, 0.1)',
-							...style,
-							flex: 1,
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							backgroundColor: 'black',
+							opacity: Animated.sub(
+								0.7,
+								Animated.multiply( this.overlayOpacity, 0.7 )
+							),
 						} }
-						keyboardVerticalOffset={ -safeAreaBottomInset }
 					>
-						<BottomSheetReanimated
-							snapPoints={ snapPoints }
-							initialSnap={ initialSnap }
-							renderContent={ this.renderContent }
-							renderHeader={ getHeader }
-							onCloseEnd={ this.onCloseBottomSheet }
+						<TouchableOpacity
+							style={ { flex: 1 } }
+							onPress={ this.onOverlayPress }
 						/>
-					</KeyboardAvoidingView>
-				</View>
+					</Animated.View>
+					<BottomSheetReanimated
+						key={ `${ JSON.stringify( snapPoints ) }` }
+						snapPoints={ snapPoints }
+						initialSnap={ initialSnap }
+						renderHeader={ this.renderHandler }
+						renderContent={ this.renderContent }
+						callbackNode={ this.overlayOpacity }
+						onCloseEnd={ this.onCloseBottomSheet }
+						enabledContentGestureInteraction={ ! scrollEnabled }
+						enabledHeaderGestureInteraction
+						onOpenEnd={ this.openEnd }
+						onCloseStart={ this.closeStart }
+						ref={ this.bottomSheetRef }
+					/>
+				</KeyboardAvoidingView>
 			</RNModal>
 		);
 	}

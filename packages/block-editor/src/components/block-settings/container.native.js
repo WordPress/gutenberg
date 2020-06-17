@@ -4,17 +4,21 @@
 /**
  * External dependencies
  */
-import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
+import {
+	NavigationContainer,
+	useFocusEffect,
+	DefaultTheme,
+} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {
 	InspectorControls,
 	SETTINGS_DEFAULTS as defaultSettings,
 } from '@wordpress/block-editor';
 import { BottomSheet, ColorSettings } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useRef, useCallback, useState } from '@wordpress/element';
-import { View, Animated } from 'react-native';
+import { View } from 'react-native';
 /**
  * Internal dependencies
  */
@@ -38,7 +42,7 @@ const BottomSheetScreen = ( { children, setHeight } ) => {
 	);
 
 	const onLayout = ( e ) => {
-		if ( height.current.maxHeight === 0 ) {
+		if ( height.current.maxHeight !== e.nativeEvent.layout.height ) {
 			height.current.maxHeight = e.nativeEvent.layout.height;
 			setHeight( e.nativeEvent.layout.height );
 		}
@@ -48,7 +52,7 @@ const BottomSheetScreen = ( { children, setHeight } ) => {
 
 const Stack = createStackNavigator();
 
-let snaps = [ 1, 1, 1, 0 ];
+let snaps;
 
 function BottomSheetSettings( {
 	editorSidebarOpened,
@@ -57,12 +61,9 @@ function BottomSheetSettings( {
 } ) {
 	const [ height, setHeightValue ] = useState( 1 );
 	const setHeight = ( maxHeight ) => {
-		const bHei = maxHeight + 20;
-		if ( height !== bHei ) {
-			if ( snaps[ 0 ] === 1 ) {
-				snaps = [ bHei, 0.75 * bHei, 0.5 * bHei, 0 ];
-			}
-			setHeightValue( maxHeight + 20 );
+		if ( height !== maxHeight ) {
+			snaps = [ maxHeight + 64, 0.75 * maxHeight, 0.5 * maxHeight, 0 ];
+			setHeightValue( maxHeight );
 		}
 	};
 
@@ -77,6 +78,19 @@ function BottomSheetSettings( {
 			<ColorSettings defaultSettings={ defaultSettings } />
 		</BottomSheetScreen>
 	) );
+
+	const backgroundStyle = usePreferredColorSchemeStyle(
+		styles.background,
+		styles.backgroundDark
+	);
+
+	const MyTheme = {
+		...DefaultTheme,
+		colors: {
+			...DefaultTheme.colors,
+			background: backgroundStyle.backgroundColor,
+		},
+	};
 	return (
 		<BottomSheet
 			isVisible={ editorSidebarOpened }
@@ -86,11 +100,12 @@ function BottomSheetSettings( {
 			snapPoints={ snaps }
 			{ ...props }
 		>
-			<Animated.View style={ { height } }>
-				<NavigationContainer>
+			<View style={ { height } }>
+				<NavigationContainer theme={ MyTheme }>
 					<Stack.Navigator
 						screenOptions={ {
 							headerShown: false,
+							gestureEnabled: false,
 						} }
 					>
 						<Stack.Screen
@@ -105,7 +120,7 @@ function BottomSheetSettings( {
 						/>
 					</Stack.Navigator>
 				</NavigationContainer>
-			</Animated.View>
+			</View>
 		</BottomSheet>
 	);
 }

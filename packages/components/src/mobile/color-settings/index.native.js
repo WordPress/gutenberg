@@ -45,7 +45,7 @@ function ColorSettings( { defaultSettings } ) {
 	// }
 
 	return (
-		<View style={ { height: 250 } }>
+		<View style={ { height: '100%' } }>
 			<Stack.Navigator
 				screenOptions={ {
 					headerShown: false,
