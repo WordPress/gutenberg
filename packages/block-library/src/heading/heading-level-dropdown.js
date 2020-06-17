@@ -13,8 +13,9 @@ import { DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import HeadingLevelChecker from './heading-level-checker';
 import HeadingLevelIcon from './heading-level-icon';
+import HeadingLevelWarning from './heading-level-warning';
+import useHeadingLevelValidator from './use-heading-level-validator';
 
 const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
 
@@ -48,6 +49,12 @@ export default function HeadingLevelDropdown( {
 	selectedLevel,
 	onChange,
 } ) {
+	const getLevelValidity = useHeadingLevelValidator( clientId );
+
+	const { levelMayBeInvalid: selectedLevelMayBeInvalid } = getLevelValidity(
+		selectedLevel
+	);
+
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
@@ -89,6 +96,10 @@ export default function HeadingLevelDropdown( {
 										<HeadingLevelIcon
 											level={ targetLevel }
 											isPressed={ isActive }
+											isDiscouraged={
+												getLevelValidity( targetLevel )
+													.levelMayBeInvalid
+											}
 										/>
 									),
 									title: sprintf(
@@ -104,7 +115,10 @@ export default function HeadingLevelDropdown( {
 							} ) }
 						/>
 					</Toolbar>
-					<HeadingLevelChecker selectedHeadingId={ clientId } />
+					<HeadingLevelWarning
+						levelIsInvalid={ selectedLevelMayBeInvalid }
+						selectedLevel={ selectedLevel }
+					/>
 				</>
 			) }
 		/>
