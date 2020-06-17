@@ -53,7 +53,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'role' => 'administrator',
 			)
 		);
-		self::$editor_id      = $factory->user->create(
+		self::$editor_id     = $factory->user->create(
 			array(
 				'role' => 'editor',
 			)
@@ -343,7 +343,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 */
 	public function test_create_item_with_auto_add_permission_incorrect() {
-		wp_set_current_user( self::$editor_id  );
+		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'POST', '/__experimental/menus' );
 		$request->set_param( 'name', 'My Awesome Term' );
 		$request->set_param( 'slug', 'so-awesome' );
