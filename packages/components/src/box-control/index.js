@@ -14,7 +14,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Button from '../button';
-import { FlexItem, FlexBlock } from '../flex';
+import CustomSelectControl from '../custom-select-control';
+import { FlexItem } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import BoxControlIcon from './icon';
@@ -45,6 +46,18 @@ function useUniqueId( idProp ) {
 	return idProp || id;
 }
 
+const DEFAULT_OPTION = {
+	key: 'default',
+	name: __( 'Default' ),
+	value: undefined,
+};
+
+const CUSTOM_OPTION = {
+	key: 'custom',
+	name: __( 'Custom' ),
+	value: 'custom',
+};
+
 export default function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
@@ -53,6 +66,7 @@ export default function BoxControl( {
 	label = __( 'Box Control' ),
 	values: valuesProp,
 	units,
+	presetValues,
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp );
 	const inputValues = values || DEFAULT_VALUES;
@@ -99,6 +113,18 @@ export default function BoxControl( {
 		setIsDirty( false );
 	};
 
+	const handleOnChangePresets = ( { selectedItem: { value } } ) => {
+		const nextValues = {
+			top: value,
+			right: value,
+			bottom: value,
+			left: value,
+		};
+		onChange( nextValues );
+		setValues( nextValues );
+		setIsDirty( true );
+	};
+
 	const inputControlProps = {
 		...inputProps,
 		onChange: handleOnChange,
@@ -109,6 +135,28 @@ export default function BoxControl( {
 		units,
 		values: inputValues,
 	};
+
+	const presetUnit = units ? units : 'px';
+	const options = [
+		DEFAULT_OPTION,
+		...presetValues.map( ( presetValue ) => ( {
+			key: presetValue.slug,
+			name: presetValue.name,
+			value: presetValue.value + presetUnit,
+		} ) ),
+		CUSTOM_OPTION,
+	];
+	let selectedOption = DEFAULT_OPTION;
+	if (
+		!! inputValues?.top &&
+		inputValues?.top === inputValues?.right &&
+		inputValues?.top === inputValues?.bottom &&
+		inputValues?.top === inputValues?.left
+	) {
+		selectedOption =
+			options.find( ( option ) => option.value === inputValues.top ) ||
+			CUSTOM_OPTION;
+	}
 
 	return (
 		<Root id={ id } role="region" aria-labelledby={ headingId }>
@@ -126,12 +174,20 @@ export default function BoxControl( {
 				</FlexItem>
 			</Header>
 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
-				<FlexBlock>
+				<FlexItem>
+					<CustomSelectControl
+						className={ 'component-box-control__preset' }
+						options={ options }
+						value={ selectedOption }
+						onChange={ handleOnChangePresets }
+					/>
+				</FlexItem>
+				<FlexItem>
 					<AllInputControl
 						{ ...inputControlProps }
 						disabled={ ! isLinked }
 					/>
-				</FlexBlock>
+				</FlexItem>
 				<FlexItem>
 					<Button
 						className="component-box-control__reset-button"
