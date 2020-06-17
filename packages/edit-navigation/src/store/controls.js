@@ -22,6 +22,20 @@ export function apiFetch( request ) {
 	};
 }
 
+export function getPendingActions( postId ) {
+	return {
+		type: 'GET_PENDING_ACTIONS',
+		id: postId,
+	};
+}
+
+export function isProcessingPost( postId ) {
+	return {
+		type: 'IS_PROCESSING_POST',
+		id: postId,
+	};
+}
+
 export function getNavigationPost( menuId ) {
 	return {
 		type: 'SELECT',
@@ -94,6 +108,20 @@ const controls = {
 			return registry.select( registryName )[ selectorName ]( ...args );
 		}
 	),
+
+	GET_PENDING_ACTIONS: createRegistryControl( ( registry ) => ( { id } ) => {
+		const state = registry.stores[
+			'core/edit-navigation'
+		].store.getState();
+		return state.processing[ id ]?.pendingActions || [];
+	} ),
+
+	IS_PROCESSING_POST: createRegistryControl( ( registry ) => ( { id } ) => {
+		const state = registry.stores[
+			'core/edit-navigation'
+		].store.getState();
+		return state.processing[ id ]?.inProgress;
+	} ),
 
 	DISPATCH: createRegistryControl(
 		( registry ) => ( { registryName, actionName, args } ) => {

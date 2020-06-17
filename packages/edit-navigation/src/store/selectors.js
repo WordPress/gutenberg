@@ -13,14 +13,6 @@ import { createRegistrySelector } from '@wordpress/data';
  */
 import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
 
-export function getPendingActions( state, menuId ) {
-	return state.processing[ menuId ]?.pendingActions || [];
-}
-
-export function isProcessingMenuItems( state, menuId ) {
-	return state.processing[ menuId ]?.inProgress;
-}
-
 export const getNavigationPost = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
 		return select( 'core' ).getEditedEntityRecord(

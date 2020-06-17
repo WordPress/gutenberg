@@ -12,7 +12,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { select, resolveMenuItems, dispatch, apiFetch } from './controls';
+import {
+	getPendingActions,
+	isProcessingPost,
+	resolveMenuItems,
+	dispatch,
+	apiFetch,
+} from './controls';
 import { menuItemsQuery, KIND, POST_TYPE } from './utils';
 
 // Hits POST /wp/v2/menu-items once for every Link block that doesn't have an
@@ -186,42 +192,34 @@ function computeCustomizedAttribute( blocks, menuId, menuItemsByClientId ) {
 }
 
 function serializeProcessing( callback ) {
-	return function* ( menuId ) {
-		const isProcessing = yield select(
-			'core/edit-navigation',
-			'isProcessingMenuItems',
-			menuId
-		);
+	return function* ( post ) {
+		const isProcessing = yield isProcessingPost( post.id );
 
 		if ( isProcessing ) {
 			yield {
 				type: 'ENQUEUE_AFTER_PROCESSING',
-				menuId,
+				id: post.id,
 				action: callback,
 			};
 			return { status: 'pending' };
 		}
 
 		yield {
-			type: 'START_PROCESSING_MENU_ITEMS',
-			menuId,
+			type: 'START_PROCESSING_POST',
+			id: post.id,
 		};
 
 		try {
-			yield* callback( menuId );
+			yield* callback( post );
 		} finally {
 			yield {
-				type: 'FINISH_PROCESSING_MENU_ITEMS',
-				menuId,
+				type: 'FINISH_PROCESSING_POST',
+				id: post.id,
 			};
 
-			const pendingActions = yield select(
-				'core/edit-navigation',
-				'getPendingActions',
-				menuId
-			);
+			const pendingActions = yield getPendingActions( post.id );
 			if ( pendingActions.length ) {
-				yield* pendingActions[ 0 ]( menuId );
+				yield* pendingActions[ 0 ]( post );
 			}
 		}
 	};

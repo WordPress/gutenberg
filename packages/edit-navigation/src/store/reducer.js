@@ -3,25 +3,25 @@
  */
 import { combineReducers } from '@wordpress/data';
 
-function processing( state, { type, menuId, ...rest } ) {
+function processing( state, { type, id, ...rest } ) {
 	switch ( type ) {
-		case 'START_PROCESSING_MENU_ITEMS':
-			state[ menuId ] = {
-				...state[ menuId ],
+		case 'START_PROCESSING_POST':
+			state[ id ] = {
+				...state[ id ],
 				inProgress: true,
 			};
 			break;
-		case 'FINISH_PROCESSING_MENU_ITEMS':
-			state[ menuId ] = {
-				...state[ menuId ],
+		case 'FINISH_PROCESSING_POST':
+			state[ id ] = {
+				...state[ id ],
 				inProgress: false,
 			};
 			break;
 		case 'ENQUEUE_AFTER_PROCESSING':
-			const pendingActions = state[ menuId ]?.pendingActions || [];
+			const pendingActions = state[ id ]?.pendingActions || [];
 			if ( ! pendingActions.includes( rest.action ) ) {
-				state[ menuId ] = {
-					...state[ menuId ],
+				state[ id ] = {
+					...state[ id ],
 					pendingActions: [ ...pendingActions, rest.action ],
 				};
 			}
