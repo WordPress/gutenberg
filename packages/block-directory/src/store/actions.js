@@ -74,7 +74,8 @@ export function* installBlockType( block ) {
 			},
 			method: 'POST',
 		} );
-		yield addInstalledBlockType( { ...block, plugin: response.plugin } );
+		const endpoint = response?._links?.self[ 0 ]?.href;
+		yield addInstalledBlockType( { ...block, endpoint } );
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
@@ -95,17 +96,16 @@ export function* installBlockType( block ) {
  * @param {Object} block The blockType object.
  */
 export function* uninstallBlockType( block ) {
-	const plugin = block.plugin.replace( '.php', '' );
 	try {
 		yield apiFetch( {
-			path: `__experimental/plugins/${ plugin }`,
+			url: block.endpoint,
 			data: {
 				status: 'inactive',
 			},
 			method: 'PUT',
 		} );
 		yield apiFetch( {
-			path: `__experimental/plugins/${ plugin }`,
+			url: block.endpoint,
 			method: 'DELETE',
 		} );
 		yield removeInstalledBlockType( block );
