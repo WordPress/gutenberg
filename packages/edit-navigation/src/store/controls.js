@@ -54,10 +54,8 @@ export function getNavigationPost( menuId ) {
 
 export function resolveMenuItems( menuId ) {
 	return {
-		type: 'RESOLVE_SELECT',
-		registryName: 'core',
-		selectorName: 'getMenuItems',
-		args: [ menuItemsQuery( menuId ) ],
+		type: 'RESOLVE_MENU_ITEMS',
+		query: menuItemsQuery( menuId ),
 	};
 }
 
@@ -72,24 +70,6 @@ export function resolveMenuItems( menuId ) {
 export function select( registryName, selectorName, ...args ) {
 	return {
 		type: 'SELECT',
-		registryName,
-		selectorName,
-		args,
-	};
-}
-
-/**
- * Dispatches a control action for triggering a registry select that has a
- * resolver.
- *
- * @param {string} registryName
- * @param {string} selectorName
- * @param {Array} args  Arguments for the select.
- * @return {Object} control descriptor.
- */
-export function resolveSelect( registryName, selectorName, ...args ) {
-	return {
-		type: 'RESOLVE_SELECT',
 		registryName,
 		selectorName,
 		args,
@@ -143,11 +123,11 @@ const controls = {
 		}
 	),
 
-	RESOLVE_SELECT: createRegistryControl(
-		( registry ) => ( { registryName, selectorName, args } ) => {
+	RESOLVE_MENU_ITEMS: createRegistryControl(
+		( registry ) => ( { query } ) => {
 			return registry
-				.__experimentalResolveSelect( registryName )
-				[ selectorName ]( ...args );
+				.__experimentalResolveSelect( 'core' )
+				.getMenuItems( query );
 		}
 	),
 };
