@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { invert, keyBy, omit } from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -12,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { select, resolveMenuItems, dispatch, apiFetch } from './controls';
-import { uuidv4, menuItemsQuery, KIND, POST_TYPE } from './utils';
+import { menuItemsQuery, KIND, POST_TYPE } from './utils';
 
 // Hits POST /wp/v2/menu-items once for every Link block that doesn't have an
 // associated menu item. (IDK what a good name for this is.)
@@ -111,7 +112,7 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 	body.append( 'wp_customize', 'on' );
 	body.append( 'customize_theme', stylesheet );
 	body.append( 'nonce', nonce );
-	body.append( 'customize_changeset_uuid', uuidv4() );
+	body.append( 'customize_changeset_uuid', uuid() );
 	body.append( 'customize_autosaved', 'on' );
 	body.append( 'customize_changeset_status', 'publish' );
 	body.append( 'action', 'customize_save' );
