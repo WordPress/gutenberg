@@ -166,12 +166,6 @@
 		box-shadow: 0 0 0 1px $light-gray-ui;
 	}
 
-	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
-		outline: 2px solid $light-gray-secondary;
-
-		&::after {
-			content: none;
-		}
 	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
 		box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
 		outline: $border-width-focus solid transparent;
@@ -208,7 +202,7 @@
 }
 
 
-.is-block-moving-mode.block-editor-block-list__breadcrumb {
+.is-block-moving-mode.block-editor-block-list__block-selection-button {
 	// Should be invisible but not unfocusable.
 	opacity: 0;
 	font-size: 1px;
