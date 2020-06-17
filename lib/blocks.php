@@ -342,7 +342,7 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 		$dom = new DOMDocument( '1.0', 'utf-8' );
 
-		// Suppress warnings from this method from polluting the font-end.
+		// Suppress warnings from this method from polluting the front-end.
 		// @codingStandardsIgnoreStart
 		if ( ! @$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
 		// @codingStandardsIgnoreEnd
