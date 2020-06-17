@@ -23,11 +23,9 @@
 		"node": ">=8"
 	},
 	"files": [
-		"build",
-		"build-module"
+		"src"
 	],
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"main": "src/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/keycodes": "file:../keycodes",

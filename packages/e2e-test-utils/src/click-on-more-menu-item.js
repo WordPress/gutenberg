@@ -18,14 +18,14 @@ export async function clickOnMoreMenuItem( buttonLabel ) {
 	const moreMenuContainerSelector =
 		'//*[contains(concat(" ", @class, " "), " edit-post-more-menu__content ")]';
 	let elementToClick = first(
-		await page.$x(
+		await page.$(
 			`${ moreMenuContainerSelector }//button[contains(text(), "${ buttonLabel }")]`
 		)
 	);
 	// If button is not found, the label should be on the info wrapper.
 	if ( ! elementToClick ) {
 		elementToClick = first(
-			await page.$x(
+			await page.$(
 				moreMenuContainerSelector +
 					'//button' +
 					`/*[contains(concat(" ", @class, " "), " components-menu-item__info-wrapper ")][contains(text(), "${ buttonLabel }")]`

@@ -7,15 +7,11 @@
  *
  * @return {?Object} Result of querying.
  */
-export function wpDataSelect( store, selector, ...parameters ) {
-	return page.evaluate(
-		( _store, _selector, ..._parameters ) => {
-			return window.wp.data
-				.select( _store )
-				[ _selector ]( ..._parameters );
+export async function wpDataSelect( store, selector, ...parameters ) {
+	return await page.evaluate(
+		( [ _store, _selector ] ) => {
+			return window.wp.data.select( _store )[ _selector ]();
 		},
-		store,
-		selector,
-		parameters
+		[ store, selector ]
 	);
 }

@@ -51,7 +51,7 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should apply multiple formats when selection is collapsed', async () => {
+	it.only( 'should apply multiple formats when selection is collapsed', async () => {
 		await clickBlockAppender();
 		await pressKeyWithModifier( 'primary', 'b' );
 		await pressKeyWithModifier( 'primary', 'i' );

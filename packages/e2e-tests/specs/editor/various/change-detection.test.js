@@ -48,16 +48,9 @@ describe( 'Change detection', () => {
 	}
 
 	async function interceptSave() {
-		await page.setRequestInterception( true );
-
-		handleInterceptedRequest = ( interceptedRequest ) => {
-			if ( interceptedRequest.url().includes( '/wp/v2/posts' ) ) {
-				hadInterceptedSave = true;
-			} else {
-				interceptedRequest.continue();
-			}
-		};
-		page.on( 'request', handleInterceptedRequest );
+		await page.route( '*/v2/posts', ( route ) => {
+			route.abort();
+		} );
 	}
 
 	async function releaseSaveIntercept() {

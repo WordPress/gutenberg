@@ -39,8 +39,8 @@ export async function setUpResponseMocking( mocks ) {
 		// We only want to set up the request interception once, or else we get a crash
 		// when we try to process the same request twice.
 		interceptionInitialized = true;
-		await page.setRequestInterception( true );
-		page.on( 'request', async ( request ) => {
+		await page.route( '**/*', async ( route ) => {
+			const request = route.request();
 			for ( let i = 0; i < requestMocks.length; i++ ) {
 				const mock = requestMocks[ i ];
 				if ( mock.match( request ) ) {
@@ -48,7 +48,7 @@ export async function setUpResponseMocking( mocks ) {
 					return;
 				}
 			}
-			request.continue();
+			route.continue();
 		} );
 	}
 	// Overwrite with the passed in mocks, so we can change the mocks mid-test to test
