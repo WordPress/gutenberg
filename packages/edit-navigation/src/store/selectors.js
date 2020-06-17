@@ -29,8 +29,8 @@ export const isResolvingNavigationPost = ( state, menuId ) => {
 };
 
 export const getMenuItemForClientId = createRegistrySelector(
-	( select ) => ( state, post, clientId ) => {
-		const mapping = invert( post.meta.menuItemIdToClientId );
+	( select ) => ( state, postId, clientId ) => {
+		const mapping = invert( state.mapping[ postId ] );
 		return select( 'core' ).getMenuItem( mapping[ clientId ] );
 	}
 );

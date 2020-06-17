@@ -16,15 +16,22 @@ import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
 
 export function* getNavigationPost( menuId ) {
 	// Ensure an empty post to start with
-	yield persistPost(
-		createStubPost( menuId, [], {
-			isResolving: true,
-		} )
-	);
+	const stubPost = createStubPost( menuId, null, {
+		isResolving: true,
+	} );
+	yield persistPost( stubPost );
 
 	// Now let's create a proper one hydrated with actual menu items
 	const menuItems = yield resolveMenuItems( menuId );
-	yield persistPost( createStubPost( menuId, menuItems ) );
+	const [ navigationBlock, menuItemIdToClientId ] = createNavigationBlock(
+		menuItems
+	);
+	yield {
+		type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
+		postId: stubPost.id,
+		mapping: menuItemIdToClientId,
+	};
+	yield persistPost( createStubPost( menuId, navigationBlock ) );
 }
 
 const persistPost = ( post ) =>
@@ -38,10 +45,7 @@ const persistPost = ( post ) =>
 		false
 	);
 
-const createStubPost = ( menuId, menuItems, meta ) => {
-	const [ navigationBlock, menuItemIdToClientId ] = createNavigationBlock(
-		menuItems
-	);
+const createStubPost = ( menuId, navigationBlock, meta ) => {
 	const id = buildNavigationPostId( menuId );
 	return {
 		id,
@@ -52,7 +56,6 @@ const createStubPost = ( menuId, menuItems, meta ) => {
 		meta: {
 			...meta,
 			menuId,
-			menuItemIdToClientId,
 		},
 	};
 };

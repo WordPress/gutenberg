@@ -25,14 +25,21 @@ export function apiFetch( request ) {
 export function getPendingActions( postId ) {
 	return {
 		type: 'GET_PENDING_ACTIONS',
-		id: postId,
+		postId,
 	};
 }
 
 export function isProcessingPost( postId ) {
 	return {
 		type: 'IS_PROCESSING_POST',
-		id: postId,
+		postId,
+	};
+}
+
+export function getMenuItemToClientIdMapping( postId ) {
+	return {
+		type: 'GET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
+		postId,
 	};
 }
 
@@ -109,19 +116,26 @@ const controls = {
 		}
 	),
 
-	GET_PENDING_ACTIONS: createRegistryControl( ( registry ) => ( { id } ) => {
-		const state = registry.stores[
-			'core/edit-navigation'
-		].store.getState();
-		return state.processingQueue[ id ]?.pendingActions || [];
-	} ),
+	GET_PENDING_ACTIONS: createRegistryControl(
+		( registry ) => ( { postId } ) => {
+			return (
+				getState( registry ).processingQueue[ postId ]
+					?.pendingActions || []
+			);
+		}
+	),
 
-	IS_PROCESSING_POST: createRegistryControl( ( registry ) => ( { id } ) => {
-		const state = registry.stores[
-			'core/edit-navigation'
-		].store.getState();
-		return state.processingQueue[ id ]?.inProgress;
-	} ),
+	IS_PROCESSING_POST: createRegistryControl(
+		( registry ) => ( { postId } ) => {
+			return getState( registry ).processingQueue[ postId ]?.inProgress;
+		}
+	),
+
+	GET_MENU_ITEM_TO_CLIENT_ID_MAPPING: createRegistryControl(
+		( registry ) => ( { postId } ) => {
+			return getState( registry ).mapping[ postId ] || {};
+		}
+	),
 
 	DISPATCH: createRegistryControl(
 		( registry ) => ( { registryName, actionName, args } ) => {
@@ -137,5 +151,8 @@ const controls = {
 		}
 	),
 };
+
+const getState = ( registry ) =>
+	registry.stores[ 'core/edit-navigation' ].store.getState();
 
 export default controls;

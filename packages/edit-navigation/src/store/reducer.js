@@ -3,29 +3,37 @@
  */
 import { combineReducers } from '@wordpress/data';
 
-function processingQueue( state, { type, id, ...rest } ) {
+function mapping( state, { type, postId, ...rest } ) {
+	if ( type === 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING' ) {
+		state[ postId ] = rest.mapping;
+	}
+
+	return state || {};
+}
+
+function processingQueue( state, { type, postId, ...rest } ) {
 	switch ( type ) {
 		case 'START_PROCESSING_POST':
-			state[ id ] = {
-				...state[ id ],
+			state[ postId ] = {
+				...state[ postId ],
 				inProgress: true,
 			};
 			break;
 		case 'FINISH_PROCESSING_POST':
-			state[ id ] = {
-				...state[ id ],
+			state[ postId ] = {
+				...state[ postId ],
 				inProgress: false,
 				pendingActions:
-					state[ id ]?.pendingActions?.filter(
+					state[ postId ]?.pendingActions?.filter(
 						( item ) => item !== rest.action
 					) || [],
 			};
 			break;
 		case 'ENQUEUE_AFTER_PROCESSING':
-			const pendingActions = state[ id ]?.pendingActions || [];
+			const pendingActions = state[ postId ]?.pendingActions || [];
 			if ( ! pendingActions.includes( rest.action ) ) {
-				state[ id ] = {
-					...state[ id ],
+				state[ postId ] = {
+					...state[ postId ],
 					pendingActions: [ ...pendingActions, rest.action ],
 				};
 			}
@@ -36,5 +44,6 @@ function processingQueue( state, { type, id, ...rest } ) {
 }
 
 export default combineReducers( {
+	mapping,
 	processingQueue,
 } );

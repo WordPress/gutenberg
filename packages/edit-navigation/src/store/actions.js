@@ -13,19 +13,25 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
+	getNavigationPost,
 	getPendingActions,
 	isProcessingPost,
+	getMenuItemToClientIdMapping,
 	resolveMenuItems,
 	dispatch,
 	apiFetch,
 } from './controls';
-import { menuItemsQuery, KIND, POST_TYPE } from './utils';
+import { menuItemsQuery } from './utils';
 
 // Hits POST /wp/v2/menu-items once for every Link block that doesn't have an
 // associated menu item. (IDK what a good name for this is.)
 export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 	const menuId = post.meta.menuId;
-	const mapping = post.meta.menuItemIdToClientId;
+
+	const mapping = yield {
+		type: 'GET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
+		postId: post.id,
+	};
 	const clientIdToMenuId = invert( mapping );
 
 	const stack = [ post.blocks[ 0 ] ];
@@ -57,23 +63,29 @@ export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 		stack.push( ...block.innerBlocks );
 	}
 
-	yield dispatch( 'core', 'editEntityRecord', KIND, POST_TYPE, post.id, {
-		meta: {
-			...post.meta,
-			menuItemIdToClientId: mapping,
-		},
-	} );
+	yield {
+		type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
+		postId: post.id,
+		mapping,
+	};
 } );
 
 export const saveNavigationPost = serializeProcessing( function* ( post ) {
 	const menuId = post.meta.menuId;
 	const menuItemsByClientId = mapMenuItemsByClientId(
 		yield resolveMenuItems( menuId ),
-		post.meta.menuItemIdToClientId
+		yield getMenuItemToClientIdMapping( post.id )
 	);
 
 	try {
-		yield* batchSave( menuId, menuItemsByClientId, post.blocks[ 0 ] );
+		const response = yield* batchSave(
+			menuId,
+			menuItemsByClientId,
+			post.blocks[ 0 ]
+		);
+		if ( ! response.success ) {
+			throw new Error();
+		}
 		yield dispatch(
 			'core/notices',
 			'createSuccessNotice',
@@ -131,7 +143,7 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 		)
 	);
 
-	yield apiFetch( {
+	return yield apiFetch( {
 		url: '/wp-admin/admin-ajax.php',
 		method: 'POST',
 		body,
@@ -193,12 +205,13 @@ function computeCustomizedAttribute( blocks, menuId, menuItemsByClientId ) {
 
 function serializeProcessing( callback ) {
 	return function* ( post ) {
-		const isProcessing = yield isProcessingPost( post.id );
+		const postId = post.id;
+		const isProcessing = yield isProcessingPost( postId );
 
 		if ( isProcessing ) {
 			yield {
 				type: 'ENQUEUE_AFTER_PROCESSING',
-				id: post.id,
+				postId,
 				action: callback,
 			};
 			return { status: 'pending' };
@@ -206,7 +219,7 @@ function serializeProcessing( callback ) {
 
 		yield {
 			type: 'START_PROCESSING_POST',
-			id: post.id,
+			postId,
 		};
 
 		try {
@@ -214,16 +227,20 @@ function serializeProcessing( callback ) {
 		} finally {
 			yield {
 				type: 'FINISH_PROCESSING_POST',
-				id: post.id,
+				postId,
 				action: callback,
 			};
 
-			const pendingActions = yield getPendingActions( post.id );
+			const pendingActions = yield getPendingActions( postId );
 			if ( pendingActions.length ) {
 				const serializedCallback = serializeProcessing(
 					pendingActions[ 0 ]
 				);
-				yield* serializedCallback( post );
+
+				// re-fetch the post as running the callback() likely updated it
+				yield* serializedCallback(
+					yield getNavigationPost( post.meta.menuId )
+				);
 			}
 		}
 	};
