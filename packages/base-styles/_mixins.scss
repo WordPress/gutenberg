@@ -438,49 +438,46 @@
 	}
 }
 
-@mixin admin-scheme($color-primary-h, $color-primary-s, $color-primary-l) {
-	--wp-admin-theme-color: hsl(#{$color-primary-h}, #{$color-primary-s}, #{$color-primary-l});
+@mixin admin-scheme($color-primary) {
+	--wp-admin-theme-color: #{$color-primary};
 
 	// Darker shades.
-	--wp-admin-theme-color-darker-10: hsl(#{$color-primary-h}, #{$color-primary-s}, #{$color-primary-l - 5});
-	--wp-admin-theme-color-darker-20: hsl(#{$color-primary-h}, #{$color-primary-s}, #{$color-primary-l - 10});
+	--wp-admin-theme-color-darker-10: #{darken($color-primary, 5%)};
+	--wp-admin-theme-color-darker-20: #{darken($color-primary, 10%)};
 }
 
-// Using individual HSL (Hue, Saturation, Lightness) values, we can adjust the brightness
-// of a color, without using SASS.
-// You can convert an RGB color to HSL on https://www.w3schools.com/colors/colors_converter.asp.
 @mixin wordpress-admin-schemes() {
 	body.admin-color-light {
-		@include admin-scheme(197, 100%, 36%); // #0085ba
+		@include admin-scheme(#0085ba);
 	}
 
 	body.admin-color-blue {
-		@include admin-scheme(196, 87%, 28%); // #096484
+		@include admin-scheme(#096484);
 	}
 
 	body.admin-color-coffee {
-		@include admin-scheme(24, 8%, 25%); // #46403c
+		@include admin-scheme(#46403c);
 	}
 
 	body.admin-color-ectoplasm {
-		@include admin-scheme(265, 27%, 34%); // #523f6d
+		@include admin-scheme(#523f6d);
 	}
 
 	body.admin-color-midnight {
-		@include admin-scheme(4, 72%, 57%); // #e14d43
+		@include admin-scheme(#e14d43);
 	}
 
 	body.admin-color-ocean {
-		@include admin-scheme(193, 14%, 45%); // #627c83
+		@include admin-scheme(#627c83);
 	}
 
 	body.admin-color-sunrise {
-		@include admin-scheme(26, 70%, 55%); // #dd823b
+		@include admin-scheme(#dd823b);
 	}
 }
 
 // It is important to include these styles in all built stylesheets
 // This allows to CSS variables post CSS plugin to generate fallbacks.
 :root {
-	@include admin-scheme(200, 100%, 36%); // #007cba
+	@include admin-scheme(#007cba);
 }
