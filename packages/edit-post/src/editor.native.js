@@ -99,6 +99,7 @@ class Editor extends Component {
 			hiddenBlockTypes,
 			blockTypes,
 			post,
+			postId,
 			postType,
 			...props
 		} = this.props;
@@ -112,9 +113,9 @@ class Editor extends Component {
 		);
 
 		const normalizedPost = post || {
-			id: 1,
+			id: postId,
 			title: {
-				raw: props.initialTitle,
+				raw: props.initialTitle || '',
 			},
 			content: {
 				// make sure the post content is in sync with gutenberg store

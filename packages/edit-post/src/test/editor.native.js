@@ -57,6 +57,7 @@ const renderEditorWith = ( content ) => {
 			initialHtmlModeEnabled={ false }
 			initialTitle={ '' }
 			postType="post"
+			postId="1"
 		/>
 	);
 };

@@ -1,16 +1,15 @@
 /**
  * External dependencies
  */
+// This library works as a polyfill for the global crypto.getRandomValues which is needed by `uuid` version 7.0.0
+import 'react-native-get-random-values';
 import jsdom from 'jsdom-jscore-rn';
 import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
-/**
- * WordPress dependencies
- */
-import { nativeLoggingHook } from '@wordpress/react-native-bridge';
 
 /**
  * WordPress dependencies
  */
+import { nativeLoggingHook } from '@wordpress/react-native-bridge';
 import { createElement } from '@wordpress/element';
 
 /**

@@ -57,6 +57,10 @@ const isLocalEnvironment = () => {
 	return testEnvironment.toLowerCase() === 'local';
 };
 
+const isMacOSEnvironment = () => {
+	return process.platform === 'darwin';
+};
+
 const IOS_RECORDINGS_DIR = './ios-screen-recordings';
 const ANDROID_RECORDINGS_DIR = './android-screen-recordings';
 
@@ -67,6 +71,10 @@ const getScreenRecordingFileNameBase = ( testPath, id ) => {
 
 jasmine.getEnv().addReporter( {
 	specStarted: ( { testPath, id } ) => {
+		if ( ! isMacOSEnvironment() ) {
+			return;
+		}
+
 		const fileName =
 			getScreenRecordingFileNameBase( testPath, id ) + '.mp4';
 
@@ -85,6 +93,11 @@ jasmine.getEnv().addReporter( {
 				'720x1280',
 				`/sdcard/${ fileName }`,
 			] );
+
+			androidScreenRecordingProcess.stderr.on( 'data', ( data ) => {
+				// eslint-disable-next-line no-console
+				console.log( `Android screen recording error => ${ data }` );
+			} );
 
 			return;
 		}
@@ -110,16 +123,32 @@ jasmine.getEnv().addReporter( {
 		);
 	},
 	specDone: ( { testPath, id, status } ) => {
+		if ( ! isMacOSEnvironment() ) {
+			return;
+		}
+
 		const fileNameBase = getScreenRecordingFileNameBase( testPath, id );
 
 		if ( isAndroid() ) {
 			androidScreenRecordingProcess.kill( 'SIGINT' );
 			// wait for kill
-			childProcess.execSync( 'sleep 20' );
+			childProcess.execSync( 'sleep 1' );
 
-			childProcess.execSync(
-				`adb pull /sdcard/${ fileNameBase }.mp4 ${ ANDROID_RECORDINGS_DIR }`
-			);
+			try {
+				childProcess.execSync(
+					`adb pull /sdcard/${ fileNameBase }.mp4 ${ ANDROID_RECORDINGS_DIR }`
+				);
+			} catch ( error ) {
+				// Some (old) Android devices don't support screen recording or
+				// sometimes the initial `should be able to see visual editor`
+				// tests are too fast and a recording is not generated. This is
+				// when `adb pull` can't find the recording file. In these cases
+				// we ignore the errors and keep running the tests.
+				// eslint-disable-next-line no-console
+				console.log(
+					`Android screen recording error => ${ error.stdout }`
+				);
+			}
 
 			const oldPath = `${ ANDROID_RECORDINGS_DIR }/${ fileNameBase }.mp4`;
 			const newPath = `${ ANDROID_RECORDINGS_DIR }/${ fileNameBase }.${ status }.mp4`;

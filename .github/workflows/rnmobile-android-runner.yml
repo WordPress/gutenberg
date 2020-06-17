@@ -7,8 +7,7 @@ jobs:
     strategy:
       matrix:
         native-test-name: [
-          gutenberg-editor-heading,
-          gutenberg-editor-image,
+          gutenberg-editor-gallery
         ]
 
     steps:
@@ -16,17 +15,15 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Restore npm cache
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: ~/.npm
         key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-npm-
 
     - run: npm ci
 
     - name: Restore Gradle cache
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: ~/.gradle/caches
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}

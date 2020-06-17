@@ -29,7 +29,7 @@ exports.android = {
 	browserName: '',
 	platformName: 'Android',
 	platformVersion: '9.0',
-	deviceName: 'test',
+	deviceName: 'Google Pixel 3 XL GoogleAPI Emulator',
 	automationName: 'UiAutomator2',
 	os: 'Android',
 	appPackage: 'com.gutenberg',
