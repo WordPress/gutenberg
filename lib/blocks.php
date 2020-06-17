@@ -394,7 +394,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 	// Check support for text colors.
 	if ( in_array( 'color', $supports, true ) ) {
 		$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-		$has_custom_text_color = has_triple_nested_key( $attributes, 'style', 'color', 'text' );
+		$has_custom_text_color = isset( $attributes['style']['color']['text'] );
 
 		// Apply required generic class.
 		if ( $has_custom_text_color || $has_named_text_color ) {
@@ -410,7 +410,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 
 	// Link Colors.
 	if ( in_array( 'link-color', $supports, true ) ) {
-		$has_link_color = has_triple_nested_key( $attributes, 'style', 'color', 'link' );
+		$has_link_color = isset( $attributes['style']['color']['link'] );
 		// Apply required class and style.
 		if ( $has_link_color ) {
 			$color_settings['css_classes'][] = 'has-link-color';
@@ -429,7 +429,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 	// Background Colors.
 	if ( in_array( 'background-color', $supports, true ) ) {
 		$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-		$has_custom_background_color = has_triple_nested_key( $attributes, 'style', 'color', 'background' );
+		$has_custom_background_color = isset( $attributes['style']['color']['background'] );
 
 		// Apply required background class.
 		if ( $has_custom_background_color || $has_named_background_color ) {
@@ -446,7 +446,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
 	// Gradients.
 	if ( in_array( 'background', $supports, true ) ) {
 		$has_named_gradient  = array_key_exists( 'gradient', $attributes );
-		$has_custom_gradient = has_triple_nested_key( $attributes, 'style', 'color', 'gradient' );
+		$has_custom_gradient = isset( $attributes['style']['color']['gradient'] );
 
 		if ( $has_named_gradient || $has_custom_gradient ) {
 			$color_settings['css_classes'][] = 'has-background';
@@ -480,7 +480,7 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 	// Font Size.
 	if ( in_array( 'font-size', $supports, true ) ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
-		$has_custom_font_size = has_triple_nested_key( $attributes, 'style', 'typography', 'fontSize' );
+		$has_custom_font_size = isset( $attributes['style']['typography']['fontSize'] );
 
 		// Apply required class or style.
 		if ( $has_named_font_size ) {
@@ -492,7 +492,7 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 
 	// Line Height.
 	if ( in_array( 'line-height', $supports, true ) ) {
-		$has_line_height = has_triple_nested_key( $attributes, 'style', 'typography', 'lineHeight' );
+		$has_line_height = isset( $attributes['style']['typography']['lineHeight'] );
 		// Add the style (no classes for line-height).
 		if ( $has_line_height ) {
 			$typography['inline_styles'] .= sprintf( 'line-height: %s;', $attributes['style']['typography']['lineHeight'] );
@@ -500,19 +500,4 @@ function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
 	}
 
 	return $typography;
-}
-
-/**
- * Checks whether or not the given array has the given chain of nested keys.
- * ex) $attributes['style']['color']['font']
- *
- * @param  array  $array array to check for keys.
- * @param  string $key1 1st level key to check.
- * @param  string $key2 2nd level key to check.
- * @param  string $key3 3rd level key to check.
- */
-function has_triple_nested_key( $array, $key1, $key2, $key3 ) {
-	return array_key_exists( $key1, $array )
-	&& array_key_exists( $key2, $array[ $key1 ] )
-	&& array_key_exists( $key3, $array[ $key1 ][ $key2 ] );
 }
