@@ -8,10 +8,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 async function focusBlockToolbar() {
-	// Move the mouse to show the block toolbar
-	await page.mouse.move( 0, 0 );
-	await page.mouse.move( 10, 10 );
-	await pressKeyWithModifier( 'shift', 'Tab' );
+	await pressKeyWithModifier( 'alt', 'F10' );
 }
 
 async function expectLabelToHaveFocus( label ) {
