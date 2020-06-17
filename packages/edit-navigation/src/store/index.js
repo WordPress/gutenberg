@@ -32,9 +32,6 @@ export const storeConfig = {
 	actions,
 };
 
-const store = registerStore( MODULE_KEY, {
-	...storeConfig,
-	persist: [ 'preferences' ],
-} );
+const store = registerStore( MODULE_KEY, storeConfig );
 
 export default store;
