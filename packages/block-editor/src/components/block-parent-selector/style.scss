@@ -1,5 +1,10 @@
 .block-editor-block-parent-selector {
 	background: $white;
-	border: $border-width solid $dark-gray-primary;
-	border-radius: $radius-block-ui;
+
+	.block-editor-block-parent-selector__button {
+		width: $grid-unit-60;
+		height: $grid-unit-60;
+		border: $border-width solid $dark-gray-primary;
+		border-radius: $radius-block-ui;
+	}
 }
