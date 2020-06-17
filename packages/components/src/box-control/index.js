@@ -44,6 +44,7 @@ function useUniqueId( idProp ) {
 
 	return idProp || id;
 }
+
 export default function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
@@ -121,6 +122,17 @@ export default function BoxControl( {
 					</Text>
 				</FlexItem>
 				<FlexItem>
+					<BoxControlIcon side={ side } />
+				</FlexItem>
+			</Header>
+			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
+				<FlexBlock>
+					<AllInputControl
+						{ ...inputControlProps }
+						disabled={ ! isLinked }
+					/>
+				</FlexBlock>
+				<FlexItem>
 					<Button
 						className="component-box-control__reset-button"
 						isSecondary
@@ -131,16 +143,8 @@ export default function BoxControl( {
 						{ __( 'Reset' ) }
 					</Button>
 				</FlexItem>
-			</Header>
-			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
-				<FlexItem>
-					<BoxControlIcon side={ side } />
-				</FlexItem>
-				{ isLinked && (
-					<FlexBlock>
-						<AllInputControl { ...inputControlProps } />
-					</FlexBlock>
-				) }
+			</HeaderControlWrapper>
+			<HeaderControlWrapper>
 				<FlexItem>
 					<LinkedButton
 						onClick={ toggleLinked }
