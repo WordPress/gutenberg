@@ -99,7 +99,7 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 		// Next measure the distance to the trailing edge of the block.
 		const trailingEdgeDistance = Math.sqrt(
 			( cursorLateralPosition - edgeLateralPosition ) ** 2 +
-				( cursorForwardPosition - trailingEdgeForwardPosition ** 2 )
+				( cursorForwardPosition - trailingEdgeForwardPosition ) ** 2
 		);
 
 		// If no candidate has been assigned yet or this is the nearest
