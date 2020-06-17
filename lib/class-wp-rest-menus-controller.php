@@ -514,7 +514,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			$nav_menu_option['auto_add'] = array();
 		}
 
-		$auto_add = (bool) $request['auto_add'];
+		$auto_add = $request['auto_add'];
 
 		if ( $auto_add ) {
 			if ( ! in_array( $menu_id, $nav_menu_option['auto_add'], true ) ) {
