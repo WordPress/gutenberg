@@ -191,30 +191,28 @@ function serializeProcessing( callback ) {
 			'isProcessingMenuItems',
 			menuId
 		);
+
 		if ( isProcessing ) {
-			yield dispatch(
-				'core/edit-navigation',
-				'enqueueAfterProcessing',
+			yield {
+				type: 'ENQUEUE_AFTER_PROCESSING',
 				menuId,
-				callback
-			);
+				action: callback,
+			};
 			return { status: 'pending' };
 		}
 
-		yield dispatch(
-			'core/edit-navigation',
-			'startProcessingMenuItems',
-			menuId
-		);
+		yield {
+			type: 'START_PROCESSING_MENU_ITEMS',
+			menuId,
+		};
 
 		try {
 			yield* callback( menuId );
 		} finally {
-			yield dispatch(
-				'core/edit-navigation',
-				'finishProcessingMenuItems',
-				menuId
-			);
+			yield {
+				type: 'FINISH_PROCESSING_MENU_ITEMS',
+				menuId,
+			};
 
 			const pendingActions = yield select(
 				'core/edit-navigation',
@@ -225,27 +223,5 @@ function serializeProcessing( callback ) {
 				yield* pendingActions[ 0 ]( menuId );
 			}
 		}
-	};
-}
-
-export function startProcessingMenuItems( menuId ) {
-	return {
-		type: 'START_PROCESSING_MENU_ITEMS',
-		menuId,
-	};
-}
-
-export function finishProcessingMenuItems( menuId ) {
-	return {
-		type: 'FINISH_PROCESSING_MENU_ITEMS',
-		menuId,
-	};
-}
-
-export function enqueueAfterProcessing( menuId, action ) {
-	return {
-		type: 'ENQUEUE_AFTER_PROCESSING',
-		menuId,
-		action,
 	};
 }
