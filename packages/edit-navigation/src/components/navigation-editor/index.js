@@ -11,7 +11,7 @@ import { Spinner } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import MenuEditorShortcuts from './shortcuts';
+import NavigationEditorShortcuts from './shortcuts';
 import BlockEditorArea from './block-editor-area';
 import NavigationStructureArea from './navigation-structure-area';
 import useNavigationBlockEditor from './use-navigation-block-editor';
@@ -33,9 +33,9 @@ export default function NavigationEditor( {
 	const { saveNavigationPost } = useDispatch( 'core/edit-navigation' );
 	const save = () => saveNavigationPost( post );
 	return (
-		<div className="edit-navigation-menu-editor">
+		<div className="edit-navigation-editor">
 			<BlockEditorKeyboardShortcuts.Register />
-			<MenuEditorShortcuts.Register />
+			<NavigationEditorShortcuts.Register />
 
 			{ isLoading ? (
 				<Spinner />
@@ -51,7 +51,7 @@ export default function NavigationEditor( {
 					} }
 				>
 					<BlockEditorKeyboardShortcuts />
-					<MenuEditorShortcuts saveBlocks={ save } />
+					<NavigationEditorShortcuts saveBlocks={ save } />
 					<NavigationStructureArea
 						blocks={ blocks }
 						initialOpen={ isLargeViewport }

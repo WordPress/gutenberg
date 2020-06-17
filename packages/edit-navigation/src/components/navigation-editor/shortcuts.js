@@ -6,7 +6,7 @@ import { useDispatch } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
-function MenuEditorShortcuts( { saveBlocks } ) {
+function NavigationEditorShortcuts( { saveBlocks } ) {
 	useShortcut(
 		'core/edit-navigation/save-menu',
 		useCallback( ( event ) => {
@@ -21,13 +21,13 @@ function MenuEditorShortcuts( { saveBlocks } ) {
 	return null;
 }
 
-function RegisterMenuEditorShortcuts() {
+function RegisterNavigationEditorShortcuts() {
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/edit-navigation/save-menu',
 			category: 'global',
-			description: __( 'Save the menu currently being edited.' ),
+			description: __( 'Save the navigation currently being edited.' ),
 			keyCombination: {
 				modifier: 'primary',
 				character: 's',
@@ -38,6 +38,6 @@ function RegisterMenuEditorShortcuts() {
 	return null;
 }
 
-MenuEditorShortcuts.Register = RegisterMenuEditorShortcuts;
+NavigationEditorShortcuts.Register = RegisterNavigationEditorShortcuts;
 
-export default MenuEditorShortcuts;
+export default NavigationEditorShortcuts;

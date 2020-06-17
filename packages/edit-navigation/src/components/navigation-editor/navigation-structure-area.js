@@ -33,7 +33,7 @@ export default function NavigationStructureArea( { blocks, initialOpen } ) {
 	);
 
 	return isSmallScreen ? (
-		<Panel className="edit-navigation-menu-editor__navigation-structure-panel">
+		<Panel className="edit-navigation-editor__navigation-structure-panel">
 			<PanelBody
 				title={ __( 'Navigation structure' ) }
 				initialOpen={ initialOpen }
@@ -42,8 +42,8 @@ export default function NavigationStructureArea( { blocks, initialOpen } ) {
 			</PanelBody>
 		</Panel>
 	) : (
-		<Card className="edit-navigation-menu-editor__navigation-structure-card">
-			<CardHeader className="edit-navigation-menu-editor__navigation-structure-header">
+		<Card className="edit-navigation-editor__navigation-structure-card">
+			<CardHeader className="edit-navigation-editor__navigation-structure-header">
 				{ __( 'Navigation structure' ) }
 			</CardHeader>
 			<CardBody>{ content }</CardBody>
