@@ -1,15 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	map,
-	includes,
-	findIndex,
-	flow,
-	sortBy,
-	groupBy,
-	isEmpty,
-} from 'lodash';
+import { map, findIndex, flow, sortBy, groupBy, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,13 +40,14 @@ export function InserterBlockList( {
 		rootClientId,
 		onInsert
 	);
-	const rootChildBlocks = useSelect(
+
+	const hasChildItems = useSelect(
 		( select ) => {
 			const { getBlockName } = select( 'core/block-editor' );
 			const { getChildBlockNames } = select( 'core/blocks' );
 			const rootBlockName = getBlockName( rootClientId );
 
-			return getChildBlockNames( rootBlockName );
+			return !! getChildBlockNames( rootBlockName ).length;
 		},
 		[ rootClientId ]
 	);
@@ -62,12 +55,6 @@ export function InserterBlockList( {
 	const filteredItems = useMemo( () => {
 		return searchBlockItems( items, categories, collections, filterValue );
 	}, [ filterValue, items, categories, collections ] );
-
-	const childItems = useMemo( () => {
-		return filteredItems.filter( ( { name } ) =>
-			includes( rootChildBlocks, name )
-		);
-	}, [ filteredItems, rootChildBlocks ] );
 
 	const suggestedItems = useMemo( () => {
 		return items.slice( 0, MAX_SUGGESTED_ITEMS );
@@ -127,16 +114,19 @@ export function InserterBlockList( {
 	}, [ filterValue, debouncedSpeak ] );
 
 	const hasItems = ! isEmpty( filteredItems );
-	const hasChildItems = childItems.length > 0;
 
 	return (
 		<div>
-			<ChildBlocks
-				rootClientId={ rootClientId }
-				items={ childItems }
-				onSelect={ onSelectItem }
-				onHover={ onHover }
-			/>
+			{ hasChildItems && (
+				<ChildBlocks
+					rootClientId={ rootClientId }
+					// Pass along every block, as getInserterItems() will have
+					// already filtered out non-child blocks.
+					items={ filteredItems }
+					onSelect={ onSelectItem }
+					onHover={ onHover }
+				/>
+			) }
 
 			{ ! hasChildItems && !! suggestedItems.length && ! filterValue && (
 				<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
