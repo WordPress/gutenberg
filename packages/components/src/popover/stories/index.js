@@ -4,16 +4,10 @@
 import { boolean, select, text } from '@storybook/addon-knobs';
 
 /**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import { DraggableWrapper } from './_utils';
 import Popover from '../';
-import Button from '../../button';
 
 export default { title: 'Components/Popover', component: Popover };
 
@@ -105,53 +99,4 @@ export const positioning = () => {
 	return (
 		<DragExample label={ label } content={ content } noArrow={ noArrow } />
 	);
-};
-
-function DynamicHeightPopover() {
-	const [ height, setHeight ] = useState( 200 );
-	const increase = () => setHeight( height + 100 );
-	const decrease = () => setHeight( height - 100 );
-
-	return (
-		<div style={ { padding: '20px' } }>
-			<div>
-				<Button
-					isPrimary
-					onClick={ increase }
-					style={ {
-						marginRight: '20px',
-					} }
-				>
-					Increase Size
-				</Button>
-
-				<Button isPrimary onClick={ decrease }>
-					Decrease Size
-				</Button>
-			</div>
-
-			<p>
-				When the height of the popover exceeds the available space in
-				the canvas, a scrollbar inside the popover should appear.
-			</p>
-
-			<div>
-				<Popover>
-					<div
-						style={ {
-							height,
-							background: '#eee',
-							padding: '20px',
-						} }
-					>
-						Content with dynamic height
-					</div>
-				</Popover>
-			</div>
-		</div>
-	);
-}
-
-export const dynamicHeight = () => {
-	return <DynamicHeightPopover />;
 };

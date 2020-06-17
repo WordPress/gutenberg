@@ -16,20 +16,11 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__popover .block-editor-inserter__menu {
-	margin: -$grid-unit-15;
-
-	.block-editor-inserter__search {
-		top: -$grid-unit-15;
-	}
-
-	.block-editor-inserter__tabs .components-tab-panel__tabs {
-		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
-	}
-
-	.block-editor-inserter__main-area {
-		overflow: visible;
-		height: auto;
+.block-editor-inserter__popover > .components-popover__content {
+	@include break-medium {
+		overflow-y: visible;
+		height: 100vh;
+		padding: 0;
 	}
 }
 
@@ -52,7 +43,8 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__main-area {
 	width: auto;
-	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
 	height: 100%;
 	@include break-medium {
 		width: $block-inserter-width;
@@ -73,10 +65,9 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	padding: $grid-unit-20;
-	position: sticky;
-	top: 0;
-	background: $white;
 	z-index: 1;
+	flex-shrink: 0;
+	position: relative;
 
 	input[type="search"].block-editor-inserter__search-input {
 		@include input-control;
@@ -112,15 +103,11 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__tabs {
 	display: flex;
+	flex-grow: 1;
 	flex-direction: column;
 	margin-top: -$grid-unit-10;
 
 	.components-tab-panel__tabs {
-		position: sticky;
-		// Computed based off the search input height and paddings
-		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60;
-		background: $white;
-		z-index: 1;
 		border-bottom: $border-width solid $light-gray-500;
 
 		.components-tab-panel__tabs-item {
@@ -158,6 +145,18 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__block-list {
 	flex-grow: 1;
 	position: relative;
+}
+
+// This extra div is needed because
+// flex grow and overflow auto doesn't work well together.
+.block-editor-inserter__scrollable {
+	overflow: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	overflow-y: scroll;
 }
 
 .block-editor-inserter__popover .block-editor-block-types-list {

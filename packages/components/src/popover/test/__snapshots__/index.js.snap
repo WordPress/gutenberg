@@ -15,11 +15,7 @@ exports[`Popover should pass additional props to portaled element 1`] = `
             class="components-popover__content"
             tabindex="-1"
           >
-            <div
-              style="position: relative;"
-            >
-              Hello
-            </div>
+            Hello
           </div>
         </div>
       </div>
@@ -42,11 +38,7 @@ exports[`Popover should render content 1`] = `
             class="components-popover__content"
             tabindex="-1"
           >
-            <div
-              style="position: relative;"
-            >
-              Hello
-            </div>
+            Hello
           </div>
         </div>
       </div>

@@ -81,12 +81,14 @@ function InserterMenu( {
 	const blocksTab = (
 		<>
 			<div className="block-editor-inserter__block-list">
-				<InserterBlockList
-					rootClientId={ destinationRootClientId }
-					onInsert={ onInsert }
-					onHover={ onHover }
-					filterValue={ filterValue }
-				/>
+				<div className="block-editor-inserter__scrollable">
+					<InserterBlockList
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsert }
+						onHover={ onHover }
+						filterValue={ filterValue }
+					/>
+				</div>
 			</div>
 			{ showInserterHelpPanel && (
 				<div className="block-editor-inserter__tips">
@@ -100,7 +102,9 @@ function InserterMenu( {
 	);
 
 	const patternsTab = (
-		<BlockPatterns onInsert={ onInsert } filterValue={ filterValue } />
+		<div className="block-editor-inserter__scrollable">
+			<BlockPatterns onInsert={ onInsert } filterValue={ filterValue } />
+		</div>
 	);
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
