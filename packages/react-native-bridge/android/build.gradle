@@ -246,8 +246,8 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         }
     }
 
-    yarn_install.dependsOn bundleUpToDateCheck
-    yarn_install.onlyIf { !isBundleUpToDate() }
+    npm_install.dependsOn bundleUpToDateCheck
+    npm_install.onlyIf { !isBundleUpToDate() }
 
     task buildJSBundle(type: YarnTask) {
         dependsOn bundleUpToDateCheck
@@ -313,6 +313,6 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
     backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
     backupHermesReleaseAAR.dependsOn(copyJSBundle)
     copyJSBundle.dependsOn(buildJSBundle)
-    buildJSBundle.dependsOn(yarn_install)
+    buildJSBundle.dependsOn(npm_install)
     nodeSetup.dependsOn(resetExtractedRNTools)
 }
