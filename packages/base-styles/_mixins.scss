@@ -446,8 +446,6 @@
 	// This requires refactoring some existing styles.
 	--wp-admin-theme-color-darker-20: #{darken($color-primary, 20%)};
 	--wp-admin-theme-color-darker-10: #{darken($color-primary, 10%)};
-	--wp-admin-theme-color-lighter-10: #{lighten($color-primary, 10%)};
-	--wp-admin-theme-color-lighter-40: #{lighten($color-primary, 40%)};
 }
 
 @mixin wordpress-admin-schemes() {
