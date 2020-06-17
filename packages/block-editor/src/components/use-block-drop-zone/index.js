@@ -31,7 +31,7 @@ import { useEffect, useCallback, useState } from '@wordpress/element';
  * This function works for both horizontal and vertical block lists and uses the following
  * terms for its variables:
  *
- * - Lateral, meaning the axis running horizontally when a block list is vertical or vice-versa.
+ * - Lateral, meaning the axis running horizontally when a block list is vertical and vertically when a block list is horizontal.
  * - Forward, meaning the axis running vertically when a block list is vertical and horizontally
  * when a block list is horizontal.
  *
