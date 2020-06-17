@@ -515,15 +515,12 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 
 		$auto_add = $request['auto_add'];
 
-		if ( $auto_add ) {
-			if ( ! in_array( $menu_id, $nav_menu_option['auto_add'], true ) ) {
-				$nav_menu_option['auto_add'][] = $menu_id;
-			}
-		} else {
-			$key = array_search( $menu_id, $nav_menu_option['auto_add'], true );
-			if ( false !== $key ) {
-				unset( $nav_menu_option['auto_add'][ $key ] );
-			}
+		$i = array_search( $menu_id, $nav_menu_options['auto_add'], true );
+
+		if ( $auto_add && false === $i ) {
+			$nav_menu_option['auto_add'][] = $menu_id;
+		} elseif ( ! $auto_add && false !== $i ) {
+			array_splice( $nav_menu_options['auto_add'], $i, 1 );
 		}
 
 		$update = update_option( 'nav_menu_options', $nav_menu_option );
