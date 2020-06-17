@@ -421,10 +421,14 @@ function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
 		return $settings;
 	}
 
-	// Create template part auto-drafts for the edited post.
-	$post = isset( $settings['templateId'] )
-		? get_post( $settings['templateId'] ) // It's a template.
-		: get_post(); // It's a post.
+	// If this is the Site Editor, auto-drafts for template parts have already been generated
+	// through `gutenberg_find_template_post_and_parts` in `gutenberg_edit_site_init`.
+	if ( isset( $settings['editSiteInitialState'] ) ) {
+		return $settings;
+	}
+
+	// Otherwise, create template part auto-drafts for the edited post.
+	$post = get_post();
 	foreach ( parse_blocks( $post->post_content ) as $block ) {
 		create_auto_draft_for_template_part_block( $block );
 	}
