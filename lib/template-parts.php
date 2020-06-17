@@ -213,6 +213,17 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 			'value' => $request['theme'],
 		);
 
+		// Ensure auto-drafts of all theme supplied template parts are created.
+		if( $request['theme'] === get_current_theme() ) {
+			foreach ( get_template_types() as $template_type ) {
+				// Skip 'embed' for now because it is not a regular template type.
+				if ( in_array( $template_type, array( 'embed' ), true ) ) {
+					continue;
+				}
+				gutenberg_find_template_post_and_parts( $template_type );
+			}
+		};
+
 		$args['meta_query'] = $meta_query;
 	}
 
