@@ -215,11 +215,15 @@ function serializeProcessing( callback ) {
 			yield {
 				type: 'FINISH_PROCESSING_POST',
 				id: post.id,
+				action: callback,
 			};
 
 			const pendingActions = yield getPendingActions( post.id );
 			if ( pendingActions.length ) {
-				yield* pendingActions[ 0 ]( post );
+				const serializedCallback = serializeProcessing(
+					pendingActions[ 0 ]
+				);
+				yield* serializedCallback( post );
 			}
 		}
 	};

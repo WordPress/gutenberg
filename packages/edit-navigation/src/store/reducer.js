@@ -15,6 +15,10 @@ function processing( state, { type, id, ...rest } ) {
 			state[ id ] = {
 				...state[ id ],
 				inProgress: false,
+				pendingActions:
+					state[ id ]?.pendingActions?.filter(
+						( item ) => item !== rest.action
+					) || [],
 			};
 			break;
 		case 'ENQUEUE_AFTER_PROCESSING':
