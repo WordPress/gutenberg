@@ -1,0 +1,26 @@
+name: Create Block
+
+on:
+  push:
+    paths:
+    - 'packages/**'
+    - '!packages/**/test/**'
+    - '!packages/**/*.md'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: npm install, build, format and lint
+      run: |
+        npm ci
+        npm run test:create-block
+      env:
+        CI: true
