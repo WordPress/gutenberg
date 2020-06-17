@@ -321,7 +321,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 			return $locations_update;
 		}
 
-		$this->handle_auto_add( $term->id, $request );
+		$this->handle_auto_add( $term->term_id, $request );
 
 		$fields_update = $this->update_additional_fields_for_object( $term, $request );
 
