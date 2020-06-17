@@ -372,7 +372,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  Gutenberg: b17049009d25ed9cf1af675bf239dc01336362a2
+  Gutenberg: 237167a5bb725cedcef0fa56f73b009bc1c389bd
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
