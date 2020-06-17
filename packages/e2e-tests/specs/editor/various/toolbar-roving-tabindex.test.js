@@ -19,7 +19,7 @@ async function expectLabelToHaveFocus( label ) {
 	).toBe( label );
 }
 
-async function testToolbar( currentBlockLabel ) {
+async function testBlockToolbarKeyboardNavigation( currentBlockLabel ) {
 	await focusBlockToolbar();
 	await expectLabelToHaveFocus( 'Change block type or style' );
 	await page.keyboard.press( 'ArrowRight' );
@@ -30,11 +30,14 @@ async function testToolbar( currentBlockLabel ) {
 	await expectLabelToHaveFocus( 'Move up' );
 }
 
-async function testGroup( currentBlockLabel ) {
+async function wrapCurrentBlockWithGroup() {
 	await page.click( '[aria-label="Change block type or style"]' );
 	await page.evaluate( () => {
 		document.querySelector( '.editor-block-list-item-group' ).click();
 	} );
+}
+
+async function testGroupKeyboardNavigation( currentBlockLabel ) {
 	await expectLabelToHaveFocus( 'Block: Group' );
 	await page.keyboard.press( 'Tab' );
 	await expectLabelToHaveFocus( currentBlockLabel );
@@ -54,27 +57,31 @@ describe( 'Toolbar roving tabindex', () => {
 	it( 'ensures paragraph block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph' );
-		await testToolbar( 'Paragraph block' );
-		await testGroup( 'Paragraph block' );
+		await testBlockToolbarKeyboardNavigation( 'Paragraph block' );
+		await wrapCurrentBlockWithGroup();
+		await testGroupKeyboardNavigation( 'Paragraph block' );
 	} );
 
 	it( 'ensures heading block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Heading' );
 		await page.keyboard.type( 'Heading' );
-		await testToolbar( 'Write heading…' );
-		await testGroup( 'Write heading…' );
+		await testBlockToolbarKeyboardNavigation( 'Write heading…' );
+		await wrapCurrentBlockWithGroup();
+		await testGroupKeyboardNavigation( 'Write heading…' );
 	} );
 
 	it( 'ensures list block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'List' );
-		await testToolbar( 'Write list…' );
-		await testGroup( 'Write list…' );
+		await testBlockToolbarKeyboardNavigation( 'Write list…' );
+		await wrapCurrentBlockWithGroup();
+		await testGroupKeyboardNavigation( 'Write list…' );
 	} );
 
 	it( 'ensures image block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Image' );
-		await testToolbar( 'Block: Image' );
-		await testGroup( 'Block: Image' );
+		await testBlockToolbarKeyboardNavigation( 'Block: Image' );
+		await wrapCurrentBlockWithGroup();
+		await testGroupKeyboardNavigation( 'Block: Image' );
 	} );
 } );
