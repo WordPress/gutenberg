@@ -9,12 +9,19 @@
 # Exit if any command fails.
 set -e
 
+DIRECTORY="$PWD"
+
 status () {
 	echo -e "\n\033[1;34m$1\033[0m\n"
 }
 
+cleanup() {
+	rm -rf "$DIRECTORY/esnext-test"
+}
+
+trap cleanup EXIT
+
 status "Scaffolding block..."
-rm -rf esnext-test
 npx wp-create-block esnext-test --no-wp-scripts
 cd esnext-test
 
