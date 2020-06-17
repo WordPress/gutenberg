@@ -31,10 +31,7 @@ export const storeConfig = {
 	controls,
 };
 
-const store = registerStore( MODULE_KEY, {
-	...storeConfig,
-	persist: [ 'preferences' ],
-} );
+const store = registerStore( MODULE_KEY, storeConfig );
 applyMiddlewares( store );
 
 export default store;
