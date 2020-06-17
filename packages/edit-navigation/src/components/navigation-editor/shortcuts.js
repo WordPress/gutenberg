@@ -18,6 +18,25 @@ function NavigationEditorShortcuts( { saveBlocks } ) {
 		}
 	);
 
+	const { redo, undo } = useDispatch( 'core' );
+	useShortcut(
+		'core/edit-navigation/undo',
+		( event ) => {
+			undo();
+			event.preventDefault();
+		},
+		{ bindGlobal: true }
+	);
+
+	useShortcut(
+		'core/edit-navigation/redo',
+		( event ) => {
+			redo();
+			event.preventDefault();
+		},
+		{ bindGlobal: true }
+	);
+
 	return null;
 }
 
@@ -31,6 +50,24 @@ function RegisterNavigationEditorShortcuts() {
 			keyCombination: {
 				modifier: 'primary',
 				character: 's',
+			},
+		} );
+		registerShortcut( {
+			name: 'core/edit-navigation/undo',
+			category: 'global',
+			description: __( 'Undo your last changes.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'z',
+			},
+		} );
+		registerShortcut( {
+			name: 'core/edit-navigation/redo',
+			category: 'global',
+			description: __( 'Redo your last undo.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: 'z',
 			},
 		} );
 	}, [ registerShortcut ] );
