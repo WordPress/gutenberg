@@ -28,7 +28,6 @@ function HeadingEdit( {
 	mergeBlocks,
 	onReplace,
 	mergedStyle,
-	clientId,
 } ) {
 	const { textAlign, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;

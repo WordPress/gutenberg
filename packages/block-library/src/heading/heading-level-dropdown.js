@@ -3,18 +3,21 @@
  */
 import {
 	Dropdown,
+	ExternalLink,
 	Toolbar,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import HeadingLevelChecker from './heading-level-checker';
 import HeadingLevelIcon from './heading-level-icon';
+import HeadingLevelWarning from './heading-level-warning';
+import useHeadingLevelValidator from './use-heading-level-validator';
 
 const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
 
@@ -48,6 +51,17 @@ export default function HeadingLevelDropdown( {
 	selectedLevel,
 	onChange,
 } ) {
+	const helpTextId = useInstanceId(
+		HeadingLevelDropdown,
+		'block-library-heading__heading-level-dropdown__help'
+	);
+
+	const getLevelValidity = useHeadingLevelValidator( clientId );
+
+	const { levelMayBeInvalid: selectedLevelMayBeInvalid } = getLevelValidity(
+		selectedLevel
+	);
+
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
@@ -82,27 +96,54 @@ export default function HeadingLevelDropdown( {
 							isCollapsed={ false }
 							controls={ HEADING_LEVELS.map( ( targetLevel ) => {
 								const isActive = targetLevel === selectedLevel;
+								const levelMayBeInvalid = getLevelValidity(
+									targetLevel
+								).levelMayBeInvalid;
+
 								return {
 									icon: (
 										<HeadingLevelIcon
 											level={ targetLevel }
 											isPressed={ isActive }
+											isDiscouraged={ levelMayBeInvalid }
 										/>
 									),
-									title: sprintf(
-										// translators: %s: heading level e.g: "1", "2", "3"
-										__( 'Heading %d' ),
-										targetLevel
-									),
+									title: levelMayBeInvalid
+										? sprintf(
+												// translators: %d: heading level e.g: "1", "2", "3"
+												__(
+													'Heading %d (may be invalid)'
+												),
+												targetLevel
+										  )
+										: sprintf(
+												// translators: %d: heading level e.g: "1", "2", "3"
+												__( 'Heading %d' ),
+												targetLevel
+										  ),
+									// Move tooltips above buttons so they don't overlap
+									// the help text below.
+									tooltipPosition: 'top',
 									isActive,
 									onClick() {
 										onChange( targetLevel );
 									},
 								};
 							} ) }
+							aria-describedby={ helpTextId }
 						/>
 					</Toolbar>
-					<HeadingLevelChecker selectedHeadingId={ clientId } />
+					<p
+						id={ helpTextId }
+						className="block-library-heading__heading-level-dropdown__help"
+					>
+						<ExternalLink href="https://www.w3.org/WAI/tutorials/page-structure/headings/">
+							{ __( 'Learn about heading levels.' ) }
+						</ExternalLink>
+					</p>
+					{ selectedLevelMayBeInvalid && (
+						<HeadingLevelWarning selectedLevel={ selectedLevel } />
+					) }
 				</>
 			) }
 		/>
