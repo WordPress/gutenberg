@@ -22,12 +22,6 @@ const stateReducer = (
 	{ selectedItem },
 	{ type, changes, props: { items } }
 ) => {
-	const selectedItemIndex = items.findIndex(
-		( item ) => item.key === selectedItem?.key
-	);
-	if ( changes.highlightedIndex < 0 ) {
-		changes.highlightedIndex = selectedItemIndex;
-	}
 	switch ( type ) {
 		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowDown:
 			// If we already have a selected item, try to select the next one,
@@ -37,7 +31,7 @@ const stateReducer = (
 					items[
 						selectedItem
 							? Math.min(
-									selectedItemIndex + 1,
+									items.indexOf( selectedItem ) + 1,
 									items.length - 1
 							  )
 							: 0
@@ -50,7 +44,7 @@ const stateReducer = (
 				selectedItem:
 					items[
 						selectedItem
-							? Math.max( selectedItemIndex - 1, 0 )
+							? Math.max( items.indexOf( selectedItem ) - 1, 0 )
 							: items.length - 1
 					],
 			};
@@ -64,9 +58,8 @@ export default function CustomSelectControl( {
 	label,
 	options: items,
 	onChange: onSelectedItemChange,
-	value,
+	value: _selectedItem,
 } ) {
-	const valueIndex = items.findIndex( ( item ) => item.key === value?.key );
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -76,12 +69,14 @@ export default function CustomSelectControl( {
 		highlightedIndex,
 		selectedItem,
 	} = useSelect( {
-		initialSelectedItem: items[ valueIndex >= 0 ? valueIndex : 0 ],
+		initialSelectedItem: items[ 0 ],
 		items,
 		itemToString,
 		onSelectedItemChange,
+		selectedItem: _selectedItem,
 		stateReducer,
 	} );
+
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
@@ -90,12 +85,13 @@ export default function CustomSelectControl( {
 	// fully ARIA compliant.
 	if (
 		menuProps[ 'aria-activedescendant' ] &&
-		menuProps[ 'aria-hidden' ] === true
+		menuProps[ 'aria-activedescendant' ].slice(
+			0,
+			'downshift-null'.length
+		) === 'downshift-null'
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
-	const selectedItemValue = value ? value : selectedItem;
-
 	return (
 		<div
 			className={ classnames(
@@ -126,7 +122,7 @@ export default function CustomSelectControl( {
 					isSmall: true,
 				} ) }
 			>
-				{ itemToString( selectedItemValue ) }
+				{ itemToString( selectedItem ) }
 				<Icon
 					icon={ chevronDown }
 					className="components-custom-select-control__button-icon"
@@ -135,7 +131,7 @@ export default function CustomSelectControl( {
 			<ul { ...menuProps }>
 				{ isOpen &&
 					items.map( ( item, index ) => (
-						// eslint-disable-next-line react/jsx-key, jsx-a11y/role-supports-aria-props
+						// eslint-disable-next-line react/jsx-key
 						<li
 							{ ...getItemProps( {
 								item,
@@ -150,10 +146,9 @@ export default function CustomSelectControl( {
 									}
 								),
 								style: item.style,
-								'aria-selected': index === valueIndex,
 							} ) }
 						>
-							{ item.key === selectedItemValue.key && (
+							{ item === selectedItem && (
 								<Icon
 									icon={ check }
 									className="components-custom-select-control__item-icon"

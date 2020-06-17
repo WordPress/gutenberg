@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import memoize from 'memize';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -26,7 +31,7 @@ function getSelectValueFromFontSize( fontSizes, value ) {
 	return DEFAULT_FONT_SIZE;
 }
 
-function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+const getSelectOptions = memoize( ( optionsArray, disableCustomFontSizes ) => {
 	optionsArray = [
 		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
 		...optionsArray,
@@ -39,7 +44,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		name: option.name,
 		style: { fontSize: option.size },
 	} ) );
-}
+} );
 
 export default function FontSizePicker( {
 	fallbackFontSize,
