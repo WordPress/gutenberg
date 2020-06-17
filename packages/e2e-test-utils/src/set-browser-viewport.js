@@ -48,6 +48,6 @@ export async function setBrowserViewport( viewport ) {
 			? PREDEFINED_DIMENSIONS[ viewport ]
 			: viewport;
 
-	await page.setViewport( dimensions );
+	await page.setViewportSize( dimensions );
 	await waitForWindowDimensions( dimensions.width, dimensions.height );
 }
