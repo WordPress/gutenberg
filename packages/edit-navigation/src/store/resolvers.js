@@ -15,10 +15,20 @@ import { resolveMenuItems, dispatch } from './controls';
 import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
 
 export function* getNavigationPost( menuId ) {
-	const menuItems = yield resolveMenuItems( menuId );
+	// Ensure an empty post to start with
+	yield persistPost(
+		createStubPost( menuId, [], {
+			isResolving: true,
+		} )
+	);
 
-	const post = createStubPost( menuId, menuItems );
-	yield dispatch(
+	// Now let's create a proper one hydrated with actual menu items
+	const menuItems = yield resolveMenuItems( menuId );
+	yield persistPost( createStubPost( menuId, menuItems ) );
+}
+
+const persistPost = ( post ) =>
+	dispatch(
 		'core',
 		'receiveEntityRecords',
 		KIND,
@@ -27,9 +37,8 @@ export function* getNavigationPost( menuId ) {
 		{ id: post.id },
 		false
 	);
-}
 
-const createStubPost = ( menuId, menuItems ) => {
+const createStubPost = ( menuId, menuItems, meta ) => {
 	const [ navigationBlock, menuItemIdToClientId ] = createNavigationBlock(
 		menuItems
 	);
@@ -41,6 +50,7 @@ const createStubPost = ( menuId, menuItems ) => {
 		type: 'page',
 		blocks: [ navigationBlock ],
 		meta: {
+			...meta,
 			menuId,
 			menuItemIdToClientId,
 		},
