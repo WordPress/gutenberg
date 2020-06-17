@@ -489,10 +489,9 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 */
 	function get_menu_auto_add( $menu_id ) {
 		$nav_menu_option = (array) get_option( 'nav_menu_options', array( 'auto_add' => array() ) );
-		if ( ! in_array( $menu_id, $nav_menu_option['auto_add'], true ) ) {
-			return false;
-		}
-		return true;
+		$check = in_array( $menu_id, $nav_menu_option['auto_add'], true );
+		
+		return $check;
 	}
 
 	/**
