@@ -3,6 +3,7 @@
  */
 import { useCombobox } from 'downshift';
 import classnames from 'classnames';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -19,6 +20,8 @@ export default function ComboboxControl( {
 	onChange: onSelectedItemChange,
 	value: _selectedItem,
 	initialSelectedItem,
+	initialInputValue,
+	isLoading,
 } ) {
 	const {
 		getLabelProps,
@@ -35,7 +38,10 @@ export default function ComboboxControl( {
 		itemToString,
 		onInputValueChange,
 		onSelectedItemChange,
-		selectedItem: _selectedItem || initialSelectedItem,
+		selectedItem: _selectedItem,
+		initialSelectedItem,
+		initialInputValue,
+		initialIsOpen: false,
 	} );
 	const menuProps = getMenuProps( {
 		className: 'components-combobox-control__menu',
@@ -96,31 +102,35 @@ export default function ComboboxControl( {
 			</div>
 			<ul { ...menuProps }>
 				{ isOpen &&
-					items.map( ( item, index ) => (
-						// eslint-disable-next-line react/jsx-key
-						<li
-							{ ...getItemProps( {
-								item,
-								index,
-								key: item.key,
-								className: classnames(
-									'components-combobox-control__item',
-									{
-										'is-highlighted':
-											index === highlightedIndex,
-									}
-								),
-								style: item.style,
-							} ) }
-						>
-							{ item === selectedItem && (
-								<Dashicon
-									icon="saved"
-									className="components-combobox-control__item-icon"
-								/>
-							) }
-							{ item.name }
-						</li>
+					( isLoading ? (
+						<div className="loading">{ __( 'Loading...' ) }</div>
+					) : (
+						items.map( ( item, index ) => (
+							// eslint-disable-next-line react/jsx-key
+							<li
+								{ ...getItemProps( {
+									item,
+									index,
+									key: item.key,
+									className: classnames(
+										'components-combobox-control__item',
+										{
+											'is-highlighted':
+												index === highlightedIndex,
+										}
+									),
+									style: item.style,
+								} ) }
+							>
+								{ item === selectedItem && (
+									<Dashicon
+										icon="saved"
+										className="components-combobox-control__item-icon"
+									/>
+								) }
+								{ item.name }
+							</li>
+						) )
 					) ) }
 			</ul>
 		</div>

@@ -35,6 +35,15 @@ export function* getAuthors() {
 	} );
 	yield receiveUserQuery( 'authors', users );
 }
+/**
+ * Request a single author from the REST API.
+ */
+export function* getAuthor( id = '' ) {
+	const users = yield apiFetch( {
+		path: `/wp/v2/users/${ id }?who=authors&per_page=1`,
+	} );
+	yield receiveUserQuery( 'author', users );
+}
 
 /**
  * Requests the current user from the REST API.

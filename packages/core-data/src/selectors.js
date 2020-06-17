@@ -76,6 +76,17 @@ export const getUserQueryResults = createSelector(
 );
 
 /**
+ * Returns all available authors.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Authors list.
+ */
+export function getAuthor( state ) {
+	return getUserQueryResults( state, 'author' );
+}
+
+/**
  * Returns whether the entities for the give kind are loaded.
  *
  * @param {Object} state   Data state.
