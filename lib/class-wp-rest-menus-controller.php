@@ -501,8 +501,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 * @param int             $menu_id The menu id to update the location form.
 	 * @param WP_REST_Request $request The request object with menu and locations data.
 	 *
-	 * @return Boolean|Null   Return the value of auto_add or null if the auto_add
-	 *                        is not present in the request.
+	 * @return bool True if the auto update was successfully updated.
 	 */
 	function handle_auto_add( $menu_id, $request ) {
 		if ( ! isset( $request['auto_add'] ) ) {
