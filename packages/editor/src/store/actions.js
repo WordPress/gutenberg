@@ -34,11 +34,12 @@ import serializeBlocks from './utils/serialize-blocks';
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post      Post object.
- * @param {Object} edits     Initial edited attributes object.
- * @param {Array?} template  Block Template.
+ * @param {Object}    post       Post object.
+ * @param {Object}    edits      Initial edited attributes object.
+ * @param {Array?}    template   Block Template.
+ * @param {Function?} setBlocks  Optional callback called with parsed blocks.
  */
-export function* setupEditor( post, edits, template ) {
+export function* setupEditor( post, edits, template, setBlocks ) {
 	// In order to ensure maximum of a single parse during setup, edits are
 	// included as part of editor setup action. Assume edited content as
 	// canonical if provided, falling back to post.
@@ -64,6 +65,7 @@ export function* setupEditor( post, edits, template ) {
 		edits,
 		template,
 	};
+	if ( setBlocks ) setBlocks( blocks );
 	yield resetEditorBlocks( blocks, {
 		__unstableShouldCreateUndoLevel: false,
 	} );

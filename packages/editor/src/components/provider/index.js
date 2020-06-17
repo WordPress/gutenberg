@@ -7,7 +7,7 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -20,6 +20,7 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useBlockCollab } from '@wordpress/block-collab';
 
 /**
  * Internal dependencies
@@ -79,7 +80,8 @@ class EditorProvider extends Component {
 		props.setupEditor(
 			props.post,
 			props.initialEdits,
-			props.settings.template
+			props.settings.template,
+			props.setBlocks
 		);
 
 		if ( props.settings.autosave ) {
@@ -276,7 +278,24 @@ export default compose( [
 			isPostTitleSelected: isPostTitleSelected && isPostTitleSelected(),
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
+	createHigherOrderComponent( ( WrappedComponent ) => {
+		const CollaborativeEditingExperimentWrapper = ( props ) => (
+			<WrappedComponent
+				{ ...props }
+				{ ...useBlockCollab(
+					props.post.id,
+					props.post.collaborative_editing_secret
+				) }
+			/>
+		);
+		return ( props ) =>
+			props.settings.__experimentalCollaborativeEditing ? (
+				<CollaborativeEditingExperimentWrapper { ...props } />
+			) : (
+				<WrappedComponent { ...props } />
+			);
+	}, 'withCollaborativeEditingExperiment' ),
+	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			setupEditor,
 			updatePostLock,
@@ -292,9 +311,23 @@ export default compose( [
 			setupEditor,
 			updatePostLock,
 			createWarningNotice,
-			resetEditorBlocks,
+			resetEditorBlocks( blocks, options ) {
+				if ( ownProps.setBlocks ) ownProps.setBlocks( blocks );
+				if ( ownProps.setSelf )
+					ownProps.setSelf( {
+						selectionStart: options.selectionStart,
+						selectionEnd: options.selectionEnd,
+					} );
+				resetEditorBlocks( blocks, options );
+			},
 			updateEditorSettings,
 			resetEditorBlocksWithoutUndoLevel( blocks, options ) {
+				if ( ownProps.setBlocks ) ownProps.setBlocks( blocks );
+				if ( ownProps.setSelf )
+					ownProps.setSelf( {
+						selectionStart: options.selectionStart,
+						selectionEnd: options.selectionEnd,
+					} );
 				resetEditorBlocks( blocks, {
 					...options,
 					__unstableShouldCreateUndoLevel: false,
