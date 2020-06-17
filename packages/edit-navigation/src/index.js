@@ -63,3 +63,5 @@ export function initialize( id, settings ) {
 		document.getElementById( id )
 	);
 }
+
+export { storeConfig } from './store';
