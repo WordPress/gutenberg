@@ -314,11 +314,12 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 	if ( isset( $block['attrs'] ) ) {
 		// Check what style features the block supports.
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-		if ( $block_type ) {
-			$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
-		} else {
-			$supports = array();
+		if ( ! $block_type ) {
+			return $block_content;
 		}
+		
+		$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
+
 		// Return early if nothing is supported.
 		if ( count( $supports ) === 0 ) {
 			return $block_content;
