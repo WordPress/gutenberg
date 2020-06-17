@@ -205,7 +205,7 @@ function selector( select ) {
 		hasMultiSelection,
 		getBlockOrder,
 		isNavigationMode,
-		isBlockMovingMode,
+		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
@@ -234,7 +234,7 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		blocks: getBlockOrder(),
 		isNavigationMode: isNavigationMode(),
-		isBlockMovingMode,
+		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
@@ -280,7 +280,7 @@ export default function WritingFlow( { children } ) {
 		hasMultiSelection,
 		blocks,
 		isNavigationMode,
-		isBlockMovingMode,
+		hasBlockMovingClientId,
 		isSelectionEnabled,
 		blockSelectionStart,
 		isMultiSelecting,
@@ -295,7 +295,7 @@ export default function WritingFlow( { children } ) {
 		selectBlock,
 		clearSelectedBlock,
 		setNavigationMode,
-		setBlockMovingMode,
+		setBlockMovingClientId,
 		moveBlockToPosition,
 	} = useDispatch( 'core/block-editor' );
 
@@ -314,15 +314,15 @@ export default function WritingFlow( { children } ) {
 			)
 		) {
 			setNavigationMode( false );
-			setBlockMovingMode( null );
+			setBlockMovingClientId( null );
 		} else if (
 			isNavigationMode &&
-			isBlockMovingMode() &&
+			hasBlockMovingClientId() &&
 			getBlockClientId( event.target )
 		) {
 			setCanInsertMovingBlock(
 				canInsertBlockType(
-					getBlockName( isBlockMovingMode() ),
+					getBlockName( hasBlockMovingClientId() ),
 					getBlockRootClientId( getBlockClientId( event.target ) )
 				)
 			);
@@ -441,7 +441,7 @@ export default function WritingFlow( { children } ) {
 						selectedBlockClientId,
 					] )[ 0 ] ?? selectedBlockClientId;
 			}
-			const startingBlockClientId = isBlockMovingMode();
+			const startingBlockClientId = hasBlockMovingClientId();
 
 			if ( startingBlockClientId && focusedBlockUid ) {
 				setCanInsertMovingBlock(
@@ -452,7 +452,7 @@ export default function WritingFlow( { children } ) {
 				);
 			}
 			if ( isEscape && startingBlockClientId ) {
-				setBlockMovingMode( null );
+				setBlockMovingClientId( null );
 				setCanInsertMovingBlock( false );
 			}
 			if ( ( isEnter || isSpace ) && startingBlockClientId ) {
@@ -481,7 +481,7 @@ export default function WritingFlow( { children } ) {
 					destinationBlockIndex
 				);
 				selectBlock( startingBlockClientId );
-				setBlockMovingMode( null );
+				setBlockMovingClientId( null );
 			}
 			if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
 				if ( focusedBlockUid ) {
@@ -684,7 +684,7 @@ export default function WritingFlow( { children } ) {
 
 	const className = classnames( 'block-editor-writing-flow', {
 		'is-navigate-mode': isNavigationMode,
-		'is-block-moving-mode': !! isBlockMovingMode(),
+		'is-block-moving-mode': !! hasBlockMovingClientId(),
 		'can-insert-moving-block': canInsertMovingBlock,
 	} );
 

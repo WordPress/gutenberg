@@ -41,13 +41,13 @@ function BlockSelectionButton( {
 			const {
 				__unstableGetBlockWithoutInnerBlocks,
 				getBlockIndex,
-				isBlockMovingMode,
+				hasBlockMovingClientId,
 			} = select( 'core/block-editor' );
 			const index = getBlockIndex( clientId, rootClientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
 			);
-			const blockMovingMode = isBlockMovingMode();
+			const blockMovingMode = hasBlockMovingClientId();
 			return { index, name, attributes, blockMovingMode };
 		},
 		[ clientId, rootClientId ]

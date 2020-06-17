@@ -887,15 +887,15 @@ export function* setNavigationMode( isNavigationMode = true ) {
 /**
  * Generator that triggers an action used to enable or disable the block moving mode.
  *
- * @param {string|null} isBlockMovingMode Enable/Disable block moving mode.
+ * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.
  */
-export function* setBlockMovingMode( isBlockMovingMode = null ) {
+export function* setBlockMovingClientId( hasBlockMovingClientId = null ) {
 	yield {
 		type: 'SET_BLOCK_MOVING_MODE',
-		isBlockMovingMode,
+		hasBlockMovingClientId,
 	};
 
-	if ( isBlockMovingMode ) {
+	if ( hasBlockMovingClientId ) {
 		speak(
 			__(
 				'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'

@@ -1587,8 +1587,8 @@ export function isNavigationMode( state ) {
  *
  * @return {string}     Client Id of moving block.
  */
-export function isBlockMovingMode( state ) {
-	return state.isBlockMovingMode;
+export function hasBlockMovingClientId( state ) {
+	return state.hasBlockMovingClientId;
 }
 
 /**

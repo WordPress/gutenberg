@@ -1539,11 +1539,11 @@ export function isNavigationMode( state = false, action ) {
  *
  * @return {string|null} Updated state.
  */
-export function isBlockMovingMode( state = null, action ) {
+export function hasBlockMovingClientId( state = null, action ) {
 	// Let inserting block always trigger Edit mode.
 
 	if ( action.type === 'SET_BLOCK_MOVING_MODE' ) {
-		return action.isBlockMovingMode;
+		return action.hasBlockMovingClientId;
 	}
 
 	return state;
@@ -1657,7 +1657,7 @@ export default combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
-	isBlockMovingMode,
+	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
 } );

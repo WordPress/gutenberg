@@ -48,7 +48,7 @@ export default function BlockActions( { clientIds, children } ) {
 		insertAfterBlock,
 		insertBeforeBlock,
 		flashBlock,
-		setBlockMovingMode,
+		setBlockMovingClientId,
 		setNavigationMode,
 	} = useDispatch( 'core/block-editor' );
 
@@ -74,7 +74,7 @@ export default function BlockActions( { clientIds, children } ) {
 		},
 		onMoveTo() {
 			setNavigationMode( true );
-			setBlockMovingMode( clientIds[ 0 ] );
+			setBlockMovingClientId( clientIds[ 0 ] );
 		},
 		onGroup() {
 			if ( ! blocks.length ) {
