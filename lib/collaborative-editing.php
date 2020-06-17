@@ -89,7 +89,8 @@ function gutenberg_admin_enqueue_scripts_collaborative_editing( $hook ) {
 	if ( 'post-new.php' === $hook || 'post.php' === $hook ) {
 		wp_add_inline_script(
 			'wp-block-collab',
-			'wp.blockCollab.addBlockSelections()'
+			'wp.blockCollab.addBlockSelections();
+			 wp.blockCollab.addBlockComments();'
 		);
 	}
 }

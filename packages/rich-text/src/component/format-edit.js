@@ -30,6 +30,7 @@ export default function FormatEdit( {
 	value,
 	allowedFormats,
 	withoutInteractiveFormatting,
+	richTextIdentifier,
 } ) {
 	return formatTypes.map( ( { name, edit: Edit, tagName } ) => {
 		if ( ! Edit ) {
@@ -67,6 +68,7 @@ export default function FormatEdit( {
 				value={ value }
 				onChange={ onChange }
 				onFocus={ onFocus }
+				richTextIdentifier={ richTextIdentifier }
 			/>
 		);
 	} );

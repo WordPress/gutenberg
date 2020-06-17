@@ -1202,6 +1202,7 @@ class RichText extends Component {
 						onChange={ this.onChange }
 						onFocus={ onFocus }
 						formatTypes={ formatTypes }
+						richTextIdentifier={ this.props.identifier }
 					/>
 				) }
 				{ children &&

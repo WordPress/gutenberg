@@ -25,12 +25,17 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
 		"@wordpress/rich-text": "file:../rich-text",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.15",
+		"uuid": "^7.0.2",
 		"y-webrtc": "^10.1.5",
 		"yjs": "^13.2.0"
 	},

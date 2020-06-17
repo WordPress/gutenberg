@@ -1,0 +1,9 @@
+@import "./comment/style.scss";
+
+.block-collab-add-block-comments__block.is-commented {
+	border: 2px solid #b0c4de;
+}
+
+.block-collab-add-block-comments--inline-comment {
+	background: #b0c4de;
+}
