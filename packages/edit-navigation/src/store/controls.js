@@ -113,14 +113,14 @@ const controls = {
 		const state = registry.stores[
 			'core/edit-navigation'
 		].store.getState();
-		return state.processing[ id ]?.pendingActions || [];
+		return state.processingQueue[ id ]?.pendingActions || [];
 	} ),
 
 	IS_PROCESSING_POST: createRegistryControl( ( registry ) => ( { id } ) => {
 		const state = registry.stores[
 			'core/edit-navigation'
 		].store.getState();
-		return state.processing[ id ]?.inProgress;
+		return state.processingQueue[ id ]?.inProgress;
 	} ),
 
 	DISPATCH: createRegistryControl(

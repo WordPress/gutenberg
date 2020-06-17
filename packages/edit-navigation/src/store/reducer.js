@@ -3,7 +3,7 @@
  */
 import { combineReducers } from '@wordpress/data';
 
-function processing( state, { type, id, ...rest } ) {
+function processingQueue( state, { type, id, ...rest } ) {
 	switch ( type ) {
 		case 'START_PROCESSING_POST':
 			state[ id ] = {
@@ -36,5 +36,5 @@ function processing( state, { type, id, ...rest } ) {
 }
 
 export default combineReducers( {
-	processing,
+	processingQueue,
 } );
