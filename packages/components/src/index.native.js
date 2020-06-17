@@ -41,6 +41,7 @@ export { default as ResizableBox } from './resizable-box';
 export { default as UnsupportedFooterControl } from './unsupported-footer-control';
 export { default as ColorControl } from './color-control';
 export { default as QueryControls } from './query-controls';
+export { default as RadioControl } from './radio-control';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
