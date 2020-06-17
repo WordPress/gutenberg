@@ -160,7 +160,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 *
 	 * @param WP_REST_Request $request The request object with post and locations data.
 	 *
-	 * @return bool|WP_Error Whether the current user can assign the provided terms.
+	 * @return true|WP_Error Whether the current user can assign the provided terms.
 	 */
 	protected function check_set_auto_add_permission( $request ) {
 		if ( ! isset( $request['auto_add'] ) ) {
