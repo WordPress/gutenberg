@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+/**
+ * External dependencies
+ */
 // eslint-disable-next-line import/no-extraneous-dependencies
 const gettextParser = require( 'gettext-parser' ),
 	fs = require( 'fs' ),
@@ -19,7 +22,7 @@ function escapeResourceXML( unsafeXMLValue ) {
 	// See: https://tekeye.uk/android/examples/android-string-resources-gotchas
 	// Let's replace XML special characters  <, >, &, ", ', \, \t and \n
 	// Note that this does not support android:textstyle attributes (<b></b>...)
-	return unsafeXMLValue.replace( /(\r?\n|\r|\t|<|>|&|'|"|\\)/gm, function(
+	return unsafeXMLValue.replace( /(\r?\n|\r|\t|<|>|&|'|"|\\)/gm, function (
 		character
 	) {
 		switch ( character ) {
@@ -52,7 +55,7 @@ function escapeResourceXML( unsafeXMLValue ) {
  * @return {string} valid string passing Android linter rules.
  */
 function androidReplacements( XMLValue ) {
-	return XMLValue.replace( /(-|\.\.\.)/gm, function( character ) {
+	return XMLValue.replace( /(-|\.\.\.)/gm, function ( character ) {
 		switch ( character ) {
 			case '-':
 				return '–'; // Android lint rule: TypographyDashes.
@@ -72,7 +75,7 @@ function androidReplacements( XMLValue ) {
  * @param {string} prefix Optional prefix to add to the name
  * @return {string} A unique name for this string
  */
-const getUniqueName = ( function() {
+const getUniqueName = ( function () {
 	const names = {};
 	const ANDROID_MAX_NAME_LENGTH = 100;
 	const HASH_LENGTH = 8;
@@ -160,13 +163,13 @@ if ( require.main === module ) {
 		fs.writeFileSync( destination, xmlOutput );
 	} else {
 		let inputData = '';
-		process.stdin.on( 'readable', function() {
+		process.stdin.on( 'readable', function () {
 			const chunk = this.read();
 			if ( chunk !== null ) {
 				inputData += chunk;
 			}
 		} );
-		process.stdin.on( 'end', function() {
+		process.stdin.on( 'end', function () {
 			process.stdout.write( po2Android( inputData ) );
 		} );
 	}

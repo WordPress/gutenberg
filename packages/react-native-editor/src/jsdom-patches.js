@@ -45,7 +45,7 @@ const { ATTRIBUTE_NODE, DOCUMENT_FRAGMENT_NODE } = Node;
  * paths that make use of functions in the Gutenberg (web) project, which has
  * expectation that this is implemented (as it is in the browser environment).
  */
-Node.prototype.contains = function( otherNode ) {
+Node.prototype.contains = function ( otherNode ) {
 	return (
 		this === otherNode ||
 		Array.prototype.some.call( this._childNodes, ( childNode ) => {
@@ -67,7 +67,7 @@ Node.prototype.contains = function( otherNode ) {
  * see: https://github.com/jsdom/jsdom/issues/717 for more information, * and:
  * https://dom.spec.whatwg.org/#dom-node-insertbefore for the latest spec.
  */
-Node.prototype.insertBefore = function(
+Node.prototype.insertBefore = function (
 	/* Node */ newChild,
 	/* Node*/ refChild
 ) {
@@ -164,7 +164,7 @@ Element.prototype.matches = Element.prototype.matchesSelector;
  * Implementation of Element.prototype.closest that it's missing from the jsdom-jscore fork we're using.
  * See https://github.com/wordpress-mobile/gutenberg-mobile/issues/1625
  */
-Element.prototype.closest = function( selector ) {
+Element.prototype.closest = function ( selector ) {
 	let el = this;
 	while ( el ) {
 		if ( el.matches( selector ) ) {

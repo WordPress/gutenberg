@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+/**
+ * External dependencies
+ */
 // eslint-disable-next-line import/no-extraneous-dependencies
 const gettextParser = require( 'gettext-parser' ),
 	fs = require( 'fs' );
@@ -40,13 +43,13 @@ if ( require.main === module ) {
 		fs.writeFileSync( destination, swiftOutput );
 	} else {
 		let inputData = '';
-		process.stdin.on( 'readable', function() {
+		process.stdin.on( 'readable', function () {
 			const chunk = this.read();
 			if ( chunk !== null ) {
 				inputData += chunk;
 			}
 		} );
-		process.stdin.on( 'end', function() {
+		process.stdin.on( 'end', function () {
 			process.stdout.write( po2Swift( inputData ) );
 		} );
 	}

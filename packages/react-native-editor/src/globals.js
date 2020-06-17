@@ -34,7 +34,7 @@ global.wp = {
 const doc = jsdom.html( '', null, null );
 
 // inject a simple version of the missing createHTMLDocument method that `hpq` depends on
-doc.implementation.createHTMLDocument = function( html ) {
+doc.implementation.createHTMLDocument = function ( html ) {
 	return jsdom.html( html, null, null );
 };
 
