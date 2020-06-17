@@ -29,40 +29,18 @@
 
 // TODO: create a new npm package with this transformer, or extend 'react-native-sass-transformer'
 
+/**
+ * External dependencies
+ */
 const fs = require( 'fs' );
+const path = require( 'path' );
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 const sass = require( 'node-sass' );
 // eslint-disable-next-line import/no-extraneous-dependencies
-const semver = require( 'semver' );
-// eslint-disable-next-line import/no-extraneous-dependencies
 const css2rn = require( 'css-to-react-native-transform' ).default;
-const path = require( 'path' );
 
-let upstreamTransformer = null;
-
-const reactNativeVersionString = require( 'react-native/package.json' ).version;
-const reactNativeMinorVersion = semver( reactNativeVersionString ).minor;
-
-if ( reactNativeMinorVersion >= 59 ) {
-	upstreamTransformer = require( 'metro-react-native-babel-transformer' );
-} else if ( reactNativeMinorVersion >= 56 ) {
-	upstreamTransformer = require( 'metro/src/reactNativeTransformer' );
-} else if ( reactNativeMinorVersion >= 52 ) {
-	upstreamTransformer = require( 'metro/src/transformer' );
-} else if ( reactNativeMinorVersion >= 47 ) {
-	upstreamTransformer = require( 'metro-bundler/src/transformer' );
-} else if ( reactNativeMinorVersion === 46 ) {
-	upstreamTransformer = require( 'metro-bundler/build/transformer' );
-} else {
-	// handle RN <= 0.45
-	const oldUpstreamTransformer = require( 'react-native/packager/transformer' );
-	upstreamTransformer = {
-		transform( { src, filename, options } ) {
-			return oldUpstreamTransformer.transform( src, filename, options );
-		},
-	};
-}
+const upstreamTransformer = require( 'metro-react-native-babel-transformer' );
 
 // TODO: need to find a way to pass the include paths and the default asset files via some config
 const autoImportIncludePaths = [
@@ -162,7 +140,7 @@ function transform( src, filename, options ) {
 	return upstreamTransformer.transform( { src, filename, options } );
 }
 
-module.exports.transform = function( { src, filename, options } ) {
+module.exports.transform = function ( { src, filename, options } ) {
 	if ( filename.endsWith( '.scss' ) || filename.endsWith( '.sass' ) ) {
 		// "auto-import" the stylesheets the GB webpack config imports
 		src = imports + src;
