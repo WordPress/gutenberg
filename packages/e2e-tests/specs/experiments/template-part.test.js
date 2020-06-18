@@ -45,7 +45,7 @@ describe( 'Template Part', () => {
 			await page.click(
 				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
 			);
-			const [ switchToHeaderTemplatePartButton ] = await page.$x(
+			const switchToHeaderTemplatePartButton = await page.waitForXPath(
 				'//button[contains(text(), "header")]'
 			);
 			await switchToHeaderTemplatePartButton.click();
