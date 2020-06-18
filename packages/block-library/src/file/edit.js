@@ -13,12 +13,13 @@ import { withSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	BlockIcon,
+	__unstableBlockToken as BlockToken,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	RichText,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 
 /**
@@ -49,13 +50,8 @@ class FileEdit extends Component {
 	}
 
 	componentDidMount() {
-		const {
-			attributes,
-			mediaUpload,
-			noticeOperations,
-			setAttributes,
-		} = this.props;
-		const { downloadButtonText, href } = attributes;
+		const { attributes, mediaUpload, noticeOperations } = this.props;
+		const { href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
 		if ( isBlobURL( href ) ) {
@@ -71,12 +67,6 @@ class FileEdit extends Component {
 			} );
 
 			revokeBlobURL( href );
-		}
-
-		if ( downloadButtonText === undefined ) {
-			setAttributes( {
-				downloadButtonText: _x( 'Download', 'button label' ),
-			} );
 		}
 	}
 
@@ -144,7 +134,6 @@ class FileEdit extends Component {
 			textLinkHref,
 			textLinkTarget,
 			showDownloadButton,
-			downloadButtonText,
 		} = attributes;
 		const { hasError, showCopyConfirmation } = this.state;
 		const attachmentPage = media && media.link;
@@ -219,20 +208,10 @@ class FileEdit extends Component {
 											'wp-block-file__button-richtext-wrapper'
 										}
 									>
-										{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
-										<RichText
-											tagName="div" // must be block-level or else cursor disappears
-											className={
-												'wp-block-file__button'
-											}
-											value={ downloadButtonText }
-											withoutInteractiveFormatting
-											placeholder={ __( 'Add text…' ) }
-											onChange={ ( text ) =>
-												setAttributes( {
-													downloadButtonText: text,
-												} )
-											}
+										<BlockToken
+											tagName="div"
+											className="wp-block-file__button"
+											initialValue="Download"
 										/>
 									</div>
 								) }

@@ -66,6 +66,7 @@ function gutenberg_reregister_core_block_types() {
 		'shortcode.php'       => 'core/shortcode',
 		'social-link.php'     => 'core/social-link',
 		'tag-cloud.php'       => 'core/tag-cloud',
+		'token.php'           => 'core/token',
 	);
 
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {

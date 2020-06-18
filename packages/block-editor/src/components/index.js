@@ -20,6 +20,7 @@ export { default as BlockNavigationDropdown } from './block-navigation/dropdown'
 export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } from './block-navigation/block-slot';
 export { default as __experimentalBlockNavigationEditor } from './block-navigation/editor';
 export { default as __experimentalBlockNavigationTree } from './block-navigation/tree';
+export { default as __unstableBlockToken } from './block-token';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export { default as ButtonBlockerAppender } from './button-block-appender';

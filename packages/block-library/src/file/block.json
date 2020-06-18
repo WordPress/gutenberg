@@ -28,11 +28,6 @@
 		"showDownloadButton": {
 			"type": "boolean",
 			"default": true
-		},
-		"downloadButtonText": {
-			"type": "string",
-			"source": "html",
-			"selector": "a[download]"
 		}
 	},
 	"supports": {

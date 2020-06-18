@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, InnerBlocks } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -10,7 +10,6 @@ export default function save( { attributes } ) {
 		textLinkHref,
 		textLinkTarget,
 		showDownloadButton,
-		downloadButtonText,
 	} = attributes;
 
 	return (
@@ -31,7 +30,7 @@ export default function save( { attributes } ) {
 						className="wp-block-file__button"
 						download={ true }
 					>
-						<RichText.Content value={ downloadButtonText } />
+						<InnerBlocks.Content />
 					</a>
 				) }
 			</div>
