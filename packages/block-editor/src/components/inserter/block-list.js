@@ -118,14 +118,15 @@ export function InserterBlockList( {
 	return (
 		<div>
 			{ hasChildItems && (
-				<ChildBlocks
-					rootClientId={ rootClientId }
-					// Pass along every block, as getInserterItems() will have
-					// already filtered out non-child blocks.
-					items={ filteredItems }
-					onSelect={ onSelectItem }
-					onHover={ onHover }
-				/>
+				<ChildBlocks rootClientId={ rootClientId }>
+					<BlockTypesList
+						// Pass along every block, as getInserterItems() will have
+						// already filtered out non-child blocks.
+						items={ filteredItems }
+						onSelect={ onSelectItem }
+						onHover={ onHover }
+					/>
+				</ChildBlocks>
 			) }
 
 			{ ! hasChildItems && !! suggestedItems.length && ! filterValue && (
