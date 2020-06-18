@@ -144,6 +144,7 @@ function QuickInserter( {
 		<div className="block-editor-inserter__quick-inserter">
 			{ showSearch && (
 				<InserterSearchForm
+					value={ filterValue }
 					onChange={ ( value ) => {
 						setFilterValue( value );
 					} }

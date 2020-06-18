@@ -3,10 +3,10 @@
  */
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { VisuallyHidden } from '@wordpress/components';
-import { Icon, search } from '@wordpress/icons';
+import { VisuallyHidden, Button } from '@wordpress/components';
+import { Icon, search, close } from '@wordpress/icons';
 
-function InserterSearchForm( { onChange } ) {
+function InserterSearchForm( { onChange, value } ) {
 	const instanceId = useInstanceId( InserterSearchForm );
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
@@ -29,11 +29,18 @@ function InserterSearchForm( { onChange } ) {
 				autoFocus
 				onChange={ ( event ) => onChange( event.target.value ) }
 				autoComplete="off"
+				value={ value || '' }
 			/>
-			<Icon
-				className="block-editor-inserter__search-icon"
-				icon={ search }
-			/>
+			<div className="block-editor-inserter__search-icon">
+				{ !! value && (
+					<Button
+						icon={ !! value ? close : search }
+						label={ value }
+						onClick={ () => onChange( '' ) }
+					/>
+				) }
+				{ ! value && <Icon icon={ search } /> }
+			</div>
 		</div>
 	);
 	/* eslint-enable jsx-a11y/no-autofocus */

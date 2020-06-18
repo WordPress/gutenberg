@@ -121,7 +121,10 @@ function InserterMenu( {
 			<div className="block-editor-inserter__main-area">
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
-					<InserterSearchForm onChange={ setFilterValue } />
+					<InserterSearchForm
+						onChange={ setFilterValue }
+						value={ filterValue }
+					/>
 					{ showPatterns && (
 						<InserterTabs>
 							{ ( tab ) => {

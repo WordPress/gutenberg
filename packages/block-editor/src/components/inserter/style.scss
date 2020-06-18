@@ -101,13 +101,27 @@ $block-inserter-tabs-height: 44px;
 		&::placeholder {
 			color: $dark-gray-400;
 		}
+
+		&::-webkit-search-decoration,
+		&::-webkit-search-cancel-button,
+		&::-webkit-search-results-button,
+		&::-webkit-search-results-decoration {
+			-webkit-appearance: none;
+		}
 	}
 }
 
 .block-editor-inserter__search-icon {
 	position: absolute;
-	top: $grid-unit-20 + ($grid-unit-60 - $icon-size) / 2;
-	right: $grid-unit-20 + ($grid-unit-60 - $icon-size) / 2;
+	top: 0;
+	right: $grid-unit-10 + ($grid-unit-60 - $icon-size) / 2;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+
+	> svg {
+		margin: $grid-unit-10;
+	}
 }
 
 .block-editor-inserter__tabs {
