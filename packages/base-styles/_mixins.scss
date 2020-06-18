@@ -441,13 +441,9 @@
 @mixin admin-scheme($color-primary) {
 	--wp-admin-theme-color: #{$color-primary};
 
-	// Ideally, we should limit these computed variables,
-	// because we can"t compute colors based on CSS variables.
-	// This requires refactoring some existing styles.
-	--wp-admin-theme-color-darker-20: #{darken($color-primary, 20%)};
-	--wp-admin-theme-color-darker-10: #{darken($color-primary, 10%)};
-	--wp-admin-theme-color-lighter-10: #{lighten($color-primary, 10%)};
-	--wp-admin-theme-color-lighter-40: #{lighten($color-primary, 40%)};
+	// Darker shades.
+	--wp-admin-theme-color-darker-10: #{darken($color-primary, 5%)};
+	--wp-admin-theme-color-darker-20: #{darken($color-primary, 10%)};
 }
 
 @mixin wordpress-admin-schemes() {
