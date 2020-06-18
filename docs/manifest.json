@@ -1022,7 +1022,7 @@
 	{
 		"title": "ResizeTooltip",
 		"slug": "resize-tooltip",
-		"markdown_source": "../packages/components/src/resize-tooltip/README.md",
+		"markdown_source": "../packages/components/src/resizable-box/resize-tooltip/README.md",
 		"parent": "components"
 	},
 	{
