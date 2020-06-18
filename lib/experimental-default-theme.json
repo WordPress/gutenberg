@@ -125,8 +125,8 @@
 			],
 			"padding": [
 				{ "slug": "small", "value": 4 },
-				{ "slug": "regular", "value": 14 },
-				{ "slug": "large", "value": 23 }
+				{ "slug": "regular", "value": 16 },
+				{ "slug": "large", "value": 32 }
 			]
 		},
 		"features": {

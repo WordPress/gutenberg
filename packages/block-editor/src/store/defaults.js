@@ -134,8 +134,8 @@ export const SETTINGS_DEFAULTS = {
 
 	padding: [
 		{ slug: 'small', name: __( 'Small' ), value: 4 },
-		{ slug: 'regular', name: __( 'Regular' ), value: 14 },
-		{ slug: 'large', name: __( 'Large' ), value: 23 },
+		{ slug: 'regular', name: __( 'Regular' ), value: 16 },
+		{ slug: 'large', name: __( 'Large' ), value: 32 },
 	],
 
 	// This is current max width of the block inner area
