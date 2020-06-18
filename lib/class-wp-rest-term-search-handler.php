@@ -115,7 +115,48 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 	 * @return array Links for the given item.
 	 */
 	public function prepare_item_links( $id ) {
-		return array();
+		$term = get_term( $id );
+
+		$links = array();
+
+		$item_route = $this->detect_rest_item_route( $term );
+		if ( ! empty( $item_route ) ) {
+			$links['self'] = array(
+				'href'       => rest_url( $item_route ),
+				'embeddable' => true,
+			);
+		}
+
+		$links['about'] = array(
+			'href' => rest_url( sprintf( 'wp/v2/taxonomies/%s', $term->taxonomy ) ),
+		);
+
+		return $links;
+	}
+
+	/**
+	 * Attempts to detect the route to access a single item.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param WP_Post $post Term object.
+	 * @return string REST route relative to the REST base URI, or empty string if unknown.
+	 */
+	protected function detect_rest_item_route( $term ) {
+		$taxonomy = get_taxonomy( $term->taxonomy );
+		if ( ! $taxonomy ) {
+			return '';
+		}
+
+		// It's currently impossible to detect the REST URL from a custom controller.
+		if ( ! empty( $taxonomy->rest_controller_class ) && 'WP_REST_Terms_Controller' !== $taxonomy->rest_controller_class ) {
+			return '';
+		}
+
+		$namespace = 'wp/v2';
+		$rest_base = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
+
+		return sprintf( '%s/%s/%d', $namespace, $rest_base, $term->term_id );
 	}
 
 }
