@@ -2,6 +2,7 @@
 ------
 * [**] Add support for customizing gradient type and angle in Buttons and Cover blocks.
 * [*] Show content information (block, word and characters counts).
+* [*] [Android] Fix handling of upload completion while re-opening the editor
 
 1.30.0
 ------
