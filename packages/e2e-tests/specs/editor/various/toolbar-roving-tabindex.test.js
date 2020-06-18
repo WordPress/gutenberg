@@ -84,4 +84,11 @@ describe( 'Toolbar roving tabindex', () => {
 		await wrapCurrentBlockWithGroup();
 		await testGroupKeyboardNavigation( 'Block: Image' );
 	} );
+
+	it( 'ensures custom html block toolbar uses roving tabindex', async () => {
+		await insertBlock( 'Custom HTML' );
+		await testBlockToolbarKeyboardNavigation( 'Block: Custom HTML' );
+		await wrapCurrentBlockWithGroup();
+		await testGroupKeyboardNavigation( 'Block: Custom HTML' );
+	} );
 } );
