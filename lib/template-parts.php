@@ -223,7 +223,17 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 				$template_part_files       = array_merge( $template_part_files, $child_template_part_files );
 			}
 			foreach ( $template_part_files as $template_part_file ) {
-				$template_part = parse_block( $template_part_file )[0];
+				$content = file_get_contents( $template_part_file );
+				// Infer slug from filepath.
+				$slug = substr(
+					$template_part_file,
+					// Starting position of slug.
+					strpos( $template_part_file, 'block-template-parts/' ) + 21,
+					// Subtract ending '.html'.
+					-5
+				);
+				$template_part_string = '<!-- wp:template-part {"slug":"' . $slug . '","theme":"' . $request['theme'] . '"} -->' . $content . '<!-- /wp:template-part -->';
+				$template_part        = parse_blocks( $template_part_string )[0];
 				create_auto_draft_for_template_part_block( $template_part );
 			}
 		};
