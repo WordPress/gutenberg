@@ -85,72 +85,80 @@ describe( 'Template Part', () => {
 		const testContent = 'some words...';
 
 		// Selectors
-		const chooseButtonSelector =
-			'//div[contains(@class,"is-selected")]//button[text()="Choose"]';
 		const entitiesSaveSelector =
 			'.editor-entities-saved-states__save-button';
 		const savePostSelector = '.editor-post-publish-button__button';
 		const templatePartSelector = '*[data-type="core/template-part"]';
 		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
-		const templatePartButtonSelector = `${ templatePartSelector } button`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
+		const createNewButtonSelector =
+			'//button[contains(text(), "Create new")]';
+		const disabledButtonSelector =
+			'.wp-block-template-part__placeholder-create-button[disabled]';
 
-		it( 'Should prompt to create when no match found', async () => {
+		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
+			const [ createNewButton ] = await page.$x(
+				createNewButtonSelector
+			);
+			await createNewButton.click();
+			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( testSlug );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( testTheme );
-			// Should say 'Create'
-			const placeholderButton = await page.$(
-				templatePartButtonSelector
-			);
-			const text = await page.evaluate(
-				( element ) => element.textContent,
-				placeholderButton
-			);
-			expect( text ).toBe( 'Create' );
-
-			// Finish creating template part, insert some text, and save.
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Enter' );
-			await page.waitForSelector( activatedTemplatePartSelector );
+
+			const newTemplatePart = await page.waitForSelector(
+				activatedTemplatePartSelector
+			);
+			expect( newTemplatePart ).toBeTruthy();
+
+			// Finish creating template part, insert some text, and save.
 			await page.click( templatePartSelector );
 			await page.keyboard.type( testContent );
 			await page.click( savePostSelector );
 			await page.click( entitiesSaveSelector );
 		} );
 
-		it( 'Should prompt to Choose when match found', async () => {
+		it( 'Should preview newly added template part', async () => {
 			await createNewPost();
-			await disablePrePublishChecks();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			await page.keyboard.type( testSlug );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testTheme );
-			// Should say 'Choose'
-			const placeholderButton = await page.waitForXPath(
-				chooseButtonSelector
-			);
-			expect( placeholderButton ).not.toBeNull();
-		} );
-
-		it( 'Should dispaly a preview when match is found', async () => {
-			const [ preview ] = await page.$x( testContentSelector );
+			const preview = await page.waitForXPath( testContentSelector );
 			expect( preview ).toBeTruthy();
 		} );
 
-		it( 'Should insert the desired template part', async () => {
-			const [ placeholderButton ] = await page.$x( chooseButtonSelector );
-			await placeholderButton.click();
+		it( 'Should insert template part when preview is selected', async () => {
+			const [ preview ] = await page.$x( testContentSelector );
+			await preview.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
 			const templatePartContent = await page.waitForXPath(
 				testContentSelector
 			);
 			expect( templatePartContent ).toBeTruthy();
+		} );
+
+		it( 'Should disable create button for slug/theme combo', async () => {
+			await createNewPost();
+			// Create new template part.
+			await insertBlock( 'Template Part' );
+			const [ createNewButton ] = await page.$x(
+				createNewButtonSelector
+			);
+			await createNewButton.click();
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( testSlug );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( testTheme );
+
+			const disabledButton = await page.waitForSelector(
+				disabledButtonSelector
+			);
+			expect( disabledButton ).toBeTruthy();
 		} );
 	} );
 } );

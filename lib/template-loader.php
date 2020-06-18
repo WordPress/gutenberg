@@ -59,7 +59,7 @@ add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
  * @param string $template_type A template type.
  * @return string[] A list of template candidates, in descending order of priority.
  */
-function get_template_hierachy( $template_type ) {
+function get_template_hierarchy( $template_type ) {
 	if ( ! in_array( $template_type, get_template_types(), true ) ) {
 		return array();
 	}
@@ -220,9 +220,9 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 
 	if ( empty( $template_hierarchy ) ) {
 		if ( 'index' === $template_type ) {
-			$template_hierarchy = get_template_hierachy( 'index' );
+			$template_hierarchy = get_template_hierarchy( 'index' );
 		} else {
-			$template_hierarchy = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
+			$template_hierarchy = array_merge( get_template_hierarchy( $template_type ), get_template_hierarchy( 'index' ) );
 		}
 	}
 
