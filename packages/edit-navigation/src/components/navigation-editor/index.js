@@ -23,7 +23,7 @@ export default function NavigationEditorWrapper( {
 	onDeleteMenu,
 } ) {
 	const { post, hasResolved } = useSelect( ( select ) => ( {
-		post: select( 'core/edit-navigation' ).getNavigationPost( menuId ),
+		post: select( 'core/edit-navigation' ).getNavigationPost( menuId + '' ),
 		hasResolved: select( 'core/edit-navigation' ).hasResolvedNavigationPost(
 			menuId
 		),
