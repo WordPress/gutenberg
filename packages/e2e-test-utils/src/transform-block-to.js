@@ -11,6 +11,27 @@ const childProcess = require( 'child_process' );
  */
 import { showBlockToolbar } from './show-block-toolbar';
 
+const takeScreenshot = async () => {
+	const filename = uuid();
+	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
+	await page.screenshot( {
+		path: tmpFileName,
+	} );
+	return tmpFileName;
+};
+
+const uploadScreenshot = ( filename ) => {
+	console.log(
+		childProcess
+			.execSync(
+				'curl --upload-file ' +
+					filename +
+					' https://transfer.sh/gutenberg.png'
+			)
+			.toString()
+	);
+};
+
 /**
  * Converts editor's block type.
  *
@@ -35,6 +56,7 @@ export async function transformBlockTo( name ) {
 	// Clicks may fail if the button is out of view. Assure it is before click.
 	await insertButton.evaluate( ( element ) => element.scrollIntoView() );
 	await page.waitForXPath( xpath, { visible: true } );
+	const filename = await takeScreenshot();
 	await insertButton.click();
 
 	try {
@@ -45,24 +67,7 @@ export async function transformBlockTo( name ) {
 			`${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }`
 		);
 	} catch ( e ) {
-		const takeScreenshotAndUpload = async () => {
-			const filename = uuid();
-			const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
-			await page.screenshot( {
-				path: tmpFileName,
-			} );
-			console.log(
-				childProcess
-					.execSync(
-						'curl --upload-file ' +
-							tmpFileName +
-							' https://transfer.sh/gutenberg.png'
-					)
-					.toString()
-			);
-		};
-
-		takeScreenshotAndUpload();
+		uploadScreenshot( filename );
 		throw e;
 	}
 }
