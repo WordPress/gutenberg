@@ -126,7 +126,7 @@ public class Gutenberg: NSObject {
         if let serverID = serverID {
             data["mediaServerId"] = serverID
         }
-        bridgeModule.sendEventIfNeeded(.mediaUpload, body: data)
+        sendEvent(.mediaUpload, body: data)
     }
 
     public func appendMedia(id: Int32, url: URL, type: MediaType) {
@@ -135,7 +135,7 @@ public class Gutenberg: NSObject {
             "mediaUrl" : url.absoluteString,
             "mediaType": type.rawValue,
         ]
-        bridgeModule.sendEventIfNeeded(.mediaAppend, body: data)
+        sendEvent(.mediaAppend, body: data)
     }
 
     public func setFocusOnTitle() {
