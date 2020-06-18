@@ -223,7 +223,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
 	 */
 	public function flip_image( $request ) {
-		$modifier = new Image_Editor_Flip( $request['direction'] );
+		$modifier = new Image_Editor_Flip( 'vertical' === $request['direction'], 'horizontal' === $request['direction'] );
 
 		return $this->editor->modify_image( $request['media_id'], array( $modifier ) );
 	}
@@ -258,7 +258,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$modifiers[] = new Image_Editor_Rotate( $request['rotate']['angle'] );
 		}
 		if ( $request['flip'] ) {
-			$modifiers[] = new Image_Editor_Flip( $request['flip']['direction'] );
+			$modifiers[] = new Image_Editor_Flip( $request['flip']['vertical'], $request['flip']['horizontal'] );
 		}
 		if ( $request['crop'] ) {
 			$modifiers[] = new Image_Editor_Crop( $request['crop']['x'], $request['crop']['y'], $request['crop']['width'], $request['crop']['height'] );
