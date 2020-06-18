@@ -120,8 +120,9 @@ export function InserterBlockList( {
 			{ hasChildItems && (
 				<ChildBlocks rootClientId={ rootClientId }>
 					<BlockTypesList
-						// Pass along every block, as getInserterItems() will have
-						// already filtered out non-child blocks.
+						// Pass along every block, as useBlockTypesState() and
+						// getInserterItems() will have already filtered out
+						// non-child blocks.
 						items={ filteredItems }
 						onSelect={ onSelectItem }
 						onHover={ onHover }
