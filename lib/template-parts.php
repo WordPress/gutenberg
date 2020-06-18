@@ -215,12 +215,15 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 
 		// Ensure auto-drafts of all theme supplied template parts are created.
 		if( $request['theme'] === get_current_theme() ) {
-			foreach ( get_template_types() as $template_type ) {
-				// Skip 'embed' for now because it is not a regular template type.
-				if ( in_array( $template_type, array( 'embed' ), true ) ) {
-					continue;
-				}
-				gutenberg_find_template_post_and_parts( $template_type );
+			$template_part_files = glob( get_stylesheet_directory() . '/block-template-parts/*.html' );
+			$template_part_files = is_array( $template_part_files ) ? $template_part_files : array();
+			if ( is_child_theme() ) {
+				$child_template_part_files = glob( get_template_directory() . '/block-template-parts/*.html' );
+				$child_template_part_files = is_array( $child_template_part_files ) ? $child_template_part_files : array();
+				$template_part_files       = array_merge( $template_part_files, $child_template_part_files );
+			}
+			foreach ( $template_part_files as $template_part ) {
+				create_auto_draft_for_template_part_block( $template_part );
 			}
 		};
 
