@@ -14,14 +14,11 @@ export function getDragCursor( dragDirection ) {
 
 	switch ( dragDirection ) {
 		case 'n':
-			dragCursor = 'ns-resize';
-			break;
-		case 'e':
-			dragCursor = 'ew-resize';
-			break;
 		case 's':
 			dragCursor = 'ns-resize';
 			break;
+
+		case 'e':
 		case 'w':
 			dragCursor = 'ew-resize';
 			break;
