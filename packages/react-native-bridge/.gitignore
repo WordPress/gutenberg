@@ -38,7 +38,6 @@ build/
 .gradle
 local.properties
 *.iml
-android/src/main/assets/
 
 # BUCK
 buck-out/
