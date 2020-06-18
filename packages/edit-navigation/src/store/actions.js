@@ -239,6 +239,12 @@ function serializeProcessing( callback ) {
 		}
 
 		yield {
+			type: 'POP_PENDING_ACTION',
+			postId,
+			action: callback,
+		};
+
+		yield {
 			type: 'START_PROCESSING_POST',
 			postId,
 		};

@@ -26,12 +26,21 @@ export function processingQueue( state, { type, postId, ...rest } ) {
 			return {
 				...state,
 				[ postId ]: {
+					...state[ postId ],
 					inProgress: false,
-					pendingActions:
-						state[ postId ]?.pendingActions?.filter(
-							( item ) => item !== rest.action
-						) || [],
 				},
+			};
+
+		case 'POP_PENDING_ACTION':
+			const postState = state[ postId ] || {};
+			if ( 'pendingActions' in postState ) {
+				postState.pendingActions = postState.pendingActions?.filter(
+					( item ) => item !== rest.action
+				);
+			}
+			return {
+				...state,
+				[ postId ]: postState,
 			};
 
 		case 'ENQUEUE_AFTER_PROCESSING':
