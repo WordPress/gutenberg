@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useRef, forwardRef } from '@wordpress/element';
-import { SelectionBox } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -89,11 +88,6 @@ function BlockList(
 				__experimentalPassedProps.className
 			) }
 		>
-			<SelectionBox
-				isVisible={ isMultiSelecting }
-				boundariesElement=".interface-interface-skeleton__content"
-				containerElement=".block-editor-block-list__layout"
-			/>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )

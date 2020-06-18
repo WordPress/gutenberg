@@ -38,6 +38,14 @@ function SelectionBox( {
 	}, [ boundariesElement ] );
 
 	useEffect( () => {
+		containerNodeRef.current = getBoundingElement( containerElement );
+	}, [ containerElement ] );
+
+	useEffect( () => {
+		setIsDrawing( isVisible );
+	}, [ isVisible ] );
+
+	useEffect( () => {
 		const handleOnMouseDown = ( event ) => {
 			const nextScrollTop = boundariesNodeRef.current?.scrollTop || 0;
 			const nextScrollLeft = boundariesNodeRef.current?.scrollLeft || 0;
@@ -47,11 +55,9 @@ function SelectionBox( {
 			const nextX = event.clientX + nextScrollLeft;
 			const nextY = event.clientY + nextScrollTop;
 
-			// console.log( scrollTop, event.clientY, offsetTop );
-
 			setPositionStart( {
-				x: nextX - offsetTop,
-				y: nextY - offsetLeft,
+				x: nextX - offsetLeft,
+				y: nextY - offsetTop,
 			} );
 
 			const nextPositionEnd = {
@@ -59,7 +65,7 @@ function SelectionBox( {
 				y: nextY,
 			};
 
-			setIsDrawing( true );
+			// setIsDrawing( true );
 			setPositionEnd( nextPositionEnd );
 			lastPositionEnd.current = nextPositionEnd;
 		};
@@ -74,8 +80,11 @@ function SelectionBox( {
 			const nextScrollTop = boundariesNodeRef.current?.scrollTop || 0;
 			const nextScrollLeft = boundariesNodeRef.current?.scrollLeft || 0;
 
-			const nextX = event.clientX + nextScrollLeft;
-			const nextY = event.clientY + nextScrollTop;
+			const offsetTop = containerNodeRef.current?.offsetTop || 0;
+			const offsetLeft = containerNodeRef.current?.offsetLeft || 0;
+
+			const nextX = event.clientX + nextScrollLeft - offsetLeft;
+			const nextY = event.clientY + nextScrollTop - offsetTop;
 
 			const nextPositionEnd = {
 				x: nextX,
@@ -98,8 +107,11 @@ function SelectionBox( {
 			const nextScrollTop = nextTop - prevTop;
 			const nextScrollLeft = nextLeft - prevLeft;
 
-			const nextX = x + nextScrollLeft;
-			const nextY = y + nextScrollTop;
+			const offsetTop = containerNodeRef.current?.offsetTop || 0;
+			const offsetLeft = containerNodeRef.current?.offsetLeft || 0;
+
+			const nextX = x + nextScrollLeft - offsetLeft;
+			const nextY = y + nextScrollTop - offsetTop;
 
 			const nextPositionEnd = {
 				x: nextX,
@@ -138,7 +150,7 @@ function SelectionBox( {
 				);
 			}
 		};
-	}, [ isDrawing ] );
+	}, [ isDrawing, isVisible ] );
 
 	if ( ! isVisible || ! isDrawing ) return null;
 
@@ -164,6 +176,7 @@ function SelectionBox( {
 		transform: `translate3d(${ box.left }px, ${ box.top }px, 0)`,
 		width: box.width,
 		willChange: 'width, height, transform',
+		zIndex: 99999,
 	};
 
 	return <div style={ style } />;

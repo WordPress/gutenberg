@@ -5,6 +5,7 @@ import {
 	PostTitle,
 	VisualEditorGlobalKeyboardShortcuts,
 } from '@wordpress/editor';
+
 import {
 	WritingFlow,
 	Typewriter,
@@ -16,7 +17,8 @@ import {
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+
+import { Popover, SelectionBox } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -29,6 +31,10 @@ function VisualEditor() {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
 
+	const hasMultiSelection = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).hasMultiSelection();
+	} );
+
 	const inlineStyles = useResizeCanvas( deviceType );
 
 	return (
@@ -36,6 +42,11 @@ function VisualEditor() {
 			className="edit-post-visual-editor editor-styles-wrapper"
 			style={ inlineStyles }
 		>
+			<SelectionBox
+				isVisible={ hasMultiSelection }
+				boundariesElement=".interface-interface-skeleton__content"
+				containerElement=".edit-post-visual-editor.editor-styles-wrapper"
+			/>
 			<VisualEditorGlobalKeyboardShortcuts />
 			<MultiSelectScrollIntoView />
 			<Popover.Slot name="block-toolbar" />
