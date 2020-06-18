@@ -78,8 +78,6 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
-jest.mock( 'react-native-recyclerview-list' );
-
 jest.mock( '@react-native-community/slider', () => () => 'Slider', {
 	virtual: true,
 } );
