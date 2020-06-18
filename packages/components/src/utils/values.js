@@ -28,14 +28,5 @@ export function isValueEmpty( value ) {
  * @return {any} A defined value or the fallback value.
  */
 export function getDefinedValue( values = [], fallbackValue ) {
-	let value;
-
-	for ( const val of values ) {
-		if ( isValueDefined( val ) ) {
-			value = val;
-			break;
-		}
-	}
-
-	return isValueDefined( value ) ? value : fallbackValue;
+	return values.find( isValueDefined ) ?? fallbackValue;
 }
