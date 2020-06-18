@@ -108,8 +108,10 @@ export default function useBlockSync( {
 	// waiting for React renders for changes.
 	const onInputRef = useRef( onInput );
 	const onChangeRef = useRef( onChange );
-	onInputRef.current = onInput;
-	onChangeRef.current = onChange;
+	useEffect( () => {
+		onInputRef.current = onInput;
+		onChangeRef.current = onChange;
+	}, [ onInput, onChange ] );
 
 	useEffect( () => {
 		const {
