@@ -130,22 +130,22 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 							'crop'   => array(
 								'type'       => 'object',
 								'properties' => array(
-									'x' => array(
+									'left' => array(
 										'type'     => 'integer',
 										'minimum'  => 0,
 										'required' => true,
 									),
-									'y' => array(
+									'top' => array(
 										'type'     => 'integer',
 										'minimum'  => 0,
 										'required' => true,
 									),
-									'w' => array(
+									'width' => array(
 										'type'     => 'integer',
 										'minimum'  => 1,
 										'required' => true,
 									),
-									'h' => array(
+									'height' => array(
 										'type'     => 'integer',
 										'minimum'  => 1,
 										'required' => true,
