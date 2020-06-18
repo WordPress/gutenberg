@@ -13,6 +13,9 @@ import { createRegistrySelector } from '@wordpress/data';
  */
 import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
 
+/**
+ * @see resolvers.js
+ */
 export const getNavigationPost = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
 		// When the record is unavailable, calling getEditedEntityRecord triggers a http
@@ -39,6 +42,13 @@ export const hasResolvedNavigationPost = createRegistrySelector(
 	}
 );
 
+/**
+ * Returns a menu item represented by the block with id clientId.
+ *
+ * @param {number} postId    Navigation post id
+ * @param {number} clientId  Block clientId
+ * @return {Object|null} Menu item entity
+ */
 export const getMenuItemForClientId = createRegistrySelector(
 	( select ) => ( state, postId, clientId ) => {
 		const mapping = invert( state.mapping[ postId ] );

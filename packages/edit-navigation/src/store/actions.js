@@ -23,8 +23,13 @@ import {
 } from './controls';
 import { menuItemsQuery } from './utils';
 
-// Hits POST /wp/v2/menu-items once for every Link block that doesn't have an
-// associated menu item. (IDK what a good name for this is.)
+/**
+ * Creates a menu item for every block that doesn't have an associated menuItem.
+ * Requests POST /wp/v2/menu-items once for every menu item created.
+ *
+ * @param {Object} post A navigation post to process
+ * @return {Function} An action creator
+ */
 export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 	const menuId = post.meta.menuId;
 
@@ -70,6 +75,12 @@ export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 	};
 } );
 
+/**
+ * Converts all the blocks into menu items and submits a batch request to save everything at once.
+ *
+ * @param {Object} post A navigation post to process
+ * @return {Function} An action creator
+ */
 export const saveNavigationPost = serializeProcessing( function* ( post ) {
 	const menuId = post.meta.menuId;
 	const menuItemsByClientId = mapMenuItemsByClientId(
@@ -203,6 +214,16 @@ function computeCustomizedAttribute( blocks, menuId, menuItemsByClientId ) {
 	}
 }
 
+/**
+ * This wrapper guarantees serial execution of data processing actions.
+ *
+ * Examples:
+ * * saveNavigationPost() needs to wait for all the missing items to be created.
+ * * Concurrent createMissingMenuItems() could result in sending more requests than required.
+ *
+ * @param {Function} callback An action creator to wrap
+ * @return {Function} Original callback wrapped in a serial execution context
+ */
 function serializeProcessing( callback ) {
 	return function* ( post ) {
 		const postId = post.id;

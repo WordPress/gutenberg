@@ -14,6 +14,16 @@ import { createBlock } from '@wordpress/blocks';
 import { resolveMenuItems, dispatch } from './controls';
 import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
 
+/**
+ * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
+ * post is meant as a convenient to only exists in runtime and should never be saved. It
+ * enables a convenient way of editing the navigation by using a regular post editor.
+ *
+ * Fetches all menu items, converts them into blocks, and hydrates a new post with them.
+ *
+ * @param {number} menuId The id of menu to create a post from
+ * @return {void}
+ */
 export function* getNavigationPost( menuId ) {
 	const stubPost = createStubPost( menuId );
 	// Persist an empty post to warm up the state
@@ -41,17 +51,6 @@ export function* getNavigationPost( menuId ) {
 	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
 }
 
-const persistPost = ( post ) =>
-	dispatch(
-		'core',
-		'receiveEntityRecords',
-		KIND,
-		POST_TYPE,
-		post,
-		{ id: post.id },
-		false
-	);
-
 const createStubPost = ( menuId, navigationBlock ) => {
 	const id = buildNavigationPostId( menuId );
 	return {
@@ -66,6 +65,23 @@ const createStubPost = ( menuId, navigationBlock ) => {
 	};
 };
 
+const persistPost = ( post ) =>
+	dispatch(
+		'core',
+		'receiveEntityRecords',
+		KIND,
+		POST_TYPE,
+		post,
+		{ id: post.id },
+		false
+	);
+
+/**
+ * Converts an adjacency list of menuItems into a navigation block.
+ *
+ * @param {Array} menuItems a list of menu items
+ * @return {Object} Navigation block
+ */
 function createNavigationBlock( menuItems ) {
 	const itemsByParentID = groupBy( menuItems, 'parent' );
 	const menuItemIdToClientId = {};
