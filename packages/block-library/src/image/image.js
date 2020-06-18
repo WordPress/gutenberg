@@ -15,6 +15,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarGroup,
+	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -99,6 +100,7 @@ export default function Image( {
 	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
+	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const imageSizeOptions = map(
@@ -175,10 +177,16 @@ export default function Image( {
 		} );
 	}
 
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingImage( false );
+		}
+	}, [ isSelected ] );
+
 	const controls = (
 		<>
 			<BlockControls>
-				{ url && (
+				{ ! isEditingImage && (
 					<ToolbarGroup>
 						<ImageURLInputUI
 							url={ href || '' }
@@ -192,6 +200,15 @@ export default function Image( {
 						/>
 					</ToolbarGroup>
 				) }
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={ () =>
+							setIsEditingImage( ( value ) => ! value )
+						}
+					>
+						{ isEditingImage ? __( 'Cancel' ) : __( 'Edit' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
@@ -267,7 +284,6 @@ export default function Image( {
 		// should direct focus to block.
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		<>
-			{ controls }
 			<img
 				src={ url }
 				alt={ defaultedAlt }
@@ -299,7 +315,21 @@ export default function Image( {
 			: naturalHeight;
 	}
 
-	if ( ! isResizable || ! imageWidthWithinContainer ) {
+	if ( __experimentalEnableRichImageEditing && isEditingImage ) {
+		img = (
+			<ImageEditor
+				id={ id }
+				url={ url }
+				setAttributes={ setAttributes }
+				naturalWidth={ naturalWidth }
+				naturalHeight={ naturalHeight }
+				width={ width }
+				height={ height }
+				clientWidth={ clientWidth }
+				setIsEditingImage={ setIsEditingImage }
+			/>
+		);
+	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
 		img = <div style={ { width, height } }>{ img }</div>;
 	} else {
 		const currentWidth = width || imageWidthWithinContainer;
@@ -380,26 +410,9 @@ export default function Image( {
 		);
 	}
 
-	if ( __experimentalEnableRichImageEditing ) {
-		img = (
-			<ImageEditor
-				id={ id }
-				url={ url }
-				setAttributes={ setAttributes }
-				isSelected={ isSelected }
-				naturalWidth={ naturalWidth }
-				naturalHeight={ naturalHeight }
-				width={ width }
-				height={ height }
-				clientWidth={ clientWidth }
-			>
-				{ img }
-			</ImageEditor>
-		);
-	}
-
 	return (
 		<>
+			{ controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
