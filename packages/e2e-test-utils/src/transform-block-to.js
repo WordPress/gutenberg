@@ -19,6 +19,9 @@ export async function transformBlockTo( name ) {
 		visible: true,
 	} );
 	await switcherToggle.click();
+	await page.waitForSelector( '.block-editor-block-switcher__container', {
+		visible: true,
+	} );
 
 	// Find the block button option within the switcher popover.
 	const xpath = `//*[contains(@class, "block-editor-block-switcher__popover")]//button[.='${ name }']`;
