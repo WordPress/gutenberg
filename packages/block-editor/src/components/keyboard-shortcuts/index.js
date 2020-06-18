@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last } from 'lodash';
+import { first, last, castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -12,15 +12,25 @@ import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
 	// Shortcuts Logic
-	const { clientIds, rootBlocksClientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds, getBlockOrder } = select(
-			'core/block-editor'
-		);
-		return {
-			clientIds: getSelectedBlockClientIds(),
-			rootBlocksClientIds: getBlockOrder(),
-		};
-	}, [] );
+	const { clientIds, rootBlocksClientIds, rootClientId } = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientIds,
+				getBlockOrder,
+				getBlockRootClientId,
+			} = select( 'core/block-editor' );
+			const selectedClientIds = getSelectedBlockClientIds();
+			const normalizedClientIds = castArray( selectedClientIds );
+			const [ firstClientId ] = normalizedClientIds;
+			// todo have to check logic and mover/button to reuse...
+			return {
+				clientIds: selectedClientIds,
+				rootBlocksClientIds: getBlockOrder(),
+				rootClientId: getBlockRootClientId( firstClientId ),
+			};
+		},
+		[]
+	);
 
 	const {
 		duplicateBlocks,
@@ -29,7 +39,39 @@ function KeyboardShortcuts() {
 		insertBeforeBlock,
 		multiSelect,
 		clearSelectedBlock,
+		moveBlocksUp,
+		moveBlocksDown,
 	} = useDispatch( 'core/block-editor' );
+
+	// todo jsdoc
+	// todo tests
+	// todo have to check block-mover/button.js for logic (ex disabled...)
+	useShortcut(
+		'core/block-editor/move-up',
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				moveBlocksUp( clientIds, rootClientId );
+			},
+			[ clientIds, duplicateBlocks ]
+		),
+		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
+	);
+
+	// todo jsdoc
+	// todo tests
+	// todo have to check block-mover/button.js for logic (ex disabled...)
+	useShortcut(
+		'core/block-editor/move-down',
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				moveBlocksDown( clientIds, rootClientId );
+			},
+			[ clientIds, duplicateBlocks ]
+		),
+		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
+	);
 
 	// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
 	// Prevents reposition Chrome devtools pane shortcut when devtools are open.
@@ -218,6 +260,26 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'alt',
 				character: 'F10',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/move-up',
+			category: 'block',
+			description: __( 'Move block Up.' ),
+			keyCombination: {
+				modifier: 'alt', // todo change these...
+				character: 'q',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/move-down',
+			category: 'block',
+			description: __( 'Move block Down.' ),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'w',
 			},
 		} );
 	}, [ registerShortcut ] );
