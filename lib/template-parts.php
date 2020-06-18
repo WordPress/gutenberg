@@ -214,7 +214,7 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 		);
 
 		// Ensure auto-drafts of all theme supplied template parts are created.
-		if( $request['theme'] === get_current_theme() ) {
+		if ( wp_get_theme() === $request['theme'] ) {
 			$template_part_files = glob( get_stylesheet_directory() . '/block-template-parts/*.html' );
 			$template_part_files = is_array( $template_part_files ) ? $template_part_files : array();
 			if ( is_child_theme() ) {
@@ -222,7 +222,8 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 				$child_template_part_files = is_array( $child_template_part_files ) ? $child_template_part_files : array();
 				$template_part_files       = array_merge( $template_part_files, $child_template_part_files );
 			}
-			foreach ( $template_part_files as $template_part ) {
+			foreach ( $template_part_files as $template_part_file ) {
+				$template_part = parse_block( $template_part_file )[0];
 				create_auto_draft_for_template_part_block( $template_part );
 			}
 		};
