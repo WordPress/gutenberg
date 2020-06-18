@@ -185,17 +185,6 @@ export class BlockSwitcher extends Component {
 									<div className="block-editor-block-switcher__container">
 										{ hoveredClassName !== null &&
 											PreviewBlockPopover }
-										{ hasPossibleBlockTransformations && (
-											<BlockTransformationsMenu
-												possibleBlockTransformations={
-													possibleBlockTransformations
-												}
-												onSelect={ ( name ) => {
-													onTransform( blocks, name );
-													onClose();
-												} }
-											/>
-										) }
 										{ hasBlockStyles && (
 											<MenuGroup>
 												<div className="block-editor-block-switcher__label">
@@ -212,6 +201,17 @@ export class BlockSwitcher extends Component {
 													role="menuitem"
 												/>
 											</MenuGroup>
+										) }
+										{ hasPossibleBlockTransformations && (
+											<BlockTransformationsMenu
+												possibleBlockTransformations={
+													possibleBlockTransformations
+												}
+												onSelect={ ( name ) => {
+													onTransform( blocks, name );
+													onClose();
+												} }
+											/>
 										) }
 									</div>
 								)
