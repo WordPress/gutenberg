@@ -186,7 +186,7 @@ export class BlockSwitcher extends Component {
 										{ hoveredClassName !== null &&
 											PreviewBlockPopover }
 										{ hasBlockStyles && (
-											<MenuGroup>
+											<MenuGroup label={ __( 'Styles' ) }>
 												<div className="block-editor-block-switcher__label">
 													{ __( 'Styles' ) }
 												</div>

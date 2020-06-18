@@ -9,7 +9,7 @@ const BlockTransformationsMenu = ( {
 	onSelect,
 } ) => {
 	return (
-		<MenuGroup>
+		<MenuGroup label={ __( 'Transform to' ) }>
 			<div className="block-editor-block-switcher__label">
 				{ __( 'Transform to' ) }
 			</div>
