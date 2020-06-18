@@ -43,7 +43,7 @@ import { withSelect } from '@wordpress/data';
 import {
 	external,
 	link,
-	image as icon,
+	image as placeholderIcon,
 	textColor,
 	replace,
 } from '@wordpress/icons';
@@ -310,7 +310,7 @@ export class ImageEdit extends React.Component {
 	getPlaceholderIcon() {
 		return (
 			<Icon
-				icon={ icon }
+				icon={ placeholderIcon }
 				{ ...this.props.getStylesFromColorScheme(
 					styles.iconPlaceholder,
 					styles.iconPlaceholderDark
@@ -480,7 +480,7 @@ export class ImageEdit extends React.Component {
 				<BlockCaption
 					clientId={ this.props.clientId }
 					isSelected={ this.state.isCaptionSelected }
-					accessible={ true }
+					accessible
 					accessibilityLabelCreator={ this.accessibilityLabelCreator }
 					onFocus={ this.onFocusCaption }
 					onBlur={ this.props.onBlur } // always assign onBlur as props

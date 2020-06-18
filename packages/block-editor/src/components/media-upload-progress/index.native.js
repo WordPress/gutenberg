@@ -116,7 +116,7 @@ export class MediaUploadProgress extends React.Component {
 	}
 
 	render() {
-		const { renderContent = () => {} } = this.props;
+		const { renderContent = () => null } = this.props;
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
