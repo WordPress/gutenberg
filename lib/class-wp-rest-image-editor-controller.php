@@ -29,7 +29,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 */
 	public function __construct() {
 		$this->namespace = '__experimental';
-		$this->rest_base = '/richimage/(?P<media_id>[\d]+)';
+		$this->rest_base = '/image-editor/(?P<media_id>[\d]+)';
 		$this->editor    = new Image_Editor();
 	}
 
@@ -119,7 +119,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			$this->rest_base . '/apply',
+			$this->rest_base,
 			array(
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,

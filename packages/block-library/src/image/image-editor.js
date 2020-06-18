@@ -48,7 +48,7 @@ const POPOVER_PROPS = { position: 'bottom right' };
 
 function richImageRequest( id, attrs ) {
 	return apiFetch( {
-		path: `__experimental/richimage/${ id }/apply`,
+		path: `__experimental/image-editor/${ id }`,
 		headers: {
 			'Content-type': 'application/json',
 		},
