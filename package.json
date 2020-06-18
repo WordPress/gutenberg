@@ -238,6 +238,7 @@
 		"publish:patch": "npm run clean:package-types && npm run build:packages && lerna publish --dist-tag patch",
 		"publish:prod": "npm run clean:package-types && npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
+		"test:create-block": "./bin/test-create-block.sh",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test-e2e:debug": "wp-scripts --inspect-brk test-e2e --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
