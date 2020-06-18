@@ -61,7 +61,7 @@ export default function MenuEditor( {
 					initialOpen={ isLargeViewport }
 				/>
 				<BlockEditorArea
-					saveBlocks={ eventuallySaveMenuItems }
+					saveBlocks={ saveMenuItems }
 					menuId={ menuId }
 					onDeleteMenu={ onDeleteMenu }
 				/>

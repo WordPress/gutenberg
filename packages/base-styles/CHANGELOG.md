@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## Breaking Changes
+
+- Remove the AdminColorThemes JavaScript variables.
+
 ## 1.2.0 (2020-01-13)
 
 ### Bug Fix

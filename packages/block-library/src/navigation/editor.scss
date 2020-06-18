@@ -145,3 +145,14 @@ $color-control-label-height: 20px;
 	display: flex;
 	flex-direction: column;
 }
+
+// Dark style appender.
+.wp-block-navigation.is-style-dark {
+	.block-editor-button-block-appender.block-list-appender__toggle {
+		color: #fff;
+	}
+	.block-editor-button-block-appender.block-list-appender__toggle > svg {
+		color: #000;
+		background-color: #fff;
+	}
+}

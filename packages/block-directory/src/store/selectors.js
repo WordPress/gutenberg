@@ -1,4 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { createRegistrySelector } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import hasBlockType from './utils/has-block-type';
+
+/**
  * Returns true if application is requesting for downloadable blocks.
  *
  * @param {Object} state Global application state.
@@ -45,6 +55,54 @@ export function hasInstallBlocksPermission( state ) {
 export function getInstalledBlockTypes( state ) {
 	return state.blockManagement.installedBlockTypes;
 }
+
+/**
+ * Returns block types that have been installed on the server and used in the
+ * current post.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} Block type items.
+ */
+export const getNewBlockTypes = createRegistrySelector(
+	( select ) => ( state ) => {
+		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
+		const installedBlockTypes = getInstalledBlockTypes( state );
+
+		const newBlockTypes = [];
+		installedBlockTypes.forEach( ( blockType ) => {
+			if ( hasBlockType( blockType, usedBlockTree ) ) {
+				newBlockTypes.push( blockType );
+			}
+		} );
+
+		return newBlockTypes;
+	}
+);
+
+/**
+ * Returns the block types that have been installed on the server but are not
+ * used in the current post.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} Block type items.
+ */
+export const getUnusedBlockTypes = createRegistrySelector(
+	( select ) => ( state ) => {
+		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
+		const installedBlockTypes = getInstalledBlockTypes( state );
+
+		const newBlockTypes = [];
+		installedBlockTypes.forEach( ( blockType ) => {
+			if ( ! hasBlockType( blockType, usedBlockTree ) ) {
+				newBlockTypes.push( blockType );
+			}
+		} );
+
+		return newBlockTypes;
+	}
+);
 
 /**
  * Returns true if application is calling install endpoint.
