@@ -213,7 +213,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function rotate_image( $request ) {
 		$modifier = new Image_Editor_Rotate( $request['angle'] );
 
-		return $this->editor->modify_image( $request['media_id'], $modifier );
+		return $this->editor->modify_image( $request['media_id'], array( $modifier ) );
 	}
 
 	/**
@@ -228,7 +228,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function flip_image( $request ) {
 		$modifier = new Image_Editor_Flip( $request['direction'] );
 
-		return $this->editor->modify_image( $request['media_id'], $modifier );
+		return $this->editor->modify_image( $request['media_id'], array( $modifier ) );
 	}
 
 	/**
@@ -243,7 +243,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function crop_image( $request ) {
 		$modifier = new Image_Editor_Crop( $request['crop_x'], $request['crop_y'], $request['crop_width'], $request['crop_height'] );
 
-		return $this->editor->modify_image( $request['media_id'], $modifier );
+		return $this->editor->modify_image( $request['media_id'], array( $modifier ) );
 	}
 
 	/**
@@ -256,90 +256,16 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
 	 */
 	public function apply_edits( $request ) {
-		require_once ABSPATH . 'wp-admin/includes/image.php';
-
-		$params = $request->get_params();
-
-		$media_id = $params['media_id'];
-
-		// Get image information.
-		$attachment_info = wp_get_attachment_metadata( $media_id );
-		$media_url       = wp_get_attachment_image_url( $media_id, 'original' );
-
-		if ( ! $attachment_info || ! $media_url ) {
-			return new WP_Error( 'unknown', 'Unable to get meta information for file' );
+		$modifiers = array();
+		if ( $request['rotate'] ) {
+			$modifiers[] = new Image_Editor_Rotate( $request['rotate']['angle'] );
 		}
-
-		$meta = array( 'original_name' => basename( $media_url ) );
-
-		if ( isset( $attachment_info['richimage'] ) ) {
-			$meta = array_merge( $meta, $attachment_info['richimage'] );
+		if ( $request['flip'] ) {
+			$modifiers[] = new Image_Editor_Flip( $request['flip']['direction'] );
 		}
-
-		// Try and load the image itself.
-		$image_path = get_attached_file( $media_id );
-		if ( empty( $image_path ) ) {
-			return new WP_Error( 'fileunknown', 'Unable to find original media file' );
+		if ( $request['crop'] ) {
+			$modifiers[] = new Image_Editor_Crop( $request['crop']['x'], $request['crop']['y'], $request['crop']['width'], $request['crop']['height'] );
 		}
-
-		$image_editor = wp_get_image_editor( $image_path );
-		if ( ! $image_editor->load() ) {
-			return new WP_Error( 'fileload', 'Unable to load original media file' );
-		}
-
-		// Finally apply the modifications.
-		if ( isset( $params['crop'] ) ) {
-			$image_editor->crop(
-				$params['crop']['x'],
-				$params['crop']['y'],
-				$params['crop']['w'],
-				$params['crop']['h']
-			);
-		}
-		if ( isset( $params['rotate'] ) ) {
-			$image_editor->rotate( $params['rotate']['angle'] );
-		}
-		if ( isset( $params['flip'] ) ) {
-			$image_editor->flip( $params['flip']['horizontal'], $params['flip']['vertical'] );
-		}
-
-		// TODO: Generate filename based on edits.
-		$target_file = 'edited-' . $meta['original_name'];
-
-		$filename = rtrim( dirname( $image_path ), '/' ) . '/' . $target_file;
-
-		// Save to disk.
-		$saved = $image_editor->save( $filename );
-
-		if ( is_wp_error( $saved ) ) {
-			return $saved;
-		}
-
-		// Update attachment details.
-		$attachment_post = array(
-			'guid'           => $saved['path'],
-			'post_mime_type' => $saved['mime-type'],
-			'post_title'     => pathinfo( $target_file, PATHINFO_FILENAME ),
-			'post_content'   => '',
-			'post_status'    => 'inherit',
-		);
-
-		// Add this as an attachment.
-		$attachment_id = wp_insert_attachment( $attachment_post, $saved['path'], 0 );
-		if ( 0 === $attachment_id ) {
-			return new WP_Error( 'attachment', 'Unable to add image as attachment' );
-		}
-
-		// Generate thumbnails.
-		$metadata = wp_generate_attachment_metadata( $attachment_id, $saved['path'] );
-
-		$metadata['richimage'] = $meta;
-
-		wp_update_attachment_metadata( $attachment_id, $metadata );
-
-		return array(
-			'media_id' => $attachment_id,
-			'url'      => wp_get_attachment_image_url( $attachment_id, 'original' ),
-		);
+		return $this->editor->modify_image( $request['media_id'], $modifiers );
 	}
 }

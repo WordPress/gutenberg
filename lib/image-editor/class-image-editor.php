@@ -44,19 +44,33 @@ class Image_Editor {
 	/**
 	 * Modifies an image.
 	 *
-	 * @param integer               $media_id Media id.
-	 * @param Image_Editor_Modifier $modifier Modifier to apply to the image.
+	 * @param integer $media_id Media id.
+	 * @param array   $modifiers Modifier to apply to the image.
 	 * @return array|WP_Error If successful image JSON containing the media_id and url of modified image, otherwise WP_Error.
 	 */
-	public function modify_image( $media_id, $modifier ) {
+	public function modify_image( $media_id, $modifiers ) {
 		// Get image information.
 		$info = $this->load_image_info( $media_id );
 		if ( is_wp_error( $info ) ) {
 			return $info;
 		}
 
-		// Update it with our modifier.
-		$info['meta'] = $modifier->apply_to_meta( $info['meta'] );
+		// Try and load the image itself.
+		$image = $this->load_image( $media_id, $info );
+		if ( is_wp_error( $image ) ) {
+			return $image;
+		}
+
+		foreach ( $modifiers as $modifier ) {
+			// Update it with our modifier.
+			$info['meta'] = $modifier->apply_to_meta( $info['meta'] );
+
+			// Finally apply the modification.
+			$modified = $modifier->apply_to_image( $image['editor'] );
+			if ( is_wp_error( $modified ) ) {
+				return $modified;
+			}
+		}
 
 		// Generate filename based on current attributes.
 		$target_file = $this->get_filename( $info['meta'] );
@@ -66,18 +80,6 @@ class Image_Editor {
 		if ( $image ) {
 			// Return the existing image.
 			return $image;
-		}
-
-		// Try and load the image itself.
-		$image = $this->load_image( $media_id, $info );
-		if ( is_wp_error( $image ) ) {
-			return $image;
-		}
-
-		// Finally apply the modification.
-		$modified = $modifier->apply_to_image( $image['editor'] );
-		if ( is_wp_error( $modified ) ) {
-			return $modified;
 		}
 
 		// And save.
