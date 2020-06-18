@@ -80,6 +80,7 @@ describe( 'Heading', () => {
 		);
 
 		await customTextColorButton.click();
+		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '#7700ff' );
