@@ -120,5 +120,5 @@ def reactNativeVersion() {
 
     def packageFile = new File("$projectDir/../../../package.json")
     def packageContent = new groovy.json.JsonSlurper().parseText(packageFile.text)
-    return packageContent['dependencies']['react-native']
+    return packageContent['devDependencies']['react-native']
 }
