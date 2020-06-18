@@ -8,12 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	ResizableBox,
-	ResizeTooltip,
-	RangeControl,
-} from '@wordpress/components';
+import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -77,13 +72,13 @@ const SpacerEdit = ( {
 				onResizeStart={ handleOnResizeStart }
 				onResizeStop={ handleOnResizeStop }
 				showHandle={ isSelected }
-			>
-				<ResizeTooltip
-					axis="y"
-					isVisible={ isResizing }
-					position="bottom"
-				/>
-			</ResizableBox>
+				__experimentalShowTooltip={ true }
+				__experimentalTooltipProps={ {
+					axis: 'y',
+					position: 'bottom',
+					isVisible: isResizing,
+				} }
+			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
 					<RangeControl

@@ -7,7 +7,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { POSITIONS } from './utils';
-import { useRTL } from '../utils/style-mixins';
+import { useRTL } from '../../utils/style-mixins';
 import {
 	TooltipWrapper,
 	Tooltip,

@@ -40,7 +40,7 @@ export function useResizeLabel( {
 	axis,
 	fadeTimeout = 180,
 	onResize = noop,
-	position = POSITIONS.corner,
+	position = POSITIONS.bottom,
 	showPx = false,
 } ) {
 	/*
@@ -175,7 +175,7 @@ function getSizeLabel( {
 	height,
 	moveX = false,
 	moveY = false,
-	position = POSITIONS.corner,
+	position = POSITIONS.bottom,
 	showPx = false,
 	width,
 } ) {

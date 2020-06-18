@@ -5,8 +5,6 @@ ResizeTooltip displays the dimensions of an element whenever the width or height
 ## Usage
 
 ```jsx
-import { ResizeTooltip } from '@wordpress/components';
-
 const Example = () => {
 	return (
 		<div style={ { position: 'relative' } }>
@@ -23,16 +21,16 @@ Be sure that the parent element containing `<ResizeTooltip />` has the `position
 
 `<ResizeTooltip />` has three positions;
 
--   `bottom`
--   `corner` (Default)
+-   `bottom` (Default)
+-   `corner`
 
 ##### `bottom`
 
-The `bottom` position renders the dimensions label at the bottom-center of the (parent) element.
+The `bottom` position (default) renders the dimensions label at the bottom-center of the (parent) element.
 
 ##### `corner`
 
-The `corner` position (default) renders the dimensions label in the top-right corner of the (parent) element.
+The `corner` position renders the dimensions label in the top-right corner of the (parent) element.
 
 ## Props
 

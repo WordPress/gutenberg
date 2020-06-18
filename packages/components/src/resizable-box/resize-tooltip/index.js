@@ -24,7 +24,7 @@ function ResizeTooltip(
 		isVisible = true,
 		labelRef,
 		onResize = noop,
-		position = POSITIONS.corner,
+		position = POSITIONS.bottom,
 		showPx = true,
 		zIndex = 1000,
 		...props
