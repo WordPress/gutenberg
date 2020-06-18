@@ -784,6 +784,7 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
+						linkTextColor: defaultTextDecorationColor,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
@@ -809,7 +810,6 @@ export class RichText extends Component {
 						( parentBlockStyles && parentBlockStyles.color ) ||
 						defaultColor
 					}
-					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={
