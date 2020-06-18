@@ -1,14 +1,10 @@
 /**
- * External dependencies
- */
-import memoize from 'memize';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { textColor } from '@wordpress/icons';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,7 +27,10 @@ function getSelectValueFromFontSize( fontSizes, value ) {
 	return DEFAULT_FONT_SIZE;
 }
 
-const getSelectOptions = memoize( ( optionsArray, disableCustomFontSizes ) => {
+function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+	if ( disableCustomFontSizes && ! optionsArray.length ) {
+		return null;
+	}
 	optionsArray = [
 		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
 		...optionsArray,
@@ -44,7 +43,7 @@ const getSelectOptions = memoize( ( optionsArray, disableCustomFontSizes ) => {
 		name: option.name,
 		style: { fontSize: option.size },
 	} ) );
-} );
+}
 
 export default function FontSizePicker( {
 	fallbackFontSize,
@@ -56,11 +55,14 @@ export default function FontSizePicker( {
 } ) {
 	const instanceId = useInstanceId( FontSizePicker );
 
-	if ( disableCustomFontSizes && ! fontSizes.length ) {
+	const options = useMemo(
+		() => getSelectOptions( fontSizes, disableCustomFontSizes ),
+		[ fontSizes, disableCustomFontSizes ]
+	);
+
+	if ( ! options ) {
 		return null;
 	}
-
-	const options = getSelectOptions( fontSizes, disableCustomFontSizes );
 
 	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
 
