@@ -107,8 +107,8 @@ class WP_Block {
 
 		$this->available_context = $available_context;
 
-		if ( ! empty( $this->block_type->context ) ) {
-			foreach ( $this->block_type->context as $context_name ) {
+		if ( ! empty( $this->block_type->uses_context ) ) {
+			foreach ( $this->block_type->uses_context as $context_name ) {
 				if ( array_key_exists( $context_name, $this->available_context ) ) {
 					$this->context[ $context_name ] = $this->available_context[ $context_name ];
 				}
@@ -118,15 +118,13 @@ class WP_Block {
 		if ( ! empty( $block['innerBlocks'] ) ) {
 			$child_context = $this->available_context;
 
-			/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
-			if ( ! empty( $this->block_type->providesContext ) ) {
-				foreach ( $this->block_type->providesContext as $context_name => $attribute_name ) {
+			if ( ! empty( $this->block_type->provides_context ) ) {
+				foreach ( $this->block_type->provides_context as $context_name => $attribute_name ) {
 					if ( array_key_exists( $attribute_name, $this->attributes ) ) {
 						$child_context[ $context_name ] = $this->attributes[ $attribute_name ];
 					}
 				}
 			}
-			/* phpcs:enable */
 
 			$this->inner_blocks = new WP_Block_List( $block['innerBlocks'], $child_context, $registry );
 		}

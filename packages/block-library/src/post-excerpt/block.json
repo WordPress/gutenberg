@@ -14,7 +14,7 @@
 			"default": true
 		}
 	},
-	"context": [
+	"usesContext": [
 		"postId"
 	],
 	"supports": {

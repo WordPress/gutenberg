@@ -246,6 +246,8 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			'category'         => 'category',
 			'keywords'         => 'keywords',
 			'parent'           => 'parent',
+			'provides_context' => 'provides_context',
+			'uses_context'     => 'uses_context',
 			'supports'         => 'supports',
 			'styles'           => 'styles',
 			'textdomain'       => 'textdomain',
@@ -254,8 +256,6 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			'script'           => 'script',
 			'editor_style'     => 'editor_style',
 			'style'            => 'style',
-			'provides_context' => 'providesContext',
-			'uses_context'     => 'context',
 		);
 		foreach ( $extra_fields as $key => $extra_field ) {
 			if ( rest_is_field_included( $key, $fields ) ) {
@@ -378,6 +378,27 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
 				),
+				'provides_context' => array(
+					'description'          => __( 'Context provided by blocks of this type.', 'gutenberg' ),
+					'type'                 => 'object',
+					'properties'           => array(),
+					'additionalProperties' => array(
+						'type' => 'string',
+					),
+					'default'              => array(),
+					'context'              => array( 'embed', 'view', 'edit' ),
+					'readonly'             => true,
+				),
+				'uses_context'     => array(
+					'description' => __( 'Context values inherited by blocks of this type.', 'gutenberg' ),
+					'type'        => 'array',
+					'default'     => array(),
+					'items'       => array(
+						'type' => 'string',
+					),
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
 				'supports'         => array(
 					'description' => __( 'Block supports.', 'gutenberg' ),
 					'type'        => 'object',
@@ -476,27 +497,6 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					),
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
-				),
-				'provides_context' => array(
-					'description'          => __( 'Context provided by blocks of this type.', 'gutenberg' ),
-					'type'                 => 'object',
-					'properties'           => array(),
-					'additionalProperties' => array(
-						'type' => 'string',
-					),
-					'default'              => array(),
-					'context'              => array( 'embed', 'view', 'edit' ),
-					'readonly'             => true,
-				),
-				'uses_context'     => array(
-					'description' => __( 'Context values inherited by blocks of this type.', 'gutenberg' ),
-					'type'        => 'array',
-					'default'     => array(),
-					'items'       => array(
-						'type' => 'string',
-					),
-					'context'     => array( 'embed', 'view', 'edit' ),
-					'readonly'    => true,
 				),
 			),
 		);
