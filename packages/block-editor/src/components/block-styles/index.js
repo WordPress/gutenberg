@@ -86,7 +86,7 @@ function BlockStyles( {
 	clientId,
 	onSwitch = noop,
 	onHoverClassName = noop,
-	role,
+	itemRole,
 } ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( 'core/block-editor' );
@@ -146,7 +146,7 @@ function BlockStyles( {
 						onHover={ () => onHoverClassName( styleClassName ) }
 						style={ style }
 						styleClassName={ styleClassName }
-						role={ role }
+						itemRole={ itemRole }
 					/>
 				);
 			} ) }
@@ -162,7 +162,7 @@ function BlockStyleItem( {
 	onHover,
 	onSelect,
 	styleClassName,
-	role,
+	itemRole,
 } ) {
 	const previewBlocks = useMemo( () => {
 		return {
@@ -189,7 +189,7 @@ function BlockStyleItem( {
 			} }
 			onMouseEnter={ onHover }
 			onMouseLeave={ onBlur }
-			role={ role || 'button' }
+			role={ itemRole || 'button' }
 			tabIndex="0"
 			aria-label={ style.label || style.name }
 		>

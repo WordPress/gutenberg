@@ -195,7 +195,7 @@ export class BlockSwitcher extends Component {
 													onHoverClassName={
 														this.onHoverClassName
 													}
-													role="menuitem"
+													itemRole="menuitem"
 												/>
 											</MenuGroup>
 										) }
