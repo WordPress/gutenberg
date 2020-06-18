@@ -22,6 +22,26 @@ public struct Block {
     }
 }
 
+public struct ContentInfo {
+    public let characterCount: Int
+    public let wordCount: Int
+    public let paragraphCount: Int
+    public let blockCount: Int
+}
+
+extension ContentInfo {
+
+    static func decode(from dict: [String: Int]) -> ContentInfo? {
+        guard  let characters = dict["characterCount"],
+            let words = dict["wordCount"],
+            let paragraphs = dict["paragraphCount"],
+            let blocks = dict["blockCount"] else {
+                return nil
+        }
+        return ContentInfo(characterCount: characters, wordCount: words, paragraphCount: paragraphs, blockCount: blocks)
+    }
+}
+
 public typealias MediaPickerDidPickMediaCallback = (_ media: [MediaInfo]?) -> Void
 public typealias MediaImportCallback = (_ media: MediaInfo?) -> Void
 
@@ -103,7 +123,8 @@ public protocol GutenbergBridgeDelegate: class {
     ///     - title: the title as shown by the editor.
     ///     - html: The current HTML presented by the editor.
     ///     - changed: True if the given HTML presents changes from the last request or initial value.
-    func gutenbergDidProvideHTML(title: String, html: String, changed: Bool)
+    ///     - contentInfo: Information about the post content: characters, words, paragraphs, blocks.
+    func gutenbergDidProvideHTML(title: String, html: String, changed: Bool, contentInfo: ContentInfo?)
 
     /// Tells the delegate that an image block requested an image from the media picker.
     ///
