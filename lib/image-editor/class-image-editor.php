@@ -55,6 +55,21 @@ class Image_Editor {
 			return $info;
 		}
 
+		foreach ( $modifiers as $modifier ) {
+			// Update it with our modifier.
+			$info['meta'] = $modifier->apply_to_meta( $info['meta'] );
+		}
+
+		// Generate filename based on current attributes.
+		$target_file = $this->get_filename( $info['meta'] );
+
+		// Does the image already exist?
+		$existing_image = $this->get_existing_image( $info, $target_file );
+		if ( $existing_image ) {
+			// Return the existing image.
+			return $existing_image;
+		}
+
 		// Try and load the image itself.
 		$image = $this->load_image( $media_id, $info );
 		if ( is_wp_error( $image ) ) {
@@ -62,24 +77,11 @@ class Image_Editor {
 		}
 
 		foreach ( $modifiers as $modifier ) {
-			// Update it with our modifier.
-			$info['meta'] = $modifier->apply_to_meta( $info['meta'] );
-
 			// Finally apply the modification.
 			$modified = $modifier->apply_to_image( $image['editor'] );
 			if ( is_wp_error( $modified ) ) {
 				return $modified;
 			}
-		}
-
-		// Generate filename based on current attributes.
-		$target_file = $this->get_filename( $info['meta'] );
-
-		// Does the image already exist?
-		$image = $this->get_existing_image( $info, $target_file );
-		if ( $image ) {
-			// Return the existing image.
-			return $image;
 		}
 
 		// And save.
