@@ -15,13 +15,16 @@ import { resolveMenuItems, dispatch } from './controls';
 import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
 
 export function* getNavigationPost( menuId ) {
-	// Ensure an empty post to start with
-	const stubPost = createStubPost( menuId, null, {
-		isResolving: true,
-	} );
+	const stubPost = createStubPost( menuId );
+	// Persist an empty post to warm up the state
 	yield persistPost( stubPost );
 
-	// Now let's create a proper one hydrated with actual menu items
+	// Dispatch startResolution to skip the execution of the real getEntityRecord resolver - it would
+	// issue an http request and fail.
+	const args = [ KIND, POST_TYPE, stubPost.id ];
+	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
+
+	// Now let's create a proper one hydrated using actual menu items
 	const menuItems = yield resolveMenuItems( menuId );
 	const [ navigationBlock, menuItemIdToClientId ] = createNavigationBlock(
 		menuItems
@@ -31,7 +34,11 @@ export function* getNavigationPost( menuId ) {
 		postId: stubPost.id,
 		mapping: menuItemIdToClientId,
 	};
+	// Persist the actual post containing the navigation block
 	yield persistPost( createStubPost( menuId, navigationBlock ) );
+
+	// Dispatch finishResolution to conclude startResolution dispatched earlier
+	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
 }
 
 const persistPost = ( post ) =>
@@ -45,7 +52,7 @@ const persistPost = ( post ) =>
 		false
 	);
 
-const createStubPost = ( menuId, navigationBlock, meta ) => {
+const createStubPost = ( menuId, navigationBlock ) => {
 	const id = buildNavigationPostId( menuId );
 	return {
 		id,
@@ -54,7 +61,6 @@ const createStubPost = ( menuId, navigationBlock, meta ) => {
 		type: 'page',
 		blocks: [ navigationBlock ],
 		meta: {
-			...meta,
 			menuId,
 		},
 	};
