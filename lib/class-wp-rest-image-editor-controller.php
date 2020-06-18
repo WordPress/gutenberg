@@ -127,53 +127,50 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
 						array(
-							'type'       => 'object',
-							'properties' => array(
-								'crop'   => array(
-									'type'       => 'object',
-									'properties' => array(
-										'x' => array(
-											'type'     => 'integer',
-											'minimum'  => 0,
-											'required' => true,
-										),
-										'y' => array(
-											'type'     => 'integer',
-											'minimum'  => 0,
-											'required' => true,
-										),
-										'w' => array(
-											'type'     => 'integer',
-											'minimum'  => 1,
-											'required' => true,
-										),
-										'h' => array(
-											'type'     => 'integer',
-											'minimum'  => 1,
-											'required' => true,
-										),
+							'crop'   => array(
+								'type'       => 'object',
+								'properties' => array(
+									'x' => array(
+										'type'     => 'integer',
+										'minimum'  => 0,
+										'required' => true,
+									),
+									'y' => array(
+										'type'     => 'integer',
+										'minimum'  => 0,
+										'required' => true,
+									),
+									'w' => array(
+										'type'     => 'integer',
+										'minimum'  => 1,
+										'required' => true,
+									),
+									'h' => array(
+										'type'     => 'integer',
+										'minimum'  => 1,
+										'required' => true,
 									),
 								),
-								'rotate' => array(
-									'type'       => 'object',
-									'properties' => array(
-										'angle' => array(
-											'type'     => 'integer',
-											'required' => true,
-										),
+							),
+							'rotate' => array(
+								'type'       => 'object',
+								'properties' => array(
+									'angle' => array(
+										'type'     => 'integer',
+										'required' => true,
 									),
 								),
-								'flip'   => array(
-									'type'       => 'object',
-									'properties' => array(
-										'horizontal' => array(
-											'type'     => 'boolean',
-											'required' => true,
-										),
-										'vertical'   => array(
-											'type'     => 'boolean',
-											'required' => true,
-										),
+							),
+							'flip'   => array(
+								'type'       => 'object',
+								'properties' => array(
+									'horizontal' => array(
+										'type'     => 'boolean',
+										'required' => true,
+									),
+									'vertical'   => array(
+										'type'     => 'boolean',
+										'required' => true,
 									),
 								),
 							),
