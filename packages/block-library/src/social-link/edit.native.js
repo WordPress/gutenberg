@@ -125,11 +125,6 @@ const SocialLinkEdit = ( {
 		}
 	}
 
-	function onIconLongPress() {
-		onFocus();
-		setIsLinkSheetVisible( true );
-	}
-
 	function getLinkSettings( isCompatibleWithSettings = true ) {
 		return (
 			<>
@@ -205,10 +200,7 @@ const SocialLinkEdit = ( {
 			>
 				{ getLinkSettings( false ) }
 			</BottomSheet>
-			<TouchableWithoutFeedback
-				onPress={ onIconPress }
-				onLongPress={ onIconLongPress }
-			>
+			<TouchableWithoutFeedback onPress={ onIconPress }>
 				<Animated.View
 					style={ [ styles.iconContainer, { backgroundColor } ] }
 				>

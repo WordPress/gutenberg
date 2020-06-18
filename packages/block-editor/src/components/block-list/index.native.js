@@ -304,42 +304,54 @@ export class BlockList extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId, __experimentalMoverDirection } ) => {
-		const {
-			getBlockCount,
-			getBlockOrder,
-			getSelectedBlockClientId,
-			isBlockInsertionPointVisible,
-			getSettings,
-			getBlockHierarchyRootClientId,
-		} = select( 'core/block-editor' );
+	withSelect(
+		(
+			select,
+			{ rootClientId, __experimentalMoverDirection, filterInnerBlocks }
+		) => {
+			const {
+				getBlockCount,
+				getBlockOrder,
+				getSelectedBlockClientId,
+				isBlockInsertionPointVisible,
+				getSettings,
+				getBlockHierarchyRootClientId,
+			} = select( 'core/block-editor' );
 
-		const isStackedHorizontally =
-			__experimentalMoverDirection === 'horizontal';
+			const isStackedHorizontally =
+				__experimentalMoverDirection === 'horizontal';
 
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const blockClientIds = getBlockOrder( rootClientId );
+			const selectedBlockClientId = getSelectedBlockClientId();
 
-		const isReadOnly = getSettings().readOnly;
+			let blockClientIds = getBlockOrder( rootClientId );
 
-		const rootBlockId = getBlockHierarchyRootClientId(
-			selectedBlockClientId
-		);
-		const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
+			if ( filterInnerBlocks ) {
+				blockClientIds = filterInnerBlocks(
+					getBlockOrder( rootClientId )
+				);
+			}
 
-		const isFloatingToolbarVisible =
-			!! selectedBlockClientId && hasRootInnerBlocks;
+			const isReadOnly = getSettings().readOnly;
 
-		return {
-			blockClientIds,
-			blockCount: getBlockCount( rootClientId ),
-			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
-			isReadOnly,
-			isRootList: rootClientId === undefined,
-			isFloatingToolbarVisible,
-			isStackedHorizontally,
-		};
-	} ),
+			const rootBlockId = getBlockHierarchyRootClientId(
+				selectedBlockClientId
+			);
+			const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
+
+			const isFloatingToolbarVisible =
+				!! selectedBlockClientId && hasRootInnerBlocks;
+
+			return {
+				blockClientIds,
+				blockCount: getBlockCount( rootClientId ),
+				isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
+				isReadOnly,
+				isRootList: rootClientId === undefined,
+				isFloatingToolbarVisible,
+				isStackedHorizontally,
+			};
+		}
+	),
 	withDispatch( ( dispatch ) => {
 		const { insertBlock, replaceBlock, clearSelectedBlock } = dispatch(
 			'core/block-editor'

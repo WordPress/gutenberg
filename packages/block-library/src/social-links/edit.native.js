@@ -7,8 +7,8 @@ import { View } from 'react-native';
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useRef, useEffect, useState } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
+import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -32,45 +32,49 @@ const TEMPLATE = [
 ];
 
 function SocialLinksEdit( {
-	clientId,
 	shouldDelete,
 	onDelete,
 	isSelected,
 	isInnerIconSelected,
 	innerBlocks,
-	replaceInnerBlocks,
 	attributes,
+	activeInnerBlocks,
+	getBlock,
 } ) {
-	const [ initialCreation, setInitialCreation ] = useState( true );
-	const [ savedInnerBlocks, setSavedInnerBlocks ] = useState( [] );
 	const { align } = attributes;
 	const shouldRenderFooterAppender = isSelected || isInnerIconSelected;
 	const { marginLeft: spacing } = styles.spacing;
-
-	useEffect( () => {
-		if ( ! shouldRenderFooterAppender ) {
-			replaceInnerBlocks(
-				clientId,
-				innerBlocks.filter( ( block ) => block.attributes.url ),
-				false
-			);
-			setInitialCreation( false );
-			if ( ! initialCreation ) {
-				setSavedInnerBlocks( innerBlocks );
-			}
-		} else if (
-			shouldRenderFooterAppender &&
-			savedInnerBlocks.length > 0
-		) {
-			replaceInnerBlocks( clientId, savedInnerBlocks, false );
-		}
-	}, [ shouldRenderFooterAppender ] );
 
 	const renderFooterAppender = useRef( () => (
 		<View>
 			<InnerBlocks.ButtonBlockAppender isFloating={ true } />
 		</View>
 	) );
+
+	const placeholderStyle = usePreferredColorSchemeStyle(
+		styles.placeholder,
+		styles.placeholderDark
+	);
+
+	function renderPlaceholder() {
+		return [ ...new Array( innerBlocks.length ) ].map( ( index ) => (
+			<View style={ placeholderStyle } key={ index } />
+		) );
+	}
+
+	function filterInnerBlocks( blockIds ) {
+		return blockIds.filter(
+			( blockId ) => getBlock( blockId ).attributes.url
+		);
+	}
+
+	if ( ! shouldRenderFooterAppender && activeInnerBlocks.length === 0 ) {
+		return (
+			<View style={ styles.placeholderWrapper }>
+				{ renderPlaceholder() }
+			</View>
+		);
+	}
 
 	return (
 		<InnerBlocks
@@ -85,6 +89,9 @@ function SocialLinksEdit( {
 			marginVertical={ spacing }
 			marginHorizontal={ spacing }
 			horizontalAlignment={ align }
+			filterInnerBlocks={
+				! shouldRenderFooterAppender && filterInnerBlocks
+			}
 		/>
 	);
 }
@@ -96,6 +103,7 @@ export default compose(
 			getBlockParents,
 			getSelectedBlockClientId,
 			getBlocks,
+			getBlock,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockParents = getBlockParents(
@@ -108,11 +116,11 @@ export default compose(
 		);
 
 		return {
-			shouldDelete:
-				getBlockCount( clientId ) === 1 ||
-				activeInnerBlocks.length === 1,
+			shouldDelete: getBlockCount( clientId ) === 1,
 			isInnerIconSelected: selectedBlockParents[ 0 ] === clientId,
 			innerBlocks,
+			activeInnerBlocks,
+			getBlock,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
