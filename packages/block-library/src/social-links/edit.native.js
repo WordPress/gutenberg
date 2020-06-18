@@ -7,7 +7,7 @@ import { View } from 'react-native';
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -41,9 +41,16 @@ function SocialLinksEdit( {
 	activeInnerBlocks,
 	getBlock,
 } ) {
-	const { align } = attributes;
+	const [ initialCreation, setInitialCreation ] = useState( true );
 	const shouldRenderFooterAppender = isSelected || isInnerIconSelected;
+	const { align } = attributes;
 	const { marginLeft: spacing } = styles.spacing;
+
+	useEffect( () => {
+		if ( ! shouldRenderFooterAppender ) {
+			setInitialCreation( false );
+		}
+	}, [ shouldRenderFooterAppender ] );
 
 	const renderFooterAppender = useRef( () => (
 		<View>
@@ -57,7 +64,7 @@ function SocialLinksEdit( {
 	);
 
 	function renderPlaceholder() {
-		return [ ...new Array( innerBlocks.length ) ].map( ( index ) => (
+		return [ ...new Array( innerBlocks.length || 1 ) ].map( ( index ) => (
 			<View style={ placeholderStyle } key={ index } />
 		) );
 	}
@@ -80,7 +87,7 @@ function SocialLinksEdit( {
 		<InnerBlocks
 			allowedBlocks={ ALLOWED_BLOCKS }
 			templateLock={ false }
-			template={ TEMPLATE }
+			template={ initialCreation && TEMPLATE }
 			renderFooterAppender={
 				shouldRenderFooterAppender && renderFooterAppender.current
 			}

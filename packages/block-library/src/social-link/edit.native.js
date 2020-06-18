@@ -52,12 +52,15 @@ const SocialLinkEdit = ( {
 
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
 	const [ isValue, setIsValue ] = useState( !! url );
+	const [ urlInputValue, setUrlInputValue ] = useState( '' );
+	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
 
 	const IconComponent = getIconBySite( service )();
 	const socialLinkName = getNameBySite( service );
 
+	// When new social icon is added link sheet is opened automatically
 	useEffect( () => {
 		if ( isSelected && ! url ) {
 			setIsLinkSheetVisible( true );
@@ -65,8 +68,15 @@ const SocialLinkEdit = ( {
 	}, [] );
 
 	useEffect( () => {
-		setAttributes( { url: prependHTTP( url ) } );
-	}, [ ! isLinkSheetVisible && url ] );
+		setUrlInputValue( url || '' );
+		setLabelInputValue( label || '' );
+		if ( ! url ) {
+			setIsValue( false );
+			animatedValue.setValue( 0 );
+		} else if ( url ) {
+			animateColors();
+		}
+	}, [ url ] );
 
 	const interpolationColors = {
 		backgroundColor: animatedValue.interpolate( {
@@ -92,11 +102,11 @@ const SocialLinkEdit = ( {
 			setIsValue( false );
 			animatedValue.setValue( 0 );
 		}
-		setAttributes( { url: value } );
+		setUrlInputValue( value );
 	}
 
 	function onChangeLabel( value ) {
-		setAttributes( { label: value } );
+		setLabelInputValue( value );
 	}
 
 	function animateColors() {
@@ -111,10 +121,15 @@ const SocialLinkEdit = ( {
 	}
 
 	function onCloseSettingsSheet() {
-		if ( url ) {
+		setAttributes( {
+			url: prependHTTP( urlInputValue ),
+			label: labelInputValue,
+		} );
+		setIsLinkSheetVisible( false );
+
+		if ( urlInputValue !== '' ) {
 			animateColors();
 		}
-		setIsLinkSheetVisible( false );
 	}
 
 	function onIconPress() {
@@ -143,7 +158,7 @@ const SocialLinkEdit = ( {
 				>
 					<TextControl
 						label={ __( 'URL' ) }
-						value={ url || '' }
+						value={ urlInputValue }
 						valuePlaceholder={ __( 'Add URL' ) }
 						onChange={ onChangeURL }
 						onSubmit={ onCloseSettingsSheet }
@@ -155,7 +170,7 @@ const SocialLinkEdit = ( {
 					/>
 					<TextControl
 						label={ __( 'Link label' ) }
-						value={ label || '' }
+						value={ labelInputValue }
 						valuePlaceholder={ __( 'None' ) }
 						onChange={ onChangeLabel }
 					/>
