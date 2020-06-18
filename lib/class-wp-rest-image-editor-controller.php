@@ -261,7 +261,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$modifiers[] = new Image_Editor_Flip( $request['flip']['vertical'], $request['flip']['horizontal'] );
 		}
 		if ( $request['crop'] ) {
-			$modifiers[] = new Image_Editor_Crop( $request['crop']['x'], $request['crop']['y'], $request['crop']['width'], $request['crop']['height'] );
+			$modifiers[] = new Image_Editor_Crop( $request['crop']['left'], $request['crop']['top'], $request['crop']['width'], $request['crop']['height'] );
 		}
 		return $this->editor->modify_image( $request['media_id'], $modifiers );
 	}

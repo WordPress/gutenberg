@@ -304,10 +304,10 @@ export default function ImageEditor( {
 			{
 				action: 'crop',
 				options: {
-					crop_x: crop.x,
-					crop_y: crop.y,
-					crop_width: crop.width,
-					crop_height: crop.height,
+					left: crop.x,
+					top: crop.y,
+					width: crop.width,
+					height: crop.height,
 				},
 			},
 		] );
