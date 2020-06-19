@@ -12,6 +12,7 @@ import { withSelect } from '@wordpress/data';
 
 export function PublishButtonLabel( {
 	isPublished,
+	isScheduled,
 	isBeingScheduled,
 	isSaving,
 	isPublishing,
@@ -21,13 +22,13 @@ export function PublishButtonLabel( {
 } ) {
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
-	} else if ( isPublished && isSaving && ! isAutosaving ) {
+	} else if ( ( isPublished || isScheduled ) && isSaving && ! isAutosaving ) {
 		return __( 'Updating…' );
 	} else if ( isBeingScheduled && isSaving && ! isAutosaving ) {
 		return __( 'Scheduling…' );
 	}
 
-	if ( isPublished ) {
+	if ( isPublished || isScheduled ) {
 		return hasNonPostEntityChanges ? __( 'Update…' ) : __( 'Update' );
 	} else if ( isBeingScheduled ) {
 		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
@@ -44,6 +45,7 @@ export default compose( [
 	withSelect( ( select, { forceIsSaving } ) => {
 		const {
 			isCurrentPostPublished,
+			isCurrentPostScheduled,
 			isEditedPostBeingScheduled,
 			isSavingPost,
 			isPublishingPost,
@@ -53,6 +55,7 @@ export default compose( [
 		} = select( 'core/editor' );
 		return {
 			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isPublishing: isPublishingPost(),
