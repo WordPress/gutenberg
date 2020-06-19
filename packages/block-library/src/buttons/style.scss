@@ -12,4 +12,8 @@
 
 .wp-block-buttons.aligncenter {
 	text-align: center;
+
+	.wp-block-button:last-child {
+		margin-right: 0;
+	}
 }
