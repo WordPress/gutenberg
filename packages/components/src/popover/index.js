@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useEffect } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useEffect,
+	useLayoutEffect,
+} from '@wordpress/element';
 import { focus, getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
@@ -267,7 +272,7 @@ const Popover = ( {
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
 	noArrow = isExpanded || noArrow;
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( isExpanded ) {
 			setClass( containerRef.current, 'is-without-arrow', noArrow );
 			setClass( containerRef.current, 'is-alternate', isAlternate );
