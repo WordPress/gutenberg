@@ -36,7 +36,6 @@ import BlockPreview from '../block-preview';
 import BlockTransformationsMenu from './block-transformations-menu';
 
 function PreviewBlockPopover( { hoveredBlock, hoveredClassName } ) {
-	if ( hoveredClassName === null ) return null;
 	const hoveredBlockType = getBlockType( hoveredBlock.name );
 	return (
 		<div className="block-editor-block-switcher__popover__preview__parent">
@@ -182,12 +181,14 @@ export class BlockSwitcher extends Component {
 								( hasBlockStyles ||
 									hasPossibleBlockTransformations ) && (
 									<div className="block-editor-block-switcher__container">
-										<PreviewBlockPopover
-											hoveredBlock={ hoveredBlock }
-											hoveredClassName={
-												hoveredClassName
-											}
-										/>
+										{ hoveredClassName !== null && (
+											<PreviewBlockPopover
+												hoveredBlock={ hoveredBlock }
+												hoveredClassName={
+													hoveredClassName
+												}
+											/>
+										) }
 										{ hasBlockStyles && (
 											<MenuGroup label={ __( 'Styles' ) }>
 												<BlockStyles
