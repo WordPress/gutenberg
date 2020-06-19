@@ -2,11 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { noop } from 'lodash';
+import {
+	useDisclosureState,
+	Disclosure,
+	DisclosureContent,
+} from 'reakit/Disclosure';
 
 /**
  * WordPress dependencies
  */
-import { Component, forwardRef } from '@wordpress/element';
+import { useReducedMotion } from '@wordpress/compose';
+import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
 /**
@@ -14,82 +21,109 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
  */
 import Button from '../button';
 import Icon from '../icon';
+import { useCombinedRefs, useUpdateEffect } from '../utils';
 
-export class PanelBody extends Component {
-	constructor( props ) {
-		super( ...arguments );
-		this.state = {
-			opened: props.initialOpen === undefined ? true : props.initialOpen,
-		};
-		this.toggle = this.toggle.bind( this );
+export function PanelBody(
+	{
+		children,
+		className,
+		disableSmoothScrollIntoView,
+		focusable,
+		icon,
+		initialOpen: initialOpenProp,
+		onToggle = noop,
+		opened,
+		title,
+	},
+	ref
+) {
+	const initialOpen = useRef( initialOpenProp ).current;
+	const disclosure = useDisclosureState( { visible: initialOpen || opened } );
+	const nodeRef = useRef();
+	const combinedRefs = useCombinedRefs( ref, nodeRef );
+
+	// Defaults to 'smooth' scrolling
+	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
+	let scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
+
+	// However, this behavior can be overridden by prop
+	if ( disableSmoothScrollIntoView ) {
+		scrollBehavior = 'auto';
 	}
 
-	toggle( event ) {
-		event.preventDefault();
-		if ( this.props.opened === undefined ) {
-			this.setState( ( state ) => ( {
-				opened: ! state.opened,
-			} ) );
+	const isOpened = disclosure.visible;
+
+	// Runs after initial render
+	useUpdateEffect( () => {
+		if ( disclosure.visible ) {
+			/*
+			 * Scrolls the content into view when visible.
+			 * This improves the UX when there are multiple stacking <PanelBody />
+			 * components in a scrollable container.
+			 */
+			nodeRef.current.scrollIntoView( {
+				inline: 'nearest',
+				block: 'nearest',
+				behavior: scrollBehavior,
+			} );
 		}
 
-		if ( this.props.onToggle ) {
-			this.props.onToggle();
-		}
-	}
+		onToggle( disclosure.visible );
+	}, [ disclosure.visible, onToggle, scrollBehavior ] );
 
-	render() {
-		const {
-			title,
-			children,
-			opened,
-			className,
-			icon,
-			forwardedRef,
-		} = this.props;
-		const isOpened = opened === undefined ? this.state.opened : opened;
-		const classes = classnames( 'components-panel__body', className, {
-			'is-opened': isOpened,
-		} );
+	const classes = classnames( 'components-panel__body', className, {
+		'is-opened': isOpened,
+	} );
 
-		return (
-			<div className={ classes } ref={ forwardedRef }>
-				{ !! title && (
-					<h2 className="components-panel__body-title">
-						<Button
-							className="components-panel__body-toggle"
-							onClick={ this.toggle }
-							aria-expanded={ isOpened }
-						>
-							{ /*
-								Firefox + NVDA don't announce aria-expanded because the browser
-								repaints the whole element, so this wrapping span hides that.
-							*/ }
-							<span aria-hidden="true">
-								<Icon
-									className="components-panel__arrow"
-									icon={ isOpened ? chevronUp : chevronDown }
-								/>
-							</span>
-							{ title }
-							{ icon && (
-								<Icon
-									icon={ icon }
-									className="components-panel__icon"
-									size={ 20 }
-								/>
-							) }
-						</Button>
-					</h2>
-				) }
-				{ isOpened && children }
-			</div>
-		);
-	}
+	return (
+		<div className={ classes } ref={ combinedRefs }>
+			<PanelHeader
+				focusable={ focusable }
+				title={ title }
+				icon={ icon }
+				{ ...disclosure }
+			/>
+			<DisclosureContent { ...disclosure }>
+				{ children }
+			</DisclosureContent>
+		</div>
+	);
 }
 
-const forwardedPanelBody = ( props, ref ) => {
-	return <PanelBody { ...props } forwardedRef={ ref } />;
-};
-forwardedPanelBody.displayName = 'PanelBody';
+function PanelHeader( { focusable, isOpened, icon, title, ...props } ) {
+	if ( ! title ) return null;
 
-export default forwardRef( forwardedPanelBody );
+	return (
+		<h2 className="components-panel__body-title">
+			<Disclosure
+				as={ Button }
+				className="components-panel__body-toggle"
+				focusable={ focusable }
+				{ ...props }
+			>
+				{ /*
+					Firefox + NVDA don't announce aria-expanded because the browser
+					repaints the whole element, so this wrapping span hides that.
+				*/ }
+				<span aria-hidden="true">
+					<Icon
+						className="components-panel__arrow"
+						icon={ isOpened ? chevronUp : chevronDown }
+					/>
+				</span>
+				{ title }
+				{ icon && (
+					<Icon
+						icon={ icon }
+						className="components-panel__icon"
+						size={ 20 }
+					/>
+				) }
+			</Disclosure>
+		</h2>
+	);
+}
+
+const ForwardedComponent = forwardRef( PanelBody );
+
+export default ForwardedComponent;
