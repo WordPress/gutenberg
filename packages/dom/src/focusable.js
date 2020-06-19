@@ -49,14 +49,17 @@ function isVisible( element ) {
 
 /**
  * Returns true if the specified element should be skipped from focusable elements.
- * For now it checks if tabindex attribute is set to -1.
+ * For now it rather specific for `iframes` and  if tabindex attribute is set to -1.
  *
  * @param {Element} element DOM element to test.
  *
  * @return {boolean} Whether element should be skipped from focusable elements.
  */
 function skipFocus( element ) {
-	return element.getAttribute( 'tabindex' ) === '-1';
+	return (
+		element.nodeName.toLocaleLowerCase() === 'iframe' &&
+		element.getAttribute( 'tabindex' ) === '-1'
+	);
 }
 
 /**
