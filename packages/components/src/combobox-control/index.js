@@ -1,9 +1,12 @@
+/* eslint-disable no-console */
+
 /**
  * External dependencies
  */
 import { useCombobox } from 'downshift';
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
+import { Spinner } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -19,7 +22,7 @@ export default function ComboboxControl( {
 	onInputValueChange: onInputValueChange,
 	onChange: onSelectedItemChange,
 	value: _selectedItem,
-	initialSelectedItem,
+	initialHighlightedIndex,
 	initialInputValue,
 	isLoading,
 } ) {
@@ -39,10 +42,11 @@ export default function ComboboxControl( {
 		onInputValueChange,
 		onSelectedItemChange,
 		selectedItem: _selectedItem,
-		initialSelectedItem,
+		initialHighlightedIndex,
 		initialInputValue,
 		initialIsOpen: false,
 	} );
+
 	const menuProps = getMenuProps( {
 		className: 'components-combobox-control__menu',
 	} );
@@ -57,8 +61,7 @@ export default function ComboboxControl( {
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
-	/* eslint-disable no-console */
-	console.log( 'ComboboxControl initialSelectedItem', initialSelectedItem );
+
 	return (
 		<div
 			className={ classnames( 'components-combobox-control', className ) }
@@ -103,7 +106,9 @@ export default function ComboboxControl( {
 			<ul { ...menuProps }>
 				{ isOpen &&
 					( isLoading ? (
-						<div className="loading">{ __( 'Loading...' ) }</div>
+						<span>
+							<Spinner /> { __( 'Loading' ) }
+						</span>
 					) : (
 						items.map( ( item, index ) => (
 							// eslint-disable-next-line react/jsx-key
