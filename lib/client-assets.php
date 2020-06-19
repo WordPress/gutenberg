@@ -718,6 +718,23 @@ function gutenberg_extend_settings_link_color( $settings ) {
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_link_color' );
 
+/**
+ * Override theme styles.
+ * Do not backport this to WordPress Core.
+ */
+function gutenberg_override_theme_styles() {
+	$theme_style = 'html body {
+		--wp-admin-theme-color: #3858e9;
+		--wp-admin-theme-color-darker-10: #2145e6;
+		--wp-admin-theme-color-darker-20: #183ad6;
+	}';
+	wp_add_inline_style( 'wp-edit-post', $theme_style );
+	wp_add_inline_style( 'wp-edit-site', $theme_style );
+	wp_add_inline_style( 'wp-edit-widgets', $theme_style );
+	wp_add_inline_style( 'wp-edit-navigation', $theme_style );
+}
+add_action( 'init', 'gutenberg_override_theme_styles' );
+
 /*
  * Register default patterns if not registered in Core already.
  */
