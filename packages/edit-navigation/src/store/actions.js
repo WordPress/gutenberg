@@ -237,7 +237,6 @@ function serializeProcessing( callback ) {
 			};
 			return { status: 'pending' };
 		}
-
 		yield {
 			type: 'POP_PENDING_ACTION',
 			postId,
