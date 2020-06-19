@@ -4,6 +4,7 @@
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import { InnerBlocks } from '@wordpress/block-editor';
 
+const renderAppender = () => <InnerBlocks.ButtonBlockAppender />;
 export default function TemplatePartInnerBlocks( {
 	postId: id,
 	hasInnerBlocks,
@@ -18,11 +19,7 @@ export default function TemplatePartInnerBlocks( {
 			value={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
-			renderAppender={
-				hasInnerBlocks
-					? undefined
-					: () => <InnerBlocks.ButtonBlockAppender />
-			}
+			renderAppender={ hasInnerBlocks ? undefined : renderAppender }
 		/>
 	);
 }

@@ -51,7 +51,8 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 			) }
 		>
 			<Dropdown
-				position="bottom left right"
+				contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
+				position="bottom right left"
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<ButtonGroup>
 						<Button
