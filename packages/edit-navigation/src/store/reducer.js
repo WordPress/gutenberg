@@ -3,7 +3,17 @@
  */
 import { combineReducers } from '@wordpress/data';
 
-export function mapping( state, { type, postId, ...rest } ) {
+/**
+ * Internal to edit-navigation package.
+ *
+ * Stores menuItemId -> clientId mapping which is necessary for saving the navigation.
+ *
+ * @param {Object} state Redux state
+ * @param {Object} action Redux action
+ * @return {Object} Updated state
+ */
+export function mapping( state, action ) {
+	const { type, postId, ...rest } = action;
 	if ( type === 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING' ) {
 		return { ...state, [ postId ]: rest.mapping };
 	}
@@ -11,7 +21,18 @@ export function mapping( state, { type, postId, ...rest } ) {
 	return state || {};
 }
 
-export function processingQueue( state, { type, postId, ...rest } ) {
+/**
+ * Internal to edit-navigation package.
+ *
+ * Enables serializeProcessing action wrapper by storing the underlying execution
+ * state and any pending actions.
+ *
+ * @param {Object} state Redux state
+ * @param {Object} action Redux action
+ * @return {Object} Updated state
+ */
+export function processingQueue( state, action ) {
+	const { type, postId, ...rest } = action;
 	switch ( type ) {
 		case 'START_PROCESSING_POST':
 			return {

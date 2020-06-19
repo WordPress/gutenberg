@@ -39,6 +39,12 @@ export const getNavigationPostForMenu = createRegistrySelector(
 	}
 );
 
+/**
+ * Returns true if the navigation post related to menuId was already resolved.
+ *
+ * @param {number} menuId The id of menu.
+ * @return {boolean} True if the navigation post related to menuId was already resolved, false otherwise.
+ */
 export const hasResolvedNavigationPost = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
 		return select( 'core' ).hasFinishedResolution( 'getEntityRecord', [

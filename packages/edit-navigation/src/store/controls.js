@@ -22,6 +22,12 @@ export function apiFetch( request ) {
 	};
 }
 
+/**
+ * Returns a list of pending actions for given post id.
+ *
+ * @param {number} postId Post ID.
+ * @return {Array} List of pending actions.
+ */
 export function getPendingActions( postId ) {
 	return {
 		type: 'GET_PENDING_ACTIONS',
@@ -29,6 +35,13 @@ export function getPendingActions( postId ) {
 	};
 }
 
+/**
+ * Returns boolean indicating whether or not an action processing specified
+ * post is currently running.
+ *
+ * @param {number} postId Post ID.
+ * @return {Object} Action.
+ */
 export function isProcessingPost( postId ) {
 	return {
 		type: 'IS_PROCESSING_POST',
@@ -36,6 +49,12 @@ export function isProcessingPost( postId ) {
 	};
 }
 
+/**
+ * Selects menuItemId -> clientId mapping (necessary for saving the navigation).
+ *
+ * @param {number} postId Navigation post ID.
+ * @return {Object} Action.
+ */
 export function getMenuItemToClientIdMapping( postId ) {
 	return {
 		type: 'GET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
@@ -43,6 +62,13 @@ export function getMenuItemToClientIdMapping( postId ) {
 	};
 }
 
+/**
+ * Resolves navigation post for given menuId.
+ *
+ * @see selectors.js
+ * @param {number} menuId Menu ID.
+ * @return {Object} Action.
+ */
 export function getNavigationPostForMenu( menuId ) {
 	return {
 		type: 'SELECT',
@@ -52,6 +78,12 @@ export function getNavigationPostForMenu( menuId ) {
 	};
 }
 
+/**
+ * Resolves menu items for given menu id.
+ *
+ * @param {number} menuId Menu ID.
+ * @return {Object} Action.
+ */
 export function resolveMenuItems( menuId ) {
 	return {
 		type: 'RESOLVE_MENU_ITEMS',
