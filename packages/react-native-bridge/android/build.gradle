@@ -199,7 +199,7 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
 			}
 		}
 
-		def isRelevantFile = { it.name.endsWithAny('.js', '.css') || it.name ==~ /package(-lock)?\.json/ }
+		def isRelevantFile = { it.name.endsWithAny('.js', '.css', '.scss') || it.name ==~ /package(-lock)?\.json/ }
 		def inputFiles = []
 		dirs.forEach { dir ->
 			file(dir).eachFile {
