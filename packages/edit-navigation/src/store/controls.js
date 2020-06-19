@@ -43,11 +43,11 @@ export function getMenuItemToClientIdMapping( postId ) {
 	};
 }
 
-export function getNavigationPost( menuId ) {
+export function getNavigationPostForMenu( menuId ) {
 	return {
 		type: 'SELECT',
 		registryName: 'core/edit-navigation',
-		selectorName: 'getNavigationPost',
+		selectorName: 'getNavigationPostForMenu',
 		args: [ menuId ],
 	};
 }

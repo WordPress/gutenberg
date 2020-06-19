@@ -23,10 +23,10 @@ import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
  * @param {string} menuId The id of menu to create a post from.
  * @return {null|Object} Post once the resolver fetches it, otherwise null
  */
-export const getNavigationPost = createRegistrySelector(
+export const getNavigationPostForMenu = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
 		// When the record is unavailable, calling getEditedEntityRecord triggers a http
-		// request via it's related resolver. Let's return nothing until getNavigationPost
+		// request via it's related resolver. Let's return nothing until getNavigationPostForMenu
 		// resolver marks the record as resolved.
 		if ( ! hasResolvedNavigationPost( state, menuId ) ) {
 			return null;

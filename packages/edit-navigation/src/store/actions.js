@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	getNavigationPost,
+	getNavigationPostForMenu,
 	getPendingActions,
 	isProcessingPost,
 	getMenuItemToClientIdMapping,
@@ -265,7 +265,7 @@ function serializeProcessing( callback ) {
 
 				// re-fetch the post as running the callback() likely updated it
 				yield* serializedCallback(
-					yield getNavigationPost( post.meta.menuId )
+					yield getNavigationPostForMenu( post.meta.menuId )
 				);
 			}
 		}
