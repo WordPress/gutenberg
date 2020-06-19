@@ -65,9 +65,13 @@
 	}
 }
 
-// We keep the min width the same for the border to work.
 .components-popover.block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
+}
+
+// We keep the min width the same for the border to work.
+.components-popover.block-editor-block-switcher__popover .components-popover__content > div {
+	min-width: auto;
 	display: flex;
 	background: $white;
 	padding: 0;
