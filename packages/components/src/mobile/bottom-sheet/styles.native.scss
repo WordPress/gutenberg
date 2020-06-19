@@ -179,6 +179,16 @@
 	border-radius: $panel-padding;
 }
 
+// Radio Cell
+
+.selectedIcon {
+	color: $blue-50;
+}
+
+.selectedIconDark {
+	color: $blue-30;
+}
+
 // Navigation Header
 
 .bottomSheetHeader {

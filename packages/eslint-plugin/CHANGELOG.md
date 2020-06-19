@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Support ESLint `^7` as peer dependency.
+
 ## 7.0.0 (2020-06-15)
 
 ### Breaking Changes

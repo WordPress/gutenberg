@@ -66,16 +66,13 @@ export function* installBlockType( block ) {
 			throw new Error( __( 'Block has no assets.' ) );
 		}
 		yield setIsInstalling( block.id, true );
-		const response = yield apiFetch( {
+		yield apiFetch( {
 			path: '__experimental/block-directory/install',
 			data: {
 				slug: block.id,
 			},
 			method: 'POST',
 		} );
-		if ( response.success !== true ) {
-			throw new Error( __( 'Unable to install this block.' ) );
-		}
 		yield addInstalledBlockType( block );
 
 		yield loadAssets( assets );

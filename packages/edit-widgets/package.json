@@ -6,7 +6,10 @@
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
-		"wordpress"
+		"wordpress",
+		"gutenberg",
+		"editor",
+		"widgets"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-widgets/README.md",
 	"repository": {

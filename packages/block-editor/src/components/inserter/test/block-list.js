@@ -13,6 +13,13 @@ import { useSelect } from '@wordpress/data';
  */
 import { InserterBlockList as BaseInserterBlockList } from '../block-list';
 import items, { categories, collections } from './fixtures';
+import useBlockTypesState from '../hooks/use-block-types-state';
+
+jest.mock( '../hooks/use-block-types-state', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test
@@ -63,20 +70,22 @@ describe( 'InserterMenu', () => {
 	beforeEach( () => {
 		debouncedSpeak.mockClear();
 
-		useSelect.mockImplementation( () => ( {
+		useBlockTypesState.mockImplementation( () => [
+			items,
 			categories,
 			collections,
-			items,
-		} ) );
+		] );
+
+		useSelect.mockImplementation( () => false );
 	} );
 
 	it( 'should show nothing if there are no items', () => {
 		const noItems = [];
-		useSelect.mockImplementation( () => ( {
+		useBlockTypesState.mockImplementation( () => [
+			noItems,
 			categories,
 			collections,
-			items: noItems,
-		} ) );
+		] );
 		const { container } = render(
 			<InserterBlockList filterValue="random" />
 		);
@@ -145,6 +154,20 @@ describe( 'InserterMenu', () => {
 		expect( blocks[ 0 ].textContent ).toBe( 'Paragraph' );
 		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Paragraph' );
 		expect( blocks[ 2 ].textContent ).toBe( 'Some Other Block' );
+
+		assertNoResultsMessageNotToBePresent( container );
+	} );
+
+	it( 'displays child blocks UI when root block has child blocks', () => {
+		useSelect.mockImplementation( () => true );
+
+		const { container } = render( <InserterBlockList /> );
+
+		const childBlocksContent = container.querySelector(
+			'.block-editor-inserter__child-blocks'
+		);
+
+		expect( childBlocksContent ).not.toBeNull();
 
 		assertNoResultsMessageNotToBePresent( container );
 	} );

@@ -387,6 +387,11 @@ export default function Image( {
 				url={ url }
 				setAttributes={ setAttributes }
 				isSelected={ isSelected }
+				naturalWidth={ naturalWidth }
+				naturalHeight={ naturalHeight }
+				width={ width }
+				height={ height }
+				clientWidth={ clientWidth }
 			>
 				{ img }
 			</ImageEditor>

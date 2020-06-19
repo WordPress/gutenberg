@@ -6,8 +6,10 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"postcss",
 		"css",
+		"plugin",
 		"postcss-plugin",
 		"colors",
 		"themes"
@@ -29,7 +31,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"postcss": "^7.0.13"
+		"postcss": "^7.0.32"
 	},
 	"publishConfig": {
 		"access": "public"
