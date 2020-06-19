@@ -40,7 +40,6 @@ def buildGutenbergMobileJSBundle =
 def tempFolder = "${System.getenv('TMPDIR')}/jsbundle/${System.getenv('VERSION')}"
 def nodeFolder = file("${tempFolder}/nodejs")
 def npmFolder = file("${tempFolder}/npm")
-def yarnFolder = file("${tempFolder}/yarn")
 
 if (buildGutenbergMobileJSBundle) {
     println 'Building the Gutenberg Mobile JS bundle'
@@ -54,9 +53,6 @@ if (buildGutenbergMobileJSBundle) {
         // Version of npm to use.
         npmVersion = '6.14.2'
 
-        // Version of Yarn to use.
-        yarnVersion = '1.22.4'
-
         // Base URL for fetching node distributions (change if you have a mirror).
         distBaseUrl = 'https://nodejs.org/dist'
 
@@ -69,9 +65,6 @@ if (buildGutenbergMobileJSBundle) {
 
         // Set the work directory for NPM
         npmWorkDir = file(npmFolder)
-
-        // Set the work directory for Yarn
-        yarnWorkDir = file(yarnFolder)
 
         // Set the work directory where node_modules should be located
         nodeModulesDir = file("${project.projectDir}/../../../../")
@@ -249,11 +242,11 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
     npm_install.dependsOn bundleUpToDateCheck
     npm_install.onlyIf { !isBundleUpToDate() }
 
-    task buildJSBundle(type: YarnTask) {
+    task buildJSBundle(type: NpmTask) {
         dependsOn bundleUpToDateCheck
         onlyIf { !isBundleUpToDate() }
 
-        args = ['bundle:android']
+        args = ['run', 'bundle:android']
     }
 
     task backupHermesDebugAAR(type: Copy) {
@@ -305,7 +298,7 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
 
     task resetExtractedRNTools(type: Delete) {
         println "Deleting temporary folders with extracted RN tools"
-        delete nodeFolder, npmFolder, yarnFolder
+        delete nodeFolder, npmFolder
     }
 
     preBuild.dependsOn(cleanupNodeModulesFolder)
