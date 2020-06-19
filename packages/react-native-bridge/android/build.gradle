@@ -191,8 +191,8 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
 		def dirs = [jsRootDir]
 		file(jsRootDir).eachDirRecurse { dir ->
 			def isRelevantDir = !['react-native-bridge/android/build/intermediates',
+					             file("$jsRootDir/bundle").absolutePath,
 								 'node_modules'].any { dir.absolutePath.contains(it) } &&
-					dir.name != 'bundle' &&
 					!dir.name.startsWith('symlinked')
 			if (isRelevantDir) {
 				dirs << dir
