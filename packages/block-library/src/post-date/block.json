@@ -6,7 +6,7 @@
 			"type": "string"
 		}
 	},
-	"context": [
+	"usesContext": [
 		"postId"
 	],
 	"supports": {

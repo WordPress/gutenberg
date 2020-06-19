@@ -9,10 +9,7 @@ import Cropper from 'react-easy-crop';
  * WordPress dependencies
  */
 
-import {
-	BlockControls,
-	__experimentalBlock as Block,
-} from '@wordpress/block-editor';
+import { BlockControls } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	rotateLeft as rotateLeftIcon,
@@ -26,9 +23,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 	__experimentalToolbarItem as ToolbarItem,
-	Icon,
 	Spinner,
-	withNotices,
 	RangeControl,
 	DropdownMenu,
 	MenuGroup,
@@ -36,11 +31,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import richImageRequest from './api';
+import apiFetch from '@wordpress/api-fetch';
 
 const ROTATE_STEP = 90;
 const DEFAULT_CROP = {
@@ -54,6 +45,17 @@ const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.1;
 const POPOVER_PROPS = { position: 'bottom right' };
+
+function richImageRequest( id, action, attrs ) {
+	return apiFetch( {
+		path: `__experimental/richimage/${ id }/${ action }`,
+		headers: {
+			'Content-type': 'application/json',
+		},
+		method: 'POST',
+		body: JSON.stringify( attrs ),
+	} );
+}
 
 function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 	return (
@@ -154,25 +156,25 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 	);
 }
 
-function RichImage( props ) {
-	const {
-		isSelected,
-		attributes: { id, url },
-		originalBlock: OriginalBlock,
-		setAttributes,
-	} = props;
+export default function ImageEditor( {
+	id,
+	url,
+	setAttributes,
+	isSelected,
+	naturalWidth,
+	naturalHeight,
+	width,
+	height,
+	clientWidth,
+	children,
+} ) {
 	const { createErrorNotice } = useDispatch( 'core/notices' );
 	const [ isCropping, setIsCropping ] = useState( false );
 	const [ inProgress, setIsProgress ] = useState( null );
-	const [ imageSize, setImageSize ] = useState( {
-		naturalHeight: 0,
-		naturalWidth: 0,
-	} );
 	const [ crop, setCrop ] = useState( null );
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
 	const [ zoom, setZoom ] = useState( 1 );
 	const [ aspect, setAspect ] = useState( 4 / 3 );
-	const isEditing = ! isCropping && isSelected && url;
 
 	// Cancel cropping on deselect.
 	useEffect( () => {
@@ -189,9 +191,9 @@ function RichImage( props ) {
 				setIsProgress( null );
 				setIsCropping( false );
 
-				if ( response.mediaID && response.mediaID !== id ) {
+				if ( response.media_id && response.media_id !== id ) {
 					setAttributes( {
-						id: response.mediaID,
+						id: response.media_id,
 						url: response.url,
 					} );
 				}
@@ -213,10 +215,10 @@ function RichImage( props ) {
 
 	function cropImage() {
 		adjustImage( 'crop', {
-			cropX: crop.x,
-			cropY: crop.y,
-			cropWidth: crop.width,
-			cropHeight: crop.height,
+			crop_x: crop.x,
+			crop_y: crop.y,
+			crop_width: crop.width,
+			crop_height: crop.height,
 		} );
 	}
 
@@ -234,14 +236,15 @@ function RichImage( props ) {
 					</div>
 				) }
 				{ isCropping ? (
-					<Block.div className="richimage__crop-controls">
+					<>
 						<div
 							className="richimage__crop-area"
 							style={ {
-								paddingBottom: `${
-									( 100 * imageSize.naturalHeight ) /
-									imageSize.naturalWidth
-								}%`,
+								width,
+								height:
+									height ||
+									( clientWidth * naturalHeight ) /
+										naturalWidth,
 							} }
 						>
 							<Cropper
@@ -255,7 +258,6 @@ function RichImage( props ) {
 								onCropChange={ setPosition }
 								onCropComplete={ setCrop }
 								onZoomChange={ setZoom }
-								onMediaLoaded={ setImageSize }
 							/>
 						</div>
 						<RangeControl
@@ -267,13 +269,13 @@ function RichImage( props ) {
 							value={ zoom }
 							onChange={ setZoom }
 						/>
-					</Block.div>
+					</>
 				) : (
-					<OriginalBlock { ...props } className={ classes } />
+					children
 				) }
 			</div>
-			{ isEditing && (
-				<BlockControls>
+			<BlockControls>
+				{ ! isCropping && (
 					<ToolbarGroup>
 						<ToolbarItem>
 							{ ( toggleProps ) => (
@@ -349,42 +351,35 @@ function RichImage( props ) {
 							} }
 						/>
 					</ToolbarGroup>
-				</BlockControls>
-			) }
-			{ isCropping && (
-				<BlockControls>
-					<ToolbarGroup>
-						<div className="richimage__crop-icon">
-							<Icon icon={ cropIcon } />
-						</div>
-					</ToolbarGroup>
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<AspectMenu
-									toggleProps={ toggleProps }
-									isDisabled={ inProgress }
-									onClick={ setAspect }
-								/>
-							) }
-						</ToolbarItem>
-					</ToolbarGroup>
-					<ToolbarGroup>
-						<ToolbarButton onClick={ cropImage }>
-							{ __( 'Apply' ) }
-						</ToolbarButton>
-						<ToolbarButton
-							onClick={ () => {
-								setIsCropping( false );
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
+				) }
+				{ isCropping && (
+					<>
+						<ToolbarGroup>
+							<ToolbarItem>
+								{ ( toggleProps ) => (
+									<AspectMenu
+										toggleProps={ toggleProps }
+										isDisabled={ inProgress }
+										onClick={ setAspect }
+									/>
+								) }
+							</ToolbarItem>
+						</ToolbarGroup>
+						<ToolbarGroup>
+							<ToolbarButton onClick={ cropImage }>
+								{ __( 'Apply' ) }
+							</ToolbarButton>
+							<ToolbarButton
+								onClick={ () => {
+									setIsCropping( false );
+								} }
+							>
+								{ __( 'Cancel' ) }
+							</ToolbarButton>
+						</ToolbarGroup>
+					</>
+				) }
+			</BlockControls>
 		</>
 	);
 }
-
-export default withNotices( RichImage );

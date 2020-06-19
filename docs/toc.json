@@ -2,7 +2,7 @@
 	{ "docs/readme.md": [] },
 
 	{ "docs/contributors/principles.md": [
-		{ "docs/architecture/index.md": [
+		{ "docs/architecture/readme.md": [
 			{ "docs/architecture/modularity.md": [] },
 			{ "docs/architecture/performance.md": [] },
 			{ "docs/architecture/automated-testing.md": [] }

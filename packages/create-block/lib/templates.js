@@ -19,8 +19,8 @@ const predefinedBlockTemplates = {
 			title: 'ES5 Example',
 			description:
 				'Example block written with ES5 standard and no JSX – no build step required.',
+			wpScripts: false,
 		},
-		wpScripts: false,
 	},
 	esnext: {
 		defaultValues: {
@@ -78,6 +78,7 @@ const getDefaultValues = ( blockTemplate ) => {
 		license: 'GPL-2.0-or-later',
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
+		wpScripts: true,
 		...blockTemplate.defaultValues,
 	};
 };
@@ -92,13 +93,8 @@ const getPrompts = ( blockTemplate ) => {
 	} );
 };
 
-const hasWPScriptsEnabled = ( blockTemplate ) => {
-	return blockTemplate.wpScripts !== false;
-};
-
 module.exports = {
 	getBlockTemplate,
 	getDefaultValues,
 	getPrompts,
-	hasWPScriptsEnabled,
 };
