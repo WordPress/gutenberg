@@ -77,6 +77,12 @@ To register a new block type, start by creating a `block.json` file. This file:
 			"selector": ".message"
 		}
 	},
+	"providesContext": {
+		"my-plugin/message": "message"
+	},
+	"usesContext": [
+		"groupId"
+	],
 	"supports": {
 		"align": true,
 		"lightBlockWrapper": true
@@ -251,6 +257,46 @@ The [gettext](https://www.gnu.org/software/gettext/) text domain of the plugin/b
 Attributes provide the structured data needs of a block. They can exist in different forms when they are serialized, but they are declared together under a common interface.
 
 See the [the attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
+
+### Provides Context
+
+* Type: `object`
+* Optional
+* Localized: No
+* Property: `providesContext`
+* Default: `{}`
+
+Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block's own attribute.
+
+See [the block context documentation](/docs/designers-developers/developers/block-api/block-context.md) for more details.
+
+```json
+{
+	"providesContext": {
+		"my-plugin/recordId": "recordId"
+	}
+}
+```
+
+### Context
+
+* Type: `string[]`
+* Optional
+* Localized: No
+* Property: `usesContext`
+* Default: `[]`
+
+Array of the names of context values to inherit from an ancestor provider.
+
+See [the block context documentation](/docs/designers-developers/developers/block-api/block-context.md) for more details.
+
+```json
+{
+	"usesContext": [
+		"message"
+	]
+}
+```
 
 ### Supports
 

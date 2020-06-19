@@ -13,27 +13,27 @@
 	},
 	{
 		"title": "Architecture",
-		"slug": "index",
-		"markdown_source": "../docs/architecture/index.md",
+		"slug": "architecture",
+		"markdown_source": "../docs/architecture/readme.md",
 		"parent": "principles"
 	},
 	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/architecture/modularity.md",
-		"parent": "index"
+		"parent": "architecture"
 	},
 	{
 		"title": "Performance",
 		"slug": "performance",
 		"markdown_source": "../docs/architecture/performance.md",
-		"parent": "index"
+		"parent": "architecture"
 	},
 	{
 		"title": "Automated Testing",
 		"slug": "automated-testing",
 		"markdown_source": "../docs/architecture/automated-testing.md",
-		"parent": "index"
+		"parent": "architecture"
 	},
 	{
 		"title": "Key Concepts",
