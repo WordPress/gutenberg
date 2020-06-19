@@ -107,7 +107,7 @@ function NavigationLinkEdit( {
 	}, [ url ] );
 
 	/**
-	 * Focus the navigation link label text and select it.
+	 * Focus the Link label text and select it.
 	 */
 	function selectLabelText() {
 		ref.current.focus();

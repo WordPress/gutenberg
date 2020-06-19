@@ -1,4 +1,4 @@
-// Normalize navigation link and edit containers, to look mostly the same.
+// Normalize Link and edit containers, to look mostly the same.
 .wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
 .wp-block-navigation-link__container {
 	border-radius: 0;
@@ -47,7 +47,7 @@
 	margin-left: -4px;
 }
 
-.wp-block-navigation-link__dropdown-content .components-popover__content {
+.wp-block-navigation-link__dropdown-content .components-popover__content > div {
 	padding: $grid-unit-10 0;
 }
 

@@ -265,7 +265,6 @@ const Popover = ( {
 	const slot = useSlot( __unstableSlotName );
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
-
 	noArrow = isExpanded || noArrow;
 
 	useEffect( () => {
@@ -330,6 +329,10 @@ const Popover = ( {
 				)?.parentNode;
 			}
 
+			const usedContentSize = ! contentSize.height
+				? contentRef.current.getBoundingClientRect()
+				: contentSize;
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -339,7 +342,7 @@ const Popover = ( {
 				contentWidth,
 			} = computePopoverPosition(
 				anchor,
-				contentSize,
+				usedContentSize,
 				position,
 				__unstableSticky,
 				containerRef.current,
