@@ -171,7 +171,7 @@ const getAutoCompleterUI = ( autocompleter ) => {
 								}
 								const keyedOptions = optionsData.map(
 									( optionData, optionIndex ) => ( {
-										key: `${ autocompleter.idx }-${ optionIndex }`,
+										key: `${ autocompleter.name }-${ optionIndex }`,
 										value: optionData,
 										label: autocompleter.getOptionLabel(
 											optionData
@@ -442,12 +442,8 @@ export class Autocomplete extends Component {
 				const textAfterSelection = getTextContent(
 					slice( record, undefined, getTextContent( record ).length )
 				);
-				const allCompleters = map( completers, ( completer, idx ) => ( {
-					...completer,
-					idx,
-				} ) );
 				const autocompleter = find(
-					allCompleters,
+					completers,
 					( { triggerPrefix, allowContext } ) => {
 						const index = text.lastIndexOf( triggerPrefix );
 
