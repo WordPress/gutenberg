@@ -17,13 +17,15 @@ import NavigationStructureArea from './navigation-structure-area';
 import useNavigationBlockEditor from './use-navigation-block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 
-export default function NavigationEditorWrapper( {
+export default function NavigationEditor( {
 	menuId,
 	blockEditorSettings,
 	onDeleteMenu,
 } ) {
 	const { post, hasResolved } = useSelect( ( select ) => ( {
-		post: select( 'core/edit-navigation' ).getNavigationPostForMenu( menuId + '' ),
+		post: select( 'core/edit-navigation' ).getNavigationPostForMenu(
+			menuId + ''
+		),
 		hasResolved: select( 'core/edit-navigation' ).hasResolvedNavigationPost(
 			menuId
 		),
