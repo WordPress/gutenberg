@@ -189,6 +189,7 @@ export default function ImageEditor( {
 					setAttributes( {
 						id: response.media_id,
 						url: response.url,
+						height: width / aspect,
 					} );
 				}
 			} )
@@ -279,7 +280,6 @@ export default function ImageEditor( {
 					onCropChange={ setPosition }
 					onCropComplete={ setCrop }
 					onZoomChange={ setZoom }
-					onRotationChange={ setRotation }
 				/>
 				{ inProgress && <Spinner /> }
 			</div>
