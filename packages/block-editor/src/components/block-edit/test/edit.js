@@ -86,7 +86,7 @@ describe( 'Edit', () => {
 		registerBlockType( 'core/test-block', {
 			category: 'text',
 			title: 'block title',
-			context: [ 'value' ],
+			usesContext: [ 'value' ],
 			edit,
 			save: noop,
 		} );
@@ -106,7 +106,7 @@ describe( 'Edit', () => {
 			registerBlockType( 'core/test-block', {
 				category: 'text',
 				title: 'block title',
-				context: [ 'value' ],
+				usesContext: [ 'value' ],
 				supports: {
 					lightBlockWrapper: true,
 				},
