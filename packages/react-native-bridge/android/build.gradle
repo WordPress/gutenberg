@@ -184,45 +184,32 @@ if (buildGutenbergMobileJSBundle) {
     def bundleName = 'index.android.bundle'
     def jsRootDir = '../../../..'
 
-    task bundleUpToDateCheck {
-        description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
+	task bundleUpToDateCheck {
+		description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
 If they are changed, the isBundleUpToDate flag is switched to false. That flag is used by other tasks.")
 
-        def isRelevantFile = { it.name.endsWithAny('.js', '.css') || it.name == 'package.json' }
-        def inputFiles = {
-            def jsFiles = []
-            def dirs = []
-            file(jsRootDir).eachDir { dir ->
-                if (dir.name != 'node_modules'
-                        && dir.name != 'bundle'
-                        && dir.name != 'gutenberg'
-                        && !dir.name.startsWith('symlinked')) {
-                    dirs << dir
-                }
-            }
-            file("$jsRootDir/gutenberg").eachDir { dir ->
-                if (dir.name != 'node_modules') {
-                    dirs << dir
-                }
-            }
+		def dirs = [jsRootDir]
+		file(jsRootDir).eachDirRecurse { dir ->
+			def isRelevantDir = !['react-native-bridge/android/build/intermediates',
+								 'node_modules'].any { dir.absolutePath.contains(it) } &&
+					dir.name != 'bundle' &&
+					!dir.name.startsWith('symlinked')
+			if (isRelevantDir) {
+				dirs << dir
+			}
+		}
 
-            dirs.forEach { dir ->
-                file(dir).eachFileRecurse {
-                    if (isRelevantFile(it)) {
-                        jsFiles << it
-                    }
-                }
-            }
+		def isRelevantFile = { it.name.endsWithAny('.js', '.css') || it.name ==~ /package(-lock)?\.json/ }
+		def inputFiles = []
+		dirs.forEach { dir ->
+			file(dir).eachFile {
+				if (isRelevantFile(it)) {
+					inputFiles << it
+				}
+			}
+		}
 
-            def jsRootDirFiles = file(jsRootDir).listFiles().findAll {
-                isRelevantFile(it)
-            }
-            def gutenbergRootDirFiles = file("$jsRootDir/gutenberg").listFiles().findAll {
-                isRelevantFile(it)
-            }
-            return jsFiles + jsRootDirFiles + gutenbergRootDirFiles
-        }
-        inputs.files(inputFiles())
+        inputs.files(inputFiles)
 
         // We cannot use the bundle file itself as an output because it does not yet exist when this
         // task finishes. Nevertheless, we have to declare something as an output because only tasks
@@ -230,11 +217,19 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         // output. Since that file never exists, that "output" will always be considered "up-to-date".
         outputs.file("nonexistentfile")
 
-        // The bundle file can only be up-to-date if a bundle file exists. If this task runs, that
-        // means some of the inputs have changed, and the isBundleUpToDate flag is set back to false
-        // because the bundle should be rebuilt.
-        project.ext.isBundleUpToDate = file("$buildAssetsFolder/$bundleName").exists()
-        doLast {
+		// Using onlyIf here as a hack to run this check at the time of execution even if the task
+		// is otherwise up to date. For example, even if the task is up to date the isBundleUpToDate value
+		// should be false if the bundle file does not exist at the time this task runs. This must be run
+		// at execution time to catch the case where the clean task is also running and would remove the
+		// bundle file between the configuration phase and the execution of this task.
+		onlyIf {
+			project.ext.isBundleUpToDate = file("$buildAssetsFolder/$bundleName").exists()
+			true
+		}
+
+		// If this task runs, that means some of the inputs have changed, and the isBundleUpToDate
+		// flag needs should be false so that the bundle is rebuilt.
+		doLast {
             project.ext.isBundleUpToDate = false
         }
     }
