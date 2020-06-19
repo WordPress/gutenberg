@@ -16,7 +16,7 @@ import { rgba, color } from '../utils/style-mixins';
 function SelectionBox( {
 	boundariesElement = window,
 	containerElement,
-	isVisible = true,
+	isVisible,
 } ) {
 	const [ positionStart, setPositionStart ] = useState( {
 		x: 0,
@@ -29,6 +29,7 @@ function SelectionBox( {
 	const [ isDrawing, setIsDrawing ] = useState( false );
 	const boundariesNodeRef = useRef( getBoundingElement( boundariesElement ) );
 	const containerNodeRef = useRef( getBoundingElement( containerElement ) );
+	const nodeRef = useRef();
 
 	const lastScrollCoords = useRef( { top: 0, left: 0 } );
 	const lastPositionEnd = useRef( positionEnd );
@@ -38,11 +39,15 @@ function SelectionBox( {
 	}, [ boundariesElement ] );
 
 	useEffect( () => {
-		containerNodeRef.current = getBoundingElement( containerElement );
+		containerNodeRef.current = containerElement
+			? getBoundingElement( containerElement )
+			: nodeRef.current.parentElement;
 	}, [ containerElement ] );
 
 	useEffect( () => {
-		setIsDrawing( isVisible );
+		if ( isVisible !== undefined ) {
+			setIsDrawing( isVisible );
+		}
 	}, [ isVisible ] );
 
 	useEffect( () => {
@@ -55,19 +60,18 @@ function SelectionBox( {
 			const nextX = event.clientX + nextScrollLeft;
 			const nextY = event.clientY + nextScrollTop;
 
-			setPositionStart( {
+			const nextPositionEnd = {
 				x: nextX - offsetLeft,
 				y: nextY - offsetTop,
-			} );
-
-			const nextPositionEnd = {
-				x: nextX,
-				y: nextY,
 			};
 
-			// setIsDrawing( true );
+			setPositionStart( nextPositionEnd );
 			setPositionEnd( nextPositionEnd );
 			lastPositionEnd.current = nextPositionEnd;
+
+			if ( isVisible === undefined ) {
+				setIsDrawing( true );
+			}
 		};
 
 		const handleOnMouseUp = () => {
@@ -107,11 +111,8 @@ function SelectionBox( {
 			const nextScrollTop = nextTop - prevTop;
 			const nextScrollLeft = nextLeft - prevLeft;
 
-			const offsetTop = containerNodeRef.current?.offsetTop || 0;
-			const offsetLeft = containerNodeRef.current?.offsetLeft || 0;
-
-			const nextX = x + nextScrollLeft - offsetLeft;
-			const nextY = y + nextScrollTop - offsetTop;
+			const nextX = x + nextScrollLeft;
+			const nextY = y + nextScrollTop;
 
 			const nextPositionEnd = {
 				x: nextX,
@@ -127,11 +128,15 @@ function SelectionBox( {
 			};
 		};
 
-		document.addEventListener( 'mousedown', handleOnMouseDown );
-		document.addEventListener( 'mouseup', handleOnMouseUp );
+		window.addEventListener( 'mousedown', handleOnMouseDown );
 		document.addEventListener( 'mousemove', handleOnMouseMove );
+		window.addEventListener( 'mouseup', handleOnMouseUp );
 
 		if ( boundariesNodeRef.current ) {
+			boundariesNodeRef.current.addEventListener(
+				'mouseup',
+				handleOnMouseUp
+			);
 			boundariesNodeRef.current.addEventListener(
 				'scroll',
 				handleOnScroll
@@ -139,11 +144,15 @@ function SelectionBox( {
 		}
 
 		return () => {
-			document.removeEventListener( 'mousedown', handleOnMouseDown );
-			document.removeEventListener( 'mouseup', handleOnMouseUp );
+			window.removeEventListener( 'mousedown', handleOnMouseDown );
 			document.removeEventListener( 'mousemove', handleOnMouseMove );
+			window.removeEventListener( 'mouseup', handleOnMouseUp );
 
 			if ( boundariesNodeRef.current ) {
+				boundariesNodeRef.current.removeEventListener(
+					'mouseup',
+					handleOnMouseUp
+				);
 				boundariesNodeRef.current.removeEventListener(
 					'scroll',
 					handleOnScroll
@@ -151,8 +160,6 @@ function SelectionBox( {
 			}
 		};
 	}, [ isDrawing, isVisible ] );
-
-	if ( ! isVisible || ! isDrawing ) return null;
 
 	const box = getBoxClientRect( {
 		maxWidth: getBoundingElementMaxWidth( boundariesNodeRef.current ),
@@ -167,6 +174,7 @@ function SelectionBox( {
 		backgroundColor: rgba( color( 'ui.borderFocus' ), 0.2 ),
 		border: '1px solid',
 		borderColor: rgba( color( 'ui.borderFocus' ), 0.8 ),
+		display: isDrawing ? 'block' : 'none',
 		height: box.height,
 		left: 0,
 		opacity: 0.5,
@@ -179,7 +187,7 @@ function SelectionBox( {
 		zIndex: 99999,
 	};
 
-	return <div style={ style } />;
+	return <div style={ style } ref={ nodeRef } />;
 }
 
 function getBoundingElement( selector = window ) {
@@ -218,14 +226,36 @@ function getBoxClientRect( {
 	const isXPositive = endX > startX;
 	const isYPositive = endY > startY;
 
-	const left = isXPositive ? startX : endX;
-	const top = isYPositive ? startY : endY;
+	let left = isXPositive ? startX : endX;
+	let top = isYPositive ? startY : endY;
 
 	let width = isXPositive ? endX - startX : startX - endX;
 	let height = isYPositive ? endY - startY : startY - endY;
 
-	width = maxWidth ? clamp( width, 0, maxWidth - left ) : width;
-	height = maxHeight ? clamp( height, 0, maxHeight - top ) : height;
+	let widthLimit = maxWidth;
+	let heightLimit = maxHeight;
+
+	if ( ! isXPositive && widthLimit ) {
+		widthLimit = startX;
+	} else {
+		widthLimit = widthLimit - left;
+	}
+
+	if ( ! isYPositive && heightLimit ) {
+		heightLimit = startY;
+	} else {
+		heightLimit = heightLimit - top;
+	}
+
+	width = widthLimit ? clamp( width, 0, widthLimit ) : width;
+	height = heightLimit ? clamp( height, 0, heightLimit ) : height;
+
+	if ( width === widthLimit && ! isXPositive ) {
+		left = 0;
+	}
+	if ( height === heightLimit && ! isYPositive ) {
+		top = 0;
+	}
 
 	return {
 		top,

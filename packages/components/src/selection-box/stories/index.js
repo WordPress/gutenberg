@@ -14,6 +14,7 @@ export const _default = () => {
 				width: 600,
 				height: 400,
 				overflowY: 'scroll',
+				marginTop: 30,
 			} }
 		>
 			<div
