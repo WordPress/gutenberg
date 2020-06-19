@@ -108,19 +108,19 @@ class WP_Block {
 		if ( ! empty( $this->block_type->context ) ) {
 			$message = sprintf(
 				/* translators: 1: Block name. */
-				__( 'Block type "context" option is deprecated. Please use "uses_context" instead in "%s" block.', 'gutenberg' ),
+				__( 'The "context" parameter provided in block type "%s" is deprecated. Please use "uses_context" instead.', 'gutenberg' ),
 				$this->name
 			);
-			_doing_it_wrong( __CLASS__, $message, '8.4.0' );
+			_doing_it_wrong( __CLASS__, $message, '8.6.0' );
 			$this->block_type->uses_context = $this->block_type->context;
 		}
 		if ( ! empty( $this->block_type->providesContext ) ) {
 			$message = sprintf(
 				/* translators: 1: Block name. */
-				__( 'Block type "providesContext" option is deprecated. Please use "provides_context" instead in "%s" block.', 'gutenberg' ),
+				__( 'The "providesContext" parameter provided in block type "%s" is deprecated. Please use "provides_context".', 'gutenberg' ),
 				$this->name
 			);
-			_doing_it_wrong( __CLASS__, $message, '8.4.0' );
+			_doing_it_wrong( __CLASS__, $message, '8.6.0' );
 			$this->block_type->provides_context = $this->block_type->providesContext;
 		}
 
