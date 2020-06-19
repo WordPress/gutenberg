@@ -1,4 +1,4 @@
-# Themes & Block Editor: experimental theme.json
+# Themes & Block Editor: Global Styles
 
 > **These features are still experimental**. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 >

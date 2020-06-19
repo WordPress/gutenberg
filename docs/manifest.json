@@ -258,9 +258,9 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Themes & Block Editor: experimental theme.json",
+		"title": "Themes & Block Editor: Global Styles",
 		"slug": "theme-json",
-		"markdown_source": "../docs/designers-developers/developers/themes/theme-json.md",
+		"markdown_source": "../docs/designers-developers/developers/themes/global-styles.md",
 		"parent": "themes"
 	},
 	{
