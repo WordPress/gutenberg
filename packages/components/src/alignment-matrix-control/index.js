@@ -3,11 +3,7 @@
  */
 import { noop } from 'lodash';
 import classnames from 'classnames';
-import {
-	unstable_useCompositeState as useCompositeState,
-	unstable_Composite as Composite,
-	unstable_CompositeGroup as CompositeGroup,
-} from 'reakit';
+import { useCompositeState, Composite, CompositeGroup } from 'reakit';
 
 /**
  * WordPress dependencies

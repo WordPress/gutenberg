@@ -41,7 +41,7 @@
 		"requireindex": "^1.2.0"
 	},
 	"peerDependencies": {
-		"eslint": "6.x"
+		"eslint": "^6 || ^7"
 	},
 	"publishConfig": {
 		"access": "public"

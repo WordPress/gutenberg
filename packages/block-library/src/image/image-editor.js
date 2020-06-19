@@ -161,15 +161,16 @@ export default function ImageEditor( {
 	url,
 	setAttributes,
 	isSelected,
+	naturalWidth,
+	naturalHeight,
+	width,
+	height,
+	clientWidth,
 	children,
 } ) {
 	const { createErrorNotice } = useDispatch( 'core/notices' );
 	const [ isCropping, setIsCropping ] = useState( false );
 	const [ inProgress, setIsProgress ] = useState( null );
-	const [ imageSize, setImageSize ] = useState( {
-		naturalHeight: 0,
-		naturalWidth: 0,
-	} );
 	const [ crop, setCrop ] = useState( null );
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
 	const [ zoom, setZoom ] = useState( 1 );
@@ -235,14 +236,15 @@ export default function ImageEditor( {
 					</div>
 				) }
 				{ isCropping ? (
-					<div className="richimage__crop-controls">
+					<>
 						<div
 							className="richimage__crop-area"
 							style={ {
-								paddingBottom: `${
-									( 100 * imageSize.naturalHeight ) /
-									imageSize.naturalWidth
-								}%`,
+								width,
+								height:
+									height ||
+									( clientWidth * naturalHeight ) /
+										naturalWidth,
 							} }
 						>
 							<Cropper
@@ -256,7 +258,6 @@ export default function ImageEditor( {
 								onCropChange={ setPosition }
 								onCropComplete={ setCrop }
 								onZoomChange={ setZoom }
-								onMediaLoaded={ setImageSize }
 							/>
 						</div>
 						<RangeControl
@@ -268,7 +269,7 @@ export default function ImageEditor( {
 							value={ zoom }
 							onChange={ setZoom }
 						/>
-					</div>
+					</>
 				) : (
 					children
 				) }
