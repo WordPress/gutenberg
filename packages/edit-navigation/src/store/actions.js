@@ -135,6 +135,9 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 	const { nonce, stylesheet } = yield apiFetch( {
 		path: '/__experimental/customizer-nonces/get-save-nonce',
 	} );
+	if ( ! nonce ) {
+		throw new Error();
+	}
 
 	// eslint-disable-next-line no-undef
 	const body = new FormData();
