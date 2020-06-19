@@ -10,7 +10,7 @@ import { escapeRegExp, find, map, debounce, deburr } from 'lodash';
 import {
 	Component,
 	renderToString,
-	useEffect,
+	useLayoutEffect,
 	useState,
 } from '@wordpress/element';
 import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
@@ -157,7 +157,7 @@ const getAutoCompleterUI = ( autocompleter ) => {
 				 * `activePromise` in the state would result in it actually being in `this.state`
 				 * before the promise resolves and we check to see if this is the active promise or not.
 				 */
-				useEffect( () => {
+				useLayoutEffect( () => {
 					const { options, isDebounced } = autocompleter;
 					const loadOptions = debounce(
 						() => {
@@ -229,7 +229,7 @@ const getAutoCompleterUI = ( autocompleter ) => {
 		onReset,
 	} ) {
 		const [ items ] = useItems( filterValue );
-		useEffect( () => {
+		useLayoutEffect( () => {
 			onChangeOptions( items );
 		}, [ items ] );
 
