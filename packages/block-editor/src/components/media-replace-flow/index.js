@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { uniqueId } from 'lodash';
+import { uniqueId, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
+	withFilters,
 } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
@@ -36,6 +37,7 @@ const MediaReplaceFlow = ( {
 	accept,
 	onSelect,
 	onSelectURL,
+	onFilesUpload = noop,
 	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
@@ -86,6 +88,7 @@ const MediaReplaceFlow = ( {
 
 	const uploadFiles = ( event ) => {
 		const files = event.target.files;
+		onFilesUpload( files );
 		const setMedia = ( [ media ] ) => {
 			selectMedia( media );
 		};
@@ -199,4 +202,5 @@ export default compose( [
 			removeNotice,
 		};
 	} ),
+	withFilters( 'editor.MediaReplaceFlow' ),
 ] )( MediaReplaceFlow );

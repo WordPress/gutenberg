@@ -57,6 +57,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Image_Editor_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-image-editor-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Plugins_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-plugins-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
@@ -100,5 +103,6 @@ require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
 require dirname( __FILE__ ) . '/edit-site-page.php';
+require dirname( __FILE__ ) . '/edit-site-export.php';
 require dirname( __FILE__ ) . '/editor-features.php';
 require dirname( __FILE__ ) . '/global-styles.php';

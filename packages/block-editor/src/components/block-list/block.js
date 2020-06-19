@@ -107,6 +107,7 @@ function BlockListBlock( {
 			? getBlockDefaultClassName( name )
 			: null;
 	const customClassName = lightBlockWrapper ? attributes.className : null;
+	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the
@@ -116,6 +117,7 @@ function BlockListBlock( {
 		customClassName,
 		'block-editor-block-list__block',
 		{
+			'wp-block': ! isAligned,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': isSelected,
 			'is-highlighted': isHighlighted,
@@ -151,6 +153,19 @@ function BlockListBlock( {
 			toggleSelection={ toggleSelection }
 		/>
 	);
+
+	// For aligned blocks, provide a wrapper element so the block can be
+	// positioned relative to the block column.
+	if ( isAligned ) {
+		const alignmentWrapperProps = {
+			'data-align': wrapperProps[ 'data-align' ],
+		};
+		blockEdit = (
+			<div className="wp-block" { ...alignmentWrapperProps }>
+				{ blockEdit }
+			</div>
+		);
+	}
 
 	if ( mode !== 'visual' ) {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;

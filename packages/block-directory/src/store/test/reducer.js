@@ -12,7 +12,7 @@ import {
 	errorNotices,
 	hasPermission,
 } from '../reducer';
-import { installedItem, downloadableBlock } from './fixtures';
+import { blockTypeInstalled, downloadableBlock } from './fixtures';
 
 describe( 'state', () => {
 	describe( 'downloadableBlocks()', () => {
@@ -72,7 +72,7 @@ describe( 'state', () => {
 			const initialState = deepFreeze( { installedBlockTypes: [] } );
 			const state = blockManagement( initialState, {
 				type: 'ADD_INSTALLED_BLOCK_TYPE',
-				item: installedItem,
+				item: blockTypeInstalled,
 			} );
 
 			expect( state.installedBlockTypes ).toHaveLength( 1 );
@@ -80,11 +80,11 @@ describe( 'state', () => {
 
 		it( 'should remove item from the installedBlockTypesList', () => {
 			const initialState = deepFreeze( {
-				installedBlockTypes: [ installedItem ],
+				installedBlockTypes: [ blockTypeInstalled ],
 			} );
 			const state = blockManagement( initialState, {
 				type: 'REMOVE_INSTALLED_BLOCK_TYPE',
-				item: installedItem,
+				item: blockTypeInstalled,
 			} );
 
 			expect( state.installedBlockTypes ).toHaveLength( 0 );
