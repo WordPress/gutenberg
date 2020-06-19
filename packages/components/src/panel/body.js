@@ -38,7 +38,9 @@ export function PanelBody(
 	ref
 ) {
 	const initialOpen = useRef( initialOpenProp ).current;
-	const disclosure = useDisclosureState( { visible: initialOpen || opened } );
+	const disclosure = useDisclosureState( {
+		visible: initialOpen !== undefined ? initialOpen : opened,
+	} );
 	const nodeRef = useRef();
 	const combinedRefs = useCombinedRefs( ref, nodeRef );
 
@@ -61,15 +63,21 @@ export function PanelBody(
 			 * This improves the UX when there are multiple stacking <PanelBody />
 			 * components in a scrollable container.
 			 */
-			nodeRef.current.scrollIntoView( {
-				inline: 'nearest',
-				block: 'nearest',
-				behavior: scrollBehavior,
-			} );
+			if ( nodeRef.current.scrollIntoView ) {
+				nodeRef.current.scrollIntoView( {
+					inline: 'nearest',
+					block: 'nearest',
+					behavior: scrollBehavior,
+				} );
+			}
 		}
 
 		onToggle( disclosure.visible );
 	}, [ disclosure.visible, onToggle, scrollBehavior ] );
+
+	useUpdateEffect( () => {
+		disclosure.setVisible( opened );
+	}, [ disclosure.setVisible, opened ] );
 
 	const classes = classnames( 'components-panel__body', className, {
 		'is-opened': isOpened,
@@ -77,7 +85,7 @@ export function PanelBody(
 
 	return (
 		<div className={ classes } ref={ combinedRefs }>
-			<PanelHeader
+			<PanelBodyTitle
 				focusable={ focusable }
 				title={ title }
 				icon={ icon }
@@ -90,39 +98,42 @@ export function PanelBody(
 	);
 }
 
-function PanelHeader( { focusable, isOpened, icon, title, ...props } ) {
-	if ( ! title ) return null;
+const PanelBodyTitle = forwardRef(
+	( { focusable, isOpened, icon, title, ...props }, ref ) => {
+		if ( ! title ) return null;
 
-	return (
-		<h2 className="components-panel__body-title">
-			<Disclosure
-				as={ Button }
-				className="components-panel__body-toggle"
-				focusable={ focusable }
-				{ ...props }
-			>
-				{ /*
+		return (
+			<h2 className="components-panel__body-title">
+				<Disclosure
+					as={ Button }
+					className="components-panel__body-toggle"
+					focusable={ focusable }
+					ref={ ref }
+					{ ...props }
+				>
+					{ /*
 					Firefox + NVDA don't announce aria-expanded because the browser
 					repaints the whole element, so this wrapping span hides that.
 				*/ }
-				<span aria-hidden="true">
-					<Icon
-						className="components-panel__arrow"
-						icon={ isOpened ? chevronUp : chevronDown }
-					/>
-				</span>
-				{ title }
-				{ icon && (
-					<Icon
-						icon={ icon }
-						className="components-panel__icon"
-						size={ 20 }
-					/>
-				) }
-			</Disclosure>
-		</h2>
-	);
-}
+					<span aria-hidden="true">
+						<Icon
+							className="components-panel__arrow"
+							icon={ isOpened ? chevronUp : chevronDown }
+						/>
+					</span>
+					{ title }
+					{ icon && (
+						<Icon
+							icon={ icon }
+							className="components-panel__icon"
+							size={ 20 }
+						/>
+					) }
+				</Disclosure>
+			</h2>
+		);
+	}
+);
 
 const ForwardedComponent = forwardRef( PanelBody );
 
