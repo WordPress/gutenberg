@@ -9,12 +9,12 @@ import { truncate } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 
 function ThemePreview( {
-	theme: { author_name: authorName, description, name, screenshot, version },
+	theme: { author, description, name, screenshot, version },
 } ) {
 	return (
 		<div className="edit-site-template-switcher__theme-preview">
 			<span className="edit-site-template-switcher__theme-preview-name">
-				{ name }
+				{ name.raw }
 			</span>{ ' ' }
 			<span className="edit-site-template-switcher__theme-preview-version">
 				{ 'v' + version }
@@ -22,7 +22,7 @@ function ThemePreview( {
 			<div className="edit-site-template-switcher__theme-preview-byline">
 				{
 					// translators: %s: theme author name.
-					sprintf( __( 'By %s' ), [ authorName ] )
+					sprintf( __( 'By %s' ), [ author.raw ] )
 				}
 			</div>
 			<img
@@ -31,7 +31,7 @@ function ThemePreview( {
 				alt={ 'Theme Preview' }
 			/>
 			<div className="edit-site-template-switcher__theme-preview-description">
-				{ truncate( description, {
+				{ truncate( description.raw, {
 					length: 120,
 					separator: /\. +/,
 				} ) }
