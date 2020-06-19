@@ -200,15 +200,17 @@ export default function Image( {
 						/>
 					</ToolbarGroup>
 				) }
-				<ToolbarGroup>
-					<ToolbarButton
-						onClick={ () =>
-							setIsEditingImage( ( value ) => ! value )
-						}
-					>
-						{ isEditingImage ? __( 'Cancel' ) : __( 'Edit' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
+				{ id && (
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () =>
+								setIsEditingImage( ( value ) => ! value )
+							}
+						>
+							{ isEditingImage ? __( 'Cancel' ) : __( 'Edit' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				) }
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
@@ -318,6 +320,7 @@ export default function Image( {
 	if (
 		__experimentalEnableRichImageEditing &&
 		isEditingImage &&
+		id &&
 		naturalWidth &&
 		naturalHeight
 	) {
