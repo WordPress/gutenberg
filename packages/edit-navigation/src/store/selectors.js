@@ -14,7 +14,14 @@ import { createRegistrySelector } from '@wordpress/data';
 import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
 
 /**
- * @see resolvers.js
+ * Returns a "stub" navigation post reflecting the contents of menu with id=menuId. The
+ * post is meant as a convenient to only exists in runtime and should never be saved. It
+ * enables a convenient way of editing the navigation by using a regular post editor.
+ *
+ * Related resolver fetches all menu items, converts them into blocks, and hydrates a new post with them.
+ *
+ * @param {string} menuId The id of menu to create a post from.
+ * @return {null|Object} Post once the resolver fetches it, otherwise null
  */
 export const getNavigationPost = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
