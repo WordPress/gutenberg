@@ -1,49 +1,7 @@
 
-.wp-block-template-part__placeholder-tabs {
-	display: flex;
-	flex-grow: 1;
-	flex-direction: column;
-
-	.components-tab-panel__tabs {
-		border-bottom: $border-width solid $light-gray-500;
-
-		.components-tab-panel__tabs-item {
-			flex-grow: 1;
-			margin-bottom: -$border-width;
-		}
-	}
-
-	.components-tab-panel__tab-content {
-		margin-top: $grid-unit-20;
-		display: flex;
-		flex-grow: 1;
-		flex-direction: column;
-		position: relative;
-	}
-
-	.wp-block-template-part__placeholder-input-container {
-		display: flex;
-		flex-wrap: wrap;
-		width: 100%;
-
-		.wp-block-template-part__placeholder-input {
-			margin: 5px;
-		}
-	}
-
-	.wp-block-template-part__placeholder-help-phrase {
-		padding: 0 $grid-unit-15 $grid-unit-15;
-	}
-
-	.wp-block-template-part__placeholder-create-button {
-		align-self: flex-start;
-	}
-
-	.wp-block-template-part__placeholder-preview-filter-input {
-		width: inherit;
-	}
+.wp-block-template-part__placeholder-preview-filter-input {
+	width: inherit;
 }
-
 
 .wp-block-template-part__placeholder-preview-container {
 	width: inherit;
