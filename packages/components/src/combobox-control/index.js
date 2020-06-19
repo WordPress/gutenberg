@@ -1,17 +1,18 @@
-/* eslint-disable no-console */
-
 /**
  * External dependencies
  */
 import { useCombobox } from 'downshift';
 import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
-import { Spinner } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { Button, Dashicon } from '../';
+import { Button, Dashicon, Spinner } from '../';
 
 const itemToString = ( item ) => item && item.name;
 export default function ComboboxControl( {

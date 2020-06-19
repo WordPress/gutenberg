@@ -6,11 +6,11 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-import EnhancedPostAuthor from './enhanced-post-author';
 /**
  * Internal dependencies
  */
 import PostAuthorCheck from './check';
+import EnhancedPostAuthor from './enhanced-post-author';
 
 export class PostAuthor extends Component {
 	constructor() {
@@ -34,6 +34,11 @@ export class PostAuthor extends Component {
 			onUpdateAuthor,
 		} = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
+
+		// Wait until we have the post author before displaying the component.
+		if ( 0 === postAuthor.length ) {
+			return null;
+		}
 
 		// Disable reason: A select with an onchange throws a warning
 

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -8,11 +13,6 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import ComboboxControl from '../../../../components/build/combobox-control/';
-
-/**
- * External dependencies
- */
-import { debounce } from 'lodash';
 
 function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	const currentPostAuthor = postAuthor[ 0 ];
@@ -31,9 +31,11 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 
 	// Ensure the current author is included in the initial dropdown list.
 	let foundAuthor = initialAuthors.findIndex(
-		( author ) => currentPostAuthor.id === author.id
+		( author ) => currentPostAuthor && currentPostAuthor.id === author.id
 	);
-	if ( foundAuthor < 0 ) {
+
+	if ( currentPostAuthor && foundAuthor < 0 ) {
+		currentPostAuthor.key = initialAuthors.length;
 		initialAuthors = [ currentPostAuthor, ...initialAuthors ];
 		foundAuthor = 0;
 	}
@@ -51,11 +53,6 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	// The currently selected author.
 	const [ selectedAuthor, setSelectedAuthor ] = useState( currentPostAuthor );
 
-	// Wait until we have the post author before displaying the component.
-	if ( 0 === postAuthor.length ) {
-		return null;
-	}
-
 	/**
 	 * Handle author selection.
 	 *
@@ -69,7 +66,7 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	/**
 	 * Handle user input.
 	 *
-	 * @param {Object} param0 Contains a single property `inputValue` with the string value of the input field.
+	 * @param {string} inputValue The current value of the input field.
 	 */
 	const handleKeydown = ( { inputValue } ) => {
 		if ( '' === inputValue ) {
@@ -89,7 +86,7 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	const searchAuthors = debounce( ( query ) => {
 		const payload = '?search=' + encodeURIComponent( query );
 		setIsLoadingSearchResult( true );
-		apiFetch( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
+		apiFetch( { path: '/wp/v2/users' + payload } ).then( ( results ) => {
 			setAvailableAuthors(
 				results.map( ( author, i ) => ( {
 					key: i,
@@ -100,12 +97,12 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 			);
 			setIsLoadingSearchResult( false );
 		} );
-	}, 150 );
+	}, 300 );
 
 	return (
 		<ComboboxControl
 			id={ id }
-			isLoadingSearchResults={ isLoadingSearchResults }
+			isLoading={ isLoadingSearchResults }
 			options={ availableAuthors }
 			initialHighlightedIndex={ foundAuthor }
 			initialInputValue={ selectedAuthor.name }
