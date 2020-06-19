@@ -16,16 +16,17 @@ export function PublishButtonLabel( {
 	isBeingScheduled,
 	isSaving,
 	isPublishing,
+	isScheduling,
 	hasPublishAction,
 	isAutosaving,
 	hasNonPostEntityChanges,
 } ) {
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
+	} else if ( isScheduling ) {
+		return __( 'Scheduling…' );
 	} else if ( ( isPublished || isScheduled ) && isSaving && ! isAutosaving ) {
 		return __( 'Updating…' );
-	} else if ( isBeingScheduled && isSaving && ! isAutosaving ) {
-		return __( 'Scheduling…' );
 	}
 
 	if ( isPublished || isScheduled ) {
@@ -49,6 +50,7 @@ export default compose( [
 			isEditedPostBeingScheduled,
 			isSavingPost,
 			isPublishingPost,
+			isSchedulingPost,
 			getCurrentPost,
 			getCurrentPostType,
 			isAutosavingPost,
@@ -59,6 +61,7 @@ export default compose( [
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isPublishing: isPublishingPost(),
+			isScheduling: isSchedulingPost(),
 			hasPublishAction: get(
 				getCurrentPost(),
 				[ '_links', 'wp:action-publish' ],

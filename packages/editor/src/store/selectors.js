@@ -488,13 +488,16 @@ export function isCurrentPostPublished( state, currentPost ) {
  * Returns true if post is already scheduled.
  *
  * @param {Object} state Global application state.
+ * @param {Object?} currentPost Explicit current post for bypassing registry selector.
  *
  * @return {boolean} Whether current post is scheduled to be posted.
  */
-export function isCurrentPostScheduled( state ) {
+export function isCurrentPostScheduled( state, currentPost ) {
+	const post = currentPost || getCurrentPost( state );
+
 	return (
-		getCurrentPost( state ).status === 'future' &&
-		! isCurrentPostPublished( state )
+		post.status === 'future' &&
+		! isCurrentPostPublished( state, currentPost )
 	);
 }
 
@@ -1108,6 +1111,39 @@ export function isPublishingPost( state ) {
 	return (
 		!! stateBeforeRequest &&
 		! isCurrentPostPublished( null, stateBeforeRequest.currentPost )
+	);
+}
+
+/**
+ * Returns true if the post is being scheduled, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether post is being scheduled.
+ */
+export function isSchedulingPost( state ) {
+	if ( ! isSavingPost( state ) ) {
+		return false;
+	}
+
+	// Saving is optimistic, so assume that current post would be marked as
+	// scheduled if scheduling
+	if ( ! isCurrentPostScheduled( state ) ) {
+		return false;
+	}
+
+	// Use post update transaction ID to retrieve the state prior to the
+	// optimistic transaction
+	const stateBeforeRequest = getStateBeforeOptimisticTransaction(
+		state,
+		POST_UPDATE_TRANSACTION_ID
+	);
+
+	// Consider as scheduling when current post prior to request was not
+	// considered scheduled
+	return (
+		!! stateBeforeRequest &&
+		! isCurrentPostScheduled( null, stateBeforeRequest.currentPost )
 	);
 }
 
