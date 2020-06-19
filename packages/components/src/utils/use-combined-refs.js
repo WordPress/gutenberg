@@ -10,11 +10,17 @@ export function useCombinedRefs( ...refs ) {
 		refs.forEach( ( ref ) => {
 			if ( ! ref ) return;
 
-			if ( typeof ref === 'function' ) {
-				ref( targetRef.current );
-			} else {
-				ref.current = targetRef.current;
-			}
+			/*
+			 * Wrapping in try/catch as this causes issues in Jest.
+			 * Cannot add property current, object is not extensible
+			 */
+			try {
+				if ( typeof ref === 'function' ) {
+					ref( targetRef.current );
+				} else {
+					ref.current = targetRef.current;
+				}
+			} catch {}
 		} );
 	}, [] );
 
