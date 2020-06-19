@@ -48,10 +48,10 @@ if (buildGutenbergMobileJSBundle) {
 
     node {
         // Version of node to use.
-        version = '12.16.1'
+        version = '12.18.1'
 
         // Version of npm to use.
-        npmVersion = '6.14.2'
+        npmVersion = '6.14.5'
 
         // Base URL for fetching node distributions (change if you have a mirror).
         distBaseUrl = 'https://nodejs.org/dist'
