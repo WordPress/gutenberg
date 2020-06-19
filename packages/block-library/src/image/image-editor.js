@@ -174,7 +174,13 @@ export default function ImageEditor( {
 	function apply() {
 		setIsProgress( true );
 
-		richImageRequest( id, { crop, rotation } )
+		const attrs = { crop };
+
+		if ( rotation > 0 ) {
+			attrs.rotation = rotation;
+		}
+
+		richImageRequest( id, attrs )
 			.then( ( response ) => {
 				setIsProgress( false );
 				setIsEditingImage( false );
