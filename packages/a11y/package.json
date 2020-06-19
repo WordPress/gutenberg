@@ -6,6 +6,8 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
+		"accessibility",
 		"a11y",
 		"aria-live"
 	],

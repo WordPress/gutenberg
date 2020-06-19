@@ -47,6 +47,24 @@ const MOCK_BLOCK1 = {
 	humanized_updated: '5 months ago',
 };
 
+const MOCK_INSTALLED_BLOCK_PLUGIN_DETAILS = {
+	plugin: 'block-directory-test-block',
+	status: 'active',
+	name: 'Block Directory',
+	plugin_uri: '',
+	author: 'No Author',
+	author_uri: '',
+	description: {
+		raw: 'This plugin is useful for the block.',
+		rendered: 'This plugin is useful for the block.',
+	},
+	version: '1.0',
+	network_only: false,
+	requires_wp: '',
+	requires_php: '',
+	text_domain: 'block-directory-test-block',
+};
+
 const MOCK_BLOCK2 = {
 	...MOCK_BLOCK1,
 	name: 'block-directory-test-block/secondary-block',
@@ -73,7 +91,42 @@ const block = `( function() {
 	} );
 } )();`;
 
+const MOCK_OPTIONS = {
+	namespace: '__experimental',
+	methods: [ 'GET' ],
+	endpoints: [
+		{
+			methods: [ 'GET' ],
+			args: {},
+		},
+	],
+	schema: {
+		$schema: 'http://json-schema.org/draft-04/schema#',
+		title: 'block-directory-item',
+		type: 'object',
+		properties: {},
+	},
+};
+
+const MOCK_OPTIONS_RESPONSE = {
+	match: ( request ) =>
+		matchUrl( request.url(), SEARCH_URLS ) &&
+		request.method() === 'OPTIONS',
+	onRequestMatch: async ( request ) => {
+		const response = {
+			content: 'application/json',
+			body: JSON.stringify( MOCK_OPTIONS ),
+			headers: {
+				Allow: 'GET',
+			},
+		};
+
+		return request.respond( response );
+	},
+};
+
 const MOCK_EMPTY_RESPONSES = [
+	MOCK_OPTIONS_RESPONSE,
 	{
 		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
 		onRequestMatch: createJSONResponse( [] ),
@@ -81,6 +134,7 @@ const MOCK_EMPTY_RESPONSES = [
 ];
 
 const MOCK_BLOCKS_RESPONSES = [
+	MOCK_OPTIONS_RESPONSE,
 	{
 		// Mock response for search with the block
 		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
@@ -89,7 +143,9 @@ const MOCK_BLOCKS_RESPONSES = [
 	{
 		// Mock response for install
 		match: ( request ) => matchUrl( request.url(), INSTALL_URLS ),
-		onRequestMatch: createJSONResponse( { success: true } ),
+		onRequestMatch: createJSONResponse(
+			MOCK_INSTALLED_BLOCK_PLUGIN_DETAILS
+		),
 	},
 	{
 		// Mock the response for the js asset once it gets injected

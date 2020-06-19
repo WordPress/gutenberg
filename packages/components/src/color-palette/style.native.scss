@@ -23,3 +23,22 @@
 	margin-top: 12px;
 	margin-bottom: 12px;
 }
+
+.customIndicatorWrapper {
+	flex-direction: row;
+	align-items: center;
+}
+
+.customText {
+	font-size: 16px;
+	color: $gray-dark;
+}
+
+.customTextDark {
+	color: $white;
+}
+
+.customTextAndroid {
+	letter-spacing: 1.25;
+	font-weight: medium;
+}

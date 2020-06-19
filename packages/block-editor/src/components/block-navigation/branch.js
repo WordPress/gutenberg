@@ -30,26 +30,30 @@ export default function BlockNavigationBranch( props ) {
 
 	const isTreeRoot = ! parentBlockClientId;
 	const filteredBlocks = compact( blocks );
+	const itemHasAppender = ( parentClientId ) =>
+		showAppender &&
+		! isTreeRoot &&
+		selectedBlockClientId === parentClientId;
+	const hasAppender = itemHasAppender( parentBlockClientId );
 	// Add +1 to the rowCount to take the block appender into account.
-	const rowCount = showAppender
+	const rowCount = hasAppender
 		? filteredBlocks.length + 1
 		: filteredBlocks.length;
-	const hasAppender =
-		showAppender && filteredBlocks.length > 0 && ! isTreeRoot;
 	const appenderPosition = rowCount;
 
 	return (
 		<>
 			{ map( filteredBlocks, ( block, index ) => {
 				const { clientId, innerBlocks } = block;
-				const hasNestedBlocks =
-					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 				const position = index + 1;
 				const isLastRowAtLevel = rowCount === position;
 				const updatedTerminatedLevels = isLastRowAtLevel
 					? [ ...terminatedLevels, level ]
 					: terminatedLevels;
 				const updatedPath = [ ...path, position ];
+				const hasNestedBlocks =
+					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
+				const hasNestedAppender = itemHasAppender( clientId );
 
 				return (
 					<Fragment key={ clientId }>
@@ -64,7 +68,7 @@ export default function BlockNavigationBranch( props ) {
 							terminatedLevels={ terminatedLevels }
 							path={ updatedPath }
 						/>
-						{ hasNestedBlocks && (
+						{ ( hasNestedBlocks || hasNestedAppender ) && (
 							<BlockNavigationBranch
 								blocks={ innerBlocks }
 								selectedBlockClientId={ selectedBlockClientId }

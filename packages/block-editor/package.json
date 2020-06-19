@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "4.0.0",
+	"version": "4.1.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"editor",
 		"blocks"
 	],
@@ -43,7 +44,6 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/shortcode": "file:../shortcode",
 		"@wordpress/token-list": "file:../token-list",

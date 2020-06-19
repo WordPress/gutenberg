@@ -57,11 +57,11 @@ export default function MenuEditor( {
 				<BlockEditorKeyboardShortcuts />
 				<MenuEditorShortcuts saveBlocks={ saveMenuItems } />
 				<NavigationStructureArea
-					blocks={ blocks }
+					blocks={ blocks[ 0 ]?.innerBlocks || [] }
 					initialOpen={ isLargeViewport }
 				/>
 				<BlockEditorArea
-					saveBlocks={ eventuallySaveMenuItems }
+					saveBlocks={ saveMenuItems }
 					menuId={ menuId }
 					onDeleteMenu={ onDeleteMenu }
 				/>

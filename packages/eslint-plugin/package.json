@@ -1,12 +1,14 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "6.1.0",
+	"version": "7.0.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"eslint"
+		"gutenberg",
+		"eslint",
+		"plugin"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/eslint-plugin/README.md",
 	"repository": {
@@ -39,7 +41,7 @@
 		"requireindex": "^1.2.0"
 	},
 	"peerDependencies": {
-		"eslint": "6.x"
+		"eslint": "^6 || ^7"
 	},
 	"publishConfig": {
 		"access": "public"
