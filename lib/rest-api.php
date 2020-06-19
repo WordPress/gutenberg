@@ -117,7 +117,7 @@ function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
 
 	foreach ( $rich_field_mappings as $field => $header ) {
 		if ( ! in_array( $field, $fields, true ) ) {
-			$data[ $field ]['raw'] = $theme->display( $header, false, true );
+			$data[ $field ]['raw']      = $theme->display( $header, false, true );
 			$data[ $field ]['rendered'] = $theme->display( $header );
 		}
 	}
