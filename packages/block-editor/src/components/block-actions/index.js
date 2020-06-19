@@ -14,7 +14,11 @@ import { hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
  */
 import { useNotifyCopy } from '../copy-handler';
 
-export default function BlockActions( { clientIds, children } ) {
+export default function BlockActions( {
+	clientIds,
+	children,
+	__experimentalUpdateSelection: updateSelection,
+} ) {
 	const {
 		canInsertBlockType,
 		getBlockRootClientId,
@@ -59,10 +63,10 @@ export default function BlockActions( { clientIds, children } ) {
 		rootClientId,
 		blocks,
 		onDuplicate() {
-			return duplicateBlocks( clientIds );
+			return duplicateBlocks( clientIds, updateSelection );
 		},
 		onRemove() {
-			removeBlocks( clientIds );
+			return removeBlocks( clientIds, updateSelection );
 		},
 		onInsertBefore() {
 			insertBeforeBlock( first( castArray( clientIds ) ) );

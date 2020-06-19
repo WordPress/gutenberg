@@ -10,23 +10,21 @@ import {
 	Panel,
 	PanelBody,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 export default function NavigationStructureArea( { blocks, initialOpen } ) {
+	const [ selectedBlockId, setSelectedBlockId ] = useState( null );
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
-	const selectedBlockClientIds = useSelect(
-		( select ) => select( 'core/block-editor' ).getSelectedBlockClientIds(),
-		[]
-	);
-	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const showNavigationStructure = !! blocks.length;
 
 	const content = showNavigationStructure && (
 		<__experimentalBlockNavigationTree
 			blocks={ blocks }
-			selectedBlockClientId={ selectedBlockClientIds[ 0 ] }
-			selectBlock={ selectBlock }
+			selectedBlockClientId={ selectedBlockId }
+			selectBlock={ ( id ) => {
+				setSelectedBlockId( id );
+			} }
 			__experimentalFeatures
 			showNestedBlocks
 			showAppender

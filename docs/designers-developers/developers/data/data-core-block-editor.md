@@ -946,6 +946,7 @@ Generator that triggers an action used to duplicate a list of blocks.
 _Parameters_
 
 -   _clientIds_ `Array<string>`: 
+-   _updateSelection_ `boolean`: 
 
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
 
