@@ -81,7 +81,6 @@ function ColumnEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<InnerBlocks
-				templateLock={ false }
 				renderAppender={
 					hasChildBlocks
 						? undefined
