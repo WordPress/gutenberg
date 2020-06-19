@@ -3,6 +3,7 @@
  */
 
 import Cropper from 'react-easy-crop';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -252,13 +253,10 @@ export default function ImageEditor( {
 
 	return (
 		<>
-			{ inProgress && (
-				<div className="richimage__working-spinner">
-					<Spinner />
-				</div>
-			) }
 			<div
-				className="richimage__crop-area"
+				className={ classnames( 'richimage__crop-area', {
+					'is-applying': inProgress,
+				} ) }
 				style={ {
 					width: editedWidth,
 					height: editedHeight,
@@ -277,22 +275,26 @@ export default function ImageEditor( {
 					onZoomChange={ setZoom }
 					onRotationChange={ setRotation }
 				/>
+				{ inProgress && <Spinner /> }
 			</div>
-			<RangeControl
-				className="richimage__zoom-control"
-				label={ __( 'Zoom' ) }
-				min={ MIN_ZOOM }
-				max={ MAX_ZOOM }
-				step={ ZOOM_STEP }
-				value={ zoom }
-				onChange={ setZoom }
-			/>
+			{ ! inProgress && (
+				<RangeControl
+					className="richimage__zoom-control"
+					label={ __( 'Zoom' ) }
+					min={ MIN_ZOOM }
+					max={ MAX_ZOOM }
+					step={ ZOOM_STEP }
+					value={ zoom }
+					onChange={ setZoom }
+				/>
+			) }
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
 						icon={ rotateRightIcon }
 						label={ __( 'Rotate' ) }
 						onClick={ rotate }
+						disabled={ inProgress }
 					/>
 				</ToolbarGroup>
 				<ToolbarGroup>
@@ -307,7 +309,7 @@ export default function ImageEditor( {
 					</ToolbarItem>
 				</ToolbarGroup>
 				<ToolbarGroup>
-					<ToolbarButton onClick={ apply }>
+					<ToolbarButton onClick={ apply } disabled={ inProgress }>
 						{ __( 'Apply' ) }
 					</ToolbarButton>
 				</ToolbarGroup>

@@ -5,6 +5,7 @@ figure.wp-block-image:not(.wp-block) {
 .wp-block-image {
 	position: relative;
 
+	.is-applying img,
 	&.is-transient img {
 		opacity: 0.3;
 	}
@@ -69,35 +70,6 @@ figure.wp-block-image:not(.wp-block) {
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
-}
-
-// Working State.
-.richimage__working {
-	position: relative;
-
-	.richimage__working-spinner {
-		position: absolute;
-		z-index: 1;
-		left: 50%;
-		top: calc(50% - #{ $grid-unit-60 });
-		transform: translate(-50%, -50%);
-	}
-
-	img {
-		opacity: 0.6;
-	}
-}
-
-// Without this the toolbar buttons gain padding, making them too tall and breaking the toolbar
-// This only happens during the processing state as we change the dropdowns into buttons to disable the dropdowns
-.richimage-toolbar__working {
-	padding: 0 6px;
-}
-
-.richimage-crop {
-	.components-resizable-box__handle {
-		display: block;
-	}
 }
 
 .richimage__crop-area {
