@@ -35,6 +35,47 @@ import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
 import BlockTransformationsMenu from './block-transformations-menu';
 
+function PreviewBlockPopover( { hoveredBlock, hoveredClassName } ) {
+	if ( hoveredClassName === null ) return null;
+	const hoveredBlockType = getBlockType( hoveredBlock.name );
+	return (
+		<div className="block-editor-block-switcher__popover__preview__parent">
+			<div className="block-editor-block-switcher__popover__preview__container">
+				<Popover
+					className="block-editor-block-switcher__preview__popover"
+					position="bottom right"
+					focusOnMount={ false }
+				>
+					<div className="block-editor-block-switcher__preview">
+						<div className="block-editor-block-switcher__preview-title">
+							{ __( 'Preview' ) }
+						</div>
+						<BlockPreview
+							viewportWidth={ 500 }
+							blocks={
+								hoveredBlockType.example
+									? getBlockFromExample( hoveredBlock.name, {
+											attributes: {
+												...hoveredBlockType.example
+													.attributes,
+												className: hoveredClassName,
+											},
+											innerBlocks:
+												hoveredBlockType.example
+													.innerBlocks,
+									  } )
+									: cloneBlock( hoveredBlock, {
+											className: hoveredClassName,
+									  } )
+							}
+						/>
+					</div>
+				</Popover>
+			</div>
+		</div>
+	);
+}
+
 export class BlockSwitcher extends Component {
 	constructor() {
 		super( ...arguments );
@@ -62,8 +103,6 @@ export class BlockSwitcher extends Component {
 		}
 
 		const [ hoveredBlock ] = blocks;
-		const hoveredBlockType = getBlockType( hoveredBlock.name );
-
 		const itemsByName = mapKeys( inserterItems, ( { name } ) => name );
 		const possibleBlockTransformations = orderBy(
 			filter(
@@ -102,46 +141,6 @@ export class BlockSwitcher extends Component {
 				</ToolbarGroup>
 			);
 		}
-
-		const PreviewBlockPopover = (
-			<div className="block-editor-block-switcher__popover__preview__parent">
-				<div className="block-editor-block-switcher__popover__preview__container">
-					<Popover
-						className="block-editor-block-switcher__preview__popover"
-						position="bottom right"
-						focusOnMount={ false }
-					>
-						<div className="block-editor-block-switcher__preview">
-							<div className="block-editor-block-switcher__preview-title">
-								{ __( 'Preview' ) }
-							</div>
-							<BlockPreview
-								viewportWidth={ 500 }
-								blocks={
-									hoveredBlockType.example
-										? getBlockFromExample(
-												hoveredBlock.name,
-												{
-													attributes: {
-														...hoveredBlockType
-															.example.attributes,
-														className: hoveredClassName,
-													},
-													innerBlocks:
-														hoveredBlockType.example
-															.innerBlocks,
-												}
-										  )
-										: cloneBlock( hoveredBlock, {
-												className: hoveredClassName,
-										  } )
-								}
-							/>
-						</div>
-					</Popover>
-				</div>
-			</div>
-		);
 
 		const blockSwitcherLabel =
 			1 === blocks.length
@@ -183,8 +182,12 @@ export class BlockSwitcher extends Component {
 								( hasBlockStyles ||
 									hasPossibleBlockTransformations ) && (
 									<div className="block-editor-block-switcher__container">
-										{ hoveredClassName !== null &&
-											PreviewBlockPopover }
+										<PreviewBlockPopover
+											hoveredBlock={ hoveredBlock }
+											hoveredClassName={
+												hoveredClassName
+											}
+										/>
 										{ hasBlockStyles && (
 											<MenuGroup label={ __( 'Styles' ) }>
 												<BlockStyles
