@@ -32,7 +32,7 @@ export function processingQueue( state, { type, postId, ...rest } ) {
 			};
 
 		case 'POP_PENDING_ACTION':
-			const postState = state[ postId ] || {};
+			const postState = { ...state[ postId ] };
 			if ( 'pendingActions' in postState ) {
 				postState.pendingActions = postState.pendingActions?.filter(
 					( item ) => item !== rest.action

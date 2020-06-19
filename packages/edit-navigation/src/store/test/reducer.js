@@ -168,6 +168,7 @@ describe( 'processingQueue', () => {
 			postId: 1,
 			action: 'some action',
 		} );
+		expect( newState ).not.toBe( originalState );
 		expect( newState ).toEqual( {
 			1: {
 				pendingActions: [ 'first action', 'another action' ],
