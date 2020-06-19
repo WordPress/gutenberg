@@ -24,7 +24,7 @@ export default function NavigationEditor( {
 } ) {
 	const { post, hasResolved } = useSelect( ( select ) => ( {
 		post: select( 'core/edit-navigation' ).getNavigationPostForMenu(
-			menuId + ''
+			menuId
 		),
 		hasResolved: select( 'core/edit-navigation' ).hasResolvedNavigationPost(
 			menuId

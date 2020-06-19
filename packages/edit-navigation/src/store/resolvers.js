@@ -21,7 +21,7 @@ import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
  *
  * Fetches all menu items, converts them into blocks, and hydrates a new post with them.
  *
- * @param {string} menuId The id of menu to create a post from
+ * @param {number} menuId The id of menu to create a post from
  * @return {void}
  */
 export function* getNavigationPostForMenu( menuId ) {

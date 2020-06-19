@@ -20,7 +20,7 @@ import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
  *
  * Related resolver fetches all menu items, converts them into blocks, and hydrates a new post with them.
  *
- * @param {string} menuId The id of menu to create a post from.
+ * @param {number} menuId The id of menu to create a post from.
  * @return {null|Object} Post once the resolver fetches it, otherwise null
  */
 export const getNavigationPostForMenu = createRegistrySelector(

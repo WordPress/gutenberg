@@ -80,7 +80,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 									label: menu.name,
 								} ) ) }
 								onChange={ ( selectedMenuId ) =>
-									setMenuId( selectedMenuId )
+									setMenuId( Number( selectedMenuId ) )
 								}
 								value={ menuId }
 							/>
