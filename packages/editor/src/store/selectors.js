@@ -495,10 +495,7 @@ export function isCurrentPostPublished( state, currentPost ) {
 export function isCurrentPostScheduled( state, currentPost ) {
 	const post = currentPost || getCurrentPost( state );
 
-	return (
-		post.status === 'future' &&
-		! isCurrentPostPublished( state, currentPost )
-	);
+	return post.status === 'future' && ! isCurrentPostPublished( state, post );
 }
 
 /**
