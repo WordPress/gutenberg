@@ -33,7 +33,6 @@ import createDataTree from './create-data-tree';
 
 const CREATE_EMPTY_OPTION_VALUE = '__CREATE_EMPTY__';
 const CREATE_FROM_PAGES_OPTION_VALUE = '__CREATE_FROM_PAGES__';
-const CREATE_PLACEHOLDER_VALUE = '__CREATE_PLACEHOLDER__';
 
 /**
  * Get instruction text for the Placeholder component.
@@ -46,13 +45,15 @@ const CREATE_PLACEHOLDER_VALUE = '__CREATE_PLACEHOLDER__';
 function getPlaceholderInstructions( hasMenus, hasPages ) {
 	if ( hasMenus && hasPages ) {
 		return __(
-			'Create a navigation from all existing pages, or choose a menu.'
+			'Use an existing menu here, include all top-level pages, or add an empty Navigation block.'
 		);
 	} else if ( hasMenus && ! hasPages ) {
-		return __( 'Create a navigation from a menu or create empty.' );
+		return __(
+			'Use an existing menu here, or add an empty Navigation block.'
+		);
 	} else if ( ! hasMenus && hasPages ) {
 		return __(
-			'Create a navigation from all existing pages, or create empty.'
+			'Include all existing pages here, or add an empty Navigation block.'
 		);
 	}
 
@@ -223,21 +224,17 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 
 	const createOptions = useMemo(
 		() => [
-			{
-				id: CREATE_PLACEHOLDER_VALUE,
-				name: __( 'Select where to start from…' ),
-			},
 			...( hasMenus ? menus : [] ),
 			{
 				id: CREATE_EMPTY_OPTION_VALUE,
-				name: __( 'Create empty menu' ),
+				name: __( 'Create empty Navigation' ),
 				className: 'is-create-empty-option',
 			},
 			...( hasPages
 				? [
 						{
 							id: CREATE_FROM_PAGES_OPTION_VALUE,
-							name: __( 'New from all top-level pages' ),
+							name: __( 'Create from all top-level pages' ),
 						},
 				  ]
 				: [] ),
@@ -265,10 +262,6 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 
 		const { key } = selectedCreateOption;
 		switch ( key ) {
-			case CREATE_PLACEHOLDER_VALUE:
-				// Do nothing.
-				return;
-
 			case CREATE_EMPTY_OPTION_VALUE: {
 				const blocks = [ createBlock( 'core/navigation-link' ) ];
 				onCreate( blocks );
@@ -309,11 +302,6 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 			className="wp-block-navigation-placeholder"
 			icon={ icon }
 			label={ __( 'Navigation' ) }
-			instructions={
-				! isLoading
-					? getPlaceholderInstructions( hasMenus, hasPages )
-					: undefined
-			}
 		>
 			{ isLoading && (
 				<div ref={ ref }>
@@ -330,10 +318,14 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 							className={ classnames( {
 								'has-menus': hasMenus,
 							} ) }
-							label={ __(
-								'Select to create from Pages, existing Menu or empty'
-							) }
-							hideLabelFromVision={ true }
+							label={
+								! isLoading
+									? getPlaceholderInstructions(
+											hasMenus,
+											hasPages
+									  )
+									: undefined
+							}
 							value={ selectedCreateOption || createOptions[ 0 ] }
 							onChange={ ( { selectedItem } ) => {
 								if (
@@ -354,11 +346,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						<Button
 							isSecondary
 							className="wp-block-navigation-placeholder__button"
-							disabled={
-								! selectedCreateOption ||
-								selectedCreateOption.key ===
-									CREATE_PLACEHOLDER_VALUE
-							}
+							disabled={ ! selectedCreateOption }
 							isBusy={ isCreatingFromMenu }
 							onClick={ onCreateButtonClick }
 						>
