@@ -78,7 +78,7 @@ function ColumnsEditContainer( {
 		}
 	}, [ width ] );
 
-	const getColumnWidth = useMemo( () => {
+	const contentStyle = useMemo( () => {
 		const minWidth = Math.min( width, styles.columnsContainer.maxWidth );
 		const columnBaseWidth = minWidth / columnsInRow;
 
@@ -151,7 +151,7 @@ function ColumnsEditContainer( {
 						onDeleteBlock={
 							columnCount === 1 ? onDeleteBlock : undefined
 						}
-						contentStyle={ getColumnWidth }
+						contentStyle={ contentStyle }
 					/>
 				) }
 			</View>
