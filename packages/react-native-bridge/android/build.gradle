@@ -280,10 +280,20 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         onlyIf { !isBundleUpToDate() }
 
         def origFileName = 'App.js'
-        def origWithPath = "../../bundle/android/${origFileName}"
-        from origWithPath
+        def origWithPath = "$jsRootDir/bundle/android/${origFileName}"
+		from origWithPath
         into buildAssetsFolder
         rename origFileName, bundleName
+
+		// Prevent this task from silently failing
+		// Using onlyIf as a bit of a hack to perform this check at the time of execution
+		onlyIf {
+			if (inputs.sourceFiles.empty) {
+				throw new StopExecutionException("ERROR: Could not find bundle file to copy.")
+			}
+			true
+		}
+
         doLast {
             println "Done copying the Android JS bundle to assets folder"
         }
@@ -293,7 +303,7 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         dependsOn bundleUpToDateCheck
         onlyIf { !isBundleUpToDate() }
 
-        delete '../../node_modules'
+        delete "$jsRootDir/node_modules"
     }
 
     task resetExtractedRNTools(type: Delete) {
