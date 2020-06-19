@@ -9,6 +9,7 @@ import {
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
@@ -43,7 +44,13 @@ function useIsAccessibleToolbar( ref ) {
 
 	const determineIsAccessibleToolbar = useCallback( () => {
 		const tabbables = focus.tabbable.find( ref.current );
-		setIsAccessibleToolbar( hasOnlyToolbarItem( tabbables ) );
+		const onlyToolbarItem = hasOnlyToolbarItem( tabbables );
+		if ( ! onlyToolbarItem ) {
+			deprecated( 'Using custom components as toolbar controls', {
+				alternative: 'ToolbarItem or ToolbarButton components',
+			} );
+		}
+		setIsAccessibleToolbar( onlyToolbarItem );
 	}, [] );
 
 	useLayoutEffect( determineIsAccessibleToolbar, [] );
