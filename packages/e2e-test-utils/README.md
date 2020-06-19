@@ -42,7 +42,11 @@ Clicks the default block appender.
 
 <a name="clickBlockToolbarButton" href="#clickBlockToolbarButton">#</a> **clickBlockToolbarButton**
 
-Undocumented declaration.
+Clicks a block toolbar button.
+
+_Parameters_
+
+-   _buttonAriaLabel_ `string`: The aria label of the button to click.
 
 <a name="clickButton" href="#clickButton">#</a> **clickButton**
 

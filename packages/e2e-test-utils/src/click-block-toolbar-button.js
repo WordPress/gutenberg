@@ -8,7 +8,7 @@ import { showBlockToolbar } from './show-block-toolbar';
  *
  * @param {string} buttonAriaLabel The aria label of the button to click.
  */
-export async function c( buttonAriaLabel ) {
+export async function clickBlockToolbarButton( buttonAriaLabel ) {
 	await showBlockToolbar();
 
 	const BLOCK_TOOLBAR_SELECTOR = '.block-editor-block-toolbar';

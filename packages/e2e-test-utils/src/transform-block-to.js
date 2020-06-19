@@ -25,7 +25,7 @@ export async function transformBlockTo( name ) {
 
 	// Find the block button option within the switcher popover.
 	const xpath = `//*[contains(@class, "block-editor-block-switcher__popover")]//button[.='${ name }']`;
-	const insertButton = page.waitForXPath( xpath, { visible: true } );
+	const insertButton = await page.waitForXPath( xpath, { visible: true } );
 	// Clicks may fail if the button is out of view. Assure it is before click.
 	await insertButton.evaluate( ( element ) => element.scrollIntoView() );
 	await insertButton.click();
