@@ -176,6 +176,8 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			'attributes'      => 'attributes',
 			'providesContext' => 'provides_context',
 			'usesContext'     => 'uses_context',
+			// Deprecated: remove with Gutenberg 8.6 release.
+			'context'         => 'uses_context',
 			'supports'        => 'supports',
 			'styles'          => 'styles',
 			'example'         => 'example',

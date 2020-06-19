@@ -41,6 +41,7 @@ export const Edit = ( props ) => {
 		if ( blockType && blockType.context ) {
 			deprecated( 'Block type "context" option', {
 				alternative: '"usesContext"',
+				version: '8.6.0',
 				hint: `Block "${ name }".`,
 				link:
 					'https://developer.wordpress.org/block-editor/developers/block-api/block-context/',
