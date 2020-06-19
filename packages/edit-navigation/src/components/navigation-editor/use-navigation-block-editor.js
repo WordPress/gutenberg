@@ -19,12 +19,9 @@ export default function useNavigationBlockEditor( post ) {
 		{ id: post.id }
 	);
 	const onChange = useCallback(
-		( updatedBlocks ) => {
-			async function handle() {
-				await _onChange( updatedBlocks );
-				createMissingMenuItems( post );
-			}
-			handle();
+		async ( updatedBlocks ) => {
+			await _onChange( updatedBlocks );
+			createMissingMenuItems( post );
 		},
 		[ blocks, onChange ]
 	);
