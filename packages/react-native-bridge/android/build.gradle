@@ -69,10 +69,6 @@ if (buildGutenbergMobileJSBundle) {
         // Set the work directory where node_modules should be located
         nodeModulesDir = file("${project.projectDir}/../../../../")
     }
-
-    npm_install {
-        args = ['--prefer-offline']
-    }
 }
 
 // import the `readReactNativeVersion()` function
@@ -239,8 +235,8 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         }
     }
 
-    npm_install.dependsOn bundleUpToDateCheck
-    npm_install.onlyIf { !isBundleUpToDate() }
+    npm_ci.dependsOn bundleUpToDateCheck
+    npm_ci.onlyIf { !isBundleUpToDate() }
 
     task buildJSBundle(type: NpmTask) {
         dependsOn bundleUpToDateCheck
@@ -306,6 +302,6 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
     backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
     backupHermesReleaseAAR.dependsOn(copyJSBundle)
     copyJSBundle.dependsOn(buildJSBundle)
-    buildJSBundle.dependsOn(npm_install)
+    buildJSBundle.dependsOn(npm_ci)
     nodeSetup.dependsOn(resetExtractedRNTools)
 }
