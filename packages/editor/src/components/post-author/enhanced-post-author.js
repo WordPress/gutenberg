@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { withInstanceId, compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
-import ComboboxControl from '../../../../components/build/combobox-control';
-import { useState, useEffect } from '@wordpress/element';
-import apiRequest from '@wordpress/api-request';
+import { useState } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
+
+/**
+ * Internal dependencies
+ */
+import ComboboxControl from '../../../../components/build/combobox-control/';
 
 /**
  * External dependencies
@@ -14,10 +15,6 @@ import apiRequest from '@wordpress/api-request';
 import { debounce } from 'lodash';
 
 function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
-	// Wait until we have the post author before displaying the component.
-	if ( 0 === postAuthor.length ) {
-		return null;
-	}
 	const currentPostAuthor = postAuthor[ 0 ];
 	let initialAuthors = [];
 	authors.forEach( ( author, i ) => {
@@ -54,10 +51,15 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	// The currently selected author.
 	const [ selectedAuthor, setSelectedAuthor ] = useState( currentPostAuthor );
 
+	// Wait until we have the post author before displaying the component.
+	if ( 0 === postAuthor.length ) {
+		return null;
+	}
+
 	/**
 	 * Handle author selection.
 	 *
-	 * @param {object} selectedItem The selected Author.
+	 * @param {Object} selectedItem The selected Author.
 	 */
 	const handleSelect = ( { selectedItem } ) => {
 		setSelectedAuthor( selectedItem );
@@ -67,7 +69,7 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	/**
 	 * Handle user input.
 	 *
-	 * @param {object} param0 Contains a single property `inputValue` with the string value of the input field.
+	 * @param {Object} param0 Contains a single property `inputValue` with the string value of the input field.
 	 */
 	const handleKeydown = ( { inputValue } ) => {
 		if ( '' === inputValue ) {
@@ -87,7 +89,7 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	const searchAuthors = debounce( ( query ) => {
 		const payload = '?search=' + encodeURIComponent( query );
 		setIsLoadingSearchResult( true );
-		apiRequest( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
+		apiFetch( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
 			setAvailableAuthors(
 				results.map( ( author, i ) => ( {
 					key: i,
