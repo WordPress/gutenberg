@@ -180,7 +180,7 @@
 	}
 
 	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
-		box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 		outline: $border-width-focus solid transparent;
 	}
 
@@ -209,7 +209,7 @@
 
 	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
 		&::before {
-			border-color: $blue-medium-focus;
+			border-color: var(--wp-admin-theme-color);
 		}
 	}
 }
