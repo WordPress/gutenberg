@@ -259,7 +259,7 @@
 	},
 	{
 		"title": "Themes & Block Editor: Global Styles",
-		"slug": "theme-json",
+		"slug": "global-styles",
 		"markdown_source": "../docs/designers-developers/developers/themes/global-styles.md",
 		"parent": "themes"
 	},
