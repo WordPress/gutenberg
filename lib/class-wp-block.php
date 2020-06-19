@@ -124,7 +124,6 @@ class WP_Block {
 			$this->block_type->provides_context = $this->block_type->providesContext;
 		}
 
-
 		$this->available_context = $available_context;
 
 		if ( ! empty( $this->block_type->uses_context ) ) {
