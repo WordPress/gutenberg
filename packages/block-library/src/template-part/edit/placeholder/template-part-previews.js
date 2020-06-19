@@ -178,7 +178,7 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 				per_page: -1,
 			}
 		);
-		const currentTheme = select( 'core' ).getCurrentTheme().textdomain;
+		const currentTheme = select( 'core' ).getCurrentTheme()?.textdomain;
 		const themeTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template_part',
