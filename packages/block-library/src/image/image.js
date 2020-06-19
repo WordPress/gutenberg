@@ -26,6 +26,7 @@ import {
 	RichText,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -42,7 +43,7 @@ import ImageEditor from './image-editor';
 /**
  * Module constants
  */
-import { MIN_SIZE } from './constants';
+import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 
 function getFilename( url ) {
 	const path = getPath( url );
@@ -72,6 +73,9 @@ export default function Image( {
 	isSelected,
 	insertBlocksAfter,
 	onReplace,
+	onSelectImage,
+	onSelectURL,
+	onUploadError,
 	containerRef,
 } ) {
 	const image = useSelect(
@@ -183,6 +187,12 @@ export default function Image( {
 		}
 	}, [ isSelected ] );
 
+	const canEditImage =
+		__experimentalEnableRichImageEditing &&
+		id &&
+		naturalWidth &&
+		naturalHeight;
+
 	const controls = (
 		<>
 			<BlockControls>
@@ -200,16 +210,25 @@ export default function Image( {
 						/>
 					</ToolbarGroup>
 				) }
-				{ id && (
+				{ canEditImage && ! isEditingImage && (
 					<ToolbarGroup>
 						<ToolbarButton
-							onClick={ () =>
-								setIsEditingImage( ( value ) => ! value )
-							}
+							onClick={ () => setIsEditingImage( true ) }
 						>
-							{ isEditingImage ? __( 'Cancel' ) : __( 'Edit' ) }
+							{ __( 'Crop' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
+				) }
+				{ ! isEditingImage && (
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*"
+						onSelect={ onSelectImage }
+						onSelectURL={ onSelectURL }
+						onError={ onUploadError }
+					/>
 				) }
 			</BlockControls>
 			<InspectorControls>
@@ -317,13 +336,7 @@ export default function Image( {
 			: naturalHeight;
 	}
 
-	if (
-		__experimentalEnableRichImageEditing &&
-		isEditingImage &&
-		id &&
-		naturalWidth &&
-		naturalHeight
-	) {
+	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
 				id={ id }

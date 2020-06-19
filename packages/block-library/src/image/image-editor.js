@@ -318,6 +318,9 @@ export default function ImageEditor( {
 					<ToolbarButton onClick={ apply } disabled={ inProgress }>
 						{ __( 'Apply' ) }
 					</ToolbarButton>
+					<ToolbarButton onClick={ () => setIsEditingImage( false ) }>
+						{ __( 'Cancel' ) }
+					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
 		</>
