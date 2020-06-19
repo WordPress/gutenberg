@@ -54,6 +54,11 @@ const createTemplatePart = async (
 ) => {
 	// Create new template part.
 	await insertBlock( 'Template Part' );
+	const [ createNewButton ] = await page.$x(
+		'//button[contains(text(), "Create new")]'
+	);
+	await createNewButton.click();
+	await page.keyboard.press( 'Tab' );
 	await page.keyboard.type( templatePartName );
 	await page.keyboard.press( 'Tab' );
 	await page.keyboard.type( themeName );

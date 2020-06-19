@@ -43,6 +43,8 @@ Options:
 --title <value>              display title for the block
 --short-description <value>  short description for the block
 --category <name>            category name for the block
+--wp-scripts                 enable integration with `@wordpress/scripts` package
+--no-wp-scripts              disable integration with `@wordpress/scripts` package
 -h, --help                   output usage information
 ```
 

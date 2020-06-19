@@ -10,7 +10,7 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus, getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
 /**
@@ -260,11 +260,11 @@ const Popover = ( {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
-	const contentRect = useRef();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
 	const slot = useSlot( __unstableSlotName );
 	const isExpanded = expandOnMobile && isMobileViewport;
+	const [ containerResizeListener, contentSize ] = useResizeObserver();
 
 	noArrow = isExpanded || noArrow;
 
@@ -297,10 +297,6 @@ const Popover = ( {
 
 			if ( ! anchor ) {
 				return;
-			}
-
-			if ( ! contentRect.current ) {
-				contentRect.current = contentRef.current.getBoundingClientRect();
 			}
 
 			let relativeOffsetTop = 0;
@@ -343,7 +339,7 @@ const Popover = ( {
 				contentWidth,
 			} = computePopoverPosition(
 				anchor,
-				contentRect.current,
+				contentSize,
 				position,
 				__unstableSticky,
 				containerRef.current,
@@ -481,6 +477,7 @@ const Popover = ( {
 		anchorRef,
 		shouldAnchorIncludePadding,
 		position,
+		contentSize,
 		__unstableSticky,
 		__unstableAllowVerticalSubpixelPosition,
 		__unstableAllowHorizontalSubpixelPosition,
@@ -603,7 +600,10 @@ const Popover = ( {
 							className="components-popover__content"
 							tabIndex="-1"
 						>
-							{ children }
+							<div style={ { position: 'relative' } }>
+								{ containerResizeListener }
+								{ children }
+							</div>
 						</div>
 					</IsolatedEventContainer>
 				) }

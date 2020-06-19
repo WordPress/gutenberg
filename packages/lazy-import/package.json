@@ -1,11 +1,13 @@
 {
 	"name": "@wordpress/lazy-import",
-	"version": "1.0.0-prerelease",
+	"version": "1.0.0",
 	"description": "Lazily import a module, installing it automatically if missing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
-		"wordpress"
+		"wordpress",
+		"gutenberg",
+		"import"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/lazy-import/README.md",
 	"repository": {
