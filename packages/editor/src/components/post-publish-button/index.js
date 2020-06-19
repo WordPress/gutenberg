@@ -88,6 +88,7 @@ export class PostPublishButton extends Component {
 			forceIsSaving,
 			hasPublishAction,
 			isBeingScheduled,
+			isScheduled,
 			isOpen,
 			isPostSavingLocked,
 			isPublishable,
@@ -122,7 +123,7 @@ export class PostPublishButton extends Component {
 			publishStatus = 'pending';
 		} else if ( visibility === 'private' ) {
 			publishStatus = 'private';
-		} else if ( isBeingScheduled ) {
+		} else if ( isBeingScheduled || isScheduled ) {
 			publishStatus = 'future';
 		} else {
 			publishStatus = 'publish';
@@ -198,6 +199,7 @@ export default compose( [
 		const {
 			isSavingPost,
 			isEditedPostBeingScheduled,
+			isCurrentPostScheduled,
 			getEditedPostVisibility,
 			isCurrentPostPublished,
 			isEditedPostSaveable,
@@ -211,6 +213,7 @@ export default compose( [
 		return {
 			isSaving: isSavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
+			isScheduled: isCurrentPostScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
 			isPostSavingLocked: isPostSavingLocked(),
