@@ -105,6 +105,26 @@ class WP_Block {
 
 		$this->block_type = $registry->get_registered( $this->name );
 
+		if ( ! empty( $this->block_type->context ) ) {
+			$message = sprintf(
+				/* translators: 1: Block name. */
+				__( 'Block type "context" option is deprecated. Please use "uses_context" instead in "%s" block.', 'gutenberg' ),
+				$this->name
+			);
+			_doing_it_wrong( __CLASS__, $message, '8.4.0' );
+			$this->block_type->uses_context = $this->block_type->context;
+		}
+		if ( ! empty( $this->block_type->providesContext ) ) {
+			$message = sprintf(
+				/* translators: 1: Block name. */
+				__( 'Block type "providesContext" option is deprecated. Please use "provides_context" instead in "%s" block.', 'gutenberg' ),
+				$this->name
+			);
+			_doing_it_wrong( __CLASS__, $message, '8.4.0' );
+			$this->block_type->provides_context = $this->block_type->providesContext;
+		}
+
+
 		$this->available_context = $available_context;
 
 		if ( ! empty( $this->block_type->uses_context ) ) {
