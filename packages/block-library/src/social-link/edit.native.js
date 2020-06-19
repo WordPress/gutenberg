@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	View,
-	Platform,
-	Animated,
-	Easing,
-	TouchableWithoutFeedback,
-} from 'react-native';
+import { View, Animated, Easing, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -15,17 +9,13 @@ import {
 import { BlockControls } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import {
-	PanelBody,
-	TextControl,
 	ToolbarGroup,
-	BottomSheet,
 	ToolbarButton,
-	UnsupportedFooterControl,
+	LinkSettings,
 } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { link, Icon } from '@wordpress/icons';
-import { prependHTTP } from '@wordpress/url';
 /**
  * Internal dependencies
  */
@@ -41,7 +31,7 @@ const SocialLinkEdit = ( {
 	isSelected,
 	onFocus,
 } ) => {
-	const { url, service, label } = attributes;
+	const { url, service } = attributes;
 	const activeIcon =
 		styles[ `wp-social-link-${ service }` ] || styles[ `wp-social-link` ];
 
@@ -52,8 +42,6 @@ const SocialLinkEdit = ( {
 
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
 	const [ isValue, setIsValue ] = useState( !! url );
-	const [ urlInputValue, setUrlInputValue ] = useState( '' );
-	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
 
@@ -68,8 +56,6 @@ const SocialLinkEdit = ( {
 	}, [] );
 
 	useEffect( () => {
-		setUrlInputValue( url || '' );
-		setLabelInputValue( label || '' );
 		if ( ! url ) {
 			setIsValue( false );
 			animatedValue.setValue( 0 );
@@ -97,17 +83,20 @@ const SocialLinkEdit = ( {
 		? activeIcon
 		: interpolationColors;
 
-	function onChangeURL( value ) {
-		if ( value === '' ) {
-			setIsValue( false );
-			animatedValue.setValue( 0 );
-		}
-		setUrlInputValue( value );
-	}
-
-	function onChangeLabel( value ) {
-		setLabelInputValue( value );
-	}
+	const options = {
+		url: {
+			label: __( 'URL' ),
+			placeholder: __( 'Add URL' ),
+			autoFocus: true,
+		},
+		linkLabel: {
+			label: __( 'Link label' ),
+			placeholder: __( 'None' ),
+		},
+		footer: {
+			label: __( 'Briefly describe the link to help screen reader user' ),
+		},
+	};
 
 	function animateColors() {
 		Animated.sequence( [
@@ -121,15 +110,12 @@ const SocialLinkEdit = ( {
 	}
 
 	function onCloseSettingsSheet() {
-		setAttributes( {
-			url: prependHTTP( urlInputValue ),
-			label: labelInputValue,
-		} );
 		setIsLinkSheetVisible( false );
+	}
 
-		if ( urlInputValue !== '' ) {
-			animateColors();
-		}
+	function onEmptyURL() {
+		animatedValue.setValue( 0 );
+		setIsValue( false );
 	}
 
 	function onIconPress() {
@@ -138,56 +124,6 @@ const SocialLinkEdit = ( {
 		} else {
 			onFocus();
 		}
-	}
-
-	function getLinkSettings( isCompatibleWithSettings = true ) {
-		return (
-			<>
-				<PanelBody
-					title={
-						isCompatibleWithSettings &&
-						sprintf(
-							/* translators: %s: name of the social service. */
-							__( '%s label' ),
-							socialLinkName
-						)
-					}
-					style={
-						! isCompatibleWithSettings && styles.linkSettingsPanel
-					}
-				>
-					<TextControl
-						label={ __( 'URL' ) }
-						value={ urlInputValue }
-						valuePlaceholder={ __( 'Add URL' ) }
-						onChange={ onChangeURL }
-						onSubmit={ onCloseSettingsSheet }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						// eslint-disable-next-line jsx-a11y/no-autofocus
-						autoFocus={ Platform.OS === 'ios' }
-						keyboardType="url"
-					/>
-					<TextControl
-						label={ __( 'Link label' ) }
-						value={ labelInputValue }
-						valuePlaceholder={ __( 'None' ) }
-						onChange={ onChangeLabel }
-					/>
-				</PanelBody>
-				<PanelBody
-					style={
-						! isCompatibleWithSettings && styles.linkSettingsPanel
-					}
-				>
-					<UnsupportedFooterControl
-						label={ __(
-							'Briefly describe the link to help screen reader user'
-						) }
-					></UnsupportedFooterControl>
-				</PanelBody>
-			</>
-		);
 	}
 
 	return (
@@ -208,13 +144,14 @@ const SocialLinkEdit = ( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
-			<BottomSheet
+			<LinkSettings
 				isVisible={ isLinkSheetVisible }
+				attributes={ attributes }
+				onEmptyURL={ onEmptyURL }
 				onClose={ onCloseSettingsSheet }
-				hideHeader
-			>
-				{ getLinkSettings( false ) }
-			</BottomSheet>
+				setAttributes={ setAttributes }
+				options={ options }
+			/>
 			<TouchableWithoutFeedback onPress={ onIconPress }>
 				<Animated.View
 					style={ [ styles.iconContainer, { backgroundColor } ] }
