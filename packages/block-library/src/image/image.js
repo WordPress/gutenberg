@@ -315,7 +315,12 @@ export default function Image( {
 			: naturalHeight;
 	}
 
-	if ( __experimentalEnableRichImageEditing && isEditingImage ) {
+	if (
+		__experimentalEnableRichImageEditing &&
+		isEditingImage &&
+		naturalWidth &&
+		naturalHeight
+	) {
 		img = (
 			<ImageEditor
 				id={ id }

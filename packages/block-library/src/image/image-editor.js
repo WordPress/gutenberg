@@ -159,8 +159,16 @@ export default function ImageEditor( {
 	const [ crop, setCrop ] = useState( null );
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
 	const [ zoom, setZoom ] = useState( 1 );
-	const [ aspect, setAspect ] = useState( 4 / 3 );
+	const [ aspect, setAspect ] = useState( naturalWidth / naturalHeight );
 	const [ rotation, setRotation ] = useState( 0 );
+	const [ editedUrl, setEditedUrl ] = useState();
+
+	const editedWidth = width;
+	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
+
+	if ( rotation % 180 === 90 ) {
+		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
+	}
 
 	function apply() {
 		setIsProgress( true );
@@ -193,7 +201,53 @@ export default function ImageEditor( {
 	}
 
 	function rotate() {
-		setRotation( ( value ) => ( value + 90 ) % 360 );
+		const angle = ( rotation + 90 ) % 360;
+
+		if ( angle === 0 ) {
+			setEditedUrl();
+			setRotation( angle );
+			setAspect( 1 / aspect );
+			return;
+		}
+
+		function editImage( event ) {
+			const canvas = document.createElement( 'canvas' );
+
+			let translateX = 0;
+			let translateY = 0;
+
+			if ( angle % 180 ) {
+				canvas.width = event.target.height;
+				canvas.height = event.target.width;
+			} else {
+				canvas.width = event.target.width;
+				canvas.height = event.target.height;
+			}
+
+			if ( angle === 90 || angle === 180 ) {
+				translateX = canvas.width;
+			}
+
+			if ( angle === 270 || angle === 180 ) {
+				translateY = canvas.height;
+			}
+
+			const context = canvas.getContext( '2d' );
+
+			context.translate( translateX, translateY );
+			context.rotate( ( angle * Math.PI ) / 180 );
+			context.drawImage( event.target, 0, 0 );
+
+			canvas.toBlob( ( blob ) => {
+				setEditedUrl( URL.createObjectURL( blob ) );
+				setRotation( angle );
+				setAspect( 1 / aspect );
+			} );
+		}
+
+		const el = new window.Image();
+		el.src = url;
+		el.onload = editImage;
 	}
 
 	return (
@@ -206,20 +260,17 @@ export default function ImageEditor( {
 			<div
 				className="richimage__crop-area"
 				style={ {
-					width,
-					height:
-						height ||
-						( clientWidth * naturalHeight ) / naturalWidth,
+					width: editedWidth,
+					height: editedHeight,
 				} }
 			>
 				<Cropper
-					image={ url }
+					image={ editedUrl || url }
 					disabled={ inProgress }
 					minZoom={ MIN_ZOOM }
 					maxZoom={ MAX_ZOOM }
 					crop={ position }
 					zoom={ zoom }
-					rotation={ rotation }
 					aspect={ aspect }
 					onCropChange={ setPosition }
 					onCropComplete={ setCrop }
