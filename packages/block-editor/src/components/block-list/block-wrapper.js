@@ -45,7 +45,6 @@ const BlockComponent = forwardRef(
 			enableAnimation,
 			index,
 			className,
-			isLocked,
 			name,
 			mode,
 			blockTitle,
@@ -249,8 +248,7 @@ const BlockComponent = forwardRef(
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
-				// Only allow shortcuts when a blocks is selected and not locked.
-				onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
+				onKeyDown={ onKeyDown }
 				// Only allow selection to be started from a selected block.
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
 				// No need to have these listeners for hover class in edit mode.
