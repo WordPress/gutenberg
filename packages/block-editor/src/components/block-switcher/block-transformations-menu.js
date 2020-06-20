@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { MenuGroup, MenuItem } from '@wordpress/components';
+import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -21,6 +22,7 @@ const BlockTransformationsMenu = ( {
 				return (
 					<MenuItem
 						key={ name }
+						className={ getBlockMenuDefaultClassName( name ) }
 						icon={ <BlockIcon icon={ icon } showColors /> }
 						onClick={ ( event ) => {
 							event.preventDefault();
