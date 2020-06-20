@@ -58,6 +58,10 @@
 	// so we supply the styles so as to not appear broken or unstyled in those themes.
 	figcaption {
 		@include caption-style();
+
+		img {
+			display: inline;
+		}
 	}
 }
 
