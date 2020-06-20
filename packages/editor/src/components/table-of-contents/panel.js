@@ -19,7 +19,8 @@ function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
 				paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
 				numberOfBlocks: getGlobalBlockCount(),
 			};
-		}
+		},
+		[]
 	);
 	return (
 		/*

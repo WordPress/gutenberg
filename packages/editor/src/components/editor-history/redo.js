@@ -9,8 +9,9 @@ import { redo as redoIcon } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
 
 function EditorHistoryRedo( props, ref ) {
-	const hasRedo = useSelect( ( select ) =>
-		select( 'core/editor' ).hasEditorRedo()
+	const hasRedo = useSelect(
+		( select ) => select( 'core/editor' ).hasEditorRedo(),
+		[]
 	);
 	const { redo } = useDispatch( 'core/editor' );
 	return (

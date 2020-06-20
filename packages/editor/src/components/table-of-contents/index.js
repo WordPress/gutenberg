@@ -14,7 +14,8 @@ import TableOfContentsPanel from './panel';
 
 function TableOfContents( { hasOutlineItemsDisabled, ...props }, ref ) {
 	const hasBlocks = useSelect(
-		( select ) => !! select( 'core/block-editor' ).getBlockCount()
+		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+		[]
 	);
 	return (
 		<Dropdown
