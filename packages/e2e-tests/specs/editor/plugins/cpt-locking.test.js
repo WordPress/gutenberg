@@ -104,22 +104,11 @@ describe( 'cpt locking', () => {
 			);
 		} );
 
-		it( 'can use the global inserter in inner blocks', async () => {
-			await page.click( 'button[aria-label="Two columns; equal split"]' );
+		it( 'should disable the inserter in inner blocks', async () => {
 			await page.click(
-				'.wp-block-column .block-editor-button-block-appender'
+				'.wp-block-column .block-editor-block-list__block[data-type="core/paragraph"]'
 			);
-			await page.type( '.block-editor-inserter__search-input', 'image' );
-			await pressKeyTimes( 'Tab', 2 );
-			await page.keyboard.press( 'Enter' );
-			await page.click( '.edit-post-header-toolbar__inserter-toggle' );
-			await page.type(
-				'.block-editor-inserter__search-input',
-				'gallery'
-			);
-			await pressKeyTimes( 'Tab', 2 );
-			await page.keyboard.press( 'Enter' );
-			expect( await page.$( '.wp-block-gallery' ) ).not.toBeNull();
+			shouldDisableTheInserter();
 		} );
 	} );
 

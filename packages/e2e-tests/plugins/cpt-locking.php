@@ -20,7 +20,36 @@ function gutenberg_test_cpt_locking() {
 			),
 		),
 		array( 'core/quote' ),
-		array( 'core/columns' ),
+		array(
+			'core/columns',
+			array(),
+			array(
+				array(
+					'core/column',
+					array(),
+					array(
+						array(
+							'core/paragraph',
+							array(
+								'placeholder' => 'Add a description',
+							),
+						),
+					),
+				),
+				array(
+					'core/column',
+					array(),
+					array(
+						array(
+							'core/paragraph',
+							array(
+								'placeholder' => 'Add a description',
+							),
+						),
+					),
+				),
+			),
+		),
 	);
 	register_post_type(
 		'locked-all-post',
