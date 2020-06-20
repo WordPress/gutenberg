@@ -11,8 +11,8 @@
 		text-align: center;
 	}
 
-	&.alignfull img,
-	&.alignwide img {
+	&.alignfull > img,
+	&.alignwide > img {
 		width: 100%;
 	}
 
