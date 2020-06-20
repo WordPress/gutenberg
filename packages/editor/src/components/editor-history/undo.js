@@ -9,8 +9,9 @@ import { undo as undoIcon } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
 
 function EditorHistoryUndo( props, ref ) {
-	const hasUndo = useSelect( ( select ) =>
-		select( 'core/editor' ).hasEditorUndo()
+	const hasUndo = useSelect(
+		( select ) => select( 'core/editor' ).hasEditorUndo(),
+		[]
 	);
 	const { undo } = useDispatch( 'core/editor' );
 	return (
