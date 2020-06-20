@@ -3,17 +3,21 @@
 	display: inline-block;
 	margin-right: $grid-unit-10;
 	margin-bottom: $grid-unit-10;
+
+	&:last-child {
+		margin-right: 0;
+	}
 }
 
 .wp-block-buttons.alignright .wp-block-button {
 	margin-right: 0;
 	margin-left: $grid-unit-10;
+
+	&:first-child {
+		margin-left: 0;
+	}
 }
 
 .wp-block-buttons.aligncenter {
 	text-align: center;
-
-	.wp-block-button:last-child {
-		margin-right: 0;
-	}
 }
