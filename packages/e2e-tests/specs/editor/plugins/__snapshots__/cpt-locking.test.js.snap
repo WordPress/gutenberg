@@ -14,7 +14,17 @@ exports[`cpt locking template_lock all should not error when deleting the cotent
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns\\"></div>
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
@@ -32,7 +42,17 @@ exports[`cpt locking template_lock false should allow blocks to be inserted 1`] 
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns\\"></div>
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
 <!-- /wp:columns -->
 
 <!-- wp:list -->
@@ -54,7 +74,17 @@ exports[`cpt locking template_lock false should allow blocks to be moved 1`] = `
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns\\"></div>
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
@@ -68,7 +98,17 @@ exports[`cpt locking template_lock false should allow blocks to be removed 1`] =
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns\\"></div>
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
@@ -86,6 +126,16 @@ exports[`cpt locking template_lock insert should allow blocks to be moved 1`] = 
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns\\"></div>
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
