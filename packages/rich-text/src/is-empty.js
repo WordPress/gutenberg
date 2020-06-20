@@ -4,12 +4,14 @@
 import { LINE_SEPARATOR } from './special-characters';
 
 /**
- * Check if a Rich Text value is Empty, meaning it contains no text or any
+ * Check if a Rich Text value is empty, meaning it contains no text or any
  * objects (such as images).
  *
- * @param {Object} value Value to use.
+ * @param {Object}      value           Object containing the value that
+ *                                      should be checked.
+ * @param {string}      value.text      The text that should be check.
  *
- * @return {boolean} True if the value is empty, false if not.
+ * @return {boolean}    True if the value is empty, false if not.
  */
 export function isEmpty( { text } ) {
 	return text.length === 0;
@@ -19,7 +21,11 @@ export function isEmpty( { text } ) {
  * Check if the current collapsed selection is on an empty line in case of a
  * multiline value.
  *
- * @param  {Object} value Value te check.
+ * @param {Object}      value           Object containing the value that
+ *                                      should be checked.
+ * @param {string}      value.text      The text that should be check.
+ * @param {number}      value.start     The starting index
+ * @param {number}      value.end       The ending index
  *
  * @return {boolean} True if the line is empty, false if not.
  */

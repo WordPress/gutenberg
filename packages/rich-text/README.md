@@ -183,12 +183,13 @@ _Returns_
 
 <a name="isEmpty" href="#isEmpty">#</a> **isEmpty**
 
-Check if a Rich Text value is Empty, meaning it contains no text or any
+Check if a Rich Text value is empty, meaning it contains no text or any
 objects (such as images).
 
 _Parameters_
 
--   _value_ `Object`: Value to use.
+-   _value_ `Object`: Object containing the value that should be checked.
+-   _value.text_ `string`: The text that should be check.
 
 _Returns_
 
