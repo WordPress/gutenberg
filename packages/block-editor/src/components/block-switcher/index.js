@@ -190,7 +190,10 @@ export class BlockSwitcher extends Component {
 											/>
 										) }
 										{ hasBlockStyles && (
-											<MenuGroup label={ __( 'Styles' ) }>
+											<MenuGroup
+												label={ __( 'Styles' ) }
+												className="block-editor-block-switcher__styles__menugroup"
+											>
 												<BlockStyles
 													clientId={
 														hoveredBlock.clientId
@@ -205,6 +208,7 @@ export class BlockSwitcher extends Component {
 										) }
 										{ hasPossibleBlockTransformations && (
 											<BlockTransformationsMenu
+												className="block-editor-block-switcher__transforms__menugroup"
 												possibleBlockTransformations={
 													possibleBlockTransformations
 												}

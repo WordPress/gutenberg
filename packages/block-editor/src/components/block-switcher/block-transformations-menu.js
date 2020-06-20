@@ -10,11 +10,12 @@ import { MenuGroup, MenuItem } from '@wordpress/components';
 import BlockIcon from '../block-icon';
 
 const BlockTransformationsMenu = ( {
+	className,
 	possibleBlockTransformations,
 	onSelect,
 } ) => {
 	return (
-		<MenuGroup label={ __( 'Transform to' ) }>
+		<MenuGroup label={ __( 'Transform to' ) } className={ className }>
 			{ possibleBlockTransformations.map( ( item ) => {
 				const { name, icon, title } = item;
 				return (
