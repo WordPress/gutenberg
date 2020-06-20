@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### New Features
+
+- Add new CLI options: `--no-wp-scripts` and `--wp-scripts` to let users override the settings that template defines for supports for `@wordpress/scripts` package integration ([#23195](https://github.com/WordPress/gutenberg/pull/23195)).
+
+## 0.14.2 (2020-06-16)
+
+### Bug Fix
+
+- Fix errors reported by CSS linter in ESNext template by using hex colors in CSS files ([#23188](https://github.com/WordPress/gutenberg/pull/23188)).
+
+## 0.14.1 (2020-06-15)
+
+### Bug Fix
+
+- Fix an error reported by JavaScript linter by improving JSDoc comment in ESNext template in `src/edit.js` file ([#23164](https://github.com/WordPress/gutenberg/pull/23164)).
+
+## 0.14.0 (2020-06-15)
+
+### Enhancements
+
+- Update `esnext` (default) template to leverage CSS import in JavaScript support added to `@wordpress/scripts` ([#22727](https://github.com/WordPress/gutenberg/pull/22727/files)).
+
 ## 0.13.0 (2020-05-28)
 
 ### Internal
@@ -16,7 +38,7 @@
 
 ### Enhancements
 
-- Update `esnext` template to scaffold 3 JavaScript source files to illustrate how ES modules help to better organize code.
+- Update `esnext` (default) template to scaffold 3 JavaScript source files to illustrate how ES modules help to better organize code ([#21750](https://github.com/WordPress/gutenberg/pull/21750)).
 
 ## 0.10.0 (2020-04-01)
 

@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.17.0",
+	"version": "9.18.0",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"editor"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/editor/README.md",

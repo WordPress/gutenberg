@@ -1,11 +1,14 @@
 {
 	"name": "@wordpress/project-management-automation",
-	"version": "1.6.0",
+	"version": "1.7.0",
 	"description": "GitHub Action that implements various automation to assist with managing the Gutenberg GitHub repository.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
-		"wordpress"
+		"wordpress",
+		"gutenberg",
+		"github",
+		"action"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/project-management-automation/README.md",
 	"repository": {

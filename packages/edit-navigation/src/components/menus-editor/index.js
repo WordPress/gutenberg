@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import CreateMenuPanel from './create-menu-panel';
+import CreateMenuArea from './create-menu-area';
 import MenuEditor from '../menu-editor';
 
 export default function MenusEditor( { blockEditorSettings } ) {
@@ -95,7 +95,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				</CardBody>
 			</Card>
 			{ isCreateMenuPanelVisible && (
-				<CreateMenuPanel
+				<CreateMenuArea
 					menus={ stateMenus }
 					onCancel={
 						// User can only cancel out of menu creation if there

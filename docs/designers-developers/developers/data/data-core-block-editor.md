@@ -946,6 +946,7 @@ Generator that triggers an action used to duplicate a list of blocks.
 _Parameters_
 
 -   _clientIds_ `Array<string>`: 
+-   _updateSelection_ `boolean`: 
 
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
 
@@ -1395,12 +1396,12 @@ _Returns_
 
 <a name="updateBlockAttributes" href="#updateBlockAttributes">#</a> **updateBlockAttributes**
 
-Returns an action object used in signalling that the block attributes with
-the specified client ID has been updated.
+Returns an action object used in signalling that the multiple blocks'
+attributes with the specified client IDs have been updated.
 
 _Parameters_
 
--   _clientId_ `string`: Block client ID.
+-   _clientIds_ `(string|Array<string>)`: Block client IDs.
 -   _attributes_ `Object`: Block attributes to be merged.
 
 _Returns_

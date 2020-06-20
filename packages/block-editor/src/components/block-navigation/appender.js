@@ -9,8 +9,8 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockNavigationLeaf from './leaf';
-import ButtonBlockAppender from '../button-block-appender';
 import DescenderLines from './descender-lines';
+import Inserter from '../inserter';
 
 export default function BlockNavigationAppender( {
 	parentBlockClientId,
@@ -41,18 +41,18 @@ export default function BlockNavigationAppender( {
 				className="block-editor-block-navigation-appender__cell"
 				colSpan="3"
 			>
-				{ ( props ) => (
+				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-appender__container">
 						<DescenderLines
 							level={ level }
 							isLastRow={ position === rowCount }
 							terminatedLevels={ terminatedLevels }
 						/>
-						<ButtonBlockAppender
+						<Inserter
 							rootClientId={ parentBlockClientId }
 							__experimentalSelectBlockOnInsert={ false }
 							aria-describedby={ descriptionId }
-							{ ...props }
+							toggleProps={ { ref, tabIndex, onFocus } }
 						/>
 						<div
 							className="block-editor-block-navigation-appender__description"

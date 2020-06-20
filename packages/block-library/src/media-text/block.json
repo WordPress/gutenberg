@@ -1,6 +1,6 @@
 {
 	"name": "core/media-text",
-	"category": "layout",
+	"category": "media",
 	"attributes": {
 		"align": {
 			"type": "string",
@@ -84,7 +84,8 @@
 		],
 		"html": false,
 		"__experimentalColor": {
-			"gradients": true
+			"gradients": true,
+			"linkColor": true
 		}
 	}
 }

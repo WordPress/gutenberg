@@ -2,10 +2,14 @@
 
 For features included in the Gutenberg plugin, the deprecation policy is intended to support backward compatibility for two minor plugin releases, when possible. Features and code included in a stable release of WordPress are not included in this deprecation timeline, and are instead subject to the [versioning policies of the WordPress project](https://make.wordpress.org/core/handbook/about/release-cycle/version-numbering/). The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 8.6.0
+
+- Block API integration with [Block Context](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-context.md) was updated. When registering a block use `usesContext` and `providesContext` pair in JavaScript files and `uses_context` and `provides_context` pair in PHP files instead of previous pair `context` and `providesContext`.
+
 ## 8.3.0
 
 - The PHP function `gutenberg_get_post_from_context` has been removed. Use [Block Context](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-context.md) instead.
-- The old Block Pattern APIs `register_pattern`/`unregister_pattern` have been removed. Use the [new functions](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-patterns.md#register_block_pattern) instead. 
+- The old Block Pattern APIs `register_pattern`/`unregister_pattern` have been removed. Use the [new functions](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-patterns.md#register_block_pattern) instead.
 
 ## 5.5.0
 

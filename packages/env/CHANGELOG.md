@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `wp-env destroy` now removes dangling docker volumes and networks associated with the WordPress environment.
+
 ## 1.4.0 (2020-05-28)
 
 ### New Feature

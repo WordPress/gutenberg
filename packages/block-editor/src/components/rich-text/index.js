@@ -385,6 +385,7 @@ function RichTextWrapper(
 			__unstableMarkAutomaticChange,
 			multiline,
 			splitValue,
+			onSplitAtEnd,
 		]
 	);
 
@@ -574,7 +575,8 @@ function RichTextWrapper(
 				value,
 				onChange,
 				onFocus,
-				Editable,
+				editableProps,
+				editableTagName: TagName,
 			} ) => (
 				<>
 					{ children && children( { value, onChange, onFocus } ) }
@@ -593,7 +595,8 @@ function RichTextWrapper(
 						isSelected={ nestedIsSelected }
 					>
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
-							<Editable
+							<TagName
+								{ ...editableProps }
 								aria-autocomplete={
 									listBoxId ? 'list' : undefined
 								}
@@ -601,7 +604,10 @@ function RichTextWrapper(
 								aria-activedescendant={ activeId }
 								start={ startAttr }
 								reversed={ reversed }
-								onKeyDown={ onKeyDown }
+								onKeyDown={ ( event ) => {
+									onKeyDown( event );
+									editableProps.onKeyDown( event );
+								} }
 							/>
 						) }
 					</Autocomplete>

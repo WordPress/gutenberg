@@ -19,7 +19,7 @@
 
 	&[aria-expanded="true"],
 	&:hover {
-		color: $theme-color;
+		color: var(--wp-admin-theme-color);
 	}
 
 	// Unset some hovers, instead of adding :not specificity.
@@ -30,7 +30,7 @@
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus $theme-color;
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 1px solid transparent;
@@ -42,24 +42,24 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: color($theme-color);
+		background: var(--wp-admin-theme-color);
 		color: $white;
 		text-decoration: none;
 		text-shadow: none;
 
 		&:hover:not(:disabled) {
-			background: color($theme-color shade(10%));
+			background: var(--wp-admin-theme-color-darker-10);
 			color: $white;
 		}
 
 		&:active:not(:disabled) {
-			background: color($theme-color shade(20%));
-			border-color: color($theme-color shade(20%));
+			background: var(--wp-admin-theme-color-darker-20);
+			border-color: var(--wp-admin-theme-color-darker-20);
 			color: $white;
 		}
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 1px solid transparent;
@@ -70,15 +70,15 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			color: color($theme-color tint(40%));
-			background: color($theme-color tint(10%));
-			border-color: color($theme-color tint(10%));
+			color: rgba($white, 0.4);
+			background: var(--wp-admin-theme-color);
+			border-color: var(--wp-admin-theme-color);
 			opacity: 1;
 
 			&:focus:enabled {
 				box-shadow:
 					0 0 0 $border-width $white,
-					0 0 0 3px color($theme-color);
+					0 0 0 3px var(--wp-admin-theme-color);
 			}
 		}
 
@@ -91,13 +91,13 @@
 			/* stylelint-disable */
 			background-image: linear-gradient(
 				-45deg,
-				$theme-color 28%,
-				color($theme-color shade(20%)) 28%,
-				color($theme-color shade(20%)) 72%,
-				$theme-color 72%
+				var(--wp-admin-theme-color) 28%,
+				var(--wp-admin-theme-color-darker-20) 28%,
+				var(--wp-admin-theme-color-darker-20) 72%,
+				var(--wp-admin-theme-color)  72%
 			);
 			/* stylelint-enable */
-			border-color: color($theme-color);
+			border-color: var(--wp-admin-theme-color);
 		}
 	}
 
@@ -109,13 +109,13 @@
 	&.is-tertiary {
 		&:active:not(:disabled) {
 			background: $light-gray-tertiary;
-			color: color($theme-color shade(10%));
+			color: var(--wp-admin-theme-color-darker-10);
 			box-shadow: none;
 		}
 
 		&:hover:not(:disabled) {
-			color: color($theme-color shade(10%));
-			box-shadow: inset 0 0 0 $border-width color($theme-color shade(10%));
+			color: var(--wp-admin-theme-color-darker-10);
+			box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color-darker-10);
 		}
 
 		&:disabled,
@@ -134,10 +134,10 @@
 	 */
 
 	&.is-secondary {
-		box-shadow: inset 0 0 0 $border-width $theme-color;
+		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
 		outline: 1px solid transparent; // Shown in high contrast mode.
 		white-space: nowrap;
-		color: $theme-color;
+		color: var(--wp-admin-theme-color);
 		background: transparent;
 	}
 
@@ -147,7 +147,7 @@
 
 	&.is-tertiary {
 		white-space: nowrap;
-		color: $theme-color;
+		color: var(--wp-admin-theme-color);
 		background: transparent;
 		padding: 6px; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
 
@@ -218,10 +218,10 @@
 		/* stylelint-disable */
 		background-image: linear-gradient(
 			-45deg,
-			color($white shade(2%)) 28%,
-			color($white shade(12%)) 28%,
-			color($white shade(12%)) 72%,
-			color($white shade(2%)) 72%
+			darken($white, 2%) 28%,
+			darken($white, 12%) 28%,
+			darken($white, 12%) 72%,
+			darken($white, 2%) 72%
 		);
 		/* stylelint-enable */
 	}
@@ -233,6 +233,7 @@
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
+			padding: 0 8px;
 			width: 24px;
 		}
 	}
@@ -264,7 +265,7 @@
 		background: $dark-gray-primary;
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;

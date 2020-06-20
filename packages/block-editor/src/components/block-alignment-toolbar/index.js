@@ -13,11 +13,6 @@ import {
 	stretchWide,
 } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import { withBlockEditContext } from '../block-edit/context';
-
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
 		icon: positionLeft,
@@ -45,6 +40,10 @@ const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
 const DEFAULT_CONTROL = 'center';
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
+const POPOVER_PROPS = {
+	isAlternate: true,
+};
+
 export function BlockAlignmentToolbar( {
 	value,
 	onChange,
@@ -68,6 +67,7 @@ export function BlockAlignmentToolbar( {
 
 	return (
 		<ToolbarGroup
+			popoverProps={ POPOVER_PROPS }
 			isCollapsed={ isCollapsed }
 			icon={
 				activeAlignmentControl
@@ -88,11 +88,6 @@ export function BlockAlignmentToolbar( {
 }
 
 export default compose(
-	withBlockEditContext( ( { clientId } ) => {
-		return {
-			clientId,
-		};
-	} ),
 	withSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		const settings = getSettings();
