@@ -57,7 +57,7 @@ function isVisible( element ) {
  */
 function skipFocus( element ) {
 	return (
-		element.nodeName.toLocaleLowerCase() === 'iframe' &&
+		element.nodeName.toLowerCase() === 'iframe' &&
 		element.getAttribute( 'tabindex' ) === '-1'
 	);
 }
