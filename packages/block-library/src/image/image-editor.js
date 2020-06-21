@@ -31,19 +31,8 @@ import apiFetch from '@wordpress/api-fetch';
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
-const ZOOM_STEP = 0.1;
+const ZOOM_STEP = 0.01;
 const POPOVER_PROPS = { position: 'bottom right' };
-
-function richImageRequest( id, attrs ) {
-	return apiFetch( {
-		path: `__experimental/richimage/${ id }/apply`,
-		headers: {
-			'Content-type': 'application/json',
-		},
-		method: 'POST',
-		body: JSON.stringify( attrs ),
-	} );
-}
 
 function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 	return (
@@ -174,24 +163,26 @@ export default function ImageEditor( {
 	function apply() {
 		setIsProgress( true );
 
-		const attrs = { crop };
+		const attrs = crop;
 
 		if ( rotation > 0 ) {
 			attrs.rotation = rotation;
 		}
 
-		richImageRequest( id, attrs )
+		apiFetch( {
+			path: `__experimental/richimage/${ id }/apply`,
+			headers: {
+				'Content-type': 'application/json',
+			},
+			method: 'POST',
+			body: JSON.stringify( attrs ),
+		} )
 			.then( ( response ) => {
-				setIsProgress( false );
-				setIsEditingImage( false );
-
-				if ( response.media_id && response.media_id !== id ) {
-					setAttributes( {
-						id: response.media_id,
-						url: response.url,
-						height: width / aspect,
-					} );
-				}
+				setAttributes( {
+					id: response.media_id,
+					url: response.url,
+					height: height && width ? width / aspect : undefined,
+				} );
 			} )
 			.catch( () => {
 				createErrorNotice(
@@ -203,6 +194,8 @@ export default function ImageEditor( {
 						type: 'snackbar',
 					}
 				);
+			} )
+			.finally( () => {
 				setIsProgress( false );
 				setIsEditingImage( false );
 			} );

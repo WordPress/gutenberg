@@ -8,11 +8,6 @@
  */
 
 /**
- * Image editor
- */
-include_once __DIR__ . '/image-editor/class-image-editor.php';
-
-/**
  * Controller which provides REST API endpoints for image editing.
  *
  * @since 7.x ?
@@ -30,7 +25,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function __construct() {
 		$this->namespace = '__experimental';
 		$this->rest_base = '/richimage/(?P<media_id>[\d]+)';
-		$this->editor    = new Image_Editor();
 	}
 
 	/**
@@ -42,83 +36,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
-			$this->rest_base . '/rotate',
-			array(
-				array(
-					'methods'             => WP_REST_Server::EDITABLE,
-					'callback'            => array( $this, 'rotate_image' ),
-					'permission_callback' => array( $this, 'permission_callback' ),
-					'args'                => array(
-						'angle' => array(
-							'description' => __( 'Rotation angle', 'gutenberg' ),
-							'type'        => 'integer',
-							'required'    => true,
-						),
-					),
-				),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			$this->rest_base . '/flip',
-			array(
-				array(
-					'methods'             => WP_REST_Server::EDITABLE,
-					'callback'            => array( $this, 'flip_image' ),
-					'permission_callback' => array( $this, 'permission_callback' ),
-					'args'                => array(
-						'direction' => array(
-							'description' => __( 'Flip direction', 'gutenberg' ),
-							'type'        => 'string',
-							'enum'        => array( 'vertical', 'horizontal' ),
-							'required'    => true,
-						),
-					),
-				),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			$this->rest_base . '/crop',
-			array(
-				array(
-					'methods'             => WP_REST_Server::EDITABLE,
-					'callback'            => array( $this, 'crop_image' ),
-					'permission_callback' => array( $this, 'permission_callback' ),
-					'args'                => array(
-						'crop_x'      => array(
-							'description' => __( 'Crop offset percentage from left', 'gutenberg' ),
-							'type'        => 'number',
-							'minimum'     => 0,
-							'required'    => true,
-						),
-						'crop_y'      => array(
-							'description' => __( 'Crop offset percentage from top', 'gutenberg' ),
-							'type'        => 'number',
-							'minimum'     => 0,
-							'required'    => true,
-						),
-						'crop_width'  => array(
-							'description' => __( 'Crop width percentage', 'gutenberg' ),
-							'type'        => 'number',
-							'minimum'     => 1,
-							'required'    => true,
-						),
-						'crop_height' => array(
-							'description' => __( 'Crop height percentage', 'gutenberg' ),
-							'type'        => 'number',
-							'minimum'     => 1,
-							'required'    => true,
-						),
-					),
-				),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
 			$this->rest_base . '/apply',
 			array(
 				array(
@@ -126,57 +43,28 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'apply_edits' ),
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
-						array(
-							'type'       => 'object',
-							'properties' => array(
-								'crop'   => array(
-									'type'       => 'object',
-									'properties' => array(
-										'x' => array(
-											'type'     => 'integer',
-											'minimum'  => 0,
-											'required' => true,
-										),
-										'y' => array(
-											'type'     => 'integer',
-											'minimum'  => 0,
-											'required' => true,
-										),
-										'w' => array(
-											'type'     => 'integer',
-											'minimum'  => 1,
-											'required' => true,
-										),
-										'h' => array(
-											'type'     => 'integer',
-											'minimum'  => 1,
-											'required' => true,
-										),
-									),
-								),
-								'rotate' => array(
-									'type'       => 'object',
-									'properties' => array(
-										'angle' => array(
-											'type'     => 'integer',
-											'required' => true,
-										),
-									),
-								),
-								'flip'   => array(
-									'type'       => 'object',
-									'properties' => array(
-										'horizontal' => array(
-											'type'     => 'boolean',
-											'required' => true,
-										),
-										'vertical'   => array(
-											'type'     => 'boolean',
-											'required' => true,
-										),
-									),
-								),
-							),
+						'x' => array(
+							'type'     => 'float',
+							'minimum'  => 0,
+							'required' => true,
+						),
+						'y' => array(
+							'type'     => 'float',
+							'minimum'  => 0,
+							'required' => true,
+						),
+						'width' => array(
+							'type'     => 'float',
+							'minimum'  => 1,
+							'required' => true,
+						),
+						'height' => array(
+							'type'     => 'float',
+							'minimum'  => 1,
+							'required' => true,
+						),
+						'rotation' => array(
+							'type'     => 'integer',
 						),
 					),
 				),
@@ -202,7 +90,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Rotates an image.
+	 * Applies all edits in one go.
 	 *
 	 * @since 7.x ?
 	 * @access public
@@ -210,51 +98,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
 	 */
-	public function rotate_image( $request ) {
-		$modifier = new Image_Editor_Rotate( $request['angle'] );
-
-		return $this->editor->modify_image( $request['media_id'], $modifier );
-	}
-
-	/**
-	 * Flips/mirrors an image.
-	 *
-	 * @since 7.x ?
-	 * @access public
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
-	 */
-	public function flip_image( $request ) {
-		$modifier = new Image_Editor_Flip( $request['direction'] );
-
-		return $this->editor->modify_image( $request['media_id'], $modifier );
-	}
-
-	/**
-	 * Crops an image.
-	 *
-	 * @since 7.x ?
-	 * @access public
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
-	 */
-	public function crop_image( $request ) {
-		$modifier = new Image_Editor_Crop( $request['crop_x'], $request['crop_y'], $request['crop_width'], $request['crop_height'] );
-
-		return $this->editor->modify_image( $request['media_id'], $modifier );
-	}
-
-	/**
- 	 * Applies all edits in one go.
- 	 *
- 	 * @since 7.x ?
- 	 * @access public
- 	 *
- 	 * @param WP_REST_Request $request Full details about the request.
- 	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
- 	 */
 	public function apply_edits( $request ) {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
@@ -289,15 +132,12 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 
 		$size = $image_editor->get_size();
 
-		$crop_x = round( ( $size['width'] * $params['crop']['x'] ) / 100.0 );
-		$crop_y = round( ( $size['height'] * $params['crop']['y'] ) / 100.0 );
-		$width  = round( ( $size['width'] * $params['crop']['width'] ) / 100.0 );
-		$height = round( ( $size['height'] * $params['crop']['height'] ) / 100.0 );
-
 		// Finally apply the modifications.
-		if ( isset( $params['crop'] ) ) {
-			$image_editor->crop( $crop_x, $crop_y, $width, $height );
-		}
+		$crop_x = round( ( $size['width'] * floatval( $params['x'] ) ) / 100.0 );
+		$crop_y = round( ( $size['height'] * floatval( $params['y'] ) ) / 100.0 );
+		$width  = round( ( $size['width'] * floatval( $params['width'] ) ) / 100.0 );
+		$height = round( ( $size['height'] * floatval( $params['height'] ) ) / 100.0 );
+		$image_editor->crop( $crop_x, $crop_y, $width, $height );
 
 		if ( isset( $params['rotation'] ) ) {
 			$image_editor->rotate( 0 - $params['rotation'] );
