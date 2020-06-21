@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
+import { isEmpty, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -13,18 +14,29 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import BaseControl from '../base-control';
 
+/**
+ * Used to render the <select /> Loading... placeholder when the isLoading
+ * state is set.
+ */
+const loadingValue = '__loading__';
+
 export default function SelectControl( {
+	disabled,
 	help,
+	isLoading = false,
 	label,
 	multiple = false,
-	onChange,
+	onChange = noop,
 	options = [],
 	className,
 	hideLabelFromVision,
+	value: valueProp,
 	...props
 } ) {
 	const instanceId = useInstanceId( SelectControl );
 	const id = `inspector-select-control-${ instanceId }`;
+	const isDisabled = disabled || isLoading;
+
 	const onChangeValue = ( event ) => {
 		if ( multiple ) {
 			const selectedOptions = [ ...event.target.options ].filter(
@@ -37,38 +49,57 @@ export default function SelectControl( {
 		onChange( event.target.value );
 	};
 
-	// Disable reason: A select with an onchange throws a warning
+	if ( isEmpty( options ) ) {
+		return null;
+	}
 
+	const value = isLoading ? loadingValue : valueProp;
+
+	// Disable reason: A select with an onchange throws a warning
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
-		! isEmpty( options ) && (
-			<BaseControl
-				label={ label }
-				hideLabelFromVision={ hideLabelFromVision }
+		<BaseControl
+			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
+			isLoading={ isLoading }
+			id={ id }
+			help={ help }
+			className={ className }
+		>
+			<select
+				aria-busy={ isLoading }
 				id={ id }
-				help={ help }
-				className={ className }
+				className="components-select-control__input"
+				disabled={ isDisabled }
+				onChange={ onChangeValue }
+				aria-describedby={ !! help ? `${ id }__help` : undefined }
+				multiple={ multiple }
+				value={ value }
+				{ ...props }
 			>
-				<select
-					id={ id }
-					className="components-select-control__input"
-					onChange={ onChangeValue }
-					aria-describedby={ !! help ? `${ id }__help` : undefined }
-					multiple={ multiple }
-					{ ...props }
-				>
-					{ options.map( ( option, index ) => (
-						<option
-							key={ `${ option.label }-${ option.value }-${ index }` }
-							value={ option.value }
-							disabled={ option.disabled }
-						>
-							{ option.label }
-						</option>
-					) ) }
-				</select>
-			</BaseControl>
-		)
+				<SelectOptions isLoading={ isLoading } options={ options } />
+			</select>
+		</BaseControl>
 	);
 	/* eslint-enable jsx-a11y/no-onchange */
+}
+
+function SelectOptions( { isLoading, options } ) {
+	if ( isLoading ) {
+		return (
+			<option disabled value={ loadingValue }>
+				{ __( 'Loading…' ) }
+			</option>
+		);
+	}
+
+	return options.map( ( option, index ) => (
+		<option
+			key={ `${ option.label }-${ option.value }-${ index }` }
+			value={ option.value }
+			disabled={ option.disabled }
+		>
+			{ option.label }
+		</option>
+	) );
 }

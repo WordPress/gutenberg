@@ -37,6 +37,7 @@ export const _default = () => {
 		'Help Text',
 		'Help text to explain the select control.'
 	);
+	const isLoading = boolean( 'isLoading', false );
 	const multiple = boolean( 'Allow Multiple Selection', false );
 	const options = object( 'Options', [
 		{ value: null, label: 'Select an Option', disabled: true },
@@ -51,6 +52,7 @@ export const _default = () => {
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
+			isLoading={ isLoading }
 			multiple={ multiple }
 			options={ options }
 			className={ className }
