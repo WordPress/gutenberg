@@ -43,28 +43,28 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'apply_edits' ),
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
-						'x' => array(
+						'x'        => array(
 							'type'     => 'float',
 							'minimum'  => 0,
 							'required' => true,
 						),
-						'y' => array(
+						'y'        => array(
 							'type'     => 'float',
 							'minimum'  => 0,
 							'required' => true,
 						),
-						'width' => array(
+						'width'    => array(
 							'type'     => 'float',
 							'minimum'  => 1,
 							'required' => true,
 						),
-						'height' => array(
+						'height'   => array(
 							'type'     => 'float',
 							'minimum'  => 1,
 							'required' => true,
 						),
 						'rotation' => array(
-							'type'     => 'integer',
+							'type' => 'integer',
 						),
 					),
 				),
