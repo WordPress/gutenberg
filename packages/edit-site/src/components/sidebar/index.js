@@ -14,6 +14,7 @@ import {
 	__experimentalLineHeightControl as LineHeightControl,
 } from '@wordpress/block-editor';
 import { getBlockTypes } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
@@ -47,6 +48,18 @@ const DefaultSidebar = ( { identifier, title, icon, children } ) => {
 };
 
 export function SidebarComplementaryAreaFills() {
+	const {
+		__experimentalGlobalStylesUser: userStyles,
+	} = useSelect( ( select ) => select( 'core/block-editor' ).getSettings() );
+
+	const fromPx = ( value ) => +value?.replace( 'px', '' ) ?? null;
+	const getFontSizeValue = ( blockName ) =>
+		fromPx( userStyles?.[ blockName ]?.styles?.typography?.fontSize ) ??
+		null;
+
+	const getLineHeightValue = ( blockName ) =>
+		userStyles?.[ blockName ]?.styles?.typography?.lineHeight ?? null;
+
 	return (
 		<>
 			<DefaultSidebar
@@ -66,6 +79,7 @@ export function SidebarComplementaryAreaFills() {
 					{ getBlockTypes()
 						.map(
 							( {
+								name,
 								title,
 								supports: {
 									__experimentalFontSize,
@@ -74,12 +88,11 @@ export function SidebarComplementaryAreaFills() {
 							} ) => {
 								const panels = [];
 								panels.push( <h3>{ title }</h3> );
+
 								if ( __experimentalFontSize ) {
 									panels.push(
 										<FontSizePicker
-											value={ {
-												size: 20,
-											} }
+											value={ getFontSizeValue( name ) }
 											onChange={ () =>
 												console.log(
 													'change font size'
@@ -92,10 +105,12 @@ export function SidebarComplementaryAreaFills() {
 								if ( __experimentalLineHeight ) {
 									panels.push(
 										<LineHeightControl
-											value={ 2 }
-											onChange={ console.log(
-												'change line height'
-											) }
+											value={ getLineHeightValue( name ) }
+											onChange={ () =>
+												console.log(
+													'change line height'
+												)
+											}
 										/>
 									);
 								}

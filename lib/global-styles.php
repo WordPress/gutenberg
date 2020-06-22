@@ -97,6 +97,8 @@ function gutenberg_experimental_global_styles_get_from_file( $file_path ) {
 /**
  * Returns the user's origin config.
  *
+ * @param boolean $include_draft Whether to include draft or only publish CPTs.
+ *
  * @return array Config that adheres to the theme.json schema.
  */
 function gutenberg_experimental_global_styles_get_user() {
@@ -561,15 +563,19 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
  * Takes data from the different origins (core, theme, and user)
  * and returns the merged result.
  *
- * @return array Merged trees.
+ * @param boolean $include_draft Whether to include draft or only publish CPT for user styles.
+ *
+ * @return string
  */
-function gutenberg_experimental_global_styles_get_merged_origins() {
-	$core   = gutenberg_experimental_global_styles_get_core();
-	$theme  = gutenberg_experimental_global_styles_get_theme();
-	$user   = gutenberg_experimental_global_styles_get_user();
-	$merged = gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user );
+function gutenberg_experimental_global_styles_get_stylesheet( $include_draft = false ) {
+	$gs_merged = array();
+	$gs_core   = gutenberg_experimental_global_styles_get_core();
+	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
+	$gs_user   = gutenberg_experimental_global_styles_get_user( $include_draft );
 
-	return $merged;
+	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
+
+	return $gs_merged;
 }
 
 /**
@@ -645,24 +651,15 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
 
+	$include_draft = true;
 	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		$settings['__experimentalGlobalStylesUser']         = gutenberg_experimental_global_styles_get_user( $include_draft );
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
-
-		$global_styles = gutenberg_experimental_global_styles_merge_trees(
-			gutenberg_experimental_global_styles_get_core(),
-			gutenberg_experimental_global_styles_get_theme()
-		);
-
-		$settings['__experimentalGlobalStylesBase'] = $global_styles;
 	}
 
 	// Add the styles for the editor via the settings
 	// so they get processed as if they were added via add_editor_styles:
 	// they will get the editor wrapper class.
-	$merged               = gutenberg_experimental_global_styles_get_merged_origins();
-	$stylesheet           = gutenberg_experimental_global_styles_resolver( $merged );
-	$settings['styles'][] = array( 'css' => $stylesheet );
-
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
 
 	// Unsetting deprecated settings defined by Core.
@@ -670,6 +667,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['disableCustomFontSizes'] );
 	unset( $settings['enableCustomLineHeight'] );
+	$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $include_draft ) );
 
 	return $settings;
 }
