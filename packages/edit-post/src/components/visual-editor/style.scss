@@ -45,19 +45,10 @@
 	height: 0;
 }
 
-// Ideally this wrapper div is not needed but if we waant to match the positionning of blocks
+// Ideally this wrapper div is not needed but if we want to match the positioning of blocks
 // .block-editor-block-list__layout and block-editor-block-list__block
 // We need to have two DOM elements.
 .edit-post-visual-editor__post-title-wrapper {
-	// This padding is needed to match the block root container padding
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-side-ui-width;
-		padding-right: $block-side-ui-width;
-	}
-
 	.editor-post-title {
 		// Center.
 		margin-left: auto;

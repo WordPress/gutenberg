@@ -21,6 +21,9 @@ describe( 'TypeWriter', () => {
 		// Create first block.
 		await page.keyboard.press( 'Enter' );
 
+		// Create second block.
+		await page.keyboard.press( 'Enter' );
+
 		const initialPosition = await getCaretPosition();
 
 		// The page shouldn't be scrolled when it's being filled.
@@ -118,7 +121,10 @@ describe( 'TypeWriter', () => {
 		await page.keyboard.press( 'Enter' );
 		// Create second block.
 		await page.keyboard.press( 'Enter' );
+		// Create third block.
+		await page.keyboard.press( 'Enter' );
 		// Move to first block.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 
 		const initialPosition = await getCaretPosition();

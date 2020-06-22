@@ -799,6 +799,11 @@ describe( 'actions', () => {
 			expect( actions ).toEqual( [
 				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
 				select( 'core/block-editor', 'getTemplateLock', undefined ),
+				select(
+					'core/block-editor',
+					'getPreviousBlockClientId',
+					'myclientid'
+				),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],

@@ -4,8 +4,8 @@
 	.components-button {
 		border-radius: 0;
 		display: inline-flex;
-		color: var(--wp-admin-theme-color);
-		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+		color: $dark-gray-primary;
+		box-shadow: inset 0 0 0 $border-width $dark-gray-primary;
 
 		& + .components-button {
 			margin-left: -1px;
@@ -29,7 +29,7 @@
 
 		// The active button should look pressed.
 		&.is-primary {
-			box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 $border-width $dark-gray-primary;
 		}
 	}
 }

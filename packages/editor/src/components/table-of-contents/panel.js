@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,13 +10,18 @@ import { withSelect } from '@wordpress/data';
 import WordCount from '../word-count';
 import DocumentOutline from '../document-outline';
 
-function TableOfContentsPanel( {
-	headingCount,
-	paragraphCount,
-	numberOfBlocks,
-	hasOutlineItemsDisabled,
-	onRequestClose,
-} ) {
+function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
+	const { headingCount, paragraphCount, numberOfBlocks } = useSelect(
+		( select ) => {
+			const { getGlobalBlockCount } = select( 'core/block-editor' );
+			return {
+				headingCount: getGlobalBlockCount( 'core/heading' ),
+				paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
+				numberOfBlocks: getGlobalBlockCount(),
+			};
+		},
+		[]
+	);
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -72,11 +77,4 @@ function TableOfContentsPanel( {
 	);
 }
 
-export default withSelect( ( select ) => {
-	const { getGlobalBlockCount } = select( 'core/block-editor' );
-	return {
-		headingCount: getGlobalBlockCount( 'core/heading' ),
-		paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
-		numberOfBlocks: getGlobalBlockCount(),
-	};
-} )( TableOfContentsPanel );
+export default TableOfContentsPanel;

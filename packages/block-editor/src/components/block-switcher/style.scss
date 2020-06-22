@@ -65,54 +65,31 @@
 	}
 }
 
-
-// We double the max-width for it to fit both the preview & content but we keep the min width the same for the border to work.
-.components-popover.block-editor-block-switcher__popover .components-popover__content > div {
+.components-popover.block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
-	max-width: calc(340px * 2);
+}
+
+// We keep the min width the same for the border to work.
+.components-popover.block-editor-block-switcher__popover .components-popover__content > div {
+	min-width: auto;
 	display: flex;
 	background: $white;
 	padding: 0;
 
 	.components-menu-group {
-		padding: $grid-unit-20 $grid-unit-30;
+		padding: $grid-unit-20;
+		margin: 0;
+	}
+}
+
+.block-editor-block-switcher__popover .components-popover__content {
+
+	.block-editor-block-styles {
+		margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
 	}
 
-	.components-menu-group + .components-menu-group {
-		border-color: $light-gray-secondary;
-	}
-
-	.block-editor-block-switcher__container {
-		min-width: 300px;
-		max-width: 340px;
-		width: 50%;
-	}
-
-	.block-editor-block-switcher__label {
-		margin-bottom: $grid-unit-15;
-		color: $medium-gray-text;
-		text-transform: uppercase;
-		font-size: 11px;
-		font-weight: 500;
-	}
-
-	@include break-medium {
-		position: relative;
-
-		.block-editor-block-switcher__preview {
-			border-left: $border-width solid $light-gray-500;
-			margin-top: -$grid-unit-15;
-			margin-bottom: -$grid-unit-15;
-			background: $white;
-			width: 300px;
-			height: auto;
-			// Sticky helps us keep the preview at the top when scrolling
-			position: sticky;
-			align-self: stretch;
-			// For sticky to work we need top
-			top: 0;
-			padding: 10px;
-		}
+	.block-editor-block-styles__item-label {
+		text-align: left;
 	}
 
 	// Hide the bottom border on the last panel so it stacks with the popover.
@@ -129,12 +106,39 @@
 	}
 }
 
-.block-editor-block-switcher__popover .block-editor-block-styles {
-	margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
+.block-editor-block-switcher__popover__preview__parent {
+	.block-editor-block-switcher__popover__preview__container {
+		position: absolute;
+		top: -$grid-unit-15;
+		left: calc(100% + #{$grid-unit-40});
+	}
 }
 
-.block-editor-block-switcher__popover .block-editor-block-types-list {
-	margin: $grid-unit-15 0 0 0;
+.block-editor-block-switcher__preview__popover {
+	display: none;
+
+	// Position correctly. Needs specificity.
+	&.components-popover {
+		margin-left: $grid-unit-05;
+		margin-top: $grid-unit-15 - $border-width;
+	}
+
+	@include break-medium() {
+		display: block;
+	}
+
+	.components-popover__content {
+		box-shadow: none;
+		border: $border-width solid $dark-gray-primary;
+		background: $white;
+		border-radius: $radius-block-ui;
+	}
+
+	.block-editor-block-switcher__preview {
+		width: 300px;
+		height: auto;
+		padding: $grid-unit-20;
+	}
 }
 
 .block-editor-block-switcher__preview-title {
