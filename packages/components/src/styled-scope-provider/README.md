@@ -13,7 +13,7 @@ import {
 } from '@wordpress/components';
 
 const Example = () => (
-	<StyledScopeProvider scope="html body #editor">
+	<StyledScopeProvider scope="html body.wp-admin">
 		...
 		<InputControl />
 		...
@@ -21,10 +21,10 @@ const Example = () => (
 );
 ```
 
-In the above example, the `<InputControl />` component styles (which are generated with [Emotion](https://github.com/emotion-js/emotion)), will be prefixed with `html body #editor`.
-Instead of the generated CSS selector of `.css-123jda`, it would instead be `html body #editor .css-123jda`. Increasing specificity in a controlled manner is helpful in situations where there may be conflicting styles.
+In the above example, the `<InputControl />` component styles (which are generated with [Emotion](https://github.com/emotion-js/emotion)), will be prefixed with `html body.wp-admin`.
+Instead of the generated CSS selector of `.css-123jda`, it would instead be `html body.wp-admin .css-123jda`. Increasing specificity in a controlled manner is helpful in situations where there may be conflicting styles.
 
-In the case of `<InputControl />`, existing style rules such as `#editor input[type="text]` may pose problematic. However, the automatically generated selectors `html body #editor .css-123jda` will help ensure the elements are styled as expected.
+In the case of `<InputControl />`, existing style rules such as `#editor input[type="text]` may pose problematic. However, the automatically generated selectors `html body.wp-admin .css-123jda` will help ensure the elements are styled as expected.
 
 ## Props
 

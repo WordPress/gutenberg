@@ -217,7 +217,7 @@ class EditorProvider extends Component {
 		);
 
 		return (
-			<StyledScopeProvider scope="html body #editor">
+			<StyledScopeProvider scope="html body.wp-admin">
 				<EditorStyles styles={ settings.styles } />
 				<EntityProvider kind="root" type="site">
 					<EntityProvider
