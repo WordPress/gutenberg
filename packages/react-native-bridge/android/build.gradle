@@ -182,16 +182,16 @@ boolean isBundleUpToDate() {
 
 if (buildGutenbergMobileJSBundle) {
     def bundleName = 'index.android.bundle'
-    def jsRootDir = '../../../..'
+    def mobileGutenbergRootDir = '../../../..'
 
     task bundleUpToDateCheck {
         description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
 If they are changed, the isBundleUpToDate flag is switched to false. That flag is used by other tasks.")
 
-        def dirs = [jsRootDir]
-        file(jsRootDir).eachDirRecurse { dir ->
+        def dirs = [mobileGutenbergRootDir]
+        file(mobileGutenbergRootDir).eachDirRecurse { dir ->
             def isRelevantDir = !['react-native-bridge/android/build/intermediates',
-                                  file("$jsRootDir/bundle").absolutePath,
+                                  file("$mobileGutenbergRootDir/bundle").absolutePath,
                                   'node_modules'].any { dir.absolutePath.contains(it) } &&
                     !dir.name.startsWith('symlinked')
             if (isRelevantDir) {
@@ -275,7 +275,7 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         onlyIf { !isBundleUpToDate() }
 
         def origFileName = 'App.js'
-        def origWithPath = "$jsRootDir/bundle/android/${origFileName}"
+        def origWithPath = "$mobileGutenbergRootDir/bundle/android/${origFileName}"
         from origWithPath
         into buildAssetsFolder
         rename origFileName, bundleName
@@ -298,7 +298,7 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         dependsOn bundleUpToDateCheck
         onlyIf { !isBundleUpToDate() }
 
-        delete "$jsRootDir/node_modules"
+        delete "$mobileGutenbergRootDir/node_modules"
     }
 
     task resetExtractedRNTools(type: Delete) {
