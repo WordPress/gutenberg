@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { createSlotFill, PanelBody } from '@wordpress/components';
 import {
 	ComplementaryArea,
 	ComplementaryAreaMoreMenuItem,
@@ -9,6 +9,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { cog, pencil } from '@wordpress/icons';
 import { Platform } from '@wordpress/element';
+import {
+	FontSizePicker,
+	__experimentalLineHeightControl as LineHeightControl,
+} from '@wordpress/block-editor';
+import { getBlockTypes } from '@wordpress/blocks';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
@@ -57,7 +62,49 @@ export function SidebarComplementaryAreaFills() {
 				title={ __( 'Global Styles' ) }
 				icon={ pencil }
 			>
-				<p>Global Styles area</p>
+				<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
+					{ getBlockTypes()
+						.map(
+							( {
+								title,
+								supports: {
+									__experimentalFontSize,
+									__experimentalLineHeight,
+								},
+							} ) => {
+								const panels = [];
+								panels.push( <h3>{ title }</h3> );
+								if ( __experimentalFontSize ) {
+									panels.push(
+										<FontSizePicker
+											value={ {
+												size: 20,
+											} }
+											onChange={ () =>
+												console.log(
+													'change font size'
+												)
+											}
+										/>
+									);
+								}
+
+								if ( __experimentalLineHeight ) {
+									panels.push(
+										<LineHeightControl
+											value={ 2 }
+											onChange={ console.log(
+												'change line height'
+											) }
+										/>
+									);
+								}
+
+								return panels.length > 1 ? panels : null;
+							}
+						)
+						.filter( Boolean ) }
+				</PanelBody>
 			</DefaultSidebar>
 		</>
 	);
