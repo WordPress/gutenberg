@@ -27,8 +27,8 @@ describe( 'block editor keyboard shortcuts', () => {
 	} );
 
 	describe( 'move blocks', () => {
-		const moveUp = async () => pressKeyWithModifier( 'alt', 'q' );
-		const moveDown = async () => pressKeyWithModifier( 'alt', 'w' );
+		const moveUp = async () => pressKeyWithModifier( 'primaryAlt', 'q' );
+		const moveDown = async () => pressKeyWithModifier( 'primaryAlt', 'w' );
 		const paragraphBlocks = [ 'First', 'Second', 'Third' ];
 		describe( 'single block selected', () => {
 			it( 'should move the block up', async () => {
