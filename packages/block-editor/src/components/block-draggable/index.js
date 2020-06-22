@@ -6,7 +6,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 
 const SCROLL_INACTIVE_DISTANCE_PX = 50;
-const SCROLL_INTERVAL_MS = 50;
+const SCROLL_INTERVAL_MS = 25;
 const PIXELS_PER_SECOND_PER_DISTANCE = 5;
 const VELOCITY_MULTIPLIER =
 	PIXELS_PER_SECOND_PER_DISTANCE * ( SCROLL_INTERVAL_MS / 1000 );

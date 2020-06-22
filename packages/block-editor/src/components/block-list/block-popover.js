@@ -177,7 +177,9 @@ function BlockPopover( {
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
 			// Popover calculates the width once. Trigger a reset by remounting
-			// the component.
+			// the component. We include both shouldShowContextualToolbar and isToolbarForced
+			// in the key to prevent the component being unmounted unexpectedly when isToolbarForced = true,
+			// e.g. during drag and drop
 			key={ shouldShowContextualToolbar || isToolbarForced }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
