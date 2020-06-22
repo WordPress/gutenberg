@@ -3,7 +3,10 @@
  */
 import { useCallback, useRef } from '@wordpress/element';
 import { serialize, pasteHandler } from '@wordpress/blocks';
-import { documentHasSelection, documentHasTextSelection } from '@wordpress/dom';
+import {
+	documentHasSelection,
+	documentHasUncollapsedSelection,
+} from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -12,7 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { getPasteEventData } from '../../utils/get-paste-event-data';
 
-function useNotifyCopy() {
+export function useNotifyCopy() {
 	const { getBlockName } = useSelect(
 		( select ) => select( 'core/block-editor' ),
 		[]
@@ -93,7 +96,7 @@ function CopyHandler( { children } ) {
 			// Otherwise, any focus on an input field is considered.
 			const hasSelection =
 				event.type === 'copy' || event.type === 'cut'
-					? documentHasTextSelection()
+					? documentHasUncollapsedSelection()
 					: documentHasSelection();
 
 			// Let native copy behaviour take over in input fields.

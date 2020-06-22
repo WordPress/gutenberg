@@ -1,0 +1,11 @@
+.block-directory-downloadable-block-icon {
+	width: $button-size;
+	height: $button-size;
+
+	.block-editor-block-icon {
+		width: $button-size;
+		height: $button-size;
+		font-size: $button-size;
+		background-color: $light-gray-300;
+	}
+}

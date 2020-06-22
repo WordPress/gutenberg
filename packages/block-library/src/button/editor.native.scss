@@ -29,7 +29,7 @@
 	border-radius: $border-width * 4;
 	padding: $block-spacing;
 	border-width: $border-width;
-	margin: 2 * $panel-padding;
+	margin: 2 * $grid-unit-20;
 	background-color: $button-fallback-bg;
 	color: $white;
 }

@@ -33,6 +33,10 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
 const DEFAULT_CONTROL = 'top';
 
+const POPOVER_PROPS = {
+	isAlternate: true,
+};
+
 export function BlockVerticalAlignmentToolbar( {
 	value,
 	onChange,
@@ -49,6 +53,7 @@ export function BlockVerticalAlignmentToolbar( {
 
 	return (
 		<ToolbarGroup
+			popoverProps={ POPOVER_PROPS }
 			isCollapsed={ isCollapsed }
 			icon={
 				activeAlignment

@@ -45,13 +45,24 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'updateBlockAttributes', () => {
-		it( 'should return the UPDATE_BLOCK_ATTRIBUTES action', () => {
+		it( 'should return the UPDATE_BLOCK_ATTRIBUTES action (string)', () => {
 			const clientId = 'myclientid';
 			const attributes = {};
 			const result = updateBlockAttributes( clientId, attributes );
 			expect( result ).toEqual( {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId,
+				clientIds: [ clientId ],
+				attributes,
+			} );
+		} );
+
+		it( 'should return the UPDATE_BLOCK_ATTRIBUTES action (array)', () => {
+			const clientIds = [ 'myclientid' ];
+			const attributes = {};
+			const result = updateBlockAttributes( clientIds, attributes );
+			expect( result ).toEqual( {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds,
 				attributes,
 			} );
 		} );
@@ -788,6 +799,11 @@ describe( 'actions', () => {
 			expect( actions ).toEqual( [
 				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
 				select( 'core/block-editor', 'getTemplateLock', undefined ),
+				select(
+					'core/block-editor',
+					'getPreviousBlockClientId',
+					'myclientid'
+				),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],

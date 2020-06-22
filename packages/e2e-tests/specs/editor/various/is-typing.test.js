@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { clickBlockAppender, createNewPost } from '@wordpress/e2e-test-utils';
+import {
+	clickBlockAppender,
+	createNewPost,
+	showBlockToolbar,
+} from '@wordpress/e2e-test-utils';
 
 describe( 'isTyping', () => {
 	beforeEach( async () => {
@@ -83,8 +87,7 @@ describe( 'isTyping', () => {
 		await page.keyboard.type( 'Type' );
 
 		// Show Toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		await showBlockToolbar();
 
 		// Open the dropdown
 		await page.click( '.dropdown-open' );

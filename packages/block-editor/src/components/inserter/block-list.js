@@ -1,15 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	map,
-	includes,
-	findIndex,
-	flow,
-	sortBy,
-	groupBy,
-	isEmpty,
-} from 'lodash';
+import { map, findIndex, flow, sortBy, groupBy, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,8 +10,6 @@ import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
 import { controlsRepeat } from '@wordpress/icons';
-import { speak } from '@wordpress/a11y';
-import { createBlock } from '@wordpress/blocks';
 import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -33,19 +23,7 @@ import __experimentalInserterMenuExtension from '../inserter-menu-extension';
 import { searchBlockItems } from './search-items';
 import InserterPanel from './panel';
 import InserterNoResults from './no-results';
-
-// Copied over from the Columns block. It seems like it should become part of public API.
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
+import useBlockTypesState from './hooks/use-block-types-state';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -55,73 +33,29 @@ export function InserterBlockList( {
 	rootClientId,
 	onInsert,
 	onHover,
-	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 	filterValue,
 	debouncedSpeak,
+	showMostUsedBlocks,
 } ) {
-	const {
-		categories,
-		collections,
-		items,
-		rootChildBlocks,
-		fetchReusableBlocks,
-	} = useSelect(
-		( select ) => {
-			const { getInserterItems, getBlockName, getSettings } = select(
-				'core/block-editor'
-			);
-			const {
-				getCategories,
-				getCollections,
-				getChildBlockNames,
-			} = select( 'core/blocks' );
-			const rootBlockName = getBlockName( rootClientId );
-			const { __experimentalFetchReusableBlocks } = getSettings();
+	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
+		rootClientId,
+		onInsert
+	);
 
-			return {
-				categories: getCategories(),
-				collections: getCollections(),
-				rootChildBlocks: getChildBlockNames( rootBlockName ),
-				items: getInserterItems( rootClientId ),
-				fetchReusableBlocks: __experimentalFetchReusableBlocks,
-			};
+	const hasChildItems = useSelect(
+		( select ) => {
+			const { getBlockName } = select( 'core/block-editor' );
+			const { getChildBlockNames } = select( 'core/blocks' );
+			const rootBlockName = getBlockName( rootClientId );
+
+			return !! getChildBlockNames( rootBlockName ).length;
 		},
 		[ rootClientId ]
 	);
 
-	// Fetch resuable blocks on mount
-	useEffect( () => {
-		if ( fetchReusableBlocks ) {
-			fetchReusableBlocks();
-		}
-	}, [] );
-
-	const onSelectItem = ( item ) => {
-		const { name, title, initialAttributes, innerBlocks } = item;
-		const insertedBlock = createBlock(
-			name,
-			initialAttributes,
-			createBlocksFromInnerBlocksTemplate( innerBlocks )
-		);
-
-		onInsert( insertedBlock );
-
-		if ( ! selectBlockOnInsert ) {
-			// translators: %s: the name of the block that has been added
-			const message = sprintf( __( '%s block added' ), title );
-			speak( message );
-		}
-	};
-
 	const filteredItems = useMemo( () => {
 		return searchBlockItems( items, categories, collections, filterValue );
 	}, [ filterValue, items, categories, collections ] );
-
-	const childItems = useMemo( () => {
-		return filteredItems.filter( ( { name } ) =>
-			includes( rootChildBlocks, name )
-		);
-	}, [ filteredItems, rootChildBlocks ] );
 
 	const suggestedItems = useMemo( () => {
 		return items.slice( 0, MAX_SUGGESTED_ITEMS );
@@ -181,26 +115,34 @@ export function InserterBlockList( {
 	}, [ filterValue, debouncedSpeak ] );
 
 	const hasItems = ! isEmpty( filteredItems );
-	const hasChildItems = childItems.length > 0;
 
 	return (
 		<div>
-			<ChildBlocks
-				rootClientId={ rootClientId }
-				items={ childItems }
-				onSelect={ onSelectItem }
-				onHover={ onHover }
-			/>
-
-			{ ! hasChildItems && !! suggestedItems.length && ! filterValue && (
-				<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+			{ hasChildItems && (
+				<ChildBlocks rootClientId={ rootClientId }>
 					<BlockTypesList
-						items={ suggestedItems }
+						// Pass along every block, as useBlockTypesState() and
+						// getInserterItems() will have already filtered out
+						// non-child blocks.
+						items={ filteredItems }
 						onSelect={ onSelectItem }
 						onHover={ onHover }
 					/>
-				</InserterPanel>
+				</ChildBlocks>
 			) }
+
+			{ showMostUsedBlocks &&
+				! hasChildItems &&
+				!! suggestedItems.length &&
+				! filterValue && (
+					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+						<BlockTypesList
+							items={ suggestedItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+						/>
+					</InserterPanel>
+				) }
 
 			{ ! hasChildItems &&
 				map( categories, ( category ) => {

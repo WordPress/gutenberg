@@ -99,7 +99,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 		icon: 'format-image',
 
-		category: 'common',
+		category: 'text',
 
 		attributes: {
 			category: {
@@ -354,7 +354,7 @@ Returns all the block categories.
 
 _Returns_
 
--   `Array<Object>`: Block categories.
+-   `Array<WPBlockCategory>`: Block categories.
 
 <a name="getChildBlockNames" href="#getChildBlockNames">#</a> **getChildBlockNames**
 
@@ -632,8 +632,10 @@ Registers a new block collection to group blocks in the same namespace in the in
 
 _Parameters_
 
--   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace
--   _settings_ `Object`: An object composed of a title to show in the inserter, and an icon to show in the inserter
+-   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace.
+-   _settings_ `Object`: The block collection settings.
+-   _settings.title_ `string`: The title to display in the block inserter.
+-   _settings.icon_ `[Object]`: The icon to display in the block inserter.
 
 <a name="registerBlockStyle" href="#registerBlockStyle">#</a> **registerBlockStyle**
 
@@ -687,7 +689,7 @@ Sets the block categories.
 
 _Parameters_
 
--   _categories_ `Array<Object>`: Block categories.
+-   _categories_ `Array<WPBlockCategory>`: Block categories.
 
 <a name="setDefaultBlockName" href="#setDefaultBlockName">#</a> **setDefaultBlockName**
 
@@ -789,7 +791,7 @@ Updates a category.
 _Parameters_
 
 -   _slug_ `string`: Block category slug.
--   _category_ `Object`: Object containing the category properties that should be updated.
+-   _category_ `WPBlockCategory`: Object containing the category properties that should be updated.
 
 <a name="withBlockContentContext" href="#withBlockContentContext">#</a> **withBlockContentContext**
 

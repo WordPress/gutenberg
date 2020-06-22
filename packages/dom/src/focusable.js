@@ -48,6 +48,21 @@ function isVisible( element ) {
 }
 
 /**
+ * Returns true if the specified element should be skipped from focusable elements.
+ * For now it rather specific for `iframes` and  if tabindex attribute is set to -1.
+ *
+ * @param {Element} element DOM element to test.
+ *
+ * @return {boolean} Whether element should be skipped from focusable elements.
+ */
+function skipFocus( element ) {
+	return (
+		element.nodeName.toLowerCase() === 'iframe' &&
+		element.getAttribute( 'tabindex' ) === '-1'
+	);
+}
+
+/**
  * Returns true if the specified area element is a valid focusable element, or
  * false otherwise. Area is only focusable if within a map where a named map
  * referenced by an image somewhere in the document.
@@ -77,7 +92,7 @@ export function find( context ) {
 	const elements = context.querySelectorAll( SELECTOR );
 
 	return Array.from( elements ).filter( ( element ) => {
-		if ( ! isVisible( element ) ) {
+		if ( ! isVisible( element ) || skipFocus( element ) ) {
 			return false;
 		}
 

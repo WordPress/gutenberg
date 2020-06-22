@@ -5,7 +5,7 @@ import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 
-const BlockDraggable = ( { children, clientIds } ) => {
+const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 	const { srcRootClientId, index, isDraggable } = useSelect(
 		( select ) => {
 			const {
@@ -57,6 +57,7 @@ const BlockDraggable = ( { children, clientIds } ) => {
 
 	return (
 		<Draggable
+			cloneClassname={ cloneClassname }
 			elementId={ blockElementId }
 			transferData={ transferData }
 			onDragStart={ () => {

@@ -64,8 +64,6 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
-	isNavigationMode,
-	isMultiSelecting,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -107,6 +105,7 @@ function BlockListBlock( {
 			? getBlockDefaultClassName( name )
 			: null;
 	const customClassName = lightBlockWrapper ? attributes.className : null;
+	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the
@@ -116,6 +115,7 @@ function BlockListBlock( {
 		customClassName,
 		'block-editor-block-list__block',
 		{
+			'wp-block': ! isAligned,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': isSelected,
 			'is-highlighted': isHighlighted,
@@ -152,6 +152,19 @@ function BlockListBlock( {
 		/>
 	);
 
+	// For aligned blocks, provide a wrapper element so the block can be
+	// positioned relative to the block column.
+	if ( isAligned ) {
+		const alignmentWrapperProps = {
+			'data-align': wrapperProps[ 'data-align' ],
+		};
+		blockEdit = (
+			<div className="wp-block" { ...alignmentWrapperProps }>
+				{ blockEdit }
+			</div>
+		);
+	}
+
 	if ( mode !== 'visual' ) {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 	}
@@ -162,8 +175,6 @@ function BlockListBlock( {
 		isSelected,
 		isFirstMultiSelected,
 		isLastMultiSelected,
-		isMultiSelecting,
-		isNavigationMode,
 		isPartOfMultiSelection,
 		enableAnimation,
 		index,
@@ -228,7 +239,7 @@ const applyWithSelect = withSelect(
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
-			isNavigationMode,
+			getMultiSelectedBlockClientIds,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -247,6 +258,7 @@ const applyWithSelect = withSelect(
 		// the state. It happens now because the order in withSelect rendering
 		// is not correct.
 		const { name, attributes, isValid } = block || {};
+		const isFirstMultiSelected = isFirstMultiSelectedBlock( clientId );
 
 		// Do not add new properties here, use `useSelect` instead to avoid
 		// leaking new props to the public API (editor.BlockListBlock filter).
@@ -255,9 +267,12 @@ const applyWithSelect = withSelect(
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId ),
-			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
+			isFirstMultiSelected,
 			isLastMultiSelected:
 				getLastMultiSelectedBlockClientId() === clientId,
+			multiSelectedClientIds: isFirstMultiSelected
+				? getMultiSelectedBlockClientIds()
+				: undefined,
 
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if
@@ -269,7 +284,6 @@ const applyWithSelect = withSelect(
 			isSelectionEnabled: isSelectionEnabled(),
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
-			isNavigationMode: isNavigationMode(),
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to
@@ -301,8 +315,16 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( newAttributes ) {
-			const { clientId } = ownProps;
-			updateBlockAttributes( clientId, newAttributes );
+			const {
+				clientId,
+				isFirstMultiSelected,
+				multiSelectedClientIds,
+			} = ownProps;
+			const clientIds = isFirstMultiSelected
+				? multiSelectedClientIds
+				: [ clientId ];
+
+			updateBlockAttributes( clientIds, newAttributes );
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;

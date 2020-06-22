@@ -13,6 +13,13 @@ import { useSelect } from '@wordpress/data';
  */
 import { InserterBlockList as BaseInserterBlockList } from '../block-list';
 import items, { categories, collections } from './fixtures';
+import useBlockTypesState from '../hooks/use-block-types-state';
+
+jest.mock( '../hooks/use-block-types-state', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test
@@ -63,20 +70,22 @@ describe( 'InserterMenu', () => {
 	beforeEach( () => {
 		debouncedSpeak.mockClear();
 
-		useSelect.mockImplementation( () => ( {
+		useBlockTypesState.mockImplementation( () => [
+			items,
 			categories,
 			collections,
-			items,
-		} ) );
+		] );
+
+		useSelect.mockImplementation( () => false );
 	} );
 
 	it( 'should show nothing if there are no items', () => {
 		const noItems = [];
-		useSelect.mockImplementation( () => ( {
+		useBlockTypesState.mockImplementation( () => [
+			noItems,
 			categories,
 			collections,
-			items: noItems,
-		} ) );
+		] );
 		const { container } = render(
 			<InserterBlockList filterValue="random" />
 		);
@@ -93,10 +102,10 @@ describe( 'InserterMenu', () => {
 		const { container } = initializeAllClosedMenuState();
 		const embedTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
-		)[ 4 ];
+		)[ 3 ];
 		const embedTabTitle = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
-		)[ 4 ];
+		)[ 3 ];
 		const blocks = embedTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
@@ -104,7 +113,7 @@ describe( 'InserterMenu', () => {
 		expect( embedTabTitle.textContent ).toBe( 'Embeds' );
 		expect( blocks ).toHaveLength( 2 );
 		expect( blocks[ 0 ].textContent ).toBe( 'YouTube' );
-		expect( blocks[ 1 ].textContent ).toBe( 'A Text Embed' );
+		expect( blocks[ 1 ].textContent ).toBe( 'A Paragraph Embed' );
 
 		assertNoResultsMessageNotToBePresent( container );
 	} );
@@ -113,10 +122,10 @@ describe( 'InserterMenu', () => {
 		const { container } = initializeAllClosedMenuState();
 		const reusableTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
-		)[ 6 ];
+		)[ 5 ];
 		const reusableTabTitle = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
-		)[ 6 ];
+		)[ 5 ];
 		const blocks = reusableTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
@@ -132,19 +141,33 @@ describe( 'InserterMenu', () => {
 		const { container } = initializeAllClosedMenuState();
 		const commonTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
-		)[ 1 ];
+		)[ 0 ];
 		const commonTabTitle = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
-		)[ 1 ];
+		)[ 0 ];
 		const blocks = commonTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
-		expect( commonTabTitle.textContent ).toBe( 'Common blocks' );
+		expect( commonTabTitle.textContent ).toBe( 'Text' );
 		expect( blocks ).toHaveLength( 3 );
-		expect( blocks[ 0 ].textContent ).toBe( 'Text' );
-		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( blocks[ 0 ].textContent ).toBe( 'Paragraph' );
+		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Paragraph' );
 		expect( blocks[ 2 ].textContent ).toBe( 'Some Other Block' );
+
+		assertNoResultsMessageNotToBePresent( container );
+	} );
+
+	it( 'displays child blocks UI when root block has child blocks', () => {
+		useSelect.mockImplementation( () => true );
+
+		const { container } = render( <InserterBlockList /> );
+
+		const childBlocksContent = container.querySelector(
+			'.block-editor-inserter__child-blocks'
+		);
+
+		expect( childBlocksContent ).not.toBeNull();
 
 		assertNoResultsMessageNotToBePresent( container );
 	} );
@@ -153,7 +176,7 @@ describe( 'InserterMenu', () => {
 		const { container } = initializeAllClosedMenuState();
 		const layoutTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
-		)[ 2 ];
+		)[ 1 ];
 		const disabledBlocks = layoutTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item[disabled], .block-editor-block-types-list__item[aria-disabled="true"]'
 		);
@@ -164,7 +187,7 @@ describe( 'InserterMenu', () => {
 
 	it( 'should allow searching for items', () => {
 		const { container } = render(
-			<InserterBlockList filterValue="text" />
+			<InserterBlockList filterValue="paragraph" />
 		);
 
 		const matchingCategories = container.querySelectorAll(
@@ -172,7 +195,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( matchingCategories ).toHaveLength( 3 );
-		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Text' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 		expect( matchingCategories[ 2 ].textContent ).toBe( 'Core' ); // "Core" namespace collection
 
@@ -186,13 +209,13 @@ describe( 'InserterMenu', () => {
 		expect( debouncedSpeak ).toHaveBeenCalledWith( '3 results found.' );
 
 		// Default block results.
-		expect( blocks[ 0 ].textContent ).toBe( 'Text' );
-		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
-		expect( blocks[ 2 ].textContent ).toBe( 'A Text Embed' );
+		expect( blocks[ 0 ].textContent ).toBe( 'Paragraph' );
+		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Paragraph' );
+		expect( blocks[ 2 ].textContent ).toBe( 'A Paragraph Embed' );
 
 		// Collection results.
-		expect( blocks[ 3 ].textContent ).toBe( 'Text' );
-		expect( blocks[ 4 ].textContent ).toBe( 'Advanced Text' );
+		expect( blocks[ 3 ].textContent ).toBe( 'Paragraph' );
+		expect( blocks[ 4 ].textContent ).toBe( 'Advanced Paragraph' );
 
 		assertNoResultsMessageNotToBePresent( container );
 	} );
@@ -243,7 +266,7 @@ describe( 'InserterMenu', () => {
 
 	it( 'should trim whitespace of search terms', () => {
 		const { container } = render(
-			<InserterBlockList filterValue=" text" />
+			<InserterBlockList filterValue=" paragraph" />
 		);
 
 		const matchingCategories = container.querySelectorAll(
@@ -251,7 +274,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( matchingCategories ).toHaveLength( 3 );
-		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Text' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
 		const blocks = container.querySelectorAll(
@@ -259,9 +282,9 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( blocks ).toHaveLength( 5 );
-		expect( blocks[ 0 ].textContent ).toBe( 'Text' );
-		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
-		expect( blocks[ 2 ].textContent ).toBe( 'A Text Embed' );
+		expect( blocks[ 0 ].textContent ).toBe( 'Paragraph' );
+		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Paragraph' );
+		expect( blocks[ 2 ].textContent ).toBe( 'A Paragraph Embed' );
 
 		assertNoResultsMessageNotToBePresent( container );
 	} );

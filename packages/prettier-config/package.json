@@ -6,8 +6,9 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"prettier",
-		"prettier-config"
+		"config"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/prettier-config/README.md",
 	"repository": {

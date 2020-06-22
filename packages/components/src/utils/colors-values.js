@@ -144,6 +144,8 @@ export const UI = {
 	borderLight: LIGHT_GRAY[ 600 ],
 	label: DARK_GRAY[ 500 ],
 	textDisabled: DARK_GRAY[ 150 ],
+	textDark: BASE.white,
+	textLight: BASE.black,
 };
 
 export const COLORS = {

@@ -23,7 +23,6 @@ export function Button( props, ref ) {
 		href,
 		target,
 		isPrimary,
-		isLarge,
 		isSmall,
 		isTertiary,
 		isPressed,
@@ -54,7 +53,6 @@ export function Button( props, ref ) {
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': isDefault || isSecondary,
 		'is-primary': isPrimary,
-		'is-large': isLarge,
 		'is-small': isSmall,
 		'is-tertiary': isTertiary,
 		'is-pressed': isPressed,

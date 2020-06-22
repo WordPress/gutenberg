@@ -6,8 +6,8 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"jest",
-		"jest-preset",
 		"preset",
 		"react",
 		"enzyme"

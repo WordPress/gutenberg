@@ -221,6 +221,10 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Latest Posts',
 		availableTransforms: [ 'Group' ],
 	},
+	'core__latest-posts__displayAuthor': {
+		originalBlock: 'Latest Posts',
+		availableTransforms: [ 'Group' ],
+	},
 	'core__latest-posts__displayPostDate': {
 		originalBlock: 'Latest Posts',
 		availableTransforms: [ 'Group' ],
@@ -246,7 +250,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [ 'Group' ],
 	},
 	'core__navigation-link': {
-		originalBlock: 'Navigation Link',
+		originalBlock: 'Link',
 		availableTransforms: [ 'Group' ],
 	},
 	core__nextpage: {
@@ -274,7 +278,7 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	core__preformatted: {
 		originalBlock: 'Preformatted',
-		availableTransforms: [ 'Group', 'Paragraph' ],
+		availableTransforms: [ 'Group', 'Paragraph', 'Code' ],
 	},
 	core__pullquote: {
 		originalBlock: 'Pullquote',

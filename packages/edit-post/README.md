@@ -95,6 +95,8 @@ _Parameters_
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
 -   _props.label_ `string`: The menu item text.
 -   _props.onClick_ `Function`: Callback function to be executed when the user click the menu item.
+-   _props.small_ `[boolean]`: Whether to render the label or not.
+-   _props.role_ `[string]`: The ARIA role for the menu item.
 
 _Returns_
 
@@ -311,6 +313,7 @@ _Parameters_
 
 -   _props_ `Object`: Component properties.
 -   _props.className_ `[string]`: An optional class name added to the row.
+-   _props.children_ `WPElement`: Children to be rendered.
 
 _Returns_
 
