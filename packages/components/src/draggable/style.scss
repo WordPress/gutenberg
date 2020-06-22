@@ -17,9 +17,3 @@ body.is-dragging-components-draggable {
 	pointer-events: none;
 	z-index: z-index(".components-draggable__clone");
 }
-
-// This hides the block being dragged.
-// The effect is that the block being dragged appears to be "lifted".
-.is-dragging.is-selected {
-	display: none !important;
-}

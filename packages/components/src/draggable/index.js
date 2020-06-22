@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSafeTimeout } from '@wordpress/compose';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
@@ -22,6 +22,7 @@ class Draggable extends Component {
 		this.onDragOver = this.onDragOver.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.resetDragState = this.resetDragState.bind( this );
+		this.dragComponentRef = createRef();
 	}
 
 	componentWillUnmount() {
@@ -142,6 +143,18 @@ class Draggable extends Component {
 			}px`;
 		}
 
+		/*
+		 * __experimentalDragComponent
+		 * If a dragComponent is defined, the following logic will clone the
+		 * HTML node and inject it into the cloneWrapper.
+		 */
+		if ( this.dragComponentRef.current ) {
+			const clonedDragComponent = document.createElement( 'div' );
+			clonedDragComponent.innerHTML = this.dragComponentRef.current.innerHTML;
+			this.cloneWrapper.appendChild( clonedDragComponent );
+		}
+
+		// Inject the cloneWrapper into the DOM.
 		elementWrapper.appendChild( this.cloneWrapper );
 
 		// Mark the current cursor coordinates.
@@ -177,12 +190,28 @@ class Draggable extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
+		const {
+			children,
+			__experimentalDragComponent: dragComponent,
+		} = this.props;
 
-		return children( {
-			onDraggableStart: this.onDragStart,
-			onDraggableEnd: this.onDragEnd,
-		} );
+		return (
+			<>
+				{ children( {
+					onDraggableStart: this.onDragStart,
+					onDraggableEnd: this.onDragEnd,
+				} ) }
+				{ dragComponent && (
+					<div
+						className="components-draggable-drag-component-root"
+						style={ { display: 'none' } }
+						ref={ this.dragComponentRef }
+					>
+						{ dragComponent }
+					</div>
+				) }
+			</>
+		);
 	}
 }
 
