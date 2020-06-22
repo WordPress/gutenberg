@@ -1,4 +1,3 @@
-
 # Development Environment
 
 We will need a place to work and tools for creating a block, this is often referred to as the development enviornment. The three main pieces needed for our development environment are:
@@ -14,6 +13,8 @@ The tools needed for development are **Node** and **NPM**. **Nodejs** is a runti
 The tools are used to convert the JavaScript we are going to write into a format that browsers can run. This is called transpiling or the build step.
 
 You can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, the LTS (long term support) version is recommeneded. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
+
+On Mac, it is recommended to use [Homebrew package manager](https://brew.sh/) to install node. Homebrew sets up user level permissions properly, whereas the default Node installer sets it up at the system-level causing permission issues later.
 
 The important part after installing is being able to use them in your terminal. Open a terminal command-line and type `node -v` and `npm -v` to confirm they are installed.
 
@@ -35,7 +36,6 @@ The WordPress [wp-env package](https://www.npmjs.com/package/@wordpress/env) let
 
 The `wp-env` package requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
-
 After confirming that the prerequisites are installed, install `wp-env` globally from the command-line using:
 
 ```bash
@@ -53,14 +53,14 @@ wp-env --version
 
 A block is just a plugin, so any WordPress environment can be used for development. A couple of alternatives that might be easier, since they do not require Docker install and setup.
 
-* [Local by Flywheel](https://localbyflywheel.com/) - Local is a single application you download and install. You will need to know where the plugin directory is located after install. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`
+-   [Local by Flywheel](https://localbyflywheel.com/) - Local is a single application you download and install. You will need to know where the plugin directory is located after install. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`
 
-* [WampServer](http://www.wampserver.com/en/) or
-[MAMP](https://www.mamp.info/) environments, both are quite similar to
-Local, combining a web server, PHP, and database. However these tools
-are not WordPress specific, so if you are not already using them, Local might be an easier option
+-   [WampServer](http://www.wampserver.com/en/) or
+    [MAMP](https://www.mamp.info/) environments, both are quite similar to
+    Local, combining a web server, PHP, and database. However these tools
+    are not WordPress specific, so if you are not already using them, Local might be an easier option
 
-* Remote server - you could work on remote server that is easy to setup, since most hosts have a standard WordPress install. However, this may require additonal development time to sync to the server.
+-   Remote server - you could work on remote server that is easy to setup, since most hosts have a standard WordPress install. However, this may require additonal development time to sync to the server.
 
 The important part is having a WordPress site installed, and know where and how to update files in the plugins directory.
 
