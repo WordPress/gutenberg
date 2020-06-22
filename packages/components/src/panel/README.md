@@ -120,6 +120,20 @@ The class that will be added with `components-panel__body`, if the panel is curr
 -   Type: `String`
 -   Required: No
 
+###### disableSmoothScrollIntoView
+
+By default, the `PanelBody` will smooth scroll into view (if needed). Smooth scrolling can be disabled if `disableSmoothScrollIntoView` is set to `true`.
+
+-   Type: `Boolean`
+-   Required: No
+
+###### focusable
+
+By default, the `PanelBody` header is focusable. This can be disabled if `focusable` is set to `false`.
+
+-   Type: `Boolean`
+-   Required: No
+
 ###### icon
 
 An icon to be shown next to the `PanelBody` title.
