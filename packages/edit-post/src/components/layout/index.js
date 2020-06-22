@@ -72,6 +72,7 @@ function Layout() {
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
+		showMostUsedBlocks,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -84,6 +85,9 @@ function Layout() {
 			),
 			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
 				'fullscreenMode'
+			),
+			showMostUsedBlocks: select( 'core/edit-post' ).isFeatureActive(
+				'mostUsedBlocks'
 			),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
@@ -176,6 +180,9 @@ function Layout() {
 								</div>
 								<div className="edit-post-layout__inserter-panel-content">
 									<Library
+										showMostUsedBlocks={
+											showMostUsedBlocks
+										}
 										showInserterHelpPanel
 										onSelect={ () => {
 											if ( isMobileViewport ) {
