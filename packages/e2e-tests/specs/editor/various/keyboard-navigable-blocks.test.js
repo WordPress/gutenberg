@@ -7,6 +7,7 @@ import {
 	pressKeyWithModifier,
 	clickBlockAppender,
 	getEditedPostContent,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 async function getActiveLabel() {
@@ -89,10 +90,7 @@ describe( 'Order of block keyboard navigation', () => {
 
 		// Select the middle block.
 		await page.keyboard.press( 'ArrowUp' );
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
-
+		await showBlockToolbar();
 		await navigateToContentEditorTop();
 		await tabThroughParagraphBlock( 'Paragraph 1' );
 

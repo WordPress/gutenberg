@@ -222,7 +222,7 @@ $arrow-size: 8px;
 	display: flex;
 	height: $panel-header-height;
 	justify-content: space-between;
-	padding: 0 8px 0 $panel-padding;
+	padding: 0 8px 0 $grid-unit-20;
 }
 
 .components-popover__header-title {
