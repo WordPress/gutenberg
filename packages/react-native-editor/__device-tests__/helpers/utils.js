@@ -40,11 +40,13 @@ let appiumProcess;
 let iOSScreenRecordingProcess;
 let androidScreenRecordingProcess;
 
+const backspace = '\u0008';
+
 // Used to map unicode and special values to keycodes on Android
 // Docs for keycode values: https://developer.android.com/reference/android/view/KeyEvent.html
 const strToKeycode = {
 	'\n': 66,
-	'\u0008': 67,
+	[ backspace ]: 67,
 };
 
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
@@ -510,6 +512,7 @@ const toggleOrientation = async ( driver ) => {
 };
 
 module.exports = {
+	backspace,
 	timer,
 	setupDriver,
 	isLocalEnvironment,

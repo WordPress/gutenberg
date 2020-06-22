@@ -106,7 +106,12 @@ Creates new post.
 
 _Parameters_
 
--   _obj_ `Object`: Object to create new post, along with tips enabling option.
+-   _object_ `Object`: Object to create new post, along with tips enabling option.
+-   _object.postType_ `[string]`: Post type of the new post.
+-   _object.title_ `[string]`: Title of the new post.
+-   _object.content_ `[string]`: Content of the new post.
+-   _object.excerpt_ `[string]`: Excerpt of the new post.
+-   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
 <a name="createURL" href="#createURL">#</a> **createURL**
 
@@ -282,7 +287,16 @@ _Returns_
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
 Opens the inserter, searches for the given term, then selects the first
-result that appears.
+result that appears. It then waits briefly for the block list to update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="insertPattern" href="#insertPattern">#</a> **insertPattern**
+
+Opens the inserter, searches for the given pattern, then selects the first
+result that appears. It then waits briefly for the block list to update.
 
 _Parameters_
 
@@ -407,6 +421,14 @@ _Returns_
 <a name="searchForBlock" href="#searchForBlock">#</a> **searchForBlock**
 
 Search for block in the global inserter
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="searchForPattern" href="#searchForPattern">#</a> **searchForPattern**
+
+Search for pattern in the global inserter
 
 _Parameters_
 

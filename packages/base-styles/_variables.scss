@@ -11,7 +11,7 @@ $editor-font: "Noto Serif", serif;
 $editor-html-font: Menlo, Consolas, monaco, monospace;
 $editor-font-size: 16px;
 $default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks (it's 2x $block-padding).
-$text-editor-font-size: 14px;
+$text-editor-font-size: 15px;
 $editor-line-height: 1.8;
 $big-font-size: 18px;
 $mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in"
@@ -54,7 +54,7 @@ $spinner-size: 18px;
 $mobile-header-toolbar-height: 44px;
 $mobile-floating-toolbar-height: 44px;
 $mobile-floating-toolbar-margin: 8px;
-
+$mobile-color-swatch: 48px;
 
 /**
  * Shadows.

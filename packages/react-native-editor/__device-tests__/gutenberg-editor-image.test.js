@@ -14,7 +14,7 @@ import testData from './helpers/test-data';
 
 jest.setTimeout( 1000000 );
 
-describe( 'Gutenberg Editor Image Block tests', () => {
+describe( 'Gutenberg Editor Image Block tests @canary', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;

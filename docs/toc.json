@@ -2,6 +2,11 @@
 	{ "docs/readme.md": [] },
 
 	{ "docs/contributors/principles.md": [
+		{ "docs/architecture/index.md": [
+			{ "docs/architecture/modularity.md": [] },
+			{ "docs/architecture/performance.md": [] },
+			{ "docs/architecture/automated-testing.md": [] }
+		] },
 		{ "docs/designers-developers/key-concepts.md": [] },
 		{ "docs/designers-developers/glossary.md": [] },
 		{ "docs/designers-developers/faq.md": [] },
@@ -42,7 +47,8 @@
 		{ "docs/designers-developers/developers/feature-flags.md": [] },
 		{ "docs/designers-developers/developers/themes/README.md": [
 			{ "docs/designers-developers/developers/themes/theme-support.md": [] },
-			{ "docs/designers-developers/developers/themes/block-based-themes.md": [] }
+			{ "docs/designers-developers/developers/themes/block-based-themes.md": [] },
+			{ "docs/designers-developers/developers/themes/theme-json.md": [] }
 		] },
 		{ "docs/designers-developers/developers/backward-compatibility/README.md": [
 			{ "docs/designers-developers/developers/backward-compatibility/deprecations.md": [] },

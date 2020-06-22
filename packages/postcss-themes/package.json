@@ -1,13 +1,15 @@
 {
 	"name": "@wordpress/postcss-themes",
-	"version": "2.3.0",
+	"version": "2.5.0",
 	"description": "PostCSS plugin to generate theme colors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"postcss",
 		"css",
+		"plugin",
 		"postcss-plugin",
 		"colors",
 		"themes"
@@ -29,9 +31,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"autoprefixer": "^9.4.5",
-		"postcss": "^7.0.13",
-		"postcss-color-function": "^4.0.1"
+		"postcss": "^7.0.32"
 	},
 	"publishConfig": {
 		"access": "public"

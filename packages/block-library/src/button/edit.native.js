@@ -18,7 +18,7 @@ import {
 	withColors,
 	InspectorControls,
 	BlockControls,
-	SETTINGS_DEFAULTS,
+	withGradient,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -175,20 +175,16 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes } = this.props;
-		const { gradient, customGradient } = attributes;
-		const defaultGradients = SETTINGS_DEFAULTS.gradients;
+		const { backgroundColor, attributes, gradientValue } = this.props;
+		const { customGradient } = attributes;
 
-		if ( customGradient || gradient ) {
-			return (
-				customGradient ||
-				defaultGradients.find(
-					( defaultGradient ) => defaultGradient.slug === gradient
-				).gradient
-			);
+		if ( customGradient || gradientValue ) {
+			return customGradient || gradientValue;
 		}
+		const colorAndStyleProps = getColorAndStyleProps( attributes );
 		return (
-			getColorAndStyleProps( attributes ).style?.backgroundColor ||
+			colorAndStyleProps.style?.backgroundColor ||
+			colorAndStyleProps.style?.background ||
 			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
 			backgroundColor.color ||
 			styles.defaultButton.backgroundColor
@@ -197,8 +193,10 @@ class ButtonEdit extends Component {
 
 	getTextColor() {
 		const { textColor, attributes } = this.props;
+		const colorAndStyleProps = getColorAndStyleProps( attributes );
+
 		return (
-			getColorAndStyleProps( attributes ).style?.color ||
+			colorAndStyleProps.style?.color ||
 			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
 			textColor.color ||
 			styles.defaultButton.color
@@ -473,7 +471,7 @@ class ButtonEdit extends Component {
 						placeholderTextColor={
 							styles.placeholderTextColor.color
 						}
-						identifier="content"
+						identifier="text"
 						tagName="p"
 						minWidth={ minWidth }
 						maxWidth={ maxWidth }
@@ -541,6 +539,7 @@ class ButtonEdit extends Component {
 
 export default compose( [
 	withInstanceId,
+	withGradient,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );

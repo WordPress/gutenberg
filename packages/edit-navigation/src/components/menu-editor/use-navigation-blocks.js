@@ -1,134 +1,114 @@
 /**
  * External dependencies
  */
-import { groupBy, isEqual, difference } from 'lodash';
+import { keyBy, groupBy, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
 
-function createBlockFromMenuItem( menuItem, innerBlocks = [] ) {
-	return createBlock(
-		'core/navigation-link',
-		{
-			label: menuItem.title.rendered,
-			url: menuItem.url,
-		},
-		innerBlocks
-	);
-}
+/**
+ * Internal dependencies
+ */
+import { flattenBlocks } from './helpers';
 
-function createMenuItemAttributesFromBlock( block ) {
+export default function useNavigationBlocks( menuItems ) {
+	const [ blocks, setBlocks ] = useState( [] );
+	const menuItemsRef = useRef( {} );
+
+	// Refresh our model whenever menuItems change
+	useEffect( () => {
+		const [ innerBlocks, clientIdToMenuItemMapping ] = menuItemsToBlocks(
+			menuItems,
+			blocks[ 0 ]?.innerBlocks,
+			menuItemsRef.current
+		);
+
+		const navigationBlock = blocks[ 0 ]
+			? { ...blocks[ 0 ], innerBlocks }
+			: createBlock( 'core/navigation', {}, innerBlocks );
+
+		setBlocks( [ navigationBlock ] );
+		menuItemsRef.current = clientIdToMenuItemMapping;
+	}, [ menuItems ] );
+
 	return {
-		title: block.attributes.label,
-		url: block.attributes.url,
+		blocks,
+		setBlocks,
+		menuItemsRef,
 	};
 }
 
-export default function useNavigationBlocks( menuId ) {
-	// menuItems is an array of menu item objects.
-	const menuItems = useSelect(
-		( select ) =>
-			select( 'core' ).getMenuItems( { menus: menuId, per_page: -1 } ),
-		[ menuId ]
+const menuItemsToBlocks = (
+	menuItems,
+	prevBlocks = [],
+	prevClientIdToMenuItemMapping = {}
+) => {
+	const blocksByMenuId = mapBlocksByMenuId(
+		prevBlocks,
+		prevClientIdToMenuItemMapping
 	);
 
-	const { saveMenuItem } = useDispatch( 'core' );
-
-	const [ blocks, setBlocks ] = useState( [] );
-
-	const menuItemsRef = useRef( {} );
-
-	useEffect( () => {
-		if ( ! menuItems ) {
+	const itemsByParentID = groupBy( menuItems, 'parent' );
+	const clientIdToMenuItemMapping = {};
+	const menuItemsToTreeOfBlocks = ( items ) => {
+		const innerBlocks = [];
+		if ( ! items ) {
 			return;
 		}
 
-		const itemsByParentID = groupBy( menuItems, 'parent' );
-
-		menuItemsRef.current = {};
-
-		const createMenuItemBlocks = ( items ) => {
-			const innerBlocks = [];
-			for ( const item of items ) {
-				let menuItemInnerBlocks = [];
-				if ( itemsByParentID[ item.id ]?.length ) {
-					menuItemInnerBlocks = createMenuItemBlocks(
-						itemsByParentID[ item.id ]
-					);
-				}
-				const block = createBlockFromMenuItem(
-					item,
-					menuItemInnerBlocks
+		const sortedItems = sortBy( items, 'menu_order' );
+		for ( const item of sortedItems ) {
+			let menuItemInnerBlocks = [];
+			if ( itemsByParentID[ item.id ]?.length ) {
+				menuItemInnerBlocks = menuItemsToTreeOfBlocks(
+					itemsByParentID[ item.id ]
 				);
-				menuItemsRef.current[ block.clientId ] = item;
-				innerBlocks.push( block );
 			}
-			return innerBlocks;
-		};
-
-		// createMenuItemBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
-		const innerBlocks = createMenuItemBlocks( itemsByParentID[ 0 ] );
-		setBlocks( [ createBlock( 'core/navigation', {}, innerBlocks ) ] );
-	}, [ menuItems ] );
-
-	const saveBlocks = () => {
-		const { clientId, innerBlocks } = blocks[ 0 ];
-		const parentItemId = menuItemsRef.current[ clientId ]?.parent;
-
-		const saveNestedBlocks = async ( nestedBlocks, parentId = 0 ) => {
-			for ( const block of nestedBlocks ) {
-				const menuItem = menuItemsRef.current[ block.clientId ];
-				let currentItemId = menuItem?.id || 0;
-
-				if ( ! menuItem ) {
-					const savedItem = await saveMenuItem( {
-						...createMenuItemAttributesFromBlock( block ),
-						menus: menuId,
-						parent: parentId,
-					} );
-					if ( block.innerBlocks.length ) {
-						currentItemId = savedItem.id;
-					}
-				}
-
-				if (
-					menuItem &&
-					! isEqual(
-						block.attributes,
-						createBlockFromMenuItem( menuItem ).attributes
-					)
-				) {
-					saveMenuItem( {
-						...menuItem,
-						...createMenuItemAttributesFromBlock( block ),
-						menus: menuId, // Gotta do this because REST API doesn't like receiving an array here. Maybe a bug in the REST API?
-						parent: parentId,
-					} );
-				}
-
-				if ( block.innerBlocks.length ) {
-					saveNestedBlocks( block.innerBlocks, currentItemId );
-				}
-			}
-		};
-
-		saveNestedBlocks( innerBlocks, parentItemId );
-
-		const deletedClientIds = difference(
-			Object.keys( menuItemsRef.current ),
-			innerBlocks.map( ( block ) => block.clientId )
-		);
-
-		// Disable reason, this code will eventually be implemented.
-		// eslint-disable-next-line no-unused-vars
-		for ( const deletedClientId of deletedClientIds ) {
-			// TODO - delete menu items.
+			const linkBlock = menuItemToLinkBlock(
+				item,
+				menuItemInnerBlocks,
+				blocksByMenuId[ item.id ]
+			);
+			clientIdToMenuItemMapping[ linkBlock.clientId ] = item;
+			innerBlocks.push( linkBlock );
 		}
+		return innerBlocks;
 	};
 
-	return [ blocks, setBlocks, saveBlocks ];
+	// menuItemsToTreeOfLinkBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
+	const blocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
+	return [ blocks, clientIdToMenuItemMapping ];
+};
+
+function menuItemToLinkBlock(
+	menuItem,
+	innerBlocks = [],
+	existingBlock = null
+) {
+	const attributes = {
+		label: menuItem.title.rendered,
+		url: menuItem.url,
+	};
+
+	if ( existingBlock ) {
+		return {
+			...existingBlock,
+			attributes,
+			innerBlocks,
+		};
+	}
+	return createBlock( 'core/navigation-link', attributes, innerBlocks );
 }
+
+const mapBlocksByMenuId = ( blocks, menuItemsByClientId ) => {
+	const blocksByClientId = keyBy( flattenBlocks( blocks ), 'clientId' );
+	const blocksByMenuId = {};
+	for ( const clientId in menuItemsByClientId ) {
+		const menuItem = menuItemsByClientId[ clientId ];
+		blocksByMenuId[ menuItem.id ] = blocksByClientId[ clientId ];
+	}
+	return blocksByMenuId;
+};

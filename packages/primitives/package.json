@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/primitives",
-	"version": "1.4.0",
+	"version": "1.5.0",
 	"description": "WordPress cross-platform primitives.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"mobile",
 		"platform"
 	],

@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/nux",
-	"version": "3.15.0",
+	"version": "3.18.0",
 	"description": "NUX (New User eXperience) module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"nux"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/nux/README.md",
@@ -20,6 +21,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"!((src|build|build-module)/components/**)"
+	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/components": "file:../components",

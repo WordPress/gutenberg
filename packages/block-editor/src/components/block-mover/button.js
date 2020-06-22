@@ -17,19 +17,23 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { leftArrow, rightArrow } from './icons';
-import { chevronUp, chevronDown } from '@wordpress/icons';
+import {
+	chevronLeft,
+	chevronRight,
+	chevronUp,
+	chevronDown,
+} from '@wordpress/icons';
 import { getBlockMoverDescription } from './mover-description';
 
 const getArrowIcon = ( direction, orientation, isRTL ) => {
 	if ( direction === 'up' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? rightArrow : leftArrow;
+			return isRTL ? chevronRight : chevronLeft;
 		}
 		return chevronUp;
 	} else if ( direction === 'down' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? leftArrow : rightArrow;
+			return isRTL ? chevronLeft : chevronRight;
 		}
 		return chevronDown;
 	}

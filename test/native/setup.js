@@ -22,12 +22,15 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		subscribeAndroidModalClosed: jest.fn(),
+		subscribeUpdateTheme: jest.fn(),
 		subscribePreferredColorScheme: () => 'light',
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
 		requestMediaPicker: jest.fn(),
+		requestUnsupportedBlockFallback: jest.fn(),
+		subscribeReplaceBlock: jest.fn(),
 		mediaSources: {
 			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 			deviceCamera: 'DEVICE_CAMERA',
@@ -74,8 +77,6 @@ jest.mock( 'react-native-safe-area', () => {
 		removeEventListener: jest.fn(),
 	};
 } );
-
-jest.mock( 'react-native-recyclerview-list' );
 
 jest.mock( '@react-native-community/slider', () => () => 'Slider', {
 	virtual: true,

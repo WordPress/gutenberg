@@ -145,6 +145,10 @@ android {
             }
         }
     }
+
+    packagingOptions {
+        pickFirst 'META-INF/-no-jdk.kotlin_module'
+    }
 }
 
 repositories {

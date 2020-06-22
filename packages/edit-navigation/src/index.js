@@ -6,6 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
+import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -56,6 +57,7 @@ export function initialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+	settings.__experimentalNavigationScreen = true;
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )

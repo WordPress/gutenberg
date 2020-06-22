@@ -1,15 +1,67 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { serialize, pasteHandler } from '@wordpress/blocks';
-import { documentHasSelection } from '@wordpress/dom';
+import {
+	documentHasSelection,
+	documentHasUncollapsedSelection,
+} from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { getPasteEventData } from '../../utils/get-paste-event-data';
+
+export function useNotifyCopy() {
+	const { getBlockName } = useSelect(
+		( select ) => select( 'core/block-editor' ),
+		[]
+	);
+	const { getBlockType } = useSelect(
+		( select ) => select( 'core/blocks' ),
+		[]
+	);
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
+
+	return useCallback( ( eventType, selectedBlockClientIds ) => {
+		let notice = '';
+		if ( selectedBlockClientIds.length === 1 ) {
+			const clientId = selectedBlockClientIds[ 0 ];
+			const { title } = getBlockType( getBlockName( clientId ) );
+			notice =
+				eventType === 'copy'
+					? sprintf(
+							// Translators: Name of the block being copied, e.g. "Paragraph"
+							__( 'Copied "%s" to clipboard.' ),
+							title
+					  )
+					: sprintf(
+							// Translators: Name of the block being cut, e.g. "Paragraph"
+							__( 'Moved "%s" to clipboard.' ),
+							title
+					  );
+		} else {
+			notice =
+				eventType === 'copy'
+					? sprintf(
+							// Translators: Number of blocks being copied
+							__( 'Copied %d blocks to clipboard.' ),
+							selectedBlockClientIds.length
+					  )
+					: sprintf(
+							// Translators: Number of blocks being cut
+							__( 'Moved %d blocks to clipboard.' ),
+							selectedBlockClientIds.length
+					  );
+		}
+		createSuccessNotice( notice, {
+			type: 'snackbar',
+		} );
+	}, [] );
+}
 
 function CopyHandler( { children } ) {
 	const containerRef = useRef();
@@ -21,7 +73,11 @@ function CopyHandler( { children } ) {
 		getSettings,
 	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
 
-	const { removeBlocks, replaceBlocks } = useDispatch( 'core/block-editor' );
+	const { flashBlock, removeBlocks, replaceBlocks } = useDispatch(
+		'core/block-editor'
+	);
+
+	const notifyCopy = useNotifyCopy();
 
 	const {
 		__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
@@ -35,9 +91,18 @@ function CopyHandler( { children } ) {
 		}
 
 		// Always handle multiple selected blocks.
-		// Let native copy behaviour take over in input fields.
-		if ( ! hasMultiSelection() && documentHasSelection() ) {
-			return;
+		if ( ! hasMultiSelection() ) {
+			// If copying, only consider actual text selection as selection.
+			// Otherwise, any focus on an input field is considered.
+			const hasSelection =
+				event.type === 'copy' || event.type === 'cut'
+					? documentHasUncollapsedSelection()
+					: documentHasSelection();
+
+			// Let native copy behaviour take over in input fields.
+			if ( hasSelection ) {
+				return;
+			}
 		}
 
 		if ( ! containerRef.current.contains( event.target ) ) {
@@ -46,6 +111,10 @@ function CopyHandler( { children } ) {
 		event.preventDefault();
 
 		if ( event.type === 'copy' || event.type === 'cut' ) {
+			if ( selectedBlockClientIds.length === 1 ) {
+				flashBlock( selectedBlockClientIds[ 0 ] );
+			}
+			notifyCopy( event.type, selectedBlockClientIds );
 			const blocks = getBlocksByClientId( selectedBlockClientIds );
 			const serialized = serialize( blocks );
 

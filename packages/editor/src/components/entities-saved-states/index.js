@@ -6,138 +6,40 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	CheckboxControl,
-	Button,
-	PanelBody,
-	PanelRow,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
-import {
-	close as closeIcon,
-	page,
-	layout,
-	grid,
-	blockDefault,
-} from '@wordpress/icons';
+import { close as closeIcon } from '@wordpress/icons';
 
-const ENTITY_NAME_ICONS = {
-	site: layout,
-	page,
-	post: grid,
-	wp_template: grid,
+/**
+ * Internal dependencies
+ */
+import EntityTypeList from './entity-type-list';
+
+const ENTITY_NAMES = {
+	wp_template_part: ( number ) =>
+		_n( 'template part', 'template parts', number ),
+	wp_template: ( number ) => _n( 'template', 'templates', number ),
+	post: ( number ) => _n( 'post', 'posts', number ),
+	page: ( number ) => _n( 'page', 'pages', number ),
+	site: ( number ) => _n( 'site', 'sites', number ),
 };
 
-function EntityRecordState( { record, checked, onChange, closePanel } ) {
-	const { name, kind, title, key } = record;
-	const parentBlockId = useSelect( ( select ) => {
-		// Get entity's blocks.
-		const { blocks = [] } = select( 'core' ).getEditedEntityRecord(
-			kind,
-			name,
-			key
-		);
-		// Get parents of the entity's first block.
-		const parents = select( 'core/block-editor' ).getBlockParents(
-			blocks[ 0 ]?.clientId
-		);
-		// Return closest parent block's clientId.
-		return parents[ parents.length - 1 ];
-	}, [] );
-
-	const isSelected = useSelect(
-		( select ) => {
-			const selectedBlockId = select(
-				'core/block-editor'
-			).getSelectedBlockClientId();
-			return selectedBlockId === parentBlockId;
-		},
-		[ parentBlockId ]
-	);
-	const isSelectedText = isSelected ? __( 'Selected' ) : __( 'Select' );
-	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
-		parentBlockId,
-	] );
-	const selectAndDismiss = useCallback( () => {
-		selectBlock( parentBlockId );
-		closePanel();
-	}, [ parentBlockId ] );
-
-	return (
-		<PanelRow>
-			<CheckboxControl
-				label={ <strong>{ title || __( 'Untitled' ) }</strong> }
-				checked={ checked }
-				onChange={ onChange }
-			/>
-			{ parentBlockId ? (
-				<>
-					<Button
-						onClick={ selectParentBlock }
-						className="entities-saved-states__find-entity"
-						disabled={ isSelected }
-					>
-						{ isSelectedText }
-					</Button>
-					<Button
-						onClick={ selectAndDismiss }
-						className="entities-saved-states__find-entity-small"
-						disabled={ isSelected }
-					>
-						{ isSelectedText }
-					</Button>
-				</>
-			) : null }
-		</PanelRow>
-	);
-}
-
-function EntityTypeList( {
-	list,
-	unselectedEntities,
-	setUnselectedEntities,
-	closePanel,
-} ) {
-	const firstRecord = list[ 0 ];
-	const entity = useSelect(
-		( select ) =>
-			select( 'core' ).getEntity( firstRecord.kind, firstRecord.name ),
-		[ firstRecord.kind, firstRecord.name ]
-	);
-
-	// Set icon based on type of entity.
-	const { name } = firstRecord;
-	const icon = ENTITY_NAME_ICONS[ name ] || blockDefault;
-
-	return (
-		<PanelBody title={ entity.label } initialOpen={ true } icon={ icon }>
-			{ list.map( ( record ) => {
-				return (
-					<EntityRecordState
-						key={ record.key || 'site' }
-						record={ record }
-						checked={
-							! some(
-								unselectedEntities,
-								( elt ) =>
-									elt.kind === record.kind &&
-									elt.name === record.name &&
-									elt.key === record.key
-							)
-						}
-						onChange={ ( value ) =>
-							setUnselectedEntities( record, value )
-						}
-						closePanel={ closePanel }
-					/>
-				);
-			} ) }
-		</PanelBody>
-	);
-}
+const PLACEHOLDER_PHRASES = {
+	// 0 is a back up, but should never be observed.
+	0: __( 'There are no changes.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	1: __( 'Changes have been made to your %s.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	2: __( 'Changes have been made to your %1$s and %2$s.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	3: __( 'Changes have been made to your %1$s, %2$s, and %3$s.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	4: __( 'Changes have been made to your %1$s, %2$s, %3$s, and %4$s.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	5: __( 'Changes have been made to your %1$s, %2$s, %3$s, %4$s, and %5$s.' ),
+};
 
 export default function EntitiesSavedStates( { isOpen, close } ) {
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
@@ -153,6 +55,23 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 	const partitionedSavables = Object.values(
 		groupBy( dirtyEntityRecords, 'name' )
 	);
+
+	// Get labels for text-prompt phrase.
+	const entityNamesForPrompt = [];
+	partitionedSavables.forEach( ( list ) => {
+		if ( ENTITY_NAMES[ list[ 0 ].name ] ) {
+			entityNamesForPrompt.push(
+				ENTITY_NAMES[ list[ 0 ].name ]( list.length )
+			);
+		}
+	} );
+	// Get text-prompt phrase based on number of entity types changed.
+	const placeholderPhrase =
+		PLACEHOLDER_PHRASES[ entityNamesForPrompt.length ] ||
+		// Fallback for edge case that should not be observed (more than 5 entity types edited).
+		__( 'Changes have been made to multiple entity types.' );
+	// eslint-disable-next-line @wordpress/valid-sprintf
+	const promptPhrase = sprintf( placeholderPhrase, ...entityNamesForPrompt );
 
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
@@ -188,12 +107,15 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 			}
 		);
 
+		close( entitiesToSave );
+
 		entitiesToSave.forEach( ( { kind, name, key } ) => {
 			saveEditedEntityRecord( kind, name, key );
 		} );
-
-		close( entitiesToSave );
 	};
+
+	const [ isReviewing, setIsReviewing ] = useState( false );
+	const toggleIsReviewing = () => setIsReviewing( ( value ) => ! value );
 
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
@@ -203,6 +125,18 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 		<div className="entities-saved-states__panel">
 			<div className="entities-saved-states__panel-header">
 				<Button
+					isPrimary
+					disabled={
+						dirtyEntityRecords.length -
+							unselectedEntities.length ===
+						0
+					}
+					onClick={ saveCheckedEntities }
+					className="editor-entities-saved-states__save-button"
+				>
+					{ __( 'Save' ) }
+				</Button>
+				<Button
 					onClick={ dismissPanel }
 					icon={ closeIcon }
 					label={ __( 'Close panel' ) }
@@ -210,33 +144,33 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 			</div>
 
 			<div className="entities-saved-states__text-prompt">
-				<h2>
-					{ __( 'Please review the following changes to save:' ) }
-				</h2>
+				<strong>{ __( 'Are you ready to save?' ) }</strong>
+				<p>{ promptPhrase }</p>
+				<p>
+					<Button
+						onClick={ toggleIsReviewing }
+						isLink
+						className="entities-saved-states__review-changes-button"
+					>
+						{ isReviewing
+							? __( 'Hide changes.' )
+							: __( 'Review changes.' ) }
+					</Button>
+				</p>
 			</div>
 
-			{ partitionedSavables.map( ( list ) => {
-				return (
-					<EntityTypeList
-						key={ list[ 0 ].name }
-						list={ list }
-						closePanel={ dismissPanel }
-						unselectedEntities={ unselectedEntities }
-						setUnselectedEntities={ setUnselectedEntities }
-					/>
-				);
-			} ) }
-
-			<Button
-				isPrimary
-				disabled={
-					dirtyEntityRecords.length - unselectedEntities.length === 0
-				}
-				onClick={ saveCheckedEntities }
-				className="editor-entities-saved-states__save-button"
-			>
-				{ __( 'Save selected items' ) }
-			</Button>
+			{ isReviewing &&
+				partitionedSavables.map( ( list ) => {
+					return (
+						<EntityTypeList
+							key={ list[ 0 ].name }
+							list={ list }
+							closePanel={ dismissPanel }
+							unselectedEntities={ unselectedEntities }
+							setUnselectedEntities={ setUnselectedEntities }
+						/>
+					);
+				} ) }
 		</div>
 	) : null;
 }

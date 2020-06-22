@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/wordcount",
-	"version": "2.8.0",
+	"version": "2.9.0",
 	"description": "WordPress word count utility.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"wordcount"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/wordcount/README.md",

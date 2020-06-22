@@ -14,8 +14,5 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Date' ),
-	supports: {
-		html: false,
-	},
 	edit,
 };

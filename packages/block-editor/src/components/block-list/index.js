@@ -15,7 +15,7 @@ import { useRef, forwardRef } from '@wordpress/element';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import RootContainer from './root-container';
-import useBlockDropZone from '../block-drop-zone';
+import useBlockDropZone from '../use-block-drop-zone';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -27,7 +27,6 @@ function BlockList(
 	{
 		className,
 		rootClientId,
-		isDraggable,
 		renderAppender,
 		__experimentalTagName = 'div',
 		__experimentalAppenderTagName,
@@ -38,6 +37,7 @@ function BlockList(
 	function selector( select ) {
 		const {
 			getBlockOrder,
+			getBlockListSettings,
 			isMultiSelecting,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
@@ -51,6 +51,8 @@ function BlockList(
 			isMultiSelecting: isMultiSelecting(),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+			moverDirection: getBlockListSettings( rootClientId )
+				?.__experimentalMoverDirection,
 			hasMultiSelection: hasMultiSelection(),
 			enableAnimation:
 				! isTyping() &&
@@ -63,15 +65,18 @@ function BlockList(
 		isMultiSelecting,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
+		moverDirection,
 		hasMultiSelection,
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
 
 	const Container = rootClientId ? __experimentalTagName : RootContainer;
-	const targetClientId = useBlockDropZone( {
+	const dropTargetIndex = useBlockDropZone( {
 		element: ref,
 		rootClientId,
 	} );
+
+	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
 		<Container
@@ -88,6 +93,8 @@ function BlockList(
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
+				const isDropTarget = dropTargetIndex === index;
+
 				return (
 					<AsyncModeProvider
 						key={ clientId }
@@ -96,18 +103,18 @@ function BlockList(
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							isDraggable={ isDraggable }
 							isMultiSelecting={ isMultiSelecting }
-							// This prop is explicitely computed and passed down
+							// This prop is explicitly computed and passed down
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }
 							enableAnimation={ enableAnimation }
-							className={
-								clientId === targetClientId
-									? 'is-drop-target'
-									: undefined
-							}
+							className={ classnames( {
+								'is-drop-target': isDropTarget,
+								'is-dropping-horizontally':
+									isDropTarget &&
+									moverDirection === 'horizontal',
+							} ) }
 						/>
 					</AsyncModeProvider>
 				);
@@ -116,9 +123,11 @@ function BlockList(
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={
-					targetClientId === null ? 'is-drop-target' : undefined
-				}
+				className={ classnames( {
+					'is-drop-target': isAppenderDropTarget,
+					'is-dropping-horizontally':
+						isAppenderDropTarget && moverDirection === 'horizontal',
+				} ) }
 			/>
 		</Container>
 	);

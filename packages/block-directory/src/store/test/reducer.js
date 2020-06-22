@@ -6,8 +6,13 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { downloadableBlocks, blockManagement, hasPermission } from '../reducer';
-import { installedItem, downloadableBlock } from './fixtures';
+import {
+	blockManagement,
+	downloadableBlocks,
+	errorNotices,
+	hasPermission,
+} from '../reducer';
+import { blockTypeInstalled, downloadableBlock } from './fixtures';
 
 describe( 'state', () => {
 	describe( 'downloadableBlocks()', () => {
@@ -17,31 +22,32 @@ describe( 'state', () => {
 			} );
 			const state = downloadableBlocks( initialState, {
 				type: 'FETCH_DOWNLOADABLE_BLOCKS',
+				filterValue: 'test',
 			} );
 
-			expect( state.isRequestingDownloadableBlocks ).toBe( true );
+			expect( state.isRequestingDownloadableBlocks ).toEqual( true );
 		} );
 
 		it( 'should update state to reflect search results have returned', () => {
+			const query = downloadableBlock.title;
 			const state = downloadableBlocks( undefined, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: downloadableBlock.title,
+				filterValue: query,
 				downloadableBlocks: [ downloadableBlock ],
 			} );
 
-			expect( state.isRequestingDownloadableBlocks ).toBe( false );
+			expect( state.isRequestingDownloadableBlocks ).toEqual( false );
 		} );
 
 		it( "should set user's search term and save results", () => {
+			const query = downloadableBlock.title;
 			const state = downloadableBlocks( undefined, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: downloadableBlock.title,
+				filterValue: query,
 				downloadableBlocks: [ downloadableBlock ],
 			} );
-			expect( state.results ).toHaveProperty( downloadableBlock.title );
-			expect( state.results[ downloadableBlock.title ] ).toHaveLength(
-				1
-			);
+			expect( state.results ).toHaveProperty( query );
+			expect( state.results[ query ] ).toHaveLength( 1 );
 
 			// It should append to the results
 			const updatedState = downloadableBlocks( state, {
@@ -66,7 +72,7 @@ describe( 'state', () => {
 			const initialState = deepFreeze( { installedBlockTypes: [] } );
 			const state = blockManagement( initialState, {
 				type: 'ADD_INSTALLED_BLOCK_TYPE',
-				item: installedItem,
+				item: blockTypeInstalled,
 			} );
 
 			expect( state.installedBlockTypes ).toHaveLength( 1 );
@@ -74,11 +80,11 @@ describe( 'state', () => {
 
 		it( 'should remove item from the installedBlockTypesList', () => {
 			const initialState = deepFreeze( {
-				installedBlockTypes: [ installedItem ],
+				installedBlockTypes: [ blockTypeInstalled ],
 			} );
 			const state = blockManagement( initialState, {
 				type: 'REMOVE_INSTALLED_BLOCK_TYPE',
-				item: installedItem,
+				item: blockTypeInstalled,
 			} );
 
 			expect( state.installedBlockTypes ).toHaveLength( 0 );
@@ -92,7 +98,69 @@ describe( 'state', () => {
 				hasPermission: false,
 			} );
 
-			expect( state ).toBe( false );
+			expect( state ).toEqual( false );
+		} );
+	} );
+
+	describe( 'errorNotices()', () => {
+		it( 'should set an error notice', () => {
+			const initialState = deepFreeze( {} );
+			const state = errorNotices( initialState, {
+				type: 'SET_ERROR_NOTICE',
+				blockId: 'block/has-error',
+				notice: 'Error',
+			} );
+
+			expect( state ).toEqual( {
+				'block/has-error': 'Error',
+			} );
+		} );
+
+		it( 'should set a second error notice', () => {
+			const initialState = deepFreeze( {
+				'block/has-error': 'Error',
+			} );
+			const state = errorNotices( initialState, {
+				type: 'SET_ERROR_NOTICE',
+				blockId: 'block/another-error',
+				notice: 'Error',
+			} );
+
+			expect( state ).toEqual( {
+				'block/has-error': 'Error',
+				'block/another-error': 'Error',
+			} );
+		} );
+
+		it( 'should clear an existing error notice', () => {
+			const initialState = deepFreeze( {
+				'block/has-error': 'Error',
+			} );
+			const state = errorNotices( initialState, {
+				type: 'SET_ERROR_NOTICE',
+				blockId: 'block/has-error',
+				notice: false,
+			} );
+
+			expect( state ).toEqual( {
+				'block/has-error': false,
+			} );
+		} );
+
+		it( 'should clear a nonexistent error notice', () => {
+			const initialState = deepFreeze( {
+				'block/has-error': 'Error',
+			} );
+			const state = errorNotices( initialState, {
+				type: 'SET_ERROR_NOTICE',
+				blockId: 'block/no-error',
+				notice: false,
+			} );
+
+			expect( state ).toEqual( {
+				'block/has-error': 'Error',
+				'block/no-error': false,
+			} );
 		} );
 	} );
 } );

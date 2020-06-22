@@ -21,10 +21,7 @@ const NavigatorIcon = (
 	</SVG>
 );
 
-export default function useBlockNavigator(
-	clientId,
-	__experimentalWithBlockNavigationSlots
-) {
+export default function useBlockNavigator( clientId, __experimentalFeatures ) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
 
 	const navigatorToolbarButton = (
@@ -46,9 +43,7 @@ export default function useBlockNavigator(
 		>
 			<BlockNavigationList
 				clientId={ clientId }
-				__experimentalWithBlockNavigationSlots={
-					__experimentalWithBlockNavigationSlots
-				}
+				__experimentalFeatures={ __experimentalFeatures }
 			/>
 		</Modal>
 	);

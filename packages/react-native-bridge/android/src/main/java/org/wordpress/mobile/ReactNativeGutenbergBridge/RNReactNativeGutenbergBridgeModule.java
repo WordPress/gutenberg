@@ -1,5 +1,7 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
+import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
@@ -19,15 +21,18 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.StarterPageTemplatesTooltipShownCallback;
+import org.wordpress.mobile.WPAndroidGlue.DeferredEventEmitter;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModule {
+public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModule implements
+        DeferredEventEmitter.JSEventEmitter {
     private final ReactApplicationContext mReactContext;
     private final GutenbergBridgeJS2Parent mGutenbergBridgeJS2Parent;
 
@@ -35,34 +40,29 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_UPDATE_HTML = "updateHtml";
     private static final String EVENT_NAME_UPDATE_TITLE = "setTitle";
     private static final String EVENT_NAME_FOCUS_TITLE = "setFocusOnTitle";
-    private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_APPEND = "mediaAppend";
     private static final String EVENT_NAME_TOGGLE_HTML_MODE = "toggleHTMLMode";
     private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
+    private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
+    private static final String EVENT_NAME_UPDATE_THEME = "updateTheme";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
-    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_STATE = "state";
-    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID = "mediaId";
-    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL = "mediaUrl";
-    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
-    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS = "progress";
-    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_SERVER_ID = "mediaServerId";
+    public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID = "mediaId";
+    public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL = "mediaUrl";
+    public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
+    private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
+    private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
 
     private static final String MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK = "isPreferredColorSchemeDark";
-
-    private static final int MEDIA_UPLOAD_STATE_UPLOADING = 1;
-    private static final int MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
-    private static final int MEDIA_UPLOAD_STATE_FAILED = 3;
-    private static final int MEDIA_UPLOAD_STATE_RESET = 4;
-
-    private static final int MEDIA_SERVER_ID_UNKNOWN = 0;
 
     private static final String MEDIA_SOURCE_MEDIA_LIBRARY = "SITE_MEDIA_LIBRARY";
     private static final String MEDIA_SOURCE_DEVICE_LIBRARY = "DEVICE_MEDIA_LIBRARY";
     private static final String MEDIA_SOURCE_DEVICE_CAMERA = "DEVICE_CAMERA";
-    private static final String MEDIA_SOURCE_MEDIA_EDITOR = "MEDIA_EDITOR";
+
+    private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
+    private static final String MAP_KEY_REPLACE_BLOCK_BLOCK_ID = "clientId";
 
     private boolean mIsDarkMode;
 
@@ -79,7 +79,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         return "RNReactNativeGutenbergBridge";
     }
 
-
     @Override
     public Map<String, Object> getConstants() {
         final HashMap<String, Object> constants = new HashMap<>();
@@ -87,7 +86,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         return constants;
     }
 
-    private void emitToJS(String eventName, @Nullable WritableMap data) {
+    @Override
+    public void emitToJS(String eventName, @Nullable WritableMap data) {
         mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, data);
     }
 
@@ -126,9 +126,27 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         emitToJS(EVENT_NAME_PREFERRED_COLOR_SCHEME, writableMap);
     }
 
+    public void updateTheme(@Nullable Bundle editorTheme) {
+        if (editorTheme == null) return;
+
+        WritableMap writableMap = new WritableNativeMap();
+        Serializable colors = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_COLORS);
+        Serializable gradients = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_GRADIENTS);
+
+        if (colors != null) {
+            writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, Arguments.fromList((ArrayList)colors));
+        }
+
+        if (gradients != null) {
+            writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, Arguments.fromList((ArrayList)gradients));
+        }
+
+        emitToJS(EVENT_NAME_UPDATE_THEME, writableMap);
+    }
+
     @ReactMethod
-    public void provideToNative_Html(String html, String title, boolean changed) {
-        mGutenbergBridgeJS2Parent.responseHtml(title, html, changed);
+    public void provideToNative_Html(String html, String title, boolean changed, ReadableMap contentInfo) {
+        mGutenbergBridgeJS2Parent.responseHtml(title, html, changed, contentInfo);
     }
 
     @ReactMethod
@@ -137,16 +155,16 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void requestMediaPickFrom(String mediaSource, ReadableArray filter, Boolean allowMultipleSelection, final Callback onUploadMediaSelected) {
+    public void requestMediaPickFrom(String mediaSource, ReadableArray filter, Boolean allowMultipleSelection, final Callback onMediaSelected) {
         MediaType mediaType = getMediaTypeFromFilter(filter);
         if (mediaSource.equals(MEDIA_SOURCE_MEDIA_LIBRARY)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection, mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_LIBRARY)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection, mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), mediaType);
         } else {
-            mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection);
+            mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection);
         }
     }
 
@@ -169,12 +187,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     @ReactMethod
     public void requestMediaImport(String url, final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.requestMediaImport(url, getNewUploadMediaCallback(false, onUploadMediaSelected));
+        mGutenbergBridgeJS2Parent.requestMediaImport(url, getNewMediaSelectedCallback(false, onUploadMediaSelected));
     }
 
     @ReactMethod
     public void mediaUploadSync() {
-        mGutenbergBridgeJS2Parent.mediaUploadSync(getNewUploadMediaCallback(false,null));
+        mGutenbergBridgeJS2Parent.mediaUploadSync(getNewMediaSelectedCallback(false,null));
     }
 
     @ReactMethod
@@ -199,7 +217,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     @ReactMethod
     public void requestMediaEditor(String mediaUrl, final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.requestMediaEditor(getNewUploadMediaCallback(false, onUploadMediaSelected), mediaUrl);
+        mGutenbergBridgeJS2Parent.requestMediaEditor(getNewMediaSelectedCallback(false, onUploadMediaSelected), mediaUrl);
     }
 
     @ReactMethod
@@ -239,6 +257,19 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         mGutenbergBridgeJS2Parent.logUserEvent(GutenbergUserEvent.getEnum(eventName), eventProperties);
     }
 
+    @ReactMethod
+    public void requestUnsupportedBlockFallback(String content, String blockId, String blockName) {
+        mGutenbergBridgeJS2Parent.gutenbergDidRequestUnsupportedBlockFallback((savedContent, savedBlockId) ->
+                replaceBlock(savedContent, savedBlockId), content, blockId, blockName);
+    }
+
+    private void replaceBlock(String content, String blockId) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putString(MAP_KEY_REPLACE_BLOCK_HTML, content);
+        writableMap.putString(MAP_KEY_REPLACE_BLOCK_BLOCK_ID, blockId);
+        emitToJS(EVENT_NAME_MEDIA_REPLACE_BLOCK, writableMap);
+    }
+
     private OtherMediaOptionsReceivedCallback getNewOtherMediaReceivedCallback(final Callback jsCallback) {
         return new OtherMediaOptionsReceivedCallback() {
             @Override public void onOtherMediaOptionsReceived(ArrayList<MediaOption> mediaOptions) {
@@ -251,10 +282,34 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         };
     }
 
-    private GutenbergBridgeJS2Parent.MediaUploadCallback getNewUploadMediaCallback(final Boolean allowMultipleSelection, final Callback jsCallback) {
-        return new GutenbergBridgeJS2Parent.MediaUploadCallback() {
+    @ReactMethod
+    public void addMention(Promise promise) {
+        mGutenbergBridgeJS2Parent.onAddMention(promise::resolve);
+    }
+
+    @ReactMethod
+    public void setStarterPageTemplatesTooltipShown(boolean tooltipShown) {
+        mGutenbergBridgeJS2Parent.setStarterPageTemplatesTooltipShown(tooltipShown);
+    }
+
+    @ReactMethod
+    public void requestStarterPageTemplatesTooltipShown(final Callback jsCallback) {
+        StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback = requestStarterPageTemplatesTooltipShownCallback(jsCallback);
+        mGutenbergBridgeJS2Parent.requestStarterPageTemplatesTooltipShown(starterPageTemplatesTooltipShownCallback);
+    }
+
+    private StarterPageTemplatesTooltipShownCallback requestStarterPageTemplatesTooltipShownCallback(final Callback jsCallback) {
+        return new StarterPageTemplatesTooltipShownCallback() {
+            @Override public void onRequestStarterPageTemplatesTooltipShown(boolean tooltipShown) {
+                jsCallback.invoke(tooltipShown);
+            }
+        };
+    }
+
+    private GutenbergBridgeJS2Parent.MediaSelectedCallback getNewMediaSelectedCallback(final Boolean allowMultipleSelection, final Callback jsCallback) {
+        return new GutenbergBridgeJS2Parent.MediaSelectedCallback() {
             @Override
-            public void onUploadMediaFileSelected(List<RNMedia> mediaList) {
+            public void onMediaFileSelected(List<RNMedia> mediaList) {
                 if (allowMultipleSelection) {
                     WritableArray writableArray = new WritableNativeArray();
                     for (RNMedia media : mediaList) {
@@ -270,42 +325,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 }
             }
 
-            @Override public void onUploadMediaFileClear(int mediaId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_RESET, mediaId, null, 0);
-            }
-
-            @Override
-            public void onMediaFileUploadProgress(int mediaId, float progress) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
-            }
-
-            @Override
-            public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
-            }
-
-            @Override
-            public void onMediaFileUploadFailed(int mediaId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
-            }
         };
     }
 
-    private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress) {
-        setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN);
-    }
-
-    private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress, int mediaServerId) {
-        WritableMap writableMap = new WritableNativeMap();
-        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_STATE, state);
-        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
-        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
-        writableMap.putDouble(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS, progress);
-        if (mediaServerId != MEDIA_SERVER_ID_UNKNOWN) {
-            writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_SERVER_ID, mediaServerId);
-        }
-        emitToJS(EVENT_NAME_MEDIA_UPLOAD, writableMap);
-    }
 
     public void toggleEditorMode() {
         emitToJS(EVENT_NAME_TOGGLE_HTML_MODE, null);

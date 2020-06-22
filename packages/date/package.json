@@ -6,6 +6,7 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"date"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/date/README.md",

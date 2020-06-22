@@ -12,7 +12,7 @@ import testData from './helpers/test-data';
 
 jest.setTimeout( 1000000 );
 
-describe( 'Gutenberg Editor tests', () => {
+describe( 'Gutenberg Editor tests @canary', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;

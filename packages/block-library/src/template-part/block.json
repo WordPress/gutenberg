@@ -1,6 +1,6 @@
 {
 	"name": "core/template-part",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"postId": {
 			"type": "number"
@@ -11,5 +11,8 @@
 		"theme": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"html": false
 	}
 }

@@ -55,15 +55,9 @@ const setupInitHooks = () => {
 	wpHooks.addFilter(
 		'native.block_editor_props',
 		'core/react-native-editor',
-		( {
-			initialData: initialDataParam,
-			initialTitle: initialTitleParam,
-			initialHtmlModeEnabled,
-			postType: postTypeParam,
-		} ) => {
-			let initialData = initialDataParam;
-			let initialTitle = initialTitleParam;
-			let postType = postTypeParam;
+		( props ) => {
+			const { capabilities = {} } = props;
+			let { initialData, initialTitle, postType } = props;
 
 			if ( initialData === undefined && __DEV__ ) {
 				initialData = initialHtml;
@@ -77,9 +71,12 @@ const setupInitHooks = () => {
 
 			return {
 				initialHtml: initialData,
-				initialHtmlModeEnabled,
+				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
 				initialTitle,
 				postType,
+				capabilities,
+				colors: props.colors,
+				gradients: props.gradients,
 			};
 		}
 	);

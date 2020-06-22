@@ -1,12 +1,15 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.0.0-beta.3",
+	"version": "1.1.0",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
-		"wordpress"
+		"wordpress",
+		"gutenberg",
+		"editor",
+		"navigation"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-navigation/README.md",
 	"repository": {
@@ -20,6 +23,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"!((src|build|build-module)/components/**)"
+	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
@@ -33,8 +40,8 @@
 		"@wordpress/dom-ready": "file:../dom-ready",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
-	  	"@wordpress/html-entities": "file:../html-entities",
-	  	"@wordpress/i18n": "file:../i18n",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",

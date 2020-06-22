@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useRegistry, useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	Tooltip,
 	DropdownMenu,
@@ -11,14 +11,20 @@ import {
 	MenuItemsChoice,
 	MenuItem,
 } from '@wordpress/components';
-import { Icon, home, plus } from '@wordpress/icons';
+import { Icon, home, plus, undo } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import AddTemplate from '../add-template';
+import { findTemplate } from '../../utils';
 import TemplatePreview from './template-preview';
 import ThemePreview from './theme-preview';
+
+const TEMPLATE_OVERRIDES = {
+	page: ( slug ) => `page-${ slug }`,
+	category: ( slug ) => `category-${ slug }`,
+	post: ( slug ) => `single-post-${ slug }`,
+};
 
 function TemplateLabel( { template, homeId } ) {
 	return (
@@ -41,25 +47,21 @@ function TemplateLabel( { template, homeId } ) {
 }
 
 export default function TemplateSwitcher( {
-	ids,
-	templatePartIds,
+	page,
 	activeId,
-	homeId,
+	activeTemplatePartId,
 	isTemplatePart,
 	onActiveIdChange,
 	onActiveTemplatePartIdChange,
-	onAddTemplateId,
+	onAddTemplate,
+	onRemoveTemplate,
 } ) {
 	const [ hoveredTemplate, setHoveredTemplate ] = useState();
 	const [ themePreviewVisible, setThemePreviewVisible ] = useState( false );
 
-	const onHoverTemplate = ( id ) => {
-		setHoveredTemplate( { id, type: 'template' } );
-	};
 	const onHoverTemplatePart = ( id ) => {
 		setHoveredTemplate( { id, type: 'template-part' } );
 	};
-
 	const onMouseEnterTheme = () => {
 		setThemePreviewVisible( () => true );
 	};
@@ -67,51 +69,78 @@ export default function TemplateSwitcher( {
 		setThemePreviewVisible( () => false );
 	};
 
-	const { currentTheme, templates, templateParts } = useSelect(
+	const registry = useRegistry();
+	const [ homeId, setHomeId ] = useState();
+
+	useEffect( () => {
+		findTemplate(
+			'/',
+			registry.__experimentalResolveSelect( 'core' ).getEntityRecords
+		).then(
+			( newHomeId ) => setHomeId( newHomeId ),
+			() => setHomeId( null )
+		);
+	}, [ registry ] );
+
+	const { currentTheme, template, templateParts } = useSelect(
 		( select ) => {
-			const { getCurrentTheme, getEntityRecord } = select( 'core' );
+			const {
+				getCurrentTheme,
+				getEntityRecord,
+				getEntityRecords,
+			} = select( 'core' );
+
+			const _template = getEntityRecord(
+				'postType',
+				'wp_template',
+				activeId
+			);
+
 			return {
 				currentTheme: getCurrentTheme(),
-				templates: ids.map( ( id ) => {
-					const template = getEntityRecord(
-						'postType',
-						'wp_template',
-						id
-					);
-					return {
-						label: template ? (
-							<TemplateLabel
-								template={ template }
-								homeId={ homeId }
-							/>
-						) : (
-							__( 'Loading…' )
-						),
-						value: id,
-						slug: template ? template.slug : __( 'Loading…' ),
-					};
-				} ),
-				templateParts: templatePartIds.map( ( id ) => {
-					const template = getEntityRecord(
-						'postType',
-						'wp_template_part',
-						id
-					);
-					return {
-						label: template ? (
-							<TemplateLabel template={ template } />
-						) : (
-							__( 'Loading…' )
-						),
-						value: id,
-						slug: template ? template.slug : __( 'Loading…' ),
-					};
-				} ),
+				template: _template,
+				templateParts: _template
+					? getEntityRecords( 'postType', 'wp_template_part', {
+							resolved: true,
+							template: _template.slug,
+					  } )
+					: null,
 			};
 		},
-		[ ids, templatePartIds, homeId ]
+		[ activeId ]
 	);
-	const [ isAddTemplateOpen, setIsAddTemplateOpen ] = useState( false );
+
+	const templateItem = {
+		label: template ? (
+			<TemplateLabel template={ template } homeId={ homeId } />
+		) : (
+			__( 'Loading…' )
+		),
+		value: activeId,
+		slug: template ? template.slug : __( 'Loading…' ),
+		content: template?.content,
+	};
+
+	const templatePartItems = templateParts?.map( ( templatePart ) => ( {
+		label: <TemplateLabel template={ templatePart } />,
+		value: templatePart.id,
+		slug: templatePart.slug,
+	} ) );
+
+	const overwriteSlug =
+		TEMPLATE_OVERRIDES[ page.type ] &&
+		page.slug &&
+		TEMPLATE_OVERRIDES[ page.type ]( page.slug );
+	const overwriteTemplate = () =>
+		onAddTemplate( {
+			slug: overwriteSlug,
+			title: overwriteSlug,
+			status: 'publish',
+			content: templateItem.content.raw,
+		} );
+	const revertToParent = async () => {
+		onRemoveTemplate( activeId );
+	};
 	return (
 		<>
 			<DropdownMenu
@@ -123,36 +152,49 @@ export default function TemplateSwitcher( {
 				label={ __( 'Switch Template' ) }
 				toggleProps={ {
 					children: ( isTemplatePart
-						? templateParts
-						: templates
-					).find( ( choice ) => choice.value === activeId ).slug,
+						? templatePartItems
+						: [ templateItem ]
+					).find(
+						( choice ) =>
+							choice.value ===
+							( isTemplatePart ? activeTemplatePartId : activeId )
+					).slug,
 				} }
 			>
-				{ ( { onClose } ) => (
+				{ () => (
 					<>
-						<MenuGroup label={ __( 'Templates' ) }>
-							<MenuItemsChoice
-								choices={ templates }
-								value={
-									! isTemplatePart ? activeId : undefined
-								}
-								onSelect={ onActiveIdChange }
-								onHover={ onHoverTemplate }
-							/>
+						<MenuGroup label={ __( 'Template' ) }>
 							<MenuItem
-								icon={ plus }
-								onClick={ () => {
-									onClose();
-									setIsAddTemplateOpen( true );
-								} }
+								onClick={ () => onActiveIdChange( activeId ) }
 							>
-								{ __( 'New' ) }
+								{ templateItem.label }
 							</MenuItem>
+							{ overwriteSlug &&
+								overwriteSlug !== templateItem.slug && (
+									<MenuItem
+										icon={ plus }
+										onClick={ overwriteTemplate }
+									>
+										{ __( 'Overwrite Template' ) }
+									</MenuItem>
+								) }
+							{ overwriteSlug === templateItem.slug && (
+								<MenuItem
+									icon={ undo }
+									onClick={ revertToParent }
+								>
+									{ __( 'Revert to Parent' ) }
+								</MenuItem>
+							) }
 						</MenuGroup>
 						<MenuGroup label={ __( 'Template Parts' ) }>
 							<MenuItemsChoice
-								choices={ templateParts }
-								value={ isTemplatePart ? activeId : undefined }
+								choices={ templatePartItems }
+								value={
+									isTemplatePart
+										? activeTemplatePartId
+										: undefined
+								}
 								onSelect={ onActiveTemplatePartIdChange }
 								onHover={ onHoverTemplatePart }
 							/>
@@ -175,15 +217,6 @@ export default function TemplateSwitcher( {
 					</>
 				) }
 			</DropdownMenu>
-			<AddTemplate
-				ids={ ids }
-				onAddTemplateId={ onAddTemplateId }
-				onRequestClose={ useCallback(
-					() => setIsAddTemplateOpen( false ),
-					[]
-				) }
-				isOpen={ isAddTemplateOpen }
-			/>
 		</>
 	);
 }

@@ -8,6 +8,7 @@ import {
 	pressKeyTimes,
 	getEditedPostContent,
 	clickBlockToolbarButton,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 async function getSelectedFlatIndices() {
@@ -537,6 +538,19 @@ describe( 'Multi-block selection', () => {
 		await pressKeyWithModifier( 'primary', 'c' );
 		await pressKeyWithModifier( 'primary', 'v' );
 		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should set attributes for multiple paragraphs', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await clickBlockToolbarButton( 'Change text alignment' );
+		await clickButton( 'Align text center' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

@@ -12,10 +12,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	enableExperimentalFeatures,
-	disableExperimentalFeatures,
-} from '../../experimental-features';
+import { useExperimentalFeatures } from '../../experimental-features';
 import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Multi-entity save flow', () => {
@@ -27,9 +24,21 @@ describe( 'Multi-entity save flow', () => {
 	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector = 'button[aria-label="Close panel"]';
+	const createNewButtonSelector = '//button[contains(text(), "Create new")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
+		// Expand to view savable entities if necessary.
+		const reviewChangesButton = await page.$(
+			'.entities-saved-states__review-changes-button'
+		);
+		const [ needsToOpen ] = await reviewChangesButton.$x(
+			'//*[contains(text(),"Review changes.")]'
+		);
+		if ( needsToOpen ) {
+			await reviewChangesButton.click();
+		}
+
 		const checkedBoxes = await page.$$( checkedBoxSelector );
 		const checkboxInputs = await page.$$( checkboxInputSelector );
 		expect( checkedBoxes.length - checkboxInputs.length ).toBe( 0 );
@@ -42,18 +51,15 @@ describe( 'Multi-entity save flow', () => {
 			expect( element ).toBeNull();
 		}
 	};
-	// Setup & Teardown.
-	const requiredExperiments = [
+
+	useExperimentalFeatures( [
 		'#gutenberg-full-site-editing',
 		'#gutenberg-full-site-editing-demo',
-	];
+	] );
+
 	beforeAll( async () => {
-		await enableExperimentalFeatures( requiredExperiments );
 		await trashExistingPosts( 'wp_template' );
 		await trashExistingPosts( 'wp_template_part' );
-	} );
-	afterAll( async () => {
-		await disableExperimentalFeatures( requiredExperiments );
 	} );
 
 	describe( 'Post Editor', () => {
@@ -103,6 +109,11 @@ describe( 'Multi-entity save flow', () => {
 			it( 'Should trigger multi-entity save button once template part edited', async () => {
 				// Create new template part.
 				await insertBlock( 'Template Part' );
+				const [ createNewButton ] = await page.$x(
+					createNewButtonSelector
+				);
+				await createNewButton.click();
+				await page.keyboard.press( 'Tab' );
 				await page.keyboard.type( 'test-template-part' );
 				await page.keyboard.press( 'Tab' );
 				await page.keyboard.type( 'test-theme' );

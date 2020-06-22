@@ -34,6 +34,7 @@ export default function VerseEdit( {
 			</BlockControls>
 			<RichText
 				tagName={ Block.pre }
+				identifier="content"
 				preserveWhiteSpace
 				value={ content }
 				onChange={ ( nextContent ) => {
