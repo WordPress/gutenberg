@@ -85,19 +85,9 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const {
-		maxWidth,
-		isRTL,
-		imageSizes,
-		__experimentalEnableRichImageEditing,
-	} = useSelect( ( select ) => {
+	const { maxWidth, isRTL, imageSizes } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		return pick( getSettings(), [
-			'imageSizes',
-			'isRTL',
-			'maxWidth',
-			'__experimentalEnableRichImageEditing',
-		] );
+		return pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] );
 	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -187,11 +177,7 @@ export default function Image( {
 		}
 	}, [ isSelected ] );
 
-	const canEditImage =
-		__experimentalEnableRichImageEditing &&
-		id &&
-		naturalWidth &&
-		naturalHeight;
+	const canEditImage = id && naturalWidth && naturalHeight;
 
 	const controls = (
 		<>
