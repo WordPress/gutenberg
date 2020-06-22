@@ -2,8 +2,12 @@
  * WordPress dependencies
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { VisuallyHidden, Button } from '@wordpress/components';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import {
+	VisuallyHidden,
+	Button,
+	withSpokenMessages,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -86,6 +90,7 @@ function QuickInserter( {
 	clientId,
 	isAppender,
 	selectBlockOnInsert,
+	debouncedSpeak,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [
@@ -140,6 +145,17 @@ function QuickInserter( {
 		}
 	}, [ setInsererIsOpened ] );
 
+	// Announce search results on change
+	useEffect( () => {
+		const count = filteredBlockTypes.length + filteredBlockPatterns.length;
+		const resultsFoundMessage = sprintf(
+			/* translators: %d: number of results. */
+			_n( '%d result found.', '%d results found.', count ),
+			count
+		);
+		debouncedSpeak( resultsFoundMessage );
+	}, [ filterValue, debouncedSpeak ] );
+
 	return (
 		<div className="block-editor-inserter__quick-inserter">
 			{ showSearch && (
@@ -171,4 +187,4 @@ function QuickInserter( {
 	);
 }
 
-export default QuickInserter;
+export default withSpokenMessages( QuickInserter );

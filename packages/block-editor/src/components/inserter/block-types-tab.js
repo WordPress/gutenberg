@@ -12,7 +12,6 @@ import { addQueryArgs } from '@wordpress/url';
 import { controlsRepeat } from '@wordpress/icons';
 import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -244,4 +243,4 @@ export function BlockTypesTab( {
 	);
 }
 
-export default compose( withSpokenMessages )( BlockTypesTab );
+export default withSpokenMessages( BlockTypesTab );
