@@ -152,6 +152,7 @@ export default function ImageEditor( {
 	const [ aspect, setAspect ] = useState( naturalWidth / naturalHeight );
 	const [ rotation, setRotation ] = useState( 0 );
 	const [ editedUrl, setEditedUrl ] = useState();
+	const naturalAspectRatio = naturalWidth / naturalHeight;
 
 	const editedWidth = width;
 	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
@@ -205,6 +206,10 @@ export default function ImageEditor( {
 			setEditedUrl();
 			setRotation( angle );
 			setAspect( 1 / aspect );
+			setPosition( {
+				x: -( position.y * naturalAspectRatio ),
+				y: position.x * naturalAspectRatio,
+			} );
 			return;
 		}
 
@@ -240,6 +245,10 @@ export default function ImageEditor( {
 				setEditedUrl( URL.createObjectURL( blob ) );
 				setRotation( angle );
 				setAspect( 1 / aspect );
+				setPosition( {
+					x: -( position.y * naturalAspectRatio ),
+					y: position.x * naturalAspectRatio,
+				} );
 			} );
 		}
 
