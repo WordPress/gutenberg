@@ -5,9 +5,11 @@ import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden, Button } from '@wordpress/components';
 import { Icon, search, close } from '@wordpress/icons';
+import { useRef } from '@wordpress/element';
 
 function InserterSearchForm( { onChange, value } ) {
 	const instanceId = useInstanceId( InserterSearchForm );
+	const searchInput = useRef();
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
@@ -22,6 +24,7 @@ function InserterSearchForm( { onChange, value } ) {
 				{ __( 'Search for a block' ) }
 			</VisuallyHidden>
 			<input
+				ref={ searchInput }
 				className="block-editor-inserter__search-input"
 				id={ `block-editor-inserter__search-${ instanceId }` }
 				type="search"
@@ -34,9 +37,12 @@ function InserterSearchForm( { onChange, value } ) {
 			<div className="block-editor-inserter__search-icon">
 				{ !! value && (
 					<Button
-						icon={ !! value ? close : search }
-						label={ value }
-						onClick={ () => onChange( '' ) }
+						icon={ close }
+						label={ __( 'Reset search' ) }
+						onClick={ () => {
+							onChange( '' );
+							searchInput.current.focus();
+						} }
 					/>
 				) }
 				{ ! value && <Icon icon={ search } /> }
