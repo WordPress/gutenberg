@@ -150,7 +150,6 @@
 		"glob": "7.1.2",
 		"husky": "3.0.5",
 		"inquirer": "7.1.0",
-		"jest": "26.0.1",
 		"jest-emotion": "10.0.32",
 		"jest-junit": "10.0.0",
 		"jest-serializer-enzyme": "1.0.0",
