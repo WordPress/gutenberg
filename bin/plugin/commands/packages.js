@@ -288,22 +288,40 @@ async function prepublishPackages( minimumVersionBump ) {
 	await runCleanLocalFoldersStep( temporaryFolders, abortMessage );
 }
 
-async function prepublishNpmStablePackages() {
+async function prepareLatestDistTag() {
 	log(
 		formats.title(
 			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
 		),
-		'Welcome! This tool is going to help you with prepublish to npm steps for the next stable version of WordPress packages.\n',
+		'Welcome! This tool is going to help you with preparing everything for publishing a new stable version of WordPress packages.\n',
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
 	await prepublishPackages( 'minor' );
 
 	log(
-		'\n>> 🎉 WordPress packages are ready to publish.\n',
-		'Thanks for performing the prepublish process! You still need to run "npm run publish:prod" to perform the actual release.\n',
+		'\n>> 🎉 WordPress packages are ready to publish!\n',
+		'You need to run "npm run publish:prod" to release them to npm.\n',
 		'Let also people know on WordPress Slack when everything is finished.\n'
 	);
 }
 
-module.exports = { prepublishNpmStablePackages };
+async function prepareNextDistTag() {
+	log(
+		formats.title(
+			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
+		),
+		'Welcome! This tool is going to help you with preparing everything for publishing a new RC version of WordPress packages.\n',
+		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
+	);
+
+	await prepublishPackages( 'minor' );
+
+	log(
+		'\n>> 🎉 WordPress packages are ready to publish!\n',
+		'You need to run "npm run publish:dev" to release them to npm.\n',
+		'Let also people know on WordPress Slack when everything is finished.\n'
+	);
+}
+
+module.exports = { prepareLatestDistTag, prepareNextDistTag };
