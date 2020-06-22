@@ -4,11 +4,28 @@
  * WordPress dependencies
  */
 import { applyFilters, doAction } from '@wordpress/hooks';
+import { plugins as pluginsIcon } from '@wordpress/icons';
 
 /**
  * External dependencies
  */
 import { isFunction } from 'lodash';
+
+/**
+ * Defined behavior of a plugin type.
+ *
+ * @typedef {Object} WPPlugin
+ *
+ * @property {string}                    name   A string identifying the plugin. Must be
+ *                                              unique across all registered plugins.
+ *                                              unique across all registered plugins.
+ * @property {string|WPElement|Function} icon   An icon to be shown in the UI. It can
+ *                                              be a slug of the Dashicon, or an element
+ *                                              (or function returning an element) if you
+ *                                              choose to render your own SVG.
+ * @property {Function}                  render A component containing the UI elements
+ *                                              to be rendered.
+ */
 
 /**
  * Plugin definitions keyed by plugin name.
@@ -20,13 +37,12 @@ const plugins = {};
 /**
  * Registers a plugin to the editor.
  *
- * @param {string}                    name            A string identifying the plugin. Must be unique across all registered plugins.
- * @param {Object}                    settings        The settings for this plugin.
- * @param {string|WPElement|Function} settings.icon   An icon to be shown in the UI. It can be a slug of the Dashicon,
- * or an element (or function returning an element) if you choose to render your own SVG.
- * @param {Function}                  settings.render A component containing the UI elements to be rendered.
+ * @param {string}   name     A string identifying the plugin.Must be
+ *                            unique across all registered plugins.
+ * @param {WPPlugin} settings The settings for this plugin.
  *
- * @example <caption>ES5</caption>
+ * @example
+ * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var el = wp.element.createElement;
@@ -34,6 +50,7 @@ const plugins = {};
  * var PluginSidebar = wp.editPost.PluginSidebar;
  * var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
  * var registerPlugin = wp.plugins.registerPlugin;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function Component() {
  * 	return el(
@@ -57,16 +74,18 @@ const plugins = {};
  * 	);
  * }
  * registerPlugin( 'plugin-name', {
- * 	icon: 'smiley',
+ * 	icon: moreIcon,
  * 	render: Component,
  * } );
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
+ * <caption>ESNext</caption>
  * ```js
  * // Using ESNext syntax
- * const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
- * const { registerPlugin } = wp.plugins;
+ * import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+ * import { registerPlugin } from '@wordpress/plugins';
+ * import { more } from '@wordpress/icons';
  *
  * const Component = () => (
  * 	<>
@@ -85,24 +104,20 @@ const plugins = {};
  * );
  *
  * registerPlugin( 'plugin-name', {
- * 	icon: 'smiley',
+ * 	icon: more,
  * 	render: Component,
  * } );
  * ```
  *
- * @return {Object} The final plugin settings object.
+ * @return {WPPlugin} The final plugin settings object.
  */
 export function registerPlugin( name, settings ) {
 	if ( typeof settings !== 'object' ) {
-		console.error(
-			'No settings object provided!'
-		);
+		console.error( 'No settings object provided!' );
 		return null;
 	}
 	if ( typeof name !== 'string' ) {
-		console.error(
-			'Plugin names must be strings.'
-		);
+		console.error( 'Plugin names must be strings.' );
 		return null;
 	}
 	if ( ! /^[a-z][a-z0-9-]*$/.test( name ) ) {
@@ -112,9 +127,7 @@ export function registerPlugin( name, settings ) {
 		return null;
 	}
 	if ( plugins[ name ] ) {
-		console.error(
-			`Plugin "${ name }" is already registered.`
-		);
+		console.error( `Plugin "${ name }" is already registered.` );
 	}
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
@@ -128,7 +141,7 @@ export function registerPlugin( name, settings ) {
 
 	plugins[ name ] = {
 		name,
-		icon: 'admin-plugins',
+		icon: pluginsIcon,
 		...settings,
 	};
 
@@ -142,7 +155,8 @@ export function registerPlugin( name, settings ) {
  *
  * @param {string} name Plugin name.
  *
- * @example <caption>ES5</caption>
+ * @example
+ * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var unregisterPlugin = wp.plugins.unregisterPlugin;
@@ -150,7 +164,8 @@ export function registerPlugin( name, settings ) {
  * unregisterPlugin( 'plugin-name' );
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
+ * <caption>ESNext</caption>
  * ```js
  * // Using ESNext syntax
  * const { unregisterPlugin } = wp.plugins;
@@ -163,9 +178,7 @@ export function registerPlugin( name, settings ) {
  */
 export function unregisterPlugin( name ) {
 	if ( ! plugins[ name ] ) {
-		console.error(
-			'Plugin "' + name + '" is not registered.'
-		);
+		console.error( 'Plugin "' + name + '" is not registered.' );
 		return;
 	}
 	const oldPlugin = plugins[ name ];
@@ -181,7 +194,7 @@ export function unregisterPlugin( name ) {
  *
  * @param {string} name Plugin name.
  *
- * @return {?Object} Plugin setting.
+ * @return {?WPPlugin} Plugin setting.
  */
 export function getPlugin( name ) {
 	return plugins[ name ];
@@ -190,7 +203,7 @@ export function getPlugin( name ) {
 /**
  * Returns all registered plugins.
  *
- * @return {Array} Plugin settings.
+ * @return {WPPlugin[]} Plugin settings.
  */
 export function getPlugins() {
 	return Object.values( plugins );

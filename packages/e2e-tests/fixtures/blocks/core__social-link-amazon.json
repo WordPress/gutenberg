@@ -1,11 +1,11 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/social-link-amazon",
+        "name": "core/social-link",
         "isValid": true,
         "attributes": {
             "url": "https://example.com/",
-            "site": "amazon"
+            "service": "amazon"
         },
         "innerBlocks": [],
         "originalContent": ""

@@ -9,7 +9,7 @@ import { noop } from 'lodash';
  */
 import FormFileUpload from '../';
 
-describe( 'InserterMenu', () => {
+describe( 'FormFileUpload', () => {
 	it( 'should show an Icon Button and a hidden input', () => {
 		const wrapper = shallow(
 			<FormFileUpload
@@ -22,9 +22,9 @@ describe( 'InserterMenu', () => {
 			</FormFileUpload>
 		);
 
-		const iconButton = wrapper.find( 'ForwardRef(IconButton)' );
+		const button = wrapper.find( 'ForwardRef(Button)' );
 		const input = wrapper.find( 'input' );
-		expect( iconButton.prop( 'children' ) ).toBe( 'My Upload Button' );
+		expect( button.prop( 'children' ) ).toBe( 'My Upload Button' );
 		expect( input.prop( 'style' ).display ).toBe( 'none' );
 	} );
 } );

@@ -1,6 +1,7 @@
 .edit-post-header-toolbar {
 	display: inline-flex;
 	align-items: center;
+	border: none;
 
 	// Hide all action buttons except the inserter on mobile.
 	> .components-button {
@@ -11,13 +12,38 @@
 		}
 	}
 
+	> .edit-post-header-toolbar__inserter-toggle {
+		display: inline-flex;
+	}
+
 	// Hide table of contents and block navigation on mobile.
-	.block-editor-block-navigation,
-	.table-of-contents {
+	.block-editor-block-navigation {
 		display: none;
 
 		@include break-small() {
 			display: flex;
+		}
+	}
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles
+	> .components-button.has-icon,
+	> .components-dropdown > .components-button.has-icon {
+		height: $button-size;
+		min-width: $button-size;
+		padding: 6px;
+
+		&.is-pressed {
+			background: $dark-gray-primary;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
+			outline: 1px solid transparent;
+		}
+
+		&::before {
+			display: none;
 		}
 	}
 }
@@ -26,13 +52,17 @@
 .edit-post-header-toolbar__block-toolbar {
 	// Stack toolbar below Editor Bar.
 	position: absolute;
-	top: $header-height;
+	top: $header-height + $border-width;
 	left: 0;
 	right: 0;
 	background: $white;
-	min-height: $block-toolbar-height;
 	border-bottom: $border-width solid $light-gray-500;
 
+	&:empty {
+		display: none;
+	}
+
+	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;
 		border-bottom: none;
@@ -50,25 +80,36 @@
 	}
 
 	// Move toolbar into top Editor Bar.
-	@include break-xlarge {
-		padding-left: $grid-size;
+	@include break-wide {
+		padding-left: $grid-unit-10;
 		position: static;
 		left: auto;
 		right: auto;
 		background: none;
 		border-bottom: none;
-		min-height: auto;
 
 		.is-sidebar-opened & {
 			right: auto;
 		}
 
 		.block-editor-block-toolbar {
-			margin: -($grid-size + $border-width) 0;
+			border-left: $border-width solid $light-gray-500;
 		}
 
+		.block-editor-block-toolbar .components-toolbar-group,
 		.block-editor-block-toolbar .components-toolbar {
-			padding: ($grid-size + $border-width + $border-width) $grid-size-small ($grid-size + $border-width);
+			$top-toolbar-padding: ($header-height - $grid-unit-60) / 2;
+			height: $header-height;
+			padding: $top-toolbar-padding 0;
 		}
 	}
+}
+
+.edit-post-header-toolbar .edit-post-header-toolbar__inserter-toggle.has-icon {
+	margin-right: $grid-unit-10;
+	// Special dimensions for this button.
+	min-width: 32px;
+	width: 32px;
+	height: 32px;
+	padding: 0;
 }

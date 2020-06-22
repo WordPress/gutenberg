@@ -18,7 +18,11 @@ describe( 'PanelRow', () => {
 		expect( wrapper.hasClass( 'custom' ) ).toBe( true );
 	} );
 	it( 'should return child components', () => {
-		const wrapper = shallow( <PanelRow><p>children</p></PanelRow> );
+		const wrapper = shallow(
+			<PanelRow>
+				<p>children</p>
+			</PanelRow>
+		);
 		expect( wrapper.find( 'p' ).text() ).toBe( 'children' );
 	} );
 } );

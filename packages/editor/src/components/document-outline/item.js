@@ -30,7 +30,10 @@ const TableOfContentsItem = ( {
 			className="document-outline__button"
 			onClick={ onSelect }
 		>
-			<span className="document-outline__emdash" aria-hidden="true"></span>
+			<span
+				className="document-outline__emdash"
+				aria-hidden="true"
+			></span>
 			{
 				// path is an array of nodes that are ancestors of the heading starting in the top level node.
 				// This mapping renders each ancestor to make it easier for the user to know where the headings are nested.
@@ -40,12 +43,8 @@ const TableOfContentsItem = ( {
 					</strong>
 				) )
 			}
-			<strong className="document-outline__level">
-				{ level }
-			</strong>
-			<span className="document-outline__item-content">
-				{ children }
-			</span>
+			<strong className="document-outline__level">{ level }</strong>
+			<span className="document-outline__item-content">{ children }</span>
 		</a>
 	</li>
 );

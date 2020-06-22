@@ -64,6 +64,38 @@ export function select( storeKey, selectorName, ...args ) {
 }
 
 /**
+ * Dispatches a control action for triggering a registry select.
+ *
+ * Note: This functions like the `select` control, but does not wait
+ * for resolvers.
+ *
+ * @param {string} storeKey     The key for the store the selector belongs to.
+ * @param {string} selectorName The name of the selector.
+ * @param {Array}  args         Arguments for the select.
+ *
+ * @example
+ * ```js
+ * import { __unstableSyncSelect } from '@wordpress/data-controls';
+ *
+ * // Action generator using `__unstableSyncSelect`.
+ * export function* myAction() {
+ * 	const isEditorSideBarOpened = yield __unstableSyncSelect( 'core/edit-post', 'isEditorSideBarOpened' );
+ * 	// Do stuff with the result from the `__unstableSyncSelect`.
+ * }
+ * ```
+ *
+ * @return {Object} The control descriptor.
+ */
+export function __unstableSyncSelect( storeKey, selectorName, ...args ) {
+	return {
+		type: 'SYNC_SELECT',
+		storeKey,
+		selectorName,
+		args,
+	};
+}
+
+/**
  * Dispatches a control action for triggering a registry dispatch.
  *
  * @param {string} storeKey    The key for the store the action belongs to
@@ -91,39 +123,6 @@ export function dispatch( storeKey, actionName, ...args ) {
 		args,
 	};
 }
-
-/**
- * Utility for returning a promise that handles a selector with a resolver.
- *
- * @param {Object} registry             The data registry.
- * @param {Object} options
- * @param {string} options.storeKey     The store the selector belongs to
- * @param {string} options.selectorName The selector name
- * @param {Array}  options.args         The arguments fed to the selector
- *
- * @return {Promise}  A promise for resolving the given selector.
- */
-const resolveSelect = ( registry, { storeKey, selectorName, args } ) => {
-	return new Promise( ( resolve ) => {
-		const hasFinished = () => registry.select( 'core/data' )
-			.hasFinishedResolution( storeKey, selectorName, args );
-		const getResult = () => registry.select( storeKey )[ selectorName ]
-			.apply( null, args );
-
-		// trigger the selector (to trigger the resolver)
-		const result = getResult();
-		if ( hasFinished() ) {
-			return resolve( result );
-		}
-
-		const unsubscribe = registry.subscribe( () => {
-			if ( hasFinished() ) {
-				unsubscribe();
-				resolve( getResult() );
-			}
-		} );
-	} );
-};
 
 /**
  * The default export is what you use to register the controls with your custom
@@ -159,9 +158,16 @@ export const controls = {
 	},
 	SELECT: createRegistryControl(
 		( registry ) => ( { storeKey, selectorName, args } ) => {
-			return registry.select( storeKey )[ selectorName ].hasResolver ?
-				resolveSelect( registry, { storeKey, selectorName, args } ) :
-				registry.select( storeKey )[ selectorName ]( ...args );
+			return registry[
+				registry.select( storeKey )[ selectorName ].hasResolver
+					? '__experimentalResolveSelect'
+					: 'select'
+			]( storeKey )[ selectorName ]( ...args );
+		}
+	),
+	SYNC_SELECT: createRegistryControl(
+		( registry ) => ( { storeKey, selectorName, args } ) => {
+			return registry.select( storeKey )[ selectorName ]( ...args );
 		}
 	),
 	DISPATCH: createRegistryControl(

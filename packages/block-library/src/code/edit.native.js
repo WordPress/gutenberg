@@ -13,7 +13,6 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { escape, unescape } from './utils';
 
 /**
  * Block code style
@@ -23,24 +22,35 @@ import styles from './theme.scss';
 // Note: styling is applied directly to the (nested) PlainText component. Web-side components
 // apply it to the container 'div' but we don't have a proper proposal for cascading styling yet.
 export function CodeEdit( props ) {
-	const { attributes, setAttributes, style, onFocus, onBlur, getStylesFromColorScheme } = props;
-	const codeStyle = getStylesFromColorScheme( styles.blockCode, styles.blockCodeDark );
-	const placeholderStyle = getStylesFromColorScheme( styles.placeholder, styles.placeholderDark );
+	const {
+		attributes,
+		setAttributes,
+		onFocus,
+		onBlur,
+		getStylesFromColorScheme,
+	} = props;
+	const codeStyle = getStylesFromColorScheme(
+		styles.blockCode,
+		styles.blockCodeDark
+	);
+	const placeholderStyle = getStylesFromColorScheme(
+		styles.placeholder,
+		styles.placeholderDark
+	);
 
 	return (
 		<View>
 			<PlainText
-				value={ unescape( attributes.content ) }
-				style={ [ style, codeStyle ] }
+				value={ attributes.content }
+				style={ codeStyle }
 				multiline={ true }
 				underlineColorAndroid="transparent"
-				onChange={ ( content ) => setAttributes( { content: escape( content ) } ) }
+				onChange={ ( content ) => setAttributes( { content } ) }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
 				isSelected={ props.isSelected }
 				onFocus={ onFocus }
 				onBlur={ onBlur }
-				fontFamily={ ( styles.blockCode.fontFamily ) }
 				placeholderTextColor={ placeholderStyle.color }
 			/>
 		</View>

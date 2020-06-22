@@ -18,12 +18,12 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 					className="edit-post-manage-blocks-modal__checklist-item"
 				>
 					<CheckboxControl
-						label={ (
+						label={
 							<>
 								{ blockType.title }
 								<BlockIcon icon={ blockType.icon } />
 							</>
-						) }
+						}
 						checked={ value.includes( blockType.name ) }
 						onChange={ partial( onItemChange, blockType.name ) }
 					/>

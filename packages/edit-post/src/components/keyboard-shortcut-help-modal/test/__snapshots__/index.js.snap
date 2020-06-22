@@ -1,291 +1,86 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`KeyboardShortcutHelpModal should match snapshot when the modal is active 1`] = `
-<Fragment>
-  <KeyboardShortcuts
-    bindGlobal={true}
+<WithInstanceId(Modal)
+  className="edit-post-keyboard-shortcut-help-modal"
+  closeLabel="Close"
+  onRequestClose={[Function]}
+  title="Keyboard shortcuts"
+>
+  <ShortcutSection
+    className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
     shortcuts={
-      Object {
-        "shift+alt+h": [Function],
-      }
+      Array [
+        "core/edit-post/keyboard-shortcuts",
+      ]
     }
   />
-  <WithInstanceId(Modal)
-    className="edit-post-keyboard-shortcut-help"
-    closeLabel="Close"
-    onRequestClose={[Function]}
-    title="Keyboard Shortcuts"
-  >
-    <ShortcutSection
-      className="edit-post-keyboard-shortcut-help__main-shortcuts"
-      key="0"
-      shortcuts={
-        Array [
-          Object {
-            "description": "Display these keyboard shortcuts.",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "H",
-            ],
+  <ShortcutCategorySection
+    categoryName="global"
+    title="Global shortcuts"
+  />
+  <ShortcutCategorySection
+    categoryName="selection"
+    title="Selection shortcuts"
+  />
+  <ShortcutCategorySection
+    additionalShortcuts={
+      Array [
+        Object {
+          "ariaLabel": "Forward-slash",
+          "description": "Change the block type after adding a new paragraph.",
+          "keyCombination": Object {
+            "character": "/",
           },
-        ]
-      }
-    />
-    <ShortcutSection
-      key="1"
-      shortcuts={
-        Array [
-          Object {
-            "description": "Save your changes.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "S",
-            ],
+        },
+      ]
+    }
+    categoryName="block"
+    title="Block shortcuts"
+  />
+  <ShortcutSection
+    shortcuts={
+      Array [
+        Object {
+          "description": "Make the selected text bold.",
+          "keyCombination": Object {
+            "character": "b",
+            "modifier": "primary",
           },
-          Object {
-            "description": "Undo your last changes.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Z",
-            ],
+        },
+        Object {
+          "description": "Make the selected text italic.",
+          "keyCombination": Object {
+            "character": "i",
+            "modifier": "primary",
           },
-          Object {
-            "description": "Redo your last undo.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              "Z",
-            ],
+        },
+        Object {
+          "description": "Convert the selected text into a link.",
+          "keyCombination": Object {
+            "character": "k",
+            "modifier": "primary",
           },
-          Object {
-            "ariaLabel": "Control + Shift + Comma",
-            "description": "Show or hide the settings sidebar.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              ",",
-            ],
+        },
+        Object {
+          "description": "Remove a link.",
+          "keyCombination": Object {
+            "character": "k",
+            "modifier": "primaryShift",
           },
-          Object {
-            "description": "Open the block navigation menu.",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "O",
-            ],
+        },
+        Object {
+          "description": "Underline the selected text.",
+          "keyCombination": Object {
+            "character": "u",
+            "modifier": "primary",
           },
-          Object {
-            "ariaLabel": "Control + Backtick",
-            "description": "Navigate to the next part of the editor.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "\`",
-            ],
-          },
-          Object {
-            "ariaLabel": "Control + Shift + Backtick",
-            "description": "Navigate to the previous part of the editor.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              "\`",
-            ],
-          },
-          Object {
-            "description": "Navigate to the next part of the editor (alternative).",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "N",
-            ],
-          },
-          Object {
-            "description": "Navigate to the previous part of the editor (alternative).",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "P",
-            ],
-          },
-          Object {
-            "description": "Navigate to the nearest toolbar.",
-            "keyCombination": Array [
-              "Alt",
-              "+",
-              "F10",
-            ],
-          },
-          Object {
-            "description": "Switch between Visual Editor and Code Editor.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "M",
-            ],
-          },
-        ]
-      }
-      title="Global shortcuts"
-    />
-    <ShortcutSection
-      key="2"
-      shortcuts={
-        Array [
-          Object {
-            "description": "Select all text when typing. Press again to select all blocks.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "A",
-            ],
-          },
-          Object {
-            "ariaLabel": "Escape",
-            "description": "Clear selection.",
-            "keyCombination": "Esc",
-          },
-        ]
-      }
-      title="Selection shortcuts"
-    />
-    <ShortcutSection
-      key="3"
-      shortcuts={
-        Array [
-          Object {
-            "description": "Duplicate the selected block(s).",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              "D",
-            ],
-          },
-          Object {
-            "description": "Remove the selected block(s).",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "Z",
-            ],
-          },
-          Object {
-            "description": "Insert a new block before the selected block(s).",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Alt",
-              "+",
-              "T",
-            ],
-          },
-          Object {
-            "description": "Insert a new block after the selected block(s).",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Alt",
-              "+",
-              "Y",
-            ],
-          },
-          Object {
-            "ariaLabel": "Forward-slash",
-            "description": "Change the block type after adding a new paragraph.",
-            "keyCombination": "/",
-          },
-        ]
-      }
-      title="Block shortcuts"
-    />
-    <ShortcutSection
-      key="4"
-      shortcuts={
-        Array [
-          Object {
-            "description": "Make the selected text bold.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "B",
-            ],
-          },
-          Object {
-            "description": "Make the selected text italic.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "I",
-            ],
-          },
-          Object {
-            "description": "Convert the selected text into a link.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "K",
-            ],
-          },
-          Object {
-            "description": "Remove a link.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              "K",
-            ],
-          },
-          Object {
-            "description": "Underline the selected text.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "U",
-            ],
-          },
-        ]
-      }
-      title="Text formatting"
-    />
-  </WithInstanceId(Modal)>
-</Fragment>
+        },
+      ]
+    }
+    title="Text formatting"
+  />
+</WithInstanceId(Modal)>
 `;
 
-exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not active 1`] = `
-<Fragment>
-  <KeyboardShortcuts
-    bindGlobal={true}
-    shortcuts={
-      Object {
-        "shift+alt+h": [Function],
-      }
-    }
-  />
-</Fragment>
-`;
+exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not active 1`] = `""`;

@@ -39,9 +39,7 @@ function createRunHook( hooks, returnFirstArg ) {
 		}
 
 		if ( ! handlers || ! handlers.length ) {
-			return returnFirstArg ?
-				args[ 0 ] :
-				undefined;
+			return returnFirstArg ? args[ 0 ] : undefined;
 		}
 
 		const hookInfo = {

@@ -7,15 +7,17 @@
 	}
 }
 
-// Needs specificity
-.components-icon-button:not(:disabled):not([aria-disabled="true"]).editor-post-last-revision__title {
+.components-button.editor-post-last-revision__title {
+	height: 100%;
 
 	&:hover,
 	&:active {
-		@include menu-style__neutral;
+		// Override the default button hover style
+		background: $light-gray-200;
 	}
 
 	&:focus {
-		@include menu-style__focus;
+		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		border-radius: 0;
 	}
 }

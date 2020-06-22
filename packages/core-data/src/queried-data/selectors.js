@@ -39,10 +39,10 @@ function getQueriedItemsUncached( state, query ) {
 	}
 
 	const startOffset = perPage === -1 ? 0 : ( page - 1 ) * perPage;
-	const endOffset = perPage === -1 ? itemIds.length : Math.min(
-		startOffset + perPage,
-		itemIds.length
-	);
+	const endOffset =
+		perPage === -1
+			? itemIds.length
+			: Math.min( startOffset + perPage, itemIds.length );
 
 	const items = [];
 	for ( let i = startOffset; i < endOffset; i++ ) {

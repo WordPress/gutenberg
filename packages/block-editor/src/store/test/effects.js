@@ -39,7 +39,7 @@ describe( 'effects', () => {
 			content: {},
 		},
 		save: () => 'Saved',
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
@@ -70,7 +70,10 @@ describe( 'effects', () => {
 
 			const dispatch = jest.fn();
 			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
+				dispatch,
+				getState,
+			} );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
@@ -83,11 +86,14 @@ describe( 'effects', () => {
 				},
 				merge( attributes, attributesToMerge ) {
 					return {
-						content: attributes.content + ' ' + attributesToMerge.content,
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
 					};
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const blockA = deepFreeze( {
@@ -113,26 +119,34 @@ describe( 'effects', () => {
 					offset: 0,
 				},
 			} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
+				dispatch,
+				getState,
+			} );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( selectionChange(
-				blockA.clientId,
-				'content',
-				'chicken'.length + 1,
-				'chicken'.length + 1,
-			) );
+			expect( dispatch ).toHaveBeenCalledWith(
+				selectionChange(
+					blockA.clientId,
+					'content',
+					'chicken'.length + 1,
+					'chicken'.length + 1
+				)
+			);
 			const lastCall = dispatch.mock.calls[ 1 ];
 			expect( lastCall ).toHaveLength( 1 );
 			const [ lastCallArgument ] = lastCall;
-			const expectedGenerator = replaceBlocks( [ 'chicken', 'ribs' ], [ {
-				clientId: 'chicken',
-				name: 'core/test-block',
-				attributes: { content: 'chicken ribs' },
-			} ] );
-			expect(
-				Array.from( lastCallArgument )
-			).toEqual(
+			const expectedGenerator = replaceBlocks(
+				[ 'chicken', 'ribs' ],
+				[
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: { content: 'chicken ribs' },
+					},
+				]
+			);
+			expect( Array.from( lastCallArgument ) ).toEqual(
 				Array.from( expectedGenerator )
 			);
 		} );
@@ -144,11 +158,14 @@ describe( 'effects', () => {
 				},
 				merge( attributes, attributesToMerge ) {
 					return {
-						content: attributes.content + ' ' + attributesToMerge.content,
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
 					};
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block-2', defaultBlockSettings );
@@ -175,7 +192,10 @@ describe( 'effects', () => {
 					offset: 0,
 				},
 			} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
+				dispatch,
+				getState,
+			} );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -189,11 +209,14 @@ describe( 'effects', () => {
 				},
 				merge( attributes, attributesToMerge ) {
 					return {
-						content: attributes.content + ' ' + attributesToMerge.content,
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
 					};
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block-2', {
@@ -203,18 +226,20 @@ describe( 'effects', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/test-block' ],
-						transform: ( { content2 } ) => {
-							return createBlock( 'core/test-block', {
-								content: content2,
-							} );
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/test-block' ],
+							transform: ( { content2 } ) => {
+								return createBlock( 'core/test-block', {
+									content: content2,
+								} );
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block 2',
 			} );
 			const blockA = deepFreeze( {
@@ -240,26 +265,34 @@ describe( 'effects', () => {
 					offset: 0,
 				},
 			} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
+				dispatch,
+				getState,
+			} );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( selectionChange(
-				blockA.clientId,
-				'content',
-				'chicken'.length + 1,
-				'chicken'.length + 1,
-			) );
-			const expectedGenerator = replaceBlocks( [ 'chicken', 'ribs' ], [ {
-				clientId: 'chicken',
-				name: 'core/test-block',
-				attributes: { content: 'chicken ribs' },
-			} ] );
+			expect( dispatch ).toHaveBeenCalledWith(
+				selectionChange(
+					blockA.clientId,
+					'content',
+					'chicken'.length + 1,
+					'chicken'.length + 1
+				)
+			);
+			const expectedGenerator = replaceBlocks(
+				[ 'chicken', 'ribs' ],
+				[
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: { content: 'chicken ribs' },
+					},
+				]
+			);
 			const lastCall = dispatch.mock.calls[ 1 ];
 			expect( lastCall ).toHaveLength( 1 );
 			const [ lastCallArgument ] = lastCall;
-			expect(
-				Array.from( lastCallArgument )
-			).toEqual(
+			expect( Array.from( lastCallArgument ) ).toEqual(
 				Array.from( expectedGenerator )
 			);
 		} );
@@ -285,53 +318,57 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should return undefined if no template assigned', () => {
-			const result = validateBlocksToTemplate( resetBlocks( [
-				createBlock( 'core/test-block' ),
-			] ), store );
+			const result = validateBlocksToTemplate(
+				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
+				store
+			);
 
 			expect( result ).toBe( undefined );
 		} );
 
 		it( 'should return undefined if invalid but unlocked', () => {
-			store.dispatch( updateSettings( {
-				template: [
-					[ 'core/foo', {} ],
-				],
-			} ) );
+			store.dispatch(
+				updateSettings( {
+					template: [ [ 'core/foo', {} ] ],
+				} )
+			);
 
-			const result = validateBlocksToTemplate( resetBlocks( [
-				createBlock( 'core/test-block' ),
-			] ), store );
+			const result = validateBlocksToTemplate(
+				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
+				store
+			);
 
 			expect( result ).toBe( undefined );
 		} );
 
 		it( 'should return undefined if locked and valid', () => {
-			store.dispatch( updateSettings( {
-				template: [
-					[ 'core/test-block' ],
-				],
-				templateLock: 'all',
-			} ) );
+			store.dispatch(
+				updateSettings( {
+					template: [ [ 'core/test-block' ] ],
+					templateLock: 'all',
+				} )
+			);
 
-			const result = validateBlocksToTemplate( resetBlocks( [
-				createBlock( 'core/test-block' ),
-			] ), store );
+			const result = validateBlocksToTemplate(
+				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
+				store
+			);
 
 			expect( result ).toBe( undefined );
 		} );
 
 		it( 'should return validity set action if invalid on default state', () => {
-			store.dispatch( updateSettings( {
-				template: [
-					[ 'core/foo' ],
-				],
-				templateLock: 'all',
-			} ) );
+			store.dispatch(
+				updateSettings( {
+					template: [ [ 'core/foo' ] ],
+					templateLock: 'all',
+				} )
+			);
 
-			const result = validateBlocksToTemplate( resetBlocks( [
-				createBlock( 'core/test-block' ),
-			] ), store );
+			const result = validateBlocksToTemplate(
+				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
+				store
+			);
 
 			expect( result ).toEqual( setTemplateValidity( false ) );
 		} );

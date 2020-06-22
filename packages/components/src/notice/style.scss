@@ -31,15 +31,15 @@
 
 .components-notice__content {
 	flex-grow: 1;
-	margin: $grid-size-small #{ $icon-button-size-small + $border-width } $grid-size-small 0;
+	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
 }
 
 .components-notice__action.components-button {
 	&,
 	&.is-link {
-		margin-left: 4px;
+		margin-left: $grid-unit-15;
 	}
-	&.is-default {
+	&.is-secondary {
 		vertical-align: initial;
 	}
 }
@@ -51,14 +51,14 @@
 	align-self: flex-start;
 	flex-shrink: 0;
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
 		color: $dark-gray-900;
 		background-color: transparent;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 		box-shadow: none;
 	}
 }
@@ -70,14 +70,14 @@
 	z-index: z-index(".components-notice-list");
 
 	.components-notice__content {
-		margin-top: $grid-size + $grid-size-small;
-		margin-bottom: $grid-size + $grid-size-small;
-		line-height: 1.6;
+		margin-top: $grid-unit-15;
+		margin-bottom: $grid-unit-15;
+		line-height: 2;
 	}
 
-	// Reduce margins on inline buttons so that they don't add too much extra line-height.
 	.components-notice__action.components-button {
-		margin-top: -2px;
-		margin-bottom: -2px;
+		display: block;
+		margin-left: 0;
+		margin-top: $grid-unit-10;
 	}
 }

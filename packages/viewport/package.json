@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "2.8.0",
+	"version": "2.19.0",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"viewport"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/viewport/README.md",
@@ -21,7 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.9.2",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"lodash": "^4.17.15"

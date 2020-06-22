@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/deprecated",
-	"version": "2.6.0",
+	"version": "2.8.0",
 	"description": "Deprecation utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"deprecated"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/deprecated/README.md",
@@ -20,8 +21,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.9.2",
 		"@wordpress/hooks": "file:../hooks"
 	},
 	"publishConfig": {

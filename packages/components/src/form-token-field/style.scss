@@ -1,24 +1,17 @@
 .components-form-token-field__input-container {
+	@include input-control();
 	display: flex;
 	flex-wrap: wrap;
 	align-items: flex-start;
 	width: 100%;
-	margin: 0 0 $grid-size 0;
-	padding: $grid-size-small;
-	background-color: $white;
-	border: $border-width solid $light-gray-700;
-	color: $dark-gray-700;
+	margin: 0 0 $grid-unit-10 0;
+	padding: $grid-unit-05;
 	cursor: text;
 
-	@include input-style__neutral();
 
 	&.is-disabled {
 		background: $light-gray-500;
 		border-color: $light-gray-700;
-	}
-
-	&.is-active {
-		@include input-style__focus();
 	}
 
 	// Token input
@@ -26,7 +19,7 @@
 		display: inline-block;
 		width: 100%;
 		max-width: 100%;
-		margin: 2px 0 2px 8px;
+		margin-left: 4px;
 		padding: 0;
 		min-height: 24px;
 		background: inherit;
@@ -47,7 +40,7 @@
 
 .components-form-token-field__label {
 	display: inline-block;
-	margin-bottom: $grid-size-small;
+	margin-bottom: $grid-unit-05;
 }
 
 .components-form-token-field__help {
@@ -89,7 +82,7 @@
 
 		.components-form-token-field__token-text {
 			background: transparent;
-			color: theme(secondary);
+			color: var(--wp-admin-theme-color);
 		}
 
 		.components-form-token-field__remove-token {
@@ -129,9 +122,10 @@
 }
 
 .components-form-token-field__token-text,
-.components-form-token-field__remove-token.components-icon-button {
+.components-form-token-field__remove-token.components-button {
 	display: inline-block;
 	line-height: 24px;
+	height: auto;
 	background: $light-gray-500;
 	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 	@include reduce-motion;
@@ -145,7 +139,7 @@
 	text-overflow: ellipsis;
 }
 
-.components-form-token-field__remove-token.components-icon-button {
+.components-form-token-field__remove-token.components-button {
 	cursor: pointer;
 	border-radius: 0 12px 12px 0;
 	padding: 0 2px;
@@ -168,7 +162,7 @@
 	@include reduce-motion("transition");
 	list-style: none;
 	border-top: $border-width solid $dark-gray-300;
-	margin: $grid-size-small (-$grid-size-small) (-$grid-size-small);
+	margin: $grid-unit-05 (-$grid-unit-05) (-$grid-unit-05);
 	padding-top: 3px;
 }
 

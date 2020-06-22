@@ -1,0 +1,10 @@
+{
+	"name": "core/post-comments-form",
+	"category": "design",
+	"usesContext": [
+		"postId"
+	],
+	"supports": {
+		"html": false
+	}
+}

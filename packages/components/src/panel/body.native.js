@@ -1,27 +1,24 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { Component } from '@wordpress/element';
+import styles from './body.scss';
+import BottomSeparatorCover from './bottom-separator-cover';
 
-export class PanelBody extends Component {
-	constructor( ) {
-		super( ...arguments );
-		this.state = {};
-	}
-
-	render() {
-		const { children } = this.props;
-		return (
-			<View >
-				{ children }
-			</View>
-		);
-	}
+export function PanelBody( { children, title, style = {} } ) {
+	return (
+		<View style={ [ styles.panelContainer, style ] }>
+			{ title && (
+				<Text style={ styles.sectionHeaderText }>{ title }</Text>
+			) }
+			{ children }
+			<BottomSeparatorCover />
+		</View>
+	);
 }
 
 export default PanelBody;

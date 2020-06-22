@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/autop",
-	"version": "2.5.0",
+	"version": "2.8.0",
 	"description": "WordPress's automatic paragraph functions `autop` and `removep`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"autop"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/autop/README.md",
@@ -20,8 +21,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.4.4"
+		"@babel/runtime": "^7.9.2"
 	},
 	"publishConfig": {
 		"access": "public"

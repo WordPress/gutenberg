@@ -1,12 +1,23 @@
 {
 	"name": "core/group",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
-		"backgroundColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"anchor": true,
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
 		}
 	}
 }

@@ -8,6 +8,8 @@ import { default as tinycolor, mostReadable } from 'tinycolor2';
  * WordPress dependencies
  */
 import { Component, isValidElement } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -50,8 +52,10 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
 	const blockType = getBlockType( defaultBlockName );
 
-	return every( blockType.attributes, ( value, key ) =>
-		newDefaultBlock.attributes[ key ] === block.attributes[ key ]
+	return every(
+		blockType.attributes,
+		( value, key ) =>
+			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
 }
 
@@ -64,11 +68,12 @@ export function isUnmodifiedDefaultBlock( block ) {
  */
 
 export function isValidIcon( icon ) {
-	return !! icon && (
-		isString( icon ) ||
-		isValidElement( icon ) ||
-		isFunction( icon ) ||
-		icon instanceof Component
+	return (
+		!! icon &&
+		( isString( icon ) ||
+			isValidElement( icon ) ||
+			isFunction( icon ) ||
+			icon instanceof Component )
 	);
 }
 
@@ -93,11 +98,13 @@ export function normalizeIconObject( icon ) {
 
 		return {
 			...icon,
-			foreground: icon.foreground ? icon.foreground : mostReadable(
-				tinyBgColor,
-				ICON_COLORS,
-				{ includeFallbackColors: true, level: 'AA', size: 'large' }
-			).toHexString(),
+			foreground: icon.foreground
+				? icon.foreground
+				: mostReadable( tinyBgColor, ICON_COLORS, {
+						includeFallbackColors: true,
+						level: 'AA',
+						size: 'large',
+				  } ).toHexString(),
 			shadowColor: tinyBgColor.setAlpha( 0.3 ).toRgbString(),
 		};
 	}
@@ -120,4 +127,108 @@ export function normalizeBlockType( blockTypeOrName ) {
 	}
 
 	return blockTypeOrName;
+}
+
+/**
+ * Get the label for the block, usually this is either the block title,
+ * or the value of the block's `label` function when that's specified.
+ *
+ * @param {Object} blockType  The block type.
+ * @param {Object} attributes The values of the block's attributes.
+ * @param {Object} context    The intended use for the label.
+ *
+ * @return {string} The block label.
+ */
+export function getBlockLabel( blockType, attributes, context = 'visual' ) {
+	const { __experimentalLabel: getLabel, title } = blockType;
+
+	const label = getLabel && getLabel( attributes, { context } );
+
+	if ( ! label ) {
+		return title;
+	}
+
+	// Strip any HTML (i.e. RichText formatting) before returning.
+	return stripHTML( label );
+}
+
+/**
+ * Get a label for the block for use by screenreaders, this is more descriptive
+ * than the visual label and includes the block title and the value of the
+ * `getLabel` function if it's specified.
+ *
+ * @param {Object}  blockType              The block type.
+ * @param {Object}  attributes             The values of the block's attributes.
+ * @param {?number} position               The position of the block in the block list.
+ * @param {string}  [direction='vertical'] The direction of the block layout.
+ *
+ * @return {string} The block label.
+ */
+export function getAccessibleBlockLabel(
+	blockType,
+	attributes,
+	position,
+	direction = 'vertical'
+) {
+	// `title` is already localized, `label` is a user-supplied value.
+	const { title } = blockType;
+	const label = getBlockLabel( blockType, attributes, 'accessibility' );
+	const hasPosition = position !== undefined;
+
+	// getBlockLabel returns the block title as a fallback when there's no label,
+	// if it did return the title, this function needs to avoid adding the
+	// title twice within the accessible label. Use this `hasLabel` boolean to
+	// handle that.
+	const hasLabel = label && label !== title;
+
+	if ( hasPosition && direction === 'vertical' ) {
+		if ( hasLabel ) {
+			return sprintf(
+				/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The block label.. */
+				__( '%1$s Block. Row %2$d. %3$s' ),
+				title,
+				position,
+				label
+			);
+		}
+
+		return sprintf(
+			/* translators: accessibility text. 1: The block title. 2: The block row number. */
+			__( '%1$s Block. Row %2$d' ),
+			title,
+			position
+		);
+	} else if ( hasPosition && direction === 'horizontal' ) {
+		if ( hasLabel ) {
+			return sprintf(
+				/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The block label.. */
+				__( '%1$s Block. Column %2$d. %3$s' ),
+				title,
+				position,
+				label
+			);
+		}
+
+		return sprintf(
+			/* translators: accessibility text. 1: The block title. 2: The block column number. */
+			__( '%1$s Block. Column %2$d' ),
+			title,
+			position
+		);
+	}
+
+	if ( hasLabel ) {
+		return sprintf(
+			/* translators: accessibility text. %1: The block title. %2: The block label. */
+			__( '%1$s Block. %2$s' ),
+			title,
+			label
+		);
+	}
+
+	return sprintf(
+		/* translators: accessibility text. %s: The block title. */
+		__( '%s Block' ),
+		title
+	);
 }

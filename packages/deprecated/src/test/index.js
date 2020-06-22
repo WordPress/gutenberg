@@ -18,9 +18,7 @@ describe( 'deprecated', () => {
 	it( 'should show a deprecation warning', () => {
 		deprecated( 'Eating meat' );
 
-		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated.'
-		);
+		expect( console ).toHaveWarnedWith( 'Eating meat is deprecated.' );
 	} );
 
 	it( 'should show a deprecation warning with a version', () => {
@@ -32,7 +30,10 @@ describe( 'deprecated', () => {
 	} );
 
 	it( 'should show a deprecation warning with an alternative', () => {
-		deprecated( 'Eating meat', { version: '2020.01.01', alternative: 'vegetables' } );
+		deprecated( 'Eating meat', {
+			version: '2020.01.01',
+			alternative: 'vegetables',
+		} );
 
 		expect( console ).toHaveWarnedWith(
 			'Eating meat is deprecated and will be removed in version 2020.01.01. Please use vegetables instead.'

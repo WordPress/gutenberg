@@ -16,13 +16,14 @@ export default compose(
 
 		return {
 			block,
-			shouldRender: ( block && block.name === 'core/html' ),
+			shouldRender: block && block.name === 'core/html',
 		};
 	} ),
 	withDispatch( ( dispatch, { block } ) => ( {
-		onClick: () => dispatch( 'core/block-editor' ).replaceBlocks(
-			block.clientId,
-			rawHandler( { HTML: getBlockContent( block ) } ),
-		),
-	} ) ),
+		onClick: () =>
+			dispatch( 'core/block-editor' ).replaceBlocks(
+				block.clientId,
+				rawHandler( { HTML: getBlockContent( block ) } )
+			),
+	} ) )
 )( BlockConvertButton );

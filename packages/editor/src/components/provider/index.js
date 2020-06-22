@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick, defaultTo, differenceBy, isEqual, noop } from 'lodash';
+import { map, pick, defaultTo } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -12,11 +12,14 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider } from '@wordpress/core-data';
-import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
+import {
+	BlockEditorProvider,
+	BlockContextProvider,
+	__unstableEditorStyles as EditorStyles,
+} from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
-import { unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -25,13 +28,24 @@ import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
-import InserterMenuDownloadableBlocksPanel from '../inserter-menu-downloadable-blocks-panel';
 
-const fetchLinkSuggestions = async ( search ) => {
+/**
+ * Fetches link suggestions from the API. This function is an exact copy of a function found at:
+ *
+ * wordpress/editor/src/components/provider/index.js
+ *
+ * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
+ * Until we refactor it, just copying the code is the simplest solution.
+ *
+ * @param {Object} search
+ * @param {number} perPage
+ * @return {Promise<Object[]>} List of suggestions
+ */
+const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
 	const posts = await apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
-			per_page: 20,
+			per_page: perPage,
 			type: 'post',
 		} ),
 	} );
@@ -40,10 +54,9 @@ const fetchLinkSuggestions = async ( search ) => {
 		id: post.id,
 		url: post.url,
 		title: decodeEntities( post.title ) || __( '(no title)' ),
+		type: post.subtype || post.type,
 	} ) );
 };
-
-const UNINSTALL_ERROR_NOTICE_ID = 'block-uninstall-error';
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -53,17 +66,27 @@ class EditorProvider extends Component {
 			maxSize: 1,
 		} );
 
+		this.getDefaultBlockContext = memize( this.getDefaultBlockContext, {
+			maxSize: 1,
+		} );
+
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( props.recovery ) {
 			return;
 		}
 
 		props.updatePostLock( props.settings.postLock );
-		props.setupEditor( props.post, props.initialEdits, props.settings.template );
+		props.setupEditor(
+			props.post,
+			props.initialEdits,
+			props.settings.template
+		);
 
 		if ( props.settings.autosave ) {
 			props.createWarningNotice(
-				__( 'There is an autosave of this post that is more recent than the version below.' ),
+				__(
+					'There is an autosave of this post that is more recent than the version below.'
+				),
 				{
 					id: 'autosave-exists',
 					actions: [
@@ -80,80 +103,73 @@ class EditorProvider extends Component {
 	getBlockEditorSettings(
 		settings,
 		reusableBlocks,
+		__experimentalFetchReusableBlocks,
 		hasUploadPermissions,
-		canUserUseUnfilteredHTML
+		canUserUseUnfilteredHTML,
+		undo,
+		shouldInsertAtTheTop
 	) {
 		return {
 			...pick( settings, [
+				'__experimentalBlockDirectory',
+				'__experimentalBlockPatterns',
+				'__experimentalBlockPatternCategories',
+				'__experimentalDisableCustomUnits',
+				'__experimentalDisableCustomLineHeight',
+				'__experimentalEnableCustomSpacing',
+				'__experimentalEnableLegacyWidgetBlock',
+				'__experimentalEnableLinkColor',
+				'__experimentalEnableFullSiteEditing',
+				'__experimentalEnableFullSiteEditingDemo',
+				'__experimentalFeatures',
+				'__experimentalGlobalStylesUserEntityId',
+				'__experimentalGlobalStylesBase',
+				'__experimentalPreferredStyleVariations',
 				'alignWide',
 				'allowedBlockTypes',
-				'__experimentalPreferredStyleVariations',
 				'availableLegacyWidgets',
 				'bodyPlaceholder',
 				'codeEditingEnabled',
 				'colors',
 				'disableCustomColors',
 				'disableCustomFontSizes',
+				'disableCustomGradients',
 				'focusMode',
 				'fontSizes',
+				'gradients',
 				'hasFixedToolbar',
 				'hasPermissionsToManageWidgets',
 				'imageSizes',
+				'imageDimensions',
 				'isRTL',
 				'maxWidth',
+				'onUpdateDefaultBlockStyles',
 				'styles',
 				'template',
 				'templateLock',
 				'titlePlaceholder',
-				'onUpdateDefaultBlockStyles',
-				'__experimentalEnableLegacyWidgetBlock',
-				'__experimentalEnableMenuBlock',
-				'__experimentalBlockDirectory',
-				'showInserterHelpPanel',
 			] ),
+			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
+			__experimentalFetchReusableBlocks,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
+			__experimentalUndo: undo,
+			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 		};
+	}
+
+	getDefaultBlockContext( postId, postType ) {
+		return { postId, postType };
 	}
 
 	componentDidMount() {
 		this.props.updateEditorSettings( this.props.settings );
-
-		if ( ! this.props.settings.styles ) {
-			return;
-		}
-
-		const updatedStyles = transformStyles( this.props.settings.styles, '.editor-styles-wrapper' );
-
-		map( updatedStyles, ( updatedCSS ) => {
-			if ( updatedCSS ) {
-				const node = document.createElement( 'style' );
-				node.innerHTML = updatedCSS;
-				document.body.appendChild( node );
-			}
-		} );
 	}
 
 	componentDidUpdate( prevProps ) {
 		if ( this.props.settings !== prevProps.settings ) {
 			this.props.updateEditorSettings( this.props.settings );
-		}
-
-		// When a block is installed from the inserter and is unused,
-		// it is removed when saving the post.
-		// Todo: move this to the edit-post package into a separate component.
-		if ( ! isEqual( this.props.downloadableBlocksToUninstall, prevProps.downloadableBlocksToUninstall ) ) {
-			this.props.downloadableBlocksToUninstall.forEach( ( blockType ) => {
-				this.props.uninstallBlock( blockType, noop, () => {
-					this.props.createWarningNotice(
-						__( 'Block previews can\'t uninstall.' ), {
-							id: UNINSTALL_ERROR_NOTICE_ID,
-						} );
-				} );
-				unregisterBlockType( blockType.name );
-			} );
 		}
 	}
 
@@ -168,11 +184,16 @@ class EditorProvider extends Component {
 			post,
 			blocks,
 			resetEditorBlocks,
+			selectionStart,
+			selectionEnd,
 			isReady,
 			settings,
 			reusableBlocks,
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
+			isPostTitleSelected,
+			__experimentalFetchReusableBlocks,
+			undo,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -182,25 +203,45 @@ class EditorProvider extends Component {
 		const editorSettings = this.getBlockEditorSettings(
 			settings,
 			reusableBlocks,
+			__experimentalFetchReusableBlocks,
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML,
+			undo,
+			isPostTitleSelected
+		);
+
+		const defaultBlockContext = this.getDefaultBlockContext(
+			post.id,
+			post.type
 		);
 
 		return (
-			<EntityProvider kind="postType" type={ post.type } id={ post.id }>
-				<BlockEditorProvider
-					value={ blocks }
-					onInput={ resetEditorBlocksWithoutUndoLevel }
-					onChange={ resetEditorBlocks }
-					settings={ editorSettings }
-					useSubRegistry={ false }
-				>
-					{ children }
-					<ReusableBlocksButtons />
-					<ConvertToGroupButtons />
-					{ editorSettings.__experimentalBlockDirectory && <InserterMenuDownloadableBlocksPanel /> }
-				</BlockEditorProvider>
-			</EntityProvider>
+			<>
+				<EditorStyles styles={ settings.styles } />
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ post.type }
+						id={ post.id }
+					>
+						<BlockContextProvider value={ defaultBlockContext }>
+							<BlockEditorProvider
+								value={ blocks }
+								onInput={ resetEditorBlocksWithoutUndoLevel }
+								onChange={ resetEditorBlocks }
+								selectionStart={ selectionStart }
+								selectionEnd={ selectionEnd }
+								settings={ editorSettings }
+								useSubRegistry={ false }
+							>
+								{ children }
+								<ReusableBlocksButtons />
+								<ConvertToGroupButtons />
+							</BlockEditorProvider>
+						</BlockContextProvider>
+					</EntityProvider>
+				</EntityProvider>
+			</>
 		);
 	}
 }
@@ -212,21 +253,26 @@ export default compose( [
 			canUserUseUnfilteredHTML,
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
+			getEditorSelectionStart,
+			getEditorSelectionEnd,
 			__experimentalGetReusableBlocks,
+			isPostTitleSelected,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
-		const { getInstalledBlockTypes } = select( 'core/block-directory' );
-		const { getBlocks } = select( 'core/block-editor' );
-
-		const downloadableBlocksToUninstall = differenceBy( getInstalledBlockTypes(), getBlocks(), 'name' );
 
 		return {
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
+			selectionStart: getEditorSelectionStart(),
+			selectionEnd: getEditorSelectionEnd(),
 			reusableBlocks: __experimentalGetReusableBlocks(),
-			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
-			downloadableBlocksToUninstall,
+			hasUploadPermissions: defaultTo(
+				canUser( 'create', 'media' ),
+				true
+			),
+			// This selector is only defined on mobile.
+			isPostTitleSelected: isPostTitleSelected && isPostTitleSelected(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -235,10 +281,11 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			updateEditorSettings,
+			__experimentalFetchReusableBlocks,
 			__experimentalTearDownEditor,
+			undo,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
-		const { uninstallBlock } = dispatch( 'core/block-directory' );
 
 		return {
 			setupEditor,
@@ -246,13 +293,15 @@ export default compose( [
 			createWarningNotice,
 			resetEditorBlocks,
 			updateEditorSettings,
-			resetEditorBlocksWithoutUndoLevel( blocks ) {
+			resetEditorBlocksWithoutUndoLevel( blocks, options ) {
 				resetEditorBlocks( blocks, {
+					...options,
 					__unstableShouldCreateUndoLevel: false,
 				} );
 			},
 			tearDownEditor: __experimentalTearDownEditor,
-			uninstallBlock,
+			__experimentalFetchReusableBlocks,
+			undo,
 		};
 	} ),
 ] )( EditorProvider );

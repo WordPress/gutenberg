@@ -61,6 +61,10 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* A list of autocompleters to use instead of the default.
 
+### `preserveWhiteSpace: Boolean`
+
+*Optional.* Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space. If turned on, soft line breaks will be saved as newline characters, not as line break elements.
+
 ## RichText.Content
 
 `RichText.Content` should be used in the `save` function of your block to correctly save rich text content.

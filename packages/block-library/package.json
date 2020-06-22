@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.9.0",
+	"version": "2.20.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"blocks"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-library/README.md",
@@ -20,8 +21,11 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**"
+	],
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.9.2",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -34,11 +38,16 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
+		"@wordpress/escape-html": "file:../escape-html",
+		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
@@ -46,10 +55,10 @@
 		"classnames": "^2.2.5",
 		"fast-average-color": "4.3.0",
 		"lodash": "^4.17.15",
-		"memize": "^1.0.5",
+		"memize": "^1.1.0",
 		"moment": "^2.22.1",
-		"tinycolor2": "^1.4.1",
-		"url": "^0.11.0"
+		"react-easy-crop": "^3.0.0",
+		"tinycolor2": "^1.4.1"
 	},
 	"publishConfig": {
 		"access": "public"

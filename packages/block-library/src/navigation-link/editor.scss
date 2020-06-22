@@ -1,0 +1,58 @@
+// Normalize Link and edit containers, to look mostly the same.
+.wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
+.wp-block-navigation-link__container {
+	border-radius: 0;
+	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
+	line-height: $button-size;
+	min-height: $button-size;
+}
+
+/**
+ * Adjust Navigation Item.
+ */
+.wp-block-navigation-link {
+	.block-editor-block-list__layout {
+		display: block;
+	}
+
+	&.is-editing,
+	&.is-selected {
+		min-width: 20px;
+	}
+
+	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus)[data-rich-text-placeholder]::after {
+		display: inline-block;
+	}
+
+	.block-list-appender {
+		margin: $grid-unit-10 * 2;
+		margin-left: $grid-unit-10 * 1.25;
+		margin-top: $grid-unit-10 * 1.25;
+	}
+}
+
+.wp-block-navigation-link__nofollow-external-link {
+	display: block;
+}
+
+// Separator
+.wp-block-navigation-link__separator {
+	margin: $grid-unit-10 0 $grid-unit-10;
+	border-top: $border-width solid $light-gray-500;
+}
+
+// Popover styles
+.components-popover.wp-block-navigation-link__dropdown-content {
+	margin-top: -1px;
+	margin-left: -4px;
+}
+
+.wp-block-navigation-link__dropdown-content .components-popover__content > div {
+	padding: $grid-unit-10 0;
+}
+
+.wp-block-navigation .block-editor-block-list__block[data-type="core/navigation-link"] {
+	& > .block-editor-block-list__insertion-point {
+		display: none;
+	}
+}

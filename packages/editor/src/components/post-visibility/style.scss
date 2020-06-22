@@ -1,6 +1,6 @@
 .edit-post-post-visibility__dialog,
 .editor-post-visibility__dialog-fieldset {
-	padding: $grid-size-small;
+	padding: $grid-unit-05;
 	padding-top: 0;
 
 	.editor-post-visibility__dialog-legend {
@@ -10,7 +10,8 @@
 		padding: 0;
 	}
 
-	.editor-post-visibility__dialog-radio {
+	.editor-post-visibility__dialog-radio[type="radio"] {
+		@include radio-control;
 		margin-top: 2px;
 	}
 
@@ -28,7 +29,8 @@
 		margin-bottom: 0;
 	}
 
-	.editor-post-visibility__dialog-password-input {
+	.editor-post-visibility__dialog-password-input[type="text"] {
+		@include input-control;
 		margin-left: 28px;
 	}
 }

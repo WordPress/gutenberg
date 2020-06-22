@@ -6,6 +6,12 @@
 	background-color: $gray-lighten-30;
 }
 
+.imageBorder {
+	border-color: $blue-medium;
+	border-width: 2px;
+	border-style: solid;
+}
+
 .uploadFailedText {
 	color: #fff;
 	font-size: 14;
@@ -18,13 +24,16 @@
 	align-items: center;
 }
 
-.clearSettingsButton {
-	color: $alert-red;
-}
-
 .modalIcon {
 	width: 80px;
 	height: 80px;
+	justify-content: center;
+	align-items: center;
+}
+
+.imageUploadingIconContainer {
+	width: 40px;
+	height: 40px;
 	justify-content: center;
 	align-items: center;
 }
@@ -35,12 +44,67 @@
 	height: 100%;
 }
 
-.icon {
+.iconPlaceholder {
 	fill: $gray-dark;
 	width: 100%;
 	height: 100%;
 }
 
-.iconDark {
+.iconPlaceholderDark {
 	fill: $white;
+}
+
+.iconUpload {
+	fill: $gray-lighten-20;
+	width: 100%;
+	height: 100%;
+}
+
+.iconUploadDark {
+	fill: $gray-70;
+}
+
+.imageContainerUpload {
+	justify-content: center;
+	align-items: center;
+	background-color: $gray-light;
+}
+
+.imageContainerUploadDark {
+	background-color: $gray-90;
+}
+
+.content {
+	flex: 1;
+}
+
+.contentCentered {
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+}
+
+.editContainer {
+	width: 44px;
+	height: 44px;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.edit {
+	width: 30px;
+	height: 30px;
+	background-color: $gray-dark;
+	border-radius: 22px;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+
+.iconCustomise {
+	fill: #fff;
+	position: absolute;
+	top: 7px;
+	left: 7px;
 }

@@ -10,14 +10,17 @@
 <dt>Block</dt>
 <dd>The abstract term used to describe units of markup that, composed together, form the content or layout of a webpage. The idea combines concepts of what in WordPress today we achieve with shortcodes, custom HTML, and embed discovery into a single consistent API and user experience.</dd>
 
-<dt>Block Categories</dt>
-<dd>These are not a WordPress taxonomy, but instead used internally to sort blocks in the Block Inserter.</dd>
+<dt>Block categories</dt>
+<dd>These are not a WordPress taxonomy, but instead used internally to sort blocks in the Block Library.</dd>
 
-<dt>Block Inserter</dt>
+<dt>Block ~Inserter~ Library</dt>
 <dd>Primary interface for selecting from the available blocks, triggered by plus icon buttons on Blocks or in the top-left of the editor interface.</dd>
 
 <dt>Block name</dt>
 <dd>A unique identifier for a block type, consisting of a plugin-specific namespace and a short label describing the block's intent. e.g. <code>core/image</code></dd>
+
+<dt>Patterns</dt>
+<dd>Patterns are predefined layouts of blocks that can be inserted as starter content that are meant to be changed by the user every time. Once inserted, they exist as a local save and are not global.</dd>
 
 <dt>Block type</dt>
 <dd>In contrast with the blocks composing a particular post, a block type describes the blueprint by which any block of that type should behave. So while there may be many images within a post, each behaves consistent with a unified image block type definition.</dd>
@@ -56,6 +59,9 @@
 <dd>A set of button controls. In the context of a block, usually referring to the toolbar of block controls shown above the selected block.</dd>
 
 <dt>Template</dt>
-<dd> A template is a pre-defined arrangement of blocks, possibly with predefined attributes or placeholder content. You can provide a template for a post type, to give users a starting point when creating a new piece of content, or inside a custom block with the <code>InnerBlocks</code> component. See the templates documentation for more information. See <a href="../../developers/block-api/block-templates.md">templates documentation</a> for more information.</dd>
+<dd> A template is a pre-defined arrangement of blocks, possibly with predefined attributes or placeholder content. You can provide a template for a post type, to give users a starting point when creating a new piece of content, or inside a custom block with the <code>InnerBlocks</code> component. See the <a href="../../developers/block-api/block-templates/">templates documentation</a> for more information.</dd>
+
+<dt>Template part</dt>
+<dd>Template parts are equivalent – in blocks – of theme template parts. They are generally defined by a theme first. They carry some semantic meaning (could be swapped between themes such as a header) and can only be inserted in the site editor context (within “templates”). They are primarily site structure and are never to be mixed with the post content editor. </dd>
 
 </dl>

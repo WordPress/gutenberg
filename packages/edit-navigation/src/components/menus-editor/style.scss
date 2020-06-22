@@ -1,0 +1,56 @@
+.edit-navigation-menus-editor__menu-selection-card {
+	margin-bottom: 10px;
+}
+
+.edit-navigation-menus-editor__menu-selection-card-body {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+
+	.edit-navigation-menus-editor__menu-select-control {
+		margin-right: 0;
+		margin-bottom: 10px;
+		align-self: normal;
+	}
+
+	@include break-large {
+		flex-direction: row;
+		align-items: center;
+
+		.edit-navigation-menus-editor__menu-select-control {
+			align-self: center;
+			margin-right: 1ch;
+			margin-bottom: 0;
+		}
+	}
+}
+
+.edit-navigation-menus-editor__menu-select-control {
+	flex: 1;
+	margin-right: 1ch;
+
+	@include break-small {
+		.components-base-control__field {
+			display: flex;
+			flex-direction: row;
+			align-items: baseline;
+			margin-bottom: 0;
+		}
+		.components-base-control__label {
+			margin-right: 1ch;
+		}
+	}
+}
+
+.edit-navigation-menus-editor__menu-selection-card-instructional-text {
+	margin: 0;
+}
+
+.edit-navigation-menus-editor__create-menu-area {
+	margin-bottom: 10px;
+}
+
+.edit-navigation-menus-editor__cancel-create-menu-button {
+	margin-left: 8px;
+}
+

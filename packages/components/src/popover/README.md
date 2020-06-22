@@ -18,7 +18,7 @@ const MyPopover = withState( {
 		setState( ( state ) => ( { isVisible: ! state.isVisible } ) );
 	};
 	return (
-		<Button isDefault onClick={ toggleVisible }>
+		<Button isSecondary onClick={ toggleVisible }>
 			Toggle Popover!
 			{ isVisible && (
 				<Popover>
@@ -127,9 +127,20 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
 
 ### anchorRect
 
-A custom `DOMRect` object at which to position the popover.
+A custom `DOMRect` object at which to position the popover. `anchorRect` is used when the position (custom `DOMRect` object) of the popover needs to be fixed at one location all the time.
 
 - Type: `DOMRect`
+- Required: No
+
+### getAnchorRect
+
+A callback function which is used to override the anchor value computation algorithm. `anchorRect` will take precedence over this prop, if both are passed together.
+
+If you need the `DOMRect` object i.e., the position of popover to be calculated on every time, the popover re-renders, then use `getAnchorRect`.
+
+`getAnchorRect` callback function receives a reference to the popover anchor element as a function parameter and it should return a `DOMRect` objcet.
+
+- Type: `Function`
 - Required: No
 
 ## Methods

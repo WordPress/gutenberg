@@ -4,19 +4,23 @@ This page covers how to set up your development environment to use the ESNext an
 
 This documentation covers development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop Gutenberg itself, see the [Getting Started](/docs/contributors/getting-started.md) documentation.
 
-Most browsers can not interpret or run ESNext and JSX syntaxes, so we use a transformation step to convert these syntaxes to code that browsers can understand.
+Most browsers cannot interpret or run ESNext and JSX syntaxes, so we use a transformation step to convert these syntaxes to code that browsers can understand.
 
-There are a few reasons to use ESNext and the extra step. First, it makes for simpler code that is easier to read and write. Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers. Also, by using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
+There are a few reasons to use ESNext and this extra step of transformation:
+
+- It makes for simpler code that is easier to read and write. 
+- Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers.
+- By using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
 
 There are different tools that can perform this transformation or build step; WordPress uses webpack and Babel.
 
-[webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript, creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to webpack to transform both ESNext and JSX to JavaScript.
+[webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript and creates a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to webpack to transform both ESNext and JSX to JavaScript.
 
-The [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) package abstracts these libraries away to standardize and simplify development, so you won't need to handle the details for configuring those libraries. See the package documentation for configuration details.
+The [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) package abstracts these libraries away to standardize and simplify development, so you won't need to handle the details for configuring webpack or babel. See the [@wordpress/scripts package documentation](https://developer.wordpress.org/block-editor/packages/packages-scripts/) for configuration details.
 
 ## Quick Start
 
-For a quick start, you can use one of the examples from the [Gutenberg Examples repository](https://github.com/wordpress/gutenberg-examples/). Each one of the `-esnext` directories contain the necessary files for working with ESNext and JSX.
+If you prefer a quick start, you can use one of the examples from the [Gutenberg Examples repository](https://github.com/wordpress/gutenberg-examples/) and skip below. Each one of the `-esnext` directories in the examples repository contain the necessary files for working with ESNext and JSX.
 
 ## Setup
 
@@ -24,7 +28,7 @@ Both webpack and Babel are tools written in JavaScript and run using [Node.js](h
 
 First, you need to set up Node.js for your development environment. The steps required depend on your operating system, if you have a package manager installed, setup can be as straightforward as:
 
-- Ubuntu: `apt install node`
+- Ubuntu: `apt install nodejs npm`
 - macOS: `brew install node`
 - Windows: `choco install node`
 
@@ -65,7 +69,7 @@ About to write to /home/mkaz/src/wp/scratch/package.json:
   "description": "Test block",
   "main": "block.js",
   "scripts": {
-	"test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "mkaz",
   "license": "GPL-2.0-only"
@@ -87,11 +91,11 @@ Also, if you look at package.json file it will include a new section:
 
 ```json
 "devDependencies": {
-  "@wordpress/scripts": "5.0.0"
+  "@wordpress/scripts": "6.0.0"
 }
 ```
 
-## Webpack & Babel
+## Setting Up wp-scripts build
 
 The `@wordpress/scripts` package handles the dependencies and default configuration for webpack and Babel. The scripts package expects the source file to compile to be found at `src/index.js`, and will save the compiled output to `build/index.js`.
 
@@ -103,7 +107,7 @@ import { registerBlockType } from '@wordpress/blocks';
 registerBlockType( 'myguten/test-block', {
 	title: 'Basic Example',
 	icon: 'smiley',
-	category: 'layout',
+	category: 'design',
 	edit: () => <div>Hola, mundo!</div>,
 	save: () => <div>Hola, mundo!</div>,
 } );
@@ -119,13 +123,13 @@ To configure npm to run a script, you use the scripts section in `package.json` 
 
 You can then run the build using: `npm run build`.
 
-After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [Step 2 in this tutorial](loading-javascript.md), and the block will load in the editor.
+After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [loading JavaScript step in this tutorial](/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md), and the block will load in the editor.
 
 ## Finishing Touches
 
 ### Development Mode
 
-The **build** command in `@wordpress/scripts` runs in a "production" mode. This shrinks the code down so it downloads faster, but makes it difficult to read in the process. You can use the **start** command which runs a development mode that does not shrink the code, and additionally continues a running process to watch the source file for more changes and rebuild as you develop.
+The **build** command in `@wordpress/scripts` runs in "production" mode. This shrinks the code down so it downloads faster, but makes it difficult to read in the process. You can use the **start** command which runs in development mode that does not shrink the code, and additionally continues a running process to watch the source file for more changes and rebuilds as you develop.
 
 The start command can be added to the same scripts section of `package.json`:
 
@@ -148,7 +152,7 @@ Likewise, you do not need to include `node_modules` or any of the above configur
 
 ### Dependency Management
 
-Using wp-scripts ver 5.0.0+ build step will also produce a `index.asset.php` file that contains an array of dependencies and version number for your block. For our simple example above is something like:
+Using `wp-scripts` ver 5.0.0+ build step will also produce an `index.asset.php` file that contains an array of dependencies and a version number for your block. For our simple example above, it is something like:
 `array('dependencies' => array('wp-element', 'wp-polyfill'), 'version' => 'fc93c4a9675c108725227db345898bcc');`
 
 Here is how to use this asset file to automatically set the dependency list for enqueuing the script. This prevents having to manually update the dependencies, it will be created based on the package imports used within your block.

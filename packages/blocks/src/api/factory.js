@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import {
 	every,
 	reduce,
@@ -26,7 +26,11 @@ import { createHooks, applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { getBlockType, getBlockTypes, getGroupingBlockName } from './registration';
+import {
+	getBlockType,
+	getBlockTypes,
+	getGroupingBlockName,
+} from './registration';
 import { normalizeBlockType } from './utils';
 
 /**
@@ -44,27 +48,31 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const sanitizedAttributes = reduce( blockType.attributes, ( result, schema, key ) => {
-		const value = attributes[ key ];
+	const sanitizedAttributes = reduce(
+		blockType.attributes,
+		( accumulator, schema, key ) => {
+			const value = attributes[ key ];
 
-		if ( undefined !== value ) {
-			result[ key ] = value;
-		} else if ( schema.hasOwnProperty( 'default' ) ) {
-			result[ key ] = schema.default;
-		}
-
-		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
-			// Ensure value passed is always an array, which we're expecting in
-			// the RichText component to handle the deprecated value.
-			if ( typeof result[ key ] === 'string' ) {
-				result[ key ] = [ result[ key ] ];
-			} else if ( ! Array.isArray( result[ key ] ) ) {
-				result[ key ] = [];
+			if ( undefined !== value ) {
+				accumulator[ key ] = value;
+			} else if ( schema.hasOwnProperty( 'default' ) ) {
+				accumulator[ key ] = schema.default;
 			}
-		}
 
-		return result;
-	}, {} );
+			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
+				// Ensure value passed is always an array, which we're expecting in
+				// the RichText component to handle the deprecated value.
+				if ( typeof accumulator[ key ] === 'string' ) {
+					accumulator[ key ] = [ accumulator[ key ] ];
+				} else if ( ! Array.isArray( accumulator[ key ] ) ) {
+					accumulator[ key ] = [];
+				}
+			}
+
+			return accumulator;
+		},
+		{}
+	);
 
 	const clientId = uuid();
 
@@ -99,7 +107,8 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 			...block.attributes,
 			...mergeAttributes,
 		},
-		innerBlocks: newInnerBlocks ||
+		innerBlocks:
+			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),
 	};
 }
@@ -123,14 +132,20 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// or wildcard transforms are allowed.
 	const isMultiBlock = blocks.length > 1;
 	const firstBlockName = first( blocks ).name;
-	const isValidForMultiBlocks = isWildcardBlockTransform( transform ) || ! isMultiBlock || transform.isMultiBlock;
+	const isValidForMultiBlocks =
+		isWildcardBlockTransform( transform ) ||
+		! isMultiBlock ||
+		transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
 		return false;
 	}
 
 	// Check non-wildcard transforms to ensure that transform is valid
 	// for a block selection of multiple blocks of different types
-	if ( ! isWildcardBlockTransform( transform ) && ! every( blocks, { name: firstBlockName } ) ) {
+	if (
+		! isWildcardBlockTransform( transform ) &&
+		! every( blocks, { name: firstBlockName } )
+	) {
 		return false;
 	}
 
@@ -143,20 +158,29 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// Check if the transform's block name matches the source block (or is a wildcard)
 	// only if this is a transform 'from'.
 	const sourceBlock = first( blocks );
-	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1 || isWildcardBlockTransform( transform );
+	const hasMatchingName =
+		direction !== 'from' ||
+		transform.blocks.indexOf( sourceBlock.name ) !== -1 ||
+		isWildcardBlockTransform( transform );
 	if ( ! hasMatchingName ) {
 		return false;
 	}
 
 	// Don't allow single Grouping blocks to be transformed into
 	// a Grouping block.
-	if ( ! isMultiBlock && isContainerGroupBlock( sourceBlock.name ) && isContainerGroupBlock( transform.blockName ) ) {
+	if (
+		! isMultiBlock &&
+		isContainerGroupBlock( sourceBlock.name ) &&
+		isContainerGroupBlock( transform.blockName )
+	) {
 		return false;
 	}
 
 	// If the transform has a `isMatch` function specified, check that it returns true.
 	if ( isFunction( transform.isMatch ) ) {
-		const attributes = transform.isMultiBlock ? blocks.map( ( block ) => block.attributes ) : sourceBlock.attributes;
+		const attributes = transform.isMultiBlock
+			? blocks.map( ( block ) => block.attributes )
+			: sourceBlock.attributes;
 		if ( ! transform.isMatch( attributes ) ) {
 			return false;
 		}
@@ -186,13 +210,14 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
 		( blockType ) => {
 			const fromTransforms = getBlockTransforms( 'from', blockType.name );
 
-			return !! findTransform(
-				fromTransforms,
-				( transform ) => {
-					return isPossibleTransformForSource( transform, 'from', blocks );
-				}
-			);
-		},
+			return !! findTransform( fromTransforms, ( transform ) => {
+				return isPossibleTransformForSource(
+					transform,
+					'from',
+					blocks
+				);
+			} );
+		}
 	);
 
 	return blockTypesWithPossibleFromTransforms;
@@ -216,12 +241,11 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	const transformsTo = getBlockTransforms( 'to', blockType.name );
 
 	// filter all 'to' transforms to find those that are possible.
-	const possibleTransforms = filter(
-		transformsTo,
-		( transform ) => {
-			return transform && isPossibleTransformForSource( transform, 'to', blocks );
-		}
-	);
+	const possibleTransforms = filter( transformsTo, ( transform ) => {
+		return (
+			transform && isPossibleTransformForSource( transform, 'to', blocks )
+		);
+	} );
 
 	// Build a list of block names using the possible 'to' transforms.
 	const blockNames = flatMap(
@@ -242,7 +266,11 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  *
  * @return {boolean} whether transform is a wildcard transform
  */
-export const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && Array.isArray( t.blocks ) && t.blocks.includes( '*' );
+export const isWildcardBlockTransform = ( t ) =>
+	t &&
+	t.type === 'block' &&
+	Array.isArray( t.blocks ) &&
+	t.blocks.includes( '*' );
 
 /**
  * Determines whether the given Block is the core Block which
@@ -253,24 +281,8 @@ export const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && Arra
  *
  * @return {boolean} whether or not the Block is the container Block type
  */
-export const isContainerGroupBlock = ( name ) => name === getGroupingBlockName();
-
-/**
- * Determines whether the provided Blocks are of the same type
- * (eg: all `core/paragraph`).
- *
- * @param  {Array}  blocksArray the Block definitions
- *
- * @return {boolean} whether or not the given Blocks pass the criteria
- */
-export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
-	if ( ! blocksArray.length ) {
-		return false;
-	}
-	const sourceName = blocksArray[ 0 ].name;
-
-	return every( blocksArray, [ 'name', sourceName ] );
-};
+export const isContainerGroupBlock = ( name ) =>
+	name === getGroupingBlockName();
 
 /**
  * Returns an array of block types that the set of blocks received as argument
@@ -285,8 +297,12 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 
-	const blockTypesForFromTransforms = getBlockTypesForPossibleFromTransforms( blocks );
-	const blockTypesForToTransforms = getBlockTypesForPossibleToTransforms( blocks );
+	const blockTypesForFromTransforms = getBlockTypesForPossibleFromTransforms(
+		blocks
+	);
+	const blockTypesForToTransforms = getBlockTypesForPossibleToTransforms(
+		blocks
+	);
 
 	return uniq( [
 		...blockTypesForFromTransforms,
@@ -317,7 +333,7 @@ export function findTransform( transforms, predicate ) {
 			hooks.addFilter(
 				'transform',
 				'transform/' + i.toString(),
-				( result ) => result ? result : candidate,
+				( result ) => ( result ? result : candidate ),
 				candidate.priority
 			);
 		}
@@ -341,9 +357,8 @@ export function findTransform( transforms, predicate ) {
 export function getBlockTransforms( direction, blockTypeOrName ) {
 	// When retrieving transforms for all block types, recurse into self.
 	if ( blockTypeOrName === undefined ) {
-		return flatMap(
-			getBlockTypes(),
-			( { name } ) => getBlockTransforms( direction, name )
+		return flatMap( getBlockTypes(), ( { name } ) =>
+			getBlockTransforms( direction, name )
 		);
 	}
 
@@ -375,13 +390,6 @@ export function switchToBlockType( blocks, name ) {
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
 
-	// Unless it's a Grouping Block then for multi block selections
-	// check that all Blocks are of the same type otherwise
-	// we can't run a conversion
-	if ( ! isContainerGroupBlock( name ) && isMultiBlock && ! isBlockSelectionOfSameType( blocksArray ) ) {
-		return null;
-	}
-
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
 	const transformationsFrom = getBlockTransforms( 'from', name );
@@ -390,11 +398,19 @@ export function switchToBlockType( blocks, name ) {
 	const transformation =
 		findTransform(
 			transformationsTo,
-			( t ) => t.type === 'block' && ( ( isWildcardBlockTransform( t ) ) || t.blocks.indexOf( name ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) =>
+				t.type === 'block' &&
+				( isWildcardBlockTransform( t ) ||
+					t.blocks.indexOf( name ) !== -1 ) &&
+				( ! isMultiBlock || t.isMultiBlock )
 		) ||
 		findTransform(
 			transformationsFrom,
-			( t ) => t.type === 'block' && ( ( isWildcardBlockTransform( t ) ) || t.blocks.indexOf( sourceName ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) =>
+				t.type === 'block' &&
+				( isWildcardBlockTransform( t ) ||
+					t.blocks.indexOf( sourceName ) !== -1 ) &&
+				( ! isMultiBlock || t.isMultiBlock )
 		);
 
 	// Stop if there is no valid transformation.
@@ -406,17 +422,24 @@ export function switchToBlockType( blocks, name ) {
 
 	if ( transformation.isMultiBlock ) {
 		if ( has( transformation, '__experimentalConvert' ) ) {
-			transformationResults = transformation.__experimentalConvert( blocksArray );
+			transformationResults = transformation.__experimentalConvert(
+				blocksArray
+			);
 		} else {
 			transformationResults = transformation.transform(
 				blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
-				blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks ),
+				blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks )
 			);
 		}
 	} else if ( has( transformation, '__experimentalConvert' ) ) {
-		transformationResults = transformation.__experimentalConvert( firstBlock );
+		transformationResults = transformation.__experimentalConvert(
+			firstBlock
+		);
 	} else {
-		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
+		transformationResults = transformation.transform(
+			firstBlock.attributes,
+			firstBlock.innerBlocks
+		);
 	}
 
 	// Ensure that the transformation function returned an object or an array
@@ -431,11 +454,18 @@ export function switchToBlockType( blocks, name ) {
 
 	// Ensure that every block object returned by the transformation has a
 	// valid block type.
-	if ( transformationResults.some( ( result ) => ! getBlockType( result.name ) ) ) {
+	if (
+		transformationResults.some(
+			( result ) => ! getBlockType( result.name )
+		)
+	) {
 		return null;
 	}
 
-	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.name === name );
+	const firstSwitchedBlock = findIndex(
+		transformationResults,
+		( result ) => result.name === name
+	);
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.
@@ -448,7 +478,10 @@ export function switchToBlockType( blocks, name ) {
 			...result,
 			// The first transformed block whose type matches the "destination"
 			// type gets to keep the existing client ID of the first block.
-			clientId: index === firstSwitchedBlock ? firstBlock.clientId : result.clientId,
+			clientId:
+				index === firstSwitchedBlock
+					? firstBlock.clientId
+					: result.clientId,
 		};
 
 		/**
@@ -459,7 +492,11 @@ export function switchToBlockType( blocks, name ) {
 		 * @param {Object}   transformedBlock The transformed block.
 		 * @param {Object[]} blocks           Original blocks transformed.
 		 */
-		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
+		return applyFilters(
+			'blocks.switchToBlockType.transformedBlock',
+			transformedBlock,
+			blocks
+		);
 	} );
 }
 
@@ -472,7 +509,11 @@ export function switchToBlockType( blocks, name ) {
  * @return {Object} block.
  */
 export const getBlockFromExample = ( name, example ) => {
-	return createBlock( name, example.attributes, map(
-		example.innerBlocks, ( innerBlock ) => getBlockFromExample( innerBlock.name, innerBlock )
-	) );
+	return createBlock(
+		name,
+		example.attributes,
+		map( example.innerBlocks, ( innerBlock ) =>
+			getBlockFromExample( innerBlock.name, innerBlock )
+		)
+	);
 };

@@ -7,49 +7,53 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { NavigableMenu } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import BlockNavigationList from './list';
+import BlockNavigationTree from './tree';
 
-function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, selectBlock } ) {
+function BlockNavigation( {
+	rootBlock,
+	rootBlocks,
+	selectedBlockClientId,
+	selectBlock,
+	__experimentalFeatures,
+} ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
 	}
 
-	const hasHierarchy = (
-		rootBlock && (
-			rootBlock.clientId !== selectedBlockClientId ||
-			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 )
-		)
-	);
+	const hasHierarchy =
+		rootBlock &&
+		( rootBlock.clientId !== selectedBlockClientId ||
+			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 ) );
 
 	return (
-		<NavigableMenu
-			role="presentation"
-			className="editor-block-navigation__container block-editor-block-navigation__container"
-		>
-			<p className="editor-block-navigation__label block-editor-block-navigation__label">{ __( 'Block navigation' ) }</p>
+		<div className="block-editor-block-navigation__container">
+			<p className="block-editor-block-navigation__label">
+				{ __( 'Block navigation' ) }
+			</p>
 			{ hasHierarchy && (
-				<BlockNavigationList
+				<BlockNavigationTree
 					blocks={ [ rootBlock ] }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
+					__experimentalFeatures={ __experimentalFeatures }
 					showNestedBlocks
 				/>
 			) }
 			{ ! hasHierarchy && (
-				<BlockNavigationList
+				<BlockNavigationTree
 					blocks={ rootBlocks }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
+					__experimentalFeatures={ __experimentalFeatures }
 				/>
 			) }
-		</NavigableMenu>
+		</div>
 	);
 }
 
@@ -64,7 +68,11 @@ export default compose(
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			rootBlocks: getBlocks(),
-			rootBlock: selectedBlockClientId ? getBlock( getBlockHierarchyRootClientId( selectedBlockClientId ) ) : null,
+			rootBlock: selectedBlockClientId
+				? getBlock(
+						getBlockHierarchyRootClientId( selectedBlockClientId )
+				  )
+				: null,
 			selectedBlockClientId,
 		};
 	} ),

@@ -6,26 +6,26 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { useViewportMatch, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PostPublishButton } from '@wordpress/editor';
-import { withViewportMatch } from '@wordpress/viewport';
 
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
 	forceIsSaving,
 	hasPublishAction,
 	isBeingScheduled,
-	isLessThanMediumViewport,
 	isPending,
 	isPublished,
 	isPublishSidebarEnabled,
 	isPublishSidebarOpened,
 	isScheduled,
 	togglePublishSidebar,
+	setEntitiesSavedStatesCallback,
 } ) {
 	const IS_TOGGLE = 'toggle';
 	const IS_BUTTON = 'button';
+	const isSmallerThanMediumViewport = useViewportMatch( 'medium', '<' );
 	let component;
 
 	/**
@@ -53,10 +53,10 @@ export function PostPublishButtonOrToggle( {
 	if (
 		isPublished ||
 		( isScheduled && isBeingScheduled ) ||
-		( isPending && ! hasPublishAction && ! isLessThanMediumViewport )
+		( isPending && ! hasPublishAction && ! isSmallerThanMediumViewport )
 	) {
 		component = IS_BUTTON;
-	} else if ( isLessThanMediumViewport ) {
+	} else if ( isSmallerThanMediumViewport ) {
 		component = IS_TOGGLE;
 	} else if ( isPublishSidebarEnabled ) {
 		component = IS_TOGGLE;
@@ -71,6 +71,7 @@ export function PostPublishButtonOrToggle( {
 			isOpen={ isPublishSidebarOpened }
 			isToggle={ component === IS_TOGGLE }
 			onToggle={ togglePublishSidebar }
+			setEntitiesSavedStatesCallback={ setEntitiesSavedStatesCallback }
 		/>
 	);
 }
@@ -85,8 +86,12 @@ export default compose(
 		isBeingScheduled: select( 'core/editor' ).isEditedPostBeingScheduled(),
 		isPending: select( 'core/editor' ).isCurrentPostPending(),
 		isPublished: select( 'core/editor' ).isCurrentPostPublished(),
-		isPublishSidebarEnabled: select( 'core/editor' ).isPublishSidebarEnabled(),
-		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		isPublishSidebarEnabled: select(
+			'core/editor'
+		).isPublishSidebarEnabled(),
+		isPublishSidebarOpened: select(
+			'core/edit-post'
+		).isPublishSidebarOpened(),
 		isScheduled: select( 'core/editor' ).isCurrentPostScheduled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
@@ -94,6 +99,5 @@ export default compose(
 		return {
 			togglePublishSidebar,
 		};
-	} ),
-	withViewportMatch( { isLessThanMediumViewport: '< medium' } ),
+	} )
 )( PostPublishButtonOrToggle );

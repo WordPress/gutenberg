@@ -3,7 +3,7 @@
  */
 import { Component, createPortal } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
-import { deprecated } from '@wordpress/deprecated';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -116,11 +116,13 @@ class Modal extends Component {
 			...otherProps
 		} = this.props;
 
-		const headingId = aria.labelledby || `components-modal-header-${ instanceId }`;
+		const headingId =
+			aria.labelledby || `components-modal-header-${ instanceId }`;
 
 		if ( isDismissable ) {
 			deprecated( 'isDismissable prop of the Modal component', {
-				alternative: 'isDismissible prop (renamed) of the Modal component',
+				alternative:
+					'isDismissible prop (renamed) of the Modal component',
 			} );
 		}
 		// Disable reason: this stops mouse events from triggering tooltips and
@@ -134,7 +136,7 @@ class Modal extends Component {
 				} }
 				{ ...otherProps }
 			>
-				<div className={ 'components-modal__content' } tabIndex="0">
+				<div className={ 'components-modal__content' } role="document">
 					<ModalHeader
 						closeLabel={ closeButtonLabel }
 						headingId={ headingId }

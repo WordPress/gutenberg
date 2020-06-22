@@ -2,7 +2,9 @@
  * External dependencies
  */
 import moment from 'moment';
-import { DayPickerSingleDateController } from 'react-dates';
+// react-dates doesn't tree-shake correctly, so we import from the individual
+// component here, to avoid including too much of the library
+import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
 
 /**
  * WordPress dependencies
@@ -25,19 +27,24 @@ class DatePicker extends Component {
 	}
 
 	/*
-	* Todo: We should remove this function ASAP.
-	* It is kept because focus is lost when we click on the previous and next month buttons.
-	* This focus loss closes the date picker popover.
-	* Ideally we should add an upstream commit on react-dates to fix this issue.
-	*/
+	 * Todo: We should remove this function ASAP.
+	 * It is kept because focus is lost when we click on the previous and next month buttons.
+	 * This focus loss closes the date picker popover.
+	 * Ideally we should add an upstream commit on react-dates to fix this issue.
+	 */
 	keepFocusInside() {
 		if ( ! this.nodeRef.current ) {
 			return;
 		}
 		// If focus was lost.
-		if ( ! document.activeElement || ! this.nodeRef.current.contains( document.activeElement ) ) {
+		if (
+			! document.activeElement ||
+			! this.nodeRef.current.contains( document.activeElement )
+		) {
 			// Retrieve the focus region div.
-			const focusRegion = this.nodeRef.current.querySelector( '.DayPicker_focusRegion' );
+			const focusRegion = this.nodeRef.current.querySelector(
+				'.DayPicker_focusRegion'
+			);
 			if ( ! focusRegion ) {
 				return;
 			}
@@ -65,7 +72,7 @@ class DatePicker extends Component {
 	 * object representing now. If a null value is passed, return a null value.
 	 *
 	 * @param {?string} currentDate Date representing the currently selected date or null to signify no selection.
-	 * @return {?Moment} Moment object for selected date or null.
+	 * @return {?moment.Moment} Moment object for selected date or null.
 	 */
 	getMomentDate( currentDate ) {
 		if ( null === currentDate ) {
@@ -80,10 +87,7 @@ class DatePicker extends Component {
 		const momentDate = this.getMomentDate( currentDate );
 
 		return (
-			<div
-				className="components-datetime__date"
-				ref={ this.nodeRef }
-			>
+			<div className="components-datetime__date" ref={ this.nodeRef }>
 				<DayPickerSingleDateController
 					date={ momentDate }
 					daySize={ 30 }
@@ -91,7 +95,9 @@ class DatePicker extends Component {
 					hideKeyboardShortcutsPanel
 					// This is a hack to force the calendar to update on month or year change
 					// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
-					key={ `datepicker-controller-${ momentDate ? momentDate.format( 'MM-YYYY' ) : 'null' }` }
+					key={ `datepicker-controller-${
+						momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
+					}` }
 					noBorder
 					numberOfMonths={ 1 }
 					onDateChange={ this.onChangeMoment }

@@ -6,7 +6,7 @@
  *
  * @return {string} The manipulated text.
  */
-export default function( settings, text ) {
+export default function stripHTMLComments( settings, text ) {
 	if ( settings.HTMLcommentRegExp ) {
 		return text.replace( settings.HTMLcommentRegExp, '' );
 	}

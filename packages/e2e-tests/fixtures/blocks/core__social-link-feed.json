@@ -1,11 +1,11 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/social-link-feed",
+        "name": "core/social-link",
         "isValid": true,
         "attributes": {
             "url": "https://example.com/",
-            "site": "feed"
+            "service": "feed"
         },
         "innerBlocks": [],
         "originalContent": ""

@@ -1,0 +1,30 @@
+{
+	"name": "core/post-title",
+	"category": "design",
+	"usesContext": [
+		"postId",
+		"postType"
+	],
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"level": {
+			"type": "number",
+			"default": 2
+		}
+	},
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalSelector": {
+			"core/post-title/h1": "h1",
+			"core/post-title/h2": "h2",
+			"core/post-title/h3": "h3",
+			"core/post-title/h4": "h4",
+			"core/post-title/h5": "h5",
+			"core/post-title/h6": "h6",
+			"core/post-title/p": "p"
+		}
+	}
+}

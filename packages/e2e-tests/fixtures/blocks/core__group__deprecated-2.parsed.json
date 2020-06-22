@@ -1,0 +1,34 @@
+[
+    {
+        "blockName": "core/group",
+        "attrs": {
+            "textColor": "accent"
+        },
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t\t<p>My paragraph</p>\n\t\t",
+                "innerContent": [
+                    "\n\t\t<p>My paragraph</p>\n\t\t"
+                ]
+            }
+        ],
+        "innerHTML": "\n<div class=\"wp-block-group has-text-color\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t\n\t</div>\n</div>\n",
+        "innerContent": [
+            "\n<div class=\"wp-block-group has-text-color\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t",
+            null,
+            "\n\t</div>\n</div>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { existsSync } = require( 'fs' );
+const { existsSync, readdirSync } = require( 'fs' );
 const path = require( 'path' );
 
 /**
@@ -24,9 +24,16 @@ const fromScriptsRoot = ( scriptName ) =>
 const hasScriptFile = ( scriptName ) =>
 	existsSync( fromScriptsRoot( scriptName ) );
 
+const getScripts = () =>
+	readdirSync( path.join( path.dirname( __dirname ), 'scripts' ) )
+		.filter( ( f ) => path.extname( f ) === '.js' )
+		.map( ( f ) => path.basename( f, '.js' ) );
+
 module.exports = {
+	fromProjectRoot,
 	fromConfigRoot,
 	fromScriptsRoot,
+	getScripts,
 	hasProjectFile,
 	hasScriptFile,
 };

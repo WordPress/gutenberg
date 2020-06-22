@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const postcss = require( 'postcss' );
@@ -13,7 +14,9 @@ const { basename, sep } = require( 'path' );
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
-const { camelCaseDash } = require( '@wordpress/scripts/utils' );
+const {
+	camelCaseDash,
+} = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
 
 /**
  * Internal dependencies
@@ -22,16 +25,26 @@ const { dependencies } = require( './package' );
 
 const {
 	NODE_ENV: mode = 'development',
-	WP_DEVTOOL: devtool = ( mode === 'production' ? false : 'source-map' ),
+	WP_DEVTOOL: devtool = mode === 'production' ? false : 'source-map',
 } = process.env;
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
+const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
 
 const gutenbergPackages = Object.keys( dependencies )
-	.filter( ( packageName ) => packageName.startsWith( WORDPRESS_NAMESPACE ) )
+	.filter(
+		( packageName ) =>
+			! BUNDLED_PACKAGES.includes( packageName ) &&
+			packageName.startsWith( WORDPRESS_NAMESPACE )
+	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 module.exports = {
+	optimization: {
+		// Only concatenate modules in production, when not analyzing bundles.
+		concatenateModules:
+			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+	},
 	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		const name = camelCaseDash( packageName );
@@ -55,10 +68,20 @@ module.exports = {
 		] ),
 	},
 	plugins: [
+		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
+		// content as a convenient interactive zoomable treemap.
+		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		new DefinePlugin( {
 			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
-			'process.env.GUTENBERG_PHASE': JSON.stringify( parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1 ),
-			'process.env.FORCE_REDUCED_MOTION': JSON.stringify( process.env.FORCE_REDUCED_MOTION ),
+			'process.env.GUTENBERG_PHASE': JSON.stringify(
+				parseInt(
+					process.env.npm_package_config_GUTENBERG_PHASE,
+					10
+				) || 1
+			),
+			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
+				process.env.FORCE_REDUCED_MOTION
+			),
 		} ),
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {
@@ -82,15 +105,18 @@ module.exports = {
 				return path;
 			},
 		} ),
-		new LibraryExportDefaultPlugin( [
-			'api-fetch',
-			'deprecated',
-			'dom-ready',
-			'redux-routine',
-			'token-list',
-			'server-side-render',
-			'shortcode',
-		].map( camelCaseDash ) ),
+		new LibraryExportDefaultPlugin(
+			[
+				'api-fetch',
+				'deprecated',
+				'dom-ready',
+				'redux-routine',
+				'token-list',
+				'server-side-render',
+				'shortcode',
+				'warning',
+			].map( camelCaseDash )
+		),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
 				from: `./packages/${ packageName }/build-style/*.css`,
@@ -100,14 +126,20 @@ module.exports = {
 					if ( mode === 'production' ) {
 						return postcss( [
 							require( 'cssnano' )( {
-								preset: [ 'default', {
-									discardComments: {
-										removeAll: true,
+								preset: [
+									'default',
+									{
+										discardComments: {
+											removeAll: true,
+										},
 									},
-								} ],
+								],
 							} ),
 						] )
-							.process( content, { from: 'src/app.css', to: 'dest/app.css' } )
+							.process( content, {
+								from: 'src/app.css',
+								to: 'dest/app.css',
+							} )
 							.then( ( result ) => result.css );
 					}
 					return content;
@@ -117,39 +149,58 @@ module.exports = {
 		new CopyWebpackPlugin( [
 			{
 				from: './packages/block-library/src/**/index.php',
-				test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }index\\.php$` ),
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
+				),
 				to: 'build/block-library/blocks/[1].php',
 				transform( content ) {
 					content = content.toString();
 
 					// Within content, search for any function definitions. For
 					// each, replace every other reference to it in the file.
-					return content
-						.match( /^function [^\(]+/gm )
-						.reduce( ( result, functionName ) => {
-							// Trim leading "function " prefix from match.
-							functionName = functionName.slice( 9 );
+					return (
+						content
+							.match( /^function [^\(]+/gm )
+							.reduce( ( result, functionName ) => {
+								// Trim leading "function " prefix from match.
+								functionName = functionName.slice( 9 );
 
-							// Prepend the Gutenberg prefix, substituting any
-							// other core prefix (e.g. "wp_").
-							return result.replace(
-								new RegExp( functionName, 'g' ),
-								( match ) => 'gutenberg_' + match.replace( /^wp_/, '' )
-							);
-						}, content )
-						// The core blocks override procedure takes place in
-						// the init action default priority to ensure that core
-						// blocks would have been registered already. Since the
-						// blocks implementations occur at the default priority
-						// and due to WordPress hooks behavior not considering
-						// mutations to the same priority during another's
-						// callback, the Gutenberg build blocks are modified
-						// to occur at a later priority.
-						.replace( /(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/, '$1, 20' );
+								// Prepend the Gutenberg prefix, substituting any
+								// other core prefix (e.g. "wp_").
+								return result.replace(
+									new RegExp( functionName, 'g' ),
+									( match ) =>
+										'gutenberg_' +
+										match.replace( /^wp_/, '' )
+								);
+							}, content )
+							// The core blocks override procedure takes place in
+							// the init action default priority to ensure that core
+							// blocks would have been registered already. Since the
+							// blocks implementations occur at the default priority
+							// and due to WordPress hooks behavior not considering
+							// mutations to the same priority during another's
+							// callback, the Gutenberg build blocks are modified
+							// to occur at a later priority.
+							.replace(
+								/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
+								'$1, 20'
+							)
+					);
 				},
+			},
+			{
+				from: './packages/block-library/src/*/block.json',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
+				),
+				to: 'build/block-library/blocks/[1]/block.json',
 			},
 		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
-	],
+	].filter( Boolean ),
+	watchOptions: {
+		ignored: '!packages/*/!(src)/**/*',
+	},
 	devtool,
 };

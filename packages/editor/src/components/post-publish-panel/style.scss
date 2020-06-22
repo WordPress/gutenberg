@@ -1,6 +1,5 @@
 .editor-post-publish-panel {
 	background: $white;
-	color: $dark-gray-500;
 }
 
 .editor-post-publish-panel__content {
@@ -9,19 +8,24 @@
 
 	.components-spinner {
 		display: block;
-		float: none;
 		margin: 100px auto 0;
 	}
 }
 
 .editor-post-publish-panel__header {
 	background: $white;
-	padding-left: 16px;
-	height: $header-height;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	height: $header-height + $border-width;
 	border-bottom: $border-width solid $light-gray-500;
 	display: flex;
 	align-items: center;
 	align-content: space-between;
+
+	.components-button.has-icon {
+		position: absolute;
+		right: $grid-unit-10;
+	}
 }
 
 .editor-post-publish-panel__header-publish-button {
@@ -107,7 +111,7 @@
 }
 
 .post-publish-panel__postpublish-post-address {
-	margin-bottom: $grid-size-large;
+	margin-bottom: $grid-unit-20;
 
 	input[readonly] {
 		padding: 10px;
@@ -122,7 +126,7 @@
 }
 
 .post-publish-panel__postpublish-subheader {
-	margin: 0 0 $grid-size;
+	margin: 0 0 $grid-unit-10;
 }
 
 .post-publish-panel__tip {

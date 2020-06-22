@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
+import { share as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,16 +16,34 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Social links' ),
-	description: __( 'Create a block of links to your social media or external sites' ),
-	supports: {
-		align: [ 'left', 'center', 'right' ],
-	},
+	title: __( 'Social Icons' ),
+	description: __(
+		'Display icons linking to your social media profiles or websites.'
+	),
+	keywords: [ _x( 'links', 'block keywords' ) ],
 	example: {
 		innerBlocks: [
-			{ name: 'core/social-link-wordpress', attributes: { url: 'https://wordpress.org' } },
-			{ name: 'core/social-link-facebook', attributes: { url: 'https://www.facebook.com/WordPress/' } },
-			{ name: 'core/social-link-twitter', attributes: { url: 'https://twitter.com/WordPress' } },
+			{
+				name: 'core/social-link',
+				attributes: {
+					service: 'wordpress',
+					url: 'https://wordpress.org',
+				},
+			},
+			{
+				name: 'core/social-link',
+				attributes: {
+					service: 'facebook',
+					url: 'https://www.facebook.com/WordPress/',
+				},
+			},
+			{
+				name: 'core/social-link',
+				attributes: {
+					service: 'twitter',
+					url: 'https://twitter.com/WordPress',
+				},
+			},
 		],
 	},
 	styles: [
@@ -32,6 +51,7 @@ export const settings = {
 		{ name: 'logos-only', label: __( 'Logos Only' ) },
 		{ name: 'pill-shape', label: __( 'Pill Shape' ) },
 	],
+	icon,
 	edit,
 	save,
 };

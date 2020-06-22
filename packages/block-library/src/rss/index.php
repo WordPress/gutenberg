@@ -20,10 +20,6 @@ function render_block_core_rss( $attributes ) {
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
-		// PHP 5.2 compatibility. See: http://simplepie.org/wiki/faq/i_m_getting_memory_leaks.
-		$rss->__destruct();
-		unset( $rss );
-
 		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.' ) . '</div></div>';
 	}
 
@@ -96,63 +92,16 @@ function render_block_core_rss( $attributes ) {
 		$class .= ' ' . $attributes['className'];
 	}
 
-	$list_items_markup = "<ul class='{$class}'>{$list_items}</ul>";
-
-	// PHP 5.2 compatibility. See: http://simplepie.org/wiki/faq/i_m_getting_memory_leaks.
-	$rss->__destruct();
-	unset( $rss );
-
-	return $list_items_markup;
+	return sprintf( '<ul class="%s">%s</ul>', esc_attr( $class ), $list_items );
 }
 
 /**
  * Registers the `core/rss` block on server.
  */
 function register_block_core_rss() {
-	register_block_type(
-		'core/rss',
+	register_block_type_from_metadata(
+		__DIR__ . '/rss',
 		array(
-			'attributes'      => array(
-				'align'          => array(
-					'type' => 'string',
-					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
-				),
-				'className'      => array(
-					'type' => 'string',
-				),
-				'columns'        => array(
-					'type'    => 'number',
-					'default' => 2,
-				),
-				'blockLayout'    => array(
-					'type'    => 'string',
-					'default' => 'list',
-				),
-				'feedURL'        => array(
-					'type'    => 'string',
-					'default' => '',
-				),
-				'itemsToShow'    => array(
-					'type'    => 'number',
-					'default' => 5,
-				),
-				'displayExcerpt' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'displayAuthor'  => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'displayDate'    => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'excerptLength'  => array(
-					'type'    => 'number',
-					'default' => 55,
-				),
-			),
 			'render_callback' => 'render_block_core_rss',
 		)
 	);

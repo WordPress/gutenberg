@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/e2e-test-utils",
-	"version": "2.4.0",
+	"version": "4.9.0",
 	"description": "End-To-End (E2E) test utils for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"e2e",
 		"utils"
 	],
@@ -28,7 +29,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.9.2",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/url": "file:../url",
 		"lodash": "^4.17.15",

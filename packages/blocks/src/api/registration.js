@@ -1,14 +1,16 @@
-/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+/* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
 
 /**
  * External dependencies
  */
 import {
 	get,
+	isFunction,
+	isNil,
+	isPlainObject,
 	omit,
 	pick,
-	isFunction,
-	isPlainObject,
+	pickBy,
 	some,
 } from 'lodash';
 
@@ -17,6 +19,7 @@ import {
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,12 +28,19 @@ import { isValidIcon, normalizeIconObject } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
+ * An icon type definition. One of a Dashicon slug, an element,
+ * or a component.
+ *
+ * @typedef {(string|WPElement|WPComponent)} WPIcon
+ *
+ * @see https://developer.wordpress.org/resource/dashicons/
+ */
+
+/**
  * Render behavior of a block type icon; one of a Dashicon slug, an element,
  * or a component.
  *
- * @typedef {(string|WPElement|WPComponent)} WPBlockTypeIconRender
- *
- * @see https://developer.wordpress.org/resource/dashicons/
+ * @typedef {WPIcon} WPBlockTypeIconRender
  */
 
 /**
@@ -58,37 +68,70 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  */
 
 /**
- * Defined behavior of a block type.
+ * Named block variation scopes.
  *
- * @typedef {Object} WPBlockType
- *
- * @property {string}           name        Block type's namespaced name.
- * @property {string}           title       Human-readable block type label.
- * @property {string}           category    Block type category classification,
- *                                          used in search interfaces to arrange
- *                                          block types by category.
- * @property {WPBlockTypeIcon} [icon]       Block type icon.
- * @property {string[]}        [keywords]   Additional keywords to produce block
- *                                          type as result in search interfaces.
- * @property {Object}          [attributes] Block type attributes.
- * @property {WPComponent}     [save]       Optional component describing
- *                                          serialized markup structure of a
- *                                          block type.
- * @property {WPComponent}      edit        Component rendering an element to
- *                                          manipulate the attributes of a block
- *                                          in the context of an editor.
+ * @typedef {'block'|'inserter'} WPBlockVariationScope
  */
 
 /**
- * Default values to assign for omitted optional block type settings.
+ * An object describing a variation defined for the block type.
  *
- * @type {Object}
+ * @typedef {Object} WPBlockVariation
+ *
+ * @property {string}   name                   The unique and machine-readable name.
+ * @property {string}   title                  A human-readable variation title.
+ * @property {string}   [description]          A detailed variation description.
+ * @property {WPIcon}   [icon]                 An icon helping to visualize the variation.
+ * @property {boolean}  [isDefault]            Indicates whether the current variation is
+ *                                             the default one. Defaults to `false`.
+ * @property {Object}   [attributes]           Values which override block attributes.
+ * @property {Array[]}  [innerBlocks]          Initial configuration of nested blocks.
+ * @property {Object}   [example]              Example provides structured data for
+ *                                             the block preview. You can set to
+ *                                             `undefined` to disable the preview shown
+ *                                             for the block type.
+ * @property {WPBlockVariationScope[]} [scope] The list of scopes where the variation
+ *                                             is applicable. When not provided, it
+ *                                             assumes all available scopes.
  */
-export const DEFAULT_BLOCK_TYPE_SETTINGS = {
-	icon: 'block-default',
-	attributes: {},
-	keywords: [],
-	save: () => null,
+
+/**
+ * Defined behavior of a block type.
+ *
+ * @typedef {Object} WPBlock
+ *
+ * @property {string}             name          Block type's namespaced name.
+ * @property {string}             title         Human-readable block type label.
+ * @property {string}             [description] A detailed block type description.
+ * @property {string}             [category]    Block type category classification,
+ *                                              used in search interfaces to arrange
+ *                                              block types by category.
+ * @property {WPBlockTypeIcon}    [icon]        Block type icon.
+ * @property {string[]}           [keywords]    Additional keywords to produce block
+ *                                              type as result in search interfaces.
+ * @property {Object}             [attributes]  Block type attributes.
+ * @property {WPComponent}        [save]        Optional component describing
+ *                                              serialized markup structure of a
+ *                                              block type.
+ * @property {WPComponent}        edit          Component rendering an element to
+ *                                              manipulate the attributes of a block
+ *                                              in the context of an editor.
+ * @property {WPBlockVariation[]} [variations]  The list of block variations.
+ * @property {Object}             [example]     Example provides structured data for
+ *                                              the block preview. When not defined
+ *                                              then no preview is shown.
+ */
+
+/**
+ * Mapping of legacy category slugs to their latest normal values, used to
+ * accommodate updates of the default set of block categories.
+ *
+ * @type {Record<string,string>}
+ */
+const LEGACY_CATEGORY_MAPPING = {
+	common: 'text',
+	formatting: 'text',
+	layout: 'design',
 };
 
 export let serverSideBlockDefinitions = {};
@@ -98,7 +141,8 @@ export let serverSideBlockDefinitions = {};
  *
  * @param {Object} definitions Server-side block definitions
  */
-export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { // eslint-disable-line camelcase
+// eslint-disable-next-line camelcase
+export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 	serverSideBlockDefinitions = {
 		...serverSideBlockDefinitions,
 		...definitions,
@@ -114,20 +158,28 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
  * @param {Object} settings Block settings.
  *
  * @return {?WPBlock} The block, if it has been successfully registered;
- *                     otherwise `undefined`.
+ *                    otherwise `undefined`.
  */
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
-		...DEFAULT_BLOCK_TYPE_SETTINGS,
-		...get( serverSideBlockDefinitions, name ),
+		icon: blockDefault,
+		keywords: [],
+		attributes: {},
+		providesContext: {},
+		usesContext: [],
+		supports: {},
+		styles: [],
+		save: () => null,
+		...pickBy(
+			get( serverSideBlockDefinitions, name, {} ),
+			( value ) => ! isNil( value )
+		),
 		...settings,
 	};
 
 	if ( typeof name !== 'string' ) {
-		console.error(
-			'Block names must be strings.'
-		);
+		console.error( 'Block names must be strings.' );
 		return;
 	}
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
@@ -137,9 +189,7 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	if ( select( 'core/blocks' ).getBlockType( name ) ) {
-		console.error(
-			'Block "' + name + '" is already registered.'
-		);
+		console.error( 'Block "' + name + '" is already registered.' );
 		return;
 	}
 
@@ -148,7 +198,8 @@ export function registerBlockType( name, settings ) {
 
 	if ( settings.deprecated ) {
 		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
-			pick( // Only keep valid deprecation keys.
+			pick(
+				// Only keep valid deprecation keys.
 				applyFilters(
 					'blocks.registerBlockType',
 					// Merge deprecation keys with pre-filter settings
@@ -168,49 +219,46 @@ export function registerBlockType( name, settings ) {
 	}
 
 	if ( ! isPlainObject( settings ) ) {
-		console.error(
-			'Block settings must be a valid object.'
-		);
+		console.error( 'Block settings must be a valid object.' );
 		return;
 	}
 
 	if ( ! isFunction( settings.save ) ) {
-		console.error(
-			'The "save" property must be a valid function.'
-		);
+		console.error( 'The "save" property must be a valid function.' );
 		return;
 	}
 	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
-		console.error(
-			'The "edit" property must be a valid function.'
-		);
+		console.error( 'The "edit" property must be a valid function.' );
 		return;
 	}
-	if ( ! ( 'category' in settings ) ) {
-		console.error(
-			'The block "' + name + '" must have a category.'
-		);
-		return;
+
+	// Canonicalize legacy categories to equivalent fallback.
+	if ( LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category ) ) {
+		settings.category = LEGACY_CATEGORY_MAPPING[ settings.category ];
 	}
+
 	if (
 		'category' in settings &&
-		! some( select( 'core/blocks' ).getCategories(), { slug: settings.category } )
+		! some( select( 'core/blocks' ).getCategories(), {
+			slug: settings.category,
+		} )
 	) {
-		console.error(
-			'The block "' + name + '" must have a registered category.'
+		console.warn(
+			'The block "' +
+				name +
+				'" is registered with an invalid category "' +
+				settings.category +
+				'".'
 		);
-		return;
+		delete settings.category;
 	}
+
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
-		console.error(
-			'The block "' + name + '" must have a title.'
-		);
+		console.error( 'The block "' + name + '" must have a title.' );
 		return;
 	}
 	if ( typeof settings.title !== 'string' ) {
-		console.error(
-			'Block titles must be strings.'
-		);
+		console.error( 'Block titles must be strings.' );
 		return;
 	}
 
@@ -218,7 +266,7 @@ export function registerBlockType( name, settings ) {
 	if ( ! isValidIcon( settings.icon.src ) ) {
 		console.error(
 			'The icon passed is invalid. ' +
-			'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
+				'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
 		);
 		return;
 	}
@@ -229,19 +277,39 @@ export function registerBlockType( name, settings ) {
 }
 
 /**
+ * Registers a new block collection to group blocks in the same namespace in the inserter.
+ *
+ * @param {string} namespace       The namespace to group blocks by in the inserter; corresponds to the block namespace.
+ * @param {Object} settings        The block collection settings.
+ * @param {string} settings.title  The title to display in the block inserter.
+ * @param {Object} [settings.icon] The icon to display in the block inserter.
+ */
+export function registerBlockCollection( namespace, { title, icon } ) {
+	dispatch( 'core/blocks' ).addBlockCollection( namespace, title, icon );
+}
+
+/**
+ * Unregisters a block collection
+ *
+ * @param {string} namespace The namespace to group blocks by in the inserter; corresponds to the block namespace
+ *
+ */
+export function unregisterBlockCollection( namespace ) {
+	dispatch( 'core/blocks' ).removeBlockCollection( namespace );
+}
+
+/**
  * Unregisters a block.
  *
  * @param {string} name Block name.
  *
  * @return {?WPBlock} The previous block value, if it has been successfully
- *                     unregistered; otherwise `undefined`.
+ *                    unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
 	const oldBlock = select( 'core/blocks' ).getBlockType( name );
 	if ( ! oldBlock ) {
-		console.error(
-			'Block "' + name + '" is not registered.'
-		);
+		console.error( 'Block "' + name + '" is not registered.' );
 		return;
 	}
 	dispatch( 'core/blocks' ).removeBlockTypes( name );
@@ -353,7 +421,11 @@ export function getBlockTypes() {
  * @return {?*} Block support value
  */
 export function getBlockSupport( nameOrType, feature, defaultSupports ) {
-	return select( 'core/blocks' ).getBlockSupport( nameOrType, feature, defaultSupports );
+	return select( 'core/blocks' ).getBlockSupport(
+		nameOrType,
+		feature,
+		defaultSupports
+	);
 }
 
 /**
@@ -367,7 +439,11 @@ export function getBlockSupport( nameOrType, feature, defaultSupports ) {
  * @return {boolean} Whether block supports feature.
  */
 export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
-	return select( 'core/blocks' ).hasBlockSupport( nameOrType, feature, defaultSupports );
+	return select( 'core/blocks' ).hasBlockSupport(
+		nameOrType,
+		feature,
+		defaultSupports
+	);
 }
 
 /**
@@ -414,7 +490,9 @@ export const hasChildBlocks = ( blockName ) => {
  *                   and false otherwise.
  */
 export const hasChildBlocksWithInserterSupport = ( blockName ) => {
-	return select( 'core/blocks' ).hasChildBlocksWithInserterSupport( blockName );
+	return select( 'core/blocks' ).hasChildBlocksWithInserterSupport(
+		blockName
+	);
 };
 
 /**
@@ -434,5 +512,28 @@ export const registerBlockStyle = ( blockName, styleVariation ) => {
  * @param {string} styleVariationName Name of class applied to the block.
  */
 export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
-	dispatch( 'core/blocks' ).removeBlockStyles( blockName, styleVariationName );
+	dispatch( 'core/blocks' ).removeBlockStyles(
+		blockName,
+		styleVariationName
+	);
+};
+
+/**
+ * Registers a new block variation for the given block type.
+ *
+ * @param {string}           blockName Name of the block (example: “core/columns”).
+ * @param {WPBlockVariation} variation Object describing a block variation.
+ */
+export const registerBlockVariation = ( blockName, variation ) => {
+	dispatch( 'core/blocks' ).addBlockVariations( blockName, variation );
+};
+
+/**
+ * Unregisters a block variation defined for the given block type.
+ *
+ * @param {string} blockName     Name of the block (example: “core/columns”).
+ * @param {string} variationName Name of the variation defined for the block.
+ */
+export const unregisterBlockVariation = ( blockName, variationName ) => {
+	dispatch( 'core/blocks' ).removeBlockVariations( blockName, variationName );
 };

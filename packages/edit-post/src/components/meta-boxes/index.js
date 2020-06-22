@@ -26,7 +26,9 @@ function MetaBoxes( { location, isVisible, metaBoxes } ) {
 }
 
 export default withSelect( ( select, { location } ) => {
-	const { isMetaBoxLocationVisible, getMetaBoxesPerLocation } = select( 'core/edit-post' );
+	const { isMetaBoxLocationVisible, getMetaBoxesPerLocation } = select(
+		'core/edit-post'
+	);
 
 	return {
 		metaBoxes: getMetaBoxesPerLocation( location ),

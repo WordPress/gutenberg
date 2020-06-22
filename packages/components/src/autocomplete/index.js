@@ -8,7 +8,15 @@ import { escapeRegExp, find, map, debounce, deburr } from 'lodash';
  * WordPress dependencies
  */
 import { Component, renderToString } from '@wordpress/element';
-import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
+import {
+	ENTER,
+	ESCAPE,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	SPACE,
+} from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
@@ -18,7 +26,6 @@ import {
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
-import { getRectangleFromRange } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -91,7 +98,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  */
 
 /**
- * @typedef {Object} Completer
+ * @typedef {Object} WPCompleter
  * @property {string} name a way to identify a completer, useful for selective overriding.
  * @property {?string} className A class to apply to the popup menu.
  * @property {string} triggerPrefix the prefix that will display the menu.
@@ -114,7 +121,9 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 			keywords = [ ...keywords, option.label ];
 		}
 
-		const isMatch = keywords.some( ( keyword ) => search.test( deburr( keyword ) ) );
+		const isMatch = keywords.some( ( keyword ) =>
+			search.test( deburr( keyword ) )
+		);
 		if ( ! isMatch ) {
 			continue;
 		}
@@ -130,13 +139,9 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	return filtered;
 }
 
-function getCaretRect() {
+function getRange() {
 	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-
-	if ( range ) {
-		return getRectangleFromRange( range );
-	}
+	return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 }
 
 export class Autocomplete extends Component {
@@ -186,9 +191,10 @@ export class Autocomplete extends Component {
 			const completion = getOptionCompletion( option.value, query );
 
 			const { action, value } =
-				( undefined === completion.action || undefined === completion.value ) ?
-					{ action: 'insert-at-caret', value: completion } :
-					completion;
+				undefined === completion.action ||
+				undefined === completion.value
+					? { action: 'insert-at-caret', value: completion }
+					: completion;
 
 			if ( 'replace' === action ) {
 				onReplace( [ value ] );
@@ -219,11 +225,18 @@ export class Autocomplete extends Component {
 			return;
 		}
 		if ( !! filteredOptions.length ) {
-			debouncedSpeak( sprintf( _n(
-				'%d result found, use up and down arrow keys to navigate.',
-				'%d results found, use up and down arrow keys to navigate.',
-				filteredOptions.length
-			), filteredOptions.length ), 'assertive' );
+			debouncedSpeak(
+				sprintf(
+					/* translators: %d: number of results. */
+					_n(
+						'%d result found, use up and down arrow keys to navigate.',
+						'%d results found, use up and down arrow keys to navigate.',
+						filteredOptions.length
+					),
+					filteredOptions.length
+				),
+				'assertive'
+			);
 		} else {
 			debouncedSpeak( __( 'No results.' ), 'assertive' );
 		}
@@ -232,8 +245,8 @@ export class Autocomplete extends Component {
 	/**
 	 * Load options for an autocompleter.
 	 *
-	 * @param {Completer} completer The autocompleter.
-	 * @param {string}    query     The query, if any.
+	 * @param {WPCompleter} completer The autocompleter.
+	 * @param {string}      query     The query, if any.
 	 */
 	loadOptions( completer, query ) {
 		const { options } = completer;
@@ -249,7 +262,7 @@ export class Autocomplete extends Component {
 		 * `activePromise` in the state would result in it actually being in `this.state`
 		 * before the promise resolves and we check to see if this is the active promise or not.
 		 */
-		const promise = this.activePromise = Promise.resolve(
+		const promise = ( this.activePromise = Promise.resolve(
 			typeof options === 'function' ? options( query ) : options
 		).then( ( optionsData ) => {
 			if ( promise !== this.activePromise ) {
@@ -257,23 +270,35 @@ export class Autocomplete extends Component {
 				// or else we might end triggering a race condition updating the state.
 				return;
 			}
-			const keyedOptions = optionsData.map( ( optionData, optionIndex ) => ( {
-				key: `${ completer.idx }-${ optionIndex }`,
-				value: optionData,
-				label: completer.getOptionLabel( optionData ),
-				keywords: completer.getOptionKeywords ? completer.getOptionKeywords( optionData ) : [],
-				isDisabled: completer.isOptionDisabled ? completer.isOptionDisabled( optionData ) : false,
-			} ) );
+			const keyedOptions = optionsData.map(
+				( optionData, optionIndex ) => ( {
+					key: `${ completer.idx }-${ optionIndex }`,
+					value: optionData,
+					label: completer.getOptionLabel( optionData ),
+					keywords: completer.getOptionKeywords
+						? completer.getOptionKeywords( optionData )
+						: [],
+					isDisabled: completer.isOptionDisabled
+						? completer.isOptionDisabled( optionData )
+						: false,
+				} )
+			);
 
-			const filteredOptions = filterOptions( this.state.search, keyedOptions );
-			const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
+			const filteredOptions = filterOptions(
+				this.state.search,
+				keyedOptions
+			);
+			const selectedIndex =
+				filteredOptions.length === this.state.filteredOptions.length
+					? this.state.selectedIndex
+					: 0;
 			this.setState( {
 				[ 'options_' + completer.idx ]: keyedOptions,
 				filteredOptions,
 				selectedIndex,
 			} );
 			this.announce( filteredOptions );
-		} );
+		} ) );
 	}
 
 	handleKeyDown( event ) {
@@ -308,12 +333,16 @@ export class Autocomplete extends Component {
 		let nextSelectedIndex;
 		switch ( event.keyCode ) {
 			case UP:
-				nextSelectedIndex = ( selectedIndex === 0 ? filteredOptions.length : selectedIndex ) - 1;
+				nextSelectedIndex =
+					( selectedIndex === 0
+						? filteredOptions.length
+						: selectedIndex ) - 1;
 				this.setState( { selectedIndex: nextSelectedIndex } );
 				break;
 
 			case DOWN:
-				nextSelectedIndex = ( selectedIndex + 1 ) % filteredOptions.length;
+				nextSelectedIndex =
+					( selectedIndex + 1 ) % filteredOptions.length;
 				this.setState( { selectedIndex: nextSelectedIndex } );
 				break;
 
@@ -348,21 +377,37 @@ export class Autocomplete extends Component {
 			const prevText = deburr( getTextContent( slice( prevRecord, 0 ) ) );
 
 			if ( text !== prevText ) {
-				const textAfterSelection = getTextContent( slice( record, undefined, getTextContent( record ).length ) );
-				const allCompleters = map( completers, ( completer, idx ) => ( { ...completer, idx } ) );
-				const open = find( allCompleters, ( { triggerPrefix, allowContext } ) => {
-					const index = text.lastIndexOf( triggerPrefix );
+				const textAfterSelection = getTextContent(
+					slice( record, undefined, getTextContent( record ).length )
+				);
+				const allCompleters = map( completers, ( completer, idx ) => ( {
+					...completer,
+					idx,
+				} ) );
+				const open = find(
+					allCompleters,
+					( { triggerPrefix, allowContext } ) => {
+						const index = text.lastIndexOf( triggerPrefix );
 
-					if ( index === -1 ) {
-						return false;
+						if ( index === -1 ) {
+							return false;
+						}
+
+						if (
+							allowContext &&
+							! allowContext(
+								text.slice( 0, index ),
+								textAfterSelection
+							)
+						) {
+							return false;
+						}
+
+						return /^\S*$/.test(
+							text.slice( index + triggerPrefix.length )
+						);
 					}
-
-					if ( allowContext && ! allowContext( text.slice( 0, index ), textAfterSelection ) ) {
-						return false;
-					}
-
-					return /^\S*$/.test( text.slice( index + triggerPrefix.length ) );
-				} );
+				);
 
 				if ( ! open ) {
 					this.reset();
@@ -370,11 +415,22 @@ export class Autocomplete extends Component {
 				}
 
 				const safeTrigger = escapeRegExp( open.triggerPrefix );
-				const match = text.match( new RegExp( `${ safeTrigger }(\\S*)$` ) );
+				const match = text.match(
+					new RegExp( `${ safeTrigger }(\\S*)$` )
+				);
 				const query = match && match[ 1 ];
-				const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
+				const {
+					open: wasOpen,
+					suppress: wasSuppress,
+					query: wasQuery,
+				} = this.state;
 
-				if ( open && ( ! wasOpen || open.idx !== wasOpen.idx || query !== wasQuery ) ) {
+				if (
+					open &&
+					( ! wasOpen ||
+						open.idx !== wasOpen.idx ||
+						query !== wasQuery )
+				) {
 					if ( open.isDebounced ) {
 						this.debouncedLoadOptions( open, query );
 					} else {
@@ -382,14 +438,29 @@ export class Autocomplete extends Component {
 					}
 				}
 				// create a regular expression to filter the options
-				const search = open ? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' ) : /./;
+				const search = open
+					? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' )
+					: /./;
 				// filter the options we already have
-				const filteredOptions = open ? filterOptions( search, this.state[ 'options_' + open.idx ] ) : [];
+				const filteredOptions = open
+					? filterOptions(
+							search,
+							this.state[ 'options_' + open.idx ]
+					  )
+					: [];
 				// check if we should still suppress the popover
-				const suppress = ( open && wasSuppress === open.idx ) ? wasSuppress : undefined;
+				const suppress =
+					open && wasSuppress === open.idx ? wasSuppress : undefined;
 				// update the state
 				if ( wasOpen || open ) {
-					this.setState( { selectedIndex: 0, filteredOptions, suppress, search, open, query } );
+					this.setState( {
+						selectedIndex: 0,
+						filteredOptions,
+						suppress,
+						search,
+						open,
+						query,
+					} );
 				}
 				// announce the count of filtered options but only if they have loaded
 				if ( open && this.state[ 'options_' + open.idx ] ) {
@@ -406,11 +477,16 @@ export class Autocomplete extends Component {
 	render() {
 		const { children, instanceId, isSelected } = this.props;
 		const { open, suppress, selectedIndex, filteredOptions } = this.state;
-		const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+		const { key: selectedKey = '' } =
+			filteredOptions[ selectedIndex ] || {};
 		const { className, idx } = open || {};
 		const isExpanded = suppress !== idx && filteredOptions.length > 0;
-		const listBoxId = isExpanded ? `components-autocomplete-listbox-${ instanceId }` : null;
-		const activeId = isExpanded ? `components-autocomplete-item-${ instanceId }-${ selectedKey }` : null;
+		const listBoxId = isExpanded
+			? `components-autocomplete-listbox-${ instanceId }`
+			: null;
+		const activeId = isExpanded
+			? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
+			: null;
 
 		return (
 			<>
@@ -426,28 +502,36 @@ export class Autocomplete extends Component {
 						onClose={ this.reset }
 						position="top right"
 						className="components-autocomplete__popover"
-						getAnchorRect={ getCaretRect }
+						anchorRef={ getRange() }
 					>
 						<div
 							id={ listBoxId }
 							role="listbox"
 							className="components-autocomplete__results"
 						>
-							{ isExpanded && map( filteredOptions, ( option, index ) => (
-								<Button
-									key={ option.key }
-									id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-									role="option"
-									aria-selected={ index === selectedIndex }
-									disabled={ option.isDisabled }
-									className={ classnames( 'components-autocomplete__result', className, {
-										'is-selected': index === selectedIndex,
-									} ) }
-									onClick={ () => this.select( option ) }
-								>
-									{ option.label }
-								</Button>
-							) ) }
+							{ isExpanded &&
+								map( filteredOptions, ( option, index ) => (
+									<Button
+										key={ option.key }
+										id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+										role="option"
+										aria-selected={
+											index === selectedIndex
+										}
+										disabled={ option.isDisabled }
+										className={ classnames(
+											'components-autocomplete__result',
+											className,
+											{
+												'is-selected':
+													index === selectedIndex,
+											}
+										) }
+										onClick={ () => this.select( option ) }
+									>
+										{ option.label }
+									</Button>
+								) ) }
 						</div>
 					</Popover>
 				) }
@@ -456,7 +540,6 @@ export class Autocomplete extends Component {
 	}
 }
 
-export default compose( [
-	withSpokenMessages,
-	withInstanceId,
-] )( Autocomplete );
+export default compose( [ withSpokenMessages, withInstanceId ] )(
+	Autocomplete
+);

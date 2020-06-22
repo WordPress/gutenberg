@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { uniqWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,25 +13,50 @@ import {
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 } from '@wordpress/block-editor';
-import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
+import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
+// remove duplicates after gallery append
+const dedupMedia = ( media ) =>
+	uniqWith(
+		media,
+		( media1, media2 ) =>
+			media1.id === media2.id || media1.url === media2.url
+	);
+
 function MediaPlaceholder( props ) {
 	const {
+		addToGallery,
 		allowedTypes = [],
 		labels = {},
 		icon,
 		onSelect,
+		__experimentalOnlyMediaLibrary,
 		isAppender,
 		disableMediaButtons,
 		getStylesFromColorScheme,
 		multiple,
+		value = [],
 	} = props;
+
+	// use ref to keep media array current for callbacks during rerenders
+	const mediaRef = useRef( value );
+	mediaRef.current = value;
+
+	// append and deduplicate media array for gallery use case
+	const setMedia =
+		multiple && addToGallery
+			? ( selected ) =>
+					onSelect(
+						dedupMedia( [ ...mediaRef.current, ...selected ] )
+					)
+			: onSelect;
 
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
@@ -52,6 +78,8 @@ function MediaPlaceholder( props ) {
 			instructions = __( 'ADD IMAGE' );
 		} else if ( isVideo ) {
 			instructions = __( 'ADD VIDEO' );
+		} else {
+			instructions = __( 'ADD IMAGE OR VIDEO' );
 		}
 	}
 
@@ -62,15 +90,20 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select a video' );
 	}
 
-	const emptyStateTitleStyle = getStylesFromColorScheme( styles.emptyStateTitle, styles.emptyStateTitleDark );
+	const emptyStateTitleStyle = getStylesFromColorScheme(
+		styles.emptyStateTitle,
+		styles.emptyStateTitleDark
+	);
+	const addMediaButtonStyle = getStylesFromColorScheme(
+		styles.addMediaButton,
+		styles.addMediaButtonDark
+	);
 
 	const renderContent = () => {
 		if ( isAppender === undefined || ! isAppender ) {
 			return (
 				<>
-					<View style={ styles.modalIcon }>
-						{ icon }
-					</View>
+					<View style={ styles.modalIcon }>{ icon }</View>
 					<Text style={ emptyStateTitleStyle }>
 						{ placeholderTitle }
 					</Text>
@@ -81,11 +114,11 @@ function MediaPlaceholder( props ) {
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
-				<Dashicon
-					icon="plus-alt"
-					style={ styles.addBlockButton }
-					color={ styles.addBlockButton.color }
-					size={ styles.addBlockButton.size }
+				<Icon
+					icon={ plusCircleFilled }
+					style={ addMediaButtonStyle }
+					color={ addMediaButtonStyle.color }
+					size={ addMediaButtonStyle.size }
 				/>
 			);
 		}
@@ -95,13 +128,23 @@ function MediaPlaceholder( props ) {
 		return null;
 	}
 
-	const emptyStateContainerStyle = getStylesFromColorScheme( styles.emptyStateContainer, styles.emptyStateContainerDark );
+	const appenderStyle = getStylesFromColorScheme(
+		styles.appender,
+		styles.appenderDark
+	);
+	const emptyStateContainerStyle = getStylesFromColorScheme(
+		styles.emptyStateContainer,
+		styles.emptyStateContainerDark
+	);
 
 	return (
 		<View style={ { flex: 1 } }>
 			<MediaUpload
 				allowedTypes={ allowedTypes }
-				onSelect={ onSelect }
+				onSelect={ setMedia }
+				__experimentalOnlyMediaLibrary={
+					__experimentalOnlyMediaLibrary
+				}
 				multiple={ multiple }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
@@ -116,12 +159,14 @@ function MediaPlaceholder( props ) {
 							onPress={ ( event ) => {
 								props.onFocus( event );
 								open();
-							} }>
+							} }
+						>
 							<View
 								style={ [
 									emptyStateContainerStyle,
-									isAppender && styles.isAppender,
-								] }>
+									isAppender && appenderStyle,
+								] }
+							>
 								{ getMediaOptions() }
 								{ renderContent() }
 							</View>

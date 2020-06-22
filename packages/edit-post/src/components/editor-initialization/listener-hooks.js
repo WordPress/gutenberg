@@ -20,10 +20,7 @@ import {
  * @param {number} postId  The current post id.
  */
 export const useBlockSelectionListener = ( postId ) => {
-	const {
-		hasBlockSelection,
-		isEditorSidebarOpened,
-	} = useSelect(
+	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(
 		( select ) => ( {
 			hasBlockSelection: !! select(
 				'core/block-editor'
@@ -48,44 +45,6 @@ export const useBlockSelectionListener = ( postId ) => {
 };
 
 /**
- * This listener hook is used to monitor viewport size and adjust the sidebar
- * accordingly.
- *
- * @param {number} postId  The current post id.
- */
-export const useAdjustSidebarListener = ( postId ) => {
-	const { isSmall, activeGeneralSidebarName } = useSelect(
-		( select ) => ( {
-			isSmall: select( 'core/viewport' ).isViewportMatch( '< medium' ),
-			activeGeneralSidebarName: select( STORE_KEY ).getActiveGeneralSidebarName(),
-		} ),
-		[ postId ]
-	);
-
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( STORE_KEY );
-
-	const previousIsSmall = useRef( isSmall );
-	const sidebarToReOpenOnExpand = useRef( null );
-
-	useEffect( () => {
-		if ( previousIsSmall.current === isSmall ) {
-			return;
-		}
-		previousIsSmall.current = isSmall;
-
-		if ( isSmall ) {
-			sidebarToReOpenOnExpand.current = activeGeneralSidebarName;
-			if ( activeGeneralSidebarName ) {
-				closeGeneralSidebar();
-			}
-		} else if ( sidebarToReOpenOnExpand.current && ! activeGeneralSidebarName ) {
-			openGeneralSidebar( sidebarToReOpenOnExpand.current );
-			sidebarToReOpenOnExpand.current = null;
-		}
-	}, [ isSmall, activeGeneralSidebarName ] );
-};
-
-/**
  * This listener hook monitors any change in permalink and updates the view
  * post link in the admin bar.
  *
@@ -101,7 +60,8 @@ export const useUpdatePostLinkListener = ( postId ) => {
 	const nodeToUpdate = useRef();
 
 	useEffect( () => {
-		nodeToUpdate.current = document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
+		nodeToUpdate.current =
+			document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
 			document.querySelector( VIEW_AS_LINK_SELECTOR );
 	}, [ postId ] );
 

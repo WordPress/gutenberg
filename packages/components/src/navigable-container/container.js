@@ -81,7 +81,12 @@ class NavigableContainer extends Component {
 		}
 
 		const { getFocusableContext } = this;
-		const { cycle = true, eventToOffset, onNavigate = noop, stopNavigationEvents } = this.props;
+		const {
+			cycle = true,
+			eventToOffset,
+			onNavigate = noop,
+			stopNavigationEvents,
+		} = this.props;
 
 		const offset = eventToOffset( event );
 
@@ -107,7 +112,9 @@ class NavigableContainer extends Component {
 		}
 
 		const { index, focusables } = context;
-		const nextIndex = cycle ? cycleValue( index, focusables.length, offset ) : index + offset;
+		const nextIndex = cycle
+			? cycleValue( index, focusables.length, offset )
+			: index + offset;
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 			focusables[ nextIndex ].focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
@@ -117,11 +124,13 @@ class NavigableContainer extends Component {
 	render() {
 		const { children, ...props } = this.props;
 		return (
-			<div ref={ this.bindContainer }
+			<div
+				ref={ this.bindContainer }
 				{ ...omit( props, [
 					'stopNavigationEvents',
 					'eventToOffset',
 					'onNavigate',
+					'onKeyDown',
 					'cycle',
 					'onlyBrowserTabstops',
 					'forwardedRef',

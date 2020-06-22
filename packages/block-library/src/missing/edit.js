@@ -17,7 +17,10 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	let messageHTML;
 	if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
-			__( 'Your site doesn’t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.' ),
+			/* translators: %s: block name */
+			__(
+				'Your site doesn’t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.'
+			),
 			originalName
 		);
 		actions.push(
@@ -27,16 +30,17 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 		);
 	} else {
 		messageHTML = sprintf(
-			__( 'Your site doesn’t include support for the "%s" block. You can leave this block intact or remove it entirely.' ),
+			/* translators: %s: block name */
+			__(
+				'Your site doesn’t include support for the "%s" block. You can leave this block intact or remove it entirely.'
+			),
 			originalName
 		);
 	}
 
 	return (
 		<>
-			<Warning actions={ actions }>
-				{ messageHTML }
-			</Warning>
+			<Warning actions={ actions }>{ messageHTML }</Warning>
 			<RawHTML>{ originalUndelimitedContent }</RawHTML>
 		</>
 	);
@@ -46,9 +50,12 @@ const MissingEdit = withDispatch( ( dispatch, { clientId, attributes } ) => {
 	const { replaceBlock } = dispatch( 'core/block-editor' );
 	return {
 		convertToHTML() {
-			replaceBlock( clientId, createBlock( 'core/html', {
-				content: attributes.originalUndelimitedContent,
-			} ) );
+			replaceBlock(
+				clientId,
+				createBlock( 'core/html', {
+					content: attributes.originalUndelimitedContent,
+				} )
+			);
 		},
 	};
 } )( MissingBlockWarning );

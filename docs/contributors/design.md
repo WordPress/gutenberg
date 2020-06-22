@@ -1,8 +1,24 @@
-# Design Principles & Vision
+# Design Contributions
 
-This is a living document that outlines the design principles and patterns of the editor interface. Its aim is to explain the background of the design, inform future improvements, and help people design great blocks.
+A guide on how to get started contributing design to the Gutenberg project.
+
+## Discussions
+
+The [Make WordPress Design blog](https://make.wordpress.org/design/) is the primary spot for the latest information around WordPress Design Team: including announcements, product goals, meeting notes, meeting agendas, and more.
+
+Real-time discussions for design take place in the `#design` channel in [Make WordPress Slack](https://make.wordpress.org/chat) (registration required). Weekly meetings for the Design team are on Wednesdays at 19:00UTC.
+
+## How Can Designers Contribute?
+
+The Gutenberg project uses GitHub for managing code and tracking issues. The main repository is at: [https://github.com/WordPress/gutenberg](https://github.com/WordPress/gutenberg).
+
+If you'd like to contribute to the design or front-end, feel free to contribute to tickets labeled [Needs Design](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3A%22Needs+Design%22) or [Needs Design Feedback](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3A"Needs+Design+Feedback%22). We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it so we can compare.
+
+The [WordPress Design team](http://make.wordpress.org/design/) uses [Figma](https://www.figma.com/) to collaborate and share work. If you'd like to contribute, join the [#design channel](http://wordpress.slack.com/messages/design/) in [Slack](https://make.wordpress.org/chat/) and ask the team to set you up with a free Figma account. This will give you access to a helpful [library of components](https://www.figma.com/file/ZtN5xslEVYgzU7Dd5CxgGZwq/WordPress-Components?node-id=0%3A1) used in WordPress.
 
 ## Principles
+
+This section outlines the design principles and patterns of the editor interface—to explain the background of the design, inform future improvements, and help people design great blocks.
 
 ![Gutenberg Logo](https://cldup.com/J2MgjuShPv-3000x3000.png)
 
@@ -12,7 +28,7 @@ Gutenberg's all-encompassing goal is a post- and page-building experience that m
 
 From the [kickoff post](https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/):
 
-> The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
+> The editor will endeavor to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
 
 We can extract a few key principles from this:
 
@@ -24,7 +40,7 @@ We can extract a few key principles from this:
 
 One thing that sets WordPress apart from other systems is that it allows users to create as rich a post layout as they can imagine — as long as they know HTML and CSS and build a custom theme.
 
-Gutenberg reshapes the editor into a tool that allows users write rich posts and build beautiful layouts in a few clicks — no technical knowledge needed. WordPress will become a powerful and flexible content tool that’s accessible to all.
+Gutenberg reshapes the editor into a tool that allows users to write rich posts and build beautiful layouts in a few clicks — no technical knowledge needed. WordPress will become a powerful and flexible content tool that’s accessible to all.
 
 ### Vision
 

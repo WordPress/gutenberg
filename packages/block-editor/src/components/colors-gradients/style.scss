@@ -1,0 +1,26 @@
+.block-editor-color-gradient-control {
+	&__color-indicator {
+		margin-bottom: $grid-unit-10;
+	}
+
+	&__button-tabs {
+		display: block;
+		margin-bottom: $grid-unit-10;
+	}
+}
+
+.block-editor-panel-color-gradient-settings {
+	.component-color-indicator {
+		vertical-align: text-bottom;
+	}
+
+	&__panel-title {
+		.component-color-indicator {
+			display: inline-block;
+		}
+	}
+
+	&.is-opened &__panel-title .component-color-indicator {
+		display: none;
+	}
+}

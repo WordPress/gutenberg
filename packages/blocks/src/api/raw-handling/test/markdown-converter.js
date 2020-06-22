@@ -24,7 +24,7 @@ describe( 'markdownConverter', () => {
 
 	it( 'should not correct code with line breaks', () => {
 		const input = '```js\ntest\n```';
-		const output = '<pre><code class=\"js language-js\">test</code></pre>';
+		const output = '<pre><code class="js language-js">test</code></pre>';
 		expect( markdownConverter( input ) ).toEqual( output );
 	} );
 } );

@@ -1,12 +1,12 @@
 $color-palette-circle-size: 28px;
-$color-palette-circle-spacing: 14px;
+$color-palette-circle-spacing: 12px;
 
 .components-circular-option-picker {
-	margin-right: -14px;
-	width: calc(100% + 14px);
+	display: inline-block;
+	margin-top: 0.6rem;
+	width: 100%;
 
 	.components-circular-option-picker__custom-clear-wrapper {
-		width: calc(100% - 14px);
 		display: flex;
 		justify-content: flex-end;
 	}
@@ -22,6 +22,7 @@ $color-palette-circle-spacing: 14px;
 	transform: scale(1);
 	transition: 100ms transform ease;
 	@include reduce-motion("transition");
+
 	&:hover {
 		transform: scale(1.2);
 	}
@@ -61,18 +62,23 @@ $color-palette-circle-spacing: 14px;
 	@include reduce-motion("transition");
 	cursor: pointer;
 
-	&.is-active {
+	&:hover {
+		// Override default button hover style.
+		box-shadow: inset 0 0 0 ($color-palette-circle-size / 2) !important;
+	}
+
+	&.is-pressed {
 		box-shadow: inset 0 0 0 4px;
 		position: relative;
-		z-index: z-index(".components-circular-option-picker__option.is-active");
+		z-index: z-index(".components-circular-option-picker__option.is-pressed");
+		overflow: visible;
 
-		& + .dashicons-saved {
+		& + svg {
 			position: absolute;
-			left: 4px;
-			top: 4px;
+			left: 2px;
+			top: 2px;
 			border-radius: 50%;
-			z-index: z-index(".components-circular-option-picker__option.is-active + .dashicons-saved");
-			background: $white;
+			z-index: z-index(".components-circular-option-picker__option.is-pressed + svg");
 			pointer-events: none;
 		}
 	}
@@ -91,7 +97,6 @@ $color-palette-circle-spacing: 14px;
 	}
 
 	&:focus {
-		outline: none;
 		&::after {
 			content: "";
 			border: #{ $border-width * 2 } solid $dark-gray-400;
@@ -104,6 +109,12 @@ $color-palette-circle-spacing: 14px;
 			box-shadow: inset 0 0 0 2px $white;
 		}
 	}
+
+	&.components-button:focus {
+		background-color: transparent;
+		box-shadow: inset 0 0 0 ($color-palette-circle-size / 2);
+		outline: none;
+	}
 }
 
 .components-circular-option-picker__button-action .components-circular-option-picker__option {
@@ -113,7 +124,7 @@ $color-palette-circle-spacing: 14px;
 
 
 .components-circular-option-picker__dropdown-link-action {
-	margin-right: $grid-size-large;
+	margin-right: $grid-unit-20;
 
 	.components-button {
 		line-height: 22px;

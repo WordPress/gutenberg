@@ -1,11 +1,11 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/social-link-dropbox",
+        "name": "core/social-link",
         "isValid": true,
         "attributes": {
             "url": "https://example.com/",
-            "site": "dropbox"
+            "service": "dropbox"
         },
         "innerBlocks": [],
         "originalContent": ""

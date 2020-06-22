@@ -5,6 +5,28 @@ In the previous step, the block had applied its own styles by an inline `style` 
 The editor will automatically generate a class name for each block type to simplify styling. It can be accessed from the object argument passed to the edit and save functions. In step 2, we will create a stylesheet to use that class name.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+import { registerBlockType } from '@wordpress/blocks';
+
+registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
+	title: 'Example: Stylesheets',
+
+	icon: 'universal-access-alt',
+
+	category: 'design',
+
+	example: {},
+
+	edit( { className } ) {
+		return <p className={ className }>Hello World, step 2 (from the editor, in green).</p>;
+	},
+
+	save() {
+		return <p>Hello World, step 2 (from the frontend, in red).</p>;
+	},
+} );
+```
 {% ES5 %}
 ```js
 ( function( blocks, element ) {
@@ -13,7 +35,7 @@ The editor will automatically generate a class name for each block type to simpl
 	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 		title: 'Example: Stylesheets',
 		icon: 'universal-access-alt',
-		category: 'layout',
+		category: 'design',
 		example: {},
 		edit: function( props ) {
 			return el(
@@ -34,28 +56,6 @@ The editor will automatically generate a class name for each block type to simpl
 	window.wp.blocks,
 	window.wp.element
 ) );
-```
-{% ESNext %}
-```js
-import { registerBlockType } from '@wordpress/blocks';
-
-registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
-	title: 'Example: Stylesheets',
-
-	icon: 'universal-access-alt',
-
-	category: 'layout',
-
-	example: {},
-
-	edit( { className } ) {
-		return <p className={ className }>Hello World, step 2 (from the editor, in green).</p>;
-	},
-
-	save() {
-		return <p>Hello World, step 2 (from the frontend, in red).</p>;
-	}
-} );
 ```
 {% end %}
 

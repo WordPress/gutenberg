@@ -15,9 +15,12 @@ import { HTMLTextInput } from '..';
 
 // Utility to find a TextInput in a ShallowWrapper
 const findTextInputInWrapper = ( wrapper, matchingProps ) => {
-	return wrapper.dive().findWhere( ( node ) => {
-		return node.name() === 'TextInput' && node.is( matchingProps );
-	} ).first();
+	return wrapper
+		.dive()
+		.findWhere( ( node ) => {
+			return node.name() === 'TextInput' && node.is( matchingProps );
+		} )
+		.first();
 };
 
 // Finds the Content TextInput in our HTMLInputView
@@ -40,7 +43,9 @@ const getStylesFromColorScheme = () => {
 describe( 'HTMLTextInput', () => {
 	it( 'HTMLTextInput renders', () => {
 		const wrapper = shallow(
-			<HTMLTextInput getStylesFromColorScheme={ getStylesFromColorScheme } />
+			<HTMLTextInput
+				getStylesFromColorScheme={ getStylesFromColorScheme }
+			/>
 		);
 		expect( wrapper ).toBeTruthy();
 	} );
@@ -120,4 +125,3 @@ describe( 'HTMLTextInput', () => {
 		expect( editTitle ).toHaveBeenCalledWith( 'text' );
 	} );
 } );
-

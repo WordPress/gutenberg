@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { fireEvent, render } from '@testing-library/react';
 import { each } from 'lodash';
 
 /**
@@ -14,14 +14,16 @@ import { TAB, SPACE } from '@wordpress/keycodes';
  */
 import { TabbableContainer } from '../tabbable';
 
-function simulateVisible( wrapper, selector ) {
-	const elements = wrapper.getDOMNode().querySelectorAll( selector );
+function simulateVisible( container, selector ) {
+	const elements = container.querySelectorAll( selector );
 	each( elements, ( elem ) => {
-		elem.getClientRects = () => [ 'trick-jsdom-into-having-size-for-element-rect' ];
+		elem.getClientRects = () => [
+			'trick-jsdom-into-having-size-for-element-rect',
+		];
 	} );
 }
 
-function fireKeyDown( container, keyCode, shiftKey ) {
+function fireKeyDown( node, keyCode, shiftKey ) {
 	const interaction = {
 		stopped: false,
 	};
@@ -33,7 +35,7 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 	event.stopImmediatePropagation = () => {
 		interaction.stopped = true;
 	};
-	container.getDOMNode().dispatchEvent( event );
+	fireEvent( node, event );
 
 	return interaction;
 }
@@ -41,31 +43,50 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 describe( 'TabbableContainer', () => {
 	it( 'should navigate by keypresses', () => {
 		let currentIndex = 0;
-		const wrapper = mount( (
+		const { container } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<TabbableContainer className="wrapper" onNavigate={ ( index ) => currentIndex = index }>
-				<div className="section" id="section1" tabIndex="0">Section One</div>
-				<div className="section" id="section2" tabIndex="0">Section Two</div>
-				<div className="deep-section-wrapper">
-					<div className="section" id="section-deep" tabIndex="0">Section to <strong>not</strong> skip</div>
+			<TabbableContainer
+				className="wrapper"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
+				<div className="section" id="section1" tabIndex="0">
+					Section One
 				</div>
-				<div className="section" id="section3" tabIndex="0">Section Three</div>
+				<div className="section" id="section2" tabIndex="0">
+					Section Two
+				</div>
+				<div className="deep-section-wrapper">
+					<div className="section" id="section-deep" tabIndex="0">
+						Section to <strong>not</strong> skip
+					</div>
+				</div>
+				<div className="section" id="section3" tabIndex="0">
+					Section Three
+				</div>
 			</TabbableContainer>
 			/* eslint-enable no-restricted-syntax */
-		) );
+		);
 
-		simulateVisible( wrapper, '*' );
+		simulateVisible( container, '*' );
 
-		const container = wrapper.find( 'div.wrapper' );
-		wrapper.getDOMNode().querySelector( '#section1' ).focus();
+		container.querySelector( '#section1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, shiftKey );
+		function assertKeyDown(
+			keyCode,
+			shiftKey,
+			expectedActiveIndex,
+			expectedStop
+		) {
+			const interaction = fireKeyDown(
+				container.querySelector( '.wrapper' ),
+				keyCode,
+				shiftKey
+			);
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
 		}
@@ -83,28 +104,46 @@ describe( 'TabbableContainer', () => {
 
 	it( 'should navigate by keypresses and stop at edges', () => {
 		let currentIndex = 0;
-		const wrapper = mount( (
+		const { container } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<TabbableContainer cycle={ false } className="wrapper" onNavigate={ ( index ) => currentIndex = index }>
-				<div className="section" id="section1" tabIndex="0">Section One</div>
-				<div className="section" id="section2" tabIndex="0">Section Two</div>
-				<div className="section" id="section3" tabIndex="0">Section Three</div>
+			<TabbableContainer
+				cycle={ false }
+				className="wrapper"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
+				<div className="section" id="section1" tabIndex="0">
+					Section One
+				</div>
+				<div className="section" id="section2" tabIndex="0">
+					Section Two
+				</div>
+				<div className="section" id="section3" tabIndex="0">
+					Section Three
+				</div>
 			</TabbableContainer>
 			/* eslint-enable no-restricted-syntax */
-		) );
+		);
 
-		simulateVisible( wrapper, '*' );
+		simulateVisible( container, '*' );
 
-		const container = wrapper.find( 'div.wrapper' );
-		wrapper.getDOMNode().querySelector( '#section1' ).focus();
+		container.querySelector( '#section1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, shiftKey );
+		function assertKeyDown(
+			keyCode,
+			shiftKey,
+			expectedActiveIndex,
+			expectedStop
+		) {
+			const interaction = fireKeyDown(
+				container.querySelector( '.wrapper' ),
+				keyCode,
+				shiftKey
+			);
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
 		}

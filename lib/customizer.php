@@ -55,7 +55,7 @@ function gutenberg_customize_register( $wp_customize ) {
 			'sanitize_callback' => 'gutenberg_customize_sanitize',
 		)
 	);
-	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
 		$wp_customize->add_section(
 			'gutenberg_widget_blocks',
 			array( 'title' => __( 'Widget Blocks (Experimental)', 'gutenberg' ) )

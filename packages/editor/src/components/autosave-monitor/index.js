@@ -7,7 +7,12 @@ import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isDirty, editsReference, isAutosaveable, isAutosaving } = this.props;
+		const {
+			isDirty,
+			editsReference,
+			isAutosaveable,
+			isAutosaving,
+		} = this.props;
 
 		// The edits reference is held for comparison to avoid scheduling an
 		// autosave if an edit has not been made since the last autosave
@@ -30,9 +35,7 @@ export class AutosaveMonitor extends Component {
 			prevProps.editsReference !== editsReference
 		) {
 			this.toggleTimer(
-				isDirty &&
-				isAutosaveable &&
-				! this.didAutosaveForEditsReference
+				isDirty && isAutosaveable && ! this.didAutosaveForEditsReference
 			);
 		}
 	}
@@ -55,13 +58,10 @@ export class AutosaveMonitor extends Component {
 		}
 
 		if ( isPendingSave && ! ( shouldThrottle && this.pendingSave ) ) {
-			this.pendingSave = setTimeout(
-				() => {
-					this.props.autosave();
-					delete this.pendingSave;
-				},
-				interval * 1000
-			);
+			this.pendingSave = setTimeout( () => {
+				this.props.autosave();
+				delete this.pendingSave;
+			}, interval * 1000 );
 		}
 	}
 
@@ -72,9 +72,7 @@ export class AutosaveMonitor extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const {
-			getReferenceByDistinctEdits,
-		} = select( 'core' );
+		const { getReferenceByDistinctEdits } = select( 'core' );
 
 		const {
 			isEditedPostDirty,

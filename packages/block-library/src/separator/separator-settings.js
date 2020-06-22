@@ -2,15 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	InspectorControls,
-	PanelColorSettings,
-} from '@wordpress/block-editor';
+import { InspectorControls, PanelColorSettings } from '@wordpress/block-editor';
 
 const SeparatorSettings = ( { color, setColor } ) => (
 	<InspectorControls>
 		<PanelColorSettings
-			title={ __( 'Color Settings' ) }
+			title={ __( 'Color settings' ) }
 			colorSettings={ [
 				{
 					value: color.color,
@@ -18,8 +15,7 @@ const SeparatorSettings = ( { color, setColor } ) => (
 					label: __( 'Color' ),
 				},
 			] }
-		>
-		</PanelColorSettings>
+		></PanelColorSettings>
 	</InspectorControls>
 );
 

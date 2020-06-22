@@ -5,7 +5,7 @@
  * https://github.com/GoogleChrome/puppeteer/issues/1751
  *
  * @param {number} width  Width of the window.
- * @param {height} height Height of the window.
+ * @param {number} height Height of the window.
  */
 export async function waitForWindowDimensions( width, height ) {
 	await page

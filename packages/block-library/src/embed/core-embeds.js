@@ -17,6 +17,8 @@ import {
 	embedRedditIcon,
 	embedTumblrIcon,
 	embedAmazonIcon,
+	embedAnimotoIcon,
+	embedDailymotionIcon,
 } from './icons';
 
 /**
@@ -31,7 +33,7 @@ export const common = [
 		settings: {
 			title: 'Twitter',
 			icon: embedTwitterIcon,
-			keywords: [ 'tweet' ],
+			keywords: [ 'tweet', __( 'social' ) ],
 			description: __( 'Embed a tweet.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
@@ -44,14 +46,19 @@ export const common = [
 			keywords: [ __( 'music' ), __( 'video' ) ],
 			description: __( 'Embed a YouTube video.' ),
 		},
-		patterns: [ /^https?:\/\/((m|www)\.)?youtube\.com\/.+/i, /^https?:\/\/youtu\.be\/.+/i ],
+		patterns: [
+			/^https?:\/\/((m|www)\.)?youtube\.com\/.+/i,
+			/^https?:\/\/youtu\.be\/.+/i,
+		],
 	},
 	{
 		name: 'core-embed/facebook',
 		settings: {
 			title: 'Facebook',
 			icon: embedFacebookIcon,
+			keywords: [ __( 'social' ) ],
 			description: __( 'Embed a Facebook post.' ),
+			previewable: false,
 		},
 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
 	},
@@ -60,7 +67,7 @@ export const common = [
 		settings: {
 			title: 'Instagram',
 			icon: embedInstagramIcon,
-			keywords: [ __( 'image' ) ],
+			keywords: [ __( 'image' ), __( 'social' ) ],
 			description: __( 'Embed an Instagram post.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
@@ -103,7 +110,10 @@ export const common = [
 			keywords: [ __( 'image' ) ],
 			description: __( 'Embed Flickr content.' ),
 		},
-		patterns: [ /^https?:\/\/(www\.)?flickr\.com\/.+/i, /^https?:\/\/flic\.kr\/.+/i ],
+		patterns: [
+			/^https?:\/\/(www\.)?flickr\.com\/.+/i,
+			/^https?:\/\/flic\.kr\/.+/i,
+		],
 	},
 	{
 		name: 'core-embed/vimeo',
@@ -122,7 +132,7 @@ export const others = [
 		name: 'core-embed/animoto',
 		settings: {
 			title: 'Animoto',
-			icon: embedVideoIcon,
+			icon: embedAnimotoIcon,
 			description: __( 'Embed an Animoto video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?(animoto|video214)\.com\/.+/i ],
@@ -137,38 +147,49 @@ export const others = [
 		patterns: [ /^https?:\/\/cloudup\.com\/.+/i ],
 	},
 	{
+		// Deprecated since CollegeHumor content is now powered by YouTube
 		name: 'core-embed/collegehumor',
 		settings: {
 			title: 'CollegeHumor',
 			icon: embedVideoIcon,
 			description: __( 'Embed CollegeHumor content.' ),
+			supports: {
+				inserter: false,
+			},
 		},
-		patterns: [ /^https?:\/\/(www\.)?collegehumor\.com\/.+/i ],
+		patterns: [],
 	},
 	{
 		name: 'core-embed/crowdsignal',
 		settings: {
 			title: 'Crowdsignal',
 			icon: embedContentIcon,
-			keywords: [ 'polldaddy' ],
-			transform: [ {
-				type: 'block',
-				blocks: [ 'core-embed/polldaddy' ],
-				transform: ( content ) => {
-					return createBlock( 'core-embed/crowdsignal', {
-						content,
-					} );
+			keywords: [ 'polldaddy', __( 'survey' ) ],
+			transform: [
+				{
+					type: 'block',
+					blocks: [ 'core-embed/polldaddy' ],
+					transform: ( content ) => {
+						return createBlock( 'core-embed/crowdsignal', {
+							content,
+						} );
+					},
 				},
-			} ],
-			description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
+			],
+			description: __(
+				'Embed Crowdsignal (formerly Polldaddy) content.'
+			),
 		},
-		patterns: [ /^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i ],
+		patterns: [
+			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i,
+		],
 	},
 	{
 		name: 'core-embed/dailymotion',
 		settings: {
 			title: 'Dailymotion',
-			icon: embedVideoIcon,
+			icon: embedDailymotionIcon,
+			keywords: [ __( 'video' ) ],
 			description: __( 'Embed a Dailymotion video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
@@ -178,6 +199,7 @@ export const others = [
 		settings: {
 			title: 'Hulu',
 			icon: embedVideoIcon,
+			keywords: [ __( 'video' ) ],
 			description: __( 'Embed Hulu content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?hulu\.com\/.+/i ],
@@ -207,7 +229,10 @@ export const others = [
 			icon: embedContentIcon,
 			description: __( 'Embed Kickstarter content.' ),
 		},
-		patterns: [ /^https?:\/\/(www\.)?kickstarter\.com\/.+/i, /^https?:\/\/kck\.st\/.+/i ],
+		patterns: [
+			/^https?:\/\/(www\.)?kickstarter\.com\/.+/i,
+			/^https?:\/\/kck\.st\/.+/i,
+		],
 	},
 	{
 		name: 'core-embed/meetup-com',
@@ -292,8 +317,9 @@ export const others = [
 			title: 'SmugMug',
 			icon: embedPhotoIcon,
 			description: __( 'Embed SmugMug content.' ),
+			previewable: false,
 		},
-		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(.+\.)?smugmug\.com\/.*/i ],
 	},
 	{
 		// Deprecated in favour of the core-embed/speaker-deck block.
@@ -312,18 +338,30 @@ export const others = [
 		settings: {
 			title: 'Speaker Deck',
 			icon: embedContentIcon,
-			transform: [ {
-				type: 'block',
-				blocks: [ 'core-embed/speaker' ],
-				transform: ( content ) => {
-					return createBlock( 'core-embed/speaker-deck', {
-						content,
-					} );
+			transform: [
+				{
+					type: 'block',
+					blocks: [ 'core-embed/speaker' ],
+					transform: ( content ) => {
+						return createBlock( 'core-embed/speaker-deck', {
+							content,
+						} );
+					},
 				},
-			} ],
+			],
 			description: __( 'Embed Speaker Deck content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
+	},
+	{
+		name: 'core-embed/tiktok',
+		settings: {
+			title: 'TikTok',
+			icon: embedVideoIcon,
+			keywords: [ __( 'video' ) ],
+			description: __( 'Embed a TikTok video.' ),
+		},
+		patterns: [ /^https?:\/\/(www\.)?tiktok\.com\/.+/i ],
 	},
 	{
 		name: 'core-embed/ted',
@@ -339,6 +377,7 @@ export const others = [
 		settings: {
 			title: 'Tumblr',
 			icon: embedTumblrIcon,
+			keywords: [ __( 'social' ) ],
 			description: __( 'Embed a Tumblr post.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],

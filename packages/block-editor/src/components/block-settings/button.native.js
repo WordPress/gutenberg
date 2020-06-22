@@ -4,15 +4,17 @@
 import { createSlotFill, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
+import { cog } from '@wordpress/icons';
 
 const { Fill, Slot } = createSlotFill( 'SettingsToolbarButton' );
 
-const SettingsButton = ( { openGeneralSidebar } ) =>
+const SettingsButton = ( { openGeneralSidebar } ) => (
 	<ToolbarButton
 		title={ __( 'Open Settings' ) }
-		icon="admin-generic"
+		icon={ cog }
 		onClick={ openGeneralSidebar }
-	/>;
+	/>
+);
 
 const SettingsButtonFill = ( props ) => (
 	<Fill>

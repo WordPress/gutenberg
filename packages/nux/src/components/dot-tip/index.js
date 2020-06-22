@@ -2,17 +2,11 @@
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
-import { Popover, Button, IconButton } from '@wordpress/components';
+import { Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
-
-function getAnchorRect( anchor ) {
-	// The default getAnchorRect() excludes an element's top and bottom padding
-	// from its calculation. We want tips to point to the outer margin of an
-	// element, so we override getAnchorRect() to include all padding.
-	return anchor.parentNode.getBoundingClientRect();
-}
+import { close } from '@wordpress/icons';
 
 function onClick( event ) {
 	// Tips are often nested within buttons. We stop propagation so that clicking
@@ -29,13 +23,6 @@ export function DotTip( {
 	onDisable,
 } ) {
 	const anchorParent = useRef( null );
-	const getAnchorRectCallback = useCallback(
-		( anchor ) => {
-			anchorParent.current = anchor.parentNode;
-			return getAnchorRect( anchor );
-		},
-		[ anchorParent ]
-	);
 	const onFocusOutsideCallback = useCallback(
 		( event ) => {
 			if ( ! anchorParent.current ) {
@@ -58,7 +45,7 @@ export function DotTip( {
 			position={ position }
 			noArrow
 			focusOnMount="container"
-			getAnchorRect={ getAnchorRectCallback }
+			shouldAnchorIncludePadding
 			role="dialog"
 			aria-label={ __( 'Editor tips' ) }
 			onClick={ onClick }
@@ -70,9 +57,9 @@ export function DotTip( {
 					{ hasNextTip ? __( 'See next tip' ) : __( 'Got it' ) }
 				</Button>
 			</p>
-			<IconButton
+			<Button
 				className="nux-dot-tip__disable"
-				icon="no-alt"
+				icon={ close }
 				label={ __( 'Disable tips' ) }
 				onClick={ onDisable }
 			/>
@@ -99,5 +86,5 @@ export default compose(
 				disableTips();
 			},
 		};
-	} ),
+	} )
 )( DotTip );

@@ -5,16 +5,56 @@ import momentLib from 'moment';
 import 'moment-timezone/moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
+/** @typedef {import('moment').Moment} Moment */
+
 const WP_ZONE = 'WP';
+
+// This regular expression tests positive for UTC offsets as described in ISO 8601.
+// See: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
+const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:?[0-9][0-9])?$/;
 
 // Changes made here will likely need to be made in `lib/client-assets.php` as
 // well because it uses the `setSettings()` function to change these settings.
 let settings = {
 	l10n: {
 		locale: 'en',
-		months: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
-		monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
-		weekdays: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
+		months: [
+			'January',
+			'February',
+			'March',
+			'April',
+			'May',
+			'June',
+			'July',
+			'August',
+			'September',
+			'October',
+			'November',
+			'December',
+		],
+		monthsShort: [
+			'Jan',
+			'Feb',
+			'Mar',
+			'Apr',
+			'May',
+			'Jun',
+			'Jul',
+			'Aug',
+			'Sep',
+			'Oct',
+			'Nov',
+			'Dec',
+		],
+		weekdays: [
+			'Sunday',
+			'Monday',
+			'Tuesday',
+			'Wednesday',
+			'Thursday',
+			'Friday',
+			'Saturday',
+		],
 		weekdaysShort: [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
 		meridiem: { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' },
 		relative: {
@@ -62,9 +102,13 @@ export function setSettings( dateSettings ) {
 		weekdaysShort: dateSettings.l10n.weekdaysShort,
 		meridiem( hour, minute, isLowercase ) {
 			if ( hour < 12 ) {
-				return isLowercase ? dateSettings.l10n.meridiem.am : dateSettings.l10n.meridiem.AM;
+				return isLowercase
+					? dateSettings.l10n.meridiem.am
+					: dateSettings.l10n.meridiem.AM;
 			}
-			return isLowercase ? dateSettings.l10n.meridiem.pm : dateSettings.l10n.meridiem.PM;
+			return isLowercase
+				? dateSettings.l10n.meridiem.pm
+				: dateSettings.l10n.meridiem.PM;
 		},
 		longDateFormat: {
 			LT: dateSettings.formats.time,
@@ -94,12 +138,14 @@ export function __experimentalGetSettings() {
 
 function setupWPTimezone() {
 	// Create WP timezone based off dateSettings.
-	momentLib.tz.add( momentLib.tz.pack( {
-		name: WP_ZONE,
-		abbrs: [ WP_ZONE ],
-		untils: [ null ],
-		offsets: [ -settings.timezone.offset * 60 || 0 ],
-	} ) );
+	momentLib.tz.add(
+		momentLib.tz.pack( {
+			name: WP_ZONE,
+			abbrs: [ WP_ZONE ],
+			untils: [ null ],
+			offsets: [ -settings.timezone.offset * 60 || 0 ],
+		} )
+	);
 }
 
 // Date constants.
@@ -145,7 +191,7 @@ const formatMap = {
 	/**
 	 * Gets the ordinal suffix.
 	 *
-	 * @param {moment} momentDate Moment instance.
+	 * @param {Moment} momentDate Moment instance.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -160,7 +206,7 @@ const formatMap = {
 	/**
 	 * Gets the day of the year (zero-indexed).
 	 *
-	 * @param {moment} momentDate Moment instance.
+	 * @param {Moment} momentDate Moment instance.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -180,7 +226,7 @@ const formatMap = {
 	/**
 	 * Gets the days in the month.
 	 *
-	 * @param {moment} momentDate Moment instance.
+	 * @param {Moment} momentDate Moment instance.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -192,7 +238,7 @@ const formatMap = {
 	/**
 	 * Gets whether the current year is a leap year.
 	 *
-	 * @param {moment} momentDate Moment instance.
+	 * @param {Moment} momentDate Moment instance.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -209,7 +255,7 @@ const formatMap = {
 	/**
 	 * Gets the current time in Swatch Internet Time (.beats).
 	 *
-	 * @param {moment} momentDate Moment instance.
+	 * @param {Moment} momentDate Moment instance.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -219,11 +265,10 @@ const formatMap = {
 			minutes = parseInt( timezoned.format( 'm' ), 10 ),
 			hours = parseInt( timezoned.format( 'H' ), 10 );
 		return parseInt(
-			(
-				seconds +
-				( minutes * MINUTE_IN_SECONDS ) +
-				( hours * HOUR_IN_SECONDS )
-			) / 86.4,
+			( seconds +
+				minutes * MINUTE_IN_SECONDS +
+				hours * HOUR_IN_SECONDS ) /
+				86.4,
 			10
 		);
 	},
@@ -240,7 +285,7 @@ const formatMap = {
 	/**
 	 * Gets whether the timezone is in DST currently.
 	 *
-	 * @param {moment} momentDate Moment instance.
+	 * @param {Moment} momentDate Moment instance.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -253,7 +298,7 @@ const formatMap = {
 	/**
 	 * Gets the timezone offset in seconds.
 	 *
-	 * @param {moment} momentDate Moment instance.
+	 * @param {Moment} momentDate Moment instance.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -262,7 +307,11 @@ const formatMap = {
 		const offset = momentDate.format( 'Z' );
 		const sign = offset[ 0 ] === '-' ? -1 : 1;
 		const parts = offset.substring( 1 ).split( ':' );
-		return sign * ( ( parts[ 0 ] * HOUR_IN_MINUTES ) + parts[ 1 ] ) * MINUTE_IN_SECONDS;
+		return (
+			sign *
+			( parts[ 0 ] * HOUR_IN_MINUTES + parts[ 1 ] ) *
+			MINUTE_IN_SECONDS
+		);
 	},
 	// Full date/time
 	c: 'YYYY-MM-DDTHH:mm:ssZ', // .toISOString
@@ -273,10 +322,10 @@ const formatMap = {
 /**
  * Formats a date. Does not alter the date's timezone.
  *
- * @param {string}                    dateFormat PHP-style formatting string.
- *                                               See php.net/date.
- * @param {(Date|string|moment|null)} dateValue  Date object or string,
- *                                               parsable by moment.js.
+ * @param {string}                  dateFormat PHP-style formatting string.
+ *                                             See php.net/date.
+ * @param {Date|string|Moment|null} dateValue  Date object or string,
+ *                                             parsable by moment.js.
  *
  * @return {string} Formatted date.
  */
@@ -312,30 +361,35 @@ export function format( dateFormat, dateValue = new Date() ) {
 }
 
 /**
- * Formats a date (like `date()` in PHP), in the site's timezone.
+ * Formats a date (like `date()` in PHP).
  *
- * @param {string}                    dateFormat PHP-style formatting string.
- *                                               See php.net/date.
- * @param {(Date|string|moment|null)} dateValue  Date object or string,
- *                                               parsable by moment.js.
+ * @param {string}                  dateFormat PHP-style formatting string.
+ *                                             See php.net/date.
+ * @param {Date|string|Moment|null} dateValue  Date object or string, parsable
+ *                                             by moment.js.
+ * @param {string|number|null}      timezone   Timezone to output result in or a
+ *                                             UTC offset. Defaults to timezone from
+ *                                             site.
  *
- * @return {string} Formatted date.
+ * @see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+ * @see https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
+ *
+ * @return {string} Formatted date in English.
  */
-export function date( dateFormat, dateValue = new Date() ) {
-	const offset = settings.timezone.offset * HOUR_IN_MINUTES;
-	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
+export function date( dateFormat, dateValue = new Date(), timezone ) {
+	const dateMoment = buildMoment( dateValue, timezone );
 	return format( dateFormat, dateMoment );
 }
 
 /**
  * Formats a date (like `date()` in PHP), in the UTC timezone.
  *
- * @param {string}                    dateFormat PHP-style formatting string.
- *                                               See php.net/date.
- * @param {(Date|string|moment|null)} dateValue  Date object or string,
- *                                               parsable by moment.js.
+ * @param {string}                  dateFormat PHP-style formatting string.
+ *                                             See php.net/date.
+ * @param {Date|string|Moment|null} dateValue  Date object or string,
+ *                                             parsable by moment.js.
  *
- * @return {string} Formatted date.
+ * @return {string} Formatted date in English.
  */
 export function gmdate( dateFormat, dateValue = new Date() ) {
 	const dateMoment = momentLib( dateValue ).utc();
@@ -343,26 +397,54 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
 }
 
 /**
- * Formats a date (like `date_i18n()` in PHP).
+ * Formats a date (like `wp_date()` in PHP), translating it into site's locale.
  *
- * @param {string}                    dateFormat PHP-style formatting string.
- *                                               See php.net/date.
- * @param {(Date|string|moment|null)} dateValue  Date object or string,
- *                                               parsable by moment.js.
- * @param {boolean}                   gmt        True for GMT/UTC, false for
- *                                               site's timezone.
+ * Backward Compatibility Notice: if `timezone` is set to `true`, the function
+ * behaves like `gmdateI18n`.
+ *
+ * @param {string}                     dateFormat PHP-style formatting string.
+ *                                                See php.net/date.
+ * @param {Date|string|Moment|null}    dateValue  Date object or string, parsable by
+ *                                                moment.js.
+ * @param {string|number|boolean|null} timezone   Timezone to output result in or a
+ *                                                UTC offset. Defaults to timezone from
+ *                                                site. Notice: `boolean` is effectively
+ *                                                deprecated, but still supported for
+ *                                                backward compatibility reasons.
+ *
+ * @see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+ * @see https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
  *
  * @return {string} Formatted date.
  */
-export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
-	// Defaults.
-	const offset = gmt ? 0 : settings.timezone.offset * HOUR_IN_MINUTES;
-	// Convert to moment object.
-	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
+export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
+	if ( true === timezone ) {
+		return gmdateI18n( dateFormat, dateValue );
+	}
 
-	// Set the locale.
+	if ( false === timezone ) {
+		timezone = undefined;
+	}
+
+	const dateMoment = buildMoment( dateValue, timezone );
 	dateMoment.locale( settings.l10n.locale );
-	// Format and return.
+	return format( dateFormat, dateMoment );
+}
+
+/**
+ * Formats a date (like `wp_date()` in PHP), translating it into site's locale
+ * and using the UTC timezone.
+ *
+ * @param {string}                  dateFormat PHP-style formatting string.
+ *                                             See php.net/date.
+ * @param {Date|string|Moment|null} dateValue  Date object or string,
+ *                                             parsable by moment.js.
+ *
+ * @return {string} Formatted date.
+ */
+export function gmdateI18n( dateFormat, dateValue = new Date() ) {
+	const dateMoment = momentLib( dateValue ).utc();
+	dateMoment.locale( settings.l10n.locale );
 	return format( dateFormat, dateMoment );
 }
 
@@ -393,6 +475,53 @@ export function getDate( dateString ) {
 	}
 
 	return momentLib.tz( dateString, WP_ZONE ).toDate();
+}
+
+/**
+ * Creates a moment instance using the given timezone or, if none is provided, using global settings.
+ *
+ * @param {Date|string|Moment|null} dateValue Date object or string, parsable
+ *                                            by moment.js.
+ * @param {string|number|null}      timezone  Timezone to output result in or a
+ *                                            UTC offset. Defaults to timezone from
+ *                                            site.
+ *
+ * @see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+ * @see https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
+ *
+ * @return {Moment} a moment instance.
+ */
+function buildMoment( dateValue, timezone = '' ) {
+	const dateMoment = momentLib( dateValue );
+
+	if ( timezone && ! isUTCOffset( timezone ) ) {
+		return dateMoment.tz( timezone );
+	}
+
+	if ( timezone && isUTCOffset( timezone ) ) {
+		return dateMoment.utcOffset( timezone );
+	}
+
+	if ( settings.timezone.string ) {
+		return dateMoment.tz( settings.timezone.string );
+	}
+
+	return dateMoment.utcOffset( settings.timezone.offset );
+}
+
+/**
+ * Returns whether a certain UTC offset is valid or not.
+ *
+ * @param {number|string} offset a UTC offset.
+ *
+ * @return {boolean} whether a certain UTC offset is valid or not.
+ */
+function isUTCOffset( offset ) {
+	if ( 'number' === typeof offset ) {
+		return true;
+	}
+
+	return VALID_UTC_OFFSET.test( offset );
 }
 
 setupWPTimezone();

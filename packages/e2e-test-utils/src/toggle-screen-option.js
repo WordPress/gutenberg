@@ -13,7 +13,9 @@ import { clickOnMoreMenuItem } from './click-on-more-menu-item';
  */
 export async function toggleScreenOption( label, shouldBeChecked = undefined ) {
 	await clickOnMoreMenuItem( 'Options' );
-	const [ handle ] = await page.$x( `//label[contains(text(), "${ label }")]` );
+	const [ handle ] = await page.$x(
+		`//label[contains(text(), "${ label }")]`
+	);
 
 	const isChecked = await page.evaluate(
 		( element ) => element.control.checked,

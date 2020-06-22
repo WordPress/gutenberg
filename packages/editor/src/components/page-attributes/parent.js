@@ -16,7 +16,12 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import { buildTermsTree } from '../../utils/terms';
 
-export function PageAttributesParent( { parent, postType, items, onUpdateParent } ) {
+export function PageAttributesParent( {
+	parent,
+	postType,
+	items,
+	onUpdateParent,
+} ) {
 	const isHierarchical = get( postType, [ 'hierarchical' ], false );
 	const parentPageLabel = get( postType, [ 'labels', 'parent_item_colon' ] );
 	const pageItems = items || [];
@@ -24,11 +29,16 @@ export function PageAttributesParent( { parent, postType, items, onUpdateParent 
 		return null;
 	}
 
-	const pagesTree = buildTermsTree( pageItems.map( ( item ) => ( {
-		id: item.id,
-		parent: item.parent,
-		name: item.title.raw ? item.title.raw : `#${ item.id } (${ __( 'no title' ) })`,
-	} ) ) );
+	const pagesTree = buildTermsTree(
+		pageItems.map( ( item ) => ( {
+			id: item.id,
+			parent: item.parent,
+			name:
+				item.title && item.title.raw
+					? item.title.raw
+					: `#${ item.id } (${ __( 'no title' ) })`,
+		} ) )
+	);
 	return (
 		<TreeSelect
 			className="editor-page-attributes__parent"
@@ -43,7 +53,9 @@ export function PageAttributesParent( { parent, postType, items, onUpdateParent 
 
 const applyWithSelect = withSelect( ( select ) => {
 	const { getPostType, getEntityRecords } = select( 'core' );
-	const { getCurrentPostId, getEditedPostAttribute } = select( 'core/editor' );
+	const { getCurrentPostId, getEditedPostAttribute } = select(
+		'core/editor'
+	);
 	const postTypeSlug = getEditedPostAttribute( 'type' );
 	const postType = getPostType( postTypeSlug );
 	const postId = getCurrentPostId();
@@ -58,7 +70,9 @@ const applyWithSelect = withSelect( ( select ) => {
 
 	return {
 		parent: getEditedPostAttribute( 'parent' ),
-		items: isHierarchical ? getEntityRecords( 'postType', postTypeSlug, query ) : [],
+		items: isHierarchical
+			? getEntityRecords( 'postType', postTypeSlug, query )
+			: [],
 		postType,
 	};
 } );
@@ -72,7 +86,6 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-export default compose( [
-	applyWithSelect,
-	applyWithDispatch,
-] )( PageAttributesParent );
+export default compose( [ applyWithSelect, applyWithDispatch ] )(
+	PageAttributesParent
+);

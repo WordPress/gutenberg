@@ -1,32 +1,27 @@
 {
-	"compilerOptions": {
-		"allowJs": true,
-		"allowSyntheticDefaultImports": true,
-		"checkJs": true,
-		"jsx": "preserve",
-		"lib": ["dom", "esnext"],
-		"module": "commonjs",
-		"noEmit": true,
-		"resolveJsonModule": true,
-		"target": "esnext",
-
-		/* Strict Type-Checking Options */
-		"strict": true,                        /* Enable all strict type-checking options. */
-		"noImplicitAny": false,                /* Raise error on expressions and declarations with an implied 'any' type. */
-
-		/* Additional Checks */
-		"noUnusedLocals": true,                /* Report errors on unused locals. */
-		"noUnusedParameters": true,            /* Report errors on unused parameters. */
-		"noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
-		"noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
-
-	},
-	"include": [
-		"./packages/url/**/*.js"
+	"references": [
+		{ "path": "bin" },
+		{ "path": "packages/a11y" },
+		{ "path": "packages/autop" },
+		{ "path": "packages/blob" },
+		{ "path": "packages/block-editor" },
+		{ "path": "packages/element" },
+		{ "path": "packages/dependency-extraction-webpack-plugin" },
+		{ "path": "packages/dom-ready" },
+		{ "path": "packages/escape-html" },
+		{ "path": "packages/eslint-plugin" },
+		{ "path": "packages/html-entities" },
+		{ "path": "packages/i18n" },
+		{ "path": "packages/icons" },
+		{ "path": "packages/is-shallow-equal" },
+		{ "path": "packages/lazy-import" },
+		{ "path": "packages/prettier-config" },
+		{ "path": "packages/primitives" },
+		{ "path": "packages/priority-queue" },
+		{ "path": "packages/project-management-automation" },
+		{ "path": "packages/token-list" },
+		{ "path": "packages/url" },
+		{ "path": "packages/warning" }
 	],
-	"exclude": [
-		"./packages/**/test/**",
-		"./packages/**/build/**",
-		"./packages/**/build-module/**"
-	]
+	"files": []
 }

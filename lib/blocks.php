@@ -6,28 +6,6 @@
  */
 
 /**
- * Retrieves registered social link blocks
- *
- * @return array Array of strings containing the registered social link block names.
- */
-function gutenberg_get_registered_social_link_blocks() {
-	$social_link_prefix        = 'core/social-link';
-	$social_link_prefix_length = strlen( $social_link_prefix );
-
-	$registry    = WP_Block_Type_Registry::get_instance();
-	$block_types = $registry->get_all_registered();
-
-	$registered_social_link_blocks = array();
-	foreach ( $block_types as $block_type ) {
-		// Block type name starts with $social_link_prefix.
-		if ( strncmp( $block_type->name, $social_link_prefix, $social_link_prefix_length ) === 0 ) {
-			$registered_social_link_blocks[] = $block_type->name;
-		}
-	}
-	return $registered_social_link_blocks;
-}
-
-/**
  * Substitutes the implementation of a core-registered block type, if exists,
  * with the built result from the plugin.
  */
@@ -38,23 +16,103 @@ function gutenberg_reregister_core_block_types() {
 		return;
 	}
 
+	$block_folders = array(
+		'audio',
+		'button',
+		'buttons',
+		'classic',
+		'code',
+		'column',
+		'columns',
+		'file',
+		'gallery',
+		'group',
+		'heading',
+		'html',
+		'image',
+		'list',
+		'media-text',
+		'missing',
+		'more',
+		'navigation-link',
+		'nextpage',
+		'paragraph',
+		'preformatted',
+		'pullquote',
+		'quote',
+		'separator',
+		'social-links',
+		'spacer',
+		'subhead',
+		'table',
+		'text-columns',
+		'verse',
+		'video',
+		'widget-area',
+	);
+
 	$block_names = array(
 		'archives.php'        => 'core/archives',
 		'block.php'           => 'core/block',
 		'calendar.php'        => 'core/calendar',
 		'categories.php'      => 'core/categories',
+		'cover.php'           => 'core/cover',
 		'latest-comments.php' => 'core/latest-comments',
 		'latest-posts.php'    => 'core/latest-posts',
 		'legacy-widget.php'   => 'core/legacy-widget',
-		'navigation-menu.php' => 'core/navigation-menu',
+		'navigation.php'      => 'core/navigation',
 		'rss.php'             => 'core/rss',
-		'shortcode.php'       => 'core/shortcode',
 		'search.php'          => 'core/search',
-		'social-link.php'     => gutenberg_get_registered_social_link_blocks(),
+		'shortcode.php'       => 'core/shortcode',
+		'social-link.php'     => 'core/social-link',
 		'tag-cloud.php'       => 'core/tag-cloud',
 	);
 
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
+		$block_names = array_merge(
+			$block_names,
+			array(
+				'post-author.php'         => 'core/post-author',
+				'post-comments.php'       => 'core/post-comments',
+				'post-comments-count.php' => 'core/post-comments-count',
+				'post-comments-form.php'  => 'core/post-comments-form',
+				'post-content.php'        => 'core/post-content',
+				'post-date.php'           => 'core/post-date',
+				'post-excerpt.php'        => 'core/post-excerpt',
+				'post-featured-image.php' => 'core/post-featured-image',
+				'post-tags.php'           => 'core/post-tags',
+				'post-title.php'          => 'core/post-title',
+				'query.php'               => 'core/query',
+				'query-loop.php'          => 'core/query-loop',
+				'query-pagination.php'    => 'core/query-pagination',
+				'site-title.php'          => 'core/site-title',
+				'template-part.php'       => 'core/template-part',
+			)
+		);
+	}
+
 	$registry = WP_Block_Type_Registry::get_instance();
+
+	foreach ( $block_folders as $folder_name ) {
+		$block_json_file = $blocks_dir . '/' . $folder_name . '/block.json';
+		if ( ! file_exists( $block_json_file ) ) {
+			return;
+		}
+
+		// Ideally, all paths to block metadata files should be listed in
+		// WordPress core. In this place we should rather use filter
+		// to replace paths with overrides defined by the plugin.
+		$metadata = json_decode( file_get_contents( $block_json_file ), true );
+		if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
+			return false;
+		}
+
+		if ( $registry->is_registered( $metadata['name'] ) ) {
+			$registry->unregister( $metadata['name'] );
+		}
+
+		register_block_type_from_metadata( $block_json_file );
+	}
 
 	foreach ( $block_names as $file => $block_names ) {
 		if ( ! file_exists( $blocks_dir . $file ) ) {
@@ -77,6 +135,87 @@ function gutenberg_reregister_core_block_types() {
 	}
 }
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
+
+/**
+ * Complements the implementation of block type `core/social-icon`, whether it
+ * be provided by core or the plugin, with derived block types for each
+ * "service" (WordPress, Twitter, etc.) supported by Social Links.
+ *
+ * This ensures backwards compatibility for any users running the Gutenberg
+ * plugin who have used Social Links prior to their conversion to block
+ * variations.
+ *
+ * This shim is INTENTIONALLY left out of core, as Social Links haven't yet
+ * landed there.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/19887
+ */
+function gutenberg_register_legacy_social_link_blocks() {
+	$services = array(
+		'amazon',
+		'bandcamp',
+		'behance',
+		'chain',
+		'codepen',
+		'deviantart',
+		'dribbble',
+		'dropbox',
+		'etsy',
+		'facebook',
+		'feed',
+		'fivehundredpx',
+		'flickr',
+		'foursquare',
+		'goodreads',
+		'google',
+		'github',
+		'instagram',
+		'lastfm',
+		'linkedin',
+		'mail',
+		'mastodon',
+		'meetup',
+		'medium',
+		'pinterest',
+		'pocket',
+		'reddit',
+		'skype',
+		'snapchat',
+		'soundcloud',
+		'spotify',
+		'tumblr',
+		'twitch',
+		'twitter',
+		'vimeo',
+		'vk',
+		'wordpress',
+		'yelp',
+		'youtube',
+	);
+
+	foreach ( $services as $service ) {
+		register_block_type(
+			'core/social-link-' . $service,
+			array(
+				'category'        => 'widgets',
+				'attributes'      => array(
+					'url'     => array(
+						'type' => 'string',
+					),
+					'service' => array(
+						'type'    => 'string',
+						'default' => $service,
+					),
+					'label'   => array(
+						'type' => 'string',
+					),
+				),
+				'render_callback' => 'gutenberg_render_block_core_social_link',
+			)
+		);
+	}
+}
+add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
 
 if ( ! function_exists( 'register_block_style' ) ) {
 	/**

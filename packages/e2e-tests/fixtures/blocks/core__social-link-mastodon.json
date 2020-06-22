@@ -1,11 +1,11 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/social-link-mastodon",
+        "name": "core/social-link",
         "isValid": true,
         "attributes": {
             "url": "https://example.com/",
-            "site": "mastodon"
+            "service": "mastodon"
         },
         "innerBlocks": [],
         "originalContent": ""

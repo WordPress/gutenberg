@@ -70,7 +70,7 @@ export function fromDOM( domNode ) {
 	if ( domNode.nodeType !== ELEMENT_NODE ) {
 		throw new TypeError(
 			'A block node can only be created from a node of type text or ' +
-			'element.'
+				'element.'
 		);
 	}
 

@@ -1,14 +1,17 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import {
 	every,
 	filter,
 	find,
 	forEach,
+	get,
+	isEmpty,
 	map,
+	reduce,
 	some,
+	toString,
 } from 'lodash';
 
 /**
@@ -17,28 +20,24 @@ import {
 import { compose } from '@wordpress/compose';
 import {
 	PanelBody,
-	RangeControl,
 	SelectControl,
 	ToggleControl,
 	withNotices,
+	RangeControl,
 } from '@wordpress/components';
-import {
-	BlockIcon,
-	MediaPlaceholder,
-	InspectorControls,
-	RichText,
-} from '@wordpress/block-editor';
-import { Component } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
+import { Component, Platform } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withSelect } from '@wordpress/data';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
  */
-import GalleryImage from './gallery-image';
-import { icon } from './icons';
+import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+import Gallery from './gallery';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -48,12 +47,25 @@ const linkOptions = [
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
+const PLACEHOLDER_TEXT = Platform.select( {
+	web: __(
+		'Drag images, upload new ones or select files from your library.'
+	),
+	native: __( 'ADD MEDIA' ),
+} );
+
+const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
+	web: {},
+	native: { type: 'stepper' },
+} );
+
 class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectImages = this.onSelectImages.bind( this );
+		this.onDeselectImage = this.onDeselectImage.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
@@ -65,6 +77,8 @@ class GalleryEdit extends Component {
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.onFocusGalleryCaption = this.onFocusGalleryCaption.bind( this );
+		this.getImagesSizeOptions = this.getImagesSizeOptions.bind( this );
+		this.updateImagesSize = this.updateImagesSize.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -74,13 +88,17 @@ class GalleryEdit extends Component {
 
 	setAttributes( attributes ) {
 		if ( attributes.ids ) {
-			throw new Error( 'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes' );
+			throw new Error(
+				'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes'
+			);
 		}
 
 		if ( attributes.images ) {
 			attributes = {
 				...attributes,
-				ids: map( attributes.images, 'id' ),
+				// Unlike images[ n ].id which is a string, always ensure the
+				// ids array contains numbers as per its attribute type.
+				ids: map( attributes.images, ( { id } ) => parseInt( id, 10 ) ),
 			};
 		}
 
@@ -92,6 +110,16 @@ class GalleryEdit extends Component {
 			if ( this.state.selectedImage !== index ) {
 				this.setState( {
 					selectedImage: index,
+				} );
+			}
+		};
+	}
+
+	onDeselectImage( index ) {
+		return () => {
+			if ( this.state.selectedImage === index ) {
+				this.setState( {
+					selectedImage: null,
 				} );
 			}
 		};
@@ -125,7 +153,10 @@ class GalleryEdit extends Component {
 
 	onRemoveImage( index ) {
 		return () => {
-			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
+			const images = filter(
+				this.props.attributes.images,
+				( img, i ) => index !== i
+			);
 			const { columns } = this.props.attributes;
 			this.setState( { selectedImage: null } );
 			this.setAttributes( {
@@ -136,22 +167,26 @@ class GalleryEdit extends Component {
 	}
 
 	selectCaption( newImage, images, attachmentCaptions ) {
-		const currentImage = find(
-			images, { id: newImage.id }
-		);
+		// The image id in both the images and attachmentCaptions arrays is a
+		// string, so ensure comparison works correctly by converting the
+		// newImage.id to a string.
+		const newImageId = toString( newImage.id );
+		const currentImage = find( images, { id: newImageId } );
 
-		const currentImageCaption = currentImage ? currentImage.caption : newImage.caption;
+		const currentImageCaption = currentImage
+			? currentImage.caption
+			: newImage.caption;
 
 		if ( ! attachmentCaptions ) {
 			return currentImageCaption;
 		}
 
-		const attachment = find(
-			attachmentCaptions, { id: newImage.id }
-		);
+		const attachment = find( attachmentCaptions, {
+			id: newImageId,
+		} );
 
 		// if the attachment caption is updated
-		if ( attachment && ( attachment.caption !== newImage.caption ) ) {
+		if ( attachment && attachment.caption !== newImage.caption ) {
 			return newImage.caption;
 		}
 
@@ -159,20 +194,28 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( newImages ) {
-		const { columns, images } = this.props.attributes;
+		const { columns, images, sizeSlug } = this.props.attributes;
 		const { attachmentCaptions } = this.state;
-		this.setState(
-			{
-				attachmentCaptions: newImages.map( ( newImage ) => ( {
-					id: newImage.id,
-					caption: newImage.caption,
-				} ) ),
-			}
-		);
+		this.setState( {
+			attachmentCaptions: newImages.map( ( newImage ) => ( {
+				// Store the attachmentCaption id as a string for consistency
+				// with the type of the id in the images attribute.
+				id: toString( newImage.id ),
+				caption: newImage.caption,
+			} ) ),
+		} );
 		this.setAttributes( {
 			images: newImages.map( ( newImage ) => ( {
-				...pickRelevantMediaFiles( newImage ),
-				caption: this.selectCaption( newImage, images, attachmentCaptions ),
+				...pickRelevantMediaFiles( newImage, sizeSlug ),
+				caption: this.selectCaption(
+					newImage,
+					images,
+					attachmentCaptions
+				),
+				// The id value is stored in a data attribute, so when the
+				// block is parsed it's converted to a string. Converting
+				// to a string here ensures it's type is consistent.
+				id: toString( newImage.id ),
 			} ) ),
 			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
@@ -197,7 +240,9 @@ class GalleryEdit extends Component {
 	}
 
 	getImageCropHelp( checked ) {
-		return checked ? __( 'Thumbnails are cropped to align.' ) : __( 'Thumbnails are not cropped.' );
+		return checked
+			? __( 'Thumbnails are cropped to align.' )
+			: __( 'Thumbnails are not cropped.' );
 	}
 
 	onFocusGalleryCaption() {
@@ -207,7 +252,9 @@ class GalleryEdit extends Component {
 	}
 
 	setImageAttributes( index, attributes ) {
-		const { attributes: { images } } = this.props;
+		const {
+			attributes: { images },
+		} = this.props;
 		const { setAttributes } = this;
 		if ( ! images[ index ] ) {
 			return;
@@ -224,10 +271,48 @@ class GalleryEdit extends Component {
 		} );
 	}
 
+	getImagesSizeOptions() {
+		const { imageSizes, resizedImages } = this.props;
+		return map(
+			filter( imageSizes, ( { slug } ) =>
+				some( resizedImages, ( sizes ) => sizes[ slug ] )
+			),
+			( { name, slug } ) => ( { value: slug, label: name } )
+		);
+	}
+
+	updateImagesSize( sizeSlug ) {
+		const {
+			attributes: { images },
+			resizedImages,
+		} = this.props;
+
+		const updatedImages = map( images, ( image ) => {
+			if ( ! image.id ) {
+				return image;
+			}
+			const url = get( resizedImages, [
+				parseInt( image.id, 10 ),
+				sizeSlug,
+			] );
+			return {
+				...image,
+				...( url && { url } ),
+			};
+		} );
+
+		this.setAttributes( { images: updatedImages, sizeSlug } );
+	}
+
 	componentDidMount() {
 		const { attributes, mediaUpload } = this.props;
 		const { images } = attributes;
-		if ( every( images, ( { url } ) => isBlobURL( url ) ) ) {
+		if (
+			Platform.OS === 'web' &&
+			images &&
+			images.length > 0 &&
+			every( images, ( { url } ) => isBlobURL( url ) )
+		) {
 			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
 			forEach( images, ( { url } ) => revokeBlobURL( url ) );
 			mediaUpload( {
@@ -254,38 +339,37 @@ class GalleryEdit extends Component {
 			className,
 			isSelected,
 			noticeUI,
-			setAttributes,
+			insertBlocksAfter,
 		} = this.props;
 		const {
-			align,
 			columns = defaultColumnsNumber( attributes ),
-			caption,
 			imageCrop,
 			images,
 			linkTo,
+			sizeSlug,
 		} = attributes;
 
 		const hasImages = !! images.length;
-		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
-				addToGallery={ hasImagesWithId }
+				addToGallery={ hasImages }
 				isAppender={ hasImages }
 				className={ className }
 				disableMediaButtons={ hasImages && ! isSelected }
-				icon={ ! hasImages && <BlockIcon icon={ icon } /> }
+				icon={ ! hasImages && sharedIcon }
 				labels={ {
 					title: ! hasImages && __( 'Gallery' ),
-					instructions: ! hasImages && __( 'Drag images, upload new ones or select files from your library.' ),
+					instructions: ! hasImages && PLACEHOLDER_TEXT,
 				} }
 				onSelect={ this.onSelectImages }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
-				value={ hasImagesWithId ? images : undefined }
+				value={ images }
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
+				onFocus={ this.props.onFocus }
 			/>
 		);
 
@@ -293,99 +377,118 @@ class GalleryEdit extends Component {
 			return mediaPlaceholder;
 		}
 
-		const captionClassNames = classnames(
-			'blocks-gallery-caption',
-			{
-				'screen-reader-text': ! isSelected && RichText.isEmpty( caption ),
-			}
-		);
+		const imageSizeOptions = this.getImagesSizeOptions();
+		const shouldShowSizeOptions =
+			hasImages && ! isEmpty( imageSizeOptions );
+
 		return (
 			<>
 				<InspectorControls>
-					<PanelBody title={ __( 'Gallery Settings' ) }>
-						{ images.length > 1 && <RangeControl
-							label={ __( 'Columns' ) }
-							value={ columns }
-							onChange={ this.setColumnsNumber }
-							min={ 1 }
-							max={ Math.min( MAX_COLUMNS, images.length ) }
-							required
-						/> }
+					<PanelBody title={ __( 'Gallery settings' ) }>
+						{ images.length > 1 && (
+							<RangeControl
+								label={ __( 'Columns' ) }
+								value={ columns }
+								onChange={ this.setColumnsNumber }
+								min={ 1 }
+								max={ Math.min( MAX_COLUMNS, images.length ) }
+								{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
+								required
+							/>
+						) }
+
 						<ToggleControl
-							label={ __( 'Crop Images' ) }
+							label={ __( 'Crop images' ) }
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }
 							help={ this.getImageCropHelp }
 						/>
 						<SelectControl
-							label={ __( 'Link To' ) }
+							label={ __( 'Link to' ) }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
 						/>
+						{ shouldShowSizeOptions && (
+							<SelectControl
+								label={ __( 'Image size' ) }
+								value={ sizeSlug }
+								options={ imageSizeOptions }
+								onChange={ this.updateImagesSize }
+							/>
+						) }
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<figure className={ classnames(
-					className,
-					{
-						[ `align${ align }` ]: align,
-						[ `columns-${ columns }` ]: columns,
-						'is-cropped': imageCrop,
-					}
-				) }
-				>
-					<ul className="blocks-gallery-grid">
-						{ images.map( ( img, index ) => {
-						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
-							const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
-
-							return (
-								<li className="blocks-gallery-item" key={ img.id || img.url }>
-									<GalleryImage
-										url={ img.url }
-										alt={ img.alt }
-										id={ img.id }
-										isFirstItem={ index === 0 }
-										isLastItem={ ( index + 1 ) === images.length }
-										isSelected={ isSelected && this.state.selectedImage === index }
-										onMoveBackward={ this.onMoveBackward( index ) }
-										onMoveForward={ this.onMoveForward( index ) }
-										onRemove={ this.onRemoveImage( index ) }
-										onSelect={ this.onSelectImage( index ) }
-										setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
-										caption={ img.caption }
-										aria-label={ ariaLabel }
-									/>
-								</li>
-							);
-						} ) }
-					</ul>
-					{ mediaPlaceholder }
-					<RichText
-						tagName="figcaption"
-						className={ captionClassNames }
-						placeholder={ __( 'Write gallery caption…' ) }
-						value={ caption }
-						unstableOnFocus={ this.onFocusGalleryCaption }
-						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inlineToolbar
-					/>
-				</figure>
+				<Gallery
+					{ ...this.props }
+					selectedImage={ this.state.selectedImage }
+					mediaPlaceholder={ mediaPlaceholder }
+					onMoveBackward={ this.onMoveBackward }
+					onMoveForward={ this.onMoveForward }
+					onRemoveImage={ this.onRemoveImage }
+					onSelectImage={ this.onSelectImage }
+					onDeselectImage={ this.onDeselectImage }
+					onSetImageAttributes={ this.setImageAttributes }
+					onFocusGalleryCaption={ this.onFocusGalleryCaption }
+					insertBlocksAfter={ insertBlocksAfter }
+				/>
 			</>
 		);
 	}
 }
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { attributes: { ids }, isSelected } ) => {
+		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
-		const {
-			__experimentalMediaUpload,
-		} = getSettings();
+		const { imageSizes, mediaUpload } = getSettings();
+
+		let resizedImages = {};
+
+		if ( isSelected ) {
+			resizedImages = reduce(
+				ids,
+				( currentResizedImages, id ) => {
+					if ( ! id ) {
+						return currentResizedImages;
+					}
+					const image = getMedia( id );
+					const sizes = reduce(
+						imageSizes,
+						( currentSizes, size ) => {
+							const defaultUrl = get( image, [
+								'sizes',
+								size.slug,
+								'url',
+							] );
+							const mediaDetailsUrl = get( image, [
+								'media_details',
+								'sizes',
+								size.slug,
+								'source_url',
+							] );
+							return {
+								...currentSizes,
+								[ size.slug ]: defaultUrl || mediaDetailsUrl,
+							};
+						},
+						{}
+					);
+					return {
+						...currentResizedImages,
+						[ parseInt( id, 10 ) ]: sizes,
+					};
+				},
+				{}
+			);
+		}
 
 		return {
-			mediaUpload: __experimentalMediaUpload,
+			imageSizes,
+			mediaUpload,
+			resizedImages,
 		};
 	} ),
 	withNotices,
+	withViewportMatch( { isNarrow: '< small' } ),
 ] )( GalleryEdit );

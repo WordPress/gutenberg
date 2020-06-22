@@ -1,0 +1,9 @@
+.block-editor-tool-selector__help {
+	margin-top: $grid-unit-10;
+	margin-left: -$grid-unit-15;
+	margin-right: -$grid-unit-15;
+	margin-bottom: -$grid-unit-15;
+	padding: $grid-unit-15 ($grid-unit-15 + $grid-unit-10);
+	border-top: 1px solid $light-gray-500;
+	color: $dark-gray-300;
+}

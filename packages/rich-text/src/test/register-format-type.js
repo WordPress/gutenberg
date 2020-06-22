@@ -17,9 +17,11 @@ describe( 'registerFormatType', () => {
 	} );
 
 	afterEach( () => {
-		select( 'core/rich-text' ).getFormatTypes().forEach( ( { name } ) => {
-			unregisterFormatType( name );
-		} );
+		select( 'core/rich-text' )
+			.getFormatTypes()
+			.forEach( ( { name } ) => {
+				unregisterFormatType( name );
+			} );
 	} );
 
 	const validName = 'plugin/test';
@@ -44,31 +46,41 @@ describe( 'registerFormatType', () => {
 
 	it( 'should reject format types without a namespace', () => {
 		const format = registerFormatType( 'doing-it-wrong' );
-		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( console ).toHaveErroredWith(
+			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should reject format types with too many namespaces', () => {
 		const format = registerFormatType( 'doing/it/wrong' );
-		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( console ).toHaveErroredWith(
+			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should reject format types with invalid characters', () => {
 		const format = registerFormatType( 'still/_doing_it_wrong' );
-		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( console ).toHaveErroredWith(
+			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should reject format types with uppercase characters', () => {
 		const format = registerFormatType( 'Core/Bold' );
-		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( console ).toHaveErroredWith(
+			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should reject format types not starting with a letter', () => {
 		const format = registerFormatType( 'my-plugin/4-fancy-format' );
-		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( console ).toHaveErroredWith(
+			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
@@ -79,7 +91,10 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should accept valid format names', () => {
-		const format = registerFormatType( 'my-plugin/fancy-format-4', validSettings );
+		const format = registerFormatType(
+			'my-plugin/fancy-format-4',
+			validSettings
+		);
 		expect( console ).not.toHaveErrored();
 		expect( format ).toEqual( {
 			name: 'my-plugin/fancy-format-4',
@@ -90,7 +105,9 @@ describe( 'registerFormatType', () => {
 	it( 'should error on already registered name', () => {
 		registerFormatType( validName, validSettings );
 		const duplicateFormat = registerFormatType( validName, validSettings );
-		expect( console ).toHaveErroredWith( 'Format "plugin/test" is already registered.' );
+		expect( console ).toHaveErroredWith(
+			'Format "plugin/test" is already registered.'
+		);
 		expect( duplicateFormat ).toBeUndefined();
 	} );
 
@@ -98,7 +115,9 @@ describe( 'registerFormatType', () => {
 		const settings = { ...validSettings };
 		delete settings.tagName;
 		const format = registerFormatType( validName, settings );
-		expect( console ).toHaveErroredWith( 'Format tag names must be a string.' );
+		expect( console ).toHaveErroredWith(
+			'Format tag names must be a string.'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
@@ -107,7 +126,9 @@ describe( 'registerFormatType', () => {
 			...validSettings,
 			tagName: '',
 		} );
-		expect( console ).toHaveErroredWith( 'Format tag names must be a string.' );
+		expect( console ).toHaveErroredWith(
+			'Format tag names must be a string.'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
@@ -115,7 +136,9 @@ describe( 'registerFormatType', () => {
 		const settings = { ...validSettings };
 		delete settings.className;
 		const format = registerFormatType( validName, settings );
-		expect( console ).toHaveErroredWith( 'Format class names must be a string, or null to handle bare elements.' );
+		expect( console ).toHaveErroredWith(
+			'Format class names must be a string, or null to handle bare elements.'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
@@ -124,7 +147,9 @@ describe( 'registerFormatType', () => {
 			...validSettings,
 			className: '',
 		} );
-		expect( console ).toHaveErroredWith( 'Format class names must be a string, or null to handle bare elements.' );
+		expect( console ).toHaveErroredWith(
+			'Format class names must be a string, or null to handle bare elements.'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
@@ -133,14 +158,21 @@ describe( 'registerFormatType', () => {
 			...validSettings,
 			className: 'invalid class name',
 		} );
-		expect( console ).toHaveErroredWith( 'A class name must begin with a letter, followed by any number of hyphens, letters, or numbers.' );
+		expect( console ).toHaveErroredWith(
+			'A class name must begin with a letter, followed by any number of hyphens, letters, or numbers.'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should error on already registered tagName', () => {
 		registerFormatType( validName, validSettings );
-		const duplicateTagNameFormat = registerFormatType( 'plugin/second', validSettings );
-		expect( console ).toHaveErroredWith( 'Format "plugin/test" is already registered to handle bare tag name "test".' );
+		const duplicateTagNameFormat = registerFormatType(
+			'plugin/second',
+			validSettings
+		);
+		expect( console ).toHaveErroredWith(
+			'Format "plugin/test" is already registered to handle bare tag name "test".'
+		);
 		expect( duplicateTagNameFormat ).toBeUndefined();
 	} );
 
@@ -153,7 +185,9 @@ describe( 'registerFormatType', () => {
 			...validSettings,
 			className: 'test',
 		} );
-		expect( console ).toHaveErroredWith( 'Format "plugin/test" is already registered to handle class name "test".' );
+		expect( console ).toHaveErroredWith(
+			'Format "plugin/test" is already registered to handle class name "test".'
+		);
 		expect( duplicateClassNameFormat ).toBeUndefined();
 	} );
 
@@ -161,7 +195,9 @@ describe( 'registerFormatType', () => {
 		const settings = { ...validSettings };
 		delete settings.title;
 		const format = registerFormatType( validName, settings );
-		expect( console ).toHaveErroredWith( `The format "${ validName }" must have a title.` );
+		expect( console ).toHaveErroredWith(
+			`The format "${ validName }" must have a title.`
+		);
 		expect( format ).toBeUndefined();
 	} );
 
@@ -170,7 +206,9 @@ describe( 'registerFormatType', () => {
 			...validSettings,
 			title: '',
 		} );
-		expect( console ).toHaveErroredWith( 'The format "plugin/test" must have a title.' );
+		expect( console ).toHaveErroredWith(
+			'The format "plugin/test" must have a title.'
+		);
 		expect( format ).toBeUndefined();
 	} );
 

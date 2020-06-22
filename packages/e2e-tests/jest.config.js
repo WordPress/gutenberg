@@ -1,8 +1,6 @@
 module.exports = {
 	...require( '@wordpress/scripts/config/jest-e2e.config' ),
-	setupFiles: [
-		'<rootDir>/config/gutenberg-phase.js',
-	],
+	setupFiles: [ '<rootDir>/config/gutenberg-phase.js' ],
 	setupFilesAfterEnv: [
 		'<rootDir>/config/setup-test-framework.js',
 		'@wordpress/jest-console',
@@ -11,7 +9,7 @@ module.exports = {
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
-		'/wordpress/',
-		'e2e-tests/specs/performance.test.js',
+		'<rootDir>/wordpress/',
+		'e2e-tests/specs/performance/',
 	],
 };

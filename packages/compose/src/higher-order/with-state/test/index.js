@@ -26,14 +26,23 @@ const getTestComponent = ( WrappedComponent ) => {
 
 describe( 'withState', () => {
 	it( 'should pass initial state and allow updates', () => {
-		const EnhancedComponent = withState( { count: 0 } )( ( { count, setState } ) => (
-			<button onClick={ () => setState( ( state ) => ( { count: state.count + 1 } ) ) }>
+		const EnhancedComponent = withState( {
+			count: 0,
+		} )( ( { count, setState } ) => (
+			<button
+				onClick={ () =>
+					setState( ( state ) => ( { count: state.count + 1 } ) )
+				}
+			>
 				{ count }
 			</button>
 		) );
 
-		const wrapper = TestUtils.renderIntoDocument( getTestComponent( EnhancedComponent ) );
-		const buttonElement = () => TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
+		const wrapper = TestUtils.renderIntoDocument(
+			getTestComponent( EnhancedComponent )
+		);
+		const buttonElement = () =>
+			TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
 
 		expect( buttonElement().outerHTML ).toBe( '<button>0</button>' );
 		TestUtils.Simulate.click( buttonElement() );

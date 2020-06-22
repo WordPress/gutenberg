@@ -11,12 +11,14 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { DOWN, ENTER, UP } from '@wordpress/keycodes';
 import { pure } from '@wordpress/compose';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 import TextControl from '../text-control';
+import VisuallyHidden from '../visually-hidden';
 import { isValidHex } from './utils';
 
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */
@@ -86,7 +88,7 @@ export class Input extends Component {
 	}
 }
 
-const PureIconButton = pure( IconButton );
+const PureButton = pure( Button );
 
 export class Inputs extends Component {
 	constructor( { hsl } ) {
@@ -141,7 +143,7 @@ export class Inputs extends Component {
 			return value;
 		}
 
-		if ( value > 0 ) {
+		if ( value < 0 ) {
 			return 0;
 		} else if ( value > 1 ) {
 			return 1;
@@ -175,9 +177,9 @@ export class Inputs extends Component {
 		} else if ( this.state.view === 'rgb' ) {
 			return (
 				<fieldset>
-					<legend className="screen-reader-text">
+					<VisuallyHidden as="legend">
 						{ __( 'Color value in RGB' ) }
-					</legend>
+					</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }
@@ -219,7 +221,7 @@ export class Inputs extends Component {
 								type="number"
 								min="0"
 								max="1"
-								step="0.05"
+								step="0.01"
 							/>
 						) }
 					</div>
@@ -228,9 +230,9 @@ export class Inputs extends Component {
 		} else if ( this.state.view === 'hsl' ) {
 			return (
 				<fieldset>
-					<legend className="screen-reader-text">
+					<VisuallyHidden as="legend">
 						{ __( 'Color value in HSL' ) }
-					</legend>
+					</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }
@@ -285,9 +287,10 @@ export class Inputs extends Component {
 		return (
 			<div className="components-color-picker__inputs-wrapper">
 				{ this.renderFields() }
-				<div className="components-color-picker__inputs-toggle">
-					<PureIconButton
-						icon="arrow-down-alt2"
+				<div className="components-color-picker__inputs-toggle-wrapper">
+					<PureButton
+						className="components-color-picker__inputs-toggle"
+						icon={ chevronDown }
 						label={ __( 'Change color format' ) }
 						onClick={ this.toggleViews }
 					/>

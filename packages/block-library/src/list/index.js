@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { list as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -20,13 +20,15 @@ export const settings = {
 	title: __( 'List' ),
 	description: __( 'Create a bulleted or numbered list.' ),
 	icon,
-	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
-	supports: {
-		className: false,
-	},
+	keywords: [
+		__( 'bullet list' ),
+		__( 'ordered list' ),
+		__( 'numbered list' ),
+	],
 	example: {
 		attributes: {
-			values: '<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
+			values:
+				'<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
 		},
 	},
 	transforms,

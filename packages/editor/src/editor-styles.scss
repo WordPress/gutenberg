@@ -12,8 +12,16 @@ body {
 	font-family: $editor-font;
 	font-size: $editor-font-size;
 	line-height: $editor-line-height;
-	color: $dark-gray-900;
+	color: $dark-gray-primary;
+	padding: 10px;
 }
+
+// For full-wide blocks, we compensate for these 10px.
+.block-editor-block-list__layout.is-root-container > .wp-block[data-align="full"] {
+	margin-left: -10px;
+	margin-right: -10px;
+}
+
 
 /* Headings */
 // These follow a Major Third type scale
@@ -103,7 +111,8 @@ p {
 ul,
 ol {
 	margin-bottom: $default-block-margin;
-	padding: inherit;
+	padding-left: 1.3em;
+	margin-left: 1.3em;
 
 	// Remove bottom margin from nested lists.
 	ul,
@@ -128,4 +137,32 @@ ol {
 ul ul,
 ol ul {
 	list-style-type: circle;
+}
+
+.wp-align-wrapper {
+	max-width: $content-width;
+
+	> .wp-block,
+	&.wp-align-full {
+		max-width: none;
+	}
+
+	&.wp-align-wide {
+		max-width: 1100px;
+	}
+}
+
+a {
+	// This inherits the blue link color set by wp-admin, which is unfortunate.
+	// However both inherit and unset properties set the color to black.
+	transition: none;
+}
+
+code,
+kbd {
+	padding: 0;
+	margin: 0;
+	background: inherit;
+	font-size: inherit;
+	font-family: monospace;
 }

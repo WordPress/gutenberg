@@ -1,3 +1,23 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## Breaking Changes
+
+- Revert enabling the `shippedProposals` flag. That flag enables the use of stage-3 proposals, but the goal of this preset is to only support stage-4 features. [#22083](https://github.com/WordPress/gutenberg/pull/22083)
+
+## 4.12.0 (2020-04-15)
+
+### New Features
+
+- The bundled `@babel/core` dependency has been updated from requiring `^7.8.3` to requiring `^7.9.0`. All other Babel plugins were updated to the latest version (see [Highlights](https://babeljs.io/blog/2020/03/16/7.9.0)).
+
+## 4.10.0 (2020-02-04)
+
+### New Feature
+
+- The bundled `@babel/core` dependency has been updated from requiring `^7.4.4` to requiring `^7.8.3`. All other Babel plugins were updated to the latest version. `@babel/preset-env` has now ESMAScript 2020 support enabled by default (see [Highlights](https://babeljs.io/blog/2020/01/11/7.8.0#highlights)).
+
 ## 4.5.0 (2019-08-29)
 
 ### Bug Fixes

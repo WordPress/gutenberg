@@ -1,6 +1,6 @@
 {
 	"name": "core/image",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -22,6 +22,12 @@
 			"type": "string",
 			"source": "html",
 			"selector": "figcaption"
+		},
+		"title": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "img",
+			"attribute": "title"
 		},
 		"href": {
 			"type": "string",
@@ -63,5 +69,8 @@
 			"selector": "figure > a",
 			"attribute": "target"
 		}
+	},
+	"supports": {
+		"lightBlockWrapper": true
 	}
 }

@@ -52,13 +52,15 @@ describe( 'isFormatEqual', () => {
 			format1: { type: 'bold', attributes: { a: '1' } },
 			format2: { type: 'bold', attributes: { a: '1', b: '1' } },
 			isEqual: false,
-			description: 'should return false if one has a different amount of attributes',
+			description:
+				'should return false if one has a different amount of attributes',
 		},
 		{
 			format1: { type: 'bold', attributes: { b: '1', a: '1' } },
 			format2: { type: 'bold', attributes: { a: '1', b: '1' } },
 			isEqual: true,
-			description: 'should return true both have same attributes but different order',
+			description:
+				'should return true both have same attributes but different order',
 		},
 	];
 

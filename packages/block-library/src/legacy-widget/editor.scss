@@ -1,14 +1,12 @@
-.wp-block-legacy-widget__edit-container,
-.wp-block-legacy-widget__preview {
-	padding-left: 2.5em;
-	padding-right: 2.5em;
-}
-
 .wp-block-legacy-widget__edit-container {
 	.widget-inside {
 		border: none;
 		display: block;
 		box-shadow: none;
+	}
+	// Reset z-index set on https://github.com/WordPress/wordpress-develop/commit/f26d4d37351a55fd1fc5dad0f5fef8f0f964908c.
+	.widget.open {
+		z-index: 0;
 	}
 }
 
@@ -19,4 +17,19 @@
 
 .wp-block-legacy-widget__preview {
 	overflow: auto;
+}
+
+.wp-block-legacy-widget__preview,
+.wp-block-legacy-widget__edit-container,
+.wp-block-legacy-widget__edit-widget-title {
+	padding: $grid-unit-10 $block-padding;
+}
+
+.wp-block-legacy-widget__edit-widget-title {
+	background: $light-gray-100;
+	color: $dark-gray-500;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	padding: $grid-unit-10 $block-padding;
+	font-weight: 600;
 }

@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Order of block keyboard navigation should navigate correctly with multi selection 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>4</p>
+<!-- /wp:paragraph -->"
+`;

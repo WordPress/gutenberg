@@ -10,7 +10,8 @@ const transforms = {
 			schema: {
 				'wp-block': { attributes: [ 'data-block' ] },
 			},
-			isMatch: ( node ) => node.dataset && node.dataset.block === 'core/more',
+			isMatch: ( node ) =>
+				node.dataset && node.dataset.block === 'core/more',
 			transform( node ) {
 				const { customText, noTeaser } = node.dataset;
 				const attrs = {};

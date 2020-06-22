@@ -29,7 +29,13 @@ class TokenInput extends Component {
 	}
 
 	render() {
-		const { value, isExpanded, instanceId, selectedSuggestionIndex, ...props } = this.props;
+		const {
+			value,
+			isExpanded,
+			instanceId,
+			selectedSuggestionIndex,
+			...props
+		} = this.props;
 		const size = value.length + 1;
 
 		return (
@@ -45,8 +51,16 @@ class TokenInput extends Component {
 				role="combobox"
 				aria-expanded={ isExpanded }
 				aria-autocomplete="list"
-				aria-owns={ isExpanded ? `components-form-token-suggestions-${ instanceId }` : undefined }
-				aria-activedescendant={ selectedSuggestionIndex !== -1 ? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }` : undefined }
+				aria-owns={
+					isExpanded
+						? `components-form-token-suggestions-${ instanceId }`
+						: undefined
+				}
+				aria-activedescendant={
+					selectedSuggestionIndex !== -1
+						? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+						: undefined
+				}
 				aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
 			/>
 		);

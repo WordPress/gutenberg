@@ -6,7 +6,7 @@ import {
 	PostTitle,
 	TextEditorGlobalKeyboardShortcuts,
 } from '@wordpress/editor';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
@@ -17,17 +17,17 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 		<div className="edit-post-text-editor">
 			{ isRichEditingEnabled && (
 				<div className="edit-post-text-editor__toolbar">
-					<h2>{ __( 'Editing Code' ) }</h2>
-					<IconButton
+					<h2>{ __( 'Editing code' ) }</h2>
+					<Button
+						isTertiary
 						onClick={ onExit }
-						icon="no-alt"
 						shortcut={ displayShortcut.secondary( 'm' ) }
 					>
-						{ __( 'Exit Code Editor' ) }
-					</IconButton>
+						{ __( 'Exit code editor' ) }
+					</Button>
 					<TextEditorGlobalKeyboardShortcuts />
 				</div>
-			)	}
+			) }
 			<div className="edit-post-text-editor__body">
 				<PostTitle />
 				<PostTextEditor />
@@ -38,7 +38,8 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 
 export default compose(
 	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+			.richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		return {

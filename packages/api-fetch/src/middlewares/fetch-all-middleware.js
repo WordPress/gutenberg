@@ -3,6 +3,11 @@
  */
 import { addQueryArgs } from '@wordpress/url';
 
+/**
+ * Internal dependencies
+ */
+import apiFetch from '..';
+
 // Apply query arguments to both URL and Path, whichever is present.
 const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 	...options,
@@ -11,18 +16,19 @@ const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 } );
 
 // Duplicates parsing functionality from apiFetch.
-const parseResponse = ( response ) => response.json ?
-	response.json() :
-	Promise.reject( response );
+const parseResponse = ( response ) =>
+	response.json ? response.json() : Promise.reject( response );
 
 const parseLinkHeader = ( linkHeader ) => {
 	if ( ! linkHeader ) {
 		return {};
 	}
 	const match = linkHeader.match( /<([^>]+)>; rel="next"/ );
-	return match ? {
-		next: match[ 1 ],
-	} : {};
+	return match
+		? {
+				next: match[ 1 ],
+		  }
+		: {};
 };
 
 const getNextPageUrl = ( response ) => {
@@ -31,8 +37,10 @@ const getNextPageUrl = ( response ) => {
 };
 
 const requestContainsUnboundedQuery = ( options ) => {
-	const pathIsUnbounded = options.path && options.path.indexOf( 'per_page=-1' ) !== -1;
-	const urlIsUnbounded = options.url && options.url.indexOf( 'per_page=-1' ) !== -1;
+	const pathIsUnbounded =
+		options.path && options.path.indexOf( 'per_page=-1' ) !== -1;
+	const urlIsUnbounded =
+		options.url && options.url.indexOf( 'per_page=-1' ) !== -1;
 	return pathIsUnbounded || urlIsUnbounded;
 };
 
@@ -50,7 +58,7 @@ const fetchAllMiddleware = async ( options, next ) => {
 	}
 
 	// Retrieve requested page of results.
-	const response = await next( {
+	const response = await apiFetch( {
 		...modifyQuery( options, {
 			per_page: 100,
 		} ),
@@ -75,7 +83,7 @@ const fetchAllMiddleware = async ( options, next ) => {
 	// Iteratively fetch all remaining pages until no "next" header is found.
 	let mergedResults = [].concat( results );
 	while ( nextPage ) {
-		const nextResponse = await next( {
+		const nextResponse = await apiFetch( {
 			...options,
 			// Ensure the URL for the next page is used instead of any provided path.
 			path: undefined,

@@ -35,7 +35,9 @@ export function mockOrTransform(
 		if ( mockCheck( responseObject ) ) {
 			request.respond( getJSONResponse( mock ) );
 		} else {
-			request.respond( getJSONResponse( responseObjectTransform( responseObject ) ) );
+			request.respond(
+				getJSONResponse( responseObjectTransform( responseObject ) )
+			);
 		}
 	};
 }

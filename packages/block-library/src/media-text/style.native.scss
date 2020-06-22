@@ -1,3 +1,5 @@
+$media-to-text: 12px;
+
 .wp-block-media-text {
 	display: flex;
 	align-items: flex-start;
@@ -26,4 +28,117 @@
 
 .is-vertically-aligned-bottom {
 	align-items: flex-end;
+}
+
+.is-selected {
+	padding-bottom: 8;
+}
+
+.content {
+	flex: 1;
+}
+
+.contentCentered {
+	flex: 1;
+	align-items: center;
+}
+
+.imageContainer {
+	align-items: center;
+	background-color: $gray-lighten-30;
+	height: 144;
+	justify-content: center;
+}
+
+.modalIcon {
+	width: 24px;
+	height: 24px;
+	justify-content: center;
+	align-items: center;
+}
+
+.icon {
+	fill: $gray-dark;
+	width: 24px;
+	height: 24px;
+}
+
+.iconDark {
+	fill: $white;
+}
+
+.iconRetry {
+	fill: #fff;
+	width: 100%;
+	height: 100%;
+}
+
+.iconRetryVideo {
+	fill: $gray-dark;
+}
+
+.video {
+	width: 100%;
+	height: 100%;
+}
+
+.videoContainer {
+	flex: 1;
+	background-color: #000;
+}
+
+.videoPlaceholder {
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	background-color: $gray-lighten-30;
+	justify-content: center;
+}
+
+.uploadFailed {
+	background-color: rgba(0, 0, 0, 0.5);
+	flex: 1;
+}
+
+.uploadFailedText {
+	color: #fff;
+	font-size: 14;
+	margin-top: 5;
+}
+
+.uploadFailedTextVideo {
+	color: $gray-dark;
+}
+
+// Inner blocks STACK
+.innerBlockStackMediaLeft {
+	margin-top: $media-to-text;
+}
+
+.innerBlockStackMediaRight {
+	margin-bottom: $media-to-text;
+}
+
+// Inner blocks
+.innerBlock {
+	padding-right: $media-to-text;
+	padding-left: $media-to-text;
+}
+
+// Media STACK
+.mediaStackLeft {
+	margin-bottom: $media-to-text;
+}
+
+.mediaStackRight {
+	margin-top: $media-to-text;
+}
+
+// Media
+.mediaLeft {
+	padding-right: $media-to-text;
+}
+
+.mediaRight {
+	padding-left: $media-to-text;
 }

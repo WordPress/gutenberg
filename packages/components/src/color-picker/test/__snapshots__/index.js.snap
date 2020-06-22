@@ -29,7 +29,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
         <button
           aria-describedby="color-picker-saturation-2"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -37,9 +37,10 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
               "top": "20%",
             }
           }
+          type="button"
         />
         <div
-          className="screen-reader-text"
+          className="components-visually-hidden"
           id="color-picker-saturation-2"
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
@@ -99,7 +100,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
                 tabIndex="0"
               />
               <p
-                className="components-color-picker__hue-description screen-reader-text"
+                className="components-visually-hidden"
                 id="components-color-picker__hue-description-2"
               >
                 Move the arrow left or right to change hue.
@@ -140,11 +141,11 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -155,17 +156,16 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
-            focusable="false"
-            height={20}
+            aria-hidden={true}
+            focusable={false}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -204,7 +204,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
         <button
           aria-describedby="color-picker-saturation-4"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -212,9 +212,10 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
               "top": "20%",
             }
           }
+          type="button"
         />
         <div
-          className="screen-reader-text"
+          className="components-visually-hidden"
           id="color-picker-saturation-4"
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
@@ -274,7 +275,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
                 tabIndex="0"
               />
               <p
-                className="components-color-picker__hue-description screen-reader-text"
+                className="components-visually-hidden"
                 id="components-color-picker__hue-description-4"
               >
                 Move the arrow left or right to change hue.
@@ -315,11 +316,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -330,17 +331,16 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
           type="button"
         >
           <svg
-            aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
-            focusable="false"
-            height={20}
+            aria-hidden={true}
+            focusable={false}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -379,7 +379,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
         <button
           aria-describedby="color-picker-saturation-5"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -387,9 +387,10 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
               "top": "20%",
             }
           }
+          type="button"
         />
         <div
-          className="screen-reader-text"
+          className="components-visually-hidden"
           id="color-picker-saturation-5"
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
@@ -449,7 +450,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
                 tabIndex="0"
               />
               <p
-                className="components-color-picker__hue-description screen-reader-text"
+                className="components-visually-hidden"
                 id="components-color-picker__hue-description-5"
               >
                 Move the arrow left or right to change hue.
@@ -490,11 +491,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -505,17 +506,16 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
           type="button"
         >
           <svg
-            aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
-            focusable="false"
-            height={20}
+            aria-hidden={true}
+            focusable={false}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -554,7 +554,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
         <button
           aria-describedby="color-picker-saturation-3"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -562,9 +562,10 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
               "top": "20%",
             }
           }
+          type="button"
         />
         <div
-          className="screen-reader-text"
+          className="components-visually-hidden"
           id="color-picker-saturation-3"
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
@@ -624,7 +625,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
                 tabIndex="0"
               />
               <p
-                className="components-color-picker__hue-description screen-reader-text"
+                className="components-visually-hidden"
                 id="components-color-picker__hue-description-3"
               >
                 Move the arrow left or right to change hue.
@@ -665,11 +666,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -680,17 +681,16 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
-            focusable="false"
-            height={20}
+            aria-hidden={true}
+            focusable={false}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -729,7 +729,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
         <button
           aria-describedby="color-picker-saturation-1"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -737,9 +737,10 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
               "top": "0%",
             }
           }
+          type="button"
         />
         <div
-          className="screen-reader-text"
+          className="components-visually-hidden"
           id="color-picker-saturation-1"
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
@@ -799,7 +800,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
                 tabIndex="0"
               />
               <p
-                className="components-color-picker__hue-description screen-reader-text"
+                className="components-visually-hidden"
                 id="components-color-picker__hue-description-1"
               >
                 Move the arrow left or right to change hue.
@@ -840,11 +841,11 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -855,17 +856,16 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
-            focusable="false"
-            height={20}
+            aria-hidden={true}
+            focusable={false}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -904,7 +904,7 @@ exports[`ColorPicker should render color picker 1`] = `
         <button
           aria-describedby="color-picker-saturation-0"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -912,9 +912,10 @@ exports[`ColorPicker should render color picker 1`] = `
               "top": "0%",
             }
           }
+          type="button"
         />
         <div
-          className="screen-reader-text"
+          className="components-visually-hidden"
           id="color-picker-saturation-0"
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
@@ -974,7 +975,7 @@ exports[`ColorPicker should render color picker 1`] = `
                 tabIndex="0"
               />
               <p
-                className="components-color-picker__hue-description screen-reader-text"
+                className="components-visually-hidden"
                 id="components-color-picker__hue-description-0"
               >
                 Move the arrow left or right to change hue.
@@ -1015,11 +1016,11 @@ exports[`ColorPicker should render color picker 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -1030,17 +1031,16 @@ exports[`ColorPicker should render color picker 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
-            focusable="false"
-            height={20}
+            aria-hidden={true}
+            focusable={false}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>

@@ -6,35 +6,24 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	getBlobByURL,
-	isBlobURL,
-	revokeBlobURL,
-} from '@wordpress/blob';
-import {
-	Animate,
-	ClipboardButton,
-	IconButton,
-	Toolbar,
-	withNotices,
-} from '@wordpress/components';
+import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { Animate, ClipboardButton, withNotices } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	BlockIcon,
-	MediaUpload,
-	MediaUploadCheck,
 	MediaPlaceholder,
+	MediaReplaceFlow,
 	RichText,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import { file as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import FileBlockInspector from './inspector';
 
 class FileEdit extends Component {
@@ -44,9 +33,13 @@ class FileEdit extends Component {
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.confirmCopyURL = this.confirmCopyURL.bind( this );
 		this.resetCopyConfirmation = this.resetCopyConfirmation.bind( this );
-		this.changeLinkDestinationOption = this.changeLinkDestinationOption.bind( this );
+		this.changeLinkDestinationOption = this.changeLinkDestinationOption.bind(
+			this
+		);
 		this.changeOpenInNewWindow = this.changeOpenInNewWindow.bind( this );
-		this.changeShowDownloadButton = this.changeShowDownloadButton.bind( this );
+		this.changeShowDownloadButton = this.changeShowDownloadButton.bind(
+			this
+		);
 		this.onUploadError = this.onUploadError.bind( this );
 
 		this.state = {
@@ -145,13 +138,13 @@ class FileEdit extends Component {
 			media,
 		} = this.props;
 		const {
+			id,
 			fileName,
 			href,
 			textLinkHref,
 			textLinkTarget,
 			showDownloadButton,
 			downloadButtonText,
-			id,
 		} = attributes;
 		const { hasError, showCopyConfirmation } = this.state;
 		const attachmentPage = media && media.link;
@@ -162,7 +155,9 @@ class FileEdit extends Component {
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'File' ),
-						instructions: __( 'Upload a file or pick one from your media library.' ),
+						instructions: __(
+							'Upload a file or pick one from your media library.'
+						),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
@@ -183,32 +178,29 @@ class FileEdit extends Component {
 					{ ...{
 						openInNewWindow: !! textLinkTarget,
 						showDownloadButton,
-						changeLinkDestinationOption: this.changeLinkDestinationOption,
+						changeLinkDestinationOption: this
+							.changeLinkDestinationOption,
 						changeOpenInNewWindow: this.changeOpenInNewWindow,
 						changeShowDownloadButton: this.changeShowDownloadButton,
 					} }
 				/>
 				<BlockControls>
-					<MediaUploadCheck>
-						<Toolbar>
-							<MediaUpload
-								onSelect={ this.onSelectFile }
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit file' ) }
-										onClick={ open }
-										icon="edit"
-									/>
-								) }
-							/>
-						</Toolbar>
-					</MediaUploadCheck>
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ href }
+						accept="*"
+						onSelect={ this.onSelectFile }
+						onError={ this.onUploadError }
+					/>
 				</BlockControls>
 				<Animate type={ isBlobURL( href ) ? 'loading' : null }>
 					{ ( { className: animateClassName } ) => (
-						<div className={ classnames( classes, animateClassName ) }>
+						<div
+							className={ classnames(
+								classes,
+								animateClassName
+							) }
+						>
 							<div className={ 'wp-block-file__content-wrapper' }>
 								<div className="wp-block-file__textlink">
 									<RichText
@@ -216,35 +208,51 @@ class FileEdit extends Component {
 										value={ fileName }
 										placeholder={ __( 'Write file name…' ) }
 										withoutInteractiveFormatting
-										onChange={ ( text ) => setAttributes( { fileName: text } ) }
+										onChange={ ( text ) =>
+											setAttributes( { fileName: text } )
+										}
 									/>
 								</div>
-								{ showDownloadButton &&
-									<div className={ 'wp-block-file__button-richtext-wrapper' }>
+								{ showDownloadButton && (
+									<div
+										className={
+											'wp-block-file__button-richtext-wrapper'
+										}
+									>
 										{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
 										<RichText
 											tagName="div" // must be block-level or else cursor disappears
-											className={ 'wp-block-file__button' }
+											className={
+												'wp-block-file__button'
+											}
 											value={ downloadButtonText }
 											withoutInteractiveFormatting
 											placeholder={ __( 'Add text…' ) }
-											onChange={ ( text ) => setAttributes( { downloadButtonText: text } ) }
+											onChange={ ( text ) =>
+												setAttributes( {
+													downloadButtonText: text,
+												} )
+											}
 										/>
 									</div>
-								}
+								) }
 							</div>
-							{ isSelected &&
+							{ isSelected && (
 								<ClipboardButton
-									isDefault
+									isSecondary
 									text={ href }
-									className={ 'wp-block-file__copy-url-button' }
+									className={
+										'wp-block-file__copy-url-button'
+									}
 									onCopy={ this.confirmCopyURL }
 									onFinishCopy={ this.resetCopyConfirmation }
 									disabled={ isBlobURL( href ) }
 								>
-									{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
+									{ showCopyConfirmation
+										? __( 'Copied!' )
+										: __( 'Copy URL' ) }
 								</ClipboardButton>
-							}
+							) }
 						</div>
 					) }
 				</Animate>
@@ -257,11 +265,11 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
-		const { __experimentalMediaUpload } = getSettings();
+		const { mediaUpload } = getSettings();
 		const { id } = props.attributes;
 		return {
 			media: id === undefined ? undefined : getMedia( id ),
-			mediaUpload: __experimentalMediaUpload,
+			mediaUpload,
 		};
 	} ),
 	withNotices,

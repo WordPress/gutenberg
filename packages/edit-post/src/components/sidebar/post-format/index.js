@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { PanelRow } from '@wordpress/components';
-import { PostFormat as PostFormatForm, PostFormatCheck } from '@wordpress/editor';
+import {
+	PostFormat as PostFormatForm,
+	PostFormatCheck,
+} from '@wordpress/editor';
 
 export function PostFormat() {
 	return (

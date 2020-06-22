@@ -10,7 +10,13 @@ import { compose } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-function TaxonomyPanel( { isEnabled, taxonomy, isOpened, onTogglePanel, children } ) {
+function TaxonomyPanel( {
+	isEnabled,
+	taxonomy,
+	isOpened,
+	onTogglePanel,
+	children,
+} ) {
 	if ( ! isEnabled ) {
 		return null;
 	}
@@ -37,17 +43,19 @@ export default compose(
 		const panelName = slug ? `taxonomy-panel-${ slug }` : '';
 		return {
 			panelName,
-			isEnabled: slug ?
-				select( 'core/edit-post' ).isEditorPanelEnabled( panelName ) :
-				false,
-			isOpened: slug ?
-				select( 'core/edit-post' ).isEditorPanelOpened( panelName ) :
-				false,
+			isEnabled: slug
+				? select( 'core/edit-post' ).isEditorPanelEnabled( panelName )
+				: false,
+			isOpened: slug
+				? select( 'core/edit-post' ).isEditorPanelOpened( panelName )
+				: false,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onTogglePanel: () => {
-			dispatch( 'core/edit-post' ).toggleEditorPanelOpened( ownProps.panelName );
+			dispatch( 'core/edit-post' ).toggleEditorPanelOpened(
+				ownProps.panelName
+			);
 		},
-	} ) ),
+	} ) )
 )( TaxonomyPanel );

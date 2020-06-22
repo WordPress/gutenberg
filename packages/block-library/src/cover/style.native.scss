@@ -1,0 +1,73 @@
+.icon {
+	fill: $gray-dark;
+	height: 24px;
+	width: 24px;
+}
+
+.iconDark {
+	fill: $white;
+}
+
+.backgroundContainer {
+	overflow: hidden;
+	width: 100%;
+	position: relative;
+}
+
+.content {
+	justify-content: center;
+	width: 100%;
+	padding: $block-edge-to-content;
+	z-index: 3;
+}
+
+.overlay {
+	width: 100%;
+	height: 100%;
+	z-index: 2;
+	color: $black;
+	position: absolute;
+}
+
+.defaultColor {
+	color: $white;
+}
+
+.background {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+}
+
+.backgroundSolid {
+	background-color: $gray-lighten-30;
+}
+
+.backgroundSolidDark {
+	background-color: $background-dark-secondary;
+}
+
+.uploadFailedContainer {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	padding: 8px;
+	justify-content: flex-start;
+	align-items: flex-end;
+	z-index: 3;
+}
+
+.uploadFailed {
+	width: 24px;
+	height: 24px;
+	border-radius: 12px;
+	justify-content: center;
+	align-items: center;
+	background-color: #fff;
+}
+
+.uploadFailedIcon {
+	fill: $red-40;
+	width: 100%;
+	height: 100%;
+}

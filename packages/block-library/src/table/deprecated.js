@@ -8,18 +8,111 @@ import classnames from 'classnames';
  */
 import { RichText, getColorClassName } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import metadata from './block.json';
-
 const supports = {
 	align: true,
 };
 
 const deprecated = [
 	{
-		attributes: metadata.attributes,
+		attributes: {
+			hasFixedLayout: {
+				type: 'boolean',
+				default: false,
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			head: {
+				type: 'array',
+				default: [],
+				source: 'query',
+				selector: 'thead tr',
+				query: {
+					cells: {
+						type: 'array',
+						default: [],
+						source: 'query',
+						selector: 'td,th',
+						query: {
+							content: {
+								type: 'string',
+								source: 'html',
+							},
+							tag: {
+								type: 'string',
+								default: 'td',
+								source: 'tag',
+							},
+							scope: {
+								type: 'string',
+								source: 'attribute',
+								attribute: 'scope',
+							},
+						},
+					},
+				},
+			},
+			body: {
+				type: 'array',
+				default: [],
+				source: 'query',
+				selector: 'tbody tr',
+				query: {
+					cells: {
+						type: 'array',
+						default: [],
+						source: 'query',
+						selector: 'td,th',
+						query: {
+							content: {
+								type: 'string',
+								source: 'html',
+							},
+							tag: {
+								type: 'string',
+								default: 'td',
+								source: 'tag',
+							},
+							scope: {
+								type: 'string',
+								source: 'attribute',
+								attribute: 'scope',
+							},
+						},
+					},
+				},
+			},
+			foot: {
+				type: 'array',
+				default: [],
+				source: 'query',
+				selector: 'tfoot tr',
+				query: {
+					cells: {
+						type: 'array',
+						default: [],
+						source: 'query',
+						selector: 'td,th',
+						query: {
+							content: {
+								type: 'string',
+								source: 'html',
+							},
+							tag: {
+								type: 'string',
+								default: 'td',
+								source: 'tag',
+							},
+							scope: {
+								type: 'string',
+								source: 'attribute',
+								attribute: 'scope',
+							},
+						},
+					},
+				},
+			},
+		},
 		supports,
 		save( { attributes } ) {
 			const {
@@ -35,7 +128,10 @@ const deprecated = [
 				return null;
 			}
 
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 
 			const classes = classnames( backgroundClass, {
 				'has-fixed-layout': hasFixedLayout,
@@ -53,13 +149,17 @@ const deprecated = [
 					<Tag>
 						{ rows.map( ( { cells }, rowIndex ) => (
 							<tr key={ rowIndex }>
-								{ cells.map( ( { content, tag, scope }, cellIndex ) =>
-									<RichText.Content
-										tagName={ tag }
-										value={ content }
-										key={ cellIndex }
-										scope={ tag === 'th' ? scope : undefined }
-									/>
+								{ cells.map(
+									( { content, tag, scope }, cellIndex ) => (
+										<RichText.Content
+											tagName={ tag }
+											value={ content }
+											key={ cellIndex }
+											scope={
+												tag === 'th' ? scope : undefined
+											}
+										/>
+									)
 								) }
 							</tr>
 						) ) }

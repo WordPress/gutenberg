@@ -17,8 +17,11 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import {
 	BlockEditorProvider,
-	BlockList
+	BlockList,
+	WritingFlow,
+	ObserveTyping
 } from '@wordpress/block-editor';
+import { Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent () {
@@ -30,6 +33,7 @@ function MyEditorComponent () {
 			onInput={ updateBlocks }
 			onChange={ updateBlocks }
 		>
+			<Popover.Slot name="block-toolbar" />
 			<WritingFlow>
 				<ObserveTyping>
 					<BlockList />
@@ -45,11 +49,13 @@ function MyEditorComponent () {
 // import '@wordpress/block-editor/build-style/style.css';
 ```
 
-In this example, we're instantiating a block editor. A block editor is composed by a `BlockEditorProvider` wrapper component where you passe the current array of blocks and on each change the `onInput` or `onChange` callbacks are called depending on whether the change is considered persistent or not.
+In this example, we're instantiating a block editor. A block editor is composed by a `BlockEditorProvider` wrapper component where you pass the current array of blocks and on each change the `onInput` or `onChange` callbacks are called depending on whether the change is considered persistent or not.
 
 Inside `BlockEditorProvider`, you can nest any of the available `@wordpress/block-editor` UI components to build the UI of your editor.
 
 In the example above we're rendering the `BlockList` to show and edit the block list. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#API) for the list of all the available components).
+
+The `Popover.Slot` with the `name="block-toolbar"` prop is used to render the toolbar for a selected block.
 
 In the example above, there's no registered block type, in order to use the block editor successfully make sure to register some block types. For instance, registering the core block types can be done like so:
 
@@ -81,6 +87,30 @@ _Related_
 <a name="BlockAlignmentToolbar" href="#BlockAlignmentToolbar">#</a> **BlockAlignmentToolbar**
 
 Undocumented declaration.
+
+<a name="BlockBreadcrumb" href="#BlockBreadcrumb">#</a> **BlockBreadcrumb**
+
+Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
+
+_Returns_
+
+-   `WPElement`: Block Breadcrumb.
+
+<a name="BlockColorsStyleSelector" href="#BlockColorsStyleSelector">#</a> **BlockColorsStyleSelector**
+
+Undocumented declaration.
+
+<a name="BlockContextProvider" href="#BlockContextProvider">#</a> **BlockContextProvider**
+
+Component which merges passed value with current consumed block context.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-context/README.md>
+
+_Parameters_
+
+-   _props_ `BlockContextProviderProps`: 
 
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
@@ -132,12 +162,13 @@ _Related_
 
 _Parameters_
 
--   _blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
--   _viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+-   _preview_ `Object`: options for how the preview should be shown
+-   _preview.blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
 
--   `WPElement`: Rendered element.
+-   `WPComponent`: The component to be rendered.
 
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
@@ -147,9 +178,31 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="BlockSettingsMenuControls" href="#BlockSettingsMenuControls">#</a> **BlockSettingsMenuControls**
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md>
+
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
-Undocumented declaration.
+Renders the block's configured title as a string, or empty if the title
+cannot be determined.
+
+_Usage_
+
+```jsx
+<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+```
+
+_Parameters_
+
+-   _props_ `Object`: 
+-   _props.clientId_ `string`: Client ID of block.
+
+_Returns_
+
+-   `?string`: Block title.
 
 <a name="BlockToolbar" href="#BlockToolbar">#</a> **BlockToolbar**
 
@@ -168,6 +221,10 @@ _Related_
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md>
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
+
+Undocumented declaration.
+
+<a name="ColorPaletteControl" href="#ColorPaletteControl">#</a> **ColorPaletteControl**
 
 Undocumented declaration.
 
@@ -268,7 +325,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug. Otherwise, an object with just the size value based on customFontSize is returned.
+-   `?Object`: If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug. Otherwise, an object with just the size value based on customFontSize is returned.
 
 <a name="getFontSizeClass" href="#getFontSizeClass">#</a> **getFontSizeClass**
 
@@ -281,6 +338,45 @@ _Parameters_
 _Returns_
 
 -   `string`: String with the class corresponding to the fontSize passed. The class is generated by appending 'has-' followed by fontSizeSlug in kebabCase and ending with '-font-size'.
+
+<a name="getFontSizeObjectByValue" href="#getFontSizeObjectByValue">#</a> **getFontSizeObjectByValue**
+
+Returns the corresponding font size object for a given value.
+
+_Parameters_
+
+-   _fontSizes_ `Array`: Array of font size objects.
+-   _value_ `number`: Font size value.
+
+_Returns_
+
+-   `Object`: Font size object.
+
+<a name="getGradientSlugByValue" href="#getGradientSlugByValue">#</a> **getGradientSlugByValue**
+
+Retrieves the gradient slug per slug.
+
+_Parameters_
+
+-   _gradients_ `Array`: Gradient Palette
+-   _value_ `string`: Gradient value
+
+_Returns_
+
+-   `string`: Gradient slug.
+
+<a name="getGradientValueBySlug" href="#getGradientValueBySlug">#</a> **getGradientValueBySlug**
+
+Retrieves the gradient value per slug.
+
+_Parameters_
+
+-   _gradients_ `Array`: Gradient Palette
+-   _slug_ `string`: Gradient slug
+
+_Returns_
+
+-   `string`: Gradient value.
 
 <a name="InnerBlocks" href="#InnerBlocks">#</a> **InnerBlocks**
 
@@ -308,6 +404,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md>
 
+<a name="MediaReplaceFlow" href="#MediaReplaceFlow">#</a> **MediaReplaceFlow**
+
+Undocumented declaration.
+
 <a name="MediaUpload" href="#MediaUpload">#</a> **MediaUpload**
 
 _Related_
@@ -320,13 +420,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
 
-<a name="MultiBlocksSwitcher" href="#MultiBlocksSwitcher">#</a> **MultiBlocksSwitcher**
-
-Undocumented declaration.
-
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
-Undocumented declaration.
+Scrolls the multi block selection end into view if not in view already. This
+is important to do after selection by keyboard.
 
 <a name="NavigableToolbar" href="#NavigableToolbar">#</a> **NavigableToolbar**
 
@@ -370,28 +467,34 @@ Undocumented declaration.
 
 The default editor settings
 
- alignWide                              boolean       Enable/Disable Wide/Full Alignments
- availableLegacyWidgets                 Array         Array of objects representing the legacy widgets available.
- colors                                 Array         Palette colors
- disableCustomColors                    boolean       Whether or not the custom colors are disabled
- fontSizes                              Array         Available font sizes
- disableCustomFontSizes                 boolean       Whether or not the custom font sizes are disabled
- imageSizes                             Array         Available image sizes
- maxWidth                               number        Max width to constraint resizing
- allowedBlockTypes                      boolean|Array Allowed block types
- hasFixedToolbar                        boolean       Whether or not the editor toolbar is fixed
- hasPermissionsToManageWidgets          boolean       Whether or not the user is able to manage widgets.
- focusMode                              boolean       Whether the focus mode is enabled or not
- styles                                 Array         Editor Styles
- isRTL                                  boolean       Whether the editor is in RTL mode
- bodyPlaceholder                        string        Empty post placeholder
- titlePlaceholder                       string        Empty title placeholder
- codeEditingEnabled                     string        Whether or not the user can switch to the code editor
- showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
- **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
- **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
- **experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
- **experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
+_Type Definition_
+
+-   _SETTINGS_DEFAULT_ `Object`
+
+_Properties_
+
+-   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
+-   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
+-   _colors_ `Array`: Palette colors
+-   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
+-   _fontSizes_ `Array`: Available font sizes
+-   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
+-   _imageSizes_ `Array`: Available image sizes
+-   _maxWidth_ `number`: Max width to constraint resizing
+-   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
+-   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+-   _hasPermissionsToManageWidgets_ `boolean`: Whether or not the user is able to manage widgets.
+-   _focusMode_ `boolean`: Whether the focus mode is enabled or not
+-   _styles_ `Array`: Editor Styles
+-   _isRTL_ `boolean`: Whether the editor is in RTL mode
+-   _bodyPlaceholder_ `string`: Empty post placeholder
+-   _titlePlaceholder_ `string`: Empty title placeholder
+-   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+-   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
+-   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
+-   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
+-   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -408,6 +511,10 @@ _Related_
 _Type_
 
 -   `Object` 
+
+<a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
+
+Undocumented declaration.
 
 <a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
 
@@ -445,6 +552,20 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
+
+<a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
+
+Undocumented declaration.
+
+<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
+
+Function that manipulates media queries from stylesheets to simulate a given
+viewport width.
+
+_Parameters_
+
+-   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
+-   _width_ `?number`: Viewport width to simulate. If provided null, the stylesheets will not be modified.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
@@ -492,7 +613,13 @@ _Returns_
 
 <a name="WritingFlow" href="#WritingFlow">#</a> **WritingFlow**
 
-Undocumented declaration.
+Handles selection and navigation across blocks. This component should be
+wrapped around BlockList.
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.children_ `WPElement`: Children to be rendered.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

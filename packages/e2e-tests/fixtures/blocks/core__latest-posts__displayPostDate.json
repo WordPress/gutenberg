@@ -8,11 +8,16 @@
             "displayPostContent": false,
             "displayPostContentRadio": "excerpt",
             "excerptLength": 55,
+            "displayAuthor": false,
             "displayPostDate": true,
             "postLayout": "list",
             "columns": 3,
             "order": "desc",
-            "orderBy": "date"
+            "orderBy": "date",
+            "displayFeaturedImage": false,
+            "featuredImageSizeSlug": "thumbnail",
+            "featuredImageSizeWidth": null,
+            "featuredImageSizeHeight": null
         },
         "innerBlocks": [],
         "originalContent": ""

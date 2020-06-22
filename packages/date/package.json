@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/date",
-	"version": "3.5.0",
+	"version": "3.9.0",
 	"description": "Date module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"date"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/date/README.md",
@@ -21,7 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.9.2",
 		"moment": "^2.22.1",
 		"moment-timezone": "^0.5.16"
 	},

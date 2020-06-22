@@ -26,7 +26,9 @@ describe( 'Input ', () => {
 					onChange={ onChange }
 				/>
 			).root;
-			testInstance.findByType( 'input' ).props.onKeyDown( { keyCode: ENTER } );
+			testInstance
+				.findByType( 'input' )
+				.props.onKeyDown( { keyCode: ENTER } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
 				source: 'rgb',
@@ -47,7 +49,9 @@ describe( 'Input ', () => {
 					onChange={ onChange }
 				/>
 			).root;
-			testInstance.findByType( 'input' ).props.onKeyDown( { keyCode: UP } );
+			testInstance
+				.findByType( 'input' )
+				.props.onKeyDown( { keyCode: UP } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
 				source: 'rgb',
@@ -68,7 +72,9 @@ describe( 'Input ', () => {
 					onChange={ onChange }
 				/>
 			).root;
-			testInstance.findByType( 'input' ).props.onKeyDown( { keyCode: DOWN } );
+			testInstance
+				.findByType( 'input' )
+				.props.onKeyDown( { keyCode: DOWN } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
 				source: 'rgb',
@@ -89,7 +95,9 @@ describe( 'Input ', () => {
 					onChange={ onChange }
 				/>
 			).root;
-			testInstance.findByType( 'input' ).props.onChange( { target: { value: '#aaaaaa' } } );
+			testInstance
+				.findByType( 'input' )
+				.props.onChange( { target: { value: '#aaaaaa' } } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
 				source: 'rgb',
@@ -133,7 +141,9 @@ describe( 'Input ', () => {
 					onChange={ onChange }
 				/>
 			).root;
-			testInstance.findByType( 'input' ).props.onChange( { target: { value: '#aaaaa' } } );
+			testInstance
+				.findByType( 'input' )
+				.props.onChange( { target: { value: '#aaaaa' } } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
 				source: 'rgb',
@@ -155,7 +165,9 @@ describe( 'Input ', () => {
 					onChange={ onChange }
 				/>
 			).root;
-			testInstance.findByType( 'input' ).props.onKeyDown( { keyCode: SPACE } );
+			testInstance
+				.findByType( 'input' )
+				.props.onKeyDown( { keyCode: SPACE } );
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 	} );

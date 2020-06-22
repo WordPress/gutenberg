@@ -1,5 +1,21 @@
 # Attributes
 
+## Type Validation
+
+The only required field for an attribute is the `type` field. It indicates the type of data that is stored within the attribute.
+
+Accepted values in the `type` field MUST be one of the following:
+
+* null
+* boolean
+* object
+* array
+* number
+* string
+* integer
+
+See [WordPress's REST API documentation](https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/) for additional details.
+
 ## Common Sources
 
 Attribute sources are used to define how the block attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
@@ -33,19 +49,33 @@ _Example_: Extract the `src` attribute from an image found in the block's markup
 // { "url": "https://lorempixel.com/1200/800/" }
 ```
 
-#### `attribute` Type Validation
+Most attributes from markup will be of type `string`. Numeric attributes in HTML are still stored as strings, and are not converted automatically.
 
-Accepted values in the `type` field of an `attribute` MUST be one of the following:
+```js
+{
+	width: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'width',
+	}
+}
+// { "width": "50" }
+```
 
-* null
-* boolean
-* object
-* array
-* number
-* string
-* integer
+The only exception is when checking for the existence of an attribute (for example, the `disabled` attribute on a `button`). In that case type `boolean` can be used and the stored value will be a boolean.
 
-See [WordPress's REST API documentation](https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/) for additional details.
+```js
+{
+	disabled: {
+		type: 'boolean',
+		source: 'attribute',
+		selector: 'button',
+		attribute: 'disabled',
+	}
+}
+// { "disabled": true }
+```
 
 ### `text`
 
@@ -114,7 +144,7 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 {
 	images: {
 		type: 'array',
-		source: 'query'
+		source: 'query',
 		selector: 'img',
 		query: {
 			url: {
@@ -155,6 +185,16 @@ attributes: {
 From here, meta attributes can be read and written by a block using the same interface as any attribute:
 
 {% codetabs %}
+{% ESNext %}
+```js
+edit( { attributes, setAttributes } ) {
+	function onChange( event ) {
+		setAttributes( { author: event.target.value } );
+	}
+
+	return <input value={ attributes.author } onChange={ onChange } type="text" />;
+},
+```
 {% ES5 %}
 ```js
 edit: function( props ) {
@@ -166,16 +206,6 @@ edit: function( props ) {
 		value: props.attributes.author,
 		onChange: onChange,
 	} );
-},
-```
-{% ESNext %}
-```js
-edit( { attributes, setAttributes } ) {
-	function onChange( event ) {
-		setAttributes( { author: event.target.value } );
-	}
-
-	return <input value={ attributes.author } onChange={ onChange } type="text" />;
 },
 ```
 {% end %}

@@ -1,10 +1,8 @@
 /**
  * External dependencies
  */
-import {
-	without,
-	mapValues,
-} from 'lodash';
+import { omit, without, mapValues } from 'lodash';
+import memize from 'memize';
 
 /**
  * Internal dependencies
@@ -34,6 +32,8 @@ import createCoreDataStore from './store';
 
 /**
  * @typedef {Object} WPDataPlugin An object of registry function overrides.
+ *
+ * @property {Function} registerStore registers store.
  */
 
 /**
@@ -88,6 +88,62 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return parent && parent.select( reducerKey );
 	}
 
+	const getResolveSelectors = memize(
+		( selectors ) => {
+			return mapValues(
+				omit( selectors, [
+					'getIsResolving',
+					'hasStartedResolution',
+					'hasFinishedResolution',
+					'isResolving',
+					'getCachedResolvers',
+				] ),
+				( selector, selectorName ) => {
+					return ( ...args ) => {
+						return new Promise( ( resolve ) => {
+							const hasFinished = () =>
+								selectors.hasFinishedResolution(
+									selectorName,
+									args
+								);
+							const getResult = () =>
+								selector.apply( null, args );
+
+							// trigger the selector (to trigger the resolver)
+							const result = getResult();
+							if ( hasFinished() ) {
+								return resolve( result );
+							}
+
+							const unsubscribe = subscribe( () => {
+								if ( hasFinished() ) {
+									unsubscribe();
+									resolve( getResult() );
+								}
+							} );
+						} );
+					};
+				}
+			);
+		},
+		{ maxSize: 1 }
+	);
+
+	/**
+	 * Given the name of a registered store, returns an object containing the store's
+	 * selectors pre-bound to state so that you only need to supply additional arguments,
+	 * and modified so that they return promises that resolve to their eventual values,
+	 * after any resolvers have ran.
+	 *
+	 * @param {string} reducerKey Part of the state shape to register the
+	 *                            selectors for.
+	 *
+	 * @return {Object} Each key of the object matches the name of a selector.
+	 */
+	function __experimentalResolveSelect( reducerKey ) {
+		return getResolveSelectors( select( reducerKey ) );
+	}
+
 	/**
 	 * Returns the available actions for a part of the state.
 	 *
@@ -114,7 +170,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			if ( typeof attribute !== 'function' ) {
 				return attribute;
 			}
-			return function() {
+			return function () {
 				return registry[ key ].apply( null, arguments );
 			};
 		} );
@@ -146,6 +202,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		namespaces: stores, // TODO: Deprecate/remove this.
 		subscribe,
 		select,
+		__experimentalResolveSelect,
 		dispatch,
 		use,
 	};
@@ -183,8 +240,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
 
-	Object.entries( storeConfigs ).forEach(
-		( [ name, config ] ) => registry.registerStore( name, config )
+	Object.entries( storeConfigs ).forEach( ( [ name, config ] ) =>
+		registry.registerStore( name, config )
 	);
 
 	if ( parent ) {

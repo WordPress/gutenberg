@@ -7,9 +7,13 @@ import { first, last, partial, castArray } from 'lodash';
  * WordPress dependencies
  */
 import { ToolbarButton } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { getMoversSetup } from './mover-description';
 
 const BlockMover = ( {
 	isFirst,
@@ -19,7 +23,19 @@ const BlockMover = ( {
 	onMoveUp,
 	firstIndex,
 	rootClientId,
+	isStackedHorizontally,
 } ) => {
+	const {
+		description: {
+			backwardButtonHint,
+			forwardButtonHint,
+			firstBlockTitle,
+			lastBlockTitle,
+		},
+		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
+		title: { backward: backwardButtonTitle, forward: forwardButtonTitle },
+	} = getMoversSetup( isStackedHorizontally, { firstIndex } );
+
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
 	}
@@ -27,35 +43,21 @@ const BlockMover = ( {
 	return (
 		<>
 			<ToolbarButton
-				title={ ! isFirst ?
-					sprintf(
-						/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-						__( 'Move block up from row %1$s to row %2$s' ),
-						firstIndex + 1,
-						firstIndex
-					) :
-					__( 'Move block up' )
-				}
+				title={ ! isFirst ? backwardButtonTitle : firstBlockTitle }
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
-				icon="arrow-up-alt"
-				extraProps={ { hint: __( 'Double tap to move the block up' ) } }
+				icon={ backwardButtonIcon }
+				extraProps={ { hint: backwardButtonHint } }
 			/>
 
 			<ToolbarButton
-				title={ ! isLast ?
-					sprintf(
-						/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-						__( 'Move block down from row %1$s to row %2$s' ),
-						firstIndex + 1,
-						firstIndex + 2
-					) :
-					__( 'Move block down' )
-				}
+				title={ ! isLast ? forwardButtonTitle : lastBlockTitle }
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
-				icon="arrow-down-alt"
-				extraProps={ { hint: __( 'Double tap to move the block down' ) } }
+				icon={ forwardButtonIcon }
+				extraProps={ {
+					hint: forwardButtonHint,
+				} }
 			/>
 		</>
 	);
@@ -63,13 +65,21 @@ const BlockMover = ( {
 
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlockIndex, getTemplateLock, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
+		const {
+			getBlockIndex,
+			getTemplateLock,
+			getBlockRootClientId,
+			getBlockOrder,
+		} = select( 'core/block-editor' );
 		const normalizedClientIds = castArray( clientIds );
 		const firstClientId = first( normalizedClientIds );
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
-		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
+		const lastIndex = getBlockIndex(
+			last( normalizedClientIds ),
+			rootClientId
+		);
 
 		return {
 			firstIndex,
@@ -80,11 +90,13 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp } = dispatch( 'core/block-editor' );
+		const { moveBlocksDown, moveBlocksUp } = dispatch(
+			'core/block-editor'
+		);
 		return {
 			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
 			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
 		};
 	} ),
-	withInstanceId,
+	withInstanceId
 )( BlockMover );

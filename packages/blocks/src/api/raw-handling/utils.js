@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, mergeWith, includes, noop } from 'lodash';
+import { mapValues, mergeWith, includes, noop, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,13 +22,24 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 /**
  * Given raw transforms from blocks, merges all schemas into one.
  *
- * @param {Array} transforms Block transforms, of the `raw` type.
+ * @param {Array}  transforms            Block transforms, of the `raw` type.
+ * @param {Object} phrasingContentSchema The phrasing content schema.
+ * @param {Object} isPaste               Whether the context is pasting or not.
  *
  * @return {Object} A complete block content schema.
  */
-export function getBlockContentSchema( transforms ) {
+export function getBlockContentSchema(
+	transforms,
+	phrasingContentSchema,
+	isPaste
+) {
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
 		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
+
+		schema = isFunction( schema )
+			? schema( { phrasingContentSchema, isPaste } )
+			: schema;
+
 		// If the block does not has anchor support and the transform does not
 		// provides an isMatch we can return the schema right away.
 		if ( ! hasAnchorSupport && ! isMatch ) {
@@ -203,7 +214,10 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 				if ( node.hasAttributes() ) {
 					// Strip invalid attributes.
 					Array.from( node.attributes ).forEach( ( { name } ) => {
-						if ( name !== 'class' && ! includes( attributes, name ) ) {
+						if (
+							name !== 'class' &&
+							! includes( attributes, name )
+						) {
 							node.removeAttribute( name );
 						}
 					} );
@@ -223,7 +237,11 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 						} );
 
 						Array.from( node.classList ).forEach( ( name ) => {
-							if ( ! mattchers.some( ( isMatch ) => isMatch( name ) ) ) {
+							if (
+								! mattchers.some( ( isMatch ) =>
+									isMatch( name )
+								)
+							) {
 								node.classList.remove( name );
 							}
 						} );
@@ -244,25 +262,47 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 					if ( children ) {
 						// If a parent requires certain children, but it does
 						// not have them, drop the parent and continue.
-						if ( require.length && ! node.querySelector( require.join( ',' ) ) ) {
-							cleanNodeList( node.childNodes, doc, schema, inline );
+						if (
+							require.length &&
+							! node.querySelector( require.join( ',' ) )
+						) {
+							cleanNodeList(
+								node.childNodes,
+								doc,
+								schema,
+								inline
+							);
 							unwrap( node );
-						// If the node is at the top, phrasing content, and
-						// contains children that are block content, unwrap
-						// the node because it is invalid.
+							// If the node is at the top, phrasing content, and
+							// contains children that are block content, unwrap
+							// the node because it is invalid.
 						} else if (
 							node.parentNode.nodeName === 'BODY' &&
 							isPhrasingContent( node )
 						) {
-							cleanNodeList( node.childNodes, doc, schema, inline );
+							cleanNodeList(
+								node.childNodes,
+								doc,
+								schema,
+								inline
+							);
 
-							if ( Array.from( node.childNodes ).some( ( child ) => ! isPhrasingContent( child ) ) ) {
+							if (
+								Array.from( node.childNodes ).some(
+									( child ) => ! isPhrasingContent( child )
+								)
+							) {
 								unwrap( node );
 							}
 						} else {
-							cleanNodeList( node.childNodes, doc, children, inline );
+							cleanNodeList(
+								node.childNodes,
+								doc,
+								children,
+								inline
+							);
 						}
-					// Remove children if the node is not supposed to have any.
+						// Remove children if the node is not supposed to have any.
 					} else {
 						while ( node.firstChild ) {
 							remove( node.firstChild );
@@ -270,13 +310,17 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 					}
 				}
 			}
-		// Invalid child. Continue with schema at the same place and unwrap.
+			// Invalid child. Continue with schema at the same place and unwrap.
 		} else {
 			cleanNodeList( node.childNodes, doc, schema, inline );
 
 			// For inline mode, insert a line break when unwrapping nodes that
 			// are not phrasing content.
-			if ( inline && ! isPhrasingContent( node ) && node.nextElementSibling ) {
+			if (
+				inline &&
+				! isPhrasingContent( node ) &&
+				node.nextElementSibling
+			) {
 				insertAfter( doc.createElement( 'br' ), node );
 			}
 
@@ -302,4 +346,26 @@ export function removeInvalidHTML( HTML, schema, inline ) {
 	cleanNodeList( doc.body.childNodes, doc, schema, inline );
 
 	return doc.body.innerHTML;
+}
+
+/**
+ * Gets a sibling within text-level context.
+ *
+ * @param {Element} node  The subject node.
+ * @param {string}  which "next" or "previous".
+ */
+export function getSibling( node, which ) {
+	const sibling = node[ `${ which }Sibling` ];
+
+	if ( sibling && isPhrasingContent( sibling ) ) {
+		return sibling;
+	}
+
+	const { parentNode } = node;
+
+	if ( ! parentNode || ! isPhrasingContent( parentNode ) ) {
+		return;
+	}
+
+	return getSibling( parentNode, which );
 }

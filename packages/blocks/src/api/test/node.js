@@ -1,16 +1,15 @@
 /**
  * Internal dependencies
  */
-import {
-	getNamedNodeMapAsObject,
-	toHTML,
-	fromDOM,
-} from '../node';
+import { getNamedNodeMapAsObject, toHTML, fromDOM } from '../node';
 
 describe( 'getNamedNodeMapAsObject', () => {
 	it( 'should return an object of node attributes', () => {
 		const node = document.createElement( 'img' );
-		node.setAttribute( 'src', 'https://s.w.org/style/images/wporg-logo.svg' );
+		node.setAttribute(
+			'src',
+			'https://s.w.org/style/images/wporg-logo.svg'
+		);
 
 		const object = getNamedNodeMapAsObject( node.attributes );
 		expect( object ).toEqual( {
@@ -31,7 +30,9 @@ describe( 'toHTML', () => {
 
 		const html = toHTML( blockNode );
 
-		expect( html ).toBe( '<strong class="is-extra-strong">This is a test</strong>' );
+		expect( html ).toBe(
+			'<strong class="is-extra-strong">This is a test</strong>'
+		);
 	} );
 } );
 

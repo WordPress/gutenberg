@@ -39,24 +39,38 @@ export function applyFormat(
 
 	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
-		const startFormat = find( newFormats[ startIndex ], { type: format.type } );
+		const startFormat = find( newFormats[ startIndex ], {
+			type: format.type,
+		} );
 
 		// If the caret is at a format of the same type, expand start and end to
 		// the edges of the format. This is useful to apply new attributes.
 		if ( startFormat ) {
 			const index = newFormats[ startIndex ].indexOf( startFormat );
 
-			while ( newFormats[ startIndex ] && newFormats[ startIndex ][ index ] === startFormat ) {
-				newFormats[ startIndex ] =
-					replace( newFormats[ startIndex ], index, format );
+			while (
+				newFormats[ startIndex ] &&
+				newFormats[ startIndex ][ index ] === startFormat
+			) {
+				newFormats[ startIndex ] = replace(
+					newFormats[ startIndex ],
+					index,
+					format
+				);
 				startIndex--;
 			}
 
 			endIndex++;
 
-			while ( newFormats[ endIndex ] && newFormats[ endIndex ][ index ] === startFormat ) {
-				newFormats[ endIndex ] =
-					replace( newFormats[ endIndex ], index, format );
+			while (
+				newFormats[ endIndex ] &&
+				newFormats[ endIndex ][ index ] === startFormat
+			) {
+				newFormats[ endIndex ] = replace(
+					newFormats[ endIndex ],
+					index,
+					format
+				);
 				endIndex++;
 			}
 		}
@@ -66,8 +80,9 @@ export function applyFormat(
 
 		for ( let index = startIndex; index < endIndex; index++ ) {
 			if ( newFormats[ index ] ) {
-				newFormats[ index ] = newFormats[ index ]
-					.filter( ( { type } ) => type !== format.type );
+				newFormats[ index ] = newFormats[ index ].filter(
+					( { type } ) => type !== format.type
+				);
 
 				const length = newFormats[ index ].length;
 

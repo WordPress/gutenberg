@@ -23,9 +23,9 @@ function createDoingHook( hooks ) {
 		}
 
 		// Return the __current hook.
-		return hooks.__current[ 0 ] ?
-			hookName === hooks.__current[ 0 ].name :
-			false;
+		return hooks.__current[ 0 ]
+			? hookName === hooks.__current[ 0 ].name
+			: false;
 	};
 }
 

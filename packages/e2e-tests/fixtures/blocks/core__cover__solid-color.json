@@ -1,0 +1,30 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/cover",
+        "isValid": true,
+        "attributes": {
+            "hasParallax": false,
+            "dimRatio": 50,
+            "overlayColor": "primary",
+            "backgroundType": "image"
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "align": "center",
+                    "content": "",
+                    "dropCap": false,
+                    "placeholder": "Write title…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "originalContent": "<p class=\"has-text-align-center has-large-font-size\"></p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-cover has-primary-background-color has-background-dim\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+    }
+]

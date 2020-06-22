@@ -1,15 +1,42 @@
 .edit-post-visual-editor {
 	position: relative;
 	padding-top: 50px;
+	// Default background color so that grey .edit-post-editor-regions__content color doesn't show through.
+	background-color: $white;
 
+	// The button element easily inherits styles that are meant for the editor style.
+	// These rules enhance the specificity to reduce that inheritance.
+	// This is duplicated in edit-site.
 	& .components-button {
 		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 12px;
+
+		&.is-tertiary {
+			padding: 6px;
+		}
 	}
+
+	flex: 1 1 auto;
+
+	// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.
+	// But it works as expected without it.
+	// The flex-basis is needed for the other browsers to make sure the content area is full-height.
+	@supports (position: sticky) {
+		flex-basis: 100%;
+	}
+}
+
+.edit-post-visual-editor > .block-editor__typewriter,
+.edit-post-visual-editor > .block-editor__typewriter > div,
+.edit-post-visual-editor > .block-editor__typewriter > div > .block-editor-writing-flow,
+.edit-post-visual-editor > .block-editor__typewriter > div > .block-editor-writing-flow > .block-editor-writing-flow__click-redirect {
+	height: 100%;
 }
 
 .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
 	// Allow the page to be scrolled with the last block in the middle.
-	height: 50vh;
+	min-height: 40vh;
 	width: 100%;
 }
 
@@ -18,83 +45,18 @@
 	height: 0;
 }
 
-// The base width of blocks
-.edit-post-visual-editor .block-editor-block-list__block {
-	margin-left: auto;
-	margin-right: auto;
+// Ideally this wrapper div is not needed but if we want to match the positioning of blocks
+// .block-editor-block-list__layout and block-editor-block-list__block
+// We need to have two DOM elements.
+.edit-post-visual-editor__post-title-wrapper {
+	.editor-post-title {
+		// Center.
+		margin-left: auto;
+		margin-right: auto;
 
-	@include break-small() {
-		// Compensate for side UI width.
-		.block-editor-block-list__block-edit {
-			margin-left: -$block-side-ui-width;
-			margin-right: -$block-side-ui-width;
-		}
-
-		// Center the block toolbar on wide and full-wide blocks.
-		// Use specific selector to not affect nested block toolbars.
-		&[data-align="wide"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar,
-		&[data-align="full"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar {
-			height: 0; // This collapses the container to an invisible element without margin.
-			width: calc(100% - #{$block-side-ui-width * 3} - #{$grid-size-small * 1.5}); // -90px to account for inner element left position value causing overflow-x scrollbars
-			margin-left: 0;
-			margin-right: 0;
-			text-align: center;
-			// This float rule takes the toolbar out of the flow, without it having to be absolute positioned.
-			// This is necessary because otherwise the mere presence of the toolbar can push down content.
-			// Pairs with relative rule on line 49.
-			float: left;
-
-			@include break-xlarge() {
-				width: calc(100% - #{$block-padding * 2} + #{$border-width * 2}); // On the largest screens, line the toolbar up with standard-aligned block controls.
-			}
-
-			.block-editor-block-toolbar {
-				max-width: $content-width;
-				width: 100%;
-
-				// Necessary for the toolbar to be centered.
-				// This unsets an absolute position that will otherwise left align the toolbar.
-				position: relative;
-			}
-		}
-	}
-}
-
-// The base width of the title should match that of blocks even if it isn't a block
-.editor-post-title {
-	@include break-small() {
-		padding-left: $block-container-side-padding;
-		padding-right: $block-container-side-padding;
-	}
-}
-.edit-post-visual-editor .editor-post-title__block {
-	margin-left: auto;
-	margin-right: auto;
-
-	// Apply default block margin below the post title.
-	// This ensures the first block on the page is in a good position.
-	// This rule can be retired once the title becomes an actual block.
-	margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
-
-	// Stack borders.
-	> div {
-		margin-left: 0;
-		margin-right: 0;
-	}
-
-	// Stretch to mimic outline padding on desktop.
-	@include break-small() {
-		> div {
-			margin-left: -$block-side-ui-clearance;
-			margin-right: -$block-side-ui-clearance;
-		}
-	}
-}
-
-.edit-post-visual-editor {
-	// If the first block is floated, it needs top margin, unlike the rule in line 69.
-	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="left"]:first-child,
-	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="right"]:first-child {
-		margin-top: $block-padding + $block-spacing + $border-width + $border-width + $block-padding;
+		// Apply default block margin below the post title.
+		// This ensures the first block on the page is in a good position.
+		// This rule can be retired once the title becomes an actual block.
+		margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
 	}
 }

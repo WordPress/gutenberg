@@ -4,28 +4,37 @@
 import { castArray } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { dispatch } from '@wordpress/data-controls';
+
+/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
- * @param {string} name Sidebar name to be opened.
+ * @param {?string} name Sidebar name to be opened.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function openGeneralSidebar( name ) {
-	return {
-		type: 'OPEN_GENERAL_SIDEBAR',
-		name,
-	};
+export function* openGeneralSidebar( name ) {
+	yield dispatch(
+		'core/interface',
+		'enableComplementaryArea',
+		'core/edit-post',
+		name
+	);
 }
 
 /**
  * Returns an action object signalling that the user closed the sidebar.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function closeGeneralSidebar() {
-	return {
-		type: 'CLOSE_GENERAL_SIDEBAR',
-	};
+export function* closeGeneralSidebar() {
+	yield dispatch(
+		'core/interface',
+		'disableComplementaryArea',
+		'core/edit-post'
+	);
 }
 
 /**
@@ -196,6 +205,13 @@ export function updatePreferredStyleVariations( blockName, blockStyle ) {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that the editor should attempt
+ * to locally autosave the current post every `interval` seconds.
+ *
+ * @param {number} interval The new interval, in seconds.
+ * @return {Object} Action object.
+ */
 export function __experimentalUpdateLocalAutosaveInterval( interval ) {
 	return {
 		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
@@ -252,5 +268,19 @@ export function requestMetaBoxUpdates() {
 export function metaBoxUpdatesSuccess() {
 	return {
 		type: 'META_BOX_UPDATES_SUCCESS',
+	};
+}
+
+/**
+ * Returns an action object used to toggle the width of the editing canvas.
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalSetPreviewDeviceType( deviceType ) {
+	return {
+		type: 'SET_PREVIEW_DEVICE_TYPE',
+		deviceType,
 	};
 }

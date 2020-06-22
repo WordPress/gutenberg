@@ -321,6 +321,46 @@ exports[`recordToDom should ignore formats at line separator 1`] = `
 </body>
 `;
 
+exports[`recordToDom should not error with overlapping formats (1) 1`] = `
+<body>
+  <a
+    href="#"
+  >
+    <em>
+      1
+    </em>
+    <strong
+      data-rich-text-format-boundary="true"
+    >
+      2
+    </strong>
+  </a>
+  
+</body>
+`;
+
+exports[`recordToDom should not error with overlapping formats (2) 1`] = `
+<body>
+  <em>
+    <a
+      data-rich-text-format-boundary="true"
+      href="#"
+    >
+      1
+    </a>
+  </em>
+  <strong>
+    <a
+      data-rich-text-format-boundary="true"
+      href="#"
+    >
+      2
+    </a>
+  </strong>
+  
+</body>
+`;
+
 exports[`recordToDom should preserve emoji 1`] = `
 <body>
   🍒

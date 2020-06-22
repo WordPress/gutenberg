@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { createURLMatcher } from './create-url-matcher';
+import { join } from 'path';
 
 /**
  * Creates a function to determine if a request has a parameter with a certain value.
@@ -11,14 +11,24 @@ import { createURLMatcher } from './create-url-matcher';
  * @return {Function} Function that determines if a request's query parameter is the specified value.
  */
 function parameterEquals( parameterName, value ) {
-	return ( request ) => {
-		const url = request.url();
-		const match = new RegExp( `.*${ parameterName }=([^&]+).*` ).exec( url );
-		if ( ! match ) {
-			return false;
-		}
-		return value === decodeURIComponent( match[ 1 ] );
-	};
+	return ( request ) =>
+		new URL( request.url() ).searchParams.get( parameterName ) === value;
+}
+
+/**
+ * Creates a function to determine if a request is a REST request of a given
+ * path, accounting for variance in site permalink configuration.
+ *
+ * @param {string} path REST path to test.
+ *
+ * @return {Function} Function that determines if a request is a REST request of
+ *                    a given path, accounting for variance in site permalink
+ *                    configuration.
+ */
+function isRESTRoute( path ) {
+	return ( request ) =>
+		parameterEquals( 'rest_route', path )( request ) ||
+		new URL( request.url() ).pathname.endsWith( join( '/wp-json', path ) );
 }
 
 /**
@@ -29,6 +39,6 @@ function parameterEquals( parameterName, value ) {
  */
 export function createEmbeddingMatcher( url ) {
 	return ( request ) =>
-		createURLMatcher( 'oembed%2F1.0%2Fproxy' )( request ) &&
+		isRESTRoute( '/oembed/1.0/proxy' )( request ) &&
 		parameterEquals( 'url', url )( request );
 }

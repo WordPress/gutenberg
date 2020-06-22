@@ -85,19 +85,17 @@ import { useDispatchWithMap } from '../use-dispatch';
  * returns an object with the same keys. For example, it should not contain
  * conditions under which a different value would be returned.
  *
- * @return {Component} Enhanced component with merged dispatcher props.
+ * @return {WPComponent} Enhanced component with merged dispatcher props.
  */
-const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
-	( WrappedComponent ) => ( ownProps ) => {
-		const mapDispatch = ( dispatch, registry ) => mapDispatchToProps(
-			dispatch,
-			ownProps,
-			registry
-		);
-		const dispatchProps = useDispatchWithMap( mapDispatch, [] );
-		return <WrappedComponent { ...ownProps } { ...dispatchProps } />;
-	},
-	'withDispatch'
-);
+const withDispatch = ( mapDispatchToProps ) =>
+	createHigherOrderComponent(
+		( WrappedComponent ) => ( ownProps ) => {
+			const mapDispatch = ( dispatch, registry ) =>
+				mapDispatchToProps( dispatch, ownProps, registry );
+			const dispatchProps = useDispatchWithMap( mapDispatch, [] );
+			return <WrappedComponent { ...ownProps } { ...dispatchProps } />;
+		},
+		'withDispatch'
+	);
 
 export default withDispatch;

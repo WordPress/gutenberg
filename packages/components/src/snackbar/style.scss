@@ -23,23 +23,30 @@
 		background-color: $dark-gray-900;
 		box-shadow:
 			0 0 0 1px $white,
-			0 0 0 3px $blue-medium-focus;
+			0 0 0 3px var(--wp-admin-theme-color);
 	}
 }
 
 .components-snackbar__action.components-button {
-	margin-left: 32px;
+	margin-left: $grid-unit-40;
 	color: $white;
 	height: auto;
 	flex-shrink: 0;
 	line-height: $default-line-height;
+	padding: 0;
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
 		text-decoration: underline;
+		background-color: transparent;
+
+		&:focus {
+			color: $white;
+			box-shadow: none;
+			outline: 1px dotted $white;
+		}
 
 		&:hover {
-			color: $white;
-			text-decoration: none;
+			color: $blue-medium-400;
 		}
 	}
 }

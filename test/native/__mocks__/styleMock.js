@@ -75,4 +75,22 @@ module.exports = {
 	unsupportedBlockIcon: {
 		color: 'white',
 	},
+	infoIcon: {
+		size: 36,
+	},
+	infoSheetIcon: {
+		color: 'gray',
+	},
+	blockToolbar: {
+		height: 44,
+	},
+	headerToolbar: {
+		height: 44,
+	},
+	blockBorder: {
+		width: 1,
+	},
+	defaultBlock: {
+		marginTop: 16,
+	},
 };

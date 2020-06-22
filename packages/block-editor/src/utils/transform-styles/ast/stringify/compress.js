@@ -35,17 +35,15 @@ inherits( Compiler, Base );
  * Compile `node`.
  */
 
-Compiler.prototype.compile = function( node ) {
-	return node.stylesheet
-		.rules.map( this.visit, this )
-		.join( '' );
+Compiler.prototype.compile = function ( node ) {
+	return node.stylesheet.rules.map( this.visit, this ).join( '' );
 };
 
 /**
  * Visit comment node.
  */
 
-Compiler.prototype.comment = function( node ) {
+Compiler.prototype.comment = function ( node ) {
 	return this.emit( '', node.position );
 };
 
@@ -53,7 +51,7 @@ Compiler.prototype.comment = function( node ) {
  * Visit import node.
  */
 
-Compiler.prototype.import = function( node ) {
+Compiler.prototype.import = function ( node ) {
 	return this.emit( '@import ' + node.import + ';', node.position );
 };
 
@@ -61,31 +59,35 @@ Compiler.prototype.import = function( node ) {
  * Visit media node.
  */
 
-Compiler.prototype.media = function( node ) {
-	return this.emit( '@media ' + node.media, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.rules ) +
-    this.emit( '}' );
+Compiler.prototype.media = function ( node ) {
+	return (
+		this.emit( '@media ' + node.media, node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.rules ) +
+		this.emit( '}' )
+	);
 };
 
 /**
  * Visit document node.
  */
 
-Compiler.prototype.document = function( node ) {
+Compiler.prototype.document = function ( node ) {
 	const doc = '@' + ( node.vendor || '' ) + 'document ' + node.document;
 
-	return this.emit( doc, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.rules ) +
-    this.emit( '}' );
+	return (
+		this.emit( doc, node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.rules ) +
+		this.emit( '}' )
+	);
 };
 
 /**
  * Visit charset node.
  */
 
-Compiler.prototype.charset = function( node ) {
+Compiler.prototype.charset = function ( node ) {
 	return this.emit( '@charset ' + node.charset + ';', node.position );
 };
 
@@ -93,7 +95,7 @@ Compiler.prototype.charset = function( node ) {
  * Visit namespace node.
  */
 
-Compiler.prototype.namespace = function( node ) {
+Compiler.prototype.namespace = function ( node ) {
 	return this.emit( '@namespace ' + node.namespace + ';', node.position );
 };
 
@@ -101,105 +103,123 @@ Compiler.prototype.namespace = function( node ) {
  * Visit supports node.
  */
 
-Compiler.prototype.supports = function( node ) {
-	return this.emit( '@supports ' + node.supports, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.rules ) +
-    this.emit( '}' );
+Compiler.prototype.supports = function ( node ) {
+	return (
+		this.emit( '@supports ' + node.supports, node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.rules ) +
+		this.emit( '}' )
+	);
 };
 
 /**
  * Visit keyframes node.
  */
 
-Compiler.prototype.keyframes = function( node ) {
-	return this.emit( '@' +
-    ( node.vendor || '' ) +
-    'keyframes ' +
-    node.name, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.keyframes ) +
-    this.emit( '}' );
+Compiler.prototype.keyframes = function ( node ) {
+	return (
+		this.emit(
+			'@' + ( node.vendor || '' ) + 'keyframes ' + node.name,
+			node.position
+		) +
+		this.emit( '{' ) +
+		this.mapVisit( node.keyframes ) +
+		this.emit( '}' )
+	);
 };
 
 /**
  * Visit keyframe node.
  */
 
-Compiler.prototype.keyframe = function( node ) {
+Compiler.prototype.keyframe = function ( node ) {
 	const decls = node.declarations;
 
-	return this.emit( node.values.join( ',' ), node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( decls ) +
-    this.emit( '}' );
+	return (
+		this.emit( node.values.join( ',' ), node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( decls ) +
+		this.emit( '}' )
+	);
 };
 
 /**
  * Visit page node.
  */
 
-Compiler.prototype.page = function( node ) {
-	const sel = node.selectors.length ?
-		node.selectors.join( ', ' ) :
-		'';
+Compiler.prototype.page = function ( node ) {
+	const sel = node.selectors.length ? node.selectors.join( ', ' ) : '';
 
-	return this.emit( '@page ' + sel, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.declarations ) +
-    this.emit( '}' );
+	return (
+		this.emit( '@page ' + sel, node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.declarations ) +
+		this.emit( '}' )
+	);
 };
 
 /**
  * Visit font-face node.
  */
 
-Compiler.prototype[ 'font-face' ] = function( node ) {
-	return this.emit( '@font-face', node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.declarations ) +
-    this.emit( '}' );
+Compiler.prototype[ 'font-face' ] = function ( node ) {
+	return (
+		this.emit( '@font-face', node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.declarations ) +
+		this.emit( '}' )
+	);
 };
 
 /**
  * Visit host node.
  */
 
-Compiler.prototype.host = function( node ) {
-	return this.emit( '@host', node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.rules ) +
-    this.emit( '}' );
+Compiler.prototype.host = function ( node ) {
+	return (
+		this.emit( '@host', node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.rules ) +
+		this.emit( '}' )
+	);
 };
 
 /**
  * Visit custom-media node.
  */
 
-Compiler.prototype[ 'custom-media' ] = function( node ) {
-	return this.emit( '@custom-media ' + node.name + ' ' + node.media + ';', node.position );
+Compiler.prototype[ 'custom-media' ] = function ( node ) {
+	return this.emit(
+		'@custom-media ' + node.name + ' ' + node.media + ';',
+		node.position
+	);
 };
 
 /**
  * Visit rule node.
  */
 
-Compiler.prototype.rule = function( node ) {
+Compiler.prototype.rule = function ( node ) {
 	const decls = node.declarations;
 	if ( ! decls.length ) {
 		return '';
 	}
 
-	return this.emit( node.selectors.join( ',' ), node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( decls ) +
-    this.emit( '}' );
+	return (
+		this.emit( node.selectors.join( ',' ), node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( decls ) +
+		this.emit( '}' )
+	);
 };
 
 /**
  * Visit declaration node.
  */
 
-Compiler.prototype.declaration = function( node ) {
-	return this.emit( node.property + ':' + node.value, node.position ) + this.emit( ';' );
+Compiler.prototype.declaration = function ( node ) {
+	return (
+		this.emit( node.property + ':' + node.value, node.position ) +
+		this.emit( ';' )
+	);
 };

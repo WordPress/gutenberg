@@ -3,10 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import {
-	IconButton,
-	Popover,
-} from '@wordpress/components';
+import { Button, Popover } from '@wordpress/components';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,7 +16,9 @@ class URLPopover extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.toggleSettingsVisibility = this.toggleSettingsVisibility.bind( this );
+		this.toggleSettingsVisibility = this.toggleSettingsVisibility.bind(
+			this
+		);
 
 		this.state = {
 			isSettingsExpanded: false,
@@ -41,26 +41,24 @@ class URLPopover extends Component {
 			...popoverProps
 		} = this.props;
 
-		const {
-			isSettingsExpanded,
-		} = this.state;
+		const { isSettingsExpanded } = this.state;
 
 		const showSettings = !! renderSettings && isSettingsExpanded;
 
 		return (
 			<Popover
-				className="editor-url-popover block-editor-url-popover"
+				className="block-editor-url-popover"
 				focusOnMount={ focusOnMount }
 				position={ position }
 				{ ...popoverProps }
 			>
 				<div className="block-editor-url-popover__input-container">
-					<div className="editor-url-popover__row block-editor-url-popover__row">
+					<div className="block-editor-url-popover__row">
 						{ children }
 						{ !! renderSettings && (
-							<IconButton
-								className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
-								icon="arrow-down-alt2"
+							<Button
+								className="block-editor-url-popover__settings-toggle"
+								icon={ chevronDown }
 								label={ __( 'Link settings' ) }
 								onClick={ this.toggleSettingsVisibility }
 								aria-expanded={ isSettingsExpanded }
@@ -68,15 +66,13 @@ class URLPopover extends Component {
 						) }
 					</div>
 					{ showSettings && (
-						<div className="editor-url-popover__row block-editor-url-popover__row editor-url-popover__settings block-editor-url-popover__settings">
+						<div className="block-editor-url-popover__row block-editor-url-popover__settings">
 							{ renderSettings() }
 						</div>
 					) }
 				</div>
 				{ additionalControls && ! showSettings && (
-					<div
-						className="block-editor-url-popover__additional-controls"
-					>
+					<div className="block-editor-url-popover__additional-controls">
 						{ additionalControls }
 					</div>
 				) }

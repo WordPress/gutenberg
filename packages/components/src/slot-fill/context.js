@@ -6,7 +6,18 @@ import { sortBy, forEach, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createContext, useContext, useState, useEffect } from '@wordpress/element';
+import {
+	Component,
+	createContext,
+	useContext,
+	useState,
+	useEffect,
+} from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import SlotFillBubblesVirtuallyProvider from './bubbles-virtually/slot-fill-provider';
 
 const SlotFillContext = createContext( {
 	registerSlot: () => {},
@@ -29,6 +40,7 @@ class SlotFillProvider extends Component {
 		this.unregisterFill = this.unregisterFill.bind( this );
 		this.getSlot = this.getSlot.bind( this );
 		this.getFills = this.getFills.bind( this );
+		this.hasFills = this.hasFills.bind( this );
 		this.subscribe = this.subscribe.bind( this );
 
 		this.slots = {};
@@ -41,6 +53,7 @@ class SlotFillProvider extends Component {
 			unregisterFill: this.unregisterFill,
 			getSlot: this.getSlot,
 			getFills: this.getFills,
+			hasFills: this.hasFills,
 			subscribe: this.subscribe,
 		};
 	}
@@ -64,10 +77,7 @@ class SlotFillProvider extends Component {
 	}
 
 	registerFill( name, instance ) {
-		this.fills[ name ] = [
-			...( this.fills[ name ] || [] ),
-			instance,
-		];
+		this.fills[ name ] = [ ...( this.fills[ name ] || [] ), instance ];
 		this.forceUpdateSlot( name );
 	}
 
@@ -84,10 +94,7 @@ class SlotFillProvider extends Component {
 	}
 
 	unregisterFill( name, instance ) {
-		this.fills[ name ] = without(
-			this.fills[ name ],
-			instance
-		);
+		this.fills[ name ] = without( this.fills[ name ], instance );
 		this.resetFillOccurrence( name );
 		this.forceUpdateSlot( name );
 	}
@@ -103,6 +110,10 @@ class SlotFillProvider extends Component {
 			return [];
 		}
 		return sortBy( this.fills[ name ], 'occurrence' );
+	}
+
+	hasFills( name ) {
+		return this.fills[ name ] && !! this.fills[ name ].length;
 	}
 
 	resetFillOccurrence( name ) {
@@ -134,7 +145,9 @@ class SlotFillProvider extends Component {
 	render() {
 		return (
 			<Provider value={ this.contextValue }>
-				{ this.props.children }
+				<SlotFillBubblesVirtuallyProvider>
+					{ this.props.children }
+				</SlotFillBubblesVirtuallyProvider>
 			</Provider>
 		);
 	}

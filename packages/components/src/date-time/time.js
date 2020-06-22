@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Button from '../button';
+import ButtonGroup from '../button-group';
 
 /**
  * Module Constants
@@ -30,7 +31,7 @@ class TimePicker extends Component {
 			year: '',
 			hours: '',
 			minutes: '',
-			am: true,
+			am: '',
 			date: null,
 		};
 		this.changeDate = this.changeDate.bind( this );
@@ -88,7 +89,7 @@ class TimePicker extends Component {
 		const month = selected.format( 'MM' );
 		const year = selected.format( 'YYYY' );
 		const minutes = selected.format( 'mm' );
-		const am = selected.format( 'A' );
+		const am = selected.format( 'H' ) <= 11 ? 'AM' : 'PM';
 		const hours = selected.format( is12Hour ? 'hh' : 'HH' );
 		const date = currentTime ? moment( currentTime ) : moment();
 		this.setState( { day, month, year, minutes, hours, am, date } );
@@ -98,6 +99,9 @@ class TimePicker extends Component {
 		const { is12Hour } = this.props;
 		const { am, hours, date } = this.state;
 		const value = parseInt( hours, 10 );
+		if ( value === date.hour() ) {
+			return;
+		}
 		if (
 			! isInteger( value ) ||
 			( is12Hour && ( value < 1 || value > 12 ) ) ||
@@ -107,15 +111,22 @@ class TimePicker extends Component {
 			return;
 		}
 
-		const newDate = is12Hour ?
-			date.clone().hours( am === 'AM' ? value % 12 : ( ( ( value % 12 ) + 12 ) % 24 ) ) :
-			date.clone().hours( value );
+		const newDate = is12Hour
+			? date
+					.clone()
+					.hours(
+						am === 'AM' ? value % 12 : ( ( value % 12 ) + 12 ) % 24
+					)
+			: date.clone().hours( value );
 		this.changeDate( newDate );
 	}
 
 	updateMinutes() {
 		const { minutes, date } = this.state;
 		const value = parseInt( minutes, 10 );
+		if ( value === date.minute() ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 0 || value > 59 ) {
 			this.syncState( this.props );
 			return;
@@ -127,6 +138,9 @@ class TimePicker extends Component {
 	updateDay() {
 		const { day, date } = this.state;
 		const value = parseInt( day, 10 );
+		if ( value === date.date() ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 1 || value > 31 ) {
 			this.syncState( this.props );
 			return;
@@ -138,6 +152,9 @@ class TimePicker extends Component {
 	updateMonth() {
 		const { month, date } = this.state;
 		const value = parseInt( month, 10 );
+		if ( value === date.month() + 1 ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 1 || value > 12 ) {
 			this.syncState( this.props );
 			return;
@@ -149,6 +166,9 @@ class TimePicker extends Component {
 	updateYear() {
 		const { year, date } = this.state;
 		const value = parseInt( year, 10 );
+		if ( value === date.year() ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 0 || value > 9999 ) {
 			this.syncState( this.props );
 			return;
@@ -165,7 +185,9 @@ class TimePicker extends Component {
 			}
 			let newDate;
 			if ( value === 'PM' ) {
-				newDate = date.clone().hours( ( ( parseInt( hours, 10 ) % 12 ) + 12 ) % 24 );
+				newDate = date
+					.clone()
+					.hours( ( ( parseInt( hours, 10 ) % 12 ) + 12 ) % 24 );
 			} else {
 				newDate = date.clone().hours( parseInt( hours, 10 ) % 12 );
 			}
@@ -192,13 +214,16 @@ class TimePicker extends Component {
 	onChangeMinutes( event ) {
 		const minutes = event.target.value;
 		this.setState( {
-			minutes: ( minutes === '' ) ? '' : ( '0' + minutes ).slice( -2 ),
+			minutes: minutes === '' ? '' : ( '0' + minutes ).slice( -2 ),
 		} );
 	}
 
 	renderMonth( month ) {
 		return (
-			<div key="render-month" className="components-datetime__time-field components-datetime__time-field-month">
+			<div
+				key="render-month"
+				className="components-datetime__time-field components-datetime__time-field-month"
+			>
 				<select
 					aria-label={ __( 'Month' ) }
 					className="components-datetime__time-field-month-select"
@@ -225,7 +250,10 @@ class TimePicker extends Component {
 
 	renderDay( day ) {
 		return (
-			<div key="render-day" className="components-datetime__time-field components-datetime__time-field-day">
+			<div
+				key="render-day"
+				className="components-datetime__time-field components-datetime__time-field-day"
+			>
 				<input
 					aria-label={ __( 'Day' ) }
 					className="components-datetime__time-field-day-input"
@@ -252,7 +280,9 @@ class TimePicker extends Component {
 		return (
 			<div className={ classnames( 'components-datetime__time' ) }>
 				<fieldset>
-					<legend className="components-datetime__time-legend invisible">{ __( 'Date' ) }</legend>
+					<legend className="components-datetime__time-legend invisible">
+						{ __( 'Date' ) }
+					</legend>
 					<div className="components-datetime__time-wrapper">
 						{ this.renderDayMonthFormat( is12Hour ) }
 						<div className="components-datetime__time-field components-datetime__time-field-year">
@@ -270,7 +300,9 @@ class TimePicker extends Component {
 				</fieldset>
 
 				<fieldset>
-					<legend className="components-datetime__time-legend invisible">{ __( 'Time' ) }</legend>
+					<legend className="components-datetime__time-legend invisible">
+						{ __( 'Time' ) }
+					</legend>
 					<div className="components-datetime__time-wrapper">
 						<div className="components-datetime__time-field components-datetime__time-field-time">
 							<input
@@ -286,7 +318,10 @@ class TimePicker extends Component {
 							/>
 							<span
 								className="components-datetime__time-separator"
-								aria-hidden="true">:</span>
+								aria-hidden="true"
+							>
+								:
+							</span>
 							<input
 								aria-label={ __( 'Minutes' ) }
 								className="components-datetime__time-field-minutes-input"
@@ -299,26 +334,24 @@ class TimePicker extends Component {
 							/>
 						</div>
 						{ is12Hour && (
-							<div className="components-datetime__time-field components-datetime__time-field-am-pm">
+							<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
 								<Button
-									aria-pressed={ am === 'AM' }
-									isDefault
-									className="components-datetime__time-am-button"
-									isToggled={ am === 'AM' }
+									isPrimary={ am === 'AM' }
+									isSecondary={ am !== 'AM' }
 									onClick={ this.updateAmPm( 'AM' ) }
+									className="components-datetime__time-am-button"
 								>
 									{ __( 'AM' ) }
 								</Button>
 								<Button
-									aria-pressed={ am === 'PM' }
-									isDefault
-									className="components-datetime__time-pm-button"
-									isToggled={ am === 'PM' }
+									isPrimary={ am === 'PM' }
+									isSecondary={ am !== 'PM' }
 									onClick={ this.updateAmPm( 'PM' ) }
+									className="components-datetime__time-pm-button"
 								>
 									{ __( 'PM' ) }
 								</Button>
-							</div>
+							</ButtonGroup>
 						) }
 					</div>
 				</fieldset>

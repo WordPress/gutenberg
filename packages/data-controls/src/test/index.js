@@ -31,87 +31,86 @@ describe( 'controls', () => {
 		const selectorWithFalseResolver = jest.fn();
 		selectorWithFalseResolver.hasResolver = false;
 		const hasFinishedResolution = jest.fn();
-		const unsubscribe = jest.fn();
-		let subscribedCallback;
+
+		const mockStore = {
+			selectorWithResolver,
+			selectorWithUndefinedResolver,
+			selectorWithFalseResolver,
+		};
+
 		const registryMock = {
+			__experimentalResolveSelect: ( storeKey ) => {
+				const stores = {
+					mockStore,
+				};
+				return stores[ storeKey ];
+			},
 			select: ( storeKey ) => {
 				const stores = {
-					mockStore: {
-						selectorWithResolver,
-						selectorWithUndefinedResolver,
-						selectorWithFalseResolver,
-					},
+					mockStore,
 					'core/data': {
 						hasFinishedResolution,
 					},
 				};
 				return stores[ storeKey ];
 			},
-			subscribe: jest.fn(
-				( subscribeCallback ) => {
-					subscribedCallback = subscribeCallback;
-					return unsubscribe;
-				}
-			),
 		};
-		const getSelectorArgs = ( storeKey, selectorName, ...args ) => (
-			{ storeKey, selectorName, args }
-		);
+		const getSelectorArgs = ( storeKey, selectorName, ...args ) => ( {
+			storeKey,
+			selectorName,
+			args,
+		} );
 		beforeEach( () => {
 			selectorWithUndefinedResolver.mockReturnValue( 'foo' );
 			selectorWithFalseResolver.mockReturnValue( 'bar' );
-			selectorWithResolver.mockReturnValue( 'resolved' );
 			hasFinishedResolution.mockReturnValue( false );
+			selectorWithResolver.mockResolvedValue( 'resolved' );
 		} );
 		afterEach( () => {
 			selectorWithUndefinedResolver.mockClear();
 			selectorWithResolver.mockClear();
 			selectorWithFalseResolver.mockClear();
 			hasFinishedResolution.mockClear();
-			unsubscribe.mockClear();
 		} );
 		it( 'invokes selector with undefined resolver', () => {
 			const testControl = controls.SELECT( registryMock );
-			const value = testControl( getSelectorArgs(
-				'mockStore',
-				'selectorWithUndefinedResolver'
-			) );
+			const value = testControl(
+				getSelectorArgs( 'mockStore', 'selectorWithUndefinedResolver' )
+			);
 			expect( value ).toBe( 'foo' );
 			expect( selectorWithUndefinedResolver ).toHaveBeenCalled();
 			expect( hasFinishedResolution ).not.toHaveBeenCalled();
 		} );
 		it( 'invokes selector with resolver set to false', () => {
 			const testControl = controls.SELECT( registryMock );
-			const value = testControl( getSelectorArgs(
-				'mockStore',
-				'selectorWithFalseResolver'
-			) );
+			const value = testControl(
+				getSelectorArgs( 'mockStore', 'selectorWithFalseResolver' )
+			);
 			expect( value ).toBe( 'bar' );
 			expect( selectorWithFalseResolver ).toHaveBeenCalled();
 			expect( hasFinishedResolution ).not.toHaveBeenCalled();
 		} );
 		describe( 'invokes selector with resolver set to true', () => {
 			const testControl = controls.SELECT( registryMock );
-			it( 'returns a promise', () => {
-				const value = testControl( getSelectorArgs(
-					'mockStore',
-					'selectorWithResolver'
-				) );
-				expect( value ).toBeInstanceOf( Promise );
-				expect( hasFinishedResolution ).toHaveBeenCalled();
-				expect( registryMock.subscribe ).toHaveBeenCalled();
-			} );
-			it( 'selector with resolver resolves to expected result when ' +
-				'finished', async () => {
-				const value = testControl( getSelectorArgs(
-					'mockStore',
-					'selectorWithResolver'
-				) );
-				hasFinishedResolution.mockReturnValue( true );
-				subscribedCallback();
+			it( 'returns a promise', async () => {
+				const value = testControl(
+					getSelectorArgs( 'mockStore', 'selectorWithResolver' )
+				);
 				await expect( value ).resolves.toBe( 'resolved' );
-				expect( unsubscribe ).toHaveBeenCalled();
+				expect( selectorWithResolver ).toHaveBeenCalled();
 			} );
+			it(
+				'selector with resolver resolves to expected result when ' +
+					'finished',
+				async () => {
+					const value = testControl(
+						getSelectorArgs( 'mockStore', 'selectorWithResolver' )
+					);
+					hasFinishedResolution.mockReturnValue( true );
+					expect( selectorWithResolver ).toHaveBeenCalled();
+					await expect( value ).resolves.toBe( 'resolved' );
+				}
+			);
 		} );
 	} );
 	describe( 'DISPATCH', () => {

@@ -15,7 +15,9 @@ class BlockSelectionClearer extends Component {
 		super( ...arguments );
 
 		this.bindContainer = this.bindContainer.bind( this );
-		this.clearSelectionIfFocusTarget = this.clearSelectionIfFocusTarget.bind( this );
+		this.clearSelectionIfFocusTarget = this.clearSelectionIfFocusTarget.bind(
+			this
+		);
 	}
 
 	bindContainer( ref ) {
@@ -36,7 +38,7 @@ class BlockSelectionClearer extends Component {
 			clearSelectedBlock,
 		} = this.props;
 
-		const hasSelection = ( hasSelectedBlock || hasMultiSelection );
+		const hasSelection = hasSelectedBlock || hasMultiSelection;
 		if ( event.target === this.container && hasSelection ) {
 			clearSelectedBlock();
 		}
@@ -60,7 +62,9 @@ class BlockSelectionClearer extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { hasSelectedBlock, hasMultiSelection } = select( 'core/block-editor' );
+		const { hasSelectedBlock, hasMultiSelection } = select(
+			'core/block-editor'
+		);
 
 		return {
 			hasSelectedBlock: hasSelectedBlock(),

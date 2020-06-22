@@ -1,70 +1,123 @@
 # Getting Started
 
-Gutenberg is a Node.js-based project, built primarily in JavaScript.
 
-The first step is to install a recent version of Node. The easiest way (on MacOS, Linux, or Windows 10 with the Linux Subsystem) is by installing and running [nvm]. Once `nvm` is installed, you can install the correct version of Node by running `nvm install` in the Gutenberg directory.
+Gutenberg is built using the [latest active LTS release](https://github.com/nodejs/Release#release-schedule) of [Node.js](https://nodejs.org/en/), along with the latest version of [NPM](http://npmjs.com/).
 
-Once you have Node installed, run these scripts:
+The easiest way to install and manage node and NPM (on macOS, Linux, or Windows 10 with the Linux Subsystem) is by using [nvm](https://github.com/creationix/nvm). Once nvm is installed, you can install the correct version of Node by running nvm install --latest-npm in the Gutenberg directory.
 
-```
+>**Note:** If you find yourself needing to build older versions of Gutenberg, nvm makes that process easier too. Because Gutenberg's `.nvmrc` file is regularly updated to the current available LTS release, running `nvm install` on an older branch will install whichever LTS version was active at that time.
+
+Once you have Node installed, run these scripts from within your local Gutenberg repository:
+
+Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system.
+
+```bash
 npm install
 npm run build
 ```
 
 This will build Gutenberg, ready to be used as a WordPress plugin!
 
+`npm run build` is intended for one-off compilations of the project. If you're planning to do continued development in the source files, using `npm run dev` will most often be the better option. This will configure the build to avoid minifying the generated output, rebuild files automatically as they are changed in your working directory, and configure dependencies as running in a development environment so that useful warnings and errors are logged to your browser's developer console.
+
 If you don't have a local WordPress environment to load Gutenberg in, we can help get that up and running, too.
 
 ## Local Environment
 
-The quickest way to get up and running is to use the provided Docker setup. If you don't already have it, you'll need to install Docker by following their instructions for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
+### Step 1: Installing a Local Environment
+
+The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/env), which is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. In its default mode, it'll install and run a local WordPress environment for you; however, it's also possible to [configure](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md#wp-envjson) it to use a pre-existing local WordPress installation.
+
+If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`.
+
+To install Docker, follow their instructions here for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If running Ubuntu, see these [extended instructions for help and troubleshooting](/docs/contributors/env-ubuntu.md).
+
+To install Docker Compose, [follow their instructions here](https://docs.docker.com/compose/install/), be sure to select your operating system for proper instructions.
 
 Once Docker is installed and running, run this script to install WordPress, and build your local environment:
 
-```
-npm run env install
-```
-
-WordPress will be installed in the `wordpress` directory, if you need to access WordPress core files directly, you can find them there.
-
-If you already have WordPress checked out in a different directory, you can use that installation, instead, by running these commands:
-
-```
-export WP_DEVELOP_DIR=/path/to/wordpress-develop
-npm run env connect
+```bash
+npx wp-env start
 ```
 
-This will use WordPress' own local environment, and mount your Gutenberg directory as a volume there.
+### Step 2: Accessing and Configuring the Local WordPress Install
 
-In Windows, you can set the `WP_DEVELOP_DIR` environment variable using the appropriate method for your shell:
+#### Accessing the Local WordPress Install
 
-    CMD: set WP_DEVELOP_DIR=/path/to/wordpress-develop
-    PowerShell: $env:WP_DEVELOP_DIR = "/path/to/wordpress-develop"
+The WordPress installation should now be available at `http://localhost:8888` (**Username**: `admin`, **Password**: `password`).
+If this port is in use, you can override it using the `WP_ENV_PORT` environment variable. For more information, consult the `wp-env` [README](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
 
-The WordPress installation should be available at `http://localhost:8889` (**Username**: `admin`, **Password**: `password`).
-If this port is in use, you can override it using the `LOCAL_PORT` environment variable. For example, `export LOCAL_PORT=7777` will change the URL to `http://localhost:7777` . If you're running [e2e tests](/docs/contributors/testing-overview.md#end-to-end-testing), this change will be used correctly.
+To shut down this local WordPress instance run `npx wp-env stop`. To start it back up again, run `npx wp-env start` again.
 
-To bring down this local WordPress instance later run `npm run env stop`. To bring it back up again, run `npm run env start`.
+#### Toggling Debug Systems
 
-WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. It is possible to use environment variables (`LOCAL_WP_DEBUG` and `LOCAL_SCRIPT_DEBUG`) to update a site's configuration constants located in `wp-config.php` file. Both flags can be disabled at any time by running the following command:
-```
-LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npm run env install
-```
-By default, both flags will be set to `true`.
+WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. In order to use with `wp-env,` you'll have to edit your local WordPress install's `wp-config.php`.
+
+#### Troubleshooting
+
+See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenberg/tree/master/packages/env#troubleshooting-common-problems).
 
 ## On A Remote Server
 
-Open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your web server and activate the plugin from the WordPress admin.
+You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 
-You can also type `npm run package-plugin` which will run the two commands above and create a zip file automatically for you which you can use to install Gutenberg through the WordPress admin.
+To build: open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`.
 
-[npm]: https://www.npmjs.com/
-[nvm]: https://github.com/creationix/nvm
+After building the cloned gutenberg directory contains the complete plugin, you can upload the entire repository to your `wp-content/plugins` directory and activate the plugin from the WordPress admin.
 
-## Playground
+Another way to upload after building is to run `npm run build:plugin-zip` to create a plugin zip file — this requires `bash` and `php` to run. The script creates `gutenberg.zip` that you can use to install Gutenberg through the WordPress admin.
 
-The Gutenberg repository also includes a static Gutenberg playground that allows testing and developing in a WordPress-agnostic context. This is very helpful for developing reusable components and trying generic JavaScript modules without any backend dependency.
+## Storybook
 
-You can launch the playground by running `npm run playground:dev` locally. The playground should be available on [http://localhost:1234](http://localhost:1234).
+> Storybook is an open source tool for developing UI components in isolation for React, React Native and more. It makes building stunning UIs organized and efficient.
 
-You can also test the playground version of the current master branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
+The Gutenberg repository also includes [Storybook] integration that allows testing and developing in a WordPress-agnostic context. This is very helpful for developing reusable components and trying generic JavaScript modules without any backend dependency.
+
+You can launch Storybook by running `npm run storybook:dev` locally. It will open in your browser automatically.
+
+You can also test Storybook for the current `master` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
+
+[Storybook]: https://storybook.js.org/
+
+## Developer Tools
+
+We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers, these tools are also available for other editors.
+
+### EditorConfig
+
+[EditorConfig](https://editorconfig.org/) defines a standard configuration for setting up your editor, for example using tabs instead of spaces. You should install the [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=editorconfig.editorconfig) extension and it will automatically configure your editor to match the rules defined in [.editorconfig](https://github.com/WordPress/gutenberg/blob/master/.editorconfig).
+
+### ESLint
+
+[ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. You should install the [ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for Visual Studio Code, see eslint docs for [more editor integrations](https://eslint.org/docs/user-guide/integrations).
+
+With the extension installed, ESLint will use the [.eslintrc.js](https://github.com/WordPress/gutenberg/blob/master/.eslintrc.js) file in the root of the Gutenberg repository for formatting rules. It will highlight issues as you develop, you can also set the following preference to fix lint rules on save.
+
+```json
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+```
+
+### Prettier
+
+[Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESlint are similar, Prettier is more about formatting and style, while ESlint is for detecting coding errors.
+
+To use Prettier with Visual Studio Code, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode). You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings.
+
+```json
+"[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+},
+```
+
+This will use the `.prettierrc.js` file included in the root of the Gutenberg repository.
+
+If you only want to use this configuration with the Gutenberg project, create a directory called .vscode at the top-level of Gutenberg, and place your settings in a settings.json there. Visual Studio Code refers to this as Workplace Settings, and only apply to the project.
+
+For other editors, see [Prettier's Editor Integration docs](https://prettier.io/docs/en/editors.html)
+
+### TypeScript
+
+**TypeScript** is a typed superset of JavaScript language. The Gutenberg project uses TypeScript via JSDoc to [type check JavaScript files](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html). If you use Visual Studio Code, TypeScript support is built-in, otherwise see [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for editor integrations.

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
+import { filter, every, toString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,9 +19,7 @@ const parseShortcodeIds = ( ids ) => {
 		return [];
 	}
 
-	return ids.split( ',' ).map( ( id ) => (
-		parseInt( id, 10 )
-	) );
+	return ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) );
 };
 
 const transforms = {
@@ -31,22 +29,30 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/image' ],
 			transform: ( attributes ) => {
-				// Init the align attribute from the first item which may be either the placeholder or an image.
-				let { align } = attributes[ 0 ];
-				// Loop through all the images and check if they have the same align.
-				align = every( attributes, [ 'align', align ] ) ? align : undefined;
+				// Init the align and size from the first item which may be either the placeholder or an image.
+				let { align, sizeSlug } = attributes[ 0 ];
+				// Loop through all the images and check if they have the same align and size.
+				align = every( attributes, [ 'align', align ] )
+					? align
+					: undefined;
+				sizeSlug = every( attributes, [ 'sizeSlug', sizeSlug ] )
+					? sizeSlug
+					: undefined;
 
 				const validImages = filter( attributes, ( { url } ) => url );
 
 				return createBlock( 'core/gallery', {
-					images: validImages.map( ( { id, url, alt, caption } ) => ( {
-						id,
-						url,
-						alt,
-						caption,
-					} ) ),
-					ids: validImages.map( ( { id } ) => id ),
+					images: validImages.map(
+						( { id, url, alt, caption } ) => ( {
+							id: toString( id ),
+							url,
+							alt,
+							caption,
+						} )
+					),
+					ids: validImages.map( ( { id } ) => parseInt( id, 10 ) ),
 					align,
+					sizeSlug,
 				} );
 			},
 		},
@@ -58,7 +64,7 @@ const transforms = {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
 						return parseShortcodeIds( ids ).map( ( id ) => ( {
-							id,
+							id: toString( id ),
 						} ) );
 					},
 				},
@@ -86,13 +92,21 @@ const transforms = {
 			// When created by drag and dropping multiple files on an insertion point
 			type: 'files',
 			isMatch( files ) {
-				return files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 );
+				return (
+					files.length !== 1 &&
+					every(
+						files,
+						( file ) => file.type.indexOf( 'image/' ) === 0
+					)
+				);
 			},
 			transform( files ) {
 				const block = createBlock( 'core/gallery', {
-					images: files.map( ( file ) => pickRelevantMediaFiles( {
-						url: createBlobURL( file ),
-					} ) ),
+					images: files.map( ( file ) =>
+						pickRelevantMediaFiles( {
+							url: createBlobURL( file ),
+						} )
+					),
 				} );
 				return block;
 			},
@@ -102,15 +116,18 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { images, align } ) => {
+			transform: ( { images, align, sizeSlug, ids } ) => {
 				if ( images.length > 0 ) {
-					return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', {
-						id,
-						url,
-						alt,
-						caption,
-						align,
-					} ) );
+					return images.map( ( { url, alt, caption }, index ) =>
+						createBlock( 'core/image', {
+							id: ids[ index ],
+							url,
+							alt,
+							caption,
+							align,
+							sizeSlug,
+						} )
+					);
 				}
 				return createBlock( 'core/image', { align } );
 			},

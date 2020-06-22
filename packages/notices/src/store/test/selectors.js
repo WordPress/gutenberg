@@ -29,9 +29,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the notices array for a given context', () => {
 			const state = {
-				foo: [
-					{ id: 'c', content: 'message 3' },
-				],
+				foo: [ { id: 'c', content: 'message 3' } ],
 			};
 
 			expect( getNotices( state, 'foo' ) ).toEqual( [

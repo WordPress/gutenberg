@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { verse as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -19,19 +19,21 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Verse' ),
-	description: __( 'Insert poetry. Use special spacing formats. Or quote song lyrics.' ),
+	description: __(
+		'Insert poetry. Use special spacing formats. Or quote song lyrics.'
+	),
 	icon,
 	example: {
 		attributes: {
-			content: __( 'WHAT was he doing, the great god Pan,' ) + '<br>' +
-			__( '    Down in the reeds by the river?' ) + '<br>' +
-			__( 'Spreading ruin and scattering ban,' ) + '<br>' +
-			__( 'Splashing and paddling with hoofs of a goat,' ) + '<br>' +
-			__( 'And breaking the golden lilies afloat' ) + '<br>' +
-			__( '    With the dragon-fly on the river.' ),
+			/* eslint-disable @wordpress/i18n-no-collapsible-whitespace */
+			// translators: Sample content for the Verse block. Can be replaced with a more locale-adequate work.
+			content: __(
+				'WHAT was he doing, the great god Pan,\n	Down in the reeds by the river?\nSpreading ruin and scattering ban,\nSplashing and paddling with hoofs of a goat,\nAnd breaking the golden lilies afloat\n    With the dragon-fly on the river.'
+			),
+			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
 	},
-	keywords: [ __( 'poetry' ) ],
+	keywords: [ __( 'poetry' ), __( 'poem' ) ],
 	transforms,
 	deprecated,
 	merge( attributes, attributesToMerge ) {

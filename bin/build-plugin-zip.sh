@@ -26,7 +26,7 @@ warning () {
 	echo -e "\n${YELLOW_BOLD}$1${COLOR_RESET}\n"
 }
 
-status "💃 Time to release Gutenberg 🕺"
+status "💃 Time to build the Gutenberg plugin ZIP file 🕺"
 
 if [ -z "$NO_CHECKS" ]; then
 	# Make sure there are no changes in the working tree. Release builds should be
@@ -99,7 +99,7 @@ done
 
 # Run the build.
 status "Installing dependencies... 📦"
-PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install
+npm install
 status "Generating build... 👷‍♀️"
 npm run build
 
@@ -109,17 +109,19 @@ npm run build
 php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
-build_files=$(ls build/*/*.{js,css,asset.php} build/block-library/blocks/*.php)
+build_files=$(ls build/*/*.{js,css,asset.php} build/block-library/blocks/*.php build/block-library/blocks/*/block.json)
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
 zip -r gutenberg.zip \
 	gutenberg.php \
-	lib/*.php \
+	lib \
 	packages/block-serialization-default-parser/*.php \
 	post-content.php \
 	$vendor_scripts \
 	$build_files \
+	readme.txt \
+	changelog.txt \
 	README.md
 
 # Reset `gutenberg.php`.

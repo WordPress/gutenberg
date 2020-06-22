@@ -32,7 +32,7 @@ domReady( function() {
 
 _Parameters_
 
--   _callback_ `Function`: A function to execute after the DOM is ready.
+-   _callback_ `Callback`: A function to execute after the DOM is ready.
 
 _Returns_
 
@@ -43,6 +43,6 @@ _Returns_
 
 ## Browser support
 
-See <https://make.wordpress.org/design/handbook/design-guide/browser-support/>
+See <https://make.wordpress.org/core/handbook/best-practices/browser-support/>
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

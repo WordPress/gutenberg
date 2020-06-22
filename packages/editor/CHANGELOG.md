@@ -1,3 +1,7 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
 ## 9.4.0 (2019-06-12)
 
 ### Deprecations
@@ -273,7 +277,7 @@
 
 ### Deprecations
 
-- The Reusable Blocks Data API is marked as experimental as it's subject to change in the future ([#11230](https://github.com/WordPress/gutenberg/pull/11230)).
+- The Reusable blocks Data API is marked as experimental as it's subject to change in the future ([#11230](https://github.com/WordPress/gutenberg/pull/11230)).
 
 ## 6.0.1 (2018-10-30)
 

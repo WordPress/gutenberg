@@ -1,0 +1,13 @@
+{
+	"name": "core/query-pagination",
+	"category": "design",
+	"usesContext": [
+		"queryId",
+		"query",
+		"queryContext"
+	],
+	"supports": {
+		"reusable": false,
+		"html": false
+	}
+}

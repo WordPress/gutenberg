@@ -1,5 +1,5 @@
 /**
- * GitHub dependencies
+ * External dependencies
  */
 const { setFailed, getInput } = require( '@actions/core' );
 const { context, GitHub } = require( '@actions/github' );
@@ -7,25 +7,46 @@ const { context, GitHub } = require( '@actions/github' );
 /**
  * Internal dependencies
  */
-const assignFixedIssues = require( './assign-fixed-issues' );
-const addFirstTimeContributorLabel = require( './add-first-time-contributor-label' );
-const addMilestone = require( './add-milestone' );
+const assignFixedIssues = require( './tasks/assign-fixed-issues' );
+const firstTimeContributor = require( './tasks/first-time-contributor' );
+const addMilestone = require( './tasks/add-milestone' );
 const debug = require( './debug' );
+const ifNotFork = require( './if-not-fork' );
 
+/** @typedef {import('@actions/github').GitHub} GitHub */
+
+/**
+ * Automation task function.
+ *
+ * @typedef {(payload:any,octokit:GitHub)=>void} WPAutomationTask
+ */
+
+/**
+ * Full list of automations, matched by given properties against the incoming
+ * payload object.
+ *
+ * @typedef WPAutomation
+ *
+ * @property {string}           event    Webhook event name to match.
+ * @property {string}           [action] Action to match, if applicable.
+ * @property {WPAutomationTask} task     Task to run.
+ */
+
+/**
+ * @type {WPAutomation[]}
+ */
 const automations = [
 	{
 		event: 'pull_request',
 		action: 'opened',
-		task: assignFixedIssues,
+		task: ifNotFork( assignFixedIssues ),
 	},
 	{
-		event: 'pull_request',
-		action: 'opened',
-		task: addFirstTimeContributorLabel,
+		event: 'push',
+		task: firstTimeContributor,
 	},
 	{
-		event: 'pull_request',
-		action: 'closed',
+		event: 'push',
 		task: addMilestone,
 	},
 ];
@@ -39,18 +60,25 @@ const automations = [
 
 	const octokit = new GitHub( token );
 
-	debug( `main: Received event = '${ context.eventName }', action = '${ context.payload.action }'` );
+	debug(
+		`main: Received event = '${ context.eventName }', action = '${ context.payload.action }'`
+	);
 
 	for ( const { event, action, task } of automations ) {
-		if ( event === context.eventName && action === context.payload.action ) {
+		if (
+			event === context.eventName &&
+			( action === undefined || action === context.payload.action )
+		) {
 			try {
 				debug( `main: Starting task ${ task.name }` );
 				await task( context.payload, octokit );
 			} catch ( error ) {
-				debug( `main: Task ${ task.name } failed with error: ${ error }` );
+				setFailed(
+					`main: Task ${ task.name } failed with error: ${ error }`
+				);
 			}
 		}
 	}
 
 	debug( 'main: All done!' );
-}() );
+} )();

@@ -16,12 +16,6 @@ import {
 	ZWNBSP,
 } from './special-characters';
 
-/**
- * Browser dependencies
- */
-
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
-
 function createEmptyValue() {
 	return {
 		formats: [],
@@ -42,11 +36,15 @@ function toFormat( { type, attributes } ) {
 	let formatType;
 
 	if ( attributes && attributes.class ) {
-		formatType = select( 'core/rich-text' ).getFormatTypeForClassName( attributes.class );
+		formatType = select( 'core/rich-text' ).getFormatTypeForClassName(
+			attributes.class
+		);
 
 		if ( formatType ) {
 			// Preserve any additional classes.
-			attributes.class = ` ${ attributes.class } `.replace( ` ${ formatType.className } `, ' ' ).trim();
+			attributes.class = ` ${ attributes.class } `
+				.replace( ` ${ formatType.className } `, ' ' )
+				.trim();
 
 			if ( ! attributes.class ) {
 				delete attributes.class;
@@ -55,7 +53,9 @@ function toFormat( { type, attributes } ) {
 	}
 
 	if ( ! formatType ) {
-		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement( type );
+		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement(
+			type
+		);
 	}
 
 	if ( ! formatType ) {
@@ -130,6 +130,8 @@ function toFormat( { type, attributes } ) {
  *                                            multiline.
  * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
+ * @param {?boolean} [$1.preserveWhiteSpace]  Whether or not to collapse white
+ *                                            space characters.
  *
  * @return {Object} A rich text value.
  */
@@ -141,6 +143,7 @@ export function create( {
 	multilineTag,
 	multilineWrapperTags,
 	__unstableIsEditableTree: isEditableTree,
+	preserveWhiteSpace,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -151,6 +154,8 @@ export function create( {
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
+		// It does not matter which document this is, we're just using it to
+		// parse.
 		element = createElement( document, html );
 	}
 
@@ -163,6 +168,7 @@ export function create( {
 			element,
 			range,
 			isEditableTree,
+			preserveWhiteSpace,
 		} );
 	}
 
@@ -172,6 +178,7 @@ export function create( {
 		multilineTag,
 		multilineWrapperTags,
 		isEditableTree,
+		preserveWhiteSpace,
 	} );
 }
 
@@ -196,22 +203,22 @@ function accumulateSelection( accumulator, node, range, value ) {
 	// Selection can be extracted from value.
 	if ( value.start !== undefined ) {
 		accumulator.start = currentLength + value.start;
-	// Range indicates that the current node has selection.
-	} else if ( node === startContainer && node.nodeType === TEXT_NODE ) {
+		// Range indicates that the current node has selection.
+	} else if ( node === startContainer && node.nodeType === node.TEXT_NODE ) {
 		accumulator.start = currentLength + startOffset;
-	// Range indicates that the current node is selected.
+		// Range indicates that the current node is selected.
 	} else if (
 		parentNode === startContainer &&
 		node === startContainer.childNodes[ startOffset ]
 	) {
 		accumulator.start = currentLength;
-	// Range indicates that the selection is after the current node.
+		// Range indicates that the selection is after the current node.
 	} else if (
 		parentNode === startContainer &&
 		node === startContainer.childNodes[ startOffset - 1 ]
 	) {
 		accumulator.start = currentLength + value.text.length;
-	// Fallback if no child inside handled the selection.
+		// Fallback if no child inside handled the selection.
 	} else if ( node === startContainer ) {
 		accumulator.start = currentLength;
 	}
@@ -219,22 +226,22 @@ function accumulateSelection( accumulator, node, range, value ) {
 	// Selection can be extracted from value.
 	if ( value.end !== undefined ) {
 		accumulator.end = currentLength + value.end;
-	// Range indicates that the current node has selection.
-	} else if ( node === endContainer && node.nodeType === TEXT_NODE ) {
+		// Range indicates that the current node has selection.
+	} else if ( node === endContainer && node.nodeType === node.TEXT_NODE ) {
 		accumulator.end = currentLength + endOffset;
-	// Range indicates that the current node is selected.
+		// Range indicates that the current node is selected.
 	} else if (
 		parentNode === endContainer &&
 		node === endContainer.childNodes[ endOffset - 1 ]
 	) {
 		accumulator.end = currentLength + value.text.length;
-	// Range indicates that the selection is before the current node.
+		// Range indicates that the selection is before the current node.
 	} else if (
 		parentNode === endContainer &&
 		node === endContainer.childNodes[ endOffset ]
 	) {
 		accumulator.end = currentLength;
-	// Fallback if no child inside handled the selection.
+		// Fallback if no child inside handled the selection.
 	} else if ( node === endContainer ) {
 		accumulator.end = currentLength + endOffset;
 	}
@@ -268,14 +275,25 @@ function filterRange( node, range, filter ) {
 	return { startContainer, startOffset, endContainer, endOffset };
 }
 
+/**
+ * Collapse any whitespace used for HTML formatting to one space character,
+ * because it will also be displayed as such by the browser.
+ *
+ * @param {string} string
+ */
+function collapseWhiteSpace( string ) {
+	return string.replace( /[\n\r\t]+/g, ' ' );
+}
+
 const ZWNBSPRegExp = new RegExp( ZWNBSP, 'g' );
 
-function filterString( string ) {
-	// Reduce any whitespace used for HTML formatting to one space
-	// character, because it will also be displayed as such by the browser.
-	return string.replace( /[\n\r\t]+/g, ' ' )
-		// Remove padding added by `toTree`.
-		.replace( ZWNBSPRegExp, '' );
+/**
+ * Removes padding (zero width non breaking spaces) added by `toTree`.
+ *
+ * @param {string} string
+ */
+function removePadding( string ) {
+	return string.replace( ZWNBSPRegExp, '' );
 }
 
 /**
@@ -288,6 +306,8 @@ function filterString( string ) {
  *                                            multiline.
  * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
  *                                            nesting is possible.
+ * @param {?boolean} $1.preserveWhiteSpace    Whether or not to collapse white
+ *                                            space characters.
  *
  * @return {Object} A rich text value.
  */
@@ -298,6 +318,7 @@ function createFromElement( {
 	multilineWrapperTags,
 	currentWrapperTags = [],
 	isEditableTree,
+	preserveWhiteSpace,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -317,9 +338,16 @@ function createFromElement( {
 		const node = element.childNodes[ index ];
 		const type = node.nodeName.toLowerCase();
 
-		if ( node.nodeType === TEXT_NODE ) {
-			const text = filterString( node.nodeValue );
-			range = filterRange( node, range, filterString );
+		if ( node.nodeType === node.TEXT_NODE ) {
+			let filter = removePadding;
+
+			if ( ! preserveWhiteSpace ) {
+				filter = ( string ) =>
+					removePadding( collapseWhiteSpace( string ) );
+			}
+
+			const text = filter( node.nodeValue );
+			range = filterRange( node, range, filter );
 			accumulateSelection( accumulator, node, range, { text } );
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
@@ -329,16 +357,18 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( node.nodeType !== ELEMENT_NODE ) {
+		if ( node.nodeType !== node.ELEMENT_NODE ) {
 			continue;
 		}
 
-		if ( isEditableTree && (
+		if (
+			isEditableTree &&
 			// Ignore any placeholders.
-			node.getAttribute( 'data-rich-text-placeholder' ) ||
-			// Ignore any line breaks that are not inserted by us.
-			( type === 'br' && ! node.getAttribute( 'data-rich-text-line-break' ) )
-		) ) {
+			( node.getAttribute( 'data-rich-text-placeholder' ) ||
+				// Ignore any line breaks that are not inserted by us.
+				( type === 'br' &&
+					! node.getAttribute( 'data-rich-text-line-break' ) ) )
+		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
 		}
@@ -349,15 +379,21 @@ function createFromElement( {
 			continue;
 		}
 
-		const lastFormats = accumulator.formats[ accumulator.formats.length - 1 ];
+		const lastFormats =
+			accumulator.formats[ accumulator.formats.length - 1 ];
 		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
 		const newFormat = toFormat( {
 			type,
 			attributes: getAttributes( { element: node } ),
 		} );
-		const format = isFormatEqual( newFormat, lastFormat ) ? lastFormat : newFormat;
+		const format = isFormatEqual( newFormat, lastFormat )
+			? lastFormat
+			: newFormat;
 
-		if ( multilineWrapperTags && multilineWrapperTags.indexOf( type ) !== -1 ) {
+		if (
+			multilineWrapperTags &&
+			multilineWrapperTags.indexOf( type ) !== -1
+		) {
 			const value = createFromMultilineElement( {
 				element: node,
 				range,
@@ -365,6 +401,7 @@ function createFromElement( {
 				multilineWrapperTags,
 				currentWrapperTags: [ ...currentWrapperTags, format ],
 				isEditableTree,
+				preserveWhiteSpace,
 			} );
 
 			accumulateSelection( accumulator, node, range, value );
@@ -378,6 +415,7 @@ function createFromElement( {
 			multilineTag,
 			multilineWrapperTags,
 			isEditableTree,
+			preserveWhiteSpace,
 		} );
 
 		accumulateSelection( accumulator, node, range, value );
@@ -393,11 +431,30 @@ function createFromElement( {
 				} );
 			}
 		} else {
+			// Indices should share a reference to the same formats array.
+			// Only create a new reference if `formats` changes.
+			function mergeFormats( formats ) {
+				if ( mergeFormats.formats === formats ) {
+					return mergeFormats.newFormats;
+				}
+
+				const newFormats = formats
+					? [ format, ...formats ]
+					: [ format ];
+
+				mergeFormats.formats = formats;
+				mergeFormats.newFormats = newFormats;
+
+				return newFormats;
+			}
+
+			// Since the formats parameter can be `undefined`, preset
+			// `mergeFormats` with a new reference.
+			mergeFormats.newFormats = [ format ];
+
 			mergePair( accumulator, {
 				...value,
-				formats: Array.from( value.formats, ( formats ) =>
-					formats ? [ format, ...formats ] : [ format ]
-				),
+				formats: Array.from( value.formats, mergeFormats ),
 			} );
 		}
 	}
@@ -409,15 +466,17 @@ function createFromElement( {
  * Creates a rich text value from a DOM element and range that should be
  * multiline.
  *
- * @param {Object}    $1                      Named argements.
- * @param {?Element}  $1.element              Element to create value from.
- * @param {?Range}    $1.range                Range to create value from.
- * @param {?string}   $1.multilineTag         Multiline tag if the structure is
- *                                            multiline.
- * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
- *                                            nesting is possible.
- * @param {boolean}   $1.currentWrapperTags   Whether to prepend a line
- *                                            separator.
+ * @param {Object}   $1                      Named argements.
+ * @param {?Element} $1.element              Element to create value from.
+ * @param {?Range}   $1.range                Range to create value from.
+ * @param {?string}  $1.multilineTag         Multiline tag if the structure is
+ *                                           multiline.
+ * @param {?Array}   $1.multilineWrapperTags Tags where lines can be found if
+ *                                           nesting is possible.
+ * @param {boolean}  $1.currentWrapperTags   Whether to prepend a line
+ *                                           separator.
+ * @param {?boolean} $1.preserveWhiteSpace   Whether or not to collapse white
+ *                                           space characters.
  *
  * @return {Object} A rich text value.
  */
@@ -428,6 +487,7 @@ function createFromMultilineElement( {
 	multilineWrapperTags,
 	currentWrapperTags = [],
 	isEditableTree,
+	preserveWhiteSpace,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -452,13 +512,17 @@ function createFromMultilineElement( {
 			multilineWrapperTags,
 			currentWrapperTags,
 			isEditableTree,
+			preserveWhiteSpace,
 		} );
 
 		// Multiline value text should be separated by a line separator.
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
 			mergePair( accumulator, {
 				formats: [ , ],
-				replacements: currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ],
+				replacements:
+					currentWrapperTags.length > 0
+						? [ currentWrapperTags ]
+						: [ , ],
 				text: LINE_SEPARATOR,
 			} );
 		}

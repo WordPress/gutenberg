@@ -1,0 +1,37 @@
+{
+	"name": "core/navigation-link",
+	"category": "design",
+	"parent": [
+		"core/navigation"
+	],
+	"attributes": {
+		"label": {
+			"type": "string"
+		},
+		"nofollow": {
+			"type": "boolean",
+			"default": false
+		},
+		"type": {
+			"type": "string"
+		},
+		"description": {
+			"type": "string"
+		},
+		"id": {
+			"type": "number"
+		},
+		"opensInNewTab": {
+			"type": "boolean",
+			"default": false
+		},
+		"url": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}

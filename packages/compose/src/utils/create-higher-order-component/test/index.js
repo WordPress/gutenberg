@@ -24,7 +24,9 @@ describe( 'createHigherOrderComponent', () => {
 			'with-one-two_threeFOUR'
 		)( () => <div /> );
 
-		expect( TestComponent.displayName ).toBe( 'WithOneTwoThreeFour(Component)' );
+		expect( TestComponent.displayName ).toBe(
+			'WithOneTwoThreeFour(Component)'
+		);
 	} );
 
 	it( 'should use function name', () => {
@@ -50,7 +52,9 @@ describe( 'createHigherOrderComponent', () => {
 			'withTest'
 		)( SomeAnotherComponent );
 
-		expect( TestComponent.displayName ).toBe( 'WithTest(SomeAnotherComponent)' );
+		expect( TestComponent.displayName ).toBe(
+			'WithTest(SomeAnotherComponent)'
+		);
 	} );
 
 	it( 'should use displayName property', () => {
@@ -65,6 +69,8 @@ describe( 'createHigherOrderComponent', () => {
 			'withTest'
 		)( SomeYetAnotherComponent );
 
-		expect( TestComponent.displayName ).toBe( 'WithTest(CustomDisplayName)' );
+		expect( TestComponent.displayName ).toBe(
+			'WithTest(CustomDisplayName)'
+		);
 	} );
 } );

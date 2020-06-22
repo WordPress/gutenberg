@@ -34,7 +34,7 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 
 	useLayoutEffect( () => {
 		ref.current.children = children;
-		if ( slot && ! slot.props.bubblesVirtually ) {
+		if ( slot ) {
 			slot.forceUpdate();
 		}
 	}, [ children ] );
@@ -49,7 +49,7 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 		registerFill( name, ref.current );
 	}, [ name ] );
 
-	if ( ! slot || ! slot.node || ! slot.props.bubblesVirtually ) {
+	if ( ! slot || ! slot.node ) {
 		return null;
 	}
 

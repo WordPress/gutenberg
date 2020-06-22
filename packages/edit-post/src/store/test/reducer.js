@@ -7,9 +7,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	DEFAULT_ACTIVE_GENERAL_SIDEBAR,
 	preferences,
-	activeGeneralSidebar,
 	activeModal,
 	isSavingMetaBoxes,
 	metaBoxLocations,
@@ -23,28 +21,6 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( PREFERENCES_DEFAULTS );
-		} );
-
-		it( 'should set the general sidebar dismissed', () => {
-			const original = deepFreeze( preferences( undefined, {} ) );
-			const state = preferences( original, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} );
-
-			expect( state.isGeneralSidebarDismissed ).toBe( false );
-		} );
-
-		it( 'should set the general sidebar undismissed', () => {
-			const original = deepFreeze( preferences( undefined, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} ) );
-			const state = preferences( original, {
-				type: 'CLOSE_GENERAL_SIDEBAR',
-			} );
-
-			expect( state.isGeneralSidebarDismissed ).toBe( true );
 		} );
 
 		it( 'should disable panels by default', () => {
@@ -173,48 +149,15 @@ describe( 'state', () => {
 		} );
 
 		it( 'should toggle a feature flag', () => {
-			const state = preferences( deepFreeze( { features: { chicken: true } } ), {
-				type: 'TOGGLE_FEATURE',
-				feature: 'chicken',
-			} );
+			const state = preferences(
+				deepFreeze( { features: { chicken: true } } ),
+				{
+					type: 'TOGGLE_FEATURE',
+					feature: 'chicken',
+				}
+			);
 
 			expect( state.features ).toEqual( { chicken: false } );
-		} );
-
-		describe( 'pinnedPluginItems', () => {
-			const initialState = deepFreeze( {
-				pinnedPluginItems: {
-					'foo/enabled': true,
-					'foo/disabled': false,
-				},
-			} );
-
-			it( 'should disable a pinned plugin flag when the value does not exist', () => {
-				const state = preferences( initialState, {
-					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
-					pluginName: 'foo/does-not-exist',
-				} );
-
-				expect( state.pinnedPluginItems[ 'foo/does-not-exist' ] ).toBe( false );
-			} );
-
-			it( 'should disable a pinned plugin flag when it is enabled', () => {
-				const state = preferences( initialState, {
-					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
-					pluginName: 'foo/enabled',
-				} );
-
-				expect( state.pinnedPluginItems[ 'foo/enabled' ] ).toBe( false );
-			} );
-
-			it( 'should enable a pinned plugin flag when it is disabled', () => {
-				const state = preferences( initialState, {
-					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
-					pluginName: 'foo/disabled',
-				} );
-
-				expect( state.pinnedPluginItems[ 'foo/disabled' ] ).toBe( true );
-			} );
 		} );
 
 		describe( 'hiddenBlockTypes', () => {
@@ -228,11 +171,7 @@ describe( 'state', () => {
 					blockNames: [ 'b', 'c' ],
 				} );
 
-				expect( state.hiddenBlockTypes ).toEqual( [
-					'a',
-					'b',
-					'c',
-				] );
+				expect( state.hiddenBlockTypes ).toEqual( [ 'a', 'b', 'c' ] );
 			} );
 
 			it( 'omits present names by enable', () => {
@@ -245,28 +184,8 @@ describe( 'state', () => {
 					blockNames: [ 'b', 'c' ],
 				} );
 
-				expect( state.hiddenBlockTypes ).toEqual( [
-					'a',
-				] );
+				expect( state.hiddenBlockTypes ).toEqual( [ 'a' ] );
 			} );
-		} );
-	} );
-
-	describe( 'activeGeneralSidebar', () => {
-		it( 'should default to the default active sidebar', () => {
-			const state = activeGeneralSidebar( undefined, {} );
-
-			expect( state ).toBe( DEFAULT_ACTIVE_GENERAL_SIDEBAR );
-		} );
-
-		it( 'should set the general sidebar', () => {
-			const original = activeGeneralSidebar( undefined, {} );
-			const state = activeGeneralSidebar( original, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} );
-
-			expect( state ).toBe( 'edit-post/document' );
 		} );
 	} );
 

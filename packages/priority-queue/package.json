@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/priority-queue",
-	"version": "1.3.0",
+	"version": "1.6.0",
 	"description": "Generic browser priority queue.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"browser",
 		"async"
 	],
@@ -21,8 +22,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.4.4"
+		"@babel/runtime": "^7.9.2"
 	},
 	"publishConfig": {
 		"access": "public"

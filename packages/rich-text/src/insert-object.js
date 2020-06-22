@@ -18,12 +18,7 @@ const OBJECT_REPLACEMENT_CHARACTER = '\ufffc';
  *
  * @return {Object} A new value with the object inserted.
  */
-export function insertObject(
-	value,
-	formatToInsert,
-	startIndex,
-	endIndex
-) {
+export function insertObject( value, formatToInsert, startIndex, endIndex ) {
 	const valueToInsert = {
 		formats: [ , ],
 		replacements: [ formatToInsert ],

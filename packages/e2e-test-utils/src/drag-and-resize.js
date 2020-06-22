@@ -16,8 +16,8 @@ export async function dragAndResize( element, delta ) {
 		height: elementHeight,
 	} = await element.boundingBox();
 
-	const originX = elementX + ( elementWidth / 2 );
-	const originY = elementY + ( elementHeight / 2 );
+	const originX = elementX + elementWidth / 2;
+	const originY = elementY + elementHeight / 2;
 
 	await page.mouse.move( originX, originY );
 	await page.mouse.down();

@@ -24,9 +24,9 @@ function createDidHook( hooks ) {
 			return;
 		}
 
-		return hooks[ hookName ] && hooks[ hookName ].runs ?
-			hooks[ hookName ].runs :
-			0;
+		return hooks[ hookName ] && hooks[ hookName ].runs
+			? hooks[ hookName ].runs
+			: 0;
 	};
 }
 

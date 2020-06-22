@@ -37,7 +37,9 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 
@@ -50,7 +52,9 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
 		testRenderer.root.findByType( 'input' ).props.onBlur();
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
@@ -64,8 +68,12 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root.findByType( 'input' ).props.onKeyDown( { keyCode: UP } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onKeyDown( { keyCode: UP } );
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 
@@ -78,8 +86,12 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root.findByType( 'input' ).props.onKeyDown( { keyCode: DOWN } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onKeyDown( { keyCode: DOWN } );
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 
@@ -92,8 +104,12 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root.findByType( 'input' ).props.onKeyDown( { keyCode: ENTER } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onKeyDown( { keyCode: ENTER } );
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 } );

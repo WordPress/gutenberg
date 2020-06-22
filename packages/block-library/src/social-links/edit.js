@@ -4,37 +4,35 @@
 
 import {
 	InnerBlocks,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import socialList from '../social-link/social-list';
-
-const ALLOWED_BLOCKS = Object.keys( socialList ).map( ( site ) => {
-	return 'core/social-link-' + site;
-} );
+const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
 // Template contains the links that show when start.
 const TEMPLATE = [
-	[ 'core/social-link-wordpress', { url: 'https://wordpress.org' } ],
-	[ 'core/social-link-facebook' ],
-	[ 'core/social-link-twitter' ],
-	[ 'core/social-link-instagram' ],
-	[ 'core/social-link-linkedin' ],
-	[ 'core/social-link-youtube' ],
+	[
+		'core/social-link',
+		{ service: 'wordpress', url: 'https://wordpress.org' },
+	],
+	[ 'core/social-link', { service: 'facebook' } ],
+	[ 'core/social-link', { service: 'twitter' } ],
+	[ 'core/social-link', { service: 'instagram' } ],
+	[ 'core/social-link', { service: 'linkedin' } ],
+	[ 'core/social-link', { service: 'youtube' } ],
 ];
 
-export const SocialLinksEdit = function( { className } ) {
+export function SocialLinksEdit() {
 	return (
-		<div className={ className }>
-			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				templateLock={ false }
-				template={ TEMPLATE }
-			/>
-		</div>
+		<InnerBlocks
+			allowedBlocks={ ALLOWED_BLOCKS }
+			templateLock={ false }
+			template={ TEMPLATE }
+			__experimentalMoverDirection={ 'horizontal' }
+			__experimentalTagName={ Block.ul }
+			__experimentalAppenderTagName="li"
+		/>
 	);
-};
+}
 
 export default SocialLinksEdit;

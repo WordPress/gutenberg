@@ -2,8 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Toolbar, PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToolbarButton,
+	PanelBody,
+	ToggleControl,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
+import { pencil } from '@wordpress/icons';
 
 const EmbedControls = ( props ) => {
 	const {
@@ -18,20 +24,23 @@ const EmbedControls = ( props ) => {
 	return (
 		<>
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					{ showEditButton && (
-						<IconButton
+						<ToolbarButton
 							className="components-toolbar__control"
 							label={ __( 'Edit URL' ) }
-							icon="edit"
+							icon={ pencil }
 							onClick={ switchBackToURLInput }
 						/>
 					) }
-				</Toolbar>
+				</ToolbarGroup>
 			</BlockControls>
 			{ themeSupportsResponsive && blockSupportsResponsive && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
+					<PanelBody
+						title={ __( 'Media settings' ) }
+						className="blocks-responsive"
+					>
 						<ToggleControl
 							label={ __( 'Resize for smaller devices' ) }
 							checked={ allowResponsive }

@@ -1,0 +1,43 @@
+{
+	"name": "core/post-author",
+	"category": "design",
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"avatarSize": {
+			"type": "number",
+			"default": 48
+		},
+		"showAvatar": {
+			"type": "boolean",
+			"default": true
+		},
+		"showBio": {
+			"type": "boolean"
+		},
+		"byline": {
+			"type": "string"
+		},
+		"backgroundColor": {
+			"type": "string"
+		},
+		"textColor": {
+			"type": "string"
+		},
+		"customBackgroundColor": {
+			"type": "string"
+		},
+		"customTextColor": {
+			"type": "string"
+		}
+	},
+	"usesContext": [
+		"postType",
+		"postId"
+	],
+	"supports": {
+		"html": false,
+		"__experimentalFontSize": true
+	}
+}

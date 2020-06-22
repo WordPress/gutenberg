@@ -7,19 +7,23 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { visitAdminPage } from './visit-admin-page';
-import { disableNavigationMode } from './keyboard-mode';
 
 /**
  * Creates new post.
  *
- * @param {Object} obj Object to create new post, along with tips enabling option.
+ * @param {Object}  object                    Object to create new post, along with tips enabling option.
+ * @param {string}  [object.postType]         Post type of the new post.
+ * @param {string}  [object.title]            Title of the new post.
+ * @param {string}  [object.content]          Content of the new post.
+ * @param {string}  [object.excerpt]          Excerpt of the new post.
+ * @param {boolean} [object.showWelcomeGuide] Whether to show the welcome guide.
  */
 export async function createNewPost( {
 	postType,
 	title,
 	content,
 	excerpt,
-	enableTips = false,
+	showWelcomeGuide = false,
 } = {} ) {
 	const query = addQueryArgs( '', {
 		post_type: postType,
@@ -27,16 +31,29 @@ export async function createNewPost( {
 		content,
 		excerpt,
 	} ).slice( 1 );
+
 	await visitAdminPage( 'post-new.php', query );
 
-	await page.evaluate( ( _enableTips ) => {
-		const action = _enableTips ? 'enableTips' : 'disableTips';
-		wp.data.dispatch( 'core/nux' )[ action ]();
-	}, enableTips );
+	const isWelcomeGuideActive = await page.evaluate( () =>
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' )
+	);
+	const isFullscreenMode = await page.evaluate( () =>
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'fullscreenMode' )
+	);
 
-	if ( enableTips ) {
+	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
+		await page.evaluate( () =>
+			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' )
+		);
+
 		await page.reload();
 	}
 
-	await disableNavigationMode();
+	if ( isFullscreenMode ) {
+		await page.evaluate( () =>
+			wp.data
+				.dispatch( 'core/edit-post' )
+				.toggleFeature( 'fullscreenMode' )
+		);
+	}
 }

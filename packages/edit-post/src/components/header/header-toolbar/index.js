@@ -1,60 +1,104 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
-import { withViewportMatch } from '@wordpress/viewport';
-import { DotTip } from '@wordpress/nux';
-import { __ } from '@wordpress/i18n';
+import { useViewportMatch } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { __, _x } from '@wordpress/i18n';
 import {
-	Inserter,
 	BlockToolbar,
 	NavigableToolbar,
 	BlockNavigationDropdown,
+	ToolSelector,
 } from '@wordpress/block-editor';
 import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 } from '@wordpress/editor';
+import {
+	Button,
+	__experimentalToolbarItem as ToolbarItem,
+} from '@wordpress/components';
+import { plus } from '@wordpress/icons';
 
-function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isTextModeEnabled } ) {
-	const toolbarAriaLabel = hasFixedToolbar ?
-		/* translators: accessibility text for the editor toolbar when Top Toolbar is on */
-		__( 'Document and block tools' ) :
-		/* translators: accessibility text for the editor toolbar when Top Toolbar is off */
-		__( 'Document tools' );
+function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
+	const {
+		hasFixedToolbar,
+		isInserterEnabled,
+		isTextModeEnabled,
+		previewDeviceType,
+	} = useSelect( ( select ) => {
+		const {
+			hasInserterItems,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+		} = select( 'core/block-editor' );
+		return {
+			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+				'fixedToolbar'
+			),
+			// This setting (richEditingEnabled) should not live in the block editor's setting.
+			isInserterEnabled:
+				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+				select( 'core/editor' ).getEditorSettings()
+					.richEditingEnabled &&
+				hasInserterItems(
+					getBlockRootClientId( getBlockSelectionEnd() )
+				),
+			isTextModeEnabled:
+				select( 'core/edit-post' ).getEditorMode() === 'text',
+			previewDeviceType: select(
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
+		};
+	}, [] );
+	const isLargeViewport = useViewportMatch( 'medium' );
+
+	const displayBlockToolbar =
+		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
+
+	const toolbarAriaLabel = displayBlockToolbar
+		? /* translators: accessibility text for the editor toolbar when Top Toolbar is on */
+		  __( 'Document and block tools' )
+		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
+		  __( 'Document tools' );
 
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<div>
-				<Inserter disabled={ ! showInserter } position="bottom right" showInserterHelpPanel />
-				<DotTip tipId="core/editor.inserter">
-					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kinds of content: you can insert text, headings, images, lists, and lots more!' ) }
-				</DotTip>
-			</div>
-			<EditorHistoryUndo />
-			<EditorHistoryRedo />
-			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
-			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
-			{ hasFixedToolbar && isLargeViewport && (
+			<ToolbarItem
+				as={ Button }
+				className="edit-post-header-toolbar__inserter-toggle"
+				isPrimary
+				isPressed={ isInserterOpen }
+				onClick={ onToggleInserter }
+				disabled={ ! isInserterEnabled }
+				icon={ plus }
+				label={ _x(
+					'Add block',
+					'Generic label for block inserter button'
+				) }
+			/>
+			{ isLargeViewport && <ToolbarItem as={ ToolSelector } /> }
+			<ToolbarItem as={ EditorHistoryUndo } />
+			<ToolbarItem as={ EditorHistoryRedo } />
+			<ToolbarItem
+				as={ TableOfContents }
+				hasOutlineItemsDisabled={ isTextModeEnabled }
+			/>
+			<ToolbarItem
+				as={ BlockNavigationDropdown }
+				isDisabled={ isTextModeEnabled }
+			/>
+			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
-					<BlockToolbar />
+					<BlockToolbar hideDragHandle />
 				</div>
 			) }
 		</NavigableToolbar>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-		// This setting (richEditingEnabled) should not live in the block editor's setting.
-		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
-	} ) ),
-	withViewportMatch( { isLargeViewport: 'medium' } ),
-] )( HeaderToolbar );
+export default HeaderToolbar;

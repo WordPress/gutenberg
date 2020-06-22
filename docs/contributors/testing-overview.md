@@ -27,7 +27,9 @@ Assuming you've followed the [instructions](/docs/contributors/getting-started.m
 npm test
 ```
 
-Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`. ESLint can also fix not all, but many issues automatically by running `npm run lint:fix`. To reduce the likelihood of unexpected build failures caused by code styling issues, you're encouraged to [install an ESLint integration for your editor](https://eslint.org/docs/user-guide/integrations) and/or create a [git pre-commit hook](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) containing the `npm run lint:fix` command.
+Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint-js:fix`.
+
+To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/getting-started.md) for additional information.
 
 To run unit tests only, without the linter, use `npm run test-unit` instead.
 
@@ -342,7 +344,36 @@ test( 'should contain mars if planets is true', () => {
 
 It's tempting to snapshot deep renders, but that makes for huge snapshots. Additionally, deep renders no longer test a single component, but an entire tree. With `shallow`, we snapshot just the components that are directly rendered by the component we want to test.
 
-## End to end Testing
+#### Troubleshooting
+
+Sometimes we need to mock refs for some stories which use them. Check the following documents to learn more:
+- Why we need to use [Mocking Refs for Snapshot Testing](https://reactjs.org/blog/2016/11/16/react-v15.4.0.html#mocking-refs-for-snapshot-testing) with React.
+- [Using createNodeMock to mock refs](https://github.com/storybookjs/storybook/tree/master/addons/storyshots/storyshots-core#using-createnodemock-to-mock-refs) with StoryShots.
+
+In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`. If this happens, search for `initStoryshots` method call, which contains all necessary configurations to adjust.
+
+### Debugging Jest unit tests
+
+Running `npm run test-unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+
+## Native mobile testing
+
+Part of the unit-tests suite is a set of Jest tests run exercise native-mobile codepaths, developed in React Native. Since those tests run on Node, they can be launched locally on your development machine without the need for specific native Android or iOS dev tools or SDKs. It also means that they can be debugged using typical dev tools. Read on for instructions how to debug.
+
+### Debugging the native mobile unit tests
+
+To locally run the tests in debug mode, follow these steps:
+0. Make sure you have ran `npm ci` to install all the packages
+1. Run `npm run test-unit:native:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
+2. Open `chrome://inspect` in Chrome
+3. Under the "Remote Target" section, look for a `../../node_modules/.bin/jest ` target and click on the "inspect" link. That will open a new window with the Chrome DevTools debugger attached to the process and stopped at the beginning of the `jest.js` file. Alternatively, if the targets are not visible, click on the `Open dedicated DevTools for Node` link in the same page.
+4. You can place breakpoints or `debugger;` statements throughout the code, including the tests code, to stop and inspect
+5. Click on the "Play" button to resume execution
+6. Enjoy debugging the native mobile unit tests!
+
+## End-to-end Testing
+
+End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
 If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the e2e tests locally using this command:
 
@@ -356,21 +387,52 @@ or interactively
 npm run test-e2e:watch
 ```
 
-Sometimes it's useful to observe the browser while running tests. To do so you can use these environment variables:
+Sometimes it's useful to observe the browser while running tests. Then, use this command:
 
 ```bash
-PUPPETEER_HEADLESS=false PUPPETEER_SLOWMO=80 npm run test-e2e:watch
+npm run test-e2e:watch -- --puppeteer-interactive
+```
+
+You can control the speed of execution with `--puppeteer-slowmo`:
+
+```bash
+npm run test-e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
+```
+
+You can additionally have the devtools automatically open for interactive debugging in the browser:
+
+```bash
+npm run test-e2e:watch -- --puppeteer-devtools
 ```
 
 If you're using a different setup, you can provide the base URL, username and password like this:
 
 ```bash
-WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
+npm run test-e2e -- --wordpress-base-url=http://localhost:8888 --wordpress-username=admin --wordpress-password=password
 ```
+
+If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
+
+```
+THROTTLE_CPU=4 npm run test-e2e
+```
+
+`THROTTLE_CPU` is a slowdown factor (in this example, a 4x slowdown multiplier)
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
+
+```
+DOWNLOAD_THROUGHPUT=125000 npm run test-e2e
+```
+
+`DOWNLOAD_THROUGHPUT` is a numeric value representing bytes-per-second network download (in this example, a 1Mbps download speed).
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+
 
 ### Core Block Testing
 
-Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
+Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](https://github.com/wordpress/gutenberg/blob/master/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
 
 ## PHP Testing
 
@@ -386,3 +448,27 @@ To run unit tests only, without the linter, use `npm run test-unit-php` instead.
 
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
+
+## Performance Testing
+
+To ensure that the editor stays performant as we add features, we monitor the impact pull requests and releases can have on some key metrics:
+
+* The time it takes to load the editor.
+* The time it takes for the browser to respond when typing.
+* The time it takes to select a block.
+
+Performance tests are end-to-end tests running the editor and capturing these measures. To run the tests, make sure you have an e2e testing environment ready and run the following command:
+
+```
+npm run test-performance
+```
+
+This gives you the result for the current branch/code on the running environment.
+
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `./bin/plugin/cli.js perf [branches]`, example:
+
+```
+./bin/plugin/cli.js perf master v8.1.0 v8.0.0
+```
+
+**Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.

@@ -41,12 +41,12 @@ The filter will send any setting to the initialized Editor, which means any edit
 ### Available default editor settings
 
 #### `richEditingEnabled`
-If it is `true` the user can edit the content using the Visual Editor.
+If it is `true` the user can edit the content using the visual editor.
 
-It is set by default to the return value of the [`user_can_richedit`](https://developer.wordpress.org/reference/functions/user_can_richedit/) function. It checks if the user can access the Visual Editor and whether it’s supported by the user’s browser.
+It is set by default to the return value of the [`user_can_richedit`](https://developer.wordpress.org/reference/functions/user_can_richedit/) function. It checks if the user can access the visual editor and whether it’s supported by the user’s browser.
 
 
 #### `codeEditingEnabled`
-Default `true`. Indicates whether the user can access the Code Editor **in addition** to the Visual Editor.
+Default `true`. Indicates whether the user can access the code editor **in addition** to the visual editor.
 
-If set to false the user will not be able to switch between Visual and Code editor. The option in the settings menu will not be available and the keyboard shortcut for switching editor types will not fire.  
+If set to false the user will not be able to switch between visual and code editor. The option in the settings menu will not be available and the keyboard shortcut for switching editor types will not fire.  

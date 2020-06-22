@@ -32,6 +32,10 @@ import getQueryParts from './get-query-parts';
  * @return {number[]} Merged array of item IDs.
  */
 export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
+	const receivedAllIds = page === 1 && perPage === -1;
+	if ( receivedAllIds ) {
+		return nextItemIds;
+	}
 	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
 
 	// If later page has already been received, default to the larger known
@@ -46,14 +50,13 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	for ( let i = 0; i < size; i++ ) {
 		// Preserve existing item ID except for subset of range of next items.
-		const isInNextItemsRange = (
+		const isInNextItemsRange =
 			i >= nextItemIdsStartIndex &&
-			i < nextItemIdsStartIndex + nextItemIds.length
-		);
+			i < nextItemIdsStartIndex + nextItemIds.length;
 
-		mergedItemIds[ i ] = isInNextItemsRange ?
-			nextItemIds[ i - nextItemIdsStartIndex ] :
-			itemIds[ i ];
+		mergedItemIds[ i ] = isInNextItemsRange
+			? nextItemIds[ i - nextItemIdsStartIndex ]
+			: itemIds[ i ];
 	}
 
 	return mergedItemIds;
@@ -74,10 +77,13 @@ function items( state = {}, action ) {
 			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
-				...action.items.reduce( ( acc, value ) => {
+				...action.items.reduce( ( accumulator, value ) => {
 					const itemId = value[ key ];
-					acc[ itemId ] = conservativeMapItem( state[ itemId ], value );
-					return acc;
+					accumulator[ itemId ] = conservativeMapItem(
+						state[ itemId ],
+						value
+					);
+					return accumulator;
 				}, {} ),
 			};
 	}

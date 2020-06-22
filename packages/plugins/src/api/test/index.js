@@ -1,12 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	registerPlugin,
-	unregisterPlugin,
-	getPlugin,
-	getPlugins,
-} from '../';
+import { registerPlugin, unregisterPlugin, getPlugin, getPlugins } from '../';
 
 describe( 'registerPlugin', () => {
 	afterEach( () => {
@@ -41,19 +36,26 @@ describe( 'registerPlugin', () => {
 		registerPlugin( 'plugin/with/special/characters', {
 			render: () => {},
 		} );
-		expect( console ).toHaveErroredWith( 'Plugin names must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".' );
+		expect( console ).toHaveErroredWith(
+			'Plugin names must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
+		);
 	} );
 
 	it( 'fails to register a plugin with a non-string name', () => {
-		registerPlugin( {}, {
-			render: () => {},
-		} );
+		registerPlugin(
+			{},
+			{
+				render: () => {},
+			}
+		);
 		expect( console ).toHaveErroredWith( 'Plugin names must be strings.' );
 	} );
 
 	it( 'fails to register a plugin without a render function', () => {
 		registerPlugin( 'another-plugin', {} );
-		expect( console ).toHaveErroredWith( 'The "render" property must be specified and must be a valid function.' );
+		expect( console ).toHaveErroredWith(
+			'The "render" property must be specified and must be a valid function.'
+		);
 	} );
 
 	it( 'fails to register a plugin that was already been registered', () => {
@@ -63,6 +65,8 @@ describe( 'registerPlugin', () => {
 		registerPlugin( 'plugin', {
 			render: () => 'plugin content',
 		} );
-		expect( console ).toHaveErroredWith( 'Plugin "plugin" is already registered.' );
+		expect( console ).toHaveErroredWith(
+			'Plugin "plugin" is already registered.'
+		);
 	} );
 } );

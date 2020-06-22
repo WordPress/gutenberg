@@ -11,14 +11,25 @@ import { Component } from '@wordpress/element';
 
 class Picker extends Component {
 	presentPicker() {
-		const { options, onChange } = this.props;
+		const {
+			options,
+			onChange,
+			title,
+			destructiveButtonIndex,
+			disabledButtonIndices,
+			anchor,
+		} = this.props;
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
 
 		ActionSheetIOS.showActionSheetWithOptions(
 			{
+				title,
 				options: fullOptions,
 				cancelButtonIndex: 0,
+				destructiveButtonIndex,
+				disabledButtonIndices,
+				anchor,
 			},
 			( buttonIndex ) => {
 				if ( buttonIndex === 0 ) {
@@ -26,7 +37,7 @@ class Picker extends Component {
 				}
 				const selected = options[ buttonIndex - 1 ];
 				onChange( selected.value );
-			},
+			}
 		);
 	}
 

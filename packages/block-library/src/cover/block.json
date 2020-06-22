@@ -1,6 +1,6 @@
 {
 	"name": "core/cover",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"url": {
 			"type": "string"
@@ -31,6 +31,24 @@
 		},
 		"minHeight": {
 			"type": "number"
+		},
+		"minHeightUnit": {
+			"type": "string"
+		},
+		"gradient": {
+			"type": "string"
+		},
+		"customGradient": {
+			"type": "string"
+		},
+		"contentPosition": {
+			"type": "string"
 		}
+	},
+	"supports": {
+		"align": true,
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalPadding": true
 	}
 }

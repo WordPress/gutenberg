@@ -11,6 +11,7 @@ import { Component } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { VisuallyHidden } from '@wordpress/components';
 
 export class PostTextEditor extends Component {
 	constructor() {
@@ -67,9 +68,12 @@ export class PostTextEditor extends Component {
 		const { instanceId } = this.props;
 		return (
 			<>
-				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
+				<VisuallyHidden
+					as="label"
+					htmlFor={ `post-content-${ instanceId }` }
+				>
 					{ __( 'Type text or HTML' ) }
-				</label>
+				</VisuallyHidden>
 				<Textarea
 					autoComplete="off"
 					dir="auto"

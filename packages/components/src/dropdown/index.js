@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
@@ -62,6 +67,9 @@ class Dropdown extends Component {
 	}
 
 	close() {
+		if ( this.props.onClose ) {
+			this.props.onClose();
+		}
 		this.setState( { isOpen: false } );
 	}
 
@@ -70,7 +78,7 @@ class Dropdown extends Component {
 		const {
 			renderContent,
 			renderToggle,
-			position = 'bottom',
+			position = 'bottom right',
 			className,
 			contentClassName,
 			expandOnMobile,
@@ -82,11 +90,13 @@ class Dropdown extends Component {
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 
 		return (
-			<div className={ className } ref={ this.containerRef }>
+			<div
+				className={ classnames( 'components-dropdown', className ) }
+				ref={ this.containerRef }
+			>
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover
-						className={ contentClassName }
 						position={ position }
 						onClose={ this.close }
 						onFocusOutside={ this.closeIfFocusOutside }
@@ -94,6 +104,11 @@ class Dropdown extends Component {
 						headerTitle={ headerTitle }
 						focusOnMount={ focusOnMount }
 						{ ...popoverProps }
+						className={ classnames(
+							'components-dropdown__content',
+							popoverProps ? popoverProps.className : undefined,
+							contentClassName
+						) }
 					>
 						{ renderContent( args ) }
 					</Popover>

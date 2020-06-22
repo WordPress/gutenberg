@@ -1,0 +1,15 @@
+{
+	"name": "core/post-date",
+	"category": "design",
+	"attributes": {
+		"format": {
+			"type": "string"
+		}
+	},
+	"usesContext": [
+		"postId"
+	],
+	"supports": {
+		"html": false
+	}
+}

@@ -43,10 +43,7 @@ class Dropdown extends Component {
 
 	render() {
 		const { isOpen } = this.state;
-		const {
-			renderContent,
-			renderToggle,
-		} = this.props;
+		const { renderContent, renderToggle } = this.props;
 
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 

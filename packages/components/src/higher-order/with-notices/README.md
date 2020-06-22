@@ -11,7 +11,7 @@ const MyComponentWithNotices = withNotices(
 		return (
 			<div>
 				{ noticeUI }
-				<Button isDefault onClick={ addError }>Add error</Button>
+				<Button isSecondary onClick={ addError }>Add error</Button>
 			</div>
 		)
 	}

@@ -26,11 +26,7 @@
 	}
 
 	&.is-opened {
-		padding: $panel-padding;
-	}
-
-	> .components-icon-button {
-		color: $dark-gray-900;
+		padding: $grid-unit-20;
 	}
 }
 
@@ -38,8 +34,8 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 0 $panel-padding;
-	height: 50px;
+	padding: 0 $grid-unit-20;
+	height: $grid-unit-60;
 	border-top: $border-width solid $light-gray-500;
 	border-bottom: $border-width solid $light-gray-500;
 
@@ -67,35 +63,39 @@
 	@include reduce-motion("transition");
 }
 .components-panel__body.is-opened > .components-panel__body-title {
-	margin: -1 * $panel-padding;
+	margin: -1 * $grid-unit-20;
 	margin-bottom: 5px;
 }
 
 // Hover States
-.components-panel__body > .components-panel__body-title:hover,
-.edit-post-last-revision__panel > .components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+.components-panel__body > .components-panel__body-title:hover {
+	// Override the default button hover style
 	background: $light-gray-200;
+	border: none;
 }
 
 .components-panel__body-toggle.components-button {
 	position: relative;
-	padding: 15px;
+	padding: $grid-unit-20;
 	outline: none;
 	width: 100%;
-	font-weight: 600;
+	font-weight: 500;
 	text-align: left;
-	color: $dark-gray-900;
-	@include menu-style__neutral;
+	color: $dark-gray-primary;
+	border: none;
+	box-shadow: none;
 	transition: 0.1s background ease-in-out;
 	@include reduce-motion("transition");
+	height: auto;
 
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
+	&:focus {
+		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		border-radius: 0;
 	}
 
 	.components-panel__arrow {
 		position: absolute;
-		right: $grid-size + 2;
+		right: $grid-unit-20;
 		top: 50%;
 		transform: translateY(-50%);
 		color: $dark-gray-900;

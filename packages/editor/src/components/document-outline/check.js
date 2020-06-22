@@ -9,7 +9,10 @@ import { filter } from 'lodash';
 import { withSelect } from '@wordpress/data';
 
 function DocumentOutlineCheck( { blocks, children } ) {
-	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
+	const headings = filter(
+		blocks,
+		( block ) => block.name === 'core/heading'
+	);
 
 	if ( headings.length < 1 ) {
 		return null;

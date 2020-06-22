@@ -1,4 +1,4 @@
-# List Reusable Blocks
+# List Reusable blocks
 
 Package used to add import/export links to the listing page of the reusable blocks.
 

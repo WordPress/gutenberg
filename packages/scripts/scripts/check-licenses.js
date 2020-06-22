@@ -3,7 +3,6 @@
  */
 const spawn = require( 'cross-spawn' );
 const { existsSync, readFileSync } = require( 'fs' );
-const { sep } = require( 'path' );
 const chalk = require( 'chalk' );
 
 /**
@@ -21,17 +20,18 @@ const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
  */
 
 const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
+const WARNING = chalk.reset.inverse.bold.yellow( ' WARNING ' );
 
 const prod = hasArgInCLI( '--prod' ) || hasArgInCLI( '--production' );
 const dev = hasArgInCLI( '--dev' ) || hasArgInCLI( '--development' );
 const gpl2 = hasArgInCLI( '--gpl2' );
-const ignored = hasArgInCLI( '--ignore' ) ?
-	getArgFromCLI( '--ignore' )
-		// "--ignore=a, b" -> "[ 'a', ' b' ]"
-		.split( ',' )
-		// "[ 'a', ' b' ]" -> "[ 'a', 'b' ]"
-		.map( ( moduleName ) => moduleName.trim() ) :
-	[];
+const ignored = hasArgInCLI( '--ignore' )
+	? getArgFromCLI( '--ignore' )
+			// "--ignore=a, b" -> "[ 'a', ' b' ]"
+			.split( ',' )
+			// "[ 'a', ' b' ]" -> "[ 'a', 'b' ]"
+			.map( ( moduleName ) => moduleName.trim() )
+	: [];
 
 /*
  * A list of license strings that we've found to be GPL2 compatible.
@@ -47,6 +47,7 @@ const gpl2CompatibleLicenses = [
 	'BSD-3-Clause',
 	'BSD-3-Clause-W3C',
 	'BSD-like',
+	'0BSD',
 	'CC-BY-4.0',
 	'CC0-1.0',
 	'GPL-2.0',
@@ -108,15 +109,11 @@ const licenseFiles = [
  * and their matching license.
  */
 const licenseFileStrings = {
-	'Apache-2.0': [
-		'Licensed under the Apache License, Version 2.0',
-	],
+	'Apache-2.0': [ 'Licensed under the Apache License, Version 2.0' ],
 	BSD: [
 		'Redistributions in binary form must reproduce the above copyright notice,',
 	],
-	'BSD-3-Clause-W3C': [
-		'W3C 3-clause BSD License',
-	],
+	'BSD-3-Clause-W3C': [ 'W3C 3-clause BSD License' ],
 	MIT: [
 		'Permission is hereby granted, free of charge,',
 		'## License\n\nMIT',
@@ -149,7 +146,7 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	}
 
 	// We can skip the parsing below if there isn't an 'OR' in the license.
-	if ( ! licenseType.includes( 'OR' ) ) {
+	if ( ! formattedlicenseType.includes( ' or ' ) ) {
 		return false;
 	}
 
@@ -166,40 +163,67 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 		.map( ( e ) => e.trim() );
 
 	// We can then check our array of licenses against the allowedLicense.
-	return undefined !== subLicenseTypes.find( ( subLicenseType ) => checkLicense( allowedLicense, subLicenseType ) );
+	return (
+		undefined !==
+		subLicenseTypes.find( ( subLicenseType ) =>
+			checkLicense( allowedLicense, subLicenseType )
+		)
+	);
 };
 
-/**
- * Returns true if the given module path is not to be ignored for consideration
- * in license validation, or false otherwise.
- *
- * @param {string} moduleName Module path.
- *
- * @return {boolean} Whether module path is not to be ignored.
- */
-const isNotIgnoredModule = ( moduleName ) => (
-	! ignored.some( ( ignoredItem ) => (
-		// `moduleName` is a file path to the module directory. Assume CLI arg
-		// is passed as basename of package (directory(s) after node_modules).
-		// Prefix with sep to avoid false-positives on prefixing variations.
-		moduleName.endsWith( sep + ignoredItem )
-	) )
+// Use `npm ls` to grab a list of all the packages.
+const child = spawn.sync(
+	'npm',
+	[
+		'ls',
+		'--json',
+		'--long',
+		...( prod ? [ '--prod' ] : [] ),
+		...( dev ? [ '--dev' ] : [] ),
+	],
+	{ maxBuffer: 1024 * 1024 * 100 } // output size for prod is ~21 MB and dev is ~76 MB
 );
 
-// Use `npm ls` to grab a list of all the packages.
-const child = spawn.sync( 'npm', [
-	'ls',
-	'--parseable',
-	...( prod ? [ '--prod' ] : [] ),
-	...( dev ? [ '--dev' ] : [] ),
-] );
+const result = JSON.parse( child.stdout.toString() );
 
-const modules = child.stdout
-	.toString()
-	.split( '\n' )
-	.filter( isNotIgnoredModule );
+const topLevelDeps = result.dependencies;
 
-modules.forEach( ( path ) => {
+function traverseDepTree( deps ) {
+	for ( const key in deps ) {
+		const dep = deps[ key ];
+
+		if ( ignored.includes( dep.name ) ) {
+			return;
+		}
+
+		if ( ! dep.hasOwnProperty( 'path' ) ) {
+			if ( dep.hasOwnProperty( 'peerMissing' ) ) {
+				process.stdout.write(
+					`${ WARNING } Unable to locate path for missing peer dep ${ dep.name }@${ dep.version }. `
+				);
+			} else {
+				process.exitCode = 1;
+				process.stdout.write(
+					`${ ERROR } Unable to locate path for ${ dep.name }@${ dep.version }. `
+				);
+			}
+		} else if ( dep.missing ) {
+			process.stdout.write(
+				`${ WARNING } missing dep ${ dep.name }@${ dep.version }. `
+			);
+		} else {
+			checkDepLicense( dep.path );
+		}
+
+		if ( dep.hasOwnProperty( 'dependencies' ) ) {
+			traverseDepTree( dep.dependencies );
+		} else {
+			return;
+		}
+	}
+}
+
+function checkDepLicense( path ) {
 	if ( ! path ) {
 		return;
 	}
@@ -218,17 +242,19 @@ modules.forEach( ( path ) => {
 	 * - { licenses: [ { type: 'MIT' }, { type: 'Zlib' } ] }
 	 */
 	const packageInfo = require( filename );
-	const license = packageInfo.license ||
-		(
-			packageInfo.licenses &&
-			packageInfo.licenses
-				.map( ( l ) => l.type || l )
-				.join( ' OR ' )
-		);
+	const license =
+		packageInfo.license ||
+		( packageInfo.licenses &&
+			packageInfo.licenses.map( ( l ) => l.type || l ).join( ' OR ' ) );
 	let licenseType = typeof license === 'object' ? license.type : license;
 
 	// Check if the license we've detected is telling us to look in the license file, instead.
-	if ( licenseType && licenseFiles.find( ( licenseFile ) => licenseType.includes( licenseFile ) ) ) {
+	if (
+		licenseType &&
+		licenseFiles.find( ( licenseFile ) =>
+			licenseType.includes( licenseFile )
+		)
+	) {
 		licenseType = undefined;
 	}
 
@@ -248,16 +274,23 @@ modules.forEach( ( path ) => {
 				const licenseText = readFileSync( licensePath ).toString();
 
 				// Check if the file contains any of the strings in licenseFileStrings
-				return Object.keys( licenseFileStrings ).reduce( ( stringDetectedType, licenseStringType ) => {
-					const licenseFileString = licenseFileStrings[ licenseStringType ];
+				return Object.keys( licenseFileStrings ).reduce(
+					( stringDetectedType, licenseStringType ) => {
+						const licenseFileString =
+							licenseFileStrings[ licenseStringType ];
 
-					return licenseFileString.reduce( ( currentDetectedType, fileString ) => {
-						if ( licenseText.includes( fileString ) ) {
-							return licenseStringType;
-						}
-						return currentDetectedType;
-					}, stringDetectedType );
-				}, detectedType );
+						return licenseFileString.reduce(
+							( currentDetectedType, fileString ) => {
+								if ( licenseText.includes( fileString ) ) {
+									return licenseStringType;
+								}
+								return currentDetectedType;
+							},
+							stringDetectedType
+						);
+					},
+					detectedType
+				);
 			}
 			return detectedType;
 		}, false );
@@ -268,10 +301,16 @@ modules.forEach( ( path ) => {
 	}
 
 	// Now that we finally have a license to check, see if any of the allowed licenses match.
-	const allowed = licenses.find( ( allowedLicense ) => checkLicense( allowedLicense, licenseType ) );
+	const allowed = licenses.find( ( allowedLicense ) =>
+		checkLicense( allowedLicense, licenseType )
+	);
 
 	if ( ! allowed ) {
 		process.exitCode = 1;
-		process.stdout.write( `${ ERROR } Module ${ packageInfo.name } has an incompatible license '${ licenseType }'.\n` );
+		process.stdout.write(
+			`${ ERROR } Module ${ packageInfo.name } has an incompatible license '${ licenseType }'.\n`
+		);
 	}
-} );
+}
+
+traverseDepTree( topLevelDeps );

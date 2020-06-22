@@ -25,10 +25,16 @@ function render_block_core_search( $attributes ) {
 			$input_id,
 			$attributes['label']
 		);
+	} else {
+		$label_markup = sprintf(
+			'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
+			$input_id,
+			__( 'Search' )
+		);
 	}
 
 	$input_markup = sprintf(
-		'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" />',
+		'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" required />',
 		$input_id,
 		esc_attr( get_search_query() ),
 		esc_attr( $attributes['placeholder'] )
@@ -45,14 +51,13 @@ function render_block_core_search( $attributes ) {
 	if ( isset( $attributes['className'] ) ) {
 		$class .= ' ' . $attributes['className'];
 	}
-
 	if ( isset( $attributes['align'] ) ) {
 		$class .= ' align' . $attributes['align'];
 	}
 
 	return sprintf(
 		'<form class="%s" role="search" method="get" action="%s">%s</form>',
-		$class,
+		esc_attr( $class ),
 		esc_url( home_url( '/' ) ),
 		$label_markup . $input_markup . $button_markup
 	);
@@ -62,30 +67,9 @@ function render_block_core_search( $attributes ) {
  * Registers the `core/search` block on the server.
  */
 function register_block_core_search() {
-	register_block_type(
-		'core/search',
+	register_block_type_from_metadata(
+		__DIR__ . '/search',
 		array(
-			'attributes'      => array(
-				'align'       => array(
-					'type' => 'string',
-					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
-				),
-				'className'   => array(
-					'type' => 'string',
-				),
-				'label'       => array(
-					'type'    => 'string',
-					'default' => __( 'Search' ),
-				),
-				'placeholder' => array(
-					'type'    => 'string',
-					'default' => '',
-				),
-				'buttonText'  => array(
-					'type'    => 'string',
-					'default' => __( 'Search' ),
-				),
-			),
 			'render_callback' => 'render_block_core_search',
 		)
 	);

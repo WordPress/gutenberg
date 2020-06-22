@@ -6,7 +6,7 @@ import { difference } from 'lodash';
 /**
  * Internal dependencies
  */
-import { isPhrasingContent } from './phrasing-content';
+import { isTextContent } from './phrasing-content';
 
 /**
  * Checks if the given node should be considered inline content, optionally
@@ -18,7 +18,7 @@ import { isPhrasingContent } from './phrasing-content';
  * @return {boolean} True if the node is inline content, false if nohe.
  */
 function isInline( node, contextTag ) {
-	if ( isPhrasingContent( node ) ) {
+	if ( isTextContent( node ) ) {
 		return true;
 	}
 
@@ -32,22 +32,28 @@ function isInline( node, contextTag ) {
 		[ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 	];
 
-	return inlineWhitelistTagGroups.some( ( tagGroup ) =>
-		difference( [ tag, contextTag ], tagGroup ).length === 0
+	return inlineWhitelistTagGroups.some(
+		( tagGroup ) => difference( [ tag, contextTag ], tagGroup ).length === 0
 	);
 }
 
 function deepCheck( nodes, contextTag ) {
-	return nodes.every( ( node ) =>
-		isInline( node, contextTag ) && deepCheck( Array.from( node.children ), contextTag )
+	return nodes.every(
+		( node ) =>
+			isInline( node, contextTag ) &&
+			deepCheck( Array.from( node.children ), contextTag )
 	);
 }
 
 function isDoubleBR( node ) {
-	return node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
+	return (
+		node.nodeName === 'BR' &&
+		node.previousSibling &&
+		node.previousSibling.nodeName === 'BR'
+	);
 }
 
-export default function( HTML, contextTag ) {
+export default function isInlineContent( HTML, contextTag ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = HTML;

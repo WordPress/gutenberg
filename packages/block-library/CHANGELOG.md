@@ -1,3 +1,14 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.12.0 (2020-01-13)
+
+### Bug Fixes
+
+- Fixes a regression published in version 2.9.2 that would prevent some build tools from including
+  styles provided in the packages build-styles directory.
+
 ## 2.7.0 (2019-08-05)
 
 ### Enhancements

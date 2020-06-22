@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { URL } from 'url';
-
-/**
  * Internal dependencies
  */
 import { createURL } from './create-url';
@@ -20,5 +15,5 @@ export function isCurrentURL( WPPath, query = '' ) {
 
 	currentURL.search = query;
 
-	return createURL( WPPath ) === currentURL.href;
+	return createURL( WPPath, query ) === currentURL.href;
 }

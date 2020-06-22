@@ -19,19 +19,28 @@ import { isActionOfType, isAction } from './is-action';
  * @return {Function} co-routine runtime
  */
 export default function createRuntime( controls = {}, dispatch ) {
-	const rungenControls = map( controls, ( control, actionType ) => ( value, next, iterate, yieldNext, yieldError ) => {
-		if ( ! isActionOfType( value, actionType ) ) {
-			return false;
+	const rungenControls = map(
+		controls,
+		( control, actionType ) => (
+			value,
+			next,
+			iterate,
+			yieldNext,
+			yieldError
+		) => {
+			if ( ! isActionOfType( value, actionType ) ) {
+				return false;
+			}
+			const routine = control( value );
+			if ( isPromise( routine ) ) {
+				// Async control routine awaits resolution.
+				routine.then( yieldNext, yieldError );
+			} else {
+				yieldNext( routine );
+			}
+			return true;
 		}
-		const routine = control( value );
-		if ( isPromise( routine ) ) {
-			// Async control routine awaits resolution.
-			routine.then( yieldNext, yieldError );
-		} else {
-			yieldNext( routine );
-		}
-		return true;
-	} );
+	);
 
 	const unhandledActionControl = ( value, next ) => {
 		if ( ! isAction( value ) ) {
@@ -45,12 +54,17 @@ export default function createRuntime( controls = {}, dispatch ) {
 
 	const rungenRuntime = create( rungenControls );
 
-	return ( action ) => new Promise( ( resolve, reject ) =>
-		rungenRuntime( action, ( result ) => {
-			if ( isAction( result ) ) {
-				dispatch( result );
-			}
-			resolve( result );
-		}, reject )
-	);
+	return ( action ) =>
+		new Promise( ( resolve, reject ) =>
+			rungenRuntime(
+				action,
+				( result ) => {
+					if ( isAction( result ) ) {
+						dispatch( result );
+					}
+					resolve( result );
+				},
+				reject
+			)
+		);
 }

@@ -10,6 +10,8 @@ export async function ensureSidebarOpened() {
 	try {
 		return page.$eval( '.edit-post-sidebar', () => {} );
 	} catch ( error ) {
-		return page.click( '.edit-post-header__settings [aria-label="Settings"]' );
+		return page.click(
+			'.edit-post-header__settings [aria-label="Settings"]'
+		);
 	}
 }

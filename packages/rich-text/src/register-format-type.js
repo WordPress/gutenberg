@@ -1,25 +1,27 @@
 /**
- * External dependencies
- */
-import { mapKeys } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { select, dispatch, withSelect, withDispatch } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
-import { compose } from '@wordpress/compose';
+import { select, dispatch } from '@wordpress/data';
+
+/**
+ * @typedef {Object} WPFormat
+ *
+ * @property {string}   name        A string identifying the format. Must be
+ *                                  unique across all registered formats.
+ * @property {string}   tagName     The HTML tag this format will wrap the
+ *                                  selection with.
+ * @property {string}   [className] A class to match the format.
+ * @property {string}   title       Name of the format.
+ * @property {Function} edit        Should return a component for the user to
+ *                                  interact with the new registered format.
+ */
 
 /**
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
  * @param {string}   name                 Format name.
- * @param {Object}   settings             Format settings.
- * @param {string}   settings.tagName     The HTML tag this format will wrap the selection with.
- * @param {string}   [settings.className] A class to match the format.
- * @param {string}   settings.title       Name of the format.
- * @param {Function} settings.edit        Should return a component for the user to interact with the new registered format.
+ * @param {WPFormat} settings             Format settings.
  *
  * @return {WPFormat|undefined} The format, if it has been successfully registered;
  *                              otherwise `undefined`.
@@ -31,9 +33,7 @@ export function registerFormatType( name, settings ) {
 	};
 
 	if ( typeof settings.name !== 'string' ) {
-		window.console.error(
-			'Format names must be strings.'
-		);
+		window.console.error( 'Format names must be strings.' );
 		return;
 	}
 
@@ -51,18 +51,14 @@ export function registerFormatType( name, settings ) {
 		return;
 	}
 
-	if (
-		typeof settings.tagName !== 'string' ||
-		settings.tagName === ''
-	) {
-		window.console.error(
-			'Format tag names must be a string.'
-		);
+	if ( typeof settings.tagName !== 'string' || settings.tagName === '' ) {
+		window.console.error( 'Format tag names must be a string.' );
 		return;
 	}
 
 	if (
-		( typeof settings.className !== 'string' || settings.className === '' ) &&
+		( typeof settings.className !== 'string' ||
+			settings.className === '' ) &&
 		settings.className !== null
 	) {
 		window.console.error(
@@ -79,8 +75,9 @@ export function registerFormatType( name, settings ) {
 	}
 
 	if ( settings.className === null ) {
-		const formatTypeForBareElement = select( 'core/rich-text' )
-			.getFormatTypeForBareElement( settings.tagName );
+		const formatTypeForBareElement = select(
+			'core/rich-text'
+		).getFormatTypeForBareElement( settings.tagName );
 
 		if ( formatTypeForBareElement ) {
 			window.console.error(
@@ -89,8 +86,9 @@ export function registerFormatType( name, settings ) {
 			return;
 		}
 	} else {
-		const formatTypeForClassName = select( 'core/rich-text' )
-			.getFormatTypeForClassName( settings.className );
+		const formatTypeForClassName = select(
+			'core/rich-text'
+		).getFormatTypeForClassName( settings.className );
 
 		if ( formatTypeForClassName ) {
 			window.console.error(
@@ -109,94 +107,19 @@ export function registerFormatType( name, settings ) {
 
 	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
 		window.console.error(
-			'The format "' + settings.name + '" can have a maximum of 3 keywords.'
+			'The format "' +
+				settings.name +
+				'" can have a maximum of 3 keywords.'
 		);
 		return;
 	}
 
 	if ( typeof settings.title !== 'string' ) {
-		window.console.error(
-			'Format titles must be strings.'
-		);
+		window.console.error( 'Format titles must be strings.' );
 		return;
 	}
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
-
-	if ( settings.__experimentalCreatePrepareEditableTree ) {
-		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
-			const selectPrefix = `format_prepare_props_(${ name })_`;
-			const dispatchPrefix = `format_on_change_props_(${ name })_`;
-
-			const Component = ( props ) => {
-				const newProps = { ...props };
-				const propsByPrefix = Object.keys( props ).reduce( ( accumulator, key ) => {
-					if ( key.startsWith( selectPrefix ) ) {
-						accumulator[ key.slice( selectPrefix.length ) ] = props[ key ];
-					}
-
-					if ( key.startsWith( dispatchPrefix ) ) {
-						accumulator[ key.slice( dispatchPrefix.length ) ] = props[ key ];
-					}
-
-					return accumulator;
-				}, {} );
-				const args = {
-					richTextIdentifier: props.identifier,
-					blockClientId: props.clientId,
-				};
-
-				if ( settings.__experimentalCreateOnChangeEditableValue ) {
-					newProps[ `format_value_functions_(${ name })` ] =
-						settings.__experimentalCreatePrepareEditableTree(
-							propsByPrefix,
-							args
-						);
-					newProps[ `format_on_change_functions_(${ name })` ] =
-						settings.__experimentalCreateOnChangeEditableValue(
-							propsByPrefix,
-							args
-						);
-				} else {
-					newProps[ `format_prepare_functions_(${ name })` ] =
-						settings.__experimentalCreatePrepareEditableTree(
-							propsByPrefix,
-							args
-						);
-				}
-
-				return <OriginalComponent { ...newProps } />;
-			};
-
-			const hocs = [];
-
-			if ( settings.__experimentalGetPropsForEditableTreePreparation ) {
-				hocs.push( withSelect( ( sel, { clientId, identifier } ) =>
-					mapKeys(
-						settings.__experimentalGetPropsForEditableTreePreparation( sel, {
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						} ),
-						( value, key ) => selectPrefix + key
-					)
-				) );
-			}
-
-			if ( settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
-				hocs.push( withDispatch( ( disp, { clientId, identifier } ) =>
-					mapKeys(
-						settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						} ),
-						( value, key ) => dispatchPrefix + key
-					)
-				) );
-			}
-
-			return hocs.length ? compose( hocs )( Component ) : Component;
-		} );
-	}
 
 	return settings;
 }

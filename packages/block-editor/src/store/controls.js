@@ -22,9 +22,16 @@ export function select( storeName, selectorName, ...args ) {
 }
 
 const controls = {
-	SELECT: createRegistryControl( ( registry ) => ( { storeName, selectorName, args } ) => {
-		return registry.select( storeName )[ selectorName ]( ...args );
-	} ),
+	SELECT: createRegistryControl(
+		( registry ) => ( { storeName, selectorName, args } ) => {
+			return registry.select( storeName )[ selectorName ]( ...args );
+		}
+	),
+	SLEEP( { duration } ) {
+		return new Promise( ( resolve ) => {
+			setTimeout( resolve, duration );
+		} );
+	},
 };
 
 export default controls;

@@ -1,4 +1,3 @@
-
 function createCoreDataStore( registry ) {
 	const getCoreDataSelector = ( selectorName ) => ( reducerKey, ...args ) => {
 		return registry.select( reducerKey )[ selectorName ]( ...args );
@@ -16,10 +15,13 @@ function createCoreDataStore( registry ) {
 				'hasFinishedResolution',
 				'isResolving',
 				'getCachedResolvers',
-			].reduce( ( memo, selectorName ) => ( {
-				...memo,
-				[ selectorName ]: getCoreDataSelector( selectorName ),
-			} ), {} );
+			].reduce(
+				( memo, selectorName ) => ( {
+					...memo,
+					[ selectorName ]: getCoreDataSelector( selectorName ),
+				} ),
+				{}
+			);
 		},
 
 		getActions() {
@@ -29,10 +31,13 @@ function createCoreDataStore( registry ) {
 				'invalidateResolution',
 				'invalidateResolutionForStore',
 				'invalidateResolutionForStoreSelector',
-			].reduce( ( memo, actionName ) => ( {
-				...memo,
-				[ actionName ]: getCoreDataAction( actionName ),
-			} ), {} );
+			].reduce(
+				( memo, actionName ) => ( {
+					...memo,
+					[ actionName ]: getCoreDataAction( actionName ),
+				} ),
+				{}
+			);
 		},
 
 		subscribe() {

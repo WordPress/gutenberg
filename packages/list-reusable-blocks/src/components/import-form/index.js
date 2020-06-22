@@ -80,11 +80,7 @@ class ImportForm extends Component {
 				className="list-reusable-blocks-import-form"
 				onSubmit={ this.onSubmit }
 			>
-				{ error && (
-					<Notice status="error">
-						{ error }
-					</Notice>
-				) }
+				{ error && <Notice status="error">{ error }</Notice> }
 				<label
 					htmlFor={ inputId }
 					className="list-reusable-blocks-import-form__label"
@@ -100,7 +96,7 @@ class ImportForm extends Component {
 					type="submit"
 					isBusy={ isLoading }
 					disabled={ ! file || isLoading }
-					isDefault
+					isSecondary
 					className="list-reusable-blocks-import-form__button"
 				>
 					{ _x( 'Import', 'button label' ) }

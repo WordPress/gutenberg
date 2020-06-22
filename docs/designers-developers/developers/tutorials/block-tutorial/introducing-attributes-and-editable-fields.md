@@ -26,26 +26,25 @@ In the code snippet above, when loading the editor, the `content` value will be 
 
 Earlier examples used the `createElement` function to create DOM nodes, but it's also possible to encapsulate this behavior into "components". This abstraction helps you share common behaviors and hide complexity in self-contained units.
 
-There are a number of [components available](/docs/designers-developers/developers/packages/packages-editor.md#components) to use in implementing your blocks. You can see one such component in the code below: the [`RichText` component](/docs/designers-developers/developers/packages/packages-editor.md#richtext).
+There are a number of [components available](/docs/designers-developers/developers/packages/packages-editor.md#components) to use in implementing your blocks. You can see one such component in the code below: the [`RichText` component](/docs/designers-developers/developers/packages/packages-editor.md#richtext) is part of the `wp-editor` package.
 
 The `RichText` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc.
 
-To use the `RichText` component, add `wp-editor` to the dependency array of registered script handles when calling `wp_register_script`.
+To use the `RichText` component, and using ES5 code, remember to add `wp-editor` to the dependency array of registered script handles when calling `wp_register_script`.
 
 ```php
+// automatically load dependencies and version
+$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
+
 wp_register_script(
-	'gutenberg-examples-03',
-	plugins_url( 'block.js', __FILE__ ),
-	array(
-		'wp-blocks',
-		'wp-element',
-		'wp-editor'    // Note the addition of wp-editor to the dependencies
-	),
-	filemtime( plugin_dir_path( __FILE__ ) . 'block.js' )
+	'gutenberg-examples-03-esnext',
+	plugins_url( 'build/index.js', __FILE__ ),
+	$asset_file['dependencies'],
+	$asset_file['version']
 );
 ```
 
-Do not forget to also update the `editor_script` handle in `register_block_type` to `gutenberg-examples-03`.
+Do not forget to also update the `editor_script` handle in `register_block_type` to `gutenberg-examples-03-esnext`.
 
 Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `RichText` at all, or it may need many independent `RichText` elements, each operating on a subset of the overall block state.
 
@@ -54,6 +53,46 @@ Because `RichText` allows for nested nodes, you'll most often use it in conjunct
 Here is the complete block definition for Example 03.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+import { registerBlockType } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
+
+registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
+	title: 'Example: Editable (esnext)',
+	icon: 'universal-access-alt',
+	category: 'design',
+	attributes: {
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'p',
+		},
+	},
+	example: {
+		attributes: {
+			content: 'Hello World',
+		},
+	},
+	edit: ( props ) => {
+		const { attributes: { content }, setAttributes, className } = props;
+		const onChangeContent = ( newContent ) => {
+			setAttributes( { content: newContent } );
+		};
+		return (
+			<RichText
+				tagName="p"
+				className={ className }
+				onChange={ onChangeContent }
+				value={ content }
+			/>
+		);
+	},
+	save: ( props ) => {
+		return <RichText.Content tagName="p" value={ props.attributes.content } />;
+	},
+} );
+```
 {% ES5 %}
 ```js
 ( function( blocks, editor, element ) {
@@ -63,7 +102,7 @@ Here is the complete block definition for Example 03.
 	blocks.registerBlockType( 'gutenberg-examples/example-03-editable', {
 		title: 'Example: Editable',
 		icon: 'universal-access-alt',
-		category: 'layout',
+		category: 'design',
 
 		attributes: {
 			content: {
@@ -105,45 +144,5 @@ Here is the complete block definition for Example 03.
 	window.wp.editor,
 	window.wp.element
 ) );
-```
-{% ESNext %}
-```js
-import { registerBlockType } from '@wordpress/blocks';
-import { RichText } from '@wordpress/block-editor';
-
-registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
-	title: 'Example: Editable (esnext)',
-	icon: 'universal-access-alt',
-	category: 'layout',
-	attributes: {
-		content: {
-			type: 'array',
-			source: 'children',
-			selector: 'p',
-		},
-	},
-	example: {
-		attributes: {
-			content: 'Hello World',
-		},
-	},
-	edit: ( props ) => {
-		const { attributes: { content }, setAttributes, className } = props;
-		const onChangeContent = ( newContent ) => {
-			setAttributes( { content: newContent } );
-		};
-		return (
-			<RichText
-				tagName="p"
-				className={ className }
-				onChange={ onChangeContent }
-				value={ content }
-			/>
-		);
-	},
-	save: ( props ) => {
-		return <RichText.Content tagName="p" value={ props.attributes.content } />;
-	},
-} );
 ```
 {% end %}

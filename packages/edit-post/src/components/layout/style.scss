@@ -1,24 +1,8 @@
-.edit-post-layout,
-.edit-post-layout__content {
-	height: 100%;
+.edit-post-layout__metaboxes {
+	flex-shrink: 0;
 }
-
-.edit-post-layout {
-	position: relative;
-	box-sizing: border-box;
-
-	// Beyond the mobile breakpoint, the editor bar is fixed, so make room for it eabove the layout content.
-	@include break-small {
-		padding-top: $header-height;
-	}
-
-	// Beyond the medium breakpoint, the main scrolling area itself becomes fixed so the padding then becomes
-	// unnecessary, but until then it's still needed.
-}
-
 .edit-post-layout__metaboxes:not(:empty) {
 	border-top: $border-width solid $light-gray-500;
-	margin-top: 10px;
 	padding: 10px 0 10px;
 	clear: both;
 
@@ -28,122 +12,14 @@
 }
 
 // Adjust the position of the notices
-.edit-post-layout__content .components-editor-notices__snackbar {
+.edit-post-layout .components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
-	bottom: 20px;
+	bottom: 40px;
 	padding-left: 16px;
 	padding-right: 16px;
 }
-@include editor-left(".edit-post-layout__content .components-editor-notices__snackbar");
-
-.edit-post-layout__content {
-	display: flex;
-	flex-direction: column;
-
-	// These rules are specific to mobile and small breakpoints.
-	min-height: 100%;
-	position: relative;
-
-	// We scroll the main editing canvas, the sidebar, and the block library separately to prevent scroll bleed.
-	// Because the navigation sidebar menu has "flyout" menus, we can't yet, scroll that independently, but as soon
-	// as we can, we should simplify these rules.
-	// In the mean time, if a user has a small screen and lots of plugin-added menu items in the navigation menu,
-	// they have to be able to scroll. To accommodate the flyout menus, we scroll the `body` element for this.
-	@include break-medium() {
-		// Because the body element scrolls the navigation sidebar, we have to use position fixed here.
-		// Otherwise you would scroll the editing canvas out of view when you scroll the sidebar.
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-
-		// Because this is scoped to break-medium and larger, the admin-bar is always this height.
-		top: $header-height + $admin-bar-height;
-
-		// Sadly, `position: fixed;` do not inherit boundaries from a relative parent. Due to that we have to compensate using `calc`.
-		min-height: calc(100% - #{ $header-height + $admin-bar-height });
-		height: auto; // This overrides the 100% height the element inherits from line 3.
-
-		// In this matrix, we compensate for any configurations for the presence and width of the navigation sidebar.
-		// This is similar to the code in the @editor-left mixin, but uses margins instead.
-		// Because we are beyond the medium breakpoint, we only have to worry about folded, auto-folded, and default.
-		margin-left: $admin-sidebar-width;
-
-		// Auto fold is when on smaller breakpoints, nav menu auto colllapses.
-		body.auto-fold & {
-			margin-left: $admin-sidebar-width-collapsed;
-
-			@include break-large() {
-				margin-left: $admin-sidebar-width;
-			}
-		}
-
-		// Sidebar manually collapsed.
-		body.folded & {
-			margin-left: $admin-sidebar-width-collapsed;
-		}
-
-		// Provide special rules for fullscreen mode.
-		body.is-fullscreen-mode & {
-			margin-left: 0 !important;
-			top: $header-height;
-		}
-	}
-
-	// For users with the Top Toolbar option enabled, special rules apply to the height of the content area.
-	.has-fixed-toolbar & {
-		// From the medium breakpoint it sits below the editor bar.
-		@include break-medium() {
-			top: $header-height + $admin-bar-height + $block-controls-height;
-		}
-
-		// From the xlarge breakpoint it sits in the editor bar.
-		@include break-xlarge() {
-			top: $header-height + $admin-bar-height;
-		}
-	}
-
-	// Pad the scroll box so content on the bottom can be scrolled up.
-	padding-bottom: 50vh;
-	@include break-small {
-		padding-bottom: 0;
-	}
-
-	// On mobile the main content (html or body) area has to scroll.
-	// If, like we do on the desktop, scroll an element (.edit-post-layout__content) you can invoke
-	// the overscroll bounce on the non-scrolling container, causing for a frustrating scrolling experience.
-	// The following rule enables this scrolling beyond the mobile breakpoint, because on the desktop
-	// breakpoints scrolling an isolated element helps avoid scroll bleed.
-	@include break-small() {
-		overflow-y: auto;
-	}
-	-webkit-overflow-scrolling: touch;
-
-	// This rule ensures that if you've scrolled to the end of a container,
-	// then pause, then keep scrolling downwards, the browser doesn't try to scroll
-	// the parent element, usually invoking a "bounce" effect and then preventing you
-	// from scrolling upwards until you pause again.
-	// This is only necessary beyond the small breakpoint because that's when the scroll container changes.
-	@include break-small() {
-		overscroll-behavior-y: none;
-	}
-
-	.edit-post-visual-editor {
-		flex: 1 1 auto;
-
-		// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.
-		// But it works as expected without it.
-		// The flex-basis is needed for the other browsers to make sure the content area is full-height.
-		@supports (position: sticky) {
-			flex-basis: 100%;
-		}
-	}
-
-	.edit-post-layout__metaboxes {
-		flex-shrink: 0;
-	}
-}
+@include editor-left(".edit-post-layout .components-editor-notices__snackbar");
 
 .edit-post-layout .editor-post-publish-panel {
 	position: fixed;
@@ -155,7 +31,7 @@
 	overflow: auto;
 
 	@include break-medium() {
-		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel-break-medium");
+		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
@@ -181,56 +57,82 @@
 	}
 }
 
-.edit-post-layout .editor-post-publish-panel__header-publish-button {
-	// Match the size of the Publish... button.
-	.components-button.is-large {
-		height: 33px;
-		line-height: 32px;
-	}
-
-	// Size the spacer flexibly to allow for different button lengths.
-	.editor-post-publish-panel__spacer {
-		display: inline-flex;
-		flex: 0 1 52px; // This number is approximative to keep the publish button at the same position when opening the panel
-	}
+.interface-interface-skeleton__sidebar > div {
+	height: 100%;
 }
 
-.edit-post-toggle-publish-panel {
-	position: fixed;
+.edit-post-layout .editor-post-publish-panel__header-publish-button {
+	justify-content: center;
+}
+
+
+.edit-post-layout__toggle-publish-panel,
+.edit-post-layout__toogle-sidebar-panel,
+.edit-post-layout__toggle-entities-saved-states-panel {
+	z-index: z-index(".edit-post-layout__toogle-sidebar-panel");
+	position: fixed !important; // Need to override the default relative positionning
 	top: -9999em;
 	bottom: auto;
 	left: auto;
 	right: 0;
-	z-index: z-index(".edit-post-toggle-publish-panel");
-	padding: 10px 10px 10px 0;
 	width: $sidebar-width;
 	background-color: $white;
+	border: 1px dotted $light-gray-500;
+	height: auto !important; // Need to override the default sidebar positionnings
+	padding: $grid-unit-30;
+	display: flex;
+	justify-content: center;
 
-	&:focus {
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within &,
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within & {
 		top: auto;
 		bottom: 0;
 	}
+}
 
-	.edit-post-toggle-publish-panel__button {
-		width: auto;
-		height: auto;
-		display: block;
-		font-size: 14px;
-		font-weight: 600;
-		margin: 0 0 0 auto;
-		padding: 15px 23px 14px;
-		line-height: normal;
-		text-decoration: none;
-		outline: none;
-		background: #f1f1f1;
-		color: theme(secondary);
+.edit-post-layout__footer {
+	display: none;
+	z-index: z-index(".edit-post-layout__footer");
 
-		&:focus {
-			position: fixed;
-			top: auto;
-			right: 10px;
-			bottom: 10px;
-			left: auto;
-		}
+	// Stretch to mimic outline padding on desktop.
+	@include break-medium() {
+		display: flex;
+		background: $white;
+		height: $footer-height;
+		align-items: center;
+		font-size: $default-font-size;
+		padding: 0 ($grid-unit-15 + 6px);
+	}
+}
+
+.edit-post-layout .interface-interface-skeleton__content {
+	background-color: $light-gray-700;
+}
+
+.edit-post-layout__inserter-panel {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.edit-post-layout__inserter-panel-header {
+	padding-top: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	display: flex;
+	justify-content: flex-end;
+
+	@include break-medium() {
+		display: none;
+	}
+}
+
+.edit-post-layout__inserter-panel-content {
+	// Leave space for the close button
+	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+
+	@include break-medium() {
+		height: 100%;
 	}
 }

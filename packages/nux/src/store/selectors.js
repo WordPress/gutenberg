@@ -7,7 +7,7 @@ import { includes, difference, keys, has } from 'lodash';
 /**
  * An object containing information about a guide.
  *
- * @typedef {Object} NUX.GuideInfo
+ * @typedef {Object} NUXGuideInfo
  * @property {string[]} tipIds       Which tips the guide contains.
  * @property {?string}  currentTipId The guide's currently showing tip.
  * @property {?string}  nextTipId    The guide's next tip to show.
@@ -20,24 +20,27 @@ import { includes, difference, keys, has } from 'lodash';
  * @param {Object} state Global application state.
  * @param {string} tipId The tip to query.
  *
- * @return {?NUX.GuideInfo} Information about the associated guide.
+ * @return {?NUXGuideInfo} Information about the associated guide.
  */
 export const getAssociatedGuide = createSelector(
 	( state, tipId ) => {
 		for ( const tipIds of state.guides ) {
 			if ( includes( tipIds, tipId ) ) {
-				const nonDismissedTips = difference( tipIds, keys( state.preferences.dismissedTips ) );
-				const [ currentTipId = null, nextTipId = null ] = nonDismissedTips;
+				const nonDismissedTips = difference(
+					tipIds,
+					keys( state.preferences.dismissedTips )
+				);
+				const [
+					currentTipId = null,
+					nextTipId = null,
+				] = nonDismissedTips;
 				return { tipIds, currentTipId, nextTipId };
 			}
 		}
 
 		return null;
 	},
-	( state ) => [
-		state.guides,
-		state.preferences.dismissedTips,
-	],
+	( state ) => [ state.guides, state.preferences.dismissedTips ]
 );
 
 /**

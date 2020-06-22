@@ -15,7 +15,9 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 				onChange={ ( value ) => onUpdateExcerpt( value ) }
 				value={ excerpt }
 			/>
-			<ExternalLink href={ __( 'https://wordpress.org/support/article/excerpt/' ) }>
+			<ExternalLink
+				href={ __( 'https://wordpress.org/support/article/excerpt/' ) }
+			>
 				{ __( 'Learn more about manual excerpts' ) }
 			</ExternalLink>
 		</div>
@@ -25,7 +27,9 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			excerpt: select( 'core/editor' ).getEditedPostAttribute( 'excerpt' ),
+			excerpt: select( 'core/editor' ).getEditedPostAttribute(
+				'excerpt'
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

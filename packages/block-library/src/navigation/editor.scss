@@ -1,0 +1,158 @@
+$navigation-height: 60px;
+$navigation-item-height: 46px;
+
+// Undo default editor styles.
+.editor-styles-wrapper .wp-block-navigation ul,
+.editor-styles-wrapper .wp-block-navigation ol {
+	margin-bottom: 0;
+	margin-left: 0;
+	padding-left: 0;
+}
+
+.editor-styles-wrapper .wp-block-navigation .block-editor-block-list__block {
+	margin: 0;
+}
+
+// Polish the Appender.
+.wp-block-navigation .block-list-appender {
+	margin: 0;
+	display: flex;
+	align-items: center;
+}
+
+.wp-block-navigation.is-vertical .block-list-appender {
+	margin: $grid-unit-10;
+}
+
+.wp-block-navigation__inserter-content {
+	padding: $grid-unit-20;
+}
+
+// Ensure sub-menus stay open and visible when a nested block is selected.
+.wp-block-navigation__container.is-parent-of-selected-block {
+	visibility: visible;
+	opacity: 1;
+}
+
+// Styles for submenu flyout
+.has-child {
+	// Only show the flyout when the parent menu item is selected.
+	// Do not show it on hover.
+	&,
+	&:hover {
+		> .wp-block-navigation__container {
+			opacity: 0;
+			visibility: hidden;
+		}
+	}
+
+	&.is-selected,
+	&.has-child-selected {
+		> .wp-block-navigation__container {
+			opacity: 1;
+			visibility: visible;
+		}
+	}
+
+	// Adjust the appender margin to match other menu items
+	.wp-block-navigation__container {
+		.block-list-appender .block-editor-button-block-appender {
+			margin-left: $grid-unit-10 * 2;
+		}
+	}
+}
+
+/**
+ * Colors Selector component
+ */
+$colors-selector-size: 22px;
+.block-library-colors-selector {
+	width: auto;
+
+	// Toolbar colors-selector button.
+	.block-library-colors-selector__toggle {
+		display: block;
+		margin: 0 auto;
+		padding: 3px;
+		width: auto;
+	}
+
+	// Button container.
+	.block-library-colors-selector__icon-container {
+		height: 30px;
+		position: relative;
+		margin: 0 auto;
+		padding: 3px;
+		display: flex;
+		align-items: center;
+		border-radius: 4px;
+	}
+
+	.block-library-colors-selector__state-selection {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	// colors-selector - selection status.
+	.block-library-colors-selector__state-selection {
+		border-radius: $colors-selector-size / 2;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+
+		width: $colors-selector-size;
+		min-width: $colors-selector-size;
+		height: $colors-selector-size;
+		min-height: $colors-selector-size;
+		line-height: ($colors-selector-size - 2);
+		padding: 2px;
+
+		// Styling icon color.
+		&.has-text-color {
+			> svg,
+			> svg path {
+				color: inherit;
+			}
+		}
+	}
+}
+
+// Colors Selector Popover.
+$color-control-label-height: 20px;
+.block-library-colors-selector__popover {
+	.color-palette-controller-container {
+		padding: 16px;
+	}
+
+	.components-base-control__label {
+		height: $color-control-label-height;
+		line-height: $color-control-label-height;
+	}
+
+	.component-color-indicator {
+		float: right;
+		margin-top: 2px;
+	}
+
+	.components-panel__body-title {
+		display: none;
+	}
+}
+
+// IE fix for submenu visibility on parent focus
+
+.is-editing > .wp-block-navigation__container {
+	visibility: visible;
+	opacity: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+// Dark style appender.
+.wp-block-navigation.is-style-dark {
+	.block-editor-button-block-appender.block-list-appender__toggle {
+		color: #fff;
+	}
+	.block-editor-button-block-appender.block-list-appender__toggle > svg {
+		color: #000;
+		background-color: #fff;
+	}
+}

@@ -52,14 +52,46 @@ describe( 'changeListType', () => {
 		const text = `a${ LINE_SEPARATOR }1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }i${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4${ LINE_SEPARATOR }b`;
 
 		const record = {
-			replacements: [ , [ ul ], , [ ul ], , [ ul, ul ], , [ ul ], , [ ul ], , , , [ ul ], , ],
+			replacements: [
+				,
+				[ ul ],
+				,
+				[ ul ],
+				,
+				[ ul, ul ],
+				,
+				[ ul ],
+				,
+				[ ul ],
+				,
+				,
+				,
+				[ ul ],
+				,
+			],
 			text,
 			start: 4,
 			end: 9,
 		};
 		const expected = {
 			...record,
-			replacements: [ , [ ol ], , [ ol ], , [ ol, ul ], , [ ol ], , [ ol ], , , , [ ul ], , ],
+			replacements: [
+				,
+				[ ol ],
+				,
+				[ ol ],
+				,
+				[ ol, ul ],
+				,
+				[ ol ],
+				,
+				[ ol ],
+				,
+				,
+				,
+				[ ul ],
+				,
+			],
 		};
 		const result = changeListType( deepFreeze( record ), ol );
 

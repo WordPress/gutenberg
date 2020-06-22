@@ -10,7 +10,9 @@ import IsolatedEventContainer from '../';
 
 describe( 'IsolatedEventContainer', () => {
 	it( 'should pass props to container', () => {
-		const isolated = shallow( <IsolatedEventContainer className="test" onClick="click" /> );
+		const isolated = shallow(
+			<IsolatedEventContainer className="test" onClick="click" />
+		);
 
 		expect( isolated.hasClass( 'test' ) ).toBe( true );
 		expect( isolated.prop( 'onClick' ) ).toBe( 'click' );

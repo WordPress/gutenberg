@@ -31,7 +31,11 @@ class ReusableBlockEditPanel extends Component {
 			this.titleField.current.select();
 		}
 		// Move focus back to the Edit button after pressing the Escape key or Save.
-		if ( ( prevProps.isEditing || prevProps.isSaving ) && ! this.props.isEditing && ! this.props.isSaving ) {
+		if (
+			( prevProps.isEditing || prevProps.isSaving ) &&
+			! this.props.isEditing &&
+			! this.props.isSaving
+		) {
 			this.editButton.current.focus();
 		}
 	}
@@ -53,18 +57,25 @@ class ReusableBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, isEditDisabled, onEdit, instanceId } = this.props;
+		const {
+			isEditing,
+			title,
+			isSaving,
+			isEditDisabled,
+			onEdit,
+			instanceId,
+		} = this.props;
 
 		return (
 			<>
-				{ ( ! isEditing && ! isSaving ) && (
+				{ ! isEditing && ! isSaving && (
 					<div className="reusable-block-edit-panel">
 						<b className="reusable-block-edit-panel__info">
 							{ title }
 						</b>
 						<Button
 							ref={ this.editButton }
-							isLarge
+							isSecondary
 							className="reusable-block-edit-panel__button"
 							disabled={ isEditDisabled }
 							onClick={ onEdit }
@@ -74,7 +85,10 @@ class ReusableBlockEditPanel extends Component {
 					</div>
 				) }
 				{ ( isEditing || isSaving ) && (
-					<form className="reusable-block-edit-panel" onSubmit={ this.handleFormSubmit }>
+					<form
+						className="reusable-block-edit-panel"
+						onSubmit={ this.handleFormSubmit }
+					>
 						<label
 							htmlFor={ `reusable-block-edit-panel__title-${ instanceId }` }
 							className="reusable-block-edit-panel__label"
@@ -93,7 +107,7 @@ class ReusableBlockEditPanel extends Component {
 						/>
 						<Button
 							type="submit"
-							isLarge
+							isSecondary
 							isBusy={ isSaving }
 							disabled={ ! title || isSaving }
 							className="reusable-block-edit-panel__button"

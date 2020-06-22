@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, has } from 'lodash';
+import { has } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,15 +38,16 @@ export function addAttribute( settings ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
-		// Use Lodash's assign to gracefully handle if attributes are undefined
-		settings.attributes = assign( settings.attributes, {
+		// Gracefully handle if settings.attributes is undefined.
+		settings.attributes = {
+			...settings.attributes,
 			anchor: {
 				type: 'string',
 				source: 'attribute',
 				attribute: 'id',
 				selector: '*',
 			},
-		} );
+		};
 	}
 
 	return settings;
@@ -56,46 +57,59 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include a new block inspector control for
  * assigning the anchor ID, if block supports anchor.
  *
- * @param {Function|Component} BlockEdit Original component.
+ * @param {WPComponent} BlockEdit Original component.
  *
- * @return {string} Wrapped component.
+ * @return {WPComponent} Wrapped component.
  */
-export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
-		const hasAnchor = hasBlockSupport( props.name, 'anchor' );
+export const withInspectorControl = createHigherOrderComponent(
+	( BlockEdit ) => {
+		return ( props ) => {
+			const hasAnchor = hasBlockSupport( props.name, 'anchor' );
 
-		if ( hasAnchor && props.isSelected ) {
-			return (
-				<>
-					<BlockEdit { ...props } />
-					<InspectorAdvancedControls>
-						<TextControl
-							className="html-anchor-control"
-							label={ __( 'HTML Anchor' ) }
-							help={ (
-								<>
-									{ __( 'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.' ) }
+			if ( hasAnchor && props.isSelected ) {
+				return (
+					<>
+						<BlockEdit { ...props } />
+						<InspectorAdvancedControls>
+							<TextControl
+								className="html-anchor-control"
+								label={ __( 'HTML anchor' ) }
+								help={
+									<>
+										{ __(
+											'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
+										) }
 
-									<ExternalLink href={ 'https://wordpress.org/support/article/page-jumps/' }>
-										{ __( 'Learn more about anchors' ) }
-									</ExternalLink>
-								</>
-							) }
-							value={ props.attributes.anchor || '' }
-							onChange={ ( nextValue ) => {
-								nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-								props.setAttributes( {
-									anchor: nextValue,
-								} );
-							} } />
-					</InspectorAdvancedControls>
-				</>
-			);
-		}
+										<ExternalLink
+											href={
+												'https://wordpress.org/support/article/page-jumps/'
+											}
+										>
+											{ __( 'Learn more about anchors' ) }
+										</ExternalLink>
+									</>
+								}
+								value={ props.attributes.anchor || '' }
+								onChange={ ( nextValue ) => {
+									nextValue = nextValue.replace(
+										ANCHOR_REGEX,
+										'-'
+									);
+									props.setAttributes( {
+										anchor: nextValue,
+									} );
+								} }
+							/>
+						</InspectorAdvancedControls>
+					</>
+				);
+			}
 
-		return <BlockEdit { ...props } />;
-	};
-}, 'withInspectorControl' );
+			return <BlockEdit { ...props } />;
+		};
+	},
+	'withInspectorControl'
+);
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -117,5 +131,13 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
-addFilter( 'editor.BlockEdit', 'core/editor/anchor/with-inspector-control', withInspectorControl );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/anchor/save-props', addSaveProps );
+addFilter(
+	'editor.BlockEdit',
+	'core/editor/anchor/with-inspector-control',
+	withInspectorControl
+);
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/anchor/save-props',
+	addSaveProps
+);

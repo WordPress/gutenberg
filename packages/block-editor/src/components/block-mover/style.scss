@@ -1,92 +1,118 @@
 .block-editor-block-mover {
-
-	@include break-small() {
-		min-height: $empty-paragraph-height;
-		opacity: 0;
-		background: $white;
-		border: 1px solid $dark-opacity-light-800;
-		border-radius: $radius-round-rectangle;
-		transition: box-shadow 0.2s ease-out;
-		@include reduce-motion("transition");
-
-		&.is-visible {
-			@include edit-post__fade-in-animation;
-		}
-
-		&:hover {
-			box-shadow: $shadow-toolbar;
-		}
-
-		// 24px is the smallest size of a good pressable button.
-		// With 3 pieces of side UI, that comes to a total of 72px.
-		// To vertically center against a 56px paragraph, move upwards 72px - 56px / 2.
-		// Don't do this for wide, fullwide, or mobile.
-		.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) & {
-			margin-top: -$grid-size;
-		}
-	}
+	display: inline-flex;
+	flex-direction: row;
 }
 
-// Mover icon buttons.
-.block-editor-block-mover__control {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	padding: 0;
-	border: none;
-	box-shadow: none;
-
-	// Carefully adjust the size of the side UI to fit one paragraph of text (56px).
-	width: $block-side-ui-width;
-	height: $icon-button-size-small;
-
-	svg {
-		width: $block-side-ui-width;
-		height: $icon-button-size-small;
-		padding: #{ ($block-side-ui-width - $icon-button-size-small) / 2 } #{ ($block-side-ui-width - 18px) / 2 }; // This makes the SVG fill the whole available area, without scaling the artwork.
-	}
-
-	&[aria-disabled="true"] {
-		cursor: default;
-		pointer-events: none;
-		color: $dark-opacity-300;
-	}
-
-	@include break-small() {
-		color: $dark-opacity-300;
-
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
-			background-color: transparent;
-			box-shadow: none;
-		}
-
-		&:focus:not(:disabled) {
-			background-color: transparent;
-		}
-	}
-
-}
-
-.block-editor-block-mover__control-drag-handle {
-	cursor: move; // Fallback for IE/Edge < 14
-	cursor: grab;
-	fill: currentColor;
-
-	&,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):focus {
-		box-shadow: none;
-		background: none;
-		color: $dark-opacity-500;
-	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
-		cursor: grabbing;
-	}
-}
-
-.block-editor-block-mover__description {
+.block-editor-block-mover-button__description {
 	display: none;
+}
+
+.block-editor-block-mover-button.has-icon {
+	padding: 0;
+}
+
+// Show the mover in a single button under the contextual toolbar.
+.block-editor-block-mover {
+	.components-toolbar-group,
+	.components-toolbar {
+		flex-direction: column;
+		flex: 1;
+	}
+
+	&.is-horizontal .components-toolbar-group,
+	&.is-horizontal .components-toolbar {
+		flex-direction: row;
+	}
+
+	.block-editor-block-mover-button {
+		height: $block-toolbar-height/2;
+		width: $block-toolbar-height;
+		padding: 0 !important;
+
+		// Focus style.
+		// Overrides .components-toolbar-group styles
+		&::before {
+			left: $grid-unit-10 !important;
+			right: $grid-unit-10 !important;
+		}
+	}
+
+	// Position the icons correctly.
+	.components-toolbar-group .block-editor-block-mover-button.is-up-button,
+	.components-toolbar .block-editor-block-mover-button.is-up-button {
+		svg {
+			margin-bottom: -$grid-unit-10;
+		}
+
+		// Focus style.
+		&::before {
+			bottom: 0;
+			height: calc(100% - #{ $grid-unit-10 });
+		}
+	}
+
+	.components-toolbar-group .block-editor-block-mover-button.is-down-button,
+	.components-toolbar .block-editor-block-mover-button.is-down-button {
+		svg {
+			margin-top: -$grid-unit-10;
+		}
+
+		// Focus style.
+		&::before {
+			top: 0;
+			height: calc(100% - #{ $grid-unit-10 });
+		}
+	}
+
+	// Mover is horizontal.
+	&.is-horizontal {
+		.block-editor-block-mover-button.has-icon {
+			height: $block-toolbar-height;
+			// Overrides .components-toolbar-group styles
+			width: $block-toolbar-height / 2;
+			min-width: $grid-unit-30;
+			padding-left: 0;
+			padding-right: 0;
+
+			// Focus style.
+			&::before {
+				top: $grid-unit-10;
+				bottom: $grid-unit-10;
+				min-width: 0;
+				width: auto;
+				height: auto;
+			}
+		}
+
+		// Position the icons correctly.
+		.block-editor-block-mover-button.is-up-button.has-icon {
+			svg {
+				margin-left: 0;
+				margin-right: -$grid-unit-10;
+				margin-bottom: 0;
+			}
+
+			// Focus style.
+			// Overrides .components-toolbar-group styles
+			&::before {
+				left: $grid-unit-10 !important;
+				right: 0 !important;
+			}
+		}
+
+		.block-editor-block-mover-button.is-down-button.has-icon {
+			svg {
+				margin-left: -$grid-unit-10;
+				margin-right: 0;
+				margin-top: 0;
+			}
+
+			// Focus style.
+			// Overrides .components-toolbar-group styles
+			&::before {
+				left: 0 !important;
+				right: $grid-unit-10 !important;
+			}
+		}
+	}
 }

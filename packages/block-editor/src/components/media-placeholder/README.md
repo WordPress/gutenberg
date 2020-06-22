@@ -7,12 +7,12 @@ MediaPlaceholder
 
 An example usage which sets the URL of the selected image to `theImage` attributes.
 
-```
-const { MediaPlaceholder } = wp.editor;
+```js
+import { MediaPlaceholder } from '@wordpress/block-editor';
 
 ...
 
-	edit: ( { attributes, setAttributes } ) {
+	edit: ( { attributes, setAttributes } ) => {
 		const mediaPlaceholder = <MediaPlaceholder
 			onSelect = {
 				( el ) => {
@@ -140,6 +140,15 @@ Callback called when an upload error happens.
 - Required: No
 - Platform: Web
 
+### onFilesPreUpload
+Callback called before to start to upload the files.
+It receives an array with the files to upload before to the final process. It means that it's possible these files couldn't be uploaded.    
+
+- Type: `Function`
+- Required: No
+- Default: `Function` noop
+- Platform: Web
+
 ### onSelect
 
 Callback called when the files are selected/uploaded.
@@ -155,9 +164,17 @@ The argument of the callback is an object containing the following properties:
 
 ### value
 
-Media ID (or media IDs if multiple is true) to be selected by default when opening the media library.
+An object or an array of objects that contain media ID (`id` property) to be selected by default when opening the media library.
 
-- Type: `Number|Array`
+- Type: `Object|Array`
+- Required: No
+- Platform: Web
+
+### onSelectURL
+
+Callback called when urls can be configured. No media insertion from url will be available if not set.
+
+- Type: `Function`
 - Required: No
 - Platform: Web
 

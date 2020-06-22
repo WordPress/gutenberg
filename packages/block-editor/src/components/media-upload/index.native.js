@@ -3,9 +3,9 @@
  */
 import React from 'react';
 import {
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
+	getOtherMediaOptions,
+	requestMediaPicker,
+	mediaSources,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -13,45 +13,108 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
+import { capturePhoto, captureVideo, image, wordpress } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
-
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA = 'take_media';
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
+const cameraImageSource = {
+	id: mediaSources.deviceCamera, // ID is the value sent to native
+	value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
+	label: __( 'Take a Photo' ),
+	types: [ MEDIA_TYPE_IMAGE ],
+	icon: capturePhoto,
+};
+
+const cameraVideoSource = {
+	id: mediaSources.deviceCamera,
+	value: mediaSources.deviceCamera,
+	label: __( 'Take a Video' ),
+	types: [ MEDIA_TYPE_VIDEO ],
+	icon: captureVideo,
+};
+
+const deviceLibrarySource = {
+	id: mediaSources.deviceLibrary,
+	value: mediaSources.deviceLibrary,
+	label: __( 'Choose from device' ),
+	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+	icon: image,
+};
+
+const siteLibrarySource = {
+	id: mediaSources.siteMediaLibrary,
+	value: mediaSources.siteMediaLibrary,
+	label: __( 'WordPress Media Library' ),
+	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+	icon: wordpress,
+	mediaLibrary: true,
+};
+
+const internalSources = [
+	deviceLibrarySource,
+	cameraImageSource,
+	cameraVideoSource,
+	siteLibrarySource,
+];
+
 export class MediaUpload extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
-		this.onPickerChange = this.onPickerChange.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
+		this.getAllSources = this.getAllSources.bind( this );
+
+		this.state = {
+			otherMediaOptions: [],
+		};
 	}
-	getTakeMediaLabel() {
+
+	componentDidMount() {
 		const { allowedTypes = [] } = this.props;
+		getOtherMediaOptions( allowedTypes, ( otherMediaOptions ) => {
+			const otherMediaOptionsWithIcons = otherMediaOptions.map(
+				( option ) => {
+					return {
+						...option,
+						types: allowedTypes,
+						id: option.value,
+					};
+				}
+			);
 
-		const isOneType = allowedTypes.length === 1;
-		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
-		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+			this.setState( { otherMediaOptions: otherMediaOptionsWithIcons } );
+		} );
+	}
 
-		if ( isImage ) {
-			return OPTION_TAKE_PHOTO;
-		} else if ( isVideo ) {
-			return OPTION_TAKE_VIDEO;
-		} return OPTION_TAKE_PHOTO_OR_VIDEO;
+	getAllSources() {
+		return internalSources.concat( this.state.otherMediaOptions );
 	}
 
 	getMediaOptionsItems() {
-		return [
-			{ icon: this.getChooseFromDeviceIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
-			{ icon: this.getTakeMediaIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, label: this.getTakeMediaLabel() },
-			{ icon: this.getWordPressLibraryIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
-		];
+		const {
+			allowedTypes = [],
+			__experimentalOnlyMediaLibrary,
+		} = this.props;
+
+		return this.getAllSources()
+			.filter( ( source ) => {
+				return __experimentalOnlyMediaLibrary
+					? source.mediaLibrary
+					: allowedTypes.some( ( allowedType ) =>
+							source.types.includes( allowedType )
+					  );
+			} )
+			.map( ( source ) => {
+				return {
+					...source,
+					icon: source.icon || this.getChooseFromDeviceIcon(),
+				};
+			} );
 	}
 
 	getChooseFromDeviceIcon() {
@@ -68,52 +131,42 @@ export class MediaUpload extends React.Component {
 		}
 	}
 
-	getTakeMediaIcon() {
-		return 'camera';
-	}
-
-	getWordPressLibraryIcon() {
-		return 'wordpress-alt';
-	}
-
 	onPickerPresent() {
 		if ( this.picker ) {
 			this.picker.presentPicker();
 		}
 	}
 
-	onPickerSelect( requestFunction ) {
+	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		requestFunction( allowedTypes, multiple, ( media ) => {
-			if ( ( multiple && media ) || media.id ) {
+		const mediaSource = this.getAllSources()
+			.filter( ( source ) => source.value === value )
+			.shift();
+		const types = allowedTypes.filter( ( type ) =>
+			mediaSource.types.includes( type )
+		);
+
+		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
+			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );
 			}
 		} );
 	}
 
-	onPickerChange( value ) {
-		if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
-			this.onPickerSelect( requestMediaPickFromDeviceLibrary );
-		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA ) {
-			this.onPickerSelect( requestMediaPickFromDeviceCamera );
-		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
-			this.onPickerSelect( requestMediaPickFromMediaLibrary );
-		}
-	}
-
 	render() {
-		const mediaOptions = this.getMediaOptionsItems();
-
 		const getMediaOptions = () => (
 			<Picker
-				hideCancelButton={ true }
-				ref={ ( instance ) => this.picker = instance }
-				options={ mediaOptions }
-				onChange={ this.onPickerChange }
+				hideCancelButton
+				ref={ ( instance ) => ( this.picker = instance ) }
+				options={ this.getMediaOptionsItems() }
+				onChange={ this.onPickerSelect }
 			/>
 		);
 
-		return this.props.render( { open: this.onPickerPresent, getMediaOptions } );
+		return this.props.render( {
+			open: this.onPickerPresent,
+			getMediaOptions,
+		} );
 	}
 }
 

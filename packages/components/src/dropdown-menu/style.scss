@@ -1,49 +1,9 @@
-.components-dropdown-menu {
-	padding: 3px;
-	display: flex;
-
-	.components-dropdown-menu__toggle {
-		width: auto;
-		margin: 0;
-		padding: 4px;
-		border: $border-width solid transparent;
-		display: flex;
-		flex-direction: row;
-
-		&.is-active,
-		&.is-active:hover {
-			box-shadow: none;
-			background-color: $dark-gray-500;
-			color: $white;
-		}
-
-		&:focus::before {
-			top: -3px;
-			right: -3px;
-			bottom: -3px;
-			left: -3px;
-		}
-
-		&:hover,
-		&:focus,
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
-			@include formatting-button-style__hover();
-		}
-
-		// Add a dropdown arrow indicator.
-		.components-dropdown-menu__indicator::after {
-			@include dropdown-arrow();
-		}
-	}
-}
-
 .components-dropdown-menu__popover .components-popover__content {
 	width: 200px;
 }
 
 .components-dropdown-menu__menu {
 	width: 100%;
-	padding: ($grid-size - $border-width) 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
@@ -54,7 +14,7 @@
 		padding: 6px;
 		outline: none;
 		cursor: pointer;
-		margin-bottom: $grid-size-small;
+		margin-bottom: $grid-unit-05;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -74,46 +34,61 @@
 			height: 1px;
 		}
 
-		// Plain menu styles.
-		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
-			@include menu-style__focus();
-		}
-
-		&:hover,
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
-			@include menu-style__hover();
+		&.is-active svg {
+			// Block UI appearance.
+			color: $white;
+			background: $dark-gray-primary;
+			box-shadow: 0 0 0 $border-width $dark-gray-primary;
+			border-radius: $border-width;
 		}
 
 		// Formatting buttons
 		> svg {
-			border-radius: $radius-round-rectangle;
-
-			// This assumes 20x20px dashicons.
-			padding: 2px;
-			width: $icon-button-size-small;
-			height: $icon-button-size-small;
-			margin: -1px $grid-size -1px 0;
+			border-radius: $radius-block-ui;
+			width: $button-size-small;
+			height: $button-size-small;
 		}
-
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active > svg {
-			@include formatting-button-style__active();
-		}
-	}
-
-	.components-menu-group:not(:last-child) {
-		border-bottom: $border-width solid $light-gray-500;
 	}
 
 	.components-menu-item__button,
-	.components-menu-item__button.components-icon-button {
-		padding-left: 2rem;
+	.components-menu-item__button.components-button {
+		min-height: $button-size;
+		height: auto;
+		padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
+		text-align: left;
 
 		&.has-icon {
-			padding-left: 0.5rem;
-		}
-
-		.dashicon {
-			margin-right: 4px;
+			padding-left: $grid-unit-10;
 		}
 	}
+
+	.components-menu-group {
+		padding: $grid-unit-15;
+		margin-top: 0;
+		margin-bottom: 0;
+		margin-left: -$grid-unit-15;
+		margin-right: -$grid-unit-15;
+
+		&:first-child {
+			margin-top: -$grid-unit-15;
+		}
+
+		&:last-child {
+			margin-bottom: -$grid-unit-15;
+		}
+	}
+
+	.components-menu-group + .components-menu-group {
+		margin-top: 0;
+		border-top: $border-width solid $light-gray-secondary;
+		padding: $grid-unit-15;
+
+		.is-alternate & {
+			border-color: $dark-gray-primary;
+		}
+	}
+}
+
+.components-dropdown-menu__menu.no-icons  .components-menu-item__button.components-button {
+	padding: 0 $grid-unit-15;
 }

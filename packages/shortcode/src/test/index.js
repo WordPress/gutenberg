@@ -11,7 +11,10 @@ describe( 'shortcode', () => {
 		} );
 
 		it( 'should find the shortcode with attributes', () => {
-			const result = next( 'foo', 'this has the [foo param="foo"] shortcode' );
+			const result = next(
+				'foo',
+				'this has the [foo param="foo"] shortcode'
+			);
 			expect( result.index ).toBe( 13 );
 		} );
 
@@ -21,7 +24,10 @@ describe( 'shortcode', () => {
 		} );
 
 		it( 'should not find shortcodes with attributes that are not there', () => {
-			const result = next( 'bar', 'this has the [foo param="bar"] shortcode' );
+			const result = next(
+				'bar',
+				'this has the [foo param="bar"] shortcode'
+			);
 			expect( result ).toBe( undefined );
 		} );
 
@@ -37,7 +43,11 @@ describe( 'shortcode', () => {
 		} );
 
 		it( 'should find the second instances of the shortcode when the starting indice is after the start of the first one', () => {
-			const result = next( 'foo', 'this has the [foo] shortcode [foo] twice', 14 );
+			const result = next(
+				'foo',
+				'this has the [foo] shortcode [foo] twice',
+				14
+			);
 			expect( result.index ).toBe( 29 );
 		} );
 
@@ -47,7 +57,10 @@ describe( 'shortcode', () => {
 		} );
 
 		it( 'should not find escaped shortcodes with attributes', () => {
-			const result = next( 'foo', 'this has the [[foo param="foo"]] shortcode' );
+			const result = next(
+				'foo',
+				'this has the [[foo param="foo"]] shortcode'
+			);
 			expect( result ).toBe( undefined );
 		} );
 
@@ -68,7 +81,10 @@ describe( 'shortcode', () => {
 		} );
 
 		it( 'should find the second instances of the shortcode when the first one is escaped', () => {
-			const result = next( 'foo', 'this has the [[foo]] shortcode [foo] twice' );
+			const result = next(
+				'foo',
+				'this has the [[foo]] shortcode [foo] twice'
+			);
 			expect( result.index ).toBe( 31 );
 		} );
 
@@ -83,60 +99,124 @@ describe( 'shortcode', () => {
 
 	describe( 'replace', () => {
 		it( 'should replace the shortcode', () => {
-			const result1 = replace( 'foo', 'this has the [foo] shortcode', () => 'bar' );
+			const result1 = replace(
+				'foo',
+				'this has the [foo] shortcode',
+				() => 'bar'
+			);
 			expect( result1 ).toBe( 'this has the bar shortcode' );
 
-			const result2 = replace( 'foo', 'this has the [foo param="foo"] shortcode', () => 'bar' );
+			const result2 = replace(
+				'foo',
+				'this has the [foo param="foo"] shortcode',
+				() => 'bar'
+			);
 			expect( result2 ).toBe( 'this has the bar shortcode' );
 		} );
 
 		it( 'should replace the shortcode with data from an attribute', () => {
-			const result1 = replace( 'foo', 'this [foo param="replacement text"] came from a shortcode attribute', ( match ) => {
-				return match.attrs.named.param || '';
-			} );
-			expect( result1 ).toBe( 'this replacement text came from a shortcode attribute' );
+			const result1 = replace(
+				'foo',
+				'this [foo param="replacement text"] came from a shortcode attribute',
+				( match ) => {
+					return match.attrs.named.param || '';
+				}
+			);
+			expect( result1 ).toBe(
+				'this replacement text came from a shortcode attribute'
+			);
 		} );
 
 		it( 'should not replace the shortcode when it does not match', () => {
-			const result1 = replace( 'bar', 'this has the [foo] shortcode', () => 'bar' );
+			const result1 = replace(
+				'bar',
+				'this has the [foo] shortcode',
+				() => 'bar'
+			);
 			expect( result1 ).toBe( 'this has the [foo] shortcode' );
 
-			const result2 = replace( 'bar', 'this has the [foo param="bar"] shortcode', () => 'bar' );
-			expect( result2 ).toBe( 'this has the [foo param="bar"] shortcode' );
+			const result2 = replace(
+				'bar',
+				'this has the [foo param="bar"] shortcode',
+				() => 'bar'
+			);
+			expect( result2 ).toBe(
+				'this has the [foo param="bar"] shortcode'
+			);
 		} );
 
 		it( 'should replace the shortcode in all instances of its use', () => {
-			const result1 = replace( 'foo', 'this has the [foo] shortcode [foo] twice', () => 'bar' );
+			const result1 = replace(
+				'foo',
+				'this has the [foo] shortcode [foo] twice',
+				() => 'bar'
+			);
 			expect( result1 ).toBe( 'this has the bar shortcode bar twice' );
 
-			const result2 = replace( 'foo', 'this has the [foo param="foo"] shortcode [foo] twice', () => 'bar' );
+			const result2 = replace(
+				'foo',
+				'this has the [foo param="foo"] shortcode [foo] twice',
+				() => 'bar'
+			);
 			expect( result2 ).toBe( 'this has the bar shortcode bar twice' );
 		} );
 
 		it( 'should not replace the escaped shortcodes', () => {
-			const result1 = replace( 'foo', 'this has the [[foo]] shortcode', () => 'bar' );
+			const result1 = replace(
+				'foo',
+				'this has the [[foo]] shortcode',
+				() => 'bar'
+			);
 			expect( result1 ).toBe( 'this has the [[foo]] shortcode' );
 
-			const result2 = replace( 'foo', 'this has the [[foo param="bar"]] shortcode', () => 'bar' );
-			expect( result2 ).toBe( 'this has the [[foo param="bar"]] shortcode' );
+			const result2 = replace(
+				'foo',
+				'this has the [[foo param="bar"]] shortcode',
+				() => 'bar'
+			);
+			expect( result2 ).toBe(
+				'this has the [[foo param="bar"]] shortcode'
+			);
 
-			const result3 = replace( 'foo', 'this [foo] has the [[foo param="bar"]] shortcode escaped', () => 'bar' );
-			expect( result3 ).toBe( 'this bar has the [[foo param="bar"]] shortcode escaped' );
+			const result3 = replace(
+				'foo',
+				'this [foo] has the [[foo param="bar"]] shortcode escaped',
+				() => 'bar'
+			);
+			expect( result3 ).toBe(
+				'this bar has the [[foo param="bar"]] shortcode escaped'
+			);
 		} );
 
 		it( 'should replace improperly escaped shortcodes that include newlines', () => {
-			const result1 = replace( 'foo', 'this [foo] has the [[foo param="bar"]\n] shortcode ', () => 'bar' );
+			const result1 = replace(
+				'foo',
+				'this [foo] has the [[foo param="bar"]\n] shortcode ',
+				() => 'bar'
+			);
 			expect( result1 ).toBe( 'this bar has the [bar\n] shortcode ' );
 
-			const result2 = replace( 'foo', 'this [foo] has the [\n[foo param="bar"]] shortcode ', () => 'bar' );
+			const result2 = replace(
+				'foo',
+				'this [foo] has the [\n[foo param="bar"]] shortcode ',
+				() => 'bar'
+			);
 			expect( result2 ).toBe( 'this bar has the [\nbar] shortcode ' );
 		} );
 
 		it( 'should not replace the shortcode when it is an incomplete match', () => {
-			const result1 = replace( 'foo', 'this has the [foobar] shortcode', () => 'bar' );
+			const result1 = replace(
+				'foo',
+				'this has the [foobar] shortcode',
+				() => 'bar'
+			);
 			expect( result1 ).toBe( 'this has the [foobar] shortcode' );
 
-			const result2 = replace( 'foobar', 'this has the [foo] shortcode', () => 'bar' );
+			const result2 = replace(
+				'foobar',
+				'this has the [foo] shortcode',
+				() => 'bar'
+			);
 			expect( result2 ).toBe( 'this has the [foo] shortcode' );
 		} );
 	} );

@@ -22,7 +22,9 @@ function validateHookName( hookName ) {
 
 	if ( ! /^[a-zA-Z][a-zA-Z0-9_.-]*$/.test( hookName ) ) {
 		// eslint-disable-next-line no-console
-		console.error( 'The hook name can only contain numbers, letters, dashes, periods and underscores.' );
+		console.error(
+			'The hook name can only contain numbers, letters, dashes, periods and underscores.'
+		);
 		return false;
 	}
 

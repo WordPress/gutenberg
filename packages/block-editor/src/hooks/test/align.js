@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import renderer from 'react-test-renderer';
+import renderer, { act } from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -17,17 +17,18 @@ import {
 /**
  * Internal dependencies
  */
+import BlockEditorProvider from '../../components/provider';
 import {
 	getValidAlignments,
 	withToolbarControls,
-	insideSelectWithDataAlign,
+	withDataAlign,
 	addAssignedAlign,
 } from '../align';
 
 describe( 'align', () => {
 	const blockSettings = {
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
@@ -38,7 +39,10 @@ describe( 'align', () => {
 	} );
 
 	describe( 'addAttribute()', () => {
-		const filterRegisterBlockType = applyFilters.bind( null, 'blocks.registerBlockType' );
+		const filterRegisterBlockType = applyFilters.bind(
+			null,
+			'blocks.registerBlockType'
+		);
 
 		it( 'should do nothing if the block settings does not define align support', () => {
 			const settings = filterRegisterBlockType( blockSettings );
@@ -64,54 +68,75 @@ describe( 'align', () => {
 		} );
 
 		it( 'should return all custom aligns set', () => {
-			expect(
-				getValidAlignments( [ 'left', 'right' ] )
-			).toEqual(
-				[ 'left', 'right' ]
-			);
+			expect( getValidAlignments( [ 'left', 'right' ] ) ).toEqual( [
+				'left',
+				'right',
+			] );
 		} );
 
 		it( 'should return all aligns if block defines align support as true', () => {
-			expect(
-				getValidAlignments( true )
-			).toEqual(
-				[ 'left', 'center', 'right', 'wide', 'full' ]
-			);
+			expect( getValidAlignments( true ) ).toEqual( [
+				'left',
+				'center',
+				'right',
+				'wide',
+				'full',
+			] );
 		} );
 
 		it( 'should return all aligns except wide if wide align explicitly false on the block', () => {
-			expect(
-				getValidAlignments( true, false, true )
-			).toEqual( [ 'left', 'center', 'right' ] );
+			expect( getValidAlignments( true, false, true ) ).toEqual( [
+				'left',
+				'center',
+				'right',
+			] );
 
-			expect(
-				getValidAlignments( true, false, false )
-			).toEqual( [ 'left', 'center', 'right' ] );
+			expect( getValidAlignments( true, false, false ) ).toEqual( [
+				'left',
+				'center',
+				'right',
+			] );
 		} );
 
 		it( 'should return all aligns except wide if wide align is not supported by the theme', () => {
-			expect(
-				getValidAlignments( true, true, false )
-			).toEqual( [ 'left', 'center', 'right' ] );
+			expect( getValidAlignments( true, true, false ) ).toEqual( [
+				'left',
+				'center',
+				'right',
+			] );
 
-			expect(
-				getValidAlignments( true, false, false )
-			).toEqual( [ 'left', 'center', 'right' ] );
+			expect( getValidAlignments( true, false, false ) ).toEqual( [
+				'left',
+				'center',
+				'right',
+			] );
 		} );
 
 		it( 'should not remove wide aligns if they are not supported by the block and were set using an array in supports align', () => {
 			expect(
-				getValidAlignments( [ 'left', 'right', 'wide', 'full' ], false, true )
+				getValidAlignments(
+					[ 'left', 'right', 'wide', 'full' ],
+					false,
+					true
+				)
 			).toEqual( [ 'left', 'right', 'wide', 'full' ] );
 		} );
 
 		it( 'should remove wide aligns if they are not supported by the theme and were set using an array in supports align', () => {
 			expect(
-				getValidAlignments( [ 'left', 'right', 'wide', 'full' ], true, false )
+				getValidAlignments(
+					[ 'left', 'right', 'wide', 'full' ],
+					true,
+					false
+				)
 			).toEqual( [ 'left', 'right' ] );
 
 			expect(
-				getValidAlignments( [ 'left', 'right', 'wide', 'full' ], false, false )
+				getValidAlignments(
+					[ 'left', 'right', 'wide', 'full' ],
+					false,
+					false
+				)
 			).toEqual( [ 'left', 'right' ] );
 		} );
 	} );
@@ -120,9 +145,9 @@ describe( 'align', () => {
 		it( 'should do nothing if no valid alignments', () => {
 			registerBlockType( 'core/foo', blockSettings );
 
-			const EnhancedComponent = withToolbarControls( ( { wrapperProps } ) => (
-				<div { ...wrapperProps } />
-			) );
+			const EnhancedComponent = withToolbarControls(
+				( { wrapperProps } ) => <div { ...wrapperProps } />
+			);
 
 			const wrapper = renderer.create(
 				<EnhancedComponent
@@ -144,9 +169,9 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = withToolbarControls( ( { wrapperProps } ) => (
-				<div { ...wrapperProps } />
-			) );
+			const EnhancedComponent = withToolbarControls(
+				( { wrapperProps } ) => <div { ...wrapperProps } />
+			);
 
 			const wrapper = renderer.create(
 				<EnhancedComponent
@@ -169,19 +194,27 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = insideSelectWithDataAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					attributes={ {
-						align: 'wide',
-					} }
-					name="core/foo"
-				/>
-			);
-			expect( wrapper.toTree().rendered.props.wrapperProps ).toEqual( {
+			let wrapper;
+			act( () => {
+				wrapper = renderer.create(
+					<BlockEditorProvider
+						settings={ { alignWide: true } }
+						value={ [] }
+					>
+						<EnhancedComponent
+							attributes={ {
+								align: 'wide',
+							} }
+							name="core/foo"
+						/>
+					</BlockEditorProvider>
+				);
+			} );
+			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {
 				'data-align': 'wide',
 			} );
 		} );
@@ -195,20 +228,27 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = insideSelectWithDataAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					name="core/foo"
-					attributes={ {
-						align: 'wide',
-					} }
-					hasWideEnabled={ false }
-				/>
-			);
-			expect( wrapper.toTree().rendered.props.wrapperProps ).toEqual( undefined );
+			let wrapper;
+			act( () => {
+				wrapper = renderer.create(
+					<BlockEditorProvider
+						settings={ { alignWide: false } }
+						value={ [] }
+					>
+						<EnhancedComponent
+							name="core/foo"
+							attributes={ {
+								align: 'wide',
+							} }
+						/>
+					</BlockEditorProvider>
+				);
+			} );
+			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
 		} );
 
 		it( 'should not render invalid align', () => {
@@ -220,20 +260,27 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = insideSelectWithDataAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					name="core/foo"
-					attributes={ {
-						align: 'wide',
-					} }
-				/>
-			);
-
-			expect( wrapper.toTree().props.wrapperProps ).toBeUndefined();
+			let wrapper;
+			act( () => {
+				wrapper = renderer.create(
+					<BlockEditorProvider
+						settings={ { alignWide: true } }
+						value={ [] }
+					>
+						<EnhancedComponent
+							name="core/foo"
+							attributes={ {
+								align: 'wide',
+							} }
+						/>
+					</BlockEditorProvider>
+				);
+			} );
+			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
 		} );
 	} );
 
@@ -241,11 +288,15 @@ describe( 'align', () => {
 		it( 'should do nothing if block does not support align', () => {
 			registerBlockType( 'core/foo', blockSettings );
 
-			const props = addAssignedAlign( {
-				className: 'foo',
-			}, 'core/foo', {
-				align: 'wide',
-			} );
+			const props = addAssignedAlign(
+				{
+					className: 'foo',
+				},
+				'core/foo',
+				{
+					align: 'wide',
+				}
+			);
 
 			expect( props ).toEqual( {
 				className: 'foo',
@@ -260,11 +311,15 @@ describe( 'align', () => {
 				},
 			} );
 
-			const props = addAssignedAlign( {
-				className: 'foo',
-			}, 'core/foo', {
-				align: 'wide',
-			} );
+			const props = addAssignedAlign(
+				{
+					className: 'foo',
+				},
+				'core/foo',
+				{
+					align: 'wide',
+				}
+			);
 
 			expect( props ).toEqual( {
 				className: 'alignwide foo',

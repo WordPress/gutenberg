@@ -18,9 +18,7 @@ export function ManageBlocksMenuItem( { openModal } ) {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const {
-		openModal,
-	} = dispatch( 'core/edit-post' );
+	const { openModal } = dispatch( 'core/edit-post' );
 
 	return {
 		openModal,

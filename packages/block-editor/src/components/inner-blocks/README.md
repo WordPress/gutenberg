@@ -41,9 +41,10 @@ _Note:_ Because the save step will automatically apply props to the element retu
 ## Props
 
 ### `allowedBlocks`
-* **Type:** `Array<String>`
+* **Type:** `Boolean|Array<String>`
+* **Default:** `true`
 
-Allowed blocks prop should contain an array of strings, each string should contain the identifier of a block. When allowedBlocks is set it is only possible to insert blocks part of the set specified in the array.
+`allowedBlocks` can contain an array of strings, each string should contain the identifier of a block. When `allowedBlocks` is set it is only possible to insert blocks part of the set specified in the array.
 
 ```jsx
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
@@ -67,11 +68,13 @@ const ALLOWED_BLOCKS = [];
 
 The previous code block restricts all blocks, so only child blocks explicitly registered as compatible with this block can be inserted. If no child blocks are available: it will be impossible to insert any inner blocks.
 
+If `allowedBlocks` is set to `true`, all blocks are allowed. `false` means no blocks are allowed.
+
 ### `template`
 * **Type:** `Array<Array<Object>>`
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
-More information about templates can be found in [template docs](/docs/developers/block-api/block-templates.md).
+More information about templates can be found in [template docs](/docs/designers-developers/developers/block-api/block-templates.md).
 
 ```jsx
 const TEMPLATE = [ [ 'core/columns', {}, [
@@ -90,69 +93,6 @@ const TEMPLATE = [ [ 'core/columns', {}, [
 
 The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
 
-### `__experimentalTemplateOptions`
-
-* **Type:** `Array<Object>`
-
-To present the user with a set of template choices for the inner blocks, you may provide an array of template options.
-
-A template option is an object consisting of the following properties:
-
-- `title` (`string`): A human-readable label which describes the template. 
-- `icon` (`WPElement|string`): An element or [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug to show as a visual approximation of the template.
-- `template` (`Array<Array>`): The template to apply when the option has been selected. See [`template` documentation](#template) for more information.
-
-For the template placeholder selection to be displayed, you must render `InnerBlocks` with a `template` prop value of `null`. You may track this as state of your component, updating its value when receiving the selected template via `__experimentalOnSelectTemplateOption`.
-
-```jsx
-import { useState } from '@wordpress/element';
-
-const TEMPLATE_OPTIONS = [
-	{
-		title: 'Two Columns',
-		icon: <svg />,
-		template: [
-			[ 'core/column', { width: 50 } ],
-			[ 'core/column', { width: 50 } ],
-		],
-	},
-	{
-		title: 'Three Columns',
-		icon: <svg />,
-		template: [
-			[ 'core/column', { width: 33.33 } ],
-			[ 'core/column', { width: 33.33 } ],
-			[ 'core/column', { width: 33.33 } ],
-		],
-	},
-];
-
-function edit() {
-	const [ template, setTemplate ] = useState( null );
-
-	return (
-		<InnerBlocks
-			template={ template }
-		    __experimentalTemplateOptions={ TEMPLATE_OPTIONS }
-		    __experimentalOnSelectTemplateOption={ setTemplate }
-		/>
-	);
-}
-```
-
-### `__experimentalOnSelectTemplateOption`
-
-* **Type:** `Function`
-
-Callback function invoked when the user makes a template selection, used in combination with the `__experimentalTemplateOptions` props. The selected template is passed as the first and only argument. The value of the template may be `undefined` if the `__experimentalAllowTemplateOptionSkip` prop is passed to `InnerBlocks` and the user opts to skip template selection.
-
-### `__experimentalAllowTemplateOptionSkip`
-
-* **Type:** `Boolean`
-* **Default:** `false`
-
-Whether to include a button in the template selection placeholder to allow the user to skip selection, used in combination with the `__experimentalTemplateOptions` prop. When clicked, the `__experimentalOnSelectTemplateOption` callback will be passed an `undefined` value as the template.
-
 ### `templateInsertUpdatesSelection`
 * **Type:** `Boolean`
 * **Default:** `true`
@@ -163,7 +103,7 @@ If false the selection should not be updated when child blocks specified in the 
 ### `templateLock`
 * **Type:** `String|Boolean`
 
-Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/developers/block-api/block-templates.md#locking).
+Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/designers-developers/developers/block-api/block-templates.md#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*
@@ -184,7 +124,7 @@ A 'render prop' function that can be used to customize the block's appender.
 
 #### Notes
 * For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
-	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted. 
+	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted.
 	- `<InnerBlocks.DefaultBlockAppender />` - display the default block appender as set by `wp.blocks.setDefaultBlockName`. Typically this is the `paragraph` block.
 * Consumers are also free to pass any valid render function. This provides the full flexibility to define a bespoke block appender.
 
@@ -206,6 +146,14 @@ A 'render prop' function that can be used to customize the block's appender.
 />
 ```
 
+### `__experimentalCaptureToolbars`
+
+* **Type:** `Boolean`
+* **Default:** `false`
+
+Determines whether the toolbars of _all_ child Blocks (applied deeply, recursive) should have their toolbars "captured" and shown on the Block which is consuming `InnerBlocks`.
+
+For example, a button block, deeply nested in several levels of block `X` that utilises this property will see the button block's toolbar displayed on block `X`'s toolbar area.
 
 
 

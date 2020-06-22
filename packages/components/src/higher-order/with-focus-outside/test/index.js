@@ -48,7 +48,10 @@ describe( 'withFocusOutside', () => {
 	};
 
 	const simulateEvent = ( event, index = 0 ) => {
-		const element = TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'input' );
+		const element = TestUtils.scryRenderedDOMComponentsWithTag(
+			wrapper,
+			'input'
+		);
 		TestUtils.Simulate[ event ]( element[ index ] );
 	};
 
@@ -119,8 +122,10 @@ describe( 'withFocusOutside', () => {
 		simulateEvent( 'focus' );
 		simulateEvent( 'input' );
 
-		// eslint-disable-next-line react/no-find-dom-node
-		ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
+		ReactDOM.unmountComponentAtNode(
+			// eslint-disable-next-line react/no-find-dom-node
+			ReactDOM.findDOMNode( wrapper ).parentNode
+		);
 
 		jest.runAllTimers();
 

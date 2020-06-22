@@ -6,6 +6,8 @@ import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
 import { withSelect } from '@wordpress/data';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
@@ -16,12 +18,18 @@ class Typewriter extends Component {
 
 		this.ref = createRef();
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.addSelectionChangeListener = this.addSelectionChangeListener.bind( this );
-		this.computeCaretRectOnSelectionChange = this.computeCaretRectOnSelectionChange.bind( this );
+		this.addSelectionChangeListener = this.addSelectionChangeListener.bind(
+			this
+		);
+		this.computeCaretRectOnSelectionChange = this.computeCaretRectOnSelectionChange.bind(
+			this
+		);
 		this.maintainCaretPosition = this.maintainCaretPosition.bind( this );
 		this.computeCaretRect = this.computeCaretRect.bind( this );
 		this.onScrollResize = this.onScrollResize.bind( this );
-		this.isSelectionEligibleForScroll = this.isSelectionEligibleForScroll.bind( this );
+		this.isSelectionEligibleForScroll = this.isSelectionEligibleForScroll.bind(
+			this
+		);
 	}
 
 	componentDidMount() {
@@ -34,7 +42,10 @@ class Typewriter extends Component {
 	componentWillUnmount() {
 		window.removeEventListener( 'scroll', this.onScrollResize, true );
 		window.removeEventListener( 'resize', this.onScrollResize, true );
-		document.removeEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
+		document.removeEventListener(
+			'selectionchange',
+			this.computeCaretRectOnSelectionChange
+		);
 
 		if ( this.onScrollResize.rafId ) {
 			window.cancelAnimationFrame( this.onScrollResize.rafId );
@@ -59,7 +70,10 @@ class Typewriter extends Component {
 	 * event. Also removes the listener, so it acts as a one-time listener.
 	 */
 	computeCaretRectOnSelectionChange() {
-		document.removeEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
+		document.removeEventListener(
+			'selectionchange',
+			this.computeCaretRectOnSelectionChange
+		);
 		this.computeCaretRect();
 	}
 
@@ -100,7 +114,7 @@ class Typewriter extends Component {
 	 * Maintains the scroll position after a selection change caused by a
 	 * keyboard event.
 	 *
-	 * @param {SyntheticEvent} event Synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event Synthetic keyboard event.
 	 */
 	maintainCaretPosition( { keyCode } ) {
 		if ( ! this.isSelectionEligibleForScroll() ) {
@@ -143,16 +157,16 @@ class Typewriter extends Component {
 		}
 
 		const windowScroll = scrollContainer === document.body;
-		const scrollY = windowScroll ?
-			window.scrollY :
-			scrollContainer.scrollTop;
-		const scrollContainerY = windowScroll ?
-			0 :
-			scrollContainer.getBoundingClientRect().top;
-		const relativeScrollPosition = windowScroll ?
-			this.caretRect.top / window.innerHeight :
-			( this.caretRect.top - scrollContainerY ) /
-			( window.innerHeight - scrollContainerY );
+		const scrollY = windowScroll
+			? window.scrollY
+			: scrollContainer.scrollTop;
+		const scrollContainerY = windowScroll
+			? 0
+			: scrollContainer.getBoundingClientRect().top;
+		const relativeScrollPosition = windowScroll
+			? this.caretRect.top / window.innerHeight
+			: ( this.caretRect.top - scrollContainerY ) /
+			  ( window.innerHeight - scrollContainerY );
 
 		// If the scroll position is at the start, the active editable element
 		// is the last one, and the caret is positioned within the initial
@@ -170,9 +184,9 @@ class Typewriter extends Component {
 			return;
 		}
 
-		const scrollContainerHeight = windowScroll ?
-			window.innerHeight :
-			scrollContainer.clientHeight;
+		const scrollContainerHeight = windowScroll
+			? window.innerHeight
+			: scrollContainer.clientHeight;
 
 		// Abort if the target scroll position would scroll the caret out of
 		// view.
@@ -200,7 +214,10 @@ class Typewriter extends Component {
 	 * maintained.
 	 */
 	addSelectionChangeListener() {
-		document.addEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
+		document.addEventListener(
+			'selectionchange',
+			this.computeCaretRectOnSelectionChange
+		);
 	}
 
 	onKeyDown( event ) {
@@ -219,12 +236,6 @@ class Typewriter extends Component {
 	}
 
 	render() {
-		// There are some issues with Internet Explorer, which are probably not
-		// worth spending time on. Let's disable it.
-		if ( isIE ) {
-			return this.props.children;
-		}
-
 		// Disable reason: Wrapper itself is non-interactive, but must capture
 		// bubbling events from children to determine focus transition intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -235,6 +246,7 @@ class Typewriter extends Component {
 				onKeyUp={ this.maintainCaretPosition }
 				onMouseDown={ this.addSelectionChangeListener }
 				onTouchStart={ this.addSelectionChangeListener }
+				className="block-editor__typewriter"
 			>
 				{ this.props.children }
 			</div>
@@ -244,11 +256,22 @@ class Typewriter extends Component {
 }
 
 /**
+ * The exported component. The implementation of Typewriter faced technical
+ * challenges in Internet Explorer, and is simply skipped, rendering the given
+ * props children instead.
+ *
+ * @type {WPComponent}
+ */
+const TypewriterOrIEBypass = isIE
+	? ( props ) => props.children
+	: withSelect( ( select ) => {
+			const { getSelectedBlockClientId } = select( 'core/block-editor' );
+			return { selectedBlockClientId: getSelectedBlockClientId() };
+	  } )( Typewriter );
+
+/**
  * Ensures that the text selection keeps the same vertical distance from the
  * viewport during keyboard events within this component. The vertical distance
  * can vary. It is the last clicked or scrolled to position.
  */
-export default withSelect( ( select ) => {
-	const { getSelectedBlockClientId } = select( 'core/block-editor' );
-	return { selectedBlockClientId: getSelectedBlockClientId() };
-} )( Typewriter );
+export default TypewriterOrIEBypass;

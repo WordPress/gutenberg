@@ -1,39 +1,15 @@
 .edit-post-header {
 	height: $header-height;
-	padding: $grid-size-small 2px;
-	border-bottom: $border-width solid $light-gray-500;
 	background: $white;
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
 	align-items: center;
 	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
-	z-index: z-index(".edit-post-header");
-	left: 0;
-	right: 0;
 
 	// Make toolbar sticky on larger breakpoints
 	@include break-zoomed-in {
-		height: $header-height;
-		top: 0;
-		position: sticky;
 		flex-wrap: nowrap;
-	}
-
-	// On mobile the main content area has to scroll, otherwise you can invoke the overscroll bounce on the non-scrolling container.
-	@include break-small {
-		position: fixed;
-		padding: $grid-size;
-		top: $admin-bar-height-big;
-	}
-
-	@include break-medium() {
-		top: $admin-bar-height;
-
-		body.is-fullscreen-mode & {
-			top: 0;
-		}
 	}
 
 	// Some browsers, most notably IE11, honor an older version of the flexbox spec
@@ -55,74 +31,79 @@
 	}
 }
 
-@include editor-left(".edit-post-header");
-
 .edit-post-header__toolbar {
 	display: flex;
+	flex-grow: 1;
+	padding-left: $grid-unit-10;
+
+	@include break-small() {
+		padding-left: $grid-unit-30;
+	}
+
+	.table-of-contents {
+		display: none;
+
+		@include break-small() {
+			display: block;
+		}
+	}
 }
 
 .edit-post-header__settings {
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: wrap;
+	padding-right: $grid-unit-05;
+
+	@include break-small () {
+		padding-right: $grid-unit-20;
+	}
 }
 
-.edit-post-header .components-button {
-	// Header toggle buttons.
-	&.is-toggled {
-		color: $white;
-		background: $dark-gray-500;
-		margin: 1px;
-		padding: 7px;
-	}
 
-	// The !important in this ruleset need to override the pile of :not() selectors used in the icon-button.
-	&.is-toggled:hover,
-	&.is-toggled:focus {
-		box-shadow: 0 0 0 $border-width $dark-gray-500, inset 0 0 0 $border-width $white !important;
-		color: $white !important;
-		background: $dark-gray-500 !important;
-	}
-
-	// Make editor header bar buttons bigger to match IconButtons.
-	&.editor-post-save-draft,
-	&.editor-post-switch-to-draft,
-	&.editor-post-preview,
-	&.editor-post-publish-button,
-	&.editor-post-publish-panel__toggle {
-		margin: 2px;
-		height: 33px;
-		line-height: 32px;
-		font-size: $default-font-size;
-	}
-
-	&.editor-post-save-draft,
-	&.editor-post-switch-to-draft {
-		padding: 0 5px;
+/**
+ * Buttons in the Toolbar
+ */
+.edit-post-header__settings {
+	// Adjust button paddings to scale better to mobile.
+	.components-button.editor-post-save-draft,
+	.editor-post-saved-state,
+	.components-button.editor-post-switch-to-draft,
+	.components-button.editor-post-preview,
+	.components-button.block-editor-post-preview__dropdown,
+	.components-button.editor-post-publish-button,
+	.components-button.editor-post-publish-panel__toggle {
+		padding: 0 6px;
+		margin-right: $grid-unit-05;
 
 		@include break-small() {
 			padding: 0 12px;
+			margin-right: $grid-unit-15;
 		}
 	}
+}
 
-	&.editor-post-preview,
-	&.editor-post-publish-button,
-	&.editor-post-publish-panel__toggle {
-		padding: 0 5px 2px;
+.edit-post-header-preview__grouping-external {
+	display: flex;
+	position: relative;
+	padding-bottom: 0;
+}
 
-		@include break-small() {
-			padding: 0 12px 2px;
-		}
+.edit-post-header-preview__button-external {
+	padding-left: $grid-unit-10;
+
+	margin-right: auto;
+	width: 100%;
+	display: flex;
+	justify-content: flex-start;
+
+	svg {
+		margin-right: $grid-unit-10;
 	}
+}
 
-	@include break-medium() {
-		&.editor-post-preview {
-			margin: 0 3px 0 12px;
-		}
-
-		&.editor-post-publish-button,
-		&.editor-post-publish-panel__toggle {
-			margin: 0 12px 0 3px;
-		}
+.edit-post-post-preview-dropdown {
+	.components-popover__content > div {
+		padding-bottom: 0;
 	}
 }

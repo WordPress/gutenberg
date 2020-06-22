@@ -2,21 +2,25 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon } from '@wordpress/components';
 import { PlainText } from '@wordpress/block-editor';
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
+import { Icon, shortcode } from '@wordpress/icons';
 
-const ShortcodeEdit = ( { attributes, setAttributes, instanceId } ) => {
+export default function ShortcodeEdit( { attributes, setAttributes } ) {
+	const instanceId = useInstanceId( ShortcodeEdit );
 	const inputId = `blocks-shortcode-input-${ instanceId }`;
 
 	return (
-		<div className="wp-block-shortcode  components-placeholder">
-			<label htmlFor={ inputId } className="components-placeholder__label">
-				<Dashicon icon="shortcode" />
+		<div className="wp-block-shortcode components-placeholder">
+			<label
+				htmlFor={ inputId }
+				className="components-placeholder__label"
+			>
+				<Icon icon={ shortcode } />
 				{ __( 'Shortcode' ) }
 			</label>
 			<PlainText
-				className="input-control"
+				className="blocks-shortcode__textarea"
 				id={ inputId }
 				value={ attributes.text }
 				placeholder={ __( 'Write shortcode here…' ) }
@@ -24,6 +28,4 @@ const ShortcodeEdit = ( { attributes, setAttributes, instanceId } ) => {
 			/>
 		</div>
 	);
-};
-
-export default withInstanceId( ShortcodeEdit );
+}

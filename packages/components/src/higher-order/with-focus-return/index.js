@@ -23,10 +23,7 @@ import Provider, { Consumer } from './context';
  * @return {boolean} Whether object is component-like.
  */
 function isComponentLike( object ) {
-	return (
-		object instanceof Component ||
-		typeof object === 'function'
-	);
+	return object instanceof Component || typeof object === 'function';
 }
 
 /**
@@ -36,11 +33,11 @@ function isComponentLike( object ) {
  * when the component is unmounted.
  *
  * @param {(WPComponent|Object)} options The component to be enhanced with
- *                                       focus return behavior, or an object
- *                                       describing the component and the
- *                                       focus return characteristics.
+ *                                      focus return behavior, or an object
+ *                                      describing the component and the
+ *                                      focus return characteristics.
  *
- * @return {Component} Component with the focus restauration behaviour.
+ * @return {WPComponent} Component with the focus restauration behaviour.
  */
 function withFocusReturn( options ) {
 	// Normalize as overloaded form `withFocusReturn( options )( Component )`
@@ -52,14 +49,14 @@ function withFocusReturn( options ) {
 
 	const { onFocusReturn = stubTrue } = options;
 
-	return function( WrappedComponent ) {
+	return ( WrappedComponent ) => {
 		class FocusReturn extends Component {
 			constructor() {
 				super( ...arguments );
 
-				this.ownFocusedElements = new Set;
+				this.ownFocusedElements = new Set();
 				this.activeElementOnMount = document.activeElement;
-				this.setIsFocusedFalse = () => this.isFocused = false;
+				this.setIsFocusedFalse = () => ( this.isFocused = false );
 				this.setIsFocusedTrue = ( event ) => {
 					this.ownFocusedElements.add( event.target );
 					this.isFocused = true;
@@ -117,7 +114,9 @@ function withFocusReturn( options ) {
 
 		return ( props ) => (
 			<Consumer>
-				{ ( context ) => <FocusReturn childProps={ props } focus={ context } /> }
+				{ ( context ) => (
+					<FocusReturn childProps={ props } focus={ context } />
+				) }
 			</Consumer>
 		);
 	};

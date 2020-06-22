@@ -30,7 +30,8 @@ describe( 'KeyboardShortcuts', () => {
 			<KeyboardShortcuts
 				shortcuts={ {
 					d: spy,
-				} } />
+				} }
+			/>
 		);
 
 		keyPress( 68, document );
@@ -49,7 +50,8 @@ describe( 'KeyboardShortcuts', () => {
 					bindGlobal
 					shortcuts={ {
 						d: spy,
-					} } />
+					} }
+				/>
 				<textarea></textarea>
 			</div>,
 			{ attachTo: attachNode }
@@ -71,7 +73,8 @@ describe( 'KeyboardShortcuts', () => {
 					eventName="keyup"
 					shortcuts={ {
 						d: spy,
-					} } />
+					} }
+				/>
 				<textarea></textarea>
 			</div>,
 			{ attachTo: attachNode }

@@ -16,12 +16,10 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	// Disable insertion as this block is deprecated and ultimately replaced by the Columns block.
-	supports: {
-		inserter: false,
-	},
 	title: __( 'Text Columns (deprecated)' ),
-	description: __( 'This block is deprecated. Please use the Columns block instead.' ),
+	description: __(
+		'This block is deprecated. Please use the Columns block instead.'
+	),
 	transforms,
 	getEditWrapperProps( attributes ) {
 		const { width } = attributes;

@@ -1,0 +1,23 @@
+{
+	"name": "core/post-excerpt",
+	"category": "design",
+	"attributes": {
+		"wordCount": {
+			"type": "number",
+			"default": 55
+		},
+		"moreText": {
+			"type": "string"
+		},
+		"showMoreOnNewLine": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"usesContext": [
+		"postId"
+	],
+	"supports": {
+		"html": false
+	}
+}

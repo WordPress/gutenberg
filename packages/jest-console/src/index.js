@@ -16,7 +16,9 @@ import supportedMatchers from './supported-matchers';
  * @param {string} methodName Name of console method.
  */
 const setConsoleMethodSpy = ( matcherName, methodName ) => {
-	const spy = jest.spyOn( console, methodName ).mockName( `console.${ methodName }` );
+	const spy = jest
+		.spyOn( console, methodName )
+		.mockName( `console.${ methodName }` );
 
 	/**
 	 * Resets the spy to its initial state.

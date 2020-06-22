@@ -36,8 +36,11 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 	}
 
 	.components-popover__content {
-		padding: 5px (36px + 5px) 5px 20px;
 		width: 350px;
+
+		> div {
+			padding: 20px 18px;
+		}
 
 		@include break-small {
 			width: 450px;
@@ -51,37 +54,37 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 	}
 
 	// Position the dot right next to the edge of the button
-	&.is-top {
+	&[data-y-axis="top"] {
 		margin-top: -$dot-size / 2;
 	}
-	&.is-bottom {
+	&[data-y-axis="bottom"] {
 		margin-top: $dot-size / 2;
 	}
-	&.is-middle.is-left {
+	&[data-y-axis="middle"][data-y-axis="left"] {
 		margin-left: -$dot-size / 2;
 	}
-	&.is-middle.is-right {
+	&[data-y-axis="middle"][data-y-axis="right"] {
 		margin-left: $dot-size / 2;
 	}
 
 	// Position the tip content away from the dot
-	&.is-top .components-popover__content {
+	&[data-y-axis="top"] .components-popover__content {
 		margin-bottom: 20px;
 	}
-	&.is-bottom .components-popover__content {
+	&[data-y-axis="bottom"] .components-popover__content {
 		margin-top: 20px;
 	}
-	&.is-middle.is-left .components-popover__content {
+	&[data-y-axis="middle"][data-y-axis="left"] .components-popover__content {
 		margin-right: 20px;
 	}
-	&.is-middle.is-right .components-popover__content {
+	&[data-y-axis="middle"][data-y-axis="right"] .components-popover__content {
 		margin-left: 20px;
 	}
 
 	// Extra specificity so that we can override the styles in .component-popover
-	&:not(.is-mobile).is-left,
-	&:not(.is-mobile).is-center,
-	&:not(.is-mobile).is-right {
+	&[data-y-axis="left"],
+	&[data-y-axis="center"],
+	&[data-y-axis="right"] {
 		// Position tips above popovers
 		z-index: z-index(".nux-dot-tip");
 
@@ -99,22 +102,22 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 		}
 	}
 
-	&.components-popover:not(.is-mobile):not(.is-middle).is-right .components-popover__content {
+	&.components-popover:not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-left: 0;
 	}
 
-	&.components-popover:not(.is-mobile):not(.is-middle).is-left .components-popover__content {
+	&.components-popover:not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-right: 0;
 	}
 
-	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not(.is-middle).is-right .components-popover__content {
+	&.components-popover.edit-post-more-menu__content:not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-left: -12px;
 	}
 
-	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not(.is-middle).is-left .components-popover__content {
+	&.components-popover.edit-post-more-menu__content:not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-right: -12px;
 	}

@@ -1,15 +1,34 @@
 // These styles are only applied to the appender when it appears inside of a block.
 // Otherwise the default appender may be improperly positioned in some themes.
 .block-editor-block-list__block .block-list-appender {
-	margin: $block-padding;
+	margin: $grid-unit-10 0;
 
 	// Add additional margin to the appender when inside a group with a background color.
 	// If changing this, be sure to sync up with group/editor.scss line 13.
 	.has-background & {
-		margin: ($block-padding*2 + $block-spacing) $block-padding;
+		margin: ($grid-unit-20 + $block-spacing) $grid-unit-10;
+	}
+
+	// Animate appearance.
+	.block-list-appender__toggle {
+		padding: 0;
+		opacity: 1;
+		transform: scale(1);
+		transition: all 0.1s ease;
+		@include reduce-motion("transition");
 	}
 }
 
 .block-list-appender > .block-editor-inserter {
 	display: block;
+}
+
+
+// Hide the nested appender unless parent or child is selected.
+// This selector targets unselected blocks that have only a single nesting level.
+.block-editor-block-list__block:not(.is-selected):not(.has-child-selected):not(.block-editor-block-list__layout) {
+	.block-editor-block-list__layout > .block-list-appender .block-list-appender__toggle {
+		opacity: 0;
+		transform: scale(0);
+	}
 }

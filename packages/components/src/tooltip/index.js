@@ -131,16 +131,17 @@ class Tooltip extends Component {
 	createSetIsMouseDown( isMouseDown ) {
 		return ( event ) => {
 			// Preserve original child callback behavior
-			this.emitToChild( isMouseDown ? 'onMouseDown' : 'onMouseUp', event );
+			this.emitToChild(
+				isMouseDown ? 'onMouseDown' : 'onMouseUp',
+				event
+			);
 
 			// On mouse down, the next `mouseup` should revert the value of the
 			// instance property and remove its own event handler. The bind is
 			// made on the document since the `mouseup` might not occur within
 			// the bounds of the element.
 			document[
-				isMouseDown ?
-					'addEventListener' :
-					'removeEventListener'
+				isMouseDown ? 'addEventListener' : 'removeEventListener'
 			]( 'mouseup', this.cancelIsMouseDown );
 
 			this.isInMouseDown = isMouseDown;
@@ -152,7 +153,9 @@ class Tooltip extends Component {
 		if ( Children.count( children ) !== 1 ) {
 			if ( 'development' === process.env.NODE_ENV ) {
 				// eslint-disable-next-line no-console
-				console.error( 'Tooltip should be called with only a single child element.' );
+				console.error(
+					'Tooltip should be called with only a single child element.'
+				);
 			}
 
 			return children;
@@ -177,11 +180,15 @@ class Tooltip extends Component {
 						className="components-tooltip"
 						aria-hidden="true"
 						animate={ false }
+						noArrow={ true }
 					>
 						{ text }
-						<Shortcut className="components-tooltip__shortcut" shortcut={ shortcut } />
+						<Shortcut
+							className="components-tooltip__shortcut"
+							shortcut={ shortcut }
+						/>
 					</Popover>
-				),
+				)
 			),
 		} );
 	}

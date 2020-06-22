@@ -17,3 +17,5 @@ The block editor introduced in WordPress 5.0 is written in JavaScript, with the 
 4. [Troubleshooting](/docs/designers-developers/developers/tutorials/javascript/troubleshooting.md)
 5. [JavaScript Versions and Building](/docs/designers-developers/developers/tutorials/javascript/versions-and-building.md)
 6. [Scope your code](/docs/designers-developers/developers/tutorials/javascript/scope-your-code.md)
+7. [JavaScript Build Step](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md)
+

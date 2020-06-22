@@ -9,7 +9,6 @@ import classnames from 'classnames';
 
 import { Component, createRef } from '@wordpress/element';
 import { ESCAPE } from '@wordpress/keycodes';
-import { focus } from '@wordpress/dom';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -27,7 +26,6 @@ class ModalFrame extends Component {
 		this.containerRef = createRef();
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleFocusOutside = this.handleFocusOutside.bind( this );
-		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 	}
 
 	/**
@@ -36,17 +34,7 @@ class ModalFrame extends Component {
 	componentDidMount() {
 		// Focus on mount
 		if ( this.props.focusOnMount ) {
-			this.focusFirstTabbable();
-		}
-	}
-
-	/**
-	 * Focuses the first tabbable element.
-	 */
-	focusFirstTabbable() {
-		const tabbables = focus.tabbable.find( this.containerRef.current );
-		if ( tabbables.length ) {
-			tabbables[ 0 ].focus();
+			this.containerRef.current.focus();
 		}
 	}
 
@@ -107,10 +95,7 @@ class ModalFrame extends Component {
 		const {
 			overlayClassName,
 			contentLabel,
-			aria: {
-				describedby,
-				labelledby,
-			},
+			aria: { describedby, labelledby },
 			children,
 			className,
 			role,
@@ -119,7 +104,10 @@ class ModalFrame extends Component {
 
 		return (
 			<IsolatedEventContainer
-				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
+				className={ classnames(
+					'components-modal__screen-overlay',
+					overlayClassName
+				) }
 				onKeyDown={ this.handleKeyDown }
 			>
 				<div

@@ -1,16 +1,10 @@
 {
 	"name": "core/media-text",
-	"category": "layout",
+	"category": "media",
 	"attributes": {
 		"align": {
 			"type": "string",
 			"default": "wide"
-		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
 		},
 		"mediaAlt": {
 			"type": "string",
@@ -32,6 +26,36 @@
 			"selector": "figure video,figure img",
 			"attribute": "src"
 		},
+		"mediaLink": {
+			"type": "string"
+		},
+		"linkDestination": {
+			"type": "string"
+		},
+		"linkTarget": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "figure a",
+			"attribute": "target"
+		},
+		"href": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "figure a",
+			"attribute": "href"
+		},
+		"rel": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "figure a",
+			"attribute": "rel"
+		},
+		"linkClass": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "figure a",
+			"attribute": "class"
+		},
 		"mediaType": {
 			"type": "string"
 		},
@@ -51,6 +75,18 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
 		}
 	}
 }

@@ -6,59 +6,95 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { URLPopover } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import {
+	InspectorControls,
+	URLPopover,
+	URLInput,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
+import { Fragment, useState } from '@wordpress/element';
 import {
 	Button,
-	IconButton,
+	PanelBody,
+	PanelRow,
+	TextControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { getIconBySite } from './social-list';
+import { getIconBySite, getNameBySite } from './social-list';
 
 const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
-	const { url, site } = attributes;
+	const { url, service, label } = attributes;
 	const [ showURLPopover, setPopover ] = useState( false );
-	const classes = classNames(
-		'wp-social-link',
-		'wp-social-link-' + site,
-		{ 'wp-social-link__is-incomplete': ! url },
-	);
+	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
+		'wp-social-link__is-incomplete': ! url,
+	} );
 
-	// Import icon.
-	const IconComponent = getIconBySite( site );
+	const IconComponent = getIconBySite( service );
+	const socialLinkName = getNameBySite( service );
 
 	return (
-		<Button
-			className={ classes }
-			onClick={ () => setPopover( true ) }
-		>
-			<IconComponent />
-			{ isSelected && showURLPopover && (
-				<URLPopover
-					onClose={ () => setPopover( false ) }
+		<Fragment>
+			<InspectorControls>
+				<PanelBody
+					title={ sprintf(
+						/* translators: %s: name of the social service. */
+						__( '%s label' ),
+						socialLinkName
+					) }
+					initialOpen={ false }
 				>
-					<form
-						className="block-editor-url-popover__link-editor"
-						onSubmit={ ( event ) => {
-							event.preventDefault();
-							setPopover( false );
-						} } >
-						<div className="editor-url-input block-editor-url-input">
-							<input type="text"
-								value={ url }
-								onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
-								placeholder={ __( 'Enter Address' ) }
-							/>
-						</div>
-						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-					</form>
-				</URLPopover>
-			) }
-		</Button>
+					<PanelRow>
+						<TextControl
+							label={ __( 'Link label' ) }
+							help={ __(
+								'Briefly describe the link to help screen reader users.'
+							) }
+							value={ label }
+							onChange={ ( value ) =>
+								setAttributes( { label: value } )
+							}
+						/>
+					</PanelRow>
+				</PanelBody>
+			</InspectorControls>
+			<Block.li className={ classes }>
+				<Button onClick={ () => setPopover( true ) }>
+					<IconComponent />
+					{ isSelected && showURLPopover && (
+						<URLPopover onClose={ () => setPopover( false ) }>
+							<form
+								className="block-editor-url-popover__link-editor"
+								onSubmit={ ( event ) => {
+									event.preventDefault();
+									setPopover( false );
+								} }
+							>
+								<div className="block-editor-url-input">
+									<URLInput
+										value={ url }
+										onChange={ ( nextURL ) =>
+											setAttributes( { url: nextURL } )
+										}
+										placeholder={ __( 'Enter address' ) }
+										disableSuggestions={ true }
+									/>
+								</div>
+								<Button
+									icon={ keyboardReturn }
+									label={ __( 'Apply' ) }
+									type="submit"
+								/>
+							</form>
+						</URLPopover>
+					) }
+				</Button>
+			</Block.li>
+		</Fragment>
 	);
 };
 

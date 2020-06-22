@@ -5,21 +5,16 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] 
   className="editor-post-preview"
   disabled={false}
   href="https://wordpress.org/?p=1"
-  isLarge={true}
+  isTertiary={true}
   onClick={[Function]}
   target="wp-preview-1"
 >
   Preview
-  <span
-    className="screen-reader-text"
+  <VisuallyHidden
+    as="span"
   >
     (opens in a new tab)
-  </span>
-  <WithSelect(WithDispatch(DotTip))
-    tipId="core/editor.preview"
-  >
-    Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.
-  </WithSelect(WithDispatch(DotTip))>
+  </VisuallyHidden>
 </ForwardRef(Button)>
 `;
 
@@ -28,20 +23,15 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] = 
   className="editor-post-preview"
   disabled={false}
   href="https://wordpress.org/?p=1&preview=true"
-  isLarge={true}
+  isTertiary={true}
   onClick={[Function]}
   target="wp-preview-1"
 >
   Preview
-  <span
-    className="screen-reader-text"
+  <VisuallyHidden
+    as="span"
   >
     (opens in a new tab)
-  </span>
-  <WithSelect(WithDispatch(DotTip))
-    tipId="core/editor.preview"
-  >
-    Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.
-  </WithSelect(WithDispatch(DotTip))>
+  </VisuallyHidden>
 </ForwardRef(Button)>
 `;

@@ -15,12 +15,17 @@ import { Component } from '@wordpress/element';
 
 describe( 'TabPanel', () => {
 	const getElementByClass = ( wrapper, className ) => {
-		return TestUtils.findRenderedDOMComponentWithClass( wrapper, className );
+		return TestUtils.findRenderedDOMComponentWithClass(
+			wrapper,
+			className
+		);
 	};
 
 	const getElementsByClass = ( wrapper, className ) => {
-		return TestUtils
-			.scryRenderedDOMComponentsWithClass( wrapper, className );
+		return TestUtils.scryRenderedDOMComponentsWithClass(
+			wrapper,
+			className
+		);
 	};
 
 	const elementClick = ( element ) => {
@@ -61,7 +66,11 @@ describe( 'TabPanel', () => {
 					},
 				],
 				children: ( tab ) => {
-					return <p tabIndex="0" className={ tab.name + '-view' }>{ tab.name }</p>;
+					return (
+						<p tabIndex="0" className={ tab.name + '-view' }>
+							{ tab.name }
+						</p>
+					);
 				},
 			};
 
@@ -73,12 +82,20 @@ describe( 'TabPanel', () => {
 			const betaTab = getElementByClass( wrapper, 'beta' );
 			const gammaTab = getElementByClass( wrapper, 'gamma' );
 
-			const getAlphaViews = () => getElementsByClass( wrapper, 'alpha-view' );
-			const getBetaViews = () => getElementsByClass( wrapper, 'beta-view' );
-			const getGammaViews = () => getElementsByClass( wrapper, 'gamma-view' );
+			const getAlphaViews = () =>
+				getElementsByClass( wrapper, 'alpha-view' );
+			const getBetaViews = () =>
+				getElementsByClass( wrapper, 'beta-view' );
+			const getGammaViews = () =>
+				getElementsByClass( wrapper, 'gamma-view' );
 
-			const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
-			const getActiveView = () => getElementByClass( wrapper, 'components-tab-panel__tab-content' ).firstChild.textContent;
+			const getActiveTab = () =>
+				getElementByClass( wrapper, 'active-tab' );
+			const getActiveView = () =>
+				getElementByClass(
+					wrapper,
+					'components-tab-panel__tab-content'
+				).firstChild.textContent;
 
 			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
 			expect( getAlphaViews() ).toHaveLength( 1 );
@@ -138,7 +155,11 @@ describe( 'TabPanel', () => {
 				},
 			],
 			children: ( tab ) => {
-				return <p tabIndex="0" className={ tab.name + '-view' }>{ tab.name }</p>;
+				return (
+					<p tabIndex="0" className={ tab.name + '-view' }>
+						{ tab.name }
+					</p>
+				);
 			},
 		};
 		const wrapper = TestUtils.renderIntoDocument(

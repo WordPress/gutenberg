@@ -1,0 +1,23 @@
+// Increased specificity to override blocks default margin.
+.wp-block-buttons .wp-block-button {
+	display: inline-block;
+	margin-right: $grid-unit-10;
+	margin-bottom: $grid-unit-10;
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+.wp-block-buttons.alignright .wp-block-button {
+	margin-right: 0;
+	margin-left: $grid-unit-10;
+
+	&:first-child {
+		margin-left: 0;
+	}
+}
+
+.wp-block-buttons.aligncenter {
+	text-align: center;
+}

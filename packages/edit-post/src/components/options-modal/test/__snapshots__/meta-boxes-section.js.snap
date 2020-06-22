@@ -2,20 +2,20 @@
 
 exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
 <Section
-  title="Advanced Panels"
+  title="Advanced panels"
 >
   <WithSelect(EnableCustomFieldsOption)
-    label="Custom Fields"
+    label="Custom fields"
   />
 </Section>
 `;
 
 exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`] = `
 <Section
-  title="Advanced Panels"
+  title="Advanced panels"
 >
   <WithSelect(EnableCustomFieldsOption)
-    label="Custom Fields"
+    label="Custom fields"
   />
   <WithSelect(IfCondition(WithDispatch(BaseOption)))
     key="test1"
@@ -32,7 +32,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
 
 exports[`MetaBoxesSection renders meta box options 1`] = `
 <Section
-  title="Advanced Panels"
+  title="Advanced panels"
 >
   <WithSelect(IfCondition(WithDispatch(BaseOption)))
     key="test1"
