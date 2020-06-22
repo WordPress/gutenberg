@@ -153,10 +153,10 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 		$this->assertSame( 'my-plugin/notice', $result->name );
 		$this->assertSame( 'Notice', $result->title );
 		$this->assertSame( 'common', $result->category );
-		$this->assertEquals( array( 'core/group' ), $result->parent );
+		$this->assertEqualSets( array( 'core/group' ), $result->parent );
 		$this->assertSame( 'star', $result->icon );
 		$this->assertSame( 'Shows warning, error or success notices…', $result->description );
-		$this->assertEquals( array( 'alert', 'message' ), $result->keywords );
+		$this->assertEqualSets( array( 'alert', 'message' ), $result->keywords );
 		$this->assertEquals(
 			array(
 				'message' => array(
@@ -167,6 +167,13 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 			),
 			$result->attributes
 		);
+		$this->assertEquals(
+			array(
+				'my-plugin/message' => 'message',
+			),
+			$result->provides_context
+		);
+		$this->assertEqualSets( array( 'groupId' ), $result->uses_context );
 		$this->assertEquals(
 			array(
 				'align'             => true,
