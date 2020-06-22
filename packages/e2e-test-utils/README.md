@@ -360,6 +360,16 @@ _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
 
+<a name="multiSelectBlocks" href="#multiSelectBlocks">#</a> **multiSelectBlocks**
+
+Select multiple blocks on the editor given the start clientId and the end clientId.
+The start block must be already selected.
+
+_Parameters_
+
+-   _start_ `string`: Identifier of the start block.
+-   _end_ `string`: Identifier of the end block.
+
 <a name="openDocumentSettingsSidebar" href="#openDocumentSettingsSidebar">#</a> **openDocumentSettingsSidebar**
 
 Clicks on the button in the header which opens Document Settings sidebar when it is closed.

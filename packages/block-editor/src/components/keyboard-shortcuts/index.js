@@ -22,7 +22,6 @@ function KeyboardShortcuts() {
 			const selectedClientIds = getSelectedBlockClientIds();
 			const normalizedClientIds = castArray( selectedClientIds );
 			const [ firstClientId ] = normalizedClientIds;
-			// todo have to check logic and mover/button to reuse...
 			return {
 				clientIds: selectedClientIds,
 				rootBlocksClientIds: getBlockOrder(),
@@ -43,9 +42,7 @@ function KeyboardShortcuts() {
 		moveBlocksDown,
 	} = useDispatch( 'core/block-editor' );
 
-	// todo jsdoc
-	// todo tests
-	// todo have to check block-mover/button.js for logic (ex disabled...)
+	// Moves selected block/blocks up
 	useShortcut(
 		'core/block-editor/move-up',
 		useCallback(
@@ -58,9 +55,7 @@ function KeyboardShortcuts() {
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
 
-	// todo jsdoc
-	// todo tests
-	// todo have to check block-mover/button.js for logic (ex disabled...)
+	// Moves selected block/blocks up
 	useShortcut(
 		'core/block-editor/move-down',
 		useCallback(
@@ -269,7 +264,7 @@ function KeyboardShortcutsRegister() {
 			description: __( 'Move block Up.' ),
 			keyCombination: {
 				modifier: 'alt', // todo change these...
-				character: 'q',
+				character: 'q', // 'up',
 			},
 		} );
 
@@ -278,8 +273,8 @@ function KeyboardShortcutsRegister() {
 			category: 'block',
 			description: __( 'Move block Down.' ),
 			keyCombination: {
-				modifier: 'alt',
-				character: 'w',
+				modifier: 'alt', // todo change these...
+				character: 'w', //'down',
 			},
 		} );
 	}, [ registerShortcut ] );
