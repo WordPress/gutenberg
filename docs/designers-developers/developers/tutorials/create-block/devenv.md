@@ -14,7 +14,7 @@ The tools are used to convert the JavaScript we are going to write into a format
 
 You can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, the LTS (long term support) version is recommeneded. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
 
-On Mac, it is recommended to use [Homebrew package manager](https://brew.sh/) to install node. Homebrew sets up user level permissions properly, whereas the default Node installer sets it up at the system-level causing permission issues later.
+On Mac, it is recommended to use the [Homebrew package manager](https://brew.sh/) to install node and not the installer above. Homebrew sets up user level permissions properly, whereas the default Node installer sets it up at the system-level causing permission issues later. Follow the directions on Homebrew to install the package manager, and then run `brew install node` to have it install node.
 
 The important part after installing is being able to use them in your terminal. Open a terminal command-line and type `node -v` and `npm -v` to confirm they are installed.
 
