@@ -89,7 +89,10 @@ function ColumnsEditContainer( {
 
 		let columnWidth = columnBaseWidth;
 		if ( columnsInRow > 1 ) {
-			const margins = columnsInRow * Math.min(columnsInRow, LARGE_CONTAINER_COLUMNS_IN_ROW) * styles.columnMargin.marginLeft;
+			const margins =
+				columnsInRow *
+				Math.min( columnsInRow, LARGE_CONTAINER_COLUMNS_IN_ROW ) *
+				styles.columnMargin.marginLeft;
 			columnWidth = ( minWidth - margins ) / columnsInRow;
 		}
 
@@ -102,7 +105,10 @@ function ColumnsEditContainer( {
 			return 1;
 		} else if ( containerWidth < BREAKPOINTS.large ) {
 			// show LARGE_CONTAINER_COLUMNS_IN_ROW Column in row for large breakpoint container width
-			return Math.min( Math.max( 1, columnCount ), LARGE_CONTAINER_COLUMNS_IN_ROW );
+			return Math.min(
+				Math.max( 1, columnCount ),
+				LARGE_CONTAINER_COLUMNS_IN_ROW
+			);
 		}
 		// show all Column in one row
 		return Math.max( 1, columnsNumber );
