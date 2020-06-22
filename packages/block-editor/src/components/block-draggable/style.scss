@@ -34,11 +34,6 @@
 // This hides the block being dragged.
 // The effect is that the block being dragged appears to be "lifted".
 .is-dragging.is-selected {
-	opacity: 0.4 !important;
-
-	&::before,
-	&::after {
-		display: none !important;
-	}
+	display: none !important;
 }
 
