@@ -4,6 +4,7 @@
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { getScrollContainer } from '@wordpress/dom';
 
 const SCROLL_INACTIVE_DISTANCE_PX = 50;
 const SCROLL_INTERVAL_MS = 25;
@@ -29,8 +30,7 @@ function getVerticalScrollParent( node ) {
 		return null;
 	}
 
-	// @todo - remove this hack and get a real reference to the scroll parent
-	return node.closest( '.interface-interface-skeleton__content' );
+	return getScrollContainer( node );
 }
 
 const BlockDraggable = ( {
