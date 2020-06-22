@@ -102,10 +102,10 @@ describe( 'InserterMenu', () => {
 		const { container } = initializeAllClosedMenuState();
 		const embedTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
-		)[ 4 ];
+		)[ 3 ];
 		const embedTabTitle = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
-		)[ 4 ];
+		)[ 3 ];
 		const blocks = embedTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
@@ -122,10 +122,10 @@ describe( 'InserterMenu', () => {
 		const { container } = initializeAllClosedMenuState();
 		const reusableTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
-		)[ 6 ];
+		)[ 5 ];
 		const reusableTabTitle = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
-		)[ 6 ];
+		)[ 5 ];
 		const blocks = reusableTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
@@ -141,10 +141,10 @@ describe( 'InserterMenu', () => {
 		const { container } = initializeAllClosedMenuState();
 		const commonTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
-		)[ 1 ];
+		)[ 0 ];
 		const commonTabTitle = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
-		)[ 1 ];
+		)[ 0 ];
 		const blocks = commonTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
@@ -176,7 +176,7 @@ describe( 'InserterMenu', () => {
 		const { container } = initializeAllClosedMenuState();
 		const layoutTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
-		)[ 2 ];
+		)[ 1 ];
 		const disabledBlocks = layoutTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item[disabled], .block-editor-block-types-list__item[aria-disabled="true"]'
 		);

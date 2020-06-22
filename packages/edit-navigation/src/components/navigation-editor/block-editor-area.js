@@ -66,9 +66,9 @@ export default function BlockEditorArea( {
 	}, [ rootBlockId ] );
 
 	return (
-		<Card className="edit-navigation-menu-editor__block-editor-area">
+		<Card className="edit-navigation-editor__block-editor-area">
 			<CardHeader>
-				<div className="edit-navigation-menu-editor__block-editor-area-header-text">
+				<div className="edit-navigation-editor__block-editor-area-header-text">
 					{ __( 'Navigation menu' ) }
 				</div>
 
@@ -79,7 +79,7 @@ export default function BlockEditorArea( {
 			<CardBody>
 				<NavigableToolbar
 					className={ classnames(
-						'edit-navigation-menu-editor__block-editor-toolbar',
+						'edit-navigation-editor__block-editor-toolbar',
 						{
 							'is-hidden': isNavigationModeActive,
 						}

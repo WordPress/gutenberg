@@ -1,4 +1,4 @@
-.edit-navigation-menu-editor {
+.edit-navigation-editor {
 	display: grid;
 	align-items: self-start;
 	grid-gap: 10px;
@@ -13,7 +13,7 @@
 	}
 }
 
-.edit-navigation-menu-editor__block-editor-toolbar {
+.edit-navigation-editor__block-editor-toolbar {
 	height: 46px;
 	margin-bottom: 12px;
 	border: 1px solid #e2e4e7;
@@ -58,7 +58,7 @@
 	}
 }
 
-.edit-navigation-menu-editor__navigation-structure-panel {
+.edit-navigation-editor__navigation-structure-panel {
 	// IE11 requires the column to be explicitly declared.
 	grid-column: 1;
 
@@ -73,11 +73,11 @@
 	}
 }
 
-.edit-navigation-menu-editor__navigation-structure-header {
+.edit-navigation-editor__navigation-structure-header {
 	font-weight: bold;
 }
 
-.edit-navigation-menu-editor__block-editor-area {
+.edit-navigation-editor__block-editor-area {
 	@include break-medium {
 		// IE11 requires the column to be explicitly declared.
 		// Only shift this into the second column on desktop.
@@ -91,7 +91,7 @@
 		justify-content: space-between;
 	}
 
-	.edit-navigation-menu-editor__block-editor-area-header-text {
+	.edit-navigation-editor__block-editor-area-header-text {
 		flex-grow: 1;
 		font-weight: bold;
 	}

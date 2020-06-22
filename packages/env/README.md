@@ -12,7 +12,7 @@ $ npm -g i @wordpress/env
 $ wp-env start
 ```
 
-The local environment will be available at http://localhost:8888.
+The local environment will be available at http://localhost:8888 (Username: `admin`, Password: `password`).
 
 ## Prerequisites
 
