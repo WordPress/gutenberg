@@ -1,8 +1,8 @@
 .separator {
-	margin-top: $panel-padding / 2;
-	margin-bottom: $panel-padding / 2;
-	margin-left: -$panel-padding;
-	margin-right: -$panel-padding;
+	margin-top: $grid-unit-20 / 2;
+	margin-bottom: $grid-unit-20 / 2;
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
 	height: $border-width;
 	background-color: $light-gray-400;
 }

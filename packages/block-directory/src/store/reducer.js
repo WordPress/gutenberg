@@ -11,27 +11,22 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export const downloadableBlocks = (
-	state = {
-		results: {},
-		isRequestingDownloadableBlocks: true,
-	},
-	action
-) => {
+export const downloadableBlocks = ( state = {}, action ) => {
 	switch ( action.type ) {
 		case 'FETCH_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
-				isRequestingDownloadableBlocks: true,
+				[ action.filterValue ]: {
+					isRequesting: true,
+				},
 			};
 		case 'RECEIVE_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
-				results: {
-					...state.results,
-					[ action.filterValue ]: action.downloadableBlocks,
+				[ action.filterValue ]: {
+					results: action.downloadableBlocks,
+					isRequesting: false,
 				},
-				isRequestingDownloadableBlocks: false,
 			};
 	}
 	return state;

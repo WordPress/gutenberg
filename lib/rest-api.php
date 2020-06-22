@@ -285,10 +285,6 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  * @since 7.x.0
  */
 function gutenberg_register_image_editor() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-rich-image-editing' ) ) {
-		return;
-	}
-
 	$image_editor = new WP_REST_Image_Editor_Controller();
 	$image_editor->register_routes();
 }

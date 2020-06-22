@@ -51,7 +51,7 @@
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",
 		"quantize": "^1.0.2",
-		"re-resizable": "^6.0.0",
+		"re-resizable": "^6.4.0",
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",
 		"react-use-gesture": "^7.0.15",
