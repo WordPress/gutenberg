@@ -315,9 +315,12 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 				>
 					<>
 						<CustomSelectControl
-							className={ classnames( {
-								'has-menus': hasMenus,
-							} ) }
+							className={ classnames(
+								'wp-block-navigation-placeholder__select-control',
+								{
+									'has-menus': hasMenus,
+								}
+							) }
 							label={
 								! isLoading
 									? getPlaceholderInstructions(
