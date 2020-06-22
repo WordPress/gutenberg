@@ -50,7 +50,7 @@ function KeyboardShortcuts() {
 				event.preventDefault();
 				moveBlocksUp( clientIds, rootClientId );
 			},
-			[ clientIds, duplicateBlocks ]
+			[ clientIds, moveBlocksUp ]
 		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
@@ -63,7 +63,7 @@ function KeyboardShortcuts() {
 				event.preventDefault();
 				moveBlocksDown( clientIds, rootClientId );
 			},
-			[ clientIds, duplicateBlocks ]
+			[ clientIds, moveBlocksDown ]
 		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
