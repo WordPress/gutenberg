@@ -89,18 +89,20 @@ async function runWordPressReleaseBranchSyncStep(
  * @param {string} gitWorkingDirectoryPath Git working directory path.
  * @param {string} minimumVersionBump      Minimum version bump for the packages.
  * @param {string} abortMessage            Abort Message.
+ * @param {boolean} isRC                   Whether the package version to publish is a pre-release.
  */
 async function updatePackageChangelogs(
 	gitWorkingDirectoryPath,
 	minimumVersionBump,
-	abortMessage
+	abortMessage,
+	isRC
 ) {
 	const changelogFiles = await glob(
 		path.resolve( gitWorkingDirectoryPath, 'packages/*/CHANGELOG.md' )
 	);
 	const processedPackages = await Promise.all(
-		changelogFiles.map( async ( changelogFile ) => {
-			const fileStream = fs.createReadStream( changelogFile );
+		changelogFiles.map( async ( changelogPath ) => {
+			const fileStream = fs.createReadStream( changelogPath );
 
 			const lines = readline.createInterface( {
 				input: fileStream,
@@ -152,30 +154,42 @@ async function updatePackageChangelogs(
 				}
 			}
 			const packageName = `@wordpress/${
-				changelogFile.split( '/' ).reverse()[ 1 ]
+				changelogPath.split( '/' ).reverse()[ 1 ]
 			}`;
-			const { version } = readJSONFile(
-				changelogFile.replace( 'CHANGELOG.md', 'package.json' )
+			const packageJSONPath = changelogPath.replace(
+				'CHANGELOG.md',
+				'package.json'
 			);
-			const nextVersion =
+			const packageLockPath = changelogPath.replace(
+				'CHANGELOG.md',
+				'package-lock.json'
+			);
+			const { version } = readJSONFile( packageJSONPath );
+			let nextVersion =
 				versionBump !== null
 					? semver.inc( version, versionBump )
 					: null;
 
+			if ( nextVersion !== null && isRC ) {
+				nextVersion = nextVersion + '-rc.1';
+			}
+
 			return {
-				changelogFile,
+				changelogPath,
+				packageJSONPath,
+				packageLockPath,
 				packageName,
-				version,
 				nextVersion,
+				version,
 			};
 		} )
 	);
 
-	const changelogsToUpdate = processedPackages.filter(
+	const packagesToUpdate = processedPackages.filter(
 		( { nextVersion } ) => nextVersion
 	);
 
-	if ( changelogsToUpdate.length === 0 ) {
+	if ( packagesToUpdate.length === 0 ) {
 		log( '>> No changes in CHANGELOG files detected.' );
 		return;
 	}
@@ -186,19 +200,48 @@ async function updatePackageChangelogs(
 
 	const publishDate = new Date().toISOString().split( 'T' )[ 0 ];
 	await Promise.all(
-		changelogsToUpdate.map(
-			async ( { changelogFile, packageName, nextVersion, version } ) => {
+		packagesToUpdate.map(
+			async ( {
+				changelogPath,
+				packageJSONPath,
+				packageLockPath,
+				packageName,
+				nextVersion,
+				version,
+			} ) => {
+				// Update changelog
 				const content = await fs.promises.readFile(
-					changelogFile,
+					changelogPath,
 					'utf8'
 				);
 				await fs.promises.writeFile(
-					changelogFile,
+					changelogPath,
 					content.replace(
 						'## Unreleased',
 						`## Unreleased\n\n## ${ nextVersion } (${ publishDate })`
 					)
 				);
+
+				// Update package.json & package-lock.json
+				const packageJson = readJSONFile( packageJSONPath );
+				const packageLock = readJSONFile( packageLockPath );
+				const newPackageJson = {
+					...packageJson,
+					version: nextVersion,
+				};
+				fs.writeFileSync(
+					packageJSONPath,
+					JSON.stringify( newPackageJson, null, '\t' ) + '\n'
+				);
+				const newPackageLock = {
+					...packageLock,
+					version: nextVersion,
+				};
+				fs.writeFileSync(
+					packageLockPath,
+					JSON.stringify( newPackageLock, null, '\t' ) + '\n'
+				);
+
 				log(
 					`   - ${ packageName }: ${ version } -> ${ nextVersion }`
 				);
@@ -246,13 +289,14 @@ async function runPushGitChangesStep(
 }
 
 /**
- * Prepublish to npm steps for WordPress packages.
+ * Prepare everything to publish WordPress packages to npm.
  *
  * @param {string} minimumVersionBump Minimum version bump for the packages.
+ * @param {boolean} isRC Whether the package version to publish is a pre-release.
  *
  * @return {Promise<Object>} Github release object.
  */
-async function prepublishPackages( minimumVersionBump ) {
+async function prepareForPackageRelease( minimumVersionBump, isRC ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
 	let abortMessage = 'Aborting!';
 	const temporaryFolders = [];
@@ -273,7 +317,8 @@ async function prepublishPackages( minimumVersionBump ) {
 	await updatePackageChangelogs(
 		gitWorkingDirectoryPath,
 		minimumVersionBump,
-		abortMessage
+		abortMessage,
+		isRC
 	);
 
 	// Push the local changes
@@ -297,7 +342,7 @@ async function prepareLatestDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	await prepublishPackages( 'minor' );
+	await prepareForPackageRelease( 'minor', false );
 
 	log(
 		'\n>> 🎉 WordPress packages are ready to publish!\n',
@@ -315,7 +360,7 @@ async function prepareNextDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	await prepublishPackages( 'minor' );
+	await prepareForPackageRelease( 'minor', true );
 
 	log(
 		'\n>> 🎉 WordPress packages are ready to publish!\n',
