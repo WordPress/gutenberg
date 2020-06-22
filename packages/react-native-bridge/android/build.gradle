@@ -302,7 +302,9 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
     }
 
     task resetExtractedRNTools(type: Delete) {
-        println "Deleting temporary folders with extracted RN tools"
+        doFirst {
+            println "Deleting temporary folders with extracted RN tools"
+        }
         delete nodeFolder, npmFolder
     }
 
