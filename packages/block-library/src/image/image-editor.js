@@ -30,6 +30,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
+/**
+ * Internal dependencies
+ */
+
+import { convertCropCoordinateSystem } from './utils';
+
 const MIN_ZOOM = 100;
 const MAX_ZOOM = 300;
 const POPOVER_PROPS = {
@@ -154,31 +160,21 @@ export default function ImageEditor( {
 	const [ zoom, setZoom ] = useState( 100 );
 	const [ aspect, setAspect ] = useState( naturalWidth / naturalHeight );
 	const [ rotation, setRotation ] = useState( 0 );
-	const [ editedUrl, setEditedUrl ] = useState();
-
-	const editedWidth = width;
-	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
-	let naturalAspectRatio = naturalWidth / naturalHeight;
-
-	if ( rotation % 180 === 90 ) {
-		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
-		naturalAspectRatio = naturalHeight / naturalWidth;
-	}
 
 	function apply() {
 		setIsProgress( true );
 
-		let attrs = {};
+		const size = {
+			width: naturalWidth,
+			height: naturalHeight,
+		};
 
-		// The crop script may return some very small, sub-pixel values when the image was not cropped.
-		// Crop only when the new size has changed by more than 0.1%.
-		if ( crop.width < 99.9 || crop.height < 99.9 ) {
-			attrs = crop;
-		}
+		const newCrop = convertCropCoordinateSystem( rotation, size, crop );
 
-		if ( rotation > 0 ) {
-			attrs.rotation = rotation;
-		}
+		const attrs = {
+			...newCrop,
+			rotation,
+		};
 
 		apiFetch( {
 			path: `wp/v2/media/${ id }/edit`,
@@ -189,7 +185,6 @@ export default function ImageEditor( {
 				setAttributes( {
 					id: response.id,
 					url: response.source_url,
-					height: height && width ? width / aspect : undefined,
 				} );
 			} )
 			.catch( ( error ) => {
@@ -209,64 +204,6 @@ export default function ImageEditor( {
 				setIsProgress( false );
 				setIsEditingImage( false );
 			} );
-	}
-
-	function rotate() {
-		const angle = ( rotation + 90 ) % 360;
-
-		if ( angle === 0 ) {
-			setEditedUrl();
-			setRotation( angle );
-			setAspect( 1 / aspect );
-			setPosition( {
-				x: -( position.y * naturalAspectRatio ),
-				y: position.x * naturalAspectRatio,
-			} );
-			return;
-		}
-
-		function editImage( event ) {
-			const canvas = document.createElement( 'canvas' );
-
-			let translateX = 0;
-			let translateY = 0;
-
-			if ( angle % 180 ) {
-				canvas.width = event.target.height;
-				canvas.height = event.target.width;
-			} else {
-				canvas.width = event.target.width;
-				canvas.height = event.target.height;
-			}
-
-			if ( angle === 90 || angle === 180 ) {
-				translateX = canvas.width;
-			}
-
-			if ( angle === 270 || angle === 180 ) {
-				translateY = canvas.height;
-			}
-
-			const context = canvas.getContext( '2d' );
-
-			context.translate( translateX, translateY );
-			context.rotate( ( angle * Math.PI ) / 180 );
-			context.drawImage( event.target, 0, 0 );
-
-			canvas.toBlob( ( blob ) => {
-				setEditedUrl( URL.createObjectURL( blob ) );
-				setRotation( angle );
-				setAspect( 1 / aspect );
-				setPosition( {
-					x: -( position.y * naturalAspectRatio ),
-					y: position.x * naturalAspectRatio,
-				} );
-			} );
-		}
-
-		const el = new window.Image();
-		el.src = url;
-		el.onload = editImage;
 	}
 
 	return (
@@ -294,24 +231,28 @@ export default function ImageEditor( {
 					'is-applying': inProgress,
 				} ) }
 				style={ {
-					width: editedWidth,
-					height: editedHeight,
+					width,
+					height:
+						height ||
+						( clientWidth * naturalHeight ) / naturalWidth,
 				} }
 			>
 				<Cropper
-					image={ editedUrl || url }
+					image={ url }
 					disabled={ inProgress }
 					minZoom={ MIN_ZOOM / 100 }
 					maxZoom={ MAX_ZOOM / 100 }
-					crop={ position }
-					zoom={ zoom / 100 }
 					aspect={ aspect }
-					onCropChange={ setPosition }
-					onCropComplete={ ( newCropPercent ) => {
-						setCrop( newCropPercent );
-					} }
+					zoom={ zoom / 100 }
+					rotation={ rotation }
+					crop={ position }
 					onZoomChange={ ( newZoom ) => {
 						setZoom( newZoom * 100 );
+					} }
+					onRotationChange={ setRotation }
+					onCropChange={ setPosition }
+					onCropComplete={ ( croppedArea ) => {
+						setCrop( croppedArea );
 					} }
 				/>
 				{ inProgress && <Spinner /> }
@@ -321,7 +262,9 @@ export default function ImageEditor( {
 					<ToolbarButton
 						icon={ rotateRightIcon }
 						label={ __( 'Rotate' ) }
-						onClick={ rotate }
+						onClick={ () =>
+							setRotation( ( prev ) => ( prev + 90 ) % 360 )
+						}
 						disabled={ inProgress }
 					/>
 				</ToolbarGroup>
