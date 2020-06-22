@@ -63,7 +63,7 @@ export function DefaultBlockAppender( {
 			/>
 			<Inserter
 				rootClientId={ rootClientId }
-				position="top right"
+				position="bottom right"
 				isAppender
 				__experimentalIsQuick
 			/>

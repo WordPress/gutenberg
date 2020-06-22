@@ -207,7 +207,7 @@ function BlockPopover( {
 			{ showEmptyBlockSideInserter && (
 				<div className="block-editor-block-list__empty-block-inserter">
 					<Inserter
-						position="top right"
+						position="bottom right"
 						rootClientId={ rootClientId }
 						clientId={ clientId }
 						__experimentalIsQuick
