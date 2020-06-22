@@ -305,12 +305,6 @@ if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_a
  * @return string New block output.
  */
 function gutenberg_experimental_apply_classnames_and_styles( $block_content, $block ) {
-	// Don't filter template part blocks since we filter the blocks in each template
-	// part individually.
-	if ( 'core/template-part' === $block['blockName'] ) {
-		return $block_content;
-	}
-
 	if ( isset( $block['attrs'] ) ) {
 		// Check what style features the block supports.
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
