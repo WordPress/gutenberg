@@ -357,7 +357,7 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 			return $block_content;
 		}
 
-		// Some inline styles may be added without ending ';', add this is necessary.
+		// Some inline styles may be added without ending ';', add this if necessary.
 		$current_styles = trim( $block_root->getAttribute( 'style' ), ' ' );
 		if ( strlen( $current_styles ) > 0 && substr( $current_styles, -1 ) !== ';' ) {
 			$current_styles = $current_styles . ';';
@@ -365,7 +365,7 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 		// Merge and dedupe new and existing classes and styles.
 		$new_classes = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . implode( ' ', $extra_classes ) ) ) );
-		$new_styles  = implode( ' ', array_unique( explode( ' ', $current_styles . $extra_styles ) ) );
+		$new_styles  = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . $extra_styles ) ) );
 
 		// Apply new styles and classes.
 		if ( ! empty( $new_classes ) ) {
