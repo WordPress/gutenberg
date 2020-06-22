@@ -152,17 +152,6 @@ export function templateType( state, action ) {
 }
 
 /**
- * Reducer returning the list of template part IDs.
- *
- * @param {Object} state Current state.
- *
- * @return {Object} Updated state.
- */
-export function templatePartIds( state = [] ) {
-	return state;
-}
-
-/**
  * Reducer returning the page being edited.
  *
  * @param {Object} state  Current state.
@@ -198,7 +187,6 @@ export default combineReducers( {
 	templateId,
 	templatePartId,
 	templateType,
-	templatePartIds,
 	page,
 	showOnFront,
 } );

@@ -13,7 +13,6 @@ import {
 	templateId,
 	templatePartId,
 	templateType,
-	templatePartIds,
 	page,
 	showOnFront,
 } from '../reducer';
@@ -161,17 +160,6 @@ describe( 'state', () => {
 					type: 'SET_TEMPLATE_PART',
 				} )
 			).toEqual( 'wp_template_part' );
-		} );
-	} );
-
-	describe( 'templatePartIds()', () => {
-		it( 'should apply default state', () => {
-			expect( templatePartIds( undefined, {} ) ).toEqual( [] );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templatePartIds( state, {} ) ).toBe( state );
 		} );
 	} );
 

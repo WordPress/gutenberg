@@ -9,7 +9,6 @@ import {
 	getTemplateId,
 	getTemplatePartId,
 	getTemplateType,
-	getTemplatePartIds,
 	getPage,
 	getShowOnFront,
 } from '../selectors';
@@ -127,13 +126,6 @@ describe( 'selectors', () => {
 		it( 'returns the template type', () => {
 			const state = { templateType: {} };
 			expect( getTemplateType( state ) ).toBe( state.templateType );
-		} );
-	} );
-
-	describe( 'getTemplatePartIds', () => {
-		it( 'returns the template part IDs', () => {
-			const state = { templatePartIds: {} };
-			expect( getTemplatePartIds( state ) ).toBe( state.templatePartIds );
 		} );
 	} );
 

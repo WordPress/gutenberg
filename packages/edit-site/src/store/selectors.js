@@ -124,17 +124,6 @@ export function getTemplateType( state ) {
 }
 
 /**
- * Returns the current template part IDs.
- *
- * @param {Object} state Global application state.
- *
- * @return {number[]} Template part IDs.
- */
-export function getTemplatePartIds( state ) {
-	return state.templatePartIds;
-}
-
-/**
  * Returns the current page object.
  *
  * @param {Object} state Global application state.
