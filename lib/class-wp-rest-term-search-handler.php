@@ -46,7 +46,7 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 	 *               total count for the matching search results.
 	 */
 	public function search_items( WP_REST_Request $request ) {
-
+		$term_search = '';
 		if ( ! empty( $request['search'] ) ) {
 			$term_search = $request['search'];
 		}
