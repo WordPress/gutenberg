@@ -286,7 +286,7 @@ $block-inserter-tabs-height: 44px;
 	border-top: $border-width solid $light-gray-500;
 }
 
-.block-editor-inserter__popover.is-quick > .components-popover__content {
+.block-editor-inserter__popover.is-quick > .components-popover__content > div {
 	@include break-medium {
 		padding: 0;
 	}
