@@ -16,15 +16,10 @@ body.is-dragging-components-draggable {
 	background: transparent;
 	pointer-events: none;
 	z-index: z-index(".components-draggable__clone");
-	opacity: 0.7;
-
-	// Hide the actual clone. If this experiment is successful, we'll want to actually remove the clone entirely.
-	> * {
-		display: none;
-	}
 }
 
-// This is only for testing.
+// This hides the block being dragged.
+// The effect is that the block being dragged appears to be "lifted".
 .is-dragging.is-selected {
 	display: none !important;
 }
