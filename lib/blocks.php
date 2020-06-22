@@ -305,75 +305,75 @@ if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_a
  * @return string New block output.
  */
 function gutenberg_experimental_apply_classnames_and_styles( $block_content, $block ) {
-	if ( isset( $block['attrs'] ) ) {
-		// Check what style features the block supports.
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-		if ( ! $block_type ) {
-			return $block_content;
-		}
-
-		$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
-
-		// Return early if nothing is supported.
-		if ( count( $supports ) === 0 ) {
-			return $block_content;
-		}
-
-		$colors     = gutenberg_experimental_build_css_colors( $block['attrs'], $supports );
-		$typography = gutenberg_experimental_build_css_typography( $block['attrs'], $supports );
-
-		$extra_classes = array_merge(
-			$colors['css_classes'],
-			$typography['css_classes'],
-			isset( $block['attrs']['className'] ) ? array( $block['attrs']['className'] ) : array(),
-			isset( $block['attrs']['align'] ) ? array( 'has-text-align-' . $block['attrs']['align'] ) : array()
-		);
-		$extra_styles  = (
-			$colors['inline_styles'] ||
-			$typography['inline_styles']
-		) ? esc_attr( $colors['inline_styles'] ) .
-			esc_attr( $typography['inline_styles'] )
-		: '';
-
-		$dom = new DOMDocument( '1.0', 'utf-8' );
-
-		// Suppress warnings from this method from polluting the front-end.
-		// @codingStandardsIgnoreStart
-		if ( ! @$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
-		// @codingStandardsIgnoreEnd
-			return $block_content;
-		}
-
-		$xpath      = new DOMXPath( $dom );
-		$block_root = $xpath->query( '/*' )[0];
-
-		if ( empty( $block_root ) ) {
-			return $block_content;
-		}
-
-		// Some inline styles may be added without ending ';', add this if necessary.
-		$current_styles = trim( $block_root->getAttribute( 'style' ), ' ' );
-		if ( strlen( $current_styles ) > 0 && substr( $current_styles, -1 ) !== ';' ) {
-			$current_styles = $current_styles . ';';
-		};
-
-		// Merge and dedupe new and existing classes and styles.
-		$new_classes = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . implode( ' ', $extra_classes ) ) ) );
-		$new_styles  = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . $extra_styles ) ) );
-
-		// Apply new styles and classes.
-		if ( ! empty( $new_classes ) ) {
-			$block_root->setAttribute( 'class', $new_classes );
-		}
-
-		if ( ! empty( $new_styles ) ) {
-			$block_root->setAttribute( 'style', $new_styles );
-		}
-
-		return $dom->saveHtml();
+	if ( ! isset( $block['attrs'] ) ) {
+		return $block_content;
 	}
 
-	return $block_content;
+	// Check what style features the block supports.
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	if ( ! $block_type ) {
+		return $block_content;
+	}
+
+	$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
+
+	// Return early if nothing is supported.
+	if ( 0 === count( $supports ) ) {
+		return $block_content;
+	}
+
+	$colors     = gutenberg_experimental_build_css_colors( $block['attrs'], $supports );
+	$typography = gutenberg_experimental_build_css_typography( $block['attrs'], $supports );
+
+	$extra_classes = array_merge(
+		$colors['css_classes'],
+		$typography['css_classes'],
+		isset( $block['attrs']['className'] ) ? array( $block['attrs']['className'] ) : array(),
+		isset( $block['attrs']['align'] ) ? array( 'has-text-align-' . $block['attrs']['align'] ) : array()
+	);
+	$extra_styles  = (
+		$colors['inline_styles'] ||
+		$typography['inline_styles']
+	) ? esc_attr( $colors['inline_styles'] ) .
+		esc_attr( $typography['inline_styles'] )
+	: '';
+
+	$dom = new DOMDocument( '1.0', 'utf-8' );
+
+	// Suppress warnings from this method from polluting the front-end.
+	// @codingStandardsIgnoreStart
+	if ( ! @$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
+	// @codingStandardsIgnoreEnd
+		return $block_content;
+	}
+
+	$xpath      = new DOMXPath( $dom );
+	$block_root = $xpath->query( '/*' )[0];
+
+	if ( empty( $block_root ) ) {
+		return $block_content;
+	}
+
+	// Some inline styles may be added without ending ';', add this if necessary.
+	$current_styles = trim( $block_root->getAttribute( 'style' ), ' ' );
+	if ( strlen( $current_styles ) > 0 && substr( $current_styles, -1 ) !== ';' ) {
+		$current_styles = $current_styles . ';';
+	};
+
+	// Merge and dedupe new and existing classes and styles.
+	$new_classes = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . implode( ' ', $extra_classes ) ) ) );
+	$new_styles  = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . $extra_styles ) ) );
+
+	// Apply new styles and classes.
+	if ( ! empty( $new_classes ) ) {
+		$block_root->setAttribute( 'class', $new_classes );
+	}
+
+	if ( ! empty( $new_styles ) ) {
+		$block_root->setAttribute( 'style', $new_styles );
+	}
+
+	return $dom->saveHtml();
 }
 add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles', 10, 2 );
 
