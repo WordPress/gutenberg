@@ -62,6 +62,7 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 			array(
 				'taxonomy'   => $taxonomies,
 				'name__like' => $term_search,
+				'hide_empty' => false,
 			)
 		);
 

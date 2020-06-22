@@ -77,6 +77,7 @@ class WP_REST_Term_Search_Handler_Test extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
 			array(
+				0 => 1, // that is the default category
 				self::$my_category,
 				self::$my_tag,
 			),
@@ -99,6 +100,7 @@ class WP_REST_Term_Search_Handler_Test extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
 			array(
+				0 => 1, // that is the default category
 				self::$my_category,
 			),
 			wp_list_pluck( $response->get_data(), 'id' )
@@ -134,6 +136,7 @@ class WP_REST_Term_Search_Handler_Test extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
 			array(
+				0 => 1, // this is the default category
 				self::$my_category,
 				self::$my_tag,
 			),
