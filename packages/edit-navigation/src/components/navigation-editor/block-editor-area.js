@@ -13,14 +13,14 @@ import {
 	ObserveTyping,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	Button,
-	CheckboxControl,
 	Card,
 	CardHeader,
 	CardBody,
 	CardFooter,
+	CheckboxControl,
 	Popover,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -57,15 +57,18 @@ export default function BlockEditorArea( {
 		},
 		[]
 	);
+
 	const { saveMenu } = useDispatch( 'core' );
 	const menu = useSelect( ( select ) => select( 'core' ).getMenu( menuId ), [
 		menuId,
 	] );
 
-	const [ autoAddPages, setAutoAddPages ] = useState( menu.auto_add );
+	const [ autoAddPages, setAutoAddPages ] = useState( false );
 
 	useEffect( () => {
-		setAutoAddPages( menu.auto_add );
+		if ( menu ) {
+			setAutoAddPages( menu.auto_add );
+		}
 	}, [ menuId ] );
 
 	// Select the navigation block when it becomes available
