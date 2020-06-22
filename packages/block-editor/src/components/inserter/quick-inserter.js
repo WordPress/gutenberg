@@ -179,6 +179,9 @@ function QuickInserter( {
 				<Button
 					className="block-editor-inserter__quick-inserter-expand"
 					onClick={ () => setInsererIsOpened( true ) }
+					aria-label={ __(
+						'Browse all. This will open the main inserter panel in the editor toolbar.'
+					) }
 				>
 					{ __( 'Browse all' ) }
 				</Button>
