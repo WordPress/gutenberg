@@ -164,7 +164,7 @@ export default function Image( {
 		}
 
 		setAttributes( {
-			url,
+			url: newUrl,
 			width: undefined,
 			height: undefined,
 			sizeSlug: newSizeSlug,
