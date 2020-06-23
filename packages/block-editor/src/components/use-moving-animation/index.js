@@ -68,8 +68,6 @@ function useMovingAnimation(
 
 	const previous = ref.current ? getAbsolutePosition( ref.current ) : null;
 	const scrollContainer = useRef();
-	const prevX = useRef( 0 );
-	const prevY = useRef( 0 );
 
 	useLayoutEffect( () => {
 		if ( triggeredAnimation ) {
@@ -110,11 +108,51 @@ function useMovingAnimation(
 			y,
 			clientTop: blockRect.top,
 		};
-		prevX.current = x;
-		prevY.current = y;
 		triggerAnimation();
 		setTransform( newTransform );
 	}, [ triggerAnimationOnChange ] );
+
+	// Only called when either the x or y value changes.
+	function onFrameChange( { x, y } ) {
+		if ( ! ref.current ) {
+			return;
+		}
+
+		const isMoving = x === 0 && y === 0;
+		ref.current.style.transformOrigin = isMoving ? '' : 'center';
+		ref.current.style.transform = isMoving
+			? ''
+			: `translate3d(${ x }px,${ y }px,0)`;
+		ref.current.style.zIndex = ! isSelected || isMoving ? '' : '1';
+
+		if (
+			adjustScrolling &&
+			scrollContainer.current &&
+			! prefersReducedMotion
+		) {
+			const blockRect = ref.current.getBoundingClientRect();
+			const diff = blockRect.top - transform.clientTop;
+
+			if ( diff ) {
+				scrollContainer.current.scrollTop += diff;
+			}
+		}
+	}
+
+	// Called for every frame computed by useSpring.
+	function onFrame( { x, y } ) {
+		x = Math.round( x );
+		y = Math.round( y );
+
+		if ( x !== onFrame.x || y !== onFrame.y ) {
+			onFrameChange( { x, y } );
+			onFrame.x = x;
+			onFrame.y = y;
+		}
+	}
+
+	onFrame.x = 0;
+	onFrame.y = 0;
 
 	useSpring( {
 		from: {
@@ -128,36 +166,7 @@ function useMovingAnimation(
 		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
-		onFrame( { x, y } ) {
-			if ( ref.current ) {
-				x = Math.round( x );
-				y = Math.round( y );
-				ref.current.style.transformOrigin = 'center';
-				ref.current.style.transform =
-					x === 0 && y === 0
-						? ''
-						: `translate3d(${ x }px,${ y }px,0)`;
-				ref.current.style.zIndex =
-					! isSelected || ( x === 0 && y === 0 ) ? '' : '1';
-
-				if (
-					adjustScrolling &&
-					scrollContainer.current &&
-					! prefersReducedMotion &&
-					y !== prevY.current
-				) {
-					const blockRect = ref.current.getBoundingClientRect();
-					const diff = blockRect.top - transform.clientTop;
-
-					if ( diff ) {
-						scrollContainer.current.scrollTop += diff;
-					}
-				}
-
-				prevX.current = x;
-				prevY.current = y;
-			}
-		},
+		onFrame,
 	} );
 }
 
