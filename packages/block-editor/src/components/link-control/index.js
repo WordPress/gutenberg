@@ -615,11 +615,6 @@ function LinkControl( {
 						</Button>
 						<ViewerSlot fillProps={ value } />
 					</div>
-					<LinkControlSettingsDrawer
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
-					/>
 				</Fragment>
 			) }
 			<LinkControlSettingsDrawer
