@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody } from '@wordpress/components';
+import { ColorPalette, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	FontSizePicker,
@@ -63,6 +63,47 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 										}
 									/>
 								);
+							}
+
+							return panels.length > 1 ? panels : null;
+						}
+					)
+					.filter( Boolean ) }
+			</PanelBody>
+			<PanelBody title={ __( 'Color' ) } initialOpen={ false }>
+				{ getBlockTypes()
+					.map(
+						( {
+							name,
+							title,
+							supports: { __experimentalColor },
+						} ) => {
+							const panels = [];
+							panels.push( <h3>{ title }</h3> );
+
+							if ( __experimentalColor ) {
+								// TODO: text & background color
+								panels.push(
+									<ColorPalette
+										colors={ [
+											{ name: 'red', color: '#f00' },
+											{ name: 'white', color: '#fff' },
+											{ name: 'blue', color: '#00f' },
+										] }
+										value={ '#f00' }
+										onChange={ () =>
+											console.log( 'change color' )
+										}
+									/>
+								);
+							}
+
+							if ( __experimentalColor?.gradients ) {
+								// TODO: do gradients
+							}
+
+							if ( __experimentalColor?.linkColor ) {
+								// TODO: do link color
 							}
 
 							return panels.length > 1 ? panels : null;
