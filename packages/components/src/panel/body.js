@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { noop } from 'lodash';
+import mergeRefs from 'react-merge-refs';
 import {
 	useDisclosureState,
 	Disclosure,
@@ -21,7 +22,7 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
  */
 import Button from '../button';
 import Icon from '../icon';
-import { useCombinedRefs, useUpdateEffect } from '../utils';
+import { useUpdateEffect } from '../utils';
 
 export function PanelBody(
 	{
@@ -42,7 +43,6 @@ export function PanelBody(
 		visible: initialOpen !== undefined ? initialOpen : opened,
 	} );
 	const nodeRef = useRef();
-	const combinedRefs = useCombinedRefs( ref, nodeRef );
 
 	// Defaults to 'smooth' scrolling
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
@@ -84,7 +84,7 @@ export function PanelBody(
 	} );
 
 	return (
-		<div className={ classes } ref={ combinedRefs }>
+		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
 			<PanelBodyTitle
 				focusable={ focusable }
 				title={ title }
