@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last, castArray } from 'lodash';
+import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -20,8 +20,7 @@ function KeyboardShortcuts() {
 				getBlockRootClientId,
 			} = select( 'core/block-editor' );
 			const selectedClientIds = getSelectedBlockClientIds();
-			const normalizedClientIds = castArray( selectedClientIds );
-			const [ firstClientId ] = normalizedClientIds;
+			const [ firstClientId ] = selectedClientIds;
 			return {
 				clientIds: selectedClientIds,
 				rootBlocksClientIds: getBlockOrder(),
