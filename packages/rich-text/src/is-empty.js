@@ -9,7 +9,7 @@ import { LINE_SEPARATOR } from './special-characters';
  *
  * @param {Object}      value           Object containing the value that
  *                                      should be checked.
- * @param {string}      value.text      The text that should be check.
+ * @param {string}      value.text      The text that should be checked.
  *
  * @return {boolean}    True if the value is empty, false if not.
  */
