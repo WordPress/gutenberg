@@ -563,15 +563,13 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
  * Takes data from the different origins (core, theme, and user)
  * and returns the merged result.
  *
- * @param boolean $include_draft Whether to include draft or only publish CPT for user styles.
- *
  * @return string
  */
-function gutenberg_experimental_global_styles_get_stylesheet( $include_draft = false ) {
+function gutenberg_experimental_global_styles_get_stylesheet() {
 	$gs_merged = array();
 	$gs_core   = gutenberg_experimental_global_styles_get_core();
 	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
-	$gs_user   = gutenberg_experimental_global_styles_get_user( $include_draft );
+	$gs_user   = gutenberg_experimental_global_styles_get_user();
 
 	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
 
