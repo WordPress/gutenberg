@@ -295,6 +295,7 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         }
     }
 
+    def nodeModulesFolders = ["$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"] as String[]
     task cleanupNodeModulesFolders(type: Delete) {
         doFirst {
             println "Deleting node_modules folders"
@@ -302,7 +303,7 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         dependsOn bundleUpToDateCheck
         onlyIf { !isBundleUpToDate() }
 
-        delete "$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"
+        delete nodeModulesFolders
     }
 
     task resetExtractedRNTools(type: Delete) {
@@ -324,6 +325,6 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         doFirst {
             println "Executing extended clean task that also deletes node_modules folders"
         }
-        delete "$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"
+        delete nodeModulesFolders
     }
 }
