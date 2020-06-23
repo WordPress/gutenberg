@@ -29,13 +29,6 @@
 		margin-left: $grid-unit-10 * 1.25;
 		margin-top: $grid-unit-10 * 1.25;
 	}
-
-	// Hide the draggable mover until functionality for positioning it on drag correctly is added: https://github.com/WordPress/gutenberg/issues/19703
-	.block-editor-block-toolbar .components-toolbar.block-editor-block-mover {
-		.components-button.block-editor-block-mover__control-drag-handle {
-			display: none;
-		}
-	}
 }
 
 .wp-block-navigation-link__nofollow-external-link {
