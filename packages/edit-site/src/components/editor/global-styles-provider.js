@@ -10,6 +10,12 @@ const GlobalStylesContext = createContext( {
 	setFontSize: () => {},
 	getLineHeight: () => {},
 	setLineHeight: () => {},
+	getTextColor: () => {},
+	setTextColor: () => {},
+	getBackgroundColor: () => {},
+	setBackgroundColor: () => {},
+	getLinkColor: () => {},
+	setLinkColor: () => {},
 } );
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
@@ -21,13 +27,30 @@ export default ( { children, entityId } ) => {
 		setFontSize,
 		getLineHeight,
 		setLineHeight,
+		getTextColor,
+		setTextColor,
+		getBackgroundColor,
+		setBackgroundColor,
+		getLinkColor,
+		setLinkColor,
 	} = useGlobalStylesFromEntities( entityId );
 
 	useGlobalStylesEffectToUpdateStylesheet( userStyles );
 
 	return (
 		<GlobalStylesContext.Provider
-			value={ { getFontSize, setFontSize, getLineHeight, setLineHeight } }
+			value={ {
+				getFontSize,
+				setFontSize,
+				getLineHeight,
+				setLineHeight,
+				getTextColor,
+				setTextColor,
+				getBackgroundColor,
+				setBackgroundColor,
+				getLinkColor,
+				setLinkColor,
+			} }
 		>
 			{ children }
 		</GlobalStylesContext.Provider>
@@ -60,7 +83,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 		return userData?.content ? JSON.parse( userData.content ) : {};
 	} );
 
-	// Font size getter & setter
+	// Font size: getter & setter
 	const fromPx = ( value ) => ( value ? +value.replace( 'px', '' ) : null );
 	const toPx = ( value ) => ( value ? value + 'px' : null );
 	const getFontSize = ( blockName ) =>
@@ -82,7 +105,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 			} ),
 		} );
 
-	// Line height getter & setter
+	// Line height: getter & setter
 	const getLineHeight = ( blockName ) =>
 		userStyles?.[ blockName ]?.styles?.typography?.lineHeight ?? null;
 	const setLineHeight = ( blockName, newValue ) =>
@@ -101,12 +124,75 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 			} ),
 		} );
 
+	// Text color: getter & setter
+	const getTextColor = ( blockName ) =>
+		userStyles?.[ blockName ]?.styles?.color?.textColor;
+	const setTextColor = ( blockName, newValue ) =>
+		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
+			content: JSON.stringify( {
+				...userStyles,
+				[ blockName ]: {
+					styles: {
+						...userStyles?.[ blockName ]?.styles,
+						color: {
+							...userStyles?.[ blockName ]?.styles?.color,
+							textColor: newValue,
+						},
+					},
+				},
+			} ),
+		} );
+
+	// Background color: getter & setter
+	const getBackgroundColor = ( blockName ) =>
+		userStyles?.[ blockName ]?.styles?.color?.backgroundColor;
+	const setBackgroundColor = ( blockName, newValue ) =>
+		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
+			content: JSON.stringify( {
+				...userStyles,
+				[ blockName ]: {
+					styles: {
+						...userStyles?.[ blockName ]?.styles,
+						color: {
+							...userStyles?.[ blockName ]?.styles?.color,
+							backgroundColor: newValue,
+						},
+					},
+				},
+			} ),
+		} );
+
+	// Link color: getter & setter
+	const getLinkColor = ( blockName ) =>
+		userStyles?.[ blockName ]?.styles?.color?.linkColor;
+	const setLinkColor = ( blockName, newValue ) =>
+		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
+			content: JSON.stringify( {
+				...userStyles,
+				[ blockName ]: {
+					styles: {
+						...userStyles?.[ blockName ]?.styles,
+						color: {
+							...userStyles?.[ blockName ]?.styles?.color,
+							linkColor: newValue,
+						},
+					},
+				},
+			} ),
+		} );
+
 	return {
 		userStyles,
 		getFontSize,
 		setFontSize,
 		getLineHeight,
 		setLineHeight,
+		getTextColor,
+		setTextColor,
+		getBackgroundColor,
+		setBackgroundColor,
+		getLinkColor,
+		setLinkColor,
 	};
 };
 
@@ -154,6 +240,19 @@ const getStylesFromTree = ( tree ) => {
 		if ( blockStyles?.typography?.lineHeight ) {
 			declarations.push(
 				`line-height: ${ blockStyles.typography.lineHeight }`
+			);
+		}
+		if ( blockStyles?.color?.textColor ) {
+			declarations.push( `color: ${ blockStyles.color.textColor }` );
+		}
+		if ( blockStyles?.color?.backgroundColor ) {
+			declarations.push(
+				`background-color: ${ blockStyles.color.backgroundColor }`
+			);
+		}
+		if ( blockStyles?.color?.linkColor ) {
+			declarations.push(
+				`--wp--style--color--link: ${ blockStyles.color.linkColor }`
 			);
 		}
 		return declarations.join( ';' );

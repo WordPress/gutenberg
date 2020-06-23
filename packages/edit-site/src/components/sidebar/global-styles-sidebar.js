@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { ColorPalette, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	FontSizePicker,
 	__experimentalLineHeightControl as LineHeightControl,
+	FontSizePicker,
+	PanelColorSettings,
 } from '@wordpress/block-editor';
 import { getBlockTypes } from '@wordpress/blocks';
 
@@ -21,6 +22,12 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 		setFontSize,
 		getLineHeight,
 		setLineHeight,
+		getBackgroundColor,
+		setBackgroundColor,
+		getTextColor,
+		setTextColor,
+		getLinkColor,
+		setLinkColor,
 	} = useGlobalStylesContext();
 
 	return (
@@ -29,7 +36,7 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 			title={ panelTitle }
 			icon={ icon }
 		>
-			<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
+			<PanelBody title={ __( 'Typography' ) }>
 				{ getBlockTypes()
 					.map(
 						( {
@@ -70,7 +77,8 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 					)
 					.filter( Boolean ) }
 			</PanelBody>
-			<PanelBody title={ __( 'Color' ) } initialOpen={ false }>
+
+			<PanelBody title={ __( 'Color' ) } initialOpen={ true }>
 				{ getBlockTypes()
 					.map(
 						( {
@@ -78,24 +86,20 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 							title,
 							supports: { __experimentalColor },
 						} ) => {
-							const panels = [];
-							panels.push( <h3>{ title }</h3> );
-
+							const settings = [];
 							if ( __experimentalColor ) {
-								// TODO: text & background color
-								panels.push(
-									<ColorPalette
-										colors={ [
-											{ name: 'red', color: '#f00' },
-											{ name: 'white', color: '#fff' },
-											{ name: 'blue', color: '#00f' },
-										] }
-										value={ '#f00' }
-										onChange={ () =>
-											console.log( 'change color' )
-										}
-									/>
-								);
+								settings.push( {
+									value: getTextColor( name ),
+									onChange: ( value ) =>
+										setTextColor( name, value ),
+									label: __( 'Text color' ),
+								} );
+								settings.push( {
+									value: getBackgroundColor( name ),
+									onChange: ( value ) =>
+										setBackgroundColor( name, value ),
+									label: __( 'Background color' ),
+								} );
 							}
 
 							if ( __experimentalColor?.gradients ) {
@@ -103,10 +107,24 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 							}
 
 							if ( __experimentalColor?.linkColor ) {
-								// TODO: do link color
+								settings.push( {
+									value: getLinkColor( name ),
+									onChange: ( value ) =>
+										setLinkColor( name, value ),
+									label: __( 'Link color' ),
+								} );
 							}
 
-							return panels.length > 1 ? panels : null;
+							if ( settings.length > 0 ) {
+								return (
+									<PanelColorSettings
+										title={ title }
+										colorSettings={ settings }
+									/>
+								);
+							}
+
+							return null;
 						}
 					)
 					.filter( Boolean ) }
