@@ -11,6 +11,7 @@ import {
 	useLayoutEffect,
 	useReducer,
 	useRef,
+	useMemo,
 } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
@@ -66,8 +67,15 @@ function useMovingAnimation(
 		clientTop: 0,
 	} );
 
-	const previous = ref.current ? getAbsolutePosition( ref.current ) : null;
 	const scrollContainer = useRef();
+	const previous = useMemo(
+		() => ( ref.current ? getAbsolutePosition( ref.current ) : null ),
+		[ triggerAnimationOnChange ]
+	);
+	const prevRect = useMemo(
+		() => ( ref.current ? ref.current.getBoundingClientRect() : null ),
+		[ triggerAnimationOnChange ]
+	);
 
 	useLayoutEffect( () => {
 		if ( triggeredAnimation ) {
@@ -83,14 +91,14 @@ function useMovingAnimation(
 
 		if ( prefersReducedMotion ) {
 			if ( adjustScrolling && scrollContainer.current ) {
-				// if the animation is disabled and the scroll needs to be adjusted,
-				// just move directly to the final scroll position
-				ref.current.style.transform = '';
-				const destination = getAbsolutePosition( ref.current );
-				scrollContainer.current.scrollTop =
-					scrollContainer.current.scrollTop -
-					previous.top +
-					destination.top;
+				// if the animation is disabled and the scroll needs to be
+				// adjusted, just move directly to the final scroll position.
+				const blockRect = ref.current.getBoundingClientRect();
+				const diff = blockRect.top - prevRect.top;
+
+				if ( diff ) {
+					scrollContainer.current.scrollTop += diff;
+				}
 			}
 
 			return;
@@ -98,18 +106,13 @@ function useMovingAnimation(
 
 		ref.current.style.transform = '';
 		const destination = getAbsolutePosition( ref.current );
-		const x = Math.round( previous.left - destination.left );
-		const y = Math.round( previous.top - destination.top );
-		ref.current.style.transform =
-			x === 0 && y === 0 ? '' : `translate3d(${ x }px,${ y }px,0)`;
-		const blockRect = ref.current.getBoundingClientRect();
-		const newTransform = {
-			x,
-			y,
-			clientTop: blockRect.top,
-		};
+
 		triggerAnimation();
-		setTransform( newTransform );
+		setTransform( {
+			x: Math.round( previous.left - destination.left ),
+			y: Math.round( previous.top - destination.top ),
+			clientTop: prevRect.top,
+		} );
 	}, [ triggerAnimationOnChange ] );
 
 	// Only called when either the x or y value changes.
