@@ -49,6 +49,7 @@ export default ( { children, entityId, stylesheetId, baseStyles } ) => {
 				...userStyles,
 				[ blockName ]: {
 					styles: {
+						...userStyles[ blockName ].styles,
 						typography: {
 							...userStyles[ blockName ].styles.typography,
 							fontSize: toPx( newValue ),
@@ -67,6 +68,7 @@ export default ( { children, entityId, stylesheetId, baseStyles } ) => {
 				...userStyles,
 				[ blockName ]: {
 					styles: {
+						...userStyles[ blockName ].styles,
 						typography: {
 							...userStyles[ blockName ].styles.typography,
 							lineHeight: newValue,
