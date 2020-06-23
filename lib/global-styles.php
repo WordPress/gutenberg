@@ -648,12 +648,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	$include_draft = true;
 	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		// Base styles to be used to regenerate the stylesheet upon user changes in the editor.
-		$settings['__experimentalGlobalStylesBaseStyles'] = gutenberg_experimental_global_styles_merge_trees(
-			gutenberg_experimental_global_styles_get_core(),
-			gutenberg_experimental_global_styles_get_theme()
-		);
-
 		// The CPT ID for entity retrieval/saving.
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 	}

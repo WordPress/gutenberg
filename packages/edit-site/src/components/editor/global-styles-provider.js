@@ -14,7 +14,7 @@ const GlobalStylesContext = createContext( {
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
-export default ( { children, entityId, baseStyles } ) => {
+export default ( { children, entityId } ) => {
 	const {
 		userStyles,
 		getFontSize,
@@ -23,7 +23,7 @@ export default ( { children, entityId, baseStyles } ) => {
 		setLineHeight,
 	} = useGlobalStylesFromEntities( entityId );
 
-	useGlobalStylesEffectToUpdateStylesheet( baseStyles, userStyles );
+	useGlobalStylesEffectToUpdateStylesheet( userStyles );
 
 	return (
 		<GlobalStylesContext.Provider
@@ -110,7 +110,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 	};
 };
 
-const useGlobalStylesEffectToUpdateStylesheet = ( baseStyles, userStyles ) => {
+const useGlobalStylesEffectToUpdateStylesheet = ( userStyles ) => {
 	useEffect( () => {
 		const embeddedStylesheetId = 'user-generated-global-styles-inline-css';
 		let styleNode = document.getElementById( embeddedStylesheetId );
@@ -123,15 +123,8 @@ const useGlobalStylesEffectToUpdateStylesheet = ( baseStyles, userStyles ) => {
 				.appendChild( styleNode );
 		}
 
-		styleNode.innerText = getStylesFromTree(
-			mergeTrees( baseStyles, userStyles )
-		);
-	}, [ baseStyles, userStyles ] );
-};
-
-const mergeTrees = ( base, user ) => {
-	//TODO: merge trees
-	return user;
+		styleNode.innerText = getStylesFromTree( userStyles );
+	}, [ userStyles ] );
 };
 
 const getStylesFromTree = ( tree ) => {
