@@ -42,7 +42,7 @@ function render_block_core_site_logo( $attributes ) {
 	}
 	remove_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
 
-	return $html;
+	return '<a href="' . get_bloginfo( 'url' ) . '" title="' . get_bloginfo( 'name' ) . '">' . $html . '</a>';
 }
 
 /**
@@ -64,7 +64,7 @@ add_action( 'init', 'register_block_core_site_logo' );
 
 function override_custom_logo_theme_mod( $custom_logo ) {
 	$sitelogo = get_option( 'sitelogo' );
-	return false === $sitelogo ? $custom_logo : $sitelogo; 
+	return false === $sitelogo ? $custom_logo : $sitelogo;
 }
 
 function sync_site_logo_to_theme_mod( $custom_logo ) {

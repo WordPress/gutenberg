@@ -2,90 +2,251 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { debounce } from 'lodash';
+import { includes, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
-	useEntityProp,
-	__experimentalUseEntitySaving,
-} from '@wordpress/core-data';
-import {
-	IconButton,
 	Notice,
 	PanelBody,
 	RangeControl,
 	ResizableBox,
+	Spinner,
+	ToolbarButton,
 } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockControls,
-	BlockAlignmentToolbar,
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import icon from './icon';
+import useClientWidth from '../image/use-client-width';
 
-import ImageSize from '../image/image-size';
+/**
+ * Module constants
+ */
+import { MIN_SIZE } from '../image/constants';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const ACCEPT_MEDIA_STRING = 'image/*';
-const getHandleStates = ( align, isRTL = false ) => {
-	const defaultAlign = isRTL ? 'right' : 'left';
-	const handleStates = {
-		left: {
-			right: true,
-			left: false,
-		},
-		center: {
-			right: true,
-			left: true,
-		},
-		right: {
-			right: false,
-			left: true,
-		},
-	};
 
-	return handleStates[ align ? align : defaultAlign ];
+const SiteLogo = ( {
+	alt,
+	attributes: { align, width, height },
+	containerRef,
+	isSelected,
+	setAttributes,
+	url,
+} ) => {
+	const clientWidth = useClientWidth( containerRef, [ align ] );
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const isWideAligned = includes( [ 'wide', 'full' ], align );
+	const isResizable = ! isWideAligned && isLargeViewport;
+	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
+	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const classes = classnames( 'custom-logo-link', {
+		'is-transient': isBlobURL( url ),
+	} );
+	const { maxWidth, isRTL } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] );
+	} );
+
+	function onResizeStart() {
+		toggleSelection( false );
+	}
+
+	function onResizeStop() {
+		toggleSelection( true );
+	}
+
+	let img = (
+		// Disable reason: Image itself is not meant to be interactive, but
+		// should direct focus to block.
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+		<a href="#home" className={ classes } rel="home">
+			<img
+				className="custom-logo"
+				src={ url }
+				alt={ alt }
+				onLoad={ ( event ) => {
+					setNaturalSize(
+						pick( event.target, [
+							'naturalWidth',
+							'naturalHeight',
+						] )
+					);
+				} }
+			/>
+		</a>
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+	);
+
+	let imageWidthWithinContainer;
+	let logoInspectorControls = null;
+
+	if ( clientWidth && naturalWidth && naturalHeight ) {
+		const exceedMaxWidth = naturalWidth > clientWidth;
+		imageWidthWithinContainer = exceedMaxWidth ? clientWidth : naturalWidth;
+	}
+
+	if ( ! isResizable || ! imageWidthWithinContainer ) {
+		img = <div style={ { width, height } }>{ img }</div>;
+	} else {
+		const currentWidth = width || imageWidthWithinContainer;
+		const ratio = naturalWidth / naturalHeight;
+		const currentHeight = currentWidth * ratio;
+		const minWidth =
+			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
+		const minHeight =
+			naturalHeight < naturalWidth ? MIN_SIZE : MIN_SIZE / ratio;
+
+		// With the current implementation of ResizableBox, an image needs an
+		// explicit pixel value for the max-width. In absence of being able to
+		// set the content-width, this max-width is currently dictated by the
+		// vanilla editor style. The following variable adds a buffer to this
+		// vanilla style, so 3rd party themes have some wiggleroom. This does,
+		// in most cases, allow you to scale the image beyond the width of the
+		// main column, though not infinitely.
+		// @todo It would be good to revisit this once a content-width variable
+		// becomes available.
+		const maxWidthBuffer = maxWidth * 2.5;
+
+		let showRightHandle = false;
+		let showLeftHandle = false;
+
+		/* eslint-disable no-lonely-if */
+		// See https://github.com/WordPress/gutenberg/issues/7584.
+		if ( align === 'center' ) {
+			// When the image is centered, show both handles.
+			showRightHandle = true;
+			showLeftHandle = true;
+		} else if ( isRTL ) {
+			// In RTL mode the image is on the right by default.
+			// Show the right handle and hide the left handle only when it is
+			// aligned left. Otherwise always show the left handle.
+			if ( align === 'left' ) {
+				showRightHandle = true;
+			} else {
+				showLeftHandle = true;
+			}
+		} else {
+			// Show the left handle and hide the right handle only when the
+			// image is aligned right. Otherwise always show the right handle.
+			if ( align === 'right' ) {
+				showLeftHandle = true;
+			} else {
+				showRightHandle = true;
+			}
+		}
+		/* eslint-enable no-lonely-if */
+
+		img = (
+			<ResizableBox
+				size={ { width, height } }
+				showHandle={ isSelected }
+				minWidth={ minWidth }
+				maxWidth={ maxWidthBuffer }
+				minHeight={ minHeight }
+				maxHeight={ maxWidthBuffer / ratio }
+				lockAspectRatio
+				enable={ {
+					top: false,
+					right: showRightHandle,
+					bottom: true,
+					left: showLeftHandle,
+				} }
+				onResizeStart={ onResizeStart }
+				onResizeStop={ ( event, direction, elt, delta ) => {
+					onResizeStop();
+					setAttributes( {
+						width: parseInt( currentWidth + delta.width, 10 ),
+						height: parseInt( currentHeight + delta.height, 10 ),
+					} );
+				} }
+			>
+				{ img }
+			</ResizableBox>
+		);
+
+		logoInspectorControls = (
+			<InspectorControls>
+				<PanelBody title={ __( 'Site Logo Settings' ) }>
+					<RangeControl
+						label={ __( 'Image width' ) }
+						onChange={ ( newWidth ) =>
+							setAttributes( { width: newWidth } )
+						}
+						min={ minWidth }
+						max={ maxWidthBuffer }
+						initialPosition={ Math.min(
+							naturalWidth,
+							maxWidthBuffer
+						) }
+						value={ width || '' }
+						disabled={ ! isResizable }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		);
+	}
+
+	return (
+		<>
+			{ logoInspectorControls }
+			{ img }
+		</>
+	);
 };
 
-export default function LogoEdit( { attributes: { align, width }, children, className, clientId, setAttributes, isSelected } ) {
-	const [ isEditing, setIsEditing ] = useState( false );
+export default function LogoEdit( {
+	attributes,
+	className,
+	setAttributes,
+	isSelected,
+} ) {
+	const { width } = attributes;
 	const [ url, setUrl ] = useState( null );
 	const [ error, setError ] = useState();
-	const [ logo, setLogo ] = useEntityProp( 'root', 'site', 'sitelogo' );
-	const [ isDirty, , save ] = __experimentalUseEntitySaving(
-		'root',
-		'site',
-		'sitelogo'
+	const ref = useRef();
+	const { sitelogo } = useSelect( ( select ) =>
+		select( 'core' ).getEditedEntityRecord( 'root', 'site' )
 	);
-
 	const mediaItemData = useSelect(
 		( select ) => {
-			const mediaItem = select( 'core' ).getEntityRecord( 'root', 'media', logo );
-			return mediaItem && {
-				url: mediaItem.source_url,
-				alt: mediaItem.alt_text,
-			};
-		}, [ logo ] );
-
-	const { isRTL, isLargeViewport } = useSelect(
-		( select ) => ( {
-			isRTL: select( 'core/block-editor' ).getSettings().isRTL,
-			isLargeViewport: select( 'core/viewport' ).isViewportMatch( 'medium' ),
-		} )
+			const mediaItem = select( 'core' ).getEntityRecord(
+				'root',
+				'media',
+				sitelogo
+			);
+			return (
+				mediaItem && {
+					url: mediaItem.source_url,
+					alt: mediaItem.alt_text,
+				}
+			);
+		},
+		[ sitelogo ]
 	);
+
+	const { editEntityRecord } = useDispatch( 'core' );
+	const setLogo = ( newValue ) =>
+		editEntityRecord( 'root', 'site', undefined, {
+			sitelogo: newValue,
+		} );
 
 	let alt = null;
 	if ( mediaItemData ) {
@@ -95,189 +256,107 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 		}
 	}
 
-	if ( isDirty ) {
-		save();
-	}
-
 	const onSelectLogo = ( media ) => {
 		if ( ! media ) {
 			return;
 		}
 
-		if ( ! media.id && media.url ) { // This is a temporary blob image
+		if ( ! media.id && media.url ) {
+			// This is a temporary blob image
 			setLogo( '' );
 			setError();
 			setUrl( media.url );
-			setIsEditing( false );
 			return;
 		}
 
 		setLogo( media.id.toString() );
-		setIsEditing( false );
 	};
 
 	const deleteLogo = () => {
 		setLogo( '' );
+		setUrl( '' );
 	};
 
 	const onUploadError = ( message ) => {
-		setIsEditing( true );
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
 
 	const controls = (
 		<BlockControls>
-			<BlockAlignmentToolbar
-				value={ align }
-				onChange={ ( newAlign ) => setAttributes( { align: newAlign } ) }
-				controls={ [ 'left', 'center', 'right' ] }
-			/>
-			{ url && <MediaReplaceFlow
-				mediaURL={ url }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				accept={ ACCEPT_MEDIA_STRING }
-				onSelect={ onSelectLogo }
-				onError={ onUploadError }
-			/> }
+			{ url && (
+				<MediaReplaceFlow
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept={ ACCEPT_MEDIA_STRING }
+					onSelect={ onSelectLogo }
+					onError={ onUploadError }
+				/>
+			) }
+			{ !! url && (
+				<ToolbarButton
+					icon="trash"
+					onClick={ () => deleteLogo() }
+					label={ __( 'Delete Site Logo' ) }
+				/>
+			) }
 		</BlockControls>
 	);
 
-	const getInspectorControls = ( imageWidth, resizedImageWidth, containerWidth, canResize ) => {
-		return (
-			<InspectorControls>
-				<PanelBody title={ __( 'Site Logo Settings' ) }>
-					<RangeControl
-						label={ __( 'Image width' ) }
-						onChange={ ( newWidth ) => setAttributes( { width: newWidth } ) }
-						min={ 10 }
-						max={ Math.min( imageWidth, containerWidth ) }
-						initialPosition={ Math.min( imageWidth, containerWidth ) }
-						value={ resizedImageWidth || '' }
-						disabled={ ! canResize }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		);
-	};
-
-	const [ maxWidth, setMaxWidth ] = useState( 10 );
-
-	useEffect( () => {
-		const wrapperElement = document.getElementById( `block-${ clientId }` );
-		const calculateMaxWidth = debounce( () => setMaxWidth( wrapperElement && wrapperElement.clientWidth ), 250 );
-		calculateMaxWidth();
-		window.addEventListener( 'resize', calculateMaxWidth );
-		return () => window.removeEventListener( 'resize', calculateMaxWidth );
-	} );
-
-	const classes = classnames( 'custom-logo-link', {
-		'is-transient': isBlobURL( url ),
-	} );
-
-	const img = (
-		<a href="#home" className={ classes } rel="home">
-			<img className="custom-logo" src={ url } alt={ alt } />
-		</a>
-	);
-
 	const label = __( 'Site Logo' );
-	const logoImage = (
-		<ImageSize src={ url }>
-			{ ( sizes ) => {
-				const {
-					imageWidthWithinContainer,
-					imageWidth,
-					imageHeight,
-				} = sizes;
+	let logoImage;
+	if ( url === null ) {
+		logoImage = <Spinner />;
+	}
 
-				const currentWidth = width || imageWidthWithinContainer;
-				const ratio = imageWidth / imageHeight;
-				const currentHeight = currentWidth / ratio;
+	if ( !! url ) {
+		logoImage = (
+			<SiteLogo
+				alt={ alt }
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				containerRef={ ref }
+				url={ url }
+			/>
+		);
+	}
 
-				const maxWidthProp = {};
-				if ( maxWidth ) {
-					maxWidthProp.maxWidth = Math.min( imageWidth, maxWidth );
-				}
-
-				const canResize = ! isEditing && isLargeViewport && ( ! width || width <= maxWidth );
-
-				const wrapperProps = {};
-				if ( align ) {
-					wrapperProps.className = `align${ align }`;
-				}
-
-				if ( ! canResize ) {
-					wrapperProps.style = { width: Math.min( currentWidth, maxWidth ) };
-				}
-
-				const boxSize = {
-					width: Math.min( currentWidth, maxWidth ),
-					height: ( maxWidth && currentWidth <= maxWidth ) ? currentHeight : maxWidth / ratio,
-				};
-
-				return (
-					<>
-						{ getInspectorControls( imageWidth, width, maxWidth, canResize ) }
-						<div { ...wrapperProps }>
-							{ canResize ? (
-								<ResizableBox
-									showHandle={ isSelected }
-									size={ boxSize }
-									lockAspectRatio={ true }
-									minWidth={ 10 }
-									{ ...maxWidthProp }
-									enable={ {
-										top: false,
-										bottom: true,
-										...getHandleStates( align, isRTL ),
-									} }
-
-									onResizeStop={ ( event, direction, elt, delta ) => {
-										setAttributes( {
-											width: parseInt( currentWidth + delta.width, 10 ),
-										} );
-									} }
-									style={ { display: 'inline-block' } }
-								>
-									{ img }
-								</ResizableBox>
-							) : img }
-						</div>
-					</>
-				);
-			} }
-		</ImageSize>
-	);
-	const editComponent = (
+	const mediaPlaceholder = (
 		<MediaPlaceholder
 			icon={ <BlockIcon icon={ icon } /> }
 			labels={ {
 				title: label,
-				instructions: __( 'Upload an image, or pick one from your media library, to be your site logo' ),
+				instructions: __(
+					'Upload an image, or pick one from your media library, to be your site logo'
+				),
 			} }
 			onSelect={ onSelectLogo }
 			accept={ ACCEPT_MEDIA_STRING }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			mediaPreview={ !! url && img }
-			notices={ error && (
-				<Notice status="error" isDismissible={ false }>{ error }</Notice>
-			) }
-			onCancel={ !! url && ( () => setIsEditing( false ) ) }
+			mediaPreview={ logoImage }
+			notices={
+				error && (
+					<Notice status="error" isDismissible={ false }>
+						{ error }
+					</Notice>
+				)
+			}
 			onError={ onUploadError }
-		>
-			{ !! url && (
-				<IconButton isLarge icon="delete" onClick={ deleteLogo }>
-					{ __( 'Delete Site Logo' ) }
-				</IconButton>
-			) }
-			{ children }
-		</MediaPlaceholder>
+		/>
 	);
 
+	const classes = classnames( className, {
+		'is-resized': !! width,
+		'is-focused': isSelected,
+	} );
+
+	const key = !! url;
+
 	return (
-		<div className={ className }>
+		<Block.figure ref={ ref } className={ classes } key={ key }>
 			{ controls }
-			{ ! url || isEditing ? editComponent : logoImage }
-		</div>
+			{ url && logoImage }
+			{ ! url && mediaPlaceholder }
+		</Block.figure>
 	);
 }

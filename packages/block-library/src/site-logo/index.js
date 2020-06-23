@@ -17,11 +17,9 @@ export const settings = {
 	title: __( 'Site Logo' ),
 	description: __( 'Show a site logo' ),
 	icon,
-	getEditWrapperProps( attributes ) {
-		const { align, width } = attributes;
-		if ( 'left' === align || 'center' === align || 'right' === align ) {
-			return { 'data-align': align, 'data-resized': !! width };
-		}
+	supports: {
+		align: true,
+		alignWide: false,
 	},
 	edit,
 };

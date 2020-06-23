@@ -1,4 +1,14 @@
+.wp-block[data-align="center"] > .wp-block-site-logo {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
 .wp-block-site-logo {
+	&.is-resized {
+		display: table;
+	}
+
 	.custom-logo-link {
 		cursor: inherit;
 
@@ -11,6 +21,10 @@
 		}
 	}
 
+	img {
+		max-width: 100%;
+	}
+
 	.editor-media-placeholder__button {
 		margin-bottom: 0;
 	}
@@ -18,5 +32,9 @@
 	.block-editor-media-placeholder__cancel-button {
 		flex-basis: 100%;
 		text-align: center;
+	}
+
+	.components-resizable-box__container {
+		display: inline-block;
 	}
 }
