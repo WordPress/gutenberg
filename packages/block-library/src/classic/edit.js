@@ -136,7 +136,7 @@ export default class ClassicEdit extends Component {
 		);
 
 		editor.on( 'keydown', ( event ) => {
-			 // Prevent Gutenberg undo from kicking in so TinyMCE undo stack works.
+			// Prevent Gutenberg undo from kicking in so TinyMCE undo stack works.
 			if ( isKeyboardEvent.primary( event, 'z' ) ) {
 				event.stopPropagation();
 			}
