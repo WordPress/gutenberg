@@ -72,7 +72,7 @@ function NavigationPostEditor( { post, blockEditorSettings, onDeleteMenu } ) {
 			/>
 			<BlockEditorArea
 				saveBlocks={ save }
-				menuId={ post.menuId }
+				menuId={ post.meta.menuId }
 				onDeleteMenu={ onDeleteMenu }
 			/>
 		</BlockEditorProvider>

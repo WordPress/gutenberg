@@ -255,8 +255,7 @@ const Popover = ( {
 	onFocusOutside,
 	__unstableSticky,
 	__unstableSlotName = SLOT_NAME,
-	__unstableAllowVerticalSubpixelPosition,
-	__unstableAllowHorizontalSubpixelPosition,
+	__unstableObserveElement,
 	__unstableFixedPosition = true,
 	__unstableBoundaryParent,
 	/* eslint-enable no-unused-vars */
@@ -286,7 +285,7 @@ const Popover = ( {
 			return;
 		}
 
-		const refresh = ( { subpixels } = {} ) => {
+		const refresh = () => {
 			if ( ! containerRef.current || ! contentRef.current ) {
 				return;
 			}
@@ -359,38 +358,8 @@ const Popover = ( {
 				typeof popoverTop === 'number' &&
 				typeof popoverLeft === 'number'
 			) {
-				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
-					setStyle(
-						containerRef.current,
-						'left',
-						popoverLeft + 'px'
-					);
-					setStyle( containerRef.current, 'top' );
-					setStyle(
-						containerRef.current,
-						'transform',
-						`translateY(${ popoverTop }px)`
-					);
-				} else if (
-					subpixels &&
-					__unstableAllowHorizontalSubpixelPosition
-				) {
-					setStyle( containerRef.current, 'top', popoverTop + 'px' );
-					setStyle( containerRef.current, 'left' );
-					setStyle(
-						containerRef.current,
-						'transform',
-						`translate(${ popoverLeft }px)`
-					);
-				} else {
-					setStyle( containerRef.current, 'top', popoverTop + 'px' );
-					setStyle(
-						containerRef.current,
-						'left',
-						popoverLeft + 'px'
-					);
-					setStyle( containerRef.current, 'transform' );
-				}
+				setStyle( containerRef.current, 'top', popoverTop + 'px' );
+				setStyle( containerRef.current, 'left', popoverLeft + 'px' );
 			}
 
 			setClass(
@@ -455,15 +424,9 @@ const Popover = ( {
 
 		let observer;
 
-		const observeElement =
-			__unstableAllowVerticalSubpixelPosition ||
-			__unstableAllowHorizontalSubpixelPosition;
-
-		if ( observeElement ) {
-			observer = new window.MutationObserver( () =>
-				refresh( { subpixels: true } )
-			);
-			observer.observe( observeElement, { attributes: true } );
+		if ( __unstableObserveElement ) {
+			observer = new window.MutationObserver( refresh );
+			observer.observe( __unstableObserveElement, { attributes: true } );
 		}
 
 		return () => {
@@ -487,8 +450,7 @@ const Popover = ( {
 		position,
 		contentSize,
 		__unstableSticky,
-		__unstableAllowVerticalSubpixelPosition,
-		__unstableAllowHorizontalSubpixelPosition,
+		__unstableObserveElement,
 		__unstableBoundaryParent,
 	] );
 

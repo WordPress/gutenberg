@@ -33,10 +33,10 @@ export const TooltipWrapper = styled.div`
 export const Tooltip = styled.div`
 	background: ${ color( 'ui.border' ) };
 	border-radius: 2px;
-	box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.2 );
 	box-sizing: border-box;
+	font-size: 12px;
 	color: ${ color( 'ui.textDark' ) };
-	padding: 4px 6px;
+	padding: 4px 8px;
 	position: relative;
 `;
 
@@ -48,6 +48,6 @@ export const LabelText = styled( Text )`
 		${ text };
 		display: block;
 		font-size: 13px;
-		line-height: 1;
+		line-height: 1.4;
 	}
 `;
