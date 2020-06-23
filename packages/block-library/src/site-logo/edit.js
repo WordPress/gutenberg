@@ -57,12 +57,19 @@ const SiteLogo = ( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
-	const classes = classnames( 'custom-logo-link', {
+	const classes = classnames( {
 		'is-transient': isBlobURL( url ),
 	} );
-	const { maxWidth, isRTL } = useSelect( ( select ) => {
+	const { maxWidth, isRTL, title } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		return pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] );
+		const siteEntities = select( 'core' ).getEditedEntityRecord(
+			'root',
+			'site'
+		);
+		return {
+			title: siteEntities.title,
+			...pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] ),
+		};
 	} );
 
 	function onResizeStart() {
@@ -77,20 +84,22 @@ const SiteLogo = ( {
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		<a href="#home" className={ classes } rel="home">
-			<img
-				className="custom-logo"
-				src={ url }
-				alt={ alt }
-				onLoad={ ( event ) => {
-					setNaturalSize(
-						pick( event.target, [
-							'naturalWidth',
-							'naturalHeight',
-						] )
-					);
-				} }
-			/>
+		<a href="#home" className={ classes } rel="home" title={ title }>
+			<span className="custom-logo-link">
+				<img
+					className="custom-logo"
+					src={ url }
+					alt={ alt }
+					onLoad={ ( event ) => {
+						setNaturalSize(
+							pick( event.target, [
+								'naturalWidth',
+								'naturalHeight',
+							] )
+						);
+					} }
+				/>
+			</span>
 		</a>
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
@@ -313,9 +322,10 @@ export default function LogoEdit( {
 			<SiteLogo
 				alt={ alt }
 				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSelected={ isSelected }
+				className={ className }
 				containerRef={ ref }
+				isSelected={ isSelected }
+				setAttributes={ setAttributes }
 				url={ url }
 			/>
 		);
