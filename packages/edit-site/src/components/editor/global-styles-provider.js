@@ -179,5 +179,5 @@ const getStylesFromTree = ( tree ) => {
 		);
 	} );
 
-	return styles.join( '\n' );
+	return styles.join( '' );
 };
