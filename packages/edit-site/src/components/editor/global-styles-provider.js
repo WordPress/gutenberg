@@ -6,8 +6,10 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 
 const GlobalStylesContext = createContext( {
+	/* eslint-disable no-unused-vars */
 	getProperty: ( context, family, name, units ) => {},
 	setProperty: ( context, family, name, value, units ) => {},
+	/* eslint-enable no-unused-vars */
 } );
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
@@ -120,7 +122,7 @@ const getStylesFromTree = ( tree ) => {
 			name,
 			supports: { __experimentalSelector },
 		} = getBlockType( blockName );
-		let selector = '.wp-block-' + name;
+		let selector = '.wp-block-' + name.replace( 'core/', '' );
 		if (
 			__experimentalSelector &&
 			'string' === typeof __experimentalSelector
