@@ -3,6 +3,7 @@
  */
 import { createContext, useContext, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { getBlockType } from '@wordpress/blocks';
 
 const GlobalStylesContext = createContext( {
 	getFontSize: () => {},
@@ -124,11 +125,61 @@ const useGlobalStylesEffectToUpdateStylesheet = ( baseStyles, userStyles ) => {
 				.appendChild( styleNode );
 		}
 
+		styleNode.innerText = getStylesFromTree(
+			mergeTrees( baseStyles, userStyles )
+		);
+	}, [ baseStyles, userStyles ] );
+};
+
+const mergeTrees = ( base, user ) => {
+	//TODO: merge trees
+	return user;
+};
+
+const getStylesFromTree = ( tree ) => {
+	const styles = [];
+	const getSelector = ( blockName ) => {
+		const {
+			name,
+			supports: { __experimentalSelector },
+		} = getBlockType( blockName );
+		let selector = '.wp-block-' + name;
+		if (
+			__experimentalSelector &&
+			'string' === typeof __experimentalSelector
+		) {
+			selector = __experimentalSelector;
+		}
+		return selector;
+	};
+
+	const getStyleDeclarations = ( blockStyles ) => {
+		const declarations = [];
+		if ( blockStyles?.typography?.fontSize ) {
+			declarations.push(
+				`font-size: ${ blockStyles.typography.fontSize }`
+			);
+		}
+		if ( blockStyles?.typography?.lineHeight ) {
+			declarations.push(
+				`line-height: ${ blockStyles.typography.lineHeight }`
+			);
+		}
+		return declarations.join( ';' );
+	};
+
+	Object.keys( tree ).forEach( ( blockName ) => {
+		const blockSelector = getSelector( blockName );
+		const blockDeclarations = getStyleDeclarations(
+			tree[ blockName ]?.styles
+		);
+
 		// TODO: look at how to hook into the styles generation
 		// so we can avoid having to increase the class specificity here.
-		styleNode.innerText = `.editor-styles-wrapper.editor-styles-wrapper p {
-			font-size: 42px;
-			line-height: 2;
-		}`;
-	}, [ baseStyles, userStyles ] );
+		styles.push(
+			`.editor-styles-wrapper.editor-styles-wrapper ${ blockSelector } { ${ blockDeclarations } }`
+		);
+	} );
+
+	return styles.join( '\n' );
 };
