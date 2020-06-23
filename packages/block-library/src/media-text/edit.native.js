@@ -304,6 +304,7 @@ class MediaTextEdit extends Component {
 			...( isSelected && styles[ 'is-selected' ] ),
 			backgroundColor:
 				wrapperProps?.style?.backgroundColor || backgroundColor.color,
+			paddingBottom: 0,
 		};
 
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
