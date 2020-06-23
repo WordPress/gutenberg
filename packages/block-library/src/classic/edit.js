@@ -34,6 +34,7 @@ export default class ClassicEdit extends Component {
 		this.initialize = this.initialize.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.focus = this.focus.bind( this );
+		this.state = { lastUndo: false };
 	}
 
 	componentDidMount() {
@@ -136,9 +137,8 @@ export default class ClassicEdit extends Component {
 		);
 
 		editor.on( 'keydown', ( event ) => {
-			// Prevent Gutenberg undo from kicking in so TinyMCE undo stack works.
 			if ( isKeyboardEvent.primary( event, 'z' ) ) {
-				event.stopPropagation();
+				this.handleUndo( event )
 			}
 
 			if (
@@ -213,6 +213,19 @@ export default class ClassicEdit extends Component {
 		event.stopPropagation();
 		// Prevent Mousetrap from moving focus to the top toolbar when pressing `alt+f10` on this block toolbar.
 		event.nativeEvent.stopImmediatePropagation();
+	}
+
+	handleUndo( event ) {
+		// While there is content in the block prevent Gutenberg undo from kicking in so TinyMCE undo stack works.
+		// Need to also track if it is the last undo otherwise block is removed along with last bit of content.
+		if ( isTmceEmpty( this.editor ) && ! this.state.lastUndo ) {
+			this.setState( { lastUndo: true } );
+			event.stopPropagation();
+		}
+		if ( ! isTmceEmpty( this.editor ) )  {
+			this.setState( { lastUndo: false } );
+			event.stopPropagation();
+		}
 	}
 
 	render() {
