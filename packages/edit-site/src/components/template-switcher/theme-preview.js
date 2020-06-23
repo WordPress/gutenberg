@@ -13,9 +13,13 @@ function ThemePreview( {
 } ) {
 	return (
 		<div className="edit-site-template-switcher__theme-preview">
-			<span className="edit-site-template-switcher__theme-preview-name">
-				{ name.raw }
-			</span>{ ' ' }
+			<span
+				className="edit-site-template-switcher__theme-preview-name"
+				dangerouslySetInnerHTML={ {
+					/* name.rendered is sanitized on the server side. */
+					__html: name.rendered,
+				} }
+			/>{ ' ' }
 			<span className="edit-site-template-switcher__theme-preview-version">
 				{ 'v' + version }
 			</span>
@@ -31,10 +35,14 @@ function ThemePreview( {
 				alt={ 'Theme Preview' }
 			/>
 			<div className="edit-site-template-switcher__theme-preview-description">
-				{ truncate( description.raw, {
-					length: 120,
-					separator: /\. +/,
-				} ) }
+				{ truncate(
+					/* Not using description.rendered here, as we might contain after an opening HTML tag. */
+					description.raw,
+					{
+						length: 120,
+						separator: /\. +/,
+					}
+				) }
 			</div>
 		</div>
 	);
