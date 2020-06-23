@@ -131,7 +131,7 @@ To run a single test instead of the entire suite, use `npm run native device-tes
 
 Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. For now, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the CLI, then change the port number in the tests while (optionally) commenting out related code in the `beforeAll` and `afterAll` block. 
 
-For a more detailed outline of the UI tests and how to get started writing one, please visit the [UI Test documentation](https://github.com/WordPress/gutenberg/blob/master/packages/react-native-editor/__device-tests__/README.md) and our [contributing guide](https://github.com/WordPress/gutenberg/blob/master/packages/react-native-editor/__device-tests__/CONTRIBUTING.md).
+For a more detailed outline of the UI tests and how to get started writing one, please visit the [UI Test documentation](/packages/react-native-editor/__device-tests__/README.md) and our [contributing guide](/packages/react-native-editor/__device-tests__/CONTRIBUTING.md).
 
 You might want to use Visual Studio Code as an editor. The project includes the configuration needed to use the above codestyle and linting tools automatically.
 
