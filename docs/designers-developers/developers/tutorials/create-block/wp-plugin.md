@@ -6,12 +6,22 @@ A new block in the WordPress block editor is added by creating a WordPress plugi
 
 A WordPress plugin is a set of files in a directory within the site's `wp-content/plugins` directory. For this example, we will use the `create-block` package to generate the necessary plugin files.
 
-If you do not plan to use `wp-env` change to your local WordPress plugin directory; if you do plan to use `wp-env` start from any directory for your project.
+### Switch to Working Directory
 
-Run the following command to generate plugin files:
+(1A) If you do not plan to use `wp-env` change to your local WordPress plugin directory. For example in Local it is: `~\Local Sites\mywp\wp-content\plugins`
+
+-or-
+
+(1B) If you do use `wp-env` start, you can start from any directory for your project. `wp-env` will use it as a plugin directory for your site.
+
+### Generate Plugin Files
+
+(2) Once in the right directory for your enviornment, the next step is to
+Regardless of environment, run the Run the following command to generate plugin files:
 
 ```
 npx @wordpress/create-block gutenpride
+cd gutenpride
 ```
 
 All of the plugin files we develop will be in this `gutenpride` directory.
@@ -32,15 +42,23 @@ The script created a PHP file `gutenpride.php` that is the main plugin file. At 
  */
 ```
 
-The generated plugin should now be listed on the Plugins admin page in your WordPress install. If you are using `wp-env`, see [Development Enviornment setup](devenv.md), then you should now run:
+### Start WordPress
+
+(3A) If you are using Local, or other environment confirm it is started and running.
+
+-or-
+
+(3B) If you are using `wp-env`, see [Development Environment setup](devenv.md), then you should now run from inside the `gutenpride` directory:
 
 ```
 wp-env start
 ```
 
-This will start your local WordPress site and use the current directory as your plugin, go to https://localhost:8888/wp-admin/ to confirm.
+This will start your local WordPress site and use the current directory as your plugin directory. In your browser, go to https://localhost:8888/wp-admin/ and login, the default username is "admin" and password is "password", no quotes.
 
-To login, the default username is "admin" and password is "password", no quotes.
+### Confirm Plugin Installed
+
+The generated plugin should now be listed on the Plugins admin page in your WordPress install. Switch WorPress to the plugins page and activate.
 
 For more on creating a WordPress plugin see [Plugin Basics](https://developer.wordpress.org/plugins/plugin-basics/), and [Plugin Header requirements](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/) for explanation and additional fields you can include in your plugin
 header.
