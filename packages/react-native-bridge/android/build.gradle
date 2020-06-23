@@ -294,11 +294,14 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         }
     }
 
-    task cleanupNodeModulesFolder(type: Delete) {
+    task cleanupNodeModulesFolders(type: Delete) {
+        doFirst {
+            println "Deleting node_modules folders"
+        }
         dependsOn bundleUpToDateCheck
         onlyIf { !isBundleUpToDate() }
 
-        delete "$mobileGutenbergRootDir/node_modules"
+        delete "$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"
     }
 
     task resetExtractedRNTools(type: Delete) {
@@ -308,11 +311,18 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         delete nodeFolder, npmFolder
     }
 
-    preBuild.dependsOn(cleanupNodeModulesFolder)
-    cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
+    preBuild.dependsOn(cleanupNodeModulesFolders)
+    cleanupNodeModulesFolders.dependsOn(backupHermesDebugAAR)
     backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
     backupHermesReleaseAAR.dependsOn(copyJSBundle)
     copyJSBundle.dependsOn(buildJSBundle)
     buildJSBundle.dependsOn(npm_install)
     nodeSetup.dependsOn(resetExtractedRNTools)
+
+    clean {
+        doFirst {
+            println "Executing extended clean task that also deletes node_modules folders"
+        }
+        delete "$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"
+    }
 }
