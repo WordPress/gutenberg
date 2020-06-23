@@ -130,6 +130,10 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_cannot_load_editor', __( 'Unable to load original media file.', 'gutenberg' ), array( 'status' => 500 ) );
 		}
 
+		if ( isset( $params['rotation'] ) ) {
+			$image_editor->rotate( 0 - $params['rotation'] );
+		}
+
 		$size = $image_editor->get_size();
 
 		// Finally apply the modifications.
@@ -138,10 +142,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		$width  = round( ( $size['width'] * floatval( $params['width'] ) ) / 100.0 );
 		$height = round( ( $size['height'] * floatval( $params['height'] ) ) / 100.0 );
 		$image_editor->crop( $crop_x, $crop_y, $width, $height );
-
-		if ( isset( $params['rotation'] ) ) {
-			$image_editor->rotate( 0 - $params['rotation'] );
-		}
 
 		// TODO: Generate filename based on edits.
 		$target_file = 'edited-' . $meta['original_name'];
