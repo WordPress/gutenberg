@@ -19,7 +19,7 @@ Note that the OS platform used by the maintainers is macOS but the tools and set
 
 ### Clone the project
 
-* Clone the project and submodules:
+* Clone the project:
 ```
 git clone https://github.com/WordPress/gutenberg.git
 ```
@@ -138,4 +138,3 @@ You might want to use Visual Studio Code as an editor. The project includes the 
 ## License
 
 Gutenberg Mobile is an Open Source project covered by the [GNU General Public License version 2](LICENSE).
-
