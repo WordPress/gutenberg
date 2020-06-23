@@ -8,25 +8,20 @@ import {
 	__experimentalLineHeightControl as LineHeightControl,
 } from '@wordpress/block-editor';
 import { getBlockTypes } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
+import { useGlobalStylesContext } from '../editor/global-styles-provider';
 
 export default ( { identifier, title: panelTitle, icon } ) => {
 	const {
-		__experimentalGlobalStylesUser: userStyles,
-	} = useSelect( ( select ) => select( 'core/block-editor' ).getSettings() );
-
-	const fromPx = ( value ) => +value?.replace( 'px', '' ) ?? null;
-	const getFontSizeValue = ( blockName ) =>
-		fromPx( userStyles?.[ blockName ]?.styles?.typography?.fontSize ) ??
-		null;
-
-	const getLineHeightValue = ( blockName ) =>
-		userStyles?.[ blockName ]?.styles?.typography?.lineHeight ?? null;
+		getFontSize,
+		setFontSize,
+		getLineHeight,
+		setLineHeight,
+	} = useGlobalStylesContext();
 
 	return (
 		<DefaultSidebar
@@ -51,9 +46,9 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 							if ( __experimentalFontSize ) {
 								panels.push(
 									<FontSizePicker
-										value={ getFontSizeValue( name ) }
-										onChange={ () =>
-											console.log( 'change font size' )
+										value={ getFontSize( name ) }
+										onChange={ ( value ) =>
+											setFontSize( name, value )
 										}
 									/>
 								);
@@ -62,9 +57,9 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 							if ( __experimentalLineHeight ) {
 								panels.push(
 									<LineHeightControl
-										value={ getLineHeightValue( name ) }
-										onChange={ () =>
-											console.log( 'change line height' )
+										value={ getLineHeight( name ) }
+										onChange={ ( value ) =>
+											setLineHeight( name, value )
 										}
 									/>
 								);

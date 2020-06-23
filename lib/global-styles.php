@@ -653,7 +653,10 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	$include_draft = true;
 	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		$settings['__experimentalGlobalStylesUser']         = gutenberg_experimental_global_styles_get_user( $include_draft );
+		$settings['__experimentalGlobalStylesBaseStyles']   = gutenberg_experimental_global_styles_merge_trees(
+			gutenberg_experimental_global_styles_get_core(),
+			gutenberg_experimental_global_styles_get_theme()
+		);
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 	}
 
