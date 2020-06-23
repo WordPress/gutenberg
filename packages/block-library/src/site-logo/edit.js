@@ -17,6 +17,7 @@ import {
 	ResizableBox,
 	Spinner,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -292,6 +293,7 @@ export default function LogoEdit( {
 
 	const controls = (
 		<BlockControls>
+			<ToolbarGroup>
 			{ url && (
 				<MediaReplaceFlow
 					mediaURL={ url }
@@ -308,6 +310,7 @@ export default function LogoEdit( {
 					label={ __( 'Delete Site Logo' ) }
 				/>
 			) }
+			</ToolbarGroup>
 		</BlockControls>
 	);
 
