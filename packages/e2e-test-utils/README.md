@@ -380,6 +380,10 @@ Also selects the start block in order to properly multi select.
 
 _Usage_
 
+```js
+multiSelectBlocksByRange( 2, 3 );
+```
+
 // selects three blocks -- from the second block to fourth (2, 3, 4).
 
 _Parameters_

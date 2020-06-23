@@ -47,7 +47,10 @@ const getMultiSelectByRangeIds = async ( startFrom, selectBlocks ) => {
  *
  * Also selects the start block in order to properly multi select.
  *
- * @example <caption>multiSelectBlocksByRange( 2, 3 )</caption>
+ * @example
+ * ```js
+ * multiSelectBlocksByRange( 2, 3 );
+ * ```
  * // selects three blocks -- from the second block to fourth (2, 3, 4).
  *
  * @param {number} startFrom The order of start block in editor.
