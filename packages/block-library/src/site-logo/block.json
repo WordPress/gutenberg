@@ -10,6 +10,7 @@
 		}
 	},
 	"supports": {
-		"html": false
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }

@@ -353,10 +353,10 @@ export default function LogoEdit( {
 	const key = !! url;
 
 	return (
-		<Block.figure ref={ ref } className={ classes } key={ key }>
+		<Block.div ref={ ref } className={ classes } key={ key }>
 			{ controls }
 			{ url && logoImage }
 			{ ! url && mediaPlaceholder }
-		</Block.figure>
+		</Block.div>
 	);
 }
