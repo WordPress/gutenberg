@@ -205,6 +205,7 @@ class MediaContainer extends Component {
 				>
 					<View
 						style={ [
+							imageFill && styles.imageCropped,
 							styles.mediaImageContainer,
 							! isUploadInProgress && aligmentStyles,
 						] }

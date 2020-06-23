@@ -55,7 +55,6 @@ const ImageComponent = ( {
 	retryMessage,
 	url,
 	width: imageWidth,
-	height: imageHeight,
 	focalPoint,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
@@ -77,8 +76,10 @@ const ImageComponent = ( {
 		const { height, width } = event.nativeEvent.layout;
 
 		if (
-			containerSize?.width !== width ||
-			containerSize?.height !== height
+			width !== 0 &&
+			height !== 0 &&
+			( containerSize?.width !== width ||
+				containerSize?.height !== height )
 		) {
 			setContainerSize( { width, height } );
 		}
@@ -125,38 +126,35 @@ const ImageComponent = ( {
 					? imageWidth
 					: customWidth,
 		},
-		imageData && {
-			height:
-				imageHeight > 0 && imageHeight < containerSize?.height
-					? imageHeight
-					: undefined,
-		},
-		focalPoint &&
-			imageData && {
-				width: imageWidth || '100%',
-				...styles.imageWithFocalPoint,
-			},
+		focalPoint && styles.focalPointContainer,
 	];
 
 	const imageStyles = [
 		{
-			aspectRatio: imageData?.aspectRatio,
 			opacity: isUploadInProgress ? 0.3 : 1,
+			height: containerSize?.height,
 		},
-		focalPoint && [
+		focalPoint && styles.focalPoint,
+		focalPoint &&
 			getImageWithFocalPointStyles(
 				focalPoint,
 				containerSize,
 				imageData
 			),
-			containerSize?.height > imageWidth && { height: '100%' },
-		],
+		! focalPoint &&
+			imageData &&
+			containerSize && {
+				height:
+					imageData?.width > containerSize?.width
+						? containerSize?.width / imageData?.aspectRatio
+						: undefined,
+			},
 	];
 
 	return (
 		<View
 			style={ [
-				{ flex: 1 },
+				styles.container,
 				// only set alignItems if an image exists because alignItems causes the placeholder
 				// to disappear when an aligned image can't be downloaded
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
@@ -189,11 +187,14 @@ const ImageComponent = ( {
 						</View>
 					</View>
 				) : (
-					<Image
-						style={ containerSize && imageStyles }
-						source={ { uri: url } }
-						{ ...( ! focalPoint && { resizeMethod: 'scale' } ) }
-					/>
+					<View style={ focalPoint && styles.focalPointContent }>
+						<Image
+							aspectRatio={ imageData?.aspectRatio }
+							style={ imageStyles }
+							source={ { uri: url } }
+							{ ...( ! focalPoint && { resizeMethod: 'scale' } ) }
+						/>
+					</View>
 				) }
 
 				{ isUploadFailed && (

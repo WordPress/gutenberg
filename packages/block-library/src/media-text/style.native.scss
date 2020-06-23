@@ -170,6 +170,10 @@ $media-to-text: 12px;
 	height: 200px;
 }
 
+.imageCropped {
+	min-height: 100px;
+}
+
 .mediaImageContainer {
 	height: 100%;
 	flex-direction: row;

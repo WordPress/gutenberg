@@ -325,7 +325,6 @@ export class ImageEdit extends React.Component {
 		const {
 			align,
 			url,
-			height,
 			width,
 			alt,
 			href,
@@ -456,7 +455,6 @@ export class ImageEdit extends React.Component {
 									<Image
 										align={ align && alignToFlex[ align ] }
 										alt={ alt }
-										height={ height }
 										isSelected={
 											isSelected && ! isCaptionSelected
 										}
