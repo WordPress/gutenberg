@@ -38,6 +38,11 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 					} ) => {
 						const panels = [];
 
+						if ( 'core/heading' === name ) {
+							//TODO: process heading as separate blocks
+							return null;
+						}
+
 						if ( __experimentalFontSize ) {
 							panels.push(
 								<FontSizePicker
