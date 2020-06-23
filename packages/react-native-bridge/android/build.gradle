@@ -189,9 +189,10 @@ if (buildGutenbergMobileJSBundle) {
 If they are changed, the isBundleUpToDate flag is switched to false. That flag is used by other tasks.")
 
         def dirs = [mobileGutenbergRootDir]
+        def bundlePath = file("$mobileGutenbergRootDir/bundle").absolutePath
         file(mobileGutenbergRootDir).eachDirRecurse { dir ->
             def isRelevantDir = !['react-native-bridge/android/build/intermediates',
-                                  file("$mobileGutenbergRootDir/bundle").absolutePath,
+                                  bundlePath,
                                   'node_modules'].any { dir.absolutePath.contains(it) } &&
                     !dir.name.startsWith('symlinked')
             if (isRelevantDir) {
