@@ -108,7 +108,7 @@ const SiteLogo = ( {
 	} else {
 		const currentWidth = width || imageWidthWithinContainer;
 		const ratio = naturalWidth / naturalHeight;
-		const currentHeight = currentWidth * ratio;
+		const currentHeight = currentWidth / ratio;
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
 		const minHeight =

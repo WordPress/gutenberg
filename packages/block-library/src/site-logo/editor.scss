@@ -22,6 +22,7 @@
 	}
 
 	img {
+		display: block;
 		max-width: 100%;
 	}
 
@@ -32,9 +33,5 @@
 	.block-editor-media-placeholder__cancel-button {
 		flex-basis: 100%;
 		text-align: center;
-	}
-
-	.components-resizable-box__container {
-		display: inline-block;
 	}
 }
