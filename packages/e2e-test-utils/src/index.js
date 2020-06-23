@@ -35,7 +35,10 @@ export { installPlugin } from './install-plugin';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
-export { multiSelectBlocks } from './multi-select-blocks';
+export {
+	multiSelectBlocksByIds,
+	multiSelectBlocksByRange,
+} from './multi-select-blocks';
 export {
 	enableFocusLossObservation,
 	disableFocusLossObservation,

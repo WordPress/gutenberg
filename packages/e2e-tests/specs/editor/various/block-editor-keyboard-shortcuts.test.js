@@ -4,8 +4,8 @@
 import {
 	createNewPost,
 	getAllBlocks,
-	selectBlockByClientId,
-	multiSelectBlocks,
+	multiSelectBlocksByIds,
+	multiSelectBlocksByRange,
 	insertBlock,
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
@@ -54,8 +54,7 @@ describe( 'block editor keyboard shortcuts', () => {
 			it( 'should move the blocks up', async () => {
 				await createTestParagraphBlocks( paragraphBlocks );
 				const [ , secondBefore, thirdBefore ] = await getBlocksInfo();
-				await selectBlockByClientId( secondBefore );
-				await multiSelectBlocks( secondBefore, thirdBefore );
+				await multiSelectBlocksByRange( 2, 2 ); // from second block select 2 blocks ( 2, 3 )
 				await moveUp();
 				const [ firstAfter, secondAfter ] = await getBlocksInfo();
 				expect( firstAfter ).toBe( secondBefore );
@@ -69,8 +68,7 @@ describe( 'block editor keyboard shortcuts', () => {
 					secondBefore,
 					thirdBefore,
 				] = await getBlocksInfo();
-				await selectBlockByClientId( firstBefore );
-				await multiSelectBlocks( firstBefore, secondBefore );
+				await multiSelectBlocksByIds( firstBefore, secondBefore );
 				await moveDown();
 				const [
 					firstAfter,

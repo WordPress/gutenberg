@@ -360,15 +360,32 @@ _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
 
-<a name="multiSelectBlocks" href="#multiSelectBlocks">#</a> **multiSelectBlocks**
+<a name="multiSelectBlocksByIds" href="#multiSelectBlocksByIds">#</a> **multiSelectBlocksByIds**
 
 Select multiple blocks on the editor given the start clientId and the end clientId.
-The start block must be already selected.
+First selects the start block in order to properly multi select.
 
 _Parameters_
 
 -   _start_ `string`: Identifier of the start block.
 -   _end_ `string`: Identifier of the end block.
+
+<a name="multiSelectBlocksByRange" href="#multiSelectBlocksByRange">#</a> **multiSelectBlocksByRange**
+
+Select multiple blocks on the editor given the start block order
+and the total amount of wanted selected blocks.
+Validates if not available blocks for selection.
+
+Also selects the start block in order to properly multi select.
+
+_Usage_
+
+// selects three blocks -- from the second block to fourth (2, 3, 4).
+
+_Parameters_
+
+-   _startFrom_ `number`: The order of start block in editor.
+-   _selectBlocks_ `number`: How many blocks should multi select.
 
 <a name="openDocumentSettingsSidebar" href="#openDocumentSettingsSidebar">#</a> **openDocumentSettingsSidebar**
 
