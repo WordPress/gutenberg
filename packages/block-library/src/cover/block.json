@@ -46,6 +46,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
 		"html": false,
 		"lightBlockWrapper": true,

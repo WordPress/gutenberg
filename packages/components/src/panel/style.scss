@@ -26,7 +26,7 @@
 	}
 
 	&.is-opened {
-		padding: $panel-padding;
+		padding: $grid-unit-20;
 	}
 }
 
@@ -34,8 +34,8 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 0 $panel-padding;
-	height: 50px;
+	padding: 0 $grid-unit-20;
+	height: $grid-unit-60;
 	border-top: $border-width solid $light-gray-500;
 	border-bottom: $border-width solid $light-gray-500;
 
@@ -63,7 +63,7 @@
 	@include reduce-motion("transition");
 }
 .components-panel__body.is-opened > .components-panel__body-title {
-	margin: -1 * $panel-padding;
+	margin: -1 * $grid-unit-20;
 	margin-bottom: 5px;
 }
 
@@ -76,12 +76,12 @@
 
 .components-panel__body-toggle.components-button {
 	position: relative;
-	padding: 15px;
+	padding: $grid-unit-20;
 	outline: none;
 	width: 100%;
-	font-weight: 600;
+	font-weight: 500;
 	text-align: left;
-	color: $dark-gray-900;
+	color: $dark-gray-primary;
 	border: none;
 	box-shadow: none;
 	transition: 0.1s background ease-in-out;

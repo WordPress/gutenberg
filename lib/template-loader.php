@@ -91,12 +91,11 @@ function get_template_hierarchy( $template_type ) {
  * @return string The path to the Full Site Editing template canvas file.
  */
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
-	global $_wp_current_template_id, $_wp_current_template_content;
+	global $_wp_current_template_content;
 
 	$current_template = gutenberg_find_template_post_and_parts( $type, $templates );
 
 	if ( $current_template ) {
-		$_wp_current_template_id      = $current_template['template_post']->ID;
 		$_wp_current_template_content = empty( $current_template['template_post']->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template['template_post']->post_content;
 
 		if ( isset( $_GET['_wp-find-template'] ) ) {
@@ -416,16 +415,20 @@ function gutenberg_strip_php_suffix( $template_file ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
-	global $post, $_wp_current_template_id;
+	global $post;
 
 	if ( ! $post || ! post_type_exists( 'wp_template' ) || ! post_type_exists( 'wp_template_part' ) ) {
 		return $settings;
 	}
 
-	// Create template part auto-drafts for the edited post.
-	$post = isset( $_wp_current_template_id )
-		? get_post( $_wp_current_template_id ) // It's a template.
-		: get_post(); // It's a post.
+	// If this is the Site Editor, auto-drafts for template parts have already been generated
+	// through `gutenberg_find_template_post_and_parts` in `gutenberg_edit_site_init`.
+	if ( isset( $settings['editSiteInitialState'] ) ) {
+		return $settings;
+	}
+
+	// Otherwise, create template part auto-drafts for the edited post.
+	$post = get_post();
 	foreach ( parse_blocks( $post->post_content ) as $block ) {
 		create_auto_draft_for_template_part_block( $block );
 	}

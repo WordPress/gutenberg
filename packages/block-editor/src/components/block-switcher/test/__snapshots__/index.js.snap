@@ -26,31 +26,17 @@ exports[`BlockSwitcher should render disabled block switcher with multi block of
 `;
 
 exports[`BlockSwitcher should render enabled block switcher with multi block when transforms exist 1`] = `
-<Dropdown
-  className="block-editor-block-switcher"
-  contentClassName="block-editor-block-switcher__popover"
-  popoverProps={
-    Object {
-      "isAlternate": true,
-      "position": "bottom right",
-    }
-  }
-  renderContent={[Function]}
-  renderToggle={[Function]}
-/>
+<ToolbarGroup>
+  <ForwardRef(ToolbarItem)>
+    <Component />
+  </ForwardRef(ToolbarItem)>
+</ToolbarGroup>
 `;
 
 exports[`BlockSwitcher should render switcher with blocks 1`] = `
-<Dropdown
-  className="block-editor-block-switcher"
-  contentClassName="block-editor-block-switcher__popover"
-  popoverProps={
-    Object {
-      "isAlternate": true,
-      "position": "bottom right",
-    }
-  }
-  renderContent={[Function]}
-  renderToggle={[Function]}
-/>
+<ToolbarGroup>
+  <ForwardRef(ToolbarItem)>
+    <Component />
+  </ForwardRef(ToolbarItem)>
+</ToolbarGroup>
 `;
