@@ -17,18 +17,7 @@ import DefaultSidebar from './default-sidebar';
 import { useGlobalStylesContext } from '../editor/global-styles-provider';
 
 export default ( { identifier, title: panelTitle, icon } ) => {
-	const {
-		getFontSize,
-		setFontSize,
-		getLineHeight,
-		setLineHeight,
-		getBackgroundColor,
-		setBackgroundColor,
-		getTextColor,
-		setTextColor,
-		getLinkColor,
-		setLinkColor,
-	} = useGlobalStylesContext();
+	const { getProperty, setProperty } = useGlobalStylesContext();
 
 	return (
 		<DefaultSidebar
@@ -53,9 +42,20 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 							if ( __experimentalFontSize ) {
 								panels.push(
 									<FontSizePicker
-										value={ getFontSize( name ) }
+										value={ getProperty(
+											name,
+											'typography',
+											'fontSize',
+											'px'
+										) }
 										onChange={ ( value ) =>
-											setFontSize( name, value )
+											setProperty(
+												name,
+												'typography',
+												'fontSize',
+												value,
+												'px'
+											)
 										}
 									/>
 								);
@@ -64,9 +64,18 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 							if ( __experimentalLineHeight ) {
 								panels.push(
 									<LineHeightControl
-										value={ getLineHeight( name ) }
+										value={ getProperty(
+											name,
+											'typography',
+											'lineHeight'
+										) }
 										onChange={ ( value ) =>
-											setLineHeight( name, value )
+											setProperty(
+												name,
+												'typography',
+												'lineHeight',
+												value
+											)
 										}
 									/>
 								);
@@ -78,7 +87,7 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 					.filter( Boolean ) }
 			</PanelBody>
 
-			<PanelBody title={ __( 'Color' ) } initialOpen={ true }>
+			<PanelBody title={ __( 'Color' ) }>
 				{ getBlockTypes()
 					.map(
 						( {
@@ -89,15 +98,29 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 							const settings = [];
 							if ( __experimentalColor ) {
 								settings.push( {
-									value: getTextColor( name ),
+									value: getProperty( name, 'color', 'text' ),
 									onChange: ( value ) =>
-										setTextColor( name, value ),
+										setProperty(
+											name,
+											'color',
+											'text',
+											value
+										),
 									label: __( 'Text color' ),
 								} );
 								settings.push( {
-									value: getBackgroundColor( name ),
+									value: getProperty(
+										name,
+										'color',
+										'background'
+									),
 									onChange: ( value ) =>
-										setBackgroundColor( name, value ),
+										setProperty(
+											name,
+											'color',
+											'background',
+											value
+										),
 									label: __( 'Background color' ),
 								} );
 							}
@@ -108,9 +131,14 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 
 							if ( __experimentalColor?.linkColor ) {
 								settings.push( {
-									value: getLinkColor( name ),
+									value: getProperty( name, 'color', 'link' ),
 									onChange: ( value ) =>
-										setLinkColor( name, value ),
+										setProperty(
+											name,
+											'color',
+											'link',
+											value
+										),
 									label: __( 'Link color' ),
 								} );
 							}

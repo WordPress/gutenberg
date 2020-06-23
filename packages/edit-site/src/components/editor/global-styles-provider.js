@@ -6,16 +6,8 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 
 const GlobalStylesContext = createContext( {
-	getFontSize: () => {},
-	setFontSize: () => {},
-	getLineHeight: () => {},
-	setLineHeight: () => {},
-	getTextColor: () => {},
-	setTextColor: () => {},
-	getBackgroundColor: () => {},
-	setBackgroundColor: () => {},
-	getLinkColor: () => {},
-	setLinkColor: () => {},
+	getProperty: ( context, family, name, units ) => {},
+	setProperty: ( context, family, name, value, units ) => {},
 } );
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
@@ -23,16 +15,8 @@ export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 export default ( { children, entityId } ) => {
 	const {
 		userStyles,
-		getFontSize,
-		setFontSize,
-		getLineHeight,
-		setLineHeight,
-		getTextColor,
-		setTextColor,
-		getBackgroundColor,
-		setBackgroundColor,
-		getLinkColor,
-		setLinkColor,
+		getProperty,
+		setProperty,
 	} = useGlobalStylesFromEntities( entityId );
 
 	useGlobalStylesEffectToUpdateStylesheet( userStyles );
@@ -40,16 +24,8 @@ export default ( { children, entityId } ) => {
 	return (
 		<GlobalStylesContext.Provider
 			value={ {
-				getFontSize,
-				setFontSize,
-				getLineHeight,
-				setLineHeight,
-				getTextColor,
-				setTextColor,
-				getBackgroundColor,
-				setBackgroundColor,
-				getLinkColor,
-				setLinkColor,
+				getProperty,
+				setProperty,
 			} }
 		>
 			{ children }
@@ -83,98 +59,30 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 		return userData?.content ? JSON.parse( userData.content ) : {};
 	} );
 
-	// Font size: getter & setter
-	const fromPx = ( value ) => ( value ? +value.replace( 'px', '' ) : null );
-	const toPx = ( value ) => ( value ? value + 'px' : null );
-	const getFontSize = ( blockName ) =>
-		fromPx( userStyles?.[ blockName ]?.styles?.typography?.fontSize ) ??
-		null;
-	const setFontSize = ( blockName, newValue ) =>
-		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
-			content: JSON.stringify( {
-				...userStyles,
-				[ blockName ]: {
-					styles: {
-						...userStyles?.[ blockName ]?.styles,
-						typography: {
-							...userStyles?.[ blockName ]?.styles?.typography,
-							fontSize: toPx( newValue ),
-						},
-					},
-				},
-			} ),
-		} );
+	const fromUnits = {
+		noop: ( value ) => value,
+		px: ( value ) => ( value ? +value.replace( 'px', '' ) : null ),
+	};
+	const toUnits = {
+		noop: ( value ) => value,
+		px: ( value ) => ( value ? value + 'px' : null ),
+	};
 
-	// Line height: getter & setter
-	const getLineHeight = ( blockName ) =>
-		userStyles?.[ blockName ]?.styles?.typography?.lineHeight ?? null;
-	const setLineHeight = ( blockName, newValue ) =>
-		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
-			content: JSON.stringify( {
-				...userStyles,
-				[ blockName ]: {
-					styles: {
-						...userStyles?.[ blockName ]?.styles,
-						typography: {
-							...userStyles?.[ blockName ]?.styles?.typography,
-							lineHeight: newValue,
-						},
-					},
-				},
-			} ),
-		} );
+	const getProperty = ( context, family, name, units = 'noop' ) =>
+		fromUnits[ units ](
+			userStyles?.[ context ]?.styles?.[ family ]?.[ name ]
+		);
 
-	// Text color: getter & setter
-	const getTextColor = ( blockName ) =>
-		userStyles?.[ blockName ]?.styles?.color?.text;
-	const setTextColor = ( blockName, newValue ) =>
+	const setProperty = ( context, family, name, value, units = 'noop' ) =>
 		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
 			content: JSON.stringify( {
 				...userStyles,
-				[ blockName ]: {
+				[ context ]: {
 					styles: {
-						...userStyles?.[ blockName ]?.styles,
-						color: {
-							...userStyles?.[ blockName ]?.styles?.color,
-							text: newValue,
-						},
-					},
-				},
-			} ),
-		} );
-
-	// Background color: getter & setter
-	const getBackgroundColor = ( blockName ) =>
-		userStyles?.[ blockName ]?.styles?.color?.background;
-	const setBackgroundColor = ( blockName, newValue ) =>
-		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
-			content: JSON.stringify( {
-				...userStyles,
-				[ blockName ]: {
-					styles: {
-						...userStyles?.[ blockName ]?.styles,
-						color: {
-							...userStyles?.[ blockName ]?.styles?.color,
-							background: newValue,
-						},
-					},
-				},
-			} ),
-		} );
-
-	// Link color: getter & setter
-	const getLinkColor = ( blockName ) =>
-		userStyles?.[ blockName ]?.styles?.color?.link;
-	const setLinkColor = ( blockName, newValue ) =>
-		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
-			content: JSON.stringify( {
-				...userStyles,
-				[ blockName ]: {
-					styles: {
-						...userStyles?.[ blockName ]?.styles,
-						color: {
-							...userStyles?.[ blockName ]?.styles?.color,
-							link: newValue,
+						...userStyles?.[ context ]?.styles,
+						[ family ]: {
+							...userStyles?.[ context ]?.styles?.[ family ],
+							[ name ]: toUnits[ units ]( value ),
 						},
 					},
 				},
@@ -183,16 +91,8 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 
 	return {
 		userStyles,
-		getFontSize,
-		setFontSize,
-		getLineHeight,
-		setLineHeight,
-		getTextColor,
-		setTextColor,
-		getBackgroundColor,
-		setBackgroundColor,
-		getLinkColor,
-		setLinkColor,
+		getProperty,
+		setProperty,
 	};
 };
 
