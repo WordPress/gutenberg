@@ -261,7 +261,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/move-up',
 			category: 'block',
-			description: __( 'Move block Up.' ),
+			description: __( 'Move the selected block(s) up.' ),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 't',
