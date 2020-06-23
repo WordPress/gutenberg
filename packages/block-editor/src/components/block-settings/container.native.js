@@ -52,8 +52,6 @@ const BottomSheetScreen = ( { children, setHeight } ) => {
 
 const Stack = createStackNavigator();
 
-let snaps;
-
 function BottomSheetSettings( {
 	editorSidebarOpened,
 	closeGeneralSidebar,
@@ -62,7 +60,6 @@ function BottomSheetSettings( {
 	const [ height, setHeightValue ] = useState( 1 );
 	const setHeight = ( maxHeight ) => {
 		if ( height !== maxHeight ) {
-			snaps = [ maxHeight + 64, 0.75 * maxHeight, 0.5 * maxHeight, 0 ];
 			setHeightValue( maxHeight );
 		}
 	};
@@ -93,11 +90,11 @@ function BottomSheetSettings( {
 	};
 	return (
 		<BottomSheet
+			key={ height }
 			isVisible={ editorSidebarOpened }
 			onClose={ closeGeneralSidebar }
 			hideHeader
 			contentStyle={ styles.content }
-			snapPoints={ snaps }
 			{ ...props }
 		>
 			<View style={ { height } }>

@@ -43,14 +43,9 @@ import BottomSheetReanimated from 'reanimated-bottom-sheet';
 
 const windowHeight = Dimensions.get( 'window' ).height;
 
-const defaultSnapPoints = [
-	windowHeight * 0.8,
-	windowHeight * 0.5,
-	windowHeight * 0.25,
-	0,
-];
+const defaultSnapPoints = [ windowHeight - 54, windowHeight * 0.5, 0 ];
 
-const defaultInitialSnap = 2;
+const defaultInitialSnap = 1;
 
 class BottomSheet extends Component {
 	constructor() {
@@ -76,6 +71,7 @@ class BottomSheet extends Component {
 		this.renderContent = this.renderContent.bind( this );
 		this.openEnd = this.openEnd.bind( this );
 		this.closeStart = this.closeStart.bind( this );
+		this.closeEnd = this.closeEnd.bind( this );
 		this.renderHandler = this.renderHandler.bind( this );
 		this.onOverlayPress = this.onOverlayPress.bind( this );
 		this.state = {
@@ -89,7 +85,10 @@ class BottomSheet extends Component {
 			onHardwareButtonPress: null,
 			isMaxHeightSet: true,
 			extraProps: {},
+			contentHeight: 0,
+			isShown: false,
 		};
+		this.shouldScroll = false;
 
 		this.bottomSheetRef = createRef();
 
@@ -97,7 +96,7 @@ class BottomSheet extends Component {
 			this.onSafeAreaInsetsUpdate
 		);
 		Dimensions.addEventListener( 'change', this.onDimensionsChange );
-		this.overlayOpacity = new Animated.Value( 1 );
+		this.overlayOpacity = new Animated.Value( 0 );
 	}
 
 	keyboardWillShow( e ) {
@@ -311,93 +310,176 @@ class BottomSheet extends Component {
 		return (
 			<View style={ [ { height: '100%' }, backgroundStyle ] }>
 				{ ! hideHeader && this.getHeader() }
-				<ScrollView
-					disableScrollViewPanResponder
-					showsHorizontalScrollIndicator={ false }
-					showsVerticalScrollIndicator={ false }
-					contentContainerStyle={ [ styles.content, contentStyle ] }
-					scrollEnabled={ scrollEnabled }
-					automaticallyAdjustContentInsets={ false }
-				>
-					<BottomSheetProvider
-						value={ {
-							shouldEnableBottomSheetScroll: this
-								.onShouldEnableScroll,
-							shouldDisableBottomSheetMaxHeight: this
-								.onShouldSetBottomSheetMaxHeight,
-							onCloseBottomSheet: this.onHandleClosingBottomSheet,
-							onHardwareButtonPress: this
-								.onHandleHardwareButtonPress,
-						} }
+				{ this.shouldScroll ? (
+					<ScrollView
+						disableScrollViewPanResponder
+						showsHorizontalScrollIndicator={ false }
+						showsVerticalScrollIndicator={ false }
+						contentContainerStyle={ [
+							styles.content,
+							contentStyle,
+						] }
+						scrollEnabled={ scrollEnabled }
+						automaticallyAdjustContentInsets={ false }
 					>
-						{ children }
-					</BottomSheetProvider>
-				</ScrollView>
+						<BottomSheetProvider
+							value={ {
+								shouldEnableBottomSheetScroll: this
+									.onShouldEnableScroll,
+								shouldDisableBottomSheetMaxHeight: this
+									.onShouldSetBottomSheetMaxHeight,
+								onCloseBottomSheet: this
+									.onHandleClosingBottomSheet,
+								onHardwareButtonPress: this
+									.onHandleHardwareButtonPress,
+							} }
+						>
+							{ children }
+						</BottomSheetProvider>
+					</ScrollView>
+				) : (
+					<View style={ [ styles.content, contentStyle ] }>
+						<BottomSheetProvider
+							value={ {
+								shouldEnableBottomSheetScroll: this
+									.onShouldEnableScroll,
+								shouldDisableBottomSheetMaxHeight: this
+									.onShouldSetBottomSheetMaxHeight,
+								onCloseBottomSheet: this
+									.onHandleClosingBottomSheet,
+								onHardwareButtonPress: this
+									.onHandleHardwareButtonPress,
+							} }
+						>
+							{ children }
+						</BottomSheetProvider>
+					</View>
+				) }
 			</View>
 		);
 	}
 
 	openEnd() {
-		this.onShouldEnableScroll( true );
+		if ( this.shouldScroll ) {
+			this.onShouldEnableScroll( true );
+		}
 	}
 
 	closeStart() {
-		this.onShouldEnableScroll( false );
+		if ( this.shouldScroll ) {
+			this.onShouldEnableScroll( false );
+		}
+	}
+
+	closeEnd() {
+		this.setState( { contentHeight: 0, isShown: false } );
+		this.onCloseBottomSheet();
 	}
 
 	render() {
+		const { isVisible, style = {}, highestSnap, children } = this.props;
 		const {
-			isVisible,
-			style = {},
-			snapPoints = defaultSnapPoints,
-			initialSnap = defaultInitialSnap,
-		} = this.props;
-		const { safeAreaBottomInset, scrollEnabled } = this.state;
+			safeAreaBottomInset,
+			scrollEnabled,
+			contentHeight,
+			isShown,
+		} = this.state;
+		let computedSnapPoints;
+		let computedInitialSnapPoint;
+		const maxSnapPoint =
+			highestSnap ||
+			( contentHeight > 0 ? contentHeight + safeAreaBottomInset : 0 );
+		if ( maxSnapPoint < defaultSnapPoints[ 1 ] ) {
+			computedSnapPoints = [ maxSnapPoint, 0, 0 ];
+			computedInitialSnapPoint = 0;
+		} else if ( maxSnapPoint < defaultSnapPoints[ 0 ] ) {
+			computedSnapPoints = [ maxSnapPoint, defaultSnapPoints[ 1 ], 0 ];
+			computedInitialSnapPoint = 1;
+		} else {
+			computedSnapPoints = defaultSnapPoints;
+			computedInitialSnapPoint = defaultInitialSnap;
+			this.shouldScroll = true;
+		}
 
 		return (
-			<RNModal visible={ isVisible } transparent={ true }>
-				<KeyboardAvoidingView
-					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ {
-						...style,
-						flex: 1,
-					} }
-					keyboardVerticalOffset={ -safeAreaBottomInset }
-				>
-					<Animated.View
+			<RNModal
+				onShow={ () => {
+					this.setState( { isShown: true } );
+				} }
+				visible={ isVisible }
+				animationType={ 'none' }
+				transparent={ true }
+				supportedOrientations={ [ 'landscape', 'portrait' ] }
+			>
+				{ isShown && maxSnapPoint === 0 && (
+					<View style={ { opacity: 0 } }>
+						<View
+							onLayout={ ( e ) => {
+								this.setState( {
+									contentHeight: e.nativeEvent.layout.height,
+								} );
+							} }
+						>
+							{ children }
+						</View>
+					</View>
+				) }
+
+				{ maxSnapPoint > 0 && (
+					<KeyboardAvoidingView
+						behavior={ Platform.OS === 'ios' && 'padding' }
 						style={ {
-							position: 'absolute',
-							top: 0,
-							left: 0,
-							right: 0,
-							bottom: 0,
-							backgroundColor: 'black',
-							opacity: Animated.sub(
-								0.7,
-								Animated.multiply( this.overlayOpacity, 0.7 )
-							),
+							...style,
+							flex: 1,
 						} }
+						keyboardVerticalOffset={ -safeAreaBottomInset }
 					>
-						<TouchableOpacity
-							style={ { flex: 1 } }
-							onPress={ this.onOverlayPress }
+						<Animated.View
+							style={ {
+								position: 'absolute',
+								top: 0,
+								left: 0,
+								right: 0,
+								bottom: 0,
+								backgroundColor: 'black',
+								opacity:
+									maxSnapPoint > 50
+										? Animated.sub(
+												0.7,
+												Animated.multiply(
+													this.overlayOpacity,
+													0.7
+												)
+										  )
+										: 0,
+							} }
+						>
+							<TouchableOpacity
+								style={ { flex: 1 } }
+								onPress={ this.onOverlayPress }
+							/>
+						</Animated.View>
+						<BottomSheetReanimated
+							snapPoints={ computedSnapPoints }
+							initialSnap={ computedInitialSnapPoint }
+							renderHeader={ this.renderHandler }
+							renderContent={ this.renderContent }
+							callbackNode={ this.overlayOpacity }
+							enabledContentGestureInteraction={
+								! ( this.shouldScroll && scrollEnabled )
+							}
+							enabledHeaderGestureInteraction
+							onOpenEnd={ this.openEnd }
+							onCloseStart={ this.closeStart }
+							onCloseEnd={ this.closeEnd }
+							ref={ this.bottomSheetRef }
+							enabledInnerScrolling={
+								this.shouldScroll && scrollEnabled
+							}
+							enabledBottomInitialAnimation
 						/>
-					</Animated.View>
-					<BottomSheetReanimated
-						key={ `${ JSON.stringify( snapPoints ) }` }
-						snapPoints={ snapPoints }
-						initialSnap={ initialSnap }
-						renderHeader={ this.renderHandler }
-						renderContent={ this.renderContent }
-						callbackNode={ this.overlayOpacity }
-						onCloseEnd={ this.onCloseBottomSheet }
-						enabledContentGestureInteraction={ ! scrollEnabled }
-						enabledHeaderGestureInteraction
-						onOpenEnd={ this.openEnd }
-						onCloseStart={ this.closeStart }
-						ref={ this.bottomSheetRef }
-					/>
-				</KeyboardAvoidingView>
+					</KeyboardAvoidingView>
+				) }
 			</RNModal>
 		);
 	}
