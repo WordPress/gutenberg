@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext } from '@wordpress/element';
+import { createContext, useContext, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 const GlobalStylesContext = createContext( {
@@ -13,7 +13,34 @@ const GlobalStylesContext = createContext( {
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
-export default ( { children, entityId, stylesheetId, baseStyles } ) => {
+export default ( { children, entityId, baseStyles } ) => {
+	const {
+		userStyles,
+		getFontSize,
+		setFontSize,
+		getLineHeight,
+		setLineHeight,
+	} = useGlobalStylesFromEntities( entityId );
+
+	useGlobalStylesEffectToUpdateStylesheet( baseStyles, userStyles );
+
+	return (
+		<GlobalStylesContext.Provider
+			value={ { getFontSize, setFontSize, getLineHeight, setLineHeight } }
+		>
+			{ children }
+		</GlobalStylesContext.Provider>
+	);
+};
+
+/**
+ * Hook that exposes an API to retrieve and update user styles.
+ *
+ * @param {number} entityId Entity that stores the user data as CPT.
+ *
+ * @return {Object} User data as well as getters and setters.
+ */
+const useGlobalStylesFromEntities = ( entityId ) => {
 	const { editEntityRecord } = useDispatch( 'core' );
 	const userStyles = useSelect( ( select ) => {
 		// Trigger entity retrieval
@@ -31,9 +58,6 @@ export default ( { children, entityId, stylesheetId, baseStyles } ) => {
 
 		return userData?.content ? JSON.parse( userData.content ) : {};
 	} );
-
-	console.log( 'base styles ', baseStyles );
-	console.log( 'stylesheet id ', stylesheetId );
 
 	// Font Size getter & setter
 	const fromPx = ( value ) => +value?.replace( 'px', '' ) ?? null;
@@ -78,11 +102,33 @@ export default ( { children, entityId, stylesheetId, baseStyles } ) => {
 			} ),
 		} );
 
-	return (
-		<GlobalStylesContext.Provider
-			value={ { getFontSize, setFontSize, getLineHeight, setLineHeight } }
-		>
-			{ children }
-		</GlobalStylesContext.Provider>
-	);
+	return {
+		userStyles,
+		getFontSize,
+		setFontSize,
+		getLineHeight,
+		setLineHeight,
+	};
+};
+
+const useGlobalStylesEffectToUpdateStylesheet = ( baseStyles, userStyles ) => {
+	useEffect( () => {
+		const embeddedStylesheetId = 'user-generated-global-styles-inline-css';
+		let styleNode = document.getElementById( embeddedStylesheetId );
+
+		if ( ! styleNode ) {
+			styleNode = document.createElement( 'style' );
+			styleNode.id = embeddedStylesheetId;
+			document
+				.getElementsByTagName( 'head' )[ 0 ]
+				.appendChild( styleNode );
+		}
+
+		// TODO: look at how to hook into the styles generation
+		// so we can avoid having to increase the class specificity here.
+		styleNode.innerText = `.editor-styles-wrapper.editor-styles-wrapper p {
+			font-size: 42px;
+			line-height: 2;
+		}`;
+	}, [ baseStyles, userStyles ] );
 };
