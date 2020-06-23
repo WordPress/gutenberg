@@ -2,17 +2,17 @@
  * External dependencies
  */
 import React from 'react';
-import {
-	getOtherMediaOptions,
-	requestMediaPicker,
-	mediaSources,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
+import {
+	getOtherMediaOptions,
+	requestMediaPicker,
+	mediaSources,
+} from '@wordpress/react-native-bridge';
 import { capturePhoto, captureVideo, image, wordpress } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
