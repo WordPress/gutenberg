@@ -5,10 +5,10 @@ import { Platform, Clipboard } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { compose, usePrevious } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { link, external } from '@wordpress/icons';
 
 /**
@@ -44,12 +44,7 @@ function LinkSettings( {
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
-
-	const prevEditorSidebarOpenedRef = useRef();
-	useEffect( () => {
-		prevEditorSidebarOpenedRef.current = editorSidebarOpened;
-	} );
-	const prevEditorSidebarOpened = prevEditorSidebarOpenedRef.current;
+	const prevEditorSidebarOpened = usePrevious( editorSidebarOpened );
 
 	useEffect( () => {
 		setUrlInputValue( url || '' );
