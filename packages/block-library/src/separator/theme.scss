@@ -1,6 +1,6 @@
 .wp-block-separator {
 	border: none;
-	border-bottom: 2px solid $dark-gray-100;
+	border-bottom: var(--wp--style--border--width, 2px) solid $dark-gray-100;
 	margin-left: auto;
 	margin-right: auto;
 
@@ -12,9 +12,11 @@
 	&.has-background:not(.is-style-dots) {
 		border-bottom: none;
 		height: 1px;
+		height: var(--wp--style--border--width, 1px);
 	}
 
 	&.has-background:not(.is-style-wide):not(.is-style-dots) {
 		height: 2px;
+		height: calc(var(--wp--style--border--width, 1px) * 2);
 	}
 }

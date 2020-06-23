@@ -4,6 +4,7 @@
 	// Wide style
 	&.is-style-wide {
 		border-bottom-width: 1px;
+		border-bottom-width: var(--wp--style--border--width, 1px);
 	}
 
 	// Dots style

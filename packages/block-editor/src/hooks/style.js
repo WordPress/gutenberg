@@ -15,6 +15,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
+import { BORDER_SUPPORT_KEY, BorderEdit, borderStyleMappings } from './border';
 import {
 	PADDING_SUPPORT_KEY,
 	PaddingEdit,
@@ -24,6 +25,7 @@ import SpacingPanelControl from '../components/spacing-panel-control';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
+	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	PADDING_SUPPORT_KEY,
 ];
@@ -53,6 +55,7 @@ function compileStyleValue( uncompiledValue ) {
  */
 export function getInlineStyles( styles = {} ) {
 	const mappings = {
+		...borderStyleMappings,
 		...paddingStyleMappings,
 		lineHeight: [ 'typography', 'lineHeight' ],
 		fontSize: [ 'typography', 'fontSize' ],
@@ -168,6 +171,7 @@ export const withBlockControls = createHigherOrderComponent(
 			<TypographyPanel key="typography" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
+			<BorderEdit key="border" { ...props } />,
 			hasPaddingSupport && (
 				<SpacingPanelControl key="spacing">
 					<PaddingEdit { ...props } />

@@ -690,6 +690,20 @@ function gutenberg_extend_settings_custom_units( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
 
 /**
+ * Extends block editor settings to determine whether to use custom border controls.
+ * Currently experimental.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_custom_border( $settings ) {
+	$settings['__experimentalEnableCustomBorder'] = get_theme_support( 'experimental-custom-border' );
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_border' );
+
+/**
  * Extends block editor settings to determine whether to use custom spacing controls.
  * Currently experimental.
  *
@@ -705,7 +719,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_spacing' 
 
 
 /**
- * Extends block editor settings to determine whether to use custom spacing controls.
+ * Extends block editor settings to determine whether to use custom link colors.
  * Currently experimental.
  *
  * @param array $settings Default editor settings.

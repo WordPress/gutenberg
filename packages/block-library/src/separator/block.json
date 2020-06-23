@@ -10,6 +10,7 @@
 		}
 	},
 	"supports": {
-		"anchor": true
+		"anchor": true,
+		"__experimentalEnableCustomBorder": true
 	}
 }
