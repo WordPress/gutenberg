@@ -147,9 +147,8 @@ function gutenberg_edit_site_init( $hook ) {
 
 	$settings['editSiteInitialState'] = array();
 
-	$settings['editSiteInitialState']['templateType'] = 'wp_template';
-	$settings['editSiteInitialState']['showOnFront']  = get_option( 'show_on_front' );
-	$settings['editSiteInitialState']['page']         = array(
+	$settings['editSiteInitialState']['showOnFront'] = get_option( 'show_on_front' );
+	$settings['editSiteInitialState']['page']        = array(
 		'path'    => '/',
 		'context' => 'page' === $settings['editSiteInitialState']['showOnFront'] ? array(
 			'postType' => 'page',
