@@ -75,3 +75,11 @@ body.toplevel_page_gutenberg-edit-site {
 }
 
 @include wordpress-admin-schemes();
+
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/template-part"].is-focus-mode.is-selected,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/template-part"].is-focus-mode.has-child-selected {
+	opacity: 1;
+	.block-editor-block-list__block.is-focus-mode {
+		opacity: 1;
+	}
+}

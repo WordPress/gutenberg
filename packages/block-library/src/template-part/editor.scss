@@ -84,3 +84,16 @@
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 	}
 }
+
+.block-editor-block-list__block[data-type="core/template-part"].is-selected {
+	box-shadow: 0 0 0 10000px rgba(0, 0, 0, 0.1);
+}
+
+.block-editor-block-list__block[data-type="core/template-part"].has-child-selected {
+	box-shadow: inset 0 0 0 $border-width-focus $gray-700, 0 0 0 10000px rgba(0, 0, 0, 0.1);
+}
+
+.block-editor-block-list__block[data-type="core/template-part"]:hover:not(.is-selected):not(.has-child-selected) {
+	cursor: pointer;
+	box-shadow: inset 0 0 0 $border-width-focus $gray-700;
+}
