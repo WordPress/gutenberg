@@ -13,6 +13,9 @@
 	color: $white;
 	white-space: nowrap;
 	text-align: center;
+	line-height: 1.4;
+	font-size: 12px;
+	box-shadow: none;
 
 	// This prevents quickly hovering the tooltip from blocking hovering something else.
 	pointer-events: none;
