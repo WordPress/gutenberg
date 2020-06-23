@@ -44,31 +44,46 @@ export default function addBlockSelections() {
 	addFilter(
 		'editor.BlockListBlock',
 		'core/block-collab/add-block-selections',
-		( OriginalComponent ) => ( { className, ...props } ) => {
-			const isPeerSelected = useSelect(
+		( OriginalComponent ) => ( props ) => {
+			const selectingPeers = useSelect(
 				( select ) =>
 					Object.values(
 						select(
 							'core/block-collab/add-block-selections'
 						).getState()
-					).some(
+					).filter(
 						( peer ) =>
 							peer.selectionStart?.clientId === props.clientId &&
 							peer.selectionEnd?.clientId === props.clientId
 					),
 				[ props.clientId ]
 			);
+			const component = <OriginalComponent { ...props } />;
+			if ( ! selectingPeers.length ) return component;
 			return (
-				<OriginalComponent
-					{ ...props }
+				<div
 					className={ classnames(
-						className,
 						'block-collab-add-block-selections__block',
-						{
-							'is-peer-selected': isPeerSelected,
-						}
+						'is-peer-selected'
 					) }
-				/>
+					style={ {
+						outlineColor: selectingPeers[ 0 ].color,
+					} }
+				>
+					<div className="block-collab-add-block-selections__block-peer-names">
+						{ selectingPeers.map( ( peer ) => (
+							<div
+								key={ peer.peerId }
+								style={ {
+									color: peer.color,
+								} }
+							>
+								{ peer.name }
+							</div>
+						) ) }
+					</div>
+					{ component }
+				</div>
 			);
 		}
 	);
@@ -81,6 +96,7 @@ export default function addBlockSelections() {
 		attributes: {
 			id: 'id',
 			className: 'class',
+			style: 'style',
 		},
 		edit() {
 			return null;
@@ -106,6 +122,7 @@ export default function addBlockSelections() {
 						peerId: peer.peerId,
 						selectionStartOffset: peer.selectionStart.offset,
 						selectionEndOffset: peer.selectionEnd.offset,
+						color: peer.color,
 					} ) ),
 			};
 		},
@@ -114,7 +131,12 @@ export default function addBlockSelections() {
 				peers.reduce(
 					(
 						record,
-						{ peerId, selectionStartOffset, selectionEndOffset }
+						{
+							peerId,
+							selectionStartOffset,
+							selectionEndOffset,
+							color,
+						}
 					) => {
 						const isCollapsed =
 							selectionStartOffset === selectionEndOffset;
@@ -137,6 +159,7 @@ export default function addBlockSelections() {
 										'is-collapsed': isCollapsed,
 										'is-at-end': isAtEnd,
 									} ),
+									style: `background-color: ${ color };`,
 								},
 							},
 							selectionStartOffset,

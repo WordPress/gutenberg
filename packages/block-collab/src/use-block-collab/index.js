@@ -3,6 +3,7 @@
  */
 import * as yjs from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
+import ColorHash from 'color-hash';
 
 /**
  * WordPress dependencies
@@ -25,10 +26,11 @@ const instances = {};
  *
  * @param {string} id       The ID.
  * @param {string} password The password.
+ * @param {Object} user     The user object.
  *
  * @return {Object} The shared data.
  */
-export default function useBlockCollab( id, password ) {
+export default function useBlockCollab( id, password, user ) {
 	const [ peers, setPeers ] = useState( {} );
 	const [ setSelf, setSetSelf ] = useState( () => () => {} );
 
@@ -40,6 +42,11 @@ export default function useBlockCollab( id, password ) {
 		initialBlocksRef.current = newBlocks;
 		_setBlocks( newBlocks );
 	} );
+
+	const userRef = useRef( user );
+	useEffect( () => {
+		userRef.current = user;
+	}, [ user ] );
 
 	const setAddBlockSelectionsState = useDispatch(
 		'core/block-collab/add-block-selections'
@@ -95,6 +102,8 @@ export default function useBlockCollab( id, password ) {
 					{
 						...self,
 						peerId: instances[ instanceKey ].provider.room.peerId,
+						name: userRef.current.name,
+						color: new ColorHash().hex( userRef.current.id ),
 					}
 				);
 			}, localYjsChangeSymbol );

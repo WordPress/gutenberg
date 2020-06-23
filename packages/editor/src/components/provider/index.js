@@ -9,7 +9,7 @@ import memize from 'memize';
  */
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider } from '@wordpress/core-data';
 import {
@@ -284,7 +284,11 @@ export default compose( [
 				{ ...props }
 				{ ...useBlockCollab(
 					props.post.id,
-					props.post.collaborative_editing_secret
+					props.post.collaborative_editing_secret,
+					useSelect(
+						( select ) => select( 'core' ).getCurrentUser(),
+						[]
+					)
 				) }
 			/>
 		);

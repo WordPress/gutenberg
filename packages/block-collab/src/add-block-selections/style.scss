@@ -1,5 +1,15 @@
+.block-collab-add-block-selections__block {
+	position: relative;
+}
+
 .block-collab-add-block-selections__block.is-peer-selected {
 	outline: 1px dashed #000;
+}
+
+.block-collab-add-block-selections__block-peer-names {
+	font-size: 12px;
+	position: absolute;
+	top: 100%;
 }
 
 .block-collab-add-block-selections--caret {
@@ -12,8 +22,9 @@
 }
 
 .block-collab-add-block-selections--caret::before {
-	background: #2e3d48;
+	background: inherit;
 	bottom: 0;
+	box-shadow: 0 0 2px 0 #2e3d48;
 	content: "";
 	font-size: 1em;
 	left: -1px;
@@ -28,7 +39,8 @@
 }
 
 .block-collab-add-block-selections--caret::after {
-	background-color: #2e3d48;
+	background-color: inherit;
+	box-shadow: 0 0 2px 0 #2e3d48;
 	content: "";
 	height: 8px;
 	left: -4px;

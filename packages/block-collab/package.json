@@ -34,6 +34,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/rich-text": "file:../rich-text",
 		"classnames": "^2.2.5",
+		"color-hash": "^1.0.3",
 		"lodash": "^4.17.15",
 		"uuid": "^7.0.2",
 		"y-webrtc": "^10.1.5",

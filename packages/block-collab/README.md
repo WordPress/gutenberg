@@ -42,6 +42,7 @@ _Parameters_
 
 -   _id_ `string`: The ID.
 -   _password_ `string`: The password.
+-   _user_ `Object`: The user object.
 
 _Returns_
 
