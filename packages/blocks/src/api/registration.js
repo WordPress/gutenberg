@@ -166,6 +166,8 @@ export function registerBlockType( name, settings ) {
 		icon: blockDefault,
 		keywords: [],
 		attributes: {},
+		providesContext: {},
+		usesContext: [],
 		supports: {},
 		styles: [],
 		save: () => null,

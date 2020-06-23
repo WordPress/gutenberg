@@ -1020,6 +1020,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ResizeTooltip",
+		"slug": "resize-tooltip",
+		"markdown_source": "../packages/components/src/resizable-box/resize-tooltip/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ResponsiveWrapper",
 		"slug": "responsive-wrapper",
 		"markdown_source": "../packages/components/src/responsive-wrapper/README.md",

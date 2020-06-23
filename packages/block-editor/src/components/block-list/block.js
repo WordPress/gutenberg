@@ -64,8 +64,6 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
-	isNavigationMode,
-	isMultiSelecting,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -177,8 +175,6 @@ function BlockListBlock( {
 		isSelected,
 		isFirstMultiSelected,
 		isLastMultiSelected,
-		isMultiSelecting,
-		isNavigationMode,
 		isPartOfMultiSelection,
 		enableAnimation,
 		index,
@@ -243,7 +239,6 @@ const applyWithSelect = withSelect(
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
-			isNavigationMode,
 			getMultiSelectedBlockClientIds,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
@@ -289,7 +284,6 @@ const applyWithSelect = withSelect(
 			isSelectionEnabled: isSelectionEnabled(),
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
-			isNavigationMode: isNavigationMode(),
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to

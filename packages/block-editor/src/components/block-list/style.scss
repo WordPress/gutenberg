@@ -694,31 +694,3 @@
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
 }
-
-
-// Add side padding for the canvas, currently edit-post-visual-editor.
-// The purpose of this padding is to ensure that on small viewports, there is
-// room for the block border that sits 14px ($block-padding) offset from the
-// block footprint.
-// These paddings and margins are removed from the BlockPreview component's style
-// Any change need to be reflected there.
-.block-editor-block-list__layout.is-root-container {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-side-ui-width;
-		padding-right: $block-side-ui-width;
-	}
-
-	// Full-wide. (to account for the paddings added above)
-	> .wp-block[data-align="full"] {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
-
-		@include break-small() {
-			margin-left: -$block-side-ui-width;
-			margin-right: -$block-side-ui-width;
-		}
-	}
-}
