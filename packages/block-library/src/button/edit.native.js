@@ -214,7 +214,7 @@ class ButtonEdit extends Component {
 		this.props.closeSettingsBottomSheet();
 	}
 
-	getLinkSettings( isCompatibleWithSettings, extractSettings ) {
+	getLinkSettings( isCompatibleWithSettings ) {
 		const { isLinkSheetVisible } = this.state;
 		const { attributes, setAttributes } = this.props;
 		const actions = [
@@ -226,18 +226,15 @@ class ButtonEdit extends Component {
 
 		const options = {
 			url: {
-				showIcon: ! isCompatibleWithSettings,
 				label: __( 'Button Link URL' ),
 				placeholder: __( 'Add URL' ),
 				autoFocus: ! isCompatibleWithSettings,
 				autoFill: true,
 			},
 			openInNewTab: {
-				showIcon: ! isCompatibleWithSettings,
 				label: __( 'Open in new tab' ),
 			},
 			linkRel: {
-				showIcon: ! isCompatibleWithSettings,
 				label: __( 'Link Rel' ),
 				placeholder: __( 'None' ),
 			},
@@ -249,9 +246,10 @@ class ButtonEdit extends Component {
 				attributes={ attributes }
 				onClose={ this.dismissSheet }
 				setAttributes={ setAttributes }
-				extractSettings={ extractSettings }
+				withBottomSheet={ ! isCompatibleWithSettings }
 				actions={ actions }
 				options={ options }
+				showIcon={ ! isCompatibleWithSettings }
 			/>
 		);
 	}
@@ -396,7 +394,7 @@ class ButtonEdit extends Component {
 					</BlockControls>
 				) }
 
-				{ this.getLinkSettings( false, false ) }
+				{ this.getLinkSettings( false ) }
 
 				<ColorEdit { ...this.props } />
 				<InspectorControls>
@@ -410,7 +408,7 @@ class ButtonEdit extends Component {
 						/>
 					</PanelBody>
 					<PanelBody title={ __( 'Link Settings' ) }>
-						{ this.getLinkSettings( true, true ) }
+						{ this.getLinkSettings( true ) }
 					</PanelBody>
 				</InspectorControls>
 			</View>

@@ -5,10 +5,10 @@ import { Platform, Clipboard } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { compose, usePrevious } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { link, external } from '@wordpress/icons';
 
 /**
@@ -30,21 +30,67 @@ import styles from './style.scss';
 const NEW_TAB_REL = 'noreferrer noopener';
 
 function LinkSettings( {
+	// Control link settings `BottomSheet` visibility
 	isVisible,
+	// Callback that is called on closing bottom sheet
 	onClose,
+	// Object of attributes to be set or updated in `LinkSettings`
 	attributes,
+	// Function called to set attributes
 	setAttributes,
+	// Callback that is called when url input field is empty
 	onEmptyURL,
+	// Object of available options along with specific, customizable properties.
+	// Available options keys:
+	//	* url - uses `TextControl` component to set `attributes.url`
+	//	* linkLabel - uses `TextControl` component to set `attributes.label`
+	//	* openInNewTab - uses `ToggleControl` component to set `attributes.linkTarget` and `attributes.rel`
+	//	* linkRel - uses `TextControl` component to set `attributes.rel`
+	//	* footer - uses `UnsupportedFooterControl` component to display message, e.g. about missing functionality
+	// Available properties:
+	//	* label - control component label, e.g. `Button Link URL`
+	//	* placeholder - control component placeholder, e.g. `Add URL`
+	//	* autoFocus (url only) - whether url input should be focused on sheet opening
+	//	* autoFill (url only) - whether url input should be filled with url from clipboard
+	// Example:
+	//	const options = {
+	//		url: {
+	//			label: __( 'Button Link URL' ),
+	//			placeholder: __( 'Add URL' ),
+	//			autoFocus: true,
+	//			autoFill: true,
+	//		}
+	//	}
 	options,
-	extractSettings,
+	// Specifies whether settings should be wrapped into `BottomSheet`
+	withBottomSheet,
+	// Defines buttons which will be displayed below the all options.
+	// It's an array of objects with following properties:
+	//	* label - button title
+	//	* onPress - callback that is called on pressing button
+	// Example:
+	// 	const actions = [
+	//		{
+	//			label: __( 'Remove link' ),
+	//			onPress: () => setAttributes({ url: '' }),
+	//		},
+	//	];
 	actions,
+	// Specifies whether general `BottomSheet` is opened
 	editorSidebarOpened,
+	// Specifies whether icon should be displayed next to the label
+	showIcon,
 } ) {
 	const { url, label, linkTarget, rel } = attributes;
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
-	const prevEditorSidebarOpened = usePrevious( editorSidebarOpened );
+	const prevEditorSidebarOpenedRef = useRef();
+
+	useEffect( () => {
+		prevEditorSidebarOpenedRef.current = editorSidebarOpened;
+	} );
+	const prevEditorSidebarOpened = prevEditorSidebarOpenedRef.current;
 
 	useEffect( () => {
 		setUrlInputValue( url || '' );
@@ -132,7 +178,7 @@ function LinkSettings( {
 			<>
 				{ options.url && (
 					<TextControl
-						icon={ options.url.showIcon && link }
+						icon={ showIcon && link }
 						label={ options.url.label }
 						value={ urlInputValue }
 						valuePlaceholder={ options.url.placeholder }
@@ -157,7 +203,7 @@ function LinkSettings( {
 				) }
 				{ options.openInNewTab && (
 					<ToggleControl
-						icon={ options.openInNewTab.showIcon && external }
+						icon={ showIcon && external }
 						label={ options.openInNewTab.label }
 						checked={ linkTarget === '_blank' }
 						onChange={ onChangeOpenInNewTab }
@@ -165,7 +211,7 @@ function LinkSettings( {
 				) }
 				{ options.linkRel && (
 					<TextControl
-						icon={ options.linkRel.showIcon && LinkRelIcon }
+						icon={ showIcon && LinkRelIcon }
 						label={ options.linkRel.label }
 						value={ rel || '' }
 						valuePlaceholder={ options.linkRel.placeholder }
@@ -180,7 +226,7 @@ function LinkSettings( {
 		);
 	}
 
-	if ( extractSettings ) {
+	if ( ! withBottomSheet ) {
 		return getSettings();
 	}
 
