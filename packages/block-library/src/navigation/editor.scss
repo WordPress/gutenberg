@@ -105,6 +105,11 @@ $colors-selector-size: 22px;
 		line-height: ($colors-selector-size - 2);
 		padding: 2px;
 
+		> svg {
+			// Override `min-width: $button-size-small` on toolbar-group/style.scss
+			min-width: auto !important;
+		}
+
 		// Styling icon color.
 		&.has-text-color {
 			> svg,
