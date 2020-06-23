@@ -32,6 +32,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
+import { crop } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -200,9 +201,9 @@ export default function Image( {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => setIsEditingImage( true ) }
-						>
-							{ __( 'Crop' ) }
-						</ToolbarButton>
+							icon={ crop }
+							label={ __( 'Crop' ) }
+						/>
 					</ToolbarGroup>
 				) }
 				{ ! isEditingImage && (
