@@ -138,7 +138,7 @@ export default class ClassicEdit extends Component {
 
 		editor.on( 'keydown', ( event ) => {
 			if ( isKeyboardEvent.primary( event, 'z' ) ) {
-				this.handleUndo( event )
+				this.handleUndo( event );
 			}
 
 			if (
@@ -222,7 +222,7 @@ export default class ClassicEdit extends Component {
 			this.setState( { lastUndo: true } );
 			event.stopPropagation();
 		}
-		if ( ! isTmceEmpty( this.editor ) )  {
+		if ( ! isTmceEmpty( this.editor ) ) {
 			this.setState( { lastUndo: false } );
 			event.stopPropagation();
 		}
