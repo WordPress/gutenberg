@@ -152,13 +152,14 @@ export default function ImageEditor( {
 	const [ aspect, setAspect ] = useState( naturalWidth / naturalHeight );
 	const [ rotation, setRotation ] = useState( 0 );
 	const [ editedUrl, setEditedUrl ] = useState();
-	const naturalAspectRatio = naturalWidth / naturalHeight;
 
 	const editedWidth = width;
 	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
+	let naturalAspectRatio = naturalWidth / naturalHeight;
 
 	if ( rotation % 180 === 90 ) {
 		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
+		naturalAspectRatio = naturalHeight / naturalWidth;
 	}
 
 	function apply() {
