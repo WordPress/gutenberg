@@ -284,6 +284,9 @@ class TimePicker extends Component {
 			const { timezone } = getDateSettings();
 			const offset =
 				timezone.offset > 0 ? '+' + timezone.offset : timezone.offset;
+			const zoneAbbr = moment
+				.tz( new Date(), timezone.string )
+				.zoneAbbr();
 			const timezoneDetail =
 				'UTC' === timezone.string
 					? __( 'Coordinated Universal Time' )
@@ -292,9 +295,9 @@ class TimePicker extends Component {
 					  ') ' +
 					  timezone.string.replace( '_', ' ' );
 			const timezoneAbbr =
-				'' === timezone.string
-					? 'UTC' + offset
-					: moment.tz( new Date(), timezone.string ).zoneAbbr();
+				'' !== timezone.string && isNaN( zoneAbbr )
+					? zoneAbbr
+					: 'UTC' + offset;
 
 			return (
 				<Tooltip position="top center" text={ timezoneDetail }>
