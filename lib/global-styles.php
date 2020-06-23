@@ -97,8 +97,6 @@ function gutenberg_experimental_global_styles_get_from_file( $file_path ) {
 /**
  * Returns the user's origin config.
  *
- * @param boolean $include_draft Whether to include draft or only publish CPTs.
- *
  * @return array Config that adheres to the theme.json schema.
  */
 function gutenberg_experimental_global_styles_get_user() {
