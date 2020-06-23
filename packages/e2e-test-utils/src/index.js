@@ -61,5 +61,7 @@ export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
 export { showBlockToolbar } from './show-block-toolbar';
+export { wpDataDispatch } from './wp-data-dispatch';
+export { wpDataSelect } from './wp-data-select';
 
 export * from './mocks';
