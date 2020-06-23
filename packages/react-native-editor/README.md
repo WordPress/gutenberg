@@ -21,13 +21,7 @@ Note that the OS platform used by the maintainers is macOS but the tools and set
 
 * Clone the project and submodules:
 ```
-git clone --recurse-submodules https://github.com/wordpress-mobile/gutenberg-mobile.git
-```
-
-* Or if you already have the project cloned, initialize and update the submodules:
-```
-git submodule init
-git submodule update
+git clone https://github.com/WordPress/gutenberg.git
 ```
 
 ## Set up
@@ -81,7 +75,7 @@ To see a list of all of your available iOS devices, use `xcrun simctl list devic
 
 ### Troubleshooting
 
-Some times, and especially when tweaking anything in the `package.json`, Babel configuration (`.babelrc`) or the Jest configuration (`jest.config.js`), your changes might seem to not take effect as expected. On those times, you might need to clean various caches before starting the packager. To do that, run the script: `yarn start:reset`. Other times, you might want to reinstall the NPM packages from scratch and the `yarn clean:install` script can be handy.
+Some times, and especially when tweaking anything in the `package.json`, Babel configuration (`.babelrc`) or the Jest configuration (`jest.config.js`), your changes might seem to not take effect as expected. On those times, you might need to clean various caches before starting the packager. To do that, run the script: `npm run native start:reset`. Other times, you might want to reinstall the NPM packages from scratch and the `npm run native clean:install` script can be handy.
 
 ## Developing with Visual Studio Code
 
@@ -113,13 +107,13 @@ Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "R
 
 ## Writing and Running Unit Tests
 
-This project is set up to use [jest](https://facebook.github.io/jest/) for tests. You can configure whatever testing strategy you like, but jest works out of the box. Create test files in directories called `__tests__` or with the `.test.js` extension to have the files loaded by jest. See an example test [here](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/src/index.test.js). The [jest documentation](https://facebook.github.io/jest/docs/en/getting-started.html) is also a wonderful resource, as is the [React Native testing tutorial](https://facebook.github.io/jest/docs/en/tutorial-react-native.html).
+This project is set up to use [jest](https://facebook.github.io/jest/) for tests. You can configure whatever testing strategy you like, but jest works out of the box. Create test files in directories called `__tests__` or with the `.test.js` extension to have the files loaded by jest. See an example test [here](https://github.com/WordPress/gutenberg/blob/master/packages/react-native-editor/src/test/api-fetch-setup.test.js). The [jest documentation](https://facebook.github.io/jest/docs/en/getting-started.html) is also a wonderful resource, as is the [React Native testing tutorial](https://facebook.github.io/jest/docs/en/tutorial-react-native.html).
 
 ## UI Tests
 
 This repository uses Appium to run UI tests. The tests live in `__device-tests__` and are written using Appium to run tests against simulators and real devices. To run these you'll need to check off a few things: 
 
-* When running the tests, you'll need to ensure the Metro bundler (`yarn start`) is not running. 
+* When running the tests, you'll need to ensure the Metro bundler (`npm run native start`) is not running. 
 * [Appium CLI](https://github.com/appium/appium/blob/master/docs/en/about-appium/getting-started.md) installed and available globally. We also recommend using [appium-doctor](https://github.com/appium/appium-doctor) to ensure all of Appium's dependencies are good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4723, just be sure that the port is free or feel free to change the port number in the test file. 
 * For iOS a simulator should automatically launch but for Android you'll need to have an emulator *with at least platform version 8.0* fired up and running.
 
@@ -133,34 +127,11 @@ and for Android:
 
 To run a single test instead of the entire suite, use `npm run native device-tests:local`. Here's an example that runs only `gutenberg-editor-paragraph.test`:
 
-`TEST_RN_PLATFORM=ios yarn device-tests:local gutenberg-editor-paragraph.test`
+`TEST_RN_PLATFORM=ios npm run native device-tests:local gutenberg-editor-paragraph.test`
 
 Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. For now, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the CLI, then change the port number in the tests while (optionally) commenting out related code in the `beforeAll` and `afterAll` block. 
 
-For a more detailed outline of the UI tests and how to get started writing one, please visit the [UI Test documentation](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/__device-tests__/README.md) and our [contributing guide](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/__device-tests__/CONTRIBUTING.md).
-
-## Static analysis and code style
-
-The project includes a linter (`eslint`) to perform codestyle and static analysis of the code. The configuration used is the same as [the one in the Gutenberg project](https://github.com/WordPress/gutenberg/blob/master/eslint/config.js). To perform the check, run:
-
-```
-yarn lint
-```
-
-To have the linter also _fix_ the violations run: `yarn lint:fix`.
-
-In parallel to `eslint`, the project uses `Prettier` for codestyling. Run:
-
-```
-yarn prettier
-```
-to enforce the style. This will modify the source files to make them conform to the rules.
-
-`Flow` is used as a static type checker for JavaScript code. Flow checks JavaScript code for errors through static type annotations. These types allow you to tell Flow how you want your code to work, and Flow will make sure it does work that way. To perform the check run:
-
-```
-yarn flow
-```
+For a more detailed outline of the UI tests and how to get started writing one, please visit the [UI Test documentation](https://github.com/WordPress/gutenberg/blob/master/packages/react-native-editor/__device-tests__/README.md) and our [contributing guide](https://github.com/WordPress/gutenberg/blob/master/packages/react-native-editor/__device-tests__/CONTRIBUTING.md).
 
 You might want to use Visual Studio Code as an editor. The project includes the configuration needed to use the above codestyle and linting tools automatically.
 
