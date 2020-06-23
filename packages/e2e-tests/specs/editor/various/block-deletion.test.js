@@ -104,6 +104,9 @@ describe( 'block deletion -', () => {
 		it( 'results in three remaining blocks and positions the caret at the end of the third block', async () => {
 			// Add an image block since it's easier to click the wrapper on non-textual blocks.
 			await page.keyboard.type( '/image' );
+			await page.waitForXPath(
+				`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Image')]`
+			);
 			await page.keyboard.press( 'Enter' );
 
 			// Click on something that's not a block.
