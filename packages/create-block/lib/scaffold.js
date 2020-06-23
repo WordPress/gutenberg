@@ -10,6 +10,7 @@ const { dirname } = require( 'path' );
 /**
  * Internal dependencies
  */
+const initBlockJSON = require( './init-block-json' );
 const initPackageJSON = require( './init-package-json' );
 const initWPScripts = require( './init-wp-scripts' );
 const { code, info, success } = require( './log' );
@@ -67,6 +68,7 @@ module.exports = async (
 		} )
 	);
 
+	await initBlockJSON( blockTemplate, view );
 	await initPackageJSON( view );
 
 	if ( wpScripts ) {
