@@ -30,6 +30,7 @@ export default ( { children, entityId, stylesheetId, baseStyles } ) => {
 
 	// Font Size getter & setter
 	const fromPx = ( value ) => +value?.replace( 'px', '' ) ?? null;
+	const toPx = ( value ) => value + 'px';
 	const getFontSize = ( blockName ) =>
 		fromPx( userStyles?.[ blockName ]?.styles?.typography?.fontSize ) ??
 		null;
@@ -39,7 +40,7 @@ export default ( { children, entityId, stylesheetId, baseStyles } ) => {
 				[ blockName ]: {
 					styles: {
 						typography: {
-							fontSize: newValue,
+							fontSize: toPx( newValue ),
 						},
 					},
 				},
