@@ -7,12 +7,12 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
 
 /**
  * External dependencies
  */
 import { Modal, Platform, View, SafeAreaView } from 'react-native';
-import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
