@@ -294,22 +294,22 @@ export default function LogoEdit( {
 	const controls = (
 		<BlockControls>
 			<ToolbarGroup>
-			{ url && (
-				<MediaReplaceFlow
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept={ ACCEPT_MEDIA_STRING }
-					onSelect={ onSelectLogo }
-					onError={ onUploadError }
-				/>
-			) }
-			{ !! url && (
-				<ToolbarButton
-					icon="trash"
-					onClick={ () => deleteLogo() }
-					label={ __( 'Delete Site Logo' ) }
-				/>
-			) }
+				{ url && (
+					<MediaReplaceFlow
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept={ ACCEPT_MEDIA_STRING }
+						onSelect={ onSelectLogo }
+						onError={ onUploadError }
+					/>
+				) }
+				{ !! url && (
+					<ToolbarButton
+						icon="trash"
+						onClick={ () => deleteLogo() }
+						label={ __( 'Delete Site Logo' ) }
+					/>
+				) }
 			</ToolbarGroup>
 		</BlockControls>
 	);
