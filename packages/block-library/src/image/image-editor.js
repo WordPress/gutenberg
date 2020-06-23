@@ -155,9 +155,11 @@ export default function ImageEditor( {
 
 	const editedWidth = width;
 	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
+	let naturalAspectRatio = naturalWidth / naturalHeight;
 
 	if ( rotation % 180 === 90 ) {
 		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
+		naturalAspectRatio = naturalHeight / naturalWidth;
 	}
 
 	function apply() {
@@ -170,17 +172,14 @@ export default function ImageEditor( {
 		}
 
 		apiFetch( {
-			path: `__experimental/richimage/${ id }/apply`,
-			headers: {
-				'Content-type': 'application/json',
-			},
+			path: `__experimental/image-editor/${ id }/apply`,
 			method: 'POST',
-			body: JSON.stringify( attrs ),
+			data: attrs,
 		} )
 			.then( ( response ) => {
 				setAttributes( {
-					id: response.media_id,
-					url: response.url,
+					id: response.id,
+					url: response.source_url,
 					height: height && width ? width / aspect : undefined,
 				} );
 			} )
@@ -208,6 +207,10 @@ export default function ImageEditor( {
 			setEditedUrl();
 			setRotation( angle );
 			setAspect( 1 / aspect );
+			setPosition( {
+				x: -( position.y * naturalAspectRatio ),
+				y: position.x * naturalAspectRatio,
+			} );
 			return;
 		}
 
@@ -243,6 +246,10 @@ export default function ImageEditor( {
 				setEditedUrl( URL.createObjectURL( blob ) );
 				setRotation( angle );
 				setAspect( 1 / aspect );
+				setPosition( {
+					x: -( position.y * naturalAspectRatio ),
+					y: position.x * naturalAspectRatio,
+				} );
 			} );
 		}
 
