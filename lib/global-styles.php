@@ -579,24 +579,14 @@ function gutenberg_experimental_global_styles_get_stylesheet( $include_draft = f
 }
 
 /**
- * Returns the stylesheet handle used for the embedded stylesheet.
- *
- * @return string Stylesheet handle.
- */
-function gutenberg_experimental_global_styles_get_embedded_stylesheet_handle() {
-	return 'global-styles';
-}
-
-/**
  * Fetches the preferences for each origin (core, theme, user)
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet();
-	$handle     = gutenberg_experimental_global_styles_get_embedded_stylesheet_handle();
-	wp_register_style( $handle, false, array(), true, true );
-	wp_add_inline_style( $handle, $stylesheet );
-	wp_enqueue_style( $handle );
+	wp_register_style( 'global-styles', false, array(), true, true );
+	wp_add_inline_style( 'global-styles', $stylesheet );
+	wp_enqueue_style( 'global-styles');
 }
 
 /**
@@ -666,9 +656,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 		// The CPT ID for entity retrieval/saving.
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
-
-		// WordPress adds the suffix '-inline-css' to the handle we pass for embedded stylesheets.
-		$settings['__experimentalGlobalStylesEmbeddedId'] = gutenberg_experimental_global_styles_get_embedded_stylesheet_handle() . '-inline-css';
 	}
 
 	// Add the styles for the editor via the settings
