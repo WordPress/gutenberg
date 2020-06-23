@@ -23,7 +23,7 @@ export function isEmpty( { text } ) {
  *
  * @param {Object}      value           Object containing the value that
  *                                      should be checked.
- * @param {string}      value.text      The text that should be check.
+ * @param {string}      value.text      The text that should be checked.
  * @param {number}      value.start     The starting index
  * @param {number}      value.end       The ending index
  *
