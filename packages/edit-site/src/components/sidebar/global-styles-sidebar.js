@@ -25,138 +25,116 @@ export default ( { identifier, title: panelTitle, icon } ) => {
 			title={ panelTitle }
 			icon={ icon }
 		>
-			<PanelBody title={ __( 'Typography' ) }>
-				{ getBlockTypes()
-					.map(
-						( {
-							name,
-							title,
-							supports: {
-								__experimentalFontSize,
-								__experimentalLineHeight,
-							},
-						} ) => {
-							const panels = [];
-							panels.push( <h3>{ title }</h3> );
+			{ getBlockTypes()
+				.map(
+					( {
+						name,
+						title,
+						supports: {
+							__experimentalFontSize,
+							__experimentalLineHeight,
+							__experimentalColor,
+						},
+					} ) => {
+						const panels = [];
 
-							if ( __experimentalFontSize ) {
-								panels.push(
-									<FontSizePicker
-										value={ getProperty(
+						if ( __experimentalFontSize ) {
+							panels.push(
+								<FontSizePicker
+									value={ getProperty(
+										name,
+										'typography',
+										'fontSize',
+										'px'
+									) }
+									onChange={ ( value ) =>
+										setProperty(
 											name,
 											'typography',
 											'fontSize',
+											value,
 											'px'
-										) }
-										onChange={ ( value ) =>
-											setProperty(
-												name,
-												'typography',
-												'fontSize',
-												value,
-												'px'
-											)
-										}
-									/>
-								);
-							}
+										)
+									}
+								/>
+							);
+						}
 
-							if ( __experimentalLineHeight ) {
-								panels.push(
-									<LineHeightControl
-										value={ getProperty(
+						if ( __experimentalLineHeight ) {
+							panels.push(
+								<LineHeightControl
+									value={ getProperty(
+										name,
+										'typography',
+										'lineHeight'
+									) }
+									onChange={ ( value ) =>
+										setProperty(
 											name,
 											'typography',
-											'lineHeight'
-										) }
-										onChange={ ( value ) =>
-											setProperty(
-												name,
-												'typography',
-												'lineHeight',
-												value
-											)
-										}
-									/>
-								);
-							}
-
-							return panels.length > 1 ? panels : null;
-						}
-					)
-					.filter( Boolean ) }
-			</PanelBody>
-
-			<PanelBody title={ __( 'Color' ) }>
-				{ getBlockTypes()
-					.map(
-						( {
-							name,
-							title,
-							supports: { __experimentalColor },
-						} ) => {
-							const settings = [];
-							if ( __experimentalColor ) {
-								settings.push( {
-									value: getProperty( name, 'color', 'text' ),
-									onChange: ( value ) =>
-										setProperty(
-											name,
-											'color',
-											'text',
+											'lineHeight',
 											value
-										),
-									label: __( 'Text color' ),
-								} );
-								settings.push( {
-									value: getProperty(
+										)
+									}
+								/>
+							);
+						}
+
+						const settings = [];
+						if ( __experimentalColor ) {
+							settings.push( {
+								value: getProperty( name, 'color', 'text' ),
+								onChange: ( value ) =>
+									setProperty( name, 'color', 'text', value ),
+								label: __( 'Text color' ),
+							} );
+							settings.push( {
+								value: getProperty(
+									name,
+									'color',
+									'background'
+								),
+								onChange: ( value ) =>
+									setProperty(
 										name,
 										'color',
-										'background'
+										'background',
+										value
 									),
-									onChange: ( value ) =>
-										setProperty(
-											name,
-											'color',
-											'background',
-											value
-										),
-									label: __( 'Background color' ),
-								} );
-							}
-
-							if ( __experimentalColor?.gradients ) {
-								// TODO: do gradients
-							}
-
-							if ( __experimentalColor?.linkColor ) {
-								settings.push( {
-									value: getProperty( name, 'color', 'link' ),
-									onChange: ( value ) =>
-										setProperty(
-											name,
-											'color',
-											'link',
-											value
-										),
-									label: __( 'Link color' ),
-								} );
-							}
-
-							if ( settings.length > 0 ) {
-								return (
-									<PanelColorSettings
-										title={ title }
-										colorSettings={ settings }
-									/>
-								);
-							}
-
-							return null;
+								label: __( 'Background color' ),
+							} );
 						}
-					)
-					.filter( Boolean ) }
-			</PanelBody>
+
+						if ( __experimentalColor?.gradients ) {
+							// TODO: do gradients
+						}
+
+						if ( __experimentalColor?.linkColor ) {
+							settings.push( {
+								value: getProperty( name, 'color', 'link' ),
+								onChange: ( value ) =>
+									setProperty( name, 'color', 'link', value ),
+								label: __( 'Link color' ),
+							} );
+						}
+
+						if ( settings.length > 0 ) {
+							panels.push(
+								<PanelColorSettings
+									title={ __( 'Color' ) }
+									colorSettings={ settings }
+								/>
+							);
+						}
+
+						return panels.length > 0 ? (
+							<PanelBody title={ title } initialOpen={ false }>
+								{ panels }
+							</PanelBody>
+						) : null;
+					}
+				)
+				.filter( Boolean ) }
 		</DefaultSidebar>
 	);
 };
