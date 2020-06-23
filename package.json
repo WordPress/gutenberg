@@ -153,7 +153,6 @@
 		"jest-emotion": "10.0.32",
 		"jest-junit": "10.0.0",
 		"jest-serializer-enzyme": "1.0.0",
-		"jest-watch-typeahead": "0.6.0",
 		"jsdom": "15.2.1",
 		"lerna": "3.18.2",
 		"lint-staged": "9.2.5",
