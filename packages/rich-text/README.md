@@ -189,7 +189,7 @@ objects (such as images).
 _Parameters_
 
 -   _value_ `Object`: Object containing the value that should be checked.
--   _value.text_ `string`: The text that should be check.
+-   _value.text_ `string`: The text that should be checked.
 
 _Returns_
 
