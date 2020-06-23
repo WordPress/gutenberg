@@ -21,7 +21,6 @@ branches:
     - rnmobile/master
     - /rnmobile\/release.*/
     - /wp\/.*/
-    - feat/import-gutenberg-mobile-no-squash
 
 env:
   global:
