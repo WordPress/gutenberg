@@ -21,6 +21,11 @@ import {
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import PluginHeaderToolbar from '../plugin-header-toolbar';
+
 function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 	const {
 		hasFixedToolbar,
@@ -92,6 +97,7 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 				as={ BlockNavigationDropdown }
 				isDisabled={ isTextModeEnabled }
 			/>
+			{ isLargeViewport && <PluginHeaderToolbar.Slot /> }
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />
