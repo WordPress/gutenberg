@@ -271,7 +271,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/move-down',
 			category: 'block',
-			description: __( 'Move block Down.' ),
+			description: __( 'Move the selected block(s) down.' ),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'y',
