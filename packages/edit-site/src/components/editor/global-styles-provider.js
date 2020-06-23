@@ -60,23 +60,21 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 		return userData?.content ? JSON.parse( userData.content ) : {};
 	} );
 
-	// Font Size getter & setter
-	const fromPx = ( value ) => +value?.replace( 'px', '' ) ?? null;
-	const toPx = ( value ) => value + 'px';
-
+	// Font size getter & setter
+	const fromPx = ( value ) => ( value ? +value.replace( 'px', '' ) : null );
+	const toPx = ( value ) => ( value ? value + 'px' : null );
 	const getFontSize = ( blockName ) =>
 		fromPx( userStyles?.[ blockName ]?.styles?.typography?.fontSize ) ??
 		null;
-
 	const setFontSize = ( blockName, newValue ) =>
 		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
 			content: JSON.stringify( {
 				...userStyles,
 				[ blockName ]: {
 					styles: {
-						...userStyles[ blockName ].styles,
+						...userStyles?.[ blockName ]?.styles,
 						typography: {
-							...userStyles[ blockName ].styles.typography,
+							...userStyles?.[ blockName ]?.styles?.typography,
 							fontSize: toPx( newValue ),
 						},
 					},
@@ -93,9 +91,9 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 				...userStyles,
 				[ blockName ]: {
 					styles: {
-						...userStyles[ blockName ].styles,
+						...userStyles?.[ blockName ]?.styles,
 						typography: {
-							...userStyles[ blockName ].styles.typography,
+							...userStyles?.[ blockName ]?.styles?.typography,
 							lineHeight: newValue,
 						},
 					},
