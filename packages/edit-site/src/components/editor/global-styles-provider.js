@@ -13,7 +13,7 @@ const GlobalStylesContext = createContext( {
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
-export default ( { children, entityId, baseStyles } ) => {
+export default ( { children, entityId, stylesheetId, baseStyles } ) => {
 	const { editEntityRecord } = useDispatch( 'core' );
 	const userStyles = useSelect( ( select ) => {
 		const userData = select( 'core' ).getEntityRecord(
@@ -24,6 +24,9 @@ export default ( { children, entityId, baseStyles } ) => {
 
 		return userData?.content?.raw ? JSON.parse( userData.content.raw ) : {};
 	} );
+
+	console.log( 'base styles ', baseStyles );
+	console.log( 'stylesheet id ', stylesheetId );
 
 	// Font Size getter & setter
 	const fromPx = ( value ) => +value?.replace( 'px', '' ) ?? null;

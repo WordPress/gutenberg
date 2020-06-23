@@ -579,19 +579,24 @@ function gutenberg_experimental_global_styles_get_stylesheet( $include_draft = f
 }
 
 /**
+ * Returns the stylesheet handle used for the embedded stylesheet.
+ *
+ * @return string Stylesheet handle.
+ */
+function gutenberg_experimental_global_styles_get_embedded_stylesheet_handle() {
+	return 'global-styles';
+}
+
+/**
  * Fetches the preferences for each origin (core, theme, user)
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	$merged     = gutenberg_experimental_global_styles_get_merged_origins();
-	$stylesheet = gutenberg_experimental_global_styles_resolver( $merged );
-	if ( empty( $stylesheet ) ) {
-		return;
-	}
-
-	wp_register_style( 'global-styles', false, array(), true, true );
-	wp_add_inline_style( 'global-styles', $stylesheet );
-	wp_enqueue_style( 'global-styles' );
+	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet();
+	$handle     = gutenberg_experimental_global_styles_get_embedded_stylesheet_handle();
+	wp_register_style( $handle, false, array(), true, true );
+	wp_add_inline_style( $handle, $stylesheet );
+	wp_enqueue_style( $handle );
 }
 
 /**
@@ -653,11 +658,17 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	$include_draft = true;
 	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		$settings['__experimentalGlobalStylesBaseStyles']   = gutenberg_experimental_global_styles_merge_trees(
+		// Base styles to be used to regenerate the stylesheet upon user changes in the editor.
+		$settings['__experimentalGlobalStylesBaseStyles'] = gutenberg_experimental_global_styles_merge_trees(
 			gutenberg_experimental_global_styles_get_core(),
 			gutenberg_experimental_global_styles_get_theme()
 		);
+
+		// The CPT ID for entity retrieval/saving.
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
+
+		// WordPress adds the suffix '-inline-css' to the handle we pass for embedded stylesheets.
+		$settings['__experimentalGlobalStylesEmbeddedId'] = gutenberg_experimental_global_styles_get_embedded_stylesheet_handle() . '-inline-css';
 	}
 
 	// Add the styles for the editor via the settings
