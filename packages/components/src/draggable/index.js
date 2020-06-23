@@ -11,7 +11,6 @@ import { withSafeTimeout } from '@wordpress/compose';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
-const cloneHeightTransformationBreakpoint = 700;
 const clonePadding = 0;
 
 class Draggable extends Component {
@@ -126,22 +125,11 @@ class Draggable extends Component {
 			elementRect.width + clonePadding * 2
 		}px`;
 
-		if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
-			// Scale down clone if original element is larger than 700px.
-			this.cloneWrapper.style.transform = 'scale(0.5)';
-			this.cloneWrapper.style.transformOrigin = 'top left';
-			// Position clone near the cursor.
-			this.cloneWrapper.style.top = `${ event.clientY - 100 }px`;
-			this.cloneWrapper.style.left = `${ event.clientX }px`;
-		} else {
-			// Position clone right over the original element (20px padding).
-			this.cloneWrapper.style.top = `${
-				elementTopOffset - clonePadding
-			}px`;
-			this.cloneWrapper.style.left = `${
-				elementLeftOffset - clonePadding
-			}px`;
-		}
+		// Position clone right over the original element (20px padding).
+		this.cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
+		this.cloneWrapper.style.left = `${
+			elementLeftOffset - clonePadding
+		}px`;
 
 		/*
 		 * __experimentalDragComponent
