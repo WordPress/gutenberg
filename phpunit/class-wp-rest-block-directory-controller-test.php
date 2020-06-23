@@ -29,8 +29,6 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( '/__experimental/block-directory/search', $routes );
-		$this->assertArrayHasKey( '/__experimental/block-directory/install', $routes );
-		$this->assertArrayHasKey( '/__experimental/block-directory/uninstall', $routes );
 	}
 
 	public function test_context_param() {
