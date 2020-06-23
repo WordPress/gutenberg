@@ -263,8 +263,8 @@ function KeyboardShortcutsRegister() {
 			category: 'block',
 			description: __( 'Move block Up.' ),
 			keyCombination: {
-				modifier: 'primaryAlt', // todo change these...
-				character: 'q', // 'up',
+				modifier: 'secondary',
+				character: 't',
 			},
 		} );
 
@@ -273,8 +273,8 @@ function KeyboardShortcutsRegister() {
 			category: 'block',
 			description: __( 'Move block Down.' ),
 			keyCombination: {
-				modifier: 'primaryAlt', // todo change these...
-				character: 'w', //'down',
+				modifier: 'secondary',
+				character: 'y',
 			},
 		} );
 	}, [ registerShortcut ] );
