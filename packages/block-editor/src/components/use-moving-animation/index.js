@@ -63,11 +63,13 @@ function useMovingAnimation(
 	const [ transform, setTransform ] = useState( {
 		x: 0,
 		y: 0,
-		scrollTop: 0,
+		clientTop: 0,
 	} );
 
 	const previous = ref.current ? getAbsolutePosition( ref.current ) : null;
 	const scrollContainer = useRef();
+	const prevX = useRef( 0 );
+	const prevY = useRef( 0 );
 
 	useLayoutEffect( () => {
 		if ( triggeredAnimation ) {
@@ -80,11 +82,12 @@ function useMovingAnimation(
 		}
 
 		scrollContainer.current = getScrollContainer( ref.current );
+
 		if ( prefersReducedMotion ) {
 			if ( adjustScrolling && scrollContainer.current ) {
 				// if the animation is disabled and the scroll needs to be adjusted,
 				// just move directly to the final scroll position
-				ref.current.style.transform = 'none';
+				ref.current.style.transform = '';
 				const destination = getAbsolutePosition( ref.current );
 				scrollContainer.current.scrollTop =
 					scrollContainer.current.scrollTop -
@@ -94,21 +97,21 @@ function useMovingAnimation(
 
 			return;
 		}
-		ref.current.style.transform = 'none';
+
+		ref.current.style.transform = '';
 		const destination = getAbsolutePosition( ref.current );
-		const newTransform = {
-			x: previous.left - destination.left,
-			y: previous.top - destination.top,
-			scrollTop: scrollContainer.current
-				? scrollContainer.current.scrollTop -
-				  previous.top +
-				  destination.top
-				: 0,
-		};
+		const x = Math.round( previous.left - destination.left );
+		const y = Math.round( previous.top - destination.top );
 		ref.current.style.transform =
-			newTransform.x === 0 && newTransform.y === 0
-				? undefined
-				: `translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
+			x === 0 && y === 0 ? '' : `translate3d(${ x }px,${ y }px,0)`;
+		const blockRect = ref.current.getBoundingClientRect();
+		const newTransform = {
+			x,
+			y,
+			clientTop: blockRect.top,
+		};
+		prevX.current = x;
+		prevY.current = y;
 		triggerAnimation();
 		setTransform( newTransform );
 	}, [ triggerAnimationOnChange ] );
@@ -126,23 +129,33 @@ function useMovingAnimation(
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
 		onFrame( { x, y } ) {
-			if (
-				adjustScrolling &&
-				scrollContainer.current &&
-				! prefersReducedMotion &&
-				y
-			) {
-				scrollContainer.current.scrollTop = transform.scrollTop + y;
-			}
-
 			if ( ref.current ) {
+				x = Math.round( x );
+				y = Math.round( y );
 				ref.current.style.transformOrigin = 'center';
 				ref.current.style.transform =
 					x === 0 && y === 0
-						? null
+						? ''
 						: `translate3d(${ x }px,${ y }px,0)`;
 				ref.current.style.zIndex =
-					! isSelected || ( x === 0 && y === 0 ) ? null : '1';
+					! isSelected || ( x === 0 && y === 0 ) ? '' : '1';
+
+				if (
+					adjustScrolling &&
+					scrollContainer.current &&
+					! prefersReducedMotion &&
+					y !== prevY.current
+				) {
+					const blockRect = ref.current.getBoundingClientRect();
+					const diff = blockRect.top - transform.clientTop;
+
+					if ( diff ) {
+						scrollContainer.current.scrollTop += diff;
+					}
+				}
+
+				prevX.current = x;
+				prevY.current = y;
 			}
 		},
 	} );
