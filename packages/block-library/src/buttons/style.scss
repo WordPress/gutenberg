@@ -10,19 +10,25 @@
 }
 
 .wp-block-buttons.alignright .wp-block-button {
+	/*rtl:ignore*/
 	margin-right: 0;
+	/*rtl:ignore*/
 	margin-left: $grid-unit-10;
 
 	&:first-child {
+		/*rtl:ignore*/
 		margin-left: 0;
 	}
 }
 
 .wp-block-buttons.alignleft .wp-block-button {
+	/*rtl:ignore*/
 	margin-left: 0;
+	/*rtl:ignore*/
 	margin-right: $grid-unit-10;
 
 	&:first-child {
+		/*rtl:ignore*/
 		margin-right: 0;
 	}
 }
