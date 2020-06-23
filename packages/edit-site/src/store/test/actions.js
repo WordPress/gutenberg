@@ -73,10 +73,13 @@ describe( 'actions', () => {
 				args: [],
 			} );
 			expect( it.next( page ).value ).toEqual( {
-				type: 'DISPATCH',
-				storeKey: 'core/edit-site',
-				actionName: 'setPage',
-				args: [ page ],
+				value: {
+					type: 'DISPATCH',
+					storeKey: 'core/edit-site',
+					actionName: 'setPage',
+					args: [ page ],
+				},
+				done: true,
 			} );
 		} );
 	} );
