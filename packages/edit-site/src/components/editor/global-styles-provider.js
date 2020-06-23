@@ -126,7 +126,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 
 	// Text color: getter & setter
 	const getTextColor = ( blockName ) =>
-		userStyles?.[ blockName ]?.styles?.color?.textColor;
+		userStyles?.[ blockName ]?.styles?.color?.text;
 	const setTextColor = ( blockName, newValue ) =>
 		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
 			content: JSON.stringify( {
@@ -136,7 +136,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 						...userStyles?.[ blockName ]?.styles,
 						color: {
 							...userStyles?.[ blockName ]?.styles?.color,
-							textColor: newValue,
+							text: newValue,
 						},
 					},
 				},
@@ -145,7 +145,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 
 	// Background color: getter & setter
 	const getBackgroundColor = ( blockName ) =>
-		userStyles?.[ blockName ]?.styles?.color?.backgroundColor;
+		userStyles?.[ blockName ]?.styles?.color?.background;
 	const setBackgroundColor = ( blockName, newValue ) =>
 		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
 			content: JSON.stringify( {
@@ -155,7 +155,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 						...userStyles?.[ blockName ]?.styles,
 						color: {
 							...userStyles?.[ blockName ]?.styles?.color,
-							backgroundColor: newValue,
+							background: newValue,
 						},
 					},
 				},
@@ -164,7 +164,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 
 	// Link color: getter & setter
 	const getLinkColor = ( blockName ) =>
-		userStyles?.[ blockName ]?.styles?.color?.linkColor;
+		userStyles?.[ blockName ]?.styles?.color?.link;
 	const setLinkColor = ( blockName, newValue ) =>
 		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
 			content: JSON.stringify( {
@@ -174,7 +174,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 						...userStyles?.[ blockName ]?.styles,
 						color: {
 							...userStyles?.[ blockName ]?.styles?.color,
-							linkColor: newValue,
+							link: newValue,
 						},
 					},
 				},
@@ -242,17 +242,17 @@ const getStylesFromTree = ( tree ) => {
 				`line-height: ${ blockStyles.typography.lineHeight }`
 			);
 		}
-		if ( blockStyles?.color?.textColor ) {
-			declarations.push( `color: ${ blockStyles.color.textColor }` );
+		if ( blockStyles?.color?.text ) {
+			declarations.push( `color: ${ blockStyles.color.text }` );
 		}
-		if ( blockStyles?.color?.backgroundColor ) {
+		if ( blockStyles?.color?.background ) {
 			declarations.push(
-				`background-color: ${ blockStyles.color.backgroundColor }`
+				`background-color: ${ blockStyles.color.background }`
 			);
 		}
-		if ( blockStyles?.color?.linkColor ) {
+		if ( blockStyles?.color?.link ) {
 			declarations.push(
-				`--wp--style--color--link: ${ blockStyles.color.linkColor }`
+				`--wp--style--color--link: ${ blockStyles.color.link }`
 			);
 		}
 		return declarations.join( ';' );
