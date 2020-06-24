@@ -16,7 +16,6 @@ import {
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -38,7 +37,6 @@ function VisualEditor() {
 		>
 			<VisualEditorGlobalKeyboardShortcuts />
 			<MultiSelectScrollIntoView />
-			<Popover.Slot name="block-toolbar" />
 			<Typewriter>
 				<CopyHandler>
 					<WritingFlow>

@@ -266,6 +266,7 @@ function Layout() {
 				<KeyboardShortcutHelpModal />
 				<WelcomeGuide />
 				<Popover.Slot />
+				<Popover.Slot name="block-toolbar" />
 				<PluginArea />
 			</FocusReturnProvider>
 		</>
