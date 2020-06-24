@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -116,16 +120,19 @@ export default class ClassicEdit extends Component {
 			bookmark = null;
 		} );
 
-		editor.on( 'Paste Change input Undo Redo', () => {
-			const value = editor.getContent();
+		editor.on(
+			'Paste Change input Undo Redo',
+			debounce( () => {
+				const value = editor.getContent();
 
-			if ( value !== editor._lastChange ) {
-				editor._lastChange = value;
-				setAttributes( {
-					content: value,
-				} );
-			}
-		} );
+				if ( value !== editor._lastChange ) {
+					editor._lastChange = value;
+					setAttributes( {
+						content: value,
+					} );
+				}
+			}, 250 )
+		);
 
 		editor.on( 'keydown', ( event ) => {
 			if (
