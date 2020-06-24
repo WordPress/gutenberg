@@ -11,16 +11,16 @@ const { writeFile } = require( 'fs' ).promises;
 const { info } = require( './log' );
 
 module.exports = async ( {
-		slug,
-		namespace,
-		title,
-		description,
-		category,
-		dashicon,
-		textdomain,
-		editorScript,
-		editorStyle,
-		style,
+	slug,
+	namespace,
+	title,
+	description,
+	category,
+	dashicon,
+	textdomain,
+	editorScript,
+	editorStyle,
+	style,
 } ) => {
 	const outputFile = join( process.cwd(), slug, 'block.json' );
 
