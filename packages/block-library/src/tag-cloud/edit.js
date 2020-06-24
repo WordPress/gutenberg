@@ -34,10 +34,6 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		return [ selectOption, ...taxonomyOptions ];
 	};
 
-	const toggleShowTagCounts = () => {
-		setAttributes( { showTagCounts: ! showTagCounts } );
-	};
-
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Tag Cloud settings' ) }>
@@ -52,7 +48,9 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 				<ToggleControl
 					label={ __( 'Show post counts' ) }
 					checked={ showTagCounts }
-					onChange={ toggleShowTagCounts }
+					onChange={ () =>
+						setAttributes( { showTagCounts: ! showTagCounts } )
+					}
 				/>
 			</PanelBody>
 		</InspectorControls>
