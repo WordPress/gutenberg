@@ -1,15 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	map,
-	flowRight,
-	omit,
-	forEach,
-	filter,
-	keyBy,
-	toPlainObject,
-} from 'lodash';
+import { map, flowRight, omit, forEach, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -162,7 +154,10 @@ const queries = ( state = {}, action ) => {
 			return receiveQueries( state, action );
 		case 'REMOVE_ITEMS':
 			const newState = { ...state };
-			const removedItems = keyBy( toPlainObject( action.items ) );
+			const removedItems = action.items.reduce( ( result, item ) => {
+				result[ item.toString() ] = true;
+				return result;
+			}, {} );
 			forEach( newState, ( queryItems, key ) => {
 				if ( newState[ key ] ) {
 					newState[ key ] = filter( queryItems, ( queryId ) => {
