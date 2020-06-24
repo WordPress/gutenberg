@@ -88,7 +88,7 @@ async function runWordPressReleaseBranchSyncStep(
  *
  * @param {string} gitWorkingDirectoryPath Git working directory path.
  * @param {string} minimumVersionBump      Minimum version bump for the packages.
- * @param {boolean} isPrerelease           Whether the package version to publish is a pre-release.
+ * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
  * @param {string} abortMessage            Abort Message.
  */
 async function updatePackages(
@@ -208,7 +208,9 @@ async function updatePackages(
 					changelogPath,
 					content.replace(
 						'## Unreleased',
-						`## Unreleased\n\n## ${ nextVersion }-rc.1 (${ publishDate })`
+						`## Unreleased\n\n## ${
+							isPrerelease ? nextVersion + '-rc.1' : nextVersion
+						} (${ publishDate })`
 					)
 				);
 
@@ -216,7 +218,9 @@ async function updatePackages(
 				const packageJson = readJSONFile( packageJSONPath );
 				const newPackageJson = {
 					...packageJson,
-					version: isPrerelease ? 'pre' + nextVersion : nextVersion,
+					version: isPrerelease
+						? '-prerelease' + nextVersion
+						: nextVersion,
 				};
 				fs.writeFileSync(
 					packageJSONPath,
@@ -298,8 +302,8 @@ async function prepareForPackageRelease( minimumVersionBump, isPrerelease ) {
 	await updatePackages(
 		gitWorkingDirectoryPath,
 		minimumVersionBump,
-		abortMessage,
-		isPrerelease
+		isPrerelease,
+		abortMessage
 	);
 
 	// Push the local changes
