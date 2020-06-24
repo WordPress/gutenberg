@@ -11,6 +11,8 @@ jobs:
         ]
 
     steps:
+    - run: system_profiler SPHardwareDataType
+
     - uses: actions/checkout@v2
 
     - name: Restore npm cache
@@ -44,6 +46,9 @@ jobs:
           ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-
           ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-
           ${{ runner.os }}-pods-
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v2
 
     - name: Bundle iOS
       run: npm run native test:e2e:bundle:ios
