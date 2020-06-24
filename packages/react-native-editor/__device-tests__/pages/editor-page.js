@@ -300,7 +300,7 @@ export default class EditorPage {
 		);
 		await blockActionsMenuButton.click();
 
-		const removeActionButtonIdentifier = `Remove ${ blockName }`;
+		const removeActionButtonIdentifier = `Remove block`;
 		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
 		const removeActionButton = await this.driver.elementByXPath(
 			removeActionButtonLocator

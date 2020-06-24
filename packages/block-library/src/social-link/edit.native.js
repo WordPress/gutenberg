@@ -151,6 +151,7 @@ const SocialLinkEdit = ( {
 				onClose={ onCloseSettingsSheet }
 				setAttributes={ setAttributes }
 				options={ options }
+				withBottomSheet={ true }
 			/>
 			<TouchableWithoutFeedback onPress={ onIconPress }>
 				<Animated.View
