@@ -20,9 +20,9 @@ const predefinedBlockTemplates = {
 			description:
 				'Example block written with ES5 standard and no JSX – no build step required.',
 			wpScripts: false,
-			editorScript: 'file:index.js',
-			editorStyle: 'file:editor.css',
-			style: 'file:style.css',
+			editorScript: 'file:./index.js',
+			editorStyle: 'file:./editor.css',
+			style: 'file:./style.css',
 		},
 	},
 	esnext: {
