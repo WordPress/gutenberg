@@ -16,11 +16,11 @@ import ComboboxControl from '../../../../components/build/combobox-control/';
 
 function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	let initialAuthors = [];
-	authors.forEach( ( author, i ) => {
+	authors.forEach( ( author ) => {
 		initialAuthors = [
 			...initialAuthors,
 			{
-				key: i,
+				key: author.id,
 				name: author.name,
 				value: author.name,
 				id: author.id,
@@ -87,8 +87,8 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 		setIsLoadingSearchResult( true );
 		apiFetch( { path: '/wp/v2/users' + payload } ).then( ( results ) => {
 			setAvailableAuthors(
-				results.map( ( author, i ) => ( {
-					key: i,
+				results.map( ( author ) => ( {
+					key: author.id,
 					name: author.name,
 					value: author.name,
 					id: author.id,
