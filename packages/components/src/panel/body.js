@@ -28,7 +28,6 @@ export function PanelBody(
 	{
 		children,
 		className,
-		disableSmoothScrollIntoView,
 		focusable,
 		icon,
 		initialOpen: initialOpenProp,
@@ -46,13 +45,7 @@ export function PanelBody(
 
 	// Defaults to 'smooth' scrolling
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
-	let scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
-
-	// However, this behavior can be overridden by prop
-	if ( disableSmoothScrollIntoView ) {
-		scrollBehavior = 'auto';
-	}
-
+	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
 	const isOpened = disclosure.visible;
 
 	// Runs after initial render
