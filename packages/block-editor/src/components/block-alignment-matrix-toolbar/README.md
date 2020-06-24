@@ -4,7 +4,6 @@ The alignment matrix toolbar allows users to quickly adjust inner block alignmen
 ![Button components](https://i.imgur.com/PxYkgL5.png)
 
 ## Table of contents
-
 - [Alignment Matrix Toolbar](#alignment-matrix-toolbar)
 	- [Table of contents](#table-of-contents)
 	- [Design guidelines](#design-guidelines)
