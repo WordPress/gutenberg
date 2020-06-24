@@ -386,9 +386,10 @@ class BottomSheet extends Component {
 		} = this.state;
 		let computedSnapPoints;
 		let computedInitialSnapPoint;
-		const maxSnapPoint =
-			highestSnap ||
-			( contentHeight > 0 ? contentHeight + safeAreaBottomInset : 0 );
+		let maxSnapPoint = highestSnap || contentHeight || 0;
+		if ( maxSnapPoint !== 0 ) {
+			maxSnapPoint += safeAreaBottomInset;
+		}
 		if ( maxSnapPoint < defaultSnapPoints[ 1 ] ) {
 			computedSnapPoints = [ maxSnapPoint, 0, 0 ];
 			computedInitialSnapPoint = 0;
