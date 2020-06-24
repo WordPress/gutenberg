@@ -209,7 +209,7 @@ async function updatePackages(
 					content.replace(
 						'## Unreleased',
 						`## Unreleased\n\n## ${
-							isPrerelease ? nextVersion + '-rc.1' : nextVersion
+							isPrerelease ? nextVersion + '-rc.0' : nextVersion
 						} (${ publishDate })`
 					)
 				);
