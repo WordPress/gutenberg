@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { InserterBlockList as BaseInserterBlockList } from '../block-list';
+import { BlockTypesTab } from '../block-types-tab';
 import items, { categories, collections } from './fixtures';
 import useBlockTypesState from '../hooks/use-block-types-state';
 
@@ -36,9 +36,7 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 const debouncedSpeak = jest.fn();
 
 function InserterBlockList( props ) {
-	return (
-		<BaseInserterBlockList debouncedSpeak={ debouncedSpeak } { ...props } />
-	);
+	return <BlockTypesTab debouncedSpeak={ debouncedSpeak } { ...props } />;
 }
 
 const initializeAllClosedMenuState = ( propOverrides ) => {

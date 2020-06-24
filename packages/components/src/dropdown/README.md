@@ -108,3 +108,18 @@ Use this o object to access properties/feature if the `Popover` component that a
  
  - Type: `Object`
  - Required: No
+
+### onClose
+
+A callback invoked when the popover should be closed.
+
+- Type: `Function`
+- Required: No
+
+### onToggle
+
+A callback invoked when the state of the popover changes from open to closed and vice versa.
+Function receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
+
+- Type: `Function`
+- Required: No

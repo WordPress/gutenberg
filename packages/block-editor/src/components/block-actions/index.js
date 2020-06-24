@@ -52,6 +52,8 @@ export default function BlockActions( {
 		insertAfterBlock,
 		insertBeforeBlock,
 		flashBlock,
+		setBlockMovingClientId,
+		setNavigationMode,
 	} = useDispatch( 'core/block-editor' );
 
 	const notifyCopy = useNotifyCopy();
@@ -73,6 +75,10 @@ export default function BlockActions( {
 		},
 		onInsertAfter() {
 			insertAfterBlock( last( castArray( clientIds ) ) );
+		},
+		onMoveTo() {
+			setNavigationMode( true );
+			setBlockMovingClientId( clientIds[ 0 ] );
 		},
 		onGroup() {
 			if ( ! blocks.length ) {

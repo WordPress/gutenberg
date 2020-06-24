@@ -119,10 +119,6 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
  * @since 6.5.0
  */
 function gutenberg_register_rest_block_directory() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ) ) {
-		return;
-	}
-
 	$block_directory_controller = new WP_REST_Block_Directory_Controller();
 	$block_directory_controller->register_routes();
 }
@@ -159,10 +155,6 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
  * Registers the Plugins REST API routes.
  */
 function gutenberg_register_plugins_endpoint() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ) ) {
-		return;
-	}
-
 	$plugins = new WP_REST_Plugins_Controller();
 	$plugins->register_routes();
 }

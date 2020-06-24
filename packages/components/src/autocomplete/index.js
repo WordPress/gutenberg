@@ -264,7 +264,7 @@ const getAutoCompleterUI = ( autocompleter ) => {
 									'is-selected': index === selectedIndex,
 								}
 							) }
-							onClick={ () => onSelect }
+							onClick={ () => onSelect( option ) }
 						>
 							{ option.label }
 						</Button>
@@ -525,7 +525,7 @@ export class Autocomplete extends Component {
 						listBoxId={ listBoxId }
 						selectedIndex={ selectedIndex }
 						onChangeOptions={ this.onChangeOptions }
-						onSelect={ this.onSelect }
+						onSelect={ this.select }
 						onReset={ this.onReset }
 					/>
 				) }
