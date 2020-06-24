@@ -9,6 +9,7 @@ import {
 	withSpokenMessages,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -26,6 +27,16 @@ import { searchBlockItems, searchItems } from './search-items';
 const SEARCH_THRESHOLD = 6;
 const SHOWN_BLOCK_TYPES = 6;
 const SHOWN_BLOCK_PATTERNS = 2;
+
+const preventArrowKeysPropagation = ( event ) => {
+	if (
+		[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].includes( event.keyCode )
+	) {
+		// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
+		event.stopPropagation();
+	}
+};
+const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 function QuickInserterList( {
 	blockTypes,
@@ -159,8 +170,18 @@ function QuickInserter( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
+	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
+	// is always visible, and one which already incurs this behavior of autoFocus via
+	// Popover's focusOnMount.
+	// Disable reason (no-static-element-interactions): Navigational key-presses within
+	// the menu are prevented from triggering WritingFlow and ObserveTyping interactions.
+	/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 	return (
-		<div className="block-editor-inserter__quick-inserter">
+		<div
+			className="block-editor-inserter__quick-inserter"
+			onKeyPress={ stopKeyPropagation }
+			onKeyDown={ preventArrowKeysPropagation }
+		>
 			{ showSearch && (
 				<InserterSearchForm
 					value={ filterValue }
@@ -191,6 +212,7 @@ function QuickInserter( {
 			) }
 		</div>
 	);
+	/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 }
 
 export default withSpokenMessages( QuickInserter );
