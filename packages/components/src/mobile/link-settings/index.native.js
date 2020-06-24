@@ -213,7 +213,7 @@ function LinkSettings( {
 					<TextControl
 						icon={ showIcon && LinkRelIcon }
 						label={ options.linkRel.label }
-						value={ rel || '' }
+						value={ linkRelInputValue }
 						valuePlaceholder={ options.linkRel.placeholder }
 						onChange={ onChangeLinkRel }
 						onSubmit={ onCloseSettingsSheet }
