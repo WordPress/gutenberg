@@ -1,18 +1,18 @@
 # Alignment Matrix Toolbar
-The alignment matrix allows users the ability to change text alignment quickly and intuitively.
+The alignment matrix toolbar allows users to quickly adjust inner block alignment; this is in contrast to the alignment toolbar that aligns the frame block.
 
 ![Button components](https://i.imgur.com/PxYkgL5.png)
 
 ## Table of contents
 
 - [Alignment Matrix Toolbar](#alignment-matrix-toolbar)
-  - [Table of contents](#table-of-contents)
-  - [Design guidelines](#design-guidelines)
-    - [Usage](#usage)
-    - [Best practices](#best-practices)
-  - [Development guidelines](#development-guidelines)
-    - [Usage](#usage-1)
-    - [Props](#props)
+	- [Table of contents](#table-of-contents)
+	- [Design guidelines](#design-guidelines)
+		- [Usage](#usage)
+		- [Best practices](#best-practices)
+	- [Development guidelines](#development-guidelines)
+		- [Usage](#usage-1)
+		- [Props](#props)
 
 ## Design guidelines
 
