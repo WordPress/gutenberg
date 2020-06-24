@@ -25,16 +25,12 @@ describe( 'block editor keyboard shortcuts', () => {
 	describe( 'move blocks', () => {
 		const moveUp = async () => pressKeyWithModifier( 'secondary', 't' );
 		const moveDown = async () => pressKeyWithModifier( 'secondary', 'y' );
-		const multiSelectBlocks = async () => {
-			await page.keyboard.down( 'Shift' );
-			await page.keyboard.press( 'ArrowUp' );
-			await page.keyboard.up( 'Shift' );
-		};
 		describe( 'single block selected', () => {
 			it( 'should move the block up', async () => {
 				await createTestParagraphBlocks();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
-				await Promise.all( [ moveUp(), moveUp() ] ); // press twice
+				await moveUp();
+				await moveUp();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
 
@@ -51,7 +47,9 @@ describe( 'block editor keyboard shortcuts', () => {
 			it( 'should move the blocks up', async () => {
 				await createTestParagraphBlocks();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
-				await multiSelectBlocks();
+				await page.keyboard.down( 'Shift' );
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.up( 'Shift' );
 				await moveUp();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
@@ -60,7 +58,9 @@ describe( 'block editor keyboard shortcuts', () => {
 				await createTestParagraphBlocks();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 				await page.keyboard.press( 'ArrowUp' );
-				await multiSelectBlocks();
+				await page.keyboard.down( 'Shift' );
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.up( 'Shift' );
 				await moveDown();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
