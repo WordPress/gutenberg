@@ -24,18 +24,18 @@ if (
 	 *
 	 * @param string $tag     The `<script>` tag for the enqueued script.
 	 * @param string $handle  The script's registered handle.
-	 * @param string $src_esc The script's pre-escaped registered src.
+	 * @param string $esc_src The script's pre-escaped registered src.
 	 *
 	 * @return string  Filtered script tag.
 	 */
-	function gutenberg_change_script_tag( $tag, $handle, $src_esc ) {
+	function gutenberg_change_script_tag( $tag, $handle, $esc_src ) {
 		if ( ! is_admin() ) {
 			return $tag;
 		}
 
 		$tag = str_replace(
-			sprintf( "<script src='%s'></script>", $src_esc ),
-			sprintf( "<script data-handle='%s' src='%s'></script>", esc_attr( $handle ), $src_esc ),
+			sprintf( "<script src='%s'></script>", $esc_src ),
+			sprintf( "<script data-handle='%s' src='%s'></script>", esc_attr( $handle ), $esc_src ),
 			$tag
 		);
 
