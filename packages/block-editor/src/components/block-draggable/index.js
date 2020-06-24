@@ -107,10 +107,10 @@ const BlockDraggable = ( {
 			cloneClassname={ cloneClassname }
 			elementId={ blockElementId }
 			transferData={ transferData }
-			onDragStart={ ( clientX, clientY ) => {
+			onDragStart={ ( event ) => {
 				startDraggingBlocks();
 				isDragging.current = true;
-				dragStartY.current = clientY;
+				dragStartY.current = event.clientY;
 
 				// find nearest parent(s) to scroll
 				scrollParentY.current = getVerticalScrollParent(
