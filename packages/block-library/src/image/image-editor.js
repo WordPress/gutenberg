@@ -265,6 +265,29 @@ export default function ImageEditor( {
 
 	return (
 		<>
+			{ ! inProgress && (
+				<div
+					className="richimage__zoom-control"
+					aria-label={ __( 'Zoom' ) }
+				>
+					<Icon icon={ search } />
+					<RangeControl
+						min={ MIN_ZOOM }
+						max={ MAX_ZOOM }
+						value={ Math.round( zoom ) }
+						onChange={ setZoom }
+					/>
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<AspectMenu
+								toggleProps={ toggleProps }
+								isDisabled={ inProgress }
+								onClick={ setAspect }
+							/>
+						) }
+					</ToolbarItem>
+				</div>
+			) }
 			<div
 				className={ classnames( 'richimage__crop-area', {
 					'is-applying': inProgress,
@@ -290,29 +313,6 @@ export default function ImageEditor( {
 				/>
 				{ inProgress && <Spinner /> }
 			</div>
-			{ ! inProgress && (
-				<div
-					className="richimage__zoom-control"
-					aria-label={ __( 'Zoom' ) }
-				>
-					<Icon icon={ search } />
-					<RangeControl
-						min={ MIN_ZOOM }
-						max={ MAX_ZOOM }
-						value={ Math.round( zoom ) }
-						onChange={ setZoom }
-					/>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<AspectMenu
-								toggleProps={ toggleProps }
-								isDisabled={ inProgress }
-								onClick={ setAspect }
-							/>
-						) }
-					</ToolbarItem>
-				</div>
-			) }
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton

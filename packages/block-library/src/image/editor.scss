@@ -94,15 +94,19 @@ figure.wp-block-image:not(.wp-block) {
 	border: $border-width solid $dark-gray-primary;
 	border-radius: $radius-block-ui;
 	background-color: $white;
-	margin-top: $grid-unit-15;
-	margin-bottom: $grid-unit-15;
 	padding: $grid-unit-10;
 	line-height: 1;
 	width: 100%;
-	max-width: $break-mobile;
+	max-width: 280px;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+
+	// Place as a stacked toolbar.
+	position: sticky;
+	top: $grid-unit-60 + $grid-unit-15;
+	z-index: z-index(".block-editor-block-list__block-popover");
+	float: left;
 
 	.components-range-control {
 		flex: 1;
@@ -116,7 +120,7 @@ figure.wp-block-image:not(.wp-block) {
 	}
 
 	.richimage__aspect-ratio {
-		height: $grid-unit-60;
+		height: $grid-unit-60 - $border-width - $border-width;
 		margin-top: -$grid-unit-10;
 		margin-bottom: -$grid-unit-10;
 		display: flex;
