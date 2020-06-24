@@ -12,9 +12,25 @@ The tools needed for development are **Node** and **NPM**. **Nodejs** is a runti
 
 The tools are used to convert the JavaScript we are going to write into a format that browsers can run. This is called transpiling or the build step.
 
-You can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, the LTS (long term support) version is recommeneded. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
+For Mac and Linux, it is recommended to use the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm). Using `nvm` to install node allows installing specific versions, plus installs locally in your home directory and avoids any global permission issues.
 
-On Mac, it is recommended to use the [Homebrew package manager](https://brew.sh/) to install node and not the installer above. Homebrew sets up user level permissions properly, whereas the default Node installer sets it up at the system-level causing permission issues later. Follow the directions on Homebrew to install the package manager, and then run `brew install node` to have it install node.
+For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, the long term support (LTS) version is recommeneded. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
+
+Here are the quick instructions to install using nvm, see the [full installation instructions](https://github.com/nvm-sh/nvm#installing-and-updating) for additional details.
+
+A tip for macOS Catalina, the default profile file may not be created, you can create the required file typing `touch ~/.zshrc` on the command-line. It is fine to run if the file already exists. Note, `~/` is a shortcut to your home directory.
+
+Run the following on the command-line to install nvm:
+
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+```
+
+After installing nvm, you need to use it to install node, to install the latest version of node, run:
+
+```
+nvm install --lts
+```
 
 The important part after installing is being able to use them in your terminal. Open a terminal command-line and type `node -v` and `npm -v` to confirm they are installed.
 
@@ -26,7 +42,7 @@ v12.18.0
 6.14.4
 ```
 
-The minimum version for node is >= 10.x and for npm >= 6.9x, using the current LTS version will always be supported.
+Your versions may not match exactly, that is fine. The minimum version for node is >= 10.x and for npm >= 6.9x, using the current LTS version will always be supported.
 
 ## WordPress Development Site
 
