@@ -22,10 +22,8 @@ const SEARCH_URLS = [
 ];
 
 const INSTALL_URLS = [
-	'/__experimental/block-directory/install',
-	`rest_route=${ encodeURIComponent(
-		'/__experimental/block-directory/install'
-	) }`,
+	'/__experimental/plugins',
+	`rest_route=${ encodeURIComponent( '/__experimental/plugins' ) }`,
 ];
 
 // Example Blocks
