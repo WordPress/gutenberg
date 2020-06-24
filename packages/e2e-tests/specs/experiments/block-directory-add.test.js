@@ -8,10 +8,6 @@ import {
 	getEditedPostContent,
 	createJSONResponse,
 } from '@wordpress/e2e-test-utils';
-/**
- * Internal dependencies
- */
-import { useExperimentalFeatures } from '../../experimental-features';
 
 // Urls to mock
 const SEARCH_URLS = [
@@ -173,7 +169,6 @@ const matchUrl = ( reqUrl, urls ) => {
 };
 
 describe( 'adding blocks from block directory', () => {
-	useExperimentalFeatures( [ '#gutenberg-block-directory' ] );
 
 	beforeEach( async () => {
 		await createNewPost();
