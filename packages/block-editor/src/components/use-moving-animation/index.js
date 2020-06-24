@@ -70,13 +70,13 @@ function useMovingAnimation(
 	// return a function to maintain that position by scrolling.
 	const preserveScrollPosition = useMemo( () => {
 		if ( ! adjustScrolling || ! ref.current ) {
-			return;
+			return () => {};
 		}
 
 		const scrollContainer = getScrollContainer( ref.current );
 
 		if ( ! scrollContainer ) {
-			return;
+			return () => {};
 		}
 
 		const prevRect = ref.current.getBoundingClientRect();
@@ -103,9 +103,7 @@ function useMovingAnimation(
 		if ( prefersReducedMotion ) {
 			// if the animation is disabled and the scroll needs to be adjusted,
 			// just move directly to the final scroll position.
-			if ( preserveScrollPosition ) {
-				preserveScrollPosition();
-			}
+			preserveScrollPosition();
 
 			return;
 		}
@@ -133,9 +131,7 @@ function useMovingAnimation(
 			: `translate3d(${ x }px,${ y }px,0)`;
 		ref.current.style.zIndex = ! isSelected || isMoving ? '' : '1';
 
-		if ( preserveScrollPosition ) {
-			preserveScrollPosition();
-		}
+		preserveScrollPosition();
 	}
 
 	// Called for every frame computed by useSpring.
