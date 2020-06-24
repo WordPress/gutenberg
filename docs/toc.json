@@ -94,6 +94,16 @@
 			{ "docs/designers-developers/developers/tutorials/javascript/scope-your-code.md": [] },
 			{ "docs/designers-developers/developers/tutorials/javascript/js-build-setup.md": [] }
 		] },
+		{ "docs/designers-developers/developers/tutorials/create-block/readme.md": [
+			{ "docs/designers-developers/developers/tutorials/create-block/devenv.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/wp-plugin.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/esnext-js.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/block-anatomy.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/block-attributes.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/block-code.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/author-experience.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/finishing.md": [] }
+		] },
 		{ "docs/designers-developers/developers/tutorials/block-tutorial/readme.md": [
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md": [] },
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md": [] },

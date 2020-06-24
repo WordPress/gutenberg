@@ -1,4 +1,3 @@
-
 # Anatomy of a Gutenberg Block
 
 At its simplest, a block in Gutenberg is a JavaScript object with a specific set of properties. Here is the complete code for registering a block:
@@ -14,19 +13,15 @@ registerBlockType( 'create-block/gutenpride', {
 	supports: {
 		// Removes support for an HTML mode.
 		html: false,
-    },
+	},
 
-    edit: ( ) => {
-        return (
-            <div> Hello in Editor. </div>
-        );
-    },
+	edit: () => {
+		return <div> Hello in Editor. </div>;
+	},
 
-    save: ( ) => {
-        return (
-            <div> Hello in Save.</div>
-        );
-    },
+	save: () => {
+		return <div> Hello in Save.</div>;
+	},
 } );
 ```
 
@@ -51,7 +46,9 @@ The results of the save function is what the editor will insert into the **post_
 If you look at the generated `src/index.js` file, the block title and description are wrapped in a function that looks like this:
 
 ```js
-__('Gutenpride', 'create_block')
+__( 'Gutenpride', 'create_block' );
 ```
 
 This is an internationalization wrapper that allows for the string "Gutenpride" to be translated. The second parameter, "create_block" is called the text domain and gives context for where the string is from. The JavaScript internationalization, often abbreviated i18n, matches the core WordPress internationalization process. See the [I18n for WordPress documentation](https://codex.wordpress.org/I18n_for_WordPress_Developers) for more details.
+
+Next Section: [Block Attributes](block-attributes.md)

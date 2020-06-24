@@ -1,4 +1,3 @@
-
 # ESNext Syntax
 
 A brief aside to discuss JavaScript.
@@ -24,13 +23,17 @@ Arrow functions provide a shorter syntax for defining a function; this is such a
 Before you might define a function like:
 
 ```js
-const f = function( param ) { console.log( param ); }
+const f = function ( param ) {
+	console.log( param );
+};
 ```
 
 Using arrow function, you can define the same using:
 
 ```js
-const g = ( param ) => { console.log( param ); }
+const g = ( param ) => {
+	console.log( param );
+};
 ```
 
 Or even shorter, if the function is only a single-line you can omit the
@@ -46,18 +49,14 @@ For example, our save function could be shortened from:
 
 ```js
 save: ( { attributes } ) => {
-    return (
-        <div className="theurl">{ attributes.url }</div>
-    );
-}
+	return <div className="theurl">{ attributes.url }</div>;
+};
 ```
 
 To:
 
 ```js
-save: ( { attributes } ) => (
-    <div className="theurl">{ attributes.url }</div>
-);
+save: ( { attributes } ) => <div className="theurl">{ attributes.url }</div>;
 ```
 
 There are even more ways to shorten code, but you don't want to take it too far and make it harder to read what is going on.
@@ -96,23 +95,21 @@ To import, you would use:
 import edit from './edit';
 
 registerBlockType( 'mkaz/qrcode-block', {
-    title: 'QRCode Block',
-    icon: 'visibility',
-    category: 'widgets',
-    attributes: {
-        url: {
-            type: 'string',
-            source: 'text',
-            selector: '.theurl',
-        },
-    },
-    edit,
-    save: ( { attributes } ) => {
-        return (
-            <div> ... </div>
-        );
-    }
-});
+	title: 'QRCode Block',
+	icon: 'visibility',
+	category: 'widgets',
+	attributes: {
+		url: {
+			type: 'string',
+			source: 'text',
+			selector: '.theurl',
+		},
+	},
+	edit,
+	save: ( { attributes } ) => {
+		return <div> ... </div>;
+	},
+} );
 ```
 
 Note, you can also shorten `edit: edit` to just `edit` as shown above. JavaScript will automatically assign the property `edit` to the value of `edit`. This is another form of destructuring.
@@ -123,6 +120,8 @@ It helps to become familiar with the ESNext syntax and the common shorter forms.
 
 Here are a few more resources that may help
 
-- [ES5 vs ES6 with example code](https://medium.com/recraftrelic/es5-vs-es6-with-example-code-9901fa0136fc)
-- [Top 10 ES6 Features by Example](https://blog.pragmatists.com/top-10-es6-features-by-example-80ac878794bb)
-- [ES6 Syntax and Feature Overview](https://www.taniarascia.com/es6-syntax-and-feature-overview/)
+-   [ES5 vs ES6 with example code](https://medium.com/recraftrelic/es5-vs-es6-with-example-code-9901fa0136fc)
+-   [Top 10 ES6 Features by Example](https://blog.pragmatists.com/top-10-es6-features-by-example-80ac878794bb)
+-   [ES6 Syntax and Feature Overview](https://www.taniarascia.com/es6-syntax-and-feature-overview/)
+
+Next Section: [Anatomy of a Gutenberg Block](block-anatomy.md)

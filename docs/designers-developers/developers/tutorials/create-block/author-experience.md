@@ -1,4 +1,3 @@
-
 # Authoring Experience
 
 ## Background
@@ -16,8 +15,8 @@ import { Placeholder, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit( { attributes, className, setAttributes } ) {
-		return (
-				<div className={ className }>
+	return (
+		<div className={ className }>
 			<Placeholder
 				label="Gutenpride Block"
 				instructions="Add your message"
@@ -27,8 +26,8 @@ export default function Edit( { attributes, className, setAttributes } ) {
 					onChange={ ( val ) => setAttributes( { message: val } ) }
 				/>
 			</Placeholder>
-				</div>
-		);
+		</div>
+	);
 }
 ```
 
@@ -39,7 +38,7 @@ The placeholder looks ok, for a simple text message it may or may not be what yo
 For this we can use a ternary function, to display content based on a value being set or not. A ternary function is an inline if-else statement, using the syntax:
 
 ```js
-	( clause ) ? ( doIfTrue ) : ( doIfFalse )
+clause ? doIfTrue : doIfFalse;
 ```
 
 This can be used inside a block to control what shows when a parameter is set or not. A simple case that displays a `message` if set, otherwise show the form element:
@@ -67,7 +66,7 @@ The `isSelected` parameter is passed in to the `edit` function and is set to tru
 Using that parameter, we can use the logic:
 
 ```js
-attributes.message && ! isSelected
+attributes.message && ! isSelected;
 ```
 
 If the message is set and `!isSelected`, meaning we are not editing the block, the focus is elsewhere, then display the message not the text field.
@@ -78,25 +77,31 @@ All so this combined together here's what the edit function looks like this:
 import { Placeholder, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function Edit( { attributes, className, isSelected, setAttributes } ) {
-		return (
-			<div className={ className }>
-				{ attributes.message && !isSelected ?
-					<div>
-						{ attributes.message }
-					</div> :
-					<Placeholder
-						label="Gutenpride Block"
-						instructions="Add your message"
-					>
-						<TextControl
-							value={ attributes.message }
-							onChange={ ( val ) => setAttributes( { message: val } ) }
-						/>
-					</Placeholder>
-				}
-			</div>
-		);
+export default function Edit( {
+	attributes,
+	className,
+	isSelected,
+	setAttributes,
+} ) {
+	return (
+		<div className={ className }>
+			{ attributes.message && ! isSelected ? (
+				<div>{ attributes.message }</div>
+			) : (
+				<Placeholder
+					label="Gutenpride Block"
+					instructions="Add your message"
+				>
+					<TextControl
+						value={ attributes.message }
+						onChange={ ( val ) =>
+							setAttributes( { message: val } )
+						}
+					/>
+				</Placeholder>
+			) }
+		</div>
+	);
 }
 ```
 
@@ -111,7 +116,7 @@ The simpler and better solution is to modify the `editor.css` to include the pro
 Update `editor.css` to:
 
 ```css
-.wp-block-create-block-gutenpride input[type="text"] {
+.wp-block-create-block-gutenpride input[type='text'] {
 	font-family: Gilbert;
 	font-size: 64px;
 }
@@ -132,3 +137,5 @@ export default function Edit( { attributes, className, setAttributes } ) {
 	);
 }
 ```
+
+Next Section: [Finishing Touches](finishing.md)
