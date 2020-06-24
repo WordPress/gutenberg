@@ -162,12 +162,24 @@ function gutenberg_rest_nonce() {
 }
 add_action( 'wp_ajax_gutenberg_rest_nonce', 'gutenberg_rest_nonce' );
 
+/**
+ * Parses a posts blocks and then detects whether the post includes
+ * a classic block.
+ *
+ * @param WP_Post $post The post to check for classic blocks.
+ */
 function gutenberg_does_post_have_classic_block( $post ) {
 	$parsed = parse_blocks( $post->post_content );
 
+	/**
+	 * Recursive function to walk the block tree and detect whether
+	 * a classic block exists.
+	 *
+	 * @param WP_Block_Parser_Block $block The block to check.
+	 */
 	function check_for_classic_block_recursive( $block ) {
 		$block_name = $block['blockName'];
-		if ( is_null( $block_name ) || 'core/freeform' == $block_name ) {
+		if ( is_null( $block_name ) || 'core/freeform' === $block_name ) {
 			return true;
 		}
 		if ( empty( $block->children ) ) {
@@ -215,7 +227,7 @@ function gutenberg_print_tinymce_scripts() {
 		return;
 	}
 
-	foreach ( $wp_meta_boxes[$post_type] as $position ) {
+	foreach ( $wp_meta_boxes[ $post_type ] as $position ) {
 		foreach ( $position as $priority ) {
 			foreach ( $priority as $box ) {
 				if ( ! $box ) {
@@ -225,7 +237,7 @@ function gutenberg_print_tinymce_scripts() {
 				$is_back_compat_box = isset( $box['args']['__back_compat_meta_box'] ) && true === $box['args']['__back_compat_meta_box'];
 
 				if ( ! $is_back_compat_box ) {
-					// we've found a true meta box which may depend on TinyMCE
+					// We've found a true meta box which may depend on TinyMCE.
 					wp_print_tinymce_scripts();
 					return;
 				}
@@ -234,44 +246,35 @@ function gutenberg_print_tinymce_scripts() {
 	}
 
 	if ( gutenberg_does_post_have_classic_block( $post ) ) {
-		// if the classic block is already used then we cannot delay loading TinyMCE
+		// If the classic block is already used then we cannot delay loading TinyMCE.
 		wp_print_tinymce_scripts();
 		return;
 	}
 
-	// Otherwise we're in the block editor and should only print support scripts.
+	// Otherwise we've found a situation where we can asynchronously load
+	// TinyMCE and should only print support scripts.
 
-	// Translations
-	echo "<script type='text/javascript'>\n" .
-		"window.wpMceTranslation = function() {\n" .
+	// Translations.
+	echo '<script type="text/javascript">\n' .
+		'window.wpMceTranslation = function() {\n' .
 			_WP_Editors::wp_mce_translation() .
-		"\n};\n";
+		'\n};\n';
 
-	// Full list of TinyMCE JS scripts to load in order
+	// Full list of TinyMCE JS scripts to load in order.
 	$wp_scripts  = wp_scripts();
 	$tinymce_dep = $wp_scripts->registered['wp-tinymce'];
 
-	echo "window.wpTinyMCEOrderedScriptURIs = [];\n";
+	echo 'window.wpTinyMCEOrderedScriptURIs = [];\n';
 
 	foreach ( $tinymce_dep->deps as $handle ) {
 		$url = $wp_scripts->get_url( $handle );
-		echo "window.wpTinyMCEOrderedScriptURIs.push( \"$url\");\n";
+		echo 'window.wpTinyMCEOrderedScriptURIs.push( "' . $url . '");\n';
 	}
 
 	$url = $wp_scripts->get_url( $tinymce_dep->handle );
-	echo "window.wpTinyMCEOrderedScriptURIs.push( \"$url\" );\n" .
-		"</script>";
+	echo 'window.wpTinyMCEOrderedScriptURIs.push( "' . $url . '" );\n' .
+		'</script>';
 }
 
 remove_action( 'print_tinymce_scripts', 'wp_print_tinymce_scripts' );
 add_action( 'print_tinymce_scripts', 'gutenberg_print_tinymce_scripts' );
-
-// function gutenberg_print_tinymce_when_meta_boxes_are_present( $post_type, $position, $post ) {
-// 	global $wp_meta_boxes;
-
-// 	if ( ! empty( $wp_meta_boxes ) ) {
-// 		wp_print_tinymce_scripts();
-// 	}
-// }
-
-// add_action( 'do_meta_boxes', 'gutenberg_print_tinymce_when_meta_boxes_are_present', 10, 3 );
