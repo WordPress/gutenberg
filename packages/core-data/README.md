@@ -254,7 +254,7 @@ _Returns_
 
 <a name="getAuthor" href="#getAuthor">#</a> **getAuthor**
 
-Returns all available authors.
+Returns an Author by ID.
 
 _Parameters_
 

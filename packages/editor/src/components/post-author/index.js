@@ -36,7 +36,7 @@ export class PostAuthor extends Component {
 		const selectId = 'post-author-selector-' + instanceId;
 
 		// Wait until we have the post author before displaying the component.
-		if ( 0 === postAuthor.length ) {
+		if ( ! postAuthor || 0 === postAuthor.length ) {
 			return null;
 		}
 

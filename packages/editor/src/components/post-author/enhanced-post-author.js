@@ -30,7 +30,7 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 
 	// Ensure the current author is included in the initial dropdown list.
 	let foundAuthor = initialAuthors.findIndex(
-		( author ) => currentPostAuthor?.id === author.id
+		( author ) => postAuthor?.id === author.id
 	);
 
 	if ( postAuthor && foundAuthor < 0 ) {
@@ -104,7 +104,7 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 			isLoading={ isLoadingSearchResults }
 			options={ availableAuthors }
 			initialHighlightedIndex={ foundAuthor }
-			initialInputValue={ selectedAuthor.name }
+			initialInputValue={ selectedAuthor?.name }
 			onInputValueChange={ handleKeydown }
 			onChange={ handleSelect }
 		/>
