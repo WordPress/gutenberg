@@ -4,9 +4,9 @@
         "name": "core/post-author",
         "isValid": true,
         "attributes": {
-			"avatarSize": 48,
-			"showAvatar": true
-		},
+            "avatarSize": 48,
+            "showAvatar": true
+        },
         "innerBlocks": [],
         "originalContent": ""
     }
