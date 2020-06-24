@@ -76,14 +76,14 @@ export const getUserQueryResults = createSelector(
 );
 
 /**
- * Returns all available authors.
+ * Returns an Author by ID.
  *
  * @param {Object} state Data state.
  *
  * @return {Array} Authors list.
  */
-export function getAuthor( state ) {
-	return getUserQueryResults( state, 'author' );
+export function getAuthor( state, id ) {
+	return getUserQueryResults( state, 'author' )[ 0 ];
 }
 
 /**

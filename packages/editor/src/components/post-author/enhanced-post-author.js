@@ -15,7 +15,6 @@ import apiFetch from '@wordpress/api-fetch';
 import ComboboxControl from '../../../../components/build/combobox-control/';
 
 function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
-	const currentPostAuthor = postAuthor[ 0 ];
 	let initialAuthors = [];
 	authors.forEach( ( author, i ) => {
 		initialAuthors = [
@@ -34,9 +33,9 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 		( author ) => currentPostAuthor?.id === author.id
 	);
 
-	if ( currentPostAuthor && foundAuthor < 0 ) {
-		currentPostAuthor.key = initialAuthors.length;
-		initialAuthors = [ currentPostAuthor, ...initialAuthors ];
+	if ( postAuthor && foundAuthor < 0 ) {
+		postAuthor.key = initialAuthors.length;
+		initialAuthors = [ postAuthor, ...initialAuthors ];
 		foundAuthor = 0;
 	}
 
@@ -51,7 +50,7 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	);
 
 	// The currently selected author.
-	const [ selectedAuthor, setSelectedAuthor ] = useState( currentPostAuthor );
+	const [ selectedAuthor, setSelectedAuthor ] = useState( postAuthor );
 
 	/**
 	 * Handle author selection.
