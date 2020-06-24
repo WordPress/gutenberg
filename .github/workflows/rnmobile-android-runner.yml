@@ -11,6 +11,9 @@ jobs:
         ]
 
     steps:
+
+    - run: system_profiler SPHardwareDataType
+
     - name: checkout
       uses: actions/checkout@v2
 
