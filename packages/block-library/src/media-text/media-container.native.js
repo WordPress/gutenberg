@@ -2,16 +2,16 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-} from 'react-native-gutenberg-bridge';
-
-/**
- * WordPress dependencies
- */
+} from '@wordpress/react-native-bridge';
 import { Icon, Image, withNotices } from '@wordpress/components';
 import {
 	MEDIA_TYPE_IMAGE,

@@ -1,0 +1,112 @@
+.edit-navigation-editor {
+	display: grid;
+	align-items: self-start;
+	grid-gap: 10px;
+
+	@include break-medium {
+		grid-template-columns: 280px 1fr;
+	}
+
+	// Make the block list take up the full width of the panel.
+	.block-editor-block-list__layout.is-root-container {
+		padding: 0;
+	}
+}
+
+.edit-navigation-editor__block-editor-toolbar {
+	height: 46px;
+	margin-bottom: 12px;
+	border: 1px solid #e2e4e7;
+
+	// Borders around toolbar segments.
+	.components-toolbar-group,
+	.components-toolbar {
+		background: none;
+		// IE11 has thick paddings without this.
+		line-height: 0;
+
+		// These margins make the buttons themselves overlap the chrome of the toolbar.
+		// This helps make them square, and maximize the hit area.
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
+
+		// The component is born with a border, but we only need some of them.
+		border: 0;
+
+		// Add a border after item groups to show as separator in the block toolbar.
+		border-right: $border-width solid $light-gray-500;
+	}
+
+
+	// When entering navigation mode, hide the toolbar, but do so in a way where the
+	// outer container retains its height to avoid the blocks moving upwards.
+	&.is-hidden {
+		border-color: transparent;
+
+		.block-editor-block-toolbar {
+			display: none;
+		}
+	}
+}
+
+.block-editor-block-navigation-leaf {
+	> :first-child {
+		padding-left: 0;
+	}
+	> :first-child button {
+		padding-left: 0;
+	}
+}
+
+.edit-navigation-editor__navigation-structure-panel {
+	// IE11 requires the column to be explicitly declared.
+	grid-column: 1;
+
+	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
+	-ms-grid-row-align: start;
+
+	.components-card__header {
+		font-weight: bold;
+		border-bottom: 0;
+		padding-top: $grid-unit-30 !important;
+		padding-bottom: $grid-unit-30 !important;
+	}
+}
+
+.edit-navigation-editor__navigation-structure-header {
+	font-weight: bold;
+}
+
+.edit-navigation-editor__block-editor-area {
+	@include break-medium {
+		// IE11 requires the column to be explicitly declared.
+		// Only shift this into the second column on desktop.
+		grid-column: 2;
+	}
+
+	.components-card__footer,
+	.components-card__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.edit-navigation-editor__block-editor-area-header-text {
+		flex-grow: 1;
+		font-weight: bold;
+	}
+}
+
+.components-panel__header-actions {
+	margin-bottom: $grid-unit-60;
+	width: 100%;
+	text-align: right;
+}
+
+.components-panel__footer-actions {
+	margin-top: $grid-unit-60;
+	padding-top: $grid-unit-20;
+	width: 100%;
+	text-align: left;
+	border-top: 1px solid $light-gray-300;
+}

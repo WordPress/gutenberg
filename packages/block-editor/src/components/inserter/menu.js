@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  */
 import { useState } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { TabPanel, VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
@@ -18,9 +18,10 @@ import { useSelect } from '@wordpress/data';
 import Tips from './tips';
 import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
-import InserterBlockList from './block-list';
-import BlockPatterns from './block-patterns';
+import BlockTypesTab from './block-types-tab';
+import BlockPatternsTabs from './block-patterns-tab';
 import useInsertionPoint from './hooks/use-insertion-point';
+import InserterTabs from './tabs';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -31,6 +32,7 @@ function InserterMenu( {
 	__experimentalSelectBlockOnInsert,
 	onSelect,
 	showInserterHelpPanel,
+	showMostUsedBlocks,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -81,11 +83,12 @@ function InserterMenu( {
 	const blocksTab = (
 		<>
 			<div className="block-editor-inserter__block-list">
-				<InserterBlockList
+				<BlockTypesTab
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsert }
 					onHover={ onHover }
 					filterValue={ filterValue }
+					showMostUsedBlocks={ showMostUsedBlocks }
 				/>
 			</div>
 			{ showInserterHelpPanel && (
@@ -100,7 +103,7 @@ function InserterMenu( {
 	);
 
 	const patternsTab = (
-		<BlockPatterns onInsert={ onInsert } filterValue={ filterValue } />
+		<BlockPatternsTabs onInsert={ onInsert } filterValue={ filterValue } />
 	);
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
@@ -116,32 +119,24 @@ function InserterMenu( {
 			onKeyDown={ onKeyDown }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterSearchForm onChange={ setFilterValue } />
-				{ showPatterns && (
-					<TabPanel
-						className="block-editor-inserter__tabs"
-						tabs={ [
-							{
-								name: 'blocks',
-								/* translators: Blocks tab title in the block inserter. */
-								title: __( 'Blocks' ),
-							},
-							{
-								name: 'patterns',
-								/* translators: Patterns tab title in the block inserter. */
-								title: __( 'Patterns' ),
-							},
-						] }
-					>
-						{ ( tab ) => {
-							if ( tab.name === 'blocks' ) {
-								return blocksTab;
-							}
-							return patternsTab;
-						} }
-					</TabPanel>
-				) }
-				{ ! showPatterns && blocksTab }
+				{ /* the following div is necessary to fix the sticky position of the search form */ }
+				<div className="block-editor-inserter__content">
+					<InserterSearchForm
+						onChange={ setFilterValue }
+						value={ filterValue }
+					/>
+					{ showPatterns && (
+						<InserterTabs>
+							{ ( tab ) => {
+								if ( tab.name === 'blocks' ) {
+									return blocksTab;
+								}
+								return patternsTab;
+							} }
+						</InserterTabs>
+					) }
+					{ ! showPatterns && blocksTab }
+				</div>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<div className="block-editor-inserter__preview-container">

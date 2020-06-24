@@ -1,7 +1,7 @@
 {
 	"name": "core/post-comments-count",
 	"category": "design",
-	"context": [
+	"usesContext": [
 		"postId"
 	],
 	"supports": {

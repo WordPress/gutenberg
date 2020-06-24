@@ -13,27 +13,27 @@
 	},
 	{
 		"title": "Architecture",
-		"slug": "index",
-		"markdown_source": "../docs/architecture/index.md",
+		"slug": "architecture",
+		"markdown_source": "../docs/architecture/readme.md",
 		"parent": "principles"
 	},
 	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/architecture/modularity.md",
-		"parent": "index"
+		"parent": "architecture"
 	},
 	{
 		"title": "Performance",
 		"slug": "performance",
 		"markdown_source": "../docs/architecture/performance.md",
-		"parent": "index"
+		"parent": "architecture"
 	},
 	{
 		"title": "Automated Testing",
 		"slug": "automated-testing",
 		"markdown_source": "../docs/architecture/automated-testing.md",
-		"parent": "index"
+		"parent": "architecture"
 	},
 	{
 		"title": "Key Concepts",
@@ -1020,6 +1020,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ResizeTooltip",
+		"slug": "resize-tooltip",
+		"markdown_source": "../packages/components/src/resizable-box/resize-tooltip/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ResponsiveWrapper",
 		"slug": "responsive-wrapper",
 		"markdown_source": "../packages/components/src/responsive-wrapper/README.md",
@@ -1593,6 +1599,24 @@
 		"title": "@wordpress/project-management-automation",
 		"slug": "packages-project-management-automation",
 		"markdown_source": "../packages/project-management-automation/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-aztec",
+		"slug": "packages-react-native-aztec",
+		"markdown_source": "../packages/react-native-aztec/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-bridge",
+		"slug": "packages-react-native-bridge",
+		"markdown_source": "../packages/react-native-bridge/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-editor",
+		"slug": "packages-react-native-editor",
+		"markdown_source": "../packages/react-native-editor/README.md",
 		"parent": "packages"
 	},
 	{

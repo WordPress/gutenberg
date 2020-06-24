@@ -3,18 +3,18 @@
  */
 import React from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
+import { isEmpty, get, find, map } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-} from 'react-native-gutenberg-bridge';
-import { isEmpty, get, find, map } from 'lodash';
-
-/**
- * WordPress dependencies
- */
+} from '@wordpress/react-native-bridge';
 import {
 	CycleSelectControl,
 	Icon,
