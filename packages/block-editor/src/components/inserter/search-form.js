@@ -4,7 +4,7 @@
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden, Button } from '@wordpress/components';
-import { Icon, search, close } from '@wordpress/icons';
+import { Icon, search, closeSmall } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
 function InserterSearchForm( { onChange, value } ) {
@@ -37,7 +37,7 @@ function InserterSearchForm( { onChange, value } ) {
 			<div className="block-editor-inserter__search-icon">
 				{ !! value && (
 					<Button
-						icon={ close }
+						icon={ closeSmall }
 						label={ __( 'Reset search' ) }
 						onClick={ () => {
 							onChange( '' );

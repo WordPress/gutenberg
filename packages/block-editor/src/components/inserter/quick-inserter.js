@@ -147,6 +147,9 @@ function QuickInserter( {
 
 	// Announce search results on change
 	useEffect( () => {
+		if ( ! filterValue ) {
+			return;
+		}
 		const count = filteredBlockTypes.length + filteredBlockPatterns.length;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
