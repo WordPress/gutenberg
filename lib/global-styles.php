@@ -289,6 +289,18 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
 }
 
 /**
+ * Return the data for the global context.
+ *
+ * @return array
+ */
+function gutenberg_experimental_global_styles_get_global_context() {
+	return array(
+		'selector' => ':root',
+		'supports' => array( 'background-color', '--wp--style--color--link', 'font-size' ),
+	);
+}
+
+/**
  * Retrieves the block data (selector/supports).
  *
  * @return array
@@ -646,6 +658,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
 		// The CPT ID for entity retrieval/saving.
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
+		$settings['__experimentalGlobalStylesGlobalContext'] = gutenberg_experimental_global_styles_get_global_context();
 	}
 
 	// Add the styles for the editor via the settings

@@ -9,12 +9,13 @@ const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
 	getProperty: ( context, family, name, units ) => {},
 	setProperty: ( context, family, name, value, units ) => {},
+	globalContext: {},
 	/* eslint-enable no-unused-vars */
 } );
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
-export default ( { children, entityId } ) => {
+export default ( { children, entityId, globalContext } ) => {
 	const {
 		userStyles,
 		getProperty,
@@ -28,6 +29,7 @@ export default ( { children, entityId } ) => {
 			value={ {
 				getProperty,
 				setProperty,
+				globalContext,
 			} }
 		>
 			{ children }
@@ -117,11 +119,17 @@ const useGlobalStylesEffectToUpdateStylesheet = ( userStyles ) => {
 
 const getStylesFromTree = ( tree ) => {
 	const styles = [];
+
 	const getSelector = ( blockName ) => {
+		if ( 'global' === blockName ) {
+			return ''; // We use the .editor-styles-wrapper for this one
+		}
+
 		const {
 			name,
 			supports: { __experimentalSelector },
 		} = getBlockType( blockName );
+
 		let selector = '.wp-block-' + name.replace( 'core/', '' );
 		if (
 			__experimentalSelector &&
