@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.0.0-rc.0 (2020-06-24)
+
 ### Breaking Changes
 
 -   The bundled `stylelint` dependency has been updated from requiring `^9.10.1` to requiring `^13.6.0`.

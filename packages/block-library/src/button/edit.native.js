@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	View,
-	AccessibilityInfo,
-	Platform,
-	Clipboard,
-	Text,
-} from 'react-native';
+import { View, AccessibilityInfo, Platform, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -21,19 +15,15 @@ import {
 	withGradient,
 } from '@wordpress/block-editor';
 import {
-	TextControl,
-	ToggleControl,
 	PanelBody,
-	PanelActions,
 	RangeControl,
 	ToolbarGroup,
 	ToolbarButton,
-	BottomSheet,
+	LinkSettings,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { isURL, prependHTTP } from '@wordpress/url';
-import { link, external } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,40 +31,28 @@ import { link, external } from '@wordpress/icons';
 import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background';
-import LinkRelIcon from './link-rel';
 import ColorEdit from './color-edit';
 import getColorAndStyleProps from './color-props';
 
-const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
-const PREPEND_HTTP = 'http://';
 
 class ButtonEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.onChangeText = this.onChangeText.bind( this );
 		this.onChangeBorderRadius = this.onChangeBorderRadius.bind( this );
-		this.onChangeLinkRel = this.onChangeLinkRel.bind( this );
-		this.onChangeOpenInNewTab = this.onChangeOpenInNewTab.bind( this );
-		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.onSetMaxWidth = this.onSetMaxWidth.bind( this );
 		this.dismissSheet = this.dismissSheet.bind( this );
-		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
 		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.onRemove = this.onRemove.bind( this );
 		this.getPlaceholderWidth = this.getPlaceholderWidth.bind( this );
-
-		// `isEditingURL` property is used to prevent from automatically pasting
-		// URL from clipboard while trying to clear `Button URL` field and then
-		// manually adding specific link
-		this.isEditingURL = false;
 
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
@@ -89,13 +67,7 @@ class ButtonEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const {
-			selectedId,
-			setAttributes,
-			editorSidebarOpened,
-			attributes: { url },
-			parentWidth,
-		} = this.props;
+		const { selectedId, editorSidebarOpened, parentWidth } = this.props;
 		const { isLinkSheetVisible, isButtonFocused } = this.state;
 
 		if ( prevProps.selectedId !== selectedId ) {
@@ -104,16 +76,6 @@ class ButtonEdit extends Component {
 
 		if ( prevProps.parentWidth !== parentWidth ) {
 			this.onSetMaxWidth();
-		}
-
-		if (
-			( prevProps.editorSidebarOpened && ! editorSidebarOpened ) ||
-			( prevState.isLinkSheetVisible && ! isLinkSheetVisible )
-		) {
-			// Prepends "http://" to an url when closing link settings sheet and button settings sheet
-			setAttributes( { url: prependHTTP( url ) } );
-			// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
-			this.isEditingURL = false;
 		}
 
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
@@ -126,15 +88,6 @@ class ButtonEdit extends Component {
 				this.richTextRef.blur();
 				this.onToggleButtonFocus( false );
 			}
-		}
-
-		// Paste a URL from clipboard
-		if (
-			( isLinkSheetVisible || editorSidebarOpened ) &&
-			! url &&
-			! this.isEditingURL
-		) {
-			this.getURLFromClipboard();
 		}
 
 		if ( this.richTextRef ) {
@@ -157,21 +110,6 @@ class ButtonEdit extends Component {
 				} );
 			}
 		}
-	}
-
-	async getURLFromClipboard() {
-		const { setAttributes } = this.props;
-		const clipboardText = await Clipboard.getString();
-
-		if ( ! clipboardText ) {
-			return;
-		}
-		// Check if pasted text is URL
-		if ( ! isURL( clipboardText ) ) {
-			return;
-		}
-
-		setAttributes( { url: clipboardText } );
 	}
 
 	getBackgroundColor() {
@@ -215,36 +153,6 @@ class ButtonEdit extends Component {
 		} );
 	}
 
-	onChangeLinkRel( value ) {
-		const { setAttributes } = this.props;
-		setAttributes( { rel: value } );
-	}
-
-	onChangeURL( value ) {
-		this.isEditingURL = true;
-		const { setAttributes } = this.props;
-		setAttributes( { url: value } );
-	}
-
-	onChangeOpenInNewTab( value ) {
-		const { setAttributes, attributes } = this.props;
-		const { rel } = attributes;
-
-		const newLinkTarget = value ? '_blank' : undefined;
-
-		let updatedRel = rel;
-		if ( newLinkTarget && ! rel ) {
-			updatedRel = NEW_TAB_REL;
-		} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
-			updatedRel = undefined;
-		}
-
-		setAttributes( {
-			linkTarget: newLinkTarget,
-			rel: updatedRel,
-		} );
-	}
-
 	onShowLinkSettings() {
 		this.setState( { isLinkSheetVisible: true } );
 	}
@@ -266,7 +174,7 @@ class ButtonEdit extends Component {
 			linkTarget: '',
 		} );
 
-		this.setState( { isLinkSheetVisible: false } );
+		this.onHideLinkSettings();
 	}
 
 	onLayout( { nativeEvent } ) {
@@ -302,48 +210,47 @@ class ButtonEdit extends Component {
 	}
 
 	dismissSheet() {
-		this.setState( {
-			isLinkSheetVisible: false,
-		} );
+		this.onHideLinkSettings();
 		this.props.closeSettingsBottomSheet();
 	}
 
-	getLinkSettings( url, rel, linkTarget, isCompatibleWithSettings ) {
+	getLinkSettings( isCompatibleWithSettings ) {
+		const { isLinkSheetVisible } = this.state;
+		const { attributes, setAttributes } = this.props;
+		const actions = [
+			{
+				label: __( 'Remove link' ),
+				onPress: this.onClearSettings,
+			},
+		];
+
+		const options = {
+			url: {
+				label: __( 'Button Link URL' ),
+				placeholder: __( 'Add URL' ),
+				autoFocus: ! isCompatibleWithSettings,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: __( 'None' ),
+			},
+		};
+
 		return (
-			<>
-				<TextControl
-					icon={ ! isCompatibleWithSettings && link }
-					label={ __( 'Button Link URL' ) }
-					value={ url || '' }
-					valuePlaceholder={ __( 'Add URL' ) }
-					onChange={ this.onChangeURL }
-					onSubmit={ this.dismissSheet }
-					autoCapitalize="none"
-					autoCorrect={ false }
-					// eslint-disable-next-line jsx-a11y/no-autofocus
-					autoFocus={
-						! isCompatibleWithSettings && Platform.OS === 'ios'
-					}
-					keyboardType="url"
-				/>
-				<ToggleControl
-					icon={ ! isCompatibleWithSettings && external }
-					label={ __( 'Open in new tab' ) }
-					checked={ linkTarget === '_blank' }
-					onChange={ this.onChangeOpenInNewTab }
-				/>
-				<TextControl
-					icon={ ! isCompatibleWithSettings && LinkRelIcon }
-					label={ __( 'Link Rel' ) }
-					value={ rel || '' }
-					valuePlaceholder={ __( 'None' ) }
-					onChange={ this.onChangeLinkRel }
-					onSubmit={ this.dismissSheet }
-					autoCapitalize="none"
-					autoCorrect={ false }
-					keyboardType="url"
-				/>
-			</>
+			<LinkSettings
+				isVisible={ isLinkSheetVisible }
+				attributes={ attributes }
+				onClose={ this.dismissSheet }
+				setAttributes={ setAttributes }
+				withBottomSheet={ ! isCompatibleWithSettings }
+				actions={ actions }
+				options={ options }
+				showIcon={ ! isCompatibleWithSettings }
+			/>
 		);
 	}
 
@@ -385,20 +292,8 @@ class ButtonEdit extends Component {
 			mergeBlocks,
 			parentWidth,
 		} = this.props;
-		const {
-			placeholder,
-			text,
-			borderRadius,
-			url,
-			linkTarget,
-			rel,
-		} = attributes;
-		const {
-			maxWidth,
-			isLinkSheetVisible,
-			isButtonFocused,
-			placeholderTextWidth,
-		} = this.state;
+		const { placeholder, text, borderRadius, url } = attributes;
+		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
 		if ( parentWidth === 0 ) {
@@ -430,13 +325,6 @@ class ButtonEdit extends Component {
 
 		const backgroundColor = this.getBackgroundColor();
 		const textColor = this.getTextColor();
-
-		const actions = [
-			{
-				label: __( 'Remove link' ),
-				onPress: this.onClearSettings,
-			},
-		];
 
 		return (
 			<View onLayout={ this.onLayout }>
@@ -500,22 +388,13 @@ class ButtonEdit extends Component {
 								title={ __( 'Edit link' ) }
 								icon={ link }
 								onClick={ this.onShowLinkSettings }
-								isActive={ url && url !== PREPEND_HTTP }
+								isActive={ url }
 							/>
 						</ToolbarGroup>
 					</BlockControls>
 				) }
 
-				<BottomSheet
-					isVisible={ isLinkSheetVisible }
-					onClose={ this.onHideLinkSettings }
-					hideHeader
-				>
-					<PanelBody style={ styles.linkSettingsPanel }>
-						{ this.getLinkSettings( url, rel, linkTarget ) }
-					</PanelBody>
-					<PanelActions actions={ actions } />
-				</BottomSheet>
+				{ this.getLinkSettings( false ) }
 
 				<ColorEdit { ...this.props } />
 				<InspectorControls>
@@ -529,7 +408,7 @@ class ButtonEdit extends Component {
 						/>
 					</PanelBody>
 					<PanelBody title={ __( 'Link Settings' ) }>
-						{ this.getLinkSettings( url, rel, linkTarget, true ) }
+						{ this.getLinkSettings( true ) }
 					</PanelBody>
 				</InspectorControls>
 			</View>

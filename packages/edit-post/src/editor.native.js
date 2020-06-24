@@ -3,7 +3,6 @@
  */
 import memize from 'memize';
 import { size, map, without } from 'lodash';
-import { subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 import { I18nManager } from 'react-native';
 
 /**
@@ -14,6 +13,7 @@ import { EditorProvider } from '@wordpress/editor';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
 import {
 	SlotFillProvider,
 	SiteCapabilitiesContext,
@@ -112,6 +112,7 @@ class Editor extends Component {
 			hiddenBlockTypes,
 			blockTypes,
 			post,
+			postId,
 			postType,
 			colors,
 			gradients,
@@ -129,9 +130,9 @@ class Editor extends Component {
 		);
 
 		const normalizedPost = post || {
-			id: 1,
+			id: postId,
 			title: {
-				raw: props.initialTitle,
+				raw: props.initialTitle || '',
 			},
 			content: {
 				// make sure the post content is in sync with gutenberg store
