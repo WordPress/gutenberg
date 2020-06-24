@@ -20,7 +20,6 @@
 	align-items: center;
 	position: relative;
 	margin: 0;
-	padding: $grid-unit-10;
 
 	.wp-block-navigation__container:empty {
 		display: none;
@@ -32,7 +31,6 @@
 	$navigation-vertical-padding: $grid-unit-10 * 0.75;
 	.wp-block-navigation__container {
 		border: $border-width solid rgba(0, 0, 0, 0.15);
-		padding: $navigation-vertical-padding 0;
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
@@ -60,8 +58,8 @@
 
 			// Nested submenus sit to the left on large breakpoints
 			.wp-block-navigation__container {
-				left: calc(100% + #{$grid-unit-10});
-				top: -$border-width - $navigation-vertical-padding;
+				left: 100%;
+				top: -1px;
 
 				// Prevent the menu from disappearing when the mouse is over the gap
 				&::before {
@@ -108,8 +106,11 @@
 // All links
 .wp-block-navigation-link__content {
 	text-decoration: none;
-	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+	padding: $grid-unit-10 $grid-unit-10 * 2;
 
+	+ .wp-block-navigation-link__content {
+		padding-top: 0;
+	}
 	.has-text-color & {
 		color: inherit;
 	}

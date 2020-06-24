@@ -49,7 +49,9 @@ add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
 
 ## Default block styles
 
-Core blocks include default styles. The styles are enqueued for editing but are not enqueued for viewing unless the theme opts-in to the core styles. If you'd like to use default styles in your theme, add theme support for `wp-block-styles`:
+Core blocks include default structural styles. These are loaded in both the editor and the front end by default. An example of these styles is the CSS that powers the columns block. Without these rules, the block would result in a broken layout containing no columns at all.
+
+The block editor allows themes to opt-in to slightly more opinionated styles for the front end. An example of these styles is the default color bar to the left of blockquotes. If you'd like to use these opinionated styles in your theme, add theme support for `wp-block-styles`:
 
 ```php
 add_theme_support( 'wp-block-styles' );
@@ -352,4 +354,20 @@ To make the content resize and keep its aspect ratio, the `<body>` element needs
 
 ```php
 add_theme_support( 'responsive-embeds' );
+```
+
+## Experimental — Cover block padding
+
+In the Guteberg plugin 8.3, Cover blocks can provide padding controls in the editor for users. This is not avaialble by default, and requires the theme to opt in by declaring support:
+
+```php
+add_theme_support('experimental-custom-spacing');
+```
+
+## Experimental — Link color control
+
+In the Guteberg plugin 8.3, link color control is available to the Paragraph, Heading, Group, Columns, and Media & Text blocks. This is not avaialble by default, and requires the theme to opt in by declaring support:
+
+```php
+add_theme_support('experimental-link-color');
 ```

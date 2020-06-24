@@ -9,6 +9,7 @@ import {
 	setUpResponseMocking,
 	clickBlockToolbarButton,
 	pressKeyWithModifier,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -427,8 +428,7 @@ describe( 'Navigation', () => {
 			type: 'url',
 		} );
 
-		// Move the mouse to reveal the block movers. Without this the test seems to fail.
-		await page.mouse.move( 100, 100 );
+		await showBlockToolbar();
 
 		// Add another Link block.
 		// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,

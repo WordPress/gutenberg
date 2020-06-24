@@ -35,6 +35,7 @@ export function InserterBlockList( {
 	onHover,
 	filterValue,
 	debouncedSpeak,
+	showMostUsedBlocks,
 } ) {
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
@@ -130,15 +131,18 @@ export function InserterBlockList( {
 				</ChildBlocks>
 			) }
 
-			{ ! hasChildItems && !! suggestedItems.length && ! filterValue && (
-				<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
-					<BlockTypesList
-						items={ suggestedItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-					/>
-				</InserterPanel>
-			) }
+			{ showMostUsedBlocks &&
+				! hasChildItems &&
+				!! suggestedItems.length &&
+				! filterValue && (
+					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+						<BlockTypesList
+							items={ suggestedItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+						/>
+					</InserterPanel>
+				) }
 
 			{ ! hasChildItems &&
 				map( categories, ( category ) => {

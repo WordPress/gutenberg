@@ -94,7 +94,7 @@ export default compose( [
 		const downloadableItems = hasPermission
 			? getDownloadableBlocks( filterValue )
 			: [];
-		const isLoading = isRequestingDownloadableBlocks();
+		const isLoading = isRequestingDownloadableBlocks( filterValue );
 
 		return {
 			downloadableItems,

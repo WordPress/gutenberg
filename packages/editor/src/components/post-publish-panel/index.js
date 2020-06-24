@@ -17,7 +17,7 @@ import {
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { close } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -96,7 +96,7 @@ export class PostPublishPanel extends Component {
 					) }
 					<Button
 						onClick={ onClose }
-						icon={ close }
+						icon={ closeSmall }
 						label={ __( 'Close panel' ) }
 					/>
 				</div>
