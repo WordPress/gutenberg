@@ -59,8 +59,11 @@ export default class ClassicEdit extends Component {
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
 		const currentContent = editor.getContent();
-		
-		if ( prevProps.attributes.content !== content && currentContent !== content ) {
+
+		if (
+			prevProps.attributes.content !== content &&
+			currentContent !== content
+		) {
 			editor.setContent( content || '' );
 		}
 	}
