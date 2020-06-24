@@ -29,6 +29,9 @@ module.exports = async (
 		licenseURI,
 		version,
 		wpScripts,
+		editorScript,
+		editorStyle,
+		style,
 	}
 ) => {
 	slug = slug.toLowerCase();
@@ -52,6 +55,9 @@ module.exports = async (
 		license,
 		licenseURI,
 		textdomain: namespace,
+		editorScript,
+		editorStyle,
+		style,
 	};
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
@@ -68,7 +74,7 @@ module.exports = async (
 		} )
 	);
 
-	await initBlockJSON( blockTemplate, view );
+	await initBlockJSON( view );
 	await initPackageJSON( view );
 
 	if ( wpScripts ) {
