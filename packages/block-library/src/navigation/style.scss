@@ -59,7 +59,7 @@
 			// Nested submenus sit to the left on large breakpoints
 			.wp-block-navigation__container {
 				left: 100%;
-				top: 0;
+				top: -1px;
 
 				// Prevent the menu from disappearing when the mouse is over the gap
 				&::before {
