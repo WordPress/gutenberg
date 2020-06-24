@@ -178,6 +178,49 @@
 	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
 		box-shadow: 0 0 0 1px $light-gray-ui;
 	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		outline: $border-width-focus solid transparent;
+	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
+
+		&::before {
+			content: "";
+			position: absolute;
+			z-index: 0;
+			pointer-events: none;
+			transition:
+				border-color 0.1s linear,
+				border-style 0.1s linear,
+				box-shadow 0.1s linear;
+			right: 0;
+			left: 0;
+			top: -$default-block-margin / 2;
+			border-radius: $radius-block-ui;
+			border-top: 4px solid $light-gray-secondary;
+		}
+
+		&::after {
+			content: none;
+		}
+	}
+
+	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
+		&::before {
+			border-color: var(--wp-admin-theme-color);
+		}
+	}
+}
+
+
+.is-block-moving-mode.block-editor-block-list__block-selection-button {
+	// Should be invisible but not unfocusable.
+	opacity: 0;
+	font-size: 1px;
+	height: 1px;
+	padding: 0;
 }
 
 /**
@@ -693,32 +736,4 @@
 
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
-}
-
-
-// Add side padding for the canvas, currently edit-post-visual-editor.
-// The purpose of this padding is to ensure that on small viewports, there is
-// room for the block border that sits 14px ($block-padding) offset from the
-// block footprint.
-// These paddings and margins are removed from the BlockPreview component's style
-// Any change need to be reflected there.
-.block-editor-block-list__layout.is-root-container {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-side-ui-width;
-		padding-right: $block-side-ui-width;
-	}
-
-	// Full-wide. (to account for the paddings added above)
-	> .wp-block[data-align="full"] {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
-
-		@include break-small() {
-			margin-left: -$block-side-ui-width;
-			margin-right: -$block-side-ui-width;
-		}
-	}
 }

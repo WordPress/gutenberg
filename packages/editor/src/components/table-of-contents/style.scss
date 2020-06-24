@@ -8,7 +8,9 @@
 
 .table-of-contents__popover {
 	.components-popover__content {
-		padding: $grid-unit-20;
+		> div {
+			padding: $grid-unit-20;
+		}
 
 		@include break-small {
 			max-height: calc(100vh - 120px);

@@ -7,16 +7,22 @@
 }
 
 .components-tooltip .components-popover__content {
-	padding: $grid-unit-05 $grid-unit-10;
 	background: $dark-gray-primary;
 	border-radius: $radius-block-ui;
 	border-width: 0;
 	color: $white;
 	white-space: nowrap;
 	text-align: center;
+	line-height: 1.4;
+	font-size: 12px;
+	box-shadow: none;
 
 	// This prevents quickly hovering the tooltip from blocking hovering something else.
 	pointer-events: none;
+
+	> div {
+		padding: $grid-unit-05 $grid-unit-10;
+	}
 }
 
 .components-tooltip__shortcut {

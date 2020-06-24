@@ -14,7 +14,11 @@ import { hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
  */
 import { useNotifyCopy } from '../copy-handler';
 
-export default function BlockActions( { clientIds, children } ) {
+export default function BlockActions( {
+	clientIds,
+	children,
+	__experimentalUpdateSelection: updateSelection,
+} ) {
 	const {
 		canInsertBlockType,
 		getBlockRootClientId,
@@ -48,6 +52,8 @@ export default function BlockActions( { clientIds, children } ) {
 		insertAfterBlock,
 		insertBeforeBlock,
 		flashBlock,
+		setBlockMovingClientId,
+		setNavigationMode,
 	} = useDispatch( 'core/block-editor' );
 
 	const notifyCopy = useNotifyCopy();
@@ -59,16 +65,20 @@ export default function BlockActions( { clientIds, children } ) {
 		rootClientId,
 		blocks,
 		onDuplicate() {
-			return duplicateBlocks( clientIds );
+			return duplicateBlocks( clientIds, updateSelection );
 		},
 		onRemove() {
-			removeBlocks( clientIds );
+			return removeBlocks( clientIds, updateSelection );
 		},
 		onInsertBefore() {
 			insertBeforeBlock( first( castArray( clientIds ) ) );
 		},
 		onInsertAfter() {
 			insertAfterBlock( last( castArray( clientIds ) ) );
+		},
+		onMoveTo() {
+			setNavigationMode( true );
+			setBlockMovingClientId( clientIds[ 0 ] );
 		},
 		onGroup() {
 			if ( ! blocks.length ) {

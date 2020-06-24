@@ -6,24 +6,6 @@ $toggle-border-width: 2px;
 	position: relative;
 	display: inline-block;
 
-	// On/Off icon indicators.
-	.components-form-toggle__on,
-	.components-form-toggle__off {
-		position: absolute;
-		top: $toggle-border-width * 3;
-		box-sizing: border-box;
-	}
-
-	.components-form-toggle__off {
-		color: $dark-gray-300;
-		fill: currentColor;
-		right: $toggle-border-width * 3;
-	}
-
-	.components-form-toggle__on {
-		left: $toggle-border-width * 3 + 2px; // Indent 2px extra because icon is thinner.
-	}
-
 	// Unchecked state.
 	.components-form-toggle__track {
 		content: "";
@@ -90,11 +72,6 @@ $toggle-border-width: 2px;
 			border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
 			transform: translateX($toggle-width - ($toggle-border-width * 4) - ($toggle-height - ($toggle-border-width * 4)));
 		}
-
-		&::before {
-			background-color: var(--wp-admin-theme-color);
-			border: $toggle-border-width solid var(--wp-admin-theme-color);
-		}
 	}
 
 	// Disabled state:
@@ -124,25 +101,5 @@ $toggle-border-width: 2px;
 	// Don't show custom checkbox checkmark.
 	&::before {
 		content: "";
-	}
-}
-
-// Ensure on indicator works in normal and Windows high contrast mode both.
-.components-form-toggle .components-form-toggle__on {
-	// Outlines show up in windows high contrast mode.
-	outline: $border-width solid transparent;
-	outline-offset: -1px;
-
-	// This colors the indicator black, then inverts it for normal mode.
-	border: $border-width solid $black;
-	filter: invert(100%) contrast(500%); // This makes the icon white for normal mode, and it makes it dark blue in Windows High Contrast Mode.
-}
-
-@supports (-ms-high-contrast-adjust: auto) {
-	// Edge stacks outlines on top of the SVG itself, and when showing them in high contrast mode it means they get inverted again.
-	// Therefore, show a different style for the on indicator only in Edge and IE11.
-	.components-form-toggle .components-form-toggle__on {
-		filter: none;
-		border: $border-width solid $white;
 	}
 }

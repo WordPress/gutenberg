@@ -21,8 +21,8 @@
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
-	padding-left: $panel-padding / 2;
-	padding-right: $panel-padding / 2;
+	padding-left: $grid-unit-20 / 2;
+	padding-right: $grid-unit-20 / 2;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -76,5 +76,5 @@
 }
 
 .columnPadding {
-	padding: $panel-padding;
+	padding: $grid-unit-20;
 }
