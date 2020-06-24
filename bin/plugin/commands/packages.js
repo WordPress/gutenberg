@@ -219,7 +219,7 @@ async function updatePackages(
 				const newPackageJson = {
 					...packageJson,
 					version: isPrerelease
-						? '-prerelease' + nextVersion
+						? nextVersion + '-prerelease'
 						: nextVersion,
 				};
 				fs.writeFileSync(
