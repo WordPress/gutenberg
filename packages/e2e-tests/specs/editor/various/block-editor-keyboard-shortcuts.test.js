@@ -3,23 +3,19 @@
  */
 import {
 	createNewPost,
-	getAllBlocks,
-	multiSelectBlocksByIds,
-	multiSelectBlocksByRange,
-	insertBlock,
+	clickBlockAppender,
+	getEditedPostContent,
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-const createTestParagraphBlocks = async ( paragraphBlocks ) => {
-	const paragraph = 'Paragraph';
-	for ( const paragraphBlock of paragraphBlocks ) {
-		await insertBlock( paragraph );
-		await page.keyboard.type( `${ paragraphBlock } ${ paragraph }` );
-	}
+const createTestParagraphBlocks = async () => {
+	await clickBlockAppender();
+	await page.keyboard.type( 'First paragraph' );
+	await page.keyboard.press( 'Enter' );
+	await page.keyboard.type( 'Second paragraph' );
+	await page.keyboard.press( 'Enter' );
+	await page.keyboard.type( 'Third paragraph' );
 };
-
-const getBlocksInfo = async () =>
-	( await getAllBlocks() ).map( ( { clientId } ) => clientId );
 
 describe( 'block editor keyboard shortcuts', () => {
 	beforeEach( async () => {
@@ -29,55 +25,44 @@ describe( 'block editor keyboard shortcuts', () => {
 	describe( 'move blocks', () => {
 		const moveUp = async () => pressKeyWithModifier( 'secondary', 't' );
 		const moveDown = async () => pressKeyWithModifier( 'secondary', 'y' );
-		const paragraphBlocks = [ 'First', 'Second', 'Third' ];
+		const multiSelectBlocks = async () => {
+			await page.keyboard.down( 'Shift' );
+			await page.keyboard.press( 'ArrowUp' );
+			await page.keyboard.up( 'Shift' );
+		};
 		describe( 'single block selected', () => {
 			it( 'should move the block up', async () => {
-				await createTestParagraphBlocks( paragraphBlocks );
-				const [ , , third ] = await getBlocksInfo();
-				await page.focus( `.wp-block[data-block="${ third }"]` ); // Select second block
+				await createTestParagraphBlocks();
+				expect( await getEditedPostContent() ).toMatchSnapshot();
 				await Promise.all( [ moveUp(), moveUp() ] ); // press twice
-				const [ first ] = await getBlocksInfo();
-				expect( third ).toBe( first );
+				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
 
 			it( 'should move the block down', async () => {
-				await createTestParagraphBlocks( paragraphBlocks );
-				const [ first ] = await getBlocksInfo();
-				await page.focus( `.wp-block[data-block="${ first }"]` ); // Select first block
+				await createTestParagraphBlocks();
+				expect( await getEditedPostContent() ).toMatchSnapshot();
+				await page.keyboard.press( 'ArrowUp' );
 				await moveDown();
-				const [ , second ] = await getBlocksInfo();
-				expect( second ).toBe( first );
+				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
 		} );
 
 		describe( 'multiple blocks selected', () => {
 			it( 'should move the blocks up', async () => {
-				await createTestParagraphBlocks( paragraphBlocks );
-				const [ , secondBefore, thirdBefore ] = await getBlocksInfo();
-				await multiSelectBlocksByRange( 2, 2 ); // from second block select 2 blocks ( 2, 3 )
+				await createTestParagraphBlocks();
+				expect( await getEditedPostContent() ).toMatchSnapshot();
+				await multiSelectBlocks();
 				await moveUp();
-				const [ firstAfter, secondAfter ] = await getBlocksInfo();
-				expect( firstAfter ).toBe( secondBefore );
-				expect( secondAfter ).toBe( thirdBefore );
+				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
 
 			it( 'should move the blocks down', async () => {
-				await createTestParagraphBlocks( paragraphBlocks );
-				const [
-					firstBefore,
-					secondBefore,
-					thirdBefore,
-				] = await getBlocksInfo();
-				await multiSelectBlocksByIds( firstBefore, secondBefore );
+				await createTestParagraphBlocks();
+				expect( await getEditedPostContent() ).toMatchSnapshot();
+				await page.keyboard.press( 'ArrowUp' );
+				await multiSelectBlocks();
 				await moveDown();
-				const [
-					firstAfter,
-					secondAfter,
-					thirdAfter,
-				] = await getBlocksInfo();
-				expect( firstAfter ).toBe( thirdBefore );
-				expect( secondAfter ).toBe( firstBefore );
-				expect( thirdAfter ).toBe( secondBefore );
+				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
 		} );
 	} );
