@@ -317,26 +317,13 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 	$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
 
-	// Return early if nothing is supported.
-	if ( 0 === count( $supports ) ) {
+	$attributes = array();
+	$attributes = gutenberg_experimental_build_css_colors( $attributes, $block['attrs'], $supports );
+	$attributes = gutenberg_experimental_build_css_typography( $attributes, $block['attrs'], $supports );
+
+	if ( ! count( $attributes ) ) {
 		return $block_content;
 	}
-
-	$colors     = gutenberg_experimental_build_css_colors( $block['attrs'], $supports );
-	$typography = gutenberg_experimental_build_css_typography( $block['attrs'], $supports );
-
-	$extra_classes = array_merge(
-		$colors['css_classes'],
-		$typography['css_classes'],
-		isset( $block['attrs']['className'] ) ? array( $block['attrs']['className'] ) : array(),
-		isset( $block['attrs']['align'] ) ? array( 'has-text-align-' . $block['attrs']['align'] ) : array()
-	);
-	$extra_styles  = (
-		$colors['inline_styles'] ||
-		$typography['inline_styles']
-	) ? esc_attr( $colors['inline_styles'] ) .
-		esc_attr( $typography['inline_styles'] )
-	: '';
 
 	$dom = new DOMDocument( '1.0', 'utf-8' );
 
@@ -361,8 +348,8 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 	};
 
 	// Merge and dedupe new and existing classes and styles.
-	$new_classes = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . implode( ' ', $extra_classes ) ) ) );
-	$new_styles  = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . $extra_styles ) ) );
+	$new_classes = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . implode( ' ', array_key_exists( 'css_classes', $attributes ) ? $attributes['css_classes'] : array() ) ) ) );
+	$new_styles  = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . esc_attr( implode( ' ', array_key_exists( 'inline_styles', $attributes ) ? $attributes['inline_styles'] : array() ) ) ) ) );
 
 	// Apply new styles and classes.
 	if ( ! empty( $new_classes ) ) {
@@ -381,124 +368,115 @@ add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles'
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the block markup in the front-end.
  *
- * @param  array $attributes block attributes.
+ * @param  array $attributes comprehensive list of attributes to be applied.
+ * @param  array $block_attributes block attributes.
  * @param  array $supports style features the block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function gutenberg_experimental_build_css_colors( $attributes, $supports ) {
-	$color_settings = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
+function gutenberg_experimental_build_css_colors( $attributes, $block_attributes, $supports ) {
 	// Text Colors.
 	// Check support for text colors.
 	if ( in_array( 'color', $supports, true ) ) {
-		$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-		$has_custom_text_color = isset( $attributes['style']['color']['text'] );
+		$has_named_text_color  = array_key_exists( 'textColor', $block_attributes );
+		$has_custom_text_color = isset( $block_attributes['style']['color']['text'] );
 
 		// Apply required generic class.
 		if ( $has_custom_text_color || $has_named_text_color ) {
-			$color_settings['css_classes'][] = 'has-text-color';
+			$attributes['css_classes'][] = 'has-text-color';
 		}
 		// Apply color class or inline style.
 		if ( $has_named_text_color ) {
-			$color_settings['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
+			$attributes['css_classes'][] = sprintf( 'has-%s-color', $block_attributes['textColor'] );
 		} elseif ( $has_custom_text_color ) {
-			$color_settings['inline_styles'] .= sprintf( 'color: %s;', $attributes['style']['color']['text'] );
+			$attributes['inline_styles'][] = sprintf( 'color: %s;', $block_attributes['style']['color']['text'] );
 		}
 	}
 
 	// Link Colors.
 	if ( in_array( 'link-color', $supports, true ) ) {
-		$has_link_color = isset( $attributes['style']['color']['link'] );
+		$has_link_color = isset( $block_attributes['style']['color']['link'] );
 		// Apply required class and style.
 		if ( $has_link_color ) {
-			$color_settings['css_classes'][] = 'has-link-color';
+			$attributes['css_classes'][] = 'has-link-color';
 			// If link is a named color.
-			if ( strpos( $attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
+			if ( strpos( $block_attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
 				// Get the name from the string and add proper styles.
-				$index_to_splice                  = strrpos( $attributes['style']['color']['link'], '|' ) + 1;
-				$link_color_name                  = substr( $attributes['style']['color']['link'], $index_to_splice );
-				$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
+				$index_to_splice               = strrpos( $block_attributes['style']['color']['link'], '|' ) + 1;
+				$link_color_name               = substr( $block_attributes['style']['color']['link'], $index_to_splice );
+				$attributes['inline_styles'][] = sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
 			} else {
-				$color_settings['inline_styles'] .= sprintf( '--wp--style--color--link: %s;', $attributes['style']['color']['link'] );
+				$attributes['inline_styles'][] = sprintf( '--wp--style--color--link: %s;', $block_attributes['style']['color']['link'] );
 			}
 		}
 	}
 
 	// Background Colors.
 	if ( in_array( 'background-color', $supports, true ) ) {
-		$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-		$has_custom_background_color = isset( $attributes['style']['color']['background'] );
+		$has_named_background_color  = array_key_exists( 'backgroundColor', $block_attributes );
+		$has_custom_background_color = isset( $block_attributes['style']['color']['background'] );
 
 		// Apply required background class.
 		if ( $has_custom_background_color || $has_named_background_color ) {
-			$color_settings['css_classes'][] = 'has-background';
+			$attributes['css_classes'][] = 'has-background';
 		}
 		// Apply background color classes or styles.
 		if ( $has_named_background_color ) {
-			$color_settings['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
+			$attributes['css_classes'][] = sprintf( 'has-%s-background-color', $block_attributes['backgroundColor'] );
 		} elseif ( $has_custom_background_color ) {
-			$color_settings['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
+			$attributes['inline_styles'][] = sprintf( 'background-color: %s;', $block_attributes['style']['color']['background'] );
 		}
 	}
 
 	// Gradients.
 	if ( in_array( 'background', $supports, true ) ) {
-		$has_named_gradient  = array_key_exists( 'gradient', $attributes );
-		$has_custom_gradient = isset( $attributes['style']['color']['gradient'] );
+		$has_named_gradient  = array_key_exists( 'gradient', $block_attributes );
+		$has_custom_gradient = isset( $block_attributes['style']['color']['gradient'] );
 
 		if ( $has_named_gradient || $has_custom_gradient ) {
-			$color_settings['css_classes'][] = 'has-background';
+			$attributes['css_classes'][] = 'has-background';
 		}
 		// Apply required background class.
 		if ( $has_named_gradient ) {
-			$color_settings['css_classes'][] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
+			$attributes['css_classes'][] = sprintf( 'has-%s-gradient-background', $block_attributes['gradient'] );
 		} elseif ( $has_custom_gradient ) {
-			$color_settings['inline_styles'] .= sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
+			$attributes['inline_styles'][] = sprintf( 'background: %s;', $block_attributes['style']['color']['gradient'] );
 		}
 	}
 
-	return $color_settings;
+	return $attributes;
 }
 
 /**
  * Build an array with CSS classes and inline styles defining the font sizes
  * which will be applied to the block markup in the front-end.
  *
- * @param  array $attributes block attributes.
+ * @param  array $attributes comprehensive list of attributes to be applied.
+ * @param  array $block_attributes block attributes.
  * @param  array $supports style features the block attributes.
  * @return array Font size CSS classes and inline styles.
  */
-function gutenberg_experimental_build_css_typography( $attributes, $supports ) {
-	// CSS classes.
-	$typography = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
+function gutenberg_experimental_build_css_typography( $attributes, $block_attributes, $supports ) {
 	// Font Size.
 	if ( in_array( 'font-size', $supports, true ) ) {
-		$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
-		$has_custom_font_size = isset( $attributes['style']['typography']['fontSize'] );
+		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
+		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
 
 		// Apply required class or style.
 		if ( $has_named_font_size ) {
-			$typography['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
+			$attributes['css_classes'][] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
 		} elseif ( $has_custom_font_size ) {
-			$typography['inline_styles'] .= sprintf( 'font-size: %spx;', $attributes['style']['typography']['fontSize'] );
+			$attributes['inline_styles'][] = sprintf( 'font-size: %spx;', $block_attributes['style']['typography']['fontSize'] );
 		}
 	}
 
 	// Line Height.
 	if ( in_array( 'line-height', $supports, true ) ) {
-		$has_line_height = isset( $attributes['style']['typography']['lineHeight'] );
+		$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
 		// Add the style (no classes for line-height).
 		if ( $has_line_height ) {
-			$typography['inline_styles'] .= sprintf( 'line-height: %s;', $attributes['style']['typography']['lineHeight'] );
+			$attributes['inline_styles'][] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
 		}
 	}
 
-	return $typography;
+	return $attributes;
 }
