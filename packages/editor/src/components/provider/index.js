@@ -121,7 +121,6 @@ class EditorProvider extends Component {
 				'__experimentalEnableLinkColor',
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',
-				'__experimentalEnableRichImageEditing',
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',

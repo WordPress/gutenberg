@@ -14,11 +14,11 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
-import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
+import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 

@@ -17,7 +17,7 @@ import {
 	userEvents,
 	requestStarterPageTemplatesTooltipShown,
 	setStarterPageTemplatesTooltipShown,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 import { Animated, Dimensions, Keyboard } from 'react-native';
 
 /**

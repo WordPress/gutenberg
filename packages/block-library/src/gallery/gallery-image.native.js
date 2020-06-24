@@ -9,15 +9,15 @@ import {
 	Text,
 	TouchableWithoutFeedback,
 } from 'react-native';
-import {
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
 import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';

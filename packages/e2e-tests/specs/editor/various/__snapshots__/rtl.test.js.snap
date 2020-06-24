@@ -8,11 +8,11 @@ exports[`RTL should arrow navigate 1`] = `
 
 exports[`RTL should arrow navigate between blocks 1`] = `
 "<!-- wp:paragraph -->
-<p>٠<br>١</p>
+<p>٠</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>٠<br>١<br>٢</p>
+<p><br>١١٠<br><br>٢</p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -24,7 +24,11 @@ exports[`RTL should merge backward 1`] = `
 
 exports[`RTL should merge forward 1`] = `
 "<!-- wp:paragraph -->
-<p>٠١</p>
+<p>٠</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
 <!-- /wp:paragraph -->"
 `;
 

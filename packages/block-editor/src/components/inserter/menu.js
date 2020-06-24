@@ -31,6 +31,7 @@ function InserterMenu( {
 	__experimentalSelectBlockOnInsert,
 	onSelect,
 	showInserterHelpPanel,
+	showMostUsedBlocks,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -86,6 +87,7 @@ function InserterMenu( {
 					onInsert={ onInsert }
 					onHover={ onHover }
 					filterValue={ filterValue }
+					showMostUsedBlocks={ showMostUsedBlocks }
 				/>
 			</div>
 			{ showInserterHelpPanel && (
