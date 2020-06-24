@@ -65,7 +65,7 @@ export function PanelBody(
 		}
 
 		onToggle( disclosure.visible );
-	}, [ disclosure.visible, onToggle, scrollBehavior ] );
+	}, [ disclosure.visible, scrollBehavior ] );
 
 	useUpdateEffect( () => {
 		disclosure.setVisible( opened );
