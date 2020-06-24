@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.6.0-rc.1 (2020-06-24)
+
 ### Bug Fixes
 
 -   `wp-env destroy` now removes dangling docker volumes and networks associated with the WordPress environment.
