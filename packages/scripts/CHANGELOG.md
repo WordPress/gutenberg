@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 12.0.0-rc.1 (2020-06-24)
+## 12.0.0-rc.0 (2020-06-24)
 
 ### Breaking Changes
 
