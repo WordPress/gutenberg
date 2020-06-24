@@ -749,9 +749,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
 				// Note: sanitization implemented in self::prepare_item_for_database().
-				'sanitize_callback' => null,
+//				'sanitize_callback' => null,
 				// Note: validation implemented in self::prepare_item_for_database().
-				'validate_callback' => null,
+//				'validate_callback' => null,
 			),
 			'properties'  => array(
 				'raw'      => array(
