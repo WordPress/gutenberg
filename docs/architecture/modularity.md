@@ -2,9 +2,9 @@
 
 The WordPress block editor is based around the idea that you can combine independent blocks together to write your post or build your page. Blocks can also use and interact with each other. This makes it very modular and flexible.
 
-But the Block Editor does not embrace modularity for its behavior and output only, the Gutenberg repository is also built from the ground up as several reusable and independent modules or packages, that, combined together lead to the application and interface we all now. These modules are known as [WordPress packages](https://www.npmjs.com/org/wordpress) and are published and updated regularly on the npm package repository.
+But the Block Editor does not embrace modularity for its behavior and output only. The Gutenberg repository is also built from the ground up as several reusable and independent modules or packages, that, combined together, lead to the application and interface we all know. These modules are known as [WordPress packages](https://www.npmjs.com/org/wordpress) and are published and updated regularly on the npm package repository.
 
-These packages are used to power the Block Editor but they  can be used to power any page in the WordPress Admin or outside.
+These packages are used to power the Block Editor, but they can be used to power any page in the WordPress Admin or outside.
 
 ## Why?
 

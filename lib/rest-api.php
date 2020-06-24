@@ -119,10 +119,6 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
  * @since 6.5.0
  */
 function gutenberg_register_rest_block_directory() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ) ) {
-		return;
-	}
-
 	$block_directory_controller = new WP_REST_Block_Directory_Controller();
 	$block_directory_controller->register_routes();
 }
@@ -153,6 +149,16 @@ function gutenberg_register_rest_customizer_nonces() {
 	$nav_menu_location->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
+
+
+/**
+ * Registers the Plugins REST API routes.
+ */
+function gutenberg_register_plugins_endpoint() {
+	$plugins = new WP_REST_Plugins_Controller();
+	$plugins->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
@@ -271,10 +277,6 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  * @since 7.x.0
  */
 function gutenberg_register_image_editor() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-rich-image-editing' ) ) {
-		return;
-	}
-
 	$image_editor = new WP_REST_Image_Editor_Controller();
 	$image_editor->register_routes();
 }

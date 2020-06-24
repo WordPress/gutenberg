@@ -59,7 +59,7 @@ add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
  * @param string $template_type A template type.
  * @return string[] A list of template candidates, in descending order of priority.
  */
-function get_template_hierachy( $template_type ) {
+function get_template_hierarchy( $template_type ) {
 	if ( ! in_array( $template_type, get_template_types(), true ) ) {
 		return array();
 	}
@@ -220,9 +220,9 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 
 	if ( empty( $template_hierarchy ) ) {
 		if ( 'index' === $template_type ) {
-			$template_hierarchy = get_template_hierachy( 'index' );
+			$template_hierarchy = get_template_hierarchy( 'index' );
 		} else {
-			$template_hierarchy = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
+			$template_hierarchy = array_merge( get_template_hierarchy( $template_type ), get_template_hierarchy( 'index' ) );
 		}
 	}
 
@@ -335,7 +335,7 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 
 	if ( $current_template_post ) {
 		$template_part_ids = array();
-		if ( is_admin() ) {
+		if ( is_admin() || defined( 'REST_REQUEST' ) ) {
 			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
 				$template_part_ids = array_merge( $template_part_ids, create_auto_draft_for_template_part_block( $block ) );
 			}

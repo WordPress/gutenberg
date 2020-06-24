@@ -7,6 +7,7 @@ const SlotFillContext = createContext( {
 	slots: {},
 	fills: {},
 	registerSlot: () => {},
+	updateSlot: () => {},
 	unregisterSlot: () => {},
 	registerFill: () => {},
 	unregisterFill: () => {},

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The bundled `stylelint` dependency has been updated from requiring `^9.10.1` to requiring `^13.6.0`.
+-   The bundled `stylelint-config-wordpress` dependency has been updated from requiring `^13.1.0` to requiring `^17.0.0`.
+
+### Bug Fixes
+
+-   During rebuilds, all webpack assets that are not used anymore will be removed automatically.
+
 ## 11.0.0 (2020-06-15)
 
 ### Breaking Changes

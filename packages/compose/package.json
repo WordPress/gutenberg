@@ -6,8 +6,10 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"React",
-		"hoc"
+		"gutenberg",
+		"react",
+		"hoc",
+		"hooks"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/compose/README.md",
 	"repository": {
@@ -26,6 +28,7 @@
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/priority-queue": "file:../priority-queue",
 		"clipboard": "^2.0.1",
 		"lodash": "^4.17.15",
 		"mousetrap": "^1.6.5",

@@ -66,11 +66,6 @@ describe( 'block deletion -', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			// The blocks can't be empty to trigger the toolbar
 			await page.keyboard.type( 'Paragraph to remove' );
-
-			// Move the mouse to show the block toolbar
-			await page.mouse.move( 0, 0 );
-			await page.mouse.move( 10, 10 );
-
 			await clickOnBlockSettingsMenuRemoveBlockButton();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -156,11 +151,6 @@ describe( 'deleting all blocks', () => {
 	it( 'results in the default block getting selected', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
-
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
-
 		await clickOnBlockSettingsMenuRemoveBlockButton();
 
 		// There is a default block:
