@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.15.0-rc.1 (2020-06-24)
+
 ### New Features
 
 - Add new CLI options: `--no-wp-scripts` and `--wp-scripts` to let users override the settings that template defines for supports for `@wordpress/scripts` package integration ([#23195](https://github.com/WordPress/gutenberg/pull/23195)).
