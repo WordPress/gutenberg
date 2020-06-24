@@ -12,6 +12,7 @@ import classnames from 'classnames';
 import { BlockControls } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
+	Icon, search,
 	rotateRight as rotateRightIcon,
 	aspectRatio as aspectRatioIcon,
 } from '@wordpress/icons';
@@ -285,14 +286,18 @@ export default function ImageEditor( {
 				{ inProgress && <Spinner /> }
 			</div>
 			{ ! inProgress && (
-				<RangeControl
+				<div
 					className="richimage__zoom-control"
-					label={ __( 'Zoom' ) }
-					min={ MIN_ZOOM }
-					max={ MAX_ZOOM }
-					value={ Math.round( zoom ) }
-					onChange={ setZoom }
-				/>
+					aria-label={ __( 'Zoom' ) }
+				>
+					<Icon icon={ search } />
+					<RangeControl
+						min={ MIN_ZOOM }
+						max={ MAX_ZOOM }
+						value={ Math.round( zoom ) }
+						onChange={ setZoom }
+					/>
+				</div>
 			) }
 			<BlockControls>
 				<ToolbarGroup>

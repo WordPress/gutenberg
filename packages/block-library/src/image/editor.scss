@@ -96,8 +96,24 @@ figure.wp-block-image:not(.wp-block) {
 	background-color: $white;
 	margin-top: $grid-unit-15;
 	margin-bottom: $grid-unit-15;
-	padding: $grid-unit-15 $grid-unit-15 $grid-unit-10;
+	padding: $grid-unit-10;
 	line-height: 1;
+	width: 100%;
+	max-width: $break-mobile;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	.components-range-control {
+		flex: 1;
+		margin-right: 0;
+		margin-left: $grid-unit-15;
+	}
+
+	.components-base-control__field {
+		display: flex;
+		margin-bottom: 0;
+	}
 }
 
 // Make the toolbar dropdowns blend in.
