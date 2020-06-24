@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/nux",
-	"version": "3.18.0",
+	"version": "3.18.1-rc.0",
 	"description": "NUX (New User eXperience) module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"nux"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/nux/README.md",

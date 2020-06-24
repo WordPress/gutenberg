@@ -33,7 +33,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
  * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
  * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
- * @property {boolean} __experimentalEnableRichImageEditing Whether the user has enabled Rich Image Editing
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -151,7 +150,6 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalBlockDirectory: false,
 	__experimentalEnableFullSiteEditing: false,
 	__experimentalEnableFullSiteEditingDemo: false,
-	__experimentalEnableRichImageEditing: false,
 	__mobileEnablePageTemplates: false,
 	gradients: [
 		{

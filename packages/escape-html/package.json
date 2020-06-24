@@ -1,11 +1,13 @@
 {
 	"name": "@wordpress/escape-html",
-	"version": "1.8.0",
+	"version": "1.8.1-rc.0",
 	"description": "Escape HTML utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
-		"wordpress"
+		"wordpress",
+		"gutenberg",
+		"html"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/escape-html/README.md",
 	"repository": {

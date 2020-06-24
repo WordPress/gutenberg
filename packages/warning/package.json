@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/warning",
-	"version": "1.1.0",
+	"version": "1.1.1-rc.0",
 	"description": "Warning utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"warning"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/warning/README.md",

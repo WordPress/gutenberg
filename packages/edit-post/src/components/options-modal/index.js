@@ -26,6 +26,7 @@ import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
 	EnablePanelOption,
+	EnableFeature,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 
@@ -46,6 +47,12 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption
 					label={ __( 'Pre-publish checks' ) }
+				/>
+				<EnableFeature
+					featureName="mostUsedBlocks"
+					label={ __(
+						'Enable the Most Used Blocks category in the block library'
+					) }
 				/>
 			</Section>
 			<Section title={ __( 'Document panels' ) }>

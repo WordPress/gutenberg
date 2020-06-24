@@ -10,7 +10,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { BottomSheetConsumer } from '@wordpress/components';
+import {
+	BottomSheetConsumer,
+	ColorControl,
+	PanelBody,
+} from '@wordpress/components';
 import { useRoute } from '@react-navigation/native';
 /**
  * Internal dependencies
@@ -18,6 +22,7 @@ import { useRoute } from '@react-navigation/native';
 import ColorPicker from '../../color-picker';
 import ColorPalette from '../../color-palette';
 import ColorIndicator from '../../color-indicator';
+import CustomGradientPicker from '../../custom-gradient-picker';
 import NavigationHeader from '../bottom-sheet/navigation-header';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
@@ -63,6 +68,11 @@ function ColorSettings( { defaultSettings } ) {
 					component={ PickerScreen }
 					options={ { cardStyleInterpolator: forFade } }
 				/>
+				<Stack.Screen
+					name="GradientPicker"
+					component={ GradientPickerScreen }
+					options={ { cardStyleInterpolator: forFade } }
+				/>
 			</Stack.Navigator>
 		</View>
 	);
@@ -101,6 +111,23 @@ const PickerScreen = ( { route, navigation } ) => {
 	);
 };
 
+const GradientPickerScreen = ( { route, navigation } ) => {
+	const { setColor, currentValue, isGradientColor } = route.params;
+	return (
+		<View>
+			<NavigationHeader
+				screen={ __( 'Customize Gradient' ) }
+				leftButtonOnPress={ navigation.goBack }
+			/>
+			<CustomGradientPicker
+				setColor={ setColor }
+				currentValue={ currentValue }
+				isGradientColor={ isGradientColor }
+			/>
+		</View>
+	);
+};
+
 const PaletteScreen = ( { route, navigation } ) => {
 	const {
 		label,
@@ -125,6 +152,8 @@ const PaletteScreen = ( { route, navigation } ) => {
 	);
 
 	const isSolidSegment = currentSegment === segments[ 0 ];
+	const isCustomGadientShown = ! isSolidSegment && isGradientColor;
+
 	const setColor = ( color ) => {
 		setCurrentValue( color );
 		if ( isSolidSegment && onColorChange && onGradientChange ) {
@@ -132,18 +161,36 @@ const PaletteScreen = ( { route, navigation } ) => {
 			onGradientChange( '' );
 		} else if ( isSolidSegment && onColorChange ) {
 			onColorChange( color );
+			onColorChange( '' );
 		} else if ( ! isSolidSegment && onGradientChange ) {
 			onGradientChange( color );
 		}
 	};
+
+	function onCustomPress() {
+		if ( isSolidSegment ) {
+			navigation.navigate( 'Picker', {
+				setColor,
+				isGradientColor,
+				currentValue,
+			} );
+		} else {
+			navigation.navigate( 'GradientPicker', {
+				setColor,
+				isGradientColor,
+				currentValue,
+				isSolidSegment,
+			} );
+		}
+	}
 
 	function getFooter() {
 		if ( onGradientChange ) {
 			return (
 				<SegmentedControls
 					segments={ segments }
-					segmentHandler={ ( item ) => setCurrentSegment( item ) }
-					selectedIndex={ selectedSegmentIndex }
+					segmentHandler={ setCurrentSegment }
+					selectedIndex={ segments.indexOf( currentSegment ) }
 					addonLeft={
 						currentValue && (
 							<ColorIndicator
@@ -189,18 +236,24 @@ const PaletteScreen = ( { route, navigation } ) => {
 						activeColor={ currentValue }
 						isGradientColor={ isGradientColor }
 						currentSegment={ currentSegment }
-						onCustomPress={ () => {
-							navigation.navigate( 'Picker', {
-								setColor,
-								isGradientColor,
-								currentValue,
-							} );
-						} }
+						onCustomPress={ onCustomPress }
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
 						}
 						defaultSettings={ defaultSettings }
 					/>
+					{ isCustomGadientShown && (
+						<>
+							<View style={ horizontalSeparatorStyle } />
+							<PanelBody>
+								<ColorControl
+									label={ __( 'Customize Gradient' ) }
+									onPress={ onCustomPress }
+									withColorIndicator={ false }
+								/>
+							</PanelBody>
+						</>
+					) }
 					<View style={ horizontalSeparatorStyle } />
 					{ getFooter() }
 				</View>

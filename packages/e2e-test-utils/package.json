@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/e2e-test-utils",
-	"version": "4.9.0",
+	"version": "4.9.1-rc.0",
 	"description": "End-To-End (E2E) test utils for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"e2e",
 		"utils"
 	],

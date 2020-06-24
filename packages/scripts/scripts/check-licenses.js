@@ -80,6 +80,7 @@ const otherOssLicenses = [
 	'Apache License, Version 2.0',
 	'Apache version 2.0',
 	'CC-BY-3.0',
+	'CC-BY-SA-2.0',
 	'LGPL',
 ];
 

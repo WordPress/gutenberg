@@ -1,12 +1,14 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "3.19.0",
+	"version": "3.19.1-rc.0",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"editor"
+		"gutenberg",
+		"editor",
+		"post"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/README.md",
 	"repository": {
@@ -50,6 +52,7 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/warning": "file:../warning",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.15",
 		"memize": "^1.1.0",

@@ -1,13 +1,13 @@
 {
 	"name": "@wordpress/env",
-	"version": "1.5.0",
+	"version": "1.6.0-rc.0",
 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"environment",
-		"wordpress-environment",
 		"docker"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/env#readme",

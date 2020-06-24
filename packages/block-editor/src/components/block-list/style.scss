@@ -75,7 +75,7 @@
 			right: $border-width;
 
 			// 2px outside.
-			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 
 			// Show a light color for dark themes.
@@ -96,6 +96,11 @@
 			opacity: 1;
 		}
 	}
+}
+
+.block-editor-block-list__layout .block-editor-block-list__block,
+.block-editor-block-list__layout .block-list-appender {
+	position: relative;
 
 	// Between-blocks dropzone line indicator.
 	&.is-drop-target::before {
@@ -104,13 +109,21 @@
 		z-index: 0;
 		pointer-events: none;
 		transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
+		top: -$default-block-margin / 2;
 		right: 0;
 		left: 0;
-		top: -$default-block-margin / 2;
-		border-top: 4px solid $blue-medium-focus;
+		border-top: 4px solid var(--wp-admin-theme-color);
+	}
+
+	&.is-drop-target.is-dropping-horizontally::before {
+		top: 0;
+		bottom: 0;
+		// Drop target border-width plus a couple of pixels so that the border looks between blocks.
+		left: -6px;
+		border-top: none;
+		border-left: 4px solid var(--wp-admin-theme-color);
 	}
 }
-
 
 /**
  * Cross-Block Selection
@@ -140,7 +153,7 @@
 
 		&::after { // Everything else.
 			// 2px outside.
-			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 			transition: box-shadow 0.2s ease-out;
 			@include reduce-motion("transition");
@@ -165,6 +178,49 @@
 	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
 		box-shadow: 0 0 0 1px $light-gray-ui;
 	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		outline: $border-width-focus solid transparent;
+	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
+
+		&::before {
+			content: "";
+			position: absolute;
+			z-index: 0;
+			pointer-events: none;
+			transition:
+				border-color 0.1s linear,
+				border-style 0.1s linear,
+				box-shadow 0.1s linear;
+			right: 0;
+			left: 0;
+			top: -$default-block-margin / 2;
+			border-radius: $radius-block-ui;
+			border-top: 4px solid $light-gray-secondary;
+		}
+
+		&::after {
+			content: none;
+		}
+	}
+
+	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
+		&::before {
+			border-color: var(--wp-admin-theme-color);
+		}
+	}
+}
+
+
+.is-block-moving-mode.block-editor-block-list__block-selection-button {
+	// Should be invisible but not unfocusable.
+	opacity: 0;
+	font-size: 1px;
+	height: 1px;
+	padding: 0;
 }
 
 /**
@@ -328,7 +384,7 @@
 	height: $border-width-focus;
 	left: 0;
 	right: 0;
-	background: theme(primary);
+	background: var(--wp-admin-theme-color);
 }
 
 // This is the clickable plus.
@@ -600,7 +656,7 @@
 
 		// When button is focused, it receives a box-shadow instead of the border.
 		&:focus {
-			box-shadow: 0 0 0 $border-width-focus $theme-color;
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 		}
 	}
 }
@@ -680,32 +736,4 @@
 
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
-}
-
-
-// Add side padding for the canvas, currently edit-post-visual-editor.
-// The purpose of this padding is to ensure that on small viewports, there is
-// room for the block border that sits 14px ($block-padding) offset from the
-// block footprint.
-// These paddings and margins are removed from the BlockPreview component's style
-// Any change need to be reflected there.
-.block-editor-block-list__layout.is-root-container {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-side-ui-width;
-		padding-right: $block-side-ui-width;
-	}
-
-	// Full-wide. (to account for the paddings added above)
-	> .wp-block[data-align="full"] {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
-
-		@include break-small() {
-			margin-left: -$block-side-ui-width;
-			margin-right: -$block-side-ui-width;
-		}
-	}
 }

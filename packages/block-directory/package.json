@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/block-directory",
-	"version": "1.11.0",
+	"version": "1.11.1-rc.0",
 	"description": "Extend editor with block directory features to search, download and install blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"block directory"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-directory/README.md",

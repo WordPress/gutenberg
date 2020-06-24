@@ -1,14 +1,13 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "11.0.0",
+	"version": "12.0.0-rc.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"scripts",
-		"reusable-scripts",
-		"wordpress-scripts"
+		"gutenberg",
+		"scripts"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/scripts/README.md",
 	"repository": {

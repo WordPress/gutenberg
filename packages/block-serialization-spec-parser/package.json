@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/block-serialization-spec-parser",
-	"version": "3.6.0",
+	"version": "3.6.1-rc.0",
 	"description": "Block serialization specification parser for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"block",
 		"spec",
 		"parser"

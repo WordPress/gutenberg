@@ -6,8 +6,11 @@ $tree-item-height: 36px;
 }
 
 .block-editor-block-navigation__label {
-	margin: 0 0 $grid-unit-10;
-	color: $dark-gray-300;
+	margin: 0 0 $grid-unit-15;
+	color: $medium-gray-text;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
 }
 
 .block-editor-block-navigation__container {
@@ -51,14 +54,6 @@ $tree-item-height: 36px;
 	.block-editor-block-icon {
 		align-self: flex-start;
 		margin-right: 6px;
-	}
-
-	&.is-selected .block-editor-block-icon svg,
-	&.is-selected:focus .block-editor-block-icon svg {
-		color: $white;
-		background: $dark-gray-primary;
-		box-shadow: 0 0 0 $border-width $dark-gray-primary;
-		border-radius: $border-width;
 	}
 
 	.block-editor-block-navigation-block__menu-cell,

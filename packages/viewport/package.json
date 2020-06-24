@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "2.19.0",
+	"version": "2.19.1-rc.0",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"viewport"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/viewport/README.md",

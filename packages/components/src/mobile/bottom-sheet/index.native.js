@@ -13,17 +13,13 @@ import {
 	TouchableOpacity,
 } from 'react-native';
 import SafeArea from 'react-native-safe-area';
-import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 import Animated from 'react-native-reanimated';
-/**
- * Internal dependencies
- */
-import { BottomSheetProvider } from './bottom-sheet-context';
 
 /**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
+import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
@@ -37,8 +33,9 @@ import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import ColorCell from './color-cell';
+import RadioCell from './radio-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
-
+import { BottomSheetProvider } from './bottom-sheet-context';
 import BottomSheetReanimated from 'reanimated-bottom-sheet';
 
 const windowHeight = Dimensions.get( 'window' ).height;
@@ -503,5 +500,6 @@ ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
 ThemedBottomSheet.ColorCell = ColorCell;
+ThemedBottomSheet.RadioCell = RadioCell;
 
 export default ThemedBottomSheet;

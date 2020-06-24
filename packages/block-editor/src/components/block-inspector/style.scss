@@ -20,6 +20,6 @@
 	display: block;
 	font-size: $default-font-size;
 	background: $white;
-	padding: ($panel-padding * 2) $panel-padding;
+	padding: ($grid-unit-20 * 2) $grid-unit-20;
 	text-align: center;
 }

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 12.0.0-rc.0 (2020-06-24)
+
+### Breaking Changes
+
+-   The bundled `stylelint` dependency has been updated from requiring `^9.10.1` to requiring `^13.6.0`.
+-   The bundled `stylelint-config-wordpress` dependency has been updated from requiring `^13.1.0` to requiring `^17.0.0`.
+
+### Bug Fixes
+
+-   During rebuilds, all webpack assets that are not used anymore will be removed automatically.
+
 ## 11.0.0 (2020-06-15)
 
 ### Breaking Changes
@@ -10,8 +21,6 @@
 -   The default Babel configuration has changed to only support stage-4 proposals. This affects the `build` and `start` commands that use the bundled Babel configuration; if a project provides its own, this change doesn't affect it ([#22083](https://github.com/WordPress/gutenberg/pull/22083)).
 -   The bundled `wp-prettier` dependency has been upgraded from `1.19.1` to `2.0.5`. Refer to the [Prettier 2.0 "2020" blog post](https://prettier.io/blog/2020/03/21/2.0.0.html) for full details about the major changes included in Prettier 2.0.
 -   The bundled `eslint` dependency has been updated from requiring `^6.8.0` to requiring `^7.1.0`.
--   The bundled `stylelint` dependency has been updated from requiring `^9.10.1` to requiring `^13.6.0`.
--   The bundled `stylelint-config-wordpress` dependency has been updated from requiring `^13.1.0` to requiring `^17.0.0`.
 
 ### New Feature
 
@@ -20,7 +29,6 @@
 ### Bug Fixes
 
 -   Update webpack configuration to not run the Sass loader on CSS files. It's now limited to .scss and .sass files.
--   During rebuilds, all webpack assets that are not used anymore will be removed automatically.
 -   Fix broken `style.(sc|sa|c)ss` handling in the `build` and `start` scripts ([#23127](https://github.com/WordPress/gutenberg/pull/23127)).
 
 ## 10.0.0 (2020-05-28)

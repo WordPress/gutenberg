@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
 
 import RNReactNativeGutenbergBridge, {
@@ -10,11 +10,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
 	subscribeUpdateTheme,
-} from 'react-native-gutenberg-bridge';
-
-/**
- * WordPress dependencies
- */
+} from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
 import {

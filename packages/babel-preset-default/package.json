@@ -1,14 +1,15 @@
 {
 	"name": "@wordpress/babel-preset-default",
-	"version": "4.15.0",
+	"version": "4.15.1-rc.0",
 	"description": "Default Babel preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"babel",
 		"preset",
-		"default"
+		"babel-preset"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/babel-preset-default/README.md",
 	"repository": {
