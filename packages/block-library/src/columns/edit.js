@@ -91,7 +91,7 @@ function ColumnsEditContainer( {
 			</InspectorControls>
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
-				__experimentalMoverDirection="horizontal"
+				__experimentalBlockListOrientation="horizontal"
 				__experimentalTagName={ Block.div }
 				__experimentalPassedProps={ {
 					className: classes,

@@ -20,7 +20,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * @param {boolean}  captureToolbars Whether or children toolbars should be shown
  *                                   in the inner blocks component rather than on
  *                                   the child block.
- * @param {string} __experimentalMoverDirection The direction in which the block
+ * @param {string} __experimentalBlockListOrientation The direction in which the block
  *                                   should face.
  */
 export default function useNestedSettingsUpdate(
@@ -28,7 +28,7 @@ export default function useNestedSettingsUpdate(
 	allowedBlocks,
 	templateLock,
 	captureToolbars,
-	__experimentalMoverDirection
+	__experimentalBlockListOrientation
 ) {
 	const { updateBlockListSettings } = useDispatch( 'core/block-editor' );
 
@@ -62,8 +62,8 @@ export default function useNestedSettingsUpdate(
 			newSettings.__experimentalCaptureToolbars = captureToolbars;
 		}
 
-		if ( __experimentalMoverDirection !== undefined ) {
-			newSettings.__experimentalMoverDirection = __experimentalMoverDirection;
+		if ( __experimentalBlockListOrientation !== undefined ) {
+			newSettings.__experimentalBlockListOrientation = __experimentalBlockListOrientation;
 		}
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -76,7 +76,7 @@ export default function useNestedSettingsUpdate(
 		templateLock,
 		parentLock,
 		captureToolbars,
-		__experimentalMoverDirection,
+		__experimentalBlockListOrientation,
 		updateBlockListSettings,
 	] );
 }

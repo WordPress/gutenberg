@@ -47,7 +47,7 @@ function BlockPopover( {
 	clientId,
 	rootClientId,
 	isValid,
-	moverDirection,
+	blockListOrientation,
 	isEmptyDefaultBlock,
 	capturingClientId,
 } ) {
@@ -195,7 +195,7 @@ function BlockPopover( {
 				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
-					moverDirection={ moverDirection }
+					moverDirection={ blockListOrientation }
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (
@@ -234,7 +234,7 @@ function wrapperSelector( select ) {
 	const { name, attributes = {}, isValid } =
 		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
-	const { __experimentalMoverDirection } =
+	const { __experimentalBlockListOrientation } =
 		getBlockListSettings( rootClientId ) || {};
 
 	// Get Block List Settings for all ancestors of the current Block clientId
@@ -263,7 +263,7 @@ function wrapperSelector( select ) {
 		rootClientId: getBlockRootClientId( clientId ),
 		name,
 		isValid,
-		moverDirection: __experimentalMoverDirection,
+		blockListOrientation: __experimentalBlockListOrientation,
 		isEmptyDefaultBlock:
 			name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		capturingClientId,
@@ -282,7 +282,7 @@ export default function WrappedBlockPopover() {
 		rootClientId,
 		name,
 		isValid,
-		moverDirection,
+		blockListOrientation,
 		isEmptyDefaultBlock,
 		capturingClientId,
 	} = selected;
@@ -296,7 +296,7 @@ export default function WrappedBlockPopover() {
 			clientId={ clientId }
 			rootClientId={ rootClientId }
 			isValid={ isValid }
-			moverDirection={ moverDirection }
+			blockListOrientation={ blockListOrientation }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
 			capturingClientId={ capturingClientId }
 		/>

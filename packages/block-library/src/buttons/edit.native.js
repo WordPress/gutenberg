@@ -68,7 +68,7 @@ function ButtonsEdit( {
 				renderFooterAppender={
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}
-				__experimentalMoverDirection="horizontal"
+				__experimentalBlockListOrientation="horizontal"
 				horizontalAlignment={ align }
 				onDeleteBlock={ shouldDelete ? onDelete : undefined }
 				onAddBlock={ onAddNextButton }

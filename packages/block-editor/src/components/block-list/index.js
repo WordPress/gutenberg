@@ -49,8 +49,8 @@ function BlockList(
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			moverDirection: getBlockListSettings( rootClientId )
-				?.__experimentalMoverDirection,
+			blockListOrientation: getBlockListSettings( rootClientId )
+				?.__experimentalBlockListOrientation,
 			hasMultiSelection: hasMultiSelection(),
 			enableAnimation:
 				! isTyping() &&
@@ -62,7 +62,7 @@ function BlockList(
 		blockClientIds,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
-		moverDirection,
+		blockListOrientation,
 		hasMultiSelection,
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
@@ -109,7 +109,7 @@ function BlockList(
 								'is-drop-target': isDropTarget,
 								'is-dropping-horizontally':
 									isDropTarget &&
-									moverDirection === 'horizontal',
+									blockListOrientation === 'horizontal',
 							} ) }
 						/>
 					</AsyncModeProvider>
@@ -122,7 +122,8 @@ function BlockList(
 				className={ classnames( {
 					'is-drop-target': isAppenderDropTarget,
 					'is-dropping-horizontally':
-						isAppenderDropTarget && moverDirection === 'horizontal',
+						isAppenderDropTarget &&
+						blockListOrientation === 'horizontal',
 				} ) }
 			/>
 		</Container>

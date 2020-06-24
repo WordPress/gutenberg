@@ -36,7 +36,7 @@ function UncontrolledInnerBlocks( props ) {
 		template,
 		templateLock,
 		templateInsertUpdatesSelection,
-		__experimentalMoverDirection,
+		__experimentalBlockListOrientation,
 		renderAppender,
 		renderFooterAppender,
 		parentWidth,
@@ -72,7 +72,9 @@ function UncontrolledInnerBlocks( props ) {
 			renderAppender={ renderAppender }
 			renderFooterAppender={ renderFooterAppender }
 			withFooter={ false }
-			__experimentalMoverDirection={ __experimentalMoverDirection }
+			__experimentalBlockListOrientation={
+				__experimentalBlockListOrientation
+			}
 			parentWidth={ parentWidth }
 			horizontalAlignment={ horizontalAlignment }
 			horizontal={ horizontal }

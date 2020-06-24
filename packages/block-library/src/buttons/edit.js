@@ -27,7 +27,7 @@ function ButtonsEdit() {
 				<InnerBlocks
 					allowedBlocks={ ALLOWED_BLOCKS }
 					template={ BUTTONS_TEMPLATE }
-					__experimentalMoverDirection="horizontal"
+					__experimentalBlockListOrientation="horizontal"
 				/>
 			</AlignmentHookSettingsProvider>
 		</Block.div>

@@ -46,7 +46,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
 
-		const { __experimentalMoverDirection } =
+		const { __experimentalBlockListOrientation } =
 			getBlockListSettings( blockRootClientId ) || {};
 
 		return {
@@ -63,7 +63,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
 			),
-			moverDirection: __experimentalMoverDirection,
+			moverDirection: __experimentalBlockListOrientation,
 		};
 	}, [] );
 

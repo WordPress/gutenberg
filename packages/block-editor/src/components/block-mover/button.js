@@ -102,7 +102,7 @@ const BlockMoverButton = forwardRef(
 				const block = getBlock( firstClientId );
 				const isFirstBlock = firstBlockIndex === 0;
 				const isLastBlock = lastBlockIndex === blockOrder.length - 1;
-				const { __experimentalMoverDirection = 'vertical' } =
+				const { __experimentalBlockListOrientation = 'vertical' } =
 					getBlockListSettings( blockRootClientId ) || {};
 
 				return {
@@ -114,7 +114,7 @@ const BlockMoverButton = forwardRef(
 					isLast: isLastBlock,
 					isRTL: getSettings().isRTL,
 					moverOrientation:
-						orientation || __experimentalMoverDirection,
+						orientation || __experimentalBlockListOrientation,
 				};
 			},
 			[ clientIds, direction ]
