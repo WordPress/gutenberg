@@ -28,7 +28,6 @@ export function PanelBody(
 	{
 		children,
 		className,
-		focusable,
 		icon,
 		initialOpen: initialOpenProp,
 		onToggle = noop,
@@ -78,12 +77,7 @@ export function PanelBody(
 
 	return (
 		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
-			<PanelBodyTitle
-				focusable={ focusable }
-				title={ title }
-				icon={ icon }
-				{ ...disclosure }
-			/>
+			<PanelBodyTitle title={ title } icon={ icon } { ...disclosure } />
 			<DisclosureContent { ...disclosure }>
 				{ children }
 			</DisclosureContent>
@@ -92,7 +86,7 @@ export function PanelBody(
 }
 
 const PanelBodyTitle = forwardRef(
-	( { focusable, isOpened, icon, title, ...props }, ref ) => {
+	( { isOpened, icon, title, ...props }, ref ) => {
 		if ( ! title ) return null;
 
 		return (
@@ -100,7 +94,6 @@ const PanelBodyTitle = forwardRef(
 				<Disclosure
 					as={ Button }
 					className="components-panel__body-toggle"
-					focusable={ focusable }
 					ref={ ref }
 					{ ...props }
 				>
