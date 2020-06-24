@@ -112,6 +112,17 @@ export default class ClassicEdit extends Component {
 			bookmark = null;
 		} );
 
+		editor.on( 'Paste Change input Undo Redo', () => {
+			const value = editor.getContent();
+
+			if ( value !== editor._lastChange ) {
+				editor._lastChange = value;
+				setAttributes( {
+					content: value,
+				} );
+			}
+        });
+
 		editor.on( 'keydown', ( event ) => {
 			if (
 				( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
