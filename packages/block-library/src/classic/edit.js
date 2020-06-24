@@ -121,7 +121,7 @@ export default class ClassicEdit extends Component {
 					content: value,
 				} );
 			}
-        });
+		} );
 
 		editor.on( 'keydown', ( event ) => {
 			if (
