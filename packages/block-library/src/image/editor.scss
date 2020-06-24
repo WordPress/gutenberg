@@ -106,7 +106,7 @@ figure.wp-block-image:not(.wp-block) {
 
 	.components-range-control {
 		flex: 1;
-		margin-right: 0;
+		margin-right: $grid-unit-15;
 		margin-left: $grid-unit-15;
 	}
 
@@ -114,26 +114,18 @@ figure.wp-block-image:not(.wp-block) {
 		display: flex;
 		margin-bottom: 0;
 	}
-}
 
-// Make the toolbar dropdowns blend in.
-.components-toolbar.richimage-toolbar__dropdown { // Needs specificity.
-	padding: 0;
-	border-left: none;
-	border-right: none;
+	.richimage__aspect-ratio {
+		height: $grid-unit-60;
+		margin-top: -$grid-unit-10;
+		margin-bottom: -$grid-unit-10;
+		display: flex;
+		align-items: center;
 
-	.components-icon-button.has-text svg {
-		margin-right: 0;
+		.components-button {
+			width: $button-size;
+			padding-left: 0;
+			padding-right: 0;
+		}
 	}
-
-	.components-dropdown-menu__indicator {
-		display: none;
-	}
-}
-
-// Make icons 24x24 unscaled.
-.richimage-toolbar__dropdown > .components-button,
-.richimage-toolbar__dropdown,
-.richimage-toolbar__control {
-	padding: 6px;
 }

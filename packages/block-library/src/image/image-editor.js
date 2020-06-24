@@ -12,7 +12,8 @@ import classnames from 'classnames';
 import { BlockControls } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
-	Icon, search,
+	Icon,
+	search,
 	rotateRight as rotateRightIcon,
 	aspectRatio as aspectRatioIcon,
 } from '@wordpress/icons';
@@ -32,7 +33,10 @@ import apiFetch from '@wordpress/api-fetch';
 
 const MIN_ZOOM = 100;
 const MAX_ZOOM = 300;
-const POPOVER_PROPS = { position: 'bottom right' };
+const POPOVER_PROPS = {
+	position: 'bottom right',
+	isAlternate: true,
+};
 
 function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 	return (
@@ -59,6 +63,7 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 			label={ __( 'Aspect Ratio' ) }
 			popoverProps={ POPOVER_PROPS }
 			toggleProps={ toggleProps }
+			className="richimage__aspect-ratio"
 		>
 			{ ( { onClose } ) => (
 				<>
@@ -297,6 +302,15 @@ export default function ImageEditor( {
 						value={ Math.round( zoom ) }
 						onChange={ setZoom }
 					/>
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<AspectMenu
+								toggleProps={ toggleProps }
+								isDisabled={ inProgress }
+								onClick={ setAspect }
+							/>
+						) }
+					</ToolbarItem>
 				</div>
 			) }
 			<BlockControls>
@@ -307,17 +321,6 @@ export default function ImageEditor( {
 						onClick={ rotate }
 						disabled={ inProgress }
 					/>
-				</ToolbarGroup>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<AspectMenu
-								toggleProps={ toggleProps }
-								isDisabled={ inProgress }
-								onClick={ setAspect }
-							/>
-						) }
-					</ToolbarItem>
 				</ToolbarGroup>
 				<ToolbarGroup>
 					<ToolbarButton onClick={ apply } disabled={ inProgress }>
