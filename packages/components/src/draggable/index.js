@@ -38,7 +38,11 @@ class Draggable extends Component {
 		event.preventDefault();
 
 		this.resetDragState();
-		this.props.setTimeout( onDragEnd );
+
+		// Allow the Synthetic Event to be accessed from asynchronous code.
+		// https://reactjs.org/docs/events.html#event-pooling
+		event.persist();
+		this.props.setTimeout( onDragEnd.bind( this, event ) );
 	}
 
 	/**
@@ -64,6 +68,8 @@ class Draggable extends Component {
 
 		const { onDragOver = noop } = this.props;
 
+		// The `event` from `onDragOver` is not a SyntheticEvent
+		// and so it doesn't require `event.persist()`.
 		this.props.setTimeout( onDragOver.bind( this, event ) );
 	}
 
@@ -154,9 +160,10 @@ class Draggable extends Component {
 		document.body.classList.add( 'is-dragging-components-draggable' );
 		document.addEventListener( 'dragover', this.onDragOver );
 
-		this.props.setTimeout(
-			onDragStart.bind( this, event.clientX, event.clientY )
-		);
+		// Allow the Synthetic Event to be accessed from asynchronous code.
+		// https://reactjs.org/docs/events.html#event-pooling
+		event.persist();
+		this.props.setTimeout( onDragStart.bind( this, event ) );
 	}
 
 	/**
