@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.1.0",
+	"version": "1.1.1-rc.0",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
@@ -50,7 +50,7 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.15",
 		"rememo": "^3.0.0",
-	  	"uuid": "^7.0.2"
+		"uuid": "^7.0.2"
 	},
 	"publishConfig": {
 		"access": "public"
