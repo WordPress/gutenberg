@@ -85,6 +85,7 @@ export default function Header( {
 					isPrimary
 					isPressed={ isInserterOpen }
 					onClick={ onToggleInserter }
+					className="edit-site-header-toolbar__inserter-toggle"
 					icon={ plus }
 					label={ _x(
 						'Add block',
