@@ -9,6 +9,10 @@
 /**
  * Tests for REST API for block types
  *
+ * This test file can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/47620
+ *
  * @see WP_Test_REST_Post_Type_Controller_Testcase
  */
 class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Controller_Testcase {
