@@ -309,12 +309,12 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 		return $block_content;
 	}
 
-	// Check what style features the block supports.
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	if ( ! $block_type ) {
+	// If no render_callback, assume styles have been previously handled.
+	if ( ! $block_type || ! $block_type->render_callback ) {
 		return $block_content;
 	}
-
+	// Check what style features the block supports.
 	$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
 
 	$attributes = array();
