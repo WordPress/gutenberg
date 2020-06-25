@@ -296,7 +296,7 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
 function gutenberg_experimental_global_styles_get_global_context() {
 	return array(
 		'selector' => ':root',
-		'supports' => array( 'background-color', '--wp--style--color--link', 'font-size' ),
+		'supports' => array( 'background-color', '--wp--style--color--link' ),
 	);
 }
 
