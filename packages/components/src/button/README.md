@@ -132,7 +132,6 @@ Name | Type | Default | Description
 `isPrimary` | `bool` | `false` | Renders a primary button style.
 `isTertiary` | `bool` | `false` | Renders a text-based button style.
 `isDestructive` | `bool` | `false` | Renders a red text-based button style to indicate destructive behavior.
-`isLarge` | `bool` | `false` | Increases the size of the button.
 `isSmall` | `bool` | `false` | Decreases the size of the button.
 `isPressed` | `bool` | `false` | Renders a pressed button style.
 `isBusy` | `bool` | `false` | Indicates activity while a action is being performed.

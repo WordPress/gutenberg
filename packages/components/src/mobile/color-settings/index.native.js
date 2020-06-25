@@ -1,22 +1,25 @@
 /**
  * External dependencies
  */
-import { View, Text, LayoutAnimation } from 'react-native';
+import { View, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { ColorControl, PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
 import ColorPicker from '../../color-picker';
 import ColorPalette from '../../color-palette';
 import ColorIndicator from '../../color-indicator';
+import CustomGradientPicker from '../../custom-gradient-picker';
 import NavigationHeader from '../bottom-sheet/navigation-header';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
+import { performLayoutAnimation } from '../layout-animation';
 
 import styles from './style.scss';
 
@@ -35,6 +38,9 @@ function ColorSettings( {
 } ) {
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const [ isCustomScreen, setIsCustomScreen ] = useState( false );
+	const [ isCustomGradientScreen, setIsCustomGradientScreen ] = useState(
+		false
+	);
 
 	const { segments, subsheets, isGradient } = colorsUtils;
 	const isGradientColor = isGradient( currentValue );
@@ -45,6 +51,7 @@ function ColorSettings( {
 	);
 
 	const isSolidSegment = currentSegment === segments[ 0 ];
+	const isCustomGadientShown = ! isSolidSegment && isGradientColor;
 
 	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.horizontalSeparator,
@@ -55,6 +62,8 @@ function ColorSettings( {
 		onHardwareButtonPress( () => {
 			if ( isCustomScreen ) {
 				onCustomScreenToggle( false );
+			} else if ( isCustomGradientScreen ) {
+				onCustomGradientScreenToggle( false );
 			} else {
 				onReplaceSubsheet(
 					subsheets[ 0 ],
@@ -63,7 +72,11 @@ function ColorSettings( {
 				);
 			}
 		} );
-	}, [ isCustomScreen ] );
+	}, [ isCustomScreen, isCustomGradientScreen ] );
+
+	useEffect( () => {
+		performLayoutAnimation();
+	}, [ isCustomGadientShown ] );
 
 	useEffect( () => {
 		setCurrentSegment( segments[ selectedSegmentIndex ] );
@@ -77,14 +90,21 @@ function ColorSettings( {
 	}
 
 	function onCustomScreenToggle( shouldShow ) {
-		LayoutAnimation.configureNext(
-			LayoutAnimation.create(
-				300,
-				LayoutAnimation.Types.easeInEaseOut,
-				LayoutAnimation.Properties.opacity
-			)
-		);
+		performLayoutAnimation();
 		setIsCustomScreen( shouldShow );
+	}
+
+	function onCustomGradientScreenToggle( shouldShow ) {
+		performLayoutAnimation();
+		setIsCustomGradientScreen( shouldShow );
+	}
+
+	function onCustomPress() {
+		if ( isSolidSegment ) {
+			onCustomScreenToggle( true );
+		} else {
+			onCustomGradientScreenToggle( true );
+		}
 	}
 
 	function setColor( color ) {
@@ -96,6 +116,7 @@ function ColorSettings( {
 			onColorChange( color );
 		} else if ( ! isSolidSegment && onGradientChange ) {
 			onGradientChange( color );
+			onColorChange( '' );
 		}
 	}
 
@@ -104,8 +125,8 @@ function ColorSettings( {
 			return (
 				<SegmentedControls
 					segments={ segments }
-					segmentHandler={ ( item ) => setCurrentSegment( item ) }
-					selectedIndex={ selectedSegmentIndex }
+					segmentHandler={ setCurrentSegment }
+					selectedIndex={ segments.indexOf( currentSegment ) }
 					addonLeft={
 						currentValue && (
 							<ColorIndicator
@@ -152,9 +173,7 @@ function ColorSettings( {
 						setColor={ setColor }
 						activeColor={ currentValue }
 						isGradientColor={ isGradientColor }
-						onNavigationBack={ () => {
-							onCustomScreenToggle( false );
-						} }
+						onNavigationBack={ () => onCustomScreenToggle( false ) }
 						onCloseBottomSheet={ onCloseBottomSheet }
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
@@ -162,7 +181,7 @@ function ColorSettings( {
 					/>
 				</View>
 			) }
-			{ ! isCustomScreen && (
+			{ ! isCustomScreen && ! isCustomGradientScreen && (
 				<View>
 					<NavigationHeader
 						screen={ label }
@@ -176,16 +195,43 @@ function ColorSettings( {
 						isGradientColor={ isGradientColor }
 						currentSegment={ currentSegment }
 						isCustomScreen={ isCustomScreen }
-						onCustomPress={ () => {
-							onCustomScreenToggle( true );
-						} }
+						onCustomPress={ onCustomPress }
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
 						}
 						defaultSettings={ defaultSettings }
 					/>
+					{ isCustomGadientShown && (
+						<>
+							<View style={ horizontalSeparatorStyle } />
+							<PanelBody>
+								<ColorControl
+									label={ __( 'Customize Gradient' ) }
+									onPress={ () =>
+										onCustomGradientScreenToggle( true )
+									}
+									withColorIndicator={ false }
+								/>
+							</PanelBody>
+						</>
+					) }
 					<View style={ horizontalSeparatorStyle } />
 					{ getFooter() }
+				</View>
+			) }
+			{ isCustomGradientScreen && (
+				<View>
+					<NavigationHeader
+						screen={ __( 'Customize Gradient' ) }
+						leftButtonOnPress={ () =>
+							onCustomGradientScreenToggle( false )
+						}
+					/>
+					<CustomGradientPicker
+						setColor={ setColor }
+						currentValue={ currentValue }
+						isGradientColor={ isGradientColor }
+					/>
 				</View>
 			) }
 		</View>

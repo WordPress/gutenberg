@@ -19,17 +19,6 @@
 	}
 }
 
-.block-list-appender.is-drop-target > div::before {
-	content: "";
-	position: absolute;
-	right: -$grid-unit-10;
-	left: -$grid-unit-10;
-	top: -$grid-unit-10;
-	bottom: -$grid-unit-10;
-	border-radius: $radius-block-ui;
-	border: 3px solid var(--wp-admin-theme-color);
-}
-
 .block-list-appender > .block-editor-inserter {
 	display: block;
 }

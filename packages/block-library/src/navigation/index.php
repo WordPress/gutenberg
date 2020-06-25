@@ -88,7 +88,7 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 /**
  * Recursively filters out links with no labels to build a clean navigation block structure.
  *
- * @param array $blocks Navigation link inner blocks from the Navigation block.
+ * @param array $blocks Link inner blocks from the Navigation block.
  * @return array Blocks that had valid labels
  */
 function block_core_navigation_empty_navigation_links_recursive( $blocks ) {

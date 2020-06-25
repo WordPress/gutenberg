@@ -99,6 +99,7 @@ export const withInspectorControl = createHigherOrderComponent(
 										anchor: nextValue,
 									} );
 								} }
+								autoComplete="off"
 							/>
 						</InspectorAdvancedControls>
 					</>

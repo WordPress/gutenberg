@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
@@ -35,6 +35,7 @@
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/dom-ready": "file:../dom-ready",
@@ -48,7 +49,8 @@
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.15",
-		"rememo": "^3.0.0"
+		"rememo": "^3.0.0",
+		"uuid": "^7.0.2"
 	},
 	"publishConfig": {
 		"access": "public"

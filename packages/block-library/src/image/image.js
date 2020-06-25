@@ -15,6 +15,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarGroup,
+	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -25,11 +26,13 @@ import {
 	RichText,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
+import { crop } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,7 +44,7 @@ import ImageEditor from './image-editor';
 /**
  * Module constants
  */
-import { MIN_SIZE } from './constants';
+import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 
 function getFilename( url ) {
 	const path = getPath( url );
@@ -71,6 +74,9 @@ export default function Image( {
 	isSelected,
 	insertBlocksAfter,
 	onReplace,
+	onSelectImage,
+	onSelectURL,
+	onUploadError,
 	containerRef,
 } ) {
 	const image = useSelect(
@@ -80,25 +86,16 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const {
-		maxWidth,
-		isRTL,
-		imageSizes,
-		__experimentalEnableRichImageEditing,
-	} = useSelect( ( select ) => {
+	const { maxWidth, isRTL, imageSizes } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		return pick( getSettings(), [
-			'imageSizes',
-			'isRTL',
-			'maxWidth',
-			'__experimentalEnableRichImageEditing',
-		] );
+		return pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] );
 	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
+	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const imageSizeOptions = map(
@@ -168,17 +165,25 @@ export default function Image( {
 		}
 
 		setAttributes( {
-			url,
+			url: newUrl,
 			width: undefined,
 			height: undefined,
 			sizeSlug: newSizeSlug,
 		} );
 	}
 
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingImage( false );
+		}
+	}, [ isSelected ] );
+
+	const canEditImage = id && naturalWidth && naturalHeight;
+
 	const controls = (
 		<>
 			<BlockControls>
-				{ url && (
+				{ ! isEditingImage && (
 					<ToolbarGroup>
 						<ImageURLInputUI
 							url={ href || '' }
@@ -191,6 +196,26 @@ export default function Image( {
 							rel={ rel }
 						/>
 					</ToolbarGroup>
+				) }
+				{ canEditImage && ! isEditingImage && (
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () => setIsEditingImage( true ) }
+							icon={ crop }
+							label={ __( 'Crop' ) }
+						/>
+					</ToolbarGroup>
+				) }
+				{ ! isEditingImage && (
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*"
+						onSelect={ onSelectImage }
+						onSelectURL={ onSelectURL }
+						onError={ onUploadError }
+					/>
 				) }
 			</BlockControls>
 			<InspectorControls>
@@ -267,7 +292,6 @@ export default function Image( {
 		// should direct focus to block.
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		<>
-			{ controls }
 			<img
 				src={ url }
 				alt={ defaultedAlt }
@@ -299,7 +323,21 @@ export default function Image( {
 			: naturalHeight;
 	}
 
-	if ( ! isResizable || ! imageWidthWithinContainer ) {
+	if ( canEditImage && isEditingImage ) {
+		img = (
+			<ImageEditor
+				id={ id }
+				url={ url }
+				setAttributes={ setAttributes }
+				naturalWidth={ naturalWidth }
+				naturalHeight={ naturalHeight }
+				width={ width }
+				height={ height }
+				clientWidth={ clientWidth }
+				setIsEditingImage={ setIsEditingImage }
+			/>
+		);
+	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
 		img = <div style={ { width, height } }>{ img }</div>;
 	} else {
 		const currentWidth = width || imageWidthWithinContainer;
@@ -380,21 +418,9 @@ export default function Image( {
 		);
 	}
 
-	if ( __experimentalEnableRichImageEditing ) {
-		img = (
-			<ImageEditor
-				id={ id }
-				url={ url }
-				setAttributes={ setAttributes }
-				isSelected={ isSelected }
-			>
-				{ img }
-			</ImageEditor>
-		);
-	}
-
 	return (
 		<>
+			{ controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText

@@ -105,10 +105,29 @@ class WP_Block {
 
 		$this->block_type = $registry->get_registered( $this->name );
 
+		if ( ! empty( $this->block_type->context ) ) {
+			$message = sprintf(
+				/* translators: 1: Block name. */
+				__( 'The "context" parameter provided in block type "%s" is deprecated. Please use "uses_context" instead.', 'gutenberg' ),
+				$this->name
+			);
+			_doing_it_wrong( __CLASS__, $message, '8.6.0' );
+			$this->block_type->uses_context = $this->block_type->context;
+		}
+		if ( ! empty( $this->block_type->providesContext ) ) {
+			$message = sprintf(
+				/* translators: 1: Block name. */
+				__( 'The "providesContext" parameter provided in block type "%s" is deprecated. Please use "provides_context".', 'gutenberg' ),
+				$this->name
+			);
+			_doing_it_wrong( __CLASS__, $message, '8.6.0' );
+			$this->block_type->provides_context = $this->block_type->providesContext;
+		}
+
 		$this->available_context = $available_context;
 
-		if ( ! empty( $this->block_type->context ) ) {
-			foreach ( $this->block_type->context as $context_name ) {
+		if ( ! empty( $this->block_type->uses_context ) ) {
+			foreach ( $this->block_type->uses_context as $context_name ) {
 				if ( array_key_exists( $context_name, $this->available_context ) ) {
 					$this->context[ $context_name ] = $this->available_context[ $context_name ];
 				}
@@ -118,15 +137,13 @@ class WP_Block {
 		if ( ! empty( $block['innerBlocks'] ) ) {
 			$child_context = $this->available_context;
 
-			/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
-			if ( ! empty( $this->block_type->providesContext ) ) {
-				foreach ( $this->block_type->providesContext as $context_name => $attribute_name ) {
+			if ( ! empty( $this->block_type->provides_context ) ) {
+				foreach ( $this->block_type->provides_context as $context_name => $attribute_name ) {
 					if ( array_key_exists( $attribute_name, $this->attributes ) ) {
 						$child_context[ $context_name ] = $this->attributes[ $attribute_name ];
 					}
 				}
 			}
-			/* phpcs:enable */
 
 			$this->inner_blocks = new WP_Block_List( $block['innerBlocks'], $child_context, $registry );
 		}

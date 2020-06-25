@@ -88,19 +88,21 @@ async function runWordPressReleaseBranchSyncStep(
  *
  * @param {string} gitWorkingDirectoryPath Git working directory path.
  * @param {string} minimumVersionBump      Minimum version bump for the packages.
+ * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
  * @param {string} abortMessage            Abort Message.
  */
-async function updatePackageChangelogs(
+async function updatePackages(
 	gitWorkingDirectoryPath,
 	minimumVersionBump,
+	isPrerelease,
 	abortMessage
 ) {
 	const changelogFiles = await glob(
 		path.resolve( gitWorkingDirectoryPath, 'packages/*/CHANGELOG.md' )
 	);
 	const processedPackages = await Promise.all(
-		changelogFiles.map( async ( changelogFile ) => {
-			const fileStream = fs.createReadStream( changelogFile );
+		changelogFiles.map( async ( changelogPath ) => {
+			const fileStream = fs.createReadStream( changelogPath );
 
 			const lines = readline.createInterface( {
 				input: fileStream,
@@ -152,30 +154,33 @@ async function updatePackageChangelogs(
 				}
 			}
 			const packageName = `@wordpress/${
-				changelogFile.split( '/' ).reverse()[ 1 ]
+				changelogPath.split( '/' ).reverse()[ 1 ]
 			}`;
-			const { version } = readJSONFile(
-				changelogFile.replace( 'CHANGELOG.md', 'package.json' )
+			const packageJSONPath = changelogPath.replace(
+				'CHANGELOG.md',
+				'package.json'
 			);
+			const { version } = readJSONFile( packageJSONPath );
 			const nextVersion =
 				versionBump !== null
 					? semver.inc( version, versionBump )
 					: null;
 
 			return {
-				changelogFile,
+				changelogPath,
+				packageJSONPath,
 				packageName,
-				version,
 				nextVersion,
+				version,
 			};
 		} )
 	);
 
-	const changelogsToUpdate = processedPackages.filter(
+	const packagesToUpdate = processedPackages.filter(
 		( { nextVersion } ) => nextVersion
 	);
 
-	if ( changelogsToUpdate.length === 0 ) {
+	if ( packagesToUpdate.length === 0 ) {
 		log( '>> No changes in CHANGELOG files detected.' );
 		return;
 	}
@@ -186,19 +191,42 @@ async function updatePackageChangelogs(
 
 	const publishDate = new Date().toISOString().split( 'T' )[ 0 ];
 	await Promise.all(
-		changelogsToUpdate.map(
-			async ( { changelogFile, packageName, nextVersion, version } ) => {
+		packagesToUpdate.map(
+			async ( {
+				changelogPath,
+				packageJSONPath,
+				packageName,
+				nextVersion,
+				version,
+			} ) => {
+				// Update changelog
 				const content = await fs.promises.readFile(
-					changelogFile,
+					changelogPath,
 					'utf8'
 				);
 				await fs.promises.writeFile(
-					changelogFile,
+					changelogPath,
 					content.replace(
 						'## Unreleased',
-						`## Unreleased\n\n## ${ nextVersion } (${ publishDate })`
+						`## Unreleased\n\n## ${
+							isPrerelease ? nextVersion + '-rc.0' : nextVersion
+						} (${ publishDate })`
 					)
 				);
+
+				// Update package.json
+				const packageJson = readJSONFile( packageJSONPath );
+				const newPackageJson = {
+					...packageJson,
+					version: isPrerelease
+						? nextVersion + '-prerelease'
+						: nextVersion,
+				};
+				fs.writeFileSync(
+					packageJSONPath,
+					JSON.stringify( newPackageJson, null, '\t' ) + '\n'
+				);
+
 				log(
 					`   - ${ packageName }: ${ version } -> ${ nextVersion }`
 				);
@@ -246,13 +274,14 @@ async function runPushGitChangesStep(
 }
 
 /**
- * Prepublish to npm steps for WordPress packages.
+ * Prepare everything to publish WordPress packages to npm.
  *
  * @param {string} minimumVersionBump Minimum version bump for the packages.
+ * @param {boolean} isPrerelease Whether the package version to publish is a prerelease.
  *
  * @return {Promise<Object>} Github release object.
  */
-async function prepublishPackages( minimumVersionBump ) {
+async function prepareForPackageRelease( minimumVersionBump, isPrerelease ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
 	let abortMessage = 'Aborting!';
 	const temporaryFolders = [];
@@ -270,9 +299,10 @@ async function prepublishPackages( minimumVersionBump ) {
 		abortMessage
 	);
 
-	await updatePackageChangelogs(
+	await updatePackages(
 		gitWorkingDirectoryPath,
 		minimumVersionBump,
+		isPrerelease,
 		abortMessage
 	);
 
@@ -288,22 +318,40 @@ async function prepublishPackages( minimumVersionBump ) {
 	await runCleanLocalFoldersStep( temporaryFolders, abortMessage );
 }
 
-async function prepublishNpmStablePackages() {
+async function prepareLatestDistTag() {
 	log(
 		formats.title(
 			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
 		),
-		'Welcome! This tool is going to help you with prepublish to npm steps for the next stable version of WordPress packages.\n',
+		'Welcome! This tool is going to help you with preparing everything for publishing a new stable version of WordPress packages.\n',
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	await prepublishPackages( 'minor' );
+	await prepareForPackageRelease( 'patch' );
 
 	log(
-		'\n>> 🎉 WordPress packages are ready to publish.\n',
-		'Thanks for performing the prepublish process! You still need to run "npm run publish:prod" to perform the actual release.\n',
+		'\n>> 🎉 WordPress packages are ready to publish!\n',
+		'You need to run "npm run publish:prod" to release them to npm.\n',
 		'Let also people know on WordPress Slack when everything is finished.\n'
 	);
 }
 
-module.exports = { prepublishNpmStablePackages };
+async function prepareNextDistTag() {
+	log(
+		formats.title(
+			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
+		),
+		'Welcome! This tool is going to help you with preparing everything for publishing a new RC version of WordPress packages.\n',
+		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
+	);
+
+	await prepareForPackageRelease( 'minor', true );
+
+	log(
+		'\n>> 🎉 WordPress packages are ready to publish!\n',
+		'You need to run "npm run publish:dev" to release them to npm.\n',
+		'Let also people know on WordPress Slack when everything is finished.\n'
+	);
+}
+
+module.exports = { prepareLatestDistTag, prepareNextDistTag };

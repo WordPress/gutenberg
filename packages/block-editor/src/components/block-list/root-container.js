@@ -24,16 +24,13 @@ export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
 
 function selector( select ) {
-	const {
-		getSelectedBlockClientId,
-		hasMultiSelection,
-		isMultiSelecting,
-	} = select( 'core/block-editor' );
+	const { getSelectedBlockClientId, hasMultiSelection } = select(
+		'core/block-editor'
+	);
 
 	return {
 		selectedBlockClientId: getSelectedBlockClientId(),
 		hasMultiSelection: hasMultiSelection(),
-		isMultiSelecting: isMultiSelecting(),
 	};
 }
 
@@ -53,11 +50,10 @@ function onDragStart( event ) {
 }
 
 function RootContainer( { children, className }, ref ) {
-	const {
-		selectedBlockClientId,
-		hasMultiSelection,
-		isMultiSelecting,
-	} = useSelect( selector, [] );
+	const { selectedBlockClientId, hasMultiSelection } = useSelect(
+		selector,
+		[]
+	);
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const onSelectionStart = useMultiSelection( ref );
 
@@ -84,7 +80,6 @@ function RootContainer( { children, className }, ref ) {
 
 	return (
 		<InsertionPoint
-			isMultiSelecting={ isMultiSelecting }
 			hasMultiSelection={ hasMultiSelection }
 			selectedBlockClientId={ selectedBlockClientId }
 			containerRef={ ref }

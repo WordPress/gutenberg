@@ -2,21 +2,17 @@
  * External dependencies
  */
 
-import classnames from 'classnames';
 import Cropper from 'react-easy-crop';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 
 import { BlockControls } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
-	rotateLeft as rotateLeftIcon,
 	rotateRight as rotateRightIcon,
-	flipHorizontal as flipHorizontalIcon,
-	flipVertical as flipVerticalIcon,
-	crop as cropIcon,
 	aspectRatio as aspectRatioIcon,
 } from '@wordpress/icons';
 import {
@@ -33,29 +29,9 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
-const ROTATE_STEP = 90;
-const DEFAULT_CROP = {
-	unit: '%',
-	x: 25,
-	y: 25,
-	width: 50,
-	height: 50,
-};
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 3;
-const ZOOM_STEP = 0.1;
+const MIN_ZOOM = 100;
+const MAX_ZOOM = 300;
 const POPOVER_PROPS = { position: 'bottom right' };
-
-function richImageRequest( id, action, attrs ) {
-	return apiFetch( {
-		path: `__experimental/richimage/${ id }/${ action }`,
-		headers: {
-			'Content-type': 'application/json',
-		},
-		method: 'POST',
-		body: JSON.stringify( attrs ),
-	} );
-}
 
 function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 	return (
@@ -160,42 +136,51 @@ export default function ImageEditor( {
 	id,
 	url,
 	setAttributes,
-	isSelected,
-	children,
+	naturalWidth,
+	naturalHeight,
+	width,
+	height,
+	clientWidth,
+	setIsEditingImage,
 } ) {
 	const { createErrorNotice } = useDispatch( 'core/notices' );
-	const [ isCropping, setIsCropping ] = useState( false );
-	const [ inProgress, setIsProgress ] = useState( null );
-	const [ imageSize, setImageSize ] = useState( {
-		naturalHeight: 0,
-		naturalWidth: 0,
-	} );
+	const [ inProgress, setIsProgress ] = useState( false );
 	const [ crop, setCrop ] = useState( null );
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
-	const [ zoom, setZoom ] = useState( 1 );
-	const [ aspect, setAspect ] = useState( 4 / 3 );
+	const [ zoom, setZoom ] = useState( 100 );
+	const [ aspect, setAspect ] = useState( naturalWidth / naturalHeight );
+	const [ rotation, setRotation ] = useState( 0 );
+	const [ editedUrl, setEditedUrl ] = useState();
 
-	// Cancel cropping on deselect.
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsCropping( false );
+	const editedWidth = width;
+	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
+	let naturalAspectRatio = naturalWidth / naturalHeight;
+
+	if ( rotation % 180 === 90 ) {
+		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
+		naturalAspectRatio = naturalHeight / naturalWidth;
+	}
+
+	function apply() {
+		setIsProgress( true );
+
+		const attrs = crop;
+
+		if ( rotation > 0 ) {
+			attrs.rotation = rotation;
 		}
-	}, [ isSelected ] );
 
-	function adjustImage( action, attrs ) {
-		setIsProgress( action );
-
-		richImageRequest( id, action, attrs )
+		apiFetch( {
+			path: `__experimental/image-editor/${ id }/apply`,
+			method: 'POST',
+			data: attrs,
+		} )
 			.then( ( response ) => {
-				setIsProgress( null );
-				setIsCropping( false );
-
-				if ( response.media_id && response.media_id !== id ) {
-					setAttributes( {
-						id: response.media_id,
-						url: response.url,
-					} );
-				}
+				setAttributes( {
+					id: response.id,
+					url: response.source_url,
+					height: height && width ? width / aspect : undefined,
+				} );
 			} )
 			.catch( () => {
 				createErrorNotice(
@@ -207,177 +192,136 @@ export default function ImageEditor( {
 						type: 'snackbar',
 					}
 				);
-				setIsProgress( null );
-				setIsCropping( false );
+			} )
+			.finally( () => {
+				setIsProgress( false );
+				setIsEditingImage( false );
 			} );
 	}
 
-	function cropImage() {
-		adjustImage( 'crop', {
-			crop_x: crop.x,
-			crop_y: crop.y,
-			crop_width: crop.width,
-			crop_height: crop.height,
-		} );
-	}
+	function rotate() {
+		const angle = ( rotation + 90 ) % 360;
 
-	const classes = classnames( {
-		richimage__working: inProgress !== null,
-		[ 'richimage__working__' + inProgress ]: inProgress !== null,
-	} );
+		if ( angle === 0 ) {
+			setEditedUrl();
+			setRotation( angle );
+			setAspect( 1 / aspect );
+			setPosition( {
+				x: -( position.y * naturalAspectRatio ),
+				y: position.x * naturalAspectRatio,
+			} );
+			return;
+		}
+
+		function editImage( event ) {
+			const canvas = document.createElement( 'canvas' );
+
+			let translateX = 0;
+			let translateY = 0;
+
+			if ( angle % 180 ) {
+				canvas.width = event.target.height;
+				canvas.height = event.target.width;
+			} else {
+				canvas.width = event.target.width;
+				canvas.height = event.target.height;
+			}
+
+			if ( angle === 90 || angle === 180 ) {
+				translateX = canvas.width;
+			}
+
+			if ( angle === 270 || angle === 180 ) {
+				translateY = canvas.height;
+			}
+
+			const context = canvas.getContext( '2d' );
+
+			context.translate( translateX, translateY );
+			context.rotate( ( angle * Math.PI ) / 180 );
+			context.drawImage( event.target, 0, 0 );
+
+			canvas.toBlob( ( blob ) => {
+				setEditedUrl( URL.createObjectURL( blob ) );
+				setRotation( angle );
+				setAspect( 1 / aspect );
+				setPosition( {
+					x: -( position.y * naturalAspectRatio ),
+					y: position.x * naturalAspectRatio,
+				} );
+			} );
+		}
+
+		const el = new window.Image();
+		el.src = url;
+		el.onload = editImage;
+	}
 
 	return (
 		<>
-			<div className={ classes }>
-				{ inProgress && (
-					<div className="richimage__working-spinner">
-						<Spinner />
-					</div>
-				) }
-				{ isCropping ? (
-					<div className="richimage__crop-controls">
-						<div
-							className="richimage__crop-area"
-							style={ {
-								paddingBottom: `${
-									( 100 * imageSize.naturalHeight ) /
-									imageSize.naturalWidth
-								}%`,
-							} }
-						>
-							<Cropper
-								image={ url }
-								disabled={ inProgress }
-								minZoom={ MIN_ZOOM }
-								maxZoom={ MAX_ZOOM }
-								crop={ position }
-								zoom={ zoom }
-								aspect={ aspect }
-								onCropChange={ setPosition }
-								onCropComplete={ setCrop }
-								onZoomChange={ setZoom }
-								onMediaLoaded={ setImageSize }
-							/>
-						</div>
-						<RangeControl
-							className="richimage__zoom-control"
-							label={ __( 'Zoom' ) }
-							min={ MIN_ZOOM }
-							max={ MAX_ZOOM }
-							step={ ZOOM_STEP }
-							value={ zoom }
-							onChange={ setZoom }
-						/>
-					</div>
-				) : (
-					children
-				) }
+			<div
+				className={ classnames( 'richimage__crop-area', {
+					'is-applying': inProgress,
+				} ) }
+				style={ {
+					width: editedWidth,
+					height: editedHeight,
+				} }
+			>
+				<Cropper
+					image={ editedUrl || url }
+					disabled={ inProgress }
+					minZoom={ MIN_ZOOM / 100 }
+					maxZoom={ MAX_ZOOM / 100 }
+					crop={ position }
+					zoom={ zoom / 100 }
+					aspect={ aspect }
+					onCropChange={ setPosition }
+					onCropComplete={ setCrop }
+					onZoomChange={ ( newZoom ) => {
+						setZoom( newZoom * 100 );
+					} }
+				/>
+				{ inProgress && <Spinner /> }
 			</div>
+			{ ! inProgress && (
+				<RangeControl
+					className="richimage__zoom-control"
+					label={ __( 'Zoom' ) }
+					min={ MIN_ZOOM }
+					max={ MAX_ZOOM }
+					value={ Math.round( zoom ) }
+					onChange={ setZoom }
+				/>
+			) }
 			<BlockControls>
-				{ ! isCropping && (
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									icon={ rotateLeftIcon }
-									label={ __( 'Rotate' ) }
-									popoverProps={ POPOVER_PROPS }
-									toggleProps={ toggleProps }
-									controls={ [
-										{
-											icon: rotateLeftIcon,
-											title: __( 'Rotate left' ),
-											isDisabled: inProgress,
-											onClick() {
-												adjustImage( 'rotate', {
-													angle: -ROTATE_STEP,
-												} );
-											},
-										},
-										{
-											icon: rotateRightIcon,
-											title: __( 'Rotate right' ),
-											isDisabled: inProgress,
-											onClick() {
-												adjustImage( 'rotate', {
-													angle: ROTATE_STEP,
-												} );
-											},
-										},
-									] }
-								/>
-							) }
-						</ToolbarItem>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									icon={ flipVerticalIcon }
-									label={ __( 'Flip' ) }
-									popoverProps={ POPOVER_PROPS }
-									toggleProps={ toggleProps }
-									controls={ [
-										{
-											icon: flipVerticalIcon,
-											title: __( 'Flip vertical' ),
-											isDisabled: inProgress,
-											onClick: () => {
-												adjustImage( 'flip', {
-													direction: 'vertical',
-												} );
-											},
-										},
-										{
-											icon: flipHorizontalIcon,
-											title: __( 'Flip horizontal' ),
-											isDisabled: inProgress,
-											onClick: () => {
-												adjustImage( 'flip', {
-													direction: 'horizontal',
-												} );
-											},
-										},
-									] }
-								/>
-							) }
-						</ToolbarItem>
-						<ToolbarButton
-							disabled={ inProgress }
-							icon={ cropIcon }
-							label={ __( 'Crop' ) }
-							onClick={ () => {
-								setIsCropping( ( prev ) => ! prev );
-								setCrop( DEFAULT_CROP );
-							} }
-						/>
-					</ToolbarGroup>
-				) }
-				{ isCropping && (
-					<>
-						<ToolbarGroup>
-							<ToolbarItem>
-								{ ( toggleProps ) => (
-									<AspectMenu
-										toggleProps={ toggleProps }
-										isDisabled={ inProgress }
-										onClick={ setAspect }
-									/>
-								) }
-							</ToolbarItem>
-						</ToolbarGroup>
-						<ToolbarGroup>
-							<ToolbarButton onClick={ cropImage }>
-								{ __( 'Apply' ) }
-							</ToolbarButton>
-							<ToolbarButton
-								onClick={ () => {
-									setIsCropping( false );
-								} }
-							>
-								{ __( 'Cancel' ) }
-							</ToolbarButton>
-						</ToolbarGroup>
-					</>
-				) }
+				<ToolbarGroup>
+					<ToolbarButton
+						icon={ rotateRightIcon }
+						label={ __( 'Rotate' ) }
+						onClick={ rotate }
+						disabled={ inProgress }
+					/>
+				</ToolbarGroup>
+				<ToolbarGroup>
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<AspectMenu
+								toggleProps={ toggleProps }
+								isDisabled={ inProgress }
+								onClick={ setAspect }
+							/>
+						) }
+					</ToolbarItem>
+				</ToolbarGroup>
+				<ToolbarGroup>
+					<ToolbarButton onClick={ apply } disabled={ inProgress }>
+						{ __( 'Apply' ) }
+					</ToolbarButton>
+					<ToolbarButton onClick={ () => setIsEditingImage( false ) }>
+						{ __( 'Cancel' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
 			</BlockControls>
 		</>
 	);

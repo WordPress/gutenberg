@@ -8,23 +8,23 @@ Behind any block type registration is some abstract concept of a unit of content
 
 In more practical terms, an implementation should fulfill requirements that:
 
-* A block type registration should be declarative and context-agnostic. Any runtime (PHP, JS, or other) should be able to interpret the basics of a block type (see "Block API" in the sections below) and should be able to fetch or retrieve the definitions of the context-specific implementation details. The following things should be made possible:
-  * Fetching the available block types through REST APIs.
-  * Fetching block objects from posts through REST APIs.
-* This API should be backward compatible with what we have at the moment.
-* It should be possible to statically analyze a block type in order to support advanced use-cases required by one of the [9 projects](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) for 2019 in WordPress: "Building a WordPress.org directory for discovering blocks, and a way to seamlessly install them.". The block directory should not need to parse JavaScript or PHP files to retrieve their definitions similar to how it happens for plugins as of today.
+-   A block type registration should be declarative and context-agnostic. Any runtime (PHP, JS, or other) should be able to interpret the basics of a block type (see "Block API" in the sections below) and should be able to fetch or retrieve the definitions of the context-specific implementation details. The following things should be made possible:
+    -   Fetching the available block types through REST APIs.
+    -   Fetching block objects from posts through REST APIs.
+-   This API should be backward compatible with what we have at the moment.
+-   It should be possible to statically analyze a block type in order to support advanced use-cases required by one of the [9 projects](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) for 2019 in WordPress: "Building a WordPress.org directory for discovering blocks, and a way to seamlessly install them.". The block directory should not need to parse JavaScript or PHP files to retrieve their definitions similar to how it happens for plugins as of today.
 
 It can statically analyze the files of any plugin to retrieve blocks and their properties.
-* It should not require a build tool compilation step (e.g. Babel, Webpack) to author code which would be referenced in a block type definition.
-* There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions. It practical terms, it means that the editor should be able to be loaded without enqueuing all the assets (scripts and styles) of all block types. What it needs is the basic metadata (`title`, `description`, `category`, `icon`, etc…) to start with. It should be fine to defer loading all other code (`edit`, `save`, `transforms`, and other JavaScript implementations) until it is explicitly used (inserted into the post content).
+
+-   It should not require a build tool compilation step (e.g. Babel, Webpack) to author code which would be referenced in a block type definition.
+-   There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions. It practical terms, it means that the editor should be able to be loaded without enqueuing all the assets (scripts and styles) of all block types. What it needs is the basic metadata (`title`, `description`, `category`, `icon`, etc…) to start with. It should be fine to defer loading all other code (`edit`, `save`, `transforms`, and other JavaScript implementations) until it is explicitly used (inserted into the post content).
 
 ## References
 
-* Issue: [Block API: Server-side awareness of block types](https://github.com/WordPress/gutenberg/issues/2751)
-* Follow-up issue: [Expose available blocks via an API](https://github.com/WordPress/gutenberg/issues/4116)
-* Current documentation: [/docs/designers-developers/developers/block-api/block-registration.md](/docs/designers-developers/developers/block-api/block-registration.md)
-* Make WordPress.org post: [The Block Directory, and a new type of plugin](https://make.wordpress.org/meta/2019/03/08/the-block-directory-and-a-new-type-of-plugin/)
-
+-   Issue: [Block API: Server-side awareness of block types](https://github.com/WordPress/gutenberg/issues/2751)
+-   Follow-up issue: [Expose available blocks via an API](https://github.com/WordPress/gutenberg/issues/4116)
+-   Current documentation: [/docs/designers-developers/developers/block-api/block-registration.md](/docs/designers-developers/developers/block-api/block-registration.md)
+-   Make WordPress.org post: [The Block Directory, and a new type of plugin](https://make.wordpress.org/meta/2019/03/08/the-block-directory-and-a-new-type-of-plugin/)
 
 ## Previous attempts
 
@@ -36,11 +36,11 @@ Another exploration in [#5652](https://github.com/WordPress/gutenberg/pull/5652)
 
 ### Conclusions
 
-* The current approaches to client-side block type registration cannot support the proposed requirement to have all block types known outside the browser context.
-* Using a statically-defined, JSON-formatted block type definition enables easy integration in both JavaScript and PHP runtimes.
-* Registering a block type in PHP would allow for attribute default values to be assigned as dynamically generated from some external state (e.g. a database value, or localized string).
-* By default, JSON does not support localization or dynamic values.
-* On the server, a block type `icon` property can only be assigned as a string and thus cannot support SVGs and component-based icons.
+-   The current approaches to client-side block type registration cannot support the proposed requirement to have all block types known outside the browser context.
+-   Using a statically-defined, JSON-formatted block type definition enables easy integration in both JavaScript and PHP runtimes.
+-   Registering a block type in PHP would allow for attribute default values to be assigned as dynamically generated from some external state (e.g. a database value, or localized string).
+-   By default, JSON does not support localization or dynamic values.
+-   On the server, a block type `icon` property can only be assigned as a string and thus cannot support SVGs and component-based icons.
 
 ---
 
@@ -52,13 +52,12 @@ Blocks are the fundamental elements of the editor. They are the primary way in w
 
 To register a new block type, start by creating a `block.json` file. This file:
 
-* Gives a name to the block type.
-* Defines some important metadata about the registered block type (title, category, icon, description, keywords).
-* Defines the attributes of the block type.
-* Registers all the scripts and styles for your block type.
+-   Gives a name to the block type.
+-   Defines some important metadata about the registered block type (title, category, icon, description, keywords).
+-   Defines the attributes of the block type.
+-   Registers all the scripts and styles for your block type.
 
 **Example:**
-
 
 ```json
 {
@@ -77,6 +76,10 @@ To register a new block type, start by creating a `block.json` file. This file:
 			"selector": ".message"
 		}
 	},
+	"providesContext": {
+		"my-plugin/message": "message"
+	},
+	"usesContext": [ "groupId" ],
 	"supports": {
 		"align": true,
 		"lightBlockWrapper": true
@@ -88,7 +91,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 	"example": {
 		"attributes": {
 			"message": "This is a notice!"
-		},
+		}
 	},
 	"editorScript": "file:./build/index.js",
 	"script": "file:./build/script.js",
@@ -103,10 +106,10 @@ This section describes all the properties that can be added to the `block.json` 
 
 ### Name
 
-* Type: `string`
-* Required
-* Localized: No
-* Property: `name`
+-   Type: `string`
+-   Required
+-   Localized: No
+-   Property: `name`
 
 ```json
 { "name": "core/heading" }
@@ -120,10 +123,10 @@ The name for a block is a unique string that identifies a block. Names have to b
 
 ### Title
 
-* Type: `string`
-* Required
-* Localized: Yes
-* Property: `title`
+-   Type: `string`
+-   Required
+-   Localized: Yes
+-   Property: `title`
 
 ```json
 { "title": "Heading" }
@@ -133,10 +136,10 @@ This is the display title for your block, which can be translated with our trans
 
 ### Category
 
-* Type: `string`
-* Required
-* Localized: No
-* Property: `category`
+-   Type: `string`
+-   Required
+-   Localized: No
+-   Property: `category`
 
 ```json
 { "category": "text" }
@@ -146,11 +149,11 @@ Blocks are grouped into categories to help users browse and discover them.
 
 The core provided categories are:
 
-* common
-* formatting
-* layout
-* widgets
-* embed
+-   common
+-   formatting
+-   layout
+-   widgets
+-   embed
 
 Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
 
@@ -158,10 +161,10 @@ An implementation should expect and tolerate unknown categories, providing some 
 
 ### Parent
 
-* Type: `string[]`
-* Optional
-* Localized: No
-* Property: `parent`
+-   Type: `string[]`
+-   Optional
+-   Localized: No
+-   Property: `parent`
 
 ```json
 { "parent": [ "my-block/product" ] }
@@ -171,10 +174,10 @@ Setting `parent` lets a block require that it is only available when nested with
 
 ### Icon
 
-* Type: `string`
-* Optional
-* Localized: No
-* Property: `icon`
+-   Type: `string`
+-   Optional
+-   Localized: No
+-   Property: `icon`
 
 ```json
 { "icon": "smile" }
@@ -186,23 +189,26 @@ An icon property should be specified to make it easier to identify a block. Thes
 
 ### Description
 
-* Type: `string`
-* Optional
-* Localized: Yes
-* Property: `description`
+-   Type: `string`
+-   Optional
+-   Localized: Yes
+-   Property: `description`
 
 ```json
- { "description": "Introduce new sections and organize content to help visitors" }
+{
+	"description": "Introduce new sections and organize content to help visitors"
+}
 ```
 
 This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector.
 
 ### Keywords
 
-* Type: `string[]`
-* Optional
-* Localized: Yes
-* Property: `keywords`
+-   Type: `string[]`
+-   Optional
+-   Localized: Yes
+-   Property: `keywords`
+-   Default: `[]`
 
 ```json
 { "keywords": [ "keyword1", "keyword2" ] }
@@ -212,10 +218,10 @@ Sometimes a block could have aliases that help users discover it while searching
 
 ### Text Domain
 
-* Type: `string`
-* Optional
-* Localized: No
-* Property: `textdomain`
+-   Type: `string`
+-   Optional
+-   Localized: No
+-   Property: `textdomain`
 
 ```json
 { "textdomain": "my-plugin" }
@@ -225,10 +231,11 @@ The [gettext](https://www.gnu.org/software/gettext/) text domain of the plugin/b
 
 ### Attributes
 
-* Type: `object`
-* Optional
-* Localized: No
-* Property: `attributes`
+-   Type: `object`
+-   Optional
+-   Localized: No
+-   Property: `attributes`
+-   Default: `{}`
 
 ```json
 {
@@ -252,23 +259,63 @@ Attributes provide the structured data needs of a block. They can exist in diffe
 
 See the [the attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
 
+### Provides Context
+
+-   Type: `object`
+-   Optional
+-   Localized: No
+-   Property: `providesContext`
+-   Default: `{}`
+
+Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block's own attribute.
+
+See [the block context documentation](/docs/designers-developers/developers/block-api/block-context.md) for more details.
+
+```json
+{
+	"providesContext": {
+		"my-plugin/recordId": "recordId"
+	}
+}
+```
+
+### Context
+
+-   Type: `string[]`
+-   Optional
+-   Localized: No
+-   Property: `usesContext`
+-   Default: `[]`
+
+Array of the names of context values to inherit from an ancestor provider.
+
+See [the block context documentation](/docs/designers-developers/developers/block-api/block-context.md) for more details.
+
+```json
+{
+	"usesContext": [ "message" ]
+}
+```
+
 ### Supports
 
- *   Type: `object`
- *   Optional
- *   Localized: No
- *   Property: `supports`
+-   Type: `object`
+-   Optional
+-   Localized: No
+-   Property: `supports`
+-   Default: `{}`
 
- It contains as set of options to control features used in the editor.
+It contains as set of options to control features used in the editor.
 
- See the [the supports documentation](/docs/designers-developers/developers/block-api/block-registration.md#supports-optional) for more details.
+See the [the supports documentation](/docs/designers-developers/developers/block-api/block-registration.md#supports-optional) for more details.
 
 ### Style Variations
 
-* Type: `array`
-* Optional
-* Localized: Yes (`label` only)
-* Property: `styles`
+-   Type: `array`
+-   Optional
+-   Localized: Yes (`label` only)
+-   Property: `styles`
+-   Default: `[]`
 
 ```json
 {
@@ -285,12 +332,12 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 
 ### Example
 
- *   Type: `object`
- *   Optional
- *   Localized: No
- *   Property: `example`
+-   Type: `object`
+-   Optional
+-   Localized: No
+-   Property: `example`
 
- ```json
+```json
 {
 	"example": {
 		"attributes": {
@@ -298,18 +345,18 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 		}
 	}
 }
- ```
+```
 
- It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
+It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
 
- See the [the example documentation](/docs/designers-developers/developers/block-api/block-registration.md#example-optional) for more details.
+See the [the example documentation](/docs/designers-developers/developers/block-api/block-registration.md#example-optional) for more details.
 
 ### Editor Script
 
-* Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
-* Optional
-* Localized: No
-* Property: `editorScript`
+-   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Optional
+-   Localized: No
+-   Property: `editorScript`
 
 ```json
 { "editorScript": "file:./build/index.js" }
@@ -319,10 +366,10 @@ Block type editor script definition. It will only be enqueued in the context of 
 
 ### Script
 
-* Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
-* Optional
-* Localized: No
-* Property: `script`
+-   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Optional
+-   Localized: No
+-   Property: `script`
 
 ```json
 { "script": "file:./build/script.js" }
@@ -332,10 +379,10 @@ Block type frontend script definition. It will be enqueued both in the editor an
 
 ### Editor Style
 
-* Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
-* Optional
-* Localized: No
-* Property: `editorStyle`
+-   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Optional
+-   Localized: No
+-   Property: `editorStyle`
 
 ```json
 { "editorStyle": "file:./build/index.css" }
@@ -345,10 +392,10 @@ Block type editor style definition. It will only be enqueued in the context of t
 
 ### Style
 
-* Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
-* Optional
-* Localized: No
-* Property: `style`
+-   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Optional
+-   Localized: No
+-   Property: `style`
 
 ```json
 { "style": "file:./build/style.css" }
@@ -359,25 +406,27 @@ Block type frontend style definition. It will be enqueued both in the editor and
 ## Backward compatibility
 
 The following properties are going to be supported for backward compatibility reasons on the client-side only. Some of them might be replaced with alternative APIs in the future:
- - `edit` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
- - `save` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
- - `transforms` - see the [Transforms](/docs/designers-developers/developers/block-api/block-registration.md#transforms-optional) documentation for more details.
- - `deprecated` - see the [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) documentation for more details.
- - `merge` - undocumented as of today. Its role is to handle merging multiple blocks into one.
- - `getEditWrapperProps` - undocumented as well. Its role is to inject additional props to the block edit's component wrapper.
+
+-   `edit` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
+-   `save` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
+-   `transforms` - see the [Transforms](/docs/designers-developers/developers/block-api/block-registration.md#transforms-optional) documentation for more details.
+-   `deprecated` - see the [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) documentation for more details.
+-   `merge` - undocumented as of today. Its role is to handle merging multiple blocks into one.
+-   `getEditWrapperProps` - undocumented as well. Its role is to inject additional props to the block edit's component wrapper.
 
 **Example**:
+
 ```js
 wp.blocks.registerBlockType( 'my-block/name', {
-	edit: function() {
+	edit: function () {
 		// Edit definition goes here.
 	},
-	save: function() {
+	save: function () {
 		// Save definition goes here.
 	},
-	getEditWrapperProps: function() {
+	getEditWrapperProps: function () {
 		// Implementation goes here.
-	}
+	},
 } );
 ```
 
@@ -394,6 +443,7 @@ An alternative would be a script or style handle name referencing a registered a
 **Example:**
 
 In `block.json`:
+
 ```json
 {
 	"editorScript": "file:./build/index.js",
@@ -408,9 +458,10 @@ In the context of WordPress, when a block is registered with PHP, it will automa
 That's why, the `WPDefinedAsset` type has to offer a way to mirror also the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings.
 
 It's possible to provide an object which takes the following shape:
-- `handle` (`string`) - the name of the script. If omitted, it will be auto-generated.
-- `dependencies` (`string[]`) - an array of registered script handles this script depends on. Default value: `[]`.
-- `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
+
+-   `handle` (`string`) - the name of the script. If omitted, it will be auto-generated.
+-   `dependencies` (`string[]`) - an array of registered script handles this script depends on. Default value: `[]`.
+-   `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
 
 The definition is stored inside separate PHP file which ends with `.asset.php` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as it is expected it will become an option to auto-generate those asset files with `@wordpress/scripts` package.
 
@@ -423,11 +474,13 @@ build/
 ```
 
 In `block.json`:
+
 ```json
 { "editorScript": "file:./build/index.js" }
 ```
 
 In `build/index.asset.php`:
+
 ```php
 <?php
 return array(
@@ -462,9 +515,13 @@ In JavaScript, with the help of a new helper function `registerBlockTypeFromMeta
 ```js
 const metadata = {
 	title: _x( 'My block', 'block title', 'my-plugin' ),
-	description: _x( 'My block is fantastic', 'block description', 'my-plugin' ),
+	description: _x(
+		'My block is fantastic',
+		'block description',
+		'my-plugin'
+	),
 	keywords: [ _x( 'fantastic', 'block keywords', 'my-plugin' ) ],
-}
+};
 ```
 
 In PHP, it is transformed at runtime with a new helper function `register_block_from_metadata` to code roughly equivalent to:
@@ -485,9 +542,10 @@ Implementation should follow the existing [get_plugin_data](https://codex.wordpr
 There is also a new API method proposed `register_block_type_from_metadata` that aims to simplify the block type registration on the server from metadata stored in the `block.json` file. This function is going to handle also all necessary work to make internationalization work seamlessly for metadata defined.
 
 This function takes two params:
-- `$path` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
-- `$args` (`array`) –  an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
-  - `$render_callback` (`callable`) – callback used to render blocks of this block type.
+
+-   `$path` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
+-   `$args` (`array`) – an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
+    -   `$render_callback` (`callable`) – callback used to render blocks of this block type.
 
 It returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
 

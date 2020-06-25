@@ -6,20 +6,12 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { Children, cloneElement } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-export const BlockQuotation = withPreferredColorScheme( ( props ) => {
-	const { getStylesFromColorScheme } = props;
-
-	const blockQuoteStyle = getStylesFromColorScheme(
-		styles.wpBlockQuoteLight,
-		styles.wpBlockQuoteDark
-	);
-
+export const BlockQuotation = ( props ) => {
 	const newChildren = Children.map( props.children, ( child ) => {
 		if ( child && child.props.identifier === 'citation' ) {
 			return cloneElement( child, {
@@ -27,12 +19,9 @@ export const BlockQuotation = withPreferredColorScheme( ( props ) => {
 			} );
 		}
 		if ( child && child.props.identifier === 'value' ) {
-			return cloneElement( child, {
-				tagsToEliminate: [ 'div' ],
-				style: styles.wpBlockQuoteValue,
-			} );
+			return cloneElement( child, { tagsToEliminate: [ 'div' ] } );
 		}
 		return child;
 	} );
-	return <View style={ blockQuoteStyle }>{ newChildren }</View>;
-} );
+	return <View style={ styles.wpBlockQuote }>{ newChildren }</View>;
+};
