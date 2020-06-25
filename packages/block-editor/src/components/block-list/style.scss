@@ -528,13 +528,6 @@
 
 
 /**
- * Block Toolbar, top and contextual.
- */
-.block-editor-block-contextual-toolbar-wrapper {
-	padding-left: $block-toolbar-height; // Provide space for the mover control on full-wide items.
-}
-
-/**
  * Block Toolbar when contextual.
  */
 
@@ -651,9 +644,6 @@
 		border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 		background-color: $white;
 
-		// Indent to align with block toolbar.
-		margin-left: $block-toolbar-height + $border-width;
-
 		// When button is focused, it receives a box-shadow instead of the border.
 		&:focus {
 			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
@@ -720,12 +710,6 @@
 		.block-editor-block-list__block-selection-button,
 		.block-editor-block-contextual-toolbar {
 			margin-bottom: $grid-unit-15;
-			margin-left: - $block-toolbar-height;
-		}
-
-		.block-editor-block-contextual-toolbar[data-align="full"],
-		.block-editor-block-list__block-selection-button[data-align="full"] {
-			margin-left: 0;
 		}
 	}
 
