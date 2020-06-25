@@ -26,7 +26,7 @@ import {
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
-import { link } from '@wordpress/icons';
+import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -70,13 +70,15 @@ function URLPicker( {
 	onToggleOpenInNewTab,
 } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+	const urlIsSet = !! url;
+	const urlIsSetandSelected = urlIsSet && isSelected;
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
 
 		// prevents default behaviour for event
 		return false;
 	};
-	const linkControl = isURLPickerOpen && (
+	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
 		<Popover
 			position="bottom center"
 			onClose={ () => setIsURLPickerOpen( false ) }
@@ -101,13 +103,31 @@ function URLPicker( {
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						name="link"
-						icon={ link }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
-					/>
+					{ ! urlIsSet && (
+						<ToolbarButton
+							name="link"
+							icon={ link }
+							title={ __( 'Link' ) }
+							shortcut={ displayShortcut.primary( 'k' ) }
+							onClick={ openLinkControl }
+						/>
+					) }
+					{ urlIsSetandSelected && (
+						<ToolbarButton
+							name="link"
+							icon={ linkOff }
+							title={ __( 'Unlink' ) }
+							shortcut={ displayShortcut.primaryShift( 'k' ) }
+							onClick={ () =>
+								setAttributes( {
+									url: undefined,
+									linkTarget: undefined,
+									rel: undefined,
+								} )
+							}
+							isActive={ true }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			{ isSelected && (
