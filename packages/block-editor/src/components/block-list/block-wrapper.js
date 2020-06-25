@@ -233,7 +233,7 @@ const BlockComponent = forwardRef(
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
-				{ ...omit( wrapperProps, [ 'data-align' ] ) }
+				{ ...wrapperProps }
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
