@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 import { v4 as uuid } from 'uuid';
+
+/**
+ * WordPress dependencies
+ */
+import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
 
 export * from './actions.js';
 

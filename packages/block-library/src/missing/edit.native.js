@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
-import { requestUnsupportedBlockFallback } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
+import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
 import { BottomSheet, Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';

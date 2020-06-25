@@ -125,16 +125,14 @@ function ColorGradientControlInner( {
 					<ButtonGroup className="block-editor-color-gradient-control__button-tabs">
 						<Button
 							isSmall
-							isPrimary={ currentTab === 'color' }
-							isSecondary={ currentTab !== 'color' }
+							isPressed={ currentTab === 'color' }
 							onClick={ () => setCurrentTab( 'color' ) }
 						>
 							{ __( 'Solid' ) }
 						</Button>
 						<Button
 							isSmall
-							isPrimary={ currentTab === 'gradient' }
-							isSecondary={ currentTab !== 'gradient' }
+							isPressed={ currentTab === 'gradient' }
 							onClick={ () => setCurrentTab( 'gradient' ) }
 						>
 							{ __( 'Gradient' ) }

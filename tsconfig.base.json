@@ -5,6 +5,7 @@
 		"allowSyntheticDefaultImports": true,
 		"jsx": "preserve",
 		"target": "esnext",
+		"types": ["react", "node", "requestidlecallback"],
 		"module": "esnext",
 		"lib": [ "dom", "esnext" ],
 		"declaration": true,
@@ -40,6 +41,7 @@
 		"**/build-*/**",
 		"**/*.android.js",
 		"**/*.ios.js",
-		"**/*.native.js"
+		"**/*.native.js",
+		"./packages/**/react-native-*/**"
 	]
 }
