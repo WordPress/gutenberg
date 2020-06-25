@@ -4,7 +4,7 @@
 import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
-const SCROLL_INACTIVE_DISTANCE_PX = 50;
+const BOUNDARY_ZONE_PERCENTAGE_SIZE = 0.33;
 const SCROLL_INTERVAL_MS = 25;
 const PIXELS_PER_SECOND_PER_PERCENTAGE = 1000;
 const VELOCITY_MULTIPLIER =
@@ -61,36 +61,30 @@ export default function useScrollWhenDragging( dragElement ) {
 
 	const scrollOnDragOver = useCallback( ( event ) => {
 		const scrollParentHeight = scrollParentY.current.offsetHeight;
+		const scrollParentBoundaryHeight =
+			BOUNDARY_ZONE_PERCENTAGE_SIZE * scrollParentHeight;
+		const offsetDragPosition =
+			event.clientY - scrollParentY.current.offsetTop;
 
 		if ( event.clientY > dragStartY.current ) {
-			// User is dragging downwards.
-			const moveableDistance = Math.max(
-				scrollParentHeight -
-					dragStartY.current -
-					SCROLL_INACTIVE_DISTANCE_PX,
-				0
+			// User is dragging down.
+			const scrollParentBoundaryTop =
+				scrollParentHeight - scrollParentBoundaryHeight;
+			const distanceIntoBoundary = Math.max(
+				0,
+				offsetDragPosition - scrollParentBoundaryTop
 			);
-			const dragDistance = Math.max(
-				event.clientY -
-					dragStartY.current -
-					SCROLL_INACTIVE_DISTANCE_PX,
-				0
-			);
-			const distancePercentage = dragDistance / moveableDistance;
+			const distancePercentage =
+				distanceIntoBoundary / scrollParentBoundaryHeight;
 			velocityY.current = VELOCITY_MULTIPLIER * distancePercentage;
 		} else if ( event.clientY < dragStartY.current ) {
-			// User is dragging upwards.
-			const moveableDistance = Math.max(
-				dragStartY.current - SCROLL_INACTIVE_DISTANCE_PX,
-				0
+			// User is dragging up.
+			const distanceIntoBoundary = Math.max(
+				0,
+				scrollParentBoundaryHeight - offsetDragPosition
 			);
-			const dragDistance = Math.max(
-				dragStartY.current -
-					event.clientY -
-					SCROLL_INACTIVE_DISTANCE_PX,
-				0
-			);
-			const distancePercentage = dragDistance / moveableDistance;
+			const distancePercentage =
+				distanceIntoBoundary / scrollParentBoundaryHeight;
 			velocityY.current = -VELOCITY_MULTIPLIER * distancePercentage;
 		} else {
 			velocityY.current = 0;
