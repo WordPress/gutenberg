@@ -20,7 +20,6 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 			return {
 				key: author.id,
 				name: author.name,
-				value: author.name,
 				id: author.id,
 			};
 		} );
@@ -76,7 +75,6 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 				.map( ( author ) => ( {
 					key: author.id,
 					name: author.name,
-					value: author.name,
 					id: author.id,
 				} ) );
 		},
