@@ -33,7 +33,7 @@ const BlockActionsMenu = ( {
 	anchorNodeRef,
 } ) => {
 	const pickerRef = useRef();
-	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
+	const moversOptions = { keys: [ 'icon', 'actionTitle' ], blockTitle };
 
 	const {
 		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
@@ -45,7 +45,8 @@ const BlockActionsMenu = ( {
 
 	const deleteOption = {
 		id: 'deleteOption',
-		label: __( 'Remove block' ),
+		// translators: %s: block title e.g: "Paragraph".
+		label: sprintf( __( 'Remove %s' ), blockTitle ),
 		value: 'deleteOption',
 		icon: trash,
 		separated: true,
@@ -54,7 +55,8 @@ const BlockActionsMenu = ( {
 
 	const settingsOption = {
 		id: 'settingsOption',
-		label: __( 'Block settings' ),
+		// translators: %s: block title e.g: "Paragraph".
+		label: sprintf( __( '%s Settings' ), blockTitle ),
 		value: 'settingsOption',
 		icon: cog,
 	};
@@ -134,8 +136,6 @@ const BlockActionsMenu = ( {
 				anchor={
 					anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined
 				}
-				// translators: %s: block title e.g: "Paragraph".
-				title={ sprintf( __( '%s block options' ), blockTitle ) }
 			/>
 		</>
 	);
