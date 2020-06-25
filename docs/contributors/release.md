@@ -12,7 +12,7 @@ We release a new major version approximately every two weeks. The current and ne
 
 - **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
 
-- **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](./testing-overview.md#performance-testing) is published.
+- **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](https://developer.wordpress.org/block-editor/contributors/testing-overview/#performance-testing) is published.
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
@@ -79,6 +79,8 @@ Guidelines for proof-reading include:
 - Remove mobile app pull request entries.
 
 Once you have cleaned up the changelog, choose a few features to highlight in the release post and record an animation of them in use.
+
+You should also include a performance audit at the end of the release post. You can use `bin/plugin/cli.js perf` to automatically do this.
 
 Compile this to a draft post on [make.wordpress.org/core](https://make.wordpress.org/core/); this post should be published after the actual release.
 
