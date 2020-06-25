@@ -8,15 +8,15 @@ import { uniq, map } from 'lodash';
  */
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { Flex, FlexItem, FlexBlock } from '@wordpress/components';
-import { menu } from '@wordpress/icons';
+import { Flex, FlexItem } from '@wordpress/components';
+import { menu, handle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
 
-export function BlockDraggableChip( { icon = menu, label } ) {
+export function BlockDraggableChip( { icon = menu } ) {
 	return (
 		<div className="block-editor-block-draggable-chip-wrapper">
 			<div className="block-editor-block-draggable-chip">
@@ -25,15 +25,11 @@ export function BlockDraggableChip( { icon = menu, label } ) {
 					className="block-editor-block-draggable-chip__content"
 				>
 					<FlexItem>
+						<BlockIcon icon={ handle } />
+					</FlexItem>
+					<FlexItem>
 						<BlockIcon icon={ icon } />
 					</FlexItem>
-					{ label && (
-						<FlexBlock>
-							<div className="block-editor-block-draggable-chip__label">
-								{ label }
-							</div>
-						</FlexBlock>
-					) }
 				</Flex>
 			</div>
 		</div>
