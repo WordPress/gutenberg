@@ -594,7 +594,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet();
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $stylesheet );
-	wp_enqueue_style( 'global-styles');
+	wp_enqueue_style( 'global-styles' );
 }
 
 /**
@@ -653,17 +653,30 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
+	if ( ! function_exists( 'get_current_screen' ) ) {
+		return false;
+	}
+	$screen = get_current_screen();
 
-	$include_draft = true;
-	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		// The CPT ID for entity retrieval/saving.
-		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
+	if ( ! empty( $screen ) &&
+		gutenberg_is_edit_site_page( $screen->id ) &&
+		gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		$settings['__experimentalGlobalStylesUserEntityId']  = gutenberg_experimental_global_styles_get_user_cpt_id();
 		$settings['__experimentalGlobalStylesGlobalContext'] = gutenberg_experimental_global_styles_get_global_context();
+		$settings['__experimentalGlobalStylesBaseStyles']    = gutenberg_experimental_global_styles_merge_trees(
+			gutenberg_experimental_global_styles_get_core(),
+			gutenberg_experimental_global_styles_get_theme()
+		);
+	} else {
+		// We are in a block editor context, as this function
+		// is hooked to the block_editor_settings filter.
+		//
+		// Add the styles for the editor via the settings
+		// so they get processed as if they were added via add_editor_styles:
+		// they will get the editor wrapper class.
+		$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet() );
 	}
 
-	// Add the styles for the editor via the settings
-	// so they get processed as if they were added via add_editor_styles:
-	// they will get the editor wrapper class.
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
 
 	// Unsetting deprecated settings defined by Core.
@@ -671,7 +684,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['disableCustomFontSizes'] );
 	unset( $settings['enableCustomLineHeight'] );
-	$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $include_draft ) );
 
 	return $settings;
 }
