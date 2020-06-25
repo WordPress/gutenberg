@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { FontSizePicker, PanelColorSettings } from '@wordpress/block-editor';
+import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -25,23 +26,25 @@ export default () => {
 
 	if ( supports.includes( FONT_SIZE ) ) {
 		panels.push(
-			<FontSizePicker
-				value={ getProperty(
-					'global',
-					'typography',
-					'fontSize',
-					'px'
-				) }
-				onChange={ ( value ) =>
-					setProperty(
+			<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
+				<FontSizePicker
+					value={ getProperty(
 						'global',
 						'typography',
 						'fontSize',
-						value,
 						'px'
-					)
-				}
-			/>
+					) }
+					onChange={ ( value ) =>
+						setProperty(
+							'global',
+							'typography',
+							'fontSize',
+							value,
+							'px'
+						)
+					}
+				/>
+			</PanelBody>
 		);
 	}
 
