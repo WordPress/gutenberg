@@ -79,7 +79,6 @@ export function* installBlockType( block ) {
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
-
 		if ( ! registeredBlocks.length ) {
 			throw new Error( __( 'Unable to get block types.' ) );
 		}
