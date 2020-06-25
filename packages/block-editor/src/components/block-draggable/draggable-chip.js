@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniq, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
@@ -16,7 +11,25 @@ import { menu, handle } from '@wordpress/icons';
  */
 import BlockIcon from '../block-icon';
 
-export function BlockDraggableChip( { icon = menu } ) {
+export default function BlockDraggableChip( { clientIds } ) {
+	const icon = useSelect(
+		( select ) => {
+			const { getBlockName } = select( 'core/block-editor' );
+			const [ firstId ] = clientIds;
+			const blockName = getBlockName( firstId );
+			const isOfSameType = clientIds.every(
+				( id ) => getBlockName( id ) === blockName
+			);
+
+			if ( ! isOfSameType ) {
+				return menu;
+			}
+
+			return getBlockType( blockName ).icon;
+		},
+		[ clientIds ]
+	);
+
 	return (
 		<div className="block-editor-block-draggable-chip-wrapper">
 			<div className="block-editor-block-draggable-chip">
@@ -35,32 +48,3 @@ export function BlockDraggableChip( { icon = menu } ) {
 		</div>
 	);
 }
-
-/*
- * Connects the <BaseBlockDraggableChip /> UI with data from @wordpress/data.
- */
-function ConnectedBlockDraggableChip( { clientIds } ) {
-	const { blocks } = useSelect( ( select ) => {
-		const { getBlocksByClientId } = select( 'core/block-editor' );
-
-		return { blocks: getBlocksByClientId( clientIds ) };
-	} );
-
-	// When selection consists of blocks of multiple types, display an
-	// appropriate icon to communicate the non-uniformity.
-	const isSelectionOfSameType = uniq( map( blocks, 'name' ) ).length === 1;
-
-	let icon;
-	let label;
-
-	if ( isSelectionOfSameType ) {
-		const sourceBlockName = blocks[ 0 ].name;
-		const blockType = getBlockType( sourceBlockName );
-		icon = blockType.icon;
-		label = blockType.title;
-	}
-
-	return <BlockDraggableChip icon={ icon } label={ label } />;
-}
-
-export default ConnectedBlockDraggableChip;
