@@ -7,12 +7,12 @@ import { useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
 import {
 	Placeholder,
-	TextControl,
 	Dropdown,
 	ButtonGroup,
 	Button,
 } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
+import { __experimentalSearchForm as SearchForm } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -69,12 +69,9 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				) }
 				renderContent={ () => (
 					<>
-						<TextControl
-							label={ __( 'Search' ) }
-							placeholder={ __( 'header' ) }
-							value={ filterValue }
+						<SearchForm
 							onChange={ setFilterValue }
-							className="wp-block-template-part__placeholder-preview-filter-input"
+							className="wp-block-template-part__placeholder-preview-search-form"
 						/>
 						<div className="wp-block-template-part__placeholder-preview-container">
 							<TemplatePartPreviews

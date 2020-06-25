@@ -2,25 +2,16 @@
 .wp-block-template-part__placeholder-preview-dropdown-content {
 	.components-popover__content {
 		min-width: 320px;
-		padding-top: 0;
+		padding: 0;
 	}
 }
 
-.wp-block-template-part__placeholder-preview-filter-input {
-	background: $white;
+.wp-block-template-part__placeholder-preview-search-form {
 	border-bottom: $border-width solid $light-gray-500;
-	left: 0;
-	margin: 0 ( -$grid-unit-15 ) $grid-unit-15;
-	padding: $grid-unit-15;
-	position: sticky;
-	top: 0;
-	z-index: z-index(".wp-block-template-part__placeholder-preview-filter-input");
 }
 
 .wp-block-template-part__placeholder-preview-container {
 	background: $white;
-	border-radius: $radius-block-ui;
-	border: $border-width solid $light-gray-500;
 	padding-bottom: 16px;
 
 	.wp-block-template-part__placeholder-preview-item {
@@ -49,7 +40,7 @@
 	.wp-block-template-part__placeholder-preview-item-title {
 		padding: $grid-unit-05;
 		font-size: 12px;
-		text-align: center;
+		text-align: left;
 	}
 
 	.wp-block-template-part__placeholder-panel-group-header {

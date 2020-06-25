@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -7,7 +12,7 @@ import { VisuallyHidden, Button } from '@wordpress/components';
 import { Icon, search, closeSmall } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
-function InserterSearchForm( { onChange, value } ) {
+function InserterSearchForm( { className, onChange, value } ) {
 	const instanceId = useInstanceId( InserterSearchForm );
 	const searchInput = useRef();
 
@@ -16,7 +21,12 @@ function InserterSearchForm( { onChange, value } ) {
 	// Popover's focusOnMount.
 	/* eslint-disable jsx-a11y/no-autofocus */
 	return (
-		<div className="block-editor-inserter__search">
+		<div
+			className={ classnames(
+				'block-editor-inserter__search',
+				className
+			) }
+		>
 			<VisuallyHidden
 				as="label"
 				htmlFor={ `block-editor-inserter__search-${ instanceId }` }
