@@ -35,8 +35,24 @@ export function* getAuthors() {
 	} );
 	yield receiveUserQuery( 'authors', users );
 }
+
+/**
+ * Searches for authors from the REST API.
+ *
+ * @param {string} search A search query string.
+ */
+export function* searchAuthors( search = '' ) {
+	const users = yield apiFetch( {
+		path: `/wp/v2/users/?who=authors&per_page=100&search=${ search }`,
+	} );
+
+	yield receiveUserQuery( 'searchAuthors', users );
+}
+
 /**
  * Request a single author from the REST API.
+ *
+ * @param {string} id The ID of the author to retrieve.
  */
 export function* getAuthor( id = '' ) {
 	const users = yield apiFetch( {

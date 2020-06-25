@@ -6,8 +6,8 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useEffect } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { useState, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,7 +15,6 @@ import apiFetch from '@wordpress/api-fetch';
 import ComboboxControl from '../../../../components/build/combobox-control/';
 
 function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
-
 	let initialAuthors = useMemo( () => {
 		return authors.map( ( author ) => {
 			return {
@@ -25,7 +24,7 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 				id: author.id,
 			};
 		} );
-	}, [ authors ] )
+	}, [ authors ] );
 
 	// Ensure the current author is included in the initial dropdown list.
 	let foundAuthor = initialAuthors.findIndex(
@@ -37,16 +36,6 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 		initialAuthors = [ postAuthor, ...initialAuthors ];
 		foundAuthor = 0;
 	}
-
-	// The search result loading state.
-	const [ isLoadingSearchResults, setIsLoadingSearchResult ] = useState(
-		false
-	);
-
-	// The list of authors available in the dropdown.
-	const [ availableAuthors, setAvailableAuthors ] = useState(
-		initialAuthors
-	);
 
 	// The currently selected author.
 	const [ selectedAuthor, setSelectedAuthor ] = useState( postAuthor );
@@ -60,6 +49,9 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 	 * @param {Object} selectedItem The selected Author.
 	 */
 	const handleSelect = ( { selectedItem } ) => {
+		if ( ! selectedItem ) {
+			return;
+		}
 		setFieldValue( selectedItem.name );
 		onUpdateAuthor( selectedItem.id );
 		setSelectedAuthor( selectedItem );
@@ -74,46 +66,30 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 		setFieldValue( inputValue );
 	};
 
-	// Refresh the user list when the field value changes or the selection is changed.
-	useEffect( () => {
-		// When the field is cleared or unchanged, use the original author list.
-		if ( '' === fieldValue || fieldValue === selectedAuthor.name ) {
-			setAvailableAuthors( initialAuthors );
-		} else {
-			searchAuthors( fieldValue );
-		}
-	}, [ fieldValue, selectedAuthor ] );
-
-	/**
-	 * Search for authors from the rest API.
-	 *
-	 * @param string query The string to search for.
-	 **/
-	const searchAuthors = debounce( ( query ) => {
-		const payload = '?search=' + encodeURIComponent( query );
-		setIsLoadingSearchResult( true );
-		apiFetch( { path: '/wp/v2/users' + payload } ).then( ( results ) => {
-			setAvailableAuthors(
-				results.map( ( author ) => ( {
+	const availableAuthors = useSelect(
+		( select ) => {
+			if ( '' === fieldValue || fieldValue === selectedAuthor.name ) {
+				return initialAuthors;
+			}
+			return select( 'core' )
+				.searchAuthors( fieldValue )
+				.map( ( author ) => ( {
 					key: author.id,
 					name: author.name,
 					value: author.name,
 					id: author.id,
-				} ) )
-			);
-			setIsLoadingSearchResult( false );
-		} );
-	},
-	300 );
+				} ) );
+		},
+		[ fieldValue, selectedAuthor ]
+	);
 
 	return (
 		<ComboboxControl
 			id={ id }
-			isLoading={ isLoadingSearchResults }
 			options={ availableAuthors }
 			initialHighlightedIndex={ foundAuthor }
 			initialInputValue={ selectedAuthor?.name }
-			onInputValueChange={ handleKeydown }
+			onInputValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleSelect }
 		/>
 	);

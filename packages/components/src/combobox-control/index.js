@@ -5,14 +5,9 @@ import { useCombobox } from 'downshift';
 import classnames from 'classnames';
 
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
-import { Button, Dashicon, Spinner } from '../';
+import { Button, Dashicon } from '../';
 
 const itemToString = ( item ) => item && item.name;
 export default function ComboboxControl( {
@@ -25,7 +20,6 @@ export default function ComboboxControl( {
 	value: _selectedItem,
 	initialHighlightedIndex,
 	initialInputValue,
-	isLoading,
 } ) {
 	const {
 		getLabelProps,
@@ -106,37 +100,31 @@ export default function ComboboxControl( {
 			</div>
 			<ul { ...menuProps }>
 				{ isOpen &&
-					( isLoading ? (
-						<span>
-							<Spinner /> { __( 'Loading' ) }
-						</span>
-					) : (
-						items.map( ( item, index ) => (
-							// eslint-disable-next-line react/jsx-key
-							<li
-								{ ...getItemProps( {
-									item,
-									index,
-									key: item.key,
-									className: classnames(
-										'components-combobox-control__item',
-										{
-											'is-highlighted':
-												index === highlightedIndex,
-										}
-									),
-									style: item.style,
-								} ) }
-							>
-								{ item === selectedItem && (
-									<Dashicon
-										icon="saved"
-										className="components-combobox-control__item-icon"
-									/>
-								) }
-								{ item.name }
-							</li>
-						) )
+					items.map( ( item, index ) => (
+						// eslint-disable-next-line react/jsx-key
+						<li
+							{ ...getItemProps( {
+								item,
+								index,
+								key: item.key,
+								className: classnames(
+									'components-combobox-control__item',
+									{
+										'is-highlighted':
+											index === highlightedIndex,
+									}
+								),
+								style: item.style,
+							} ) }
+						>
+							{ item === selectedItem && (
+								<Dashicon
+									icon="saved"
+									className="components-combobox-control__item-icon"
+								/>
+							) }
+							{ item.name }
+						</li>
 					) ) }
 			</ul>
 		</div>

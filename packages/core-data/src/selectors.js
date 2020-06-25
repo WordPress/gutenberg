@@ -48,6 +48,17 @@ export function getAuthors( state ) {
 }
 
 /**
+ * Returns searched authors.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Authors list.
+ */
+export function searchAuthors( state ) {
+	return getUserQueryResults( state, 'searchAuthors' );
+}
+
+/**
  * Returns the current user.
  *
  * @param {Object} state Data state.
