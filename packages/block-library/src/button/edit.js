@@ -74,9 +74,15 @@ function URLPicker( {
 	const urlIsSetandSelected = urlIsSet && isSelected;
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
-
-		// prevents default behaviour for event
-		return false;
+		return false; // prevents default behaviour for event
+	};
+	const unlinkButton = () => {
+		setAttributes( {
+			url: undefined,
+			linkTarget: undefined,
+			rel: undefined,
+		} );
+		setIsURLPickerOpen( false );
 	};
 	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
 		<Popover
@@ -118,13 +124,7 @@ function URLPicker( {
 							icon={ linkOff }
 							title={ __( 'Unlink' ) }
 							shortcut={ displayShortcut.primaryShift( 'k' ) }
-							onClick={ () =>
-								setAttributes( {
-									url: undefined,
-									linkTarget: undefined,
-									rel: undefined,
-								} )
-							}
+							onClick={ unlinkButton }
 							isActive={ true }
 						/>
 					) }
@@ -135,6 +135,7 @@ function URLPicker( {
 					bindGlobal
 					shortcuts={ {
 						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
 					} }
 				/>
 			) }
