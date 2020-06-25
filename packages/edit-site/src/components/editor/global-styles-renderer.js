@@ -12,9 +12,43 @@ import {
 	PRESET_GRADIENT,
 } from './utils';
 
-const mergeTrees = ( baseStyles, userStyles ) => {
-	// TODO: merge trees
-	return baseStyles;
+const mergeTrees = ( baseData, userData ) => {
+	// Deep clone from base data
+	const mergedTree = JSON.parse( JSON.stringify( baseData ) );
+
+	Object.keys( userData ).forEach( ( context ) => {
+		// Normalize object shape
+		if ( ! mergedTree[ context ].styles?.typography ) {
+			mergedTree[ context ].styles.typography = {};
+		}
+		if ( ! mergedTree[ context ].styles?.color ) {
+			mergedTree[ context ].styles.color = {};
+		}
+
+		// TODO: this needs to account for presets as well
+		if ( userData?.[ context ]?.styles?.typography?.fontSize ) {
+			mergedTree[ context ].styles.typography.fontSize =
+				userData[ context ].styles.typography.fontSize;
+		}
+		if ( userData?.[ context ]?.styles?.typography?.lineHeight ) {
+			mergedTree[ context ].styles.typography.lineHeight =
+				userData[ context ].styles.typography.lineHeight;
+		}
+		if ( userData?.[ context ]?.styles?.color?.link ) {
+			mergedTree[ context ].styles.color.link =
+				userData[ context ].styles.color.link;
+		}
+		if ( userData?.[ context ]?.styles?.color?.background ) {
+			mergedTree[ context ].styles.color.background =
+				userData[ context ].styles.color.background;
+		}
+		if ( userData?.[ context ]?.styles?.color?.text ) {
+			mergedTree[ context ].styles.color.text =
+				userData[ context ].styles.color.text;
+		}
+	} );
+
+	return mergedTree;
 };
 
 export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
