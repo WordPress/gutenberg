@@ -167,17 +167,20 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 
 		$settings          = array();
 		$property_mappings = array(
-			'title'       => 'title',
-			'category'    => 'category',
-			'context'     => 'context',
-			'parent'      => 'parent',
-			'icon'        => 'icon',
-			'description' => 'description',
-			'keywords'    => 'keywords',
-			'attributes'  => 'attributes',
-			'supports'    => 'supports',
-			'styles'      => 'styles',
-			'example'     => 'example',
+			'title'           => 'title',
+			'category'        => 'category',
+			'parent'          => 'parent',
+			'icon'            => 'icon',
+			'description'     => 'description',
+			'keywords'        => 'keywords',
+			'attributes'      => 'attributes',
+			'providesContext' => 'provides_context',
+			'usesContext'     => 'uses_context',
+			// Deprecated: remove with Gutenberg 8.6 release.
+			'context'         => 'context',
+			'supports'        => 'supports',
+			'styles'          => 'styles',
+			'example'         => 'example',
 		);
 
 		foreach ( $property_mappings as $key => $mapped_key ) {

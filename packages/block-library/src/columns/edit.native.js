@@ -16,7 +16,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useMemo } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 /**
@@ -44,13 +44,6 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 const DEFAULT_COLUMNS = 2;
 const MIN_COLUMNS_NUMBER = 1;
 
-/**
- * Number of columns in each row for large breakpoint container width
- *
- * @type {number}
- */
-const LARGE_CONTAINER_COLUMNS_IN_ROW = 3;
-
 const BREAKPOINTS = {
 	mobile: 480,
 	large: 768,
@@ -68,47 +61,42 @@ function ColumnsEditContainer( {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUMBER );
 
-	const containerMaxWidth = styles.columnsContainer.maxWidth;
-
 	const { verticalAlignment } = attributes;
 	const { width } = sizes || {};
 
 	useEffect( () => {
 		const newColumnCount = ! columnCount ? DEFAULT_COLUMNS : columnCount;
 		updateColumns( columnCount, newColumnCount );
-		setColumnsInRow( getColumnsInRow( width, newColumnCount ) );
+		if ( width ) {
+			setColumnsInRow( getColumnsInRow( width, newColumnCount ) );
+		}
 	}, [ columnCount ] );
 
 	useEffect( () => {
-		setColumnsInRow( getColumnsInRow( width, columnCount ) );
+		if ( width ) {
+			setColumnsInRow( getColumnsInRow( width, columnCount ) );
+		}
 	}, [ width ] );
 
-	const getColumnWidth = ( containerWidth = containerMaxWidth ) => {
-		const minWidth = Math.min( containerWidth, containerMaxWidth );
+	const contentStyle = useMemo( () => {
+		const minWidth = Math.min( width, styles.columnsContainer.maxWidth );
 		const columnBaseWidth = minWidth / columnsInRow;
 
 		let columnWidth = columnBaseWidth;
 		if ( columnsInRow > 1 ) {
-			const margins =
-				columnsInRow *
-				Math.min( columnsInRow, LARGE_CONTAINER_COLUMNS_IN_ROW ) *
-				styles.columnMargin.marginLeft;
+			const margins = columnsInRow * 2 * styles.columnMargin.marginLeft;
 			columnWidth = ( minWidth - margins ) / columnsInRow;
 		}
-
-		return columnWidth;
-	};
+		return { width: columnWidth };
+	}, [ width, columnsInRow ] );
 
 	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
 		if ( containerWidth < BREAKPOINTS.mobile ) {
 			// show only 1 Column in row for mobile breakpoint container width
 			return 1;
 		} else if ( containerWidth < BREAKPOINTS.large ) {
-			// show LARGE_CONTAINER_COLUMNS_IN_ROW Column in row for large breakpoint container width
-			return Math.min(
-				Math.max( 1, columnCount ),
-				LARGE_CONTAINER_COLUMNS_IN_ROW
-			);
+			// show 2 Column in row for large breakpoint container width
+			return Math.min( Math.max( 1, columnCount ), 2 );
 		}
 		// show all Column in one row
 		return Math.max( 1, columnsNumber );
@@ -150,20 +138,22 @@ function ColumnsEditContainer( {
 			</BlockControls>
 			<View style={ isSelected && styles.innerBlocksSelected }>
 				{ resizeListener }
-				<InnerBlocks
-					renderAppender={ renderAppender }
-					__experimentalMoverDirection={
-						columnsInRow > 1 ? 'horizontal' : undefined
-					}
-					horizontal={ true }
-					allowedBlocks={ ALLOWED_BLOCKS }
-					contentResizeMode="stretch"
-					onAddBlock={ onAddNextColumn }
-					onDeleteBlock={
-						columnCount === 1 ? onDeleteBlock : undefined
-					}
-					contentStyle={ { width: getColumnWidth( width ) } }
-				/>
+				{ width && (
+					<InnerBlocks
+						renderAppender={ renderAppender }
+						__experimentalMoverDirection={
+							columnsInRow > 1 ? 'horizontal' : undefined
+						}
+						horizontal={ true }
+						allowedBlocks={ ALLOWED_BLOCKS }
+						contentResizeMode="stretch"
+						onAddBlock={ onAddNextColumn }
+						onDeleteBlock={
+							columnCount === 1 ? onDeleteBlock : undefined
+						}
+						contentStyle={ contentStyle }
+					/>
+				) }
 			</View>
 		</>
 	);

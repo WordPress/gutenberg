@@ -36,8 +36,11 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 	}
 
 	.components-popover__content {
-		padding: 5px (36px + 5px) 5px 20px;
 		width: 350px;
+
+		> div {
+			padding: 20px 18px;
+		}
 
 		@include break-small {
 			width: 450px;

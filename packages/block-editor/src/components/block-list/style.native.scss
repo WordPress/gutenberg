@@ -7,7 +7,7 @@
 .horizontalContentContainer {
 	flex-direction: row;
 	flex-wrap: wrap;
-	justify-content: flex-start;
+	justify-content: space-between;
 	align-items: stretch;
 	max-width: $content-width;
 	overflow: visible;

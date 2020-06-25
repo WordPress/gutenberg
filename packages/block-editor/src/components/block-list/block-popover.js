@@ -31,6 +31,7 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
+		isDraggingBlocks,
 	} = select( 'core/block-editor' );
 	return {
 		isNavigationMode: isNavigationMode(),
@@ -40,6 +41,7 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: getLastMultiSelectedBlockClientId(),
+		isDragging: isDraggingBlocks(),
 	};
 }
 
@@ -60,6 +62,7 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 		lastClientId,
+		isDragging,
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
@@ -96,7 +99,8 @@ function BlockPopover( {
 		! shouldShowBreadcrumb &&
 		! shouldShowContextualToolbar &&
 		! isToolbarForced &&
-		! showEmptyBlockSideInserter
+		! showEmptyBlockSideInserter &&
+		! isDragging
 	) {
 		return null;
 	}
@@ -136,6 +140,14 @@ function BlockPopover( {
 		setIsInserterShown( false );
 	}
 
+	function onDragStart() {
+		setIsToolbarForced( true );
+	}
+
+	function onDragEnd() {
+		setIsToolbarForced( false );
+	}
+
 	// Position above the anchor, pop out towards the right, and position in the
 	// left corner. For the side inserter, pop out towards the left, and
 	// position in the right corner.
@@ -155,18 +167,15 @@ function BlockPopover( {
 			__unstableSticky={ ! showEmptyBlockSideInserter }
 			__unstableSlotName="block-toolbar"
 			__unstableBoundaryParent
-			// Allow subpixel positioning for the block movement animation.
-			__unstableAllowVerticalSubpixelPosition={
-				moverDirection !== 'horizontal' && node
-			}
-			__unstableAllowHorizontalSubpixelPosition={
-				moverDirection === 'horizontal' && node
-			}
+			// Observe movement for block animations (especially horizontal).
+			__unstableObserveElement={ node }
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
 			// Popover calculates the width once. Trigger a reset by remounting
-			// the component.
-			key={ shouldShowContextualToolbar }
+			// the component. We include both shouldShowContextualToolbar and isToolbarForced
+			// in the key to prevent the component being unmounted unexpectedly when isToolbarForced = true,
+			// e.g. during drag and drop
+			key={ shouldShowContextualToolbar || isToolbarForced }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -189,6 +198,7 @@ function BlockPopover( {
 					<Inserter
 						clientId={ clientId }
 						rootClientId={ rootClientId }
+						__experimentalIsQuick
 					/>
 				</div>
 			) }
@@ -198,6 +208,8 @@ function BlockPopover( {
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
 					data-align={ align }
+					onDragStart={ onDragStart }
+					onDragEnd={ onDragEnd }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
@@ -211,9 +223,10 @@ function BlockPopover( {
 			{ showEmptyBlockSideInserter && (
 				<div className="block-editor-block-list__empty-block-inserter">
 					<Inserter
-						position="top right"
+						position="bottom right"
 						rootClientId={ rootClientId }
 						clientId={ clientId }
+						__experimentalIsQuick
 					/>
 				</div>
 			) }

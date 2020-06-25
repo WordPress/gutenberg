@@ -4,7 +4,7 @@
 
 .components-custom-select-control__label {
 	display: block;
-	margin-bottom: 5px;
+	margin-bottom: $grid-unit-10;
 }
 
 .components-custom-select-control__button {
@@ -26,9 +26,9 @@
 		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
 	}
 
-	&-icon {
+	.components-custom-select-control__button-icon {
 		height: 100%;
-		padding: 0 4px;
+		padding: 0;
 		position: absolute;
 		right: 0;
 		top: 0;

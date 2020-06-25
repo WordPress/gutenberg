@@ -61,18 +61,20 @@ const transforms = {
 						),
 						multilineTag: 'li',
 					} ),
+					anchor: blockAttributes.anchor,
 				} );
 			},
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/quote' ],
-			transform: ( { value } ) => {
+			transform: ( { value, anchor } ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
 						value: create( { html: value, multilineTag: 'p' } ),
 						multilineTag: 'li',
 					} ),
+					anchor,
 				} );
 			},
 		},
@@ -86,6 +88,7 @@ const transforms = {
 			transform( node ) {
 				const attributes = {
 					ordered: node.nodeName === 'OL',
+					anchor: node.id === '' ? undefined : node.id,
 				};
 
 				if ( attributes.ordered ) {
@@ -157,7 +160,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/quote' ],
-			transform: ( { values } ) => {
+			transform: ( { values, anchor } ) => {
 				return createBlock( 'core/quote', {
 					value: toHTMLString( {
 						value: create( {
@@ -167,6 +170,7 @@ const transforms = {
 						} ),
 						multilineTag: 'p',
 					} ),
+					anchor,
 				} );
 			},
 		},

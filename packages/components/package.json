@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "9.8.0",
+	"version": "9.9.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -50,11 +50,12 @@
 		"lodash": "^4.17.15",
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",
-		"re-resizable": "^6.0.0",
+		"re-resizable": "^6.4.0",
 		"react-dates": "^17.1.1",
+		"react-resize-aware": "^3.0.1",
 		"react-spring": "^8.0.20",
 		"react-use-gesture": "^7.0.15",
-		"reakit": "^1.0.4",
+		"reakit": "^1.1.0",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^7.0.2"

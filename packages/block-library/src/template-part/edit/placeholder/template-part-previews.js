@@ -178,11 +178,13 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 				per_page: -1,
 			}
 		);
-		const resolvedTemplateParts = select( 'core' ).getEntityRecords(
+		const currentTheme = select( 'core' ).getCurrentTheme()?.textdomain;
+		const themeTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template_part',
 			{
-				resolved: true,
+				theme: currentTheme,
+				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
 			}
 		);
@@ -190,8 +192,8 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 		if ( publishedTemplateParts ) {
 			combinedTemplateParts.push( ...publishedTemplateParts );
 		}
-		if ( resolvedTemplateParts ) {
-			combinedTemplateParts.push( ...resolvedTemplateParts );
+		if ( themeTemplateParts ) {
+			combinedTemplateParts.push( ...themeTemplateParts );
 		}
 		return uniq( combinedTemplateParts );
 	}, [] );

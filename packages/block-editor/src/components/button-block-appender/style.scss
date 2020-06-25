@@ -39,11 +39,7 @@
 			width: 24px;
 			background-color: $dark-gray-primary;
 			color: $white;
-		}
-
-		.block-editor-button-block-appender__label {
-			display: block;
-			margin-left: $grid-unit-10;
+			border-radius: $radius-block-ui;
 		}
 	}
 }

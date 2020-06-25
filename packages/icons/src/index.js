@@ -32,6 +32,7 @@ export { default as chevronUp } from './library/chevron-up';
 export { default as classic } from './library/classic';
 export { default as closeCircleFilled } from './library/close-circle-filled';
 export { default as close } from './library/close';
+export { default as closeSmall } from './library/close-small';
 export { default as cloudUpload } from './library/cloud-upload';
 export { default as cloud } from './library/cloud';
 export { default as code } from './library/code';

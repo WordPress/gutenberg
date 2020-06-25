@@ -491,6 +491,11 @@ _Parameters_
 
 -   _mocks_ `Array`: Array of mock settings.
 
+<a name="showBlockToolbar" href="#showBlockToolbar">#</a> **showBlockToolbar**
+
+The block toolbar is not always visible while typing.
+Call this function to reveal it.
+
 <a name="switchEditorModeTo" href="#switchEditorModeTo">#</a> **switchEditorModeTo**
 
 Switches editor mode.

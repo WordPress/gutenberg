@@ -13,7 +13,15 @@ body {
 	font-size: $editor-font-size;
 	line-height: $editor-line-height;
 	color: $dark-gray-primary;
+	padding: 10px;
 }
+
+// For full-wide blocks, we compensate for these 10px.
+.block-editor-block-list__layout.is-root-container > .wp-block[data-align="full"] {
+	margin-left: -10px;
+	margin-right: -10px;
+}
+
 
 /* Headings */
 // These follow a Major Third type scale

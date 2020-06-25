@@ -659,6 +659,18 @@ _Returns_
 
 -   `?string`: Block Template Lock
 
+<a name="hasBlockMovingClientId" href="#hasBlockMovingClientId">#</a> **hasBlockMovingClientId**
+
+Returns whether block moving mode is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Client Id of moving block.
+
 <a name="hasInserterItems" href="#hasInserterItems">#</a> **hasInserterItems**
 
 Determines whether there are items to show in the inserter.
@@ -946,6 +958,7 @@ Generator that triggers an action used to duplicate a list of blocks.
 _Parameters_
 
 -   _clientIds_ `Array<string>`: 
+-   _updateSelection_ `boolean`: 
 
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
 
@@ -1245,6 +1258,14 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+
+<a name="setBlockMovingClientId" href="#setBlockMovingClientId">#</a> **setBlockMovingClientId**
+
+Generator that triggers an action used to enable or disable the block moving mode.
+
+_Parameters_
+
+-   _hasBlockMovingClientId_ `(string|null)`: Enable/Disable block moving mode.
 
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 
