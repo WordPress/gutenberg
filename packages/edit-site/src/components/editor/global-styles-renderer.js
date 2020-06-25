@@ -19,6 +19,9 @@ const mergeTrees = ( baseStyles, userStyles ) => {
 
 export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
 	const styles = [];
+	// TODO: this needs to be integrated in the processing.
+	// See comment in the server
+	styles.push( 'a { color: var(--wp--style--color--link, #00e); }' );
 	const tree = mergeTrees( baseTree, userTree );
 
 	/**
