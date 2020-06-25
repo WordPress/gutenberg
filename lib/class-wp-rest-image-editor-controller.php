@@ -46,22 +46,18 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 						'x'        => array(
 							'type'     => 'number',
 							'minimum'  => 0,
-							'required' => true,
 						),
 						'y'        => array(
 							'type'     => 'number',
 							'minimum'  => 0,
-							'required' => true,
 						),
 						'width'    => array(
 							'type'     => 'number',
 							'minimum'  => 1,
-							'required' => true,
 						),
 						'height'   => array(
 							'type'     => 'number',
 							'minimum'  => 1,
-							'required' => true,
 						),
 						'rotation' => array(
 							'type' => 'integer',
@@ -124,13 +120,12 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		}
 
 		if ( isset( $params['x'], $params['y'], $params['width'], $params['height'] ) ) {
-			// The crop script may return some very small, sub-pixel values when the image was not cropped.
-			// Crop only when the cropping coordinates values are changed by more than 0.1%.
+			// Check if the crop dimensions are whitin bounds.
 			if (
-				floatval( $params['x'] ) > 0.1 ||
-				floatval( $params['y'] ) > 0.1 ||
-				floatval( $params['width'] ) < 99.9 ||
-				floatval( $params['height'] ) < 99.9
+				( $params['x'] >= 0 && $params['x'] < 100 ) &&
+				( $params['y'] >= 0 && $params['y'] < 100 ) &&
+				( $params['width'] >= 1 && $params['width'] <= 100 ) &&
+				( $params['height'] >= 1 && $params['height'] <= 100 )
 			) {
 				$crop = true;
 			}
