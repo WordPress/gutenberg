@@ -13,7 +13,7 @@ const VELOCITY_MULTIPLIER =
 /**
  * React hook that scrolls the scroll container when a block is being dragged.
  *
- * @param {Element} dragElement The `id` attribute of the block element.
+ * @param {Element} dragElement The DOM element being dragged.
  *
  * @return {Function[]} `startScrolling`, `scrollOnDragOver`, `stopScrolling`
  *                      functions to be called in `onDragStart`, `onDragOver`
