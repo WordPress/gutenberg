@@ -31,6 +31,10 @@
 .editor-post-publish-panel__header-publish-button,
 .editor-post-publish-panel__header-cancel-button {
 	flex-grow: 1;
+
+	@include break-mobile() {
+		max-width: $admin-sidebar-width;
+	}
 }
 
 .editor-post-publish-panel__header-publish-button {
