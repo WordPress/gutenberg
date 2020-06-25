@@ -11,8 +11,7 @@ jobs:
         ]
 
     steps:
-
-    - run: system_profiler SPHardwareDataType
+    - run: brew install watchman
 
     - name: checkout
       uses: actions/checkout@v2
