@@ -84,7 +84,7 @@ export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
 	 */
 	const getBlockPresetsDeclarations = ( blockPresets ) => {
 		const declarations = [];
-		[ PRESET_GRADIENT, PRESET_COLOR, PRESET_FONT_SIZE ].forEach(
+		[ PRESET_COLOR, PRESET_FONT_SIZE, PRESET_GRADIENT ].forEach(
 			( category ) => {
 				if ( blockPresets?.[ category ] ) {
 					blockPresets[ category ].forEach( ( { slug, value } ) =>
