@@ -11,8 +11,6 @@ jobs:
         ]
 
     steps:
-    - run: brew install watchman
-
     - uses: actions/checkout@v2
 
     - name: Restore npm cache
