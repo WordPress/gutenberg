@@ -334,6 +334,7 @@ export default compose( [
 
 			let blockClientIds = getBlockOrder( rootClientId );
 
+			// Display only block which fulfill the condition in passed `filterInnerBlocks` function
 			if ( filterInnerBlocks ) {
 				blockClientIds = filterInnerBlocks(
 					getBlockOrder( rootClientId )

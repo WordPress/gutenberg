@@ -32,7 +32,7 @@ class PostTitle extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		// Unselect if any other block is selected
+		// Unselect if any other block is selected and blur the RichText
 		if (
 			this.props.isSelected &&
 			! prevProps.isAnyBlockSelected &&

@@ -144,7 +144,14 @@ const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;
 
 	settings.variations
-		.sort( ( a, b ) => ( a.title < b.title ? -1 : 1 ) )
+		.sort( ( a, b ) => {
+			if ( a.title < b.title ) {
+				return -1;
+			} else if ( a.title > b.title ) {
+				return 1;
+			}
+			return 0;
+		} )
 		.forEach( ( v ) => {
 			registerBlockType( `${ name }-${ v.name }`, {
 				...metadata,

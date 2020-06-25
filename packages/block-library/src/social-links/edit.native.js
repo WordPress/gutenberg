@@ -131,15 +131,12 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
-		const { removeBlock, replaceInnerBlocks } = dispatch(
-			'core/block-editor'
-		);
+		const { removeBlock } = dispatch( 'core/block-editor' );
 
 		return {
 			onDelete: () => {
 				removeBlock( clientId, false );
 			},
-			replaceInnerBlocks,
 		};
 	} )
 )( SocialLinksEdit );

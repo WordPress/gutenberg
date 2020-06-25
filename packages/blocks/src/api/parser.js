@@ -434,6 +434,7 @@ export function createBlockWithFallback( blockNode ) {
 	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
 		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
 		attributes.service = name.substring( 17 );
+		// Display social link service name for mobile platform
 		name = Platform.OS === 'web' ? 'core/social-link' : name;
 	}
 
