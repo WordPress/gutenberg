@@ -58,6 +58,7 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
+		wpScripts,
 	};
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
