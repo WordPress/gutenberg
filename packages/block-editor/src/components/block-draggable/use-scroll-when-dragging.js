@@ -61,32 +61,36 @@ export default function useScrollWhenDragging( dragElement ) {
 
 	const scrollOnDragOver = useCallback( ( event ) => {
 		const scrollParentHeight = scrollParentY.current.offsetHeight;
+		const offsetDragStartPosition =
+			dragStartY.current - scrollParentY.current.offsetTop;
+		const offsetDragPosition =
+			event.clientY - scrollParentY.current.offsetTop;
 
-		if ( event.clientY > dragStartY.current ) {
+		if ( event.clientY > offsetDragStartPosition ) {
 			// User is dragging downwards.
 			const moveableDistance = Math.max(
 				scrollParentHeight -
-					dragStartY.current -
+					offsetDragStartPosition -
 					SCROLL_INACTIVE_DISTANCE_PX,
 				0
 			);
 			const dragDistance = Math.max(
-				event.clientY -
-					dragStartY.current -
+				offsetDragPosition -
+					offsetDragStartPosition -
 					SCROLL_INACTIVE_DISTANCE_PX,
 				0
 			);
 			const distancePercentage = dragDistance / moveableDistance;
 			velocityY.current = VELOCITY_MULTIPLIER * distancePercentage;
-		} else if ( event.clientY < dragStartY.current ) {
+		} else if ( event.clientY < offsetDragStartPosition ) {
 			// User is dragging upwards.
 			const moveableDistance = Math.max(
-				dragStartY.current - SCROLL_INACTIVE_DISTANCE_PX,
+				offsetDragStartPosition - SCROLL_INACTIVE_DISTANCE_PX,
 				0
 			);
 			const dragDistance = Math.max(
-				dragStartY.current -
-					event.clientY -
+				offsetDragStartPosition -
+					offsetDragPosition -
 					SCROLL_INACTIVE_DISTANCE_PX,
 				0
 			);
