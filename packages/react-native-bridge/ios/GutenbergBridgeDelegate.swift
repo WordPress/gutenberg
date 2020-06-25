@@ -15,10 +15,11 @@ public struct MediaInfo {
 public struct Block {
     public let id: String
     public let name: String
+    public let title: String
     public let content: String
 
     public func replacingContent(with newContent: String) -> Block {
-        Block(id: id, name: name, content: newContent)
+        Block(id: id, name: name, title: title, content: newContent)
     }
 }
 
