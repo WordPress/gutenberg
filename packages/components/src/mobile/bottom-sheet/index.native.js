@@ -35,6 +35,7 @@ import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import ColorCell from './color-cell';
 import LinkCell from './link-cell';
+import LinkSuggestionItemCell from './link-suggestion-item-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
@@ -426,5 +427,6 @@ ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
 ThemedBottomSheet.ColorCell = ColorCell;
 ThemedBottomSheet.LinkCell = LinkCell;
+ThemedBottomSheet.LinkSuggestionItemCell = LinkSuggestionItemCell;
 
 export default ThemedBottomSheet;

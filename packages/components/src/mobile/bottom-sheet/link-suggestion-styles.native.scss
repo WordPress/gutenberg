@@ -1,0 +1,22 @@
+.suggestionTitleStyle {
+	text-align: left;
+	font-weight: bold;
+}
+
+.suggestionSummaryStyle {
+	text-align: left;
+}
+
+.itemContainerStyle {
+	justify-content: flex-start;
+	margin-top: 10;
+	margin-bottom: 10;
+}
+
+.suggestionContainerStyle {
+	align-items: flex-start;
+}
+
+.hidden {
+	display: none;
+}
