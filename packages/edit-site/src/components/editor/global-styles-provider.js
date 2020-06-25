@@ -79,11 +79,11 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 
 	const fromUnits = {
 		noop: ( value ) => value,
-		px: ( value ) => ( value ? +value.replace( 'px', '' ) : null ),
+		px: ( value ) => ( value ? +value.replace( 'px', '' ) : value ),
 	};
 	const toUnits = {
 		noop: ( value ) => value,
-		px: ( value ) => ( value ? value + 'px' : null ),
+		px: ( value ) => ( value ? value + 'px' : value ),
 	};
 
 	const getProperty = ( context, family, name, units = 'noop' ) =>
