@@ -12,7 +12,7 @@ We release a new major version approximately every two weeks. The current and ne
 
 - **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
 
-- **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](https://developer.wordpress.org/block-editor/contributors/testing-overview/#performance-testing) is published.
+- **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](/docs/block-editor/contributors/testing-overview/#performance-testing) is published.
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
