@@ -36,9 +36,6 @@ function EnhancedPostAuthor( { postAuthor, authors, onUpdateAuthor } ) {
 		foundAuthor = 0;
 	}
 
-	// The currently selected author.
-	const [ selectedAuthor, setSelectedAuthor ] = useState( postAuthor );
-
 	// The currently field value.
 	const [ fieldValue, setFieldValue ] = useState( postAuthor.name );
 
@@ -53,7 +50,6 @@ function EnhancedPostAuthor( { postAuthor, authors, onUpdateAuthor } ) {
 		}
 		setFieldValue( selectedItem.name );
 		onUpdateAuthor( selectedItem.id );
-		setSelectedAuthor( selectedItem );
 	};
 
 	/**
@@ -67,7 +63,7 @@ function EnhancedPostAuthor( { postAuthor, authors, onUpdateAuthor } ) {
 
 	const availableAuthors = useSelect(
 		( select ) => {
-			if ( '' === fieldValue || fieldValue === selectedAuthor.name ) {
+			if ( '' === fieldValue || fieldValue === postAuthor.name ) {
 				return initialAuthors;
 			}
 			return select( 'core' )
@@ -78,14 +74,14 @@ function EnhancedPostAuthor( { postAuthor, authors, onUpdateAuthor } ) {
 					id: author.id,
 				} ) );
 		},
-		[ fieldValue, selectedAuthor ]
+		[ fieldValue, postAuthor ]
 	);
 
 	return (
 		<ComboboxControl
 			options={ availableAuthors }
 			initialHighlightedIndex={ foundAuthor }
-			initialInputValue={ selectedAuthor?.name }
+			initialInputValue={ postAuthor.name }
 			onInputValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleSelect }
 		/>
