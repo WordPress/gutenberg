@@ -1575,6 +1575,79 @@ describe( 'state', () => {
 			] );
 		} );
 
+		it( 'should move multiple blocks', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs', 'veggies' ],
+				index: 0,
+			} );
+
+			expect( state.order[ '' ] ).toEqual( [
+				'ribs',
+				'veggies',
+				'chicken',
+			] );
+		} );
+
+		it( 'should move multiple blocks to different parent', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs', 'veggies' ],
+				fromRootClientId: '',
+				toRootClientId: 'chicken',
+				index: 0,
+			} );
+
+			expect( state.order[ '' ] ).toEqual( [ 'chicken' ] );
+			expect( state.order.chicken ).toEqual( [ 'ribs', 'veggies' ] );
+		} );
+
 		describe( 'blocks', () => {
 			it( 'should not reset any blocks that are not in the post', () => {
 				const actions = [

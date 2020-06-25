@@ -617,10 +617,10 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'moveBlockToPosition', () => {
+	describe( 'moveBlocksToPosition', () => {
 		it( 'should yield MOVE_BLOCKS_TO_POSITION action if locking is insert and move is not changing the root block', () => {
 			const moveBlockToPositionGenerator = moveBlocksToPosition(
-				'chicken',
+				[ 'chicken' ],
 				'ribs',
 				'ribs',
 				5
@@ -639,7 +639,7 @@ describe( 'actions', () => {
 				type: 'MOVE_BLOCKS_TO_POSITION',
 				fromRootClientId: 'ribs',
 				toRootClientId: 'ribs',
-				clientIds: 'chicken',
+				clientIds: [ 'chicken' ],
 				index: 5,
 			} );
 
@@ -648,7 +648,7 @@ describe( 'actions', () => {
 
 		it( 'should not yield MOVE_BLOCKS_TO_POSITION action if locking is all', () => {
 			const moveBlockToPositionGenerator = moveBlocksToPosition(
-				'chicken',
+				[ 'chicken' ],
 				'ribs',
 				'ribs',
 				5
@@ -750,6 +750,34 @@ describe( 'actions', () => {
 				done: true,
 				value: undefined,
 			} );
+		} );
+	} );
+
+	describe( 'moveBlockToPosition', () => {
+		it( 'should yield MOVE_BLOCKS_TO_POSITION action with a single block', () => {
+			const moveBlockToPositionGenerator = moveBlocksToPosition(
+				'chicken',
+				'ribs',
+				'ribs',
+				5
+			);
+
+			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
+				args: [ 'ribs' ],
+				selectorName: 'getTemplateLock',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				fromRootClientId: 'ribs',
+				toRootClientId: 'ribs',
+				clientIds: 'chicken',
+				index: 5,
+			} );
+
+			expect( moveBlockToPositionGenerator.next().done ).toBe( true );
 		} );
 	} );
 
