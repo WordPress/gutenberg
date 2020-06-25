@@ -14,8 +14,21 @@ import { __experimentalGetSettings as getDateSettings } from '@wordpress/date';
  */
 import Tooltip from '../tooltip';
 
+/**
+ * Displays timezone information when user timezone is different from site timezone.
+ */
 const TimeZone = () => {
 	const { timezone } = getDateSettings();
+	const userTimezone = moment.tz.guess( true );
+
+	if (
+		! timezone.string ||
+		timezone.string === userTimezone ||
+		'WP' === userTimezone
+	) {
+		return null;
+	}
+
 	const offset =
 		timezone.offset > 0 ? '+' + timezone.offset : timezone.offset;
 	const zoneAbbr = moment.tz( new Date(), timezone.string ).zoneAbbr();
