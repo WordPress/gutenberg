@@ -8,7 +8,7 @@
 
 ### Bug Fix
 
--   Fix the error in the scaffolding process caused by the missing `scripts` section in `package.json` file ([#23399](https://github.com/WordPress/gutenberg/pull/23399)).
+-   Fix the error in the scaffolding process caused by the missing `scripts` section in `package.json` file ([#23443](https://github.com/WordPress/gutenberg/pull/23443)).
 
 ## 0.15.0-rc.0 (2020-06-24)
 
