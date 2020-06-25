@@ -39,7 +39,10 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 				aria-label={ __( 'Block tools' ) }
 				{ ...props }
 			>
-				<BlockToolbar />
+				<BlockToolbar
+					onDragStart={ props.onDragStart }
+					onDragEnd={ props.onDragEnd }
+				/>
 			</NavigableToolbar>
 		</div>
 	);

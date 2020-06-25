@@ -16,6 +16,7 @@ body.is-dragging-components-draggable {
 	background: transparent;
 	pointer-events: none;
 	z-index: z-index(".components-draggable__clone");
+	opacity: 0.7;
 
 	> * {
 		// This needs specificity as a theme is meant to define these by default.
