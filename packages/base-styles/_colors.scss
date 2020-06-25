@@ -5,8 +5,8 @@
 // WordPress colors.
 $black: #000;					// Use only when you truly need pure black. For UI, use $dark-gray-primary.
 $dark-gray-primary: #1e1e1e;
-$medium-gray-text: #757575;		// Meets 4.6:1 text contrast.
-$light-gray-ui: #949494;		// Meets 3:1 UI contrast.
+$medium-gray-text: #757575;		// Meets 4.6:1 text contrast against white.
+$light-gray-ui: #949494;		// Meets 3:1 UI or large text contrast against white.
 $light-gray-secondary: #ccc;
 $light-gray-tertiary: #e7e8e9;
 $white: #fff;
@@ -38,6 +38,7 @@ $dark-gray-300: #6c7781;
 $dark-gray-200: #7e8993;
 $dark-gray-150: #8d96a0;
 $dark-gray-100: #8f98a1;
+
 $light-gray-900: #a2aab2;
 $light-gray-800: #b5bcc2;
 $light-gray-700: #ccd0d4;
@@ -48,9 +49,4 @@ $light-gray-300: #edeff0;
 $light-gray-200: #f3f4f5;
 $light-gray-100: #f8f9f9;
 
-// Additional colors.
-$blue-medium-700: #007fac;
-$blue-medium-500: #00a0d2;
-$blue-medium-400: #33b3db;
-$blue-medium-300: #66c6e4;
 $blue-medium-100: #e5f5fa;
