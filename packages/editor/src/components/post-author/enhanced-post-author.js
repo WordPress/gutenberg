@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
  */
 import ComboboxControl from '../../../../components/build/combobox-control/';
 
-function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
+function EnhancedPostAuthor( { postAuthor, authors, onUpdateAuthor } ) {
 	let initialAuthors = useMemo( () => {
 		return authors.map( ( author ) => {
 			return {
@@ -83,7 +83,6 @@ function EnhancedPostAuthor( { postAuthor, id, authors, onUpdateAuthor } ) {
 
 	return (
 		<ComboboxControl
-			id={ id }
 			options={ availableAuthors }
 			initialHighlightedIndex={ foundAuthor }
 			initialInputValue={ selectedAuthor?.name }
