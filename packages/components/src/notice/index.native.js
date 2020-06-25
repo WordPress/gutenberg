@@ -8,12 +8,15 @@ import {
 	TouchableWithoutFeedback,
 	View,
 	Dimensions,
+	Platform,
 } from 'react-native';
+import { BlurView } from '@react-native-community/blur';
 
 /**
  * WordPress dependencies
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,6 +29,7 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const timer = useRef( null );
+	const isIOS = Platform.OS === 'ios';
 
 	const onDimensionsChange = () => {
 		setWidth( Dimensions.get( 'window' ).width );
@@ -43,7 +47,7 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 		return () => {
 			clearTimeout( timer?.current );
 		};
-	}, [ visible ] );
+	}, [ visible, id ] );
 
 	const onHide = () => {
 		setVisible( false );
@@ -68,40 +72,47 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 		} );
 	};
 
+	const noticeSolidStyles = usePreferredColorSchemeStyle(
+		styles.noticeSolid,
+		styles.noticeSolidDark
+	);
+
+	const textStyles = usePreferredColorSchemeStyle(
+		styles.text,
+		styles.textDark
+	);
+
 	return (
 		<>
 			<Animated.View
-				style={ {
-					transform: [
-						{
-							translateY: animationValue.interpolate( {
-								inputRange: [ 0, 1 ],
-								outputRange: [ -30, 0 ],
-							} ),
-						},
-					],
-				} }
+				style={ [
+					styles.notice,
+					! isIOS && noticeSolidStyles,
+					{
+						width,
+						transform: [
+							{
+								translateY: animationValue.interpolate( {
+									inputRange: [ 0, 1 ],
+									outputRange: [ -24, 0 ],
+								} ),
+							},
+						],
+					},
+				] }
 			>
 				<TouchableWithoutFeedback onPress={ onHide }>
-					<View
-						style={ [
-							styles.notice,
-							{
-								width,
-								shadowColor: styles.noticeShadow.color,
-								shadowOffset: {
-									width: 0,
-									height: 2,
-								},
-								shadowOpacity: 0.25,
-								shadowRadius: 2,
-								elevation: 2,
-							},
-						] }
-					>
-						<Text style={ styles.text }>{ content }</Text>
+					<View style={ styles.noticeContent }>
+						<Text style={ textStyles }>{ content }</Text>
 					</View>
 				</TouchableWithoutFeedback>
+				{ isIOS && (
+					<BlurView
+						style={ styles.blurBackground }
+						blurType="prominent"
+						blurAmount={ 10 }
+					/>
+				) }
 			</Animated.View>
 		</>
 	);

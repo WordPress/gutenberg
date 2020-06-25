@@ -89,26 +89,25 @@ const BlockActionsMenu = ( {
 
 	const copyButtonOption = {
 		id: 'copyButtonOption',
-		label: __( 'Copy' ),
+		label: __( 'Copy block' ),
 		value: 'copyButtonOption',
 	};
 
 	const cutButtonOption = {
 		id: 'cutButtonOption',
-		label: __( 'Cut' ),
+		label: __( 'Cut block' ),
 		value: 'cutButtonOption',
 	};
 
 	const pasteButtonOption = {
 		id: 'pasteButtonOption',
-		label: __( 'Paste' ),
+		label: __( 'Paste block' ),
 		value: 'pasteButtonOption',
-		disabled: ! isPasteEnabled,
 	};
 
 	const duplicateButtonOption = {
 		id: 'duplicateButtonOption',
-		label: __( 'Duplicate' ),
+		label: __( 'Duplicate block' ),
 		value: 'duplicateButtonOption',
 	};
 
@@ -118,7 +117,7 @@ const BlockActionsMenu = ( {
 		wrapBlockSettings && settingsOption,
 		copyButtonOption,
 		cutButtonOption,
-		pasteButtonOption,
+		isPasteEnabled && pasteButtonOption,
 		duplicateButtonOption,
 		deleteOption,
 	] );
@@ -156,9 +155,17 @@ const BlockActionsMenu = ( {
 				break;
 			case pasteButtonOption.value:
 				pasteBlock();
+				createInfoNotice(
+					// translators: displayed right after the block is pasted.
+					__( 'Block pasted' )
+				);
 				break;
 			case duplicateButtonOption.value:
 				duplicateBlock();
+				createInfoNotice(
+					// translators: displayed right after the block is duplicated.
+					__( 'Block duplicated' )
+				);
 				break;
 		}
 	}

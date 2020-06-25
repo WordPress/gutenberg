@@ -28,17 +28,30 @@ class NoticeList extends Component {
 	}
 
 	render() {
-		const { notices } = this.props;
+		const { notices, shouldStack } = this.props;
+
+		if ( ! notices.length ) {
+			return null;
+		}
 
 		return (
 			<View style={ styles.list } key={ notices.lenght }>
-				{ notices.reverse().map( ( notice ) => (
+				{ shouldStack ? (
+					notices
+						.reverse()
+						.map( ( notice ) => (
+							<Notice
+								{ ...notice }
+								key={ notice.id }
+								onNoticeHidden={ this.removeNotice }
+							></Notice>
+						) )
+				) : (
 					<Notice
-						{ ...notice }
-						key={ notice.id }
+						{ ...notices[ notices.length - 1 ] }
 						onNoticeHidden={ this.removeNotice }
 					></Notice>
-				) ) }
+				) }
 			</View>
 		);
 	}

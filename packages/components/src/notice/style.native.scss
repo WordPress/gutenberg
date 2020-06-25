@@ -1,12 +1,12 @@
-$noticeColor: #121212;
-
-.noticeShadow {
-	color: $black;
+.text {
+	color: #212121;
+	align-self: center;
+	background-color: transparent;
+	font-size: 12;
 }
 
-.text {
+.textDark {
 	color: $white;
-	align-self: center;
 }
 
 .list {
@@ -21,7 +21,26 @@ $noticeColor: #121212;
 }
 
 .notice {
-	height: 30;
-	background-color: $noticeColor;
+	height: 24;
 	justify-content: center;
+}
+
+.noticeContent {
+	position: absolute;
+	z-index: 1;
+	width: 100%;
+}
+
+.noticeSolid {
+	background-color: #f4f4f4;
+}
+
+.noticeSolidDark {
+	background-color: #2a2a2a;
+}
+
+.blurBackground {
+	width: 100%;
+	height: 100%;
+	position: absolute;
 }
