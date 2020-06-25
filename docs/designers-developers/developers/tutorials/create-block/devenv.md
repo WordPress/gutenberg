@@ -1,6 +1,6 @@
 # Development Environment
 
-We will need a place to work and tools for creating a block, this is often referred to as the development enviornment. The three main pieces needed for our development environment are:
+We will need a place to work and tools for creating a block, this is often referred to as the development environment. The three main pieces needed for our development environment are:
 
 1. Node/NPM Development Tools
 2. WordPress Development Site
