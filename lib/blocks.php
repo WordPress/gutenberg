@@ -349,9 +349,9 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 	// Merge and dedupe new and existing classes and styles.
 	$classes_to_add = esc_attr( implode( ' ', array_key_exists( 'css_classes', $attributes ) ? $attributes['css_classes'] : array() ) );
-	$styles_to_add = esc_attr( implode( ' ', array_key_exists( 'inline_styles', $attributes ) ? $attributes['inline_styles'] : array() ) );
-	$new_classes = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . $classes_to_add ) ) );
-	$new_styles  = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . $styles_to_add ) ) );
+	$styles_to_add  = esc_attr( implode( ' ', array_key_exists( 'inline_styles', $attributes ) ? $attributes['inline_styles'] : array() ) );
+	$new_classes    = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . $classes_to_add ) ) );
+	$new_styles     = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . $styles_to_add ) ) );
 
 	// Apply new styles and classes.
 	if ( ! empty( $new_classes ) ) {
