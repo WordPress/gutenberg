@@ -54,6 +54,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * Checks if a given request has access to read a menu item if they have access to edit them.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return bool|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ) {
@@ -62,7 +63,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			return $post;
 		}
 		if ( $post && ! $this->check_update_permission( $post ) ) {
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you cannot view this menu item, unless you have access to permission edit it. ', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_cannot_view',
+				__( 'Sorry, you cannot view this menu item, unless you have access to permission edit it. ', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() ) );
 		}
 
 		return parent::get_item_permissions_check( $request );
@@ -72,16 +75,23 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * Checks if a given request has access to read menu items if they have access to edit them.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) {
 		$post_type = get_post_type_object( $this->post_type );
 		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
 			if ( 'edit' === $request['context'] ) {
-				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit posts in this post type.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+				return new WP_Error( 'rest_forbidden_context',
+					__( 'Sorry, you are not allowed to edit posts in this post type.', 'gutenberg' ),
+					array( 'status' => rest_authorization_required_code() ) );
 			}
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you cannot view these menu items, unless you have access to permission edit them. ', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+
+			return new WP_Error( 'rest_cannot_view',
+				__( 'Sorry, you cannot view these menu items, unless you have access to permission edit them. ', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() ) );
 		}
+
 		return true;
 	}
 
@@ -104,7 +114,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 		$prepared_nav_item = (array) $prepared_nav_item;
 
-		$nav_menu_item_id = wp_update_nav_menu_item( $prepared_nav_item['menu-id'], $prepared_nav_item['menu-item-db-id'], $prepared_nav_item );
+		$nav_menu_item_id = wp_update_nav_menu_item( $prepared_nav_item['menu-id'], $prepared_nav_item['menu-item-db-id'],
+			$prepared_nav_item );
 		if ( is_wp_error( $nav_menu_item_id ) ) {
 			if ( 'db_insert_error' === $nav_menu_item_id->get_error_code() ) {
 				$nav_menu_item_id->add_data( array( 'status' => 500 ) );
@@ -127,9 +138,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		 *
 		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
 		 *
-		 * @param object          $nav_menu_item Inserted or updated nav item object.
-		 * @param WP_REST_Request $request       Request object.
-		 * @param bool            $creating      True when creating a post, false when updating.
+		 * @param object $nav_menu_item Inserted or updated nav item object.
+		 * @param WP_REST_Request $request Request object.
+		 * @param bool $creating True when creating a post, false when updating.
 		 *                                       SA
 		 */
 		do_action( "rest_insert_{$this->post_type}", $nav_menu_item, $request, true );
@@ -158,9 +169,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		 *
 		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
 		 *
-		 * @param object          $nav_menu_item Inserted or updated nav item object.
-		 * @param WP_REST_Request $request       Request object.
-		 * @param bool            $creating      True when creating a post, false when updating.
+		 * @param object $nav_menu_item Inserted or updated nav item object.
+		 * @param WP_REST_Request $request Request object.
+		 * @param bool $creating True when creating a post, false when updating.
 		 */
 		do_action( "rest_after_insert_{$this->post_type}", $nav_menu_item, $request, true );
 
@@ -194,7 +205,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		$prepared_nav_item = (array) $prepared_nav_item;
 
-		$nav_menu_item_id = wp_update_nav_menu_item( $prepared_nav_item['menu-id'], $prepared_nav_item['menu-item-db-id'], $prepared_nav_item );
+		$nav_menu_item_id = wp_update_nav_menu_item( $prepared_nav_item['menu-id'], $prepared_nav_item['menu-item-db-id'],
+			$prepared_nav_item );
 
 		if ( is_wp_error( $nav_menu_item_id ) ) {
 			if ( 'db_update_error' === $nav_menu_item_id->get_error_code() ) {
@@ -247,6 +259,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * Deletes a single menu item.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return true|WP_Error True on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
@@ -260,7 +273,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		// We don't support trashing for menu items.
 		if ( ! $force ) {
 			/* translators: %s: force=true */
-			return new WP_Error( 'rest_trash_not_supported', sprintf( __( "Menu items do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ), array( 'status' => 501 ) );
+			return new WP_Error( 'rest_trash_not_supported',
+				sprintf( __( "Menu items do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ),
+				array( 'status' => 501 ) );
 		}
 
 		$previous = $this->prepare_item_for_response( $menu_item, $request );
@@ -284,9 +299,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		 *
 		 * They dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
 		 *
-		 * @param Object          $menu_item  The deleted or trashed menu item.
+		 * @param Object $menu_item The deleted or trashed menu item.
 		 * @param WP_REST_Response $response The response data.
-		 * @param WP_REST_Request  $request  The request sent to the API.
+		 * @param WP_REST_Request $request The request sent to the API.
 		 */
 		do_action( "rest_delete_{$this->post_type}", $menu_item, $response, $request );
 
@@ -356,6 +371,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'menu-item-description' => 'description',
 			'menu-item-attr-title'  => 'attr_title',
 			'menu-item-target'      => 'target',
+			'menu-item-title'       => 'title',
 			'menu-item-classes'     => 'classes',
 			'menu-item-xfn'         => 'xfn',
 			'menu-item-status'      => 'status',
@@ -368,9 +384,11 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				$check = rest_validate_value_from_schema( $request[ $api_request ], $schema['properties'][ $api_request ] );
 				if ( is_wp_error( $check ) ) {
 					$check->add_data( array( 'status' => 400 ) );
+
 					return $check;
 				}
-				$prepared_nav_item[ $original ] = rest_sanitize_value_from_schema( $request[ $api_request ], $schema['properties'][ $api_request ] );
+				$prepared_nav_item[ $original ] = rest_sanitize_value_from_schema( $request[ $api_request ],
+					$schema['properties'][ $api_request ] );
 			}
 		}
 
@@ -379,15 +397,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		// If menus submitted, cast to int.
 		if ( isset( $request[ $base ] ) && ! empty( $request[ $base ] ) ) {
 			$prepared_nav_item['menu-id'] = absint( $request[ $base ] );
-		}
-
-		// Nav menu title.
-		if ( ! empty( $schema['properties']['title'] ) && isset( $request['title'] ) ) {
-			if ( is_string( $request['title'] ) ) {
-				$prepared_nav_item['menu-item-title'] = $request['title'];
-			} elseif ( ! empty( $request['title']['raw'] ) ) {
-				$prepared_nav_item['menu-item-title'] = $request['title']['raw'];
-			}
 		}
 
 		// Check if object id exists before saving.
@@ -399,7 +408,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 					return new WP_Error( 'rest_term_invalid_id', __( 'Invalid term ID.', 'gutenberg' ), array( 'status' => 400 ) );
 				}
 				$prepared_nav_item['menu-item-object'] = get_term_field( 'taxonomy', $original );
-
 				// If post, check if post object exists.
 			} elseif ( 'post_type' === $prepared_nav_item['menu-item-type'] ) {
 				$original = get_post( absint( $prepared_nav_item['menu-item-object-id'] ) );
@@ -421,11 +429,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		// Check if menu item is type custom, then title and url are required.
 		if ( 'custom' === $prepared_nav_item['menu-item-type'] ) {
-			if ( '' === $prepared_nav_item['menu-item-title'] ) {
-				return new WP_Error( 'rest_title_required', __( 'Title required if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
-			}
 			if ( empty( $prepared_nav_item['menu-item-url'] ) ) {
-				return new WP_Error( 'rest_url_required', __( 'URL required if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_url_required', __( 'URL required if menu item of type custom.', 'gutenberg' ),
+					array( 'status' => 400 ) );
 			}
 		}
 
@@ -466,7 +472,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			// Check if valid parent id is valid nav menu item in menu.
 			if ( $prepared_nav_item['menu-item-parent-id'] ) {
 				if ( ! is_nav_menu_item( $prepared_nav_item['menu-item-parent-id'] ) ) {
-					return new WP_Error( 'invalid_menu_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ), array( 'status' => 400 ) );
+					return new WP_Error( 'invalid_menu_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ),
+						array( 'status' => 400 ) );
 				}
 				if ( ! $menu_item_ids || ! in_array( $prepared_nav_item['menu-item-parent-id'], $menu_item_ids, true ) ) {
 					return new WP_Error( 'invalid_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ), array( 'status' => 400 ) );
@@ -495,13 +502,12 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		// Apply the same filters as when calling wp_insert_post().
 
 		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-title'] = wp_unslash( apply_filters( 'title_save_pre', wp_slash( $prepared_nav_item['menu-item-title'] ) ) );
+		$prepared_nav_item['menu-item-attr-title'] = wp_unslash( apply_filters( 'excerpt_save_pre',
+			wp_slash( $prepared_nav_item['menu-item-attr-title'] ) ) );
 
 		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-attr-title'] = wp_unslash( apply_filters( 'excerpt_save_pre', wp_slash( $prepared_nav_item['menu-item-attr-title'] ) ) );
-
-		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-description'] = wp_unslash( apply_filters( 'content_save_pre', wp_slash( $prepared_nav_item['menu-item-description'] ) ) );
+		$prepared_nav_item['menu-item-description'] = wp_unslash( apply_filters( 'content_save_pre',
+			wp_slash( $prepared_nav_item['menu-item-description'] ) ) );
 
 		// Valid url.
 		if ( '' !== $prepared_nav_item['menu-item-url'] ) {
@@ -523,9 +529,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		 *
 		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
 		 *
-		 * @param stdClass        $prepared_post An object representing a single post prepared
+		 * @param stdClass $prepared_post An object representing a single post prepared
 		 *                                       for inserting or updating the database.
-		 * @param WP_REST_Request $request       Request object.
+		 * @param WP_REST_Request $request Request object.
 		 */
 		return apply_filters( "rest_pre_insert_{$this->post_type}", $prepared_nav_item, $request );
 	}
@@ -533,7 +539,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	/**
 	 * Prepares a single post output for response.
 	 *
-	 * @param object          $post    Post object.
+	 * @param object $post Post object.
 	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return WP_REST_Response Response object.
@@ -663,8 +669,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
 		 *
 		 * @param WP_REST_Response $response The response object.
-		 * @param object           $post     Post object.
-		 * @param WP_REST_Request  $request  Request object.
+		 * @param object $post Post object.
+		 * @param WP_REST_Request $request Request object.
 		 */
 		return apply_filters( "rest_prepare_{$this->post_type}", $response, $post, $request );
 	}
@@ -745,13 +751,35 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		$schema['properties']['title'] = array(
 			'description' => __( 'The title for the object.', 'gutenberg' ),
-			'type'        => 'object',
+			'type'        => array( 'object', 'string' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
-				// Note: sanitization implemented in self::prepare_item_for_database().
-//				'sanitize_callback' => null,
-				// Note: validation implemented in self::prepare_item_for_database().
-//				'validate_callback' => null,
+				'validate_callback' => static function( $value, $request ) {
+					if ( 'custom' !== $request['type'] ) {
+						return true;
+					}
+					if ( '' === $value ) {
+						return new WP_Error(
+							'rest_title_required',
+							__( 'Title required if menu item of type custom.', 'gutenberg' )
+						);
+					}
+				},
+				'sanitize_callback'    => static function( $value ) {
+					if ( ! $value) {
+						return "";
+					}
+
+					$title = "";
+					if ( is_string( $value ) ) {
+						$title = $value;
+					} elseif ( ! empty( $value['raw'] ) ) {
+						$title = $value['raw'];
+					}
+
+					$title = wp_unslash( apply_filters( 'title_save_pre', wp_slash( $title ) ) );
+					return $title;
+				},
 			),
 			'properties'  => array(
 				'raw'      => array(
@@ -854,7 +882,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		);
 
 		$schema['properties']['object_id'] = array(
-			'description' => __( 'The DB ID of the original object this menu item represents, e . g . ID for posts and term_id for categories.', 'gutenberg' ),
+			'description' => __( 'The DB ID of the original object this menu item represents, e . g . ID for posts and term_id for categories.',
+				'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'integer',
 			'minimum'     => 0,
@@ -983,8 +1012,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * Determines the allowed query_vars for a get_items() response and prepares
 	 * them for WP_Query.
 	 *
-	 * @param array           $prepared_args Optional. Prepared WP_Query arguments. Default empty array.
-	 * @param WP_REST_Request $request       Optional. Full details about the request.
+	 * @param array $prepared_args Optional. Prepared WP_Query arguments. Default empty array.
+	 * @param WP_REST_Request $request Optional. Full details about the request.
 	 *
 	 * @return array Items query arguments.
 	 */

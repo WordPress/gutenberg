@@ -178,7 +178,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item() {
 		wp_set_current_user( self::$admin_id );
@@ -193,7 +193,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item_invalid_term() {
 		wp_set_current_user( self::$admin_id );
@@ -212,7 +212,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item_change_position() {
 		wp_set_current_user( self::$admin_id );
@@ -234,7 +234,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item_invalid_position() {
 		wp_set_current_user( self::$admin_id );
@@ -321,7 +321,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item_invalid_parent_menu_item() {
 		wp_set_current_user( self::$admin_id );
@@ -340,7 +340,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item_invalid_parent_post() {
 		wp_set_current_user( self::$admin_id );
@@ -358,7 +358,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item_invalid_menu() {
 		wp_set_current_user( self::$admin_id );
@@ -375,7 +375,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item_invalid_post() {
 		wp_set_current_user( self::$admin_id );
@@ -394,7 +394,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item_invalid_post_type() {
 		wp_set_current_user( self::$admin_id );
@@ -428,11 +428,12 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		);
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_title_required', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertEquals( 'Title required if menu item of type custom.', $response->get_data()['data']['params']['title'] );
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_create_item_invalid_custom_link_url() {
 		wp_set_current_user( self::$admin_id );
@@ -451,7 +452,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
@@ -480,7 +481,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_update_item_clean_xfn() {
 		wp_set_current_user( self::$admin_id );
@@ -513,7 +514,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 
 
 	/**
-	 * @requires PHP <= 5.3
+	 *
 	 */
 	public function test_update_item_invalid() {
 		wp_set_current_user( self::$admin_id );
