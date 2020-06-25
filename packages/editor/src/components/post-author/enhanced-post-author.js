@@ -15,7 +15,7 @@ import { useSelect } from '@wordpress/data';
 import ComboboxControl from '../../../../components/build/combobox-control/';
 
 function EnhancedPostAuthor( { postAuthor, authors, onUpdateAuthor } ) {
-	let initialAuthors = useMemo( () => {
+	const initialAuthors = useMemo( () => {
 		return authors.map( ( author ) => {
 			return {
 				key: author.id,
@@ -32,7 +32,7 @@ function EnhancedPostAuthor( { postAuthor, authors, onUpdateAuthor } ) {
 
 	if ( foundAuthor < 0 ) {
 		postAuthor.key = initialAuthors.length;
-		initialAuthors = [ postAuthor, ...initialAuthors ];
+		initialAuthors.unshift( postAuthor );
 		foundAuthor = 0;
 	}
 
