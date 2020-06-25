@@ -20,16 +20,17 @@ export default function TemplatePartNamePanel( { postId, setAttributes } ) {
 		postId
 	);
 	return (
-		<TextControl
-			hideLabelFromVision
-			label={ __( 'Name' ) }
-			value={ title }
-			onChange={ ( value ) => {
-				setTitle( value );
-				const slug = cleanForSlug( value );
-				setSlug( slug );
-				setAttributes( { slug } );
-			} }
-		/>
+		<div className="wp-block-template-part__name-panel">
+			<TextControl
+				label={ __( 'Name' ) }
+				value={ title }
+				onChange={ ( value ) => {
+					setTitle( value );
+					const slug = cleanForSlug( value );
+					setSlug( slug );
+					setAttributes( { slug } );
+				} }
+			/>
+		</div>
 	);
 }
