@@ -474,60 +474,6 @@
 		"parent": "javascript"
 	},
 	{
-		"title": "Create Block Tutorial",
-		"slug": "create-block",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/readme.md",
-		"parent": "tutorials"
-	},
-	{
-		"title": "Development Environment",
-		"slug": "devenv",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/devenv.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "WordPress Plugin",
-		"slug": "wp-plugin",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/wp-plugin.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "ESNext Syntax",
-		"slug": "esnext-js",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/esnext-js.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Anatomy of a Gutenberg Block",
-		"slug": "block-anatomy",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/block-anatomy.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Block Attributes",
-		"slug": "block-attributes",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/block-attributes.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Code Implementation",
-		"slug": "block-code",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/block-code.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Authoring Experience",
-		"slug": "author-experience",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/author-experience.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "finishing",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/finishing.md",
-		"parent": "create-block"
-	},
-	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/readme.md",
