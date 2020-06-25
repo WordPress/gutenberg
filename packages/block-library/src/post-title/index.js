@@ -15,6 +15,9 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Title' ),
+	description: __(
+		'Add the title of your post.'
+	),
 	icon,
 	edit,
 };
