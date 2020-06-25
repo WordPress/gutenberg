@@ -79,9 +79,17 @@ export function* installBlockType( block ) {
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
+
 		if ( ! registeredBlocks.length ) {
 			throw new Error( __( 'Unable to get block types.' ) );
 		}
+
+		if (
+			! registeredBlocks.filter( ( i ) => i.name === block.name ).length
+		) {
+			throw new Error( __( 'Error registering block.' ) );
+		}
+
 		success = true;
 	} catch ( error ) {
 		yield setErrorNotice( id, error.message || __( 'An error occurred.' ) );
