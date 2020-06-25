@@ -30,7 +30,7 @@ Verifies if publish checks are enabled.
 
 _Returns_
 
--   `boolean`: Boolean which represents the state of prepublish checks.
+-   `Promise<boolean>`: Boolean which represents the state of prepublish checks.
 
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
