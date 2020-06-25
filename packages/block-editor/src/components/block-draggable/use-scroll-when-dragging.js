@@ -13,13 +13,13 @@ const VELOCITY_MULTIPLIER =
 /**
  * React hook that scrolls the scroll container when a block is being dragged.
  *
- * @param {string} blockElementId The `id` attribute of the block element.
+ * @param {Element} dragElement The `id` attribute of the block element.
  *
  * @return {Function[]} `startScrolling`, `scrollOnDragOver`, `stopScrolling`
  *                      functions to be called in `onDragStart`, `onDragOver`
  *                      and `onDragEnd` events respectively.
  */
-export default function useScrollWhenDragging( blockElementId ) {
+export default function useScrollWhenDragging( dragElement ) {
 	const dragStartY = useRef( null );
 	const velocityY = useRef( null );
 	const scrollParentY = useRef( null );
@@ -41,9 +41,7 @@ export default function useScrollWhenDragging( blockElementId ) {
 			dragStartY.current = event.clientY;
 
 			// Find nearest parent(s) to scroll.
-			scrollParentY.current = getScrollContainer(
-				document.getElementById( blockElementId )
-			);
+			scrollParentY.current = getScrollContainer( dragElement );
 
 			scrollEditorInterval.current = setInterval( () => {
 				if ( scrollParentY.current && velocityY.current ) {
@@ -58,7 +56,7 @@ export default function useScrollWhenDragging( blockElementId ) {
 				}
 			}, SCROLL_INTERVAL_MS );
 		},
-		[ blockElementId ]
+		[ dragElement ]
 	);
 
 	const scrollOnDragOver = useCallback( ( event ) => {
