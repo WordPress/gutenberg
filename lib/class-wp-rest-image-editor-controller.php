@@ -83,7 +83,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 */
 	public function permission_callback( $request ) {
 		if ( ! current_user_can( 'edit_post', $request['media_id'] ) ) {
-			return new WP_Error( 'rest_cannot_edit_image', __( 'Sorry, you are not allowed to edit images.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+			$error = __( 'Sorry, you are not allowed to edit images.', 'gutenberg' );
+			return new WP_Error( 'rest_cannot_edit_image', $error, array( 'status' => rest_authorization_required_code() ) );
 		}
 
 		return true;
@@ -109,30 +110,57 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		$image_meta = wp_get_attachment_metadata( $attachment_id );
 
 		if ( ! $image_meta || ! $image_file ) {
-			return new WP_Error( 'rest_unknown_attachment', __( 'Unable to get meta information for file.', 'gutenberg' ), array( 'status' => 404 ) );
+			$error = __( 'Unable to get meta information for file.', 'gutenberg' );
+			return new WP_Error( 'rest_unknown_attachment', $error, array( 'status' => 404 ) );
+		}
+
+		// Check if we need to do anything.
+		$rotate = 0;
+		$crop   = false;
+
+		if ( ! empty( $params['rotation'] ) ) {
+			// Rotation direction: clockwise vs. counter clockwise.
+			$rotate = 0 - (int) $params['rotation'];
+		}
+
+		if ( isset( $params['x'], $params['y'], $params['width'], $params['height'] ) ) {
+			// The crop script may return some very small, sub-pixel values when the image was not cropped.
+			// Crop only when the cropping coordinates values are changed by more than 0.1%.
+			if (
+				floatval( $params['x'] ) > 0.1 ||
+				floatval( $params['y'] ) > 0.1 ||
+				floatval( $params['width'] ) < 99.9 ||
+				floatval( $params['height'] ) < 99.9
+			) {
+				$crop = true;
+			}
+		}
+
+		if ( ! $rotate && ! $crop ) {
+			$error = __( 'The image was not erdited. Edit the image before applying the changes.', 'gutenberg' );
+			return new WP_Error( 'rest_image_not_edited', $error, array( 'status' => 400 ) );
 		}
 
 		$image_editor = wp_get_image_editor( $image_file );
 
 		if ( is_wp_error( $image_editor ) ) {
 			// This image cannot be edited.
-			return new WP_Error( 'rest_unknown_image_file_type', __( 'Unable to edit this image.', 'gutenberg' ), array( 'status' => 500 ) );
+			$error = __( 'Unable to edit this image.', 'gutenberg' );
+			return new WP_Error( 'rest_unknown_image_file_type', $error, array( 'status' => 500 ) );
 		}
 
-		if ( isset( $params['rotation'] ) ) { // TODO: use `rotate` instead?
-			// CW / CCW
-			$result = $image_editor->rotate( 0 - $params['rotation'] );
+		if ( $rotate !== 0 ) {
+			$result = $image_editor->rotate( $rotate );
 
-			// TODO: return the "real" error message?
 			if ( is_wp_error( $result ) ) {
-				return new WP_Error( 'rest_image_rotation_failed', __( 'Unable to rotate this image.', 'gutenberg' ), array( 'status' => 500 ) );
+				$error = __( 'Unable to rotate this image.', 'gutenberg' );
+				return new WP_Error( 'rest_image_rotation_failed', $error, array( 'status' => 500 ) );
 			}
 		}
 
-		if ( isset( $params['x'], $params['y'], $params['width'], $params['height'] ) ) {
+		if ( $crop ) {
 			$size = $image_editor->get_size();
 
-			// Crop
 			$crop_x = round( ( $size['width'] * floatval( $params['x'] ) ) / 100.0 );
 			$crop_y = round( ( $size['height'] * floatval( $params['y'] ) ) / 100.0 );
 			$width  = round( ( $size['width'] * floatval( $params['width'] ) ) / 100.0 );
@@ -141,7 +169,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$result = $image_editor->crop( $crop_x, $crop_y, $width, $height );
 
 			if ( is_wp_error( $result ) ) {
-				return new WP_Error( 'rest_image_crop_failed', __( 'Unable to crop this image.', 'gutenberg' ), array( 'status' => 500 ) );
+				$error = __( 'Unable to crop this image.', 'gutenberg' );
+				return new WP_Error( 'rest_image_crop_failed', $error, array( 'status' => 500 ) );
 			}
 		}
 
@@ -164,7 +193,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		// Create the uploads sub-directory if needed.
 		$uploads = wp_upload_dir();
 
-		// Tests the file basename in the (proper/new) upload directory.
+		// Make the file name unique in the (new) upload directory.
 		$filename = wp_unique_filename( $uploads['path'], $filename );
 
 		// Save to disk.
@@ -175,7 +204,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		}
 
 		// Create new attachment post.
-		// TODO: Add possibility to preset the content and excerpt, and maybe the title?
 		$attachment_post = array(
 			'post_mime_type' => $saved['mime-type'],
 			'guid'           => $uploads['url'] . "/$filename",
@@ -198,9 +226,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		// Generate image sub-sizes and meta.
 		$new_image_meta = wp_generate_attachment_metadata( $new_attachment_id, $saved['path'] );
 
-		// TODO: Keep?
 		// Copy the EXIF metadata from the original attachment if not generated for the edited image.
-		// (EXIF is removed when using GD.)
 		if ( ! empty( $image_meta['image_meta'] ) ) {
 			$empty_image_meta = true;
 
@@ -218,7 +244,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$new_image_meta['image_meta']['orientation'] = 1;
 		}
 
-		// TODO: reference to the parent image: attachment_id? path? Anything else?
 		// The attachment_id may change if the site is exported and imported.
 		$new_image_meta['parent_image'] = array(
 			'attachment_id' => $attachment_id,
