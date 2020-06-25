@@ -11,6 +11,7 @@ import { withSafeTimeout } from '@wordpress/compose';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
+const cloneHeightTransformationBreakpoint = 700;
 const clonePadding = 0;
 
 class Draggable extends Component {
@@ -76,6 +77,7 @@ class Draggable extends Component {
 	/**
 	 * This method does a couple of things:
 	 *
+	 * - Clones the current element and spawns clone over original element.
 	 * - Adds a fake temporary drag image to avoid browser defaults.
 	 * - Sets transfer data.
 	 * - Adds dragover listener.
@@ -121,25 +123,52 @@ class Draggable extends Component {
 		if ( cloneClassname ) {
 			this.cloneWrapper.classList.add( cloneClassname );
 		}
+
 		this.cloneWrapper.style.width = `${
 			elementRect.width + clonePadding * 2
 		}px`;
 
-		// Position clone right over the original element (20px padding).
-		this.cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
-		this.cloneWrapper.style.left = `${
-			elementLeftOffset - clonePadding
-		}px`;
-
-		/*
-		 * __experimentalDragComponent
-		 * If a dragComponent is defined, the following logic will clone the
-		 * HTML node and inject it into the cloneWrapper.
-		 */
+		// If a dragComponent is defined, the following logic will clone the
+		// HTML node and inject it into the cloneWrapper.
 		if ( this.dragComponentRef.current ) {
+			// Position clone right over the original element (20px padding).
+			this.cloneWrapper.style.top = `${
+				elementTopOffset - clonePadding
+			}px`;
+			this.cloneWrapper.style.left = `${
+				elementLeftOffset - clonePadding
+			}px`;
+
 			const clonedDragComponent = document.createElement( 'div' );
 			clonedDragComponent.innerHTML = this.dragComponentRef.current.innerHTML;
 			this.cloneWrapper.appendChild( clonedDragComponent );
+		} else {
+			const clone = element.cloneNode( true );
+			clone.id = `clone-${ elementId }`;
+
+			if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
+				// Scale down clone if original element is larger than 700px.
+				this.cloneWrapper.style.transform = 'scale(0.5)';
+				this.cloneWrapper.style.transformOrigin = 'top left';
+				// Position clone near the cursor.
+				this.cloneWrapper.style.top = `${ event.clientY - 100 }px`;
+				this.cloneWrapper.style.left = `${ event.clientX }px`;
+			} else {
+				// Position clone right over the original element (20px padding).
+				this.cloneWrapper.style.top = `${
+					elementTopOffset - clonePadding
+				}px`;
+				this.cloneWrapper.style.left = `${
+					elementLeftOffset - clonePadding
+				}px`;
+			}
+
+			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
+			Array.from(
+				clone.querySelectorAll( 'iframe' )
+			).forEach( ( child ) => child.parentNode.removeChild( child ) );
+
+			this.cloneWrapper.appendChild( clone );
 		}
 
 		// Inject the cloneWrapper into the DOM.
