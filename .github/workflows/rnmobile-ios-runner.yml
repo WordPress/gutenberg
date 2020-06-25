@@ -47,8 +47,8 @@ jobs:
           ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-
           ${{ runner.os }}-pods-
 
-    - name: Bundle iOS 25 times
-      run: for i in $(seq 1 25); do npm run native clean && npm run native clean:runtime && npm run native test:e2e:bundle:ios zsh -i -c exit; done
+    - name: Bundle iOS
+      run: npm run native test:e2e:bundle:ios
 
     - name: Switch Xcode Version
       run: sudo xcode-select --switch /Applications/Xcode_11.4.1.app
