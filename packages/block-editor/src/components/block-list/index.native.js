@@ -54,6 +54,7 @@ export class BlockList extends Component {
 			parentWidth: this.props.parentWidth,
 			renderFooterAppender: this.props.renderFooterAppender,
 			onDeleteBlock: this.props.onDeleteBlock,
+			contentStyle: this.props.contentstyle,
 		};
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
@@ -108,16 +109,23 @@ export class BlockList extends Component {
 	}
 
 	getExtraData() {
-		const { parentWidth, renderFooterAppender, onDeleteBlock } = this.props;
+		const {
+			parentWidth,
+			renderFooterAppender,
+			onDeleteBlock,
+			contentStyle,
+		} = this.props;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
-			this.extraData.onDeleteBlock !== onDeleteBlock
+			this.extraData.onDeleteBlock !== onDeleteBlock ||
+			this.extraData.contentStyle !== contentStyle
 		) {
 			this.extraData = {
 				parentWidth,
 				renderFooterAppender,
 				onDeleteBlock,
+				contentStyle,
 			};
 		}
 		return this.extraData;

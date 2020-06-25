@@ -8,9 +8,119 @@ import {
 	findTransform,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect, useCallback, useState } from '@wordpress/element';
 
-const parseDropEvent = ( event ) => {
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
+/**
+ * @typedef  {Object} WPBlockDragPosition
+ * @property {number} x The horizontal position of a the block being dragged.
+ * @property {number} y The vertical position of the block being dragged.
+ */
+
+/**
+ * The orientation of a block list.
+ *
+ * @typedef {'horizontal'|'vertical'|undefined} WPBlockListOrientation
+ */
+
+/**
+ * Given a list of block DOM elements finds the index that a block should be dropped
+ * at.
+ *
+ * This function works for both horizontal and vertical block lists and uses the following
+ * terms for its variables:
+ *
+ * - Lateral, meaning the axis running horizontally when a block list is vertical and vertically when a block list is horizontal.
+ * - Forward, meaning the axis running vertically when a block list is vertical and horizontally
+ * when a block list is horizontal.
+ *
+ *
+ * @param {Element[]}              elements    Array of DOM elements that represent each block in a block list.
+ * @param {WPBlockDragPosition}    position    The position of the item being dragged.
+ * @param {WPBlockListOrientation} orientation The orientation of a block list.
+ *
+ * @return {number|undefined} The block index that's closest to the drag position.
+ */
+export function getNearestBlockIndex( elements, position, orientation ) {
+	const { x, y } = position;
+	const isHorizontal = orientation === 'horizontal';
+
+	let candidateIndex;
+	let candidateDistance;
+
+	elements.forEach( ( element, index ) => {
+		// Ensure the element is a block. It should have the `data-block` attribute.
+		if ( ! element.dataset.block ) {
+			return;
+		}
+
+		const rect = element.getBoundingClientRect();
+		const cursorLateralPosition = isHorizontal ? y : x;
+		const cursorForwardPosition = isHorizontal ? x : y;
+		const edgeLateralStart = isHorizontal ? rect.top : rect.left;
+		const edgeLateralEnd = isHorizontal ? rect.bottom : rect.right;
+
+		// When the cursor position is within the lateral bounds of the block,
+		// measure the straight line distance to the nearest point on the
+		// block's edge, else measure diagonal distance to the nearest corner.
+		let edgeLateralPosition;
+		if (
+			cursorLateralPosition >= edgeLateralStart &&
+			cursorLateralPosition <= edgeLateralEnd
+		) {
+			edgeLateralPosition = cursorLateralPosition;
+		} else if ( cursorLateralPosition < edgeLateralStart ) {
+			edgeLateralPosition = edgeLateralStart;
+		} else {
+			edgeLateralPosition = edgeLateralEnd;
+		}
+		const leadingEdgeForwardPosition = isHorizontal ? rect.left : rect.top;
+		const trailingEdgeForwardPosition = isHorizontal
+			? rect.right
+			: rect.bottom;
+
+		// First measure the distance to the leading edge of the block.
+		const leadingEdgeDistance = Math.sqrt(
+			( cursorLateralPosition - edgeLateralPosition ) ** 2 +
+				( cursorForwardPosition - leadingEdgeForwardPosition ) ** 2
+		);
+
+		// If no candidate has been assigned yet or this is the nearest
+		// block edge to the cursor, then assign it as the candidate.
+		if (
+			candidateDistance === undefined ||
+			Math.abs( leadingEdgeDistance ) < candidateDistance
+		) {
+			candidateDistance = leadingEdgeDistance;
+			candidateIndex = index;
+		}
+
+		// Next measure the distance to the trailing edge of the block.
+		const trailingEdgeDistance = Math.sqrt(
+			( cursorLateralPosition - edgeLateralPosition ) ** 2 +
+				( cursorForwardPosition - trailingEdgeForwardPosition ) ** 2
+		);
+
+		// If no candidate has been assigned yet or this is the nearest
+		// block edge to the cursor, then assign it as the candidate.
+		if ( Math.abs( trailingEdgeDistance ) < candidateDistance ) {
+			candidateDistance = trailingEdgeDistance;
+			candidateIndex = index + 1;
+		}
+	} );
+
+	return candidateIndex;
+}
+
+/**
+ * Retrieve the data for a block drop event.
+ *
+ * @param {WPSyntheticEvent} event The drop event.
+ *
+ * @return {Object} An object with block drag and drop data.
+ */
+function parseDropEvent( event ) {
 	let result = {
 		srcRootClientId: null,
 		srcClientId: null,
@@ -32,34 +142,52 @@ const parseDropEvent = ( event ) => {
 	}
 
 	return result;
-};
+}
 
-export default function useBlockDropZone( { element, rootClientId } ) {
-	const [ clientId, setClientId ] = useState( null );
+/**
+ * @typedef  {Object} WPBlockDropZoneConfig
+ * @property {Object} element      A React ref object pointing to the block list's DOM element.
+ * @property {string} rootClientId The root client id for the block list.
+ */
+
+/**
+ * A React hook that can be used to make a block list handle drag and drop.
+ *
+ * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
+ *
+ * @return {number|undefined} The block index that's closest to the drag position.
+ */
+export default function useBlockDropZone( {
+	element,
+	rootClientId: targetRootClientId,
+} ) {
+	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
 	function selector( select ) {
 		const {
 			getBlockIndex,
+			getBlockListSettings,
 			getClientIdsOfDescendants,
 			getSettings,
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		return {
 			getBlockIndex,
-			blockIndex: getBlockIndex( clientId, rootClientId ),
+			moverDirection: getBlockListSettings( targetRootClientId )
+				?.__experimentalMoverDirection,
 			getClientIdsOfDescendants,
 			hasUploadPermissions: !! getSettings().mediaUpload,
-			isLockedAll: getTemplateLock( rootClientId ) === 'all',
+			isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
 		};
 	}
 
 	const {
 		getBlockIndex,
-		blockIndex,
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
 		isLockedAll,
-	} = useSelect( selector, [ rootClientId, clientId ] );
+		moverDirection,
+	} = useSelect( selector, [ targetRootClientId ] );
 	const {
 		insertBlocks,
 		updateBlockAttributes,
@@ -83,15 +211,15 @@ export default function useBlockDropZone( { element, rootClientId } ) {
 					files,
 					updateBlockAttributes
 				);
-				insertBlocks( blocks, blockIndex, rootClientId );
+				insertBlocks( blocks, targetBlockIndex, targetRootClientId );
 			}
 		},
 		[
 			hasUploadPermissions,
 			updateBlockAttributes,
 			insertBlocks,
-			blockIndex,
-			rootClientId,
+			targetBlockIndex,
+			targetRootClientId,
 		]
 	);
 
@@ -100,73 +228,71 @@ export default function useBlockDropZone( { element, rootClientId } ) {
 			const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 			if ( blocks.length ) {
-				insertBlocks( blocks, blockIndex, rootClientId );
+				insertBlocks( blocks, targetBlockIndex, targetRootClientId );
 			}
 		},
-		[ insertBlocks, blockIndex, rootClientId ]
+		[ insertBlocks, targetBlockIndex, targetRootClientId ]
 	);
 
 	const onDrop = useCallback(
 		( event ) => {
 			const {
-				srcRootClientId,
-				srcClientId,
-				srcIndex,
-				type,
+				srcRootClientId: sourceRootClientId,
+				srcClientId: sourceClientId,
+				srcIndex: sourceBlockIndex,
+				type: dropType,
 			} = parseDropEvent( event );
 
-			const isBlockDropType = ( dropType ) => dropType === 'block';
-			const isSameLevel = ( srcRoot, dstRoot ) => {
-				// Note that rootClientId of top-level blocks will be undefined OR a void string,
-				// so we also need to account for that case separately.
-				return (
-					srcRoot === dstRoot ||
-					( ! srcRoot === true && ! dstRoot === true )
-				);
-			};
-			const isSameBlock = ( src, dst ) => src === dst;
-			const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) =>
-				getClientIdsOfDescendants( [ src ] ).some(
-					( id ) => id === dst
-				);
+			// If the user isn't dropping a block, return early.
+			if ( dropType !== 'block' ) {
+				return;
+			}
 
+			// If the user is dropping to the same position, return early.
 			if (
-				! isBlockDropType( type ) ||
-				isSameBlock( srcClientId, clientId ) ||
-				isSrcBlockAnAncestorOfDstBlock(
-					srcClientId,
-					clientId || rootClientId
+				sourceRootClientId === targetRootClientId &&
+				sourceBlockIndex === targetBlockIndex
+			) {
+				return;
+			}
+
+			// If the user is attempting to drop a block within its own
+			// nested blocks, return early as this would create infinite
+			// recursion.
+			if (
+				targetRootClientId === sourceClientId ||
+				getClientIdsOfDescendants( [ sourceClientId ] ).some(
+					( id ) => id === targetRootClientId
 				)
 			) {
 				return;
 			}
 
-			const dstIndex = clientId
-				? getBlockIndex( clientId, rootClientId )
-				: undefined;
-			const positionIndex = blockIndex;
+			const isAtSameLevel =
+				sourceRootClientId === targetRootClientId ||
+				( sourceRootClientId === '' &&
+					targetRootClientId === undefined );
+
 			// If the block is kept at the same level and moved downwards,
 			// subtract to account for blocks shifting upward to occupy its old position.
 			const insertIndex =
-				dstIndex &&
-				srcIndex < dstIndex &&
-				isSameLevel( srcRootClientId, rootClientId )
-					? positionIndex - 1
-					: positionIndex;
+				isAtSameLevel && sourceBlockIndex < targetBlockIndex
+					? targetBlockIndex - 1
+					: targetBlockIndex;
+
 			moveBlockToPosition(
-				srcClientId,
-				srcRootClientId,
-				rootClientId,
+				sourceClientId,
+				sourceRootClientId,
+				targetRootClientId,
 				insertIndex
 			);
 		},
 		[
 			getClientIdsOfDescendants,
 			getBlockIndex,
-			clientId,
-			blockIndex,
+			targetBlockIndex,
 			moveBlockToPosition,
-			rootClientId,
+			targetRootClientId,
 		]
 	);
 
@@ -181,33 +307,22 @@ export default function useBlockDropZone( { element, rootClientId } ) {
 
 	useEffect( () => {
 		if ( position ) {
-			const { y } = position;
-			const rect = element.current.getBoundingClientRect();
-
-			const offset = y - rect.top;
-			const target = Array.from( element.current.children ).find(
-				( blockEl ) => {
-					return (
-						blockEl.offsetTop + blockEl.offsetHeight / 2 > offset
-					);
-				}
+			const blockElements = Array.from( element.current.children );
+			const targetIndex = getNearestBlockIndex(
+				blockElements,
+				position,
+				moverDirection
 			);
 
-			if ( ! target ) {
+			if ( targetIndex === undefined ) {
 				return;
 			}
 
-			const targetClientId = target.id.slice( 'block-'.length );
-
-			if ( ! targetClientId ) {
-				return;
-			}
-
-			setClientId( targetClientId );
+			setTargetBlockIndex( targetIndex );
 		}
 	}, [ position ] );
 
 	if ( position ) {
-		return clientId;
+		return targetBlockIndex;
 	}
 }

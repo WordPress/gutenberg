@@ -18,6 +18,7 @@ function InserterLibrary( {
 	clientId,
 	isAppender,
 	showInserterHelpPanel,
+	showMostUsedBlocks = false,
 	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 	onSelect = noop,
 } ) {
@@ -39,6 +40,7 @@ function InserterLibrary( {
 			clientId={ clientId }
 			isAppender={ isAppender }
 			showInserterHelpPanel={ showInserterHelpPanel }
+			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 		/>
 	);

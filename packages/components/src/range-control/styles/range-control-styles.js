@@ -215,59 +215,31 @@ const tooltipPosition = ( { position } ) => {
 
 	if ( isTop ) {
 		return css`
-			margin-top: -4px;
-			top: -100%;
-
-			&::after {
-				border-bottom: none;
-				border-top-style: solid;
-				bottom: -6px;
-			}
+			top: -80%;
 		`;
 	}
 
 	return css`
-		margin-bottom: -4px;
-		bottom: -100%;
-
-		&::after {
-			border-bottom-style: solid;
-			border-top: none;
-			top: -6px;
-		}
+		bottom: -80%;
 	`;
 };
 
 export const Tooltip = styled.span`
-	background: ${ color( 'darkGray.800' ) };
-	border-radius: 3px;
+	background: ${ color( 'ui.border' ) };
+	border-radius: 2px;
 	box-sizing: border-box;
 	color: white;
 	display: inline-block;
-	font-size: 11px;
+	font-size: 12px;
 	min-width: 32px;
 	opacity: 0;
-	padding: 8px;
+	padding: 4px 8px;
 	pointer-events: none;
 	position: absolute;
 	text-align: center;
 	transition: opacity 120ms ease;
 	user-select: none;
-
-	&::after {
-		border: 6px solid ${ color( 'darkGray.800' ) };
-		border-left-color: transparent;
-		border-right-color: transparent;
-		bottom: -6px;
-		box-sizing: border-box;
-		content: '';
-		height: 0;
-		left: 50%;
-		line-height: 0;
-		margin-left: -6px;
-		position: absolute;
-		width: 0;
-	}
+	line-height: 1.4;
 
 	${ tooltipShow };
 	${ tooltipPosition };
@@ -282,8 +254,9 @@ export const InputNumber = styled.input`
 	box-sizing: border-box;
 	display: inline-block;
 	margin-top: 0;
-	min-width: 54px;
+	min-width: 60px;
 	max-width: 120px;
+	font-size: 13px;
 
 	input[type='number']& {
 		${ rangeHeight };

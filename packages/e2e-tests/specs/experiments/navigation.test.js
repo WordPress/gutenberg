@@ -9,6 +9,7 @@ import {
 	setUpResponseMocking,
 	clickBlockToolbarButton,
 	pressKeyWithModifier,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -172,7 +173,7 @@ async function mockCreatePageResponse( title, slug ) {
  *
  * @param {Object} link link object to be tested
  * @param {string} link.url What will be typed in the search input
- * @param {string} link.label What the resulting label will be in the creating Navigation Link Block after the block is created.
+ * @param {string} link.label What the resulting label will be in the creating Link Block after the block is created.
  * @param {string} link.type What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
  */
 async function updateActiveNavigationLink( { url, label, type } ) {
@@ -340,7 +341,7 @@ describe( 'Navigation', () => {
 			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
 			// block previews.
 			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Content"][role="region"] li[aria-label="Block: Navigation Link"]',
+				'[aria-label="Content"][role="region"] li[aria-label="Block: Link"]',
 				( els ) => els.length
 			);
 
@@ -366,7 +367,7 @@ describe( 'Navigation', () => {
 			// Scope element selector to the "Editor content" as otherwise it picks up on
 			// Block Style live previews.
 			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Content"][role="region"] li[aria-label="Block: Navigation Link"]',
+				'[aria-label="Content"][role="region"] li[aria-label="Block: Link"]',
 				( els ) => els.length
 			);
 
@@ -420,17 +421,16 @@ describe( 'Navigation', () => {
 
 		await createEmptyNavBlock();
 
-		// Add a link to the default Navigation Link block.
+		// Add a link to the default Link block.
 		await updateActiveNavigationLink( {
 			url: 'https://wordpress.org',
 			label: 'WP',
 			type: 'url',
 		} );
 
-		// Move the mouse to reveal the block movers. Without this the test seems to fail.
-		await page.mouse.move( 100, 100 );
+		await showBlockToolbar();
 
-		// Add another Navigation Link block.
+		// Add another Link block.
 		// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
 		// an issue where the block appender requires two clicks.
 		await page.click( '.wp-block-navigation .block-list-appender' );
@@ -470,14 +470,14 @@ describe( 'Navigation', () => {
 			{ title: 'Get in Touch', slug: 'get-in-touch' },
 		] );
 
-		// Add a link to the default Navigation Link block.
+		// Add a link to the default Link block.
 		await updateActiveNavigationLink( {
 			url: 'Get in Touch',
 			label: 'Contact',
 			type: 'entity',
 		} );
 
-		// Expect a Navigation Block with two Navigation Links in the snapshot.
+		// Expect a Navigation Block with two Links in the snapshot.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

@@ -7,7 +7,7 @@ $border-radius-ios: 7px;
 
 .segment {
 	border-radius: $segment-height / 2;
-	padding: 6px $panel-padding;
+	padding: 6px $grid-unit-20;
 	align-items: center;
 	justify-content: center;
 	margin-top: $segment-spacing + $border-width;
@@ -91,7 +91,7 @@ $border-radius-ios: 7px;
 .row {
 	flex-direction: row;
 	align-items: center;
-	padding: $panel-padding / 2 $panel-padding;
+	padding: $grid-unit-20 / 2 $grid-unit-20;
 }
 
 .flex {

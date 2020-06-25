@@ -72,7 +72,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 		$this->register_block_type(
 			'gutenberg/test-context-provider',
 			array(
-				'attributes'      => array(
+				'attributes'       => array(
 					'contextWithAssigned'   => array(
 						'type' => 'number',
 					),
@@ -87,7 +87,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 						'type' => 'number',
 					),
 				),
-				'providesContext' => array(
+				'provides_context' => array(
 					'gutenberg/contextWithAssigned'   => 'contextWithAssigned',
 					'gutenberg/contextWithDefault'    => 'contextWithDefault',
 					'gutenberg/contextWithoutDefault' => 'contextWithoutDefault',
@@ -99,7 +99,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 		$this->register_block_type(
 			'gutenberg/test-context-consumer',
 			array(
-				'context'         => array(
+				'uses_context'    => array(
 					'gutenberg/contextWithDefault',
 					'gutenberg/contextWithAssigned',
 					'gutenberg/contextWithoutDefault',
@@ -141,7 +141,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 		$this->register_block_type(
 			'gutenberg/test-context-consumer',
 			array(
-				'context'         => array( 'postId', 'postType' ),
+				'uses_context'    => array( 'postId', 'postType' ),
 				'render_callback' => function( $attributes, $content, $block ) use ( &$provided_context ) {
 					$provided_context[] = $block->context;
 
@@ -172,7 +172,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 		$this->register_block_type(
 			'gutenberg/test-context-consumer',
 			array(
-				'context'         => array( 'example' ),
+				'uses_context'    => array( 'example' ),
 				'render_callback' => function( $attributes, $content, $block ) use ( &$provided_context ) {
 					$provided_context[] = $block->context;
 

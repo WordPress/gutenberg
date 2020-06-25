@@ -5,6 +5,12 @@
 	"parent": [
 		"core/group"
 	],
+	"providesContext": {
+		"my-plugin/message": "message"
+	},
+	"usesContext": [
+		"groupId"
+	],
 	"icon": "star",
 	"description": "Shows warning, error or success notices…",
 	"keywords": [

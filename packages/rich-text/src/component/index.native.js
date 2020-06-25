@@ -3,9 +3,12 @@
 /**
  * External dependencies
  */
-import RCTAztecView from 'react-native-aztec';
+/**
+ * WordPress dependencies
+ */
+import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
-import { addMention } from 'react-native-gutenberg-bridge';
+import { addMention } from '@wordpress/react-native-bridge';
 import { get, pickBy } from 'lodash';
 import memize from 'memize';
 
