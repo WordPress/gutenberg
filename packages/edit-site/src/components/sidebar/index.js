@@ -3,7 +3,7 @@
  */
 import { createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { cog, pencil } from '@wordpress/icons';
+import { cog, typography } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -29,7 +29,7 @@ export function SidebarComplementaryAreaFills() {
 			<GlobalStylesSidebar
 				identifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
-				icon={ pencil }
+				icon={ typography }
 			/>
 		</>
 	);
