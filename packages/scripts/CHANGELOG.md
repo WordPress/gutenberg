@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Allow the CSS, SVG, and Sass loaders to process files from node_modules directory.
+
 ## 12.0.0-rc.0 (2020-06-24)
 
 ### Breaking Changes
