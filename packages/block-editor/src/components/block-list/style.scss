@@ -590,10 +590,13 @@
 		.components-button.has-icon.block-editor-block-mover-button.block-editor-block-mover-button {
 			min-width: $button-size;
 			width: $button-size;
-			cursor: grab;
 
-			&:active {
-				cursor: grabbing;
+			[draggable="true"] & {
+				cursor: grab;
+
+				&:active {
+					cursor: grabbing;
+				}
 			}
 		}
 
