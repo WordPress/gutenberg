@@ -1,0 +1,26 @@
+name: Linting
+
+on: [pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: npm install, build
+      run: |
+        npm ci
+        npm run test:create-block
+        npm run build
+    - name: Lint JavaScript and Styles
+      run: npm run lint
+    - name: Lint ES5 built files (IE11)
+      run: npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js
+    - name: Type checking
+      run: npm run build:package-types

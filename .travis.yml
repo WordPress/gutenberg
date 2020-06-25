@@ -65,32 +65,6 @@ install:
 
 jobs:
   include:
-    - name: Lint
-      install:
-        - npm ci
-        # eslint-plugin-import/no-extraneous-dependencies relies on modules to
-        # be "installed", which in practice requires that packages be built,
-        # presumably so that pkg.main can be resolved.
-        #
-        # See: https://github.com/benmosher/eslint-plugin-import/blob/92caa35/resolvers/node/index.js
-        - node ./bin/packages/build.js
-      script:
-        - npm run lint
-
-    - name: Lint ES5 only
-      install:
-        - npm ci
-        - npm run build
-      script:
-        - npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js
-
-    - name: Typecheck
-      install:
-        - npm ci
-      script:
-        - npm run build:package-types
-
-
     - name: Build artifacts
       install:
         # A "full" install is executed, since `npm ci` does not always exit
