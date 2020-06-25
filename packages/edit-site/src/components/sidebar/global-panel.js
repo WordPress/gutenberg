@@ -9,10 +9,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useGlobalStylesContext } from '../editor/global-styles-provider';
-
-const FONT_SIZE = 'font-size';
-const LINK_COLOR = '--wp--style--color--link';
-const BACKGROUND_COLOR = 'background-color';
+import { FONT_SIZE, BACKGROUND_COLOR, LINK_COLOR } from '../editor/utils';
 
 export default () => {
 	const {

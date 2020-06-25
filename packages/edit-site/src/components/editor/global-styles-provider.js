@@ -19,14 +19,24 @@ const GlobalStylesContext = createContext( {
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
-export default ( { children, entityId, globalContext, baseStyles } ) => {
+export default ( {
+	children,
+	entityId,
+	globalContext,
+	baseStyles,
+	blockData,
+} ) => {
 	const {
 		userStyles,
 		getProperty,
 		setProperty,
 	} = useGlobalStylesFromEntities( entityId );
 
-	useGlobalStylesEffectToUpdateStylesheet( baseStyles, userStyles );
+	useGlobalStylesEffectToUpdateStylesheet(
+		blockData,
+		baseStyles,
+		userStyles
+	);
 
 	return (
 		<GlobalStylesContext.Provider
@@ -104,7 +114,11 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 	};
 };
 
-const useGlobalStylesEffectToUpdateStylesheet = ( baseStyles, userStyles ) => {
+const useGlobalStylesEffectToUpdateStylesheet = (
+	blockData,
+	baseStyles,
+	userStyles
+) => {
 	useEffect( () => {
 		const embeddedStylesheetId = 'global-styles-inline-css';
 		let styleNode = document.getElementById( embeddedStylesheetId );
@@ -117,6 +131,10 @@ const useGlobalStylesEffectToUpdateStylesheet = ( baseStyles, userStyles ) => {
 				.appendChild( styleNode );
 		}
 
-		styleNode.innerText = getGlobalStyles( baseStyles, userStyles );
+		styleNode.innerText = getGlobalStyles(
+			blockData,
+			baseStyles,
+			userStyles
+		);
 	}, [ userStyles ] );
 };

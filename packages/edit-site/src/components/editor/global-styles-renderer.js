@@ -1,65 +1,70 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import {
+	FONT_SIZE,
+	TEXT_COLOR,
+	BACKGROUND_COLOR,
+	LINE_HEIGHT,
+	LINK_COLOR,
+	PRESET_COLOR,
+	PRESET_FONT_SIZE,
+	PRESET_GRADIENT,
+} from './utils';
 
 const mergeTrees = ( baseStyles, userStyles ) => {
 	// TODO: merge trees
 	return baseStyles;
 };
 
-export const getGlobalStyles = ( baseTree, userTree ) => {
+export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
 	const styles = [];
 	const tree = mergeTrees( baseTree, userTree );
-
-	const getSelector = ( blockName ) => {
-		if ( 'global' === blockName ) {
-			return ''; // We use the .editor-styles-wrapper for this one
-		}
-
-		const {
-			name,
-			supports: { __experimentalSelector },
-		} = getBlockType( blockName );
-
-		let selector = '.wp-block-' + name.replace( 'core/', '' );
-		if (
-			__experimentalSelector &&
-			'string' === typeof __experimentalSelector
-		) {
-			selector = __experimentalSelector;
-		}
-		return selector;
-	};
 
 	/**
 	 * Transform given style tree into a set of style declarations.
 	 *
-	 * @param {Object} blockStyles
+	 * @param {Object} blockSupports What styles the block supports.
+	 * @param {Object} blockStyles Block styles.
 	 *
 	 * @return {Array} An array of style declarations.
 	 */
-	const getBlockStylesDeclarations = ( blockStyles ) => {
+	const getBlockStylesDeclarations = ( blockSupports, blockStyles ) => {
 		const declarations = [];
-		if ( blockStyles?.typography?.fontSize ) {
+		if (
+			blockSupports.includes( FONT_SIZE ) &&
+			blockStyles?.typography?.fontSize
+		) {
 			declarations.push(
-				`font-size: ${ blockStyles.typography.fontSize }`
+				`${ FONT_SIZE }: ${ blockStyles.typography.fontSize }`
 			);
 		}
-		if ( blockStyles?.typography?.lineHeight ) {
+		if (
+			blockSupports.includes( LINE_HEIGHT ) &&
+			blockStyles?.typography?.lineHeight
+		) {
 			declarations.push(
 				`line-height: ${ blockStyles.typography.lineHeight }`
 			);
 		}
-		if ( blockStyles?.color?.text ) {
+		if (
+			blockSupports.includes( TEXT_COLOR ) &&
+			blockStyles?.color?.text
+		) {
 			declarations.push( `color: ${ blockStyles.color.text }` );
 		}
-		if ( blockStyles?.color?.background ) {
+		if (
+			blockSupports.includes( BACKGROUND_COLOR ) &&
+			blockStyles?.color?.background
+		) {
 			declarations.push(
 				`background-color: ${ blockStyles.color.background }`
 			);
 		}
-		if ( blockStyles?.color?.link ) {
+		if (
+			blockSupports.includes( LINK_COLOR ) &&
+			blockStyles?.color?.link
+		) {
 			declarations.push(
 				`--wp--style--color--link: ${ blockStyles.color.link }`
 			);
@@ -76,35 +81,44 @@ export const getGlobalStyles = ( baseTree, userTree ) => {
 	 */
 	const getBlockPresetsDeclarations = ( blockPresets ) => {
 		const declarations = [];
-		[ 'color', 'font-size', 'gradient' ].forEach( ( category ) => {
-			if ( blockPresets?.[ category ] ) {
-				blockPresets[ category ].forEach( ( { slug, value } ) =>
-					declarations.push(
-						`--wp--preset--${ category }--${ slug }: ${ value }`
-					)
-				);
+		[ PRESET_GRADIENT, PRESET_COLOR, PRESET_FONT_SIZE ].forEach(
+			( category ) => {
+				if ( blockPresets?.[ category ] ) {
+					blockPresets[ category ].forEach( ( { slug, value } ) =>
+						declarations.push(
+							`--wp--preset--${ category }--${ slug }: ${ value }`
+						)
+					);
+				}
 			}
-		} );
+		);
 		return declarations;
 	};
 
-	Object.keys( tree ).forEach( ( blockName ) => {
-		if ( blockName.startsWith( 'core/heading/' ) ) {
-			return; // We skip heading for now.
+	const getBlockSelector = ( selector ) => {
+		// TODO: look at how to hook into the styles generation
+		// so we can avoid having to increase the class specificity here
+		// and remap :root.
+		if ( ':root' === selector ) {
+			selector = '';
 		}
-		const blockSelector = getSelector( blockName );
+		return `.editor-styles-wrapper.editor-styles-wrapper ${ selector }`;
+	};
+
+	Object.keys( blockData ).forEach( ( blockName ) => {
+		const blockSelector = getBlockSelector(
+			blockData[ blockName ].selector
+		);
 		const blockDeclarations = [
-			...getBlockStylesDeclarations( tree[ blockName ].styles ),
+			...getBlockStylesDeclarations(
+				blockData[ blockName ].supports,
+				tree[ blockName ].styles
+			),
 			...getBlockPresetsDeclarations( tree[ blockName ].presets ),
 		];
-
 		if ( blockDeclarations.length > 0 ) {
-			// TODO: look at how to hook into the styles generation
-			// so we can avoid having to increase the class specificity here.
 			styles.push(
-				`.editor-styles-wrapper.editor-styles-wrapper ${ blockSelector } { ${ blockDeclarations.join(
-					';'
-				) } }`
+				`${ blockSelector } { ${ blockDeclarations.join( ';' ) } }`
 			);
 		}
 	} );
