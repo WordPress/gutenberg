@@ -3,7 +3,11 @@
  */
 import { createContext, useContext, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { getBlockType } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { getGlobalStyles } from './global-styles-renderer';
 
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
@@ -15,14 +19,14 @@ const GlobalStylesContext = createContext( {
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
-export default ( { children, entityId, globalContext } ) => {
+export default ( { children, entityId, globalContext, baseStyles } ) => {
 	const {
 		userStyles,
 		getProperty,
 		setProperty,
 	} = useGlobalStylesFromEntities( entityId );
 
-	useGlobalStylesEffectToUpdateStylesheet( userStyles );
+	useGlobalStylesEffectToUpdateStylesheet( baseStyles, userStyles );
 
 	return (
 		<GlobalStylesContext.Provider
@@ -100,9 +104,9 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 	};
 };
 
-const useGlobalStylesEffectToUpdateStylesheet = ( userStyles ) => {
+const useGlobalStylesEffectToUpdateStylesheet = ( baseStyles, userStyles ) => {
 	useEffect( () => {
-		const embeddedStylesheetId = 'user-generated-global-styles-inline-css';
+		const embeddedStylesheetId = 'global-styles-inline-css';
 		let styleNode = document.getElementById( embeddedStylesheetId );
 
 		if ( ! styleNode ) {
@@ -113,73 +117,6 @@ const useGlobalStylesEffectToUpdateStylesheet = ( userStyles ) => {
 				.appendChild( styleNode );
 		}
 
-		styleNode.innerText = getStylesFromTree( userStyles );
+		styleNode.innerText = getGlobalStyles( baseStyles, userStyles );
 	}, [ userStyles ] );
-};
-
-const getStylesFromTree = ( tree ) => {
-	const styles = [];
-
-	const getSelector = ( blockName ) => {
-		if ( 'global' === blockName ) {
-			return ''; // We use the .editor-styles-wrapper for this one
-		}
-
-		const {
-			name,
-			supports: { __experimentalSelector },
-		} = getBlockType( blockName );
-
-		let selector = '.wp-block-' + name.replace( 'core/', '' );
-		if (
-			__experimentalSelector &&
-			'string' === typeof __experimentalSelector
-		) {
-			selector = __experimentalSelector;
-		}
-		return selector;
-	};
-
-	const getStyleDeclarations = ( blockStyles ) => {
-		const declarations = [];
-		if ( blockStyles?.typography?.fontSize ) {
-			declarations.push(
-				`font-size: ${ blockStyles.typography.fontSize }`
-			);
-		}
-		if ( blockStyles?.typography?.lineHeight ) {
-			declarations.push(
-				`line-height: ${ blockStyles.typography.lineHeight }`
-			);
-		}
-		if ( blockStyles?.color?.text ) {
-			declarations.push( `color: ${ blockStyles.color.text }` );
-		}
-		if ( blockStyles?.color?.background ) {
-			declarations.push(
-				`background-color: ${ blockStyles.color.background }`
-			);
-		}
-		if ( blockStyles?.color?.link ) {
-			declarations.push(
-				`--wp--style--color--link: ${ blockStyles.color.link }`
-			);
-		}
-		return declarations.join( ';' );
-	};
-
-	Object.keys( tree ).forEach( ( blockName ) => {
-		const blockSelector = getSelector( blockName );
-		const blockDeclarations = getStyleDeclarations(
-			tree[ blockName ]?.styles
-		);
-
-		// TODO: look at how to hook into the styles generation
-		// so we can avoid having to increase the class specificity here.
-		styles.push(
-			`.editor-styles-wrapper.editor-styles-wrapper ${ blockSelector } { ${ blockDeclarations } }`
-		);
-	} );
-
-	return styles.join( '' );
 };
