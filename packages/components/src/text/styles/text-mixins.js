@@ -136,6 +136,15 @@ const variant = ( variantName = 'body' ) => {
 	}
 };
 
+const textPropsStyles = ( {
+	fontWeight,
+	fontSize,
+	lineHeight,
+	textTransform,
+} ) => {
+	return css( { fontWeight, fontSize, lineHeight, textTransform } );
+};
+
 /**
  * @typedef {Object} TextProps
  * @property {TextVariant} variant one of TextVariant to be used
@@ -145,6 +154,7 @@ const variant = ( variantName = 'body' ) => {
  * @param {TextProps} props
  */
 export const text = ( props ) => css`
-	${ fontFamily }
-	${ variant( props.variant ) }
+	${ fontFamily };
+	${ variant( props.variant ) };
+	${ textPropsStyles( props ) };
 `;
