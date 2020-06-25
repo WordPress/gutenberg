@@ -1489,8 +1489,8 @@ describe( 'state', () => {
 				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 0,
 			} );
 
@@ -1526,8 +1526,8 @@ describe( 'state', () => {
 				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 2,
 			} );
 
@@ -1563,8 +1563,8 @@ describe( 'state', () => {
 				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 1,
 			} );
 
