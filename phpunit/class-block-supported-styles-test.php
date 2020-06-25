@@ -149,7 +149,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_styles  = 'test:style; color: #000;background-color: #fff;';
+		$expected_styles  = 'test:style; color: #000; background-color: #fff;';
 		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background';
 
 		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
@@ -486,7 +486,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background';
-		$expected_styles  = 'test:style; color: #000;background-color: #fff;background: some-gradient;font-size: 10px;line-height: 20;';
+		$expected_styles  = 'test:style; color: #000; background-color: #fff; background: some-gradient; font-size: 10px; line-height: 20;';
 
 		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
