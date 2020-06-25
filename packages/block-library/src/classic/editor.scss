@@ -297,7 +297,7 @@ div[data-type="core/freeform"] {
 	margin: 0;
 	position: sticky;
 	z-index: z-index(".block-library-classic__toolbar");
-	top: $grid-unit-10;
+	top: 0;
 	border: $border-width solid $light-gray-500;
 	border-bottom: none;
 	border-radius: $radius-block-ui;
