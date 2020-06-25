@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, Fragment } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -175,7 +175,6 @@ function Navigation( {
 							] }
 						/>
 						<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
-
 						<BlockColorsStyleSelector
 							TextColor={ TextColor }
 							BackgroundColor={ BackgroundColor }
@@ -240,7 +239,7 @@ function Navigation( {
 					</Block.nav>
 				</BackgroundColor>
 			</TextColor>
-		</>
+		</Fragment>
 	);
 }
 
