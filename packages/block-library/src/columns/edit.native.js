@@ -44,6 +44,13 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 const DEFAULT_COLUMNS = 2;
 const MIN_COLUMNS_NUMBER = 1;
 
+/**
+ * Number of columns in each row for large breakpoint container width
+ *
+ * @type {number}
+ */
+const LARGE_CONTAINER_COLUMNS_IN_ROW = 3;
+
 const BREAKPOINTS = {
 	mobile: 480,
 	large: 768,
@@ -84,7 +91,10 @@ function ColumnsEditContainer( {
 
 		let columnWidth = columnBaseWidth;
 		if ( columnsInRow > 1 ) {
-			const margins = columnsInRow * 2 * styles.columnMargin.marginLeft;
+			const margins =
+				columnsInRow *
+				Math.min( columnsInRow, LARGE_CONTAINER_COLUMNS_IN_ROW ) *
+				styles.columnMargin.marginLeft;
 			columnWidth = ( minWidth - margins ) / columnsInRow;
 		}
 		return { width: columnWidth };
@@ -95,8 +105,11 @@ function ColumnsEditContainer( {
 			// show only 1 Column in row for mobile breakpoint container width
 			return 1;
 		} else if ( containerWidth < BREAKPOINTS.large ) {
-			// show 2 Column in row for large breakpoint container width
-			return Math.min( Math.max( 1, columnCount ), 2 );
+			// show LARGE_CONTAINER_COLUMNS_IN_ROW Column in row for large breakpoint container width
+			return Math.min(
+				Math.max( 1, columnCount ),
+				LARGE_CONTAINER_COLUMNS_IN_ROW
+			);
 		}
 		// show all Column in one row
 		return Math.max( 1, columnsNumber );
