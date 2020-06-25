@@ -136,7 +136,7 @@ export function requestUnsupportedBlockFallback(
 	htmlContent,
 	blockClientId,
 	blockName,
-	blockTitle,
+	blockTitle
 ) {
 	RNReactNativeGutenbergBridge.requestUnsupportedBlockFallback(
 		htmlContent,
