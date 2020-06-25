@@ -21,7 +21,27 @@ const initConfig = require( '../init-config' );
  * @param {Object}   options.spinner   A CLI spinner which indicates progress.
  * @param {boolean}  options.debug     True if debug mode is enabled.
  */
-module.exports = async function run( { container, command, spinner, debug } ) {
+module.exports = async function run( options ) {
+	let { container, command, spinner, debug } = options;
+
+	// Add properties.
+	Object.keys( options )
+		.filter(
+			( key ) =>
+				// '_' and '$0' internal property for yargs.
+				! [
+					'_',
+					'$0',
+					'container',
+					'command',
+					'spinner',
+					'debug',
+				].includes( key )
+		)
+		.forEach( ( key ) => {
+			command.push( `--${ key }=${ options[ key ] }` );
+		} );
+
 	const config = await initConfig( { spinner, debug } );
 
 	command = command.join( ' ' );
