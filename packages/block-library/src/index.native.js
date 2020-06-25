@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Platform } from 'react-native';
+import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -143,27 +144,18 @@ const registerBlock = ( block ) => {
 const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;
 
-	settings.variations
-		.sort( ( a, b ) => {
-			if ( a.title < b.title ) {
-				return -1;
-			} else if ( a.title > b.title ) {
-				return 1;
-			}
-			return 0;
-		} )
-		.forEach( ( v ) => {
-			registerBlockType( `${ name }-${ v.name }`, {
-				...metadata,
-				name: `${ name }-${ v.name }`,
-				...settings,
-				icon: v.icon(),
-				title: v.title,
-				initialAttributes: {
-					service: v.name,
-				},
-			} );
+	sortBy( settings.variations, 'title' ).forEach( ( v ) => {
+		registerBlockType( `${ name }-${ v.name }`, {
+			...metadata,
+			name: `${ name }-${ v.name }`,
+			...settings,
+			icon: v.icon(),
+			title: v.title,
+			initialAttributes: {
+				service: v.name,
+			},
 		} );
+	} );
 };
 
 // only enable code block for development
@@ -173,13 +165,14 @@ const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
 
-// Hide the Classic block and SocialIcon block
+// Hide the Classic block and SocialLink block
 addFilter(
 	'blocks.registerBlockType',
 	'core/react-native-editor',
 	( settings, name ) => {
+		const hiddenBlocks = [ 'core/freeform', 'core/social-link' ];
 		if (
-			( name === 'core/freeform' || name === 'core/social-link' ) &&
+			hiddenBlocks.includes( name ) &&
 			hasBlockSupport( settings, 'inserter', true )
 		) {
 			settings.supports = {

@@ -32,6 +32,9 @@ const SocialLinkEdit = ( {
 	onFocus,
 } ) => {
 	const { url, service } = attributes;
+	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
+	const [ isValue, setIsValue ] = useState( !! url );
+
 	const activeIcon =
 		styles[ `wp-social-link-${ service }` ] || styles[ `wp-social-link` ];
 
@@ -39,9 +42,6 @@ const SocialLinkEdit = ( {
 		styles.inactiveIcon,
 		styles.inactiveIconDark
 	);
-
-	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
-	const [ isValue, setIsValue ] = useState( !! url );
 
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
 
