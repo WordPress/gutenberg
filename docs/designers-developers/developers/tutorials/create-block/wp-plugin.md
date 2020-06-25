@@ -16,7 +16,7 @@ A WordPress plugin is a set of files in a directory within the site's `wp-conten
 
 ### Generate Plugin Files
 
-(2) Once in the right directory for your enviornment, the next step is to
+(2) Once in the right directory for your environment, the next step is to
 Regardless of environment, run the Run the following command to generate plugin files:
 
 ```
