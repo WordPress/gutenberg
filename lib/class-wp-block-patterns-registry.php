@@ -7,6 +7,11 @@
 
 /**
  * Class used for interacting with patterns.
+ *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50445
+ * @see https://core.trac.wordpress.org/changeset/48156
  */
 final class WP_Block_Patterns_Registry {
 	/**

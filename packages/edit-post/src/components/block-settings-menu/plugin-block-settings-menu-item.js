@@ -68,8 +68,8 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * import { __ } from wp.i18n;
- * import { PluginBlockSettingsMenuItem } from wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
  *
  * const doOnClick = ( ) => {
  *     // To be called when the user clicks the menu item.
