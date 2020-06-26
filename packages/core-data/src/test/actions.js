@@ -42,9 +42,6 @@ describe( 'deleteEntityRecord', () => {
 		// Trigger generator
 		fulfillment.next();
 
-		// remove items
-		fulfillment.next( entities );
-
 		// delete api call
 		const { value: apiFetchAction } = fulfillment.next( entities );
 		expect( apiFetchAction.request ).toEqual( {
