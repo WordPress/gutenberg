@@ -365,7 +365,10 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			// Only ever populate $prepared_nav_item['menu-item-object'] if it's missing here!
 		}
 
+		$taxonomy = get_taxonomy( 'nav_menu' );
+		$base     = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
 		$mapping = array(
+			'menu-id'               => $base,
 			'menu-item-db-id'       => 'id',
 			'menu-item-object-id'   => 'object_id',
 			'menu-item-object'      => 'object',
@@ -413,13 +416,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			if ( is_array( $prepared_nav_item[ $key ] ) ) {
 				$prepared_nav_item[ $key ] = implode( " ", $prepared_nav_item[ $key ] );
 			}
-		}
-
-		$taxonomy = get_taxonomy( 'nav_menu' );
-		$base     = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
-		// If menus submitted, cast to int.
-		if ( isset( $request[ $base ] ) && ! empty( $request[ $base ] ) ) {
-			$prepared_nav_item['menu-id'] = absint( $request[ $base ] );
 		}
 
 		// The section below depends on:
@@ -935,6 +931,19 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				},
 				'sanitize_callback' => static function ( $value ) {
 					return intval( $value );
+				},
+			),
+		);
+
+		$taxonomy = get_taxonomy( 'nav_menu' );
+		$base     = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
+		$schema['properties'][$base] = array(
+			'description' => __( 'Related menu ID.', 'gutenberg' ),
+			'context'     => array( 'view', 'edit', 'embed' ),
+			'type'        => 'integer',
+			'arg_options' => array(
+				'sanitize_callback' => static function ( $value ) {
+					return absint( $value );
 				},
 			),
 		);

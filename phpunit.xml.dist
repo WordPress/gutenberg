@@ -8,7 +8,7 @@
 	>
 	<testsuites>
 		<testsuite name="default">
-			<directory suffix="-test.php">./phpunit/</directory>
+			<directory suffix="-test.php">./phpunit/class-rest-nav-menu-items-controller-test.php</directory>
 		</testsuite>
 	</testsuites>
 	<groups>
