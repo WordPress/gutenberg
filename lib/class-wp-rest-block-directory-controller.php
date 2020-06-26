@@ -20,7 +20,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * Constructs the controller.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'block-directory';
 	}
 
@@ -177,7 +177,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	protected function prepare_links( $plugin ) {
 		$links = array(
 			'https://api.w.org/install-plugin' => array(
-				'href' => add_query_arg( 'slug', urlencode( $plugin['slug'] ), rest_url( '__experimental/plugins' ) ),
+				'href' => add_query_arg( 'slug', urlencode( $plugin['slug'] ), rest_url( 'wp/v2/plugins' ) ),
 			),
 		);
 
@@ -185,7 +185,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		if ( $plugin_file ) {
 			$links['https://api.w.org/plugin'] = array(
-				'href'       => rest_url( '__experimental/plugins/' . substr( $plugin_file, 0, - 4 ) ),
+				'href'       => rest_url( 'wp/v2/plugins/' . substr( $plugin_file, 0, - 4 ) ),
 				'embeddable' => true,
 			);
 		}
@@ -322,8 +322,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
 
-		$query_params['context']['default']  = 'view';
-		$query_params['per_page']['default'] = 3;
+		$query_params['context']['default'] = 'view';
 
 		$query_params['term'] = array(
 			'description' => __( 'Limit result set to blocks matching the search term.', 'gutenberg' ),

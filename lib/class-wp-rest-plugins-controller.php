@@ -24,7 +24,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'plugins';
 	}
 
