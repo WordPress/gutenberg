@@ -33,28 +33,37 @@ export function floatClamp( value, min, max ) {
 /**
  * Hook to store a clamped value, derived from props.
  *
- * @param {Object} settings       Hook settings.
- * @param {number} settings.min   The minimum value.
- * @param {number} settings.max   The maximum value.
- * @param {number} settings.value The current value.
+ * @param {Object} settings         Hook settings.
+ * @param {number} settings.min     The minimum value.
+ * @param {number} settings.max     The maximum value.
+ * @param {number} settings.value  	The current value.
+ * @param {any}    settings.initial The initial value.
+ *
+ * @return {[*, Function]} The controlled value and the value setter.
  */
-export function useControlledRangeValue( { min, max, value: valueProp } ) {
-	const [ value, setValue ] = useControlledState(
-		floatClamp( valueProp, min, max )
+export function useControlledRangeValue( {
+	min,
+	max,
+	value: valueProp,
+	initial,
+} ) {
+	const [ state, setInternalState ] = useControlledState(
+		floatClamp( valueProp, min, max ),
+		{ initial, fallback: null }
 	);
 
-	const setClampValue = useCallback(
+	const setState = useCallback(
 		( nextValue ) => {
 			if ( nextValue === null ) {
-				setValue( null );
+				setInternalState( null );
 			} else {
-				setValue( floatClamp( nextValue, min, max ) );
+				setInternalState( floatClamp( nextValue, min, max ) );
 			}
 		},
 		[ min, max ]
 	);
 
-	return [ value, setClampValue ];
+	return [ state, setState ];
 }
 
 /**
@@ -67,12 +76,14 @@ export function useControlledRangeValue( { min, max, value: valueProp } ) {
  * @param {Function} [settings.onMouseMove=noop]  A callback function invoked when the mouse is moved.
  * @param {Function} [settings.onMouseLeave=noop] A callback function invoked when the mouse is moved out of the element.
  * @param {number}   [settings.timeout=300]       Timeout before the element is shown or hidden.
+ *
+ * @return {Object} Bound properties for use on a React.Node.
  */
 export function useDebouncedHoverInteraction( {
-	onShow = noop,
 	onHide = noop,
-	onMouseMove = noop,
 	onMouseLeave = noop,
+	onMouseMove = noop,
+	onShow = noop,
 	timeout = 300,
 } ) {
 	const [ show, setShow ] = useState( false );

@@ -121,11 +121,16 @@ figure.wp-block-gallery {
 	left: -2px;
 }
 
-.blocks-gallery-item__move-backward.components-button,
-.blocks-gallery-item__move-forward.components-button,
-.blocks-gallery-item__remove.components-button {
-	padding: 0;
+// Increases specificity
+// Resolves: https://github.com/WordPress/gutenberg/issues/23469
+.wp-block-gallery {
+	.blocks-gallery-item__move-backward.components-button,
+	.blocks-gallery-item__move-forward.components-button,
+	.blocks-gallery-item__remove.components-button {
+		padding: 0;
+	}
 }
+
 
 .blocks-gallery-item .components-spinner {
 	position: absolute;

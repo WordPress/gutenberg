@@ -4,7 +4,7 @@
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { Flex, FlexItem } from '@wordpress/components';
-import { menu, handle } from '@wordpress/icons';
+import { layout, handle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,7 +22,7 @@ export default function BlockDraggableChip( { clientIds } ) {
 			);
 
 			if ( ! isOfSameType ) {
-				return menu;
+				return layout;
 			}
 
 			return getBlockType( blockName ).icon;
@@ -43,6 +43,7 @@ export default function BlockDraggableChip( { clientIds } ) {
 					<FlexItem>
 						<BlockIcon icon={ icon } />
 					</FlexItem>
+					<FlexItem>{ `(${ clientIds.length })` }</FlexItem>
 				</Flex>
 			</div>
 		</div>
