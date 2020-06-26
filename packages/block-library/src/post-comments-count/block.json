@@ -1,5 +1,10 @@
 {
 	"name": "core/post-comments-count",
-	"category": "layout",
-	"context": [ "postId" ]
+	"category": "design",
+	"usesContext": [
+		"postId"
+	],
+	"supports": {
+		"html": false
+	}
 }

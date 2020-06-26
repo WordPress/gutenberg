@@ -2,16 +2,16 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
-import {
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-	mediaUploadSync,
-} from 'react-native-gutenberg-bridge';
 import Video from 'react-native-video';
 
 /**
  * WordPress dependencies
  */
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import {
 	Icon,
@@ -20,7 +20,7 @@ import {
 	RangeControl,
 	ToolbarButton,
 	ToolbarGroup,
-	LinearGradient,
+	Gradient,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -127,8 +127,6 @@ const Cover = ( {
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
 		const onSelect = attributesFromMedia( setAttributes );
-		// Remove gradient attribute
-		setAttributes( { gradient: undefined, customGradient: undefined } );
 		onSelect( media );
 	};
 
@@ -204,6 +202,19 @@ const Cover = ( {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
+			{ url ? (
+				<PanelBody>
+					<RangeControl
+						label={ __( 'Opacity' ) }
+						minimumValue={ 0 }
+						maximumValue={ 100 }
+						value={ dimRatio }
+						onChange={ onOpactiyChange }
+						style={ styles.rangeCellContainer }
+						separatorType={ 'topFullWidth' }
+					/>
+				</PanelBody>
+			) : null }
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<RangeControl
 					label={ __( 'Minimum height in pixels' ) }
@@ -214,18 +225,6 @@ const Cover = ( {
 					style={ styles.rangeCellContainer }
 				/>
 			</PanelBody>
-			{ url ? (
-				<PanelBody title={ __( 'Overlay' ) }>
-					<RangeControl
-						label={ __( 'Background Opacity' ) }
-						minimumValue={ 0 }
-						maximumValue={ 100 }
-						value={ dimRatio }
-						onChange={ onOpactiyChange }
-						style={ styles.rangeCellContainer }
-					/>
-				</PanelBody>
-			) : null }
 		</InspectorControls>
 	);
 
@@ -324,7 +323,7 @@ const Cover = ( {
 
 			<View pointerEvents="none" style={ overlayStyles }>
 				{ gradientValue && (
-					<LinearGradient
+					<Gradient
 						gradientValue={ gradientValue }
 						style={ styles.background }
 					/>

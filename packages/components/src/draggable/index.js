@@ -6,13 +6,13 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSafeTimeout } from '@wordpress/compose';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
 const cloneHeightTransformationBreakpoint = 700;
-const clonePadding = 20;
+const clonePadding = 0;
 
 class Draggable extends Component {
 	constructor() {
@@ -22,6 +22,7 @@ class Draggable extends Component {
 		this.onDragOver = this.onDragOver.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.resetDragState = this.resetDragState.bind( this );
+		this.dragComponentRef = createRef();
 	}
 
 	componentWillUnmount() {
@@ -38,7 +39,11 @@ class Draggable extends Component {
 		event.preventDefault();
 
 		this.resetDragState();
-		this.props.setTimeout( onDragEnd );
+
+		// Allow the Synthetic Event to be accessed from asynchronous code.
+		// https://reactjs.org/docs/events.html#event-pooling
+		event.persist();
+		this.props.setTimeout( onDragEnd.bind( this, event ) );
 	}
 
 	/**
@@ -63,6 +68,12 @@ class Draggable extends Component {
 		// Update cursor coordinates.
 		this.cursorLeft = event.clientX;
 		this.cursorTop = event.clientY;
+
+		const { onDragOver = noop } = this.props;
+
+		// The `event` from `onDragOver` is not a SyntheticEvent
+		// and so it doesn't require `event.persist()`.
+		this.props.setTimeout( onDragOver.bind( this, event ) );
 	}
 
 	/**
@@ -76,7 +87,12 @@ class Draggable extends Component {
 	 * @param  {Object} event The non-custom DragEvent.
 	 */
 	onDragStart( event ) {
-		const { elementId, transferData, onDragStart = noop } = this.props;
+		const {
+			cloneClassname,
+			elementId,
+			transferData,
+			onDragStart = noop,
+		} = this.props;
 		const element = document.getElementById( elementId );
 		if ( ! element ) {
 			event.preventDefault();
@@ -104,34 +120,55 @@ class Draggable extends Component {
 		const elementWrapper = element.parentNode;
 		const elementTopOffset = parseInt( elementRect.top, 10 );
 		const elementLeftOffset = parseInt( elementRect.left, 10 );
-		const clone = element.cloneNode( true );
-		clone.id = `clone-${ elementId }`;
 		this.cloneWrapper = document.createElement( 'div' );
 		this.cloneWrapper.classList.add( cloneWrapperClass );
+		if ( cloneClassname ) {
+			this.cloneWrapper.classList.add( cloneClassname );
+		}
+
 		this.cloneWrapper.style.width = `${ elementRect.width +
 			clonePadding * 2 }px`;
 
-		if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
-			// Scale down clone if original element is larger than 700px.
-			this.cloneWrapper.style.transform = 'scale(0.5)';
-			this.cloneWrapper.style.transformOrigin = 'top left';
-			// Position clone near the cursor.
-			this.cloneWrapper.style.top = `${ event.clientY - 100 }px`;
-			this.cloneWrapper.style.left = `${ event.clientX }px`;
-		} else {
+		// If a dragComponent is defined, the following logic will clone the
+		// HTML node and inject it into the cloneWrapper.
+		if ( this.dragComponentRef.current ) {
 			// Position clone right over the original element (20px padding).
 			this.cloneWrapper.style.top = `${ elementTopOffset -
 				clonePadding }px`;
 			this.cloneWrapper.style.left = `${ elementLeftOffset -
 				clonePadding }px`;
+
+			const clonedDragComponent = document.createElement( 'div' );
+			clonedDragComponent.innerHTML = this.dragComponentRef.current.innerHTML;
+			this.cloneWrapper.appendChild( clonedDragComponent );
+		} else {
+			const clone = element.cloneNode( true );
+			clone.id = `clone-${ elementId }`;
+
+			if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
+				// Scale down clone if original element is larger than 700px.
+				this.cloneWrapper.style.transform = 'scale(0.5)';
+				this.cloneWrapper.style.transformOrigin = 'top left';
+				// Position clone near the cursor.
+				this.cloneWrapper.style.top = `${ event.clientY - 100 }px`;
+				this.cloneWrapper.style.left = `${ event.clientX }px`;
+			} else {
+				// Position clone right over the original element (20px padding).
+				this.cloneWrapper.style.top = `${ elementTopOffset -
+					clonePadding }px`;
+				this.cloneWrapper.style.left = `${ elementLeftOffset -
+					clonePadding }px`;
+			}
+
+			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
+			Array.from(
+				clone.querySelectorAll( 'iframe' )
+			).forEach( ( child ) => child.parentNode.removeChild( child ) );
+
+			this.cloneWrapper.appendChild( clone );
 		}
 
-		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
-		Array.from( clone.querySelectorAll( 'iframe' ) ).forEach( ( child ) =>
-			child.parentNode.removeChild( child )
-		);
-
-		this.cloneWrapper.appendChild( clone );
+		// Inject the cloneWrapper into the DOM.
 		elementWrapper.appendChild( this.cloneWrapper );
 
 		// Mark the current cursor coordinates.
@@ -141,7 +178,10 @@ class Draggable extends Component {
 		document.body.classList.add( 'is-dragging-components-draggable' );
 		document.addEventListener( 'dragover', this.onDragOver );
 
-		this.props.setTimeout( onDragStart );
+		// Allow the Synthetic Event to be accessed from asynchronous code.
+		// https://reactjs.org/docs/events.html#event-pooling
+		event.persist();
+		this.props.setTimeout( onDragStart.bind( this, event ) );
 	}
 
 	/**
@@ -156,17 +196,36 @@ class Draggable extends Component {
 			this.cloneWrapper = null;
 		}
 
+		this.cursorLeft = null;
+		this.cursorTop = null;
+
 		// Reset cursor.
 		document.body.classList.remove( 'is-dragging-components-draggable' );
 	}
 
 	render() {
-		const { children } = this.props;
+		const {
+			children,
+			__experimentalDragComponent: dragComponent,
+		} = this.props;
 
-		return children( {
-			onDraggableStart: this.onDragStart,
-			onDraggableEnd: this.onDragEnd,
-		} );
+		return (
+			<>
+				{ children( {
+					onDraggableStart: this.onDragStart,
+					onDraggableEnd: this.onDragEnd,
+				} ) }
+				{ dragComponent && (
+					<div
+						className="components-draggable-drag-component-root"
+						style={ { display: 'none' } }
+						ref={ this.dragComponentRef }
+					>
+						{ dragComponent }
+					</div>
+				) }
+			</>
+		);
 	}
 }
 

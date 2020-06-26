@@ -21,6 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import Layout from './components/layout';
+import './store';
 
 /**
  * Fetches link suggestions from the API. This function is an exact copy of a function found at:
@@ -57,6 +58,7 @@ export function initialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+	settings.__experimentalNavigationScreen = true;
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )

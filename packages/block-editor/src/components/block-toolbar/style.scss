@@ -66,50 +66,40 @@
 	}
 }
 
+.block-editor-block-toolbar__block-parent-selector-wrapper {
+	position: absolute;
+	top: -1px;
+	left: -1px;
+	opacity: 0;
+	transition: all 60ms linear;
+	z-index: -1; // This makes it slide out from underneath the toolbar.
+
+	@include reduce-motion("transition");
+
+	.is-showing-movers & {
+		opacity: 1;
+		transform: translateY(-($block-toolbar-height + $grid-unit-15));
+	}
+
+	// Hide the Parent button in Top Toolbar mode.
+	.edit-post-header-toolbar__block-toolbar & {
+		display: none;
+	}
+}
+
 .block-editor-block-toolbar__mover-switcher-container {
 	display: flex;
 }
 
 .block-editor-block-toolbar__block-switcher-wrapper {
+	display: flex;
+
+	// Drag and drop is only enabled in contextual toolbars.
+	&:not([draggable="false"]) * {
+		cursor: grab;
+	}
+
 	.block-editor-block-switcher {
 		display: block;
 	}
 }
-
-.block-editor-block-toolbar.has-responsive-movers {
-	.block-editor-block-toolbar__mover-trigger-container {
-		@include break-medium() {
-			bottom: -1px;
-			left: -1px;
-			position: absolute;
-			top: -1px;
-			transform: translateX(-48px);
-			user-select: none;
-		}
-	}
-
-	// Explicitly color the background of the switcher to "cover" the mover control as it animates out.
-	.block-editor-block-toolbar__block-switcher-wrapper {
-		background: $white;
-		border-left: $border-width solid;
-		border-radius: 0 0 $radius-block-ui $radius-block-ui;
-		position: relative;
-		z-index: 1;
-		margin-left: -$border-width;
-	}
-
-	.block-editor-block-toolbar__mover-trigger-wrapper:not(:empty) {
-		@include break-medium() {
-			background-color: $white;
-			border: 1px solid $black;
-			border-bottom-left-radius: 2px;
-			border-top-left-radius: 2px;
-			border-right: none;
-			height: 100%;
-			transition: all 60ms linear;
-		}
-
-		@include reduce-motion("transition");
-	}
-}
-

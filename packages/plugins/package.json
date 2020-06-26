@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "2.16.0",
+	"version": "2.19.0",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"plugins"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/plugins/README.md",

@@ -1,17 +1,19 @@
 /**
  * External dependencies
  */
-import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
+import { castArray, filter, mapKeys, orderBy, uniq, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
-	Dropdown,
+	DropdownMenu,
 	ToolbarButton,
 	ToolbarGroup,
+	__experimentalToolbarItem as ToolbarItem,
 	MenuGroup,
+	Popover,
 } from '@wordpress/components';
 import {
 	getBlockType,
@@ -21,7 +23,6 @@ import {
 	getBlockFromExample,
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
-import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { layout } from '@wordpress/icons';
@@ -32,12 +33,47 @@ import { layout } from '@wordpress/icons';
 import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
-import BlockTypesList from '../block-types-list';
+import BlockTransformationsMenu from './block-transformations-menu';
 
-const POPOVER_PROPS = {
-	position: 'bottom right',
-	isAlternate: true,
-};
+function PreviewBlockPopover( { hoveredBlock, hoveredClassName } ) {
+	const hoveredBlockType = getBlockType( hoveredBlock.name );
+	return (
+		<div className="block-editor-block-switcher__popover__preview__parent">
+			<div className="block-editor-block-switcher__popover__preview__container">
+				<Popover
+					className="block-editor-block-switcher__preview__popover"
+					position="bottom right"
+					focusOnMount={ false }
+				>
+					<div className="block-editor-block-switcher__preview">
+						<div className="block-editor-block-switcher__preview-title">
+							{ __( 'Preview' ) }
+						</div>
+						<BlockPreview
+							viewportWidth={ 500 }
+							blocks={
+								hoveredBlockType.example
+									? getBlockFromExample( hoveredBlock.name, {
+											attributes: {
+												...hoveredBlockType.example
+													.attributes,
+												className: hoveredClassName,
+											},
+											innerBlocks:
+												hoveredBlockType.example
+													.innerBlocks,
+									  } )
+									: cloneBlock( hoveredBlock, {
+											className: hoveredClassName,
+									  } )
+							}
+						/>
+					</div>
+				</Popover>
+			</div>
+		</div>
+	);
+}
 
 export class BlockSwitcher extends Component {
 	constructor() {
@@ -61,15 +97,11 @@ export class BlockSwitcher extends Component {
 		} = this.props;
 		const { hoveredClassName } = this.state;
 
-		if ( ! blocks || ! blocks.length ) {
+		if ( ! Array.isArray( blocks ) || ! blocks.length ) {
 			return null;
 		}
 
-		const hoveredBlock = hoveredClassName ? blocks[ 0 ] : null;
-		const hoveredBlockType = hoveredClassName
-			? getBlockType( hoveredBlock.name )
-			: null;
-
+		const [ hoveredBlock ] = blocks;
 		const itemsByName = mapKeys( inserterItems, ( { name } ) => name );
 		const possibleBlockTransformations = orderBy(
 			filter(
@@ -87,145 +119,114 @@ export class BlockSwitcher extends Component {
 
 		let icon;
 		if ( isSelectionOfSameType ) {
-			const sourceBlockName = blocks[ 0 ].name;
+			const sourceBlockName = hoveredBlock.name;
 			const blockType = getBlockType( sourceBlockName );
 			icon = blockType.icon;
 		} else {
 			icon = layout;
 		}
 
-		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {
+		const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
+
+		if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 			return (
 				<ToolbarGroup>
 					<ToolbarButton
 						disabled
 						className="block-editor-block-switcher__no-switcher-icon"
-						label={ __( 'Block icon' ) }
+						title={ __( 'Block icon' ) }
 						icon={ <BlockIcon icon={ icon } showColors /> }
 					/>
 				</ToolbarGroup>
 			);
 		}
 
-		return (
-			<Dropdown
-				popoverProps={ POPOVER_PROPS }
-				className="block-editor-block-switcher"
-				contentClassName="block-editor-block-switcher__popover"
-				renderToggle={ ( { onToggle, isOpen } ) => {
-					const openOnArrowDown = ( event ) => {
-						if ( ! isOpen && event.keyCode === DOWN ) {
-							event.preventDefault();
-							event.stopPropagation();
-							onToggle();
-						}
-					};
-					const label =
-						1 === blocks.length
-							? __( 'Change block type or style' )
-							: sprintf(
-									/* translators: %s: number of blocks. */
-									_n(
-										'Change type of %d block',
-										'Change type of %d blocks',
-										blocks.length
-									),
-									blocks.length
-							  );
+		const blockSwitcherLabel =
+			1 === blocks.length
+				? __( 'Change block type or style' )
+				: sprintf(
+						/* translators: %s: number of blocks. */
+						_n(
+							'Change type of %d block',
+							'Change type of %d blocks',
+							blocks.length
+						),
+						blocks.length
+				  );
 
-					return (
-						<ToolbarGroup>
-							<ToolbarButton
-								className="block-editor-block-switcher__toggle"
-								onClick={ onToggle }
-								aria-haspopup="true"
-								aria-expanded={ isOpen }
-								label={ label }
-								onKeyDown={ openOnArrowDown }
-								showTooltip
-								icon={ <BlockIcon icon={ icon } showColors /> }
-							/>
-						</ToolbarGroup>
-					);
-				} }
-				renderContent={ ( { onClose } ) => (
-					<>
-						{ ( hasBlockStyles ||
-							possibleBlockTransformations.length !== 0 ) && (
-							<div className="block-editor-block-switcher__container">
-								{ hasBlockStyles && (
-									<MenuGroup>
-										<div className="block-editor-block-switcher__label">
-											{ __( 'Styles' ) }
-										</div>
-										<BlockStyles
-											clientId={ blocks[ 0 ].clientId }
-											onSwitch={ onClose }
-											onHoverClassName={
-												this.onHoverClassName
-											}
-										/>
-									</MenuGroup>
-								) }
-								{ possibleBlockTransformations.length !== 0 && (
-									<MenuGroup>
-										<div className="block-editor-block-switcher__label">
-											{ __( 'Transform to' ) }
-										</div>
-										<BlockTypesList
-											items={ possibleBlockTransformations.map(
-												( destinationBlockType ) => ( {
-													id:
-														destinationBlockType.name,
-													icon:
-														destinationBlockType.icon,
-													title:
-														destinationBlockType.title,
-												} )
-											) }
-											onSelect={ ( item ) => {
-												onTransform( blocks, item.id );
-												onClose();
-											} }
-										/>
-									</MenuGroup>
-								) }
-							</div>
-						) }
-						{ hoveredClassName !== null && (
-							<div className="block-editor-block-switcher__preview">
-								<div className="block-editor-block-switcher__preview-title">
-									{ __( 'Preview' ) }
-								</div>
-								<BlockPreview
-									viewportWidth={ 500 }
-									blocks={
-										hoveredBlockType.example
-											? getBlockFromExample(
-													hoveredBlock.name,
-													{
-														attributes: {
-															...hoveredBlockType
-																.example
-																.attributes,
-															className: hoveredClassName,
-														},
-														innerBlocks:
-															hoveredBlockType
-																.example
-																.innerBlocks,
-													}
-											  )
-											: cloneBlock( hoveredBlock, {
-													className: hoveredClassName,
-											  } )
-									}
+		return (
+			<ToolbarGroup>
+				<ToolbarItem>
+					{ ( toggleProps ) => (
+						<DropdownMenu
+							className="block-editor-block-switcher"
+							label={ blockSwitcherLabel }
+							popoverProps={ {
+								position: 'bottom right',
+								isAlternate: true,
+								className:
+									'block-editor-block-switcher__popover',
+							} }
+							icon={
+								<BlockIcon
+									icon={ icon }
+									className="block-editor-block-switcher__toggle"
+									showColors
 								/>
-							</div>
-						) }
-					</>
-				) }
-			/>
+							}
+							toggleProps={ toggleProps }
+							menuProps={ { orientation: 'both' } }
+						>
+							{ ( { onClose } ) =>
+								( hasBlockStyles ||
+									hasPossibleBlockTransformations ) && (
+									<div className="block-editor-block-switcher__container">
+										{ hasPossibleBlockTransformations && (
+											<BlockTransformationsMenu
+												className="block-editor-block-switcher__transforms__menugroup"
+												possibleBlockTransformations={
+													possibleBlockTransformations
+												}
+												onSelect={ ( name ) => {
+													onTransform( blocks, name );
+													onClose();
+												} }
+											/>
+										) }
+										{ hasBlockStyles && (
+											<MenuGroup
+												label={ __( 'Styles' ) }
+												className="block-editor-block-switcher__styles__menugroup"
+											>
+												{ hoveredClassName !== null && (
+													<PreviewBlockPopover
+														hoveredBlock={
+															hoveredBlock
+														}
+														hoveredClassName={
+															hoveredClassName
+														}
+													/>
+												) }
+												<BlockStyles
+													clientId={
+														hoveredBlock.clientId
+													}
+													onSwitch={ onClose }
+													onHoverClassName={
+														this.onHoverClassName
+													}
+													itemRole="menuitem"
+												/>
+											</MenuGroup>
+										) }
+									</div>
+								)
+							}
+						</DropdownMenu>
+					) }
+				</ToolbarItem>
+			</ToolbarGroup>
 		);
 	}
 }
@@ -239,7 +240,7 @@ export default compose(
 		} = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
 		const rootClientId = getBlockRootClientId(
-			first( castArray( clientIds ) )
+			castArray( clientIds )[ 0 ]
 		);
 		const blocks = getBlocksByClientId( clientIds );
 		const firstBlock = blocks && blocks.length === 1 ? blocks[ 0 ] : null;

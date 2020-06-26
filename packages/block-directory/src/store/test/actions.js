@@ -1,148 +1,225 @@
 /**
- * WordPress dependencies
- */
-import * as blockFunctions from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
-import { downloadBlock, installBlock } from '../actions';
-import * as controls from '../controls';
-
-const ACTIONS = {
-	apiFetch: 'API_FETCH',
-	addInstalledBlockType: 'ADD_INSTALLED_BLOCK_TYPE',
-	removeInstalledBlockType: 'REMOVE_INSTALLED_BLOCK_TYPE',
-};
-
-jest.mock( '@wordpress/blocks' );
+import { installBlockType, uninstallBlockType } from '../actions';
 
 describe( 'actions', () => {
-	const item = { id: 'block/block', name: 'Test Block' };
-	const blockPlugin = {
-		assets: [ 'http://www.wordpress.org/plugins/fakeasset.js' ],
+	const endpoint = '/wp-json/__experimental/plugins/block/block';
+	const item = {
+		id: 'block/block',
+		name: 'Test Block',
+		assets: [ 'script.js' ],
 	};
-	const getBlockTypeMock = jest.spyOn( blockFunctions, 'getBlockTypes' );
-	jest.spyOn( controls, 'apiFetch' );
-	jest.spyOn( controls, 'loadAssets' );
-
-	afterEach( () => {
-		jest.clearAllMocks();
-	} );
-
-	afterAll( () => {
-		jest.resetAllMocks();
-	} );
-
-	const callsTheApi = ( generator ) => {
-		return expect( generator.next( { success: true } ).value.type ).toEqual(
-			ACTIONS.apiFetch
-		);
-	};
-
-	const expectTest = ( hasCall, noCall ) => {
-		expect( hasCall ).toHaveBeenCalledTimes( 1 );
-		expect( noCall ).toHaveBeenCalledTimes( 0 );
-	};
-
-	const expectSuccess = ( onSuccess, onError ) => {
-		expectTest( onSuccess, onError );
-	};
-
-	const expectError = ( onSuccess, onError ) => {
-		expectTest( onError, onSuccess );
-	};
-
-	describe( 'downloadBlock', () => {
-		it( 'should throw error if the plugin has no assets', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
-
-			const generator = downloadBlock(
+	const plugin = {
+		plugin: 'block/block.php',
+		status: 'active',
+		name: 'Test Block',
+		version: '1.0.0',
+		_links: {
+			self: [
 				{
-					assets: [],
+					href: endpoint,
 				},
-				onSuccess,
-				onError
-			);
+			],
+		},
+	};
 
-			// Move onto the onError callback
-			generator.next();
+	describe( 'installBlockType', () => {
+		it( 'should install a block successfully', () => {
+			const generator = installBlockType( item );
 
-			expectError( onSuccess, onError );
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+				notice: false,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: true,
+			} );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+				request: {
+					path: '__experimental/plugins',
+					method: 'POST',
+				},
+			} );
+
+			const itemWithEndpoint = { ...item, endpoint };
+			expect( generator.next( plugin ).value ).toEqual( {
+				type: 'ADD_INSTALLED_BLOCK_TYPE',
+				item: itemWithEndpoint,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'LOAD_ASSETS',
+				assets: item.assets,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				args: [],
+				selectorName: 'getBlockTypes',
+				storeKey: 'core/blocks',
+				type: 'SELECT',
+			} );
+
+			expect( generator.next( [ item ] ).value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: false,
+			} );
+
+			expect( generator.next() ).toEqual( {
+				value: true,
+				done: true,
+			} );
 		} );
 
-		it( 'should call on success function', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
+		it( 'should set an error if the plugin has no assets', () => {
+			const generator = installBlockType( { ...item, assets: [] } );
 
-			// The block is registered
-			getBlockTypeMock.mockReturnValue( [ item ] );
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+				notice: false,
+			} );
 
-			const generator = downloadBlock( blockPlugin, onSuccess, onError );
+			expect( generator.next().value ).toMatchObject( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+			} );
 
-			// Trigger the loading of assets
-			generator.next();
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: false,
+			} );
 
-			// Trigger the block check via getBlockTypes
-			generator.next();
-
-			expectSuccess( onSuccess, onError );
+			expect( generator.next() ).toEqual( {
+				value: false,
+				done: true,
+			} );
 		} );
 
-		it( 'should call on error when no blocks are returned', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
+		it( "should set an error if the plugin can't install", () => {
+			const generator = installBlockType( item );
 
-			// The block is not registered
-			getBlockTypeMock.mockReturnValue( [] );
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+				notice: false,
+			} );
 
-			const generator = downloadBlock( blockPlugin, onSuccess, onError );
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: true,
+			} );
 
-			// Trigger the loading of assets
-			generator.next();
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+				request: {
+					path: '__experimental/plugins',
+					method: 'POST',
+				},
+			} );
 
-			//Complete
-			generator.next();
+			const apiError = {
+				code: 'plugins_api_failed',
+				message: 'Plugin not found.',
+				data: null,
+			};
+			expect( generator.throw( apiError ).value ).toMatchObject( {
+				type: 'SET_ERROR_NOTICE',
+				blockId: item.id,
+			} );
 
-			expectError( onSuccess, onError );
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: item.id,
+				isInstalling: false,
+			} );
+
+			expect( generator.next() ).toEqual( {
+				value: false,
+				done: true,
+			} );
 		} );
 	} );
 
-	describe( 'installBlock', () => {
-		it( 'should install a block successfully', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
+	describe( 'uninstallBlockType', () => {
+		const itemWithEndpoint = { ...item, endpoint };
 
-			const generator = installBlock( item, onSuccess, onError );
+		it( 'should uninstall a block successfully', () => {
+			const generator = uninstallBlockType( itemWithEndpoint );
 
-			// It triggers API_FETCH that wraps @wordpress/api-fetch
-			callsTheApi( generator );
+			// First the deactivation step
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+				request: {
+					url: endpoint,
+					method: 'PUT',
+				},
+			} );
 
-			// It triggers ADD_INSTALLED_BLOCK_TYPE
-			expect( generator.next( { success: true } ).value.type ).toEqual(
-				ACTIONS.addInstalledBlockType
-			);
+			// Then the deletion step
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+				request: {
+					url: endpoint,
+					method: 'DELETE',
+				},
+			} );
 
-			// Move on to success
-			generator.next();
+			expect( generator.next().value ).toEqual( {
+				type: 'REMOVE_INSTALLED_BLOCK_TYPE',
+				item: itemWithEndpoint,
+			} );
 
-			expectSuccess( onSuccess, onError );
+			expect( generator.next() ).toEqual( {
+				value: undefined,
+				done: true,
+			} );
 		} );
 
-		it( 'should trigger error state when error is thrown', () => {
-			const onSuccess = jest.fn();
-			const onError = jest.fn();
+		it( "should set a global notice if the plugin can't be deleted", () => {
+			const generator = uninstallBlockType( itemWithEndpoint );
 
-			const generator = installBlock( item, onSuccess, onError );
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+				request: {
+					url: endpoint,
+					method: 'PUT',
+				},
+			} );
 
-			// It triggers API_FETCH that wraps @wordpress/api-fetch
-			callsTheApi( generator );
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+				request: {
+					url: endpoint,
+					method: 'DELETE',
+				},
+			} );
 
-			// Move on to error
-			generator.next();
+			const apiError = {
+				code: 'rest_cannot_delete_active_plugin',
+				message:
+					'Cannot delete an active plugin. Please deactivate it first.',
+				data: null,
+			};
+			expect( generator.throw( apiError ).value ).toMatchObject( {
+				type: 'DISPATCH',
+				actionName: 'createErrorNotice',
+				storeKey: 'core/notices',
+			} );
 
-			expectError( onSuccess, onError );
+			expect( generator.next() ).toEqual( {
+				value: undefined,
+				done: true,
+			} );
 		} );
 	} );
 } );

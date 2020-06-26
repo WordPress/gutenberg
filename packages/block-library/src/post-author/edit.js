@@ -1,37 +1,28 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
+import { forEach, groupBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
-	FontSizePicker,
 	InspectorControls,
 	RichText,
 	__experimentalUseColors,
 	BlockColorsStyleSelector,
-	withFontSizes,
 } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-const DEFAULT_AVATAR_SIZE = 24;
+const DEFAULT_CONTRAST_CHECK_FONT_SIZE = 12;
 
-function PostAuthorEdit( {
-	isSelected,
-	fontSize,
-	setFontSize,
-	context,
-	attributes,
-	setAttributes,
-} ) {
+function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 	const { postType, postId } = context;
 
 	const { authorId, authorDetails, authors } = useSelect(
@@ -56,6 +47,26 @@ function PostAuthorEdit( {
 
 	const { editEntityRecord } = useDispatch( 'core' );
 
+	// Need font size in number form for named presets to be used in contrastCheckers.
+	const { fontSizes } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
+	const fontSizeIndex = useMemo( () => groupBy( fontSizes, 'slug' ), [
+		fontSizes,
+	] );
+	const contrastCheckFontSize = useMemo(
+		() =>
+			// Custom size if set.
+			attributes.style?.typography?.fontSize ||
+			// Size of preset/named value if set.
+			fontSizeIndex[ attributes.fontSize ]?.[ 0 ].size ||
+			DEFAULT_CONTRAST_CHECK_FONT_SIZE,
+		[
+			attributes.style?.typography?.fontSize,
+			attributes.fontSize,
+			fontSizeIndex,
+		]
+	);
 	const ref = useRef();
 	const {
 		TextColor,
@@ -72,7 +83,7 @@ function PostAuthorEdit( {
 				{
 					backgroundColor: true,
 					textColor: true,
-					fontSize: fontSize.size,
+					fontSize: contrastCheckFontSize,
 				},
 			],
 			colorDetector: { targetRef: ref },
@@ -80,7 +91,7 @@ function PostAuthorEdit( {
 				initialOpen: true,
 			},
 		},
-		[ fontSize.size ]
+		[ contrastCheckFontSize ]
 	);
 
 	const { align, showAvatar, showBio, byline } = attributes;
@@ -95,17 +106,13 @@ function PostAuthorEdit( {
 		} );
 	}
 
-	let avatarSize = DEFAULT_AVATAR_SIZE;
-	if ( !! attributes.avatarSize ) {
-		avatarSize = attributes.avatarSize;
-	}
-
-	const blockClassNames = classnames( 'wp-block-post-author', {
-		[ fontSize.class ]: fontSize.class,
-	} );
-	const blockInlineStyles = {
-		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-	};
+	const classNames = useMemo( () => {
+		return {
+			block: classnames( 'wp-block-post-author', {
+				[ `has-text-align-${ align }` ]: align,
+			} ),
+		};
+	}, [ align ] );
 
 	return (
 		<>
@@ -153,12 +160,6 @@ function PostAuthorEdit( {
 						}
 					/>
 				</PanelBody>
-				<PanelBody title={ __( 'Text settings' ) }>
-					<FontSizePicker
-						value={ fontSize.size }
-						onChange={ setFontSize }
-					/>
-				</PanelBody>
 			</InspectorControls>
 
 			{ InspectorControlsColorPanel }
@@ -180,19 +181,15 @@ function PostAuthorEdit( {
 
 			<TextColor>
 				<BackgroundColor>
-					<div
-						ref={ ref }
-						className={ classnames( blockClassNames, {
-							[ `has-text-align-${ align }` ]: align,
-						} ) }
-						style={ blockInlineStyles }
-					>
+					<div ref={ ref } className={ classNames.block }>
 						{ showAvatar && authorDetails && (
 							<div className="wp-block-post-author__avatar">
 								<img
-									width={ avatarSize }
+									width={ attributes.avatarSize }
 									src={
-										authorDetails.avatar_urls[ avatarSize ]
+										authorDetails.avatar_urls[
+											attributes.avatarSize
+										]
 									}
 									alt={ authorDetails.name }
 								/>
@@ -205,12 +202,6 @@ function PostAuthorEdit( {
 									className="wp-block-post-author__byline"
 									multiline={ false }
 									placeholder={ __( 'Write byline …' ) }
-									withoutInteractiveFormatting
-									allowedFormats={ [
-										'core/bold',
-										'core/italic',
-										'core/strikethrough',
-									] }
 									value={ byline }
 									onChange={ ( value ) =>
 										setAttributes( { byline: value } )
@@ -221,7 +212,7 @@ function PostAuthorEdit( {
 								{ authorDetails?.name }
 							</p>
 							{ showBio && (
-								<p className={ 'wp-block-post-author__bio' }>
+								<p className="wp-block-post-author__bio">
 									{ authorDetails?.description }
 								</p>
 							) }
@@ -233,4 +224,4 @@ function PostAuthorEdit( {
 	);
 }
 
-export default withFontSizes( 'fontSize' )( PostAuthorEdit );
+export default PostAuthorEdit;

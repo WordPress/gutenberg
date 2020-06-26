@@ -7,6 +7,11 @@
 
 /**
  * Class used for interacting with patterns.
+ *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50445
+ * @see https://core.trac.wordpress.org/changeset/48156
  */
 final class WP_Block_Patterns_Registry {
 	/**
@@ -137,45 +142,4 @@ function register_block_pattern( $pattern_name, $pattern_properties ) {
  */
 function unregister_block_pattern( $pattern_name ) {
 	return WP_Block_Patterns_Registry::get_instance()->unregister( $pattern_name );
-}
-
-/**
- * Class used for interacting with patterns.
- */
-class WP_Patterns_Registry {
-
-	/**
-	 * Utility method to retrieve the main instance of the class.
-	 *
-	 * @return WP_Block_Patterns_Registry The main instance.
-	 */
-	public static function get_instance() {
-		_deprecated_function( 'WP_Patterns_Registry', 'Gutenberg 8.3.0', 'WP_Block_Patterns_Registry' );
-		return WP_Block_Patterns_Registry::get_instance();
-	}
-}
-
-/**
- * Registers a new pattern.
- *
- * @param string $pattern_name       Pattern name including namespace.
- * @param array  $pattern_properties Array containing the properties of the pattern.
- *
- * @return boolean True if the pattern was registered with success and false otherwise.
- */
-function register_pattern( $pattern_name, $pattern_properties ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 8.1.0', 'register_block_pattern()' );
-	return register_block_pattern( $pattern_name, $pattern_properties );
-}
-
-/**
- * Unregisters a pattern.
- *
- * @param string $pattern_name       Pattern name including namespace.
- *
- * @return boolean True if the pattern was unregistered with success and false otherwise.
- */
-function unregister_pattern( $pattern_name ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 8.1.0', 'unregister_block_pattern()' );
-	return unregister_block_pattern( $pattern_name );
 }

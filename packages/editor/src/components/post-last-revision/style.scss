@@ -8,7 +8,7 @@
 }
 
 .components-button.editor-post-last-revision__title {
-	height: auto;
+	height: 100%;
 
 	&:hover,
 	&:active {
@@ -17,7 +17,7 @@
 	}
 
 	&:focus {
-		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
+		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 		border-radius: 0;
 	}
 }

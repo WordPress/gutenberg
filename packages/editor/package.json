@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.16.0",
+	"version": "9.19.0",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"editor"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/editor/README.md",
@@ -29,7 +30,6 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
-		"@wordpress/block-directory": "file:../block-directory",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",

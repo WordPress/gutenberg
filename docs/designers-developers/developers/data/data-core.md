@@ -658,6 +658,7 @@ _Parameters_
 -   _name_ `string`: Name of the received entity.
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
+-   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 
 <a name="undo" href="#undo">#</a> **undo**
 

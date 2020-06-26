@@ -1,18 +1,39 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
 const SimpleGit = require( 'simple-git/promise' );
-const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
 
+/**
+ * Internal dependencies
+ */
+const { getRandomTemporaryPath } = require( './utils' );
+
+/**
+ * Clones a Github repository.
+ *
+ * @param {string} repositoryUrl
+ *
+ * @return {Promise<string>} Repository local Path
+ */
 async function clone( repositoryUrl ) {
-	const gitWorkingDirectoryPath = path.join( os.tmpdir(), uuid() );
+	const gitWorkingDirectoryPath = getRandomTemporaryPath();
 	const simpleGit = SimpleGit();
-	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath );
+	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath, [
+		'--depth=1',
+		'--no-single-branch',
+	] );
 	return gitWorkingDirectoryPath;
 }
 
+/**
+ * Commits changes to the repository.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ * @param {string} message Commit message.
+ * @param {string[]} filesToAdd Files to add.
+ *
+ * @return {Promise<string>} Commit Hash
+ */
 async function commit( gitWorkingDirectoryPath, message, filesToAdd = [] ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 	await simpleGit.add( filesToAdd );
@@ -22,36 +43,76 @@ async function commit( gitWorkingDirectoryPath, message, filesToAdd = [] ) {
 	return commitHash;
 }
 
+/**
+ * Creates a local branch.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ * @param {string} branchName Branch Name
+ */
 async function createLocalBranch( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 	await simpleGit.checkoutLocalBranch( branchName );
 }
 
+/**
+ * Checkout a local branch.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ * @param {string} branchName Branch Name
+ */
 async function checkoutRemoteBranch( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 	await simpleGit.checkout( branchName );
 }
 
+/**
+ * Creates a local tag.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ * @param {string} tagName Tag Name
+ */
 async function createLocalTag( gitWorkingDirectoryPath, tagName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 	await simpleGit.addTag( tagName );
 }
 
+/**
+ * Pushes a local branch to the origin.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ * @param {string} branchName Branch Name
+ */
 async function pushBranchToOrigin( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 	await simpleGit.push( 'origin', branchName );
 }
 
+/**
+ * Pushes tags to the origin.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ */
 async function pushTagsToOrigin( gitWorkingDirectoryPath ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 	await simpleGit.pushTags( 'origin' );
 }
 
+/**
+ * Discard local changes.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ */
 async function discardLocalChanges( gitWorkingDirectoryPath ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 	await simpleGit.reset( 'hard' );
 }
 
+/**
+ * Reset local branch against the origin.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ * @param {string} branchName Branch Name
+ */
 async function resetLocalBranchAgainstOrigin(
 	gitWorkingDirectoryPath,
 	branchName
@@ -62,6 +123,12 @@ async function resetLocalBranchAgainstOrigin(
 	await simpleGit.pull( 'origin', branchName );
 }
 
+/**
+ * Cherry-picks a commit into master
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ * @param {string} commitHash Branch Name
+ */
 async function cherrypickCommitIntoBranch(
 	gitWorkingDirectoryPath,
 	commitHash
@@ -71,6 +138,12 @@ async function cherrypickCommitIntoBranch(
 	await simpleGit.raw( [ 'cherry-pick', commitHash ] );
 }
 
+/**
+ * Replaces the local branch's content with the content from another branch.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ * @param {string} sourceBranchName Branch Name
+ */
 async function replaceContentFromRemoteBranch(
 	gitWorkingDirectoryPath,
 	sourceBranchName

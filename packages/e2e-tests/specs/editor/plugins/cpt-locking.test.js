@@ -21,10 +21,15 @@ describe( 'cpt locking', () => {
 		await deactivatePlugin( 'gutenberg-test-plugin-cpt-locking' );
 	} );
 
-	const shouldRemoveTheInserter = async () => {
+	const shouldDisableTheInserter = async () => {
 		expect(
-			await page.$( '.edit-post-header [aria-label="Add block"]' )
-		).toBeNull();
+			await page.evaluate( () => {
+				const inserter = document.querySelector(
+					'.edit-post-header [aria-label="Add block"]'
+				);
+				return inserter.getAttribute( 'disabled' );
+			} )
+		).not.toBeNull();
 	};
 
 	const shouldNotAllowBlocksToBeRemoved = async () => {
@@ -42,10 +47,6 @@ describe( 'cpt locking', () => {
 		await page.click(
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 		);
-		// Hover the block switcher to show the movers
-		await page.hover(
-			'.block-editor-block-toolbar .block-editor-block-toolbar__block-switcher-wrapper'
-		);
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
 		await page.type(
@@ -60,7 +61,7 @@ describe( 'cpt locking', () => {
 			await createNewPost( { postType: 'locked-all-post' } );
 		} );
 
-		it( 'should remove the inserter', shouldRemoveTheInserter );
+		it( 'should disable the inserter', shouldDisableTheInserter );
 
 		it(
 			'should not allow blocks to be removed',
@@ -102,6 +103,24 @@ describe( 'cpt locking', () => {
 				'The content of your post doesn’t match the template assigned to your post type.'
 			);
 		} );
+
+		it( 'can use the global inserter in inner blocks', async () => {
+			await page.click( 'button[aria-label="Two columns; equal split"]' );
+			await page.click(
+				'.wp-block-column .block-editor-button-block-appender'
+			);
+			await page.type( '.block-editor-inserter__search-input', 'image' );
+			await pressKeyTimes( 'Tab', 2 );
+			await page.keyboard.press( 'Enter' );
+			await page.click( '.edit-post-header-toolbar__inserter-toggle' );
+			await page.type(
+				'.block-editor-inserter__search-input',
+				'gallery'
+			);
+			await pressKeyTimes( 'Tab', 2 );
+			await page.keyboard.press( 'Enter' );
+			expect( await page.$( '.wp-block-gallery' ) ).not.toBeNull();
+		} );
 	} );
 
 	describe( 'template_lock insert', () => {
@@ -109,7 +128,7 @@ describe( 'cpt locking', () => {
 			await createNewPost( { postType: 'locked-insert-post' } );
 		} );
 
-		it( 'should remove the inserter', shouldRemoveTheInserter );
+		it( 'should disable the inserter', shouldDisableTheInserter );
 
 		it(
 			'should not allow blocks to be removed',

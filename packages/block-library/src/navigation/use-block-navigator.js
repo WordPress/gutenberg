@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { Button, SVG, Path, Modal } from '@wordpress/components';
+import { ToolbarButton, SVG, Path, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,14 +21,11 @@ const NavigatorIcon = (
 	</SVG>
 );
 
-export default function useBlockNavigator(
-	clientId,
-	__experimentalWithBlockNavigationSlots
-) {
+export default function useBlockNavigator( clientId, __experimentalFeatures ) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
 
 	const navigatorToolbarButton = (
-		<Button
+		<ToolbarButton
 			className="components-toolbar__control"
 			label={ __( 'Open block navigator' ) }
 			onClick={ () => setIsNavigationListOpen( true ) }
@@ -46,9 +43,7 @@ export default function useBlockNavigator(
 		>
 			<BlockNavigationList
 				clientId={ clientId }
-				__experimentalWithBlockNavigationSlots={
-					__experimentalWithBlockNavigationSlots
-				}
+				__experimentalFeatures={ __experimentalFeatures }
 			/>
 		</Modal>
 	);

@@ -1,12 +1,15 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.16.0",
+	"version": "0.19.0",
 	"private": true,
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
-		"wordpress"
+		"wordpress",
+		"gutenberg",
+		"editor",
+		"widgets"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-widgets/README.md",
 	"repository": {
@@ -43,6 +46,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"classnames": "^2.2.5",
 		"lodash": "^4.17.15",
 		"rememo": "^3.0.0"
 	},

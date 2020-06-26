@@ -32,9 +32,23 @@ import ColorPanel from './color-panel';
 export const COLOR_SUPPORT_KEY = '__experimentalColor';
 
 const hasColorSupport = ( blockType ) =>
-	hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
+	Platform.OS === 'web' && hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+const hasLinkColorSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return isObject( colorSupport ) && !! colorSupport.linkColor;
+};
 
 const hasGradientSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return isObject( colorSupport ) && !! colorSupport.gradients;
@@ -117,6 +131,7 @@ export function addSaveProps( props, blockType, attributes ) {
 				backgroundColor ||
 				style?.color?.background ||
 				( hasGradient && ( gradient || style?.color?.gradient ) ),
+			'has-link-color': style?.color?.link,
 		}
 	);
 	props.className = newClassName ? newClassName : undefined;
@@ -147,6 +162,15 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
+const getLinkColorFromAttributeValue = ( colors, value ) => {
+	const attributeParsed = /var:preset\|color\|(.+)/.exec( value );
+	if ( attributeParsed && attributeParsed[ 1 ] ) {
+		return getColorObjectByAttributeValues( colors, attributeParsed[ 1 ] )
+			.color;
+	}
+	return value;
+};
+
 /**
  * Inspector control panel containing the color related configuration
  *
@@ -156,9 +180,13 @@ export function addEditProps( settings ) {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
-	const { colors, gradients } = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings();
-	}, [] );
+	const { colors, gradients, __experimentalEnableLinkColor } = useSelect(
+		( select ) => {
+			return select( 'core/block-editor' ).getSettings();
+		},
+		[]
+	);
+
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
 	// synchronously causing our two callbacks to override changes
@@ -241,6 +269,21 @@ export function ColorEdit( props ) {
 		};
 	};
 
+	const onChangeLinkColor = ( value ) => {
+		const colorObject = getColorObjectByColorValue( colors, value );
+		props.setAttributes( {
+			style: {
+				...props.attributes.style,
+				color: {
+					...props.attributes.style?.color,
+					link: colorObject?.slug
+						? `var:preset|color|${ colorObject.slug }`
+						: value,
+				},
+			},
+		} );
+	};
+
 	return (
 		<ColorPanel
 			enableContrastChecking={
@@ -271,6 +314,21 @@ export function ColorEdit( props ) {
 						? onChangeGradient
 						: undefined,
 				},
+				...( __experimentalEnableLinkColor &&
+				hasLinkColorSupport( blockName )
+					? [
+							{
+								label: __( 'Link Color' ),
+								onColorChange: onChangeLinkColor,
+								colorValue: getLinkColorFromAttributeValue(
+									colors,
+									style?.color?.link
+								),
+								clearable: !! props.attributes.style?.color
+									?.link,
+							},
+					  ]
+					: [] ),
 			] }
 		/>
 	);

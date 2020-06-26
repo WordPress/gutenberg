@@ -88,7 +88,7 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 /**
  * Recursively filters out links with no labels to build a clean navigation block structure.
  *
- * @param array $blocks Navigation link inner blocks from the Navigation block.
+ * @param array $blocks Link inner blocks from the Navigation block.
  * @return array Blocks that had valid labels
  */
 function block_core_navigation_empty_navigation_links_recursive( $blocks ) {
@@ -288,52 +288,8 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation() {
-
-	register_block_type(
-		'core/navigation',
-		array(
-			'attributes' => array(
-				'orientation'           => array(
-					'type' => 'string',
-				),
-				'className'             => array(
-					'type' => 'string',
-				),
-				'textColor'             => array(
-					'type' => 'string',
-				),
-				'customTextColor'       => array(
-					'type' => 'string',
-				),
-				// deprecated.
-				'rgbTextColor'          => array(
-					'type' => 'string',
-				),
-				'backgroundColor'       => array(
-					'type' => 'string',
-				),
-				'customBackgroundColor' => array(
-					'type' => 'string',
-				),
-				// deprecated.
-				'rgbBackgroundColor'    => array(
-					'type' => 'string',
-				),
-				'fontSize'              => array(
-					'type' => 'string',
-				),
-				'customFontSize'        => array(
-					'type' => 'number',
-				),
-				'itemsJustification'    => array(
-					'type' => 'string',
-				),
-				'showSubmenuIcon'       => array(
-					'type'    => 'boolean',
-					'default' => true,
-				),
-			),
-		)
+	register_block_type_from_metadata(
+		__DIR__ . '/navigation'
 	);
 }
 add_action( 'init', 'register_block_core_navigation' );

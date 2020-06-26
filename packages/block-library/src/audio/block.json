@@ -1,6 +1,6 @@
 {
 	"name": "core/audio",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"src": {
 			"type": "string",
@@ -34,5 +34,10 @@
 			"selector": "audio",
 			"attribute": "preload"
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"lightBlockWrapper": true
 	}
 }

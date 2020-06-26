@@ -7,7 +7,7 @@
 
 // Forcing some space above the list of options in
 // the dropdown to visually balance them.
-.block-editor-media-replace-flow__options .components-popover__content {
+.block-editor-media-replace-flow__options .components-popover__content > div {
 	padding-top: $grid-unit-20;
 }
 

@@ -16,7 +16,7 @@ const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-w
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const {
 	camelCaseDash,
-} = require( '@wordpress/dependency-extraction-webpack-plugin/util' );
+} = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
 
 /**
  * Internal dependencies
@@ -35,7 +35,8 @@ const gutenbergPackages = Object.keys( dependencies )
 	.filter(
 		( packageName ) =>
 			! BUNDLED_PACKAGES.includes( packageName ) &&
-			packageName.startsWith( WORDPRESS_NAMESPACE )
+			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 

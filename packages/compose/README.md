@@ -119,6 +119,33 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
+
+React hook returns an array which items get asynchronously appended from a source array.
+This behavior is useful if we want to render a list of items asynchronously for performance reasons.
+
+_Parameters_
+
+-   _list_ `Array`: Source array.
+
+_Returns_
+
+-   `Array`: Async array.
+
+<a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
+
+Copies the text to the clipboard when the element is clicked.
+
+_Parameters_
+
+-   _ref_ `Object`: Reference with the element.
+-   _text_ `(string|Function)`: The text to copy.
+-   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+
+_Returns_
+
+-   `boolean`: Whether or not the text has been copied. Resets after the timeout.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
@@ -149,6 +176,19 @@ _Parameters_
 _Returns_
 
 -   `boolean`: return value of the media query.
+
+<a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
+
+Use something's value from the previous render.
+Based on <https://usehooks.com/usePrevious/>.
+
+_Parameters_
+
+-   _value_ `T`: The value to track.
+
+_Returns_
+
+-   `(T|undefined)`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 

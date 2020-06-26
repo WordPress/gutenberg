@@ -689,6 +689,35 @@ function gutenberg_extend_settings_custom_units( $settings ) {
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
 
+/**
+ * Extends block editor settings to determine whether to use custom spacing controls.
+ * Currently experimental.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_custom_spacing( $settings ) {
+	$settings['__experimentalEnableCustomSpacing'] = get_theme_support( 'experimental-custom-spacing' );
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_spacing' );
+
+
+/**
+ * Extends block editor settings to determine whether to use custom spacing controls.
+ * Currently experimental.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_link_color( $settings ) {
+	$settings['__experimentalEnableLinkColor'] = get_theme_support( 'experimental-link-color' );
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_link_color' );
+
 /*
  * Register default patterns if not registered in Core already.
  */
@@ -703,6 +732,7 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
 	register_block_pattern( 'core/hero-right-column', gutenberg_load_block_pattern( 'hero-right-column' ) );
 	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
+	register_block_pattern( 'core/features-services', gutenberg_load_block_pattern( 'features-services' ) );
 }
 
 /*

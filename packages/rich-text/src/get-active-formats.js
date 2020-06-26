@@ -1,9 +1,13 @@
 /**
  * Gets the all format objects at the start of the selection.
  *
- * @param {Object} value                Value to inspect.
- * @param {Array}  EMPTY_ACTIVE_FORMATS Array to return if there are no active
- *                                      formats.
+ * @param {Object}        value                Value to inspect.
+ * @param {Array<Array>}  value.formats        Formats object data values.
+ * @param {number}        value.start          Index to start from.
+ * @param {number}        value.end            Index to end.
+ * @param {Array}         value.activeFormats  Array to return if there are active formats.
+ * @param {Array}         EMPTY_ACTIVE_FORMATS Array to return if there are no active
+ *                                             formats.
  *
  * @return {?Object} Active format objects.
  */

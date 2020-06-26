@@ -5,6 +5,7 @@ figure.wp-block-image:not(.wp-block) {
 .wp-block-image {
 	position: relative;
 
+	.is-applying img,
 	&.is-transient img {
 		opacity: 0.3;
 	}
@@ -24,10 +25,13 @@ figure.wp-block-image:not(.wp-block) {
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
-.wp-block-image .components-resizable-box__container img {
-	display: block;
-	width: inherit;
-	height: inherit;
+.wp-block-image .components-resizable-box__container {
+	display: inline-block;
+	img {
+		display: block;
+		width: inherit;
+		height: inherit;
+	}
 }
 
 .block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
@@ -66,4 +70,54 @@ figure.wp-block-image:not(.wp-block) {
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
+}
+
+.richimage__crop-area {
+	position: relative;
+	max-width: 100%;
+	width: 100%;
+}
+
+.richimage__crop-icon {
+	padding: 0 8px;
+	min-width: 48px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	svg {
+		fill: currentColor;
+	}
+}
+
+.richimage__zoom-control {
+	border: $border-width solid $dark-gray-primary;
+	border-radius: $radius-block-ui;
+	background-color: $white;
+	margin-top: $grid-unit-15;
+	margin-bottom: $grid-unit-15;
+	padding: $grid-unit-15 $grid-unit-15 $grid-unit-10;
+	line-height: 1;
+}
+
+// Make the toolbar dropdowns blend in.
+.components-toolbar.richimage-toolbar__dropdown { // Needs specificity.
+	padding: 0;
+	border-left: none;
+	border-right: none;
+
+	.components-icon-button.has-text svg {
+		margin-right: 0;
+	}
+
+	.components-dropdown-menu__indicator {
+		display: none;
+	}
+}
+
+// Make icons 24x24 unscaled.
+.richimage-toolbar__dropdown > .components-button,
+.richimage-toolbar__dropdown,
+.richimage-toolbar__control {
+	padding: 6px;
 }

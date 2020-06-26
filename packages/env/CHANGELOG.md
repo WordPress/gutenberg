@@ -2,8 +2,19 @@
 
 ## Unreleased
 
+## 1.6.0-rc.0 (2020-06-24)
+
+### Bug Fixes
+
+-   `wp-env destroy` now removes dangling docker volumes and networks associated with the WordPress environment.
+
+## 1.4.0 (2020-05-28)
+
 ### New Feature
 
+-   Add support for running interactive commands. Examples: `wp-env run cli wp shell` and `wp-env run cli bash`.
+-   View php and WordPress log output with the new `wp-env logs` command.
+-   Clean up your local environment with the new `wp-env destroy` command.
 -   Expose Docker service for running phpunit commands.
 -   You may now mount local directories to any location within the WordPress install. For example, you may specify `"wp-content/mu-plugins": "./path/to/mu-plugins"` to add mu-plugins.
 

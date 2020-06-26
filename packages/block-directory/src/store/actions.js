@@ -1,27 +1,32 @@
 /**
  * WordPress dependencies
  */
-import { getBlockTypes } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { apiFetch, dispatch, select } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
  */
-import { apiFetch, loadAssets } from './controls';
+import { loadAssets } from './controls';
 
 /**
- * Returns an action object used in signalling that the downloadable blocks have been requested and is loading.
+ * Returns an action object used in signalling that the downloadable blocks
+ * have been requested and is loading.
+ *
+ * @param {string} filterValue Search string.
  *
  * @return {Object} Action object.
  */
-export function fetchDownloadableBlocks() {
-	return { type: 'FETCH_DOWNLOADABLE_BLOCKS' };
+export function fetchDownloadableBlocks( filterValue ) {
+	return { type: 'FETCH_DOWNLOADABLE_BLOCKS', filterValue };
 }
 
 /**
- * Returns an action object used in signalling that the downloadable blocks have been updated.
+ * Returns an action object used in signalling that the downloadable blocks
+ * have been updated.
  *
- * @param {Array} downloadableBlocks Downloadable blocks.
- * @param {string} filterValue Search string.
+ * @param {Array}  downloadableBlocks Downloadable blocks.
+ * @param {string} filterValue        Search string.
  *
  * @return {Object} Action object.
  */
@@ -34,9 +39,10 @@ export function receiveDownloadableBlocks( downloadableBlocks, filterValue ) {
 }
 
 /**
- * Returns an action object used in signalling that the user does not have permission to install blocks.
+ * Returns an action object used in signalling that the user does not have
+ * permission to install blocks.
  *
- @param {boolean} hasPermission User has permission to install blocks.
+ * @param {boolean} hasPermission User has permission to install blocks.
  *
  * @return {Object} Action object.
  */
@@ -45,88 +51,77 @@ export function setInstallBlocksPermission( hasPermission ) {
 }
 
 /**
- * Action triggered to download block assets.
- *
- * @param {Object} item The selected block item
- * @param {Function} onSuccess The callback function when the action has succeeded.
- * @param {Function} onError The callback function when the action has failed.
- */
-export function* downloadBlock( item, onSuccess, onError ) {
-	try {
-		if ( ! item.assets.length ) {
-			throw new Error( 'Block has no assets' );
-		}
-
-		yield loadAssets( item.assets );
-		const registeredBlocks = getBlockTypes();
-		if ( registeredBlocks.length ) {
-			onSuccess( item );
-		} else {
-			throw new Error( 'Unable to get block types' );
-		}
-	} catch ( error ) {
-		yield onError( error );
-	}
-}
-
-/**
  * Action triggered to install a block plugin.
  *
- * @param {string} item The block item returned by search.
- * @param {Function} onSuccess The callback function when the action has succeeded.
- * @param {Function} onError The callback function when the action has failed.
+ * @param {Object} block The block item returned by search.
  *
+ * @return {boolean} Whether the block was successfully installed & loaded.
  */
-export function* installBlock( { id, name }, onSuccess, onError ) {
+export function* installBlockType( block ) {
+	const { id, assets } = block;
+	let success = false;
+	yield clearErrorNotice( id );
 	try {
+		if ( ! Array.isArray( assets ) || ! assets.length ) {
+			throw new Error( __( 'Block has no assets.' ) );
+		}
+		yield setIsInstalling( block.id, true );
 		const response = yield apiFetch( {
-			path: '__experimental/block-directory/install',
+			path: '__experimental/plugins',
 			data: {
-				slug: id,
+				slug: block.id,
+				status: 'active',
 			},
 			method: 'POST',
 		} );
-		if ( response.success === false ) {
-			throw new Error( response.errorMessage );
+		const endpoint = response?._links?.self[ 0 ]?.href;
+		yield addInstalledBlockType( { ...block, endpoint } );
+
+		yield loadAssets( assets );
+		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
+		if ( ! registeredBlocks.length ) {
+			throw new Error( __( 'Unable to get block types.' ) );
 		}
-		yield addInstalledBlockType( { id, name } );
-		onSuccess();
+		success = true;
 	} catch ( error ) {
-		onError( error );
+		yield setErrorNotice( id, error.message || __( 'An error occurred.' ) );
 	}
+	yield setIsInstalling( block.id, false );
+	return success;
 }
 
 /**
  * Action triggered to uninstall a block plugin.
  *
- * @param {string} item The block item returned by search.
- * @param {Function} onSuccess The callback function when the action has succeeded.
- * @param {Function} onError The callback function when the action has failed.
- *
+ * @param {Object} block The blockType object.
  */
-export function* uninstallBlock( { id, name }, onSuccess, onError ) {
+export function* uninstallBlockType( block ) {
 	try {
-		const response = yield apiFetch( {
-			path: '__experimental/block-directory/uninstall',
+		yield apiFetch( {
+			url: block.endpoint,
 			data: {
-				slug: id,
+				status: 'inactive',
 			},
+			method: 'PUT',
+		} );
+		yield apiFetch( {
+			url: block.endpoint,
 			method: 'DELETE',
 		} );
-		if ( response.success === false ) {
-			throw new Error( response.errorMessage );
-		}
-		yield removeInstalledBlockType( { id, name } );
-		onSuccess();
+		yield removeInstalledBlockType( block );
 	} catch ( error ) {
-		onError( error );
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			error.message || __( 'An error occurred.' )
+		);
 	}
 }
 
 /**
  * Returns an action object used to add a newly installed block type.
  *
- * @param {string} item The block item with the block id and name.
+ * @param {Object} item The block item with the block id and name.
  *
  * @return {Object} Action object.
  */
@@ -154,12 +149,15 @@ export function removeInstalledBlockType( item ) {
 /**
  * Returns an action object used to indicate install in progress
  *
- * @param {boolean} isInstalling Boolean value that tells state whether installation is occurring
+ * @param {string} blockId
+ * @param {boolean} isInstalling
  *
+ * @return {Object} Action object.
  */
-export function setIsInstalling( isInstalling ) {
+export function setIsInstalling( blockId, isInstalling ) {
 	return {
 		type: 'SET_INSTALLING_BLOCK',
+		blockId,
 		isInstalling,
 	};
 }
@@ -168,27 +166,29 @@ export function setIsInstalling( isInstalling ) {
  * Sets an error notice string to be displayed to the user
  *
  * @param {string} blockId The ID of the block plugin. eg: my-block
- * @param {string} noticeId The ID of the message used to determine which notice to show.
+ * @param {string} notice  The message shown in the notice.
  *
+ * @return {Object} Action object.
  */
-export function setErrorNotice( blockId, noticeId ) {
+export function setErrorNotice( blockId, notice ) {
 	return {
-		type: 'SET_ERROR_NOTICE_ID',
+		type: 'SET_ERROR_NOTICE',
 		blockId,
-		noticeId,
+		notice,
 	};
 }
 
 /**
- * Sets the error noticeId to empty for specific block
+ * Sets the error notice to empty for specific block
  *
  * @param {string} blockId The ID of the block plugin. eg: my-block
  *
+ * @return {Object} Action object.
  */
 export function clearErrorNotice( blockId ) {
 	return {
-		type: 'SET_ERROR_NOTICE_ID',
+		type: 'SET_ERROR_NOTICE',
 		blockId,
-		noticeId: '',
+		notice: false,
 	};
 }

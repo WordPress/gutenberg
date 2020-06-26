@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/date",
-	"version": "3.9.0",
+	"version": "3.10.0",
 	"description": "Date module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"date"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/date/README.md",

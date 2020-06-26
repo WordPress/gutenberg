@@ -4,11 +4,11 @@ Blocks are the fundamental element of the editor. They are the primary way in wh
 
 The following sections will walk you through the existing block APIs:
 
-- [Block registration](/docs/designers-developers/developers/block-api/block-registration.md).
+- [Block registration](/docs/designers-developers/developers/block-api/block-registration.md)
 - [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md)
 - [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md)
 - [Deprecated blocks](/docs/designers-developers/developers/block-api/block-deprecation.md)
-- [Transformations](./docs/designers-developers/developers/block-transforms.md)
+- [Transformations](/docs/designers-developers/developers/block-api/block-transforms.md)
 - [Templates](/docs/designers-developers/developers/block-api/block-templates.md)
 - [Annotations](/docs/designers-developers/developers/block-api/block-annotations.md)
 - [Patterns (experimental)](/docs/designers-developers/developers/block-api/block-patterns.md)

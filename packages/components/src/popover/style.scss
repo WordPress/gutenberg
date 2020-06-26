@@ -203,7 +203,7 @@ $arrow-size: 8px;
 	}
 
 	.components-popover:not([data-y-axis="middle"])[data-x-axis="right"] & {
-		margin-left: -24px;
+		margin-left: -($grid-unit-30 + $border-width);
 	}
 
 	.components-popover[data-x-axis="left"] & {
@@ -212,13 +212,8 @@ $arrow-size: 8px;
 	}
 
 	.components-popover:not([data-y-axis="middle"])[data-x-axis="left"] & {
-		margin-right: -24px;
+		margin-right: -($grid-unit-30 + $border-width);
 	}
-}
-
-// The withFocusReturn div
-.components-popover__content > div {
-	height: 100%;
 }
 
 .components-popover__header {
@@ -227,7 +222,7 @@ $arrow-size: 8px;
 	display: flex;
 	height: $panel-header-height;
 	justify-content: space-between;
-	padding: 0 8px 0 $panel-padding;
+	padding: 0 8px 0 $grid-unit-20;
 }
 
 .components-popover__header-title {

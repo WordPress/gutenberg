@@ -5,6 +5,7 @@
 @import "./components/header/fullscreen-mode-close/style.scss";
 @import "./components/header/more-menu/style.scss";
 @import "./components/notices/style.scss";
+@import "./components/page-switcher/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/template-switcher/style.scss";
 @import "./components/editor/style.scss";
@@ -72,3 +73,5 @@ body.toplevel_page_gutenberg-edit-site {
 		opacity: 1;
 	}
 }
+
+@include wordpress-admin-schemes();

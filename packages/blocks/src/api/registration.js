@@ -3,7 +3,16 @@
 /**
  * External dependencies
  */
-import { get, isFunction, isPlainObject, omit, pick, some } from 'lodash';
+import {
+	get,
+	isFunction,
+	isNil,
+	isPlainObject,
+	omit,
+	pick,
+	pickBy,
+	some,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -91,27 +100,39 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @typedef {Object} WPBlock
  *
- * @property {string}             name         Block type's namespaced name.
- * @property {string}             title        Human-readable block type label.
- * @property {string}             description  A detailed block type description.
- * @property {string}             category     Block type category classification,
- *                                             used in search interfaces to arrange
- *                                             block types by category.
- * @property {WPBlockTypeIcon}    [icon]       Block type icon.
- * @property {string[]}           [keywords]   Additional keywords to produce block
- *                                             type as result in search interfaces.
- * @property {Object}             [attributes] Block type attributes.
- * @property {WPComponent}        [save]       Optional component describing
- *                                             serialized markup structure of a
- *                                             block type.
- * @property {WPComponent}        edit         Component rendering an element to
- *                                             manipulate the attributes of a block
- *                                             in the context of an editor.
- * @property {WPBlockVariation[]} [variations] The list of block variations.
- * @property {Object}             [example]    Example provides structured data for
- *                                             the block preview. When not defined
- *                                             then no preview is shown.
+ * @property {string}             name          Block type's namespaced name.
+ * @property {string}             title         Human-readable block type label.
+ * @property {string}             [description] A detailed block type description.
+ * @property {string}             [category]    Block type category classification,
+ *                                              used in search interfaces to arrange
+ *                                              block types by category.
+ * @property {WPBlockTypeIcon}    [icon]        Block type icon.
+ * @property {string[]}           [keywords]    Additional keywords to produce block
+ *                                              type as result in search interfaces.
+ * @property {Object}             [attributes]  Block type attributes.
+ * @property {WPComponent}        [save]        Optional component describing
+ *                                              serialized markup structure of a
+ *                                              block type.
+ * @property {WPComponent}        edit          Component rendering an element to
+ *                                              manipulate the attributes of a block
+ *                                              in the context of an editor.
+ * @property {WPBlockVariation[]} [variations]  The list of block variations.
+ * @property {Object}             [example]     Example provides structured data for
+ *                                              the block preview. When not defined
+ *                                              then no preview is shown.
  */
+
+/**
+ * Mapping of legacy category slugs to their latest normal values, used to
+ * accommodate updates of the default set of block categories.
+ *
+ * @type {Record<string,string>}
+ */
+const LEGACY_CATEGORY_MAPPING = {
+	common: 'text',
+	formatting: 'text',
+	layout: 'design',
+};
 
 export let serverSideBlockDefinitions = {};
 
@@ -143,10 +164,17 @@ export function registerBlockType( name, settings ) {
 	settings = {
 		name,
 		icon: blockDefault,
-		attributes: {},
 		keywords: [],
+		attributes: {},
+		providesContext: {},
+		usesContext: [],
+		supports: {},
+		styles: [],
 		save: () => null,
-		...get( serverSideBlockDefinitions, name ),
+		...pickBy(
+			get( serverSideBlockDefinitions, name, {} ),
+			( value ) => ! isNil( value )
+		),
 		...settings,
 	};
 
@@ -203,6 +231,12 @@ export function registerBlockType( name, settings ) {
 		console.error( 'The "edit" property must be a valid function.' );
 		return;
 	}
+
+	// Canonicalize legacy categories to equivalent fallback.
+	if ( LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category ) ) {
+		settings.category = LEGACY_CATEGORY_MAPPING[ settings.category ];
+	}
+
 	if (
 		'category' in settings &&
 		! some( select( 'core/blocks' ).getCategories(), {
@@ -218,6 +252,7 @@ export function registerBlockType( name, settings ) {
 		);
 		delete settings.category;
 	}
+
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
 		console.error( 'The block "' + name + '" must have a title.' );
 		return;
@@ -244,9 +279,10 @@ export function registerBlockType( name, settings ) {
 /**
  * Registers a new block collection to group blocks in the same namespace in the inserter.
  *
- * @param {string} namespace The namespace to group blocks by in the inserter; corresponds to the block namespace
- * @param {Object} settings  An object composed of a title to show in the inserter, and an icon to show in the inserter
- *
+ * @param {string} namespace       The namespace to group blocks by in the inserter; corresponds to the block namespace.
+ * @param {Object} settings        The block collection settings.
+ * @param {string} settings.title  The title to display in the block inserter.
+ * @param {Object} [settings.icon] The icon to display in the block inserter.
  */
 export function registerBlockCollection( namespace, { title, icon } ) {
 	dispatch( 'core/blocks' ).addBlockCollection( namespace, title, icon );

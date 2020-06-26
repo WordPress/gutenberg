@@ -117,7 +117,7 @@ export class PostSavedState extends Component {
 			return null;
 		}
 
-		const label = isPending ? __( 'Save as Pending' ) : __( 'Save Draft' );
+		const label = isPending ? __( 'Save as pending' ) : __( 'Save draft' );
 		if ( ! isLargeViewport ) {
 			return (
 				<Button
