@@ -11,7 +11,7 @@ import { LINE_SEPARATOR } from './special-characters';
  *                                      should be checked.
  * @param {string}      value.text      The text that should be checked.
  *
- * @return {boolean}    True if the value is empty, false if not.
+ * @return {boolean} True if the value is empty, false if not.
  */
 export function isEmpty( { text } ) {
 	return text.length === 0;
