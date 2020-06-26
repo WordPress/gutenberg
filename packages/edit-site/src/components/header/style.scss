@@ -9,11 +9,16 @@
 .edit-site-header__toolbar {
 	display: flex;
 	flex-grow: 1;
-	padding-left: $grid-unit-10;
+	padding-left: $grid-unit-30;
 	align-items: center;
 
-	& > * {
+	.edit-site-header-toolbar__inserter-toggle {
 		margin-left: 5px;
+		margin-right: $grid-unit-10;
+		min-width: $grid-unit-40;
+		width: $grid-unit-40;
+		height: $grid-unit-40;
+		padding: 0;
 	}
 }
 
