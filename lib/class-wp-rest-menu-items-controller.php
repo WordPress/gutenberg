@@ -337,19 +337,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
-		// The section below depends on:
-		// 1. Stored data (on update)
-		// 2. Request data and schema validation/sanitization of "type" and "url" properties
-		// And should be executed even when $request['url'] is null
-
-		// Check if menu item is type custom, then title and url are required.
-		if ( 'custom' === $prepared_nav_item['menu-item-type'] ) {
-			if ( empty( $prepared_nav_item['menu-item-url'] ) ) {
-				return new WP_Error( 'rest_url_required', __( 'URL required if menu item of type custom.', 'gutenberg' ),
-					array( 'status' => 400 ) );
-			}
-		}
-
 		foreach ( array( 'menu-item-parent-id' ) as $key ) {
 			// Note we need to allow negative-integer IDs for previewed objects not inserted yet.
 			$prepared_nav_item[ $key ] = intval( $prepared_nav_item[ $key ] );
@@ -358,8 +345,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		foreach ( array( 'menu-item-type', ) as $key ) {
 			$prepared_nav_item[ $key ] = sanitize_key( $prepared_nav_item[ $key ] );
 		}
-
-		// Apply the same filters as when calling wp_insert_post().
 
 		$prepared_nav_item = (object) $prepared_nav_item;
 
@@ -663,14 +648,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * Retrieves the term's schema, conforming to JSON Schema.
 	 *
 	 * @return array Item schema data.
-	 *
-	 * 1. get_item_schema
-	 * 2. validation
-	 * 3. sanitization
-	 * 4. prepare_item_for_database
-	 *    * fetch an object and assign it's data to $prepared_nav_item
-	 *    * assign sanitized data to $prepared_nav_item
-	 *    * further validation and sanitization based on fetched object and preceeding operations
 	 */
 	public function get_item_schema() {
 		$schema = array(
@@ -753,10 +730,11 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'sanitize_callback' => function ( $value, $request ) {
 					if ( 'post_type_archive' === $value ) {
 						$prepared_nav_item = $this->prepare_item_for_sanitization( $request );
-						$post_type = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
-						$original  = get_post_type_object( $post_type );
+						$post_type         = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
+						$original          = get_post_type_object( $post_type );
 						if ( empty( $original ) ) {
-							return new WP_Error( 'rest_post_invalid_type', __( 'Invalid post type.', 'gutenberg' ), array( 'status' => 400 ) );
+							return new WP_Error( 'rest_post_invalid_type', __( 'Invalid post type.', 'gutenberg' ),
+								array( 'status' => 400 ) );
 						}
 					}
 
@@ -813,6 +791,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 								array( 'status' => 400 ) );
 						}
 					}
+
 					return $value;
 				},
 			),
