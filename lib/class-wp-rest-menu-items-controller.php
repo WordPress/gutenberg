@@ -316,6 +316,81 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * @return stdClass|WP_Error
 	 */
 	protected function prepare_item_for_database( $request ) {
+		$prepared_nav_item = $this->prepare_item_for_sanitization( $request );
+
+		// Check if object id exists before saving.
+		if ( ! $prepared_nav_item['menu-item-object'] ) {
+			// If taxonony, check if term exists.
+			if ( 'taxonomy' === $prepared_nav_item['menu-item-type'] ) {
+				$original                              = get_term( absint( $prepared_nav_item['menu-item-object-id'] ) );
+				$prepared_nav_item['menu-item-object'] = get_term_field( 'taxonomy', $original );
+				// If post, check if post object exists.
+			} elseif ( 'post_type' === $prepared_nav_item['menu-item-type'] ) {
+				$original                              = get_post( absint( $prepared_nav_item['menu-item-object-id'] ) );
+				$prepared_nav_item['menu-item-object'] = get_post_type( $original );
+			}
+		}
+
+		foreach ( array( "menu-item-xfn", "menu-item-classes" ) as $key ) {
+			if ( is_array( $prepared_nav_item[ $key ] ) ) {
+				$prepared_nav_item[ $key ] = implode( " ", $prepared_nav_item[ $key ] );
+			}
+		}
+
+		// The section below depends on:
+		// 1. Stored data (on update)
+		// 2. Request data and schema validation/sanitization
+		// 3. The section above "Check if object id exists before saving."
+		// And should be executed even when $request['type'] is null
+
+		// If post type archive, check if post type exists.
+		if ( 'post_type_archive' === $prepared_nav_item['menu-item-type'] ) {
+			$post_type = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
+			$original  = get_post_type_object( $post_type );
+			if ( empty( $original ) ) {
+				return new WP_Error( 'rest_post_invalid_type', __( 'Invalid post type.', 'gutenberg' ), array( 'status' => 400 ) );
+			}
+		}
+
+		// The section below depends on:
+		// 1. Stored data (on update)
+		// 2. Request data and schema validation/sanitization of "type" and "url" properties
+		// And should be executed even when $request['url'] is null
+
+		// Check if menu item is type custom, then title and url are required.
+		if ( 'custom' === $prepared_nav_item['menu-item-type'] ) {
+			if ( empty( $prepared_nav_item['menu-item-url'] ) ) {
+				return new WP_Error( 'rest_url_required', __( 'URL required if menu item of type custom.', 'gutenberg' ),
+					array( 'status' => 400 ) );
+			}
+		}
+
+		foreach ( array( 'menu-item-parent-id' ) as $key ) {
+			// Note we need to allow negative-integer IDs for previewed objects not inserted yet.
+			$prepared_nav_item[ $key ] = intval( $prepared_nav_item[ $key ] );
+		}
+
+		foreach ( array( 'menu-item-type', ) as $key ) {
+			$prepared_nav_item[ $key ] = sanitize_key( $prepared_nav_item[ $key ] );
+		}
+
+		// Apply the same filters as when calling wp_insert_post().
+
+		$prepared_nav_item = (object) $prepared_nav_item;
+
+		/**
+		 * Filters a post before it is inserted via the REST API.
+		 *
+		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
+		 *
+		 * @param stdClass $prepared_post An object representing a single post prepared
+		 *                                       for inserting or updating the database.
+		 * @param WP_REST_Request $request Request object.
+		 */
+		return apply_filters( "rest_pre_insert_{$this->post_type}", $prepared_nav_item, $request );
+	}
+
+	protected function prepare_item_for_sanitization( $request ) {
 		$menu_item_db_id = $request['id'];
 		$menu_item_obj   = $this->get_nav_menu_item( $menu_item_db_id );
 		// Need to persist the menu item data. See https://core.trac.wordpress.org/ticket/28138 .
@@ -360,14 +435,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
-		// Check if object id exists before saving.
-		if ( ! $prepared_nav_item['menu-item-object'] ) {
-			// Only ever populate $prepared_nav_item['menu-item-object'] if it's missing here!
-		}
-
 		$taxonomy = get_taxonomy( 'nav_menu' );
 		$base     = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
-		$mapping = array(
+		$mapping  = array(
 			'menu-id'               => $base,
 			'menu-item-db-id'       => 'id',
 			'menu-item-object-id'   => 'object_id',
@@ -392,132 +462,16 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				$check = rest_validate_value_from_schema( $request[ $api_request ], $schema['properties'][ $api_request ] );
 				if ( is_wp_error( $check ) ) {
 					$check->add_data( array( 'status' => 400 ) );
+
 					return $check;
 				}
-				$prepared_nav_item[ $original ] = rest_sanitize_value_from_schema( $request[ $api_request ], $schema['properties'][ $api_request ] );
+				$prepared_nav_item[ $original ] = rest_sanitize_value_from_schema( $request[ $api_request ],
+					$schema['properties'][ $api_request ] );
 			}
 		}
 
-		// Check if object id exists before saving.
-		if ( ! $prepared_nav_item['menu-item-object'] ) {
-			// If taxonony, check if term exists.
-			if ( 'taxonomy' === $prepared_nav_item['menu-item-type'] ) {
-				$original = get_term( absint( $prepared_nav_item['menu-item-object-id'] ) );
-				$prepared_nav_item['menu-item-object'] = get_term_field( 'taxonomy', $original );
-
-				// If post, check if post object exists.
-			} elseif ( 'post_type' === $prepared_nav_item['menu-item-type'] ) {
-				$original = get_post( absint( $prepared_nav_item['menu-item-object-id'] ) );
-				$prepared_nav_item['menu-item-object'] = get_post_type( $original );
-			}
-		}
-
-		foreach ( array( "menu-item-xfn", "menu-item-classes" ) as $key ) {
-			if ( is_array( $prepared_nav_item[ $key ] ) ) {
-				$prepared_nav_item[ $key ] = implode( " ", $prepared_nav_item[ $key ] );
-			}
-		}
-
-		// The section below depends on:
-		// 1. Stored data (on update)
-		// 2. Request data and schema validation/sanitization
-		// 3. The section above "Check if object id exists before saving."
-		// And should be executed even when $request['type'] is null
-
-		// If post type archive, check if post type exists.
-		if ( 'post_type_archive' === $prepared_nav_item['menu-item-type'] ) {
-			$post_type = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
-			$original  = get_post_type_object( $post_type );
-			if ( empty( $original ) ) {
-				return new WP_Error( 'rest_post_invalid_type', __( 'Invalid post type.', 'gutenberg' ), array( 'status' => 400 ) );
-			}
-		}
-
-		// The section below depends on:
-		// 1. Stored data (on update)
-		// 2. Request data and schema validation/sanitization of "type" and "url" properties
-		// And should be executed even when $request['url'] is null
-
-		// Check if menu item is type custom, then title and url are required.
-		if ( 'custom' === $prepared_nav_item['menu-item-type'] ) {
-			if ( empty( $prepared_nav_item['menu-item-url'] ) ) {
-				return new WP_Error( 'rest_url_required', __( 'URL required if menu item of type custom.', 'gutenberg' ),
-					array( 'status' => 400 ) );
-			}
-		}
-
-		// The section below depends on:
-		// 1. Stored data (on update)
-		// 2. $prepared_nav_item['menu-id'] which is based on $request[ ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name ]
-		// Moving it to validate_callback is not straightforward
-
-		// If menu id is set, valid the value of menu item position and parent id.
-		if ( ! empty( $prepared_nav_item['menu-id'] ) ) {
-			// If menu item position is set to 0, insert as the last item in the existing menu.
-			$menu_items = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
-			if ( 0 === (int) $prepared_nav_item['menu-item-position'] ) {
-				if ( $menu_items ) {
-					$last_item = $menu_items[ count( $menu_items ) - 1 ];
-					if ( $last_item && isset( $last_item->menu_order ) ) {
-						$prepared_nav_item['menu-item-position'] = $last_item->menu_order + 1;
-					} else {
-						$prepared_nav_item['menu-item-position'] = count( $menu_items ) - 1;
-					}
-					array_push( $menu_items, $last_item );
-				} else {
-					$prepared_nav_item['menu-item-position'] = 1;
-				}
-			}
-
-			// Check if existing menu position is already in use by another menu item.
-			$menu_item_ids = array();
-			foreach ( $menu_items as $menu_item ) {
-				$menu_item_ids[] = $menu_item->ID;
-				if ( $menu_item->ID !== (int) $menu_item_db_id ) {
-					if ( (int) $prepared_nav_item['menu-item-position'] === (int) $menu_item->menu_order ) {
-						return new WP_Error( 'invalid_menu_order', __( 'Invalid menu position.', 'gutenberg' ), array( 'status' => 400 ) );
-					}
-				}
-			}
-
-			// Check if valid parent id is valid nav menu item in menu.
-			if ( $prepared_nav_item['menu-item-parent-id'] ) {
-				if ( ! is_nav_menu_item( $prepared_nav_item['menu-item-parent-id'] ) ) {
-					return new WP_Error( 'invalid_menu_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ),
-						array( 'status' => 400 ) );
-				}
-				if ( ! $menu_item_ids || ! in_array( $prepared_nav_item['menu-item-parent-id'], $menu_item_ids, true ) ) {
-					return new WP_Error( 'invalid_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ), array( 'status' => 400 ) );
-				}
-			}
-		}
-
-		foreach ( array( 'menu-item-parent-id' ) as $key ) {
-			// Note we need to allow negative-integer IDs for previewed objects not inserted yet.
-			$prepared_nav_item[ $key ] = intval( $prepared_nav_item[ $key ] );
-		}
-
-		foreach ( array( 'menu-item-type', ) as $key ) {
-			$prepared_nav_item[ $key ] = sanitize_key( $prepared_nav_item[ $key ] );
-		}
-
-		// Apply the same filters as when calling wp_insert_post().
-
-		$prepared_nav_item = (object) $prepared_nav_item;
-
-		/**
-		 * Filters a post before it is inserted via the REST API.
-		 *
-		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
-		 *
-		 * @param stdClass $prepared_post An object representing a single post prepared
-		 *                                       for inserting or updating the database.
-		 * @param WP_REST_Request $request Request object.
-		 */
-		return apply_filters( "rest_pre_insert_{$this->post_type}", $prepared_nav_item, $request );
+		return $prepared_nav_item;
 	}
-
-
 
 	/**
 	 * Prepares a single post output for response.
@@ -835,6 +789,34 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'minimum'     => 0,
 			'default'     => 0,
 			'context'     => array( 'view', 'edit', 'embed' ),
+
+			'arg_options' => array(
+				'sanitize_callback' => function ( $value, $request ) {
+					$prepared_nav_item = $this->prepare_item_for_sanitization( $request );
+					if ( empty( $prepared_nav_item['menu-id'] ) ) {
+						return $value;
+					}
+
+					$menu_items    = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
+					$menu_item_ids = array();
+					foreach ( $menu_items as $menu_item ) {
+						$menu_item_ids[] = $menu_item->ID;
+					}
+
+					// Check if valid parent id is valid nav menu item in menu.
+					if ( $prepared_nav_item['menu-item-parent-id'] ) {
+						if ( ! is_nav_menu_item( $prepared_nav_item['menu-item-parent-id'] ) ) {
+							return new WP_Error( 'invalid_menu_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ),
+								array( 'status' => 400 ) );
+						}
+						if ( ! $menu_item_ids || ! in_array( $prepared_nav_item['menu-item-parent-id'], $menu_item_ids, true ) ) {
+							return new WP_Error( 'invalid_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ),
+								array( 'status' => 400 ) );
+						}
+					}
+					return $value;
+				},
+			),
 		);
 
 		$schema['properties']['attr_title'] = array(
@@ -892,6 +874,44 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'type'        => 'integer',
 			'minimum'     => 0,
 			'default'     => 0,
+			'arg_options' => array(
+				'sanitize_callback' => function ( $value, $request ) {
+					$prepared_nav_item = $this->prepare_item_for_sanitization( $request );
+					if ( empty( $prepared_nav_item['menu-id'] ) ) {
+						return $value;
+					}
+
+					// If menu item position is set to 0, insert as the last item in the existing menu.
+					$menu_items = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
+					if ( 0 === (int) $prepared_nav_item['menu-item-position'] ) {
+						if ( $menu_items ) {
+							$last_item = $menu_items[ count( $menu_items ) - 1 ];
+							if ( $last_item && isset( $last_item->menu_order ) ) {
+								$prepared_nav_item['menu-item-position'] = $last_item->menu_order + 1;
+							} else {
+								$prepared_nav_item['menu-item-position'] = count( $menu_items ) - 1;
+							}
+							array_push( $menu_items, $last_item );
+						} else {
+							$prepared_nav_item['menu-item-position'] = 1;
+						}
+					}
+
+					// Check if existing menu position is already in use by another menu item.
+					$menu_item_ids = array();
+					foreach ( $menu_items as $menu_item ) {
+						$menu_item_ids[] = $menu_item->ID;
+						if ( $menu_item->ID !== (int) $request['id'] ) {
+							if ( (int) $prepared_nav_item['menu-item-position'] === (int) $menu_item->menu_order ) {
+								return new WP_Error( 'invalid_menu_order', __( 'Invalid menu position.', 'gutenberg' ),
+									array( 'status' => 400 ) );
+							}
+						}
+					}
+
+					return $prepared_nav_item['menu-item-position'];
+				},
+			),
 		);
 		$schema['properties']['object']     = array(
 			'description' => __( 'The type of object originally represented, such as "category," "post", or "attachment."', 'gutenberg' ),
@@ -1016,6 +1036,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 						if ( ! is_nav_menu( absint( $value ) ) ) {
 							return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
 						}
+
 						return true;
 					},
 					'sanitize_callback' => static function ( $value ) {

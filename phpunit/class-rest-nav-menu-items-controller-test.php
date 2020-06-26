@@ -262,7 +262,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertErrorResponse( 'invalid_menu_order', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertEquals( 'Invalid menu position.', $response->get_data()['data']['params']['menu_order'] );
 	}
 
 	/**
@@ -337,7 +338,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		);
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'invalid_item_parent', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertEquals( 'Invalid menu item parent.', $response->get_data()['data']['params']['parent'] );
 	}
 
 	/**
@@ -355,7 +357,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		);
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'invalid_menu_item_parent', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertEquals( 'Invalid menu item parent.', $response->get_data()['data']['params']['parent'] );
 	}
 
 	/**
