@@ -36,7 +36,7 @@ const defaultOptions = {
  * @param {any} currentState The current value.
  * @param {Object} options Additional options for the hook.
  * @param {any} options.initial The initial state.
- * @param {any} options.fallbackState The state to use when no state is defined.
+ * @param {any} options.fallback The state to use when no state is defined.
  *
  * @return {[*, Function]} The controlled value and the value setter.
  */
