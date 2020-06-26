@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import CreateMenuArea from './create-menu-area';
-import MenuEditor from '../menu-editor';
+import NavigationEditor from '../navigation-editor';
 
 export default function MenusEditor( { blockEditorSettings } ) {
 	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
@@ -80,7 +80,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 									label: menu.name,
 								} ) ) }
 								onChange={ ( selectedMenuId ) =>
-									setMenuId( selectedMenuId )
+									setMenuId( Number( selectedMenuId ) )
 								}
 								value={ menuId }
 							/>
@@ -111,7 +111,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				/>
 			) }
 			{ hasMenus && (
-				<MenuEditor
+				<NavigationEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
 					onDeleteMenu={ ( deletedMenu ) => {

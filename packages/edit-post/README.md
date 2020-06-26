@@ -72,8 +72,8 @@ function MyPluginBlockSettingsMenuItem() {
 
 ```jsx
 // Using ESNext syntax
-import { __ } from wp.i18n;
-import { PluginBlockSettingsMenuItem } from wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
 
 const doOnClick = ( ) => {
     // To be called when the user clicks the menu item.
@@ -133,8 +133,8 @@ registerPlugin( 'my-document-setting-plugin', {
 
 ```jsx
 // Using ESNext syntax
-const { registerPlugin } = wp.plugins;
-const { PluginDocumentSettingPanel } = wp.editPost;
+import { registerPlugin } from '@wordpress/plugins';
+import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 
 const MyDocumentSettingTest = () => (
 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
@@ -245,8 +245,8 @@ function MyPluginPostPublishPanel() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginPostPublishPanel } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginPostPublishPanel } from '@wordpress/edit-post';
 
 const MyPluginPostPublishPanel = () => (
 	<PluginPostPublishPanel
@@ -297,8 +297,8 @@ function MyPluginPostStatusInfo() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginPostStatusInfo } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
 const MyPluginPostStatusInfo = () => (
 	<PluginPostStatusInfo
@@ -346,8 +346,8 @@ function MyPluginPrePublishPanel() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginPrePublishPanel } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginPrePublishPanel } from '@wordpress/edit-post';
 
 const MyPluginPrePublishPanel = () => (
 	<PluginPrePublishPanel

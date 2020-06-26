@@ -21,7 +21,7 @@ import {
 	WritingFlow,
 	ObserveTyping
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent () {
@@ -33,13 +33,15 @@ function MyEditorComponent () {
 			onInput={ updateBlocks }
 			onChange={ updateBlocks }
 		>
-			<Popover.Slot name="block-toolbar" />
-			<WritingFlow>
-				<ObserveTyping>
-					<BlockList />
-				</ObserveTyping>
-			</WritingFlow>
-			<Popover.Slot />
+			<SlotFillProvider>
+				<Popover.Slot name="block-toolbar" />
+				<WritingFlow>
+					<ObserveTyping>
+						<BlockList />
+					</ObserveTyping>
+				</WritingFlow>
+				<Popover.Slot />
+			</SlotFillProvider>
 		</BlockEditorProvider>
 	);
 }
@@ -495,7 +497,6 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
 -   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
--   _\_\_experimentalEnableRichImageEditing_ `boolean`: Whether the user has enabled Rich Image Editing
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 

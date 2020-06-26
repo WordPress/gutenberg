@@ -53,13 +53,6 @@ $navigation-item-height: 46px;
 			visibility: visible;
 		}
 	}
-
-	// Adjust the appender margin to match other menu items
-	.wp-block-navigation__container {
-		.block-list-appender .block-editor-button-block-appender {
-			margin-left: $grid-unit-10 * 2;
-		}
-	}
 }
 
 /**
@@ -104,6 +97,11 @@ $colors-selector-size: 22px;
 		min-height: $colors-selector-size;
 		line-height: ($colors-selector-size - 2);
 		padding: 2px;
+
+		> svg {
+			// Override `min-width: $button-size-small` on toolbar-group/style.scss
+			min-width: auto !important;
+		}
 
 		// Styling icon color.
 		&.has-text-color {
@@ -155,4 +153,8 @@ $color-control-label-height: 20px;
 		color: #000;
 		background-color: #fff;
 	}
+}
+
+.wp-block-navigation .block-editor-button-block-appender {
+	justify-content: flex-start;
 }

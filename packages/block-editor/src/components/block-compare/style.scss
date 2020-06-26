@@ -14,14 +14,14 @@
 
 .block-editor-block-compare__wrapper {
 	display: flex;
-	padding-bottom: $panel-padding;
+	padding-bottom: $grid-unit-20;
 
 	> div {
 		display: flex;
 		justify-content: space-between;
 		flex-direction: column;
 		width: 50%;
-		padding: 0 $panel-padding 0 0;
+		padding: 0 $grid-unit-20 0 0;
 		min-width: 200px;
 
 		button {

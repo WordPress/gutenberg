@@ -49,7 +49,9 @@ add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
 
 ## Default block styles
 
-Core blocks include default styles. The styles are enqueued for editing but are not enqueued for viewing unless the theme opts-in to the core styles. If you'd like to use default styles in your theme, add theme support for `wp-block-styles`:
+Core blocks include default structural styles. These are loaded in both the editor and the front end by default. An example of these styles is the CSS that powers the columns block. Without these rules, the block would result in a broken layout containing no columns at all.
+
+The block editor allows themes to opt-in to slightly more opinionated styles for the front end. An example of these styles is the default color bar to the left of blockquotes. If you'd like to use these opinionated styles in your theme, add theme support for `wp-block-styles`:
 
 ```php
 add_theme_support( 'wp-block-styles' );
@@ -239,7 +241,7 @@ As an example for the regular font size, a theme may provide the following class
 Themes can disable the ability to set custom font sizes with the following code:
 
 ```php
-add_theme_support('disable-custom-font-sizes');
+add_theme_support( 'disable-custom-font-sizes' );
 ```
 
 When set, users will be restricted to the default sizes provided in the block editor or the sizes provided via the `editor-font-sizes` theme support setting.
@@ -277,7 +279,7 @@ For example, if you write `body { ... }` in your editor style, this is rewritten
 Because it works a little differently, you need to opt-in to this by adding an extra snippet to your theme, in addition to the add_editor_style function:
 
 ```php
-add_theme_support('editor-styles');
+add_theme_support( 'editor-styles' );
 ```
 
 You shouldn't need to change your editor styles too much; most themes can add the snippet above and get similar results in the classic editor and inside the block editor.

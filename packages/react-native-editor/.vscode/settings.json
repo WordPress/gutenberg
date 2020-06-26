@@ -1,0 +1,17 @@
+{
+    "javascript.validate.enable": false,
+
+    // Enable/disable default JavaScript formatter (For Prettier)
+    "javascript.format.enable": false,
+
+    // Use 'prettier-eslint' instead of 'prettier'. Other settings will only be fallbacks in case they could not be inferred from eslint rules.
+    "prettier.eslintIntegration": true,
+    "search.exclude": {
+        "**/bundle/android/App.js": true,
+        "**/bundle/android/App.js.map": true,
+        "**/bundle/ios/App.js": true,
+        "**/bundle/ios/App.js.map": true,
+        "**/i18n-cache/data": true,
+        "**/symlinked-packages": true
+    },
+}

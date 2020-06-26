@@ -1,6 +1,6 @@
 .interface-complementary-area {
 	background: $white;
-	color: $dark-gray-500;
+	color: $dark-gray-primary;
 	overflow: visible;
 
 	@include break-small() {
@@ -55,7 +55,7 @@
 	h2,
 	h3 {
 		font-size: $default-font-size;
-		color: $dark-gray-500;
+		color: $dark-gray-primary;
 		margin-bottom: 1.5em;
 	}
 

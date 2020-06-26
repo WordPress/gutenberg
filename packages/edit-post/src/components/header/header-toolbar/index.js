@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
 	BlockToolbar,
@@ -21,10 +21,12 @@ import {
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 
-function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
+function HeaderToolbar() {
+	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
 	const {
 		hasFixedToolbar,
 		isInserterEnabled,
+		isInserterOpened,
 		isTextModeEnabled,
 		previewDeviceType,
 	} = useSelect( ( select ) => {
@@ -45,6 +47,7 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 				hasInserterItems(
 					getBlockRootClientId( getBlockSelectionEnd() )
 				),
+			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
 			previewDeviceType: select(
@@ -72,8 +75,8 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 				as={ Button }
 				className="edit-post-header-toolbar__inserter-toggle"
 				isPrimary
-				isPressed={ isInserterOpen }
-				onClick={ onToggleInserter }
+				isPressed={ isInserterOpened }
+				onClick={ () => setIsInserterOpened( ! isInserterOpened ) }
 				disabled={ ! isInserterEnabled }
 				icon={ plus }
 				label={ _x(
