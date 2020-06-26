@@ -1,124 +1,63 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
-import { noop } from 'lodash';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { useControlledState } from '../use-controlled-state';
+import { isValueDefined, getDefinedValue } from '../values';
 
-describe( 'hooks', () => {
-	const getInput = () => screen.getByTestId( 'input' );
+const defaultOptions = {
+	initial: undefined,
+	/**
+	 * Defaults to empty string, as that is preferred for usage with
+	 * <input />, <textarea />, and <select /> form elements.
+	 */
+	fallback: '',
+};
 
-	describe( 'useControlledState', () => {
-		const Example = ( { value: valueProp, onChange = noop } ) => {
-			const [ state, setState ] = useControlledState( valueProp );
+/**
+ * Custom hooks for "controlled" components to track and consolidate internal
+ * state and incoming values. This is useful for components that render
+ * `input`, `textarea`, or `select` HTML elements.
+ *
+ * https://reactjs.org/docs/forms.html#controlled-components
+ *
+ * At first, a component using useControlledState receives an initial prop
+ * value, which is used as initial internal state.
+ *
+ * This internal state can be maintained and updated without
+ * relying on new incoming prop values.
+ *
+ * Unlike the basic useState hook, useControlledState's state can
+ * be updated if a new incoming prop value is changed.
+ *
+ * @param {any} currentState The current value.
+ * @param {Object} options Additional options for the hook.
+ * @param {any} options.initial The initial state.
+ * @param {any} options.fallback The state to use when no state is defined.
+ *
+ * @return {[*, Function]} The controlled value and the value setter.
+ */
+function useControlledState( currentState, options = defaultOptions ) {
+	const { initial, fallback } = { ...defaultOptions, ...options };
 
-			const handleOnChange = ( event ) => {
-				const nextValue = event.target.value;
-				setState( nextValue );
-				onChange( nextValue );
-			};
+	const [ internalState, setInternalState ] = useState( currentState );
+	const hasCurrentState = isValueDefined( currentState );
 
-			return (
-				<input
-					data-testid="input"
-					type="text"
-					value={ state }
-					onChange={ handleOnChange }
-				/>
-			);
-		};
+	const state = getDefinedValue(
+		[ currentState, internalState, initial ],
+		fallback
+	);
 
-		it( 'should use incoming prop as state on initial render', () => {
-			const spy = jest.fn();
-			render( <Example value="Hello" onChange={ spy } /> );
+	const setState = ( nextState ) => {
+		if ( ! hasCurrentState ) {
+			setInternalState( nextState );
+		}
+	};
 
-			const input = getInput();
+	return [ state, setState ];
+}
 
-			expect( input.value ).toBe( 'Hello' );
-			expect( spy ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should update rendered value onChange', () => {
-			const spy = jest.fn();
-			render( <Example value="Hello" onChange={ spy } /> );
-
-			const input = getInput();
-
-			fireEvent.change( input, { target: { value: 'There' } } );
-
-			expect( input.value ).toBe( 'There' );
-			expect( spy ).toHaveBeenCalledTimes( 1 );
-
-			fireEvent.change( input, { target: { value: 'Hello There' } } );
-
-			expect( input.value ).toBe( 'Hello There' );
-			expect( spy ).toHaveBeenCalledTimes( 2 );
-		} );
-
-		/**
-		 * This test demonstrates the primary feature of the useControlledState
-		 * hook. The <Example /> component receives an initial prop value
-		 * which is used as the initial internal state.
-		 *
-		 * This internal state can be maintained and updated without
-		 * relying on new incoming prop values.
-		 *
-		 * Unlike the basic useState hook, useControlledState's state can
-		 * be updated if a new incoming prop value is changed.
-		 */
-		it( 'should update changed value with new incoming prop value', () => {
-			const spy = jest.fn();
-
-			/**
-			 * The <input /> value starts with "Hello", since it is passed down
-			 * from props. The prop being rendered is the state provided by
-			 * useControlledState, rather than the value prop directly.
-			 */
-			const { rerender } = render(
-				<Example value="Hello" onChange={ spy } />
-			);
-
-			const input = getInput();
-
-			/**
-			 * When the <input /> changes, it updates the internal state value.
-			 */
-			fireEvent.change( input, { target: { value: 'There' } } );
-
-			expect( input.value ).toBe( 'There' );
-
-			/**
-			 * If a new value prop is passed down, it will update the
-			 * internal state value, which will be rerendered into
-			 * the <input />.
-			 */
-			rerender( <Example value="New Value" /> );
-
-			expect( input.value ).toBe( 'New Value' );
-			expect( spy ).toHaveBeenCalledTimes( 1 );
-		} );
-
-		it( 'should new incoming prop value with new change value', () => {
-			const spy = jest.fn();
-			const { rerender } = render(
-				<Example value="Hello" onChange={ spy } />
-			);
-			const input = getInput();
-
-			fireEvent.change( input, { target: { value: 'There' } } );
-
-			rerender( <Example value="New Value" /> );
-
-			fireEvent.change( input, {
-				target: { value: 'New Change Value' },
-			} );
-
-			expect( input.value ).toBe( 'New Change Value' );
-			expect( spy ).toHaveBeenCalledTimes( 1 );
-		} );
-	} );
-} );
+export default useControlledState;

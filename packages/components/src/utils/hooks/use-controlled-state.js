@@ -1,7 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { isValueDefined, getDefinedValue } from '../values';
+
+const defaultOptions = {
+	initial: undefined,
+	/**
+	 * Defaults to empty string, as that is preferred for usage with
+	 * <input />, <textarea />, and <select /> form elements.
+	 */
+	fallback: '',
+};
 
 /**
  * Custom hooks for "controlled" components to track and consolidate internal
@@ -19,20 +33,31 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * Unlike the basic useState hook, useControlledState's state can
  * be updated if a new incoming prop value is changed.
  *
- * @param {any} initialState The initial state value.
+ * @param {any} currentState The current value.
+ * @param {Object} options Additional options for the hook.
+ * @param {any} options.initial The initial state.
+ * @param {any} options.fallback The state to use when no state is defined.
+ *
  * @return {[*, Function]} The controlled value and the value setter.
  */
-export function useControlledState( initialState ) {
-	const [ state, setState ] = useState( initialState );
-	const lastInitialStateRef = useRef( initialState );
+function useControlledState( currentState, options = defaultOptions ) {
+	const { initial, fallback } = { ...defaultOptions, ...options };
 
-	useEffect( () => {
-		// Update the internal state if the incoming value changes.
-		if ( initialState !== lastInitialStateRef.current ) {
-			setState( initialState );
-			lastInitialStateRef.current = initialState;
+	const [ internalState, setInternalState ] = useState( currentState );
+	const hasCurrentState = isValueDefined( currentState );
+
+	const state = getDefinedValue(
+		[ currentState, internalState, initial ],
+		fallback
+	);
+
+	const setState = ( nextState ) => {
+		if ( ! hasCurrentState ) {
+			setInternalState( nextState );
 		}
-	}, [ initialState ] );
+	};
 
 	return [ state, setState ];
 }
+
+export default useControlledState;
