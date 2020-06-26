@@ -24,7 +24,7 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 		};
-	} );
+	}, [] );
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
 			return null;
@@ -39,10 +39,7 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 				aria-label={ __( 'Block tools' ) }
 				{ ...props }
 			>
-				<BlockToolbar
-					onDragStart={ props.onDragStart }
-					onDragEnd={ props.onDragEnd }
-				/>
+				<BlockToolbar />
 			</NavigableToolbar>
 		</div>
 	);
