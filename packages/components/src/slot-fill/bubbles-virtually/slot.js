@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useRef, useLayoutEffect, useContext } from '@wordpress/element';
-import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -17,13 +16,6 @@ export default function Slot( {
 } ) {
 	const registry = useContext( SlotFillContext );
 	const ref = useRef();
-
-	if ( registry.__unstableDefaultContext ) {
-		warning(
-			'Components must be wrapped within `SlotFillProvider`. ' +
-				'See https://developer.wordpress.org/block-editor/components/slot-fill/'
-		);
-	}
 
 	useLayoutEffect( () => {
 		registry.registerSlot( name, ref, fillProps );

@@ -2,12 +2,17 @@
  * WordPress dependencies
  */
 import { createContext } from '@wordpress/element';
+import warning from '@wordpress/warning';
 
 const SlotFillContext = createContext( {
-	__unstableDefaultContext: true,
 	slots: {},
 	fills: {},
-	registerSlot: () => {},
+	registerSlot: () => {
+		warning(
+			'Components must be wrapped within `SlotFillProvider`. ' +
+				'See https://developer.wordpress.org/block-editor/components/slot-fill/'
+		);
+	},
 	updateSlot: () => {},
 	unregisterSlot: () => {},
 	registerFill: () => {},
