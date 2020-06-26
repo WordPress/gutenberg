@@ -43,24 +43,30 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'apply_edits' ),
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
+						'rotation' => array(
+							'type' => 'integer',
+						),
+
+						// Crop values are in percents.
 						'x'        => array(
 							'type'    => 'number',
 							'minimum' => 0,
+							'maximum' => 100,
 						),
 						'y'        => array(
 							'type'    => 'number',
 							'minimum' => 0,
+							'maximum' => 100,
 						),
 						'width'    => array(
 							'type'    => 'number',
-							'minimum' => 1,
+							'minimum' => 0,
+							'maximum' => 100,
 						),
 						'height'   => array(
 							'type'    => 'number',
-							'minimum' => 1,
-						),
-						'rotation' => array(
-							'type' => 'integer',
+							'minimum' => 0,
+							'maximum' => 100,
 						),
 					),
 				),
@@ -120,15 +126,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		}
 
 		if ( isset( $params['x'], $params['y'], $params['width'], $params['height'] ) ) {
-			// Check if the crop dimensions are whitin bounds.
-			if (
-				( $params['x'] >= 0 && $params['x'] < 100 ) &&
-				( $params['y'] >= 0 && $params['y'] < 100 ) &&
-				( $params['width'] >= 1 && $params['width'] <= 100 ) &&
-				( $params['height'] >= 1 && $params['height'] <= 100 )
-			) {
-				$crop = true;
-			}
+			$crop = true;
 		}
 
 		if ( ! $rotate && ! $crop ) {
@@ -144,7 +142,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_unknown_image_file_type', $error, array( 'status' => 500 ) );
 		}
 
-		if ( $rotate !== 0 ) {
+		if ( 0 !== $rotate ) {
 			$result = $image_editor->rotate( $rotate );
 
 			if ( is_wp_error( $result ) ) {
