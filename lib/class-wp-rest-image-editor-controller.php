@@ -130,7 +130,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		}
 
 		if ( ! $rotate && ! $crop ) {
-			$error = __( 'The image was not erdited. Edit the image before applying the changes.', 'gutenberg' );
+			$error = __( 'The image was not edited. Edit the image before applying the changes.', 'gutenberg' );
 			return new WP_Error( 'rest_image_not_edited', $error, array( 'status' => 400 ) );
 		}
 
