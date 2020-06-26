@@ -3,6 +3,7 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
+import { render as testRender } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -371,6 +372,20 @@ describe( 'UnitControl', () => {
 			} );
 
 			expect( state ).toBe( '123rem' );
+		} );
+
+		it( 'should update unit after initial render and with new unit prop', () => {
+			const { container: testContainer, rerender } = testRender(
+				<UnitControl value={ '10%' } />
+			);
+
+			const select = testContainer.querySelector( 'select' );
+
+			expect( select.value ).toBe( '%' );
+
+			rerender( <UnitControl value={ state } unit="em" /> );
+
+			expect( select.value ).toBe( 'em' );
 		} );
 	} );
 } );

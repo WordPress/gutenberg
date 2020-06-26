@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +19,7 @@ import {
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
+import { useControlledState } from '../utils/hooks';
 
 function UnitControl(
 	{
@@ -43,7 +44,9 @@ function UnitControl(
 	ref
 ) {
 	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
-	const [ unit, setUnit ] = useState( initialUnit );
+	const [ unit, setUnit ] = useControlledState( unitProp, {
+		initial: initialUnit,
+	} );
 
 	const classes = classnames( 'components-unit-control', className );
 
