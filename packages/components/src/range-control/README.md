@@ -168,6 +168,14 @@ If no value exists this prop contains the slider starting position.
 -   Required: No
 -   Platform: Web | Mobile
 
+### isShiftStepEnabled
+
+If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the value by the `shiftStep` value.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+
 #### marks
 
 Renders a visual representation of `step` ticks. Custom mark indicators can be provided by an `Array`.
