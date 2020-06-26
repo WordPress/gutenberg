@@ -339,21 +339,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		// The section below depends on:
 		// 1. Stored data (on update)
-		// 2. Request data and schema validation/sanitization
-		// 3. The section above "Check if object id exists before saving."
-		// And should be executed even when $request['type'] is null
-
-		// If post type archive, check if post type exists.
-		if ( 'post_type_archive' === $prepared_nav_item['menu-item-type'] ) {
-			$post_type = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
-			$original  = get_post_type_object( $post_type );
-			if ( empty( $original ) ) {
-				return new WP_Error( 'rest_post_invalid_type', __( 'Invalid post type.', 'gutenberg' ), array( 'status' => 400 ) );
-			}
-		}
-
-		// The section below depends on:
-		// 1. Stored data (on update)
 		// 2. Request data and schema validation/sanitization of "type" and "url" properties
 		// And should be executed even when $request['url'] is null
 
@@ -764,6 +749,20 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'enum'        => array( 'taxonomy', 'post_type', 'post_type_archive', 'custom' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'default'     => 'custom',
+			'arg_options' => array(
+				'sanitize_callback' => function ( $value, $request ) {
+					if ( 'post_type_archive' === $value ) {
+						$prepared_nav_item = $this->prepare_item_for_sanitization( $request );
+						$post_type = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
+						$original  = get_post_type_object( $post_type );
+						if ( empty( $original ) ) {
+							return new WP_Error( 'rest_post_invalid_type', __( 'Invalid post type.', 'gutenberg' ), array( 'status' => 400 ) );
+						}
+					}
+
+					return $value;
+				},
+			),
 		);
 
 		$schema['properties']['status'] = array(
