@@ -1,95 +1,122 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import { useState, useMemo } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { withInstanceId, compose } from '@wordpress/compose';
-import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
+
 /**
  * Internal dependencies
  */
+import ComboboxControl from '../../../../components/build/combobox-control/';
 import PostAuthorCheck from './check';
-import EnhancedPostAuthor from './enhanced-post-author';
 
-export class PostAuthor extends Component {
-	constructor() {
-		super( ...arguments );
+function PostAuthor() {
+	const authors = useSelect( ( select ) => select( 'core' ).getAuthors() );
+	const postAuthor = useSelect( ( select ) =>
+		select( 'core' ).getAuthor(
+			select( 'core/editor' ).getEditedPostAttribute( 'author' )
+		)
+	);
 
-		this.setAuthorId = this.setAuthorId.bind( this );
+	const dispatch = useDispatch();
+
+	const authorsForField = useMemo( () => {
+		return authors.map( ( author ) => {
+			return {
+				key: author.id,
+				name: author.name,
+				id: author.id,
+			};
+		} );
+	}, [ authors ] );
+
+	// Ensure the current author is included in the initial dropdown list.
+	let foundAuthor = authorsForField.findIndex(
+		( author ) => postAuthor?.id === author.id
+	);
+
+	// The currently field value.
+	const [ fieldValue, setFieldValue ] = useState( postAuthor?.name );
+
+	if ( authors?.length > 0 && foundAuthor < 0 && postAuthor ) {
+		postAuthor.key = authorsForField.length;
+		authors.unshift( postAuthor );
+		foundAuthor = 0;
 	}
 
-	setAuthorId( event ) {
-		const { onUpdateAuthor } = this.props;
-		const { value } = event.target;
-		onUpdateAuthor( Number( value ) );
-	}
-
-	render() {
-		const {
-			postAuthor,
-			postAuthorID,
-			instanceId,
-			authors,
-			onUpdateAuthor,
-		} = this.props;
-		const selectId = 'post-author-selector-' + instanceId;
-
-		// Wait until we have the post author before displaying the component.
-		if ( ! postAuthor || 0 === postAuthor.length ) {
-			return null;
+	/**
+	 * Handle author selection.
+	 *
+	 * @param {Object} selectedItem The selected Author.
+	 */
+	const handleSelect = ( { selectedItem } ) => {
+		if ( ! selectedItem ) {
+			return;
 		}
+		setFieldValue( selectedItem.name );
+		dispatch( 'core/editor' ).editPost( { author: selectedItem.id } );
+	};
 
-		// Disable reason: A select with an onchange throws a warning
+	/**
+	 * Handle user input.
+	 *
+	 * @param {string} inputValue The current value of the input field.
+	 */
+	const handleKeydown = ( { inputValue } ) => {
+		setFieldValue( inputValue );
+	};
 
-		/* eslint-disable jsx-a11y/no-onchange */
-		return (
-			<PostAuthorCheck>
-				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
-				{ authors.length > 50 ? (
-					<EnhancedPostAuthor
-						id={ selectId }
-						postAuthor={ postAuthor }
-						authors={ authors }
-						instanceId={ instanceId }
-						onUpdateAuthor={ onUpdateAuthor }
-					/>
-				) : (
-					<select
-						id={ selectId }
-						value={ postAuthorID }
-						onChange={ this.setAuthorId }
-						className="editor-post-author__select"
-					>
-						{ authors.map( ( author ) => (
-							<option key={ author.id } value={ author.id }>
-								{ decodeEntities( author.name ) }
-							</option>
-						) ) }
-					</select>
-				) }
-			</PostAuthorCheck>
-		);
-		/* eslint-enable jsx-a11y/no-onchange */
+	const availableAuthors = useSelect(
+		( select ) => {
+			if (
+				! fieldValue ||
+				'' === fieldValue ||
+				fieldValue === postAuthor?.name
+			) {
+				return select( 'core' )
+					.getAuthors()
+					.map( ( author ) => ( {
+						key: author.id,
+						name: author.name,
+						id: author.id,
+					} ) );
+			}
+
+			return select( 'core' )
+				.getAuthors( { search: fieldValue } )
+				.map( ( author ) => ( {
+					key: author.id,
+					name: author.name,
+					id: author.id,
+				} ) );
+		},
+		[ fieldValue, postAuthor ]
+	);
+
+	if ( ! postAuthor ) {
+		return null;
 	}
+
+	const selectId = 'post-author-selector';
+
+	return (
+		<PostAuthorCheck>
+			<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
+			<ComboboxControl
+				options={ availableAuthors }
+				initialInputValue={ postAuthor?.name }
+				onInputValueChange={ debounce( handleKeydown, 300 ) }
+				onChange={ handleSelect }
+				initialHighlightedIndex={ foundAuthor }
+			/>
+		</PostAuthorCheck>
+	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			postAuthorID: select( 'core/editor' ).getEditedPostAttribute(
-				'author'
-			),
-			postAuthor: select( 'core' ).getAuthor(
-				select( 'core/editor' ).getEditedPostAttribute( 'author' )
-			),
-			authors: select( 'core' ).getAuthors(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateAuthor( author ) {
-			dispatch( 'core/editor' ).editPost( { author } );
-		},
-	} ) ),
-	withInstanceId,
-] )( PostAuthor );
+export default PostAuthor;

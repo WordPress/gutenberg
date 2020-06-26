@@ -43,19 +43,8 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  *
  * @return {Array} Authors list.
  */
-export function getAuthors( state ) {
-	return getUserQueryResults( state, 'authors' );
-}
-
-/**
- * Returns searched authors.
- *
- * @param {Object} state Data state.
- *
- * @return {Array} Authors list.
- */
-export function searchAuthors( state ) {
-	return getUserQueryResults( state, 'searchAuthors' );
+export function getAuthors( state, query = {} ) {
+	return getUserQueryResults( state, `authors::${ query?.search }` );
 }
 
 /**

@@ -18,6 +18,8 @@ export default function ComboboxControl( {
 	onInputValueChange: onInputValueChange,
 	onChange: onSelectedItemChange,
 	value: _selectedItem,
+	initialInputValue,
+	initialHighlightedIndex,
 } ) {
 	const {
 		getLabelProps,
@@ -30,12 +32,14 @@ export default function ComboboxControl( {
 		highlightedIndex,
 		selectedItem,
 	} = useCombobox( {
-		initialSelectedItem: items[ 0 ],
+		initialSelectedItem: items[ initialHighlightedIndex || 0 ],
+		initialInputValue,
 		items,
 		itemToString,
 		onInputValueChange,
 		onSelectedItemChange,
 		selectedItem: _selectedItem,
+		initialHighlightedIndex,
 	} );
 	const menuProps = getMenuProps( {
 		className: 'components-combobox-control__menu',

@@ -29,24 +29,16 @@ import { ifNotResolved } from './utils';
 /**
  * Requests authors from the REST API.
  */
-export function* getAuthors() {
-	const users = yield apiFetch( {
-		path: '/wp/v2/users/?who=authors&per_page=100',
-	} );
-	yield receiveUserQuery( 'authors', users );
-}
-
-/**
- * Searches for authors from the REST API.
- *
- * @param {string} search A search query string.
- */
-export function* searchAuthors( search = '' ) {
-	const users = yield apiFetch( {
-		path: `/wp/v2/users/?who=authors&per_page=100&search=${ search }`,
+export function* getAuthors( query = {} ) {
+	const path = addQueryArgs( '/wp/v2/users/?who=authors&per_page=100', {
+		...query,
 	} );
 
-	yield receiveUserQuery( 'searchAuthors', users );
+	const users = yield apiFetch( {
+		path,
+	} );
+
+	yield receiveUserQuery( `authors::${ query?.search }`, users );
 }
 
 /**
