@@ -20,17 +20,20 @@ import {
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
-export default function BlockEditor() {
-	const { settings, templateType, page } = useSelect( ( select ) => {
-		const { getSettings, getTemplateType, getPage } = select(
-			'core/edit-site'
-		);
-		return {
-			settings: getSettings(),
-			templateType: getTemplateType(),
-			page: getPage(),
-		};
-	}, [] );
+export default function BlockEditor( { setIsInserterOpen } ) {
+	const { settings, templateType, page } = useSelect(
+		( select ) => {
+			const { getSettings, getTemplateType, getPage } = select(
+				'core/edit-site'
+			);
+			return {
+				settings: getSettings( setIsInserterOpen ),
+				templateType: getTemplateType(),
+				page: getPage(),
+			};
+		},
+		[ setIsInserterOpen ]
+	);
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		templateType

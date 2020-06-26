@@ -47,29 +47,33 @@ export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
 /**
  * Returns the settings, taking into account active features and permissions.
  *
- * @param {Object} state Global application state.
+ * @param {Object}   state             Global application state.
+ * @param {Function} setIsInserterOpen Setter for the open state of the global inserter.
  *
  * @return {Object} Settings.
  */
 export const getSettings = createSelector(
-	( state ) => {
-		const canUserCreateMedia = getCanUserCreateMedia( state );
-		if ( ! canUserCreateMedia ) {
-			return state.settings;
-		}
-
-		return {
+	( state, setIsInserterOpen ) => {
+		const settings = {
 			...state.settings,
 			focusMode: isFeatureActive( state, 'focusMode' ),
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
-			mediaUpload( { onError, ...rest } ) {
-				uploadMedia( {
-					wpAllowedMimeTypes: state.settings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
-					...rest,
-				} );
-			},
+			__experimentalSetIsInserterOpened: setIsInserterOpen,
 		};
+
+		const canUserCreateMedia = getCanUserCreateMedia( state );
+		if ( ! canUserCreateMedia ) {
+			return settings;
+		}
+
+		settings.mediaUpload = ( { onError, ...rest } ) => {
+			uploadMedia( {
+				wpAllowedMimeTypes: state.settings.allowedMimeTypes,
+				onError: ( { message } ) => onError( message ),
+				...rest,
+			} );
+		};
+		return settings;
 	},
 	( state ) => [
 		getCanUserCreateMedia( state ),

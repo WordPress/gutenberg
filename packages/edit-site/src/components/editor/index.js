@@ -223,7 +223,13 @@ function Editor() {
 											>
 												<Notices />
 												<Popover.Slot name="block-toolbar" />
-												{ template && <BlockEditor /> }
+												{ template && (
+													<BlockEditor
+														setIsInserterOpen={
+															setIsInserterOpen
+														}
+													/>
+												) }
 												<KeyboardShortcuts />
 											</BlockSelectionClearer>
 										}
