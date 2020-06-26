@@ -103,6 +103,10 @@ export function getEmbedEditComponent(
 		};
 
 		useEffect( () => {
+			if ( ! preview?.html ) {
+				return;
+			}
+
 			// If we can embed the url, bail early.
 			if ( ! cannotEmbed ) {
 				return;
@@ -120,7 +124,7 @@ export function getEmbedEditComponent(
 			setURL( newURL );
 			setIsEditingURL( false );
 			setAttributes( { url: newURL } );
-		}, [ attributes.allowResponsive, attributes.className, cannotEmbed, fetching, preview.html ] );
+		}, [ preview?.html, attributes.url ] );
 
 		useEffect( () => {
 			if ( preview && ! isEditingURL ) {
