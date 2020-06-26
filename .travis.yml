@@ -65,15 +65,6 @@ install:
 
 jobs:
   include:
-    - name: PHP unit tests
-      script:
-        - npm run test-php && npm run test-unit-php-multisite
-
-    - name: PHP unit tests (PHP 5.6)
-      env: LOCAL_PHP=5.6-fpm
-      script:
-        - npm run test-php && npm run test-unit-php-multisite
-
     - name: E2E tests (Admin) (1/4)
       env: FORCE_REDUCED_MOTION=true
       script:
