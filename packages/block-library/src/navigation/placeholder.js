@@ -69,9 +69,9 @@ function getPlaceholderInstructions( hasMenus, hasPages ) {
  * @return {number|undefined} The menu id.
  */
 function getSelectedMenu( selectedCreateOption ) {
-	const optionKey = selectedCreateOption?.key;
-	return optionKey !== undefined && Number.isInteger( optionKey )
-		? optionKey
+	const optionId = selectedCreateOption?.id;
+	return optionId !== undefined && Number.isInteger( optionId )
+		? optionId
 		: undefined;
 }
 
@@ -296,6 +296,10 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 			setIsCreatingFromMenu( false );
 		}
 	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
+
+	if ( hasMenus && ! selectedCreateOption ) {
+		setSelectedCreateOption( createOptions[ 0 ] );
+	}
 
 	return (
 		<Placeholder
