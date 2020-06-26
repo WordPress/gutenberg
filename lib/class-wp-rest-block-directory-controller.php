@@ -144,7 +144,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		foreach ( $plugin['block_assets'] as $asset ) {
 			// Allow for fully qualified URLs in future
-			if ( 'https' === wp_parse_url( $asset,  PHP_URL_SCHEME ) && !empty( wp_parse_url( $asset,  PHP_URL_HOST ) ) ) {
+			if ( 'https' === wp_parse_url( $asset, PHP_URL_SCHEME ) && !empty( wp_parse_url( $asset, PHP_URL_HOST ) ) ) {
 				$block['assets'][] = esc_url_raw(
 					$asset,
 					array( 'https' )

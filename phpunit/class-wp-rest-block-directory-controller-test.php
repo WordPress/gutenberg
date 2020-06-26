@@ -123,7 +123,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 
 			// Assets should be fully qualified https URLs
 			foreach ( $plugin[ 'assets' ] as $asset ) {
-				$this->assertEquals( 'https', wp_parse_url( $asset,  PHP_URL_SCHEME ) );
+				$this->assertEquals( 'https', wp_parse_url( $asset, PHP_URL_SCHEME ) );
 			}
 		}
 	}
