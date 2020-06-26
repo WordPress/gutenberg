@@ -43,13 +43,14 @@ const BlockDraggable = ( {
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
-	const blockNodes = useContext( BlockNodes );
 	const [ firstClientId ] = clientIds;
+	const blockNodes = useContext( BlockNodes );
+	const blockElement = blockNodes ? blockNodes[ firstClientId ] : undefined;
 	const [
 		startScrolling,
 		scrollOnDragOver,
 		stopScrolling,
-	] = useScrollWhenDragging( blockNodes[ firstClientId ] );
+	] = useScrollWhenDragging( blockElement );
 
 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
 		'core/block-editor'
