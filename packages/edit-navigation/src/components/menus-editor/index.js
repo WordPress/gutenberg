@@ -38,7 +38,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		if ( ! hasCompletedFirstLoad && hasLoadedMenus ) {
 			setHasCompletedFirstLoad( true );
 		}
-	}, [ hasLoadedMenus ] );
+	}, [ menus, hasLoadedMenus ] );
 
 	const [ menuId, setMenuId ] = useState();
 	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
@@ -114,7 +114,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
 					onDeleteMenu={ async () => {
-						await deleteMenu( menuId, '' );
+						await deleteMenu( menuId, 'force=true' );
 					} }
 				/>
 			) }
