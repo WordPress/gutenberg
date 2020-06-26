@@ -66,9 +66,10 @@ jobs:
       with:
         node-version: 12.x
 
-    - name: Npm install
+    - name: Npm install and build
       run: |
         npm ci
+        npm run build
 
     - name: Install WordPress
       # It's not necessary to run the full build, since Jest can interpret
