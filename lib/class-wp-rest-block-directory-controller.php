@@ -143,8 +143,18 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		);
 
 		foreach ( $plugin['block_assets'] as $asset ) {
-			// TODO: Return from API, not client-set.
-			$block['assets'][] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
+			// Allow for fully qualified URLs in future
+			if ( 'https' === wp_parse_url( $asset,  PHP_URL_SCHEME ) && !empty( wp_parse_url( $asset,  PHP_URL_HOST ) ) ) {
+				$block['assets'][] = esc_url_raw(
+					$asset,
+					array( 'https' )
+				);
+			} else {
+				$block['assets'][] = esc_url_raw( 
+					add_query_arg( 'v', strtotime( $block['last_updated'] ), 'https://ps.w.org/' . $plugin['slug'] . $asset ),
+					array( 'https' )
+				);
+			}
 		}
 
 		$this->add_additional_fields_to_object( $block, $request );
