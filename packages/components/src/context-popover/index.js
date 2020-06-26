@@ -3,17 +3,7 @@
  */
 import { random } from 'lodash';
 import styled from '@emotion/styled';
-import {
-	usePopoverState,
-	Popover,
-	PopoverDisclosure,
-	PopoverBackdrop,
-} from 'reakit/Popover';
-
-/**
- * WordPress dependencies
- */
-import { useEffect } from '@wordpress/element';
+import { usePopoverState, Popover, PopoverDisclosure } from 'reakit/Popover';
 
 /**
  * Internal dependencies
@@ -33,26 +23,22 @@ import Text from '../text';
 function ContextPopover( { children, trigger, title } ) {
 	const popover = usePopoverState( {
 		animated: 200,
-		placement: 'top-start',
+		placement: 'left-start',
+		modal: true,
 	} );
-
-	useEffect( () => {
-		if ( popover.visible ) {
-			document.querySelector( '.sidebar' ).style.overflow = 'hidden';
-		} else {
-			document.querySelector( '.sidebar' ).style.overflow = null;
-		}
-	}, [ popover.visible ] );
 
 	return (
 		<>
-			<PopoverDisclosure { ...popover } as={ Trigger }>
+			<PopoverDisclosure
+				{ ...popover }
+				as={ Trigger }
+				isOpen={ popover.visible }
+			>
 				{ trigger }
 			</PopoverDisclosure>
 			<Popover
 				{ ...popover }
 				aria-label="Welcome"
-				hideOnClickOutside={ false }
 				as={ Wrapper }
 				tabIndex={ 0 }
 			>
@@ -83,21 +69,16 @@ function ContextPopover( { children, trigger, title } ) {
 					</Card>
 				</AnimatedWrapper>
 			</Popover>
-			<PopoverBackdrop
-				{ ...popover }
-				as={ Backdrop }
-				onClick={ () => popover.hide() }
-			/>
 		</>
 	);
 }
 
 const Sidebar = styled.div`
 	align-items: center;
-	width: 300px;
+	width: 265px;
 	height: 100vh;
 	box-shadow: 0 0 0 1px #ddd inset;
-	margin: auto;
+	margin-left: auto;
 	position: relative;
 	overflow-y: auto;
 `;
@@ -108,8 +89,8 @@ const SidebarContent = styled.div`
 `;
 
 const Wrapper = styled.div`
-	max-width: 320px;
-	padding: 0 4px;
+	max-width: 285px;
+	padding: 0;
 	width: 100%;
 	z-index: 9999;
 `;
@@ -117,11 +98,10 @@ const Wrapper = styled.div`
 const AnimatedWrapper = styled.div`
 	opacity: 0;
 	transition: all 100ms linear;
-	transform: translate3d( 0, 20px, 0 );
+	transform-origin: top right;
 
 	[data-enter] & {
 		opacity: 1;
-		transform: translate3d( 0, 0, 0 );
 	}
 `;
 
@@ -131,7 +111,7 @@ const PopoverHeader = styled( CardHeader )`
 `;
 
 const PopoverContentWrapper = styled.div`
-	max-height: 50vh;
+	max-height: 70vh;
 	overflow-y: auto;
 `;
 
@@ -148,23 +128,15 @@ const Trigger = styled.div`
 	&:hover {
 		box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.1 );
 	}
-`;
 
-const Backdrop = styled.div`
-	position: absolute;
-	top: 0;
-	left: 1px;
-	right: 1px;
-	bottom: 0;
-	z-index: 999;
-	opacity: 0;
-	transition: all 100ms linear;
-	transform: translate3d( 0, 0, 0 );
-	background: rgba( 255, 255, 255, 0.85 );
-
-	&[data-enter] {
-		opacity: 1;
-	}
+	${ ( { isOpen } ) => {
+		return (
+			isOpen &&
+			`
+			background: rgba( 0, 0, 0, 0.04 );
+		`
+		);
+	} }
 `;
 
 const Spacer = styled.div`
@@ -193,7 +165,10 @@ function ColorPopover( { color, title } ) {
 			}
 		>
 			<CardBody>
-				<ColorPalette colors={ colors } />
+				<ColorPalette
+					colors={ colors }
+					__experimentalDisableCustomColorsPopover={ true }
+				/>
 				<Spacer />
 				<RangeControl label="Opacity" />
 				<RangeControl label="Hue" />
@@ -254,7 +229,10 @@ function BoxShadowPopover() {
 			<CardBody>
 				<RangeControl label="Spread" />
 				<RangeControl label="Weight" />
-				<ColorPalette colors={ colors } />
+				<ColorPalette
+					colors={ colors }
+					__experimentalDisableCustomColorsPopover={ true }
+				/>
 			</CardBody>
 		</ContextPopover>
 	);
