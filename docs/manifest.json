@@ -744,6 +744,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ComboboxControl",
+		"slug": "combobox-control",
+		"markdown_source": "../packages/components/src/combobox-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CustomSelectControl",
 		"slug": "custom-select-control",
 		"markdown_source": "../packages/components/src/custom-select-control/README.md",
@@ -1605,6 +1611,24 @@
 		"title": "@wordpress/project-management-automation",
 		"slug": "packages-project-management-automation",
 		"markdown_source": "../packages/project-management-automation/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-aztec",
+		"slug": "packages-react-native-aztec",
+		"markdown_source": "../packages/react-native-aztec/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-bridge",
+		"slug": "packages-react-native-bridge",
+		"markdown_source": "../packages/react-native-bridge/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-editor",
+		"slug": "packages-react-native-editor",
+		"markdown_source": "../packages/react-native-editor/README.md",
 		"parent": "packages"
 	},
 	{

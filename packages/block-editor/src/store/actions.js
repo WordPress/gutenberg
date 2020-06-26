@@ -368,18 +368,18 @@ export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
 export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
 
 /**
- * Returns an action object signalling that an indexed block should be moved
- * to a new index.
+ * Returns an action object signalling that the given blocks should be moved to
+ * a new position.
  *
- * @param  {?string} clientId         The client ID of the block.
+ * @param  {?string} clientIds        The client IDs of the blocks.
  * @param  {?string} fromRootClientId Root client ID source.
  * @param  {?string} toRootClientId   Root client ID destination.
- * @param  {number}  index            The index to move the block into.
+ * @param  {number}  index            The index to move the blocks to.
  *
  * @yield {Object} Action object.
  */
-export function* moveBlockToPosition(
-	clientId,
+export function* moveBlocksToPosition(
+	clientIds,
 	fromRootClientId = '',
 	toRootClientId = '',
 	index
@@ -397,12 +397,13 @@ export function* moveBlockToPosition(
 	}
 
 	const action = {
-		type: 'MOVE_BLOCK_TO_POSITION',
+		type: 'MOVE_BLOCKS_TO_POSITION',
 		fromRootClientId,
 		toRootClientId,
-		clientId,
+		clientIds,
 		index,
 	};
+
 	// If moving inside the same root block the move is always possible.
 	if ( fromRootClientId === toRootClientId ) {
 		yield action;
@@ -410,28 +411,48 @@ export function* moveBlockToPosition(
 	}
 
 	// If templateLock is insert we can not remove the block from the parent.
-	// Given that here we know that we are moving the block to a different parent, the move should not be possible if the condition is true.
+	// Given that here we know that we are moving the block to a different
+	// parent, the move should not be possible if the condition is true.
 	if ( templateLock === 'insert' ) {
 		return;
 	}
 
-	const blockName = yield select(
+	const canInsertBlocks = yield select(
 		'core/block-editor',
-		'getBlockName',
-		clientId
-	);
-
-	const canInsertBlock = yield select(
-		'core/block-editor',
-		'canInsertBlockType',
-		blockName,
+		'canInsertBlocks',
+		clientIds,
 		toRootClientId
 	);
 
 	// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
-	if ( canInsertBlock ) {
+	if ( canInsertBlocks ) {
 		yield action;
 	}
+}
+
+/**
+ * Returns an action object signalling that the given block should be moved to a
+ * new position.
+ *
+ * @param  {?string} clientId         The client ID of the block.
+ * @param  {?string} fromRootClientId Root client ID source.
+ * @param  {?string} toRootClientId   Root client ID destination.
+ * @param  {number}  index            The index to move the block to.
+ *
+ * @yield {Object} Action object.
+ */
+export function* moveBlockToPosition(
+	clientId,
+	fromRootClientId = '',
+	toRootClientId = '',
+	index
+) {
+	yield moveBlocksToPosition(
+		[ clientId ],
+		fromRootClientId,
+		toRootClientId,
+		index
+	);
 }
 
 /**
@@ -887,6 +908,26 @@ export function* setNavigationMode( isNavigationMode = true ) {
 		speak(
 			__(
 				'You are currently in edit mode. To return to the navigation mode, press Escape.'
+			)
+		);
+	}
+}
+
+/**
+ * Generator that triggers an action used to enable or disable the block moving mode.
+ *
+ * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.
+ */
+export function* setBlockMovingClientId( hasBlockMovingClientId = null ) {
+	yield {
+		type: 'SET_BLOCK_MOVING_MODE',
+		hasBlockMovingClientId,
+	};
+
+	if ( hasBlockMovingClientId ) {
+		speak(
+			__(
+				'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
 			)
 		);
 	}

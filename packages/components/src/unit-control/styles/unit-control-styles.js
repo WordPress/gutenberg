@@ -49,14 +49,16 @@ export const ValueInput = styled( NumberControl )`
 const unitSizeStyles = ( { size } ) => {
 	const sizes = {
 		default: {
-			top: 1,
 			height: 28,
+			lineHeight: '24px',
 			minHeight: 28,
+			top: 1,
 		},
 		small: {
-			top: 1,
 			height: 22,
+			lineHeight: '18px',
 			minHeight: 22,
+			top: 1,
 		},
 	};
 
@@ -88,20 +90,10 @@ const baseUnitLabelStyles = ( props ) => {
 	`;
 };
 
-const unitLabelPaddingStyles = ( { size } ) => {
-	const sizes = {
-		default: '6px 2px',
-		small: '4px 2px',
-	};
-
-	return css( { padding: sizes[ size ] } );
-};
-
 export const UnitLabel = styled.div`
 	pointer-events: none;
 
 	${ baseUnitLabelStyles };
-	${ unitLabelPaddingStyles };
 `;
 
 export const UnitSelect = styled.select`

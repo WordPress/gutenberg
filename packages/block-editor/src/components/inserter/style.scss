@@ -101,13 +101,27 @@ $block-inserter-tabs-height: 44px;
 		&::placeholder {
 			color: $dark-gray-400;
 		}
+
+		&::-webkit-search-decoration,
+		&::-webkit-search-cancel-button,
+		&::-webkit-search-results-button,
+		&::-webkit-search-results-decoration {
+			-webkit-appearance: none;
+		}
 	}
 }
 
 .block-editor-inserter__search-icon {
 	position: absolute;
-	top: $grid-unit-20 + ($grid-unit-60 - $icon-size) / 2;
-	right: $grid-unit-20 + ($grid-unit-60 - $icon-size) / 2;
+	top: 0;
+	right: $grid-unit-10 + ($grid-unit-60 - $icon-size) / 2;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+
+	> svg {
+		margin: $grid-unit-10;
+	}
 }
 
 .block-editor-inserter__tabs {
@@ -248,32 +262,49 @@ $block-inserter-tabs-height: 44px;
 	flex-shrink: 0;
 }
 
-.block-editor-inserter__patterns-item {
-	border-radius: $radius-block-ui;
-	cursor: pointer;
-	margin-top: $grid-unit-20;
-	transition: all 0.05s ease-in-out;
-	position: relative;
-	border: $border-width solid transparent;
+.block-editor-inserter__quick-inserter {
+	width: $block-inserter-width;
+}
 
-	&:hover {
-		border: $border-width solid var(--wp-admin-theme-color);
-	}
+.block-editor-inserter__quick-inserter-results {
+	padding-bottom: $grid-unit-20;
 
-	&:focus {
-		box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-admin-theme-color);
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
-	}
-
-	&.is-placeholder {
-		min-height: 100px;
+	.block-editor-inserter__panel-header {
+		height: 0;
+		padding: 0;
+		float: left;
 	}
 }
 
-.block-editor-inserter__patterns-item-title {
-	padding: $grid-unit-05;
-	font-size: 12px;
-	text-align: center;
+.block-editor-inserter__quick-inserter-patterns {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: $grid-unit-10;
+}
+
+.block-editor-inserter__quick-inserter-separator {
+	border-top: $border-width solid $light-gray-500;
+}
+
+.block-editor-inserter__popover.is-quick > .components-popover__content > div {
+	@include break-medium {
+		padding: 0;
+	}
+}
+
+.block-editor-inserter__quick-inserter-expand.components-button {
+	display: block;
+	background: $dark-gray-primary;
+	color: $white;
+	width: 100%;
+	height: ($button-size + $grid-unit-10);
+	border-radius: 0;
+
+	&:hover {
+		color: $white;
+	}
+
+	&:focus:not(:disabled) {
+		box-shadow: inset 0 0 0 $border-width-focus $dark-gray-primary, inset 0 0 0 2px $white;
+	}
 }
