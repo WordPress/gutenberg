@@ -12,6 +12,7 @@
  * @see WP_REST_Posts_Controller
  */
 class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
+
 	/**
 	 * Constructor.
 	 *
@@ -204,8 +205,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		$prepared_nav_item = (array) $prepared_nav_item;
-
-		$nav_menu_item_id = wp_update_nav_menu_item( $prepared_nav_item['menu-id'], $prepared_nav_item['menu-item-db-id'],
+		$nav_menu_item_id  = wp_update_nav_menu_item( $prepared_nav_item['menu-id'], $prepared_nav_item['menu-item-db-id'],
 			$prepared_nav_item );
 
 		if ( is_wp_error( $nav_menu_item_id ) ) {
@@ -360,6 +360,11 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
+		// Check if object id exists before saving.
+		if ( ! $prepared_nav_item['menu-item-object'] ) {
+			// Only ever populate $prepared_nav_item['menu-item-object'] if it's missing here!
+		}
+
 		$mapping = array(
 			'menu-item-db-id'       => 'id',
 			'menu-item-object-id'   => 'object_id',
@@ -389,6 +394,12 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				}
 				$prepared_nav_item[ $original ] = rest_sanitize_value_from_schema( $request[ $api_request ],
 					$schema['properties'][ $api_request ] );
+			}
+		}
+
+		foreach ( array( "menu-item-xfn", "menu-item-classes" ) as $key ) {
+			if ( is_array( $prepared_nav_item[ $key ] ) ) {
+				$prepared_nav_item[ $key ] = implode( " ", $prepared_nav_item[ $key ] );
 			}
 		}
 
@@ -462,46 +473,16 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
-		foreach ( array( 'menu-item-object-id', 'menu-item-parent-id' ) as $key ) {
+		foreach ( array( 'menu-item-parent-id' ) as $key ) {
 			// Note we need to allow negative-integer IDs for previewed objects not inserted yet.
 			$prepared_nav_item[ $key ] = intval( $prepared_nav_item[ $key ] );
 		}
 
-		foreach ( array( 'menu-item-type', 'menu-item-object', 'menu-item-target' ) as $key ) {
+		foreach ( array( 'menu-item-type', ) as $key ) {
 			$prepared_nav_item[ $key ] = sanitize_key( $prepared_nav_item[ $key ] );
 		}
 
-		// Valid xfn and classes are an array.
-		foreach ( array( 'menu-item-xfn', 'menu-item-classes' ) as $key ) {
-			$value = $prepared_nav_item[ $key ];
-			if ( ! is_array( $value ) ) {
-				$value = wp_parse_list( $value );
-			}
-			$prepared_nav_item[ $key ] = implode( ' ', array_map( 'sanitize_html_class', $value ) );
-		}
-
 		// Apply the same filters as when calling wp_insert_post().
-
-		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-attr-title'] = wp_unslash( apply_filters( 'excerpt_save_pre',
-			wp_slash( $prepared_nav_item['menu-item-attr-title'] ) ) );
-
-		/** This filter is documented in wp-includes/post.php */
-		$prepared_nav_item['menu-item-description'] = wp_unslash( apply_filters( 'content_save_pre',
-			wp_slash( $prepared_nav_item['menu-item-description'] ) ) );
-
-		// Valid url.
-		if ( '' !== $prepared_nav_item['menu-item-url'] ) {
-			$prepared_nav_item['menu-item-url'] = esc_url_raw( $prepared_nav_item['menu-item-url'] );
-			if ( '' === $prepared_nav_item['menu-item-url'] ) {
-				// Fail sanitization if URL is invalid.
-				return new WP_Error( 'invalid_url', __( 'Invalid URL.', 'gutenberg' ), array( 'status' => 400 ) );
-			}
-		}
-		// Only draft / publish are valid post status for menu items.
-		if ( 'publish' !== $prepared_nav_item['menu-item-status'] ) {
-			$prepared_nav_item['menu-item-status'] = 'draft';
-		}
 
 		$prepared_nav_item = (object) $prepared_nav_item;
 
@@ -735,7 +716,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'type'        => array( 'object', 'string' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
-				'validate_callback' => static function( $value, $request ) {
+				'validate_callback' => static function ( $value, $request ) {
 					if ( 'custom' !== $request['type'] ) {
 						return true;
 					}
@@ -746,8 +727,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 						);
 					}
 				},
-				'sanitize_callback'    => static function( $value ) {
-					if ( ! $value) {
+				'sanitize_callback' => static function ( $value ) {
+					if ( ! $value ) {
 						return "";
 					}
 
@@ -759,6 +740,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 					}
 
 					$title = wp_unslash( apply_filters( 'title_save_pre', wp_slash( $title ) ) );
+
 					return $title;
 				},
 			),
@@ -807,6 +789,15 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'enum'        => array_keys( get_post_stati( array( 'internal' => false ) ) ),
 			'default'     => 'publish',
 			'context'     => array( 'view', 'edit', 'embed' ),
+			'arg_options' => array(
+				'sanitize_callback' => static function ( $value, $request ) {
+					if ( 'publish' !== $value ) {
+						return 'draft';
+					}
+
+					return $value;
+				},
+			),
 		);
 
 		$schema['properties']['parent'] = array(
@@ -822,7 +813,14 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'type'        => 'string',
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
-				'sanitize_callback' => 'sanitize_text_field',
+				'sanitize_callback' => static function ( $value, $request ) {
+					$sanitized = sanitize_text_field( $value );
+					/** This filter is documented in wp-includes/post.php */
+					$sanitized = wp_unslash( apply_filters( 'excerpt_save_pre',
+						wp_slash( $sanitized ) ) );
+
+					return $sanitized;
+				},
 			),
 		);
 
@@ -835,7 +833,10 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
 				'sanitize_callback' => function ( $value ) {
-					return array_map( 'sanitize_html_class', wp_parse_list( $value ) );
+					$sanitized = $value;
+					$sanitized = array_map( 'sanitize_html_class', wp_parse_list( $sanitized ) );
+
+					return array_map( 'sanitize_html_class', $sanitized );
 				},
 			),
 		);
@@ -845,7 +846,14 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'type'        => 'string',
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
-				'sanitize_callback' => 'sanitize_text_field',
+				'sanitize_callback' => static function ( $value, $request ) {
+					$sanitized = sanitize_text_field( $value );
+					/** This filter is documented in wp-includes/post.php */
+					$sanitized = wp_unslash( apply_filters( 'content_save_pre',
+						wp_slash( $sanitized ) ) );
+
+					return $sanitized;
+				},
 			),
 		);
 
@@ -876,21 +884,27 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 							return new WP_Error( 'rest_post_invalid_id', __( 'Invalid post ID.', 'gutenberg' ), array( 'status' => 400 ) );
 						}
 					}
+
 					return true;
 				},
 
 				'sanitize_callback' => static function ( $value, $request ) {
+					$sanitized = "";
 					// If taxonony, check if term exists.
 					if ( 'taxonomy' === $request['type'] ) {
 						$original = get_term( absint( $request['object_id'] ) );
-						return get_term_field( 'taxonomy', $original );
+
+						$sanitized = get_term_field( 'taxonomy', $original );
 						// If post, check if post object exists.
 					} elseif ( 'post_type' === $request['type'] ) {
 						$original = get_post( absint( $request['object_id'] ) );
-						return get_post_type( $original );
+
+						$sanitized = get_post_type( $original );
 					}
-				}
-			)
+
+					return sanitize_key( $sanitized );
+				},
+			),
 		);
 
 		$schema['properties']['object_id'] = array(
@@ -899,7 +913,12 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'integer',
 			'minimum'     => 0,
-			'default'     => 0
+			'default'     => 0,
+			'arg_options' => array(
+				'sanitize_callback' => static function ( $value ) {
+					return intval( $value );
+				},
+			),
 		);
 
 		$schema['properties']['target'] = array(
@@ -909,6 +928,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'enum'        => array(
 				'_blank',
 				'',
+			),
+			'arg_options' => array(
+				'sanitize_callback' => 'sanitize_key',
 			),
 		);
 
@@ -924,6 +946,18 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'type'        => 'string',
 			'format'      => 'uri',
 			'context'     => array( 'view', 'edit', 'embed' ),
+			'arg_options' => array(
+				'validate_callback' => static function ( $value, $request ) {
+					$validated = esc_url_raw( $value );
+					if ( '' === $validated ) {
+						// Fail sanitization if URL is invalid.
+						return new WP_Error( 'invalid_url', __( 'Invalid URL.', 'gutenberg' ), array( 'status' => 400 ) );
+					}
+				},
+				'sanitize_callback' => static function ( $value, $request ) {
+					return esc_url_raw( $value );
+				},
+			),
 		);
 
 		$schema['properties']['xfn'] = array(
@@ -935,7 +969,10 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
 				'sanitize_callback' => function ( $value ) {
-					return array_map( 'sanitize_html_class', wp_parse_list( $value ) );
+					$sanitized = $value;
+					$sanitized = array_map( 'sanitize_html_class', wp_parse_list( $sanitized ) );
+
+					return array_map( 'sanitize_html_class', $sanitized );
 				},
 			),
 		);
