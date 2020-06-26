@@ -1,5 +1,5 @@
 name: React Native E2E Tests (Android)
-on: push
+on: pull_request
 
 jobs:
   test:
@@ -11,6 +11,8 @@ jobs:
         ]
 
     steps:
+    - run: brew install watchman
+
     - name: checkout
       uses: actions/checkout@v2
 

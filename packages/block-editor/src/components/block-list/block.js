@@ -68,15 +68,18 @@ function BlockListBlock( {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
 	// (editor.BlockListBlock filter)
-	const { isDragging, isHighlighted } = useSelect( ( select ) => {
-		const { isDraggingBlocks, isBlockHighlighted } = select(
-			'core/block-editor'
-		);
-		return {
-			isDragging: isDraggingBlocks(),
-			isHighlighted: isBlockHighlighted( clientId ),
-		};
-	}, [] );
+	const { isDragging, isHighlighted } = useSelect(
+		( select ) => {
+			const { isDraggingBlocks, isBlockHighlighted } = select(
+				'core/block-editor'
+			);
+			return {
+				isDragging: isDraggingBlocks(),
+				isHighlighted: isBlockHighlighted( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 	const { removeBlock } = useDispatch( 'core/block-editor' );
 	const onRemove = () => removeBlock( clientId );
 

@@ -12,15 +12,23 @@ import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
 	// Shortcuts Logic
-	const { clientIds, rootBlocksClientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds, getBlockOrder } = select(
-			'core/block-editor'
-		);
-		return {
-			clientIds: getSelectedBlockClientIds(),
-			rootBlocksClientIds: getBlockOrder(),
-		};
-	}, [] );
+	const { clientIds, rootBlocksClientIds, rootClientId } = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientIds,
+				getBlockOrder,
+				getBlockRootClientId,
+			} = select( 'core/block-editor' );
+			const selectedClientIds = getSelectedBlockClientIds();
+			const [ firstClientId ] = selectedClientIds;
+			return {
+				clientIds: selectedClientIds,
+				rootBlocksClientIds: getBlockOrder(),
+				rootClientId: getBlockRootClientId( firstClientId ),
+			};
+		},
+		[]
+	);
 
 	const {
 		duplicateBlocks,
@@ -29,7 +37,35 @@ function KeyboardShortcuts() {
 		insertBeforeBlock,
 		multiSelect,
 		clearSelectedBlock,
+		moveBlocksUp,
+		moveBlocksDown,
 	} = useDispatch( 'core/block-editor' );
+
+	// Moves selected block/blocks up
+	useShortcut(
+		'core/block-editor/move-up',
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				moveBlocksUp( clientIds, rootClientId );
+			},
+			[ clientIds, moveBlocksUp ]
+		),
+		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
+	);
+
+	// Moves selected block/blocks up
+	useShortcut(
+		'core/block-editor/move-down',
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				moveBlocksDown( clientIds, rootClientId );
+			},
+			[ clientIds, moveBlocksDown ]
+		),
+		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
+	);
 
 	// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
 	// Prevents reposition Chrome devtools pane shortcut when devtools are open.
@@ -218,6 +254,26 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'alt',
 				character: 'F10',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/move-up',
+			category: 'block',
+			description: __( 'Move the selected block(s) up.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 't',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/move-down',
+			category: 'block',
+			description: __( 'Move the selected block(s) down.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'y',
 			},
 		} );
 	}, [ registerShortcut ] );

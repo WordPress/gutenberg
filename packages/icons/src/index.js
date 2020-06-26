@@ -70,6 +70,7 @@ export { default as gallery } from './library/gallery';
 export { default as globe } from './library/globe';
 export { default as grid } from './library/grid';
 export { default as group } from './library/group';
+export { default as handle } from './library/handle';
 export { default as heading } from './library/heading';
 export { default as help } from './library/help';
 export { default as inbox } from './library/inbox';

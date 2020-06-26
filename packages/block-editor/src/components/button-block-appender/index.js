@@ -31,6 +31,7 @@ function ButtonBlockAppender(
 			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
+			__experimentalIsQuick
 			renderToggle={ ( {
 				onToggle,
 				disabled,
