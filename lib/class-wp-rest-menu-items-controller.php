@@ -109,6 +109,16 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		$prepared_nav_item = $this->prepare_item_for_database( $request );
+		/**
+		 * Filters a post before it is inserted via the REST API.
+		 *
+		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
+		 *
+		 * @param stdClass $prepared_post An object representing a single post prepared
+		 *                                       for inserting or updating the database.
+		 * @param WP_REST_Request $request Request object.
+		 */
+		$prepared_nav_item = apply_filters( "rest_pre_insert_{$this->post_type}", (object) $prepared_nav_item, $request );
 
 		if ( is_wp_error( $prepared_nav_item ) ) {
 			return $prepared_nav_item;
@@ -199,6 +209,16 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		$prepared_nav_item = $this->prepare_item_for_database( $request );
+		/**
+		 * Filters a post before it is inserted via the REST API.
+		 *
+		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
+		 *
+		 * @param stdClass $prepared_post An object representing a single post prepared
+		 *                                       for inserting or updating the database.
+		 * @param WP_REST_Request $request Request object.
+		 */
+		$prepared_nav_item = apply_filters( "rest_pre_insert_{$this->post_type}", (object) $prepared_nav_item, $request );
 
 		if ( is_wp_error( $prepared_nav_item ) ) {
 			return $prepared_nav_item;
@@ -313,54 +333,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 *
-	 * @return stdClass|WP_Error
+	 * @return array|WP_Error
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$prepared_nav_item = $this->prepare_item_for_sanitization( $request );
-
-		// Check if object id exists before saving.
-		if ( ! $prepared_nav_item['menu-item-object'] ) {
-			// If taxonony, check if term exists.
-			if ( 'taxonomy' === $prepared_nav_item['menu-item-type'] ) {
-				$original                              = get_term( absint( $prepared_nav_item['menu-item-object-id'] ) );
-				$prepared_nav_item['menu-item-object'] = get_term_field( 'taxonomy', $original );
-				// If post, check if post object exists.
-			} elseif ( 'post_type' === $prepared_nav_item['menu-item-type'] ) {
-				$original                              = get_post( absint( $prepared_nav_item['menu-item-object-id'] ) );
-				$prepared_nav_item['menu-item-object'] = get_post_type( $original );
-			}
-		}
-
-		foreach ( array( "menu-item-xfn", "menu-item-classes" ) as $key ) {
-			if ( is_array( $prepared_nav_item[ $key ] ) ) {
-				$prepared_nav_item[ $key ] = implode( " ", $prepared_nav_item[ $key ] );
-			}
-		}
-
-		foreach ( array( 'menu-item-parent-id' ) as $key ) {
-			// Note we need to allow negative-integer IDs for previewed objects not inserted yet.
-			$prepared_nav_item[ $key ] = intval( $prepared_nav_item[ $key ] );
-		}
-
-		foreach ( array( 'menu-item-type', ) as $key ) {
-			$prepared_nav_item[ $key ] = sanitize_key( $prepared_nav_item[ $key ] );
-		}
-
-		$prepared_nav_item = (object) $prepared_nav_item;
-
-		/**
-		 * Filters a post before it is inserted via the REST API.
-		 *
-		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
-		 *
-		 * @param stdClass $prepared_post An object representing a single post prepared
-		 *                                       for inserting or updating the database.
-		 * @param WP_REST_Request $request Request object.
-		 */
-		return apply_filters( "rest_pre_insert_{$this->post_type}", $prepared_nav_item, $request );
-	}
-
-	protected function prepare_item_for_sanitization( $request ) {
 		$menu_item_db_id = $request['id'];
 		$menu_item_obj   = $this->get_nav_menu_item( $menu_item_db_id );
 		// Need to persist the menu item data. See https://core.trac.wordpress.org/ticket/28138 .
@@ -437,6 +412,25 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				}
 				$prepared_nav_item[ $original ] = rest_sanitize_value_from_schema( $request[ $api_request ],
 					$schema['properties'][ $api_request ] );
+			}
+		}
+
+		// Check if object id exists before saving.
+		if ( ! $prepared_nav_item['menu-item-object'] ) {
+			// If taxonony, check if term exists.
+			if ( 'taxonomy' === $prepared_nav_item['menu-item-type'] ) {
+				$original                              = get_term( absint( $prepared_nav_item['menu-item-object-id'] ) );
+				$prepared_nav_item['menu-item-object'] = get_term_field( 'taxonomy', $original );
+				// If post, check if post object exists.
+			} elseif ( 'post_type' === $prepared_nav_item['menu-item-type'] ) {
+				$original                              = get_post( absint( $prepared_nav_item['menu-item-object-id'] ) );
+				$prepared_nav_item['menu-item-object'] = get_post_type( $original );
+			}
+		}
+
+		foreach ( array( "menu-item-xfn", "menu-item-classes" ) as $key ) {
+			if ( is_array( $prepared_nav_item[ $key ] ) ) {
+				$prepared_nav_item[ $key ] = implode( " ", $prepared_nav_item[ $key ] );
 			}
 		}
 
@@ -729,7 +723,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'arg_options' => array(
 				'sanitize_callback' => function ( $value, $request ) {
 					if ( 'post_type_archive' === $value ) {
-						$prepared_nav_item = $this->prepare_item_for_sanitization( $request );
+						$prepared_nav_item = $this->prepare_item_for_database( $request );
 						$post_type         = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
 						$original          = get_post_type_object( $post_type );
 						if ( empty( $original ) ) {
@@ -738,7 +732,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 						}
 					}
 
-					return $value;
+					return sanitize_key( $value );
 				},
 			),
 		);
@@ -769,7 +763,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 			'arg_options' => array(
 				'sanitize_callback' => function ( $value, $request ) {
-					$prepared_nav_item = $this->prepare_item_for_sanitization( $request );
+					$prepared_nav_item = $this->prepare_item_for_database( $request, true );
 					if ( empty( $prepared_nav_item['menu-id'] ) ) {
 						return $value;
 					}
@@ -854,7 +848,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'default'     => 0,
 			'arg_options' => array(
 				'sanitize_callback' => function ( $value, $request ) {
-					$prepared_nav_item = $this->prepare_item_for_sanitization( $request );
+					$prepared_nav_item = $this->prepare_item_for_database( $request );
 					if ( empty( $prepared_nav_item['menu-id'] ) ) {
 						return $value;
 					}
