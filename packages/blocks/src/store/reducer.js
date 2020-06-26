@@ -4,6 +4,7 @@
 import {
 	filter,
 	find,
+	findLast,
 	get,
 	isEmpty,
 	keyBy,
@@ -11,6 +12,7 @@ import {
 	mapValues,
 	omit,
 	uniqBy,
+	without,
 } from 'lodash';
 
 /**
@@ -94,15 +96,43 @@ export function blockStyles( state = {}, action ) {
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
+			let mergedStyles = uniqBy(
+				[ ...get( state, [ action.blockName ], [] ), ...action.styles ],
+				( style ) => style.name
+			);
+
+			const hasMultipleDefaults =
+				filter( mergedStyles, ( style ) => style.isDefault ).length > 1;
+
+			// If there are multiple default styles, unset all but the last one.
+			if ( hasMultipleDefaults ) {
+				const lastDefaultStyle = findLast(
+					mergedStyles,
+					( style ) => style.isDefault
+				);
+
+				// Unset any preceding defaults.
+				mergedStyles = mergedStyles.map( ( style ) => {
+					if ( style.isDefault && style !== lastDefaultStyle ) {
+						return {
+							...style,
+							isDefault: false,
+						};
+					}
+
+					return style;
+				} );
+
+				// Reorder styles so that new default is first.
+				mergedStyles = [
+					lastDefaultStyle,
+					...without( mergedStyles, lastDefaultStyle ),
+				];
+			}
+
 			return {
 				...state,
-				[ action.blockName ]: uniqBy(
-					[
-						...get( state, [ action.blockName ], [] ),
-						...action.styles,
-					],
-					( style ) => style.name
-				),
+				[ action.blockName ]: mergedStyles,
 			};
 		case 'REMOVE_BLOCK_STYLES':
 			return {
