@@ -31,7 +31,6 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-		isDraggingBlocks,
 	} = select( 'core/block-editor' );
 	return {
 		isNavigationMode: isNavigationMode(),
@@ -41,7 +40,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: getLastMultiSelectedBlockClientId(),
-		isDragging: isDraggingBlocks(),
 	};
 }
 
@@ -61,7 +59,6 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 		lastClientId,
-		isDragging,
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
@@ -98,8 +95,7 @@ function BlockPopover( {
 		! shouldShowBreadcrumb &&
 		! shouldShowContextualToolbar &&
 		! isToolbarForced &&
-		! showEmptyBlockSideInserter &&
-		! isDragging
+		! showEmptyBlockSideInserter
 	) {
 		return null;
 	}
@@ -139,14 +135,6 @@ function BlockPopover( {
 		setIsInserterShown( false );
 	}
 
-	function onDragStart() {
-		setIsToolbarForced( true );
-	}
-
-	function onDragEnd() {
-		setIsToolbarForced( false );
-	}
-
 	// Position above the anchor, pop out towards the right, and position in the
 	// left corner. For the side inserter, pop out towards the left, and
 	// position in the right corner.
@@ -170,11 +158,6 @@ function BlockPopover( {
 			__unstableObserveElement={ node }
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
-			// Popover calculates the width once. Trigger a reset by remounting
-			// the component. We include both shouldShowContextualToolbar and isToolbarForced
-			// in the key to prevent the component being unmounted unexpectedly when isToolbarForced = true,
-			// e.g. during drag and drop
-			key={ shouldShowContextualToolbar || isToolbarForced }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -206,8 +189,6 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
