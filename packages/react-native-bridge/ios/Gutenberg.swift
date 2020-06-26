@@ -222,7 +222,7 @@ extension Gutenberg {
 }
 
 public extension Gutenberg.MediaSource {
-    public init(id: String, label: String, types: [Gutenberg.MediaType]) {
+    init(id: String, label: String, types: [Gutenberg.MediaType]) {
         self.id = id
         self.label = label
         self.types = Set(types)
