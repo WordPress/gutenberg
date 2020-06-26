@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   build:
-
+    name: Check
     runs-on: ubuntu-latest
 
     steps:

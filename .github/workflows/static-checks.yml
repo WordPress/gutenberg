@@ -4,7 +4,7 @@ on: push
 
 jobs:
   check:
-    name: Static Analysis (Linting, License, Type checks...)
+    name: All
 
     runs-on: ubuntu-latest
 

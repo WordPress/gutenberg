@@ -4,7 +4,7 @@ on: push
 
 jobs:
   unit-js:
-    name: JavaScript Unit Tests
+    name: JavaScript
 
     runs-on: ubuntu-latest
 
@@ -41,7 +41,7 @@ jobs:
       run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
   mobile-unit-js:
-    name: Mobile Unit Tests
+    name: Mobile
 
     runs-on: ubuntu-latest
 
