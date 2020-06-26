@@ -14,7 +14,7 @@ import {
  * WordPress dependencies
  */
 import { useReducedMotion } from '@wordpress/compose';
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
 /**
@@ -47,6 +47,12 @@ export function PanelBody(
 	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
 	const isOpened = disclosure.visible;
 
+	const currentOnToggle = useRef( onToggle );
+
+	useEffect( () => {
+		currentOnToggle.current = onToggle;
+	}, [ onToggle ] );
+
 	// Runs after initial render
 	useUpdateEffect( () => {
 		if ( disclosure.visible ) {
@@ -64,7 +70,7 @@ export function PanelBody(
 			}
 		}
 
-		onToggle( disclosure.visible );
+		currentOnToggle.current( disclosure.visible );
 	}, [ disclosure.visible, scrollBehavior ] );
 
 	useUpdateEffect( () => {
