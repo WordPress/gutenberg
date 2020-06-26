@@ -671,10 +671,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
 				'validate_callback' => static function ( $value, $request ) {
-					if ( 'custom' !== $request['type'] ) {
-						return true;
-					}
-					if ( '' === $value ) {
+					if ( 'custom' === $request['type'] && '' === $value ) {
 						return new WP_Error(
 							'rest_title_required',
 							__( 'Title required if menu item of type custom.', 'gutenberg' )
