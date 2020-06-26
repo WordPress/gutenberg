@@ -46,7 +46,6 @@ function selector( select ) {
 function BlockPopover( {
 	clientId,
 	rootClientId,
-	align,
 	isValid,
 	moverDirection,
 	isEmptyDefaultBlock,
@@ -159,9 +158,6 @@ function BlockPopover( {
 			__unstableObserveElement={ node }
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
-			// Popover calculates the width once. Trigger a reset by remounting
-			// the component.
-			key={ shouldShowContextualToolbar }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -193,7 +189,6 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
-					data-align={ align }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
@@ -201,7 +196,6 @@ function BlockPopover( {
 					clientId={ clientId }
 					rootClientId={ rootClientId }
 					moverDirection={ moverDirection }
-					data-align={ align }
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (
@@ -268,7 +262,6 @@ function wrapperSelector( select ) {
 		clientId,
 		rootClientId: getBlockRootClientId( clientId ),
 		name,
-		align: attributes.align,
 		isValid,
 		moverDirection: __experimentalMoverDirection,
 		isEmptyDefaultBlock:
@@ -288,7 +281,6 @@ export default function WrappedBlockPopover() {
 		clientId,
 		rootClientId,
 		name,
-		align,
 		isValid,
 		moverDirection,
 		isEmptyDefaultBlock,
@@ -303,7 +295,6 @@ export default function WrappedBlockPopover() {
 		<BlockPopover
 			clientId={ clientId }
 			rootClientId={ rootClientId }
-			align={ align }
 			isValid={ isValid }
 			moverDirection={ moverDirection }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
