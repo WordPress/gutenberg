@@ -97,12 +97,9 @@ describe( 'Button', () => {
 				/>
 			);
 			expect( iconButton.find( 'Icon' ).dive() ).not.toBeNull();
-			expect(
-				iconButton
-					.find( '.test' )
-					.shallow()
-					.text()
-			).toBe( 'Test' );
+			expect( iconButton.find( '.test' ).shallow().text() ).toBe(
+				'Test'
+			);
 		} );
 
 		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', () => {

@@ -137,7 +137,9 @@ export function getEmbedBlockSettings( {
 			return (
 				<figure className={ embedClassName }>
 					<div className="wp-block-embed__wrapper">
-						{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+						{
+							`\n${ url }\n` /* URL needs to be on its own line. */
+						}
 					</div>
 					{ ! RichText.isEmpty( caption ) && (
 						<RichText.Content
@@ -166,7 +168,9 @@ export function getEmbedBlockSettings( {
 
 					return (
 						<figure className={ embedClassName }>
-							{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+							{
+								`\n${ url }\n` /* URL needs to be on its own line. */
+							}
 							{ ! RichText.isEmpty( caption ) && (
 								<RichText.Content
 									tagName="figcaption"

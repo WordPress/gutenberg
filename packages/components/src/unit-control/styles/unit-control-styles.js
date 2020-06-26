@@ -18,7 +18,7 @@ const paddingStyles = ( { disableUnits } ) => {
 	const value = disableUnits ? 3 : 24;
 
 	return css`
-		${rtl( { paddingRight: value } )()};
+		${ rtl( { paddingRight: value } )() };
 	`;
 };
 
@@ -45,8 +45,8 @@ export const ValueInput = styled( NumberControl )`
 			display: block;
 			width: 100%;
 
-			${arrowStyles};
-			${paddingStyles};
+			${ arrowStyles };
+			${ paddingStyles };
 		}
 	}
 `;
@@ -99,22 +99,22 @@ export const UnitLabel = styled.div`
 	&&& {
 		pointer-events: none;
 
-		${baseUnitLabelStyles};
+		${ baseUnitLabelStyles };
 	}
 `;
 
 export const UnitSelect = styled.select`
 	&&& {
-		${baseUnitLabelStyles};
+		${ baseUnitLabelStyles };
 		cursor: pointer;
 		border: 1px solid transparent;
 
 		&:hover {
-			background-color: ${color( 'lightGray.300' )};
+			background-color: ${ color( 'lightGray.300' ) };
 		}
 
 		&:focus {
-			border-color: ${color( 'ui.borderFocus' )};
+			border-color: ${ color( 'ui.borderFocus' ) };
 			outline: 2px solid transparent;
 			outline-offset: 0;
 		}

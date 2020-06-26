@@ -26,12 +26,12 @@ const containerPositionStyles = ( { isPositionAbsolute } ) => {
 export const Container = styled.div`
 	box-sizing: border-box;
 	position: relative;
-	${containerPositionStyles};
+	${ containerPositionStyles };
 `;
 
 export const Side = styled.div`
 	box-sizing: border-box;
-	background: ${color( 'ui.brand' )};
+	background: ${ color( 'ui.brand' ) };
 	filter: brightness( 1 );
 	opacity: 0;
 	position: absolute;
@@ -39,11 +39,11 @@ export const Side = styled.div`
 	transition: opacity 120ms linear;
 	z-index: 1;
 
-	${( { isActive } ) =>
+	${ ( { isActive } ) =>
 		isActive &&
 		`
 		opacity: 0.3;
-	`}
+	` }
 `;
 
 export const TopView = styled( Side )`
@@ -55,7 +55,7 @@ export const TopView = styled( Side )`
 export const RightView = styled( Side )`
 	top: 0;
 	bottom: 0;
-	${rtl( { right: 0 } )};
+	${ rtl( { right: 0 } ) };
 `;
 
 export const BottomView = styled( Side )`
@@ -67,5 +67,5 @@ export const BottomView = styled( Side )`
 export const LeftView = styled( Side )`
 	top: 0;
 	bottom: 0;
-	${rtl( { left: 0 } )};
+	${ rtl( { left: 0 } ) };
 `;

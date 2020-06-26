@@ -52,18 +52,16 @@ class Draggable extends Component {
 	 * @param  {Object} event The non-custom DragEvent.
 	 */
 	onDragOver( event ) {
-		this.cloneWrapper.style.top = `${ parseInt(
-			this.cloneWrapper.style.top,
-			10
-		) +
+		this.cloneWrapper.style.top = `${
+			parseInt( this.cloneWrapper.style.top, 10 ) +
 			event.clientY -
-			this.cursorTop }px`;
-		this.cloneWrapper.style.left = `${ parseInt(
-			this.cloneWrapper.style.left,
-			10
-		) +
+			this.cursorTop
+		}px`;
+		this.cloneWrapper.style.left = `${
+			parseInt( this.cloneWrapper.style.left, 10 ) +
 			event.clientX -
-			this.cursorLeft }px`;
+			this.cursorLeft
+		}px`;
 
 		// Update cursor coordinates.
 		this.cursorLeft = event.clientX;
@@ -126,17 +124,20 @@ class Draggable extends Component {
 			this.cloneWrapper.classList.add( cloneClassname );
 		}
 
-		this.cloneWrapper.style.width = `${ elementRect.width +
-			clonePadding * 2 }px`;
+		this.cloneWrapper.style.width = `${
+			elementRect.width + clonePadding * 2
+		}px`;
 
 		// If a dragComponent is defined, the following logic will clone the
 		// HTML node and inject it into the cloneWrapper.
 		if ( this.dragComponentRef.current ) {
 			// Position clone right over the original element (20px padding).
-			this.cloneWrapper.style.top = `${ elementTopOffset -
-				clonePadding }px`;
-			this.cloneWrapper.style.left = `${ elementLeftOffset -
-				clonePadding }px`;
+			this.cloneWrapper.style.top = `${
+				elementTopOffset - clonePadding
+			}px`;
+			this.cloneWrapper.style.left = `${
+				elementLeftOffset - clonePadding
+			}px`;
 
 			const clonedDragComponent = document.createElement( 'div' );
 			clonedDragComponent.innerHTML = this.dragComponentRef.current.innerHTML;
@@ -154,10 +155,12 @@ class Draggable extends Component {
 				this.cloneWrapper.style.left = `${ event.clientX }px`;
 			} else {
 				// Position clone right over the original element (20px padding).
-				this.cloneWrapper.style.top = `${ elementTopOffset -
-					clonePadding }px`;
-				this.cloneWrapper.style.left = `${ elementLeftOffset -
-					clonePadding }px`;
+				this.cloneWrapper.style.top = `${
+					elementTopOffset - clonePadding
+				}px`;
+				this.cloneWrapper.style.left = `${
+					elementLeftOffset - clonePadding
+				}px`;
 			}
 
 			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze

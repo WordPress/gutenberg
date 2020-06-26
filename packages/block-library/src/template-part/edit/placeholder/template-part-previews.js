@@ -119,9 +119,7 @@ function TemplatePartSearchResults( {
 			( { slug, meta: { theme } } ) =>
 				slug.toLowerCase().includes( normalizedFilterValue ) ||
 				// Since diacritics can be used in theme names, remove them for the comparison.
-				deburr( theme )
-					.toLowerCase()
-					.includes( normalizedFilterValue )
+				deburr( theme ).toLowerCase().includes( normalizedFilterValue )
 		);
 		// Order based on value location.
 		searchResults.sort( ( a, b ) => {

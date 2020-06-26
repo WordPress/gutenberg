@@ -39,23 +39,23 @@ export const Wrapper = styled.span`
 	position: relative;
 	width: 100%;
 
-	${wrapperColor};
-	${rangeHeight};
-	${wrapperMargin};
+	${ wrapperColor };
+	${ rangeHeight };
+	${ wrapperMargin };
 
-	${rtl( { marginLeft: 10 } )}
+	${ rtl( { marginLeft: 10 } ) }
 `;
 
 export const BeforeIconWrapper = styled.span`
 	margin-top: 3px;
 
-	${rtl( { marginRight: 6 } )}
+	${ rtl( { marginRight: 6 } ) }
 `;
 
 export const AfterIconWrapper = styled.span`
 	margin-top: 3px;
 
-	${rtl( { marginLeft: 16 } )}
+	${ rtl( { marginLeft: 16 } ) }
 `;
 
 const railBackgroundColor = ( { disabled, railColor } ) => {
@@ -71,7 +71,7 @@ const railBackgroundColor = ( { disabled, railColor } ) => {
 };
 
 export const Rail = styled.span`
-	background-color: ${color( 'lightGray.600' )};
+	background-color: ${ color( 'lightGray.600' ) };
 	box-sizing: border-box;
 	left: 0;
 	pointer-events: none;
@@ -82,7 +82,7 @@ export const Rail = styled.span`
 	margin-top: 14px;
 	top: 0;
 
-	${railBackgroundColor};
+	${ railBackgroundColor };
 `;
 
 const trackBackgroundColor = ( { disabled, trackColor } ) => {
@@ -108,7 +108,7 @@ export const Track = styled.span`
 	margin-top: 14px;
 	top: 0;
 
-	${trackBackgroundColor};
+	${ trackBackgroundColor };
 `;
 
 export const MarksWrapper = styled.span`
@@ -139,7 +139,7 @@ export const Mark = styled.span`
 	top: -4px;
 	width: 1px;
 
-	${markFill};
+	${ markFill };
 `;
 
 const markLabelFill = ( { isFilled } ) => {
@@ -150,7 +150,7 @@ const markLabelFill = ( { isFilled } ) => {
 
 export const MarkLabel = styled.span`
 	box-sizing: border-box;
-	color: ${color( 'lightGray.600' )};
+	color: ${ color( 'lightGray.600' ) };
 	left: 0;
 	font-size: 11px;
 	position: absolute;
@@ -158,7 +158,7 @@ export const MarkLabel = styled.span`
 	transform: translateX( -50% );
 	white-space: nowrap;
 
-	${markLabelFill};
+	${ markLabelFill };
 `;
 
 export const ThumbWrapper = styled.span`
@@ -175,7 +175,7 @@ export const ThumbWrapper = styled.span`
 	user-select: none;
 	width: 20px;
 
-	${rtl( { marginLeft: -10 } )}
+	${ rtl( { marginLeft: -10 } ) }
 `;
 
 const thumbFocus = ( { isFocused } ) => {
@@ -197,7 +197,7 @@ export const Thumb = styled.span`
 	align-items: center;
 	background-color: white;
 	border-radius: 50%;
-	border: 1px solid ${color( 'darkGray.200' )};
+	border: 1px solid ${ color( 'darkGray.200' ) };
 	box-sizing: border-box;
 	height: 100%;
 	outline: 0;
@@ -206,7 +206,7 @@ export const Thumb = styled.span`
 	user-select: none;
 	width: 100%;
 
-	${thumbFocus};
+	${ thumbFocus };
 `;
 
 export const InputRange = styled.input`
@@ -245,7 +245,7 @@ const tooltipPosition = ( { position } ) => {
 };
 
 export const Tooltip = styled.span`
-	background: ${color( 'ui.border' )};
+	background: ${ color( 'ui.border' ) };
 	border-radius: 2px;
 	box-sizing: border-box;
 	color: white;
@@ -261,13 +261,13 @@ export const Tooltip = styled.span`
 	user-select: none;
 	line-height: 1.4;
 
-	${tooltipShow};
-	${tooltipPosition};
-	${reduceMotion( 'transition' )};
-	${rtl(
+	${ tooltipShow };
+	${ tooltipPosition };
+	${ reduceMotion( 'transition' ) };
+	${ rtl(
 		{ transform: 'translateX(-50%)' },
 		{ transform: 'translateX(50%)' }
-	)}
+	) }
 `;
 
 export const InputNumber = styled( NumberControl )`
@@ -275,13 +275,13 @@ export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;
 	margin-top: 0;
-	width: ${space( 8 )};
+	width: ${ space( 8 ) };
 
 	input[type='number']& {
-		${rangeHeight};
+		${ rangeHeight };
 	}
 
-	${rtl( { marginLeft: space( 2 ) } )}
+	${ rtl( { marginLeft: space( 2 ) } ) }
 `;
 
 export const ActionRightWrapper = styled.span`
@@ -292,8 +292,8 @@ export const ActionRightWrapper = styled.span`
 	button,
 	button.is-small {
 		margin-left: 0;
-		${rangeHeight};
+		${ rangeHeight };
 	}
 
-	${rtl( { marginLeft: 8 } )}
+	${ rtl( { marginLeft: 8 } ) }
 `;

@@ -21,9 +21,7 @@ const { createHash } = require( 'crypto' );
  * @return {string} md5 hash of string.
  */
 function md5( text ) {
-	return createHash( 'md5' )
-		.update( text )
-		.digest( 'hex' );
+	return createHash( 'md5' ).update( text ).digest( 'hex' );
 }
 
 /**

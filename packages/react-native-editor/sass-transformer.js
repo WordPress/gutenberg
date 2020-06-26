@@ -140,7 +140,7 @@ function transform( src, filename, options ) {
 	return upstreamTransformer.transform( { src, filename, options } );
 }
 
-module.exports.transform = function( { src, filename, options } ) {
+module.exports.transform = function ( { src, filename, options } ) {
 	if ( filename.endsWith( '.scss' ) || filename.endsWith( '.sass' ) ) {
 		// "auto-import" the stylesheets the GB webpack config imports
 		src = imports + src;

@@ -132,33 +132,37 @@ export class UnsupportedBlockEdit extends Component {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ // eslint-disable-next-line no-undef
-						__DEV__
-							? __(
-									"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
-							  )
-							: __(
-									'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
-							  ) }
+						{
+							// eslint-disable-next-line no-undef
+							__DEV__
+								? __(
+										"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
+								  )
+								: __(
+										'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
+								  )
+						}
 					</Text>
 				</View>
-				{ // eslint-disable-next-line no-undef
-				__DEV__ && (
-					<>
-						<BottomSheet.Cell
-							label={ __( 'Edit block in web browser' ) }
-							separatorType="topFullWidth"
-							onPress={ this.requestFallback }
-							labelStyle={ actionButtonStyle }
-						/>
-						<BottomSheet.Cell
-							label={ __( 'Dismiss' ) }
-							separatorType="topFullWidth"
-							onPress={ this.toggleSheet }
-							labelStyle={ actionButtonStyle }
-						/>
-					</>
-				) }
+				{
+					// eslint-disable-next-line no-undef
+					__DEV__ && (
+						<>
+							<BottomSheet.Cell
+								label={ __( 'Edit block in web browser' ) }
+								separatorType="topFullWidth"
+								onPress={ this.requestFallback }
+								labelStyle={ actionButtonStyle }
+							/>
+							<BottomSheet.Cell
+								label={ __( 'Dismiss' ) }
+								separatorType="topFullWidth"
+								onPress={ this.toggleSheet }
+								labelStyle={ actionButtonStyle }
+							/>
+						</>
+					)
+				}
 			</BottomSheet>
 		);
 	}

@@ -175,9 +175,8 @@ class DependencyExtractionWebpackPlugin {
 		// The type indicates the option may be `undefined`.
 		// However, at this point in compilation, webpack has filled the options in if
 		// they were not provided.
-		const outputFilename =
-			/** @type {{filename:string}} */ ( compiler.options.output )
-				.filename;
+		const outputFilename = /** @type {{filename:string}} */ ( compiler
+			.options.output ).filename;
 
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
 			const {
@@ -262,9 +261,8 @@ class DependencyExtractionWebpackPlugin {
 				// The type indicates the option may be `undefined`.
 				// However, at this point in compilation, webpack has filled the options in if
 				// they were not provided.
-				const outputFolder =
-					/** @type {{path:string}} */ ( compiler.options.output )
-						.path;
+				const outputFolder = /** @type {{path:string}} */ ( compiler
+					.options.output ).path;
 
 				const assetsFilePath = path.resolve(
 					outputFolder,

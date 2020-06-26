@@ -274,8 +274,9 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 			...block,
 			attributes: {
 				...attributes,
-				className: `${ className ||
-					'' } is-style-${ blockStyle }`.trim(),
+				className: `${
+					className || ''
+				} is-style-${ blockStyle }`.trim(),
 			},
 		};
 	} );

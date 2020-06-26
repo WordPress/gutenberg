@@ -30,7 +30,7 @@ import { menuItemsQuery } from './utils';
  * @param {Object} post A navigation post to process
  * @return {Function} An action creator
  */
-export const createMissingMenuItems = serializeProcessing( function*( post ) {
+export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 	const menuId = post.meta.menuId;
 
 	const mapping = yield {
@@ -81,7 +81,7 @@ export const createMissingMenuItems = serializeProcessing( function*( post ) {
  * @param {Object} post A navigation post to process
  * @return {Function} An action creator
  */
-export const saveNavigationPost = serializeProcessing( function*( post ) {
+export const saveNavigationPost = serializeProcessing( function* ( post ) {
 	const menuId = post.meta.menuId;
 	const menuItemsByClientId = mapMenuItemsByClientId(
 		yield resolveMenuItems( menuId ),
@@ -228,7 +228,7 @@ function computeCustomizedAttribute( blocks, menuId, menuItemsByClientId ) {
  * @return {Function} Original callback wrapped in a serial execution context
  */
 function serializeProcessing( callback ) {
-	return function*( post ) {
+	return function* ( post ) {
 		const postId = post.id;
 		const isProcessing = yield isProcessingPost( postId );
 
