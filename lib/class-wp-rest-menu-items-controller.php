@@ -1010,28 +1010,20 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			if ( 'nav_menu' === $taxonomy->name ) {
 				$schema['properties'][ $base ]['type'] = 'integer';
 				unset( $schema['properties'][ $base ]['items'] );
+				$schema['properties'][ $base ]['arg_options'] = array(
+					'validate_callback' => static function ( $value ) {
+						// Check if nav menu is valid.
+						if ( ! is_nav_menu( absint( $value ) ) ) {
+							return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
+						}
+						return true;
+					},
+					'sanitize_callback' => static function ( $value ) {
+						return absint( $value );
+					},
+				);
 			}
 		}
-
-		$taxonomy = get_taxonomy( 'nav_menu' );
-		$base     = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
-		$schema['properties'][ $base ] = array(
-			'description' => __( 'Related menu ID.', 'gutenberg' ),
-			'context'     => array( 'view', 'edit' ),
-			'type'        => 'integer',
-			'arg_options' => array(
-				'validate_callback' => static function ( $value ) {
-					// Check if nav menu is valid.
-					if ( ! is_nav_menu( absint( $value ) ) ) {
-						return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
-					}
-					return true;
-				},
-				'sanitize_callback' => static function ( $value ) {
-					return absint( $value );
-				},
-			),
-		);
 
 		$schema['properties']['meta'] = $this->meta->get_field_schema();
 
