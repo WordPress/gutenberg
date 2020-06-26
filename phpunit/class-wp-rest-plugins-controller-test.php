@@ -11,7 +11,7 @@
  */
 class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
-	const BASE        = '/__experimental/plugins';
+	const BASE        = '/wp/v2/plugins';
 	const PLUGIN      = 'test-plugin/test-plugin';
 	const PLUGIN_FILE = self::PLUGIN . '.php';
 

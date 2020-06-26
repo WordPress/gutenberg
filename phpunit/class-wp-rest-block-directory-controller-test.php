@@ -28,12 +28,12 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 
-		$this->assertArrayHasKey( '/__experimental/block-directory/search', $routes );
+		$this->assertArrayHasKey( '/wp/v2/block-directory/search', $routes );
 	}
 
 	public function test_context_param() {
 		// Collection.
-		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/block-directory/search' );
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/block-directory/search' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
@@ -43,7 +43,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
 
-		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/block-directory/search' );
 		$request->set_query_params( array( 'term' => 'foo' ) );
 
 		$result = rest_do_request( $request );
@@ -54,7 +54,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 	public function test_get_items_wdotorg_unavailable() {
 		wp_set_current_user( self::$admin_id );
 
-		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/block-directory/search' );
 		$request->set_query_params( array( 'term' => 'foo' ) );
 
 		$this->prevent_requests_to_host( 'api.wordpress.org' );
@@ -65,7 +65,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 	}
 
 	public function test_get_items_logged_out() {
-		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/block-directory/search' );
 		$request->set_query_params( array( 'term' => 'foo' ) );
 		$response = rest_do_request( $request );
 		$this->assertErrorResponse( 'rest_block_directory_cannot_view', $response );
@@ -74,7 +74,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 	public function test_get_items_no_results() {
 		wp_set_current_user( self::$admin_id );
 
-		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/block-directory/search' );
 		$request->set_query_params( array( 'term' => '0c4549ee68f24eaaed46a49dc983ecde' ) );
 		$response = rest_do_request( $request );
 		$data     = $response->get_data();
@@ -104,7 +104,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 		wp_set_current_user( self::$admin_id );
 
 		// This will hit the live API. We're searching for `block` which should definitely return at least one result.
-		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/block-directory/search' );
 		$request->set_query_params( array( 'term' => 'block' ) );
 		$response = rest_do_request( $request );
 		$data     = $response->get_data();
@@ -131,7 +131,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 	public function test_get_item_schema() {
 		wp_set_current_user( self::$admin_id );
 
-		$request = new WP_REST_Request( 'OPTIONS', '/__experimental/block-directory/search' );
+		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/block-directory/search' );
 		$request->set_query_params( array( 'term' => 'foo' ) );
 		$response = rest_do_request( $request );
 		$data     = $response->get_data();
