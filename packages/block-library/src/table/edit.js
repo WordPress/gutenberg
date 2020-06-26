@@ -291,14 +291,21 @@ export class TableEdit extends Component {
 
 		const { attributes, setAttributes } = this.props;
 		const { sectionName, rowIndex } = selectedCell;
+		const newRowIndex = rowIndex + delta;
 
-		this.setState( { selectedCell: null } );
 		setAttributes(
 			insertRow( attributes, {
 				sectionName,
-				rowIndex: rowIndex + delta,
+				rowIndex: newRowIndex,
 			} )
 		);
+		// this just allows to be able to add more rows, by enabling the corresponding
+		// buttons. It needs to be revised when programmatically focus to RichText is handled
+		this.createOnFocus( {
+			sectionName,
+			rowIndex: newRowIndex,
+			columnIndex: 0,
+		} );
 	}
 
 	/**
@@ -346,13 +353,19 @@ export class TableEdit extends Component {
 
 		const { attributes, setAttributes } = this.props;
 		const { columnIndex } = selectedCell;
+		const newColumnIndex = columnIndex + delta;
 
-		this.setState( { selectedCell: null } );
 		setAttributes(
 			insertColumn( attributes, {
-				columnIndex: columnIndex + delta,
+				columnIndex: newColumnIndex,
 			} )
 		);
+		// this just allows to be able to add more rows, by enabling the corresponding
+		// buttons. It needs to be revised when programmatically focus to RichText is handled
+		this.createOnFocus( {
+			rowIndex: 0,
+			columnIndex: newColumnIndex,
+		} );
 	}
 
 	/**
