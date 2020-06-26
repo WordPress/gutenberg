@@ -399,25 +399,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$prepared_nav_item['menu-id'] = absint( $request[ $base ] );
 		}
 
-		// Check if object id exists before saving.
-		if ( ! $prepared_nav_item['menu-item-object'] ) {
-			// If taxonony, check if term exists.
-			if ( 'taxonomy' === $prepared_nav_item['menu-item-type'] ) {
-				$original = get_term( absint( $prepared_nav_item['menu-item-object-id'] ) );
-				if ( empty( $original ) || is_wp_error( $original ) ) {
-					return new WP_Error( 'rest_term_invalid_id', __( 'Invalid term ID.', 'gutenberg' ), array( 'status' => 400 ) );
-				}
-				$prepared_nav_item['menu-item-object'] = get_term_field( 'taxonomy', $original );
-				// If post, check if post object exists.
-			} elseif ( 'post_type' === $prepared_nav_item['menu-item-type'] ) {
-				$original = get_post( absint( $prepared_nav_item['menu-item-object-id'] ) );
-				if ( empty( $original ) ) {
-					return new WP_Error( 'rest_post_invalid_id', __( 'Invalid post ID.', 'gutenberg' ), array( 'status' => 400 ) );
-				}
-				$prepared_nav_item['menu-item-object'] = get_post_type( $original );
-			}
-		}
-
 		// If post type archive, check if post type exists.
 		if ( 'post_type_archive' === $prepared_nav_item['menu-item-type'] ) {
 			$post_type = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
@@ -879,6 +860,37 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'description' => __( 'The type of object originally represented, such as "category," "post", or "attachment."', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'string',
+			'default'     => '',
+			'arg_options' => array(
+				'validate_callback' => static function ( $value, $request ) {
+					// If taxonony, check if term exists.
+					if ( 'taxonomy' === $request['type'] ) {
+						$original = get_term( absint( $request['object_id'] ) );
+						if ( empty( $original ) || is_wp_error( $original ) ) {
+							return new WP_Error( 'rest_term_invalid_id', __( 'Invalid term ID.', 'gutenberg' ), array( 'status' => 400 ) );
+						}
+						// If post, check if post object exists.
+					} elseif ( 'post_type' === $request['type'] ) {
+						$original = get_post( absint( $request['object_id'] ) );
+						if ( empty( $original ) ) {
+							return new WP_Error( 'rest_post_invalid_id', __( 'Invalid post ID.', 'gutenberg' ), array( 'status' => 400 ) );
+						}
+					}
+					return true;
+				},
+
+				'sanitize_callback' => static function ( $value, $request ) {
+					// If taxonony, check if term exists.
+					if ( 'taxonomy' === $request['type'] ) {
+						$original = get_term( absint( $request['object_id'] ) );
+						return get_term_field( 'taxonomy', $original );
+						// If post, check if post object exists.
+					} elseif ( 'post_type' === $request['type'] ) {
+						$original = get_post( absint( $request['object_id'] ) );
+						return get_post_type( $original );
+					}
+				}
+			)
 		);
 
 		$schema['properties']['object_id'] = array(
@@ -887,7 +899,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'integer',
 			'minimum'     => 0,
-			'default'     => 0,
+			'default'     => 0
 		);
 
 		$schema['properties']['target'] = array(

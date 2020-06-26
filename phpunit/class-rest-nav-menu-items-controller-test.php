@@ -208,7 +208,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		);
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_term_invalid_id', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertEquals( 'Invalid term ID.', $response->get_data()['data']['params']['object'] );
 	}
 
 	/**
@@ -390,7 +391,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		);
 		$request->set_body_params( $params );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertEquals( 'Invalid post ID.', $response->get_data()['data']['params']['object'] );
 	}
 
 	/**
