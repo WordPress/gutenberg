@@ -1,9 +1,10 @@
-name: Linting
+name: Unit Tests
 
 on: push
 
 jobs:
-  build:
+  unit-js:
+    name: JavaScript Unit Tests
 
     runs-on: ubuntu-latest
 
@@ -29,25 +30,12 @@ jobs:
         node-version: 12.x
 
     - name: Npm install and build
-      # A "full" install is executed, since `npm ci` does not always exit
-      # with an error status code if the lock file is inaccurate.
-      #
-      # See: https://github.com/WordPress/gutenberg/issues/16157
+      # It's not necessary to run the full build, since Jest can interpret
+      # source files with `babel-jest`. Some packages have their own custom
+      # build tasks, however. These must be run.
       run: |
-        npm install
-        npm run build
+        npm ci
+        npx lerna run build
 
-    - name: Lint JavaScript and Styles
-      run: npm run lint
-
-    - name: Lint ES5 built files (IE11)
-      run: npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js
-
-    - name: Type checking
-      run: npm run build:package-types
-
-    - name: Build artifacts
-      run: npm run check-local-changes
-
-    - name: License compatibility
-      run: npm run check-licenses
+    - name: Running the tests
+      run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
