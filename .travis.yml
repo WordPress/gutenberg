@@ -65,27 +65,6 @@ install:
 
 jobs:
   include:
-    - name: JavaScript unit tests
-      env: INSTALL_WORDPRESS=false
-      install:
-        - npm ci
-        # It's not necessary to run the full build, since Jest can interpret
-        # source files with `babel-jest`. Some packages have their own custom
-        # build tasks, however. These must be run.
-        - npx lerna run build
-      script:
-        - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
-
-    - name: JavaScript native mobile tests
-      install:
-        - npm ci
-        # It's not necessary to run the full build, since Jest can interpret
-        # source files with `babel-jest`. Some packages have their own custom
-        # build tasks, however. These must be run.
-        - npx lerna run build
-      script:
-        - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
-
     - name: PHP unit tests
       script:
         - npm run test-php && npm run test-unit-php-multisite
