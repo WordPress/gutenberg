@@ -54,12 +54,7 @@ describe( 'Tooltip', () => {
 			expect( button.childAt( 1 ).name() ).toBe( 'Popover' );
 			expect( popover.prop( 'focusOnMount' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
-			expect(
-				popover
-					.children()
-					.first()
-					.text()
-			).toBe( 'Help text' );
+			expect( popover.children().first().text() ).toBe( 'Help text' );
 		} );
 
 		it( 'should show popover on focus', () => {

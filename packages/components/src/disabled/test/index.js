@@ -47,7 +47,7 @@ describe( 'Disabled', () => {
 
 	beforeAll( () => {
 		MutationObserver = window.MutationObserver;
-		window.MutationObserver = function() {};
+		window.MutationObserver = function () {};
 		window.MutationObserver.prototype = {
 			observe() {},
 			disconnect() {},
