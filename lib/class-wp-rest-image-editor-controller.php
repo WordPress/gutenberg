@@ -44,20 +44,20 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
 						'x'        => array(
-							'type'     => 'number',
-							'minimum'  => 0,
+							'type'    => 'number',
+							'minimum' => 0,
 						),
 						'y'        => array(
-							'type'     => 'number',
-							'minimum'  => 0,
+							'type'    => 'number',
+							'minimum' => 0,
 						),
 						'width'    => array(
-							'type'     => 'number',
-							'minimum'  => 1,
+							'type'    => 'number',
+							'minimum' => 1,
 						),
 						'height'   => array(
-							'type'     => 'number',
-							'minimum'  => 1,
+							'type'    => 'number',
+							'minimum' => 1,
 						),
 						'rotation' => array(
 							'type' => 'integer',

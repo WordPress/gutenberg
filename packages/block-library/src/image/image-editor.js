@@ -167,13 +167,8 @@ export default function ImageEditor( {
 		let attrs = {};
 
 		// The crop script may return some very small, sub-pixel values when the image was not cropped.
-		// Crop only when the cropping dimensions are changed by more than 0.1%.
-		if (
-			crop.x > 0.1 ||
-			crop.y > 0.1 ||
-			crop.width < 99.9 ||
-			crop.height < 99.9
-		) {
+		// Crop only when the new size has changed by more than 0.1%.
+		if ( crop.width < 99.9 || crop.height < 99.9 ) {
 			attrs = crop;
 		}
 
