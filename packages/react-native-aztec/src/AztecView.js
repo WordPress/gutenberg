@@ -162,11 +162,7 @@ class AztecView extends React.Component {
 
 	render() {
 		// eslint-disable-next-line no-unused-vars
-		const {
-			onActiveFormatsChange,
-			style,
-			...otherProps
-		} = this.props;
+		const { onActiveFormatsChange, style, ...otherProps } = this.props;
 
 		if ( style.hasOwnProperty( 'lineHeight' ) ) {
 			delete style.lineHeight;
