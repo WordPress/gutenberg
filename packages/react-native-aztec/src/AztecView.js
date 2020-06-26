@@ -162,11 +162,28 @@ class AztecView extends React.Component {
 
 	render() {
 		// eslint-disable-next-line no-unused-vars
-		const { onActiveFormatsChange, onFocus, ...otherProps } = this.props;
+		const {
+			onActiveFormatsChange,
+			style,
+			...otherProps
+		} = this.props;
+
+		if ( style.hasOwnProperty( 'lineHeight' ) ) {
+			delete style.lineHeight;
+			window.console.warn(
+				"Removing lineHeight style as it's not supported by native AztecView"
+			);
+			// IMPORTANT: Current Gutenberg implementation is supporting line-height without unit e.g. 'line-height':1.5
+			// and library which we are using to convert css to react-native requires unit to be included with dimension
+			// https://github.com/kristerkari/css-to-react-native-transform/blob/945866e84a505fdfb1a43b03ebe4bd32784a7f22/src/index.spec.js#L1234
+			// which means that we would need to patch the library if we want to support line-height from native AztecView in the future.
+		}
+
 		return (
 			<TouchableWithoutFeedback onPress={ this._onPress }>
 				<RCTAztecView
 					{ ...otherProps }
+					style={ style }
 					onContentSizeChange={ this._onContentSizeChange }
 					onHTMLContentWithCursor={ this._onHTMLContentWithCursor }
 					onSelectionChange={ this._onSelectionChange }
