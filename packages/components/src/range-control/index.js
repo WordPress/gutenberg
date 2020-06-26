@@ -198,6 +198,7 @@ function RangeControl(
 				>
 					<InputRange
 						{ ...props }
+						className="components-range-control__slider"
 						describedBy={ describedBy }
 						disabled={ disabled }
 						id={ id }

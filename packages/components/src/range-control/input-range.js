@@ -54,7 +54,6 @@ function InputRange(
 			aria-describedby={ describedBy }
 			aria-label={ label }
 			aria-hidden={ false }
-			className="components-range-control__slider"
 			onBlur={ onBlur }
 			onChange={ onChange }
 			onFocus={ onFocus }
