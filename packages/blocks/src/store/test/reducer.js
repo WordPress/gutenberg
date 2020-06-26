@@ -90,6 +90,39 @@ describe( 'blockStyles', () => {
 		} );
 	} );
 
+	it( 'should allow a new default block style to be assigned', () => {
+		const original = deepFreeze( {
+			'core/image': [ { name: 'posh', isDefault: true } ],
+		} );
+
+		let state = blockStyles( original, {
+			type: 'ADD_BLOCK_STYLES',
+			blockName: 'core/image',
+			styles: [ { name: 'fancy', isDefault: true } ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'fancy', isDefault: true },
+				{ name: 'posh', isDefault: false },
+			],
+		} );
+
+		state = blockStyles( state, {
+			type: 'ADD_BLOCK_STYLES',
+			blockName: 'core/image',
+			styles: [ { name: 'lightbox', isDefault: true } ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'lightbox', isDefault: true },
+				{ name: 'fancy', isDefault: false },
+				{ name: 'posh', isDefault: false },
+			],
+		} );
+	} );
+
 	it( 'should add block styles when adding a block', () => {
 		const original = deepFreeze( {
 			'core/image': [ { name: 'fancy' } ],
