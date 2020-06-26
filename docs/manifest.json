@@ -744,6 +744,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ComboboxControl",
+		"slug": "combobox-control",
+		"markdown_source": "../packages/components/src/combobox-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CustomSelectControl",
 		"slug": "custom-select-control",
 		"markdown_source": "../packages/components/src/custom-select-control/README.md",

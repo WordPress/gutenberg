@@ -8,10 +8,6 @@ import {
 	getEditedPostContent,
 	createJSONResponse,
 } from '@wordpress/e2e-test-utils';
-/**
- * Internal dependencies
- */
-import { useExperimentalFeatures } from '../../experimental-features';
 
 // Urls to mock
 const SEARCH_URLS = [
@@ -22,10 +18,8 @@ const SEARCH_URLS = [
 ];
 
 const INSTALL_URLS = [
-	'/__experimental/block-directory/install',
-	`rest_route=${ encodeURIComponent(
-		'/__experimental/block-directory/install'
-	) }`,
+	'/__experimental/plugins',
+	`rest_route=${ encodeURIComponent( '/__experimental/plugins' ) }`,
 ];
 
 // Example Blocks
@@ -175,8 +169,6 @@ const matchUrl = ( reqUrl, urls ) => {
 };
 
 describe( 'adding blocks from block directory', () => {
-	useExperimentalFeatures( [ '#gutenberg-block-directory' ] );
-
 	beforeEach( async () => {
 		await createNewPost();
 	} );

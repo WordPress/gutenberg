@@ -7,65 +7,17 @@ import { fromPairs } from 'lodash';
  * WordPress dependencies
  */
 import { useMemo, useCallback } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
-import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import BlockPreview from '../block-preview';
 import InserterPanel from './panel';
 import { searchItems } from './search-items';
 import InserterNoResults from './no-results';
 import usePatternsState from './hooks/use-patterns-state';
-
-function BlockPattern( { pattern, onClick } ) {
-	const { content, viewportWidth } = pattern;
-	const blocks = useMemo( () => parse( content ), [ content ] );
-
-	return (
-		<div
-			className="block-editor-inserter__patterns-item"
-			role="button"
-			onClick={ () => onClick( pattern, blocks ) }
-			onKeyDown={ ( event ) => {
-				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
-					onClick( pattern, blocks );
-				}
-			} }
-			tabIndex={ 0 }
-			aria-label={ pattern.title }
-		>
-			<BlockPreview blocks={ blocks } viewportWidth={ viewportWidth } />
-			<div className="block-editor-inserter__patterns-item-title">
-				{ pattern.title }
-			</div>
-		</div>
-	);
-}
-
-function BlockPatternPlaceholder() {
-	return (
-		<div className="block-editor-inserter__patterns-item is-placeholder" />
-	);
-}
-
-function BlockPatternList( { patterns, shownPatterns, onClickPattern } ) {
-	return patterns.map( ( pattern ) => {
-		const isShown = shownPatterns.includes( pattern );
-		return isShown ? (
-			<BlockPattern
-				key={ pattern.name }
-				pattern={ pattern }
-				onClick={ onClickPattern }
-			/>
-		) : (
-			<BlockPatternPlaceholder key={ pattern.name } />
-		);
-	} );
-}
+import BlockPatternList from '../block-patterns-list';
 
 function BlockPatternsSearchResults( { filterValue, onInsert } ) {
 	const [ patterns, , onClick ] = usePatternsState( onInsert );
@@ -81,7 +33,7 @@ function BlockPatternsSearchResults( { filterValue, onInsert } ) {
 			<InserterPanel title={ __( 'Search Results' ) }>
 				<BlockPatternList
 					shownPatterns={ currentShownPatterns }
-					patterns={ filteredPatterns }
+					blockPatterns={ filteredPatterns }
 					onClickPattern={ onClick }
 				/>
 			</InserterPanel>
@@ -147,7 +99,7 @@ function BlockPatternsPerCategories( { onInsert } ) {
 						>
 							<BlockPatternList
 								shownPatterns={ currentShownPatterns }
-								patterns={ categoryPatterns }
+								blockPatterns={ categoryPatterns }
 								onClickPattern={ onClick }
 							/>
 						</InserterPanel>
@@ -159,7 +111,7 @@ function BlockPatternsPerCategories( { onInsert } ) {
 				<InserterPanel title={ _x( 'Uncategorized' ) }>
 					<BlockPatternList
 						shownPatterns={ currentShownPatterns }
-						patterns={ uncategorizedPatterns }
+						blockPatterns={ uncategorizedPatterns }
 						onClickPattern={ onClick }
 					/>
 				</InserterPanel>
@@ -168,7 +120,7 @@ function BlockPatternsPerCategories( { onInsert } ) {
 	);
 }
 
-function BlockPatterns( { onInsert, filterValue } ) {
+function BlockPatternsTabs( { onInsert, filterValue } ) {
 	return filterValue ? (
 		<BlockPatternsSearchResults
 			onInsert={ onInsert }
@@ -179,4 +131,4 @@ function BlockPatterns( { onInsert, filterValue } ) {
 	);
 }
 
-export default BlockPatterns;
+export default BlockPatternsTabs;

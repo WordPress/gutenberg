@@ -70,14 +70,30 @@
 	.editor-post-saved-state,
 	.components-button.editor-post-switch-to-draft,
 	.components-button.editor-post-preview,
-	.components-button.block-editor-post-preview__dropdown,
-	.components-button.editor-post-publish-button,
-	.components-button.editor-post-publish-panel__toggle {
-		padding: 0 6px;
+	.components-button.block-editor-post-preview__dropdown {
+		padding: 0 #{ $grid-unit-15 / 2 };
 		margin-right: $grid-unit-05;
 
 		@include break-small() {
-			padding: 0 12px;
+			margin-right: $grid-unit-15;
+		}
+	}
+
+	.components-button.editor-post-save-draft,
+	.components-button.editor-post-switch-to-draft,
+	.components-button.editor-post-preview,
+	.components-button.block-editor-post-preview__button-toggle {
+		color: $dark-gray-primary;
+	}
+
+	.components-button.block-editor-post-preview__dropdown,
+	.components-button.editor-post-publish-button,
+	.components-button.editor-post-publish-panel__toggle {
+		padding: 0 #{ $grid-unit-15 / 2 };
+		margin-right: $grid-unit-05;
+
+		@include break-small() {
+			padding: 0 $grid-unit-15;
 			margin-right: $grid-unit-15;
 		}
 	}
