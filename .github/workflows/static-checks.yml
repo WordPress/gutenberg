@@ -1,9 +1,10 @@
-name: Linting
+name: Static Analysis (Linting, License, Type checks...)
 
 on: push
 
 jobs:
-  build:
+  check:
+    name: All
 
     runs-on: ubuntu-latest
 
