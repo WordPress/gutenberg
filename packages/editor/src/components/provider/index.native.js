@@ -1,6 +1,9 @@
 /**
  * External dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import RNReactNativeGutenbergBridge, {
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
@@ -9,7 +12,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
 	subscribeUpdateTheme,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 
 /**
  * WordPress dependencies

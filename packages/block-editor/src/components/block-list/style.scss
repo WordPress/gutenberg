@@ -178,6 +178,49 @@
 	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
 		box-shadow: 0 0 0 1px $light-gray-ui;
 	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		outline: $border-width-focus solid transparent;
+	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
+
+		&::before {
+			content: "";
+			position: absolute;
+			z-index: 0;
+			pointer-events: none;
+			transition:
+				border-color 0.1s linear,
+				border-style 0.1s linear,
+				box-shadow 0.1s linear;
+			right: 0;
+			left: 0;
+			top: -$default-block-margin / 2;
+			border-radius: $radius-block-ui;
+			border-top: 4px solid $light-gray-secondary;
+		}
+
+		&::after {
+			content: none;
+		}
+	}
+
+	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
+		&::before {
+			border-color: var(--wp-admin-theme-color);
+		}
+	}
+}
+
+
+.is-block-moving-mode.block-editor-block-list__block-selection-button {
+	// Should be invisible but not unfocusable.
+	opacity: 0;
+	font-size: 1px;
+	height: 1px;
+	padding: 0;
 }
 
 /**
@@ -485,13 +528,6 @@
 
 
 /**
- * Block Toolbar, top and contextual.
- */
-.block-editor-block-contextual-toolbar-wrapper {
-	padding-left: $block-toolbar-height; // Provide space for the mover control on full-wide items.
-}
-
-/**
  * Block Toolbar when contextual.
  */
 
@@ -547,10 +583,13 @@
 		.components-button.has-icon.block-editor-block-mover-button.block-editor-block-mover-button {
 			min-width: $button-size;
 			width: $button-size;
-			cursor: grab;
 
-			&:active {
-				cursor: grabbing;
+			[draggable="true"] & {
+				cursor: grab;
+
+				&:active {
+					cursor: grabbing;
+				}
 			}
 		}
 
@@ -607,9 +646,6 @@
 		box-shadow: 0 0 0 $border-width $dark-gray-primary;
 		border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 		background-color: $white;
-
-		// Indent to align with block toolbar.
-		margin-left: $block-toolbar-height + $border-width;
 
 		// When button is focused, it receives a box-shadow instead of the border.
 		&:focus {
@@ -677,12 +713,6 @@
 		.block-editor-block-list__block-selection-button,
 		.block-editor-block-contextual-toolbar {
 			margin-bottom: $grid-unit-15;
-			margin-left: - $block-toolbar-height;
-		}
-
-		.block-editor-block-contextual-toolbar[data-align="full"],
-		.block-editor-block-list__block-selection-button[data-align="full"] {
-			margin-left: 0;
 		}
 	}
 
