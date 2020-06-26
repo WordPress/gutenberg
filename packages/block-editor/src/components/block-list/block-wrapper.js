@@ -13,6 +13,7 @@ import {
 	useState,
 	useContext,
 	forwardRef,
+	createPortal,
 } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
@@ -27,6 +28,27 @@ import useMovingAnimation from '../use-moving-animation';
 import { Context, SetBlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
+import BlockDraggableChip from '../block-draggable/draggable-chip';
+
+function useOnLongPress( ref, timeout, callback, deps ) {
+	useEffect( () => {
+		let timeoutId;
+		const set = ( event ) => {
+			clearTimeout( timeoutId );
+			timeoutId = setTimeout( () => callback( event ), timeout );
+		};
+		const unset = () => {
+			clearTimeout( timeoutId );
+		};
+		ref.current.addEventListener( 'mousedown', set );
+		ref.current.addEventListener( 'mouseup', unset );
+		return () => {
+			ref.current.removeEventListener( 'mousedown', set );
+			ref.current.removeEventListener( 'mouseup', unset );
+			clearTimeout( timeoutId );
+		};
+	}, deps );
+}
 
 const BlockComponent = forwardRef(
 	(
@@ -235,6 +257,111 @@ const BlockComponent = forwardRef(
 			setHovered( false );
 		}
 
+		const [ isDraggging, setIsDragging ] = useState( false );
+		const container = useRef( document.createElement( 'div' ) );
+
+		useOnLongPress(
+			wrapper,
+			250,
+			() => {
+				if (
+					// isSelected is oudated.
+					! wrapper.current.classList.contains( 'is-selected' ) ||
+					! window.getSelection().isCollapsed
+				) {
+					return;
+				}
+
+				const cancel = () => {
+					window.removeEventListener( 'mouseup', cancel );
+					document.removeEventListener( 'selectionchange', cancel );
+
+					wrapper.current.style.transform = '';
+					wrapper.current.style.transition = '';
+				};
+
+				window.addEventListener( 'mouseup', cancel );
+				document.addEventListener( 'selectionchange', cancel );
+
+				wrapper.current.style.transform = 'scale(1.02)';
+				wrapper.current.style.transition = 'transform .75s ease-in-out';
+			},
+			[]
+		);
+
+		useOnLongPress(
+			wrapper,
+			1000,
+			( _event ) => {
+				wrapper.current.style.transform = '';
+				wrapper.current.style.transition = '';
+
+				if (
+					! wrapper.current.classList.contains( 'is-selected' ) ||
+					! window.getSelection().isCollapsed
+				) {
+					return;
+				}
+
+				const { parentNode } = wrapper.current;
+
+				setIsDragging( true );
+				wrapper.current.style.display = 'none';
+				window.getSelection().removeAllRanges();
+				parentNode.appendChild( container.current );
+				container.current.style.position = 'fixed';
+				container.current.style.pointerEvents = 'none';
+				container.current.style.left = _event.clientX - 20 + 'px';
+				container.current.style.top = _event.clientY + 20 + 'px';
+
+				const onMouseMove = ( event ) => {
+					const newEvent = new window.CustomEvent( 'dragover', {
+						bubbles: true,
+						detail: {
+							clientX: event.clientX,
+							clientY: event.clientY,
+						},
+					} );
+					window.dispatchEvent( newEvent );
+
+					container.current.style.left = event.clientX - 20 + 'px';
+					container.current.style.top = event.clientY + 20 + 'px';
+				};
+
+				const onMouseUp = ( event ) => {
+					window.removeEventListener( 'mousemove', onMouseMove );
+					window.removeEventListener( 'mouseup', onMouseUp );
+
+					setIsDragging( false );
+
+					const dataTransfer = new window.DataTransfer();
+					const data = {
+						type: 'block',
+						srcIndex: index,
+						srcClientId: clientId,
+						srcRootClientId: rootClientId || '',
+					};
+
+					dataTransfer.setData( 'text', JSON.stringify( data ) );
+
+					const newEvent = new window.DragEvent( 'drop', {
+						bubbles: true,
+						dataTransfer,
+					} );
+					event.target.dispatchEvent( newEvent );
+					parentNode.removeChild( container.current );
+
+					if ( wrapper.current ) {
+						wrapper.current.style.display = '';
+					}
+				};
+
+				window.addEventListener( 'mousemove', onMouseMove );
+				window.addEventListener( 'mouseup', onMouseUp );
+			},
+			[]
+		);
+
 		return (
 			// eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
 			<TagName
@@ -271,6 +398,11 @@ const BlockComponent = forwardRef(
 				} }
 			>
 				{ children }
+				{ isDraggging &&
+					createPortal(
+						<BlockDraggableChip clientIds={ [ clientId ] } />,
+						container.current
+					) }
 			</TagName>
 		);
 	}

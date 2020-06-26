@@ -59,6 +59,7 @@ class DropZoneProvider extends Component {
 
 		// Event listeners
 		this.onDragOver = this.onDragOver.bind( this );
+		this.onMouseUp = this.onMouseUp.bind( this );
 		this.onDrop = this.onDrop.bind( this );
 		// Context methods so this component can receive data from consumers
 		this.addDropZone = this.addDropZone.bind( this );
@@ -82,14 +83,19 @@ class DropZoneProvider extends Component {
 		};
 	}
 
+	onMouseUp() {
+		this.timeoutId = window.setTimeout( this.resetDragState );
+	}
+
 	componentDidMount() {
 		window.addEventListener( 'dragover', this.onDragOver );
-		window.addEventListener( 'mouseup', this.resetDragState );
+		window.addEventListener( 'mouseup', this.onMouseUp );
 	}
 
 	componentWillUnmount() {
 		window.removeEventListener( 'dragover', this.onDragOver );
-		window.removeEventListener( 'mouseup', this.resetDragState );
+		window.removeEventListener( 'mouseup', this.onMouseUp );
+		window.clearTimeout( this.timeoutId );
 	}
 
 	addDropZone( dropZone ) {
