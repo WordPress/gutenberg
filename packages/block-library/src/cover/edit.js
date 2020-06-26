@@ -174,6 +174,12 @@ function ResizableCover( {
 				setIsResizing( false );
 			} }
 			minHeight={ COVER_MIN_HEIGHT }
+			__experimentalShowTooltip={ true }
+			__experimentalTooltipProps={ {
+				axis: 'y',
+				position: 'bottom',
+				isVisible: isResizing,
+			} }
 			{ ...props }
 		/>
 	);
