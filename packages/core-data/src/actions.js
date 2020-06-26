@@ -142,11 +142,12 @@ export function receiveEmbedPreview( url, preview ) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string} kind      Kind of the deleted entity.
- * @param {string} name      Name of the deleted entity.
- * @param {string} recordId  Record Id of the entity to be deleted.
+ * @param {string} kind              Kind of the deleted entity.
+ * @param {string} name              Name of the deleted entity.
+ * @param {string} recordId          Record Id of the entity to be deleted.
+ * @param {string} deleteQueryParams Special query parameters for the DELETE API call. These parameters will be appended to the rest base with a '?' in front.
  */
-export function* deleteEntityRecord( kind, name, recordId ) {
+export function* deleteEntityRecord( kind, name, recordId, deleteQueryParams ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
@@ -156,8 +157,8 @@ export function* deleteEntityRecord( kind, name, recordId ) {
 	try {
 		let path = `${ entity.baseURL }/${ recordId }`;
 
-		if ( entity.forceDelete ) {
-			path += '?force=true';
+		if ( deleteQueryParams ) {
+			path += '?' + deleteQueryParams;
 		}
 
 		yield apiFetch( {
