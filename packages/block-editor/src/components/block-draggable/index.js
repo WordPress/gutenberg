@@ -26,10 +26,7 @@ const BlockDraggable = ( {
 				getBlockRootClientId,
 				getTemplateLock,
 			} = select( 'core/block-editor' );
-			const rootClientId =
-				clientIds.length === 1
-					? getBlockRootClientId( clientIds[ 0 ] )
-					: null;
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
@@ -37,7 +34,7 @@ const BlockDraggable = ( {
 			return {
 				index: getBlockIndex( clientIds[ 0 ], rootClientId ),
 				srcRootClientId: rootClientId,
-				isDraggable: clientIds.length === 1 && 'all' !== templateLock,
+				isDraggable: 'all' !== templateLock,
 			};
 		},
 		[ clientIds ]
@@ -72,7 +69,7 @@ const BlockDraggable = ( {
 	const transferData = {
 		type: 'block',
 		srcIndex: index,
-		srcClientId: clientIds[ 0 ],
+		srcClientIds: clientIds,
 		srcRootClientId,
 	};
 
