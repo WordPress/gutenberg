@@ -23,8 +23,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
-		$this->rest_base = '/image-editor/(?P<media_id>[\d]+)';
+		$this->namespace = 'wp/v2';
+		$this->rest_base = 'media';
 	}
 
 	/**
@@ -36,7 +36,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
-			$this->rest_base . '/apply',
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/edit',
 			array(
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
@@ -84,7 +84,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function permission_callback( $request ) {
-		if ( ! current_user_can( 'edit_post', $request['media_id'] ) ) {
+		if ( ! current_user_can( 'edit_post', $request['id'] ) ) {
 			$error = __( 'Sorry, you are not allowed to edit images.', 'gutenberg' );
 			return new WP_Error( 'rest_cannot_edit_image', $error, array( 'status' => rest_authorization_required_code() ) );
 		}
@@ -109,7 +109,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
 		$params        = $request->get_params();
-		$attachment_id = $params['media_id'];
+		$attachment_id = $params['id'];
 
 		// This also confirms the attachment is an image.
 		$image_file = wp_get_original_image_path( $attachment_id );

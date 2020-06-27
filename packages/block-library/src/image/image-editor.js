@@ -177,7 +177,7 @@ export default function ImageEditor( {
 		}
 
 		apiFetch( {
-			path: `__experimental/image-editor/${ id }/apply`,
+			path: `wp/v2/media/${ id }/edit`,
 			method: 'POST',
 			data: attrs,
 		} )
