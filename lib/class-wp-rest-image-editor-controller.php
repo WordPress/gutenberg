@@ -217,7 +217,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			'post_content'   => '',
 		);
 
-		$new_attachment_id = wp_insert_attachment( $attachment_post, $saved['path'], 0, true );
+		$new_attachment_id = wp_insert_attachment( wp_slash( $attachment_post ), $saved['path'], 0, true );
 
 		if ( is_wp_error( $new_attachment_id ) ) {
 			if ( 'db_update_error' === $new_attachment_id->get_error_code() ) {
