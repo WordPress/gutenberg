@@ -6,14 +6,15 @@ $z-layers: (
 	".block-editor-block-list__block::before": 0,
 	".block-editor-block-switcher__arrow": 1,
 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
-	".block-library-classic__toolbar": 10,
+	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
 	".block-editor-block-list__layout .reusable-block-indicator": 1,
-	".block-editor-block-list__breadcrumb": 22,
+	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
 	".components-panel__header.edit-post-sidebar__panel-tabs": -1,
 	".edit-post-sidebar .components-panel": -2,
 	".edit-post-text-editor__toolbar": 1,
 	".block-editor-inserter__tabs": 1,
+	".edit-post-sidebar__panel-tab.is-active": 1,
 	".block-editor-inserter__tab.is-active": 1,
 	".components-panel__header": 1,
 	".components-modal__header": 10,
@@ -39,8 +40,6 @@ $z-layers: (
 	// The draggable element should show up above the entire UI
 	".components-draggable__clone": 1000000000,
 
-	// Should have higher index than the inset/underlay used for dragging
-	".components-placeholder__fieldset": 1,
 	".block-editor-block-list__block .reusable-block-edit-panel *": 1,
 
 	// Show drop zone above most standard content, but below any overlays

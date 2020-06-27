@@ -7,10 +7,7 @@ import { InnerBlocks } from '@wordpress/block-editor';
 export default function TemplatePartInnerBlocks() {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		'wp_template_part',
-		{
-			initialEdits: { status: 'publish' },
-		}
+		'wp_template_part'
 	);
 	return (
 		<InnerBlocks

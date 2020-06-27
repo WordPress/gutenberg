@@ -1,7 +1,8 @@
 {
 	"name": "core/buttons",
-	"category": "layout",
+	"category": "design",
 	"supports": {
+		"anchor": true,
 		"align": true,
 		"alignWide": false,
 		"lightBlockWrapper": true

@@ -1,7 +1,7 @@
 {
 	"name": "core/query-pagination",
-	"category": "layout",
-	"context": [
+	"category": "design",
+	"usesContext": [
 		"queryId",
 		"query",
 		"queryContext"

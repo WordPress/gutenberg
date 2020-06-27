@@ -19,6 +19,7 @@ import {
 	ResizableBox,
 	ToggleControl,
 	withNotices,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -69,6 +70,8 @@ const INNER_BLOCKS_TEMPLATE = [
 		},
 	],
 ];
+
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -244,6 +247,7 @@ function CoverEdit( {
 		hasParallax,
 		minHeight,
 		minHeightUnit,
+		style: styleAttribute,
 		url,
 	} = attributes;
 	const {
@@ -298,21 +302,26 @@ function CoverEdit( {
 	const controls = (
 		<>
 			<BlockControls>
-				<BlockAlignmentMatrixToolbar
-					label={ __( 'Change content position' ) }
-					value={ contentPosition }
-					onChange={ ( nextPosition ) =>
-						setAttributes( { contentPosition: nextPosition } )
-					}
-				/>
 				{ hasBackground && (
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*,video/*"
-						onSelect={ onSelectMedia }
-					/>
+					<>
+						<BlockAlignmentMatrixToolbar
+							label={ __( 'Change content position' ) }
+							value={ contentPosition }
+							onChange={ ( nextPosition ) =>
+								setAttributes( {
+									contentPosition: nextPosition,
+								} )
+							}
+						/>
+
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ url }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="image/*,video/*"
+							onSelect={ onSelectMedia }
+						/>
+					</>
 				) }
 			</BlockControls>
 			<InspectorControls>
@@ -393,7 +402,7 @@ function CoverEdit( {
 						>
 							{ !! url && (
 								<RangeControl
-									label={ __( 'Background opacity' ) }
+									label={ __( 'Opacity' ) }
 									value={ dimRatio }
 									onChange={ ( newDimRation ) =>
 										setAttributes( {
@@ -471,6 +480,10 @@ function CoverEdit( {
 		<>
 			{ controls }
 			<Block.div className={ classes } data-url={ url } style={ style }>
+				<BoxControlVisualizer
+					values={ styleAttribute?.spacing?.padding }
+					showValues={ styleAttribute?.visualizers?.padding }
+				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
 					onResizeStart={ () => {

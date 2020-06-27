@@ -54,6 +54,11 @@ const createTemplatePart = async (
 ) => {
 	// Create new template part.
 	await insertBlock( 'Template Part' );
+	const [ createNewButton ] = await page.$x(
+		'//button[contains(text(), "Create new")]'
+	);
+	await createNewButton.click();
+	await page.keyboard.press( 'Tab' );
 	await page.keyboard.type( templatePartName );
 	await page.keyboard.press( 'Tab' );
 	await page.keyboard.type( themeName );
@@ -167,12 +172,6 @@ describe( 'Multi-entity editor states', () => {
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
 		await visitSiteEditor();
-		expect( await openEntitySavePanel() ).toBe( true );
-
-		await saveAllEntities();
-		await visitSiteEditor();
-
-		// Unable to open the save panel implies that no entities are dirty.
 		expect( await openEntitySavePanel() ).toBe( false );
 	} );
 

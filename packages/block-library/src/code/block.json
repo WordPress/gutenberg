@@ -1,6 +1,6 @@
 {
 	"name": "core/code",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"content": {
 			"type": "string",
@@ -9,6 +9,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"lightBlockWrapper": true
 	}

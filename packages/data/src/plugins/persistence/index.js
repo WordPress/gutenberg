@@ -181,7 +181,7 @@ function persistencePlugin( registry, pluginOptions ) {
 			// Load from persistence to use as initial state.
 			const persistedState = persistence.get()[ reducerKey ];
 			if ( persistedState !== undefined ) {
-				let initialState = options.reducer( undefined, {
+				let initialState = options.reducer( options.initialState, {
 					type: '@@WP/PERSISTENCE_RESTORE',
 				} );
 

@@ -43,7 +43,7 @@ figure.wp-block-gallery {
 	}
 
 	figure.is-selected {
-		box-shadow: 0 0 0 $border-width $white, 0 0 0 3px $theme-color;
+		box-shadow: 0 0 0 $border-width $white, 0 0 0 3px var(--wp-admin-theme-color);
 		border-radius: $radius-block-ui;
 		outline: 2px solid transparent;
 
@@ -121,11 +121,16 @@ figure.wp-block-gallery {
 	left: -2px;
 }
 
-.blocks-gallery-item__move-backward.components-button,
-.blocks-gallery-item__move-forward.components-button,
-.blocks-gallery-item__remove.components-button {
-	padding: 0;
+// Increases specificity
+// Resolves: https://github.com/WordPress/gutenberg/issues/23469
+.wp-block-gallery {
+	.blocks-gallery-item__move-backward.components-button,
+	.blocks-gallery-item__move-forward.components-button,
+	.blocks-gallery-item__remove.components-button {
+		padding: 0;
+	}
 }
+
 
 .blocks-gallery-item .components-spinner {
 	position: absolute;

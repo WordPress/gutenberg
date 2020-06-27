@@ -1,6 +1,6 @@
 {
 	"name": "core/group",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"tagName": {
 			"type": "string",
@@ -16,7 +16,8 @@
 		"html": false,
 		"lightBlockWrapper": true,
 		"__experimentalColor": {
-			"gradients": true
+			"gradients": true,
+			"linkColor": true
 		}
 	}
 }

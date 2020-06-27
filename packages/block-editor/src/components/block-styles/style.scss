@@ -16,14 +16,14 @@
 	flex-direction: column;
 
 	&:focus {
-		box-shadow: 0 0 0 $border-width-focus $theme-color;
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
 	}
 
 	&:hover .block-editor-block-styles__item-preview {
-		border-color: $theme-color;
+		border-color: var(--wp-admin-theme-color);
 	}
 
 	&.is-active {
@@ -41,7 +41,6 @@
 .block-editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
 	padding: 0;
-	border: $border-width solid rgba($dark-gray-primary, 0.2);
 	border-radius: $radius-block-ui;
 	display: flex;
 	overflow: hidden;
@@ -51,7 +50,11 @@
 	min-height: 80px;
 }
 
+.block-editor-block-switcher__styles__menugroup {
+	position: relative;
+}
+
 .block-editor-block-styles__item-label {
 	text-align: center;
-	padding: 4px 2px;
+	padding: 4px 0;
 }

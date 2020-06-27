@@ -9,7 +9,55 @@ import {
 	setUpResponseMocking,
 	clickBlockToolbarButton,
 	pressKeyWithModifier,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
+
+/**
+ * Internal dependencies
+ */
+import menuItemsFixture from './fixtures/menu-items-response-fixture.json';
+
+const menusFixture = [
+	{
+		name: 'Test Menu 1',
+		slug: 'test-menu-1',
+	},
+	{
+		name: 'Test Menu 2',
+		slug: 'test-menu-2',
+	},
+	{
+		name: 'Test Menu 3',
+		slug: 'test-menu-3',
+	},
+];
+
+// Matching against variations of the same URL encoded and non-encoded
+// produces the most reliable mocking.
+const REST_MENUS_ROUTES = [
+	'/__experimental/menus',
+	`rest_route=${ encodeURIComponent( '/__experimental/menus' ) }`,
+];
+const REST_MENU_ITEMS_ROUTES = [
+	'/__experimental/menu-items',
+	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
+];
+
+const REST_PAGES_ROUTES = [
+	'/wp/v2/pages',
+	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
+];
+
+/**
+ * Determines if a given URL matches any of a given collection of
+ * routes (extressed as substrings).
+ *
+ * @param {string} reqUrl the full URL to be tested for matches.
+ * @param {Array} routes array of strings to match against the URL.
+ */
+function matchUrlToRoute( reqUrl, routes ) {
+	return routes.some( ( route ) => reqUrl.includes( route ) );
+}
 
 async function mockPagesResponse( pages ) {
 	const mappedPages = pages.map( ( { title, slug }, index ) => ( {
@@ -25,11 +73,7 @@ async function mockPagesResponse( pages ) {
 	await setUpResponseMocking( [
 		{
 			match: ( request ) =>
-				request
-					.url()
-					.includes(
-						`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`
-					),
+				matchUrlToRoute( request.url(), REST_PAGES_ROUTES ),
 			onRequestMatch: createJSONResponse( mappedPages ),
 		},
 	] );
@@ -50,6 +94,56 @@ async function mockSearchResponse( items ) {
 				request.url().includes( `rest_route` ) &&
 				request.url().includes( `search` ),
 			onRequestMatch: createJSONResponse( mappedItems ),
+		},
+	] );
+}
+
+/**
+ * Creates mocked REST API responses for calls to menus and menu-items
+ * endpoints.
+ * Note: this needs to be within a single call to
+ * `setUpResponseMocking` as you can only setup response mocking once per test run.
+ *
+ * @param {Array} menus menus to provide as mocked responses to menus entity API requests.
+ * @param {Array} menuItems menu items to provide as mocked responses to menu-items entity API requests.
+ */
+async function mockAllMenusResponses(
+	menus = menusFixture,
+	menuItems = menuItemsFixture
+) {
+	const mappedMenus = menus.length
+		? menus.map( ( menu, index ) => ( {
+				...menu,
+				id: index + 1,
+		  } ) )
+		: [];
+
+	await setUpResponseMocking( [
+		{
+			match: ( request ) =>
+				matchUrlToRoute( request.url(), REST_MENUS_ROUTES ),
+			onRequestMatch: createJSONResponse( mappedMenus ),
+		},
+		{
+			match: ( request ) =>
+				matchUrlToRoute( request.url(), REST_MENU_ITEMS_ROUTES ),
+			onRequestMatch: createJSONResponse( menuItems ),
+		},
+	] );
+}
+
+async function mockEmptyMenusAndPagesResponses() {
+	const emptyResponse = [];
+	await setUpResponseMocking( [
+		{
+			match: ( request ) =>
+				matchUrlToRoute( request.url(), REST_MENUS_ROUTES ),
+			onRequestMatch: createJSONResponse( emptyResponse ),
+		},
+		{
+			match: ( request ) =>
+				matchUrlToRoute( request.url(), REST_PAGES_ROUTES ),
+			onRequestMatch: createJSONResponse( emptyResponse ),
 		},
 	] );
 }
@@ -79,7 +173,7 @@ async function mockCreatePageResponse( title, slug ) {
  *
  * @param {Object} link link object to be tested
  * @param {string} link.url What will be typed in the search input
- * @param {string} link.label What the resulting label will be in the creating Navigation Link Block after the block is created.
+ * @param {string} link.label What the resulting label will be in the creating Link Block after the block is created.
  * @param {string} link.type What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
  */
 async function updateActiveNavigationLink( { url, label, type } ) {
@@ -123,72 +217,220 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 	}
 }
 
+async function selectDropDownOption( optionText ) {
+	const buttonText = 'Select where to start from…';
+	await page.waitForXPath(
+		`//button[text()="${ buttonText }"][not(@disabled)]`
+	);
+	const [ dropdownToggle ] = await page.$x(
+		`//button[text()="${ buttonText }"][not(@disabled)]`
+	);
+	await dropdownToggle.click();
+
+	const [ theOption ] = await page.$x( `//li[text()="${ optionText }"]` );
+
+	await theOption.click();
+}
+
+async function clickCreateButton() {
+	const buttonText = 'Create';
+	// Wait for button to become available
+	await page.waitForXPath(
+		`//button[text()="${ buttonText }"][not(@disabled)]`
+	);
+
+	// Then locate...
+	const [ createNavigationButton ] = await page.$x(
+		`//button[text()="${ buttonText }"][not(@disabled)]`
+	);
+
+	// Then click
+	await createNavigationButton.click();
+}
+
+async function createEmptyNavBlock() {
+	await selectDropDownOption( 'Create empty menu' );
+	await clickCreateButton();
+}
+
+beforeEach( async () => {
+	await createNewPost();
+} );
+
+afterEach( async () => {
+	await setUpResponseMocking( [] );
+} );
 describe( 'Navigation', () => {
-	beforeEach( async () => {
-		await createNewPost();
+	describe( 'Creating from existing Pages', () => {
+		it( 'allows a navigation block to be created using existing pages', async () => {
+			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
+			// consistent and to test the feature more rigorously than the single default sample page.
+			await mockPagesResponse( [
+				{
+					title: 'Home',
+					slug: 'home',
+				},
+				{
+					title: 'About',
+					slug: 'about',
+				},
+				{
+					title: 'Contact Us',
+					slug: 'contact',
+				},
+			] );
+
+			// Add the navigation block.
+			await insertBlock( 'Navigation' );
+
+			await selectDropDownOption( 'New from all top-level pages' );
+
+			await clickCreateButton();
+
+			// Snapshot should contain the mocked pages.
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'does not display option to create from existing Pages if there are no Pages', async () => {
+			// Force no Pages or Menus to be returned by API responses.
+			await mockEmptyMenusAndPagesResponses();
+
+			// Add the navigation block.
+			await insertBlock( 'Navigation' );
+
+			const dropdownButtonText = 'Select where to start from…';
+			await page.waitForXPath(
+				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			);
+			const [ dropdownToggle ] = await page.$x(
+				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			);
+
+			await dropdownToggle.click();
+
+			const dropDownItemsLength = await page.$$eval(
+				'ul[role="listbox"] li[role="option"]',
+				( els ) => els.length
+			);
+
+			// Should only be showing
+			// 1. Placeholder value.
+			// 2. Create empty menu.
+			expect( dropDownItemsLength ).toEqual( 2 );
+
+			await page.waitForXPath( '//li[text()="Create empty menu"]' );
+
+			// Snapshot should contain the mocked menu items.
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
 	} );
 
-	afterEach( async () => {
-		await setUpResponseMocking( [] );
+	describe( 'Creating from existing Menus', () => {
+		it( 'allows a navigation block to be created from existing menus', async () => {
+			await mockAllMenusResponses();
+
+			// Add the navigation block.
+			await insertBlock( 'Navigation' );
+
+			await selectDropDownOption( 'Test Menu 2' );
+
+			await clickCreateButton();
+
+			// await page.waitFor( 50000000 );
+
+			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
+			// block previews.
+			const navBlockItemsLength = await page.$$eval(
+				'[aria-label="Content"][role="region"] li[aria-label="Block: Link"]',
+				( els ) => els.length
+			);
+
+			// Assert the correct number of Nav Link blocks were inserted.
+			expect( navBlockItemsLength ).toEqual( menuItemsFixture.length );
+
+			// Snapshot should contain the mocked menu items.
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'creates an empty navigation block when the selected existing menu is also empty', async () => {
+			// Force mock to return no Menus Items (empty menu)
+			const emptyMenuItems = [];
+			await mockAllMenusResponses( menusFixture, emptyMenuItems );
+
+			// Add the navigation block.
+			await insertBlock( 'Navigation' );
+
+			await selectDropDownOption( 'Test Menu 1' );
+
+			await clickCreateButton();
+
+			// Scope element selector to the "Editor content" as otherwise it picks up on
+			// Block Style live previews.
+			const navBlockItemsLength = await page.$$eval(
+				'[aria-label="Content"][role="region"] li[aria-label="Block: Link"]',
+				( els ) => els.length
+			);
+
+			// Assert an empty Nav Block is created.
+			// We expect 1 here because a "placeholder" Nav Item Block is automatically inserted
+			expect( navBlockItemsLength ).toEqual( 1 );
+
+			// Snapshot should contain the mocked menu items.
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'does not display option to create from existing menus if there are no menus', async () => {
+			// Force no Menus to be returned by API response.
+			await mockEmptyMenusAndPagesResponses();
+
+			// Add the navigation block.
+			await insertBlock( 'Navigation' );
+
+			const dropdownButtonText = 'Select where to start from…';
+			await page.waitForXPath(
+				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			);
+			const [ dropdownToggle ] = await page.$x(
+				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			);
+			await dropdownToggle.click();
+
+			const dropDownItemsLength = await page.$$eval(
+				'ul[role="listbox"] li[role="option"]',
+				( els ) => els.length
+			);
+
+			// Should only be showing
+			// 1. Placeholder.
+			// 2. Create from Empty.
+			expect( dropDownItemsLength ).toEqual( 2 );
+
+			await page.waitForXPath( '//li[text()="Create empty menu"]' );
+
+			// Snapshot should contain the mocked menu items.
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
 	} );
 
-	it( 'allows a navigation menu to be created using existing pages', async () => {
-		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
-		// consistent and to test the feature more rigorously than the single default sample page.
-		await mockPagesResponse( [
-			{
-				title: 'Home',
-				slug: 'home',
-			},
-			{
-				title: 'About',
-				slug: 'about',
-			},
-			{
-				title: 'Contact Us',
-				slug: 'contact',
-			},
-		] );
-
-		// Add the navigation block.
-		await insertBlock( 'Navigation' );
-
-		// Create an empty nav block. The 'create' button is disabled until pages are loaded,
-		// so we must wait for it to become not-disabled.
-		await page.waitForXPath(
-			'//button[text()="Create from all top-level pages"][not(@disabled)]'
-		);
-		const [ createFromExistingButton ] = await page.$x(
-			'//button[text()="Create from all top-level pages"][not(@disabled)]'
-		);
-		await createFromExistingButton.click();
-
-		// Snapshot should contain the mocked pages.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'allows a navigation menu to be created from an empty menu using a mixture of internal and external links', async () => {
+	it( 'allows an empty navigation block to be created and manually populated using a mixture of internal and external links', async () => {
 		// Add the navigation block.
 		await insertBlock( 'Navigation' );
 
 		// Create an empty nav block.
 		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-		const [ createEmptyButton ] = await page.$x(
-			'//button[text()="Create empty"]'
-		);
-		await createEmptyButton.click();
 
-		// Add a link to the default Navigation Link block.
+		await createEmptyNavBlock();
+
+		// Add a link to the default Link block.
 		await updateActiveNavigationLink( {
 			url: 'https://wordpress.org',
 			label: 'WP',
 			type: 'url',
 		} );
 
-		// Move the mouse to reveal the block movers. Without this the test seems to fail.
-		await page.mouse.move( 100, 100 );
+		await showBlockToolbar();
 
-		// Add another Navigation Link block.
+		// Add another Link block.
 		// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
 		// an issue where the block appender requires two clicks.
 		await page.click( '.wp-block-navigation .block-list-appender' );
@@ -228,14 +470,14 @@ describe( 'Navigation', () => {
 			{ title: 'Get in Touch', slug: 'get-in-touch' },
 		] );
 
-		// Add a link to the default Navigation Link block.
+		// Add a link to the default Link block.
 		await updateActiveNavigationLink( {
 			url: 'Get in Touch',
 			label: 'Contact',
 			type: 'entity',
 		} );
 
-		// Expect a Navigation Block with two Navigation Links in the snapshot.
+		// Expect a Navigation Block with two Links in the snapshot.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -257,11 +499,7 @@ describe( 'Navigation', () => {
 		await insertBlock( 'Navigation' );
 
 		// Create an empty nav block.
-		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-		const [ createEmptyButton ] = await page.$x(
-			'//button[text()="Create empty"]'
-		);
-		await createEmptyButton.click();
+		await createEmptyNavBlock();
 
 		// Wait for URL input to be focused
 		await page.waitForSelector(

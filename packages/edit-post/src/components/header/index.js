@@ -17,11 +17,7 @@ import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 
-function Header( {
-	onToggleInserter,
-	isInserterOpen,
-	setEntitiesSavedStatesCallback,
-} ) {
+function Header( { setEntitiesSavedStatesCallback } ) {
 	const { hasActiveMetaboxes, isPublishSidebarOpened, isSaving } = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
@@ -39,10 +35,7 @@ function Header( {
 				<FullscreenModeClose />
 			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
-				<HeaderToolbar
-					onToggleInserter={ onToggleInserter }
-					isInserterOpen={ isInserterOpen }
-				/>
+				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (

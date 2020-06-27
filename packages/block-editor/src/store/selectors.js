@@ -1203,6 +1203,22 @@ export const canInsertBlockType = createSelector(
 );
 
 /**
+ * Determines if the given blocks are allowed to be inserted into the block
+ * list.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientIds    The block client IDs to be inserted.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given blocks are allowed to be inserted.
+ */
+export function canInsertBlocks( state, clientIds, rootClientId = null ) {
+	return clientIds.every( ( id ) =>
+		canInsertBlockType( state, getBlockName( state, id ), rootClientId )
+	);
+}
+
+/**
  * Returns information about how recently and frequently a block has been inserted.
  *
  * @param {Object} state Global application state.
@@ -1578,6 +1594,17 @@ function getReusableBlocks( state ) {
  */
 export function isNavigationMode( state ) {
 	return state.isNavigationMode;
+}
+
+/**
+ * Returns whether block moving mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string}     Client Id of moving block.
+ */
+export function hasBlockMovingClientId( state ) {
+	return state.hasBlockMovingClientId;
 }
 
 /**

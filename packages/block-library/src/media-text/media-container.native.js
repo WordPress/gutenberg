@@ -7,15 +7,15 @@ import {
 	Text,
 	TouchableWithoutFeedback,
 } from 'react-native';
-import {
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
+import {
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
 import { Icon, Button, ToolbarGroup, withNotices } from '@wordpress/components';
 import {
 	BlockControls,

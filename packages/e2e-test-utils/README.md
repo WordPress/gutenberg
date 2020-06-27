@@ -30,7 +30,7 @@ Verifies if publish checks are enabled.
 
 _Returns_
 
--   `boolean`: Boolean which represents the state of prepublish checks.
+-   `Promise<boolean>`: Boolean which represents the state of prepublish checks.
 
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
@@ -106,7 +106,12 @@ Creates new post.
 
 _Parameters_
 
--   _obj_ `Object`: Object to create new post, along with tips enabling option.
+-   _object_ `Object`: Object to create new post, along with tips enabling option.
+-   _object.postType_ `[string]`: Post type of the new post.
+-   _object.title_ `[string]`: Title of the new post.
+-   _object.content_ `[string]`: Content of the new post.
+-   _object.excerpt_ `[string]`: Excerpt of the new post.
+-   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
 <a name="createURL" href="#createURL">#</a> **createURL**
 
@@ -485,6 +490,11 @@ If none of the mock settings match the request, the request is allowed to contin
 _Parameters_
 
 -   _mocks_ `Array`: Array of mock settings.
+
+<a name="showBlockToolbar" href="#showBlockToolbar">#</a> **showBlockToolbar**
+
+The block toolbar is not always visible while typing.
+Call this function to reveal it.
 
 <a name="switchEditorModeTo" href="#switchEditorModeTo">#</a> **switchEditorModeTo**
 

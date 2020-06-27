@@ -1,7 +1,7 @@
 {
 	"name": "core/post-content",
-	"category": "layout",
-	"context": [
+	"category": "design",
+	"usesContext": [
 		"postId",
 		"postType"
 	],

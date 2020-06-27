@@ -49,7 +49,6 @@ function Indicator( { clientId } ) {
 }
 
 export default function InsertionPoint( {
-	isMultiSelecting,
 	hasMultiSelection,
 	selectedBlockClientId,
 	children,
@@ -60,15 +59,20 @@ export default function InsertionPoint( {
 	const [ inserterElement, setInserterElement ] = useState( null );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
 	const ref = useRef();
-	const { multiSelectedBlockClientIds } = useSelect( ( select ) => {
-		const { getMultiSelectedBlockClientIds } = select(
-			'core/block-editor'
-		);
+	const { multiSelectedBlockClientIds, isMultiSelecting } = useSelect(
+		( select ) => {
+			const {
+				getMultiSelectedBlockClientIds,
+				isMultiSelecting: _isMultiSelecting,
+			} = select( 'core/block-editor' );
 
-		return {
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-		};
-	} );
+			return {
+				isMultiSelecting: _isMultiSelecting(),
+				multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+			};
+		},
+		[]
+	);
 
 	function onMouseMove( event ) {
 		if (
@@ -183,6 +187,7 @@ export default function InsertionPoint( {
 							<Inserter
 								position="bottom center"
 								clientId={ inserterClientId }
+								__experimentalIsQuick
 							/>
 						</div>
 					</div>

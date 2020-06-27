@@ -33,11 +33,25 @@ _Returns_
 
 <a name="documentHasTextSelection" href="#documentHasTextSelection">#</a> **documentHasTextSelection**
 
-Check whether the current document has selected text.
+Check whether the current document has selected text. This applies to ranges
+of text in the document, and not selection inside <input> and <textarea>
+elements.
+
+See: <https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects>.
 
 _Returns_
 
 -   `boolean`: True if there is selection, false if not.
+
+<a name="documentHasUncollapsedSelection" href="#documentHasUncollapsedSelection">#</a> **documentHasUncollapsedSelection**
+
+Check whether the current document has any sort of selection. This includes
+ranges of text across elements and any selection inside <input> and
+<textarea> elements.
+
+_Returns_
+
+-   `boolean`: Whether there is any sort of "selection" in the document.
 
 <a name="focus" href="#focus">#</a> **focus**
 
