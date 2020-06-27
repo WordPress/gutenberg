@@ -25,7 +25,7 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -188,10 +188,12 @@ export default function ImageEditor( {
 					height: height && width ? width / aspect : undefined,
 				} );
 			} )
-			.catch( () => {
+			.catch( ( error ) => {
 				createErrorNotice(
-					__(
-						'Unable to perform the image modification. Please check your media storage.'
+					sprintf(
+						/* translators: 1. Error message */
+						__( 'Could not edit image. %s' ),
+						error.message
 					),
 					{
 						id: 'image-editing-error',
