@@ -259,8 +259,10 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 
 		wp_update_attachment_metadata( $new_attachment_id, $new_image_meta );
 
-		$path     = '/wp/v2/media/' . $new_attachment_id;
-		$response = rest_do_request( $path );
+		$path        = '/wp/v2/media/' . $new_attachment_id;
+		$new_request = new WP_REST_Request( 'GET', $path );
+		$new_request->set_query_params( array( 'context' => 'edit' ) );
+		$response = rest_do_request( $new_request );
 
 		if ( ! $response->is_error() ) {
 			$response->set_status( 201 );
