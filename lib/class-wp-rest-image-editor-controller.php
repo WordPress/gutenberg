@@ -120,6 +120,16 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_unknown_attachment', $error, array( 'status' => 404 ) );
 		}
 
+		$supported_types = array( 'image/jpeg', 'image/png', 'image/gif' );
+		$mime_type       = get_post_mime_type( $request['id'] );
+		if ( ! in_array( $mime_type, $supported_types, true ) ) {
+			return new WP_Error(
+				'rest_cannot_edit_file_type',
+				__( 'Sorry, you are not allowed to edit file type.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
 		// Check if we need to do anything.
 		$rotate = 0;
 		$crop   = false;
