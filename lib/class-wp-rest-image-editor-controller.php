@@ -120,7 +120,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		}
 
 		$supported_types = array( 'image/jpeg', 'image/png', 'image/gif' );
-		$mime_type       = get_post_mime_type( $request['id'] );
+		$mime_type       = get_post_mime_type( $attachment_id );
 		if ( ! in_array( $mime_type, $supported_types, true ) ) {
 			return new WP_Error(
 				'rest_cannot_edit_file_type',
