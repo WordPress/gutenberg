@@ -108,8 +108,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function apply_edits( $request ) {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		$params        = $request->get_params();
-		$attachment_id = $params['id'];
+		$attachment_id = $request['id'];
 
 		// This also confirms the attachment is an image.
 		$image_file = wp_get_original_image_path( $attachment_id );
@@ -134,12 +133,12 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		$rotate = 0;
 		$crop   = false;
 
-		if ( ! empty( $params['rotation'] ) ) {
+		if ( ! empty( $request['rotation'] ) ) {
 			// Rotation direction: clockwise vs. counter clockwise.
-			$rotate = 0 - (int) $params['rotation'];
+			$rotate = 0 - (int) $request['rotation'];
 		}
 
-		if ( isset( $params['x'], $params['y'], $params['width'], $params['height'] ) ) {
+		if ( isset( $request['x'], $request['y'], $request['width'], $request['height'] ) ) {
 			$crop = true;
 		}
 
@@ -168,10 +167,10 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		if ( $crop ) {
 			$size = $image_editor->get_size();
 
-			$crop_x = round( ( $size['width'] * floatval( $params['x'] ) ) / 100.0 );
-			$crop_y = round( ( $size['height'] * floatval( $params['y'] ) ) / 100.0 );
-			$width  = round( ( $size['width'] * floatval( $params['width'] ) ) / 100.0 );
-			$height = round( ( $size['height'] * floatval( $params['height'] ) ) / 100.0 );
+			$crop_x = round( ( $size['width'] * floatval( $request['x'] ) ) / 100.0 );
+			$crop_y = round( ( $size['height'] * floatval( $request['y'] ) ) / 100.0 );
+			$width  = round( ( $size['width'] * floatval( $request['width'] ) ) / 100.0 );
+			$height = round( ( $size['height'] * floatval( $request['height'] ) ) / 100.0 );
 
 			$result = $image_editor->crop( $crop_x, $crop_y, $width, $height );
 
