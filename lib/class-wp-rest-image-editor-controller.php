@@ -89,6 +89,10 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_cannot_edit_image', $error, array( 'status' => rest_authorization_required_code() ) );
 		}
 
+		if ( ! current_user_can( 'upload_files' ) ) {
+			return new WP_Error( 'rest_cannot_edit_image', __( 'Sorry, you are not allowed to upload media on this site.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+		}
+
 		return true;
 	}
 
