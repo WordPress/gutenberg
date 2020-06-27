@@ -124,7 +124,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		if ( ! in_array( $mime_type, $supported_types, true ) ) {
 			return new WP_Error(
 				'rest_cannot_edit_file_type',
-				__( 'Sorry, you are not allowed to edit file type.', 'gutenberg' ),
+				__( 'This type of file cannot be edited.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
