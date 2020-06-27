@@ -1,6 +1,9 @@
 name: End-2-End Tests
 
-on: push
+on:
+  pull_request:
+  push:
+    branches: [master]
 
 jobs:
   admin-1:
