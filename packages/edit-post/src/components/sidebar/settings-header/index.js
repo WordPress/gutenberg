@@ -8,15 +8,14 @@ import { get } from 'lodash';
  */
 import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { withDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
-const SettingsHeader = ( {
-	openDocumentSettings,
-	openBlockSettings,
-	sidebarName,
-} ) => {
+const SettingsHeader = ( { sidebarName } ) => {
 	// translators: Label for the Block Settings Sidebar tab, not selected.
 	const blockLabel = __( 'Block' );
+
+	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
+
 	const documentLabel = useSelect( ( select ) => {
 		const currentPostType = select( 'core/editor' ).getCurrentPostType();
 		const postType = select( 'core' ).getPostType( currentPostType );
@@ -24,13 +23,11 @@ const SettingsHeader = ( {
 		// translators: Default ARIA label for the Document sidebar tab, not selected.
 		const defaultDocumentLabel = __( 'Document' );
 
-		return [ 'post', 'page' ].includes( currentPostType )
-			? defaultDocumentLabel
-			: get(
-					postType,
-					[ 'labels', 'singular_name' ],
-					defaultDocumentLabel
-			  );
+		return get(
+			postType,
+			[ 'labels', 'singular_name' ],
+			defaultDocumentLabel
+		);
 	} );
 
 	const [ documentAriaLabel, documentActiveClass ] =
@@ -50,7 +47,7 @@ const SettingsHeader = ( {
 		<ul>
 			<li>
 				<Button
-					onClick={ openDocumentSettings }
+					onClick={ () => openGeneralSidebar( 'edit-post/document' ) }
 					className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
 					aria-label={ documentAriaLabel }
 					data-label={ documentLabel }
@@ -60,7 +57,7 @@ const SettingsHeader = ( {
 			</li>
 			<li>
 				<Button
-					onClick={ openBlockSettings }
+					onClick={ () => openGeneralSidebar( 'edit-post/block' ) }
 					className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
 					aria-label={ blockAriaLabel }
 					data-label={ blockLabel }
@@ -72,14 +69,4 @@ const SettingsHeader = ( {
 	);
 };
 
-export default withDispatch( ( dispatch ) => {
-	const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-	return {
-		openDocumentSettings() {
-			openGeneralSidebar( 'edit-post/document' );
-		},
-		openBlockSettings() {
-			openGeneralSidebar( 'edit-post/block' );
-		},
-	};
-} )( SettingsHeader );
+export default SettingsHeader;
