@@ -1,7 +1,7 @@
 <?php
 /**
  * Start: Include for phase 2
- * REST API: WP_REST_Menus_Controller class
+ * REST API: WP_REST_Image_Editor_Controller class
  *
  * @package    WordPress
  * @subpackage REST_API
