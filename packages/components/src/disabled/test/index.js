@@ -65,11 +65,20 @@ describe( 'Disabled', () => {
 		</form>
 	);
 
+	// this is needed because TestUtils does not accept a stateless component.
+	class DisabledComponent extends Component {
+		render() {
+			const { children } = this.props;
+
+			return <Disabled>{ children }</Disabled>;
+		}
+	}
+
 	it( 'will disable all fields', () => {
 		const wrapper = TestUtils.renderIntoDocument(
-			<Disabled>
+			<DisabledComponent>
 				<Form />
-			</Disabled>
+			</DisabledComponent>
 		);
 
 		const input = TestUtils.findRenderedDOMComponentWithTag(
@@ -150,9 +159,9 @@ describe( 'Disabled', () => {
 
 		test( "lets components know that they're disabled via context", () => {
 			const wrapper = TestUtils.renderIntoDocument(
-				<Disabled>
+				<DisabledComponent>
 					<DisabledStatus />
-				</Disabled>
+				</DisabledComponent>
 			);
 			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
 				wrapper,
