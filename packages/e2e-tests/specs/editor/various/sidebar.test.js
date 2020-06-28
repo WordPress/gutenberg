@@ -10,11 +10,11 @@ import {
 	openDocumentSettingsSidebar,
 	pressKeyWithModifier,
 	setBrowserViewport,
+	getDocumentLabel,
 } from '@wordpress/e2e-test-utils';
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
 const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
-const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Document';
 
 describe( 'Sidebar', () => {
 	afterEach( () => {
@@ -26,6 +26,7 @@ describe( 'Sidebar', () => {
 		await clearLocalStorage();
 		await createNewPost();
 		await enableFocusLossObservation();
+		const documentLabel = await getDocumentLabel();
 		const { nodesCount, content, height, width } = await page.$$eval(
 			ACTIVE_SIDEBAR_TAB_SELECTOR,
 			( nodes ) => {
@@ -43,7 +44,7 @@ describe( 'Sidebar', () => {
 		expect( nodesCount ).toBe( 1 );
 
 		// the active sidebar tab should be document.
-		expect( content ).toBe( ACTIVE_SIDEBAR_BUTTON_TEXT );
+		expect( content ).toBe( documentLabel );
 
 		// the active sidebar tab should be visible
 		expect( width ).toBeGreaterThan( 10 );
@@ -99,12 +100,14 @@ describe( 'Sidebar', () => {
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 
-		// Tab lands at first (presumed selected) option "Document".
+		// Tab lands at first (presumed selected) option i.e., document label (Post, Page etc.).
 		await page.keyboard.press( 'Tab' );
+		const documentLabel = await getDocumentLabel();
 		const isActiveDocumentTab = await page.evaluate(
-			() =>
-				document.activeElement.textContent === 'Document' &&
-				document.activeElement.classList.contains( 'is-active' )
+			( label ) =>
+				document.activeElement.textContent === label &&
+				document.activeElement.classList.contains( 'is-active' ),
+			documentLabel
 		);
 		expect( isActiveDocumentTab ).toBe( true );
 

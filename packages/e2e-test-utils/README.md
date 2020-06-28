@@ -253,6 +253,18 @@ _Returns_
 
 -   `Promise`: Promise resolving with a string containing the block title.
 
+<a name="getCurrentPostType" href="#getCurrentPostType">#</a> **getCurrentPostType**
+
+Returns a promise which resolves with the current post type name.
+
+_Returns_
+
+-   `Promise`: Promise resolving with current post type name.
+
+<a name="getDocumentLabel" href="#getDocumentLabel">#</a> **getDocumentLabel**
+
+Undocumented declaration.
+
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
 Returns a promise which resolves with the edited post content (HTML string).
@@ -275,6 +287,18 @@ _Related_
 _Returns_
 
 -   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
+
+<a name="getPostType" href="#getPostType">#</a> **getPostType**
+
+Returns a promise which resolves with the post type object for the given post type name.
+
+_Parameters_
+
+-   _name_ `string`: Name of the post type.
+
+_Returns_
+
+-   `Promise`: Promise resolving with post type object.
 
 <a name="hasBlockSwitcher" href="#hasBlockSwitcher">#</a> **hasBlockSwitcher**
 

@@ -10,6 +10,7 @@ export { createNewPost } from './create-new-post';
 export { createURL } from './create-url';
 export { deactivatePlugin } from './deactivate-plugin';
 export { disablePrePublishChecks } from './disable-pre-publish-checks';
+export { getDocumentLabel } from './document-label';
 export { dragAndResize } from './drag-and-resize';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';
 export { enablePrePublishChecks } from './enable-pre-publish-checks';
@@ -41,6 +42,7 @@ export {
 } from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
+export { getCurrentPostType, getPostType } from './post-type';
 export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';
 export { publishPost } from './publish-post';
