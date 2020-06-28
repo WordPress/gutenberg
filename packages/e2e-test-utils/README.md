@@ -263,7 +263,11 @@ _Returns_
 
 <a name="getDocumentLabel" href="#getDocumentLabel">#</a> **getDocumentLabel**
 
-Undocumented declaration.
+Get Document settings tab label in sidebar.
+
+_Returns_
+
+-   `string`: Label string for Document settings tab in sidebar.
 
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
