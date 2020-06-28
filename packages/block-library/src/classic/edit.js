@@ -111,6 +111,7 @@ export default class ClassicEdit extends Component {
 			editor.once( 'focus', () => {
 				if ( bookmark ) {
 					editor.selection.moveToBookmark( bookmark );
+					editor.selection.getNode().scrollIntoView( false );
 				}
 			} );
 
