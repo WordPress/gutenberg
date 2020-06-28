@@ -259,7 +259,7 @@ Returns a promise which resolves with the current post type name.
 
 _Returns_
 
--   `Promise`: Promise resolving with current post type name.
+-   `Promise<?string>`: Promise resolving with current post type name.
 
 <a name="getDocumentLabel" href="#getDocumentLabel">#</a> **getDocumentLabel**
 
@@ -302,7 +302,7 @@ _Parameters_
 
 _Returns_
 
--   `Promise`: Promise resolving with post type object.
+-   `Promise<?Object>`: Promise resolving with post type object.
 
 <a name="hasBlockSwitcher" href="#hasBlockSwitcher">#</a> **hasBlockSwitcher**
 
