@@ -258,18 +258,16 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$response->header( 'Location', rest_url( $path ) );
 		}
 
-		$attachment    = get_post( $new_attachment_id );
 
 		/**
 		 * Fires after a single attachment updated via the REST API.
 		 *
 		 * @since 5.5.0
 		 *
-		 * @param WP_Post          $attachment Updated attachment object.
-		 * @param WP_REST_Response $response   The response data.
-		 * @param WP_REST_Request  $request    The request sent to the API.
+		 * @param int  $new_attachment_id ID of new attachment object.
+		 * @param int  $attachment_id ID of original attachment object.
 		 */
-		do_action( 'rest_after_edit_attachment', $attachment, $response, $request );
+		do_action( 'rest_after_edit_attachment', $new_attachment_id, $attachment_id );
 
 		return $response;
 	}
