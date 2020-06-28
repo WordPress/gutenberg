@@ -7,46 +7,50 @@ import { clamp } from 'lodash';
  * Parses and retrieves a number value.
  *
  * @param {any} value The incoming value.
+ *
  * @return {number} The parsed number value.
  */
-function getNumberValue( value ) {
+export function getNumber( value ) {
 	const number = Number( value );
 
 	return isNaN( number ) ? 0 : number;
 }
 
 /**
- * Parses a value to safely store value state.
- *
- * @param {any} value The incoming value.
- * @return {number} The parsed number value.
- */
-export function getValue( value ) {
-	const parsedValue = parseFloat( value );
-
-	return isNaN( parsedValue ) ? value : parsedValue;
-}
-
-/**
  * Safely adds 2 values.
  *
- * @param {any} a First value.
- * @param {any} b Second value.
- * @return {number} The sum of the 2 values.
+ * @param {number|string} args Values to add together.
+ *
+ * @return {number} The sum of values.
  */
-export function add( a, b ) {
-	return getNumberValue( a ) + getNumberValue( b );
+export function add( ...args ) {
+	return args.reduce( ( sum, arg ) => sum + getNumber( arg ), 0 );
 }
 
 /**
  * Safely subtracts 2 values.
  *
- * @param {any} a First value.
- * @param {any} b Second value.
+ * @param {number|string} args Values to subtract together.
+ *
  * @return {number} The difference of the 2 values.
  */
-export function subtract( a, b ) {
-	return getNumberValue( a ) - getNumberValue( b );
+export function subtract( ...args ) {
+	return args.reduce( ( diff, arg, index ) => {
+		const value = getNumber( arg );
+		return index === 0 ? value : diff - value;
+	} );
+}
+
+/**
+ * Determines the decimal position of a number value.
+ *
+ * @param {number} value The number to evaluate.
+ *
+ * @return {number} The number of decimal places.
+ */
+function getPrecision( value ) {
+	const split = ( value + '' ).split( '.' );
+	return split[ 1 ] !== undefined ? split[ 1 ].length : 0;
 }
 
 /**
@@ -56,6 +60,7 @@ export function subtract( a, b ) {
  * @param {number} min The minimum range.
  * @param {number} max The maximum range.
  * @param {number} step A multiplier for the value.
+ *
  * @return {number} The rounded and clamped value.
  */
 export function roundClamp(
@@ -64,12 +69,15 @@ export function roundClamp(
 	max = Infinity,
 	step = 1
 ) {
-	const baseValue = getNumberValue( value );
-	const stepValue = getNumberValue( step );
+	const baseValue = getNumber( value );
+	const stepValue = getNumber( step );
+	const precision = getPrecision( step );
 	const rounded = Math.round( baseValue / stepValue ) * stepValue;
 	const clampedValue = clamp( rounded, min, max );
 
-	return clampedValue;
+	return precision
+		? getNumber( clampedValue.toFixed( precision ) )
+		: clampedValue;
 }
 
 /**
@@ -81,6 +89,7 @@ export function roundClamp(
  * @property {number} min The minimum range.
  * @property {number} max The maximum range.
  * @property {number} step A multiplier for the value.
+ *
  * @return {string} The rounded and clamped value.
  */
 export function roundClampString( ...args ) {

@@ -39,10 +39,9 @@ const defaultInputProps = {
 };
 
 function useUniqueId( idProp ) {
-	const instanceId = useInstanceId( BoxControl );
-	const id = `inspector-box-control-${ instanceId }`;
+	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
 
-	return idProp || id;
+	return idProp || instanceId;
 }
 export default function BoxControl( {
 	id: idProp,
