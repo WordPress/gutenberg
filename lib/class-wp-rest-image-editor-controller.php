@@ -248,6 +248,17 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			'file'          => _wp_relative_upload_path( $image_file ),
 		);
 
+		/**
+		 * Filters the updated attachment meta data.
+		 *
+		 * @since 5.5.0
+		 *
+		 * @param array $data              Array of updated attachment meta data.
+		 * @param int   $new_attachment_id Attachment post ID.
+		 * @param int   $attachment_id     Original Attachment post ID.
+		 */
+		$new_image_meta = apply_filters( 'wp_edited_attachment_metadata', $new_image_meta, $new_attachment_id, $attachment_id );
+
 		wp_update_attachment_metadata( $new_attachment_id, $new_image_meta );
 
 		$path     = '/wp/v2/media/' . $new_attachment_id;
@@ -257,17 +268,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$response->set_status( 201 );
 			$response->header( 'Location', rest_url( $path ) );
 		}
-
-
-		/**
-		 * Fires after a single attachment updated via the REST API.
-		 *
-		 * @since 5.5.0
-		 *
-		 * @param int  $new_attachment_id ID of new attachment object.
-		 * @param int  $attachment_id ID of original attachment object.
-		 */
-		do_action( 'rest_after_edit_attachment', $new_attachment_id, $attachment_id );
 
 		return $response;
 	}
