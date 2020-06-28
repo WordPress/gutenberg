@@ -1,7 +1,7 @@
 <?php
 /**
  * Start: Include for phase 2
- * REST API: WP_REST_Menus_Controller class
+ * REST API: WP_REST_Image_Editor_Controller class
  *
  * @package    WordPress
  * @subpackage REST_API
@@ -23,8 +23,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
-		$this->rest_base = '/image-editor/(?P<media_id>[\d]+)';
+		$this->namespace = 'wp/v2';
+		$this->rest_base = 'media';
 	}
 
 	/**
@@ -36,7 +36,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
-			$this->rest_base . '/apply',
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/edit',
 			array(
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
@@ -84,7 +84,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function permission_callback( $request ) {
-		if ( ! current_user_can( 'edit_post', $request['media_id'] ) ) {
+		if ( ! current_user_can( 'edit_post', $request['id'] ) ) {
 			$error = __( 'Sorry, you are not allowed to edit images.', 'gutenberg' );
 			return new WP_Error( 'rest_cannot_edit_image', $error, array( 'status' => rest_authorization_required_code() ) );
 		}
@@ -108,8 +108,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function apply_edits( $request ) {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		$params        = $request->get_params();
-		$attachment_id = $params['media_id'];
+		$attachment_id = $request['id'];
 
 		// This also confirms the attachment is an image.
 		$image_file = wp_get_original_image_path( $attachment_id );
@@ -120,16 +119,26 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_unknown_attachment', $error, array( 'status' => 404 ) );
 		}
 
+		$supported_types = array( 'image/jpeg', 'image/png', 'image/gif' );
+		$mime_type       = get_post_mime_type( $attachment_id );
+		if ( ! in_array( $mime_type, $supported_types, true ) ) {
+			return new WP_Error(
+				'rest_cannot_edit_file_type',
+				__( 'This type of file cannot be edited.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
 		// Check if we need to do anything.
 		$rotate = 0;
 		$crop   = false;
 
-		if ( ! empty( $params['rotation'] ) ) {
+		if ( ! empty( $request['rotation'] ) ) {
 			// Rotation direction: clockwise vs. counter clockwise.
-			$rotate = 0 - (int) $params['rotation'];
+			$rotate = 0 - (int) $request['rotation'];
 		}
 
-		if ( isset( $params['x'], $params['y'], $params['width'], $params['height'] ) ) {
+		if ( isset( $request['x'], $request['y'], $request['width'], $request['height'] ) ) {
 			$crop = true;
 		}
 
@@ -158,10 +167,10 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		if ( $crop ) {
 			$size = $image_editor->get_size();
 
-			$crop_x = round( ( $size['width'] * floatval( $params['x'] ) ) / 100.0 );
-			$crop_y = round( ( $size['height'] * floatval( $params['y'] ) ) / 100.0 );
-			$width  = round( ( $size['width'] * floatval( $params['width'] ) ) / 100.0 );
-			$height = round( ( $size['height'] * floatval( $params['height'] ) ) / 100.0 );
+			$crop_x = round( ( $size['width'] * floatval( $request['x'] ) ) / 100.0 );
+			$crop_y = round( ( $size['height'] * floatval( $request['y'] ) ) / 100.0 );
+			$width  = round( ( $size['width'] * floatval( $request['width'] ) ) / 100.0 );
+			$height = round( ( $size['height'] * floatval( $request['height'] ) ) / 100.0 );
 
 			$result = $image_editor->crop( $crop_x, $crop_y, $width, $height );
 
@@ -208,7 +217,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			'post_content'   => '',
 		);
 
-		$new_attachment_id = wp_insert_attachment( $attachment_post, $saved['path'], 0, true );
+		$new_attachment_id = wp_insert_attachment( wp_slash( $attachment_post ), $saved['path'], 0, true );
 
 		if ( is_wp_error( $new_attachment_id ) ) {
 			if ( 'db_update_error' === $new_attachment_id->get_error_code() ) {
@@ -250,8 +259,10 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 
 		wp_update_attachment_metadata( $new_attachment_id, $new_image_meta );
 
-		$path     = '/wp/v2/media/' . $new_attachment_id;
-		$response = rest_do_request( $path );
+		$path        = '/wp/v2/media/' . $new_attachment_id;
+		$new_request = new WP_REST_Request( 'GET', $path );
+		$new_request->set_query_params( array( 'context' => 'edit' ) );
+		$response = rest_do_request( $new_request );
 
 		if ( ! $response->is_error() ) {
 			$response->set_status( 201 );
