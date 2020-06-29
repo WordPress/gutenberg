@@ -145,9 +145,9 @@ export function receiveEmbedPreview( url, preview ) {
  * @param {string} kind              Kind of the deleted entity.
  * @param {string} name              Name of the deleted entity.
  * @param {string} recordId          Record Id of the entity to be deleted.
- * @param {string} deleteQueryParams Special query parameters for the DELETE API call. These parameters will be appended to the rest base with a '?' in front.
+ * @param {string} query Special query parameters for the DELETE API call. These parameters will be appended to the rest base with a '?' in front.
  */
-export function* deleteEntityRecord( kind, name, recordId, deleteQueryParams ) {
+export function* deleteEntityRecord( kind, name, recordId, query ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
@@ -157,8 +157,8 @@ export function* deleteEntityRecord( kind, name, recordId, deleteQueryParams ) {
 	try {
 		let path = `${ entity.baseURL }/${ recordId }`;
 
-		if ( deleteQueryParams ) {
-			path += '?' + deleteQueryParams;
+		if ( query ) {
+			path += '?' + query;
 		}
 
 		yield apiFetch( {
