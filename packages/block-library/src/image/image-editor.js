@@ -171,10 +171,17 @@ export default function ImageEditor( {
 
 		const newCrop = convertCropCoordinateSystem( rotation, size, crop );
 
-		const attrs = {
-			...newCrop,
-			rotation,
-		};
+		let attrs = {};
+
+		// The crop script may return some very small, sub-pixel values when the image was not cropped.
+		// Crop only when the new size has changed by more than 0.1%.
+		if ( newCrop.width < 99.9 || newCrop.height < 99.9 ) {
+			attrs = newCrop;
+		}
+
+		if ( rotation > 0 ) {
+			attrs.rotation = rotation;
+		}
 
 		apiFetch( {
 			path: `wp/v2/media/${ id }/edit`,
