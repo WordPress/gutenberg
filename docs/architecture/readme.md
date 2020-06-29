@@ -2,6 +2,7 @@
 
 This living document serves as a high-level documentation to explain the conceptual choices and tool choices in the Gutenberg repository.
 
+- [Understand the repository folder structure](/docs/architecture/folder-structure.md).
 - [Modularity and WordPress Packages](/docs/architecture/modularity.md).
 - [Block Editor Performance](/docs/architecture/performance.md).
 - What are the decision decisions behind the Data Module?
