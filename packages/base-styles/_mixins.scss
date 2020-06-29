@@ -451,6 +451,10 @@
 		@include admin-scheme(#0085ba);
 	}
 
+	body.admin-color-modern {
+		@include admin-scheme(#3858e9);
+	}
+
 	body.admin-color-blue {
 		@include admin-scheme(#096484);
 	}
