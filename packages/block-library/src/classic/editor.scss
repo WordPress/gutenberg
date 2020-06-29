@@ -1,4 +1,5 @@
 .wp-block-freeform.block-library-rich-text__tinymce {
+	height: auto; /* Allow height of embed iframes to be calculated properly */
 	p,
 	li {
 		line-height: $editor-line-height;
