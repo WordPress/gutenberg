@@ -152,6 +152,7 @@ function ColumnsEditContainer( {
 							columnCount === 1 ? onDeleteBlock : undefined
 						}
 						contentStyle={ contentStyle }
+						parentWidth={ width }
 					/>
 				) }
 			</View>

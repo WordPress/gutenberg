@@ -12,22 +12,26 @@ import {
 	InnerBlocks,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
+	InspectorControls,
 } from '@wordpress/block-editor';
+import { PanelBody, RangeControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
 
 function ColumnEdit( {
-	attributes,
+	attributes: { verticalAlignment, width },
 	setAttributes,
 	hasChildren,
 	isSelected,
 	getStylesFromColorScheme,
 	isParentSelected,
 	contentStyle,
+	parentWidth,
 } ) {
-	const { verticalAlignment } = attributes;
+	const hasWidth = Number.isFinite( width );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -44,6 +48,11 @@ function ColumnEdit( {
 						),
 					contentStyle,
 					styles.columnPlaceholderNotSelected,
+					hasWidth && {
+						width: parentWidth * ( width / 100 ),
+						maxWidth: parentWidth,
+						minWidth: 36,
+					},
 				] }
 			></View>
 		);
@@ -57,10 +66,32 @@ function ColumnEdit( {
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Column settings' ) }>
+					<RangeControl
+						label={ __( 'Percentage width' ) }
+						min={ 1 }
+						max={ 100 }
+						step={ 0.1 }
+						value={ width || 50 }
+						onChange={ ( nextWidth ) => {
+							setAttributes( {
+								width: Number( nextWidth.toFixed( 1 ) ),
+							} );
+						} }
+						toFixed={ 1 }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<View
 				style={ [
 					contentStyle,
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
+					hasWidth && {
+						width: parentWidth * ( width / 100 ),
+						maxWidth: parentWidth,
+						minWidth: 36,
+					},
 				] }
 			>
 				<InnerBlocks
