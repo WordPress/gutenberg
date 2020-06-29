@@ -6,6 +6,7 @@ import UIKit
 class RCTAztecView: Aztec.TextView {
     @objc var onBackspace: RCTBubblingEventBlock? = nil
     @objc var onChange: RCTBubblingEventBlock? = nil
+    @objc var onKeyDown: RCTBubblingEventBlock? = nil
     @objc var onEnter: RCTBubblingEventBlock? = nil
     @objc var onFocus: RCTBubblingEventBlock? = nil
     @objc var onBlur: RCTBubblingEventBlock? = nil
@@ -14,6 +15,7 @@ class RCTAztecView: Aztec.TextView {
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
     @objc var minWidth: CGFloat = 0
     @objc var maxWidth: CGFloat = 0
+    @objc var triggerKeyCodes: NSArray?
 
     @objc var activeFormats: NSSet? = nil {
         didSet {
@@ -304,7 +306,7 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Edits
 
     open override func insertText(_ text: String) {
-        guard !interceptEnter(text) else {
+        guard !interceptEnter(text), !interceptTriggersKeyCodes(text) else {
             return
         }
 
@@ -342,12 +344,13 @@ class RCTAztecView: Aztec.TextView {
         }
 
         guard text == "\n",
-            let onEnter = onEnter else {
+            let onKeyDown = onKeyDown else {
                 return false
         }
 
-        let caretData = packCaretDataForRN()
-        onEnter(caretData)
+        var eventData = packCaretDataForRN()
+        eventData = add(keyTrigger: "\r", to: eventData)
+        onKeyDown(eventData)
         return true
     }
 
@@ -356,17 +359,43 @@ class RCTAztecView: Aztec.TextView {
             || (selectedRange.location == 0 && selectedRange.length == 0)
             || text.count == 1 // send backspace event when cleaning all characters
             || selectedRange == NSRange(location: 0, length: textStorage.length), // send backspace event when deleting all the text
-            let onBackspace = onBackspace else {
+            let onKeyDown = onKeyDown else {
                 return false
         }
         var range = selectedRange
         if text.count == 1 {
             range = NSRange(location: 0, length: textStorage.length)
         }
-        let caretData = packCaretDataForRN(overrideRange: range)
+        var caretData = packCaretDataForRN(overrideRange: range)
         onSelectionChange?(caretData)
-        onBackspace(caretData)
+        let backSpaceKeyCode:UInt8 = 8
+        caretData = add(keyCode: backSpaceKeyCode, to: caretData)
+        onKeyDown(caretData)
         return true
+    }
+
+    private func interceptTriggersKeyCodes(_ text: String) -> Bool {
+        guard let keyCodes = triggerKeyCodes,
+            keyCodes.count > 0,
+            let onKeyDown = onKeyDown,
+            text.count == 1
+        else {
+            return false
+        }
+        for value in keyCodes {
+            guard let keyString = value as? String,
+                let keyCode = keyString.first?.asciiValue,
+                text.contains(keyString)
+            else {
+                continue
+            }
+
+            var eventData = [AnyHashable:Any]()
+            eventData = add(keyCode: keyCode, to: eventData)
+            onKeyDown(eventData)
+            return true
+        }
+        return false;
     }
 
     private func isNewLineBeforeSelectionAndNotEndOfContent() -> Bool {
@@ -426,6 +455,19 @@ class RCTAztecView: Aztec.TextView {
             }
         }
 
+        return result
+    }
+
+    func add(keyTrigger: String, to pack:[AnyHashable: Any]) -> [AnyHashable: Any] {
+        guard let keyCode = keyTrigger.first?.asciiValue else {
+            return pack
+        }
+        return add(keyCode: keyCode, to: pack)
+    }
+
+    func add(keyCode: UInt8, to pack:[AnyHashable: Any]) -> [AnyHashable: Any] {
+        var result = pack
+        result["keyCode"] = keyCode
         return result
     }
 

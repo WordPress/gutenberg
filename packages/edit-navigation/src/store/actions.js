@@ -252,7 +252,10 @@ function serializeProcessing( callback ) {
 		};
 
 		try {
-			yield* callback( post );
+			yield* callback(
+				// re-select the post as it could be outdated by now
+				yield getNavigationPostForMenu( post.meta.menuId )
+			);
 		} finally {
 			yield {
 				type: 'FINISH_PROCESSING_POST',
@@ -266,10 +269,7 @@ function serializeProcessing( callback ) {
 					pendingActions[ 0 ]
 				);
 
-				// re-fetch the post as running the callback() likely updated it
-				yield* serializedCallback(
-					yield getNavigationPostForMenu( post.meta.menuId )
-				);
+				yield* serializedCallback( post );
 			}
 		}
 	};

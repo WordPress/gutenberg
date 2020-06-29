@@ -19,7 +19,7 @@
 	text-align: left;
 
 	&:focus {
-		border-color: $blue-medium-500;
+		border-color: var(--wp-admin-theme-color);
 	}
 
 	&-input {
