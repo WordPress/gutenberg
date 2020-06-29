@@ -102,7 +102,7 @@ export default function BlockEditorArea( {
 					className={ classnames(
 						'edit-navigation-editor__block-editor-toolbar',
 						{
-							'is-hidden': isNavigationModeActive,
+							'is-hidden': isNavigationModeActive || isRootBlockSelected,
 						}
 					) }
 					aria-label={ __( 'Block tools' ) }
