@@ -27,7 +27,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { BACKSPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
 import { Icon, atSymbol } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -40,6 +40,7 @@ import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { insert } from '../insert';
+import { getTextContent } from '../get-text-content';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
@@ -80,8 +81,10 @@ export class RichText extends Component {
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
 		this.onChange = this.onChange.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
+		this.handleMention = this.handleMention.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
@@ -99,6 +102,7 @@ export class RichText extends Component {
 		);
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
+		this.showMention = this.showMention.bind( this );
 		this.insertString = this.insertString.bind( this );
 		this.state = {
 			activeFormats: [],
@@ -297,7 +301,20 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'content size change';
 	}
 
+	onKeyDown( event ) {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		this.handleDelete( event );
+		this.handleEnter( event );
+		this.handleMention( event );
+	}
+
 	handleEnter( event ) {
+		if ( event.keyCode !== ENTER ) {
+			return;
+		}
 		const { onEnter } = this.props;
 
 		if ( ! onEnter ) {
@@ -313,7 +330,11 @@ export class RichText extends Component {
 	}
 
 	handleDelete( event ) {
-		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
+		const { keyCode } = event;
+
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
+			return;
+		}
 		const isReverse = keyCode === BACKSPACE;
 
 		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
@@ -364,6 +385,35 @@ export class RichText extends Component {
 
 		event.preventDefault();
 		this.lastAztecEventType = 'input';
+	}
+
+	handleMention( event ) {
+		const { keyCode } = event;
+
+		if ( keyCode !== '@'.charCodeAt( 0 ) ) {
+			return;
+		}
+		const record = this.getRecord();
+		const text = getTextContent( record );
+		// Only start the mention UI if the selection is on the start of text or the character before is a space
+		if (
+			text.length === 0 ||
+			record.start === 0 ||
+			text.charAt( record.start - 1 ) === ' '
+		) {
+			this.showMention();
+		} else {
+			this.insertString( record, '@' );
+		}
+	}
+
+	showMention() {
+		const record = this.getRecord();
+		addMention()
+			.then( ( mentionUserId ) => {
+				this.insertString( record, `@${ mentionUserId } ` );
+			} )
+			.catch( () => {} );
 	}
 
 	/**
@@ -690,6 +740,7 @@ export class RichText extends Component {
 			parentBlockStyles,
 			withoutInteractiveFormatting,
 			capabilities,
+			disableEditingMenu = false,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -797,8 +848,13 @@ export class RichText extends Component {
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
-					onEnter={ this.handleEnter }
-					onBackspace={ this.handleDelete }
+					onKeyDown={ this.onKeyDown }
+					triggerKeyCodes={
+						disableEditingMenu === false &&
+						isMentionsSupported( capabilities )
+							? [ '@' ]
+							: []
+					}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
@@ -820,7 +876,7 @@ export class RichText extends Component {
 					}
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
-					disableEditingMenu={ this.props.disableEditingMenu }
+					disableEditingMenu={ disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
@@ -842,28 +898,12 @@ export class RichText extends Component {
 						<BlockFormatControls>
 							{
 								// eslint-disable-next-line no-undef
-								__DEV__ && isMentionsSupported( capabilities ) && (
+								isMentionsSupported( capabilities ) && (
 									<Toolbar>
 										<ToolbarButton
 											title={ __( 'Insert mention' ) }
 											icon={ <Icon icon={ atSymbol } /> }
-											onClick={ () => {
-												addMention()
-													.then(
-														( mentionUserId ) => {
-															let stringToInsert = `@${ mentionUserId }`;
-															if ( this.isIOS ) {
-																stringToInsert +=
-																	' ';
-															}
-															this.insertString(
-																record,
-																stringToInsert
-															);
-														}
-													)
-													.catch( () => {} );
-											} }
+											onClick={ this.showMention }
 										/>
 									</Toolbar>
 								)
