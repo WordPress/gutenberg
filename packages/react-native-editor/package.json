@@ -47,11 +47,10 @@
     "jed": "^1.1.1",
     "jsc-android": "^241213.1.0",
     "jsdom-jscore-rn": "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800",
-    "metro-react-native-babel-preset": "0.57.0",
+    "metro-react-native-babel-preset": "0.58.0",
     "metro-react-native-babel-transformer": "0.56.0",
     "node-fetch": "^2.3.0",
-    "react-native": "0.61.5",
-    "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
+    "react-native": "0.62.2",
     "react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#f03f2c16414aff4ea76064dcd00a9e3c6efc838d",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker",
@@ -60,9 +59,9 @@
     "react-native-modal": "^6.5.0",
     "react-native-safe-area": "^0.5.0",
     "react-native-sass-transformer": "^1.1.1",
-    "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
+    "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#53482ee63368956b0d4fc4094307ca5b3c7b7caf",
     "react-native-url-polyfill": "^1.1.2",
-    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f"
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#8134ebedbbee26a325a9aae220625ad14e346bac"
   },
   "publishConfig": {
     "access": "public"
