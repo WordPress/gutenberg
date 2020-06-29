@@ -20,7 +20,6 @@ import {
 import {
 	ToolbarGroup,
 	ToolbarButton,
-	__experimentalToolbarItem as ToolbarItem,
 	Spinner,
 	RangeControl,
 	DropdownMenu,
@@ -56,13 +55,12 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 	);
 }
 
-function AspectMenu( { isDisabled, onClick, toggleProps } ) {
+function AspectMenu( { isDisabled, onClick } ) {
 	return (
 		<DropdownMenu
 			icon={ aspectRatioIcon }
 			label={ __( 'Aspect Ratio' ) }
 			popoverProps={ POPOVER_PROPS }
-			toggleProps={ toggleProps }
 			className="wp-block-image__aspect-ratio"
 		>
 			{ ( { onClose } ) => (
@@ -277,15 +275,10 @@ export default function ImageEditor( {
 						value={ Math.round( zoom ) }
 						onChange={ setZoom }
 					/>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<AspectMenu
-								toggleProps={ toggleProps }
-								isDisabled={ inProgress }
-								onClick={ setAspect }
-							/>
-						) }
-					</ToolbarItem>
+					<AspectMenu
+						isDisabled={ inProgress }
+						onClick={ setAspect }
+					/>
 				</div>
 			) }
 			<div
