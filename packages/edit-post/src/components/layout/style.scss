@@ -111,15 +111,6 @@
 	.interface-interface-skeleton__content {
 		background-color: $light-gray-700;
 	}
-
-	.interface-interface-skeleton__content,
-	.interface-interface-skeleton__sidebar {
-		// This improves render performance when scrolling.
-		// It promotes this element to a dedicated "layer" in the browser. The rendering
-		// is then assisted by the GPU, which improves performance.
-		// See: https://aerotwist.com/blog/on-translate3d-and-layer-creation-hacks/
-		transform: translate3d(0, 0, 0);
-	}
 }
 
 .edit-post-layout__inserter-panel {
