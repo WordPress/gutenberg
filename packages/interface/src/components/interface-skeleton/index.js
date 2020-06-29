@@ -6,9 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { useObserveInterfaceHeight } from './utils';
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -36,6 +41,11 @@ function InterfaceSkeleton( {
 } ) {
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
+	const bodyNodeRef = useRef();
+	const { resizeListener } = useObserveInterfaceHeight( {
+		ref: bodyNodeRef,
+	} );
+
 	const defaultLabels = {
 		/* translators: accessibility text for the top bar landmark region. */
 		header: __( 'Header' ),
@@ -60,6 +70,7 @@ function InterfaceSkeleton( {
 				'interface-interface-skeleton'
 			) }
 		>
+			{ resizeListener }
 			{ !! header && (
 				<div
 					className="interface-interface-skeleton__header"
@@ -70,7 +81,10 @@ function InterfaceSkeleton( {
 					{ header }
 				</div>
 			) }
-			<div className="interface-interface-skeleton__body">
+			<div
+				className="interface-interface-skeleton__body"
+				ref={ bodyNodeRef }
+			>
 				{ !! leftSidebar && (
 					<div
 						className="interface-interface-skeleton__left-sidebar"

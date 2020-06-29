@@ -57,6 +57,27 @@ html.interface-interface-skeleton__html-container {
 	overscroll-behavior-y: none;
 }
 
+.interface-interface-skeleton__content,
+.interface-interface-skeleton__left-sidebar,
+.interface-interface-skeleton__sidebar {
+	// This improves render performance when interacting with the DOM.
+	// The Interface scrollable elements use adaptive CSS properties to calculate
+	// height on initial render. However, anytime interactions happen
+	// (e.g. typing), the browser needs to recalculate layout measurements
+	// in order to adjust scroll height.
+	// The --wp-editor--body-height CSS variable is calculated by JavaScript.
+	// It provides a fixed (px) value, which reduces the browser's need to
+	// recalculate height values on interaction. The height value is updated
+	// on resize-based events.
+	height: var(--wp-editor--body-height, 100%);
+
+	// This improves render performance when scrolling.
+	// It promotes this element to a dedicated "layer" in the browser. The rendering
+	// is then assisted by the GPU, which improves performance.
+	// See: https://aerotwist.com/blog/on-translate3d-and-layer-creation-hacks/
+	transform: translate3d(0, 0, 0);
+}
+
 .interface-interface-skeleton__content {
 	flex-grow: 1;
 

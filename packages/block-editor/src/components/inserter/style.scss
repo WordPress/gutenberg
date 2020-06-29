@@ -14,6 +14,14 @@ $block-inserter-tabs-height: 44px;
 	@include break-medium {
 		position: relative;
 	}
+
+	&__content {
+		// This improves render performance when scrolling.
+		// It promotes this element to a dedicated "layer" in the browser. The rendering
+		// is then assisted by the GPU, which improves performance.
+		// See: https://aerotwist.com/blog/on-translate3d-and-layer-creation-hacks/
+		transform: translate3d(0, 0, 0);
+	}
 }
 
 .block-editor-inserter__popover .block-editor-inserter__menu {
