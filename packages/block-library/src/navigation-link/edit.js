@@ -60,10 +60,11 @@ function NavigationLinkEdit( {
 	mergeBlocks,
 	onReplace,
 } ) {
-	const { label, opensInNewTab, url, nofollow, description } = attributes;
+	const { label, opensInNewTab, url, id, nofollow, description } = attributes;
 	const link = {
 		url,
 		opensInNewTab,
+		title: label,
 	};
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const itemLabelPlaceholder = __( 'Add link…' );
@@ -248,6 +249,7 @@ function NavigationLinkEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
+								id={ id }
 								showInitialSuggestions={ true }
 								createSuggestion={
 									userCanCreatePages
@@ -258,12 +260,14 @@ function NavigationLinkEdit( {
 									title: newTitle = '',
 									url: newURL = '',
 									opensInNewTab: newOpensInNewTab,
-									id,
+									id: newId,
 								} = {} ) =>
 									setAttributes( {
-										url: ( () => {
-											return encodeURI( newURL );
-										} )(),
+										url: newId
+											? undefined
+											: ( () => {
+													return encodeURI( newURL );
+											  } )(),
 										label: ( () => {
 											const normalizedTitle = newTitle.replace(
 												/http(s?):\/\//gi,
@@ -287,7 +291,7 @@ function NavigationLinkEdit( {
 											return escape( normalizedURL );
 										} )(),
 										opensInNewTab: newOpensInNewTab,
-										id: id ? Number( id ) : undefined,
+										id: newId ? Number( newId ) : undefined,
 									} )
 								}
 							/>

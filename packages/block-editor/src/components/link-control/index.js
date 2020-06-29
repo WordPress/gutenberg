@@ -158,6 +158,7 @@ const makeCancelable = ( promise ) => {
 function LinkControl( {
 	searchInputPlaceholder,
 	value,
+	id,
 	settings,
 	onChange = noop,
 	noDirectEntry = false,
@@ -177,7 +178,7 @@ function LinkControl( {
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
-			: ! value || ! value.url
+			: ! value || ( ! value.url && ! id )
 	);
 	const [ isResolvingLink, setIsResolvingLink ] = useState( false );
 	const [ errorMessage, setErrorMessage ] = useState( null );
@@ -591,19 +592,31 @@ function LinkControl( {
 							}
 						) }
 					>
-						<span className="block-editor-link-control__search-item-header">
-							<ExternalLink
-								className="block-editor-link-control__search-item-title"
-								href={ value.url }
-							>
-								{ ( value && value.title ) || displayURL }
-							</ExternalLink>
-							{ value && value.title && (
-								<span className="block-editor-link-control__search-item-info">
-									{ displayURL }
-								</span>
-							) }
-						</span>
+						{ typeof value.url !== 'undefined' && (
+							<span className="block-editor-link-control__search-item-header">
+								<ExternalLink
+									className="block-editor-link-control__search-item-title"
+									href={ value.url }
+								>
+									{ ( value && value.title ) || displayURL }
+								</ExternalLink>
+								{ value && value.title && (
+									<span className="block-editor-link-control__search-item-info">
+										{ displayURL }
+									</span>
+								) }
+							</span>
+						) }
+
+						{ typeof value.url === 'undefined' && (
+							<span className="block-editor-link-control__search-item-header">
+								{ value && value.title && (
+									<span className="block-editor-link-control__search-item-info">
+										{ value.title }
+									</span>
+								) }
+							</span>
+						) }
 
 						<Button
 							isSecondary
