@@ -242,17 +242,16 @@ export default function ImageEditor( {
 					disabled={ inProgress }
 					minZoom={ MIN_ZOOM / 100 }
 					maxZoom={ MAX_ZOOM / 100 }
-					aspect={ aspect }
-					zoom={ zoom / 100 }
-					rotation={ rotation }
 					crop={ position }
-					onZoomChange={ ( newZoom ) => {
-						setZoom( newZoom * 100 );
-					} }
-					onRotationChange={ setRotation }
+					zoom={ zoom / 100 }
+					aspect={ aspect }
+					rotation={ rotation }
 					onCropChange={ setPosition }
 					onCropComplete={ ( croppedArea ) => {
 						setCrop( croppedArea );
+					} }
+					onZoomChange={ ( newZoom ) => {
+						setZoom( newZoom * 100 );
 					} }
 				/>
 				{ inProgress && <Spinner /> }
