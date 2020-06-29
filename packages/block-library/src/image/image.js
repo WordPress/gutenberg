@@ -6,7 +6,7 @@ import { get, filter, map, last, pick, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { isBlobURL } from '@wordpress/blob';
+import { isBlobURL, createBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
 	PanelBody,
@@ -32,7 +32,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
-import { crop } from '@wordpress/icons';
+import { crop, external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -172,6 +172,17 @@ export default function Image( {
 		} );
 	}
 
+	function uploadExternal() {
+		window
+			.fetch( url )
+			.then( ( response ) => response.blob() )
+			.then( ( blob ) => {
+				onSelectImage( {
+					url: createBlobURL( blob ),
+				} );
+			} );
+	}
+
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
@@ -203,6 +214,15 @@ export default function Image( {
 							onClick={ () => setIsEditingImage( true ) }
 							icon={ crop }
 							label={ __( 'Crop' ) }
+						/>
+					</ToolbarGroup>
+				) }
+				{ ! id && (
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ uploadExternal }
+							icon={ external }
+							label={ __( 'Upload external image' ) }
 						/>
 					</ToolbarGroup>
 				) }

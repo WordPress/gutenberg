@@ -181,7 +181,7 @@ export function ImageEdit( {
 
 	const isTemp = isTemporaryImage( id, url );
 
-	// Upload a temporary image on mount.
+	// Upload temporary images.
 	useEffect( () => {
 		if ( ! isTemp ) {
 			return;
@@ -201,7 +201,7 @@ export function ImageEdit( {
 				},
 			} );
 		}
-	}, [] );
+	}, [ isTemp ] );
 
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
 	// no longer temporary).
