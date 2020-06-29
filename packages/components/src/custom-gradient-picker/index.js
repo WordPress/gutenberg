@@ -4,24 +4,20 @@
 import { get, omit } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import AnglePickerControl from '../angle-picker-control';
-import { LinearGradientIcon, RadialGradientIcon } from './icons';
 import CustomGradientBar from './custom-gradient-bar';
-import BaseControl from '../base-control';
+import { Flex, FlexItem } from '../flex';
+import SelectControl from '../select-control';
 import { getGradientParsed } from './utils';
 import { serializeGradient } from './serializer';
-import ToolbarGroup from '../toolbar-group';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
 	HORIZONTAL_GRADIENT_ORIENTATION,
+	GRADIENT_OPTIONS,
 } from './constants';
+import { SelectWrapper } from './styles/custom-gradient-picker-styles';
 
 const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	const angle = get(
@@ -71,27 +67,22 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		);
 	};
 
+	const handleOnChange = ( next ) => {
+		if ( next === 'linear-gradient' ) {
+			onSetLinearGradient();
+		}
+		if ( next === 'radial-gradient' ) {
+			onSetRadialGradient();
+		}
+	};
+
 	return (
-		<BaseControl className="components-custom-gradient-picker__type-picker">
-			<BaseControl.VisualLabel>{ __( 'Type' ) }</BaseControl.VisualLabel>
-			<ToolbarGroup
-				className="components-custom-gradient-picker__toolbar"
-				controls={ [
-					{
-						icon: <LinearGradientIcon />,
-						title: __( 'Linear Gradient' ),
-						isActive: hasGradient && type === 'linear-gradient',
-						onClick: onSetLinearGradient,
-					},
-					{
-						icon: <RadialGradientIcon />,
-						title: __( 'Radial Gradient' ),
-						isActive: hasGradient && type === 'radial-gradient',
-						onClick: onSetRadialGradient,
-					},
-				] }
-			/>
-		</BaseControl>
+		<SelectControl
+			className="components-custom-gradient-picker__type-picker"
+			value={ hasGradient && type }
+			options={ GRADIENT_OPTIONS }
+			onChange={ handleOnChange }
+		/>
 	);
 };
 
@@ -101,20 +92,27 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	return (
 		<div className="components-custom-gradient-picker">
 			<CustomGradientBar value={ value } onChange={ onChange } />
-			<div className="components-custom-gradient-picker__ui-line">
-				<GradientTypePicker
-					gradientAST={ gradientAST }
-					hasGradient={ hasGradient }
-					onChange={ onChange }
-				/>
-				{ type === 'linear-gradient' && (
-					<GradientAnglePicker
+			<Flex
+				gap={ 3 }
+				className="components-custom-gradient-picker__ui-line"
+			>
+				<SelectWrapper>
+					<GradientTypePicker
 						gradientAST={ gradientAST }
 						hasGradient={ hasGradient }
 						onChange={ onChange }
 					/>
+				</SelectWrapper>
+				{ type === 'linear-gradient' && (
+					<FlexItem>
+						<GradientAnglePicker
+							gradientAST={ gradientAST }
+							hasGradient={ hasGradient }
+							onChange={ onChange }
+						/>
+					</FlexItem>
 				) }
-			</div>
+			</Flex>
 		</div>
 	);
 }

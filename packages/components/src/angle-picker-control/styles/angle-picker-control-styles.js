@@ -24,8 +24,8 @@ export const CircleRoot = styled.div`
 	border: 1px solid ${ color( 'ui.borderLight' ) };
 	box-sizing: border-box;
 	cursor: grab;
-	float: left;
 	height: ${ CIRCLE_SIZE }px;
+	overflow: hidden;
 	width: ${ CIRCLE_SIZE }px;
 `;
 

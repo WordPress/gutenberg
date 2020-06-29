@@ -73,11 +73,6 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 	height: 20px;
 }
 
-.components-custom-gradient-picker__ui-line {
-	display: flex;
-	justify-content: space-between;
-}
-
 .components-custom-gradient-picker .components-custom-gradient-picker__ui-line {
 	.components-base-control.components-angle-picker,
 	.components-base-control.components-custom-gradient-picker__type-picker {

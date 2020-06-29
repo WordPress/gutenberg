@@ -159,6 +159,7 @@ export const Input = styled.input`
 		box-shadow: none !important;
 		color: ${ color( 'black' ) };
 		display: block;
+		margin: 0;
 		outline: none;
 		padding-left: 8px;
 		padding-right: 8px;
