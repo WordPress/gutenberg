@@ -3,6 +3,7 @@
 exports[`Navigation Creating from existing Menus allows a navigation block to be created from existing menus 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
 <!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"id\\":94} /-->
+
 <!-- wp:navigation-link {\\"label\\":"Accusamus quo repellat illum magnam quas\\",\\"id\\":41} -->
 <!-- wp:navigation-link {\\"label\\":"Debitis cum consequatur sit doloremque\\",\\"id\\":51} /-->
 <!-- /wp:navigation-link -->
