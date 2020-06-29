@@ -58,7 +58,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		);
 		if ( isset( $schema['properties']['password'] ) ) {
 			$get_item_args['password'] = array(
-				'description' => __( 'The password for the post if it is password protected.' ),
+				'description' => __( 'The password for the post if it is password protected.', 'default' ),
 				'type'        => 'string',
 			);
 		}
@@ -68,7 +68,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			array(
 				'args'        => array(
 					'id' => array(
-						'description' => __( 'Unique identifier for the object.' ),
+						'description' => __( 'Unique identifier for the object.', 'default' ),
 						'type'        => 'integer',
 					),
 				),
@@ -93,7 +93,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 						'force' => array(
 							'type'        => 'boolean',
 							'default'     => false,
-							'description' => __( 'Whether to bypass Trash and force deletion.' ),
+							'description' => __( 'Whether to bypass Trash and force deletion.', 'default' ),
 						),
 					),
 				),
@@ -135,7 +135,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * Checks if a given request has access to read a menu item if they have access to edit them.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 *
 	 * @return bool|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ) {
@@ -384,9 +383,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		// We don't support trashing for menu items.
 		if ( ! $force ) {
-			/* translators: %s: force=true */
 			return new WP_Error(
 				'rest_trash_not_supported',
+				/* translators: %s: force=true */
 				sprintf( __( "Menu items do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ),
 				array( 'status' => 501 )
 			);
@@ -425,6 +424,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	/**
 	 * Prepares a single post for create or update.
 	 *
+	 * @param array           $params List of params to sanitize.
 	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return array|WP_Error
@@ -538,8 +538,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		// If post type archive, check if post type exists.
 		if ( 'post_type_archive' === $request['type'] ) {
-			$post_type         = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
-			$original          = get_post_type_object( $post_type );
+			$post_type = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
+			$original  = get_post_type_object( $post_type );
 			if ( empty( $original ) ) {
 				return new WP_Error(
 					'rest_post_invalid_type',
@@ -602,7 +602,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	/**
 	 * Prepares a single post output for response.
 	 *
-	 * @param object $post Post object.
+	 * @param object          $post Post object.
 	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return WP_REST_Response Response object.
@@ -1040,14 +1040,14 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'format'      => 'uri',
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
-				'validate_callback' => static function ( $value, $request ) {
+				'validate_callback' => static function ( $value ) {
 					$validated = esc_url_raw( $value );
 					if ( '' === $validated ) {
 						// Fail sanitization if URL is invalid.
 						return new WP_Error( 'invalid_url', __( 'Invalid URL.', 'gutenberg' ), array( 'status' => 400 ) );
 					}
 				},
-				'sanitize_callback' => static function ( $value, $request ) {
+				'sanitize_callback' => static function ( $value ) {
 					return esc_url_raw( $value );
 				},
 			),
@@ -1167,7 +1167,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * Determines the allowed query_vars for a get_items() response and prepares
 	 * them for WP_Query.
 	 *
-	 * @param array $prepared_args Optional. Prepared WP_Query arguments. Default empty array.
+	 * @param array           $prepared_args Optional. Prepared WP_Query arguments. Default empty array.
 	 * @param WP_REST_Request $request Optional. Full details about the request.
 	 *
 	 * @return array Items query arguments.

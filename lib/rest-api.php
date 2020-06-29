@@ -173,7 +173,7 @@ function wp_api_nav_menus_post_type_args( $args, $post_type ) {
 		$args['show_in_rest']          = true;
 		$args['rest_base']             = 'menu-items';
 		$args['rest_controller_class'] = 'WP_REST_Menu_Items_Controller';
-		$args['validate_callback'] = array('WP_REST_Menu_Items_Controller', 'validate');
+		$args['validate_callback']     = array( 'WP_REST_Menu_Items_Controller', 'validate' );
 	}
 
 	return $args;
