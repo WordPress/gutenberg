@@ -174,8 +174,7 @@ export const withDataAlign = createHigherOrderComponent(
 		const { name, attributes } = props;
 		const { align } = attributes;
 		const hasWideEnabled = useSelect(
-			( select ) =>
-				!! select( 'core/block-editor' ).getSettings().alignWide,
+			( select ) => !! select( 'core' ).getThemeSupports().alignWide,
 			[]
 		);
 

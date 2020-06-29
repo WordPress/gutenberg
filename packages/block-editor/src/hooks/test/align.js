@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import renderer, { act } from 'react-test-renderer';
+import renderer from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -13,17 +13,23 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import BlockEditorProvider from '../../components/provider';
 import {
 	getValidAlignments,
 	withToolbarControls,
 	withDataAlign,
 	addAssignedAlign,
 } from '../align';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
 
 describe( 'align', () => {
 	const blockSettings = {
@@ -186,6 +192,8 @@ describe( 'align', () => {
 
 	describe( 'withDataAlign', () => {
 		it( 'should render with wrapper props', () => {
+			useSelect.mockImplementation( () => true );
+
 			registerBlockType( 'core/foo', {
 				...blockSettings,
 				supports: {
@@ -198,28 +206,22 @@ describe( 'align', () => {
 				<div { ...wrapperProps } />
 			) );
 
-			let wrapper;
-			act( () => {
-				wrapper = renderer.create(
-					<BlockEditorProvider
-						settings={ { alignWide: true } }
-						value={ [] }
-					>
-						<EnhancedComponent
-							attributes={ {
-								align: 'wide',
-							} }
-							name="core/foo"
-						/>
-					</BlockEditorProvider>
-				);
-			} );
+			const wrapper = renderer.create(
+				<EnhancedComponent
+					attributes={ {
+						align: 'wide',
+					} }
+					name="core/foo"
+				/>
+			);
 			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {
 				'data-align': 'wide',
 			} );
 		} );
 
 		it( 'should not render wide/full wrapper props if wide controls are not enabled', () => {
+			useSelect.mockImplementation( () => false );
+
 			registerBlockType( 'core/foo', {
 				...blockSettings,
 				supports: {
@@ -232,26 +234,20 @@ describe( 'align', () => {
 				<div { ...wrapperProps } />
 			) );
 
-			let wrapper;
-			act( () => {
-				wrapper = renderer.create(
-					<BlockEditorProvider
-						settings={ { alignWide: false } }
-						value={ [] }
-					>
-						<EnhancedComponent
-							name="core/foo"
-							attributes={ {
-								align: 'wide',
-							} }
-						/>
-					</BlockEditorProvider>
-				);
-			} );
+			const wrapper = renderer.create(
+				<EnhancedComponent
+					name="core/foo"
+					attributes={ {
+						align: 'wide',
+					} }
+				/>
+			);
 			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
 		} );
 
 		it( 'should not render invalid align', () => {
+			useSelect.mockImplementation( () => true );
+
 			registerBlockType( 'core/foo', {
 				...blockSettings,
 				supports: {
@@ -264,22 +260,14 @@ describe( 'align', () => {
 				<div { ...wrapperProps } />
 			) );
 
-			let wrapper;
-			act( () => {
-				wrapper = renderer.create(
-					<BlockEditorProvider
-						settings={ { alignWide: true } }
-						value={ [] }
-					>
-						<EnhancedComponent
-							name="core/foo"
-							attributes={ {
-								align: 'wide',
-							} }
-						/>
-					</BlockEditorProvider>
-				);
-			} );
+			const wrapper = renderer.create(
+				<EnhancedComponent
+					name="core/foo"
+					attributes={ {
+						align: 'wide',
+					} }
+				/>
+			);
 			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
 		} );
 	} );
