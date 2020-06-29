@@ -390,9 +390,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		 *
 		 * They dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
 		 *
-		 * @param Object           $menu_item The deleted or trashed menu item.
-		 * @param WP_REST_Response $response  The response data.
-		 * @param WP_REST_Request  $request   The request sent to the API.
+		 * @param Object          $menu_item The deleted or trashed menu item.
+		 * @param WP_REST_Response $response The response data.
+		 * @param WP_REST_Request  $request  The request sent to the API.
 		 */
 		do_action( "rest_delete_{$this->post_type}", $menu_item, $response, $request );
 
@@ -404,7 +404,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 *
-	 * @return array|WP_Error
+	 * @return null
 	 */
 	public function sanitize( $request ) {
 		$menu_item_db_id = $request['id'];
