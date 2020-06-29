@@ -17,12 +17,7 @@ import {
 	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import {
-	useSelect,
-	useDispatch,
-	withSelect,
-	withDispatch,
-} from '@wordpress/data';
+import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
@@ -78,11 +73,6 @@ function Navigation( {
 			},
 		},
 		[ fontSize.size ]
-	);
-	const isNavigationManagementScreen = useSelect(
-		( select ) =>
-			select( 'core/block-editor' ).getSettings()
-				.__experimentalNavigationScreen
 	);
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
@@ -167,10 +157,7 @@ function Navigation( {
 						},
 					] }
 				/>
-				{ ! isNavigationManagementScreen && (
-					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
-				) }
-
+				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 				<BlockColorsStyleSelector
 					TextColor={ TextColor }
 					BackgroundColor={ BackgroundColor }
@@ -179,6 +166,7 @@ function Navigation( {
 				</BlockColorsStyleSelector>
 			</BlockControls>
 			{ navigatorModal }
+
 			<InspectorControls>
 				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
