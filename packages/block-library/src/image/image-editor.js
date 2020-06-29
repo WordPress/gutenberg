@@ -161,6 +161,13 @@ export default function ImageEditor( {
 	const [ aspect, setAspect ] = useState( naturalWidth / naturalHeight );
 	const [ rotation, setRotation ] = useState( 0 );
 
+	const editedWidth = width;
+	const editedHeight =
+		height ||
+		( rotation % 180 === 90
+			? ( clientWidth * naturalWidth ) / naturalHeight
+			: ( clientWidth * naturalHeight ) / naturalWidth );
+
 	function apply() {
 		setIsProgress( true );
 
@@ -192,6 +199,7 @@ export default function ImageEditor( {
 				setAttributes( {
 					id: response.id,
 					url: response.source_url,
+					height: height && width ? width / aspect : undefined,
 				} );
 			} )
 			.catch( ( error ) => {
@@ -238,10 +246,8 @@ export default function ImageEditor( {
 					'is-applying': inProgress,
 				} ) }
 				style={ {
-					width,
-					height:
-						height ||
-						( clientWidth * naturalHeight ) / naturalWidth,
+					width: editedWidth,
+					height: editedHeight,
 				} }
 			>
 				<Cropper
