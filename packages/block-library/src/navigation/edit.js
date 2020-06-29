@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, Fragment } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -17,7 +17,12 @@ import {
 	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
+import {
+	useSelect,
+	useDispatch,
+	withSelect,
+	withDispatch,
+} from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
@@ -74,6 +79,11 @@ function Navigation( {
 		},
 		[ fontSize.size ]
 	);
+	const isNavigationManagementScreen = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getSettings()
+				.__experimentalNavigationScreen
+	);
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
@@ -121,7 +131,7 @@ function Navigation( {
 
 	// UI State: rendered Block UI
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<Toolbar
 					icon={
@@ -157,7 +167,10 @@ function Navigation( {
 						},
 					] }
 				/>
-				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+				{ ! isNavigationManagementScreen && (
+					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+				) }
+
 				<BlockColorsStyleSelector
 					TextColor={ TextColor }
 					BackgroundColor={ BackgroundColor }
@@ -166,7 +179,6 @@ function Navigation( {
 				</BlockColorsStyleSelector>
 			</BlockControls>
 			{ navigatorModal }
-
 			<InspectorControls>
 				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
@@ -220,7 +232,7 @@ function Navigation( {
 					</Block.nav>
 				</BackgroundColor>
 			</TextColor>
-		</Fragment>
+		</>
 	);
 }
 
