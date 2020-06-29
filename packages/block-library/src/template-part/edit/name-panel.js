@@ -13,7 +13,7 @@ export default function TemplatePartNamePanel( { postId, setAttributes } ) {
 		'title',
 		postId
 	);
-	const [ , setSlug ] = useEntityProp(
+	const [ slug, setSlug ] = useEntityProp(
 		'postType',
 		'wp_template_part',
 		'slug',
@@ -23,12 +23,12 @@ export default function TemplatePartNamePanel( { postId, setAttributes } ) {
 		<div className="wp-block-template-part__name-panel">
 			<TextControl
 				label={ __( 'Name' ) }
-				value={ title }
+				value={ title || slug }
 				onChange={ ( value ) => {
 					setTitle( value );
-					const slug = cleanForSlug( value );
-					setSlug( slug );
-					setAttributes( { slug } );
+					const newSlug = cleanForSlug( value );
+					setSlug( newSlug );
+					setAttributes( { slug: newSlug } );
 				} }
 			/>
 		</div>
