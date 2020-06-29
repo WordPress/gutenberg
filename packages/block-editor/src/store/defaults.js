@@ -150,9 +150,6 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalBlockDirectory: false,
 	__experimentalEnableFullSiteEditing: false,
 	__experimentalEnableFullSiteEditingDemo: false,
-	__experimentalUiParts: {
-		blockToolbarSwitcher: true,
-	},
 	__mobileEnablePageTemplates: false,
 	gradients: [
 		{
