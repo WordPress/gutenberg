@@ -1,4 +1,6 @@
-# Folder Structure
+---
+title: Folder Structure
+---
 
 The following snippet explains how the Gutenberg repository is structured omitting irrelevant or obvious items with further explanations:
 
@@ -11,16 +13,16 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── CODE_OF_CONDUCT.md
     │
     ├── .editorconfig
-    ├── .eslintignore 
-    ├── .eslintrc 
-    ├── .jshintignore 
-    ├── .eslintignore 
+    ├── .eslintignore
+    ├── .eslintrc
+    ├── .jshintignore
+    ├── .eslintignore
     ├── .prettierrc.js
     ├── .stylelintrc.json
     ├── .markdownlintignore
     ├── .npmpackagejsonlintrc.json
     ├── phpcs.xml.dist
-    │   Dot files and config files used to configure the various linting tools 
+    │   Dot files and config files used to configure the various linting tools
     │   used in the repository (PHP, JS, styles...).
     │
     ├── .browserslistrc
@@ -32,7 +34,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Transpilation and bundling Config files.
     │
     ├── .wp-env.json
-    │   Config file for the development and testing environment. 
+    │   Config file for the development and testing environment.
     │   Includes WordPress and the Gutenberg plugin.
     │
     ├── composer.lock
@@ -42,9 +44,9 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │
     ├── package-lock.json
     ├── package.json
-    │	Handling of JavaScript dependencies. Both for development tools and  
+    │	Handling of JavaScript dependencies. Both for development tools and
     │   production dependencies.
-    │   The package.json also serves to define common tasks and scripts 
+    │   The package.json also serves to define common tasks and scripts
     |   used for day to day development.
     │
     ├── changelog.txt
@@ -80,9 +82,9 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   PHP Source code of the Gutenberg plugin.
     │
     ├── packages
-    │   Source code of the WordPress packages. 
+    │   Source code of the WordPress packages.
     │   Packages can be:
-    │    - Production JavaScript scripts and styles loaded on WordPress 
+    │    - Production JavaScript scripts and styles loaded on WordPress
     │      and the Gutenberg plugin or distributed as npm packages.
     │    - Development tools available on npm.
     │
@@ -109,7 +111,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Component Stories to load on the Gutenberg storybook.
     │
     ├── packages/e2e-tests
-    │   End-2-end tests of the Gutenberg plugin. 
+    │   End-2-end tests of the Gutenberg plugin.
     │   Distributed as a package for potential reuse in Core and other plugins.
     │
     ├── phpunit
@@ -126,4 +128,3 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │
     └── test/unit
         Configuration for the Packages unit tests.
-

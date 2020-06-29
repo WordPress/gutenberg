@@ -1,4 +1,6 @@
-# Authoring Experience
+---
+title: Authoring Experience
+---
 
 ## Background
 

@@ -1,4 +1,6 @@
-# WordPress Plugin
+---
+title: WordPress Plugin
+---
 
 A block is added to the block editor using a WordPress plugin. You can create your own plugin, and after installing and activating the plugin use the block. Let's first look at what makes up a WordPress plugin.
 

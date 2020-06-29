@@ -1,4 +1,6 @@
-# Extending the Block Editor
+---
+title: Extending the Block Editor
+---
 
 Let's look at using the [Block Style Variation example](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) to extend the editor. This example allows you to add your own custom CSS class name to any core block type.
 
@@ -34,13 +36,11 @@ See [Packages](/docs/designers-developers/developers/packages.md) for list of av
 
 After you have updated both JavaScript and PHP files, go to the block editor and create a new post.
 
-Add a quote block, and in the right sidebar under Styles, you will see your new Fancy Quote style listed.  
+Add a quote block, and in the right sidebar under Styles, you will see your new Fancy Quote style listed.
 
 Click the Fancy Quote to select and apply that style to your quote block:
 
-
 ![Fancy Quote Style in Inspector](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/fancy-quote-in-inspector.png)
-
 
 Even if you Preview or Publish the post you will not see a visible change. However, if you look at the source, you will see the `is-style-fancy-quote` class name is now attached to your quote block.
 

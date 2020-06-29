@@ -1,4 +1,6 @@
-# Code Implementation
+---
+title: Code Implementation
+---
 
 The basic block is in place, the next step is to add styles to the block. Feel free to style and adjust for your own preference, the main lesson is showing how to create and load external resources. For this example I'm going to load the colorized gilbert font from [Type with Pride](https://www.typewithpride.com/).
 

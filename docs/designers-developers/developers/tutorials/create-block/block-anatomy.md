@@ -1,4 +1,6 @@
-# Anatomy of a Block
+---
+title: Anatomy of a Block
+---
 
 At its simplest, a block in the WordPress block editor is a JavaScript object with a specific set of properties.
 

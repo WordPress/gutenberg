@@ -1,4 +1,6 @@
-# Block Attributes
+---
+title: Block Attributes
+---
 
 Attributes are the way a block stores data, they define how a block is parsed to extract data from the saved content.
 

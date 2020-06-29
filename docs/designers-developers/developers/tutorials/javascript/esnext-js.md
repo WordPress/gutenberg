@@ -1,4 +1,6 @@
-# ESNext Syntax
+---
+title: ESNext Syntax
+---
 
 The JavaScript language continues to evolve, the syntax used to write JavaScript code is not fixed but changes over time. [Ecma International](https://en.wikipedia.org/wiki/Ecma_International) is the organization that sets the standard for the language, officially called [ECMAScript](https://en.wikipedia.org/wiki/ECMAScript). A new standard for JavaScript is published each year, the 6th edition published in 2015 is often referred to as ES6. Our usage would more appropriately be **ESNext** referring to the latest standard. The build step is what converts this latest syntax of JavaScript to a version understood by browsers.
 

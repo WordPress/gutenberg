@@ -1,4 +1,6 @@
-# Troubleshooting
+---
+title: Troubleshooting
+---
 
 If you're having trouble getting your code to work, here are a few ways to troubleshoot.
 
@@ -20,7 +22,7 @@ If you do not see the file being loaded, doublecheck the enqueue function is cor
 
 The console log will show an error if a dependency your JavaScript code uses has not been declared and loaded in the browser. In the example, if `myguten.js` script is enqueued without declaring the `wp-blocks` dependency, the console log will show:
 
-<img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/js-tutorial-error-blocks-undefined.png" width=448 title="error wp.blocks is undefined"/>
+<img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/js-tutorial-error-blocks-undefined.png" width="448" title="error wp.blocks is undefined"/>
 
 You can correct by checking your `wp_enqueue_script` function includes all packages listed that are used:
 
@@ -31,4 +33,3 @@ wp_enqueue_script(
 	array( 'wp-blocks' )
 );
 ```
-
