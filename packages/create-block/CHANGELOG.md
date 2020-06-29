@@ -2,9 +2,19 @@
 
 ## Unreleased
 
+## 0.16.0 (2020-06-25)
+
+### New Feature
+
+-   Generate `block.json` file with all metadata necessary for Block Directory ([#23399](https://github.com/WordPress/gutenberg/pull/23399)).
+
+### Bug Fix
+
+-   Fix the error in the scaffolding process caused by the missing `scripts` section in `package.json` file ([#23443](https://github.com/WordPress/gutenberg/pull/23443)).
+
 ## 0.15.0-rc.0 (2020-06-24)
 
-### New Features
+### New Feature
 
 -   Add new CLI options: `--no-wp-scripts` and `--wp-scripts` to let users override the settings that template defines for supports for `@wordpress/scripts` package integration ([#23195](https://github.com/WordPress/gutenberg/pull/23195)).
 

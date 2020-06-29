@@ -3,9 +3,22 @@
  */
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 
-const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
+/**
+ * Internal dependencies
+ */
+import BlockDraggableChip from './draggable-chip';
+import useScrollWhenDragging from './use-scroll-when-dragging';
+import { BlockNodes } from '../block-list/root-container';
+
+const BlockDraggable = ( {
+	children,
+	clientIds,
+	cloneClassname,
+	onDragStart,
+	onDragEnd,
+} ) => {
 	const { srcRootClientId, index, isDraggable } = useSelect(
 		( select ) => {
 			const {
@@ -13,10 +26,7 @@ const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 				getBlockRootClientId,
 				getTemplateLock,
 			} = select( 'core/block-editor' );
-			const rootClientId =
-				clientIds.length === 1
-					? getBlockRootClientId( clientIds[ 0 ] )
-					: null;
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
@@ -24,12 +34,21 @@ const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 			return {
 				index: getBlockIndex( clientIds[ 0 ], rootClientId ),
 				srcRootClientId: rootClientId,
-				isDraggable: clientIds.length === 1 && 'all' !== templateLock,
+				isDraggable: 'all' !== templateLock,
 			};
 		},
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
+	const [ firstClientId ] = clientIds;
+	const blockNodes = useContext( BlockNodes );
+	const blockElement = blockNodes ? blockNodes[ firstClientId ] : undefined;
+	const [
+		startScrolling,
+		scrollOnDragOver,
+		stopScrolling,
+	] = useScrollWhenDragging( blockElement );
+
 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
 		'core/block-editor'
 	);
@@ -47,27 +66,42 @@ const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 		return children( { isDraggable: false } );
 	}
 
-	const blockElementId = `block-${ clientIds[ 0 ] }`;
 	const transferData = {
 		type: 'block',
 		srcIndex: index,
-		srcClientId: clientIds[ 0 ],
+		srcClientIds: clientIds,
 		srcRootClientId,
 	};
 
 	return (
 		<Draggable
 			cloneClassname={ cloneClassname }
-			elementId={ blockElementId }
+			elementId={ `block-${ clientIds[ 0 ] }` }
 			transferData={ transferData }
-			onDragStart={ () => {
+			onDragStart={ ( event ) => {
 				startDraggingBlocks();
 				isDragging.current = true;
+
+				startScrolling( event );
+
+				if ( onDragStart ) {
+					onDragStart();
+				}
 			} }
+			onDragOver={ scrollOnDragOver }
 			onDragEnd={ () => {
 				stopDraggingBlocks();
 				isDragging.current = false;
+
+				stopScrolling();
+
+				if ( onDragEnd ) {
+					onDragEnd();
+				}
 			} }
+			__experimentalDragComponent={
+				<BlockDraggableChip clientIds={ clientIds } />
+			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {

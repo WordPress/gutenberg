@@ -50,6 +50,9 @@
 // We need to have two DOM elements.
 .edit-post-visual-editor__post-title-wrapper {
 	.editor-post-title {
+		// Add some top margin.
+		margin-top: 2em;
+
 		// Center.
 		margin-left: auto;
 		margin-right: auto;
