@@ -424,12 +424,11 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	/**
 	 * Prepares a single post for create or update.
 	 *
-	 * @param array           $params List of params to sanitize.
 	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return array|WP_Error
 	 */
-	public function sanitize( $params, $request ) {
+	public function sanitize( $request ) {
 		$menu_item_db_id = $request['id'];
 		$menu_item_obj   = $this->get_nav_menu_item( $menu_item_db_id );
 		// Need to persist the menu item data. See https://core.trac.wordpress.org/ticket/28138 .
@@ -594,9 +593,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
-		$params['POST']['prepared_nav_item'] = $prepared_nav_item;
-
-		return $params;
+		$request['prepared_nav_item'] = $prepared_nav_item;
 	}
 
 	/**
