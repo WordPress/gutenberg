@@ -32,13 +32,6 @@ export default function LatestComments( { attributes, setAttributes } ) {
 		displayExcerpt,
 	} = attributes;
 
-	const toggleAttribute = ( propName ) => {
-		return () => {
-			const value = attributes[ propName ];
-			setAttributes( { [ propName ]: ! value } );
-		};
-	};
-
 	return (
 		<>
 			<InspectorControls>
@@ -46,17 +39,25 @@ export default function LatestComments( { attributes, setAttributes } ) {
 					<ToggleControl
 						label={ __( 'Display avatar' ) }
 						checked={ displayAvatar }
-						onChange={ toggleAttribute( 'displayAvatar' ) }
+						onChange={ () =>
+							setAttributes( { displayAvatar: ! displayAvatar } )
+						}
 					/>
 					<ToggleControl
 						label={ __( 'Display date' ) }
 						checked={ displayDate }
-						onChange={ toggleAttribute( 'displayDate' ) }
+						onChange={ () =>
+							setAttributes( { displayDate: ! displayDate } )
+						}
 					/>
 					<ToggleControl
 						label={ __( 'Display excerpt' ) }
 						checked={ displayExcerpt }
-						onChange={ toggleAttribute( 'displayExcerpt' ) }
+						onChange={ () =>
+							setAttributes( {
+								displayExcerpt: ! displayExcerpt,
+							} )
+						}
 					/>
 					<RangeControl
 						label={ __( 'Number of comments' ) }
