@@ -63,7 +63,7 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 			label={ __( 'Aspect Ratio' ) }
 			popoverProps={ POPOVER_PROPS }
 			toggleProps={ toggleProps }
-			className="richimage__aspect-ratio"
+			className="wp-block-image__aspect-ratio"
 		>
 			{ ( { onClose } ) => (
 				<>
@@ -267,7 +267,7 @@ export default function ImageEditor( {
 		<>
 			{ ! inProgress && (
 				<div
-					className="richimage__zoom-control"
+					className="wp-block-image__zoom-control"
 					aria-label={ __( 'Zoom' ) }
 				>
 					<Icon icon={ search } />
@@ -289,7 +289,7 @@ export default function ImageEditor( {
 				</div>
 			) }
 			<div
-				className={ classnames( 'richimage__crop-area', {
+				className={ classnames( 'wp-block-image__crop-area', {
 					'is-applying': inProgress,
 				} ) }
 				style={ {
