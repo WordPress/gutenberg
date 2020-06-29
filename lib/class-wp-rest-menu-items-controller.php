@@ -182,6 +182,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		$prepared_nav_item = $request['prepared_nav_item'];
+
 		/**
 		 * Filters a post before it is inserted via the REST API.
 		 *
@@ -281,6 +282,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		$prepared_nav_item = $request['prepared_nav_item'];
+
 		/**
 		 * Filters a post before it is inserted via the REST API.
 		 *
