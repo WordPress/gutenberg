@@ -2,38 +2,38 @@
 
 The following snippet explains how the Gutenberg repository is structured omitting irrelevant or obvious items with further explanations:
 
-	│
+    │
     ├── LICENSE
     ├── README.md
     ├── SECURITY.md
     ├── CONTRIBUTING.md
     ├── CONTRIBUTORS.md
     ├── CODE_OF_CONDUCT.md
-	│
+    │
     ├── .editorconfig
-	├── .eslintignore 
-	├── .eslintrc 
-	├── .jshintignore 
-	├── .eslintignore 
-	├── .prettierrc.js
-	├── .stylelintrc.json
-	├── .markdownlintignore
-	├── .npmpackagejsonlintrc.json
-	├── phpcs.xml.dist
-	│   Dot files and config files used to configure the various linting tools 
-	│   used in the repository (PHP, JS, styles...).
-	│
-	├── .browserslistrc
+    ├── .eslintignore 
+    ├── .eslintrc 
+    ├── .jshintignore 
+    ├── .eslintignore 
+    ├── .prettierrc.js
+    ├── .stylelintrc.json
+    ├── .markdownlintignore
+    ├── .npmpackagejsonlintrc.json
+    ├── phpcs.xml.dist
+    │   Dot files and config files used to configure the various linting tools 
+    │   used in the repository (PHP, JS, styles...).
+    │
+    ├── .browserslistrc
     ├── babel.config.js
     ├── jsconfig.json
     ├── tsconfig.json
     ├── tsconfig.base.json
     ├── webpack.config.js
-	│   Transpilation and bundling Config files.
-	│
+    │   Transpilation and bundling Config files.
+    │
     ├── .wp-env.json
     │   Config file for the development and testing environment. 
-	│   Includes WordPress and the Gutenberg plugin.
+    │   Includes WordPress and the Gutenberg plugin.
     │
     ├── composer.lock
     ├── composer.json
@@ -42,25 +42,25 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │
     ├── package-lock.json
     ├── package.json
-	│	Handling of JavaScript dependencies. Both for development tools and  
-	│   production dependencies.
-	│   The package.json also serves to define common tasks and scripts 
-	|   used for day to day development.
-	│
+    │	Handling of JavaScript dependencies. Both for development tools and  
+    │   production dependencies.
+    │   The package.json also serves to define common tasks and scripts 
+    |   used for day to day development.
+    │
     ├── changelog.txt
     ├── readme.txt
     │   Readme and Changelog of the Gutenberg plugin hosted on the WordPress
     │   plugin repository.
     │
     ├── gutenberg.php
-	│   Entry point of the Gutenberg plugin.
-	│
+    │   Entry point of the Gutenberg plugin.
+    │
     ├── post-content.php
-	│   Demo post content used on the Gutenberg plugin to showcase the editor.
+    │   Demo post content used on the Gutenberg plugin to showcase the editor.
     │
     ├── .github/*
-	│   Config of the different Github features (issues and PR templates, CI, owners).
-	│
+    │   Config of the different Github features (issues and PR templates, CI, owners).
+    │
     ├── bin/api-docs
     │   Tool/script used to generate the API Docs.
     │
@@ -77,13 +77,13 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Set of documentation pages composing the [Block editor handbook](https://developer.wordpress.org/block-editor/).
     │
     ├── lib
-	│   PHP Source code of the Gutenberg plugin.
+    │   PHP Source code of the Gutenberg plugin.
     │
     ├── packages
-	│   Source code of the WordPress packages. 
-	│   Packages can be:
-	│    - Production JavaScript scripts and styles loaded on WordPress 
-	│      and the Gutenberg plugin or distributed as npm packages.
+    │   Source code of the WordPress packages. 
+    │   Packages can be:
+    │    - Production JavaScript scripts and styles loaded on WordPress 
+    │      and the Gutenberg plugin or distributed as npm packages.
     │    - Development tools available on npm.
     │
     ├── packages/{packageName}/package.json
@@ -97,23 +97,23 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Source code of a given package.
     |
     ├── packages/{packageName}/src/**/*.test.js
-	│   JavaScript unit tests.
+    │   JavaScript unit tests.
     |
     ├── packages/{packageName}/src/**/{ComponentName}/index.js
-	│   Entry point of a given component.
+    │   Entry point of a given component.
     |
     ├── packages/{packageName}/src/**/{ComponentName}/style.scss
-	│   Style entry point for a given component.
-	│
+    │   Style entry point for a given component.
+    │
     ├── packages/{packageName}/src/**/{ComponentName}/stories/*.js
-	│   Component Stories to load on the Gutenberg storybook.
+    │   Component Stories to load on the Gutenberg storybook.
     │
     ├── packages/e2e-tests
-	│   End-2-end tests of the Gutenberg plugin. 
-	│   Distributed as a package for potential reuse in Core and other plugins.
+    │   End-2-end tests of the Gutenberg plugin. 
+    │   Distributed as a package for potential reuse in Core and other plugins.
     │
     ├── phpunit
-	│   Unit tests for the PHP code of the Gutenberg plugin.
+    │   Unit tests for the PHP code of the Gutenberg plugin.
     │
     ├── storybook
     │   Config of the [Gutenberg Storybook](http://wordpress.github.io).
