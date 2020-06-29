@@ -56,7 +56,6 @@ figure.wp-block-gallery {
 		opacity: 0.3;
 	}
 
-	.is-selected .block-library-gallery-item__move-menu,
 	.is-selected .block-library-gallery-item__inline-menu {
 		background: $white;
 		border: 1px solid $dark-gray-primary;
@@ -88,9 +87,17 @@ figure.wp-block-gallery {
 			color: inherit;
 		}
 	}
+
+	.block-editor-media-placeholder {
+		margin: 0;
+		height: 100%;
+
+		.components-placeholder__label {
+			display: flex;
+		}
+	}
 }
 
-.block-library-gallery-item__move-menu,
 .block-library-gallery-item__inline-menu {
 	margin: $grid-unit-10;
 	display: inline-flex;
@@ -112,22 +119,17 @@ figure.wp-block-gallery {
 .block-library-gallery-item__inline-menu {
 	position: absolute;
 	top: -2px;
-	right: -2px;
-}
 
-.block-library-gallery-item__move-menu {
-	position: absolute;
-	top: -2px;
-	left: -2px;
-}
-
-// Increases specificity
-// Resolves: https://github.com/WordPress/gutenberg/issues/23469
-.wp-block-gallery {
-	.blocks-gallery-item__move-backward.components-button,
-	.blocks-gallery-item__move-forward.components-button,
-	.blocks-gallery-item__remove.components-button {
+	.components-button.has-icon {
 		padding: 0;
+	}
+
+	&.is-left {
+		left: -2px;
+	}
+
+	&.is-right {
+		right: -2px;
 	}
 }
 
