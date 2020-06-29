@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { Animate, Button, Panel, Slot, Fill } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { withPluginContext } from '@wordpress/plugins';
 import { starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
 
@@ -17,6 +16,8 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import ComplementaryAreaHeader from '../complementary-area-header';
+import ComplementaryAreaToggle from '../complementary-area-toggle';
+import withComplementaryAreaContext from '../complementary-area-context';
 import PinnedItems from '../pinned-items';
 
 function ComplementaryAreaSlot( { scope, ...props } ) {
@@ -135,17 +136,13 @@ function ComplementaryArea( {
 		<>
 			{ isPinned && isPinnable && (
 				<PinnedItems scope={ scope }>
-					<Button
-						icon={ icon }
-						label={ title }
-						onClick={ () =>
-							isActive
-								? disableComplementaryArea( scope )
-								: enableComplementaryArea( scope, identifier )
-						}
+					<ComplementaryAreaToggle
+						scope={ scope }
+						identifier={ identifier }
 						isPressed={ isActive }
 						aria-expanded={ isActive }
-						shortcut={ toggleShortcut }
+						label={ title }
+						icon={ icon }
 					/>
 				</PinnedItems>
 			) }
@@ -162,7 +159,12 @@ function ComplementaryArea( {
 						closeLabel={ closeLabel }
 						onClose={ () => disableComplementaryArea( scope ) }
 						smallScreenTitle={ smallScreenTitle }
-						toggleShortcut={ toggleShortcut }
+						toggleButtonProps={ {
+							label: closeLabel,
+							shortcut: toggleShortcut,
+							scope,
+							identifier,
+						} }
 					>
 						{ header || (
 							<>
@@ -198,13 +200,9 @@ function ComplementaryArea( {
 	);
 }
 
-const ComplementaryAreaWrapped = withPluginContext( ( context, ownProps ) => {
-	return {
-		icon: ownProps.icon || context.icon,
-		identifier:
-			ownProps.identifier || `${ context.name }/${ ownProps.name }`,
-	};
-} )( ComplementaryArea );
+const ComplementaryAreaWrapped = withComplementaryAreaContext(
+	ComplementaryArea
+);
 
 ComplementaryAreaWrapped.Slot = ComplementaryAreaSlot;
 

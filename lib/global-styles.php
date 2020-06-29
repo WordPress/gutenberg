@@ -199,34 +199,28 @@ function gutenberg_experimental_global_styles_get_core() {
 function gutenberg_experimental_global_styles_get_theme_presets() {
 	$theme_presets = array();
 
-	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
-	if ( is_array( $theme_colors ) ) {
-		foreach ( $theme_colors as $color ) {
-			$theme_presets['global']['presets']['color'][] = array(
-				'slug'  => $color['slug'],
-				'value' => $color['color'],
-			);
-		}
+	$theme_colors = gutenberg_experimental_get( get_theme_support( 'editor-color-palette' ), array( '0' ) );
+	foreach ( $theme_colors as $color ) {
+		$theme_presets['global']['presets']['color'][] = array(
+			'slug'  => $color['slug'],
+			'value' => $color['color'],
+		);
 	}
 
-	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[0];
-	if ( is_array( $theme_gradients ) ) {
-		foreach ( $theme_gradients as $gradient ) {
-			$theme_presets['global']['presets']['gradient'][] = array(
-				'slug'  => $gradient['slug'],
-				'value' => $gradient['gradient'],
-			);
-		}
+	$theme_gradients = gutenberg_experimental_get( get_theme_support( 'editor-gradient-presets' ), array( '0' ) );
+	foreach ( $theme_gradients as $gradient ) {
+		$theme_presets['global']['presets']['gradient'][] = array(
+			'slug'  => $gradient['slug'],
+			'value' => $gradient['gradient'],
+		);
 	}
 
-	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[0];
-	if ( is_array( $theme_font_sizes ) ) {
-		foreach ( $theme_font_sizes as $font_size ) {
-			$theme_presets['global']['presets']['font-size'][] = array(
-				'slug'  => $font_size['slug'],
-				'value' => $font_size['size'],
-			);
-		}
+	$theme_font_sizes = gutenberg_experimental_get( get_theme_support( 'editor-font-sizes' ), array( '0' ) );
+	foreach ( $theme_font_sizes as $font_size ) {
+		$theme_presets['global']['presets']['font-size'][] = array(
+			'slug'  => $font_size['slug'],
+			'value' => $font_size['size'],
+		);
 	}
 
 	return $theme_presets;
@@ -308,7 +302,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 
 	$registry = WP_Block_Type_Registry::get_instance();
 	foreach ( $registry->get_all_registered() as $block_name => $block_type ) {
-		if ( ! is_array( $block_type->supports ) ) {
+		if ( empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
 			continue;
 		}
 
@@ -375,17 +369,18 @@ function gutenberg_experimental_global_styles_get_block_data() {
  */
 function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
 	$mappings = array(
-		'line-height'      => array( 'typography', 'lineHeight' ),
-		'font-size'        => array( 'typography', 'fontSize' ),
-		'background'       => array( 'color', 'gradient' ),
-		'background-color' => array( 'color', 'background' ),
-		'color'            => array( 'color', 'text' ),
+		'line-height'              => array( 'typography', 'lineHeight' ),
+		'font-size'                => array( 'typography', 'fontSize' ),
+		'background'               => array( 'color', 'gradient' ),
+		'background-color'         => array( 'color', 'background' ),
+		'color'                    => array( 'color', 'text' ),
+		'--wp--style--color--link' => array( 'color', 'link' ),
 	);
 
 	$result = array();
 
 	foreach ( $mappings as $key => $path ) {
-		$value = gutenberg_experimental_get( $styles, $path );
+		$value = gutenberg_experimental_get( $styles, $path, null );
 		if ( null !== $value ) {
 			$result[ $key ] = $value;
 		}
@@ -438,6 +433,16 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
 			)
 		);
 	}
+
+	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		// To support all themes, we added in the block-library stylesheet
+		// a style rule such as .has-link-color a { color: var(--wp--style--color--link, #00e); }
+		// so that existing link colors themes used didn't break.
+		// We add this here to make it work for themes that opt-in to theme.json
+		// In the future, we may do this differently.
+		$stylesheet .= 'a { color: var(--wp--style--color--link, #00e); }';
+	}
+
 	return $stylesheet;
 }
 
@@ -453,6 +458,7 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
 function gutenberg_experimental_global_styles_resolver_styles( $block_selector, $block_supports, $block_styles ) {
 	$css_rule         = '';
 	$css_declarations = '';
+
 	foreach ( $block_styles as $property => $value ) {
 		// Only convert to CSS:
 		//
@@ -553,9 +559,6 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		return;
-	}
 
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet();
 
@@ -571,18 +574,17 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		return $settings;
+
+	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
+
+		$global_styles = gutenberg_experimental_global_styles_merge_trees(
+			gutenberg_experimental_global_styles_get_core(),
+			gutenberg_experimental_global_styles_get_theme()
+		);
+
+		$settings['__experimentalGlobalStylesBase'] = $global_styles;
 	}
-
-	$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
-
-	$global_styles = gutenberg_experimental_global_styles_merge_trees(
-		gutenberg_experimental_global_styles_get_core(),
-		gutenberg_experimental_global_styles_get_theme()
-	);
-
-	$settings['__experimentalGlobalStylesBase'] = $global_styles;
 
 	// Add the styles for the editor via the settings
 	// so they get processed as if they were added via add_editor_styles:

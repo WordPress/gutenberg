@@ -12,6 +12,30 @@
 		"parent": null
 	},
 	{
+		"title": "Architecture",
+		"slug": "architecture",
+		"markdown_source": "../docs/architecture/readme.md",
+		"parent": "principles"
+	},
+	{
+		"title": "Modularity",
+		"slug": "modularity",
+		"markdown_source": "../docs/architecture/modularity.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Performance",
+		"slug": "performance",
+		"markdown_source": "../docs/architecture/performance.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Automated Testing",
+		"slug": "automated-testing",
+		"markdown_source": "../docs/architecture/automated-testing.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Key Concepts",
 		"slug": "key-concepts",
 		"markdown_source": "../docs/designers-developers/key-concepts.md",
@@ -720,6 +744,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ComboboxControl",
+		"slug": "combobox-control",
+		"markdown_source": "../packages/components/src/combobox-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CustomSelectControl",
 		"slug": "custom-select-control",
 		"markdown_source": "../packages/components/src/custom-select-control/README.md",
@@ -993,6 +1023,12 @@
 		"title": "ResizableBox",
 		"slug": "resizable-box",
 		"markdown_source": "../packages/components/src/resizable-box/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ResizeTooltip",
+		"slug": "resize-tooltip",
+		"markdown_source": "../packages/components/src/resizable-box/resize-tooltip/README.md",
 		"parent": "components"
 	},
 	{
@@ -1569,6 +1605,24 @@
 		"title": "@wordpress/project-management-automation",
 		"slug": "packages-project-management-automation",
 		"markdown_source": "../packages/project-management-automation/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-aztec",
+		"slug": "packages-react-native-aztec",
+		"markdown_source": "../packages/react-native-aztec/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-bridge",
+		"slug": "packages-react-native-bridge",
+		"markdown_source": "../packages/react-native-bridge/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-editor",
+		"slug": "packages-react-native-editor",
+		"markdown_source": "../packages/react-native-editor/README.md",
 		"parent": "packages"
 	},
 	{

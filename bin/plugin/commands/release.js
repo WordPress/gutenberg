@@ -5,6 +5,7 @@ const inquirer = require( 'inquirer' );
 const fs = require( 'fs' );
 const semver = require( 'semver' );
 const Octokit = require( '@octokit/rest' );
+const { sprintf } = require( 'sprintf-js' );
 
 /**
  * Internal dependencies
@@ -19,6 +20,10 @@ const {
 const git = require( '../lib/git' );
 const svn = require( '../lib/svn' );
 const { getNextMajorVersion } = require( '../lib/version' );
+const {
+	getIssuesByMilestone,
+	getMilestoneByTitle,
+} = require( '../lib/milestone' );
 const config = require( '../config' );
 const {
 	runGitRepositoryCloneStep,
@@ -445,11 +450,12 @@ async function runGithubReleaseStep(
 				type: 'input',
 				name: 'token',
 				message:
-					'Please provide a GitHub personal authentication token. Navigate to ' +
+					'Please enter a GitHub personal authentication token.\n' +
+					'You can create one by navigating to ' +
 					formats.success(
 						'https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages'
 					) +
-					' to create one.',
+					'.\nToken:',
 			},
 		] );
 
@@ -625,6 +631,50 @@ async function updateThePluginStableVersion(
 }
 
 /**
+ * Checks whether the milestone associated with the release has open issues or
+ * pull requests. Returns a promise resolving to true if there are no open issue
+ * or pull requests, or false otherwise.
+ *
+ * @param {string} version Release version.
+ *
+ * @return {Promise<boolean>} Promise resolving to boolean indicating whether
+ *                            the milestone is clear of open issues.
+ */
+async function isMilestoneClear( version ) {
+	const { githubRepositoryOwner: owner, githubRepositoryName: name } = config;
+	const octokit = new Octokit();
+	const milestone = await getMilestoneByTitle(
+		octokit,
+		owner,
+		name,
+		// Disable reason: valid-sprintf applies to `@wordpress/i18n` where
+		// strings are expected to need to be extracted, and thus variables are
+		// not allowed. This string will not need to be extracted.
+		// eslint-disable-next-line @wordpress/valid-sprintf
+		sprintf( config.versionMilestoneFormat, {
+			...config,
+			...semver.parse( version ),
+		} )
+	);
+
+	if ( ! milestone ) {
+		// If milestone can't be found, it's not especially actionable to warn
+		// that the milestone isn't clear. `true` is the sensible fallback.
+		return true;
+	}
+
+	const issues = await getIssuesByMilestone(
+		new Octokit(),
+		owner,
+		name,
+		milestone.number,
+		'open'
+	);
+
+	return issues.length === 0;
+}
+
+/**
  * Release a new version.
  *
  * @param {boolean} isRC Whether it's an RC release or not.
@@ -661,6 +711,14 @@ async function releasePlugin( isRC = true ) {
 				abortMessage
 		  );
 
+	if ( ! ( await isMilestoneClear( version ) ) ) {
+		await askForConfirmation(
+			'There are still open issues in the milestone. Are you sure you want to proceed?',
+			false,
+			abortMessage
+		);
+	}
+
 	// Bumping the version and commit.
 	const commitHash = await runBumpPluginVersionUpdateChangelogAndCommitStep(
 		gitWorkingDirectory,
@@ -686,9 +744,9 @@ async function releasePlugin( isRC = true ) {
 	);
 
 	abortMessage =
-		'Aborting! Make sure to ' + isRC
-			? 'remove'
-			: 'reset' + ' the remote release branch and remove the git tag.';
+		'Aborting! Make sure to ' +
+		( isRC ? 'remove' : 'reset' ) +
+		' the remote release branch and remove the git tag.';
 
 	// Creating the GitHub Release
 	const release = await runGithubReleaseStep(

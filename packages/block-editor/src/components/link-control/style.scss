@@ -127,7 +127,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 	// The added specificity is needed to override.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus $theme-color inset;
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color) inset;
 	}
 
 	&.is-selected {

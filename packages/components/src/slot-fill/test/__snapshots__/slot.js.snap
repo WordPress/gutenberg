@@ -164,3 +164,11 @@ exports[`Slot should render in expected order 1`] = `
   />
 </div>
 `;
+
+exports[`Slot should warn without a Provider 1`] = `
+<div>
+  <div>
+    <div />
+  </div>
+</div>
+`;

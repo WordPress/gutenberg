@@ -7,24 +7,12 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   <div
     className="editor-post-publish-panel__header"
   >
-    <div
-      className="editor-post-publish-panel__header-published"
-    >
-      Published
-    </div>
     <ForwardRef(Button)
-      icon={
-        <SVG
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <Path
-            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
-          />
-        </SVG>
-      }
+      className="is-secondary"
       label="Close panel"
-    />
+    >
+      Close
+    </ForwardRef(Button)>
   </div>
   <div
     className="editor-post-publish-panel__content"
@@ -50,24 +38,12 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   <div
     className="editor-post-publish-panel__header"
   >
-    <div
-      className="editor-post-publish-panel__header-published"
-    >
-      Scheduled
-    </div>
     <ForwardRef(Button)
-      icon={
-        <SVG
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <Path
-            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
-          />
-        </SVG>
-      }
+      className="is-secondary"
       label="Close panel"
-    />
+    >
+      Close
+    </ForwardRef(Button)>
   </div>
   <div
     className="editor-post-publish-panel__content"
@@ -101,19 +77,16 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
         onSubmit={[Function]}
       />
     </div>
-    <ForwardRef(Button)
-      icon={
-        <SVG
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <Path
-            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
-          />
-        </SVG>
-      }
-      label="Close panel"
-    />
+    <div
+      className="editor-post-publish-panel__header-cancel-button"
+    >
+      <ForwardRef(Button)
+        className="is-secondary"
+        label="Close panel"
+      >
+        Cancel
+      </ForwardRef(Button)>
+    </div>
   </div>
   <div
     className="editor-post-publish-panel__content"
@@ -145,19 +118,16 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
         onSubmit={[Function]}
       />
     </div>
-    <ForwardRef(Button)
-      icon={
-        <SVG
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <Path
-            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
-          />
-        </SVG>
-      }
-      label="Close panel"
-    />
+    <div
+      className="editor-post-publish-panel__header-cancel-button"
+    >
+      <ForwardRef(Button)
+        className="is-secondary"
+        label="Close panel"
+      >
+        Cancel
+      </ForwardRef(Button)>
+    </div>
   </div>
   <div
     className="editor-post-publish-panel__content"
@@ -189,19 +159,16 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
         onSubmit={[Function]}
       />
     </div>
-    <ForwardRef(Button)
-      icon={
-        <SVG
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <Path
-            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
-          />
-        </SVG>
-      }
-      label="Close panel"
-    />
+    <div
+      className="editor-post-publish-panel__header-cancel-button"
+    >
+      <ForwardRef(Button)
+        className="is-secondary"
+        label="Close panel"
+      >
+        Cancel
+      </ForwardRef(Button)>
+    </div>
   </div>
   <div
     className="editor-post-publish-panel__content"

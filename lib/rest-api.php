@@ -55,7 +55,8 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
 /**
  * Add fields required for site editing to the /themes endpoint.
  *
- * @todo Remove once https://core.trac.wordpress.org/ticket/49906 is fixed.
+ * @todo Remove once Gutenberg's minimum required WordPress version is v5.5.
+ * @see https://core.trac.wordpress.org/ticket/49906
  * @see https://github.com/WordPress/wordpress-develop/pull/222
  *
  * @param WP_REST_Response $response The response object.
@@ -63,25 +64,63 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
  * @param WP_REST_Request  $request  Request object.
  */
 function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
-	$data           = $response->get_data();
-	$field_mappings = array(
-		'author'      => 'Author',
-		'author_name' => 'Author Name',
-		'author_uri'  => 'Author URI',
-		'description' => 'Description',
-		'name'        => 'Name',
-		'stylesheet'  => 'Stylesheet',
-		'template'    => 'Template',
-		'theme_uri'   => 'Theme URI',
-		'version'     => 'Version',
-	);
+	$data   = $response->get_data();
+	$fields = array_keys( $data );
 
-	foreach ( $field_mappings as $field => $theme_field ) {
-		$data[ $field ] = $theme[ $theme_field ];
+	/**
+	 * The following is basically copied from Core's WP_REST_Themes_Controller::prepare_item_for_response()
+	 * (as of WP v5.5), with `rest_is_field_included()` replaced by `! in_array()`.
+	 * This makes sure that we add all the fields that are missing from Core.
+	 *
+	 * @see https://github.com/WordPress/WordPress/blob/019bc2d244c4d536338d2c634419583e928143df/wp-includes/rest-api/endpoints/class-wp-rest-themes-controller.php#L118-L167
+	 */
+	if ( ! in_array( 'stylesheet', $fields, true ) ) {
+		$data['stylesheet'] = $theme->get_stylesheet();
 	}
 
-	// Using $theme->get_screenshot() with no args to get absolute URL.
-	$data['screenshot'] = $theme->get_screenshot();
+	if ( ! in_array( 'template', $fields, true ) ) {
+		/**
+		 * Use the get_template() method, not the 'Template' header, for finding the template.
+		 * The 'Template' header is only good for what was written in the style.css, while
+		 * get_template() takes into account where WordPress actually located the theme and
+		 * whether it is actually valid.
+		 */
+		$data['template'] = $theme->get_template();
+	}
+
+	$plain_field_mappings = array(
+		'requires_php' => 'RequiresPHP',
+		'requires_wp'  => 'RequiresWP',
+		'textdomain'   => 'TextDomain',
+		'version'      => 'Version',
+	);
+
+	foreach ( $plain_field_mappings as $field => $header ) {
+		if ( ! in_array( $field, $fields, true ) ) {
+			$data[ $field ] = $theme->get( $header );
+		}
+	}
+
+	if ( ! in_array( 'screenshot', $fields, true ) ) {
+		// Using $theme->get_screenshot() with no args to get absolute URL.
+		$data['screenshot'] = $theme->get_screenshot() ? $theme->get_screenshot() : '';
+	}
+
+	$rich_field_mappings = array(
+		'author'      => 'Author',
+		'author_uri'  => 'AuthorURI',
+		'description' => 'Description',
+		'name'        => 'Name',
+		'tags'        => 'Tags',
+		'theme_uri'   => 'ThemeURI',
+	);
+
+	foreach ( $rich_field_mappings as $field => $header ) {
+		if ( ! in_array( $field, $fields, true ) ) {
+			$data[ $field ]['raw']      = $theme->display( $header, false, true );
+			$data[ $field ]['rendered'] = $theme->display( $header );
+		}
+	}
 
 	$response->set_data( $data );
 	return $response;
@@ -119,10 +158,6 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
  * @since 6.5.0
  */
 function gutenberg_register_rest_block_directory() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ) ) {
-		return;
-	}
-
 	$block_directory_controller = new WP_REST_Block_Directory_Controller();
 	$block_directory_controller->register_routes();
 }
@@ -153,6 +188,16 @@ function gutenberg_register_rest_customizer_nonces() {
 	$nav_menu_location->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
+
+
+/**
+ * Registers the Plugins REST API routes.
+ */
+function gutenberg_register_plugins_endpoint() {
+	$plugins = new WP_REST_Plugins_Controller();
+	$plugins->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.

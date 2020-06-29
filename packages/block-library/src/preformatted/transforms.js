@@ -8,9 +8,10 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/code', 'core/paragraph' ],
-			transform: ( { content } ) =>
+			transform: ( { content, anchor } ) =>
 				createBlock( 'core/preformatted', {
 					content,
+					anchor,
 				} ),
 		},
 		{
@@ -34,6 +35,11 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				createBlock( 'core/paragraph', attributes ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/code' ],
+			transform: ( attributes ) => createBlock( 'core/code', attributes ),
 		},
 	],
 };

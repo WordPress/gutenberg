@@ -15,8 +15,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import CreateMenuPanel from './create-menu-panel';
-import MenuEditor from '../menu-editor';
+import CreateMenuArea from './create-menu-area';
+import NavigationEditor from '../navigation-editor';
 
 export default function MenusEditor( { blockEditorSettings } ) {
 	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
@@ -80,7 +80,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 									label: menu.name,
 								} ) ) }
 								onChange={ ( selectedMenuId ) =>
-									setMenuId( selectedMenuId )
+									setMenuId( Number( selectedMenuId ) )
 								}
 								value={ menuId }
 							/>
@@ -95,7 +95,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				</CardBody>
 			</Card>
 			{ isCreateMenuPanelVisible && (
-				<CreateMenuPanel
+				<CreateMenuArea
 					menus={ stateMenus }
 					onCancel={
 						// User can only cancel out of menu creation if there
@@ -111,7 +111,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				/>
 			) }
 			{ hasMenus && (
-				<MenuEditor
+				<NavigationEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
 					onDeleteMenu={ ( deletedMenu ) => {

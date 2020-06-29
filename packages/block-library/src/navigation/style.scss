@@ -20,7 +20,6 @@
 	align-items: center;
 	position: relative;
 	margin: 0;
-	padding: $grid-unit-10;
 
 	.wp-block-navigation__container:empty {
 		display: none;
@@ -32,7 +31,6 @@
 	$navigation-vertical-padding: $grid-unit-10 * 0.75;
 	.wp-block-navigation__container {
 		border: $border-width solid rgba(0, 0, 0, 0.15);
-		padding: $navigation-vertical-padding 0;
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
@@ -60,8 +58,8 @@
 
 			// Nested submenus sit to the left on large breakpoints
 			.wp-block-navigation__container {
-				left: calc(100% + #{$grid-unit-10});
-				top: -$border-width - $navigation-vertical-padding;
+				left: 100%;
+				top: -1px;
 
 				// Prevent the menu from disappearing when the mouse is over the gap
 				&::before {
@@ -108,8 +106,11 @@
 // All links
 .wp-block-navigation-link__content {
 	text-decoration: none;
-	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+	padding: $grid-unit-10 $grid-unit-10 * 2;
 
+	+ .wp-block-navigation-link__content {
+		padding-top: 0;
+	}
 	.has-text-color & {
 		color: inherit;
 	}
@@ -168,4 +169,67 @@
 
 .items-justified-right > ul {
 	justify-content: flex-end;
+}
+
+.wp-block-navigation-placeholder__actions {
+	display: flex;
+	align-items: flex-start;
+
+	.components-base-control {
+		margin-right: 5px;
+	}
+
+	.components-select-control__input {
+		margin: 0;
+		min-height: 36px; // match button height
+	}
+
+	.wp-block-navigation-placeholder__button {
+		height: 36px;
+	}
+}
+
+.wp-block-navigation-placeholder {
+
+	.components-spinner {
+		margin-top: -4px;
+		margin-left: 4px;
+		vertical-align: middle;
+		margin-right: 7px;
+	}
+	.components-custom-select-control__button {
+		height: auto; // overide default button styles
+		margin-bottom: 0; // cancel bottom margin
+		min-width: 220px; // avoids control size jump depending on selection
+	}
+
+	// Styles for when there are Menus present in the dropdown.
+	.components-custom-select-control.has-menus .components-custom-select-control__item {
+		display: list-item; // remove flex to allow pseudo element to stack
+		padding: 10px 25px;
+
+		// Creates a faux divider between the menu options if present
+		&.is-create-empty-option {
+			position: relative; // positioning context for pseudo
+			margin-top: 20px;
+
+			&::before {
+				content: "";
+				position: absolute; // take out of flow to retain size of list item
+				top: -10px;
+				left: 25px; // match list item padding
+				right: 25px; // match list item padding
+				display: list-item;
+				height: 15px;
+				border-top: 1px solid $medium-gray-text;
+			}
+		}
+	}
+
+	.components-custom-select-control__menu {
+		margin-top: 3px; // match gap in design
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+
 }

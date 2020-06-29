@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { apiFetch, select } from '@wordpress/data-controls';
+import { apiFetch, dispatch, select } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -65,18 +65,17 @@ export function* installBlockType( block ) {
 		if ( ! Array.isArray( assets ) || ! assets.length ) {
 			throw new Error( __( 'Block has no assets.' ) );
 		}
-		yield setIsInstalling( true );
+		yield setIsInstalling( block.id, true );
 		const response = yield apiFetch( {
-			path: '__experimental/block-directory/install',
+			path: '__experimental/plugins',
 			data: {
 				slug: block.id,
+				status: 'active',
 			},
 			method: 'POST',
 		} );
-		if ( response.success !== true ) {
-			throw new Error( __( 'Unable to install this block.' ) );
-		}
-		yield addInstalledBlockType( block );
+		const endpoint = response?._links?.self[ 0 ]?.href;
+		yield addInstalledBlockType( { ...block, endpoint } );
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
@@ -87,8 +86,36 @@ export function* installBlockType( block ) {
 	} catch ( error ) {
 		yield setErrorNotice( id, error.message || __( 'An error occurred.' ) );
 	}
-	yield setIsInstalling( false );
+	yield setIsInstalling( block.id, false );
 	return success;
+}
+
+/**
+ * Action triggered to uninstall a block plugin.
+ *
+ * @param {Object} block The blockType object.
+ */
+export function* uninstallBlockType( block ) {
+	try {
+		yield apiFetch( {
+			url: block.endpoint,
+			data: {
+				status: 'inactive',
+			},
+			method: 'PUT',
+		} );
+		yield apiFetch( {
+			url: block.endpoint,
+			method: 'DELETE',
+		} );
+		yield removeInstalledBlockType( block );
+	} catch ( error ) {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			error.message || __( 'An error occurred.' )
+		);
+	}
 }
 
 /**
@@ -106,15 +133,31 @@ export function addInstalledBlockType( item ) {
 }
 
 /**
+ * Returns an action object used to remove a newly installed block type.
+ *
+ * @param {string} item The block item with the block id and name.
+ *
+ * @return {Object} Action object.
+ */
+export function removeInstalledBlockType( item ) {
+	return {
+		type: 'REMOVE_INSTALLED_BLOCK_TYPE',
+		item,
+	};
+}
+
+/**
  * Returns an action object used to indicate install in progress
  *
+ * @param {string} blockId
  * @param {boolean} isInstalling
  *
  * @return {Object} Action object.
  */
-export function setIsInstalling( isInstalling ) {
+export function setIsInstalling( blockId, isInstalling ) {
 	return {
 		type: 'SET_INSTALLING_BLOCK',
+		blockId,
 		isInstalling,
 	};
 }

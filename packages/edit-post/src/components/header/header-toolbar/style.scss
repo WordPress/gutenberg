@@ -1,6 +1,7 @@
 .edit-post-header-toolbar {
 	display: inline-flex;
 	align-items: center;
+	border: none;
 
 	// Hide all action buttons except the inserter on mobile.
 	> .components-button {
@@ -21,6 +22,28 @@
 
 		@include break-small() {
 			display: flex;
+		}
+	}
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles
+	> .components-button.has-icon,
+	> .components-dropdown > .components-button.has-icon {
+		height: $button-size;
+		min-width: $button-size;
+		padding: 6px;
+
+		&.is-pressed {
+			background: $dark-gray-primary;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
+			outline: 1px solid transparent;
+		}
+
+		&::before {
+			display: none;
 		}
 	}
 }
@@ -82,7 +105,7 @@
 	}
 }
 
-.edit-post-header-toolbar .edit-post-header-toolbar__inserter-toggle {
+.edit-post-header-toolbar .edit-post-header-toolbar__inserter-toggle.has-icon {
 	margin-right: $grid-unit-10;
 	// Special dimensions for this button.
 	min-width: 32px;

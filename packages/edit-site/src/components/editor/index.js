@@ -57,7 +57,8 @@ function Editor() {
 		templateType,
 		page,
 		template,
-	} = useSelect( ( select ) => {
+		select,
+	} = useSelect( ( _select ) => {
 		const {
 			isFeatureActive,
 			__experimentalGetPreviewDeviceType,
@@ -66,14 +67,14 @@ function Editor() {
 			getTemplatePartId,
 			getTemplateType,
 			getPage,
-		} = select( 'core/edit-site' );
+		} = _select( 'core/edit-site' );
 		const _templateId = getTemplateId();
 		const _templatePartId = getTemplatePartId();
 		const _templateType = getTemplateType();
 		return {
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
-			sidebarIsOpened: !! select(
+			sidebarIsOpened: !! _select(
 				'core/interface'
 			).getActiveComplementaryArea( 'core/edit-site' ),
 			settings: getSettings(),
@@ -81,13 +82,15 @@ function Editor() {
 			templatePartId: _templatePartId,
 			templateType: _templateType,
 			page: getPage(),
-			template: select( 'core' ).getEntityRecord(
+			template: _select( 'core' ).getEntityRecord(
 				'postType',
 				_templateType,
 				_templateType === 'wp_template' ? _templateId : _templatePartId
 			),
+			select: _select,
 		};
 	}, [] );
+	const { editEntityRecord } = useDispatch( 'core' );
 	const { setPage } = useDispatch( 'core/edit-site' );
 
 	const inlineStyles = useResizeCanvas( deviceType );
@@ -101,8 +104,20 @@ function Editor() {
 		[]
 	);
 	const closeEntitiesSavedStates = useCallback(
-		() => setIsEntitiesSavedStatesOpen( false ),
-		[]
+		( entitiesToSave ) => {
+			if ( entitiesToSave ) {
+				const { getEditedEntityRecord } = select( 'core' );
+				entitiesToSave.forEach( ( { kind, name, key } ) => {
+					const record = getEditedEntityRecord( kind, name, key );
+					editEntityRecord( kind, name, key, {
+						status: 'publish',
+						title: record.slug,
+					} );
+				} );
+			}
+			setIsEntitiesSavedStatesOpen( false );
+		},
+		[ select ]
 	);
 
 	// Set default query for misplaced Query Loop blocks, and
@@ -129,7 +144,7 @@ function Editor() {
 		} ),
 		[ page.context ]
 	);
-	return template ? (
+	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -208,7 +223,7 @@ function Editor() {
 											>
 												<Notices />
 												<Popover.Slot name="block-toolbar" />
-												<BlockEditor />
+												{ template && <BlockEditor /> }
 												<KeyboardShortcuts />
 											</BlockSelectionClearer>
 										}
@@ -253,6 +268,6 @@ function Editor() {
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</>
-	) : null;
+	);
 }
 export default Editor;

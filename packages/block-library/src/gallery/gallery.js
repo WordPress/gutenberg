@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { RichText } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ export const Gallery = ( props ) => {
 		onDeselectImage,
 		onSetImageAttributes,
 		onFocusGalleryCaption,
+		insertBlocksAfter,
 	} = props;
 
 	const {
@@ -97,6 +99,9 @@ export const Gallery = ( props ) => {
 				unstableOnFocus={ onFocusGalleryCaption }
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
+				__unstableOnSplitAtEnd={ () =>
+					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+				}
 			/>
 		</figure>
 	);
