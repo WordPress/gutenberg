@@ -166,7 +166,6 @@ function Navigation( {
 				</BlockColorsStyleSelector>
 			</BlockControls>
 			{ navigatorModal }
-
 			<InspectorControls>
 				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
