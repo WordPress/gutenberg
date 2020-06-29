@@ -51,11 +51,11 @@ export function setTemplate( templateId ) {
 }
 
 /**
- * Returns an action object used to add a template.
+ * Adds a new template, and sets it as the current template.
  *
  * @param {Object} template The template.
  *
- * @return {Object} Action object.
+ * @return {Object} Action object used to set the current template.
  */
 export function* addTemplate( template ) {
 	const newTemplate = yield dispatch(
@@ -72,11 +72,11 @@ export function* addTemplate( template ) {
 }
 
 /**
- * Returns an action object used to remove a template.
+ * Removes a template, and updates the current page and template.
  *
  * @param {number} templateId The template ID.
  *
- * @return {Object} Action object.
+ * @return {Object} Action object used to set the current page and template.
  */
 export function* removeTemplate( templateId ) {
 	yield apiFetch( {
