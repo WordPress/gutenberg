@@ -789,7 +789,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		$schema['properties']['title'] = array(
 			'description' => __( 'The title for the object.', 'gutenberg' ),
-			'type'        => array( 'object', 'string' ),
+			'type'        => array( 'string', 'object' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'arg_options' => array(
 				'validate_callback' => static function ( $value, $request ) {

@@ -195,6 +195,52 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	/**
 	 *
 	 */
+	public function test_create_item_title_array() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$params = $this->set_menu_item_data(
+			array(
+				'title' => array(
+					'raw'      => 'A raw title',
+					'rendered' => 'A rendered title',
+				),
+			)
+		);
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->check_create_menu_item_response( $response );
+		$this->assertEquals( 'A raw title', $response->get_data()['title']['raw'] );
+	}
+
+	/**
+	 *
+	 */
+	public function test_create_item_title_empty() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$params = $this->set_menu_item_data(
+			array(
+				'title' => array(
+					'raw'      => '',
+					'rendered' => 'A rendered title',
+				),
+			)
+		);
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->check_create_menu_item_response( $response );
+		$this->assertEquals( '', $response->get_data()['title']['raw'] );
+	}
+
+	/**
+	 *
+	 */
 	public function test_create_item_invalid_term() {
 		wp_set_current_user( self::$admin_id );
 
