@@ -9,9 +9,13 @@ import ReactNative, {
 	Platform,
 } from 'react-native';
 import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
+/**
+ * WordPress dependencies
+ */
+import { ENTER, BACKSPACE } from '@wordpress/keycodes';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
-const BACKSPACE = 8;
+
 class AztecView extends React.Component {
 	constructor() {
 		super( ...arguments );
@@ -65,7 +69,7 @@ class AztecView extends React.Component {
 
 		const { onKeyDown } = this.props;
 
-		const newEvent = { ...event, keyCode: 13 };
+		const newEvent = { ...event, keyCode: ENTER };
 		onKeyDown( newEvent );
 	}
 
