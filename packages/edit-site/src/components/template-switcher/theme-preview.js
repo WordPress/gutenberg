@@ -9,20 +9,24 @@ import { truncate } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 
 function ThemePreview( {
-	theme: { author_name: authorName, description, name, screenshot, version },
+	theme: { author, description, name, screenshot, version },
 } ) {
 	return (
 		<div className="edit-site-template-switcher__theme-preview">
-			<span className="edit-site-template-switcher__theme-preview-name">
-				{ name }
-			</span>{ ' ' }
+			<span
+				className="edit-site-template-switcher__theme-preview-name"
+				dangerouslySetInnerHTML={ {
+					/* name.rendered is sanitized on the server side. */
+					__html: name.rendered,
+				} }
+			/>{ ' ' }
 			<span className="edit-site-template-switcher__theme-preview-version">
 				{ 'v' + version }
 			</span>
 			<div className="edit-site-template-switcher__theme-preview-byline">
 				{
 					// translators: %s: theme author name.
-					sprintf( __( 'By %s' ), [ authorName ] )
+					sprintf( __( 'By %s' ), [ author.raw ] )
 				}
 			</div>
 			<img
@@ -31,10 +35,14 @@ function ThemePreview( {
 				alt={ 'Theme Preview' }
 			/>
 			<div className="edit-site-template-switcher__theme-preview-description">
-				{ truncate( description, {
-					length: 120,
-					separator: /\. +/,
-				} ) }
+				{ truncate(
+					/* Not using description.rendered here, as we might contain after an opening HTML tag. */
+					description.raw,
+					{
+						length: 120,
+						separator: /\. +/,
+					}
+				) }
 			</div>
 		</div>
 	);

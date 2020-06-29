@@ -93,7 +93,7 @@ Here's the markup for a left-floated image:
 </div>
 ```
 
-Here's an example using the above markup to achieve a responsive layout that features a sidebar, wide images, and floated elements with bounded captions: https://codepen.io/joen/pen/zLWvrW.
+Here's an example [codepen](https://codepen.io/joen/pen/zLWvrW) using the above markup to achieve a responsive layout that features a sidebar, wide images, and floated elements with bounded captions.
 
 ### Block Color Palettes
 
