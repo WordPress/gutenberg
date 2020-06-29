@@ -47,13 +47,8 @@ export default function InputField( {
 			return;
 		}
 
-		// Only propagate the event if the value is valid.
-		if ( event.target.checkValidity && ! event.target.checkValidity() ) {
-			// Otherwise... reset to initial value
-			setValue( valueProp );
-			return;
-		}
-		onChange( event );
+		setValue( nextValue );
+		onChange( nextValue );
 	};
 
 	const handleOnBlur = ( event ) => {
@@ -61,22 +56,8 @@ export default function InputField( {
 		handleOnCommit( event );
 	};
 
-	const handleOnChange = ( event ) => {
-		setValue( event.target.value );
-
-		/**
-		 * Prevent submitting if changes are invalid.
-		 * This only applies to values being entered via KEY_DOWN.
-		 *
-		 * Pressing the up/down arrows of the HTML input also triggers a
-		 * change event. However, those values will be (pre)validated by the
-		 * HTML input.
-		 */
-		if ( event.target.checkValidity && ! event.target.checkValidity() ) {
-			return;
-		}
-
-		handleOnCommit( event );
+	const handleOnChange = ( next ) => {
+		handleOnCommit( { target: { value: next } } );
 	};
 
 	const handleOnKeyDown = ( event ) => {

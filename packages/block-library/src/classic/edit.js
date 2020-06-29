@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -58,8 +63,12 @@ export default class ClassicEdit extends Component {
 		} = this.props;
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
+		const currentContent = editor.getContent();
 
-		if ( prevProps.attributes.content !== content ) {
+		if (
+			prevProps.attributes.content !== content &&
+			currentContent !== content
+		) {
 			editor.setContent( content || '' );
 		}
 	}
@@ -111,6 +120,20 @@ export default class ClassicEdit extends Component {
 		editor.on( 'mousedown touchstart', () => {
 			bookmark = null;
 		} );
+
+		editor.on(
+			'Paste Change input Undo Redo',
+			debounce( () => {
+				const value = editor.getContent();
+
+				if ( value !== editor._lastChange ) {
+					editor._lastChange = value;
+					setAttributes( {
+						content: value,
+					} );
+				}
+			}, 250 )
+		);
 
 		editor.on( 'keydown', ( event ) => {
 			if (

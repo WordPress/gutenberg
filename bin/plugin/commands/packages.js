@@ -218,9 +218,7 @@ async function updatePackages(
 				const packageJson = readJSONFile( packageJSONPath );
 				const newPackageJson = {
 					...packageJson,
-					version: isPrerelease
-						? nextVersion + '-prerelease'
-						: nextVersion,
+					version: nextVersion + '-prerelease',
 				};
 				fs.writeFileSync(
 					packageJSONPath,
