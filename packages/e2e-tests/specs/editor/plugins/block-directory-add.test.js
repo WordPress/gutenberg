@@ -34,7 +34,7 @@ const MOCK_BLOCK1 = {
 	author: 'No Author',
 	icon: 'block-default',
 	assets: [
-		'fake_url.com/block.js', // we will mock this
+		'https://fake_url.com/block.js', // we will mock this
 	],
 	humanized_updated: '5 months ago',
 };
