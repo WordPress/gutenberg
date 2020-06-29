@@ -23,6 +23,87 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Registers the routes for the objects of the controller.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @see register_rest_route()
+	 */
+	public function register_routes() {
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
+					'permission_callback' => array( $this, 'create_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
+					'sanitize_callback'   => array( $this, 'sanitize' ),
+				),
+				'schema'      => array( $this, 'get_public_item_schema' ),
+				'allow_batch' => true,
+			)
+		);
+
+		$schema        = $this->get_item_schema();
+		$get_item_args = array(
+			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+		);
+		if ( isset( $schema['properties']['password'] ) ) {
+			$get_item_args['password'] = array(
+				'description' => __( 'The password for the post if it is password protected.' ),
+				'type'        => 'string',
+			);
+		}
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)',
+			array(
+				'args'        => array(
+					'id' => array(
+						'description' => __( 'Unique identifier for the object.' ),
+						'type'        => 'integer',
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => $get_item_args,
+				),
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'update_item' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+					'sanitize_callback'   => array( $this, 'sanitize' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
+					'args'                => array(
+						'force' => array(
+							'type'        => 'boolean',
+							'default'     => false,
+							'description' => __( 'Whether to bypass Trash and force deletion.' ),
+						),
+					),
+				),
+				'schema'      => array( $this, 'get_public_item_schema' ),
+				'allow_batch' => true,
+			)
+		);
+	}
+
+	/**
 	 * Get the post, if the ID is valid.
 	 *
 	 * @param int $id Supplied ID.
@@ -113,7 +194,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			return new WP_Error( 'rest_post_exists', __( 'Cannot create existing post.', 'gutenberg' ), array( 'status' => 400 ) );
 		}
 
-		$prepared_nav_item = $this->prepare_item_for_database( $request );
+		$prepared_nav_item = $request['prepared_nav_item'];
 		/**
 		 * Filters a post before it is inserted via the REST API.
 		 *
@@ -216,7 +297,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			return $valid_check;
 		}
 
-		$prepared_nav_item = $this->prepare_item_for_database( $request );
+		$prepared_nav_item = $request['prepared_nav_item'];
 		/**
 		 * Filters a post before it is inserted via the REST API.
 		 *
@@ -348,7 +429,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 *
 	 * @return array|WP_Error
 	 */
-	protected function prepare_item_for_database( $request ) {
+	public function sanitize( $params, $request ) {
 		$menu_item_db_id = $request['id'];
 		$menu_item_obj   = $this->get_nav_menu_item( $menu_item_db_id );
 		// Need to persist the menu item data. See https://core.trac.wordpress.org/ticket/28138 .
@@ -449,13 +530,79 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
-		return $prepared_nav_item;
+		$menu_items    = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
+		$menu_item_ids = array();
+		foreach ( $menu_items as $menu_item ) {
+			$menu_item_ids[] = $menu_item->ID;
+		}
+
+		// If post type archive, check if post type exists.
+		if ( 'post_type_archive' === $request['type'] ) {
+			$post_type         = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
+			$original          = get_post_type_object( $post_type );
+			if ( empty( $original ) ) {
+				return new WP_Error(
+					'rest_post_invalid_type',
+					__( 'Invalid post type.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+		}
+
+		// If menu id is set, valid the value of menu item position and parent id.
+		if ( ! empty( $prepared_nav_item['menu-id'] ) ) {
+			// Check if nav menu is valid.
+			if ( ! is_nav_menu( $prepared_nav_item['menu-id'] ) ) {
+				return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
+			}
+
+			// If menu item position is set to 0, insert as the last item in the existing menu.
+			$menu_items = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
+			if ( 0 === (int) $prepared_nav_item['menu-item-position'] ) {
+				if ( $menu_items ) {
+					$last_item = $menu_items[ count( $menu_items ) - 1 ];
+					if ( $last_item && isset( $last_item->menu_order ) ) {
+						$prepared_nav_item['menu-item-position'] = $last_item->menu_order + 1;
+					} else {
+						$prepared_nav_item['menu-item-position'] = count( $menu_items ) - 1;
+					}
+					array_push( $menu_items, $last_item );
+				} else {
+					$prepared_nav_item['menu-item-position'] = 1;
+				}
+			}
+
+			// Check if existing menu position is already in use by another menu item.
+			$menu_item_ids = array();
+			foreach ( $menu_items as $menu_item ) {
+				$menu_item_ids[] = $menu_item->ID;
+				if ( $menu_item->ID !== (int) $menu_item_db_id ) {
+					if ( (int) $prepared_nav_item['menu-item-position'] === (int) $menu_item->menu_order ) {
+						return new WP_Error( 'invalid_menu_order', __( 'Invalid menu position.', 'gutenberg' ), array( 'status' => 400 ) );
+					}
+				}
+			}
+
+			// Check if valid parent id is valid nav menu item in menu.
+			if ( $prepared_nav_item['menu-item-parent-id'] ) {
+				if ( ! is_nav_menu_item( $prepared_nav_item['menu-item-parent-id'] ) ) {
+					return new WP_Error( 'invalid_menu_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ), array( 'status' => 400 ) );
+				}
+				if ( ! $menu_item_ids || ! in_array( $prepared_nav_item['menu-item-parent-id'], $menu_item_ids, true ) ) {
+					return new WP_Error( 'invalid_item_parent', __( 'Invalid menu item parent.', 'gutenberg' ), array( 'status' => 400 ) );
+				}
+			}
+		}
+
+		$params['POST']['prepared_nav_item'] = $prepared_nav_item;
+
+		return $params;
 	}
 
 	/**
 	 * Prepares a single post output for response.
 	 *
-	 * @param object          $post Post object.
+	 * @param object $post Post object.
 	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return WP_REST_Response Response object.
@@ -733,20 +880,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'default'     => 'custom',
 			'arg_options' => array(
-				'sanitize_callback' => function ( $value, $request ) {
-					if ( 'post_type_archive' === $value ) {
-						$prepared_nav_item = $this->prepare_item_for_database( $request );
-						$post_type         = ( $prepared_nav_item['menu-item-object'] ) ? $prepared_nav_item['menu-item-object'] : false;
-						$original = get_post_type_object( $post_type );
-						if ( empty( $original ) ) {
-							return new WP_Error(
-								'rest_post_invalid_type',
-								__( 'Invalid post type.', 'gutenberg' ),
-								array( 'status' => 400 )
-							);
-						}
-					}
-
+				'sanitize_callback' => function ( $value ) {
 					return sanitize_key( $value );
 				},
 			),
@@ -775,41 +909,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'minimum'     => 0,
 			'default'     => 0,
 			'context'     => array( 'view', 'edit', 'embed' ),
-
-			'arg_options' => array(
-				'sanitize_callback' => function ( $value, $request ) {
-					$prepared_nav_item = $this->prepare_item_for_database( $request );
-					if ( empty( $prepared_nav_item['menu-id'] ) ) {
-						return $value;
-					}
-
-					$menu_items    = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
-					$menu_item_ids = array();
-					foreach ( $menu_items as $menu_item ) {
-						$menu_item_ids[] = $menu_item->ID;
-					}
-
-					// Check if valid parent id is valid nav menu item in menu.
-					if ( $prepared_nav_item['menu-item-parent-id'] ) {
-						if ( ! is_nav_menu_item( $prepared_nav_item['menu-item-parent-id'] ) ) {
-							return new WP_Error(
-								'invalid_menu_item_parent',
-								__( 'Invalid menu item parent.', 'gutenberg' ),
-								array( 'status' => 400 )
-							);
-						}
-						if ( ! $menu_item_ids || ! in_array( $prepared_nav_item['menu-item-parent-id'], $menu_item_ids, true ) ) {
-							return new WP_Error(
-								'invalid_item_parent',
-								__( 'Invalid menu item parent.', 'gutenberg' ),
-								array( 'status' => 400 )
-							);
-						}
-					}
-
-					return $value;
-				},
-			),
 		);
 
 		$schema['properties']['attr_title'] = array(
@@ -875,47 +974,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'type'        => 'integer',
 			'minimum'     => 0,
 			'default'     => 0,
-			'arg_options' => array(
-				'sanitize_callback' => function ( $value, $request ) {
-					$prepared_nav_item = $this->prepare_item_for_database( $request );
-					if ( empty( $prepared_nav_item['menu-id'] ) ) {
-						return $value;
-					}
-
-					// If menu item position is set to 0, insert as the last item in the existing menu.
-					$menu_items = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
-					if ( 0 === (int) $prepared_nav_item['menu-item-position'] ) {
-						if ( $menu_items ) {
-							$last_item = $menu_items[ count( $menu_items ) - 1 ];
-							if ( $last_item && isset( $last_item->menu_order ) ) {
-								$prepared_nav_item['menu-item-position'] = $last_item->menu_order + 1;
-							} else {
-								$prepared_nav_item['menu-item-position'] = count( $menu_items ) - 1;
-							}
-							array_push( $menu_items, $last_item );
-						} else {
-							$prepared_nav_item['menu-item-position'] = 1;
-						}
-					}
-
-					// Check if existing menu position is already in use by another menu item.
-					$menu_item_ids = array();
-					foreach ( $menu_items as $menu_item ) {
-						$menu_item_ids[] = $menu_item->ID;
-						if ( $menu_item->ID !== (int) $request['id'] ) {
-							if ( (int) $prepared_nav_item['menu-item-position'] === (int) $menu_item->menu_order ) {
-								return new WP_Error(
-									'invalid_menu_order',
-									__( 'Invalid menu position.', 'gutenberg' ),
-									array( 'status' => 400 )
-								);
-							}
-						}
-					}
-
-					return $prepared_nav_item['menu-item-position'];
-				},
-			),
 		);
 		$schema['properties']['object']     = array(
 			'description' => __( 'The type of object originally represented, such as "category," "post", or "attachment."', 'gutenberg' ),
@@ -1109,7 +1167,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * Determines the allowed query_vars for a get_items() response and prepares
 	 * them for WP_Query.
 	 *
-	 * @param array           $prepared_args Optional. Prepared WP_Query arguments. Default empty array.
+	 * @param array $prepared_args Optional. Prepared WP_Query arguments. Default empty array.
 	 * @param WP_REST_Request $request Optional. Full details about the request.
 	 *
 	 * @return array Items query arguments.
