@@ -46,7 +46,6 @@ const gpl2CompatibleLicenses = [
 	'BSD-2-Clause',
 	'BSD-3-Clause',
 	'BSD-3-Clause-W3C',
-	'BSD-like',
 	'0BSD',
 	'CC-BY-4.0',
 	'CC0-1.0',
@@ -57,15 +56,11 @@ const gpl2CompatibleLicenses = [
 	'LGPL-2.1',
 	'MIT',
 	'MIT/X11',
-	'MIT (http://mootools.net/license.txt)',
 	'MPL-2.0',
 	'Public Domain',
 	'Unlicense',
 	'WTFPL',
 	'Zlib',
-	'(MIT AND BSD-3-Clause)',
-	'(MIT AND Zlib)',
-	'(CC-BY-4.0 AND MIT)',
 ];
 
 /*
@@ -74,15 +69,7 @@ const gpl2CompatibleLicenses = [
  * We're cool with using packages that are licensed under any of these if we're not
  * distributing them (for example, build tools), but we can't included them in a release.
  */
-const otherOssLicenses = [
-	'Apache-2.0',
-	'Apache 2.0',
-	'Apache License, Version 2.0',
-	'Apache version 2.0',
-	'CC-BY-3.0',
-	'CC-BY-SA-2.0',
-	'LGPL',
-];
+const otherOssLicenses = [ 'Apache-2.0', 'CC-BY-3.0', 'CC-BY-SA-2.0', 'LGPL' ];
 
 const licenses = [
 	...gpl2CompatibleLicenses,
@@ -224,6 +211,40 @@ function traverseDepTree( deps ) {
 	}
 }
 
+function detectTypeFromLicenseFiles( path ) {
+	return licenseFiles.reduce( ( detectedType, licenseFile ) => {
+		if ( detectedType ) {
+			return detectedType;
+		}
+
+		const licensePath = path + '/' + licenseFile;
+
+		if ( existsSync( licensePath ) ) {
+			const licenseText = readFileSync( licensePath ).toString();
+
+			// Check if the file contains any of the strings in licenseFileStrings
+			return Object.keys( licenseFileStrings ).reduce(
+				( stringDetectedType, licenseStringType ) => {
+					const licenseFileString =
+						licenseFileStrings[ licenseStringType ];
+
+					return licenseFileString.reduce(
+						( currentDetectedType, fileString ) => {
+							if ( licenseText.includes( fileString ) ) {
+								return licenseStringType;
+							}
+							return currentDetectedType;
+						},
+						stringDetectedType
+					);
+				},
+				detectedType
+			);
+		}
+		return detectedType;
+	}, false );
+}
+
 function checkDepLicense( path ) {
 	if ( ! path ) {
 		return;
@@ -259,51 +280,28 @@ function checkDepLicense( path ) {
 		licenseType = undefined;
 	}
 
+	if ( licenseType ) {
+		const allowed = licenses.find( ( allowedLicense ) =>
+			checkLicense( allowedLicense, licenseType )
+		);
+		if ( allowed ) {
+			return;
+		}
+	}
+
 	/*
-	 * If we haven't been able to detect a license in the package.json file, try reading
-	 * it from the files defined in licenseFiles, instead.
+	 * If we haven't been able to detect a license in the package.json file,
+	 * or the type was invalid, try reading it from the files defined in
+	 * license files, instead.
 	 */
-	if ( licenseType === undefined ) {
-		licenseType = licenseFiles.reduce( ( detectedType, licenseFile ) => {
-			if ( detectedType ) {
-				return detectedType;
-			}
-
-			const licensePath = path + '/' + licenseFile;
-
-			if ( existsSync( licensePath ) ) {
-				const licenseText = readFileSync( licensePath ).toString();
-
-				// Check if the file contains any of the strings in licenseFileStrings
-				return Object.keys( licenseFileStrings ).reduce(
-					( stringDetectedType, licenseStringType ) => {
-						const licenseFileString =
-							licenseFileStrings[ licenseStringType ];
-
-						return licenseFileString.reduce(
-							( currentDetectedType, fileString ) => {
-								if ( licenseText.includes( fileString ) ) {
-									return licenseStringType;
-								}
-								return currentDetectedType;
-							},
-							stringDetectedType
-						);
-					},
-					detectedType
-				);
-			}
-			return detectedType;
-		}, false );
+	const detectedLicenseType = detectTypeFromLicenseFiles( path );
+	if ( ! licenseType && ! detectedLicenseType ) {
+		return;
 	}
 
-	if ( ! licenseType ) {
-		return false;
-	}
-
-	// Now that we finally have a license to check, see if any of the allowed licenses match.
+	// Now that we have a license to check, see if any of the allowed licenses match.
 	const allowed = licenses.find( ( allowedLicense ) =>
-		checkLicense( allowedLicense, licenseType )
+		checkLicense( allowedLicense, detectedLicenseType )
 	);
 
 	if ( ! allowed ) {
