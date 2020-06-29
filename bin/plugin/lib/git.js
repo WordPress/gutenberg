@@ -18,7 +18,10 @@ const { getRandomTemporaryPath } = require( './utils' );
 async function clone( repositoryUrl ) {
 	const gitWorkingDirectoryPath = getRandomTemporaryPath();
 	const simpleGit = SimpleGit();
-	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath );
+	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath, [
+		'--depth=1',
+		'--no-single-branch',
+	] );
 	return gitWorkingDirectoryPath;
 }
 

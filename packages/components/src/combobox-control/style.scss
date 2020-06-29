@@ -1,0 +1,70 @@
+.components-combobox-control {
+	color: $dark-gray-500;
+	position: relative;
+}
+
+.components-combobox-control__label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+.components-combobox-control__button {
+	border: 1px solid $dark-gray-200;
+	border-radius: 4px;
+	color: $dark-gray-500;
+	display: inline-block;
+	min-height: 30px;
+	min-width: 130px;
+	position: relative;
+	text-align: left;
+
+	&:focus {
+		border-color: var(--wp-admin-theme-color);
+	}
+
+	&-input {
+		border: none;
+		height: calc(100% - 2px);
+		left: 1px;
+		padding: 0 4px;
+		position: absolute;
+		top: 1px;
+		width: calc(100% - 2px);
+	}
+
+	&-button:hover {
+		box-shadow: none !important;
+	}
+
+	&-icon {
+		height: 100%;
+		padding: 0 4px;
+		position: absolute;
+		right: 0;
+		top: 0;
+	}
+}
+
+.components-combobox-control__menu {
+	background: $white;
+	min-width: 100%;
+	padding: 0;
+	position: absolute;
+	z-index: z-index(".components-popover");
+}
+
+.components-combobox-control__item {
+	align-items: center;
+	display: flex;
+	list-style-type: none;
+	padding: 10px 5px 10px 25px;
+
+	&.is-highlighted {
+		background: $light-gray-500;
+	}
+
+	&-icon {
+		margin-left: -20px;
+		margin-right: 0;
+	}
+}

@@ -123,7 +123,7 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 function parseDropEvent( event ) {
 	let result = {
 		srcRootClientId: null,
-		srcClientId: null,
+		srcClientIds: null,
 		srcIndex: null,
 		type: null,
 	};
@@ -191,7 +191,7 @@ export default function useBlockDropZone( {
 	const {
 		insertBlocks,
 		updateBlockAttributes,
-		moveBlockToPosition,
+		moveBlocksToPosition,
 	} = useDispatch( 'core/block-editor' );
 
 	const onFilesDrop = useCallback(
@@ -238,7 +238,7 @@ export default function useBlockDropZone( {
 		( event ) => {
 			const {
 				srcRootClientId: sourceRootClientId,
-				srcClientId: sourceClientId,
+				srcClientIds: sourceClientIds,
 				srcIndex: sourceBlockIndex,
 				type: dropType,
 			} = parseDropEvent( event );
@@ -260,8 +260,8 @@ export default function useBlockDropZone( {
 			// nested blocks, return early as this would create infinite
 			// recursion.
 			if (
-				targetRootClientId === sourceClientId ||
-				getClientIdsOfDescendants( [ sourceClientId ] ).some(
+				sourceClientIds.includes( targetRootClientId ) ||
+				getClientIdsOfDescendants( sourceClientIds ).some(
 					( id ) => id === targetRootClientId
 				)
 			) {
@@ -280,8 +280,8 @@ export default function useBlockDropZone( {
 					? targetBlockIndex - 1
 					: targetBlockIndex;
 
-			moveBlockToPosition(
-				sourceClientId,
+			moveBlocksToPosition(
+				sourceClientIds,
 				sourceRootClientId,
 				targetRootClientId,
 				insertIndex
@@ -291,7 +291,7 @@ export default function useBlockDropZone( {
 			getClientIdsOfDescendants,
 			getBlockIndex,
 			targetBlockIndex,
-			moveBlockToPosition,
+			moveBlocksToPosition,
 			targetRootClientId,
 		]
 	);
