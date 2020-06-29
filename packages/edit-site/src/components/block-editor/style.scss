@@ -1,17 +1,3 @@
-.edit-site-block-editor__block-list {
-	padding-bottom: $grid-unit-30;
-	padding-top: $grid-unit-30 + 5;
-
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	// Full-wide. (to account for the padddings added above)
-	.wp-block[data-align="full"] {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
-	}
-}
-
 // The button element easily inherits styles that are meant for the editor style.
 // These rules enhance the specificity to reduce that inheritance.
 // This is duplicated in visual-editor.
