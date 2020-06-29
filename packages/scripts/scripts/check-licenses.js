@@ -69,7 +69,13 @@ const gpl2CompatibleLicenses = [
  * We're cool with using packages that are licensed under any of these if we're not
  * distributing them (for example, build tools), but we can't included them in a release.
  */
-const otherOssLicenses = [ 'Apache-2.0', 'CC-BY-3.0', 'CC-BY-SA-2.0', 'LGPL' ];
+const otherOssLicenses = [
+	'Apache-2.0',
+	'Apache License, Version 2.0',
+	'CC-BY-3.0',
+	'CC-BY-SA-2.0',
+	'LGPL',
+];
 
 const licenses = [
 	...gpl2CompatibleLicenses,
