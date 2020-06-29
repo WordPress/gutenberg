@@ -89,10 +89,10 @@ export function BlockAlignmentToolbar( {
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		const settings = getSettings();
+		const { getThemeSupports } = select( 'core' );
+		const themeSupports = getThemeSupports();
 		return {
-			wideControlsEnabled: settings.alignWide,
+			wideControlsEnabled: themeSupports.alignWide,
 		};
 	} )
 )( BlockAlignmentToolbar );
