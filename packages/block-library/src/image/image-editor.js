@@ -268,9 +268,10 @@ export default function ImageEditor( {
 					<ToolbarButton
 						icon={ rotateRightIcon }
 						label={ __( 'Rotate' ) }
-						onClick={ () =>
-							setRotation( ( prev ) => ( prev + 90 ) % 360 )
-						}
+						onClick={ () => {
+							setRotation( ( prev ) => ( prev + 90 ) % 360 );
+							setAspect( ( prev ) => 1 / prev );
+						} }
 						disabled={ inProgress }
 					/>
 				</ToolbarGroup>
