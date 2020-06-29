@@ -1641,3 +1641,14 @@ export function isBlockHighlighted( state, clientId ) {
 export function areInnerBlocksControlled( state, clientId ) {
 	return !! state.blocks.controlledInnerBlocks[ clientId ];
 }
+
+/**
+ * Returns whether to keep caret inside block in edit mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether to keep caret inside block.
+ */
+export function keepCaretInsideBlock( state ) {
+	return state.keepCaretInsideBlock;
+}

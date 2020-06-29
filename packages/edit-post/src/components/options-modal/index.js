@@ -27,6 +27,7 @@ import {
 	EnablePublishSidebarOption,
 	EnablePanelOption,
 	EnableFeature,
+	EnableKeepCaretInBlock,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 
@@ -53,6 +54,11 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 					label={ __(
 						'Enable the Most Used Blocks category in the block library'
 					) }
+				/>
+			</Section>
+			<Section title={ __( 'Keyboard options' ) }>
+				<EnableKeepCaretInBlock
+					label={ __( 'Keep cursor inside active block' ) }
 				/>
 			</Section>
 			<Section title={ __( 'Document panels' ) }>

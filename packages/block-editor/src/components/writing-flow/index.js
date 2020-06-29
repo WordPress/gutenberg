@@ -214,6 +214,7 @@ function selector( select ) {
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
+		keepCaretInsideBlock,
 	} = select( 'core/block-editor' );
 
 	const selectedBlockClientId = getSelectedBlockClientId();
@@ -243,6 +244,7 @@ function selector( select ) {
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
+		keepCaretInsideBlock: keepCaretInsideBlock(),
 	};
 }
 
@@ -289,6 +291,7 @@ export default function WritingFlow( { children } ) {
 		getClientIdsOfDescendants,
 		canInsertBlockType,
 		getBlockName,
+		keepCaretInsideBlock,
 	} = useSelect( selector, [] );
 	const {
 		multiSelect,
@@ -637,7 +640,11 @@ export default function WritingFlow( { children } ) {
 			// Moving from block multi-selection to single block selection
 			moveSelection( isReverse );
 			event.preventDefault();
-		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
+		} else if (
+			isVertical &&
+			isVerticalEdge( target, isReverse ) &&
+			! keepCaretInsideBlock
+		) {
 			const closestTabbable = getClosestTabbable(
 				target,
 				isReverse,
@@ -656,7 +663,8 @@ export default function WritingFlow( { children } ) {
 		} else if (
 			isHorizontal &&
 			getSelection().isCollapsed &&
-			isHorizontalEdge( target, isReverseDir )
+			isHorizontalEdge( target, isReverseDir ) &&
+			! keepCaretInsideBlock
 		) {
 			const closestTabbable = getClosestTabbable(
 				target,
