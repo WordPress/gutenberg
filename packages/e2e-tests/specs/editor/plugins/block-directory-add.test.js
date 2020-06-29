@@ -84,7 +84,7 @@ const block = `( function() {
 } )();`;
 
 const MOCK_OPTIONS = {
-	namespace: '__experimental',
+	namespace: 'wp/v2',
 	methods: [ 'GET' ],
 	endpoints: [
 		{
