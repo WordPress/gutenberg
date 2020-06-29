@@ -10,6 +10,8 @@
 /**
  * Controller which provides REST endpoint for the blocks.
  *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
  * @since 5.5.0
  *
  * @see   WP_REST_Controller

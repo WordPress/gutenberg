@@ -10,6 +10,8 @@
 /**
  * Core class to access plugins via the REST API.
  *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
  * @since 5.5.0
  *
  * @see   WP_REST_Controller
