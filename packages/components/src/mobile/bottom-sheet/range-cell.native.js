@@ -24,6 +24,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import Cell from './cell';
 import styles from './range-cell.scss';
+import rowStyles from './cellRowStyles.scss';
 import borderStyles from './borderStyles.scss';
 
 class BottomSheetRangeCell extends Component {
@@ -179,7 +180,7 @@ class BottomSheetRangeCell extends Component {
 			<Cell
 				{ ...cellProps }
 				cellContainerStyle={ styles.cellContainerStyles }
-				cellRowContainerStyle={ styles.cellRowStyles }
+				cellRowContainerStyle={ rowStyles.cellRowStyles }
 				accessibilityRole={ 'none' }
 				value={ '' }
 				editable={ false }
