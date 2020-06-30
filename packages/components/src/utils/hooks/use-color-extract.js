@@ -73,16 +73,14 @@ export function useColorExtract( {
 		const isGetPalette = numberOfColors !== 1;
 
 		return new Promise( ( resolve, reject ) => {
-			imageNode.onload = () => {
-				let data;
-				let value;
-
-				try {
+			try {
+				imageNode.onload = () => {
+					let data;
+					let value;
 					const extractor = new ColorThief();
 					const extractedData = isGetPalette
 						? extractor.getPalette( imageNode, numberOfColors )
 						: extractor.getColor( imageNode );
-
 					if ( isGetPalette ) {
 						data = extractedData.map( ( values ) => {
 							return tinycolor( {
@@ -97,17 +95,17 @@ export function useColorExtract( {
 						data = tinycolor( { r, g, b } );
 						value = data.toHexString();
 					}
-
 					setColors( value );
 					resolve( [ value, data ] );
-				} catch ( err ) {
-					reject( err );
+					srcRef.current = src;
+				};
+				// Load the image
+				if ( src ) {
+					imageNode.src = src;
 				}
-				srcRef.current = src;
-			};
-
-			// Load the image
-			imageNode.src = src;
+			} catch ( err ) {
+				reject( err );
+			}
 		} );
 	};
 
