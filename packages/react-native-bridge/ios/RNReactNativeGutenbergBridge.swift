@@ -60,9 +60,9 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func requestUnsupportedBlockFallback(_ content: String, blockId: String, blockName: String) {
+    func requestUnsupportedBlockFallback(_ content: String, blockId: String, blockName: String, blockTitle: String) {
         DispatchQueue.main.async {
-            let block = Block(id: blockId, name: blockName, content: content)
+            let block = Block(id: blockId, name: blockName, title: blockTitle, content: content)
             self.delegate?.gutenbergDidRequestUnsupportedBlockFallback(for: block)
         }
     }

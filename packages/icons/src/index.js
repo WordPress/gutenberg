@@ -48,6 +48,7 @@ export { default as currencyDollar } from './library/currency-dollar';
 export { default as currencyEuro } from './library/currency-euro';
 export { default as currencyPound } from './library/currency-pound';
 export { default as desktop } from './library/desktop';
+export { default as edit } from './library/edit';
 export { default as external } from './library/external';
 export { default as file } from './library/file';
 export { default as flipHorizontal } from './library/flip-horizontal';

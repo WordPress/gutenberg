@@ -212,7 +212,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
                     String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
                     insertBlock = String.format(insertBlock, blockContent);
-                    evaluateJavaScript(removeNewLines(insertBlock));
+                    evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
 
                     view.setVisibility(View.VISIBLE);
                 }, 2000);

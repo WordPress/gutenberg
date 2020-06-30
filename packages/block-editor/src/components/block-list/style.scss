@@ -422,7 +422,7 @@
 .block-editor-default-block-appender,
 .block-editor-block-list__insertion-point-inserter,
 .block-editor-block-list__block-popover-inserter {
-	.block-editor-inserter__toggle.components-button {
+	.block-editor-inserter__toggle.components-button.has-icon {
 		// Basic look
 		background: $dark-gray-primary;
 		border-radius: $radius-block-ui;

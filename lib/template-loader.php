@@ -135,7 +135,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 function create_auto_draft_for_template_part_block( $block ) {
 	$template_part_ids = array();
 
-	if ( 'core/template-part' === $block['blockName'] ) {
+	if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['slug'] ) ) {
 		if ( isset( $block['attrs']['postId'] ) ) {
 			// Template part is customized.
 			$template_part_id = $block['attrs']['postId'];

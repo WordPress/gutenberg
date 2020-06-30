@@ -33,7 +33,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/url": "file:../url",
 		"lodash": "^4.17.15",
-		"node-fetch": "^1.7.3"
+		"node-fetch": "^2.6.0"
 	},
 	"peerDependencies": {
 		"jest": ">=24",

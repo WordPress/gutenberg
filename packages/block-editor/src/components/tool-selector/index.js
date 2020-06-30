@@ -12,17 +12,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
+import { edit as editIcon } from '@wordpress/icons';
 
-const editIcon = (
-	<SVG
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
-		viewBox="0 0 24 24"
-	>
-		<Path d="M20.1 5.1L16.9 2 6.2 12.7l-1.3 4.4 4.5-1.3L20.1 5.1zM4 20.8h8v-1.5H4v1.5z" />
-	</SVG>
-);
 const selectIcon = (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"

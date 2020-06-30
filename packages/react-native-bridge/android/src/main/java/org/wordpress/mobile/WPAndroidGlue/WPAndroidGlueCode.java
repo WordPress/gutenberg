@@ -373,10 +373,11 @@ public class WPAndroidGlueCode {
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
                                                                     String content,
                                                                     String blockId,
-                                                                    String blockName) {
+                                                                    String blockName,
+                                                                    String blockTitle) {
                 mReplaceUnsupportedBlockCallback = replaceUnsupportedBlockCallback;
                 mOnGutenbergDidRequestUnsupportedBlockFallbackListener.
-                        gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, content));
+                        gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, blockTitle, content));
             }
 
             @Override 

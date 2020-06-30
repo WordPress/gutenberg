@@ -149,9 +149,9 @@ Blocks are grouped into categories to help users browse and discover them.
 
 The core provided categories are:
 
--   common
--   formatting
--   layout
+-   text
+-   media
+-   design
 -   widgets
 -   embed
 
