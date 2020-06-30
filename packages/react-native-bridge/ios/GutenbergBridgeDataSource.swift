@@ -37,13 +37,16 @@ public protocol GutenbergBridgeDataSource: class {
     /// - Returns: Gutenberg related localization key value pairs for the current locale.
     func gutenbergTranslations() -> [String : [String]]?
 
-    /// Asks the delegate for a list of Media Sources to show on the Media Source Picker.
+    /// Asks the data source for a list of Media Sources to show on the Media Source Picker.
     func gutenbergMediaSources() -> [Gutenberg.MediaSource]
 
     func gutenbergCapabilities() -> [String: Bool]?
 
-    /// Asks the delegate for a list of theme colors
+    /// Asks the data source for a list of theme colors.
     func gutenbergEditorTheme() -> GutenbergEditorTheme?
+
+    /// Asks the data source for a view to show while the Editor is loading.
+     var loadingView: UIView? { get }
 }
 
 public extension GutenbergBridgeDataSource {
@@ -54,6 +57,10 @@ public extension GutenbergBridgeDataSource {
     func gutenbergPostType() -> String {
         return "post"
     }
+
+    var loadingView: UIView? {
+         return nil
+     }
 }
 
 public protocol GutenbergEditorTheme {

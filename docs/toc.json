@@ -3,6 +3,7 @@
 
 	{ "docs/contributors/principles.md": [
 		{ "docs/architecture/readme.md": [
+			{ "docs/architecture/folder-structure.md": [] },
 			{ "docs/architecture/modularity.md": [] },
 			{ "docs/architecture/performance.md": [] },
 			{ "docs/architecture/automated-testing.md": [] }
