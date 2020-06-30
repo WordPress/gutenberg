@@ -2,19 +2,32 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 function PostTrash( { isNew, postId, postType, ...props } ) {
+	const [ disabled, setDisabled ] = useState( false );
+
 	if ( isNew || ! postId ) {
 		return null;
 	}
+	const onClick = () => {
+		if ( disabled ) {
+			return false;
+		}
 
-	const onClick = () => props.trashPost( postId, postType );
+		setDisabled( true );
+
+		return props.trashPost( postId, postType )
+			.then( () => {
+				setDisabled( false );
+			} );
+	};
 
 	return (
-		<Button className="editor-post-trash is-link" onClick={ onClick }>
+		<Button className="editor-post-trash is-link" aria-disabled={ disabled } onClick={ onClick }>
 			{ __( 'Move to Trash' ) }
 		</Button>
 	);
