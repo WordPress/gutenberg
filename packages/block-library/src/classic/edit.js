@@ -120,7 +120,9 @@ export default class ClassicEdit extends Component {
 			// There is an issue with Chrome and the editor.focus call in core at https://core.trac.wordpress.org/browser/trunk/src/js/_enqueues/lib/link.js#L451.
 			// This causes a scroll to the top of editor content on return from some content updating dialogs tracking
 			// scroll position until this is fixed in core.
-			const scrollContainer = document.querySelector('.interface-interface-skeleton__content');
+			const scrollContainer = document.querySelector(
+				'.interface-interface-skeleton__content'
+			);
 			const scrollPosition = scrollContainer.scrollTop;
 			if ( ! isSelected ) {
 				setAttributes( {
