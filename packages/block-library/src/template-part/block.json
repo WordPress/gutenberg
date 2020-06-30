@@ -13,6 +13,7 @@
 		}
 	},
 	"supports": {
+		"align": true,
 		"html": false
 	}
 }
