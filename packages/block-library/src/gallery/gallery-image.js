@@ -19,7 +19,7 @@ import {
 	closeSmall,
 	chevronLeft,
 	chevronRight,
-	pencil,
+	edit,
 	image as imageIcon,
 } from '@wordpress/icons';
 
@@ -293,7 +293,7 @@ class GalleryImage extends Component {
 				</div>
 				<div className="block-library-gallery-item__inline-menu is-right">
 					<Button
-						icon={ pencil }
+						icon={ edit }
 						onClick={ this.onEdit }
 						label={ __( 'Replace image' ) }
 						disabled={ ! isSelected }
