@@ -56,48 +56,34 @@ figure.wp-block-gallery {
 		opacity: 0.3;
 	}
 
-	.is-selected .block-library-gallery-item__move-menu,
 	.is-selected .block-library-gallery-item__inline-menu {
-		background: $white;
-		border: 1px solid $dark-gray-primary;
-		border-radius: $radius-block-ui;
-		transition: box-shadow 0.2s ease-out;
-		@include reduce-motion("transition");
+		display: inline-flex;
+	}
 
-		&:hover {
-			box-shadow: $shadow-popover;
-		}
+	.block-editor-media-placeholder {
+		margin: 0;
+		height: 100%;
 
-		.components-button {
-			color: $dark-gray-primary;
-			min-width: $grid-unit-30;
-			height: $grid-unit-30;
-
-			@include break-small() {
-				// Use smaller buttons to fit when there are many columns.
-				.columns-7 &,
-				.columns-8 & {
-					padding: 0;
-					width: inherit;
-					height: inherit;
-				}
-			}
-		}
-
-		.components-button:focus {
-			color: inherit;
+		.components-placeholder__label {
+			display: flex;
 		}
 	}
 }
 
-.block-library-gallery-item__move-menu,
 .block-library-gallery-item__inline-menu {
+	display: none;
+	position: absolute;
+	top: -2px;
 	margin: $grid-unit-10;
-	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
+	transition: box-shadow 0.2s ease-out;
+	@include reduce-motion("transition");
+	border-radius: $radius-block-ui;
+	background: $white;
+	border: $border-width solid $dark-gray-primary;
 
-	.components-button {
-		color: transparent;
+	&:hover {
+		box-shadow: $shadow-popover;
 	}
 
 	@include break-small() {
@@ -107,27 +93,28 @@ figure.wp-block-gallery {
 			padding: $grid-unit-05 / 2;
 		}
 	}
-}
 
-.block-library-gallery-item__inline-menu {
-	position: absolute;
-	top: -2px;
-	right: -2px;
-}
+	.components-button.has-icon {
+		border: none;
+		box-shadow: none;
 
-.block-library-gallery-item__move-menu {
-	position: absolute;
-	top: -2px;
-	left: -2px;
-}
+		@include break-small() {
+			// Use smaller buttons to fit when there are many columns.
+			.columns-7 &,
+			.columns-8 & {
+				padding: 0;
+				width: inherit;
+				height: inherit;
+			}
+		}
+	}
 
-// Increases specificity
-// Resolves: https://github.com/WordPress/gutenberg/issues/23469
-.wp-block-gallery {
-	.blocks-gallery-item__move-backward.components-button,
-	.blocks-gallery-item__move-forward.components-button,
-	.blocks-gallery-item__remove.components-button {
-		padding: 0;
+	&.is-left {
+		left: -2px;
+	}
+
+	&.is-right {
+		right: -2px;
 	}
 }
 
