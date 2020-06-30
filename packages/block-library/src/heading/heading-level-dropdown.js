@@ -58,6 +58,11 @@ export default function HeadingLevelDropdown( {
 	const [ hoverIsInvalid, setHoverIsInvalid ] = useState( false );
 	const [ hoverLevel, setHoverLevel ] = useState( null );
 
+	const onHover = ( targetLevel ) => {
+		setHoverIsInvalid( getLevelValidity( targetLevel ).levelMayBeInvalid );
+		setHoverLevel( targetLevel );
+	};
+
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
@@ -115,11 +120,10 @@ export default function HeadingLevelDropdown( {
 										onChange( targetLevel );
 									},
 									onMouseEnter() {
-										setHoverIsInvalid(
-											getLevelValidity( targetLevel )
-												.levelMayBeInvalid
-										);
-										setHoverLevel( targetLevel );
+										onHover( targetLevel );
+									},
+									onFocus() {
+										onHover( targetLevel );
 									},
 									onMouseLeave() {
 										setHoverIsInvalid( false );
