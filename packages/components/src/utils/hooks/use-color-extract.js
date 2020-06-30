@@ -69,11 +69,11 @@ export function useColorExtract( {
 	};
 
 	const extractColor = () => {
-		const imageNode = getImageNode();
-		const isGetPalette = numberOfColors !== 1;
-
 		return new Promise( ( resolve, reject ) => {
 			try {
+				const imageNode = getImageNode();
+				const isGetPalette = numberOfColors !== 1;
+
 				imageNode.onload = () => {
 					let data;
 					let value;
