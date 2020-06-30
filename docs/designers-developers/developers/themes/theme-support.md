@@ -358,7 +358,7 @@ add_theme_support( 'responsive-embeds' );
 
 ## Experimental — Cover block padding
 
-In the Guteberg plugin 8.3, Cover blocks can provide padding controls in the editor for users. This is not avaialble by default, and requires the theme to opt in by declaring support:
+Using the Gutenberg plugin (version 8.3 or later), Cover blocks can provide padding controls in the editor for users. This is off by default, and requires the theme to opt in by declaring support:
 
 ```php
 add_theme_support('experimental-custom-spacing');
@@ -366,7 +366,7 @@ add_theme_support('experimental-custom-spacing');
 
 ## Experimental — Link color control
 
-In the Guteberg plugin 8.3, link color control is available to the Paragraph, Heading, Group, Columns, and Media & Text blocks. This is not avaialble by default, and requires the theme to opt in by declaring support:
+Using the Gutenberg plugin (version 8.3 or later), link color control is available to the Paragraph, Heading, Group, Columns, and Media & Text blocks. This is off by default, and  requires the theme to opt in by declaring support:
 
 ```php
 add_theme_support('experimental-link-color');
