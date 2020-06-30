@@ -230,7 +230,6 @@ export class BlockList extends Component {
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
 				/>
-
 				{ this.shouldShowInnerBlockAppender() && (
 					<View
 						style={ {

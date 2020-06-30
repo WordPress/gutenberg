@@ -80,6 +80,9 @@ extension LogLevel {
         case .warning: self = .warn
         case .error: self = .error
         case .fatal: self = .fatal
+        @unknown default:
+            assertionFailure("Unknown log level: \(rnLogLevel)")
+            self = .trace
         }
     }
 }
