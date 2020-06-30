@@ -18,6 +18,12 @@
 		"parent": "principles"
 	},
 	{
+		"title": "Folder Structure",
+		"slug": "folder-structure",
+		"markdown_source": "../docs/architecture/folder-structure.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/architecture/modularity.md",
