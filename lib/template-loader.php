@@ -186,7 +186,7 @@ function create_auto_draft_for_template_part_block( $block ) {
 					} else {
 						$template_part_id = wp_insert_post(
 							array(
-								'post_content' => file_get_contents( $template_part_file_path ),
+								'post_content' => $file_contents,
 								'post_title'   => $block['attrs']['slug'],
 								'post_status'  => 'auto-draft',
 								'post_type'    => 'wp_template_part',
