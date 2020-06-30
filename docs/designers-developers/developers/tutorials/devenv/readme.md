@@ -1,6 +1,8 @@
 # Development Environment
 
-We will need a place to work and tools for creating a block, this is often referred to as the development environment. The three main pieces needed for our development environment are:
+The development environment setup guide is for setting up your local development environment for JavaScript development; creating plugins and tools for extending WordPress and the block editor.
+
+A development enviornment is a catch-all term for the setup on your computer to work. The three main pieces needed for our development environment are:
 
 1. Node/NPM Development Tools
 2. WordPress Development Site

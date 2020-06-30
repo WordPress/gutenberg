@@ -20,11 +20,17 @@ You now need to activate the plugin from inside wp-admin plugins page.
 
 After activated, go to the block editor and use the inserter to search and add your new block.
 
+## Prerequisities
+
+The first thing you need is a development enviornment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md).
+
 ## Table of Contents
 
-1. [Development Environment](devenv.md)
-2. [WordPress Plugin](wp-plugin.md)
-3. [Anatomy of a Block](block-anatomy.md)
+The create a block tutorials breaks down to the following sections.
+
+1. [WordPress Plugin](wp-plugin.md)
+2. [ESNext Syntax](esnext-js.md)
+3. [Anatomy of a Gutenberg Block ](block-anatomy.md)
 4. [Block Attributes](block-attributes.md)
 5. [Code Implementation](block-code.md)
 6. [Authoring Experience](author-experience.md)
