@@ -4,5 +4,8 @@
 
 .block-directory-downloadable-block-notice__content {
 	padding-right: 12px;
-	margin-bottom: 8px;
+}
+
+.block-directory-downloadable-block-notice__content + * {
+	margin-top: 8px;
 }

@@ -23,17 +23,19 @@ export const DownloadableBlockNotice = ( { block, onClick } ) => {
 			className="block-directory-downloadable-block-notice"
 		>
 			<div className="block-directory-downloadable-block-notice__content">
-				{ errorNotice }
+				{ errorNotice.msg }
 			</div>
-			<Button
-				isSmall
-				isPrimary
-				onClick={ () => {
-					onClick( block );
-				} }
-			>
-				{ __( 'Retry' ) }
-			</Button>
+			{ ! errorNotice.isFatal && (
+				<Button
+					isSmall
+					isPrimary
+					onClick={ () => {
+						onClick( block );
+					} }
+				>
+					{ __( 'Retry' ) }
+				</Button>
+			) }
 		</Notice>
 	);
 };

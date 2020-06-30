@@ -86,12 +86,22 @@ export function* installBlockType( block ) {
 		if (
 			! registeredBlocks.filter( ( i ) => i.name === block.name ).length
 		) {
-			throw new Error( __( 'Error registering block.' ) );
+			throw new Error(
+				__( 'Error registering block. Try reloading to the page.' )
+			);
 		}
 
 		success = true;
 	} catch ( error ) {
-		yield setErrorNotice( id, error.message || __( 'An error occurred.' ) );
+		let msg = error.message || __( 'An error occurred.' );
+
+		if ( error.code && error.code === 'folder_exists' ) {
+			msg = __(
+				'Block is already installed. Try reloading to the page.'
+			);
+		}
+
+		yield setErrorNotice( id, msg, true );
 	}
 	yield setIsInstalling( block.id, false );
 	return success;
@@ -173,15 +183,19 @@ export function setIsInstalling( blockId, isInstalling ) {
  * Sets an error notice string to be displayed to the user
  *
  * @param {string} blockId The ID of the block plugin. eg: my-block
- * @param {string} notice  The message shown in the notice.
+ * @param {string} msg  The message shown in the notice.
+ * @param {boolean} isFatal Whether the user can recover from the error
  *
  * @return {Object} Action object.
  */
-export function setErrorNotice( blockId, notice ) {
+export function setErrorNotice( blockId, msg, isFatal = false ) {
 	return {
 		type: 'SET_ERROR_NOTICE',
 		blockId,
-		notice,
+		notice: {
+			msg,
+			isFatal,
+		},
 	};
 }
 
@@ -196,6 +210,6 @@ export function clearErrorNotice( blockId ) {
 	return {
 		type: 'SET_ERROR_NOTICE',
 		blockId,
-		notice: false,
+		notice: undefined,
 	};
 }
