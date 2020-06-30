@@ -149,11 +149,11 @@ Blocks are grouped into categories to help users browse and discover them.
 
 The core provided categories are:
 
--   common
--   formatting
--   layout
+-   text
+-   media
+-   design
 -   widgets
--   embed
+-   embeds
 
 Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
 
