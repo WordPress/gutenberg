@@ -73,19 +73,6 @@ export default class ClassicEdit extends Component {
 		}
 	}
 
-	isElementInViewport( el ) {
-		const rect = el.getBoundingClientRect();
-		return (
-			rect.top >= 0 &&
-			rect.left >= 0 &&
-			rect.bottom <=
-				( window.innerHeight ||
-					document.documentElement.clientHeight ) &&
-			rect.right <=
-				( window.innerWidth || document.documentElement.clientWidth )
-		);
-	}
-
 	initialize() {
 		const { clientId } = this.props;
 		const { settings } = window.wpEditorL10n.tinymce;
@@ -131,8 +118,7 @@ export default class ClassicEdit extends Component {
 			editor.once( 'focus', () => {
 				if ( bookmark ) {
 					editor.selection.moveToBookmark( bookmark );
-					const selectedNode = editor.selection.getNode();
-					if ( ! this.isElementInViewport( selectedNode ) ) {
+					if ( scrollContainer.scrollTop !== scrollPosition ) {
 						scrollContainer.scrollTop = scrollPosition;
 					}
 				}
