@@ -214,7 +214,7 @@ function selector( select ) {
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
-		keepCaretInsideBlock,
+		getSettings,
 	} = select( 'core/block-editor' );
 
 	const selectedBlockClientId = getSelectedBlockClientId();
@@ -244,7 +244,7 @@ function selector( select ) {
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
-		keepCaretInsideBlock: keepCaretInsideBlock(),
+		keepCaretInsideBlock: getSettings().keepCaretInsideBlock,
 	};
 }
 

@@ -27,7 +27,6 @@ import {
 	EnablePublishSidebarOption,
 	EnablePanelOption,
 	EnableFeature,
-	EnableKeepCaretInBlock,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 
@@ -57,7 +56,8 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 				/>
 			</Section>
 			<Section title={ __( 'Keyboard options' ) }>
-				<EnableKeepCaretInBlock
+				<EnableFeature
+					featureName="keepCaretInsideBlock"
 					label={ __( 'Keep cursor inside active block' ) }
 				/>
 			</Section>

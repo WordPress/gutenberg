@@ -47,7 +47,8 @@ class Editor extends Component {
 		preferredStyleVariations,
 		__experimentalLocalAutosaveInterval,
 		__experimentalSetIsInserterOpened,
-		updatePreferredStyleVariations
+		updatePreferredStyleVariations,
+		keepCaretInsideBlock
 	) {
 		settings = {
 			...settings,
@@ -61,6 +62,7 @@ class Editor extends Component {
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened,
+			keepCaretInsideBlock,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -97,6 +99,7 @@ class Editor extends Component {
 			__experimentalLocalAutosaveInterval,
 			setIsInserterOpened,
 			updatePreferredStyleVariations,
+			keepCaretInsideBlock,
 			...props
 		} = this.props;
 
@@ -113,7 +116,8 @@ class Editor extends Component {
 			preferredStyleVariations,
 			__experimentalLocalAutosaveInterval,
 			setIsInserterOpened,
-			updatePreferredStyleVariations
+			updatePreferredStyleVariations,
+			keepCaretInsideBlock
 		);
 
 		return (
@@ -169,6 +173,7 @@ export default compose( [
 			__experimentalLocalAutosaveInterval: getPreference(
 				'localAutosaveInterval'
 			),
+			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

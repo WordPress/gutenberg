@@ -1099,17 +1099,3 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
-
-/**
- * Returns an action object that changes caret navigation in edit mode.
- *
- * @param {boolean} keepCaretInsideBlock
- *
- * @return {Object} Action object
- */
-export function setKeepCaretInsideBlock( keepCaretInsideBlock = false ) {
-	return {
-		type: 'SET_KEEP_CARET_INSIDE_BLOCK',
-		keepCaretInsideBlock,
-	};
-}

@@ -489,6 +489,7 @@ _Properties_
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _isRTL_ `boolean`: Whether the editor is in RTL mode
+-   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor

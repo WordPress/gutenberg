@@ -18,6 +18,14 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     />
   </Section>
   <Section
+    title="Keyboard options"
+  >
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="keepCaretInsideBlock"
+      label="Keep cursor inside active block"
+    />
+  </Section>
+  <Section
     title="Document panels"
   >
     <EnablePluginDocumentSettingPanelOptionSlot />

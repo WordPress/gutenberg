@@ -1643,22 +1643,6 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
-/**
- * Reducer returning whether caret should be kept inside block.
- *
- * @param {string|null} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string|null} Updated state.
- */
-export function keepCaretInsideBlock( state = false, action ) {
-	if ( action.type === 'SET_KEEP_CARET_INSIDE_BLOCK' ) {
-		return action.keepCaretInsideBlock;
-	}
-
-	return state;
-}
-
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1680,5 +1664,4 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
-	keepCaretInsideBlock,
 } );
