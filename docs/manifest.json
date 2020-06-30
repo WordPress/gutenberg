@@ -18,6 +18,12 @@
 		"parent": "principles"
 	},
 	{
+		"title": "Folder Structure",
+		"slug": "folder-structure",
+		"markdown_source": "../docs/architecture/folder-structure.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/architecture/modularity.md",
@@ -741,6 +747,12 @@
 		"title": "ColorPicker",
 		"slug": "color-picker",
 		"markdown_source": "../packages/components/src/color-picker/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ComboboxControl",
+		"slug": "combobox-control",
+		"markdown_source": "../packages/components/src/combobox-control/README.md",
 		"parent": "components"
 	},
 	{

@@ -12,9 +12,10 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { useDragCursor, isValueEmpty } from './utils';
+import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './state';
+import { isValueEmpty } from '../utils/values';
 
 function InputField(
 	{

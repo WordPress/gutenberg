@@ -450,11 +450,12 @@ async function runGithubReleaseStep(
 				type: 'input',
 				name: 'token',
 				message:
-					'Please provide a GitHub personal authentication token. Navigate to ' +
+					'Please enter a GitHub personal authentication token.\n' +
+					'You can create one by navigating to ' +
 					formats.success(
 						'https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages'
 					) +
-					' to create one.',
+					'.\nToken:',
 			},
 		] );
 

@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
 
 const { wp } = window;
 
@@ -58,8 +63,12 @@ export default class ClassicEdit extends Component {
 		} = this.props;
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
+		const currentContent = editor.getContent();
 
-		if ( prevProps.attributes.content !== content ) {
+		if (
+			prevProps.attributes.content !== content &&
+			currentContent !== content
+		) {
 			editor.setContent( content || '' );
 		}
 	}
@@ -112,7 +121,26 @@ export default class ClassicEdit extends Component {
 			bookmark = null;
 		} );
 
+		editor.on(
+			'Paste Change input Undo Redo',
+			debounce( () => {
+				const value = editor.getContent();
+
+				if ( value !== editor._lastChange ) {
+					editor._lastChange = value;
+					setAttributes( {
+						content: value,
+					} );
+				}
+			}, 250 )
+		);
+
 		editor.on( 'keydown', ( event ) => {
+			if ( isKeyboardEvent.primary( event, 'z' ) ) {
+				// Prevent the gutenberg undo kicking in so TinyMCE undo stack works as expected
+				event.stopPropagation();
+			}
+
 			if (
 				( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
 				isTmceEmpty( editor )

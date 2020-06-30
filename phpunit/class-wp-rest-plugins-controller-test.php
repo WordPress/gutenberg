@@ -121,7 +121,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_do_request( self::BASE );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) );
+		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) );
 
 		$this->assertCount( 1, $items );
 		$this->check_get_plugin_data( array_shift( $items ) );
@@ -139,7 +139,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'GET', self::BASE );
 		$request->set_query_params( array( 'search' => 'Cool' ) );
 		$response = rest_do_request( $request );
-		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) ) );
 	}
 
 	public function test_get_items_status() {
@@ -149,12 +149,12 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'GET', self::BASE );
 		$request->set_query_params( array( 'status' => 'inactive' ) );
 		$response = rest_do_request( $request );
-		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) ) );
 
 		$request = new WP_REST_Request( 'GET', self::BASE );
 		$request->set_query_params( array( 'status' => 'active' ) );
 		$response = rest_do_request( $request );
-		$this->assertCount( 0, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+		$this->assertCount( 0, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) ) );
 	}
 
 	public function test_get_items_status_multiple() {
@@ -165,8 +165,8 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_query_params( array( 'status' => array( 'inactive', 'active' ) ) );
 		$response = rest_do_request( $request );
 
-		$this->assertGreaterThan( 1, count( wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ), 'NOT' ) ) );
-		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+		$this->assertGreaterThan( 1, count( wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ), 'NOT' ) ) );
+		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) ) );
 	}
 
 	/**
@@ -179,13 +179,13 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'GET', self::BASE );
 		$request->set_query_params( array( 'status' => 'network-active' ) );
 		$response = rest_do_request( $request );
-		$this->assertCount( 0, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+		$this->assertCount( 0, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) ) );
 
 		activate_plugin( self::PLUGIN_FILE, '', true );
 		$request = new WP_REST_Request( 'GET', self::BASE );
 		$request->set_query_params( array( 'status' => 'network-active' ) );
 		$response = rest_do_request( $request );
-		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) ) );
+		$this->assertCount( 1, wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) ) );
 	}
 
 	public function test_get_items_logged_out() {
@@ -235,7 +235,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_do_request( self::BASE );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) );
+		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) );
 		$this->assertCount( 0, $items );
 	}
 
@@ -249,7 +249,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_do_request( self::BASE );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) );
+		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) );
 		$this->assertCount( 1, $items );
 		$this->check_get_plugin_data( array_shift( $items ), true );
 	}
@@ -265,7 +265,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_do_request( self::BASE );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN_FILE ) );
+		$items = wp_list_filter( $response->get_data(), array( 'plugin' => self::PLUGIN ) );
 		$this->assertCount( 1, $items );
 		$this->check_get_plugin_data( array_shift( $items ), true );
 	}
@@ -743,7 +743,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertNotWPError( $response->as_error() );
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertTrue( $response->get_data()['deleted'] );
-		$this->assertEquals( 'test-plugin/test-plugin.php', $response->get_data()['previous']['plugin'] );
+		$this->assertEquals( self::PLUGIN, $response->get_data()['previous']['plugin'] );
 		$this->assertFileNotExists( WP_PLUGIN_DIR . '/' . self::PLUGIN_FILE );
 	}
 
@@ -876,7 +876,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @param bool  $network_only Whether the plugin is network only.
 	 */
 	protected function check_get_plugin_data( $data, $network_only = false ) {
-		$this->assertEquals( 'test-plugin/test-plugin.php', $data['plugin'] );
+		$this->assertEquals( 'test-plugin/test-plugin', $data['plugin'] );
 		$this->assertEquals( '1.5.4', $data['version'] );
 		$this->assertEquals( 'inactive', $data['status'] );
 		$this->assertEquals( 'Test Plugin', $data['name'] );
