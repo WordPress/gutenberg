@@ -160,10 +160,11 @@ function create_auto_draft_for_template_part_block( $block ) {
 				)
 			);
 			$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
-			if ( $template_part_post ) {
+			if ( $template_part_post && 'auto-draft' !== $template_part_post->post_status ) {
 				$template_part_id = $template_part_post->ID;
 			} else {
-				// Template part is not customized, get it from a file and make an auto-draft for it.
+				// Template part is not customized, get it from a file and make an auto-draft for it, unless one already exists
+				// and the underlying file hasn't changed.
 				$template_part_file_path =
 				get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
 				if ( ! file_exists( $template_part_file_path ) ) {
@@ -171,24 +172,32 @@ function create_auto_draft_for_template_part_block( $block ) {
 						$template_part_file_path =
 							dirname( __FILE__ ) . '/demo-block-template-parts/' . $block['attrs']['slug'] . '.html';
 						if ( ! file_exists( $template_part_file_path ) ) {
-							return;
+							$template_part_file_path = false;
 						}
 					} else {
-						return;
+						$template_part_file_path = false;
 					}
 				}
-				$template_part_id = wp_insert_post(
-					array(
-						'post_content' => file_get_contents( $template_part_file_path ),
-						'post_title'   => $block['attrs']['slug'],
-						'post_status'  => 'auto-draft',
-						'post_type'    => 'wp_template_part',
-						'post_name'    => $block['attrs']['slug'],
-						'meta_input'   => array(
-							'theme' => $block['attrs']['theme'],
-						),
-					)
-				);
+
+				if ( $template_part_file_path ) {
+					$file_contents = file_get_contents( $template_part_file_path );
+					if ( $template_part_post && $template_part_post->post_content === $file_contents ) {
+						$template_part_id = $template_part_post->ID;
+					} else {
+						$template_part_id = wp_insert_post(
+							array(
+								'post_content' => $file_contents,
+								'post_title'   => $block['attrs']['slug'],
+								'post_status'  => 'auto-draft',
+								'post_type'    => 'wp_template_part',
+								'post_name'    => $block['attrs']['slug'],
+								'meta_input'   => array(
+									'theme' => $block['attrs']['theme'],
+								),
+							)
+						);
+					}
+				}
 			}
 		}
 		$template_part_ids[ $block['attrs']['slug'] ] = $template_part_id;
