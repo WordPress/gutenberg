@@ -11,7 +11,7 @@
  */
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
-	$blocks_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
+	$blocks_dir = __DIR__ . '/../build/block-library/blocks/';
 	if ( ! file_exists( $blocks_dir ) ) {
 		return;
 	}

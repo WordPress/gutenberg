@@ -44,7 +44,7 @@ function gutenberg_customize_sanitize( $value ) {
  * @since 6.1.0
  */
 function gutenberg_customize_register( $wp_customize ) {
-	require dirname( __FILE__ ) . '/class-wp-customize-widget-blocks-control.php';
+	require __DIR__ . '/class-wp-customize-widget-blocks-control.php';
 	$wp_customize->add_setting(
 		'gutenberg_widget_blocks',
 		array(

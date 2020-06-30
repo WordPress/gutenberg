@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 0.1.0
  */
 function gutenberg_dir_path() {
-	return plugin_dir_path( dirname( __FILE__ ) );
+	return plugin_dir_path( __DIR__ );
 }
 
 /**
@@ -31,7 +31,7 @@ function gutenberg_dir_path() {
  * @since 0.1.0
  */
 function gutenberg_url( $path ) {
-	return plugins_url( $path, dirname( __FILE__ ) );
+	return plugins_url( $path, __DIR__ );
 }
 
 /**

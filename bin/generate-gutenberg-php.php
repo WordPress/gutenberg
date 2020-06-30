@@ -7,7 +7,7 @@
  * @package gutenberg-build
  */
 
-$f = fopen( dirname( dirname( __FILE__ ) ) . '/gutenberg.php', 'r' );
+$f = fopen( dirname( __DIR__ ) . '/gutenberg.php', 'r' );
 
 $plugin_version = null;
 $inside_defines = false;
