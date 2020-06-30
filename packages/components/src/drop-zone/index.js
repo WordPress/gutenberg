@@ -89,7 +89,6 @@ function DropZoneComponent( {
 			<div className="components-drop-zone__content">
 				<Icon
 					icon={ upload }
-					size="40"
 					className="components-drop-zone__content-icon"
 				/>
 				<span className="components-drop-zone__content-text">
