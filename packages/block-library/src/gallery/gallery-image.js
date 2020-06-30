@@ -8,7 +8,7 @@ import { debounce, get, omit } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Button, Spinner } from '@wordpress/components';
+import { Button, Spinner, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -275,7 +275,7 @@ class GalleryImage extends Component {
 						value={ { id, src: url } }
 					/>
 				) }
-				<div className="block-library-gallery-item__inline-menu is-left">
+				<ButtonGroup className="block-library-gallery-item__inline-menu is-left">
 					<Button
 						icon={ chevronLeft }
 						onClick={ isFirstItem ? undefined : onMoveBackward }
@@ -290,8 +290,8 @@ class GalleryImage extends Component {
 						aria-disabled={ isLastItem }
 						disabled={ ! isSelected }
 					/>
-				</div>
-				<div className="block-library-gallery-item__inline-menu is-right">
+				</ButtonGroup>
+				<ButtonGroup className="block-library-gallery-item__inline-menu is-right">
 					<Button
 						icon={ edit }
 						onClick={ this.onEdit }
@@ -304,7 +304,7 @@ class GalleryImage extends Component {
 						label={ __( 'Remove image' ) }
 						disabled={ ! isSelected }
 					/>
-				</div>
+				</ButtonGroup>
 				{ ! isEditing && ( isSelected || caption ) && (
 					<RichText
 						tagName="figcaption"

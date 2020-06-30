@@ -57,35 +57,7 @@ figure.wp-block-gallery {
 	}
 
 	.is-selected .block-library-gallery-item__inline-menu {
-		background: $white;
-		border: 1px solid $dark-gray-primary;
-		border-radius: $radius-block-ui;
-		transition: box-shadow 0.2s ease-out;
-		@include reduce-motion("transition");
-
-		&:hover {
-			box-shadow: $shadow-popover;
-		}
-
-		.components-button {
-			color: $dark-gray-primary;
-			min-width: $grid-unit-30;
-			height: $grid-unit-30;
-
-			@include break-small() {
-				// Use smaller buttons to fit when there are many columns.
-				.columns-7 &,
-				.columns-8 & {
-					padding: 0;
-					width: inherit;
-					height: inherit;
-				}
-			}
-		}
-
-		.components-button:focus {
-			color: inherit;
-		}
+		display: inline-flex;
 	}
 
 	.block-editor-media-placeholder {
@@ -99,12 +71,19 @@ figure.wp-block-gallery {
 }
 
 .block-library-gallery-item__inline-menu {
+	display: none;
+	position: absolute;
+	top: -2px;
 	margin: $grid-unit-10;
-	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
+	transition: box-shadow 0.2s ease-out;
+	@include reduce-motion("transition");
+	border-radius: $radius-block-ui;
+	background: $white;
+	border: $border-width solid $dark-gray-primary;
 
-	.components-button {
-		color: transparent;
+	&:hover {
+		box-shadow: $shadow-popover;
 	}
 
 	@include break-small() {
@@ -114,14 +93,20 @@ figure.wp-block-gallery {
 			padding: $grid-unit-05 / 2;
 		}
 	}
-}
-
-.block-library-gallery-item__inline-menu {
-	position: absolute;
-	top: -2px;
 
 	.components-button.has-icon {
-		padding: 0;
+		border: none;
+		box-shadow: none;
+
+		@include break-small() {
+			// Use smaller buttons to fit when there are many columns.
+			.columns-7 &,
+			.columns-8 & {
+				padding: 0;
+				width: inherit;
+				height: inherit;
+			}
+		}
 	}
 
 	&.is-left {
