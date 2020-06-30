@@ -147,10 +147,10 @@ export function receiveEmbedPreview( url, preview ) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string} kind              Kind of the deleted entity.
- * @param {string} name              Name of the deleted entity.
- * @param {string} recordId          Record ID of the deleted entity.
- * @param {?Object}query             Special query parameters for the DELETE API call.
+ * @param {string}  kind              Kind of the deleted entity.
+ * @param {string}  name              Name of the deleted entity.
+ * @param {string}  recordId          Record ID of the deleted entity.
+ * @param {?Object} query             Special query parameters for the DELETE API call.
  */
 export function* deleteEntityRecord( kind, name, recordId, query ) {
 	const entities = yield getKindEntities( kind );
@@ -172,22 +172,7 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 		} );
 
 		yield removeItems( kind, name, recordId, true );
-	} catch ( _error ) {
-		const persistedRecord = yield select(
-			'getEditedEntityRecord',
-			kind,
-			name,
-			recordId
-		);
-
-		yield receiveEntityRecords(
-			kind,
-			name,
-			persistedRecord,
-			undefined,
-			false
-		);
-	}
+	} catch ( _error ) {}
 }
 
 /**
