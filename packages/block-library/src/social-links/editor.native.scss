@@ -3,10 +3,10 @@
 }
 
 .placeholder {
-	width: 36px;
-	height: 36px;
+	width: $button-size;
+	height: $button-size;
 	background-color: $light-ultra-dim;
-	border-radius: 18px;
+	border-radius: $button-size / 2;
 	margin-right: 4 * $block-selected-margin;
 	margin-bottom: 2 * $block-selected-margin;
 }
