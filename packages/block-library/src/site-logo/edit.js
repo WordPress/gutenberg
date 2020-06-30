@@ -219,7 +219,7 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width } = attributes;
-	const [ url, setUrl ] = useState( null );
+	const [ url, setUrl ] = useState();
 	const [ error, setError ] = useState();
 	const ref = useRef();
 	const { sitelogo } = useSelect( ( select ) =>
@@ -306,7 +306,7 @@ export default function LogoEdit( {
 
 	const label = __( 'Site Logo' );
 	let logoImage;
-	if ( url === null ) {
+	if ( sitelogo === undefined ) {
 		logoImage = <Spinner />;
 	}
 
