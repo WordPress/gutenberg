@@ -15,7 +15,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
-import { close, chevronLeft, chevronRight } from '@wordpress/icons';
+import { closeSmall, chevronLeft, chevronRight } from '@wordpress/icons';
 
 class GalleryImage extends Component {
 	constructor() {
@@ -212,7 +212,7 @@ class GalleryImage extends Component {
 				</div>
 				<div className="block-library-gallery-item__inline-menu">
 					<Button
-						icon={ close }
+						icon={ closeSmall }
 						onClick={ onRemove }
 						className="blocks-gallery-item__remove"
 						label={ __( 'Remove image' ) }

@@ -51,8 +51,9 @@ function UncontrolledInnerBlocks( props ) {
 		filterInnerBlocks,
 	} = props;
 
-	const block = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getBlock( clientId )
+	const block = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+		[ clientId ]
 	) || { innerBlocks: [] };
 
 	useNestedSettingsUpdate( clientId, allowedBlocks, templateLock );
