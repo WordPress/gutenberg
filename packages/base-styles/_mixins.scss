@@ -289,25 +289,27 @@
 
 @mixin checkbox-control {
 	@include input-control;
-	border: $border-width + 1 solid $medium-gray-text;
+	border: $border-width solid $dark-gray-primary;
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-block-ui;
 
 	&:focus {
-		border-color: $medium-gray-text;
-		box-shadow: 0 0 0 1px $medium-gray-text;
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
 	}
 
 	&:checked {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
-	}
 
-	&:checked:focus {
-		box-shadow: 0 0 0 $border-width-focus $medium-gray-text;
+		// Hide default checkbox styles in IE.
+		&::-ms-check {
+			opacity: 0;
+		}
 	}
-
 
 	&:checked::before,
 	&[aria-checked="mixed"]::before {
@@ -342,10 +344,6 @@
 				float: none;
 				font-size: 21px;
 			}
-		}
-
-		&:focus {
-			box-shadow: 0 0 0 $border-width-focus $dark-gray-500;
 		}
 	}
 }
