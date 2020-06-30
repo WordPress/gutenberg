@@ -8,8 +8,14 @@ import { noop } from 'lodash';
 import { useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 
-const { clearTimeout, setTimeout } = window;
-const DEBOUNCE_TIMEOUT = 250;
+const {
+	cancelAnimationFrame,
+	clearTimeout,
+	requestAnimationFrame,
+	setTimeout,
+} = window;
+
+const DEBOUNCE_TIMEOUT = 200;
 
 /**
  * Hook that creates a showMover state, as well as debounced show/hide callbacks.
@@ -173,6 +179,7 @@ export function useShowMoversGestures( {
  */
 export function useToggleBlockHighlight( clientId ) {
 	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
+	let requestAnimationFrameId;
 
 	const updateBlockHighlight = useCallback(
 		( isFocused ) => {
@@ -182,7 +189,20 @@ export function useToggleBlockHighlight( clientId ) {
 	);
 
 	useEffect( () => {
-		return () => updateBlockHighlight( false );
+		// On mount, we make sure to cancel any pending animation frame request
+		// that hasn't been completed yet. Components like NavigableToolbar may
+		// mount and unmount quickly.
+		if ( requestAnimationFrameId ) {
+			cancelAnimationFrame( requestAnimationFrameId );
+		}
+
+		return () => {
+			// Sequences state change to enable editor updates (e.g. cursor
+			// position) to render correctly.
+			requestAnimationFrameId = requestAnimationFrame( () => {
+				updateBlockHighlight( false );
+			} );
+		};
 	}, [ updateBlockHighlight ] );
 
 	return updateBlockHighlight;
