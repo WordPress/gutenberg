@@ -73,6 +73,19 @@ export default class ClassicEdit extends Component {
 		}
 	}
 
+	isElementInViewport( el ) {
+		const rect = el.getBoundingClientRect();
+		return (
+			rect.top >= 0 &&
+			rect.left >= 0 &&
+			rect.bottom <=
+				( window.innerHeight ||
+					document.documentElement.clientHeight ) &&
+			rect.right <=
+				( window.innerWidth || document.documentElement.clientWidth )
+		);
+	}
+
 	initialize() {
 		const { clientId } = this.props;
 		const { settings } = window.wpEditorL10n.tinymce;
@@ -91,6 +104,7 @@ export default class ClassicEdit extends Component {
 		const {
 			attributes: { content },
 			setAttributes,
+			isSelected,
 		} = this.props;
 		const { ref } = this;
 		let bookmark;
@@ -104,14 +118,19 @@ export default class ClassicEdit extends Component {
 		editor.on( 'blur', () => {
 			bookmark = editor.selection.getBookmark( 2, true );
 
-			setAttributes( {
-				content: editor.getContent(),
-			} );
+			if ( ! isSelected ) {
+				setAttributes( {
+					content: editor.getContent(),
+				} );
+			}
 
 			editor.once( 'focus', () => {
 				if ( bookmark ) {
 					editor.selection.moveToBookmark( bookmark );
-					editor.selection.getNode().scrollIntoView( false );
+					const selectedNode = editor.selection.getNode();
+					if ( ! this.isElementInViewport( selectedNode ) ) {
+						selectedNode.scrollIntoView( false );
+					}
 				}
 			} );
 
