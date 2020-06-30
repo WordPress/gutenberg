@@ -126,6 +126,18 @@ const SocialLinkEdit = ( {
 		}
 	}
 
+	const accessibilityHint = url
+		? sprintf(
+				// translators: %s: social link name e.g: "Instagram".
+				__( '%s has URL set' ),
+				socialLinkName
+		  )
+		: sprintf(
+				// translators: %s: social link name e.g: "Instagram".
+				__( '%s has no URL set' ),
+				socialLinkName
+		  );
+
 	return (
 		<View>
 			{ isSelected && (
@@ -153,7 +165,16 @@ const SocialLinkEdit = ( {
 				options={ options }
 				withBottomSheet={ true }
 			/>
-			<TouchableWithoutFeedback onPress={ onIconPress }>
+			<TouchableWithoutFeedback
+				onPress={ onIconPress }
+				accessibilityRole={ 'button' }
+				accessibilityLabel={ sprintf(
+					// translators: %s: social link name e.g: "Instagram".
+					__( '%s social icon' ),
+					socialLinkName
+				) }
+				accessibilityHint={ accessibilityHint }
+			>
 				<Animated.View
 					style={ [ styles.iconContainer, { backgroundColor } ] }
 				>
