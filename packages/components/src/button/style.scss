@@ -191,9 +191,26 @@
 		}
 	}
 
-	// Link buttons that are red to indicate destructive behavior.
-	&.is-link.is-destructive {
-		color: $alert-red;
+	/**
+	 * Buttons that indicate destructive actions.
+	 */
+
+	&.is-destructive {
+		color: darken($alert-red, 15%);
+
+		&.is-secondary {
+			box-shadow: inset 0 0 0 $border-width darken($alert-red, 15%);
+		}
+
+		&:hover:not(:disabled),
+		&:active:not(:disabled) {
+			color: darken($alert-red, 20%);
+			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus darken($alert-red, 20%);
+		}
 	}
 
 	&:not([aria-disabled="true"]):active {
