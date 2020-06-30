@@ -37,7 +37,7 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
 ];
 
 function Disabled( { className, children, ...props } ) {
-	const node = useRef( null );
+	const node = useRef();
 
 	const disable = () => {
 		focus.focusable.find( node.current ).forEach( ( focusable ) => {
