@@ -2,7 +2,7 @@
 	background: $light-gray-200;
 
 	.is-dark-theme & {
-		background: $light-opacity-light-200;
+		background: rgba($white, 0.15);
 	}
 }
 

@@ -15,7 +15,7 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -75,9 +75,7 @@ const BlockComponent = forwardRef(
 			},
 			[ isSelected ]
 		);
-		const { removeBlock, insertDefaultBlock } = useDispatch(
-			'core/block-editor'
-		);
+		const { insertDefaultBlock } = useDispatch( 'core/block-editor' );
 		const fallbackRef = useRef();
 		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
@@ -171,11 +169,7 @@ const BlockComponent = forwardRef(
 				props.onKeyDown( event );
 			}
 
-			if (
-				keyCode !== ENTER &&
-				keyCode !== BACKSPACE &&
-				keyCode !== DELETE
-			) {
+			if ( keyCode !== ENTER ) {
 				return;
 			}
 
@@ -187,8 +181,6 @@ const BlockComponent = forwardRef(
 
 			if ( keyCode === ENTER ) {
 				insertDefaultBlock( {}, rootClientId, index + 1 );
-			} else {
-				removeBlock( clientId );
 			}
 		};
 

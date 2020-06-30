@@ -36,15 +36,15 @@
 
 		// Large text needs a 3:1 contrast ratio.
 		&::-webkit-input-placeholder {
-			color: $dark-opacity-200;
+			color: $medium-gray-placeholder;
 		}
 
 		&::-moz-placeholder {
-			color: $dark-opacity-200;
+			color: $medium-gray-placeholder;
 		}
 
 		&:-ms-input-placeholder {
-			color: $dark-opacity-200;
+			color: $medium-gray-placeholder;
 		}
 
 		&:focus {

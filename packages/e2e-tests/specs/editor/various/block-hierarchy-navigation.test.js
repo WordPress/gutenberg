@@ -30,7 +30,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'First column' );
 
@@ -46,7 +46,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Tweak the columns count.
 		await openDocumentSettingsSidebar();
 		await page.focus(
-			'.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]'
+			'.block-editor-block-inspector [aria-label="Columns"][type="number"]'
 		);
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -66,7 +66,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'Third column' );
 
@@ -82,7 +82,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'First column' );
 
@@ -109,7 +109,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'Third column' );
 

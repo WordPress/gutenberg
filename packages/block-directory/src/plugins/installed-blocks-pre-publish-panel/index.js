@@ -11,8 +11,9 @@ import { useSelect } from '@wordpress/data';
 import CompactList from '../../components/compact-list';
 
 export default function InstalledBlocksPrePublishPanel() {
-	const newBlockTypes = useSelect( ( select ) =>
-		select( 'core/block-directory' ).getNewBlockTypes()
+	const newBlockTypes = useSelect(
+		( select ) => select( 'core/block-directory' ).getNewBlockTypes(),
+		[]
 	);
 
 	if ( ! newBlockTypes.length ) {

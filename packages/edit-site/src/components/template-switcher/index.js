@@ -204,7 +204,7 @@ export default function TemplateSwitcher( {
 								onMouseEnter={ onMouseEnterTheme }
 								onMouseLeave={ onMouseLeaveTheme }
 							>
-								{ currentTheme.name }
+								{ currentTheme.name.raw }
 							</MenuItem>
 						</MenuGroup>
 						{ !! hoveredTemplate?.id && (

@@ -19,10 +19,6 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 		if ( is_multisite() ) {
 			grant_super_admin( self::$admin_id );
 		}
-
-		if ( ! defined( 'FS_METHOD' ) ) {
-			define( 'FS_METHOD', 'direct' );
-		}
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -33,8 +29,6 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( '/__experimental/block-directory/search', $routes );
-		$this->assertArrayHasKey( '/__experimental/block-directory/install', $routes );
-		$this->assertArrayHasKey( '/__experimental/block-directory/uninstall', $routes );
 	}
 
 	public function test_context_param() {
@@ -95,20 +89,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 	}
 
 	public function test_create_item() {
-		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
-			delete_plugins( array( 'hello-dolly/hello.php' ) );
-		}
-
-		wp_set_current_user( self::$admin_id );
-
-		$request = new WP_REST_Request( 'POST', '/__experimental/block-directory/install' );
-		$request->set_body_params( array( 'slug' => 'hello-dolly' ) );
-
-		$response = rest_do_request( $request );
-		$this->skip_on_filesystem_error( $response );
-		$this->assertNotWPError( $response->as_error() );
-		$this->assertEquals( 201, $response->get_status() );
-		$this->assertEquals( 'Hello Dolly', $response->get_data()['name'] );
+		$this->markTestSkipped( 'Controller does not have create_item route.' );
 	}
 
 	public function test_update_item() {
@@ -116,7 +97,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 	}
 
 	public function test_delete_item() {
-		$this->markTestSkipped( 'Covered by Plugins controller tests.' );
+		$this->markTestSkipped( 'Controller does not have delete_item route.' );
 	}
 
 	public function test_prepare_item() {
@@ -170,25 +151,6 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 		$this->assertArrayHasKey( 'icon', $properties );
 		$this->assertArrayHasKey( 'humanized_updated', $properties );
 		$this->assertArrayHasKey( 'assets', $properties );
-	}
-
-	/**
-	 * Skips the test if the response is an error due to the filesystem being unavailable.
-	 *
-	 * @since 5.5.0
-	 *
-	 * @param WP_REST_Response $response The response object to inspect.
-	 */
-	protected function skip_on_filesystem_error( WP_REST_Response $response ) {
-		if ( ! $response->is_error() ) {
-			return;
-		}
-
-		$code = $response->as_error()->get_error_code();
-
-		if ( 'fs_unavailable' === $code || false !== strpos( $code, 'mkdir_failed' ) ) {
-			$this->markTestSkipped( 'Filesystem is unavailable.' );
-		}
 	}
 
 	/**

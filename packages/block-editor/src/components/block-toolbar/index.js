@@ -2,13 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -32,7 +33,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		isVisual,
 		moverDirection,
 	} = useSelect( ( select ) => {
-		const { getBlockType } = select( 'core/blocks' );
 		const {
 			getBlockName,
 			getBlockMode,

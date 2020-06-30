@@ -181,31 +181,6 @@ export class BlockSwitcher extends Component {
 								( hasBlockStyles ||
 									hasPossibleBlockTransformations ) && (
 									<div className="block-editor-block-switcher__container">
-										{ hoveredClassName !== null && (
-											<PreviewBlockPopover
-												hoveredBlock={ hoveredBlock }
-												hoveredClassName={
-													hoveredClassName
-												}
-											/>
-										) }
-										{ hasBlockStyles && (
-											<MenuGroup
-												label={ __( 'Styles' ) }
-												className="block-editor-block-switcher__styles__menugroup"
-											>
-												<BlockStyles
-													clientId={
-														hoveredBlock.clientId
-													}
-													onSwitch={ onClose }
-													onHoverClassName={
-														this.onHoverClassName
-													}
-													itemRole="menuitem"
-												/>
-											</MenuGroup>
-										) }
 										{ hasPossibleBlockTransformations && (
 											<BlockTransformationsMenu
 												className="block-editor-block-switcher__transforms__menugroup"
@@ -217,6 +192,33 @@ export class BlockSwitcher extends Component {
 													onClose();
 												} }
 											/>
+										) }
+										{ hasBlockStyles && (
+											<MenuGroup
+												label={ __( 'Styles' ) }
+												className="block-editor-block-switcher__styles__menugroup"
+											>
+												{ hoveredClassName !== null && (
+													<PreviewBlockPopover
+														hoveredBlock={
+															hoveredBlock
+														}
+														hoveredClassName={
+															hoveredClassName
+														}
+													/>
+												) }
+												<BlockStyles
+													clientId={
+														hoveredBlock.clientId
+													}
+													onSwitch={ onClose }
+													onHoverClassName={
+														this.onHoverClassName
+													}
+													itemRole="menuitem"
+												/>
+											</MenuGroup>
 										) }
 									</div>
 								)

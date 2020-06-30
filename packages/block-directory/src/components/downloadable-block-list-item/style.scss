@@ -23,6 +23,10 @@
 	border-top: 0;
 }
 
+.block-directory-downloadable-block-list-item:last-child {
+	border-bottom: 0;
+}
+
 .block-directory-downloadable-block-list-item__panel {
 	display: flex;
 	flex-grow: 1;

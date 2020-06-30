@@ -531,10 +531,10 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$item   = _get_plugin_data_markup_translate( $item['_file'], $item, false );
-		$marked = _get_plugin_data_markup_translate( $item['_file'], $item, true, false );
+		$marked = _get_plugin_data_markup_translate( $item['_file'], $item, true );
 
 		$data = array(
-			'plugin'       => $item['_file'],
+			'plugin'       => substr( $item['_file'], 0, - 4 ),
 			'status'       => $this->get_plugin_status( $item['_file'] ),
 			'name'         => $item['Name'],
 			'plugin_uri'   => $item['PluginURI'],

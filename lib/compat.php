@@ -8,6 +8,12 @@
  * @package gutenberg
  */
 
+/**
+ * These functions can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50263
+ * @see https://core.trac.wordpress.org/changeset/48141
+ */
 if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	/**
 	 * Removes the block asset's path prefix if provided.

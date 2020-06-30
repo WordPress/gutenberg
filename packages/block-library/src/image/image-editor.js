@@ -25,13 +25,12 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 3;
-const ZOOM_STEP = 0.01;
+const MIN_ZOOM = 100;
+const MAX_ZOOM = 300;
 const POPOVER_PROPS = { position: 'bottom right' };
 
 function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
@@ -148,7 +147,7 @@ export default function ImageEditor( {
 	const [ inProgress, setIsProgress ] = useState( false );
 	const [ crop, setCrop ] = useState( null );
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
-	const [ zoom, setZoom ] = useState( 1 );
+	const [ zoom, setZoom ] = useState( 100 );
 	const [ aspect, setAspect ] = useState( naturalWidth / naturalHeight );
 	const [ rotation, setRotation ] = useState( 0 );
 	const [ editedUrl, setEditedUrl ] = useState();
@@ -165,14 +164,20 @@ export default function ImageEditor( {
 	function apply() {
 		setIsProgress( true );
 
-		const attrs = crop;
+		let attrs = {};
+
+		// The crop script may return some very small, sub-pixel values when the image was not cropped.
+		// Crop only when the new size has changed by more than 0.1%.
+		if ( crop.width < 99.9 || crop.height < 99.9 ) {
+			attrs = crop;
+		}
 
 		if ( rotation > 0 ) {
 			attrs.rotation = rotation;
 		}
 
 		apiFetch( {
-			path: `__experimental/image-editor/${ id }/apply`,
+			path: `wp/v2/media/${ id }/edit`,
 			method: 'POST',
 			data: attrs,
 		} )
@@ -183,10 +188,12 @@ export default function ImageEditor( {
 					height: height && width ? width / aspect : undefined,
 				} );
 			} )
-			.catch( () => {
+			.catch( ( error ) => {
 				createErrorNotice(
-					__(
-						'Unable to perform the image modification. Please check your media storage.'
+					sprintf(
+						/* translators: 1. Error message */
+						__( 'Could not edit image. %s' ),
+						error.message
 					),
 					{
 						id: 'image-editing-error',
@@ -272,14 +279,16 @@ export default function ImageEditor( {
 				<Cropper
 					image={ editedUrl || url }
 					disabled={ inProgress }
-					minZoom={ MIN_ZOOM }
-					maxZoom={ MAX_ZOOM }
+					minZoom={ MIN_ZOOM / 100 }
+					maxZoom={ MAX_ZOOM / 100 }
 					crop={ position }
-					zoom={ zoom }
+					zoom={ zoom / 100 }
 					aspect={ aspect }
 					onCropChange={ setPosition }
 					onCropComplete={ setCrop }
-					onZoomChange={ setZoom }
+					onZoomChange={ ( newZoom ) => {
+						setZoom( newZoom * 100 );
+					} }
 				/>
 				{ inProgress && <Spinner /> }
 			</div>
@@ -289,8 +298,7 @@ export default function ImageEditor( {
 					label={ __( 'Zoom' ) }
 					min={ MIN_ZOOM }
 					max={ MAX_ZOOM }
-					step={ ZOOM_STEP }
-					value={ zoom }
+					value={ Math.round( zoom ) }
 					onChange={ setZoom }
 				/>
 			) }

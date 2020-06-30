@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
-import { requestUnsupportedBlockFallback } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
+import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
 import { BottomSheet, Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
@@ -70,7 +70,7 @@ export class UnsupportedBlockEdit extends Component {
 		this.setState( { sendFallbackMessage: true } );
 	}
 
-	renderSheet( title ) {
+	renderSheet( blockTitle, blockName ) {
 		const { getStylesFromColorScheme, attributes, clientId } = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
 			styles.infoText,
@@ -95,7 +95,7 @@ export class UnsupportedBlockEdit extends Component {
 				  __( "'%s' isn't yet supported on WordPress for Android" )
 				: // translators: %s: Name of the block
 				  __( "'%s' isn't yet supported on WordPress for iOS" );
-		const infoTitle = sprintf( titleFormat, title );
+		const infoTitle = sprintf( titleFormat, blockTitle );
 
 		const actionButtonStyle = getStylesFromColorScheme(
 			styles.actionButton,
@@ -115,7 +115,8 @@ export class UnsupportedBlockEdit extends Component {
 							requestUnsupportedBlockFallback(
 								attributes.originalContent,
 								clientId,
-								title
+								blockName,
+								blockTitle
 							);
 						}, 100 );
 						this.setState( { sendFallbackMessage: false } );
@@ -209,7 +210,7 @@ export class UnsupportedBlockEdit extends Component {
 				/>
 				<Text style={ titleStyle }>{ title }</Text>
 				{ subtitle }
-				{ this.renderSheet( title ) }
+				{ this.renderSheet( title, originalName ) }
 			</View>
 		);
 	}
