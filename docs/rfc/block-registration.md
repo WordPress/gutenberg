@@ -153,7 +153,7 @@ The core provided categories are:
 -   media
 -   design
 -   widgets
--   embeds
+-   embed
 
 Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
 
