@@ -49,11 +49,11 @@ Examples for an Image Slider block:
 Gutenberg allows you to indicate which category your block fits in. Choosing the right category makes it easy for users to find in the Gutenberg menu.
 
 **Possible Values**:
-- Common
--  Formatting
--  Layout
--  Widgets
--  embed
+- Text
+- Media
+- Design
+- Widgets
+- Embeds
 
 [Read more](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#category) about categories.
 
