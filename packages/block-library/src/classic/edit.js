@@ -104,7 +104,6 @@ export default class ClassicEdit extends Component {
 		const {
 			attributes: { content },
 			setAttributes,
-			isSelected,
 		} = this.props;
 		const { ref } = this;
 		let bookmark;
@@ -124,11 +123,10 @@ export default class ClassicEdit extends Component {
 				'.interface-interface-skeleton__content'
 			);
 			const scrollPosition = scrollContainer.scrollTop;
-			if ( ! isSelected ) {
-				setAttributes( {
-					content: editor.getContent(),
-				} );
-			}
+
+			setAttributes( {
+				content: editor.getContent(),
+			} );
 
 			editor.once( 'focus', () => {
 				if ( bookmark ) {
