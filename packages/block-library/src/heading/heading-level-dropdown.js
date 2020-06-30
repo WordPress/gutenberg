@@ -9,7 +9,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
-
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -54,6 +54,9 @@ export default function HeadingLevelDropdown( {
 	const { levelMayBeInvalid: selectedLevelMayBeInvalid } = getLevelValidity(
 		selectedLevel
 	);
+
+	const [ hoverIsInvalid, setHoverIsInvalid ] = useState( false );
+	const [ hoverLevel, setHoverLevel ] = useState( null );
 
 	return (
 		<Dropdown
@@ -111,14 +114,27 @@ export default function HeadingLevelDropdown( {
 									onClick() {
 										onChange( targetLevel );
 									},
+									onMouseEnter() {
+										setHoverIsInvalid(
+											getLevelValidity( targetLevel )
+												.levelMayBeInvalid
+										);
+										setHoverLevel( targetLevel );
+									},
+									onMouseLeave() {
+										setHoverIsInvalid( false );
+									},
 								};
 							} ) }
 						/>
 					</Toolbar>
-					<HeadingLevelWarning
-						levelIsInvalid={ selectedLevelMayBeInvalid }
-						selectedLevel={ selectedLevel }
-					/>
+					{ ( hoverIsInvalid || selectedLevelMayBeInvalid ) && (
+						<HeadingLevelWarning
+							selectedLevel={
+								hoverIsInvalid ? hoverLevel : selectedLevel
+							}
+						/>
+					) }
 				</>
 			) }
 		/>

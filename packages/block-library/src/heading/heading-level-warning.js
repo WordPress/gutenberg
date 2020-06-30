@@ -21,21 +21,14 @@ const INVALID_LEVEL_MESSAGE_SPOKEN = __(
 	'The chosen heading level may be invalid. Use proper heading levels to organize your content for visitors and search engines. See the content structure tool for more info.'
 );
 
-export default function HeadingLevelWarning( {
-	selectedLevel,
-	levelIsInvalid,
-} ) {
+export default function HeadingLevelWarning( { selectedLevel } ) {
 	// For accessibility, announce the invalid heading level to screen readers.
 	// The selectedLevel value is included in the dependency array so that the
 	// message will be replayed if a new level is selected, but the new level is
 	// still invalid.
 	useEffect( () => {
-		if ( levelIsInvalid ) speak( INVALID_LEVEL_MESSAGE_SPOKEN );
-	}, [ selectedLevel, levelIsInvalid ] );
-
-	if ( ! levelIsInvalid ) {
-		return null;
-	}
+		speak( INVALID_LEVEL_MESSAGE_SPOKEN );
+	}, [ selectedLevel ] );
 
 	return (
 		<Notice
