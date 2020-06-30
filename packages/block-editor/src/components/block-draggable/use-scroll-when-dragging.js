@@ -13,13 +13,11 @@ const VELOCITY_MULTIPLIER =
 /**
  * React hook that scrolls the scroll container when a block is being dragged.
  *
- * @param {Element} dragElement The DOM element being dragged.
- *
  * @return {Function[]} `startScrolling`, `scrollOnDragOver`, `stopScrolling`
  *                      functions to be called in `onDragStart`, `onDragOver`
  *                      and `onDragEnd` events respectively.
  */
-export default function useScrollWhenDragging( dragElement ) {
+export default function useScrollWhenDragging() {
 	const dragStartY = useRef( null );
 	const velocityY = useRef( null );
 	const scrollParentY = useRef( null );
@@ -36,28 +34,25 @@ export default function useScrollWhenDragging( dragElement ) {
 		[]
 	);
 
-	const startScrolling = useCallback(
-		( event ) => {
-			dragStartY.current = event.clientY;
+	const startScrolling = useCallback( ( event ) => {
+		dragStartY.current = event.clientY;
 
-			// Find nearest parent(s) to scroll.
-			scrollParentY.current = getScrollContainer( dragElement );
+		// Find nearest parent(s) to scroll.
+		scrollParentY.current = getScrollContainer( event.target );
 
-			scrollEditorInterval.current = setInterval( () => {
-				if ( scrollParentY.current && velocityY.current ) {
-					const newTop =
-						scrollParentY.current.scrollTop + velocityY.current;
+		scrollEditorInterval.current = setInterval( () => {
+			if ( scrollParentY.current && velocityY.current ) {
+				const newTop =
+					scrollParentY.current.scrollTop + velocityY.current;
 
-					// Setting `behavior: 'smooth'` as a scroll property seems to hurt performance.
-					// Better to use a small scroll interval.
-					scrollParentY.current.scroll( {
-						top: newTop,
-					} );
-				}
-			}, SCROLL_INTERVAL_MS );
-		},
-		[ dragElement ]
-	);
+				// Setting `behavior: 'smooth'` as a scroll property seems to hurt performance.
+				// Better to use a small scroll interval.
+				scrollParentY.current.scroll( {
+					top: newTop,
+				} );
+			}
+		}, SCROLL_INTERVAL_MS );
+	}, [] );
 
 	const scrollOnDragOver = useCallback( ( event ) => {
 		const scrollParentHeight = scrollParentY.current.offsetHeight;

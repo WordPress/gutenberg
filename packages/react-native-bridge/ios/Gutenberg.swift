@@ -13,7 +13,9 @@ public class Gutenberg: NSObject {
     private var extraModules: [RCTBridgeModule];
 
     public lazy var rootView: UIView = {
-        return RCTRootView(bridge: bridge, moduleName: "gutenberg", initialProperties: initialProps)
+        let view = RCTRootView(bridge: bridge, moduleName: "gutenberg", initialProperties: initialProps)
+        view.loadingView = dataSource.loadingView
+        return view
     }()
 
     public var delegate: GutenbergBridgeDelegate? {
@@ -222,7 +224,7 @@ extension Gutenberg {
 }
 
 public extension Gutenberg.MediaSource {
-    public init(id: String, label: String, types: [Gutenberg.MediaType]) {
+    init(id: String, label: String, types: [Gutenberg.MediaType]) {
         self.id = id
         self.label = label
         self.types = Set(types)

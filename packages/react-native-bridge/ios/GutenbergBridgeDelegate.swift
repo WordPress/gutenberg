@@ -12,13 +12,22 @@ public struct MediaInfo {
     }
 }
 
+/// Wrapper for single block data
 public struct Block {
+    /// Gutenberg internal block ID
     public let id: String
+    /// Gutenberg internal block name
     public let name: String
+    /// User facing block name string (localized)
+    public let title: String
+    /// Block HTML content
     public let content: String
 
+    /// Creates a copy of the receiver modifying only its content field.
+    /// - Parameter newContent: The content for the new block instance.
+    /// - Returns: A new block instance with copied fields and new content.
     public func replacingContent(with newContent: String) -> Block {
-        Block(id: id, name: name, content: newContent)
+        Block(id: id, name: name, title: title, content: newContent)
     }
 }
 
@@ -80,6 +89,9 @@ extension LogLevel {
         case .warning: self = .warn
         case .error: self = .error
         case .fatal: self = .fatal
+        @unknown default:
+            assertionFailure("Unknown log level: \(rnLogLevel)")
+            self = .trace
         }
     }
 }
