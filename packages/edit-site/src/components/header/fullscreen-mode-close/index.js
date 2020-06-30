@@ -12,13 +12,14 @@ function FullscreenModeClose( { icon } ) {
 			const { isFeatureActive } = select( 'core/edit-site' );
 			const { getEntityRecord } = select( 'core' );
 			const { isResolving } = select( 'core/data' );
-			const siteData = getEntityRecord( 'root', 'base', undefined ) || {};
+			const siteData =
+				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 			return {
 				isActive: isFeatureActive( 'fullscreenMode' ),
 				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
 					'root',
-					'base',
+					'__unstableBase',
 					undefined,
 				] ),
 				siteIconUrl: siteData.site_icon_url,

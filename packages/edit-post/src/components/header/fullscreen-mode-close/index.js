@@ -19,13 +19,14 @@ function FullscreenModeClose() {
 			const { isFeatureActive } = select( 'core/edit-post' );
 			const { isResolving } = select( 'core/data' );
 			const { getEntityRecord, getPostType } = select( 'core' );
-			const siteData = getEntityRecord( 'root', 'base', undefined ) || {};
+			const siteData =
+				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 			return {
 				isActive: isFeatureActive( 'fullscreenMode' ),
 				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
 					'root',
-					'base',
+					'__unstableBase',
 					undefined,
 				] ),
 				postType: getPostType( getCurrentPostType() ),
