@@ -114,7 +114,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
 					onDeleteMenu={ async () => {
-						await deleteMenu( menuId, 'force=true' );
+						await deleteMenu( menuId, { force: 'true' } );
 						setMenuId( false );
 					} }
 				/>

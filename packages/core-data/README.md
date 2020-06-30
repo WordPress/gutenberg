@@ -62,8 +62,8 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the deleted entity.
 -   _name_ `string`: Name of the deleted entity.
--   _recordId_ `string`: Record Id of the entity to be deleted.
--   _query_ `string`: Special query parameters for the DELETE API call. These parameters will be appended to the rest base with a '?' in front.
+-   _recordId_ `string`: Record ID of the deleted entity.
+-   _query_ `?Object`: Special query parameters for the DELETE API call.
 
 <a name="editEntityRecord" href="#editEntityRecord">#</a> **editEntityRecord**
 

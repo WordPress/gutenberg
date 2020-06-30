@@ -4,6 +4,11 @@
 import { castArray, get, isEqual, find } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
@@ -144,8 +149,8 @@ export function receiveEmbedPreview( url, preview ) {
  *
  * @param {string} kind              Kind of the deleted entity.
  * @param {string} name              Name of the deleted entity.
- * @param {string} recordId          Record Id of the entity to be deleted.
- * @param {string} query Special query parameters for the DELETE API call. These parameters will be appended to the rest base with a '?' in front.
+ * @param {string} recordId          Record ID of the deleted entity.
+ * @param {?Object}query             Special query parameters for the DELETE API call.
  */
 export function* deleteEntityRecord( kind, name, recordId, query ) {
 	const entities = yield getKindEntities( kind );
@@ -158,7 +163,7 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 		let path = `${ entity.baseURL }/${ recordId }`;
 
 		if ( query ) {
-			path += '?' + query;
+			path = addQueryArgs( path, query );
 		}
 
 		yield apiFetch( {
