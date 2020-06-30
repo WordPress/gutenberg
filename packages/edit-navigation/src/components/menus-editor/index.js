@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	Button,
@@ -32,20 +32,19 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		false
 	);
 
+	const { deleteMenu } = useDispatch( 'core' );
+
 	useEffect( () => {
 		if ( ! hasCompletedFirstLoad && hasLoadedMenus ) {
 			setHasCompletedFirstLoad( true );
 		}
-	}, [ hasLoadedMenus ] );
+	}, [ menus, hasLoadedMenus ] );
 
 	const [ menuId, setMenuId ] = useState();
-	const [ stateMenus, setStateMenus ] = useState();
 	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
 
 	useEffect( () => {
 		if ( menus?.length ) {
-			setStateMenus( menus );
-
 			// Only set menuId if it's currently unset.
 			if ( ! menuId ) {
 				setMenuId( menus[ 0 ].id );
@@ -57,7 +56,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		return <Spinner />;
 	}
 
-	const hasMenus = !! stateMenus?.length;
+	const hasMenus = !! menus?.length;
 	const isCreateMenuPanelVisible =
 		hasCompletedFirstLoad && ( ! hasMenus || showCreateMenuPanel );
 
@@ -75,7 +74,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 							<SelectControl
 								className="edit-navigation-menus-editor__menu-select-control"
 								label={ __( 'Select navigation to edit:' ) }
-								options={ stateMenus?.map( ( menu ) => ( {
+								options={ menus?.map( ( menu ) => ( {
 									value: menu.id,
 									label: menu.name,
 								} ) ) }
@@ -96,7 +95,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 			</Card>
 			{ isCreateMenuPanelVisible && (
 				<CreateMenuArea
-					menus={ stateMenus }
+					menus={ menus }
 					onCancel={
 						// User can only cancel out of menu creation if there
 						// are other menus to fall back to showing.
@@ -114,16 +113,9 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				<NavigationEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
-					onDeleteMenu={ ( deletedMenu ) => {
-						const newStateMenus = stateMenus.filter( ( menu ) => {
-							return menu.id !== deletedMenu;
-						} );
-						setStateMenus( newStateMenus );
-						if ( newStateMenus.length ) {
-							setMenuId( newStateMenus[ 0 ].id );
-						} else {
-							setMenuId();
-						}
+					onDeleteMenu={ async () => {
+						await deleteMenu( menuId, 'force=true' );
+						setMenuId( false );
 					} }
 				/>
 			) }
