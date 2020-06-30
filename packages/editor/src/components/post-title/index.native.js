@@ -26,6 +26,11 @@ import { pasteHandler } from '@wordpress/blocks';
 import styles from './style.scss';
 
 class PostTitle extends Component {
+	constructor() {
+		super( ...arguments );
+		this.onPaste = this.onPaste.bind( this );
+	}
+
 	componentDidUpdate( prevProps ) {
 		// Unselect if any other block is selected
 		if (
@@ -51,16 +56,29 @@ class PostTitle extends Component {
 		this.props.onSelect();
 	}
 
-	onPaste( { value, onChange, plainText } ) {
+	onPaste( { value, onChange, plainText, html } ) {
+		const { title, onInsertBlockAfter, onUpdate } = this.props;
 		const content = pasteHandler( {
+			html,
 			plainText,
-			mode: 'INLINE',
-			tagName: 'p',
 		} );
 
 		if ( typeof content === 'string' ) {
 			const valueToInsert = create( { html: content } );
 			onChange( insert( value, valueToInsert ) );
+		} else if ( typeof content !== 'string' && content.length ) {
+			const [ firstBlock ] = content;
+
+			if (
+				! title &&
+				( firstBlock.name === 'core/heading' ||
+					firstBlock.name === 'core/paragraph' )
+			) {
+				onUpdate( firstBlock.attributes.content );
+				onInsertBlockAfter( content.slice( 1 ) );
+			} else {
+				onInsertBlockAfter( content );
+			}
 		}
 	}
 
@@ -145,13 +163,15 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { undo, redo, togglePostTitleSelection } = dispatch(
+		const { undo, redo, togglePostTitleSelection, editPost } = dispatch(
 			'core/editor'
 		);
 
-		const { clearSelectedBlock, insertDefaultBlock } = dispatch(
-			'core/block-editor'
-		);
+		const {
+			clearSelectedBlock,
+			insertDefaultBlock,
+			insertBlocks,
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			onEnterPress() {
@@ -165,6 +185,12 @@ export default compose(
 			},
 			onUnselect() {
 				togglePostTitleSelection( false );
+			},
+			onInsertBlockAfter( blocks ) {
+				insertBlocks( blocks, 0 );
+			},
+			onUpdate( title ) {
+				editPost( { title } );
 			},
 		};
 	} ),
