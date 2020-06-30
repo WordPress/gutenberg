@@ -81,7 +81,7 @@ const SiteLogo = ( {
 		toggleSelection( true );
 	}
 
-	let img = (
+	const img = (
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
@@ -106,7 +106,6 @@ const SiteLogo = ( {
 	);
 
 	let imageWidthWithinContainer;
-	let logoInspectorControls = null;
 
 	if ( clientWidth && naturalWidth && naturalHeight ) {
 		const exceedMaxWidth = naturalWidth > clientWidth;
@@ -114,57 +113,76 @@ const SiteLogo = ( {
 	}
 
 	if ( ! isResizable || ! imageWidthWithinContainer ) {
-		img = <div style={ { width, height } }>{ img }</div>;
-	} else {
-		const currentWidth = width || imageWidthWithinContainer;
-		const ratio = naturalWidth / naturalHeight;
-		const currentHeight = currentWidth / ratio;
-		const minWidth =
-			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
-		const minHeight =
-			naturalHeight < naturalWidth ? MIN_SIZE : MIN_SIZE / ratio;
+		return <div style={ { width, height } }>{ img }</div>;
+	}
 
-		// With the current implementation of ResizableBox, an image needs an
-		// explicit pixel value for the max-width. In absence of being able to
-		// set the content-width, this max-width is currently dictated by the
-		// vanilla editor style. The following variable adds a buffer to this
-		// vanilla style, so 3rd party themes have some wiggleroom. This does,
-		// in most cases, allow you to scale the image beyond the width of the
-		// main column, though not infinitely.
-		// @todo It would be good to revisit this once a content-width variable
-		// becomes available.
-		const maxWidthBuffer = maxWidth * 2.5;
+	const currentWidth = width || imageWidthWithinContainer;
+	const ratio = naturalWidth / naturalHeight;
+	const currentHeight = currentWidth / ratio;
+	const minWidth = naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
+	const minHeight =
+		naturalHeight < naturalWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
-		let showRightHandle = false;
-		let showLeftHandle = false;
+	// With the current implementation of ResizableBox, an image needs an
+	// explicit pixel value for the max-width. In absence of being able to
+	// set the content-width, this max-width is currently dictated by the
+	// vanilla editor style. The following variable adds a buffer to this
+	// vanilla style, so 3rd party themes have some wiggleroom. This does,
+	// in most cases, allow you to scale the image beyond the width of the
+	// main column, though not infinitely.
+	// @todo It would be good to revisit this once a content-width variable
+	// becomes available.
+	const maxWidthBuffer = maxWidth * 2.5;
 
-		/* eslint-disable no-lonely-if */
-		// See https://github.com/WordPress/gutenberg/issues/7584.
-		if ( align === 'center' ) {
-			// When the image is centered, show both handles.
+	let showRightHandle = false;
+	let showLeftHandle = false;
+
+	/* eslint-disable no-lonely-if */
+	// See https://github.com/WordPress/gutenberg/issues/7584.
+	if ( align === 'center' ) {
+		// When the image is centered, show both handles.
+		showRightHandle = true;
+		showLeftHandle = true;
+	} else if ( isRTL ) {
+		// In RTL mode the image is on the right by default.
+		// Show the right handle and hide the left handle only when it is
+		// aligned left. Otherwise always show the left handle.
+		if ( align === 'left' ) {
 			showRightHandle = true;
-			showLeftHandle = true;
-		} else if ( isRTL ) {
-			// In RTL mode the image is on the right by default.
-			// Show the right handle and hide the left handle only when it is
-			// aligned left. Otherwise always show the left handle.
-			if ( align === 'left' ) {
-				showRightHandle = true;
-			} else {
-				showLeftHandle = true;
-			}
 		} else {
-			// Show the left handle and hide the right handle only when the
-			// image is aligned right. Otherwise always show the right handle.
-			if ( align === 'right' ) {
-				showLeftHandle = true;
-			} else {
-				showRightHandle = true;
-			}
+			showLeftHandle = true;
 		}
-		/* eslint-enable no-lonely-if */
+	} else {
+		// Show the left handle and hide the right handle only when the
+		// image is aligned right. Otherwise always show the right handle.
+		if ( align === 'right' ) {
+			showLeftHandle = true;
+		} else {
+			showRightHandle = true;
+		}
+	}
+	/* eslint-enable no-lonely-if */
 
-		img = (
+	return (
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Site Logo Settings' ) }>
+					<RangeControl
+						label={ __( 'Image width' ) }
+						onChange={ ( newWidth ) =>
+							setAttributes( { width: newWidth } )
+						}
+						min={ minWidth }
+						max={ maxWidthBuffer }
+						initialPosition={ Math.min(
+							naturalWidth,
+							maxWidthBuffer
+						) }
+						value={ width || '' }
+						disabled={ ! isResizable }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<ResizableBox
 				size={ { width, height } }
 				showHandle={ isSelected }
@@ -190,34 +208,6 @@ const SiteLogo = ( {
 			>
 				{ img }
 			</ResizableBox>
-		);
-
-		logoInspectorControls = (
-			<InspectorControls>
-				<PanelBody title={ __( 'Site Logo Settings' ) }>
-					<RangeControl
-						label={ __( 'Image width' ) }
-						onChange={ ( newWidth ) =>
-							setAttributes( { width: newWidth } )
-						}
-						min={ minWidth }
-						max={ maxWidthBuffer }
-						initialPosition={ Math.min(
-							naturalWidth,
-							maxWidthBuffer
-						) }
-						value={ width || '' }
-						disabled={ ! isResizable }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		);
-	}
-
-	return (
-		<>
-			{ logoInspectorControls }
-			{ img }
 		</>
 	);
 };
