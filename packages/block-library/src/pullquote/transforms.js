@@ -35,45 +35,6 @@ const transforms = {
 				} );
 			},
 		},
-		{
-			type: 'raw',
-			isMatch: ( node ) => {
-				const isParagraphOrSingleCite = ( () => {
-					let hasCitation = false;
-					return ( child ) => {
-						// Child is a paragraph.
-						if ( child.nodeName === 'P' ) {
-							return true;
-						}
-						// Child is a cite and no other cite child exists before it.
-						if ( ! hasCitation && child.nodeName === 'CITE' ) {
-							hasCitation = true;
-							return true;
-						}
-					};
-				} )();
-				return (
-					node.nodeName === 'BLOCKQUOTE' &&
-					// The quote block can only handle multiline paragraph
-					// content with an optional cite child.
-					Array.from( node.childNodes ).every(
-						isParagraphOrSingleCite
-					)
-				);
-			},
-			schema: ( { phrasingContentSchema } ) => ( {
-				blockquote: {
-					children: {
-						p: {
-							children: phrasingContentSchema,
-						},
-						cite: {
-							children: phrasingContentSchema,
-						},
-					},
-				},
-			} ),
-		},
 	],
 	to: [
 		{
