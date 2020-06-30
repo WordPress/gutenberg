@@ -187,16 +187,27 @@ export default function ImageEditor( {
 	function apply() {
 		setIsProgress( true );
 
-		let attrs = {};
+		const attrs = {
+			modifiers: [],
+		};
 
 		// The crop script may return some very small, sub-pixel values when the image was not cropped.
 		// Crop only when the new size has changed by more than 0.1%.
 		if ( crop.width < 99.9 || crop.height < 99.9 ) {
-			attrs = crop;
+			attrs.modifiers.push( {
+				type: 'crop',
+				left: crop.x,
+				top: crop.y,
+				width: crop.width,
+				height: crop.height,
+			} );
 		}
 
 		if ( rotation > 0 ) {
-			attrs.rotation = rotation;
+			attrs.modifiers.push( {
+				type: 'rotate',
+				angle: rotation,
+			} );
 		}
 
 		attrs.src = url;
