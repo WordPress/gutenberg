@@ -25,7 +25,7 @@ import {
 	MediaWrapper,
 	MediaContainer,
 } from './styles/focal-point-picker-style';
-import { roundClamp } from '../number-control/utils';
+import { roundClamp } from '../utils/math';
 import { INITIAL_BOUNDS } from './utils';
 
 export class FocalPointPicker extends Component {
