@@ -1,6 +1,6 @@
 $toggle-width: 36px;
 $toggle-height: 18px;
-$toggle-border-width: 2px;
+$toggle-border-width: 1px;
 
 .components-form-toggle {
 	position: relative;
@@ -13,7 +13,7 @@ $toggle-border-width: 2px;
 		box-sizing: border-box;
 		vertical-align: top;
 		background-color: $white;
-		border: $toggle-border-width solid $dark-gray-300;
+		border: $toggle-border-width solid $dark-gray-primary;
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: $toggle-height / 2;
@@ -25,30 +25,15 @@ $toggle-border-width: 2px;
 		display: block;
 		position: absolute;
 		box-sizing: border-box;
-		top: $toggle-border-width * 2;
-		left: $toggle-border-width * 2;
-		width: $toggle-height - ($toggle-border-width * 4);
-		height: $toggle-height - ($toggle-border-width * 4);
+		top: $toggle-border-width * 3;
+		left: $toggle-border-width * 3;
+		width: $toggle-height - ($toggle-border-width * 6);
+		height: $toggle-height - ($toggle-border-width * 6);
 		border-radius: 50%;
 		transition: 0.1s transform ease;
 		@include reduce-motion("transition");
-		background-color: $dark-gray-300;
-		border: 5px solid $dark-gray-300; // Has explicit border to act as a fill in Windows High Contrast Mode.
-	}
-
-	&:hover {
-		.components-form-toggle__track {
-			border: $toggle-border-width solid $dark-gray-500;
-		}
-
-		.components-form-toggle__thumb {
-			background-color: $dark-gray-500;
-			border: 5px solid $dark-gray-300; // Has explicit border to act as a fill in Windows High Contrast Mode.
-		}
-
-		.components-form-toggle__off {
-			color: $dark-gray-500;
-		}
+		background-color: $dark-gray-primary;
+		border: 5px solid $dark-gray-primary; // Has explicit border to act as a fill in Windows High Contrast Mode.
 	}
 
 	// Checked state.
@@ -58,7 +43,7 @@ $toggle-border-width: 2px;
 		border: #{ $toggle-height / 2 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
 	}
 
-	&__input:focus + .components-form-toggle__track {
+	.components-form-toggle__input:focus + .components-form-toggle__track {
 		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
