@@ -73,3 +73,11 @@
 .components-dropdown-menu__menu > div:not(:first-child) {
     display: none;
 }
+
+/*
+ Some Themes can overwrite values on \'editor-styles-wrapper\'.
+ This will ensure that the top padding is correct on our single-block version of gutenberg web.
+ */
+.editor-styles-wrapper {
+    padding-top: 50px !important;
+}
