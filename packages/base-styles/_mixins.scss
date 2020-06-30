@@ -350,36 +350,35 @@
 
 @mixin radio-control {
 	@include input-control;
-	border: $border-width + 1 solid $medium-gray-text;
+	border: $border-width solid $dark-gray-primary;
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-round;
 
 	&:checked::before {
-		width: 6px;
-		height: 6px;
-		margin: 6px 0 0 6px;
+		width: 7px;
+		height: 7px;
+		margin: 8px 0 0 8px;
 		background-color: $white;
 
 		@include break-medium() {
-			margin: 3px 0 0 3px;
+			width: 6px;
+			height: 6px;
+			margin: 4px 0 0 4px;
 		}
 	}
 
 	&:focus {
-		border-color: $medium-gray-text;
-		box-shadow: 0 0 0 1px $medium-gray-text;
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
 	}
 
 	&:checked {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
 	}
-
-	&:checked:focus {
-		box-shadow: 0 0 0 $border-width-focus $medium-gray-text;
-	}
-
 }
 
 /**
