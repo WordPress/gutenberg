@@ -9,7 +9,7 @@ import { clamp, isFinite, noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, forwardRef } from '@wordpress/element';
-import { compose, withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,18 +18,14 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { color } from '../utils/colors';
-import {
-	floatClamp,
-	useControlledRangeValue,
-	useDebouncedHoverInteraction,
-} from './utils';
+import { floatClamp, useControlledRangeValue } from './utils';
+import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
 import {
 	ActionRightWrapper,
 	AfterIconWrapper,
 	BeforeIconWrapper,
-	InputRange,
 	Root,
 	Track,
 	ThumbWrapper,
@@ -39,263 +35,258 @@ import {
 import InputField from './input-field';
 import { useRTL } from '../utils/rtl';
 
-const BaseRangeControl = forwardRef(
-	(
-		{
-			afterIcon,
-			allowReset = false,
-			beforeIcon,
-			className,
-			currentInput,
-			color: colorProp = color( 'blue.wordpress.700' ),
-			disabled = false,
-			help,
-			instanceId,
-			initialPosition,
-			label,
-			marks = false,
-			max = 100,
-			min = 0,
-			onBlur = noop,
-			onChange = noop,
-			onFocus = noop,
-			onMouseMove = noop,
-			onMouseLeave = noop,
-			resetFallbackValue,
-			renderTooltipContent = ( v ) => v,
-			showTooltip: showTooltipProp,
-			step = 1,
-			value: valueProp,
-			withInputField = true,
-			...props
-		},
-		ref
-	) => {
-		const isRTL = useRTL();
+function RangeControl(
+	{
+		afterIcon,
+		allowReset = false,
+		beforeIcon,
+		className,
+		currentInput,
+		color: colorProp = color( 'ui.brand' ),
+		disabled = false,
+		help,
+		initialPosition,
+		isShiftStepEnabled = true,
+		label,
+		marks = false,
+		max = 100,
+		min = 0,
+		onBlur = noop,
+		onChange = noop,
+		onFocus = noop,
+		onMouseMove = noop,
+		onMouseLeave = noop,
+		railColor,
+		resetFallbackValue,
+		renderTooltipContent = ( v ) => v,
+		showTooltip: showTooltipProp,
+		shiftStep = 10,
+		step = 1,
+		trackColor,
+		value: valueProp,
+		withInputField = true,
+		...props
+	},
+	ref
+) {
+	const isRTL = useRTL();
 
-		const sliderValue =
-			valueProp !== undefined ? valueProp : initialPosition;
+	const [ value, setValue ] = useControlledRangeValue( {
+		min,
+		max,
+		value: valueProp,
+		initial: initialPosition,
+	} );
+	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
+	const [ isFocused, setIsFocused ] = useState( false );
 
-		const [ value, setValue ] = useControlledRangeValue( {
-			min,
-			max,
-			value: sliderValue,
-		} );
-		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
-		const [ isFocused, setIsFocused ] = useState( false );
+	const inputRef = useRef();
 
-		const inputRef = useRef();
+	const setRef = ( nodeRef ) => {
+		inputRef.current = nodeRef;
 
-		const setRef = ( nodeRef ) => {
-			inputRef.current = nodeRef;
+		if ( ref ) {
+			ref( nodeRef );
+		}
+	};
 
-			if ( ref ) {
-				ref( nodeRef );
-			}
-		};
+	const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
+	const isThumbFocused = ! disabled && isFocused;
 
-		const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
-		const isThumbFocused = ! disabled && isFocused;
+	const isValueReset = value === null;
+	const currentValue = value !== undefined ? value : currentInput;
 
-		const isValueReset = value === null;
-		const currentValue = value !== undefined ? value : currentInput;
+	const inputSliderValue = isValueReset ? '' : currentValue;
 
-		const inputSliderValue = isValueReset ? '' : currentValue;
+	const rangeFillValue = isValueReset
+		? floatClamp( max / 2, min, max )
+		: value;
 
-		const rangeFillValue = isValueReset
-			? floatClamp( max / 2, min, max )
-			: value;
+	const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
+	const fillValue = isValueReset ? 50 : calculatedFillValue;
+	const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
 
-		const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
-		const fillValue = isValueReset ? 50 : calculatedFillValue;
-		const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
+	const classes = classnames( 'components-range-control', className );
 
-		const classes = classnames( 'components-range-control', className );
+	const wrapperClasses = classnames(
+		'components-range-control__wrapper',
+		!! marks && 'is-marked'
+	);
 
-		const wrapperClasses = classnames(
-			'components-range-control__wrapper',
-			!! marks && 'is-marked'
-		);
+	const id = useInstanceId( RangeControl, 'inspector-range-control' );
+	const describedBy = !! help ? `${ id }__help` : undefined;
+	const enableTooltip = showTooltipProp !== false && isFinite( value );
 
-		const id = `inspector-range-control-${ instanceId }`;
+	const handleOnRangeChange = ( event ) => {
+		const nextValue = parseFloat( event.target.value );
+		handleOnChange( nextValue );
+	};
 
-		const describedBy = !! help ? `${ id }__help` : undefined;
-		const enableTooltip = showTooltipProp !== false && isFinite( value );
+	const handleOnChange = ( nextValue ) => {
+		if ( isNaN( nextValue ) ) {
+			handleOnReset();
+			return;
+		}
 
-		const handleOnChange = ( event ) => {
-			const nextValue = parseFloat( event.target.value );
+		setValue( nextValue );
+		onChange( nextValue );
+	};
 
-			if ( isNaN( nextValue ) ) {
-				handleOnReset();
-				return;
-			}
+	const handleOnReset = () => {
+		let resetValue = parseFloat( resetFallbackValue );
+		let onChangeResetValue = resetValue;
 
-			setValue( nextValue );
-			onChange( nextValue );
-		};
+		if ( isNaN( resetValue ) ) {
+			resetValue = null;
+			onChangeResetValue = undefined;
+		}
 
-		const handleOnReset = () => {
-			let resetValue = parseFloat( resetFallbackValue );
-			let onChangeResetValue = resetValue;
+		setValue( resetValue );
 
-			if ( isNaN( resetValue ) ) {
-				resetValue = null;
-				onChangeResetValue = undefined;
-			}
+		/**
+		 * Previously, this callback would always receive undefined as
+		 * an argument. This behavior is unexpected, specifically
+		 * when resetFallbackValue is defined.
+		 *
+		 * The value of undefined is not ideal. Passing it through
+		 * to internal <input /> elements would change it from a
+		 * controlled component to an uncontrolled component.
+		 *
+		 * For now, to minimize unexpected regressions, we're going to
+		 * preserve the undefined callback argument, except when a
+		 * resetFallbackValue is defined.
+		 */
+		onChange( onChangeResetValue );
+	};
 
-			setValue( resetValue );
+	const handleShowTooltip = () => setShowTooltip( true );
+	const handleHideTooltip = () => setShowTooltip( false );
 
-			/**
-			 * Previously, this callback would always receive undefined as
-			 * an argument. This behavior is unexpected, specifically
-			 * when resetFallbackValue is defined.
-			 *
-			 * The value of undefined is not ideal. Passing it through
-			 * to internal <input /> elements would change it from a
-			 * controlled component to an uncontrolled component.
-			 *
-			 * For now, to minimize unexpected regressions, we're going to
-			 * preserve the undefined callback argument, except when a
-			 * resetFallbackValue is defined.
-			 */
-			onChange( onChangeResetValue );
-		};
+	const handleOnBlur = ( event ) => {
+		onBlur( event );
+		setIsFocused( false );
+		handleHideTooltip();
+	};
 
-		const handleShowTooltip = () => setShowTooltip( true );
-		const handleHideTooltip = () => setShowTooltip( false );
+	const handleOnFocus = ( event ) => {
+		onFocus( event );
+		setIsFocused( true );
+		handleShowTooltip();
+	};
 
-		const handleOnBlur = ( event ) => {
-			onBlur( event );
-			setIsFocused( false );
-			handleHideTooltip();
-		};
+	const offsetStyle = {
+		[ isRTL ? 'right' : 'left' ]: fillValueOffset,
+	};
 
-		const handleOnFocus = ( event ) => {
-			onFocus( event );
-			setIsFocused( true );
-			handleShowTooltip();
-		};
-
-		const hoverInteractions = useDebouncedHoverInteraction( {
-			onShow: handleShowTooltip,
-			onHide: handleHideTooltip,
-			onMouseMove,
-			onMouseLeave,
-		} );
-
-		const offsetStyle = {
-			[ isRTL ? 'right' : 'left' ]: fillValueOffset,
-		};
-
-		return (
-			<BaseControl
-				className={ classes }
-				label={ label }
-				id={ id }
-				help={ help }
-			>
-				<Root
-					className="components-range-control__root"
-					isRTL={ isRTL }
+	return (
+		<BaseControl
+			className={ classes }
+			label={ label }
+			id={ id }
+			help={ help }
+		>
+			<Root className="components-range-control__root" isRTL={ isRTL }>
+				{ beforeIcon && (
+					<BeforeIconWrapper>
+						<Icon icon={ beforeIcon } />
+					</BeforeIconWrapper>
+				) }
+				<Wrapper
+					className={ wrapperClasses }
+					color={ colorProp }
+					marks={ !! marks }
 				>
-					{ beforeIcon && (
-						<BeforeIconWrapper>
-							<Icon icon={ beforeIcon } />
-						</BeforeIconWrapper>
-					) }
-					<Wrapper
-						className={ wrapperClasses }
-						color={ colorProp }
-						marks={ !! marks }
-					>
-						<InputRange
-							{ ...props }
-							{ ...hoverInteractions }
-							aria-describedby={ describedBy }
-							aria-label={ label }
-							aria-hidden={ false }
-							className="components-range-control__slider"
-							disabled={ disabled }
-							id={ id }
-							max={ max }
-							min={ min }
-							onBlur={ handleOnBlur }
-							onChange={ handleOnChange }
-							onFocus={ handleOnFocus }
-							ref={ setRef }
-							step={ step }
-							tabIndex={ 0 }
-							type="range"
-							value={ inputSliderValue }
-						/>
-						<RangeRail
+					<InputRange
+						{ ...props }
+						className="components-range-control__slider"
+						describedBy={ describedBy }
+						disabled={ disabled }
+						id={ id }
+						isShiftStepEnabled={ isShiftStepEnabled }
+						label={ label }
+						max={ max }
+						min={ min }
+						onBlur={ handleOnBlur }
+						onChange={ handleOnRangeChange }
+						onFocus={ handleOnFocus }
+						onMouseMove={ onMouseMove }
+						onMouseLeave={ onMouseLeave }
+						ref={ setRef }
+						shiftStep={ shiftStep }
+						step={ step }
+						value={ inputSliderValue }
+					/>
+					<RangeRail
+						aria-hidden={ true }
+						disabled={ disabled }
+						marks={ marks }
+						max={ max }
+						min={ min }
+						railColor={ railColor }
+						step={ step }
+						value={ rangeFillValue }
+					/>
+					<Track
+						aria-hidden={ true }
+						className="components-range-control__track"
+						disabled={ disabled }
+						style={ { width: fillValueOffset } }
+						trackColor={ trackColor }
+					/>
+					<ThumbWrapper style={ offsetStyle }>
+						<Thumb
 							aria-hidden={ true }
-							disabled={ disabled }
-							marks={ marks }
-							max={ max }
-							min={ min }
-							step={ step }
-							value={ rangeFillValue }
+							isFocused={ isThumbFocused }
 						/>
-						<Track
-							aria-hidden={ true }
-							className="components-range-control__track"
-							disabled={ disabled }
-							style={ { width: fillValueOffset } }
-						/>
-						<ThumbWrapper style={ offsetStyle }>
-							<Thumb
-								aria-hidden={ true }
-								isFocused={ isThumbFocused }
-							/>
-						</ThumbWrapper>
-						{ enableTooltip && (
-							<SimpleTooltip
-								className="components-range-control__tooltip"
-								inputRef={ inputRef }
-								renderTooltipContent={ renderTooltipContent }
-								show={ isCurrentlyFocused || showTooltip }
-								style={ offsetStyle }
-								value={ value }
-							/>
-						) }
-					</Wrapper>
-					{ afterIcon && (
-						<AfterIconWrapper>
-							<Icon icon={ afterIcon } />
-						</AfterIconWrapper>
-					) }
-					{ withInputField && (
-						<InputField
-							disabled={ disabled }
-							label={ label }
-							max={ max }
-							min={ min }
-							onChange={ handleOnChange }
-							onReset={ handleOnReset }
-							step={ step }
-							value={ inputSliderValue }
+					</ThumbWrapper>
+					{ enableTooltip && (
+						<SimpleTooltip
+							className="components-range-control__tooltip"
+							inputRef={ inputRef }
+							renderTooltipContent={ renderTooltipContent }
+							show={ isCurrentlyFocused || showTooltip }
+							style={ offsetStyle }
+							value={ value }
 						/>
 					) }
-					{ allowReset && (
-						<ActionRightWrapper>
-							<Button
-								className="components-range-control__reset"
-								disabled={ disabled || value === undefined }
-								isSecondary
-								isSmall
-								onClick={ handleOnReset }
-							>
-								{ __( 'Reset' ) }
-							</Button>
-						</ActionRightWrapper>
-					) }
-				</Root>
-			</BaseControl>
-		);
-	}
-);
+				</Wrapper>
+				{ afterIcon && (
+					<AfterIconWrapper>
+						<Icon icon={ afterIcon } />
+					</AfterIconWrapper>
+				) }
+				{ withInputField && (
+					<InputField
+						disabled={ disabled }
+						isShiftStepEnabled={ isShiftStepEnabled }
+						label={ label }
+						max={ max }
+						min={ min }
+						onChange={ handleOnChange }
+						onReset={ handleOnReset }
+						shiftStep={ shiftStep }
+						step={ step }
+						value={ inputSliderValue }
+					/>
+				) }
+				{ allowReset && (
+					<ActionRightWrapper>
+						<Button
+							className="components-range-control__reset"
+							disabled={ disabled || value === undefined }
+							isSecondary
+							isSmall
+							onClick={ handleOnReset }
+						>
+							{ __( 'Reset' ) }
+						</Button>
+					</ActionRightWrapper>
+				) }
+			</Root>
+		</BaseControl>
+	);
+}
 
-export const RangeControlNext = compose( withInstanceId )( BaseRangeControl );
+const ForwardedComponent = forwardRef( RangeControl );
 
-export default RangeControlNext;
+export default ForwardedComponent;

@@ -7,11 +7,18 @@ import { partial, first, castArray, last, compact } from 'lodash';
  * WordPress dependencies
  */
 import { ToolbarButton, Picker } from '@wordpress/components';
-import { getBlockType, getDefaultBlockName } from '@wordpress/blocks';
+import {
+	getBlockType,
+	getDefaultBlockName,
+	serialize,
+	rawHandler,
+	createBlock,
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { moreHorizontalMobile, trash, cog } from '@wordpress/icons';
+import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
@@ -31,12 +38,19 @@ const BlockActionsMenu = ( {
 	blockTitle,
 	isEmptyDefaultBlock,
 	anchorNodeRef,
+	getBlocksByClientId,
+	selectedBlockClientId,
+	updateClipboard,
+	createInfoNotice,
+	duplicateBlock,
+	removeBlocks,
+	pasteBlock,
+	isPasteEnabled,
 } ) => {
 	const pickerRef = useRef();
-	const moversOptions = { keys: [ 'icon', 'actionTitle' ], blockTitle };
+	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
 
 	const {
-		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
 		actionTitle: {
 			backward: backwardButtonTitle,
 			forward: forwardButtonTitle,
@@ -45,27 +59,22 @@ const BlockActionsMenu = ( {
 
 	const deleteOption = {
 		id: 'deleteOption',
-		// translators: %s: block title e.g: "Paragraph".
-		label: sprintf( __( 'Remove %s' ), blockTitle ),
+		label: __( 'Remove block' ),
 		value: 'deleteOption',
-		icon: trash,
 		separated: true,
 		disabled: isEmptyDefaultBlock,
 	};
 
 	const settingsOption = {
 		id: 'settingsOption',
-		// translators: %s: block title e.g: "Paragraph".
-		label: sprintf( __( '%s Settings' ), blockTitle ),
+		label: __( 'Block settings' ),
 		value: 'settingsOption',
-		icon: cog,
 	};
 
 	const backwardButtonOption = {
 		id: 'backwardButtonOption',
 		label: backwardButtonTitle,
 		value: 'backwardButtonOption',
-		icon: backwardButtonIcon,
 		disabled: isFirst,
 	};
 
@@ -73,14 +82,41 @@ const BlockActionsMenu = ( {
 		id: 'forwardButtonOption',
 		label: forwardButtonTitle,
 		value: 'forwardButtonOption',
-		icon: forwardButtonIcon,
 		disabled: isLast,
+	};
+
+	const copyButtonOption = {
+		id: 'copyButtonOption',
+		label: __( 'Copy block' ),
+		value: 'copyButtonOption',
+	};
+
+	const cutButtonOption = {
+		id: 'cutButtonOption',
+		label: __( 'Cut block' ),
+		value: 'cutButtonOption',
+	};
+
+	const pasteButtonOption = {
+		id: 'pasteButtonOption',
+		label: __( 'Paste block' ),
+		value: 'pasteButtonOption',
+	};
+
+	const duplicateButtonOption = {
+		id: 'duplicateButtonOption',
+		label: __( 'Duplicate block' ),
+		value: 'duplicateButtonOption',
 	};
 
 	const options = compact( [
 		wrapBlockMover && backwardButtonOption,
 		wrapBlockMover && forwardButtonOption,
 		wrapBlockSettings && settingsOption,
+		copyButtonOption,
+		cutButtonOption,
+		isPasteEnabled && pasteButtonOption,
+		duplicateButtonOption,
 		deleteOption,
 	] );
 
@@ -97,6 +133,37 @@ const BlockActionsMenu = ( {
 				break;
 			case backwardButtonOption.value:
 				onMoveUp();
+				break;
+			case copyButtonOption.value:
+				const copyBlock = getBlocksByClientId( selectedBlockClientId );
+				updateClipboard( serialize( copyBlock ) );
+				createInfoNotice(
+					// translators: displayed right after the block is copied.
+					__( 'Block copied' )
+				);
+				break;
+			case cutButtonOption.value:
+				const cutBlock = getBlocksByClientId( selectedBlockClientId );
+				updateClipboard( serialize( cutBlock ) );
+				removeBlocks( selectedBlockClientId );
+				createInfoNotice(
+					// translators: displayed right after the block is cut.
+					__( 'Block cut' )
+				);
+				break;
+			case pasteButtonOption.value:
+				pasteBlock();
+				createInfoNotice(
+					// translators: displayed right after the block is pasted.
+					__( 'Block pasted' )
+				);
+				break;
+			case duplicateButtonOption.value:
+				duplicateBlock();
+				createInfoNotice(
+					// translators: displayed right after the block is duplicated.
+					__( 'Block duplicated' )
+				);
 				break;
 		}
 	}
@@ -133,9 +200,12 @@ const BlockActionsMenu = ( {
 				destructiveButtonIndex={ options.length }
 				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform.OS !== 'ios' }
+				leftAlign={ true }
 				anchor={
 					anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined
 				}
+				// translators: %s: block title e.g: "Paragraph".
+				title={ sprintf( __( '%s block options' ), blockTitle ) }
 			/>
 		</>
 	);
@@ -149,7 +219,11 @@ export default compose(
 			getBlockOrder,
 			getBlockName,
 			getBlock,
+			getBlocksByClientId,
+			getSelectedBlockClientIds,
+			canInsertBlockType,
 		} = select( 'core/block-editor' );
+		const { getClipboard } = select( 'core/editor' );
 		const normalizedClientIds = castArray( clientIds );
 		const block = getBlock( normalizedClientIds );
 		const blockName = getBlockName( normalizedClientIds );
@@ -171,25 +245,82 @@ export default compose(
 		const isEmptyDefaultBlock =
 			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
 
+		const clipboard = getClipboard();
+		const clipboardBlock =
+			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
+		const isPasteEnabled =
+			clipboardBlock &&
+			canInsertBlockType( clipboardBlock.name, rootClientId );
+
 		return {
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			rootClientId,
 			blockTitle,
 			isEmptyDefaultBlock,
+			getBlocksByClientId,
+			selectedBlockClientId: getSelectedBlockClientIds(),
+			currentIndex: firstIndex,
+			isPasteEnabled,
+			clipboardBlock,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp } = dispatch(
-			'core/block-editor'
-		);
-		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+	withDispatch(
+		(
+			dispatch,
+			{ clientIds, rootClientId, currentIndex, clipboardBlock },
+			{ select }
+		) => {
+			const {
+				moveBlocksDown,
+				moveBlocksUp,
+				duplicateBlocks,
+				removeBlocks,
+				insertBlock,
+				replaceBlocks,
+			} = dispatch( 'core/block-editor' );
+			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+			const { updateClipboard, createInfoNotice } = dispatch(
+				'core/editor'
+			);
+			const { getBlockSelectionEnd, getBlock } = select(
+				'core/block-editor'
+			);
 
-		return {
-			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
-			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
-			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
-		};
-	} ),
+			return {
+				onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
+				onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
+				openGeneralSidebar: () =>
+					openGeneralSidebar( 'edit-post/block' ),
+				updateClipboard,
+				createInfoNotice,
+				duplicateBlock() {
+					return duplicateBlocks( clientIds );
+				},
+				removeBlocks,
+				pasteBlock: () => {
+					const canReplaceBlock = isUnmodifiedDefaultBlock(
+						getBlock( getBlockSelectionEnd() )
+					);
+
+					if ( ! canReplaceBlock ) {
+						const insertedBlock = createBlock(
+							clipboardBlock.name,
+							clipboardBlock.attributes,
+							clipboardBlock.innerBlocks
+						);
+
+						insertBlock(
+							insertedBlock,
+							currentIndex + 1,
+							rootClientId
+						);
+					} else {
+						replaceBlocks( clientIds, clipboardBlock );
+					}
+				},
+			};
+		}
+	),
 	withInstanceId
 )( BlockActionsMenu );

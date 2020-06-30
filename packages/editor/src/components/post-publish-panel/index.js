@@ -79,26 +79,32 @@ export class PostPublishPanel extends Component {
 			<div className="editor-post-publish-panel" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">
 					{ isPostPublish ? (
-						<div className="editor-post-publish-panel__header-published">
-							{ isScheduled
-								? __( 'Scheduled' )
-								: __( 'Published' ) }
-						</div>
+						<Button
+							onClick={ onClose }
+							icon={ closeSmall }
+							label={ __( 'Close panel' ) }
+						/>
 					) : (
-						<div className="editor-post-publish-panel__header-publish-button">
-							<PostPublishButton
-								focusOnMount={ true }
-								onSubmit={ this.onSubmit }
-								forceIsDirty={ forceIsDirty }
-								forceIsSaving={ forceIsSaving }
-							/>
-						</div>
+						<>
+							<div className="editor-post-publish-panel__header-publish-button">
+								<PostPublishButton
+									focusOnMount={ true }
+									onSubmit={ this.onSubmit }
+									forceIsDirty={ forceIsDirty }
+									forceIsSaving={ forceIsSaving }
+								/>
+							</div>
+							<div className="editor-post-publish-panel__header-cancel-button">
+								<Button
+									onClick={ onClose }
+									label={ __( 'Close panel' ) }
+									isSecondary
+								>
+									{ __( 'Cancel' ) }
+								</Button>
+							</div>
+						</>
 					) }
-					<Button
-						onClick={ onClose }
-						icon={ closeSmall }
-						label={ __( 'Close panel' ) }
-					/>
 				</div>
 				<div className="editor-post-publish-panel__content">
 					{ isPrePublish && (

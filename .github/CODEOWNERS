@@ -15,6 +15,7 @@
 /packages/block-library/src/gallery             @mkevins @pinarol
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
+/packages/block-library/src/image               @ajlende
 
 # Editor
 /packages/annotations                           @atimmer @ellatrix

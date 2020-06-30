@@ -11,6 +11,8 @@ if (
 	/**
 	 * Function responsible for enqueuing the assets required
 	 * for the block directory functionality in the editor.
+	 *
+	 * This filter can be removed when plugin support requires WordPress 5.5.0+.
 	 */
 	function gutenberg_enqueue_block_editor_assets_block_directory() {
 		wp_enqueue_script( 'wp-block-directory' );
@@ -20,6 +22,8 @@ if (
 
 	/**
 	 * Add data attribute of handle to all script tags output in the wp-admin.
+	 *
+	 * This filter can be removed when plugin support requires WordPress 5.5.0+.
 	 *
 	 * @param string $tag     The `<script>` tag for the enqueued script.
 	 * @param string $handle  The script's registered handle.

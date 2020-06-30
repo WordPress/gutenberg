@@ -12,7 +12,7 @@ We release a new major version approximately every two weeks. The current and ne
 
 - **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
 
-- **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](./testing-overview.md#performance-testing) is published.
+- **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](/docs/block-editor/contributors/testing-overview/#performance-testing) is published.
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
@@ -80,6 +80,8 @@ Guidelines for proof-reading include:
 
 Once you have cleaned up the changelog, choose a few features to highlight in the release post and record an animation of them in use.
 
+You should also include a performance audit at the end of the release post. You can use `bin/plugin/cli.js perf` to automatically do this.
+
 Compile this to a draft post on [make.wordpress.org/core](https://make.wordpress.org/core/); this post should be published after the actual release.
 
 ##### Creating the Release Branch
@@ -124,11 +126,14 @@ If a bug is found in a release candidate and a fix is committed to `master`, we 
 1. Checkout the corresponding release branch with: `git checkout release/x.x`.
 2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`.
 3. Create [a commit like this](https://github.com/WordPress/gutenberg/pull/13125/commits/13fa651dadc2472abb9b95f80db9d5f23e63ae9c), bumping the version number in `gutenberg.php`, `package.json`, and `package-lock.json` to `x.x.0-rc.2`.
-4. Create a Pull Request from the release branch into `master` using the changelog as a description and ensure the tests pass properly.
+4. Create a Pull Request from the release branch into `master` using the changelog as a description and ensure the tests pass properly. Note that if there there are merge conflicts, Travis CI will not run on the PR. Run tests locally using `npm run test` and `npm run test-e2e` if this happens.
 5. Tag the RC version. `git tag vx.x.0-rc.2` from the release branch.
 6. Push the tag `git push --tags`.
-7. Merge the version bump pull request and avoid removing the release branch.
-8. Follow the steps in [build the plugin](#build-the-plugin) and [publish the release on GitHub](#publish-the-release-on-github).
+7. Create a branch for bumping the version number. `git checkout -b bump/x.x`.
+8. Create a Pull Request from the `bump/x.x` branch into `master` using the
+   changelog as a description.
+9. Merge the version bump pull request.
+10. Follow the steps in [build the plugin](#build-the-plugin) and [publish the release on GitHub](#publish-the-release-on-github).
 
 You can copy the existing changelog from the previous release candidate. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7) and the call for testing post.
 

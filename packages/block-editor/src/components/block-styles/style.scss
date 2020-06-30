@@ -41,7 +41,6 @@
 .block-editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
 	padding: 0;
-	border: $border-width solid rgba($dark-gray-primary, 0.2);
 	border-radius: $radius-block-ui;
 	display: flex;
 	overflow: hidden;
@@ -49,6 +48,10 @@
 	align-items: center;
 	flex-grow: 1;
 	min-height: 80px;
+}
+
+.block-editor-block-switcher__styles__menugroup {
+	position: relative;
 }
 
 .block-editor-block-styles__item-label {

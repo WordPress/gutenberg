@@ -67,10 +67,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 
-if ( ! class_exists( 'WP_Block_Styles_Registry' ) ) {
-	require dirname( __FILE__ ) . '/class-wp-block-styles-registry.php';
-}
-
 if ( ! class_exists( 'WP_Block_Patterns_Registry' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block-patterns-registry.php';
 }
