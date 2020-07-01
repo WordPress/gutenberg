@@ -15,8 +15,6 @@ import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useBlockTypesState from './hooks/use-block-types-state';
 
-const reusableBlockFilter = ( { category } ) => category === 'reusable';
-
 function ReusableBlocksList( {
 	debouncedSpeak,
 	filterValue,
@@ -30,15 +28,19 @@ function ReusableBlocksList( {
 	);
 
 	const filteredItems = useMemo( () => {
+		const reusableItems = items.filter(
+			( { category } ) => category === 'reusable'
+		);
+
 		if ( ! filterValue ) {
-			return items.filter( reusableBlockFilter );
+			return reusableItems;
 		}
 		return searchBlockItems(
-			items,
+			reusableItems,
 			categories,
 			collections,
 			filterValue
-		).filter( reusableBlockFilter );
+		);
 	}, [ filterValue, items, categories, collections ] );
 
 	// Announce search results on change.
