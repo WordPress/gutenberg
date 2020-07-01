@@ -96,6 +96,7 @@ function render_block_core_navigation_link( $content, $block ) {
 
 	$html .= '</span>';
 
+	// TODO - use block context for $has_submenu setting.
 	if ( $has_submenu ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
 		$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
@@ -122,37 +123,12 @@ function render_block_core_navigation_link( $content, $block ) {
 /**
  * Register the navigation link block.
  *
+ * @uses render_block_core_navigation()
+ * @throws WP_Error An WP_Error exception parsing the block definition.
  */
-function register_block_core_navigation_link() {
-	register_block_type(
-		'core/navigation-link',
-		array(
-			'attributes' => array(
-				'label'         => array(
-					'type' => 'string',
-				),
-				'nofollow'      => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'type'          => array(
-					'type' => 'string',
-				),
-				'description'   => array(
-					'type' => 'string',
-				),
-				'id'            => array(
-					'type' => 'number',
-				),
-				'opensInNewTab' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'url'           => array(
-					'type' => 'string',
-				),
-			),
-		)
+function register_block_core_navigation() {
+	register_block_type_from_metadata(
+		__DIR__ . '/navigation-link'
 	);
 }
 add_action( 'init', 'register_block_core_navigation_link' );
