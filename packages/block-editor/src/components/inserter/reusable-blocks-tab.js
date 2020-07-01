@@ -15,7 +15,9 @@ import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useBlockTypesState from './hooks/use-block-types-state';
 
-function ReusableBlocksSearchResults( {
+const reusableBlockFilter = ( { category } ) => category === 'reusable';
+
+function ReusableBlocksList( {
 	debouncedSpeak,
 	filterValue,
 	onHover,
@@ -28,12 +30,15 @@ function ReusableBlocksSearchResults( {
 	);
 
 	const filteredItems = useMemo( () => {
+		if ( ! filterValue ) {
+			return items.filter( reusableBlockFilter );
+		}
 		return searchBlockItems(
 			items,
 			categories,
 			collections,
 			filterValue
-		).filter( ( { category } ) => category === 'reusable' );
+		).filter( reusableBlockFilter );
 	}, [ filterValue, items, categories, collections ] );
 
 	// Announce search results on change.
@@ -46,47 +51,22 @@ function ReusableBlocksSearchResults( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
-	if ( filterValue ) {
-		return !! filteredItems.length ? (
-			<InserterPanel title={ __( 'Search Results' ) }>
-				<BlockTypesList
-					items={ filteredItems }
-					onSelect={ onSelectItem }
-					onHover={ onHover }
-				/>
-			</InserterPanel>
-		) : (
-			<InserterNoResults />
-		);
+	if ( filteredItems.length === 0 ) {
+		return <InserterNoResults />;
 	}
-}
-
-export function InsertableReusableBlocks( {
-	onInsert,
-	onHover,
-	rootClientId,
-} ) {
-	const [ items, , , onSelectItem ] = useBlockTypesState(
-		rootClientId,
-		onInsert
-	);
-
-	const filteredItems = useMemo( () => {
-		return items.filter( ( { category } ) => category === 'reusable' );
-	}, [ items ] );
 
 	return (
-		<>
-			{ filteredItems.length > 0 && (
-				<InserterPanel title={ __( 'Reusable blocks' ) }>
-					<BlockTypesList
-						items={ filteredItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-					/>
-				</InserterPanel>
-			) }
-		</>
+		<InserterPanel
+			title={
+				filterValue ? __( 'Search Results' ) : __( 'Reusable blocks' )
+			}
+		>
+			<BlockTypesList
+				items={ filteredItems }
+				onSelect={ onSelectItem }
+				onHover={ onHover }
+			/>
+		</InserterPanel>
 	);
 }
 
@@ -112,21 +92,13 @@ export function ReusableBlocksTab( {
 } ) {
 	return (
 		<>
-			{ filterValue ? (
-				<ReusableBlocksSearchResults
-					debouncedSpeak={ debouncedSpeak }
-					filterValue={ filterValue }
-					onHover={ onHover }
-					onInsert={ onInsert }
-					rootClientId={ rootClientId }
-				/>
-			) : (
-				<InsertableReusableBlocks
-					onInsert={ onInsert }
-					onHover={ onHover }
-					rootClientId={ rootClientId }
-				/>
-			) }
+			<ReusableBlocksList
+				debouncedSpeak={ debouncedSpeak }
+				filterValue={ filterValue }
+				onHover={ onHover }
+				onInsert={ onInsert }
+				rootClientId={ rootClientId }
+			/>
 			<div className="block-editor-inserter__manage-reusable-blocks-container">
 				<a
 					className="block-editor-inserter__manage-reusable-blocks"
