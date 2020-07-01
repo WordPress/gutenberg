@@ -40,8 +40,8 @@
 	}
 
 	input[type="search"].components-text-control__input {
-		padding: 0.75 * $grid-unit-20;
-		border-radius: $radius-round-rectangle;
+		padding: $grid-unit-10;
+		border-radius: $radius-block-ui;
 	}
 }
 
