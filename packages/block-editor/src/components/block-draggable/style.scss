@@ -7,7 +7,7 @@
 	background-color: $dark-gray-primary;
 	border-radius: $radius-block-ui;
 	border: $border-width solid $dark-gray-primary;
-	box-shadow: $shadow-popover;
+	box-shadow: 0 4px 6px rgba($black, 0.3);
 	color: $white;
 	cursor: grabbing;
 	display: inline-flex;
@@ -20,7 +20,7 @@
 		fill: currentColor;
 	}
 
-	&__content {
+	.block-editor-block-draggable-chip__content {
 		margin: auto;
 	}
 
