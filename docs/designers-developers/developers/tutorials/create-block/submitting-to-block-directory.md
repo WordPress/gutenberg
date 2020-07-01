@@ -69,7 +69,7 @@ Double check that the following is true for your block:
 `editorStyle` is pointing to the CSS bundle that includes all the css used in the **editor**.
 `script` is pointing to the JavaScript bundle that includes all the code used on the **website**.
 `style` is pointing to the CSS bundle that includes all the code used on the **website**.
-I have included example data (Optional, but useful)
+Includes example data (Optional, but useful)
 
 Although it isn’t necessary that you have both an `editorScript/editorStyle` and `script/style` listed in your `block.json` we encourage the separation of code used for editing and code used for displaying your block in order to keep both interfaces running quickly.
 
