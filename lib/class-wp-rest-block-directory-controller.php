@@ -143,14 +143,14 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		);
 
 		foreach ( $plugin['block_assets'] as $asset ) {
-			// Allow for fully qualified URLs in future
-			if ( 'https' === wp_parse_url( $asset, PHP_URL_SCHEME ) && !empty( wp_parse_url( $asset, PHP_URL_HOST ) ) ) {
+			// Allow for fully qualified URLs in future.
+			if ( 'https' === wp_parse_url( $asset, PHP_URL_SCHEME ) && ! empty( wp_parse_url( $asset, PHP_URL_HOST ) ) ) {
 				$block['assets'][] = esc_url_raw(
 					$asset,
 					array( 'https' )
 				);
 			} else {
-				$block['assets'][] = esc_url_raw( 
+				$block['assets'][] = esc_url_raw(
 					add_query_arg( 'v', strtotime( $block['last_updated'] ), 'https://ps.w.org/' . $plugin['slug'] . $asset ),
 					array( 'https' )
 				);
