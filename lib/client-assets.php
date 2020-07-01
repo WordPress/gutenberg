@@ -728,6 +728,7 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
 	register_block_pattern( 'core/text-two-columns-with-images', gutenberg_load_block_pattern( 'text-two-columns-with-images' ) );
 	register_block_pattern( 'core/text-three-columns-images-buttons', gutenberg_load_block_pattern( 'text-three-columns-images-buttons' ) );
+	register_block_pattern( 'core/large-header', gutenberg_load_block_pattern( 'large-header' ) );
 }
 
 /*
@@ -738,4 +739,5 @@ if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
 	register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'gutenberg' ) ) );
 	register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'gutenberg' ) ) );
 	register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'header', array( 'label' => _x( 'Header', 'Block pattern category', 'gutenberg' ) ) );
 }
