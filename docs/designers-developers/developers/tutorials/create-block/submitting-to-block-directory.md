@@ -1,5 +1,5 @@
 #Share your Block with the World
-So you’ve created an awesome block have you? Care to share? Here is some basic information on how to submit a block to the Block Directory.
+So you've created an awesome block? Care to share?
 
 **Contents**:
 1. Help users understand your block
