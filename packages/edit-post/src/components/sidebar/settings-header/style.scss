@@ -1,51 +1,68 @@
-.components-button.edit-post-sidebar__panel-tab {
-	border-radius: 0;
-	height: $grid-unit-60;
-	background: transparent;
-	border: none;
-	box-shadow: none;
-	cursor: pointer;
-	display: inline-block;
-	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
-	margin-left: 0;
-	font-weight: 500;
-
-	// This pseudo-element "duplicates" the tab label and sets the text to bold.
-	// This ensures that the tab doesn't change width when selected.
-	// See: https://github.com/WordPress/gutenberg/pull/9793
-	&::after {
-		content: attr(data-label);
-		display: block;
-		font-weight: 600;
-		height: 0;
-		overflow: hidden;
-		speak: none;
-		visibility: hidden;
+.edit-post-sidebar__panel-tabs {
+	ul {
+		width: 100%;
+		margin-right: $grid-unit-20;
+		position: relative;
 	}
 
-	&.is-active {
-		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
-		box-shadow: inset 0 0 0 $border-width-focus transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
-		position: relative;
-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
+	li {
+		width: 50%;
+	}
 
-		// This border appears in Windows High Contrast mode instead of the box-shadow.
-		&::before {
+	// Tab indicator
+	li:last-child::before {
+		content: "";
+		position: absolute;
+		pointer-events: none;
+		top: 0;
+		width: calc(50% - #{ $grid-unit-20 + $grid-unit-20 });
+		margin-left: $grid-unit-20;
+		bottom: $grid-unit-10 + $border-width;
+		border-bottom: $border-width-tab solid var(--wp-admin-theme-color);
+
+		transition: all 0.1s ease;
+		@include reduce-motion("transition");
+	}
+
+	// Position tab indicator under active tab.
+	li:nth-child(1).is-active ~ li:last-child::before {
+		left: 0;
+	}
+
+	li:nth-child(2).is-active::before {
+		left: 50%;
+	}
+
+	.components-button.edit-post-sidebar__panel-tab {
+		width: 100%;
+		text-align: left;
+		position: relative;
+		border-radius: 0;
+		height: $grid-unit-60;
+		background: transparent;
+		border: none;
+		box-shadow: none;
+		cursor: pointer;
+		display: inline-block;
+		padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+		margin-left: 0;
+		font-weight: 500;
+
+		&::after {
 			content: "";
 			position: absolute;
-			top: 0;
-			bottom: 1px;
-			right: 0;
-			left: 0;
-			border-bottom: $border-width-tab solid transparent;
+			background: transparent;
+			bottom: $grid-unit-10 - $border-width-tab;
+			left: $grid-unit-20;
+			right: $grid-unit-20;
+			height: $border-width-tab;
+			box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
+			transition: all 0.2s ease;
+			@include reduce-motion("transition");
 		}
-	}
 
-	&:focus {
-		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
-	}
-
-	&.is-active:focus {
-		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
+		&:focus::after {
+			box-shadow: 0 -#{$border-width-focus} 0 0 var(--wp-admin-theme-color);
+		}
 	}
 }

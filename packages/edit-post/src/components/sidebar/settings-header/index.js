@@ -28,20 +28,20 @@ const SettingsHeader = ( {
 	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
 		<ul>
-			<li>
+			<li className={ `${ documentActiveClass }` }>
 				<Button
 					onClick={ openDocumentSettings }
-					className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
+					className={ `edit-post-sidebar__panel-tab` }
 					aria-label={ documentAriaLabel }
 					data-label={ __( 'Document' ) }
 				>
 					{ __( 'Document' ) }
 				</Button>
 			</li>
-			<li>
+			<li className={ `${ blockActiveClass }` }>
 				<Button
 					onClick={ openBlockSettings }
-					className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
+					className={ `edit-post-sidebar__panel-tab` }
 					aria-label={ blockAriaLabel }
 					data-label={ blockLabel }
 				>
