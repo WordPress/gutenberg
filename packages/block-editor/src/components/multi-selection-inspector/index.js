@@ -17,10 +17,7 @@ function MultiSelectionInspector( { blocks } ) {
 
 	return (
 		<div className="block-editor-multi-selection-inspector__card">
-			<BlockIcon
-				icon={ stack }
-				showColors
-			/>
+			<BlockIcon icon={ stack } showColors />
 			<div className="block-editor-multi-selection-inspector__card-content">
 				<div className="block-editor-multi-selection-inspector__card-title">
 					{ sprintf(
