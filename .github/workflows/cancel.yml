@@ -1,5 +1,5 @@
 name: Cancel
-on: [push]
+on: [push, pull_request]
 jobs:
   cancel:
     name: 'Cancel Previous Runs'
