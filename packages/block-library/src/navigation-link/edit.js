@@ -10,6 +10,7 @@ import { escape, get, head, find } from 'lodash';
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { external as externalIcon } from '@wordpress/icons';
 import {
 	ExternalLink,
 	KeyboardShortcuts,
@@ -19,10 +20,12 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
+	__experimentalToolbarItem as ToolbarItem,
 } from '@wordpress/components';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
+	BlockToolbarContents,
 	BlockControls,
 	InnerBlocks,
 	InspectorControls,
@@ -136,6 +139,42 @@ function NavigationLinkEdit( {
 
 	return (
 		<Fragment>
+			{ isLinkOpen && (
+				<BlockToolbarContents>
+					<ToolbarGroup className="navigation-link-edit__toolbar-link-input-group">
+						<ToolbarItem>
+							{ ( toolbarItemProps ) => (
+								<input
+									{ ...toolbarItemProps }
+									type="text"
+									placeholder={ 'Link address' }
+									style={ {
+										height: 40,
+										width: 200,
+										margin: '3px 15px',
+									} }
+									onKeyUp={ () => {} }
+								/>
+							) }
+						</ToolbarItem>
+						<ToolbarButton
+							icon={ externalIcon }
+							name="new-window"
+							title={ __( 'Opens in new window' ) }
+						/>
+					</ToolbarGroup>
+					<ToolbarGroup>
+						<ToolbarButton
+							name="done"
+							title={ __( 'Done' ) }
+							onClick={ () => setIsLinkOpen( false ) }
+							className="navigation-link-edit-link-done"
+						>
+							Done
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockToolbarContents>
+			) }
 			<BlockControls>
 				<ToolbarGroup>
 					<KeyboardShortcuts
@@ -240,57 +279,6 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ isLinkOpen && (
-						<Popover
-							position="bottom center"
-							onClose={ () => setIsLinkOpen( false ) }
-						>
-							<LinkControl
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								showInitialSuggestions={ true }
-								createSuggestion={
-									userCanCreatePages
-										? handleCreatePage
-										: undefined
-								}
-								onChange={ ( {
-									title: newTitle = '',
-									url: newURL = '',
-									opensInNewTab: newOpensInNewTab,
-									id,
-								} = {} ) =>
-									setAttributes( {
-										url: encodeURI( newURL ),
-										label: ( () => {
-											const normalizedTitle = newTitle.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											const normalizedURL = newURL.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											if (
-												newTitle !== '' &&
-												normalizedTitle !==
-													normalizedURL &&
-												label !== newTitle
-											) {
-												return escape( newTitle );
-											} else if ( label ) {
-												return label;
-											}
-											// If there's no label, add the URL.
-											return escape( normalizedURL );
-										} )(),
-										opensInNewTab: newOpensInNewTab,
-										id,
-									} )
-								}
-							/>
-						</Popover>
-					) }
 				</div>
 				{ showSubmenuIcon && (
 					<span className="wp-block-navigation-link__submenu-icon">
