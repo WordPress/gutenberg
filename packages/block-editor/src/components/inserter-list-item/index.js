@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { CompositeItem } from 'reakit';
 
 /**
  * WordPress dependencies
@@ -19,6 +20,7 @@ function InserterListItem( {
 	isDisabled,
 	title,
 	className,
+	composite,
 	...props
 } ) {
 	const itemIconStyle = icon
@@ -30,7 +32,9 @@ function InserterListItem( {
 
 	return (
 		<li className="block-editor-block-types-list__list-item">
-			<Button
+			<CompositeItem
+				as={ Button }
+				{ ...composite }
 				className={ classnames(
 					'block-editor-block-types-list__item',
 					className
@@ -51,7 +55,7 @@ function InserterListItem( {
 				<span className="block-editor-block-types-list__item-title">
 					{ title }
 				</span>
-			</Button>
+			</CompositeItem>
 		</li>
 	);
 }

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { Composite, useCompositeState } from 'reakit';
+
+/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
@@ -15,6 +20,7 @@ function BlockTypesList( {
 	onHover = () => {},
 	children,
 } ) {
+	const composite = useCompositeState();
 	const normalizedItems = includeVariationsInInserterItems( items );
 
 	return (
@@ -23,7 +29,12 @@ function BlockTypesList( {
 		 * Safari+VoiceOver won't announce the list otherwise.
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<ul role="list" className="block-editor-block-types-list">
+		<Composite
+			as="ul"
+			role="list"
+			{ ...composite }
+			className="block-editor-block-types-list"
+		>
 			{ normalizedItems.map( ( item ) => {
 				return (
 					<InserterListItem
@@ -40,11 +51,12 @@ function BlockTypesList( {
 						onBlur={ () => onHover( null ) }
 						isDisabled={ item.isDisabled }
 						title={ item.title }
+						composite={ composite }
 					/>
 				);
 			} ) }
 			{ children }
-		</ul>
+		</Composite>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 }
