@@ -141,7 +141,7 @@ function ColumnsEditContainer( {
 				{ width && (
 					<InnerBlocks
 						renderAppender={ renderAppender }
-						__experimentalBlockListOrientation={
+						orientation={
 							columnsInRow > 1 ? 'horizontal' : undefined
 						}
 						horizontal={ true }

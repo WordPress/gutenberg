@@ -311,44 +311,41 @@ export class BlockList extends Component {
 }
 
 export default compose( [
-	withSelect(
-		( select, { rootClientId, __experimentalBlockListOrientation } ) => {
-			const {
-				getBlockCount,
-				getBlockOrder,
-				getSelectedBlockClientId,
-				isBlockInsertionPointVisible,
-				getSettings,
-				getBlockHierarchyRootClientId,
-			} = select( 'core/block-editor' );
+	withSelect( ( select, { rootClientId, orientation } ) => {
+		const {
+			getBlockCount,
+			getBlockOrder,
+			getSelectedBlockClientId,
+			isBlockInsertionPointVisible,
+			getSettings,
+			getBlockHierarchyRootClientId,
+		} = select( 'core/block-editor' );
 
-			const isStackedHorizontally =
-				__experimentalBlockListOrientation === 'horizontal';
+		const isStackedHorizontally = orientation === 'horizontal';
 
-			const selectedBlockClientId = getSelectedBlockClientId();
-			const blockClientIds = getBlockOrder( rootClientId );
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const blockClientIds = getBlockOrder( rootClientId );
 
-			const isReadOnly = getSettings().readOnly;
+		const isReadOnly = getSettings().readOnly;
 
-			const rootBlockId = getBlockHierarchyRootClientId(
-				selectedBlockClientId
-			);
-			const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
+		const rootBlockId = getBlockHierarchyRootClientId(
+			selectedBlockClientId
+		);
+		const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
 
-			const isFloatingToolbarVisible =
-				!! selectedBlockClientId && hasRootInnerBlocks;
+		const isFloatingToolbarVisible =
+			!! selectedBlockClientId && hasRootInnerBlocks;
 
-			return {
-				blockClientIds,
-				blockCount: getBlockCount( rootClientId ),
-				isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
-				isReadOnly,
-				isRootList: rootClientId === undefined,
-				isFloatingToolbarVisible,
-				isStackedHorizontally,
-			};
-		}
-	),
+		return {
+			blockClientIds,
+			blockCount: getBlockCount( rootClientId ),
+			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
+			isReadOnly,
+			isRootList: rootClientId === undefined,
+			isFloatingToolbarVisible,
+			isStackedHorizontally,
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { insertBlock, replaceBlock, clearSelectedBlock } = dispatch(
 			'core/block-editor'
@@ -385,32 +382,28 @@ class EmptyListComponent extends Component {
 }
 
 const EmptyListComponentCompose = compose( [
-	withSelect(
-		( select, { rootClientId, __experimentalBlockListOrientation } ) => {
-			const {
-				getBlockOrder,
-				getBlockInsertionPoint,
-				isBlockInsertionPointVisible,
-			} = select( 'core/block-editor' );
+	withSelect( ( select, { rootClientId, orientation } ) => {
+		const {
+			getBlockOrder,
+			getBlockInsertionPoint,
+			isBlockInsertionPointVisible,
+		} = select( 'core/block-editor' );
 
-			const isStackedHorizontally =
-				__experimentalBlockListOrientation === 'horizontal';
+		const isStackedHorizontally = orientation === 'horizontal';
+		const blockClientIds = getBlockOrder( rootClientId );
+		const insertionPoint = getBlockInsertionPoint();
+		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
+		const shouldShowInsertionPoint =
+			! isStackedHorizontally &&
+			blockInsertionPointIsVisible &&
+			insertionPoint.rootClientId === rootClientId &&
+			// if list is empty, show the insertion point (via the default appender)
+			( blockClientIds.length === 0 ||
+				// or if the insertion point is right before the denoted block
+				! blockClientIds[ insertionPoint.index ] );
 
-			const blockClientIds = getBlockOrder( rootClientId );
-			const insertionPoint = getBlockInsertionPoint();
-			const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
-			const shouldShowInsertionPoint =
-				! isStackedHorizontally &&
-				blockInsertionPointIsVisible &&
-				insertionPoint.rootClientId === rootClientId &&
-				// if list is empty, show the insertion point (via the default appender)
-				( blockClientIds.length === 0 ||
-					// or if the insertion point is right before the denoted block
-					! blockClientIds[ insertionPoint.index ] );
-
-			return {
-				shouldShowInsertionPoint,
-			};
-		}
-	),
+		return {
+			shouldShowInsertionPoint,
+		};
+	} ),
 ] )( EmptyListComponent );
