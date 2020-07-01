@@ -84,7 +84,7 @@ export function* installBlockType( block ) {
 			! registeredBlocks.filter( ( i ) => i.name === block.name ).length
 		) {
 			throw new Error(
-				__( 'Error registering block. Try reloading to the page.' )
+				__( 'Error registering block. Try reloading the page.' )
 			);
 		}
 
@@ -98,7 +98,7 @@ export function* installBlockType( block ) {
 		// Specific API errors that are fatal
 		const fatalAPIErrors = {
 			folder_exists: __(
-				'Block is already installed. Try reloading to the page.'
+				'This block is already installed. Try reloading the page.'
 			),
 			unable_to_connect_to_filesystem: __(
 				'Error installing block. You can reload the page and try again.'
