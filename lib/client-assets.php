@@ -729,6 +729,7 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/text-two-columns-with-images', gutenberg_load_block_pattern( 'text-two-columns-with-images' ) );
 	register_block_pattern( 'core/text-three-columns-images-buttons', gutenberg_load_block_pattern( 'text-three-columns-images-buttons' ) );
 	register_block_pattern( 'core/large-header', gutenberg_load_block_pattern( 'large-header' ) );
+	register_block_pattern( 'core/large-header-two-columns-text', gutenberg_load_block_pattern( 'large-header-two-columns-text' ) );
 }
 
 /*
