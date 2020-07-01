@@ -3,18 +3,15 @@
 /**
  * External dependencies
  */
-/**
- * WordPress dependencies
- */
-import RCTAztecView from '@wordpress/react-native-aztec';
-import { View, Platform } from 'react-native';
-import { addMention } from '@wordpress/react-native-bridge';
-import { get, pickBy } from 'lodash';
+import { get, pickBy, deburr } from 'lodash';
 import memize from 'memize';
+import { View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
  */
+import RCTAztecView from '@wordpress/react-native-aztec';
+import { addMention } from '@wordpress/react-native-bridge';
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import {
@@ -40,6 +37,7 @@ import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { insert } from '../insert';
+import { slice } from '../slice';
 import { getTextContent } from '../get-text-content';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
@@ -206,10 +204,10 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'format change';
 	}
 
-	insertString( record, string ) {
+	insertString( record, string, start, end ) {
 		if ( record && string ) {
 			this.lastEventCount = undefined;
-			const toInsert = insert( record, string );
+			const toInsert = insert( record, string, start, end );
 			this.onFormatChange( toInsert );
 		}
 	}
@@ -407,11 +405,66 @@ export class RichText extends Component {
 		}
 	}
 
+	searchMention( record ) {
+		const beforeSelectionText = deburr(
+			getTextContent( slice( record, 0 ) )
+		);
+		const mentionTrigger = '@';
+		const startMention = new RegExp(
+			`(\\s|^)${ mentionTrigger }(\\w)+$`,
+			`g`
+		);
+		const match = beforeSelectionText.match( startMention );
+		const mentionStart = match && match[ match.length - 1 ];
+		if ( mentionStart === null ) {
+			return {
+				mention: '',
+				start: record.start,
+				end: record.end,
+			};
+		}
+		const text = getTextContent( record );
+		const afterSelectionText = deburr(
+			getTextContent( slice( record, undefined, text.length ) )
+		);
+		const afterMatch = afterSelectionText.match(
+			new RegExp( `^(\\w+)(\\s|$)`, `` )
+		);
+		const mentionEnd = afterMatch && afterMatch[ 1 ];
+		if ( mentionEnd === null ) {
+			return {
+				mention: mentionStart,
+				start: record.start - mentionStart.length,
+				end: record.end,
+			};
+		}
+		return {
+			mention: mentionStart + mentionEnd,
+			start: record.start - mentionStart.length + 1,
+			end: record.end + mentionEnd.length,
+		};
+	}
+
 	showMention() {
 		const record = this.getRecord();
-		addMention()
+		const currentMention = this.searchMention( record );
+		// console.log(
+		// 	'Current Mention:' +
+		// 		currentMention.mention +
+		// 		'[' +
+		// 		currentMention.start +
+		// 		',' +
+		// 		currentMention.end +
+		// 		']'
+		// );
+		addMention( currentMention.mention )
 			.then( ( mentionUserId ) => {
-				this.insertString( record, `@${ mentionUserId } ` );
+				this.insertString(
+					record,
+					`@${ mentionUserId } `,
+					currentMention.start,
+					currentMention.end
+				);
 			} )
 			.catch( () => {} );
 	}

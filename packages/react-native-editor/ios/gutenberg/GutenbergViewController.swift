@@ -209,8 +209,12 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         present(UINavigationController(rootViewController: controller), animated: true)
     }
 
-    func gutenbergDidRequestMention(callback: @escaping (Result<String, NSError>) -> Void) {
-        callback(.success("matt"))
+    func gutenbergDidRequestMention(mention: String, callback: @escaping (Result<String, NSError>) -> Void) {
+        if mention.isEmpty {
+            callback(.success("matt"))
+        } else {
+            callback(.success("sergio"))
+        }
     }
 
     func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {

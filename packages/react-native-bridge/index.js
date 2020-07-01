@@ -207,8 +207,8 @@ export function logUserEvent( event, properties ) {
 	return RNReactNativeGutenbergBridge.logUserEvent( event, properties );
 }
 
-export function addMention() {
-	return RNReactNativeGutenbergBridge.addMention();
+export function addMention( mention ) {
+	return RNReactNativeGutenbergBridge.addMention( mention );
 }
 
 export function requestStarterPageTemplatesTooltipShown( callback ) {

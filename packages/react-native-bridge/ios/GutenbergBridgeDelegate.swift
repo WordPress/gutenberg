@@ -211,8 +211,9 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block)
 
     /// Tells the delegate that the editor requested a mention
+    /// - Parameter mention: Current mention if any
     /// - Parameter callback: Completion handler to be called with an user mention or an error
-    func gutenbergDidRequestMention(callback: @escaping (Swift.Result<String, NSError>) -> Void)
+    func gutenbergDidRequestMention(mention: String, callback: @escaping (Swift.Result<String, NSError>) -> Void)
 
     /// Tells the delegate that the editor requested to show the tooltip
     func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool

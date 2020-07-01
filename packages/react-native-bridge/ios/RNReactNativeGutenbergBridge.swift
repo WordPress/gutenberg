@@ -267,8 +267,8 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func addMention(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        self.delegate?.gutenbergDidRequestMention(callback: { (result) in
+    func addMention(_ mention: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        self.delegate?.gutenbergDidRequestMention(mention: mention, callback: { (result) in
             switch result {
             case .success(let mention):
                 resolver([mention])
