@@ -158,6 +158,7 @@ export default function ReusableBlockEdit( {
 			// saved reusable block.
 			value={ isEditing ? localBlocks : blocks }
 			onChange={ handleModifyBlocks }
+			onInput={ handleModifyBlocks }
 		/>
 	);
 
