@@ -136,11 +136,6 @@ $block-inserter-tabs-height: 44px;
 		background: $white;
 		z-index: 1;
 		border-bottom: $border-width solid $light-gray-500;
-
-		.components-tab-panel__tabs-item {
-			flex-grow: 1;
-			margin-bottom: -$border-width;
-		}
 	}
 
 	.components-tab-panel__tab-content {

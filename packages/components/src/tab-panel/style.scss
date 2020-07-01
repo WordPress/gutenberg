@@ -1,60 +1,62 @@
 .components-tab-panel__tabs {
 	display: flex;
-	align-items: stretch;
 }
 
 .components-tab-panel__tabs-item {
+	position: relative;
+	border-radius: 0;
+	height: $grid-unit-60;
 	background: transparent;
 	border: none;
 	box-shadow: none;
-	border-radius: 0;
 	cursor: pointer;
-	height: $grid-unit-60;
-	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+	display: inline-block;
+	padding: $border-width-tab $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 500;
-	transition: box-shadow 0.1s linear;
-	box-sizing: border-box;
 
-	// This pseudo-element "duplicates" the tab label and sets the text to bold.
-	// This ensures that the tab doesn't change width when selected.
-	// See: https://github.com/WordPress/gutenberg/pull/9793
-	&::after {
-		content: attr(data-label);
-		display: block;
-		height: 0;
-		overflow: hidden;
-		speak: none;
-		visibility: hidden;
+	&::before {
+		box-sizing: border-box;
+		content: "";
+		position: absolute;
+		bottom: $grid-unit-10;
+		right: $grid-unit-20;
+		left: $grid-unit-20;
+		height: $border-width-tab * 2;
+
+		// Animate tab.
+		box-shadow: inset 0 0 0 0 transparent;
+		transition: box-shadow 0.2s ease;
+		@include reduce-motion("transition");
+	}
+
+	&.is-active::before {
+		box-shadow: inset 0 $border-width-tab 0 0 var(--wp-admin-theme-color);
+
+		// Shown to Windows High Contrast mode.
+		border-bottom: $border-width-tab solid transparent;
 	}
 
 	&:focus:not(:disabled) {
-		box-shadow: inset 0 $border-width-focus var(--wp-admin-theme-color);
+		box-shadow: none;
 	}
 
+	&::after {
+		content: "";
+		position: absolute;
+		bottom: $grid-unit-10 - $border-width-tab;
+		right: $grid-unit-20;
+		left: $grid-unit-20;
+		height: $border-width-tab * 2;
+		box-shadow: inset 0 0 0 0 var(--wp-admin-theme-color);
 
-	&.is-active {
-		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
-		box-shadow: inset 0 0 0 $border-width-focus transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
-		position: relative;
-
-		// This border appears in Windows High Contrast mode instead of the box-shadow.
-		&::before {
-			content: "";
-			position: absolute;
-			top: 0;
-			bottom: 1px;
-			right: 0;
-			left: 0;
-			border-bottom: $border-width-tab solid transparent;
-		}
+		// Animate focus.
+		box-shadow: inset 0 0 0 0 transparent;
+		transition: box-shadow 0.2s ease;
+		@include reduce-motion("transition");
 	}
 
-	&:focus {
-		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
-	}
-
-	&.is-active:focus {
-		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
+	&:focus::after {
+		box-shadow: inset 0 $border-width-focus 0 0 var(--wp-admin-theme-color);
 	}
 }
