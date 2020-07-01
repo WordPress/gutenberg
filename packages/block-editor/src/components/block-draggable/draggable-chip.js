@@ -43,7 +43,9 @@ export default function BlockDraggableChip( { clientIds } ) {
 					<FlexItem>
 						<BlockIcon icon={ icon } />
 					</FlexItem>
-					<FlexItem>{ `(${ clientIds.length })` }</FlexItem>
+					{ clientIds.length > 1 && (
+						<FlexItem>{ `(${ clientIds.length })` }</FlexItem>
+					) }
 				</Flex>
 			</div>
 		</div>
