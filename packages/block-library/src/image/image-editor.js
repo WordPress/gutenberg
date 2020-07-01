@@ -307,7 +307,9 @@ export default function ImageEditor( {
 					zoom={ zoom / 100 }
 					aspect={ aspect }
 					onCropChange={ setPosition }
-					onCropComplete={ setCrop }
+					onCropComplete={ ( newCropPercent ) => {
+						setCrop( newCropPercent );
+					} }
 					onZoomChange={ ( newZoom ) => {
 						setZoom( newZoom * 100 );
 					} }
