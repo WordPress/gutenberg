@@ -302,6 +302,16 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="insertReusableBlock" href="#insertReusableBlock">#</a> **insertReusableBlock**
+
+Opens the inserter, searches for the given reusable block, then selects the
+first result that appears. It then waits briefly for the block list to
+update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
 <a name="installPlugin" href="#installPlugin">#</a> **installPlugin**
 
 Installs a plugin from the WP.org repository.
@@ -429,6 +439,14 @@ _Parameters_
 <a name="searchForPattern" href="#searchForPattern">#</a> **searchForPattern**
 
 Search for pattern in the global inserter
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="searchForReusableBlock" href="#searchForReusableBlock">#</a> **searchForReusableBlock**
+
+Search for reusable block in the global inserter.
 
 _Parameters_
 

@@ -20,6 +20,7 @@ import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs from './block-patterns-tab';
+import ReusableBlocksTab from './reusable-blocks-tab';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 
@@ -46,18 +47,20 @@ function InserterMenu( {
 		isAppender,
 		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
 	} );
-	const { hasPatterns } = useSelect(
-		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
-			return {
-				hasPatterns: !! getSettings().__experimentalBlockPatterns
-					?.length,
-			};
-		},
-		[ isAppender, clientId, rootClientId ]
-	);
+	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
+		const {
+			__experimentalBlockPatterns,
+			__experimentalReusableBlocks,
+		} = select( 'core/block-editor' ).getSettings();
+
+		return {
+			hasPatterns: !! __experimentalBlockPatterns?.length,
+			hasReusableBlocks: !! __experimentalReusableBlocks?.length,
+		};
+	}, [] );
 
 	const showPatterns = ! destinationRootClientId && hasPatterns;
+
 	const onKeyDown = ( event ) => {
 		if (
 			includes(
@@ -106,6 +109,15 @@ function InserterMenu( {
 		<BlockPatternsTabs onInsert={ onInsert } filterValue={ filterValue } />
 	);
 
+	const reusableBlocksTab = (
+		<ReusableBlocksTab
+			rootClientId={ destinationRootClientId }
+			onInsert={ onInsert }
+			onHover={ onHover }
+			filterValue={ filterValue }
+		/>
+	);
+
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
 	// Popover's focusOnMount.
@@ -125,17 +137,22 @@ function InserterMenu( {
 						onChange={ setFilterValue }
 						value={ filterValue }
 					/>
-					{ showPatterns && (
-						<InserterTabs>
+					{ ( showPatterns || hasReusableBlocks ) && (
+						<InserterTabs
+							showPatterns={ showPatterns }
+							showReusableBlocks={ hasReusableBlocks }
+						>
 							{ ( tab ) => {
 								if ( tab.name === 'blocks' ) {
 									return blocksTab;
+								} else if ( tab.name === 'patterns' ) {
+									return patternsTab;
 								}
-								return patternsTab;
+								return reusableBlocksTab;
 							} }
 						</InserterTabs>
 					) }
-					{ ! showPatterns && blocksTab }
+					{ ! showPatterns && ! hasReusableBlocks && blocksTab }
 				</div>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (

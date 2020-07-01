@@ -262,6 +262,10 @@ $block-inserter-tabs-height: 44px;
 	flex-shrink: 0;
 }
 
+.block-editor-inserter__manage-reusable-blocks-container {
+	padding: $grid-unit-20;
+}
+
 .block-editor-inserter__quick-inserter {
 	width: $block-inserter-width;
 }

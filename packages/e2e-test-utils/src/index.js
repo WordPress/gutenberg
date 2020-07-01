@@ -26,8 +26,10 @@ export { getPageError } from './get-page-error';
 export {
 	insertBlock,
 	insertPattern,
+	insertReusableBlock,
 	searchForBlock,
 	searchForPattern,
+	searchForReusableBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
 } from './inserter';
