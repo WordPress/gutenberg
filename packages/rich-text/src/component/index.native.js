@@ -406,6 +406,13 @@ export class RichText extends Component {
 	}
 
 	searchMention( record ) {
+		if ( ! isCollapsed( record ) ) {
+			return {
+				mention: '',
+				start: record.start,
+				end: record.end,
+			};
+		}
 		const beforeSelectionText = deburr(
 			getTextContent( slice( record, 0 ) )
 		);
@@ -441,7 +448,7 @@ export class RichText extends Component {
 		return {
 			mention: mentionStart + mentionEnd,
 			start: record.start - mentionStart.length + 1,
-			end: record.end + mentionEnd.length,
+			end: record.start + mentionEnd.length,
 		};
 	}
 
