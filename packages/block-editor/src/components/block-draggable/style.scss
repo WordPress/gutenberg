@@ -23,6 +23,11 @@
 	&__content {
 		margin: auto;
 	}
+
+	.components-flex__item {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
 }
 
 // This hides the block being dragged.

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { Flex, FlexItem } from '@wordpress/components';
@@ -44,7 +45,9 @@ export default function BlockDraggableChip( { clientIds } ) {
 						<BlockIcon icon={ icon } />
 					</FlexItem>
 					{ clientIds.length > 1 && (
-						<FlexItem>{ `(${ clientIds.length })` }</FlexItem>
+						<FlexItem>
+							{ `${ clientIds.length }` } { __( 'blocks' ) }
+						</FlexItem>
 					) }
 				</Flex>
 			</div>
