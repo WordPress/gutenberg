@@ -22,16 +22,16 @@ function InserterLibrary( {
 	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 	onSelect = noop,
 } ) {
-	const { destinationRootClientId } = useSelect( ( select ) => {
-		const { getBlockRootClientId } = select( 'core/block-editor' );
+	const destinationRootClientId = useSelect(
+		( select ) => {
+			const { getBlockRootClientId } = select( 'core/block-editor' );
 
-		rootClientId =
-			rootClientId || getBlockRootClientId( clientId ) || undefined;
-
-		return {
-			rootClientId,
-		};
-	} );
+			return (
+				rootClientId || getBlockRootClientId( clientId ) || undefined
+			);
+		},
+		[ clientId, rootClientId ]
+	);
 
 	return (
 		<InserterMenu

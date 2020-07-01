@@ -5,6 +5,12 @@
  * @package Gutenberg
  */
 
+/**
+ * This test can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50263
+ * @see https://core.trac.wordpress.org/changeset/48141
+ */
 class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 
 	function test_does_not_remove_block_asset_path_prefix() {

@@ -129,17 +129,20 @@ export function requestMediaPicker( source, filter, multiple, callback ) {
  *
  * @param {string} htmlContent Raw html content of the block.
  * @param {string} blockClientId the clientId of the block.
- * @param {string} blockName the user-facing, localized block name.
+ * @param {string} blockName the internal system block name.
+ * @param {string} blockTitle the user-facing, localized block name.
  */
 export function requestUnsupportedBlockFallback(
 	htmlContent,
 	blockClientId,
-	blockName
+	blockName,
+	blockTitle
 ) {
 	RNReactNativeGutenbergBridge.requestUnsupportedBlockFallback(
 		htmlContent,
 		blockClientId,
-		blockName
+		blockName,
+		blockTitle
 	);
 }
 

@@ -49,34 +49,32 @@ const getTemplateDropdownElement = async ( itemName ) => {
 
 const createTemplatePart = async (
 	templatePartName = 'test-template-part',
-	themeName = 'test-theme',
 	isNested = false
 ) => {
 	// Create new template part.
-	await insertBlock( 'Template Part' );
+	await insertBlock( 'Section' );
 	const [ createNewButton ] = await page.$x(
-		'//button[contains(text(), "Create new")]'
+		'//button[contains(text(), "New section")]'
 	);
 	await createNewButton.click();
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.type( templatePartName );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.type( themeName );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Enter' );
 	await page.waitForSelector(
 		isNested
 			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
 			: '.wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
 	);
+	await page.keyboard.press( 'Tab' );
+	await page.keyboard.type( templatePartName );
 };
 
 const editTemplatePart = async ( textToAdd, isNested = false ) => {
 	await page.click(
-		isNested
-			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"]'
-			: '.wp-block[data-type="core/template-part"]'
+		`${
+			isNested
+				? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"]'
+				: '.wp-block[data-type="core/template-part"]'
+		} .block-editor-button-block-appender`
 	);
+	await page.click( '.editor-block-list-item-paragraph' );
 	for ( const text of textToAdd ) {
 		await page.keyboard.type( text );
 		await page.keyboard.press( 'Enter' );
@@ -208,7 +206,7 @@ describe( 'Multi-entity editor states', () => {
 				'Default template part test text.',
 				'Second paragraph test.',
 			] );
-			await createTemplatePart( nestedTPName, 'test-theme', true );
+			await createTemplatePart( nestedTPName, true );
 			await editTemplatePart(
 				[ 'Nested Template Part Text.', 'Second Nested test.' ],
 				true

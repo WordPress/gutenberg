@@ -67,7 +67,7 @@ export function* installBlockType( block ) {
 		}
 		yield setIsInstalling( block.id, true );
 		const response = yield apiFetch( {
-			path: '__experimental/plugins',
+			path: 'wp/v2/plugins',
 			data: {
 				slug: block.id,
 				status: 'active',

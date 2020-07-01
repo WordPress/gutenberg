@@ -19,6 +19,21 @@ _Returns_
 
 -   `boolean`: True if the block has controlled inner blocks.
 
+<a name="canInsertBlocks" href="#canInsertBlocks">#</a> **canInsertBlocks**
+
+Determines if the given blocks are allowed to be inserted into the block
+list.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientIds_ `string`: The block client IDs to be inserted.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `boolean`: Whether the given blocks are allowed to be inserted.
+
 <a name="canInsertBlockType" href="#canInsertBlockType">#</a> **canInsertBlockType**
 
 Determines if the given block type is allowed to be inserted into the block list.
@@ -1073,21 +1088,33 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="moveBlocksToPosition" href="#moveBlocksToPosition">#</a> **moveBlocksToPosition**
+
+Returns an action object signalling that the given blocks should be moved to
+a new position.
+
+_Parameters_
+
+-   _clientIds_ `?string`: The client IDs of the blocks.
+-   _fromRootClientId_ `?string`: Root client ID source.
+-   _toRootClientId_ `?string`: Root client ID destination.
+-   _index_ `number`: The index to move the blocks to.
+
 <a name="moveBlocksUp" href="#moveBlocksUp">#</a> **moveBlocksUp**
 
 Undocumented declaration.
 
 <a name="moveBlockToPosition" href="#moveBlockToPosition">#</a> **moveBlockToPosition**
 
-Returns an action object signalling that an indexed block should be moved
-to a new index.
+Returns an action object signalling that the given block should be moved to a
+new position.
 
 _Parameters_
 
 -   _clientId_ `?string`: The client ID of the block.
 -   _fromRootClientId_ `?string`: Root client ID source.
 -   _toRootClientId_ `?string`: Root client ID destination.
--   _index_ `number`: The index to move the block into.
+-   _index_ `number`: The index to move the block to.
 
 <a name="multiSelect" href="#multiSelect">#</a> **multiSelect**
 

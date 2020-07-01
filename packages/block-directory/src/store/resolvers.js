@@ -26,7 +26,7 @@ export default {
 		try {
 			yield fetchDownloadableBlocks( filterValue );
 			const results = yield apiFetch( {
-				path: `__experimental/block-directory/search?term=${ filterValue }`,
+				path: `wp/v2/block-directory/search?term=${ filterValue }`,
 			} );
 			const blocks = results.map( ( result ) =>
 				mapKeys( result, ( value, key ) => {
@@ -45,7 +45,7 @@ export default {
 		try {
 			const response = yield apiFetch( {
 				method: 'OPTIONS',
-				path: `__experimental/block-directory/search`,
+				path: `wp/v2/block-directory/search`,
 				parse: false,
 			} );
 

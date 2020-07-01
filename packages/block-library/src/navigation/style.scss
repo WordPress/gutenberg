@@ -141,20 +141,20 @@
 .wp-block-navigation,
 .wp-block-navigation.is-style-light {
 	.wp-block-navigation-link:not(.has-text-color) {
-		color: $light-style-sub-menu-text-color;
+		color: $dark-gray-primary;
 	}
 	&:not(.has-background) .wp-block-navigation__container {
-		background-color: $light-style-sub-menu-background-color;
+		background-color: $white;
 	}
 }
 
 // Dark styles.
 .wp-block-navigation.is-style-dark {
 	.wp-block-navigation-link:not(.has-text-color) {
-		color: $dark-style-sub-menu-text-color;
+		color: $white;
 	}
 	&:not(.has-background) .wp-block-navigation__container {
-		background-color: $dark-style-sub-menu-background-color;
+		background-color: $dark-gray-primary;
 	}
 }
 

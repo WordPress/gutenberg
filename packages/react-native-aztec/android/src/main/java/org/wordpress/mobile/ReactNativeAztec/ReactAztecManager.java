@@ -139,7 +139,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                                 MapBuilder.of(
                                         "bubbled", "onSubmitEditing", "captured", "onSubmitEditingCapture")))*/
                 .put(
-                        "topChange",
+                        "topAztecChange",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onChange")))
@@ -623,13 +623,15 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             // the text (minus the Enter char itself).
             if (!mEditText.isEnterPressedUnderway()) {
                 int currentEventCount = mEditText.incrementAndGetEventCounter();
+                boolean singleCharacterHasBeenAdded = count - before == 1;
                 // The event that contains the event counter and updates it must be sent first.
                 // TODO: t7936714 merge these events
                 mEventDispatcher.dispatchEvent(
-                        new ReactTextChangedEvent(
+                        new AztecReactTextChangedEvent(
                                 mEditText.getId(),
                                 mEditText.toHtml(mEditText.getText(), false),
-                                currentEventCount));
+                                currentEventCount,
+                                singleCharacterHasBeenAdded ? s.charAt(start + before) : null));
 
                 mEventDispatcher.dispatchEvent(
                         new ReactTextInputEvent(
@@ -657,8 +659,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
 
         @Override
-        public void afterTextChanged(Editable s) {
-        }
+        public void afterTextChanged(Editable s) {}
     }
 
     private class AztecContentSizeWatcher implements com.facebook.react.views.textinput.ContentSizeWatcher {

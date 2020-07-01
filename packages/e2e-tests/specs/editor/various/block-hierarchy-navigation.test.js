@@ -46,7 +46,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Tweak the columns count.
 		await openDocumentSettingsSidebar();
 		await page.focus(
-			'.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]'
+			'.block-editor-block-inspector [aria-label="Columns"][type="number"]'
 		);
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );

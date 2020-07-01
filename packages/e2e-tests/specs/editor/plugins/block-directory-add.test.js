@@ -11,15 +11,13 @@ import {
 
 // Urls to mock
 const SEARCH_URLS = [
-	'/__experimental/block-directory/search',
-	`rest_route=${ encodeURIComponent(
-		'/__experimental/block-directory/search'
-	) }`,
+	'/wp/v2/block-directory/search',
+	`rest_route=${ encodeURIComponent( '/wp/v2/block-directory/search' ) }`,
 ];
 
 const INSTALL_URLS = [
-	'/__experimental/plugins',
-	`rest_route=${ encodeURIComponent( '/__experimental/plugins' ) }`,
+	'/wp/v2/plugins',
+	`rest_route=${ encodeURIComponent( '/wp/v2/plugins' ) }`,
 ];
 
 // Example Blocks
@@ -36,7 +34,7 @@ const MOCK_BLOCK1 = {
 	author: 'No Author',
 	icon: 'block-default',
 	assets: [
-		'fake_url.com/block.js', // we will mock this
+		'https://fake_url.com/block.js', // we will mock this
 	],
 	humanized_updated: '5 months ago',
 };
@@ -86,7 +84,7 @@ const block = `( function() {
 } )();`;
 
 const MOCK_OPTIONS = {
-	namespace: '__experimental',
+	namespace: 'wp/v2',
 	methods: [ 'GET' ],
 	endpoints: [
 		{
