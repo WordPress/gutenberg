@@ -83,7 +83,7 @@ export function* installBlockType( block ) {
 			! registeredBlocks.length ||
 			! registeredBlocks.filter( ( i ) => i.name === block.name ).length
 		) {
-			throw new TypeError(
+			throw new Error(
 				__( 'Error registering block. Try reloading to the page.' )
 			);
 		}
@@ -91,15 +91,26 @@ export function* installBlockType( block ) {
 		success = true;
 	} catch ( error ) {
 		let msg = error.message || __( 'An error occurred.' );
-		const fatal = error instanceof TypeError;
 
-		if ( error.code && error.code === 'folder_exists' ) {
-			msg = __(
+		// Errors we throw are fatal
+		let isFatal = error instanceof Error;
+
+		// Specific API errors that are fatal
+		const fatalAPIErrors = {
+			folder_exists: __(
 				'Block is already installed. Try reloading to the page.'
-			);
+			),
+			unable_to_connect_to_filesystem: __(
+				'Error installing block. You can reload the page and try again.'
+			),
+		};
+
+		if ( fatalAPIErrors[ error.code ] ) {
+			isFatal = true;
+			msg = fatalAPIErrors[ error.code ];
 		}
 
-		yield setErrorNotice( id, msg, fatal );
+		yield setErrorNotice( id, msg, isFatal );
 	}
 	yield setIsInstalling( block.id, false );
 	return success;
