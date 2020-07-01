@@ -423,8 +423,10 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	/** This filter is documented in src/wp-includes/blocks.php */
 	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
 
-	$context = array(
-		'postId'   => $post->ID,
+	$context = array();
+
+	if ( $post instanceof WP_Post ) {
+		$context['postId'] = $post->ID;
 
 		/*
 		 * The `postType` context is largely unnecessary server-side, since the
@@ -432,12 +434,12 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 		 * manifest is expected to be shared between the server and the client,
 		 * it should be included to consistently fulfill the expectation.
 		 */
-		'postType' => $post->post_type,
-
-		'query'    => array( 'categoryIds' => array() ),
-	);
+		$context['postType'] = $post->post_type;
+	}
 
 	if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
+		$context['query'] = array( 'categoryIds' => array() );
+
 		foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
 			$context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
 		}
