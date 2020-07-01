@@ -19,6 +19,7 @@ const LinkControlSearchInput = ( {
 	renderSuggestions,
 	fetchSuggestions,
 	showInitialSuggestions,
+	onlySuggestions,
 	errorMessage,
 } ) => {
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState();
@@ -54,19 +55,22 @@ const LinkControlSearchInput = ( {
 					placeholder={ placeholder ?? __( 'Search or type url' ) }
 					__experimentalRenderSuggestions={ renderSuggestions }
 					__experimentalFetchLinkSuggestions={ fetchSuggestions }
+					__experimentalOnlySuggestions={ onlySuggestions }
 					__experimentalHandleURLSuggestions={ true }
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
 				/>
-				<div className="block-editor-link-control__search-actions">
-					<Button
-						type="submit"
-						label={ __( 'Submit' ) }
-						icon={ keyboardReturn }
-						className="block-editor-link-control__search-submit"
-					/>
-				</div>
+				{ ! onlySuggestions && (
+					<div className="block-editor-link-control__search-actions">
+						<Button
+							type="submit"
+							label={ __( 'Submit' ) }
+							icon={ keyboardReturn }
+							className="block-editor-link-control__search-submit"
+						/>
+					</div>
+				) }
 			</div>
 
 			{ errorMessage && (
