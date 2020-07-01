@@ -424,7 +424,7 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
 
 	$context = array(
-		'postId'   => $post->ID,
+		'postId'   => $post ? $post->ID : 0,
 
 		/*
 		 * The `postType` context is largely unnecessary server-side, since the
@@ -432,7 +432,7 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 		 * manifest is expected to be shared between the server and the client,
 		 * it should be included to consistently fulfill the expectation.
 		 */
-		'postType' => $post->post_type,
+		'postType' => $post ? $post->post_type : false,
 
 		'query'    => array( 'categoryIds' => array() ),
 	);
