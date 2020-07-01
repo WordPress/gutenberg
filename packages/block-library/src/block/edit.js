@@ -6,11 +6,7 @@ import { partial } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	BlockEditorProvider,
-	BlockList,
-	WritingFlow,
-} from '@wordpress/block-editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 import { parse, serialize } from '@wordpress/blocks';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -33,13 +29,11 @@ export default function ReusableBlockEdit( {
 		blocks,
 		title,
 		canUpdateBlock,
-		settings,
 	} = useSelect(
 		( select ) => {
 			const { canUser } = select( 'core' );
 			const {
 				__experimentalGetParsedReusableBlock: getParsedReusableBlock,
-				getSettings,
 			} = select( 'core/block-editor' );
 			const {
 				__experimentalGetReusableBlock: getReusableBlock,
@@ -71,7 +65,6 @@ export default function ReusableBlockEdit( {
 					!! _reusableBlock &&
 					! _reusableBlock.isTemporary &&
 					!! canUser( 'update', 'blocks', ref ),
-				settings: getSettings(),
 			};
 		},
 		[ ref ]
@@ -160,18 +153,12 @@ export default function ReusableBlockEdit( {
 	}
 
 	let content = (
-		<BlockEditorProvider
-			settings={ settings }
+		<InnerBlocks
 			// If editing, use local state; otherwise, load the blocks from the
 			// saved reusable block.
 			value={ isEditing ? localBlocks : blocks }
 			onChange={ handleModifyBlocks }
-			onInput={ handleModifyBlocks }
-		>
-			<WritingFlow>
-				<BlockList />
-			</WritingFlow>
-		</BlockEditorProvider>
+		/>
 	);
 
 	if ( ! isEditing ) {
