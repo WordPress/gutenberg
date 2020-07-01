@@ -53,7 +53,7 @@ Gutenberg allows you to indicate which category your block fits in. Choosing the
 - media
 - design
 - widgets
-- embeds
+- embed
 
 [Read more](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#category) about categories.
 
