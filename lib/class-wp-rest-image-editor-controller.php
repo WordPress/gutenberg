@@ -184,7 +184,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'angle' => array(
-					'type'     => 'integer',
+					'type'     => 'number',
 					'required' => $is_required,
 				),
 			),
