@@ -726,6 +726,7 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
 	register_block_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
 	register_block_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
+	register_block_pattern( 'core/text-two-columns-with-images', gutenberg_load_block_pattern( 'text-two-columns-with-images' ) );
 }
 
 /*
