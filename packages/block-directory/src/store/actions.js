@@ -79,14 +79,11 @@ export function* installBlockType( block ) {
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
-		if ( ! registeredBlocks.length ) {
-			throw new Error( __( 'Unable to get block types.' ) );
-		}
-
 		if (
+			! registeredBlocks.length ||
 			! registeredBlocks.filter( ( i ) => i.name === block.name ).length
 		) {
-			throw new Error(
+			throw new TypeError(
 				__( 'Error registering block. Try reloading to the page.' )
 			);
 		}
@@ -94,6 +91,7 @@ export function* installBlockType( block ) {
 		success = true;
 	} catch ( error ) {
 		let msg = error.message || __( 'An error occurred.' );
+		const fatal = error instanceof TypeError;
 
 		if ( error.code && error.code === 'folder_exists' ) {
 			msg = __(
@@ -101,7 +99,7 @@ export function* installBlockType( block ) {
 			);
 		}
 
-		yield setErrorNotice( id, msg, true );
+		yield setErrorNotice( id, msg, fatal );
 	}
 	yield setIsInstalling( block.id, false );
 	return success;
