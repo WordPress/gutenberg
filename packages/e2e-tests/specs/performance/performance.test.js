@@ -77,6 +77,7 @@ describe( 'Performance', () => {
 			load: [],
 			domcontentloaded: [],
 			type: [],
+			oldType: [],
 			focus: [],
 		};
 
@@ -131,8 +132,13 @@ describe( 'Performance', () => {
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
+
+		let startTime;
+
 		while ( i-- ) {
+			startTime = new Date();
 			await page.keyboard.type( 'x' );
+			results.oldType.push( new Date() - startTime );
 		}
 
 		await page.tracing.stop();
