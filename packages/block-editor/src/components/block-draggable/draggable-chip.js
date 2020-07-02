@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { Flex, FlexItem } from '@wordpress/components';
@@ -15,6 +15,10 @@ import BlockIcon from '../block-icon';
 export default function BlockDraggableChip( { clientIds } ) {
 	const icon = useSelect(
 		( select ) => {
+			if ( clientIds.length !== 1 ) {
+				return;
+			}
+
 			const { getBlockName } = select( 'core/block-editor' );
 			const [ firstId ] = clientIds;
 			const blockName = getBlockName( firstId );
@@ -34,16 +38,17 @@ export default function BlockDraggableChip( { clientIds } ) {
 					<FlexItem>
 						<BlockIcon icon={ handle } />
 					</FlexItem>
-					{ clientIds.length === 1 && (
-						<FlexItem>
+					<FlexItem>
+						{ icon ? (
 							<BlockIcon icon={ icon } />
-						</FlexItem>
-					) }
-					{ clientIds.length > 1 && (
-						<FlexItem>
-							{ `${ clientIds.length }` } { __( 'blocks' ) }
-						</FlexItem>
-					) }
+						) : (
+							sprintf(
+								/* translators: %d: number of blocks. */
+								__( '%d blocks' ),
+								clientIds.length
+							)
+						) }
+					</FlexItem>
 				</Flex>
 			</div>
 		</div>
