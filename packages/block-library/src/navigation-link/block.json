@@ -29,6 +29,15 @@
 			"type": "string"
 		}
 	},
+	"usesContext": [
+		"core/textColor",
+		"core/customTextColor",
+		"core/backgroundColor",
+		"core/customBackgroundColor",
+		"core/fontSize",
+		"core/customFontSize",
+		"core/showSubmenuIcon"
+	],
 	"supports": {
 		"reusable": false,
 		"html": false,

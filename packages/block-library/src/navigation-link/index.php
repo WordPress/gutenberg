@@ -6,6 +6,86 @@
  */
 
 /**
+ * Build an array with CSS classes and inline styles defining the colors
+ * which will be applied to the navigation markup in the front-end.
+ *
+ * @param  array $context Navigation block context.
+ * @return array Colors CSS classes and inline styles.
+ */
+function block_core_navigation_link_build_css_colors( $context ) {
+	$colors = array(
+		'css_classes'   => array(),
+		'inline_styles' => '',
+	);
+
+	// Text color.
+	$has_named_text_color  = array_key_exists( 'core/textColor', $context );
+	$has_custom_text_color = array_key_exists( 'core/customTextColor', $context );
+
+	// If has text color.
+	if ( $has_custom_text_color || $has_named_text_color ) {
+		// Add has-text-color class.
+		$colors['css_classes'][] = 'has-text-color';
+	}
+
+	if ( $has_named_text_color ) {
+		// Add the color class.
+		$colors['css_classes'][] = sprintf( 'has-%s-color', $context['core/textColor'] );
+	} elseif ( $has_custom_text_color ) {
+		// Add the custom color inline style.
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['core/customTextColor'] );
+	}
+
+	// Background color.
+	$has_named_background_color  = array_key_exists( 'core/backgroundColor', $context );
+	$has_custom_background_color = array_key_exists( 'core/customBackgroundColor', $context );
+
+	// If has background color.
+	if ( $has_custom_background_color || $has_named_background_color ) {
+		// Add has-background class.
+		$colors['css_classes'][] = 'has-background';
+	}
+
+	if ( $has_named_background_color ) {
+		// Add the background-color class.
+		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $context['core/backgroundColor'] );
+	} elseif ( $has_custom_background_color ) {
+		// Add the custom background-color inline style.
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['core/customBackgroundColor'] );
+	}
+
+	return $colors;
+}
+
+/**
+ * Build an array with CSS classes and inline styles defining the font sizes
+ * which will be applied to the navigation markup in the front-end.
+ *
+ * @param  array $context Navigation block context.
+ * @return array Font size CSS classes and inline styles.
+ */
+function block_core_navigation_link_build_css_font_sizes( $context ) {
+	// CSS classes.
+	$font_sizes = array(
+		'css_classes'   => array(),
+		'inline_styles' => '',
+	);
+
+	$has_named_font_size  = array_key_exists( 'core/fontSize', $context );
+	$has_custom_font_size = array_key_exists( 'core/customFontSize', $context );
+
+	if ( $has_named_font_size ) {
+		// Add the font size class.
+		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['core/fontSize'] );
+	} elseif ( $has_custom_font_size ) {
+		// Add the custom font size inline style.
+		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['core/customFontSize'] );
+	}
+
+	return $font_sizes;
+}
+
+/**
  * Returns the top-level submenu SVG chevron icon.
  *
  * @return string
@@ -29,10 +109,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// TODO $classes and $style_attribute below are temporary. Ideally the Navigation Block would
-	// have some way of passing its attributes to the Navigation Link so that these continue to work.
-	$classes         = array( 'wp-block-navigation-link' );
-	$style_attribute = '';
+	$colors          = block_core_navigation_link_build_css_colors( $block->context );
+	$font_sizes      = block_core_navigation_link_build_css_font_sizes( $block->context );
+	$classes         = array_merge(
+		$colors['css_classes'],
+		$font_sizes['css_classes']
+	);
+	$classes[]       = 'wp-block-navigation-link';
+	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] );
 
 	$css_classes = trim( implode( ' ', $classes ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;
@@ -87,8 +171,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	$html .= '</span>';
 
-	// TODO - use block context for $has_submenu setting.
-	if ( $has_submenu ) {
+	if ( $block->context['core/showSubmenuIcon'] ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
 		$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
 	}
