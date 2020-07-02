@@ -6,7 +6,7 @@ import { get, filter, map, last, pick, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { isBlobURL, createBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
 	PanelBody,
@@ -86,12 +86,21 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const { maxWidth, isRTL, imageSizes } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] );
-	} );
+	const { maxWidth, isRTL, imageSizes, mediaUpload } = useSelect(
+		( select ) => {
+			const { getSettings } = select( 'core/block-editor' );
+			return pick( getSettings(), [
+				'imageSizes',
+				'isRTL',
+				'maxWidth',
+				'mediaUpload',
+			] );
+		}
+	);
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
-	const { createErrorNotice } = useDispatch( 'core/notices' );
+	const { createErrorNotice, createSuccessNotice } = useDispatch(
+		'core/notices'
+	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
@@ -178,8 +187,23 @@ export default function Image( {
 			.fetch( url )
 			.then( ( response ) => response.blob() )
 			.then( ( blob ) => {
-				onSelectImage( {
-					url: createBlobURL( blob ),
+				mediaUpload( {
+					filesList: [ blob ],
+					onFileChange( [ img ] ) {
+						onSelectImage( img );
+
+						if ( isBlobURL( img.url ) ) {
+							return;
+						}
+
+						createSuccessNotice( __( 'Image uploaded.' ), {
+							type: 'snackbar',
+						} );
+					},
+					allowedTypes: ALLOWED_MEDIA_TYPES,
+					onError( message ) {
+						createErrorNotice( message, { type: 'snackbar' } );
+					},
 				} );
 			} )
 			.catch( () => {
@@ -187,10 +211,7 @@ export default function Image( {
 					__(
 						'The image host doesn’t allow access from a script. Please download and upload the image manually.'
 					),
-					{
-						id: 'external-image-upload-error',
-						type: 'snackbar',
-					}
+					{ type: 'snackbar' }
 				);
 			} );
 	}
