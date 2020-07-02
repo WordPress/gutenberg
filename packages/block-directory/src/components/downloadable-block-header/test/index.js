@@ -57,7 +57,7 @@ describe( 'DownloadableBlockHeader', () => {
 			expect( onClickMock ).toHaveBeenCalledTimes( 0 );
 		} );
 
-		test( 'should trigger the onClick function if not installable', () => {
+		test( 'should not trigger the onClick function if not installable', () => {
 			const onClickMock = jest.fn();
 			const wrapper = getContainer(
 				pluginWithIcon,
