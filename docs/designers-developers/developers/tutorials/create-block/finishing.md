@@ -6,7 +6,7 @@ This tutorial covers general concepts and structure for creating basic blocks.
 
 The block editor provides a [components package](/packages/components/README.md) which contains numerous prebuilt components you can use to build your block.
 
-You can visually browse the components and what their implementation looks like using the Storybook tool published at https://wordpress.github.io/gutenberg
+You can visually browse the components and what their implementation looks like using the Storybook tool published at [https://wordpress.github.io/gutenberg].
 
 ## Additional Tutorials
 
@@ -18,7 +18,7 @@ The [Sidebar tutorial](/docs/designers-developers/developers/tutorials/sidebar-t
 
 Nested blocks, a block that contains additional blocks, is a common pattern used by various blocks such as Columns, Cover, and Social Links. The **InnerBlocks component** enables this functionality, see the [Using InnerBlocks documentation](/docs/designers-developers/developers/tutorials/block-tutorial/nested-blocks-inner-blocks.md).
 
-## How did they do that?
+## How did they do that
 
 One of the best sources for information and reference is the Block Editor itself, all the core blocks are built the same way. A good way to learn how things are done is to find a core block code that does something close to what you are interested in and then using the same approach for your own block.
 
