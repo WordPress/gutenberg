@@ -98,7 +98,7 @@
 		right: $grid-unit-20;
 		top: 50%;
 		transform: translateY(-50%);
-		color: $dark-gray-900;
+		color: $dark-gray-primary;
 		fill: currentColor;
 		transition: 0.1s color ease-in-out;
 		@include reduce-motion("transition");
