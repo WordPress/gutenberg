@@ -8,27 +8,30 @@ import { throttle } from 'lodash';
  * WordPress dependencies
  */
 import { useRef, useState, useEffect, useCallback } from '@wordpress/element';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
-import BlockToolbarContents from '../block-toolbar-contents';
+import BlockControls from '../block-controls';
 
 export default function CustomizableBlockToolbarContent( {
 	children,
 	className,
 } ) {
 	return (
-		<BlockToolbarContents.Slot>
-			{ ( fills ) => (
-				<CustomizableBlockToolbarContentChildren
-					className={ className }
-					fills={ fills }
-				>
-					{ children }
-				</CustomizableBlockToolbarContentChildren>
-			) }
-		</BlockToolbarContents.Slot>
+		<BlockControls.Slot __experimentalIsExpanded>
+			{ ( fills ) => {
+				return (
+					<CustomizableBlockToolbarContentChildren
+						className={ className }
+						fills={ fills }
+					>
+						{ children }
+					</CustomizableBlockToolbarContentChildren>
+				);
+			} }
+		</BlockControls.Slot>
 	);
 }
 
@@ -89,6 +92,14 @@ function CustomizableBlockToolbarContentChildren( {
 		return () => observer.disconnect();
 	}, [] );
 
+	useEffect( () => {
+		if ( fills.length > 1 ) {
+			warning(
+				`${ fills.length } <BlockControls isExpanded> slots were registered but only one may be displayed.`
+			);
+		}
+	}, [ fills.length ] );
+
 	return (
 		<div
 			className="block-editor-block-toolbar-width-container"
@@ -103,7 +114,7 @@ function CustomizableBlockToolbarContentChildren( {
 						classNames="block-editor-block-toolbar-content"
 					>
 						<div className={ className } ref={ fillsRef }>
-							{ fills }
+							{ fills[ 0 ] }
 						</div>
 					</CSSTransition>
 				) : (
