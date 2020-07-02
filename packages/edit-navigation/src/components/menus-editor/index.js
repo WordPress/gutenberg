@@ -28,17 +28,25 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		false
 	);
 
-	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
-		const { getMenus, hasFinishedResolution } = select( 'core' );
-		const query = { per_page: -1 };
-		return {
-			menus: getMenus( query ),
-			hasLoadedMenus: hasFinishedResolution( 'getMenus', [ query ] ),
-		};
-	}, [] );
-
-	const menuDeleteError = useSelect( ( select ) =>
-		select( 'core' ).getLastEntityDeleteError( 'root', 'menu', menuId )
+	const { menus, hasLoadedMenus, menuDeleteError } = useSelect(
+		( select ) => {
+			const {
+				getMenus,
+				hasFinishedResolution,
+				getLastEntityDeleteError,
+			} = select( 'core' );
+			const query = { per_page: -1 };
+			return {
+				menus: getMenus( query ),
+				hasLoadedMenus: hasFinishedResolution( 'getMenus', [ query ] ),
+				menuDeleteError: getLastEntityDeleteError(
+					'root',
+					'menu',
+					menuId
+				),
+			};
+		},
+		[]
 	);
 
 	const { deleteMenu } = useDispatch( 'core' );
@@ -48,7 +56,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		if ( ! hasCompletedFirstLoad && hasLoadedMenus ) {
 			setHasCompletedFirstLoad( true );
 		}
-	}, [ menus, hasLoadedMenus ] );
+	}, [ hasLoadedMenus ] );
 
 	// Handle REST API Error messages.
 	useEffect( () => {

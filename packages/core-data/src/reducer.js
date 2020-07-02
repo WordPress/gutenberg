@@ -288,7 +288,6 @@ function entity( entityConfig ) {
 									action.type ===
 									'DELETE_ENTITY_RECORD_START',
 								error: action.error,
-								isAutosave: action.isAutosave,
 							},
 						};
 				}
