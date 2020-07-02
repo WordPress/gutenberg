@@ -23,6 +23,10 @@ function BlockTypesList( {
 } ) {
 	const composite = useCompositeState();
 	const normalizedItems = includeVariationsInInserterItems( items );
+	const orderId = normalizedItems.reduce(
+		( acc, item ) => acc + '--' + item.id,
+		''
+	);
 
 	return (
 		/*
@@ -36,6 +40,8 @@ function BlockTypesList( {
 			{ ...composite }
 			className="block-editor-block-types-list"
 			aria-label={ label }
+			// This ensures the composite state refreshes when the list order changes.
+			key={ orderId }
 		>
 			{ normalizedItems.map( ( item ) => {
 				return (
