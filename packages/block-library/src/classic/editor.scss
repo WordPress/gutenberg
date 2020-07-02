@@ -13,7 +13,7 @@
 
 	blockquote {
 		margin: 0;
-		box-shadow: inset 0 0 0 0 $light-gray-500;
+		box-shadow: inset 0 0 0 0 $gray-200;
 		border-left: 4px solid $black;
 		padding-left: 1em;
 	}
@@ -244,7 +244,7 @@ div[data-type="core/freeform"] {
 	&::before {
 		transition: border-color 0.1s linear, box-shadow 0.1s linear;
 		@include reduce-motion("transition");
-		border: $border-width solid $light-gray-500;
+		border: $border-width solid $gray-200;
 
 		// Windows High Contrast mode will show this outline.
 		outline: $border-width solid transparent;
@@ -299,7 +299,7 @@ div[data-type="core/freeform"] {
 	position: sticky;
 	z-index: z-index(".block-library-classic__toolbar");
 	top: 0;
-	border: $border-width solid $light-gray-500;
+	border: $border-width solid $gray-200;
 	border-bottom: none;
 	border-radius: $radius-block-ui;
 	margin-bottom: $grid-unit-10;

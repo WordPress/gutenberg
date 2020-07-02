@@ -10,7 +10,7 @@
 
 
 	&.is-disabled {
-		background: $light-gray-500;
+		background: $gray-200;
 		border-color: $light-gray-700;
 	}
 
@@ -126,7 +126,7 @@
 	display: inline-block;
 	line-height: 24px;
 	height: auto;
-	background: $light-gray-500;
+	background: $gray-200;
 	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 	@include reduce-motion;
 }

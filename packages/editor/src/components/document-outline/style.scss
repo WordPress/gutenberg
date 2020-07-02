@@ -16,7 +16,7 @@
 	}
 
 	.document-outline__emdash::before {
-		color: $light-gray-500;
+		color: $gray-200;
 		margin-right: 4px;
 	}
 
@@ -66,7 +66,7 @@
 }
 
 .document-outline__level {
-	background: $light-gray-500;
+	background: $gray-200;
 	color: $gray-900;
 	border-radius: 3px;
 	font-size: $default-font-size;

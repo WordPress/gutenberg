@@ -90,9 +90,9 @@
 
 	li {
 		margin: 0;
-		border-bottom: $border-width solid $light-gray-500;
+		border-bottom: $border-width solid $gray-200;
 		&:first-child {
-			border-top: $border-width solid $light-gray-500;
+			border-top: $border-width solid $gray-200;
 		}
 
 		button {

@@ -28,7 +28,7 @@ $block-editor-link-control-number-of-actions: 1;
 		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
 		margin: $grid-unit-20;
 		position: relative;
-		border: 1px solid $light-gray-500;
+		border: 1px solid $gray-200;
 		border-radius: $radius-block-ui;
 	}
 
@@ -228,7 +228,7 @@ $block-editor-link-control-number-of-actions: 1;
 		left: 0;
 		display: block;
 		width: 100%;
-		border-top: 1px solid $light-gray-500;
+		border-top: 1px solid $gray-200;
 	}
 }
 
@@ -238,7 +238,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__settings {
-	border-top: 1px solid $light-gray-500;
+	border-top: 1px solid $gray-200;
 	margin: 0;
 	padding: $grid-unit-20 $grid-unit-30;
 
