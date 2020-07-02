@@ -32,7 +32,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
-import { crop, external } from '@wordpress/icons';
+import { crop, upload } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -233,7 +233,7 @@ export default function Image( {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ uploadExternal }
-							icon={ external }
+							icon={ upload }
 							label={ __( 'Upload external image' ) }
 						/>
 					</ToolbarGroup>
