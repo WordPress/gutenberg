@@ -8,7 +8,7 @@ import {
 	findTransform,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useCallback, useState } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -154,17 +154,14 @@ function parseDropEvent( event ) {
  * A React hook that can be used to make a block list handle drag and drop.
  *
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
- *
- * @return {number|undefined} The block index that's closest to the drag position.
  */
 export default function useBlockDropZone( {
 	element,
 	rootClientId: targetRootClientId,
 } ) {
-	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
-
 	function selector( select ) {
 		const {
+			getBlockDropTarget,
 			getBlockIndex,
 			getBlockListSettings,
 			getClientIdsOfDescendants,
@@ -172,6 +169,7 @@ export default function useBlockDropZone( {
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		return {
+			getBlockDropTarget,
 			getBlockIndex,
 			orientation: getBlockListSettings( targetRootClientId )
 				?.orientation,
@@ -182,6 +180,7 @@ export default function useBlockDropZone( {
 	}
 
 	const {
+		getBlockDropTarget,
 		getBlockIndex,
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
@@ -192,7 +191,13 @@ export default function useBlockDropZone( {
 		insertBlocks,
 		updateBlockAttributes,
 		moveBlocksToPosition,
+		setBlockDropTarget,
 	} = useDispatch( 'core/block-editor' );
+
+	const {
+		blockIndex: targetBlockIndex,
+		rootClientId: dropTargetRootClientId,
+	} = getBlockDropTarget();
 
 	const onFilesDrop = useCallback(
 		( files ) => {
@@ -308,21 +313,27 @@ export default function useBlockDropZone( {
 	useEffect( () => {
 		if ( position ) {
 			const blockElements = Array.from( element.current.children );
-			const targetIndex = getNearestBlockIndex(
+			const newTargetIndex = getNearestBlockIndex(
 				blockElements,
 				position,
 				orientation
 			);
 
-			if ( targetIndex === undefined ) {
+			if ( newTargetIndex === undefined ) {
 				return;
 			}
 
-			setTargetBlockIndex( targetIndex );
+			if (
+				targetRootClientId !== dropTargetRootClientId ||
+				targetBlockIndex !== newTargetIndex
+			) {
+				setBlockDropTarget( targetRootClientId, newTargetIndex );
+			}
 		}
-	}, [ position ] );
-
-	if ( position ) {
-		return targetBlockIndex;
-	}
+	}, [
+		position,
+		targetRootClientId,
+		dropTargetRootClientId,
+		targetBlockIndex,
+	] );
 }

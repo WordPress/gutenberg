@@ -179,7 +179,8 @@
 		box-shadow: 0 0 0 1px $light-gray-ui;
 	}
 
-	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
+	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected,
+	.block-editor-block-list__block.is-dropping-into-inner-blocks {
 		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 		outline: $border-width-focus solid transparent;
 	}

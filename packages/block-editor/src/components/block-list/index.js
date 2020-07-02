@@ -36,6 +36,7 @@ function BlockList(
 ) {
 	function selector( select ) {
 		const {
+			getBlockDropTarget,
 			getBlockOrder,
 			getBlockListSettings,
 			getSelectedBlockClientId,
@@ -46,6 +47,7 @@ function BlockList(
 		} = select( 'core/block-editor' );
 
 		return {
+			blockDropTarget: getBlockDropTarget(),
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
@@ -58,6 +60,7 @@ function BlockList(
 	}
 
 	const {
+		blockDropTarget,
 		blockClientIds,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
@@ -67,12 +70,19 @@ function BlockList(
 	} = useSelect( selector, [ rootClientId ] );
 
 	const Container = rootClientId ? __experimentalTagName : RootContainer;
-	const dropTargetIndex = useBlockDropZone( {
+	useBlockDropZone( {
 		element: ref,
 		rootClientId,
 	} );
 
-	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
+	const {
+		rootClientId: dropTargetRootClientId,
+		blockIndex: dropTargetIndex,
+	} = blockDropTarget;
+
+	const isDroppingInBlockList = dropTargetRootClientId === rootClientId;
+	const isAppenderDropTarget =
+		isDroppingInBlockList && dropTargetIndex === blockClientIds.length;
 
 	return (
 		<Container
@@ -89,7 +99,10 @@ function BlockList(
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
-				const isDropTarget = dropTargetIndex === index;
+				const isDropTarget =
+					isDroppingInBlockList && dropTargetIndex === index;
+				const isDroppingIntoInnerBlocks =
+					dropTargetRootClientId === clientId;
 
 				return (
 					<AsyncModeProvider
@@ -109,6 +122,7 @@ function BlockList(
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
+								'is-dropping-into-inner-blocks': isDroppingIntoInnerBlocks,
 							} ) }
 						/>
 					</AsyncModeProvider>

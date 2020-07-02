@@ -130,6 +130,10 @@ _Returns_
 
 -   `number`: Number of blocks in the post.
 
+<a name="getBlockDropTarget" href="#getBlockDropTarget">#</a> **getBlockDropTarget**
+
+Undocumented declaration.
+
 <a name="getBlockHierarchyRootClientId" href="#getBlockHierarchyRootClientId">#</a> **getBlockHierarchyRootClientId**
 
 Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -1285,6 +1289,10 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+
+<a name="setBlockDropTarget" href="#setBlockDropTarget">#</a> **setBlockDropTarget**
+
+Undocumented declaration.
 
 <a name="setBlockMovingClientId" href="#setBlockMovingClientId">#</a> **setBlockMovingClientId**
 
