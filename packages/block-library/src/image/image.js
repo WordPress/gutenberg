@@ -91,6 +91,7 @@ export default function Image( {
 		return pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] );
 	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { createErrorNotice } = useDispatch( 'core/notices' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
@@ -180,6 +181,17 @@ export default function Image( {
 				onSelectImage( {
 					url: createBlobURL( blob ),
 				} );
+			} )
+			.catch( () => {
+				createErrorNotice(
+					__(
+						'The image host doesn’t allow access from a script. Please download and upload the image manually.'
+					),
+					{
+						id: 'external-image-upload-error',
+						type: 'snackbar',
+					}
+				);
 			} );
 	}
 
