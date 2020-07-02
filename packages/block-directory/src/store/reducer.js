@@ -104,7 +104,10 @@ export const errorNotices = ( state = {}, action ) => {
 		case 'SET_ERROR_NOTICE':
 			return {
 				...state,
-				[ action.blockId ]: action.notice,
+				[ action.blockId ]: {
+					message: action.message,
+					isFatal: action.isFatal,
+				},
 			};
 	}
 	return state;

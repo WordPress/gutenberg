@@ -201,10 +201,8 @@ export function setErrorNotice( blockId, message, isFatal = false ) {
 	return {
 		type: 'SET_ERROR_NOTICE',
 		blockId,
-		notice: {
-			message,
-			isFatal,
-		},
+		message,
+		isFatal,
 	};
 }
 
