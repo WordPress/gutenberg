@@ -487,7 +487,7 @@ function gutenberg_posts_orderby( $orderby, $query ) {
 	global $wpdb;
 	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 		if ( 'menu_order' === $query->query['orderby'] ) {
-			$orderby = "$wpdb->posts.menu_order,$wpdb->posts.post_title,$wpdb->posts.id " . $query->query['order'] ;
+			$orderby = "$wpdb->posts.menu_order,$wpdb->posts.post_title,$wpdb->posts.id " . $query->query['order'];
 		}
 	}
 	return $orderby;
