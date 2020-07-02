@@ -76,22 +76,6 @@ export const blockManagement = (
 };
 
 /**
- * Reducer returning an array of downloadable blocks.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function hasPermission( state = true, action ) {
-	if ( action.type === 'SET_INSTALL_BLOCKS_PERMISSION' ) {
-		return action.hasPermission;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning an object of error notices.
  *
  * @param {Object} state  Current state.
@@ -113,6 +97,5 @@ export const errorNotices = ( state = {}, action ) => {
 export default combineReducers( {
 	downloadableBlocks,
 	blockManagement,
-	hasPermission,
 	errorNotices,
 } );

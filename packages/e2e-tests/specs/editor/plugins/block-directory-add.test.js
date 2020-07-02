@@ -83,53 +83,21 @@ const block = `( function() {
 	} );
 } )();`;
 
-const MOCK_OPTIONS = {
-	namespace: 'wp/v2',
-	methods: [ 'GET' ],
-	endpoints: [
-		{
-			methods: [ 'GET' ],
-			args: {},
-		},
-	],
-	schema: {
-		$schema: 'http://json-schema.org/draft-04/schema#',
-		title: 'block-directory-item',
-		type: 'object',
-		properties: {},
-	},
-};
-
-const MOCK_OPTIONS_RESPONSE = {
-	match: ( request ) =>
-		matchUrl( request.url(), SEARCH_URLS ) &&
-		request.method() === 'OPTIONS',
-	onRequestMatch: async ( request ) => {
-		const response = {
-			content: 'application/json',
-			body: JSON.stringify( MOCK_OPTIONS ),
-			headers: {
-				Allow: 'GET',
-			},
-		};
-
-		return request.respond( response );
-	},
-};
-
 const MOCK_EMPTY_RESPONSES = [
-	MOCK_OPTIONS_RESPONSE,
 	{
-		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
+		match: ( request ) =>
+			matchUrl( request.url(), SEARCH_URLS ) &&
+			request.method() === 'GET',
 		onRequestMatch: createJSONResponse( [] ),
 	},
 ];
 
 const MOCK_BLOCKS_RESPONSES = [
-	MOCK_OPTIONS_RESPONSE,
 	{
 		// Mock response for search with the block
-		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
+		match: ( request ) =>
+			matchUrl( request.url(), SEARCH_URLS ) &&
+			request.method() === 'GET',
 		onRequestMatch: createJSONResponse( [ MOCK_BLOCK1, MOCK_BLOCK2 ] ),
 	},
 	{
