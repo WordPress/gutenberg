@@ -1010,6 +1010,10 @@ export function isDraggingBlocks( state ) {
 	return state.isDraggingBlocks;
 }
 
+export function getBlockDropTarget( state ) {
+	return state.blockDropTarget;
+}
+
 /**
  * Returns true if the caret is within formatted text, or false otherwise.
  *

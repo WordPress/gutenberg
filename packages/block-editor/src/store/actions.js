@@ -737,6 +737,14 @@ export function stopDraggingBlocks() {
 	};
 }
 
+export function setBlockDropTarget( rootClientId, blockIndex ) {
+	return {
+		type: 'SET_BLOCK_DROP_TARGET',
+		rootClientId,
+		blockIndex,
+	};
+}
+
 /**
  * Returns an action object used in signalling that the caret has entered formatted text.
  *
