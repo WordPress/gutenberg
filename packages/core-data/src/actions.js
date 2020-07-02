@@ -162,14 +162,14 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 	}
 
 	yield {
-		type: 'DEELETE_ENTITY_RECORD_START',
+		type: 'DELETE_ENTITY_RECORD_START',
 		kind,
 		name,
 		recordId,
 	};
 
 	try {
-		let path = `aas${ entity.baseURL }/${ recordId }`;
+		let path = `${ entity.baseURL }/${ recordId }`;
 
 		if ( query ) {
 			path = addQueryArgs( path, query );

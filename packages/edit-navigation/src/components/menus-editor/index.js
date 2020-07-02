@@ -22,6 +22,12 @@ import NavigationEditor from '../navigation-editor';
 const noticeId = 'edit-navigation-delete-menu-error';
 
 export default function MenusEditor( { blockEditorSettings } ) {
+	const [ menuId, setMenuId ] = useState();
+	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
+	const [ hasCompletedFirstLoad, setHasCompletedFirstLoad ] = useState(
+		false
+	);
+
 	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
 		const { getMenus, hasFinishedResolution } = select( 'core' );
 		const query = { per_page: -1 };
@@ -31,13 +37,10 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		};
 	}, [] );
 
-	const [ hasCompletedFirstLoad, setHasCompletedFirstLoad ] = useState(
-		false
+	const menuDeleteError = useSelect( ( select ) =>
+		select( 'core' ).getLastEntityDeleteError( 'root', 'menu', menuId )
 	);
 
-	const menuDeleteError = useSelect( ( select ) =>
-		select( 'core' ).getLastEntityDeleteError( 'root', 'menu' )
-	);
 	const { deleteMenu } = useDispatch( 'core' );
 	const { createErrorNotice, removeNotice } = useDispatch( 'core/notices' );
 
@@ -61,9 +64,6 @@ export default function MenusEditor( { blockEditorSettings } ) {
 			createErrorNotice( errorText, { id: noticeId } );
 		}
 	}, [ menuDeleteError ] );
-
-	const [ menuId, setMenuId ] = useState();
-	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
 
 	useEffect( () => {
 		if ( menus?.length ) {
