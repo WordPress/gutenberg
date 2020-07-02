@@ -1,4 +1,5 @@
-#Share your Block with the World
+# Share your Block with the World
+
 So you've created an awesome block? Care to share?
 
 **Contents**:
@@ -6,8 +7,8 @@ So you've created an awesome block? Care to share?
 2. Analyze your plugin
 3. Zip & Submit
 
-
 ## Step 1: Help users understand your block
+
 Providing straightforward, easy to understand block information is important to the block directory and our end users.
 
 **Guidelines**:
@@ -18,6 +19,7 @@ Providing straightforward, easy to understand block information is important to 
 - Choose the right category
 
 ### Name your block based on what it does
+
 Users typically search the block directory within the Block Editor and do so in the context of a task. For example, when building their post, a user may search the Block Directory for an “image gallery”. Naming your block accordingly will help the Block Directory surface it when it's needed.
 
 **Not So Good**: WebTeam5 Image Works
@@ -26,8 +28,8 @@ Users typically search the block directory within the Block Editor and do so in 
 **Question: What happens when there are multiple blocks with similar names?**
 Try your best to make your block's name functional and unique to make it stand out. Look for applicable synonyms or include a prefix if necessary.
 
-
 ### Clearly describe your block
+
 The description really helps to communicate what your block does.The quicker a user understands how your block will help them, the more likely it is a user will use your block. Users will be reading your block's description within the Block Editor where space can be limited. Try to keep it short and concise.
 
 **Not So Good**: The best way to show images on your website using jQuery and CSS.
@@ -36,6 +38,7 @@ The description really helps to communicate what your block does.The quicker a u
 **Tip**: It’s not about marketing your block, in fact we want to avoid marketing in blocks. You can read more about it in the [plugin guidelines]. Stick to being as clear as you can. The block directory will provide metrics to let users know how awesome your block is!
 
 ### Add Keywords for broader context
+
 Keywords add extra context to your block and make it more likely to be found in the inserter. 
 
 Examples for an Image Slider block:
@@ -46,6 +49,7 @@ Examples for an Image Slider block:
 [Read more](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#keyword) about keywords.
 
 ### Choose the right category
+
 The Block Editor allows you to indicate the category your block belongs in, making it easier for users to locate your block in the menu.
 
 **Possible Values**:
@@ -58,7 +62,6 @@ The Block Editor allows you to indicate the category your block belongs in, maki
 [Read more](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#category) about categories.
 
 Wondering where to input all this information? Read the next section :)
-
 
 ## Step 2: Analyze your plugin
 
@@ -77,6 +80,7 @@ The `block.json` file also contains other important properties. Take a look at a
 
 
 ## Step 3: Zip & Submit
+
 The community is ecstatic you made it this far! Time to submit your plugin!
 
 Take a few moments to read the block guidelines (https://github.com/WordPress/wporg-plugin-guidelines/blob/block-guidelines/blocks.md)
