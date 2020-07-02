@@ -106,7 +106,7 @@ function createNavigationBlock( menuItems ) {
 		return innerBlocks;
 	};
 
-	// menuItemsToTreeOfLinkBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
+	// menuItemsToTreeOfBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
 	const innerBlocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
 	const navigationBlock = createBlock( 'core/navigation', {}, innerBlocks );
 	return [ navigationBlock, menuItemIdToClientId ];
