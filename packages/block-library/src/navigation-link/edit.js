@@ -25,7 +25,7 @@ import {
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
-	BlockToolbarContents,
+	__experimentalBlockToolbarContents as BlockToolbarContents,
 	BlockControls,
 	InnerBlocks,
 	InspectorControls,
