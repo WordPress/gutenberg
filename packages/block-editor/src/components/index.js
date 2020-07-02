@@ -15,7 +15,7 @@ export { default as BlockControls } from './block-controls';
 export { default as BlockColorsStyleSelector } from './color-style-selector';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
-export { default as BlockToolbarContents } from './block-toolbar-contents';
+export { default as __experimentalBlockToolbarContents } from './block-toolbar-contents';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } from './block-navigation/block-slot';
