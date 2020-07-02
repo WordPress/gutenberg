@@ -17,6 +17,10 @@
 	position: relative;
 	text-align: left;
 	overflow: hidden;
+
+	& + .block-directory-downloadable-block-list-item {
+		border-top: none;
+	}
 }
 
 .block-directory-downloadable-block-list-item:last-child:not(:only-of-type) {
