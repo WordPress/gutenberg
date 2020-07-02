@@ -103,7 +103,7 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 		);
 
 		// If no candidate has been assigned yet or this is the nearest
-		// block edge to the cursor, then assign it as the candidate.
+		// block edge to the cursor, then assign the next block as the candidate.
 		if ( Math.abs( trailingEdgeDistance ) < candidateDistance ) {
 			candidateDistance = trailingEdgeDistance;
 			let nextBlockOffset = 1;
