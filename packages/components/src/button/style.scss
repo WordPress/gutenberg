@@ -154,6 +154,9 @@
 			display: inline-block;
 			flex: 0 0 auto;
 		}
+
+		// Windows High Contrast mode.
+		outline: 1px dotted transparent;
 	}
 
 	/**
