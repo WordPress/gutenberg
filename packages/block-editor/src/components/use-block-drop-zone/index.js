@@ -330,10 +330,5 @@ export default function useBlockDropZone( {
 				setBlockDropTarget( targetRootClientId, newTargetIndex );
 			}
 		}
-	}, [
-		position,
-		targetRootClientId,
-		dropTargetRootClientId,
-		targetBlockIndex,
-	] );
+	}, [ position ] );
 }
