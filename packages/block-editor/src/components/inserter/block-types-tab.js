@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { map, findIndex, flow, sortBy, groupBy, isEmpty } from 'lodash';
+import {
+	map,
+	findIndex,
+	flow,
+	sortBy,
+	groupBy,
+	isEmpty,
+	orderBy,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,7 +65,10 @@ export function BlockTypesTab( {
 	}, [ filterValue, items, categories, collections ] );
 
 	const suggestedItems = useMemo( () => {
-		return items.slice( 0, MAX_SUGGESTED_ITEMS );
+		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
+			0,
+			MAX_SUGGESTED_ITEMS
+		);
 	}, [ items ] );
 
 	const reusableItems = useMemo( () => {
