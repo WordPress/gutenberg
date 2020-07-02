@@ -18,7 +18,7 @@
 
 		// Always show outlines in code editor
 		.editor-post-title__input {
-			border: $border-width solid $light-gray-secondary;
+			border: $border-width solid $gray-400;
 			margin-bottom: -$border-width;
 
 			// Same padding as body.
@@ -28,7 +28,7 @@
 			}
 
 			&:focus {
-				border: $border-width solid $dark-gray-primary;
+				border: $border-width solid $gray-900;
 			}
 		}
 
@@ -75,7 +75,7 @@
 		line-height: $button-size;
 		margin: 0 auto 0 0;
 		font-size: $default-font-size;
-		color: $dark-gray-primary;
+		color: $gray-900;
 	}
 
 	.components-button svg {

@@ -129,7 +129,7 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $medium-gray-text;
+	border: $border-width solid $gray-700;
 	@include reduce-motion("transition");
 }
 
@@ -289,7 +289,7 @@
 
 @mixin checkbox-control {
 	@include input-control;
-	border: $border-width solid $dark-gray-primary;
+	border: $border-width solid $gray-900;
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-block-ui;
@@ -350,7 +350,7 @@
 
 @mixin radio-control {
 	@include input-control;
-	border: $border-width solid $dark-gray-primary;
+	border: $border-width solid $gray-900;
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-round;

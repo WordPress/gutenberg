@@ -1,6 +1,6 @@
 .components-toolbar-group {
 	min-height: $block-toolbar-height;
-	border-right: $border-width solid $dark-gray-primary;
+	border-right: $border-width solid $gray-900;
 	background-color: $white;
 	display: inline-flex;
 	flex-shrink: 0;
@@ -19,7 +19,7 @@
 .components-toolbar {
 	min-height: $block-toolbar-height;
 	margin: 0;
-	border: $border-width solid $dark-gray-primary;
+	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	display: inline-flex;

@@ -22,7 +22,7 @@
 		white-space: pre-wrap;
 		font-family: $editor-html-font;
 		font-size: $text-editor-font-size;
-		color: $dark-gray-primary;
+		color: $gray-900;
 	}
 
 	> *:first-child {
@@ -52,7 +52,7 @@
 	code {
 		padding: 2px;
 		border-radius: 2px;
-		color: $dark-gray-primary;
+		color: $gray-900;
 		background: $light-gray-200;
 		font-family: $editor-html-font;
 		font-size: 14px;
@@ -251,7 +251,7 @@ div[data-type="core/freeform"] {
 	}
 
 	&.is-selected::before {
-		border-color: $dark-gray-primary;
+		border-color: $gray-900;
 	}
 
 	.block-editor-block-contextual-toolbar + div {
@@ -275,7 +275,7 @@ div[data-type="core/freeform"] {
 	.mce-btn.mce-active:hover button,
 	.mce-btn.mce-active i,
 	.mce-btn.mce-active:hover i {
-		color: $dark-gray-primary;
+		color: $gray-900;
 	}
 
 	// Prevent toolbar clipping on heading style in RTL languages
@@ -313,7 +313,7 @@ div[data-type="core/freeform"] {
 	div[data-type="core/freeform"].is-selected &,
 	div[data-type="core/freeform"].is-typing & {
 		display: block;
-		border-color: $dark-gray-primary;
+		border-color: $gray-900;
 	}
 
 	// Remove the box shadow to mimic other Gutenberg UI.
@@ -341,7 +341,7 @@ div[data-type="core/freeform"] {
 	}
 
 	div.mce-toolbar-grp {
-		border-bottom: 1px solid $dark-gray-primary;
+		border-bottom: 1px solid $gray-900;
 	}
 
 	// Overwrite inline styles.

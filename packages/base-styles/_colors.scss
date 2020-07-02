@@ -2,19 +2,19 @@
  * Colors
  */
 
-// WordPress colors.
-$black: #000;					// Use only when you truly need pure black. For UI, use $dark-gray-primary.
-$dark-gray-primary: #1e1e1e;
-$medium-gray-text: #757575;		// Meets 4.6:1 text contrast against white.
-$light-gray-ui: #949494;		// Meets 3:1 UI or large text contrast against white.
-$light-gray-secondary: #ccc;
-$light-gray-tertiary: #e7e8e9;
+// WordPress grays.
+$black: #000;			// Use only when you truly need pure black. For UI, use $gray-900.
+$gray-900: #1e1e1e;
+$gray-700: #757575;		// Meets 4.6:1 text contrast against white.
+$gray-600: #949494;		// Meets 3:1 UI or large text contrast against white.
+$gray-400: #ccc;
+$gray-200: #e7e8e9;
 $white: #fff;
-$blue-medium-focus-dark: $white;	// Focus color when the theme is dark.
 
-// Opacities. For use when transparency is needed.
-$dark-gray-placeholder: rgba($dark-gray-primary, 0.62);
-$medium-gray-placeholder: rgba($dark-gray-primary, 0.55);
+// Opacities & additional colors.
+$blue-medium-focus-dark: $white;	// Focus color when the theme is dark.
+$dark-gray-placeholder: rgba($gray-900, 0.62);
+$medium-gray-placeholder: rgba($gray-900, 0.55);
 $light-gray-placeholder: rgba($white, 0.65);
 
 // Alert colors.
