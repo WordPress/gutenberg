@@ -82,7 +82,7 @@ $block-inserter-tabs-height: 44px;
 		@include input-control;
 		display: block;
 		padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
-		background: $light-gray-200;
+		background: $gray-100;
 		border: none;
 		width: 100%;
 		height: $grid-unit-60;
@@ -240,7 +240,7 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__preview-content {
 	min-height: $grid-unit-60 * 3;
-	background: $light-gray-200;
+	background: $gray-100;
 	display: grid;
 	flex-grow: 1;
 	align-items: center;
@@ -253,7 +253,7 @@ $block-inserter-tabs-height: 44px;
 	align-items: center;
 	min-height: $grid-unit-60 * 3;
 	color: $dark-gray-400;
-	background: $light-gray-200;
+	background: $gray-100;
 }
 
 .block-editor-inserter__tips {

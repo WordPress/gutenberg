@@ -131,7 +131,7 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	&.is-selected {
-		background: $light-gray-200;
+		background: $gray-100;
 
 		.block-editor-link-control__search-item-type {
 			background: $white;
@@ -198,7 +198,7 @@ $block-editor-link-control-number-of-actions: 1;
 		padding: 3px 8px;
 		margin-left: auto;
 		font-size: 0.9em;
-		background-color: $light-gray-200;
+		background-color: $gray-100;
 		border-radius: 2px;
 	}
 }
