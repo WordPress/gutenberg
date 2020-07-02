@@ -25,7 +25,6 @@ import {
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalBlockToolbarContents as BlockToolbarContents,
 	BlockControls,
 	InnerBlocks,
 	InspectorControls,
@@ -140,7 +139,7 @@ function NavigationLinkEdit( {
 	return (
 		<Fragment>
 			{ isLinkOpen && (
-				<BlockToolbarContents>
+				<BlockControls __experimentalIsExpanded>
 					<ToolbarGroup className="navigation-link-edit__toolbar-link-input-group">
 						<ToolbarItem>
 							{ ( toolbarItemProps ) => (
@@ -173,7 +172,7 @@ function NavigationLinkEdit( {
 							Done
 						</ToolbarButton>
 					</ToolbarGroup>
-				</BlockToolbarContents>
+				</BlockControls>
 			) }
 			<BlockControls>
 				<ToolbarGroup>
