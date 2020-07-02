@@ -12,7 +12,7 @@ $gray-200: #e7e8e9;
 $white: #fff;
 
 // Opacities & additional colors.
-$blue-medium-focus-dark: $white;	// Focus color when the theme is dark.
+$dark-theme-focus: $white;	// Focus color when the theme is dark.
 $dark-gray-placeholder: rgba($gray-900, 0.62);
 $medium-gray-placeholder: rgba($gray-900, 0.55);
 $light-gray-placeholder: rgba($white, 0.65);
@@ -47,4 +47,3 @@ $light-gray-300: #edeff0;
 $light-gray-200: #f3f4f5;
 $light-gray-100: #f8f9f9;
 
-$blue-medium-100: #e5f5fa;

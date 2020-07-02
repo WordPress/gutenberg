@@ -80,7 +80,7 @@
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
+				box-shadow: 0 0 0 $border-width-focus $dark-theme-focus;
 			}
 		}
 	}
@@ -163,7 +163,7 @@
 
 			// Show a lighter color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
+				box-shadow: 0 0 0 $border-width-focus $dark-theme-focus;
 			}
 		}
 
