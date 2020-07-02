@@ -67,20 +67,7 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/quote' ],
-			transform: ( { value, anchor } ) => {
-				return createBlock( 'core/list', {
-					values: toHTMLString( {
-						value: create( { html: value, multilineTag: 'p' } ),
-						multilineTag: 'li',
-					} ),
-					anchor,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/pullquote' ],
+			blocks: [ 'core/quote', 'core/pullquote' ],
 			transform: ( { value, anchor } ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
