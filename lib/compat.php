@@ -480,14 +480,14 @@ remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_
  *
  * @see https://core.trac.wordpress.org/ticket/46294
  *
- * @param string $orderby Current orderby value.
+ * @param string   $orderby Current orderby value.
  * @param WP_Query $query Query object.
  */
 function gutenberg_posts_orderby( $orderby, $query ) {
 	global $wpdb;
-	if ( defined('REST_REQUEST') && REST_REQUEST ) {
-		if ( $query->query['orderby'] === 'menu_order' ) {
-			$orderby = "$wpdb->posts.menu_order,post_title,id asc";
+	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		if ( 'menu_order' === $query->query['orderby'] ) {
+			$orderby = "$wpdb->posts.menu_order,$wpdb->posts.post_title,$wpdb->posts.id " . $query->query['order'] ;
 		}
 	}
 	return $orderby;
