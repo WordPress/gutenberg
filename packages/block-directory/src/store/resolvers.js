@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { camelCase, get, hasIn, includes, mapKeys } from 'lodash';
+import { camelCase, hasIn, includes, mapKeys } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,7 +57,7 @@ export default {
 			} else {
 				// If the request was preloaded server-side and is returned by the
 				// preloading middleware, the header will be a simple property.
-				allowHeader = get( response, [ 'headers', 'Allow' ], '' );
+				allowHeader = response?.headers?.Allow ?? '';
 			}
 
 			const isAllowed = includes( allowHeader, 'GET' );
