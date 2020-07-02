@@ -31,7 +31,7 @@ function InserterListItem( {
 		: {};
 
 	return (
-		<li className="block-editor-block-types-list__list-item">
+		<li className="block-editor-block-types-list__list-item" role="option">
 			<CompositeItem
 				as={ Button }
 				{ ...composite }

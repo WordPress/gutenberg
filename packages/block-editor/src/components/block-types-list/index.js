@@ -19,6 +19,7 @@ function BlockTypesList( {
 	onSelect,
 	onHover = () => {},
 	children,
+	label,
 } ) {
 	const composite = useCompositeState();
 	const normalizedItems = includeVariationsInInserterItems( items );
@@ -31,9 +32,10 @@ function BlockTypesList( {
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<Composite
 			as="ul"
-			role="list"
+			role="listbox"
 			{ ...composite }
 			className="block-editor-block-types-list"
+			aria-label={ label }
 		>
 			{ normalizedItems.map( ( item ) => {
 				return (
