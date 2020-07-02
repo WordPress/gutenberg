@@ -742,6 +742,6 @@ if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
 	register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'gutenberg' ) ) );
 	register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'gutenberg' ) ) );
 	register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'gutenberg' ) ) );
-	register_block_pattern_category( 'header', array( 'label' => _x( 'Header', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'header', array( 'label' => _x( 'Headers', 'Block pattern category', 'gutenberg' ) ) );
 	register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'gutenberg' ) ) );
 }
