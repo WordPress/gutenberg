@@ -155,24 +155,45 @@ export function receiveEmbedPreview( url, preview ) {
 export function* deleteEntityRecord( kind, name, recordId, query ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
+	let error;
+	let deletedRecord = false;
 	if ( ! entity ) {
 		return;
 	}
 
+	yield {
+		type: 'DEELETE_ENTITY_RECORD_START',
+		kind,
+		name,
+		recordId,
+	};
+
 	try {
-		let path = `${ entity.baseURL }/${ recordId }`;
+		let path = `aas${ entity.baseURL }/${ recordId }`;
 
 		if ( query ) {
 			path = addQueryArgs( path, query );
 		}
 
-		yield apiFetch( {
+		deletedRecord = yield apiFetch( {
 			path,
 			method: 'DELETE',
 		} );
 
 		yield removeItems( kind, name, recordId, true );
-	} catch ( _error ) {}
+	} catch ( _error ) {
+		error = _error;
+	}
+
+	yield {
+		type: 'DELETE_ENTITY_RECORD_FINISH',
+		kind,
+		name,
+		recordId,
+		error,
+	};
+
+	return deletedRecord;
 }
 
 /**

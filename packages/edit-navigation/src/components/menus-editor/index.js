@@ -11,12 +11,15 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+const { DOMParser } = window;
 
 /**
  * Internal dependencies
  */
 import CreateMenuArea from './create-menu-area';
 import NavigationEditor from '../navigation-editor';
+
+const noticeId = 'edit-navigation-delete-menu-error';
 
 export default function MenusEditor( { blockEditorSettings } ) {
 	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
@@ -32,13 +35,32 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		false
 	);
 
+	const menuDeleteError = useSelect( ( select ) =>
+		select( 'core' ).getLastEntityDeleteError( 'root', 'menu' )
+	);
 	const { deleteMenu } = useDispatch( 'core' );
+	const { createErrorNotice, removeNotice } = useDispatch( 'core/notices' );
 
 	useEffect( () => {
 		if ( ! hasCompletedFirstLoad && hasLoadedMenus ) {
 			setHasCompletedFirstLoad( true );
 		}
 	}, [ menus, hasLoadedMenus ] );
+
+	// Handle REST API Error messages.
+	useEffect( () => {
+		if ( menuDeleteError ) {
+			// Error messages from the REST API often contain HTML.
+			// createErrorNotice does not support HTML in error text, so first
+			// strip HTML out using DOMParser.
+			const document = new DOMParser().parseFromString(
+				menuDeleteError.message,
+				'text/html'
+			);
+			const errorText = document.body.textContent || '';
+			createErrorNotice( errorText, { id: noticeId } );
+		}
+	}, [ menuDeleteError ] );
 
 	const [ menuId, setMenuId ] = useState();
 	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
@@ -114,8 +136,13 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
 					onDeleteMenu={ async () => {
-						await deleteMenu( menuId, { force: 'true' } );
-						setMenuId( false );
+						removeNotice( noticeId );
+						const deletedMenu = await deleteMenu( menuId, {
+							force: 'true',
+						} );
+						if ( deletedMenu ) {
+							setMenuId( false );
+						}
 					} }
 				/>
 			) }

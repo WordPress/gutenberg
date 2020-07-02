@@ -276,6 +276,25 @@ function entity( entityConfig ) {
 
 				return state;
 			},
+
+			deleting: ( state = {}, action ) => {
+				switch ( action.type ) {
+					case 'DELETE_ENTITY_RECORD_START':
+					case 'DELETE_ENTITY_RECORD_FINISH':
+						return {
+							...state,
+							[ action.recordId ]: {
+								pending:
+									action.type ===
+									'DELETE_ENTITY_RECORD_START',
+								error: action.error,
+								isAutosave: action.isAutosave,
+							},
+						};
+				}
+
+				return state;
+			},
 		} )
 	);
 }

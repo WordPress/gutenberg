@@ -42,8 +42,11 @@ describe( 'deleteEntityRecord', () => {
 		// Trigger generator
 		fulfillment.next();
 
+		// Start
+		fulfillment.next( entities );
+
 		// delete api call
-		const { value: apiFetchAction } = fulfillment.next( entities );
+		const { value: apiFetchAction } = fulfillment.next();
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts/10',
 			method: 'DELETE',

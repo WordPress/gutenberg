@@ -214,6 +214,21 @@ _Returns_
 
 -   `?Array`: Records.
 
+<a name="getLastEntityDeleteError" href="#getLastEntityDeleteError">#</a> **getLastEntityDeleteError**
+
+Returns the specified entity record's last delete error.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `number`: Record ID.
+
+_Returns_
+
+-   `?Object`: The entity record's save error.
+
 <a name="getLastEntitySaveError" href="#getLastEntitySaveError">#</a> **getLastEntitySaveError**
 
 Returns the specified entity record's last save error.
@@ -406,6 +421,21 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the entity record is autosaving or not.
+
+<a name="isDeletingEntityRecord" href="#isDeletingEntityRecord">#</a> **isDeletingEntityRecord**
+
+Returns true if the specified entity record is deleting, and false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `number`: Record ID.
+
+_Returns_
+
+-   `boolean`: Whether the entity record is deleting or not.
 
 <a name="isPreviewEmbedFallback" href="#isPreviewEmbedFallback">#</a> **isPreviewEmbedFallback**
 
