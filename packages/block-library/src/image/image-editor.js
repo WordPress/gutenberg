@@ -12,14 +12,13 @@ import classnames from 'classnames';
 import { BlockControls } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
-	Icon,
-	search,
 	rotateRight as rotateRightIcon,
 	aspectRatio as aspectRatioIcon,
 } from '@wordpress/icons';
 import {
 	ToolbarGroup,
 	ToolbarButton,
+	__experimentalToolbarItem as ToolbarItem,
 	Spinner,
 	RangeControl,
 	DropdownMenu,
@@ -272,22 +271,12 @@ export default function ImageEditor( {
 	return (
 		<>
 			{ ! inProgress && (
-				<div
-					className="wp-block-image__zoom-control"
-					aria-label={ __( 'Zoom' ) }
-				>
-					<Icon icon={ search } />
-					<RangeControl
-						min={ MIN_ZOOM }
-						max={ MAX_ZOOM }
-						value={ Math.round( zoom ) }
-						onChange={ setZoom }
-					/>
-					<AspectMenu
-						isDisabled={ inProgress }
-						onClick={ setAspect }
-					/>
-				</div>
+				<RangeControl
+					min={ MIN_ZOOM }
+					max={ MAX_ZOOM }
+					value={ Math.round( zoom ) }
+					onChange={ setZoom }
+				/>
 			) }
 			<div
 				className={ classnames( 'wp-block-image__crop-area', {
@@ -324,6 +313,17 @@ export default function ImageEditor( {
 						onClick={ rotate }
 						disabled={ inProgress }
 					/>
+				</ToolbarGroup>
+				<ToolbarGroup>
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<AspectMenu
+								toggleProps={ toggleProps }
+								isDisabled={ inProgress }
+								onClick={ setAspect }
+							/>
+						) }
+					</ToolbarItem>
 				</ToolbarGroup>
 				<ToolbarGroup>
 					<ToolbarButton onClick={ apply } disabled={ inProgress }>
