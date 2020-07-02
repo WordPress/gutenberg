@@ -68,7 +68,12 @@
 
 		// Focus style.
 		&:focus::before {
-			@include block-toolbar-button-style__focus();
+			@include focus-shadow(
+				$inset-1: true,
+				$color-2: $white,
+				$inset-2: true,
+				$outline: true
+			);
 		}
 
 		// Ensure the icon buttons remain square.

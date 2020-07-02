@@ -117,11 +117,52 @@
  * Focus styles.
  */
 
-@mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 0 4px $white;
+@mixin focus-shadow(
+	$color-1: var(--wp-admin-theme-color),
+	$size-1: $border-width-focus,
+	$fallback-size-1: 2px,
+	$inset-1: false,
+	$color-2: false,
+	$size-2: $border-width-tab,
+	$fallback-size-2: $size-2,
+	$inset-2: $inset-1,
+	$outline: false
+) {
+	@if $inset-1 == false {
+		$inset-1: null;
+	}
+	@else {
+		$inset-1: inset;
+	}
 
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
+	@if $inset-2 == false {
+		$inset-2: null;
+	}
+	@else {
+		$inset-2: inset;
+	}
+
+	@if $color-2 == false {
+		box-shadow: $inset-1 0 0 0 $size-1 $color-1;
+
+		// Whole px values render better on 1x screens.
+		@media ( max-resolution: 96dpi ) {
+			box-shadow: $inset-1 0 0 0 $fallback-size-1 $color-1;
+		}
+	}
+	@else {
+		box-shadow: $inset-1 0 0 0 $size-1 $color-1, $inset-2 0 0 0 $size-2 $color-2;
+
+		// Whole px values render better on 1x screens.
+		@media ( max-resolution: 96dpi ) {
+			box-shadow: $inset-1 0 0 0 $fallback-size-1, $inset-2 0 0 0 $fallback-size-2 $color-2;
+		}
+	}
+
+	@if $outline == true {
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
 }
 
 // Tabs, Inputs, Square buttons.
@@ -133,15 +174,15 @@
 	@include reduce-motion("transition");
 }
 
-
 @mixin input-style__focus() {
 	border-color: var(--wp-admin-theme-color);
-	box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
 
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
+	@include focus-shadow(
+		$size-1: ($border-width-focus - $border-width),
+		$fallback-size-1: (2px - $border-width),
+		$outline: true
+	);
 }
-
 
 /**
  * Applies editor left position to the selector passed as argument
@@ -295,10 +336,15 @@
 	border-radius: $radius-block-ui;
 
 	&:focus {
-		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
-
-		// Only visible in Windows High Contrast mode.
-		outline: 2px solid transparent;
+		@include focus-shadow(
+			$color-1: $white,
+			$size-1: ($border-width * 2),
+			$fallback-size-1: ($border-width * 2),
+			$color-2: var(--wp-admin-theme-color),
+			$size-2: ($border-width * 2 + $border-width-focus),
+			$fallback-size-2: ($border-width * 2 + 2px),
+			$outline: true
+		);
 	}
 
 	&:checked {
@@ -369,10 +415,15 @@
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
-
-		// Only visible in Windows High Contrast mode.
-		outline: 2px solid transparent;
+		@include focus-shadow(
+			$color-1: $white,
+			$size-1: ($border-width * 2),
+			$fallback-size-1: ($border-width * 2),
+			$color-2: var(--wp-admin-theme-color),
+			$size-2: ($border-width * 2 + $border-width-focus),
+			$fallback-size-2: ($border-width * 2 + 2px),
+			$outline: true
+		);
 	}
 
 	&:checked {

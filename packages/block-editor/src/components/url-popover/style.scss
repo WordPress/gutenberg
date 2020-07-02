@@ -35,7 +35,12 @@
 		box-shadow: none;
 
 		> svg {
-			@include block-toolbar-button-style__focus();
+			@include focus-shadow(
+				$inset-1: true,
+				$color-2: $white,
+				$inset-2: true,
+				$outline: true
+			);
 		}
 	}
 }
