@@ -37,7 +37,7 @@ function FullscreenModeClose( { icon } ) {
 	if ( siteIconUrl ) {
 		buttonIcon = (
 			<img
-				alt="site-icon"
+				alt={ __( 'Site Icon' ) }
 				className="edit-site-fullscreen-mode-close_site-icon"
 				src={ siteIconUrl }
 			/>

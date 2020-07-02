@@ -34,8 +34,10 @@ describe( 'FullscreenModeClose', () => {
 				} ) );
 			} );
 
-			const { getByAltText } = render( <FullscreenModeClose /> );
-			const siteIcon = getByAltText( 'site-icon' );
+			const { container } = render( <FullscreenModeClose /> );
+			const siteIcon = container.querySelector(
+				'.edit-site-fullscreen-mode-close_site-icon'
+			);
 
 			expect( siteIcon ).toBeTruthy();
 		} );
@@ -51,10 +53,10 @@ describe( 'FullscreenModeClose', () => {
 				} ) );
 			} );
 
-			const { container, queryByAltText } = render(
-				<FullscreenModeClose />
+			const { container } = render( <FullscreenModeClose /> );
+			const siteIcon = container.querySelector(
+				'.edit-site-fullscreen-mode-close_site-icon'
 			);
-			const siteIcon = queryByAltText( 'site-icon' );
 			const defaultIcon = container.querySelector( 'svg' );
 
 			expect( siteIcon ).toBeFalsy();
