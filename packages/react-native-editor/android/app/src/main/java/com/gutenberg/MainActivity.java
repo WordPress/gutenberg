@@ -29,6 +29,7 @@ public class MainActivity extends ReactActivity {
                 Bundle bundle = new Bundle();
                 Bundle capabilities = new Bundle();
                 capabilities.putBoolean(WPAndroidGlueCode.PROP_NAME_CAPABILITIES_MENTIONS, true);
+                capabilities.putBoolean(WPAndroidGlueCode.PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, true);
                 bundle.putBundle(WPAndroidGlueCode.PROP_NAME_CAPABILITIES, capabilities);
                 return bundle;
             }
