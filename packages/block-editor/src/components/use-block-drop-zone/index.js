@@ -173,8 +173,8 @@ export default function useBlockDropZone( {
 		} = select( 'core/block-editor' );
 		return {
 			getBlockIndex,
-			moverDirection: getBlockListSettings( targetRootClientId )
-				?.__experimentalMoverDirection,
+			orientation: getBlockListSettings( targetRootClientId )
+				?.orientation,
 			getClientIdsOfDescendants,
 			hasUploadPermissions: !! getSettings().mediaUpload,
 			isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
@@ -186,7 +186,7 @@ export default function useBlockDropZone( {
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
 		isLockedAll,
-		moverDirection,
+		orientation,
 	} = useSelect( selector, [ targetRootClientId ] );
 	const {
 		insertBlocks,
@@ -311,7 +311,7 @@ export default function useBlockDropZone( {
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				position,
-				moverDirection
+				orientation
 			);
 
 			if ( targetIndex === undefined ) {

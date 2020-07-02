@@ -202,7 +202,7 @@ function Navigation( {
 									: false
 							}
 							templateInsertUpdatesSelection={ false }
-							__experimentalMoverDirection={
+							orientation={
 								attributes.orientation || 'horizontal'
 							}
 							__experimentalTagName="ul"
