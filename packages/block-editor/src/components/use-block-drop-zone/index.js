@@ -165,14 +165,12 @@ export default function useBlockDropZone( {
 
 	function selector( select ) {
 		const {
-			getBlockIndex,
 			getBlockListSettings,
 			getClientIdsOfDescendants,
 			getSettings,
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		return {
-			getBlockIndex,
 			orientation: getBlockListSettings( targetRootClientId )
 				?.orientation,
 			getClientIdsOfDescendants,
@@ -182,7 +180,6 @@ export default function useBlockDropZone( {
 	}
 
 	const {
-		getBlockIndex,
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
 		isLockedAll,
@@ -289,7 +286,6 @@ export default function useBlockDropZone( {
 		},
 		[
 			getClientIdsOfDescendants,
-			getBlockIndex,
 			targetBlockIndex,
 			moveBlocksToPosition,
 			targetRootClientId,
