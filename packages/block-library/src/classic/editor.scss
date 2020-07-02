@@ -59,7 +59,7 @@
 	}
 
 	&:focus code[data-mce-selected] {
-		background: $light-gray-400;
+		background: $gray-200;
 	}
 
 	.alignright {
@@ -152,12 +152,12 @@
 		}
 
 		.loading-placeholder {
-			border: 1px dashed $light-gray-400;
+			border: 1px dashed $gray-200;
 			padding: 10px;
 		}
 
 		.wpview-error {
-			border: 1px solid $light-gray-400;
+			border: 1px solid $gray-200;
 			padding: 1em 0;
 			margin: 0;
 			word-wrap: break-word;
