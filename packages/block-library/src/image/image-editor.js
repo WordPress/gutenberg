@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import {
 	Icon,
 	search,
+	check,
 	rotateRight as rotateRightIcon,
 	aspectRatio as aspectRatioIcon,
 } from '@wordpress/icons';
@@ -37,7 +38,7 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
+function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 	return (
 		<MenuGroup label={ label }>
 			{ aspectRatios.map( ( { title, aspect } ) => (
@@ -47,6 +48,9 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 					onClick={ () => {
 						onClick( aspect );
 					} }
+					role="menuitemradio"
+					isSelected={ aspect === value }
+					icon={ aspect === value ? check : undefined }
 				>
 					{ title }
 				</MenuItem>
@@ -55,7 +59,7 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 	);
 }
 
-function AspectMenu( { isDisabled, onClick } ) {
+function AspectMenu( { isDisabled, onClick, value, defaultValue } ) {
 	return (
 		<DropdownMenu
 			icon={ aspectRatioIcon }
@@ -66,12 +70,31 @@ function AspectMenu( { isDisabled, onClick } ) {
 			{ ( { onClose } ) => (
 				<>
 					<AspectGroup
+						isDisabled={ isDisabled }
+						onClick={ ( aspect ) => {
+							onClick( aspect );
+							onClose();
+						} }
+						value={ value }
+						aspectRatios={ [
+							{
+								title: __( 'Original' ),
+								aspect: defaultValue,
+							},
+							{
+								title: __( 'Square' ),
+								aspect: 1,
+							},
+						] }
+					/>
+					<AspectGroup
 						label={ __( 'Landscape' ) }
 						isDisabled={ isDisabled }
 						onClick={ ( aspect ) => {
 							onClick( aspect );
 							onClose();
 						} }
+						value={ value }
 						aspectRatios={ [
 							{
 								title: __( '16:10' ),
@@ -98,6 +121,7 @@ function AspectMenu( { isDisabled, onClick } ) {
 							onClick( aspect );
 							onClose();
 						} }
+						value={ value }
 						aspectRatios={ [
 							{
 								title: __( '10:16' ),
@@ -114,19 +138,6 @@ function AspectMenu( { isDisabled, onClick } ) {
 							{
 								title: __( '2:3' ),
 								aspect: 2 / 3,
-							},
-						] }
-					/>
-					<AspectGroup
-						isDisabled={ isDisabled }
-						onClick={ ( aspect ) => {
-							onClick( aspect );
-							onClose();
-						} }
-						aspectRatios={ [
-							{
-								title: __( 'Square' ),
-								aspect: 1,
 							},
 						] }
 					/>
@@ -286,6 +297,8 @@ export default function ImageEditor( {
 					<AspectMenu
 						isDisabled={ inProgress }
 						onClick={ setAspect }
+						value={ aspect }
+						defaultValue={ naturalWidth / naturalHeight }
 					/>
 				</div>
 			) }
