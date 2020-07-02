@@ -1,15 +1,4 @@
 .block-editor-block-list__layout .block-editor-block-list__block { // Needs specificity to override inherited styles.
-	// While block is being dragged, dim the slot dragged from, and hide some UI.
-	&.is-dragging {
-		> * {
-			background: $light-gray-100;
-		}
-
-		> * > * {
-			visibility: hidden;
-		}
-	}
-
 	.reusable-block-edit-panel * {
 		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
 	}
