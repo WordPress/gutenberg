@@ -99,12 +99,9 @@ function createNavigationBlock( menuItems ) {
 					itemsByParentID[ item.id ]
 				);
 			}
-			const linkBlock = convertMenuItemToBlock(
-				item,
-				menuItemInnerBlocks
-			);
-			menuItemIdToClientId[ item.id ] = linkBlock.clientId;
-			innerBlocks.push( linkBlock );
+			const block = convertMenuItemToBlock( item, menuItemInnerBlocks );
+			menuItemIdToClientId[ item.id ] = block.clientId;
+			innerBlocks.push( block );
 		}
 		return innerBlocks;
 	};
