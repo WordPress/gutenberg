@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, useCallback } from '@wordpress/element';
@@ -22,15 +17,9 @@ export default function DefaultStylePicker( { blockName } ) {
 			const preferredStyleVariations =
 				settings.__experimentalPreferredStyleVariations;
 			return {
-				preferredStyle: get( preferredStyleVariations, [
-					'value',
-					blockName,
-				] ),
-				onUpdatePreferredStyleVariations: get(
-					preferredStyleVariations,
-					[ 'onChange' ],
-					null
-				),
+				preferredStyle: preferredStyleVariations?.value?.[ blockName ],
+				onUpdatePreferredStyleVariations:
+					preferredStyleVariations?.onChange ?? null,
 				styles: select( 'core/blocks' ).getBlockStyles( blockName ),
 			};
 		},
