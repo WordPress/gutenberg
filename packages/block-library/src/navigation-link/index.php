@@ -17,22 +17,13 @@ function block_core_navigation_link_render_submenu_icon() {
 /**
  * Renders the `core/navigation-link` block.
  *
+ * @param array $attributes The block attributes.
  * @param array $content The saved content.
- * @param array $block   The parsed block.
+ * @param array $block The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_core_navigation_link( $content, $block ) {
-	if ( 'core/navigation-link' !== $block['blockName'] ) {
-		return $content;
-	}
-
-	// Apply default attributes. This is currently needed because the nav link block overrides
-	// block rendering using the render_block filter. It does this to gain access to
-	// innerBlocks, but at the same time this bypasses prepare_attributes_for_render.
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$attributes = $block_type->prepare_attributes_for_render( $block['attrs'] );
-
+function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Don't render the block's subtree if it has no label.
 	if ( empty( $attributes['label'] ) ) {
 		return '';
@@ -44,7 +35,7 @@ function render_block_core_navigation_link( $content, $block ) {
 	$style_attribute = '';
 
 	$css_classes = trim( implode( ' ', $classes ) );
-	$has_submenu = count( (array) $block['innerBlocks'] ) > 0;
+	$has_submenu = count( $block->inner_blocks ) > 0;
 	$is_active   = ! empty( $attributes['id'] ) && ( get_the_ID() === $attributes['id'] );
 
 	$class_name = ! empty( $attributes['className'] ) ? implode( ' ', (array) $attributes['className'] ) : false;
@@ -106,7 +97,10 @@ function render_block_core_navigation_link( $content, $block ) {
 	// End anchor tag content.
 
 	if ( $has_submenu ) {
-		$inner_blocks_html = implode( array_map( 'render_block', $block['innerBlocks'] ) );
+		$inner_blocks_html = '';
+		foreach ( $block->inner_blocks as $inner_block ) {
+			$inner_blocks_html .= $inner_block->render();
+		}
 
 		// TODO - classname is wrong!
 		$html .= sprintf(
@@ -128,8 +122,10 @@ function render_block_core_navigation_link( $content, $block ) {
  */
 function register_block_core_navigation_link() {
 	register_block_type_from_metadata(
-		__DIR__ . '/navigation-link'
+		__DIR__ . '/navigation-link',
+		array(
+			'render_callback' => 'render_block_core_navigation_link',
+		)
 	);
 }
 add_action( 'init', 'register_block_core_navigation_link' );
-add_filter( 'render_block', 'render_block_core_navigation_link', 10, 2 );

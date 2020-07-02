@@ -97,23 +97,13 @@ function block_core_navigation_render_submenu_icon() {
 /**
  * Renders the `core/navigation` block on server.
  *
+ * @param array $attributes The block attributes.
  * @param array $content The saved content.
  * @param array $block The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_core_navigation( $content, $block ) {
-
-	if ( 'core/navigation' !== $block['blockName'] ) {
-		return $content;
-	}
-
-	// Apply default attributes. This is currently needed because the nav block overrides
-	// block rendering using the render_block filter. It does this to gain access to
-	// innerBlocks, but at the same time this bypasses prepare_attributes_for_render.
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$attributes = $block_type->prepare_attributes_for_render( $block['attrs'] );
-
+function render_block_core_navigation( $attributes, $content, $block ) {
 	/**
 	 * Deprecated:
 	 * The rgbTextColor and rgbBackgroundColor attributes
@@ -131,7 +121,7 @@ function render_block_core_navigation( $content, $block ) {
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-	if ( empty( $block['innerBlocks'] ) ) {
+	if ( empty( $block->inner_blocks ) ) {
 		return '';
 	}
 
@@ -152,8 +142,10 @@ function render_block_core_navigation( $content, $block ) {
 		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
 		: '';
 
-	// Render inner blocks.
-	$inner_blocks_html = implode( array_map( 'render_block', $block['innerBlocks'] ) );
+	$inner_blocks_html = '';
+	foreach ( $block->inner_blocks as $inner_block ) {
+		$inner_blocks_html .= $inner_block->render();
+	}
 
 	return sprintf(
 		'<nav %1$s %2$s><ul class="wp-block-navigation__container">%3$s</ul></nav>',
@@ -171,9 +163,11 @@ function render_block_core_navigation( $content, $block ) {
  */
 function register_block_core_navigation() {
 	register_block_type_from_metadata(
-		__DIR__ . '/navigation'
+		__DIR__ . '/navigation',
+		array(
+			'render_callback' => 'render_block_core_navigation',
+		)
 	);
 }
 
 add_action( 'init', 'register_block_core_navigation' );
-add_filter( 'render_block', 'render_block_core_navigation', 10, 2 );
