@@ -40,6 +40,7 @@ import { crop, upload } from '@wordpress/icons';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import ImageEditor from './image-editor';
+import { isExternalImage } from './edit';
 
 /**
  * Module constants
@@ -106,6 +107,7 @@ export default function Image( {
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
+	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const imageSizeOptions = map(
@@ -120,6 +122,20 @@ export default function Image( {
 			setCaptionFocused( false );
 		}
 	}, [ isSelected ] );
+
+	// If an image is externally hosted, try to fetch the image data. This may
+	// fail if the image host doesn't allow CORS with the domain. If it works,
+	// we can enable a button in the toolbar to upload the image.
+	useEffect( () => {
+		if ( ! isExternalImage( id, url ) || ! isSelected || externalBlob ) {
+			return;
+		}
+
+		window
+			.fetch( url )
+			.then( ( response ) => response.blob() )
+			.then( ( blob ) => setExternalBlob( blob ) );
+	}, [ id, url, isSelected, externalBlob ] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -183,37 +199,25 @@ export default function Image( {
 	}
 
 	function uploadExternal() {
-		window
-			.fetch( url )
-			.then( ( response ) => response.blob() )
-			.then( ( blob ) => {
-				mediaUpload( {
-					filesList: [ blob ],
-					onFileChange( [ img ] ) {
-						onSelectImage( img );
+		mediaUpload( {
+			filesList: [ externalBlob ],
+			onFileChange( [ img ] ) {
+				onSelectImage( img );
 
-						if ( isBlobURL( img.url ) ) {
-							return;
-						}
+				if ( isBlobURL( img.url ) ) {
+					return;
+				}
 
-						createSuccessNotice( __( 'Image uploaded.' ), {
-							type: 'snackbar',
-						} );
-					},
-					allowedTypes: ALLOWED_MEDIA_TYPES,
-					onError( message ) {
-						createErrorNotice( message, { type: 'snackbar' } );
-					},
+				setExternalBlob();
+				createSuccessNotice( __( 'Image uploaded.' ), {
+					type: 'snackbar',
 				} );
-			} )
-			.catch( () => {
-				createErrorNotice(
-					__(
-						'The image host doesn’t allow access from a script. Please download and upload the image manually.'
-					),
-					{ type: 'snackbar' }
-				);
-			} );
+			},
+			allowedTypes: ALLOWED_MEDIA_TYPES,
+			onError( message ) {
+				createErrorNotice( message, { type: 'snackbar' } );
+			},
+		} );
 	}
 
 	useEffect( () => {
@@ -250,7 +254,7 @@ export default function Image( {
 						/>
 					</ToolbarGroup>
 				) }
-				{ ! id && (
+				{ externalBlob && (
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ uploadExternal }
