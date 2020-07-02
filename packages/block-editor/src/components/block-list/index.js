@@ -72,7 +72,8 @@ function BlockList(
 		rootClientId,
 	} );
 
-	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
+	const isDroppingAtEndOfBlockList =
+		dropTargetIndex === blockClientIds.length;
 
 	return (
 		<Container
@@ -89,7 +90,10 @@ function BlockList(
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
-				const isDropTarget = dropTargetIndex === index;
+				const isDroppingBefore = dropTargetIndex === index;
+				const isDroppingAfter =
+					isDroppingAtEndOfBlockList &&
+					index === blockClientIds.length - 1;
 
 				return (
 					<AsyncModeProvider
@@ -105,9 +109,10 @@ function BlockList(
 							index={ index }
 							enableAnimation={ enableAnimation }
 							className={ classnames( {
-								'is-drop-target': isDropTarget,
+								'is-dropping-before': isDroppingBefore,
+								'is-dropping-after': isDroppingAfter,
 								'is-dropping-horizontally':
-									isDropTarget &&
+									( isDroppingBefore || isDroppingAfter ) &&
 									orientation === 'horizontal',
 							} ) }
 						/>
@@ -118,11 +123,6 @@ function BlockList(
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={ classnames( {
-					'is-drop-target': isAppenderDropTarget,
-					'is-dropping-horizontally':
-						isAppenderDropTarget && orientation === 'horizontal',
-				} ) }
 			/>
 		</Container>
 	);
