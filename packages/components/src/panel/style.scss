@@ -133,7 +133,8 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-top: 20px;
+	margin-top: $grid-unit-10;
+	min-height: $button-size;
 
 	select {
 		// Necessary for select to respond to flexbox
@@ -141,7 +142,7 @@
 	}
 
 	label {
-		margin-right: 10px;
+		margin-right: $grid-unit-15;
 		flex-shrink: 0;
 		max-width: 75%;
 	}

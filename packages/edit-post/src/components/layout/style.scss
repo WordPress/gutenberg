@@ -34,7 +34,7 @@
 		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
 		top: $admin-bar-height;
 		left: auto;
-		width: $sidebar-width;
+		width: $sidebar-width + $border-width;
 		border-left: $border-width solid $light-gray-500;
 		transform: translateX(+100%);
 		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
