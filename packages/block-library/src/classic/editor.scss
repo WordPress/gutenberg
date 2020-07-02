@@ -22,7 +22,7 @@
 		white-space: pre-wrap;
 		font-family: $editor-html-font;
 		font-size: $text-editor-font-size;
-		color: $dark-gray-800;
+		color: $dark-gray-primary;
 	}
 
 	> *:first-child {
@@ -52,7 +52,7 @@
 	code {
 		padding: 2px;
 		border-radius: 2px;
-		color: $dark-gray-800;
+		color: $dark-gray-primary;
 		background: $light-gray-200;
 		font-family: $editor-html-font;
 		font-size: 14px;
@@ -275,7 +275,7 @@ div[data-type="core/freeform"] {
 	.mce-btn.mce-active:hover button,
 	.mce-btn.mce-active i,
 	.mce-btn.mce-active:hover i {
-		color: $dark-gray-800;
+		color: $dark-gray-primary;
 	}
 
 	// Prevent toolbar clipping on heading style in RTL languages
