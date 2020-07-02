@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -109,6 +115,8 @@ export const errorNotices = ( state = {}, action ) => {
 					isFatal: action.isFatal,
 				},
 			};
+		case 'CLEAR_ERROR_NOTICE':
+			return omit( state, action.blockId );
 	}
 	return state;
 };

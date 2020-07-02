@@ -215,8 +215,7 @@ export function setErrorNotice( blockId, message, isFatal = false ) {
  */
 export function clearErrorNotice( blockId ) {
 	return {
-		type: 'SET_ERROR_NOTICE',
+		type: 'CLEAR_ERROR_NOTICE',
 		blockId,
-		notice: undefined,
 	};
 }
