@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { Flex, FlexItem } from '@wordpress/components';
-import { stack, handle } from '@wordpress/icons';
+import { handle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,13 +18,6 @@ export default function BlockDraggableChip( { clientIds } ) {
 			const { getBlockName } = select( 'core/block-editor' );
 			const [ firstId ] = clientIds;
 			const blockName = getBlockName( firstId );
-			const isOfSameType = clientIds.every(
-				( id ) => getBlockName( id ) === blockName
-			);
-
-			if ( ! isOfSameType ) {
-				return stack;
-			}
 
 			return getBlockType( blockName ).icon;
 		},
