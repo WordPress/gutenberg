@@ -472,3 +472,24 @@ add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_cont
  * @see WP_Block::render
  */
 remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
+
+/**
+ * Filters a REST query ordered by menu_order to ensure a repeatable sequence over multiple pages.
+ *
+ * This can be removed when WordPress core supports pagination of requests ordering on menu_order.
+ *
+ * @see https://core.trac.wordpress.org/ticket/46294
+ *
+ * @param string $orderby Current orderby value.
+ * @param WP_Query $query Query object.
+ */
+function gutenberg_posts_orderby( $orderby, $query ) {
+	global $wpdb;
+	if ( defined('REST_REQUEST') && REST_REQUEST ) {
+		if ( $query->query['orderby'] === 'menu_order' ) {
+			$orderby = "$wpdb->posts.menu_order,post_title,id asc";
+		}
+	}
+	return $orderby;
+}
+add_filter( 'posts_orderby', 'gutenberg_posts_orderby', 10, 2 );
