@@ -16,6 +16,7 @@ export default function save( { attributes } ) {
 		foot,
 		backgroundColor,
 		caption,
+		figure,
 	} = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
 
@@ -34,6 +35,8 @@ export default function save( { attributes } ) {
 	} );
 
 	const hasCaption = ! RichText.isEmpty( caption );
+
+	const Wrapper = figure ? 'figure' : 'div';
 
 	const Section = ( { type, rows } ) => {
 		if ( ! rows.length ) {
@@ -77,15 +80,18 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<figure>
+		<Wrapper>
 			<table className={ classes === '' ? undefined : classes }>
+				{ hasCaption && ! figure && (
+					<RichText.Content tagName="caption" value={ caption } />
+				) }
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />
 			</table>
-			{ hasCaption && (
+			{ hasCaption && figure && (
 				<RichText.Content tagName="figcaption" value={ caption } />
 			) }
-		</figure>
+		</Wrapper>
 	);
 }

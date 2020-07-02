@@ -129,6 +129,7 @@ export class TableEdit extends Component {
 			this
 		);
 		this.getCellAlignment = this.getCellAlignment.bind( this );
+		this.onChangeWrapFigure = this.onChangeWrapFigure.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -185,6 +186,16 @@ export class TableEdit extends Component {
 		const { hasFixedLayout } = attributes;
 
 		setAttributes( { hasFixedLayout: ! hasFixedLayout } );
+	}
+
+	/**
+	 * Toggles whether the table has a fixed layout or not.
+	 */
+	onChangeWrapFigure() {
+		const { attributes, setAttributes } = this.props;
+		const { figure } = attributes;
+
+		setAttributes( { figure: ! figure } );
 	}
 
 	/**
@@ -560,7 +571,14 @@ export class TableEdit extends Component {
 			insertBlocksAfter,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
-		const { hasFixedLayout, caption, head, body, foot } = attributes;
+		const {
+			hasFixedLayout,
+			caption,
+			head,
+			body,
+			foot,
+			figure,
+		} = attributes;
 		const isEmpty =
 			isEmptyTableSection( head ) &&
 			isEmptyTableSection( body ) &&
@@ -656,6 +674,11 @@ export class TableEdit extends Component {
 							label={ __( 'Footer section' ) }
 							checked={ !! ( foot && foot.length ) }
 							onChange={ this.onToggleFooterSection }
+						/>
+						<ToggleControl
+							label={ __( 'Wrap table in figure tag' ) }
+							checked={ !! figure }
+							onChange={ this.onChangeWrapFigure }
 						/>
 					</PanelBody>
 					<PanelColorSettings
