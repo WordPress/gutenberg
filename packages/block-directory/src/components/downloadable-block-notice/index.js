@@ -23,7 +23,7 @@ export const DownloadableBlockNotice = ( { block, onClick } ) => {
 			className="block-directory-downloadable-block-notice"
 		>
 			<div className="block-directory-downloadable-block-notice__content">
-				{ errorNotice.msg }
+				{ errorNotice.message }
 			</div>
 			<Button
 				isSmall

@@ -90,7 +90,7 @@ export function* installBlockType( block ) {
 
 		success = true;
 	} catch ( error ) {
-		let msg = error.message || __( 'An error occurred.' );
+		let message = error.message || __( 'An error occurred.' );
 
 		// Errors we throw are fatal
 		let isFatal = error instanceof Error;
@@ -107,10 +107,10 @@ export function* installBlockType( block ) {
 
 		if ( fatalAPIErrors[ error.code ] ) {
 			isFatal = true;
-			msg = fatalAPIErrors[ error.code ];
+			message = fatalAPIErrors[ error.code ];
 		}
 
-		yield setErrorNotice( id, msg, isFatal );
+		yield setErrorNotice( id, message, isFatal );
 	}
 	yield setIsInstalling( block.id, false );
 	return success;
@@ -192,17 +192,17 @@ export function setIsInstalling( blockId, isInstalling ) {
  * Sets an error notice string to be displayed to the user
  *
  * @param {string} blockId The ID of the block plugin. eg: my-block
- * @param {string} msg  The message shown in the notice.
+ * @param {string} message  The message shown in the notice.
  * @param {boolean} isFatal Whether the user can recover from the error
  *
  * @return {Object} Action object.
  */
-export function setErrorNotice( blockId, msg, isFatal = false ) {
+export function setErrorNotice( blockId, message, isFatal = false ) {
 	return {
 		type: 'SET_ERROR_NOTICE',
 		blockId,
 		notice: {
-			msg,
+			message,
 			isFatal,
 		},
 	};
