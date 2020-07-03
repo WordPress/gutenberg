@@ -55,6 +55,15 @@ const MOCK_INSTALLED_BLOCK_PLUGIN_DETAILS = {
 	requires_wp: '',
 	requires_php: '',
 	text_domain: 'block-directory-test-block',
+	_links: [
+		{
+			self: [
+				{
+					href: '',
+				},
+			],
+		},
+	],
 };
 
 const MOCK_BLOCK2 = {
