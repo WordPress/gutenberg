@@ -24,6 +24,14 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="activateTheme" href="#activateTheme">#</a> **activateTheme**
+
+Activates an installed theme.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+
 <a name="arePrePublishChecksEnabled" href="#arePrePublishChecksEnabled">#</a> **arePrePublishChecksEnabled**
 
 Verifies if publish checks are enabled.
@@ -320,6 +328,15 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 -   _searchTerm_ `?string`: If the plugin is not findable by its slug use an alternative term to search.
+
+<a name="installTheme" href="#installTheme">#</a> **installTheme**
+
+Installs a theme from the WP.org repository.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _searchTerm_ `?string`: Search term to use if the theme is not findable by its slug.
 
 <a name="isCurrentURL" href="#isCurrentURL">#</a> **isCurrentURL**
 

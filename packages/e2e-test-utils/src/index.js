@@ -1,4 +1,5 @@
 export { activatePlugin } from './activate-plugin';
+export { activateTheme } from './activate-theme';
 export { arePrePublishChecksEnabled } from './are-pre-publish-checks-enabled';
 export { clearLocalStorage } from './clear-local-storage';
 export { clickBlockAppender } from './click-block-appender';
@@ -34,6 +35,7 @@ export {
 	closeGlobalBlockInserter,
 } from './inserter';
 export { installPlugin } from './install-plugin';
+export { installTheme } from './install-theme';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
