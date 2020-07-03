@@ -68,7 +68,7 @@ public struct FallbackJavascriptInjection {
             try script(with: .retrieveHtml),
         ]
 
-        insertBlockScript = try script(with: .insertBlock, argument: blockHTML)
+        insertBlockScript = try script(with: .insertBlock, argument: blockHTML.replacingOccurrences(of: "\\n", with: "\\\\n"))
         injectCssScript = try script(with: .injectCss)
         injectWPBarsCssScript = try getInjectCssScript(with: .wpBarsStyle)
         injectEditorCssScript = try getInjectCssScript(with: .editorStyle)

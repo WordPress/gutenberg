@@ -313,10 +313,7 @@ export class BlockList extends Component {
 
 export default compose( [
 	withSelect(
-		(
-			select,
-			{ rootClientId, __experimentalMoverDirection, filterInnerBlocks }
-		) => {
+		( select, { rootClientId, orientation, filterInnerBlocks } ) => {
 			const {
 				getBlockCount,
 				getBlockOrder,
@@ -326,8 +323,7 @@ export default compose( [
 				getBlockHierarchyRootClientId,
 			} = select( 'core/block-editor' );
 
-			const isStackedHorizontally =
-				__experimentalMoverDirection === 'horizontal';
+			const isStackedHorizontally = orientation === 'horizontal';
 
 			const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -339,11 +335,11 @@ export default compose( [
 
 			const isReadOnly = getSettings().readOnly;
 
+			const blockCount = getBlockCount( rootBlockId );
+
 			const rootBlockId = getBlockHierarchyRootClientId(
 				selectedBlockClientId
 			);
-
-			const blockCount = getBlockCount( rootBlockId );
 			const hasRootInnerBlocks = !! blockCount;
 
 			const isFloatingToolbarVisible =
@@ -380,13 +376,7 @@ class EmptyListComponent extends Component {
 			shouldShowInsertionPoint,
 			rootClientId,
 			renderAppender,
-			renderFooterAppender,
 		} = this.props;
-
-		if ( renderFooterAppender ) {
-			return null;
-		}
-
 		return (
 			<View style={ styles.defaultAppender }>
 				<ReadableContentView>
@@ -402,16 +392,14 @@ class EmptyListComponent extends Component {
 }
 
 const EmptyListComponentCompose = compose( [
-	withSelect( ( select, { rootClientId, __experimentalMoverDirection } ) => {
+	withSelect( ( select, { rootClientId, orientation } ) => {
 		const {
 			getBlockOrder,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 		} = select( 'core/block-editor' );
 
-		const isStackedHorizontally =
-			__experimentalMoverDirection === 'horizontal';
-
+		const isStackedHorizontally = orientation === 'horizontal';
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();

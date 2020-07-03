@@ -6,12 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import {
-	blockManagement,
-	downloadableBlocks,
-	errorNotices,
-	hasPermission,
-} from '../reducer';
+import { blockManagement, downloadableBlocks, errorNotices } from '../reducer';
 import { blockTypeInstalled, downloadableBlock } from './fixtures';
 
 describe( 'state', () => {
@@ -86,17 +81,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state.installedBlockTypes ).toHaveLength( 0 );
-		} );
-	} );
-
-	describe( 'hasPermission()', () => {
-		it( 'should update permissions appropriately', () => {
-			const state = hasPermission( true, {
-				type: 'SET_INSTALL_BLOCKS_PERMISSION',
-				hasPermission: false,
-			} );
-
-			expect( state ).toEqual( false );
 		} );
 	} );
 

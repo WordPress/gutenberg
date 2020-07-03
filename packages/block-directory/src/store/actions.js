@@ -39,18 +39,6 @@ export function receiveDownloadableBlocks( downloadableBlocks, filterValue ) {
 }
 
 /**
- * Returns an action object used in signalling that the user does not have
- * permission to install blocks.
- *
- * @param {boolean} hasPermission User has permission to install blocks.
- *
- * @return {Object} Action object.
- */
-export function setInstallBlocksPermission( hasPermission ) {
-	return { type: 'SET_INSTALL_BLOCKS_PERMISSION', hasPermission };
-}
-
-/**
  * Action triggered to install a block plugin.
  *
  * @param {Object} block The block item returned by search.
@@ -67,7 +55,7 @@ export function* installBlockType( block ) {
 		}
 		yield setIsInstalling( block.id, true );
 		const response = yield apiFetch( {
-			path: '__experimental/plugins',
+			path: 'wp/v2/plugins',
 			data: {
 				slug: block.id,
 				status: 'active',

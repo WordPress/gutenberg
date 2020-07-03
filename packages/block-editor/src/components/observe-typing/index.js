@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { over, includes } from 'lodash';
+import { over } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,7 +39,7 @@ const KEY_DOWN_ELIGIBLE_KEY_CODES = [ UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE ];
  */
 function isKeyDownEligibleForStartTyping( event ) {
 	const { keyCode, shiftKey } = event;
-	return ! shiftKey && includes( KEY_DOWN_ELIGIBLE_KEY_CODES, keyCode );
+	return ! shiftKey && KEY_DOWN_ELIGIBLE_KEY_CODES.includes( keyCode );
 }
 
 function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {

@@ -6,6 +6,7 @@ import {
 	insertBlock,
 	disablePrePublishChecks,
 	visitAdminPage,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -13,7 +14,6 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { useExperimentalFeatures } from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Template Part', () => {
 	useExperimentalFeatures( [
@@ -22,12 +22,12 @@ describe( 'Template Part', () => {
 	] );
 
 	beforeAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	describe( 'Template part block', () => {

@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -167,7 +168,7 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 function computeCustomizedAttribute( blocks, menuId, menuItemsByClientId ) {
 	const blocksList = blocksTreeToFlatList( blocks );
 	const dataList = blocksList.map( ( { block, parentId, position } ) =>
-		linkBlockToRequestItem( block, parentId, position )
+		blockToRequestItem( block, parentId, position )
 	);
 
 	// Create an object like { "nav_menu_item[12]": {...}} }
@@ -195,14 +196,29 @@ function computeCustomizedAttribute( blocks, menuId, menuItemsByClientId ) {
 		);
 	}
 
-	function linkBlockToRequestItem( block, parentId, position ) {
+	function blockToRequestItem( block, parentId, position ) {
 		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
+
+		let attributes;
+
+		if ( block.name === 'core/navigation-link' ) {
+			attributes = {
+				type: 'custom',
+				title: block.attributes?.label,
+				original_title: '',
+				url: block.attributes.url,
+			};
+		} else {
+			attributes = {
+				type: 'html',
+				content: serialize( block ),
+			};
+		}
+
 		return {
 			...menuItem,
+			...attributes,
 			position,
-			title: block.attributes?.label,
-			url: block.attributes.url,
-			original_title: '',
 			classes: ( menuItem.classes || [] ).join( ' ' ),
 			xfn: ( menuItem.xfn || [] ).join( ' ' ),
 			nav_menu_term_id: menuId,

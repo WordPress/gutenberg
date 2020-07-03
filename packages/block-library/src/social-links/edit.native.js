@@ -93,7 +93,7 @@ function SocialLinksEdit( {
 			renderFooterAppender={
 				shouldRenderFooterAppender && renderFooterAppender.current
 			}
-			__experimentalMoverDirection={ 'horizontal' }
+			orientation={ 'horizontal' }
 			onDeleteBlock={ shouldDelete ? onDelete : undefined }
 			marginVertical={ spacing }
 			marginHorizontal={ spacing }
