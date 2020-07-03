@@ -155,9 +155,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
                                                                     String content,
                                                                     String blockId,
-                                                                    String blockName) {
+                                                                    String blockName,
+                                                                    String blockTitle) {
                 mReplaceUnsupportedBlockCallback = replaceUnsupportedBlockCallback;
-                openGutenbergWebView(content, blockId, blockName);
+                openGutenbergWebView(content, blockId, blockTitle);
             }
 
             @Override

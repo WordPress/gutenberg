@@ -4,7 +4,7 @@
 import { installBlockType, uninstallBlockType } from '../actions';
 
 describe( 'actions', () => {
-	const endpoint = '/wp-json/__experimental/plugins/block/block';
+	const endpoint = '/wp-json/wp/v2/plugins/block/block';
 	const item = {
 		id: 'block/block',
 		name: 'Test Block',
@@ -43,7 +43,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					path: '__experimental/plugins',
+					path: 'wp/v2/plugins',
 					method: 'POST',
 				},
 			} );
@@ -122,7 +122,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					path: '__experimental/plugins',
+					path: 'wp/v2/plugins',
 					method: 'POST',
 				},
 			} );
