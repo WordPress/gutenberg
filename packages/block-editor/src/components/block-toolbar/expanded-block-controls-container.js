@@ -98,7 +98,7 @@ function ExpandedBlockControlsHandler( { fills, className = '', children } ) {
 	const displayFill = fills[ 0 ];
 	return (
 		<div
-			className="block-editor-block-toolbar-width-container"
+			className="block-editor-block-toolbar-animated-width-container"
 			ref={ containerRef }
 			style={ dimensions }
 		>
