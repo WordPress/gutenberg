@@ -6,6 +6,7 @@ import {
 	insertBlock,
 	publishPost,
 	visitAdminPage,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -13,7 +14,6 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { useExperimentalFeatures } from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -58,8 +58,8 @@ describe( 'Multi-entity save flow', () => {
 	] );
 
 	beforeAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	describe( 'Post Editor', () => {
