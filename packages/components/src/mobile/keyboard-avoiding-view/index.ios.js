@@ -3,18 +3,71 @@
  */
 import {
 	KeyboardAvoidingView as IOSKeyboardAvoidingView,
+	Animated,
+	Keyboard,
 	Dimensions,
 } from 'react-native';
 
-export const KeyboardAvoidingView = ( { parentHeight, ...otherProps } ) => {
+/**
+ * WordPress dependencies
+ */
+import { useState, useEffect, useRef } from '@wordpress/element';
+
+const AnimatedKeyboardAvoidingView = Animated.createAnimatedComponent(
+	IOSKeyboardAvoidingView
+);
+
+const MIN_HEIGHT = 44;
+
+export const KeyboardAvoidingView = ( {
+	parentHeight,
+	style,
+	...otherProps
+} ) => {
+	const [ keyboardHeight, setKeyboardHeight ] = useState( 0 );
+	const animatedHeight = useRef( new Animated.Value( 44 ) ).current;
+
 	const { height: fullHeight } = Dimensions.get( 'window' );
 	const keyboardVerticalOffset = fullHeight - parentHeight;
 
+	useEffect( () => {
+		Keyboard.addListener( 'keyboardWillShow', onKeyboardWillShow );
+		Keyboard.addListener( 'keyboardWillHide', onKeyboardWillHide );
+		return () => {
+			Keyboard.removeListener( 'keyboardWillShow', onKeyboardWillShow );
+			Keyboard.removeListener( 'keyboardWillHide', onKeyboardWillHide );
+		};
+	}, [] );
+
+	useEffect( () => {
+		animate();
+	}, [ keyboardHeight ] );
+
+	function onKeyboardWillShow( e ) {
+		setKeyboardHeight( e.endCoordinates.height );
+	}
+
+	function onKeyboardWillHide(): void {
+		setKeyboardHeight( 0 );
+	}
+
+	const paddedKeyboardHeight =
+		keyboardHeight +
+		( style.bottom ? MIN_HEIGHT - style.bottom : MIN_HEIGHT );
+
+	function animate() {
+		Animated.timing( animatedHeight, {
+			toValue: keyboardHeight ? paddedKeyboardHeight : MIN_HEIGHT,
+			duration: keyboardHeight ? 0 : 150,
+		} ).start();
+	}
+
 	return (
-		<IOSKeyboardAvoidingView
+		<AnimatedKeyboardAvoidingView
 			{ ...otherProps }
 			behavior="padding"
 			keyboardVerticalOffset={ keyboardVerticalOffset }
+			style={ [ style, { height: animatedHeight } ] }
 		/>
 	);
 };
