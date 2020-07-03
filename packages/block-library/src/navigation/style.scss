@@ -2,7 +2,7 @@
 .wp-block-navigation,
 .wp-block-navigation.is-style-light {
 	.wp-block-navigation-link:not(.has-text-color) {
-		color: $dark-gray-primary;
+		color: $gray-900;
 	}
 	&:not(.has-background) .wp-block-navigation__container {
 		background-color: $white;
@@ -15,7 +15,7 @@
 		color: $white;
 	}
 	&:not(.has-background) .wp-block-navigation__container {
-		background-color: $dark-gray-primary;
+		background-color: $gray-900;
 	}
 }
 

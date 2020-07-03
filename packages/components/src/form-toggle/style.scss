@@ -13,7 +13,7 @@ $toggle-border-width: 1px;
 		box-sizing: border-box;
 		vertical-align: top;
 		background-color: $white;
-		border: $toggle-border-width solid $dark-gray-primary;
+		border: $toggle-border-width solid $gray-900;
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: $toggle-height / 2;
@@ -32,8 +32,8 @@ $toggle-border-width: 1px;
 		border-radius: 50%;
 		transition: 0.1s transform ease;
 		@include reduce-motion("transition");
-		background-color: $dark-gray-primary;
-		border: 5px solid $dark-gray-primary; // Has explicit border to act as a fill in Windows High Contrast Mode.
+		background-color: $gray-900;
+		border: 5px solid $gray-900; // Has explicit border to act as a fill in Windows High Contrast Mode.
 	}
 
 	// Checked state.
