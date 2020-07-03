@@ -557,6 +557,18 @@ _Parameters_
 
 -   _name_ `string`: Block name.
 
+<a name="trashAllPosts" href="#trashAllPosts">#</a> **trashAllPosts**
+
+Navigates to the post listing screen and bulk-trashes any posts which exist.
+
+_Parameters_
+
+-   _postType_ `string`: String slug for type of post to trash.
+
+_Returns_
+
+-   `Promise`: Promise resolving once posts have been trashed.
+
 <a name="uninstallPlugin" href="#uninstallPlugin">#</a> **uninstallPlugin**
 
 Uninstalls a plugin.

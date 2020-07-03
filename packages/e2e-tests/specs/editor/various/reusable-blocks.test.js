@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	searchForReusableBlock,
 	getEditedPostContent,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 
 function waitForAndAcceptDialog() {
@@ -20,6 +21,10 @@ function waitForAndAcceptDialog() {
 describe( 'Reusable blocks', () => {
 	beforeAll( async () => {
 		await createNewPost();
+	} );
+
+	afterAll( async () => {
+		await trashAllPosts( 'wp_block' );
 	} );
 
 	beforeEach( async () => {
