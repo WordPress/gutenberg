@@ -47,7 +47,7 @@ function CustomizableBlockToolbarContentChildren( {
 
 	const fillsPropRef = useRef();
 	fillsPropRef.current = fills;
-	const resize = useCallback(
+	const resizeToolbar = useCallback(
 		throttle( ( elem ) => {
 			if ( ! elem ) {
 				elem = fillsPropRef.current.length
@@ -79,7 +79,7 @@ function CustomizableBlockToolbarContentChildren( {
 				( { type } ) => type === 'childList'
 			);
 			if ( hasChildList ) {
-				resize();
+				resizeToolbar();
 			}
 		} );
 
