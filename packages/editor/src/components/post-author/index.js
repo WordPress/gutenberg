@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
 import ComboboxControl from '../../../../components/build/combobox-control/';
 import PostAuthorCheck from './check';
 
+let latestAvailableAuthors;
 function PostAuthor() {
 	const authors = useSelect( ( select ) => select( 'core' ).getAuthors() );
 	const postAuthor = useSelect( ( select ) =>
@@ -96,8 +97,16 @@ function PostAuthor() {
 					id: author.id,
 				} ) );
 		},
-		[ fieldValue, postAuthor ]
+		[ fieldValue, postAuthor, isLoading ]
 	);
+
+	const isLoading = useSelect( ( select ) => {
+		return select( 'core/data' ).isResolving( 'core', 'getAuthors', [ { search: fieldValue } ] );
+	}, [ availableAuthors, fieldValue ] );
+
+	if ( ! isLoading ) {
+		latestAvailableAuthors = availableAuthors;
+	}
 
 	if ( ! postAuthor ) {
 		return null;
@@ -109,11 +118,12 @@ function PostAuthor() {
 		<PostAuthorCheck>
 			<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
 			<ComboboxControl
-				options={ availableAuthors }
+				options={ latestAvailableAuthors }
 				initialInputValue={ postAuthor?.name }
 				onInputValueChange={ debounce( handleKeydown, 300 ) }
 				onChange={ handleSelect }
 				initialHighlightedIndex={ foundAuthor }
+				isLoading={ isLoading }
 			/>
 		</PostAuthorCheck>
 	);
