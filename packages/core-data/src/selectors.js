@@ -16,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-
+import getQueryParts from './queried-data/get-query-parts';
 /**
  * Returns true if a request is in progress for embed preview data, or false
  * otherwise.
@@ -45,7 +45,8 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  * @return {Array} Authors list.
  */
 export function getAuthors( state, query = {} ) {
-	return getUserQueryResults( state, `authors::${ query?.search }` );
+	const { stableKey } = getQueryParts( query );
+	return getUserQueryResults( state, `authors::${ stableKey }` );
 }
 
 /**

@@ -25,6 +25,7 @@ import {
 import { getKindEntities } from './entities';
 import { apiFetch, resolveSelect } from './controls';
 import { ifNotResolved } from './utils';
+import getQueryParts from './queried-data/get-query-parts';
 
 /**
  * Requests authors from the REST API.
@@ -37,8 +38,9 @@ export function* getAuthors( query = {} ) {
 	const users = yield apiFetch( {
 		path,
 	} );
+	const { stableKey } = getQueryParts( query );
 
-	yield receiveUserQuery( `authors::${ query?.search }`, users );
+	yield receiveUserQuery( `authors::${ stableKey }`, users );
 }
 
 /**
