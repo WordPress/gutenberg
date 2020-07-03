@@ -117,13 +117,9 @@ export function MediaPlaceholder( {
 		let setMedia;
 		if ( multiple ) {
 			if ( addToGallery ) {
-				// To allow changes to a gallery to be made while uploads are in progress
-				// (including trigging multiple upload groups and removing already in place images),
-				// we must be able to add newMedia based on the current value of the Gallery
-				// whenever the setMedia function runs (not destructuring 'value' from props).
-				// Additionally, since the setMedia function runs multiple times per upload group
+				// Since the setMedia function runs multiple times per upload group
 				// and is passed newMedia containing every item in its group each time, we must
-				// also filter out whatever this upload group had previously returned to the
+				// filter out whatever this upload group had previously returned to the
 				// gallery before adding and returning the image array with replacement newMedia
 				// values.
 
@@ -135,13 +131,13 @@ export function MediaPlaceholder( {
 					const filteredMedia = ( value || [] ).filter( ( item ) => {
 						// If Item has id, only remove it if lastMediaPassed has an item with that id.
 						if ( item.id ) {
-							return lastMediaPassed.every(
+							return ! lastMediaPassed.some(
 								// Be sure to convert to number for comparison.
 								( { id } ) => Number( id ) === Number( item.id )
 							);
 						}
 						// Compare transient images via .includes since gallery may append extra info onto the url.
-						return lastMediaPassed.every( ( { urlSlug } ) =>
+						return ! lastMediaPassed.some( ( { urlSlug } ) =>
 							item.url.includes( urlSlug )
 						);
 					} );
