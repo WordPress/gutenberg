@@ -29,9 +29,8 @@ describe( 'actions', () => {
 			const generator = installBlockType( item );
 
 			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
+				type: 'CLEAR_ERROR_NOTICE',
 				blockId: item.id,
-				notice: false,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -82,9 +81,8 @@ describe( 'actions', () => {
 			const generator = installBlockType( { ...item, assets: [] } );
 
 			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
+				type: 'CLEAR_ERROR_NOTICE',
 				blockId: item.id,
-				notice: false,
 			} );
 
 			expect( generator.next().value ).toMatchObject( {
@@ -108,9 +106,8 @@ describe( 'actions', () => {
 			const generator = installBlockType( item );
 
 			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
+				type: 'CLEAR_ERROR_NOTICE',
 				blockId: item.id,
-				notice: false,
 			} );
 
 			expect( generator.next().value ).toEqual( {
