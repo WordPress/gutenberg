@@ -44,6 +44,10 @@
 		top: 0;
 	}
 }
+.components-combobox-control__menu.is-loading {
+	color: $gray-200;
+	pointer-events: none;
+}
 
 .components-combobox-control__menu {
 	background: $white;
