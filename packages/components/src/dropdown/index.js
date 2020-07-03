@@ -95,6 +95,7 @@ export default function Dropdown( {
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
 					{ ...popoverProps }
+					anchorRef={ containerRef.current }
 					className={ classnames(
 						'components-dropdown__content',
 						popoverProps ? popoverProps.className : undefined,
