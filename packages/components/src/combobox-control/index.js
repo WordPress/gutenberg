@@ -43,12 +43,9 @@ export default function ComboboxControl( {
 		initialHighlightedIndex,
 	} );
 	const menuProps = getMenuProps( {
-		className: classnames(
-			'components-combobox-control__menu',
-			{
-				'is-loading': isLoading,
-			}
-		),
+		className: classnames( 'components-combobox-control__menu', {
+			'is-loading': isLoading,
+		} ),
 	} );
 	// We need this here, because the null active descendant is not
 	// fully ARIA compliant.
