@@ -64,7 +64,9 @@ function SocialLinksEdit( {
 	);
 
 	function renderPlaceholder() {
-		return [ ...new Array( innerBlocks.length || 1 ) ].map( ( index ) => (
+		return [
+			...new Array( innerBlocks.length || 1 ),
+		].map( ( _, index ) => (
 			<View style={ placeholderStyle } key={ index } />
 		) );
 	}

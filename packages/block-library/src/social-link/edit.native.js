@@ -25,6 +25,21 @@ import styles from './editor.scss';
 const ANIMATION_DELAY = 300;
 const ANIMATION_DURATION = 400;
 
+const linkSettingsOptions = {
+	url: {
+		label: __( 'URL' ),
+		placeholder: __( 'Add URL' ),
+		autoFocus: true,
+	},
+	linkLabel: {
+		label: __( 'Link label' ),
+		placeholder: __( 'None' ),
+	},
+	footer: {
+		label: __( 'Briefly describe the link to help screen reader user' ),
+	},
+};
+
 const SocialLinkEdit = ( {
 	attributes,
 	setAttributes,
@@ -83,21 +98,6 @@ const SocialLinkEdit = ( {
 		? activeIcon
 		: interpolationColors;
 
-	const options = {
-		url: {
-			label: __( 'URL' ),
-			placeholder: __( 'Add URL' ),
-			autoFocus: true,
-		},
-		linkLabel: {
-			label: __( 'Link label' ),
-			placeholder: __( 'None' ),
-		},
-		footer: {
-			label: __( 'Briefly describe the link to help screen reader user' ),
-		},
-	};
-
 	function animateColors() {
 		Animated.sequence( [
 			Animated.delay( ANIMATION_DELAY ),
@@ -111,6 +111,10 @@ const SocialLinkEdit = ( {
 
 	function onCloseSettingsSheet() {
 		setIsLinkSheetVisible( false );
+	}
+
+	function onOpenSettingsSheet() {
+		setIsLinkSheetVisible( true );
 	}
 
 	function onEmptyURL() {
@@ -150,7 +154,7 @@ const SocialLinkEdit = ( {
 								socialLinkName
 							) }
 							icon={ link }
-							onClick={ () => setIsLinkSheetVisible( true ) }
+							onClick={ onOpenSettingsSheet }
 							isActive={ url }
 						/>
 					</ToolbarGroup>
@@ -162,7 +166,7 @@ const SocialLinkEdit = ( {
 				onEmptyURL={ onEmptyURL }
 				onClose={ onCloseSettingsSheet }
 				setAttributes={ setAttributes }
-				options={ options }
+				options={ linkSettingsOptions }
 				withBottomSheet={ true }
 			/>
 			<TouchableWithoutFeedback

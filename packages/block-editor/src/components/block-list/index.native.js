@@ -332,12 +332,9 @@ export default compose( [
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			let blockClientIds = getBlockOrder( rootClientId );
-
 			// Display only block which fulfill the condition in passed `filterInnerBlocks` function
 			if ( filterInnerBlocks ) {
-				blockClientIds = filterInnerBlocks(
-					getBlockOrder( rootClientId )
-				);
+				blockClientIds = filterInnerBlocks( blockClientIds );
 			}
 
 			const isReadOnly = getSettings().readOnly;
@@ -345,14 +342,16 @@ export default compose( [
 			const rootBlockId = getBlockHierarchyRootClientId(
 				selectedBlockClientId
 			);
-			const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
+
+			const blockCount = getBlockCount( rootBlockId );
+			const hasRootInnerBlocks = !! blockCount;
 
 			const isFloatingToolbarVisible =
 				!! selectedBlockClientId && hasRootInnerBlocks;
 
 			return {
 				blockClientIds,
-				blockCount: getBlockCount( rootClientId ),
+				blockCount,
 				isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
 				isReadOnly,
 				isRootList: rootClientId === undefined,
