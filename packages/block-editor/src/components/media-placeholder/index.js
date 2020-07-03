@@ -87,8 +87,7 @@ export function MediaPlaceholder( {
 	}, [ value ] );
 
 	const onlyAllowsImages = () =>
-		allowedTypes &&
-		allowedTypes.every(
+		allowedTypes?.every(
 			( allowedType ) =>
 				allowedType === 'image' || allowedType.startsWith( 'image/' )
 		);
