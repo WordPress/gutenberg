@@ -56,7 +56,10 @@ export * from './text';
 
 // Mobile Components
 export { default as BottomSheet } from './mobile/bottom-sheet';
-export { BottomSheetConsumer } from './mobile/bottom-sheet/bottom-sheet-context';
+export {
+	BottomSheetConsumer,
+	BottomSheetContext,
+} from './mobile/bottom-sheet/bottom-sheet-context';
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';

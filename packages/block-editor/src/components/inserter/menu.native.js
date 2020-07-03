@@ -20,7 +20,7 @@ import {
 	compose,
 	withPreferredColorScheme,
 } from '@wordpress/compose';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet, BottomSheetConsumer, Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -131,57 +131,72 @@ export class InserterMenu extends Component {
 				onClose={ this.onClose }
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
+				isChildrenScrollable
+				adjustToContentHeight
 			>
 				<TouchableHighlight accessible={ false }>
-					<FlatList
-						onLayout={ this.onLayout }
-						scrollEnabled={ false }
-						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-						keyboardShouldPersistTaps="always"
-						numColumns={ numberOfColumns }
-						data={ items }
-						ItemSeparatorComponent={ () => (
-							<View style={ styles.rowSeparator } />
-						) }
-						keyExtractor={ ( item ) => item.name }
-						renderItem={ ( { item } ) => (
-							<TouchableHighlight
-								style={ styles.touchableArea }
-								underlayColor="transparent"
-								activeOpacity={ 0.5 }
-								accessibilityLabel={ item.title }
-								onPress={ () => onSelect( item ) }
-							>
-								<View
-									style={ [
-										styles.modalItem,
-										{ width: columnProperties.maxWidth },
-									] }
-								>
-									<View
-										style={ [
-											modalIconWrapperStyle,
-											columnProperties.itemWidth && {
-												width:
-													columnProperties.itemWidth,
-											},
-										] }
+					<BottomSheetConsumer>
+						{ ( { scrollEnabled } ) => (
+							<FlatList
+								onLayout={ this.onLayout }
+								scrollEnabled={ scrollEnabled }
+								showsHorizontalScrollIndicator={ false }
+								showsVerticalScrollIndicator={ false }
+								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+								keyboardShouldPersistTaps="always"
+								numColumns={ numberOfColumns }
+								data={ items }
+								ItemSeparatorComponent={ () => (
+									<View style={ styles.rowSeparator } />
+								) }
+								keyExtractor={ ( item ) => item.name }
+								renderItem={ ( { item } ) => (
+									<TouchableHighlight
+										style={ styles.touchableArea }
+										underlayColor="transparent"
+										activeOpacity={ 0.5 }
+										accessibilityLabel={ item.title }
+										onPress={ () => onSelect( item ) }
 									>
-										<View style={ modalIconStyle }>
-											<Icon
-												icon={ item.icon.src }
-												fill={ modalIconStyle.fill }
-												size={ modalIconStyle.width }
-											/>
+										<View
+											style={ [
+												styles.modalItem,
+												{
+													width:
+														columnProperties.maxWidth,
+												},
+											] }
+										>
+											<View
+												style={ [
+													modalIconWrapperStyle,
+													columnProperties.itemWidth && {
+														width:
+															columnProperties.itemWidth,
+													},
+												] }
+											>
+												<View style={ modalIconStyle }>
+													<Icon
+														icon={ item.icon.src }
+														fill={
+															modalIconStyle.fill
+														}
+														size={
+															modalIconStyle.width
+														}
+													/>
+												</View>
+											</View>
+											<Text style={ modalItemLabelStyle }>
+												{ item.title }
+											</Text>
 										</View>
-									</View>
-									<Text style={ modalItemLabelStyle }>
-										{ item.title }
-									</Text>
-								</View>
-							</TouchableHighlight>
+									</TouchableHighlight>
+								) }
+							/>
 						) }
-					/>
+					</BottomSheetConsumer>
 				</TouchableHighlight>
 			</BottomSheet>
 		);

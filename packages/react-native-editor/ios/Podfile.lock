@@ -21,7 +21,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Gutenberg (8.3.0):
+  - Gutenberg (8.4.0):
     - React (= 0.61.5)
     - React-CoreModules (= 0.61.5)
     - React-RCTImage (= 0.61.5)
@@ -195,6 +195,8 @@ PODS:
     - React
   - react-native-safe-area (0.5.1):
     - React
+  - react-native-safe-area-context (3.0.6):
+    - React
   - react-native-slider (2.0.7):
     - React
   - react-native-video (5.0.2):
@@ -239,6 +241,14 @@ PODS:
     - ReactCommon/jscallinvoker (= 0.61.5)
   - ReactNativeDarkMode (0.0.10):
     - React
+  - RNCMaskedView (0.1.10):
+    - React
+  - RNGestureHandler (1.6.1):
+    - React
+  - RNReanimated (1.9.0):
+    - React
+  - RNScreens (2.9.0):
+    - React
   - RNSVG (9.13.6-gb):
     - React
   - RNTAztecView (0.1.11):
@@ -269,6 +279,7 @@ DEPENDENCIES:
   - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
   - react-native-keyboard-aware-scroll-view (from `../../../node_modules/react-native-keyboard-aware-scroll-view`)
   - react-native-safe-area (from `../../../node_modules/react-native-safe-area`)
+  - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-slider (from `../../../node_modules/@react-native-community/slider`)"
   - react-native-video (from `../../../node_modules/react-native-video`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -283,6 +294,10 @@ DEPENDENCIES:
   - ReactCommon/jscallinvoker (from `../../../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
   - ReactNativeDarkMode (from `../../../node_modules/react-native-dark-mode`)
+  - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
+  - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
+  - RNReanimated (from `../../../node_modules/react-native-reanimated`)
+  - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - RNTAztecView (from `../../react-native-aztec/RNTAztecView.podspec`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
@@ -331,6 +346,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-keyboard-aware-scroll-view"
   react-native-safe-area:
     :path: "../../../node_modules/react-native-safe-area"
+  react-native-safe-area-context:
+    :path: "../../../node_modules/react-native-safe-area-context"
   react-native-slider:
     :path: "../../../node_modules/@react-native-community/slider"
   react-native-video:
@@ -357,6 +374,14 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon"
   ReactNativeDarkMode:
     :path: "../../../node_modules/react-native-dark-mode"
+  RNCMaskedView:
+    :path: "../../../node_modules/@react-native-community/masked-view"
+  RNGestureHandler:
+    :path: "../../../node_modules/react-native-gesture-handler"
+  RNReanimated:
+    :path: "../../../node_modules/react-native-reanimated"
+  RNScreens:
+    :path: "../../../node_modules/react-native-screens"
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
@@ -372,7 +397,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  Gutenberg: 237167a5bb725cedcef0fa56f73b009bc1c389bd
+  Gutenberg: 42a3ed491af07194744d45aa7fc44b8202ea1a5b
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
@@ -385,6 +410,7 @@ SPEC CHECKSUMS:
   react-native-get-random-values: 8940331a943a46c165d3ed05802c09c392f8dd46
   react-native-keyboard-aware-scroll-view: ffa9152671fec9a571197ed2d02e0fcb90206e60
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
+  react-native-safe-area-context: b26361b9f0a5a17c371a80bb37b88493ea68c77e
   react-native-slider: f81b89fa0c1f9a65742d33f889a194ca6653a985
   react-native-video: 961749da457e73bf0b5565edfbaffc25abfb8974
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
@@ -398,6 +424,10 @@ SPEC CHECKSUMS:
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
+  RNCMaskedView: f5c7d14d6847b7b44853f7acb6284c1da30a3459
+  RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
+  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
+  RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
   RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
   RNTAztecView: b4c945bdc156b98dbf5c8a676def6c7736efa337
   WordPress-Aztec-iOS: d01bf0c5e150ae6a046f06ba63b7cc2762061c0b

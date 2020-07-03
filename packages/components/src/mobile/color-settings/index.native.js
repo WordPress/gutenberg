@@ -8,14 +8,25 @@ import { createStackNavigator } from '@react-navigation/stack';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import {
+	useState,
+	// useEffect,
+	useContext,
+	useRef,
+	useCallback,
+} from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
 	BottomSheetConsumer,
 	ColorControl,
 	PanelBody,
+	BottomSheetContext,
 } from '@wordpress/components';
-import { useRoute } from '@react-navigation/native';
+import {
+	useRoute,
+	useFocusEffect,
+	useNavigation,
+} from '@react-navigation/native';
 /**
  * Internal dependencies
  */
@@ -29,6 +40,27 @@ import { colorsUtils } from './utils';
 
 import styles from './style.scss';
 
+const BottomSheetScreen = ( { children, setHeight } ) => {
+	const context = useContext( BottomSheetContext );
+	const height = useRef( { maxHeight: 0 } );
+	useFocusEffect(
+		useCallback( () => {
+			if ( height.current.maxHeight !== 0 ) {
+				setHeight( height.current.maxHeight, context.snapToHeight );
+			}
+			return () => {};
+		}, [] )
+	);
+
+	const onLayout = ( e ) => {
+		if ( height.current.maxHeight !== e.nativeEvent.layout.height ) {
+			height.current.maxHeight = e.nativeEvent.layout.height;
+			setHeight( e.nativeEvent.layout.height, context.snapToHeight );
+		}
+	};
+	return <View onLayout={ onLayout }>{ children }</View>;
+};
+
 const forFade = ( { current } ) => ( {
 	cardStyle: {
 		opacity: current.progress,
@@ -38,19 +70,46 @@ const Stack = createStackNavigator();
 
 function ColorSettings( { defaultSettings } ) {
 	const route = useRoute();
-
-	useEffect( () => {
-		// shouldDisableBottomSheetMaxHeight( true );
-		// onCloseBottomSheet( null );
-	}, [] );
+	const [ height, setHeightValue ] = useState( 1 );
+	const setHeight = ( maxHeight, snapToHeight ) => {
+		if ( height !== maxHeight ) {
+			if ( snapToHeight ) {
+				snapToHeight( maxHeight );
+			}
+			setHeightValue( maxHeight );
+		}
+	};
+	// useEffect( () => {
+	// snapToHeight( 300 );
+	// shouldDisableBottomSheetMaxHeight( true );
+	// onCloseBottomSheet( null );
+	// }, [] );
 
 	// function afterHardwareButtonPress() {
 	// 	onHardwareButtonPress( null );
 	// 	shouldDisableBottomSheetMaxHeight( true );
 	// }
 
+	const PaletteScreenView = useRef( () => (
+		<BottomSheetScreen setHeight={ setHeight }>
+			<PaletteScreen />
+		</BottomSheetScreen>
+	) );
+
+	const PickerScreenView = useRef( () => (
+		<BottomSheetScreen setHeight={ setHeight }>
+			<PickerScreen />
+		</BottomSheetScreen>
+	) );
+
+	const GradientPickerView = useRef( () => (
+		<BottomSheetScreen setHeight={ setHeight }>
+			<GradientPickerScreen />
+		</BottomSheetScreen>
+	) );
+
 	return (
-		<View style={ { height: '100%' } }>
+		<View style={ { height } }>
 			<Stack.Navigator
 				screenOptions={ {
 					headerShown: false,
@@ -59,18 +118,18 @@ function ColorSettings( { defaultSettings } ) {
 			>
 				<Stack.Screen
 					name="Palette"
-					component={ PaletteScreen }
+					component={ PaletteScreenView.current }
 					options={ { cardStyleInterpolator: forFade } }
 					initialParams={ { defaultSettings, ...route.params } }
 				/>
 				<Stack.Screen
 					name="Picker"
-					component={ PickerScreen }
+					component={ PickerScreenView.current }
 					options={ { cardStyleInterpolator: forFade } }
 				/>
 				<Stack.Screen
 					name="GradientPicker"
-					component={ GradientPickerScreen }
+					component={ GradientPickerView.current }
 					options={ { cardStyleInterpolator: forFade } }
 				/>
 			</Stack.Navigator>
@@ -80,7 +139,9 @@ function ColorSettings( { defaultSettings } ) {
 
 export default ColorSettings;
 
-const PickerScreen = ( { route, navigation } ) => {
+const PickerScreen = () => {
+	const route = useRoute();
+	const navigation = useNavigation();
 	const { setColor, currentValue, isGradientColor } = route.params;
 	return (
 		<BottomSheetConsumer>
@@ -111,7 +172,9 @@ const PickerScreen = ( { route, navigation } ) => {
 	);
 };
 
-const GradientPickerScreen = ( { route, navigation } ) => {
+const GradientPickerScreen = () => {
+	const route = useRoute();
+	const navigation = useNavigation();
 	const { setColor, currentValue, isGradientColor } = route.params;
 	return (
 		<View>
@@ -128,7 +191,9 @@ const GradientPickerScreen = ( { route, navigation } ) => {
 	);
 };
 
-const PaletteScreen = ( { route, navigation } ) => {
+const PaletteScreen = () => {
+	const route = useRoute();
+	const navigation = useNavigation();
 	const {
 		label,
 		onColorChange,

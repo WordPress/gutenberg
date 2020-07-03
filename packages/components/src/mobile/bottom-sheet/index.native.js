@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import SafeArea from 'react-native-safe-area';
 import Animated from 'react-native-reanimated';
+import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -40,7 +41,12 @@ import BottomSheetReanimated from 'reanimated-bottom-sheet';
 
 const windowHeight = Dimensions.get( 'window' ).height;
 
-const defaultSnapPoints = [ windowHeight - 54, windowHeight * 0.5, 0 ];
+const defaultSnapPoints = [
+	windowHeight - 54,
+	windowHeight * 0.5,
+	0.25 * windowHeight,
+	0,
+];
 
 const defaultInitialSnap = 1;
 
@@ -71,6 +77,15 @@ class BottomSheet extends Component {
 		this.closeEnd = this.closeEnd.bind( this );
 		this.renderHandler = this.renderHandler.bind( this );
 		this.onOverlayPress = this.onOverlayPress.bind( this );
+		this.setContentHeight = this.setContentHeight.bind( this );
+		this.snapToHeight = this.snapToHeight.bind( this );
+		this.debounceSetContentHeight = debounce( ( e ) => {
+			this.setContentHeight( e );
+		}, 100 );
+
+		this.debounceSetContentHeight = this.debounceSetContentHeight.bind(
+			this
+		);
 		this.state = {
 			safeAreaBottomInset: 0,
 			bounces: false,
@@ -93,7 +108,7 @@ class BottomSheet extends Component {
 			this.onSafeAreaInsetsUpdate
 		);
 		Dimensions.addEventListener( 'change', this.onDimensionsChange );
-		this.overlayOpacity = new Animated.Value( 0 );
+		this.overlayOpacity = new Animated.Value( 1 );
 	}
 
 	keyboardWillShow( e ) {
@@ -235,6 +250,42 @@ class BottomSheet extends Component {
 		this.setState( { onHardwareButtonPress: action } );
 	}
 
+	getSnapPoints() {
+		const { highestSnap, adjustToContentHeight } = this.props;
+		const { contentHeight, safeAreaBottomInset } = this.state;
+		let maxSnapPoint;
+		if ( adjustToContentHeight && contentHeight > 0 ) {
+			maxSnapPoint = contentHeight + safeAreaBottomInset + 16;
+		} else if ( highestSnap ) {
+			maxSnapPoint = highestSnap + safeAreaBottomInset;
+		}
+
+		if ( ! maxSnapPoint && ! adjustToContentHeight ) {
+			return {
+				snapPoints: defaultSnapPoints,
+				initialSnap: defaultInitialSnap,
+			};
+		}
+		if ( ! maxSnapPoint ) {
+			return {};
+		}
+		if ( maxSnapPoint < defaultSnapPoints[ 1 ] ) {
+			return { snapPoints: [ maxSnapPoint, 0 ], initialSnap: 0 };
+		} else if ( maxSnapPoint < defaultSnapPoints[ 0 ] * 0.75 ) {
+			return {
+				snapPoints: [ maxSnapPoint, maxSnapPoint * 0.5, 0 ],
+				initialSnap: 1,
+			};
+		}
+		if ( maxSnapPoint > defaultSnapPoints[ 0 ] ) {
+			this.shouldScroll = true;
+		}
+		return {
+			snapPoints: defaultSnapPoints,
+			initialSnap: defaultInitialSnap,
+		};
+	}
+
 	onCloseBottomSheet() {
 		const { onClose } = this.props;
 		const { onCloseBottomSheet } = this.state;
@@ -254,9 +305,20 @@ class BottomSheet extends Component {
 	}
 
 	onOverlayPress() {
-		const { snapPoints = defaultSnapPoints } = this.props;
+		const { snapPoints } = this.getSnapPoints();
 		if ( this.bottomSheetRef.current ) {
+			// this.bottomSheetRef.current.snapToHeight( 250 );
 			this.bottomSheetRef.current.snapTo( snapPoints.length - 1 );
+		}
+	}
+
+	snapToHeight( height ) {
+		const { safeAreaBottomInset } = this.state;
+
+		if ( this.bottomSheetRef.current ) {
+			this.bottomSheetRef.current.snapToHeight(
+				height + safeAreaBottomInset + 16
+			);
 		}
 	}
 
@@ -303,11 +365,11 @@ class BottomSheet extends Component {
 			styles.background,
 			styles.backgroundDark
 		);
-
+		const { snapPoints } = this.getSnapPoints();
 		return (
-			<View style={ [ { height: '100%' }, backgroundStyle ] }>
+			<View style={ [ backgroundStyle, { height: snapPoints[ 0 ] } ] }>
 				{ ! hideHeader && this.getHeader() }
-				{ this.shouldScroll ? (
+				{ ! this.props.isChildrenScrollable && this.shouldScroll ? (
 					<ScrollView
 						disableScrollViewPanResponder
 						showsHorizontalScrollIndicator={ false }
@@ -316,7 +378,7 @@ class BottomSheet extends Component {
 							styles.content,
 							contentStyle,
 						] }
-						scrollEnabled={ scrollEnabled }
+						scrollEnabled={ this.shouldScroll && scrollEnabled }
 						automaticallyAdjustContentInsets={ false }
 					>
 						<BottomSheetProvider
@@ -329,6 +391,9 @@ class BottomSheet extends Component {
 									.onHandleClosingBottomSheet,
 								onHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
+								scrollEnabled:
+									this.shouldScroll && scrollEnabled,
+								snapToHeight: this.snapToHeight,
 							} }
 						>
 							{ children }
@@ -346,6 +411,9 @@ class BottomSheet extends Component {
 									.onHandleClosingBottomSheet,
 								onHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
+								scrollEnabled:
+									this.shouldScroll && scrollEnabled,
+								snapToHeight: this.snapToHeight,
 							} }
 						>
 							{ children }
@@ -354,6 +422,12 @@ class BottomSheet extends Component {
 				) }
 			</View>
 		);
+	}
+
+	setContentHeight( contentHeight ) {
+		this.setState( {
+			contentHeight,
+		} );
 	}
 
 	openEnd() {
@@ -374,31 +448,19 @@ class BottomSheet extends Component {
 	}
 
 	render() {
-		const { isVisible, style = {}, highestSnap, children } = this.props;
+		const {
+			isVisible,
+			style = {},
+			children,
+			adjustToContentHeight,
+		} = this.props;
 		const {
 			safeAreaBottomInset,
 			scrollEnabled,
-			contentHeight,
 			isShown,
+			contentHeight,
 		} = this.state;
-		let computedSnapPoints;
-		let computedInitialSnapPoint;
-		let maxSnapPoint = highestSnap || contentHeight || 0;
-		if ( maxSnapPoint !== 0 ) {
-			maxSnapPoint += safeAreaBottomInset;
-		}
-		if ( maxSnapPoint < defaultSnapPoints[ 1 ] ) {
-			computedSnapPoints = [ maxSnapPoint, 0, 0 ];
-			computedInitialSnapPoint = 0;
-		} else if ( maxSnapPoint < defaultSnapPoints[ 0 ] ) {
-			computedSnapPoints = [ maxSnapPoint, defaultSnapPoints[ 1 ], 0 ];
-			computedInitialSnapPoint = 1;
-		} else {
-			computedSnapPoints = defaultSnapPoints;
-			computedInitialSnapPoint = defaultInitialSnap;
-			this.shouldScroll = true;
-		}
-
+		const { snapPoints, initialSnap } = this.getSnapPoints();
 		return (
 			<RNModal
 				onShow={ () => {
@@ -409,21 +471,22 @@ class BottomSheet extends Component {
 				transparent={ true }
 				supportedOrientations={ [ 'landscape', 'portrait' ] }
 			>
-				{ isShown && maxSnapPoint === 0 && (
+				{ adjustToContentHeight && contentHeight === 0 && isShown && (
 					<View style={ { opacity: 0 } }>
 						<View
-							onLayout={ ( e ) => {
-								this.setState( {
-									contentHeight: e.nativeEvent.layout.height,
-								} );
-							} }
+							onLayout={ ( e ) =>
+								this.debounceSetContentHeight(
+									e.nativeEvent.layout.height
+								)
+							}
 						>
 							{ children }
 						</View>
 					</View>
 				) }
 
-				{ maxSnapPoint > 0 && (
+				{ ( ( adjustToContentHeight && contentHeight > 0 ) ||
+					snapPoints ) && (
 					<KeyboardAvoidingView
 						behavior={ Platform.OS === 'ios' && 'padding' }
 						style={ {
@@ -440,16 +503,13 @@ class BottomSheet extends Component {
 								right: 0,
 								bottom: 0,
 								backgroundColor: 'black',
-								opacity:
-									maxSnapPoint > 50
-										? Animated.sub(
-												0.7,
-												Animated.multiply(
-													this.overlayOpacity,
-													0.7
-												)
-										  )
-										: 0,
+								opacity: Animated.sub(
+									0.7,
+									Animated.multiply(
+										this.overlayOpacity,
+										0.7
+									)
+								),
 							} }
 						>
 							<TouchableOpacity
@@ -458,8 +518,8 @@ class BottomSheet extends Component {
 							/>
 						</Animated.View>
 						<BottomSheetReanimated
-							snapPoints={ computedSnapPoints }
-							initialSnap={ computedInitialSnapPoint }
+							snapPoints={ snapPoints }
+							initialSnap={ initialSnap }
 							renderHeader={ this.renderHandler }
 							renderContent={ this.renderContent }
 							callbackNode={ this.overlayOpacity }

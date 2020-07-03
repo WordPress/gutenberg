@@ -153,6 +153,7 @@ class ModalLinkUI extends Component {
 				isVisible={ isVisible }
 				onClose={ this.onDismiss }
 				hideHeader
+				adjustToContentHeight
 			>
 				{
 					/* eslint-disable jsx-a11y/no-autofocus */

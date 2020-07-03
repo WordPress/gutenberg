@@ -14,10 +14,14 @@ import {
 	InspectorControls,
 	SETTINGS_DEFAULTS as defaultSettings,
 } from '@wordpress/block-editor';
-import { BottomSheet, ColorSettings } from '@wordpress/components';
+import {
+	BottomSheet,
+	ColorSettings,
+	BottomSheetContext,
+} from '@wordpress/components';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useRef, useCallback, useState } from '@wordpress/element';
+import { useRef, useCallback, useState, useContext } from '@wordpress/element';
 import { View } from 'react-native';
 /**
  * Internal dependencies
@@ -31,11 +35,12 @@ const forFade = ( { current } ) => ( {
 } );
 
 const BottomSheetScreen = ( { children, setHeight } ) => {
+	const context = useContext( BottomSheetContext );
 	const height = useRef( { maxHeight: 0 } );
 	useFocusEffect(
 		useCallback( () => {
 			if ( height.current.maxHeight !== 0 ) {
-				setHeight( height.current.maxHeight );
+				setHeight( height.current.maxHeight, context.snapToHeight );
 			}
 			return () => {};
 		}, [] )
@@ -44,7 +49,7 @@ const BottomSheetScreen = ( { children, setHeight } ) => {
 	const onLayout = ( e ) => {
 		if ( height.current.maxHeight !== e.nativeEvent.layout.height ) {
 			height.current.maxHeight = e.nativeEvent.layout.height;
-			setHeight( e.nativeEvent.layout.height );
+			setHeight( e.nativeEvent.layout.height, context.snapToHeight );
 		}
 	};
 	return <View onLayout={ onLayout }>{ children }</View>;
@@ -58,8 +63,11 @@ function BottomSheetSettings( {
 	...props
 } ) {
 	const [ height, setHeightValue ] = useState( 1 );
-	const setHeight = ( maxHeight ) => {
+	const setHeight = ( maxHeight, snapToHeight ) => {
 		if ( height !== maxHeight ) {
+			if ( snapToHeight ) {
+				snapToHeight( maxHeight );
+			}
 			setHeightValue( maxHeight );
 		}
 	};
@@ -90,11 +98,11 @@ function BottomSheetSettings( {
 	};
 	return (
 		<BottomSheet
-			key={ height }
 			isVisible={ editorSidebarOpened }
 			onClose={ closeGeneralSidebar }
 			hideHeader
 			contentStyle={ styles.content }
+			adjustToContentHeight
 			{ ...props }
 		>
 			<View style={ { height } }>
@@ -106,12 +114,16 @@ function BottomSheetSettings( {
 						} }
 					>
 						<Stack.Screen
-							options={ { cardStyleInterpolator: forFade } }
+							options={ {
+								cardStyleInterpolator: forFade,
+							} }
 							name="Settings"
 							component={ MainScreen.current }
 						/>
 						<Stack.Screen
-							options={ { cardStyleInterpolator: forFade } }
+							options={ {
+								cardStyleInterpolator: forFade,
+							} }
 							name="Colors"
 							component={ DetailsScreen.current }
 						/>

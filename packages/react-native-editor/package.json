@@ -29,8 +29,12 @@
   "main": "src/index.js",
   "react-native": "src/index",
   "dependencies": {
-    "@babel/runtime": "^7.9.2",
+    "@babel/core": "^7.9.6",
+    "@babel/runtime": "^7.9.6",
+    "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#5ad284d92b8d886e366445bf215be741ed53ddc6",
+    "@react-navigation/native": "^5.5.0",
+    "@react-navigation/stack": "^5.4.1",
     "@wordpress/api-fetch": "file:../api-fetch",
     "@wordpress/block-editor": "file:../block-editor",
     "@wordpress/block-library": "file:../block-library",
@@ -52,17 +56,22 @@
     "node-fetch": "^2.3.0",
     "react-native": "0.61.5",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
+    "react-native-gesture-handler": "^1.6.1",
     "react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#f03f2c16414aff4ea76064dcd00a9e3c6efc838d",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.8",
     "react-native-linear-gradient": "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#52bf43077171cff8714ce3e0155f3ebb7f55bc37",
     "react-native-modal": "^6.5.0",
+    "react-native-reanimated": "^1.9.0",
     "react-native-safe-area": "^0.5.0",
+    "react-native-safe-area-context": "^3.0.2",
     "react-native-sass-transformer": "^1.1.1",
+    "react-native-screens": "^2.8.0",
     "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
     "react-native-url-polyfill": "^1.1.2",
-    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f"
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f",
+    "reanimated-bottom-sheet": "^1.0.0-alpha.20"
   },
   "publishConfig": {
     "access": "public"

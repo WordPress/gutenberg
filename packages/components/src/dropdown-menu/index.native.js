@@ -135,6 +135,7 @@ function DropdownMenu( {
 						hideHeader={ true }
 						isVisible={ isOpen }
 						onClose={ onClose }
+						adjustToContentHeight
 					>
 						{ isFunction( children ) ? children( props ) : null }
 						<PanelBody
