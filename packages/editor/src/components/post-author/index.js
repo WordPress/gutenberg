@@ -9,11 +9,11 @@ import { debounce } from 'lodash';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { ComboboxControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import ComboboxControl from '../../../../components/build/combobox-control/';
 import PostAuthorCheck from './check';
 
 let latestAvailableAuthors;
