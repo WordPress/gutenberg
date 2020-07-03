@@ -260,6 +260,7 @@ Returns an Author by ID.
 _Parameters_
 
 -   _state_ `Object`: Data state.
+-   _queryID_ `string`: Query ID.
 
 _Returns_
 
@@ -272,6 +273,7 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `Object`: Data state.
+-   _query_ `string`: Query.
 
 _Returns_
 
