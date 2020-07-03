@@ -22,6 +22,7 @@ const MIN_HEIGHT = 44;
 export const KeyboardAvoidingView = ( {
 	parentHeight,
 	style,
+	withAnimatedHeight = false,
 	...otherProps
 } ) => {
 	const [ keyboardHeight, setKeyboardHeight ] = useState( 0 );
@@ -43,11 +44,11 @@ export const KeyboardAvoidingView = ( {
 		animate();
 	}, [ keyboardHeight ] );
 
-	function onKeyboardWillShow( e ) {
-		setKeyboardHeight( e.endCoordinates.height );
+	function onKeyboardWillShow( { endCoordinates } ) {
+		setKeyboardHeight( endCoordinates.height );
 	}
 
-	function onKeyboardWillHide(): void {
+	function onKeyboardWillHide() {
 		setKeyboardHeight( 0 );
 	}
 
@@ -67,7 +68,10 @@ export const KeyboardAvoidingView = ( {
 			{ ...otherProps }
 			behavior="padding"
 			keyboardVerticalOffset={ keyboardVerticalOffset }
-			style={ [ style, { height: animatedHeight } ] }
+			style={ [
+				style,
+				withAnimatedHeight && { height: animatedHeight },
+			] }
 		/>
 	);
 };
