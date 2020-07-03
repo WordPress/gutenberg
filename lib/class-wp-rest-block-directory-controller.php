@@ -97,10 +97,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$result = array();
 
 		foreach ( $response->plugins as $plugin ) {
-			if ( $this->find_plugin_for_slug( $plugin['slug'] ) ) {
-				continue;
-			}
-
 			$data     = $this->prepare_item_for_response( $plugin, $request );
 			$result[] = $this->prepare_response_for_collection( $data );
 		}
