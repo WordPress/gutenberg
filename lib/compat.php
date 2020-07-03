@@ -519,7 +519,7 @@ function gutenberg_update_nav_menu_item_content( $menu_id, $menu_item_db_id, $ar
 
 	$args = wp_parse_args( $args, $defaults );
 
-	update_post_meta( $menu_item_db_id, '_menu_item_content', $args['menu-item-content'] );
+	update_post_meta( $menu_item_db_id, '_menu_item_content', wp_slash( $args['menu-item-content'] ) );
 }
 add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content', 10, 3 );
 
