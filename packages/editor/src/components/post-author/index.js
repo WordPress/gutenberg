@@ -100,9 +100,14 @@ function PostAuthor() {
 		[ fieldValue, postAuthor, isLoading ]
 	);
 
-	const isLoading = useSelect( ( select ) => {
-		return select( 'core/data' ).isResolving( 'core', 'getAuthors', [ { search: fieldValue } ] );
-	}, [ availableAuthors, fieldValue ] );
+	const isLoading = useSelect(
+		( select ) => {
+			return select( 'core/data' ).isResolving( 'core', 'getAuthors', [
+				{ search: fieldValue },
+			] );
+		},
+		[ availableAuthors, fieldValue ]
+	);
 
 	if ( ! isLoading ) {
 		latestAvailableAuthors = availableAuthors;
