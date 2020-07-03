@@ -46,6 +46,7 @@
 		"@wordpress/react-native-bridge": "file:../react-native-bridge",
 		"fast-average-color": "^4.3.0",
 		"jed": "^1.1.1",
+		"jsc-android": "^241213.1.0",
 		"jsdom-jscore-rn": "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800",
 		"metro-react-native-babel-preset": "0.57.0",
 		"metro-react-native-babel-transformer": "0.56.0",
