@@ -111,9 +111,8 @@ describe( 'actions', () => {
 			const generator = installBlockType( inactiveBlock );
 
 			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
+				type: 'CLEAR_ERROR_NOTICE',
 				blockId: inactiveBlock.id,
-				notice: false,
 			} );
 
 			expect( generator.next().value ).toEqual( {
