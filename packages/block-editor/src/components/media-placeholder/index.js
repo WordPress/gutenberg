@@ -83,7 +83,7 @@ export function MediaPlaceholder( {
 	const [ isURLInputVisible, setIsURLInputVisible ] = useState( false );
 
 	useEffect( () => {
-		setSrc( value?.src || '' );
+		setSrc( value?.src ?? '' );
 	}, [ value ] );
 
 	const onlyAllowsImages = () =>
