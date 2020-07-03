@@ -7,7 +7,7 @@
 
 return array(
 	'title'         => __( 'Quote', 'gutenberg' ),
-	'content'       => "<!-- wp:quote {\"className\":\"is-style-large\"} -->\n<blockquote class=\"wp-block-quote is-style-large\"><p>" . __( '"Sir Knight, if your worship be disposed to alight, you will fail of nothing here but of a bed as for all other accommodations, you may be supplied to your mind."', 'gutenberg' ) . '</p><cite>' . __( '— Don Quixote', 'gutenberg' ) . "</cite></blockquote>\n<!-- /wp:quote -->",
+	'content'       => "<!-- wp:quote {\"className\":\"is-style-large\"} -->\n<blockquote class=\"wp-block-quote is-style-large\"><p>" . __( '"I know not all that may be coming, but be it what it will, I\'ll go to it laughing."', 'gutenberg' ) . '</p><cite>' . __( '— Herman Melville, Moby-Dick (1851)', 'gutenberg' ) . "</cite></blockquote>\n<!-- /wp:quote -->",
 	'viewportWidth' => 800,
 	'categories'    => array( 'text' ),
 );
