@@ -7,7 +7,7 @@ export function MediaUploadCheck( { fallback = null, children } ) {
 	const hasUploadPermissions = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return !! getSettings().mediaUpload;
-	} );
+	}, [] );
 	return hasUploadPermissions ? children : fallback;
 }
 
