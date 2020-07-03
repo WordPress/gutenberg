@@ -41,13 +41,13 @@
 		}
 	},
 	"providesContext": {
-		"core/textColor": "textColor",
-		"core/customTextColor": "customTextColor",
-		"core/backgroundColor": "backgroundColor",
-		"core/customBackgroundColor": "customBackgroundColor",
-		"core/fontSize": "fontSize",
-		"core/customFontSize": "customFontSize",
-		"core/showSubmenuIcon": "showSubmenuIcon"
+		"textColor": "textColor",
+		"customTextColor": "customTextColor",
+		"backgroundColor": "backgroundColor",
+		"customBackgroundColor": "customBackgroundColor",
+		"fontSize": "fontSize",
+		"customFontSize": "customFontSize",
+		"showSubmenuIcon": "showSubmenuIcon"
 	},
 	"supports": {
 		"align": [

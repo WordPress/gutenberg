@@ -19,8 +19,8 @@ function block_core_navigation_link_build_css_colors( $context ) {
 	);
 
 	// Text color.
-	$has_named_text_color  = array_key_exists( 'core/textColor', $context );
-	$has_custom_text_color = array_key_exists( 'core/customTextColor', $context );
+	$has_named_text_color  = array_key_exists( 'textColor', $context );
+	$has_custom_text_color = array_key_exists( 'customTextColor', $context );
 
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
@@ -30,15 +30,15 @@ function block_core_navigation_link_build_css_colors( $context ) {
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', $context['core/textColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-color', $context['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['core/customTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['customTextColor'] );
 	}
 
 	// Background color.
-	$has_named_background_color  = array_key_exists( 'core/backgroundColor', $context );
-	$has_custom_background_color = array_key_exists( 'core/customBackgroundColor', $context );
+	$has_named_background_color  = array_key_exists( 'backgroundColor', $context );
+	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $context );
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color ) {
@@ -48,10 +48,10 @@ function block_core_navigation_link_build_css_colors( $context ) {
 
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $context['core/backgroundColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $context['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['core/customBackgroundColor'] );
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['customBackgroundColor'] );
 	}
 
 	return $colors;
@@ -71,15 +71,15 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 		'inline_styles' => '',
 	);
 
-	$has_named_font_size  = array_key_exists( 'core/fontSize', $context );
-	$has_custom_font_size = array_key_exists( 'core/customFontSize', $context );
+	$has_named_font_size  = array_key_exists( 'fontSize', $context );
+	$has_custom_font_size = array_key_exists( 'customFontSize', $context );
 
 	if ( $has_named_font_size ) {
 		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['core/fontSize'] );
+		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['core/customFontSize'] );
+		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['customFontSize'] );
 	}
 
 	return $font_sizes;
@@ -171,7 +171,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	$html .= '</span>';
 
-	if ( $block->context['core/showSubmenuIcon'] ) {
+	if ( $block->context['showSubmenuIcon'] ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
 		$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
 	}

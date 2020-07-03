@@ -30,13 +30,13 @@
 		}
 	},
 	"usesContext": [
-		"core/textColor",
-		"core/customTextColor",
-		"core/backgroundColor",
-		"core/customBackgroundColor",
-		"core/fontSize",
-		"core/customFontSize",
-		"core/showSubmenuIcon"
+		"textColor",
+		"customTextColor",
+		"backgroundColor",
+		"customBackgroundColor",
+		"fontSize",
+		"customFontSize",
+		"showSubmenuIcon"
 	],
 	"supports": {
 		"reusable": false,
