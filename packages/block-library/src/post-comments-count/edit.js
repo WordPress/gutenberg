@@ -32,7 +32,7 @@ function PostCommentsCountDisplay( { className } ) {
 
 export default function PostCommentsCountEdit( { className } ) {
 	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return 'Post Comments Count Placeholder';
+		return 'Post Comments Count';
 	}
 	return <PostCommentsCountDisplay className={ className } />;
 }
