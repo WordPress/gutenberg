@@ -346,8 +346,8 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const { colors } = useSelect( ( select ) => {
-			return select( 'core/block-editor' ).getSettings();
+		const colors = useSelect( ( select ) => {
+			return select( 'core/block-editor' ).getSettings().colors;
 		}, [] );
 
 		if ( ! hasColorSupport( name ) ) {
