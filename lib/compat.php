@@ -491,7 +491,7 @@ remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see <TICKET>
+ * @see https://core.trac.wordpress.org/ticket/50544
  *
  * @param int   $menu_id         ID of the updated menu.
  * @param int   $menu_item_db_id ID of the new menu item.
@@ -535,7 +535,7 @@ add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content',
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see <TICKET>
+ * @see https://core.trac.wordpress.org/ticket/50544
  *
  * @param object $menu_item The menu item object.
  */
@@ -562,7 +562,7 @@ add_filter( 'wp_setup_nav_menu_item', 'gutenberg_setup_html_nav_menu_item' );
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see <TICKET>
+ * @see https://core.trac.wordpress.org/ticket/50544
  *
  * @param string   $item_output The menu item's starting HTML output.
  * @param WP_Post  $item        Menu item data object.
