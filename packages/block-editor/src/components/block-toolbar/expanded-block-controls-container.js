@@ -15,7 +15,7 @@ import warning from '@wordpress/warning';
  */
 import BlockControls from '../block-controls';
 
-export default function CustomizableBlockToolbarContent( {
+export default function ExpandedBlockControlsContainer( {
 	children,
 	className,
 } ) {
@@ -23,23 +23,19 @@ export default function CustomizableBlockToolbarContent( {
 		<BlockControls.Slot __experimentalIsExpanded>
 			{ ( fills ) => {
 				return (
-					<CustomizableBlockToolbarContentChildren
+					<ExpandedBlockControlsHandler
 						className={ className }
 						fills={ fills }
 					>
 						{ children }
-					</CustomizableBlockToolbarContentChildren>
+					</ExpandedBlockControlsHandler>
 				);
 			} }
 		</BlockControls.Slot>
 	);
 }
 
-function CustomizableBlockToolbarContentChildren( {
-	fills,
-	className = '',
-	children,
-} ) {
+function ExpandedBlockControlsHandler( { fills, className = '', children } ) {
 	const containerRef = useRef();
 	const fillsRef = useRef();
 	const toolbarRef = useRef();
@@ -48,30 +44,30 @@ function CustomizableBlockToolbarContentChildren( {
 	const fillsPropRef = useRef();
 	fillsPropRef.current = fills;
 	const resizeToolbar = useCallback(
-		throttle( ( elem ) => {
-			if ( ! elem ) {
-				elem = fillsPropRef.current.length
-					? fillsRef.current
-					: toolbarRef.current;
-			}
-			if ( ! elem ) {
+		throttle( () => {
+			const toolbarContentElement = fillsPropRef.current.length
+				? fillsRef.current
+				: toolbarRef.current;
+			if ( ! toolbarContentElement ) {
 				return;
 			}
-			elem.style.position = 'absolute';
-			elem.style.width = 'auto';
-			const css = window.getComputedStyle( elem, null );
+			toolbarContentElement.style.position = 'absolute';
+			toolbarContentElement.style.width = 'auto';
+			const contentCSS = window.getComputedStyle(
+				toolbarContentElement,
+				null
+			);
 			setDimensions( {
-				width: css.getPropertyValue( 'width' ),
-				height: css.getPropertyValue( 'height' ),
+				width: contentCSS.getPropertyValue( 'width' ),
+				height: contentCSS.getPropertyValue( 'height' ),
 			} );
-			elem.style.position = '';
-			elem.style.width = '';
+			toolbarContentElement.style.position = '';
+			toolbarContentElement.style.width = '';
 		}, 100 ),
 		[]
 	);
 
 	useEffect( () => {
-		// Create an observer instance linked to the callback function
 		const observer = new window.MutationObserver( function (
 			mutationsList
 		) {
@@ -83,7 +79,6 @@ function CustomizableBlockToolbarContentChildren( {
 			}
 		} );
 
-		// Start observing the target node for configured mutations
 		observer.observe( containerRef.current, {
 			childList: true,
 			subtree: true,
@@ -100,6 +95,7 @@ function CustomizableBlockToolbarContentChildren( {
 		}
 	}, [ fills.length ] );
 
+	const displayFill = fills[ 0 ];
 	return (
 		<div
 			className="block-editor-block-toolbar-width-container"
@@ -107,14 +103,14 @@ function CustomizableBlockToolbarContentChildren( {
 			style={ dimensions }
 		>
 			<TransitionGroup>
-				{ fills.length ? (
+				{ displayFill ? (
 					<CSSTransition
 						key="fills"
 						timeout={ 300 }
 						classNames="block-editor-block-toolbar-content"
 					>
 						<div className={ className } ref={ fillsRef }>
-							{ fills[ 0 ] }
+							{ displayFill }
 						</div>
 					</CSSTransition>
 				) : (

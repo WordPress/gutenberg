@@ -22,11 +22,11 @@ import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import BlockDraggable from '../block-draggable';
 import { useShowMoversGestures, useToggleBlockHighlight } from './utils';
-import CustomizableBlockToolbarContent from './customizable-content';
+import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
 export default function BlockToolbar( {
 	hideDragHandle,
-	__experimentalCustomizableContent = false,
+	__experimentalExpandedControl = false,
 } ) {
 	const {
 		blockClientIds,
@@ -104,8 +104,8 @@ export default function BlockToolbar( {
 		shouldShowMovers && 'is-showing-movers'
 	);
 
-	const Wrapper = __experimentalCustomizableContent
-		? CustomizableBlockToolbarContent
+	const Wrapper = __experimentalExpandedControl
+		? ExpandedBlockControlsContainer
 		: 'div';
 
 	return (

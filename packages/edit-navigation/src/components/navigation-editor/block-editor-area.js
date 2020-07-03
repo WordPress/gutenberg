@@ -111,7 +111,7 @@ export default function BlockEditorArea( {
 					{ hasSelectedBlock && ! isRootBlockSelected && (
 						<BlockToolbar
 							hideDragHandle
-							__experimentalCustomizableContent
+							__experimentalExpandedControl
 						/>
 					) }
 				</NavigableToolbar>
