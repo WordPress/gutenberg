@@ -127,7 +127,7 @@ export function MediaPlaceholder( {
 				setMedia = ( newMedia ) => {
 					// Remove any images this upload group is responsible for (lastMediaPassed).
 					// Their replacements are contained in newMedia.
-					const filteredMedia = ( value || [] ).filter( ( item ) => {
+					const filteredMedia = ( value ?? [] ).filter( ( item ) => {
 						// If Item has id, only remove it if lastMediaPassed has an item with that id.
 						if ( item.id ) {
 							return ! lastMediaPassed.some(
