@@ -78,7 +78,7 @@ export function MediaPlaceholder( {
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return getSettings().mediaUpload;
-	} );
+	}, [] );
 	const [ src, setSrc ] = useState( '' );
 	const [ isURLInputVisible, setIsURLInputVisible ] = useState( false );
 
