@@ -117,7 +117,6 @@ function Navigation( {
 		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 		[ fontSize.class ]: fontSize.class,
 		'is-vertical': attributes.orientation === 'vertical',
-		'has-submenu-icon': attributes.showSubmenuIcon,
 	} );
 
 	// UI State: rendered Block UI
