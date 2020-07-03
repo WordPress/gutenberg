@@ -8,10 +8,6 @@
 		"label": {
 			"type": "string"
 		},
-		"nofollow": {
-			"type": "boolean",
-			"default": false
-		},
 		"type": {
 			"type": "string"
 		},
