@@ -31,7 +31,7 @@ const DEFAULT_QUERY = {
 	per_page: -1,
 	orderby: 'count',
 	order: 'desc',
-	_fields: 'id,name',
+	_fields: 'id,name,count',
 };
 const MAX_TERMS_SUGGESTIONS = 20;
 const MAX_RELATED_TERMS_SUGGESTIONS = 10;
@@ -89,7 +89,9 @@ class FlatTermSelector extends Component {
 				include: this.props.terms.join( ',' ),
 				per_page: -1,
 			} );
-		} else this.initRequest = Promise.resolve( [] );
+		} else {
+			this.initRequest = Promise.resolve( [] );
+		}
 
 		this.initRequest.then(
 			( response ) => {
@@ -273,9 +275,9 @@ class FlatTermSelector extends Component {
 
 	appendTerm( newTerm ) {
 		if (
-			find( this.state.selectedTerms, ( selectedTerm ) =>
-				isSameTermName( selectedTerm, newTerm.name )
-			)
+			find( this.state.selectedTerms, ( selectedTerm ) => {
+				isSameTermName( selectedTerm, newTerm.name );
+			} )
 		)
 			return;
 
@@ -290,6 +292,11 @@ class FlatTermSelector extends Component {
 		this.setState( ( state ) => ( {
 			areRelatedTermsHidden: ! state.areRelatedTermsHidden,
 		} ) );
+	}
+
+	// Screen Reader is an extension for modern browsers which helps visually handicapped users to interact with websites.
+	getTermScreenReaderString( tag, count ) {
+		return `${ tag } (${ count } items)`;
 	}
 
 	render() {
@@ -311,6 +318,7 @@ class FlatTermSelector extends Component {
 			[ 'labels', 'singular_name' ],
 			slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
 		);
+		const name = get( taxonomy, [ 'labels', 'name' ] );
 		const termAddedLabel = sprintf(
 			/* translators: %s: term name. */
 			_x( '%s added', 'term' ),
@@ -326,9 +334,10 @@ class FlatTermSelector extends Component {
 			_x( 'Remove %s', 'term' ),
 			singularName
 		);
-		const tagsButtonDescription = _x(
-			'Choose from the most used tags.',
-			'term'
+		const tagsButtonLabel = sprintf(
+			/* translators: %s: term name. */
+			_x( 'Choose from the most used %s', 'terms' ),
+			name
 		);
 
 		return (
@@ -353,13 +362,20 @@ class FlatTermSelector extends Component {
 						onClick={ () => this.toggleRelatedTerms() }
 						aria-expanded={ ! this.state.areRelatedTermsHidden }
 					>
-						{ tagsButtonDescription }
+						{ tagsButtonLabel }
 					</Button>
-					{ this.state.areRelatedTermsHidden === false ? (
-						<ul className="editor-post-taxonomies__flat-terms-related-list">
+					{ ! this.state.areRelatedTermsHidden ? (
+						<ul
+							className="editor-post-taxonomies__flat-terms-related-list"
+						>
 							{ this.state.relatedTerms.map( ( term ) => (
-								<li key={ term.id }>
+								<li key={ term }>
 									<Button
+										aria-label={ this.getTermScreenReaderString(
+											term.name,
+											term.count
+										) }
+										key={ term.id }
 										className="is-link"
 										onClick={ () =>
 											this.appendTerm( term )
