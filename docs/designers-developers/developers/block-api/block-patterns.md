@@ -15,7 +15,7 @@ The `register_block_pattern` function receives the name of the pattern as the fi
 The properties of the pattern include:
  - `title` (required): A human-readable title for the pattern.
  - `content` (required): Raw HTML content for the pattern.
- - `description` (required): A description of the pattern. Used to describe the pattern in the inserter.
+ - `description`: A visually hidden text used to describe the pattern in the inserter. A description is optional but it is strongly encouraged when the title does not fully describe what the pattern does.
  - `categories`: A list of pattern categories used to group patterns. Patterns can be shown on multiple categories.
  - `keywords`: Aliases or keywords that help users discover it while searching.
  - `viewportWidth`: Specify the width of the block in the inserter.

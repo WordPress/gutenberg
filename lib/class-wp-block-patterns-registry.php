@@ -44,19 +44,13 @@ final class WP_Block_Patterns_Registry {
 
 		if ( ! isset( $pattern_properties['title'] ) || ! is_string( $pattern_properties['title'] ) ) {
 			$message = __( 'Pattern title must be a string.', 'gutenberg' );
-			_doing_it_wrong( __METHOD__, $message, '8.4.0' );
+			_doing_it_wrong( __METHOD__, $message, '8.5.0' );
 			return false;
 		}
 
 		if ( ! isset( $pattern_properties['content'] ) || ! is_string( $pattern_properties['content'] ) ) {
 			$message = __( 'Pattern content must be a string.', 'gutenberg' );
-			_doing_it_wrong( __METHOD__, $message, '8.4.0' );
-			return false;
-		}
-
-		if ( ! isset( $pattern_properties['description'] ) || ! is_string( $pattern_properties['description'] ) ) {
-			$message = __( 'Pattern description must be a string.', 'gutenberg' );
-			_doing_it_wrong( __METHOD__, $message, '8.4.0' );
+			_doing_it_wrong( __METHOD__, $message, '8.5.0' );
 			return false;
 		}
 
