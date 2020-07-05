@@ -18,7 +18,7 @@ The properties of the pattern include:
  - `description`: A visually hidden text used to describe the pattern in the inserter. A description is optional but it is strongly encouraged when the title does not fully describe what the pattern does.
  - `categories`: A list of pattern categories used to group patterns. Patterns can be shown on multiple categories.
  - `keywords`: Aliases or keywords that help users discover it while searching.
- - `viewportWidth`: Specify the width of the block in the inserter.
+ - `viewportWidth`: Specify the width of the pattern in the inserter.
 
 ```php
 register_block_pattern(
