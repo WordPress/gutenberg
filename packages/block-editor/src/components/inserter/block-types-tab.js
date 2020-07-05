@@ -8,11 +8,8 @@ import { map, findIndex, flow, sortBy, groupBy, isEmpty } from 'lodash';
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages } from '@wordpress/components';
-import { addQueryArgs } from '@wordpress/url';
-import { controlsRepeat } from '@wordpress/icons';
 import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,12 +26,13 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 const MAX_SUGGESTED_ITEMS = 6;
 
-export function InserterBlockList( {
+export function BlockTypesTab( {
 	rootClientId,
 	onInsert,
 	onHover,
 	filterValue,
 	debouncedSpeak,
+	showMostUsedBlocks,
 } ) {
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
@@ -59,12 +57,6 @@ export function InserterBlockList( {
 	const suggestedItems = useMemo( () => {
 		return items.slice( 0, MAX_SUGGESTED_ITEMS );
 	}, [ items ] );
-
-	const reusableItems = useMemo( () => {
-		return filteredItems.filter(
-			( { category } ) => category === 'reusable'
-		);
-	}, [ filteredItems ] );
 
 	const uncategorizedItems = useMemo( () => {
 		return filteredItems.filter( ( item ) => ! item.category );
@@ -130,15 +122,18 @@ export function InserterBlockList( {
 				</ChildBlocks>
 			) }
 
-			{ ! hasChildItems && !! suggestedItems.length && ! filterValue && (
-				<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
-					<BlockTypesList
-						items={ suggestedItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-					/>
-				</InserterPanel>
-			) }
+			{ showMostUsedBlocks &&
+				! hasChildItems &&
+				!! suggestedItems.length &&
+				! filterValue && (
+					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+						<BlockTypesList
+							items={ suggestedItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+						/>
+					</InserterPanel>
+				) }
 
 			{ ! hasChildItems &&
 				map( categories, ( category ) => {
@@ -196,28 +191,6 @@ export function InserterBlockList( {
 					);
 				} ) }
 
-			{ ! hasChildItems && !! reusableItems.length && (
-				<InserterPanel
-					className="block-editor-inserter__reusable-blocks-panel"
-					title={ __( 'Reusable' ) }
-					icon={ controlsRepeat }
-				>
-					<BlockTypesList
-						items={ reusableItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-					/>
-					<a
-						className="block-editor-inserter__manage-reusable-blocks"
-						href={ addQueryArgs( 'edit.php', {
-							post_type: 'wp_block',
-						} ) }
-					>
-						{ __( 'Manage all reusable blocks' ) }
-					</a>
-				</InserterPanel>
-			) }
-
 			<__experimentalInserterMenuExtension.Slot
 				fillProps={ {
 					onSelect: onSelectItem,
@@ -240,4 +213,4 @@ export function InserterBlockList( {
 	);
 }
 
-export default compose( withSpokenMessages )( InserterBlockList );
+export default withSpokenMessages( BlockTypesTab );

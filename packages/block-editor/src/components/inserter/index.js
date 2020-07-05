@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { size } from 'lodash';
+import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
@@ -18,6 +20,7 @@ import { plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import QuickInserter from './quick-inserter';
 
 const defaultRenderToggle = ( {
 	onToggle,
@@ -116,8 +119,22 @@ class Inserter extends Component {
 			isAppender,
 			showInserterHelpPanel,
 			__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+
+			// This prop is experimental to give some time for the quick inserter to mature
+			// Feel free to make them stable after a few releases.
+			__experimentalIsQuick: isQuick,
 		} = this.props;
 
+		if ( isQuick ) {
+			return (
+				<QuickInserter
+					rootClientId={ rootClientId }
+					clientId={ clientId }
+					isAppender={ isAppender }
+					selectBlockOnInsert={ selectBlockOnInsert }
+				/>
+			);
+		}
 		return (
 			<InserterMenu
 				onSelect={ onClose }
@@ -135,6 +152,7 @@ class Inserter extends Component {
 			position,
 			hasSingleBlockType,
 			insertOnlyAllowedBlock,
+			__experimentalIsQuick: isQuick,
 		} = this.props;
 
 		if ( hasSingleBlockType ) {
@@ -144,7 +162,10 @@ class Inserter extends Component {
 		return (
 			<Dropdown
 				className="block-editor-inserter"
-				contentClassName="block-editor-inserter__popover"
+				contentClassName={ classnames(
+					'block-editor-inserter__popover',
+					{ 'is-quick': isQuick }
+				) }
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
