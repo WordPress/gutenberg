@@ -4,7 +4,7 @@ A block is added to the block editor using a WordPress plugin. You can create yo
 
 ## Plugin Details
 
-A WordPress plugin is a set of files within the site's `wp-content/plugins` directory. For our tutorial, we will use the `create-block` package to generate the necessary plugin files.
+A WordPress plugin is a set of files within the site's `wp-content/plugins` directory. For our tutorial, we will use the `@wordpress/create-block` package to generate the necessary plugin files.
 
 ### Switch to Working Directory
 
@@ -12,7 +12,7 @@ A WordPress plugin is a set of files within the site's `wp-content/plugins` dire
 
 -or-
 
-(1B) If using `wp-env`, you can start from any directory for your project; `wp-env` will use map it as a plugin directory for your site.
+(1B) If using `wp-env start`, you can work from any directory for your project; `wp-env` will map it as a plugin directory for your site.
 
 ### Generate Plugin Files
 
@@ -78,11 +78,11 @@ In `package.json`, there is a `scripts` property that defines what command to ru
   },
 ```
 
-Sp these scripts are run by using: `npm run build` or `npm run start`
+These scripts are run by using: `npm run build` or `npm run start`
 
 Use `npm run build` for running once to create a "production" build. This compresses the code down so it downloads faster, but makes it harder to read using browser tools—good for final deployment but not while developing.
 
-Use `npm run start` for creating a "development" build, this does not compress the code so it is easier to read using browser tools. Additionally, development build will also start a watch process that waits and watches for changes to the file and will rebuild each time it is saved.
+Use `npm run start` for creating a "development" build, this does not compress the code so it is easier to read using browser tools, plus [source maps](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map) that make debugging easier. Additionally, development build will start a watch process that waits and watches for changes to the file and will rebuild each time it is saved; so you don't have to run the command for each change.
 
 By default, the build scripts looks for `src/index.js` for the JavaScript file to build and will save the built file to `build/index.js`. In the upcoming sections, we will look closer at that script, but first let's make sure it is loaded in WordPress.
 
