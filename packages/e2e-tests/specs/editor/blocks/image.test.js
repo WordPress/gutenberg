@@ -98,4 +98,16 @@ describe( 'Image', () => {
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '12' );
 	} );
+
+	it( 'should allow soft line breaks in caption', async () => {
+		await insertBlock( 'Image' );
+		await upload( '.wp-block-image input[type="file"]' );
+		await page.keyboard.type( '12' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Enter' );
+
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toBe( '1<br data-rich-text-line-break="true">2' );
+	} );
 } );

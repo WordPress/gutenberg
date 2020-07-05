@@ -39,10 +39,9 @@ const defaultInputProps = {
 };
 
 function useUniqueId( idProp ) {
-	const instanceId = useInstanceId( BoxControl );
-	const id = `inspector-box-control-${ instanceId }`;
+	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
 
-	return idProp || id;
+	return idProp || instanceId;
 }
 export default function BoxControl( {
 	id: idProp,
@@ -128,7 +127,7 @@ export default function BoxControl( {
 						onClick={ handleOnReset }
 						disabled={ ! isDirty }
 					>
-						Reset
+						{ __( 'Reset' ) }
 					</Button>
 				</FlexItem>
 			</Header>

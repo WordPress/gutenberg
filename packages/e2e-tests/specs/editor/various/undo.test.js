@@ -225,8 +225,8 @@ describe( 'undo', () => {
 		expect( await getSelection() ).toEqual( {
 			blockIndex: 2,
 			editableIndex: 0,
-			startOffset: 0,
-			endOffset: 0,
+			startOffset: 'is'.length,
+			endOffset: 'is'.length,
 		} );
 
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 2nd paragraph text.
@@ -245,8 +245,8 @@ describe( 'undo', () => {
 		expect( await getSelection() ).toEqual( {
 			blockIndex: 1,
 			editableIndex: 0,
-			startOffset: 0,
-			endOffset: 0,
+			startOffset: 'This'.length,
+			endOffset: 'This'.length,
 		} );
 
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 1st paragraph text.

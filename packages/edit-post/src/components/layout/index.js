@@ -56,12 +56,13 @@ const interfaceLabels = {
 };
 
 function Layout() {
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		'core/edit-post'
-	);
+	const {
+		openGeneralSidebar,
+		closeGeneralSidebar,
+		setIsInserterOpened,
+	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
 		isFullscreenActive,
@@ -72,6 +73,8 @@ function Layout() {
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
+		showMostUsedBlocks,
+		isInserterOpened,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -85,6 +88,10 @@ function Layout() {
 			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
 				'fullscreenMode'
 			),
+			showMostUsedBlocks: select( 'core/edit-post' ).isFeatureActive(
+				'mostUsedBlocks'
+			),
+			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
@@ -112,14 +119,14 @@ function Layout() {
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
 		if ( sidebarIsOpened && ! isHugeViewport ) {
-			setIsInserterOpen( false );
+			setIsInserterOpened( false );
 		}
 	}, [ sidebarIsOpened, isHugeViewport ] );
 	useEffect( () => {
-		if ( isInserterOpen && ! isHugeViewport ) {
+		if ( isInserterOpened && ! isHugeViewport ) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpen, isHugeViewport ] );
+	}, [ isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
 	// Note 'thruthy' callback implies an open panel.
@@ -153,10 +160,6 @@ function Layout() {
 					labels={ interfaceLabels }
 					header={
 						<Header
-							isInserterOpen={ isInserterOpen }
-							onToggleInserter={ () =>
-								setIsInserterOpen( ! isInserterOpen )
-							}
 							setEntitiesSavedStatesCallback={
 								setEntitiesSavedStatesCallback
 							}
@@ -164,22 +167,25 @@ function Layout() {
 					}
 					leftSidebar={
 						mode === 'visual' &&
-						isInserterOpen && (
+						isInserterOpened && (
 							<div className="edit-post-layout__inserter-panel">
 								<div className="edit-post-layout__inserter-panel-header">
 									<Button
 										icon={ close }
 										onClick={ () =>
-											setIsInserterOpen( false )
+											setIsInserterOpened( false )
 										}
 									/>
 								</div>
 								<div className="edit-post-layout__inserter-panel-content">
 									<Library
+										showMostUsedBlocks={
+											showMostUsedBlocks
+										}
 										showInserterHelpPanel
 										onSelect={ () => {
 											if ( isMobileViewport ) {
-												setIsInserterOpen( false );
+												setIsInserterOpened( false );
 											}
 										} }
 									/>

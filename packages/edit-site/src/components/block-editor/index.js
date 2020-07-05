@@ -12,7 +12,6 @@ import {
 	WritingFlow,
 	ObserveTyping,
 	BlockList,
-	ButtonBlockerAppender,
 } from '@wordpress/block-editor';
 
 /**
@@ -65,10 +64,7 @@ export default function BlockEditor() {
 			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
 				<WritingFlow>
 					<ObserveTyping>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							renderAppender={ ButtonBlockerAppender }
-						/>
+						<BlockList className="edit-site-block-editor__block-list" />
 					</ObserveTyping>
 				</WritingFlow>
 			</div>

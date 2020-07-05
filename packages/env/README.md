@@ -12,7 +12,7 @@ $ npm -g i @wordpress/env
 $ wp-env start
 ```
 
-The local environment will be available at http://localhost:8888.
+The local environment will be available at http://localhost:8888 (Username: `admin`, Password: `password`).
 
 ## Prerequisites
 
@@ -258,7 +258,8 @@ wp> ^C
 ```sh
 wp-env destroy
 
-Destroy the WordPress environment. Delete docker containers and remove local files.
+Destroy the WordPress environment. Deletes docker containers, volumes, and
+networks associated with the WordPress environment and removes local files.
 ```
 
 ### `wp-env logs [environment]`

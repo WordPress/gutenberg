@@ -10,6 +10,8 @@
 /**
  * Controller which provides REST endpoint for the blocks.
  *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
  * @since 5.5.0
  *
  * @see   WP_REST_Controller
@@ -20,7 +22,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * Constructs the controller.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'block-directory';
 	}
 
@@ -39,36 +41,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 					'args'                => $this->get_collection_params(),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/install',
-			array(
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( $this, 'create_item' ),
-				'permission_callback' => array( $this, 'create_item_permissions_check' ),
-				'args'                => array(
-					'slug' => array(
-						'required' => true,
-					),
-				),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/uninstall',
-			array(
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => array( $this, 'delete_item' ),
-				'permission_callback' => array( $this, 'delete_item_permissions_check' ),
-				'args'                => array(
-					'slug' => array(
-						'required' => true,
-					),
-				),
 			)
 		);
 	}
@@ -137,117 +109,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Checks whether a given request has permission to install and activate plugins.
-	 *
-	 * @since 5.5.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 *
-	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
-	 */
-	public function create_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
-			return new WP_Error(
-				'rest_block_directory_cannot_create',
-				__( 'Sorry, you are not allowed to install blocks.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Installs and activates a plugin
-	 *
-	 * @since 5.5.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 *
-	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
-	 */
-	public function create_item( $request ) {
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-
-		$existing = $this->find_plugin_for_slug( $request['slug'] );
-
-		if ( $existing ) {
-			$activate = new WP_REST_Request( 'PUT', '/__experimental/plugins/' . substr( $existing, 0, - 4 ) );
-			$activate->set_body_params( array( 'status' => 'active' ) );
-
-			return rest_do_request( $activate );
-		}
-
-		$inner_request = new WP_REST_Request( 'POST', '/__experimental/plugins' );
-		$inner_request->set_body_params(
-			array(
-				'slug'   => $request['slug'],
-				'status' => 'active',
-			)
-		);
-
-		return rest_do_request( $inner_request );
-	}
-
-	/**
-	 * Checks whether a given request has permission to remove/deactivate plugins.
-	 *
-	 * @since 5.5.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 *
-	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
-	 */
-	public function delete_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		if ( ! current_user_can( 'delete_plugins' ) || ! current_user_can( 'deactivate_plugins' ) ) {
-			return new WP_Error(
-				'rest_block_directory_cannot_delete',
-				__( 'Sorry, you are not allowed to uninstall blocks.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Deactivates and deletes a plugin
-	 *
-	 * @since 5.5.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 *
-	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
-	 */
-	public function delete_item( $request ) {
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-
-		$slug = trim( $request->get_param( 'slug' ) );
-
-		if ( ! $slug ) {
-			return new WP_Error( 'slug_not_provided', 'Valid slug not provided.', array( 'status' => 400 ) );
-		}
-
-		$plugin_file = $this->find_plugin_for_slug( $slug );
-
-		if ( ! $plugin_file ) {
-			return new WP_Error( 'block_not_found', 'Valid slug not provided.', array( 'status' => 400 ) );
-		}
-
-		$route      = '/__experimental/plugins/' . substr( $plugin_file, 0, - 4 );
-		$deactivate = new WP_REST_Request( 'PUT', $route );
-		$deactivate->set_body_params( array( 'status' => 'inactive' ) );
-
-		$deactivated = rest_do_request( $deactivate );
-
-		if ( $deactivated->is_error() ) {
-			return $deactivated->as_error();
-		}
-
-		return rest_do_request( new WP_REST_Request( 'DELETE', $route ) );
-	}
-
-	/**
 	 * Parse block metadata for a block, and prepare it for an API repsonse.
 	 *
 	 * @since 5.5.0
@@ -277,15 +138,25 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			'assets'              => array(),
 			'last_updated'        => $plugin['last_updated'],
 			'humanized_updated'   => sprintf(
-			/* translators: %s: Human-readable time difference. */
+				/* translators: %s: Human-readable time difference. */
 				__( '%s ago', 'gutenberg' ),
 				human_time_diff( strtotime( $plugin['last_updated'] ) )
 			),
 		);
 
 		foreach ( $plugin['block_assets'] as $asset ) {
-			// TODO: Return from API, not client-set.
-			$block['assets'][] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
+			// Allow for fully qualified URLs in future.
+			if ( 'https' === wp_parse_url( $asset, PHP_URL_SCHEME ) && ! empty( wp_parse_url( $asset, PHP_URL_HOST ) ) ) {
+				$block['assets'][] = esc_url_raw(
+					$asset,
+					array( 'https' )
+				);
+			} else {
+				$block['assets'][] = esc_url_raw(
+					add_query_arg( 'v', strtotime( $block['last_updated'] ), 'https://ps.w.org/' . $plugin['slug'] . $asset ),
+					array( 'https' )
+				);
+			}
 		}
 
 		$this->add_additional_fields_to_object( $block, $request );
@@ -308,7 +179,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	protected function prepare_links( $plugin ) {
 		$links = array(
 			'https://api.w.org/install-plugin' => array(
-				'href' => add_query_arg( 'slug', urlencode( $plugin['slug'] ), rest_url( '__experimental/plugins' ) ),
+				'href' => add_query_arg( 'slug', urlencode( $plugin['slug'] ), rest_url( 'wp/v2/plugins' ) ),
 			),
 		);
 
@@ -316,7 +187,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		if ( $plugin_file ) {
 			$links['https://api.w.org/plugin'] = array(
-				'href'       => rest_url( '__experimental/plugins/' . substr( $plugin_file, 0, - 4 ) ),
+				'href'       => rest_url( 'wp/v2/plugins/' . substr( $plugin_file, 0, - 4 ) ),
 				'embeddable' => true,
 			);
 		}
@@ -453,8 +324,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
 
-		$query_params['context']['default']  = 'view';
-		$query_params['per_page']['default'] = 3;
+		$query_params['context']['default'] = 'view';
 
 		$query_params['term'] = array(
 			'description' => __( 'Limit result set to blocks matching the search term.', 'gutenberg' ),

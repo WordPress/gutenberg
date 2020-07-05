@@ -54,6 +54,7 @@ export class BlockList extends Component {
 			parentWidth: this.props.parentWidth,
 			renderFooterAppender: this.props.renderFooterAppender,
 			onDeleteBlock: this.props.onDeleteBlock,
+			contentStyle: this.props.contentstyle,
 		};
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
@@ -108,16 +109,23 @@ export class BlockList extends Component {
 	}
 
 	getExtraData() {
-		const { parentWidth, renderFooterAppender, onDeleteBlock } = this.props;
+		const {
+			parentWidth,
+			renderFooterAppender,
+			onDeleteBlock,
+			contentStyle,
+		} = this.props;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
-			this.extraData.onDeleteBlock !== onDeleteBlock
+			this.extraData.onDeleteBlock !== onDeleteBlock ||
+			this.extraData.contentStyle !== contentStyle
 		) {
 			this.extraData = {
 				parentWidth,
 				renderFooterAppender,
 				onDeleteBlock,
+				contentStyle,
 			};
 		}
 		return this.extraData;
@@ -221,7 +229,6 @@ export class BlockList extends Component {
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
 				/>
-
 				{ this.shouldShowInnerBlockAppender() && (
 					<View
 						style={ {
@@ -304,7 +311,7 @@ export class BlockList extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId, __experimentalMoverDirection } ) => {
+	withSelect( ( select, { rootClientId, orientation } ) => {
 		const {
 			getBlockCount,
 			getBlockOrder,
@@ -314,8 +321,7 @@ export default compose( [
 			getBlockHierarchyRootClientId,
 		} = select( 'core/block-editor' );
 
-		const isStackedHorizontally =
-			__experimentalMoverDirection === 'horizontal';
+		const isStackedHorizontally = orientation === 'horizontal';
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
@@ -376,16 +382,14 @@ class EmptyListComponent extends Component {
 }
 
 const EmptyListComponentCompose = compose( [
-	withSelect( ( select, { rootClientId, __experimentalMoverDirection } ) => {
+	withSelect( ( select, { rootClientId, orientation } ) => {
 		const {
 			getBlockOrder,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 		} = select( 'core/block-editor' );
 
-		const isStackedHorizontally =
-			__experimentalMoverDirection === 'horizontal';
-
+		const isStackedHorizontally = orientation === 'horizontal';
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();

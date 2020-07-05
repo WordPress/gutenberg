@@ -26,15 +26,6 @@ import { pullLeft, pullRight } from '@wordpress/icons';
 import MediaContainer from './media-container';
 import styles from './style.scss';
 
-/**
- * Constants
- */
-const ALLOWED_BLOCKS = [
-	'core/button',
-	'core/paragraph',
-	'core/heading',
-	'core/list',
-];
 const TEMPLATE = [ [ 'core/paragraph' ] ];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
@@ -284,7 +275,6 @@ class MediaTextEdit extends Component {
 						} }
 					>
 						<InnerBlocks
-							allowedBlocks={ ALLOWED_BLOCKS }
 							template={ TEMPLATE }
 							templateInsertUpdatesSelection={ false }
 						/>

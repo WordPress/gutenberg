@@ -57,7 +57,7 @@
 	left: 0;
 	right: 0;
 	background: $white;
-	border-bottom: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $gray-200;
 
 	&:empty {
 		display: none;
@@ -94,7 +94,7 @@
 		}
 
 		.block-editor-block-toolbar {
-			border-left: $border-width solid $light-gray-500;
+			border-left: $border-width solid $gray-200;
 		}
 
 		.block-editor-block-toolbar .components-toolbar-group,

@@ -199,34 +199,28 @@ function gutenberg_experimental_global_styles_get_core() {
 function gutenberg_experimental_global_styles_get_theme_presets() {
 	$theme_presets = array();
 
-	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
-	if ( is_array( $theme_colors ) ) {
-		foreach ( $theme_colors as $color ) {
-			$theme_presets['global']['presets']['color'][] = array(
-				'slug'  => $color['slug'],
-				'value' => $color['color'],
-			);
-		}
+	$theme_colors = gutenberg_experimental_get( get_theme_support( 'editor-color-palette' ), array( '0' ) );
+	foreach ( $theme_colors as $color ) {
+		$theme_presets['global']['presets']['color'][] = array(
+			'slug'  => $color['slug'],
+			'value' => $color['color'],
+		);
 	}
 
-	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[0];
-	if ( is_array( $theme_gradients ) ) {
-		foreach ( $theme_gradients as $gradient ) {
-			$theme_presets['global']['presets']['gradient'][] = array(
-				'slug'  => $gradient['slug'],
-				'value' => $gradient['gradient'],
-			);
-		}
+	$theme_gradients = gutenberg_experimental_get( get_theme_support( 'editor-gradient-presets' ), array( '0' ) );
+	foreach ( $theme_gradients as $gradient ) {
+		$theme_presets['global']['presets']['gradient'][] = array(
+			'slug'  => $gradient['slug'],
+			'value' => $gradient['gradient'],
+		);
 	}
 
-	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[0];
-	if ( is_array( $theme_font_sizes ) ) {
-		foreach ( $theme_font_sizes as $font_size ) {
-			$theme_presets['global']['presets']['font-size'][] = array(
-				'slug'  => $font_size['slug'],
-				'value' => $font_size['size'],
-			);
-		}
+	$theme_font_sizes = gutenberg_experimental_get( get_theme_support( 'editor-font-sizes' ), array( '0' ) );
+	foreach ( $theme_font_sizes as $font_size ) {
+		$theme_presets['global']['presets']['font-size'][] = array(
+			'slug'  => $font_size['slug'],
+			'value' => $font_size['size'],
+		);
 	}
 
 	return $theme_presets;
@@ -386,7 +380,7 @@ function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
 	$result = array();
 
 	foreach ( $mappings as $key => $path ) {
-		$value = gutenberg_experimental_get( $styles, $path );
+		$value = gutenberg_experimental_get( $styles, $path, null );
 		if ( null !== $value ) {
 			$result[ $key ] = $value;
 		}

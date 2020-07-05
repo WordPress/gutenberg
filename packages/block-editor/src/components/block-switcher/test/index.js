@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 
 /**
  * WordPress dependencies
  */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { DOWN } from '@wordpress/keycodes';
-import { ToolbarButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -154,7 +154,7 @@ describe( 'BlockSwitcher', () => {
 
 		const onTransformStub = jest.fn();
 		const getDropdown = () => {
-			const blockSwitcher = shallow(
+			const blockSwitcher = mount(
 				<BlockSwitcher
 					blocks={ blocks }
 					onTransform={ onTransformStub }
@@ -181,13 +181,13 @@ describe( 'BlockSwitcher', () => {
 			} );
 
 			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
-				const toggleClosed = shallow(
+				const toggleClosed = mount(
 					getDropdown().props().renderToggle( {
 						onToggle: onToggleStub,
 						isOpen: false,
 					} )
 				);
-				const iconButtonClosed = toggleClosed.find( ToolbarButton );
+				const iconButtonClosed = toggleClosed.find( Button );
 
 				iconButtonClosed.simulate( 'keydown', mockKeyDown );
 
@@ -195,13 +195,13 @@ describe( 'BlockSwitcher', () => {
 			} );
 
 			test( 'should simulate a click event, which should call onToggle.', () => {
-				const toggleOpen = shallow(
+				const toggleOpen = mount(
 					getDropdown().props().renderToggle( {
 						onToggle: onToggleStub,
 						isOpen: true,
 					} )
 				);
-				const iconButtonOpen = toggleOpen.find( ToolbarButton );
+				const iconButtonOpen = toggleOpen.find( Button );
 
 				iconButtonOpen.simulate( 'keydown', mockKeyDown );
 
@@ -219,8 +219,10 @@ describe( 'BlockSwitcher', () => {
 							.renderContent( { onClose: onCloseStub } ) }
 					</div>
 				);
-				const blockList = content.find( 'BlockTypesList' );
-				expect( blockList.prop( 'items' ) ).toHaveLength( 1 );
+				const blockList = content.find( 'BlockTransformationsMenu' );
+				expect(
+					blockList.prop( 'possibleBlockTransformations' )
+				).toHaveLength( 1 );
 			} );
 		} );
 	} );

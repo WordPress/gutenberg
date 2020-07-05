@@ -528,7 +528,7 @@ import './style.css';
 When you run the build using the default command `wp-scripts build` (also applies to `start`) in addition to the JavaScript file `index.js` generated in the `build` folder, you should see two more files:
 
 1. `index.css` – all imported CSS files are bundled into one chunk named after the entry point, which defaults to `index.js`, and thus the file created becomes `index.css`. This is for styles used only in the editor.
-2. `style.css` – imported `style.css` file(s) (applies to SASS and SCSS extensions) get bundled into one `style.css` file that is meant to be used both on the front-end and in the editor.
+2. `style-index.css` – imported `style.css` file(s) (applies to SASS and SCSS extensions) get bundled into one `style-index.css` file that is meant to be used both on the front-end and in the editor.
 
 You can also have multiple entry points as described in the docs for the script:
 
@@ -538,7 +538,7 @@ wp-scripts start entry-one.js entry-two.js --output-path=custom
 
 If you do so, then CSS files generated will follow the names of the entry points: `entry-one.css` and `entry-two.css`.
 
-You can have only one entry point and name it differently if you will. Avoid using `style` for an entry point name, this will break your build process.
+Avoid using `style` keyword in an entry point name, this might break your build process.
 
 #### Using SVG
 
