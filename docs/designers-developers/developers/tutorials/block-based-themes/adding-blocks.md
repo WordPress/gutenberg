@@ -35,7 +35,10 @@ Next, select the footer template part and add some example content.
 
 Select the index template to view the temlate parts in the page context.
 
+To add a post loop to the index template, add a **query** block.
 
+The query block includes the post loop, and the query pagination.
+Loop and query pagination are also available as individual blocks.
 
 
 
