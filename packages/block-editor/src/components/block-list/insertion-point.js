@@ -30,6 +30,7 @@ function Indicator( { clientId } ) {
 			const rootClientId = getBlockRootClientId( clientId );
 			const blockIndex = getBlockIndex( clientId, rootClientId );
 			const insertionPoint = getBlockInsertionPoint();
+
 			return (
 				isBlockInsertionPointVisible() &&
 				insertionPoint.index === blockIndex &&
@@ -156,8 +157,9 @@ export default function InsertionPoint( {
 		? multiSelectedBlockClientIds.includes( inserterClientId )
 		: inserterClientId === selectedBlockClientId;
 	const isVisible = isInserterShown || isInserterForced || isInserterVisible;
-	const selectedElement =
-		inserterElement || getBlockDOMNode( selectedClientId );
+	const selectedElement = selectedClientId
+		? getBlockDOMNode( selectedClientId )
+		: inserterElement;
 
 	return (
 		<>
@@ -176,7 +178,7 @@ export default function InsertionPoint( {
 						style={ { width: selectedElement.offsetWidth } }
 					>
 						<Indicator
-							clientId={ inserterClientId || selectedClientId }
+							clientId={ selectedClientId || inserterClientId }
 						/>
 						{ ( isInserterShown || isInserterForced ) && (
 							/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
