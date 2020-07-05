@@ -3,29 +3,34 @@
 The purpose of this tutorial is to show how to create a basic block based theme
 and help theme developers transition to full site editing.
 
+Full site editing is an experimental feature. This tutorial was written for Gutenberg version 8.5.
+
 Please also see the documentation for block-based themes at https://developer.wordpress.org/block-editor/developers/themes/block-based-themes/
+
+## Table of Contents
+ - What is needed to create a block-based theme?
+ - Creating the theme
+ - Create the templates and template parts
+ - Experimental-theme.json -Global styles
+ - Adding blocks
 
 ## What is needed to create a block-based theme?
 
 To use a block based theme you need to have Gutenberg installed and full site editing must be enabled.
-
 Full site editing can be enabled from the Gutenberg experiments menu in the WordPress admin area.
 
-This tutorial was written for Gutenberg version 8.4.
-
 A block-based theme is built using templates and template parts.
+Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the HTML, for the selected blocks.
 
-Templates are your main files according to the [template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/), 
+Templates are the main files by the [template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/), 
 for example index, single or archive.
-
 Templates can optionally include template parts, for example header, footer or a sidebar.
 
-A block based theme requires an index.php file, and index template, a style.css file, and a functions.php file.
-
+A block based theme requires an index.php file, and index template file, a style.css file, and a functions.php file.
 You decide what additional templates and template parts to include in your theme.
 
 Templates are placed inside the block-templates folder, 
-and template parts are placed inside the block-template-parts folder.
+and template parts are placed inside the block-template-parts folder:
 
 ```
 theme
@@ -42,8 +47,6 @@ theme
 	|__ sidebar.html
 	|__ ...
 ```
-
-Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the raw HTML, for the selected blocks.
 
 ## Creating the theme
 
@@ -75,11 +78,10 @@ Use it to make something cool, have fun, and share what you've learned with othe
 
 Create a functions.php file.
 
-In this file, you will enqueue the style.css file and add the menus and theme support that you want to use.
-
+In this file, you will enqueue the style.css file and add any menus and theme support that you want to use.
 For example colors, wide blocks and featured images.
 
--You no longer need to add theme support for the title tag. This is already enabled with full site editing.
+-You no longer need to add theme support for the title tag. It is already enabled with full site editing.
 
 ```
 if ( ! function_exists( 'myfirsttheme_setup' ) ) :
@@ -141,20 +143,31 @@ function myfirsttheme_scripts() {
 add_action( 'wp_enqueue_scripts', 'myfirsttheme_scripts' );
 ```
 
-### Create the Index template
+### Create the templates and template parts
 
-WordPress requires themes to include an index.php file.
-This file is used as a fallback if the theme is activated when full site editing is not enabled.
+WordPress requires themes to include an index.php file. This file is used as a fallback if the theme is activated when full site editing is not enabled. 
 Create an empty index.php file inside your main folder.
 
-Inside the block-template folder, create an empty index.html file.
+Inside the block-template folder, create an index.html file.
+Create two empty template parts called footer.html and header.html and place them inside the block-template-parts folder.
+
+Open the index.html file and add the following code to include the two template parts:
+
+```
+<!-- wp:template-part {"slug":"header","theme":"myfirsttheme"} /-->
+
+<!-- wp:template-part {"slug":"footer","theme":"myfirsttheme"} /-->
+
+```
+If you used a differnt theme name, adjust the value for the theme key.
+
 
 ### Experimental-theme.json -Global styles
 
 The purpose of the experimental-theme.json is to make it easier to style blocks.
 
 It is used to:
- * Create global CSS variables that are used both on the front and in the editor.
+ * Create CSS variables that can be used to style blocks both on the front and in the editor.
  * Set global styles.
  * Set styles for individual block types.
 
@@ -162,7 +175,11 @@ It is used to:
 
 Create a file called experimental-theme.json and save it inside the main folder.
 
-We generate the CSS variables using global presets:
+CSS variables are generated using global presets.
+The variables are added to the `:root` on the front, and to the `.editor-styles-wrapper` class in the editor.
+
+Add the following global presets to the experimental-theme.json file:
+
 ```
 {
 	"global": {
@@ -195,9 +212,20 @@ We generate the CSS variables using global presets:
 	},
 ```
 
-Now we can use the presets with the global styles.
-This example will add the dark grey color as the site background color.
-Add the code inside the globals, after the preset:
+This code generates the following variables:
+```
+	--wp--preset--color--strong-magenta: #a156b4;
+	--wp--preset--color--very-dark-gray: #444;
+	
+	--wp--preset--line-height--small: 1.3;
+	--wp--preset--line-height--medium: 2;
+	--wp--preset--line-height--large: 2.5;
+```
+
+**Global styles** are used to set default values for the website and for the blocks.
+
+This example will add the dark grey color as the website background color.
+Add the code inside the globals, after the presets:
 ```
 	"styles": {
 		"color": {
@@ -205,21 +233,15 @@ Add the code inside the globals, after the preset:
 		}
 	}
 ```
-Next we are styling the H2 heading block using the CSS variables for text color and line height,
-combining it with a custom font size.
 
-We are also updating the font size of the paragraph block.
-The font size used here is a default size already available as an option in the block editor.
+**Block styles** sets default values for all blocks of a specific type.
 
-If we don't add a custom font size using theme support, the default CSS variables are created for us,
-ready to use.
+This example uses the CSS variables to add text color and line height to the H2 heading block,
+in combination with a custom font size.
 
-The font sizes are unit less, which is why we are using calc.
+Block styles are separate from global styles. Add the code after the globals,
+but before the closing brace.
 
-Finally, we add a default background color to the group block.
-This is to illustrate that we can use either CSS variables or color codes.
-
-Add this code below the global presets, but before the closing brace:
 ```
 	"core/heading/h2": {
 		"styles": {
@@ -232,7 +254,16 @@ Add this code below the global presets, but before the closing brace:
 			}
 		}
 	},
+```
 
+CSS variables for font sizes can be generated using the theme support, or by adding a global preset.
+
+If the theme does not add any custom font sizes, variables are created using the default sizes.
+This example adds the default medium font size to the paragraph block.
+
+The font sizes are unit less, which is why we are using calc:
+
+```
 	"core/paragraph": {
 		"styles": {
 			"typography": {
@@ -240,7 +271,12 @@ Add this code below the global presets, but before the closing brace:
 			}
 		}
 	},
+```
 
+Using the CSS variables is optional.
+In this example, the default background color for the group block is changed to white using a color code:
+
+```
 	"core/group": {
 		"styles": {
 			"color": {
@@ -251,6 +287,7 @@ Add this code below the global presets, but before the closing brace:
 ```
 
 Below are our presets and styles combined:
+
 ```
 {
 	"global": {
@@ -316,3 +353,16 @@ Below are our presets and styles combined:
 	}
 }
 ```
+
+## Adding blocks
+
+There is more than one way to add blocks to the theme files:
+- Adding and editing blocks in the site editor and exporting the theme.
+- Adding block grammar to the HTML files manually.
+
+### Adding blocks using the site editor
+
+
+
+
+
