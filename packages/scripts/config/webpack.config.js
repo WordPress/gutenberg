@@ -108,17 +108,14 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
-				exclude: /node_modules/,
 				use: [ '@svgr/webpack', 'url-loader' ],
 			},
 			{
 				test: /\.css$/,
-				exclude: /node_modules/,
 				use: cssLoaders,
 			},
 			{
 				test: /\.(sc|sa)ss$/,
-				exclude: /node_modules/,
 				use: [
 					...cssLoaders,
 					{

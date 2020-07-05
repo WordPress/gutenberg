@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Allow the CSS, SVG, and Sass loaders to process files from node_modules directory.
+-   Improve the way licenses are validated with `check-licenses` by falling back to license files verification when the entry in `package.json` doesn't contain an allowed match ([#23550](https://github.com/WordPress/gutenberg/pull/23550)).
+
+## 12.0.0-rc.0 (2020-06-24)
+
 ### Breaking Changes
 
 -   The bundled `stylelint` dependency has been updated from requiring `^9.10.1` to requiring `^13.6.0`.

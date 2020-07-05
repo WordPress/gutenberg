@@ -28,8 +28,8 @@ $block-editor-link-control-number-of-actions: 1;
 		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
 		margin: $grid-unit-20;
 		position: relative;
-		border: 1px solid $light-gray-500;
-		border-radius: $radius-round-rectangle;
+		border: 1px solid $gray-200;
+		border-radius: $radius-block-ui;
 	}
 
 	.components-base-control__field {
@@ -122,7 +122,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 	&:hover,
 	&:focus {
-		background-color: $light-gray-300;
+		background-color: $gray-200;
 	}
 
 	// The added specificity is needed to override.
@@ -131,7 +131,7 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	&.is-selected {
-		background: $light-gray-200;
+		background: $gray-100;
 
 		.block-editor-link-control__search-item-type {
 			background: $white;
@@ -167,7 +167,7 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__search-item-title mark {
-		color: $dark-gray-900;
+		color: $gray-900;
 	}
 
 	.block-editor-link-control__search-item-title {
@@ -198,7 +198,7 @@ $block-editor-link-control-number-of-actions: 1;
 		padding: 3px 8px;
 		margin-left: auto;
 		font-size: 0.9em;
-		background-color: $light-gray-200;
+		background-color: $gray-100;
 		border-radius: 2px;
 	}
 }
@@ -228,7 +228,7 @@ $block-editor-link-control-number-of-actions: 1;
 		left: 0;
 		display: block;
 		width: 100%;
-		border-top: 1px solid $light-gray-500;
+		border-top: 1px solid $gray-200;
 	}
 }
 
@@ -238,7 +238,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__settings {
-	border-top: 1px solid $light-gray-500;
+	border-top: 1px solid $gray-200;
 	margin: 0;
 	padding: $grid-unit-20 $grid-unit-30;
 

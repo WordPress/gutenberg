@@ -63,9 +63,7 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 		list.remove( 'is-style-' + activeStyle.name );
 	}
 
-	if ( ! newStyle.isDefault ) {
-		list.add( 'is-style-' + newStyle.name );
-	}
+	list.add( 'is-style-' + newStyle.name );
 
 	return list.value;
 }
@@ -82,7 +80,12 @@ const useGenericPreviewBlock = ( block, type ) =>
 		[ type.example ? block.name : block, type ]
 	);
 
-function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
+function BlockStyles( {
+	clientId,
+	onSwitch = noop,
+	onHoverClassName = noop,
+	itemRole,
+} ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
@@ -141,6 +144,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						onHover={ () => onHoverClassName( styleClassName ) }
 						style={ style }
 						styleClassName={ styleClassName }
+						itemRole={ itemRole }
 					/>
 				);
 			} ) }
@@ -156,6 +160,7 @@ function BlockStyleItem( {
 	onHover,
 	onSelect,
 	styleClassName,
+	itemRole,
 } ) {
 	const previewBlocks = useMemo( () => {
 		return {
@@ -182,7 +187,7 @@ function BlockStyleItem( {
 			} }
 			onMouseEnter={ onHover }
 			onMouseLeave={ onBlur }
-			role="button"
+			role={ itemRole || 'button' }
 			tabIndex="0"
 			aria-label={ style.label || style.name }
 		>

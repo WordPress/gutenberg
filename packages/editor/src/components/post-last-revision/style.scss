@@ -8,12 +8,12 @@
 }
 
 .components-button.editor-post-last-revision__title {
-	height: auto;
+	height: 100%;
 
 	&:hover,
 	&:active {
 		// Override the default button hover style
-		background: $light-gray-200;
+		background: $gray-100;
 	}
 
 	&:focus {

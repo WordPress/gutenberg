@@ -9,6 +9,11 @@
 	width: 100%;
 
 	overflow: hidden;
+
+	// Overrides the default padding applied in editor styles otherwise preview centering break.
+	&.editor-styles-wrapper {
+		padding: 0;
+	}
 }
 
 .block-editor-block-preview__content {

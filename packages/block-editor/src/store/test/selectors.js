@@ -55,6 +55,7 @@ const {
 	isBlockInsertionPointVisible,
 	isSelectionEnabled,
 	canInsertBlockType,
+	canInsertBlocks,
 	getInserterItems,
 	isValidTemplate,
 	getTemplate,
@@ -2273,6 +2274,59 @@ describe( 'selectors', () => {
 			expect(
 				canInsertBlockType( state, 'core/post-content-child' )
 			).toBe( true );
+		} );
+	} );
+
+	describe( 'canInsertBlocks', () => {
+		it( 'should allow blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						1: { name: 'core/test-block-a' },
+						2: { name: 'core/test-block-b' },
+						3: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						1: {},
+						2: {},
+						3: {},
+					},
+				},
+				blockListSettings: {
+					1: {
+						allowedBlocks: [
+							'core/test-block-b',
+							'core/test-block-c',
+						],
+					},
+				},
+				settings: {},
+			};
+			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( true );
+		} );
+
+		it( 'should deny blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						1: { name: 'core/test-block-a' },
+						2: { name: 'core/test-block-b' },
+						3: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						1: {},
+						2: {},
+						3: {},
+					},
+				},
+				blockListSettings: {
+					1: {
+						allowedBlocks: [ 'core/test-block-c' ],
+					},
+				},
+				settings: {},
+			};
+			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( false );
 		} );
 	} );
 

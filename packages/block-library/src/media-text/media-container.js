@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { noop } from 'lodash';
 
 /**
@@ -137,7 +138,12 @@ function MediaContainer( props ) {
 
 		return (
 			<ResizableBoxContainer
-				className="editor-media-container__resizer"
+				as="figure"
+				className={ classnames(
+					className,
+					'editor-media-container__resizer'
+				) }
+				style={ backgroundStyles }
 				size={ { width: mediaWidth + '%' } }
 				minWidth="10%"
 				maxWidth="100%"
@@ -154,9 +160,7 @@ function MediaContainer( props ) {
 					mediaUrl={ mediaUrl }
 					mediaId={ mediaId }
 				/>
-				<figure className={ className } style={ backgroundStyles }>
-					{ ( mediaTypeRenderers[ mediaType ] || noop )() }
-				</figure>
+				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
 			</ResizableBoxContainer>
 		);
 	}

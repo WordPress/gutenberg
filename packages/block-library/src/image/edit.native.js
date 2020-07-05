@@ -9,13 +9,16 @@ import {
 	TouchableWithoutFeedback,
 	Dimensions,
 } from 'react-native';
+/**
+ * WordPress dependencies
+ */
 import {
 	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 import { isEmpty, get, find, map } from 'lodash';
 
 /**

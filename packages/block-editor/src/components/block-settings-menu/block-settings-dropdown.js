@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, flow } from 'lodash';
+import { castArray, flow, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,8 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreHorizontal } from '@wordpress/icons';
+
+import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 
 /**
@@ -33,7 +35,12 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function BlockSettingsDropdown( { clientIds, ...props } ) {
+export function BlockSettingsDropdown( {
+	clientIds,
+	__experimentalSelectBlock,
+	children,
+	...props
+} ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
@@ -56,8 +63,23 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 		};
 	}, [] );
 
+	const updateSelection = useCallback(
+		__experimentalSelectBlock
+			? async ( clientIdsPromise ) => {
+					const ids = await clientIdsPromise;
+					if ( ids && ids[ 0 ] ) {
+						__experimentalSelectBlock( ids[ 0 ] );
+					}
+			  }
+			: noop,
+		[ __experimentalSelectBlock ]
+	);
+
 	return (
-		<BlockActions clientIds={ clientIds }>
+		<BlockActions
+			clientIds={ clientIds }
+			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
+		>
 			{ ( {
 				canDuplicate,
 				canInsertDefaultBlock,
@@ -67,6 +89,7 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 				onInsertBefore,
 				onRemove,
 				onCopy,
+				onMoveTo,
 				blocks,
 			} ) => (
 				<DropdownMenu
@@ -103,7 +126,11 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 								</ClipboardButton>
 								{ canDuplicate && (
 									<MenuItem
-										onClick={ flow( onClose, onDuplicate ) }
+										onClick={ flow(
+											onClose,
+											onDuplicate,
+											updateSelection
+										) }
 										shortcut={ shortcuts.duplicate }
 									>
 										{ __( 'Duplicate' ) }
@@ -131,6 +158,13 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 										</MenuItem>
 									</>
 								) }
+								{ ! isLocked && (
+									<MenuItem
+										onClick={ flow( onClose, onMoveTo ) }
+									>
+										{ __( 'Move To' ) }
+									</MenuItem>
+								) }
 								{ count === 1 && (
 									<BlockModeToggle
 										clientId={ firstBlockClientId }
@@ -142,10 +176,19 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 								fillProps={ { onClose } }
 								clientIds={ clientIds }
 							/>
+							{ typeof children === 'function'
+								? children( { onClose } )
+								: Children.map( ( child ) =>
+										cloneElement( child, { onClose } )
+								  ) }
 							<MenuGroup>
 								{ ! isLocked && (
 									<MenuItem
-										onClick={ flow( onClose, onRemove ) }
+										onClick={ flow(
+											onClose,
+											onRemove,
+											updateSelection
+										) }
 										shortcut={ shortcuts.remove }
 									>
 										{ _n(

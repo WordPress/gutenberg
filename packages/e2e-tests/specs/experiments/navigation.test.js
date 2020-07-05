@@ -9,6 +9,7 @@ import {
 	setUpResponseMocking,
 	clickBlockToolbarButton,
 	pressKeyWithModifier,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -217,14 +218,12 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 }
 
 async function selectDropDownOption( optionText ) {
-	const buttonText = 'Select where to start from…';
-	await page.waitForXPath(
-		`//button[text()="${ buttonText }"][not(@disabled)]`
+	await page.waitForSelector(
+		'.wp-block-navigation-placeholder__select-control button'
 	);
-	const [ dropdownToggle ] = await page.$x(
-		`//button[text()="${ buttonText }"][not(@disabled)]`
+	await page.click(
+		'.wp-block-navigation-placeholder__select-control button'
 	);
-	await dropdownToggle.click();
 
 	const [ theOption ] = await page.$x( `//li[text()="${ optionText }"]` );
 
@@ -248,7 +247,7 @@ async function clickCreateButton() {
 }
 
 async function createEmptyNavBlock() {
-	await selectDropDownOption( 'Create empty menu' );
+	await selectDropDownOption( 'Create empty Navigation' );
 	await clickCreateButton();
 }
 
@@ -282,7 +281,7 @@ describe( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			await selectDropDownOption( 'New from all top-level pages' );
+			await selectDropDownOption( 'Create from all top-level pages' );
 
 			await clickCreateButton();
 
@@ -297,15 +296,12 @@ describe( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			const dropdownButtonText = 'Select where to start from…';
-			await page.waitForXPath(
-				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			await page.waitForSelector(
+				'.wp-block-navigation-placeholder__select-control button'
 			);
-			const [ dropdownToggle ] = await page.$x(
-				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			await page.click(
+				'.wp-block-navigation-placeholder__select-control button'
 			);
-
-			await dropdownToggle.click();
 
 			const dropDownItemsLength = await page.$$eval(
 				'ul[role="listbox"] li[role="option"]',
@@ -313,11 +309,10 @@ describe( 'Navigation', () => {
 			);
 
 			// Should only be showing
-			// 1. Placeholder value.
-			// 2. Create empty menu.
-			expect( dropDownItemsLength ).toEqual( 2 );
+			// 1. Create empty menu.
+			expect( dropDownItemsLength ).toEqual( 1 );
 
-			await page.waitForXPath( '//li[text()="Create empty menu"]' );
+			await page.waitForXPath( '//li[text()="Create empty Navigation"]' );
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -385,14 +380,12 @@ describe( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			const dropdownButtonText = 'Select where to start from…';
-			await page.waitForXPath(
-				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			await page.waitForSelector(
+				'.wp-block-navigation-placeholder__select-control button'
 			);
-			const [ dropdownToggle ] = await page.$x(
-				`//button[text()="${ dropdownButtonText }"][not(@disabled)]`
+			await page.click(
+				'.wp-block-navigation-placeholder__select-control button'
 			);
-			await dropdownToggle.click();
 
 			const dropDownItemsLength = await page.$$eval(
 				'ul[role="listbox"] li[role="option"]',
@@ -400,11 +393,10 @@ describe( 'Navigation', () => {
 			);
 
 			// Should only be showing
-			// 1. Placeholder.
-			// 2. Create from Empty.
-			expect( dropDownItemsLength ).toEqual( 2 );
+			// 1. Create empty menu.
+			expect( dropDownItemsLength ).toEqual( 1 );
 
-			await page.waitForXPath( '//li[text()="Create empty menu"]' );
+			await page.waitForXPath( '//li[text()="Create empty Navigation"]' );
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -427,13 +419,18 @@ describe( 'Navigation', () => {
 			type: 'url',
 		} );
 
-		// Move the mouse to reveal the block movers. Without this the test seems to fail.
-		await page.mouse.move( 100, 100 );
+		await showBlockToolbar();
 
-		// Add another Link block.
+		// Add another block.
 		// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
 		// an issue where the block appender requires two clicks.
 		await page.click( '.wp-block-navigation .block-list-appender' );
+
+		// Select a Link block.
+		const [ linkButton ] = await page.$x(
+			"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Link']"
+		);
+		await linkButton.click();
 
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.

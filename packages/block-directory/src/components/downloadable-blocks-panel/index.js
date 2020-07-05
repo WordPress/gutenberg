@@ -21,7 +21,7 @@ function DownloadableBlocksPanel( {
 	isWaiting,
 	debouncedSpeak,
 } ) {
-	if ( ! hasPermission ) {
+	if ( false === hasPermission ) {
 		debouncedSpeak(
 			__(
 				'No blocks found in your library. Please contact your site administrator to install new blocks.'
@@ -38,7 +38,7 @@ function DownloadableBlocksPanel( {
 		);
 	}
 
-	if ( isLoading || isWaiting ) {
+	if ( typeof hasPermission === 'undefined' || isLoading || isWaiting ) {
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				<Spinner />
@@ -86,15 +86,17 @@ export default compose( [
 	withSelect( ( select, { filterValue } ) => {
 		const {
 			getDownloadableBlocks,
-			hasInstallBlocksPermission,
 			isRequestingDownloadableBlocks,
 		} = select( 'core/block-directory' );
 
-		const hasPermission = hasInstallBlocksPermission();
+		const hasPermission = select( 'core' ).canUser(
+			'read',
+			'block-directory/search'
+		);
 		const downloadableItems = hasPermission
 			? getDownloadableBlocks( filterValue )
 			: [];
-		const isLoading = isRequestingDownloadableBlocks();
+		const isLoading = isRequestingDownloadableBlocks( filterValue );
 
 		return {
 			downloadableItems,
