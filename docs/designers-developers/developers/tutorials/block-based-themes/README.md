@@ -149,6 +149,7 @@ WordPress requires themes to include an index.php file. This file is used as a f
 Create an empty index.php file inside your main folder.
 
 Inside the block-template folder, create an index.html file.
+
 Create two empty template parts called footer.html and header.html and place them inside the block-template-parts folder.
 
 Open the index.html file and add the following code to include the two template parts:
