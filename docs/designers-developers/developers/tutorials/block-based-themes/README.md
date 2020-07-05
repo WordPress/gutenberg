@@ -8,11 +8,11 @@ Full site editing is an experimental feature. This tutorial was written for Gute
 Please also see the documentation for block-based themes at https://developer.wordpress.org/block-editor/developers/themes/block-based-themes/
 
 ## Table of Contents
- - What is needed to create a block-based theme?
- - Creating the theme
- - Create the templates and template parts
- - Experimental-theme.json -Global styles
- - Adding blocks
+ 1. [What is needed to create a block-based theme?](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
+ 2. [Creating the theme](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-theme)
+ 3. [Create the templates and template parts](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#create-the-templates-and-template-parts)
+ 4. [Experimental-theme.json -Global styles](/docs/designers-developers/developers/tutorials/block-based-themes/README.md##experimental-themejson--global-styles)
+ 5. [Adding blocks](/docs/designers-developers/developers/tutorials/block-based-themes/adding-blocks.md)
 
 ## What is needed to create a block-based theme?
 
@@ -58,19 +58,20 @@ The file header is identical to the style.css file you would use in a traditiona
 
 ```
 /*
-Theme Name: Twenty Twenty
-Theme URI: https://wordpress.org/themes/twentytwenty/
+Theme Name: My first theme
+Theme URI: 
 Author: the WordPress team
 Author URI: https://wordpress.org/
 Description: 
 Tags:
-Version: 1.3
+Version: 1.0.0
 Requires at least: 5.0
 Tested up to: 5.4
 Requires PHP: 7.0
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: twentytwenty
+Text Domain: myfirsttheme
+
 This theme, like WordPress, is licensed under the GPL.
 Use it to make something cool, have fun, and share what you've learned with others.
 */
@@ -158,9 +159,8 @@ Open the index.html file and add the following code to include the two template 
 <!-- wp:template-part {"slug":"header","theme":"myfirsttheme"} /-->
 
 <!-- wp:template-part {"slug":"footer","theme":"myfirsttheme"} /-->
-
 ```
-If you used a differnt theme name, adjust the value for the theme key.
+If you used a different theme name, adjust the value for the theme key.
 
 
 ### Experimental-theme.json -Global styles
@@ -354,16 +354,3 @@ Below are our presets and styles combined:
 	}
 }
 ```
-
-## Adding blocks
-
-There is more than one way to add blocks to the theme files:
-- Adding and editing blocks in the site editor and exporting the theme.
-- Adding block grammar to the HTML files manually.
-
-### Adding blocks using the site editor
-
-
-
-
-
