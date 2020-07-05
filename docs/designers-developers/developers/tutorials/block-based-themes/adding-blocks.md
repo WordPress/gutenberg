@@ -31,7 +31,11 @@ In the editor you can now add a site title block, a menu, and perhaps a header i
 When you have made your changes, click on the update design button in the upper right corner,
 where you normally publish and update your content.
 
-Select the index template to see your header temlate part in its page context.
+Next, select the footer template part and add some example content.
+
+Select the index template to view the temlate parts in the page context.
+
+
 
 
 
