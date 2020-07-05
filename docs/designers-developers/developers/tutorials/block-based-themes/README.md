@@ -283,9 +283,6 @@ Below are our presets and styles combined:
 		"styles": {
 			"color": {
 				"background": "var(--wp--preset--color--very-dark-gray)"
-			},
-			"typography": {
-				"fontSize": "var(--wp--preset--font-size--normal)px"
 			}
 		}
 	},
