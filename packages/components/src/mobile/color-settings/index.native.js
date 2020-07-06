@@ -71,11 +71,8 @@ const Stack = createStackNavigator();
 function ColorSettings( { defaultSettings } ) {
 	const route = useRoute();
 	const [ height, setHeightValue ] = useState( 1 );
-	const setHeight = ( maxHeight, snapToHeight ) => {
+	const setHeight = ( maxHeight ) => {
 		if ( height !== maxHeight ) {
-			if ( snapToHeight ) {
-				snapToHeight( maxHeight );
-			}
 			setHeightValue( maxHeight );
 		}
 	};
