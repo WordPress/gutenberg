@@ -128,7 +128,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			) {
 				return new WP_Error(
 					'rest_unknown_attachment',
-					__( 'Unable to get meta information for file.' ),
+					__( 'Unable to get meta information for file.', 'gutenberg' ),
 					array( 'status' => 404 )
 				);
 			}
