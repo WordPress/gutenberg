@@ -11,7 +11,7 @@ const ConvertToBlocksButton = ( { clientId } ) => {
 	const { replaceBlocks } = useDispatch( 'core/block-editor' );
 	const block = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getBlock( clientId );
-	} );
+	}, [ clientId ] );
 
 	return (
 		<BlockControls>
