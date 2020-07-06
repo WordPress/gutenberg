@@ -1,6 +1,6 @@
 # Tutorials
 
--   First things first, see [setting up your development environment](/docs/designers-developers/developers/tutorials/javascript/readme.md) for the tools and setup you need to extend the block editor.
+-   First things first, see [setting up your development environment](/docs/designers-developers/developers/tutorials/devenv/readme.md) for the tools and setup you need to extend the block editor.
 
 -   See the [Getting Started with JavaScript Tutorial](/docs/designers-developers/developers/tutorials/javascript/readme.md) to learn about how to use JavaScript within WordPress.
 
