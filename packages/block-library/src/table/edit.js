@@ -301,10 +301,13 @@ export class TableEdit extends Component {
 		);
 		// this just allows to be able to add more rows, by enabling the corresponding
 		// buttons. It needs to be revised when programmatically focus to RichText is handled
-		this.createOnFocus( {
-			sectionName,
-			rowIndex: newRowIndex,
-			columnIndex: 0,
+		this.setState( {
+			selectedCell: {
+				sectionName,
+				rowIndex: newRowIndex,
+				columnIndex: 0,
+				type: 'cell',
+			},
 		} );
 	}
 
@@ -362,9 +365,12 @@ export class TableEdit extends Component {
 		);
 		// this just allows to be able to add more rows, by enabling the corresponding
 		// buttons. It needs to be revised when programmatically focus to RichText is handled
-		this.createOnFocus( {
-			rowIndex: 0,
-			columnIndex: newColumnIndex,
+		this.setState( {
+			selectedCell: {
+				rowIndex: 0,
+				columnIndex: newColumnIndex,
+				type: 'cell',
+			},
 		} );
 	}
 
