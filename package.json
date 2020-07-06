@@ -15,7 +15,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": "12.x",
+		"node": ">=10.0.0",
 		"npm": ">=6.9.0"
 	},
 	"config": {
