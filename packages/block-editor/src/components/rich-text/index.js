@@ -365,18 +365,20 @@ function RichTextWrapper(
 				} else {
 					onChange( insertLineSeparator( value ) );
 				}
-			} else if ( shiftKey || ( ! canSplit && ! onSplitAtEnd ) ) {
-				if ( ! disableLineBreaks ) {
-					onChange( insert( value, '\n' ) );
-				}
-			} else if ( onSplitAtEnd && ! canSplit ) {
+			} else {
 				const { text, start, end } = value;
+				const canSplitAtEnd =
+					onSplitAtEnd && start === end && end === text.length;
 
-				if ( start === end && end === text.length ) {
+				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+					if ( ! disableLineBreaks ) {
+						onChange( insert( value, '\n' ) );
+					}
+				} else if ( ! canSplit && canSplitAtEnd ) {
 					onSplitAtEnd();
+				} else if ( canSplit ) {
+					splitValue( value );
 				}
-			} else if ( canSplit ) {
-				splitValue( value );
 			}
 		},
 		[

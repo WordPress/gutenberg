@@ -28,7 +28,7 @@ export function SocialLinksEdit() {
 			allowedBlocks={ ALLOWED_BLOCKS }
 			templateLock={ false }
 			template={ TEMPLATE }
-			__experimentalMoverDirection={ 'horizontal' }
+			orientation="horizontal"
 			__experimentalTagName={ Block.ul }
 			__experimentalAppenderTagName="li"
 		/>

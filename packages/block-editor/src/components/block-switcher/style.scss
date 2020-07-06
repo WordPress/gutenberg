@@ -36,7 +36,7 @@
 	// Since it's not clickable, though, don't show a hover state.
 	&,
 	.block-editor-block-icon.has-colors {
-		color: $dark-gray-primary !important;
+		color: $gray-900 !important;
 	}
 }
 
@@ -98,7 +98,7 @@
 	}
 
 	.components-panel__body + .components-panel__body {
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $gray-100;
 	}
 }
 
@@ -125,7 +125,7 @@
 
 	.components-popover__content {
 		box-shadow: none;
-		border: $border-width solid $dark-gray-primary;
+		border: $border-width solid $gray-900;
 		background: $white;
 		border-radius: $radius-block-ui;
 	}
@@ -139,7 +139,7 @@
 
 .block-editor-block-switcher__preview-title {
 	margin-bottom: $grid-unit-15;
-	color: $medium-gray-text;
+	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 500;

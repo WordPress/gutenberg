@@ -15,7 +15,8 @@ function DownloadableBlockHeader( {
 	title,
 	rating,
 	ratingCount,
-	isLoading,
+	isLoading = false,
+	isInstallable = true,
 	onClick,
 } ) {
 	return (
@@ -31,10 +32,10 @@ function DownloadableBlockHeader( {
 			<Button
 				isSecondary
 				isBusy={ isLoading }
-				disabled={ isLoading }
+				disabled={ isLoading || ! isInstallable }
 				onClick={ ( event ) => {
 					event.preventDefault();
-					if ( ! isLoading ) {
+					if ( ! isLoading && isInstallable ) {
 						onClick();
 					}
 				} }
