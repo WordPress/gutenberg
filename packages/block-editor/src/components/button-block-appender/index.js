@@ -31,6 +31,7 @@ function ButtonBlockAppender(
 			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
+			__experimentalIsQuick
 			renderToggle={ ( {
 				onToggle,
 				disabled,
@@ -72,15 +73,10 @@ function ButtonBlockAppender(
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
 						) }
 						<Icon icon={ plus } />
-						{ hasSingleBlockType && (
-							<span className="block-editor-button-block-appender__label">
-								{ label }{ ' ' }
-							</span>
-						) }
 					</Button>
 				);
 
-				if ( isToggleButton ) {
+				if ( isToggleButton || hasSingleBlockType ) {
 					inserterButton = (
 						<Tooltip text={ label }>{ inserterButton }</Tooltip>
 					);

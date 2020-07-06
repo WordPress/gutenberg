@@ -62,7 +62,12 @@ function computeAnchorRect(
 	}
 
 	if ( anchorRef !== false ) {
-		if ( ! anchorRef ) {
+		if (
+			! anchorRef ||
+			! window.Range ||
+			! window.Element ||
+			! window.DOMRect
+		) {
 			return;
 		}
 
@@ -255,9 +260,7 @@ const Popover = ( {
 	onFocusOutside,
 	__unstableSticky,
 	__unstableSlotName = SLOT_NAME,
-	__unstableAllowVerticalSubpixelPosition,
-	__unstableAllowHorizontalSubpixelPosition,
-	__unstableFixedPosition = true,
+	__unstableObserveElement,
 	__unstableBoundaryParent,
 	/* eslint-enable no-unused-vars */
 	...contentProps
@@ -282,11 +285,10 @@ const Popover = ( {
 			setStyle( containerRef.current, 'left' );
 			setStyle( contentRef.current, 'maxHeight' );
 			setStyle( contentRef.current, 'maxWidth' );
-			setStyle( containerRef.current, 'position' );
 			return;
 		}
 
-		const refresh = ( { subpixels } = {} ) => {
+		const refresh = () => {
 			if ( ! containerRef.current || ! contentRef.current ) {
 				return;
 			}
@@ -303,6 +305,8 @@ const Popover = ( {
 				return;
 			}
 
+			const { offsetParent, ownerDocument } = containerRef.current;
+
 			let relativeOffsetTop = 0;
 
 			// If there is a positioned ancestor element that is not the body,
@@ -310,10 +314,7 @@ const Popover = ( {
 			// the popover is fixed, the offset parent is null or the body
 			// element, in which case the position is relative to the viewport.
 			// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
-			if ( ! __unstableFixedPosition ) {
-				setStyle( containerRef.current, 'position', 'absolute' );
-
-				const { offsetParent } = containerRef.current;
+			if ( offsetParent && offsetParent !== ownerDocument.body ) {
 				const offsetParentRect = offsetParent.getBoundingClientRect();
 
 				relativeOffsetTop = offsetParentRect.top;
@@ -323,8 +324,6 @@ const Popover = ( {
 					anchor.width,
 					anchor.height
 				);
-			} else {
-				setStyle( containerRef.current, 'position' );
 			}
 
 			let boundaryElement;
@@ -359,38 +358,8 @@ const Popover = ( {
 				typeof popoverTop === 'number' &&
 				typeof popoverLeft === 'number'
 			) {
-				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
-					setStyle(
-						containerRef.current,
-						'left',
-						popoverLeft + 'px'
-					);
-					setStyle( containerRef.current, 'top' );
-					setStyle(
-						containerRef.current,
-						'transform',
-						`translateY(${ popoverTop }px)`
-					);
-				} else if (
-					subpixels &&
-					__unstableAllowHorizontalSubpixelPosition
-				) {
-					setStyle( containerRef.current, 'top', popoverTop + 'px' );
-					setStyle( containerRef.current, 'left' );
-					setStyle(
-						containerRef.current,
-						'transform',
-						`translate(${ popoverLeft }px)`
-					);
-				} else {
-					setStyle( containerRef.current, 'top', popoverTop + 'px' );
-					setStyle(
-						containerRef.current,
-						'left',
-						popoverLeft + 'px'
-					);
-					setStyle( containerRef.current, 'transform' );
-				}
+				setStyle( containerRef.current, 'top', popoverTop + 'px' );
+				setStyle( containerRef.current, 'left', popoverLeft + 'px' );
 			}
 
 			setClass(
@@ -427,8 +396,7 @@ const Popover = ( {
 			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
 		};
 
-		// Height may still adjust between now and the next tick.
-		const timeoutId = window.setTimeout( refresh );
+		refresh();
 
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
@@ -455,19 +423,12 @@ const Popover = ( {
 
 		let observer;
 
-		const observeElement =
-			__unstableAllowVerticalSubpixelPosition ||
-			__unstableAllowHorizontalSubpixelPosition;
-
-		if ( observeElement ) {
-			observer = new window.MutationObserver( () =>
-				refresh( { subpixels: true } )
-			);
-			observer.observe( observeElement, { attributes: true } );
+		if ( __unstableObserveElement ) {
+			observer = new window.MutationObserver( refresh );
+			observer.observe( __unstableObserveElement, { attributes: true } );
 		}
 
 		return () => {
-			window.clearTimeout( timeoutId );
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
@@ -487,8 +448,7 @@ const Popover = ( {
 		position,
 		contentSize,
 		__unstableSticky,
-		__unstableAllowVerticalSubpixelPosition,
-		__unstableAllowHorizontalSubpixelPosition,
+		__unstableObserveElement,
 		__unstableBoundaryParent,
 	] );
 

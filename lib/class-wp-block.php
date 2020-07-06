@@ -8,6 +8,11 @@
 /**
  * Class representing a parsed instance of a block.
  *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/49926
+ * @see https://core.trac.wordpress.org/changeset/48159
+ *
  * @property array $attributes
  */
 class WP_Block {

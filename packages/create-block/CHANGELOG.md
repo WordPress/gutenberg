@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.16.0 (2020-06-25)
+
 ### New Feature
 
 -   Generate `block.json` file with all metadata necessary for Block Directory ([#23399](https://github.com/WordPress/gutenberg/pull/23399)).

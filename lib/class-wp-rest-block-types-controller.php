@@ -10,6 +10,10 @@
 /**
  * Core class used to access block types via the REST API.
  *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/47620
+ *
  * @see   WP_REST_Controller
  */
 class WP_REST_Block_Types_Controller extends WP_REST_Controller {

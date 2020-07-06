@@ -42,6 +42,8 @@ export { default as ResizableBox } from './resizable-box';
 export { default as UnsupportedFooterControl } from './unsupported-footer-control';
 export { default as ColorControl } from './color-control';
 export { default as QueryControls } from './query-controls';
+export { default as Notice } from './notice';
+export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
 
 // Higher-Order Components
@@ -67,6 +69,7 @@ export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
+export { default as LinkSettings } from './mobile/link-settings';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';

@@ -48,7 +48,7 @@
 
 .components-datetime__date {
 	min-height: 236px;
-	border-top: 1px solid $light-gray-500;
+	border-top: 1px solid $gray-200;
 
 	// Override external DatePicker styles.
 	.DayPickerNavigation_leftButton__horizontalDefault {
@@ -178,10 +178,10 @@
 	&.is-12-hour {
 		.components-datetime__time-field-day input {
 			margin: 0 -$grid-unit-05 0 0 !important;
-			border-radius: $radius-round-rectangle 0 0 $radius-round-rectangle !important;
+			border-radius: $radius-block-ui 0 0 $radius-block-ui !important;
 		}
 		.components-datetime__time-field-year input {
-			border-radius: 0 $radius-round-rectangle $radius-round-rectangle 0 !important;
+			border-radius: 0 $radius-block-ui $radius-block-ui 0 !important;
 		}
 	}
 }

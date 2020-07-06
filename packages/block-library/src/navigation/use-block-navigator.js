@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { Button, SVG, Path, Modal } from '@wordpress/components';
+import { ToolbarButton, SVG, Path, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -25,7 +25,7 @@ export default function useBlockNavigator( clientId, __experimentalFeatures ) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
 
 	const navigatorToolbarButton = (
-		<Button
+		<ToolbarButton
 			className="components-toolbar__control"
 			label={ __( 'Open block navigator' ) }
 			onClick={ () => setIsNavigationListOpen( true ) }

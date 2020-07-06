@@ -3,12 +3,12 @@
  */
 import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { EntityProvider } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import useTemplatePartPost from './use-template-part-post';
+import TemplatePartNamePanel from './name-panel';
 import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 
@@ -16,6 +16,7 @@ export default function TemplatePartEdit( {
 	attributes: { postId: _postId, slug, theme },
 	setAttributes,
 	clientId,
+	isSelected,
 } ) {
 	const initialPostId = useRef( _postId );
 	const initialSlug = useRef( slug );
@@ -28,8 +29,20 @@ export default function TemplatePartEdit( {
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part
 	// content loading.
-	const innerBlocks = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlocks( clientId ),
+	const { innerBlocks, hasSelectedInnerBlock } = useSelect(
+		( select ) => {
+			const {
+				getBlocks,
+				hasSelectedInnerBlock: getHasSelectedInnerBlock,
+			} = select( 'core/block-editor' );
+			return {
+				innerBlocks: getBlocks( clientId ),
+				hasSelectedInnerBlock: getHasSelectedInnerBlock(
+					clientId,
+					true
+				),
+			};
+		},
 		[ clientId ]
 	);
 	const { editEntityRecord } = useDispatch( 'core' );
@@ -54,13 +67,18 @@ export default function TemplatePartEdit( {
 	if ( postId ) {
 		// Part of a template file, post ID already resolved.
 		return (
-			<EntityProvider
-				kind="postType"
-				type="wp_template_part"
-				id={ postId }
-			>
-				<TemplatePartInnerBlocks />
-			</EntityProvider>
+			<>
+				{ ( isSelected || hasSelectedInnerBlock ) && (
+					<TemplatePartNamePanel
+						postId={ postId }
+						setAttributes={ setAttributes }
+					/>
+				) }
+				<TemplatePartInnerBlocks
+					postId={ postId }
+					hasInnerBlocks={ innerBlocks.length > 0 }
+				/>
+			</>
 		);
 	}
 	if ( ! initialSlug.current && ! initialTheme.current ) {

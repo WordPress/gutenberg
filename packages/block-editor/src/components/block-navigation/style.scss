@@ -7,7 +7,7 @@ $tree-item-height: 36px;
 
 .block-editor-block-navigation__label {
 	margin: 0 0 $grid-unit-15;
-	color: $medium-gray-text;
+	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 500;
@@ -157,7 +157,7 @@ $tree-item-height: 36px;
 	}
 
 	.block-editor-inserter__toggle {
-		background: $dark-gray-primary;
+		background: $gray-900;
 		color: $white;
 		height: $grid-unit-30;
 		margin: 6px 6px 6px 1px;

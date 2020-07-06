@@ -34,7 +34,7 @@
 		border: 0;
 
 		// Add a border after item groups to show as separator in the block toolbar.
-		border-right: $border-width solid $light-gray-500;
+		border-right: $border-width solid $gray-200;
 	}
 
 	> :last-child,
@@ -102,23 +102,4 @@
 	.block-editor-block-switcher {
 		display: block;
 	}
-}
-
-// Show a draggable handle when you're dragging using the toolbar component.
-.block-editor-block-toolbar__drag-clone::before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: -$block-toolbar-height - $grid-unit-15;
-	width: $button-size * 2;
-	height: $block-toolbar-height;
-	border-radius: $radius-block-ui;
-	background-color: $dark-gray-primary;
-	border: $border-width solid $dark-gray-primary;
-
-	// This should be reconsidered if successful.
-	background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTcgMTYuNWgxMFYxNUg3djEuNXptMC05VjloMTBWNy41SDd6IiBmaWxsPSIjZmZmIi8+PC9zdmc+);
-	background-size: $icon-size;
-	background-repeat: no-repeat;
-	background-position: center center;
 }

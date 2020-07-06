@@ -10,6 +10,8 @@
 /**
  * Core class to access plugins via the REST API.
  *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
  * @since 5.5.0
  *
  * @see   WP_REST_Controller
@@ -24,7 +26,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'plugins';
 	}
 
@@ -531,10 +533,10 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$item   = _get_plugin_data_markup_translate( $item['_file'], $item, false );
-		$marked = _get_plugin_data_markup_translate( $item['_file'], $item, true, false );
+		$marked = _get_plugin_data_markup_translate( $item['_file'], $item, true );
 
 		$data = array(
-			'plugin'       => $item['_file'],
+			'plugin'       => substr( $item['_file'], 0, - 4 ),
 			'status'       => $this->get_plugin_status( $item['_file'] ),
 			'name'         => $item['Name'],
 			'plugin_uri'   => $item['PluginURI'],

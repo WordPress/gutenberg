@@ -6,7 +6,7 @@ import { groupBy, sortBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { parse, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -99,23 +99,32 @@ function createNavigationBlock( menuItems ) {
 					itemsByParentID[ item.id ]
 				);
 			}
-			const linkBlock = convertMenuItemToLinkBlock(
-				item,
-				menuItemInnerBlocks
-			);
-			menuItemIdToClientId[ item.id ] = linkBlock.clientId;
-			innerBlocks.push( linkBlock );
+			const block = convertMenuItemToBlock( item, menuItemInnerBlocks );
+			menuItemIdToClientId[ item.id ] = block.clientId;
+			innerBlocks.push( block );
 		}
 		return innerBlocks;
 	};
 
-	// menuItemsToTreeOfLinkBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
+	// menuItemsToTreeOfBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
 	const innerBlocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
 	const navigationBlock = createBlock( 'core/navigation', {}, innerBlocks );
 	return [ navigationBlock, menuItemIdToClientId ];
 }
 
-function convertMenuItemToLinkBlock( menuItem, innerBlocks = [] ) {
+function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
+	if ( menuItem.type === 'html' ) {
+		const parsedBlocks = parse( menuItem.content.raw );
+
+		if ( parsedBlocks.length !== 1 ) {
+			return createBlock( 'core/freeform', {
+				originalContent: menuItem.content.raw,
+			} );
+		}
+
+		return parsedBlocks[ 0 ];
+	}
+
 	const attributes = {
 		label: menuItem.title.rendered,
 		url: menuItem.url,
