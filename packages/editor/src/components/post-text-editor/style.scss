@@ -1,5 +1,5 @@
 .edit-post-text-editor__body textarea.editor-post-text-editor {
-	border: $border-width solid $light-gray-secondary;
+	border: $border-width solid $gray-400;
 	display: block;
 	margin: 0;
 	width: 100%;
@@ -24,7 +24,7 @@
 	}
 
 	&:focus {
-		border: $border-width solid $dark-gray-primary;
+		border: $border-width solid $gray-900;
 		box-shadow: none;
 
 		// Elevate the z-index on focus so the focus style is uncropped.

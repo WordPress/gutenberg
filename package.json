@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "8.4.0",
+	"version": "8.5.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -13,6 +13,10 @@
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=10.0.0",
+		"npm": ">=6.9.0"
 	},
 	"config": {
 		"GUTENBERG_PHASE": 2
@@ -191,6 +195,7 @@
 		"sprintf-js": "1.1.1",
 		"style-loader": "1.0.0",
 		"stylelint-config-wordpress": "17.0.0",
+		"terser-webpack-plugin": "3.0.3",
 		"typescript": "3.8.3",
 		"uuid": "7.0.2",
 		"wd": "1.12.1",
@@ -199,7 +204,6 @@
 	},
 	"scripts": {
 		"analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
-		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
 		"clean:package-types": "tsc --build --clean",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
@@ -208,11 +212,9 @@
 		"build:plugin-zip": "./bin/build-plugin-zip.sh",
 		"build": "npm run build:packages && wp-scripts build",
 		"changelog": "./bin/plugin/cli.js changelog",
-		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && exit 1 );",
-		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
 		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js",

@@ -10,6 +10,8 @@
 /**
  * Controller which provides REST endpoint for the blocks.
  *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
  * @since 5.5.0
  *
  * @see   WP_REST_Controller
@@ -20,7 +22,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * Constructs the controller.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'block-directory';
 	}
 
@@ -95,10 +97,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$result = array();
 
 		foreach ( $response->plugins as $plugin ) {
-			if ( $this->find_plugin_for_slug( $plugin['slug'] ) ) {
-				continue;
-			}
-
 			$data     = $this->prepare_item_for_response( $plugin, $request );
 			$result[] = $this->prepare_response_for_collection( $data );
 		}
@@ -143,8 +141,18 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		);
 
 		foreach ( $plugin['block_assets'] as $asset ) {
-			// TODO: Return from API, not client-set.
-			$block['assets'][] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
+			// Allow for fully qualified URLs in future.
+			if ( 'https' === wp_parse_url( $asset, PHP_URL_SCHEME ) && ! empty( wp_parse_url( $asset, PHP_URL_HOST ) ) ) {
+				$block['assets'][] = esc_url_raw(
+					$asset,
+					array( 'https' )
+				);
+			} else {
+				$block['assets'][] = esc_url_raw(
+					add_query_arg( 'v', strtotime( $block['last_updated'] ), 'https://ps.w.org/' . $plugin['slug'] . $asset ),
+					array( 'https' )
+				);
+			}
 		}
 
 		$this->add_additional_fields_to_object( $block, $request );
@@ -167,7 +175,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	protected function prepare_links( $plugin ) {
 		$links = array(
 			'https://api.w.org/install-plugin' => array(
-				'href' => add_query_arg( 'slug', urlencode( $plugin['slug'] ), rest_url( '__experimental/plugins' ) ),
+				'href' => add_query_arg( 'slug', urlencode( $plugin['slug'] ), rest_url( 'wp/v2/plugins' ) ),
 			),
 		);
 
@@ -175,7 +183,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		if ( $plugin_file ) {
 			$links['https://api.w.org/plugin'] = array(
-				'href'       => rest_url( '__experimental/plugins/' . substr( $plugin_file, 0, - 4 ) ),
+				'href'       => rest_url( 'wp/v2/plugins/' . substr( $plugin_file, 0, - 4 ) ),
 				'embeddable' => true,
 			);
 		}
@@ -312,8 +320,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
 
-		$query_params['context']['default']  = 'view';
-		$query_params['per_page']['default'] = 3;
+		$query_params['context']['default'] = 'view';
 
 		$query_params['term'] = array(
 			'description' => __( 'Limit result set to blocks matching the search term.', 'gutenberg' ),

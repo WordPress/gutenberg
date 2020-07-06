@@ -1,5 +1,11 @@
 .edit-post-post-visibility {
 	width: 100%;
+	justify-content: left;
+
+	span {
+		display: block;
+		width: 35%;
+	}
 }
 
 .edit-post-post-visibility__dialog .components-popover__content {

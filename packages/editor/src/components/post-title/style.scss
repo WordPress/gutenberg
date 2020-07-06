@@ -14,7 +14,6 @@
 
 		// Inherit the styles set by the theme.
 		font-family: inherit;
-		line-height: inherit;
 		color: inherit;
 
 		// Stack borders on mobile.
@@ -33,6 +32,7 @@
 		// Match h1 heading.
 		font-size: 2.44em;
 		font-weight: bold;
+		line-height: 1.4;
 
 		// Large text needs a 3:1 contrast ratio.
 		&::-webkit-input-placeholder {

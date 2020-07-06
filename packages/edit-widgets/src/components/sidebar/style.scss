@@ -32,7 +32,7 @@
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 400;
-	color: $dark-gray-900;
+	color: $gray-900;
 
 	// This pseudo-element "duplicates" the tab label and sets the text to bold.
 	// This ensures that the tab doesn't change width when selected.
@@ -90,9 +90,9 @@
 
 	li {
 		margin: 0;
-		border-bottom: $border-width solid $light-gray-500;
+		border-bottom: $border-width solid $gray-200;
 		&:first-child {
-			border-top: $border-width solid $light-gray-500;
+			border-top: $border-width solid $gray-200;
 		}
 
 		button {
