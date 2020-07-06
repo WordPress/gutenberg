@@ -12,7 +12,8 @@
 		font-size: $default-font-size;
 		padding: 6px 12px;
 
-		&.is-tertiary {
+		&.is-tertiary,
+		&.has-icon {
 			padding: 6px;
 		}
 	}
@@ -50,6 +51,9 @@
 // We need to have two DOM elements.
 .edit-post-visual-editor__post-title-wrapper {
 	.editor-post-title {
+		// Add some top margin.
+		margin-top: 2em;
+
 		// Center.
 		margin-left: auto;
 		margin-right: auto;

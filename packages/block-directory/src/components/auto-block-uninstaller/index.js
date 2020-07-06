@@ -11,10 +11,11 @@ export default function AutoBlockUninstaller() {
 	const shouldRemoveBlockTypes = useSelect( ( select ) => {
 		const { isAutosavingPost, isSavingPost } = select( 'core/editor' );
 		return isSavingPost() && ! isAutosavingPost();
-	} );
+	}, [] );
 
-	const unusedBlockTypes = useSelect( ( select ) =>
-		select( 'core/block-directory' ).getUnusedBlockTypes()
+	const unusedBlockTypes = useSelect(
+		( select ) => select( 'core/block-directory' ).getUnusedBlockTypes(),
+		[]
 	);
 
 	useEffect( () => {

@@ -4,7 +4,7 @@
 import { installBlockType, uninstallBlockType } from '../actions';
 
 describe( 'actions', () => {
-	const endpoint = '/wp-json/__experimental/plugins/block/block';
+	const endpoint = '/wp-json/wp/v2/plugins/block/block';
 	const item = {
 		id: 'block/block',
 		name: 'Test Block',
@@ -29,9 +29,8 @@ describe( 'actions', () => {
 			const generator = installBlockType( item );
 
 			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
+				type: 'CLEAR_ERROR_NOTICE',
 				blockId: item.id,
-				notice: false,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -43,7 +42,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					path: '__experimental/plugins',
+					path: 'wp/v2/plugins',
 					method: 'POST',
 				},
 			} );
@@ -82,9 +81,8 @@ describe( 'actions', () => {
 			const generator = installBlockType( { ...item, assets: [] } );
 
 			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
+				type: 'CLEAR_ERROR_NOTICE',
 				blockId: item.id,
-				notice: false,
 			} );
 
 			expect( generator.next().value ).toMatchObject( {
@@ -108,9 +106,8 @@ describe( 'actions', () => {
 			const generator = installBlockType( item );
 
 			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
+				type: 'CLEAR_ERROR_NOTICE',
 				blockId: item.id,
-				notice: false,
 			} );
 
 			expect( generator.next().value ).toEqual( {
@@ -122,7 +119,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					path: '__experimental/plugins',
+					path: 'wp/v2/plugins',
 					method: 'POST',
 				},
 			} );

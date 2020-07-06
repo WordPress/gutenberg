@@ -2,13 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -30,24 +31,18 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		hasFixedToolbar,
 		isValid,
 		isVisual,
-		moverDirection,
 	} = useSelect( ( select ) => {
-		const { getBlockType } = select( 'core/blocks' );
 		const {
 			getBlockName,
 			getBlockMode,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockRootClientId,
-			getBlockListSettings,
 			getSettings,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
-
-		const { __experimentalMoverDirection } =
-			getBlockListSettings( blockRootClientId ) || {};
 
 		return {
 			blockClientIds: selectedBlockClientIds,
@@ -63,7 +58,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
 			),
-			moverDirection: __experimentalMoverDirection,
 		};
 	}, [] );
 
@@ -130,10 +124,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 								onDragEnd={ onDraggableEnd }
 							>
 								<BlockSwitcher clientIds={ blockClientIds } />
-								<BlockMover
-									clientIds={ blockClientIds }
-									__experimentalOrientation={ moverDirection }
-								/>
+								<BlockMover clientIds={ blockClientIds } />
 							</div>
 						) }
 					</BlockDraggable>

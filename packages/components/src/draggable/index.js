@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSafeTimeout } from '@wordpress/compose';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
@@ -22,6 +22,7 @@ class Draggable extends Component {
 		this.onDragOver = this.onDragOver.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.resetDragState = this.resetDragState.bind( this );
+		this.dragComponentRef = createRef();
 	}
 
 	componentWillUnmount() {
@@ -117,25 +118,19 @@ class Draggable extends Component {
 		const elementWrapper = element.parentNode;
 		const elementTopOffset = parseInt( elementRect.top, 10 );
 		const elementLeftOffset = parseInt( elementRect.left, 10 );
-		const clone = element.cloneNode( true );
-		clone.id = `clone-${ elementId }`;
 		this.cloneWrapper = document.createElement( 'div' );
 		this.cloneWrapper.classList.add( cloneWrapperClass );
 		if ( cloneClassname ) {
 			this.cloneWrapper.classList.add( cloneClassname );
 		}
+
 		this.cloneWrapper.style.width = `${
 			elementRect.width + clonePadding * 2
 		}px`;
 
-		if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
-			// Scale down clone if original element is larger than 700px.
-			this.cloneWrapper.style.transform = 'scale(0.5)';
-			this.cloneWrapper.style.transformOrigin = 'top left';
-			// Position clone near the cursor.
-			this.cloneWrapper.style.top = `${ event.clientY - 100 }px`;
-			this.cloneWrapper.style.left = `${ event.clientX }px`;
-		} else {
+		// If a dragComponent is defined, the following logic will clone the
+		// HTML node and inject it into the cloneWrapper.
+		if ( this.dragComponentRef.current ) {
 			// Position clone right over the original element (20px padding).
 			this.cloneWrapper.style.top = `${
 				elementTopOffset - clonePadding
@@ -143,14 +138,40 @@ class Draggable extends Component {
 			this.cloneWrapper.style.left = `${
 				elementLeftOffset - clonePadding
 			}px`;
+
+			const clonedDragComponent = document.createElement( 'div' );
+			clonedDragComponent.innerHTML = this.dragComponentRef.current.innerHTML;
+			this.cloneWrapper.appendChild( clonedDragComponent );
+		} else {
+			const clone = element.cloneNode( true );
+			clone.id = `clone-${ elementId }`;
+
+			if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
+				// Scale down clone if original element is larger than 700px.
+				this.cloneWrapper.style.transform = 'scale(0.5)';
+				this.cloneWrapper.style.transformOrigin = 'top left';
+				// Position clone near the cursor.
+				this.cloneWrapper.style.top = `${ event.clientY - 100 }px`;
+				this.cloneWrapper.style.left = `${ event.clientX }px`;
+			} else {
+				// Position clone right over the original element (20px padding).
+				this.cloneWrapper.style.top = `${
+					elementTopOffset - clonePadding
+				}px`;
+				this.cloneWrapper.style.left = `${
+					elementLeftOffset - clonePadding
+				}px`;
+			}
+
+			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
+			Array.from(
+				clone.querySelectorAll( 'iframe' )
+			).forEach( ( child ) => child.parentNode.removeChild( child ) );
+
+			this.cloneWrapper.appendChild( clone );
 		}
 
-		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
-		Array.from( clone.querySelectorAll( 'iframe' ) ).forEach( ( child ) =>
-			child.parentNode.removeChild( child )
-		);
-
-		this.cloneWrapper.appendChild( clone );
+		// Inject the cloneWrapper into the DOM.
 		elementWrapper.appendChild( this.cloneWrapper );
 
 		// Mark the current cursor coordinates.
@@ -186,12 +207,28 @@ class Draggable extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
+		const {
+			children,
+			__experimentalDragComponent: dragComponent,
+		} = this.props;
 
-		return children( {
-			onDraggableStart: this.onDragStart,
-			onDraggableEnd: this.onDragEnd,
-		} );
+		return (
+			<>
+				{ children( {
+					onDraggableStart: this.onDragStart,
+					onDraggableEnd: this.onDragEnd,
+				} ) }
+				{ dragComponent && (
+					<div
+						className="components-draggable-drag-component-root"
+						style={ { display: 'none' } }
+						ref={ this.dragComponentRef }
+					>
+						{ dragComponent }
+					</div>
+				) }
+			</>
+		);
 	}
 }
 

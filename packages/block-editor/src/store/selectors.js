@@ -6,7 +6,6 @@ import {
 	flatMap,
 	first,
 	get,
-	includes,
 	isArray,
 	isBoolean,
 	last,
@@ -1126,11 +1125,11 @@ const canInsertBlockTypeUnmemoized = (
 		if ( isArray( list ) ) {
 			// TODO: when there is a canonical way to detect that we are editing a post
 			// the following check should be changed to something like:
-			// if ( includes( list, 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
-			if ( includes( list, 'core/post-content' ) && item === null ) {
+			// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
+			if ( list.includes( 'core/post-content' ) && item === null ) {
 				return true;
 			}
-			return includes( list, item );
+			return list.includes( item );
 		}
 		return defaultResult;
 	};
@@ -1201,6 +1200,22 @@ export const canInsertBlockType = createSelector(
 		state.settings.templateLock,
 	]
 );
+
+/**
+ * Determines if the given blocks are allowed to be inserted into the block
+ * list.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientIds    The block client IDs to be inserted.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given blocks are allowed to be inserted.
+ */
+export function canInsertBlocks( state, clientIds, rootClientId = null ) {
+	return clientIds.every( ( id ) =>
+		canInsertBlockType( state, getBlockName( state, id ), rootClientId )
+	);
+}
 
 /**
  * Returns information about how recently and frequently a block has been inserted.

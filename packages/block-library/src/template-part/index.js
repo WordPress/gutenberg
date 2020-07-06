@@ -18,7 +18,8 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Template Part' ),
+	title: __( 'Section' ),
+	keywords: [ __( 'template part' ) ],
 	__experimentalLabel: ( { slug } ) => startCase( slug ),
 	edit,
 };
