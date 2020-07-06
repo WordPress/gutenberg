@@ -72,6 +72,7 @@ export default function Token( {
 				className="components-form-token-field__remove-token"
 				icon={ closeCircleFilled }
 				onClick={ ! disabled && onClick }
+				disabled={ disabled }
 				label={ messages.remove }
 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }
 			/>
