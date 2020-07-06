@@ -28,7 +28,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 
 Note: On macOS, the required developer tools are not installed by default, if not already installed you may be prompted to download the install.
 
-![Mac git command requies command line developer tools](https://developer.wordpress.org/files/2020/07/git-install-prompt.png){width=400,height=195}
+<img src="https://developer.wordpress.org/files/2020/07/git-install-prompt.png" alt="Mac git command requies command line developer tools" width="400" height="195"/>
 
 After installing nvm, you need to use it to install node, to install the latest version of node, run:
 
