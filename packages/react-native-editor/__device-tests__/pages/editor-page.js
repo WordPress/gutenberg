@@ -125,7 +125,7 @@ export default class EditorPage {
 		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
 
 		if ( ! isAndroid() ) {
-			blockLocator += '//XCUIElementTypeTextView';
+			blockLocator = `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
 		}
 		return await this.driver.elementByXPath( blockLocator );
 	}
@@ -143,11 +143,11 @@ export default class EditorPage {
 	}
 
 	// set html editor content explicitly
-	async setHtmlContentAndroid( html ) {
+	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		await htmlContentView.setText( html );
+		await htmlContentView.type( html );
 
 		await toggleHtmlMode( this.driver, false );
 	}
@@ -482,5 +482,44 @@ export default class EditorPage {
 			true
 		);
 		return await typeString( this.driver, textViewElement, text, clear );
+	}
+
+	// =============================
+	// Unsupported Block functions
+	// =============================
+
+	async getUnsupportedBlockHelpButton() {
+		const accessibilityId = 'Help icon';
+		let blockLocator =
+			'//android.widget.Button[@content-desc="Help icon, Tap here to show help"]';
+
+		if ( ! isAndroid() ) {
+			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
+		}
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async getUnsupportedBlockBottomSheetEditButton() {
+		const accessibilityId = 'Edit block in web browser';
+		let blockLocator =
+			'//android.widget.Button[@content-desc="Edit block in web browser"]';
+
+		if ( ! isAndroid() ) {
+			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
+		}
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async getUnsupportedBlockWebView() {
+		let blockLocator = '//android.webkit.WebView';
+
+		if ( ! isAndroid() ) {
+			blockLocator = '//XCUIElementTypeWebView';
+		}
+
+		this.driver.setImplicitWaitTimeout( 20000 );
+		const element = await this.driver.elementByXPath( blockLocator );
+		this.driver.setImplicitWaitTimeout( 5000 );
+		return element;
 	}
 }
