@@ -157,7 +157,8 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 
 /**
  * Add inline styles for font sizes.
- * Ideally, this is not needed and themes load the font-size classes on the editor.
+ * Ideally, this is not needed and themes load the font-size classes on the
+ * editor.
  *
  * @param  {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
@@ -171,31 +172,30 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 			wrapperProps,
 		} = props;
 
-		// Return early if the block doesn't allow modify the font-size,
-		// already has a inline font-size,
-		// or doesn't have a class to extract font-size from.
+		// Only add inline styles if the block supports font sizes, doesn't
+		// already have an inline font size, and does have a class to extract
+		// the font size from.
 		if (
-			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
-			style?.typography?.fontSize ||
-			! fontSize
+			hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) &&
+			fontSize &&
+			! style?.typography?.fontSize
 		) {
-			return <BlockListBlock { ...props } />;
+			const fontSizeValue = getFontSize(
+				fontSizes,
+				fontSize,
+				style?.typography?.fontSize
+			).size;
+
+			props.wrapperProps = {
+				...wrapperProps,
+				style: {
+					fontSize: fontSizeValue,
+					...wrapperProps?.style,
+				},
+			};
 		}
 
-		const fontSizeValue = getFontSize(
-			fontSizes,
-			fontSize,
-			style?.typography?.fontSize
-		).size;
-		const newWrapperProps = {
-			...wrapperProps,
-			style: {
-				fontSize: fontSizeValue,
-				...wrapperProps?.style,
-			},
-		};
-
-		return <BlockListBlock { ...props } wrapperProps={ newWrapperProps } />;
+		return <BlockListBlock { ...props } />;
 	},
 	'withFontSizeInlineStyles'
 );
