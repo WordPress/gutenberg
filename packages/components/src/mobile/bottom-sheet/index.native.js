@@ -69,6 +69,9 @@ class BottomSheet extends Component {
 		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
 			this
 		);
+		this.onShouldEnableInnerHandling = this.onShouldEnableInnerHandling.bind(
+			this
+		);
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 		this.renderContent = this.renderContent.bind( this );
@@ -91,7 +94,8 @@ class BottomSheet extends Component {
 			bounces: false,
 			maxHeight: 0,
 			keyboardHeight: 0,
-			scrollEnabled: false,
+			enableInnerHandling: true,
+			scrollEnabled: true,
 			isScrolling: false,
 			onCloseBottomSheet: null,
 			onHardwareButtonPress: null,
@@ -234,6 +238,10 @@ class BottomSheet extends Component {
 		this.setState( { scrollEnabled: value } );
 	}
 
+	onShouldEnableInnerHandling( enableInnerHandling ) {
+		this.setState( { enableInnerHandling } );
+	}
+
 	onShouldSetBottomSheetMaxHeight( value ) {
 		this.setState( { isMaxHeightSet: value } );
 	}
@@ -251,9 +259,16 @@ class BottomSheet extends Component {
 	}
 
 	getSnapPoints() {
-		const { highestSnap, adjustToContentHeight } = this.props;
+		const {
+			highestSnap,
+			adjustToContentHeight,
+			isChildrenScrollable,
+		} = this.props;
 		const { contentHeight, safeAreaBottomInset } = this.state;
 		let maxSnapPoint;
+		if ( isChildrenScrollable && ! adjustToContentHeight && highestSnap ) {
+			this.shouldScroll = true;
+		}
 		if ( adjustToContentHeight && contentHeight > 0 ) {
 			maxSnapPoint = contentHeight + safeAreaBottomInset + 16;
 		} else if ( highestSnap ) {
@@ -394,6 +409,8 @@ class BottomSheet extends Component {
 								scrollEnabled:
 									this.shouldScroll && scrollEnabled,
 								snapToHeight: this.snapToHeight,
+								onShouldEnableInnerHandling: this
+									.onShouldEnableInnerHandling,
 							} }
 						>
 							{ children }
@@ -414,6 +431,8 @@ class BottomSheet extends Component {
 								scrollEnabled:
 									this.shouldScroll && scrollEnabled,
 								snapToHeight: this.snapToHeight,
+								onShouldEnableInnerHandling: this
+									.onShouldEnableInnerHandling,
 							} }
 						>
 							{ children }

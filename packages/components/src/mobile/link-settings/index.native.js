@@ -235,6 +235,7 @@ function LinkSettings( {
 			isVisible={ isVisible }
 			onClose={ onCloseSettingsSheet }
 			hideHeader
+			adjustToContentHeight
 		>
 			<PanelBody style={ styles.linkSettingsPanel }>
 				{ getSettings() }

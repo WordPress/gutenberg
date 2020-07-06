@@ -61,6 +61,7 @@ export default class Picker extends Component {
 				onClose={ this.onClose }
 				style={ { paddingBottom: 20 } }
 				hideHeader
+				adjustToContentHeight
 			>
 				<View>
 					{ options.map( ( option, index ) => (

@@ -18,7 +18,7 @@ import { Icon, check, close } from '@wordpress/icons';
 import styles from './style.scss';
 
 function ColorPicker( {
-	shouldEnableBottomSheetScroll,
+	onShouldEnableInnerHandling,
 	shouldDisableBottomSheetMaxHeight,
 	isBottomSheetContentScrolling,
 	setColor,
@@ -117,17 +117,15 @@ function ColorPicker( {
 					! isBottomSheetContentScrolling && onSatValPickerChange
 				}
 				onSatValPickerDragStart={ () => {
-					shouldEnableBottomSheetScroll( false );
+					onShouldEnableInnerHandling( false );
 				} }
-				onSatValPickerDragEnd={ () =>
-					shouldEnableBottomSheetScroll( true )
-				}
+				onSatValPickerDragEnd={ () => {
+					onShouldEnableInnerHandling( true );
+				} }
 				onHuePickerDragStart={ () =>
-					shouldEnableBottomSheetScroll( false )
+					onShouldEnableInnerHandling( false )
 				}
-				onHuePickerDragEnd={ () =>
-					shouldEnableBottomSheetScroll( true )
-				}
+				onHuePickerDragEnd={ () => onShouldEnableInnerHandling( true ) }
 				huePickerBarWidth={ pickerWidth }
 				huePickerBarHeight={ pickerPointerSize / 2 }
 				satValPickerSize={ {

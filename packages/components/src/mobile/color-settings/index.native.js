@@ -10,7 +10,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { __ } from '@wordpress/i18n';
 import {
 	useState,
-	// useEffect,
+	useEffect,
 	useContext,
 	useRef,
 	useCallback,
@@ -71,20 +71,21 @@ const Stack = createStackNavigator();
 function ColorSettings( { defaultSettings } ) {
 	const route = useRoute();
 	const [ height, setHeightValue ] = useState( 1 );
+	const { onCloseBottomSheet } = useContext( BottomSheetContext );
 	const setHeight = ( maxHeight ) => {
 		if ( height !== maxHeight ) {
 			setHeightValue( maxHeight );
 		}
 	};
-	// useEffect( () => {
-	// snapToHeight( 300 );
-	// shouldDisableBottomSheetMaxHeight( true );
-	// onCloseBottomSheet( null );
-	// }, [] );
+
+	useEffect( () => {
+		// shouldDisableBottomSheetMaxHeight( true );
+		onCloseBottomSheet( null );
+	}, [] );
 
 	// function afterHardwareButtonPress() {
-	// 	onHardwareButtonPress( null );
-	// 	shouldDisableBottomSheetMaxHeight( true );
+	// onHardwareButtonPress( null );
+	// shouldDisableBottomSheetMaxHeight( true );
 	// }
 
 	const PaletteScreenView = useRef( () => (
@@ -139,33 +140,26 @@ export default ColorSettings;
 const PickerScreen = () => {
 	const route = useRoute();
 	const navigation = useNavigation();
+	const {
+		onShouldEnableInnerHandling,
+		shouldDisableBottomSheetMaxHeight,
+		onCloseBottomSheet,
+		isBottomSheetContentScrolling,
+	} = useContext( BottomSheetContext );
 	const { setColor, currentValue, isGradientColor } = route.params;
 	return (
-		<BottomSheetConsumer>
-			{ ( {
-				shouldEnableBottomSheetScroll,
-				shouldDisableBottomSheetMaxHeight,
-				onCloseBottomSheet,
-				isBottomSheetContentScrolling,
-			} ) => (
-				<ColorPicker
-					shouldEnableBottomSheetScroll={
-						shouldEnableBottomSheetScroll
-					}
-					shouldDisableBottomSheetMaxHeight={
-						shouldDisableBottomSheetMaxHeight
-					}
-					setColor={ setColor }
-					activeColor={ currentValue }
-					isGradientColor={ isGradientColor }
-					onNavigationBack={ navigation.goBack }
-					onCloseBottomSheet={ onCloseBottomSheet }
-					isBottomSheetContentScrolling={
-						isBottomSheetContentScrolling
-					}
-				/>
-			) }
-		</BottomSheetConsumer>
+		<ColorPicker
+			onShouldEnableInnerHandling={ onShouldEnableInnerHandling }
+			shouldDisableBottomSheetMaxHeight={
+				shouldDisableBottomSheetMaxHeight
+			}
+			setColor={ setColor }
+			activeColor={ currentValue }
+			isGradientColor={ isGradientColor }
+			onNavigationBack={ navigation.goBack }
+			onCloseBottomSheet={ onCloseBottomSheet }
+			isBottomSheetContentScrolling={ isBottomSheetContentScrolling }
+		/>
 	);
 };
 
@@ -223,9 +217,9 @@ const PaletteScreen = () => {
 			onGradientChange( '' );
 		} else if ( isSolidSegment && onColorChange ) {
 			onColorChange( color );
-			onColorChange( '' );
 		} else if ( ! isSolidSegment && onGradientChange ) {
 			onGradientChange( color );
+			onColorChange( '' );
 		}
 	};
 
