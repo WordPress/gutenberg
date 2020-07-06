@@ -106,6 +106,13 @@ export default function useBlockSync( {
 	// have been made. This lets us inform the data source of changes. This
 	// is an effect so that the subscriber can run synchronously without
 	// waiting for React renders for changes.
+	const onInputRef = useRef( onInput );
+	const onChangeRef = useRef( onChange );
+	useEffect( () => {
+		onInputRef.current = onInput;
+		onChangeRef.current = onChange;
+	}, [ onInput, onChange ] );
+
 	useEffect( () => {
 		const {
 			getSelectionStart,
@@ -172,8 +179,9 @@ export default function useBlockSync( {
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
 		} );
+
 		return () => unsubscribe();
-	}, [ registry, onChange, onInput, clientId ] );
+	}, [ registry, clientId ] );
 
 	// Determine if blocks need to be reset when they change.
 	useEffect( () => {

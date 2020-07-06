@@ -7,7 +7,7 @@
 		width: 100%;
 		margin-top: 0;
 		margin-bottom: 0;
-		font-size: 0.8em;
+		font-size: 0.5em;
 	}
 
 	&__avatar {
@@ -15,7 +15,8 @@
 	}
 
 	&__bio {
-		margin-top: $grid-unit-10;
+		margin-bottom: $grid-unit-10;
+		font-size: 0.7em;
 	}
 
 	&__content {

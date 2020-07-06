@@ -1,7 +1,7 @@
 export const categories = [
-	{ slug: 'common', title: 'Common blocks' },
-	{ slug: 'formatting', title: 'Formatting' },
-	{ slug: 'layout', title: 'Layout elements' },
+	{ slug: 'text', title: 'Text' },
+	{ slug: 'media', title: 'Media' },
+	{ slug: 'design', title: 'Design' },
 	{ slug: 'widgets', title: 'Widgets' },
 	{ slug: 'embed', title: 'Embeds' },
 	{ slug: 'reusable', title: 'Reusable blocks' },
@@ -14,12 +14,12 @@ export const collections = {
 	},
 };
 
-export const textItem = {
-	id: 'core/text-block',
-	name: 'core/text-block',
+export const paragraphItem = {
+	id: 'core/paragraph-block',
+	name: 'core/paragraph-block',
 	initialAttributes: {},
-	title: 'Text',
-	category: 'common',
+	title: 'Paragraph',
+	category: 'text',
 	isDisabled: false,
 	utility: 1,
 };
@@ -48,12 +48,12 @@ export const withVariationsItem = {
 	],
 };
 
-export const advancedTextItem = {
-	id: 'core/advanced-text-block',
-	name: 'core/advanced-text-block',
+export const advancedParagraphItem = {
+	id: 'core/advanced-paragraph-block',
+	name: 'core/advanced-paragraph-block',
 	initialAttributes: {},
-	title: 'Advanced Text',
-	category: 'common',
+	title: 'Advanced Paragraph',
+	category: 'text',
 	isDisabled: false,
 	utility: 1,
 };
@@ -63,7 +63,7 @@ export const someOtherItem = {
 	name: 'core/some-other-block',
 	initialAttributes: {},
 	title: 'Some Other Block',
-	category: 'common',
+	category: 'text',
 	isDisabled: false,
 	utility: 1,
 };
@@ -73,7 +73,7 @@ export const moreItem = {
 	name: 'core/more-block',
 	initialAttributes: {},
 	title: 'More',
-	category: 'layout',
+	category: 'design',
 	isDisabled: true,
 	utility: 1,
 };
@@ -89,11 +89,11 @@ export const youtubeItem = {
 	utility: 1,
 };
 
-export const textEmbedItem = {
-	id: 'core-embed/a-text-embed',
-	name: 'core-embed/a-text-embed',
+export const paragraphEmbedItem = {
+	id: 'core-embed/a-paragraph-embed',
+	name: 'core-embed/a-paragraph-embed',
 	initialAttributes: {},
-	title: 'A Text Embed',
+	title: 'A Paragraph Embed',
 	category: 'embed',
 	isDisabled: false,
 	utility: 1,
@@ -110,12 +110,12 @@ export const reusableItem = {
 };
 
 export default [
-	textItem,
 	withVariationsItem,
-	advancedTextItem,
+	paragraphItem,
+	advancedParagraphItem,
 	someOtherItem,
 	moreItem,
 	youtubeItem,
-	textEmbedItem,
+	paragraphEmbedItem,
 	reusableItem,
 ];

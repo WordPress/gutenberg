@@ -7,6 +7,12 @@ When registering a block, the `edit` and `save` functions provide the interface 
 The `edit` function describes the structure of your block in the context of the editor. This represents what the editor will render when the block is used.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+edit: () => {
+	return <div>Your block.</div>;
+}
+```
 {% ES5 %}
 ```js
 // A static div
@@ -16,12 +22,6 @@ edit: function() {
 		null,
 		'Your block.'
 	);
-}
-```
-{% ESNext %}
-```jsx
-edit: () => {
-	return <div>Your block.</div>;
 }
 ```
 {% end %}
@@ -35,6 +35,12 @@ This property surfaces all the available attributes and their corresponding valu
 In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
 
 {% codetabs %}
+{% ESNext %}
+```js
+edit: ( { attributes } ) => {
+	return <div>{ attributes.content }</div>;
+}
+```
 {% ES5 %}
 ```js
 edit: function( props ) {
@@ -43,12 +49,6 @@ edit: function( props ) {
 		null,
 		props.attributes.content
 	);
-}
-```
-{% ESNext %}
-```js
-edit: ( { attributes } ) => {
-	return <div>{ attributes.content }</div>;
 }
 ```
 {% end %}
@@ -60,6 +60,12 @@ The value of `attributes.content` will be displayed inside the `div` when insert
 This property returns the class name for the wrapper element. This is automatically added in the `save` method, but not on `edit`, as the root element may not correspond to what is _visually_ the main element of the block. You can request it to add it to the correct element in your function.
 
 {% codetabs %}
+{% ESNext %}
+```js
+edit: ( { attributes, className } ) => {
+	return <div className={ className }>{ attributes.content }</div>;
+}
+```
 {% ES5 %}
 ```js
 edit: function( props ) {
@@ -70,12 +76,6 @@ edit: function( props ) {
 	);
 }
 ```
-{% ESNext %}
-```js
-edit: ( { attributes, className } ) => {
-	return <div className={ className }>{ attributes.content }</div>;
-}
-```
 {% end %}
 
 ### isSelected
@@ -83,6 +83,19 @@ edit: ( { attributes, className } ) => {
 The isSelected property is an object that communicates whether the block is currently selected.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+edit: ( { attributes, className, isSelected } ) => {
+	return (
+		<div className={ className }>
+			Your block.
+			{ isSelected &&
+				<span>Shows only when the block is selected.</span>
+			}
+		</div>
+	);
+}
+```
 {% ES5 %}
 ```js
 edit: function( props ) {
@@ -100,19 +113,6 @@ edit: function( props ) {
 	);
 }
 ```
-{% ESNext %}
-```jsx
-edit: ( { attributes, className, isSelected } ) => {
-	return (
-		<div className={ className }>
-			Your block.
-			{ isSelected &&
-				<span>Shows only when the block is selected.</span>
-			}
-		</div>
-	);
-}
-```
 {% end %}
 
 ### setAttributes
@@ -120,6 +120,24 @@ edit: ( { attributes, className, isSelected } ) => {
 This function allows the block to update individual attributes based on user interactions.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+edit: ( { attributes, setAttributes, className, isSelected } ) => {
+	// Simplify access to attributes
+	const { content, mySetting } = attributes;
+
+	// Toggle a setting when the user clicks the button
+	const toggleSetting = () => setAttributes( { mySetting: ! mySetting } );
+	return (
+		<div className={ className }>
+			{ content }
+			{ isSelected &&
+				<button onClick={ toggleSetting }>Toggle setting</button>
+			}
+		</div>
+	);
+}
+```
 {% ES5 %}
 ```js
 edit: function( props ) {
@@ -143,29 +161,24 @@ edit: function( props ) {
 	);
 },
 ```
-{% ESNext %}
-```jsx
-edit: ( { attributes, setAttributes, className, isSelected } ) => {
-	// Simplify access to attributes
-	const { content, mySetting } = attributes;
-
-	// Toggle a setting when the user clicks the button
-	const toggleSetting = () => setAttributes( { mySetting: ! mySetting } );
-	return (
-		<div className={ className }>
-			{ content }
-			{ isSelected &&
-				<button onClick={ toggleSetting }>Toggle setting</button>
-			}
-		</div>
-	);
-}
-```
 {% end %}
 
 When using attributes that are objects or arrays it's a good idea to copy or clone the attribute prior to updating it:
 
 {% codetabs %}
+{% ESNext %}
+```js
+// Good - a new array is created from the old list attribute and a new list item:
+const { list } = attributes;
+const addListItem = ( newListItem ) => setAttributes( { list: [ ...list, newListItem ] } );
+
+// Bad - the list from the existing attribute is modified directly to add the new list item:
+const { list } = attributes;
+const addListItem = ( newListItem ) => {
+	list.push( newListItem );
+	setAttributes( { list } );
+};
+```
 {% ES5 %}
 ```js
 // Good - cloning the old list
@@ -182,19 +195,6 @@ var addListItem = function( newListItem ) {
 	setAttributes( { list: list } );
 };
 ```
-{% ESNext %}
-```js
-// Good - a new array is created from the old list attribute and a new list item:
-const { list } = attributes;
-const addListItem = ( newListItem ) => setAttributes( { list: [ ...list, newListItem ] } );
-
-// Bad - the list from the existing attribute is modified directly to add the new list item:
-const { list } = attributes;
-const addListItem = ( newListItem ) => {
-	list.push( newListItem );
-	setAttributes( { list } );
-};
-```
 {% end %}
 
 Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, the Gutenberg project follows the philosophy of the Redux library that [state should be immutable](https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability)—data should not be changed directly, but instead a new version of the data created containing the changes.
@@ -204,6 +204,12 @@ Why do this? In JavaScript, arrays and objects are passed by reference, so this 
 The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized into `post_content`.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+save: () => {
+	return <div> Your block. </div>;
+}
+```
 {% ES5 %}
 ```js
 save: function() {
@@ -212,12 +218,6 @@ save: function() {
 		null,
 		'Your block.'
 	);
-}
-```
-{% ESNext %}
-```jsx
-save: () => {
-	return <div> Your block. </div>;
 }
 ```
 {% end %}
@@ -242,6 +242,12 @@ If left unspecified, the default implementation will save no markup in post cont
 As with `edit`, the `save` function also receives an object argument including attributes which can be inserted into the markup.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+save: ( { attributes } ) => {
+	return <div>{ attributes.content }</div>;
+}
+```
 {% ES5 %}
 ```js
 save: function( props ) {
@@ -250,12 +256,6 @@ save: function( props ) {
 		null,
 		props.attributes.content
 	);
-}
-```
-{% ESNext %}
-```jsx
-save: ( { attributes } ) => {
-	return <div>{ attributes.content }</div>;
 }
 ```
 {% end %}
@@ -270,6 +270,31 @@ Here are a couple examples of using attributes, edit, and save all together.  Fo
 ### Saving Attributes to Child Elements
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+attributes: {
+	content: {
+		type: 'string',
+		source: 'html',
+		selector: 'p'
+	}
+},
+
+edit: ( { attributes, setAttributes } ) => {
+	const updateFieldValue = ( val ) => {
+		setAttributes( { content: val } );
+	}
+	return <TextControl
+			label='My Text Field'
+			value={ attributes.content }
+			onChange={ updateFieldValue }
+		/>;
+},
+
+save: ( { attributes } ) => {
+	return <p> { attributes.content } </p>;
+},
+```
 {% ES5 %}
 ```js
 attributes: {
@@ -299,31 +324,6 @@ save: function( props ) {
 	return el( 'p', {}, props.attributes.content );
 },
 ```
-{% ESNext %}
-```jsx
-attributes: {
-	content: {
-		type: 'string',
-		source: 'html',
-		selector: 'p'
-	}
-},
-
-edit: ( { attributes, setAttributes } ) => {
-	const updateFieldValue = ( val ) => {
-		setAttributes( { content: val } );
-	}
-	return <TextControl
-			label='My Text Field'
-			value={ attributes.content }
-			onChange={ updateFieldValue }
-		/>;
-},
-
-save: ( { attributes } ) => {
-	return <p> { attributes.content } </p>;
-},
-```
 {% end %}
 
 ### Saving Attributes via Serialization
@@ -333,6 +333,29 @@ Ideally, the attributes saved should be included in the markup. However, there a
 This example could be for a dynamic block, such as the [Latest Posts block](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/latest-posts/index.js), which renders the markup server-side. The save function is still required, however in this case it simply returns null since the block is not saving content from the editor.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+attributes: {
+	postsToShow: {
+		type: 'number',
+	}
+},
+
+edit: ( { attributes, setAttributes } ) => {
+	return <TextControl
+			label='Number Posts to Show'
+			value={ attributes.postsToShow }
+			onChange={ ( val ) => {
+				setAttributes( { postsToShow: parseInt( val ) } );
+			}},
+		}
+	);
+},
+
+save: () => {
+	return null;
+}
+```
 {% ES5 %}
 ```js
 attributes: {
@@ -355,29 +378,6 @@ edit: function( props ) {
 },
 
 save: function() {
-	return null;
-}
-```
-{% ESNext %}
-```jsx
-attributes: {
-	postsToShow: {
-		type: 'number',
-	}
-},
-
-edit: ( { attributes, setAttributes } ) => {
-	return <TextControl
-			label='Number Posts to Show'
-			value={ attributes.postsToShow }
-			onChange={ ( val ) => {
-				setAttributes( { postsToShow: parseInt( val ) } );
-			}},
-		}
-	);
-},
-
-save: () => {
 	return null;
 }
 ```

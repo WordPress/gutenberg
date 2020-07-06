@@ -60,5 +60,10 @@ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
   }
   isCollapsed={true}
   label="Change vertical alignment"
+  popoverProps={
+    Object {
+      "isAlternate": true,
+    }
+  }
 />
 `;

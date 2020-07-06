@@ -3,6 +3,7 @@
  */
 import { get } from 'lodash';
 import tinycolor from 'tinycolor2';
+
 /**
  * Internal dependencies
  */

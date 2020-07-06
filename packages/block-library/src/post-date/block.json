@@ -1,12 +1,12 @@
 {
 	"name": "core/post-date",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"format": {
 			"type": "string"
 		}
 	},
-	"context": [
+	"usesContext": [
 		"postId"
 	],
 	"supports": {

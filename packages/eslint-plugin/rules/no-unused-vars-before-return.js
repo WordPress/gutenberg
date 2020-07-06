@@ -104,7 +104,7 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 							// Allow unused if part of an object destructuring.
 							! isExemptObjectDestructureDeclarator( def.node ) &&
 							// Only target assignments preceding `return`.
-							def.node.end < node.end
+							def.node.range[ 1 ] < node.range[ 1 ]
 						);
 					} );
 
@@ -137,7 +137,8 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 					}
 
 					const isUsedBeforeReturn = identifiers.some(
-						( identifier ) => identifier.end < node.end
+						( identifier ) =>
+							identifier.range[ 1 ] < node.range[ 1 ]
 					);
 
 					if ( isUsedBeforeReturn ) {

@@ -1,6 +1,6 @@
 {
 	"name": "core/missing",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"originalName": {
 			"type": "string"

@@ -334,7 +334,13 @@ class GalleryEdit extends Component {
 	}
 
 	render() {
-		const { attributes, className, isSelected, noticeUI } = this.props;
+		const {
+			attributes,
+			className,
+			isSelected,
+			noticeUI,
+			insertBlocksAfter,
+		} = this.props;
 		const {
 			columns = defaultColumnsNumber( attributes ),
 			imageCrop,
@@ -405,7 +411,7 @@ class GalleryEdit extends Component {
 						/>
 						{ shouldShowSizeOptions && (
 							<SelectControl
-								label={ __( 'Images size' ) }
+								label={ __( 'Image size' ) }
 								value={ sizeSlug }
 								options={ imageSizeOptions }
 								onChange={ this.updateImagesSize }
@@ -425,6 +431,7 @@ class GalleryEdit extends Component {
 					onDeselectImage={ this.onDeselectImage }
 					onSetImageAttributes={ this.setImageAttributes }
 					onFocusGalleryCaption={ this.onFocusGalleryCaption }
+					insertBlocksAfter={ insertBlocksAfter }
 				/>
 			</>
 		);

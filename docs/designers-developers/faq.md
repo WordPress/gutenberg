@@ -179,6 +179,16 @@ This is the canonical list of keyboard shortcuts:
 			<td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>Y</kbd></td>
 		</tr>
 		<tr>
+			<td>Move the selected block(s) up.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></td>
+			<td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>⇧</kbd><kbd>T</kbd></td>
+		</tr>
+		<tr>
+			<td>Move the selected block(s) down.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd></td>
+			<td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>⇧</kbd><kbd>Y</kbd></td>
+		</tr>
+		<tr>
 			<td>Change the block type after adding a new paragraph.</td>
 			<td><kbd>/</kbd></td>
 			<td><kbd>/</kbd></td>

@@ -19,6 +19,21 @@ _Returns_
 
 -   `boolean`: True if the block has controlled inner blocks.
 
+<a name="canInsertBlocks" href="#canInsertBlocks">#</a> **canInsertBlocks**
+
+Determines if the given blocks are allowed to be inserted into the block
+list.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientIds_ `string`: The block client IDs to be inserted.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `boolean`: Whether the given blocks are allowed to be inserted.
+
 <a name="canInsertBlockType" href="#canInsertBlockType">#</a> **canInsertBlockType**
 
 Determines if the given block type is allowed to be inserted into the block list.
@@ -659,6 +674,18 @@ _Returns_
 
 -   `?string`: Block Template Lock
 
+<a name="hasBlockMovingClientId" href="#hasBlockMovingClientId">#</a> **hasBlockMovingClientId**
+
+Returns whether block moving mode is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Client Id of moving block.
+
 <a name="hasInserterItems" href="#hasInserterItems">#</a> **hasInserterItems**
 
 Determines whether there are items to show in the inserter.
@@ -946,6 +973,7 @@ Generator that triggers an action used to duplicate a list of blocks.
 _Parameters_
 
 -   _clientIds_ `Array<string>`: 
+-   _updateSelection_ `boolean`: 
 
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
 
@@ -1060,21 +1088,33 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="moveBlocksToPosition" href="#moveBlocksToPosition">#</a> **moveBlocksToPosition**
+
+Returns an action object signalling that the given blocks should be moved to
+a new position.
+
+_Parameters_
+
+-   _clientIds_ `?string`: The client IDs of the blocks.
+-   _fromRootClientId_ `?string`: Root client ID source.
+-   _toRootClientId_ `?string`: Root client ID destination.
+-   _index_ `number`: The index to move the blocks to.
+
 <a name="moveBlocksUp" href="#moveBlocksUp">#</a> **moveBlocksUp**
 
 Undocumented declaration.
 
 <a name="moveBlockToPosition" href="#moveBlockToPosition">#</a> **moveBlockToPosition**
 
-Returns an action object signalling that an indexed block should be moved
-to a new index.
+Returns an action object signalling that the given block should be moved to a
+new position.
 
 _Parameters_
 
 -   _clientId_ `?string`: The client ID of the block.
 -   _fromRootClientId_ `?string`: Root client ID source.
 -   _toRootClientId_ `?string`: Root client ID destination.
--   _index_ `number`: The index to move the block into.
+-   _index_ `number`: The index to move the block to.
 
 <a name="multiSelect" href="#multiSelect">#</a> **multiSelect**
 
@@ -1246,6 +1286,14 @@ _Parameters_
 
 -   _clientId_ `string`: Block client ID.
 
+<a name="setBlockMovingClientId" href="#setBlockMovingClientId">#</a> **setBlockMovingClientId**
+
+Generator that triggers an action used to enable or disable the block moving mode.
+
+_Parameters_
+
+-   _hasBlockMovingClientId_ `(string|null)`: Enable/Disable block moving mode.
+
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 
 Returns an action object that sets whether the block has controlled innerblocks.
@@ -1395,12 +1443,12 @@ _Returns_
 
 <a name="updateBlockAttributes" href="#updateBlockAttributes">#</a> **updateBlockAttributes**
 
-Returns an action object used in signalling that the block attributes with
-the specified client ID has been updated.
+Returns an action object used in signalling that the multiple blocks'
+attributes with the specified client IDs have been updated.
 
 _Parameters_
 
--   _clientId_ `string`: Block client ID.
+-   _clientIds_ `(string|Array<string>)`: Block client IDs.
 -   _attributes_ `Object`: Block attributes to be merged.
 
 _Returns_

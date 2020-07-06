@@ -7,6 +7,7 @@ import {
 	pressKeyWithModifier,
 	clickBlockAppender,
 	getEditedPostContent,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 async function getActiveLabel() {
@@ -43,13 +44,13 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 
 const tabThroughBlockToolbar = async () => {
 	await page.keyboard.press( 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'Change block type or style' );
+
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Move up' );
 
 	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Move down' );
-
-	await page.keyboard.press( 'ArrowRight' );
-	await expect( await getActiveLabel() ).toBe( 'Change block type or style' );
 
 	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Change text alignment' );
@@ -70,7 +71,7 @@ const tabThroughBlockToolbar = async () => {
 	await expect( await getActiveLabel() ).toBe( 'More options' );
 
 	await page.keyboard.press( 'ArrowRight' );
-	await expect( await getActiveLabel() ).toBe( 'Move up' );
+	await expect( await getActiveLabel() ).toBe( 'Change block type or style' );
 };
 
 describe( 'Order of block keyboard navigation', () => {
@@ -89,10 +90,7 @@ describe( 'Order of block keyboard navigation', () => {
 
 		// Select the middle block.
 		await page.keyboard.press( 'ArrowUp' );
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
-
+		await showBlockToolbar();
 		await navigateToContentEditorTop();
 		await tabThroughParagraphBlock( 'Paragraph 1' );
 
@@ -197,6 +195,7 @@ describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
+		await page.keyboard.press( 'ArrowRight' );
 		await expect( await getActiveLabel() ).toBe( 'Move up' );
 	} );
 } );

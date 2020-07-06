@@ -4,8 +4,8 @@
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	padding: $panel-padding;
-	margin-top: $panel-padding;
+	padding: $grid-unit-20;
+	margin-top: $grid-unit-20;
 	flex-wrap: wrap;
 }
 
@@ -43,8 +43,8 @@
 }
 
 .picker {
-	padding: $panel-padding;
-	border-radius: $panel-padding / 2;
+	padding: $grid-unit-20;
+	border-radius: $grid-unit-20 / 2;
 	height: 200px;
 }
 

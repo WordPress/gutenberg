@@ -32,7 +32,12 @@ const BlockInspector = ( {
 	showNoBlockSelectedMessage = true,
 } ) => {
 	if ( count > 1 ) {
-		return <MultiSelectionInspector />;
+		return (
+			<div className="block-editor-block-inspector">
+				<MultiSelectionInspector />
+				<InspectorControls.Slot bubblesVirtually />
+			</div>
+		);
 	}
 
 	const isSelectedBlockUnregistered =

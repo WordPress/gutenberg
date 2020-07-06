@@ -7,13 +7,18 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, Platform } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ComplementaryArea } from '@wordpress/interface';
 import { BlockInspector } from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+
+const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+	web: true,
+	native: false,
+} );
 
 /**
  * Internal dependencies
@@ -131,6 +136,7 @@ export default function Sidebar() {
 			scope="core/edit-widgets"
 			identifier={ currentArea }
 			icon={ cog }
+			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			{ currentArea === 'edit-widgets/block-areas' && <BlockAreas /> }
 			{ currentArea === 'edit-widgets/block-inspector' && (

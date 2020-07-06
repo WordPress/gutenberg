@@ -14,7 +14,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {
 			title: 'Test Gallery',
-			category: 'common',
+			category: 'text',
 			attributes: {
 				ids: {
 					type: 'array',
@@ -42,7 +42,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		} );
 		registerBlockType( 'test/broccoli', {
 			title: 'Test Broccoli',
-			category: 'common',
+			category: 'text',
 			attributes: {
 				id: {
 					type: 'number',
@@ -70,7 +70,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		} );
 		registerBlockType( 'test/fallback-broccoli', {
 			title: 'Test Fallback Broccoli',
-			category: 'common',
+			category: 'text',
 			attributes: {
 				id: {
 					type: 'number',

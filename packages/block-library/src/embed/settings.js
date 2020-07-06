@@ -46,13 +46,14 @@ export function getEmbedBlockSettings( {
 	keywords = [],
 	supports = {},
 	responsive = true,
+	previewable = true,
 } ) {
 	const blockDescription =
 		description ||
 		__(
 			'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.'
 		);
-	const edit = getEmbedEditComponent( title, icon, responsive );
+	const edit = getEmbedEditComponent( title, icon, responsive, previewable );
 	return {
 		title,
 		description: blockDescription,

@@ -25,7 +25,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 
 	icon: 'universal-access-alt',
 
-	category: 'layout',
+	category: 'design',
 
 	attributes: {
 		content: {
@@ -253,7 +253,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 
 	icon: 'universal-access-alt',
 
-	category: 'layout',
+	category: 'design',
 
 	attributes: {
 		content: {

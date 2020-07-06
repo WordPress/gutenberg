@@ -1,10 +1,13 @@
 {
 	"name": "core/site-title",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"level": {
 			"type": "number",
 			"default": 1
+		},
+		"align": {
+			"type": "string"
 		}
 	},
 	"supports": {

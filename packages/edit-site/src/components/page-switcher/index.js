@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getPath, getQueryString } from '@wordpress/url';
+import { getPathAndQueryString } from '@wordpress/url';
 import { useSelect } from '@wordpress/data';
 import {
 	Tooltip,
@@ -13,14 +13,6 @@ import { Icon, home } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 
-function getPathFromLink( link ) {
-	const path = getPath( link );
-	const queryString = getQueryString( link );
-	let value = '/';
-	if ( path ) value += path;
-	if ( queryString ) value += `?${ queryString }`;
-	return value;
-}
 export default function PageSwitcher( {
 	showOnFront,
 	activePage,
@@ -32,7 +24,7 @@ export default function PageSwitcher( {
 			const pageGroups = {
 				pages: getEntityRecords( 'postType', 'page' )?.map(
 					( _page ) => {
-						const path = getPathFromLink( _page.link );
+						const path = getPathAndQueryString( _page.link );
 						return {
 							label:
 								path === '/' ? (
@@ -59,7 +51,7 @@ export default function PageSwitcher( {
 				),
 				categories: getEntityRecords( 'taxonomy', 'category' )?.map(
 					( category ) => {
-						const path = getPathFromLink( category.link );
+						const path = getPathAndQueryString( category.link );
 						return {
 							label: category.name,
 							type: 'category',
@@ -109,7 +101,7 @@ export default function PageSwitcher( {
 		onActivePageChange( {
 			type: 'post',
 			slug: post.slug,
-			path: getPathFromLink( post.url ),
+			path: getPathAndQueryString( post.url ),
 			context: { postType: post.type, postId: post.id },
 		} );
 	return (

@@ -4,6 +4,7 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
 const { get, escapeRegExp, compact } = require( 'lodash' );
 const { basename, sep } = require( 'path' );
@@ -16,7 +17,7 @@ const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-w
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const {
 	camelCaseDash,
-} = require( '@wordpress/dependency-extraction-webpack-plugin/util' );
+} = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
 
 /**
  * Internal dependencies
@@ -35,7 +36,8 @@ const gutenbergPackages = Object.keys( dependencies )
 	.filter(
 		( packageName ) =>
 			! BUNDLED_PACKAGES.includes( packageName ) &&
-			packageName.startsWith( WORDPRESS_NAMESPACE )
+			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
@@ -44,6 +46,19 @@ module.exports = {
 		// Only concatenate modules in production, when not analyzing bundles.
 		concatenateModules:
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+		minimizer: [
+			new TerserPlugin( {
+				cache: true,
+				parallel: true,
+				sourceMap: mode !== 'production',
+				terserOptions: {
+					output: {
+						comments: /translators:/i,
+					},
+				},
+				extractComments: false,
+			} ),
+		],
 	},
 	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {

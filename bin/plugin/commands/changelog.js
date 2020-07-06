@@ -3,11 +3,17 @@
  */
 const { groupBy, escapeRegExp, uniq } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
+const { sprintf } = require( 'sprintf-js' );
+const semver = require( 'semver' );
 
 /**
  * Internal dependencies
  */
 const { getNextMajorVersion } = require( '../lib/version' );
+const {
+	getMilestoneByTitle,
+	getIssuesByMilestone,
+} = require( '../lib/milestone' );
 const { log, formats } = require( '../lib/logger' );
 const config = require( '../config' );
 // @ts-ignore
@@ -97,22 +103,6 @@ const REWORD_TERMS = {
 	config: 'configuration',
 	docs: 'documentation',
 };
-
-/**
- * Given a SemVer-formatted version string, returns an assumed milestone title
- * associated with that version.
- *
- * @see https://semver.org/
- *
- * @param {string} version Version string.
- *
- * @return {string} Milestone title.
- */
-function getMilestone( version ) {
-	const [ major, minor ] = version.split( '.' );
-
-	return `Gutenberg ${ major }.${ minor }`;
-}
 
 /**
  * Returns type candidates based on given issue label names.
@@ -347,72 +337,6 @@ function getEntry( issue ) {
 }
 
 /**
- * Returns a promise resolving to a milestone by a given title, if exists.
- *
- * @param {GitHub} octokit Initialized Octokit REST client.
- * @param {string} owner   Repository owner.
- * @param {string} repo    Repository name.
- * @param {string} title   Milestone title.
- *
- * @return {Promise<OktokitIssuesListMilestonesForRepoResponseItem|void>} Promise resolving to milestone, if exists.
- */
-async function getMilestoneByTitle( octokit, owner, repo, title ) {
-	const options = octokit.issues.listMilestonesForRepo.endpoint.merge( {
-		owner,
-		repo,
-	} );
-
-	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListMilestonesForRepoResponse>>}
-	 */
-	const responses = octokit.paginate.iterator( options );
-
-	for await ( const response of responses ) {
-		const milestones = response.data;
-		for ( const milestone of milestones ) {
-			if ( milestone.title === title ) {
-				return milestone;
-			}
-		}
-	}
-}
-
-/**
- * Returns a promise resolving to pull requests by a given milestone ID.
- *
- * @param {GitHub} octokit   Initialized Octokit REST client.
- * @param {string} owner     Repository owner.
- * @param {string} repo      Repository name.
- * @param {number} milestone Milestone ID.
- *
- * @return {Promise<IssuesListForRepoResponseItem[]>} Promise resolving to pull
- *                                                    requests for the given
- *                                                    milestone.
- */
-async function getPullRequestsByMilestone( octokit, owner, repo, milestone ) {
-	const options = octokit.issues.listForRepo.endpoint.merge( {
-		owner,
-		repo,
-		milestone,
-		state: 'closed',
-	} );
-
-	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListForRepoResponse>>}
-	 */
-	const responses = octokit.paginate.iterator( options );
-
-	const pulls = [];
-
-	for await ( const response of responses ) {
-		const issues = response.data;
-		pulls.push( ...issues.filter( ( issue ) => issue.pull_request ) );
-	}
-
-	return pulls;
-}
-
-/**
  * Returns a promise resolving to an array of pull requests associated with the
  * changelog settings object.
  *
@@ -438,7 +362,14 @@ async function fetchAllPullRequests( octokit, settings ) {
 	}
 
 	const { number } = milestone;
-	return getPullRequestsByMilestone( octokit, owner, repo, number );
+	const issues = await getIssuesByMilestone(
+		octokit,
+		owner,
+		repo,
+		number,
+		'closed'
+	);
+	return issues.filter( ( issue ) => issue.pull_request );
 }
 
 /**
@@ -516,7 +447,16 @@ async function getReleaseChangelog( options ) {
 		token: options.token,
 		milestone:
 			options.milestone === undefined
-				? getMilestone( getNextMajorVersion( manifest.version ) )
+				? // Disable reason: valid-sprintf applies to `@wordpress/i18n` where
+				  // strings are expected to need to be extracted, and thus variables are
+				  // not allowed. This string will not need to be extracted.
+				  // eslint-disable-next-line @wordpress/valid-sprintf
+				  sprintf( config.versionMilestoneFormat, {
+						...config,
+						...semver.parse(
+							getNextMajorVersion( manifest.version )
+						),
+				  } )
 				: options.milestone,
 	} );
 }

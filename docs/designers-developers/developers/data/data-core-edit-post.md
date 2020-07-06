@@ -177,6 +177,18 @@ _Returns_
 
 -   `boolean`: Is active.
 
+<a name="isInserterOpened" href="#isInserterOpened">#</a> **isInserterOpened**
+
+Returns true if the inserter is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the inserter is opened.
+
 <a name="isMetaBoxLocationActive" href="#isMetaBoxLocationActive">#</a> **isMetaBoxLocationActive**
 
 Returns true if there is an active meta box in the given location, or false
@@ -372,6 +384,18 @@ what Meta boxes are available in which location.
 _Parameters_
 
 -   _metaBoxesPerLocation_ `Object`: Meta boxes per location.
+
+_Returns_
+
+-   `Object`: Action object.
+
+<a name="setIsInserterOpened" href="#setIsInserterOpened">#</a> **setIsInserterOpened**
+
+Returns an action object used to open/close the inserter.
+
+_Parameters_
+
+-   _value_ `boolean`: A boolean representing whether the inserter should be opened or closed.
 
 _Returns_
 

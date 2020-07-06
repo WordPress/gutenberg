@@ -17,7 +17,7 @@ import Backdrop from './backdrop';
 import InputField from './input-field';
 import Label from './label';
 import { Container, Root, Suffix } from './styles/input-control-styles';
-import { isValueEmpty } from './utils';
+import { isValueEmpty } from '../utils/values';
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( InputControl );

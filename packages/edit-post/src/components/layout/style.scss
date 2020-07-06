@@ -2,7 +2,7 @@
 	flex-shrink: 0;
 }
 .edit-post-layout__metaboxes:not(:empty) {
-	border-top: $border-width solid $light-gray-500;
+	border-top: $border-width solid $gray-200;
 	padding: 10px 0 10px;
 	clear: both;
 
@@ -34,8 +34,8 @@
 		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
 		top: $admin-bar-height;
 		left: auto;
-		width: $sidebar-width;
-		border-left: $border-width solid $light-gray-500;
+		width: $sidebar-width + $border-width;
+		border-left: $border-width solid $gray-200;
 		transform: translateX(+100%);
 		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
 		@include reduce-motion("animation");
@@ -77,7 +77,7 @@
 	right: 0;
 	width: $sidebar-width;
 	background-color: $white;
-	border: 1px dotted $light-gray-500;
+	border: 1px dotted $gray-200;
 	height: auto !important; // Need to override the default sidebar positionnings
 	padding: $grid-unit-30;
 	display: flex;

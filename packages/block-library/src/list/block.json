@@ -1,6 +1,6 @@
 {
 	"name": "core/list",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"ordered": {
 			"type": "boolean",
@@ -28,6 +28,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"className": false,
 		"__unstablePasteTextInline": true,
 		"lightBlockWrapper": true

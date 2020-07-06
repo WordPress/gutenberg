@@ -1,6 +1,6 @@
 {
 	"name": "core/query",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"queryId": {
 			"type": "number"
