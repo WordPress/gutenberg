@@ -9,15 +9,18 @@ import { rawHandler, serialize } from '@wordpress/blocks';
 
 const ConvertToBlocksButton = ( { clientId } ) => {
 	const { replaceBlocks } = useDispatch( 'core/block-editor' );
-	const block = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlock( clientId );
-	}, [ clientId ] );
+	const block = useSelect(
+		( select ) => {
+			return select( 'core/block-editor' ).getBlock( clientId );
+		},
+		[ clientId ]
+	);
 
 	return (
 		<BlockControls>
 			<Toolbar>
 				<ToolbarButton
-					title={ __( 'Convert to Blocks' ) }
+					title={ __( 'Convert to blocks' ) }
 					onClick={ () =>
 						replaceBlocks(
 							block.clientId,
@@ -25,7 +28,7 @@ const ConvertToBlocksButton = ( { clientId } ) => {
 						)
 					}
 				>
-					{ __( 'Convert to Blocks' ) }
+					{ __( 'Convert to blocks' ) }
 				</ToolbarButton>
 			</Toolbar>
 		</BlockControls>
