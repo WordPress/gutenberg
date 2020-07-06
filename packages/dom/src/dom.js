@@ -461,8 +461,7 @@ export function isTextField( element ) {
 		'submit',
 	];
 	return (
-		( nodeName === 'INPUT' &&
-			! nonTextInputs.includes( element.type ) ) ||
+		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
 		nodeName === 'TEXTAREA' ||
 		contentEditable === 'true'
 	);
