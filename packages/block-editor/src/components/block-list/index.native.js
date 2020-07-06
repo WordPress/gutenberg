@@ -376,7 +376,12 @@ class EmptyListComponent extends Component {
 			shouldShowInsertionPoint,
 			rootClientId,
 			renderAppender,
+			renderFooterAppender,
 		} = this.props;
+
+		if ( renderFooterAppender ) {
+			return null;
+		}
 		return (
 			<View style={ styles.defaultAppender }>
 				<ReadableContentView>

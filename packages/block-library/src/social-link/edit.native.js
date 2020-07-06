@@ -48,7 +48,7 @@ const SocialLinkEdit = ( {
 } ) => {
 	const { url, service } = attributes;
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
-	const [ isValue, setIsValue ] = useState( !! url );
+	const [ hasUrl, setHasUrl ] = useState( !! url );
 
 	const activeIcon =
 		styles[ `wp-social-link-${ service }` ] || styles[ `wp-social-link` ];
@@ -72,7 +72,7 @@ const SocialLinkEdit = ( {
 
 	useEffect( () => {
 		if ( ! url ) {
-			setIsValue( false );
+			setHasUrl( false );
 			animatedValue.setValue( 0 );
 		} else if ( url ) {
 			animateColors();
@@ -94,7 +94,7 @@ const SocialLinkEdit = ( {
 		stroke: '',
 	};
 
-	const { backgroundColor, color, stroke } = isValue
+	const { backgroundColor, color, stroke } = hasUrl
 		? activeIcon
 		: interpolationColors;
 
@@ -106,7 +106,7 @@ const SocialLinkEdit = ( {
 				duration: ANIMATION_DURATION,
 				easing: Easing.circle,
 			} ),
-		] ).start( () => setIsValue( true ) );
+		] ).start( () => setHasUrl( true ) );
 	}
 
 	function onCloseSettingsSheet() {
@@ -119,7 +119,7 @@ const SocialLinkEdit = ( {
 
 	function onEmptyURL() {
 		animatedValue.setValue( 0 );
-		setIsValue( false );
+		setHasUrl( false );
 	}
 
 	function onIconPress() {
@@ -182,7 +182,11 @@ const SocialLinkEdit = ( {
 				<Animated.View
 					style={ [ styles.iconContainer, { backgroundColor } ] }
 				>
-					<Icon icon={ IconComponent } style={ { stroke, color } } />
+					<Icon
+						animated
+						icon={ IconComponent }
+						style={ { stroke, color } }
+					/>
 				</Animated.View>
 			</TouchableWithoutFeedback>
 		</View>
