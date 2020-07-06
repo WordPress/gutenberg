@@ -72,6 +72,7 @@ describe( 'actions', () => {
 				selectorName: 'getPage',
 				args: [],
 			} );
+			// @FIXME: Test for done: true.
 			expect( it.next( page ).value ).toEqual( {
 				type: 'DISPATCH',
 				storeKey: 'core/edit-site',
