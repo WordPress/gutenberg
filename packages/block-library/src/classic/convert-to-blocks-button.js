@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { BlockControls } from '@wordpress/block-editor';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { rawHandler, serialize } from '@wordpress/blocks';
 
@@ -17,21 +16,17 @@ const ConvertToBlocksButton = ( { clientId } ) => {
 	);
 
 	return (
-		<BlockControls>
-			<Toolbar>
-				<ToolbarButton
-					title={ __( 'Convert to blocks' ) }
-					onClick={ () =>
-						replaceBlocks(
-							block.clientId,
-							rawHandler( { HTML: serialize( block ) } )
-						)
-					}
-				>
-					{ __( 'Convert to blocks' ) }
-				</ToolbarButton>
-			</Toolbar>
-		</BlockControls>
+		<ToolbarButton
+			title={ __( 'Convert to blocks' ) }
+			onClick={ () =>
+				replaceBlocks(
+					block.clientId,
+					rawHandler( { HTML: serialize( block ) } )
+				)
+			}
+		>
+			{ __( 'Convert to blocks' ) }
+		</ToolbarButton>
 	);
 };
 

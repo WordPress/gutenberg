@@ -6,6 +6,8 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { BlockControls } from '@wordpress/block-editor';
+import { Toolbar } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
@@ -242,7 +244,11 @@ export default class ClassicEdit extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<>
-				<ConvertToBlocksButton clientId={ clientId } />
+				<BlockControls>
+					<Toolbar>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</Toolbar>
+				</BlockControls>
 				<div
 					key="toolbar"
 					id={ `toolbar-${ clientId }` }
