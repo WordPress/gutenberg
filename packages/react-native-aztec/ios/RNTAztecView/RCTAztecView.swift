@@ -355,10 +355,11 @@ class RCTAztecView: Aztec.TextView {
     }
 
     private func interceptBackspace() -> Bool {
-        guard (isNewLineBeforeSelectionAndNotEndOfContent() && selectedRange.length == 0)
-            || (selectedRange.location == 0 && selectedRange.length == 0)
-            || text.count == 1 // send backspace event when cleaning all characters
-            || selectedRange == NSRange(location: 0, length: textStorage.length), // send backspace event when deleting all the text
+        guard
+//            (isNewLineBeforeSelectionAndNotEndOfContent() && selectedRange.length == 0)
+//            || (selectedRange.location == 0 && selectedRange.length == 0)
+//            || text.count == 1 // send backspace event when cleaning all characters
+//            || selectedRange == NSRange(location: 0, length: textStorage.length), // send backspace event when deleting all the text
             let onKeyDown = onKeyDown else {
                 return false
         }

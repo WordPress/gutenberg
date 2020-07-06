@@ -304,9 +304,12 @@ export class RichText extends Component {
 			return;
 		}
 
+		this.handleMention( event );
+		if ( event.defaultPrevented ) {
+			return;
+		}
 		this.handleDelete( event );
 		this.handleEnter( event );
-		this.handleMention( event );
 	}
 
 	handleEnter( event ) {
@@ -371,11 +374,21 @@ export class RichText extends Component {
 
 		// Only process delete if the key press occurs at an uncollapsed edge.
 		if (
-			! onDelete ||
-			! isCollapsed( value ) ||
 			( isReverse && start !== 0 ) ||
 			( ! isReverse && end !== text.length )
 		) {
+			let removeStart = start;
+			let removeEnd = end;
+			if ( isCollapsed( value ) ) {
+				if ( isReverse ) {
+					removeStart = removeStart - 1;
+				} else {
+					removeEnd = removeEnd + 1;
+				}
+			}
+			newValue = remove( value, removeStart, removeEnd );
+			this.onFormatChange( newValue );
+			event.preventDefault();
 			return;
 		}
 
@@ -388,10 +401,20 @@ export class RichText extends Component {
 	handleMention( event ) {
 		const { keyCode } = event;
 
+		const record = this.getRecord();
+		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+			const mention = this.searchMention( record );
+			if ( mention.mention !== '' ) {
+				this.showMention();
+				event.preventDefault();
+			}
+			return;
+		}
+
 		if ( keyCode !== '@'.charCodeAt( 0 ) ) {
 			return;
 		}
-		const record = this.getRecord();
+
 		const text = getTextContent( record );
 		// Only start the mention UI if the selection is on the start of text or the character before is a space
 		if (
@@ -441,7 +464,7 @@ export class RichText extends Component {
 		if ( mentionEnd === null ) {
 			return {
 				mention: mentionStart,
-				start: record.start - mentionStart.length,
+				start: record.start - mentionStart.length + 1,
 				end: record.end,
 			};
 		}
