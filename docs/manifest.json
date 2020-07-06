@@ -504,6 +504,12 @@
 		"parent": "javascript"
 	},
 	{
+		"title": "ESNext Syntax",
+		"slug": "esnext-js",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/esnext-js.md",
+		"parent": "javascript"
+	},
+	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/readme.md",
