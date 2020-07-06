@@ -362,8 +362,7 @@ export class TableEdit extends Component {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// this just allows to be able to add more rows, by enabling the corresponding
-		// buttons. It needs to be revised when programmatically focus to RichText is handled
+		// Select the first cell of the new column
 		this.setState( {
 			selectedCell: {
 				rowIndex: 0,
