@@ -2,10 +2,10 @@
  * External dependencies
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-const IgnoreEmitPlugin = require( 'ignore-emit-webpack-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
+const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const path = require( 'path' );
 
 /**
@@ -18,6 +18,7 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
  * Internal dependencies
  */
 const { hasBabelConfig, hasPostCSSConfig } = require( '../utils' );
+const FixStyleWebpackPlugin = require( './fix-style-webpack-plugin' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
@@ -65,11 +66,11 @@ const config = {
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
 		splitChunks: {
 			cacheGroups: {
-				styles: {
-					name: 'style',
-					test: /style\.(sc|sa|c)ss$/,
+				style: {
+					test: /[\\/]style\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
+					automaticNameDelimiter: '-',
 				},
 				default: false,
 			},
@@ -121,17 +122,14 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
-				exclude: /node_modules/,
 				use: [ '@svgr/webpack', 'url-loader' ],
 			},
 			{
 				test: /\.css$/,
-				exclude: /node_modules/,
 				use: cssLoaders,
 			},
 			{
 				test: /\.(sc|sa)ss$/,
-				exclude: /node_modules/,
 				use: [
 					...cssLoaders,
 					{
@@ -145,6 +143,9 @@ const config = {
 		],
 	},
 	plugins: [
+		// During rebuilds, all webpack assets that are not used anymore
+		// will be removed automatically.
+		new CleanWebpackPlugin(),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
@@ -153,7 +154,7 @@ const config = {
 		// MiniCSSExtractPlugin creates JavaScript assets for CSS that are
 		// obsolete and should be removed. Related webpack issue:
 		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/85
-		new IgnoreEmitPlugin( [ 'style.js' ] ),
+		new FixStyleWebpackPlugin(),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
 		// works when running watch mode.
 		! isProduction &&

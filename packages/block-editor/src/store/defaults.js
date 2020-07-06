@@ -25,6 +25,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} focusMode Whether the focus mode is enabled or not
  * @property {Array} styles Editor Styles
  * @property {boolean} isRTL Whether the editor is in RTL mode
+ * @property {boolean} keepCaretInsideBlock Whether caret should move between blocks in edit mode
  * @property {string} bodyPlaceholder Empty post placeholder
  * @property {string} titlePlaceholder Empty title placeholder
  * @property {boolean} codeEditingEnabled Whether or not the user can switch to the code editor
@@ -33,7 +34,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
  * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
  * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
- * @property {boolean} __experimentalEnableRichImageEditing Whether the user has enabled Rich Image Editing
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -151,7 +151,6 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalBlockDirectory: false,
 	__experimentalEnableFullSiteEditing: false,
 	__experimentalEnableFullSiteEditingDemo: false,
-	__experimentalEnableRichImageEditing: false,
 	__mobileEnablePageTemplates: false,
 	gradients: [
 		{

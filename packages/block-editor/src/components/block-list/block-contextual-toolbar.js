@@ -24,7 +24,7 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 		};
-	} );
+	}, [] );
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
 			return null;

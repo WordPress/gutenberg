@@ -21,7 +21,7 @@
 	width: 8px;
 	height: 8px;
 	display: block;
-	background: $theme-color;
+	background: var(--wp-admin-theme-color);
 	border-radius: 50%;
 }
 
@@ -40,7 +40,7 @@
 .edit-site-template-switcher__template-preview,
 .edit-site-template-switcher__theme-preview {
 	display: none;
-	border: $border-width solid $light-gray-secondary;
+	border: $border-width solid $gray-400;
 	width: 300px;
 	padding: $grid-unit-20;
 	background: $white;

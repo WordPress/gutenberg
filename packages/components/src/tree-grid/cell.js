@@ -1,12 +1,24 @@
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import RovingTabIndexItem from './roving-tab-index-item';
+import TreeGridItem from './item';
 
-export default function TreeGridCell( { children, ...props } ) {
+export default forwardRef( function TreeGridCell(
+	{ children, withoutGridItem = false, ...props },
+	ref
+) {
 	return (
 		<td { ...props } role="gridcell">
-			<RovingTabIndexItem>{ children }</RovingTabIndexItem>
+			{ withoutGridItem ? (
+				children
+			) : (
+				<TreeGridItem ref={ ref }>{ children }</TreeGridItem>
+			) }
 		</td>
 	);
-}
+} );

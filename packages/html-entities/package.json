@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/html-entities",
-	"version": "2.7.0",
+	"version": "2.8.0",
 	"description": "HTML entity utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"html",
 		"entities"
 	],

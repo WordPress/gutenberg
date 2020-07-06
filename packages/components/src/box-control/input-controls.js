@@ -13,11 +13,21 @@ import { LayoutContainer, Layout } from './styles/box-control-styles';
 export default function BoxInputControls( {
 	onChange = noop,
 	onFocus = noop,
+	onHoverOn = noop,
+	onHoverOff = noop,
 	values,
 	...props
 } ) {
 	const createHandleOnFocus = ( side ) => ( event ) => {
 		onFocus( event, { side } );
+	};
+
+	const createHandleOnHoverOn = ( side ) => () => {
+		onHoverOn( { [ side ]: true } );
+	};
+
+	const createHandleOnHoverOff = ( side ) => () => {
+		onHoverOff( { [ side ]: false } );
 	};
 
 	const handleOnChange = ( nextValues ) => {
@@ -69,6 +79,8 @@ export default function BoxInputControls( {
 					value={ top }
 					onChange={ createHandleOnChange( 'top' ) }
 					onFocus={ createHandleOnFocus( 'top' ) }
+					onHoverOn={ createHandleOnHoverOn( 'top' ) }
+					onHoverOff={ createHandleOnHoverOff( 'top' ) }
 					label={ LABELS.top }
 				/>
 				<UnitControl
@@ -76,6 +88,8 @@ export default function BoxInputControls( {
 					value={ right }
 					onChange={ createHandleOnChange( 'right' ) }
 					onFocus={ createHandleOnFocus( 'right' ) }
+					onHoverOn={ createHandleOnHoverOn( 'right' ) }
+					onHoverOff={ createHandleOnHoverOff( 'right' ) }
 					label={ LABELS.right }
 				/>
 				<UnitControl
@@ -83,6 +97,8 @@ export default function BoxInputControls( {
 					value={ bottom }
 					onChange={ createHandleOnChange( 'bottom' ) }
 					onFocus={ createHandleOnFocus( 'bottom' ) }
+					onHoverOn={ createHandleOnHoverOn( 'bottom' ) }
+					onHoverOff={ createHandleOnHoverOff( 'bottom' ) }
 					label={ LABELS.bottom }
 				/>
 				<UnitControl
@@ -91,6 +107,8 @@ export default function BoxInputControls( {
 					value={ left }
 					onChange={ createHandleOnChange( 'left' ) }
 					onFocus={ createHandleOnFocus( 'left' ) }
+					onHoverOn={ createHandleOnHoverOn( 'left' ) }
+					onHoverOff={ createHandleOnHoverOff( 'left' ) }
 					label={ LABELS.left }
 				/>
 			</Layout>

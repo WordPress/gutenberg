@@ -3,7 +3,15 @@
  */
 import { NativeModules } from 'react-native';
 
-jest.mock( 'react-native-gutenberg-bridge', () => {
+jest.mock( '@wordpress/element', () => {
+	return {
+		__esModule: true,
+		...jest.requireActual( '@wordpress/element' ),
+		render: jest.fn(),
+	};
+} );
+
+jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
 		removeEventListener: jest.fn(),
@@ -70,8 +78,6 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
-jest.mock( 'react-native-recyclerview-list' );
-
 jest.mock( '@react-native-community/slider', () => () => 'Slider', {
 	virtual: true,
 } );
@@ -89,6 +95,10 @@ jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
 } );
 
 jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
+	virtual: true,
+} );
+
+jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
 } );
 

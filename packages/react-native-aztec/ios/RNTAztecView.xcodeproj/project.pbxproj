@@ -1,0 +1,428 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7ECFA93C21C39B5000FC131B /* HeadingBlockFormatHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECFA93B21C39B5000FC131B /* HeadingBlockFormatHandler.swift */; };
+		7ECFA94021C39BA000FC131B /* BlockFormatHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECFA93F21C39BA000FC131B /* BlockFormatHandler.swift */; };
+		7ECFA94221C39BBB00FC131B /* BlockModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECFA94121C39BBB00FC131B /* BlockModel.swift */; };
+		F121467D20ED2F81003DD17B /* RCTAztecViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F121467C20ED2F81003DD17B /* RCTAztecViewManager.m */; };
+		F13BF4A020ECF5450047D3F9 /* RCTAztecViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13BF49F20ECF5450047D3F9 /* RCTAztecViewManager.swift */; };
+		F1A879D020EE90C000FABD31 /* RCTAztecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A879CF20EE90C000FABD31 /* RCTAztecView.swift */; };
+		FF0DC1C523CDD21D0060074D /* Aztec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F166A37B20EE6DD7008E7C9F /* Aztec.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F166A37A20EE6DD7008E7C9F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F166A37420EE6DD7008E7C9F /* Aztec.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5951CB8E1D8BC93600E1866F;
+			remoteInfo = Aztec;
+		};
+		F166A37C20EE6DD7008E7C9F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F166A37420EE6DD7008E7C9F /* Aztec.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5951CB971D8BC93600E1866F;
+			remoteInfo = AztecTests;
+		};
+		F166A37E20EE6DEE008E7C9F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F166A37420EE6DD7008E7C9F /* Aztec.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 5951CB8D1D8BC93600E1866F;
+			remoteInfo = Aztec;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F145CFC42087D16A006C159A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		7ECFA93B21C39B5000FC131B /* HeadingBlockFormatHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadingBlockFormatHandler.swift; sourceTree = "<group>"; };
+		7ECFA93F21C39BA000FC131B /* BlockFormatHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockFormatHandler.swift; sourceTree = "<group>"; };
+		7ECFA94121C39BBB00FC131B /* BlockModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockModel.swift; sourceTree = "<group>"; };
+		F1017BCE20ED1B1A002B1024 /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		F121467C20ED2F81003DD17B /* RCTAztecViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTAztecViewManager.m; sourceTree = "<group>"; };
+		F13BF49E20ECF5440047D3F9 /* RCTAztecView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTAztecView-Bridging-Header.h"; sourceTree = "<group>"; };
+		F13BF49F20ECF5450047D3F9 /* RCTAztecViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCTAztecViewManager.swift; sourceTree = "<group>"; };
+		F145CFC62087D16A006C159A /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTAztecView.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		F166A37420EE6DD7008E7C9F /* Aztec.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Aztec.xcodeproj; path = "Carthage/Checkouts/AztecEditor-iOS/Aztec.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		F1A879CF20EE90C000FABD31 /* RCTAztecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCTAztecView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F145CFC32087D16A006C159A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF0DC1C523CDD21D0060074D /* Aztec.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F145CFBD2087D169006C159A = {
+			isa = PBXGroup;
+			children = (
+				F145CFC82087D16A006C159A /* RNTAztecView */,
+				F166A37320EE6DC7008E7C9F /* Dependencies */,
+				F145CFF92087D497006C159A /* Frameworks */,
+				F145CFC72087D16A006C159A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F145CFC72087D16A006C159A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F145CFC62087D16A006C159A /* libRNTAztecView.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F145CFC82087D16A006C159A /* RNTAztecView */ = {
+			isa = PBXGroup;
+			children = (
+				F13BF49E20ECF5440047D3F9 /* RCTAztecView-Bridging-Header.h */,
+				F121467C20ED2F81003DD17B /* RCTAztecViewManager.m */,
+				F13BF49F20ECF5450047D3F9 /* RCTAztecViewManager.swift */,
+				F1A879CF20EE90C000FABD31 /* RCTAztecView.swift */,
+				7ECFA94121C39BBB00FC131B /* BlockModel.swift */,
+				7ECFA93B21C39B5000FC131B /* HeadingBlockFormatHandler.swift */,
+				7ECFA93F21C39BA000FC131B /* BlockFormatHandler.swift */,
+			);
+			path = RNTAztecView;
+			sourceTree = "<group>";
+		};
+		F145CFF92087D497006C159A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F1017BCE20ED1B1A002B1024 /* libReact.a */,
+			);
+			path = Frameworks;
+			sourceTree = "<group>";
+		};
+		F166A37320EE6DC7008E7C9F /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				F166A37420EE6DD7008E7C9F /* Aztec.xcodeproj */,
+			);
+			path = Dependencies;
+			sourceTree = "<group>";
+		};
+		F166A37520EE6DD7008E7C9F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F166A37B20EE6DD7008E7C9F /* Aztec.framework */,
+				F166A37D20EE6DD7008E7C9F /* AztecTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F145CFC52087D16A006C159A /* RNTAztecView */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F145CFCD2087D16A006C159A /* Build configuration list for PBXNativeTarget "RNTAztecView" */;
+			buildPhases = (
+				F145CFC22087D16A006C159A /* Sources */,
+				F145CFC32087D16A006C159A /* Frameworks */,
+				F145CFC42087D16A006C159A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F166A37F20EE6DEE008E7C9F /* PBXTargetDependency */,
+			);
+			name = RNTAztecView;
+			productName = RNTAztecView;
+			productReference = F145CFC62087D16A006C159A /* libRNTAztecView.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F145CFBE2087D169006C159A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0930;
+				LastUpgradeCheck = 0930;
+				ORGANIZATIONNAME = "Automattic Inc.";
+				TargetAttributes = {
+					F145CFC52087D16A006C159A = {
+						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 1110;
+					};
+				};
+			};
+			buildConfigurationList = F145CFC12087D169006C159A /* Build configuration list for PBXProject "RNTAztecView" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F145CFBD2087D169006C159A;
+			productRefGroup = F145CFC72087D16A006C159A /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = F166A37520EE6DD7008E7C9F /* Products */;
+					ProjectRef = F166A37420EE6DD7008E7C9F /* Aztec.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				F145CFC52087D16A006C159A /* RNTAztecView */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		F166A37B20EE6DD7008E7C9F /* Aztec.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Aztec.framework;
+			remoteRef = F166A37A20EE6DD7008E7C9F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F166A37D20EE6DD7008E7C9F /* AztecTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = AztecTests.xctest;
+			remoteRef = F166A37C20EE6DD7008E7C9F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F145CFC22087D16A006C159A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7ECFA94021C39BA000FC131B /* BlockFormatHandler.swift in Sources */,
+				7ECFA93C21C39B5000FC131B /* HeadingBlockFormatHandler.swift in Sources */,
+				F13BF4A020ECF5450047D3F9 /* RCTAztecViewManager.swift in Sources */,
+				F1A879D020EE90C000FABD31 /* RCTAztecView.swift in Sources */,
+				F121467D20ED2F81003DD17B /* RCTAztecViewManager.m in Sources */,
+				7ECFA94221C39BBB00FC131B /* BlockModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F166A37F20EE6DEE008E7C9F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Aztec;
+			targetProxy = F166A37E20EE6DEE008E7C9F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		F145CFCB2087D16A006C159A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F145CFCC2087D16A006C159A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F145CFCE2087D16A006C159A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = PZYM8XX95Q;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNTAztecView/RCTAztecView-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F145CFCF2087D16A006C159A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = PZYM8XX95Q;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNTAztecView/RCTAztecView-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F145CFC12087D169006C159A /* Build configuration list for PBXProject "RNTAztecView" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F145CFCB2087D16A006C159A /* Debug */,
+				F145CFCC2087D16A006C159A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F145CFCD2087D16A006C159A /* Build configuration list for PBXNativeTarget "RNTAztecView" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F145CFCE2087D16A006C159A /* Debug */,
+				F145CFCF2087D16A006C159A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F145CFBE2087D169006C159A /* Project object */;
+}

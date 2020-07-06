@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEmpty, isNumber } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -18,10 +23,17 @@ export const LABELS = {
 };
 
 export const DEFAULT_VALUES = {
-	top: '0px',
-	right: '0px',
-	bottom: '0px',
-	left: '0px',
+	top: null,
+	right: null,
+	bottom: null,
+	left: null,
+};
+
+export const DEFAULT_VISUALIZER_VALUES = {
+	top: false,
+	right: false,
+	bottom: false,
+	left: false,
 };
 
 /**
@@ -58,7 +70,16 @@ export function getAllValue( values = {} ) {
 		: '';
 	const unit = mode( allUnits );
 
-	const allValue = `${ value }${ unit }`;
+	/**
+	 * The isNumber check is important. On reset actions, the incoming value
+	 * may be null or an empty string.
+	 *
+	 * Also, the value may also be zero (0), which is considered a valid unit value.
+	 *
+	 * isNumber() is more specific for these cases, rather than relying on a
+	 * simple truthy check.
+	 */
+	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
 
 	return allValue;
 }
@@ -74,4 +95,18 @@ export function isValuesMixed( values = {} ) {
 	const isMixed = isNaN( parseFloat( allValue ) );
 
 	return isMixed;
+}
+
+/**
+ * Checks to determine if values are defined.
+ *
+ * @param {Object} values Box values.
+ *
+ * @return {boolean} Whether values are mixed.
+ */
+export function isValuesDefined( values ) {
+	return (
+		values !== undefined &&
+		! isEmpty( Object.values( values ).filter( Boolean ) )
+	);
 }
