@@ -186,13 +186,18 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 				style?.typography?.fontSize
 			).size;
 
-			props.wrapperProps = {
-				...wrapperProps,
-				style: {
-					fontSize: fontSizeValue,
-					...wrapperProps?.style,
+			const newProps = {
+				...props,
+				wrapperProps: {
+					...wrapperProps,
+					style: {
+						fontSize: fontSizeValue,
+						...wrapperProps?.style,
+					},
 				},
 			};
+
+			return <BlockListBlock { ...newProps } />;
 		}
 
 		return <BlockListBlock { ...props } />;
