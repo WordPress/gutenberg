@@ -299,8 +299,7 @@ export class TableEdit extends Component {
 				rowIndex: newRowIndex,
 			} )
 		);
-		// this just allows to be able to add more rows, by enabling the corresponding
-		// buttons. It needs to be revised when programmatically focus to RichText is handled
+		// Select the first cell of the new row
 		this.setState( {
 			selectedCell: {
 				sectionName,
