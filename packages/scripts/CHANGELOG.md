@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Update webpack configuration to preserve translator comments in minified output.
+
 ### Bug Fixes
 
 -   Allow the CSS, SVG, and Sass loaders to process files from node_modules directory.

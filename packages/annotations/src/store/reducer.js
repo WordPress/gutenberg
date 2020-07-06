@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isNumber, mapValues } from 'lodash';
+import { isNumber, mapValues } from 'lodash';
 
 /**
  * Filters an array based on the predicate, but keeps the reference the same if
@@ -37,7 +37,7 @@ function isValidAnnotationRange( annotation ) {
 /**
  * Reducer managing annotations.
  *
- * @param {Array} state The annotations currently shown in the editor.
+ * @param {Object} state  The annotations currently shown in the editor.
  * @param {Object} action Dispatched action.
  *
  * @return {Array} Updated state.
@@ -62,7 +62,7 @@ export function annotations( state = {}, action ) {
 				return state;
 			}
 
-			const previousAnnotationsForBlock = get( state, blockClientId, [] );
+			const previousAnnotationsForBlock = state?.[ blockClientId ] ?? [];
 
 			return {
 				...state,

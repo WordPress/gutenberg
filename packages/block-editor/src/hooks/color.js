@@ -12,6 +12,7 @@ import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useRef, useEffect, Platform } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -334,6 +335,48 @@ export function ColorEdit( props ) {
 	);
 }
 
+/**
+ * This adds inline styles for color palette colors.
+ * Ideally, this is not needed and themes should load their palettes on the editor.
+ *
+ * @param  {Function} BlockListBlock Original component
+ * @return {Function}                Wrapped component
+ */
+export const withColorPaletteStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const { name, attributes } = props;
+		const { backgroundColor, textColor } = attributes;
+		const colors = useSelect( ( select ) => {
+			return select( 'core/block-editor' ).getSettings().colors;
+		}, [] );
+
+		if ( ! hasColorSupport( name ) ) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		const extraStyles = {
+			color: textColor
+				? getColorObjectByAttributeValues( colors, textColor )?.color
+				: undefined,
+			backgroundColor: backgroundColor
+				? getColorObjectByAttributeValues( colors, backgroundColor )
+						?.color
+				: undefined,
+		};
+
+		let wrapperProps = props.wrapperProps;
+		wrapperProps = {
+			...props.wrapperProps,
+			style: {
+				...extraStyles,
+				...props.wrapperProps?.style,
+			},
+		};
+
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	}
+);
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/color/addAttribute',
@@ -350,4 +393,10 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/color/addEditProps',
 	addEditProps
+);
+
+addFilter(
+	'editor.BlockListBlock',
+	'core/color/with-color-palette-styles',
+	withColorPaletteStyles
 );
