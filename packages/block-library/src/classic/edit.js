@@ -9,6 +9,10 @@ import { debounce } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
 import ConvertToBlocksButton from './convert-to-blocks-button';
 
 const { wp } = window;
@@ -29,7 +33,7 @@ function isTmceEmpty( editor ) {
 	return /^\n?$/.test( body.innerText || body.textContent );
 }
 
-export class ClassicEdit extends Component {
+export default class ClassicEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.initialize = this.initialize.bind( this );
