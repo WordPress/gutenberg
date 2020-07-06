@@ -177,6 +177,7 @@ if ( ! isProduction ) {
 	config.devtool = process.env.WP_DEVTOOL || 'source-map';
 	config.module.rules.unshift( {
 		test: /\.js$/,
+		exclude: [ /node_modules/ ],
 		use: require.resolve( 'source-map-loader' ),
 		enforce: 'pre',
 	} );
