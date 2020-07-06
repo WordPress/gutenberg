@@ -721,7 +721,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_link_color' );
 /*
  * Register default patterns if not registered in Core already.
  *
- * @TODO: Add link to Core ticket.
+ * @see https://core.trac.wordpress.org/ticket/50550
  */
 if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
 	register_block_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
@@ -739,7 +739,7 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 /*
  * Register default pattern categories if not registered in Core already.
  *
- * @TODO: Add link to Core ticket.
+ * @see https://core.trac.wordpress.org/ticket/50550
  */
 if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
 	register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'gutenberg' ) ) );
