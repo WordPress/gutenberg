@@ -10,10 +10,16 @@ import '@wordpress/format-library';
 import { render } from '@wordpress/element';
 
 /**
+ * External dependencies
+ */
+import React, { Suspense } from 'react';
+import { Text, View } from 'react-native';
+
+/**
  * Internal dependencies
  */
 import './store';
-import Editor from './editor';
+const LazyLoadedEditor = React.lazy( () => import( './editor.js' ) );
 
 let blocksRegistered = false;
 
@@ -34,5 +40,16 @@ export function initializeEditor( id, postType, postId ) {
 	registerCoreBlocks();
 	blocksRegistered = true;
 
-	render( <Editor postId={ postId } postType={ postType } />, id );
+	render(
+		<Suspense
+			fallback={
+				<View>
+					<Text>Loading...</Text>
+				</View>
+			}
+		>
+			<LazyLoadedEditor postId={ postId } postType={ postType } />
+		</Suspense>,
+		id
+	);
 }
