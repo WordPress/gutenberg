@@ -31,6 +31,14 @@ const elementData = [
 	},
 ];
 
+const createMockClassList = ( isDragging ) => {
+	return {
+		contains() {
+			return isDragging;
+		},
+	};
+};
+
 const mapElements = ( orientation ) => (
 	{ top, right, bottom, left },
 	index
@@ -52,6 +60,7 @@ const mapElements = ( orientation ) => (
 						right: bottom,
 				  };
 		},
+		classList: createMockClassList( false ),
 	};
 };
 
@@ -198,6 +207,27 @@ describe( 'getNearestBlockIndex', () => {
 
 			expect( result ).toBe( 4 );
 		} );
+
+		it( 'skips the block being dragged', () => {
+			const position = { x: 0, y: 450 };
+
+			const verticalElementsWithDraggedBlock = [
+				...verticalElements.slice( 0, 2 ),
+				{
+					...verticalElements[ 2 ],
+					classList: createMockClassList( true ),
+				},
+				...verticalElements.slice( 3, 4 ),
+			];
+
+			const result = getNearestBlockIndex(
+				verticalElementsWithDraggedBlock,
+				position,
+				orientation
+			);
+
+			expect( result ).toBe( 3 );
+		} );
 	} );
 
 	describe( 'Horizontal block lists', () => {
@@ -309,6 +339,27 @@ describe( 'getNearestBlockIndex', () => {
 			);
 
 			expect( result ).toBe( 4 );
+		} );
+
+		it( 'skips the block being dragged', () => {
+			const position = { x: 450, y: 0 };
+
+			const horizontalElementsWithDraggedBlock = [
+				...horizontalElements.slice( 0, 2 ),
+				{
+					...horizontalElements[ 2 ],
+					classList: createMockClassList( true ),
+				},
+				...horizontalElements.slice( 3, 4 ),
+			];
+
+			const result = getNearestBlockIndex(
+				horizontalElementsWithDraggedBlock,
+				position,
+				orientation
+			);
+
+			expect( result ).toBe( 3 );
 		} );
 	} );
 } );

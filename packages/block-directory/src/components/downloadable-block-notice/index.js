@@ -23,16 +23,21 @@ export const DownloadableBlockNotice = ( { block, onClick } ) => {
 			className="block-directory-downloadable-block-notice"
 		>
 			<div className="block-directory-downloadable-block-notice__content">
-				{ errorNotice }
+				{ errorNotice.message }
 			</div>
 			<Button
 				isSmall
 				isPrimary
 				onClick={ () => {
+					if ( errorNotice.isFatal ) {
+						window.location.reload();
+						return false;
+					}
+
 					onClick( block );
 				} }
 			>
-				{ __( 'Retry' ) }
+				{ errorNotice.isFatal ? __( 'Reload' ) : __( 'Retry' ) }
 			</Button>
 		</Notice>
 	);
