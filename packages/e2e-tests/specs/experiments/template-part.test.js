@@ -41,10 +41,12 @@ describe( 'Template Part', () => {
 		);
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
+			const templateDropdownSelector =
+				'.components-dropdown-menu__toggle[aria-label="Switch Template"]';
+
 			// Switch to editing the header template part.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
-			);
+			await page.waitForSelector( templateDropdownSelector );
+			await page.click( templateDropdownSelector );
 			const switchToHeaderTemplatePartButton = await page.waitForXPath(
 				'//button[contains(text(), "header")]'
 			);
@@ -62,9 +64,7 @@ describe( 'Template Part', () => {
 			);
 
 			// Switch back to the front page template.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
-			);
+			await page.click( templateDropdownSelector );
 			const [ switchToFrontPageTemplateButton ] = await page.$x(
 				'//button[contains(text(), "front-page")]'
 			);
