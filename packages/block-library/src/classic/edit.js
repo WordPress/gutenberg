@@ -9,6 +9,11 @@ import { debounce } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
+import { BlockControls } from '@wordpress/block-editor';
+import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { rawHandler, serialize } from '@wordpress/blocks';
 
 const { wp } = window;
 
@@ -28,7 +33,7 @@ function isTmceEmpty( editor ) {
 	return /^\n?$/.test( body.innerText || body.textContent );
 }
 
-export default class ClassicEdit extends Component {
+class ClassicEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.initialize = this.initialize.bind( this );
@@ -235,22 +240,50 @@ export default class ClassicEdit extends Component {
 		//    from the KeyboardShortcuts component to stop their propagation.
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return [
-			<div
-				key="toolbar"
-				id={ `toolbar-${ clientId }` }
-				ref={ ( ref ) => ( this.ref = ref ) }
-				className="block-library-classic__toolbar"
-				onClick={ this.focus }
-				data-placeholder={ __( 'Classic' ) }
-				onKeyDown={ this.onToolbarKeyDown }
-			/>,
-			<div
-				key="editor"
-				id={ `editor-${ clientId }` }
-				className="wp-block-freeform block-library-rich-text__tinymce"
-			/>,
-		];
+		return (
+			<>
+				<BlockControls>
+					<Toolbar>
+						<ToolbarButton
+							title={ __( 'Convert to Blocks' ) }
+							onClick={ this.props.convertToBlocks }
+						>
+							{ __( 'Convert to Blocks' ) }
+						</ToolbarButton>
+					</Toolbar>
+				</BlockControls>
+				<div
+					key="toolbar"
+					id={ `toolbar-${ clientId }` }
+					ref={ ( ref ) => ( this.ref = ref ) }
+					className="block-library-classic__toolbar"
+					onClick={ this.focus }
+					data-placeholder={ __( 'Classic' ) }
+					onKeyDown={ this.onToolbarKeyDown }
+				/>
+				<div
+					key="editor"
+					id={ `editor-${ clientId }` }
+					className="wp-block-freeform block-library-rich-text__tinymce"
+				/>
+			</>
+		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
+
+export default compose(
+	withSelect( ( select, { clientId } ) => {
+		const block = select( 'core/block-editor' ).getBlock( clientId );
+		return {
+			block,
+		};
+	} ),
+	withDispatch( ( dispatch, { block } ) => ( {
+		convertToBlocks: () =>
+			dispatch( 'core/block-editor' ).replaceBlocks(
+				block.clientId,
+				rawHandler( { HTML: serialize( block ) } )
+			),
+	} ) )
+)( ClassicEdit );
