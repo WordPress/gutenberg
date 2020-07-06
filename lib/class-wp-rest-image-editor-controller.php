@@ -47,6 +47,12 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 							'type' => 'integer',
 						),
 
+						// Src is required to check for correct $image_meta.
+						'src'      => array(
+							'type'     => 'string',
+							'required' => true,
+						),
+
 						// Crop values are in percents.
 						'x'        => array(
 							'type'    => 'number',
@@ -114,9 +120,24 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		$image_file = wp_get_original_image_path( $attachment_id );
 		$image_meta = wp_get_attachment_metadata( $attachment_id );
 
-		if ( ! $image_meta || ! $image_file ) {
-			$error = __( 'Unable to get meta information for file.', 'gutenberg' );
-			return new WP_Error( 'rest_unknown_attachment', $error, array( 'status' => 404 ) );
+		if ( function_exists( 'wp_image_file_matches_image_meta' ) ) {
+			if (
+				! $image_meta ||
+				! $image_file ||
+				! wp_image_file_matches_image_meta( $request['src'], $image_meta )
+			) {
+				return new WP_Error(
+					'rest_unknown_attachment',
+					__( 'Unable to get meta information for file.' ),
+					array( 'status' => 404 )
+				);
+			}
+		} else {
+			// TODO when back-compat: Check if the image file from $request['src'] exists in $image_meta.
+			if ( ! $image_meta || ! $image_file ) {
+				$error = __( 'Unable to get meta information for file.', 'gutenberg' );
+				return new WP_Error( 'rest_unknown_attachment', $error, array( 'status' => 404 ) );
+			}
 		}
 
 		$supported_types = array( 'image/jpeg', 'image/png', 'image/gif' );
