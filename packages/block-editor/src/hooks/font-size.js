@@ -90,6 +90,12 @@ function addEditProps( settings ) {
 	return settings;
 }
 
+function useFontizes() {
+	return useSelect(
+		( select ) => select( 'core/block-editor' ).getSettings().fontSizes
+	);
+}
+
 /**
  * Inspector control panel containing the font size related configuration
  *
@@ -103,10 +109,7 @@ export function FontSizeEdit( props ) {
 		setAttributes,
 	} = props;
 	const isDisabled = useIsFontSizeDisabled( props );
-
-	const { fontSizes } = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
-	);
+	const fontSizes = useFontizes();
 
 	if ( isDisabled ) {
 		return null;
@@ -144,9 +147,7 @@ export function FontSizeEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const { fontSizes } = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
-	);
+	const fontSizes = useFontizes();
 	const hasFontSizes = fontSizes.length;
 
 	return (
@@ -163,15 +164,12 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
  */
 const withFontSizeInlineStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
+		const fontSizes = useFontizes();
 		const {
 			name: blockName,
 			attributes: { fontSize, style },
 			wrapperProps,
 		} = props;
-
-		const { fontSizes } = useSelect( ( select ) =>
-			select( 'core/block-editor' ).getSettings()
-		);
 
 		// Return early if the block doesn't allow modify the font-size,
 		// already has a inline font-size,
