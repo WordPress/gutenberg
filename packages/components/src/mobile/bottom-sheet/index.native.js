@@ -11,7 +11,6 @@ import {
 	Keyboard,
 	StatusBar,
 	TouchableHighlight,
-	FlatList,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -359,7 +358,7 @@ class BottomSheet extends Component {
 				>
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
-					<FlatList
+					<ScrollView
 						disableScrollViewPanResponder
 						bounces={ bounces }
 						onScroll={ this.onScroll }
@@ -374,35 +373,29 @@ class BottomSheet extends Component {
 						] }
 						scrollEnabled={ scrollEnabled }
 						automaticallyAdjustContentInsets={ false }
-						ListHeaderComponent={
-							<>
-								<BottomSheetProvider
-									value={ {
-										shouldEnableBottomSheetScroll: this
-											.onShouldEnableScroll,
-										shouldDisableBottomSheetMaxHeight: this
-											.onShouldSetBottomSheetMaxHeight,
-										isBottomSheetContentScrolling: isScrolling,
-										onCloseBottomSheet: this
-											.onHandleClosingBottomSheet,
-										onHardwareButtonPress: this
-											.onHandleHardwareButtonPress,
-										onReplaceSubsheet: this
-											.onReplaceSubsheet,
-										extraProps,
-										currentScreen,
-									} }
-								>
-									<TouchableHighlight accessible={ false }>
-										<>{ children }</>
-									</TouchableHighlight>
-								</BottomSheetProvider>
-								<View
-									style={ { height: safeAreaBottomInset } }
-								/>
-							</>
-						}
-					></FlatList>
+					>
+						<BottomSheetProvider
+							value={ {
+								shouldEnableBottomSheetScroll: this
+									.onShouldEnableScroll,
+								shouldDisableBottomSheetMaxHeight: this
+									.onShouldSetBottomSheetMaxHeight,
+								isBottomSheetContentScrolling: isScrolling,
+								onCloseBottomSheet: this
+									.onHandleClosingBottomSheet,
+								onHardwareButtonPress: this
+									.onHandleHardwareButtonPress,
+								onReplaceSubsheet: this.onReplaceSubsheet,
+								extraProps,
+								currentScreen,
+							} }
+						>
+							<TouchableHighlight accessible={ false }>
+								<>{ children }</>
+							</TouchableHighlight>
+						</BottomSheetProvider>
+						<View style={ { height: safeAreaBottomInset } } />
+					</ScrollView>
 				</KeyboardAvoidingView>
 			</Modal>
 		);
