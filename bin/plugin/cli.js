@@ -9,10 +9,7 @@ const program = require( 'commander' );
  * Internal dependencies
  */
 const { releaseRC, releaseStable } = require( './commands/release' );
-const {
-	prepareLatestDistTag,
-	prepareNextDistTag,
-} = require( './commands/packages' );
+const { publishLatestPackages } = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
 const { runPerformanceTests } = require( './commands/performance' );
 
@@ -36,15 +33,7 @@ program
 	.description(
 		'Prepares the packages to be published to npm as stable (latest dist-tag, production version)'
 	)
-	.action( prepareLatestDistTag );
-
-program
-	.command( 'prepare-packages-rc' )
-	.alias( 'npm-rc' )
-	.description(
-		'Prepares the packages to be published to npm as RC (next dist-tag, RC version)'
-	)
-	.action( prepareNextDistTag );
+	.action( publishLatestPackages );
 
 program
 	.command( 'release-plugin-changelog' )

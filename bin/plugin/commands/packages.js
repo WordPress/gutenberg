@@ -6,12 +6,18 @@ const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
 const semver = require( 'semver' );
 const readline = require( 'readline' );
+const childProcess = require( 'child_process' );
 
 /**
  * Internal dependencies
  */
 const { log, formats } = require( '../lib/logger' );
-const { askForConfirmation, runStep, readJSONFile } = require( '../lib/utils' );
+const {
+	askForConfirmation,
+	runStep,
+	readJSONFile,
+	runShellScript,
+} = require( '../lib/utils' );
 const {
 	runGitRepositoryCloneStep,
 	runCleanLocalFoldersStep,
@@ -88,13 +94,11 @@ async function runWordPressReleaseBranchSyncStep(
  *
  * @param {string} gitWorkingDirectoryPath Git working directory path.
  * @param {string} minimumVersionBump      Minimum version bump for the packages.
- * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
  * @param {string} abortMessage            Abort Message.
  */
-async function updatePackages(
+async function updatePackageChangelogs(
 	gitWorkingDirectoryPath,
 	minimumVersionBump,
-	isPrerelease,
 	abortMessage
 ) {
 	const changelogFiles = await glob(
@@ -208,9 +212,7 @@ async function updatePackages(
 					changelogPath,
 					content.replace(
 						'## Unreleased',
-						`## Unreleased\n\n## ${
-							isPrerelease ? nextVersion + '-rc.0' : nextVersion
-						} (${ publishDate })`
+						`## Unreleased\n\n## ${ nextVersion } (${ publishDate })`
 					)
 				);
 
@@ -237,8 +239,46 @@ async function updatePackages(
 		true,
 		abortMessage
 	);
-	git.commit( gitWorkingDirectoryPath, 'Update changelog files', [ './*' ] );
+	const commitHash = await git.commit(
+		gitWorkingDirectoryPath,
+		'Update changelog files',
+		[ './*' ]
+	);
 	log( '>> Changelog files changes have been committed successfully.' );
+
+	return commitHash;
+}
+
+/**
+ * Publishes the new packages to npm
+ *
+ * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {string} minimumVersionBump      Minimum version bump for the packages.
+ * @param {string} abortMessage            Abort Message.
+ */
+async function publishPackages(
+	gitWorkingDirectoryPath,
+	minimumVersionBump,
+	abortMessage
+) {
+	await runStep( 'Publishing the npm packages', abortMessage, async () => {
+		await askForConfirmation(
+			'The npm packages are about to be published. Make sure to use to use the bump the ' +
+				formats.title( minimumVersionBump ) +
+				' version at least for each package unless the changelog indicates otherwise. Continue?',
+			true,
+			abortMessage
+		);
+
+		childProcess.execSync( 'npm install && npm run publish:prod', {
+			gitWorkingDirectoryPath,
+			env: {
+				PATH: process.env.PATH,
+				HOME: process.env.HOME,
+			},
+			stdio: 'inherit',
+		} );
+	} );
 }
 
 /**
@@ -254,7 +294,7 @@ async function runPushGitChangesStep(
 	abortMessage
 ) {
 	await runStep(
-		'Pushing the release branch and the tag',
+		'Pushing the release branch and tags',
 		abortMessage,
 		async () => {
 			await askForConfirmation(
@@ -275,11 +315,10 @@ async function runPushGitChangesStep(
  * Prepare everything to publish WordPress packages to npm.
  *
  * @param {string} minimumVersionBump Minimum version bump for the packages.
- * @param {boolean} isPrerelease Whether the package version to publish is a prerelease.
  *
  * @return {Promise<Object>} Github release object.
  */
-async function prepareForPackageRelease( minimumVersionBump, isPrerelease ) {
+async function prepareForPackageRelease( minimumVersionBump ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
 	let abortMessage = 'Aborting!';
 	const temporaryFolders = [];
@@ -297,59 +336,64 @@ async function prepareForPackageRelease( minimumVersionBump, isPrerelease ) {
 		abortMessage
 	);
 
-	await updatePackages(
+	const commitHash = await updatePackageChangelogs(
 		gitWorkingDirectoryPath,
 		minimumVersionBump,
-		isPrerelease,
 		abortMessage
 	);
 
-	// Push the local changes
-	abortMessage = `Aborting! Make sure to push changes applied to WordPress release branch "${ releaseBranch }" manually.`;
 	await runPushGitChangesStep(
 		gitWorkingDirectoryPath,
 		releaseBranch,
 		abortMessage
 	);
 
+	abortMessage = `Aborting! The release branch is synced. Make sure to publish the npm packages manually and backport the changelog commit (${ formats.title(
+		commitHash
+	) }) to master.`;
+
+	await publishPackages(
+		gitWorkingDirectoryPath,
+		minimumVersionBump,
+		abortMessage
+	);
+
+	abortMessage = `Aborting! The packages have published though. Make sure to backport the changelog commit (${ formats.title(
+		commitHash
+	) }) to master.`;
+
+	await runPushGitChangesStep(
+		gitWorkingDirectoryPath,
+		releaseBranch,
+		abortMessage
+	);
+
+	console.log(
+		`Packages published successfully. Make sure to backport the changelog commit (${ formats.title(
+			commitHash
+		) }) to master.`
+	);
+
 	abortMessage = 'Aborting! The release is finished though.';
 	await runCleanLocalFoldersStep( temporaryFolders, abortMessage );
 }
 
-async function prepareLatestDistTag() {
+async function publishLatestPackages() {
 	log(
 		formats.title(
 			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
 		),
-		'Welcome! This tool is going to help you with preparing everything for publishing a new stable version of WordPress packages.\n',
+		'Welcome! This tool is going to help you release a new stable version of WordPress packages.\n',
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
 	await prepareForPackageRelease( 'patch' );
 
 	log(
-		'\n>> 🎉 WordPress packages are ready to publish!\n',
-		'You need to run "npm run publish:prod" to release them to npm.\n',
+		'\n>> 🎉 WordPress packages are now published!\n',
+		"Don't forget to backport the changelogs to master.\n",
 		'Let also people know on WordPress Slack when everything is finished.\n'
 	);
 }
 
-async function prepareNextDistTag() {
-	log(
-		formats.title(
-			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
-		),
-		'Welcome! This tool is going to help you with preparing everything for publishing a new RC version of WordPress packages.\n',
-		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
-	);
-
-	await prepareForPackageRelease( 'minor', true );
-
-	log(
-		'\n>> 🎉 WordPress packages are ready to publish!\n',
-		'You need to run "npm run publish:dev" to release them to npm.\n',
-		'Let also people know on WordPress Slack when everything is finished.\n'
-	);
-}
-
-module.exports = { prepareLatestDistTag, prepareNextDistTag };
+module.exports = { publishLatestPackages };
