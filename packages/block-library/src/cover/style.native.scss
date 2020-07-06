@@ -29,6 +29,13 @@
 	position: absolute;
 }
 
+.overlayContainer {
+	width: 100%;
+	height: 100%;
+	z-index: 2;
+	position: absolute;
+}
+
 .defaultColor {
 	color: $white;
 }
@@ -70,4 +77,10 @@
 	fill: $red-40;
 	width: 100%;
 	height: 100%;
+}
+
+.imageContainer {
+	height: 100%;
+	position: absolute;
+	width: 100%;
 }

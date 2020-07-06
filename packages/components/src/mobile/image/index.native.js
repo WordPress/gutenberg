@@ -16,7 +16,7 @@ import { useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { MediaEdit } from '../media-edit';
-import { getImageWithFocalPointStyles } from '../image-with-focalpoint';
+import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
 import SvgIconCustomize from './icon-customize';
@@ -26,6 +26,8 @@ const ICON_TYPE = {
 	RETRY: 'retry',
 	UPLOAD: 'upload',
 };
+
+const DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
 function editImageComponent( { open, mediaOptions } ) {
 	return (
@@ -55,7 +57,8 @@ const ImageComponent = ( {
 	retryMessage,
 	url,
 	width: imageWidth,
-	focalPoint,
+	focalPoint: focalPointValues,
+	withFocalPoint = false,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
@@ -71,6 +74,11 @@ const ImageComponent = ( {
 			} );
 		}
 	}, [ url ] );
+
+	const focalPoint =
+		withFocalPoint && focalPointValues
+			? focalPointValues
+			: DEFAULT_FOCAL_POINT;
 
 	const onContainerLayout = ( event ) => {
 		const { height, width } = event.nativeEvent.layout;
@@ -126,7 +134,7 @@ const ImageComponent = ( {
 					? imageWidth
 					: customWidth,
 		},
-		focalPoint && styles.focalPointContainer,
+		withFocalPoint && styles.focalPointContainer,
 	];
 
 	const imageStyles = [
@@ -134,14 +142,14 @@ const ImageComponent = ( {
 			opacity: isUploadInProgress ? 0.3 : 1,
 			height: containerSize?.height,
 		},
-		focalPoint && styles.focalPoint,
-		focalPoint &&
+		withFocalPoint && styles.focalPoint,
+		withFocalPoint &&
 			getImageWithFocalPointStyles(
 				focalPoint,
 				containerSize,
 				imageData
 			),
-		! focalPoint &&
+		! withFocalPoint &&
 			imageData &&
 			containerSize && {
 				height:
@@ -187,12 +195,14 @@ const ImageComponent = ( {
 						</View>
 					</View>
 				) : (
-					<View style={ focalPoint && styles.focalPointContent }>
+					<View style={ withFocalPoint && styles.focalPointContent }>
 						<Image
 							aspectRatio={ imageData?.aspectRatio }
 							style={ imageStyles }
 							source={ { uri: url } }
-							{ ...( ! focalPoint && { resizeMethod: 'scale' } ) }
+							{ ...( ! withFocalPoint && {
+								resizeMethod: 'scale',
+							} ) }
 						/>
 					</View>
 				) }
@@ -215,7 +225,7 @@ const ImageComponent = ( {
 				{ isSelected &&
 					! isUploadInProgress &&
 					! isUploadFailed &&
-					( imageData || focalPoint ) && (
+					( imageData || withFocalPoint ) && (
 						<MediaEdit
 							onSelect={ onSelectMediaUploadOption }
 							source={ { uri: url } }

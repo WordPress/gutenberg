@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { Animated, View, TouchableWithoutFeedback } from 'react-native';
 import Video from 'react-native-video';
 
 /**
@@ -10,12 +10,13 @@ import Video from 'react-native-video';
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
 	mediaUploadSync,
 } from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import {
 	Icon,
-	ImageWithFocalPoint,
+	Image,
 	PanelBody,
 	RangeControl,
 	ToolbarButton,
@@ -36,7 +37,7 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
@@ -98,6 +99,10 @@ const Cover = ( {
 		gradientValue
 	);
 
+	const [ isMediaSelected, setMediaSelected ] = useState( false );
+
+	const mediaSelectedAnimation = useRef( new Animated.Value( 1 ) ).current;
+
 	// Used to set a default color for its InnerBlocks
 	// since there's no system to inherit styles yet
 	// the RichText component will check if there are
@@ -113,6 +118,10 @@ const Cover = ( {
 	// sync with local media store
 	useEffect( mediaUploadSync, [] );
 
+	useEffect( () => {
+		startMediaSelectedAnimation();
+	}, [ isMediaSelected ] );
+
 	// initialize uploading flag to false, awaiting sync
 	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
 
@@ -121,8 +130,22 @@ const Cover = ( {
 		id && getProtocol( url ) === 'file:'
 	);
 
+	// Check if Innerblocks are selected to reset isMediaSelected
+
+	if ( ! isParentSelected && isMediaSelected ) {
+		setMediaSelected( false );
+	}
+
 	// don't show failure if upload is in progress
 	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
+
+	const startMediaSelectedAnimation = () => {
+		Animated.timing( mediaSelectedAnimation, {
+			toValue: isMediaSelected ? 0 : 1,
+			duration: 300,
+			useNativeDriver: true,
+		} ).start();
+	};
 
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
@@ -145,6 +168,10 @@ const Cover = ( {
 			requestImageUploadCancelDialog( id );
 		} else if ( shouldShowFailure ) {
 			requestImageFailedRetryDialog( id );
+		} else if ( backgroundType === MEDIA_TYPE_IMAGE && isMediaSelected ) {
+			requestImageFullscreenPreview( url );
+		} else if ( backgroundType === MEDIA_TYPE_IMAGE ) {
+			setMediaSelected( true );
 		}
 	};
 
@@ -240,7 +267,10 @@ const Cover = ( {
 		>
 			<View style={ [ styles.background, backgroundColor ] }>
 				{ getMediaOptions() }
-				{ isParentSelected && toolbarControls( openMediaOptions ) }
+				{ isParentSelected &&
+					( isMediaSelected ||
+						backgroundType === VIDEO_BACKGROUND_TYPE ) &&
+					toolbarControls( openMediaOptions ) }
 				<MediaUploadProgress
 					mediaId={ id }
 					onUpdateMediaProgress={ () => {
@@ -268,12 +298,22 @@ const Cover = ( {
 						setAttributes( { id: undefined, url: undefined } );
 					} }
 				/>
+
 				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-					<ImageWithFocalPoint
-						focalPoint={ focalPoint }
-						url={ url }
-					/>
+					<View style={ styles.imageContainer }>
+						<Image
+							focalPoint={ focalPoint }
+							isSelected={ isMediaSelected }
+							isUploadFailed={ didUploadFail }
+							isUploadInProgress={ isUploadInProgress }
+							onSelectMediaUploadOption={ onSelectMedia }
+							openMediaOptions={ openMediaOptions }
+							url={ url }
+							withFocalPoint
+						/>
+					</View>
 				) }
+
 				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
 					<Video
 						muted
@@ -321,14 +361,24 @@ const Cover = ( {
 				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>
 
-			<View pointerEvents="none" style={ overlayStyles }>
-				{ gradientValue && (
-					<Gradient
-						gradientValue={ gradientValue }
-						style={ styles.background }
-					/>
-				) }
-			</View>
+			<Animated.View
+				pointerEvents="none"
+				style={ [
+					styles.overlayContainer,
+					{
+						opacity: mediaSelectedAnimation,
+					},
+				] }
+			>
+				<View style={ overlayStyles }>
+					{ gradientValue && (
+						<Gradient
+							gradientValue={ gradientValue }
+							style={ styles.background }
+						/>
+					) }
+				</View>
+			</Animated.View>
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
