@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.0.0 (2020-07-06)
+
 ### Breaking Change
 
 - `NumberControl` no longer automatically transforms values when rendering `value` into a `<input />` HTML element.
