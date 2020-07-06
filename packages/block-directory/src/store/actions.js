@@ -39,18 +39,6 @@ export function receiveDownloadableBlocks( downloadableBlocks, filterValue ) {
 }
 
 /**
- * Returns an action object used in signalling that the user does not have
- * permission to install blocks.
- *
- * @param {boolean} hasPermission User has permission to install blocks.
- *
- * @return {Object} Action object.
- */
-export function setInstallBlocksPermission( hasPermission ) {
-	return { type: 'SET_INSTALL_BLOCKS_PERMISSION', hasPermission };
-}
-
-/**
  * Action triggered to install a block plugin.
  *
  * @param {Object} block The block item returned by search.
@@ -79,12 +67,38 @@ export function* installBlockType( block ) {
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
-		if ( ! registeredBlocks.length ) {
-			throw new Error( __( 'Unable to get block types.' ) );
+		if (
+			! registeredBlocks.length ||
+			! registeredBlocks.filter( ( i ) => i.name === block.name ).length
+		) {
+			throw new Error(
+				__( 'Error registering block. Try reloading the page.' )
+			);
 		}
+
 		success = true;
 	} catch ( error ) {
-		yield setErrorNotice( id, error.message || __( 'An error occurred.' ) );
+		let message = error.message || __( 'An error occurred.' );
+
+		// Errors we throw are fatal
+		let isFatal = error instanceof Error;
+
+		// Specific API errors that are fatal
+		const fatalAPIErrors = {
+			folder_exists: __(
+				'This block is already installed. Try reloading the page.'
+			),
+			unable_to_connect_to_filesystem: __(
+				'Error installing block. You can reload the page and try again.'
+			),
+		};
+
+		if ( fatalAPIErrors[ error.code ] ) {
+			isFatal = true;
+			message = fatalAPIErrors[ error.code ];
+		}
+
+		yield setErrorNotice( id, message, isFatal );
 	}
 	yield setIsInstalling( block.id, false );
 	return success;
@@ -166,15 +180,17 @@ export function setIsInstalling( blockId, isInstalling ) {
  * Sets an error notice string to be displayed to the user
  *
  * @param {string} blockId The ID of the block plugin. eg: my-block
- * @param {string} notice  The message shown in the notice.
+ * @param {string} message  The message shown in the notice.
+ * @param {boolean} isFatal Whether the user can recover from the error
  *
  * @return {Object} Action object.
  */
-export function setErrorNotice( blockId, notice ) {
+export function setErrorNotice( blockId, message, isFatal = false ) {
 	return {
 		type: 'SET_ERROR_NOTICE',
 		blockId,
-		notice,
+		message,
+		isFatal,
 	};
 }
 
@@ -187,8 +203,7 @@ export function setErrorNotice( blockId, notice ) {
  */
 export function clearErrorNotice( blockId ) {
 	return {
-		type: 'SET_ERROR_NOTICE',
+		type: 'CLEAR_ERROR_NOTICE',
 		blockId,
-		notice: false,
 	};
 }

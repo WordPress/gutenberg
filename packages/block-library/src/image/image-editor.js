@@ -12,19 +12,21 @@ import classnames from 'classnames';
 import { BlockControls } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
-	Icon,
 	search,
+	check,
 	rotateRight as rotateRightIcon,
 	aspectRatio as aspectRatioIcon,
 } from '@wordpress/icons';
 import {
 	ToolbarGroup,
 	ToolbarButton,
+	__experimentalToolbarItem as ToolbarItem,
 	Spinner,
 	RangeControl,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	Dropdown,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
@@ -37,7 +39,7 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
+function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 	return (
 		<MenuGroup label={ label }>
 			{ aspectRatios.map( ( { title, aspect } ) => (
@@ -47,6 +49,9 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 					onClick={ () => {
 						onClick( aspect );
 					} }
+					role="menuitemradio"
+					isSelected={ aspect === value }
+					icon={ aspect === value ? check : undefined }
 				>
 					{ title }
 				</MenuItem>
@@ -55,7 +60,7 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 	);
 }
 
-function AspectMenu( { isDisabled, onClick } ) {
+function AspectMenu( { isDisabled, onClick, value, defaultValue } ) {
 	return (
 		<DropdownMenu
 			icon={ aspectRatioIcon }
@@ -66,12 +71,31 @@ function AspectMenu( { isDisabled, onClick } ) {
 			{ ( { onClose } ) => (
 				<>
 					<AspectGroup
+						isDisabled={ isDisabled }
+						onClick={ ( aspect ) => {
+							onClick( aspect );
+							onClose();
+						} }
+						value={ value }
+						aspectRatios={ [
+							{
+								title: __( 'Original' ),
+								aspect: defaultValue,
+							},
+							{
+								title: __( 'Square' ),
+								aspect: 1,
+							},
+						] }
+					/>
+					<AspectGroup
 						label={ __( 'Landscape' ) }
 						isDisabled={ isDisabled }
 						onClick={ ( aspect ) => {
 							onClick( aspect );
 							onClose();
 						} }
+						value={ value }
 						aspectRatios={ [
 							{
 								title: __( '16:10' ),
@@ -98,6 +122,7 @@ function AspectMenu( { isDisabled, onClick } ) {
 							onClick( aspect );
 							onClose();
 						} }
+						value={ value }
 						aspectRatios={ [
 							{
 								title: __( '10:16' ),
@@ -114,19 +139,6 @@ function AspectMenu( { isDisabled, onClick } ) {
 							{
 								title: __( '2:3' ),
 								aspect: 2 / 3,
-							},
-						] }
-					/>
-					<AspectGroup
-						isDisabled={ isDisabled }
-						onClick={ ( aspect ) => {
-							onClick( aspect );
-							onClose();
-						} }
-						aspectRatios={ [
-							{
-								title: __( 'Square' ),
-								aspect: 1,
 							},
 						] }
 					/>
@@ -271,24 +283,6 @@ export default function ImageEditor( {
 
 	return (
 		<>
-			{ ! inProgress && (
-				<div
-					className="wp-block-image__zoom-control"
-					aria-label={ __( 'Zoom' ) }
-				>
-					<Icon icon={ search } />
-					<RangeControl
-						min={ MIN_ZOOM }
-						max={ MAX_ZOOM }
-						value={ Math.round( zoom ) }
-						onChange={ setZoom }
-					/>
-					<AspectMenu
-						isDisabled={ inProgress }
-						onClick={ setAspect }
-					/>
-				</div>
-			) }
 			<div
 				className={ classnames( 'wp-block-image__crop-area', {
 					'is-applying': inProgress,
@@ -317,6 +311,40 @@ export default function ImageEditor( {
 				{ inProgress && <Spinner /> }
 			</div>
 			<BlockControls>
+				<ToolbarGroup>
+					<Dropdown
+						contentClassName="wp-block-image__zoom"
+						popoverProps={ POPOVER_PROPS }
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								icon={ search }
+								label={ __( 'Zoom' ) }
+								onClick={ onToggle }
+								aria-expanded={ isOpen }
+								disabled={ inProgress }
+							/>
+						) }
+						renderContent={ () => (
+							<RangeControl
+								min={ MIN_ZOOM }
+								max={ MAX_ZOOM }
+								value={ Math.round( zoom ) }
+								onChange={ setZoom }
+							/>
+						) }
+					/>
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<AspectMenu
+								toggleProps={ toggleProps }
+								isDisabled={ inProgress }
+								onClick={ setAspect }
+								value={ aspect }
+								defaultValue={ naturalWidth / naturalHeight }
+							/>
+						) }
+					</ToolbarItem>
+				</ToolbarGroup>
 				<ToolbarGroup>
 					<ToolbarButton
 						icon={ rotateRightIcon }

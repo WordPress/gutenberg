@@ -421,10 +421,16 @@ describe( 'Navigation', () => {
 
 		await showBlockToolbar();
 
-		// Add another Link block.
+		// Add another block.
 		// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
 		// an issue where the block appender requires two clicks.
 		await page.click( '.wp-block-navigation .block-list-appender' );
+
+		// Select a Link block.
+		const [ linkButton ] = await page.$x(
+			"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Link']"
+		);
+		await linkButton.click();
 
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
