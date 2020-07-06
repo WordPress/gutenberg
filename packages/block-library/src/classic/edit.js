@@ -9,8 +9,7 @@ import { debounce } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
-import { BlockControls } from '@wordpress/block-editor';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
+import ConvertToBlocksButton from './convert-to-blocks-button';
 
 const { wp } = window;
 
@@ -239,16 +238,7 @@ export class ClassicEdit extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<>
-				<BlockControls>
-					<Toolbar>
-						<ToolbarButton
-							title={ __( 'Convert to Blocks' ) }
-							onClick={ this.props.convertToBlocks }
-						>
-							{ __( 'Convert to Blocks' ) }
-						</ToolbarButton>
-					</Toolbar>
-				</BlockControls>
+				<ConvertToBlocksButton clientId={ clientId } />
 				<div
 					key="toolbar"
 					id={ `toolbar-${ clientId }` }
