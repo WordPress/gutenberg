@@ -192,6 +192,8 @@ Create a file called experimental-theme.json and save it inside the main folder.
 CSS variables are generated using **Global presets**.
 The variables are added to the `:root` on the front, and to the `.editor-styles-wrapper` class in the editor.
 
+Styles that are added to the style.css file or an editor style sheet are loaded after global styles.
+
 Add the following global presets to the experimental-theme.json file:
 
 ```
@@ -247,6 +249,10 @@ Add the code inside the globals, after the presets:
 		}
 	}
 ```
+
+
+
+
 
 **Block styles** sets default values for all blocks of a specific type.
 
