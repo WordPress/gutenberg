@@ -118,10 +118,13 @@ const ImageComponent = ( {
 		styles.iconUploadDark
 	);
 
-	const placeholderStyles = usePreferredColorSchemeStyle(
-		styles.imageContainerUpload,
-		styles.imageContainerUploadDark
-	);
+	const placeholderStyles = [
+		usePreferredColorSchemeStyle(
+			styles.imageContainerUpload,
+			styles.imageContainerUploadDark
+		),
+		withFocalPoint && styles.imageContainerUploadWithFocalpoint,
+	];
 
 	const customWidth =
 		imageData?.width < containerSize?.width ? imageData?.width : '100%';
@@ -207,7 +210,7 @@ const ImageComponent = ( {
 					</View>
 				) }
 
-				{ isUploadFailed && (
+				{ isUploadFailed && retryMessage && (
 					<View
 						style={ [
 							styles.imageContainer,
