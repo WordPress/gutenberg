@@ -50,7 +50,7 @@ export class BlockMover extends Component {
 			isLocked,
 			isHidden,
 			rootClientId,
-			__experimentalOrientation: orientation,
+			orientation,
 		} = this.props;
 		const { isFocused } = this.state;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
@@ -101,6 +101,7 @@ export default withSelect( ( select, { clientIds } ) => {
 	const {
 		getBlock,
 		getBlockIndex,
+		getBlockListSettings,
 		getTemplateLock,
 		getBlockOrder,
 		getBlockRootClientId,
@@ -125,5 +126,6 @@ export default withSelect( ( select, { clientIds } ) => {
 		firstIndex,
 		isFirst,
 		isLast,
+		orientation: getBlockListSettings( rootClientId )?.orientation,
 	};
 } )( BlockMover );

@@ -9,6 +9,10 @@ import ReactNative, {
 	Platform,
 } from 'react-native';
 import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
+/**
+ * WordPress dependencies
+ */
+import { ENTER, BACKSPACE } from '@wordpress/keycodes';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
@@ -18,6 +22,8 @@ class AztecView extends React.Component {
 		this._onContentSizeChange = this._onContentSizeChange.bind( this );
 		this._onEnter = this._onEnter.bind( this );
 		this._onBackspace = this._onBackspace.bind( this );
+		this._onKeyDown = this._onKeyDown.bind( this );
+		this._onChange = this._onChange.bind( this );
 		this._onHTMLContentWithCursor = this._onHTMLContentWithCursor.bind(
 			this
 		);
@@ -57,21 +63,43 @@ class AztecView extends React.Component {
 			return;
 		}
 
-		if ( ! this.props.onEnter ) {
+		if ( ! this.props.onKeyDown ) {
 			return;
 		}
 
-		const { onEnter } = this.props;
-		onEnter( event );
+		const { onKeyDown } = this.props;
+
+		const newEvent = { ...event, keyCode: ENTER };
+		onKeyDown( newEvent );
 	}
 
 	_onBackspace( event ) {
-		if ( ! this.props.onBackspace ) {
+		if ( ! this.props.onKeyDown ) {
 			return;
 		}
 
-		const { onBackspace } = this.props;
-		onBackspace( event );
+		const { onKeyDown } = this.props;
+
+		const newEvent = {
+			...event,
+			keyCode: BACKSPACE,
+			preventDefault: () => {},
+		};
+		onKeyDown( newEvent );
+	}
+
+	_onKeyDown( event ) {
+		if ( ! this.props.onKeyDown ) {
+			return;
+		}
+
+		const { onKeyDown } = this.props;
+		const newEvent = {
+			...event,
+			keyCode: event.nativeEvent.keyCode,
+			preventDefault: () => {},
+		};
+		onKeyDown( newEvent );
 	}
 
 	_onHTMLContentWithCursor( event ) {
@@ -105,6 +133,26 @@ class AztecView extends React.Component {
 
 		const { onBlur } = this.props;
 		onBlur( event );
+	}
+
+	_onChange( event ) {
+		// iOS uses the the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
+		// Android includes the information needed for onKeyDown in the event passed to onChange.
+		if ( Platform.OS === 'android' ) {
+			const triggersIncludeEventKeyCode =
+				this.props.triggerKeyCodes &&
+				this.props.triggerKeyCodes
+					.map( ( char ) => char.charCodeAt( 0 ) )
+					.includes( event.nativeEvent.keyCode );
+			if ( triggersIncludeEventKeyCode ) {
+				this._onKeyDown( event );
+			}
+		}
+
+		const { onChange } = this.props;
+		if ( onChange ) {
+			onChange( event );
+		}
 	}
 
 	_onSelectionChange( event ) {
@@ -182,15 +230,17 @@ class AztecView extends React.Component {
 					style={ style }
 					onContentSizeChange={ this._onContentSizeChange }
 					onHTMLContentWithCursor={ this._onHTMLContentWithCursor }
+					onChange={ this._onChange }
 					onSelectionChange={ this._onSelectionChange }
-					onEnter={ this.props.onEnter && this._onEnter }
+					onEnter={ this.props.onKeyDown && this._onEnter }
+					onBackspace={ this.props.onKeyDown && this._onBackspace }
+					onKeyDown={ this.props.onKeyDown && this._onKeyDown }
 					deleteEnter={ this.props.deleteEnter }
 					// IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
 					// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
 					// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
 					onFocus={ this._onAztecFocus }
 					onBlur={ this._onBlur }
-					onBackspace={ this._onBackspace }
 				/>
 			</TouchableWithoutFeedback>
 		);

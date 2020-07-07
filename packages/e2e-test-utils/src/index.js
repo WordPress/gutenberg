@@ -27,8 +27,10 @@ export { getPageError } from './get-page-error';
 export {
 	insertBlock,
 	insertPattern,
+	insertReusableBlock,
 	searchForBlock,
 	searchForPattern,
+	searchForReusableBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
 } from './inserter';
@@ -42,6 +44,7 @@ export {
 } from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
+export { trashAllPosts } from './posts';
 export { getCurrentPostType, getPostType } from './post-type';
 export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';

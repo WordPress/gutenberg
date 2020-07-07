@@ -12,7 +12,8 @@
 		font-size: $default-font-size;
 		padding: 6px 12px;
 
-		&.is-tertiary {
+		&.is-tertiary,
+		&.has-icon {
 			padding: 6px;
 		}
 	}

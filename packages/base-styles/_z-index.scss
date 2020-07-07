@@ -33,6 +33,7 @@ $z-layers: (
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
+	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
