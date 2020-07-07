@@ -14,7 +14,7 @@ export async function clickBlockToolbarButton( text, type = 'icon' ) {
 	const BLOCK_TOOLBAR_SELECTOR = 'block-editor-block-toolbar';
 	let button;
 
-	if ( type === 'icon ' ) {
+	if ( type === 'icon' ) {
 		const BUTTON_SELECTOR = `.${ BLOCK_TOOLBAR_SELECTOR } button[aria-label="${ text }"]`;
 		button = await page.waitForSelector( BUTTON_SELECTOR );
 	}
