@@ -16,6 +16,7 @@ To use the site editor, a full site editing theme must be installed and active.
 The site editor is similar to the block editor, but for the site layout instead of the post and page content.
 
 Two new menus have been added to the top toolbar of the editor:
+
 One that shows a list of posts, pages and categories, and indicates the item that is being edited.
 
 ![Site editor toolbar page menu](https://github.com/carolinan/gutenberg/raw/add/docs-block-based-themes/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-page-menu.png)
