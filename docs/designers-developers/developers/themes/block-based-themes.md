@@ -71,9 +71,19 @@ Here's an example of a block template:
 
 Ultimately, any WordPress user with the correct capabilities (example: `administrator` WordPress role) will be able to access these templates in the WordPress admin, edit them in dedicated views and potentially export them as a theme.
 
-In the current iteration (at the time of writing this doc), you can navigate to the temporary "Templates" admin menu under "Appearance" `wp-admin/edit.php?post_type=wp_template` and use this as a playground to edit your templates.
+As of Gutenberg 8.5, there are two ways to create and edit templates within Gutenberg. 
 
-When ready, switch to the code editor mode and grab the HTML of the template from there and put it in the right file in your theme directory.
+### Edit templates within The "Appearance" section of WP-Admin
+
+You can navigate to the temporary "Templates" admin menu under "Appearance" `wp-admin/edit.php?post_type=wp_template` and use this as a playground to edit your templates. Add blocks here and switch to the code editor mode to grab the HTML of the template when you are done. Afterwards, you can paste that markup into a file within in your theme directory.
+
+### Edit Templates within the Full-site Editor
+
+To begin, create a blank template file within your theme. For example: `mytheme/block-templates/index.html`. Afterwards, open the Full-site editor. Your new template should appear as the active template, and should be blank. Add blocks as you normally would using Gutenberg. You can add and create template parts directly using the "Template Parts" block. 
+
+Repeat for any additional templates you'd like to bundle with your theme. 
+
+When you're done, click the "Export Theme" option in the "Tools" (ellipsis) menu of the site editor. This will provide you with a ZIP download of all the templates and template parts you've created in the site editor. These new HTML files can be placed directly into your theme. 
 
 ## Templates CPT
 
