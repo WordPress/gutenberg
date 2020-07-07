@@ -13,6 +13,7 @@ import {
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -66,7 +67,7 @@ export default function PostTitleEdit( {
 					[ `has-text-align-${ align }` ]: align,
 				} ) }
 			>
-				{ post.title || 'Post Title' }
+				{ post.title || __( 'Post Title' ) }
 			</Block>
 		</>
 	);
