@@ -443,7 +443,7 @@ public class WPAndroidGlueCode {
         mIsDarkMode = isDarkMode;
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
-        mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
+        mReactRootView = new RNGestureHandlerEnabledRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
 
         ReactInstanceManagerBuilder builder =
