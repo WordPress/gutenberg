@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { apiFetch, dispatch, select } from '@wordpress/data-controls';
 
 /**
@@ -90,6 +90,25 @@ export function* installBlockType( block ) {
 			),
 			unable_to_connect_to_filesystem: __(
 				'Error installing block. You can reload the page and try again.'
+			),
+			plugin_wp_php_incompatible: sprintf(
+				// translators: 1. WordPress version number, 2. PHP version number
+				__(
+					'WordPress version >= %1$s and PHP version >= %2$s is required.'
+				),
+				block.requires,
+				block.requiresPhp
+			),
+			plugin_wp_incompatible: sprintf(
+				// translators: WordPress version number: Ie: 5.4
+				__( 'WordPress version >= %s is required.' ),
+				block.requires
+			),
+
+			plugin_php_incompatible: sprintf(
+				// translators: PHP version number: Ie: 5.4
+				__( 'PHP version >= %s is required.' ),
+				block.requiresPhp
 			),
 		};
 
