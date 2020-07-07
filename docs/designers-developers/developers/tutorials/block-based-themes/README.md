@@ -99,7 +99,8 @@ https://developer.wordpress.org/themes/basics/theme-functions/#what-is-functions
 
 https://developer.wordpress.org/block-editor/developers/themes/theme-support/
 
-```
+```php
+<?php
 if ( ! function_exists( 'myfirsttheme_setup' ) ) :
 /**
  * Sets up theme defaults and registers support for various WordPress features.
@@ -249,10 +250,6 @@ Add the code inside the globals, after the presets:
 		}
 	}
 ```
-
-
-
-
 
 **Block styles** sets default values for all blocks of a specific type.
 
