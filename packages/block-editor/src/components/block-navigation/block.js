@@ -51,7 +51,7 @@ export default function BlockNavigationBlock( {
 
 	// Subtract 1 from rowCount, as it includes the block appender.
 	const siblingCount = rowCount - 1;
-	const hasSiblings = siblingCount > 1;
+	const hasSiblings = siblingCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const hasVisibleMovers = isHovered || isFocused;
 	const moverCellClassName = classnames(
