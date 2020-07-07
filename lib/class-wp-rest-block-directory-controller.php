@@ -142,6 +142,8 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 				__( '%s ago', 'gutenberg' ),
 				human_time_diff( strtotime( $plugin['last_updated'] ) )
 			),
+			'requires'            => $plugin['requires'],
+			'requires_php'        => $plugin['requires_php']
 		);
 
 		foreach ( $plugin['block_assets'] as $asset ) {
