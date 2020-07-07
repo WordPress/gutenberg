@@ -310,6 +310,7 @@ function CoverEdit( {
 	 */
 	const { customColors } = useCoverColorExtract( {
 		color: backgroundColorValue,
+		isSelected,
 		onChange: setOverlayColor,
 		src: url,
 	} );
@@ -558,8 +559,14 @@ function CoverEdit( {
 	);
 }
 
-function useCoverColorExtract( { backgroundColor, onChange = noop, src } ) {
+function useCoverColorExtract( {
+	backgroundColor,
+	onChange = noop,
+	isSelected = false,
+	src,
+} ) {
 	const [ customExtractedColor, setCustomExtractedColor ] = useState( null );
+	const [ didSelect, setDidSelect ] = useState( false );
 
 	const updateCustomOverlayColor = ( value ) => {
 		onChange( value );
@@ -573,10 +580,15 @@ function useCoverColorExtract( { backgroundColor, onChange = noop, src } ) {
 	} );
 
 	useEffect( () => {
-		extractColor().then( ( [ value ] ) => {
-			setCustomExtractedColor( value );
-		} );
-	}, [] );
+		// Extracts color to add to color palette.
+		// Run when the block is first selected.
+		if ( ! didSelect && isSelected ) {
+			extractColor().then( ( [ value ] ) => {
+				setCustomExtractedColor( value );
+			} );
+			setDidSelect( true );
+		}
+	}, [ isSelected, didSelect ] );
 
 	let customColors = [];
 	if ( customExtractedColor ) {
