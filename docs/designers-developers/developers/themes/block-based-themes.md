@@ -96,3 +96,4 @@ One of the most important aspects of themes (if not the most important) is the s
 ## Resources
 
 - [Full Site Editing](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Full%20Site%20Editing) label.
+- [Theme Experiments](https://github.com/WordPress/theme-experiments) repository, full of block-based theme examples created by the WordPress community.

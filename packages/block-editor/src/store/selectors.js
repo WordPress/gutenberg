@@ -6,12 +6,10 @@ import {
 	flatMap,
 	first,
 	get,
-	includes,
 	isArray,
 	isBoolean,
 	last,
 	map,
-	orderBy,
 	reduce,
 	some,
 	find,
@@ -1126,11 +1124,11 @@ const canInsertBlockTypeUnmemoized = (
 		if ( isArray( list ) ) {
 			// TODO: when there is a canonical way to detect that we are editing a post
 			// the following check should be changed to something like:
-			// if ( includes( list, 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
-			if ( includes( list, 'core/post-content' ) && item === null ) {
+			// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
+			if ( list.includes( 'core/post-content' ) && item === null ) {
 				return true;
 			}
-			return includes( list, item );
+			return list.includes( item );
 		}
 		return defaultResult;
 	};
@@ -1386,11 +1384,7 @@ export const getInserterItems = createSelector(
 			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
 			: [];
 
-		return orderBy(
-			[ ...blockTypeInserterItems, ...reusableBlockInserterItems ],
-			[ 'frecency' ],
-			[ 'desc', 'desc' ]
-		);
+		return [ ...blockTypeInserterItems, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],

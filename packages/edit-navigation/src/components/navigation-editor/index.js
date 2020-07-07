@@ -63,6 +63,7 @@ function NavigationPostEditor( { post, blockEditorSettings, onDeleteMenu } ) {
 				templateLock: 'all',
 				hasFixedToolbar: true,
 			} }
+			useSubRegistry={ false }
 		>
 			<BlockEditorKeyboardShortcuts />
 			<NavigationEditorShortcuts saveBlocks={ save } />

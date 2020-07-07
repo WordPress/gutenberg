@@ -1,7 +1,13 @@
 name: Create Block
 
 on:
+  pull_request:
+    paths:
+    - 'packages/**'
+    - '!packages/**/test/**'
+    - '!packages/**/*.md'
   push:
+    branches: [master]
     paths:
     - 'packages/**'
     - '!packages/**/test/**'

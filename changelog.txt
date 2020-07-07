@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 8.5.0-rc.1 =
+
+To be provided later.
+
+
 = 8.4.0 =
 
 ### Features

@@ -60,7 +60,7 @@ $mobile-color-swatch: 48px;
  */
 
 $shadow-popover: 0 2px 6px rgba($black, 0.05);
-$shadow-modal: 0 3px 30px rgba($dark-gray-900, 0.2);
+$shadow-modal: 0 3px 30px rgba($black, 0.2);
 
 
 /**
@@ -95,11 +95,9 @@ $block-selected-padding: 0;
 $block-selected-child-margin: 5px;
 $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-border-width;
 
-
 /**
  * Border radii.
  */
 
-$radius-round-rectangle: 4px;
 $radius-round: 50%;
 $radius-block-ui: 2px;

@@ -209,7 +209,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 								/>
 							) }
 							<p className="wp-block-post-author__name">
-								{ authorDetails?.name }
+								{ authorDetails?.name || 'Post Author' }
 							</p>
 							{ showBio && (
 								<p className="wp-block-post-author__bio">

@@ -93,7 +93,7 @@ Here's the markup for a left-floated image:
 </div>
 ```
 
-Here's an example using the above markup to achieve a responsive layout that features a sidebar, wide images, and floated elements with bounded captions: https://codepen.io/joen/pen/zLWvrW.
+Here's an example [codepen](https://codepen.io/joen/pen/zLWvrW) using the above markup to achieve a responsive layout that features a sidebar, wide images, and floated elements with bounded captions.
 
 ### Block Color Palettes
 
@@ -358,7 +358,7 @@ add_theme_support( 'responsive-embeds' );
 
 ## Experimental — Cover block padding
 
-In the Guteberg plugin 8.3, Cover blocks can provide padding controls in the editor for users. This is not avaialble by default, and requires the theme to opt in by declaring support:
+Using the Gutenberg plugin (version 8.3 or later), Cover blocks can provide padding controls in the editor for users. This is off by default, and requires the theme to opt in by declaring support:
 
 ```php
 add_theme_support('experimental-custom-spacing');
@@ -366,7 +366,7 @@ add_theme_support('experimental-custom-spacing');
 
 ## Experimental — Link color control
 
-In the Guteberg plugin 8.3, link color control is available to the Paragraph, Heading, Group, Columns, and Media & Text blocks. This is not avaialble by default, and requires the theme to opt in by declaring support:
+Using the Gutenberg plugin (version 8.3 or later), link color control is available to the Paragraph, Heading, Group, Columns, and Media & Text blocks. This is off by default, and  requires the theme to opt in by declaring support:
 
 ```php
 add_theme_support('experimental-link-color');
