@@ -55,6 +55,12 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 					) }
 				/>
 			</Section>
+			<Section title={ __( 'Keyboard options' ) }>
+				<EnableFeature
+					featureName="keepCaretInsideBlock"
+					label={ __( 'Contain text cursor inside active block' ) }
+				/>
+			</Section>
 			<Section title={ __( 'Document panels' ) }>
 				<EnablePluginDocumentSettingPanelOption.Slot />
 				{ isViewable && (

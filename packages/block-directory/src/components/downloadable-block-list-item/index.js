@@ -12,8 +12,18 @@ import DownloadableBlockInfo from '../downloadable-block-info';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 
 export default function DownloadableBlockListItem( { item, onClick } ) {
-	const isLoading = useSelect(
-		( select ) => select( 'core/block-directory' ).isInstalling( item.id ),
+	const { isLoading, isInstallable } = useSelect(
+		( select ) => {
+			const { isInstalling, getErrorNoticeForBlock } = select(
+				'core/block-directory'
+			);
+			const notice = getErrorNoticeForBlock( item.id );
+			const hasFatal = notice && notice.isFatal;
+			return {
+				isLoading: isInstalling( item.id ),
+				isInstallable: ! hasFatal,
+			};
+		},
 		[ item ]
 	);
 
@@ -41,6 +51,7 @@ export default function DownloadableBlockListItem( { item, onClick } ) {
 						rating={ rating }
 						ratingCount={ ratingCount }
 						isLoading={ isLoading }
+						isInstallable={ isInstallable }
 					/>
 				</header>
 				<section className="block-directory-downloadable-block-list-item__body">

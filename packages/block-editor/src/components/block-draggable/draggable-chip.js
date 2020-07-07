@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { Flex, FlexItem } from '@wordpress/components';
-import { layout, handle } from '@wordpress/icons';
+import { handle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,16 +15,13 @@ import BlockIcon from '../block-icon';
 export default function BlockDraggableChip( { clientIds } ) {
 	const icon = useSelect(
 		( select ) => {
+			if ( clientIds.length !== 1 ) {
+				return;
+			}
+
 			const { getBlockName } = select( 'core/block-editor' );
 			const [ firstId ] = clientIds;
 			const blockName = getBlockName( firstId );
-			const isOfSameType = clientIds.every(
-				( id ) => getBlockName( id ) === blockName
-			);
-
-			if ( ! isOfSameType ) {
-				return layout;
-			}
 
 			return getBlockType( blockName ).icon;
 		},
@@ -41,9 +39,16 @@ export default function BlockDraggableChip( { clientIds } ) {
 						<BlockIcon icon={ handle } />
 					</FlexItem>
 					<FlexItem>
-						<BlockIcon icon={ icon } />
+						{ icon ? (
+							<BlockIcon icon={ icon } />
+						) : (
+							sprintf(
+								/* translators: %d: number of blocks. */
+								__( '%d blocks' ),
+								clientIds.length
+							)
+						) }
 					</FlexItem>
-					<FlexItem>{ `(${ clientIds.length })` }</FlexItem>
 				</Flex>
 			</div>
 		</div>

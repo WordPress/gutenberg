@@ -317,6 +317,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu-item-title'       => $menu_item_obj->title,
 				'menu-item-url'         => $menu_item_obj->url,
 				'menu-item-description' => $menu_item_obj->description,
+				'menu-item-content'     => $menu_item_obj->menu_item_content,
 				'menu-item-attr-title'  => $menu_item_obj->attr_title,
 				'menu-item-target'      => $menu_item_obj->target,
 				// Stored in the database as a string.
@@ -337,6 +338,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu-item-title'       => '',
 				'menu-item-url'         => '',
 				'menu-item-description' => '',
+				'menu-item-content'     => '',
 				'menu-item-attr-title'  => '',
 				'menu-item-target'      => '',
 				'menu-item-classes'     => '',
@@ -390,6 +392,15 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
+		// Nav menu content.
+		if ( ! empty( $schema['properties']['content'] ) && isset( $request['content'] ) ) {
+			if ( is_string( $request['content'] ) ) {
+				$prepared_nav_item['menu-item-content'] = $request['content'];
+			} elseif ( isset( $request['content']['raw'] ) ) {
+				$prepared_nav_item['menu-item-content'] = $request['content']['raw'];
+			}
+		}
+
 		// Check if object id exists before saving.
 		if ( ! $prepared_nav_item['menu-item-object'] ) {
 			// If taxonony, check if term exists.
@@ -426,6 +437,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 			if ( empty( $prepared_nav_item['menu-item-url'] ) ) {
 				return new WP_Error( 'rest_url_required', __( 'URL required if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
+			}
+		}
+
+		// If menu item is type html, then content is required.
+		if ( 'html' === $prepared_nav_item['menu-item-type'] ) {
+			if ( empty( $prepared_nav_item['menu-item-content'] ) ) {
+				return new WP_Error( 'rest_content_required', __( 'Content required if menu item of type html.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -594,6 +612,20 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		if ( in_array( 'object_id', $fields, true ) ) {
 			// Usually is a string, but lets expose as an integer.
 			$data['object_id'] = absint( $menu_item->object_id );
+		}
+
+		if ( rest_is_field_included( 'content', $fields ) ) {
+			$data['content'] = array();
+		}
+		if ( rest_is_field_included( 'content.raw', $fields ) ) {
+			$data['content']['raw'] = $menu_item->content;
+		}
+		if ( rest_is_field_included( 'content.rendered', $fields ) ) {
+			/** This filter is documented in wp-includes/post-template.php */
+			$data['content']['rendered'] = apply_filters( 'the_content', $menu_item->content );
+		}
+		if ( rest_is_field_included( 'content.block_version', $fields ) ) {
+			$data['content']['block_version'] = block_version( $menu_item->content );
 		}
 
 		if ( in_array( 'parent', $fields, true ) ) {
@@ -787,7 +819,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		$schema['properties']['type'] = array(
 			'description' => __( 'The family of objects originally represented, such as "post_type" or "taxonomy".', 'gutenberg' ),
 			'type'        => 'string',
-			'enum'        => array( 'taxonomy', 'post_type', 'post_type_archive', 'custom' ),
+			'enum'        => array( 'taxonomy', 'post_type', 'post_type_archive', 'custom', 'html' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'default'     => 'custom',
 		);
@@ -859,6 +891,35 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'type'        => 'integer',
 			'minimum'     => 0,
 			'default'     => 0,
+		);
+
+		$schema['properties']['content'] = array(
+			'description' => __( 'HTML content to display for this menu item. May contain blocks.', 'gutenberg' ),
+			'context'     => array( 'view', 'edit', 'embed' ),
+			'type'        => 'object',
+			'arg_options' => array(
+				'sanitize_callback' => null, // Note: sanitization implemented in self::prepare_item_for_database().
+				'validate_callback' => null, // Note: validation implemented in self::prepare_item_for_database().
+			),
+			'properties'  => array(
+				'raw'           => array(
+					'description' => __( 'HTML content, as it exists in the database.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'edit' ),
+				),
+				'rendered'      => array(
+					'description' => __( 'HTML content, transformed for display.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'block_version' => array(
+					'description' => __( 'Version of the block format used in the HTML content.', 'gutenberg' ),
+					'type'        => 'integer',
+					'context'     => array( 'edit' ),
+					'readonly'    => true,
+				),
+			),
 		);
 
 		$schema['properties']['target'] = array(

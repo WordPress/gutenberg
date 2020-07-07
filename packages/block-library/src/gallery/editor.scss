@@ -80,7 +80,7 @@ figure.wp-block-gallery {
 	@include reduce-motion("transition");
 	border-radius: $radius-block-ui;
 	background: $white;
-	border: $border-width solid $dark-gray-primary;
+	border: $border-width solid $gray-900;
 
 	&:hover {
 		box-shadow: $shadow-popover;

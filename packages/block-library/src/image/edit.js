@@ -65,7 +65,7 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  *
  * @return {boolean} Is the url an externally hosted url?
  */
-const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
+export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
 export function ImageEdit( {
 	attributes,
