@@ -21,10 +21,13 @@ One that shows a list of posts, pages and categories, and indicates the item tha
 ![Site editor toolbar page menu](https://github.com/carolinan/gutenberg/raw/add/docs-block-based-themes/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-page-menu.png)
 
 And a list of templates and template parts. Hovering over the parts will show a preview.
+
 ![Site editor toolbar template menu](https://github.com/carolinan/gutenberg/raw/add/docs-block-based-themes/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-template-menu.png)
 
 Template parts can be selected and edited directly in the site editor, like other blocks:
+
 ![A selected template part is highlighted and has a limited set of alignment controls](https://github.com/carolinan/gutenberg/raw/add/docs-block-based-themes/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-editor-template-part.png)
+
 
 Select the header template part in the menu to view and edit it individually.
 Add the blocks that you would like in your header, for example a site title block, a navigation block, and an image.
@@ -44,7 +47,9 @@ When you have made your changes, click on the **update design** button in the up
 where you normally publish and update your content.
 
 Select the templates and template parts that you want to save:
+
 ![The save menu displays a list of templates and template parts with checkboxes](https://github.com/carolinan/gutenberg/raw/add/docs-block-based-themes/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-save.png)
+
 
 When you save changes in the site editor, the files in the active theme is not udpated.
 
@@ -54,10 +59,6 @@ Instead, the templates and template parts are saved as custom post types, that a
 
 ## Exporting changes
 
-Templates and template parts can be exported as a theme zip file from the Tools menu in the site editor.
-
-
-
-
-
+Saved templates and template parts can be exported as a partial theme from the Tools menu in the site editor.
+The block HTML code can then be copied to the theme that you are editing.
 
