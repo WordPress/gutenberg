@@ -83,7 +83,7 @@ describe( 'Classic', () => {
 		);
 
 		// Convert to blocks and verify it worked correctly.
-		await clickBlockToolbarButton( 'Convert to blocks' );
+		await clickBlockToolbarButton( 'Convert to blocks', 'text' );
 		await page.waitForSelector( '.wp-block[data-type="core/gallery"]' );
 		expect( await getEditedPostContent() ).toMatch( /<!-- wp:gallery/ );
 
@@ -94,7 +94,7 @@ describe( 'Classic', () => {
 		);
 
 		// Convert to blocks again and verify it worked correctly.
-		await clickBlockToolbarButton( 'Convert to blocks' );
+		await clickBlockToolbarButton( 'Convert to blocks', 'text' );
 		await page.waitForSelector( '.wp-block[data-type="core/gallery"]' );
 		expect( await getEditedPostContent() ).toMatch( /<!-- wp:gallery/ );
 	} );
