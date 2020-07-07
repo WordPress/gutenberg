@@ -111,8 +111,8 @@ export default function PageSwitcher( {
 			toggleProps={ {
 				children:
 					[ ...pages, ...categories, ...posts ].find(
-						( choice ) => choice.value === activePage.path
-					)?.label || activePage.path,
+						( choice ) => choice.value === activePage?.path
+					)?.label || activePage?.path,
 			} }
 			menuProps={ { className: 'edit-site-page-switcher__menu' } }
 		>
@@ -121,21 +121,21 @@ export default function PageSwitcher( {
 					<MenuGroup label={ __( 'Pages' ) }>
 						<MenuItemsChoice
 							choices={ pages }
-							value={ activePage.path }
+							value={ activePage?.path }
 							onSelect={ onPageSelect }
 						/>
 					</MenuGroup>
 					<MenuGroup label={ __( 'Categories' ) }>
 						<MenuItemsChoice
 							choices={ categories }
-							value={ activePage.path }
+							value={ activePage?.path }
 							onSelect={ onPageSelect }
 						/>
 					</MenuGroup>
 					<MenuGroup label={ __( 'Posts' ) }>
 						<MenuItemsChoice
 							choices={ posts }
-							value={ activePage.path }
+							value={ activePage?.path }
 							onSelect={ onPageSelect }
 						/>
 						<LinkControl

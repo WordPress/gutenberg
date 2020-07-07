@@ -82,11 +82,15 @@ function Editor() {
 			templatePartId: _templatePartId,
 			templateType: _templateType,
 			page: getPage(),
-			template: _select( 'core' ).getEntityRecord(
-				'postType',
-				_templateType,
-				_templateType === 'wp_template' ? _templateId : _templatePartId
-			),
+			template: _templateType
+				? _select( 'core' ).getEntityRecord(
+						'postType',
+						_templateType,
+						_templateType === 'wp_template'
+							? _templateId
+							: _templatePartId
+				  )
+				: null,
 			select: _select,
 		};
 	}, [] );
@@ -125,25 +129,31 @@ function Editor() {
 	// and Query Pagination blocks.
 	const blockContext = useMemo(
 		() => ( {
-			...page.context,
-			query: page.context.query || { categoryIds: [] },
+			...page?.context,
+			query: page?.context.query || { categoryIds: [] },
 			queryContext: [
-				page.context.queryContext || { page: 1 },
+				page?.context.queryContext || { page: 1 },
 				( newQueryContext ) =>
 					setPage( {
 						...page,
 						context: {
-							...page.context,
+							...page?.context,
 							queryContext: {
-								...page.context.queryContext,
+								...page?.context.queryContext,
 								...newQueryContext,
 							},
 						},
 					} ),
 			],
 		} ),
-		[ page.context ]
+		[ page?.context ]
 	);
+
+	let entityId;
+	if ( templateType ) {
+		entityId = templateType === 'wp_template' ? templateId : templatePartId;
+	}
+
 	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -154,11 +164,7 @@ function Editor() {
 						<EntityProvider
 							kind="postType"
 							type={ templateType }
-							id={
-								templateType === 'wp_template'
-									? templateId
-									: templatePartId
-							}
+							id={ entityId }
 						>
 							<BlockContextProvider value={ blockContext }>
 								<FocusReturnProvider>
