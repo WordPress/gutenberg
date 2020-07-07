@@ -1,4 +1,4 @@
-# Adding blocks
+# Adding blocks to you theme
 
 Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the HTML, for the selected blocks.
 
@@ -51,9 +51,9 @@ Select the templates and template parts that you want to save:
 ![The save menu displays a list of templates and template parts with checkboxes](https://github.com/carolinan/gutenberg/raw/add/docs-block-based-themes/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-save.png)
 
 
-When you save changes in the site editor, the files in the active theme is not udpated.
-
+When you save changes in the site editor, the files in the active theme are not udpated.
 Instead, the templates and template parts are saved as custom post types, that are accessed via the appearance menu.
+
 ![The template parts view in the admin area displays a list of all saved template parts](https://github.com/carolinan/gutenberg/raw/add/docs-block-based-themes/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-appearance-template-parts.png)
 
 
