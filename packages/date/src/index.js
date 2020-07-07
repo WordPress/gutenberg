@@ -5,6 +5,11 @@ import momentLib from 'moment';
 import 'moment-timezone/moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
+/**
+ * Internal dependencies
+ */
+import timezoneData from './timezone-data';
+
 /** @typedef {import('moment').Moment} Moment */
 
 const WP_ZONE = 'WP';
@@ -137,6 +142,8 @@ export function __experimentalGetSettings() {
 }
 
 function setupWPTimezone() {
+	momentLib.tz.load( timezoneData );
+
 	// Create WP timezone based off dateSettings.
 	momentLib.tz.add(
 		momentLib.tz.pack( {
