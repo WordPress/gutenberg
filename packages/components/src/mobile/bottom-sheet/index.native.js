@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import SafeArea from 'react-native-safe-area';
 import Animated from 'react-native-reanimated';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { debounce } from 'lodash';
 
 /**
@@ -536,7 +537,7 @@ class BottomSheet extends Component {
 								onPress={ this.onOverlayPress }
 							/>
 						</Animated.View>
-						<BottomSheetReanimated
+						<BottomSheetWithRootView
 							snapPoints={ snapPoints }
 							initialSnap={ initialSnap }
 							renderHeader={ this.renderHandler }
@@ -561,6 +562,12 @@ class BottomSheet extends Component {
 		);
 	}
 }
+
+function BottomSheetHOC( props ) {
+	return <BottomSheetReanimated { ...props } />;
+}
+
+const BottomSheetWithRootView = gestureHandlerRootHOC( BottomSheetHOC );
 
 function getWidth() {
 	return Math.min(
