@@ -30,29 +30,31 @@ import BlockTitle from '../block-title';
  *
  * @return {WPComponent} The component to be rendered.
  */
-function BlockSelectionButton( {
-	clientId,
-	rootClientId,
-	moverDirection,
-	...props
-} ) {
+function BlockSelectionButton( { clientId, rootClientId, ...props } ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
 				__unstableGetBlockWithoutInnerBlocks,
 				getBlockIndex,
 				hasBlockMovingClientId,
+				getBlockListSettings,
 			} = select( 'core/block-editor' );
 			const index = getBlockIndex( clientId, rootClientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
 			);
 			const blockMovingMode = hasBlockMovingClientId();
-			return { index, name, attributes, blockMovingMode };
+			return {
+				index,
+				name,
+				attributes,
+				blockMovingMode,
+				orientation: getBlockListSettings( rootClientId )?.orientation,
+			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const { index, name, attributes, blockMovingMode } = selected;
+	const { index, name, attributes, blockMovingMode, orientation } = selected;
 	const { setNavigationMode, removeBlock } = useDispatch(
 		'core/block-editor'
 	);
@@ -77,7 +79,7 @@ function BlockSelectionButton( {
 		blockType,
 		attributes,
 		index + 1,
-		moverDirection
+		orientation
 	);
 
 	const classNames = classnames(

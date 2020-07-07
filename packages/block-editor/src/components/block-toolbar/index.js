@@ -31,7 +31,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		hasFixedToolbar,
 		isValid,
 		isVisual,
-		moverDirection,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -39,15 +38,11 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockRootClientId,
-			getBlockListSettings,
 			getSettings,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
-
-		const { __experimentalMoverDirection } =
-			getBlockListSettings( blockRootClientId ) || {};
 
 		return {
 			blockClientIds: selectedBlockClientIds,
@@ -63,7 +58,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
 			),
-			moverDirection: __experimentalMoverDirection,
 		};
 	}, [] );
 
@@ -130,10 +124,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 								onDragEnd={ onDraggableEnd }
 							>
 								<BlockSwitcher clientIds={ blockClientIds } />
-								<BlockMover
-									clientIds={ blockClientIds }
-									__experimentalOrientation={ moverDirection }
-								/>
+								<BlockMover clientIds={ blockClientIds } />
 							</div>
 						) }
 					</BlockDraggable>

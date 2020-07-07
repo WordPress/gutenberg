@@ -111,6 +111,7 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_TRANSLATIONS = "translations";
     public static final String PROP_NAME_CAPABILITIES = "capabilities";
     public static final String PROP_NAME_CAPABILITIES_MENTIONS = "mentions";
+    public static final String PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor";
     private static final String PROP_NAME_COLORS = "colors";
     private static final String PROP_NAME_GRADIENTS = "gradients";
 
@@ -373,13 +374,14 @@ public class WPAndroidGlueCode {
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
                                                                     String content,
                                                                     String blockId,
-                                                                    String blockName) {
+                                                                    String blockName,
+                                                                    String blockTitle) {
                 mReplaceUnsupportedBlockCallback = replaceUnsupportedBlockCallback;
                 mOnGutenbergDidRequestUnsupportedBlockFallbackListener.
-                        gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, content));
+                        gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, blockTitle, content));
             }
 
-            @Override 
+            @Override
             public void onAddMention(Consumer<String> onSuccess) {
                 mAddMentionUtil.getMention(onSuccess);
             }
@@ -430,7 +432,8 @@ public class WPAndroidGlueCode {
                              Consumer<Exception> exceptionLogger,
                              Consumer<String> breadcrumbLogger,
                              @Nullable Boolean isSiteUsingWpComRestApi,
-                             @Nullable Bundle editorTheme) {
+                             @Nullable Bundle editorTheme,
+                             boolean siteJetpackIsConnected) {
         mIsDarkMode = isDarkMode;
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
@@ -466,6 +469,7 @@ public class WPAndroidGlueCode {
         Bundle capabilities = new Bundle();
         if (isSiteUsingWpComRestApi != null) {
             capabilities.putBoolean(PROP_NAME_CAPABILITIES_MENTIONS, isSiteUsingWpComRestApi);
+            capabilities.putBoolean(PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, !siteJetpackIsConnected);
         }
         initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
 

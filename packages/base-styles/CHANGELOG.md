@@ -2,13 +2,15 @@
 
 ## Unreleased
 
-## Breaking Changes
+## 2.0.0 (2020-07-07)
 
-- Remove the AdminColorThemes JavaScript variables.
-- Retire numerous colors and old grays, indicate others for deprecation.
+### Breaking Changes
+
+-   Remove the AdminColorThemes JavaScript variables.
+-   Retire numerous colors and old grays, indicate others for deprecation.
 
 ## 1.2.0 (2020-01-13)
 
 ### Bug Fix
 
-- Import `colors` into `variables` since the latter depends on the former.
+-   Import `colors` into `variables` since the latter depends on the former.

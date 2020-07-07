@@ -145,7 +145,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
                                                      String content,
                                                      String blockId,
-                                                     String blockName);
+                                                     String blockName,
+                                                     String blockTitle);
 
     void onAddMention(Consumer<String> onSuccess);
     
