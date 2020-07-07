@@ -46,17 +46,6 @@ export function getDownloadableBlocks( state, filterValue ) {
 }
 
 /**
- * Returns true if user has permission to install blocks.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} User has permission to install blocks.
- */
-export function hasInstallBlocksPermission( state ) {
-	return state.hasPermission;
-}
-
-/**
  * Returns the block types that have been installed on the server.
  *
  * @param {Object} state Global application state.
@@ -147,5 +136,5 @@ export function getErrorNotices( state ) {
  * @return {string|boolean} The error text, or false if no error.
  */
 export function getErrorNoticeForBlock( state, blockId ) {
-	return state.errorNotices[ blockId ] || false;
+	return state.errorNotices[ blockId ];
 }

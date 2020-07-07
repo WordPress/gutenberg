@@ -103,10 +103,23 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 		);
 
 		// If no candidate has been assigned yet or this is the nearest
-		// block edge to the cursor, then assign it as the candidate.
+		// block edge to the cursor, then assign the next block as the candidate.
 		if ( Math.abs( trailingEdgeDistance ) < candidateDistance ) {
 			candidateDistance = trailingEdgeDistance;
-			candidateIndex = index + 1;
+			let nextBlockOffset = 1;
+
+			// If the next block is the one being dragged, skip it and consider
+			// the block afterwards the drop target. This is needed as the
+			// block being dragged is set to display: none and won't display
+			// any drop target styling.
+			if (
+				elements[ index + 1 ] &&
+				elements[ index + 1 ].classList.contains( 'is-dragging' )
+			) {
+				nextBlockOffset = 2;
+			}
+
+			candidateIndex = index + nextBlockOffset;
 		}
 	} );
 
@@ -165,16 +178,14 @@ export default function useBlockDropZone( {
 
 	function selector( select ) {
 		const {
-			getBlockIndex,
 			getBlockListSettings,
 			getClientIdsOfDescendants,
 			getSettings,
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		return {
-			getBlockIndex,
-			moverDirection: getBlockListSettings( targetRootClientId )
-				?.__experimentalMoverDirection,
+			orientation: getBlockListSettings( targetRootClientId )
+				?.orientation,
 			getClientIdsOfDescendants,
 			hasUploadPermissions: !! getSettings().mediaUpload,
 			isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
@@ -182,11 +193,10 @@ export default function useBlockDropZone( {
 	}
 
 	const {
-		getBlockIndex,
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
 		isLockedAll,
-		moverDirection,
+		orientation,
 	} = useSelect( selector, [ targetRootClientId ] );
 	const {
 		insertBlocks,
@@ -289,7 +299,6 @@ export default function useBlockDropZone( {
 		},
 		[
 			getClientIdsOfDescendants,
-			getBlockIndex,
 			targetBlockIndex,
 			moveBlocksToPosition,
 			targetRootClientId,
@@ -311,7 +320,7 @@ export default function useBlockDropZone( {
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				position,
-				moverDirection
+				orientation
 			);
 
 			if ( targetIndex === undefined ) {

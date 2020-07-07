@@ -193,7 +193,10 @@ function Navigation( {
 					>
 						<InnerBlocks
 							ref={ ref }
-							allowedBlocks={ [ 'core/navigation-link' ] }
+							allowedBlocks={ [
+								'core/navigation-link',
+								'core/search',
+							] }
 							renderAppender={
 								( isImmediateParentOfSelectedBlock &&
 									! selectedBlockHasDescendants ) ||
@@ -202,7 +205,7 @@ function Navigation( {
 									: false
 							}
 							templateInsertUpdatesSelection={ false }
-							__experimentalMoverDirection={
+							orientation={
 								attributes.orientation || 'horizontal'
 							}
 							__experimentalTagName="ul"

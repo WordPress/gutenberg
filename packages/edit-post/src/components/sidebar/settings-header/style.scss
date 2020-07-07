@@ -43,6 +43,8 @@
 
 	&:focus {
 		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		position: relative;
+		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
 	}
 
 	&.is-active:focus {

@@ -1,85 +1,38 @@
 /**
  * External dependencies
  */
-import { once } from 'lodash';
+import { noop, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { searchBlockItems } from '../components/inserter/search-items';
+import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
+import { includeVariationsInInserterItems } from '../components/inserter/utils';
 import BlockIcon from '../components/block-icon';
+
+const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
+	return map(
+		innerBlocksTemplate,
+		( [ name, attributes, innerBlocks = [] ] ) =>
+			createBlock(
+				name,
+				attributes,
+				createBlocksFromInnerBlocksTemplate( innerBlocks )
+			)
+	);
+};
 
 /** @typedef {import('@wordpress/block-editor').WPEditorInserterItem} WPEditorInserterItem */
 
 /** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
-
-/**
- * Returns the client ID of the parent where a newly inserted block would be
- * placed.
- *
- * @return {string} Client ID of the parent where a newly inserted block would
- *                  be placed.
- */
-function defaultGetBlockInsertionParentClientId() {
-	return select( 'core/block-editor' ).getBlockInsertionPoint().rootClientId;
-}
-
-/**
- * Returns the inserter items for the specified parent block.
- *
- * @param {string} rootClientId Client ID of the block for which to retrieve
- *                              inserter items.
- *
- * @return {Array<WPEditorInserterItem>} The inserter items for the specified
- *                                      parent.
- */
-function defaultGetInserterItems( rootClientId ) {
-	return select( 'core/block-editor' ).getInserterItems( rootClientId );
-}
-
-/**
- * Returns the name of the currently selected block.
- *
- * @return {string?} The name of the currently selected block or `null` if no
- *                   block is selected.
- */
-function defaultGetSelectedBlockName() {
-	const { getSelectedBlockClientId, getBlockName } = select(
-		'core/block-editor'
-	);
-	const selectedBlockClientId = getSelectedBlockClientId();
-	return selectedBlockClientId ? getBlockName( selectedBlockClientId ) : null;
-}
-
-/**
- * Triggers a fetch of reusable blocks, once.
- *
- * TODO: Reusable blocks fetching should be reimplemented as a core-data entity
- * resolver, not relying on `core/editor` (see #7119). The implementation here
- * is imperfect in that the options result will not await the completion of the
- * fetch request and thus will not include any reusable blocks. This has always
- * been true, but relied upon the fact the user would be delayed in typing an
- * autocompleter search query. Once implemented using resolvers, the status of
- * this request could be subscribed to as part of a promised return value using
- * the result of `hasFinishedResolution`. There is currently reliable way to
- * determine that a reusable blocks fetch request has completed.
- *
- * @return {Promise} Promise resolving once reusable blocks fetched.
- */
-const fetchReusableBlocks = once( () => {
-	const { __experimentalFetchReusableBlocks } = select(
-		'core/block-editor'
-	).getSettings();
-
-	if ( __experimentalFetchReusableBlocks ) {
-		__experimentalFetchReusableBlocks();
-	}
-} );
 
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
@@ -91,45 +44,90 @@ const fetchReusableBlocks = once( () => {
  *
  * @return {WPCompleter} A blocks completer.
  */
-export function createBlockCompleter( {
-	// Allow store-based selectors to be overridden for unit test.
-	getBlockInsertionParentClientId = defaultGetBlockInsertionParentClientId,
-	getInserterItems = defaultGetInserterItems,
-	getSelectedBlockName = defaultGetSelectedBlockName,
-} = {} ) {
+function createBlockCompleter() {
 	return {
 		name: 'blocks',
 		className: 'block-editor-autocompleters__block',
 		triggerPrefix: '/',
-		options() {
-			fetchReusableBlocks();
 
-			const selectedBlockName = getSelectedBlockName();
-			return getInserterItems( getBlockInsertionParentClientId() ).filter(
-				// Avoid offering to replace the current block with a block of the same type.
-				( inserterItem ) => selectedBlockName !== inserterItem.name
+		useItems( filterValue ) {
+			const { rootClientId, selectedBlockName } = useSelect(
+				( select ) => {
+					const {
+						getSelectedBlockClientId,
+						getBlockName,
+						getBlockInsertionPoint,
+					} = select( 'core/block-editor' );
+					const selectedBlockClientId = getSelectedBlockClientId();
+					return {
+						selectedBlockName: selectedBlockClientId
+							? getBlockName( selectedBlockClientId )
+							: null,
+						rootClientId: getBlockInsertionPoint().rootClientId,
+					};
+				},
+				[]
 			);
-		},
-		getOptionKeywords( inserterItem ) {
-			const { title, keywords = [], category } = inserterItem;
-			return [ category, ...keywords, title ];
-		},
-		getOptionLabel( inserterItem ) {
-			const { icon, title } = inserterItem;
-			return [ <BlockIcon key="icon" icon={ icon } showColors />, title ];
+			const [ items, categories, collections ] = useBlockTypesState(
+				rootClientId,
+				noop
+			);
+
+			const filteredItems = useMemo( () => {
+				return searchBlockItems(
+					items,
+					categories,
+					collections,
+					filterValue
+				).filter( ( item ) => item.name !== selectedBlockName );
+			}, [
+				filterValue,
+				selectedBlockName,
+				items,
+				categories,
+				collections,
+			] );
+
+			const options = useMemo(
+				() =>
+					includeVariationsInInserterItems( filteredItems ).map(
+						( blockItem ) => {
+							const { title, icon, isDisabled } = blockItem;
+							return {
+								key: `block-${ blockItem.id }`,
+								value: blockItem,
+								label: (
+									<>
+										<BlockIcon
+											key="icon"
+											icon={ icon }
+											showColors
+										/>
+										{ title }
+									</>
+								),
+								isDisabled,
+							};
+						}
+					),
+				[ filteredItems ]
+			);
+
+			return [ options ];
 		},
 		allowContext( before, after ) {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
 		},
 		getOptionCompletion( inserterItem ) {
-			const { name, initialAttributes } = inserterItem;
+			const { name, initialAttributes, innerBlocks } = inserterItem;
 			return {
 				action: 'replace',
-				value: createBlock( name, initialAttributes ),
+				value: createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate( innerBlocks )
+				),
 			};
-		},
-		isOptionDisabled( inserterItem ) {
-			return inserterItem.isDisabled;
 		},
 	};
 }

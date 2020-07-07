@@ -57,7 +57,7 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
  *
  * @todo Remove once Gutenberg's minimum required WordPress version is v5.5.
  * @see https://core.trac.wordpress.org/ticket/49906
- * @see https://github.com/WordPress/wordpress-develop/pull/222
+ * @see https://core.trac.wordpress.org/changeset/47921
  *
  * @param WP_REST_Response $response The response object.
  * @param WP_Theme         $theme    Theme object used to create response.

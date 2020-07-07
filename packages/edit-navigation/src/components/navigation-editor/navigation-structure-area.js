@@ -14,7 +14,9 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 export default function NavigationStructureArea( { blocks, initialOpen } ) {
-	const [ selectedBlockId, setSelectedBlockId ] = useState( null );
+	const [ selectedBlockId, setSelectedBlockId ] = useState(
+		blocks[ 0 ]?.clientId
+	);
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const showNavigationStructure = !! blocks.length;
 
