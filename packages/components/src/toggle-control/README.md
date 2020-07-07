@@ -1,31 +1,30 @@
 # ToggleControl
 
-ToggleControl is used to generate a toggle user interface.
+This component implements a standalone toggle user interface `ToggleControl` is used to generate a toggle user interface.
 
 
-## Usage
+## Example Usage
+
+### With `useState`
 
 Render a user interface to change fixed background setting.
 
-Here is an example using local state:
-
 ```jsx
+import React, { useState } from 'react';
 import { ToggleControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
 
-const MyToggleControl = withState( {
-	hasFixedBackground: false,
-} )( ( { hasFixedBackground, setState } ) => (
-	<ToggleControl
-		label="Fixed Background"
-		help={ hasFixedBackground ? 'Has fixed background.' : 'No fixed background.' }
-		checked={ hasFixedBackground }
-		onChange={ () => setState( ( state ) => ( { hasFixedBackground: ! state.hasFixedBackground } ) ) }
-	/>
-) );
+const MyToggleControl = ( ) => {
+	const [ checked, setChecked ] = useState( false );
+	return <ToggleControl
+		label="Toggle control label"
+		help={ checked ? 'Is active.' : 'Is not active.' }
+		checked={ checked }
+		onChange={ () => setChecked( !checked ) }
+	/>;
+};
 ```
 
-To use this inside a block to toggle a saveable value, use block attributes, e.g.
+### Inside a WP Block
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -36,16 +35,12 @@ registerBlockType( 'example/toggle', {
 	icon: 'universal-access-alt',
 	category: 'layout',
 	edit( { attributes, setAttributes } ) {
-		function onChange( event ) {
-			setAttributes( { toggleValue: !attributes.toggleValue } );
-		}
-
 		return (
 			<ToggleControl
 				label="Example Toggle"
 				help={ attributes.toggleValue ? 'Toggle is on' : 'Toggle is off' }
 				checked={ attributes.toggleValue }
-				onChange={ onChange }
+				onChange={ () => setAttributes( { toggleValue: !attributes.toggleValue } ) }
 			/>
 		);
 	},
