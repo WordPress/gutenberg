@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.30.0",
+	"version": "1.31.0",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -118,7 +118,6 @@
 		"clean:react": "rm -rf $TMPDIR/react-*",
 		"clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
 		"clean:babel-cache": "rm -rf ../../node_modules/.cache/babel-loader/*",
-		"clean:i18n-cache": "rm -rf ./i18n-cache/data/*.json && rm -f ./i18n-cache/index.native.js",
-		"version": "npm run bundle && git add -A bundle"
+		"clean:i18n-cache": "rm -rf ./i18n-cache/data/*.json && rm -f ./i18n-cache/index.native.js"
 	}
 }
