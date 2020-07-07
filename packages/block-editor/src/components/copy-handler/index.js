@@ -15,7 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { getPasteEventData } from '../../utils/get-paste-event-data';
 
-function useNotifyCopy() {
+export function useNotifyCopy() {
 	const { getBlockName } = useSelect(
 		( select ) => select( 'core/block-editor' ),
 		[]

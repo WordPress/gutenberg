@@ -11,15 +11,14 @@ import {
 	Keyboard,
 	StatusBar,
 	TouchableHighlight,
-	LayoutAnimation,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
-import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
+import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -34,10 +33,10 @@ import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import ColorCell from './color-cell';
+import RadioCell from './radio-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import { BottomSheetProvider } from './bottom-sheet-context';
-
-const ANIMATION_DURATION = 300;
+import { performLayoutAnimation } from '../layout-animation';
 
 class BottomSheet extends Component {
 	constructor() {
@@ -248,13 +247,7 @@ class BottomSheet extends Component {
 	}
 
 	onReplaceSubsheet( destination, extraProps, callback ) {
-		LayoutAnimation.configureNext(
-			LayoutAnimation.create(
-				ANIMATION_DURATION,
-				LayoutAnimation.Types.easeInEaseOut,
-				LayoutAnimation.Properties.opacity
-			)
-		);
+		performLayoutAnimation();
 
 		this.setState(
 			{
@@ -424,5 +417,6 @@ ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
 ThemedBottomSheet.ColorCell = ColorCell;
+ThemedBottomSheet.RadioCell = RadioCell;
 
 export default ThemedBottomSheet;

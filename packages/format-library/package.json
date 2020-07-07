@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "1.19.0",
+	"version": "1.21.0",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"formats"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/format-library/README.md",

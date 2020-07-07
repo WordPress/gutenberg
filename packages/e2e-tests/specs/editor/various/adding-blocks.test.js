@@ -50,6 +50,9 @@ describe( 'adding blocks', () => {
 		// Using the slash command
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/quote' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Quote')]`
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Quote block' );
 
@@ -62,6 +65,9 @@ describe( 'adding blocks', () => {
 		// append the default block. Pressing backspace on the focused block
 		// will remove it.
 		await page.keyboard.type( '/image' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Image')]`
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();

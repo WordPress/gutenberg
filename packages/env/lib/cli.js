@@ -168,7 +168,7 @@ module.exports = function cli() {
 	yargs.command(
 		'destroy',
 		wpRed(
-			'Destroy the WordPress environment. Delete docker containers and remove local files.'
+			'Destroy the WordPress environment. Deletes docker containers, volumes, and networks associated with the WordPress environment and removes local files.'
 		),
 		() => {},
 		withSpinner( env.destroy )

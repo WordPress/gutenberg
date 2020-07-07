@@ -138,12 +138,14 @@ export const UI = {
 	background: BASE.white,
 	backgroundDisabled: LIGHT_GRAY[ 200 ],
 	brand: BLUE.wordpress[ 700 ],
-	border: BASE.black,
+	border: G2.darkGray.primary,
 	borderFocus: BLUE.medium.focus,
 	borderDisabled: DARK_GRAY[ 700 ],
 	borderLight: LIGHT_GRAY[ 600 ],
 	label: DARK_GRAY[ 500 ],
 	textDisabled: DARK_GRAY[ 150 ],
+	textDark: BASE.white,
+	textLight: BASE.black,
 };
 
 export const COLORS = {

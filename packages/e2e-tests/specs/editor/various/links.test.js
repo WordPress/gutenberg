@@ -7,6 +7,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Links', () => {
@@ -300,9 +301,7 @@ describe( 'Links', () => {
 		// Make a collapsed selection inside the link
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowRight' );
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		await showBlockToolbar();
 		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
 		await editButton.click();
 		await waitForAutoFocus();

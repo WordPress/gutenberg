@@ -59,12 +59,17 @@ export const _default = () => {
 		bottomLeft: boolean( 'enable.bottomLeft', false ),
 		topLeft: boolean( 'enable.topLeft', false ),
 	};
+	const __experimentalShowTooltip = boolean(
+		'__experimentalShowTooltip',
+		false
+	);
 
 	const props = {
 		enable,
 		minHeight,
 		minWidth,
 		showHandle,
+		__experimentalShowTooltip,
 	};
 
 	return (

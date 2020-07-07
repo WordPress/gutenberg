@@ -47,10 +47,6 @@ describe( 'cpt locking', () => {
 		await page.click(
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 		);
-		// Hover the block switcher to show the movers
-		await page.hover(
-			'.block-editor-block-toolbar .block-editor-block-toolbar__block-switcher-wrapper'
-		);
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
 		await page.type(
@@ -114,14 +110,14 @@ describe( 'cpt locking', () => {
 				'.wp-block-column .block-editor-button-block-appender'
 			);
 			await page.type( '.block-editor-inserter__search-input', 'image' );
-			await page.keyboard.press( 'Tab' );
+			await pressKeyTimes( 'Tab', 2 );
 			await page.keyboard.press( 'Enter' );
 			await page.click( '.edit-post-header-toolbar__inserter-toggle' );
 			await page.type(
 				'.block-editor-inserter__search-input',
 				'gallery'
 			);
-			await page.keyboard.press( 'Tab' );
+			await pressKeyTimes( 'Tab', 2 );
 			await page.keyboard.press( 'Enter' );
 			expect( await page.$( '.wp-block-gallery' ) ).not.toBeNull();
 		} );

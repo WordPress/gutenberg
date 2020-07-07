@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.16.0 (2020-06-15)
+
 ### New Feature
 
 -   Added `getPathAndQueryString`.
