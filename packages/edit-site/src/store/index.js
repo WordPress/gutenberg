@@ -23,8 +23,20 @@ export default function registerEditSiteStore( initialState ) {
 		initialState,
 	} );
 
+	const { showOnFront, pageOnFront } = initialState.home;
+	const initialPage = {
+		path: '/',
+		context:
+			showOnFront === 'page'
+				? {
+						postType: 'page',
+						postId: pageOnFront,
+				  }
+				: {},
+	};
+
 	// We set the initial page here to include the template fetch which will
 	// resolve the correct homepage template.
-	store.dispatch( actions.setPage( initialState.page ) );
+	store.dispatch( actions.setupState( initialPage ) );
 	return store;
 }

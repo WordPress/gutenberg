@@ -145,6 +145,9 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 	$settings['styles'] = gutenberg_get_editor_styles();
 
+	$settings['showOnFront'] = get_option( 'show_on_front' );
+	$settings['pageOnFront'] = get_option( 'page_on_front' );
+
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.
 	global $post;

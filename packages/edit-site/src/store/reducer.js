@@ -172,11 +172,6 @@ export function home( state = {}, action ) {
 				...state,
 				templateId: action.templateId,
 			};
-		case 'SET_SHOW_ON_FRONT':
-			return {
-				...state,
-				showOnFront: action.showOnFront,
-			};
 	}
 
 	return state;
