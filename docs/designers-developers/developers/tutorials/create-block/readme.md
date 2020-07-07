@@ -14,7 +14,7 @@ From your plugins directory, to create your block run:
 npx @wordpress/create-block starter-block
 ```
 
-The above command will ask you a few questions to customize, then will create a new directory called `starter-block`, installs the necessary files, and builds the block plugin.
+The above command creates a new directory called `starter-block`, installs the necessary files, and builds the block plugin. If you want an interactive mode that prompts you for details, run the command without the `starter-block` name.
 
 You now need to activate the plugin from inside wp-admin plugins page.
 
