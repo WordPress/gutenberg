@@ -54,10 +54,7 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 export function initialize( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
 
-	const initialState = settings.editSiteInitialState;
-	delete settings.editSiteInitialState;
-	initialState.settings = settings;
-	registerEditSiteStore( initialState );
+	registerEditSiteStore( { settings } );
 
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
