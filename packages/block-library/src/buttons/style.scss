@@ -16,7 +16,6 @@
 	margin-left: $grid-unit-10;
 
 	&:first-child {
-		/*rtl:ignore*/
 		margin-left: 0;
 	}
 }
@@ -28,7 +27,6 @@
 	margin-right: $grid-unit-10;
 
 	&:last-child {
-		/*rtl:ignore*/
 		margin-right: 0;
 	}
 }

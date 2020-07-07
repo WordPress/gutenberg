@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { getPath } from '@wordpress/url';
+
+/**
  * Loads a JavaScript file.
  *
  * @param {string} asset The url for this file.
@@ -6,7 +11,7 @@
  * @return {Promise} Promise which will resolve when the asset is loaded.
  */
 export const loadScript = ( asset ) => {
-	if ( ! asset || ! /\.js$/.test( asset ) ) {
+	if ( ! asset || ! /\.js$/.test( getPath( asset ) ) ) {
 		return Promise.reject( new Error( 'No script found.' ) );
 	}
 	return new Promise( ( resolve, reject ) => {
@@ -30,7 +35,7 @@ export const loadScript = ( asset ) => {
  * @return {Promise} Promise which will resolve when the asset is added.
  */
 export const loadStyle = ( asset ) => {
-	if ( ! asset || ! /\.css$/.test( asset ) ) {
+	if ( ! asset || ! /\.css$/.test( getPath( asset ) ) ) {
 		return Promise.reject( new Error( 'No style found.' ) );
 	}
 	return new Promise( ( resolve, reject ) => {
@@ -60,7 +65,7 @@ export function loadAssets( assets ) {
 const controls = {
 	LOAD_ASSETS( { assets } ) {
 		const scripts = assets.map( ( asset ) =>
-			asset.match( /\.js$/ ) !== null
+			getPath( asset ).match( /\.js$/ ) !== null
 				? loadScript( asset )
 				: loadStyle( asset )
 		);

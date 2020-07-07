@@ -157,7 +157,6 @@ export default function InsertionPoint( {
 					focusOnMount={ false }
 					className="block-editor-block-list__insertion-point-popover"
 					__unstableSlotName="block-toolbar"
-					__unstableFixedPosition={ false }
 				>
 					<div
 						className="block-editor-block-list__insertion-point"
@@ -187,6 +186,7 @@ export default function InsertionPoint( {
 							<Inserter
 								position="bottom center"
 								clientId={ inserterClientId }
+								__experimentalIsQuick
 							/>
 						</div>
 					</div>

@@ -10,7 +10,7 @@ import {
 	useState,
 	useLayoutEffect,
 	useReducer,
-	useRef,
+	useMemo,
 } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
@@ -60,14 +60,35 @@ function useMovingAnimation(
 		0
 	);
 	const [ finishedAnimation, endAnimation ] = useReducer( counterReducer, 0 );
-	const [ transform, setTransform ] = useState( {
-		x: 0,
-		y: 0,
-		clientTop: 0,
-	} );
+	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
+	const previous = useMemo(
+		() => ( ref.current ? getAbsolutePosition( ref.current ) : null ),
+		[ triggerAnimationOnChange ]
+	);
 
-	const previous = ref.current ? getAbsolutePosition( ref.current ) : null;
-	const scrollContainer = useRef();
+	// Calculate the previous position of the block relative to the viewport and
+	// return a function to maintain that position by scrolling.
+	const preserveScrollPosition = useMemo( () => {
+		if ( ! adjustScrolling || ! ref.current ) {
+			return () => {};
+		}
+
+		const scrollContainer = getScrollContainer( ref.current );
+
+		if ( ! scrollContainer ) {
+			return () => {};
+		}
+
+		const prevRect = ref.current.getBoundingClientRect();
+		return () => {
+			const blockRect = ref.current.getBoundingClientRect();
+			const diff = blockRect.top - prevRect.top;
+
+			if ( diff ) {
+				scrollContainer.scrollTop += diff;
+			}
+		};
+	}, [ triggerAnimationOnChange, adjustScrolling ] );
 
 	useLayoutEffect( () => {
 		if ( triggeredAnimation ) {
@@ -79,37 +100,22 @@ function useMovingAnimation(
 			return;
 		}
 
-		scrollContainer.current = getScrollContainer( ref.current );
-
 		if ( prefersReducedMotion ) {
-			if ( adjustScrolling && scrollContainer.current ) {
-				// if the animation is disabled and the scroll needs to be adjusted,
-				// just move directly to the final scroll position
-				ref.current.style.transform = '';
-				const destination = getAbsolutePosition( ref.current );
-				scrollContainer.current.scrollTop =
-					scrollContainer.current.scrollTop -
-					previous.top +
-					destination.top;
-			}
+			// if the animation is disabled and the scroll needs to be adjusted,
+			// just move directly to the final scroll position.
+			preserveScrollPosition();
 
 			return;
 		}
 
 		ref.current.style.transform = '';
 		const destination = getAbsolutePosition( ref.current );
-		const x = Math.round( previous.left - destination.left );
-		const y = Math.round( previous.top - destination.top );
-		ref.current.style.transform =
-			x === 0 && y === 0 ? '' : `translate3d(${ x }px,${ y }px,0)`;
-		const blockRect = ref.current.getBoundingClientRect();
-		const newTransform = {
-			x,
-			y,
-			clientTop: blockRect.top,
-		};
+
 		triggerAnimation();
-		setTransform( newTransform );
+		setTransform( {
+			x: Math.round( previous.left - destination.left ),
+			y: Math.round( previous.top - destination.top ),
+		} );
 	}, [ triggerAnimationOnChange ] );
 
 	// Only called when either the x or y value changes.
@@ -125,18 +131,7 @@ function useMovingAnimation(
 			: `translate3d(${ x }px,${ y }px,0)`;
 		ref.current.style.zIndex = ! isSelected || isMoving ? '' : '1';
 
-		if (
-			adjustScrolling &&
-			scrollContainer.current &&
-			! prefersReducedMotion
-		) {
-			const blockRect = ref.current.getBoundingClientRect();
-			const diff = blockRect.top - transform.clientTop;
-
-			if ( diff ) {
-				scrollContainer.current.scrollTop += diff;
-			}
-		}
+		preserveScrollPosition();
 	}
 
 	// Called for every frame computed by useSpring.

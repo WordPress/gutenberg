@@ -32,7 +32,7 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'addTemplate', () => {
-		it( 'should yield the DISPATCH control to create the template and return the ADD_TEMPLATE action', () => {
+		it( 'should yield the DISPATCH control to create the template and return the SET_TEMPLATE action', () => {
 			const template = { slug: 'index' };
 			const newTemplate = { id: 1 };
 
@@ -45,7 +45,7 @@ describe( 'actions', () => {
 			} );
 			expect( it.next( newTemplate ) ).toEqual( {
 				value: {
-					type: 'ADD_TEMPLATE',
+					type: 'SET_TEMPLATE',
 					templateId: newTemplate.id,
 				},
 				done: true,
@@ -54,7 +54,7 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'removeTemplate', () => {
-		it( 'should yield the API_FETCH control, yield the SELECT control to set the page by yielding the DISPATCH control for the SET_PAGE action, and return the REMOVE_TEMPLATE action', () => {
+		it( 'should yield the API_FETCH control and yield the SELECT control to set the page by yielding the DISPATCH control for the SET_PAGE action', () => {
 			const templateId = 1;
 			const page = { path: '/' };
 
@@ -72,18 +72,12 @@ describe( 'actions', () => {
 				selectorName: 'getPage',
 				args: [],
 			} );
+			// @FIXME: Test for done: true.
 			expect( it.next( page ).value ).toEqual( {
 				type: 'DISPATCH',
 				storeKey: 'core/edit-site',
 				actionName: 'setPage',
 				args: [ page ],
-			} );
-			expect( it.next() ).toEqual( {
-				value: {
-					type: 'REMOVE_TEMPLATE',
-					templateId,
-				},
-				done: true,
 			} );
 		} );
 	} );

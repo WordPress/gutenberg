@@ -29,7 +29,7 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.click( ':focus .block-editor-button-block-appender' );
 	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
 	await page.keyboard.type( 'Paragraph' );
-	await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
 	await page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
@@ -40,7 +40,7 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.click( ':focus .block-editor-button-block-appender' );
 	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
 	await page.keyboard.type( 'Paragraph' );
-	await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
 	await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 

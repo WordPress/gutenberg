@@ -70,11 +70,8 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'validation', () => {
-		it( 'should not call onChange if the new value is lower than minimum', () => {
-			const onChange = jest.fn();
-			const { container } = render(
-				<RangeControl onChange={ onChange } min={ 11 } value={ 20 } />
-			);
+		it( 'should not apply new value is lower than minimum', () => {
+			const { container } = render( <RangeControl min={ 11 } /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
@@ -82,15 +79,11 @@ describe( 'RangeControl', () => {
 			fireEvent.change( numberInput, { target: { value: '10' } } );
 			fireEvent.blur( numberInput );
 
-			expect( onChange ).not.toHaveBeenCalled();
-			expect( rangeInput.value ).toBe( '20' );
+			expect( rangeInput.value ).not.toBe( '10' );
 		} );
 
-		it( 'should not call onChange if the new value is greater than maximum', () => {
-			const onChange = jest.fn();
-			const { container } = render(
-				<RangeControl onChange={ onChange } max={ 20 } value={ 10 } />
-			);
+		it( 'should not apply new value is greater than maximum', () => {
+			const { container } = render( <RangeControl max={ 20 } /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
@@ -98,19 +91,13 @@ describe( 'RangeControl', () => {
 			fireEvent.change( numberInput, { target: { value: '21' } } );
 			fireEvent.blur( numberInput );
 
-			expect( onChange ).not.toHaveBeenCalled();
-			expect( rangeInput.value ).toBe( '10' );
+			expect( rangeInput.value ).not.toBe( '21' );
 		} );
 
 		it( 'should call onChange if new value is valid', () => {
 			const onChange = jest.fn();
 			const { container } = render(
-				<RangeControl
-					onChange={ onChange }
-					min={ 10 }
-					max={ 20 }
-					value={ 10 }
-				/>
+				<RangeControl onChange={ onChange } min={ 10 } max={ 20 } />
 			);
 
 			const rangeInput = getRangeInput( container );
@@ -124,14 +111,8 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should validate when provided a max or min of zero', () => {
-			const onChange = jest.fn();
 			const { container } = render(
-				<RangeControl
-					onChange={ onChange }
-					min={ -100 }
-					max={ 0 }
-					value={ 0 }
-				/>
+				<RangeControl min={ -100 } max={ 0 } />
 			);
 
 			const rangeInput = getRangeInput( container );
@@ -140,19 +121,12 @@ describe( 'RangeControl', () => {
 			fireEvent.change( numberInput, { target: { value: '1' } } );
 			fireEvent.blur( numberInput );
 
-			expect( onChange ).not.toHaveBeenCalled();
 			expect( rangeInput.value ).toBe( '0' );
 		} );
 
 		it( 'should validate when min and max are negative', () => {
-			const onChange = jest.fn();
 			const { container } = render(
-				<RangeControl
-					onChange={ onChange }
-					min={ -100 }
-					max={ -50 }
-					value={ -60 }
-				/>
+				<RangeControl min={ -100 } max={ -50 } />
 			);
 
 			const rangeInput = getRangeInput( container );
@@ -161,19 +135,16 @@ describe( 'RangeControl', () => {
 			fireEvent.change( numberInput, { target: { value: '-101' } } );
 			fireEvent.blur( numberInput );
 
-			expect( onChange ).not.toHaveBeenCalled();
-			expect( rangeInput.value ).toBe( '-60' );
+			expect( rangeInput.value ).toBe( '-100' );
 
 			fireEvent.change( numberInput, { target: { value: '-49' } } );
 			fireEvent.blur( numberInput );
 
-			expect( onChange ).not.toHaveBeenCalled();
-			expect( rangeInput.value ).toBe( '-60' );
+			expect( rangeInput.value ).toBe( '-50' );
 
 			fireEvent.change( numberInput, { target: { value: '-50' } } );
 			fireEvent.blur( numberInput );
 
-			expect( onChange ).toHaveBeenCalledWith( -50 );
 			expect( rangeInput.value ).toBe( '-50' );
 		} );
 
@@ -184,7 +155,6 @@ describe( 'RangeControl', () => {
 					onChange={ onChange }
 					min={ 0.1 }
 					step={ 0.125 }
-					value={ 0.1 }
 				/>
 			);
 
@@ -194,8 +164,8 @@ describe( 'RangeControl', () => {
 			fireEvent.change( numberInput, { target: { value: '0.125' } } );
 			fireEvent.blur( numberInput );
 
-			expect( onChange ).not.toHaveBeenCalled();
-			expect( rangeInput.value ).toBe( '0.1' );
+			expect( onChange ).toHaveBeenCalledWith( 0.125 );
+			expect( rangeInput.value ).toBe( '0.125' );
 
 			fireEvent.change( numberInput, { target: { value: '0.225' } } );
 			fireEvent.blur( numberInput );
@@ -267,7 +237,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should update both field and range on change', () => {
-			const { container } = render( <RangeControl value={ 0 } /> );
+			const { container } = render( <RangeControl /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
@@ -285,13 +255,10 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should reset input values if next value is removed', () => {
-			const { container } = render( <RangeControl value={ 13 } /> );
+			const { container } = render( <RangeControl /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
-
-			expect( rangeInput.value ).toBe( '13' );
-			expect( numberInput.value ).toBe( '13' );
 
 			fireEvent.change( numberInput, { target: { value: '' } } );
 			fireEvent.blur( numberInput );
@@ -308,8 +275,7 @@ describe( 'RangeControl', () => {
 			const spy = jest.fn();
 			const { container } = render(
 				<RangeControl
-					initialPosition={ 50 }
-					value={ 10 }
+					initialPosition={ 10 }
 					allowReset={ true }
 					onChange={ spy }
 					resetFallbackValue={ 33 }
@@ -328,15 +294,12 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
-			const spy = jest.fn();
 			const { container } = render(
 				<RangeControl
 					initialPosition={ undefined }
-					value={ 10 }
 					min={ 0 }
 					max={ 100 }
 					allowReset={ true }
-					onChange={ spy }
 					resetFallbackValue={ undefined }
 				/>
 			);
@@ -349,7 +312,6 @@ describe( 'RangeControl', () => {
 
 			expect( rangeInput.value ).toBe( '50' );
 			expect( numberInput.value ).toBe( '' );
-			expect( spy ).toHaveBeenCalledWith( undefined );
 		} );
 	} );
 } );
