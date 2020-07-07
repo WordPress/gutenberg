@@ -133,4 +133,4 @@ export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 
 // Utilities
-export { useColorExtract, useControlledState } from './utils/hooks';
+export { useColorExtract } from './utils/hooks';
