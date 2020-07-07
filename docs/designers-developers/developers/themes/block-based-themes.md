@@ -77,6 +77,8 @@ As of Gutenberg 8.5, there are two ways to create and edit templates within Gute
 
 You can navigate to the temporary "Templates" admin menu under "Appearance" `wp-admin/edit.php?post_type=wp_template` and use this as a playground to edit your templates. Add blocks here and switch to the code editor mode to grab the HTML of the template when you are done. Afterwards, you can paste that markup into a file within in your theme directory.
 
+Please note that the "Templates" admin menu under "Appearance" will _not_ list templates that are bundled with your theme. It only lists new templates created by the specific WordPress site you're working on. 
+
 ### Edit Templates within the Full-site Editor
 
 To begin, create a blank template file within your theme. For example: `mytheme/block-templates/index.html`. Afterwards, open the Full-site editor. Your new template should appear as the active template, and should be blank. Add blocks as you normally would using Gutenberg. You can add and create template parts directly using the "Template Parts" block. 
@@ -84,6 +86,8 @@ To begin, create a blank template file within your theme. For example: `mytheme/
 Repeat for any additional templates you'd like to bundle with your theme. 
 
 When you're done, click the "Export Theme" option in the "Tools" (ellipsis) menu of the site editor. This will provide you with a ZIP download of all the templates and template parts you've created in the site editor. These new HTML files can be placed directly into your theme. 
+
+Note that when you export template parts this way, the template part block markup will include a `postID` attribute that can be safely removed when distributing your theme. 
 
 ## Templates CPT
 
