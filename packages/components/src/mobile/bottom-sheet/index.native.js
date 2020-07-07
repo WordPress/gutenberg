@@ -550,7 +550,7 @@ class BottomSheet extends Component {
 							onOpenEnd={ this.openEnd }
 							onCloseStart={ this.closeStart }
 							onCloseEnd={ this.closeEnd }
-							ref={ this.bottomSheetRef }
+							innerRef={ this.bottomSheetRef }
 							enabledInnerScrolling={
 								this.shouldScroll && scrollEnabled
 							}
@@ -563,8 +563,8 @@ class BottomSheet extends Component {
 	}
 }
 
-function BottomSheetHOC( props ) {
-	return <BottomSheetReanimated { ...props } />;
+function BottomSheetHOC( { innerRef, ...props } ) {
+	return <BottomSheetReanimated ref={ innerRef } { ...props } />;
 }
 
 const BottomSheetWithRootView = gestureHandlerRootHOC( BottomSheetHOC );
