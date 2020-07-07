@@ -14,6 +14,7 @@ import {
 	KeyboardShortcuts,
 	PanelBody,
 	Popover,
+	TextControl,
 	TextareaControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -58,7 +59,7 @@ function NavigationLinkEdit( {
 	mergeBlocks,
 	onReplace,
 } ) {
-	const { label, opensInNewTab, url, description } = attributes;
+	const { label, opensInNewTab, url, description, rel } = attributes;
 	const link = {
 		url,
 		opensInNewTab,
@@ -169,6 +170,14 @@ function NavigationLinkEdit( {
 						help={ __(
 							'The description will be displayed in the menu if the current theme supports it.'
 						) }
+					/>
+					<TextControl
+						value={ rel || '' }
+						onChange={ ( relValue ) => {
+							setAttributes( { rel: relValue } );
+						} }
+						label={ __( 'Link rel' ) }
+						autoComplete="off"
 					/>
 				</PanelBody>
 			</InspectorControls>
