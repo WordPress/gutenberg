@@ -111,7 +111,8 @@ const setupLocale = ( locale, extraTranslations ) => {
 		return;
 	}
 
-	const registerCoreBlocks = require( '@wordpress/block-library' ).registerCoreBlocks;
+	const registerCoreBlocks = require( '@wordpress/block-library' )
+		.registerCoreBlocks;
 	registerCoreBlocks();
 	blocksRegistered = true;
 };
