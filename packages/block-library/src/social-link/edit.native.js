@@ -13,9 +13,10 @@ import {
 	ToolbarButton,
 	LinkSettings,
 } from '@wordpress/components';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { link, Icon } from '@wordpress/icons';
+import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
@@ -45,8 +46,9 @@ const SocialLinkEdit = ( {
 	setAttributes,
 	isSelected,
 	onFocus,
+	name,
 } ) => {
-	const { url, service } = attributes;
+	const { url, service = name } = attributes;
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
 	const [ hasUrl, setHasUrl ] = useState( !! url );
 
@@ -193,4 +195,15 @@ const SocialLinkEdit = ( {
 	);
 };
 
-export default SocialLinkEdit;
+export default compose( [
+	withSelect( ( select, { clientId } ) => {
+		const { getBlock } = select( 'core/block-editor' );
+
+		const block = getBlock( clientId );
+		const name = block.name.substring( 17 );
+
+		return {
+			name,
+		};
+	} ),
+] )( SocialLinkEdit );

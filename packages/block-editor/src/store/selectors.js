@@ -1323,7 +1323,7 @@ export const getInserterItems = createSelector(
 			return {
 				id,
 				name: blockType.name,
-				initialAttributes: blockType.initialAttributes || {},
+				initialAttributes: {},
 				title: blockType.title,
 				description: blockType.description,
 				icon: blockType.icon,
