@@ -459,6 +459,7 @@ export function isTextField( element ) {
 		'range',
 		'reset',
 		'submit',
+		'number',
 	];
 	return (
 		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
