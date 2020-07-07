@@ -382,6 +382,7 @@ class EmptyListComponent extends Component {
 		if ( renderFooterAppender ) {
 			return null;
 		}
+
 		return (
 			<View style={ styles.defaultAppender }>
 				<ReadableContentView>

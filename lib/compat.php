@@ -340,6 +340,7 @@ add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
  * This can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/50278
+ * @see https://core.trac.wordpress.org/changeset/48177
  *
  * @param array[] $default_categories Array of block categories.
  *
@@ -401,6 +402,7 @@ add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
  * This can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/49927
+ * @see https://core.trac.wordpress.org/changeset/48243
  *
  * @param string|null $pre_render   The pre-rendered content. Defaults to null.
  * @param array       $parsed_block The parsed block being rendered.
@@ -458,20 +460,6 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	return $block->render();
 }
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
-
-/**
- * Avoid enqueueing block assets of all registered blocks for all posts, instead
- * deferring to block render mechanics to enqueue scripts, thereby ensuring only
- * blocks of the content have their assets enqueued.
- *
- * This can be removed once minimum support for the plugin is outside the range
- * of the version associated with closure of the following ticket.
- *
- * @see https://core.trac.wordpress.org/ticket/50328
- *
- * @see WP_Block::render
- */
-remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
 
 /**
  * Shim that hooks into `wp_update_nav_menu_item` and makes it so that nav menu

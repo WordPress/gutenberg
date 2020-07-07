@@ -9,8 +9,6 @@ import {
 	getTemplateId,
 	getTemplatePartId,
 	getTemplateType,
-	getTemplateIds,
-	getTemplatePartIds,
 	getPage,
 	getShowOnFront,
 } from '../selectors';
@@ -128,20 +126,6 @@ describe( 'selectors', () => {
 		it( 'returns the template type', () => {
 			const state = { templateType: {} };
 			expect( getTemplateType( state ) ).toBe( state.templateType );
-		} );
-	} );
-
-	describe( 'getTemplateIds', () => {
-		it( 'returns the template IDs', () => {
-			const state = { templateIds: {} };
-			expect( getTemplateIds( state ) ).toBe( state.templateIds );
-		} );
-	} );
-
-	describe( 'getTemplatePartIds', () => {
-		it( 'returns the template part IDs', () => {
-			const state = { templatePartIds: {} };
-			expect( getTemplatePartIds( state ) ).toBe( state.templatePartIds );
 		} );
 	} );
 
