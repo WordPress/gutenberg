@@ -38,7 +38,9 @@ class PostTitle extends Component {
 			! prevProps.isAnyBlockSelected &&
 			this.props.isAnyBlockSelected
 		) {
-			this.richTextRef.blur();
+			if ( this.richTextRef ) {
+				this.richTextRef.blur();
+			}
 			this.props.onUnselect();
 		}
 	}
