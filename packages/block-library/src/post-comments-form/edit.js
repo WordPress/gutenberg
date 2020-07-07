@@ -1,3 +1,3 @@
 export default function PostCommentsFormEdit() {
-	return 'Post Comments Form Placeholder';
+	return 'Post Comments Form';
 }
