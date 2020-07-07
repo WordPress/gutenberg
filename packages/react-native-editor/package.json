@@ -34,6 +34,7 @@
 		"@react-native-community/masked-view": "^0.1.10",
 		"@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#5ad284d92b8d886e366445bf215be741ed53ddc6",
 		"@react-navigation/native": "^5.6.1",
+		"@react-navigation/stack": "5.6.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
