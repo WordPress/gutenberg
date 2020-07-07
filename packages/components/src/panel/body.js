@@ -4,17 +4,12 @@
 import classnames from 'classnames';
 import { noop } from 'lodash';
 import mergeRefs from 'react-merge-refs';
-import {
-	useDisclosureState,
-	Disclosure,
-	DisclosureContent,
-} from 'reakit/Disclosure';
 
 /**
  * WordPress dependencies
  */
 import { useReducedMotion } from '@wordpress/compose';
-import { forwardRef, useEffect, useRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
 /**
@@ -22,40 +17,30 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
  */
 import Button from '../button';
 import Icon from '../icon';
-import { useUpdateEffect } from '../utils';
+import { useControlledState, useUpdateEffect } from '../utils';
 
 export function PanelBody(
-	{
-		children,
-		className,
-		icon,
-		initialOpen: initialOpenProp,
-		onToggle = noop,
-		opened,
-		title,
-	},
+	{ children, className, icon, initialOpen, onToggle = noop, opened, title },
 	ref
 ) {
-	const initialOpen = useRef( initialOpenProp ).current;
-	const disclosure = useDisclosureState( {
-		visible: initialOpen !== undefined ? initialOpen : opened,
-	} );
+	const [ isOpened, setIsOpened ] = useControlledState(
+		initialOpen !== undefined ? initialOpen : opened
+	);
 	const nodeRef = useRef();
 
 	// Defaults to 'smooth' scrolling
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
 	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
-	const isOpened = disclosure.visible;
 
-	const currentOnToggle = useRef( onToggle );
-
-	useEffect( () => {
-		currentOnToggle.current = onToggle;
-	}, [ onToggle ] );
+	const handleOnToggle = () => {
+		const next = ! isOpened;
+		setIsOpened( next );
+		onToggle( next );
+	};
 
 	// Runs after initial render
 	useUpdateEffect( () => {
-		if ( disclosure.visible ) {
+		if ( isOpened ) {
 			/*
 			 * Scrolls the content into view when visible.
 			 * This improves the UX when there are multiple stacking <PanelBody />
@@ -69,13 +54,7 @@ export function PanelBody(
 				} );
 			}
 		}
-
-		currentOnToggle.current( disclosure.visible );
-	}, [ disclosure.visible, scrollBehavior ] );
-
-	useUpdateEffect( () => {
-		disclosure.setVisible( opened );
-	}, [ disclosure.setVisible, opened ] );
+	}, [ isOpened, scrollBehavior ] );
 
 	const classes = classnames( 'components-panel__body', className, {
 		'is-opened': isOpened,
@@ -83,10 +62,13 @@ export function PanelBody(
 
 	return (
 		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
-			<PanelBodyTitle title={ title } icon={ icon } { ...disclosure } />
-			<DisclosureContent { ...disclosure }>
-				{ children }
-			</DisclosureContent>
+			<PanelBodyTitle
+				icon={ icon }
+				isOpened={ isOpened }
+				onClick={ handleOnToggle }
+				title={ title }
+			/>
+			{ isOpened && children }
 		</div>
 	);
 }
@@ -97,8 +79,7 @@ const PanelBodyTitle = forwardRef(
 
 		return (
 			<h2 className="components-panel__body-title">
-				<Disclosure
-					as={ Button }
+				<Button
 					className="components-panel__body-toggle"
 					ref={ ref }
 					{ ...props }
@@ -121,12 +102,13 @@ const PanelBodyTitle = forwardRef(
 							size={ 20 }
 						/>
 					) }
-				</Disclosure>
+				</Button>
 			</h2>
 		);
 	}
 );
 
 const ForwardedComponent = forwardRef( PanelBody );
+ForwardedComponent.displayName = 'PanelBody';
 
 export default ForwardedComponent;
