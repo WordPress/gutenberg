@@ -39,6 +39,7 @@ import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
@@ -413,6 +414,7 @@ public class WPAndroidGlueCode {
                 new RNScreensPackage(),
                 new SafeAreaContextPackage(),
                 new RNCMaskedViewPackage(),
+                new ReanimatedPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
