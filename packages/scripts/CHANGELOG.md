@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 12.1.0 (2020-07-06)
-
 ### Enhancements
 
 -   Update webpack configuration to preserve translator comments in minified output.
