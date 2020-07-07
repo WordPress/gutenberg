@@ -17,11 +17,11 @@ The site editor is similar to the block editor, but for the site layout instead 
 
 Two new menus have been added to the top toolbar of the editor:
 
-One that shows a list of posts, pages and categories, and indicates the item that is being edited.
+One that shows a list of posts, pages and categories, and indicates the item that is assigned as the front page.
 
 ![Site editor toolbar page menu](https://github.com/carolinan/gutenberg/raw/add/docs-block-based-themes/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-page-menu.png)
 
-And a list of templates and template parts. Hovering over the parts will show a preview.
+And a list of templates and template parts, that indicates the item that is being edited. Hovering over the parts will show a preview.
 
 ![Site editor toolbar template menu](https://github.com/carolinan/gutenberg/raw/add/docs-block-based-themes/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-template-menu.png)
 
