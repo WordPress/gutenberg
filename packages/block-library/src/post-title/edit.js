@@ -66,7 +66,7 @@ export default function PostTitleEdit( {
 					[ `has-text-align-${ align }` ]: align,
 				} ) }
 			>
-				{ post.title }
+				{ post.title || 'Post Title' }
 			</Block>
 		</>
 	);
