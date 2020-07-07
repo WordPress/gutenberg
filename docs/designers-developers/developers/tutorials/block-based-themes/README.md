@@ -4,7 +4,7 @@ The purpose of this tutorial is to show how to create a basic block based theme
 and help theme developers transition to full site editing.
 
 You will learn about the required files, how to combine templates and template parts,
-how to add presets for global styles, and how to add blocks and export the templates in the site edtior.
+how to add presets for global styles, and how to add blocks and export the templates in the site editor.
 
 Full site editing is an experimental feature and the workflow in this tutorial is likely to change.
 This tutorial was written for Gutenberg version 8.5.
@@ -29,7 +29,7 @@ for example index, single or archive.
 Templates can optionally include structural template parts, for example a header, footer or sidebar.
 
 Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the HTML, for the selected blocks.
-The block HTML is generated in and exported from the **Site editor**. It can also be added to the themes HTML files manually.
+The block HTML is generated in and exported from the **site editor**. It can also be added to the themes HTML files manually.
 
 ### Required files and file structure
 A block based theme requires an index.php file, and index template file, a style.css file and a functions.php file.
