@@ -148,3 +148,14 @@ export function getPage( state ) {
 export function getShowOnFront( state ) {
 	return state.home.showOnFront;
 }
+
+/**
+ * Returns the site's current `page_on_front` setting.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number?} The setting.
+ */
+export function getPageOnFront( state ) {
+	return state.home.pageOnFront;
+}
