@@ -53,10 +53,10 @@ function withBackCompat( rawConfig ) {
 		rawConfig.env = {
 			...( rawConfig.env || {} ),
 			tests: {
+				port: rawConfig.testsPort,
 				...( rawConfig.env && rawConfig.env.tests
 					? rawConfig.env.tests
 					: {} ),
-				port: rawConfig.testsPort,
 			},
 		};
 	}
