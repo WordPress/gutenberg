@@ -1,14 +1,32 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View, Text, Animated } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
+
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useContext,
+	useRef,
+	useCallback,
+} from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { ColorControl, PanelBody } from '@wordpress/components';
+import {
+	BottomSheetConsumer,
+	ColorControl,
+	PanelBody,
+	BottomSheetContext,
+} from '@wordpress/components';
+import {
+	useRoute,
+	useFocusEffect,
+	useNavigation,
+} from '@react-navigation/native';
 /**
  * Internal dependencies
  */
@@ -19,30 +37,166 @@ import CustomGradientPicker from '../../custom-gradient-picker';
 import NavigationHeader from '../bottom-sheet/navigation-header';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
-import { performLayoutAnimation } from '../layout-animation';
 
 import styles from './style.scss';
 
-function ColorSettings( {
-	label,
-	onColorChange,
-	onGradientChange,
-	colorValue,
-	onReplaceSubsheet,
-	shouldEnableBottomSheetScroll,
-	shouldDisableBottomSheetMaxHeight,
-	isBottomSheetContentScrolling,
-	onCloseBottomSheet,
-	onHardwareButtonPress,
-	defaultSettings,
-} ) {
-	const [ currentValue, setCurrentValue ] = useState( colorValue );
-	const [ isCustomScreen, setIsCustomScreen ] = useState( false );
-	const [ isCustomGradientScreen, setIsCustomGradientScreen ] = useState(
-		false
+const BottomSheetScreen = ( { children, setHeight } ) => {
+	const height = useRef( { maxHeight: 0 } );
+	useFocusEffect(
+		useCallback( () => {
+			if ( height.current.maxHeight !== 0 ) {
+				setHeight( height.current.maxHeight );
+			}
+			return () => {};
+		}, [] )
 	);
 
-	const { segments, subsheets, isGradient } = colorsUtils;
+	const onLayout = ( e ) => {
+		if ( height.current.maxHeight !== e.nativeEvent.layout.height ) {
+			height.current.maxHeight = e.nativeEvent.layout.height;
+			setHeight( e.nativeEvent.layout.height );
+		}
+	};
+	return <View onLayout={ onLayout }>{ children }</View>;
+};
+
+const forFade = ( { current } ) => ( {
+	cardStyle: {
+		opacity: current.progress,
+	},
+} );
+const Stack = createStackNavigator();
+
+function ColorSettings( { defaultSettings } ) {
+	const route = useRoute();
+	const heightValue = useRef( new Animated.Value( 1 ) ).current;
+	const {
+		onCloseBottomSheet,
+		shouldDisableBottomSheetMaxHeight,
+	} = useContext( BottomSheetContext );
+	const setHeight = ( maxHeight ) => {
+		if ( heightValue !== maxHeight ) {
+			heightValue.setValue( maxHeight );
+		}
+	};
+
+	useEffect( () => {
+		shouldDisableBottomSheetMaxHeight( true );
+		onCloseBottomSheet( null );
+	}, [] );
+
+	// function afterHardwareButtonPress() {
+	// onHardwareButtonPress( null );
+	// shouldDisableBottomSheetMaxHeight( true );
+	// }
+
+	const PaletteScreenView = useRef( () => (
+		<BottomSheetScreen setHeight={ setHeight } name={ 'palete' }>
+			<PaletteScreen />
+		</BottomSheetScreen>
+	) );
+
+	const PickerScreenView = useRef( () => (
+		<BottomSheetScreen setHeight={ setHeight } name={ 'Picker' }>
+			<PickerScreen />
+		</BottomSheetScreen>
+	) );
+
+	const GradientPickerView = useRef( () => (
+		<BottomSheetScreen setHeight={ setHeight } name={ 'Gradient' }>
+			<GradientPickerScreen />
+		</BottomSheetScreen>
+	) );
+
+	return (
+		<Animated.View style={ { height: heightValue } }>
+			<Stack.Navigator
+				screenOptions={ {
+					headerShown: false,
+					gestureEnabled: false,
+				} }
+			>
+				<Stack.Screen
+					name="Palette"
+					component={ PaletteScreenView.current }
+					options={ { cardStyleInterpolator: forFade } }
+					initialParams={ { defaultSettings, ...route.params } }
+				/>
+				<Stack.Screen
+					name="Picker"
+					component={ PickerScreenView.current }
+					options={ { cardStyleInterpolator: forFade } }
+				/>
+				<Stack.Screen
+					name="GradientPicker"
+					component={ GradientPickerView.current }
+					options={ { cardStyleInterpolator: forFade } }
+				/>
+			</Stack.Navigator>
+		</Animated.View>
+	);
+}
+
+export default ColorSettings;
+
+const PickerScreen = () => {
+	const route = useRoute();
+	const navigation = useNavigation();
+	const {
+		onShouldEnableInnerHandling,
+		shouldDisableBottomSheetMaxHeight,
+		onCloseBottomSheet,
+		isBottomSheetContentScrolling,
+	} = useContext( BottomSheetContext );
+	const { setColor, currentValue, isGradientColor } = route.params;
+	return (
+		<ColorPicker
+			onShouldEnableInnerHandling={ onShouldEnableInnerHandling }
+			shouldDisableBottomSheetMaxHeight={
+				shouldDisableBottomSheetMaxHeight
+			}
+			setColor={ setColor }
+			activeColor={ currentValue }
+			isGradientColor={ isGradientColor }
+			onNavigationBack={ navigation.goBack }
+			onCloseBottomSheet={ onCloseBottomSheet }
+			isBottomSheetContentScrolling={ isBottomSheetContentScrolling }
+		/>
+	);
+};
+
+const GradientPickerScreen = () => {
+	const route = useRoute();
+	const navigation = useNavigation();
+	const { setColor, currentValue, isGradientColor } = route.params;
+	return (
+		<View>
+			<NavigationHeader
+				screen={ __( 'Customize Gradient' ) }
+				leftButtonOnPress={ navigation.goBack }
+			/>
+			<CustomGradientPicker
+				setColor={ setColor }
+				currentValue={ currentValue }
+				isGradientColor={ isGradientColor }
+			/>
+		</View>
+	);
+};
+
+const PaletteScreen = () => {
+	const route = useRoute();
+	const navigation = useNavigation();
+	const {
+		label,
+		onColorChange,
+		onGradientChange,
+		colorValue,
+		defaultSettings,
+	} = route.params || {};
+	const { segments, isGradient } = colorsUtils;
+
+	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const isGradientColor = isGradient( currentValue );
 	const selectedSegmentIndex = isGradientColor ? 1 : 0;
 
@@ -50,64 +204,15 @@ function ColorSettings( {
 		segments[ selectedSegmentIndex ]
 	);
 
-	const isSolidSegment = currentSegment === segments[ 0 ];
-	const isCustomGadientShown = ! isSolidSegment && isGradientColor;
-
 	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.horizontalSeparator,
 		styles.horizontalSeparatorDark
 	);
 
-	useEffect( () => {
-		onHardwareButtonPress( () => {
-			if ( isCustomScreen ) {
-				onCustomScreenToggle( false );
-			} else if ( isCustomGradientScreen ) {
-				onCustomGradientScreenToggle( false );
-			} else {
-				onReplaceSubsheet(
-					subsheets[ 0 ],
-					{},
-					afterHardwareButtonPress()
-				);
-			}
-		} );
-	}, [ isCustomScreen, isCustomGradientScreen ] );
+	const isSolidSegment = currentSegment === segments[ 0 ];
+	const isCustomGadientShown = ! isSolidSegment && isGradientColor;
 
-	useEffect( () => {
-		performLayoutAnimation();
-	}, [ isCustomGadientShown ] );
-
-	useEffect( () => {
-		setCurrentSegment( segments[ selectedSegmentIndex ] );
-		shouldDisableBottomSheetMaxHeight( true );
-		onCloseBottomSheet( null );
-	}, [] );
-
-	function afterHardwareButtonPress() {
-		onHardwareButtonPress( null );
-		shouldDisableBottomSheetMaxHeight( true );
-	}
-
-	function onCustomScreenToggle( shouldShow ) {
-		performLayoutAnimation();
-		setIsCustomScreen( shouldShow );
-	}
-
-	function onCustomGradientScreenToggle( shouldShow ) {
-		performLayoutAnimation();
-		setIsCustomGradientScreen( shouldShow );
-	}
-
-	function onCustomPress() {
-		if ( isSolidSegment ) {
-			onCustomScreenToggle( true );
-		} else {
-			onCustomGradientScreenToggle( true );
-		}
-	}
-
-	function setColor( color ) {
+	const setColor = ( color ) => {
 		setCurrentValue( color );
 		if ( isSolidSegment && onColorChange && onGradientChange ) {
 			onColorChange( color );
@@ -117,6 +222,23 @@ function ColorSettings( {
 		} else if ( ! isSolidSegment && onGradientChange ) {
 			onGradientChange( color );
 			onColorChange( '' );
+		}
+	};
+
+	function onCustomPress() {
+		if ( isSolidSegment ) {
+			navigation.navigate( 'Picker', {
+				setColor,
+				isGradientColor,
+				currentValue,
+			} );
+		} else {
+			navigation.navigate( 'GradientPicker', {
+				setColor,
+				isGradientColor,
+				currentValue,
+				isSolidSegment,
+			} );
 		}
 	}
 
@@ -160,41 +282,18 @@ function ColorSettings( {
 	}
 
 	return (
-		<View renderToHardwareTextureAndroid>
-			{ isCustomScreen && (
-				<View>
-					<ColorPicker
-						shouldEnableBottomSheetScroll={
-							shouldEnableBottomSheetScroll
-						}
-						shouldDisableBottomSheetMaxHeight={
-							shouldDisableBottomSheetMaxHeight
-						}
-						setColor={ setColor }
-						activeColor={ currentValue }
-						isGradientColor={ isGradientColor }
-						onNavigationBack={ () => onCustomScreenToggle( false ) }
-						onCloseBottomSheet={ onCloseBottomSheet }
-						isBottomSheetContentScrolling={
-							isBottomSheetContentScrolling
-						}
-					/>
-				</View>
-			) }
-			{ ! isCustomScreen && ! isCustomGradientScreen && (
+		<BottomSheetConsumer>
+			{ ( { shouldEnableBottomSheetScroll } ) => (
 				<View>
 					<NavigationHeader
 						screen={ label }
-						leftButtonOnPress={ () =>
-							onReplaceSubsheet( subsheets[ 0 ] )
-						}
+						leftButtonOnPress={ navigation.goBack }
 					/>
 					<ColorPalette
 						setColor={ setColor }
 						activeColor={ currentValue }
 						isGradientColor={ isGradientColor }
 						currentSegment={ currentSegment }
-						isCustomScreen={ isCustomScreen }
 						onCustomPress={ onCustomPress }
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
@@ -207,9 +306,7 @@ function ColorSettings( {
 							<PanelBody>
 								<ColorControl
 									label={ __( 'Customize Gradient' ) }
-									onPress={ () =>
-										onCustomGradientScreenToggle( true )
-									}
+									onPress={ onCustomPress }
 									withColorIndicator={ false }
 								/>
 							</PanelBody>
@@ -219,23 +316,6 @@ function ColorSettings( {
 					{ getFooter() }
 				</View>
 			) }
-			{ isCustomGradientScreen && (
-				<View>
-					<NavigationHeader
-						screen={ __( 'Customize Gradient' ) }
-						leftButtonOnPress={ () =>
-							onCustomGradientScreenToggle( false )
-						}
-					/>
-					<CustomGradientPicker
-						setColor={ setColor }
-						currentValue={ currentValue }
-						isGradientColor={ isGradientColor }
-					/>
-				</View>
-			) }
-		</View>
+		</BottomSheetConsumer>
 	);
-}
-
-export default ColorSettings;
+};

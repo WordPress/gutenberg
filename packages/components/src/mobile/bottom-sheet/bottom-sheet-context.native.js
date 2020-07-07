@@ -18,10 +18,7 @@ if (
 
 // Context in BottomSheet is necessary for controlling the
 // transition flow between subsheets and replacing a content inside them
-export const {
-	Provider: BottomSheetProvider,
-	Consumer: BottomSheetConsumer,
-} = createContext( {
+export const BottomSheetContext = createContext( {
 	// Specifies whether content is currently scrolling
 	isBottomSheetContentScrolling: false,
 	// Function called to enable scroll within bottom sheet
@@ -41,3 +38,8 @@ export const {
 	// Specifies the currently active subsheet name
 	currentScreen: undefined,
 } );
+
+export const {
+	Provider: BottomSheetProvider,
+	Consumer: BottomSheetConsumer,
+} = BottomSheetContext;
