@@ -1,4 +1,4 @@
-# Adding blocks to you theme
+# Adding blocks to your theme
 
 Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the HTML, for the selected blocks.
 
@@ -62,4 +62,3 @@ Instead, the templates and template parts are saved as custom post types, that a
 
 Saved templates and template parts can be exported as a partial theme from the Tools menu in the site editor.
 The block HTML code can then be copied to the theme that you are editing.
-

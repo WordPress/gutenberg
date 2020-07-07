@@ -29,7 +29,7 @@ for example index, single or archive.
 Templates can optionally include structural template parts, for example a header, footer or sidebar.
 
 Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the HTML, for the selected blocks.
-The block HTML is generated in and exported from the **site editor**. It can also be added to the themes HTML files manually.
+The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
 
 ### Required files and file structure
 A block based theme requires an index.php file, and index template file, a style.css file and a functions.php file.
@@ -141,6 +141,9 @@ function myfirsttheme_setup() {
 endif; // myfirsttheme_setup
 add_action( 'after_setup_theme', 'myfirsttheme_setup' );
 
+/**
+ * Enqueue theme scripts and styles.
+ */
 function myfirsttheme_scripts() {
 	wp_enqueue_style( 'myfirsttheme-style', get_stylesheet_uri() );
 
