@@ -90,7 +90,7 @@ function addEditProps( settings ) {
 	return settings;
 }
 
-function useFontizes() {
+function useFontSizes() {
 	return useSelect(
 		( select ) => select( 'core/block-editor' ).getSettings().fontSizes
 	);
@@ -109,7 +109,7 @@ export function FontSizeEdit( props ) {
 		setAttributes,
 	} = props;
 	const isDisabled = useIsFontSizeDisabled( props );
-	const fontSizes = useFontizes();
+	const fontSizes = useFontSizes();
 
 	if ( isDisabled ) {
 		return null;
@@ -147,7 +147,7 @@ export function FontSizeEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const fontSizes = useFontizes();
+	const fontSizes = useFontSizes();
 	const hasFontSizes = fontSizes.length;
 
 	return (
@@ -165,12 +165,14 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
  */
 const withFontSizeInlineStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const fontSizes = useFontizes();
+		const fontSizes = useFontSizes();
 		const {
 			name: blockName,
 			attributes: { fontSize, style },
 			wrapperProps,
 		} = props;
+
+		const newProps = { ...props };
 
 		// Only add inline styles if the block supports font sizes, doesn't
 		// already have an inline font size, and does have a class to extract
@@ -186,7 +188,7 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 				style?.typography?.fontSize
 			).size;
 
-			props.wrapperProps = {
+			newProps.wrapperProps = {
 				...wrapperProps,
 				style: {
 					fontSize: fontSizeValue,
@@ -195,7 +197,7 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 			};
 		}
 
-		return <BlockListBlock { ...props } />;
+		return <BlockListBlock { ...newProps } />;
 	},
 	'withFontSizeInlineStyles'
 );

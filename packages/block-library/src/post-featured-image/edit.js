@@ -28,7 +28,7 @@ function PostFeaturedImageDisplay() {
 
 export default function PostFeaturedImageEdit() {
 	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return 'Post Featured Image Placeholder';
+		return 'Post Featured Image';
 	}
 	return <PostFeaturedImageDisplay />;
 }
