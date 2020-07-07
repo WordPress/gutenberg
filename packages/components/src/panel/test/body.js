@@ -25,16 +25,15 @@ describe( 'PanelBody', () => {
 			expect( panelBody.tagName ).toBe( 'DIV' );
 		} );
 
-		it( 'should render inner content', () => {
+		it( 'should render inner content, if opened', () => {
 			const { container } = render(
-				<PanelBody>
+				<PanelBody opened={ true }>
 					<div className="inner-content">Content</div>
 				</PanelBody>
 			);
 			const panelContent = getPanelBodyContent( container );
-			const content = panelContent.querySelector( '.inner-content' );
 
-			expect( content ).toBeTruthy();
+			expect( panelContent ).toBeTruthy();
 		} );
 
 		it( 'should be collapsed by default', () => {
@@ -45,7 +44,7 @@ describe( 'PanelBody', () => {
 			);
 			const panelContent = getPanelBodyContent( container );
 
-			expect( panelContent.style.display ).toBe( 'none' );
+			expect( panelContent ).toBeFalsy();
 		} );
 
 		it( 'should render as initially opened, if specified', () => {
@@ -56,7 +55,7 @@ describe( 'PanelBody', () => {
 			);
 			const panelContent = getPanelBodyContent( container );
 
-			expect( panelContent.style.display ).not.toBe( 'none' );
+			expect( panelContent ).toBeTruthy();
 		} );
 	} );
 
@@ -67,9 +66,9 @@ describe( 'PanelBody', () => {
 					<div>Content</div>
 				</PanelBody>
 			);
-			const panelContent = getPanelBodyContent( container );
+			let panelContent = getPanelBodyContent( container );
 
-			expect( panelContent.style.display ).not.toBe( 'none' );
+			expect( panelContent ).toBeTruthy();
 
 			act( () => {
 				rerender(
@@ -79,7 +78,9 @@ describe( 'PanelBody', () => {
 				);
 			} );
 
-			expect( panelContent.style.display ).toBe( 'none' );
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeFalsy();
 
 			act( () => {
 				rerender(
@@ -89,31 +90,37 @@ describe( 'PanelBody', () => {
 				);
 			} );
 
-			expect( panelContent.style.display ).not.toBe( 'none' );
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
 		} );
 
 		it( 'should toggle when clicking header', () => {
 			const { container } = render(
-				<PanelBody opened={ false } title="Panel">
+				<PanelBody title="Panel">
 					<div>Content</div>
 				</PanelBody>
 			);
-			const panelContent = getPanelBodyContent( container );
+			let panelContent = getPanelBodyContent( container );
 			const panelToggle = getPanelToggle( container );
 
-			expect( panelContent.style.display ).toBe( 'none' );
+			expect( panelContent ).toBeFalsy();
 
 			act( () => {
 				fireEvent.click( panelToggle );
 			} );
 
-			expect( panelContent.style.display ).not.toBe( 'none' );
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
 
 			act( () => {
 				fireEvent.click( panelToggle );
 			} );
 
-			expect( panelContent.style.display ).toBe( 'none' );
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeFalsy();
 		} );
 	} );
 } );
