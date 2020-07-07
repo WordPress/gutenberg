@@ -22,7 +22,9 @@ class ErrorBoundary extends Component {
 	}
 
 	reboot() {
-		this.props.onError();
+		if ( this.props.onError ) {
+			this.props.onError();
+		}
 	}
 
 	render() {
