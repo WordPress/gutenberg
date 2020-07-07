@@ -17,7 +17,6 @@ const ConvertToBlocksButton = ( { clientId } ) => {
 
 	return (
 		<ToolbarButton
-			title={ __( 'Convert to blocks' ) }
 			onClick={ () =>
 				replaceBlocks(
 					block.clientId,
