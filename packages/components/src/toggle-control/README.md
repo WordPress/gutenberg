@@ -6,6 +6,9 @@ ToggleControl is used to generate a toggle user interface.
 ## Usage
 
 Render a user interface to change fixed background setting.
+
+Here is an example using local state:
+
 ```jsx
 import { ToggleControl } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
@@ -20,6 +23,38 @@ const MyToggleControl = withState( {
 		onChange={ () => setState( ( state ) => ( { hasFixedBackground: ! state.hasFixedBackground } ) ) }
 	/>
 ) );
+```
+
+To use this inside a block to toggle a saveable value, use block attributes, e.g.
+
+```jsx
+import { registerBlockType } from '@wordpress/blocks';
+import { ToggleControl } from '@wordpress/components';
+
+registerBlockType( 'example/toggle', {
+	title: __( 'Example: Toggle Block', 'gutenberg-examples' ),
+	icon: 'universal-access-alt',
+	category: 'layout',
+	edit( { attributes, setAttributes } ) {
+		function onChange( event ) {
+			setAttributes( { toggleValue: !attributes.toggleValue } );
+		}
+
+		return (
+			<ToggleControl
+				label="Example Toggle"
+				help={ attributes.toggleValue ? 'Toggle is on' : 'Toggle is off' }
+				checked={ attributes.toggleValue }
+				onChange={ onChange }
+			/>
+		);
+	},
+	save( { attributes } ) {
+		return (
+			<p>{ attributes.toggleValue ? 'Toggle is on' : 'Toggle is off' }</p>
+		);
+	},
+} );
 ```
 
 ## Props
