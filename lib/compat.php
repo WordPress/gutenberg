@@ -572,6 +572,8 @@ add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_html_nav_menu_item', 1
 /**
  * Amends the paths to preload when initializing edit post.
  *
+ * @see https://core.trac.wordpress.org/ticket/50606
+ *
  * @since 8.4.0
  *
  * @param  array $preload_paths Default path list that will be preloaded.
