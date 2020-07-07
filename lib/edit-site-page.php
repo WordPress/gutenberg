@@ -145,18 +145,6 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 	$settings['styles'] = gutenberg_get_editor_styles();
 
-	$settings['editSiteInitialState'] = array();
-
-	$settings['editSiteInitialState']['templateType'] = 'wp_template';
-	$settings['editSiteInitialState']['showOnFront']  = get_option( 'show_on_front' );
-	$settings['editSiteInitialState']['page']         = array(
-		'path'    => '/',
-		'context' => 'page' === $settings['editSiteInitialState']['showOnFront'] ? array(
-			'postType' => 'page',
-			'postId'   => get_option( 'page_on_front' ),
-		) : array(),
-	);
-
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.
 	global $post;
