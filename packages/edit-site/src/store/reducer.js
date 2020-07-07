@@ -86,17 +86,6 @@ export function settings( state = {}, action ) {
 }
 
 /**
- * Reducer returning the home template ID.
- *
- * @param {Object} state Current state.
- *
- * @return {Object} Updated state.
- */
-export function homeTemplateId( state ) {
-	return state;
-}
-
-/**
  * Reducer returning the template ID.
  *
  * @param {Object} state  Current state.
@@ -159,7 +148,7 @@ export function templateType( state, action ) {
  *
  * @return {Object} Updated state.
  */
-export function page( state = {}, action ) {
+export function page( state, action ) {
 	switch ( action.type ) {
 		case 'SET_PAGE':
 			return action.page;
@@ -169,13 +158,27 @@ export function page( state = {}, action ) {
 }
 
 /**
- * Reducer returning the site's `show_on_front` setting.
+ * Reducer for information about the site's homepage.
  *
  * @param {Object} state Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function showOnFront( state ) {
+export function home( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_HOME_TEMPLATE':
+			return {
+				...state,
+				templateId: action.templateId,
+			};
+		case 'SET_SHOW_ON_FRONT':
+			return {
+				...state,
+				showOnFront: action.showOnFront,
+			};
+	}
+
 	return state;
 }
 
@@ -183,10 +186,9 @@ export default combineReducers( {
 	preferences,
 	deviceType,
 	settings,
-	homeTemplateId,
 	templateId,
 	templatePartId,
 	templateType,
 	page,
-	showOnFront,
+	home,
 } );
