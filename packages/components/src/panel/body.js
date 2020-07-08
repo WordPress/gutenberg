@@ -23,16 +23,17 @@ export function PanelBody(
 	{ children, className, icon, initialOpen, onToggle = noop, opened, title },
 	ref
 ) {
-	const [ isOpened, setIsOpened ] = useControlledState(
-		initialOpen !== undefined ? initialOpen : opened
-	);
+	const [ isOpened, setIsOpened ] = useControlledState( opened, {
+		initial: initialOpen === undefined ? true : initialOpen,
+	} );
 	const nodeRef = useRef();
 
 	// Defaults to 'smooth' scrolling
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
 	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
 
-	const handleOnToggle = () => {
+	const handleOnToggle = ( event ) => {
+		event.preventDefault();
 		const next = ! isOpened;
 		setIsOpened( next );
 		onToggle( next );

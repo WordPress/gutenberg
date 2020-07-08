@@ -36,7 +36,7 @@ describe( 'PanelBody', () => {
 			expect( panelContent ).toBeTruthy();
 		} );
 
-		it( 'should be collapsed by default', () => {
+		it( 'should be opened by default', () => {
 			const { container } = render(
 				<PanelBody>
 					<div>Content</div>
@@ -44,7 +44,7 @@ describe( 'PanelBody', () => {
 			);
 			const panelContent = getPanelBodyContent( container );
 
-			expect( panelContent ).toBeFalsy();
+			expect( panelContent ).toBeTruthy();
 		} );
 
 		it( 'should render as initially opened, if specified', () => {
@@ -97,7 +97,7 @@ describe( 'PanelBody', () => {
 
 		it( 'should toggle when clicking header', () => {
 			const { container } = render(
-				<PanelBody title="Panel">
+				<PanelBody title="Panel" initialOpen={ false }>
 					<div>Content</div>
 				</PanelBody>
 			);
