@@ -20,7 +20,7 @@ export default function MoreEdit( {
 	const onChangeInput = ( event ) => {
 		// Set defaultText to an empty string, allowing the user to clear/replace the input field's text
 		setPlaceholder( '' );
-		setAttributes( { customText: event.target.value ?? undefined } );
+		setAttributes( { customText: event.target.value || undefined } );
 	};
 
 	const onKeyDown = ( { keyCode } ) => {
@@ -35,7 +35,7 @@ export default function MoreEdit( {
 			: __( 'The excerpt is visible.' );
 
 	const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
-	const value = customText || placeholder;
+	const value = customText ?? placeholder;
 	const style = { width: `${ value.length + 1.2 }em` };
 
 	return (
