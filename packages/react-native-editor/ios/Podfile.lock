@@ -288,12 +288,12 @@ DEPENDENCIES:
   - ReactNativeDarkMode (from `../../../node_modules/react-native-dark-mode`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - RNTAztecView (from `../../react-native-aztec/RNTAztecView.podspec`)
-  - WordPress-Aztec-iOS (from `https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git`, tag `1.19.3`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - WordPress-Aztec-iOS
 
 EXTERNAL SOURCES:
   BVLinearGradient:
@@ -366,16 +366,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
     :path: "../../react-native-aztec/RNTAztecView.podspec"
-  WordPress-Aztec-iOS:
-    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
-    :tag: 1.19.3
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
-
-CHECKOUT OPTIONS:
-  WordPress-Aztec-iOS:
-    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
-    :tag: 1.19.3
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
@@ -417,6 +409,6 @@ SPEC CHECKSUMS:
   WordPress-Aztec-iOS: b7ac8b30f746992e85d9668453ac87c2cdcecf4f
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: 2e5afd9581065964b81dbfdfd8524d50d8ec89a2
+PODFILE CHECKSUM: b703f82e1c828f8c6c834418ae8356b9022ba86d
 
 COCOAPODS: 1.8.4
