@@ -1,4 +1,6 @@
-With each WordPress release cycle, various versions of Gutenberg are included. This has created confusion over time as people try to figure out how best to debug problems and report bugs appropriately. To make this easier for everyone to keep track of, this document serves as a canonical list of the Gutenberg versions integrated into each WordPress release. If anything looks incorrect here, please bring it up in #core-editor in [WordPress.org slack](https://make.wordpress.org/chat/).   
+With each WordPress release cycle, various versions of Gutenberg are included. This has created confusion over time as people try to figure out how best to debug problems and report bugs appropriately. To make this easier for everyone to keep track of, this document serves as a canonical list of the Gutenberg versions integrated into each WordPress release. Of note, during the beta period for WordPress releases, additional bug fixes from later Gutenberg releases than those noted are cherry-picked into the WordPress release as necessary. 
+
+If anything looks incorrect here, please bring it up in #core-editor in [WordPress.org slack](https://make.wordpress.org/chat/).   
 
 Gutenberg Versions | WordPress Version
 -- | --
