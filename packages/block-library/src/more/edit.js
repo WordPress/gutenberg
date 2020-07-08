@@ -10,7 +10,9 @@ import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 const DEFAULT_TEXT = __( 'Read more' );
 
 export default function MoreEdit( {
-	// we provide a default value as previously we allowed to save `undefined`, even though it wasn't clear to the UI
+	// Before refactoring we allowed saving empty customText with an `undefined` value
+	// but we misleadingly were showing the DEFAULT_TEXT.
+	// So for backwards compatibility we set the same Default value to custom text.
 	attributes: { customText = DEFAULT_TEXT, noTeaser },
 	insertBlocksAfter,
 	setAttributes,
