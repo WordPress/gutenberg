@@ -116,15 +116,6 @@ async function configureWordPress( environment, config, spinner ) {
 		setupCommands.push( `wp plugin activate ${ pluginSource.basename }` );
 	}
 
-	// Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
-	// file, we need to avoid loading it too early in our own wp-config.php. If
-	// we load it too early, then some things (like MULTISITE) will be defined
-	// before wp-phpunit has a chance to configure them. To avoid this, create a
-	// copy of wp-config.php for phpunit which doesn't require wp-settings.php.
-	setupCommands.push(
-		'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php'
-	);
-
 	if ( config.debug ) {
 		spinner.info(
 			`Running the following setup commands on the ${ environment } instance:\n - ${ setupCommands.join(
@@ -137,6 +128,24 @@ async function configureWordPress( environment, config, spinner ) {
 	await dockerRun( [ 'bash', '-c', setupCommands.join( ' && ' ) ], {
 		commandOptions: [ '--rm' ],
 	} );
+
+	// Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
+	// file, we need to avoid loading it too early in our own wp-config.php. If
+	// we load it too early, then some things (like MULTISITE) will be defined
+	// before wp-phpunit has a chance to configure them. To avoid this, create a
+	// copy of wp-config.php for phpunit which doesn't require wp-settings.php.
+	await dockerCompose.exec(
+		environment === 'development' ? 'wordpress' : 'tests-wordpress',
+		[
+			'sh',
+			'-c',
+			'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php',
+		],
+		{
+			config: config.dockerComposeConfigPath,
+			log: config.debug,
+		}
+	);
 }
 
 /**
