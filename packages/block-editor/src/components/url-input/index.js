@@ -82,17 +82,20 @@ class URLInput extends Component {
 		}
 
 		// Only attempt an update on suggestions if the input value has actually changed.
-		if (
-			prevProps.value !== value &&
-			this.shouldShowInitialSuggestions()
-		) {
-			this.updateSuggestions();
+		if ( prevProps.value !== value ) {
+			if ( this.shouldShowInitialSuggestions() ) {
+				this.updateSuggestions();
+			} else if ( this.shouldRefreshSuggestions() ) {
+				this.updateSuggestions( value );
+			}
 		}
 	}
 
 	componentDidMount() {
 		if ( this.shouldShowInitialSuggestions() ) {
 			this.updateSuggestions();
+		} else if ( this.shouldRefreshSuggestions() ) {
+			this.updateSuggestions( this.props.value );
 		}
 	}
 
@@ -118,6 +121,11 @@ class URLInput extends Component {
 			! ( value && value.length ) &&
 			! ( suggestions && suggestions.length )
 		);
+	}
+
+	shouldRefreshSuggestions() {
+		const { __experimentalOnlySuggestions = false } = this.props;
+		return ! this.isUpdatingSuggestions && __experimentalOnlySuggestions;
 	}
 
 	updateSuggestions( value = '' ) {
@@ -384,6 +392,7 @@ class URLInput extends Component {
 			value = '',
 			autoFocus = true,
 			__experimentalShowInitialSuggestions = false,
+			__experimentalOnlySuggestions: onlySuggestions = false,
 		} = this.props;
 
 		const {
@@ -423,29 +432,31 @@ class URLInput extends Component {
 					'is-full-width': isFullWidth,
 				} ) }
 			>
-				<input
-					className="block-editor-url-input__input"
-					autoFocus={ autoFocus }
-					type="text"
-					aria-label={ __( 'URL' ) }
-					required
-					value={ value }
-					onChange={ this.onChange }
-					onFocus={ this.onFocus }
-					onInput={ stopEventPropagation }
-					placeholder={ placeholder }
-					onKeyDown={ this.onKeyDown }
-					role="combobox"
-					aria-expanded={ showSuggestions }
-					aria-autocomplete="list"
-					aria-owns={ suggestionsListboxId }
-					aria-activedescendant={
-						selectedSuggestion !== null
-							? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
-							: undefined
-					}
-					ref={ this.inputRef }
-				/>
+				{ ! onlySuggestions && (
+					<input
+						className="block-editor-url-input__input"
+						autoFocus={ autoFocus }
+						type="text"
+						aria-label={ __( 'URL' ) }
+						required
+						value={ value }
+						onChange={ this.onChange }
+						onFocus={ this.onFocus }
+						onInput={ stopEventPropagation }
+						placeholder={ placeholder }
+						onKeyDown={ this.onKeyDown }
+						role="combobox"
+						aria-expanded={ showSuggestions }
+						aria-autocomplete="list"
+						aria-owns={ suggestionsListboxId }
+						aria-activedescendant={
+							selectedSuggestion !== null
+								? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
+								: undefined
+						}
+						ref={ this.inputRef }
+					/>
+				) }
 
 				{ loading && <Spinner /> }
 

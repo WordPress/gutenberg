@@ -482,7 +482,7 @@ function LinkControl( {
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				{ searchResultsLabel }
+				{ ! onlySuggestions && searchResultsLabel }
 				<div
 					{ ...suggestionsListProps }
 					className={ resultsListClasses }
