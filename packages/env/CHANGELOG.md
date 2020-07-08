@@ -2,13 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `config` and `mappings` options in `.wp-env.json` are now merged with any overrides instead of being overwritten.
+
 ### New Feature
 
 -   You may now specify specific configuration for different environments using `env.tests` or `env.development` in `.wp-env.json`.
-
-### Bug Fixes
-
--   The `config` and `mappings` options in `.wp-env.json` are now merged with any overrides instead of being overwritten.
 
 ## 1.6.0-rc.0 (2020-06-24)
 
