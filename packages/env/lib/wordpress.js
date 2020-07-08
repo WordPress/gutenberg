@@ -68,8 +68,9 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  *
  * @param {WPEnvironment} environment The environment to configure. Either 'development' or 'tests'.
  * @param {WPConfig}      config      The wp-env config object.
+ * @param {Object} spinner A CLI spinner which indicates progress.
  */
-async function configureWordPress( environment, config ) {
+async function configureWordPress( environment, config, spinner ) {
 	const options = {
 		config: config.dockerComposeConfigPath,
 		log: config.debug,
@@ -97,9 +98,11 @@ async function configureWordPress( environment, config ) {
 	const setupCommands = [];
 
 	// Set wp-config.php values.
-	for ( const [ key, value ] of Object.entries(
+	for ( let [ key, value ] of Object.entries(
 		config.env[ environment ].config
 	) ) {
+		// Add quotes around string values to work with multi-word strings better.
+		value = typeof value === 'string' ? `"${ value }"` : value;
 		setupCommands.push(
 			`wp config set ${ key } ${ value }${
 				typeof value !== 'string' ? ' --raw' : ''
@@ -112,12 +115,6 @@ async function configureWordPress( environment, config ) {
 		setupCommands.push( `wp plugin activate ${ pluginSource.basename }` );
 	}
 
-	// Activate the first theme.
-	const [ themeSource ] = config.env[ environment ].themeSources;
-	if ( themeSource ) {
-		setupCommands.push( `wp theme activate ${ themeSource.basename }` );
-	}
-
 	// Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
 	// file, we need to avoid loading it too early in our own wp-config.php. If
 	// we load it too early, then some things (like MULTISITE) will be defined
@@ -127,8 +124,16 @@ async function configureWordPress( environment, config ) {
 		'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php'
 	);
 
+	if ( config.debug ) {
+		spinner.info(
+			`Running the following setup commands on the ${ environment } instance:\n - ${ setupCommands.join(
+				'\n - '
+			) }\n`
+		);
+	}
+
 	// Execute all setup commands in a batch.
-	await dockerCompose.exec(
+	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
 		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
 		{
