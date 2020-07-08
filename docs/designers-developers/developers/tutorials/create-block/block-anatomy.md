@@ -41,6 +41,8 @@ The results of the edit function is what the editor will render to the editor pa
 
 The results of the save function is what the editor will insert into the **post_content** field when the post is saved. The post_content field is the field in the WordPress database used to store the content of the post.
 
+**Note:** The `block.json` file is also generated with your plugin. This file is used for registering with the block directory, as you change the properties you should update in both spots. _Development is on-going to simplify this process so only one location is required._
+
 ## Internationalization
 
 If you look at the generated `src/index.js` file, the block title and description are wrapped in a function that looks like this:

@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+## 12.1.0 (2020-07-07)
+
+### Enhancements
+
+-   Update webpack configuration to preserve translator comments in minified output.
+
 ### Bug Fixes
 
 -   Allow the CSS, SVG, and Sass loaders to process files from node_modules directory.
+-   Improve the way licenses are validated with `check-licenses` by falling back to license files verification when the entry in `package.json` doesn't contain an allowed match ([#23550](https://github.com/WordPress/gutenberg/pull/23550)).
+-   Fix `build` script error when importing `style.css` files ([#23710](https://github.com/WordPress/gutenberg/pull/23710)).
+-   Exclude `node_modules` from source map processing in `start` script ([#23711](https://github.com/WordPress/gutenberg/pull/23711)).
 
 ## 12.0.0-rc.0 (2020-06-24)
 

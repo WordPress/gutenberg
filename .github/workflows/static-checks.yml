@@ -1,9 +1,13 @@
-name: Linting
+name: Static Analysis (Linting, License, Type checks...)
 
-on: push
+on:
+  pull_request:
+  push:
+    branches: [master]
 
 jobs:
-  build:
+  check:
+    name: All
 
     runs-on: ubuntu-latest
 

@@ -63,9 +63,7 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 		list.remove( 'is-style-' + activeStyle.name );
 	}
 
-	if ( ! newStyle.isDefault ) {
-		list.add( 'is-style-' + newStyle.name );
-	}
+	list.add( 'is-style-' + newStyle.name );
 
 	return list.value;
 }

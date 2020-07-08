@@ -1,8 +1,8 @@
 .block-library-spacer__resize-container.has-show-handle {
-	background: $light-gray-200;
+	background: $gray-100;
 
 	.is-dark-theme & {
-		background: $light-opacity-light-200;
+		background: rgba($white, 0.15);
 	}
 }
 

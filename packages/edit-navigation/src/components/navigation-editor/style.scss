@@ -34,7 +34,7 @@
 		border: 0;
 
 		// Add a border after item groups to show as separator in the block toolbar.
-		border-right: $border-width solid $light-gray-500;
+		border-right: $border-width solid $gray-200;
 	}
 
 
@@ -108,5 +108,5 @@
 	padding-top: $grid-unit-20;
 	width: 100%;
 	text-align: left;
-	border-top: 1px solid $light-gray-300;
+	border-top: 1px solid $gray-200;
 }

@@ -22,8 +22,12 @@ import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import BlockDraggable from '../block-draggable';
 import { useShowMoversGestures, useToggleBlockHighlight } from './utils';
+import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
-export default function BlockToolbar( { hideDragHandle } ) {
+export default function BlockToolbar( {
+	hideDragHandle,
+	__experimentalExpandedControl = false,
+} ) {
 	const {
 		blockClientIds,
 		blockClientId,
@@ -31,7 +35,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		hasFixedToolbar,
 		isValid,
 		isVisual,
-		moverDirection,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -39,15 +42,11 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockRootClientId,
-			getBlockListSettings,
 			getSettings,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
-
-		const { __experimentalMoverDirection } =
-			getBlockListSettings( blockRootClientId ) || {};
 
 		return {
 			blockClientIds: selectedBlockClientIds,
@@ -63,7 +62,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
 			),
-			moverDirection: __experimentalMoverDirection,
 		};
 	}, [] );
 
@@ -100,8 +98,12 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		shouldShowMovers && 'is-showing-movers'
 	);
 
+	const Wrapper = __experimentalExpandedControl
+		? ExpandedBlockControlsContainer
+		: 'div';
+
 	return (
-		<div className={ classes }>
+		<Wrapper className={ classes }>
 			<div
 				className="block-editor-block-toolbar__mover-switcher-container"
 				ref={ nodeRef }
@@ -130,10 +132,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 								onDragEnd={ onDraggableEnd }
 							>
 								<BlockSwitcher clientIds={ blockClientIds } />
-								<BlockMover
-									clientIds={ blockClientIds }
-									__experimentalOrientation={ moverDirection }
-								/>
+								<BlockMover clientIds={ blockClientIds } />
 							</div>
 						) }
 					</BlockDraggable>
@@ -152,6 +151,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</div>
+		</Wrapper>
 	);
 }
