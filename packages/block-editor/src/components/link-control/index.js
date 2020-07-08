@@ -547,12 +547,12 @@ function LinkControl( {
 		);
 	};
 
+	const className = classnames( 'block-editor-link-control', {
+		'is-lite': onlySuggestions || 1,
+	} );
+
 	return (
-		<div
-			tabIndex={ -1 }
-			ref={ wrapperNode }
-			className="block-editor-link-control"
-		>
+		<div tabIndex={ -1 } ref={ wrapperNode } className={ className }>
 			{ isResolvingLink && (
 				<div className="block-editor-link-control__loading">
 					<Spinner /> { __( 'Creating' ) }…
