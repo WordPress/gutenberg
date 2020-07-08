@@ -332,6 +332,10 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Shortcode',
 		availableTransforms: [ 'Group' ],
 	},
+	'core__site-description': {
+		availableTransforms: [ 'Group' ],
+		originalBlock: 'Site Description',
+	},
 	'core__site-title': {
 		availableTransforms: [ 'Group' ],
 		originalBlock: 'Site Title',
