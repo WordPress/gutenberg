@@ -78,6 +78,16 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 />
 ```
 
+## Orientation
+
+By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style InnerBlocks to appear horizontally. When blocks are styled in such a way, the `orientation` prop can be used to indicate a horizontal layout:
+```js
+<InnerBlocks
+	orientation="horizontal"
+/>
+```
+
+Specifying this prop will result in the block movers being shown horizontally, and also ensure drag and drop works correctly.
 
 ## Template
 

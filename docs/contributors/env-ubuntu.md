@@ -1,18 +1,8 @@
 # How to setup local WordPress environment on Ubuntu
 
-This article covers setting up the local WordPress development environment using Docker on Ubuntu. The docker binaries included in the Ubuntu repositories (19.10 and earlier) do not support the features needed for the WordPress environment.
+This article covers setting up the local WordPress development environment using Docker on Ubuntu. The docker binaries included in the Ubuntu repositories (20.04 and earlier) do not support the features needed for the WordPress environment.
 
-If you are using Ubuntu 19.04 or 18.04, you can follow these [directions from Docker to install](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
-
-If you are using Ubuntu 19.10, Docker does not have a repository setup for this version. However, the binaries are the same as previous, so you can download the packages from: https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/
-
-Packages required:
-
--   `containerd.io_1.2.10-3_amd64.deb`
--   `docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb`
--   `docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb`
-
-Install using: `sudo dpkg -i *.deb`
+You can follow these [directions from Docker to install](https://docs.docker.com/install/linux/docker-ce/ubuntu/) or [download the packages manually](https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/) (download the last version of each and install using: `sudo dpkg -i *.deb`).
 
 Additionally, you need to install `docker-compose`, you can follow the [directions from Docker](https://docs.docker.com/compose/install/) or simply [download the latest binary](https://github.com/docker/compose/releases) from GitHub releases.
 
