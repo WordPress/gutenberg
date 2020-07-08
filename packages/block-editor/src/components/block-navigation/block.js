@@ -120,7 +120,7 @@ export default function BlockNavigationBlock( {
 						<TreeGridItem>
 							{ ( { ref, tabIndex, onFocus } ) => (
 								<BlockMoverUpButton
-									__experimentalOrientation="vertical"
+									orientation="vertical"
 									clientIds={ [ clientId ] }
 									ref={ ref }
 									tabIndex={ tabIndex }
@@ -131,7 +131,7 @@ export default function BlockNavigationBlock( {
 						<TreeGridItem>
 							{ ( { ref, tabIndex, onFocus } ) => (
 								<BlockMoverDownButton
-									__experimentalOrientation="vertical"
+									orientation="vertical"
 									clientIds={ [ clientId ] }
 									ref={ ref }
 									tabIndex={ tabIndex }
