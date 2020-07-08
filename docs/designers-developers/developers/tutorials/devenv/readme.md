@@ -88,7 +88,7 @@ wp-env --version
 > 1.6.0
 ```
 
-The `wp-env` script is used to create a Docker WordPress environment, to start use:
+The `wp-env` script is used to create a Docker WordPress environment, to use start from your plugin directory—if you are following the create block tutorial, this would be in the generated directory.
 
 ```sh
 wp-env start
@@ -96,7 +96,7 @@ wp-env start
 
 You can access your environment in your browser at: [http://localhost:8888/], the default username is `admin` and default password is `password`. For more information controlling the Docker enivironment see the [@wordpress/env package readme](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
 
-If you are developing a single plugin, you should run `wp-env start` from that plugin working directory—it will mount the plugin automatically. Note: This also works for themes, run from the directory you are developing the theme.
+If you are developing a single plugin, you should run `wp-env start` from that plugin working directory—it will mount and activate the plugin automatically. Note: This also works for themes, run from the directory you are developing the theme.
 
 If you want a single environment for all your plugins/themes, you need to create a `.wp-env.json` in a working directory and add the plugins/themes to it. You then run `wp-env start` from the same directory as that config file. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson).
 
