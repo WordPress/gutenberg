@@ -548,7 +548,7 @@ function LinkControl( {
 	};
 
 	const className = classnames( 'block-editor-link-control', {
-		'is-lite': onlySuggestions || 1,
+		'is-lite': onlySuggestions,
 	} );
 
 	return (
