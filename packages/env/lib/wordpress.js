@@ -71,29 +71,30 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  * @param {Object} spinner A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
-	const options = {
-		config: config.dockerComposeConfigPath,
-		log: config.debug,
+	const dockerRun = ( command, extraOptions ) => {
+		return dockerCompose.run(
+			environment === 'development' ? 'cli' : 'tests-cli',
+			command,
+			{
+				config: config.dockerComposeConfigPath,
+				log: config.debug,
+				...extraOptions,
+			}
+		);
 	};
 
-	const port = config.env[ environment ].port;
-
 	// Install WordPress.
-	await dockerCompose.run(
-		environment === 'development' ? 'cli' : 'tests-cli',
-		[
-			'wp',
-			'core',
-			'install',
-			`--url=localhost:${ port }`,
-			`--title=${ config.name }`,
-			'--admin_user=admin',
-			'--admin_password=password',
-			'--admin_email=wordpress@example.com',
-			'--skip-email',
-		],
-		options
-	);
+	await dockerRun( [
+		'wp',
+		'core',
+		'install',
+		`--url=localhost:${ config.env[ environment ].port }`,
+		`--title=${ config.name }`,
+		'--admin_user=admin',
+		'--admin_password=password',
+		'--admin_email=wordpress@example.com',
+		'--skip-email',
+	] );
 
 	const setupCommands = [];
 
@@ -133,14 +134,9 @@ async function configureWordPress( environment, config, spinner ) {
 	}
 
 	// Execute all setup commands in a batch.
-	await dockerCompose.run(
-		environment === 'development' ? 'cli' : 'tests-cli',
-		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
-		{
-			config: config.dockerComposeConfigPath,
-			log: config.debug,
-		}
-	);
+	await dockerRun( [ 'bash', '-c', setupCommands.join( ' && ' ) ], {
+		commandOptions: [ '--rm' ],
+	} );
 }
 
 /**
