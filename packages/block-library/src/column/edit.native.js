@@ -29,10 +29,7 @@ function ColumnEdit( {
 	getStylesFromColorScheme,
 	isParentSelected,
 	contentStyle,
-	parentWidth,
 } ) {
-	const hasWidth = Number.isFinite( width );
-
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
 	};
@@ -48,11 +45,6 @@ function ColumnEdit( {
 						),
 					contentStyle,
 					styles.columnPlaceholderNotSelected,
-					hasWidth && {
-						width: parentWidth * ( width / 100 ),
-						maxWidth: parentWidth,
-						minWidth: 36,
-					},
 				] }
 			></View>
 		);
@@ -76,10 +68,9 @@ function ColumnEdit( {
 						value={ width || 50 }
 						onChange={ ( nextWidth ) => {
 							setAttributes( {
-								width: Number( nextWidth.toFixed( 1 ) ),
+								width: nextWidth,
 							} );
 						} }
-						toFixed={ 1 }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -87,11 +78,6 @@ function ColumnEdit( {
 				style={ [
 					contentStyle,
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
-					hasWidth && {
-						width: parentWidth * ( width / 100 ),
-						maxWidth: parentWidth,
-						minWidth: 36,
-					},
 				] }
 			>
 				<InnerBlocks
