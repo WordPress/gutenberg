@@ -346,59 +346,61 @@ add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
  * @param WP_Scripts $scripts WP_Scripts object.
  */
 function gutenberg_add_date_settings_timezone( $scripts ) {
-	if ( did_action( 'init' ) ) {
-		global $wp_locale;
-
-		// calcualte the timezone abbr (EDT, PST) if possible.
-		$timezone_string = get_option( 'timezone_string', 'UTC' );
-		if ( empty( $timezone_string ) ) {
-			$timezone_abbr = '';
-		} else {
-			$timezone_date = new DateTime( null, new DateTimeZone( $timezone_string ) );
-			$timezone_abbr = $timezone_date->format( 'T' );
-		}
-
-		$scripts->add_inline_script(
-			'wp-date',
-			sprintf(
-				'wp.date.setSettings( %s );',
-				wp_json_encode(
-					array(
-						'l10n'     => array(
-							'locale'        => get_user_locale(),
-							'months'        => array_values( $wp_locale->month ),
-							'monthsShort'   => array_values( $wp_locale->month_abbrev ),
-							'weekdays'      => array_values( $wp_locale->weekday ),
-							'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
-							'meridiem'      => (object) $wp_locale->meridiem,
-							'relative'      => array(
-								/* translators: %s: Duration. */
-								'future' => __( '%s from now', 'default' ),
-								/* translators: %s: Duration. */
-								'past'   => __( '%s ago', 'default' ),
-							),
-						),
-						'formats'  => array(
-							/* translators: Time format, see https://www.php.net/date */
-							'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
-							/* translators: Date format, see https://www.php.net/date */
-							'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
-							/* translators: Date/Time format, see https://www.php.net/date */
-							'datetime'            => __( 'F j, Y g:i a', 'default' ),
-							/* translators: Abbreviated date/time format, see https://www.php.net/date */
-							'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
-						),
-						'timezone' => array(
-							'offset' => get_option( 'gmt_offset', 0 ),
-							'string' => get_option( 'timezone_string', 'UTC' ),
-							'abbr'   => $timezone_abbr,
-						),
-					)
-				)
-			),
-			'after'
-		);
+	if ( ! did_action( 'init' ) ) {
+		return;
 	}
+
+	global $wp_locale;
+
+	// Calculate the timezone abbr (EDT, PST) if possible.
+	$timezone_string = get_option( 'timezone_string', 'UTC' );
+	$timezone_abbr   = '';
+
+	if ( ! empty( $timezone_string ) ) {
+		$timezone_date = new DateTime( null, new DateTimeZone( $timezone_string ) );
+		$timezone_abbr = $timezone_date->format( 'T' );
+	}
+
+	$scripts->add_inline_script(
+		'wp-date',
+		sprintf(
+			'wp.date.setSettings( %s );',
+			wp_json_encode(
+				array(
+					'l10n'     => array(
+						'locale'        => get_user_locale(),
+						'months'        => array_values( $wp_locale->month ),
+						'monthsShort'   => array_values( $wp_locale->month_abbrev ),
+						'weekdays'      => array_values( $wp_locale->weekday ),
+						'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
+						'meridiem'      => (object) $wp_locale->meridiem,
+						'relative'      => array(
+							/* translators: %s: Duration. */
+							'future' => __( '%s from now', 'default' ),
+							/* translators: %s: Duration. */
+							'past'   => __( '%s ago', 'default' ),
+						),
+					),
+					'formats'  => array(
+						/* translators: Time format, see https://www.php.net/date */
+						'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
+						/* translators: Date format, see https://www.php.net/date */
+						'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
+						/* translators: Date/Time format, see https://www.php.net/date */
+						'datetime'            => __( 'F j, Y g:i a', 'default' ),
+						/* translators: Abbreviated date/time format, see https://www.php.net/date */
+						'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
+					),
+					'timezone' => array(
+						'offset' => get_option( 'gmt_offset', 0 ),
+						'string' => $timezone_string,
+						'abbr'   => $timezone_abbr,
+					),
+				)
+			)
+		),
+		'after'
+	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_add_date_settings_timezone', 20 );
 
