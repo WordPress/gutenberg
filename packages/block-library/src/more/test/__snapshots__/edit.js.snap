@@ -16,7 +16,6 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
     className="wp-block-more"
   >
     <input
-      onBlur={[Function]}
       onChange={[Function]}
       onKeyDown={[Function]}
       style={
@@ -47,7 +46,6 @@ exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
     className="wp-block-more"
   >
     <input
-      onBlur={[Function]}
       onChange={[Function]}
       onKeyDown={[Function]}
       style={
