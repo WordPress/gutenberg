@@ -15,7 +15,7 @@ export const Root = styled.div`
 `;
 
 const paddingStyles = ( { disableUnits } ) => {
-	const value = disableUnits ? 3 : 24;
+	const value = disableUnits ? 3 : 30;
 
 	return css`
 		${ rtl( { paddingRight: value } )() };
@@ -87,7 +87,7 @@ const baseUnitLabelStyles = ( props ) => {
 		position: absolute;
 		text-align-last: center;
 		text-transform: uppercase;
-		width: 20px;
+		width: 28px;
 
 		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
 		${ rtl( { right: 0 } )() }
