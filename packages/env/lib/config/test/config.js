@@ -252,6 +252,56 @@ describe( 'readConfig', () => {
 			} );
 		} );
 
+		it( 'should override plugins/themes on an environment level', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						plugins: [ './test1', './foo2' ],
+						themes: [ './test2', './foo' ],
+						env: {
+							development: {
+								plugins: [ './test1a' ],
+								themes: [ './test2a' ],
+							},
+							tests: {
+								plugins: [ './test1b' ],
+								themes: [ './test2b' ],
+							},
+						},
+					} )
+				)
+			);
+			const config = await readConfig( '.wp-env.json' );
+			expect( config.env.development.pluginSources ).toEqual( [
+				{
+					type: 'local',
+					path: expect.stringMatching( /^\/.*test1a$/ ),
+					basename: 'test1a',
+				},
+			] );
+			expect( config.env.development.themeSources ).toEqual( [
+				{
+					type: 'local',
+					path: expect.stringMatching( /^\/.*test2a$/ ),
+					basename: 'test2a',
+				},
+			] );
+			expect( config.env.tests.pluginSources ).toEqual( [
+				{
+					type: 'local',
+					path: expect.stringMatching( /^\/.*test1b$/ ),
+					basename: 'test1b',
+				},
+			] );
+			expect( config.env.tests.themeSources ).toEqual( [
+				{
+					type: 'local',
+					path: expect.stringMatching( /^\/.*test2b$/ ),
+					basename: 'test2b',
+				},
+			] );
+		} );
+
 		it( "should set testsPath on the 'core' source", async () => {
 			readFile.mockImplementation( () =>
 				Promise.resolve( JSON.stringify( { core: './relative' } ) )
