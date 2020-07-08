@@ -43,6 +43,10 @@ $input-size: 300px;
 		}
 	}
 
+	&.is-only-suggestions {
+		padding-top: $grid-unit-20;
+	}
+
 	.components-spinner {
 		position: absolute;
 		right: $input-padding;

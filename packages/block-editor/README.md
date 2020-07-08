@@ -210,6 +210,10 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="BlockToolbarContents" href="#BlockToolbarContents">#</a> **BlockToolbarContents**
+
+Undocumented declaration.
+
 <a name="BlockVerticalAlignmentToolbar" href="#BlockVerticalAlignmentToolbar">#</a> **BlockVerticalAlignmentToolbar**
 
 _Related_
@@ -400,6 +404,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
 
+<a name="LinkToolbarOverlay" href="#LinkToolbarOverlay">#</a> **LinkToolbarOverlay**
+
+Undocumented declaration.
+
 <a name="MediaPlaceholder" href="#MediaPlaceholder">#</a> **MediaPlaceholder**
 
 _Related_
@@ -559,6 +567,10 @@ _Related_
 <a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
 
 Undocumented declaration.
+
+<a name="useDisplayUrl" href="#useDisplayUrl">#</a> **useDisplayUrl**
+
+Allows to pass additional settings to the alignment hook.
 
 <a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
 

@@ -165,15 +165,18 @@ function LinkControl( {
 	showInitialSuggestions,
 	forceIsEditingLink,
 	createSuggestion,
+	onlySuggestions = false,
+	inputValue: propInputValue = '',
 } ) {
 	const cancelableOnCreate = useRef();
 	const cancelableCreateSuggestion = useRef();
 
 	const wrapperNode = useRef();
 	const instanceId = useInstanceId( LinkControl );
-	const [ inputValue, setInputValue ] = useState(
+	const [ internalInputValue, setInternalInputValue ] = useState(
 		( value && value.url ) || ''
 	);
+	const currentInputValue = propInputValue || internalInputValue;
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
@@ -249,7 +252,7 @@ function LinkControl( {
 	 * @param {string} val Current value returned by the search.
 	 */
 	const onInputChange = ( val = '' ) => {
-		setInputValue( val );
+		setInternalInputValue( val );
 	};
 
 	const handleDirectEntry = noDirectEntry
@@ -460,7 +463,7 @@ function LinkControl( {
 			: sprintf(
 					/* translators: %s: search term. */
 					__( 'Search results for "%s"' ),
-					inputValue
+					currentInputValue
 			  );
 
 		// VisuallyHidden rightly doesn't accept custom classNames
@@ -492,7 +495,7 @@ function LinkControl( {
 						) {
 							return (
 								<LinkControlSearchCreate
-									searchTerm={ inputValue }
+									searchTerm={ currentInputValue }
 									onClick={ async () => {
 										await handleOnCreate(
 											suggestion.title
@@ -534,7 +537,8 @@ function LinkControl( {
 								isURL={ directLinkEntryTypes.includes(
 									suggestion.type.toLowerCase()
 								) }
-								searchTerm={ inputValue }
+								searchTerm={ currentInputValue }
+								onlySuggestions={ onlySuggestions }
 							/>
 						);
 					} ) }
@@ -558,11 +562,11 @@ function LinkControl( {
 			{ ( isEditingLink || ! value ) && ! isResolvingLink && (
 				<LinkControlSearchInput
 					placeholder={ searchInputPlaceholder }
-					value={ inputValue }
+					value={ currentInputValue }
 					onChange={ onInputChange }
 					onSelect={ async ( suggestion ) => {
 						if ( CREATE_TYPE === suggestion.type ) {
-							await handleOnCreate( inputValue );
+							await handleOnCreate( currentInputValue );
 						} else if (
 							! noDirectEntry ||
 							Object.keys( suggestion ).length > 1
@@ -577,6 +581,7 @@ function LinkControl( {
 					fetchSuggestions={ getSearchHandler }
 					showInitialSuggestions={ showInitialSuggestions }
 					errorMessage={ errorMessage }
+					onlySuggestions={ onlySuggestions }
 				/>
 			) }
 
@@ -617,11 +622,13 @@ function LinkControl( {
 					</div>
 				</Fragment>
 			) }
-			<LinkControlSettingsDrawer
-				value={ value }
-				settings={ settings }
-				onChange={ onChange }
-			/>
+			{ ! onlySuggestions && (
+				<LinkControlSettingsDrawer
+					value={ value }
+					settings={ settings }
+					onChange={ onChange }
+				/>
+			) }
 		</div>
 	);
 }
