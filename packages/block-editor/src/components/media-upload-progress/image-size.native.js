@@ -6,7 +6,7 @@ import { Component } from '@wordpress/element';
 /**
  * External dependencies
  */
-import { View, Image } from 'react-native';
+import { View, Image as RNImage } from 'react-native';
 
 /**
  * Internal dependencies
@@ -21,6 +21,14 @@ function calculatePreferedImageSize( image, container ) {
 	return { width, height };
 }
 
+const Image = {
+	getSize: ( src, callback ) => {
+		let cancelled = false;
+		RNImage.getSize( src, ( ...args ) => ! cancelled && callback( ...args ) );
+		return { cancel: () => cancelled = true };
+	},
+};
+
 class ImageSize extends Component {
 	constructor() {
 		super( ...arguments );
@@ -29,6 +37,7 @@ class ImageSize extends Component {
 			height: undefined,
 		};
 		this.onLayout = this.onLayout.bind( this );
+		this.pendingGetSizeRequest = null;
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -52,7 +61,11 @@ class ImageSize extends Component {
 	}
 
 	fetchImageSize() {
-		Image.getSize( this.props.src, ( width, height ) => {
+		if ( this.getSizeRequest ) {
+			this.getSizeRequest.cancel();
+		}
+
+		this.getSizeRequest = Image.getSize( this.props.src, ( width, height ) => {
 			this.image = { width, height };
 			this.calculateSize();
 		} );
@@ -76,6 +89,12 @@ class ImageSize extends Component {
 			clientHeight: height,
 		};
 		this.calculateSize();
+	}
+
+	componentWillUnmount() {
+		if ( this.getSizeRequest ) {
+			this.getSizeRequest.cancel();
+		}
 	}
 
 	render() {
