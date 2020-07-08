@@ -65,6 +65,32 @@ module.exports = async function readConfig( configPath ) {
 		md5( configPath )
 	);
 
+	// Default configuration which is overridden by .wp-env.json files.
+	const defaultConfiguration = {
+		core: null,
+		plugins: [],
+		themes: [],
+		port: 8888,
+		mappings: {},
+		config: {
+			WP_DEBUG: true,
+			SCRIPT_DEBUG: true,
+			WP_PHP_BINARY: 'php',
+			WP_TESTS_EMAIL: 'admin@example.org',
+			WP_TESTS_TITLE: 'Test Blog',
+			WP_TESTS_DOMAIN: 'http://localhost',
+			WP_SITEURL: 'http://localhost',
+			WP_HOME: 'http://localhost',
+		},
+		env: {
+			development: {}, // No overrides needed, but it should exist.
+			tests: {
+				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
+				port: 8889,
+			},
+		},
+	};
+
 	// The specified base configuration from .wp-env.json or from the local
 	// source type which was automatically detected.
 	const baseConfig =
@@ -78,42 +104,15 @@ module.exports = async function readConfig( configPath ) {
 			configPath.replace( /\.wp-env\.json$/, '.wp-env.override.json' )
 		) ) || {};
 
-	// Configuration applicable to all environments.
-	const defaultWpServiceConfig = mergeWpServiceConfigs(
-		{
-			core: null,
-			plugins: [],
-			themes: [],
-			port: 8888,
-			mappings: {},
-			config: {
-				WP_DEBUG: true,
-				SCRIPT_DEBUG: true,
-				WP_PHP_BINARY: 'php',
-				WP_TESTS_EMAIL: 'admin@example.org',
-				WP_TESTS_TITLE: 'Test Blog',
-				WP_TESTS_DOMAIN: 'http://localhost',
-				WP_SITEURL: 'http://localhost',
-				WP_HOME: 'http://localhost',
-			},
-		},
-		baseConfig,
-		overrideConfig
+	// A quick validation before merging on a service by service level allows us
+	// to check the root configuration options and provide more helpful errors.
+	validateConfig(
+		mergeWpServiceConfigs( [
+			defaultConfiguration,
+			baseConfig,
+			overrideConfig,
+		] )
 	);
-
-	validateConfig( defaultWpServiceConfig );
-
-	// Configuration specific to each environment. Will be merged with any
-	// other specified environments.
-	const environmentDefaults = {
-		env: {
-			development: {}, // No overrides needed, but it should exist.
-			tests: {
-				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
-				port: 8889,
-			},
-		},
-	};
 
 	// A unique array of the environments specified in the config options.
 	// Needed so that we can override settings per-environment, rather than
@@ -121,26 +120,28 @@ module.exports = async function readConfig( configPath ) {
 	const getEnvKeys = ( config ) => Object.keys( config.env || {} );
 	const allEnvs = [
 		...new Set( [
-			...getEnvKeys( environmentDefaults ),
+			...getEnvKeys( defaultConfiguration ),
 			...getEnvKeys( baseConfig ),
 			...getEnvKeys( overrideConfig ),
 		] ),
 	];
 
-	const getEnvConfig = ( config, envName ) =>
-		config.env && config.env[ envName ] ? config.env[ envName ] : {};
+	// Returns a pair with the root config options and the specific environment config options.
+	const getEnvConfig = ( config, envName ) => [
+		config,
+		config.env && config.env[ envName ] ? config.env[ envName ] : {},
+	];
 
 	// Merge each of the specified environment-level overrides.
 	const allPorts = new Set(); // Keep track of unique ports for validation.
 	const env = allEnvs.reduce( ( result, environment ) => {
 		result[ environment ] = parseConfig(
 			validateConfig(
-				mergeWpServiceConfigs(
-					defaultWpServiceConfig,
-					getEnvConfig( environmentDefaults, environment ),
-					getEnvConfig( baseConfig, environment ),
-					getEnvConfig( overrideConfig, environment )
-				),
+				mergeWpServiceConfigs( [
+					...getEnvConfig( defaultConfiguration, environment ),
+					...getEnvConfig( baseConfig, environment ),
+					...getEnvConfig( overrideConfig, environment ),
+				] ),
 				environment
 			),
 			{
@@ -179,7 +180,7 @@ module.exports = async function readConfig( configPath ) {
  *
  * @return {Object} The merged configuration object.
  */
-function mergeWpServiceConfigs( ...configs ) {
+function mergeWpServiceConfigs( configs ) {
 	// Returns an array of nested values in the config object. For example,
 	// an array of all the wp-config objects.
 	const mergeNestedObjs = ( key ) =>
