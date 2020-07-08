@@ -37,22 +37,18 @@ export default function BlockParentSelector() {
 
 	if ( firstParentClientId !== undefined ) {
 		return (
-			<div
+			<ToolbarButton
 				className="block-editor-block-parent-selector"
+				onClick={ () => selectBlock( firstParentClientId ) }
+				label={ sprintf(
+					/* translators: %s: Name of the block's parent. */
+					__( 'Select parent (%s)' ),
+					parentBlockType.title
+				) }
+				showTooltip
+				icon={ <BlockIcon icon={ parentBlockType.icon } /> }
 				key={ firstParentClientId }
-			>
-				<ToolbarButton
-					className="block-editor-block-parent-selector__button"
-					onClick={ () => selectBlock( firstParentClientId ) }
-					label={ sprintf(
-						/* translators: %s: Name of the block's parent. */
-						__( 'Select parent (%s)' ),
-						parentBlockType.title
-					) }
-					showTooltip
-					icon={ <BlockIcon icon={ parentBlockType.icon } /> }
-				/>
-			</div>
+			/>
 		);
 	}
 

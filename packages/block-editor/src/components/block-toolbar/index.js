@@ -1,16 +1,10 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
+import { ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
-import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -21,7 +15,7 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
-import { useShowMoversGestures } from './utils';
+import { useElementHoverFocusGestures } from './utils';
 import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
 export default function BlockToolbar( {
@@ -32,7 +26,7 @@ export default function BlockToolbar( {
 		blockClientIds,
 		blockClientId,
 		blockType,
-		hasFixedToolbar,
+		hasParent,
 		hasReducedUI,
 		isValid,
 		isVisual,
@@ -40,6 +34,7 @@ export default function BlockToolbar( {
 		const {
 			getBlockName,
 			getBlockMode,
+			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockRootClientId,
@@ -56,9 +51,9 @@ export default function BlockToolbar( {
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
-			hasFixedToolbar: settings.hasFixedToolbar,
 			hasReducedUI: settings.hasReducedUI,
 			rootClientId: blockRootClientId,
+			hasParent: getBlockParents( selectedBlockClientId ).length > 0,
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
 			),
@@ -71,28 +66,21 @@ export default function BlockToolbar( {
 	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
 	const nodeRef = useRef();
 
-	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
-		{
-			ref: nodeRef,
-			onChange( isFocused ) {
-				if ( isFocused && hasReducedUI ) {
-					return;
-				}
-				toggleBlockHighlight( blockClientId, isFocused );
-			},
-		}
-	);
-
-	const displayHeaderToolbar =
-		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
+	const showBlockHighlightGestures = useElementHoverFocusGestures( {
+		ref: nodeRef,
+		onChange( isFocused ) {
+			if ( isFocused && hasReducedUI ) {
+				return;
+			}
+			toggleBlockHighlight( blockClientId, isFocused );
+		},
+	} );
 
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
 			return null;
 		}
 	}
-
-	const shouldShowMovers = displayHeaderToolbar || showMovers;
 
 	if ( blockClientIds.length === 0 ) {
 		return null;
@@ -101,23 +89,18 @@ export default function BlockToolbar( {
 	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
 
-	const classes = classnames(
-		'block-editor-block-toolbar',
-		shouldShowMovers && 'is-showing-movers'
-	);
-
 	const Wrapper = __experimentalExpandedControl
 		? ExpandedBlockControlsContainer
 		: 'div';
 
 	return (
-		<Wrapper className={ classes }>
-			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ! isMultiToolbar && (
-					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
-						<BlockParentSelector clientIds={ blockClientIds } />
-					</div>
-				) }
+		<Wrapper className="block-editor-block-toolbar">
+			{ hasParent && ! isMultiToolbar && (
+				<ToolbarGroup className="block-editor-block-toolbar__block-parent-selector-wrapper">
+					<BlockParentSelector clientIds={ blockClientIds } />
+				</ToolbarGroup>
+			) }
+			<div ref={ nodeRef } { ...showBlockHighlightGestures }>
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 						<BlockSwitcher clientIds={ blockClientIds } />
