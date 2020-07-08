@@ -155,6 +155,41 @@ describe( 'readConfig', () => {
 				true
 			);
 		} );
+
+		it( 'should match snapshot', async () => {
+			// Note: did not add sources to this config because they include absolute
+			// paths which would be different elsewhere.
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						port: 2000,
+						config: {
+							TEST_VAL1: 1,
+							TEST_VAL2: 'hello',
+							TEST_VAL3: false,
+						},
+						env: {
+							development: {
+								config: {
+									TEST: 100,
+								},
+							},
+							tests: {
+								port: 1000,
+								config: {
+									TEST: 200,
+								},
+							},
+						},
+					} )
+				)
+			);
+			const config = await readConfig( '.wp-env.json' );
+			// Remove generated values which are different on other machines.
+			delete config.dockerComposeConfigPath;
+			delete config.workDirectoryPath;
+			expect( config ).toMatchSnapshot();
+		} );
 	} );
 
 	describe( 'source parsing', () => {
