@@ -48,6 +48,9 @@ class BottomSheet extends Component {
 		this.onShouldSetBottomSheetMaxHeight = this.onShouldSetBottomSheetMaxHeight.bind(
 			this
 		);
+		this.onScrollBeginDrag = this.onScrollBeginDrag.bind( this );
+		this.onScrollEndDrag = this.onScrollEndDrag.bind( this );
+
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
@@ -237,6 +240,14 @@ class BottomSheet extends Component {
 		onClose();
 	}
 
+	onScrollBeginDrag() {
+		this.isScrolling( true );
+	}
+
+	onScrollEndDrag() {
+		this.isScrolling( false );
+	}
+
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { onHardwareButtonPress } = this.state;
@@ -270,6 +281,7 @@ class BottomSheet extends Component {
 			getStylesFromColorScheme,
 			onDismiss,
 			children,
+			isChildrenScrollable,
 			...rest
 		} = this.props;
 		const {
@@ -317,6 +329,26 @@ class BottomSheet extends Component {
 			styles.backgroundDark
 		);
 
+		const listProps = {
+			disableScrollViewPanResponder: true,
+			bounces,
+			onScroll: this.onScroll,
+			onScrollBeginDrag: this.onScrollBeginDrag,
+			onScrollEndDrag: this.onScrollEndDrag,
+			scrollEventThrottle: 16,
+			contentContainerStyle: [
+				styles.content,
+				hideHeader && styles.emptyHeader,
+				contentStyle,
+				isChildrenScrollable && {
+					flexGrow: 1,
+					paddingBottom: safeAreaBottomInset,
+				},
+			],
+			scrollEnabled,
+			automaticallyAdjustContentInsets: false,
+		};
+
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -356,22 +388,31 @@ class BottomSheet extends Component {
 				>
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
-					<ScrollView
-						disableScrollViewPanResponder
-						bounces={ bounces }
-						onScroll={ this.onScroll }
-						onScrollBeginDrag={ () => this.isScrolling( true ) }
-						onScrollEndDrag={ () => this.isScrolling( false ) }
-						scrollEventThrottle={ 16 }
-						style={ isMaxHeightSet ? { maxHeight } : {} }
-						contentContainerStyle={ [
-							styles.content,
-							hideHeader && styles.emptyHeader,
-							contentStyle,
-						] }
-						scrollEnabled={ scrollEnabled }
-						automaticallyAdjustContentInsets={ false }
-					>
+					{ ! isChildrenScrollable ? (
+						<ScrollView { ...listProps }>
+							<BottomSheetProvider
+								value={ {
+									shouldEnableBottomSheetScroll: this
+										.onShouldEnableScroll,
+									shouldDisableBottomSheetMaxHeight: this
+										.onShouldSetBottomSheetMaxHeight,
+									isBottomSheetContentScrolling: isScrolling,
+									onCloseBottomSheet: this
+										.onHandleClosingBottomSheet,
+									onHardwareButtonPress: this
+										.onHandleHardwareButtonPress,
+									onReplaceSubsheet: this.onReplaceSubsheet,
+									extraProps,
+									currentScreen,
+								} }
+							>
+								<TouchableHighlight accessible={ false }>
+									<>{ children }</>
+								</TouchableHighlight>
+							</BottomSheetProvider>
+							<View style={ { height: safeAreaBottomInset } } />
+						</ScrollView>
+					) : (
 						<BottomSheetProvider
 							value={ {
 								shouldEnableBottomSheetScroll: this
@@ -386,14 +427,24 @@ class BottomSheet extends Component {
 								onReplaceSubsheet: this.onReplaceSubsheet,
 								extraProps,
 								currentScreen,
+								listProps,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>
-								<>{ children }</>
+								<View
+									style={
+										isMaxHeightSet
+											? {
+													maxHeight,
+											  }
+											: {}
+									}
+								>
+									<>{ children }</>
+								</View>
 							</TouchableHighlight>
 						</BottomSheetProvider>
-						<View style={ { height: safeAreaBottomInset } } />
-					</ScrollView>
+					) }
 				</KeyboardAvoidingView>
 			</Modal>
 		);
