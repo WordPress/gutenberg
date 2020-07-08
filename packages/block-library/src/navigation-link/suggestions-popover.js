@@ -4,11 +4,11 @@
 import { Popover } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { LinkControl } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import LinkControl from '../link-control';
 
 function SuggestionsPopover(
 	{ url, inputValue, close, onSelect, label = '' },

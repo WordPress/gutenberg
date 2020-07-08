@@ -10,19 +10,14 @@ import {
 import { external as externalIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { useDisplayUrl } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- *
- * @param url
- */
 /**
  * Internal dependencies
  */
 import SuggestionsPopover from './suggestions-popover';
-import useDisplayUrl from '../../hooks/use-display-url';
 
-export default function LinkToolbarOverlay( {
+export default function LinkControl( {
 	url,
 	label,
 	opensInNewTab,
@@ -53,24 +48,9 @@ export default function LinkToolbarOverlay( {
 		}
 		setOpen( false );
 	};
-/*
-			popoverFactory={ ( ref ) => (
-				<SuggestionsPopover
-					url={ url }
-					inputValue={ editUrl }
-					close={ () => setOpen( false ) }
-					onSelect={ ( data ) => onChange( data ) }
-					label={ label }
-					ref={ ref }
-				/>
-			) }
-*/
-	return (
-		<ToolbarOverlay
 
-			close={ () => setOpen( false ) }
-			isOpen={ isOpen }
-		>
+	return (
+		<div>
 			{ /* @TODO use URLInput? */ }
 			<ToolbarGroup className="navigation-link-edit__toolbar-link-input-group">
 				<ToolbarItem ref={ inputRef }>
@@ -118,6 +98,14 @@ export default function LinkToolbarOverlay( {
 					Done
 				</ToolbarButton>
 			</ToolbarGroup>
-		</ToolbarOverlay>
+
+			<SuggestionsPopover
+				url={ url }
+				inputValue={ editUrl }
+				close={ () => setOpen( false ) }
+				onSelect={ ( data ) => onChange( data ) }
+				label={ label }
+			/>
+		</div>
 	);
 }

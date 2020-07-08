@@ -210,10 +210,6 @@ _Returns_
 
 Undocumented declaration.
 
-<a name="BlockToolbarContents" href="#BlockToolbarContents">#</a> **BlockToolbarContents**
-
-Undocumented declaration.
-
 <a name="BlockVerticalAlignmentToolbar" href="#BlockVerticalAlignmentToolbar">#</a> **BlockVerticalAlignmentToolbar**
 
 _Related_
@@ -403,10 +399,6 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
-
-<a name="LinkToolbarOverlay" href="#LinkToolbarOverlay">#</a> **LinkToolbarOverlay**
-
-Undocumented declaration.
 
 <a name="MediaPlaceholder" href="#MediaPlaceholder">#</a> **MediaPlaceholder**
 

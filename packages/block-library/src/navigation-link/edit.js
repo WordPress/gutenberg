@@ -24,11 +24,9 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
-	BlockToolbarContents,
 	InnerBlocks,
 	InspectorControls,
 	RichText,
-	LinkToolbarOverlay,
 	__experimentalBlock as Block,
 	useDisplayUrl,
 } from '@wordpress/block-editor';
@@ -39,6 +37,7 @@ import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
+import LinkControl from './link-control';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -76,20 +75,9 @@ function NavigationLinkEdit( {
 	return (
 		<Fragment>
 			{ isLinkOpen && (
-				<BlockToolbarContents>
-					<div style={ { minWidth: 350 } }>
-						<LinkToolbarOverlay
-							url={ url }
-							displayUrl={ displayUrl }
-							label={ label }
-							opensInNewTab={ opensInNewTab }
-							isOpen={ isLinkOpen }
-							setOpen={ setIsLinkOpen }
-							onChange={ ( data ) => setAttributes( data ) }
-							withSuggestions
-						/>
-					</div>
-				</BlockToolbarContents>
+				<BlockControls __experimentalIsExpanded={ true }>
+					<div style={ { minWidth: 350 } }>test!</div>
+				</BlockControls>
 			) }
 			<BlockControls key="1">
 				<ToolbarGroup eventToOffset={ () => undefined }>
