@@ -46,8 +46,8 @@ Clicks a block toolbar button.
 
 _Parameters_
 
--   _text_ `string`: The text string of the button label or content.
--   _type_ `string`: The type of button - 'icon' or 'text'.
+-   _content_ `string`: The text string of the button label or content.
+-   _type_ `string`: The type of button - 'ariaLabel' or 'text'.
 
 <a name="clickButton" href="#clickButton">#</a> **clickButton**
 
