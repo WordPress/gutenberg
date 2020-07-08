@@ -104,7 +104,7 @@ export default function PostExcerptEdit( {
 	isSelected,
 } ) {
 	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return 'Post Excerpt';
+		return __( 'Post Excerpt' );
 	}
 	return (
 		<PostExcerptEditor
