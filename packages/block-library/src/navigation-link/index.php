@@ -144,7 +144,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['rel'] ) ) {
 		$html .= ' rel="' . esc_attr( $attributes['rel'] ) . '"';
-	} else if ( isset( $attributes['nofollow'] ) && $attributes['nofollow'] ) {
+	} elseif ( isset( $attributes['nofollow'] ) && $attributes['nofollow'] ) {
 		$html .= ' rel="nofollow"';
 	}
 
