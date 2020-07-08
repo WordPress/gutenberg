@@ -52,9 +52,9 @@ const createTemplatePart = async (
 	isNested = false
 ) => {
 	// Create new template part.
-	await insertBlock( 'Section' );
+	await insertBlock( 'Template Part' );
 	const [ createNewButton ] = await page.$x(
-		'//button[contains(text(), "New section")]'
+		'//button[contains(text(), "New template part")]'
 	);
 	await createNewButton.click();
 	await page.waitForSelector(
