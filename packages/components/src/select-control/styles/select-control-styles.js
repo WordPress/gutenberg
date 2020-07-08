@@ -62,7 +62,7 @@ const sizeStyles = ( { size } ) => {
 export const Select = styled.select`
 	&&& {
 		appearance: none;
-		background-color: transparent;
+		background: transparent;
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;

@@ -8,5 +8,5 @@ import styled from '@emotion/styled';
 import { FlexItem } from '../../flex';
 
 export const SelectWrapper = styled( FlexItem )`
-	width: 100px;
+	width: 110px;
 `;
