@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get, omit } from 'lodash';
+import { useRoute, useNavigation } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
@@ -22,7 +23,10 @@ import {
 } from './constants';
 import styles from './style.scss';
 
-function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
+function CustomGradientPicker() {
+	const route = useRoute();
+	const navigation = useNavigation();
+	const { setColor, currentValue, isGradientColor } = route.params;
 	const [ gradientOrientation, setGradientOrientation ] = useState(
 		HORIZONTAL_GRADIENT_ORIENTATION
 	);
@@ -63,6 +67,7 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 	function onGradientTypeChange( type ) {
 		const gradientColor = getGradientColor( type );
 		performLayoutAnimation();
+		navigation.setParams( { currentValue: gradientColor } );
 		setColor( gradientColor );
 	}
 
@@ -76,6 +81,7 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 		} );
 
 		if ( isGradientColor && gradientColor !== currentValue ) {
+			navigation.setParams( { currentValue: gradientColor } );
 			setColor( gradientColor );
 		}
 	}
@@ -87,7 +93,6 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 			DEFAULT_LINEAR_GRADIENT_ANGLE
 		);
 	}
-
 	return (
 		<>
 			<PanelBody title={ __( 'Gradient Type' ) }>

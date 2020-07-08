@@ -175,11 +175,7 @@ const GradientPickerScreen = () => {
 				screen={ __( 'Customize Gradient' ) }
 				leftButtonOnPress={ navigation.goBack }
 			/>
-			<CustomGradientPicker
-				setColor={ setColor }
-				currentValue={ currentValue }
-				isGradientColor={ isGradientColor }
-			/>
+			<CustomGradientPicker />
 		</View>
 	);
 };
