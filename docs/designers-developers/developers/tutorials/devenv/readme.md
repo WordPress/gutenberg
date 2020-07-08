@@ -30,7 +30,7 @@ Note: On macOS, the required developer tools are not installed by default, if no
 
 <img src="https://developer.wordpress.org/files/2020/07/git-install-prompt.png" alt="Mac git command requies command line developer tools" width="400" height="195"/>
 
-After installing nvm, you need to use it to install node, to install the latest version of node, run:
+After installing nvm, you need to use it to install node, to install the LTS version of node, run:
 
 ```sh
 nvm install --lts
@@ -45,7 +45,7 @@ zsh: command not found: nvm
 
 First, try quitting and restarting your terminal to pick up the installed config.
 
-If the restating did not resolve, you might need to create the default profile file.
+If restarting did not resolve the problem, you might need to create the default profile file.
 
 On macOS Catalina, the default shell is zsh, to create the profile file type `touch ~/.zshrc` on the command-line. It is fine to run if the file already exists. Note, `~/` is a shortcut to your home directory. For Ubuntu, including WSL, the default profile is bash, use `touch ~/.bashrc` to create.
 
@@ -95,6 +95,10 @@ wp-env start
 ```
 
 You can access your environment in your browser at: [http://localhost:8888/], the default username is `admin` and default password is `password`. For more information controlling the Docker enivironment see the [@wordpress/env package readme](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
+
+If you are developing a single plugin, you should run `wp-env start` from that plugin working directory—it will mount the plugin automatically. Note: This also works for themes, run from the directory you are developing the theme.
+
+If you want a single environment for all your plugins/themes, you need to create a `.wp-env.json` in a working directory and add the plugins/themes to it. You then run `wp-env start` from the same directory as that config file. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson).
 
 ### Alternative to Docker
 
