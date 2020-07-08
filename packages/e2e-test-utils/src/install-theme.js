@@ -4,6 +4,7 @@
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
 import { visitAdminPage } from './visit-admin-page';
+import { themeInstalled } from './theme-installed';
 
 /**
  * Installs a theme from the WP.org repository.
@@ -13,6 +14,12 @@ import { visitAdminPage } from './visit-admin-page';
  */
 export async function installTheme( slug, searchTerm ) {
 	await switchUserToAdmin();
+
+	const installed = await themeInstalled( slug );
+	if ( installed ) {
+		return;
+	}
+
 	await visitAdminPage(
 		'theme-install.php',
 		`search=${ encodeURIComponent( searchTerm || slug ) }`
@@ -23,10 +30,11 @@ export async function installTheme( slug, searchTerm ) {
 		`div[data-slug="${ slug }"] .button.activate`
 	);
 	if ( activateLink ) {
-		switchUserToTest();
+		await switchUserToTest();
 		return;
 	}
 
+	await page.waitForSelector( `.theme-install[data-slug="${ slug }"]` );
 	await page.click( `.theme-install[data-slug="${ slug }"]` );
 	await page.waitForSelector( `.theme[data-slug="${ slug }"] .activate` );
 	await switchUserToTest();

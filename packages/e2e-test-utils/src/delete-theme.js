@@ -33,6 +33,7 @@ export async function deleteTheme( slug, newThemeSlug, newThemeSearchTerm ) {
 	await page.click( `[data-slug="${ slug }"]` );
 	await page.waitForSelector( '.theme-actions .delete-theme' );
 	await page.click( '.theme-actions .delete-theme' );
+	await page.waitForSelector( 'body:not(.modal-open)' );
 
 	// Wait for the theme to be removed from the page.
 	// eslint-disable-next-line no-restricted-syntax

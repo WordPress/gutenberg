@@ -14,7 +14,10 @@ import { switchUserToTest } from './switch-user-to-test';
 export async function themeInstalled( slug ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'themes.php' );
-	const installed = ( await page.$( `[data-slug="${ slug }"]` ) ) !== null;
+
+	await page.waitForSelector( 'h2', { text: 'Add New Theme' } );
+	const found = await page.$( `[data-slug="${ slug }"]` );
+
 	await switchUserToTest();
-	return installed;
+	return Boolean( found );
 }

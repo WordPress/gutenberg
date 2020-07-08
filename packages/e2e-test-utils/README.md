@@ -559,6 +559,18 @@ running the test is not already the admin user).
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
 
+<a name="themeInstalled" href="#themeInstalled">#</a> **themeInstalled**
+
+Checks whether a theme exists on the site.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug to check.
+
+_Returns_
+
+-   `boolean`: Whether the theme exists.
+
 <a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
 
 Toggles the More Menu.
