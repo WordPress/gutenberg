@@ -2,11 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { Resizable } from 're-resizable';
 
 /**
  * Internal dependencies
  */
+import Resizable from './resizable';
 import ResizeTooltip from './resize-tooltip';
 
 function ResizableBox( {
