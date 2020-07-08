@@ -18,6 +18,7 @@ import {
 	ImageWithFocalPoint,
 	PanelBody,
 	RangeControl,
+	BottomSheetButton,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
@@ -225,6 +226,18 @@ const Cover = ( {
 					style={ styles.rangeCellContainer }
 				/>
 			</PanelBody>
+
+			{ url ? (
+				<PanelBody title={ __( 'Media' ) }>
+					<BottomSheetButton
+						text={ __( 'Clear Media' ) }
+						color={ styles.clearMediaButton.color }
+						onPress={ () => {
+							setAttributes( { id: undefined, url: undefined } );
+						} }
+					/>
+				</PanelBody>
+			) : null }
 		</InspectorControls>
 	);
 
