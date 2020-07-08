@@ -2,43 +2,42 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, get, head, find } from 'lodash';
+import { get, head, find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
+import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { link as linkIcon } from '@wordpress/icons';
 import {
 	ExternalLink,
-	KeyboardShortcuts,
 	PanelBody,
-	Popover,
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
+	KeyboardShortcuts,
 } from '@wordpress/components';
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
 	InspectorControls,
 	RichText,
-	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
+	useDisplayUrl,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon } from '@wordpress/icons';
+
+import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
+import ToolbarLinkControl from './toolbar-link-control';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -53,105 +52,67 @@ function NavigationLinkEdit( {
 	backgroundColor,
 	rgbTextColor,
 	rgbBackgroundColor,
-	saveEntityRecord,
 	selectedBlockHasDescendants,
-	userCanCreatePages = false,
 	insertBlocksAfter,
 	mergeBlocks,
 	onReplace,
 } ) {
-	const { label, opensInNewTab, url, nofollow, description } = attributes;
-	const link = {
-		url,
-		opensInNewTab,
-	};
-	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const { label, url, opensInNewTab, nofollow, description } = attributes;
+	const displayUrl = useDisplayUrl( url );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
-	// Show the LinkControl on mount if the URL is empty
-	// ( When adding a new menu item)
-	// This can't be done in the useState call because it cconflicts
+	const [ isEditingLink, setIsEditingLink ] = useState( false );
+	// Show the LinkControl on mount if the URL is empty ( When adding a new menu item)
+	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
 		if ( ! url ) {
-			setIsLinkOpen( true );
+			setIsEditingLink( true );
 		}
 	}, [] );
 
-	/**
-	 * The hook shouldn't be necessary but due to a focus loss happening
-	 * when selecting a suggestion in the link popover, we force close on block unselection.
-	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
-		}
-	}, [ isSelected ] );
-
-	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
-	useEffect( () => {
-		if ( isLinkOpen && url ) {
-			// Does this look like a URL and have something TLD-ish?
-			if (
-				isURL( prependHTTP( label ) ) &&
-				/^.+\.[a-z]+/.test( label )
-			) {
-				// Focus and select the label text.
-				selectLabelText();
-			} else {
-				// Focus it (but do not select).
-				placeCaretAtHorizontalEdge( ref.current, true );
-			}
-		}
-	}, [ url ] );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const selection = window.getSelection();
-		const range = document.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
-
-	async function handleCreatePage( pageTitle ) {
-		const type = 'page';
-		const page = await saveEntityRecord( 'postType', type, {
-			title: pageTitle,
-			status: 'publish',
-		} );
-
-		return {
-			id: page.id,
-			type,
-			title: page.title.rendered,
-			url: page.link,
-		};
-	}
+	const link = {
+		url,
+		label,
+		opensInNewTab,
+		nofollow,
+	};
 
 	return (
 		<Fragment>
-			<BlockControls>
-				<ToolbarGroup>
+			{ isEditingLink && (
+				<ToolbarLinkControl
+					link={ link }
+					isOpen={ isEditingLink }
+					close={ () => setIsEditingLink( false ) }
+					onChange={ setAttributes }
+					withSuggestions
+				/>
+			) }
+			<BlockControls key="1">
+				<ToolbarGroup eventToOffset={ () => undefined }>
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
 							[ rawShortcut.primary( 'k' ) ]: () =>
-								setIsLinkOpen( true ),
+								setIsEditingLink( true ),
 						} }
 					/>
 					<ToolbarButton
 						name="link"
 						icon={ linkIcon }
-						title={ __( 'Link' ) }
+						title={ __( 'Edit link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ () => setIsLinkOpen( true ) }
-					/>
+						onClick={ () => setIsEditingLink( true ) }
+						className="navigation-link-edit-link-button"
+					>
+						<span className="navigation-link-edit-link-label">
+							{ displayUrl }
+						</span>
+					</ToolbarButton>
+				</ToolbarGroup>
+				<ToolbarGroup>
 					<ToolbarButton
 						name="submenu"
 						icon={ <ToolbarSubmenuIcon /> }
@@ -240,57 +201,6 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ isLinkOpen && (
-						<Popover
-							position="bottom center"
-							onClose={ () => setIsLinkOpen( false ) }
-						>
-							<LinkControl
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								showInitialSuggestions={ true }
-								createSuggestion={
-									userCanCreatePages
-										? handleCreatePage
-										: undefined
-								}
-								onChange={ ( {
-									title: newTitle = '',
-									url: newURL = '',
-									opensInNewTab: newOpensInNewTab,
-									id,
-								} = {} ) =>
-									setAttributes( {
-										url: encodeURI( newURL ),
-										label: ( () => {
-											const normalizedTitle = newTitle.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											const normalizedURL = newURL.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											if (
-												newTitle !== '' &&
-												normalizedTitle !==
-													normalizedURL &&
-												label !== newTitle
-											) {
-												return escape( newTitle );
-											} else if ( label ) {
-												return label;
-											}
-											// If there's no label, add the URL.
-											return escape( normalizedURL );
-										} )(),
-										opensInNewTab: newOpensInNewTab,
-										id,
-									} )
-								}
-							/>
-						</Popover>
-					) }
 				</div>
 				{ showSubmenuIcon && (
 					<span className="wp-block-navigation-link__submenu-icon">
@@ -373,11 +283,6 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
-		const userCanCreatePages = select( 'core' ).canUser(
-			'create',
-			'pages'
-		);
-
 		return {
 			isParentOfSelectedBlock,
 			isImmediateParentOfSelectedBlock,
@@ -386,7 +291,6 @@ export default compose( [
 			showSubmenuIcon,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
-			userCanCreatePages,
 			rgbTextColor: getColorObjectByColorSlug(
 				colors,
 				navigationBlockAttributes.textColor,
@@ -400,9 +304,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
-		const { saveEntityRecord } = dispatch( 'core' );
 		return {
-			saveEntityRecord,
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 

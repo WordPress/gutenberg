@@ -134,3 +134,30 @@
 		}
 	}
 }
+
+
+.toolbar-link-control__input-control {
+	min-width: 350px;
+	height: 100%;
+	margin-top: 1px;
+}
+
+.toolbar-link-control__icon {
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	width: 32px;
+	height: 32px;
+	color: #FFF;
+	background: #000;
+	margin: 6px;
+	border-radius: 2px;
+	svg {
+		fill: currentColor;
+	}
+}
+
+.toolbar-link-control__toggle-menu-item-label {
+	flex-grow: 1;
+	text-align: left;
+}

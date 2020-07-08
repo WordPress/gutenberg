@@ -7,6 +7,58 @@
 	min-height: $button-size;
 }
 
+.components-toolbar-button.is-active {
+	&::before{
+		background: #000;
+	}
+	color: #ccc;
+}
+
+// Truncate long URLs in the toolbar
+.block-editor-block-toolbar {
+	.navigation-link-edit__toolbar-link-input-group {
+		flex-grow: 1;
+	}
+
+	.navigation-link-edit__toolbar-link-input {
+		height: 90%;
+		border: 1px solid #ccc;
+		flex-grow: 1;
+		align-self: center;
+		font-size: 13px;
+	}
+
+	.navigation-link-edit-link-button {
+		border: 2px solid transparent;
+
+		&,
+		&.components-button.components-button.has-icon svg {
+			margin-right: 0;
+		}
+
+		.navigation-link-edit-link-label,
+		.navigation-link-edit-link-rich-text {
+			display: inline-block;
+			white-space: nowrap !important;
+			transition: max-width 0.3s ease-in;
+		}
+
+		.navigation-link-edit-link-label {
+			max-width: 230px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			margin-left: $grid-unit-10;
+			&:empty {
+				display: none;
+			}
+		}
+
+		.navigation-link-edit-link-rich-text {
+			max-width: 600px;
+		}
+	}
+}
+
 /**
  * Adjust Navigation Item.
  */

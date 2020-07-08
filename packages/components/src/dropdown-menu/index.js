@@ -47,6 +47,7 @@ function DropdownMenu( {
 	menuLabel,
 	position,
 	noIcons,
+	closeOnClick = false,
 } ) {
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
@@ -159,9 +160,11 @@ function DropdownMenu( {
 									].join() }
 									onClick={ ( event ) => {
 										event.stopPropagation();
-										props.onClose();
+										if ( closeOnClick ) {
+											props.onClose();
+										}
 										if ( control.onClick ) {
-											control.onClick();
+											control.onClick( props.onClose );
 										}
 									} }
 									className={ classnames(
