@@ -154,7 +154,35 @@ export class MediaUpload extends React.Component {
 	}
 
 	render() {
-		const { pickerTitle } = this.props;
+		const { allowedTypes = [], isReplacingMedia } = this.props;
+		const isOneType = allowedTypes.length === 1;
+		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
+		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+		const isImageOrVideo =
+			allowedTypes.length === 2 &&
+			allowedTypes.includes( MEDIA_TYPE_IMAGE ) &&
+			allowedTypes.includes( MEDIA_TYPE_VIDEO );
+
+		let pickerTitle;
+		if ( isImage ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace image from' );
+			} else {
+				pickerTitle = __( 'Choose image from' );
+			}
+		} else if ( isVideo ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace video from' );
+			} else {
+				pickerTitle = __( 'Choose video from' );
+			}
+		} else if ( isImageOrVideo ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace image or video from' );
+			} else {
+				pickerTitle = __( 'Choose image or video from' );
+			}
+		}
 
 		const getMediaOptions = () => (
 			<Picker

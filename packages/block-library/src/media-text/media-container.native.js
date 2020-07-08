@@ -321,6 +321,7 @@ class MediaContainer extends Component {
 					<MediaUpload
 						onSelect={ this.onSelectMediaUploadOption }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						isReplacingMedia={ true }
 						value={ mediaId }
 						render={ ( { open, getMediaOptions } ) => {
 							return (
