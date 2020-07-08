@@ -10,6 +10,7 @@ export { clickOnMoreMenuItem } from './click-on-more-menu-item';
 export { createNewPost } from './create-new-post';
 export { createURL } from './create-url';
 export { deactivatePlugin } from './deactivate-plugin';
+export { deleteTheme } from './delete-theme';
 export { disablePrePublishChecks } from './disable-pre-publish-checks';
 export { dragAndResize } from './drag-and-resize';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';

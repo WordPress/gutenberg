@@ -154,6 +154,16 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
+
+Deletes a theme from the site, activating another theme if necessary.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _newThemeSlug_ `?string`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
+-   _newThemeSearchTerm_ `?string`: A search term to use if the new theme is not findable by its slug.
+
 <a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
 
 Removes the focus loss listener that `enableFocusLossObservation()` adds.
