@@ -166,9 +166,7 @@ const PickerScreen = () => {
 };
 
 const GradientPickerScreen = () => {
-	const route = useRoute();
 	const navigation = useNavigation();
-	const { setColor, currentValue, isGradientColor } = route.params;
 	return (
 		<View>
 			<NavigationHeader
