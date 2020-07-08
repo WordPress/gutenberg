@@ -72,7 +72,6 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
 async function configureWordPress( environment, config ) {
 	const options = {
 		config: config.dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
 		log: config.debug,
 	};
 
@@ -95,38 +94,28 @@ async function configureWordPress( environment, config ) {
 		options
 	);
 
+	const setupCommands = [];
+
 	// Set wp-config.php values.
 	for ( const [ key, value ] of Object.entries(
 		config.env[ environment ].config
 	) ) {
-		const command = [ 'wp', 'config', 'set', key, value ];
-		if ( typeof value !== 'string' ) {
-			command.push( '--raw' );
-		}
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			command,
-			options
+		setupCommands.push(
+			`wp config set ${ key } ${ value }${
+				typeof value !== 'string' ? ' --raw' : ''
+			}`
 		);
 	}
 
 	// Activate all plugins.
 	for ( const pluginSource of config.env[ environment ].pluginSources ) {
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			`wp plugin activate ${ pluginSource.basename }`,
-			options
-		);
+		setupCommands.push( `wp plugin activate ${ pluginSource.basename }` );
 	}
 
 	// Activate the first theme.
 	const [ themeSource ] = config.env[ environment ].themeSources;
 	if ( themeSource ) {
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			`wp theme activate ${ themeSource.basename }`,
-			options
-		);
+		setupCommands.push( `wp theme activate ${ themeSource.basename }` );
 	}
 
 	// Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
@@ -134,13 +123,14 @@ async function configureWordPress( environment, config ) {
 	// we load it too early, then some things (like MULTISITE) will be defined
 	// before wp-phpunit has a chance to configure them. To avoid this, create a
 	// copy of wp-config.php for phpunit which doesn't require wp-settings.php.
+	setupCommands.push(
+		'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php'
+	);
+
+	// Execute all setup commands in a batch.
 	await dockerCompose.exec(
-		environment === 'development' ? 'wordpress' : 'tests-wordpress',
-		[
-			'sh',
-			'-c',
-			'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php',
-		],
+		environment === 'development' ? 'cli' : 'tests-cli',
+		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
 		{
 			config: config.dockerComposeConfigPath,
 			log: config.debug,
