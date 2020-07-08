@@ -1,0 +1,13 @@
+{
+	"name": "core/site-description",
+	"category": "design",
+	"attributes": {
+		"align": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}

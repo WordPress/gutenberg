@@ -67,6 +67,7 @@ import * as widgetArea from './widget-area';
 // Full Site Editing Blocks
 import * as siteLogo from './site-logo';
 import * as siteTitle from './site-title';
+import * as siteDescription from './site-description';
 import * as templatePart from './template-part';
 import * as query from './query';
 import * as queryLoop from './query-loop';
@@ -199,8 +200,9 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing
 						? [
-								siteTitle,
+								siteDescription,
 								siteLogo,
+								siteTitle,
 								templatePart,
 								query,
 								queryLoop,
