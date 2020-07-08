@@ -200,7 +200,7 @@ export default compose( [
 		const { getBlock } = select( 'core/block-editor' );
 
 		const block = getBlock( clientId );
-		const name = block.name.substring( 17 );
+		const name = block?.name.substring( 17 );
 
 		return {
 			name,
