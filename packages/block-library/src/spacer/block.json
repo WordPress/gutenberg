@@ -5,6 +5,10 @@
 		"height": {
 			"type": "number",
 			"default": 100
+		},
+		"heightUnit": {
+			"type": "string",
+			"default": "px"
 		}
 	},
 	"supports": {

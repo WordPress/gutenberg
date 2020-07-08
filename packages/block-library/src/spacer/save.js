@@ -1,3 +1,6 @@
 export default function save( { attributes } ) {
-	return <div style={ { height: attributes.height } } aria-hidden />;
+	const { height, heightUnit } = attributes;
+	const spacerHeight = heightUnit ? `${ height }${ heightUnit }` : height;
+
+	return <div style={ { height: spacerHeight } } aria-hidden />;
 }

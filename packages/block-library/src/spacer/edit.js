@@ -7,11 +7,19 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
-import { compose, withInstanceId } from '@wordpress/compose';
+import {
+	InspectorControls,
+	__experimentalUnitControl as UnitControl,
+} from '@wordpress/block-editor';
+import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
+import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { CSS_UNITS } from './shared';
 
 const MIN_SPACER_HEIGHT = 20;
 const MAX_SPACER_HEIGHT = 500;
@@ -24,10 +32,17 @@ const SpacerEdit = ( {
 	onResizeStop,
 } ) => {
 	const [ isResizing, setIsResizing ] = useState( false );
-	const { height } = attributes;
+	const { height, heightUnit } = attributes;
+
 	const updateHeight = ( value ) => {
 		setAttributes( {
 			height: value,
+		} );
+	};
+
+	const updateHeightUnit = ( unit ) => {
+		setAttributes( {
+			heightUnit: unit,
 		} );
 	};
 
@@ -36,15 +51,15 @@ const SpacerEdit = ( {
 		setIsResizing( true );
 	};
 
-	const handleOnResizeStop = ( event, direction, elt, delta ) => {
+	const handleOnResizeStop = ( event, direction, elt ) => {
 		onResizeStop();
-		const spacerHeight = Math.min(
-			parseInt( height + delta.height, 10 ),
-			MAX_SPACER_HEIGHT
-		);
+		const spacerHeight = elt.clientHeight;
 		updateHeight( spacerHeight );
+		updateHeightUnit( 'px' );
 		setIsResizing( false );
 	};
+
+	const resizeHeight = heightUnit ? `${ height }${ heightUnit }` : height;
 
 	return (
 		<>
@@ -56,7 +71,7 @@ const SpacerEdit = ( {
 					}
 				) }
 				size={ {
-					height,
+					height: resizeHeight,
 				} }
 				minHeight={ MIN_SPACER_HEIGHT }
 				enable={ {
@@ -81,18 +96,60 @@ const SpacerEdit = ( {
 			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
-					<RangeControl
-						label={ __( 'Height in pixels' ) }
-						min={ MIN_SPACER_HEIGHT }
-						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
+					<SpacerHeightInput
 						value={ height }
 						onChange={ updateHeight }
+						unit={ heightUnit }
+						onUnitChange={ updateHeightUnit }
 					/>
 				</PanelBody>
 			</InspectorControls>
 		</>
 	);
 };
+
+function SpacerHeightInput( {
+	onChange,
+	onUnitChange,
+	unit = 'px',
+	value = '',
+} ) {
+	const instanceId = useInstanceId( UnitControl );
+	const inputId = `block-cover-height-input-${ instanceId }`;
+
+	const handleOnChange = ( unprocessedValue ) => {
+		const inputValue =
+			unprocessedValue !== ''
+				? parseInt( unprocessedValue, 10 )
+				: undefined;
+
+		onChange( inputValue );
+	};
+
+	const handleOnUnitChange = ( nextUnit ) => {
+		onUnitChange( nextUnit );
+	};
+
+	const min = unit === 'px' ? MIN_SPACER_HEIGHT : 0;
+
+	return (
+		<BaseControl label={ __( 'Height' ) } id={ inputId }>
+			<UnitControl
+				id={ inputId }
+				isResetValueOnUnitChange
+				min={ min }
+				max={ MAX_SPACER_HEIGHT }
+				onChange={ handleOnChange }
+				onUnitChange={ handleOnUnitChange }
+				step="1"
+				style={ { maxWidth: 80 } }
+				unit={ unit }
+				units={ CSS_UNITS }
+				value={ value }
+			/>
+		</BaseControl>
+	);
+}
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
