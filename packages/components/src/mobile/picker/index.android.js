@@ -58,11 +58,10 @@ export default class Picker extends Component {
 
 		return (
 			<BottomSheet
-				title={ title }
 				isVisible={ isVisible }
 				onClose={ this.onClose }
 				style={ { paddingBottom: 20 } }
-				hideHeader={ title === undefined }
+				hideHeader
 			>
 				<PanelBody title={ title } style={ styles.panelBody }>
 					{ options.map( ( option, index ) => (
