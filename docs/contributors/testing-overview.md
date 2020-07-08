@@ -453,7 +453,16 @@ Every core block is required to have at least one set of fixture files for its m
 
 ## PHP Testing
 
-Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the PHP tests locally using this command:
+Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the PHP tests locally using this command.
+
+Note that these commands require the local environment to be initalized first:
+
+```bash
+# Reference the local sourcecode for wp-env in the Gutenberg repo:
+npx wp-env start
+```
+
+Using `npx` above ensures that we always use the latest wp-env sourcecode in the Gutenberg repo.
 
 ```bash
 npm run test-php
