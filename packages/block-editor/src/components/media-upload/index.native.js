@@ -22,46 +22,6 @@ export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
-const cameraImageSource = {
-	id: mediaSources.deviceCamera, // ID is the value sent to native
-	value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
-	label: __( 'Take a Photo' ),
-	types: [ MEDIA_TYPE_IMAGE ],
-	icon: capturePhoto,
-};
-
-const cameraVideoSource = {
-	id: mediaSources.deviceCamera,
-	value: mediaSources.deviceCamera,
-	label: __( 'Take a Video' ),
-	types: [ MEDIA_TYPE_VIDEO ],
-	icon: captureVideo,
-};
-
-const deviceLibrarySource = {
-	id: mediaSources.deviceLibrary,
-	value: mediaSources.deviceLibrary,
-	label: __( 'Choose from device' ),
-	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
-	icon: image,
-};
-
-const siteLibrarySource = {
-	id: mediaSources.siteMediaLibrary,
-	value: mediaSources.siteMediaLibrary,
-	label: __( 'WordPress Media Library' ),
-	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
-	icon: wordpress,
-	mediaLibrary: true,
-};
-
-const internalSources = [
-	deviceLibrarySource,
-	cameraImageSource,
-	cameraVideoSource,
-	siteLibrarySource,
-];
-
 export class MediaUpload extends React.Component {
 	constructor( props ) {
 		super( props );
@@ -92,6 +52,46 @@ export class MediaUpload extends React.Component {
 	}
 
 	getAllSources() {
+		const cameraImageSource = {
+			id: mediaSources.deviceCamera, // ID is the value sent to native
+			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
+			label: __( 'Take a Photo' ),
+			types: [ MEDIA_TYPE_IMAGE ],
+			icon: capturePhoto,
+		};
+
+		const cameraVideoSource = {
+			id: mediaSources.deviceCamera,
+			value: mediaSources.deviceCamera,
+			label: __( 'Take a Video' ),
+			types: [ MEDIA_TYPE_VIDEO ],
+			icon: captureVideo,
+		};
+
+		const deviceLibrarySource = {
+			id: mediaSources.deviceLibrary,
+			value: mediaSources.deviceLibrary,
+			label: __( 'Choose from device' ),
+			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+			icon: image,
+		};
+
+		const siteLibrarySource = {
+			id: mediaSources.siteMediaLibrary,
+			value: mediaSources.siteMediaLibrary,
+			label: __( 'WordPress Media Library' ),
+			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+			icon: wordpress,
+			mediaLibrary: true,
+		};
+
+		const internalSources = [
+			deviceLibrarySource,
+			cameraImageSource,
+			cameraVideoSource,
+			siteLibrarySource,
+		];
+
 		return internalSources.concat( this.state.otherMediaOptions );
 	}
 

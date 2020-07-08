@@ -12,7 +12,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { edit as editIcon } from '@wordpress/icons';
+import { Icon, edit as editIcon } from '@wordpress/icons';
 
 const selectIcon = (
 	<SVG
@@ -60,7 +60,7 @@ function ToolSelector( props, ref ) {
 									value: 'edit',
 									label: (
 										<>
-											{ editIcon }
+											<Icon icon={ editIcon } />
 											{ __( 'Edit' ) }
 										</>
 									),
