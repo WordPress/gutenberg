@@ -318,7 +318,8 @@ class BottomSheet extends Component {
 				contentStyle,
 				isChildrenScrollable && {
 					flexGrow: 1,
-					paddingBottom: safeAreaBottomInset,
+					paddingBottom:
+						safeAreaBottomInset || styles.content.paddingRight,
 				},
 			],
 			scrollEnabled,
@@ -392,7 +393,13 @@ class BottomSheet extends Component {
 									<>{ children }</>
 								</TouchableHighlight>
 							</BottomSheetProvider>
-							<View style={ { height: safeAreaBottomInset } } />
+							<View
+								style={ {
+									height:
+										safeAreaBottomInset ||
+										styles.content.paddingRight,
+								} }
+							/>
 						</ScrollView>
 					) : (
 						<BottomSheetProvider
