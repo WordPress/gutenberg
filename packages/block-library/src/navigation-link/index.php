@@ -144,7 +144,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$css_classes .= ' ' . $class_name;
 	};
 
-	$item_url = get_navigation_link_url( $attributes );
+	$item_url = block_core_navigation_link_get_url( $attributes );
 	$item_tag = $item_url ? 'a' : 'span';
 
 	$html = '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) .
@@ -153,7 +153,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	// Start appending HTML attributes to anchor tag.
 	if ( $item_url ) {
-		$html .= ' href="' . esc_url( $attributes['url'] ) . '"';
+		$html .= ' href="' . esc_url( $item_url ) . '"';
 	}
 
 	if (
