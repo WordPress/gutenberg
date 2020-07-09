@@ -46,7 +46,7 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  */
 export function getAuthors( state, query = {} ) {
 	const { stableKey } = getQueryParts( query );
-	return getUserQueryResults( state, `authors::${ stableKey }` );
+	return getUserQueryResults( state, stableKey );
 }
 
 /**

@@ -40,7 +40,7 @@ export function* getAuthors( query = {} ) {
 	} );
 	const { stableKey } = getQueryParts( query );
 
-	yield receiveUserQuery( `authors::${ stableKey }`, users );
+	yield receiveUserQuery( stableKey, users );
 }
 
 /**
