@@ -1,4 +1,5 @@
 # Alignment Matrix Toolbar
+
 The alignment matrix toolbar allows users to quickly adjust inner block alignment; this is in contrast to the alignment toolbar that aligns the frame block.
 
 ![Button components](https://i.imgur.com/PxYkgL5.png)
@@ -69,4 +70,3 @@ Name | Type | Default | Description
 `label` | `string` | `Change matrix alignment` | concise description of tool's functionality.
 `onChange` | `function` | `noop` | the function to execute upon a user's change of the matrix state
 `value` | `string` | `center` | describes the content alignment location and can be `top`, `right`, `bottom`, `left`, `topRight`, `bottomRight`, `bottomLeft`, `topLeft`
-
