@@ -16,9 +16,10 @@ import PostTypeSupportCheck from '../post-type-support-check';
 
 export function PostAuthorCheck( {
 	hasAssignAuthorAction,
+	authors,
 	children,
 } ) {
-	if ( ! hasAssignAuthorAction ) {
+	if ( ! hasAssignAuthorAction || authors.length < 2 ) {
 		return null;
 	}
 
@@ -39,6 +40,7 @@ export default compose( [
 				false
 			),
 			postType: select( 'core/editor' ).getCurrentPostType(),
+			authors: select( 'core' ).getAuthors(),
 		};
 	} ),
 	withInstanceId,
