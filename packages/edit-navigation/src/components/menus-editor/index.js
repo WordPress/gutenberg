@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -19,7 +24,9 @@ const { DOMParser } = window;
 import CreateMenuArea from './create-menu-area';
 import NavigationEditor from '../navigation-editor';
 
-const noticeId = 'edit-navigation-delete-menu-error';
+const noticeId = uniqueId(
+	'navigation-editor/menu-editor/edit-navigation-delete-menu-error'
+);
 
 export default function MenusEditor( { blockEditorSettings } ) {
 	const [ menuId, setMenuId ] = useState();
