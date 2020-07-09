@@ -1,20 +1,36 @@
 /**
  * External dependencies
  */
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import {
+	useFocusEffect,
+	useIsFocused,
+	useNavigation,
+} from '@react-navigation/native';
 import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
+import { BottomSheetContext } from '@wordpress/components';
 
-import { useRef, useCallback } from '@wordpress/element';
+import { useRef, useCallback, useContext } from '@wordpress/element';
 
 const BottomSheetScreen = ( { children, setHeight } ) => {
+	const navigation = useNavigation();
 	const height = useRef( { maxHeight: 0 } );
 	const isFocused = useIsFocused();
+	const { onHardwareButtonPress } = useContext( BottomSheetContext );
 	useFocusEffect(
 		useCallback( () => {
+			onHardwareButtonPress( () => {
+				if ( navigation.canGoBack() ) {
+					navigation.goBack();
+					return true;
+				}
+				onHardwareButtonPress( null );
+				return false;
+			} );
+
 			if ( height.current.maxHeight !== 0 ) {
 				setHeight( height.current.maxHeight );
 			}

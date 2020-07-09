@@ -241,8 +241,8 @@ class BottomSheet extends Component {
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { onHardwareButtonPress } = this.state;
-		if ( onHardwareButtonPress ) {
-			return onHardwareButtonPress();
+		if ( onHardwareButtonPress && onHardwareButtonPress() ) {
+			return;
 		}
 		return onClose();
 	}

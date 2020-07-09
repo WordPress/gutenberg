@@ -38,11 +38,6 @@ function ColorSettings( { defaultSettings } ) {
 		onCloseBottomSheet( null );
 	}, [] );
 
-	// function afterHardwareButtonPress() {
-	// onHardwareButtonPress( null );
-	// shouldDisableBottomSheetMaxHeight( true );
-	// }
-
 	const PaletteScreenView = useRef( () => (
 		<BottomSheet.NavigationScreen setHeight={ setHeight } name={ 'palete' }>
 			<PaletteScreen />
