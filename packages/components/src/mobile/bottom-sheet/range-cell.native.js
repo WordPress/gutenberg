@@ -97,7 +97,7 @@ class BottomSheetRangeCell extends Component {
 		}
 		return Math.min(
 			Math.max(
-				text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' ),
+				text.replace( /[^0-9]\./g, '' ).replace( /^0+(?=\d)/, '' ),
 				minimumValue
 			),
 			maximumValue
@@ -221,7 +221,7 @@ class BottomSheetRangeCell extends Component {
 						onChangeText={ this.handleChange }
 						onFocus={ this.handleToggleFocus }
 						onBlur={ this.handleToggleFocus }
-						keyboardType="number-pad"
+						keyboardType="numeric"
 						returnKeyType="done"
 						value={ `${ sliderValue }` }
 					/>

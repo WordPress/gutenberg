@@ -9,7 +9,7 @@ import Cell from './cell';
 import styles from './styles.scss';
 
 function UnsupportedFooterCell( props ) {
-	const { ...cellProps } = props;
+	const { textAlign = 'left', ...cellProps } = props;
 
 	return (
 		<Cell
@@ -17,7 +17,7 @@ function UnsupportedFooterCell( props ) {
 			editable={ false }
 			value={ '' }
 			accessibilityRole={ 'text' }
-			labelStyle={ styles.unsupportedFooterCell }
+			labelStyle={ [ styles.unsupportedFooterCell, { textAlign } ] }
 		/>
 	);
 }

@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	FlatList,
-	View,
-	Text,
-	TouchableHighlight,
-	Dimensions,
-} from 'react-native';
+import { FlatList, View, TouchableHighlight, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -20,11 +14,12 @@ import {
 	compose,
 	withPreferredColorScheme,
 } from '@wordpress/compose';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import InserterMenuItem from './menu-item';
 import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
@@ -106,24 +101,10 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { getStylesFromColorScheme, items, onSelect } = this.props;
+		const { items, onSelect } = this.props;
 		const { numberOfColumns } = this.state;
 
 		const bottomPadding = styles.contentBottomPadding;
-		const modalIconWrapperStyle = getStylesFromColorScheme(
-			styles.modalIconWrapper,
-			styles.modalIconWrapperDark
-		);
-		const modalIconStyle = getStylesFromColorScheme(
-			styles.modalIcon,
-			styles.modalIconDark
-		);
-		const modalItemLabelStyle = getStylesFromColorScheme(
-			styles.modalItemLabel,
-			styles.modalItemLabelDark
-		);
-
-		const columnProperties = this.calculateColumnsProperties();
 
 		return (
 			<BottomSheet
@@ -145,41 +126,10 @@ export class InserterMenu extends Component {
 						) }
 						keyExtractor={ ( item ) => item.name }
 						renderItem={ ( { item } ) => (
-							<TouchableHighlight
-								style={ styles.touchableArea }
-								underlayColor="transparent"
-								activeOpacity={ 0.5 }
-								accessibilityLabel={ item.title }
-								onPress={ () => onSelect( item ) }
-							>
-								<View
-									style={ [
-										styles.modalItem,
-										{ width: columnProperties.maxWidth },
-									] }
-								>
-									<View
-										style={ [
-											modalIconWrapperStyle,
-											columnProperties.itemWidth && {
-												width:
-													columnProperties.itemWidth,
-											},
-										] }
-									>
-										<View style={ modalIconStyle }>
-											<Icon
-												icon={ item.icon.src }
-												fill={ modalIconStyle.fill }
-												size={ modalIconStyle.width }
-											/>
-										</View>
-									</View>
-									<Text style={ modalItemLabelStyle }>
-										{ item.title }
-									</Text>
-								</View>
-							</TouchableHighlight>
+							<InserterMenuItem
+								item={ item }
+								onSelect={ () => onSelect( item ) }
+							/>
 						) }
 					/>
 				</TouchableHighlight>

@@ -8,6 +8,7 @@ function UnsupportedFooterControl( {
 	help,
 	instanceId,
 	className,
+	textAlign,
 	...props
 } ) {
 	const id = `inspector-unsupported-footer-control-${ instanceId }`;
@@ -19,6 +20,7 @@ function UnsupportedFooterControl( {
 			help={ help }
 			className={ className }
 			aria-describedby={ !! help ? id + '__help' : undefined }
+			textAlign={ textAlign }
 			{ ...props }
 		/>
 	);

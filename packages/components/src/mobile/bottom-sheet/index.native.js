@@ -270,6 +270,7 @@ class BottomSheet extends Component {
 			getStylesFromColorScheme,
 			onDismiss,
 			children,
+			withHeaderSeparator = false,
 			...rest
 		} = this.props;
 		const {
@@ -301,20 +302,28 @@ class BottomSheet extends Component {
 
 		const getHeader = () => (
 			<View>
-				<View style={ styles.head }>
+				<View style={ styles.bottomSheetHeader }>
 					<View style={ { flex: 1 } }>{ leftButton }</View>
-					<View style={ styles.titleContainer }>
-						<Text style={ styles.title }>{ title }</Text>
-					</View>
+					<Text
+						style={ bottomSheetHeaderTitleStyle }
+						maxFontSizeMultiplier={ 3 }
+					>
+						{ title }
+					</Text>
 					<View style={ { flex: 1 } }>{ rightButton }</View>
 				</View>
-				<View style={ styles.separator } />
+				{ withHeaderSeparator && <View style={ styles.separator } /> }
 			</View>
 		);
 
 		const backgroundStyle = getStylesFromColorScheme(
 			styles.background,
 			styles.backgroundDark
+		);
+
+		const bottomSheetHeaderTitleStyle = getStylesFromColorScheme(
+			styles.bottomSheetHeaderTitle,
+			styles.bottomSheetHeaderTitleDark
 		);
 
 		return (

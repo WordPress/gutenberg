@@ -14,7 +14,11 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import {
+	PanelBody,
+	RangeControl,
+	UnsupportedFooterControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
@@ -46,7 +50,7 @@ function ColumnEdit( {
 					contentStyle,
 					styles.columnPlaceholderNotSelected,
 				] }
-			></View>
+			/>
 		);
 	}
 
@@ -71,6 +75,14 @@ function ColumnEdit( {
 								width: nextWidth,
 							} );
 						} }
+					/>
+				</PanelBody>
+				<PanelBody>
+					<UnsupportedFooterControl
+						label={ __(
+							'Note: columns may stack on small screens'
+						) }
+						textAlign="center"
 					/>
 				</PanelBody>
 			</InspectorControls>
