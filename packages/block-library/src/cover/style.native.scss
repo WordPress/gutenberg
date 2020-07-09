@@ -71,3 +71,35 @@
 	width: 100%;
 	height: 100%;
 }
+
+.contentContainer {
+	flex-direction: row;
+	padding: 0 $grid-unit-20;
+}
+
+.container {
+	padding-bottom: $grid-unit-20;
+}
+
+.verticalSeparator {
+	border-width: 0;
+	margin-right: $grid-unit-20 / 2;
+}
+
+.verticalSeparatorDark {
+	border-width: 0;
+}
+
+.colorIndicator {
+	margin-top: 8px;
+	margin-bottom: 8px;
+	width: 24px;
+	height: 24px;
+}
+
+.customIndicatorWrapper {
+	flex-direction: row;
+	align-items: center;
+	width: 24px;
+	height: 24px;
+}

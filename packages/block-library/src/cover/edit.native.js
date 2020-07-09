@@ -21,6 +21,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
+	ColorPalette,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -67,6 +68,31 @@ const INNER_BLOCKS_TEMPLATE = [
 ];
 const COVER_MAX_HEIGHT = 1000;
 const COVER_DEFAULT_HEIGHT = 300;
+
+const COVER_DEFAULT_PALETTE = {
+	colors: [
+		{
+			name: __( 'Black' ),
+			slug: 'black',
+			color: '#000000',
+		},
+		{
+			name: __( 'White' ),
+			slug: 'white',
+			color: '#ffffff',
+		},
+		{
+			name: __( 'Vivid cyan blue' ),
+			slug: 'vivid-cyan-blue',
+			color: '#0693e3',
+		},
+		{
+			name: __( 'Pale pink' ),
+			slug: 'pale-pink',
+			color: '#f78da7',
+		},
+	],
+};
 
 const Cover = ( {
 	attributes,
@@ -157,6 +183,16 @@ const Cover = ( {
 	const onVideoLoad = () => {
 		setIsVideoLoading( false );
 	};
+
+	function setColor( color ) {
+		setAttributes( {
+			// clear all related attributes (only one should be set)
+			overlayColor: undefined,
+			customOverlayColor: color,
+			gradient: undefined,
+			customGradient: undefined,
+		} );
+	}
 
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
@@ -305,7 +341,16 @@ const Cover = ( {
 					onSelect={ onSelectMedia }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onFocus={ onFocus }
-				/>
+				>
+					<ColorPalette
+						customStyles={ styles }
+						setColor={ setColor }
+						onCustomPress={ () => {} }
+						defaultSettings={ COVER_DEFAULT_PALETTE }
+						shouldShowCustomIndicatorOption={ false }
+						shouldShowCustomLabel={ false }
+					/>
+				</MediaPlaceholder>
 			</View>
 		);
 	}

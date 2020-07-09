@@ -21,7 +21,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
+import defaultStyles from './style.scss';
 import ColorIndicator from '../color-indicator';
 import { colorsUtils } from '../mobile/color-settings/utils';
 import { performLayoutAnimation } from '../mobile/layout-animation';
@@ -40,7 +40,12 @@ function ColorPalette( {
 	currentSegment,
 	onCustomPress,
 	shouldEnableBottomSheetScroll,
+	shouldShowCustomIndicatorOption = true,
+	shouldShowCustomLabel = true,
+	customStyles,
 } ) {
+	const styles = customStyles === undefined ? defaultStyles : customStyles;
+
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
 		'linear-gradient(240deg, rgba(0,255,0,.8), 0%, rgba(0,255,0,0) 70.71%)',
@@ -66,7 +71,8 @@ function ColorPalette( {
 		: customSwatchGradients;
 	const isCustomGradientColor = isGradientColor && isSelectedCustom();
 	const shouldShowCustomIndicator =
-		! isGradientSegment || isCustomGradientColor;
+		shouldShowCustomIndicatorOption &&
+		( ! isGradientSegment || isCustomGradientColor );
 
 	const accessibilityHint = isGradientSegment
 		? __( 'Navigates to customize the gradient' )
@@ -247,11 +253,13 @@ function ColorPalette( {
 								isSelected={ isSelectedCustom() }
 								style={ styles.colorIndicator }
 							/>
-							<Text style={ customTextStyle }>
-								{ isIOS
-									? customText
-									: customText.toUpperCase() }
-							</Text>
+							{ shouldShowCustomLabel && (
+								<Text style={ customTextStyle }>
+									{ isIOS
+										? customText
+										: customText.toUpperCase() }
+								</Text>
+							) }
 						</View>
 					</TouchableWithoutFeedback>
 				</View>

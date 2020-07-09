@@ -43,6 +43,7 @@ function MediaPlaceholder( props ) {
 		getStylesFromColorScheme,
 		multiple,
 		value = [],
+		children,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -169,6 +170,7 @@ function MediaPlaceholder( props ) {
 							>
 								{ getMediaOptions() }
 								{ renderContent() }
+								{ children }
 							</View>
 						</TouchableWithoutFeedback>
 					);
