@@ -16,7 +16,6 @@ import { ComboboxControl } from '@wordpress/components';
  */
 import PostAuthorCheck from './check';
 
-let latestAvailableAuthors;
 function PostAuthor() {
 	const authors = useSelect( ( select ) => select( 'core' ).getAuthors() );
 	const postAuthor = useSelect( ( select ) =>
@@ -104,10 +103,6 @@ function PostAuthor() {
 		[ availableAuthors, fieldValue ]
 	);
 
-	if ( ! isLoading ) {
-		latestAvailableAuthors = availableAuthors;
-	}
-
 	if ( ! postAuthor ) {
 		return null;
 	}
@@ -123,7 +118,7 @@ function PostAuthor() {
 		<PostAuthorCheck>
 			<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
 			<ComboboxControl
-				options={ latestAvailableAuthors }
+				options={ availableAuthors }
 				initialInputValue={ postAuthor?.name }
 				onInputValueChange={ debounce( handleKeydown, 300 ) }
 				onChange={ handleSelect }

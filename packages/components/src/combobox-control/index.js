@@ -5,10 +5,11 @@ import { useCombobox } from 'downshift';
 import classnames from 'classnames';
 import { isEqual } from 'lodash';
 
+
 /**
  * Internal dependencies
  */
-import { Button, Dashicon } from '../';
+import { Button, Dashicon, Spinner} from '../';
 
 const itemToString = ( item ) => item && item.name;
 export default function ComboboxControl( {
@@ -71,6 +72,9 @@ export default function ComboboxControl( {
 			>
 				{ label }
 			</label>
+			{ isLoading && (
+				<Spinner />
+			) }
 			<div
 				{ ...getComboboxProps( {
 					className: 'components-combobox-control__button',
