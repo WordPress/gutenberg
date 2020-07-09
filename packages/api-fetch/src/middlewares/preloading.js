@@ -49,23 +49,14 @@ function createPreloadingMiddleware( preloadedData ) {
 				return Promise.resolve(
 					parse
 						? cache[ path ].body
-						: {
-								headers: {
-									get( key ) {
-										return cache[ path ].headers[
-											Object.keys(
-												cache[ path ].headers
-											).find(
-												( headerKey ) =>
-													headerKey.toLowerCase() ===
-													key
-											)
-										];
-									},
-								},
-								json: () =>
-									Promise.resolve( cache[ path ].body ),
-						  }
+						: new window.Response(
+								JSON.stringify( cache[ path ].body ),
+								{
+									status: 200,
+									statusText: 'OK',
+									headers: cache[ path ].headers,
+								}
+						  )
 				);
 			} else if (
 				'OPTIONS' === method &&
