@@ -75,6 +75,7 @@ function ColumnEdit( {
 								width: nextWidth,
 							} );
 						} }
+						toFixed={ 1 }
 					/>
 				</PanelBody>
 				<PanelBody>

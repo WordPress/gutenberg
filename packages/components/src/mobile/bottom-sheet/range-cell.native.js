@@ -59,6 +59,12 @@ class BottomSheetRangeCell extends Component {
 		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
 	}
 
+	toFixed( num ) {
+		const { toFixed = 0 } = this.props;
+		const fixed = Math.pow( 10, toFixed );
+		return Math.floor( num * fixed ) / fixed;
+	}
+
 	getFontScale() {
 		return PixelRatio.getFontScale() < 1 ? 1 : PixelRatio.getFontScale();
 	}
@@ -70,8 +76,11 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	handleChange( text ) {
+		const { hasFocus } = this.state;
 		if ( ! isNaN( Number( text ) ) ) {
-			this.setState( { sliderValue: text } );
+			this.setState( {
+				sliderValue: ! hasFocus ? this.toFixed( text ) : text,
+			} );
 			this.announceCurrentValue( text );
 		}
 	}
@@ -81,7 +90,7 @@ class BottomSheetRangeCell extends Component {
 
 		if ( validateInput ) {
 			const sliderValue = this.validateInput( this.state.sliderValue );
-			this.handleValueSave( sliderValue );
+			this.handleValueSave( this.toFixed( sliderValue ) );
 		}
 
 		this.setState( newState );
@@ -106,9 +115,10 @@ class BottomSheetRangeCell extends Component {
 
 	handleValueSave( text ) {
 		if ( ! isNaN( Number( text ) ) ) {
-			this.onChangeValue( text );
-			this.setState( { sliderValue: text } );
-			this.announceCurrentValue( text );
+			const value = this.toFixed( text );
+			this.onChangeValue( value );
+			this.setState( { sliderValue: value } );
+			this.announceCurrentValue( value );
 		}
 	}
 
