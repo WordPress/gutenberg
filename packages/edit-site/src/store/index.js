@@ -23,21 +23,7 @@ export default function registerEditSiteStore( initialState ) {
 		initialState,
 	} );
 
-	const { showOnFront, pageOnFront } = initialState.home;
-	const initialPage = {
-		path: '/',
-		context:
-			showOnFront === 'page'
-				? {
-						postType: 'page',
-						postId: pageOnFront,
-				  }
-				: {},
-	};
-
-	// Setup async data for the store.
-	store.dispatch( actions.setHomeTemplatePath( '/' ) );
-	store.dispatch( actions.setPage( initialPage ) );
+	store.dispatch( actions.showHomepage() );
 
 	return store;
 }

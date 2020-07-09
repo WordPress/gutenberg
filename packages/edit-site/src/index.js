@@ -54,15 +54,7 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 export function initialize( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
 
-	const initialState = {
-		settings,
-		home: {
-			showOnFront: settings.showOnFront,
-			pageOnFront: settings.pageOnFront,
-		},
-	};
-
-	registerEditSiteStore( initialState );
+	registerEditSiteStore( { settings } );
 
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
