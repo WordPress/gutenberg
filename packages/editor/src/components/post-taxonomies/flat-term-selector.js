@@ -28,7 +28,7 @@ import { addQueryArgs } from '@wordpress/url';
  * Module constants
  */
 const DEFAULT_QUERY = {
-	per_page: -1,
+	per_page: 20,
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name',
@@ -222,7 +222,9 @@ class FlatTermSelector extends Component {
 
 	searchTerms( search = '' ) {
 		invoke( this.searchRequest, [ 'abort' ] );
-		this.searchRequest = this.fetchTerms( { search } );
+		if ( search.length >= 3 ) {
+			this.searchRequest = this.fetchTerms({search});
+		}
 	}
 
 	render() {
