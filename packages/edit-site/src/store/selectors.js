@@ -91,7 +91,7 @@ export const getSettings = createSelector(
  * @return {number?} Home template ID.
  */
 export function getHomeTemplateId( state ) {
-	return state.home.templateId;
+	return state.homeTemplateId;
 }
 
 /**
@@ -136,26 +136,4 @@ export function getTemplateType( state ) {
  */
 export function getPage( state ) {
 	return state.page;
-}
-
-/**
- * Returns the site's current `show_on_front` setting.
- *
- * @param {Object} state Global application state.
- *
- * @return {string?} The setting.
- */
-export function getShowOnFront( state ) {
-	return state.home.showOnFront;
-}
-
-/**
- * Returns the site's current `page_on_front` setting.
- *
- * @param {Object} state Global application state.
- *
- * @return {number?} The setting.
- */
-export function getPageOnFront( state ) {
-	return state.home.pageOnFront;
 }

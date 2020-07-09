@@ -165,13 +165,10 @@ export function page( state, action ) {
  *
  * @return {Object} Updated state.
  */
-export function home( state = {}, action ) {
+export function homeTemplateId( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SET_HOME_TEMPLATE':
-			return {
-				...state,
-				templateId: action.templateId,
-			};
+			return action.homeTemplateId;
 	}
 
 	return state;
@@ -185,5 +182,5 @@ export default combineReducers( {
 	templatePartId,
 	templateType,
 	page,
-	home,
+	homeTemplateId,
 } );

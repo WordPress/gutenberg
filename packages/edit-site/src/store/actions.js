@@ -108,32 +108,59 @@ export function setTemplatePart( templatePartId ) {
  * Updates the homeTemplateId state with the templateId of the page resolved
  * from the given path.
  *
- * @param {string} path The path to the page which should be set as the homepage.
+ * @param {number} homeTemplateId The template ID for the homepage.
  */
-export function* setHomeTemplatePath( path ) {
-	const homeTemplateId = yield findTemplate( path );
-	dispatch( {
+export function setHomeTemplateId( homeTemplateId ) {
+	return {
 		type: 'SET_HOME_TEMPLATE',
 		homeTemplateId,
-	} );
+	};
 }
 
 /**
- * Resolves the template for a page and sets them.
+ * Resolves the template for a page if no templateId is passed and sets them.
  *
  * @param {Object}  page         The page object.
  * @param {string}  page.type    The page type.
  * @param {string}  page.slug    The page slug.
  * @param {string}  page.path    The page path.
  * @param {Object}  page.context The page context.
+ * @param {number?} templateId   The template ID for the page if we already know it.
  *
  * @return {Object} Action object.
  */
-export function* setPage( page ) {
-	const templateId = yield findTemplate( page.path );
+export function* setPage( page, templateId ) {
+	const id = templateId ?? ( yield findTemplate( page.path ) );
 	return {
 		type: 'SET_PAGE',
 		page,
-		templateId,
+		templateId: id,
 	};
+}
+
+/**
+ * Displays the site homepage for editing in the editor.
+ */
+export function* showHomepage() {
+	const templateId = yield findTemplate( '/' );
+
+	yield setHomeTemplateId( templateId );
+
+	const {
+		show_on_front: showOnFront,
+		page_on_front: frontpageId,
+	} = yield select( 'core', 'getEntityRecord', 'root', 'site' );
+
+	const homePage = {
+		path: '/',
+		context:
+			showOnFront === 'page'
+				? {
+						postType: 'page',
+						postId: frontpageId,
+				  }
+				: {},
+	};
+
+	yield setPage( homePage, templateId );
 }
