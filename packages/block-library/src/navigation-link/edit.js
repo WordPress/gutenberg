@@ -63,6 +63,7 @@ function NavigationLinkEdit( {
 	const { label, opensInNewTab, url, id, nofollow, description } = attributes;
 	const link = {
 		url,
+		id,
 		opensInNewTab,
 		title: label,
 	};
@@ -249,7 +250,6 @@ function NavigationLinkEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
-								id={ id }
 								showInitialSuggestions={ true }
 								createSuggestion={
 									userCanCreatePages

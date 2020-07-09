@@ -158,7 +158,6 @@ const makeCancelable = ( promise ) => {
 function LinkControl( {
 	searchInputPlaceholder,
 	value,
-	id,
 	settings,
 	onChange = noop,
 	noDirectEntry = false,
@@ -178,7 +177,7 @@ function LinkControl( {
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
-			: ! value || ( ! value.url && ! id )
+			: ! value || ( ! value.url && ! value.id )
 	);
 	const [ isResolvingLink, setIsResolvingLink ] = useState( false );
 	const [ errorMessage, setErrorMessage ] = useState( null );
@@ -608,7 +607,7 @@ function LinkControl( {
 							</span>
 						) }
 
-						{ typeof value.url === 'undefined' && (
+						{ typeof value.id !== 'undefined' && (
 							<span className="block-editor-link-control__search-item-header">
 								{ value && value.title && (
 									<span className="block-editor-link-control__search-item-info">
