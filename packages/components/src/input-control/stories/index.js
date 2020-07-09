@@ -37,14 +37,17 @@ function Example() {
 			'default'
 		),
 		suffix: text( 'suffix', '' ),
+		prefix: text( 'prefix', '' ),
 	};
 
 	const suffixMarkup = props.suffix ? <div>{ props.suffix }</div> : null;
+	const prefixMarkup = props.prefix ? <div>{ props.prefix }</div> : null;
 
 	return (
 		<InputControl
 			{ ...props }
 			onChange={ ( v ) => setValue( v ) }
+			prefix={ prefixMarkup }
 			suffix={ suffixMarkup }
 			value={ value }
 		/>
