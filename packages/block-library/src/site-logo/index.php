@@ -28,7 +28,7 @@ function render_block_core_site_logo( $attributes ) {
 		$class_name .= " {$attributes['className']}";
 	}
 
-	if ( ! empty( $attributes['align'] ) && in_array( $attributes['align'], array( 'center', 'left', 'right' ), TRUE ) ) {
+	if ( ! empty( $attributes['align'] ) && in_array( $attributes['align'], array( 'center', 'left', 'right' ), true ) ) {
 		$class_name .= " align{$attributes['align']}";
 	}
 
