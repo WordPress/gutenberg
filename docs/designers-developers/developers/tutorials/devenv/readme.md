@@ -94,7 +94,7 @@ The `wp-env` script is used to create a Docker WordPress environment, to use sta
 wp-env start
 ```
 
-You can access your environment in your browser at: [http://localhost:8888/], the default username is `admin` and default password is `password`. For more information controlling the Docker enivironment see the [@wordpress/env package readme](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
+You can access your environment in your browser at: [http://localhost:8888/](http://localhost:8888/), the default username is `admin` and default password is `password`. For more information controlling the Docker environment see the [@wordpress/env package readme](/packages/env/README.md).
 
 If you are developing a single plugin, you should run `wp-env start` from that plugin working directory—it will mount and activate the plugin automatically. Note: This also works for themes, run from the directory you are developing the theme.
 

@@ -28,7 +28,7 @@ The first thing you need is a development enviornment and tools. This includes s
 
 The create a block tutorials breaks down to the following sections.
 
-1. [WordPress Plugin](wp-plugin.md)
+1. [WordPress Plugin](/docs/designers-developers/developers/tutorials/create-block/wp-plugin.md)
 2. [ESNext Syntax](esnext-js.md)
 3. [Anatomy of a Gutenberg Block ](block-anatomy.md)
 4. [Block Attributes](block-attributes.md)
