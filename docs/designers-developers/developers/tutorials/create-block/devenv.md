@@ -22,19 +22,19 @@ A tip for macOS Catalina, the default profile file may not be created, you can c
 
 Run the following on the command-line to install nvm:
 
-```
+```sh
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 ```
 
 After installing nvm, you need to use it to install node, to install the latest version of node, run:
 
-```
+```sh
 nvm install --lts
 ```
 
 The important part after installing is being able to use them in your terminal. Open a terminal command-line and type `node -v` and `npm -v` to confirm they are installed.
 
-```
+```sh
 > node -v
 v12.18.0
 
@@ -54,13 +54,13 @@ The `wp-env` package requires Docker to be installed. There are instructions ava
 
 After confirming that the prerequisites are installed, install `wp-env` globally from the command-line using:
 
-```bash
+```sh
 npm -g install @wordpress/env
 ```
 
 This will be used in the next [Plugin step](wp-plugin.ms). To confirm it is installed and available, run:
 
-```
+```sh
 wp-env --version
 > 1.4.0
 ```
@@ -71,10 +71,7 @@ A block is just a plugin, so any WordPress environment can be used for developme
 
 -   [Local by Flywheel](https://localbyflywheel.com/) - Local is a single application you download and install. You will need to know where the plugin directory is located after install. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`
 
--   [WampServer](http://www.wampserver.com/en/) or
-    [MAMP](https://www.mamp.info/) environments, both are quite similar to
-    Local, combining a web server, PHP, and database. However these tools
-    are not WordPress specific, so if you are not already using them, Local might be an easier option
+-   [WampServer](http://www.wampserver.com/en/) or [MAMP](https://www.mamp.info/) environments, both are quite similar to Local, combining a web server, PHP, and database. However these tools are not WordPress specific, so if you are not already using them, Local might be an easier option
 
 -   Remote server - you could work on remote server that is easy to setup, since most hosts have a standard WordPress install. However, this may require additonal development time to sync to the server.
 

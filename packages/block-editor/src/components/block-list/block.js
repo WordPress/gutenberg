@@ -38,6 +38,30 @@ import { Block } from './block-wrapper';
 
 export const BlockListBlockContext = createContext();
 
+/**
+ * Merges wrapper props with special handling for classNames and styles.
+ *
+ * @param {Object} propsA
+ * @param {Object} propsB
+ *
+ * @return {Object} Merged props.
+ */
+function mergeWrapperProps( propsA, propsB ) {
+	const newProps = {
+		...propsA,
+		...propsB,
+	};
+
+	if ( propsA && propsB && propsA.className && propsB.className ) {
+		newProps.className = classnames( propsA.className, propsB.className );
+	}
+	if ( propsA && propsB && propsA.style && propsB.style ) {
+		newProps.style = { ...propsA.style, ...propsB.style };
+	}
+
+	return newProps;
+}
+
 function BlockListBlock( {
 	mode,
 	isFocusMode,
@@ -97,10 +121,10 @@ function BlockListBlock( {
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
-		wrapperProps = {
-			...wrapperProps,
-			...blockType.getEditWrapperProps( attributes ),
-		};
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
 	}
 
 	const generatedClassName =
