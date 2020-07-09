@@ -229,25 +229,25 @@ export default function LogoEdit( {
 	const [ logoUrl, setLogoUrl ] = useState();
 	const [ error, setError ] = useState();
 	const ref = useRef();
-	const { sitelogo, url } = useSelect( ( select ) =>
-		select( 'core' ).getEditedEntityRecord( 'root', 'site' )
-	);
-	const mediaItemData = useSelect(
-		( select ) => {
-			const mediaItem = select( 'core' ).getEntityRecord(
-				'root',
-				'media',
-				sitelogo
-			);
-			return (
-				mediaItem && {
-					url: mediaItem.source_url,
-					alt: mediaItem.alt_text,
-				}
-			);
-		},
-		[ sitelogo ]
-	);
+	const { mediaItemData, sitelogo, url } = useSelect( ( select ) => {
+		const siteSettings = select( 'core' ).getEditedEntityRecord(
+			'root',
+			'site'
+		);
+		const mediaItem = select( 'core' ).getEntityRecord(
+			'root',
+			'media',
+			siteSettings.sitelogo
+		);
+		return {
+			mediaItemData: mediaItem && {
+				url: mediaItem.source_url,
+				alt: mediaItem.alt_text,
+			},
+			sitelogo: siteSettings.sitelogo,
+			url: siteSettings.url,
+		};
+	} );
 
 	const { editEntityRecord } = useDispatch( 'core' );
 	const setLogo = ( newValue ) =>
