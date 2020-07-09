@@ -47,29 +47,33 @@ export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
 /**
  * Returns the settings, taking into account active features and permissions.
  *
- * @param {Object} state Global application state.
+ * @param {Object}   state             Global application state.
+ * @param {Function} setIsInserterOpen Setter for the open state of the global inserter.
  *
  * @return {Object} Settings.
  */
 export const getSettings = createSelector(
-	( state ) => {
-		const canUserCreateMedia = getCanUserCreateMedia( state );
-		if ( ! canUserCreateMedia ) {
-			return state.settings;
-		}
-
-		return {
+	( state, setIsInserterOpen ) => {
+		const settings = {
 			...state.settings,
 			focusMode: isFeatureActive( state, 'focusMode' ),
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
-			mediaUpload( { onError, ...rest } ) {
-				uploadMedia( {
-					wpAllowedMimeTypes: state.settings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
-					...rest,
-				} );
-			},
+			__experimentalSetIsInserterOpened: setIsInserterOpen,
 		};
+
+		const canUserCreateMedia = getCanUserCreateMedia( state );
+		if ( ! canUserCreateMedia ) {
+			return settings;
+		}
+
+		settings.mediaUpload = ( { onError, ...rest } ) => {
+			uploadMedia( {
+				wpAllowedMimeTypes: state.settings.allowedMimeTypes,
+				onError: ( { message } ) => onError( message ),
+				...rest,
+			} );
+		};
+		return settings;
 	},
 	( state ) => [
 		getCanUserCreateMedia( state ),
@@ -121,28 +125,6 @@ export function getTemplatePartId( state ) {
  */
 export function getTemplateType( state ) {
 	return state.templateType;
-}
-
-/**
- * Returns the current template IDs.
- *
- * @param {Object} state Global application state.
- *
- * @return {number[]} Template IDs.
- */
-export function getTemplateIds( state ) {
-	return state.templateIds;
-}
-
-/**
- * Returns the current template part IDs.
- *
- * @param {Object} state Global application state.
- *
- * @return {number[]} Template part IDs.
- */
-export function getTemplatePartIds( state ) {
-	return state.templatePartIds;
 }
 
 /**

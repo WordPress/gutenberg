@@ -5,6 +5,7 @@ import { useEntityId } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { __ } from '@wordpress/i18n';
 
 function PostCommentsCountDisplay( { className } ) {
 	const postId = useEntityId( 'postType', 'post' );
@@ -32,7 +33,7 @@ function PostCommentsCountDisplay( { className } ) {
 
 export default function PostCommentsCountEdit( { className } ) {
 	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return 'Post Comments Count Placeholder';
+		return __( 'Post Comments Count' );
 	}
 	return <PostCommentsCountDisplay className={ className } />;
 }

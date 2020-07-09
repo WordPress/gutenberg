@@ -136,5 +136,5 @@ export function getErrorNotices( state ) {
  * @return {string|boolean} The error text, or false if no error.
  */
 export function getErrorNoticeForBlock( state, blockId ) {
-	return state.errorNotices[ blockId ] || false;
+	return state.errorNotices[ blockId ];
 }

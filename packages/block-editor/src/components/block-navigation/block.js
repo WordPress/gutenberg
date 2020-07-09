@@ -51,7 +51,7 @@ export default function BlockNavigationBlock( {
 
 	// Subtract 1 from rowCount, as it includes the block appender.
 	const siblingCount = rowCount - 1;
-	const hasSiblings = siblingCount > 1;
+	const hasSiblings = siblingCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const hasVisibleMovers = isHovered || isFocused;
 	const moverCellClassName = classnames(
@@ -120,7 +120,7 @@ export default function BlockNavigationBlock( {
 						<TreeGridItem>
 							{ ( { ref, tabIndex, onFocus } ) => (
 								<BlockMoverUpButton
-									__experimentalOrientation="vertical"
+									orientation="vertical"
 									clientIds={ [ clientId ] }
 									ref={ ref }
 									tabIndex={ tabIndex }
@@ -131,7 +131,7 @@ export default function BlockNavigationBlock( {
 						<TreeGridItem>
 							{ ( { ref, tabIndex, onFocus } ) => (
 								<BlockMoverDownButton
-									__experimentalOrientation="vertical"
+									orientation="vertical"
 									clientIds={ [ clientId ] }
 									ref={ ref }
 									tabIndex={ tabIndex }

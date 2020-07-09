@@ -189,6 +189,7 @@ describe( 'deleting all blocks', () => {
 
 		// Add and remove a block.
 		await insertBlock( 'Image' );
+		await page.waitForSelector( 'figure[data-type="core/image"]' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Verify there is no selected block.
