@@ -36,7 +36,6 @@ import ColorCell from './color-cell';
 import RadioCell from './radio-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import { BottomSheetProvider } from './bottom-sheet-context';
-import { performLayoutAnimation } from '../layout-animation';
 
 class BottomSheet extends Component {
 	constructor() {
@@ -60,7 +59,6 @@ class BottomSheet extends Component {
 		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
 			this
 		);
-		this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
@@ -74,8 +72,6 @@ class BottomSheet extends Component {
 			onCloseBottomSheet: null,
 			onHardwareButtonPress: null,
 			isMaxHeightSet: true,
-			currentScreen: '',
-			extraProps: {},
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -137,14 +133,6 @@ class BottomSheet extends Component {
 		);
 		this.keyboardWillShowListener.remove();
 		this.keyboardDidHideListener.remove();
-	}
-
-	componentDidUpdate( prevProps ) {
-		const { isVisible } = this.props;
-
-		if ( ! prevProps.isVisible && isVisible ) {
-			this.setState( { currentScreen: '' } );
-		}
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -257,18 +245,6 @@ class BottomSheet extends Component {
 		return onClose();
 	}
 
-	onReplaceSubsheet( destination, extraProps, callback ) {
-		performLayoutAnimation();
-
-		this.setState(
-			{
-				currentScreen: destination,
-				extraProps: extraProps || {},
-			},
-			callback
-		);
-	}
-
 	render() {
 		const {
 			title = '',
@@ -291,8 +267,6 @@ class BottomSheet extends Component {
 			isScrolling,
 			scrollEnabled,
 			isMaxHeightSet,
-			extraProps,
-			currentScreen,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -389,7 +363,16 @@ class BottomSheet extends Component {
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
 					{ ! isChildrenScrollable ? (
-						<ScrollView { ...listProps }>
+						<ScrollView
+							{ ...listProps }
+							style={
+								isMaxHeightSet
+									? {
+											maxHeight,
+									  }
+									: {}
+							}
+						>
 							<BottomSheetProvider
 								value={ {
 									shouldEnableBottomSheetScroll: this
@@ -401,9 +384,6 @@ class BottomSheet extends Component {
 										.onHandleClosingBottomSheet,
 									onHardwareButtonPress: this
 										.onHandleHardwareButtonPress,
-									onReplaceSubsheet: this.onReplaceSubsheet,
-									extraProps,
-									currentScreen,
 								} }
 							>
 								<TouchableHighlight accessible={ false }>
@@ -424,9 +404,6 @@ class BottomSheet extends Component {
 									.onHandleClosingBottomSheet,
 								onHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
-								onReplaceSubsheet: this.onReplaceSubsheet,
-								extraProps,
-								currentScreen,
 								listProps,
 							} }
 						>

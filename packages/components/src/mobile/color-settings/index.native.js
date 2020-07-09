@@ -25,6 +25,7 @@ import {
 import {
 	useRoute,
 	useFocusEffect,
+	useIsFocused,
 	useNavigation,
 } from '@react-navigation/native';
 /**
@@ -42,6 +43,7 @@ import styles from './style.scss';
 
 const BottomSheetScreen = ( { children, setHeight } ) => {
 	const height = useRef( { maxHeight: 0 } );
+	const isFocused = useIsFocused();
 	useFocusEffect(
 		useCallback( () => {
 			if ( height.current.maxHeight !== 0 ) {
@@ -52,7 +54,10 @@ const BottomSheetScreen = ( { children, setHeight } ) => {
 	);
 
 	const onLayout = ( e ) => {
-		if ( height.current.maxHeight !== e.nativeEvent.layout.height ) {
+		if (
+			height.current.maxHeight !== e.nativeEvent.layout.height &&
+			isFocused
+		) {
 			height.current.maxHeight = e.nativeEvent.layout.height;
 			setHeight( e.nativeEvent.layout.height );
 		}

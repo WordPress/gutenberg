@@ -7,6 +7,7 @@
 import {
 	NavigationContainer,
 	useFocusEffect,
+	useIsFocused,
 	DefaultTheme,
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -32,6 +33,7 @@ const forFade = ( { current } ) => ( {
 
 const BottomSheetScreen = ( { children, setHeight } ) => {
 	const height = useRef( { maxHeight: 0 } );
+	const isFocused = useIsFocused();
 	useFocusEffect(
 		useCallback( () => {
 			if ( height.current.maxHeight !== 0 ) {
@@ -42,7 +44,10 @@ const BottomSheetScreen = ( { children, setHeight } ) => {
 	);
 
 	const onLayout = ( e ) => {
-		if ( height.current.maxHeight !== e.nativeEvent.layout.height ) {
+		if (
+			height.current.maxHeight !== e.nativeEvent.layout.height &&
+			isFocused
+		) {
 			height.current.maxHeight = e.nativeEvent.layout.height;
 			setHeight( e.nativeEvent.layout.height );
 		}
@@ -62,8 +67,8 @@ function BottomSheetSettings( {
 		if ( heightValue !== maxHeight ) {
 			Animated.timing( heightValue, {
 				toValue: maxHeight,
-				duration: 300,
-				easing: Easing.ease,
+				duration: 200,
+				easing: Easing.quad,
 			} ).start();
 		}
 	};

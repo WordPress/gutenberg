@@ -31,12 +31,6 @@ export const BottomSheetContext = createContext( {
 	onCloseBottomSheet: () => {},
 	// Android only: Function called to control android hardware back button functionality
 	onHardwareButtonPress: () => {},
-	// Function called to navigate to another subsheet
-	onReplaceSubsheet: () => {},
-	// Object contains extra data passed to the current subsheet
-	extraProps: {},
-	// Specifies the currently active subsheet name
-	currentScreen: undefined,
 } );
 
 export const {

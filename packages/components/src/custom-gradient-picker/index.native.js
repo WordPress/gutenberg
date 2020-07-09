@@ -14,7 +14,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { colorsUtils } from '../mobile/color-settings/utils';
-import { performLayoutAnimation } from '../mobile/layout-animation';
 import { getGradientParsed } from './utils';
 import { serializeGradient } from './serializer';
 import {
@@ -66,7 +65,6 @@ function CustomGradientPicker() {
 
 	function onGradientTypeChange( type ) {
 		const gradientColor = getGradientColor( type );
-		performLayoutAnimation();
 		navigation.setParams( { currentValue: gradientColor } );
 		setColor( gradientColor );
 	}
