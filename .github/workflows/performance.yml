@@ -1,8 +1,8 @@
 name: Performances Tests
 
 on: [pull_request]
-  paths:
-  - '!**/*.md'
+  paths-ignore:
+  - '**.md'
 
 jobs:
   performance:

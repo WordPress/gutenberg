@@ -1,8 +1,8 @@
 name: React Native E2E Tests (Android)
 
 on: pull_request
-  paths:
-  - '!**/*.md'
+  paths-ignore:
+  - '**.md'
 
 jobs:
   test:
