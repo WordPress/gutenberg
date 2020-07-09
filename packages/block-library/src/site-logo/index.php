@@ -13,10 +13,6 @@
  * @return string The render.
  */
 function render_block_core_site_logo( $attributes ) {
-	$image_attrs_filter = function ( $image_attrs ) use ( $attributes ) {
-		return $image_attrs;
-	};
-
 	$adjust_width_height_filter = function ( $image ) use ( $attributes ) {
 		if ( empty( $attributes['width'] ) ) {
 			return $image;
@@ -32,7 +28,7 @@ function render_block_core_site_logo( $attributes ) {
 		$class_name .= " {$attributes['className']}";
 	}
 
-	if ( ! empty( $attributes['align'] ) && in_array( $attributes['align'], array( 'center', 'left', 'right' ) ) ) {
+	if ( ! empty( $attributes['align'] ) && in_array( $attributes['align'], array( 'center', 'left', 'right' ), TRUE ) ) {
 		$class_name .= " align{$attributes['align']}";
 	}
 
