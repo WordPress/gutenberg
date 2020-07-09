@@ -247,7 +247,7 @@ export default function LogoEdit( {
 			sitelogo: siteSettings.sitelogo,
 			url: siteSettings.url,
 		};
-	} );
+	}, [] );
 
 	const { editEntityRecord } = useDispatch( 'core' );
 	const setLogo = ( newValue ) =>
