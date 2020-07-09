@@ -49,6 +49,43 @@ export const postTitle = combineReducers( {
 	},
 } );
 
+/**
+ * Reducer returning the clipboard state.
+ *
+ * @param {Object}  state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function clipboard( state = null, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_CLIPBOARD':
+			return action.clipboard;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the notices state.
+ *
+ * @param {Object}  state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function notices( state = [], action ) {
+	switch ( action.type ) {
+		case 'CREATE_NOTICE':
+			return [ ...state, action.notice ];
+		case 'REMOVE_ALL_NOTICES':
+			return [];
+		case 'REMOVE_NOTICE':
+			return state.filter( ( notice ) => notice.id !== action.id );
+	}
+	return state;
+}
+
 export default optimist(
 	combineReducers( {
 		postId,
@@ -62,5 +99,7 @@ export default optimist(
 		template,
 		isReady,
 		editorSettings,
+		clipboard,
+		notices,
 	} )
 );

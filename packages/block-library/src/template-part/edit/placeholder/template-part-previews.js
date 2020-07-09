@@ -22,7 +22,11 @@ function PreviewPlaceholder() {
 }
 
 function TemplatePartItem( { templatePart, setAttributes } ) {
-	const { id, slug, theme } = templatePart;
+	const {
+		id,
+		slug,
+		meta: { theme },
+	} = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';

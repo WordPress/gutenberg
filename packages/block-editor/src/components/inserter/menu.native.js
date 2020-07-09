@@ -2,25 +2,22 @@
  * External dependencies
  */
 import { FlatList, View, TouchableHighlight, Dimensions } from 'react-native';
+import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, rawHandler } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
-import {
-	withInstanceId,
-	compose,
-	withPreferredColorScheme,
-} from '@wordpress/compose';
+import { withInstanceId, compose } from '@wordpress/compose';
 import { BottomSheet } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import InserterMenuItem from './menu-item';
 import styles from './style.scss';
+import MenuItem from './menu-item.native';
 
 const MIN_COL_NUM = 3;
 
@@ -30,6 +27,7 @@ export class InserterMenu extends Component {
 
 		this.onClose = this.onClose.bind( this );
 		this.onLayout = this.onLayout.bind( this );
+		this.renderItem = this.renderItem.bind( this );
 		this.state = {
 			numberOfColumns: MIN_COL_NUM,
 		};
@@ -94,14 +92,31 @@ export class InserterMenu extends Component {
 	}
 
 	onLayout() {
-		const columnProperties = this.calculateColumnsProperties();
-		const numberOfColumns = columnProperties.numOfColumns;
+		const {
+			numOfColumns,
+			itemWidth,
+			maxWidth,
+		} = this.calculateColumnsProperties();
+		const numberOfColumns = numOfColumns;
 
-		this.setState( { numberOfColumns } );
+		this.setState( { numberOfColumns, itemWidth, maxWidth } );
+	}
+
+	renderItem( { item } ) {
+		const { itemWidth, maxWidth } = this.state;
+		const { onSelect } = this.props;
+		return (
+			<MenuItem
+				item={ item }
+				itemWidth={ itemWidth }
+				maxWidth={ maxWidth }
+				onSelect={ onSelect }
+			/>
+		);
 	}
 
 	render() {
-		const { items, onSelect } = this.props;
+		const { items } = this.props;
 		const { numberOfColumns } = this.state;
 
 		const bottomPadding = styles.contentBottomPadding;
@@ -125,12 +140,7 @@ export class InserterMenu extends Component {
 							<View style={ styles.rowSeparator } />
 						) }
 						keyExtractor={ ( item ) => item.name }
-						renderItem={ ( { item } ) => (
-							<InserterMenuItem
-								item={ item }
-								onSelect={ () => onSelect( item ) }
-							/>
-						) }
+						renderItem={ this.renderItem }
 					/>
 				</TouchableHighlight>
 			</BottomSheet>
@@ -146,8 +156,10 @@ export default compose(
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 			getSettings,
+			canInsertBlockType,
 		} = select( 'core/block-editor' );
-		const { getChildBlockNames } = select( 'core/blocks' );
+		const { getChildBlockNames, getBlockType } = select( 'core/blocks' );
+		const { getClipboard } = select( 'core/editor' );
 
 		let destinationRootClientId = rootClientId;
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
@@ -164,10 +176,29 @@ export default compose(
 		const {
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 		} = getSettings();
+		const clipboard = getClipboard();
+		const clipboardBlock =
+			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
+		const shouldAddClipboardBlock =
+			clipboardBlock &&
+			canInsertBlockType( clipboardBlock.name, destinationRootClientId );
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: getInserterItems( destinationRootClientId ),
+			items: shouldAddClipboardBlock
+				? [
+						{
+							...pick( getBlockType( clipboardBlock.name ), [
+								'name',
+								'icon',
+							] ),
+							id: 'clipboard',
+							initialAttributes: clipboardBlock.attributes,
+							innerBlocks: clipboardBlock.innerBlocks,
+						},
+						...getInserterItems( destinationRootClientId ),
+				  ]
+				: getInserterItems( destinationRootClientId ),
 			destinationRootClientId,
 			shouldInsertAtTheTop,
 		};
@@ -212,9 +243,13 @@ export default compose(
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
-				const { name, initialAttributes } = item;
+				const { name, initialAttributes, innerBlocks } = item;
 
-				const insertedBlock = createBlock( name, initialAttributes );
+				const insertedBlock = createBlock(
+					name,
+					initialAttributes,
+					innerBlocks
+				);
 
 				insertBlock(
 					insertedBlock,
@@ -233,6 +268,5 @@ export default compose(
 			},
 		};
 	} ),
-	withInstanceId,
-	withPreferredColorScheme
+	withInstanceId
 )( InserterMenu );

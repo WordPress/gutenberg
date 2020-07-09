@@ -7,7 +7,7 @@ import { BlockIcon } from '@wordpress/block-editor';
 function DownloadableBlockIcon( { icon, title } ) {
 	return (
 		<div className="block-directory-downloadable-block-icon">
-			{ icon.match( /\.(jpeg|jpg|gif|png)(?:\?.*)?$/ ) !== null ? (
+			{ icon.match( /\.(jpeg|jpg|gif|png|svg)(?:\?.*)?$/ ) !== null ? (
 				<img
 					src={ icon }
 					alt={ sprintf(

@@ -31,7 +31,6 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-		isDraggingBlocks,
 	} = select( 'core/block-editor' );
 	return {
 		isNavigationMode: isNavigationMode(),
@@ -41,7 +40,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: getLastMultiSelectedBlockClientId(),
-		isDragging: isDraggingBlocks(),
 	};
 }
 
@@ -49,7 +47,6 @@ function BlockPopover( {
 	clientId,
 	rootClientId,
 	isValid,
-	moverDirection,
 	isEmptyDefaultBlock,
 	capturingClientId,
 } ) {
@@ -61,7 +58,6 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 		lastClientId,
-		isDragging,
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
@@ -98,8 +94,7 @@ function BlockPopover( {
 		! shouldShowBreadcrumb &&
 		! shouldShowContextualToolbar &&
 		! isToolbarForced &&
-		! showEmptyBlockSideInserter &&
-		! isDragging
+		! showEmptyBlockSideInserter
 	) {
 		return null;
 	}
@@ -139,14 +134,6 @@ function BlockPopover( {
 		setIsInserterShown( false );
 	}
 
-	function onDragStart() {
-		setIsToolbarForced( true );
-	}
-
-	function onDragEnd() {
-		setIsToolbarForced( false );
-	}
-
 	// Position above the anchor, pop out towards the right, and position in the
 	// left corner. For the side inserter, pop out towards the left, and
 	// position in the right corner.
@@ -170,11 +157,6 @@ function BlockPopover( {
 			__unstableObserveElement={ node }
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
-			// Popover calculates the width once. Trigger a reset by remounting
-			// the component. We include both shouldShowContextualToolbar and isToolbarForced
-			// in the key to prevent the component being unmounted unexpectedly when isToolbarForced = true,
-			// e.g. during drag and drop
-			key={ shouldShowContextualToolbar || isToolbarForced }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -206,15 +188,12 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
 				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
-					moverDirection={ moverDirection }
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (
@@ -238,7 +217,6 @@ function wrapperSelector( select ) {
 		getBlockRootClientId,
 		__unstableGetBlockWithoutInnerBlocks,
 		getBlockParents,
-		getBlockListSettings,
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( 'core/block-editor' );
 
@@ -249,12 +227,9 @@ function wrapperSelector( select ) {
 		return;
 	}
 
-	const rootClientId = getBlockRootClientId( clientId );
 	const { name, attributes = {}, isValid } =
 		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
-	const { __experimentalMoverDirection } =
-		getBlockListSettings( rootClientId ) || {};
 
 	// Get Block List Settings for all ancestors of the current Block clientId
 	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
@@ -282,7 +257,6 @@ function wrapperSelector( select ) {
 		rootClientId: getBlockRootClientId( clientId ),
 		name,
 		isValid,
-		moverDirection: __experimentalMoverDirection,
 		isEmptyDefaultBlock:
 			name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		capturingClientId,
@@ -301,7 +275,6 @@ export default function WrappedBlockPopover() {
 		rootClientId,
 		name,
 		isValid,
-		moverDirection,
 		isEmptyDefaultBlock,
 		capturingClientId,
 	} = selected;
@@ -315,7 +288,6 @@ export default function WrappedBlockPopover() {
 			clientId={ clientId }
 			rootClientId={ rootClientId }
 			isValid={ isValid }
-			moverDirection={ moverDirection }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
 			capturingClientId={ capturingClientId }
 		/>

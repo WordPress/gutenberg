@@ -46,7 +46,8 @@ Clicks a block toolbar button.
 
 _Parameters_
 
--   _buttonAriaLabel_ `string`: The aria label of the button to click.
+-   _label_ `string`: The text string of the button label.
+-   _type_ `[string]`: The type of button label: 'ariaLabel' or 'content'.
 
 <a name="clickButton" href="#clickButton">#</a> **clickButton**
 
@@ -302,6 +303,16 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="insertReusableBlock" href="#insertReusableBlock">#</a> **insertReusableBlock**
+
+Opens the inserter, searches for the given reusable block, then selects the
+first result that appears. It then waits briefly for the block list to
+update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
 <a name="installPlugin" href="#installPlugin">#</a> **installPlugin**
 
 Installs a plugin from the WP.org repository.
@@ -434,6 +445,14 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="searchForReusableBlock" href="#searchForReusableBlock">#</a> **searchForReusableBlock**
+
+Search for reusable block in the global inserter.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
 <a name="selectBlockByClientId" href="#selectBlockByClientId">#</a> **selectBlockByClientId**
 
 Given the clientId of a block, selects the block on the editor.
@@ -538,6 +557,18 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+<a name="trashAllPosts" href="#trashAllPosts">#</a> **trashAllPosts**
+
+Navigates to the post listing screen and bulk-trashes any posts which exist.
+
+_Parameters_
+
+-   _postType_ `string`: String slug for type of post to trash.
+
+_Returns_
+
+-   `Promise`: Promise resolving once posts have been trashed.
 
 <a name="uninstallPlugin" href="#uninstallPlugin">#</a> **uninstallPlugin**
 

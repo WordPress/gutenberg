@@ -17,7 +17,7 @@
 	padding-left: $grid-unit-20;
 	padding-right: $grid-unit-20;
 	height: $header-height + $border-width;
-	border-bottom: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $gray-200;
 	display: flex;
 	align-items: center;
 	align-content: space-between;
@@ -26,11 +26,20 @@
 		width: 100%;
 		justify-content: center;
 	}
+
+	.has-icon {
+		margin-left: auto;
+		width: auto;
+	}
 }
 
 .editor-post-publish-panel__header-publish-button,
 .editor-post-publish-panel__header-cancel-button {
 	flex-grow: 1;
+
+	@include break-mobile() {
+		max-width: $admin-sidebar-width;
+	}
 }
 
 .editor-post-publish-panel__header-publish-button {
@@ -71,7 +80,7 @@
 	padding: 16px;
 
 	strong {
-		color: $dark-gray-900;
+		color: $gray-900;
 	}
 
 	.components-panel__body {
@@ -86,7 +95,7 @@
 }
 
 .post-publish-panel__postpublish .components-panel__body {
-	border-bottom: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $gray-100;
 	border-top: none;
 }
 
@@ -120,7 +129,7 @@
 
 	input[readonly] {
 		padding: 10px;
-		background: $light-gray-400;
+		background: $gray-200;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}

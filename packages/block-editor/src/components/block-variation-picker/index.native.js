@@ -20,7 +20,7 @@ import {
 /**
  * Internal dependencies
  */
-import InserterMenuItem from '../inserter/menu-item';
+import MenuItem from '../inserter/menu-item';
 import styles from './style.scss';
 
 function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
@@ -52,7 +52,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 			>
 				{ variations.map( ( v ) => {
 					return (
-						<InserterMenuItem
+						<MenuItem
 							item={ v }
 							key={ v.name }
 							onSelect={ () => {

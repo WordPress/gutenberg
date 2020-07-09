@@ -76,6 +76,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     private static final String TAG = "ReactAztecText";
 
     private static final String BLOCK_TYPE_TAG_KEY = "tag";
+    private static final String LINK_TEXT_COLOR_KEY = "linkTextColor";
 
     @Nullable private final Consumer<Exception> exceptionLogger;
     @Nullable private final Consumer<String> breadcrumbLogger;
@@ -139,7 +140,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                                 MapBuilder.of(
                                         "bubbled", "onSubmitEditing", "captured", "onSubmitEditingCapture")))*/
                 .put(
-                        "topChange",
+                        "topAztecChange",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onChange")))
@@ -202,6 +203,11 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
     @ReactProp(name = "text")
     public void setText(ReactAztecText view, ReadableMap inputMap) {
+        if (inputMap.hasKey(LINK_TEXT_COLOR_KEY)) {
+            int color = Color.parseColor(inputMap.getString(LINK_TEXT_COLOR_KEY));
+            setLinkTextColor(view, color);
+        }
+
         if (!inputMap.hasKey("eventCount")) {
             setTextfromJS(view, inputMap.getString("text"), inputMap.getMap("selection"));
         } else {
@@ -386,12 +392,13 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
     }
 
-    @ReactProp(name = "linkTextColor", customType = "Color")
-    public void setLinkTextColor(ReactAztecText view, @Nullable Integer color) {
-        view.setLinkFormatter(new LinkFormatter(view,
-                new LinkFormatter.LinkStyle(
-                        color, true)
-        ));
+    private void setLinkTextColor(ReactAztecText view, @Nullable Integer color) {
+        if (color != null && view.linkFormatter.getLinkStyle().getLinkColor() != color) {
+            view.setLinkFormatter(new LinkFormatter(view,
+                    new LinkFormatter.LinkStyle(
+                            color, true)
+            ));
+        }
     }
 
     /* End of the code taken from ReactTextInputManager */
@@ -567,7 +574,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                         }
                     }
                 });
-        
+
         // Don't think we need to add setOnEditorActionListener here (intercept Enter for example), but
         // in case check ReactTextInputManager
     }
@@ -623,13 +630,15 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             // the text (minus the Enter char itself).
             if (!mEditText.isEnterPressedUnderway()) {
                 int currentEventCount = mEditText.incrementAndGetEventCounter();
+                boolean singleCharacterHasBeenAdded = count - before == 1;
                 // The event that contains the event counter and updates it must be sent first.
                 // TODO: t7936714 merge these events
                 mEventDispatcher.dispatchEvent(
-                        new ReactTextChangedEvent(
+                        new AztecReactTextChangedEvent(
                                 mEditText.getId(),
                                 mEditText.toHtml(mEditText.getText(), false),
-                                currentEventCount));
+                                currentEventCount,
+                                singleCharacterHasBeenAdded ? s.charAt(start + before) : null));
 
                 mEventDispatcher.dispatchEvent(
                         new ReactTextInputEvent(
@@ -657,8 +666,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
 
         @Override
-        public void afterTextChanged(Editable s) {
-        }
+        public void afterTextChanged(Editable s) {}
     }
 
     private class AztecContentSizeWatcher implements com.facebook.react.views.textinput.ContentSizeWatcher {
