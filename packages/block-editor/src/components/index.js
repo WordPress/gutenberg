@@ -80,6 +80,7 @@ export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
+export { default as __experimentalQuickInserter } from './inserter/quick-inserter';
 export { default as __experimentalLibrary } from './inserter/library';
 export { default as __experimentalSearchForm } from './inserter/search-form';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';

@@ -36,6 +36,7 @@ import * as file from './file';
 import * as html from './html';
 import * as mediaText from './media-text';
 import * as navigation from './navigation';
+import * as navigationItem from './navigation-item';
 import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
@@ -193,6 +194,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					widgetArea,
 					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 					navigation,
+					navigationItem,
 					navigationLink,
 
 					// Register Full Site Editing Blocks.

@@ -1,0 +1,16 @@
+{
+	"name": "core/navigation-item",
+	"category": "design",
+	"parent": [
+		"core/navigation"
+	],
+	"attributes": {
+	},
+	"usesContext": [
+	],
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}
