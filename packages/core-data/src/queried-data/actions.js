@@ -23,7 +23,7 @@ export function receiveItems( items ) {
  *
  * @param {string} kind             Kind of the removed entities.
  * @param {string} name             Name of the removed entities.
- * @param {Array|number} records    Records removed.
+ * @param {Array|number} records    Record IDs of the removed entities.
  * @param {boolean} invalidateCache Controls whether we want to invalidate the cache.
  * @return {Object} Action object.
  */
