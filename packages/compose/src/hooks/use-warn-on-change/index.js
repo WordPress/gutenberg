@@ -10,7 +10,7 @@ function useWarnOnChange( object, prefix = 'Change detection' ) {
 		if ( value !== object[ key ] ) {
 			// eslint-disable-next-line no-console
 			console.warn(
-				prefix + ': ' + key + ' key changed:',
+				`${ prefix }: ${ key } key changed:`,
 				value,
 				object[ key ]
 			);
