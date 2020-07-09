@@ -16,7 +16,7 @@ Additional documentation for block-based themes is available at https://develope
  2. [Creating the theme](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-theme)
  3. [Creating the templates and template parts](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-templates-and-template-parts)
  4. [Experimental-theme.json -Global styles](/docs/designers-developers/developers/tutorials/block-based-themes/README.md##experimental-themejson--global-styles)
- 5. [Adding blocks](/docs/designers-developers/developers/tutorials/block-based-themes/adding-blocks.md)
+ 5. [Adding blocks](docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md)
 
 ## What is needed to create a block-based theme?
 
@@ -32,7 +32,7 @@ Each template or template part contains the [block grammar](https://developer.wo
 The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
 
 ### Required files and file structure
-A block based theme requires an index.php file, and index template file, a style.css file and a functions.php file.
+A block based theme requires an index.php file, an index template file, a style.css file and a functions.php file.
 
 The theme may optionally include an experimental-theme.json file to manage global styles.
 You decide what additional templates and template parts to include in your theme.
@@ -158,6 +158,19 @@ Create an index.php file.
 This file is used as a fallback if the theme is activated when full site editing is not enabled. 
 You may leave the file empty for this tutorial.
 
+Your theme should now include the following files and folders:
+
+```
+theme
+ |__ style.css
+ |__ functions.php
+ |__ index.php
+ |__ block-templates
+ 	|__ (empty folder)
+ |__ block-template-parts
+ 	|__ (empty folder)
+```
+
 ### Creating the templates and template parts
 
 Create two template parts called footer.html and header.html and place them inside the block-template-parts folder.
@@ -196,7 +209,7 @@ Create a file called experimental-theme.json and save it inside the main folder.
 CSS variables are generated using **Global presets**.
 The variables are added to the `:root` on the front, and to the `.editor-styles-wrapper` class in the editor.
 
-Styles that are added to the style.css file or an editor style sheet are loaded after global styles.
+Styles that are added to the themes style.css file or an editor style sheet are loaded after global styles.
 
 Add the following global presets to the experimental-theme.json file:
 
@@ -259,7 +272,7 @@ Add the code inside the globals, after the presets:
 This example uses the CSS variables to add text color and line height to the H2 heading block,
 in combination with a custom font size.
 
-When adding styles for the headings block, we need to indicate the heading level, h1 to h6.
+When adding styles for the headings block, include the heading level, h1 to h6.
 
 Block styles are separate from global styles. Add the code after the globals, but before the closing brace.
 
@@ -283,7 +296,7 @@ https://developer.wordpress.org/block-editor/developers/themes/theme-support/#bl
 If the theme does not add any custom font sizes, variables are created using the default sizes.
 This example adds the default medium font size to the paragraph block.
 
-The font sizes are unit less, which is why we are using calc:
+The font sizes are unit less, which is why calc is used:
 https://developer.mozilla.org/en-US/docs/Web/CSS/calc
 
 ```
@@ -376,3 +389,5 @@ Below are the presets and styles combined:
 	}
 }
 ```
+
+## [Adding blocks](docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md)
