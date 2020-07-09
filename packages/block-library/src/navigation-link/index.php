@@ -95,6 +95,22 @@ function block_core_navigation_link_render_submenu_icon() {
 }
 
 /**
+ * Returns the link for the one nav iteem or false
+ *
+ * @param array $attrs    The Navigation Link block attributes.
+ *
+ * @return string|bool Returns the determined link or false.
+ */
+function block_core_navigation_link_get_url( $attrs ) {
+	if ( isset( $attrs['id'] ) ) {
+		return esc_url( get_permalink( $attrs['id'] ) );
+	} elseif ( isset( $attrs['url'] ) ) {
+		return esc_url( $attrs['url'] );
+	}
+	return false;
+}
+
+/**
  * Renders the `core/navigation-link` block.
  *
  * @param array $attributes The block attributes.
@@ -128,16 +144,23 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$css_classes .= ' ' . $class_name;
 	};
 
+	$item_url = get_navigation_link_url( $attributes );
+	$item_tag = $item_url ? 'a' : 'span';
+
 	$html = '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) .
 		( $is_active ? ' current-menu-item' : '' ) . '"' . $style_attribute . '>' .
-		'<a class="wp-block-navigation-link__content"';
+		'<' . $item_tag . ' class="wp-block-navigation-link__content"';
 
 	// Start appending HTML attributes to anchor tag.
-	if ( isset( $attributes['url'] ) ) {
+	if ( $item_url ) {
 		$html .= ' href="' . esc_url( $attributes['url'] ) . '"';
 	}
 
-	if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
+	if (
+		$item_url &&
+		isset( $attributes['opensInNewTab'] ) &&
+		true === $attributes['opensInNewTab']
+	) {
 		$html .= ' target="_blank"  ';
 	}
 	// End appending HTML attributes to anchor tag.
@@ -171,7 +194,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	$html .= '</span>';
 
-	$html .= '</a>';
+	$html .= '</' . $item_tag . '>';
 	// End anchor tag content.
 
 	if ( $block->context['showSubmenuIcon'] && $has_submenu ) {
