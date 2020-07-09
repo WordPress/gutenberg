@@ -227,6 +227,7 @@ class BottomSheet extends Component {
 			onCloseBottomSheet();
 		}
 		onClose();
+		this.onShouldSetBottomSheetMaxHeight( true );
 	}
 
 	onScrollBeginDrag() {
