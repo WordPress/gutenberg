@@ -97,6 +97,7 @@ export default function PageSwitcher( {
 		].find( ( choice ) => choice.value === newPath );
 		onActivePageChange( { ...rest, path } );
 	};
+
 	const onPostSelect = ( post ) =>
 		onActivePageChange( {
 			type: 'post',
@@ -104,6 +105,8 @@ export default function PageSwitcher( {
 			path: getPathAndQueryString( post.url ),
 			context: { postType: post.type, postId: post.id },
 		} );
+
+	const activePath = activePage?.path;
 	return (
 		<DropdownMenu
 			icon={ null }
@@ -111,8 +114,8 @@ export default function PageSwitcher( {
 			toggleProps={ {
 				children:
 					[ ...pages, ...categories, ...posts ].find(
-						( choice ) => choice.value === activePage?.path
-					)?.label || activePage?.path,
+						( choice ) => choice.value === activePath
+					)?.label || activePath,
 			} }
 			menuProps={ { className: 'edit-site-page-switcher__menu' } }
 		>
@@ -121,21 +124,21 @@ export default function PageSwitcher( {
 					<MenuGroup label={ __( 'Pages' ) }>
 						<MenuItemsChoice
 							choices={ pages }
-							value={ activePage?.path }
+							value={ activePath }
 							onSelect={ onPageSelect }
 						/>
 					</MenuGroup>
 					<MenuGroup label={ __( 'Categories' ) }>
 						<MenuItemsChoice
 							choices={ categories }
-							value={ activePage?.path }
+							value={ activePath }
 							onSelect={ onPageSelect }
 						/>
 					</MenuGroup>
 					<MenuGroup label={ __( 'Posts' ) }>
 						<MenuItemsChoice
 							choices={ posts }
-							value={ activePage?.path }
+							value={ activePath }
 							onSelect={ onPageSelect }
 						/>
 						<LinkControl
