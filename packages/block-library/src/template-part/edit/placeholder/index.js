@@ -22,7 +22,7 @@ import TemplatePartPreviews from './template-part-previews';
 export default function TemplatePartPlaceholder( { setAttributes } ) {
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const onCreate = useCallback( async () => {
-		const title = 'Untitled Section';
+		const title = 'Untitled Template Part';
 		const slug = cleanForSlug( title );
 		const templatePart = await saveEntityRecord(
 			'postType',
@@ -45,9 +45,9 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 	return (
 		<Placeholder
 			icon={ blockDefault }
-			label={ __( 'Section' ) }
+			label={ __( 'Template Part' ) }
 			instructions={ __(
-				'Create a new section or pick one from a list of available sections.'
+				'Create a new template part or pick an existing one from the list.'
 			) }
 		>
 			<Dropdown
@@ -63,7 +63,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 							{ __( 'Choose existing' ) }
 						</Button>
 						<Button onClick={ onCreate }>
-							{ __( 'New section' ) }
+							{ __( 'New template part' ) }
 						</Button>
 					</ButtonGroup>
 				) }

@@ -16,7 +16,7 @@ import { useState, forwardRef } from '@wordpress/element';
 import Backdrop from './backdrop';
 import InputField from './input-field';
 import Label from './label';
-import { Container, Root, Suffix } from './styles/input-control-styles';
+import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
 import { isValueEmpty } from '../utils/values';
 
 function useUniqueId( idProp ) {
@@ -42,6 +42,7 @@ export function InputControl(
 		onFocus = noop,
 		onValidate = noop,
 		onKeyDown = noop,
+		prefix,
 		size = 'default',
 		suffix,
 		value,
@@ -93,6 +94,11 @@ export function InputControl(
 				disabled={ disabled }
 				isFocused={ isFocused }
 			>
+				{ prefix && (
+					<Prefix className="components-input-control__prefix">
+						{ prefix }
+					</Prefix>
+				) }
 				<InputField
 					{ ...props }
 					className="components-input-control__input"
