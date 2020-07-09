@@ -50,7 +50,8 @@ const SiteLogo = ( {
 	containerRef,
 	isSelected,
 	setAttributes,
-	url,
+	logoUrl,
+	siteUrl,
 } ) => {
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -59,7 +60,7 @@ const SiteLogo = ( {
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const classes = classnames( {
-		'is-transient': isBlobURL( url ),
+		'is-transient': isBlobURL( logoUrl ),
 	} );
 	const { maxWidth, isRTL, title } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -85,11 +86,11 @@ const SiteLogo = ( {
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		<a href="#home" className={ classes } rel="home" title={ title }>
+		<a href={ siteUrl } className={ classes } rel="home" title={ title } onClick={ ( event ) => event.preventDefault() }>
 			<span className="custom-logo-link">
 				<img
 					className="custom-logo"
-					src={ url }
+					src={ logoUrl }
 					alt={ alt }
 					onLoad={ ( event ) => {
 						setNaturalSize(
@@ -219,10 +220,10 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width } = attributes;
-	const [ url, setUrl ] = useState();
+	const [ logoUrl, setLogoUrl ] = useState();
 	const [ error, setError ] = useState();
 	const ref = useRef();
-	const { sitelogo } = useSelect( ( select ) =>
+	const { sitelogo, url } = useSelect( ( select ) =>
 		select( 'core' ).getEditedEntityRecord( 'root', 'site' )
 	);
 	const mediaItemData = useSelect(
@@ -251,8 +252,8 @@ export default function LogoEdit( {
 	let alt = null;
 	if ( mediaItemData ) {
 		alt = mediaItemData.alt;
-		if ( url !== mediaItemData.url ) {
-			setUrl( mediaItemData.url );
+		if ( logoUrl !== mediaItemData.url ) {
+			setLogoUrl( mediaItemData.url );
 		}
 	}
 
@@ -265,7 +266,7 @@ export default function LogoEdit( {
 			// This is a temporary blob image
 			setLogo( '' );
 			setError();
-			setUrl( media.url );
+			setLogoUrl( media.url );
 			return;
 		}
 
@@ -274,7 +275,7 @@ export default function LogoEdit( {
 
 	const deleteLogo = () => {
 		setLogo( '' );
-		setUrl( '' );
+		setLogoUrl( '' );
 	};
 
 	const onUploadError = ( message ) => {
@@ -284,16 +285,16 @@ export default function LogoEdit( {
 	const controls = (
 		<BlockControls>
 			<ToolbarGroup>
-				{ url && (
+				{ logoUrl && (
 					<MediaReplaceFlow
-						mediaURL={ url }
+						mediaURL={ logoUrl }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept={ ACCEPT_MEDIA_STRING }
 						onSelect={ onSelectLogo }
 						onError={ onUploadError }
 					/>
 				) }
-				{ !! url && (
+				{ !! logoUrl && (
 					<ToolbarButton
 						icon="trash"
 						onClick={ () => deleteLogo() }
@@ -310,7 +311,7 @@ export default function LogoEdit( {
 		logoImage = <Spinner />;
 	}
 
-	if ( !! url ) {
+	if ( !! logoUrl ) {
 		logoImage = (
 			<SiteLogo
 				alt={ alt }
@@ -319,7 +320,8 @@ export default function LogoEdit( {
 				containerRef={ ref }
 				isSelected={ isSelected }
 				setAttributes={ setAttributes }
-				url={ url }
+				logoUrl={ logoUrl }
+				siteUrl={ url }
 			/>
 		);
 	}
@@ -353,13 +355,13 @@ export default function LogoEdit( {
 		'is-focused': isSelected,
 	} );
 
-	const key = !! url;
+	const key = !! logoUrl;
 
 	return (
 		<Block.div ref={ ref } className={ classes } key={ key }>
 			{ controls }
-			{ url && logoImage }
-			{ ! url && mediaPlaceholder }
+			{ logoUrl && logoImage }
+			{ ! logoUrl && mediaPlaceholder }
 		</Block.div>
 	);
 }
