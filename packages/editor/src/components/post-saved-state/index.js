@@ -33,7 +33,6 @@ import PostSwitchToDraftButton from '../post-switch-to-draft-button';
  */
 export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
 	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );
-
 	const isLargeViewport = useViewportMatch( 'small' );
 
 	const {
@@ -45,7 +44,7 @@ export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
 		isSaveable,
 		isSaving,
 		isScheduled,
-		post,
+		hasPublishAction,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -69,7 +68,9 @@ export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
 				isSaving: forceIsSaving || isSavingPost(),
 				isSaveable: isEditedPostSaveable(),
 				isScheduled: isCurrentPostScheduled(),
-				post: getCurrentPost(),
+				hasPublishAction:
+					getCurrentPost()?.[ '_links' ]?.[ 'wp:action-publish' ] ??
+					false,
 			};
 		},
 		[ forceIsDirty, forceIsSaving ]
@@ -131,8 +132,6 @@ export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
 
 	// Once the post has been submitted for review this button
 	// is not needed for the contributor role.
-	const hasPublishAction =
-		post?.[ '_links' ]?.[ 'wp:action-publish' ] ?? false;
 
 	if ( ! hasPublishAction && isPending ) {
 		return null;

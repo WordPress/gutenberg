@@ -242,6 +242,10 @@ _Returns_
 
 -   `boolean`: Whether viewport matches query.
 
+<a name="useWarnOnChange" href="#useWarnOnChange">#</a> **useWarnOnChange**
+
+Undocumented declaration.
+
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 
 Higher-order component creator which, given an object of DOM event types and
