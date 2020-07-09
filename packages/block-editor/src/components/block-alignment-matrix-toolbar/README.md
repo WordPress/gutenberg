@@ -9,7 +9,6 @@ The alignment matrix toolbar allows users to quickly adjust inner block alignmen
 	- [Table of contents](#table-of-contents)
 	- [Design guidelines](#design-guidelines)
 		- [Usage](#usage)
-		- [Best practices](#best-practices)
 	- [Development guidelines](#development-guidelines)
 		- [Usage](#usage-1)
 		- [Props](#props)
@@ -28,13 +27,6 @@ As an example, here's the matrix alignment tool in action.
 
 
 ![rop_right](https://i.imgur.com/yGGf6IP.png)
-
-### Best practices
-
-The matrix alignment tool should:
-
-- **Folow graphic design alignment guidelines** ; text alignment is important in graphic design. You can find tutorials online about alignment principles in graphic design, but [here](https://www.printwand.com/blog/basic-alignment-principles-in-graphic-design-with-examples) is an example.
-
 
 ## Development guidelines
 
