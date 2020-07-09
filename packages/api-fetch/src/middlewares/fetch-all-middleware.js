@@ -80,7 +80,7 @@ const fetchAllMiddleware = async ( options, next ) => {
 		} );
 		const nextResults = await parseResponse( nextResponse );
 		mergedResults = mergedResults.concat( nextResults.body );
-		nextPage = getNextPageUrl( nextResponse );
+		nextPage = getNextPageUrl( nextResults );
 	}
 	return mergedResults;
 };
