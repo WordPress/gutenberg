@@ -40,13 +40,15 @@ function createPreloadingMiddleware( preloadedData ) {
 	}, {} );
 
 	return ( options, next ) => {
-		const { parse = true } = options;
+		const { parse = true, envelope = false } = options;
 		if ( typeof options.path === 'string' ) {
 			const method = options.method || 'GET';
 			const path = getStablePath( options.path );
 
 			if ( parse && 'GET' === method && cache[ path ] ) {
-				return Promise.resolve( cache[ path ].body );
+				return Promise.resolve(
+					envelope ? cache[ path ] : cache[ path ].body
+				);
 			} else if (
 				'OPTIONS' === method &&
 				cache[ method ] &&

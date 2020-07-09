@@ -19,21 +19,9 @@ const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 const parseResponse = ( response ) =>
 	response.json ? response.json() : Promise.reject( response );
 
-const parseLinkHeader = ( linkHeader ) => {
-	if ( ! linkHeader ) {
-		return {};
-	}
-	const match = linkHeader.match( /<([^>]+)>; rel="next"/ );
-	return match
-		? {
-				next: match[ 1 ],
-		  }
-		: {};
-};
-
 const getNextPageUrl = ( response ) => {
-	const { next } = parseLinkHeader( response.headers.get( 'link' ) );
-	return next;
+	const { Link } = response.headers;
+	return Link;
 };
 
 const requestContainsUnboundedQuery = ( options ) => {
@@ -63,18 +51,17 @@ const fetchAllMiddleware = async ( options, next ) => {
 			per_page: 100,
 		} ),
 		// Ensure headers are returned for page 1.
-		parse: false,
+		envelope: true,
 	} );
 
 	const results = await parseResponse( response );
 
-	if ( ! Array.isArray( results ) ) {
+	if ( ! results.body || ! Array.isArray( results.body ) ) {
 		// We have no reliable way of merging non-array results.
-		return results;
+		return results.body;
 	}
 
-	let nextPage = getNextPageUrl( response );
-
+	let nextPage = getNextPageUrl( results );
 	if ( ! nextPage ) {
 		// There are no further pages to request.
 		return results;
@@ -89,10 +76,10 @@ const fetchAllMiddleware = async ( options, next ) => {
 			path: undefined,
 			url: nextPage,
 			// Ensure we still get headers so we can identify the next page.
-			parse: false,
+			envelope: true,
 		} );
 		const nextResults = await parseResponse( nextResponse );
-		mergedResults = mergedResults.concat( nextResults );
+		mergedResults = mergedResults.concat( nextResults.body );
 		nextPage = getNextPageUrl( nextResponse );
 	}
 	return mergedResults;
