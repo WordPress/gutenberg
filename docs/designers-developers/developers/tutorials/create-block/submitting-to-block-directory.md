@@ -46,7 +46,7 @@ Examples for an Image Slider block:
 - carousel
 - gallery
 
-[Read more](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#keyword) about keywords.
+[Read more about keywords.](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#keyword)
 
 ### Choose the right category
 
@@ -59,7 +59,7 @@ The Block Editor allows you to indicate the category your block belongs in, maki
 - widgets
 - embed
 
-[Read more](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#category) about categories.
+[Read more about categories.](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#category)
 
 Wondering where to input all this information? Read the next section :)
 
@@ -83,7 +83,6 @@ The `block.json` file also contains other important properties. Take a look at a
 
 The community is ecstatic you made it this far! Time to submit your plugin!
 
-Take a few moments to read the block guidelines (https://github.com/WordPress/wporg-plugin-guidelines/blob/block-guidelines/blocks.md). Create a zip file of your block and navigate over to the [block plugin validator](https://wordpress.org/plugins/developers/block-plugin-validator/) and upload your plugin. 
-
+Take a few moments to read [the block guidelines](https://github.com/WordPress/wporg-plugin-guidelines/blob/block-guidelines/blocks.md). Create a zip file of your block and navigate over to the [block plugin validator](https://wordpress.org/plugins/developers/block-plugin-validator/) and upload your plugin. 
 
 
