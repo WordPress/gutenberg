@@ -17,7 +17,7 @@ const title = chalk.bold;
 const success = chalk.bold.green;
 
 class PerformanceReporter {
-	onRunComplete() {
+	onTestResult() {
 		const path = __dirname + '/../specs/performance/results.json';
 
 		if ( ! existsSync( path ) ) {
