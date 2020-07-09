@@ -39,7 +39,7 @@ async function didCacheChange( key, value, options ) {
  * @param {WPEnvCacheOptions} options Parsing options
  */
 async function setCache( key, value, options ) {
-	const existingCache = getCacheFile( options );
+	const existingCache = await getCacheFile( options );
 	existingCache[ key ] = value;
 
 	await fs.writeFile(
@@ -86,4 +86,4 @@ function getPathToCacheFile( workDirectoryPath ) {
 	return path.resolve( workDirectoryPath, CACHE_FILE_NAME );
 }
 
-module.exports = { didCacheChange, setCache };
+module.exports = { didCacheChange, setCache, getCache, getCacheFile };
