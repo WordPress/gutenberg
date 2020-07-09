@@ -433,7 +433,7 @@ public class WPAndroidGlueCode {
                              Consumer<String> breadcrumbLogger,
                              @Nullable Boolean isSiteUsingWpComRestApi,
                              @Nullable Bundle editorTheme,
-                             boolean siteJetpackIsConnected) {
+                             boolean isUnsupportedBlockEditorEnabled) {
         mIsDarkMode = isDarkMode;
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
@@ -469,8 +469,8 @@ public class WPAndroidGlueCode {
         Bundle capabilities = new Bundle();
         if (isSiteUsingWpComRestApi != null) {
             capabilities.putBoolean(PROP_NAME_CAPABILITIES_MENTIONS, isSiteUsingWpComRestApi);
-            capabilities.putBoolean(PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, !siteJetpackIsConnected);
         }
+        capabilities.putBoolean(PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, isUnsupportedBlockEditorEnabled);
         initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
 
         Serializable colors = editorTheme != null ? editorTheme.getSerializable(PROP_NAME_COLORS) : null;
