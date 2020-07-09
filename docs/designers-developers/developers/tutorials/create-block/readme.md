@@ -4,6 +4,10 @@ Let's get you started creating your first block for the WordPress Block Editor. 
 
 The tutorial includes setting up your development environment, tools, and getting comfortable with the new development model. If you are already comfortable, try the quick start below, otherwise step through whatever part of the tutorial you need.
 
+## Prerequisities
+
+The first thing you need is a development enviornment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md).
+
 ## Quick Start
 
 The `@wordpress/create-block` package exists to create the necessary block scaffolding to get you started. See [create-block package documentation](https://www.npmjs.com/package/@wordpress/create-block) for additional features. This quick start assumes you have a development environment with node installed, and a WordPress site.
@@ -19,10 +23,6 @@ The above command creates a new directory called `starter-block`, installs the n
 You now need to activate the plugin from inside wp-admin plugins page.
 
 After activated, go to the block editor and use the inserter to search and add your new block.
-
-## Prerequisities
-
-The first thing you need is a development enviornment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md).
 
 ## Table of Contents
 
