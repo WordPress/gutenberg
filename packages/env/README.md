@@ -174,7 +174,7 @@ $ wp-env start
 
 ### `wp-env start`
 
-The start command installs and initalizes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure WordPress except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`.
+The start command installs and initalizes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure the environment except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`. This will not overrwrite any existing content.
 
 ```sh
 wp-env start
@@ -182,11 +182,11 @@ wp-env start
 Starts WordPress for development on port 8888 (override with WP_ENV_PORT) and
 tests on port 8889 (override with WP_ENV_TESTS_PORT). The current working
 directory must be a WordPress installation, a plugin, a theme, or contain a
-.wp-env.json file. Use the '--update' flag to download updates to mapped sources
-and to re-apply WordPress configuration options.
+.wp-env.json file. After first insall, use the '--update' flag to download updates
+to mapped sources and to re-apply WordPress configuration options.
 
 Options:
-  --update   Download source updates and re-configures WordPress.
+  --update   Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
 ```
 
