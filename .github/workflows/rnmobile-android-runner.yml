@@ -2,10 +2,7 @@ name: React Native E2E Tests (Android)
 
 on: pull_request
   paths:
-  - 'lib/**'
-  - 'packages/**'
-  - '!packages/**/*.md'
-  - '!docs/**/*.md'
+  - '!**/*.md'
 
 jobs:
   test:

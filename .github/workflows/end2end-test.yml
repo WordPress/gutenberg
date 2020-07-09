@@ -3,17 +3,11 @@ name: End-to-End Tests
 on:
   pull_request:
     paths:
-    - 'lib/**'
-    - 'packages/**'
-    - '!packages/**/*.md'
-    - '!docs/**/*.md'
+    - '!**/*.md'
   push:
     branches: [master]
     paths:
-    - 'lib/**'
-    - 'packages/**'
-    - '!packages/**/*.md'
-    - '!docs/**/*.md'
+    - '!**/*.md'
 
 jobs:
   admin-1:
