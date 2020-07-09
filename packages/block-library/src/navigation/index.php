@@ -155,22 +155,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 }
 
 /**
- * Returns the link for the one nav iteem or false
- *
- * @param array $attrs    The Navigation Link block attributes.
- *
- * @return string|bool Returns the determined link or false.
- */
-function get_navigation_link_url( $attrs ) {
-	if ( isset( $attrs['id'] ) ) {
-		return esc_url( get_permalink( $attrs['id'] ) );
-	} elseif ( isset( $attrs['url'] ) ) {
-		return esc_url( $attrs['url'] );
-	}
-	return false;
-}
-
-/**
  * Register the navigation block.
  *
  * @uses render_block_core_navigation()
