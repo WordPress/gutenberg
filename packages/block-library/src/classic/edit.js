@@ -6,9 +6,16 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { BlockControls } from '@wordpress/block-editor';
+import { Toolbar } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import ConvertToBlocksButton from './convert-to-blocks-button';
 
 const { wp } = window;
 
@@ -235,22 +242,29 @@ export default class ClassicEdit extends Component {
 		//    from the KeyboardShortcuts component to stop their propagation.
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return [
-			<div
-				key="toolbar"
-				id={ `toolbar-${ clientId }` }
-				ref={ ( ref ) => ( this.ref = ref ) }
-				className="block-library-classic__toolbar"
-				onClick={ this.focus }
-				data-placeholder={ __( 'Classic' ) }
-				onKeyDown={ this.onToolbarKeyDown }
-			/>,
-			<div
-				key="editor"
-				id={ `editor-${ clientId }` }
-				className="wp-block-freeform block-library-rich-text__tinymce"
-			/>,
-		];
+		return (
+			<>
+				<BlockControls>
+					<Toolbar>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</Toolbar>
+				</BlockControls>
+				<div
+					key="toolbar"
+					id={ `toolbar-${ clientId }` }
+					ref={ ( ref ) => ( this.ref = ref ) }
+					className="block-library-classic__toolbar"
+					onClick={ this.focus }
+					data-placeholder={ __( 'Classic' ) }
+					onKeyDown={ this.onToolbarKeyDown }
+				/>
+				<div
+					key="editor"
+					id={ `editor-${ clientId }` }
+					className="wp-block-freeform block-library-rich-text__tinymce"
+				/>
+			</>
+		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
