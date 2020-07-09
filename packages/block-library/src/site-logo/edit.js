@@ -86,7 +86,13 @@ const SiteLogo = ( {
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		<a href={ siteUrl } className={ classes } rel="home" title={ title } onClick={ ( event ) => event.preventDefault() }>
+		<a
+			href={ siteUrl }
+			className={ classes }
+			rel="home"
+			title={ title }
+			onClick={ ( event ) => event.preventDefault() }
+		>
 			<span className="custom-logo-link">
 				<img
 					className="custom-logo"
