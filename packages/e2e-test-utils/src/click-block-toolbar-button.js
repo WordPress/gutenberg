@@ -6,8 +6,8 @@ import { showBlockToolbar } from './show-block-toolbar';
 /**
  * Clicks a block toolbar button.
  *
- * @param {string} label The text string of the button label.
- * @param {string} type  The type of button label - 'ariaLabel' or 'content'.
+ * @param {string} label  The text string of the button label.
+ * @param {string} [type] The type of button label: 'ariaLabel' or 'content'.
  */
 export async function clickBlockToolbarButton( label, type = 'ariaLabel' ) {
 	await showBlockToolbar();
