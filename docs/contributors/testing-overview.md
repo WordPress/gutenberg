@@ -453,20 +453,13 @@ Every core block is required to have at least one set of fixture files for its m
 
 ## PHP Testing
 
-Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the PHP tests locally using this command.
-
-Note that these commands require the local environment to be initalized first:
-
-```bash
-# Reference the local sourcecode for wp-env in the Gutenberg repo:
-npx wp-env start
-```
-
-Using `npx` above ensures that we always use the latest wp-env sourcecode in the Gutenberg repo.
+Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the PHP tests locally using this command:
 
 ```bash
 npm run test-php
 ```
+
+_Note: The phpunit commands require `wp-env` to be running. The package script will start wp-env for you if it is not already running._
 
 Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint-php`.
 
