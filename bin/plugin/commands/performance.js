@@ -153,7 +153,7 @@ async function getPerformanceResultsForBranch(
 		const rawResults = await readJSONFile(
 			path.join(
 				performanceTestDirectory,
-				'packages/e2e-tests/specs/performance/results.json'
+				'packages/e2e-tests/specs/performance/post-editor.performance.test.results.json'
 			)
 		);
 		results.push( curateResults( rawResults ) );
