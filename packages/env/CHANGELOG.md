@@ -6,6 +6,8 @@
 
 -   The `config` and `mappings` options in `.wp-env.json` are now merged with any overrides instead of being overwritten.
 -   The first listed theme is no longer activated when running wp-env start, since this overwrote whatever theme the user manually activated.
+-   `wp-env start` no longer stops the WordPress instance if it was already started unless it needs to configure WordPress.
+-   `wp-env start` no longer downloads remote source updates. Use `wp-env start --update` to update sources.
 
 ### New Feature
 

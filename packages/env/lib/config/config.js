@@ -5,7 +5,6 @@
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const os = require( 'os' );
-const crypto = require( 'crypto' );
 
 /**
  * Internal dependencies
@@ -14,6 +13,7 @@ const detectDirectoryType = require( './detect-directory-type' );
 const { validateConfig, ValidationError } = require( './validate-config' );
 const readRawConfigFile = require( './read-raw-config-file' );
 const parseConfig = require( './parse-config' );
+const md5 = require( '../md5' );
 
 /**
  * wp-env configuration.
@@ -331,14 +331,4 @@ async function getHomeDirectory() {
 			? 'wp-env'
 			: '.wp-env'
 	);
-}
-
-/**
- * Hashes the given string using the MD5 algorithm.
- *
- * @param {string} data The string to hash.
- * @return {string} An MD5 hash string.
- */
-function md5( data ) {
-	return crypto.createHash( 'md5' ).update( data ).digest( 'hex' );
 }
