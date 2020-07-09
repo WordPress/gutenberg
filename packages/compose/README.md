@@ -246,7 +246,7 @@ _Returns_
 
 Hook that performs a shallow comparison between the preview value of an object
 and the new one, if there's a difference, it prints it to the console.
-this is useful in performance related work, to check why some component re-render.
+this is useful in performance related work, to check why a component re-renders.
 
 _Usage_
 
