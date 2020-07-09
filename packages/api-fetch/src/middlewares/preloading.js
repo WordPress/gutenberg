@@ -47,7 +47,25 @@ function createPreloadingMiddleware( preloadedData ) {
 
 			if ( 'GET' === method && cache[ path ] ) {
 				return Promise.resolve(
-					parse ? cache[ path ].body : { json: cache[ path ] }
+					parse
+						? cache[ path ].body
+						: {
+								headers: {
+									get( key ) {
+										return cache[ path ].headers[
+											Object.keys(
+												cache[ path ].headers
+											).find(
+												( headerKey ) =>
+													headerKey.toLowerCase() ===
+													key
+											)
+										];
+									},
+								},
+								json: () =>
+									Promise.resolve( cache[ path ].body ),
+						  }
 				);
 			} else if (
 				'OPTIONS' === method &&
