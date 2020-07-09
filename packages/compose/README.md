@@ -242,6 +242,27 @@ _Returns_
 
 -   `boolean`: Whether viewport matches query.
 
+<a name="useWarnOnChange" href="#useWarnOnChange">#</a> **useWarnOnChange**
+
+Hook that performs a shallow comparison between the preview value of an object
+and the new one, if there's a difference, it prints it to the console.
+this is useful in performance related work, to check why some component re-render.
+
+_Usage_
+
+```jsx
+function MyComponent(props) {
+   useWarnOnChange(props);
+
+   return "Something";
+}
+```
+
+_Parameters_
+
+-   _object_ `Object`: Object which changes to compare.
+-   _prefix_ `string`: Just a prefix to show when console logging.
+
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 
 Higher-order component creator which, given an object of DOM event types and
