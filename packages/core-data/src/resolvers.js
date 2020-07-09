@@ -32,7 +32,7 @@ import getQueryParts from './queried-data/get-query-parts';
  */
 export function* getAuthors( query = {} ) {
 	const path = addQueryArgs( '/wp/v2/users/?who=authors&per_page=100', {
-		query,
+		...query,
 	} );
 
 	const users = yield apiFetch( {

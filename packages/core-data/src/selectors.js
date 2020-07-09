@@ -80,13 +80,13 @@ export const getUserQueryResults = createSelector(
 /**
  * Returns an Author by ID.
  *
- * @param {Object} state   Data state.
- * @param {string} queryID Query ID.
+ * @param {Object} state    Data state.
+ * @param {string} authorID The Author ID.
  *
  * @return {Array} Authors list.
  */
-export function getAuthor( state, queryID ) {
-	return state.users.byId[ queryID ];
+export function getAuthor( state, authorID ) {
+	return state.users.byId[ authorID ];
 }
 
 /**

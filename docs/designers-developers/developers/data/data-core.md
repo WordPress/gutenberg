@@ -34,7 +34,7 @@ Returns an Author by ID.
 _Parameters_
 
 -   _state_ `Object`: Data state.
--   _queryID_ `string`: Query ID.
+-   _authorID_ `string`: The Author ID.
 
 _Returns_
 
