@@ -46,17 +46,17 @@ To add a new documentation page requires a working JavaScript development enviro
 3. Run `npm run docs:build` to update `manifest.json`.
 4. Commit `manifest.json` with other files updated.
 
-If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file will be a uncommited local change that must be commited.
+If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommited local change that must be commited.
 
 ### Using Links
 
-It's likely that at some point you will want to link to other documentation pages. It's worth emphasizing that all documents can be browsed in different contexts:
+It's likely at some point you'll want to link to other internal documentation pages. It's worth emphasizing all documents can be browsed in different contexts:
 
 -   Block Editor Handbook
 -   GitHub website
 -   npm website
 
-To create links that work in all contexts, you should use absolute path links without the `https://github.com/WordPress/gutenberg` prefix. You can reference files using the following patterns:
+To create links that work in all contexts, you must use absolute path links without the `https://github.com/WordPress/gutenberg` prefix. You can reference files using the following patterns:
 
 -   `/docs/*.md`
 -   `/packages/*/README.md`
@@ -64,7 +64,7 @@ To create links that work in all contexts, you should use absolute path links wi
 
 This way they will be properly handled in all three aforementioned contexts.
 
-Use the full file directory and filename in the Gutenberg repository, not the published path; the Block Editor Handbook creates short URLs that you can see in the tutorials section. Likewise, the `readme.md` portion is dropped in the handbook, but should be included in links
+Use the full directory and filename from the Gutenberg repository, not the published path; the Block Editor Handbook creates short URLs—you can see this in the tutorials section. Likewise, the `readme.md` portion is dropped in the handbook, but should be included in links.
 
 An example, the link to this page is: `/docs/contributors/document.md`
 
