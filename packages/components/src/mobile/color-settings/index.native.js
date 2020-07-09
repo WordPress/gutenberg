@@ -8,26 +8,15 @@ import { createStackNavigator } from '@react-navigation/stack';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useState,
-	useEffect,
-	useContext,
-	useRef,
-	useCallback,
-} from '@wordpress/element';
+import { useState, useEffect, useContext, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
-	BottomSheetConsumer,
 	ColorControl,
 	PanelBody,
 	BottomSheetContext,
+	BottomSheet,
 } from '@wordpress/components';
-import {
-	useRoute,
-	useFocusEffect,
-	useIsFocused,
-	useNavigation,
-} from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 /**
  * Internal dependencies
  */
@@ -41,35 +30,6 @@ import { colorsUtils } from './utils';
 
 import styles from './style.scss';
 
-const BottomSheetScreen = ( { children, setHeight } ) => {
-	const height = useRef( { maxHeight: 0 } );
-	const isFocused = useIsFocused();
-	useFocusEffect(
-		useCallback( () => {
-			if ( height.current.maxHeight !== 0 ) {
-				setHeight( height.current.maxHeight );
-			}
-			return () => {};
-		}, [] )
-	);
-
-	const onLayout = ( e ) => {
-		if (
-			height.current.maxHeight !== e.nativeEvent.layout.height &&
-			isFocused
-		) {
-			height.current.maxHeight = e.nativeEvent.layout.height;
-			setHeight( e.nativeEvent.layout.height );
-		}
-	};
-	return <View onLayout={ onLayout }>{ children }</View>;
-};
-
-const forFade = ( { current } ) => ( {
-	cardStyle: {
-		opacity: current.progress,
-	},
-} );
 const Stack = createStackNavigator();
 
 function ColorSettings( { defaultSettings } ) {
@@ -96,21 +56,24 @@ function ColorSettings( { defaultSettings } ) {
 	// }
 
 	const PaletteScreenView = useRef( () => (
-		<BottomSheetScreen setHeight={ setHeight } name={ 'palete' }>
+		<BottomSheet.NavigationScreen setHeight={ setHeight } name={ 'palete' }>
 			<PaletteScreen />
-		</BottomSheetScreen>
+		</BottomSheet.NavigationScreen>
 	) );
 
 	const PickerScreenView = useRef( () => (
-		<BottomSheetScreen setHeight={ setHeight } name={ 'Picker' }>
+		<BottomSheet.NavigationScreen setHeight={ setHeight } name={ 'Picker' }>
 			<PickerScreen />
-		</BottomSheetScreen>
+		</BottomSheet.NavigationScreen>
 	) );
 
 	const GradientPickerView = useRef( () => (
-		<BottomSheetScreen setHeight={ setHeight } name={ 'Gradient' }>
+		<BottomSheet.NavigationScreen
+			setHeight={ setHeight }
+			name={ 'Gradient' }
+		>
 			<GradientPickerScreen />
-		</BottomSheetScreen>
+		</BottomSheet.NavigationScreen>
 	) );
 
 	return (
@@ -124,18 +87,18 @@ function ColorSettings( { defaultSettings } ) {
 				<Stack.Screen
 					name="Palette"
 					component={ PaletteScreenView.current }
-					options={ { cardStyleInterpolator: forFade } }
+					options={ BottomSheet.NavigationScreen.options }
 					initialParams={ { defaultSettings, ...route.params } }
 				/>
 				<Stack.Screen
 					name="Picker"
 					component={ PickerScreenView.current }
-					options={ { cardStyleInterpolator: forFade } }
+					options={ BottomSheet.NavigationScreen.options }
 				/>
 				<Stack.Screen
 					name="GradientPicker"
 					component={ GradientPickerView.current }
-					options={ { cardStyleInterpolator: forFade } }
+					options={ BottomSheet.NavigationScreen.options }
 				/>
 			</Stack.Navigator>
 		</Animated.View>
@@ -152,6 +115,7 @@ const PickerScreen = () => {
 		shouldDisableBottomSheetMaxHeight,
 		onCloseBottomSheet,
 		isBottomSheetContentScrolling,
+		shouldEnableBottomSheetScroll,
 	} = useContext( BottomSheetContext );
 	const { setColor, currentValue, isGradientColor } = route.params;
 	return (
@@ -166,6 +130,7 @@ const PickerScreen = () => {
 			onNavigationBack={ navigation.goBack }
 			onCloseBottomSheet={ onCloseBottomSheet }
 			isBottomSheetContentScrolling={ isBottomSheetContentScrolling }
+			shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
 		/>
 	);
 };
@@ -186,6 +151,7 @@ const GradientPickerScreen = () => {
 const PaletteScreen = () => {
 	const route = useRoute();
 	const navigation = useNavigation();
+	const { shouldEnableBottomSheetScroll } = useContext( BottomSheetContext );
 	const {
 		label,
 		onColorChange,
@@ -281,40 +247,34 @@ const PaletteScreen = () => {
 	}
 
 	return (
-		<BottomSheetConsumer>
-			{ ( { shouldEnableBottomSheetScroll } ) => (
-				<View>
-					<NavigationHeader
-						screen={ label }
-						leftButtonOnPress={ navigation.goBack }
-					/>
-					<ColorPalette
-						setColor={ setColor }
-						activeColor={ currentValue }
-						isGradientColor={ isGradientColor }
-						currentSegment={ currentSegment }
-						onCustomPress={ onCustomPress }
-						shouldEnableBottomSheetScroll={
-							shouldEnableBottomSheetScroll
-						}
-						defaultSettings={ defaultSettings }
-					/>
-					{ isCustomGadientShown && (
-						<>
-							<View style={ horizontalSeparatorStyle } />
-							<PanelBody>
-								<ColorControl
-									label={ __( 'Customize Gradient' ) }
-									onPress={ onCustomPress }
-									withColorIndicator={ false }
-								/>
-							</PanelBody>
-						</>
-					) }
+		<View>
+			<NavigationHeader
+				screen={ label }
+				leftButtonOnPress={ navigation.goBack }
+			/>
+			<ColorPalette
+				setColor={ setColor }
+				activeColor={ currentValue }
+				isGradientColor={ isGradientColor }
+				currentSegment={ currentSegment }
+				onCustomPress={ onCustomPress }
+				shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
+				defaultSettings={ defaultSettings }
+			/>
+			{ isCustomGadientShown && (
+				<>
 					<View style={ horizontalSeparatorStyle } />
-					{ getFooter() }
-				</View>
+					<PanelBody>
+						<ColorControl
+							label={ __( 'Customize Gradient' ) }
+							onPress={ onCustomPress }
+							withColorIndicator={ false }
+						/>
+					</PanelBody>
+				</>
 			) }
-		</BottomSheetConsumer>
+			<View style={ horizontalSeparatorStyle } />
+			{ getFooter() }
+		</View>
 	);
 };

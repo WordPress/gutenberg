@@ -34,6 +34,7 @@ import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import ColorCell from './color-cell';
 import RadioCell from './radio-cell';
+import NavigationScreen from './navigation-screen';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
@@ -446,5 +447,6 @@ ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
 ThemedBottomSheet.ColorCell = ColorCell;
 ThemedBottomSheet.RadioCell = RadioCell;
+ThemedBottomSheet.NavigationScreen = NavigationScreen;
 
 export default ThemedBottomSheet;

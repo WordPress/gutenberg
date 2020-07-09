@@ -4,12 +4,7 @@
 /**
  * External dependencies
  */
-import {
-	NavigationContainer,
-	useFocusEffect,
-	useIsFocused,
-	DefaultTheme,
-} from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {
 	InspectorControls,
@@ -18,42 +13,12 @@ import {
 import { BottomSheet, ColorSettings } from '@wordpress/components';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useRef, useCallback } from '@wordpress/element';
-import { View, Animated, Easing } from 'react-native';
+import { useRef } from '@wordpress/element';
+import { Animated, Easing } from 'react-native';
 /**
  * Internal dependencies
  */
 import styles from './container.native.scss';
-
-const forFade = ( { current } ) => ( {
-	cardStyle: {
-		opacity: current.progress,
-	},
-} );
-
-const BottomSheetScreen = ( { children, setHeight } ) => {
-	const height = useRef( { maxHeight: 0 } );
-	const isFocused = useIsFocused();
-	useFocusEffect(
-		useCallback( () => {
-			if ( height.current.maxHeight !== 0 ) {
-				setHeight( height.current.maxHeight );
-			}
-			return () => {};
-		}, [] )
-	);
-
-	const onLayout = ( e ) => {
-		if (
-			height.current.maxHeight !== e.nativeEvent.layout.height &&
-			isFocused
-		) {
-			height.current.maxHeight = e.nativeEvent.layout.height;
-			setHeight( e.nativeEvent.layout.height );
-		}
-	};
-	return <View onLayout={ onLayout }>{ children }</View>;
-};
 
 const Stack = createStackNavigator();
 
@@ -74,15 +39,15 @@ function BottomSheetSettings( {
 	};
 
 	const MainScreen = useRef( () => (
-		<BottomSheetScreen setHeight={ setHeight } name={ 'main' }>
+		<BottomSheet.NavigationScreen setHeight={ setHeight } name={ 'main' }>
 			<InspectorControls.Slot />
-		</BottomSheetScreen>
+		</BottomSheet.NavigationScreen>
 	) );
 
 	const DetailsScreen = useRef( () => (
-		<BottomSheetScreen setHeight={ setHeight } name={ 'Color' }>
+		<BottomSheet.NavigationScreen setHeight={ setHeight } name={ 'Color' }>
 			<ColorSettings defaultSettings={ defaultSettings } />
-		</BottomSheetScreen>
+		</BottomSheet.NavigationScreen>
 	) );
 
 	const backgroundStyle = usePreferredColorSchemeStyle(
@@ -115,16 +80,12 @@ function BottomSheetSettings( {
 						} }
 					>
 						<Stack.Screen
-							options={ {
-								cardStyleInterpolator: forFade,
-							} }
+							options={ BottomSheet.NavigationScreen.options }
 							name="Settings"
 							component={ MainScreen.current }
 						/>
 						<Stack.Screen
-							options={ {
-								cardStyleInterpolator: forFade,
-							} }
+							options={ BottomSheet.NavigationScreen.options }
 							name="Colors"
 							component={ DetailsScreen.current }
 						/>
