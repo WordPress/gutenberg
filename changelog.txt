@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 8.5.1 =
+
+### Bug Fixes
+
+ - Improve the performance of the Site builder page.
+ - Load external images if local images not present.
+
+
 = 8.5.0 =
 
 ### Features
