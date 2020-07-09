@@ -64,17 +64,31 @@ The Block Editor allows you to indicate the category your block belongs in, maki
 Wondering where to input all this information? Read the next section :)
 
 ## Step 2: Analyze your plugin
+Each block in your plugin should have a corresponding `block.json` file. This file provides the Block Directory important information about your block. Along with being the place to store contextual information about your block like the: `name`, `description`, `keywords` and `category`, the `block.json` file stores the location of your block’s files.
 
-The `block.json` file lives in the root folder of your block and provides the Block Directory important information about your block. Along with being the place to store contextual information about your block like the: `name`, `description`, `keywords` and `category`, the `block.json` file stores the location of your block’s files.
+Block plugins submitted to the Block Directory can contain mutliple blocks only if they are children of a single parent/ancestor. There should only be one main block. For example, a list block can contain list-item blocks. Children blocks must set the `parent` property in their `block.json` file.
 
 Double check that the following is true for your block:
-`editorScript` is pointing to the JavaScript bundle that includes all the code used in the **editor**.
-`editorStyle` is pointing to the CSS bundle that includes all the css used in the **editor**.
-`script` is pointing to the JavaScript bundle that includes all the code used on the **website**.
-`style` is pointing to the CSS bundle that includes all the code used on the **website**.
-Includes example data (Optional, but useful)
+
+- `editorScript` is pointing to the JavaScript bundle that includes all the code used in the **editor**.
+- `editorStyle` is pointing to the CSS bundle that includes all the css used in the **editor**.
+- `script` is pointing to the JavaScript bundle that includes all the code used on the **website**.
+- `style` is pointing to the CSS bundle that includes all the code used on the **website**.
 
 Although it isn’t necessary that you have both an `editorScript/editorStyle` and `script/style` listed in your `block.json` we encourage the separation of code used for editing and code used for displaying your block in order to keep both interfaces running quickly.
+
+The most basic `block.json` you need looks like this.
+
+```json
+{
+  "name": "plugin-slug/image-slider",
+  "title": "Responsive Image Slider",
+  "description": "A responsive and easy to use image gallery block.",
+  "keywords": [ "slider", "carousel", "gallery" ],
+  "category": "media",
+  "editorScript": "file:./dist/editor.js",
+}
+```
 
 The `block.json` file also contains other important properties. Take a look at an [example block.json](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#registering-a-block-type) file for reference.
 
