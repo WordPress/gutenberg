@@ -45,8 +45,10 @@ function createPreloadingMiddleware( preloadedData ) {
 			const method = options.method || 'GET';
 			const path = getStablePath( options.path );
 
-			if ( parse && 'GET' === method && cache[ path ] ) {
-				return Promise.resolve( cache[ path ].body );
+			if ( 'GET' === method && cache[ path ] ) {
+				return Promise.resolve(
+					parse ? cache[ path ].body : { json: cache[ path ] }
+				);
 			} else if (
 				'OPTIONS' === method &&
 				cache[ method ] &&

@@ -16,8 +16,12 @@ const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 } );
 
 // Duplicates parsing functionality from apiFetch.
-const parseResponse = ( response ) =>
-	response.json ? response.json() : Promise.reject( response );
+const parseResponse = ( response ) => {
+	if ( ! response.json ) Promise.reject( response );
+	return typeof response.json === 'function'
+		? response.json()
+		: response.json;
+};
 
 const parseLinkHeader = ( linkHeader ) => {
 	if ( ! linkHeader ) {
@@ -32,7 +36,11 @@ const parseLinkHeader = ( linkHeader ) => {
 };
 
 const getNextPageUrl = ( response ) => {
-	const { next } = parseLinkHeader( response.headers.get( 'link' ) );
+	const { next } = parseLinkHeader(
+		response.headers.get
+			? response.headers.get( 'link' )
+			: response.headers.Link
+	);
 	return next;
 };
 
