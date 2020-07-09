@@ -24,7 +24,7 @@ After activated, go to the block editor and use the inserter to search and add y
 
 1. [Development Environment](devenv.md)
 2. [WordPress Plugin](wp-plugin.md)
-3. [Anatomy of a Gutenberg Block](block-anatomy.md)
+3. [Anatomy of a Block](block-anatomy.md)
 4. [Block Attributes](block-attributes.md)
 5. [Code Implementation](block-code.md)
 6. [Authoring Experience](author-experience.md)
