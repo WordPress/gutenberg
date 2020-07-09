@@ -124,6 +124,10 @@ const BlockActionsMenu = ( {
 		switch ( value ) {
 			case deleteOption.value:
 				onDelete();
+				createInfoNotice(
+					// translators: displayed right after the block is deleted.
+					__( 'Block deleted' )
+				);
 				break;
 			case settingsOption.value:
 				openGeneralSidebar();
