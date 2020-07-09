@@ -60,6 +60,12 @@
 		"parent": "principles"
 	},
 	{
+		"title": "VersionsInWordpress",
+		"slug": "versions-in-wordpress",
+		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
+		"parent": "principles"
+	},
+	{
 		"title": "History",
 		"slug": "history",
 		"markdown_source": "../docs/contributors/history.md",
