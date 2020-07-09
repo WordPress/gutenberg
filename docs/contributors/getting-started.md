@@ -36,7 +36,8 @@ To install Docker Compose, [follow their instructions here](https://docs.docker.
 Once Docker is installed and running, run this script to install WordPress, and build your local environment:
 
 ```bash
-npx wp-env start
+# Note: prefixing with "npm run" will resolve npm from the local Gutenberg source code, rather than a global install which may be out of date.
+npm run wp-env start
 ```
 
 ### Step 2: Accessing and Configuring the Local WordPress Install
@@ -46,7 +47,7 @@ npx wp-env start
 The WordPress installation should now be available at `http://localhost:8888` (**Username**: `admin`, **Password**: `password`).
 If this port is in use, you can override it using the `WP_ENV_PORT` environment variable. For more information, consult the `wp-env` [README](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
 
-To shut down this local WordPress instance run `npx wp-env stop`. To start it back up again, run `npx wp-env start` again.
+To shut down this local WordPress instance run `npm run wp-env stop`. To start it back up again, run `npm run wp-env start` again.
 
 #### Toggling Debug Systems
 
