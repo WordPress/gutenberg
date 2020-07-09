@@ -8,7 +8,7 @@ describe( 'removeItems', () => {
 		const postIds = [ 1, 2, 3 ];
 		expect( removeItems( 'postType', 'post', postIds ) ).toEqual( {
 			type: 'REMOVE_ITEMS',
-			items: postIds,
+			itemIds: postIds,
 			kind: 'postType',
 			name: 'post',
 			invalidateCache: false,

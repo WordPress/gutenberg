@@ -154,8 +154,8 @@ const queries = ( state = {}, action ) => {
 			return receiveQueries( state, action );
 		case 'REMOVE_ITEMS':
 			const newState = { ...state };
-			const removedItems = action.items.reduce( ( result, item ) => {
-				result[ item ] = true;
+			const removedItems = action.itemIds.reduce( ( result, itemId ) => {
+				result[ itemId ] = true;
 				return result;
 			}, {} );
 			forEach( newState, ( queryItems, key ) => {

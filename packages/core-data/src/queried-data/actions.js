@@ -30,7 +30,7 @@ export function receiveItems( items ) {
 export function removeItems( kind, name, records, invalidateCache = false ) {
 	return {
 		type: 'REMOVE_ITEMS',
-		items: castArray( records ),
+		itemIds: castArray( records ),
 		kind,
 		name,
 		invalidateCache,
