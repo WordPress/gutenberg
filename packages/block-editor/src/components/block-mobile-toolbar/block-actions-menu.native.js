@@ -125,8 +125,8 @@ const BlockActionsMenu = ( {
 			case deleteOption.value:
 				onDelete();
 				createInfoNotice(
-					// translators: displayed right after the block is deleted.
-					__( 'Block deleted' )
+					// translators: displayed right after the block is removed.
+					__( 'Block removed' )
 				);
 				break;
 			case settingsOption.value:
