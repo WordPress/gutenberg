@@ -32,16 +32,14 @@ function PostAuthor() {
 			return {
 				key: author.id,
 				name: author.name,
-				id: author.id,
 			};
 		} );
 	}, [ authors ] );
 
 	// Ensure the current author is included in the initial dropdown list.
 	let foundAuthor = authorsForField.findIndex(
-		( author ) => postAuthor?.id === author.id
+		( author ) => postAuthor?.id === author.key
 	);
-
 	// The currently field value.
 	const [ fieldValue, setFieldValue ] = useState( postAuthor?.name );
 
@@ -50,7 +48,6 @@ function PostAuthor() {
 		authors.unshift( postAuthor );
 		foundAuthor = 0;
 	}
-
 	/**
 	 * Handle author selection.
 	 *
@@ -61,7 +58,7 @@ function PostAuthor() {
 			return;
 		}
 		setFieldValue( selectedItem.name );
-		dispatch( 'core/editor' ).editPost( { author: selectedItem.id } );
+		dispatch( 'core/editor' ).editPost( { author: selectedItem.key } );
 	};
 
 	/**
@@ -85,7 +82,6 @@ function PostAuthor() {
 					.map( ( author ) => ( {
 						key: author.id,
 						name: author.name,
-						id: author.id,
 					} ) );
 			}
 
@@ -94,7 +90,6 @@ function PostAuthor() {
 				.map( ( author ) => ( {
 					key: author.id,
 					name: author.name,
-					id: author.id,
 				} ) );
 		},
 		[ fieldValue, postAuthor, isLoading ]
@@ -119,6 +114,11 @@ function PostAuthor() {
 
 	const selectId = 'post-author-selector';
 
+	const postAuthorEntry = {
+		key: postAuthor.id,
+		name: postAuthor.name,
+	};
+
 	return (
 		<PostAuthorCheck>
 			<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
@@ -127,7 +127,7 @@ function PostAuthor() {
 				initialInputValue={ postAuthor?.name }
 				onInputValueChange={ debounce( handleKeydown, 300 ) }
 				onChange={ handleSelect }
-				initialHighlightedIndex={ foundAuthor }
+				initialSelectedItem={ postAuthorEntry }
 				isLoading={ isLoading }
 			/>
 		</PostAuthorCheck>

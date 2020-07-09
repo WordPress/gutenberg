@@ -3,6 +3,7 @@
  */
 import { useCombobox } from 'downshift';
 import classnames from 'classnames';
+import { isEqual } from 'lodash';
 
 /**
  * Internal dependencies
@@ -18,9 +19,7 @@ export default function ComboboxControl( {
 	options: items,
 	onInputValueChange: onInputValueChange,
 	onChange: onSelectedItemChange,
-	value: _selectedItem,
-	initialInputValue,
-	initialHighlightedIndex,
+	initialSelectedItem,
 } ) {
 	const {
 		getLabelProps,
@@ -33,14 +32,11 @@ export default function ComboboxControl( {
 		highlightedIndex,
 		selectedItem,
 	} = useCombobox( {
-		initialSelectedItem: items[ initialHighlightedIndex || 0 ],
-		initialInputValue,
+		initialSelectedItem,
 		items,
 		itemToString,
 		onInputValueChange,
 		onSelectedItemChange,
-		selectedItem: _selectedItem,
-		initialHighlightedIndex,
 	} );
 	const menuProps = getMenuProps( {
 		className: classnames( 'components-combobox-control__menu', {
@@ -118,7 +114,7 @@ export default function ComboboxControl( {
 								style: item.style,
 							} ) }
 						>
-							{ item === selectedItem && (
+							{ isEqual( item, selectedItem ) && (
 								<Dashicon
 									icon="saved"
 									className="components-combobox-control__item-icon"
