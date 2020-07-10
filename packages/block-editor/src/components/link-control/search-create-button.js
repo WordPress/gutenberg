@@ -6,8 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Button, Icon } from '@wordpress/components';
+import { createInterpolateElement } from '@wordpress/element';
 
 export const LinkControlSearchCreate = ( {
 	searchTerm,
@@ -32,16 +33,19 @@ export const LinkControlSearchCreate = ( {
 		>
 			<Icon
 				className="block-editor-link-control__search-item-icon"
-				size={ 18 }
-				icon="plus"
+				icon="insert"
 			/>
 
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
-					<mark>{ searchTerm }</mark>
-				</span>
-				<span className="block-editor-link-control__search-item-info">
-					{ __( 'Create a new page' ) }
+					{ createInterpolateElement(
+						sprintf(
+							/* translators: %s: search term. */
+							__( 'New page: <mark>%s</mark>' ),
+							searchTerm
+						),
+						{ mark: <mark /> }
+					) }
 				</span>
 			</span>
 		</Button>
