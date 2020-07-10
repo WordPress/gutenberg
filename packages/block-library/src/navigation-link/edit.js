@@ -52,7 +52,6 @@ function NavigationLinkEdit( {
 	backgroundColor,
 	rgbTextColor,
 	rgbBackgroundColor,
-	saveEntityRecord,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
 	insertBlocksAfter,
@@ -116,21 +115,6 @@ function NavigationLinkEdit( {
 		range.selectNodeContents( ref.current );
 		selection.removeAllRanges();
 		selection.addRange( range );
-	}
-
-	async function handleCreatePage( pageTitle ) {
-		const type = 'page';
-		const page = await saveEntityRecord( 'postType', type, {
-			title: pageTitle,
-			status: 'publish',
-		} );
-
-		return {
-			id: page.id,
-			type,
-			title: page.title.rendered,
-			url: page.link,
-		};
 	}
 
 	return (
@@ -232,11 +216,7 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
-								createSuggestion={
-									userCanCreatePages
-										? handleCreatePage
-										: undefined
-								}
+								withCreateSuggestion={ userCanCreatePages }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -383,9 +363,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
-		const { saveEntityRecord } = dispatch( 'core' );
 		return {
-			saveEntityRecord,
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 
