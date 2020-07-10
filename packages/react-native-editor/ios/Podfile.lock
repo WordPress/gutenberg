@@ -21,7 +21,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Gutenberg (8.5.0):
+  - Gutenberg (8.5.1):
     - React (= 0.62.2)
     - React-CoreModules (= 0.62.2)
     - React-RCTImage (= 0.62.2)
@@ -263,14 +263,12 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
     - ReactCommon/callinvoker (= 0.62.2)
-  - ReactNativeDarkMode (0.0.10):
-    - React
   - RNSVG (9.13.6-gb):
     - React
   - RNTAztecView (0.2.0):
     - React-Core
-    - WordPress-Aztec-iOS (~> 1.19.2)
-  - WordPress-Aztec-iOS (1.19.2)
+    - WordPress-Aztec-iOS (~> 1.19.3)
+  - WordPress-Aztec-iOS (1.19.3)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -297,7 +295,7 @@ DEPENDENCIES:
   - react-native-keyboard-aware-scroll-view (from `../../../node_modules/react-native-keyboard-aware-scroll-view`)
   - react-native-safe-area (from `../../../node_modules/react-native-safe-area`)
   - "react-native-slider (from `../../../node_modules/@react-native-community/slider`)"
-  - react-native-video (from `../../../node_modules/react-native-video`)
+  - react-native-video (from `../node_modules/react-native-video`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../../node_modules/react-native/Libraries/NativeAnimation`)
   - React-RCTBlob (from `../../../node_modules/react-native/Libraries/Blob`)
@@ -309,8 +307,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../../../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/callinvoker (from `../../../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
-  - ReactNativeDarkMode (from `../../../node_modules/react-native-dark-mode`)
-  - RNSVG (from `../../../node_modules/react-native-svg`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - RNTAztecView (from `../../react-native-aztec/RNTAztecView.podspec`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
@@ -363,7 +360,7 @@ EXTERNAL SOURCES:
   react-native-slider:
     :path: "../../../node_modules/@react-native-community/slider"
   react-native-video:
-    :path: "../../../node_modules/react-native-video"
+    :path: "../node_modules/react-native-video"
   React-RCTActionSheet:
     :path: "../../../node_modules/react-native/Libraries/ActionSheetIOS"
   React-RCTAnimation:
@@ -384,10 +381,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../../../node_modules/react-native/ReactCommon"
-  ReactNativeDarkMode:
-    :path: "../../../node_modules/react-native-dark-mode"
   RNSVG:
-    :path: "../../../node_modules/react-native-svg"
+    :path: "../node_modules/react-native-svg"
   RNTAztecView:
     :path: "../../react-native-aztec/RNTAztecView.podspec"
   Yoga:
@@ -401,7 +396,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 5465d51ccfeecb7faa12f9ae0024f2044ce4044e
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  Gutenberg: 943351f951c21e11d0e14af2deaf621c1e03548f
+  Gutenberg: 30f2d9c5b03132cb84055615f2d790a3bca8c223
   RCTRequired: cec6a34b3ac8a9915c37e7e4ad3aa74726ce4035
   RCTTypeSafety: 93006131180074cffa227a1075802c89a49dd4ce
   React: 29a8b1a02bd764fb7644ef04019270849b9a7ac3
@@ -427,12 +422,11 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
   RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
-  RNTAztecView: c19a1177301a21977389629351f2348adf53f546
-  WordPress-Aztec-iOS: d01bf0c5e150ae6a046f06ba63b7cc2762061c0b
+  RNTAztecView: 30c445fb62fc5b2f43adf14bf30ce2888e7a4746
+  WordPress-Aztec-iOS: b7ac8b30f746992e85d9668453ac87c2cdcecf4f
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
-PODFILE CHECKSUM: 1ccbdd7ce7bc4579496c2ae0e32d4d90b78127c4
+PODFILE CHECKSUM: 1a42534718a23c97a81ee1b190885a0438d258bc
 
 COCOAPODS: 1.8.4

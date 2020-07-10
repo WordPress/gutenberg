@@ -60,6 +60,12 @@
 		"parent": "principles"
 	},
 	{
+		"title": "Versions in WordPress",
+		"slug": "versions-in-wordpress",
+		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
+		"parent": "principles"
+	},
+	{
 		"title": "History",
 		"slug": "history",
 		"markdown_source": "../docs/contributors/history.md",
@@ -501,6 +507,12 @@
 		"title": "JavaScript Build Setup",
 		"slug": "js-build-setup",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/js-build-setup.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "ESNext Syntax",
+		"slug": "esnext-js",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/esnext-js.md",
 		"parent": "javascript"
 	},
 	{

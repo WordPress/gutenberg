@@ -2,8 +2,12 @@ name: Unit Tests
 
 on:
   pull_request:
+    paths-ignore:
+    - '**.md'
   push:
     branches: [master]
+    paths-ignore:
+    - '**.md'
 
 jobs:
   unit-js:
