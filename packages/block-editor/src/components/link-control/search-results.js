@@ -18,12 +18,9 @@ import LinkControlSearchItem from './search-item';
 import { CREATE_TYPE } from './constants';
 
 export default function LinkControlSearchResults( {
-	// From LinkControl:
 	instanceId,
 	withCreateSuggestion,
 	currentInputValue,
-
-	// From URLInput:
 	handleSuggestionClick,
 	suggestionsListProps,
 	buildSuggestionItemProps,
