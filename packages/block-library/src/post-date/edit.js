@@ -90,7 +90,7 @@ export default function PostDateEdit( {
 	setAttributes,
 } ) {
 	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return <p>{ 'Jan 1st, 1440' }</p>;
+		return <p>{ __( 'Jan 1st, 1440' ) }</p>;
 	}
 	return <PostDateEditor format={ format } setAttributes={ setAttributes } />;
 }

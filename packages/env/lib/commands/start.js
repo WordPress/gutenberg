@@ -99,10 +99,12 @@ module.exports = async function start( { spinner, debug } ) {
 
 	// Retry WordPress installation in case MySQL *still* wasn't ready.
 	await Promise.all( [
-		retry( () => configureWordPress( 'development', config ), {
+		retry( () => configureWordPress( 'development', config, spinner ), {
 			times: 2,
 		} ),
-		retry( () => configureWordPress( 'tests', config ), { times: 2 } ),
+		retry( () => configureWordPress( 'tests', config, spinner ), {
+			times: 2,
+		} ),
 	] );
 
 	spinner.text = 'WordPress started.';
