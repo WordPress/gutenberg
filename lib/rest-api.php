@@ -318,11 +318,11 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
 function gutenberg_register_image_editor() {
 	global $wp_version;
 
-	// Strip -beta and -src from the version string. Messes up version_compare().
-	$version = explode( '-', $wp_version, 2 )[0];
+	// Strip '-src' from the version string. Messes up version_compare().
+	$version = str_replace( '-src', '', $wp_version );
 
 	// Only register routes for versions older than WP 5.5.
-	if ( version_compare( $version, '5.5', '<' ) ) {
+	if ( version_compare( $version, '5.5-beta', '<' ) ) {
 		$image_editor = new WP_REST_Image_Editor_Controller();
 		$image_editor->register_routes();
 	}
