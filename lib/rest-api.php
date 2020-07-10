@@ -316,7 +316,15 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  * @since 7.x.0
  */
 function gutenberg_register_image_editor() {
-	$image_editor = new WP_REST_Image_Editor_Controller();
-	$image_editor->register_routes();
+	global $wp_version;
+
+	// Strip -beta and -src from the version string. Messes up version_compare().
+	$version = explode( '-', $wp_version, 2 )[0];
+
+	// Only register routes for versions older than WP 5.5.
+	if ( version_compare( $version, '5.5', '<' ) ) {
+		$image_editor = new WP_REST_Image_Editor_Controller();
+		$image_editor->register_routes();
+	}
 }
 add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );
