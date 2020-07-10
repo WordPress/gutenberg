@@ -1,16 +1,18 @@
 # JavaScript Build Setup
 
-This page covers how to set up your development environment to use the ESNext and [JSX](https://reactjs.org/docs/introducing-jsx.html) syntaxes. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short). JSX is a custom syntax extension to JavaScript that allows you to write JavaScript in a more familiar tag syntax.
+ESNext is JavaScript written using syntax and features only available in a version newer than browser support—the support browser versions is referred to as ECMAScript 5 (ES5). [JSX](https://reactjs.org/docs/introducing-jsx.html) is a custom syntax extension to JavaScript, created by React project, that allows you to write JavaScript using a familiar HTML tag-like syntax.
 
-This documentation covers development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop Gutenberg itself, see the [Getting Started](/docs/contributors/getting-started.md) documentation.
+See the [ESNext syntax documentation](/docs/designers-developers/developers/tutorials/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.
 
-Most browsers cannot interpret or run ESNext and JSX syntaxes, so we use a transformation step to convert these syntaxes to code that browsers can understand.
+Let's set up your development environment to use these syntaxes, we'll cover development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop on Gutenberg itself, see the [Getting Started](/docs/contributors/getting-started.md) documentation.
+
+Browsers cannot interpret or run ESNext and JSX syntaxes, so we must use a transformation step to convert these syntaxes to code that browsers can understand.
 
 There are a few reasons to use ESNext and this extra step of transformation:
 
-- It makes for simpler code that is easier to read and write. 
-- Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers.
-- By using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
+-   It makes for simpler code that is easier to read and write.
+-   Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers.
+-   By using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
 
 There are different tools that can perform this transformation or build step; WordPress uses webpack and Babel.
 
@@ -28,9 +30,9 @@ Both webpack and Babel are tools written in JavaScript and run using [Node.js](h
 
 First, you need to set up Node.js for your development environment. The steps required depend on your operating system, if you have a package manager installed, setup can be as straightforward as:
 
-- Ubuntu: `apt install nodejs npm`
-- macOS: `brew install node`
-- Windows: `choco install node`
+-   Ubuntu: `apt install nodejs npm`
+-   macOS: `brew install node`
+-   Windows: `choco install node`
 
 If you are not using a package manager, see the [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
 
@@ -42,14 +44,14 @@ The Node Package Manager (npm) is a tool included with node. npm allows you to i
 
 To start a new node project, first create a directory to work in:
 
-```
+```sh
 mkdir myguten-block
 cd myguten-block
 ```
 
-You create a new package.json running `npm init` in your terminal.  This will walk you through creating your package.json file:
+You create a new package.json running `npm init` in your terminal. This will walk you through creating your package.json file:
 
-```
+```sh
 npm init
 
 package name: (myguten-block) myguten-block

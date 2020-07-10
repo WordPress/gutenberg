@@ -57,6 +57,7 @@ program
 program
 	.command( 'performance-tests [branches...]' )
 	.alias( 'perf' )
+	.option( '-c, --ci', 'Run in CI (non interactive)' )
 	.description(
 		'Runs performance tests on two separate branches and outputs the result'
 	)
