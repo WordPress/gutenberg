@@ -173,7 +173,6 @@ function LinkControl( {
 	const { createPage, isCreatingPage, errorMessage } = useCreatePage();
 
 	const handleSelectSuggestion = ( updatedValue ) => {
-		setIsEditingLink( false );
 		onChange( updatedValue );
 		stopEditing();
 	};
