@@ -1,6 +1,7 @@
 1.33.0
 ------
 * [***] Media editing support in Media & Text block.
+* [***] New block: Social Icons
 
 1.31.1
 ------
@@ -8,7 +9,7 @@
 * Fix for button style.
 1.32.0
 ------
-* [***] The block editor now gives users the ability to individually edit unsupported blocks found in posts or pages. 
+* [***] The block editor now gives users the ability to individually edit unsupported blocks found in posts or pages.
 
 1.31.0
 ------
