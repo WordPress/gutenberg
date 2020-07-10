@@ -1,10 +1,11 @@
+1.32.0
+------
+* [***] The block editor now gives users the ability to individually edit unsupported blocks found in posts or pages. 
+
 1.31.1
 ------
 * Fix for pullquote stylying in dark mode.
 * Fix for button style.
-1.32.0
-------
-* [***] The block editor now gives users the ability to individually edit unsupported blocks found in posts or pages. 
 
 1.31.0
 ------
