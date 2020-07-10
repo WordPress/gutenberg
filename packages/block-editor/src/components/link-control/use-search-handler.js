@@ -52,10 +52,10 @@ export const handleEntitySearch = async (
 	directEntryHandler
 ) => {
 	let results = await Promise.all( [
-		directEntryHandler( val ),
 		fetchSearchSuggestions( val, {
 			...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
 		} ),
+		directEntryHandler( val ),
 	] );
 
 	const couldBeURL = ! val.includes( ' ' );
