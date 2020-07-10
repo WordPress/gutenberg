@@ -7,7 +7,7 @@ import { uniqueId } from 'lodash';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -24,15 +24,17 @@ const { DOMParser } = window;
 import CreateMenuArea from './create-menu-area';
 import NavigationEditor from '../navigation-editor';
 
-const noticeId = uniqueId(
-	'navigation-editor/menu-editor/edit-navigation-delete-menu-error'
-);
-
 export default function MenusEditor( { blockEditorSettings } ) {
 	const [ menuId, setMenuId ] = useState();
 	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
 	const [ hasCompletedFirstLoad, setHasCompletedFirstLoad ] = useState(
 		false
+	);
+
+	const noticeId = useRef();
+
+	noticeId.current = uniqueId(
+		'navigation-editor/menu-editor/edit-navigation-delete-menu-error'
 	);
 
 	const { menus, hasLoadedMenus, menuDeleteError } = useSelect(
@@ -53,7 +55,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				),
 			};
 		},
-		[]
+		[ menuId ]
 	);
 
 	const { deleteMenu } = useDispatch( 'core' );
@@ -76,7 +78,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				'text/html'
 			);
 			const errorText = document.body.textContent || '';
-			createErrorNotice( errorText, { id: noticeId } );
+			createErrorNotice( errorText, { id: noticeId.current } );
 		}
 	}, [ menuDeleteError ] );
 
@@ -151,7 +153,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
 					onDeleteMenu={ async () => {
-						removeNotice( noticeId );
+						removeNotice( noticeId.current );
 						const deletedMenu = await deleteMenu( menuId, {
 							force: 'true',
 						} );

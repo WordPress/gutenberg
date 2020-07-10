@@ -87,7 +87,7 @@ function items( state = {}, action ) {
 				}, {} ),
 			};
 		case 'REMOVE_ITEMS':
-			const newState = omit( state, action.items );
+			const newState = omit( state, action.itemIds );
 			return newState;
 	}
 	return state;
@@ -159,11 +159,9 @@ const queries = ( state = {}, action ) => {
 				return result;
 			}, {} );
 			forEach( newState, ( queryItems, key ) => {
-				if ( newState[ key ] ) {
-					newState[ key ] = filter( queryItems, ( queryId ) => {
-						return !! removedItems[ queryId ] === false;
-					} );
-				}
+				newState[ key ] = filter( queryItems, ( queryId ) => {
+					return !! removedItems[ queryId ] === false;
+				} );
 			} );
 			return newState;
 		default:

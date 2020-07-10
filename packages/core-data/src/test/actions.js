@@ -43,7 +43,9 @@ describe( 'deleteEntityRecord', () => {
 		fulfillment.next();
 
 		// Start
-		fulfillment.next( entities );
+		expect( fulfillment.next( entities ).value.type ).toBe(
+			'DELETE_ENTITY_RECORD_START'
+		);
 
 		// delete api call
 		const { value: apiFetchAction } = fulfillment.next();
@@ -51,6 +53,14 @@ describe( 'deleteEntityRecord', () => {
 			path: '/wp/v2/posts/10',
 			method: 'DELETE',
 		} );
+
+		expect( fulfillment.next().value.type ).toBe( 'REMOVE_ITEMS' );
+
+		expect( fulfillment.next().value.type ).toBe(
+			'DELETE_ENTITY_RECORD_FINISH'
+		);
+
+		expect( fulfillment.next().value ).not.toBe( false );
 	} );
 } );
 
