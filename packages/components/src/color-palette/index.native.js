@@ -228,7 +228,10 @@ function ColorPalette( {
 								color={ color }
 								isSelected={ isSelected( color ) }
 								opacity={ opacity }
-								style={ styles.colorIndicator }
+								style={ [
+									styles.colorIndicator,
+									styles.circleOption,
+								] }
 							/>
 						</Animated.View>
 					</TouchableWithoutFeedback>
@@ -251,7 +254,10 @@ function ColorPalette( {
 								withCustomPicker={ ! isGradientSegment }
 								color={ customIndicatorColor }
 								isSelected={ isSelectedCustom() }
-								style={ styles.colorIndicator }
+								style={ [
+									styles.colorIndicator,
+									styles.circleOption,
+								] }
 							/>
 							{ shouldShowCustomLabel && (
 								<Text style={ customTextStyle }>

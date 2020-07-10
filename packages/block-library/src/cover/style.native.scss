@@ -99,7 +99,16 @@
 
 .customIndicatorWrapper {
 	flex-direction: row;
-	align-items: center;
+	align-items: baseline;
 	width: 24px;
 	height: 24px;
+}
+
+.circleOption {
+	height: 24px;
+	width: 24px;
+	border-radius: 12px;
+	margin-right: 8px;
+	justify-content: center;
+	align-items: center;
 }

@@ -36,7 +36,7 @@ import {
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
@@ -101,6 +101,7 @@ const Cover = ( {
 	onFocus,
 	overlayColor,
 	setAttributes,
+	openGeneralSidebar,
 } ) => {
 	const {
 		backgroundType,
@@ -192,6 +193,10 @@ const Cover = ( {
 			gradient: undefined,
 			customGradient: undefined,
 		} );
+	}
+
+	function openCustomColorPicker() {
+		openGeneralSidebar();
 	}
 
 	const backgroundColor = getStylesFromColorScheme(
@@ -345,9 +350,8 @@ const Cover = ( {
 					<ColorPalette
 						customStyles={ styles }
 						setColor={ setColor }
-						onCustomPress={ () => {} }
+						onCustomPress={ openCustomColorPicker }
 						defaultSettings={ COVER_DEFAULT_PALETTE }
-						shouldShowCustomIndicatorOption={ false }
 						shouldShowCustomLabel={ false }
 					/>
 				</MediaPlaceholder>
@@ -407,6 +411,14 @@ export default compose( [
 
 		return {
 			isParentSelected: selectedBlockClientId === clientId,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+
+		return {
+			openGeneralSidebar: () =>
+				openGeneralSidebar( 'edit-post/block' ),
 		};
 	} ),
 	withPreferredColorScheme,
