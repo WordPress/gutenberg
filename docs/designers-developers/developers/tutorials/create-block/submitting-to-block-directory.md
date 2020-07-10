@@ -46,7 +46,7 @@ Examples for an Image Slider block:
 - carousel
 - gallery
 
-[Read more about keywords.](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#keyword)
+[Read more about keywords.](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#keywords)
 
 ### Choose the right category
 
