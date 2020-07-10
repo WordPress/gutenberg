@@ -22,6 +22,7 @@ import {
 	ToolbarGroup,
 	Gradient,
 	ColorPalette,
+	ColorPicker,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -102,6 +103,7 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 	openGeneralSidebar,
+	closeSettingsBottomSheet,
 } ) => {
 	const {
 		backgroundType,
@@ -269,6 +271,20 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
+	const colorPickerControls = (
+		<InspectorControls>
+			<ColorPicker
+				shouldEnableBottomSheetScroll={ () => {} }
+				shouldDisableBottomSheetMaxHeight={ () => {} }
+				setColor={ () => {} }
+				onApply={ setColor }
+				onNavigationBack={ closeSettingsBottomSheet }
+				onCloseBottomSheet={ () => {} }
+				isBottomSheetContentScrolling={ () => {} }
+			/>
+		</InspectorControls>
+	);
+
 	const renderBackground = ( {
 		open: openMediaOptions,
 		getMediaOptions,
@@ -338,6 +354,7 @@ const Cover = ( {
 	if ( ! hasBackground ) {
 		return (
 			<View>
+				{ colorPickerControls }
 				<MediaPlaceholder
 					icon={ placeholderIcon }
 					labels={ {
@@ -417,8 +434,10 @@ export default compose( [
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 
 		return {
-			openGeneralSidebar: () =>
-				openGeneralSidebar( 'edit-post/block' ),
+			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
 		};
 	} ),
 	withPreferredColorScheme,

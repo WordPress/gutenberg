@@ -26,6 +26,7 @@ function ColorPicker( {
 	isGradientColor,
 	onNavigationBack,
 	onCloseBottomSheet,
+	onApply,
 } ) {
 	const isIOS = Platform.OS === 'ios';
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
@@ -98,7 +99,12 @@ function ColorPicker( {
 		onNavigationBack();
 		onCloseBottomSheet( null );
 		shouldDisableBottomSheetMaxHeight( true );
-		setColor( action === 'apply' ? currentColor : savedColor );
+		if ( action === 'apply' ) {
+			setColor( currentColor );
+			if ( onApply !== undefined ) onApply( currentColor );
+		} else {
+			setColor( savedColor );
+		}
 	}
 
 	return (
