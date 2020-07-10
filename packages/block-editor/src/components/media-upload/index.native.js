@@ -166,21 +166,21 @@ export class MediaUpload extends React.Component {
 		let pickerTitle;
 		if ( isImage ) {
 			if ( isReplacingMedia ) {
-				pickerTitle = __( 'Replace image from' );
+				pickerTitle = __( 'Replace image' );
 			} else {
-				pickerTitle = __( 'Choose image from' );
+				pickerTitle = __( 'Choose image' );
 			}
 		} else if ( isVideo ) {
 			if ( isReplacingMedia ) {
-				pickerTitle = __( 'Replace video from' );
+				pickerTitle = __( 'Replace video' );
 			} else {
-				pickerTitle = __( 'Choose video from' );
+				pickerTitle = __( 'Choose video' );
 			}
 		} else if ( isImageOrVideo ) {
 			if ( isReplacingMedia ) {
-				pickerTitle = __( 'Replace image or video from' );
+				pickerTitle = __( 'Replace image or video' );
 			} else {
-				pickerTitle = __( 'Choose image or video from' );
+				pickerTitle = __( 'Choose image or video' );
 			}
 		}
 
