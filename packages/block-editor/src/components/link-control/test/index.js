@@ -25,6 +25,9 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
+import mockUseCreatePage from '../use-create-page';
+jest.mock( '../use-create-page' );
+
 /**
  * Wait for next tick of event loop. This is required
  * because the `fetchSearchSuggestions` Promise will
@@ -44,6 +47,11 @@ beforeEach( () => {
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
+	mockUseCreatePage.mockImplementation( () => ( {
+		createPage: () => {},
+		isCreatingPage: false,
+		errorMessage: null,
+	} ) );
 } );
 
 afterEach( () => {
@@ -673,16 +681,29 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			let resolver;
 			let resolvedEntity;
 
-			const createSuggestion = ( title ) =>
-				new Promise( ( resolve ) => {
-					resolver = resolve;
-					resolvedEntity = {
-						title,
-						id: 123,
-						url: '/?p=123',
-						type: 'page',
-					};
-				} );
+			mockUseCreatePage.mockImplementation( () => {
+				const [ isCreatingPage, setIsCreatingPage ] = useState( false );
+
+				return {
+					createPage: ( title ) => {
+						return new Promise( ( resolve ) => {
+							setIsCreatingPage( true );
+							resolver = ( arg ) => {
+								resolve( arg );
+								setIsCreatingPage( false );
+							};
+							resolvedEntity = {
+								title,
+								id: 123,
+								url: '/?p=123',
+								type: 'page',
+							};
+						} );
+					},
+					isCreatingPage,
+					errorMessage: '',
+				};
+			} );
 
 			const LinkControlConsumer = () => {
 				const [ link, setLink ] = useState( null );
@@ -693,7 +714,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 						onChange={ ( suggestion ) => {
 							setLink( suggestion );
 						} }
-						createSuggestion={ createSuggestion }
+						withCreateSuggestion
 					/>
 				);
 			};
