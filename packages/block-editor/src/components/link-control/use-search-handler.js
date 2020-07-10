@@ -16,6 +16,8 @@ import { startsWith } from 'lodash';
 import isURLLike from './is-url-like';
 import { CREATE_TYPE } from './constants';
 
+export const handleNoop = () => Promise.resolve( [] );
+
 export const handleDirectEntry = ( val ) => {
 	let type = 'URL';
 
@@ -46,10 +48,11 @@ export const handleDirectEntry = ( val ) => {
 export const handleEntitySearch = async (
 	val,
 	args,
-	fetchSearchSuggestions
+	fetchSearchSuggestions,
+	directEntryHandler
 ) => {
 	let results = await Promise.all( [
-		handleDirectEntry( val ),
+		directEntryHandler( val ),
 		fetchSearchSuggestions( val, {
 			...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
 		} ),
@@ -96,7 +99,7 @@ export const handleEntitySearch = async (
 		  } );
 };
 
-export default function useSearchHandler( enableDirectEntry = true ) {
+export default function useSearchHandler( allowDirectEntry ) {
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return {
@@ -104,12 +107,22 @@ export default function useSearchHandler( enableDirectEntry = true ) {
 				.__experimentalFetchLinkSuggestions,
 		};
 	}, [] );
+
+	const directEntryHandler = allowDirectEntry
+		? handleDirectEntry
+		: handleNoop;
+
 	return useCallback(
 		( val, args ) => {
 			return isURLLike( val )
-				? handleDirectEntry( val, args )
-				: handleEntitySearch( val, args, fetchSearchSuggestions );
+				? directEntryHandler( val, args )
+				: handleEntitySearch(
+						val,
+						args,
+						fetchSearchSuggestions,
+						directEntryHandler
+				  );
 		},
-		[ enableDirectEntry, fetchSearchSuggestions ]
+		[ directEntryHandler, fetchSearchSuggestions ]
 	);
 }
