@@ -33,6 +33,7 @@ function ColumnEdit( {
 	getStylesFromColorScheme,
 	isParentSelected,
 	contentStyle,
+	columnCount,
 } ) {
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -69,7 +70,7 @@ function ColumnEdit( {
 						min={ 1 }
 						max={ 100 }
 						step={ 0.1 }
-						value={ width || 50 }
+						value={ width || 100 / columnCount }
 						onChange={ ( nextWidth ) => {
 							setAttributes( {
 								width: nextWidth,
@@ -135,6 +136,8 @@ export default compose( [
 		const parentId = getBlockRootClientId( clientId );
 		const hasChildren = !! getBlockCount( clientId );
 
+		const columnCount = getBlockCount( parentId );
+
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
 
@@ -142,6 +145,7 @@ export default compose( [
 			hasChildren,
 			isParentSelected,
 			isSelected,
+			columnCount,
 		};
 	} ),
 	withPreferredColorScheme,

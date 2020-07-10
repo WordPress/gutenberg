@@ -1,15 +1,20 @@
 /**
  * External dependencies
  */
-import { ScrollView } from 'react-native';
+import {
+	ScrollView,
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	Platform,
+} from 'react-native';
 import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-
 import { withSelect, useDispatch } from '@wordpress/data';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import {
@@ -17,6 +22,8 @@ import {
 	BottomSheet,
 	UnsupportedFooterControl,
 } from '@wordpress/components';
+import { Icon, close } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -36,13 +43,43 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 		);
 	};
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
+	const isIOS = Platform.OS === 'ios';
+
+	const cancelButtonStyle = usePreferredColorSchemeStyle(
+		styles.cancelButton,
+		styles.cancelButtonDark
+	);
 
 	return (
 		<BottomSheet
 			isVisible={ isVisible }
 			onClose={ onClose }
-			title={ __( 'Select a preset' ) }
+			title={ __( 'Select a layout' ) }
 			contentStyle={ styles.contentStyle }
+			leftButton={
+				<TouchableWithoutFeedback
+					onPress={ onClose }
+					hitSlop={ hitSlop }
+				>
+					<View>
+						{ isIOS ? (
+							<Text
+								style={ cancelButtonStyle }
+								maxFontSizeMultiplier={ 2 }
+							>
+								{ __( 'Cancel' ) }
+							</Text>
+						) : (
+							<Icon
+								icon={ close }
+								size={ 24 }
+								style={ styles.closeIcon }
+							/>
+						) }
+					</View>
+				</TouchableWithoutFeedback>
+			}
 		>
 			<ScrollView
 				horizontal
@@ -60,7 +97,8 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 									clientId,
 									createBlocksFromInnerBlocksTemplate(
 										v.innerBlocks
-									)
+									),
+									false
 								);
 								onClose();
 							} }
@@ -85,6 +123,5 @@ export default compose(
 		return {
 			date: getBlockVariations( 'core/columns', 'block' ),
 		};
-	} ),
-	withPreferredColorScheme
+	} )
 )( BlockVariationPicker );

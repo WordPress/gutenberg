@@ -1,13 +1,28 @@
 .contentContainerStyle {
 	flex-direction: row;
 	padding-bottom: 20px;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
 }
 
 .containerStyle {
-	padding-top: 12px;
+	padding-top: $grid-unit-15;
 }
 
 .contentStyle {
 	padding-left: 0;
 	padding-right: 0;
+}
+
+.cancelButton {
+	color: #d63638;
+	font-size: 16px;
+}
+
+.cancelButtonDark {
+	color: #f86368;
+}
+
+.closeIcon {
+	color: $gray;
 }

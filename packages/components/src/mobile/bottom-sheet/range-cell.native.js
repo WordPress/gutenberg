@@ -76,10 +76,14 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	handleChange( text ) {
-		const { hasFocus } = this.state;
+		text =
+			typeof text === 'number'
+				? this.toFixed( text )
+				: text.replace( ',', '.' );
+
 		if ( ! isNaN( Number( text ) ) ) {
 			this.setState( {
-				sliderValue: ! hasFocus ? this.toFixed( text ) : text,
+				sliderValue: text,
 			} );
 			this.announceCurrentValue( text );
 		}
@@ -105,10 +109,7 @@ class BottomSheetRangeCell extends Component {
 			return Math.min( Math.max( text, minimumValue ), maximumValue );
 		}
 		return Math.min(
-			Math.max(
-				text.replace( /[^0-9]\./g, '' ).replace( /^0+(?=\d)/, '' ),
-				minimumValue
-			),
+			Math.max( text.replace( /[^0-9.]\,/g, '' ), minimumValue ),
 			maximumValue
 		);
 	}
