@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Button from '../button';
 import ButtonGroup from '../button-group';
+import TimeZone from './timezone';
 
 /**
  * Module Constants
@@ -277,6 +278,7 @@ class TimePicker extends Component {
 	render() {
 		const { is12Hour } = this.props;
 		const { year, minutes, hours, am } = this.state;
+
 		return (
 			<div className={ classnames( 'components-datetime__time' ) }>
 				<fieldset>
@@ -353,6 +355,8 @@ class TimePicker extends Component {
 								</Button>
 							</ButtonGroup>
 						) }
+
+						<TimeZone />
 					</div>
 				</fieldset>
 			</div>

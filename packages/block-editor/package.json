@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "4.2.0",
+	"version": "4.3.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -50,6 +50,7 @@
 		"@wordpress/token-list": "file:../token-list",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
 		"css-mediaquery": "^0.1.2",
@@ -60,6 +61,7 @@
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^3.0.2",
 		"react-spring": "^8.0.19",
+		"react-transition-group": "^2.9.0",
 		"redux-multi": "^0.1.12",
 		"refx": "^3.0.0",
 		"rememo": "^3.0.0",
