@@ -25,9 +25,6 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
-import mockUseCreatePage from '../use-create-page';
-jest.mock( '../use-create-page' );
-
 /**
  * Wait for next tick of event loop. This is required
  * because the `fetchSearchSuggestions` Promise will
@@ -47,11 +44,6 @@ beforeEach( () => {
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
-	mockUseCreatePage.mockImplementation( () => ( {
-		createPage: () => {},
-		isCreatingPage: false,
-		errorMessage: null,
-	} ) );
 } );
 
 afterEach( () => {
@@ -681,29 +673,18 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			let resolver;
 			let resolvedEntity;
 
-			mockUseCreatePage.mockImplementation( () => {
-				const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-
-				return {
-					createPage: ( title ) => {
-						return new Promise( ( resolve ) => {
-							setIsCreatingPage( true );
-							resolver = ( arg ) => {
-								resolve( arg );
-								setIsCreatingPage( false );
-							};
-							resolvedEntity = {
-								title,
-								id: 123,
-								url: '/?p=123',
-								type: 'page',
-							};
-						} );
-					},
-					isCreatingPage,
-					errorMessage: '',
-				};
-			} );
+			const createSuggestion = ( title ) =>
+				new Promise( ( resolve ) => {
+					resolver = ( arg ) => {
+						resolve( arg );
+					};
+					resolvedEntity = {
+						title,
+						id: 123,
+						url: '/?p=123',
+						type: 'page',
+					};
+				} );
 
 			const LinkControlConsumer = () => {
 				const [ link, setLink ] = useState( null );
@@ -714,7 +695,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 						onChange={ ( suggestion ) => {
 							setLink( suggestion );
 						} }
-						withCreateSuggestion
+						createSuggestion={ createSuggestion }
 					/>
 				);
 			};
@@ -741,6 +722,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			const searchResultElements = container.querySelectorAll(
 				'[role="listbox"] [role="option"]'
 			);
+
+			// console.log( 'searchResultElements', container.innerHTML );
+			// console.log( 'searchResultElements', searchResultElements );
 
 			const createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
@@ -796,20 +780,77 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		}
 	);
 
+	it( 'should allow createSuggestion prop to return a non-Promise value', async () => {
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( null );
+
+			return (
+				<LinkControl
+					value={ link }
+					onChange={ ( suggestion ) => {
+						setLink( suggestion );
+					} }
+					createSuggestion={ ( title ) => ( {
+						title,
+						id: 123,
+						url: '/?p=123',
+						type: 'page',
+					} ) }
+				/>
+			);
+		};
+
+		act( () => {
+			render( <LinkControlConsumer />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'Some new page to create' },
+			} );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		const searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
+
+		const createButton = first(
+			Array.from( searchResultElements ).filter( ( result ) =>
+				result.innerHTML.includes( 'New page' )
+			)
+		);
+
+		await act( async () => {
+			Simulate.click( createButton );
+		} );
+
+		await eventLoopTick();
+
+		const currentLink = container.querySelector(
+			'[aria-label="Currently selected"]'
+		);
+
+		const currentLinkHTML = currentLink.innerHTML;
+
+		expect( currentLinkHTML ).toEqual(
+			expect.stringContaining( 'Some new page to create' )
+		);
+		expect( currentLinkHTML ).toEqual(
+			expect.stringContaining( '/?p=123' )
+		);
+	} );
+
 	it( 'should allow creation of entities via the keyboard', async () => {
 		const entityNameText = 'A new page to be created';
-
-		mockUseCreatePage.mockImplementation( () => ( {
-			createPage: ( title ) =>
-				Promise.resolve( {
-					title,
-					id: 123,
-					url: '/?p=123',
-					type: 'page',
-				} ),
-			isCreatingPage: false,
-			errorMessage: '',
-		} ) );
 
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( null );
@@ -820,7 +861,14 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					onChange={ ( suggestion ) => {
 						setLink( suggestion );
 					} }
-					withCreateSuggestion
+					createSuggestion={ ( title ) =>
+						Promise.resolve( {
+							title,
+							id: 123,
+							url: '/?p=123',
+							type: 'page',
+						} )
+					}
 				/>
 			);
 		};
@@ -1073,8 +1121,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					result.innerHTML.includes( 'New page' )
 				)
 			);
-
-			expect( createButton ).not.toBeFalsy(); // shouldn't exist!
 		} );
 	} );
 } );

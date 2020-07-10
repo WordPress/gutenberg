@@ -108,9 +108,14 @@ function LinkControl( {
 	showSuggestions = true,
 	showInitialSuggestions,
 	forceIsEditingLink,
-	withCreateSuggestion = false,
+	createSuggestion,
+	withCreateSuggestion,
 	inputValue: propInputValue = '',
 } ) {
+	if ( withCreateSuggestion === undefined && createSuggestion ) {
+		withCreateSuggestion = true;
+	}
+
 	const wrapperNode = useRef();
 	const [ internalInputValue, setInternalInputValue ] = useState(
 		( value && value.url ) || ''
@@ -170,7 +175,9 @@ function LinkControl( {
 		setIsEditingLink( false );
 	}
 
-	const { createPage, isCreatingPage, errorMessage } = useCreatePage();
+	const { createPage, isCreatingPage, errorMessage } = useCreatePage(
+		createSuggestion
+	);
 
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( updatedValue );

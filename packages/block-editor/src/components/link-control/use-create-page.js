@@ -5,10 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
 
-export default function useCreatePage() {
+export default function useCreatePage( customCreatePage = null ) {
 	const { saveEntityRecord } = useDispatch( 'core' );
 
-	async function handleCreatePage( pageTitle ) {
+	async function genericCreatePage( pageTitle ) {
 		const type = 'page';
 		const page = await saveEntityRecord( 'postType', type, {
 			title: pageTitle,
@@ -22,6 +22,8 @@ export default function useCreatePage() {
 			url: page.link,
 		};
 	}
+
+	const handleCreatePage = customCreatePage || genericCreatePage;
 
 	const cancelableCreateSuggestion = useRef();
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
