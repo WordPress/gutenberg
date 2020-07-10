@@ -30,7 +30,9 @@ const FillWithSettingsButton = ( { children, ...props } ) => {
 					</BottomSheetConsumer>
 				}
 			</Fill>
-			{ React.Children.count( children ) > 0 && <BlockSettingsButton /> }
+			{ React.Children.toArray( children ).filter(
+				( child ) => child.props.dontCount !== true
+			).length > 0 && <BlockSettingsButton /> }
 		</>
 	);
 };

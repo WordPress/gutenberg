@@ -281,6 +281,7 @@ const Cover = ( {
 				onNavigationBack={ closeSettingsBottomSheet }
 				onCloseBottomSheet={ () => {} }
 				isBottomSheetContentScrolling={ () => {} }
+				dontCount={ true }
 			/>
 		</InspectorControls>
 	);
