@@ -15,13 +15,14 @@ import { BottomSheetContext } from '@wordpress/components';
 
 import { useRef, useCallback, useContext } from '@wordpress/element';
 
-const BottomSheetScreen = ( { children, setHeight } ) => {
+const BottomSheetScreen = ( { children } ) => {
 	const navigation = useNavigation();
 	const height = useRef( { maxHeight: 0 } );
 	const isFocused = useIsFocused();
 	const {
 		onHardwareButtonPress,
 		shouldDisableBottomSheetMaxHeight,
+		setHeight,
 	} = useContext( BottomSheetContext );
 	useFocusEffect(
 		useCallback( () => {

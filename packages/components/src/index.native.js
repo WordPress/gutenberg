@@ -60,6 +60,7 @@ export * from './text';
 export { default as BottomSheet } from './mobile/bottom-sheet';
 export {
 	BottomSheetConsumer,
+	BottomSheetProvider,
 	BottomSheetContext,
 } from './mobile/bottom-sheet/bottom-sheet-context';
 export { default as HTMLTextInput } from './mobile/html-text-input';

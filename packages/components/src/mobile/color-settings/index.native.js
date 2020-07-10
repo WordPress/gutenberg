@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useContext, useRef } from '@wordpress/element';
+import { useEffect, useContext, useRef } from '@wordpress/element';
 import { BottomSheetContext, BottomSheet } from '@wordpress/components';
 import { useRoute } from '@react-navigation/native';
 
@@ -22,16 +21,10 @@ const Stack = createStackNavigator();
 
 function ColorSettings( { defaultSettings } ) {
 	const route = useRoute();
-	const [ heightValue, setHeightValue ] = useState( 1 );
 	const {
 		onCloseBottomSheet,
 		shouldDisableBottomSheetMaxHeight,
 	} = useContext( BottomSheetContext );
-	const setHeight = ( maxHeight ) => {
-		if ( heightValue !== maxHeight ) {
-			setHeightValue( maxHeight );
-		}
-	};
 
 	useEffect( () => {
 		shouldDisableBottomSheetMaxHeight( true );
@@ -39,28 +32,25 @@ function ColorSettings( { defaultSettings } ) {
 	}, [] );
 
 	const PaletteScreenView = useRef( () => (
-		<BottomSheet.NavigationScreen setHeight={ setHeight } name={ 'palete' }>
+		<BottomSheet.NavigationScreen>
 			<PaletteScreen />
 		</BottomSheet.NavigationScreen>
 	) );
 
 	const PickerScreenView = useRef( () => (
-		<BottomSheet.NavigationScreen setHeight={ setHeight } name={ 'Picker' }>
+		<BottomSheet.NavigationScreen>
 			<PickerScreen />
 		</BottomSheet.NavigationScreen>
 	) );
 
 	const GradientPickerView = useRef( () => (
-		<BottomSheet.NavigationScreen
-			setHeight={ setHeight }
-			name={ 'Gradient' }
-		>
+		<BottomSheet.NavigationScreen>
 			<GradientPickerScreen />
 		</BottomSheet.NavigationScreen>
 	) );
 
 	return (
-		<View style={ { height: heightValue } }>
+		<BottomSheet.NavigationContainer>
 			<Stack.Navigator
 				screenOptions={ {
 					headerShown: false,
@@ -84,7 +74,7 @@ function ColorSettings( { defaultSettings } ) {
 					options={ BottomSheet.NavigationScreen.options }
 				/>
 			</Stack.Navigator>
-		</View>
+		</BottomSheet.NavigationContainer>
 	);
 }
 

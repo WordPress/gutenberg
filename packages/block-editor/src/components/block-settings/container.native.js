@@ -6,15 +6,11 @@
  */
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import {
-	InspectorControls,
-	SETTINGS_DEFAULTS as defaultSettings,
-} from '@wordpress/block-editor';
+import { InspectorControls } from '@wordpress/block-editor';
 import { BottomSheet, ColorSettings } from '@wordpress/components';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
-import { Animated, Easing } from 'react-native';
 /**
  * Internal dependencies
  */
@@ -25,28 +21,18 @@ const Stack = createStackNavigator();
 function BottomSheetSettings( {
 	editorSidebarOpened,
 	closeGeneralSidebar,
+	settings,
 	...props
 } ) {
-	const heightValue = useRef( new Animated.Value( 1 ) ).current;
-	const setHeight = ( maxHeight ) => {
-		if ( heightValue !== maxHeight ) {
-			Animated.timing( heightValue, {
-				toValue: maxHeight,
-				duration: 200,
-				easing: Easing.quad,
-			} ).start();
-		}
-	};
-
 	const MainScreen = useRef( () => (
-		<BottomSheet.NavigationScreen setHeight={ setHeight } name={ 'main' }>
+		<BottomSheet.NavigationScreen>
 			<InspectorControls.Slot />
 		</BottomSheet.NavigationScreen>
 	) );
 
 	const DetailsScreen = useRef( () => (
-		<BottomSheet.NavigationScreen setHeight={ setHeight } name={ 'Color' }>
-			<ColorSettings defaultSettings={ defaultSettings } />
+		<BottomSheet.NavigationScreen>
+			<ColorSettings defaultSettings={ settings } />
 		</BottomSheet.NavigationScreen>
 	) );
 
@@ -71,7 +57,7 @@ function BottomSheetSettings( {
 			adjustToContentHeight
 			{ ...props }
 		>
-			<Animated.View style={ { height: heightValue } }>
+			<BottomSheet.NavigationContainer animate>
 				<NavigationContainer theme={ MyTheme }>
 					<Stack.Navigator
 						screenOptions={ {
@@ -91,7 +77,7 @@ function BottomSheetSettings( {
 						/>
 					</Stack.Navigator>
 				</NavigationContainer>
-			</Animated.View>
+			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
 }
@@ -99,8 +85,9 @@ function BottomSheetSettings( {
 export default compose( [
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-
+		const { getSettings } = select( 'core/block-editor' );
 		return {
+			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};
 	} ),
