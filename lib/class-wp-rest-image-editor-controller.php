@@ -133,10 +133,52 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 				);
 			}
 		} else {
-			// TODO when back-compat: Check if the image file from $request['src'] exists in $image_meta.
+			// Back-compat for WP versions < 5.5.
 			if ( ! $image_meta || ! $image_file ) {
-				$error = __( 'Unable to get meta information for file.', 'gutenberg' );
-				return new WP_Error( 'rest_unknown_attachment', $error, array( 'status' => 404 ) );
+				return new WP_Error(
+					'rest_unknown_attachment',
+					__( 'Unable to get meta information for file.', 'gutenberg' ),
+					array( 'status' => 404 )
+				);
+			} else {
+				$match     = false;
+				$image_src = $request['src'];
+
+				if ( isset( $image_meta['file'] ) && strlen( $image_meta['file'] ) > 4 ) {
+					// Remove quiery args.
+					list( $image_src ) = explode( '?', $image_src );
+
+					// Check if the relative image path from the image meta is at the end of $image_src.
+					if ( strrpos( $image_src, $image_meta['file'] ) === strlen( $image_src ) - strlen( $image_meta['file'] ) ) {
+						$match = true;
+					}
+
+					if ( ! empty( $image_meta['sizes'] ) ) {
+						// Retrieve the uploads sub-directory from the full size image.
+						$dirname = _wp_get_attachment_relative_path( $image_meta['file'] );
+
+						if ( $dirname ) {
+							$dirname = trailingslashit( $dirname );
+						}
+
+						foreach ( $image_meta['sizes'] as $image_size_data ) {
+							$relative_path = $dirname . $image_size_data['file'];
+
+							if ( strrpos( $image_src, $relative_path ) === strlen( $image_src ) - strlen( $relative_path ) ) {
+								$match = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if ( ! $match ) {
+					return new WP_Error(
+						'rest_unknown_attachment',
+						__( 'Unable to get meta information for file.', 'gutenberg' ),
+						array( 'status' => 404 )
+					);
+				}
 			}
 		}
 
