@@ -232,6 +232,9 @@ const Cover = ( {
 					<BottomSheetButton
 						text={ __( 'Clear Media' ) }
 						color={ styles.clearMediaButton.color }
+						justifyContent={
+							styles.clearMediaButton.justifyContent
+						}
 						onPress={ () => {
 							setAttributes( { id: undefined, url: undefined } );
 						} }
