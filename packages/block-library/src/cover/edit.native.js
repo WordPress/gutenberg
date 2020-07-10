@@ -39,7 +39,7 @@ import {
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import { cover as icon, replace } from '@wordpress/icons';
+import { cover as icon, replace, image } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
 /**
@@ -126,6 +126,8 @@ const Cover = ( {
 		overlayColor.color ||
 		gradientValue
 	);
+
+	const hasOnlyColorBackground = ! url && hasBackground;
 
 	// Used to set a default color for its InnerBlocks
 	// since there's no system to inherit styles yet
@@ -290,66 +292,80 @@ const Cover = ( {
 		open: openMediaOptions,
 		getMediaOptions,
 	} ) => (
-		<TouchableWithoutFeedback
-			accessible={ ! isParentSelected }
-			onPress={ onMediaPressed }
-			onLongPress={ openMediaOptions }
-			disabled={ ! isParentSelected }
-		>
-			<View style={ [ styles.background, backgroundColor ] }>
-				{ getMediaOptions() }
-				{ isParentSelected && toolbarControls( openMediaOptions ) }
-				<MediaUploadProgress
-					mediaId={ id }
-					onUpdateMediaProgress={ () => {
-						setIsUploadInProgress( true );
-					} }
-					onFinishMediaUploadWithSuccess={ ( {
-						mediaServerId,
-						mediaUrl,
-					} ) => {
-						setIsUploadInProgress( false );
-						setDidUploadFail( false );
-						setAttributes( {
-							id: mediaServerId,
-							url: mediaUrl,
-							backgroundType,
-						} );
-					} }
-					onFinishMediaUploadWithFailure={ () => {
-						setIsUploadInProgress( false );
-						setDidUploadFail( true );
-					} }
-					onMediaUploadStateReset={ () => {
-						setIsUploadInProgress( false );
-						setDidUploadFail( false );
-						setAttributes( { id: undefined, url: undefined } );
-					} }
-				/>
-				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-					<ImageWithFocalPoint
-						focalPoint={ focalPoint }
-						url={ url }
+		<>
+			<TouchableWithoutFeedback
+				accessible={ ! isParentSelected }
+				onPress={ onMediaPressed }
+				onLongPress={ openMediaOptions }
+				disabled={ ! isParentSelected }
+			>
+				<View style={ [ styles.background, backgroundColor ] }>
+					{ getMediaOptions() }
+					{ isParentSelected && toolbarControls( openMediaOptions ) }
+					<MediaUploadProgress
+						mediaId={ id }
+						onUpdateMediaProgress={ () => {
+							setIsUploadInProgress( true );
+						} }
+						onFinishMediaUploadWithSuccess={ ( {
+							mediaServerId,
+							mediaUrl,
+						} ) => {
+							setIsUploadInProgress( false );
+							setDidUploadFail( false );
+							setAttributes( {
+								id: mediaServerId,
+								url: mediaUrl,
+								backgroundType,
+							} );
+						} }
+						onFinishMediaUploadWithFailure={ () => {
+							setIsUploadInProgress( false );
+							setDidUploadFail( true );
+						} }
+						onMediaUploadStateReset={ () => {
+							setIsUploadInProgress( false );
+							setDidUploadFail( false );
+							setAttributes( { id: undefined, url: undefined } );
+						} }
 					/>
-				) }
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-					<Video
-						muted
-						disableFocus
-						repeat
-						resizeMode={ 'cover' }
-						source={ { uri: url } }
-						onLoad={ onVideoLoad }
-						onLoadStart={ onVideoLoadStart }
-						style={ [
-							styles.background,
-							// Hide Video component since it has black background while loading the source
-							{ opacity: isVideoLoading ? 0 : 1 },
-						] }
-					/>
-				) }
-			</View>
-		</TouchableWithoutFeedback>
+					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+						<ImageWithFocalPoint
+							focalPoint={ focalPoint }
+							url={ url }
+						/>
+					) }
+					{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+						<Video
+							muted
+							disableFocus
+							repeat
+							resizeMode={ 'cover' }
+							source={ { uri: url } }
+							onLoad={ onVideoLoad }
+							onLoadStart={ onVideoLoadStart }
+							style={ [
+								styles.background,
+								// Hide Video component since it has black background while loading the source
+								{ opacity: isVideoLoading ? 0 : 1 },
+							] }
+						/>
+					) }
+				</View>
+			</TouchableWithoutFeedback>
+			{ hasOnlyColorBackground && (
+				<View style={ styles.selectImageContainer }>
+					<TouchableWithoutFeedback onPress={ openMediaOptions }>
+						<View style={ styles.selectImage }>
+							<Icon
+								icon={ image }
+								{ ...styles.selectImageIcon }
+							/>
+						</View>
+					</TouchableWithoutFeedback>
+				</View>
+			) }
+		</>
 	);
 
 	if ( ! hasBackground ) {
