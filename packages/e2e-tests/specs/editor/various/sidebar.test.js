@@ -104,7 +104,7 @@ describe( 'Sidebar', () => {
 		const isActiveDocumentTab = await page.evaluate(
 			() =>
 				document.activeElement.textContent === 'Post' &&
-				document.activeElement.classList.contains( 'is-active' ),
+				document.activeElement.classList.contains( 'is-active' )
 		);
 		expect( isActiveDocumentTab ).toBe( true );
 
