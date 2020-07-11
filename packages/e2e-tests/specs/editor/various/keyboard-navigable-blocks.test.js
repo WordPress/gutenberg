@@ -8,7 +8,6 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	showBlockToolbar,
-	getDocumentLabel,
 } from '@wordpress/e2e-test-utils';
 
 async function getActiveLabel() {
@@ -188,8 +187,7 @@ describe( 'Order of block keyboard navigation', () => {
 		expect( await getActiveLabel() ).toBe( 'Multiple selected blocks' );
 
 		await page.keyboard.press( 'Tab' );
-		const documentLabel = await getDocumentLabel();
-		await expect( await getActiveLabel() ).toBe( documentLabel );
+		await expect( await getActiveLabel() ).toBe( 'Post' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await getActiveLabel() ).toBe(

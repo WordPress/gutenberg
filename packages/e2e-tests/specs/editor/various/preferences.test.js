@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, getDocumentLabel } from '@wordpress/e2e-test-utils';
+import { createNewPost } from '@wordpress/e2e-test-utils';
 
 describe( 'preferences', () => {
 	beforeAll( async () => {
@@ -29,10 +29,8 @@ describe( 'preferences', () => {
 	}
 
 	it( 'remembers sidebar dismissal between sessions', async () => {
-		const documentLabel = await getDocumentLabel();
-
 		// Open by default.
-		expect( await getActiveSidebarTabText() ).toBe( documentLabel );
+		expect( await getActiveSidebarTabText() ).toBe( 'Post' );
 
 		// Change to "Block" tab.
 		await page.click( '.edit-post-sidebar__panel-tab[aria-label="Block"]' );
@@ -43,7 +41,7 @@ describe( 'preferences', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/6377
 		// See: https://github.com/WordPress/gutenberg/pull/8995
 		await page.reload();
-		expect( await getActiveSidebarTabText() ).toBe( documentLabel );
+		expect( await getActiveSidebarTabText() ).toBe( 'Post' );
 
 		// Dismiss
 		await page.click(
