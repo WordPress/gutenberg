@@ -10,17 +10,19 @@ import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
-const SettingsHeader = ( { sidebarName } ) => {
-	// translators: Label for the Block Settings Sidebar tab, not selected.
-	const blockLabel = __( 'Block' );
+// translators: Label for the Block Settings Sidebar tab, not selected.
+const BLOCK_LABEL = __( 'Block' );
+// translators: Label for the Block Settings Sidebar tab, selected.
+const BLOCK_SELECTED_LABEL = __( 'Block (selected)' );
 
+const SettingsHeader = ( { sidebarName } ) => {
 	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
 
 	const documentLabel = useSelect( ( select ) => {
 		const currentPostType = select( 'core/editor' ).getCurrentPostType();
 		const postType = select( 'core' ).getPostType( currentPostType );
 
-		// translators: Default ARIA label for the Document sidebar tab, not selected.
+		// translators: Default label for the Document sidebar tab, not selected.
 		const defaultDocumentLabel = __( 'Document' );
 
 		return get(
@@ -38,9 +40,8 @@ const SettingsHeader = ( { sidebarName } ) => {
 
 	const [ blockAriaLabel, blockActiveClass ] =
 		sidebarName === 'edit-post/block'
-			? // translators: ARIA label for the Block Settings Sidebar tab, selected.
-			  [ sprintf( __( '%1$s (selected)' ), blockLabel ), 'is-active' ]
-			: [ blockLabel, '' ];
+			? [ BLOCK_SELECTED_LABEL, 'is-active' ]
+			: [ BLOCK_LABEL, '' ];
 
 	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
@@ -60,9 +61,9 @@ const SettingsHeader = ( { sidebarName } ) => {
 					onClick={ () => openGeneralSidebar( 'edit-post/block' ) }
 					className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
 					aria-label={ blockAriaLabel }
-					data-label={ blockLabel }
+					data-label={ BLOCK_LABEL }
 				>
-					{ blockLabel }
+					{ BLOCK_LABEL }
 				</Button>
 			</li>
 		</ul>
