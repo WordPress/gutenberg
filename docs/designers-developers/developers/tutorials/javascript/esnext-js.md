@@ -1,10 +1,8 @@
 # ESNext Syntax
 
-A brief aside to discuss JavaScript.
-
-## Background
-
 The JavaScript language continues to evolve, the syntax used to write JavaScript code is not fixed but changes over time. [Ecma International](https://en.wikipedia.org/wiki/Ecma_International) is the organization that sets the standard for the language, officially called [ECMAScript](https://en.wikipedia.org/wiki/ECMAScript). A new standard for JavaScript is published each year, the 6th edition published in 2015 is often referred to as ES6. Our usage would more appropriately be **ESNext** referring to the latest standard. The build step is what converts this latest syntax of JavaScript to a version understood by browsers.
+
+Here are some common ESNext syntax patterns used throughout the Gutenberg project.
 
 ## Destructuring Assignments
 
@@ -123,5 +121,3 @@ Here are a few more resources that may help
 -   [ES5 vs ES6 with example code](https://medium.com/recraftrelic/es5-vs-es6-with-example-code-9901fa0136fc)
 -   [Top 10 ES6 Features by Example](https://blog.pragmatists.com/top-10-es6-features-by-example-80ac878794bb)
 -   [ES6 Syntax and Feature Overview](https://www.taniarascia.com/es6-syntax-and-feature-overview/)
-
-Next Section: [Anatomy of a Gutenberg Block](block-anatomy.md)

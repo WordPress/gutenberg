@@ -19,7 +19,7 @@ export default function SpacingPanelControl( { children, ...props } ) {
 	const isSpacingEnabled = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return get( getSettings(), '__experimentalEnableCustomSpacing' );
-	} );
+	}, [] );
 
 	if ( ! isSpacingEnabled ) return null;
 

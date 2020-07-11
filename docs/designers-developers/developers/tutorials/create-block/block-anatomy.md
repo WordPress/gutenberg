@@ -1,6 +1,10 @@
-# Anatomy of a Gutenberg Block
+# Anatomy of a Block
 
-At its simplest, a block in Gutenberg is a JavaScript object with a specific set of properties. Here is the complete code for registering a block:
+At its simplest, a block in the WordPress block editor is a JavaScript object with a specific set of properties.
+
+**Note:** Block development uses ESNext syntax, this refers to the latest JavaScript standard. If this is unfamiliar, I recommend reviewing the [ESNext synatx documentation](/docs/designers-developers/developers/tutorials/javascript/esnext-js.md) to familiarize yourself with the newer syntax used in modern JavaScript development.
+
+Here is the complete code for registering a block:
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -40,6 +44,8 @@ The last two block object properties are **edit** and **save**, these are the ke
 The results of the edit function is what the editor will render to the editor page when the block is inserted.
 
 The results of the save function is what the editor will insert into the **post_content** field when the post is saved. The post_content field is the field in the WordPress database used to store the content of the post.
+
+**Note:** The `block.json` file is also generated with your plugin. This file is used for registering with the block directory, as you change the properties you should update in both spots. _Development is on-going to simplify this process so only one location is required._
 
 ## Internationalization
 
