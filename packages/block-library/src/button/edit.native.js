@@ -32,7 +32,7 @@ import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background';
 import ColorEdit from './color-edit';
-import getColorAndStyleProps from './color-props';
+import { getColorAndStyleProps } from './color-props';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
