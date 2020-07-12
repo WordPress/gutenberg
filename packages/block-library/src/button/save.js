@@ -11,7 +11,7 @@ import { RichText } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import getColorAndStyleProps from './color-props';
+import { getColorAndStyleProps } from './color-props';
 
 export default function save( { attributes } ) {
 	const { borderRadius, linkTarget, rel, text, title, url } = attributes;

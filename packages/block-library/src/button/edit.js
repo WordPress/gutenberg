@@ -33,7 +33,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import ColorEdit from './color-edit';
-import getColorAndStyleProps from './color-props';
+import { getColorAndStylePropsForEditor } from './color-props';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
@@ -187,7 +187,7 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
-	const colorProps = getColorAndStyleProps( attributes );
+	const colorProps = getColorAndStylePropsForEditor( attributes );
 
 	return (
 		<>
