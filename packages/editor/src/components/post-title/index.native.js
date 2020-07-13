@@ -26,13 +26,21 @@ import { pasteHandler } from '@wordpress/blocks';
 import styles from './style.scss';
 
 class PostTitle extends Component {
+	constructor( props ) {
+		super( props );
+
+		this.setRef = this.setRef.bind( this );
+	}
 	componentDidUpdate( prevProps ) {
-		// Unselect if any other block is selected
+		// Unselect if any other block is selected and blur the RichText
 		if (
 			this.props.isSelected &&
 			! prevProps.isAnyBlockSelected &&
 			this.props.isAnyBlockSelected
 		) {
+			if ( this.richTextRef ) {
+				this.richTextRef.blur();
+			}
 			this.props.onUnselect();
 		}
 	}
@@ -62,6 +70,10 @@ class PostTitle extends Component {
 			const valueToInsert = create( { html: content } );
 			onChange( insert( value, valueToInsert ) );
 		}
+	}
+
+	setRef( richText ) {
+		this.richTextRef = richText;
 	}
 
 	render() {
@@ -100,6 +112,7 @@ class PostTitle extends Component {
 				}
 			>
 				<RichText
+					setRef={ this.setRef }
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }

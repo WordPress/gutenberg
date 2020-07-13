@@ -68,72 +68,63 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  *
  * @param {WPEnvironment} environment The environment to configure. Either 'development' or 'tests'.
  * @param {WPConfig}      config      The wp-env config object.
+ * @param {Object} spinner A CLI spinner which indicates progress.
  */
-async function configureWordPress( environment, config ) {
-	const options = {
-		config: config.dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
-		log: config.debug,
-	};
+async function configureWordPress( environment, config, spinner ) {
+	const installCommand = `wp core install --url="localhost:${ config.env[ environment ].port }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
-	const port = config.env[ environment ].port;
-
-	// Install WordPress.
-	await dockerCompose.run(
-		environment === 'development' ? 'cli' : 'tests-cli',
-		[
-			'wp',
-			'core',
-			'install',
-			`--url=localhost:${ port }`,
-			`--title=${ config.name }`,
-			'--admin_user=admin',
-			'--admin_password=password',
-			'--admin_email=wordpress@example.com',
-			'--skip-email',
-		],
-		options
-	);
+	// -eo pipefail exits the command as soon as anything fails in bash.
+	const setupCommands = [ 'set -eo pipefail', installCommand ];
 
 	// Set wp-config.php values.
-	for ( const [ key, value ] of Object.entries(
+	for ( let [ key, value ] of Object.entries(
 		config.env[ environment ].config
 	) ) {
-		const command = [ 'wp', 'config', 'set', key, value ];
-		if ( typeof value !== 'string' ) {
-			command.push( '--raw' );
-		}
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			command,
-			options
+		// Add quotes around string values to work with multi-word strings better.
+		value = typeof value === 'string' ? `"${ value }"` : value;
+		setupCommands.push(
+			`wp config set ${ key } ${ value }${
+				typeof value !== 'string' ? ' --raw' : ''
+			}`
 		);
 	}
 
 	// Activate all plugins.
 	for ( const pluginSource of config.env[ environment ].pluginSources ) {
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			`wp plugin activate ${ pluginSource.basename }`,
-			options
+		setupCommands.push( `wp plugin activate ${ pluginSource.basename }` );
+	}
+
+	if ( config.debug ) {
+		spinner.info(
+			`Running the following setup commands on the ${ environment } instance:\n - ${ setupCommands.join(
+				'\n - '
+			) }\n`
 		);
 	}
 
-	// Activate the first theme.
-	const [ themeSource ] = config.env[ environment ].themeSources;
-	if ( themeSource ) {
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			`wp theme activate ${ themeSource.basename }`,
-			options
-		);
-	}
+	// Execute all setup commands in a batch.
+	await dockerCompose.run(
+		environment === 'development' ? 'cli' : 'tests-cli',
+		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
+		{
+			config: config.dockerComposeConfigPath,
+			log: config.debug,
+		}
+	);
 
-	// Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
-	// file, we need to avoid loading it too early in our own wp-config.php. If
-	// we load it too early, then some things (like MULTISITE) will be defined
-	// before wp-phpunit has a chance to configure them. To avoid this, create a
-	// copy of wp-config.php for phpunit which doesn't require wp-settings.php.
+	/**
+	 * Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
+	 * file, we need to avoid loading it too early in our own wp-config.php. If
+	 * we load it too early, then some things (like MULTISITE) will be defined
+	 * before wp-phpunit has a chance to configure them. To avoid this, create a
+	 * copy of wp-config.php for phpunit which doesn't require wp-settings.php.
+	 *
+	 * Note that This needs to be executed using `exec` on the wordpress service
+	 * so that file permissions work properly.
+	 *
+	 * This will be removed in the future. @see https://github.com/WordPress/gutenberg/issues/23171
+	 *
+	 */
 	await dockerCompose.exec(
 		environment === 'development' ? 'wordpress' : 'tests-wordpress',
 		[
