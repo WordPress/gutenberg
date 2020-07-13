@@ -155,6 +155,11 @@ dependencies {
         implementation project(':react-native-video')
         implementation project(':@react-native-community_slider')
         implementation project(':react-native-get-random-values')
+        implementation project(':@react-native-community_masked-view')
+        implementation project(':react-native-gesture-handler')
+        implementation project(':react-native-screens')
+        implementation project(':react-native-safe-area-context')
+        implementation project(':react-native-reanimated')
 
         implementation 'com.facebook.react:react-native:+'
     } else {

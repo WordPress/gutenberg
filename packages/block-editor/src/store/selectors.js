@@ -10,7 +10,6 @@ import {
 	isBoolean,
 	last,
 	map,
-	orderBy,
 	reduce,
 	some,
 	find,
@@ -1385,11 +1384,7 @@ export const getInserterItems = createSelector(
 			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
 			: [];
 
-		return orderBy(
-			[ ...blockTypeInserterItems, ...reusableBlockInserterItems ],
-			[ 'frecency' ],
-			[ 'desc', 'desc' ]
-		);
+		return [ ...blockTypeInserterItems, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],

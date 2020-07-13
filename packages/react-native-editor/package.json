@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.30.0",
+	"version": "1.31.1",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,7 +31,10 @@
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@react-native-community/blur": "3.6.0",
+		"@react-native-community/masked-view": "^0.1.10",
 		"@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#5ad284d92b8d886e366445bf215be741ed53ddc6",
+		"@react-navigation/native": "^5.6.1",
+		"@react-navigation/stack": "5.6.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
@@ -46,20 +49,25 @@
 		"@wordpress/react-native-bridge": "file:../react-native-bridge",
 		"fast-average-color": "^4.3.0",
 		"jed": "^1.1.1",
+		"jsc-android": "^241213.1.0",
 		"jsdom-jscore-rn": "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800",
 		"metro-react-native-babel-preset": "0.57.0",
 		"metro-react-native-babel-transformer": "0.56.0",
 		"node-fetch": "^2.6.0",
 		"react-native": "0.61.5",
 		"react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
+		"react-native-gesture-handler": "^1.6.1",
 		"react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#f03f2c16414aff4ea76064dcd00a9e3c6efc838d",
 		"react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
 		"react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker",
 		"react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.8",
 		"react-native-linear-gradient": "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#52bf43077171cff8714ce3e0155f3ebb7f55bc37",
 		"react-native-modal": "^6.5.0",
+		"react-native-reanimated": "^1.9.0",
 		"react-native-safe-area": "^0.5.0",
+		"react-native-safe-area-context": "^3.0.7",
 		"react-native-sass-transformer": "^1.1.1",
+		"react-native-screens": "^2.9.0",
 		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
 		"react-native-url-polyfill": "^1.1.2",
 		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f"
@@ -117,7 +125,6 @@
 		"clean:react": "rm -rf $TMPDIR/react-*",
 		"clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
 		"clean:babel-cache": "rm -rf ../../node_modules/.cache/babel-loader/*",
-		"clean:i18n-cache": "rm -rf ./i18n-cache/data/*.json && rm -f ./i18n-cache/index.native.js",
-		"version": "npm run bundle && git add -A bundle"
+		"clean:i18n-cache": "rm -rf ./i18n-cache/data/*.json && rm -f ./i18n-cache/index.native.js"
 	}
 }

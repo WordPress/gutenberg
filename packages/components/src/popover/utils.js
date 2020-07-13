@@ -166,14 +166,12 @@ export function computePopoverYAxisPosition(
 		const scrollContainerEl =
 			getScrollContainer( anchorRef ) || document.body;
 		const scrollRect = scrollContainerEl.getBoundingClientRect();
+		const stickyPosition = scrollRect.top + height - relativeOffsetTop;
 
-		if ( anchorRect.top - height <= scrollRect.top ) {
+		if ( anchorRect.top <= stickyPosition ) {
 			return {
 				yAxis,
-				popoverTop: Math.min(
-					anchorRect.bottom - relativeOffsetTop,
-					scrollRect.top + height - relativeOffsetTop
-				),
+				popoverTop: Math.min( anchorRect.bottom, stickyPosition ),
 			};
 		}
 	}

@@ -37,6 +37,12 @@ import com.horcrux.svg.SvgPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.linusu.RNGetRandomValuesPackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
@@ -184,7 +190,7 @@ public class WPAndroidGlueCode {
     public interface OnGutenbergDidRequestUnsupportedBlockFallbackListener {
         void gutenbergDidRequestUnsupportedBlockFallback(UnsupportedBlock unsupportedBlock);
     }
-    
+
     public interface OnStarterPageTemplatesTooltipShownEventListener {
         void onSetStarterPageTemplatesTooltipShown(boolean tooltipShown);
         boolean onRequestStarterPageTemplatesTooltipShown();
@@ -406,6 +412,11 @@ public class WPAndroidGlueCode {
                 new ReactVideoPackage(),
                 new ReactSliderPackage(),
                 new RNGetRandomValuesPackage(),
+                new RNGestureHandlerPackage(),
+                new RNScreensPackage(),
+                new SafeAreaContextPackage(),
+                new RNCMaskedViewPackage(),
+                new ReanimatedPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
@@ -433,11 +444,12 @@ public class WPAndroidGlueCode {
                              Consumer<String> breadcrumbLogger,
                              @Nullable Boolean isSiteUsingWpComRestApi,
                              @Nullable Bundle editorTheme,
-                             boolean siteJetpackIsConnected) {
+                             boolean isUnsupportedBlockEditorEnabled,
+                             boolean enableMentionsFlag) {
         mIsDarkMode = isDarkMode;
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
-        mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
+        mReactRootView = new RNGestureHandlerEnabledRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
 
         ReactInstanceManagerBuilder builder =
@@ -468,9 +480,9 @@ public class WPAndroidGlueCode {
 
         Bundle capabilities = new Bundle();
         if (isSiteUsingWpComRestApi != null) {
-            capabilities.putBoolean(PROP_NAME_CAPABILITIES_MENTIONS, isSiteUsingWpComRestApi);
-            capabilities.putBoolean(PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, !siteJetpackIsConnected);
+            capabilities.putBoolean(PROP_NAME_CAPABILITIES_MENTIONS, isSiteUsingWpComRestApi && enableMentionsFlag);
         }
+        capabilities.putBoolean(PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, isUnsupportedBlockEditorEnabled);
         initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
 
         Serializable colors = editorTheme != null ? editorTheme.getSerializable(PROP_NAME_COLORS) : null;

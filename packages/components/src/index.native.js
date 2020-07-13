@@ -58,7 +58,11 @@ export * from './text';
 
 // Mobile Components
 export { default as BottomSheet } from './mobile/bottom-sheet';
-export { BottomSheetConsumer } from './mobile/bottom-sheet/bottom-sheet-context';
+export {
+	BottomSheetConsumer,
+	BottomSheetProvider,
+	BottomSheetContext,
+} from './mobile/bottom-sheet/bottom-sheet-context';
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
@@ -71,6 +75,7 @@ export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
 export { LinkPicker } from './mobile/link-picker';
 export { default as LinkSettings } from './mobile/link-settings';
+export { default as Image } from './mobile/image';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';
