@@ -10,17 +10,13 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { useInstanceId, compose } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
-export function PostTextEditor( {
-	instanceId,
-	onChange,
-	onPersist,
-	...props
-} ) {
+export function PostTextEditor( { onChange, onPersist, ...props } ) {
 	const [ value, setValue ] = useState( props.value );
 	const [ isDirty, setIsDirty ] = useState( false );
+	const instanceId = useInstanceId( PostTextEditor );
 
 	if ( ! isDirty && value !== props.value ) {
 		setValue( props.value );
@@ -99,5 +95,4 @@ export default compose( [
 			},
 		};
 	} ),
-	withInstanceId,
 ] )( PostTextEditor );
