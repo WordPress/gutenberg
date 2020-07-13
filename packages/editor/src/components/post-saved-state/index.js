@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,7 +44,7 @@ export class PostSavedState extends Component {
 
 	render() {
 		const {
-			post,
+			hasPublishAction,
 			isNew,
 			isScheduled,
 			isPublished,
@@ -108,11 +107,7 @@ export class PostSavedState extends Component {
 
 		// Once the post has been submitted for review this button
 		// is not needed for the contributor role.
-		const hasPublishAction = get(
-			post,
-			[ '_links', 'wp:action-publish' ],
-			false
-		);
+
 		if ( ! hasPublishAction && isPending ) {
 			return null;
 		}
@@ -157,7 +152,9 @@ export default compose( [
 			getEditedPostAttribute,
 		} = select( 'core/editor' );
 		return {
-			post: getCurrentPost(),
+			hasPublishAction:
+				getCurrentPost()?.[ '_links' ]?.[ 'wp:action-publish' ] ??
+				false,
 			isNew: isEditedPostNew(),
 			isPublished: isCurrentPostPublished(),
 			isScheduled: isCurrentPostScheduled(),
