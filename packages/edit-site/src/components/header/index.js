@@ -51,11 +51,7 @@ export default function Header( {
 			getPage,
 		} = select( 'core/edit-site' );
 
-		// eslint-disable-next-line camelcase
-		const { show_on_front } = select( 'core' ).getEditedEntityRecord(
-			'root',
-			'site'
-		);
+		const { getEntityRecord } = select( 'core' );
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -64,7 +60,7 @@ export default function Header( {
 			templatePartId: getTemplatePartId(),
 			templateType: getTemplateType(),
 			page: getPage(),
-			showOnFront: show_on_front,
+			showOnFront: getEntityRecord( 'root', 'site' ).show_on_front,
 		};
 	}, [] );
 
