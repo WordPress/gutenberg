@@ -196,6 +196,7 @@ class VideoEdit extends React.Component {
 		const toolbarEditButton = (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+				isReplacingMedia={ true }
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
