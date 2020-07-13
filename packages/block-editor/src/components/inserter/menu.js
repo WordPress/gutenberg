@@ -86,6 +86,7 @@ function InserterMenu( {
 					onHover={ onHover }
 					filterValue={ filterValue }
 					showMostUsedBlocks={ showMostUsedBlocks }
+					__experimentalOnUnmount={ () => setHoveredItem( null ) }
 				/>
 			</div>
 			{ showInserterHelpPanel && (
@@ -128,7 +129,10 @@ function InserterMenu( {
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
 					<InserterSearchForm
-						onChange={ setFilterValue }
+						onChange={ ( value ) => {
+							if ( hoveredItem ) setHoveredItem( null );
+							setFilterValue( value );
+						} }
 						value={ filterValue }
 					/>
 					{ ( showPatterns || hasReusableBlocks ) && (
