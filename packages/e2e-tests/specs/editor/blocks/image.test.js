@@ -81,6 +81,7 @@ describe( 'Image', () => {
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
 
+		await page.click( '.wp-block-image img' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
