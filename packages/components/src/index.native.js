@@ -70,7 +70,6 @@ export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
 export { default as LinkSettings } from './mobile/link-settings';
-export { default as BottomSheetButton } from './mobile/bottom-sheet/button';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';
