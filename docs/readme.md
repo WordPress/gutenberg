@@ -1,5 +1,4 @@
 ---
-id: readme
 title: Home
 hide_title: true
 ---

@@ -1,6 +1,9 @@
 ---
 title: Finishing Touches
+hide_title: true
 ---
+
+# Finishing Touches
 
 This tutorial covers general concepts and structure for creating basic blocks.
 

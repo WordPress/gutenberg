@@ -1,6 +1,9 @@
 ---
 title: Tutorials
+hide_title: true
 ---
+
+# Tutorials
 
 -   See the [Getting Started with JavaScript Tutorial](/docs/designers-developers/developers/tutorials/javascript/readme.md) to learn about how to use JavaScript within WordPress.
 

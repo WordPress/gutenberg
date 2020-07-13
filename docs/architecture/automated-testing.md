@@ -1,6 +1,9 @@
 ---
 title: Automated Testing
+hide_title: true
 ---
+
+# Automated Testing
 
 ## Why is Puppeteer the tool of choice for end-to-end tests?
 

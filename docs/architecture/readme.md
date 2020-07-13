@@ -1,6 +1,9 @@
 ---
 title: Architecture
+hide_title: true
 ---
+
+# Architecture
 
 This living document serves as a high-level documentation to explain the conceptual choices and tool choices in the Gutenberg repository.
 

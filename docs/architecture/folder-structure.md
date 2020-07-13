@@ -1,6 +1,9 @@
 ---
 title: Folder Structure
+hide_title: true
 ---
+
+# Folder Structure
 
 The following snippet explains how the Gutenberg repository is structured omitting irrelevant or obvious items with further explanations:
 

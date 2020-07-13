@@ -1,6 +1,9 @@
 ---
 title: Authoring Experience
+hide_title: true
 ---
+
+# Authoring Experience
 
 ## Background
 

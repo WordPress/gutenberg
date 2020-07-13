@@ -1,6 +1,9 @@
 ---
 title: Modularity
+hide_title: true
 ---
+
+# Modularity
 
 The WordPress block editor is based around the idea that you can combine independent blocks together to write your post or build your page. Blocks can also use and interact with each other. This makes it very modular and flexible.
 

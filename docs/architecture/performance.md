@@ -1,6 +1,9 @@
 ---
 title: Performance
+hide_title: true
 ---
+
+# Performance
 
 Performance is a key feature for editor applications and the Block editor is not an exception.
 

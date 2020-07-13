@@ -1,6 +1,9 @@
 ---
 title: Plugins Background
+hide_title: true
 ---
+
+# Plugins Background
 
 The primary means of extending WordPress is the plugin. The WordPress [Plugin Basics](https://developer.wordpress.org/plugins/plugin-basics/) documentation provides details on building a plugin.
 

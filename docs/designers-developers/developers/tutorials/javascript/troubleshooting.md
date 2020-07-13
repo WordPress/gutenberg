@@ -1,6 +1,9 @@
 ---
 title: Troubleshooting
+hide_title: true
 ---
+
+# Troubleshooting
 
 If you're having trouble getting your code to work, here are a few ways to troubleshoot.
 

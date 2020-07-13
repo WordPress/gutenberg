@@ -1,6 +1,9 @@
 ---
 title: JavaScript Versions and Build Step
+hide_title: true
 ---
+
+# JavaScript Versions and Build Step
 
 The Block Editor Handbook shows JavaScript examples in two syntaxes: ES5 and ESNext. These are version names for the JavaScript language standard definitions. You may also see elsewhere the names ES6, or ECMAScript 2015 mentioned. See the [ECMAScript](https://en.wikipedia.org/wiki/ECMAScript) Wikipedia article for all the details.
 
