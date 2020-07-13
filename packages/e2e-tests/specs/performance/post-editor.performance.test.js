@@ -71,7 +71,7 @@ function getSelectionEventDurations( trace ) {
 
 jest.setTimeout( 1000000 );
 
-describe( 'Performance', () => {
+describe( 'Post Editor Performance', () => {
 	it( 'Loading, typing and selecting blocks', async () => {
 		const results = {
 			load: [],
