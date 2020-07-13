@@ -8,28 +8,14 @@ import { TouchableOpacity, View, Text } from 'react-native';
  */
 import styles from './styles.scss';
 
-const BottomSheetButton = ( {
-	onPress,
-	disabled,
-	text,
-	color,
-	justifyContent,
-} ) => (
+const BottomSheetButton = ( { onPress, disabled, text, color } ) => (
 	<TouchableOpacity
 		accessible={ true }
 		onPress={ onPress }
 		disabled={ disabled }
 	>
-		<View
-			style={ {
-				flexDirection: 'row',
-				justifyContent:
-					justifyContent === undefined ? 'center' : justifyContent,
-			} }
-		>
-			<Text style={ { ...styles.buttonText, color, paddingStart: 0 } }>
-				{ text }
-			</Text>
+		<View style={ { flexDirection: 'row', justifyContent: 'center' } }>
+			<Text style={ { ...styles.buttonText, color } }>{ text }</Text>
 		</View>
 	</TouchableOpacity>
 );
