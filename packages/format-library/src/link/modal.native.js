@@ -48,7 +48,7 @@ const LinkPickerScreen = ( { inputValue, onLinkPicked: pickLink } ) => {
 	};
 
 	return (
-		<BottomSheet.NavigationScreen>
+		<BottomSheet.NavigationScreen fullHeight>
 			<LinkPicker
 				value={ inputValue }
 				onLinkPicked={ onLinkPicked }
