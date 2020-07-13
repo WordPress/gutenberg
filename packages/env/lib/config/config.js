@@ -214,7 +214,8 @@ function mergeWpServiceConfigs( configs ) {
  * added to the default plugin sources.
  *
  * @param {string} configPath A path to the config file for the source to detect.
- * @return {Object} Basic config options for the detected source type.
+ * @return {Object} Basic config options for the detected source type. Empty
+ *                  object if no config detected.
  */
 async function getDefaultBaseConfig( configPath ) {
 	const configDirectoryPath = path.dirname( configPath );
@@ -228,9 +229,7 @@ async function getDefaultBaseConfig( configPath ) {
 		return { themes: [ '.' ] };
 	}
 
-	throw new ValidationError(
-		`No .wp-env.json file found at '${ configPath }' and could not determine if '${ configDirectoryPath }' is a WordPress installation, a plugin, or a theme.`
-	);
+	return {};
 }
 
 /**

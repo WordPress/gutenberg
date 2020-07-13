@@ -171,7 +171,10 @@ async function resetDatabase(
 }
 
 async function setupWordPressDirectories( config ) {
-	if ( hasSameCoreSource( [ config.env.development, config.env.tests ] ) ) {
+	if (
+		config.env.development.coreSource &&
+		hasSameCoreSource( [ config.env.development, config.env.tests ] )
+	) {
 		await copyCoreFiles(
 			config.env.development.coreSource.path,
 			config.env.development.coreSource.testsPath
