@@ -17,7 +17,8 @@ import { chevronDown } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../button';
-import TextControl from '../text-control';
+import InputControl from '../input-control';
+import NumberControl from '../number-control';
 import VisuallyHidden from '../visually-hidden';
 import { isValidHex } from './utils';
 
@@ -73,9 +74,13 @@ export class Input extends Component {
 	}
 
 	render() {
-		const { label, value, ...props } = this.props;
+		// const { label, value,  ...props } = this.props;
+
+		const { label, value, type, ...props } = this.props;
+		const InputComponent = type === 'number' ? NumberControl : InputControl;
+
 		return (
-			<TextControl
+			<InputComponent
 				className="components-color-picker__inputs-field"
 				label={ label }
 				value={ value }
@@ -94,7 +99,7 @@ export class Inputs extends Component {
 	constructor( { hsl } ) {
 		super( ...arguments );
 
-		const view = hsl.a === 1 ? 'hex' : 'rgb';
+		const view = hsl.a === 1 ? 'rgb' : 'rgb';
 		this.state = { view };
 
 		this.toggleViews = this.toggleViews.bind( this );

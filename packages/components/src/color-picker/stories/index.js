@@ -13,11 +13,13 @@ export default { title: 'Components/ColorPicker', component: ColorPicker };
 const ColorPickerWithState = ( { ...props } ) => {
 	const [ color, setColor ] = useState( '#f00' );
 	return (
-		<ColorPicker
-			{ ...props }
-			color={ color }
-			onChangeComplete={ ( value ) => setColor( value.hex ) }
-		/>
+		<div style={ { maxWidth: 300 } }>
+			<ColorPicker
+				{ ...props }
+				color={ color }
+				onChangeComplete={ ( value ) => setColor( value.hex ) }
+			/>
+		</div>
 	);
 };
 

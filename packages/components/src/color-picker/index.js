@@ -43,27 +43,15 @@ import Alpha from './alpha';
 import Hue from './hue';
 import Inputs from './inputs';
 import Saturation from './saturation';
-import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
+import {
+	colorToState,
+	simpleCheckForValidColor,
+	isValidHex,
+	isValuesEmpty,
+} from './utils';
 
 const toLowerCase = ( value ) => String( value ).toLowerCase();
-const isValueEmpty = ( data ) => {
-	if ( data.source === 'hex' && ! data.hex ) {
-		return true;
-	} else if (
-		data.source === 'hsl' &&
-		( ! data.h || ! data.s || ! data.l )
-	) {
-		return true;
-	} else if (
-		data.source === 'rgb' &&
-		( ! data.r || ! data.g || ! data.b ) &&
-		( ! data.h || ! data.s || ! data.v || ! data.a ) &&
-		( ! data.h || ! data.s || ! data.l || ! data.a )
-	) {
-		return true;
-	}
-	return false;
-};
+
 const isValidColor = ( colors ) =>
 	colors.hex ? isValidHex( colors.hex ) : simpleCheckForValidColor( colors );
 
@@ -170,7 +158,7 @@ export default class ColorPicker extends Component {
 				break;
 			case 'commit':
 				const colors = dataToColors( this.state, data );
-				if ( ! isValueEmpty( colors ) ) {
+				if ( ! isValuesEmpty( colors ) ) {
 					this.commitValues( colors );
 				}
 				break;

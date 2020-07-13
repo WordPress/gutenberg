@@ -32,6 +32,11 @@ import { each } from 'lodash';
 import tinycolor from 'tinycolor2';
 
 /**
+ * Internal dependencies
+ */
+import { isValueEmpty } from '../utils/values';
+
+/**
  * Given a hex color, get all other color properties (rgb, alpha, etc).
  *
  * @param {Object|string} data A hex color string or an object with a hex property
@@ -211,4 +216,25 @@ export function calculateSaturationChange( e, props, container ) {
 		a: props.hsl.a,
 		source: 'rgb',
 	};
+}
+
+export function isValuesEmpty( data ) {
+	const { hex, source, h, s, l, r, g, b, v, a } = data;
+
+	if ( source === 'hex' && ! hex ) {
+		return true;
+	} else if (
+		source === 'hsl' &&
+		!! [ h, s, l ].filter( isValueEmpty ).length
+	) {
+		return true;
+	} else if (
+		source === 'rgb' &&
+		!! [ r, g, b ].filter( isValueEmpty ).length &&
+		!! [ h, s, v, a ].filter( isValueEmpty ).length &&
+		!! [ h, s, l, a ].filter( isValueEmpty ).length
+	) {
+		return true;
+	}
+	return false;
 }
