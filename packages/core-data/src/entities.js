@@ -18,6 +18,12 @@ export const DEFAULT_ENTITY_KEY = 'id';
 
 export const defaultEntities = [
 	{
+		label: __( 'Base' ),
+		name: '__unstableBase',
+		kind: 'root',
+		baseURL: '',
+	},
+	{
 		label: __( 'Site' ),
 		name: 'site',
 		kind: 'root',
