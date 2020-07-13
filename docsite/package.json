@@ -1,13 +1,24 @@
 {
-  "name": "docsite",
-  "version": "0.0.0",
+  "name": "gutenberg-docsite",
+  "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "start": "docusaurus start",
-    "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy"
-  },
+  "description": "Block Editor Handbook documentation.",
+  "author": "The WordPress Contributors",
+  "license": "GPL-2.0-or-later",
+	"keywords": [
+    "WordPress",
+    "gutenberg",
+		"documentation"
+	],
+  "homepage": "https://github.com/WordPress/gutenberg/",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "docsite"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
   "dependencies": {
     "@docusaurus/core": "2.0.0-alpha.58",
     "@docusaurus/preset-classic": "2.0.0-alpha.58",
@@ -24,5 +35,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+	"publishConfig": {
+		"access": "public"
+  },
+  "scripts": {
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "deploy": "docusaurus deploy"
   }
 }
