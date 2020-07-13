@@ -6,7 +6,7 @@ import { FlatList } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet } from '@wordpress/components';
+import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
@@ -40,16 +40,28 @@ export default function LinkPickerResults( {
 	}, [ query ] );
 
 	return (
-		<FlatList
-			data={ links }
-			keyboardShouldPersistTaps="always"
-			renderItem={ ( { item } ) => (
-				<BottomSheet.LinkSuggestionItemCell
-					suggestion={ item }
-					onLinkPicked={ onLinkPicked }
-				/>
-			) }
-			keyExtractor={ ( { url, type } ) => `${ url }-${ type }` }
-		/>
+		<BottomSheetConsumer>
+			{ ( { listProps, shouldEnableBottomSheetScroll } ) => {
+				{/* shouldEnableBottomSheetScroll( false ); */}
+
+				return (
+					<FlatList
+						data={ links }
+						keyboardShouldPersistTaps="always"
+						renderItem={ ( { item } ) => (
+							<BottomSheet.LinkSuggestionItemCell
+								suggestion={ item }
+								onLinkPicked={ onLinkPicked }
+							/>
+						) }
+						keyExtractor={ ( { url, type } ) =>
+							`${ url }-${ type }`
+						}
+						{ ...listProps }
+						scrollEnabled
+					/>
+				);
+			} }
+		</BottomSheetConsumer>
 	);
 }
