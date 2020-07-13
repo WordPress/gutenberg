@@ -24,7 +24,15 @@ Arbitrary data object attached to the drag and drop event.
 
 ### onDragStart
 
-A function to be called when dragging starts.
+A function called when dragging starts. This callback receives the `event` object from the `dragstart` event as its first parameter.
+
+-   Type: `Function`
+-   Required: No
+-   Default: `noop`
+
+### onDragOver
+
+A function called when the element being dragged is dragged over a valid drop target. This callback receives the `event` object from the `dragover` event as its first parameter.
 
 -   Type: `Function`
 -   Required: No
@@ -32,7 +40,7 @@ A function to be called when dragging starts.
 
 ### onDragEnd
 
-A function to be called when dragging ends.
+A function called when dragging ends. This callback receives the `event` object from the `dragend` event as its first parameter.
 
 -   Type: `Function`
 -   Required: No

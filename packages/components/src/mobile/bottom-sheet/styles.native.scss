@@ -27,7 +27,7 @@
 }
 
 .emptyHeader {
-	margin-top: $panel-padding / 2;
+	margin-top: $grid-unit-20 / 2;
 }
 
 
@@ -174,9 +174,9 @@
 // Color Cell
 
 .colorCircle {
-	width: 2 * $panel-padding;
-	height: 2 * $panel-padding;
-	border-radius: $panel-padding;
+	width: 2 * $grid-unit-20;
+	height: 2 * $grid-unit-20;
+	border-radius: $grid-unit-20;
 }
 
 // Radio Cell
@@ -194,8 +194,8 @@
 .bottomSheetHeader {
 	flex-direction: row;
 	align-items: center;
-	padding-right: $panel-padding;
-	padding-left: $panel-padding;
+	padding-right: $grid-unit-20;
+	padding-left: $grid-unit-20;
 	min-height: 44px;
 }
 

@@ -22,7 +22,11 @@ function PreviewPlaceholder() {
 }
 
 function TemplatePartItem( { templatePart, setAttributes } ) {
-	const { id, slug, theme } = templatePart;
+	const {
+		id,
+		slug,
+		meta: { theme },
+	} = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
@@ -178,11 +182,13 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 				per_page: -1,
 			}
 		);
-		const resolvedTemplateParts = select( 'core' ).getEntityRecords(
+		const currentTheme = select( 'core' ).getCurrentTheme()?.textdomain;
+		const themeTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template_part',
 			{
-				resolved: true,
+				theme: currentTheme,
+				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
 			}
 		);
@@ -190,8 +196,8 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 		if ( publishedTemplateParts ) {
 			combinedTemplateParts.push( ...publishedTemplateParts );
 		}
-		if ( resolvedTemplateParts ) {
-			combinedTemplateParts.push( ...resolvedTemplateParts );
+		if ( themeTemplateParts ) {
+			combinedTemplateParts.push( ...themeTemplateParts );
 		}
 		return uniq( combinedTemplateParts );
 	}, [] );

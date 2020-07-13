@@ -63,17 +63,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 	add_settings_field(
-		'gutenberg-block-directory',
-		__( 'Block Directory', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable block directory search', 'gutenberg' ),
-			'id'    => 'gutenberg-block-directory',
-		)
-	);
-	add_settings_field(
 		'gutenberg-full-site-editing',
 		__( 'Full Site Editing', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -93,17 +82,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enable Full Site Editing demo templates', 'gutenberg' ),
 			'id'    => 'gutenberg-full-site-editing-demo',
-		)
-	);
-	add_settings_field(
-		'gutenberg-rich-image-editing',
-		__( 'Rich Image Editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable inline rich image editing', 'gutenberg' ),
-			'id'    => 'gutenberg-rich-image-editing',
 		)
 	);
 	register_setting(
@@ -154,10 +132,8 @@ function gutenberg_display_experiment_section() {
 function gutenberg_experiments_editor_settings( $settings ) {
 	$experiments_settings = array(
 		'__experimentalEnableLegacyWidgetBlock'   => gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ),
-		'__experimentalBlockDirectory'            => gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ),
 		'__experimentalEnableFullSiteEditing'     => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
 		'__experimentalEnableFullSiteEditingDemo' => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ),
-		'__experimentalEnableRichImageEditing'    => gutenberg_is_experiment_enabled( 'gutenberg-rich-image-editing' ),
 	);
 
 	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );

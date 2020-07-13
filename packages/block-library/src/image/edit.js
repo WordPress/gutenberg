@@ -15,7 +15,6 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	MediaReplaceFlow,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
@@ -66,7 +65,7 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  *
  * @return {boolean} Is the url an externally hosted url?
  */
-const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
+export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
 export function ImageEdit( {
 	attributes,
@@ -223,17 +222,6 @@ export function ImageEdit( {
 				value={ align }
 				onChange={ updateAlignment }
 			/>
-			{ url && (
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
-					onSelect={ onSelectImage }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			) }
 		</BlockControls>
 	);
 	const src = isExternal ? url : undefined;
@@ -283,6 +271,9 @@ export function ImageEdit( {
 						isSelected={ isSelected }
 						insertBlocksAfter={ insertBlocksAfter }
 						onReplace={ onReplace }
+						onSelectImage={ onSelectImage }
+						onSelectURL={ onSelectURL }
+						onUploadError={ onUploadError }
 						containerRef={ ref }
 					/>
 				) }

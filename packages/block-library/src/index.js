@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/notices';
 import '@wordpress/block-editor';
 import {
 	registerBlockType,
@@ -64,6 +65,7 @@ import * as socialLink from './social-link';
 import * as widgetArea from './widget-area';
 
 // Full Site Editing Blocks
+import * as siteLogo from './site-logo';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
@@ -198,6 +200,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					...( __experimentalEnableFullSiteEditing
 						? [
 								siteTitle,
+								siteLogo,
 								templatePart,
 								query,
 								queryLoop,

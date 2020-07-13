@@ -2,16 +2,16 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
-import {
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-	mediaUploadSync,
-} from 'react-native-gutenberg-bridge';
 import Video from 'react-native-video';
 
 /**
  * WordPress dependencies
  */
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import {
 	Icon,
@@ -332,6 +332,7 @@ const Cover = ( {
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				isReplacingMedia={ true }
 				onSelect={ onSelectMedia }
 				render={ renderBackground }
 			/>

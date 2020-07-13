@@ -7,6 +7,10 @@ export function isMentionsSupported( capabilities ) {
 	return capabilities.mentions === true;
 }
 
+export function isUnsupportedBlockEditorSupported( capabilities ) {
+	return capabilities.unsupportedBlockEditor === true;
+}
+
 export const SiteCapabilitiesContext = createContext( {} );
 
 export const useSiteCapabilities = () => {

@@ -91,12 +91,11 @@ function get_template_hierarchy( $template_type ) {
  * @return string The path to the Full Site Editing template canvas file.
  */
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
-	global $_wp_current_template_id, $_wp_current_template_content;
+	global $_wp_current_template_content;
 
 	$current_template = gutenberg_find_template_post_and_parts( $type, $templates );
 
 	if ( $current_template ) {
-		$_wp_current_template_id      = $current_template['template_post']->ID;
 		$_wp_current_template_content = empty( $current_template['template_post']->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template['template_post']->post_content;
 
 		if ( isset( $_GET['_wp-find-template'] ) ) {
@@ -136,7 +135,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 function create_auto_draft_for_template_part_block( $block ) {
 	$template_part_ids = array();
 
-	if ( 'core/template-part' === $block['blockName'] ) {
+	if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['slug'] ) ) {
 		if ( isset( $block['attrs']['postId'] ) ) {
 			// Template part is customized.
 			$template_part_id = $block['attrs']['postId'];
@@ -161,10 +160,11 @@ function create_auto_draft_for_template_part_block( $block ) {
 				)
 			);
 			$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
-			if ( $template_part_post ) {
+			if ( $template_part_post && 'auto-draft' !== $template_part_post->post_status ) {
 				$template_part_id = $template_part_post->ID;
 			} else {
-				// Template part is not customized, get it from a file and make an auto-draft for it.
+				// Template part is not customized, get it from a file and make an auto-draft for it, unless one already exists
+				// and the underlying file hasn't changed.
 				$template_part_file_path =
 				get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
 				if ( ! file_exists( $template_part_file_path ) ) {
@@ -172,24 +172,32 @@ function create_auto_draft_for_template_part_block( $block ) {
 						$template_part_file_path =
 							dirname( __FILE__ ) . '/demo-block-template-parts/' . $block['attrs']['slug'] . '.html';
 						if ( ! file_exists( $template_part_file_path ) ) {
-							return;
+							$template_part_file_path = false;
 						}
 					} else {
-						return;
+						$template_part_file_path = false;
 					}
 				}
-				$template_part_id = wp_insert_post(
-					array(
-						'post_content' => file_get_contents( $template_part_file_path ),
-						'post_title'   => $block['attrs']['slug'],
-						'post_status'  => 'auto-draft',
-						'post_type'    => 'wp_template_part',
-						'post_name'    => $block['attrs']['slug'],
-						'meta_input'   => array(
-							'theme' => $block['attrs']['theme'],
-						),
-					)
-				);
+
+				if ( $template_part_file_path ) {
+					$file_contents = file_get_contents( $template_part_file_path );
+					if ( $template_part_post && $template_part_post->post_content === $file_contents ) {
+						$template_part_id = $template_part_post->ID;
+					} else {
+						$template_part_id = wp_insert_post(
+							array(
+								'post_content' => $file_contents,
+								'post_title'   => $block['attrs']['slug'],
+								'post_status'  => 'auto-draft',
+								'post_type'    => 'wp_template_part',
+								'post_name'    => $block['attrs']['slug'],
+								'meta_input'   => array(
+									'theme' => $block['attrs']['theme'],
+								),
+							)
+						);
+					}
+				}
 			}
 		}
 		$template_part_ids[ $block['attrs']['slug'] ] = $template_part_id;
@@ -416,16 +424,20 @@ function gutenberg_strip_php_suffix( $template_file ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
-	global $post, $_wp_current_template_id;
+	global $post;
 
 	if ( ! $post || ! post_type_exists( 'wp_template' ) || ! post_type_exists( 'wp_template_part' ) ) {
 		return $settings;
 	}
 
-	// Create template part auto-drafts for the edited post.
-	$post = isset( $_wp_current_template_id )
-		? get_post( $_wp_current_template_id ) // It's a template.
-		: get_post(); // It's a post.
+	// If this is the Site Editor, auto-drafts for template parts have already been generated
+	// through `filter_rest_wp_template_part_query`, when called via the REST API.
+	if ( isset( $settings['editSiteInitialState'] ) ) {
+		return $settings;
+	}
+
+	// Otherwise, create template part auto-drafts for the edited post.
+	$post = get_post();
 	foreach ( parse_blocks( $post->post_content ) as $block ) {
 		create_auto_draft_for_template_part_block( $block );
 	}

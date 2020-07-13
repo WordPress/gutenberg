@@ -18,6 +18,12 @@
 		"parent": "principles"
 	},
 	{
+		"title": "Folder Structure",
+		"slug": "folder-structure",
+		"markdown_source": "../docs/architecture/folder-structure.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/architecture/modularity.md",
@@ -51,6 +57,12 @@
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/designers-developers/faq.md",
+		"parent": "principles"
+	},
+	{
+		"title": "Versions in WordPress",
+		"slug": "versions-in-wordpress",
+		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
 		"parent": "principles"
 	},
 	{
@@ -498,6 +510,12 @@
 		"parent": "javascript"
 	},
 	{
+		"title": "ESNext Syntax",
+		"slug": "esnext-js",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/esnext-js.md",
+		"parent": "javascript"
+	},
+	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/readme.md",
@@ -741,6 +759,12 @@
 		"title": "ColorPicker",
 		"slug": "color-picker",
 		"markdown_source": "../packages/components/src/color-picker/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ComboboxControl",
+		"slug": "combobox-control",
+		"markdown_source": "../packages/components/src/combobox-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1017,6 +1041,12 @@
 		"title": "ResizableBox",
 		"slug": "resizable-box",
 		"markdown_source": "../packages/components/src/resizable-box/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ResizeTooltip",
+		"slug": "resize-tooltip",
+		"markdown_source": "../packages/components/src/resizable-box/resize-tooltip/README.md",
 		"parent": "components"
 	},
 	{
@@ -1593,6 +1623,24 @@
 		"title": "@wordpress/project-management-automation",
 		"slug": "packages-project-management-automation",
 		"markdown_source": "../packages/project-management-automation/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-aztec",
+		"slug": "packages-react-native-aztec",
+		"markdown_source": "../packages/react-native-aztec/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-bridge",
+		"slug": "packages-react-native-bridge",
+		"markdown_source": "../packages/react-native-bridge/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-native-editor",
+		"slug": "packages-react-native-editor",
+		"markdown_source": "../packages/react-native-editor/README.md",
 		"parent": "packages"
 	},
 	{

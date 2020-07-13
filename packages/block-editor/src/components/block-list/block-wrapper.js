@@ -15,7 +15,7 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -75,7 +75,7 @@ const BlockComponent = forwardRef(
 			},
 			[ isSelected ]
 		);
-		const { removeBlock, insertDefaultBlock } = useDispatch(
+		const { insertDefaultBlock, removeBlock } = useDispatch(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();

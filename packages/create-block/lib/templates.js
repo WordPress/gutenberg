@@ -20,6 +20,9 @@ const predefinedBlockTemplates = {
 			description:
 				'Example block written with ES5 standard and no JSX – no build step required.',
 			wpScripts: false,
+			editorScript: 'file:./index.js',
+			editorStyle: 'file:./editor.css',
+			style: 'file:./style.css',
 		},
 	},
 	esnext: {
@@ -79,6 +82,9 @@ const getDefaultValues = ( blockTemplate ) => {
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
 		wpScripts: true,
+		editorScript: 'file:./build/index.js',
+		editorStyle: 'file:./build/index.css',
+		style: 'file:./build/style-index.css',
 		...blockTemplate.defaultValues,
 	};
 };
