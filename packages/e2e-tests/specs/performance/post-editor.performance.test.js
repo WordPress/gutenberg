@@ -183,7 +183,7 @@ describe( 'Performance', () => {
 		results.focus = focusEvents;
 
 		writeFileSync(
-			__dirname + '/results.json',
+			__dirname + '/post-editor.performance.test.results.json',
 			JSON.stringify( results, null, 2 )
 		);
 
