@@ -1,7 +1,7 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/site-description",
+        "name": "core/site-tagline",
         "isValid": true,
         "attributes": {},
         "innerBlocks": [],

@@ -15,9 +15,9 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-export default function SiteDescriptionEdit( { attributes, setAttributes } ) {
+export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 	const { align } = attributes;
-	const [ description, setDescription ] = useEntityProp(
+	const [ siteTagline, setSiteTagline ] = useEntityProp(
 		'root',
 		'site',
 		'description'
@@ -39,10 +39,10 @@ export default function SiteDescriptionEdit( { attributes, setAttributes } ) {
 				className={ classnames( {
 					[ `has-text-align-${ align }` ]: align,
 				} ) }
-				onChange={ setDescription }
-				placeholder={ __( 'Site Description' ) }
+				onChange={ setSiteTagline }
+				placeholder={ __( 'Site Tagline' ) }
 				tagName={ Block.p }
-				value={ description }
+				value={ siteTagline }
 			/>
 		</>
 	);

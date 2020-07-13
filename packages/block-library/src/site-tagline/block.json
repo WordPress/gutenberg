@@ -1,5 +1,5 @@
 {
-	"name": "core/site-description",
+	"name": "core/site-tagline",
 	"category": "design",
 	"attributes": {
 		"align": {

@@ -168,7 +168,7 @@ Each block will declare which style properties it exposes. This has been coined 
 | Columns | Yes | Yes | Yes | Yes |
 | Media & text | Yes | Yes | Yes | Yes |
 | Site Title | Yes | Yes | - | Yes |
-| Site Description | Yes | Yes | - | Yes |
+| Site Tagline | Yes | Yes | - | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 
@@ -183,7 +183,7 @@ Each block will declare which style properties it exposes. This has been coined 
 | Columns | - | - |
 | Media & text | - | - |
 | Site Title | Yes | Yes |
-| Site Description | Yes | Yes |
+| Site Tagline | Yes | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 
@@ -397,7 +397,7 @@ The list of features that are currently supported are:
       }
     }
   },
-  "core/site-description": {
+  "core/site-tagline": {
     "styles": {
       "color": {
         "background": <value>,

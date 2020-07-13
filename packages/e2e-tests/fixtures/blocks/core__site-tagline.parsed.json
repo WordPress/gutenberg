@@ -1,6 +1,6 @@
 [
     {
-        "blockName": "core/site-description",
+        "blockName": "core/site-tagline",
         "attrs": {},
         "innerBlocks": [],
         "innerHTML": "",

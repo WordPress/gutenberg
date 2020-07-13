@@ -14,7 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Site Description' ),
+	title: __( 'Site Tagline' ),
 	icon,
 	edit,
 };
