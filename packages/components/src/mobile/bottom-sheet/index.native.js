@@ -49,8 +49,6 @@ class BottomSheet extends Component {
 		this.onShouldSetBottomSheetMaxHeight = this.onShouldSetBottomSheetMaxHeight.bind(
 			this
 		);
-		this.onScrollBeginDrag = this.onScrollBeginDrag.bind( this );
-		this.onScrollEndDrag = this.onScrollEndDrag.bind( this );
 
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
@@ -231,14 +229,6 @@ class BottomSheet extends Component {
 		this.onShouldSetBottomSheetMaxHeight( true );
 	}
 
-	onScrollBeginDrag() {
-		this.isScrolling( true );
-	}
-
-	onScrollEndDrag() {
-		this.isScrolling( false );
-	}
-
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { onHardwareButtonPress } = this.state;
@@ -260,7 +250,6 @@ class BottomSheet extends Component {
 			getStylesFromColorScheme,
 			onDismiss,
 			children,
-			isChildrenScrollable,
 			...rest
 		} = this.props;
 		const {
@@ -306,27 +295,6 @@ class BottomSheet extends Component {
 			styles.backgroundDark
 		);
 
-		const listProps = {
-			disableScrollViewPanResponder: true,
-			bounces,
-			onScroll: this.onScroll,
-			onScrollBeginDrag: this.onScrollBeginDrag,
-			onScrollEndDrag: this.onScrollEndDrag,
-			scrollEventThrottle: 16,
-			contentContainerStyle: [
-				styles.content,
-				hideHeader && styles.emptyHeader,
-				contentStyle,
-				isChildrenScrollable && {
-					flexGrow: 1,
-					paddingBottom:
-						safeAreaBottomInset || styles.content.paddingRight,
-				},
-			],
-			scrollEnabled,
-			automaticallyAdjustContentInsets: false,
-		};
-
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -366,43 +334,22 @@ class BottomSheet extends Component {
 				>
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
-					{ ! isChildrenScrollable ? (
-						<ScrollView
-							{ ...listProps }
-							style={
-								isMaxHeightSet
-									? {
-											maxHeight,
-									  }
-									: {}
-							}
-						>
-							<BottomSheetProvider
-								value={ {
-									shouldEnableBottomSheetScroll: this
-										.onShouldEnableScroll,
-									shouldDisableBottomSheetMaxHeight: this
-										.onShouldSetBottomSheetMaxHeight,
-									isBottomSheetContentScrolling: isScrolling,
-									onCloseBottomSheet: this
-										.onHandleClosingBottomSheet,
-									onHardwareButtonPress: this
-										.onHandleHardwareButtonPress,
-								} }
-							>
-								<TouchableHighlight accessible={ false }>
-									<>{ children }</>
-								</TouchableHighlight>
-							</BottomSheetProvider>
-							<View
-								style={ {
-									height:
-										safeAreaBottomInset ||
-										styles.content.paddingRight,
-								} }
-							/>
-						</ScrollView>
-					) : (
+					<ScrollView
+						disableScrollViewPanResponder
+						bounces={ bounces }
+						onScroll={ this.onScroll }
+						onScrollBeginDrag={ () => this.isScrolling( true ) }
+						onScrollEndDrag={ () => this.isScrolling( false ) }
+						scrollEventThrottle={ 16 }
+						style={ isMaxHeightSet ? { maxHeight } : {} }
+						contentContainerStyle={ [
+							styles.content,
+							hideHeader && styles.emptyHeader,
+							contentStyle,
+						] }
+						scrollEnabled={ scrollEnabled }
+						automaticallyAdjustContentInsets={ false }
+					>
 						<BottomSheetProvider
 							value={ {
 								shouldEnableBottomSheetScroll: this
@@ -414,24 +361,20 @@ class BottomSheet extends Component {
 									.onHandleClosingBottomSheet,
 								onHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
-								listProps,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>
-								<View
-									style={
-										isMaxHeightSet
-											? {
-													maxHeight,
-											  }
-											: {}
-									}
-								>
-									<>{ children }</>
-								</View>
+								<>{ children }</>
 							</TouchableHighlight>
 						</BottomSheetProvider>
-					) }
+						<View
+							style={ {
+								height:
+									safeAreaBottomInset ||
+									styles.content.paddingRight,
+							} }
+						/>
+					</ScrollView>
 				</KeyboardAvoidingView>
 			</Modal>
 		);

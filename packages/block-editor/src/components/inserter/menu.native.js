@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
 import { createBlock, rawHandler } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
+import { BottomSheet } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -127,26 +127,21 @@ export class InserterMenu extends Component {
 				onClose={ this.onClose }
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
-				isChildrenScrollable
 			>
 				<TouchableHighlight accessible={ false }>
-					<BottomSheetConsumer>
-						{ ( { listProps } ) => (
-							<FlatList
-								onLayout={ this.onLayout }
-								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-								keyboardShouldPersistTaps="always"
-								numColumns={ numberOfColumns }
-								data={ items }
-								ItemSeparatorComponent={ () => (
-									<View style={ styles.rowSeparator } />
-								) }
-								keyExtractor={ ( item ) => item.name }
-								renderItem={ this.renderItem }
-								{ ...listProps }
-							/>
+					<FlatList
+						onLayout={ this.onLayout }
+						scrollEnabled={ false }
+						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+						keyboardShouldPersistTaps="always"
+						numColumns={ numberOfColumns }
+						data={ items }
+						ItemSeparatorComponent={ () => (
+							<View style={ styles.rowSeparator } />
 						) }
-					</BottomSheetConsumer>
+						keyExtractor={ ( item ) => item.name }
+						renderItem={ this.renderItem }
+					/>
 				</TouchableHighlight>
 			</BottomSheet>
 		);
