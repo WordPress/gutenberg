@@ -106,6 +106,9 @@ export function BlockTypesTab( {
 		return result;
 	}, [ filteredItems, collections ] );
 
+	// hide block preview on unmount
+	useEffect( () => () => onHover( null ), [] );
+
 	// Announce search results on change
 	useEffect( () => {
 		const resultsFoundMessage = sprintf(

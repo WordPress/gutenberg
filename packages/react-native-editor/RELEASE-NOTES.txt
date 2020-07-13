@@ -3,13 +3,17 @@
 * [***] Media editing support in Media & Text block.
 * [***] New block: Social Icons
 
+1.32.0
+------
+* [***] Adds Copy, Cut, Paste, and Duplicate functionality to blocks
+* [***] Add support for mentions.
+* [***] Users can now individually edit unsupported blocks found in posts or pages.
+* [*] [iOS] Improved editor loading experience with Ghost Effect. 
+
 1.31.1
 ------
 * Fix for pullquote stylying in dark mode.
 * Fix for button style.
-1.32.0
-------
-* [***] The block editor now gives users the ability to individually edit unsupported blocks found in posts or pages.
 
 1.31.0
 ------
