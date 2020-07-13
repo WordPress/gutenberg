@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import Text from '../../text';
+import { controlGroupStyles } from '../../control-group/styles/control-group-styles';
 import { color, rtl, reduceMotion } from '../../utils/style-mixins';
 
 const FLOATING_LABEL_TRANSITION_SPEED = '60ms';
@@ -30,6 +31,7 @@ export const Root = styled.div`
 
 	${ rootFloatLabelStyles };
 	${ rootFocusedStyles };
+	${ controlGroupStyles };
 `;
 
 const containerDisabledStyle = ( { disabled } ) => {

@@ -16,6 +16,7 @@ import { useState, forwardRef } from '@wordpress/element';
 import Backdrop from './backdrop';
 import InputField from './input-field';
 import Label from './label';
+import { useControlGroupContext } from '../control-group';
 import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
 import { isValueEmpty } from '../utils/values';
 
@@ -52,6 +53,7 @@ export function InputControl(
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const [ isFilled, setIsFilled ] = useState( ! isValueEmpty( value ) );
+	const controlGroupProps = useControlGroupContext();
 
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
@@ -74,6 +76,7 @@ export function InputControl(
 
 	return (
 		<Root
+			{ ...controlGroupProps }
 			className={ classes }
 			isFloatingLabel={ isFloatingLabelSet }
 			isFocused={ isFocused }
