@@ -9,7 +9,6 @@ import {
 	groupBy,
 	isEmpty,
 	orderBy,
-	noop,
 } from 'lodash';
 
 /**
@@ -42,7 +41,6 @@ export function BlockTypesTab( {
 	filterValue,
 	debouncedSpeak,
 	showMostUsedBlocks,
-	__experimentalOnUnmount: onUnmount = noop,
 } ) {
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
@@ -109,7 +107,7 @@ export function BlockTypesTab( {
 	}, [ filteredItems, collections ] );
 
 	// hide block preview on unmount
-	useEffect( () => () => onUnmount(), [] );
+	useEffect( () => () => onHover( null ), [] );
 
 	// Announce search results on change
 	useEffect( () => {

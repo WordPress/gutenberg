@@ -86,7 +86,6 @@ function InserterMenu( {
 					onHover={ onHover }
 					filterValue={ filterValue }
 					showMostUsedBlocks={ showMostUsedBlocks }
-					__experimentalOnUnmount={ () => setHoveredItem( null ) }
 				/>
 			</div>
 			{ showInserterHelpPanel && (
