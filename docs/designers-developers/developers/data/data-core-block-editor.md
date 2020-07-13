@@ -1010,7 +1010,7 @@ _Returns_
 
 <a name="insertAfterBlock" href="#insertAfterBlock">#</a> **insertAfterBlock**
 
-Generator used to insert an empty block before a given block.
+Generator used to insert an empty block after a given block.
 
 _Parameters_
 
@@ -1018,7 +1018,7 @@ _Parameters_
 
 <a name="insertBeforeBlock" href="#insertBeforeBlock">#</a> **insertBeforeBlock**
 
-Generator used to insert an empty block after a given block.
+Generator used to insert an empty block before a given block.
 
 _Parameters_
 
@@ -1048,7 +1048,7 @@ be inserted, optionally at a specific index respective a root block list.
 _Parameters_
 
 -   _blocks_ `Array<Object>`: Block objects to insert.
--   _index_ `?number`: Index at which block should be inserted.
+-   _index_ `?number`: Index at which blocks should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _updateSelection_ `?boolean`: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
 
