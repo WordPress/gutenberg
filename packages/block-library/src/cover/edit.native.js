@@ -18,7 +18,7 @@ import {
 	ImageWithFocalPoint,
 	PanelBody,
 	RangeControl,
-	BottomSheetButton,
+	BottomSheet,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
@@ -36,7 +36,7 @@ import {
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
@@ -76,6 +76,7 @@ const Cover = ( {
 	onFocus,
 	overlayColor,
 	setAttributes,
+	closeSettingsBottomSheet,
 } ) => {
 	const {
 		backgroundType,
@@ -229,14 +230,13 @@ const Cover = ( {
 
 			{ url ? (
 				<PanelBody title={ __( 'Media' ) }>
-					<BottomSheetButton
-						text={ __( 'Clear Media' ) }
-						color={ styles.clearMediaButton.color }
-						justifyContent={
-							styles.clearMediaButton.justifyContent
-						}
+					<BottomSheet.Cell
+						leftAlign
+						label={ __( 'Clear Media' ) }
+						labelStyle={ styles.clearMediaButton }
 						onPress={ () => {
 							setAttributes( { id: undefined, url: undefined } );
+							closeSettingsBottomSheet();
 						} }
 					/>
 				</PanelBody>
@@ -380,5 +380,13 @@ export default compose( [
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
+		};
+	} ),
+
 	withPreferredColorScheme,
 ] )( Cover );
