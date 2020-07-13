@@ -327,14 +327,16 @@ const Cover = ( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onFocus={ onFocus }
 				>
-					<ColorPalette
-						customStyles={ styles }
-						setColor={ setColor }
-						onCustomPress={ noop }
-						defaultSettings={ COVER_DEFAULT_PALETTE }
-						shouldShowCustomIndicatorOption={ false }
-						shouldShowCustomLabel={ false }
-					/>
+					<View style={ styles.colorPaletteWrapper }>
+						<ColorPalette
+							customStyles={ styles }
+							setColor={ setColor }
+							onCustomPress={ noop }
+							defaultSettings={ COVER_DEFAULT_PALETTE }
+							shouldShowCustomIndicatorOption={ false }
+							shouldShowCustomLabel={ false }
+						/>
+					</View>
 				</MediaPlaceholder>
 			</View>
 		);

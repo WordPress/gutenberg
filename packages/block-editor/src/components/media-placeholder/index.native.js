@@ -108,6 +108,7 @@ function MediaPlaceholder( props ) {
 					<Text style={ emptyStateTitleStyle }>
 						{ placeholderTitle }
 					</Text>
+					{ children }
 					<Text style={ styles.emptyStateDescription }>
 						{ instructions }
 					</Text>
@@ -170,7 +171,6 @@ function MediaPlaceholder( props ) {
 							>
 								{ getMediaOptions() }
 								{ renderContent() }
-								{ children }
 							</View>
 						</TouchableWithoutFeedback>
 					);
