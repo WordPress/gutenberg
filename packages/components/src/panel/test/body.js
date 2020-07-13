@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, render, fireEvent } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -70,25 +70,21 @@ describe( 'PanelBody', () => {
 
 			expect( panelContent ).toBeTruthy();
 
-			act( () => {
-				rerender(
-					<PanelBody opened={ false }>
-						<div>Content</div>
-					</PanelBody>
-				);
-			} );
+			rerender(
+				<PanelBody opened={ false }>
+					<div>Content</div>
+				</PanelBody>
+			);
 
 			panelContent = getPanelBodyContent( container );
 
 			expect( panelContent ).toBeFalsy();
 
-			act( () => {
-				rerender(
-					<PanelBody opened={ true }>
-						<div>Content</div>
-					</PanelBody>
-				);
-			} );
+			rerender(
+				<PanelBody opened={ true }>
+					<div>Content</div>
+				</PanelBody>
+			);
 
 			panelContent = getPanelBodyContent( container );
 
@@ -106,17 +102,13 @@ describe( 'PanelBody', () => {
 
 			expect( panelContent ).toBeFalsy();
 
-			act( () => {
-				fireEvent.click( panelToggle );
-			} );
+			fireEvent.click( panelToggle );
 
 			panelContent = getPanelBodyContent( container );
 
 			expect( panelContent ).toBeTruthy();
 
-			act( () => {
-				fireEvent.click( panelToggle );
-			} );
+			fireEvent.click( panelToggle );
 
 			panelContent = getPanelBodyContent( container );
 
