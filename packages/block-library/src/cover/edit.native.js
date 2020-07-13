@@ -3,6 +3,7 @@
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
 import Video from 'react-native-video';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -345,7 +346,7 @@ const Cover = ( {
 					<ColorPalette
 						customStyles={ styles }
 						setColor={ setColor }
-						onCustomPress={ () => {} }
+						onCustomPress={ noop }
 						defaultSettings={ COVER_DEFAULT_PALETTE }
 						shouldShowCustomIndicatorOption={ false }
 						shouldShowCustomLabel={ false }
