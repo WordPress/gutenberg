@@ -119,6 +119,7 @@ function curateResults( results ) {
  *
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
  * @param {string} environmentDirectory     Path to the plugin environment's clone.
+ * @param {string} testSuite                Name of the tests set.
  * @param {string} branch                   Branch name.
  *
  * @return {Promise<WPFormattedPerformanceResults>} Performance results for the branch.
@@ -126,6 +127,7 @@ function curateResults( results ) {
 async function getPerformanceResultsForBranch(
 	performanceTestDirectory,
 	environmentDirectory,
+	testSuite,
 	branch
 ) {
 	// Restore clean working directory (e.g. if `package-lock.json` has local
@@ -147,13 +149,13 @@ async function getPerformanceResultsForBranch(
 	const results = [];
 	for ( let i = 0; i < 3; i++ ) {
 		await runShellScript(
-			'npm run test-performance',
+			`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.performance.test.js`,
 			performanceTestDirectory
 		);
 		const rawResults = await readJSONFile(
 			path.join(
 				performanceTestDirectory,
-				'packages/e2e-tests/specs/performance/post-editor.performance.test.results.json'
+				`packages/e2e-tests/specs/performance/${ testSuite }.performance.test.results.json`
 			)
 		);
 		results.push( curateResults( rawResults ) );
@@ -220,21 +222,32 @@ async function runPerformanceTests( branches, options ) {
 	log( '>> Starting the WordPress environment' );
 	await runShellScript( 'npm run wp-env start', environmentDirectory );
 
-	/** @type {Record<string, WPFormattedPerformanceResults>} */
+	const testSuites = [ 'post-editor', 'site-editor' ];
+
+	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
 	const results = {};
-	for ( const branch of branches ) {
-		results[ branch ] = await getPerformanceResultsForBranch(
-			performanceTestDirectory,
-			environmentDirectory,
-			branch
-		);
+	for ( const testSuite of testSuites ) {
+		results[ testSuite ] = {};
+		for ( const branch of branches ) {
+			results[ testSuite ][
+				branch
+			] = await getPerformanceResultsForBranch(
+				performanceTestDirectory,
+				environmentDirectory,
+				testSuite,
+				branch
+			);
+		}
 	}
 
 	log( '>> Stopping the WordPress environment' );
 	await runShellScript( 'npm run wp-env stop', environmentDirectory );
 
 	log( '\n>> 🎉 Results.\n' );
-	console.table( results );
+	for ( const testSuite of testSuites ) {
+		log( `\n>> ${ testSuite }\n` );
+		console.table( results[ testSuite ] );
+	}
 }
 
 module.exports = {
