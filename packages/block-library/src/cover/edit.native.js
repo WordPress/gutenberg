@@ -70,31 +70,6 @@ const INNER_BLOCKS_TEMPLATE = [
 const COVER_MAX_HEIGHT = 1000;
 const COVER_DEFAULT_HEIGHT = 300;
 
-const COVER_DEFAULT_PALETTE = {
-	colors: [
-		{
-			name: __( 'Black' ),
-			slug: 'black',
-			color: '#000000',
-		},
-		{
-			name: __( 'White' ),
-			slug: 'white',
-			color: '#ffffff',
-		},
-		{
-			name: __( 'Vivid cyan blue' ),
-			slug: 'vivid-cyan-blue',
-			color: '#0693e3',
-		},
-		{
-			name: __( 'Pale pink' ),
-			slug: 'pale-pink',
-			color: '#f78da7',
-		},
-	],
-};
-
 const Cover = ( {
 	attributes,
 	getStylesFromColorScheme,
@@ -102,6 +77,7 @@ const Cover = ( {
 	onFocus,
 	overlayColor,
 	setAttributes,
+	settings,
 } ) => {
 	const {
 		backgroundType,
@@ -114,6 +90,14 @@ const Cover = ( {
 		customOverlayColor,
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const COVER_DEFAULT_PALETTE = {
+		colors: settings.colors.filter( ( c ) =>
+			[ 'black', 'white', 'vivid-cyan-blue', 'pale-pink' ].includes(
+				c.slug
+			)
+		),
+	};
 
 	const { gradientValue } = __experimentalUseGradient();
 
@@ -406,7 +390,10 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
+		const { getSettings } = select( 'core/block-editor' );
+
 		return {
+			settings: getSettings(),
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),
