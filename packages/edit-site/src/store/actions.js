@@ -118,23 +118,22 @@ export function setHomeTemplateId( homeTemplateId ) {
 }
 
 /**
- * Resolves the template for a page if no templateId is passed and sets them.
+ * Resolves the template for a page displays both.
  *
  * @param {Object}  page         The page object.
  * @param {string}  page.type    The page type.
  * @param {string}  page.slug    The page slug.
  * @param {string}  page.path    The page path.
  * @param {Object}  page.context The page context.
- * @param {number?} templateId   The template ID for the page if we already know it.
  *
  * @return {Object} Action object.
  */
-export function* setPage( page, templateId ) {
-	const id = templateId ?? ( yield findTemplate( page.path ) );
+export function* setPage( page ) {
+	const templateId = yield findTemplate( page.path );
 	return {
 		type: 'SET_PAGE',
 		page,
-		templateId: id,
+		templateId,
 	};
 }
 
@@ -151,7 +150,7 @@ export function* showHomepage() {
 		page_on_front: frontpageId,
 	} = yield select( 'core', 'getEntityRecord', 'root', 'site' );
 
-	const homePage = {
+	const page = {
 		path: '/',
 		context:
 			showOnFront === 'page'
@@ -162,5 +161,9 @@ export function* showHomepage() {
 				: {},
 	};
 
-	yield setPage( homePage, templateId );
+	return {
+		type: 'SET_PAGE',
+		templateId,
+		page,
+	};
 }
