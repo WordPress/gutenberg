@@ -23,6 +23,7 @@ const parseConfig = require( './parse-config' );
  * @property {string}                           configDirectoryPath     Path to the .wp-env.json file.
  * @property {string}                           workDirectoryPath       Path to the work directory located in ~/.wp-env.
  * @property {string}                           dockerComposeConfigPath Path to the docker-compose.yml file.
+ * @property {boolean}                          detectedLocalConfig     If true, wp-env detected local config and used it.
  * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
  * @property {boolean}                          debug                   True if debug mode is enabled.
  */
@@ -104,6 +105,9 @@ module.exports = async function readConfig( configPath ) {
 			configPath.replace( /\.wp-env\.json$/, '.wp-env.override.json' )
 		) ) || {};
 
+	const detectedLocalConfig =
+		Object.keys( { ...baseConfig, ...overrideConfig } ).length > 0;
+
 	// A quick validation before merging on a service by service level allows us
 	// to check the root configuration options and provide more helpful errors.
 	validateConfig(
@@ -166,6 +170,7 @@ module.exports = async function readConfig( configPath ) {
 		),
 		configDirectoryPath,
 		workDirectoryPath,
+		detectedLocalConfig,
 		env,
 	} );
 };
@@ -214,7 +219,8 @@ function mergeWpServiceConfigs( configs ) {
  * added to the default plugin sources.
  *
  * @param {string} configPath A path to the config file for the source to detect.
- * @return {Object} Basic config options for the detected source type.
+ * @return {Object} Basic config options for the detected source type. Empty
+ *                  object if no config detected.
  */
 async function getDefaultBaseConfig( configPath ) {
 	const configDirectoryPath = path.dirname( configPath );
@@ -228,9 +234,7 @@ async function getDefaultBaseConfig( configPath ) {
 		return { themes: [ '.' ] };
 	}
 
-	throw new ValidationError(
-		`No .wp-env.json file found at '${ configPath }' and could not determine if '${ configDirectoryPath }' is a WordPress installation, a plugin, or a theme.`
-	);
+	return {};
 }
 
 /**

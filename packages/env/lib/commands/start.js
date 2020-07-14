@@ -56,6 +56,14 @@ module.exports = async function start( { spinner, debug } ) {
 
 	const config = await initConfig( { spinner, debug } );
 
+	if ( ! config.detectedLocalConfig ) {
+		const { configDirectoryPath } = config;
+		spinner.warn(
+			`Warning: could not find a .wp-env.json configuration file and could not determine if '${ configDirectoryPath }' is a WordPress installation, a plugin, or a theme.`
+		);
+		spinner.start();
+	}
+
 	spinner.text = 'Downloading WordPress.';
 
 	await Promise.all( [
