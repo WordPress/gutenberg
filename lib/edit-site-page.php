@@ -226,7 +226,7 @@ function register_site_editor_homepage_settings() {
 				'name' => 'show_on_front',
 			),
 			'type'         => 'string',
-			'description'  => __( 'Whether to show posts or a static page for the front page.' ),
+			'description'  => __( 'What to show on the front page', 'gutenberg' ),
 		)
 	);
 
@@ -238,7 +238,7 @@ function register_site_editor_homepage_settings() {
 				'name' => 'page_on_front',
 			),
 			'type'         => 'number',
-			'description'  => __( 'The page ID to show on the front page.' ),
+			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
 		)
 	);
 }
