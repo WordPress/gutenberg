@@ -381,6 +381,11 @@ export const LegendText = ( props ) => (
 	<BaseLegendText { ...props } as="span" />
 );
 
+export const Prefix = styled.span`
+	box-sizing: border-box;
+	display: block;
+`;
+
 export const Suffix = styled.span`
 	box-sizing: border-box;
 	display: block;

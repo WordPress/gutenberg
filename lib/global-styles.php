@@ -273,6 +273,7 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
 		'color'            => array( '__experimentalColor' ),
 		'background-color' => array( '__experimentalColor' ),
 		'background'       => array( '__experimentalColor', 'gradients' ),
+		'link-color'       => array( '__experimentalColor', 'linkColor' ),
 		'line-height'      => array( '__experimentalLineHeight' ),
 		'font-size'        => array( '__experimentalFontSize' ),
 	);

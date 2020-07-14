@@ -17,6 +17,12 @@ const git = require( '../lib/git' );
 const config = require( '../config' );
 
 /**
+ * @typedef WPPerformanceCommandOptions
+ *
+ * @property {boolean=} ci Run on CI.
+ */
+
+/**
  * @typedef WPRawPerformanceResults
  *
  * @property {number[]} load             Load Time.
@@ -170,9 +176,10 @@ async function getPerformanceResultsForBranch(
 /**
  * Runs the performances tests on an array of branches and output the result.
  *
- * @param {string[]} branches Branches to compare
+ * @param {WPPerformanceCommandOptions} options Command options.
+ * @param {string[]}                    branches Branches to compare
  */
-async function runPerformanceTests( branches ) {
+async function runPerformanceTests( branches, options ) {
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
 		branches = [ 'master' ];
@@ -185,7 +192,9 @@ async function runPerformanceTests( branches ) {
 			'Make sure these ports are not used before continuing.\n'
 	);
 
-	await askForConfirmation( 'Ready to go? ' );
+	if ( ! options.ci ) {
+		await askForConfirmation( 'Ready to go? ' );
+	}
 
 	log( '>> Cloning the repository' );
 	const performanceTestDirectory = await git.clone( config.gitRepositoryURL );

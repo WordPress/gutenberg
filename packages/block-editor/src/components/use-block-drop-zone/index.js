@@ -50,8 +50,8 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 	let candidateDistance;
 
 	elements.forEach( ( element, index ) => {
-		// Ensure the element is a block. It should have the `data-block` attribute.
-		if ( ! element.dataset.block ) {
+		// Ensure the element is a block. It should have the `wp-block` class.
+		if ( ! element.classList.contains( 'wp-block' ) ) {
 			return;
 		}
 
@@ -137,7 +137,6 @@ function parseDropEvent( event ) {
 	let result = {
 		srcRootClientId: null,
 		srcClientIds: null,
-		srcIndex: null,
 		type: null,
 	};
 
@@ -176,28 +175,32 @@ export default function useBlockDropZone( {
 } ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
-	function selector( select ) {
-		const {
-			getBlockListSettings,
-			getClientIdsOfDescendants,
-			getSettings,
-			getTemplateLock,
-		} = select( 'core/block-editor' );
-		return {
-			orientation: getBlockListSettings( targetRootClientId )
-				?.orientation,
-			getClientIdsOfDescendants,
-			hasUploadPermissions: !! getSettings().mediaUpload,
-			isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
-		};
-	}
-
 	const {
 		getClientIdsOfDescendants,
+		getBlockIndex,
 		hasUploadPermissions,
 		isLockedAll,
 		orientation,
-	} = useSelect( selector, [ targetRootClientId ] );
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockListSettings,
+				getClientIdsOfDescendants: _getClientIdsOfDescendants,
+				getBlockIndex: _getBlockIndex,
+				getSettings,
+				getTemplateLock,
+			} = select( 'core/block-editor' );
+			return {
+				orientation: getBlockListSettings( targetRootClientId )
+					?.orientation,
+				getClientIdsOfDescendants: _getClientIdsOfDescendants,
+				getBlockIndex: _getBlockIndex,
+				hasUploadPermissions: !! getSettings().mediaUpload,
+				isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
+			};
+		},
+		[ targetRootClientId ]
+	);
 	const {
 		insertBlocks,
 		updateBlockAttributes,
@@ -249,7 +252,6 @@ export default function useBlockDropZone( {
 			const {
 				srcRootClientId: sourceRootClientId,
 				srcClientIds: sourceClientIds,
-				srcIndex: sourceBlockIndex,
 				type: dropType,
 			} = parseDropEvent( event );
 
@@ -257,6 +259,8 @@ export default function useBlockDropZone( {
 			if ( dropType !== 'block' ) {
 				return;
 			}
+
+			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
 
 			// If the user is dropping to the same position, return early.
 			if (
@@ -299,6 +303,7 @@ export default function useBlockDropZone( {
 		},
 		[
 			getClientIdsOfDescendants,
+			getBlockIndex,
 			targetBlockIndex,
 			moveBlocksToPosition,
 			targetRootClientId,
@@ -317,17 +322,14 @@ export default function useBlockDropZone( {
 	useEffect( () => {
 		if ( position ) {
 			const blockElements = Array.from( element.current.children );
+
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				position,
 				orientation
 			);
 
-			if ( targetIndex === undefined ) {
-				return;
-			}
-
-			setTargetBlockIndex( targetIndex );
+			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 		}
 	}, [ position ] );
 

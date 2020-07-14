@@ -41,9 +41,14 @@ const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_BORDER_RADIUS_POSITION = 5;
 
 function BorderPanel( { borderRadius = '', setAttributes } ) {
+	const initialBorderRadius = borderRadius;
 	const setBorderRadius = useCallback(
 		( newBorderRadius ) => {
-			setAttributes( { borderRadius: newBorderRadius } );
+			if ( newBorderRadius === undefined )
+				setAttributes( {
+					borderRadius: initialBorderRadius,
+				} );
+			else setAttributes( { borderRadius: newBorderRadius } );
 		},
 		[ setAttributes ]
 	);
