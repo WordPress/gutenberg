@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -15,11 +15,10 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { MediaEdit } from '../media-edit';
 import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
-import SvgIconCustomize from './icon-customize';
+import ImageEditingButton from './image-editing-button';
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
@@ -27,28 +26,13 @@ const ICON_TYPE = {
 	UPLOAD: 'upload',
 };
 
-const DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
-
-function editImageComponent( { open, mediaOptions } ) {
-	return (
-		<TouchableWithoutFeedback onPress={ open }>
-			<View style={ styles.editContainer }>
-				<View style={ styles.edit }>
-					{ mediaOptions() }
-					<Icon
-						size={ 16 }
-						icon={ SvgIconCustomize }
-						{ ...styles.iconCustomise }
-					/>
-				</View>
-			</View>
-		</TouchableWithoutFeedback>
-	);
-}
+export const IMAGE_DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
 const ImageComponent = ( {
 	align,
 	alt,
+	editButton = true,
+	focalPoint,
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
@@ -57,8 +41,6 @@ const ImageComponent = ( {
 	retryMessage,
 	url,
 	width: imageWidth,
-	focalPoint: focalPointValues,
-	withFocalPoint = false,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
@@ -74,11 +56,6 @@ const ImageComponent = ( {
 			} );
 		}
 	}, [ url ] );
-
-	const focalPoint =
-		withFocalPoint && focalPointValues
-			? focalPointValues
-			: DEFAULT_FOCAL_POINT;
 
 	const onContainerLayout = ( event ) => {
 		const { height, width } = event.nativeEvent.layout;
@@ -123,7 +100,7 @@ const ImageComponent = ( {
 			styles.imageContainerUpload,
 			styles.imageContainerUploadDark
 		),
-		withFocalPoint && styles.imageContainerUploadWithFocalpoint,
+		focalPoint && styles.imageContainerUploadWithFocalpoint,
 	];
 
 	const customWidth =
@@ -137,7 +114,7 @@ const ImageComponent = ( {
 					? imageWidth
 					: customWidth,
 		},
-		withFocalPoint && styles.focalPointContainer,
+		focalPoint && styles.focalPointContainer,
 	];
 
 	const imageStyles = [
@@ -145,14 +122,14 @@ const ImageComponent = ( {
 			opacity: isUploadInProgress ? 0.3 : 1,
 			height: containerSize?.height,
 		},
-		withFocalPoint && styles.focalPoint,
-		withFocalPoint &&
+		focalPoint && styles.focalPoint,
+		focalPoint &&
 			getImageWithFocalPointStyles(
 				focalPoint,
 				containerSize,
 				imageData
 			),
-		! withFocalPoint &&
+		! focalPoint &&
 			imageData &&
 			containerSize && {
 				height:
@@ -198,12 +175,12 @@ const ImageComponent = ( {
 						</View>
 					</View>
 				) : (
-					<View style={ withFocalPoint && styles.focalPointContent }>
+					<View style={ focalPoint && styles.focalPointContent }>
 						<Image
 							aspectRatio={ imageData?.aspectRatio }
 							style={ imageStyles }
 							source={ { uri: url } }
-							{ ...( ! withFocalPoint && {
+							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
 							} ) }
 						/>
@@ -225,17 +202,16 @@ const ImageComponent = ( {
 						</Text>
 					</View>
 				) }
-				{ isSelected &&
-					! isUploadInProgress &&
-					! isUploadFailed &&
-					( imageData || withFocalPoint ) && (
-						<MediaEdit
-							onSelect={ onSelectMediaUploadOption }
-							source={ { uri: url } }
-							openReplaceMediaOptions={ openMediaOptions }
-							render={ editImageComponent }
-						/>
-					) }
+				{ editButton && imageData && (
+					<ImageEditingButton
+						isSelected={ isSelected }
+						isUploadFailed={ isUploadFailed }
+						isUploadInProgress={ isUploadInProgress }
+						onSelectMediaUploadOption={ onSelectMediaUploadOption }
+						openMediaOptions={ openMediaOptions }
+						url={ url }
+					/>
+				) }
 			</View>
 		</View>
 	);

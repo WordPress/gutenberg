@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Animated, View, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 import Video from 'react-native-video';
 
 /**
@@ -17,6 +17,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	Icon,
 	Image,
+	ImageEditingButton,
+	IMAGE_DEFAULT_FOCAL_POINT,
 	PanelBody,
 	RangeControl,
 	ToolbarButton,
@@ -99,9 +101,7 @@ const Cover = ( {
 		gradientValue
 	);
 
-	const [ isMediaSelected, setMediaSelected ] = useState( false );
-
-	const mediaSelectedAnimation = useRef( new Animated.Value( 1 ) ).current;
+	const openMediaOptionsRef = useRef();
 
 	// Used to set a default color for its InnerBlocks
 	// since there's no system to inherit styles yet
@@ -118,10 +118,6 @@ const Cover = ( {
 	// sync with local media store
 	useEffect( mediaUploadSync, [] );
 
-	useEffect( () => {
-		startMediaSelectedAnimation();
-	}, [ isMediaSelected ] );
-
 	// initialize uploading flag to false, awaiting sync
 	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
 
@@ -130,22 +126,8 @@ const Cover = ( {
 		id && getProtocol( url ) === 'file:'
 	);
 
-	// Check if Innerblocks are selected to reset isMediaSelected
-
-	if ( ! isParentSelected && isMediaSelected ) {
-		setMediaSelected( false );
-	}
-
 	// don't show failure if upload is in progress
 	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
-
-	const startMediaSelectedAnimation = () => {
-		Animated.timing( mediaSelectedAnimation, {
-			toValue: isMediaSelected ? 0 : 1,
-			duration: 300,
-			useNativeDriver: true,
-		} ).start();
-	};
 
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
@@ -168,10 +150,8 @@ const Cover = ( {
 			requestImageUploadCancelDialog( id );
 		} else if ( shouldShowFailure ) {
 			requestImageFailedRetryDialog( id );
-		} else if ( backgroundType === MEDIA_TYPE_IMAGE && isMediaSelected ) {
-			requestImageFullscreenPreview( url );
 		} else if ( backgroundType === MEDIA_TYPE_IMAGE ) {
-			setMediaSelected( true );
+			requestImageFullscreenPreview( url );
 		}
 	};
 
@@ -255,10 +235,7 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
-	const renderBackground = ( {
-		open: openMediaOptions,
-		getMediaOptions,
-	} ) => (
+	const renderBackground = ( openMediaOptions, getMediaOptions ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
 			onPress={ onMediaPressed }
@@ -268,8 +245,7 @@ const Cover = ( {
 			<View style={ [ styles.background, backgroundColor ] }>
 				{ getMediaOptions() }
 				{ isParentSelected &&
-					( isMediaSelected ||
-						backgroundType === VIDEO_BACKGROUND_TYPE ) &&
+					backgroundType === VIDEO_BACKGROUND_TYPE &&
 					toolbarControls( openMediaOptions ) }
 				<MediaUploadProgress
 					mediaId={ id }
@@ -302,14 +278,16 @@ const Cover = ( {
 				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 					<View style={ styles.imageContainer }>
 						<Image
-							focalPoint={ focalPoint }
-							isSelected={ isMediaSelected }
+							editButton={ false }
+							focalPoint={
+								focalPoint || IMAGE_DEFAULT_FOCAL_POINT
+							}
+							isSelected={ isParentSelected }
 							isUploadFailed={ didUploadFail }
 							isUploadInProgress={ isUploadInProgress }
 							onSelectMediaUploadOption={ onSelectMedia }
 							openMediaOptions={ openMediaOptions }
 							url={ url }
-							withFocalPoint
 						/>
 					</View>
 				) }
@@ -354,6 +332,19 @@ const Cover = ( {
 		<View style={ styles.backgroundContainer }>
 			{ controls }
 
+			{ openMediaOptionsRef?.current && (
+				<View style={ styles.imageEditButton }>
+					<ImageEditingButton
+						isSelected={ isParentSelected }
+						isUploadFailed={ didUploadFail }
+						isUploadInProgress={ isUploadInProgress }
+						onSelectMediaUploadOption={ onSelectMedia }
+						openMediaOptions={ openMediaOptionsRef?.current }
+						url={ url }
+					/>
+				</View>
+			) }
+
 			<View
 				pointerEvents="box-none"
 				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
@@ -361,15 +352,7 @@ const Cover = ( {
 				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>
 
-			<Animated.View
-				pointerEvents="none"
-				style={ [
-					styles.overlayContainer,
-					{
-						opacity: mediaSelectedAnimation,
-					},
-				] }
-			>
+			<View pointerEvents="none" style={ styles.overlayContainer }>
 				<View style={ overlayStyles }>
 					{ gradientValue && (
 						<Gradient
@@ -378,12 +361,15 @@ const Cover = ( {
 						/>
 					) }
 				</View>
-			</Animated.View>
+			</View>
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onSelect={ onSelectMedia }
-				render={ renderBackground }
+				render={ ( { open, getMediaOptions } ) => {
+					openMediaOptionsRef.current = open;
+					return renderBackground( open, getMediaOptions );
+				} }
 			/>
 
 			{ shouldShowFailure && (

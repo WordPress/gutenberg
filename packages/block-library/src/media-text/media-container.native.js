@@ -12,7 +12,12 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 } from '@wordpress/react-native-bridge';
-import { Icon, Image, withNotices } from '@wordpress/components';
+import {
+	Icon,
+	Image,
+	IMAGE_DEFAULT_FOCAL_POINT,
+	withNotices,
+} from '@wordpress/components';
 import {
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
@@ -181,6 +186,9 @@ class MediaContainer extends Component {
 			shouldStack,
 		} = this.props;
 		const { isUploadFailed, retryMessage } = params;
+		const focalPointValues = ! focalPoint
+			? IMAGE_DEFAULT_FOCAL_POINT
+			: focalPoint;
 
 		return (
 			<View
@@ -208,8 +216,7 @@ class MediaContainer extends Component {
 						<Image
 							align="center"
 							alt={ mediaAlt }
-							withFocalPoint={ imageFill }
-							focalPoint={ focalPoint }
+							focalPoint={ imageFill && focalPointValues }
 							isSelected={ isMediaSelected }
 							isUploadFailed={ isUploadFailed }
 							isUploadInProgress={ isUploadInProgress }
