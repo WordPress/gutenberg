@@ -29,7 +29,6 @@ import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
-import BlockDraggable from '../block-draggable';
 
 export default function BlockNavigationBlock( {
 	block,
@@ -72,126 +71,114 @@ export default function BlockNavigationBlock( {
 	}, [ withExperimentalFeatures, isSelected ] );
 
 	return (
-		<BlockDraggable
-			clientIds={ [ clientId ] }
-			cloneClassname="block-editor-block-toolbar__drag-clone"
+		<BlockNavigationLeaf
+			className={ classnames( {
+				'is-selected': isSelected,
+			} ) }
+			onMouseEnter={ () => setIsHovered( true ) }
+			onMouseLeave={ () => setIsHovered( false ) }
+			onFocus={ () => setIsFocused( true ) }
+			onBlur={ () => setIsFocused( false ) }
+			level={ level }
+			position={ position }
+			rowCount={ rowCount }
+			path={ path }
+			id={ `block-navigation-block-${ block.clientId }` }
+			data-block={ clientId }
 		>
-			{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
-				<BlockNavigationLeaf
-					className={ classnames( {
-						'is-selected': isSelected,
-					} ) }
-					onMouseEnter={ () => setIsHovered( true ) }
-					onMouseLeave={ () => setIsHovered( false ) }
-					onFocus={ () => setIsFocused( true ) }
-					onBlur={ () => setIsFocused( false ) }
-					level={ level }
-					position={ position }
-					rowCount={ rowCount }
-					path={ path }
-					draggable={ isDraggable }
-					onDragStart={ onDraggableStart }
-					onDragEnd={ onDraggableEnd }
-				>
+			<TreeGridCell
+				className="block-editor-block-navigation-block__contents-cell"
+				colSpan={ hasRenderedMovers ? undefined : 2 }
+				ref={ cellRef }
+			>
+				{ ( { ref, tabIndex, onFocus } ) => (
+					<div className="block-editor-block-navigation-block__contents-container">
+						<DescenderLines
+							level={ level }
+							isLastRow={ position === rowCount }
+							terminatedLevels={ terminatedLevels }
+						/>
+						<BlockNavigationBlockContents
+							block={ block }
+							onClick={ () => onClick( block.clientId ) }
+							isSelected={ isSelected }
+							position={ position }
+							siblingBlockCount={ siblingBlockCount }
+							level={ level }
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
+						/>
+					</div>
+				) }
+			</TreeGridCell>
+			{ hasRenderedMovers && (
+				<>
 					<TreeGridCell
-						className="block-editor-block-navigation-block__contents-cell"
-						colSpan={ hasRenderedMovers ? undefined : 2 }
-						ref={ cellRef }
+						className={ moverCellClassName }
+						withoutGridItem
 					>
-						{ ( { ref, tabIndex, onFocus } ) => (
-							<div className="block-editor-block-navigation-block__contents-container">
-								<DescenderLines
-									level={ level }
-									isLastRow={ position === rowCount }
-									terminatedLevels={ terminatedLevels }
-								/>
-								<BlockNavigationBlockContents
-									block={ block }
-									onClick={ () => onClick( block.clientId ) }
-									isSelected={ isSelected }
-									position={ position }
-									siblingBlockCount={ siblingBlockCount }
-									level={ level }
+						<TreeGridItem>
+							{ ( { ref, tabIndex, onFocus } ) => (
+								<BlockMoverUpButton
+									orientation="vertical"
+									clientIds={ [ clientId ] }
 									ref={ ref }
 									tabIndex={ tabIndex }
 									onFocus={ onFocus }
 								/>
-							</div>
-						) }
-					</TreeGridCell>
-					{ hasRenderedMovers && (
-						<>
-							<TreeGridCell
-								className={ moverCellClassName }
-								withoutGridItem
-							>
-								<TreeGridItem>
-									{ ( { ref, tabIndex, onFocus } ) => (
-										<BlockMoverUpButton
-											orientation="vertical"
-											clientIds={ [ clientId ] }
-											ref={ ref }
-											tabIndex={ tabIndex }
-											onFocus={ onFocus }
-										/>
-									) }
-								</TreeGridItem>
-								<TreeGridItem>
-									{ ( { ref, tabIndex, onFocus } ) => (
-										<BlockMoverDownButton
-											orientation="vertical"
-											clientIds={ [ clientId ] }
-											ref={ ref }
-											tabIndex={ tabIndex }
-											onFocus={ onFocus }
-										/>
-									) }
-								</TreeGridItem>
-							</TreeGridCell>
-						</>
-					) }
-
-					{ withExperimentalFeatures && (
-						<TreeGridCell
-							className={ blockNavigationBlockSettingsClassName }
-						>
-							{ ( { ref, tabIndex, onFocus } ) => (
-								<BlockSettingsDropdown
-									clientIds={ [ clientId ] }
-									icon={ moreVertical }
-									toggleProps={ {
-										ref,
-										tabIndex,
-										onFocus,
-									} }
-									disableOpenOnArrowDown
-									__experimentalSelectBlock={ onClick }
-								>
-									{ ( { onClose } ) => (
-										<MenuGroup>
-											<MenuItem
-												onClick={ async () => {
-													// If clientId is already selected, it won't be focused (see block-wrapper.js)
-													// This removes the selection first to ensure the focus will always switch.
-													await selectEditorBlock(
-														null
-													);
-													await selectEditorBlock(
-														clientId
-													);
-													onClose();
-												} }
-											>
-												{ __( 'Go to block' ) }
-											</MenuItem>
-										</MenuGroup>
-									) }
-								</BlockSettingsDropdown>
 							) }
-						</TreeGridCell>
-					) }
-				</BlockNavigationLeaf>
+						</TreeGridItem>
+						<TreeGridItem>
+							{ ( { ref, tabIndex, onFocus } ) => (
+								<BlockMoverDownButton
+									orientation="vertical"
+									clientIds={ [ clientId ] }
+									ref={ ref }
+									tabIndex={ tabIndex }
+									onFocus={ onFocus }
+								/>
+							) }
+						</TreeGridItem>
+					</TreeGridCell>
+				</>
 			) }
-		</BlockDraggable>
+
+			{ withExperimentalFeatures && (
+				<TreeGridCell
+					className={ blockNavigationBlockSettingsClassName }
+				>
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<BlockSettingsDropdown
+							clientIds={ [ clientId ] }
+							icon={ moreVertical }
+							toggleProps={ {
+								ref,
+								tabIndex,
+								onFocus,
+							} }
+							disableOpenOnArrowDown
+							__experimentalSelectBlock={ onClick }
+						>
+							{ ( { onClose } ) => (
+								<MenuGroup>
+									<MenuItem
+										onClick={ async () => {
+											// If clientId is already selected, it won't be focused (see block-wrapper.js)
+											// This removes the selection first to ensure the focus will always switch.
+											await selectEditorBlock( null );
+											await selectEditorBlock( clientId );
+											onClose();
+										} }
+									>
+										{ __( 'Go to block' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
+						</BlockSettingsDropdown>
+					) }
+				</TreeGridCell>
+			) }
+		</BlockNavigationLeaf>
 	);
 }
