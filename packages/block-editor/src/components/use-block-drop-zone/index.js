@@ -322,17 +322,14 @@ export default function useBlockDropZone( {
 	useEffect( () => {
 		if ( position ) {
 			const blockElements = Array.from( element.current.children );
+
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				position,
 				orientation
 			);
 
-			if ( targetIndex === undefined ) {
-				return;
-			}
-
-			setTargetBlockIndex( targetIndex );
+			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 		}
 	}, [ position ] );
 
