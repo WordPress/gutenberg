@@ -17,11 +17,11 @@ const __experimentalWithPageTemplatePicker = createHigherOrderComponent(
 			props.capabilities.modalLayoutPicker ?? false
 		);
 		const isTemplatePickerVisible =
-			__experimentalUsePageTemplatePickerVisible() &&
-			isTemplatePickerEnabled;
+			isTemplatePickerEnabled &&
+			__experimentalUsePageTemplatePickerVisible();
 		const isTemplatePickerAvailable =
-			__experimentalUsePageTemplatePickerAvailable() &&
-			isTemplatePickerEnabled;
+			isTemplatePickerEnabled &&
+			__experimentalUsePageTemplatePickerAvailable();
 
 		return (
 			<WrappedComponent
