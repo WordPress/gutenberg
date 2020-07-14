@@ -49,21 +49,15 @@ export default function save( { attributes } ) {
 		: minHeightProp;
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-	const style =
-		backgroundType === IMAGE_BACKGROUND_TYPE
-			? backgroundImageStyles( url )
-			: {};
+	const style = isImageBackground ? backgroundImageStyles( url ) : {};
 	const videoStyle = {};
 
 	if ( ! overlayColorClass ) {
 		style.backgroundColor = customOverlayColor;
 	}
-	if ( focalPoint && ! hasParallax ) {
-		style.backgroundPosition = `${ Math.round(
-			focalPoint.x * 100
-		) }% ${ Math.round( focalPoint.y * 100 ) }%`;
-	}
+
 	if ( customGradient && ! url ) {
 		style.background = customGradient;
 	}
@@ -72,11 +66,17 @@ export default function save( { attributes } ) {
 	let positionValue;
 
 	if ( focalPoint ) {
-		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
-		if ( isImageBackground ) {
+		positionValue = `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
+			focalPoint.y * 100
+		) }%`;
+
+		if ( isImageBackground && ! hasParallax ) {
 			style.backgroundPosition = positionValue;
 		}
-		videoStyle.objectPosition = positionValue;
+
+		if ( isVideoBackground ) {
+			videoStyle.objectPosition = positionValue;
+		}
 	}
 
 	const classes = classnames(
@@ -110,7 +110,7 @@ export default function save( { attributes } ) {
 					}
 				/>
 			) }
-			{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
+			{ isVideoBackground && url && (
 				<video
 					className="wp-block-cover__video-background"
 					autoPlay

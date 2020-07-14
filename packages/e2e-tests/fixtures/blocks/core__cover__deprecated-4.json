@@ -12,7 +12,9 @@
             "focalPoint": {
                 "x": "0.07",
                 "y": "0.07"
-            }
+            },
+            "title": "",
+            "contentAlign": "center"
         },
         "innerBlocks": [
             {
