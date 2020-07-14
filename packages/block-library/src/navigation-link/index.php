@@ -197,7 +197,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	$html .= '</' . $item_tag . '>';
 	// End anchor tag content.
 
-	if ( $block->context['showSubmenuIcon'] && $has_submenu ) {
+	if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] && $has_submenu ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
 		$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
 	}
