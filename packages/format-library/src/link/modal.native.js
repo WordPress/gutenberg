@@ -6,6 +6,7 @@ import {
 	NavigationContainer,
 	DefaultTheme,
 	useNavigation,
+	useRoute,
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -13,10 +14,11 @@ import { createStackNavigator } from '@react-navigation/stack';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, useState, useContext, useEffect } from '@wordpress/element';
 import { prependHTTP } from '@wordpress/url';
 import {
 	BottomSheet,
+	BottomSheetContext,
 	LinkPicker,
 	withSpokenMessages,
 } from '@wordpress/components';
@@ -39,18 +41,23 @@ import { createLinkFormat, isValidHref } from './utils';
 import styles from './modal.scss';
 const Stack = createStackNavigator();
 
-const LinkPickerScreen = ( { inputValue, onLinkPicked: pickLink } ) => {
+const LinkPickerScreen = () => {
 	const navigation = useNavigation();
-	const goBack = () => navigation.navigate( 'LinkSettings' );
+	const params = useRoute()?.params;
+	const bottomSheetContext = useContext( BottomSheetContext );
+	const goBack = () => {
+		bottomSheetContext.shouldDisableBottomSheetMaxHeight( true );
+		navigation.goBack();
+	};
 	const onLinkPicked = ( ...args ) => {
-		pickLink( ...args );
+		params.onLinkPicked( ...args );
 		goBack();
 	};
 
 	return (
 		<BottomSheet.NavigationScreen fullHeight>
 			<LinkPicker
-				value={ inputValue }
+				value={ params.inputValue }
 				onLinkPicked={ onLinkPicked }
 				onCancel={ goBack }
 			/>
@@ -58,75 +65,44 @@ const LinkPickerScreen = ( { inputValue, onLinkPicked: pickLink } ) => {
 	);
 };
 
-const LinkCell = ( { value } ) => {
+const MainLinkSettingsScreen = () => {
 	const navigation = useNavigation();
+	const params = useRoute()?.params;
+	const [ inputValue, setInputValue ] = useState( '' );
+	const [ text, setText ] = useState( '' );
+	const [ opensInNewWindow, setopensInNewWindow ] = useState( false );
+	const bottomSheetContext = useContext( BottomSheetContext );
 
-	return (
-		<BottomSheet.LinkCell
-			value={ value }
-			onPress={ () => {
-				navigation.navigate( 'LinkPicker' );
-			} }
-		/>
-	);
-};
+	useEffect( () => {
+		bottomSheetContext.onCloseBottomSheet( onDismiss );
+	}, [ inputValue ] );
 
-class ModalLinkUI extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.submitLink = this.submitLink.bind( this );
-		this.onChangeInputValue = this.onChangeInputValue.bind( this );
-		this.onChangeText = this.onChangeText.bind( this );
-		this.onChangeOpensInNewWindow = this.onChangeOpensInNewWindow.bind(
-			this
-		);
-		this.removeLink = this.removeLink.bind( this );
-		this.onDismiss = this.onDismiss.bind( this );
-		this.renderMainScreen = this.renderMainScreen.bind( this );
-		this.renderPickerScreen = this.renderPickerScreen.bind( this );
-		this.onLinkPicked = this.onLinkPicked.bind( this );
-
-		this.state = {
-			inputValue: '',
-			text: '',
-			opensInNewWindow: false,
-			isFullScreen: false,
-		};
-	}
-
-	componentDidUpdate( oldProps ) {
-		if ( oldProps === this.props ) {
-			return;
+	const removeLink = () => {
+		if ( params.onRemove && params.onClose ) {
+			params.onRemove();
+			params.onClose();
 		}
+	};
 
-		const {
-			activeAttributes: { url, target },
-		} = this.props;
-		const opensInNewWindow = target === '_blank';
+	const onLinkPicked = ( { url, title } ) => {
+		if ( ! text ) {
+			setInputValue( url );
+			setText( title );
+		} else {
+			setInputValue( url );
+		}
+	};
 
-		this.setState( {
-			inputValue: url || '',
-			text: getTextContent( slice( this.props.value ) ),
-			opensInNewWindow,
-		} );
-	}
+	const onDismiss = () => {
+		if ( inputValue === '' ) {
+			removeLink();
+		} else {
+			submitLink();
+		}
+	};
 
-	onChangeInputValue( inputValue ) {
-		this.setState( { inputValue } );
-	}
-
-	onChangeText( text ) {
-		this.setState( { text } );
-	}
-
-	onChangeOpensInNewWindow( opensInNewWindow ) {
-		this.setState( { opensInNewWindow } );
-	}
-
-	submitLink() {
-		const { isActive, onChange, speak, value } = this.props;
-		const { inputValue, opensInNewWindow, text } = this.state;
+	const submitLink = () => {
+		const { isActive, onChange, speak, value, onClose } = params;
 		const url = prependHTTP( inputValue );
 		const linkText = text || inputValue;
 		const format = createLinkFormat( {
@@ -175,77 +151,50 @@ class ModalLinkUI extends Component {
 			speak( __( 'Link inserted' ), 'assertive' );
 		}
 
-		this.props.onClose();
-	}
+		onClose();
+	};
 
-	removeLink() {
-		this.props.onRemove();
-		this.props.onClose();
-	}
+	const navigateToPicker = () => {
+		navigation.navigate( 'LinkPicker', { onLinkPicked, inputValue } );
+	};
 
-	onDismiss() {
-		if ( this.state.inputValue === '' ) {
-			this.removeLink();
-		} else {
-			this.submitLink();
-		}
-		this.setState( { isFullScreen: false } );
-	}
+	return (
+		<BottomSheet.NavigationScreen>
+			<>
+				<LinkCell value={ inputValue } onPress={ navigateToPicker } />
+				<BottomSheet.Cell
+					icon={ textColor }
+					label={ __( 'Link text' ) }
+					value={ text }
+					placeholder={ __( 'Add link text' ) }
+					onChangeValue={ setText }
+					onSubmit={ onDismiss }
+				/>
+				<BottomSheet.SwitchCell
+					icon={ external }
+					label={ __( 'Open in new tab' ) }
+					value={ opensInNewWindow }
+					onValueChange={ setopensInNewWindow }
+					separatorType={ 'fullWidth' }
+				/>
+				<BottomSheet.Cell
+					label={ __( 'Remove link' ) }
+					labelStyle={ styles.clearLinkButton }
+					separatorType={ 'none' }
+					onPress={ removeLink }
+				/>
+			</>
+		</BottomSheet.NavigationScreen>
+	);
+};
 
-	renderMainScreen() {
-		const { inputValue, text } = this.state;
+const LinkCell = ( { value, onPress } ) => {
+	return <BottomSheet.LinkCell value={ value } onPress={ onPress } />;
+};
 
-		return (
-			<BottomSheet.NavigationScreen>
-				<>
-					<LinkCell value={ inputValue } />
-					<BottomSheet.Cell
-						icon={ textColor }
-						label={ __( 'Link text' ) }
-						value={ text }
-						placeholder={ __( 'Add link text' ) }
-						onChangeValue={ this.onChangeText }
-						onSubmit={ this.onDismiss }
-					/>
-					<BottomSheet.SwitchCell
-						icon={ external }
-						label={ __( 'Open in new tab' ) }
-						value={ this.state.opensInNewWindow }
-						onValueChange={ this.onChangeOpensInNewWindow }
-						separatorType={ 'fullWidth' }
-					/>
-					<BottomSheet.Cell
-						label={ __( 'Remove link' ) }
-						labelStyle={ styles.clearLinkButton }
-						separatorType={ 'none' }
-						onPress={ this.removeLink }
-					/>
-				</>
-			</BottomSheet.NavigationScreen>
-		);
-	}
-
-	onLinkPicked( { url, title } ) {
-		if ( ! this.state.text ) {
-			this.setState( { inputValue: url, text: title } );
-		} else {
-			this.setState( { inputValue: url } );
-		}
-	}
-
-	renderPickerScreen() {
-		const { inputValue } = this.state;
-
-		return (
-			<LinkPickerScreen
-				inputValue={ inputValue }
-				onLinkPicked={ this.onLinkPicked }
-			/>
-		);
-	}
+class ModalLinkUI extends Component {
 	render() {
 		const { isVisible, getStylesFromColorScheme } = this.props;
-		const { isFullScreen } = this.state;
 
 		const backgroundStyle = getStylesFromColorScheme(
 			styles.background,
@@ -259,12 +208,9 @@ class ModalLinkUI extends Component {
 				background: backgroundStyle.backgroundColor,
 			},
 		};
-
 		return (
 			<BottomSheet
 				isVisible={ isVisible }
-				onClose={ this.onDismiss }
-				adjustToContentHeight
 				hideHeader
 				isChildrenScrollable
 			>
@@ -279,12 +225,13 @@ class ModalLinkUI extends Component {
 							<Stack.Screen
 								options={ BottomSheet.NavigationScreen.options }
 								name="LinkSettings"
-								component={ this.renderMainScreen }
+								component={ MainLinkSettingsScreen }
+								initialParams={ this.props }
 							/>
 							<Stack.Screen
 								options={ BottomSheet.NavigationScreen.options }
 								name="LinkPicker"
-								component={ this.renderPickerScreen }
+								component={ LinkPickerScreen }
 							/>
 						</Stack.Navigator>
 					</NavigationContainer>

@@ -64,6 +64,7 @@ class BottomSheet extends Component {
 			this
 		);
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
+		this.keyboardDidShow = this.keyboardDidShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
 		this.state = {
@@ -92,6 +93,15 @@ class BottomSheet extends Component {
 		);
 	}
 
+	keyboardDidShow( e ) {
+		// Note that if you set android:windowSoftInputMode to adjustResize or adjustPan,
+		// only keyboardDidShow and keyboardDidHide events will be available on Android.
+		// https://reactnative.dev/docs/keyboard#addlistener
+		if ( Platform.OS === 'android' ) {
+			this.keyboardWillShow( e );
+		}
+	}
+
 	keyboardDidHide() {
 		this.setState( { keyboardHeight: 0 }, () => this.onSetMaxHeight() );
 	}
@@ -110,6 +120,11 @@ class BottomSheet extends Component {
 			this.keyboardWillShow
 		);
 
+		this.keyboardDidShowListener = Keyboard.addListener(
+			'keyboardDidShow',
+			this.keyboardDidShow
+		);
+
 		this.keyboardDidHideListener = Keyboard.addListener(
 			'keyboardDidHide',
 			this.keyboardDidHide
@@ -123,6 +138,9 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		this.keyboardWillShowListener.remove();
+		this.keyboardDidHideListener.remove();
+		this.keyboardDidShowListener.remove();
 		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
@@ -135,8 +153,6 @@ class BottomSheet extends Component {
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
 		);
-		this.keyboardWillShowListener.remove();
-		this.keyboardDidHideListener.remove();
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -237,7 +253,10 @@ class BottomSheet extends Component {
 		if ( onCloseBottomSheet ) {
 			onCloseBottomSheet();
 		}
-		onClose();
+		if ( onClose ) {
+			onClose();
+		}
+		this.onHandleClosingBottomSheet( null );
 		this.onShouldSetBottomSheetMaxHeight( true );
 	}
 

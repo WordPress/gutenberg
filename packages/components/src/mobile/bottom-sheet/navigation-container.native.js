@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Animated, Easing } from 'react-native';
+import { Animated, Easing, InteractionManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -13,17 +13,19 @@ function BottomSheetNavigationContainer( { children, animate } ) {
 	const heightValue = useRef( new Animated.Value( 1 ) ).current;
 	const context = useContext( BottomSheetContext );
 	const setHeight = ( maxHeight ) => {
-		if ( heightValue !== maxHeight ) {
-			if ( animate ) {
-				Animated.timing( heightValue, {
-					toValue: maxHeight,
-					duration: 200,
-					easing: Easing.ease,
-				} ).start();
-			} else {
-				heightValue.setValue( maxHeight );
+		InteractionManager.runAfterInteractions( () => {
+			if ( heightValue !== maxHeight ) {
+				if ( animate ) {
+					Animated.timing( heightValue, {
+						toValue: maxHeight,
+						duration: 200,
+						easing: Easing.ease,
+					} ).start();
+				} else {
+					heightValue.setValue( maxHeight );
+				}
 			}
-		}
+		} );
 	};
 
 	return (

@@ -42,7 +42,10 @@ class BottomSheetCell extends Component {
 
 	componentDidUpdate() {
 		if ( this.state.isEditingValue ) {
-			this._valueTextInput.focus();
+			// I do not know why we need this but it is kinda weird that we call focus on each update
+			// It generates jumping content when changing screen
+			// Need investigate it
+			// this._valueTextInput.focus();
 		}
 	}
 
