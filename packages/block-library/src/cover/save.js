@@ -54,6 +54,8 @@ export default function save( { attributes } ) {
 		backgroundType === IMAGE_BACKGROUND_TYPE
 			? backgroundImageStyles( url )
 			: {};
+	const videoStyle = {};
+
 	if ( ! overlayColorClass ) {
 		style.backgroundColor = customOverlayColor;
 	}
@@ -74,6 +76,7 @@ export default function save( { attributes } ) {
 		if ( isImageBackground ) {
 			style.backgroundPosition = positionValue;
 		}
+		videoStyle.objectPosition = positionValue;
 	}
 
 	const classes = classnames(
@@ -115,7 +118,7 @@ export default function save( { attributes } ) {
 					loop
 					playsInline
 					src={ url }
-					style={ { objectPosition: positionValue } }
+					style={ videoStyle }
 				/>
 			) }
 			<div className="wp-block-cover__inner-container">
