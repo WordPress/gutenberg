@@ -1,11 +1,12 @@
 {
 	"name": "core/post-content",
 	"category": "design",
-	"context": [
+	"usesContext": [
 		"postId",
 		"postType"
 	],
 	"supports": {
+		"align": true,
 		"html": false
 	}
 }

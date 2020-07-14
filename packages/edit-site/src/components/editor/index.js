@@ -144,7 +144,7 @@ function Editor() {
 		} ),
 		[ page.context ]
 	);
-	return template ? (
+	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -223,7 +223,13 @@ function Editor() {
 											>
 												<Notices />
 												<Popover.Slot name="block-toolbar" />
-												<BlockEditor />
+												{ template && (
+													<BlockEditor
+														setIsInserterOpen={
+															setIsInserterOpen
+														}
+													/>
+												) }
 												<KeyboardShortcuts />
 											</BlockSelectionClearer>
 										}
@@ -268,6 +274,6 @@ function Editor() {
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</>
-	) : null;
+	);
 }
 export default Editor;

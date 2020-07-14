@@ -28,6 +28,8 @@ function DemoExample() {
 		left: '10px',
 	} );
 
+	const [ showVisualizer, setShowVisualizer ] = useState( {} );
+
 	return (
 		<Container align="top" gap={ 8 }>
 			<FlexBlock>
@@ -36,13 +38,17 @@ function DemoExample() {
 						label="Padding"
 						values={ values }
 						onChange={ setValues }
+						onChangeShowVisualizer={ setShowVisualizer }
 					/>
 				</Content>
 			</FlexBlock>
 			<FlexBlock>
 				<Content>
 					<BoxContainer>
-						<BoxControlVisualizer values={ values }>
+						<BoxControlVisualizer
+							showValues={ showVisualizer }
+							values={ values }
+						>
 							<Box />
 						</BoxControlVisualizer>
 					</BoxContainer>

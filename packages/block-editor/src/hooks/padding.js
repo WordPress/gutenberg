@@ -37,7 +37,22 @@ export function PaddingEdit( props ) {
 	const onChange = ( next ) => {
 		const newStyle = {
 			...style,
-			padding: next,
+			spacing: {
+				padding: next,
+			},
+		};
+
+		setAttributes( {
+			style: cleanEmptyObject( newStyle ),
+		} );
+	};
+
+	const onChangeShowVisualizer = ( next ) => {
+		const newStyle = {
+			...style,
+			visualizers: {
+				padding: next,
+			},
 		};
 
 		setAttributes( {
@@ -49,8 +64,9 @@ export function PaddingEdit( props ) {
 		web: (
 			<>
 				<BoxControl
-					values={ style?.padding }
+					values={ style?.spacing?.padding }
 					onChange={ onChange }
+					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Padding' ) }
 					units={ units }
 				/>
@@ -61,8 +77,8 @@ export function PaddingEdit( props ) {
 }
 
 export const paddingStyleMappings = {
-	paddingTop: [ 'padding', 'top' ],
-	paddingRight: [ 'padding', 'right' ],
-	paddingBottom: [ 'padding', 'bottom' ],
-	paddingLeft: [ 'padding', 'left' ],
+	paddingTop: [ 'spacing', 'padding', 'top' ],
+	paddingRight: [ 'spacing', 'padding', 'right' ],
+	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
+	paddingLeft: [ 'spacing', 'padding', 'left' ],
 };

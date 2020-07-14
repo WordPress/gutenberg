@@ -45,7 +45,7 @@ function UncontrolledInnerBlocks( props ) {
 		forwardedRef,
 		templateInsertUpdatesSelection,
 		__experimentalCaptureToolbars: captureToolbars,
-		__experimentalMoverDirection,
+		orientation,
 	} = props;
 
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
@@ -73,7 +73,7 @@ function UncontrolledInnerBlocks( props ) {
 		allowedBlocks,
 		templateLock,
 		captureToolbars,
-		__experimentalMoverDirection
+		orientation
 	);
 
 	useInnerBlockTemplateSync(

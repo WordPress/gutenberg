@@ -81,6 +81,7 @@ describe( 'Image', () => {
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
 
+		await page.click( '.wp-block-image img' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
@@ -97,5 +98,17 @@ describe( 'Image', () => {
 		expect(
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '12' );
+	} );
+
+	it( 'should allow soft line breaks in caption', async () => {
+		await insertBlock( 'Image' );
+		await upload( '.wp-block-image input[type="file"]' );
+		await page.keyboard.type( '12' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Enter' );
+
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toBe( '1<br data-rich-text-line-break="true">2' );
 	} );
 } );

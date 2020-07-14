@@ -4,7 +4,7 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
 <React.Fragment>
   <InspectorControls>
     <ForwardRef(PanelBody)>
-      <WithInstanceId(ToggleControl)
+      <ToggleControl
         checked={false}
         help={[Function]}
         label="Hide the excerpt on the full content page"
@@ -34,7 +34,7 @@ exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
 <React.Fragment>
   <InspectorControls>
     <ForwardRef(PanelBody)>
-      <WithInstanceId(ToggleControl)
+      <ToggleControl
         checked={true}
         help={[Function]}
         label="Hide the excerpt on the full content page"

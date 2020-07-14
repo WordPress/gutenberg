@@ -41,8 +41,8 @@
 
 	td.is-selected,
 	th.is-selected {
-		border-color: $blue-medium-500;
-		box-shadow: inset 0 0 0 1px $blue-medium-500;
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
 		border-style: double;
 	}
 

@@ -41,6 +41,6 @@
 
 	&:hover {
 		cursor: pointer;
-		box-shadow: 0 0 0 1px $theme-color;
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
 	}
 }

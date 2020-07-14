@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/notices';
 import '@wordpress/block-editor';
 import {
 	registerBlockType,
@@ -46,7 +47,6 @@ import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
-import * as richImage from './rich-image';
 import * as rss from './rss';
 import * as search from './search';
 import * as group from './group';
@@ -65,6 +65,7 @@ import * as socialLink from './social-link';
 import * as widgetArea from './widget-area';
 
 // Full Site Editing Blocks
+import * as siteLogo from './site-logo';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
@@ -187,7 +188,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				const {
 					__experimentalEnableLegacyWidgetBlock,
 					__experimentalEnableFullSiteEditing,
-					__experimentalEnableRichImageEditing,
 				} = settings;
 
 				[
@@ -200,6 +200,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					...( __experimentalEnableFullSiteEditing
 						? [
 								siteTitle,
+								siteLogo,
 								templatePart,
 								query,
 								queryLoop,
@@ -217,10 +218,5 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 						  ]
 						: [] ),
 				].forEach( registerBlock );
-
-				if ( __experimentalEnableRichImageEditing ) {
-					// Attach rich image tools to the image block.
-					richImage.registerBlock();
-				}
 		  }
 		: undefined;

@@ -20,7 +20,7 @@
 			"type": "string"
 		}
 	},
-	"context": [
+	"usesContext": [
 		"postType",
 		"postId"
 	],

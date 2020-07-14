@@ -107,7 +107,6 @@ export function homeTemplateId( state ) {
 export function templateId( state, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
-		case 'ADD_TEMPLATE':
 		case 'SET_PAGE':
 			return action.templateId;
 	}
@@ -143,43 +142,12 @@ export function templatePartId( state, action ) {
 export function templateType( state, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
-		case 'ADD_TEMPLATE':
 		case 'SET_PAGE':
 			return 'wp_template';
 		case 'SET_TEMPLATE_PART':
 			return 'wp_template_part';
 	}
 
-	return state;
-}
-
-/**
- * Reducer returning the list of template IDs.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function templateIds( state = [], action ) {
-	switch ( action.type ) {
-		case 'ADD_TEMPLATE':
-			return [ ...state, action.templateId ];
-		case 'REMOVE_TEMPLATE':
-			return state.filter( ( id ) => id !== action.templateId );
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the list of template part IDs.
- *
- * @param {Object} state Current state.
- *
- * @return {Object} Updated state.
- */
-export function templatePartIds( state = [] ) {
 	return state;
 }
 
@@ -219,8 +187,6 @@ export default combineReducers( {
 	templateId,
 	templatePartId,
 	templateType,
-	templateIds,
-	templatePartIds,
 	page,
 	showOnFront,
 } );

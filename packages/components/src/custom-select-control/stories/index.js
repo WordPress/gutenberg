@@ -18,6 +18,7 @@ const defaultOptions = [
 		key: 'normal',
 		name: 'Normal',
 		style: { fontSize: '100%' },
+		className: 'can-apply-custom-class-to-option',
 	},
 	{
 		key: 'large',
