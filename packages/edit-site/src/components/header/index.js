@@ -51,7 +51,9 @@ export default function Header( {
 			getPage,
 		} = select( 'core/edit-site' );
 
-		const { getEntityRecord } = select( 'core' );
+		const { show_on_front: _showOnFront } = select(
+			'core'
+		).getEditedEntityRecord( 'root', 'site' );
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -60,7 +62,7 @@ export default function Header( {
 			templatePartId: getTemplatePartId(),
 			templateType: getTemplateType(),
 			page: getPage(),
-			showOnFront: getEntityRecord( 'root', 'site' ).show_on_front,
+			showOnFront: _showOnFront,
 		};
 	}, [] );
 

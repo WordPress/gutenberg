@@ -161,9 +161,5 @@ export function* showHomepage() {
 				: {},
 	};
 
-	return {
-		type: 'SET_PAGE',
-		templateId,
-		page,
-	};
+	yield setPage( page );
 }
