@@ -152,7 +152,11 @@ class BottomSheet extends Component {
 
 	onSetMaxHeight() {
 		const { height, width } = Dimensions.get( 'window' );
-		const { safeAreaBottomInset, keyboardHeight } = this.state;
+		const {
+			safeAreaBottomInset,
+			keyboardHeight,
+			isMaxHeightSet,
+		} = this.state;
 		const statusBarHeight =
 			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
@@ -163,18 +167,22 @@ class BottomSheet extends Component {
 				keyboardHeight -
 				statusBarHeight );
 
-		// On horizontal mode `maxHeight` has to be set on 90% of width
+		// On horizontal mode `maxHeight` has to be set on 90% of height
 		if ( width > height ) {
 			this.setState( {
 				maxHeight: Math.min( 0.9 * height, maxHeightWithOpenKeyboard ),
 			} );
-			//	On vertical mode `maxHeight` has to be set on 50% of width
-		} else {
+			//	On vertical mode `maxHeight` has to be set on 50% of height
+		} else if ( isMaxHeightSet ) {
 			this.setState( {
 				maxHeight: Math.min(
 					height / 2 - safeAreaBottomInset,
 					maxHeightWithOpenKeyboard
 				),
+			} );
+		} else {
+			this.setState( {
+				maxHeight: maxHeightWithOpenKeyboard,
 			} );
 		}
 	}
@@ -272,6 +280,7 @@ class BottomSheet extends Component {
 			isScrolling,
 			scrollEnabled,
 			isMaxHeightSet,
+			keyboardHeight,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -372,7 +381,7 @@ class BottomSheet extends Component {
 						<ScrollView
 							{ ...listProps }
 							style={
-								isMaxHeightSet
+								isMaxHeightSet || keyboardHeight !== 0
 									? {
 											maxHeight,
 									  }
@@ -422,7 +431,7 @@ class BottomSheet extends Component {
 							<TouchableHighlight accessible={ false }>
 								<View
 									style={
-										isMaxHeightSet
+										isMaxHeightSet || keyboardHeight !== 0
 											? {
 													maxHeight,
 											  }
