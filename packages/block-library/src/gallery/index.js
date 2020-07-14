@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { gallery as icon } from '@wordpress/icons';
 
 /**
@@ -34,6 +34,13 @@ export const settings = {
 					url:
 						'https://s.w.org/images/core/5.3/Sediment_off_the_Yucatan_Peninsula.jpg',
 				},
+				{
+					url:
+						'https://s.w.org/images/core/5.3/Biologia_Centrali-Americana_-_Cantorchilus_semibadius_1902.jpg',
+				},
+				{
+					url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
+				},
 			],
 		},
 	},
@@ -41,4 +48,15 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
+	styles: [
+		{
+			name: 'default',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		},
+		{
+			name: 'tiled',
+			label: _x( 'Tiled', 'block style' ),
+		},
+	],
 };
