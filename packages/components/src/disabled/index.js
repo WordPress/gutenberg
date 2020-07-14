@@ -80,7 +80,6 @@ function Disabled( { className, children, ...props } ) {
 		};
 	}, [] );
 
-	//Lets return
 	return (
 		<Provider value={ true }>
 			<div
