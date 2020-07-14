@@ -4,22 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState, useRef } from '@wordpress/element';
 
-export default function useCreatePage( requestNewPage ) {
-	async function handleCreatePage( pageTitle ) {
-		const type = 'page';
-		const page = await requestNewPage( type, {
-			title: pageTitle,
-			status: 'publish',
-		} );
-
-		return {
-			id: page.id,
-			type,
-			title: page.title.rendered,
-			url: page.link,
-		};
-	}
-
+export default function useCreatePage( handleCreatePage ) {
 	const cancelableCreateSuggestion = useRef();
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
 	const [ errorMessage, setErrorMessage ] = useState( null );

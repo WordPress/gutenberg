@@ -118,8 +118,19 @@ function NavigationLinkEdit( {
 		selection.addRange( range );
 	}
 
-	function handleCreatePage( type, data ) {
-		return saveEntityRecord( 'postType', type, data );
+	async function handleCreatePage( pageTitle ) {
+		const type = 'page';
+		const page = await saveEntityRecord( 'postType', type, {
+			title: pageTitle,
+			status: 'publish',
+		} );
+
+		return {
+			id: page.id,
+			type,
+			title: page.title.rendered,
+			url: page.link,
+		};
 	}
 
 	return (
