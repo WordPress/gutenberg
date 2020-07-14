@@ -267,7 +267,11 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__quick-inserter {
-	width: $block-inserter-width;
+	width: 100%;
+
+	@include break-medium {
+		width: $block-inserter-width;
+	}
 }
 
 .block-editor-inserter__quick-inserter-results {
@@ -291,9 +295,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__popover.is-quick > .components-popover__content > div {
-	@include break-medium {
-		padding: 0;
-	}
+	padding: 0;
 }
 
 .block-editor-inserter__quick-inserter-expand.components-button {

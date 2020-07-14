@@ -108,7 +108,6 @@ function ColumnsEditContainer( {
 				columnsInRow *
 				Math.min( columnsInRow, MAX_COLUMNS_NUM_IN_ROW ) *
 				styles.columnMargin.marginLeft;
-
 			columnWidth = ( minWidth - margins ) / columnsInRow;
 		}
 		return { width: columnWidth };
