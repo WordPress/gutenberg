@@ -4,7 +4,6 @@ on:
   pull_request:
     paths-ignore:
     - '**.md'
-    - '/packages/env/*'
 
 jobs:
   test:
