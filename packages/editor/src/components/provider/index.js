@@ -41,10 +41,11 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
  * @param {number} perPage
  * @return {Promise<Object[]>} List of suggestions
  */
-const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
+const fetchLinkSuggestions = async ( search, { page, perPage = 20 } = {} ) => {
 	const posts = await apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
+			page,
 			per_page: perPage,
 			type: 'post',
 		} ),

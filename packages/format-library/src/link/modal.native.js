@@ -160,6 +160,7 @@ class ModalLinkUI extends Component {
 				onClose={ this.onDismiss }
 				hideHeader
 				style={ { flex: isFullScreen ? 1 : undefined } }
+				isChildrenScrollable={ isFullScreen }
 			>
 				<BottomSheetConsumer>
 					{ ( {
