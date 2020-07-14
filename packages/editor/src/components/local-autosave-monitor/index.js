@@ -45,9 +45,15 @@ const hasSessionStorageSupport = once( () => {
  * restore a local autosave, if one exists.
  */
 function useAutosaveNotice() {
-	const { postId, getEditedPostAttribute, hasRemoteAutosave } = useSelect(
+	const {
+		postId,
+		isEditedPostNew,
+		getEditedPostAttribute,
+		hasRemoteAutosave,
+	} = useSelect(
 		( select ) => ( {
 			postId: select( 'core/editor' ).getCurrentPostId(),
+			isEditedPostNew: select( 'core/editor' ).isEditedPostNew(),
 			getEditedPostAttribute: select( 'core/editor' )
 				.getEditedPostAttribute,
 			hasRemoteAutosave: !! select( 'core/editor' ).getEditorSettings()
@@ -60,7 +66,7 @@ function useAutosaveNotice() {
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
 	useEffect( () => {
-		let localAutosave = localAutosaveGet( postId );
+		let localAutosave = localAutosaveGet( postId, isEditedPostNew );
 		if ( ! localAutosave ) {
 			return;
 		}
@@ -84,7 +90,7 @@ function useAutosaveNotice() {
 
 			if ( ! hasDifference ) {
 				// If there is no difference, it can be safely ejected from storage.
-				localAutosaveClear( postId );
+				localAutosaveClear( postId, isEditedPostNew );
 				return;
 			}
 		}
@@ -112,16 +118,23 @@ function useAutosaveNotice() {
 				],
 			}
 		);
-	}, [ postId ] );
+	}, [ isEditedPostNew, postId ] );
 }
 
 /**
  * Custom hook which ejects a local autosave after a successful save occurs.
  */
 function useAutosavePurge() {
-	const { postId, isDirty, isAutosaving, didError } = useSelect(
+	const {
+		postId,
+		isEditedPostNew,
+		isDirty,
+		isAutosaving,
+		didError,
+	} = useSelect(
 		( select ) => ( {
 			postId: select( 'core/editor' ).getCurrentPostId(),
+			isEditedPostNew: select( 'core/editor' ).isEditedPostNew(),
 			isDirty: select( 'core/editor' ).isEditedPostDirty(),
 			isAutosaving: select( 'core/editor' ).isAutosavingPost(),
 			didError: select( 'core/editor' ).didPostSaveRequestFail(),
@@ -138,7 +151,7 @@ function useAutosavePurge() {
 			( ( lastIsAutosaving.current && ! isAutosaving ) ||
 				( lastIsDirty.current && ! isDirty ) )
 		) {
-			localAutosaveClear( postId );
+			localAutosaveClear( postId, isEditedPostNew );
 		}
 
 		lastIsDirty.current = isDirty;
