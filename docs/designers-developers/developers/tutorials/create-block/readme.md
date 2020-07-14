@@ -1,4 +1,4 @@
-# Create Block Tutorial
+# Create a Block Tutorial
 
 Let's get you started creating your first block for the WordPress Block Editor. We will create a simple block that allows the user to type a message and styles it.
 
@@ -29,9 +29,8 @@ After activated, go to the block editor and use the inserter to search and add y
 The create a block tutorials breaks down to the following sections.
 
 1. [WordPress Plugin](/docs/designers-developers/developers/tutorials/create-block/wp-plugin.md)
-2. [ESNext Syntax](/docs/designers-developers/developers/tutorials/create-block/esnext-js.md)
-3. [Anatomy of a Gutenberg Block ](/docs/designers-developers/developers/tutorials/create-block/block-anatomy.md)
-4. [Block Attributes](/docs/designers-developers/developers/tutorials/create-block/block-attributes.md)
-5. [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/block-code.md)
-6. [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)
-7. [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/finishing.md)
+2. [Anatomy of a Gutenberg Block ](/docs/designers-developers/developers/tutorials/create-block/block-anatomy.md)
+3. [Block Attributes](/docs/designers-developers/developers/tutorials/create-block/block-attributes.md)
+4. [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/block-code.md)
+5. [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)
+6. [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/finishing.md)

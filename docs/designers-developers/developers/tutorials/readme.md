@@ -4,7 +4,9 @@
 
 -   See the [Getting Started with JavaScript Tutorial](/docs/designers-developers/developers/tutorials/javascript/readme.md) to learn about how to use JavaScript within WordPress.
 
--   The [Blocks Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) is the best place to start to learn more about block creation.
+-   Beginners: The [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md) walks through creating a block plugin using the `@wordpress/create-block` package; a quick and easy way to start creating your own block.
+
+-   Intermediate: The [Block Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) covers different aspects of block developement. The documentation is slightly dated but still valid, if you are new to block development, start with the Create Block Tutorial above.
 
 -   See the [Meta Boxes Tutorial](/docs/designers-developers/developers/tutorials/metabox/readme.md) for new ways of extending the editor storing and using post meta data.
 
