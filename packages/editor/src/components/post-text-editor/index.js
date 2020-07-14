@@ -9,8 +9,8 @@ import Textarea from 'react-autosize-textarea';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { useInstanceId, compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
 export function PostTextEditor( { onChange, onPersist, ...props } ) {
@@ -76,23 +76,25 @@ export function PostTextEditor( { onChange, onPersist, ...props } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getEditedPostContent } = select( 'core/editor' );
-		return {
-			value: getEditedPostContent(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
-		return {
-			onChange( content ) {
+export default function ComposedPostTextEditor() {
+	const value = useSelect(
+		( select ) => select( 'core/editor' ).getEditedPostContent(),
+		[]
+	);
+
+	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
+
+	return (
+		<PostTextEditor
+			value={ value }
+			onChange={ ( content ) => {
 				editPost( { content } );
-			},
-			onPersist( content ) {
+			} }
+			onPersist={ ( content ) => {
 				const blocks = parse( content );
+
 				resetEditorBlocks( blocks );
-			},
-		};
-	} ),
-] )( PostTextEditor );
+			} }
+		/>
+	);
+}
