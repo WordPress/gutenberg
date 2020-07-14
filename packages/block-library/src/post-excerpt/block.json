@@ -2,6 +2,9 @@
 	"name": "core/post-excerpt",
 	"category": "design",
 	"attributes": {
+		"align": {
+			"type": "string"
+		},
 		"wordCount": {
 			"type": "number",
 			"default": 55
@@ -18,6 +21,12 @@
 		"postId"
 	],
 	"supports": {
-		"html": false
+		"html": false,
+		"__experimentalFontSize": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
+		},
+		"__experimentalLineHeight": true
 	}
 }

@@ -1,9 +1,19 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useEntityProp, useEntityId } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-import { InspectorControls, RichText } from '@wordpress/block-editor';
+import {
+	AlignmentToolbar,
+	BlockControls,
+	InspectorControls,
+	RichText,
+} from '@wordpress/block-editor';
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -26,7 +36,7 @@ function usePostContentExcerpt( wordCount ) {
 }
 
 function PostExcerptEditor( {
-	attributes: { wordCount, moreText, showMoreOnNewLine },
+	attributes: { align, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
 } ) {
@@ -38,6 +48,14 @@ function PostExcerptEditor( {
 	const postContentExcerpt = usePostContentExcerpt( wordCount );
 	return (
 		<>
+			<BlockControls>
+				<AlignmentToolbar
+					value={ align }
+					onChange={ ( newAlign ) =>
+						setAttributes( { align: newAlign } )
+					}
+				/>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
 					{ ! excerpt && (
@@ -62,19 +80,36 @@ function PostExcerptEditor( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<RichText
-				className={
-					! showMoreOnNewLine &&
-					'wp-block-post-excerpt__excerpt is-inline'
-				}
-				placeholder={ postContentExcerpt }
-				value={ excerpt || ( isSelected ? '' : postContentExcerpt ) }
-				onChange={ setExcerpt }
-				keepPlaceholderOnFocus
-			/>
-			{ ! showMoreOnNewLine && ' ' }
-			{ showMoreOnNewLine ? (
-				<p>
+			<div
+				className={ classnames( 'wp-block-post-excerpt', {
+					[ `has-text-align-${ align }` ]: align,
+				} ) }
+			>
+				<RichText
+					className={
+						! showMoreOnNewLine &&
+						'wp-block-post-excerpt__excerpt is-inline'
+					}
+					placeholder={ postContentExcerpt }
+					value={
+						excerpt || ( isSelected ? '' : postContentExcerpt )
+					}
+					onChange={ setExcerpt }
+					keepPlaceholderOnFocus
+				/>
+				{ ! showMoreOnNewLine && ' ' }
+				{ showMoreOnNewLine ? (
+					<p>
+						<RichText
+							tagName="a"
+							placeholder={ __( 'Read more…' ) }
+							value={ moreText }
+							onChange={ ( newMoreText ) =>
+								setAttributes( { moreText: newMoreText } )
+							}
+						/>
+					</p>
+				) : (
 					<RichText
 						tagName="a"
 						placeholder={ __( 'Read more…' ) }
@@ -83,17 +118,8 @@ function PostExcerptEditor( {
 							setAttributes( { moreText: newMoreText } )
 						}
 					/>
-				</p>
-			) : (
-				<RichText
-					tagName="a"
-					placeholder={ __( 'Read more…' ) }
-					value={ moreText }
-					onChange={ ( newMoreText ) =>
-						setAttributes( { moreText: newMoreText } )
-					}
-				/>
-			) }
+				) }
+			</div>
 		</>
 	);
 }
