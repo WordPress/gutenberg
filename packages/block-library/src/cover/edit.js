@@ -302,6 +302,8 @@ function CoverEdit( {
 	}
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
+	const showFocalPointPicker =
+		isVideoBackground || ( isImageBackground && ! hasParallax );
 
 	const controls = (
 		<>
@@ -338,19 +340,7 @@ function CoverEdit( {
 								onChange={ toggleParallax }
 							/>
 						) }
-						{ isImageBackground && ! hasParallax && (
-							<FocalPointPicker
-								label={ __( 'Focal point picker' ) }
-								url={ url }
-								value={ focalPoint }
-								onChange={ ( newFocalPoint ) =>
-									setAttributes( {
-										focalPoint: newFocalPoint,
-									} )
-								}
-							/>
-						) }
-						{ isVideoBackground && (
+						{ showFocalPointPicker && (
 							<FocalPointPicker
 								label={ __( 'Focal point picker' ) }
 								url={ url }
