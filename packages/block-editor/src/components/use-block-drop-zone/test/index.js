@@ -83,8 +83,10 @@ describe( 'getNearestBlockIndex', () => {
 		expect( result ).toBeUndefined();
 	} );
 
-	it( 'returns `undefined` if the elements do not have the `data-block` attribute', () => {
-		const nonBlockElements = [ { dataset: {} } ];
+	it( 'returns `undefined` if the elements do not have the `wp-block` class', () => {
+		const nonBlockElements = [
+			{ classList: createMockClassList( 'some-other-class' ) },
+		];
 		const position = { x: 0, y: 0 };
 		const orientation = 'horizontal';
 
