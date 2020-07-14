@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { Svg } from 'react-native-svg';
+import { Animated } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,7 +26,16 @@ export {
 	Stop,
 } from 'react-native-svg';
 
-export const SVG = ( { className = '', isPressed, ...props } ) => {
+const AnimatedSvg = Animated.createAnimatedComponent(
+	forwardRef( ( props, ref ) => <Svg ref={ ref } { ...props } /> )
+);
+
+export const SVG = ( {
+	className = '',
+	isPressed,
+	animated = false,
+	...props
+} ) => {
 	const colorScheme = props.colorScheme || 'light';
 	const stylesFromClasses = className
 		.split( ' ' )
@@ -38,8 +53,10 @@ export const SVG = ( { className = '', isPressed, ...props } ) => {
 
 	const appliedProps = { ...props, style: styleValues };
 
+	const SvgWrapper = animated ? AnimatedSvg : Svg;
+
 	return (
-		<Svg
+		<SvgWrapper
 			//We want to re-render when style color is changed
 			key={ appliedProps.style.color }
 			height="100%"

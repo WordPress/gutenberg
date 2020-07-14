@@ -11,6 +11,7 @@
 		{ "docs/designers-developers/key-concepts.md": [] },
 		{ "docs/designers-developers/glossary.md": [] },
 		{ "docs/designers-developers/faq.md": [] },
+		{ "docs/contributors/versions-in-wordpress.md": [] },
 		{ "docs/contributors/history.md": [] },
 		{ "docs/contributors/outreach.md": [] }
 	] },
@@ -98,7 +99,8 @@
 			{ "docs/designers-developers/developers/tutorials/javascript/troubleshooting.md": [] },
 			{ "docs/designers-developers/developers/tutorials/javascript/versions-and-building.md": [] },
 			{ "docs/designers-developers/developers/tutorials/javascript/scope-your-code.md": [] },
-			{ "docs/designers-developers/developers/tutorials/javascript/js-build-setup.md": [] }
+			{ "docs/designers-developers/developers/tutorials/javascript/js-build-setup.md": [] },
+			{ "docs/designers-developers/developers/tutorials/javascript/esnext-js.md": [] }
 		] },
 		{ "docs/designers-developers/developers/tutorials/block-tutorial/readme.md": [
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md": [] },

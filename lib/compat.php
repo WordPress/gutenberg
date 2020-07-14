@@ -639,3 +639,20 @@ function gutenberg_output_html_nav_menu_item( $item_output, $item, $depth, $args
 	return $item_output;
 }
 add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_html_nav_menu_item', 10, 4 );
+
+/**
+ * Amends the paths to preload when initializing edit post.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50606
+ *
+ * @since 8.4.0
+ *
+ * @param  array $preload_paths Default path list that will be preloaded.
+ * @return array Modified path list to preload.
+ */
+function gutenberg_preload_edit_post( $preload_paths ) {
+	$additional_paths = array( '/?context=edit' );
+	return array_merge( $preload_paths, $additional_paths );
+}
+
+add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );

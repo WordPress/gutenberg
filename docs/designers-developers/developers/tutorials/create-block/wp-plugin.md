@@ -156,4 +156,4 @@ For more info, see the build section of the [Getting Started with JavaScript tut
 
 Hopefully, at this point, you have your plugin created and activated. We have the package.json with the `@wordpress/scripts` dependency, that defines the build and start scripts. The basic block is in place and can be added to the editor.
 
-Next Section: [ESNext Syntax](esnext-js.md)
+Next Section: [Anatomy of a Block](block-anatomy.md)

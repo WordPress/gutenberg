@@ -92,7 +92,7 @@ export function BlockTypesTab( {
 	}, [ filteredItems, categories ] );
 
 	const itemsPerCollection = useMemo( () => {
-		// Create a new Object to avoid mutating collection
+		// Create a new Object to avoid mutating collection.
 		const result = { ...collections };
 		Object.keys( collections ).forEach( ( namespace ) => {
 			result[ namespace ] = filteredItems.filter(
@@ -106,7 +106,10 @@ export function BlockTypesTab( {
 		return result;
 	}, [ filteredItems, collections ] );
 
-	// Announce search results on change
+	// Hide block preview on unmount.
+	useEffect( () => () => onHover( null ), [] );
+
+	// Announce search results on change.
 	useEffect( () => {
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
