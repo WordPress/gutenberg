@@ -99,7 +99,7 @@ function PostExcerptEditor( {
 				/>
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
-					<p>
+					<p className="wp-block-post-excerpt__more-text">
 						<RichText
 							tagName="a"
 							placeholder={ __( 'Read more…' ) }

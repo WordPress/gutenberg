@@ -33,9 +33,9 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		$classes .= ' has-text-align-' . $attributes['align'];
 	}
 
-	$output = sprintf('<div class="%1$s">', esc_attr( $classes) ) . '<p>' . get_the_excerpt( $block->context['postId'] );
+	$output = sprintf('<div class="%1$s">', esc_attr( $classes) ) . '<p class="wp-block-post-excerpt__excerpt">' . get_the_excerpt( $block->context['postId'] );
 	if ( ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'] ) {
-		$output .= '</p>' . '<p>' . $more_text . '</p>';
+		$output .= '</p>' . '<p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
 	} else {
 		$output .= ' ' . $more_text . '</p>' . '</div>';
 	}
