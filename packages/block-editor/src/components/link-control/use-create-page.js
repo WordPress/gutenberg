@@ -2,15 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
 
-export default function useCreatePage( customCreatePage = null ) {
-	const { saveEntityRecord } = useDispatch( 'core' );
-
-	async function genericCreatePage( pageTitle ) {
+export default function useCreatePage( requestNewPage ) {
+	async function handleCreatePage( pageTitle ) {
 		const type = 'page';
-		const page = await saveEntityRecord( 'postType', type, {
+		const page = await requestNewPage( type, {
 			title: pageTitle,
 			status: 'publish',
 		} );
@@ -22,8 +19,6 @@ export default function useCreatePage( customCreatePage = null ) {
 			url: page.link,
 		};
 	}
-
-	const handleCreatePage = customCreatePage || genericCreatePage;
 
 	const cancelableCreateSuggestion = useRef();
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );

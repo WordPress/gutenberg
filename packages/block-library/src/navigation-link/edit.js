@@ -9,7 +9,7 @@ import { escape, get, head, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, withDispatch, withSelect } from '@wordpress/data';
 import {
 	KeyboardShortcuts,
 	PanelBody,
@@ -63,6 +63,7 @@ function NavigationLinkEdit( {
 		url,
 		opensInNewTab,
 	};
+	const { saveEntityRecord } = useDispatch( 'core' );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
@@ -115,6 +116,10 @@ function NavigationLinkEdit( {
 		range.selectNodeContents( ref.current );
 		selection.removeAllRanges();
 		selection.addRange( range );
+	}
+
+	function handleCreatePage( type, data ) {
+		return saveEntityRecord( 'postType', type, data );
 	}
 
 	return (
@@ -217,6 +222,7 @@ function NavigationLinkEdit( {
 								value={ link }
 								showInitialSuggestions={ true }
 								withCreateSuggestion={ userCanCreatePages }
+								createSuggestion={ handleCreatePage }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',

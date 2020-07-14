@@ -83,9 +83,10 @@ const LinkControlSearchInput = ( {
 					selectedSuggestion.title
 				);
 				if ( suggestion?.url ) {
-					onChange( suggestion.url );
+					onSelect( suggestion );
 				}
 			} catch ( e ) {}
+			return;
 		}
 
 		if (
