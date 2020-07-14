@@ -18,8 +18,8 @@ const CACHE_FILE_NAME = 'wp-env-cache.json';
  * existing cache value. For example, we can use this to check if the configuration
  * has changed in a new run of wp-env start.
  *
- * @param {string}           key     A unique identifier for the cache.
- * @param {any}              value   The value to check against the existing cache.
+ * @param {string}            key     A unique identifier for the cache.
+ * @param {any}               value   The value to check against the existing cache.
  * @param {WPEnvCacheOptions} options Parsing options
  *
  * @return {boolean} If true, the value is different from the cache which exists.
@@ -34,8 +34,8 @@ async function didCacheChange( key, value, options ) {
  * file if it does not exist yet, and overwrites the existing cache value for the
  * given key if it already exists.
  *
- * @param {string}           key     A unique identifier for the cache.
- * @param {any}              value   The value to persist.
+ * @param {string}            key     A unique identifier for the cache.
+ * @param {any}               value   The value to persist.
  * @param {WPEnvCacheOptions} options Parsing options
  */
 async function setCache( key, value, options ) {
@@ -53,7 +53,7 @@ async function setCache( key, value, options ) {
  * Returns undefined if the key does not exist or if the cache file has not been
  * created yet.
  *
- * @param {string}           key     The unique identifier for the cache value.
+ * @param {string}            key     The unique identifier for the cache value.
  * @param {WPEnvCacheOptions} options Parsing options
  *
  * @return {any?} The cache value. Undefined if it has not been set or if the cache
