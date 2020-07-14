@@ -1128,6 +1128,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToolbarButton",
+		"slug": "toolbar-button",
+		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Toolbar",
 		"slug": "toolbar",
 		"markdown_source": "../packages/components/src/toolbar/README.md",
