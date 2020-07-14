@@ -1,5 +1,8 @@
 name: React Native E2E Tests (iOS)
-on: pull_request
+on:
+  pull_request:
+    paths-ignore:
+    - '**.md'
 
 jobs:
   test:
@@ -31,7 +34,7 @@ jobs:
       with:
         path: packages/react-native-editor/ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app
         key: ${{ runner.os }}-ios-build-${{ hashFiles('ios-checksums.txt') }}
-    
+
     - name: Restore pods cache
       uses: actions/cache@v2
       with:

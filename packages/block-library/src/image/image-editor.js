@@ -192,6 +192,8 @@ export default function ImageEditor( {
 			attrs.rotation = rotation;
 		}
 
+		attrs.src = url;
+
 		apiFetch( {
 			path: `wp/v2/media/${ id }/edit`,
 			method: 'POST',
