@@ -26,7 +26,7 @@ export const KeyboardAvoidingView = ( {
 	...otherProps
 } ) => {
 	const [ keyboardHeight, setKeyboardHeight ] = useState( 0 );
-	const animatedHeight = useRef( new Animated.Value( 44 ) ).current;
+	const animatedHeight = useRef( new Animated.Value( MIN_HEIGHT ) ).current;
 
 	const { height: fullHeight } = Dimensions.get( 'window' );
 	const keyboardVerticalOffset = fullHeight - parentHeight;
@@ -53,8 +53,7 @@ export const KeyboardAvoidingView = ( {
 	}
 
 	const paddedKeyboardHeight =
-		keyboardHeight +
-		( style.bottom ? MIN_HEIGHT - style.bottom : MIN_HEIGHT );
+		keyboardHeight + MIN_HEIGHT - ( style.bottom || 0 );
 
 	function animate() {
 		Animated.timing( animatedHeight, {
