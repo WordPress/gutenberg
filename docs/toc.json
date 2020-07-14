@@ -92,6 +92,7 @@
 		{ "docs/contributors/repository-management.md": [] }
 	] },
 	{ "docs/designers-developers/developers/tutorials/readme.md": [
+		{ "docs/designers-developers/developers/tutorials/devenv/readme.md": [] },
 		{ "docs/designers-developers/developers/tutorials/javascript/readme.md": [
 			{ "docs/designers-developers/developers/tutorials/javascript/plugins-background.md": [] },
 			{ "docs/designers-developers/developers/tutorials/javascript/loading-javascript.md": [] },

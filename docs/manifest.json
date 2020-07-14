@@ -462,6 +462,12 @@
 		"parent": null
 	},
 	{
+		"title": "Development Environment",
+		"slug": "devenv",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/devenv/readme.md",
+		"parent": "tutorials"
+	},
+	{
 		"title": "Getting Started with JavaScript",
 		"slug": "javascript",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/readme.md",
