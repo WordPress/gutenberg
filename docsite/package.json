@@ -5,24 +5,26 @@
   "description": "Block Editor Handbook documentation.",
   "author": "The WordPress Contributors",
   "license": "GPL-2.0-or-later",
-	"keywords": [
+  "keywords": [
     "WordPress",
     "gutenberg",
-		"documentation"
-	],
+    "documentation"
+  ],
   "homepage": "https://github.com/WordPress/gutenberg/",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "docsite"
-	},
-	"bugs": {
-		"url": "https://github.com/WordPress/gutenberg/issues"
-	},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WordPress/gutenberg.git",
+    "directory": "docsite"
+  },
+  "bugs": {
+    "url": "https://github.com/WordPress/gutenberg/issues"
+  },
   "dependencies": {
     "@docusaurus/core": "2.0.0-alpha.58",
     "@docusaurus/preset-classic": "2.0.0-alpha.58",
-    "clsx": "^1.1.1"
+    "clsx": "^1.1.1",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4"
   },
   "browserslist": {
     "production": [
@@ -36,8 +38,8 @@
       "last 1 safari version"
     ]
   },
-	"publishConfig": {
-		"access": "public"
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "start": "docusaurus start",
