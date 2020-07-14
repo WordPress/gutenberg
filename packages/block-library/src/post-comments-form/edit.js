@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 export default function PostCommentsFormEdit() {
-	return 'Post Comments Form Placeholder';
+	return __( 'Post Comments Form' );
 }

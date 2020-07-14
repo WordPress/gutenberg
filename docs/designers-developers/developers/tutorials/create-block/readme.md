@@ -14,7 +14,7 @@ From your plugins directory, to create your block run:
 npx @wordpress/create-block starter-block
 ```
 
-The above command will ask you a few questions to customize, then will create a new directory called `starter-block`, installs the necessary files, and builds the block plugin.
+The above command creates a new directory called `starter-block`, installs the necessary files, and builds the block plugin. If you want an interactive mode that prompts you for details, run the command without the `starter-block` name.
 
 You now need to activate the plugin from inside wp-admin plugins page.
 
@@ -24,9 +24,8 @@ After activated, go to the block editor and use the inserter to search and add y
 
 1. [Development Environment](devenv.md)
 2. [WordPress Plugin](wp-plugin.md)
-3. [ESNext Syntax](esnext-js.md)
-4. [Anatomy of a Gutenberg Block](block-anatomy.md)
-5. [Block Attributes](block-attributes.md)
-6. [Code Implementation](block-code.md)
-7. [Authoring Experience](author-experience.md)
-8. [Finishing Touches](finishing.md)
+3. [Anatomy of a Block](block-anatomy.md)
+4. [Block Attributes](block-attributes.md)
+5. [Code Implementation](block-code.md)
+6. [Authoring Experience](author-experience.md)
+7. [Finishing Touches](finishing.md)

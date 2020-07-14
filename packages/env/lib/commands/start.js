@@ -19,13 +19,17 @@ const rimraf = util.promisify( require( 'rimraf' ) );
 const retry = require( '../retry' );
 const stop = require( './stop' );
 const initConfig = require( '../init-config' );
-const downloadSource = require( '../download-source' );
+const downloadSources = require( '../download-sources' );
 const {
 	checkDatabaseConnection,
 	makeContentDirectoriesWritable,
 	configureWordPress,
-	copyCoreFiles,
+	setupWordPressDirectories,
 } = require( '../wordpress' );
+
+/**
+ * @typedef {import('../config').Config} Config
+ */
 
 /**
  * Starts the development server.
@@ -54,65 +58,16 @@ module.exports = async function start( { spinner, debug } ) {
 
 	spinner.text = 'Downloading WordPress.';
 
-	const progresses = {};
-	const getProgressSetter = ( id ) => ( progress ) => {
-		progresses[ id ] = progress;
-		spinner.text =
-			'Downloading WordPress.\n' +
-			Object.entries( progresses )
-				.map(
-					( [ key, value ] ) =>
-						`  - ${ key }: ${ ( value * 100 ).toFixed( 0 ) }/100%`
-				)
-				.join( '\n' );
-	};
-
 	await Promise.all( [
 		// Preemptively start the database while we wait for sources to download.
 		dockerCompose.upOne( 'mysql', {
 			config: config.dockerComposeConfigPath,
 			log: config.debug,
 		} ),
-
-		( async () => {
-			if ( config.coreSource ) {
-				await downloadSource( config.coreSource, {
-					onProgress: getProgressSetter( 'core' ),
-					spinner,
-					debug: config.debug,
-				} );
-				await copyCoreFiles(
-					config.coreSource.path,
-					config.coreSource.testsPath
-				);
-
-				// Ensure the tests uploads folder is writeable for travis,
-				// creating the folder if necessary.
-				const testsUploadsPath = path.join(
-					config.coreSource.testsPath,
-					'wp-content/uploads'
-				);
-				await fs.mkdir( testsUploadsPath, { recursive: true } );
-				await fs.chmod( testsUploadsPath, 0o0767 );
-			}
-		} )(),
-
-		...config.pluginSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
-
-		...config.themeSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
+		downloadSources( config, spinner ),
 	] );
+
+	await setupWordPressDirectories( config );
 
 	spinner.text = 'Starting WordPress.';
 
@@ -144,10 +99,12 @@ module.exports = async function start( { spinner, debug } ) {
 
 	// Retry WordPress installation in case MySQL *still* wasn't ready.
 	await Promise.all( [
-		retry( () => configureWordPress( 'development', config ), {
+		retry( () => configureWordPress( 'development', config, spinner ), {
 			times: 2,
 		} ),
-		retry( () => configureWordPress( 'tests', config ), { times: 2 } ),
+		retry( () => configureWordPress( 'tests', config, spinner ), {
+			times: 2,
+		} ),
 	] );
 
 	spinner.text = 'WordPress started.';

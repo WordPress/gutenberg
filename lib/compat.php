@@ -334,12 +334,84 @@ function gutenberg_add_dom_rect_polyfill( $scripts ) {
 add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
 
 /**
+ * Adds a wp.date.setSettings with timezone abbr parameter
+ *
+ * This can be removed when plugin support requires WordPress 5.6.0+.
+ *
+ * The script registration occurs in core wp-includes/script-loader.php
+ * wp_default_packages_inline_scripts()
+ *
+ * @since 8.6.0
+ *
+ * @param WP_Scripts $scripts WP_Scripts object.
+ */
+function gutenberg_add_date_settings_timezone( $scripts ) {
+	if ( ! did_action( 'init' ) ) {
+		return;
+	}
+
+	global $wp_locale;
+
+	// Calculate the timezone abbr (EDT, PST) if possible.
+	$timezone_string = get_option( 'timezone_string', 'UTC' );
+	$timezone_abbr   = '';
+
+	if ( ! empty( $timezone_string ) ) {
+		$timezone_date = new DateTime( null, new DateTimeZone( $timezone_string ) );
+		$timezone_abbr = $timezone_date->format( 'T' );
+	}
+
+	$scripts->add_inline_script(
+		'wp-date',
+		sprintf(
+			'wp.date.setSettings( %s );',
+			wp_json_encode(
+				array(
+					'l10n'     => array(
+						'locale'        => get_user_locale(),
+						'months'        => array_values( $wp_locale->month ),
+						'monthsShort'   => array_values( $wp_locale->month_abbrev ),
+						'weekdays'      => array_values( $wp_locale->weekday ),
+						'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
+						'meridiem'      => (object) $wp_locale->meridiem,
+						'relative'      => array(
+							/* translators: %s: Duration. */
+							'future' => __( '%s from now', 'default' ),
+							/* translators: %s: Duration. */
+							'past'   => __( '%s ago', 'default' ),
+						),
+					),
+					'formats'  => array(
+						/* translators: Time format, see https://www.php.net/date */
+						'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
+						/* translators: Date format, see https://www.php.net/date */
+						'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
+						/* translators: Date/Time format, see https://www.php.net/date */
+						'datetime'            => __( 'F j, Y g:i a', 'default' ),
+						/* translators: Abbreviated date/time format, see https://www.php.net/date */
+						'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
+					),
+					'timezone' => array(
+						'offset' => get_option( 'gmt_offset', 0 ),
+						'string' => $timezone_string,
+						'abbr'   => $timezone_abbr,
+					),
+				)
+			)
+		),
+		'after'
+	);
+}
+add_action( 'wp_default_scripts', 'gutenberg_add_date_settings_timezone', 20 );
+
+/**
  * Filters default block categories to substitute legacy category names with new
  * block categories.
  *
  * This can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/50278
+ * @see https://core.trac.wordpress.org/changeset/48177
  *
  * @param array[] $default_categories Array of block categories.
  *
@@ -401,6 +473,7 @@ add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
  * This can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/49927
+ * @see https://core.trac.wordpress.org/changeset/48243
  *
  * @param string|null $pre_render   The pre-rendered content. Defaults to null.
  * @param array       $parsed_block The parsed block being rendered.
@@ -458,20 +531,6 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	return $block->render();
 }
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
-
-/**
- * Avoid enqueueing block assets of all registered blocks for all posts, instead
- * deferring to block render mechanics to enqueue scripts, thereby ensuring only
- * blocks of the content have their assets enqueued.
- *
- * This can be removed once minimum support for the plugin is outside the range
- * of the version associated with closure of the following ticket.
- *
- * @see https://core.trac.wordpress.org/ticket/50328
- *
- * @see WP_Block::render
- */
-remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
 
 /**
  * Shim that hooks into `wp_update_nav_menu_item` and makes it so that nav menu
@@ -580,3 +639,20 @@ function gutenberg_output_html_nav_menu_item( $item_output, $item, $depth, $args
 	return $item_output;
 }
 add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_html_nav_menu_item', 10, 4 );
+
+/**
+ * Amends the paths to preload when initializing edit post.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50606
+ *
+ * @since 8.4.0
+ *
+ * @param  array $preload_paths Default path list that will be preloaded.
+ * @return array Modified path list to preload.
+ */
+function gutenberg_preload_edit_post( $preload_paths ) {
+	$additional_paths = array( '/?context=edit' );
+	return array_merge( $preload_paths, $additional_paths );
+}
+
+add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );

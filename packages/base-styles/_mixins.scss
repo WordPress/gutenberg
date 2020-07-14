@@ -361,6 +361,9 @@
 		margin: 8px 0 0 8px;
 		background-color: $white;
 
+		// This border serves as a background color in Windows High Contrast mode.
+		border: 3px solid $white;
+
 		@include break-medium() {
 			width: 6px;
 			height: 6px;

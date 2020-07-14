@@ -29,6 +29,7 @@ if (
 	 * This filter can be removed when plugin support requires WordPress 5.5.0+.
 	 *
 	 * @see https://core.trac.wordpress.org/ticket/48654
+	 * @see https://core.trac.wordpress.org/changeset/48295
 	 *
 	 * @param string $tag     The `<script>` tag for the enqueued script.
 	 * @param string $handle  The script's registered handle.

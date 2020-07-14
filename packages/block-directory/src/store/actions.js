@@ -8,6 +8,7 @@ import { apiFetch, dispatch, select } from '@wordpress/data-controls';
  * Internal dependencies
  */
 import { loadAssets } from './controls';
+import getPluginUrl from './utils/get-plugin-url';
 
 /**
  * Returns an action object used in signalling that the downloadable blocks
@@ -54,16 +55,35 @@ export function* installBlockType( block ) {
 			throw new Error( __( 'Block has no assets.' ) );
 		}
 		yield setIsInstalling( block.id, true );
-		const response = yield apiFetch( {
-			path: 'wp/v2/plugins',
-			data: {
-				slug: block.id,
-				status: 'active',
-			},
-			method: 'POST',
+
+		// If we have a wp:plugin link, the plugin is installed but inactive.
+		const url = getPluginUrl( block );
+		let links = {};
+		if ( url ) {
+			yield apiFetch( {
+				url,
+				data: {
+					status: 'active',
+				},
+				method: 'PUT',
+			} );
+		} else {
+			const response = yield apiFetch( {
+				path: 'wp/v2/plugins',
+				data: {
+					slug: block.id,
+					status: 'active',
+				},
+				method: 'POST',
+			} );
+			// Add the `self` link for newly-installed blocks.
+			links = response._links;
+		}
+
+		yield addInstalledBlockType( {
+			...block,
+			links: { ...block.links, ...links },
 		} );
-		const endpoint = response?._links?.self[ 0 ]?.href;
-		yield addInstalledBlockType( { ...block, endpoint } );
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
@@ -112,14 +132,14 @@ export function* installBlockType( block ) {
 export function* uninstallBlockType( block ) {
 	try {
 		yield apiFetch( {
-			url: block.endpoint,
+			url: getPluginUrl( block ),
 			data: {
 				status: 'inactive',
 			},
 			method: 'PUT',
 		} );
 		yield apiFetch( {
-			url: block.endpoint,
+			url: getPluginUrl( block ),
 			method: 'DELETE',
 		} );
 		yield removeInstalledBlockType( block );
