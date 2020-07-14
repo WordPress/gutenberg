@@ -29,11 +29,11 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	);
 
 	$classes = 'wp-block-post-excerpt';
-	if( isset($attributes['align']) ) {
+	if ( isset( $attributes['align'] ) ) {
 		$classes .= ' has-text-align-' . $attributes['align'];
 	}
 
-	$output = sprintf('<div class="%1$s">', esc_attr( $classes) ) . '<p class="wp-block-post-excerpt__excerpt">' . get_the_excerpt( $block->context['postId'] );
+	$output = sprintf( '<div class="%1$s">', esc_attr( $classes ) ) . '<p class="wp-block-post-excerpt__excerpt">' . get_the_excerpt( $block->context['postId'] );
 	if ( ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'] ) {
 		$output .= '</p>' . '<p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
 	} else {
