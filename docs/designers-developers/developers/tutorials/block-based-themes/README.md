@@ -32,7 +32,7 @@ Each template or template part contains the [block grammar](https://developer.wo
 The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
 
 ### Required files and file structure
-A block based theme requires an index.php file, an index template file, a style.css file and a functions.php file.
+A block based theme requires an index.php file, an index template file, a style.css file, and a functions.php file.
 
 The theme may optionally include an experimental-theme.json file to manage global styles.
 You decide what additional templates and template parts to include in your theme.
