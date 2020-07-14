@@ -306,7 +306,10 @@ export class FocalPointPicker extends Component {
 						role="button"
 						tabIndex="-1"
 					>
-						<Grid bounds={ bounds } percentages={ percentages } />
+						<Grid
+							bounds={ bounds }
+							value={ percentages.x + percentages.y }
+						/>
 						<Media
 							alt={ __( 'Media preview' ) }
 							autoPlay={ autoPlay }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,17 +11,16 @@ import {
 	GridLineX,
 	GridLineY,
 } from './styles/focal-point-picker-style';
+import { useUpdateEffect } from '../utils/hooks';
+
+const { clearTimeout, setTimeout } = window;
 
 export default function FocalPointPickerGrid( {
 	bounds = {},
-	percentages = {
-		x: 0.5,
-		y: 0.5,
-	},
+	value,
 	...props
 } ) {
-	const percentageValue = percentages.x + percentages.y;
-	const animationProps = useRevealAnimation( percentageValue );
+	const animationProps = useRevealAnimation( value );
 	const style = {
 		width: bounds.width,
 		height: bounds.height,
@@ -49,28 +48,14 @@ export default function FocalPointPickerGrid( {
  */
 function useRevealAnimation( value ) {
 	const [ isActive, setIsActive ] = useState( false );
-	const valueRef = useRef( value );
-	const timeoutRef = useRef();
 
-	const clearTimer = () => {
-		if ( timeoutRef.current ) {
-			window.clearTimeout( timeoutRef.current );
-		}
-	};
+	useUpdateEffect( () => {
+		setIsActive( true );
+		const timeout = setTimeout( () => {
+			setIsActive( false );
+		}, 600 );
 
-	useEffect( () => {
-		if ( value !== valueRef.current ) {
-			setIsActive( true );
-			valueRef.current = value;
-
-			clearTimer();
-
-			timeoutRef.current = setTimeout( () => {
-				setIsActive( false );
-			}, 600 );
-		}
-
-		return () => clearTimer();
+		return () => clearTimeout( timeout );
 	}, [ value ] );
 
 	return {
