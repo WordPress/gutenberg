@@ -93,12 +93,23 @@ const Cover = ( {
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
-	const COVER_DEFAULT_PALETTE = {
-		colors: settings.colors.filter( ( c ) =>
-			[ 'black', 'white', 'vivid-cyan-blue', 'pale-pink' ].includes(
-				c.slug
-			)
-		),
+	const DEFAULT_COLORS = [
+		{
+			name: __( 'Black' ),
+			slug: 'black',
+			color: '#000000',
+		},
+		{
+			name: __( 'White' ),
+			slug: 'white',
+			color: '#ffffff',
+		},
+	];
+
+	const THEME_COLORS_COUNT = 2;
+	const themeColors = settings.colors.slice( 0, THEME_COLORS_COUNT );
+	const coverDefaultPalette = {
+		colors: [ ...DEFAULT_COLORS, ...themeColors ],
 	};
 
 	const { gradientValue } = __experimentalUseGradient();
@@ -348,7 +359,7 @@ const Cover = ( {
 							customStyles={ styles }
 							setColor={ setColor }
 							onCustomPress={ noop }
-							defaultSettings={ COVER_DEFAULT_PALETTE }
+							defaultSettings={ coverDefaultPalette }
 							shouldShowCustomIndicatorOption={ false }
 							shouldShowCustomLabel={ false }
 						/>
