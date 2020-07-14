@@ -7,7 +7,7 @@ import { once, uniqueId, omit } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-import { ifCondition } from '@wordpress/compose';
+import { ifCondition, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
@@ -118,6 +118,15 @@ function useAutosaveNotice() {
 				],
 			}
 		);
+	}, [ isEditedPostNew, postId ] );
+
+	// Once the isEditedPostNew changes from true to false, let's clear the auto-draft autosave.
+	const wasEditedPostNew = usePrevious( isEditedPostNew );
+	const prevPostId = usePrevious( postId );
+	useEffect( () => {
+		if ( prevPostId === postId && wasEditedPostNew && ! isEditedPostNew ) {
+			localAutosaveClear( postId, true );
+		}
 	}, [ isEditedPostNew, postId ] );
 }
 
