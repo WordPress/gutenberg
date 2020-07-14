@@ -29,8 +29,8 @@ import { roundClamp } from '../utils/math';
 import { INITIAL_BOUNDS } from './utils';
 
 export class FocalPointPicker extends Component {
-	constructor( props, context ) {
-		super( props, context );
+	constructor( props ) {
+		super( ...arguments );
 
 		this.state = {
 			isDragging: false,
