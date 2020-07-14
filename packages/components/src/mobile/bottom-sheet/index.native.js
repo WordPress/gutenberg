@@ -271,6 +271,7 @@ class BottomSheet extends Component {
 			contentStyle = {},
 			getStylesFromColorScheme,
 			onDismiss,
+			isChildrenScrollable,
 			children,
 			...rest
 		} = this.props;
@@ -319,6 +320,30 @@ class BottomSheet extends Component {
 			styles.backgroundDark
 		);
 
+		const listProps = {
+			disableScrollViewPanResponder: true,
+			bounces,
+			onScroll: this.onScroll,
+			onScrollBeginDrag: this.onScrollBeginDrag,
+			onScrollEndDrag: this.onScrollEndDrag,
+			scrollEventThrottle: 16,
+			contentContainerStyle: [
+				styles.content,
+				hideHeader && styles.emptyHeader,
+				contentStyle,
+				isChildrenScrollable && {
+					flexGrow: 1,
+					paddingBottom:
+						safeAreaBottomInset || styles.content.paddingRight,
+				},
+			],
+			style: isMaxHeightSet ? { maxHeight } : {},
+			scrollEnabled,
+			automaticallyAdjustContentInsets: false,
+		};
+
+		const WrapperView = isChildrenScrollable ? View : ScrollView;
+
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -358,21 +383,10 @@ class BottomSheet extends Component {
 				>
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
-					<ScrollView
-						disableScrollViewPanResponder
-						bounces={ bounces }
-						onScroll={ this.onScroll }
-						onScrollBeginDrag={ () => this.isScrolling( true ) }
-						onScrollEndDrag={ () => this.isScrolling( false ) }
-						scrollEventThrottle={ 16 }
-						style={ isMaxHeightSet ? { maxHeight } : {} }
-						contentContainerStyle={ [
-							styles.content,
-							hideHeader && styles.emptyHeader,
-							contentStyle,
-						] }
-						scrollEnabled={ scrollEnabled }
-						automaticallyAdjustContentInsets={ false }
+					<WrapperView
+						{ ...( isChildrenScrollable
+							? { style: listProps.style }
+							: listProps ) }
 					>
 						<BottomSheetProvider
 							value={ {
@@ -388,6 +402,7 @@ class BottomSheet extends Component {
 								onReplaceSubsheet: this.onReplaceSubsheet,
 								extraProps,
 								currentScreen,
+								listProps,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>
@@ -395,7 +410,7 @@ class BottomSheet extends Component {
 							</TouchableHighlight>
 						</BottomSheetProvider>
 						<View style={ { height: safeAreaBottomInset } } />
-					</ScrollView>
+					</WrapperView>
 				</KeyboardAvoidingView>
 			</Modal>
 		);
