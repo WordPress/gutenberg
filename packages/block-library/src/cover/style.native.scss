@@ -96,6 +96,14 @@
 	height: 100%;
 }
 
+.clearMediaButton {
+	color: $alert-red;
+}
+
+.colorPaletteWrapper {
+	min-height: 58px;
+}
+
 .contentContainer {
 	flex-direction: row;
 	padding: 0 $grid-unit-20;
@@ -105,27 +113,16 @@
 	padding-bottom: $grid-unit-20;
 }
 
-.verticalSeparator {
-	border-width: 0;
-	margin-right: $grid-unit-20 / 2;
-}
-
-.verticalSeparatorDark {
-	border-width: 0;
-}
-
 .colorIndicator {
-	margin-top: 8px;
-	margin-bottom: 8px;
-	width: 24px;
-	height: 24px;
+	width: 32px;
+	height: 32px;
 }
 
 .customIndicatorWrapper {
 	flex-direction: row;
 	align-items: baseline;
-	width: 24px;
-	height: 24px;
+	width: 32px;
+	height: 32px;
 }
 
 .circleOption {

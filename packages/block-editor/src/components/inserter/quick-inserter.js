@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { orderBy } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
@@ -46,7 +51,11 @@ function QuickInserterList( {
 	onHover,
 } ) {
 	const shownBlockTypes = useMemo(
-		() => blockTypes.slice( 0, SHOWN_BLOCK_TYPES ),
+		() =>
+			orderBy( blockTypes, [ 'frecency' ], [ 'desc' ] ).slice(
+				0,
+				SHOWN_BLOCK_TYPES
+			),
 		[ blockTypes ]
 	);
 	const shownBlockPatterns = useMemo(

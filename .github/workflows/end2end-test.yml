@@ -2,8 +2,12 @@ name: End-to-End Tests
 
 on:
   pull_request:
+    paths-ignore:
+    - '**.md'
   push:
     branches: [master]
+    paths-ignore:
+    - '**.md'
 
 jobs:
   admin-1:

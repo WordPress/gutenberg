@@ -18,6 +18,7 @@ import {
 	ImageWithFocalPoint,
 	PanelBody,
 	RangeControl,
+	BottomSheet,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
@@ -70,31 +71,6 @@ const INNER_BLOCKS_TEMPLATE = [
 const COVER_MAX_HEIGHT = 1000;
 const COVER_DEFAULT_HEIGHT = 300;
 
-const COVER_DEFAULT_PALETTE = {
-	colors: [
-		{
-			name: __( 'Black' ),
-			slug: 'black',
-			color: '#000000',
-		},
-		{
-			name: __( 'White' ),
-			slug: 'white',
-			color: '#ffffff',
-		},
-		{
-			name: __( 'Vivid cyan blue' ),
-			slug: 'vivid-cyan-blue',
-			color: '#0693e3',
-		},
-		{
-			name: __( 'Pale pink' ),
-			slug: 'pale-pink',
-			color: '#f78da7',
-		},
-	],
-};
-
 const Cover = ( {
 	attributes,
 	getStylesFromColorScheme,
@@ -103,6 +79,7 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 	openGeneralSidebar,
+	settings,
 	closeSettingsBottomSheet,
 } ) => {
 	const {
@@ -116,6 +93,14 @@ const Cover = ( {
 		customOverlayColor,
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const COVER_DEFAULT_PALETTE = {
+		colors: settings.colors.filter( ( c ) =>
+			[ 'black', 'white', 'vivid-cyan-blue', 'pale-pink' ].includes(
+				c.slug
+			)
+		),
+	};
 
 	const { gradientValue } = __experimentalUseGradient();
 
@@ -270,6 +255,20 @@ const Cover = ( {
 					style={ styles.rangeCellContainer }
 				/>
 			</PanelBody>
+
+			{ url ? (
+				<PanelBody title={ __( 'Media' ) }>
+					<BottomSheet.Cell
+						leftAlign
+						label={ __( 'Clear Media' ) }
+						labelStyle={ styles.clearMediaButton }
+						onPress={ () => {
+							setAttributes( { id: undefined, url: undefined } );
+							closeSettingsBottomSheet();
+						} }
+					/>
+				</PanelBody>
+			) : null }
 		</InspectorControls>
 	);
 
@@ -381,13 +380,15 @@ const Cover = ( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onFocus={ onFocus }
 				>
-					<ColorPalette
-						customStyles={ styles }
-						setColor={ setColor }
-						onCustomPress={ openCustomColorPicker }
-						defaultSettings={ COVER_DEFAULT_PALETTE }
-						shouldShowCustomLabel={ false }
-					/>
+					<View style={ styles.colorPaletteWrapper }>
+						<ColorPalette
+							customStyles={ styles }
+							setColor={ setColor }
+							onCustomPress={ openCustomColorPicker }
+							defaultSettings={ COVER_DEFAULT_PALETTE }
+							shouldShowCustomLabel={ false }
+						/>
+					</View>
 				</MediaPlaceholder>
 			</View>
 		);
@@ -415,6 +416,7 @@ const Cover = ( {
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				isReplacingMedia={ true }
 				onSelect={ onSelectMedia }
 				render={ renderBackground }
 			/>
@@ -443,7 +445,10 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
+		const { getSettings } = select( 'core/block-editor' );
+
 		return {
+			settings: getSettings(),
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),
