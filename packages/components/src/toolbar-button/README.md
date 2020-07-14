@@ -22,5 +22,5 @@ This component accepts [the same API of the Button](https://developer.wordpress.
 
 ## Related components
 
-* If you wish to implement a control do select options grouped as icon buttons you can use the [Toolbar](https://developer.wordpress.org/block-editor/components/toolbar/) component, which already handles this strategy.
+* If you wish to implement a control to select options grouped as icon buttons you can use the [Toolbar](https://developer.wordpress.org/block-editor/components/toolbar/) component, which already handles this strategy.
 * The ToolbarButton may be used with other elements such as [Dropdown](https://developer.wordpress.org/block-editor/components/dropdown/) to display options in a popover.
