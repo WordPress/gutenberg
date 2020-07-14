@@ -148,29 +148,24 @@ const dragStyles = ( { isDragging, dragCursor } ) => {
 	`;
 };
 
-// TODO: Resolve need to use &&& to increase specificity
-// https://github.com/WordPress/gutenberg/issues/18483
-
 export const Input = styled.input`
-	&&& {
-		background-color: transparent;
-		box-sizing: border-box;
-		border: none;
-		box-shadow: none !important;
-		color: ${ color( 'black' ) };
-		display: block;
-		outline: none;
-		padding-left: 8px;
-		padding-right: 8px;
-		width: 100%;
+	background-color: transparent;
+	box-sizing: border-box;
+	border: none;
+	box-shadow: none !important;
+	color: ${ color( 'black' ) };
+	display: block;
+	outline: none;
+	padding-left: 8px;
+	padding-right: 8px;
+	width: 100%;
 
-		${ dragStyles };
-		${ disabledStyles };
-		${ fontSizeStyles };
-		${ sizeStyles };
+	${ dragStyles };
+	${ disabledStyles };
+	${ fontSizeStyles };
+	${ sizeStyles };
 
-		${ placeholderStyles };
-	}
+	${ placeholderStyles };
 `;
 
 const laberColor = ( { isFloatingLabel, isFilled, isFloating } ) => {
@@ -248,26 +243,24 @@ const labelTruncation = ( { isFloating } ) => {
 };
 
 const BaseLabel = styled( Text )`
-	&&& {
-		box-sizing: border-box;
-		display: block;
-		margin: 0;
-		max-width: 100%;
-		padding: 0;
-		pointer-events: none;
-		top: 50%;
-		transition: transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear,
-			max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
-		z-index: 1;
+	box-sizing: border-box;
+	display: block;
+	margin: 0;
+	max-width: 100%;
+	padding: 0;
+	pointer-events: none;
+	top: 50%;
+	transition: transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear,
+		max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
+	z-index: 1;
 
-		${ laberColor };
-		${ labelFontSize };
-		${ labelPosition };
-		${ labelTruncation };
-		${ reduceMotion( 'transition' ) };
+	${ laberColor };
+	${ labelFontSize };
+	${ labelPosition };
+	${ labelTruncation };
+	${ reduceMotion( 'transition' ) };
 
-		${ rtl( { left: 0 } ) }
-	}
+	${ rtl( { left: 0 } ) }
 `;
 
 export const Label = ( props ) => <BaseLabel { ...props } as="label" />;
@@ -293,21 +286,19 @@ const fieldsetFocusedStyles = ( { disabled, isFocused } ) => {
 };
 
 export const Fieldset = styled.fieldset`
-	&&& {
-		box-sizing: border-box;
-		border-radius: inherit;
-		bottom: 0;
-		left: 0;
-		margin: 0;
-		padding: 0;
-		pointer-events: none;
-		position: absolute;
-		right: 0;
+	box-sizing: border-box;
+	border-radius: inherit;
+	bottom: 0;
+	left: 0;
+	margin: 0;
+	padding: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
 
-		${ fieldsetFocusedStyles };
-		${ fieldsetTopStyles };
-		${ rtl( { paddingLeft: 2 } ) }
-	}
+	${ fieldsetFocusedStyles };
+	${ fieldsetTopStyles };
+	${ rtl( { paddingLeft: 2 } ) }
 `;
 
 const legendSize = ( { isFloating, size } ) => {
@@ -326,20 +317,18 @@ const legendSize = ( { isFloating, size } ) => {
 };
 
 export const Legend = styled.legend`
-	&&& {
-		box-sizing: border-box;
-		display: block;
-		height: 11px;
-		line-height: 11px;
-		margin: 0;
-		padding: 0;
-		transition: max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
-		visibility: hidden;
-		width: auto;
+	box-sizing: border-box;
+	display: block;
+	height: 11px;
+	line-height: 11px;
+	margin: 0;
+	padding: 0;
+	transition: max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
+	visibility: hidden;
+	width: auto;
 
-		${ legendSize };
-		${ reduceMotion( 'transition' ) };
-	}
+	${ legendSize };
+	${ reduceMotion( 'transition' ) };
 `;
 
 const BaseLegendText = styled( Text )`

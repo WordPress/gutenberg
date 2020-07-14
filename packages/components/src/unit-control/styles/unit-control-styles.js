@@ -34,20 +34,15 @@ const arrowStyles = ( { disableUnits } ) => {
 	`;
 };
 
-// TODO: Resolve need to use &&& to increase specificity
-// https://github.com/WordPress/gutenberg/issues/18483
-
 export const ValueInput = styled( NumberControl )`
-	&&& {
-		input {
-			appearance: none;
-			-moz-appearance: textfield;
-			display: block;
-			width: 100%;
+	input {
+		appearance: none;
+		-moz-appearance: textfield;
+		display: block;
+		width: 100%;
 
-			${ arrowStyles };
-			${ paddingStyles };
-		}
+		${ arrowStyles };
+		${ paddingStyles };
 	}
 `;
 
@@ -96,35 +91,31 @@ const baseUnitLabelStyles = ( props ) => {
 };
 
 export const UnitLabel = styled.div`
-	&&& {
-		pointer-events: none;
+	pointer-events: none;
 
-		${ baseUnitLabelStyles };
-	}
+	${ baseUnitLabelStyles };
 `;
 
 export const UnitSelect = styled.select`
-	&&& {
-		${ baseUnitLabelStyles };
-		cursor: pointer;
-		border: 1px solid transparent;
+	${ baseUnitLabelStyles };
+	cursor: pointer;
+	border: 1px solid transparent;
+
+	&:hover {
+		background-color: ${ color( 'lightGray.300' ) };
+	}
+
+	&:focus {
+		border-color: ${ color( 'ui.borderFocus' ) };
+		outline: 2px solid transparent;
+		outline-offset: 0;
+	}
+
+	&:disabled {
+		cursor: initial;
 
 		&:hover {
-			background-color: ${ color( 'lightGray.300' ) };
-		}
-
-		&:focus {
-			border-color: ${ color( 'ui.borderFocus' ) };
-			outline: 2px solid transparent;
-			outline-offset: 0;
-		}
-
-		&:disabled {
-			cursor: initial;
-
-			&:hover {
-				background-color: transparent;
-			}
+			background-color: transparent;
 		}
 	}
 `;
