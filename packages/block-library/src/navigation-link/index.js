@@ -61,9 +61,10 @@ export const settings = {
 				},
 			},
 
-			migrate( { nofollow } ) {
+			migrate( { nofollow, ...rest } ) {
 				return {
 					rel: nofollow ? 'nofollow' : '',
+					...rest,
 				};
 			},
 
