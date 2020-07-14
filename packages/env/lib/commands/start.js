@@ -48,6 +48,14 @@ module.exports = async function start( { spinner, debug, update } ) {
 
 	const config = await initConfig( { spinner, debug } );
 
+	if ( ! config.detectedLocalConfig ) {
+		const { configDirectoryPath } = config;
+		spinner.warn(
+			`Warning: could not find a .wp-env.json configuration file and could not determine if '${ configDirectoryPath }' is a WordPress installation, a plugin, or a theme.`
+		);
+		spinner.start();
+	}
+
 	// Check if the hash of the config has changed. If so, run configuration.
 	const configHash = md5( config );
 	const workDirectoryPath = config.workDirectoryPath;
@@ -71,14 +79,6 @@ module.exports = async function start( { spinner, debug, update } ) {
 	if ( shouldConfigureWp ) {
 		await stop( { spinner, debug } );
 		spinner.text = 'Downloading sources.';
-	}
-
-	if ( ! config.detectedLocalConfig ) {
-		const { configDirectoryPath } = config;
-		spinner.warn(
-			`Warning: could not find a .wp-env.json configuration file and could not determine if '${ configDirectoryPath }' is a WordPress installation, a plugin, or a theme.`
-		);
-		spinner.start();
 	}
 
 	await Promise.all( [
