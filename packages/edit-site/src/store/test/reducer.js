@@ -14,7 +14,6 @@ import {
 	templatePartId,
 	templateType,
 	page,
-	showOnFront,
 } from '../reducer';
 import { PREFERENCES_DEFAULTS } from '../defaults';
 
@@ -165,7 +164,7 @@ describe( 'state', () => {
 
 	describe( 'page()', () => {
 		it( 'should apply default state', () => {
-			expect( page( undefined, {} ) ).toEqual( {} );
+			expect( page( undefined, {} ) ).toEqual( undefined );
 		} );
 
 		it( 'should default to returning the same state', () => {
@@ -181,17 +180,6 @@ describe( 'state', () => {
 					page: newPage,
 				} )
 			).toBe( newPage );
-		} );
-	} );
-
-	describe( 'showOnFront()', () => {
-		it( 'should apply default state', () => {
-			expect( showOnFront( undefined, {} ) ).toEqual( undefined );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( showOnFront( state, {} ) ).toBe( state );
 		} );
 	} );
 } );

@@ -165,7 +165,7 @@ export function page( state, action ) {
  *
  * @return {Object} Updated state.
  */
-export function homeTemplateId( state = {}, action ) {
+export function homeTemplateId( state, action ) {
 	switch ( action.type ) {
 		case 'SET_HOME_TEMPLATE':
 			return action.homeTemplateId;
