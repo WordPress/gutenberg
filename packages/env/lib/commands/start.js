@@ -26,10 +26,13 @@ const {
 	configureWordPress,
 	setupWordPressDirectories,
 } = require( '../wordpress' );
+const { didCacheChange, setCache } = require( '../cache' );
+const md5 = require( '../md5' );
 
 /**
  * @typedef {import('../config').Config} Config
  */
+const CONFIG_CACHE_KEY = 'config_checksum';
 
 /**
  * Starts the development server.
@@ -37,21 +40,10 @@ const {
  * @param {Object}  options
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {boolean} options.update  If true, update sources.
  */
-module.exports = async function start( { spinner, debug } ) {
-	/**
-	 * If the Docker image is already running and the `wp-env` files have been
-	 * deleted, the start command will not complete successfully. Stopping
-	 * the container before continuing allows the docker entrypoint script,
-	 * which restores the files, to run again when we start the containers.
-	 *
-	 * Additionally, this serves as a way to restart the container entirely
-	 * should the need arise.
-	 *
-	 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
-	 */
-	await stop( { spinner, debug } );
-
+module.exports = async function start( { spinner, debug, update } ) {
+	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
 	const config = await initConfig( { spinner, debug } );
@@ -64,18 +56,42 @@ module.exports = async function start( { spinner, debug } ) {
 		spinner.start();
 	}
 
-	spinner.text = 'Downloading WordPress.';
+	// Check if the hash of the config has changed. If so, run configuration.
+	const configHash = md5( config );
+	const workDirectoryPath = config.workDirectoryPath;
+	const shouldConfigureWp =
+		update ||
+		( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
+			workDirectoryPath,
+		} ) );
+
+	/**
+	 * If the Docker image is already running and the `wp-env` files have been
+	 * deleted, the start command will not complete successfully. Stopping
+	 * the container before continuing allows the docker entrypoint script,
+	 * which restores the files, to run again when we start the containers.
+	 *
+	 * Additionally, this serves as a way to restart the container entirely
+	 * should the need arise.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
+	 */
+	if ( shouldConfigureWp ) {
+		await stop( { spinner, debug } );
+		spinner.text = 'Downloading sources.';
+	}
 
 	await Promise.all( [
-		// Preemptively start the database while we wait for sources to download.
 		dockerCompose.upOne( 'mysql', {
 			config: config.dockerComposeConfigPath,
 			log: config.debug,
 		} ),
-		downloadSources( config, spinner ),
+		shouldConfigureWp && downloadSources( config, spinner ),
 	] );
 
-	await setupWordPressDirectories( config );
+	if ( shouldConfigureWp ) {
+		await setupWordPressDirectories( config );
+	}
 
 	spinner.text = 'Starting WordPress.';
 
@@ -84,36 +100,46 @@ module.exports = async function start( { spinner, debug } ) {
 		log: config.debug,
 	} );
 
-	if ( config.coreSource === null ) {
-		// Don't chown wp-content when it exists on the user's local filesystem.
+	// Only run WordPress install/configuration when config has changed.
+	if ( shouldConfigureWp ) {
+		spinner.text = 'Configuring WordPress.';
+
+		if ( config.coreSource === null ) {
+			// Don't chown wp-content when it exists on the user's local filesystem.
+			await Promise.all( [
+				makeContentDirectoriesWritable( 'development', config ),
+				makeContentDirectoriesWritable( 'tests', config ),
+			] );
+		}
+
+		try {
+			await checkDatabaseConnection( config );
+		} catch ( error ) {
+			// Wait 30 seconds for MySQL to accept connections.
+			await retry( () => checkDatabaseConnection( config ), {
+				times: 30,
+				delay: 1000,
+			} );
+
+			// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
+			await sleep( 4000 );
+		}
+
+		// Retry WordPress installation in case MySQL *still* wasn't ready.
 		await Promise.all( [
-			makeContentDirectoriesWritable( 'development', config ),
-			makeContentDirectoriesWritable( 'tests', config ),
+			retry( () => configureWordPress( 'development', config, spinner ), {
+				times: 2,
+			} ),
+			retry( () => configureWordPress( 'tests', config, spinner ), {
+				times: 2,
+			} ),
 		] );
-	}
 
-	try {
-		await checkDatabaseConnection( config );
-	} catch ( error ) {
-		// Wait 30 seconds for MySQL to accept connections.
-		await retry( () => checkDatabaseConnection( config ), {
-			times: 30,
-			delay: 1000,
+		// Set the cache key once everything has been configured.
+		await setCache( CONFIG_CACHE_KEY, configHash, {
+			workDirectoryPath,
 		} );
-
-		// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
-		await sleep( 4000 );
 	}
-
-	// Retry WordPress installation in case MySQL *still* wasn't ready.
-	await Promise.all( [
-		retry( () => configureWordPress( 'development', config, spinner ), {
-			times: 2,
-		} ),
-		retry( () => configureWordPress( 'tests', config, spinner ), {
-			times: 2,
-		} ),
-	] );
 
 	spinner.text = 'WordPress started.';
 };
