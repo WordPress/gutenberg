@@ -165,7 +165,7 @@ function gutenberg_edit_site_init( $hook ) {
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.
 	$preload_paths = array(
-		'/',
+		'/?context=edit',
 		'/wp/v2/types?context=edit',
 		'/wp/v2/taxonomies?per_page=100&context=edit',
 		'/wp/v2/pages?per_page=100&context=edit',

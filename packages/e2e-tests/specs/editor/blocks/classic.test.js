@@ -15,7 +15,6 @@ import {
 	insertBlock,
 	pressKeyWithModifier,
 	clickBlockToolbarButton,
-	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Classic', () => {
@@ -84,8 +83,7 @@ describe( 'Classic', () => {
 		);
 
 		// Convert to blocks and verify it worked correctly.
-		await clickBlockToolbarButton( 'More options' );
-		await clickButton( 'Convert to Blocks' );
+		await clickBlockToolbarButton( 'Convert to blocks', 'content' );
 		await page.waitForSelector( '.wp-block[data-type="core/gallery"]' );
 		expect( await getEditedPostContent() ).toMatch( /<!-- wp:gallery/ );
 
@@ -96,8 +94,7 @@ describe( 'Classic', () => {
 		);
 
 		// Convert to blocks again and verify it worked correctly.
-		await clickBlockToolbarButton( 'More options' );
-		await clickButton( 'Convert to Blocks' );
+		await clickBlockToolbarButton( 'Convert to blocks', 'content' );
 		await page.waitForSelector( '.wp-block[data-type="core/gallery"]' );
 		expect( await getEditedPostContent() ).toMatch( /<!-- wp:gallery/ );
 	} );
