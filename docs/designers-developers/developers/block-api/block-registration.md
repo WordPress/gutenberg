@@ -196,13 +196,15 @@ example: {
         cover: 'https://example.com/image.jpg',
     },
     innerBlocks: [
+    {
         name: 'core/paragraph',
         attributes: {
             /* translators: example text. */
             content: __(
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
             ),
-        },
+        }
+    },
     ],
 },
 ```
