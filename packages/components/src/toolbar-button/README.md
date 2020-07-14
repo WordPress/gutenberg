@@ -18,7 +18,7 @@ const MyToolbarButton = () => (
 
 ## Props
 
-This component accepts [the same API of the Button](https://developer.wordpress.org/block-editor/components/button/#props) component.
+This component accepts [the same API of the Button](/packages/components/src/button/README.md#props) component.
 
 ## Related components
 
