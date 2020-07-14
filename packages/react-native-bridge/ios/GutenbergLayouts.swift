@@ -1,31 +1,58 @@
 import Foundation
 
-struct GutenbergPageLayouts {
-    let layouts: [GutenbergLayout]
-    let categories: [GutenbergLayoutCategory]
+public struct GutenbergPageLayouts {
+    public let layouts: [GutenbergLayout]
+    public let categories: [GutenbergLayoutCategory]
+
+    /// Contains a map of layouts based on their Category slug
+    private let groupedLayouts: [String: [GutenbergLayout]]
+
+
+    public init(layouts: [GutenbergLayout], categories: [GutenbergLayoutCategory]) {
+        self.layouts = layouts
+        self.categories = categories
+        groupedLayouts = GutenbergPageLayouts.groupLayouts(layouts)
+    }
+
+    static func groupLayouts(_ layouts: [GutenbergLayout]) -> [String:[GutenbergLayout]] {
+
+        var groupedLayouts = [String:[GutenbergLayout]]()
+
+        layouts.forEach { (layout) in
+            var group = groupedLayouts[layout.slug] ?? [GutenbergLayout]()
+            group.append(layout)
+            groupedLayouts.updateValue(group, forKey: layout.slug)
+        }
+
+        return groupedLayouts
+    }
+
+    public func layouts(forCategory slug: String) -> [GutenbergLayout] {
+        return groupedLayouts[slug] ?? []
+    }
 }
 
-struct GutenbergLayout {
-    let slug: String
-    let title: String
-    let preview: String
-    let categories: [GutenbergLayoutCategory]
+public struct GutenbergLayout {
+    public let slug: String
+    public let title: String
+    public let preview: String
+    public let categories: [GutenbergLayoutCategory]
 }
 
-struct GutenbergLayoutCategory {
-    let slug: String
-    let title: String
-    let description: String
-    let emoji: String
+public struct GutenbergLayoutCategory {
+    public let slug: String
+    public let title: String
+    public let description: String
+    public let emoji: String
 }
 
-class GutenbergPageLayoutFactory {
+public class GutenbergPageLayoutFactory {
 
     //MARK: - Factory Method
 
     /// Creates a a default set of Page Layout templates to be used on for creating starter pages layouts.
     /// - Returns: A default `GutenbergPageLayouts` object that contains a default set of layouts and categories
-    static func makeDefaultPageLayouts() -> GutenbergPageLayouts {
+    public static func makeDefaultPageLayouts() -> GutenbergPageLayouts {
         let defaultLayouts = makeDefaultLayouts()
         let defaultCategories = makeDefaultCategories()
         return GutenbergPageLayouts(layouts: defaultLayouts, categories: defaultCategories)
