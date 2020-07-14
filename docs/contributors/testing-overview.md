@@ -459,7 +459,7 @@ Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If yo
 npm run test-php
 ```
 
-_Note: The phpunit commands require `wp-env` to be running. The package script will start wp-env for you if it is not already running._
+_Note: The phpunit commands require `wp-env` to be running and composer dependencies to be installed. The package script will start wp-env for you if it is not already running._
 
 Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint-php`.
 
