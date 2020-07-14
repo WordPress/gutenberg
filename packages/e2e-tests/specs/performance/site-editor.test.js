@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { basename, join } from 'path';
 import { writeFileSync } from 'fs';
 
 /**
@@ -67,8 +68,10 @@ describe( 'Site Editor Performance', () => {
 			);
 		}
 
+		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
+
 		writeFileSync(
-			__dirname + '/site-editor.performance.test.results.json',
+			join( __dirname, resultsFilename ),
 			JSON.stringify( results, null, 2 )
 		);
 

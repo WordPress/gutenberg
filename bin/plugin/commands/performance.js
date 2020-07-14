@@ -149,13 +149,13 @@ async function getPerformanceResultsForBranch(
 	const results = [];
 	for ( let i = 0; i < 3; i++ ) {
 		await runShellScript(
-			`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.performance.test.js`,
+			`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 			performanceTestDirectory
 		);
 		const rawResults = await readJSONFile(
 			path.join(
 				performanceTestDirectory,
-				`packages/e2e-tests/specs/performance/${ testSuite }.performance.test.results.json`
+				`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 			)
 		);
 		results.push( curateResults( rawResults ) );

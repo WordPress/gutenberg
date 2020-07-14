@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { join } from 'path';
+import { basename, join } from 'path';
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 
 /**
@@ -182,8 +182,10 @@ describe( 'Post Editor Performance', () => {
 		const [ focusEvents ] = getSelectionEventDurations( traceResults );
 		results.focus = focusEvents;
 
+		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
+
 		writeFileSync(
-			__dirname + '/post-editor.performance.test.results.json',
+			join( __dirname, resultsFilename ),
 			JSON.stringify( results, null, 2 )
 		);
 
