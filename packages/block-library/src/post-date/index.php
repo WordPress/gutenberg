@@ -18,10 +18,14 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	return '<time datetime="'
-		. get_the_date( 'c', $block->context['postId'] ) . '">'
-		. get_the_date( isset( $attributes['format'] ) ? $attributes['format'] : '', $block->context['postId'] )
-		. '</time>';
+	$align_class_name = empty( $attributes['align'] ) ? '' : ' ' . "has-text-align-{$attributes['align']}";
+
+	return sprintf(
+		'<div class="%1$s"><time datetime="%2$s">%3$s</time></div>',
+		'wp-block-post-date' . esc_attr( $align_class_name ),
+		get_the_date( 'c', $block->context['postId'] ),
+		get_the_date( isset( $attributes['format'] ) ? $attributes['format'] : '', $block->context['postId'] )
+	);
 }
 
 /**
