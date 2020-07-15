@@ -2,7 +2,9 @@
 
 Intertwined with the web codepaths, the Gutenberg repo also includes the [React Native](https://facebook.github.io/react-native/) based mobile tree.
 
-For instructions on how to run the Gutenberg Mobile Demo App on Android or iOS, see [Getting Started for the React Native based Mobile Gutenberg](/docs/contributors/getting-started-native-mobile.md)
+## Running Gutenberg Mobile on Android and iOS
+
+For instructions on how to run the **Gutenberg Mobile Demo App** on Android or iOS, see [Getting Started for the React Native based Mobile Gutenberg](/docs/contributors/getting-started-native-mobile.md)
 
 Also, the mobile client is packaged and released via the [official WordPress apps](https://wordpress.org/mobile/). Even though the build pipeline is slightly different then the mobile demo apps and lives in its own repo for now ([here's the native mobile repo](https://github.com/wordpress-mobile/gutenberg-mobile)), the source code itself is taken directly from this repo and the "web" side codepaths.
 
@@ -12,7 +14,17 @@ The majority of the code shared with native mobile is in the very same JavaScrip
 
 ## Mind the mobile
 
-Our tooling isn't as good yet as we'd like to and it's hard to have a good awareness of those native mobile files. That means that contributors need to manually pay attention to update the native mobile files during code refactorings. For example, renaming a function or a prop should also be performed in the native modules too, otherwise, the mobile client will break. We are in the process of putting some more safeguards in place in PRs, but we're still far from done. Please bear with us and thank you in advance. ❤️🙇‍
+Our tooling isn't as good yet as we'd like to and it's hard to have a good awareness of those native mobile files. That means that contributors need to manually pay attention to update the native mobile files during code refactorings. For example, renaming a function or a prop should also be performed in the native modules too, otherwise, the mobile client will break. We have added some mobile specific CI tests as safeguards in place in PRs, but we're still far from done. Please bear with us and thank you in advance. ❤️🙇‍
+
+## Native mobile E2E tests in Continuous Integration
+
+If you encounter a failed Android/iOS test on your pull request, we recommend the following steps:
+
+1. Re-running the failed Github Action job ([guide for how to re-run](https://docs.github.com/en/actions/configuring-and-managing-workflows/managing-a-workflow-run#viewing-your-workflow-history)) - This should fix failed test the majority of the time as there are still a few randomly occurring failures in tests that are being actively worked on.
+2. You can check if the test is failing locally by following steps to run the E2E test on your machine from the [mobile gettings started guide](docs/contributors/getting-started-native-mobile.md#ui-tests), with even more relevant info in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/master/packages/react-native-editor/__device-tests__#running-the-tests-locally)
+3. In addition to reading the logs from the E2E test, you can download a video recording from the Artifacts section of the Github job that may have additional useful information.
+4. Check if any changes in your PR would require corresponding changes to `.native.js` versions of files.
+5. Lastly, if you're stuck on a failing mobile test, feel free to reach out to contributors on slack in the #mobile or #core-editor chats in the WordPress Core Slack, [free to join](https://make.wordpress.org/chat/).
 
 ## Debugging the native mobile unit tests
 
