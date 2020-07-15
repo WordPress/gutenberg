@@ -59,7 +59,7 @@ export function useIsLineHeightDisabled( { name: blockName } = {} ) {
 	const isDisabled = useSelect( ( select ) => {
 		const editorSettings = select( 'core/block-editor' ).getSettings();
 
-		return ! editorSettings.__experimentalEnableCustomLineHeight;
+		return ! editorSettings.enableCustomLineHeight;
 	} );
 
 	return (
