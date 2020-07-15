@@ -64,7 +64,7 @@ class PostTitle extends Component {
 	onPaste( { value, onChange, plainText, html } ) {
 		const { title, onInsertBlockAfter, onUpdate } = this.props;
 		const content = pasteHandler( {
-			html,
+			HTML: html,
 			plainText,
 		} );
 
