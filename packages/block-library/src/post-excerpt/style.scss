@@ -4,3 +4,7 @@
 		line-height: inherit;
 	}
 }
+
+.wp-block-post-excerpt.has-link-color a {
+	color: var(--wp--style--color--link) !important;
+}
