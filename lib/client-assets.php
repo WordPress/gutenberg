@@ -655,7 +655,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns',
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_custom_line_height( $settings ) {
-	$settings['__experimentalDisableCustomLineHeight'] = get_theme_support( 'disable-custom-line-height' );
+	$settings['enableCustomLineHeight'] = get_theme_support( 'custom-line-height' );
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_height' );
@@ -669,7 +669,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_heig
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_custom_units( $settings ) {
-	$settings['__experimentalDisableCustomUnits'] = get_theme_support( 'experimental-custom-units' );
+	$settings['enableCustomUnits'] = get_theme_support( 'custom-units' );
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );

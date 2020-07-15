@@ -34,6 +34,7 @@ export function InputControl(
 		isPressEnterToChange = false,
 		isFloatingLabel = false,
 		label,
+		labelPosition = 'top',
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
@@ -73,14 +74,17 @@ export function InputControl(
 		<InputBase
 			className={ classes }
 			disabled={ disabled }
+			gap={ 3 }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			isFilled={ isInputFilled }
 			isFloatingLabel={ isFloatingLabel }
 			isFocused={ isFocused }
+			justify="left"
 			label={ label }
-			size={ size }
+			labelPosition={ labelPosition }
 			prefix={ prefix }
+			size={ size }
 			suffix={ suffix }
 		>
 			<InputField
