@@ -87,6 +87,7 @@ function gutenberg_reregister_core_block_types() {
 				'query-loop.php'          => 'core/query-loop',
 				'query-pagination.php'    => 'core/query-pagination',
 				'site-logo.php'           => 'core/site-logo',
+				'site-tagline.php'        => 'core/site-tagline',
 				'site-title.php'          => 'core/site-title',
 				'template-part.php'       => 'core/template-part',
 			)
