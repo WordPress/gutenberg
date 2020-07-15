@@ -226,7 +226,8 @@ export default function Image( {
 		}
 	}, [ isSelected ] );
 
-	const canEditImage = id && naturalWidth && naturalHeight;
+	const isEditorEnabled = ! window._wpImageEditorDisabled;
+	const canEditImage = id && naturalWidth && naturalHeight && isEditorEnabled;
 
 	const controls = (
 		<>
