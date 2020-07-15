@@ -80,21 +80,14 @@
 	min-height: 58px;
 }
 
-.contentContainer {
-	flex-direction: row;
-	padding: 0 $grid-unit-20;
-}
-
-.container {
-	padding-bottom: $grid-unit-20;
-}
-
-.colorIndicator {
+.paletteColorIndicator {
+	margin-top: 0;
+	margin-bottom: 0;
 	width: 32px;
 	height: 32px;
 }
 
-.customIndicatorWrapper {
+.paletteCustomIndicatorWrapper {
 	flex-direction: row;
 	align-items: center;
 	width: 32px;

@@ -346,10 +346,10 @@ const Cover = ( {
 		return (
 			<View>
 				<MediaPlaceholder
-					customEmptyStateContainer={
+					customEmptyStateContainerStyles={
 						styles.mediaPlaceholderEmptyStateContainer
 					}
-					customEmptyStateTitle={
+					customEmptyStateTitleStyles={
 						styles.mediaPlaceholderEmptyStateTitle
 					}
 					icon={ placeholderIcon }
@@ -362,7 +362,12 @@ const Cover = ( {
 				>
 					<View style={ styles.colorPaletteWrapper }>
 						<ColorPalette
-							customStyles={ styles }
+							customColorIndicatorStyles={
+								styles.paletteColorIndicator
+							}
+							customIndicatorWrapperStyles={
+								styles.paletteCustomIndicatorWrapper
+							}
 							setColor={ setColor }
 							onCustomPress={ noop }
 							defaultSettings={ coverDefaultPalette }
