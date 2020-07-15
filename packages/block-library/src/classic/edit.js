@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { BlockControls } from '@wordpress/block-editor';
@@ -133,15 +138,27 @@ export default class ClassicEdit extends Component {
 			bookmark = null;
 		} );
 
-		editor.on( 'Paste Change input Undo Redo', () => {
-			const value = editor.getContent();
+		editor.on(
+			'Paste Change input Undo Redo',
+			debounce( () => {
+				// We need this check because when we remove the editor (onUnmount)
+				// due to the usage of `debounce`, this callback is executed in
+				// another tick. This results in setting the content to empty.
+				if ( editor._isRemoved ) return;
 
-			if ( value !== editor._lastChange ) {
-				editor._lastChange = value;
-				setAttributes( {
-					content: value,
-				} );
-			}
+				const value = editor.getContent();
+
+				if ( value !== editor._lastChange ) {
+					editor._lastChange = value;
+					setAttributes( {
+						content: value,
+					} );
+				}
+			} )
+		);
+
+		editor.on( 'remove', () => {
+			editor._isRemoved = true;
 		} );
 
 		editor.on( 'keydown', ( event ) => {
