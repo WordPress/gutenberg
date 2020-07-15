@@ -274,14 +274,19 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__quick-inserter-results {
-	padding-bottom: $grid-unit-20;
+.block-editor-inserter__quick-inserter-results .block-editor-inserter__panel-header {
+	height: 0;
+	padding: 0;
+	float: left;
+}
 
-	.block-editor-inserter__panel-header {
-		height: 0;
-		padding: 0;
-		float: left;
-	}
+.block-editor-inserter__quick-inserter .block-editor-inserter__panel-content {
+	padding: 0 $grid-unit-10;
+}
+
+.block-editor-inserter__quick-inserter.has-search .block-editor-inserter__panel-content,
+.block-editor-inserter__quick-inserter.has-expand .block-editor-inserter__panel-content {
+	padding: 0 $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter-patterns {
@@ -305,6 +310,7 @@ $block-inserter-tabs-height: 44px;
 	width: 100%;
 	height: ($button-size + $grid-unit-10);
 	border-radius: 0;
+	margin-top: $grid-unit-20;
 
 	&:hover {
 		color: $white;

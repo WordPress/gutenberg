@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { orderBy } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -106,6 +107,7 @@ function QuickInserterList( {
 }
 
 function QuickInserter( {
+	onSelect,
 	rootClientId,
 	clientId,
 	isAppender,
@@ -118,6 +120,7 @@ function QuickInserter( {
 		onInsertBlocks,
 		onToggleInsertionPoint,
 	] = useInsertionPoint( {
+		onSelect,
 		rootClientId,
 		clientId,
 		isAppender,
@@ -152,7 +155,7 @@ function QuickInserter( {
 		[ filterValue, patterns ]
 	);
 
-	const setInsererIsOpened = useSelect(
+	const setInserterIsOpened = useSelect(
 		( select ) =>
 			select( 'core/block-editor' ).getSettings()
 				.__experimentalSetIsInserterOpened,
@@ -160,10 +163,10 @@ function QuickInserter( {
 	);
 
 	useEffect( () => {
-		if ( setInsererIsOpened ) {
-			setInsererIsOpened( false );
+		if ( setInserterIsOpened ) {
+			setInserterIsOpened( false );
 		}
-	}, [ setInsererIsOpened ] );
+	}, [ setInserterIsOpened ] );
 
 	// Announce search results on change
 	useEffect( () => {
@@ -187,7 +190,10 @@ function QuickInserter( {
 	/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 	return (
 		<div
-			className="block-editor-inserter__quick-inserter"
+			className={ classnames( 'block-editor-inserter__quick-inserter', {
+				'has-search': showSearch,
+				'has-expand': setInserterIsOpened,
+			} ) }
 			onKeyPress={ stopKeyPropagation }
 			onKeyDown={ preventArrowKeysPropagation }
 		>
@@ -208,10 +214,10 @@ function QuickInserter( {
 				onHover={ onToggleInsertionPoint }
 			/>
 
-			{ setInsererIsOpened && (
+			{ setInserterIsOpened && (
 				<Button
 					className="block-editor-inserter__quick-inserter-expand"
-					onClick={ () => setInsererIsOpened( true ) }
+					onClick={ () => setInserterIsOpened( true ) }
 					aria-label={ __(
 						'Browse all. This will open the main inserter panel in the editor toolbar.'
 					) }
