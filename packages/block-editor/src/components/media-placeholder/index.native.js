@@ -20,7 +20,7 @@ import { Icon, plusCircleFilled } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import defaultStyles from './styles.scss';
+import styles from './styles.scss';
 
 // remove duplicates after gallery append
 const dedupMedia = ( media ) =>
@@ -44,10 +44,9 @@ function MediaPlaceholder( props ) {
 		multiple,
 		value = [],
 		children,
-		customStyles,
+		customEmptyStateContainer,
+		customEmptyStateTitle,
 	} = props;
-
-	const styles = customStyles === undefined ? defaultStyles : customStyles;
 
 	// use ref to keep media array current for callbacks during rerenders
 	const mediaRef = useRef( value );
@@ -95,7 +94,7 @@ function MediaPlaceholder( props ) {
 	}
 
 	const emptyStateTitleStyle = getStylesFromColorScheme(
-		styles.emptyStateTitle,
+		[ styles.emptyStateTitle, props.customEmptyStateTitle ],
 		styles.emptyStateTitleDark
 	);
 	const addMediaButtonStyle = getStylesFromColorScheme(
@@ -138,7 +137,7 @@ function MediaPlaceholder( props ) {
 		styles.appenderDark
 	);
 	const emptyStateContainerStyle = getStylesFromColorScheme(
-		styles.emptyStateContainer,
+		[ styles.emptyStateContainer, props.customEmptyStateContainer ],
 		styles.emptyStateContainerDark
 	);
 

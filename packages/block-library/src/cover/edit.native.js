@@ -47,7 +47,6 @@ import { getProtocol } from '@wordpress/url';
  * Internal dependencies
  */
 import styles from './style.scss';
-import placeholderStyles from './media-placeholder.scss';
 import {
 	attributesFromMedia,
 	COVER_MIN_HEIGHT,
@@ -347,7 +346,12 @@ const Cover = ( {
 		return (
 			<View>
 				<MediaPlaceholder
-					customStyles={ placeholderStyles }
+					customEmptyStateContainer={
+						styles.mediaPlaceholderEmptyStateContainer
+					}
+					customEmptyStateTitle={
+						styles.mediaPlaceholderEmptyStateTitle
+					}
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
