@@ -40,7 +40,7 @@ describe( 'Site Editor Performance', () => {
 			focus: [],
 		};
 
-		visitAdminPage(
+		await visitAdminPage(
 			'admin.php',
 			addQueryArgs( '', {
 				page: 'gutenberg-edit-site',
