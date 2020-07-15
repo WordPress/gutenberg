@@ -21,7 +21,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import defaultStyles from './style.scss';
+import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
 import { colorsUtils } from '../mobile/color-settings/utils';
 import { performLayoutAnimation } from '../mobile/layout-animation';
@@ -42,10 +42,10 @@ function ColorPalette( {
 	shouldEnableBottomSheetScroll,
 	shouldShowCustomIndicatorOption = true,
 	shouldShowCustomLabel = true,
-	customStyles,
+	customColorIndicatorStyles,
+	customIndicatorWrapperStyles,
+	customVerticalSeparatorStyles,
 } ) {
-	const styles = customStyles === undefined ? defaultStyles : customStyles;
-
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
 		'linear-gradient(240deg, rgba(0,255,0,.8), 0%, rgba(0,255,0,0) 70.71%)',
@@ -181,7 +181,7 @@ function ColorPalette( {
 	}
 
 	const verticalSeparatorStyle = usePreferredColorSchemeStyle(
-		styles.verticalSeparator,
+		[ styles.verticalSeparator, customVerticalSeparatorStyles ],
 		styles.verticalSeparatorDark
 	);
 
@@ -230,7 +230,7 @@ function ColorPalette( {
 								opacity={ opacity }
 								style={ [
 									styles.colorIndicator,
-									styles.circleOption,
+									customColorIndicatorStyles,
 								] }
 							/>
 						</Animated.View>
@@ -239,7 +239,10 @@ function ColorPalette( {
 			} ) }
 			{ shouldShowCustomIndicator && (
 				<View
-					style={ styles.customIndicatorWrapper }
+					style={ [
+						styles.customIndicatorWrapper,
+						customIndicatorWrapperStyles,
+					] }
 					onLayout={ onCustomIndicatorLayout }
 				>
 					<View style={ verticalSeparatorStyle } />
@@ -249,14 +252,19 @@ function ColorPalette( {
 						accessibilityState={ { selected: isSelectedCustom() } }
 						accessibilityHint={ accessibilityHint }
 					>
-						<View style={ styles.customIndicatorWrapper }>
+						<View
+							style={ [
+								styles.customIndicatorWrapper,
+								customIndicatorWrapperStyles,
+							] }
+						>
 							<ColorIndicator
 								withCustomPicker={ ! isGradientSegment }
 								color={ customIndicatorColor }
 								isSelected={ isSelectedCustom() }
 								style={ [
 									styles.colorIndicator,
-									styles.circleOption,
+									customColorIndicatorStyles,
 								] }
 							/>
 							{ shouldShowCustomLabel && (

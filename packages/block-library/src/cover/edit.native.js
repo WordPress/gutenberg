@@ -47,7 +47,6 @@ import { getProtocol } from '@wordpress/url';
  * Internal dependencies
  */
 import styles from './style.scss';
-import placeholderStyles from './media-placeholder.scss';
 import {
 	attributesFromMedia,
 	COVER_MIN_HEIGHT,
@@ -384,7 +383,12 @@ const Cover = ( {
 			<View>
 				{ colorPickerControls }
 				<MediaPlaceholder
-					customStyles={ placeholderStyles }
+					customEmptyStateContainerStyles={
+						styles.mediaPlaceholderEmptyStateContainer
+					}
+					customEmptyStateTitleStyles={
+						styles.mediaPlaceholderEmptyStateTitle
+					}
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -395,9 +399,19 @@ const Cover = ( {
 				>
 					<View style={ styles.colorPaletteWrapper }>
 						<ColorPalette
-							customStyles={ styles }
+							customColorIndicatorStyles={
+								styles.paletteColorIndicator
+							}
+							customIndicatorWrapperStyles={
+								styles.paletteCustomIndicatorWrapper
+							}
+							customVerticalSeparatorStyles={
+								styles.paletteVerticalSeparator
+							}
 							setColor={ setColor }
-							onCustomPress={ openCustomColorPicker }
+							onCustomPress={
+								isParentSelected && openCustomColorPicker
+							}
 							defaultSettings={ coverDefaultPalette }
 							shouldShowCustomLabel={ false }
 						/>
