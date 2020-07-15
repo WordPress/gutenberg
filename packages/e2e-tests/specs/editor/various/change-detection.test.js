@@ -37,6 +37,7 @@ describe( 'Change detection', () => {
 		try {
 			page.on( 'dialog', handleOnDialog );
 			await page.reload();
+			await page.waitForSelector( '.edit-post-layout' );
 
 			// Ensure whether it was expected that dialog was encountered.
 			expect( hadDialog ).toBe( isDirty );

@@ -102,11 +102,13 @@ describe( 'Using Plugins API', () => {
 				'.interface-complementary-area-header button[aria-label="Close plugin"]'
 			);
 			await page.reload();
+			await page.waitForSelector( '.edit-post-layout' );
 			expect( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).toBeNull();
 			await clickOnMoreMenuItem( 'Sidebar title plugin' );
 			await page.click( 'button[aria-label="Pin to toolbar"]' );
 			expect( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).not.toBeNull();
 			await page.reload();
+			await page.waitForSelector( '.edit-post-layout' );
 			expect( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).not.toBeNull();
 		} );
 

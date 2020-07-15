@@ -34,6 +34,7 @@ describe( 'adding blocks', () => {
 	it( 'Should insert content using the placeholder and the regular inserter', async () => {
 		// This ensures the editor is loaded in navigation mode.
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Set a tall viewport. The typewriter's intrinsic height can be enough
 		// to scroll the page on a shorter viewport, thus obscuring the presence
