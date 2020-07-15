@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { dropRight, times } from 'lodash';
+import { dropRight, times, map, compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -298,12 +298,19 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected } = props;
-	const { columnCount } = useSelect(
+	const { columnCount, isDefaultColumns } = useSelect(
 		( select ) => {
-			const { getBlockCount } = select( 'core/block-editor' );
+			const { getBlockCount, getBlock } = select( 'core/block-editor' );
+			const block = getBlock( clientId );
+			const innerBlocks = block?.innerBlocks;
+			const isContentEmpty = map(
+				innerBlocks,
+				( innerBlock ) => innerBlock.innerBlocks.length
+			);
 
 			return {
 				columnCount: getBlockCount( clientId ),
+				isDefaultColumns: ! compact( isContentEmpty ).length,
 			};
 		},
 		[ clientId ]
@@ -312,7 +319,7 @@ const ColumnsEdit = ( props ) => {
 	const [ isVisible, setIsVisible ] = useState( false );
 
 	useEffect( () => {
-		if ( isSelected ) {
+		if ( isSelected && isDefaultColumns ) {
 			setIsVisible( true );
 		}
 	}, [] );
