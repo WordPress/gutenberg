@@ -18,7 +18,8 @@
 		}
 	},
 	"usesContext": [
-		"postId"
+		"postId",
+		"postType"
 	],
 	"supports": {
 		"html": false,

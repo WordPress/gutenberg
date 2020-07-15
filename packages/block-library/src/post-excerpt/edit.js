@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEntityProp, useEntityId } from '@wordpress/core-data';
+import { useEntityProp } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
@@ -17,11 +17,12 @@ import {
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function usePostContentExcerpt( wordCount ) {
+function usePostContentExcerpt( wordCount, postId, postType ) {
 	const [ , , { raw: rawPostContent } ] = useEntityProp(
 		'postType',
-		'post',
-		'content'
+		postType,
+		'content',
+		postId
 	);
 	return useMemo( () => {
 		if ( ! rawPostContent ) {
@@ -39,13 +40,19 @@ function PostExcerptEditor( {
 	attributes: { align, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
+	context: { postId, postType },
 } ) {
 	const [ excerpt, setExcerpt ] = useEntityProp(
 		'postType',
-		'post',
-		'excerpt'
+		postType,
+		'excerpt',
+		postId
 	);
-	const postContentExcerpt = usePostContentExcerpt( wordCount );
+	const postContentExcerpt = usePostContentExcerpt(
+		wordCount,
+		postId,
+		postType
+	);
 	return (
 		<>
 			<BlockControls>
@@ -128,15 +135,18 @@ export default function PostExcerptEdit( {
 	attributes,
 	setAttributes,
 	isSelected,
+	context,
 } ) {
-	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return __( 'Post Excerpt' );
-	}
+	// This check doesn't work in site editor? always false.
+	// if ( ! useEntityId( 'postType', 'post' ) ) {
+	// 	return __( 'Post Excerpt' );
+	// }
 	return (
 		<PostExcerptEditor
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			isSelected={ isSelected }
+			context={ context }
 		/>
 	);
 }
