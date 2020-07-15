@@ -47,7 +47,7 @@ describe( 'Site Editor Performance', () => {
 			} ).slice( 1 )
 		);
 
-		let i = 1;
+		let i = 3;
 
 		// Measuring loading time
 		while ( i-- ) {
