@@ -12,18 +12,22 @@
 		color: $white;
 		border-radius: 0;
 		height: $header-height;
-		width: $header-height;
+		min-width: $header-height;
 
-		&:hover {
-			background: #32373d; // WP-admin light-gray.
-		}
-
-		&:active {
-			color: $white;
-		}
-
-		&:focus {
-			box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 0 3px $white;
+		&.has-icon {
+			&:hover {
+				background: #32373d; // WP-admin light-gray.
+			}
+			&:active {
+				color: $white;
+			}
+			&:focus {
+				box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 0 3px $white;
+			}
 		}
 	}
+}
+
+.edit-site-fullscreen-mode-close_site-icon {
+	width: 36px;
 }

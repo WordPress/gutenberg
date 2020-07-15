@@ -31,6 +31,14 @@ const elementData = [
 	},
 ];
 
+const createMockClassList = ( classes ) => {
+	return {
+		contains( textToMatch ) {
+			return classes.includes( textToMatch );
+		},
+	};
+};
+
 const mapElements = ( orientation ) => (
 	{ top, right, bottom, left },
 	index
@@ -52,6 +60,7 @@ const mapElements = ( orientation ) => (
 						right: bottom,
 				  };
 		},
+		classList: createMockClassList( 'wp-block' ),
 	};
 };
 
@@ -74,8 +83,10 @@ describe( 'getNearestBlockIndex', () => {
 		expect( result ).toBeUndefined();
 	} );
 
-	it( 'returns `undefined` if the elements do not have the `data-block` attribute', () => {
-		const nonBlockElements = [ { dataset: {} } ];
+	it( 'returns `undefined` if the elements do not have the `wp-block` class', () => {
+		const nonBlockElements = [
+			{ classList: createMockClassList( 'some-other-class' ) },
+		];
 		const position = { x: 0, y: 0 };
 		const orientation = 'horizontal';
 
@@ -198,6 +209,27 @@ describe( 'getNearestBlockIndex', () => {
 
 			expect( result ).toBe( 4 );
 		} );
+
+		it( 'skips the block being dragged by checking for the `is-dragging` classname', () => {
+			const position = { x: 0, y: 450 };
+
+			const verticalElementsWithDraggedBlock = [
+				...verticalElements.slice( 0, 2 ),
+				{
+					...verticalElements[ 2 ],
+					classList: createMockClassList( 'wp-block is-dragging' ),
+				},
+				...verticalElements.slice( 3, 4 ),
+			];
+
+			const result = getNearestBlockIndex(
+				verticalElementsWithDraggedBlock,
+				position,
+				orientation
+			);
+
+			expect( result ).toBe( 3 );
+		} );
 	} );
 
 	describe( 'Horizontal block lists', () => {
@@ -309,6 +341,27 @@ describe( 'getNearestBlockIndex', () => {
 			);
 
 			expect( result ).toBe( 4 );
+		} );
+
+		it( 'skips the block being dragged by checking for the `is-dragging` classname', () => {
+			const position = { x: 450, y: 0 };
+
+			const horizontalElementsWithDraggedBlock = [
+				...horizontalElements.slice( 0, 2 ),
+				{
+					...horizontalElements[ 2 ],
+					classList: createMockClassList( 'wp-block is-dragging' ),
+				},
+				...horizontalElements.slice( 3, 4 ),
+			];
+
+			const result = getNearestBlockIndex(
+				horizontalElementsWithDraggedBlock,
+				position,
+				orientation
+			);
+
+			expect( result ).toBe( 3 );
 		} );
 	} );
 } );

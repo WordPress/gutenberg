@@ -6,6 +6,7 @@ import {
 	insertBlock,
 	publishPost,
 	visitAdminPage,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -13,7 +14,6 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { useExperimentalFeatures } from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -24,7 +24,8 @@ describe( 'Multi-entity save flow', () => {
 	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector = 'button[aria-label="Close panel"]';
-	const createNewButtonSelector = '//button[contains(text(), "New section")]';
+	const createNewButtonSelector =
+		'//button[contains(text(), "New template part")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
@@ -58,8 +59,8 @@ describe( 'Multi-entity save flow', () => {
 	] );
 
 	beforeAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	describe( 'Post Editor', () => {
@@ -108,7 +109,7 @@ describe( 'Multi-entity save flow', () => {
 
 			it( 'Should trigger multi-entity save button once template part edited', async () => {
 				// Create new template part.
-				await insertBlock( 'Section' );
+				await insertBlock( 'Template Part' );
 				const [ createNewButton ] = await page.$x(
 					createNewButtonSelector
 				);
@@ -234,7 +235,7 @@ describe( 'Multi-entity save flow', () => {
 			await demoTemplateButton.click();
 
 			// Insert a new template part placeholder.
-			await insertBlock( 'Section' );
+			await insertBlock( 'Template Part' );
 
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector

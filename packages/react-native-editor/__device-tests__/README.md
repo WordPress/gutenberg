@@ -20,11 +20,11 @@ TBA
 
 ## Running the tests locally
 
-TLDR; to run the tests locally ensure metro isn't running and then run `yarn test:e2e:ios:local` and `yarn test:e2e:android:local` for the desired platform.
+TLDR; to run the tests locally ensure metro isn't running and then run `npm run native test:e2e:ios:local` and `npm run native test:e2e:android:local` for the desired platform.
 
 Those commands include the process to build a testable version of the app, if it's the case you don't want to run the 
 full suite and want to run a specific file or files you can use the e2e build commands that can be found in the package.json for the respective platform and then 
-run `TEST_RN_PLATFORM=android yarn device-tests <pattern>` where the pattern can just be the file path.
+run `TEST_RN_PLATFORM=android npm run native device-tests <pattern>` where the pattern can just be the file path.
 
 ### Starting the Appium Server
 

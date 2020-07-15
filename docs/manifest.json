@@ -60,6 +60,12 @@
 		"parent": "principles"
 	},
 	{
+		"title": "Versions in WordPress",
+		"slug": "versions-in-wordpress",
+		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
+		"parent": "principles"
+	},
+	{
 		"title": "History",
 		"slug": "history",
 		"markdown_source": "../docs/contributors/history.md",
@@ -456,6 +462,12 @@
 		"parent": null
 	},
 	{
+		"title": "Development Environment",
+		"slug": "devenv",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/devenv/readme.md",
+		"parent": "tutorials"
+	},
+	{
 		"title": "Getting Started with JavaScript",
 		"slug": "javascript",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/readme.md",
@@ -501,6 +513,12 @@
 		"title": "JavaScript Build Setup",
 		"slug": "js-build-setup",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/js-build-setup.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "ESNext Syntax",
+		"slug": "esnext-js",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/esnext-js.md",
 		"parent": "javascript"
 	},
 	{
@@ -1113,6 +1131,12 @@
 		"title": "ToggleControl",
 		"slug": "toggle-control",
 		"markdown_source": "../packages/components/src/toggle-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolbarButton",
+		"slug": "toolbar-button",
+		"markdown_source": "../packages/components/src/toolbar-button/README.md",
 		"parent": "components"
 	},
 	{

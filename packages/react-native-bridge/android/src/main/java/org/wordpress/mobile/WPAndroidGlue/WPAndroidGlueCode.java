@@ -111,6 +111,7 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_TRANSLATIONS = "translations";
     public static final String PROP_NAME_CAPABILITIES = "capabilities";
     public static final String PROP_NAME_CAPABILITIES_MENTIONS = "mentions";
+    public static final String PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor";
     private static final String PROP_NAME_COLORS = "colors";
     private static final String PROP_NAME_GRADIENTS = "gradients";
 
@@ -183,7 +184,7 @@ public class WPAndroidGlueCode {
     public interface OnGutenbergDidRequestUnsupportedBlockFallbackListener {
         void gutenbergDidRequestUnsupportedBlockFallback(UnsupportedBlock unsupportedBlock);
     }
-    
+
     public interface OnStarterPageTemplatesTooltipShownEventListener {
         void onSetStarterPageTemplatesTooltipShown(boolean tooltipShown);
         boolean onRequestStarterPageTemplatesTooltipShown();
@@ -380,7 +381,7 @@ public class WPAndroidGlueCode {
                         gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, blockTitle, content));
             }
 
-            @Override 
+            @Override
             public void onAddMention(Consumer<String> onSuccess) {
                 mAddMentionUtil.getMention(onSuccess);
             }
@@ -431,7 +432,9 @@ public class WPAndroidGlueCode {
                              Consumer<Exception> exceptionLogger,
                              Consumer<String> breadcrumbLogger,
                              @Nullable Boolean isSiteUsingWpComRestApi,
-                             @Nullable Bundle editorTheme) {
+                             @Nullable Bundle editorTheme,
+                             boolean isUnsupportedBlockEditorEnabled,
+                             boolean enableMentionsFlag) {
         mIsDarkMode = isDarkMode;
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
@@ -466,8 +469,9 @@ public class WPAndroidGlueCode {
 
         Bundle capabilities = new Bundle();
         if (isSiteUsingWpComRestApi != null) {
-            capabilities.putBoolean(PROP_NAME_CAPABILITIES_MENTIONS, isSiteUsingWpComRestApi);
+            capabilities.putBoolean(PROP_NAME_CAPABILITIES_MENTIONS, isSiteUsingWpComRestApi && enableMentionsFlag);
         }
+        capabilities.putBoolean(PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, isUnsupportedBlockEditorEnabled);
         initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
 
         Serializable colors = editorTheme != null ? editorTheme.getSerializable(PROP_NAME_COLORS) : null;

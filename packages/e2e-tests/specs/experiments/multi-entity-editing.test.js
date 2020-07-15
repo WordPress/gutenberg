@@ -11,6 +11,7 @@ import {
 	visitAdminPage,
 	createNewPost,
 	publishPost,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -18,7 +19,6 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { useExperimentalFeatures } from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
 
 const visitSiteEditor = async () => {
 	const query = addQueryArgs( '', {
@@ -52,9 +52,9 @@ const createTemplatePart = async (
 	isNested = false
 ) => {
 	// Create new template part.
-	await insertBlock( 'Section' );
+	await insertBlock( 'Template Part' );
 	const [ createNewButton ] = await page.$x(
-		'//button[contains(text(), "New section")]'
+		'//button[contains(text(), "New template part")]'
 	);
 	await createNewButton.click();
 	await page.waitForSelector(
@@ -164,8 +164,8 @@ describe( 'Multi-entity editor states', () => {
 	] );
 
 	beforeAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
@@ -194,8 +194,8 @@ describe( 'Multi-entity editor states', () => {
 
 	describe( 'Multi-entity edit', () => {
 		beforeAll( async () => {
-			await trashExistingPosts( 'wp_template' );
-			await trashExistingPosts( 'wp_template_part' );
+			await trashAllPosts( 'wp_template' );
+			await trashAllPosts( 'wp_template_part' );
 			await createNewPost( {
 				postType: 'wp_template',
 				title: kebabCase( templateName ),

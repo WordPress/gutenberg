@@ -42,7 +42,7 @@ The save function will simply write the `attributes.message` as a div tag since 
 
 Update the edit.js and save.js files to the following, replacing the existing functions.
 
-**edit.js**
+**edit.js** file:
 
 ```js
 import { TextControl } from '@wordpress/components';
@@ -61,7 +61,7 @@ export default function Edit( { attributes, className, setAttributes } ) {
 }
 ```
 
-**save.js**
+**save.js** file:
 
 ```jsx
 export default function Save( { attributes, className } ) {
@@ -71,4 +71,4 @@ export default function Save( { attributes, className } ) {
 
 Rebuild the block using `npm run build`, reload the editor and add the block. Type a message in the editor, save, and view it in the post.
 
-Next Section: [Code Implementation](block-code.md)
+Next Section: [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/block-code.md)

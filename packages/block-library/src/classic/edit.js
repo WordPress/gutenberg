@@ -6,9 +6,16 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { BlockControls } from '@wordpress/block-editor';
+import { Toolbar } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import ConvertToBlocksButton from './convert-to-blocks-button';
 
 const { wp } = window;
 
@@ -103,6 +110,13 @@ export default class ClassicEdit extends Component {
 
 		editor.on( 'blur', () => {
 			bookmark = editor.selection.getBookmark( 2, true );
+			// There is an issue with Chrome and the editor.focus call in core at https://core.trac.wordpress.org/browser/trunk/src/js/_enqueues/lib/link.js#L451.
+			// This causes a scroll to the top of editor content on return from some content updating dialogs so tracking
+			// scroll position until this is fixed in core.
+			const scrollContainer = document.querySelector(
+				'.interface-interface-skeleton__content'
+			);
+			const scrollPosition = scrollContainer.scrollTop;
 
 			setAttributes( {
 				content: editor.getContent(),
@@ -111,6 +125,9 @@ export default class ClassicEdit extends Component {
 			editor.once( 'focus', () => {
 				if ( bookmark ) {
 					editor.selection.moveToBookmark( bookmark );
+					if ( scrollContainer.scrollTop !== scrollPosition ) {
+						scrollContainer.scrollTop = scrollPosition;
+					}
 				}
 			} );
 
@@ -225,22 +242,29 @@ export default class ClassicEdit extends Component {
 		//    from the KeyboardShortcuts component to stop their propagation.
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return [
-			<div
-				key="toolbar"
-				id={ `toolbar-${ clientId }` }
-				ref={ ( ref ) => ( this.ref = ref ) }
-				className="block-library-classic__toolbar"
-				onClick={ this.focus }
-				data-placeholder={ __( 'Classic' ) }
-				onKeyDown={ this.onToolbarKeyDown }
-			/>,
-			<div
-				key="editor"
-				id={ `editor-${ clientId }` }
-				className="wp-block-freeform block-library-rich-text__tinymce"
-			/>,
-		];
+		return (
+			<>
+				<BlockControls>
+					<Toolbar>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</Toolbar>
+				</BlockControls>
+				<div
+					key="toolbar"
+					id={ `toolbar-${ clientId }` }
+					ref={ ( ref ) => ( this.ref = ref ) }
+					className="block-library-classic__toolbar"
+					onClick={ this.focus }
+					data-placeholder={ __( 'Classic' ) }
+					onKeyDown={ this.onToolbarKeyDown }
+				/>
+				<div
+					key="editor"
+					id={ `editor-${ clientId }` }
+					className="wp-block-freeform block-library-rich-text__tinymce"
+				/>
+			</>
+		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }

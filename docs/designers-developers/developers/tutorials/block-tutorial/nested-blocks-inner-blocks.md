@@ -68,7 +68,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 
 ## Allowed Blocks
 
-Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in your InnerBlock. This restricts the that can be included only to those listed, all other blocks will not show in the inserter.
+Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in your InnerBlock. This restricts the blocks that can be included only to those listed, all other blocks will not show in the inserter.
 
 ```js
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
@@ -78,6 +78,16 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 />
 ```
 
+## Orientation
+
+By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style InnerBlocks to appear horizontally. When blocks are styled in such a way, the `orientation` prop can be used to indicate a horizontal layout:
+```js
+<InnerBlocks
+	orientation="horizontal"
+/>
+```
+
+Specifying this prop will result in the block movers being shown horizontally, and also ensure drag and drop works correctly.
 
 ## Template
 
