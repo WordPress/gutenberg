@@ -107,6 +107,7 @@ function QuickInserterList( {
 }
 
 function QuickInserter( {
+	onSelect,
 	rootClientId,
 	clientId,
 	isAppender,
@@ -119,6 +120,7 @@ function QuickInserter( {
 		onInsertBlocks,
 		onToggleInsertionPoint,
 	] = useInsertionPoint( {
+		onSelect,
 		rootClientId,
 		clientId,
 		isAppender,
