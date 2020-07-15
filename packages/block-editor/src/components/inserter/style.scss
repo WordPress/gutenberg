@@ -280,8 +280,13 @@ $block-inserter-tabs-height: 44px;
 	float: left;
 }
 
-.block-editor-inserter__quick-inserter:not(.has-search):not(.has-expand) .block-editor-inserter__panel-content {
+.block-editor-inserter__quick-inserter .block-editor-inserter__panel-content {
 	padding: 0 $grid-unit-10;
+}
+
+.block-editor-inserter__quick-inserter.has-search .block-editor-inserter__panel-content,
+.block-editor-inserter__quick-inserter.has-expand .block-editor-inserter__panel-content {
+	padding: 0 $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter-patterns {
