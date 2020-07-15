@@ -45,7 +45,8 @@ export default function PostExcerptEdit( {
 	// Set the initial moreText based on local.
 	useEffect( () => {
 		if ( moreText === null || moreText === undefined ) {
-			setAttributes( { moreText: __( 'Read more…' ) } );
+			// eslint-disable-next-line @wordpress/i18n-ellipsis
+			setAttributes( { moreText: __( 'Read more...' ) } );
 		}
 	}, [] );
 
