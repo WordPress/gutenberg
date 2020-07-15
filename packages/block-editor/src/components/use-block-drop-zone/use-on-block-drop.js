@@ -45,8 +45,8 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 			} = select( 'core/block-editor' );
 
 			return {
-				_getBlockIndex,
-				_getClientIdsOfDescendants,
+				getBlockIndex: _getBlockIndex,
+				getClientIdsOfDescendants: _getClientIdsOfDescendants,
 			};
 		},
 		[]
