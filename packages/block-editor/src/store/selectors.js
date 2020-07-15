@@ -1591,6 +1591,17 @@ export function isNavigationMode( state ) {
 }
 
 /**
+ * Returns whether the browse mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Is browse mode enabled.
+ */
+export function isBrowseMode( state ) {
+	return state.isBrowseMode;
+}
+
+/**
  * Returns whether block moving mode is enabled.
  *
  * @param {Object} state Editor state.

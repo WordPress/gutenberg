@@ -915,6 +915,18 @@ export function* setNavigationMode( isNavigationMode = true ) {
 }
 
 /**
+ * Returns an action object used to enable or disable the browse mode.
+ *
+ * @param {string} isBrowseMode Enable/Disable browse mode.
+ */
+export function* setBrowseMode( isBrowseMode = true ) {
+	return {
+		type: 'SET_BROWSE_MODE',
+		isBrowseMode,
+	};
+}
+
+/**
  * Generator that triggers an action used to enable or disable the block moving mode.
  *
  * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.

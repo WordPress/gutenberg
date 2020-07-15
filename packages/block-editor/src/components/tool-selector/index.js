@@ -11,8 +11,8 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
-import { Icon, edit as editIcon } from '@wordpress/icons';
+import { useState, forwardRef } from '@wordpress/element';
+import { Icon, edit as editIcon, link as linkIcon } from '@wordpress/icons';
 
 const selectIcon = (
 	<SVG
@@ -26,23 +26,43 @@ const selectIcon = (
 );
 
 function ToolSelector( props, ref ) {
-	const isNavigationTool = useSelect(
-		( select ) => select( 'core/block-editor' ).isNavigationMode(),
+	const { isNavigationMode, enableFullSiteEditing } = useSelect(
+		( select ) => {
+			const { isNavigationMode: _isNavigationMode, getSettings } = select(
+				'core/block-editor'
+			);
+			return {
+				isNavigationMode: _isNavigationMode(),
+				enableFullSiteEditing: getSettings()
+					.__experimentalEnableFullSiteEditing,
+			};
+		},
 		[]
 	);
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
+	const { setNavigationMode, setBrowseMode } = useDispatch(
+		'core/block-editor'
+	);
+
+	const [ tool, setTool ] = useState( isNavigationMode ? 'select' : 'edit' );
 
 	const onSwitchMode = ( mode ) => {
 		setNavigationMode( mode === 'edit' ? false : true );
+		setBrowseMode( mode === 'browse' ? false : true );
+		setTool( mode );
 	};
-
 	return (
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					{ ...props }
 					ref={ ref }
-					icon={ isNavigationTool ? selectIcon : editIcon }
+					icon={
+						{
+							edit: editIcon,
+							select: selectIcon,
+							browse: linkIcon,
+						}[ tool ]
+					}
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
 					label={ __( 'Tools' ) }
@@ -53,7 +73,7 @@ function ToolSelector( props, ref ) {
 				<>
 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
-							value={ isNavigationTool ? 'select' : 'edit' }
+							value={ tool }
 							onSelect={ onSwitchMode }
 							choices={ [
 								{
@@ -74,7 +94,16 @@ function ToolSelector( props, ref ) {
 										</>
 									),
 								},
-							] }
+								enableFullSiteEditing && {
+									value: 'browse',
+									label: (
+										<>
+											<Icon icon={ linkIcon } />
+											{ __( 'Browse' ) }
+										</>
+									),
+								},
+							].filter( Boolean ) }
 						/>
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">

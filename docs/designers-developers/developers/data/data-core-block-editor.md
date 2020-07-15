@@ -833,6 +833,18 @@ _Returns_
 
 -   `boolean`: Whether block is selected and not the last in the selection.
 
+<a name="isBrowseMode" href="#isBrowseMode">#</a> **isBrowseMode**
+
+Returns whether the browse mode is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `boolean`: Is browse mode enabled.
+
 <a name="isCaretWithinFormattedText" href="#isCaretWithinFormattedText">#</a> **isCaretWithinFormattedText**
 
 Returns true if the caret is within formatted text, or false otherwise.
@@ -1293,6 +1305,14 @@ Generator that triggers an action used to enable or disable the block moving mod
 _Parameters_
 
 -   _hasBlockMovingClientId_ `(string|null)`: Enable/Disable block moving mode.
+
+<a name="setBrowseMode" href="#setBrowseMode">#</a> **setBrowseMode**
+
+Returns an action object used to enable or disable the browse mode.
+
+_Parameters_
+
+-   _isBrowseMode_ `string`: Enable/Disable browse mode.
 
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 
