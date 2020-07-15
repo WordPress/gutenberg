@@ -158,7 +158,6 @@ describe( 'adding blocks', () => {
 
 		// Tab to the block list
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 
 		// Expect the block list to be the active element.
 		activeElementClassList = await page.evaluate(
