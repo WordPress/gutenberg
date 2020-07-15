@@ -31,8 +31,9 @@ function InserterListItem( {
 		: {};
 
 	return (
-		<li className="block-editor-block-types-list__list-item" role="option">
+		<div className="block-editor-block-types-list__list-item">
 			<CompositeItem
+				role="option"
 				as={ Button }
 				{ ...composite }
 				className={ classnames(
@@ -56,7 +57,7 @@ function InserterListItem( {
 					{ title }
 				</span>
 			</CompositeItem>
-		</li>
+		</div>
 	);
 }
 

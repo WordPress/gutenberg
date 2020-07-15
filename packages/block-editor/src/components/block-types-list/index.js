@@ -7,6 +7,7 @@ import { Composite, useCompositeState } from 'reakit';
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,6 +29,11 @@ function BlockTypesList( {
 		''
 	);
 
+	// This ensures the composite state refreshes when the list order changes.
+	useEffect( () => {
+		composite.unstable_sort();
+	}, [ composite.unstable_sort, orderId ] );
+
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -35,13 +41,10 @@ function BlockTypesList( {
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<Composite
-			as="ul"
-			role="listbox"
 			{ ...composite }
+			role="listbox"
 			className="block-editor-block-types-list"
 			aria-label={ label }
-			// This ensures the composite state refreshes when the list order changes.
-			key={ orderId }
 		>
 			{ normalizedItems.map( ( item ) => {
 				return (
