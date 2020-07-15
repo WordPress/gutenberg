@@ -163,16 +163,19 @@ async function getPerformanceResultsForBranch(
 		results.push( curateResults( rawResults ) );
 	}
 
-	const medians = {
-		load: median( results.map( ( r ) => r.load ) ),
-		domcontentloaded: median( results.map( ( r ) => r.domcontentloaded ) ),
-		type: median( results.map( ( r ) => r.type ) ),
-		minType: median( results.map( ( r ) => r.minType ) ),
-		maxType: median( results.map( ( r ) => r.maxType ) ),
-		focus: median( results.map( ( r ) => r.focus ) ),
-		minFocus: median( results.map( ( r ) => r.minFocus ) ),
-		maxFocus: median( results.map( ( r ) => r.maxFocus ) ),
-	};
+	const medians = mapValues(
+		{
+			load: results.map( ( r ) => r.load ),
+			domcontentloaded: results.map( ( r ) => r.domcontentloaded ),
+			type: results.map( ( r ) => r.type ),
+			minType: results.map( ( r ) => r.minType ),
+			maxType: results.map( ( r ) => r.maxType ),
+			focus: results.map( ( r ) => r.focus ),
+			minFocus: results.map( ( r ) => r.minFocus ),
+			maxFocus: results.map( ( r ) => r.maxFocus ),
+		},
+		median
+	);
 
 	// Remove results for which we don't have data (and where the statistical functions thus returned NaN or Infinity etc).
 	const finiteMedians = pickBy( medians, isFinite );
