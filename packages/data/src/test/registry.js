@@ -9,6 +9,19 @@ import { castArray, mapValues } from 'lodash';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 
+// This makes the prioriy queue synchronous to ease unit testing resolvers.
+jest.mock( '@wordpress/priority-queue', () => {
+	return {
+		createQueue() {
+			return {
+				add( ctx, callback ) {
+					callback();
+				},
+			};
+		},
+	};
+} );
+
 describe( 'createRegistry', () => {
 	let registry;
 

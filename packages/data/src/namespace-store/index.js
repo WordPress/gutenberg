@@ -9,6 +9,7 @@ import combineReducers from 'turbo-combine-reducers';
  * WordPress dependencies
  */
 import createReduxRoutineMiddleware from '@wordpress/redux-routine';
+import { createQueue } from '@wordpress/priority-queue';
 
 /**
  * Internal dependencies
@@ -37,6 +38,7 @@ import * as metadataActions from './metadata/actions';
 export default function createNamespace( key, options, registry ) {
 	const reducer = options.reducer;
 	const store = createReduxStore( key, options, registry );
+	const resolversQueue = createQueue();
 
 	let resolvers;
 	const actions = mapActions(
@@ -64,7 +66,12 @@ export default function createNamespace( key, options, registry ) {
 		store
 	);
 	if ( options.resolvers ) {
-		const result = mapResolvers( options.resolvers, selectors, store );
+		const result = mapResolvers(
+			options.resolvers,
+			selectors,
+			store,
+			resolversQueue
+		);
 		resolvers = result.resolvers;
 		selectors = result.selectors;
 	}
@@ -166,7 +173,6 @@ function createReduxStore( key, options, registry ) {
  *                           public facing API. Selectors will get passed the
  *                           state as first argument.
  * @param {Object} store     The store to which the selectors should be mapped.
- *
  * @return {Object} Selectors mapped to the provided store.
  */
 function mapSelectors( selectors, store ) {
@@ -218,9 +224,10 @@ function mapActions( actions, store ) {
  * @param {Object} resolvers   Resolvers to register.
  * @param {Object} selectors   The current selectors to be modified.
  * @param {Object} store       The redux store to which the resolvers should be mapped.
+ * @param {Object} queue       Resolvers async queue.
  * @return {Object}            An object containing updated selectors and resolvers.
  */
-function mapResolvers( resolvers, selectors, store ) {
+function mapResolvers( resolvers, selectors, store, queue ) {
 	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
 		const { fulfill: resolverFulfill = resolver } = resolver;
 		return { ...resolver, fulfill: resolverFulfill };
@@ -233,7 +240,6 @@ function mapResolvers( resolvers, selectors, store ) {
 			return selector;
 		}
 
-		let running = false;
 		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
@@ -245,8 +251,8 @@ function mapResolvers( resolvers, selectors, store ) {
 				}
 
 				const { metadata } = store.__unstableOriginalGetState();
+
 				if (
-					running ||
 					metadataSelectors.hasStartedResolution(
 						metadata,
 						selectorName,
@@ -256,8 +262,7 @@ function mapResolvers( resolvers, selectors, store ) {
 					return;
 				}
 
-				running = true;
-				setTimeout( async () => {
+				queue.add( {}, async () => {
 					store.dispatch(
 						metadataActions.startResolution( selectorName, args )
 					);
@@ -270,8 +275,7 @@ function mapResolvers( resolvers, selectors, store ) {
 					store.dispatch(
 						metadataActions.finishResolution( selectorName, args )
 					);
-					running = false;
-				}, 0 );
+				} );
 			}
 
 			fulfillSelector( ...args );

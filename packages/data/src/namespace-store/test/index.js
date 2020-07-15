@@ -4,6 +4,19 @@
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 
+// This makes the prioriy queue synchronous to ease unit testing resolvers.
+jest.mock( '@wordpress/priority-queue', () => {
+	return {
+		createQueue() {
+			return {
+				add( ctx, callback ) {
+					callback();
+				},
+			};
+		},
+	};
+} );
+
 describe( 'controls', () => {
 	let registry;
 
