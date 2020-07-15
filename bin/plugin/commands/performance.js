@@ -19,7 +19,8 @@ const config = require( '../config' );
 /**
  * @typedef WPPerformanceCommandOptions
  *
- * @property {boolean=} ci Run on CI.
+ * @property {boolean=} ci          Run on CI.
+ * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  */
 
 /**
@@ -200,6 +201,19 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '>> Cloning the repository' );
 	const performanceTestDirectory = await git.clone( config.gitRepositoryURL );
+
+	if ( !! options.testsBranch ) {
+		log(
+			'>> Fetching the ' +
+				formats.success( options.testsBranch ) +
+				' branch'
+		);
+		await git.checkoutRemoteBranch(
+			performanceTestDirectory,
+			options.testsBranch
+		);
+	}
+
 	const environmentDirectory = getRandomTemporaryPath();
 	log(
 		'>> Perf Tests Directory : ' +
