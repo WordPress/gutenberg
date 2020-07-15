@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -63,8 +64,8 @@ const checkStatus = ( response ) => {
 };
 
 const defaultFetchHandler = ( nextOptions ) => {
-	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
-	let { body, headers } = nextOptions;
+	const { data, envelope = false, ...remainingOptions } = nextOptions;
+	let { body, headers, url, path, parse = true } = nextOptions;
 
 	// Merge explicitly-provided headers with default values.
 	headers = { ...DEFAULT_HEADERS, ...headers };
@@ -73,6 +74,15 @@ const defaultFetchHandler = ( nextOptions ) => {
 	if ( data ) {
 		body = JSON.stringify( data );
 		headers[ 'Content-Type' ] = 'application/json';
+	}
+	// Envelope request for easier access to headers and status.
+	if ( envelope ) {
+		parse = false;
+		const queryArgs = {
+			_envelope: 1,
+		};
+		url = url && addQueryArgs( url, queryArgs );
+		path = path && addQueryArgs( path, queryArgs );
 	}
 
 	const responsePromise = window.fetch( url || path, {
