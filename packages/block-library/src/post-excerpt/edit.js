@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -36,12 +36,19 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 	}, [ rawPostContent, wordCount ] );
 }
 
-function PostExcerptEditor( {
+export default function PostExcerptEdit( {
 	attributes: { align, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
 	context: { postId, postType },
 } ) {
+	// Set the initial moreText based on local.
+	useEffect( () => {
+		if ( moreText === null || moreText === undefined ) {
+			setAttributes( { moreText: __( 'Read more…' ) } );
+		}
+	}, [] );
+
 	const [ excerpt, setExcerpt ] = useEntityProp(
 		'postType',
 		postType,
@@ -99,7 +106,11 @@ function PostExcerptEditor( {
 					}
 					placeholder={ postContentExcerpt }
 					value={
-						excerpt || ( isSelected ? '' : postContentExcerpt )
+						excerpt ||
+						( isSelected
+							? ''
+							: postContentExcerpt ||
+							  __( 'No post excerpt found' ) )
 					}
 					onChange={ setExcerpt }
 					keepPlaceholderOnFocus
@@ -128,25 +139,5 @@ function PostExcerptEditor( {
 				) }
 			</div>
 		</>
-	);
-}
-
-export default function PostExcerptEdit( {
-	attributes,
-	setAttributes,
-	isSelected,
-	context,
-} ) {
-	// This check doesn't work in site editor? always false.
-	// if ( ! useEntityId( 'postType', 'post' ) ) {
-	// 	return __( 'Post Excerpt' );
-	// }
-	return (
-		<PostExcerptEditor
-			attributes={ attributes }
-			setAttributes={ setAttributes }
-			isSelected={ isSelected }
-			context={ context }
-		/>
 	);
 }
