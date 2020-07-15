@@ -23,7 +23,7 @@ const ImageEditingButton = ( {
 	openMediaOptions,
 	url,
 } ) => {
-	if ( ! isSelected || isUploadInProgress || isUploadFailed ) {
+	if ( ! isSelected || ! url || isUploadInProgress || isUploadFailed ) {
 		return null;
 	}
 	return (
