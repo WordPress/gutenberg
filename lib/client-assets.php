@@ -670,7 +670,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns',
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_custom_line_height( $settings ) {
-	$settings['__experimentalDisableCustomLineHeight'] = get_theme_support( 'disable-custom-line-height' );
+	$settings['__experimentalEnableCustomLineHeight'] = get_theme_support( 'experimental-line-height' );
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_height' );

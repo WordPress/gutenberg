@@ -115,7 +115,7 @@ class EditorProvider extends Component {
 				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
 				'__experimentalDisableCustomUnits',
-				'__experimentalDisableCustomLineHeight',
+				'__experimentalEnableCustomLineHeight',
 				'__experimentalEnableCustomSpacing',
 				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalEnableLinkColor',
