@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { dropRight, times, map, compact } from 'lodash';
+import { dropRight, times, map, compact, delay } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -310,7 +310,9 @@ const ColumnsEdit = ( props ) => {
 
 			return {
 				columnCount: getBlockCount( clientId ),
-				isDefaultColumns: ! compact( isContentEmpty ).length,
+				isDefaultColumns:
+					innerBlocks.length === DEFAULT_COLUMNS_NUM &&
+					! compact( isContentEmpty ).length,
 			};
 		},
 		[ clientId ]
@@ -320,7 +322,7 @@ const ColumnsEdit = ( props ) => {
 
 	useEffect( () => {
 		if ( isSelected && isDefaultColumns ) {
-			setIsVisible( true );
+			delay( () => setIsVisible( true ), 100 );
 		}
 	}, [] );
 

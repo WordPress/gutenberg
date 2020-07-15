@@ -462,6 +462,12 @@
 		"parent": null
 	},
 	{
+		"title": "Development Environment",
+		"slug": "devenv",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/devenv/readme.md",
+		"parent": "tutorials"
+	},
+	{
 		"title": "Getting Started with JavaScript",
 		"slug": "javascript",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/readme.md",
@@ -1125,6 +1131,12 @@
 		"title": "ToggleControl",
 		"slug": "toggle-control",
 		"markdown_source": "../packages/components/src/toggle-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolbarButton",
+		"slug": "toolbar-button",
+		"markdown_source": "../packages/components/src/toolbar-button/README.md",
 		"parent": "components"
 	},
 	{
