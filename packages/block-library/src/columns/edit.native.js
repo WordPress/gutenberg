@@ -310,9 +310,7 @@ const ColumnsEdit = ( props ) => {
 
 			return {
 				columnCount: getBlockCount( clientId ),
-				isDefaultColumns:
-					innerBlocks.length === DEFAULT_COLUMNS_NUM &&
-					! compact( isContentEmpty ).length,
+				isDefaultColumns: ! compact( isContentEmpty ).length,
 			};
 		},
 		[ clientId ]

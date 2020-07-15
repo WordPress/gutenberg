@@ -92,6 +92,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 						<MenuItem
 							item={ v }
 							key={ v.name }
+							style={ styles.menuItem }
 							onSelect={ () => {
 								replaceInnerBlocks(
 									clientId,
