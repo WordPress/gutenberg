@@ -80,32 +80,33 @@
 	min-height: 58px;
 }
 
-.contentContainer {
-	flex-direction: row;
-	padding: 0 $grid-unit-20;
-}
-
-.container {
-	padding-bottom: $grid-unit-20;
-}
-
-.colorIndicator {
+.paletteColorIndicator {
+	margin-top: 0;
+	margin-bottom: 0;
 	width: 32px;
 	height: 32px;
 }
 
-.customIndicatorWrapper {
+.paletteCustomIndicatorWrapper {
 	flex-direction: row;
 	align-items: baseline;
 	width: 32px;
 	height: 32px;
 }
 
-.circleOption {
-	height: 24px;
-	width: 24px;
-	border-radius: 12px;
-	margin-right: 8px;
-	justify-content: center;
-	align-items: center;
+.paletteVerticalSeparator {
+	border-width: 0;
+	border-color: $light-gray-400;
+	height: 38px;
+	margin-right: 0;
+	align-self: center;
+}
+
+.mediaPlaceholderEmptyStateContainer {
+	height: 300;
+}
+
+.mediaPlaceholderEmptyStateTitle {
+	margin-top: 4;
+	margin-bottom: 16;
 }
