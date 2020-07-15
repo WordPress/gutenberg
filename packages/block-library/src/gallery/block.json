@@ -43,6 +43,12 @@
 					"type": "string",
 					"source": "html",
 					"selector": ".blocks-gallery-item__caption"
+				},
+				"ratio": {
+					"type": "string",
+					"source": "attribute",
+					"selector": "img",
+					"attribute": "data-ratio"
 				}
 			}
 		},

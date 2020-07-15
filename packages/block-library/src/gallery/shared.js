@@ -21,3 +21,36 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	}
 	return imageProps;
 };
+
+export async function getImageRatio( url ) {
+	const img = document.createElement( 'img' );
+	const imgPromise = new Promise( ( resolve, reject ) => {
+		img.onload = () => resolve( img );
+		img.onerror = reject;
+	} );
+
+	img.src = url;
+	await imgPromise;
+
+	if ( ! img ) {
+		return false;
+	}
+
+	if ( ! img.naturalWidth || ! img.naturalHeight ) {
+		return false;
+	}
+
+	const ratio = img.naturalWidth / img.naturalHeight;
+
+	if ( ratio < 0.5 ) {
+		return 'tall';
+	} else if ( ratio < 0.9 ) {
+		return 'portrait';
+	} else if ( ratio < 1.1 ) {
+		return 'square';
+	} else if ( ratio < 1.9 ) {
+		return 'landscape';
+	}
+
+	return 'wide';
+}

@@ -62,7 +62,9 @@ export const Gallery = ( props ) => {
 
 					return (
 						<li
-							className="blocks-gallery-item"
+							className={ classnames( 'blocks-gallery-item', {
+								[ `image-ratio-${ img.ratio }` ]: img.ratio,
+							} ) }
 							key={ img.id || img.url }
 						>
 							<GalleryImage

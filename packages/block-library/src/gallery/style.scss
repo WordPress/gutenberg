@@ -138,49 +138,29 @@
 }
 
 .is-style-tiled {
-	@for $column-count from 1 through 8 {
-		&.columns-#{ $column-count } .blocks-gallery-grid {
-			$half-columns: 1;
-			@if $column-count % 2 == 0 {
-				$half-columns: $column-count / 2;
-			}
-			@else {
-				$half-columns: $column-count / 2 + 0.5;
-			}
-
-			grid-template-columns: repeat(#{ $column-count }, 1fr);
-
-			.blocks-gallery-item:nth-child( #{ $half-columns }n ) {
-				grid-column: auto / span 2;
-				grid-row: auto / span 1;
-			}
-
-			.blocks-gallery-item:nth-child( #{ $column-count * 2 }n ) {
-				grid-column: auto / span $column-count;
-				grid-row: auto / span 2;
-			}
-
-			.blocks-gallery-item:nth-child( #{ $column-count - 1 }n ) {
-				grid-column: auto / span $half-columns;
-				grid-row: auto / span 3;
-			}
-
-			.blocks-gallery-item:nth-child( #{ ( $column-count - 1 ) * 2 }n ) {
-				grid-column: #{ $half-columns + 1 } / span $half-columns;
-				grid-row: auto / span 3;
-			}
-		}
-	}
-
 	.blocks-gallery-grid {
 		display: grid;
 		grid-gap: 4px;
-		grid-auto-rows: minmax(100px, 200px);
 		grid-auto-flow: dense;
 
 		.blocks-gallery-item {
 			width: 100%;
 			margin: 0;
+
+			&.image-ratio-portrait {
+				grid-column: auto / span 2;
+				grid-row: auto / span 4;
+			}
+
+			&.image-ratio-landscape {
+				grid-column: auto / span 2;
+				grid-row: auto / span 2;
+			}
+
+			&.image-ratio-wide {
+				grid-column: auto / span 4;
+				grid-row: auto / span 2;
+			}
 		}
 
 		.blocks-gallery-item figure {
@@ -189,14 +169,77 @@
 			height: 100%;
 		}
 
-		.blocks-gallery-item {
-			grid-column: auto / span 1;
-		}
-
 		.blocks-gallery-item img {
 			width: 100%;
 			height: 100%;
 			object-fit: cover;
+		}
+	}
+
+	@for $column-count from 3 through 8 {
+		&.columns-#{ $column-count } .blocks-gallery-grid {
+			// As we add more rows, the rows need to be shorter, to maintain
+			// a reasonable aspect ratio.
+			grid-auto-rows: 40px + ( 8 - $column-count ) * 10px;
+
+			// Use double the columns behind the scenes, so we have easy
+			// access to "half" the number of columns.
+			$grid-columns: $column-count * 2;
+			grid-template-columns: repeat(#{ $grid-columns }, 1fr);
+
+			@if $column-count > 4 {
+				.blocks-gallery-item:nth-child( #{ $column-count - 3 }n ) {
+					&.image-ratio-portrait {
+						grid-column: auto / span 4;
+						grid-row: auto / span 8;
+					}
+
+					&.image-ratio-landscape {
+						grid-column: auto / span 4;
+						grid-row: auto / span 4;
+					}
+
+					&.image-ratio-wide {
+						grid-column: auto / span 8;
+						grid-row: auto / span 4;
+					}
+				}
+
+				.blocks-gallery-item:nth-child( #{ $column-count * 2 }n ) {
+					&.image-ratio-portrait {
+						grid-column: auto / span $column-count;
+						grid-row: auto / span #{ $column-count * 2 };
+					}
+
+					&.image-ratio-landscape {
+						grid-column: auto / span $grid-columns;
+						grid-row: auto / span #{ $column-count - 1 };
+					}
+
+					&.image-ratio-wide {
+						grid-column: auto / span $grid-columns;
+						grid-row: auto / span #{ $column-count - 2 };
+					}
+				}
+			}
+			@else {
+				.blocks-gallery-item:nth-child( #{ $column-count * 2 }n ) {
+					&.image-ratio-portrait {
+						grid-column: auto / span 4;
+						grid-row: auto / span 8;
+					}
+
+					&.image-ratio-landscape {
+						grid-column: auto / span 4;
+						grid-row: auto / span 4;
+					}
+
+					&.image-ratio-wide {
+						grid-column: auto / span 8;
+						grid-row: auto / span 4;
+					}
+				}
+			}
 		}
 	}
 }

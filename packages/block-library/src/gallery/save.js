@@ -43,6 +43,7 @@ export default function save( { attributes } ) {
 							data-id={ image.id }
 							data-full-url={ image.fullUrl }
 							data-link={ image.link }
+							data-ratio={ image.ratio }
 							className={
 								image.id ? `wp-image-${ image.id }` : null
 							}
