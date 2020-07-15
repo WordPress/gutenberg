@@ -19,4 +19,5 @@ export const settings = {
 	category,
 	edit,
 	save,
+	keywords: [ __( 'accordion' ) ]
 };
