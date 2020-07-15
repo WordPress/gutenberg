@@ -144,7 +144,7 @@ export default class ClassicEdit extends Component {
 				// We need this check because when we remove the editor (onUnmount)
 				// due to the usage of `debounce`, this callback is executed in
 				// another tick. This results in setting the content to empty.
-				if ( editor._isRemoved ) return;
+				if ( editor._hasBeenRemoved ) return;
 
 				const value = editor.getContent();
 
@@ -154,11 +154,11 @@ export default class ClassicEdit extends Component {
 						content: value,
 					} );
 				}
-			} )
+			}, 250 )
 		);
 
 		editor.on( 'remove', () => {
-			editor._isRemoved = true;
+			editor._hasBeenRemoved = true;
 		} );
 
 		editor.on( 'keydown', ( event ) => {
