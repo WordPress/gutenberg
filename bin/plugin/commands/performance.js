@@ -2,6 +2,7 @@
  * External dependencies
  */
 const path = require( 'path' );
+const { pickBy } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -47,14 +48,14 @@ const config = require( '../config' );
 /**
  * @typedef WPFormattedPerformanceResults
  *
- * @property {string} load             Load Time.
- * @property {string} domcontentloaded DOM Contentloaded time.
- * @property {string} type             Average type time.
- * @property {string} minType          Minium type time.
- * @property {string} maxType          Maximum type time.
- * @property {string} focus            Average block selection time.
- * @property {string} minFocus         Min block selection time.
- * @property {string} maxFocus         Max block selection time.
+ * @property {string=} load             Load Time.
+ * @property {string=} domcontentloaded DOM Contentloaded time.
+ * @property {string=} type             Average type time.
+ * @property {string=} minType          Minium type time.
+ * @property {string=} maxType          Maximum type time.
+ * @property {string=} focus            Average block selection time.
+ * @property {string=} minFocus         Min block selection time.
+ * @property {string=} maxFocus         Max block selection time.
  */
 
 /**
@@ -162,7 +163,7 @@ async function getPerformanceResultsForBranch(
 		results.push( curateResults( rawResults ) );
 	}
 
-	return {
+	const formattedResults = {
 		load: formatTime( median( results.map( ( r ) => r.load ) ) ),
 		domcontentloaded: formatTime(
 			median( results.map( ( r ) => r.domcontentloaded ) )
@@ -174,6 +175,9 @@ async function getPerformanceResultsForBranch(
 		minFocus: formatTime( median( results.map( ( r ) => r.minFocus ) ) ),
 		maxFocus: formatTime( median( results.map( ( r ) => r.maxFocus ) ) ),
 	};
+
+	// Remove results for which we don't have data (and where the statistical functions thus returned NaN or Infinity etc).
+	return pickBy( formattedResults, isFinite );
 }
 
 /**
