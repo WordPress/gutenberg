@@ -53,17 +53,13 @@ export default function BlockTitle( { clientId } ) {
 		return null;
 	}
 
-	const { __experimentalLabel, title } = blockType;
+	const { title } = blockType;
+	const label = getBlockLabel( blockType, attributes );
 
-	// Check if it supports the label first. getBlockLabel will return the title
-	// if no label exists. We want to know if the label is undefined so that we
-	// can format it uniquely.
-	const label =
-		__experimentalLabel &&
-		truncate( getBlockLabel( blockType, attributes ), { length: 15 } );
-
-	if ( label ) {
-		return `${ title } - ${ label }`;
+	// Label will often fall back to the title if no label is defined for the
+	// clurrent label context. We do not want "Paragraph: Paragraph".
+	if ( label !== title ) {
+		return `${ title }: ${ truncate( label, { length: 15 } ) }`;
 	}
 	return title;
 }
