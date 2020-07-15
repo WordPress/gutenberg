@@ -104,32 +104,20 @@ describe( 'actions', () => {
 				type: 'FIND_TEMPLATE',
 				path: page.path,
 			} );
-			expect( it.next( templateId ) ).toEqual( {
-				value: {
-					type: 'SET_PAGE',
-					page,
-					templateId,
-				},
-				done: true,
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_PAGE',
+				page,
+				templateId,
 			} );
+			expect( it.next().done ).toBe( true );
 		} );
 	} );
 
 	describe( 'showHomepage', () => {
 		it( 'should calculate and set the homepage if it is set to show posts', () => {
 			const templateId = 1;
-			const path = '/';
 
 			const it = showHomepage();
-			expect( it.next().value ).toEqual( {
-				type: 'FIND_TEMPLATE',
-				path,
-			} );
-
-			expect( it.next( templateId ).value ).toEqual( {
-				type: 'SET_HOME_TEMPLATE',
-				homeTemplateId: templateId,
-			} );
 
 			expect( it.next().value ).toEqual( {
 				args: [ 'root', 'site' ],
@@ -139,32 +127,30 @@ describe( 'actions', () => {
 			} );
 
 			const page = {
-				path,
+				path: '/',
 				context: {},
 			};
 			expect( it.next( { show_on_front: 'posts' } ).value ).toEqual( {
-				type: 'DISPATCH',
-				storeKey: 'core/edit-site',
-				actionName: 'setPage',
-				args: [ page ],
+				type: 'FIND_TEMPLATE',
+				path: page.path,
+			} );
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_PAGE',
+				page,
+				templateId,
+			} );
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_HOME_TEMPLATE',
+				homeTemplateId: templateId,
 			} );
 			expect( it.next().done ).toBe( true );
 		} );
 
 		it( 'should calculate and set the homepage if it is set to show a page', () => {
-			const templateId = 1;
-			const path = '/';
+			const templateId = 2;
+			const pageId = 2;
 
 			const it = showHomepage();
-			expect( it.next().value ).toEqual( {
-				type: 'FIND_TEMPLATE',
-				path,
-			} );
-
-			expect( it.next( templateId ).value ).toEqual( {
-				type: 'SET_HOME_TEMPLATE',
-				homeTemplateId: templateId,
-			} );
 
 			expect( it.next().value ).toEqual( {
 				args: [ 'root', 'site' ],
@@ -174,19 +160,27 @@ describe( 'actions', () => {
 			} );
 
 			const page = {
-				path,
+				path: '/',
 				context: {
-					postId: 2,
 					postType: 'page',
+					postId: pageId,
 				},
 			};
 			expect(
-				it.next( { show_on_front: 'page', page_on_front: 2 } ).value
+				it.next( { show_on_front: 'page', page_on_front: pageId } )
+					.value
 			).toEqual( {
-				type: 'DISPATCH',
-				storeKey: 'core/edit-site',
-				actionName: 'setPage',
-				args: [ page ],
+				type: 'FIND_TEMPLATE',
+				path: page.path,
+			} );
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_PAGE',
+				page,
+				templateId,
+			} );
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_HOME_TEMPLATE',
+				homeTemplateId: templateId,
 			} );
 			expect( it.next().done ).toBe( true );
 		} );
