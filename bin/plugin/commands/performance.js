@@ -65,7 +65,7 @@ const config = require( '../config' );
  * @return {number} Average.
  */
 function average( array ) {
-	return array.reduce( ( a, b ) => a + b ) / array.length;
+	return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
 }
 
 /**
