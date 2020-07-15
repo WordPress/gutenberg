@@ -393,7 +393,9 @@ const Cover = ( {
 								styles.paletteVerticalSeparator
 							}
 							setColor={ setColor }
-							onCustomPress={ isParentSelected && openCustomColorPicker }
+							onCustomPress={
+								isParentSelected && openCustomColorPicker
+							}
 							defaultSettings={ coverDefaultPalette }
 							shouldShowCustomLabel={ false }
 						/>
