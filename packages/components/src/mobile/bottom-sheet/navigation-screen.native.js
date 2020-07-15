@@ -30,8 +30,8 @@ const BottomSheetScreen = ( { children, fullHeight } ) => {
 	useFocusEffect(
 		useCallback( () => {
 			onHardwareButtonPress( () => {
+				shouldDisableBottomSheetMaxHeight( true );
 				if ( navigation.canGoBack() ) {
-					shouldDisableBottomSheetMaxHeight( true );
 					navigation.goBack();
 					return true;
 				}
