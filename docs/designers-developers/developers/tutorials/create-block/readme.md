@@ -4,6 +4,10 @@ Let's get you started creating your first block for the WordPress Block Editor. 
 
 The tutorial includes setting up your development environment, tools, and getting comfortable with the new development model. If you are already comfortable, try the quick start below, otherwise step through whatever part of the tutorial you need.
 
+## Prerequisities
+
+The first thing you need is a development enviornment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md).
+
 ## Quick Start
 
 The `@wordpress/create-block` package exists to create the necessary block scaffolding to get you started. See [create-block package documentation](https://www.npmjs.com/package/@wordpress/create-block) for additional features. This quick start assumes you have a development environment with node installed, and a WordPress site.
@@ -22,10 +26,12 @@ After activated, go to the block editor and use the inserter to search and add y
 
 ## Table of Contents
 
-1. [Development Environment](devenv.md)
-2. [WordPress Plugin](wp-plugin.md)
-3. [Anatomy of a Block](block-anatomy.md)
-4. [Block Attributes](block-attributes.md)
-5. [Code Implementation](block-code.md)
-6. [Authoring Experience](author-experience.md)
-7. [Finishing Touches](finishing.md)
+The create a block tutorials breaks down to the following sections.
+
+1. [WordPress Plugin](/docs/designers-developers/developers/tutorials/create-block/wp-plugin.md)
+2. [ESNext Syntax](/docs/designers-developers/developers/tutorials/create-block/esnext-js.md)
+3. [Anatomy of a Gutenberg Block ](/docs/designers-developers/developers/tutorials/create-block/block-anatomy.md)
+4. [Block Attributes](/docs/designers-developers/developers/tutorials/create-block/block-attributes.md)
+5. [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/block-code.md)
+6. [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)
+7. [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/finishing.md)
