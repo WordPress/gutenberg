@@ -60,10 +60,10 @@ export default function BlockTitle( { clientId } ) {
 	// can format it uniquely.
 	const label =
 		__experimentalLabel &&
-		truncate( getBlockLabel( blockType, attributes ), { length: 25 } );
+		truncate( getBlockLabel( blockType, attributes ), { length: 15 } );
 
 	if ( label ) {
-		return `${ title } (${ label })`;
+		return `${ title } - ${ label }`;
 	}
 	return title;
 }
