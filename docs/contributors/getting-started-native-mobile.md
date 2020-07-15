@@ -1,6 +1,6 @@
 # Getting Started for the React Native based Mobile Gutenberg
 
-This is the mobile version of [Gutenberg](https://github.com/WordPress/gutenberg), targeting Android and iOS. It's a React Native library bootstrapped by CRNA and now ejected.
+This is the mobile version of [Gutenberg](https://github.com/WordPress/gutenberg), targeting Android and iOS. It's a React Native library bootstrapped by [Create React Native App](https://github.com/expo/create-react-native-app) and now ejected.
 
 ## Prerequisites
 
