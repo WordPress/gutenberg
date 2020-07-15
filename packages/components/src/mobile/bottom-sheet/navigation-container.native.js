@@ -1,37 +1,37 @@
 /**
  * External dependencies
  */
-import { Animated, Easing } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheetContext, BottomSheetProvider } from '@wordpress/components';
-import { useRef, useContext } from '@wordpress/element';
+import { useState, useContext } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import { performLayoutAnimation } from '../layout-animation';
 
 function BottomSheetNavigationContainer( { children, animate } ) {
-	const heightValue = useRef( new Animated.Value( 1 ) ).current;
+	const [ height, setMaxHeight ] = useState( 1 );
+
 	const context = useContext( BottomSheetContext );
 	const setHeight = ( maxHeight ) => {
-		if ( heightValue !== maxHeight ) {
+		if ( height !== maxHeight && maxHeight > 50 ) {
 			if ( animate ) {
-				Animated.timing( heightValue, {
-					toValue: maxHeight,
-					duration: 200,
-					easing: Easing.ease,
-				} ).start();
-			} else {
-				heightValue.setValue( maxHeight );
+				performLayoutAnimation( 200 );
 			}
+			setMaxHeight( maxHeight );
 		}
 	};
 
 	return (
-		<Animated.View style={ { height: heightValue } }>
+		<View style={ { height } }>
 			<BottomSheetProvider value={ { ...context, setHeight } }>
 				{ children }
 			</BottomSheetProvider>
-		</Animated.View>
+		</View>
 	);
 }
 

@@ -119,6 +119,8 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		this.keyboardWillShowListener.remove();
+		this.keyboardDidHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
@@ -131,8 +133,6 @@ class BottomSheet extends Component {
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
 		);
-		this.keyboardWillShowListener.remove();
-		this.keyboardDidHideListener.remove();
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
