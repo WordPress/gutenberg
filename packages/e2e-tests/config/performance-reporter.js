@@ -25,7 +25,9 @@ class PerformanceReporter {
 		}
 
 		const results = readFileSync( path, 'utf8' );
-		const { load, domcontentloaded, type, focus } = JSON.parse( results );
+		const { load, domcontentloaded, type, oldType, focus } = JSON.parse(
+			results
+		);
 
 		if ( load && load.length ) {
 			// eslint-disable-next-line no-console
@@ -47,6 +49,21 @@ Slowest time to type character: ${ success(
 			) }
 Fastest time to type character: ${ success(
 				round( Math.min( ...type ) ) + 'ms'
+			) }` );
+		}
+
+		if ( oldType && oldType.length ) {
+			// eslint-disable-next-line no-console
+			console.log( `
+${ title( 'Old Typing Performance:' ) }
+Average time to type character: ${ success(
+				round( average( oldType ) ) + 'ms'
+			) }
+Slowest time to type character: ${ success(
+				round( Math.max( ...oldType ) ) + 'ms'
+			) }
+Fastest time to type character: ${ success(
+				round( Math.min( ...oldType ) ) + 'ms'
 			) }` );
 		}
 
