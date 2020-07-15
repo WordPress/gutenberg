@@ -75,15 +75,13 @@ export function* addTemplate( template ) {
  * Removes a template, and updates the current page and template.
  *
  * @param {number} templateId The template ID.
- *
- * @return {Object} Action object used to set the current page and template.
  */
 export function* removeTemplate( templateId ) {
 	yield apiFetch( {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	return dispatch(
+	yield dispatch(
 		'core/edit-site',
 		'setPage',
 		yield select( 'core/edit-site', 'getPage' )
@@ -161,5 +159,5 @@ export function* showHomepage() {
 				: {},
 	};
 
-	yield setPage( page );
+	yield dispatch( 'core/edit-site', 'setPage', page );
 }
