@@ -2,7 +2,7 @@
  * External dependencies
  */
 const path = require( 'path' );
-const { pickBy } = require( 'lodash' );
+const { pickBy, mapValues } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -163,21 +163,21 @@ async function getPerformanceResultsForBranch(
 		results.push( curateResults( rawResults ) );
 	}
 
-	const formattedResults = {
-		load: formatTime( median( results.map( ( r ) => r.load ) ) ),
-		domcontentloaded: formatTime(
-			median( results.map( ( r ) => r.domcontentloaded ) )
-		),
-		type: formatTime( median( results.map( ( r ) => r.type ) ) ),
-		minType: formatTime( median( results.map( ( r ) => r.minType ) ) ),
-		maxType: formatTime( median( results.map( ( r ) => r.maxType ) ) ),
-		focus: formatTime( median( results.map( ( r ) => r.focus ) ) ),
-		minFocus: formatTime( median( results.map( ( r ) => r.minFocus ) ) ),
-		maxFocus: formatTime( median( results.map( ( r ) => r.maxFocus ) ) ),
+	const medians = {
+		load: median( results.map( ( r ) => r.load ) ),
+		domcontentloaded: median( results.map( ( r ) => r.domcontentloaded ) ),
+		type: median( results.map( ( r ) => r.type ) ),
+		minType: median( results.map( ( r ) => r.minType ) ),
+		maxType: median( results.map( ( r ) => r.maxType ) ),
+		focus: median( results.map( ( r ) => r.focus ) ),
+		minFocus: median( results.map( ( r ) => r.minFocus ) ),
+		maxFocus: median( results.map( ( r ) => r.maxFocus ) ),
 	};
 
 	// Remove results for which we don't have data (and where the statistical functions thus returned NaN or Infinity etc).
-	return pickBy( formattedResults, isFinite );
+	const finiteMedians = pickBy( medians, isFinite );
+	// Format results as times.
+	return mapValues( finiteMedians, formatTime );
 }
 
 /**
