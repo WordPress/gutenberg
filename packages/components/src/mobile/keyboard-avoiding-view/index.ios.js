@@ -59,6 +59,7 @@ export const KeyboardAvoidingView = ( {
 		Animated.timing( animatedHeight, {
 			toValue: keyboardHeight ? paddedKeyboardHeight : MIN_HEIGHT,
 			duration: keyboardHeight ? 0 : 150,
+			useNativeDriver: false,
 		} ).start();
 	}
 
@@ -67,10 +68,11 @@ export const KeyboardAvoidingView = ( {
 			{ ...otherProps }
 			behavior="padding"
 			keyboardVerticalOffset={ keyboardVerticalOffset }
-			style={ [
-				style,
-				withAnimatedHeight && { height: animatedHeight },
-			] }
+			style={
+				withAnimatedHeight
+					? [ style, { height: animatedHeight } ]
+					: style
+			}
 		/>
 	);
 };
