@@ -97,9 +97,6 @@ def bundleName = 'index_android_bundle'
 def mobileGutenbergRootDir = '../../../..'
 
 task copyJSBundle(type: Copy) {
-//        dependsOn bundleUpToDateCheck
-//        onlyIf { !isBundleUpToDate() }
-
     def origFileName = 'App.js'
     def origWithPath = "$mobileGutenbergRootDir/bundle/android/${origFileName}"
     from origWithPath
@@ -137,33 +134,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-//    sourceSets {
-//        main {
-//            assets.srcDirs += buildAssetsFolder //fileTree(dir: buildAssetsFolder, builtBy: copyJSBundle)
-//        }
-//    }
 }
 
-//android.applicationVariants.all { variant ->
-//    println variant
-////    def zipTask = project.tasks.create "textsToZip${variant.name.capitalize()}", Zip
-////    zipTask.destinationDir = file(variant.processResources.assetsDir)
-////    zipTask.baseName = "txts"
-////    zipTask.extension = "zip"
-////    zipTask.from fileTree(dir: 'text-files', include: '**/*.txt')
-////    variant.processResources.dependsOn(zipTask)
-//}
-
-//android.libraryVariants.all { variant ->
-//    variant.dump()
-////    def mergedFlavor = variant.getMergedFlavor()
-////    // Defines the value of a build variable you can use in the manifest.
-////    mergedFlavor.manifestPlaceholders = [hostName:"www.example.com"]
-//}
 
 android.libraryVariants.all { variant ->
-    println variant
     def files = project.files(buildResFolder)
     files.builtBy(copyJSBundle)
     variant.preBuildProvider.configure { dependsOn(copyJSBundle) }
@@ -229,80 +203,7 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
-boolean isBundleUpToDate() {
-    return project.hasProperty('isBundleUpToDate') && isBundleUpToDate
-}
-
-//if (buildGutenbergMobileJSBundle) {
-//    def bundleName = 'index.android.bundle'
-//    def mobileGutenbergRootDir = '../../../..'
-
-//    tasks.all { task ->
-//        if (task.name.startsWith('merge') && task.name.endsWith('Assets')) {
-//            println task.name
-//            task.inputs.file("$buildAssetsFolder/$bundleName")
-//            task.dependsOn(copyJSBundle)
-//        }
-//    }
-
-//    task bundleUpToDateCheck {
-//        description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
-//If they are changed, the isBundleUpToDate flag is switched to false. That flag is used by other tasks.")
-//
-//        def dirs = [mobileGutenbergRootDir]
-//        def bundlePath = file("$mobileGutenbergRootDir/bundle").absolutePath
-//        file(mobileGutenbergRootDir).eachDirRecurse { dir ->
-//            def isRelevantDir = !['react-native-bridge/android/build/intermediates',
-//                                  bundlePath,
-//                                  'node_modules'].any { dir.absolutePath.contains(it) } &&
-//                    !dir.name.startsWith('symlinked')
-//            if (isRelevantDir) {
-//                dirs << dir
-//            }
-//        }
-//
-//        def isRelevantFile = { it.name.endsWithAny('.js', '.css', '.scss') || it.name == 'package.json' }
-//        def inputFiles = []
-//        dirs.forEach { dir ->
-//            file(dir).eachFile {
-//                if (isRelevantFile(it)) {
-//                    inputFiles << it
-//                }
-//            }
-//        }
-//
-//        inputs.files(inputFiles)
-//
-//        // We cannot use the bundle file itself as an output because it does not yet exist when this
-//        // task finishes. Nevertheless, we have to declare something as an output because only tasks
-//        // with outputs are run incrementally, so we're declaring a file that does not exist as the
-//        // output. Since that file never exists, that "output" will always be considered "up-to-date".
-//        outputs.file("nonexistentfile")
-//
-//        // Using onlyIf here as a hack to run this check at the time of execution even if the task
-//        // is otherwise up to date. For example, even if the task is up to date the isBundleUpToDate value
-//        // should be false if the bundle file does not exist at the time this task runs. This must be run
-//        // at execution time to catch the case where the clean task is also running and would remove the
-//        // bundle file between the configuration phase and the execution of this task.
-//        onlyIf {
-//            project.ext.isBundleUpToDate = file("$buildAssetsFolder/$bundleName").exists()
-//            true
-//        }
-//
-//        // If this task runs, that means some of the inputs have changed, and the isBundleUpToDate
-//        // flag needs should be false so that the bundle is rebuilt.
-//        doLast {
-//            project.ext.isBundleUpToDate = false
-//        }
-//    }
-
-//    npm_install.dependsOn bundleUpToDateCheck
-//    npm_install.onlyIf { !isBundleUpToDate() }
-
     task buildJSBundle(type: NpmTask) {
-//        dependsOn bundleUpToDateCheck
-//        onlyIf { !isBundleUpToDate() }
-
         def dirs = [mobileGutenbergRootDir]
         def bundlePath = file("$mobileGutenbergRootDir/bundle").absolutePath
         file(mobileGutenbergRootDir).eachDirRecurse { dir ->
@@ -339,9 +240,6 @@ boolean isBundleUpToDate() {
     }
 
     task backupHermesDebugAAR(type: Copy) {
-//        dependsOn bundleUpToDateCheck
-//        onlyIf { !isBundleUpToDate() }
-
         def origFileName = 'hermes-debug.aar'
         def origWithPath = hermesOriginalPath + origFileName
         from origWithPath
@@ -352,9 +250,6 @@ boolean isBundleUpToDate() {
     }
 
     task backupHermesReleaseAAR(type: Copy) {
-//        dependsOn bundleUpToDateCheck
-//        onlyIf { !isBundleUpToDate() }
-
         def origFileName = 'hermes-release.aar'
         def origWithPath = hermesOriginalPath + origFileName
         from origWithPath
@@ -369,8 +264,6 @@ boolean isBundleUpToDate() {
         doFirst {
             println "Deleting node_modules folders"
         }
-//        dependsOn bundleUpToDateCheck
-//        onlyIf { !isBundleUpToDate() }
 
         delete nodeModulesFolders
     }
@@ -381,8 +274,6 @@ boolean isBundleUpToDate() {
         }
         delete nodeFolder, npmFolder
     }
-
-//    mergeReleaseResources.dependsOn(copyJSBundle)
 
 //    preBuild.dependsOn(cleanupNodeModulesFolders)
 //    cleanupNodeModulesFolders.dependsOn(backupHermesDebugAAR)
