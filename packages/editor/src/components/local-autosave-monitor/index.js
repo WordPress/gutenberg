@@ -188,8 +188,6 @@ function LocalAutosaveMonitor() {
 		<AutosaveMonitor
 			interval={ localAutosaveInterval }
 			autosave={ autosave }
-			isLocal={ true }
-			shouldThrottle
 		/>
 	);
 }
