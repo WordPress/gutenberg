@@ -15,11 +15,11 @@ export function AutosaveMonitor( {
 	interval,
 	autosave,
 } ) {
-	const { scheduleSave, cancelSave } = useThrottle( autosave, interval );
+	const [ throttledSave, cancelSave ] = useThrottle( autosave, interval );
 
 	useEffect( () => {
 		if ( isDirty && isAutosaveable ) {
-			scheduleSave();
+			throttledSave();
 		} else {
 			cancelSave();
 		}

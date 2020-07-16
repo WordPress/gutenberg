@@ -17,17 +17,14 @@ export default function useThrottle( callback, interval = ONE_MINUTE ) {
 		} );
 	}, [] );
 
-	const scheduleSave = function () {
+	const schedule = function () {
 		return throttled();
 	};
-	const cancelSave = function () {
+	const cancel = function () {
 		return throttled.cancel();
 	};
 
-	useEffect( () => cancelSave, [] );
+	useEffect( () => cancel, [] );
 
-	return {
-		scheduleSave,
-		cancelSave,
-	};
+	return [ schedule, cancel ];
 }

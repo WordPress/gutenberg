@@ -41,8 +41,8 @@ describe( 'useThrottle', () => {
 	} );
 
 	it( 'Should return two functions: scheduleSave and cancelSave', () => {
-		expect( typeof result.current.scheduleSave ).toBe( 'function' );
-		expect( typeof result.current.cancelSave ).toBe( 'function' );
+		expect( typeof result.current[ 0 ] ).toBe( 'function' );
+		expect( typeof result.current[ 1 ] ).toBe( 'function' );
 	} );
 
 	it( 'Should create a throttled callback on the first run only', () => {
@@ -53,7 +53,7 @@ describe( 'useThrottle', () => {
 
 	it( 'Should call the callback once after 10 seconds after calling scheduleSave once', async () => {
 		expect( saveCallback ).toBeCalledTimes( 0 );
-		result.current.scheduleSave();
+		result.current[ 0 ]();
 		expect( saveCallback ).toBeCalledTimes( 0 );
 		clock.setTimeout( () => {
 			expect( saveCallback ).toBeCalledTimes( 0 );
@@ -68,12 +68,12 @@ describe( 'useThrottle', () => {
 
 	it( 'Should call the callback only once after 10 seconds after calling scheduleSave multiple times  ', async () => {
 		expect( saveCallback ).toBeCalledTimes( 0 );
-		result.current.scheduleSave();
-		result.current.scheduleSave();
-		result.current.scheduleSave();
-		result.current.scheduleSave();
+		result.current[ 0 ]();
+		result.current[ 0 ]();
+		result.current[ 0 ]();
+		result.current[ 0 ]();
 		clock.setTimeout( () => {
-			result.current.scheduleSave();
+			result.current[ 0 ]();
 		}, 5000 );
 		expect( saveCallback ).toBeCalledTimes( 0 );
 		clock.setTimeout( () => {
@@ -89,10 +89,10 @@ describe( 'useThrottle', () => {
 
 	it( 'Should schedule one more call after another 10 seconds when calling scheduleSave again after 10 seconds  ', async () => {
 		expect( saveCallback ).toBeCalledTimes( 0 );
-		result.current.scheduleSave();
+		result.current[ 0 ]();
 		clock.setTimeout( () => {
 			expect( saveCallback ).toBeCalledTimes( 1 );
-			result.current.scheduleSave();
+			result.current[ 0 ]();
 		}, 10100 );
 		clock.setTimeout( () => {
 			expect( saveCallback ).toBeCalledTimes( 2 );
@@ -104,8 +104,8 @@ describe( 'useThrottle', () => {
 
 	it( 'Should cancel the upcoming call after calling cancelSave  ', async () => {
 		expect( saveCallback ).toBeCalledTimes( 0 );
-		result.current.scheduleSave();
-		result.current.cancelSave();
+		result.current[ 0 ]();
+		result.current[ 1 ]();
 		clock.setTimeout( () => {
 			expect( saveCallback ).toBeCalledTimes( 0 );
 		}, 10100 );
@@ -113,17 +113,17 @@ describe( 'useThrottle', () => {
 
 	it( 'Should cancel the upcoming call after calling cancelSave (multiple initial calls) ', async () => {
 		expect( saveCallback ).toBeCalledTimes( 0 );
-		result.current.scheduleSave();
-		result.current.scheduleSave();
-		result.current.scheduleSave();
-		result.current.cancelSave();
+		result.current[ 0 ]();
+		result.current[ 0 ]();
+		result.current[ 0 ]();
+		result.current[ 1 ]();
 		clock.setTimeout( () => {
 			expect( saveCallback ).toBeCalledTimes( 0 );
 		}, 10100 );
 	} );
 
-	it( 'Not throw an error when callin cancelSave without calling scheduleSave ', async () => {
-		expect( () => result.current.cancelSave() ).not.toThrowError();
+	it( 'Not throw an error when calling cancelSave without calling scheduleSave ', async () => {
+		expect( () => result.current[ 1 ]() ).not.toThrowError();
 	} );
 
 	it( 'Should cancel save on umount ', async () => {

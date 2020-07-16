@@ -8,44 +8,41 @@ import { render } from '@testing-library/react';
  */
 import { AutosaveMonitor } from '../';
 
-const mockScheduleSave = jest.fn();
+const mockThrottledSave = jest.fn();
 const mockCancelSave = jest.fn();
 jest.mock( '../use-throttle', () => {
-	return () => ( {
-		scheduleSave: () => mockScheduleSave(),
-		cancelSave: () => mockCancelSave(),
-	} );
+	return () => [ () => mockThrottledSave(), () => mockCancelSave() ];
 } );
 
 describe( 'AutosaveMonitor', () => {
 	beforeEach( () => {
-		mockScheduleSave.mockClear();
+		mockThrottledSave.mockClear();
 		mockCancelSave.mockClear();
 	} );
 
 	it( 'should schedule an autosave when dirty and saveable on initial render', () => {
 		render( <AutosaveMonitor isDirty={ true } isAutosaveable={ true } /> );
 		expect( mockCancelSave ).toHaveBeenCalledTimes( 0 );
-		expect( mockScheduleSave ).toHaveBeenCalledTimes( 1 );
+		expect( mockThrottledSave ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should schedule autosave when having become dirty and saveable', async () => {
 		render( <AutosaveMonitor isDirty={ true } isAutosaveable={ true } /> );
-		expect( mockScheduleSave ).toHaveBeenCalledTimes( 1 );
+		expect( mockThrottledSave ).toHaveBeenCalledTimes( 1 );
 		expect( mockCancelSave ).toHaveBeenCalledTimes( 0 );
 	} );
 
 	it( 'should stop autosave timer when the autosave is up to date', () => {
 		render( <AutosaveMonitor isDirty={ false } isAutosaveable={ true } /> );
 
-		expect( mockScheduleSave ).toHaveBeenCalledTimes( 0 );
+		expect( mockThrottledSave ).toHaveBeenCalledTimes( 0 );
 		expect( mockCancelSave ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should stop autosave timer when having become dirty but not autosaveable', () => {
 		render( <AutosaveMonitor isDirty={ true } isAutosaveable={ false } /> );
 
-		expect( mockScheduleSave ).toHaveBeenCalledTimes( 0 );
+		expect( mockThrottledSave ).toHaveBeenCalledTimes( 0 );
 		expect( mockCancelSave ).toHaveBeenCalledTimes( 1 );
 	} );
 
