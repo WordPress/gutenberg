@@ -73,3 +73,20 @@ export default function PostTitleEdit( {
 		</>
 	);
 }
+
+export default function PostTitleEdit( {
+	attributes,
+	setAttributes,
+	context,
+} ) {
+	if ( ! context.postType || context.postType === 'wp_template' ) {
+		return <p>{ __( 'This is a placeholder for post title.' ) }</p>;
+	}
+	return (
+		<PostTitleEditor
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			context={ context }
+		/>
+	);
+}
