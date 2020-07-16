@@ -32,7 +32,7 @@ function getMounts( config, wordpressDefault = 'wordpress' ) {
 
 	const pluginMounts = config.pluginSources.map(
 		( source ) =>
-			`${ source.path }:/var/www/html/wp-content/plugins/${ source.basename }`
+			`${ source.path }:/var/www/html/wp-content/plugins/${ source.basename }:delegated`
 	);
 
 	const themeMounts = config.themeSources.map(
@@ -44,7 +44,15 @@ function getMounts( config, wordpressDefault = 'wordpress' ) {
 		config.coreSource ? config.coreSource.path : wordpressDefault
 	}:/var/www/html`;
 
-	return [ coreMount, ...directoryMounts, ...pluginMounts, ...themeMounts ];
+	const excludes = config.excludes.map( ( source ) => source.path );
+
+	return [
+		coreMount,
+		...directoryMounts,
+		...pluginMounts,
+		...themeMounts,
+		...excludes,
+	];
 }
 
 /**

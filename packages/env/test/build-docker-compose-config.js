@@ -6,6 +6,7 @@ const buildDockerComposeConfig = require( '../lib/build-docker-compose-config' )
 // The basic config keys which build docker compose config requires.
 const CONFIG = {
 	mappings: {},
+	excludes: [],
 	pluginSources: [],
 	themeSources: [],
 	port: 8888,

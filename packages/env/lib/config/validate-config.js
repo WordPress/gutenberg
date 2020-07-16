@@ -70,6 +70,21 @@ function validateConfig( config, envLocation ) {
 			);
 		}
 	}
+
+	if ( ! Array.isArray( config.excludes ) ) {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ envPrefix }excludes" must be an array.`
+		);
+	}
+
+	for ( const localDir of config.excludes ) {
+		if ( ! localDir || typeof localDir !== 'string' ) {
+			throw new ValidationError(
+				`Invalid .wp-env.json: "${ envPrefix }excludes" should only contain strings.`
+			);
+		}
+	}
+
 	return config;
 }
 

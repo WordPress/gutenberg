@@ -33,6 +33,8 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @return {WPServiceConfig} Parsed environment-level configuration.
  */
 module.exports = function parseConfig( config, options ) {
+	console.log( 'options', options );
+	console.log( 'config', config );
 	return {
 		port: config.port,
 		coreSource: includeTestsPath(
@@ -53,6 +55,9 @@ module.exports = function parseConfig( config, options ) {
 				return result;
 			},
 			{}
+		),
+		excludes: config.excludes.map( ( localDir ) =>
+			parseSourceString( localDir, options )
 		),
 	};
 };

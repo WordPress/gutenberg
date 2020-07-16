@@ -38,6 +38,7 @@ const md5 = require( '../md5' );
  * @property {number}                    port          The port to use.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
+ * @property {string[]}                  excludes      Paths to exclude from mounting.
  */
 
 /**
@@ -73,6 +74,7 @@ module.exports = async function readConfig( configPath ) {
 		themes: [],
 		port: 8888,
 		mappings: {},
+		excludes: [],
 		config: {
 			WP_DEBUG: true,
 			SCRIPT_DEBUG: true,
@@ -203,10 +205,25 @@ function mergeWpServiceConfigs( configs ) {
 			} )
 		);
 
+	const mergeNestedArrays = ( key ) =>
+		configs
+			.map( ( config ) => {
+				if ( ! config[ key ] ) {
+					return [];
+				} else if ( Array.isArray( config[ key ] ) ) {
+					return config[ key ];
+				}
+				throw new ValidationError(
+					`Invalid .wp-env.json: "${ key }" must be an array.`
+				);
+			} )
+			.flat();
+
 	const mergedConfig = {
 		...Object.assign( {}, ...configs ),
 		config: mergeNestedObjs( 'config' ),
 		mappings: mergeNestedObjs( 'mappings' ),
+		excludes: mergeNestedArrays( 'excludes' ),
 	};
 
 	delete mergedConfig.env;
