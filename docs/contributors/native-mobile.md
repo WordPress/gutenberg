@@ -20,11 +20,11 @@ Our tooling isn't as good yet as we'd like to and it's hard to have a good aware
 
 If you encounter a failed Android/iOS test on your pull request, we recommend the following steps:
 
-1. Re-running the failed Github Action job ([guide for how to re-run](https://docs.github.com/en/actions/configuring-and-managing-workflows/managing-a-workflow-run#viewing-your-workflow-history)) - This should fix failed test the majority of the time as there are still a few randomly occurring failures in tests that are being actively worked on. See the following github issue for updated info on known failures: https://github.com/WordPress/gutenberg/issues/23949
-2. You can check if the test is failing locally by following steps to run the E2E test on your machine from the [mobile getting started guide](/docs/contributors/getting-started-native-mobile.md#ui-tests), with even more relevant info in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/master/packages/react-native-editor/__device-tests__#running-the-tests-locally)
-3. In addition to reading the logs from the E2E test, you can download a video recording from the Artifacts section of the Github job that may have additional useful information.
+1. Re-running the failed GitHub Action job ([guide for how to re-run](https://docs.github.com/en/actions/configuring-and-managing-workflows/managing-a-workflow-run#viewing-your-workflow-history)) - This should fix failed test the majority of the time as there are still a few randomly occurring failures in tests that are being actively worked on. See the following GitHub issue for updated info on known failures: https://github.com/WordPress/gutenberg/issues/23949
+2. You can check if the test is failing locally by following the steps to run the E2E test on your machine from the [mobile getting started guide](/docs/contributors/getting-started-native-mobile.md#ui-tests), with even more relevant info in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/master/packages/react-native-editor/__device-tests__#running-the-tests-locally)
+3. In addition to reading the logs from the E2E test, you can download a video recording from the Artifacts section of the GitHub job that may have additional useful information.
 4. Check if any changes in your PR would require corresponding changes to `.native.js` versions of files.
-5. Lastly, if you're stuck on a failing mobile test, feel free to reach out to contributors on slack in the #mobile or #core-editor chats in the WordPress Core Slack, [free to join](https://make.wordpress.org/chat/).
+5. Lastly, if you're stuck on a failing mobile test, feel free to reach out to contributors on Slack in the #mobile or #core-editor chats in the WordPress Core Slack, [free to join](https://make.wordpress.org/chat/).
 
 ## Debugging the native mobile unit tests
 
