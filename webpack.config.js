@@ -216,6 +216,7 @@ module.exports = {
 	].filter( Boolean ),
 	watchOptions: {
 		ignored: '!packages/*/!(src)/**/*',
+		aggregateTimeout: 500,
 	},
 	devtool,
 };
