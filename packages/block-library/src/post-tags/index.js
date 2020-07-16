@@ -15,7 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Tags' ),
-	description: __( 'Insert a list of tags to your document.' ),
+	description: __( 'Display a post\'s tags.' ),
 	icon,
 	edit,
 };
