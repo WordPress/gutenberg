@@ -13,8 +13,8 @@ jest.mock( 'lodash', () => {
 		...originalModule,
 		throttle: ( ...args ) => {
 			const originalReturn = originalModule.throttle( ...args );
-			mockedThrottle( ...args );
-			return originalReturn;
+			mockedThrottle.mockImplementation( () => originalReturn );
+			return mockedThrottle();
 		},
 	};
 } );
