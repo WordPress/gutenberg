@@ -36,7 +36,7 @@ const BlockActionsMenu = ( {
 	isFirst,
 	isLast,
 	blockTitle,
-	isEmptyDefaultBlock,
+	isEmptyDefaultRootBlock,
 	anchorNodeRef,
 	getBlocksByClientId,
 	selectedBlockClientId,
@@ -62,7 +62,7 @@ const BlockActionsMenu = ( {
 		label: __( 'Remove block' ),
 		value: 'deleteOption',
 		separated: true,
-		disabled: isEmptyDefaultBlock,
+		disabled: isEmptyDefaultRootBlock,
 	};
 
 	const settingsOption = {
@@ -246,8 +246,11 @@ export default compose(
 		const isDefaultBlock = blockName === getDefaultBlockName();
 		const isEmptyContent = block.attributes.content === '';
 		const isExactlyOneBlock = blockOrder.length === 1;
-		const isEmptyDefaultBlock =
-			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
+		const isEmptyDefaultRootBlock =
+			isExactlyOneBlock &&
+			isDefaultBlock &&
+			isEmptyContent &&
+			! rootClientId;
 
 		const clipboard = getClipboard();
 		const clipboardBlock =
@@ -261,7 +264,7 @@ export default compose(
 			isLast: lastIndex === blockOrder.length - 1,
 			rootClientId,
 			blockTitle,
-			isEmptyDefaultBlock,
+			isEmptyDefaultRootBlock,
 			getBlocksByClientId,
 			selectedBlockClientId: getSelectedBlockClientIds(),
 			currentIndex: firstIndex,
