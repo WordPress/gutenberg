@@ -260,7 +260,10 @@ export default function useBlockDropZone( {
 				return;
 			}
 
-			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
+			const sourceBlockIndex = getBlockIndex(
+				sourceClientIds[ 0 ],
+				sourceRootClientId
+			);
 
 			// If the user is dropping to the same position, return early.
 			if (
