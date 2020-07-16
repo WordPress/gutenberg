@@ -33,10 +33,6 @@ export default function MenusEditor( { blockEditorSettings } ) {
 
 	const noticeId = useRef();
 
-	noticeId.current = uniqueId(
-		'navigation-editor/menu-editor/edit-navigation-delete-menu-error'
-	);
-
 	const { menus, hasLoadedMenus, menuDeleteError } = useSelect(
 		( select ) => {
 			const {
@@ -78,6 +74,9 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				'text/html'
 			);
 			const errorText = document.body.textContent || '';
+			noticeId.current = uniqueId(
+				'navigation-editor/menu-editor/edit-navigation-delete-menu-error'
+			);
 			createErrorNotice( errorText, { id: noticeId.current } );
 		}
 	}, [ menuDeleteError ] );
