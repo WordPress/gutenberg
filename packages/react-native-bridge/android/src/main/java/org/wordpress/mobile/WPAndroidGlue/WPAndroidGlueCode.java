@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.MutableContextWrapper;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,9 +46,14 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadEventEmitter;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.R;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -450,7 +456,29 @@ public class WPAndroidGlueCode {
                                     .setJavaScriptExecutorFactory(new HermesExecutorFactory())
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (!buildGutenbergFromSource) {
-            builder.setBundleAssetName("index.android.bundle");
+            // The JS bundle file is placed the 'raw' resources for better build pipeline integration, but RN can only
+            // load from Assets or regular files. So, we'll copy the resource to the cache directory to use it.
+            int rid = R.raw.index_android_bundle;
+            Resources resources = initContext.getResources();
+
+            File cachedBundleFile = new File(initContext.getApplicationContext().getCacheDir(), resources.getResourceEntryName(rid));
+            String cachedBundleFilename = cachedBundleFile.getAbsoluteFile().toString();
+            if (!cachedBundleFile.exists()) {
+                try{
+                    byte[] buff = new byte[1024];
+                    int read;
+                    try (InputStream in = resources.openRawResource(rid);
+                         FileOutputStream out = new FileOutputStream(cachedBundleFilename)) {
+                        while ((read = in.read(buff)) > 0) {
+                            out.write(buff, 0, read);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            builder.setJSBundleFile(cachedBundleFilename);
         }
         mReactInstanceManager = builder.build();
         mReactInstanceManager.addReactInstanceEventListener(context -> {
