@@ -3,14 +3,14 @@
 exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
 <React.Fragment>
   <InspectorControls>
-    <ForwardRef(PanelBody)>
+    <PanelBody>
       <ToggleControl
         checked={false}
         help={[Function]}
         label="Hide the excerpt on the full content page"
         onChange={[Function]}
       />
-    </ForwardRef(PanelBody)>
+    </PanelBody>
   </InspectorControls>
   <div
     className="wp-block-more"
@@ -33,14 +33,14 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
 exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
 <React.Fragment>
   <InspectorControls>
-    <ForwardRef(PanelBody)>
+    <PanelBody>
       <ToggleControl
         checked={true}
         help={[Function]}
         label="Hide the excerpt on the full content page"
         onChange={[Function]}
       />
-    </ForwardRef(PanelBody)>
+    </PanelBody>
   </InspectorControls>
   <div
     className="wp-block-more"

@@ -41,8 +41,21 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
  *
  * @type {number}
  */
-const DEFAULT_COLUMNS = 2;
-const MIN_COLUMNS_NUMBER = 1;
+const DEFAULT_COLUMNS_NUM = 2;
+
+/**
+ * Minimum number of columns in a row
+ *
+ * @type {number}
+ */
+const MIN_COLUMNS_NUM = 1;
+
+/**
+ * Maximum number of columns in a row
+ *
+ * @type {number}
+ */
+const MAX_COLUMNS_NUM_IN_ROW = 3;
 
 const BREAKPOINTS = {
 	mobile: 480,
@@ -59,13 +72,15 @@ function ColumnsEditContainer( {
 	onDeleteBlock,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
-	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUMBER );
+	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
 
 	const { verticalAlignment } = attributes;
 	const { width } = sizes || {};
 
 	useEffect( () => {
-		const newColumnCount = ! columnCount ? DEFAULT_COLUMNS : columnCount;
+		const newColumnCount = ! columnCount
+			? DEFAULT_COLUMNS_NUM
+			: columnCount;
 		updateColumns( columnCount, newColumnCount );
 		if ( width ) {
 			setColumnsInRow( getColumnsInRow( width, newColumnCount ) );
@@ -84,7 +99,10 @@ function ColumnsEditContainer( {
 
 		let columnWidth = columnBaseWidth;
 		if ( columnsInRow > 1 ) {
-			const margins = columnsInRow * 2 * styles.columnMargin.marginLeft;
+			const margins =
+				columnsInRow *
+				Math.min( columnsInRow, MAX_COLUMNS_NUM_IN_ROW ) *
+				styles.columnMargin.marginLeft;
 			columnWidth = ( minWidth - margins ) / columnsInRow;
 		}
 		return { width: columnWidth };
@@ -95,8 +113,11 @@ function ColumnsEditContainer( {
 			// show only 1 Column in row for mobile breakpoint container width
 			return 1;
 		} else if ( containerWidth < BREAKPOINTS.large ) {
-			// show 2 Column in row for large breakpoint container width
-			return Math.min( Math.max( 1, columnCount ), 2 );
+			// show the maximum number of columns in a row for large breakpoint container width
+			return Math.min(
+				Math.max( 1, columnCount ),
+				MAX_COLUMNS_NUM_IN_ROW
+			);
 		}
 		// show all Column in one row
 		return Math.max( 1, columnsNumber );
@@ -124,7 +145,7 @@ function ColumnsEditContainer( {
 						onChange={ ( value ) =>
 							updateColumns( columnCount, value )
 						}
-						min={ MIN_COLUMNS_NUMBER }
+						min={ MIN_COLUMNS_NUM }
 						max={ columnCount + 1 }
 						type="stepper"
 					/>
