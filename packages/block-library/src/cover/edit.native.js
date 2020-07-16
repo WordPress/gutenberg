@@ -94,23 +94,9 @@ const Cover = ( {
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
-	const DEFAULT_COLORS = [
-		{
-			name: __( 'Black' ),
-			slug: 'black',
-			color: '#000000',
-		},
-		{
-			name: __( 'White' ),
-			slug: 'white',
-			color: '#ffffff',
-		},
-	];
-
-	const THEME_COLORS_COUNT = 2;
-	const themeColors = settings.colors.slice( 0, THEME_COLORS_COUNT );
+	const THEME_COLORS_COUNT = 4;
 	const coverDefaultPalette = {
-		colors: [ ...DEFAULT_COLORS, ...themeColors ],
+		colors: settings.colors.slice( 0, THEME_COLORS_COUNT ),
 	};
 
 	const { gradientValue } = __experimentalUseGradient();
