@@ -9,10 +9,7 @@ import { throttle } from 'lodash';
 import { useMemo, useEffect } from '@wordpress/element';
 
 const ONE_MINUTE = 60 * 1000;
-export default function useScheduledSave(
-	timeout = ONE_MINUTE,
-	callback = null
-) {
+export default function useThrottle( timeout = ONE_MINUTE, callback = null ) {
 	const throttled = useMemo( () => {
 		return throttle( callback, timeout, {
 			leading: false,

@@ -22,11 +22,11 @@ jest.mock( 'lodash', () => {
 /**
  * Internal dependencies
  */
-import useScheduledSave from '../use-scheduled-save';
+import useThrottle from '../use-throttle';
 
 let clock;
 
-describe( 'useScheduledSave', () => {
+describe( 'useThrottle', () => {
 	const saveCallback = jest.fn();
 	let result, rerender, unmount;
 
@@ -34,9 +34,7 @@ describe( 'useScheduledSave', () => {
 		clock = FakeTimers.createClock();
 		saveCallback.mockClear();
 		mockedThrottle.mockClear();
-		const hook = renderHook( () =>
-			useScheduledSave( 2 * 1000, saveCallback )
-		);
+		const hook = renderHook( () => useThrottle( 2 * 1000, saveCallback ) );
 		unmount = hook.unmount;
 		result = hook.result;
 		rerender = hook.rerender;
