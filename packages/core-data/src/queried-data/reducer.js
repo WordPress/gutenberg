@@ -32,6 +32,10 @@ import getQueryParts from './get-query-parts';
  * @return {number[]} Merged array of item IDs.
  */
 export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
+	const receivedAllIds = page === 1 && perPage === -1;
+	if ( receivedAllIds ) {
+		return nextItemIds;
+	}
 	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
 
 	// If later page has already been received, default to the larger known

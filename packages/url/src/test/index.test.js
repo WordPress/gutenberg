@@ -347,6 +347,43 @@ describe( 'isValidQueryString', () => {
 	} );
 } );
 
+describe( 'getPathAndQueryString', () => {
+	beforeAll( jest.resetModules );
+	afterAll( jest.resetModules );
+	it( 'combines the results of `getPath` and `getQueryString`', () => {
+		jest.doMock( '../get-path.js', () => ( {
+			getPath( { path } = {} ) {
+				return path;
+			},
+		} ) );
+		jest.doMock( '../get-query-string.js', () => ( {
+			getQueryString( { queryString } = {} ) {
+				return queryString;
+			},
+		} ) );
+		const {
+			getPathAndQueryString,
+		} = require( '../get-path-and-query-string' );
+		expect(
+			getPathAndQueryString( {
+				path: 'path',
+				queryString: 'queryString',
+			} )
+		).toBe( '/path?queryString' );
+		expect(
+			getPathAndQueryString( {
+				queryString: 'queryString',
+			} )
+		).toBe( '/?queryString' );
+		expect(
+			getPathAndQueryString( {
+				path: 'path',
+			} )
+		).toBe( '/path' );
+		expect( getPathAndQueryString() ).toBe( '/' );
+	} );
+} );
+
 describe( 'getFragment', () => {
 	it( 'returns the fragment of a URL', () => {
 		expect(

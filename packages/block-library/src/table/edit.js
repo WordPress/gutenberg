@@ -25,6 +25,7 @@ import {
 	TextControl,
 	ToggleControl,
 	ToolbarGroup,
+	__experimentalToolbarItem as ToolbarItem,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -39,6 +40,7 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -289,14 +291,23 @@ export class TableEdit extends Component {
 
 		const { attributes, setAttributes } = this.props;
 		const { sectionName, rowIndex } = selectedCell;
+		const newRowIndex = rowIndex + delta;
 
-		this.setState( { selectedCell: null } );
 		setAttributes(
 			insertRow( attributes, {
 				sectionName,
-				rowIndex: rowIndex + delta,
+				rowIndex: newRowIndex,
 			} )
 		);
+		// Select the first cell of the new row
+		this.setState( {
+			selectedCell: {
+				sectionName,
+				rowIndex: newRowIndex,
+				columnIndex: 0,
+				type: 'cell',
+			},
+		} );
 	}
 
 	/**
@@ -344,13 +355,21 @@ export class TableEdit extends Component {
 
 		const { attributes, setAttributes } = this.props;
 		const { columnIndex } = selectedCell;
+		const newColumnIndex = columnIndex + delta;
 
-		this.setState( { selectedCell: null } );
 		setAttributes(
 			insertColumn( attributes, {
-				columnIndex: columnIndex + delta,
+				columnIndex: newColumnIndex,
 			} )
 		);
+		// Select the first cell of the new column
+		this.setState( {
+			selectedCell: {
+				rowIndex: 0,
+				columnIndex: newColumnIndex,
+				type: 'cell',
+			},
+		} );
 	}
 
 	/**
@@ -457,7 +476,7 @@ export class TableEdit extends Component {
 	 * Renders a table section.
 	 *
 	 * @param {Object} options
-	 * @param {string} options.type Section type: head, body, or foot.
+	 * @param {string} options.name Section type: head, body, or foot.
 	 * @param {Array}  options.rows The rows to render.
 	 *
 	 * @return {Object} React element for the section.
@@ -538,6 +557,7 @@ export class TableEdit extends Component {
 			backgroundColor,
 			setBackgroundColor,
 			setAttributes,
+			insertBlocksAfter,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, caption, head, body, foot } = attributes;
@@ -595,12 +615,17 @@ export class TableEdit extends Component {
 			<>
 				<BlockControls>
 					<ToolbarGroup>
-						<DropdownMenu
-							hasArrowIndicator
-							icon={ table }
-							label={ __( 'Edit table' ) }
-							controls={ this.getTableControls() }
-						/>
+						<ToolbarItem>
+							{ ( toggleProps ) => (
+								<DropdownMenu
+									hasArrowIndicator
+									icon={ table }
+									toggleProps={ toggleProps }
+									label={ __( 'Edit table' ) }
+									controls={ this.getTableControls() }
+								/>
+							) }
+						</ToolbarItem>
 					</ToolbarGroup>
 					<AlignmentToolbar
 						label={ __( 'Change column alignment' ) }
@@ -663,6 +688,9 @@ export class TableEdit extends Component {
 						// Deselect the selected table cell when the caption is focused.
 						unstableOnFocus={ () =>
 							this.setState( { selectedCell: null } )
+						}
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
 						}
 					/>
 				</figure>

@@ -90,9 +90,16 @@ module.exports = function cli() {
 			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
 				'8889',
 				'http://localhost:8889'
-			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file.`
+			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first insall, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
 		),
-		() => {},
+		( args ) => {
+			args.option( 'update', {
+				type: 'boolean',
+				describe:
+					'Download source updates and apply WordPress configuration.',
+				default: false,
+			} );
+		},
 		withSpinner( env.start )
 	);
 	yargs.command(
@@ -168,7 +175,7 @@ module.exports = function cli() {
 	yargs.command(
 		'destroy',
 		wpRed(
-			'Destroy the WordPress environment. Delete docker containers and remove local files.'
+			'Destroy the WordPress environment. Deletes docker containers, volumes, and networks associated with the WordPress environment and removes local files.'
 		),
 		() => {},
 		withSpinner( env.destroy )

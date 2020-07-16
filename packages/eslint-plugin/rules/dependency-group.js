@@ -183,8 +183,8 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					let source;
 					switch ( child.type ) {
 						case 'ImportDeclaration':
-							source =
-								/** @type {string} */ ( child.source.value );
+							source = /** @type {string} */ ( child.source
+								.value );
 							candidates.push( [ child, source ] );
 							break;
 
@@ -196,8 +196,8 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 									init.type !== 'CallExpression' ||
 									/** @type {import('estree').CallExpression} */ ( init )
 										.callee.type !== 'Identifier' ||
-									/** @type {import('estree').Identifier} */ ( init
-										.callee ).name !== 'require'
+									/** @type {import('estree').Identifier} */ ( init.callee )
+										.name !== 'require'
 								) {
 									return;
 								}

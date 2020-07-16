@@ -14,6 +14,7 @@ import {
 	getDefaultBlockVariation,
 	getGroupingBlockName,
 	isMatchingSearchTerm,
+	getCategories,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -65,6 +66,15 @@ describe( 'selectors', () => {
 			expect(
 				getBlockSupport( state, blockName, 'features.foo.bar' )
 			).toBe( 'value' );
+		} );
+	} );
+
+	describe( 'getCategories', () => {
+		it( 'returns categories state', () => {
+			const categories = [ { slug: 'text', text: 'Text' } ];
+			const state = deepFreeze( { categories } );
+
+			expect( getCategories( state ) ).toEqual( categories );
 		} );
 	} );
 
@@ -284,8 +294,8 @@ describe( 'selectors', () => {
 		const name = 'core/paragraph';
 		const blockType = {
 			title: 'Paragraph',
-			category: 'common',
-			keywords: [ 'text' ],
+			category: 'text',
+			keywords: [ 'body' ],
 		};
 
 		const state = {
@@ -353,7 +363,7 @@ describe( 'selectors', () => {
 				const result = isMatchingSearchTerm(
 					state,
 					nameOrType,
-					'TEXT'
+					'BODY'
 				);
 
 				expect( result ).toBe( true );
@@ -364,7 +374,7 @@ describe( 'selectors', () => {
 					const result = isMatchingSearchTerm(
 						state,
 						nameOrType,
-						'COMMON'
+						'TEXT'
 					);
 
 					expect( result ).toBe( true );

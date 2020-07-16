@@ -107,11 +107,11 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 			}
 		);
 
+		close( entitiesToSave );
+
 		entitiesToSave.forEach( ( { kind, name, key } ) => {
 			saveEditedEntityRecord( kind, name, key );
 		} );
-
-		close( entitiesToSave );
 	};
 
 	const [ isReviewing, setIsReviewing ] = useState( false );

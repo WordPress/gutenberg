@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
+import Flex from '../../flex';
 import Text from '../../text';
 import { color, rtl, reduceMotion } from '../../utils/style-mixins';
 
@@ -23,16 +24,33 @@ const rootFocusedStyles = ( { isFocused } ) => {
 	return css( { zIndex: 1 } );
 };
 
-export const Root = styled.div`
-	box-sizing: border-box;
+const rootLabelPositionStyles = ( { labelPosition } ) => {
+	switch ( labelPosition ) {
+		case 'top':
+			return css`
+				align-items: flex-start;
+				flex-direction: column;
+			`;
+		case 'bottom':
+			return css`
+				align-items: flex-start;
+				flex-direction: column-reverse;
+			`;
+		default:
+			return '';
+	}
+};
+
+export const Root = styled( Flex )`
 	position: relative;
 	border-radius: 2px;
 
-	${rootFloatLabelStyles};
-	${rootFocusedStyles};
+	${ rootFloatLabelStyles };
+	${ rootFocusedStyles };
+	${ rootLabelPositionStyles };
 `;
 
-const containerDisabledStyle = ( { disabled } ) => {
+const containerDisabledStyles = ( { disabled } ) => {
 	const backgroundColor = disabled
 		? color( 'ui.backgroundDisabled' )
 		: color( 'ui.background' );
@@ -40,14 +58,24 @@ const containerDisabledStyle = ( { disabled } ) => {
 	return css( { backgroundColor } );
 };
 
+const containerWidthStyles = ( { labelPosition } ) => {
+	if ( labelPosition === 'side' ) return '';
+
+	return css`
+		width: 100%;
+	`;
+};
+
 export const Container = styled.div`
 	align-items: center;
 	box-sizing: border-box;
 	border-radius: inherit;
 	display: flex;
+	flex: 1;
 	position: relative;
 
-	${containerDisabledStyle};
+	${ containerDisabledStyles };
+	${ containerWidthStyles };
 `;
 
 const disabledStyles = ( { disabled } ) => {
@@ -70,10 +98,10 @@ const fontSizeStyles = ( { size } ) => {
 	if ( ! fontSize ) return '';
 
 	return css`
-		font-size: ${fontSizeMobile};
+		font-size: ${ fontSizeMobile };
 
 		@media ( min-width: 600px ) {
-			font-size: ${fontSize};
+			font-size: ${ fontSize };
 		}
 	`;
 };
@@ -108,7 +136,7 @@ const placeholderStyles = ( { isFilled, isFloating, isFloatingLabel } ) => {
 
 	return css`
 		&::placeholder {
-			opacity: ${opacity};
+			opacity: ${ opacity };
 		}
 
 		&::-webkit-input-placeholder {
@@ -123,7 +151,7 @@ const dragStyles = ( { isDragging, dragCursor } ) => {
 
 	if ( isDragging ) {
 		defaultArrowStyles = css`
-			cursor: ${dragCursor};
+			cursor: ${ dragCursor };
 			user-select: none;
 
 			&::-webkit-outer-spin-button,
@@ -137,14 +165,14 @@ const dragStyles = ( { isDragging, dragCursor } ) => {
 	if ( isDragging && dragCursor ) {
 		activeDragCursorStyles = css`
 			&:active {
-				cursor: ${dragCursor};
+				cursor: ${ dragCursor };
 			}
 		`;
 	}
 
 	return css`
-		${defaultArrowStyles};
-		${activeDragCursorStyles};
+		${ defaultArrowStyles };
+		${ activeDragCursorStyles };
 	`;
 };
 
@@ -157,19 +185,19 @@ export const Input = styled.input`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${color( 'black' )};
+		color: ${ color( 'black' ) };
 		display: block;
 		outline: none;
 		padding-left: 8px;
 		padding-right: 8px;
 		width: 100%;
 
-		${dragStyles};
-		${disabledStyles};
-		${fontSizeStyles};
-		${sizeStyles};
+		${ dragStyles };
+		${ disabledStyles };
+		${ fontSizeStyles };
+		${ sizeStyles };
 
-		${placeholderStyles};
+		${ placeholderStyles };
 	}
 `;
 
@@ -253,20 +281,21 @@ const BaseLabel = styled( Text )`
 		display: block;
 		margin: 0;
 		max-width: 100%;
-		padding: 0;
+		padding-bottom: 0;
+		padding-top: 0;
 		pointer-events: none;
 		top: 50%;
-		transition: transform ${FLOATING_LABEL_TRANSITION_SPEED} linear,
-			max-width ${FLOATING_LABEL_TRANSITION_SPEED} linear;
+		transition: transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear,
+			max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
 		z-index: 1;
 
-		${laberColor};
-		${labelFontSize};
-		${labelPosition};
-		${labelTruncation};
-		${reduceMotion( 'transition' )};
+		${ laberColor };
+		${ labelFontSize };
+		${ labelPosition };
+		${ labelTruncation };
+		${ reduceMotion( 'transition' ) };
 
-		${rtl( { left: 0 } )}
+		${ rtl( { left: 0 } ) }
 	}
 `;
 
@@ -304,9 +333,9 @@ export const Fieldset = styled.fieldset`
 		position: absolute;
 		right: 0;
 
-		${fieldsetFocusedStyles};
-		${fieldsetTopStyles};
-		${rtl( { paddingLeft: 2 } )}
+		${ fieldsetFocusedStyles };
+		${ fieldsetTopStyles };
+		${ rtl( { paddingLeft: 2 } ) }
 	}
 `;
 
@@ -333,24 +362,29 @@ export const Legend = styled.legend`
 		line-height: 11px;
 		margin: 0;
 		padding: 0;
-		transition: max-width ${FLOATING_LABEL_TRANSITION_SPEED} linear;
+		transition: max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
 		visibility: hidden;
 		width: auto;
 
-		${legendSize};
-		${reduceMotion( 'transition' )};
+		${ legendSize };
+		${ reduceMotion( 'transition' ) };
 	}
 `;
 
 const BaseLegendText = styled( Text )`
 	box-sizing: border-box;
 	display: inline-block;
-	${rtl( { paddingLeft: 4, paddingRight: 5 } )}
+	${ rtl( { paddingLeft: 4, paddingRight: 5 } ) }
 `;
 
 export const LegendText = ( props ) => (
 	<BaseLegendText { ...props } as="span" />
 );
+
+export const Prefix = styled.span`
+	box-sizing: border-box;
+	display: block;
+`;
 
 export const Suffix = styled.span`
 	box-sizing: border-box;

@@ -118,7 +118,7 @@ export function initializeEditor(
 
 	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
 	if ( isIphone ) {
-		window.addEventListener( 'scroll', function( event ) {
+		window.addEventListener( 'scroll', ( event ) => {
 			const editorScrollContainer = document.getElementsByClassName(
 				'interface-interface-skeleton__body'
 			)[ 0 ];

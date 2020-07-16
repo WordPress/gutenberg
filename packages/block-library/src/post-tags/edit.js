@@ -36,7 +36,7 @@ function PostTagsDisplay() {
 
 export default function PostTagsEdit() {
 	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return 'Post Tags Placeholder';
+		return __( 'Post Tags' );
 	}
 	return <PostTagsDisplay />;
 }

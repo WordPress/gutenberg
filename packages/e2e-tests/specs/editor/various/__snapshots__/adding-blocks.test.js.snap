@@ -52,3 +52,15 @@ Foo</pre>
 lines preserved[/myshortcode]
 <!-- /wp:shortcode -->"
 `;
+
+exports[`adding blocks inserts blocks at root level when using the root appender while selection is in an inner block 1`] = `
+"<!-- wp:buttons -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button -->
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\">1.1</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;

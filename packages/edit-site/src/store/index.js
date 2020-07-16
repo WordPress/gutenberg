@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { registerStore } from '@wordpress/data';
+import { controls as dataControls } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -12,12 +13,18 @@ import * as selectors from './selectors';
 import controls from './controls';
 import { STORE_KEY } from './constants';
 
-const store = registerStore( STORE_KEY, {
-	reducer,
-	actions,
-	selectors,
-	controls,
-	persist: [ 'preferences' ],
-} );
+export default function registerEditSiteStore( initialState ) {
+	const store = registerStore( STORE_KEY, {
+		reducer,
+		actions,
+		selectors,
+		controls: { ...dataControls, ...controls },
+		persist: [ 'preferences' ],
+		initialState,
+	} );
 
-export default store;
+	// We set the initial page here to include the template fetch which will
+	// resolve the correct homepage template.
+	store.dispatch( actions.setPage( initialState.page ) );
+	return store;
+}

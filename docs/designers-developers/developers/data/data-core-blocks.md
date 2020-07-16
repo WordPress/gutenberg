@@ -83,7 +83,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Categories list.
+-   `Array<WPBlockCategory>`: Categories list.
 
 <a name="getChildBlockNames" href="#getChildBlockNames">#</a> **getChildBlockNames**
 

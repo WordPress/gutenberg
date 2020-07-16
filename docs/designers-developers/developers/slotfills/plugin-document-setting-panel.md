@@ -30,3 +30,13 @@ registerPlugin( 'plugin-document-setting-panel-demo', {
 	icon: 'palmtree',
 } );
 ```
+## Accessing a panel programmatically
+
+Custom panels are namespaced with the plugin name that was passed to `registerPlugin`.
+In order to access the panels using function such as `wp.data.dispatch( 'core/edit-post' ).toggleEditorPanelOpened` or `wp.data.dispatch( 'core/edit-post' ).toggleEditorPanelEnabled` be sure to prepend the namepace.
+
+To programmatically toggle the custom panel added in the example above, use the following:
+
+```js
+wp.data.dispatch( 'core/edit-post' ).toggleEditorPanelOpened( 'plugin-document-setting-panel-demo/custom-panel' );
+```

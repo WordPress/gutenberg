@@ -44,6 +44,12 @@ add_action( 'admin_print_styles', 'gutenberg_block_editor_admin_print_styles' );
  */
 function gutenberg_block_editor_admin_print_scripts() {
 	if ( gutenberg_is_block_editor() ) {
+		/** This action is documented in wp-admin/includes/ajax-actions.php */
+		do_action( 'load-widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		/** This action is documented in wp-admin/includes/ajax-actions.php */
+		do_action( 'widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		/** This action is documented in wp-admin/widgets.php */
+		do_action( 'sidebar_admin_setup' );
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_scripts-widgets.php' );
 	}

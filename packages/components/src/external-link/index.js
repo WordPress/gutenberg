@@ -36,8 +36,10 @@ export function ExternalLink(
 		>
 			{ children }
 			<VisuallyHidden as="span">
-				{ /* translators: accessibility text */
-				__( '(opens in a new tab)' ) }
+				{
+					/* translators: accessibility text */
+					__( '(opens in a new tab)' )
+				}
 			</VisuallyHidden>
 			<Icon
 				icon={ external }

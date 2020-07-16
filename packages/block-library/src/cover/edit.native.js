@@ -2,22 +2,23 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
-import {
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-	mediaUploadSync,
-} from 'react-native-gutenberg-bridge';
 import Video from 'react-native-video';
 
 /**
  * WordPress dependencies
  */
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import {
 	Icon,
 	ImageWithFocalPoint,
 	PanelBody,
 	RangeControl,
+	BottomSheet,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
@@ -35,7 +36,7 @@ import {
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
@@ -75,6 +76,7 @@ const Cover = ( {
 	onFocus,
 	overlayColor,
 	setAttributes,
+	closeSettingsBottomSheet,
 } ) => {
 	const {
 		backgroundType,
@@ -127,8 +129,6 @@ const Cover = ( {
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
 		const onSelect = attributesFromMedia( setAttributes );
-		// Remove gradient attribute
-		setAttributes( { gradient: undefined, customGradient: undefined } );
 		onSelect( media );
 	};
 
@@ -204,6 +204,19 @@ const Cover = ( {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
+			{ url ? (
+				<PanelBody>
+					<RangeControl
+						label={ __( 'Opacity' ) }
+						minimumValue={ 0 }
+						maximumValue={ 100 }
+						value={ dimRatio }
+						onChange={ onOpactiyChange }
+						style={ styles.rangeCellContainer }
+						separatorType={ 'topFullWidth' }
+					/>
+				</PanelBody>
+			) : null }
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<RangeControl
 					label={ __( 'Minimum height in pixels' ) }
@@ -214,15 +227,17 @@ const Cover = ( {
 					style={ styles.rangeCellContainer }
 				/>
 			</PanelBody>
+
 			{ url ? (
-				<PanelBody title={ __( 'Overlay' ) }>
-					<RangeControl
-						label={ __( 'Background Opacity' ) }
-						minimumValue={ 0 }
-						maximumValue={ 100 }
-						value={ dimRatio }
-						onChange={ onOpactiyChange }
-						style={ styles.rangeCellContainer }
+				<PanelBody title={ __( 'Media' ) }>
+					<BottomSheet.Cell
+						leftAlign
+						label={ __( 'Clear Media' ) }
+						labelStyle={ styles.clearMediaButton }
+						onPress={ () => {
+							setAttributes( { id: undefined, url: undefined } );
+							closeSettingsBottomSheet();
+						} }
 					/>
 				</PanelBody>
 			) : null }
@@ -333,6 +348,7 @@ const Cover = ( {
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				isReplacingMedia={ true }
 				onSelect={ onSelectMedia }
 				render={ renderBackground }
 			/>
@@ -365,5 +381,13 @@ export default compose( [
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
+		};
+	} ),
+
 	withPreferredColorScheme,
 ] )( Cover );

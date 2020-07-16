@@ -217,7 +217,6 @@ describe( 'useBlockSync hook', () => {
 			create(
 				<TestWrapper
 					setRegistry={ setRegistry }
-					clientId="test"
 					value={ value1 }
 					onChange={ onChange }
 					onInput={ onInput }
@@ -257,7 +256,6 @@ describe( 'useBlockSync hook', () => {
 			create(
 				<TestWrapper
 					setRegistry={ setRegistry }
-					clientId="test"
 					value={ value1 }
 					onChange={ onChange }
 					onInput={ onInput }
@@ -343,7 +341,6 @@ describe( 'useBlockSync hook', () => {
 			create(
 				<TestWrapper
 					setRegistry={ setRegistry }
-					clientId="test"
 					value={ value1 }
 					onChange={ onChange }
 					onInput={ onInput }

@@ -66,6 +66,13 @@ A function that receives the value of the input.
 -   Type: `Function`
 -   Required: Yes
 
+### prefix
+
+Renders an element on the left side of the input.
+
+-   Type: `React.ReactNode`
+-   Required: No
+
 ### size
 
 Adjusts the size of the input.

@@ -61,6 +61,7 @@ function gutenberg_reregister_core_block_types() {
 		'latest-posts.php'    => 'core/latest-posts',
 		'legacy-widget.php'   => 'core/legacy-widget',
 		'navigation.php'      => 'core/navigation',
+		'navigation-link.php' => 'core/navigation-link',
 		'rss.php'             => 'core/rss',
 		'search.php'          => 'core/search',
 		'shortcode.php'       => 'core/shortcode',
@@ -85,6 +86,8 @@ function gutenberg_reregister_core_block_types() {
 				'query.php'               => 'core/query',
 				'query-loop.php'          => 'core/query-loop',
 				'query-pagination.php'    => 'core/query-pagination',
+				'site-logo.php'           => 'core/site-logo',
+				'site-tagline.php'        => 'core/site-tagline',
 				'site-title.php'          => 'core/site-title',
 				'template-part.php'       => 'core/template-part',
 			)
@@ -217,82 +220,188 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
 
-if ( ! function_exists( 'register_block_style' ) ) {
-	/**
-	 * Registers a new block style.
-	 *
-	 * @param string $block_name       Block type name including namespace.
-	 * @param array  $style_properties Array containing the properties of the style name, label, style (name of the stylesheet to be enqueued), inline_style (string containing the CSS to be added).
-	 *
-	 * @return boolean True if the block style was registered with success and false otherwise.
-	 */
-	function register_block_style( $block_name, $style_properties ) {
-		return WP_Block_Styles_Registry::get_instance()->register( $block_name, $style_properties );
+/**
+ * Renders the classNames and styles for blocks
+ *
+ * @param string $block_content Output of the current block.
+ * @param array  $block Block Object.
+ * @return string New block output.
+ */
+function gutenberg_experimental_apply_classnames_and_styles( $block_content, $block ) {
+	if ( ! isset( $block['attrs'] ) ) {
+		return $block_content;
 	}
-}
 
-if ( ! function_exists( 'unregister_block_style' ) ) {
-	/**
-	 * Unregisters a block style.
-	 *
-	 * @param string $block_name       Block type name including namespace.
-	 * @param array  $block_style_name Block style name.
-	 *
-	 * @return boolean True if the block style was unregistered with success and false otherwise.
-	 */
-	function unregister_block_style( $block_name, $block_style_name ) {
-		return WP_Block_Styles_Registry::get_instance()->unregister( $block_name, $block_style_name );
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	// If no render_callback, assume styles have been previously handled.
+	if ( ! $block_type || ! $block_type->render_callback ) {
+		return $block_content;
 	}
+	// Check what style features the block supports.
+	$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
+
+	$attributes = array();
+	$attributes = gutenberg_experimental_build_css_colors( $attributes, $block['attrs'], $supports );
+	$attributes = gutenberg_experimental_build_css_typography( $attributes, $block['attrs'], $supports );
+
+	if ( ! count( $attributes ) ) {
+		return $block_content;
+	}
+
+	$dom = new DOMDocument( '1.0', 'utf-8' );
+
+	// Suppress warnings from this method from polluting the front-end.
+	// @codingStandardsIgnoreStart
+	if ( ! @$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
+	// @codingStandardsIgnoreEnd
+		return $block_content;
+	}
+
+	$xpath      = new DOMXPath( $dom );
+	$block_root = $xpath->query( '/*' )[0];
+
+	if ( empty( $block_root ) ) {
+		return $block_content;
+	}
+
+	// Some inline styles may be added without ending ';', add this if necessary.
+	$current_styles = trim( $block_root->getAttribute( 'style' ), ' ' );
+	if ( strlen( $current_styles ) > 0 && substr( $current_styles, -1 ) !== ';' ) {
+		$current_styles = $current_styles . ';';
+	};
+
+	// Merge and dedupe new and existing classes and styles.
+	$classes_to_add = esc_attr( implode( ' ', array_key_exists( 'css_classes', $attributes ) ? $attributes['css_classes'] : array() ) );
+	$styles_to_add  = esc_attr( implode( ' ', array_key_exists( 'inline_styles', $attributes ) ? $attributes['inline_styles'] : array() ) );
+	$new_classes    = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . $classes_to_add ) ) );
+	$new_styles     = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . $styles_to_add ) ) );
+
+	// Apply new styles and classes.
+	if ( ! empty( $new_classes ) ) {
+		$block_root->setAttribute( 'class', $new_classes );
+	}
+
+	if ( ! empty( $new_styles ) ) {
+		$block_root->setAttribute( 'style', $new_styles );
+	}
+
+	return $dom->saveHtml();
 }
+add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles', 10, 2 );
 
-if ( ! has_action( 'enqueue_block_assets', 'enqueue_block_styles_assets' ) ) {
-	/**
-	 * Function responsible for enqueuing the styles required for block styles functionality on the editor and on the frontend.
-	 */
-	function gutenberg_enqueue_block_styles_assets() {
-		$block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
+/**
+ * Build an array with CSS classes and inline styles defining the colors
+ * which will be applied to the block markup in the front-end.
+ *
+ * @param  array $attributes comprehensive list of attributes to be applied.
+ * @param  array $block_attributes block attributes.
+ * @param  array $supports style features the block attributes.
+ * @return array Colors CSS classes and inline styles.
+ */
+function gutenberg_experimental_build_css_colors( $attributes, $block_attributes, $supports ) {
+	// Text Colors.
+	// Check support for text colors.
+	if ( in_array( 'color', $supports, true ) ) {
+		$has_named_text_color  = array_key_exists( 'textColor', $block_attributes );
+		$has_custom_text_color = isset( $block_attributes['style']['color']['text'] );
 
-		foreach ( $block_styles as $styles ) {
-			foreach ( $styles as $style_properties ) {
-				if ( isset( $style_properties['style_handle'] ) ) {
-					wp_enqueue_style( $style_properties['style_handle'] );
-				}
-				if ( isset( $style_properties['inline_style'] ) ) {
-					wp_add_inline_style( 'wp-block-library', $style_properties['inline_style'] );
-				}
+		// Apply required generic class.
+		if ( $has_custom_text_color || $has_named_text_color ) {
+			$attributes['css_classes'][] = 'has-text-color';
+		}
+		// Apply color class or inline style.
+		if ( $has_named_text_color ) {
+			$attributes['css_classes'][] = sprintf( 'has-%s-color', $block_attributes['textColor'] );
+		} elseif ( $has_custom_text_color ) {
+			$attributes['inline_styles'][] = sprintf( 'color: %s;', $block_attributes['style']['color']['text'] );
+		}
+	}
+
+	// Link Colors.
+	if ( in_array( 'link-color', $supports, true ) ) {
+		$has_link_color = isset( $block_attributes['style']['color']['link'] );
+		// Apply required class and style.
+		if ( $has_link_color ) {
+			$attributes['css_classes'][] = 'has-link-color';
+			// If link is a named color.
+			if ( strpos( $block_attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
+				// Get the name from the string and add proper styles.
+				$index_to_splice               = strrpos( $block_attributes['style']['color']['link'], '|' ) + 1;
+				$link_color_name               = substr( $block_attributes['style']['color']['link'], $index_to_splice );
+				$attributes['inline_styles'][] = sprintf( '--wp--style--color--link:var(--wp--preset--color--%s);', $link_color_name );
+			} else {
+				$attributes['inline_styles'][] = sprintf( '--wp--style--color--link: %s;', $block_attributes['style']['color']['link'] );
 			}
 		}
 	}
-	add_action( 'enqueue_block_assets', 'gutenberg_enqueue_block_styles_assets', 30 );
-}
-if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_assets' ) ) {
-	/**
-	 * Function responsible for enqueuing the assets required for block styles functionality on the editor.
-	 */
-	function gutenberg_enqueue_editor_block_styles_assets() {
-		$block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
 
-		$register_script_lines = array( '( function() {' );
-		foreach ( $block_styles as $block_name => $styles ) {
-			foreach ( $styles as $style_properties ) {
-				$register_script_lines[] = sprintf(
-					'	wp.blocks.registerBlockStyle( \'%s\', %s );',
-					$block_name,
-					wp_json_encode(
-						array(
-							'name'  => $style_properties['name'],
-							'label' => $style_properties['label'],
-						)
-					)
-				);
-			}
+	// Background Colors.
+	if ( in_array( 'background-color', $supports, true ) ) {
+		$has_named_background_color  = array_key_exists( 'backgroundColor', $block_attributes );
+		$has_custom_background_color = isset( $block_attributes['style']['color']['background'] );
+
+		// Apply required background class.
+		if ( $has_custom_background_color || $has_named_background_color ) {
+			$attributes['css_classes'][] = 'has-background';
 		}
-		$register_script_lines[] = '} )();';
-		$inline_script           = implode( "\n", $register_script_lines );
-
-		wp_register_script( 'wp-block-styles', false, array( 'wp-blocks' ), true, true );
-		wp_add_inline_script( 'wp-block-styles', $inline_script );
-		wp_enqueue_script( 'wp-block-styles' );
+		// Apply background color classes or styles.
+		if ( $has_named_background_color ) {
+			$attributes['css_classes'][] = sprintf( 'has-%s-background-color', $block_attributes['backgroundColor'] );
+		} elseif ( $has_custom_background_color ) {
+			$attributes['inline_styles'][] = sprintf( 'background-color: %s;', $block_attributes['style']['color']['background'] );
+		}
 	}
-	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_editor_block_styles_assets' );
+
+	// Gradients.
+	if ( in_array( 'background', $supports, true ) ) {
+		$has_named_gradient  = array_key_exists( 'gradient', $block_attributes );
+		$has_custom_gradient = isset( $block_attributes['style']['color']['gradient'] );
+
+		if ( $has_named_gradient || $has_custom_gradient ) {
+			$attributes['css_classes'][] = 'has-background';
+		}
+		// Apply required background class.
+		if ( $has_named_gradient ) {
+			$attributes['css_classes'][] = sprintf( 'has-%s-gradient-background', $block_attributes['gradient'] );
+		} elseif ( $has_custom_gradient ) {
+			$attributes['inline_styles'][] = sprintf( 'background: %s;', $block_attributes['style']['color']['gradient'] );
+		}
+	}
+
+	return $attributes;
+}
+
+/**
+ * Build an array with CSS classes and inline styles defining the font sizes
+ * which will be applied to the block markup in the front-end.
+ *
+ * @param  array $attributes comprehensive list of attributes to be applied.
+ * @param  array $block_attributes block attributes.
+ * @param  array $supports style features the block attributes.
+ * @return array Font size CSS classes and inline styles.
+ */
+function gutenberg_experimental_build_css_typography( $attributes, $block_attributes, $supports ) {
+	// Font Size.
+	if ( in_array( 'font-size', $supports, true ) ) {
+		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
+		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
+
+		// Apply required class or style.
+		if ( $has_named_font_size ) {
+			$attributes['css_classes'][] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
+		} elseif ( $has_custom_font_size ) {
+			$attributes['inline_styles'][] = sprintf( 'font-size: %spx;', $block_attributes['style']['typography']['fontSize'] );
+		}
+	}
+
+	// Line Height.
+	if ( in_array( 'line-height', $supports, true ) ) {
+		$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
+		// Add the style (no classes for line-height).
+		if ( $has_line_height ) {
+			$attributes['inline_styles'][] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
+		}
+	}
+
+	return $attributes;
 }

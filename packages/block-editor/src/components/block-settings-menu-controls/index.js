@@ -14,19 +14,17 @@ const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
 );
 
 const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
-	const { selectedBlocks } = useSelect( ( select ) => {
-		const { getBlocksByClientId, getSelectedBlockClientIds } = select(
-			'core/block-editor'
-		);
-		const ids =
-			clientIds !== null ? clientIds : getSelectedBlockClientIds();
-		return {
-			selectedBlocks: map(
-				getBlocksByClientId( ids ),
-				( block ) => block.name
-			),
-		};
-	}, [] );
+	const selectedBlocks = useSelect(
+		( select ) => {
+			const { getBlocksByClientId, getSelectedBlockClientIds } = select(
+				'core/block-editor'
+			);
+			const ids =
+				clientIds !== null ? clientIds : getSelectedBlockClientIds();
+			return map( getBlocksByClientId( ids ), ( block ) => block.name );
+		},
+		[ clientIds ]
+	);
 
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks } }>

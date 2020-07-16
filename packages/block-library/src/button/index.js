@@ -39,6 +39,6 @@ export const settings = {
 	deprecated,
 	merge: ( a, { text = '' } ) => ( {
 		...a,
-		text: a.text + text,
+		text: ( a.text || '' ) + text,
 	} ),
 };

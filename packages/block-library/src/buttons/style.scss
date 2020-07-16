@@ -1,15 +1,37 @@
 // Increased specificity to override blocks default margin.
-.wp-block-buttons .wp-block-button.wp-block-button {
+.wp-block-buttons .wp-block-button {
 	display: inline-block;
 	margin-right: $grid-unit-10;
 	margin-bottom: $grid-unit-10;
+
+	&:last-child {
+		margin-right: 0;
+	}
 }
 
 .wp-block-buttons.alignright .wp-block-button {
+	/*rtl:ignore*/
 	margin-right: 0;
+	/*rtl:ignore*/
 	margin-left: $grid-unit-10;
+
+	&:first-child {
+		margin-left: 0;
+	}
 }
 
+.wp-block-buttons.alignleft .wp-block-button {
+	/*rtl:ignore*/
+	margin-left: 0;
+	/*rtl:ignore*/
+	margin-right: $grid-unit-10;
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+.wp-block-button.aligncenter, // This is to support the legacy Button block.
 .wp-block-buttons.aligncenter {
 	text-align: center;
 }

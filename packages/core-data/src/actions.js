@@ -249,10 +249,11 @@ export function __unstableCreateUndoLevel() {
 /**
  * Action triggered to save an entity record.
  *
- * @param {string} kind    Kind of the received entity.
- * @param {string} name    Name of the received entity.
- * @param {Object} record  Record to be saved.
- * @param {Object} options Saving options.
+ * @param {string}  kind                       Kind of the received entity.
+ * @param {string}  name                       Name of the received entity.
+ * @param {Object}  record                     Record to be saved.
+ * @param {Object}  options                    Saving options.
+ * @param {boolean} [options.isAutosave=false] Whether this is an autosave.
  */
 export function* saveEntityRecord(
 	kind,

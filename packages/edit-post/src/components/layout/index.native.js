@@ -3,7 +3,6 @@
  */
 import { Platform, SafeAreaView, View } from 'react-native';
 import SafeArea from 'react-native-safe-area';
-import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -17,8 +16,14 @@ import {
 	FloatingToolbar,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView } from '@wordpress/components';
+import {
+	HTMLTextInput,
+	KeyboardAvoidingView,
+	NoticeList,
+	withSiteCapabilities,
+} from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
+import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -135,6 +140,7 @@ class Layout extends Component {
 					{ ! isHtmlView && Platform.OS === 'android' && (
 						<FloatingToolbar />
 					) }
+					<NoticeList />
 				</View>
 				<View
 					style={ {
@@ -176,5 +182,6 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	withSiteCapabilities,
 	__experimentalWithPageTemplatePicker,
 ] )( Layout );

@@ -1,6 +1,6 @@
 {
 	"name": "core/navigation",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"orientation": {
 			"type": "string"
@@ -39,6 +39,15 @@
 			"type": "boolean",
 			"default": true
 		}
+	},
+	"providesContext": {
+		"textColor": "textColor",
+		"customTextColor": "customTextColor",
+		"backgroundColor": "backgroundColor",
+		"customBackgroundColor": "customBackgroundColor",
+		"fontSize": "fontSize",
+		"customFontSize": "customFontSize",
+		"showSubmenuIcon": "showSubmenuIcon"
 	},
 	"supports": {
 		"align": [

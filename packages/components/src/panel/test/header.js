@@ -17,10 +17,7 @@ describe( 'PanelHeader', () => {
 			);
 			expect( panelHeader.type() ).toBe( 'div' );
 			expect(
-				panelHeader
-					.find( 'div' )
-					.shallow()
-					.children()
+				panelHeader.find( 'div' ).shallow().children()
 			).toHaveLength( 0 );
 		} );
 
@@ -35,10 +32,7 @@ describe( 'PanelHeader', () => {
 			const panelHeader = shallow( <PanelHeader children="Some Text" /> );
 			expect( panelHeader.text() ).toBe( 'Some Text' );
 			expect(
-				panelHeader
-					.find( 'div' )
-					.shallow()
-					.children()
+				panelHeader.find( 'div' ).shallow().children()
 			).toHaveLength( 1 );
 		} );
 
@@ -47,10 +41,7 @@ describe( 'PanelHeader', () => {
 				<PanelHeader label="Some Label" children="Some Text" />
 			);
 			expect(
-				panelHeader
-					.find( 'div' )
-					.shallow()
-					.children()
+				panelHeader.find( 'div' ).shallow().children()
 			).toHaveLength( 2 );
 		} );
 	} );

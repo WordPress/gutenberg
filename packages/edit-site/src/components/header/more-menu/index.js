@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import { ActionItem } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -56,6 +57,12 @@ const MoreMenu = () => (
 						messageDeactivated={ __(
 							'Fullscreen mode deactivated'
 						) }
+					/>
+					<ActionItem.Slot
+						name="core/edit-site/plugin-more-menu"
+						label={ __( 'Plugins' ) }
+						as={ [ MenuGroup, MenuItem ] }
+						fillProps={ { onClick: onClose } }
 					/>
 				</MenuGroup>
 				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />

@@ -1,8 +1,8 @@
 .wp-block-search {
 	&__input {
-		border-radius: $radius-round-rectangle;
+		border-radius: $radius-block-ui;
 		border: 1px solid $dark-gray-200;
-		color: $dark-opacity-300;
+		color: $dark-gray-placeholder;
 		font-family: $default-font;
 		font-size: $default-font-size;
 		padding: $grid-unit-10;
@@ -14,7 +14,7 @@
 
 	&__button {
 		background: #f7f7f7;
-		border-radius: $radius-round-rectangle;
+		border-radius: $radius-block-ui;
 		border: 1px solid #ccc;
 		box-shadow: inset 0 -1px 0 #ccc;
 		font-family: $default-font;

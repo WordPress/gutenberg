@@ -42,7 +42,13 @@ function Header( { isCustomizer } ) {
 				) }
 				<div className="edit-widgets-header__actions">
 					{ ! isCustomizer && <SaveButton /> }
-					<PinnedItems.Slot scope="core/edit-widgets" />
+					<PinnedItems.Slot
+						scope={
+							isCustomizer
+								? 'core/edit-widgets-customizer'
+								: 'core/edit-widgets'
+						}
+					/>
 				</div>
 			</div>
 			{ ( ! isLargeViewport || isCustomizer ) && (

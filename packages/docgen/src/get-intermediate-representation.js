@@ -129,12 +129,12 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
  *
  * @return {Object} Intermediate Representation in JSON.
  */
-module.exports = function(
+module.exports = (
 	path,
 	token,
 	ast = { body: [] },
 	parseDependency = () => {}
-) {
+) => {
 	const exportEntries = getExportEntries( token );
 	const ir = [];
 	exportEntries.forEach( ( entry ) => {

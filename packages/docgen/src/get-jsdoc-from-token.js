@@ -17,7 +17,7 @@ const getTypeAsString = require( './get-type-as-string' );
  * @param {Object} token Espree token.
  * @return {Object} Object representing the JSDoc comment.
  */
-module.exports = function( token ) {
+module.exports = ( token ) => {
 	let jsdoc;
 	const comments = getLeadingComments( token );
 	if ( comments && /^\*\r?\n/.test( comments ) ) {

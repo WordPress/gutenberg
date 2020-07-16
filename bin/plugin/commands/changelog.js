@@ -1,13 +1,19 @@
 /**
  * External dependencies
  */
-const { groupBy } = require( 'lodash' );
+const { groupBy, escapeRegExp, uniq } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
+const { sprintf } = require( 'sprintf-js' );
+const semver = require( 'semver' );
 
 /**
  * Internal dependencies
  */
 const { getNextMajorVersion } = require( '../lib/version' );
+const {
+	getMilestoneByTitle,
+	getIssuesByMilestone,
+} = require( '../lib/milestone' );
 const { log, formats } = require( '../lib/logger' );
 const config = require( '../config' );
 // @ts-ignore
@@ -34,19 +40,106 @@ const manifest = require( '../../../package.json' );
  */
 
 /**
- * Given a SemVer-formatted version string, returns an assumed milestone title
- * associated with that version.
+ * Changelog normalization function, returning a string to use as title, or
+ * undefined if entry should be omitted.
  *
- * @see https://semver.org/
- *
- * @param {string} version Version string.
- *
- * @return {string} Milestone title.
+ * @typedef {(text:string,issue:IssuesListForRepoResponseItem)=>string|undefined} WPChangelogNormalization
  */
-function getMilestone( version ) {
-	const [ major, minor ] = version.split( '.' );
 
-	return `Gutenberg ${ major }.${ minor }`;
+/**
+ * Mapping of label names to grouping heading text to be used in release notes,
+ * intended to be more readable in the context of release notes. Also used in
+ * merging multiple related groupings to a single heading.
+ *
+ * @type {Record<string,string>}
+ */
+const LABEL_TYPE_MAPPING = {
+	Bug: 'Bug Fixes',
+	Regression: 'Bug Fixes',
+	Feature: 'Features',
+	Enhancement: 'Enhancements',
+	'New API': 'New APIs',
+	Experimental: 'Experiments',
+	Task: 'Various',
+};
+
+/**
+ * Order in which to print group titles. A value of `undefined` is used as slot
+ * in which unrecognized headings are to be inserted.
+ *
+ * @type {Array<string|undefined>}
+ */
+const GROUP_TITLE_ORDER = [
+	'Features',
+	'Enhancements',
+	'New APIs',
+	'Bug Fixes',
+	'Performance',
+	'Experiments',
+	'Documentation',
+	'Code Quality',
+	undefined,
+	'Various',
+];
+
+/**
+ * Mapping of patterns to match a title to a grouping type.
+ *
+ * @type {Map<RegExp,string>}
+ */
+const TITLE_TYPE_PATTERNS = new Map( [
+	[ /^(\w+:)?(bug)?\s*fix(es)?(:|\/ )?/i, 'Bug Fixes' ],
+] );
+
+/**
+ * Map of common technical terms to a corresponding replacement term more
+ * appropriate for release notes.
+ *
+ * @type {Record<string,string>}
+ */
+const REWORD_TERMS = {
+	e2e: 'end-to-end',
+	url: 'URL',
+	config: 'configuration',
+	docs: 'documentation',
+};
+
+/**
+ * Returns type candidates based on given issue label names.
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {string[]} Type candidates.
+ */
+function getTypesByLabels( labels ) {
+	return uniq(
+		labels
+			.filter( ( label ) => label.startsWith( '[Type] ' ) )
+			.map( ( label ) => label.slice( '[Type] '.length ) )
+			.map( ( label ) =>
+				LABEL_TYPE_MAPPING.hasOwnProperty( label )
+					? LABEL_TYPE_MAPPING[ label ]
+					: label
+			)
+	);
+}
+
+/**
+ * Returns type candidates based on given issue title.
+ *
+ * @param {string} title Issue title.
+ *
+ * @return {string[]} Type candidates.
+ */
+function getTypesByTitle( title ) {
+	const types = [];
+	for ( const [ pattern, type ] of TITLE_TYPE_PATTERNS.entries() ) {
+		if ( pattern.test( title ) ) {
+			types.push( type );
+		}
+	}
+
+	return types;
 }
 
 /**
@@ -58,106 +151,189 @@ function getMilestone( version ) {
  * @return {string} Type label.
  */
 function getIssueType( issue ) {
-	const typeLabel = issue.labels.find( ( label ) =>
-		label.name.startsWith( '[Type] ' )
+	const candidates = [
+		...getTypesByLabels( issue.labels.map( ( { name } ) => name ) ),
+		...getTypesByTitle( issue.title ),
+	];
+
+	return candidates.length ? candidates.sort( sortGroup )[ 0 ] : 'Various';
+}
+
+/**
+ * Sort comparator, comparing two group titles.
+ *
+ * @param {string} a First group title.
+ * @param {string} b Second group title.
+ *
+ * @return {number} Sort result.
+ */
+function sortGroup( a, b ) {
+	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
+		const index = GROUP_TITLE_ORDER.indexOf( title );
+		return index === -1 ? GROUP_TITLE_ORDER.indexOf( undefined ) : index;
+	} );
+
+	return aIndex - bIndex;
+}
+
+/**
+ * Given a text string, appends a period if not already ending with one.
+ *
+ * @param {string} text Original text.
+ *
+ * @return {string} Text with trailing period.
+ */
+function addTrailingPeriod( text ) {
+	return text.replace( /\s*\.?$/, '' ) + '.';
+}
+
+/**
+ * Given a text string, replaces reworded terms.
+ *
+ * @param {string} text Original text.
+ *
+ * @return {string} Text with reworded terms.
+ */
+function reword( text ) {
+	for ( const [ term, replacement ] of Object.entries( REWORD_TERMS ) ) {
+		const pattern = new RegExp(
+			'(^| )' + escapeRegExp( term ) + '( |$)',
+			'ig'
+		);
+		text = text.replace( pattern, '$1' + replacement + '$2' );
+	}
+
+	return text;
+}
+
+/**
+ * Given a text string, capitalizes the first letter of the last segment
+ * following a colon.
+ *
+ * @param {string} text Original text.
+ *
+ * @return {string} Text with capitalizes last segment.
+ */
+function capitalizeAfterColonSeparatedPrefix( text ) {
+	const parts = text.split( ':' );
+	parts[ parts.length - 1 ] = parts[ parts.length - 1 ].replace(
+		/^(\s*)([a-z])/,
+		( _match, whitespace, letter ) => whitespace + letter.toUpperCase()
 	);
 
-	return typeLabel ? typeLabel.name.replace( /^\[Type\] /, '' ) : 'Various';
+	return parts.join( ':' );
 }
+
+/**
+ * Higher-order function which returns a normalization function to omit by title
+ * prefix matching any of the given prefixes.
+ *
+ * @param {string[]} prefixes Prefixes from which to determine if given entry
+ *                            should be omitted.
+ *
+ * @return {WPChangelogNormalization} Normalization function.
+ */
+const createOmitByTitlePrefix = ( prefixes ) => ( title ) =>
+	prefixes.some( ( prefix ) =>
+		new RegExp( '^' + escapeRegExp( prefix ), 'i' ).test( title )
+	)
+		? undefined
+		: title;
+
+/**
+ * Higher-order function which returns a normalization function to omit by issue
+ * label matching any of the given label names.
+ *
+ * @param {string[]} labels Label names from which to determine if given entry
+ *                          should be omitted.
+ *
+ * @return {WPChangelogNormalization} Normalization function.
+ */
+const createOmitByLabel = ( labels ) => ( text, issue ) =>
+	issue.labels.some( ( label ) => labels.includes( label.name ) )
+		? undefined
+		: text;
+
+/**
+ * Given an issue title and issue, returns the title with redundant grouping
+ * type details removed. The prefix is redundant since it would already be clear
+ * enough by group assignment that the prefix would be inferred.
+ *
+ * @type {WPChangelogNormalization}
+ *
+ * @return {string} Title with redundant grouping type details removed.
+ */
+function removeRedundantTypePrefix( title, issue ) {
+	const type = getIssueType( issue );
+
+	return title.replace(
+		new RegExp(
+			`^\\[?${
+				// Naively try to convert to singular form, to match "Bug Fixes"
+				// type as either "Bug Fix" or "Bug Fixes" (technically matches
+				// "Bug Fixs" as well).
+				escapeRegExp( type.replace( /(es|s)$/, '' ) )
+			}(es|s)?\\]?:?\\s*`,
+			'i'
+		),
+		''
+	);
+}
+
+/**
+ * Array of normalizations applying to title, each returning a new string, or
+ * undefined to indicate an entry which should be omitted.
+ *
+ * @type {Array<WPChangelogNormalization>}
+ */
+const TITLE_NORMALIZATIONS = [
+	createOmitByTitlePrefix( [ '[rnmobile]' ] ),
+	createOmitByLabel( [
+		'Mobile App Compatibility',
+		'[Type] Project Management',
+	] ),
+	removeRedundantTypePrefix,
+	reword,
+	capitalizeAfterColonSeparatedPrefix,
+	addTrailingPeriod,
+];
 
 /**
  * Given an issue title, returns the title with normalization transforms
- * applied.
+ * applied, or undefined to indicate that the entry should be omitted.
  *
- * @param {string} title Original title.
+ * @param {string}                        title Original title.
+ * @param {IssuesListForRepoResponseItem} issue Issue object.
  *
- * @return {string} Normalized title.
+ * @return {string|undefined} Normalized title.
  */
-function getNormalizedTitle( title ) {
-	if ( ! title.endsWith( '.' ) ) {
-		title = title + '.';
+function getNormalizedTitle( title, issue ) {
+	/** @type {string|undefined} */
+	let normalizedTitle = title;
+	for ( const normalize of TITLE_NORMALIZATIONS ) {
+		normalizedTitle = normalize( normalizedTitle, issue );
+		if ( normalizedTitle === undefined ) {
+			break;
+		}
 	}
 
-	return title;
+	return normalizedTitle;
 }
 
 /**
- * Returns a formatted changelog entry for a given issue object.
+ * Returns a formatted changelog entry for a given issue object, or undefined
+ * if entry should be omitted.
  *
  * @param {IssuesListForRepoResponseItem} issue Issue object.
  *
- * @return {string} Formatted changelog entry.
+ * @return {string=} Formatted changelog entry, or undefined to omit.
  */
 function getEntry( issue ) {
-	const title = getNormalizedTitle( issue.title );
+	const title = getNormalizedTitle( issue.title, issue );
 
-	return `- ${ title } ([${ issue.number }](${ issue.html_url }))`;
-}
-
-/**
- * Returns a promise resolving to a milestone by a given title, if exists.
- *
- * @param {GitHub} octokit Initialized Octokit REST client.
- * @param {string} owner   Repository owner.
- * @param {string} repo    Repository name.
- * @param {string} title   Milestone title.
- *
- * @return {Promise<OktokitIssuesListMilestonesForRepoResponseItem|void>} Promise resolving to milestone, if exists.
- */
-async function getMilestoneByTitle( octokit, owner, repo, title ) {
-	const options = octokit.issues.listMilestonesForRepo.endpoint.merge( {
-		owner,
-		repo,
-	} );
-
-	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListMilestonesForRepoResponse>>}
-	 */
-	const responses = octokit.paginate.iterator( options );
-
-	for await ( const response of responses ) {
-		const milestones = response.data;
-		for ( const milestone of milestones ) {
-			if ( milestone.title === title ) {
-				return milestone;
-			}
-		}
-	}
-}
-
-/**
- * Returns a promise resolving to pull requests by a given milestone ID.
- *
- * @param {GitHub} octokit   Initialized Octokit REST client.
- * @param {string} owner     Repository owner.
- * @param {string} repo      Repository name.
- * @param {number} milestone Milestone ID.
- *
- * @return {Promise<IssuesListForRepoResponseItem[]>} Promise resolving to pull
- *                                                    requests for the given
- *                                                    milestone.
- */
-async function getPullRequestsByMilestone( octokit, owner, repo, milestone ) {
-	const options = octokit.issues.listForRepo.endpoint.merge( {
-		owner,
-		repo,
-		milestone,
-		state: 'closed',
-	} );
-
-	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListForRepoResponse>>}
-	 */
-	const responses = octokit.paginate.iterator( options );
-
-	const pulls = [];
-
-	for await ( const response of responses ) {
-		const issues = response.data;
-		pulls.push( ...issues.filter( ( issue ) => issue.pull_request ) );
-	}
-
-	return pulls;
+	return title === undefined
+		? title
+		: `- ${ title } ([${ issue.number }](${ issue.html_url }))`;
 }
 
 /**
@@ -186,7 +362,14 @@ async function fetchAllPullRequests( octokit, settings ) {
 	}
 
 	const { number } = milestone;
-	return getPullRequestsByMilestone( octokit, owner, repo, number );
+	const issues = await getIssuesByMilestone(
+		octokit,
+		owner,
+		repo,
+		number,
+		'closed'
+	);
+	return issues.filter( ( issue ) => issue.pull_request );
 }
 
 /**
@@ -211,14 +394,19 @@ async function getChangelog( settings ) {
 	let changelog = '';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
-	for ( const group of Object.keys( groupedPullRequests ) ) {
-		changelog += '### ' + group + '\n\n';
-
+	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
+	for ( const group of sortedGroups ) {
 		const groupPullRequests = groupedPullRequests[ group ];
-		for ( const pullRequest of groupPullRequests ) {
-			changelog += getEntry( pullRequest ) + '\n';
+		const groupEntries = groupPullRequests
+			.map( getEntry )
+			.filter( Boolean );
+
+		if ( ! groupEntries.length ) {
+			continue;
 		}
 
+		changelog += '### ' + group + '\n\n';
+		groupEntries.forEach( ( entry ) => ( changelog += entry + '\n' ) );
 		changelog += '\n';
 	}
 
@@ -259,12 +447,30 @@ async function getReleaseChangelog( options ) {
 		token: options.token,
 		milestone:
 			options.milestone === undefined
-				? getMilestone( getNextMajorVersion( manifest.version ) )
+				? // Disable reason: valid-sprintf applies to `@wordpress/i18n` where
+				  // strings are expected to need to be extracted, and thus variables are
+				  // not allowed. This string will not need to be extracted.
+				  // eslint-disable-next-line @wordpress/valid-sprintf
+				  sprintf( config.versionMilestoneFormat, {
+						...config,
+						...semver.parse(
+							getNextMajorVersion( manifest.version )
+						),
+				  } )
 				: options.milestone,
 	} );
 }
 
 /** @type {NodeJS.Module} */ ( module ).exports = {
+	reword,
+	capitalizeAfterColonSeparatedPrefix,
+	createOmitByTitlePrefix,
+	createOmitByLabel,
+	addTrailingPeriod,
 	getNormalizedTitle,
 	getReleaseChangelog,
+	getIssueType,
+	sortGroup,
+	getTypesByLabels,
+	getTypesByTitle,
 };

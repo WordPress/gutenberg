@@ -188,6 +188,25 @@ example: {
 
 If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
 
+It's also possible to extend the block preview with inner blocks via `innerBlocks`. For example:
+
+```js
+example: {
+    attributes: {
+        cover: 'https://example.com/image.jpg',
+    },
+    innerBlocks: {
+        name: 'core/paragraph',
+        attributes: {
+            /* translators: example text. */
+            content: __(
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
+            ),
+        },
+    },
+},
+```
+
 #### variations (optional)
 
 - **Type:** `Object[]`
@@ -251,7 +270,7 @@ variations: [
 
 -   **Type:** `Object`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](./block-transforms.md) for more info about each available transformation.
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](/docs/designers-developers/developers/block-api/block-transforms.md) for more info about each available transformation.
 
 #### parent (optional)
 

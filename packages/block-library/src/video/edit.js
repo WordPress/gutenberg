@@ -25,6 +25,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -121,6 +122,7 @@ class VideoEdit extends Component {
 			noticeUI,
 			attributes,
 			setAttributes,
+			insertBlocksAfter,
 		} = this.props;
 		const onSelectVideo = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -245,6 +247,11 @@ class VideoEdit extends Component {
 								setAttributes( { caption: value } )
 							}
 							inlineToolbar
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/paragraph' )
+								)
+							}
 						/>
 					) }
 				</Block.figure>

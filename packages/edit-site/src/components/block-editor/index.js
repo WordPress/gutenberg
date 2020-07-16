@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
-import { uploadMedia } from '@wordpress/media-utils';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -13,68 +12,34 @@ import {
 	WritingFlow,
 	ObserveTyping,
 	BlockList,
-	ButtonBlockerAppender,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useEditorContext } from '../editor';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
-export default function BlockEditor() {
-	const { settings: _settings, setSettings } = useEditorContext();
-	const { canUserCreateMedia, focusMode, hasFixedToolbar } = useSelect(
+export default function BlockEditor( { setIsInserterOpen } ) {
+	const { settings, templateType, page } = useSelect(
 		( select ) => {
-			const { isFeatureActive } = select( 'core/edit-site' );
-			const _canUserCreateMedia = select( 'core' ).canUser(
-				'create',
-				'media'
+			const { getSettings, getTemplateType, getPage } = select(
+				'core/edit-site'
 			);
 			return {
-				canUserCreateMedia:
-					_canUserCreateMedia || _canUserCreateMedia !== false,
-				focusMode: isFeatureActive( 'focusMode' ),
-				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+				settings: getSettings( setIsInserterOpen ),
+				templateType: getTemplateType(),
+				page: getPage(),
 			};
 		},
-		[]
+		[ setIsInserterOpen ]
 	);
-
-	const settings = useMemo( () => {
-		if ( ! canUserCreateMedia ) {
-			return _settings;
-		}
-		return {
-			..._settings,
-			focusMode,
-			hasFixedToolbar,
-			mediaUpload( { onError, ...rest } ) {
-				uploadMedia( {
-					wpAllowedMimeTypes: _settings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
-					...rest,
-				} );
-			},
-		};
-	}, [ canUserCreateMedia, _settings, focusMode, hasFixedToolbar ] );
-
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		settings.templateType
-	);
-	const setActivePageAndTemplateId = useCallback(
-		( { page, templateId } ) =>
-			setSettings( ( prevSettings ) => ( {
-				...prevSettings,
-				page,
-				templateId,
-				templateType: 'wp_template',
-			} ) ),
-		[]
+		templateType
 	);
 
+	const { setPage } = useDispatch( 'core/edit-site' );
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -89,13 +54,11 @@ export default function BlockEditor() {
 					( fillProps ) => (
 						<NavigateToLink
 							{ ...fillProps }
-							activePage={ settings.page }
-							onActivePageAndTemplateIdChange={
-								setActivePageAndTemplateId
-							}
+							activePage={ page }
+							onActivePageChange={ setPage }
 						/>
 					),
-					[ settings.page, setActivePageAndTemplateId ]
+					[ page ]
 				) }
 			</__experimentalLinkControl.ViewerFill>
 			<SidebarInspectorFill>
@@ -104,10 +67,7 @@ export default function BlockEditor() {
 			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
 				<WritingFlow>
 					<ObserveTyping>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							renderAppender={ ButtonBlockerAppender }
-						/>
+						<BlockList className="edit-site-block-editor__block-list" />
 					</ObserveTyping>
 				</WritingFlow>
 			</div>

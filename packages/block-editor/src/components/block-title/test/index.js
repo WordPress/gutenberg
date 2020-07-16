@@ -4,9 +4,14 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { BlockTitle } from '../';
+import BlockTitle from '../';
 
 jest.mock( '@wordpress/blocks', () => {
 	return {
@@ -22,6 +27,12 @@ jest.mock( '@wordpress/blocks', () => {
 	};
 } );
 
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
+
 describe( 'BlockTitle', () => {
 	it( 'renders nothing if name is falsey', () => {
 		const wrapper = shallow( <BlockTitle /> );
@@ -30,13 +41,19 @@ describe( 'BlockTitle', () => {
 	} );
 
 	it( 'renders nothing if block type does not exist', () => {
-		const wrapper = shallow( <BlockTitle name="name-not-exists" /> );
+		useSelect.mockImplementation( () => 'name-not-exists' );
+		const wrapper = shallow(
+			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+		);
 
 		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'renders title if block type exists', () => {
-		const wrapper = shallow( <BlockTitle name="name-exists" /> );
+		useSelect.mockImplementation( () => 'name-exists' );
+		const wrapper = shallow(
+			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+		);
 
 		expect( wrapper.text() ).toBe( 'Block Title' );
 	} );

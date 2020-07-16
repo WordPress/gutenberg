@@ -14,9 +14,10 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content } ) => {
+			transform: ( { content, anchor } ) => {
 				return createBlock( name, {
 					content,
+					anchor,
 				} );
 			},
 		},
@@ -26,7 +27,7 @@ const transforms = {
 			schema: ( { phrasingContentSchema, isPaste } ) => {
 				const schema = {
 					children: phrasingContentSchema,
-					attributes: isPaste ? [] : [ 'style' ],
+					attributes: isPaste ? [] : [ 'style', 'id' ],
 				};
 				return {
 					h1: schema,
@@ -69,9 +70,10 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content } ) => {
+			transform: ( { content, anchor } ) => {
 				return createBlock( 'core/paragraph', {
 					content,
+					anchor,
 				} );
 			},
 		},

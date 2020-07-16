@@ -112,4 +112,3 @@ The scope of the complementary area e.g: "core/edit-post", "core/edit-site", "my
 
 - Type: `String`
 - Required: Yes
-

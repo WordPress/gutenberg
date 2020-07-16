@@ -18,10 +18,8 @@ import {
 
 function BlockHTML( { clientId } ) {
 	const [ html, setHtml ] = useState( '' );
-	const { block } = useSelect(
-		( select ) => ( {
-			block: select( 'core/block-editor' ).getBlock( clientId ),
-		} ),
+	const block = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
 		[ clientId ]
 	);
 	const { updateBlock } = useDispatch( 'core/block-editor' );

@@ -90,7 +90,6 @@ export function isValidHref( href ) {
  * @param {string}  options.type             The type of the link.
  * @param {string}  options.id               The ID of the link.
  * @param {boolean} options.opensInNewWindow Whether this link will open in a new window.
- * @param {Object}  options.text             The text that is being hyperlinked.
  *
  * @return {Object} The final format object.
  */
@@ -103,7 +102,7 @@ export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
 	};
 
 	if ( type ) format.attributes.type = type;
-	if ( id ) format.attributes.type = id;
+	if ( id ) format.attributes.id = id;
 
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';

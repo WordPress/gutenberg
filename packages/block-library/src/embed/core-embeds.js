@@ -58,6 +58,7 @@ export const common = [
 			icon: embedFacebookIcon,
 			keywords: [ __( 'social' ) ],
 			description: __( 'Embed a Facebook post.' ),
+			previewable: false,
 		},
 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
 	},
@@ -194,16 +195,6 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/hulu',
-		settings: {
-			title: 'Hulu',
-			icon: embedVideoIcon,
-			keywords: [ __( 'video' ) ],
-			description: __( 'Embed Hulu content.' ),
-		},
-		patterns: [ /^https?:\/\/(www\.)?hulu\.com\/.+/i ],
-	},
-	{
 		name: 'core-embed/imgur',
 		settings: {
 			title: 'Imgur',
@@ -316,6 +307,7 @@ export const others = [
 			title: 'SmugMug',
 			icon: embedPhotoIcon,
 			description: __( 'Embed SmugMug content.' ),
+			previewable: false,
 		},
 		patterns: [ /^https?:\/\/(.+\.)?smugmug\.com\/.*/i ],
 	},

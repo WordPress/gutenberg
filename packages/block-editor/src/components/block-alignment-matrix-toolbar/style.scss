@@ -1,7 +1,11 @@
 .block-editor-block-alignment-matrix-toolbar__popover {
 	.components-popover__content {
 		min-width: 0;
-		padding: $grid-unit;
 		width: auto;
+
+		> div {
+			padding: $grid-unit;
+		}
 	}
+
 }

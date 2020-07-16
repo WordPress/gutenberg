@@ -21,10 +21,7 @@ function usePostContentExcerpt( wordCount ) {
 		excerptElement.innerHTML = rawPostContent;
 		const excerpt =
 			excerptElement.textContent || excerptElement.innerText || '';
-		return excerpt
-			.trim()
-			.split( ' ', wordCount )
-			.join( ' ' );
+		return excerpt.trim().split( ' ', wordCount ).join( ' ' );
 	}, [ rawPostContent, wordCount ] );
 }
 
@@ -107,7 +104,7 @@ export default function PostExcerptEdit( {
 	isSelected,
 } ) {
 	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return 'Post Excerpt Placeholder';
+		return __( 'Post Excerpt' );
 	}
 	return (
 		<PostExcerptEditor

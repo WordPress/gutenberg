@@ -34,7 +34,8 @@
 	}
 }
 
-.wp-block-latest-posts__post-date {
+.wp-block-latest-posts__post-date,
+.wp-block-latest-posts__post-author {
 	display: block;
 	color: $dark-gray-300;
 	font-size: $default-font-size;
