@@ -8,7 +8,7 @@ import { useRef, useEffect } from '@wordpress/element';
  * Source:
  * https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/useUpdateEffect.ts
  */
-export function useUpdateEffect( effect, deps ) {
+function useUpdateEffect( effect, deps ) {
 	const mounted = useRef( false );
 
 	useEffect( () => {
@@ -19,3 +19,5 @@ export function useUpdateEffect( effect, deps ) {
 		return undefined;
 	}, deps );
 }
+
+export default useUpdateEffect;

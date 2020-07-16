@@ -120,7 +120,7 @@ function gutenberg_override_translation_file( $file, $handle ) {
 	}
 
 	// Ignore scripts that are not found in the expected `build/` location.
-	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.js';
+	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.min.js';
 	if ( ! file_exists( $script_path ) ) {
 		return $file;
 	}
@@ -247,9 +247,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_packages_scripts( $scripts ) {
-	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
+	foreach ( glob( gutenberg_dir_path() . 'build/*/index.min.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
-		// For example, `…/build/a11y/index.js` becomes `wp-a11y`.
+		// For example, `…/build/a11y/index.min.js` becomes `wp-a11y`.
 		$handle = 'wp-' . basename( dirname( $path ) );
 
 		// Replace `.js` extension with `.asset.php` to find the generated dependencies file.
@@ -655,7 +655,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns',
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_custom_line_height( $settings ) {
-	$settings['__experimentalDisableCustomLineHeight'] = get_theme_support( 'disable-custom-line-height' );
+	$settings['enableCustomLineHeight'] = get_theme_support( 'custom-line-height' );
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_height' );
@@ -669,7 +669,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_heig
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_custom_units( $settings ) {
-	$settings['__experimentalDisableCustomUnits'] = get_theme_support( 'experimental-custom-units' );
+	$settings['enableCustomUnits'] = get_theme_support( 'custom-units' );
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );

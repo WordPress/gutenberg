@@ -34,7 +34,7 @@ function BlockNavigation( {
 	return (
 		<div className="block-editor-block-navigation__container">
 			<p className="block-editor-block-navigation__label">
-				{ __( 'Block navigation' ) }
+				{ __( 'List view' ) }
 			</p>
 			{ hasHierarchy && (
 				<BlockNavigationTree
