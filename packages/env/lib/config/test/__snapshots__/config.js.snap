@@ -3,6 +3,7 @@
 exports[`readConfig config file should match snapshot 1`] = `
 Object {
   "configDirectoryPath": ".",
+  "detectedLocalConfig": true,
   "env": Object {
     "development": Object {
       "config": Object {

@@ -116,11 +116,13 @@ export default function BlockEditorArea( {
 					) }
 				</NavigableToolbar>
 				<Popover.Slot name="block-toolbar" />
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList />
-					</ObserveTyping>
-				</WritingFlow>
+				<div className="editor-styles-wrapper">
+					<WritingFlow>
+						<ObserveTyping>
+							<BlockList />
+						</ObserveTyping>
+					</WritingFlow>
+				</div>
 			</CardBody>
 			<CardFooter>
 				<CheckboxControl

@@ -8,14 +8,13 @@
 		"label": {
 			"type": "string"
 		},
-		"nofollow": {
-			"type": "boolean",
-			"default": false
-		},
 		"type": {
 			"type": "string"
 		},
 		"description": {
+			"type": "string"
+		},
+		"rel": {
 			"type": "string"
 		},
 		"id": {

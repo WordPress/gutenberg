@@ -172,20 +172,22 @@ $ wp-env start
 
 `wp-env` creates generated files in the `wp-env` home directory. By default, this is `~/.wp-env`. The exception is Linux, where files are placed at `~/wp-env` [for compatibility with Snap Packages](https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325). The `wp-env` home directory contains a subdirectory for each project named `/$md5_of_project_path`. To change the `wp-env` home directory, set the `WP_ENV_HOME` environment variable. For example, running `WP_ENV_HOME="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory).
 
-### `wp-env start [ref]`
+### `wp-env start`
+
+The start command installs and initalizes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure the environment except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`. This will not overrwrite any existing content.
 
 ```sh
 wp-env start
 
-Starts WordPress for development on port 8888 (​http://localhost:8888​)
-(override with WP_ENV_PORT) and tests on port 8889 (​http://localhost:8889​)
-(override with WP_ENV_TESTS_PORT). The current working directory must be a
-WordPress installation, a plugin, a theme, or contain a .wp-env.json file.
+Starts WordPress for development on port 8888 (override with WP_ENV_PORT) and
+tests on port 8889 (override with WP_ENV_TESTS_PORT). The current working
+directory must be a WordPress installation, a plugin, a theme, or contain a
+.wp-env.json file. After first insall, use the '--update' flag to download updates
+to mapped sources and to re-apply WordPress configuration options.
 
-
-Positionals:
-  ref  A `https://github.com/WordPress/WordPress` git repo branch or commit for
-       choosing a specific version.                 [string] [default: "master"]
+Options:
+  --update   Download source updates and apply WordPress configuration.
+                                                      [boolean] [default: false]
 ```
 
 ### `wp-env stop`
@@ -286,14 +288,14 @@ You can customize the WordPress installation, plugins and themes that the develo
 
 `.wp-env.json` supports six fields for options applicable to both the tests and development instances.
 
-| Field        | Type           | Default                                | Description                                                                                                               |
-| ------------ | -------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `"core"`     | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
-| `"plugins"`  | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                             |
-| `"themes"`   | `string[]`     | `[]`                                   | A list of themes to install in the environment. The first theme in the list will be activated.                            |
+| Field        | Type           | Default                                | Description                                                                                                                |
+| ------------ | -------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `"core"`     | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.   |
+| `"plugins"`  | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                              |
+| `"themes"`   | `string[]`     | `[]`                                   | A list of themes to install in the environment. The first theme in the list will be activated.                             |
 | `"port"`     | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'. |
-| `"config"`   | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                               |
-| `"mappings"` | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                            |
+| `"config"`   | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                |
+| `"mappings"` | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                             |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
