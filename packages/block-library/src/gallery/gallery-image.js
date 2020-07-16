@@ -26,7 +26,7 @@ import {
 /**
  * Internal dependencies
  */
-import { pickRelevantMediaFiles } from './shared';
+import { pickRelevantMediaFiles, getImageRatio } from './shared';
 
 const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
@@ -43,6 +43,7 @@ class GalleryImage extends Component {
 			this
 		);
 		this.onSelectCustomURL = this.onSelectCustomURL.bind( this );
+		this.onLoad = this.onLoad.bind( this );
 		this.state = {
 			captionSelected: false,
 			isEditing: false,
@@ -51,6 +52,10 @@ class GalleryImage extends Component {
 
 	bindContainer( ref ) {
 		this.container = ref;
+	}
+
+	onLoad() {
+		this.props.setAttributes( { ratio: getImageRatio( this.container ) } );
 	}
 
 	onSelectCaption() {
@@ -210,6 +215,7 @@ class GalleryImage extends Component {
 					onClick={ this.onSelectImage }
 					onFocus={ this.onSelectImage }
 					onKeyDown={ this.onRemoveImage }
+					onLoad={ this.onLoad }
 					tabIndex="0"
 					aria-label={ ariaLabel }
 					ref={ this.bindContainer }

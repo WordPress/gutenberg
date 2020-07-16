@@ -22,16 +22,7 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	return imageProps;
 };
 
-export async function getImageRatio( url ) {
-	const img = document.createElement( 'img' );
-	const imgPromise = new Promise( ( resolve, reject ) => {
-		img.onload = () => resolve( img );
-		img.onerror = reject;
-	} );
-
-	img.src = url;
-	await imgPromise;
-
+export function getImageRatio( img ) {
 	if ( ! img ) {
 		return false;
 	}

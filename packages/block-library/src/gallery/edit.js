@@ -36,11 +36,7 @@ import { withViewportMatch } from '@wordpress/viewport';
  * Internal dependencies
  */
 import { sharedIcon } from './shared-icon';
-import {
-	defaultColumnsNumber,
-	pickRelevantMediaFiles,
-	getImageRatio,
-} from './shared';
+import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
 
 const MAX_COLUMNS = 8;
@@ -100,12 +96,6 @@ class GalleryEdit extends Component {
 		if ( attributes.images ) {
 			attributes = {
 				...attributes,
-				images: map( attributes.images, ( image ) => {
-					return {
-						...image,
-						ratio: getImageRatio( image.url ),
-					};
-				} ),
 				// Unlike images[ n ].id which is a string, always ensure the
 				// ids array contains numbers as per its attribute type.
 				ids: map( attributes.images, ( { id } ) => parseInt( id, 10 ) ),
@@ -330,10 +320,6 @@ class GalleryEdit extends Component {
 				onFileChange: this.onSelectImages,
 				allowedTypes: [ 'image' ],
 			} );
-		}
-
-		if ( ! every( images, ( { ratio } ) => !! ratio ) ) {
-			this.setAttributes( { images } );
 		}
 	}
 
