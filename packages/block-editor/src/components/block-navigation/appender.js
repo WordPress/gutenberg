@@ -50,6 +50,7 @@ export default function BlockNavigationAppender( {
 						/>
 						<Inserter
 							rootClientId={ parentBlockClientId }
+							__experimentalIsQuick
 							__experimentalSelectBlockOnInsert={ false }
 							aria-describedby={ descriptionId }
 							toggleProps={ { ref, tabIndex, onFocus } }

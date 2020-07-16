@@ -128,6 +128,7 @@ class Inserter extends Component {
 		if ( isQuick ) {
 			return (
 				<QuickInserter
+					onSelect={ onClose }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
