@@ -50,9 +50,9 @@ The four phases of the project are Editing, Customization, Collaboration, and Mu
 - <a href="https://wordpress.org/gutenberg/handbook/">Documentation: Creating Blocks, Reference, and Guidelines</a>
 - <a href="https://wordpress.org/gutenberg/handbook/reference/faq/">Additional frequently asked questions</a>
 
-= Where can I see Gutenberg plugin versions included in WordPress? =
+= Where can I see which Gutenberg plugin versions are included in each WordPress release? =
 
-View <a href="https://developer.wordpress.org/block-editor/principles/versions-in-wordpress/">the Versions in WordPress</a> documentation to get a table for which Gutenberg plugin version is included into each WordPress major release.
+View <a href="https://developer.wordpress.org/block-editor/principles/versions-in-wordpress/">the Versions in WordPress</a> document to get a table showing which Gutenberg plugin version is included in each WordPress release.
 
 
 == Changelog ==
