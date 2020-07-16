@@ -93,7 +93,7 @@ def hermesOriginalPath = "../../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
 def buildResFolder = 'build/generated/res'
 def buildResRawFolder = "${buildResFolder}/raw/"
-def bundleName = 'index_android.bundle'
+def bundleName = 'index_android_bundle'
 def mobileGutenbergRootDir = '../../../..'
 
 task copyJSBundle(type: Copy) {
