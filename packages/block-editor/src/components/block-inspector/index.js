@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
-	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
@@ -21,9 +20,7 @@ import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
-import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
-import DefaultStylePicker from '../default-style-picker';
 import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
@@ -103,29 +100,12 @@ const BlockInspector = ( {
 	);
 };
 
-const BlockInspectorSingleBlock = ( {
-	clientId,
-	blockName,
-	hasBlockStyles,
-	bubblesVirtually,
-} ) => {
+const BlockInspectorSingleBlock = ( { clientId, bubblesVirtually } ) => {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard { ...blockInformation } />
 			<BlockVariationTransforms blockClientId={ clientId } />
-			{ hasBlockStyles && (
-				<div>
-					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ clientId } />
-						{ hasBlockSupport(
-							blockName,
-							'defaultStylePicker',
-							true
-						) && <DefaultStylePicker blockName={ blockName } /> }
-					</PanelBody>
-				</div>
-			) }
 			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			<div>
 				<AdvancedControls
