@@ -138,28 +138,22 @@ export default class ClassicEdit extends Component {
 			bookmark = null;
 		} );
 
-		editor.on(
-			'Paste Change input Undo Redo',
-			debounce( () => {
-				// We need this check because when we remove the editor (onUnmount)
-				// due to the usage of `debounce`, this callback is executed in
-				// another tick. This results in setting the content to empty.
-				if ( editor._hasBeenRemoved ) return;
+		const debouncedOnChange = debounce( () => {
+			const value = editor.getContent();
 
-				const value = editor.getContent();
+			if ( value !== editor._lastChange ) {
+				editor._lastChange = value;
+				setAttributes( {
+					content: value,
+				} );
+			}
+		}, 250 );
+		editor.on( 'Paste Change input Undo Redo', debouncedOnChange );
 
-				if ( value !== editor._lastChange ) {
-					editor._lastChange = value;
-					setAttributes( {
-						content: value,
-					} );
-				}
-			}, 250 )
-		);
-
-		editor.on( 'remove', () => {
-			editor._hasBeenRemoved = true;
-		} );
+		// We need to cancel the debounce call because when we remove
+		// the editor (onUnmount) this callback is executed in
+		// another tick. This results in setting the content to empty.
+		editor.on( 'remove', debouncedOnChange.cancel );
 
 		editor.on( 'keydown', ( event ) => {
 			if ( isKeyboardEvent.primary( event, 'z' ) ) {
