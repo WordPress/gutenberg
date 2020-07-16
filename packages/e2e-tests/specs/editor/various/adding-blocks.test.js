@@ -45,7 +45,9 @@ describe( 'adding blocks', () => {
 		await clickAtBottom(
 			await page.$( '.interface-interface-skeleton__content' )
 		);
-		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
+		expect(
+			await page.waitForSelector( '[data-type="core/paragraph"]' )
+		).not.toBeNull();
 		await page.keyboard.type( 'Paragraph block' );
 
 		// Using the slash command

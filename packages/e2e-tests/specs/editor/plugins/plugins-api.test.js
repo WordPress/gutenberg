@@ -57,10 +57,11 @@ describe( 'Using Plugins API', () => {
 
 		it( 'Should render publish panel inside Post-publish sidebar', async () => {
 			await publishPost();
-
-			const pluginPublishPanelText = await page.$eval(
-				'.editor-post-publish-panel .my-publish-panel-plugin__post',
-				( el ) => el.innerText
+			const pluginPublishPanel = await page.waitForSelector(
+				'.editor-post-publish-panel .my-publish-panel-plugin__post'
+			);
+			const pluginPublishPanelText = await pluginPublishPanel.evaluate(
+				( node ) => node.innerText
 			);
 			expect( pluginPublishPanelText ).toMatch( 'My post publish panel' );
 		} );
