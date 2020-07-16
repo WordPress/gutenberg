@@ -31,7 +31,7 @@
   "dependencies": {
     "@babel/runtime": "^7.9.2",
     "@react-native-community/blur": "3.6.0",
-		"@react-native-community/masked-view": "^git+https://github.com/wordpress-mobile/react-native-masked-view.git#6eb627ff8afa9e81d8be3f34ebfbe09f6f6dbfd3",
+		"@react-native-community/masked-view": "git+https://github.com/wordpress-mobile/react-native-masked-view.git#6eb627ff8afa9e81d8be3f34ebfbe09f6f6dbfd3",
     "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#5ad284d92b8d886e366445bf215be741ed53ddc6",
 		"@react-navigation/native": "^5.6.1",
 		"@react-navigation/stack": "5.6.2",
@@ -56,7 +56,7 @@
     "node-fetch": "^2.6.0",
     "react-native": "0.61.5",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
-		"react-native-gesture-handler": "git+https://github.com/wordpress-mobile/react-gesture-handler.git#86c8b1901137b5b67505ad43839fc03c30b54527",
+		"react-native-gesture-handler": "git+https://github.com/wordpress-mobile/react-native-gesture-handler.git#86c8b1901137b5b67505ad43839fc03c30b54527",
     "react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#f03f2c16414aff4ea76064dcd00a9e3c6efc838d",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker",
