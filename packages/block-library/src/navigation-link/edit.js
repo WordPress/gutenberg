@@ -11,12 +11,11 @@ import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import {
-	ExternalLink,
 	KeyboardShortcuts,
 	PanelBody,
 	Popover,
+	TextControl,
 	TextareaControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -60,7 +59,7 @@ function NavigationLinkEdit( {
 	mergeBlocks,
 	onReplace,
 } ) {
-	const { label, opensInNewTab, url, nofollow, description } = attributes;
+	const { label, opensInNewTab, url, description, rel } = attributes;
 	const link = {
 		url,
 		opensInNewTab,
@@ -161,30 +160,6 @@ function NavigationLinkEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'SEO settings' ) }>
-					<ToggleControl
-						checked={ nofollow }
-						onChange={ ( nofollowValue ) => {
-							setAttributes( { nofollow: nofollowValue } );
-						} }
-						label={ __( 'Add nofollow to link' ) }
-						help={
-							<Fragment>
-								{ __(
-									"Don't let search engines follow this link."
-								) }
-								<ExternalLink
-									className="wp-block-navigation-link__nofollow-external-link"
-									href={ __(
-										'https://codex.wordpress.org/Nofollow'
-									) }
-								>
-									{ __( "What's this?" ) }
-								</ExternalLink>
-							</Fragment>
-						}
-					/>
-				</PanelBody>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextareaControl
 						value={ description || '' }
@@ -195,6 +170,14 @@ function NavigationLinkEdit( {
 						help={ __(
 							'The description will be displayed in the menu if the current theme supports it.'
 						) }
+					/>
+					<TextControl
+						value={ rel || '' }
+						onChange={ ( relValue ) => {
+							setAttributes( { rel: relValue } );
+						} }
+						label={ __( 'Link rel' ) }
+						autoComplete="off"
 					/>
 				</PanelBody>
 			</InspectorControls>
