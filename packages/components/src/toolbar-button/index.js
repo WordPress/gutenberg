@@ -30,7 +30,8 @@ function ToolbarButton(
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ! accessibleToolbarState ) {
-		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
+		// TODO
+		// This should be deprecated when <Toolbar accessibilityLabel="label">
 		// becomes stable.
 		return (
 			<ToolbarButtonContainer className={ containerClassName }>
