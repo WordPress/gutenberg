@@ -12,6 +12,12 @@ public struct MediaInfo {
     }
 }
 
+/// Definition of capabilities to enable in the Block Editor
+public enum Capabilities: String {
+    case mentions
+    case unsupportedBlockEditor
+}
+
 /// Wrapper for single block data
 public struct Block {
     /// Gutenberg internal block ID
