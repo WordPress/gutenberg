@@ -170,7 +170,7 @@ dependencies {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-linear-gradient', readHashedVersion('../../react-native-editor/package.json', 'react-native-linear-gradient', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-get-random-values', readHashedVersion('../../react-native-editor/package.json', 'react-native-get-random-values', 'dependencies')))
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-masked-view', readHashedVersion('../../react-native-editor/package.json', '@react-native-community/react-native-masked-view', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-masked-view', readHashedVersion('../../react-native-editor/package.json', '@react-native-community/masked-view', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-gesture-handler', readHashedVersion('../../react-native-editor/package.json', 'react-native-gesture-handler', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-screens', readHashedVersion('../../react-native-editor/package.json', 'react-native-screens', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-safe-area-context', readHashedVersion('../../react-native-editor/package.json', 'react-native-safe-area-context', 'dependencies')))
