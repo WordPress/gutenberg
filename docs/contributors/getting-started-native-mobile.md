@@ -1,6 +1,6 @@
 # Getting Started for the React Native based Mobile Gutenberg
 
-This is the mobile version of [Gutenberg](https://github.com/WordPress/gutenberg), targeting Android and iOS. It's a React Native library bootstrapped by [Create React Native App](https://github.com/expo/create-react-native-app) and now ejected.
+Welcome! This is the Getting Started guide for the native mobile port of the block editor, targeting Android and iOS devices. Overall, it's a React Native library to be used in parent greenfield or brownfield apps. Continue reading for information on how to build and it!
 
 ## Prerequisites
 
