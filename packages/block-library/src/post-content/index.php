@@ -37,3 +37,21 @@ function register_block_core_post_content() {
 	);
 }
 add_action( 'init', 'register_block_core_post_content' );
+
+/**
+ * Only show the `core/post-content` block when editing templates and template parts.
+ * This is to prevent infinite recursions (post content containing a Post Content block
+ * that attempts to embed the post content it is part of).
+ *
+ * @param bool|array $allowed_block_types Array of block type slugs, or
+ *                                        boolean to enable/disable all.
+ * @param WP_Post    $post                The post resource data.
+ */
+function disallow_core_post_content_block_outside_templates( $allowed_block_types, $post ) {
+	if ( in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
+		return $allowed_block_types;
+	}
+	return array_diff( $allowed_block_types, array( 'core/post-content' ) );
+}
+
+add_filter( 'allowed_block_types', 'disallow_core_post_content_block_outside_templates', 10, 2 );
