@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -42,14 +42,6 @@ export default function PostExcerptEdit( {
 	isSelected,
 	context: { postId, postType },
 } ) {
-	// Set the initial moreText based on local.
-	useEffect( () => {
-		if ( moreText === null || moreText === undefined ) {
-			// eslint-disable-next-line @wordpress/i18n-ellipsis
-			setAttributes( { moreText: __( 'Read more...' ) } );
-		}
-	}, [] );
-
 	const [ excerpt, setExcerpt ] = useEntityProp(
 		'postType',
 		postType,
