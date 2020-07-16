@@ -68,6 +68,48 @@ describe( 'AutosaveMonitor', () => {
 		expect( mockCancelSave ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'should delay scheduling another autosave until after the one currently running finishes', () => {
+		const { rerender } = render(
+			<AutosaveMonitor
+				isDirty={ true }
+				isAutosaveable={ true }
+				isAutosaving={ true }
+			/>
+		);
+		expect( mockThrottledSave ).toHaveBeenCalledTimes( 0 );
+		expect( mockCancelSave ).toHaveBeenCalledTimes( 0 );
+
+		rerender(
+			<AutosaveMonitor
+				isDirty={ true }
+				isAutosaveable={ true }
+				isAutosaving={ false }
+			/>
+		);
+		expect( mockThrottledSave ).toHaveBeenCalledTimes( 1 );
+		expect( mockCancelSave ).toHaveBeenCalledTimes( 0 );
+	} );
+
+	it( 'should not schedule another autosave if the one currently running finishes and the post is not dirty anymore', () => {
+		const { rerender } = render(
+			<AutosaveMonitor
+				isDirty={ true }
+				isAutosaveable={ true }
+				isAutosaving={ true }
+			/>
+		);
+		expect( mockThrottledSave ).toHaveBeenCalledTimes( 0 );
+
+		rerender(
+			<AutosaveMonitor
+				isDirty={ false }
+				isAutosaveable={ true }
+				isAutosaving={ false }
+			/>
+		);
+		expect( mockThrottledSave ).toHaveBeenCalledTimes( 0 );
+	} );
+
 	it( 'should render nothing', () => {
 		const { container } = render( <AutosaveMonitor /> );
 		expect( container.childElementCount ).toBe( 0 );

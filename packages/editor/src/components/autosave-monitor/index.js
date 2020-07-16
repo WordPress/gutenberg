@@ -11,6 +11,7 @@ import useThrottle from './use-throttle';
 
 export function AutosaveMonitor( {
 	isDirty,
+	isAutosaving,
 	isAutosaveable,
 	interval,
 	autosave,
@@ -19,11 +20,15 @@ export function AutosaveMonitor( {
 
 	useEffect( () => {
 		if ( isDirty && isAutosaveable ) {
-			throttledSave();
+			// If there is an autosave already running, let's delay scheduling additional ones
+			// until after it's finished - the effect will run again when that happens.
+			if ( ! isAutosaving ) {
+				throttledSave();
+			}
 		} else {
 			cancelSave();
 		}
-	}, [ isDirty, isAutosaveable ] );
+	}, [ isDirty, isAutosaveable, isAutosaving ] );
 
 	return null;
 }
