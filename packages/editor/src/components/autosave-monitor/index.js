@@ -1,40 +1,69 @@
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-/**
- * Internal dependencies
- */
-import useThrottle from './use-throttle';
 
-export function AutosaveMonitor( {
-	isDirty,
-	isAutosaving,
-	isAutosaveable,
-	interval,
-	autosave,
-} ) {
-	const [ throttledSave, cancelSave ] = useThrottle( autosave, interval );
+export class AutosaveMonitor extends Component {
+	constructor( props ) {
+		super( props );
+		this.needsAutosave = props.isDirty && props.isAutosaveable;
+	}
 
-	useEffect( () => {
-		if ( isDirty && isAutosaveable ) {
-			// If there is an autosave already running, let's delay scheduling additional ones
-			// until after it's finished - the effect will run again when that happens.
-			if ( ! isAutosaving ) {
-				throttledSave();
-			}
-		} else {
-			cancelSave();
+	componentDidMount() {
+		this.scheduleAutosave();
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( ! this.props.isDirty && prevProps.isDirty ) {
+			this.needsAutosave = false;
+			return;
 		}
-	}, [ isDirty, isAutosaveable, isAutosaving ] );
 
-	return null;
+		if ( this.props.isAutosaving && ! prevProps.isAutosaving ) {
+			this.needsAutosave = false;
+			return;
+		}
+
+		if ( this.props.editsReference !== prevProps.editsReference ) {
+			this.needsAutosave = true;
+		}
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.recurringAutosaveTimeout );
+	}
+
+	scheduleAutosave( timeout = this.props.interval * 1000 ) {
+		this.recurringAutosaveTimeout = setTimeout( () => {
+			this.recurringAutosaveHandler();
+		}, timeout );
+	}
+
+	recurringAutosaveHandler() {
+		if ( ! this.props.isAutosaveable ) {
+			this.scheduleAutosave( 1000 );
+			return;
+		}
+
+		if ( this.needsAutosave ) {
+			this.needsAutosave = false;
+			this.props.autosave();
+		}
+
+		this.scheduleAutosave();
+	}
+
+	render() {
+		return null;
+	}
 }
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
+		const { getReferenceByDistinctEdits } = select( 'core' );
+
 		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
@@ -45,6 +74,7 @@ export default compose( [
 		const { interval = getEditorSettings().autosaveInterval } = ownProps;
 
 		return {
+			editsReference: getReferenceByDistinctEdits(),
 			isDirty: isEditedPostDirty(),
 			isAutosaveable: isEditedPostAutosaveable(),
 			isAutosaving: isAutosavingPost(),

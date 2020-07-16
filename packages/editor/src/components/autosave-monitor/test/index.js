@@ -10,7 +10,7 @@ import { AutosaveMonitor } from '../';
 
 const mockThrottledSave = jest.fn();
 const mockCancelSave = jest.fn();
-jest.mock( '../use-throttle', () => {
+jest.mock( '../use-throttled-autosave', () => {
 	return () => [ () => mockThrottledSave(), () => mockCancelSave() ];
 } );
 
