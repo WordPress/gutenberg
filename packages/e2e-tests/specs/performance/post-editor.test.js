@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { join } from 'path';
+import { basename, join } from 'path';
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 
 /**
@@ -71,7 +71,7 @@ function getSelectionEventDurations( trace ) {
 
 jest.setTimeout( 1000000 );
 
-describe( 'Performance', () => {
+describe( 'Post Editor Performance', () => {
 	it( 'Loading, typing and selecting blocks', async () => {
 		const results = {
 			load: [],
@@ -182,8 +182,10 @@ describe( 'Performance', () => {
 		const [ focusEvents ] = getSelectionEventDurations( traceResults );
 		results.focus = focusEvents;
 
+		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
+
 		writeFileSync(
-			__dirname + '/results.json',
+			join( __dirname, resultsFilename ),
 			JSON.stringify( results, null, 2 )
 		);
 
