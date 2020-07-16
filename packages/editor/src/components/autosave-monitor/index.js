@@ -12,7 +12,7 @@ export class AutosaveMonitor extends Component {
 	}
 
 	componentDidMount() {
-		this.scheduleAutosave();
+		this.setAutosaveTimer();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -32,18 +32,18 @@ export class AutosaveMonitor extends Component {
 	}
 
 	componentWillUnmount() {
-		clearTimeout( this.recurringAutosaveTimeout );
+		clearTimeout( this.timerId );
 	}
 
-	scheduleAutosave( timeout = this.props.interval * 1000 ) {
-		this.recurringAutosaveTimeout = setTimeout( () => {
-			this.recurringAutosaveHandler();
+	setAutosaveTimer( timeout = this.props.interval * 1000 ) {
+		this.timerId = setTimeout( () => {
+			this.autosaveTimerHandler();
 		}, timeout );
 	}
 
-	recurringAutosaveHandler() {
+	autosaveTimerHandler() {
 		if ( ! this.props.isAutosaveable ) {
-			this.scheduleAutosave( 1000 );
+			this.setAutosaveTimer( 1000 );
 			return;
 		}
 
@@ -52,7 +52,7 @@ export class AutosaveMonitor extends Component {
 			this.props.autosave();
 		}
 
-		this.scheduleAutosave();
+		this.setAutosaveTimer();
 	}
 
 	render() {
