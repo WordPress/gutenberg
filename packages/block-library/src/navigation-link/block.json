@@ -2,7 +2,7 @@
 	"name": "core/navigation-link",
 	"category": "design",
 	"parent": [
-		"core/navigation"
+		"core/navigation-links"
 	],
 	"attributes": {
 		"label": {

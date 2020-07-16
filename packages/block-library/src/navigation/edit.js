@@ -17,7 +17,7 @@ import {
 	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
@@ -33,19 +33,16 @@ import { __ } from '@wordpress/i18n';
 import useBlockNavigator from './use-block-navigator';
 import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
-import NavigationPlaceholder from './placeholder';
 
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
 	clientId,
 	fontSize,
-	hasExistingNavItems,
 	isImmediateParentOfSelectedBlock,
 	isSelected,
 	setAttributes,
 	setFontSize,
-	updateInnerBlocks,
 	className,
 } ) {
 	//
@@ -53,7 +50,6 @@ function Navigation( {
 	//
 	const ref = useRef();
 
-	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
@@ -90,23 +86,6 @@ function Navigation( {
 				itemsJustification,
 			} );
 		};
-	}
-
-	// If we don't have existing items then show the Placeholder
-	if ( ! hasExistingNavItems ) {
-		return (
-			<Block.div>
-				<NavigationPlaceholder
-					ref={ ref }
-					onCreate={ ( blocks, selectNavigationBlock ) => {
-						updateInnerBlocks( blocks );
-						if ( selectNavigationBlock ) {
-							selectBlock( clientId );
-						}
-					} }
-				/>
-			</Block.div>
-		);
 	}
 
 	const blockInlineStyles = {
@@ -194,7 +173,7 @@ function Navigation( {
 						<InnerBlocks
 							ref={ ref }
 							allowedBlocks={ [
-								'core/navigation-link',
+								'core/navigation-links',
 								'core/search',
 							] }
 							renderAppender={
@@ -208,11 +187,6 @@ function Navigation( {
 							orientation={
 								attributes.orientation || 'horizontal'
 							}
-							__experimentalTagName="ul"
-							__experimentalAppenderTagName="li"
-							__experimentalPassedProps={ {
-								className: 'wp-block-navigation__container',
-							} }
 							__experimentalCaptureToolbars={ true }
 							// Template lock set to false here so that the Nav
 							// Block on the experimental menus screen does not
@@ -229,7 +203,6 @@ function Navigation( {
 export default compose( [
 	withFontSizes( 'fontSize' ),
 	withSelect( ( select, { clientId } ) => {
-		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
 		const {
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
@@ -246,20 +219,6 @@ export default compose( [
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
-			hasExistingNavItems: !! innerBlocks.length,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId } ) => {
-		return {
-			updateInnerBlocks( blocks ) {
-				if ( blocks?.length === 0 ) {
-					return false;
-				}
-				dispatch( 'core/block-editor' ).replaceInnerBlocks(
-					clientId,
-					blocks
-				);
-			},
 		};
 	} ),
 ] )( Navigation );

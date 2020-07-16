@@ -1,0 +1,13 @@
+{
+	"name": "core/navigation-links",
+	"category": "design",
+	"parent": [
+		"core/navigation"
+	],
+	"attributes": {},
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}

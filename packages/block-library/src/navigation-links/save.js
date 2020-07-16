@@ -5,8 +5,8 @@ import { InnerBlocks } from '@wordpress/block-editor';
 
 export default function save() {
 	return (
-		<nav>
+		<ul className="wp-block-navigation__container">
 			<InnerBlocks.Content />
-		</nav>
+		</ul>
 	);
 }
