@@ -15,7 +15,7 @@ import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
  */
 import { ViewerSlot } from './viewer-slot';
 
-export default function LinkOverview( { value, onEditClick } ) {
+export default function LinkPreview( { value, onEditClick } ) {
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
 

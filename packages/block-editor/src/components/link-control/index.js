@@ -17,7 +17,7 @@ import { focus } from '@wordpress/dom';
  */
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
-import LinkOverview from './link-overview';
+import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
 import { ViewerFill } from './viewer-slot';
 
@@ -235,7 +235,7 @@ function LinkControl( {
 			) }
 
 			{ value && ! isEditingLink && ! isCreatingPage && (
-				<LinkOverview
+				<LinkPreview
 					value={ value }
 					onEditClick={ () => setIsEditingLink( true ) }
 				/>
