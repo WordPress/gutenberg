@@ -44,7 +44,9 @@ describe( 'Template Part', () => {
 			// Switch to editing the header template part.
 			const openDropdownSelector =
 				'button.components-dropdown-menu__toggle[aria-label="Switch Template"]';
-			await page.waitForSelector( openDropdownSelector );
+			await page.waitForSelector( openDropdownSelector, {
+				visible: true,
+			} );
 			await page.click( openDropdownSelector );
 
 			const switchToHeaderTemplatePartButton = await page.waitForXPath(
