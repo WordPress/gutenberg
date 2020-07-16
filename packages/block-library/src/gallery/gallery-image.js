@@ -54,6 +54,14 @@ class GalleryImage extends Component {
 		this.container = ref;
 	}
 
+	componentDidMount() {
+		// Sometimes React won't trigger the onLoad event on the img. If an aspect ratio
+		// hasn't been calculated, assume the onLoad has been skipped, and run it manually.
+		if ( ! this.props.ratio && this.container && this.container.complete ) {
+			this.onLoad();
+		}
+	}
+
 	onLoad() {
 		this.props.setAttributes( { ratio: getImageRatio( this.container ) } );
 	}

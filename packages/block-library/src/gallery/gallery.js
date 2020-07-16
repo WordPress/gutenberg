@@ -71,6 +71,7 @@ export const Gallery = ( props ) => {
 								url={ img.url }
 								alt={ img.alt }
 								id={ img.id }
+								ratio={ img.ratio }
 								isFirstItem={ index === 0 }
 								isLastItem={ index + 1 === images.length }
 								isSelected={

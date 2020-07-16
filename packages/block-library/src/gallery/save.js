@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
@@ -53,7 +58,9 @@ export default function save( { attributes } ) {
 					return (
 						<li
 							key={ image.id || image.url }
-							className="blocks-gallery-item"
+							className={ classnames( 'blocks-gallery-item', {
+								[ `image-ratio-${ image.ratio }` ]: image.ratio,
+							} ) }
 						>
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
