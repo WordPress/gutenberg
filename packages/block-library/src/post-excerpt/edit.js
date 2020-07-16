@@ -13,18 +13,19 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	Warning,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 function usePostContentExcerpt( wordCount, postId, postType ) {
-	const [ , , { raw: rawPostContent } ] = useEntityProp(
+	// Don't destrcuture items from content here, it can be undefined.
+	const [ , , content ] = useEntityProp(
 		'postType',
 		postType,
 		'content',
 		postId
 	);
+	const rawPostContent = content?.raw;
 	return useMemo( () => {
 		if ( ! rawPostContent ) {
 			return '';
@@ -37,7 +38,7 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 	}, [ rawPostContent, wordCount ] );
 }
 
-function PostExcerptEditor( {
+export default function PostExcerptEdit( {
 	attributes: { align, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
@@ -133,26 +134,5 @@ function PostExcerptEditor( {
 				) }
 			</div>
 		</>
-	);
-}
-
-export default function PostExcerptEdit( {
-	attributes,
-	setAttributes,
-	isSelected,
-	context,
-} ) {
-	if ( ! context.postType || ! context.postId ) {
-		return (
-			<Warning>{ __( 'Post excerpt block: no post found.' ) }</Warning>
-		);
-	}
-	return (
-		<PostExcerptEditor
-			attributes={ attributes }
-			setAttributes={ setAttributes }
-			isSelected={ isSelected }
-			context={ context }
-		/>
 	);
 }
