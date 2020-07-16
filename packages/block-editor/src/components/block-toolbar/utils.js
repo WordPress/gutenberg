@@ -180,9 +180,7 @@ export function useToggleBlockHighlight( clientId ) {
 	};
 
 	useEffect( () => {
-		return () => {
-			toggleBlockHighlight( clientId, false );
-		};
+		return () => toggleBlockHighlight( clientId, false );
 	}, [ clientId ] );
 
 	return updateBlockHighlight;
