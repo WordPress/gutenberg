@@ -133,6 +133,7 @@ class EditorProvider extends Component {
 				'disableCustomColors',
 				'disableCustomFontSizes',
 				'disableCustomGradients',
+				'disableImageEditor',
 				'enableCustomUnits',
 				'enableCustomLineHeight',
 				'focusMode',

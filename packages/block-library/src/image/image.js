@@ -87,17 +87,22 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const { maxWidth, isRTL, imageSizes, mediaUpload } = useSelect(
-		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
-			return pick( getSettings(), [
-				'imageSizes',
-				'isRTL',
-				'maxWidth',
-				'mediaUpload',
-			] );
-		}
-	);
+	const {
+		imageSizes,
+		disableImageEditor,
+		isRTL,
+		maxWidth,
+		mediaUpload,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return pick( getSettings(), [
+			'imageSizes',
+			'disableImageEditor',
+			'isRTL',
+			'maxWidth',
+			'mediaUpload',
+		] );
+	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		'core/notices'
@@ -226,8 +231,8 @@ export default function Image( {
 		}
 	}, [ isSelected ] );
 
-	const isEditorEnabled = ! window._wpImageEditorDisabled;
-	const canEditImage = id && naturalWidth && naturalHeight && isEditorEnabled;
+	const canEditImage =
+		id && naturalWidth && naturalHeight && ! disableImageEditor;
 
 	const controls = (
 		<>
