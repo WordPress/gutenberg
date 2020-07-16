@@ -91,7 +91,34 @@ project.ext.buildGutenbergFromSource = false
 
 def hermesOriginalPath = "../../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
-def buildAssetsFolder = 'build/assets'
+def buildResFolder = 'build/generated/res'
+def buildResRawFolder = "${buildResFolder}/raw/"
+def bundleName = 'index_android.bundle'
+def mobileGutenbergRootDir = '../../../..'
+
+task copyJSBundle(type: Copy) {
+//        dependsOn bundleUpToDateCheck
+//        onlyIf { !isBundleUpToDate() }
+
+    def origFileName = 'App.js'
+    def origWithPath = "$mobileGutenbergRootDir/bundle/android/${origFileName}"
+    from origWithPath
+    into buildResRawFolder
+    rename origFileName, bundleName
+
+    // Prevent this task from silently failing
+    // Using onlyIf as a bit of a hack to perform this check at the time of execution
+    onlyIf {
+        if (inputs.sourceFiles.empty) {
+            throw new StopExecutionException("ERROR: Could not find bundle file to copy.")
+        }
+        true
+    }
+
+    doLast {
+        println "Done copying the Android JS bundle to assets folder"
+    }
+}
 
 android {
     compileSdkVersion 28
@@ -111,11 +138,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    sourceSets {
-        main {
-            assets.srcDirs += buildAssetsFolder
-        }
-    }
+//    sourceSets {
+//        main {
+//            assets.srcDirs += buildAssetsFolder //fileTree(dir: buildAssetsFolder, builtBy: copyJSBundle)
+//        }
+//    }
 }
 
 //android.applicationVariants.all { variant ->
@@ -134,6 +161,15 @@ android {
 ////    // Defines the value of a build variable you can use in the manifest.
 ////    mergedFlavor.manifestPlaceholders = [hostName:"www.example.com"]
 //}
+
+android.libraryVariants.all { variant ->
+    println variant
+    def files = project.files(buildResFolder)
+    files.builtBy(copyJSBundle)
+    variant.preBuildProvider.configure { dependsOn(copyJSBundle) }
+    variant.mergeResourcesProvider.configure { dependsOn(copyJSBundle) }
+    variant.registerGeneratedResFolders(files)
+}
 
 repositories {
     google()
@@ -197,17 +233,17 @@ boolean isBundleUpToDate() {
     return project.hasProperty('isBundleUpToDate') && isBundleUpToDate
 }
 
-if (buildGutenbergMobileJSBundle) {
-    def bundleName = 'index.android.bundle'
-    def mobileGutenbergRootDir = '../../../..'
+//if (buildGutenbergMobileJSBundle) {
+//    def bundleName = 'index.android.bundle'
+//    def mobileGutenbergRootDir = '../../../..'
 
-    tasks.all { task ->
-        if (task.name.startsWith('merge') && task.name.endsWith('Assets')) {
-            println task.name
-            task.inputs.file("$buildAssetsFolder/$bundleName")
-            task.dependsOn(copyJSBundle)
-        }
-    }
+//    tasks.all { task ->
+//        if (task.name.startsWith('merge') && task.name.endsWith('Assets')) {
+//            println task.name
+//            task.inputs.file("$buildAssetsFolder/$bundleName")
+//            task.dependsOn(copyJSBundle)
+//        }
+//    }
 
 //    task bundleUpToDateCheck {
 //        description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
@@ -328,30 +364,6 @@ if (buildGutenbergMobileJSBundle) {
         }
     }
 
-    task copyJSBundle(type: Copy) {
-//        dependsOn bundleUpToDateCheck
-//        onlyIf { !isBundleUpToDate() }
-
-        def origFileName = 'App.js'
-        def origWithPath = "$mobileGutenbergRootDir/bundle/android/${origFileName}"
-        from origWithPath
-        into buildAssetsFolder
-        rename origFileName, bundleName
-
-        // Prevent this task from silently failing
-        // Using onlyIf as a bit of a hack to perform this check at the time of execution
-        onlyIf {
-            if (inputs.sourceFiles.empty) {
-                throw new StopExecutionException("ERROR: Could not find bundle file to copy.")
-            }
-            true
-        }
-
-        doLast {
-            println "Done copying the Android JS bundle to assets folder"
-        }
-    }
-
     def nodeModulesFolders = ["$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"] as String[]
     task cleanupNodeModulesFolders(type: Delete) {
         doFirst {
@@ -388,4 +400,4 @@ if (buildGutenbergMobileJSBundle) {
         }
         delete nodeModulesFolders
     }
-}
+//}
