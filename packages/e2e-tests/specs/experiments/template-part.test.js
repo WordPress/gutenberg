@@ -47,7 +47,9 @@ describe( 'Template Part', () => {
 			await page.waitForSelector( openDropdownSelector, {
 				visible: true,
 			} );
-			await page.click( openDropdownSelector );
+			await page.evaluate( () => {
+				document.querySelector( openDropdownSelector ).click();
+			} );
 
 			const switchToHeaderTemplatePartButton = await page.waitForXPath(
 				'//button[contains(text(), "header")]'
