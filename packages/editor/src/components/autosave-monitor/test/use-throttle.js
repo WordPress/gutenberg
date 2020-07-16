@@ -34,7 +34,7 @@ describe( 'useThrottle', () => {
 		clock = FakeTimers.createClock();
 		saveCallback.mockClear();
 		mockedThrottle.mockClear();
-		const hook = renderHook( () => useThrottle( 2 * 1000, saveCallback ) );
+		const hook = renderHook( () => useThrottle( saveCallback, 2 * 1000 ) );
 		unmount = hook.unmount;
 		result = hook.result;
 		rerender = hook.rerender;

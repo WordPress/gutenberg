@@ -9,9 +9,9 @@ import { throttle } from 'lodash';
 import { useMemo, useEffect } from '@wordpress/element';
 
 const ONE_MINUTE = 60 * 1000;
-export default function useThrottle( timeout = ONE_MINUTE, callback = null ) {
+export default function useThrottle( callback, interval = ONE_MINUTE ) {
 	const throttled = useMemo( () => {
-		return throttle( callback, timeout, {
+		return throttle( callback, interval, {
 			leading: false,
 			trailing: true,
 		} );

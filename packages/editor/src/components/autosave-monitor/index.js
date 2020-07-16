@@ -7,7 +7,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import useScheduleSave from './use-throttle';
+import useThrottle from './use-throttle';
 
 export function AutosaveMonitor( {
 	isDirty,
@@ -15,7 +15,7 @@ export function AutosaveMonitor( {
 	interval,
 	autosave,
 } ) {
-	const { scheduleSave, cancelSave } = useScheduleSave( interval, autosave );
+	const { scheduleSave, cancelSave } = useThrottle( autosave, interval );
 
 	useEffect( () => {
 		if ( isDirty && isAutosaveable ) {
