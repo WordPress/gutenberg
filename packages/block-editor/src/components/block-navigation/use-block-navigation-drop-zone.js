@@ -13,10 +13,23 @@ import useOnHTMLDrop from '../use-block-drop-zone/use-on-html-drop';
 import useOnFileDrop from '../use-block-drop-zone/use-on-file-drop';
 import useOnBlockDrop from '../use-block-drop-zone/use-on-block-drop';
 
-function getDropTargetBlocksData( ref, getRootClientId, getBlockIndex ) {
+function getDropTargetBlocksData(
+	ref,
+	dragEventType,
+	getRootClientId,
+	getBlockIndex,
+	getDraggedBlockClientIds,
+	canInsertBlocks
+) {
 	if ( ! ref.current ) {
 		return;
 	}
+
+	const isBlockDrag = dragEventType === 'default';
+
+	const draggedBlockClientIds = isBlockDrag
+		? getDraggedBlockClientIds()
+		: undefined;
 
 	const blockElements = Array.from(
 		ref.current.querySelectorAll( '[data-block]' )
@@ -32,6 +45,12 @@ function getDropTargetBlocksData( ref, getRootClientId, getBlockIndex ) {
 			blockIndex: getBlockIndex( clientId, rootClientId ),
 			element: blockElement,
 			orientation: 'vertical',
+			canInsertDraggedBlocksAsSibling: isBlockDrag
+				? canInsertBlocks( draggedBlockClientIds, rootClientId )
+				: true,
+			canInsertDraggedBlocksAsChild: isBlockDrag
+				? canInsertBlocks( draggedBlockClientIds, clientId )
+				: true,
 		};
 	} );
 }
@@ -41,7 +60,7 @@ function getDropTargetBlocksData( ref, getRootClientId, getBlockIndex ) {
 const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
 
 function getBlockNavigationDropTarget( blocksData, position ) {
-	let offset;
+	let candidateEdge;
 	let candidateBlockData;
 	let candidateDistance;
 
@@ -56,13 +75,26 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 		if ( candidateDistance === undefined || distance < candidateDistance ) {
 			candidateDistance = distance;
 			candidateBlockData = blockData;
-			offset = edge === 'bottom' ? 1 : 0;
+			candidateEdge = edge;
 		}
 	} );
 
 	if ( ! candidateBlockData ) {
 		return;
 	}
+
+	const isDraggingBelow = candidateEdge === 'bottom';
+
+	// If the user is dragging towards the bottom of the block interpret that
+	// they're trying to next the dragged block.
+	if ( isDraggingBelow && candidateBlockData.canInsertDraggedBlocksAsChild ) {
+		return {
+			rootClientId: candidateBlockData.clientId,
+			blockIndex: 0,
+		};
+	}
+
+	const offset = isDraggingBelow ? 1 : 0;
 
 	return {
 		rootClientId: candidateBlockData.rootClientId,
@@ -71,14 +103,23 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 }
 
 export default function useBlockNavigationDropZone( ref ) {
-	const { getBlockRootClientId, getBlockIndex } = useSelect( ( select ) => {
+	const {
+		canInsertBlocks,
+		getBlockRootClientId,
+		getBlockIndex,
+		getDraggedBlockClientIds,
+	} = useSelect( ( select ) => {
 		const {
+			canInsertBlocks: _canInsertBlocks,
 			getBlockRootClientId: _getBlockRootClientId,
 			getBlockIndex: _getBlockIndex,
+			getDraggedBlockClientIds: _getDraggedBlockClientIds,
 		} = select( 'core/block-editor' );
 		return {
+			canInsertBlocks: _canInsertBlocks,
 			getBlockRootClientId: _getBlockRootClientId,
 			getBlockIndex: _getBlockIndex,
+			getDraggedBlockClientIds: _getDraggedBlockClientIds,
 		};
 	}, [] );
 
@@ -92,7 +133,7 @@ export default function useBlockNavigationDropZone( ref ) {
 	const onFilesDrop = useOnFileDrop( targetRootClientId, targetBlockIndex );
 	const onDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 
-	const { position } = useDropZone( {
+	const { position, type: dragEventType } = useDropZone( {
 		element: ref,
 		onFilesDrop,
 		onHTMLDrop,
@@ -108,8 +149,11 @@ export default function useBlockNavigationDropZone( ref ) {
 		if ( hasPosition ) {
 			blocksData.current = getDropTargetBlocksData(
 				ref,
+				dragEventType,
 				getBlockRootClientId,
-				getBlockIndex
+				getBlockIndex,
+				getDraggedBlockClientIds,
+				canInsertBlocks
 			);
 		}
 	}, [ hasPosition ] );
