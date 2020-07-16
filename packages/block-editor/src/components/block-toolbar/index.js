@@ -107,6 +107,7 @@ export default function BlockToolbar( {
 			<div
 				className="block-editor-block-toolbar__mover-switcher-container"
 				ref={ nodeRef }
+				{ ...showMoversGestures }
 			>
 				{ ! isMultiToolbar && (
 					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
@@ -125,7 +126,6 @@ export default function BlockToolbar( {
 							onDraggableEnd,
 						} ) => (
 							<div
-								{ ...showMoversGestures }
 								className="block-editor-block-toolbar__block-switcher-wrapper"
 								draggable={ isDraggable && ! hideDragHandle }
 								onDragStart={ onDraggableStart }
