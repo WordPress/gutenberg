@@ -46,8 +46,6 @@ export const withInspectorControls = createHigherOrderComponent(
 
 			return (
 				<Fragment>
-					<WrappedComponent { ...props } />
-
 					<InspectorControls>
 						<div>
 							<PanelBody title={ __( 'Styles' ) }>
@@ -66,6 +64,8 @@ export const withInspectorControls = createHigherOrderComponent(
 							</PanelBody>
 						</div>
 					</InspectorControls>
+
+					<WrappedComponent { ...props } />
 				</Fragment>
 			);
 		},
