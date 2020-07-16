@@ -146,6 +146,7 @@ function MediaPlaceholder( props ) {
 					__experimentalOnlyMediaLibrary
 				}
 				multiple={ multiple }
+				isReplacingMedia={ false }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<TouchableWithoutFeedback

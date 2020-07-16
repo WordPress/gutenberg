@@ -1,6 +1,10 @@
-# Anatomy of a Gutenberg Block
+# Anatomy of a Block
 
-At its simplest, a block in Gutenberg is a JavaScript object with a specific set of properties. Here is the complete code for registering a block:
+At its simplest, a block in the WordPress block editor is a JavaScript object with a specific set of properties.
+
+**Note:** Block development uses ESNext syntax, this refers to the latest JavaScript standard. If this is unfamiliar, I recommend reviewing the [ESNext synatx documentation](/docs/designers-developers/developers/tutorials/javascript/esnext-js.md) to familiarize yourself with the newer syntax used in modern JavaScript development.
+
+Here is the complete code for registering a block:
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -53,4 +57,4 @@ __( 'Gutenpride', 'create_block' );
 
 This is an internationalization wrapper that allows for the string "Gutenpride" to be translated. The second parameter, "create_block" is called the text domain and gives context for where the string is from. The JavaScript internationalization, often abbreviated i18n, matches the core WordPress internationalization process. See the [I18n for WordPress documentation](https://codex.wordpress.org/I18n_for_WordPress_Developers) for more details.
 
-Next Section: [Block Attributes](block-attributes.md)
+Next Section: [Block Attributes](/docs/designers-developers/developers/tutorials/create-block/block-attributes.md)

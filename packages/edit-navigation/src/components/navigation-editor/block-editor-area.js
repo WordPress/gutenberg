@@ -109,15 +109,20 @@ export default function BlockEditorArea( {
 					aria-label={ __( 'Block tools' ) }
 				>
 					{ hasSelectedBlock && ! isRootBlockSelected && (
-						<BlockToolbar hideDragHandle />
+						<BlockToolbar
+							hideDragHandle
+							__experimentalExpandedControl
+						/>
 					) }
 				</NavigableToolbar>
 				<Popover.Slot name="block-toolbar" />
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList />
-					</ObserveTyping>
-				</WritingFlow>
+				<div className="editor-styles-wrapper">
+					<WritingFlow>
+						<ObserveTyping>
+							<BlockList />
+						</ObserveTyping>
+					</WritingFlow>
+				</div>
 			</CardBody>
 			<CardFooter>
 				<CheckboxControl

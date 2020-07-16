@@ -431,7 +431,7 @@ function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
 	}
 
 	// If this is the Site Editor, auto-drafts for template parts have already been generated
-	// through `gutenberg_find_template_post_and_parts` in `gutenberg_edit_site_init`.
+	// through `filter_rest_wp_template_part_query`, when called via the REST API.
 	if ( isset( $settings['editSiteInitialState'] ) ) {
 		return $settings;
 	}

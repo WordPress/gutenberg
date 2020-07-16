@@ -11,4 +11,4 @@ The following sections will walk you through the existing block APIs:
 - [Transformations](/docs/designers-developers/developers/block-api/block-transforms.md)
 - [Templates](/docs/designers-developers/developers/block-api/block-templates.md)
 - [Annotations](/docs/designers-developers/developers/block-api/block-annotations.md)
-- [Patterns (experimental)](/docs/designers-developers/developers/block-api/block-patterns.md)
+- [Block Patterns](/docs/designers-developers/developers/block-api/block-patterns.md)

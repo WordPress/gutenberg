@@ -6,9 +6,16 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { BlockControls } from '@wordpress/block-editor';
+import { Toolbar } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import ConvertToBlocksButton from './convert-to-blocks-button';
 
 const { wp } = window;
 
@@ -131,19 +138,22 @@ export default class ClassicEdit extends Component {
 			bookmark = null;
 		} );
 
-		editor.on(
-			'Paste Change input Undo Redo',
-			debounce( () => {
-				const value = editor.getContent();
+		const debouncedOnChange = debounce( () => {
+			const value = editor.getContent();
 
-				if ( value !== editor._lastChange ) {
-					editor._lastChange = value;
-					setAttributes( {
-						content: value,
-					} );
-				}
-			}, 250 )
-		);
+			if ( value !== editor._lastChange ) {
+				editor._lastChange = value;
+				setAttributes( {
+					content: value,
+				} );
+			}
+		}, 250 );
+		editor.on( 'Paste Change input Undo Redo', debouncedOnChange );
+
+		// We need to cancel the debounce call because when we remove
+		// the editor (onUnmount) this callback is executed in
+		// another tick. This results in setting the content to empty.
+		editor.on( 'remove', debouncedOnChange.cancel );
 
 		editor.on( 'keydown', ( event ) => {
 			if ( isKeyboardEvent.primary( event, 'z' ) ) {
@@ -235,22 +245,29 @@ export default class ClassicEdit extends Component {
 		//    from the KeyboardShortcuts component to stop their propagation.
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return [
-			<div
-				key="toolbar"
-				id={ `toolbar-${ clientId }` }
-				ref={ ( ref ) => ( this.ref = ref ) }
-				className="block-library-classic__toolbar"
-				onClick={ this.focus }
-				data-placeholder={ __( 'Classic' ) }
-				onKeyDown={ this.onToolbarKeyDown }
-			/>,
-			<div
-				key="editor"
-				id={ `editor-${ clientId }` }
-				className="wp-block-freeform block-library-rich-text__tinymce"
-			/>,
-		];
+		return (
+			<>
+				<BlockControls>
+					<Toolbar>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</Toolbar>
+				</BlockControls>
+				<div
+					key="toolbar"
+					id={ `toolbar-${ clientId }` }
+					ref={ ( ref ) => ( this.ref = ref ) }
+					className="block-library-classic__toolbar"
+					onClick={ this.focus }
+					data-placeholder={ __( 'Classic' ) }
+					onKeyDown={ this.onToolbarKeyDown }
+				/>
+				<div
+					key="editor"
+					id={ `editor-${ clientId }` }
+					className="wp-block-freeform block-library-rich-text__tinymce"
+				/>
+			</>
+		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }

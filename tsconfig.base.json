@@ -16,8 +16,6 @@
 
 		/* Strict Type-Checking Options */
 		"strict": true,
-		"strictNullChecks": true,
-		"noImplicitAny": true,
 
 		/* Additional Checks */
 		"noUnusedLocals": true,
@@ -32,7 +30,8 @@
 		"esModuleInterop": false,
 		"resolveJsonModule": true,
 
-		"typeRoots": [ "./node_modules/@types" ]
+		"typeRoots": [ "./typings", "./node_modules/@types" ],
+		"types": []
 	},
 	"exclude": [
 		"**/benchmark",
