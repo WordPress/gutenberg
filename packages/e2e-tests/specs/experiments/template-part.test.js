@@ -42,13 +42,18 @@ describe( 'Template Part', () => {
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.
-			const openDropdownSelector =
-				'button.components-dropdown-menu__toggle[aria-label="Switch Template"]';
-			await page.waitForSelector( openDropdownSelector, {
-				visible: true,
-			} );
+			await page.waitForSelector(
+				'button.components-dropdown-menu__toggle[aria-label="Switch Template"]',
+				{
+					visible: true,
+				}
+			);
 			await page.evaluate( () => {
-				document.querySelector( openDropdownSelector ).click();
+				document
+					.querySelector(
+						'button.components-dropdown-menu__toggle[aria-label="Switch Template"]'
+					)
+					.click();
 			} );
 
 			const switchToHeaderTemplatePartButton = await page.waitForXPath(
