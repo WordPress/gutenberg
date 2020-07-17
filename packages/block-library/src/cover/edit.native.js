@@ -332,12 +332,7 @@ const Cover = ( {
 		return (
 			<View>
 				<MediaPlaceholder
-					customEmptyStateContainerStyles={
-						styles.mediaPlaceholderEmptyStateContainer
-					}
-					customEmptyStateTitleStyles={
-						styles.mediaPlaceholderEmptyStateTitle
-					}
+					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
