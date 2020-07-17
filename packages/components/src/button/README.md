@@ -1,4 +1,5 @@
 # Button
+
 Buttons let users take actions and make choices with a single click or tap.
 
 ![Button components](https://make.wordpress.org/design/files/2019/03/button.png)
@@ -15,19 +16,19 @@ Buttons let users take actions and make choices with a single click or tap.
 
 Buttons tell users what actions they can take and give them a way to interact with the interface. You’ll find them throughout a UI, particularly in places like:
 
-- Modals
-- Forms
-- Toolbars
+-   Modals
+-   Forms
+-   Toolbars
 
 ### Best practices
 
 Buttons should:
 
-- **Be clearly and accurately labeled.**
-- **Clearly communicate that clicking or tapping will trigger an action.**
-- **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
-- **Prioritize the most important actions.** This helps users focus. Too many calls to action on one screen can be confusing, making users unsure what to do next.
-- **Have consistent locations in the interface.**
+-   **Be clearly and accurately labeled.**
+-   **Clearly communicate that clicking or tapping will trigger an action.**
+-   **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
+-   **Prioritize the most important actions.** This helps users focus. Too many calls to action on one screen can be confusing, making users unsure what to do next.
+-   **Have consistent locations in the interface.**
 
 ### Content guidelines
 
@@ -97,10 +98,10 @@ This screen layout uses:
 
 Placement best practices:
 
-- **Do**: When using multiple buttons in a row, show users which action is more important by placing it next to a button with a lower emphasis (e.g. a primary button next to a default button, or a default button next to a link button).
-- **Don’t**: Don’t place two primary buttons next to one another — they compete for focus. Only use one primary button per view.
-- **Don’t**: Don’t place a button below another button if there is space to place them side by side.
-- **Caution**: Avoid using too many buttons on a single page. When designing pages in the app or website, think about the most important actions for users to take. Too many calls to action can cause confusion and make users unsure what to do next — we always want users to feel confident and capable.
+-   **Do**: When using multiple buttons in a row, show users which action is more important by placing it next to a button with a lower emphasis (e.g. a primary button next to a default button, or a default button next to a link button).
+-   **Don’t**: Don’t place two primary buttons next to one another — they compete for focus. Only use one primary button per view.
+-   **Don’t**: Don’t place a button below another button if there is space to place them side by side.
+-   **Caution**: Avoid using too many buttons on a single page. When designing pages in the app or website, think about the most important actions for users to take. Too many calls to action can cause confusion and make users unsure what to do next — we always want users to feel confident and capable.
 
 ## Development guidelines
 
@@ -109,13 +110,9 @@ Placement best practices:
 Renders a button with default style.
 
 ```jsx
-import { Button } from "@wordpress/components";
+import { Button } from '@wordpress/components';
 
-const MyButton = () => (
-	<Button isSecondary>
-		Click me!
-	</Button>
-);
+const MyButton = () => <Button isSecondary>Click me!</Button>;
 ```
 
 ### Props
@@ -124,21 +121,28 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
 
 Props not included in this set will be applied to the `a` or `button` element.
 
-Name | Type | Default | Description
---- | --- | --- | ---
-`disabled` | `bool` | `false` | Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
-`href` | `string` | `undefined` | If provided, renders `a` instead of `button`.
-`isSecondary` | `bool` | `false` | Renders a default button style.
-`isPrimary` | `bool` | `false` | Renders a primary button style.
-`isTertiary` | `bool` | `false` | Renders a text-based button style.
-`isDestructive` | `bool` | `false` | Renders a red text-based button style to indicate destructive behavior.
-`isSmall` | `bool` | `false` | Decreases the size of the button.
-`isPressed` | `bool` | `false` | Renders a pressed button style.
-`isBusy` | `bool` | `false` | Indicates activity while a action is being performed.
-`isLink` | `bool` | `false` | Renders a button with an anchor style.
-`focus` | `bool` | `false` | Whether the button is focused.
+| Name              | Type                               | Default                                                   | Description                                                                                                       |
+| ----------------- | ---------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `disabled`        | `bool`                             | `false`                                                   | Whether the button is disabled. If `true`, this will force a `button` element to be rendered.                     |
+| `href`            | `string`                           | `undefined`                                               | If provided, renders `a` instead of `button`.                                                                     |
+| `isSecondary`     | `bool`                             | `false`                                                   | Renders a default button style.                                                                                   |
+| `isPrimary`       | `bool`                             | `false`                                                   | Renders a primary button style.                                                                                   |
+| `isTertiary`      | `bool`                             | `false`                                                   | Renders a text-based button style.                                                                                |
+| `isDestructive`   | `bool`                             | `false`                                                   | Renders a red text-based button style to indicate destructive behavior.                                           |
+| `isSmall`         | `bool`                             | `false`                                                   | Decreases the size of the button.                                                                                 |
+| `isPressed`       | `bool`                             | `false`                                                   | Renders a pressed button style.                                                                                   |
+| `isBusy`          | `bool`                             | `false`                                                   | Indicates activity while a action is being performed.                                                             |
+| `isLink`          | `bool`                             | `false`                                                   | Renders a button with an anchor style.                                                                            |
+| `focus`           | `bool`                             | `false`                                                   | Whether the button is focused.                                                                                    |
+| `target`          | `string`                           | `undefined`                                               | If provided with `href`, sets the `a` `target` attribute.                                                         |
+| `className`       | `string`                           | `''`                                                      | An optional additional class name to apply to the rendered button.                                                |
+| `icon`            | `String|Function|WPComponent|null` | `null`                                                    | If provided, renders an [Icon](/packages/components/src/icon/README.md) component inside the button.              |
+| `iconSize`        | `Number`                           | `20 when a Dashicon is rendered, 24 for all other icons.` | If provided with `icon`, sets the icon size.                                                                      |
+| `showTooltip`     | `Boolean`                          | `false`                                                   | If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.            |
+| `tooltipPosition` | `String`                           | `top center`                                              | If provided with `showTooltip`, sets the position of the tooltip.                                                 |
+| `shortcut`        | `String|Object`                    | `undefined`                                               | If provided with `showTooltip`, appends the Shortcut label to the tooltip content.                                |
+| `label`           | `String`                           | `''`                                                      | Sets the `aria-label` of the component, if none is provided and the Tooltip content if `showTooltip` if provided. |
 
 ## Related components
 
-- To group buttons together, use the `ButtonGroup` component.
-
+-   To group buttons together, use the [ButtonGroup](/packages/components/src/button-group/README.md) component.
