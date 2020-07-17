@@ -96,27 +96,6 @@ def buildResRawFolder = "${buildResFolder}/raw/"
 def bundleName = 'index_android_bundle'
 def mobileGutenbergRootDir = '../../../..'
 
-task copyJSBundle(type: Copy) {
-    def origFileName = 'App.js'
-    def origWithPath = "$mobileGutenbergRootDir/bundle/android/${origFileName}"
-    from origWithPath
-    into buildResRawFolder
-    rename origFileName, bundleName
-
-    // Prevent this task from silently failing
-    // Using onlyIf as a bit of a hack to perform this check at the time of execution
-    onlyIf {
-        if (inputs.sourceFiles.empty) {
-            throw new StopExecutionException("ERROR: Could not find bundle file to copy.")
-        }
-        true
-    }
-
-    doLast {
-        println "Done copying the Android JS bundle to assets folder"
-    }
-}
-
 android {
     compileSdkVersion 28
 
@@ -134,15 +113,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-}
-
-def bundleResFiles = project.files(buildResFolder)
-bundleResFiles.builtBy(copyJSBundle)
-
-android.libraryVariants.all { variant ->
-    variant.preBuildProvider.configure { dependsOn(copyJSBundle) }
-    variant.mergeResourcesProvider.configure { dependsOn(copyJSBundle) }
-    variant.registerGeneratedResFolders(bundleResFiles)
 }
 
 repositories {
@@ -203,6 +173,7 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
+if (buildGutenbergMobileJSBundle) {
     def nodeModulesFolders = ["$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"] as String[]
 
     task npmRunBundleAndroid(type: NpmTask) {
@@ -279,6 +250,27 @@ dependencies {
         }
     }
 
+    task copyJSBundle(type: Copy) {
+        def origFileName = 'App.js'
+        def origWithPath = "$mobileGutenbergRootDir/bundle/android/${origFileName}"
+        from origWithPath
+        into buildResRawFolder
+        rename origFileName, bundleName
+
+        // Prevent this task from silently failing
+        // Using onlyIf as a bit of a hack to perform this check at the time of execution
+        onlyIf {
+            if (inputs.sourceFiles.empty) {
+                throw new StopExecutionException("ERROR: Could not find bundle file to copy.")
+            }
+            true
+        }
+
+        doLast {
+            println "Done copying the Android JS bundle to assets folder"
+        }
+    }
+
     copyJSBundle.dependsOn(buildJSBundle)
 
     clean {
@@ -287,4 +279,13 @@ dependencies {
         }
         delete nodeModulesFolders
     }
-//}
+
+    def bundleResFiles = project.files(buildResFolder)
+    bundleResFiles.builtBy(copyJSBundle)
+
+    android.libraryVariants.all { variant ->
+        variant.preBuildProvider.configure { dependsOn(copyJSBundle) }
+        variant.mergeResourcesProvider.configure { dependsOn(copyJSBundle) }
+        variant.registerGeneratedResFolders(bundleResFiles)
+    }
+}
