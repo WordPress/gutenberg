@@ -88,16 +88,16 @@ export default function Image( {
 		[ id, isSelected ]
 	);
 	const {
+		imageEditing,
 		imageSizes,
-		disableImageEditor,
 		isRTL,
 		maxWidth,
 		mediaUpload,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return pick( getSettings(), [
+			'imageEditing',
 			'imageSizes',
-			'disableImageEditor',
 			'isRTL',
 			'maxWidth',
 			'mediaUpload',
@@ -231,8 +231,7 @@ export default function Image( {
 		}
 	}, [ isSelected ] );
 
-	const canEditImage =
-		id && naturalWidth && naturalHeight && ! disableImageEditor;
+	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 
 	const controls = (
 		<>
