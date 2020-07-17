@@ -43,7 +43,6 @@ function ColorPalette( {
 	shouldShowCustomIndicatorOption = true,
 	shouldShowCustomLabel = true,
 	customColorIndicatorStyles,
-	customIndicatorWrapperStyles,
 } ) {
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
@@ -238,10 +237,7 @@ function ColorPalette( {
 			} ) }
 			{ shouldShowCustomIndicator && (
 				<View
-					style={ [
-						styles.customIndicatorWrapper,
-						customIndicatorWrapperStyles,
-					] }
+					style={ styles.customIndicatorWrapper }
 					onLayout={ onCustomIndicatorLayout }
 				>
 					<View style={ verticalSeparatorStyle } />
@@ -251,12 +247,7 @@ function ColorPalette( {
 						accessibilityState={ { selected: isSelectedCustom() } }
 						accessibilityHint={ accessibilityHint }
 					>
-						<View
-							style={ [
-								styles.customIndicatorWrapper,
-								customIndicatorWrapperStyles,
-							] }
-						>
+						<View style={ styles.customIndicatorWrapper }>
 							<ColorIndicator
 								withCustomPicker={ ! isGradientSegment }
 								color={ customIndicatorColor }

@@ -346,9 +346,6 @@ const Cover = ( {
 							customColorIndicatorStyles={
 								styles.paletteColorIndicator
 							}
-							customIndicatorWrapperStyles={
-								styles.paletteCustomIndicatorWrapper
-							}
 							setColor={ setColor }
 							onCustomPress={ noop }
 							defaultSettings={ coverDefaultPalette }
