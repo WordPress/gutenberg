@@ -21,7 +21,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useLayoutEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -112,7 +112,7 @@ export default function ReusableBlockEdit( {
 		reusableBlock && isEditing ? blocks : null
 	);
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! reusableBlock ) {
 			fetchReusableBlock();
 		}
