@@ -68,8 +68,11 @@ public class Gutenberg: NSObject {
             initialProps["translations"] = translations
         }
 
-        if let capabilities = dataSource.gutenbergCapabilities() {
-            initialProps["capabilities"] = capabilities
+        let capabilities = dataSource.gutenbergCapabilities()
+        if capabilities.isEmpty == false {
+            initialProps["capabilities"] = Dictionary<String, Bool>(uniqueKeysWithValues: capabilities.map { key, value in
+                (key.rawValue, value)
+            })
         }
 
         let editorTheme = dataSource.gutenbergEditorTheme()

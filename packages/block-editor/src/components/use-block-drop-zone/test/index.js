@@ -31,10 +31,10 @@ const elementData = [
 	},
 ];
 
-const createMockClassList = ( isDragging ) => {
+const createMockClassList = ( classes ) => {
 	return {
-		contains() {
-			return isDragging;
+		contains( textToMatch ) {
+			return classes.includes( textToMatch );
 		},
 	};
 };
@@ -60,7 +60,7 @@ const mapElements = ( orientation ) => (
 						right: bottom,
 				  };
 		},
-		classList: createMockClassList( false ),
+		classList: createMockClassList( 'wp-block' ),
 	};
 };
 
@@ -83,8 +83,10 @@ describe( 'getNearestBlockIndex', () => {
 		expect( result ).toBeUndefined();
 	} );
 
-	it( 'returns `undefined` if the elements do not have the `data-block` attribute', () => {
-		const nonBlockElements = [ { dataset: {} } ];
+	it( 'returns `undefined` if the elements do not have the `wp-block` class', () => {
+		const nonBlockElements = [
+			{ classList: createMockClassList( 'some-other-class' ) },
+		];
 		const position = { x: 0, y: 0 };
 		const orientation = 'horizontal';
 
@@ -208,14 +210,14 @@ describe( 'getNearestBlockIndex', () => {
 			expect( result ).toBe( 4 );
 		} );
 
-		it( 'skips the block being dragged', () => {
+		it( 'skips the block being dragged by checking for the `is-dragging` classname', () => {
 			const position = { x: 0, y: 450 };
 
 			const verticalElementsWithDraggedBlock = [
 				...verticalElements.slice( 0, 2 ),
 				{
 					...verticalElements[ 2 ],
-					classList: createMockClassList( true ),
+					classList: createMockClassList( 'wp-block is-dragging' ),
 				},
 				...verticalElements.slice( 3, 4 ),
 			];
@@ -341,14 +343,14 @@ describe( 'getNearestBlockIndex', () => {
 			expect( result ).toBe( 4 );
 		} );
 
-		it( 'skips the block being dragged', () => {
+		it( 'skips the block being dragged by checking for the `is-dragging` classname', () => {
 			const position = { x: 450, y: 0 };
 
 			const horizontalElementsWithDraggedBlock = [
 				...horizontalElements.slice( 0, 2 ),
 				{
 					...horizontalElements[ 2 ],
-					classList: createMockClassList( true ),
+					classList: createMockClassList( 'wp-block is-dragging' ),
 				},
 				...horizontalElements.slice( 3, 4 ),
 			];

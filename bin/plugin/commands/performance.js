@@ -2,6 +2,7 @@
  * External dependencies
  */
 const path = require( 'path' );
+const { pickBy, mapValues } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -19,7 +20,8 @@ const config = require( '../config' );
 /**
  * @typedef WPPerformanceCommandOptions
  *
- * @property {boolean=} ci Run on CI.
+ * @property {boolean=} ci          Run on CI.
+ * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  */
 
 /**
@@ -46,14 +48,14 @@ const config = require( '../config' );
 /**
  * @typedef WPFormattedPerformanceResults
  *
- * @property {string} load             Load Time.
- * @property {string} domcontentloaded DOM Contentloaded time.
- * @property {string} type             Average type time.
- * @property {string} minType          Minium type time.
- * @property {string} maxType          Maximum type time.
- * @property {string} focus            Average block selection time.
- * @property {string} minFocus         Min block selection time.
- * @property {string} maxFocus         Max block selection time.
+ * @property {string=} load             Load Time.
+ * @property {string=} domcontentloaded DOM Contentloaded time.
+ * @property {string=} type             Average type time.
+ * @property {string=} minType          Minium type time.
+ * @property {string=} maxType          Maximum type time.
+ * @property {string=} focus            Average block selection time.
+ * @property {string=} minFocus         Min block selection time.
+ * @property {string=} maxFocus         Max block selection time.
  */
 
 /**
@@ -64,7 +66,7 @@ const config = require( '../config' );
  * @return {number} Average.
  */
 function average( array ) {
-	return array.reduce( ( a, b ) => a + b ) / array.length;
+	return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
 }
 
 /**
@@ -119,6 +121,7 @@ function curateResults( results ) {
  *
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
  * @param {string} environmentDirectory     Path to the plugin environment's clone.
+ * @param {string} testSuite                Name of the tests set.
  * @param {string} branch                   Branch name.
  *
  * @return {Promise<WPFormattedPerformanceResults>} Performance results for the branch.
@@ -126,6 +129,7 @@ function curateResults( results ) {
 async function getPerformanceResultsForBranch(
 	performanceTestDirectory,
 	environmentDirectory,
+	testSuite,
 	branch
 ) {
 	// Restore clean working directory (e.g. if `package-lock.json` has local
@@ -147,30 +151,36 @@ async function getPerformanceResultsForBranch(
 	const results = [];
 	for ( let i = 0; i < 3; i++ ) {
 		await runShellScript(
-			'npm run test-performance',
+			`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 			performanceTestDirectory
 		);
 		const rawResults = await readJSONFile(
 			path.join(
 				performanceTestDirectory,
-				'packages/e2e-tests/specs/performance/results.json'
+				`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 			)
 		);
 		results.push( curateResults( rawResults ) );
 	}
 
-	return {
-		load: formatTime( median( results.map( ( r ) => r.load ) ) ),
-		domcontentloaded: formatTime(
-			median( results.map( ( r ) => r.domcontentloaded ) )
-		),
-		type: formatTime( median( results.map( ( r ) => r.type ) ) ),
-		minType: formatTime( median( results.map( ( r ) => r.minType ) ) ),
-		maxType: formatTime( median( results.map( ( r ) => r.maxType ) ) ),
-		focus: formatTime( median( results.map( ( r ) => r.focus ) ) ),
-		minFocus: formatTime( median( results.map( ( r ) => r.minFocus ) ) ),
-		maxFocus: formatTime( median( results.map( ( r ) => r.maxFocus ) ) ),
-	};
+	const medians = mapValues(
+		{
+			load: results.map( ( r ) => r.load ),
+			domcontentloaded: results.map( ( r ) => r.domcontentloaded ),
+			type: results.map( ( r ) => r.type ),
+			minType: results.map( ( r ) => r.minType ),
+			maxType: results.map( ( r ) => r.maxType ),
+			focus: results.map( ( r ) => r.focus ),
+			minFocus: results.map( ( r ) => r.minFocus ),
+			maxFocus: results.map( ( r ) => r.maxFocus ),
+		},
+		median
+	);
+
+	// Remove results for which we don't have data (and where the statistical functions thus returned NaN or Infinity etc).
+	const finiteMedians = pickBy( medians, isFinite );
+	// Format results as times.
+	return mapValues( finiteMedians, formatTime );
 }
 
 /**
@@ -198,6 +208,19 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '>> Cloning the repository' );
 	const performanceTestDirectory = await git.clone( config.gitRepositoryURL );
+
+	if ( !! options.testsBranch ) {
+		log(
+			'>> Fetching the ' +
+				formats.success( options.testsBranch ) +
+				' branch'
+		);
+		await git.checkoutRemoteBranch(
+			performanceTestDirectory,
+			options.testsBranch
+		);
+	}
+
 	const environmentDirectory = getRandomTemporaryPath();
 	log(
 		'>> Perf Tests Directory : ' +
@@ -220,21 +243,32 @@ async function runPerformanceTests( branches, options ) {
 	log( '>> Starting the WordPress environment' );
 	await runShellScript( 'npm run wp-env start', environmentDirectory );
 
-	/** @type {Record<string, WPFormattedPerformanceResults>} */
+	const testSuites = [ 'post-editor', 'site-editor' ];
+
+	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
 	const results = {};
-	for ( const branch of branches ) {
-		results[ branch ] = await getPerformanceResultsForBranch(
-			performanceTestDirectory,
-			environmentDirectory,
-			branch
-		);
+	for ( const testSuite of testSuites ) {
+		results[ testSuite ] = {};
+		for ( const branch of branches ) {
+			results[ testSuite ][
+				branch
+			] = await getPerformanceResultsForBranch(
+				performanceTestDirectory,
+				environmentDirectory,
+				testSuite,
+				branch
+			);
+		}
 	}
 
 	log( '>> Stopping the WordPress environment' );
 	await runShellScript( 'npm run wp-env stop', environmentDirectory );
 
 	log( '\n>> 🎉 Results.\n' );
-	console.table( results );
+	for ( const testSuite of testSuites ) {
+		log( `\n>> ${ testSuite }\n` );
+		console.table( results[ testSuite ] );
+	}
 }
 
 module.exports = {
