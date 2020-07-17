@@ -279,23 +279,7 @@ dependencies {
         }
     }
 
-    task cleanupNodeModulesFolders(type: Delete) {
-        doFirst {
-            println "Deleting node_modules folders"
-        }
-
-        delete nodeModulesFolders
-    }
-
-//    preBuild.dependsOn(cleanupNodeModulesFolders)
-//    cleanupNodeModulesFolders.dependsOn(backupHermesDebugAAR)
-//    backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
-//    backupHermesReleaseAAR.dependsOn(copyJSBundle)
-
     copyJSBundle.dependsOn(buildJSBundle)
-
-//    buildJSBundle.dependsOn(npm_install)
-//    nodeSetup.dependsOn(resetExtractedRNTools)
 
     clean {
         doFirst {
