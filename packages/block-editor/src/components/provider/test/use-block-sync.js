@@ -362,4 +362,78 @@ describe( 'useBlockSync hook', () => {
 		);
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
+
+	it( 'should use fresh callbacks if onChange/onInput have been updated', async () => {
+		const fakeBlocks = [
+			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+		];
+		const onChange1 = jest.fn();
+		const onInput = jest.fn();
+
+		let registry;
+		const setRegistry = ( reg ) => {
+			registry = reg;
+		};
+		let root;
+		await act( async () => {
+			root = create(
+				<TestWrapper
+					setRegistry={ setRegistry }
+					value={ fakeBlocks }
+					onChange={ onChange1 }
+					onInput={ onInput }
+				/>
+			);
+		} );
+
+		// Create a persistent change.
+		registry
+			.dispatch( 'core/block-editor' )
+			.updateBlockAttributes( 'a', { foo: 2 } );
+
+		const updatedBlocks1 = [
+			{ clientId: 'a', innerBlocks: [], attributes: { foo: 2 } },
+		];
+
+		expect( onChange1 ).toHaveBeenCalledWith( updatedBlocks1, {
+			selectionEnd: {},
+			selectionStart: {},
+		} );
+
+		const newBlocks = [
+			{ clientId: 'b', innerBlocks: [], attributes: { foo: 1 } },
+		];
+
+		const onChange2 = jest.fn();
+
+		// Update the component to point at a "different entity" (e.g. different
+		// blocks and onChange handler.)
+		await act( async () => {
+			root.update(
+				<TestWrapper
+					setRegistry={ setRegistry }
+					value={ newBlocks }
+					onChange={ onChange2 }
+					onInput={ onInput }
+				/>
+			);
+		} );
+
+		// Create a persistent change.
+		registry
+			.dispatch( 'core/block-editor' )
+			.updateBlockAttributes( 'b', { foo: 3 } );
+
+		// The first callback should not be called with the new change.
+		expect( onChange1 ).toHaveBeenCalledWith( updatedBlocks1, {
+			selectionEnd: {},
+			selectionStart: {},
+		} );
+
+		// The second callback should be called with the new change.
+		expect( onChange2 ).toHaveBeenCalledWith(
+			[ { clientId: 'b', innerBlocks: [], attributes: { foo: 3 } } ],
+			{ selectionEnd: {}, selectionStart: {} }
+		);
+	} );
 } );
