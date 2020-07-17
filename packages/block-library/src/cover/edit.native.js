@@ -181,10 +181,6 @@ const Cover = ( {
 		} );
 	}
 
-	function openCustomColorPicker() {
-		openGeneralSidebar();
-	}
-
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
 		styles.backgroundSolidDark
@@ -393,7 +389,7 @@ const Cover = ( {
 							}
 							setColor={ setColor }
 							onCustomPress={
-								isParentSelected && openCustomColorPicker
+								isParentSelected && openGeneralSidebar
 							}
 							defaultSettings={ coverDefaultPalette }
 							shouldShowCustomLabel={ false }
