@@ -723,9 +723,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				'[role="listbox"] [role="option"]'
 			);
 
-			// console.log( 'searchResultElements', container.innerHTML );
-			// console.log( 'searchResultElements', searchResultElements );
-
 			const createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
 					result.innerHTML.includes( 'New page' )
