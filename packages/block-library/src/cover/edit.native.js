@@ -3,6 +3,7 @@
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
 import Video from 'react-native-video';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,6 +26,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
+	ColorPalette,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -79,6 +81,7 @@ const Cover = ( {
 	onFocus,
 	overlayColor,
 	setAttributes,
+	settings,
 	closeSettingsBottomSheet,
 } ) => {
 	const {
@@ -92,6 +95,11 @@ const Cover = ( {
 		customOverlayColor,
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const THEME_COLORS_COUNT = 4;
+	const coverDefaultPalette = {
+		colors: settings.colors.slice( 0, THEME_COLORS_COUNT ),
+	};
 
 	const { gradientValue } = __experimentalUseGradient();
 
@@ -171,6 +179,16 @@ const Cover = ( {
 		setAttributes( { id: undefined, url: undefined } );
 		closeSettingsBottomSheet();
 	};
+
+	function setColor( color ) {
+		setAttributes( {
+			// clear all related attributes (only one should be set)
+			overlayColor: undefined,
+			customOverlayColor: color,
+			gradient: undefined,
+			customGradient: undefined,
+		} );
+	}
 
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
@@ -338,6 +356,7 @@ const Cover = ( {
 		return (
 			<View>
 				<MediaPlaceholder
+					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -345,7 +364,20 @@ const Cover = ( {
 					onSelect={ onSelectMedia }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onFocus={ onFocus }
-				/>
+				>
+					<View style={ styles.colorPaletteWrapper }>
+						<ColorPalette
+							customColorIndicatorStyles={
+								styles.paletteColorIndicator
+							}
+							setColor={ setColor }
+							onCustomPress={ noop }
+							defaultSettings={ coverDefaultPalette }
+							shouldShowCustomIndicatorOption={ false }
+							shouldShowCustomLabel={ false }
+						/>
+					</View>
+				</MediaPlaceholder>
 			</View>
 		);
 	}
@@ -421,7 +453,10 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
+		const { getSettings } = select( 'core/block-editor' );
+
 		return {
+			settings: getSettings(),
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),
