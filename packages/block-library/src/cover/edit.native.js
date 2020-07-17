@@ -25,6 +25,7 @@ import {
 	Gradient,
 	ColorPalette,
 	ColorPicker,
+	BottomSheetConsumer,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -270,16 +271,31 @@ const Cover = ( {
 
 	const colorPickerControls = (
 		<InspectorControls>
-			<ColorPicker
-				shouldEnableBottomSheetScroll={ noop }
-				shouldDisableBottomSheetMaxHeight={ noop }
-				setColor={ noop }
-				onApply={ setColor }
-				onNavigationBack={ closeSettingsBottomSheet }
-				onCloseBottomSheet={ noop }
-				isBottomSheetContentScrolling={ noop }
-				dontCount={ true }
-			/>
+			<BottomSheetConsumer>
+				{ ( {
+					shouldEnableBottomSheetScroll,
+					shouldDisableBottomSheetMaxHeight,
+					onCloseBottomSheet,
+					isBottomSheetContentScrolling,
+				} ) => (
+					<ColorPicker
+						shouldEnableBottomSheetScroll={
+							shouldEnableBottomSheetScroll
+						}
+						shouldDisableBottomSheetMaxHeight={
+							shouldDisableBottomSheetMaxHeight
+						}
+						setColor={ noop }
+						onApply={ setColor }
+						onNavigationBack={ closeSettingsBottomSheet }
+						onCloseBottomSheet={ onCloseBottomSheet }
+						isBottomSheetContentScrolling={
+							isBottomSheetContentScrolling
+						}
+						dontCount={ true }
+					/>
+				) }
+			</BottomSheetConsumer>
 		</InspectorControls>
 	);
 
