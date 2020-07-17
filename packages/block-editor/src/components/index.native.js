@@ -35,7 +35,11 @@ export { default as Caption } from './caption';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 
-export { BottomSheetSettings, BlockSettingsButton } from './block-settings';
+export {
+	BottomSheetSettings,
+	BlockSettingsButton,
+	blockSettingsScreens,
+} from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
 // Content Related Components

@@ -17,7 +17,7 @@ import { useRef, useCallback, useContext } from '@wordpress/element';
 
 const BottomSheetScreen = ( { children } ) => {
 	const navigation = useNavigation();
-	const height = useRef( { maxHeight: 0 } );
+	const heightRef = useRef( { maxHeight: 0 } );
 	const isFocused = useIsFocused();
 	const {
 		onHardwareButtonPress,
@@ -36,22 +36,21 @@ const BottomSheetScreen = ( { children } ) => {
 				return false;
 			} );
 
-			if ( height.current.maxHeight !== 0 ) {
-				setHeight( height.current.maxHeight );
+			if ( heightRef.current.maxHeight !== 0 ) {
+				setHeight( heightRef.current.maxHeight );
 			}
 			return () => {};
 		}, [] )
 	);
+	const onLayout = ( { nativeEvent } ) => {
+		const { height } = nativeEvent.layout;
 
-	const onLayout = ( e ) => {
-		if (
-			height.current.maxHeight !== e.nativeEvent.layout.height &&
-			isFocused
-		) {
-			height.current.maxHeight = e.nativeEvent.layout.height;
-			setHeight( e.nativeEvent.layout.height );
+		if ( heightRef.current.maxHeight !== height && isFocused ) {
+			heightRef.current.maxHeight = height;
+			setHeight( height );
 		}
 	};
+
 	return <View onLayout={ onLayout }>{ children }</View>;
 };
 

@@ -1,11 +1,16 @@
 /**
- * WordPress dependencies
- */
-import { ColorControl, PanelBody } from '@wordpress/components';
-/**
  * External dependencies
  */
 import { useNavigation } from '@react-navigation/native';
+
+/**
+ * WordPress dependencies
+ */
+import {
+	ColorControl,
+	PanelBody,
+	blockSettingsScreens,
+} from '@wordpress/components';
 
 export default function PanelColorGradientSettings( { settings, title } ) {
 	const navigation = useNavigation();
@@ -22,7 +27,7 @@ export default function PanelColorGradientSettings( { settings, title } ) {
 				} ) => (
 					<ColorControl
 						onPress={ () => {
-							navigation.navigate( 'Colors', {
+							navigation.navigate( blockSettingsScreens.color, {
 								onColorChange,
 								colorValue: gradientValue || colorValue,
 								gradientValue,

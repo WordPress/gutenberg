@@ -18,6 +18,11 @@ import styles from './container.native.scss';
 
 const Stack = createStackNavigator();
 
+export const blockSettingsScreens = {
+	settings: 'Settings',
+	color: 'Color',
+};
+
 function BottomSheetSettings( {
 	editorSidebarOpened,
 	closeGeneralSidebar,
@@ -66,12 +71,12 @@ function BottomSheetSettings( {
 					>
 						<Stack.Screen
 							options={ BottomSheet.NavigationScreen.options }
-							name="Settings"
+							name={ blockSettingsScreens.settings }
 							component={ MainScreen.current }
 						/>
 						<Stack.Screen
 							options={ BottomSheet.NavigationScreen.options }
-							name="Colors"
+							name={ blockSettingsScreens.color }
 							component={ DetailsScreen.current }
 						/>
 					</Stack.Navigator>

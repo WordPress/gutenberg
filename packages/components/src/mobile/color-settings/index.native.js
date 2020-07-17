@@ -17,6 +17,8 @@ import PickerScreen from './picker-screen';
 import GradientPickerScreen from './gradient-picker-screen';
 import PaletteScreen from './palette.screen';
 
+import { colorsUtils } from './utils';
+
 const Stack = createStackNavigator();
 
 function ColorSettings( { defaultSettings } ) {
@@ -58,18 +60,18 @@ function ColorSettings( { defaultSettings } ) {
 				} }
 			>
 				<Stack.Screen
-					name="Palette"
+					name={ colorsUtils.screens.palette }
 					component={ PaletteScreenView.current }
 					options={ BottomSheet.NavigationScreen.options }
 					initialParams={ { defaultSettings, ...route.params } }
 				/>
 				<Stack.Screen
-					name="Picker"
+					name={ colorsUtils.screens.picker }
 					component={ PickerScreenView.current }
 					options={ BottomSheet.NavigationScreen.options }
 				/>
 				<Stack.Screen
-					name="GradientPicker"
+					name={ colorsUtils.screens.gradientPicker }
 					component={ GradientPickerView.current }
 					options={ BottomSheet.NavigationScreen.options }
 				/>

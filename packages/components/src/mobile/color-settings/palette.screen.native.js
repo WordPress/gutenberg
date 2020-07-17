@@ -70,13 +70,13 @@ const PaletteScreen = () => {
 
 	function onCustomPress() {
 		if ( isSolidSegment ) {
-			navigation.navigate( 'Picker', {
+			navigation.navigate( colorsUtils.screens.picker, {
 				setColor,
 				isGradientColor,
 				currentValue,
 			} );
 		} else {
-			navigation.navigate( 'GradientPicker', {
+			navigation.navigate( colorsUtils.screens.gradientPicker, {
 				setColor,
 				isGradientColor,
 				currentValue,
