@@ -121,27 +121,154 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
 
 Props not included in this set will be applied to the `a` or `button` element.
 
-| Name              | Type                               | Default                                                   | Description                                                                                                       |
-| ----------------- | ---------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `disabled`        | `bool`                             | `false`                                                   | Whether the button is disabled. If `true`, this will force a `button` element to be rendered.                     |
-| `href`            | `string`                           | `undefined`                                               | If provided, renders `a` instead of `button`.                                                                     |
-| `isSecondary`     | `bool`                             | `false`                                                   | Renders a default button style.                                                                                   |
-| `isPrimary`       | `bool`                             | `false`                                                   | Renders a primary button style.                                                                                   |
-| `isTertiary`      | `bool`                             | `false`                                                   | Renders a text-based button style.                                                                                |
-| `isDestructive`   | `bool`                             | `false`                                                   | Renders a red text-based button style to indicate destructive behavior.                                           |
-| `isSmall`         | `bool`                             | `false`                                                   | Decreases the size of the button.                                                                                 |
-| `isPressed`       | `bool`                             | `false`                                                   | Renders a pressed button style.                                                                                   |
-| `isBusy`          | `bool`                             | `false`                                                   | Indicates activity while a action is being performed.                                                             |
-| `isLink`          | `bool`                             | `false`                                                   | Renders a button with an anchor style.                                                                            |
-| `focus`           | `bool`                             | `false`                                                   | Whether the button is focused.                                                                                    |
-| `target`          | `string`                           | `undefined`                                               | If provided with `href`, sets the `a` `target` attribute.                                                         |
-| `className`       | `string`                           | `''`                                                      | An optional additional class name to apply to the rendered button.                                                |
-| `icon`            | `String|Function|WPComponent|null` | `null`                                                    | If provided, renders an [Icon](/packages/components/src/icon/README.md) component inside the button.              |
-| `iconSize`        | `Number`                           | `20 when a Dashicon is rendered, 24 for all other icons.` | If provided with `icon`, sets the icon size.                                                                      |
-| `showTooltip`     | `Boolean`                          | `false`                                                   | If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.            |
-| `tooltipPosition` | `String`                           | `top center`                                              | If provided with `showTooltip`, sets the position of the tooltip.                                                 |
-| `shortcut`        | `String|Object`                    | `undefined`                                               | If provided with `showTooltip`, appends the Shortcut label to the tooltip content.                                |
-| `label`           | `String`                           | `''`                                                      | Sets the `aria-label` of the component, if none is provided and the Tooltip content if `showTooltip` if provided. |
+#### disabled
+
+Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### href
+
+If provided, renders `a` instead of `button`.
+
+-   Type: `String`
+-   Required: No
+-   Default: `undefined`
+
+#### isSecondary
+
+Renders a default button style.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isPrimary
+
+Renders a primary button style.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isTertiary
+
+Renders a text-based button style.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isDestructive
+
+Renders a red text-based button style to indicate destructive behavior.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isSmall
+
+Decreases the size of the button.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isPressed
+
+Renders a pressed button style.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isBusy
+
+Indicates activity while a action is being performed.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isLink
+
+Renders a button with an anchor style.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### focus
+
+Whether the button is focused.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### target
+
+If provided with `href`, sets the `target` attribute to the `a`.
+
+-   Type: `String`
+-   Required: No
+
+#### className
+
+An optional additional class name to apply to the rendered button.
+
+-   Type: `String`
+-   Required: No
+
+#### icon
+
+If provided, renders an [Icon](/packages/components/src/icon/README.md) component inside the button.
+
+-   Type: `String|Function|WPComponent|null`
+-   Required: No
+-   Default: `null`
+
+#### iconSize
+
+If provided with `icon`, sets the icon size.
+
+-   Type: `Number`
+-   Required: No
+-   Default: `20 when a Dashicon is rendered, 24 for all other icons.`
+
+#### showTooltip
+
+If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### tooltipPosition
+
+If provided with`showTooltip`, sets the position of the tooltip.
+
+-   Type: `String`
+-   Require: No
+-   Default:`top center`
+
+#### shortcut
+
+If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an `Object` is provided, it should contain `display` and `ariaLabel` keys.
+
+-   Type: `String|Object`
+-   Required: No
+-   Default: `undefined`
+
+#### label
+
+Sets the `aria-label` of the component, if none is provided. Sets the Tooltip content if `showTooltip` is provided.
+
+-   Type: `String`
+-   Required: No
 
 ## Related components
 
