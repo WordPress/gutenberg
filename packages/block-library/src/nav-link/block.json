@@ -1,0 +1,25 @@
+{
+	"name": "core/nav-link",
+	"category": "design",
+	"parent": [
+		"core/nav",
+		"core/nav-submenu"
+	],
+	"attributes": {
+		"url": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a",
+			"attribute": "href"
+		},
+		"label": {
+			"type": "string",
+			"source": "html",
+			"selector": "a"
+		}
+	},
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}

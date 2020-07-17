@@ -1,0 +1,22 @@
+.wp-block-nav-link {
+	position: relative;
+
+	.wp-block-nav-submenu {
+		display: none;
+	}
+
+	&:hover,
+	&:active {
+		.wp-block-nav-submenu {
+			display: block;
+		}
+	}
+}
+
+.wp-block-nav-link__link {
+	display: block;
+	height: 50px;
+	line-height: 50px;
+	padding: 0 20px;
+	cursor: pointer;
+}

@@ -1,0 +1,17 @@
+{
+	"name": "core/nav-submenu",
+	"category": "design",
+	"parent": [
+		"core/nav-link"
+	],
+	"attributes": {
+		"width": {
+			"type": "string",
+			"default": "narrow"
+		}
+	},
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}

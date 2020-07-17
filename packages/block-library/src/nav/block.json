@@ -1,0 +1,19 @@
+{
+	"name": "core/nav",
+	"category": "design",
+	"attributes": {
+		"orientation": {
+			"type": "string",
+			"default": "horizontal"
+		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"anchor": true,
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}

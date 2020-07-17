@@ -1,0 +1,14 @@
+.wp-block-nav-link,
+.wp-block-nav-link:active,
+.wp-block-nav-link:hover {
+	.wp-block-nav-submenu {
+		display: none;
+	}
+}
+
+.wp-block-nav-link.is-selected,
+.wp-block-nav-link.is-parent-of-selected-block {
+	.wp-block-nav-submenu {
+		display: block;
+	}
+}

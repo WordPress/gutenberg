@@ -1,0 +1,10 @@
+.wp-block-nav-submenu {
+	background: $white;
+	left: 0;
+	position: absolute;
+	top: 100%;
+
+	&.width-wide {
+		width: 50vw;
+	}
+}

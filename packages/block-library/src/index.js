@@ -35,8 +35,12 @@ import * as embed from './embed';
 import * as file from './file';
 import * as html from './html';
 import * as mediaText from './media-text';
-import * as navigation from './navigation';
-import * as navigationLink from './navigation-link';
+import * as nav from './nav';
+import * as navLink from './nav-link';
+import * as navSubmenu from './nav-submenu';
+import * as navQuery from './nav-query';
+// import * as navigation from './navigation';
+// import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as legacyWidget from './legacy-widget';
@@ -194,8 +198,12 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				[
 					widgetArea,
 					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
-					navigation,
-					navigationLink,
+					nav,
+					navLink,
+					navSubmenu,
+					navQuery,
+					// navigation,
+					// navigationLink,
 
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing

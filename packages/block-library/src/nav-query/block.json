@@ -1,0 +1,14 @@
+{
+	"name": "core/nav-query",
+	"category": "design",
+	"parent": [
+		"core/nav",
+		"core/nav-submenu"
+	],
+	"attributes": {
+	},
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}
