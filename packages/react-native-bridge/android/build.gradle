@@ -203,7 +203,13 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
-    task buildJSBundle(type: NpmTask) {
+    def nodeModulesFolders = ["$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"] as String[]
+
+    task npmRunBundleAndroid(type: NpmTask) {
+        args = ['run', 'bundle:android']
+    }
+
+    task buildJSBundle {
         def dirs = [mobileGutenbergRootDir]
         def bundlePath = file("$mobileGutenbergRootDir/bundle").absolutePath
         file(mobileGutenbergRootDir).eachDirRecurse { dir ->
@@ -233,8 +239,22 @@ dependencies {
 
         outputs.file(origWithPath)
 
-        args = ['run', 'bundle:android']
         doLast {
+            println "Deleting extracted RN tools and node_modules"
+            project.delete(nodeFolder, npmFolder, nodeModulesFolders)
+
+            println "Setting up Node"
+            nodeSetup.exec()
+
+            println "Setting up npm"
+            npmSetup.exec()
+
+            println "Running npm install"
+            npm_install.exec()
+
+            println "Building gb-mobile JS bundle"
+            npmRunBundleAndroid.exec()
+
             println "Done buildJSBundle!"
         }
     }
@@ -259,20 +279,12 @@ dependencies {
         }
     }
 
-    def nodeModulesFolders = ["$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"] as String[]
     task cleanupNodeModulesFolders(type: Delete) {
         doFirst {
             println "Deleting node_modules folders"
         }
 
         delete nodeModulesFolders
-    }
-
-    task resetExtractedRNTools(type: Delete) {
-        doFirst {
-            println "Deleting temporary folders with extracted RN tools"
-        }
-        delete nodeFolder, npmFolder
     }
 
 //    preBuild.dependsOn(cleanupNodeModulesFolders)
