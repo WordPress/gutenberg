@@ -22,18 +22,10 @@ function DownloadableBlocksPanel( {
 	debouncedSpeak,
 } ) {
 	if ( false === hasPermission ) {
-		debouncedSpeak(
-			__(
-				'No blocks found in your library. Please contact your site administrator to install new blocks.'
-			)
-		);
+		debouncedSpeak( __( 'No blocks found in your library.' ) );
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				{ __( 'No blocks found in your library.' ) }
-				<br />
-				{ __(
-					'Please contact your site administrator to install new blocks.'
-				) }
 			</p>
 		);
 	}

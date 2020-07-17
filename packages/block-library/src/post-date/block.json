@@ -2,14 +2,24 @@
 	"name": "core/post-date",
 	"category": "design",
 	"attributes": {
+		"align": {
+			"type": "string"
+		},
 		"format": {
 			"type": "string"
 		}
 	},
 	"usesContext": [
-		"postId"
+		"postId",
+		"postType"
 	],
 	"supports": {
-		"html": false
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true
+		},
+		"__experimentalFontSize": true,
+		"__experimentalLineHeight": true
 	}
 }

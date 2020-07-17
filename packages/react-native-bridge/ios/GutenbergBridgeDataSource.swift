@@ -40,7 +40,10 @@ public protocol GutenbergBridgeDataSource: class {
     /// Asks the data source for a list of Media Sources to show on the Media Source Picker.
     func gutenbergMediaSources() -> [Gutenberg.MediaSource]
 
-    func gutenbergCapabilities() -> [String: Bool]?
+    /// Ask the data source what capabilities should be enabled.
+    /// Implement this method to enable one or more capabilities.
+    /// Defaults are not enabled.
+    func gutenbergCapabilities() -> [Capabilities: Bool]
 
     /// Asks the data source for a list of theme colors.
     func gutenbergEditorTheme() -> GutenbergEditorTheme?
@@ -61,6 +64,10 @@ public extension GutenbergBridgeDataSource {
     var loadingView: UIView? {
          return nil
      }
+
+    func gutenbergCapabilities() -> [Capabilities: Bool] {
+        return [:]
+    }
 }
 
 public protocol GutenbergEditorTheme {
