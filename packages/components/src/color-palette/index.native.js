@@ -181,7 +181,7 @@ function ColorPalette( {
 	}
 
 	const verticalSeparatorStyle = usePreferredColorSchemeStyle(
-		[ styles.verticalSeparator, customVerticalSeparatorStyles ],
+		styles.verticalSeparator,
 		styles.verticalSeparatorDark
 	);
 
@@ -245,7 +245,12 @@ function ColorPalette( {
 					] }
 					onLayout={ onCustomIndicatorLayout }
 				>
-					<View style={ verticalSeparatorStyle } />
+					<View
+						style={ [
+							verticalSeparatorStyle,
+							customVerticalSeparatorStyles,
+						] }
+					/>
 					<TouchableWithoutFeedback
 						onPress={ onCustomPress }
 						accessibilityRole={ 'button' }
