@@ -44,8 +44,7 @@ function MediaPlaceholder( props ) {
 		multiple,
 		value = [],
 		children,
-		customEmptyStateContainerStyles,
-		customEmptyStateTitleStyles,
+		height,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -107,12 +106,7 @@ function MediaPlaceholder( props ) {
 			return (
 				<>
 					<View style={ styles.modalIcon }>{ icon }</View>
-					<Text
-						style={ [
-							emptyStateTitleStyle,
-							customEmptyStateTitleStyles,
-						] }
-					>
+					<Text style={ emptyStateTitleStyle }>
 						{ placeholderTitle }
 					</Text>
 					{ children }
@@ -175,7 +169,7 @@ function MediaPlaceholder( props ) {
 								style={ [
 									[
 										emptyStateContainerStyle,
-										customEmptyStateContainerStyles,
+										height && { height },
 									],
 									isAppender && appenderStyle,
 								] }

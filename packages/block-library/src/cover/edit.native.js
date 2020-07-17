@@ -354,12 +354,7 @@ const Cover = ( {
 			<View>
 				{ colorPickerControls }
 				<MediaPlaceholder
-					customEmptyStateContainerStyles={
-						styles.mediaPlaceholderEmptyStateContainer
-					}
-					customEmptyStateTitleStyles={
-						styles.mediaPlaceholderEmptyStateTitle
-					}
+					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
