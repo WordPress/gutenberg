@@ -94,7 +94,7 @@ function MediaPlaceholder( props ) {
 	}
 
 	const emptyStateTitleStyle = getStylesFromColorScheme(
-		[ styles.emptyStateTitle, customEmptyStateTitleStyles ],
+		styles.emptyStateTitle,
 		styles.emptyStateTitleDark
 	);
 	const addMediaButtonStyle = getStylesFromColorScheme(
@@ -107,7 +107,12 @@ function MediaPlaceholder( props ) {
 			return (
 				<>
 					<View style={ styles.modalIcon }>{ icon }</View>
-					<Text style={ emptyStateTitleStyle }>
+					<Text
+						style={ [
+							emptyStateTitleStyle,
+							customEmptyStateTitleStyles,
+						] }
+					>
 						{ placeholderTitle }
 					</Text>
 					{ children }
@@ -137,7 +142,7 @@ function MediaPlaceholder( props ) {
 		styles.appenderDark
 	);
 	const emptyStateContainerStyle = getStylesFromColorScheme(
-		[ styles.emptyStateContainer, customEmptyStateContainerStyles ],
+		styles.emptyStateContainer,
 		styles.emptyStateContainerDark
 	);
 
@@ -168,7 +173,10 @@ function MediaPlaceholder( props ) {
 						>
 							<View
 								style={ [
-									emptyStateContainerStyle,
+									[
+										emptyStateContainerStyle,
+										customEmptyStateContainerStyles,
+									],
 									isAppender && appenderStyle,
 								] }
 							>

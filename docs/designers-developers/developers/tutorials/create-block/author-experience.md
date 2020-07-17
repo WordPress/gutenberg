@@ -138,4 +138,4 @@ export default function Edit( { attributes, className, setAttributes } ) {
 }
 ```
 
-Next Section: [Finishing Touches](finishing.md)
+Next Section: [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/finishing.md)

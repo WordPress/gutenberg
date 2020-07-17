@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useMemo } from '@wordpress/element';
+import {
+	useState,
+	createContext,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveElement,
@@ -105,7 +110,7 @@ function BlockListBlock( {
 		[ clientId ]
 	);
 	const { removeBlock } = useDispatch( 'core/block-editor' );
-	const onRemove = () => removeBlock( clientId );
+	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
