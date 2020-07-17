@@ -136,13 +136,13 @@ android {
     }
 }
 
+def bundleResFiles = project.files(buildResFolder)
+bundleResFiles.builtBy(copyJSBundle)
 
 android.libraryVariants.all { variant ->
-    def files = project.files(buildResFolder)
-    files.builtBy(copyJSBundle)
     variant.preBuildProvider.configure { dependsOn(copyJSBundle) }
     variant.mergeResourcesProvider.configure { dependsOn(copyJSBundle) }
-    variant.registerGeneratedResFolders(files)
+    variant.registerGeneratedResFolders(bundleResFiles)
 }
 
 repositories {
