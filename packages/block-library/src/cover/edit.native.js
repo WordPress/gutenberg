@@ -3,6 +3,7 @@
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
 import Video from 'react-native-video';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -270,13 +271,13 @@ const Cover = ( {
 	const colorPickerControls = (
 		<InspectorControls>
 			<ColorPicker
-				shouldEnableBottomSheetScroll={ () => {} }
-				shouldDisableBottomSheetMaxHeight={ () => {} }
-				setColor={ () => {} }
+				shouldEnableBottomSheetScroll={ noop }
+				shouldDisableBottomSheetMaxHeight={ noop }
+				setColor={ noop }
 				onApply={ setColor }
 				onNavigationBack={ closeSettingsBottomSheet }
-				onCloseBottomSheet={ () => {} }
-				isBottomSheetContentScrolling={ () => {} }
+				onCloseBottomSheet={ noop }
+				isBottomSheetContentScrolling={ noop }
 				dontCount={ true }
 			/>
 		</InspectorControls>
