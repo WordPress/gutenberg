@@ -22,6 +22,7 @@ export const paragraphItem = {
 	category: 'text',
 	isDisabled: false,
 	utility: 1,
+	keywords: [ 'random' ],
 };
 
 export const withVariationsItem = {
@@ -44,6 +45,7 @@ export const withVariationsItem = {
 		{
 			name: 'variation-three',
 			title: 'Variation Three',
+			keywords: [ 'music', 'random' ],
 		},
 	],
 };
