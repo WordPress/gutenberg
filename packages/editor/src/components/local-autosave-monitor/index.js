@@ -119,15 +119,6 @@ function useAutosaveNotice() {
 			}
 		);
 	}, [ isEditedPostNew, postId ] );
-
-	// Once the isEditedPostNew changes from true to false, let's clear the auto-draft autosave.
-	const wasEditedPostNew = usePrevious( isEditedPostNew );
-	const prevPostId = usePrevious( postId );
-	useEffect( () => {
-		if ( prevPostId === postId && wasEditedPostNew && ! isEditedPostNew ) {
-			localAutosaveClear( postId, true );
-		}
-	}, [ isEditedPostNew, postId ] );
 }
 
 /**
@@ -166,6 +157,15 @@ function useAutosavePurge() {
 		lastIsDirty.current = isDirty;
 		lastIsAutosaving.current = isAutosaving;
 	}, [ isDirty, isAutosaving, didError ] );
+
+	// Once the isEditedPostNew changes from true to false, let's clear the auto-draft autosave.
+	const wasEditedPostNew = usePrevious( isEditedPostNew );
+	const prevPostId = usePrevious( postId );
+	useEffect( () => {
+		if ( prevPostId === postId && wasEditedPostNew && ! isEditedPostNew ) {
+			localAutosaveClear( postId, true );
+		}
+	}, [ isEditedPostNew, postId ] );
 }
 
 function LocalAutosaveMonitor() {
