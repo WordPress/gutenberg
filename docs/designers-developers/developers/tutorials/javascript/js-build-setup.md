@@ -34,13 +34,13 @@ First, you need to set up Node.js for your development environment. The steps re
 -   macOS: `brew install node`
 -   Windows: `choco install node`
 
-If you are not using a package manager, see the [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
+If you are not using a package manager, see the [developer environment setup documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md) for setting up Node using nvm, or see the official [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
 
 **Note:** The build tools and process occur on the command-line, so basic familiarity using a terminal application is required. Some text editors have a terminal built-in that is fine to use; Visual Studio Code and PhpStorm are two popular options.
 
 ### Node Package Manager (npm)
 
-The Node Package Manager (npm) is a tool included with node. npm allows you to install and manage JavaScript packages. npm can also generate and process a special file called `package.json`, which contains some information about your project and the packages your project uses.
+The Node Package Manager (npm) is a tool included with node. npm allows you to install and manage JavaScript packages. npm can also generate and process a special file called `package.json`, that contains information about your project and the packages your project uses.
 
 To start a new node project, first create a directory to work in:
 
@@ -127,9 +127,7 @@ You can then run the build using: `npm run build`.
 
 After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [loading JavaScript step in this tutorial](/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md), and the block will load in the editor.
 
-## Finishing Touches
-
-### Development Mode
+## Development Mode
 
 The **build** command in `@wordpress/scripts` runs in "production" mode. This shrinks the code down so it downloads faster, but makes it difficult to read in the process. You can use the **start** command which runs in development mode that does not shrink the code, and additionally continues a running process to watch the source file for more changes and rebuilds as you develop.
 
@@ -146,13 +144,13 @@ Now, when you run `npm start` a watcher will run in the terminal. You can then e
 
 **Note:** keep an eye on your terminal for any errors. If you make a typo or syntax error, the build will fail and the error will be in the terminal.
 
-### Source Control
+## Source Control
 
 Because a typical `node_modules` folder will contain thousands of files that change with every software update, you should exclude `node_modules/` from your source control. If you ever start from a fresh clone, simply run `npm install` in the same folder your `package.json` is located to pull your required packages.
 
 Likewise, you do not need to include `node_modules` or any of the above configuration files in your plugin because they will be bundled inside the file that webpack builds. **Be sure to enqueue the `build/index.js` file** in your plugin PHP. This is the main JavaScript file needed for your block to run.
 
-### Dependency Management
+## Dependency Management
 
 Using `wp-scripts` ver 5.0.0+ build step will also produce an `index.asset.php` file that contains an array of dependencies and a version number for your block. For our simple example above, it is something like:
 `array('dependencies' => array('wp-element', 'wp-polyfill'), 'version' => 'fc93c4a9675c108725227db345898bcc');`

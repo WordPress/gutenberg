@@ -68,7 +68,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 
 ## Allowed Blocks
 
-Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in your InnerBlock. This restricts the that can be included only to those listed, all other blocks will not show in the inserter.
+Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in your InnerBlock. This restricts the blocks that can be included only to those listed, all other blocks will not show in the inserter.
 
 ```js
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];

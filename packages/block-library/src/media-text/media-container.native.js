@@ -342,6 +342,7 @@ class MediaContainer extends Component {
 		if ( mediaUrl ) {
 			return (
 				<MediaUpload
+					isReplacingMedia={ true }
 					onSelect={ this.onSelectMediaUploadOption }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ mediaId }

@@ -154,8 +154,39 @@ export class MediaUpload extends React.Component {
 	}
 
 	render() {
+		const { allowedTypes = [], isReplacingMedia } = this.props;
+		const isOneType = allowedTypes.length === 1;
+		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
+		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+		const isImageOrVideo =
+			allowedTypes.length === 2 &&
+			allowedTypes.includes( MEDIA_TYPE_IMAGE ) &&
+			allowedTypes.includes( MEDIA_TYPE_VIDEO );
+
+		let pickerTitle;
+		if ( isImage ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace image' );
+			} else {
+				pickerTitle = __( 'Choose image' );
+			}
+		} else if ( isVideo ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace video' );
+			} else {
+				pickerTitle = __( 'Choose video' );
+			}
+		} else if ( isImageOrVideo ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace image or video' );
+			} else {
+				pickerTitle = __( 'Choose image or video' );
+			}
+		}
+
 		const getMediaOptions = () => (
 			<Picker
+				title={ pickerTitle }
 				hideCancelButton
 				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
