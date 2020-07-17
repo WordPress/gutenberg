@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { map, findIndex, flow, sortBy, groupBy, isEmpty } from 'lodash';
+import {
+	map,
+	findIndex,
+	flow,
+	sortBy,
+	groupBy,
+	isEmpty,
+	orderBy,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -55,7 +63,10 @@ export function BlockTypesTab( {
 	}, [ filterValue, items, categories, collections ] );
 
 	const suggestedItems = useMemo( () => {
-		return items.slice( 0, MAX_SUGGESTED_ITEMS );
+		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
+			0,
+			MAX_SUGGESTED_ITEMS
+		);
 	}, [ items ] );
 
 	const uncategorizedItems = useMemo( () => {
@@ -81,7 +92,7 @@ export function BlockTypesTab( {
 	}, [ filteredItems, categories ] );
 
 	const itemsPerCollection = useMemo( () => {
-		// Create a new Object to avoid mutating collection
+		// Create a new Object to avoid mutating collection.
 		const result = { ...collections };
 		Object.keys( collections ).forEach( ( namespace ) => {
 			result[ namespace ] = filteredItems.filter(
@@ -95,7 +106,10 @@ export function BlockTypesTab( {
 		return result;
 	}, [ filteredItems, collections ] );
 
-	// Announce search results on change
+	// Hide block preview on unmount.
+	useEffect( () => () => onHover( null ), [] );
+
+	// Announce search results on change.
 	useEffect( () => {
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
@@ -118,6 +132,7 @@ export function BlockTypesTab( {
 						items={ filteredItems }
 						onSelect={ onSelectItem }
 						onHover={ onHover }
+						label={ __( 'Child Blocks' ) }
 					/>
 				</ChildBlocks>
 			) }
@@ -131,6 +146,7 @@ export function BlockTypesTab( {
 							items={ suggestedItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
+							label={ _x( 'Most used', 'blocks' ) }
 						/>
 					</InserterPanel>
 				) }
@@ -151,6 +167,7 @@ export function BlockTypesTab( {
 								items={ categoryItems }
 								onSelect={ onSelectItem }
 								onHover={ onHover }
+								label={ category.title }
 							/>
 						</InserterPanel>
 					);
@@ -165,6 +182,7 @@ export function BlockTypesTab( {
 						items={ uncategorizedItems }
 						onSelect={ onSelectItem }
 						onHover={ onHover }
+						label={ __( 'Uncategorized' ) }
 					/>
 				</InserterPanel>
 			) }
@@ -186,6 +204,7 @@ export function BlockTypesTab( {
 								items={ collectionItems }
 								onSelect={ onSelectItem }
 								onHover={ onHover }
+								label={ collection.title }
 							/>
 						</InserterPanel>
 					);

@@ -22,8 +22,12 @@ import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import BlockDraggable from '../block-draggable';
 import { useShowMoversGestures, useToggleBlockHighlight } from './utils';
+import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
-export default function BlockToolbar( { hideDragHandle } ) {
+export default function BlockToolbar( {
+	hideDragHandle,
+	__experimentalExpandedControl = false,
+} ) {
 	const {
 		blockClientIds,
 		blockClientId,
@@ -94,11 +98,16 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		shouldShowMovers && 'is-showing-movers'
 	);
 
+	const Wrapper = __experimentalExpandedControl
+		? ExpandedBlockControlsContainer
+		: 'div';
+
 	return (
-		<div className={ classes }>
+		<Wrapper className={ classes }>
 			<div
 				className="block-editor-block-toolbar__mover-switcher-container"
 				ref={ nodeRef }
+				{ ...showMoversGestures }
 			>
 				{ ! isMultiToolbar && (
 					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
@@ -117,7 +126,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 							onDraggableEnd,
 						} ) => (
 							<div
-								{ ...showMoversGestures }
 								className="block-editor-block-toolbar__block-switcher-wrapper"
 								draggable={ isDraggable && ! hideDragHandle }
 								onDragStart={ onDraggableStart }
@@ -143,6 +151,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</div>
+		</Wrapper>
 	);
 }

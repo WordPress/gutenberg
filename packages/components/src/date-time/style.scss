@@ -186,6 +186,13 @@
 	}
 }
 
+.components-datetime__timezone {
+	color: $dark-gray-500;
+	line-height: 30px;
+	margin-left: $grid-unit-05;
+	text-decoration: underline dotted;
+}
+
 .components-datetime__time-legend {
 	font-weight: 600;
 	margin-top: 0.5em;

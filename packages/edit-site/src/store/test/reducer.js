@@ -13,8 +13,6 @@ import {
 	templateId,
 	templatePartId,
 	templateType,
-	templateIds,
-	templatePartIds,
 	page,
 	showOnFront,
 } from '../reducer';
@@ -100,15 +98,6 @@ describe( 'state', () => {
 			).toEqual( 2 );
 		} );
 
-		it( 'should update when a template is added', () => {
-			expect(
-				templateId( 1, {
-					type: 'ADD_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( 2 );
-		} );
-
 		it( 'should update when a page is set', () => {
 			expect(
 				templateId( 1, {
@@ -157,14 +146,6 @@ describe( 'state', () => {
 			).toEqual( 'wp_template' );
 		} );
 
-		it( 'should update when a template is added', () => {
-			expect(
-				templateType( undefined, {
-					type: 'ADD_TEMPLATE',
-				} )
-			).toEqual( 'wp_template' );
-		} );
-
 		it( 'should update when a page is set', () => {
 			expect(
 				templateType( undefined, {
@@ -179,52 +160,6 @@ describe( 'state', () => {
 					type: 'SET_TEMPLATE_PART',
 				} )
 			).toEqual( 'wp_template_part' );
-		} );
-	} );
-
-	describe( 'templateIds()', () => {
-		it( 'should apply default state', () => {
-			expect( templateIds( undefined, {} ) ).toEqual( [] );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templateIds( state, {} ) ).toBe( state );
-		} );
-
-		it( 'should add template IDs', () => {
-			expect(
-				templateIds( deepFreeze( [ 1 ] ), {
-					type: 'ADD_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( [ 1, 2 ] );
-		} );
-
-		it( 'should remove template IDs', () => {
-			expect(
-				templateIds( deepFreeze( [ 1, 2 ] ), {
-					type: 'REMOVE_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( [ 1 ] );
-			expect(
-				templateIds( deepFreeze( [ 1, 2 ] ), {
-					type: 'REMOVE_TEMPLATE',
-					templateId: 1,
-				} )
-			).toEqual( [ 2 ] );
-		} );
-	} );
-
-	describe( 'templatePartIds()', () => {
-		it( 'should apply default state', () => {
-			expect( templatePartIds( undefined, {} ) ).toEqual( [] );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templatePartIds( state, {} ) ).toBe( state );
 		} );
 	} );
 

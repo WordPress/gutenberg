@@ -475,6 +475,11 @@ class RCTAztecView: Aztec.TextView {
 
     @objc
     func setContents(_ contents: NSDictionary) {
+
+        if let hexString = contents["linkTextColor"] as? String, let linkColor = UIColor(hexString: hexString), linkTextColor != linkColor {
+            linkTextColor = linkColor
+        }
+
         guard contents["eventCount"] == nil else {
             return
         }
@@ -535,7 +540,7 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    @objc var linkTextColor: UIColor {
+    var linkTextColor: UIColor {
         set {
             linkTextAttributes = [.foregroundColor: newValue, .underlineStyle: NSNumber(value: NSUnderlineStyle.single.rawValue)]
         }
