@@ -39,6 +39,9 @@ function ColorPalette( {
 	currentSegment,
 	onCustomPress,
 	shouldEnableBottomSheetScroll,
+	shouldShowCustomIndicatorOption = true,
+	shouldShowCustomLabel = true,
+	customColorIndicatorStyles,
 } ) {
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
@@ -65,7 +68,8 @@ function ColorPalette( {
 		: customSwatchGradients;
 	const isCustomGradientColor = isGradientColor && isSelectedCustom();
 	const shouldShowCustomIndicator =
-		! isGradientSegment || isCustomGradientColor;
+		shouldShowCustomIndicatorOption &&
+		( ! isGradientSegment || isCustomGradientColor );
 
 	const accessibilityHint = isGradientSegment
 		? __( 'Navigates to customize the gradient' )
@@ -220,7 +224,10 @@ function ColorPalette( {
 								color={ color }
 								isSelected={ isSelected( color ) }
 								opacity={ opacity }
-								style={ styles.colorIndicator }
+								style={ [
+									styles.colorIndicator,
+									customColorIndicatorStyles,
+								] }
 							/>
 						</Animated.View>
 					</TouchableWithoutFeedback>
@@ -243,13 +250,18 @@ function ColorPalette( {
 								withCustomPicker={ ! isGradientSegment }
 								color={ customIndicatorColor }
 								isSelected={ isSelectedCustom() }
-								style={ styles.colorIndicator }
+								style={ [
+									styles.colorIndicator,
+									customColorIndicatorStyles,
+								] }
 							/>
-							<Text style={ customTextStyle }>
-								{ isIOS
-									? customText
-									: customText.toUpperCase() }
-							</Text>
+							{ shouldShowCustomLabel && (
+								<Text style={ customTextStyle }>
+									{ isIOS
+										? customText
+										: customText.toUpperCase() }
+								</Text>
+							) }
 						</View>
 					</TouchableWithoutFeedback>
 				</View>
