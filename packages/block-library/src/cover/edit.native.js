@@ -271,7 +271,7 @@ const Cover = ( {
 
 	const colorPickerControls = (
 		<InspectorControls>
-			<BottomSheetConsumer>
+			<BottomSheetConsumer dontCount={ true }>
 				{ ( {
 					shouldEnableBottomSheetScroll,
 					shouldDisableBottomSheetMaxHeight,
@@ -292,6 +292,7 @@ const Cover = ( {
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
+						bottomLabelText={ __( 'Select a color' ) }
 						dontCount={ true }
 					/>
 				) }
