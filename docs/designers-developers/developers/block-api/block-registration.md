@@ -203,7 +203,7 @@ example: {
             content: __(
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
             ),
-        }
+        },
     },
     ],
 },
