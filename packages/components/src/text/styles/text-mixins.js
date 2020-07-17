@@ -150,10 +150,10 @@ const variant = ( variantName = 'body' ) => {
 		case 'caption':
 			return caption;
 
-        case 'helpertext':
+		case 'helpertext':
 			return helperText;
 
-        case 'label':
+		case 'label':
 			return css`
 				${ label }
 			`;
@@ -163,8 +163,8 @@ const variant = ( variantName = 'body' ) => {
 				${ labelSemibold }
 			`;
 
-        case 'sectionheading':
-    		return sectionHeading;
+		case 'sectionheading':
+			return sectionHeading;
 	}
 };
 
