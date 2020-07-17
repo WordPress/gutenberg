@@ -16,19 +16,15 @@ import SvgIconCustomize from './icon-customize';
 import styles from './style.scss';
 
 const ImageEditingButton = ( {
-	isSelected,
-	isUploadFailed,
-	isUploadInProgress,
+	onRemove,
 	onSelectMediaUploadOption,
 	openMediaOptions,
 	url,
 } ) => {
-	if ( ! isSelected || ! url || isUploadInProgress || isUploadFailed ) {
-		return null;
-	}
 	return (
 		<MediaEdit
 			onSelect={ onSelectMediaUploadOption }
+			onRemove={ onRemove }
 			source={ { uri: url } }
 			openReplaceMediaOptions={ openMediaOptions }
 			render={ ( { open, mediaOptions } ) => (

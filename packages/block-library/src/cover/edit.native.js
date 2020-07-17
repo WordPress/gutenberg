@@ -167,6 +167,11 @@ const Cover = ( {
 		setIsVideoLoading( false );
 	};
 
+	const onClearMedia = () => {
+		setAttributes( { id: undefined, url: undefined } );
+		closeSettingsBottomSheet();
+	};
+
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
 		styles.backgroundSolidDark
@@ -184,7 +189,10 @@ const Cover = ( {
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url ? backgroundColor : {},
-		isParentSelected && styles.overlaySelected,
+		isParentSelected &&
+			! isUploadInProgress &&
+			! didUploadFail &&
+			styles.overlaySelected,
 	];
 
 	const placeholderIconStyle = getStylesFromColorScheme(
@@ -242,28 +250,25 @@ const Cover = ( {
 						leftAlign
 						label={ __( 'Clear Media' ) }
 						labelStyle={ styles.clearMediaButton }
-						onPress={ () => {
-							setAttributes( { id: undefined, url: undefined } );
-							closeSettingsBottomSheet();
-						} }
+						onPress={ onClearMedia }
 					/>
 				</PanelBody>
 			) : null }
 		</InspectorControls>
 	);
 
-	const renderBackground = ( openMediaOptions, getMediaOptions ) => (
+	const renderBackground = ( getMediaOptions ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
 			onPress={ onMediaPressed }
-			onLongPress={ openMediaOptions }
+			onLongPress={ openMediaOptionsRef.current }
 			disabled={ ! isParentSelected }
 		>
 			<View style={ [ styles.background, backgroundColor ] }>
 				{ getMediaOptions() }
 				{ isParentSelected &&
 					backgroundType === VIDEO_BACKGROUND_TYPE &&
-					toolbarControls( openMediaOptions ) }
+					toolbarControls( openMediaOptionsRef.current ) }
 				<MediaUploadProgress
 					mediaId={ id }
 					onUpdateMediaProgress={ () => {
@@ -303,7 +308,7 @@ const Cover = ( {
 							isUploadFailed={ didUploadFail }
 							isUploadInProgress={ isUploadInProgress }
 							onSelectMediaUploadOption={ onSelectMedia }
-							openMediaOptions={ openMediaOptions }
+							openMediaOptions={ openMediaOptionsRef.current }
 							url={ url }
 						/>
 					</View>
@@ -349,18 +354,20 @@ const Cover = ( {
 		<View style={ styles.backgroundContainer }>
 			{ controls }
 
-			{ openMediaOptionsRef?.current && (
-				<View style={ styles.imageEditButton }>
-					<ImageEditingButton
-						isSelected={ isParentSelected }
-						isUploadFailed={ didUploadFail }
-						isUploadInProgress={ isUploadInProgress }
-						onSelectMediaUploadOption={ onSelectMedia }
-						openMediaOptions={ openMediaOptionsRef?.current }
-						url={ url }
-					/>
-				</View>
-			) }
+			{ url &&
+				openMediaOptionsRef.current &&
+				isParentSelected &&
+				! isUploadInProgress &&
+				! didUploadFail && (
+					<View style={ styles.imageEditButton }>
+						<ImageEditingButton
+							onRemove={ onClearMedia }
+							onSelectMediaUploadOption={ onSelectMedia }
+							openMediaOptions={ openMediaOptionsRef.current }
+							url={ url }
+						/>
+					</View>
+				) }
 
 			<View
 				pointerEvents="box-none"
@@ -386,7 +393,7 @@ const Cover = ( {
 				onSelect={ onSelectMedia }
 				render={ ( { open, getMediaOptions } ) => {
 					openMediaOptionsRef.current = open;
-					return renderBackground( open, getMediaOptions );
+					return renderBackground( getMediaOptions );
 				} }
 			/>
 

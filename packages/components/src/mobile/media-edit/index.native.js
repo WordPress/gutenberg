@@ -2,13 +2,13 @@
  * External dependencies
  */
 import React from 'react';
+import { compact } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
-import { update, brush } from '@wordpress/icons';
 import {
 	requestMediaEditor,
 	mediaSources,
@@ -23,7 +23,6 @@ const editOption = {
 	value: MEDIA_EDITOR,
 	label: __( 'Edit' ),
 	types: [ MEDIA_TYPE_IMAGE ],
-	icon: brush,
 };
 
 const replaceOption = {
@@ -31,20 +30,31 @@ const replaceOption = {
 	value: mediaSources.deviceLibrary,
 	label: __( 'Replace' ),
 	types: [ MEDIA_TYPE_IMAGE ],
-	icon: update,
 };
 
-const options = [ editOption, replaceOption ];
+const removeOption = {
+	id: 'removeOption',
+	label: __( 'Remove' ),
+	value: 'removeOption',
+	separated: true,
+};
 
 export class MediaEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
+		this.getMediaOptionsItems = this.getMediaOptionsItems.bind( this );
 	}
 
 	getMediaOptionsItems() {
-		return options;
+		const { onRemove } = this.props;
+
+		return compact( [
+			editOption,
+			replaceOption,
+			onRemove && removeOption,
+		] );
 	}
 
 	onPickerPresent() {
@@ -54,7 +64,7 @@ export class MediaEdit extends React.Component {
 	}
 
 	onPickerSelect( value ) {
-		const { onSelect, multiple = false } = this.props;
+		const { onSelect, onRemove, multiple = false } = this.props;
 
 		switch ( value ) {
 			case MEDIA_EDITOR:
@@ -64,18 +74,28 @@ export class MediaEdit extends React.Component {
 					}
 				} );
 				break;
+			case removeOption.value:
+				onRemove();
+				break;
 			default:
 				this.props.openReplaceMediaOptions();
 		}
 	}
 
 	render() {
+		const { onRemove } = this.props;
+		const options = this.getMediaOptionsItems();
+
 		const mediaOptions = () => (
 			<Picker
 				hideCancelButton
 				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
+				leftAlign={ true }
 				onChange={ this.onPickerSelect }
+				// translators: %s: block title e.g: "Paragraph".
+				title={ __( 'Media options' ) }
+				destructiveButtonIndex={ onRemove && options.length }
 			/>
 		);
 
