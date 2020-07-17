@@ -209,6 +209,7 @@ if (buildGutenbergMobileJSBundle) {
         def origWithPath = "$mobileGutenbergRootDir/bundle/android/${bundleOutputFilename}"
 
         outputs.file(origWithPath)
+        outputs.cacheIf { true }
 
         doLast {
             println "Deleting extracted RN tools and node_modules"
@@ -265,6 +266,8 @@ if (buildGutenbergMobileJSBundle) {
             }
             true
         }
+
+        outputs.cacheIf { true }
 
         doLast {
             println "Done copying the Android JS bundle to assets folder"
