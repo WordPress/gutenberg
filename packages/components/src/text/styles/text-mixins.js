@@ -5,6 +5,7 @@ import { fontFamily } from './font-family';
 import css from './emotion-css';
 
 const fontWeightNormal = `font-weight: 400;`;
+const fontWeightMedium = `font-weight: 500;`;
 const fontWeightSemibold = `font-weight: 600;`;
 
 const title = `
@@ -28,8 +29,8 @@ const titleSmall = `
 
 const subtitle = `
 	${ fontWeightSemibold }
-	font-size: 14px;
-	line-height: 20px;
+	font-size: 16px;
+	line-height: 24px;
 `;
 
 const subtitleLarge = `
@@ -52,14 +53,14 @@ const bodyLarge = `
 `;
 
 const bodySmall = `
-	font-size: 14px;
-	line-height: 20px;
+	font-size: 12px;
+	line-height: 1.4;
 `;
 
 const button = `
-  ${ fontWeightSemibold }
-  font-size: 14px;
-  line-height: 20px;
+    ${ fontWeightNormal }
+    font-size: 13px;
+    line-height: 13px;
 `;
 
 const caption = `
@@ -68,14 +69,32 @@ const caption = `
 	line-height: 16px;
 `;
 
+const helperText = `
+    ${ fontWeightNormal }
+    font-size: 12px;
+    line-height: 1.4em;
+    font-style: italic;
+`;
+
 const label = `
+    ${ fontWeightNormal }
+    font-size: 13px;
+    line-height: 1.4em;
+`;
+
+const labelSemibold = `
 	${ fontWeightSemibold }
-	font-size: 12px;
-	line-height: 16px;
+`;
+
+const sectionHeading = `
+	${ fontWeightMedium }
+    font-size: 11px;
+    line-height: 1.4;
+    text-transform: uppercase;
 `;
 
 /**
- * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.large'|'body.small'|'button'|'caption'|'label'} TextVariant
+ * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.large'|'body.small'|'button'|'caption'|'helpertext'|'label'|'label.semibold'|'sectionheading'} TextVariant
  */
 
 /**
@@ -131,8 +150,21 @@ const variant = ( variantName = 'body' ) => {
 		case 'caption':
 			return caption;
 
-		case 'label':
-			return label;
+        case 'helpertext':
+			return helperText;
+
+        case 'label':
+			return css`
+				${ label }
+			`;
+		case 'label.semibold':
+			return css`
+				${ label }
+				${ labelSemibold }
+			`;
+
+        case 'sectionheading':
+    		return sectionHeading;
 	}
 };
 
