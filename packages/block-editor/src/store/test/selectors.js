@@ -55,6 +55,7 @@ const {
 	isBlockInsertionPointVisible,
 	isSelectionEnabled,
 	canInsertBlockType,
+	canInsertBlocks,
 	getInserterItems,
 	isValidTemplate,
 	getTemplate,
@@ -2276,6 +2277,59 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'canInsertBlocks', () => {
+		it( 'should allow blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						1: { name: 'core/test-block-a' },
+						2: { name: 'core/test-block-b' },
+						3: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						1: {},
+						2: {},
+						3: {},
+					},
+				},
+				blockListSettings: {
+					1: {
+						allowedBlocks: [
+							'core/test-block-b',
+							'core/test-block-c',
+						],
+					},
+				},
+				settings: {},
+			};
+			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( true );
+		} );
+
+		it( 'should deny blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						1: { name: 'core/test-block-a' },
+						2: { name: 'core/test-block-b' },
+						3: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						1: {},
+						2: {},
+						3: {},
+					},
+				},
+				blockListSettings: {
+					1: {
+						allowedBlocks: [ 'core/test-block-c' ],
+					},
+				},
+				settings: {},
+			};
+			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'getInserterItems', () => {
 		it( 'should properly list block type and reusable block items', () => {
 			const state = {
@@ -2340,54 +2394,6 @@ describe( 'selectors', () => {
 				utility: 1,
 				frecency: 0,
 			} );
-		} );
-
-		it( 'should order items by descending frecency', () => {
-			const state = {
-				blocks: {
-					byClientId: {},
-					attributes: {},
-					order: {},
-					parents: {},
-					cache: {},
-				},
-				settings: {
-					__experimentalReusableBlocks: [
-						{
-							id: 1,
-							isTemporary: false,
-							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
-						},
-						{
-							id: 2,
-							isTemporary: false,
-							clientId: 'block2',
-							title: 'Reusable Block 2',
-							content: '<!-- /wp:test-block-b -->',
-						},
-					],
-				},
-				preferences: {
-					insertUsage: {
-						'core/block/1': { count: 10, time: 1000 },
-						'core/block/2': { count: 20, time: 1000 },
-					},
-				},
-				blockListSettings: {},
-			};
-			const itemIDs = getInserterItems( state ).map(
-				( item ) => item.id
-			);
-			expect( itemIDs ).toEqual( [
-				'core/block/2',
-				'core/block/1',
-				'core/test-block-a',
-				'core/test-block-b',
-				'core/test-freeform',
-				'core/post-content-child',
-			] );
 		} );
 
 		it( 'should correctly cache the return values', () => {

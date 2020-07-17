@@ -2,25 +2,28 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
-import {
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-	mediaUploadSync,
-} from 'react-native-gutenberg-bridge';
 import Video from 'react-native-video';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import {
 	Icon,
 	ImageWithFocalPoint,
 	PanelBody,
 	RangeControl,
+	BottomSheet,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
+	ColorPalette,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -35,7 +38,7 @@ import {
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
@@ -75,6 +78,8 @@ const Cover = ( {
 	onFocus,
 	overlayColor,
 	setAttributes,
+	settings,
+	closeSettingsBottomSheet,
 } ) => {
 	const {
 		backgroundType,
@@ -87,6 +92,11 @@ const Cover = ( {
 		customOverlayColor,
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const THEME_COLORS_COUNT = 4;
+	const coverDefaultPalette = {
+		colors: settings.colors.slice( 0, THEME_COLORS_COUNT ),
+	};
 
 	const { gradientValue } = __experimentalUseGradient();
 
@@ -127,8 +137,6 @@ const Cover = ( {
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
 		const onSelect = attributesFromMedia( setAttributes );
-		// Remove gradient attribute
-		setAttributes( { gradient: undefined, customGradient: undefined } );
 		onSelect( media );
 	};
 
@@ -159,6 +167,16 @@ const Cover = ( {
 	const onVideoLoad = () => {
 		setIsVideoLoading( false );
 	};
+
+	function setColor( color ) {
+		setAttributes( {
+			// clear all related attributes (only one should be set)
+			overlayColor: undefined,
+			customOverlayColor: color,
+			gradient: undefined,
+			customGradient: undefined,
+		} );
+	}
 
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
@@ -204,6 +222,19 @@ const Cover = ( {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
+			{ url ? (
+				<PanelBody>
+					<RangeControl
+						label={ __( 'Opacity' ) }
+						minimumValue={ 0 }
+						maximumValue={ 100 }
+						value={ dimRatio }
+						onChange={ onOpactiyChange }
+						style={ styles.rangeCellContainer }
+						separatorType={ 'topFullWidth' }
+					/>
+				</PanelBody>
+			) : null }
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<RangeControl
 					label={ __( 'Minimum height in pixels' ) }
@@ -214,15 +245,17 @@ const Cover = ( {
 					style={ styles.rangeCellContainer }
 				/>
 			</PanelBody>
+
 			{ url ? (
-				<PanelBody title={ __( 'Overlay' ) }>
-					<RangeControl
-						label={ __( 'Background Opacity' ) }
-						minimumValue={ 0 }
-						maximumValue={ 100 }
-						value={ dimRatio }
-						onChange={ onOpactiyChange }
-						style={ styles.rangeCellContainer }
+				<PanelBody title={ __( 'Media' ) }>
+					<BottomSheet.Cell
+						leftAlign
+						label={ __( 'Clear Media' ) }
+						labelStyle={ styles.clearMediaButton }
+						onPress={ () => {
+							setAttributes( { id: undefined, url: undefined } );
+							closeSettingsBottomSheet();
+						} }
 					/>
 				</PanelBody>
 			) : null }
@@ -299,6 +332,7 @@ const Cover = ( {
 		return (
 			<View>
 				<MediaPlaceholder
+					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -306,7 +340,20 @@ const Cover = ( {
 					onSelect={ onSelectMedia }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onFocus={ onFocus }
-				/>
+				>
+					<View style={ styles.colorPaletteWrapper }>
+						<ColorPalette
+							customColorIndicatorStyles={
+								styles.paletteColorIndicator
+							}
+							setColor={ setColor }
+							onCustomPress={ noop }
+							defaultSettings={ coverDefaultPalette }
+							shouldShowCustomIndicatorOption={ false }
+							shouldShowCustomLabel={ false }
+						/>
+					</View>
+				</MediaPlaceholder>
 			</View>
 		);
 	}
@@ -333,6 +380,7 @@ const Cover = ( {
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				isReplacingMedia={ true }
 				onSelect={ onSelectMedia }
 				render={ renderBackground }
 			/>
@@ -361,9 +409,20 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
+		const { getSettings } = select( 'core/block-editor' );
+
 		return {
+			settings: getSettings(),
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
+		};
+	} ),
+
 	withPreferredColorScheme,
 ] )( Cover );

@@ -156,6 +156,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is false 1`] = `
           value="00"
         />
       </div>
+      <TimeZone />
     </div>
   </fieldset>
 </div>
@@ -337,6 +338,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
           PM
         </ForwardRef(Button)>
       </ForwardRef(ButtonGroup)>
+      <TimeZone />
     </div>
   </fieldset>
 </div>
@@ -518,6 +520,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
           PM
         </ForwardRef(Button)>
       </ForwardRef(ButtonGroup)>
+      <TimeZone />
     </div>
   </fieldset>
 </div>
@@ -679,6 +682,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is undefined 1`]
           value="00"
         />
       </div>
+      <TimeZone />
     </div>
   </fieldset>
 </div>

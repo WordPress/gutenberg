@@ -34,14 +34,14 @@ As seen in the above example, it is recommended that you include a namespace as 
 
 ### Consuming Block Context
 
-A block can inherit a context value from an ancestor provider by assigning a `context` property in its registered settings. This should be assigned as an array of the context names the block seeks to inherit.
+A block can inherit a context value from an ancestor provider by assigning a `usesContext` property in its registered settings. This should be assigned as an array of the context names the block seeks to inherit.
 
 `record-title/block.json`
 
 ```json
 {
 	"name": "my-plugin/record-title",
-	"context": [ "my-plugin/recordId" ]
+	"usesContext": [ "my-plugin/recordId" ]
 }
 ```
 

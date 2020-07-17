@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Button,
+	ToolbarButton,
 	Dropdown,
 	ToolbarGroup,
 	SVG,
@@ -62,7 +62,7 @@ const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( {
 
 	return (
 		<ToolbarGroup>
-			<Button
+			<ToolbarButton
 				className="components-toolbar__control block-library-colors-selector__toggle"
 				label={ __( 'Open Colors Selector' ) }
 				onClick={ onToggle }

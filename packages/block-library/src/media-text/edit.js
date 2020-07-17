@@ -14,6 +14,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	InspectorControls,
+	__experimentalBlock as Block,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
 import {
@@ -107,7 +108,7 @@ function attributesFromMedia( {
 	};
 }
 
-function MediaTextEdit( { attributes, className, isSelected, setAttributes } ) {
+function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const {
 		focalPoint,
 		href,
@@ -150,7 +151,7 @@ function MediaTextEdit( { attributes, className, isSelected, setAttributes } ) {
 		setTemporaryMediaWidth( applyWidthConstraints( width ) );
 	};
 
-	const classNames = classnames( className, {
+	const classNames = classnames( {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-selected': isSelected,
 		'is-stacked-on-mobile': isStackedOnMobile,
@@ -263,7 +264,7 @@ function MediaTextEdit( { attributes, className, isSelected, setAttributes } ) {
 					</ToolbarGroup>
 				) }
 			</BlockControls>
-			<div className={ classNames } style={ style }>
+			<Block.div className={ classNames } style={ style }>
 				<MediaContainer
 					className="wp-block-media-text__media"
 					onSelectMedia={ onSelectMedia }
@@ -283,10 +284,14 @@ function MediaTextEdit( { attributes, className, isSelected, setAttributes } ) {
 					} }
 				/>
 				<InnerBlocks
+					__experimentalTagName="div"
+					__experimentalPassedProps={ {
+						className: 'wp-block-media-text__content',
+					} }
 					template={ TEMPLATE }
 					templateInsertUpdatesSelection={ false }
 				/>
-			</div>
+			</Block.div>
 		</>
 	);
 }

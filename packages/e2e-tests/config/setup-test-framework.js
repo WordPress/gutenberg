@@ -12,11 +12,8 @@ import {
 	enablePageDialogAccept,
 	isOfflineMode,
 	setBrowserViewport,
-	switchUserToAdmin,
-	switchUserToTest,
-	visitAdminPage,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Timeout, in seconds, that the test should be allowed to run.
@@ -65,40 +62,6 @@ jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 async function setupBrowser() {
 	await clearLocalStorage();
 	await setBrowserViewport( 'large' );
-}
-
-/**
- * Navigates to the post listing screen and bulk-trashes any posts which exist.
- *
- * @param {string} postType - String slug for type of post to trash.
- *
- * @return {Promise} Promise resolving once posts have been trashed.
- */
-export async function trashExistingPosts( postType = 'post' ) {
-	await switchUserToAdmin();
-	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
-	const query = addQueryArgs( '', {
-		post_type: postType,
-	} ).slice( 1 );
-	await visitAdminPage( 'edit.php', query );
-
-	// If this selector doesn't exist there are no posts for us to delete.
-	const bulkSelector = await page.$( '#bulk-action-selector-top' );
-	if ( ! bulkSelector ) {
-		return;
-	}
-
-	// Select all posts.
-	await page.waitForSelector( '[id^=cb-select-all-]' );
-	await page.click( '[id^=cb-select-all-]' );
-	// Select the "bulk actions" > "trash" option.
-	await page.select( '#bulk-action-selector-top', 'trash' );
-	// Submit the form to send all draft/scheduled/published posts to the trash.
-	await page.click( '#doaction' );
-	await page.waitForXPath(
-		'//*[contains(@class, "updated notice")]/p[contains(text(), "moved to the Trash.")]'
-	);
-	await switchUserToTest();
 }
 
 /**
@@ -163,14 +126,6 @@ function observeConsoleLogging() {
 			text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) &&
 			isOfflineMode()
 		) {
-			return;
-		}
-
-		// As of WordPress 5.3.2 in Chrome 79, navigating to the block editor
-		// (Posts > Add New) will display a console warning about
-		// non - unique IDs.
-		// See: https://core.trac.wordpress.org/ticket/23165
-		if ( text.includes( 'elements with non-unique id #_wpnonce' ) ) {
 			return;
 		}
 
@@ -289,7 +244,8 @@ beforeAll( async () => {
 	observeConsoleLogging();
 	await simulateAdverseConditions();
 
-	await trashExistingPosts();
+	await trashAllPosts();
+	await trashAllPosts( 'wp_block' );
 	await setupBrowser();
 	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
 } );

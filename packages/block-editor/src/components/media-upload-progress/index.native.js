@@ -3,18 +3,17 @@
  */
 import React from 'react';
 import { View } from 'react-native';
-import { subscribeMediaUpload } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
  */
-import ImageSize from './image-size';
 import styles from './styles.scss';
 
 export const MEDIA_UPLOAD_STATE_UPLOADING = 1;
@@ -117,12 +116,7 @@ export class MediaUploadProgress extends React.Component {
 	}
 
 	render() {
-		const {
-			coverUrl,
-			width,
-			height,
-			renderContent = () => {},
-		} = this.props;
+		const { renderContent = () => null } = this.props;
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
@@ -138,46 +132,11 @@ export class MediaUploadProgress extends React.Component {
 						<Spinner progress={ progress } />
 					</View>
 				) }
-				{ coverUrl && (
-					<ImageSize src={ coverUrl }>
-						{ ( sizes ) => {
-							const {
-								imageWidthWithinContainer,
-								imageHeightWithinContainer,
-							} = sizes;
-
-							let finalHeight = imageHeightWithinContainer;
-							if (
-								height > 0 &&
-								height < imageHeightWithinContainer
-							) {
-								finalHeight = height;
-							}
-
-							let finalWidth = imageWidthWithinContainer;
-							if (
-								width > 0 &&
-								width < imageWidthWithinContainer
-							) {
-								finalWidth = width;
-							}
-							return renderContent( {
-								isUploadInProgress,
-								isUploadFailed,
-								finalWidth,
-								finalHeight,
-								imageWidthWithinContainer,
-								retryMessage,
-							} );
-						} }
-					</ImageSize>
-				) }
-				{ ! coverUrl &&
-					renderContent( {
-						isUploadInProgress,
-						isUploadFailed,
-						retryMessage,
-					} ) }
+				{ renderContent( {
+					isUploadInProgress,
+					isUploadFailed,
+					retryMessage,
+				} ) }
 			</View>
 		);
 	}

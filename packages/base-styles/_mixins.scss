@@ -129,7 +129,7 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $medium-gray-text;
+	border: $border-width solid $gray-700;
 	@include reduce-motion("transition");
 }
 
@@ -259,55 +259,57 @@
 
 	// Use opacity to work in various editor styles.
 	&::-webkit-input-placeholder {
-		color: $dark-opacity-300;
+		color: $dark-gray-placeholder;
 	}
 
 	&::-moz-placeholder {
 		opacity: 1; // Necessary because Firefox reduces this from 1.
-		color: $dark-opacity-300;
+		color: $dark-gray-placeholder;
 	}
 
 	&:-ms-input-placeholder {
-		color: $dark-opacity-300;
+		color: $dark-gray-placeholder;
 	}
 
 	.is-dark-theme & {
 		&::-webkit-input-placeholder {
-			color: $light-opacity-300;
+			color: $light-gray-placeholder;
 		}
 
 		&::-moz-placeholder {
 			opacity: 1; // Necessary because Firefox reduces this from 1.
-			color: $light-opacity-300;
+			color: $light-gray-placeholder;
 		}
 
 		&:-ms-input-placeholder {
-			color: $light-opacity-300;
+			color: $light-gray-placeholder;
 		}
 	}
 }
 
 @mixin checkbox-control {
 	@include input-control;
-	border: $border-width + 1 solid $medium-gray-text;
+	border: $border-width solid $gray-900;
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-block-ui;
 
 	&:focus {
-		border-color: $medium-gray-text;
-		box-shadow: 0 0 0 1px $medium-gray-text;
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
 	}
 
 	&:checked {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
-	}
 
-	&:checked:focus {
-		box-shadow: 0 0 0 $border-width-focus $medium-gray-text;
+		// Hide default checkbox styles in IE.
+		&::-ms-check {
+			opacity: 0;
+		}
 	}
-
 
 	&:checked::before,
 	&[aria-checked="mixed"]::before {
@@ -343,45 +345,43 @@
 				font-size: 21px;
 			}
 		}
-
-		&:focus {
-			box-shadow: 0 0 0 $border-width-focus $dark-gray-500;
-		}
 	}
 }
 
 @mixin radio-control {
 	@include input-control;
-	border: $border-width + 1 solid $medium-gray-text;
+	border: $border-width solid $gray-900;
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-round;
 
 	&:checked::before {
-		width: 6px;
-		height: 6px;
-		margin: 6px 0 0 6px;
+		width: 7px;
+		height: 7px;
+		margin: 8px 0 0 8px;
 		background-color: $white;
 
+		// This border serves as a background color in Windows High Contrast mode.
+		border: 3px solid $white;
+
 		@include break-medium() {
-			margin: 3px 0 0 3px;
+			width: 6px;
+			height: 6px;
+			margin: 4px 0 0 4px;
 		}
 	}
 
 	&:focus {
-		border-color: $medium-gray-text;
-		box-shadow: 0 0 0 1px $medium-gray-text;
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
 	}
 
 	&:checked {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
 	}
-
-	&:checked:focus {
-		box-shadow: 0 0 0 $border-width-focus $medium-gray-text;
-	}
-
 }
 
 /**
@@ -441,18 +441,18 @@
 @mixin admin-scheme($color-primary) {
 	--wp-admin-theme-color: #{$color-primary};
 
-	// Ideally, we should limit these computed variables,
-	// because we can"t compute colors based on CSS variables.
-	// This requires refactoring some existing styles.
-	--wp-admin-theme-color-darker-20: #{darken($color-primary, 20%)};
-	--wp-admin-theme-color-darker-10: #{darken($color-primary, 10%)};
-	--wp-admin-theme-color-lighter-10: #{lighten($color-primary, 10%)};
-	--wp-admin-theme-color-lighter-40: #{lighten($color-primary, 40%)};
+	// Darker shades.
+	--wp-admin-theme-color-darker-10: #{darken($color-primary, 5%)};
+	--wp-admin-theme-color-darker-20: #{darken($color-primary, 10%)};
 }
 
 @mixin wordpress-admin-schemes() {
 	body.admin-color-light {
 		@include admin-scheme(#0085ba);
+	}
+
+	body.admin-color-modern {
+		@include admin-scheme(#3858e9);
 	}
 
 	body.admin-color-blue {

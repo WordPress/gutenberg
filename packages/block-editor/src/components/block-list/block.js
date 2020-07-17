@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useMemo } from '@wordpress/element';
+import {
+	useState,
+	createContext,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveElement,
@@ -38,6 +43,30 @@ import { Block } from './block-wrapper';
 
 export const BlockListBlockContext = createContext();
 
+/**
+ * Merges wrapper props with special handling for classNames and styles.
+ *
+ * @param {Object} propsA
+ * @param {Object} propsB
+ *
+ * @return {Object} Merged props.
+ */
+function mergeWrapperProps( propsA, propsB ) {
+	const newProps = {
+		...propsA,
+		...propsB,
+	};
+
+	if ( propsA && propsB && propsA.className && propsB.className ) {
+		newProps.className = classnames( propsA.className, propsB.className );
+	}
+	if ( propsA && propsB && propsA.style && propsB.style ) {
+		newProps.style = { ...propsA.style, ...propsB.style };
+	}
+
+	return newProps;
+}
+
 function BlockListBlock( {
 	mode,
 	isFocusMode,
@@ -64,23 +93,24 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
-	isNavigationMode,
-	isMultiSelecting,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
 	// (editor.BlockListBlock filter)
-	const { isDragging, isHighlighted } = useSelect( ( select ) => {
-		const { isDraggingBlocks, isBlockHighlighted } = select(
-			'core/block-editor'
-		);
-		return {
-			isDragging: isDraggingBlocks(),
-			isHighlighted: isBlockHighlighted( clientId ),
-		};
-	}, [] );
+	const { isDragging, isHighlighted } = useSelect(
+		( select ) => {
+			const { isDraggingBlocks, isBlockHighlighted } = select(
+				'core/block-editor'
+			);
+			return {
+				isDragging: isDraggingBlocks(),
+				isHighlighted: isBlockHighlighted( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 	const { removeBlock } = useDispatch( 'core/block-editor' );
-	const onRemove = () => removeBlock( clientId );
+	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
@@ -96,10 +126,10 @@ function BlockListBlock( {
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
-		wrapperProps = {
-			...wrapperProps,
-			...blockType.getEditWrapperProps( attributes ),
-		};
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
 	}
 
 	const generatedClassName =
@@ -177,8 +207,6 @@ function BlockListBlock( {
 		isSelected,
 		isFirstMultiSelected,
 		isLastMultiSelected,
-		isMultiSelecting,
-		isNavigationMode,
 		isPartOfMultiSelection,
 		enableAnimation,
 		index,
@@ -243,7 +271,6 @@ const applyWithSelect = withSelect(
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
-			isNavigationMode,
 			getMultiSelectedBlockClientIds,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
@@ -289,7 +316,6 @@ const applyWithSelect = withSelect(
 			isSelectionEnabled: isSelectionEnabled(),
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
-			isNavigationMode: isNavigationMode(),
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to

@@ -15,6 +15,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarGroup,
+	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -25,11 +26,13 @@ import {
 	RichText,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
+import { crop, upload } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,11 +40,12 @@ import { createBlock } from '@wordpress/blocks';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import ImageEditor from './image-editor';
+import { isExternalImage } from './edit';
 
 /**
  * Module constants
  */
-import { MIN_SIZE } from './constants';
+import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 
 function getFilename( url ) {
 	const path = getPath( url );
@@ -71,6 +75,9 @@ export default function Image( {
 	isSelected,
 	insertBlocksAfter,
 	onReplace,
+	onSelectImage,
+	onSelectURL,
+	onUploadError,
 	containerRef,
 } ) {
 	const image = useSelect(
@@ -80,25 +87,27 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const {
-		maxWidth,
-		isRTL,
-		imageSizes,
-		__experimentalEnableRichImageEditing,
-	} = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return pick( getSettings(), [
-			'imageSizes',
-			'isRTL',
-			'maxWidth',
-			'__experimentalEnableRichImageEditing',
-		] );
-	} );
+	const { maxWidth, isRTL, imageSizes, mediaUpload } = useSelect(
+		( select ) => {
+			const { getSettings } = select( 'core/block-editor' );
+			return pick( getSettings(), [
+				'imageSizes',
+				'isRTL',
+				'maxWidth',
+				'mediaUpload',
+			] );
+		}
+	);
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { createErrorNotice, createSuccessNotice } = useDispatch(
+		'core/notices'
+	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
+	const [ isEditingImage, setIsEditingImage ] = useState( false );
+	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const imageSizeOptions = map(
@@ -113,6 +122,20 @@ export default function Image( {
 			setCaptionFocused( false );
 		}
 	}, [ isSelected ] );
+
+	// If an image is externally hosted, try to fetch the image data. This may
+	// fail if the image host doesn't allow CORS with the domain. If it works,
+	// we can enable a button in the toolbar to upload the image.
+	useEffect( () => {
+		if ( ! isExternalImage( id, url ) || ! isSelected || externalBlob ) {
+			return;
+		}
+
+		window
+			.fetch( url )
+			.then( ( response ) => response.blob() )
+			.then( ( blob ) => setExternalBlob( blob ) );
+	}, [ id, url, isSelected, externalBlob ] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -168,17 +191,47 @@ export default function Image( {
 		}
 
 		setAttributes( {
-			url,
+			url: newUrl,
 			width: undefined,
 			height: undefined,
 			sizeSlug: newSizeSlug,
 		} );
 	}
 
+	function uploadExternal() {
+		mediaUpload( {
+			filesList: [ externalBlob ],
+			onFileChange( [ img ] ) {
+				onSelectImage( img );
+
+				if ( isBlobURL( img.url ) ) {
+					return;
+				}
+
+				setExternalBlob();
+				createSuccessNotice( __( 'Image uploaded.' ), {
+					type: 'snackbar',
+				} );
+			},
+			allowedTypes: ALLOWED_MEDIA_TYPES,
+			onError( message ) {
+				createErrorNotice( message, { type: 'snackbar' } );
+			},
+		} );
+	}
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingImage( false );
+		}
+	}, [ isSelected ] );
+
+	const canEditImage = id && naturalWidth && naturalHeight;
+
 	const controls = (
 		<>
 			<BlockControls>
-				{ url && (
+				{ ! isEditingImage && (
 					<ToolbarGroup>
 						<ImageURLInputUI
 							url={ href || '' }
@@ -191,6 +244,35 @@ export default function Image( {
 							rel={ rel }
 						/>
 					</ToolbarGroup>
+				) }
+				{ canEditImage && ! isEditingImage && (
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () => setIsEditingImage( true ) }
+							icon={ crop }
+							label={ __( 'Crop' ) }
+						/>
+					</ToolbarGroup>
+				) }
+				{ externalBlob && (
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ uploadExternal }
+							icon={ upload }
+							label={ __( 'Upload external image' ) }
+						/>
+					</ToolbarGroup>
+				) }
+				{ ! isEditingImage && (
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*"
+						onSelect={ onSelectImage }
+						onSelectURL={ onSelectURL }
+						onError={ onUploadError }
+					/>
 				) }
 			</BlockControls>
 			<InspectorControls>
@@ -267,7 +349,6 @@ export default function Image( {
 		// should direct focus to block.
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		<>
-			{ controls }
 			<img
 				src={ url }
 				alt={ defaultedAlt }
@@ -299,7 +380,21 @@ export default function Image( {
 			: naturalHeight;
 	}
 
-	if ( ! isResizable || ! imageWidthWithinContainer ) {
+	if ( canEditImage && isEditingImage ) {
+		img = (
+			<ImageEditor
+				id={ id }
+				url={ url }
+				setAttributes={ setAttributes }
+				naturalWidth={ naturalWidth }
+				naturalHeight={ naturalHeight }
+				width={ width }
+				height={ height }
+				clientWidth={ clientWidth }
+				setIsEditingImage={ setIsEditingImage }
+			/>
+		);
+	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
 		img = <div style={ { width, height } }>{ img }</div>;
 	} else {
 		const currentWidth = width || imageWidthWithinContainer;
@@ -380,21 +475,9 @@ export default function Image( {
 		);
 	}
 
-	if ( __experimentalEnableRichImageEditing ) {
-		img = (
-			<ImageEditor
-				id={ id }
-				url={ url }
-				setAttributes={ setAttributes }
-				isSelected={ isSelected }
-			>
-				{ img }
-			</ImageEditor>
-		);
-	}
-
 	return (
 		<>
+			{ controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText

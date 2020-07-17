@@ -306,6 +306,9 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/cover' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Cover')]`
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.click( '.components-circular-option-picker__option' );
 		await page.keyboard.type( '2' );

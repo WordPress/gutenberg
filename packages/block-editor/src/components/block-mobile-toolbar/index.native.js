@@ -8,6 +8,7 @@ import { View } from 'react-native';
  */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ const BlockMobileToolbar = ( {
 	blockWidth,
 	anchorNodeRef,
 } ) => {
+	const [ fillsLength, setFillsLength ] = useState( null );
 	const wrapBlockSettings = blockWidth < BREAKPOINTS.wrapSettings;
 	const wrapBlockMover = blockWidth <= BREAKPOINTS.wrapMover;
 
@@ -45,17 +47,18 @@ const BlockMobileToolbar = ( {
 
 			<View style={ styles.spacer } />
 
-			{ ! wrapBlockSettings && (
-				<BlockSettingsButton.Slot>
-					{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
-					{ ( fills = [ null ] ) => fills[ 0 ] }
-				</BlockSettingsButton.Slot>
-			) }
+			<BlockSettingsButton.Slot>
+				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
+				{ ( fills = [ null ] ) => {
+					setFillsLength( fills.length );
+					return wrapBlockSettings ? null : fills[ 0 ];
+				} }
+			</BlockSettingsButton.Slot>
 
 			<BlockActionsMenu
 				clientIds={ [ clientId ] }
 				wrapBlockMover={ wrapBlockMover }
-				wrapBlockSettings={ wrapBlockSettings }
+				wrapBlockSettings={ wrapBlockSettings && fillsLength }
 				isStackedHorizontally={ isStackedHorizontally }
 				onDelete={ onDelete }
 				anchorNodeRef={ anchorNodeRef }

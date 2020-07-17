@@ -208,6 +208,20 @@ describe( 'Slot', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
+	it( 'should warn without a Provider', () => {
+		const { container } = render(
+			<>
+				<div>
+					<Slot name="chicken" bubblesVirtually />
+				</div>
+				<Fill name="chicken" />
+			</>
+		);
+
+		expect( container ).toMatchSnapshot();
+		expect( console ).toHaveWarned();
+	} );
+
 	describe.each( [ false, true ] )(
 		'bubblesVirtually %p',
 		( bubblesVirtually ) => {
@@ -298,22 +312,6 @@ describe( 'Slot', () => {
 						<Fill name="egg">Content</Fill>
 					</Provider>
 				);
-				expect( container ).toMatchSnapshot();
-			} );
-
-			it( 'should not break without a Provider', () => {
-				const { container } = render(
-					<>
-						<div>
-							<Slot
-								name="chicken"
-								bubblesVirtually={ bubblesVirtually }
-							/>
-						</div>
-						<Fill name="chicken" />
-					</>
-				);
-
 				expect( container ).toMatchSnapshot();
 			} );
 		}

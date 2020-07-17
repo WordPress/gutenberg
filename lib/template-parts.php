@@ -213,6 +213,34 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 			'value' => $request['theme'],
 		);
 
+		// Ensure auto-drafts of all theme supplied template parts are created.
+		if ( wp_get_theme()->get( 'TextDomain' ) === $request['theme'] ) {
+			// Get file paths for all theme supplied template parts.
+			$template_part_files = glob( get_stylesheet_directory() . '/block-template-parts/*.html' );
+			$template_part_files = is_array( $template_part_files ) ? $template_part_files : array();
+			if ( is_child_theme() ) {
+				$child_template_part_files = glob( get_template_directory() . '/block-template-parts/*.html' );
+				$child_template_part_files = is_array( $child_template_part_files ) ? $child_template_part_files : array();
+				$template_part_files       = array_merge( $template_part_files, $child_template_part_files );
+			}
+			// Build and save each template part.
+			foreach ( $template_part_files as $template_part_file ) {
+				$content = file_get_contents( $template_part_file );
+				// Infer slug from filepath.
+				$slug = substr(
+					$template_part_file,
+					// Starting position of slug.
+					strpos( $template_part_file, 'block-template-parts/' ) + 21,
+					// Subtract ending '.html'.
+					-5
+				);
+				// Wrap content with the template part block, parse, and create auto-draft.
+				$template_part_string = '<!-- wp:template-part {"slug":"' . $slug . '","theme":"' . wp_get_theme()->get( 'TextDomain' ) . '"} -->' . $content . '<!-- /wp:template-part -->';
+				$template_part_block  = parse_blocks( $template_part_string )[0];
+				create_auto_draft_for_template_part_block( $template_part_block );
+			}
+		};
+
 		$args['meta_query'] = $meta_query;
 	}
 

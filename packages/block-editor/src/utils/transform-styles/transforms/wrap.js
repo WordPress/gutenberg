@@ -1,16 +1,11 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * @constant string IS_ROOT_TAG Regex to check if the selector is a root tag selector.
  */
 const IS_ROOT_TAG = /^(body|html|:root).*$/;
 
 const wrap = ( namespace, ignore = [] ) => ( node ) => {
 	const updateSelector = ( selector ) => {
-		if ( includes( ignore, selector.trim() ) ) {
+		if ( ignore.includes( selector.trim() ) ) {
 			return selector;
 		}
 

@@ -9,8 +9,6 @@ import {
 	getTemplateId,
 	getTemplatePartId,
 	getTemplateType,
-	getTemplateIds,
-	getTemplatePartIds,
 	getPage,
 	getShowOnFront,
 } from '../selectors';
@@ -81,7 +79,12 @@ describe( 'selectors', () => {
 			canUser.mockReturnValueOnce( false );
 			canUser.mockReturnValueOnce( false );
 			const state = { settings: {}, preferences: {} };
-			expect( getSettings( state ) ).toBe( state.settings );
+			const setInserterOpened = () => {};
+			expect( getSettings( state, setInserterOpened ) ).toEqual( {
+				focusMode: false,
+				hasFixedToolbar: false,
+				__experimentalSetIsInserterOpened: setInserterOpened,
+			} );
 		} );
 
 		it( 'returns the extended settings when the user can create media', () => {
@@ -94,10 +97,12 @@ describe( 'selectors', () => {
 					},
 				},
 			};
-			expect( getSettings( state ) ).toEqual( {
+			const setInserterOpened = () => {};
+			expect( getSettings( state, setInserterOpened ) ).toEqual( {
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
+				__experimentalSetIsInserterOpened: setInserterOpened,
 				mediaUpload: expect.any( Function ),
 			} );
 		} );
@@ -128,20 +133,6 @@ describe( 'selectors', () => {
 		it( 'returns the template type', () => {
 			const state = { templateType: {} };
 			expect( getTemplateType( state ) ).toBe( state.templateType );
-		} );
-	} );
-
-	describe( 'getTemplateIds', () => {
-		it( 'returns the template IDs', () => {
-			const state = { templateIds: {} };
-			expect( getTemplateIds( state ) ).toBe( state.templateIds );
-		} );
-	} );
-
-	describe( 'getTemplatePartIds', () => {
-		it( 'returns the template part IDs', () => {
-			const state = { templatePartIds: {} };
-			expect( getTemplatePartIds( state ) ).toBe( state.templatePartIds );
 		} );
 	} );
 

@@ -5,6 +5,12 @@
  * @package Gutenberg
  */
 
+/**
+ * This test can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50263
+ * @see https://core.trac.wordpress.org/changeset/48141
+ */
 class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 
 	function test_does_not_remove_block_asset_path_prefix() {
@@ -153,10 +159,10 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 		$this->assertSame( 'my-plugin/notice', $result->name );
 		$this->assertSame( 'Notice', $result->title );
 		$this->assertSame( 'common', $result->category );
-		$this->assertEquals( array( 'core/group' ), $result->parent );
+		$this->assertEqualSets( array( 'core/group' ), $result->parent );
 		$this->assertSame( 'star', $result->icon );
 		$this->assertSame( 'Shows warning, error or success notices…', $result->description );
-		$this->assertEquals( array( 'alert', 'message' ), $result->keywords );
+		$this->assertEqualSets( array( 'alert', 'message' ), $result->keywords );
 		$this->assertEquals(
 			array(
 				'message' => array(
@@ -167,6 +173,13 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 			),
 			$result->attributes
 		);
+		$this->assertEquals(
+			array(
+				'my-plugin/message' => 'message',
+			),
+			$result->provides_context
+		);
+		$this->assertEqualSets( array( 'groupId' ), $result->uses_context );
 		$this->assertEquals(
 			array(
 				'align'             => true,

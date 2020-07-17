@@ -4,6 +4,11 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import DownloadableBlockListItem from '../index';
@@ -18,6 +23,11 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 
 describe( 'DownloadableBlockListItem', () => {
 	it( 'should render a block item', () => {
+		useSelect.mockImplementation( () => ( {
+			isLoading: false,
+			isInstallable: true,
+		} ) );
+
 		const wrapper = shallow(
 			<DownloadableBlockListItem onClick={ jest.fn() } item={ item } />
 		);

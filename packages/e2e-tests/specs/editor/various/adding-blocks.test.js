@@ -50,6 +50,9 @@ describe( 'adding blocks', () => {
 		// Using the slash command
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/quote' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Quote')]`
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Quote block' );
 
@@ -62,6 +65,9 @@ describe( 'adding blocks', () => {
 		// append the default block. Pressing backspace on the focused block
 		// will remove it.
 		await page.keyboard.type( '/image' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Image')]`
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -152,7 +158,6 @@ describe( 'adding blocks', () => {
 
 		// Tab to the block list
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 
 		// Expect the block list to be the active element.
 		activeElementClassList = await page.evaluate(
@@ -183,5 +188,32 @@ describe( 'adding blocks', () => {
 		expect( Object.values( activeElementClassList ) ).toContain(
 			'block-editor-inserter__toggle'
 		);
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/23263
+	it( 'inserts blocks at root level when using the root appender while selection is in an inner block', async () => {
+		await insertBlock( 'Buttons' );
+		await page.keyboard.type( '1.1' );
+
+		// After inserting the Buttons block the inner button block should be selected.
+		const selectedButtonBlocks = await page.$$(
+			'.wp-block-button.is-selected'
+		);
+		expect( selectedButtonBlocks.length ).toBe( 1 );
+
+		// Specifically click the root container appender.
+		await page.click(
+			'.block-editor-block-list__layout.is-root-container > .block-list-appender .block-editor-inserter__toggle'
+		);
+
+		// Insert a paragraph block.
+		await page.waitForSelector( '.block-editor-inserter__search-input' );
+		await page.keyboard.type( 'Paragraph' );
+		await page.click( '.editor-block-list-item-paragraph' );
+		await page.keyboard.type( '2' );
+
+		// The snapshot should show a buttons block followed by a paragraph.
+		// The buttons block should contain a single button.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

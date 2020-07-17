@@ -61,7 +61,7 @@
 		background-color: transparent;
 
 		tbody tr:nth-child(odd) {
-			background-color: $light-gray-200;
+			background-color: $gray-100;
 		}
 
 		&.has-subtle-light-gray-background-color {
@@ -93,6 +93,6 @@
 			border-color: transparent;
 		}
 
-		border-bottom: 1px solid $light-gray-200;
+		border-bottom: 1px solid $gray-100;
 	}
 }

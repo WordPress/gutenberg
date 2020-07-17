@@ -15,7 +15,7 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -41,8 +41,6 @@ const BlockComponent = forwardRef(
 			isSelected,
 			isFirstMultiSelected,
 			isLastMultiSelected,
-			isMultiSelecting,
-			isNavigationMode,
 			isPartOfMultiSelection,
 			enableAnimation,
 			index,
@@ -53,21 +51,31 @@ const BlockComponent = forwardRef(
 			blockTitle,
 			wrapperProps,
 		} = useContext( BlockListBlockContext );
-		const { initialPosition } = useSelect(
+		const {
+			initialPosition,
+			shouldFocusFirstElement,
+			isNavigationMode,
+		} = useSelect(
 			( select ) => {
-				if ( ! isSelected ) {
-					return {};
-				}
+				const {
+					getSelectedBlocksInitialCaretPosition,
+					isMultiSelecting: _isMultiSelecting,
+					isNavigationMode: _isNavigationMode,
+				} = select( 'core/block-editor' );
 
 				return {
-					initialPosition: select(
-						'core/block-editor'
-					).getSelectedBlocksInitialCaretPosition(),
+					shouldFocusFirstElement:
+						isSelected &&
+						! _isMultiSelecting() &&
+						! _isNavigationMode(),
+					initialPosition: isSelected
+						? getSelectedBlocksInitialCaretPosition()
+						: undefined,
 				};
 			},
 			[ isSelected ]
 		);
-		const { removeBlock, insertDefaultBlock } = useDispatch(
+		const { insertDefaultBlock, removeBlock } = useDispatch(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
@@ -134,10 +142,10 @@ const BlockComponent = forwardRef(
 		};
 
 		useEffect( () => {
-			if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
+			if ( shouldFocusFirstElement ) {
 				focusTabbable();
 			}
-		}, [ isSelected, isMultiSelecting, isNavigationMode ] );
+		}, [ shouldFocusFirstElement ] );
 
 		// Block Reordering animation
 		useMovingAnimation(
