@@ -184,6 +184,7 @@ const Cover = ( {
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url ? backgroundColor : {},
+		isParentSelected && styles.overlaySelected,
 	];
 
 	const placeholderIconStyle = getStylesFromColorScheme(
