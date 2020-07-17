@@ -9,7 +9,7 @@ import { escape, get, head, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, withDispatch, withSelect } from '@wordpress/data';
 import {
 	KeyboardShortcuts,
 	PanelBody,
@@ -52,7 +52,6 @@ function NavigationLinkEdit( {
 	backgroundColor,
 	rgbTextColor,
 	rgbBackgroundColor,
-	saveEntityRecord,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
 	insertBlocksAfter,
@@ -64,6 +63,7 @@ function NavigationLinkEdit( {
 		url,
 		opensInNewTab,
 	};
+	const { saveEntityRecord } = useDispatch( 'core' );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
@@ -232,11 +232,8 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
-								createSuggestion={
-									userCanCreatePages
-										? handleCreatePage
-										: undefined
-								}
+								withCreateSuggestion={ userCanCreatePages }
+								createSuggestion={ handleCreatePage }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -383,9 +380,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
-		const { saveEntityRecord } = dispatch( 'core' );
 		return {
-			saveEntityRecord,
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 
