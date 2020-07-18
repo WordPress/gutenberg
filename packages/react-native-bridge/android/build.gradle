@@ -92,7 +92,7 @@ project.ext.buildGutenbergFromSource = false
 def hermesOriginalPath = "../../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
 def buildResFolder = 'build/generated/res'
-def buildResRawFolder = "${buildResFolder}/raw/"
+def buildResRawFolder = "${buildResFolder}/raw"
 def bundleName = 'index_android_bundle'
 def mobileGutenbergRootDir = '../../../..'
 def buildJSOutputFolder = "$mobileGutenbergRootDir/bundle/android"
@@ -178,7 +178,8 @@ if (buildGutenbergMobileJSBundle) {
     def nodeModulesFolders = ["$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"] as String[]
 
     task npmRunBundleAndroid(type: NpmTask) {
-        args = ['run', 'bundle:android']
+        def outputFolder = file("$buildResRawFolder").absolutePath
+        args = ['run', 'bundle:android-gradle', "--bundle_output=$outputFolder/$bundleName", "--bundle_output_sourcemap=$outputFolder/${bundleName}.map"]
     }
 
     task buildJSBundle {
@@ -206,8 +207,7 @@ if (buildGutenbergMobileJSBundle) {
 
         inputs.files(inputFiles).withPathSensitivity(PathSensitivity.RELATIVE)
 
-        def bundleOutputFilename = 'App.js'
-        def origWithPath = "$buildJSOutputFolder/$bundleOutputFilename"
+        def origWithPath = "$buildResRawFolder/$bundleName"
 
         outputs.file(origWithPath)
         outputs.cacheIf { true }
@@ -252,32 +252,6 @@ if (buildGutenbergMobileJSBundle) {
         }
     }
 
-    task copyJSBundle(type: Copy) {
-        def origFileName = 'App.js'
-        def origWithPath = "$buildJSOutputFolder/$origFileName"
-        from origWithPath
-        into buildResRawFolder
-        rename origFileName, bundleName
-
-        // Prevent this task from silently failing
-        // Using onlyIf as a bit of a hack to perform this check at the time of execution
-        onlyIf {
-            if (inputs.sourceFiles.empty) {
-                throw new StopExecutionException("ERROR: Could not find bundle file to copy.")
-            }
-            true
-        }
-
-        inputs.files(inputs.files).withPathSensitivity(PathSensitivity.RELATIVE)
-        outputs.cacheIf { true }
-
-        doLast {
-            println "Done copying the Android JS bundle to assets folder"
-        }
-    }
-
-    copyJSBundle.dependsOn(buildJSBundle)
-
     clean {
         doFirst {
             println "Executing extended clean task that also deletes node_modules folders"
@@ -286,13 +260,13 @@ if (buildGutenbergMobileJSBundle) {
     }
 
     def bundleResFiles = project.files(buildResFolder)
-    bundleResFiles.builtBy(copyJSBundle)
+    bundleResFiles.builtBy(buildJSBundle)
     def bundleJSOutputFiles = project.files(buildJSOutputFolder)
     bundleJSOutputFiles.builtBy(buildJSBundle)
 
     android.libraryVariants.all { variant ->
-        variant.preBuildProvider.configure { dependsOn(copyJSBundle) }
-        variant.mergeResourcesProvider.configure { dependsOn(copyJSBundle) }
+        variant.preBuildProvider.configure { dependsOn(buildJSBundle) }
+        variant.mergeResourcesProvider.configure { dependsOn(buildJSBundle) }
         variant.registerGeneratedResFolders(bundleResFiles)
     }
 }
