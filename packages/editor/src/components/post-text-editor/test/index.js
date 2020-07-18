@@ -5,9 +5,14 @@ import { act, create } from 'react-test-renderer';
 import Textarea from 'react-autosize-textarea';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { PostTextEditor } from '../';
+import PostTextEditor from '../';
 
 // "Downgrade" ReactAutosizeTextarea to a regular textarea. Assumes aligned
 // props interface.
@@ -15,12 +20,37 @@ jest.mock( 'react-autosize-textarea', () => ( props ) => (
 	<textarea { ...props } />
 ) );
 
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
+
+let mockEditPost = jest.fn();
+let mockResetEditorBlocks = jest.fn();
+
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
+	return {
+		useDispatch: () => ( {
+			editPost: mockEditPost,
+			resetEditorBlocks: mockResetEditorBlocks,
+		} ),
+	};
+} );
+
 describe( 'PostTextEditor', () => {
-	it( 'should render via the prop value', () => {
+	beforeEach( () => {
+		useSelect.mockImplementation( () => 'Hello World' );
+
+		mockEditPost = jest.fn();
+		mockResetEditorBlocks = jest.fn();
+	} );
+
+	it( 'should render via the value from useSelect', () => {
 		let wrapper;
 
 		act( () => {
-			wrapper = create( <PostTextEditor value="Hello World" /> );
+			wrapper = create( <PostTextEditor /> );
 		} );
 
 		const textarea = wrapper.root.findByType( Textarea );
@@ -28,14 +58,10 @@ describe( 'PostTextEditor', () => {
 	} );
 
 	it( 'should render via the state value when edits made', () => {
-		const onChange = jest.fn();
-
 		let wrapper;
 
 		act( () => {
-			wrapper = create(
-				<PostTextEditor value="Hello World" onChange={ onChange } />
-			);
+			wrapper = create( <PostTextEditor /> );
 		} );
 
 		const textarea = wrapper.root.findByType( Textarea );
@@ -45,18 +71,16 @@ describe( 'PostTextEditor', () => {
 		);
 
 		expect( textarea.props.value ).toBe( 'Hello Chicken' );
-		expect( onChange ).toHaveBeenCalledWith( 'Hello Chicken' );
+		expect( mockEditPost ).toHaveBeenCalledWith( {
+			content: 'Hello Chicken',
+		} );
 	} );
 
 	it( 'should render via the state value when edits made, even if prop value changes', () => {
-		const onChange = jest.fn();
-
 		let wrapper;
 
 		act( () => {
-			wrapper = create(
-				<PostTextEditor value="Hello World" onChange={ onChange } />
-			);
+			wrapper = create( <PostTextEditor /> );
 		} );
 
 		const textarea = wrapper.root.findByType( Textarea );
@@ -65,56 +89,45 @@ describe( 'PostTextEditor', () => {
 			textarea.props.onChange( { target: { value: 'Hello Chicken' } } )
 		);
 
+		useSelect.mockImplementation( () => 'Goodbye World' );
+
 		act( () => {
-			wrapper.update(
-				<PostTextEditor value="Goodbye World" onChange={ onChange } />
-			);
+			wrapper.update( <PostTextEditor /> );
 		} );
 
-		wrapper.update(
-			<PostTextEditor value="Goodbye World" onChange={ onChange } />
-		);
-
 		expect( textarea.props.value ).toBe( 'Hello Chicken' );
-		expect( onChange ).toHaveBeenCalledWith( 'Hello Chicken' );
+		expect( mockEditPost ).toHaveBeenCalledWith( {
+			content: 'Hello Chicken',
+		} );
 	} );
 
 	it( 'should render via the state value when edits made, even if prop value changes and state value empty', () => {
-		const onChange = jest.fn();
 		let wrapper;
 
 		act( () => {
-			wrapper = create(
-				<PostTextEditor value="Hello World" onChange={ onChange } />
-			);
+			wrapper = create( <PostTextEditor /> );
 		} );
 
 		const textarea = wrapper.root.findByType( Textarea );
-
 		act( () => textarea.props.onChange( { target: { value: '' } } ) );
+
+		useSelect.mockImplementation( () => 'Goodbye World' );
+
 		act( () => {
-			wrapper.update(
-				<PostTextEditor value="Goodbye World" onChange={ onChange } />
-			);
+			wrapper.update( <PostTextEditor /> );
 		} );
 
 		expect( textarea.props.value ).toBe( '' );
-		expect( onChange ).toHaveBeenCalledWith( '' );
+		expect( mockEditPost ).toHaveBeenCalledWith( {
+			content: '',
+		} );
 	} );
 
 	it( 'calls onPersist after changes made and user stops editing', () => {
-		const onPersist = jest.fn();
-
 		let wrapper;
 
 		act( () => {
-			wrapper = create(
-				<PostTextEditor
-					value="Hello World"
-					onChange={ () => {} }
-					onPersist={ onPersist }
-				/>
-			);
+			wrapper = create( <PostTextEditor /> );
 		} );
 
 		const textarea = wrapper.root.findByType( Textarea );
@@ -122,28 +135,20 @@ describe( 'PostTextEditor', () => {
 		act( () => textarea.props.onChange( { target: { value: '' } } ) );
 		act( () => textarea.props.onBlur() );
 
-		expect( onPersist ).toHaveBeenCalledWith( '' );
+		expect( mockResetEditorBlocks ).toHaveBeenCalledWith( [] );
 	} );
 
 	it( 'does not call onPersist after user stops editing without changes', () => {
-		const onPersist = jest.fn();
-
 		let wrapper;
 
 		act( () => {
-			wrapper = create(
-				<PostTextEditor
-					value="Hello World"
-					onChange={ () => {} }
-					onPersist={ onPersist }
-				/>
-			);
+			wrapper = create( <PostTextEditor /> );
 		} );
 
 		const textarea = wrapper.root.findByType( Textarea );
 		act( () => textarea.props.onBlur() );
 
-		expect( onPersist ).not.toHaveBeenCalled();
+		expect( mockResetEditorBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'resets to prop value after user stops editing', () => {
@@ -154,26 +159,16 @@ describe( 'PostTextEditor', () => {
 		let wrapper;
 
 		act( () => {
-			wrapper = create(
-				<PostTextEditor
-					value="Hello World"
-					onChange={ () => {} }
-					onPersist={ () => {} }
-				/>
-			);
+			wrapper = create( <PostTextEditor /> );
 		} );
 
 		const textarea = wrapper.root.findByType( Textarea );
 		act( () => textarea.props.onChange( { target: { value: '' } } ) );
 
+		useSelect.mockImplementation( () => 'Goodbye World' );
+
 		act( () => {
-			wrapper.update(
-				<PostTextEditor
-					value="Goodbye World"
-					onChange={ () => {} }
-					onPersist={ () => {} }
-				/>
-			);
+			wrapper.update( <PostTextEditor /> );
 		} );
 
 		act( () => textarea.props.onBlur() );

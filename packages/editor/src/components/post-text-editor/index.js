@@ -13,14 +13,31 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
-export function PostTextEditor( { onChange, onPersist, ...props } ) {
-	const [ value, setValue ] = useState( props.value );
+export default function PostTextEditor() {
+	const val = useSelect(
+		( select ) => select( 'core/editor' ).getEditedPostContent(),
+		[]
+	);
+
+	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
+
+	const [ value, setValue ] = useState( val );
 	const [ isDirty, setIsDirty ] = useState( false );
 	const instanceId = useInstanceId( PostTextEditor );
 
-	if ( ! isDirty && value !== props.value ) {
-		setValue( props.value );
+	if ( ! isDirty && value !== val ) {
+		setValue( val );
 	}
+
+	const onChange = ( content ) => {
+		editPost( { content } );
+	};
+
+	const onPersist = ( content ) => {
+		const blocks = parse( content );
+
+		resetEditorBlocks( blocks );
+	};
 
 	/**
 	 * Handles a textarea change event to notify the onChange prop callback and
@@ -34,11 +51,11 @@ export function PostTextEditor( { onChange, onPersist, ...props } ) {
 	 * @param {Event} event Change event.
 	 */
 	const edit = ( event ) => {
-		const val = event.target.value;
+		const v = event.target.value;
 
-		onChange( val );
+		onChange( v );
 
-		setValue( val );
+		setValue( v );
 		setIsDirty( true );
 	};
 
@@ -73,28 +90,5 @@ export function PostTextEditor( { onChange, onPersist, ...props } ) {
 				placeholder={ __( 'Start writing with text or HTML' ) }
 			/>
 		</>
-	);
-}
-
-export default function ComposedPostTextEditor() {
-	const value = useSelect(
-		( select ) => select( 'core/editor' ).getEditedPostContent(),
-		[]
-	);
-
-	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
-
-	return (
-		<PostTextEditor
-			value={ value }
-			onChange={ ( content ) => {
-				editPost( { content } );
-			} }
-			onPersist={ ( content ) => {
-				const blocks = parse( content );
-
-				resetEditorBlocks( blocks );
-			} }
-		/>
 	);
 }
