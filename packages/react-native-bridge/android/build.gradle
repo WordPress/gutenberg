@@ -95,6 +95,7 @@ def buildResFolder = 'build/generated/res'
 def buildResRawFolder = "${buildResFolder}/raw/"
 def bundleName = 'index_android_bundle'
 def mobileGutenbergRootDir = '../../../..'
+def buildJSOutputFolder = "$mobileGutenbergRootDir/bundle/android"
 
 android {
     compileSdkVersion 28
@@ -206,7 +207,7 @@ if (buildGutenbergMobileJSBundle) {
         inputs.files(inputFiles)
 
         def bundleOutputFilename = 'App.js'
-        def origWithPath = "$mobileGutenbergRootDir/bundle/android/${bundleOutputFilename}"
+        def origWithPath = "$buildJSOutputFolder/$bundleOutputFilename"
 
         outputs.file(origWithPath)
         outputs.cacheIf { true }
@@ -253,7 +254,7 @@ if (buildGutenbergMobileJSBundle) {
 
     task copyJSBundle(type: Copy) {
         def origFileName = 'App.js'
-        def origWithPath = "$mobileGutenbergRootDir/bundle/android/${origFileName}"
+        def origWithPath = "$buildJSOutputFolder/$origFileName"
         from origWithPath
         into buildResRawFolder
         rename origFileName, bundleName
@@ -285,6 +286,8 @@ if (buildGutenbergMobileJSBundle) {
 
     def bundleResFiles = project.files(buildResFolder)
     bundleResFiles.builtBy(copyJSBundle)
+    def bundleJSOutputFiles = project.files(buildJSOutputFolder)
+    bundleJSOutputFiles.builtBy(buildJSBundle)
 
     android.libraryVariants.all { variant ->
         variant.preBuildProvider.configure { dependsOn(copyJSBundle) }
