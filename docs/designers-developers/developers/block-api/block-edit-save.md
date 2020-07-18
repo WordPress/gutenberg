@@ -390,11 +390,17 @@ When the editor loads, all blocks within post content are validated to determine
 
 If a block is detected to be invalid, the user will be prompted to choose how to handle the invalidation:
 
-![Invalid block prompt](https://user-images.githubusercontent.com/1779930/35637234-a6a7a18a-0681-11e8-858b-adfc1c6f47da.png)
+![Invalid block prompt](https://user-images.githubusercontent.com/8876600/87853743-bb45db80-c947-11ea-8e61-93d948d2ba84.png)
 
-- **Overwrite**: Ignores the warning and treats the newly generated markup as correct. As noted in the behavior described above, this can result in content loss since it will overwrite the markup saved in post content.
-- **Convert to Classic**: Protects the original markup from the saved post content as correct. Since the block will be converted from its original type to the Classic block type, it will no longer be possible to edit the content using controls available for the original block type.
-- **Edit as HTML block**: Similar to _Convert to Classic_, this will protect the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
+Clicking Resolve button will open Resolve Block dialog box with two buttons:
+
+- **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
+- **Convert to Blocks**: Protects the original markup from the saved post content and convert the block from its original type to the validated block type.
+
+Clicking the "3-dot" menu on the side of the block displays two options:
+
+- **Convert to Classic Block**: Protects the original markup from the saved post content as correct. Since the block will be converted from its original type to the Classic block type, it will no longer be possible to edit the content using controls available for the original block type.
+- **Attempt Block Recovery**: Attempts recovery action as much as possible.
 
 ### Validation FAQ
 
