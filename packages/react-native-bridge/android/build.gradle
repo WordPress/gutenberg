@@ -96,7 +96,6 @@ def buildResGutenbergFolder = "${buildResFolder}/gutenberg"
 def buildResRawFolder = "${buildResGutenbergFolder}/raw"
 def bundleName = 'index_android_bundle'
 def mobileGutenbergRootDir = '../../../..'
-def buildJSOutputFolder = "$mobileGutenbergRootDir/bundle/android"
 
 android {
     compileSdkVersion 28
@@ -268,8 +267,6 @@ if (buildGutenbergMobileJSBundle) {
 
     def bundleResFiles = project.files(buildResFolder)
     bundleResFiles.builtBy(buildJSBundle)
-    def bundleJSOutputFiles = project.files(buildJSOutputFolder)
-    bundleJSOutputFiles.builtBy(buildJSBundle)
 
     android.libraryVariants.all { variant ->
         variant.preBuildProvider.configure { dependsOn(buildJSBundle) }
