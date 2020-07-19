@@ -3,7 +3,6 @@
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
 import Video from 'react-native-video';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
