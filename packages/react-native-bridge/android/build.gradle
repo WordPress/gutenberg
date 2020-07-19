@@ -185,7 +185,7 @@ if (buildGutenbergMobileJSBundle) {
 
     task npmRunBundleAndroid(type: NpmTask) {
         def outputFolder = file("$buildResRawFolder").absolutePath
-        args = ['run', 'bundle:android-gradle', "--bundle_output=$outputFolder/$bundleName", "--bundle_output_sourcemap=$outputFolder/${bundleName}.map"]
+        args = ['run', 'bundle:android-gradle', "--bundle_output=$outputFolder/$bundleName"]
     }
 
     task buildJSBundle {
