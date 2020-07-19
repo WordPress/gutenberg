@@ -26,7 +26,6 @@ function ColorPicker( {
 	isGradientColor,
 	onNavigationBack,
 	onCloseBottomSheet,
-	onApply,
 	bottomLabelText,
 } ) {
 	const isIOS = Platform.OS === 'ios';
@@ -100,12 +99,7 @@ function ColorPicker( {
 		onNavigationBack();
 		onCloseBottomSheet( null );
 		shouldDisableBottomSheetMaxHeight( true );
-		if ( action === 'apply' ) {
-			setColor( currentColor );
-			if ( onApply !== undefined ) onApply( currentColor );
-		} else {
-			setColor( savedColor );
-		}
+		setColor( action === 'apply' ? currentColor : savedColor );
 	}
 
 	return (

@@ -111,6 +111,12 @@ const Cover = ( {
 		gradientValue
 	);
 
+	const [
+		isCustomColorPickerShowing,
+		setCustomColorPickerShowing,
+	] = useState( false );
+	const [ customColor, setCustomColor ] = useState( '' );
+
 	// Used to set a default color for its InnerBlocks
 	// since there's no system to inherit styles yet
 	// the RichText component will check if there are
@@ -281,9 +287,14 @@ const Cover = ( {
 						shouldDisableBottomSheetMaxHeight={
 							shouldDisableBottomSheetMaxHeight
 						}
-						setColor={ noop }
-						onApply={ setColor }
-						onNavigationBack={ closeSettingsBottomSheet }
+						setColor={ ( color ) => {
+							setCustomColor( color );
+							setColor( color );
+						} }
+						onNavigationBack={ () => {
+							setCustomColorPickerShowing( false );
+							closeSettingsBottomSheet();
+						} }
 						onCloseBottomSheet={ onCloseBottomSheet }
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
@@ -362,12 +373,13 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
-	if ( ! hasBackground ) {
+	if ( ! hasBackground || isCustomColorPickerShowing ) {
 		return (
 			<View>
 				{ colorPickerControls }
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
+					backgroundColor={ customColor }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -388,9 +400,10 @@ const Cover = ( {
 								styles.paletteVerticalSeparator
 							}
 							setColor={ setColor }
-							onCustomPress={
-								isParentSelected && openGeneralSidebar
-							}
+							onCustomPress={ () => {
+								isParentSelected && openGeneralSidebar();
+								setCustomColorPickerShowing( true );
+							} }
 							defaultSettings={ coverDefaultPalette }
 							shouldShowCustomLabel={ false }
 						/>

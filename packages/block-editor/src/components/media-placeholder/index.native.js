@@ -45,6 +45,7 @@ function MediaPlaceholder( props ) {
 		value = [],
 		children,
 		height,
+		backgroundColor,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -170,6 +171,7 @@ function MediaPlaceholder( props ) {
 									[
 										emptyStateContainerStyle,
 										height && { height },
+										backgroundColor && { backgroundColor },
 									],
 									isAppender && appenderStyle,
 								] }
