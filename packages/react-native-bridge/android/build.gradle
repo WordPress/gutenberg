@@ -92,7 +92,8 @@ project.ext.buildGutenbergFromSource = false
 def hermesOriginalPath = "../../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
 def buildResFolder = 'build/generated/res'
-def buildResRawFolder = "${buildResFolder}/raw"
+def buildResGutenbergFolder = "${buildResFolder}/gutenberg"
+def buildResRawFolder = "${buildResGutenbergFolder}/raw"
 def bundleName = 'index_android_bundle'
 def mobileGutenbergRootDir = '../../../..'
 def buildJSOutputFolder = "$mobileGutenbergRootDir/bundle/android"
@@ -113,6 +114,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            res.srcDirs += [buildResGutenbergFolder]
+        }
     }
 }
 
