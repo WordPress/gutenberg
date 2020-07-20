@@ -404,6 +404,8 @@ describe( 'useBlockSync hook', () => {
 			{ clientId: 'b', innerBlocks: [], attributes: { foo: 1 } },
 		];
 
+		// Reset it so that we can test that it was not called after this point.
+		onChange1.mockReset();
 		const onChange2 = jest.fn();
 
 		// Update the component to point at a "different entity" (e.g. different
@@ -424,11 +426,8 @@ describe( 'useBlockSync hook', () => {
 			.dispatch( 'core/block-editor' )
 			.updateBlockAttributes( 'b', { foo: 3 } );
 
-		// The first callback should not be called with the new change.
-		expect( onChange1 ).toHaveBeenCalledWith( updatedBlocks1, {
-			selectionEnd: {},
-			selectionStart: {},
-		} );
+		// The first callback should not have been called.
+		expect( onChange1 ).not.toHaveBeenCalled();
 
 		// The second callback should be called with the new change.
 		expect( onChange2 ).toHaveBeenCalledWith(
