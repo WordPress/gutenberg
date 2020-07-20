@@ -16,15 +16,14 @@ import SvgIconCustomize from './icon-customize';
 import styles from './style.scss';
 
 const ImageEditingButton = ( {
-	onRemove,
 	onSelectMediaUploadOption,
 	openMediaOptions,
+	pickerOptions,
 	url,
 } ) => {
 	return (
 		<MediaEdit
 			onSelect={ onSelectMediaUploadOption }
-			onRemove={ onRemove }
 			source={ { uri: url } }
 			openReplaceMediaOptions={ openMediaOptions }
 			render={ ( { open, mediaOptions } ) => (
@@ -41,6 +40,7 @@ const ImageEditingButton = ( {
 					</View>
 				</TouchableWithoutFeedback>
 			) }
+			pickerOptions={ pickerOptions }
 		/>
 	);
 };

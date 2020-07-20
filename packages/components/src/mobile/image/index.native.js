@@ -36,7 +36,7 @@ const ImageComponent = ( {
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
-	onRemove,
+	mediaPickerOptions,
 	onSelectMediaUploadOption,
 	openMediaOptions,
 	retryMessage,
@@ -208,14 +208,14 @@ const ImageComponent = ( {
 					isSelected &&
 					imageData &&
 					! isUploadInProgress &&
-					! isUploadFailed(
+					! isUploadFailed && (
 						<ImageEditingButton
-							onRemove={ onRemove }
 							onSelectMediaUploadOption={
 								onSelectMediaUploadOption
 							}
 							openMediaOptions={ openMediaOptions }
 							url={ url }
+							pickerOptions={ mediaPickerOptions }
 						/>
 					) }
 			</View>

@@ -393,9 +393,18 @@ const Cover = ( {
 				! didUploadFail && (
 					<View style={ styles.imageEditButton }>
 						<ImageEditingButton
-							onRemove={ onClearMedia }
 							onSelectMediaUploadOption={ onSelectMedia }
 							openMediaOptions={ openMediaOptionsRef.current }
+							pickerOptions={ [
+								{
+									destructiveButton: true,
+									id: 'clearMedia',
+									label: __( 'Clear media' ),
+									onPress: onClearMedia,
+									separated: true,
+									value: 'clearMedia',
+								},
+							] }
 							url={ url }
 						/>
 					</View>

@@ -32,29 +32,36 @@ const replaceOption = {
 	types: [ MEDIA_TYPE_IMAGE ],
 };
 
-const removeOption = {
-	id: 'removeOption',
-	label: __( 'Remove' ),
-	value: 'removeOption',
-	separated: true,
-};
-
 export class MediaEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 		this.getMediaOptionsItems = this.getMediaOptionsItems.bind( this );
+		this.getDestructiveButtonIndex = this.getDestructiveButtonIndex.bind(
+			this
+		);
 	}
 
 	getMediaOptionsItems() {
-		const { onRemove } = this.props;
+		const { pickerOptions } = this.props;
 
 		return compact( [
 			editOption,
 			replaceOption,
-			onRemove && removeOption,
+			...( pickerOptions ? pickerOptions : [] ),
 		] );
+	}
+
+	getDestructiveButtonIndex() {
+		const options = this.getMediaOptionsItems();
+		const destructiveButtonIndex = options.findIndex(
+			( option ) => option?.destructiveButton
+		);
+
+		return destructiveButtonIndex !== -1
+			? destructiveButtonIndex + 1
+			: undefined;
 	}
 
 	onPickerPresent() {
@@ -64,7 +71,7 @@ export class MediaEdit extends React.Component {
 	}
 
 	onPickerSelect( value ) {
-		const { onSelect, onRemove, multiple = false } = this.props;
+		const { onSelect, pickerOptions, multiple = false } = this.props;
 
 		switch ( value ) {
 			case MEDIA_EDITOR:
@@ -74,18 +81,21 @@ export class MediaEdit extends React.Component {
 					}
 				} );
 				break;
-			case removeOption.value:
-				onRemove();
-				break;
 			default:
+				const optionSelected = pickerOptions.find(
+					( option ) => option.id === value
+				);
+
+				if ( optionSelected && optionSelected.onPress ) {
+					optionSelected.onPress();
+					return;
+				}
+
 				this.props.openReplaceMediaOptions();
 		}
 	}
 
 	render() {
-		const { onRemove } = this.props;
-		const options = this.getMediaOptionsItems();
-
 		const mediaOptions = () => (
 			<Picker
 				hideCancelButton
@@ -95,7 +105,7 @@ export class MediaEdit extends React.Component {
 				onChange={ this.onPickerSelect }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ __( 'Media options' ) }
-				destructiveButtonIndex={ onRemove && options.length }
+				destructiveButtonIndex={ this.getDestructiveButtonIndex() }
 			/>
 		);
 
