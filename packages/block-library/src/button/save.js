@@ -33,17 +33,21 @@ export default function save( { attributes } ) {
 	// A title will no longer be assigned for new or updated button block links.
 
 	return (
-		<div>
-			<RichText.Content
-				tagName="a"
-				className={ buttonClasses }
-				href={ url }
-				title={ title }
-				style={ buttonStyle }
-				value={ text }
-				target={ linkTarget }
-				rel={ rel }
-			/>
-		</div>
+		<>
+			{ text && (
+				<div>
+					<RichText.Content
+						tagName="a"
+						className={ buttonClasses }
+						href={ url }
+						title={ title }
+						style={ buttonStyle }
+						value={ text }
+						target={ linkTarget }
+						rel={ rel }
+					/>
+				</div>
+			) }
+		</>
 	);
 }
