@@ -42,9 +42,9 @@ function ColorPalette( {
 	shouldEnableBottomSheetScroll,
 	shouldShowCustomIndicatorOption = true,
 	shouldShowCustomLabel = true,
+	shouldShowCustomVerticalSeparator = true,
 	customColorIndicatorStyles,
 	customIndicatorWrapperStyles,
-	customVerticalSeparatorStyles,
 } ) {
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
@@ -181,7 +181,7 @@ function ColorPalette( {
 	}
 
 	const verticalSeparatorStyle = usePreferredColorSchemeStyle(
-		[ styles.verticalSeparator, customVerticalSeparatorStyles ],
+		styles.verticalSeparator,
 		styles.verticalSeparatorDark
 	);
 
@@ -245,7 +245,9 @@ function ColorPalette( {
 					] }
 					onLayout={ onCustomIndicatorLayout }
 				>
-					<View style={ verticalSeparatorStyle } />
+					{ shouldShowCustomVerticalSeparator && (
+						<View style={ verticalSeparatorStyle } />
+					) }
 					<TouchableWithoutFeedback
 						onPress={ onCustomPress }
 						accessibilityRole={ 'button' }

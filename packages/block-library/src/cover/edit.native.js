@@ -24,6 +24,7 @@ import {
 	Gradient,
 	ColorPalette,
 	ColorPicker,
+	BottomSheetConsumer,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -94,23 +95,9 @@ const Cover = ( {
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
-	const DEFAULT_COLORS = [
-		{
-			name: __( 'Black' ),
-			slug: 'black',
-			color: '#000000',
-		},
-		{
-			name: __( 'White' ),
-			slug: 'white',
-			color: '#ffffff',
-		},
-	];
-
-	const THEME_COLORS_COUNT = 2;
-	const themeColors = settings.colors.slice( 0, THEME_COLORS_COUNT );
+	const THEME_COLORS_COUNT = 4;
 	const coverDefaultPalette = {
-		colors: [ ...DEFAULT_COLORS, ...themeColors ],
+		colors: settings.colors.slice( 0, THEME_COLORS_COUNT ),
 	};
 
 	const { gradientValue } = __experimentalUseGradient();
@@ -124,6 +111,12 @@ const Cover = ( {
 	);
 
 	const hasOnlyColorBackground = ! url && hasBackground;
+
+	const [
+		isCustomColorPickerShowing,
+		setCustomColorPickerShowing,
+	] = useState( false );
+	const [ customColor, setCustomColor ] = useState( '' );
 
 	// Used to set a default color for its InnerBlocks
 	// since there's no system to inherit styles yet
@@ -193,10 +186,6 @@ const Cover = ( {
 			gradient: undefined,
 			customGradient: undefined,
 		} );
-	}
-
-	function openCustomColorPicker() {
-		openGeneralSidebar();
 	}
 
 	const backgroundColor = getStylesFromColorScheme(
@@ -285,16 +274,37 @@ const Cover = ( {
 
 	const colorPickerControls = (
 		<InspectorControls>
-			<ColorPicker
-				shouldEnableBottomSheetScroll={ () => {} }
-				shouldDisableBottomSheetMaxHeight={ () => {} }
-				setColor={ () => {} }
-				onApply={ setColor }
-				onNavigationBack={ closeSettingsBottomSheet }
-				onCloseBottomSheet={ () => {} }
-				isBottomSheetContentScrolling={ () => {} }
-				dontCount={ true }
-			/>
+			<BottomSheetConsumer dontCount={ true }>
+				{ ( {
+					shouldEnableBottomSheetScroll,
+					shouldDisableBottomSheetMaxHeight,
+					onCloseBottomSheet,
+					isBottomSheetContentScrolling,
+				} ) => (
+					<ColorPicker
+						shouldEnableBottomSheetScroll={
+							shouldEnableBottomSheetScroll
+						}
+						shouldDisableBottomSheetMaxHeight={
+							shouldDisableBottomSheetMaxHeight
+						}
+						setColor={ ( color ) => {
+							setCustomColor( color );
+							setColor( color );
+						} }
+						onNavigationBack={ () => {
+							setCustomColorPickerShowing( false );
+							closeSettingsBottomSheet();
+						} }
+						onCloseBottomSheet={ onCloseBottomSheet }
+						isBottomSheetContentScrolling={
+							isBottomSheetContentScrolling
+						}
+						bottomLabelText={ __( 'Select a color' ) }
+						dontCount={ true }
+					/>
+				) }
+			</BottomSheetConsumer>
 		</InspectorControls>
 	);
 
@@ -378,17 +388,13 @@ const Cover = ( {
 		</>
 	);
 
-	if ( ! hasBackground ) {
+	if ( ! hasBackground || isCustomColorPickerShowing ) {
 		return (
 			<View>
 				{ colorPickerControls }
 				<MediaPlaceholder
-					customEmptyStateContainerStyles={
-						styles.mediaPlaceholderEmptyStateContainer
-					}
-					customEmptyStateTitleStyles={
-						styles.mediaPlaceholderEmptyStateTitle
-					}
+					height={ styles.mediaPlaceholderEmptyStateContainer.height }
+					backgroundColor={ customColor }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -409,11 +415,15 @@ const Cover = ( {
 								styles.paletteVerticalSeparator
 							}
 							setColor={ setColor }
-							onCustomPress={
-								isParentSelected && openCustomColorPicker
-							}
+							onCustomPress={ () => {
+								if ( isParentSelected ) {
+									openGeneralSidebar();
+									setCustomColorPickerShowing( true );
+								}
+							} }
 							defaultSettings={ coverDefaultPalette }
 							shouldShowCustomLabel={ false }
+							shouldShowCustomVerticalSeparator={ false }
 						/>
 					</View>
 				</MediaPlaceholder>

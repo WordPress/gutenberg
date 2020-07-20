@@ -44,8 +44,8 @@ function MediaPlaceholder( props ) {
 		multiple,
 		value = [],
 		children,
-		customEmptyStateContainerStyles,
-		customEmptyStateTitleStyles,
+		height,
+		backgroundColor,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -94,7 +94,7 @@ function MediaPlaceholder( props ) {
 	}
 
 	const emptyStateTitleStyle = getStylesFromColorScheme(
-		[ styles.emptyStateTitle, customEmptyStateTitleStyles ],
+		styles.emptyStateTitle,
 		styles.emptyStateTitleDark
 	);
 	const addMediaButtonStyle = getStylesFromColorScheme(
@@ -137,7 +137,7 @@ function MediaPlaceholder( props ) {
 		styles.appenderDark
 	);
 	const emptyStateContainerStyle = getStylesFromColorScheme(
-		[ styles.emptyStateContainer, customEmptyStateContainerStyles ],
+		styles.emptyStateContainer,
 		styles.emptyStateContainerDark
 	);
 
@@ -168,7 +168,11 @@ function MediaPlaceholder( props ) {
 						>
 							<View
 								style={ [
-									emptyStateContainerStyle,
+									[
+										emptyStateContainerStyle,
+										height && { height },
+										backgroundColor && { backgroundColor },
+									],
 									isAppender && appenderStyle,
 								] }
 							>

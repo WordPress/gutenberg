@@ -26,7 +26,7 @@ function ColorPicker( {
 	isGradientColor,
 	onNavigationBack,
 	onCloseBottomSheet,
-	onApply,
+	bottomLabelText,
 } ) {
 	const isIOS = Platform.OS === 'ios';
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
@@ -99,12 +99,7 @@ function ColorPicker( {
 		onNavigationBack();
 		onCloseBottomSheet( null );
 		shouldDisableBottomSheetMaxHeight( true );
-		if ( action === 'apply' ) {
-			setColor( currentColor );
-			if ( onApply !== undefined ) onApply( currentColor );
-		} else {
-			setColor( savedColor );
-		}
+		setColor( action === 'apply' ? currentColor : savedColor );
 	}
 
 	return (
@@ -163,9 +158,13 @@ function ColorPicker( {
 						) }
 					</View>
 				</TouchableWithoutFeedback>
-				<Text style={ colorTextStyle } selectable>
-					{ currentColor.toUpperCase() }
-				</Text>
+				{ bottomLabelText ? (
+					<Text style={ colorTextStyle }>{ bottomLabelText }</Text>
+				) : (
+					<Text style={ colorTextStyle } selectable>
+						{ currentColor.toUpperCase() }
+					</Text>
+				) }
 				<TouchableWithoutFeedback
 					onPress={ () => onButtonPress( 'apply' ) }
 					hitSlop={ hitSlop }

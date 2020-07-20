@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalUnitControl as BaseUnitControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import useEditorFeature from '../use-editor-feature';
+import { useSelect } from '@wordpress/data';
 
 export default function UnitControl( { units: unitsProp, ...props } ) {
 	const units = useCustomUnits( unitsProp );
@@ -36,17 +32,21 @@ function filterUnitsWithSettings( settings = [], units = [] ) {
  * @return {Array} Filtered units based on settings.
  */
 export function useCustomUnits( unitsProp ) {
-	const settings = useEditorFeature( '__experimentalDisableCustomUnits' );
-	const isDisabled = !! settings;
+	const settings = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getSettings().enableCustomUnits,
+		[]
+	);
+	const isDisabled = ! settings;
 
-	// Adjust units based on add_theme_support( 'experimental-custom-units' );
+	// Adjust units based on add_theme_support( 'custom-units' );
 	let units;
 
 	/**
 	 * Handle extra arguments for add_theme_support
 	 *
-	 * Example: add_theme_support( 'experimental-custom-units', 'rem' );
-	 * Or: add_theme_support( 'experimental-custom-units', 'px, 'rem', 'em' );
+	 * Example: add_theme_support( 'custom-units', 'rem' );
+	 * Or: add_theme_support( 'custom-units', 'px, 'rem', 'em' );
 	 *
 	 * Note: If there are unit argument (e.g. 'em'), these units are enabled
 	 * within the control.

@@ -15,6 +15,15 @@ import { BlockSettingsButton } from '../block-settings';
 
 const { Fill, Slot } = createSlotFill( 'InspectorControls' );
 
+/**
+ * Adds the block settings button when the inspector control has children
+ *
+ * In some cases we don't want to show the block settings button
+ * even if the the inspector controls have children. We can exclude
+ * those childen by passing the 'dontCount' prop
+ * (e.g. The color picker control of the Cover block is triggered
+ * by a separate swatch button)
+ * */
 const FillWithSettingsButton = ( { children, ...props } ) => {
 	const { isSelected } = useBlockEditContext();
 	if ( ! isSelected ) {
