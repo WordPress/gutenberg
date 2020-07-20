@@ -135,6 +135,7 @@ class Inserter extends Component {
 				/>
 			);
 		}
+
 		return (
 			<InserterMenu
 				onSelect={ onClose }
