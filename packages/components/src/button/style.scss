@@ -173,11 +173,11 @@
 		}
 
 		&:focus:not(:disabled) {
-			color: $theme-color;
+			color: var(--wp-admin-theme-color);
 		}
 
 		&:active:not(:disabled) {
-			background: $light-gray-tertiary;
+			background: $light-gray-600;
 		}
 	}
 
@@ -227,7 +227,7 @@
 			}
 
 			&:focus:not(:disabled) {
-				color: $blue-medium-900;
+				color: var(--wp-admin-theme-color);
 			}
 		}
 	}
