@@ -195,16 +195,6 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/hulu',
-		settings: {
-			title: 'Hulu',
-			icon: embedVideoIcon,
-			keywords: [ __( 'video' ) ],
-			description: __( 'Embed Hulu content.' ),
-		},
-		patterns: [ /^https?:\/\/(www\.)?hulu\.com\/.+/i ],
-	},
-	{
 		name: 'core-embed/imgur',
 		settings: {
 			title: 'Imgur',

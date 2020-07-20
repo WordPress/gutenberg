@@ -37,6 +37,7 @@ export function InputControl(
 		isPressEnterToChange = false,
 		isFloatingLabel = false,
 		label,
+		labelPosition = 'top',
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
@@ -75,8 +76,11 @@ export function InputControl(
 	return (
 		<Root
 			className={ classes }
+			gap={ 3 }
 			isFloatingLabel={ isFloatingLabelSet }
 			isFocused={ isFocused }
+			justify="left"
+			labelPosition={ labelPosition }
 		>
 			<Label
 				className="components-input-control__label"
@@ -93,6 +97,7 @@ export function InputControl(
 				className="components-input-control__container"
 				disabled={ disabled }
 				isFocused={ isFocused }
+				labelPosition={ labelPosition }
 			>
 				{ prefix && (
 					<Prefix className="components-input-control__prefix">
