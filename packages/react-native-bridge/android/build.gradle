@@ -204,10 +204,12 @@ if (buildGutenbergMobileJSBundle) {
 
         def isRelevantFile = { it.name.endsWithAny('.js', '.css', '.scss') || it.name == 'package.json' }
         def inputFiles = []
+        def projectRootAsPath = project.rootDir.toPath()
         dirs.forEach { dir ->
             file(dir).eachFile {
                 if (isRelevantFile(it)) {
-                    inputFiles << it
+                    def inputFile = projectRootAsPath.relativize(it.toPath()).toFile()
+                    inputFiles << inputFile
                 }
             }
         }
