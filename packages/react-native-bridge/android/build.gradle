@@ -208,9 +208,9 @@ if (buildGutenbergMobileJSBundle) {
         dirs.forEach { dir ->
             file(dir).eachFile {
                 if (isRelevantFile(it)) {
-                    def inputFile = projectRootAsPath.relativize(it.toPath()).toFile()
-                    inputFiles << inputFile
-                    println inputFile.toString()
+                    // relativize the file path, otherwise inputs won't be relocatable and task hash
+                    // will be different between checkouts or machines, missing the build cache.
+                    inputFiles << projectRootAsPath.relativize(it.toPath()).toFile()
                 }
             }
         }
