@@ -49,6 +49,84 @@ function Indicator( { clientId } ) {
 	);
 }
 
+function InsertionPointPopover( {
+	clientId,
+	isInserterShown,
+	isInserterForced,
+	setIsInserterForced,
+	containerRef,
+	isInserterHidden,
+} ) {
+	const ref = useRef();
+	const element = getBlockDOMNode( clientId );
+
+	function focusClosestTabbable( event ) {
+		const { clientX, clientY, target } = event;
+
+		// Only handle click on the wrapper specifically, and not an event
+		// bubbled from the inserter itself.
+		if ( target !== ref.current ) {
+			return;
+		}
+
+		const targetRect = target.getBoundingClientRect();
+		const isReverse = clientY < targetRect.top + targetRect.height / 2;
+		const container = isReverse ? containerRef.current : element;
+		const closest =
+			getClosestTabbable( element, true, container ) || element;
+		const rect = new window.DOMRect( clientX, clientY, 0, 16 );
+
+		placeCaretAtVerticalEdge( closest, isReverse, rect, false );
+	}
+
+	return (
+		<Popover
+			noArrow
+			animate={ false }
+			anchorRef={ element }
+			position="top right left"
+			focusOnMount={ false }
+			className="block-editor-block-list__insertion-point-popover"
+			__unstableSlotName="block-toolbar"
+		>
+			<div
+				className="block-editor-block-list__insertion-point"
+				style={ { width: element?.offsetWidth } }
+			>
+				<Indicator clientId={ clientId } />
+				{ ( isInserterShown || isInserterForced ) && (
+					/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+					<div
+						ref={ ref }
+						onFocus={ () => setIsInserterForced( true ) }
+						onBlur={ () => setIsInserterForced( false ) }
+						onClick={ focusClosestTabbable }
+						// While ideally it would be enough to capture the
+						// bubbling focus event from the Inserter, due to the
+						// characteristics of click focusing of `button`s in
+						// Firefox and Safari, it is not reliable.
+						//
+						// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+						tabIndex={ -1 }
+						className={ classnames(
+							'block-editor-block-list__insertion-point-inserter',
+							{
+								'is-inserter-hidden': isInserterHidden,
+							}
+						) }
+					>
+						<Inserter
+							position="bottom center"
+							clientId={ clientId }
+							__experimentalIsQuick
+						/>
+					</div>
+				) }
+			</div>
+		</Popover>
+	);
+}
+
 export default function InsertionPoint( {
 	hasMultiSelection,
 	selectedBlockClientId,
@@ -57,9 +135,7 @@ export default function InsertionPoint( {
 } ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
-	const [ inserterElement, setInserterElement ] = useState( null );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
-	const ref = useRef();
 	const {
 		multiSelectedBlockClientIds,
 		isMultiSelecting,
@@ -128,28 +204,7 @@ export default function InsertionPoint( {
 		}
 
 		setIsInserterShown( true );
-		setInserterElement( element );
 		setInserterClientId( clientId );
-	}
-
-	function focusClosestTabbable( event ) {
-		const { clientX, clientY, target } = event;
-
-		// Only handle click on the wrapper specifically, and not an event
-		// bubbled from the inserter itself.
-		if ( target !== ref.current ) {
-			return;
-		}
-
-		const targetRect = target.getBoundingClientRect();
-		const isReverse = clientY < targetRect.top + targetRect.height / 2;
-		const blockNode = getBlockDOMNode( inserterClientId );
-		const container = isReverse ? containerRef.current : blockNode;
-		const closest =
-			getClosestTabbable( blockNode, true, container ) || blockNode;
-		const rect = new window.DOMRect( clientX, clientY, 0, 16 );
-
-		placeCaretAtVerticalEdge( closest, isReverse, rect, false );
 	}
 
 	// Hide the inserter above the selected block and during multi-selection.
@@ -157,59 +212,20 @@ export default function InsertionPoint( {
 		? multiSelectedBlockClientIds.includes( inserterClientId )
 		: inserterClientId === selectedBlockClientId;
 	const isVisible = isInserterShown || isInserterForced || isInserterVisible;
-	const selectedElement = selectedClientId
-		? getBlockDOMNode( selectedClientId )
-		: inserterElement;
 
 	return (
 		<>
 			{ ! isMultiSelecting && isVisible && (
-				<Popover
-					noArrow
-					animate={ false }
-					anchorRef={ selectedElement }
-					position="top right left"
-					focusOnMount={ false }
-					className="block-editor-block-list__insertion-point-popover"
-					__unstableSlotName="block-toolbar"
-				>
-					<div
-						className="block-editor-block-list__insertion-point"
-						style={ { width: selectedElement.offsetWidth } }
-					>
-						<Indicator
-							clientId={ selectedClientId || inserterClientId }
-						/>
-						{ ( isInserterShown || isInserterForced ) && (
-							/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
-							<div
-								ref={ ref }
-								onFocus={ () => setIsInserterForced( true ) }
-								onBlur={ () => setIsInserterForced( false ) }
-								onClick={ focusClosestTabbable }
-								// While ideally it would be enough to capture the
-								// bubbling focus event from the Inserter, due to the
-								// characteristics of click focusing of `button`s in
-								// Firefox and Safari, it is not reliable.
-								//
-								// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-								tabIndex={ -1 }
-								className={ classnames(
-									'block-editor-block-list__insertion-point-inserter',
-									{
-										'is-inserter-hidden': isInserterHidden,
-									}
-								) }
-							>
-								<Inserter
-									position="bottom center"
-									clientId={ inserterClientId }
-									__experimentalIsQuick
-								/>
-							</div>
-						) }
-					</div>
-				</Popover>
+				<InsertionPointPopover
+					clientId={
+						isInserterVisible ? selectedClientId : inserterClientId
+					}
+					isInserterShown={ isInserterShown }
+					isInserterForced={ isInserterForced }
+					setIsInserterForced={ setIsInserterForced }
+					containerRef={ containerRef }
+					isInserterHidden={ isInserterHidden }
+				/>
 			) }
 			<div
 				onMouseMove={
