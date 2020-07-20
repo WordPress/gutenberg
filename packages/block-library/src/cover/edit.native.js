@@ -399,7 +399,7 @@ const Cover = ( {
 								{
 									destructiveButton: true,
 									id: 'clearMedia',
-									label: __( 'Clear media' ),
+									label: __( 'Clear Media' ),
 									onPress: onClearMedia,
 									separated: true,
 									value: 'clearMedia',
