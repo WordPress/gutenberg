@@ -74,7 +74,7 @@ E.g displayShortcutList.primary( 'm' ) will return [ '⌘', 'M' ] on Mac.
 
 _Type_
 
--   `WPKeycodeHandlerByModifier` Keyed map of functions to shortcut sequences.
+-   (unknown type) Keyed map of functions to shortcut sequences.
 
 <a name="DOWN" href="#DOWN">#</a> **DOWN**
 
@@ -101,7 +101,7 @@ signals pressing ⌘M.
 
 _Type_
 
--   `WPKeycodeHandlerByModifier` Keyed map of functions to match events.
+-   (unknown type) Keyed map of functions to match events.
 
 <a name="LEFT" href="#LEFT">#</a> **LEFT**
 
@@ -109,29 +109,13 @@ Keycode for LEFT key.
 
 <a name="modifiers" href="#modifiers">#</a> **modifiers**
 
-Object that contains functions that return the available modifier
-depending on platform.
+_Type_
 
--   `primary`: takes a isApple function as a parameter.
--   `primaryShift`: takes a isApple function as a parameter.
--   `primaryAlt`: takes a isApple function as a parameter.
--   `secondary`: takes a isApple function as a parameter.
--   `access`: takes a isApple function as a parameter.
--   `ctrl`
--   `alt`
--   `ctrlShift`
--   `shift`
--   `shiftAlt`
+-   (unknown type) 
 
 <a name="rawShortcut" href="#rawShortcut">#</a> **rawShortcut**
 
-An object that contains functions to get raw shortcuts.
-E.g. rawShortcut.primary( 'm' ) will return 'meta+m' on Mac.
-These are intended for user with the KeyboardShortcuts component or TinyMCE.
-
-_Type_
-
--   `WPKeycodeHandlerByModifier` Keyed map of functions to raw shortcuts.
+Undocumented declaration.
 
 <a name="RIGHT" href="#RIGHT">#</a> **RIGHT**
 

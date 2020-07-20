@@ -32,7 +32,7 @@ import { isAppleOS } from './platform';
  * An object of handler functions for each of the possible modifier
  * combinations. A handler will return a value for a given key.
  *
- * @typedef {Record<WPKeycodeModifier, (key:string)=>any>} WPKeycodeHandlerByModifier
+ * @typedef {Record<WPKeycodeModifier, (key:string)=>string>} WPKeycodeHandlerByModifier
  */
 
 /**
@@ -101,19 +101,7 @@ export const SHIFT = 'shift';
 export const ZERO = 48;
 
 /**
- * Object that contains functions that return the available modifier
- * depending on platform.
- *
- * - `primary`: takes a isApple function as a parameter.
- * - `primaryShift`: takes a isApple function as a parameter.
- * - `primaryAlt`: takes a isApple function as a parameter.
- * - `secondary`: takes a isApple function as a parameter.
- * - `access`: takes a isApple function as a parameter.
- * - `ctrl`
- * - `alt`
- * - `ctrlShift`
- * - `shift`
- * - `shiftAlt`
+ * @type {Record.<WPKeycodeModifier,(isApple: (() => boolean)) => string[]>}
  */
 export const modifiers = {
 	primary: ( _isApple ) => ( _isApple() ? [ COMMAND ] : [ CTRL ] ),
@@ -136,10 +124,11 @@ export const modifiers = {
  * E.g. rawShortcut.primary( 'm' ) will return 'meta+m' on Mac.
  * These are intended for user with the KeyboardShortcuts component or TinyMCE.
  *
- * @type {WPKeycodeHandlerByModifier} Keyed map of functions to raw shortcuts.
+ * @type {Record.<WPKeycodeModifier,(x:string)=>string>}
  */
+//  * @type {WPKeycodeHandlerByModifier} Keyed map of functions to raw shortcuts.
 export const rawShortcut = mapValues( modifiers, ( modifier ) => {
-	return ( character, _isApple = isAppleOS ) => {
+	return ( /** @type {string} */ character, _isApple = isAppleOS ) => {
 		return [ ...modifier( _isApple ), character.toLowerCase() ].join( '+' );
 	};
 } );
@@ -148,11 +137,11 @@ export const rawShortcut = mapValues( modifiers, ( modifier ) => {
  * Return an array of the parts of a keyboard shortcut chord for display
  * E.g displayShortcutList.primary( 'm' ) will return [ '⌘', 'M' ] on Mac.
  *
- * @type {WPKeycodeHandlerByModifier} Keyed map of functions to shortcut
- *                                    sequences.
+ * @type {Record.<WPKeycodeModifier,(character:string,isApple:()=>boolean)=>string[]>} Keyed map of functions to
+ *                                                                                     shortcut sequences.
  */
 export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
-	return ( character, _isApple = isAppleOS ) => {
+	return ( /** @type {string} */ character, _isApple = isAppleOS ) => {
 		const isApple = _isApple();
 		const replacementKeyMap = {
 			[ ALT ]: isApple ? '⌥' : 'Alt',
@@ -171,7 +160,7 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 
 				return [ ...accumulator, replacementKey, '+' ];
 			},
-			[]
+			/** @type {string[]} */ ( [] )
 		);
 
 		const capitalizedCharacter = capitalize( character );
@@ -189,7 +178,7 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 export const displayShortcut = mapValues(
 	displayShortcutList,
 	( shortcutList ) => {
-		return ( character, _isApple = isAppleOS ) =>
+		return ( /** @type {string} */ character, _isApple = isAppleOS ) =>
 			shortcutList( character, _isApple ).join( '' );
 	}
 );
@@ -202,7 +191,7 @@ export const displayShortcut = mapValues(
  *                                    labels.
  */
 export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
-	return ( character, _isApple = isAppleOS ) => {
+	return ( /** @type {string} */ character, _isApple = isAppleOS ) => {
 		const isApple = _isApple();
 		const replacementKeyMap = {
 			[ SHIFT ]: 'Shift',
@@ -223,18 +212,27 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 	};
 } );
 
+// FIXME: Could I make this typdef an actual enum??
+/**
+ * @typedef {(ALT|CTRL|COMMAND|SHIFT)} ActiveModifiers
+ */
 /**
  * From a given KeyboardEvent, returns an array of active modifier constants for
  * the event.
  *
  * @param {KeyboardEvent} event Keyboard event.
  *
- * @return {Array<ALT|CTRL|COMMAND|SHIFT>} Active modifier constants.
+ * @return {ActiveModifiers[]} Active modifier constants.
  */
 function getEventModifiers( event ) {
-	return [ ALT, CTRL, COMMAND, SHIFT ].filter(
-		( key ) => event[ `${ key }Key` ]
-	);
+	return /** @type {ActiveModifiers[]} */ ( [
+		ALT,
+		CTRL,
+		COMMAND,
+		SHIFT,
+	] ).filter( ( key ) => {
+		return /** @type {any} */ ( event )[ `${ key }Key` ];
+	} );
 }
 
 /**
@@ -243,10 +241,14 @@ function getEventModifiers( event ) {
  * E.g. isKeyboardEvent.primary( event, 'm' ) will return true if the event
  * signals pressing ⌘M.
  *
- * @type {WPKeycodeHandlerByModifier} Keyed map of functions to match events.
+ * @type {Record.<WPKeycodeModifier,(e:KeyboardEvent,character:string)=>boolean>} Keyed map of functions to match events.
  */
 export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
-	return ( event, character, _isApple = isAppleOS ) => {
+	return (
+		/** @type {KeyboardEvent} */ event,
+		/** @type {string} */ character,
+		_isApple = isAppleOS
+	) => {
 		const mods = getModifiers( _isApple );
 		const eventMods = getEventModifiers( event );
 

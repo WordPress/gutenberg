@@ -87,7 +87,26 @@ class AztecView extends React.Component {
 		};
 		onKeyDown( newEvent );
 	}
+	/**
+	 * @typedef KeyDownNativeEvent
+	 * @property {string} keyCode Key code.
+	 */
+	/**
+	 * @type {KeyDownNativeEvent}
+	 */
+	// * @property {{keyCode: string}} nativeEvent Native event.
+	/**
+	 * @typedef KeyDownEvent
+	 * @property {KeyDownNativeEvent} nativeEvent Native event.
+	 */
 
+	/**
+	 * @type {KeyDownEvent}
+	 */
+	/**
+	 * @private
+	 * @param {KeyDownEvent} event
+	 */
 	_onKeyDown( event ) {
 		if ( ! this.props.onKeyDown ) {
 			return;

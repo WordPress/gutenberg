@@ -1,0 +1,19 @@
+{
+	// Extends a base configuration common to most packages
+	"extends": "../../tsconfig.base.json",
+
+	// Options for the TypeScript compiler
+	// We'll usually set our `rootDir` and `declarationDir` as follows, which is specific
+	// to each project.
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types"
+	},
+
+	// Which source files should be included
+	"include": [ "src/**/*" ],
+
+	// Other WordPress package dependencies that have opted-in to TypeScript should be listed
+	// here. In this case, our package depends on `@wordpress/dom-ready`.
+	"references": [ { "path":  "../i18n"}]
+}
