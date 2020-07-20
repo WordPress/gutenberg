@@ -2,7 +2,7 @@
 	"name": "core/post-author",
 	"category": "design",
 	"attributes": {
-		"align": {
+		"textAlign": {
 			"type": "string"
 		},
 		"avatarSize": {

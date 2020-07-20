@@ -43,7 +43,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 
 	const { editEntityRecord } = useDispatch( 'core' );
 
-	const { align, showAvatar, showBio, byline } = attributes;
+	const { textAlign, showAvatar, showBio, byline } = attributes;
 
 	const avatarSizes = [];
 	if ( authorDetails ) {
@@ -58,10 +58,10 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 	const classNames = useMemo( () => {
 		return {
 			block: classnames( 'wp-block-post-author', {
-				[ `has-text-align-${ align }` ]: align,
+				[ `has-text-align-${ textAlign }` ]: textAlign,
 			} ),
 		};
-	}, [ align ] );
+	}, [ textAlign ] );
 
 	return (
 		<>
@@ -113,9 +113,9 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 
 			<BlockControls>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>

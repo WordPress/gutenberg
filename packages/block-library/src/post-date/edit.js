@@ -26,7 +26,7 @@ import {
 import { __ } from '@wordpress/i18n';
 
 export default function PostDateEdit( { attributes, context, setAttributes } ) {
-	const { align, format } = attributes;
+	const { textAlign, format } = attributes;
 	const { postId, postType } = context;
 
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
@@ -60,9 +60,9 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 		<>
 			<BlockControls>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 
@@ -101,7 +101,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 
 			<Block.div
 				className={ classnames( {
-					[ `has-text-align-${ align }` ]: align,
+					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
 				{ date && (
