@@ -20,7 +20,7 @@ const PickerScreen = () => {
 	const {
 		onShouldEnableInnerHandling,
 		shouldEnableBottomSheetMaxHeight,
-		onCloseBottomSheet,
+		onHandleClosingBottomSheet,
 		isBottomSheetContentScrolling,
 		shouldEnableBottomSheetScroll,
 	} = useContext( BottomSheetContext );
@@ -35,7 +35,7 @@ const PickerScreen = () => {
 			activeColor={ currentValue }
 			isGradientColor={ isGradientColor }
 			onNavigationBack={ navigation.goBack }
-			onCloseBottomSheet={ onCloseBottomSheet }
+			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
 			isBottomSheetContentScrolling={ isBottomSheetContentScrolling }
 			shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
 		/>
