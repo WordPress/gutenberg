@@ -33,7 +33,7 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 		array( 'wp-block-post-author' ),
 		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['align'] ) ? array( 'has-text-align-' . $attributes['align'] ) : array()
+		isset( $attributes['textAlign'] ) ? array( 'has-text-align-' . $attributes['textAlign'] ) : array()
 	);
 
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
