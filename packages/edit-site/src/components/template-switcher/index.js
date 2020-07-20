@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRegistry, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import {
 	Tooltip,
 	DropdownMenu,
@@ -16,7 +16,6 @@ import { Icon, home, plus, undo } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { findTemplate } from '../../utils';
 import TemplatePreview from './template-preview';
 import ThemePreview from './theme-preview';
 
@@ -69,20 +68,7 @@ export default function TemplateSwitcher( {
 		setThemePreviewVisible( () => false );
 	};
 
-	const registry = useRegistry();
-	const [ homeId, setHomeId ] = useState();
-
-	useEffect( () => {
-		findTemplate(
-			'/',
-			registry.__experimentalResolveSelect( 'core' ).getEntityRecords
-		).then(
-			( newHomeId ) => setHomeId( newHomeId ),
-			() => setHomeId( null )
-		);
-	}, [ registry ] );
-
-	const { currentTheme, template, templateParts } = useSelect(
+	const { currentTheme, template, templateParts, homeId } = useSelect(
 		( select ) => {
 			const {
 				getCurrentTheme,
@@ -96,6 +82,8 @@ export default function TemplateSwitcher( {
 				activeId
 			);
 
+			const { getHomeTemplateId } = select( 'core/edit-site' );
+
 			return {
 				currentTheme: getCurrentTheme(),
 				template: _template,
@@ -105,6 +93,7 @@ export default function TemplateSwitcher( {
 							template: _template.slug,
 					  } )
 					: null,
+				homeId: getHomeTemplateId(),
 			};
 		},
 		[ activeId ]
@@ -128,9 +117,11 @@ export default function TemplateSwitcher( {
 	} ) );
 
 	const overwriteSlug =
+		page &&
 		TEMPLATE_OVERRIDES[ page.type ] &&
 		page.slug &&
 		TEMPLATE_OVERRIDES[ page.type ]( page.slug );
+
 	const overwriteTemplate = () =>
 		onAddTemplate( {
 			slug: overwriteSlug,
