@@ -215,6 +215,10 @@ if (buildGutenbergMobileJSBundle) {
             }
         }
 
+        // WARNING: gutenberg/packages/react-native-editor/i18n-cache/index.native.js is generated
+        //  during the bundling stage, causing the inputs to be different between builds. We should
+        //  either ignore the file, or perhaps not do any i18n fetching/generating?
+
         inputs.files(inputFiles).withPathSensitivity(PathSensitivity.RELATIVE)
 
         def origWithPath = "$buildResRawFolder/$bundleName"
