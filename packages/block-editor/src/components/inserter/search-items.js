@@ -110,7 +110,7 @@ export const searchBlockItems = (
  * @param {Object} config     Search Config.
  * @return {Array}            Filtered item list.
  */
-export const searchItems = ( items, searchTerm, config = {} ) => {
+export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
 	const normalizedSearchTerms = normalizeSearchTerm( searchTerm );
 	if ( normalizedSearchTerms.length === 0 ) {
 		return items;
