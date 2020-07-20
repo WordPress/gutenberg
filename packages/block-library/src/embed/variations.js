@@ -43,7 +43,8 @@ const variations = [
 		description: __(
 			'Embed videos, images, tweets, audio, and other content from external sources.'
 		),
-		attributes: { providerNameSlug: '' }, // todo ts check this
+		// Unknown embeds should not be responsive by default.
+		attributes: { responsive: false },
 	},
 	{
 		name: 'twitter',

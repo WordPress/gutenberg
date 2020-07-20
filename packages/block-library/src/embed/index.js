@@ -23,8 +23,6 @@ export const settings = {
 	),
 	edit,
 	// save,
-	// Unknown embeds should not be responsive by default.
-	responsive: false, // todo ts check this...
 	transforms,
 	variations,
 	deprecated,
