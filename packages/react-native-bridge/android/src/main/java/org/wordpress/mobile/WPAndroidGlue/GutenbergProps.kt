@@ -46,10 +46,11 @@ data class GutenbergProps(
         private const val PROP_POST_TYPE = "postType"
         private const val PROP_LOCALE = "locale"
         private const val PROP_TRANSLATIONS = "translations"
-        private const val PROP_CAPABILITIES = "capabilities"
-        private const val PROP_CAPABILITIES_MENTIONS = "mentions"
-        private const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
+
+        const val PROP_CAPABILITIES = "capabilities"
+        const val PROP_CAPABILITIES_MENTIONS = "mentions"
+        const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
     }
 }
