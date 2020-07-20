@@ -481,6 +481,7 @@ _Properties_
 -   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
 -   _fontSizes_ `Array`: Available font sizes
 -   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
+-   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
