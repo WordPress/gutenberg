@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import { common, others } from './core-embeds';
 import {
 	DEFAULT_EMBED_BLOCK,
 	WORDPRESS_EMBED_BLOCK,
@@ -11,7 +10,7 @@ import {
 /**
  * External dependencies
  */
-import { includes, kebabCase, toLower } from 'lodash';
+import { kebabCase } from 'lodash';
 import classnames from 'classnames/dedupe';
 import memoize from 'memize';
 
@@ -20,6 +19,26 @@ import memoize from 'memize';
  */
 import { renderToString } from '@wordpress/element';
 import { createBlock, getBlockType } from '@wordpress/blocks';
+import { _x } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import variations from './variations';
+import { embedContentIcon } from './icons';
+
+// todo ts jsdoc
+// todo ts tests
+export const getEmbedInfoByProvider = ( provider ) => {
+	const defaultEmbedInfo = {
+		title: _x( 'Embed', 'block title' ),
+		icon: embedContentIcon,
+	};
+	const { title, icon } =
+		variations.find( ( { name } ) => name === provider ) ||
+		defaultEmbedInfo;
+	return { title, icon };
+};
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -28,11 +47,8 @@ import { createBlock, getBlockType } from '@wordpress/blocks';
  * @param {Array}    patterns The list of regular expressions to test agains.
  * @return {boolean} True if any of the regular expressions match the URL.
  */
-export const matchesPatterns = ( url, patterns = [] ) => {
-	return patterns.some( ( pattern ) => {
-		return url.match( pattern );
-	} );
-};
+export const matchesPatterns = ( url, patterns = [] ) =>
+	patterns.some( ( pattern ) => url.match( pattern ) );
 
 /**
  * Finds the block name that should be used for the URL, based on the
@@ -42,7 +58,7 @@ export const matchesPatterns = ( url, patterns = [] ) => {
  * @return {string} The name of the block that should be used for this URL, e.g. core-embed/twitter
  */
 export const findBlock = ( url ) => {
-	for ( const block of [ ...common, ...others ] ) {
+	for ( const block of variations ) {
 		if ( matchesPatterns( url, block.patterns ) ) {
 			return block.name;
 		}
@@ -50,14 +66,13 @@ export const findBlock = ( url ) => {
 	return DEFAULT_EMBED_BLOCK;
 };
 
-export const isFromWordPress = ( html ) => {
-	return includes( html, 'class="wp-embedded-content"' );
-};
+export const isFromWordPress = ( html ) =>
+	html.includes( 'class="wp-embedded-content"' );
 
 export const getPhotoHtml = ( photo ) => {
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
 	// actually the full size photo. If thumbnails not found, use full image.
-	const imageUrl = photo.thumbnail_url ? photo.thumbnail_url : photo.url;
+	const imageUrl = photo.thumbnail_url || photo.url;
 	const photoPreview = (
 		<p>
 			<img src={ imageUrl } alt={ photo.title } width="100%" />
@@ -106,25 +121,26 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 		}
 	}
 
-	if ( preview ) {
-		const { html } = preview;
+	if ( ! preview ) {
+		return;
+	}
 
-		// We can't match the URL for WordPress embeds, we have to check the HTML instead.
-		if ( isFromWordPress( html ) ) {
-			// If this is not the WordPress embed block, transform it into one.
-			if ( WORDPRESS_EMBED_BLOCK !== name ) {
-				return createBlock( WORDPRESS_EMBED_BLOCK, {
-					url,
-					// By now we have the preview, but when the new block first renders, it
-					// won't have had all the attributes set, and so won't get the correct
-					// type and it won't render correctly. So, we pass through the current attributes
-					// here so that the initial render works when we switch to the WordPress
-					// block. This only affects the WordPress block because it can't be
-					// rendered in the usual Sandbox (it has a sandbox of its own) and it
-					// relies on the preview to set the correct render type.
-					...attributesFromPreview,
-				} );
-			}
+	const { html } = preview;
+	// We can't match the URL for WordPress embeds, we have to check the HTML instead.
+	if ( isFromWordPress( html ) ) {
+		// If this is not the WordPress embed block, transform it into one.
+		if ( WORDPRESS_EMBED_BLOCK !== name ) {
+			return createBlock( WORDPRESS_EMBED_BLOCK, {
+				url,
+				// By now we have the preview, but when the new block first renders, it
+				// won't have had all the attributes set, and so won't get the correct
+				// type and it won't render correctly. So, we pass through the current attributes
+				// here so that the initial render works when we switch to the WordPress
+				// block. This only affects the WordPress block because it can't be
+				// rendered in the usual Sandbox (it has a sandbox of its own) and it
+				// relies on the preview to set the correct render type.
+				...attributesFromPreview,
+			} );
 		}
 	}
 };
@@ -227,7 +243,7 @@ export const getAttributesFromPreview = memoize(
 		// because not all embed code gives us a provider name.
 		const { html, provider_name: providerName } = preview;
 		const providerNameSlug = kebabCase(
-			toLower( '' !== providerName ? providerName : title )
+			( providerName ?? title ).toLowerCase()
 		);
 
 		if ( isFromWordPress( html ) ) {
