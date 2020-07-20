@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { FlatList, View, TouchableHighlight, Dimensions } from 'react-native';
+import {
+	FlatList,
+	View,
+	TouchableHighlight,
+	TouchableWithoutFeedback,
+	Dimensions,
+} from 'react-native';
 import { pick } from 'lodash';
 
 /**
@@ -139,7 +145,11 @@ export class InserterMenu extends Component {
 								numColumns={ numberOfColumns }
 								data={ items }
 								ItemSeparatorComponent={ () => (
-									<View style={ styles.rowSeparator } />
+									<TouchableWithoutFeedback
+										accessible={ false }
+									>
+										<View style={ styles.rowSeparator } />
+									</TouchableWithoutFeedback>
 								) }
 								keyExtractor={ ( item ) => item.name }
 								renderItem={ this.renderItem }
