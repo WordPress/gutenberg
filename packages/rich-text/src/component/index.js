@@ -1106,7 +1106,7 @@ function RichText( {
 	const editableProps = {
 		// Overridable props.
 		role: 'textbox',
-		'aria-multiline': '',
+		'aria-multiline': true,
 		'aria-label': placeholder,
 		...ariaProps,
 		ref,
