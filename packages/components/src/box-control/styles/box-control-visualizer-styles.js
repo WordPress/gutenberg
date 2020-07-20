@@ -31,7 +31,6 @@ export const Container = styled.div`
 
 export const Side = styled.div`
 	box-sizing: border-box;
-	background: ${ color( 'blue.wordpress.700' ) };
 	background: ${ color( 'ui.theme' ) };
 	filter: brightness( 1 );
 	opacity: 0;

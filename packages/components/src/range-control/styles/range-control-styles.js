@@ -33,7 +33,6 @@ const wrapperMargin = ( { marks } ) =>
 
 export const Wrapper = styled.span`
 	box-sizing: border-box;
-	color: ${ color( 'blue.medium.focus' ) };
 	display: block;
 	flex: 1;
 	padding-top: 15px;

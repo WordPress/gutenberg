@@ -3,6 +3,19 @@
  */
 import { hasVariable, getFallbackDeclaration } from './utils';
 
+/*
+ * This plugin is for the stylis library. It's the CSS compiler used by
+ * CSS-in-JS libraries like Emotion.
+ *
+ * https://github.com/thysultan/stylis.js
+ */
+
+/*
+ * Generates fallback values for CSS rule declarations that contain CSS var().
+ * This plugin parses uses specified fallback values within the var()
+ * function. If one is not provided, it will attempt to use the matching
+ * variable declared at the :root scope.
+ */
 export function stylisPluginCssCustomProperties() {
 	const seen = new WeakSet();
 

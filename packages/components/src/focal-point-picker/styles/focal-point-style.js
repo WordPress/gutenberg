@@ -45,6 +45,5 @@ export const PointerIconPathOutline = styled( Path )`
 `;
 
 export const PointerIconPathFill = styled( Path )`
-	fill: ${ color( 'blue.wordpress.700' ) };
 	fill: ${ color( 'ui.theme' ) };
 `;
