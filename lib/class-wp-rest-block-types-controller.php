@@ -126,6 +126,9 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 		$data        = array();
 		$block_types = $this->block_registry->get_all_registered();
 
+		/** This filter is documented in wp-admin/edit-form-blocks.php */
+		$block_types = apply_filters( 'allowed_block_types', $block_types, $post );
+
 		// Retrieve the list of registered collection query parameters.
 		$registered = $this->get_collection_params();
 		$namespace  = '';
