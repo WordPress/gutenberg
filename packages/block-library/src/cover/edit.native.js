@@ -400,11 +400,14 @@ const Cover = ( {
 							}
 							setColor={ setColor }
 							onCustomPress={ () => {
-								isParentSelected && openGeneralSidebar();
-								setCustomColorPickerShowing( true );
+								if ( isParentSelected ) {
+									openGeneralSidebar();
+									setCustomColorPickerShowing( true );
+								}
 							} }
 							defaultSettings={ coverDefaultPalette }
 							shouldShowCustomLabel={ false }
+							shouldShowCustomVerticalSeparator={ false }
 						/>
 					</View>
 				</MediaPlaceholder>
