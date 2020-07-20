@@ -5,6 +5,7 @@
 	}
 }
 
-.wp-block-post-excerpt.has-link-color a {
-	color: var(--wp--style--color--link) !important;
+.wp-block-post-excerpt.has-link-color a,
+.wp-block-post-excerpt.has-background.has-link-color a {
+	color: var(--wp--style--color--link);
 }
