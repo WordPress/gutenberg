@@ -82,9 +82,9 @@ export class MediaEdit extends React.Component {
 				} );
 				break;
 			default:
-				const optionSelected = pickerOptions.find(
-					( option ) => option.id === value
-				);
+				const optionSelected =
+					pickerOptions &&
+					pickerOptions.find( ( option ) => option.id === value );
 
 				if ( optionSelected && optionSelected.onPress ) {
 					optionSelected.onPress();
