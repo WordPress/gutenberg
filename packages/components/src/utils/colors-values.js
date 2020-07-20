@@ -137,9 +137,9 @@ export const ALERT = {
 export const UI = {
 	background: BASE.white,
 	backgroundDisabled: LIGHT_GRAY[ 200 ],
-	brand: BLUE.wordpress[ 700 ],
+	brand: `var( --wp-admin-theme-color, ${ BLUE.wordpress[ 700 ] })`,
 	border: G2.darkGray.primary,
-	borderFocus: BLUE.medium.focus,
+	borderFocus: `var( --wp-admin-theme-color-darker-10, ${ BLUE.medium.focus })`,
 	borderDisabled: DARK_GRAY[ 700 ],
 	borderLight: LIGHT_GRAY[ 600 ],
 	label: DARK_GRAY[ 500 ],

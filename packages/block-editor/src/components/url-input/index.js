@@ -64,10 +64,10 @@ class URLInput extends Component {
 		if (
 			showSuggestions &&
 			selectedSuggestion !== null &&
+			this.suggestionNodes[ selectedSuggestion ] &&
 			! this.scrollingIntoView
 		) {
 			this.scrollingIntoView = true;
-
 			scrollIntoView(
 				this.suggestionNodes[ selectedSuggestion ],
 				this.autocompleteRef.current,
