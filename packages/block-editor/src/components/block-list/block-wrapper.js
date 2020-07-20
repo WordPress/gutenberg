@@ -71,7 +71,7 @@ const BlockComponent = forwardRef(
 					initialPosition: isSelected
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
-					isNavigationMode: _isNavigationMode
+					isNavigationMode: _isNavigationMode,
 				};
 			},
 			[ isSelected ]
