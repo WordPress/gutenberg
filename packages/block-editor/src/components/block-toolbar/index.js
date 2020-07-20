@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
@@ -21,7 +21,7 @@ import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import BlockDraggable from '../block-draggable';
-import { useShowMoversGestures, useToggleBlockHighlight } from './utils';
+import { useShowMoversGestures } from './utils';
 
 export default function BlockToolbar( { hideDragHandle } ) {
 	const {
@@ -61,13 +61,15 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		};
 	}, [] );
 
-	const toggleBlockHighlight = useToggleBlockHighlight( blockClientId );
+	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
 	const nodeRef = useRef();
 
 	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
 		{
 			ref: nodeRef,
-			onChange: toggleBlockHighlight,
+			onChange( isFocused ) {
+				toggleBlockHighlight( blockClientId, isFocused );
+			},
 		}
 	);
 
