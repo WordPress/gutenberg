@@ -4,6 +4,10 @@
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
-		"lightBlockWrapper": true
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
+		}
 	}
 }
