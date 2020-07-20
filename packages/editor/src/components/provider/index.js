@@ -7,6 +7,7 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
+import { __experimentalStyledProvider as StyledProvider } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -219,7 +220,7 @@ class EditorProvider extends Component {
 		);
 
 		return (
-			<>
+			<StyledProvider>
 				<EditorStyles styles={ settings.styles } />
 				<EntityProvider kind="root" type="site">
 					<EntityProvider
@@ -244,7 +245,7 @@ class EditorProvider extends Component {
 						</BlockContextProvider>
 					</EntityProvider>
 				</EntityProvider>
-			</>
+			</StyledProvider>
 		);
 	}
 }
