@@ -18,7 +18,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 				'core/editor'
 			);
 
-			const blocks = getBlocksByClientId( clientIds );
+			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
 			const _isReusable =
 				blocks.length === 1 &&
@@ -28,10 +28,10 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 
 			// Show 'Convert to Regular Block' when selected block is a reusable block.
 			const _isVisible =
-				isReusable ||
+				_isReusable ||
 				// Hide 'Add to Reusable blocks' when reusable blocks are disabled.
 				( canInsertBlockType( 'core/block' ) &&
-					blocks?.every(
+					blocks.every(
 						( block ) =>
 							// Guard against the case where a regular block has *just* been converted.
 							!! block &&
