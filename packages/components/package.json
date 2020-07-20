@@ -26,6 +26,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
+		"@emotion/cache": "^10.0.22",
 		"@emotion/core": "^10.0.22",
 		"@emotion/css": "^10.0.22",
 		"@emotion/native": "^10.0.22",

@@ -15,7 +15,9 @@ import '@wordpress/components/build-style/style.css';
 /**
  * Internal dependencies
  */
+import { withStyledProvider } from './decorators';
 import './style.scss';
 
 addDecorator( withA11y );
 addDecorator( withKnobs );
+addDecorator( withStyledProvider );
