@@ -23,14 +23,15 @@ export const BottomSheetContext = createContext( {
 	isBottomSheetContentScrolling: false,
 	// Function called to enable scroll within bottom sheet
 	shouldEnableBottomSheetScroll: () => {},
-	// Function called to disable bottom sheet max height.
+	// Function called to enable/disable bottom sheet max height.
 	// E.g. used to extend bottom sheet on full screen in ColorPicker,
 	// which is helpful on small devices with set the largest font/display size.
-	shouldDisableBottomSheetMaxHeight: () => {},
+	shouldEnableBottomSheetMaxHeight: () => {},
 	// Callback that is called on closing bottom sheet
-	onCloseBottomSheet: () => {},
+	onHandleClosingBottomSheet: () => {},
 	// Android only: Function called to control android hardware back button functionality
-	onHardwareButtonPress: () => {},
+	// Return true if the bottom-sheet default close action shouldn't be called
+	onHandleHardwareButtonPress: () => {},
 } );
 
 export const {

@@ -19,13 +19,13 @@ import styles from './style.scss';
 
 function ColorPicker( {
 	shouldEnableBottomSheetScroll,
-	shouldDisableBottomSheetMaxHeight,
+	shouldEnableBottomSheetMaxHeight,
 	isBottomSheetContentScrolling,
 	setColor,
 	activeColor,
 	isGradientColor,
 	onNavigationBack,
-	onCloseBottomSheet,
+	onHandleClosingBottomSheet,
 } ) {
 	const isIOS = Platform.OS === 'ios';
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
@@ -81,8 +81,8 @@ function ColorPicker( {
 			setHSVFromHex( activeColor );
 		}
 		setColor( activeColor );
-		shouldDisableBottomSheetMaxHeight( false );
-		onCloseBottomSheet( () => setColor( savedColor ) );
+		shouldEnableBottomSheetMaxHeight( false );
+		onHandleClosingBottomSheet( () => setColor( savedColor ) );
 	}, [] );
 
 	function onHuePickerChange( { hue: h } ) {
@@ -96,8 +96,8 @@ function ColorPicker( {
 
 	function onButtonPress( action ) {
 		onNavigationBack();
-		onCloseBottomSheet( null );
-		shouldDisableBottomSheetMaxHeight( true );
+		onHandleClosingBottomSheet( null );
+		shouldEnableBottomSheetMaxHeight( true );
 		setColor( action === 'apply' ? currentColor : savedColor );
 	}
 

@@ -20,19 +20,19 @@ const BottomSheetScreen = ( { children } ) => {
 	const heightRef = useRef( { maxHeight: 0 } );
 	const isFocused = useIsFocused();
 	const {
-		onHardwareButtonPress,
-		shouldDisableBottomSheetMaxHeight,
+		onHandleHardwareButtonPress,
+		shouldEnableBottomSheetMaxHeight,
 		setHeight,
 	} = useContext( BottomSheetContext );
 	useFocusEffect(
 		useCallback( () => {
-			onHardwareButtonPress( () => {
+			onHandleHardwareButtonPress( () => {
 				if ( navigation.canGoBack() ) {
-					shouldDisableBottomSheetMaxHeight( true );
+					shouldEnableBottomSheetMaxHeight( true );
 					navigation.goBack();
 					return true;
 				}
-				onHardwareButtonPress( null );
+				onHandleHardwareButtonPress( null );
 				return false;
 			} );
 

@@ -69,8 +69,8 @@ class BottomSheet extends Component {
 			keyboardHeight: 0,
 			scrollEnabled: true,
 			isScrolling: false,
-			onCloseBottomSheet: null,
-			onHardwareButtonPress: null,
+			handleClosingBottomSheet: null,
+			handleHardwareButtonPress: null,
 			isMaxHeightSet: true,
 		};
 
@@ -212,30 +212,34 @@ class BottomSheet extends Component {
 	}
 
 	onHandleClosingBottomSheet( action ) {
-		this.setState( { onCloseBottomSheet: action } );
+		this.setState( { handleClosingBottomSheet: action } );
 	}
 
 	onHandleHardwareButtonPress( action ) {
-		this.setState( { onHardwareButtonPress: action } );
+		this.setState( { handleHardwareButtonPress: action } );
 	}
 
 	onCloseBottomSheet() {
 		const { onClose } = this.props;
-		const { onCloseBottomSheet } = this.state;
-		if ( onCloseBottomSheet ) {
-			onCloseBottomSheet();
+		const { handleClosingBottomSheet } = this.state;
+		if ( handleClosingBottomSheet ) {
+			handleClosingBottomSheet();
 		}
-		onClose();
+		if ( onClose ) {
+			onClose();
+		}
 		this.onShouldSetBottomSheetMaxHeight( true );
 	}
 
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
-		const { onHardwareButtonPress } = this.state;
-		if ( onHardwareButtonPress && onHardwareButtonPress() ) {
+		const { handleHardwareButtonPress } = this.state;
+		if ( handleHardwareButtonPress && handleHardwareButtonPress() ) {
 			return;
 		}
-		return onClose();
+		if ( onClose ) {
+			return onClose();
+		}
 	}
 
 	render() {
@@ -354,12 +358,12 @@ class BottomSheet extends Component {
 							value={ {
 								shouldEnableBottomSheetScroll: this
 									.onShouldEnableScroll,
-								shouldDisableBottomSheetMaxHeight: this
+								shouldEnableBottomSheetMaxHeight: this
 									.onShouldSetBottomSheetMaxHeight,
 								isBottomSheetContentScrolling: isScrolling,
-								onCloseBottomSheet: this
+								onHandleClosingBottomSheet: this
 									.onHandleClosingBottomSheet,
-								onHardwareButtonPress: this
+								onHandleHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
 							} }
 						>

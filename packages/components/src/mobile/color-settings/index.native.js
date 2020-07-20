@@ -24,13 +24,13 @@ const Stack = createStackNavigator();
 function ColorSettings( { defaultSettings } ) {
 	const route = useRoute();
 	const {
-		onCloseBottomSheet,
-		shouldDisableBottomSheetMaxHeight,
+		onHandleClosingBottomSheet,
+		shouldEnableBottomSheetMaxHeight,
 	} = useContext( BottomSheetContext );
 
 	useEffect( () => {
-		shouldDisableBottomSheetMaxHeight( true );
-		onCloseBottomSheet( null );
+		shouldEnableBottomSheetMaxHeight( true );
+		onHandleClosingBottomSheet( null );
 	}, [] );
 
 	const PaletteScreenView = useRef( () => (

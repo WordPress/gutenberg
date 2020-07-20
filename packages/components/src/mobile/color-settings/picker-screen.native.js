@@ -19,7 +19,7 @@ const PickerScreen = () => {
 	const navigation = useNavigation();
 	const {
 		onShouldEnableInnerHandling,
-		shouldDisableBottomSheetMaxHeight,
+		shouldEnableBottomSheetMaxHeight,
 		onCloseBottomSheet,
 		isBottomSheetContentScrolling,
 		shouldEnableBottomSheetScroll,
@@ -28,8 +28,8 @@ const PickerScreen = () => {
 	return (
 		<ColorPicker
 			onShouldEnableInnerHandling={ onShouldEnableInnerHandling }
-			shouldDisableBottomSheetMaxHeight={
-				shouldDisableBottomSheetMaxHeight
+			shouldEnableBottomSheetMaxHeight={
+				shouldEnableBottomSheetMaxHeight
 			}
 			setColor={ setColor }
 			activeColor={ currentValue }
