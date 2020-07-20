@@ -436,7 +436,7 @@ describe( 'useBlockSync hook', () => {
 		);
 	} );
 
-	it( 'should use fresh callbacks when no previous changes have been made', async () => {
+	it( 'should use fresh callbacks if onChange/onInput have been updated when no previous changes have been made', async () => {
 		const fakeBlocks = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
