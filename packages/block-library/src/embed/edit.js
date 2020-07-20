@@ -123,6 +123,7 @@ const EmbedEdit = ( props ) => {
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
 	}, [ preview?.html, attributes.url ] );
+	// TODO if we need above attributes as dependecies for useEffect ( cannotEmbed, fetchin etc..)
 
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {

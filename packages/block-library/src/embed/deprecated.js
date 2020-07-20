@@ -18,9 +18,7 @@ const { attributes: blockAttributes } = metadata;
 const deprecated = [
 	{
 		attributes: blockAttributes,
-		save( { attributes } ) {
-			const { url, caption, type, providerNameSlug } = attributes;
-
+		save( { attributes: { url, caption, type, providerNameSlug } } ) {
 			if ( ! url ) {
 				return null;
 			}

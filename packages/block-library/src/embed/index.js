@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import edit from './edit';
-// import save from './save';
+import save from './save';
 import metadata from './block.json';
 import transforms from './transforms';
 import variations from './variations';
@@ -22,7 +22,7 @@ export const settings = {
 		'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.'
 	),
 	edit,
-	// save,
+	save,
 	transforms,
 	variations,
 	deprecated,

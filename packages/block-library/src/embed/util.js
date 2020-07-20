@@ -27,8 +27,8 @@ import { _x } from '@wordpress/i18n';
 import variations from './variations';
 import { embedContentIcon } from './icons';
 
-// todo ts jsdoc
-// todo ts tests
+// TODO jsdoc
+// TODO tests
 export const getEmbedInfoByProvider = ( provider ) => {
 	const defaultEmbedInfo = {
 		title: _x( 'Embed', 'block title' ),

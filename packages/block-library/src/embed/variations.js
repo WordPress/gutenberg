@@ -52,7 +52,8 @@ const variations = [
 		icon: embedTwitterIcon,
 		keywords: [ 'tweet', __( 'social' ) ],
 		description: __( 'Embed a tweet.' ),
-		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ], // todo ts - create util for basic RegEx
+		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
+		// TODO - create util for basic RegEx
 		attributes: { providerNameSlug: 'twitter', common: true },
 	},
 	{
