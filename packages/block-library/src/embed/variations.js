@@ -52,8 +52,7 @@ const variations = [
 		keywords: [ 'tweet', __( 'social' ) ],
 		description: __( 'Embed a tweet.' ),
 		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ], // todo ts - create util for basic RegEx
-		common: true,
-		attributes: { providerNameSlug: 'twitter' },
+		attributes: { providerNameSlug: 'twitter', common: true },
 	},
 	{
 		name: 'youtube',
@@ -65,8 +64,7 @@ const variations = [
 			/^https?:\/\/((m|www)\.)?youtube\.com\/.+/i,
 			/^https?:\/\/youtu\.be\/.+/i,
 		],
-		common: true,
-		attributes: { providerNameSlug: 'youtube' },
+		attributes: { providerNameSlug: 'youtube', common: true },
 	},
 	{
 		name: 'facebook',
@@ -74,10 +72,12 @@ const variations = [
 		icon: embedFacebookIcon,
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Facebook post.' ),
-		previewable: false,
 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
-		common: true,
-		attributes: { providerNameSlug: 'facebook' },
+		attributes: {
+			providerNameSlug: 'facebook',
+			previewable: false,
+			common: true,
+		},
 	},
 	{
 		name: 'instagram',
@@ -86,18 +86,19 @@ const variations = [
 		keywords: [ __( 'image' ), __( 'social' ) ],
 		description: __( 'Embed an Instagram post.' ),
 		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
-		common: true,
-		attributes: { providerNameSlug: 'instagram' },
+		attributes: { providerNameSlug: 'instagram', common: true },
 	},
 	{
 		name: 'wordpress',
 		title: 'WordPress',
 		icon: embedWordPressIcon,
 		keywords: [ __( 'post' ), __( 'blog' ) ],
-		responsive: false,
 		description: __( 'Embed a WordPress post.' ),
-		common: true,
-		attributes: { providerNameSlug: 'wordpress' },
+		attributes: {
+			providerNameSlug: 'wordpress',
+			responsive: false,
+			common: true,
+		},
 	},
 	{
 		name: 'soundcloud',
@@ -106,8 +107,7 @@ const variations = [
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed SoundCloud content.' ),
 		patterns: [ /^https?:\/\/(www\.)?soundcloud\.com\/.+/i ],
-		common: true,
-		attributes: { providerNameSlug: 'soundcloud' },
+		attributes: { providerNameSlug: 'soundcloud', common: true },
 	},
 	{
 		name: 'spotify',
@@ -116,8 +116,7 @@ const variations = [
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed Spotify content.' ),
 		patterns: [ /^https?:\/\/(open|play)\.spotify\.com\/.+/i ],
-		common: true,
-		attributes: { providerNameSlug: 'spotify' },
+		attributes: { providerNameSlug: 'spotify', common: true },
 	},
 	{
 		name: 'flickr',
@@ -129,8 +128,7 @@ const variations = [
 			/^https?:\/\/(www\.)?flickr\.com\/.+/i,
 			/^https?:\/\/flic\.kr\/.+/i,
 		],
-		common: true,
-		attributes: { providerNameSlug: 'flickr' },
+		attributes: { providerNameSlug: 'flickr', common: true },
 	},
 	{
 		name: 'vimeo',
@@ -139,8 +137,7 @@ const variations = [
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a Vimeo video.' ),
 		patterns: [ /^https?:\/\/(www\.)?vimeo\.com\/.+/i ],
-		common: true,
-		attributes: { providerNameSlug: 'vimeo' },
+		attributes: { providerNameSlug: 'vimeo', common: true },
 	},
 	{
 		name: 'animoto',
@@ -299,9 +296,8 @@ const variations = [
 		title: 'SmugMug',
 		icon: embedPhotoIcon,
 		description: __( 'Embed SmugMug content.' ),
-		previewable: false,
 		patterns: [ /^https?:\/\/(.+\.)?smugmug\.com\/.*/i ],
-		attributes: { providerNameSlug: 'smugmug' },
+		attributes: { providerNameSlug: 'smugmug', previewable: false },
 	},
 	{
 		// Deprecated in favour of the speaker-deck block.
@@ -381,13 +377,12 @@ const variations = [
 		title: 'Amazon Kindle',
 		icon: embedAmazonIcon,
 		keywords: [ __( 'ebook' ) ],
-		responsive: false,
 		description: __( 'Embed Amazon Kindle content.' ),
 		patterns: [
 			/^https?:\/\/([a-z0-9-]+\.)?(amazon|amzn)(\.[a-z]{2,4})+\/.+/i,
 			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
 		],
-		attributes: { providerNameSlug: 'amazon-kindle' },
+		attributes: { providerNameSlug: 'amazon-kindle', responsive: false },
 	},
 ];
 

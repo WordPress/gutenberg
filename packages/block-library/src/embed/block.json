@@ -20,6 +20,14 @@
 			"type": "boolean",
 			"default": true
 		},
+		"responsive": {
+			"type": "boolean",
+			"default": true
+		},
+		"previewable": {
+			"type": "boolean",
+			"defautl": true
+		},
 		"common": {
 			"type": "boolean",
 			"default": false
