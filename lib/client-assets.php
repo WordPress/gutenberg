@@ -703,24 +703,27 @@ function gutenberg_extend_settings_link_color( $settings ) {
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_link_color' );
 
-/*
- * Register default patterns if not registered in Core already.
+/**
+ * Register default patterns, potentially overriding ones that were already registered in Core.
  *
- * This can be removed when plugin support requires WordPress 5.5.0+.
+ * This can be removed when plugin support requires WordPress 5.5.0+, and patterns have been synced back to Core.
  *
  * @see https://core.trac.wordpress.org/ticket/50550
  */
-if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
-	register_block_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
-	register_block_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
-	register_block_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
-	register_block_pattern( 'core/text-two-columns-with-images', gutenberg_load_block_pattern( 'text-two-columns-with-images' ) );
-	register_block_pattern( 'core/text-three-columns-buttons', gutenberg_load_block_pattern( 'text-three-columns-buttons' ) );
-	register_block_pattern( 'core/large-header', gutenberg_load_block_pattern( 'large-header' ) );
-	register_block_pattern( 'core/large-header-paragraph', gutenberg_load_block_pattern( 'large-header-paragraph' ) );
-	register_block_pattern( 'core/three-buttons', gutenberg_load_block_pattern( 'three-buttons' ) );
-	register_block_pattern( 'core/quote', gutenberg_load_block_pattern( 'quote' ) );
+function gutenberg_register_block_patterns() {
+	if ( class_exists( 'WP_Block_Patterns_Registry' ) ) {
+		register_block_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
+		register_block_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
+		register_block_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
+		register_block_pattern( 'core/text-two-columns-with-images', gutenberg_load_block_pattern( 'text-two-columns-with-images' ) );
+		register_block_pattern( 'core/text-three-columns-buttons', gutenberg_load_block_pattern( 'text-three-columns-buttons' ) );
+		register_block_pattern( 'core/large-header', gutenberg_load_block_pattern( 'large-header' ) );
+		register_block_pattern( 'core/large-header-paragraph', gutenberg_load_block_pattern( 'large-header-paragraph' ) );
+		register_block_pattern( 'core/three-buttons', gutenberg_load_block_pattern( 'three-buttons' ) );
+		register_block_pattern( 'core/quote', gutenberg_load_block_pattern( 'quote' ) );
+	}
 }
+add_action( 'init', 'gutenberg_register_block_patterns' );
 
 /*
  * Register default pattern categories if not registered in Core already.

@@ -111,4 +111,45 @@ describe( 'searchBlockItems', () => {
 			'Variation Three'
 		);
 	} );
+
+	it( 'should search in variation keywords if exist', () => {
+		const filteredItems = searchBlockItems(
+			items,
+			categories,
+			collections,
+			'music'
+		);
+		expect( filteredItems ).toHaveLength( 1 );
+		const [ { title, variations } ] = filteredItems;
+		expect( title ).toBe( 'With Variations' );
+		expect( variations[ 0 ].title ).toBe( 'Variation Three' );
+	} );
+
+	it( 'should search in both blocks/variation keywords if exist', () => {
+		const filteredItems = searchBlockItems(
+			items,
+			categories,
+			collections,
+			'random'
+		);
+		expect( filteredItems ).toHaveLength( 2 );
+		expect( filteredItems ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( { title: 'Paragraph' } ),
+				expect.objectContaining( {
+					title: 'With Variations',
+					variations: [
+						{
+							name: 'variation-three',
+							title: 'Variation Three',
+							keywords: expect.arrayContaining( [
+								'music',
+								'random',
+							] ),
+						},
+					],
+				} ),
+			] )
+		);
+	} );
 } );
