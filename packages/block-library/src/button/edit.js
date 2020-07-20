@@ -12,8 +12,6 @@ import {
 	KeyboardShortcuts,
 	PanelBody,
 	RangeControl,
-	TextControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Popover,
@@ -166,12 +164,6 @@ function ButtonEdit( props ) {
 		text,
 		url,
 	} = attributes;
-	const onSetLinkRel = useCallback(
-		( value ) => {
-			setAttributes( { rel: value } );
-		},
-		[ setAttributes ]
-	);
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -240,18 +232,6 @@ function ButtonEdit( props ) {
 					borderRadius={ borderRadius }
 					setAttributes={ setAttributes }
 				/>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<ToggleControl
-						label={ __( 'Open in new tab' ) }
-						onChange={ onToggleOpenInNewTab }
-						checked={ linkTarget === '_blank' }
-					/>
-					<TextControl
-						label={ __( 'Link rel' ) }
-						value={ rel || '' }
-						onChange={ onSetLinkRel }
-					/>
-				</PanelBody>
 			</InspectorControls>
 		</>
 	);
