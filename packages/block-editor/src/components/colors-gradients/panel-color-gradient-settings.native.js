@@ -6,11 +6,12 @@ import { useNavigation } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
-import {
-	ColorControl,
-	PanelBody,
-	blockSettingsScreens,
-} from '@wordpress/components';
+import { ColorControl, PanelBody } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { blockSettingsScreens } from '../block-settings';
 
 export default function PanelColorGradientSettings( { settings, title } ) {
 	const navigation = useNavigation();

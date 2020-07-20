@@ -20,7 +20,7 @@ function BottomSheetNavigationContainer( { children, animate } ) {
 	const setHeight = ( maxHeight ) => {
 		if ( height !== maxHeight && maxHeight > 50 ) {
 			if ( animate ) {
-				performLayoutAnimation( 200 );
+				performLayoutAnimation( 300 );
 			}
 			setMaxHeight( maxHeight );
 		}
