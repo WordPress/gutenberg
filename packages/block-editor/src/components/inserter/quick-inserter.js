@@ -78,6 +78,7 @@ function QuickInserterList( {
 						items={ shownBlockTypes }
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
+						label={ __( 'Blocks' ) }
 					/>
 				</InserterPanel>
 			) }
