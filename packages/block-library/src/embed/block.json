@@ -26,7 +26,7 @@
 		},
 		"previewable": {
 			"type": "boolean",
-			"defautl": true
+			"default": true
 		},
 		"common": {
 			"type": "boolean",

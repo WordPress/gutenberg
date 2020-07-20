@@ -38,8 +38,7 @@ function getResponsiveHelp( checked ) {
 
 const EmbedEdit = ( props ) => {
 	const {
-		// todo check if I need to set defaults since are in block.json
-		attributes: { providerNameSlug, previewable = true, responsive = true },
+		attributes: { providerNameSlug, previewable, responsive },
 		attributes,
 		cannotEmbed,
 		fetching,
@@ -60,6 +59,7 @@ const EmbedEdit = ( props ) => {
 	 * @return {Object} Attributes derived from the preview, merged with the current attributes.
 	 */
 	const getMergedAttributes = () => {
+		const { className, allowResponsive } = attributes;
 		return {
 			...attributes,
 			...getAttributesFromPreview(
@@ -169,7 +169,7 @@ const EmbedEdit = ( props ) => {
 	// clipping or scrollbars. The `getAttributesFromPreview` function
 	// that `getMergedAttributes` uses is memoized so that we're not
 	// calculating them on every render.
-	const previewAttributes = getMergedAttributes( props, title, responsive );
+	const previewAttributes = getMergedAttributes();
 	const { caption, type, allowResponsive } = previewAttributes;
 	const className = classnames(
 		previewAttributes.className,
@@ -209,13 +209,12 @@ const EmbedEdit = ( props ) => {
 export default compose(
 	withSelect( ( select, ownProps ) => {
 		const { url } = ownProps.attributes;
-		const core = select( 'core' );
 		const {
 			getEmbedPreview,
 			isPreviewEmbedFallback,
 			isRequestingEmbedPreview,
 			getThemeSupports,
-		} = core;
+		} = select( 'core' );
 		const preview = undefined !== url && getEmbedPreview( url );
 		const previewIsFallback =
 			undefined !== url && isPreviewEmbedFallback( url );
