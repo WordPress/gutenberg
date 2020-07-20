@@ -7,6 +7,14 @@ import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Menu controls to convert block(s) to reusable block or vice-versa.
+ *
+ * @param {Object}   props           Component props.
+ * @param {string[]} props.clientIds Client ids of selected blocks.
+ *
+ * @return {import('@wordpress/element').WPComponent} The menu controls or null.
+ */
 export default function ReusableBlockConvertButton( { clientIds } ) {
 	const { isReusable, isVisible } = useSelect(
 		( select ) => {
