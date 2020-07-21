@@ -1,11 +1,8 @@
 /**
  * Internal dependencies
  */
-import {
-	isNativeSupport,
-	hasVariable,
-	memoizedTransformContent,
-} from './utils';
+import { memoizedTransformContent } from './transform';
+import { isNativeSupport, hasVariable } from './utils';
 
 /*
  * This plugin is for the stylis library. It's the CSS compiler used by
