@@ -41,6 +41,8 @@ const EmbedEdit = ( props ) => {
 			providerNameSlug,
 			previewable,
 			responsive,
+			allowResponsive,
+			caption,
 			url: attributesUrl,
 		},
 		attributes,
@@ -53,6 +55,7 @@ const EmbedEdit = ( props ) => {
 	const { icon, title } = getEmbedInfoByProvider( providerNameSlug );
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
+	// const [ mergedAttributes, setMergedAttributes ] = useState( attributes );
 	const { invalidateResolution } = useDispatch( 'core/data' );
 
 	const {
@@ -101,9 +104,9 @@ const EmbedEdit = ( props ) => {
 	/**
 	 * @return {Object} Attributes derived from the preview, merged with the current attributes.
 	 */
-	// TODO maybe use `useCallback` ??
+	// TODO maybe use `useCallback` ?? or even better useMemo // or state? with mergedAttributes?
 	const getMergedAttributes = () => {
-		const { className, allowResponsive } = attributes;
+		const { className } = attributes;
 		return {
 			...attributes,
 			...getAttributesFromPreview(
@@ -117,11 +120,12 @@ const EmbedEdit = ( props ) => {
 	};
 
 	const handleIncomingPreview = () => {
-		setAttributes( getMergedAttributes() );
+		const mergedAttributes = getMergedAttributes();
+		setAttributes( mergedAttributes );
 		if ( onReplace ) {
 			const upgradedBlock = createUpgradedEmbedBlock(
 				props,
-				getMergedAttributes()
+				mergedAttributes
 			);
 
 			if ( upgradedBlock ) {
@@ -159,6 +163,7 @@ const EmbedEdit = ( props ) => {
 
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
+			// setMergedAttributes( getMergedAttributes );
 			handleIncomingPreview();
 		}
 	}, [ preview, isEditingURL ] );
@@ -205,10 +210,10 @@ const EmbedEdit = ( props ) => {
 	// that `getMergedAttributes` uses is memoized so that we're not
 	// calculating them on every render.
 	const previewAttributes = getMergedAttributes();
-	const { caption, type, allowResponsive } = previewAttributes;
+	const { type } = previewAttributes;
 	const className = classnames(
 		previewAttributes.className,
-		props.className
+		props.className // why props here??
 	);
 
 	return (
@@ -217,7 +222,7 @@ const EmbedEdit = ( props ) => {
 				showEditButton={ preview && ! cannotEmbed }
 				themeSupportsResponsive={ themeSupportsResponsive }
 				blockSupportsResponsive={ responsive }
-				allowResponsive={ allowResponsive }
+				allowResponsive={ previewAttributes.allowResponsive }
 				getResponsiveHelp={ getResponsiveHelp }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }

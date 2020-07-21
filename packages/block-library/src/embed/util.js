@@ -233,7 +233,7 @@ export const getAttributesFromPreview = memoize(
 		title,
 		currentClassNames,
 		isResponsive,
-		allowResponsive = true
+		allowResponsive = true // is the default needed
 	) => {
 		if ( ! preview ) {
 			return {};

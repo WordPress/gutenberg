@@ -27,10 +27,6 @@
 		"previewable": {
 			"type": "boolean",
 			"default": true
-		},
-		"common": {
-			"type": "boolean",
-			"default": false
 		}
 	},
 	"supports": {
