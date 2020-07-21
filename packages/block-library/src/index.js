@@ -174,7 +174,9 @@ export const registerCoreBlocks = () => {
 /**
  * Function to register experimental core blocks depending on editor settings.
  *
- * @param {Object} settings Editor settings.
+ * @param {Object} settings         Editor settings.
+ * @param {Object} context          Post context.
+ * @param {string} context.postType Post Type
  *
  * @example
  * ```js
@@ -185,7 +187,7 @@ export const registerCoreBlocks = () => {
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( settings ) => {
+		? ( settings, { postType } ) => {
 				const {
 					__experimentalEnableLegacyWidgetBlock,
 					__experimentalEnableFullSiteEditing,
@@ -208,7 +210,16 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								queryLoop,
 								queryPagination,
 								postTitle,
-								postContent,
+								/*
+								 * Only provide the Post Content block in templates,
+								 * so there's no risk of posts including themselves through
+								 * a Post Content block (leading to infinite recursion).
+								 */
+								[ 'wp_template', 'wp_template_part' ].includes(
+									postType
+								)
+									? postContent
+									: null,
 								postAuthor,
 								postComments,
 								postCommentsCount,
@@ -217,7 +228,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postExcerpt,
 								postFeaturedImage,
 								postTags,
-						  ]
+						  ].filter( Boolean )
 						: [] ),
 				].forEach( registerBlock );
 		  }
