@@ -11,15 +11,19 @@ import { isNativeSupport, hasVariable } from './utils';
  * https://github.com/thysultan/stylis.js
  */
 
+const defaultOptions = {
+	skipSupportedBrowsers: true,
+};
+
 /*
  * Generates fallback values for CSS rule declarations that contain CSS var().
  * This plugin parses uses specified fallback values within the var()
  * function. If one is not provided, it will attempt to use the matching
  * variable declared at the :root scope.
  */
-export function stylisPluginCssCustomProperties( {
-	skipSupportedBrowsers = true,
-} ) {
+export function stylisPluginCssCustomProperties( options = {} ) {
+	const { skipSupportedBrowsers } = { ...defaultOptions, ...options };
+
 	const seen = new WeakSet();
 
 	const plugin = (
