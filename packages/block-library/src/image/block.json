@@ -68,6 +68,9 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"allowResize": {
+			"type": "boolean"
 		}
 	},
 	"supports": {

@@ -2,50 +2,6 @@
 	"name": "core/gallery",
 	"category": "media",
 	"attributes": {
-		"images": {
-			"type": "array",
-			"default": [],
-			"source": "query",
-			"selector": ".wp-block-image",
-			"query": {
-				"url": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "src"
-				},
-				"fullUrl": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "data-full-url"
-				},
-				"link": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "data-link"
-				},
-				"alt": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "alt",
-					"default": ""
-				},
-				"id": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "data-id"
-				},
-				"caption": {
-					"type": "string",
-					"source": "html",
-					"selector": ".blocks-gallery-item__caption"
-				}
-			}
-		},
 		"ids": {
 			"type": "array",
 			"items": {

@@ -87,21 +87,6 @@ class GalleryEdit extends Component {
 	}
 
 	setAttributes( attributes ) {
-		if ( attributes.ids ) {
-			throw new Error(
-				'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes'
-			);
-		}
-
-		if ( attributes.images ) {
-			attributes = {
-				...attributes,
-				// Unlike images[ n ].id which is a string, always ensure the
-				// ids array contains numbers as per its attribute type.
-				ids: map( attributes.images, ( { id } ) => parseInt( id, 10 ) ),
-			};
-		}
-
 		this.props.setAttributes( attributes );
 	}
 
@@ -132,17 +117,12 @@ class GalleryEdit extends Component {
 				link: image.link,
 				linkDestination: linkTo,
 				alt: image.alt,
+				allowResize: false,
 			} );
 		} );
 
 		this.setAttributes( {
-			images: newImages.map( ( newImage ) => ( {
-				...pickRelevantMediaFiles( newImage, sizeSlug ),
-				// The id value is stored in a data attribute, so when the
-				// block is parsed it's converted to a string. Converting
-				// to a string here ensures it's type is consistent.
-				id: toString( newImage.id ),
-			} ) ),
+			ids: newImages.map( ( newImage ) => toString( newImage.id ) ),
 			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
 
