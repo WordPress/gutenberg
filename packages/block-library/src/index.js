@@ -174,9 +174,9 @@ export const registerCoreBlocks = () => {
 /**
  * Function to register experimental core blocks depending on editor settings.
  *
- * @param {Object} settings         Editor settings.
- * @param {Object} context          Post context.
- * @param {string} context.postType Post Type
+ * @param {Object} settings           Editor settings.
+ * @param {Object} [context]          Post context.
+ * @param {string} [context.postType] Post Type
  *
  * @example
  * ```js
@@ -187,7 +187,7 @@ export const registerCoreBlocks = () => {
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( settings, { postType } ) => {
+		? ( settings, { postType } = {} ) => {
 				const {
 					__experimentalEnableLegacyWidgetBlock,
 					__experimentalEnableFullSiteEditing,
