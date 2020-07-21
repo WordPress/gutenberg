@@ -43,6 +43,7 @@ const EmbedEdit = ( props ) => {
 			responsive,
 			allowResponsive,
 			caption,
+			className,
 			url: attributesUrl,
 		},
 		attributes,
@@ -71,8 +72,7 @@ const EmbedEdit = ( props ) => {
 				isRequestingEmbedPreview,
 				getThemeSupports,
 			} = select( 'core' );
-			if ( attributesUrl === undefined ) {
-				// TODO check if url is also empty... ??
+			if ( ! attributesUrl ) {
 				return { fetching: false, cannotEmbed: true };
 			}
 
@@ -98,7 +98,7 @@ const EmbedEdit = ( props ) => {
 				cannotEmbed: ! validPreview || previewIsFallback,
 			};
 		},
-		[ attributes.url ]
+		[ attributesUrl ]
 	);
 
 	/**
@@ -106,7 +106,6 @@ const EmbedEdit = ( props ) => {
 	 */
 	// TODO maybe use `useCallback` ?? or even better useMemo // or state? with mergedAttributes?
 	const getMergedAttributes = () => {
-		const { className } = attributes;
 		return {
 			...attributes,
 			...getAttributesFromPreview(
@@ -142,7 +141,7 @@ const EmbedEdit = ( props ) => {
 			allowResponsive: newAllowResponsive,
 			className: getClassNames(
 				html,
-				attributes.className,
+				className,
 				responsive && newAllowResponsive
 			),
 		} );
@@ -152,18 +151,16 @@ const EmbedEdit = ( props ) => {
 		if ( ! preview?.html || ! cannotEmbed || fetching ) {
 			return;
 		}
-		// At this stage, we're not fetching the preview, so we know it can't be embedded, so try
-		// removing any trailing slash, and resubmit.
+		// At this stage, we're not fetching the preview and know it can't be embedded,
+		// so try removing any trailing slash, and resubmit.
 		const newURL = attributesUrl.replace( /\/$/, '' );
 		setURL( newURL );
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
 	}, [ preview?.html, attributesUrl ] );
-	// TODO if we need above attributes as dependecies for useEffect ( cannotEmbed, fetchin etc..)
 
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
-			// setMergedAttributes( getMergedAttributes );
 			handleIncomingPreview();
 		}
 	}, [ preview, isEditingURL ] );
@@ -210,10 +207,9 @@ const EmbedEdit = ( props ) => {
 	// that `getMergedAttributes` uses is memoized so that we're not
 	// calculating them on every render.
 	const previewAttributes = getMergedAttributes();
-	const { type } = previewAttributes;
-	const className = classnames(
+	const finalClassName = classnames(
 		previewAttributes.className,
-		props.className // why props here??
+		props.className // TODO why props here??
 	);
 
 	return (
@@ -230,9 +226,9 @@ const EmbedEdit = ( props ) => {
 			<EmbedPreview
 				preview={ preview }
 				previewable={ previewable }
-				className={ className }
+				className={ finalClassName }
 				url={ url }
-				type={ type }
+				type={ previewAttributes.type }
 				caption={ caption }
 				onCaptionChange={ ( value ) =>
 					setAttributes( { caption: value } )
