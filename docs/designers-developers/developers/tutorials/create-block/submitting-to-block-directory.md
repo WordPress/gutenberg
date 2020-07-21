@@ -90,7 +90,7 @@ Here is an example of a basic block.json file.
 }
 ```
 
-The `block.json` file also contains other important properties. Take a look at an [example block.json](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#registering-a-block-type) file for reference.
+The `block.json` file also contains other important properties. Take a look at an [example block.json](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#registering-a-block-type) for additional properties to be included in the block.json file.
 
 
 ## Step 3: Zip & Submit
