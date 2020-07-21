@@ -2,7 +2,6 @@
  * External dependencies
  */
 import {
-	Image,
 	StyleSheet,
 	View,
 	ScrollView,
@@ -17,14 +16,20 @@ import { isEmpty } from 'lodash';
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
 } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import { Icon, Image } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
+import {
+	Caption,
+	MediaUpload,
+	MediaUploadProgress,
+	MEDIA_TYPE_IMAGE,
+} from '@wordpress/block-editor';
 import { getProtocol } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { close, arrowLeft, arrowRight } from '@wordpress/icons';
+import { arrowLeft, arrowRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,9 +43,7 @@ const separatorStyle = compose( style.separator, {
 	borderRightWidth: StyleSheet.hairlineWidth,
 } );
 const buttonStyle = compose( style.button, { aspectRatio: 1 } );
-const removeButtonStyle = compose( style.removeButton, { aspectRatio: 1 } );
 const ICON_SIZE_ARROW = 15;
-const ICON_SIZE_REMOVE = 20;
 
 class GalleryImage extends Component {
 	constructor() {
@@ -50,7 +53,7 @@ class GalleryImage extends Component {
 		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onMediaPressed = this.onMediaPressed.bind( this );
 		this.onCaptionChange = this.onCaptionChange.bind( this );
-		this.bindContainer = this.bindContainer.bind( this );
+		this.onSelectMedia = this.onSelectMedia.bind( this );
 
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -68,10 +71,6 @@ class GalleryImage extends Component {
 		};
 	}
 
-	bindContainer( ref ) {
-		this.container = ref;
-	}
-
 	onSelectCaption() {
 		if ( ! this.state.captionSelected ) {
 			this.setState( {
@@ -85,17 +84,24 @@ class GalleryImage extends Component {
 	}
 
 	onMediaPressed() {
-		const { id, url } = this.props;
+		const { id, url, isSelected } = this.props;
+		const {
+			captionSelected,
+			isUploadInProgress,
+			didUploadFail,
+		} = this.state;
 
 		this.onSelectImage();
 
-		if ( this.state.isUploadInProgress ) {
+		if ( isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
 		} else if (
-			this.state.didUploadFail ||
+			didUploadFail ||
 			( id && getProtocol( url ) === 'file:' )
 		) {
 			requestImageFailedRetryDialog( id );
+		} else if ( isSelected && ! captionSelected ) {
+			requestImageFullscreenPreview( url );
 		}
 	}
 
@@ -113,6 +119,11 @@ class GalleryImage extends Component {
 				captionSelected: false,
 			} );
 		}
+	}
+
+	onSelectMedia( media ) {
+		const { setAttributes } = this.props;
+		setAttributes( media );
 	}
 
 	onCaptionChange( caption ) {
@@ -184,19 +195,8 @@ class GalleryImage extends Component {
 		} = this.props;
 
 		const { isUploadInProgress, captionSelected } = this.state;
-		const { isUploadFailed, retryMessage } = params;
+		const { isUploadFailed, retryMessage, openMediaOptions } = params;
 		const resizeMode = isCropped ? 'cover' : 'contain';
-
-		const imageStyle = [
-			style.image,
-			{ resizeMode },
-			isUploadInProgress ? style.imageUploading : undefined,
-		];
-
-		const overlayStyle = compose(
-			style.overlay,
-			isSelected ? style.overlaySelected : undefined
-		);
 
 		const captionPlaceholderStyle = getStylesFromColorScheme(
 			style.captionPlaceholder,
@@ -218,12 +218,27 @@ class GalleryImage extends Component {
 		return (
 			<>
 				<Image
-					style={ imageStyle }
-					source={ { uri: url } }
-					// alt={ alt }
-					accessibilityLabel={ ariaLabel }
-					ref={ this.bindContainer }
+					alt={ ariaLabel }
+					height={ style.image.height }
+					isSelected={ isSelected }
+					isUploadFailed={ isUploadFailed }
+					isUploadInProgress={ isUploadInProgress }
+					mediaPickerOptions={ [
+						{
+							destructiveButton: true,
+							id: 'removeImage',
+							label: __( 'Remove' ),
+							onPress: onRemove,
+							separated: true,
+							value: 'removeImage',
+						},
+					] }
+					onSelectMediaUploadOption={ this.onSelectMedia }
+					openMediaOptions={ openMediaOptions }
+					resizeMode={ resizeMode }
+					url={ url }
 				/>
+
 				{ isUploadFailed && (
 					<View style={ style.uploadFailedContainer }>
 						<View style={ style.uploadFailed }>
@@ -237,89 +252,71 @@ class GalleryImage extends Component {
 						</Text>
 					</View>
 				) }
-				<View style={ overlayStyle }>
-					{ ! isUploadInProgress && (
-						<>
-							{ isSelected && (
-								<View style={ style.toolbar }>
-									<View style={ style.moverButtonContainer }>
-										<Button
-											style={ buttonStyle }
-											icon={
-												isRTL ? arrowRight : arrowLeft
-											}
-											iconSize={ ICON_SIZE_ARROW }
-											onClick={
-												isFirstItem
-													? undefined
-													: onMoveBackward
-											}
-											accessibilityLabel={ __(
-												'Move Image Backward'
-											) }
-											aria-disabled={ isFirstItem }
-											disabled={ ! isSelected }
-										/>
-										<View style={ separatorStyle }></View>
-										<Button
-											style={ buttonStyle }
-											icon={
-												isRTL ? arrowLeft : arrowRight
-											}
-											iconSize={ ICON_SIZE_ARROW }
-											onClick={
-												isLastItem
-													? undefined
-													: onMoveForward
-											}
-											accessibilityLabel={ __(
-												'Move Image Forward'
-											) }
-											aria-disabled={ isLastItem }
-											disabled={ ! isSelected }
-										/>
-									</View>
-									<Button
-										style={ removeButtonStyle }
-										icon={ close }
-										iconSize={ ICON_SIZE_REMOVE }
-										onClick={ onRemove }
-										accessibilityLabel={ __(
-											'Remove Image'
-										) }
-										disabled={ ! isSelected }
-									/>
-								</View>
-							) }
-							{ ( shouldShowCaptionEditable ||
-								shouldShowCaptionExpanded ) && (
-								<View style={ captionContainerStyle }>
-									<ScrollView
-										nestedScrollEnabled
-										keyboardShouldPersistTaps="handled"
-									>
-										<Caption
-											inlineToolbar
-											isSelected={ captionSelected }
-											onChange={ this.onCaptionChange }
-											onFocus={ this.onSelectCaption }
-											placeholder={
-												isSelected
-													? __( 'Write caption…' )
-													: null
-											}
-											placeholderTextColor={
-												captionPlaceholderStyle.color
-											}
-											style={ captionStyle }
-											value={ caption }
-										/>
-									</ScrollView>
-								</View>
-							) }
-						</>
+
+				{ ! isUploadInProgress && isSelected && (
+					<View style={ style.toolbarContainer }>
+						<View style={ style.toolbar }>
+							<View style={ style.moverButtonContainer }>
+								<Button
+									style={ buttonStyle }
+									icon={ isRTL ? arrowRight : arrowLeft }
+									iconSize={ ICON_SIZE_ARROW }
+									onClick={
+										isFirstItem ? undefined : onMoveBackward
+									}
+									accessibilityLabel={ __(
+										'Move Image Backward'
+									) }
+									aria-disabled={ isFirstItem }
+									disabled={ ! isSelected }
+								/>
+								<View style={ separatorStyle }></View>
+								<Button
+									style={ buttonStyle }
+									icon={ isRTL ? arrowLeft : arrowRight }
+									iconSize={ ICON_SIZE_ARROW }
+									onClick={
+										isLastItem ? undefined : onMoveForward
+									}
+									accessibilityLabel={ __(
+										'Move Image Forward'
+									) }
+									aria-disabled={ isLastItem }
+									disabled={ ! isSelected }
+								/>
+								<View style={ separatorStyle }></View>
+							</View>
+						</View>
+					</View>
+				) }
+
+				{ ! isUploadInProgress &&
+					( shouldShowCaptionEditable ||
+						shouldShowCaptionExpanded ) && (
+						<View style={ captionContainerStyle }>
+							<ScrollView
+								nestedScrollEnabled
+								keyboardShouldPersistTaps="handled"
+							>
+								<Caption
+									inlineToolbar
+									isSelected={ captionSelected }
+									onChange={ this.onCaptionChange }
+									onFocus={ this.onSelectCaption }
+									placeholder={
+										isSelected
+											? __( 'Write caption…' )
+											: null
+									}
+									placeholderTextColor={
+										captionPlaceholderStyle.color
+									}
+									style={ captionStyle }
+									value={ caption }
+								/>
+							</ScrollView>
+						</View>
 					) }
-				</View>
 			</>
 		);
 	}
@@ -338,27 +335,48 @@ class GalleryImage extends Component {
 		);
 
 		return (
-			<TouchableWithoutFeedback
-				onPress={ this.onMediaPressed }
-				accessible={ ! isSelected } // We need only child views to be accessible after the selection
-				accessibilityLabel={ this.accessibilityLabelImageContainer() } // if we don't set this explicitly it reads system provided accessibilityLabels of all child components and those include pretty technical words which don't make sense
-				accessibilityRole={ 'imagebutton' } // this makes VoiceOver to read a description of image provided by system on iOS and lets user know this is a button which conveys the message of tappablity
-			>
-				<View style={ containerStyle }>
-					<MediaUploadProgress
-						mediaId={ id }
-						onUpdateMediaProgress={ this.updateMediaProgress }
-						onFinishMediaUploadWithSuccess={
-							this.finishMediaUploadWithSuccess
-						}
-						onFinishMediaUploadWithFailure={
-							this.finishMediaUploadWithFailure
-						}
-						onMediaUploadStateReset={ onRemove }
-						renderContent={ this.renderContent }
-					/>
-				</View>
-			</TouchableWithoutFeedback>
+			<MediaUpload
+				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+				onSelect={ this.onSelectMedia }
+				render={ ( { open, getMediaOptions } ) => {
+					return (
+						<TouchableWithoutFeedback
+							onPress={ this.onMediaPressed }
+							onLongPress={ open }
+							accessible={ ! isSelected } // We need only child views to be accessible after the selection
+							accessibilityLabel={ this.accessibilityLabelImageContainer() } // if we don't set this explicitly it reads system provided accessibilityLabels of all child components and those include pretty technical words which don't make sense
+							accessibilityRole={ 'imagebutton' } // this makes VoiceOver to read a description of image provided by system on iOS and lets user know this is a button which conveys the message of tappablity
+						>
+							<View style={ containerStyle }>
+								{ getMediaOptions() }
+								<MediaUploadProgress
+									mediaId={ id }
+									onUpdateMediaProgress={
+										this.updateMediaProgress
+									}
+									onFinishMediaUploadWithSuccess={
+										this.finishMediaUploadWithSuccess
+									}
+									onFinishMediaUploadWithFailure={
+										this.finishMediaUploadWithFailure
+									}
+									onMediaUploadStateReset={ onRemove }
+									renderContent={ ( {
+										isUploadFailed,
+										retryMessage,
+									} ) => {
+										return this.renderContent( {
+											isUploadFailed,
+											retryMessage,
+											openMediaOptions: open,
+										} );
+									} }
+								/>
+							</View>
+						</TouchableWithoutFeedback>
+					);
+				} }
+			/>
 		);
 	}
 

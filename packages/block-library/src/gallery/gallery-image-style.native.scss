@@ -1,11 +1,12 @@
 $gallery-image-container-height: 150px;
-$overlay-border-width: 3px;
+$overlay-border-width: 2px;
 $caption-background-color: rgba(0, 0, 0, 0.4);
 $caption-padding-vertical: 8px;
 
 .galleryImageContainer {
 	flex: 1;
 	height: $gallery-image-container-height;
+	overflow: hidden;
 	background-color: $gray-lighten-30;
 }
 
@@ -14,30 +15,7 @@ $caption-padding-vertical: 8px;
 }
 
 .image {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	opacity: 1;
-}
-
-.imageUploading {
-	opacity: 0.3;
-}
-
-.overlay {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	border-width: $overlay-border-width;
-	border-color: #0000;
-}
-
-.overlaySelected {
-	border-color: $blue-wordpress;
+	height: 100%;
 }
 
 .button {
@@ -72,9 +50,8 @@ $caption-padding-vertical: 8px;
 	height: 20px;
 }
 
-.removeButton {
-	width: 30px;
-	border-radius: 30px;
+.toolbarContainer {
+	position: absolute;
 }
 
 .toolbar {
@@ -115,6 +92,10 @@ $caption-padding-vertical: 8px;
 	flex: 1;
 	flex-direction: row;
 	align-items: flex-end;
+	position: absolute;
+	bottom: 2;
+	left: 2;
+	right: 2;
 }
 
 @mixin caption-shared {
