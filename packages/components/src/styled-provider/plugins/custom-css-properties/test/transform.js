@@ -15,14 +15,14 @@ describe( 'getFallbackDeclaration', () => {
 		document.documentElement.style = null;
 	} );
 	describe( 'invalid', () => {
-		test( 'should return undefined if it does not contain var()', () => {
+		it( 'should return undefined if it does not contain var()', () => {
 			const dec = 'font-size:14px';
 			const result = getFallbackDeclaration( dec );
 
 			expect( result ).toEqual( undefined );
 		} );
 
-		test( 'should return undefined fallback value is non are provided', () => {
+		it( 'should return undefined fallback value is non are provided', () => {
 			const dec = 'font-size: var( --fontSize )';
 			const result = getFallbackDeclaration( dec );
 
@@ -31,35 +31,35 @@ describe( 'getFallbackDeclaration', () => {
 	} );
 
 	describe( 'basic', () => {
-		test( 'should use fallback value if provided', () => {
+		it( 'should use fallback value if provided', () => {
 			const dec = 'font-size: var( --fontSize, 14px )';
 			const result = getFallbackDeclaration( dec );
 
 			expect( result ).toEqual( 'font-size:14px' );
 		} );
 
-		test( 'should use fallback value with spaces in-between var()', () => {
+		it( 'should use fallback value with spaces in-between var()', () => {
 			const dec = 'font-size: var(   --fontSize, 14px          )';
 			const result = getFallbackDeclaration( dec );
 
 			expect( result ).toEqual( 'font-size:14px' );
 		} );
 
-		test( 'should use fallback value without spaces in-between var()', () => {
+		it( 'should use fallback value without spaces in-between var()', () => {
 			const dec = 'font-size: var(--fontSize,14px)';
 			const result = getFallbackDeclaration( dec );
 
 			expect( result ).toEqual( 'font-size:14px' );
 		} );
 
-		test( 'should use fallback with parentheses value', () => {
+		it( 'should use fallback with parentheses value', () => {
 			const dec = 'filter: var(--blur, blur(10px))';
 			const result = getFallbackDeclaration( dec );
 
 			expect( result ).toEqual( 'filter:blur(10px)' );
 		} );
 
-		test( 'should use fallback with nested parentheses value', () => {
+		it( 'should use fallback with nested parentheses value', () => {
 			const dec =
 				'transform:translate3d(var(--x,5px),var(--y,10px),var( --z, 0))';
 			const result = getFallbackDeclaration( dec );
@@ -69,14 +69,14 @@ describe( 'getFallbackDeclaration', () => {
 	} );
 
 	describe( 'nested', () => {
-		test( 'should use nested fallback value if provided', () => {
+		it( 'should use nested fallback value if provided', () => {
 			const dec = 'font-size: var( --fontSize, var( --big, 20px ) )';
 			const result = getFallbackDeclaration( dec );
 
 			expect( result ).toEqual( 'font-size:20px' );
 		} );
 
-		test( 'should use heavily nested fallback value if provided', () => {
+		it( 'should use heavily nested fallback value if provided', () => {
 			const dec =
 				'font-size: var( --fontSize, var( --one, var( --two, var( --three, var( --four, 20px )))))';
 			const result = getFallbackDeclaration( dec );
@@ -84,7 +84,7 @@ describe( 'getFallbackDeclaration', () => {
 			expect( result ).toEqual( 'font-size:20px' );
 		} );
 
-		test( 'should use heavily nested fallback with space in-between closing parentheses', () => {
+		it( 'should use heavily nested fallback with space in-between closing parentheses', () => {
 			const dec =
 				'font-size: var( --fontSize, var( --one, var( --two, var( --three, var( --four, 20px ))  ) ) )';
 			const result = getFallbackDeclaration( dec );
@@ -92,7 +92,7 @@ describe( 'getFallbackDeclaration', () => {
 			expect( result ).toEqual( 'font-size:20px' );
 		} );
 
-		test( 'should use heavily nested fallback with parentheses value', () => {
+		it( 'should use heavily nested fallback with parentheses value', () => {
 			const dec =
 				'filter: var( --fontSize, var( --one, var( --two, var( --three, var( --four, blur(20px) ))  ) ) )';
 			const result = getFallbackDeclaration( dec );
@@ -102,7 +102,7 @@ describe( 'getFallbackDeclaration', () => {
 	} );
 
 	describe( ':root fallback', () => {
-		test( 'should not use root fallback if one is provided', () => {
+		it( 'should not use root fallback if one is provided', () => {
 			document.documentElement.style.setProperty( '--big', '80px' );
 
 			const dec = 'font-size: var( --fontSize, 20px )';
@@ -111,7 +111,7 @@ describe( 'getFallbackDeclaration', () => {
 			expect( result ).toEqual( 'font-size:20px' );
 		} );
 
-		test( 'should use root fallback if none are provided', () => {
+		it( 'should use root fallback if none are provided', () => {
 			document.documentElement.style.setProperty( '--fontSize', '80px' );
 
 			const dec = 'font-size: var( --fontSize )';
@@ -120,7 +120,7 @@ describe( 'getFallbackDeclaration', () => {
 			expect( result ).toEqual( 'font-size:80px' );
 		} );
 
-		test( 'should use root fallback with nested var()', () => {
+		it( 'should use root fallback with nested var()', () => {
 			document.documentElement.style.setProperty( '--big', '80px' );
 
 			const dec = 'font-size: var( --fontSize, var( --big ) )';
@@ -129,7 +129,7 @@ describe( 'getFallbackDeclaration', () => {
 			expect( result ).toEqual( 'font-size:80px' );
 		} );
 
-		test( 'should use latest root variable', () => {
+		it( 'should use latest root variable', () => {
 			document.documentElement.style.setProperty( '--big', '80px' );
 
 			let dec = 'font-size: var( --fontSize, var( --big ) )';

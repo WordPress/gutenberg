@@ -23,7 +23,7 @@ describe( 'stylisPluginCssCustomProperties', () => {
 	const createPlugin = () =>
 		stylisPluginCssCustomProperties( { skipSupportedBrowsers: false } );
 
-	test( 'should return undefined if no fallbacks are available', () => {
+	it( 'should return undefined if no fallbacks are available', () => {
 		const plugin = createPlugin();
 		const args = { ...baseArgs };
 		args.content = 'font-size: 14px';
@@ -33,7 +33,7 @@ describe( 'stylisPluginCssCustomProperties', () => {
 		expect( result ).toBe( undefined );
 	} );
 
-	test( 'should return fallback declaration and variablized declaration if var() is used and fallbacks are available', () => {
+	it( 'should return fallback declaration and variablized declaration if var() is used and fallbacks are available', () => {
 		const plugin = createPlugin();
 		const args = { ...baseArgs };
 
@@ -51,7 +51,7 @@ describe( 'stylisPluginCssCustomProperties', () => {
 		expect( result ).toBe( compiled.join( '' ) );
 	} );
 
-	test( 'should handle declarations with parentheses values', () => {
+	it( 'should handle declarations with parentheses values', () => {
 		const plugin = createPlugin();
 		const args = { ...baseArgs };
 
@@ -76,7 +76,7 @@ describe( 'stylisPluginCssCustomProperties', () => {
 		expect( result ).toBe( compiled.join( '' ) );
 	} );
 
-	test( 'should return fallback declarations for every var() call', () => {
+	it( 'should return fallback declarations for every var() call', () => {
 		// Set :root variables
 		document.documentElement.style.setProperty( '--bg', 'black' );
 		document.documentElement.style.setProperty( '--size', '2' );
@@ -109,7 +109,7 @@ describe( 'stylisPluginCssCustomProperties', () => {
 		expect( result ).toBe( compiled.join( '' ) );
 	} );
 
-	test( 'should return if a single fallback was transformed out of many', () => {
+	it( 'should return if a single fallback was transformed out of many', () => {
 		const plugin = createPlugin();
 		const args = { ...baseArgs };
 
