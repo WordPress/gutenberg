@@ -97,6 +97,5 @@ The `block.json` file also contains other important properties. Take a look at a
 
 The community is thankful for your contribution. It is time to submit your plugin.
 
-Take a few moments to read [the block guidelines](https://github.com/WordPress/wporg-plugin-guidelines/blob/block-guidelines/blocks.md). Create a zip file of your block and navigate over to the [block plugin validator](https://wordpress.org/plugins/developers/block-plugin-validator/) and upload your plugin. 
-
+Go through [the block guidelines](https://github.com/WordPress/wporg-plugin-guidelines/blob/block-guidelines/blocks.md). Create a zip file of your block and go to the [block plugin validator](https://wordpress.org/plugins/developers/block-plugin-validator/) and upload your plugin.
 
