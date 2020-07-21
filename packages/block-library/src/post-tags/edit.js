@@ -1,12 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp, useEntityId } from '@wordpress/core-data';
+import { useEntityProp } from '@wordpress/core-data';
+import { Warning } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-function PostTagsDisplay() {
-	const [ tags ] = useEntityProp( 'postType', 'post', 'tags' );
+function PostTagsDisplay( { context } ) {
+	const [ tags ] = useEntityProp(
+		'postType',
+		context.postType,
+		'tags',
+		context.postId
+	);
 	const tagLinks = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( 'core' );
@@ -34,9 +40,14 @@ function PostTagsDisplay() {
 	);
 }
 
-export default function PostTagsEdit() {
-	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return __( 'Post Tags' );
+export default function PostTagsEdit( { context } ) {
+	if ( ! context.postType || ! context.postId ) {
+		return (
+			<Warning>
+				{ __( 'Post tags block: No post found for this block.' ) }
+			</Warning>
+		);
 	}
-	return <PostTagsDisplay />;
+
+	return <PostTagsDisplay context={ context } />;
 }

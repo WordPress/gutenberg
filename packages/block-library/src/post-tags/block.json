@@ -2,7 +2,8 @@
 	"name": "core/post-tags",
 	"category": "design",
 	"usesContext": [
-		"postId"
+		"postId",
+		"postType"
 	],
 	"supports": {
 		"html": false
