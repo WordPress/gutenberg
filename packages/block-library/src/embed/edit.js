@@ -118,21 +118,6 @@ const EmbedEdit = ( props ) => {
 		};
 	};
 
-	const handleIncomingPreview = () => {
-		const mergedAttributes = getMergedAttributes();
-		setAttributes( mergedAttributes );
-		if ( onReplace ) {
-			const upgradedBlock = createUpgradedEmbedBlock(
-				props,
-				mergedAttributes
-			);
-
-			if ( upgradedBlock ) {
-				onReplace( upgradedBlock );
-			}
-		}
-	};
-
 	const toggleResponsive = () => {
 		const { html } = preview;
 		const newAllowResponsive = ! allowResponsive;
@@ -159,9 +144,21 @@ const EmbedEdit = ( props ) => {
 		setAttributes( { url: newURL } );
 	}, [ preview?.html, attributesUrl ] );
 
+	// Handle incoming preview
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
-			handleIncomingPreview();
+			const mergedAttributes = getMergedAttributes();
+			setAttributes( mergedAttributes );
+			if ( onReplace ) {
+				const upgradedBlock = createUpgradedEmbedBlock(
+					props,
+					mergedAttributes
+				);
+
+				if ( upgradedBlock ) {
+					onReplace( upgradedBlock );
+				}
+			}
 		}
 	}, [ preview, isEditingURL ] );
 
