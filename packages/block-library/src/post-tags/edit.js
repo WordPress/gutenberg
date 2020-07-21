@@ -47,6 +47,14 @@ export default function PostTagsEdit( { context } ) {
 				{ __( 'Post tags block: No post found for this block.' ) }
 			</Warning>
 		);
+	} else if ( context.postType !== 'post' ) {
+		return (
+			<Warning>
+				{ __(
+					'Post tags block: Tags are only available in posts. Please add this block to a post instead.'
+				) }
+			</Warning>
+		);
 	}
 
 	return <PostTagsDisplay context={ context } />;
