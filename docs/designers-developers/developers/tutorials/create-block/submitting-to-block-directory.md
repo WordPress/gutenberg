@@ -9,7 +9,7 @@ So you've created an awesome block? Care to share?
 
 ## Step 1: Help users understand your block
 
-Providing straightforward, easy to understand block information is important to the block directory and our end users.
+It is important to the Block Directory and our end users to provide easy to understand information on how your block was created.
 
 **Guidelines**:
 
@@ -74,7 +74,7 @@ Double check that the following is true for your block:
 `style` is pointing to the CSS bundle that includes all the code used on the **website**.
 Includes example data (Optional, but useful)
 
-Although it isn’t necessary that you have both an `editorScript/editorStyle` and `script/style` listed in your `block.json` we encourage the separation of code used for editing and code used for displaying your block in order to keep both interfaces running quickly.
+We encourage the separation of code by using both editorScript/editorStyle and script/style files listed in your block.json to keep the backend and frontend interfaces running smoothly. Even though only one file is required.
 
 The `block.json` file also contains other important properties. Take a look at an [example block.json](https://github.com/WordPress/gutenberg/blob/master/docs/rfc/block-registration.md#registering-a-block-type) file for reference.
 
