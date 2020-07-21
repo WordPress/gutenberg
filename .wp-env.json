@@ -6,8 +6,6 @@
 		"./packages/format-library/src",
 		"./packages/blocks/src",
 		"./packages/keycodes/src",
-		"./packages/block-serialization-default-parser/src",
-		"./packages/block-library/src",
 		"./packages/data-controls/src",
 		"./packages/jest-puppeteer-axe/src",
 		"./packages/interface/src",
