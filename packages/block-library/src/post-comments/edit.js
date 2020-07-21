@@ -7,8 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEntityId } from '@wordpress/core-data';
-import { AlignmentToolbar, BlockControls } from '@wordpress/block-editor';
+import {
+	AlignmentToolbar,
+	BlockControls,
+	Warning,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 function PostCommentsDisplay( { postId } ) {
@@ -32,13 +35,28 @@ function PostCommentsDisplay( { postId } ) {
 	);
 }
 
-export default function PostCommentsEdit( { attributes, setAttributes } ) {
+export default function PostCommentsEdit( {
+	attributes,
+	setAttributes,
+	context,
+} ) {
+	const { postType, postId } = context;
 	const { textAlign } = attributes;
-	// TODO: Update to handle multiple post types.
-	const postId = useEntityId( 'postType', 'post' );
-	if ( ! postId ) {
-		return __( 'Post Comments' );
+
+	if ( ! postType || ! postId ) {
+		return (
+			<Warning>{ __( 'Post comments block: no post found.' ) }</Warning>
+		);
+	} else if ( postType !== 'post' ) {
+		return (
+			<Warning>
+				{ __(
+					'Post comments block: Comments are only available in posts. Please add this block to a post instead.'
+				) }
+			</Warning>
+		);
 	}
+
 	return (
 		<>
 			<BlockControls>
