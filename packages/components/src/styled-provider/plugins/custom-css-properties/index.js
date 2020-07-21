@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { hasVariable, memoizedTransformContent } from './utils';
+import {
+	isNativeSupport,
+	hasVariable,
+	memoizedTransformContent,
+} from './utils';
 
 /*
  * This plugin is for the stylis library. It's the CSS compiler used by
@@ -16,7 +20,9 @@ import { hasVariable, memoizedTransformContent } from './utils';
  * function. If one is not provided, it will attempt to use the matching
  * variable declared at the :root scope.
  */
-export function stylisPluginCssCustomProperties() {
+export function stylisPluginCssCustomProperties( {
+	skipSupportedBrowsers = true,
+} ) {
 	const seen = new WeakSet();
 
 	const plugin = (
@@ -29,6 +35,9 @@ export function stylisPluginCssCustomProperties() {
 		length,
 		type
 	) => {
+		// Skip generating CSS variable fallbacks for supported browsers
+		if ( skipSupportedBrowsers && isNativeSupport ) return;
+
 		// Borrowed guard implementation from:
 		// https://github.com/Andarist/stylis-plugin-extra-scope/blob/master/src/index.js#L15
 		if ( context !== 2 || type === 107 || seen.has( selectors ) ) return;

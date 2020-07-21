@@ -167,8 +167,11 @@ describe( 'stylisPluginCssCustomProperties', () => {
 			type: 105,
 		};
 
+		const createPlugin = () =>
+			stylisPluginCssCustomProperties( { skipSupportedBrowsers: false } );
+
 		test( 'should return undefined if no fallbacks are available', () => {
-			const plugin = stylisPluginCssCustomProperties();
+			const plugin = createPlugin();
 			const args = { ...baseArgs };
 			args.content = 'font-size: 14px';
 
@@ -178,7 +181,7 @@ describe( 'stylisPluginCssCustomProperties', () => {
 		} );
 
 		test( 'should return fallback declaration and variablized declaration if var() is used and fallbacks are available', () => {
-			const plugin = stylisPluginCssCustomProperties();
+			const plugin = createPlugin();
 			const args = { ...baseArgs };
 
 			const input = [ 'font-size: var( --font, 14px );' ];
@@ -196,7 +199,7 @@ describe( 'stylisPluginCssCustomProperties', () => {
 		} );
 
 		test( 'should handle declarations with parentheses values', () => {
-			const plugin = stylisPluginCssCustomProperties();
+			const plugin = createPlugin();
 			const args = { ...baseArgs };
 
 			const input = [
@@ -223,13 +226,15 @@ describe( 'stylisPluginCssCustomProperties', () => {
 		test( 'should return fallback declarations for every var() call', () => {
 			// Set :root variables
 			document.documentElement.style.setProperty( '--bg', 'black' );
+			document.documentElement.style.setProperty( '--size', '2' );
 
-			const plugin = stylisPluginCssCustomProperties();
+			const plugin = createPlugin();
 			const args = { ...baseArgs };
 
 			const input = [
 				'background: var( --bg );',
 				'font-size: var( --font, 14px );',
+				'transform: translate( var(--x, 0) , 0) scale( var(--size, 1) );',
 				'z-index: var( --z, var( --z2, 2) );',
 			];
 
@@ -242,6 +247,8 @@ describe( 'stylisPluginCssCustomProperties', () => {
 				'background: var( --bg );',
 				'font-size:14px;',
 				'font-size: var( --font, 14px );',
+				'transform:translate(0,0)scale(2);',
+				'transform: translate( var(--x, 0) , 0) scale( var(--size, 1) );',
 				'z-index:2;',
 				'z-index: var( --z, var( --z2, 2) );',
 			];

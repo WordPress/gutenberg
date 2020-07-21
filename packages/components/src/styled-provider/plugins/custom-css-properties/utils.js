@@ -6,8 +6,11 @@ import memoize from 'memize';
 
 const VAR_REG_EXP = new RegExp( /var\(.*?\)[ \) ]*/, 'g' );
 
-const { getComputedStyle } = window;
 const htmlRootNode = document?.documentElement;
+
+// Detects native CSS varialble support
+// https://github.com/jhildenbiddle/css-vars-ponyfill/blob/master/src/index.js
+export const isNativeSupport = window?.CSS?.supports( '(--a: 0)' );
 
 /*
  * Caching the computedStyle instance for document.documentElement.
@@ -19,7 +22,8 @@ const htmlRootNode = document?.documentElement;
  * are up to date. This is important in cases where global :root variables
  * are updated.
  */
-const rootComputedStyles = htmlRootNode && getComputedStyle( htmlRootNode );
+const rootComputedStyles =
+	htmlRootNode && window.getComputedStyle( htmlRootNode );
 
 /**
  * Retrieves the custom CSS variable from the :root selector.
@@ -28,7 +32,7 @@ const rootComputedStyles = htmlRootNode && getComputedStyle( htmlRootNode );
  * @return {?string} The value of the CSS variable.
  */
 function getRootPropertyValue( key ) {
-	// Otherwise, we'll attempt to get the CSS variable from :root.
+	// We'll attempt to get the CSS variable from :root.
 	let rootStyles = rootComputedStyles;
 
 	if ( process.env.NODE_ENV === 'test' ) {
@@ -91,12 +95,10 @@ function sanitizeParens( value ) {
 function getPropValue( declaration ) {
 	let hasFallbackValue = false;
 	// Start be separating (and preparing) the prop and value from the declaration.
-	let [ prop, ...value ] = declaration.replace( / /g, '' ).split( ':' );
-	prop = prop?.trim();
-	value = value.join( '' );
+	let [ prop, value ] = declaration.replace( / /g, '' ).split( /:/ );
 
 	// Cloning the original value. We'll mutate this one (if there are variables).
-	let transformedValue = `${ value }`;
+	let transformedValue = value;
 	const matches = transformedValue.match( VAR_REG_EXP ) || [];
 
 	for ( const match of matches ) {
@@ -108,13 +110,8 @@ function getPropValue( declaration ) {
 			const parsedValue = sanitizeParens( entry );
 			const [ customProp, customFallback ] = parsedValue.split( ',' );
 
-			if ( customFallback !== undefined ) {
-				// We'll use the fallback value if defined.
-				fallback = customFallback;
-			} else {
-				// Otherwise, we'll attempt to get the CSS variable from :root.
-				fallback = getRootPropertyValue( customProp );
-			}
+			// Attempt to get the CSS variable from :root. Otherwise, use the provided fallback.
+			fallback = getRootPropertyValue( customProp ) || customFallback;
 
 			if ( fallback ) {
 				hasFallbackValue = true;
@@ -171,28 +168,31 @@ export function transformContent( content ) {
 	 * to provide fallbacks (if applicable.)
 	 */
 	const parsed = declarations.reduce( ( styles, declaration ) => {
+		// If no CSS variable is used, we return the declaration untouched.
+		if ( ! hasVariable( declaration ) ) {
+			return [ ...styles, declaration ];
+		}
 		// Retrieve the fallback a CSS variable is used in this declaration.
-		if ( hasVariable( declaration ) ) {
-			const fallback = getFallbackDeclaration( declaration );
-			/*
-			 * Prepend the fallback in our styles set.
-			 *
-			 * Example:
-			 * [
-			 * 	 ...styles,
-			 *   'background-color:var(--bg, black);'
-			 * ]
-			 *
-			 * Becomes...
-			 * [
-			 * 	 ...styles,
-			 *   'background:black;',
-			 *   'background-color:var(--bg, black);'
-			 * ]
-			 */
+		const fallback = getFallbackDeclaration( declaration );
+		/*
+		 * Prepend the fallback in our styles set.
+		 *
+		 * Example:
+		 * [
+		 * 	 ...styles,
+		 *   'background-color:var(--bg, black);'
+		 * ]
+		 *
+		 * Becomes...
+		 * [
+		 * 	 ...styles,
+		 *   'background:black;',
+		 *   'background-color:var(--bg, black);'
+		 * ]
+		 */
+		if ( fallback ) {
 			return [ ...styles, fallback, declaration ];
 		}
-		// If no CSS variable is used, we return the declaration untouched.
 		return [ ...styles, declaration ];
 	}, [] );
 
@@ -200,7 +200,7 @@ export function transformContent( content ) {
 	 * We'll rejoin our declarations with a ; separator.
 	 * Note: We need to add a ; at the end for stylis to interpret correctly.
 	 */
-	return `${ parsed.join( ';' ) };`;
+	return parsed.join( ';' ).concat( ';' );
 }
 
 export const memoizedTransformContent = memoize( transformContent );
