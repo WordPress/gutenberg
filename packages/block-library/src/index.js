@@ -211,9 +211,9 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								queryPagination,
 								postTitle,
 								/*
-								 * Only provide the Post Content block in templates,
-								 * so there's no risk of posts including themselves through
-								 * a Post Content block (leading to infinite recursion).
+								 * Only provide the Post Content block when editing templates or,
+								 * template parts so there's no risk of posts including themselves
+								 * through a Post Content block (leading to infinite recursion).
 								 */
 								[ 'wp_template', 'wp_template_part' ].includes(
 									postType
