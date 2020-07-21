@@ -60,6 +60,11 @@
 		"./packages/deprecated/src"
 	],
 	"env": {
+		"development": {
+			"excludes": [
+				"./packages/e2e-tests/"
+			]
+		},
 		"tests": {
 			"mappings": {
 				"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
