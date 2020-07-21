@@ -25,20 +25,20 @@ function render_block_core_post_categories( $attributes, $content, $block ) {
 
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : ' ' . "has-text-align-{$attributes['textAlign']}";
 
-	$categoryLinks = '';
+	$category_links = '';
 	foreach ( $post_categories as $category ) {
-		$categoryLinks .= sprintf(
+		$category_links .= sprintf(
 			'<a href="%1$s">%2$s</a> | ',
 			get_category_link( $category->term_id ),
 			esc_html( $category->name )
 		);
 	}
-	$categoryLinks = trim( $categoryLinks, ' | ' );
+	$category_links = trim( $category_links, ' | ' );
 
 	return sprintf(
 		'<div class="%1$s">%2$s</div>',
 		'wp-block-post-categories' . esc_attr( $align_class_name ),
-		$categoryLinks
+		$category_links
 	);
 }
 
