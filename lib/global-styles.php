@@ -296,6 +296,7 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
 function gutenberg_experimental_global_styles_get_global_context() {
 	return array(
 		'selector' => ':root',
+		'name'    => __( 'Global', 'gutenberg' ),
 		'supports' => array( 'font-size', 'background-color', '--wp--style--color--link' ),
 	);
 }
@@ -363,6 +364,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 			$block_data[ $block_name ] = array(
 				'selector' => $block_type->supports['__experimentalSelector'],
 				'supports' => $supports,
+				'name'     => $block_name,
 			);
 		} elseif (
 			isset( $block_type->supports['__experimentalSelector'] ) &&
@@ -372,12 +374,14 @@ function gutenberg_experimental_global_styles_get_block_data() {
 				$block_data[ $key ] = array(
 					'selector' => $selector,
 					'supports' => $supports,
+					'name'     => $block_name,
 				);
 			}
 		} else {
 			$block_data[ $block_name ] = array(
 				'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
 				'supports' => $supports,
+				'name'     => $block_name,
 			);
 		}
 	}

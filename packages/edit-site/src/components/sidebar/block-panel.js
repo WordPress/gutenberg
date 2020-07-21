@@ -8,131 +8,128 @@ import {
 	FontSizePicker,
 	PanelColorSettings,
 } from '@wordpress/block-editor';
-import { getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { useGlobalStylesContext } from '../editor/global-styles-provider';
+import {
+	FONT_SIZE,
+	LINE_HEIGHT,
+	TEXT_COLOR,
+	BACKGROUND_COLOR,
+	LINK_COLOR,
+} from '../editor/utils';
 
 export default () => {
-	const { getProperty, setProperty } = useGlobalStylesContext();
+	const { getProperty, setProperty, blockData } = useGlobalStylesContext();
 	return (
 		<>
-			{ getBlockTypes()
-				.map(
-					( {
-						name,
-						title,
-						supports: {
-							__experimentalFontSize,
-							__experimentalLineHeight,
-							__experimentalColor,
-						},
-					} ) => {
-						const panels = [];
+			{ Object.keys( blockData )
+				.map( ( selector ) => {
+					const { supports, name } = blockData[ selector ];
+					const panels = [];
 
-						if ( 'core/heading' === name ) {
-							//TODO: process heading as separate blocks
-							return null;
-						}
+					if ( 'global' === name ) {
+						return null;
+					}
 
-						if ( __experimentalFontSize ) {
-							panels.push(
-								<FontSizePicker
-									value={ getProperty(
-										name,
+					if ( supports.includes( FONT_SIZE ) ) {
+						panels.push(
+							<FontSizePicker
+								value={ getProperty(
+									selector,
+									'typography',
+									'fontSize',
+									'px'
+								) }
+								onChange={ ( value ) =>
+									setProperty(
+										selector,
 										'typography',
 										'fontSize',
+										value,
 										'px'
-									) }
-									onChange={ ( value ) =>
-										setProperty(
-											name,
-											'typography',
-											'fontSize',
-											value,
-											'px'
-										)
-									}
-								/>
-							);
-						}
-
-						if ( __experimentalLineHeight ) {
-							panels.push(
-								<LineHeightControl
-									value={ getProperty(
-										name,
-										'typography',
-										'lineHeight'
-									) }
-									onChange={ ( value ) =>
-										setProperty(
-											name,
-											'typography',
-											'lineHeight',
-											value
-										)
-									}
-								/>
-							);
-						}
-
-						const settings = [];
-						if ( __experimentalColor ) {
-							settings.push( {
-								value: getProperty( name, 'color', 'text' ),
-								onChange: ( value ) =>
-									setProperty( name, 'color', 'text', value ),
-								label: __( 'Text color' ),
-							} );
-							settings.push( {
-								value: getProperty(
-									name,
-									'color',
-									'background'
-								),
-								onChange: ( value ) =>
-									setProperty(
-										name,
-										'color',
-										'background',
-										value
-									),
-								label: __( 'Background color' ),
-							} );
-						}
-
-						if ( __experimentalColor?.gradients ) {
-							// TODO: do gradients
-						}
-
-						if ( __experimentalColor?.linkColor ) {
-							settings.push( {
-								value: getProperty( name, 'color', 'link' ),
-								onChange: ( value ) =>
-									setProperty( name, 'color', 'link', value ),
-								label: __( 'Link color' ),
-							} );
-						}
-
-						if ( settings.length > 0 ) {
-							panels.push(
-								<PanelColorSettings
-									title={ __( 'Color' ) }
-									colorSettings={ settings }
-								/>
-							);
-						}
-
-						return panels.length > 0 ? (
-							<PanelBody title={ title } initialOpen={ false }>
-								{ panels }
-							</PanelBody>
-						) : null;
+									)
+								}
+							/>
+						);
 					}
-				)
+
+					if ( supports.includes( LINE_HEIGHT ) ) {
+						panels.push(
+							<LineHeightControl
+								value={ getProperty(
+									selector,
+									'typography',
+									'lineHeight'
+								) }
+								onChange={ ( value ) =>
+									setProperty(
+										selector,
+										'typography',
+										'lineHeight',
+										value
+									)
+								}
+							/>
+						);
+					}
+
+					const settings = [];
+					if (
+						supports.includes( TEXT_COLOR ) &&
+						supports.includes( BACKGROUND_COLOR )
+					) {
+						settings.push( {
+							value: getProperty( selector, 'color', 'text' ),
+							onChange: ( value ) =>
+								setProperty( selector, 'color', 'text', value ),
+							label: __( 'Text color' ),
+						} );
+						settings.push( {
+							value: getProperty(
+								selector,
+								'color',
+								'background'
+							),
+							onChange: ( value ) =>
+								setProperty(
+									selector,
+									'color',
+									'background',
+									value
+								),
+							label: __( 'Background color' ),
+						} );
+					}
+
+					// TODO: do gradients
+
+					if ( supports.includes( LINK_COLOR ) ) {
+						settings.push( {
+							value: getProperty( selector, 'color', 'link' ),
+							onChange: ( value ) =>
+								setProperty( selector, 'color', 'link', value ),
+							label: __( 'Link color' ),
+						} );
+					}
+
+					if ( settings.length > 0 ) {
+						panels.push(
+							<PanelColorSettings
+								title={ __( 'Color' ) }
+								colorSettings={ settings }
+							/>
+						);
+					}
+
+					return panels.length > 0 ? (
+						<PanelBody title={ selector } initialOpen={ false }>
+							{ panels }
+						</PanelBody>
+					) : null;
+				} )
 				.filter( Boolean ) }
 		</>
 	);

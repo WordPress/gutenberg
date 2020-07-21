@@ -43,6 +43,7 @@ export default ( {
 			value={ {
 				getProperty,
 				setProperty,
+				blockData,
 				globalContext,
 			} }
 		>
