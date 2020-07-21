@@ -77,7 +77,6 @@ class GalleryEdit extends Component {
 		this.onUploadError = this.onUploadError.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
-		this.onFocusGalleryCaption = this.onFocusGalleryCaption.bind( this );
 		this.getImagesSizeOptions = this.getImagesSizeOptions.bind( this );
 		this.updateImagesSize = this.updateImagesSize.bind( this );
 
