@@ -35,7 +35,10 @@
 		box-shadow: none;
 
 		> svg {
-			@include block-toolbar-button-style__focus();
+			box-shadow: inset 0 0 0 var(--border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 4px $white;
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
 		}
 	}
 }

@@ -23,7 +23,7 @@
 
 	&:focus:not(:disabled) {
 		border-color: var(--wp-admin-theme-color);
-		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 calc(var(--border-width-focus) - $border-width) var(--wp-admin-theme-color);
 	}
 
 	.components-custom-select-control__button-icon {
