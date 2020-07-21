@@ -31,14 +31,14 @@ function getPropValue( declaration ) {
 	for ( const match of matches ) {
 		// Splitting again allows us to traverse through nested vars().
 		const entries = match.split( 'var(' ).filter( Boolean );
-		let fallback;
 
 		for ( const entry of entries ) {
 			const parsedValue = sanitizeParens( entry );
 			const [ customProp, customFallback ] = parsedValue.split( ',' );
 
 			// Attempt to get the CSS variable from :root. Otherwise, use the provided fallback.
-			fallback = getRootPropertyValue( customProp ) || customFallback;
+			const fallback =
+				getRootPropertyValue( customProp ) || customFallback;
 
 			if ( fallback ) {
 				hasFallbackValue = true;
