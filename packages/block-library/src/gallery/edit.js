@@ -121,8 +121,8 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( newImages ) {
-		const { clientId, insertBlocks } = this.props;
-		const { columns, images, sizeSlug, linkTo } = this.props.attributes;
+		const { clientId, replaceInnerBlocks } = this.props;
+		const { columns, sizeSlug, linkTo } = this.props.attributes;
 
 		const newBlocks = newImages.map( ( image ) => {
 			return createBlock( 'core/image', {
@@ -146,7 +146,7 @@ class GalleryEdit extends Component {
 			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
 
-		insertBlocks( newBlocks, 0, clientId );
+		replaceInnerBlocks( clientId, newBlocks );
 	}
 
 	onUploadError( message ) {
@@ -423,9 +423,9 @@ export default compose( [
 	withNotices,
 	withViewportMatch( { isNarrow: '< small' } ),
 	withDispatch( ( dispatch ) => {
-		const { insertBlocks } = dispatch( 'core/block-editor' );
+		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
 		return {
-			insertBlocks,
+			replaceInnerBlocks,
 		};
 	} ),
 ] )( GalleryEdit );
