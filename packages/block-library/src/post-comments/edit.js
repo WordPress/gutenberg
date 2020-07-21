@@ -72,7 +72,7 @@ export default function PostCommentsEdit( {
 			</BlockControls>
 
 			<div
-				className={ classnames( 'wp-block-post-author', {
+				className={ classnames( 'wp-block-post-comments', {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
