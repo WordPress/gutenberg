@@ -77,7 +77,7 @@ Double check that the following is true for your block:
 
 We encourage the separation of code by using both editorScript/editorStyle and script/style files listed in your block.json to keep the backend and frontend interfaces running smoothly. Even though only one file is required.
 
-The most basic `block.json` you need looks like this.
+Here is an example of a basic block.json file.
 
 ```json
 {
