@@ -58,12 +58,11 @@ export const matchesPatterns = ( url, patterns = [] ) =>
  * @return {string} The name of the block that should be used for this URL, e.g. core-embed/twitter
  */
 export const findBlock = ( url ) => {
-	for ( const block of variations ) {
-		if ( matchesPatterns( url, block.patterns ) ) {
-			return block.name;
-		}
-	}
-	return DEFAULT_EMBED_BLOCK;
+	const match = variations.some( ( { patterns } ) =>
+		matchesPatterns( url, patterns )
+	);
+	return match?.name || DEFAULT_EMBED_BLOCK;
+	// TODO check if get by selector
 };
 
 export const isFromWordPress = ( html ) =>
@@ -96,8 +95,11 @@ export const getPhotoHtml = ( photo ) => {
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
 export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
-	const { preview, name } = props;
-	const { url } = props.attributes;
+	const {
+		preview,
+		name,
+		attributes: { url },
+	} = props;
 
 	if ( ! url ) {
 		return;
@@ -108,7 +110,7 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 	if ( ! getBlockType( matchingBlock ) ) {
 		return;
 	}
-
+	// TODO check for WP block by provider
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
 	if (
@@ -117,6 +119,7 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 	) {
 		// At this point, we have discovered a more suitable block for this url, so transform it.
 		if ( name !== matchingBlock ) {
+			// TODO maybe pass here more attributes, like provider??
 			return createBlock( matchingBlock, { url } );
 		}
 	}

@@ -23,8 +23,7 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 function getResponsiveHelp( checked ) {
 	return checked
@@ -38,26 +37,71 @@ function getResponsiveHelp( checked ) {
 
 const EmbedEdit = ( props ) => {
 	const {
-		attributes: { providerNameSlug, previewable, responsive },
+		attributes: {
+			providerNameSlug,
+			previewable,
+			responsive,
+			url: attributesUrl,
+		},
 		attributes,
-		cannotEmbed,
-		fetching,
 		isSelected,
 		onReplace,
-		preview,
 		setAttributes,
-		themeSupportsResponsive,
-		tryAgain,
 		insertBlocksAfter,
 	} = props;
 
 	const { icon, title } = getEmbedInfoByProvider( providerNameSlug );
-	const [ url, setURL ] = useState( attributes.url );
+	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
+	const { invalidateResolution } = useDispatch( 'core/data' );
+
+	const {
+		preview,
+		fetching,
+		themeSupportsResponsive,
+		cannotEmbed,
+	} = useSelect(
+		( select ) => {
+			const {
+				getEmbedPreview,
+				isPreviewEmbedFallback,
+				isRequestingEmbedPreview,
+				getThemeSupports,
+			} = select( 'core' );
+			if ( attributesUrl === undefined ) {
+				// TODO check if url is also empty... ??
+				return { fetching: false, cannotEmbed: true };
+			}
+
+			const embedPreview = getEmbedPreview( attributesUrl );
+			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
+
+			// The external oEmbed provider does not exist. We got no type info and no html.
+			const badEmbedProvider =
+				embedPreview?.html === false &&
+				embedPreview?.type === undefined;
+			// Some WordPress URLs that can't be embedded will cause the API to return
+			// a valid JSON response with no HTML and `data.status` set to 404, rather
+			// than generating a fallback response as other embeds do.
+			const wordpressCantEmbed = embedPreview?.data?.status === 404;
+			const validPreview =
+				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
+			return {
+				preview: validPreview ? embedPreview : undefined,
+				fetching: isRequestingEmbedPreview( attributesUrl ),
+				themeSupportsResponsive: getThemeSupports()[
+					'responsive-embeds'
+				],
+				cannotEmbed: ! validPreview || previewIsFallback,
+			};
+		},
+		[ attributes.url ]
+	);
 
 	/**
 	 * @return {Object} Attributes derived from the preview, merged with the current attributes.
 	 */
+	// TODO maybe use `useCallback` ??
 	const getMergedAttributes = () => {
 		const { className, allowResponsive } = attributes;
 		return {
@@ -101,28 +145,16 @@ const EmbedEdit = ( props ) => {
 	};
 
 	useEffect( () => {
-		if ( ! preview?.html ) {
+		if ( ! preview?.html || ! cannotEmbed || fetching ) {
 			return;
 		}
-
-		// If we can embed the url, bail early.
-		if ( ! cannotEmbed ) {
-			return;
-		}
-
-		// At this stage, we either have a new preview or a new URL, but we can't embed it.
-		// If we are already fetching the preview, bail early.
-		if ( fetching ) {
-			return;
-		}
-
 		// At this stage, we're not fetching the preview, so we know it can't be embedded, so try
 		// removing any trailing slash, and resubmit.
-		const newURL = attributes.url.replace( /\/$/, '' );
+		const newURL = attributesUrl.replace( /\/$/, '' );
 		setURL( newURL );
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
-	}, [ preview?.html, attributes.url ] );
+	}, [ preview?.html, attributesUrl ] );
 	// TODO if we need above attributes as dependecies for useEffect ( cannotEmbed, fetchin etc..)
 
 	useEffect( () => {
@@ -139,7 +171,8 @@ const EmbedEdit = ( props ) => {
 	const label = sprintf( __( '%s URL' ), title );
 
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
-	if ( ! preview || cannotEmbed || isEditingURL ) {
+	const showEmbedPlacholder = ! preview || cannotEmbed || isEditingURL;
+	if ( showEmbedPlacholder ) {
 		return (
 			<EmbedPlaceholder
 				icon={ icon }
@@ -156,7 +189,9 @@ const EmbedEdit = ( props ) => {
 				cannotEmbed={ cannotEmbed }
 				onChange={ ( event ) => setURL( event.target.value ) }
 				fallback={ () => fallback( url, onReplace ) }
-				tryAgain={ tryAgain }
+				tryAgain={ () => {
+					invalidateResolution( 'core', 'getEmbedPreview', [ url ] );
+				} }
 			/>
 		);
 	}
@@ -206,47 +241,4 @@ const EmbedEdit = ( props ) => {
 	);
 };
 
-export default compose(
-	withSelect( ( select, ownProps ) => {
-		const { url } = ownProps.attributes;
-		const {
-			getEmbedPreview,
-			isPreviewEmbedFallback,
-			isRequestingEmbedPreview,
-			getThemeSupports,
-		} = select( 'core' );
-		const preview = undefined !== url && getEmbedPreview( url );
-		const previewIsFallback =
-			undefined !== url && isPreviewEmbedFallback( url );
-		const fetching = undefined !== url && isRequestingEmbedPreview( url );
-		const themeSupports = getThemeSupports();
-		// The external oEmbed provider does not exist. We got no type info and no html.
-		const badEmbedProvider =
-			!! preview && undefined === preview.type && false === preview.html;
-		// Some WordPress URLs that can't be embedded will cause the API to return
-		// a valid JSON response with no HTML and `data.status` set to 404, rather
-		// than generating a fallback response as other embeds do.
-		const wordpressCantEmbed =
-			!! preview && preview.data && preview.data.status === 404;
-		const validPreview =
-			!! preview && ! badEmbedProvider && ! wordpressCantEmbed;
-		const cannotEmbed =
-			undefined !== url && ( ! validPreview || previewIsFallback );
-		return {
-			preview: validPreview ? preview : undefined,
-			fetching,
-			themeSupportsResponsive: themeSupports[ 'responsive-embeds' ],
-			cannotEmbed,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const { url } = ownProps.attributes;
-		const coreData = dispatch( 'core/data' );
-		const tryAgain = () => {
-			coreData.invalidateResolution( 'core', 'getEmbedPreview', [ url ] );
-		};
-		return {
-			tryAgain,
-		};
-	} )
-)( EmbedEdit );
+export default EmbedEdit;

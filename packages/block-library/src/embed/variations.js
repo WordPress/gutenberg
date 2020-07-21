@@ -44,6 +44,7 @@ const variations = [
 			'Embed videos, images, tweets, audio, and other content from external sources.'
 		),
 		// Unknown embeds should not be responsive by default.
+		// TODO check when transforms to other embed by pattern...
 		attributes: { responsive: false },
 	},
 	{
@@ -54,7 +55,7 @@ const variations = [
 		description: __( 'Embed a tweet.' ),
 		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
 		// TODO - create util for basic RegEx
-		attributes: { providerNameSlug: 'twitter', common: true },
+		attributes: { providerNameSlug: 'twitter' },
 	},
 	{
 		name: 'youtube',
@@ -66,7 +67,7 @@ const variations = [
 			/^https?:\/\/((m|www)\.)?youtube\.com\/.+/i,
 			/^https?:\/\/youtu\.be\/.+/i,
 		],
-		attributes: { providerNameSlug: 'youtube', common: true },
+		attributes: { providerNameSlug: 'youtube' },
 	},
 	{
 		name: 'facebook',
@@ -78,7 +79,6 @@ const variations = [
 		attributes: {
 			providerNameSlug: 'facebook',
 			previewable: false,
-			common: true,
 		},
 	},
 	{
@@ -88,7 +88,7 @@ const variations = [
 		keywords: [ __( 'image' ), __( 'social' ) ],
 		description: __( 'Embed an Instagram post.' ),
 		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
-		attributes: { providerNameSlug: 'instagram', common: true },
+		attributes: { providerNameSlug: 'instagram' },
 	},
 	{
 		name: 'wordpress',
@@ -99,7 +99,6 @@ const variations = [
 		attributes: {
 			providerNameSlug: 'wordpress',
 			responsive: false,
-			common: true,
 		},
 	},
 	{
@@ -109,7 +108,7 @@ const variations = [
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed SoundCloud content.' ),
 		patterns: [ /^https?:\/\/(www\.)?soundcloud\.com\/.+/i ],
-		attributes: { providerNameSlug: 'soundcloud', common: true },
+		attributes: { providerNameSlug: 'soundcloud' },
 	},
 	{
 		name: 'spotify',
@@ -118,7 +117,7 @@ const variations = [
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed Spotify content.' ),
 		patterns: [ /^https?:\/\/(open|play)\.spotify\.com\/.+/i ],
-		attributes: { providerNameSlug: 'spotify', common: true },
+		attributes: { providerNameSlug: 'spotify' },
 	},
 	{
 		name: 'flickr',
@@ -130,7 +129,7 @@ const variations = [
 			/^https?:\/\/(www\.)?flickr\.com\/.+/i,
 			/^https?:\/\/flic\.kr\/.+/i,
 		],
-		attributes: { providerNameSlug: 'flickr', common: true },
+		attributes: { providerNameSlug: 'flickr' },
 	},
 	{
 		name: 'vimeo',
@@ -139,7 +138,7 @@ const variations = [
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a Vimeo video.' ),
 		patterns: [ /^https?:\/\/(www\.)?vimeo\.com\/.+/i ],
-		attributes: { providerNameSlug: 'vimeo', common: true },
+		attributes: { providerNameSlug: 'vimeo' },
 	},
 	{
 		name: 'animoto',
