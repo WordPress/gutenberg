@@ -108,4 +108,28 @@ describe( 'stylisPluginCssCustomProperties', () => {
 
 		expect( result ).toBe( compiled.join( '' ) );
 	} );
+
+	test( 'should return if a single fallback was transformed out of many', () => {
+		const plugin = createPlugin();
+		const args = { ...baseArgs };
+
+		const input = [
+			'background: var( --bg );',
+			'font-size: var( --font, 14px );',
+			'z-index: var( --z );',
+		];
+
+		args.content = input.join( '' );
+
+		const result = plugin( ...Object.values( args ) );
+
+		const compiled = [
+			'background: var( --bg );',
+			'font-size:14px;',
+			'font-size: var( --font, 14px );',
+			'z-index: var( --z );',
+		];
+
+		expect( result ).toBe( compiled.join( '' ) );
+	} );
 } );

@@ -24,16 +24,25 @@ function getPropValue( declaration ) {
 	// Start be separating (and preparing) the prop and value from the declaration.
 	let [ prop, value ] = declaration.replace( / /g, '' ).split( /:/ );
 
-	// Cloning the original value. We'll mutate this one (if there are variables).
-	let transformedValue = value;
-	const matches = transformedValue.match( VAR_REG_EXP ) || [];
+	// Searching for uses of var().
+	const matches = value.match( VAR_REG_EXP ) || [];
 
 	for ( const match of matches ) {
 		// Splitting again allows us to traverse through nested vars().
 		const entries = match.split( 'var(' ).filter( Boolean );
 
 		for ( const entry of entries ) {
+			// Removes extra parentheses
 			const parsedValue = sanitizeParens( entry );
+			/**
+			 * Splits a CSS variable into it's custom property name and fallback.
+			 *
+			 * Before:
+			 * '--bg, black'
+			 *
+			 * After:
+			 * ['--bg', 'black']
+			 */
 			const [ customProp, customFallback ] = parsedValue.split( ',' );
 
 			// Attempt to get the CSS variable from :root. Otherwise, use the provided fallback.
@@ -44,15 +53,15 @@ function getPropValue( declaration ) {
 				hasFallbackValue = true;
 				/*
 				 * If a valid fallback value is discovered, we'll replace it in
-				 * our temporary transformedValue.
+				 * our value.
 				 */
-				transformedValue = transformedValue.replace( match, fallback );
+				value = value.replace( match, fallback );
 			}
 		}
 	}
 
 	// We only want to return a value if we're able to locate a fallback value.
-	value = hasFallbackValue ? sanitizeParens( transformedValue ) : undefined;
+	value = hasFallbackValue ? sanitizeParens( value ) : undefined;
 
 	return [ prop, value ];
 }
@@ -68,7 +77,7 @@ export function getFallbackDeclaration( declaration ) {
 
 	const [ prop, value ] = getPropValue( declaration );
 
-	return value ? `${ prop }:${ value }` : undefined;
+	return value ? [ prop, value ].join( ':' ) : undefined;
 }
 
 /**
@@ -83,13 +92,14 @@ export function transformContent( content ) {
 	 * Attempts to deconstruct the content to retrieve prop/value
 	 * CSS declaration pairs.
 	 *
-	 * Example:
-	 * background-color:var(--bg, black); font-size:14px;
+	 * Before:
+	 * 'background-color:var(--bg, black); font-size:14px;'
 	 *
-	 * Becomes...
-	 * ["background-color:var(--bg, black)", " font-size:14px"]
+	 * After:
+	 * ['background-color:var(--bg, black)', ' font-size:14px']
 	 */
 	const declarations = content.split( ';' ).filter( Boolean );
+	let didTransform = false;
 
 	/*
 	 * With the declaration collection, we'll iterate over every declaration
@@ -105,13 +115,13 @@ export function transformContent( content ) {
 		/*
 		 * Prepend the fallback in our styles set.
 		 *
-		 * Example:
+		 * Before:
 		 * [
 		 * 	 ...styles,
 		 *   'background-color:var(--bg, black);'
 		 * ]
 		 *
-		 * Becomes...
+		 * After:
 		 * [
 		 * 	 ...styles,
 		 *   'background:black;',
@@ -119,6 +129,7 @@ export function transformContent( content ) {
 		 * ]
 		 */
 		if ( fallback ) {
+			didTransform = true;
 			return [ ...styles, fallback, declaration ];
 		}
 		return [ ...styles, declaration ];
@@ -128,7 +139,10 @@ export function transformContent( content ) {
 	 * We'll rejoin our declarations with a ; separator.
 	 * Note: We need to add a ; at the end for stylis to interpret correctly.
 	 */
-	return parsed.join( ';' ).concat( ';' );
+	const result = parsed.join( ';' ).concat( ';' );
+
+	// We only want to return a value if we're able to locate a fallback value.
+	return didTransform ? result : undefined;
 }
 
 export const memoizedTransformContent = memoize( transformContent );
