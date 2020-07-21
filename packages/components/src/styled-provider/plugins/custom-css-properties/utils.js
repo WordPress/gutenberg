@@ -1,3 +1,11 @@
+/**
+ * External dependencies
+ */
+import { fill } from 'lodash';
+import memoize from 'memize';
+
+const VAR_REG_EXP = new RegExp( /var\(.*?\)[ \) ]*/, 'g' );
+
 const { getComputedStyle } = window;
 const htmlRootNode = document?.documentElement;
 
@@ -46,54 +54,89 @@ export function hasVariable( declaration ) {
 }
 
 /**
+ * Appends or trims parens from a value.
+ *
+ * @param {string} value Value to sanitize.
+ * @return {string} The sanitized value
+ */
+function sanitizeParens( value ) {
+	const parenStartCount = value.match( /\(/g )?.length || 0;
+	const parenEndCount = value.match( /\)/g )?.length || 0;
+
+	const parenAppendCound = parenStartCount - parenEndCount;
+	const parenTrimCount = parenEndCount - parenStartCount;
+
+	let result;
+
+	if ( parenStartCount > parenEndCount ) {
+		// We need to append ) to the end if there are any missing.
+		const collection = Array( parenAppendCound );
+		const append = fill( collection, ')' ).join( '' );
+		result = `${ value }${ append }`;
+	} else {
+		// Otherwise, we need to trim the extra parens at the end.
+		const trimRegExp = new RegExp( `((\\\)){${ parenTrimCount }})$`, 'gi' );
+		result = value.replace( trimRegExp, '' );
+	}
+
+	return result;
+}
+
+/**
  * Interprets and retrieves the CSS property and value of a declaration rule.
  *
  * @param {string} declaration A CSS declaration rule to parse.
  * @return {Array<string, ?string>} [prop, value] parsed from the declaration.
  */
 function getPropValue( declaration ) {
-	/*
-	 * Split declaration based on var() usage. This is to accomodate nested
-	 * CSS var() scenarios.
-	 */
-	const entries = declaration.replace( / /g, '' ).split( 'var(' );
-	// Get the last entry. This is fallback value (if defined).
-	let last = entries.pop();
+	let hasFallbackValue = false;
+	// Start be separating (and preparing) the prop and value from the declaration.
+	let [ prop, ...value ] = declaration.replace( / /g, '' ).split( ':' );
+	prop = prop?.trim();
+	value = value.join( '' );
 
-	// Get + sanitize the CSS property.
-	let [ prop ] = entries;
-	prop = prop.replace( ':', '' );
+	// Cloning the original value. We'll mutate this one (if there are variables).
+	let transformedValue = `${ value }`;
+	const matches = transformedValue.match( VAR_REG_EXP ) || [];
 
-	/*
-	 * This regex removes the ending parentheses from the "last" entry.
-	 *
-	 * To support nested var(), we need to adjust the regex count targeting
-	 * the ending parentheses based on the number of starting "var(" that
-	 * appear in our entries.
-	 */
-	const regex = new RegExp( `((\\\)){${ entries.length }})$`, 'gi' );
-	last = last.replace( regex, '' );
+	for ( const match of matches ) {
+		// Splitting again allows us to traverse through nested vars().
+		const entries = match.split( 'var(' ).filter( Boolean );
+		let fallback;
 
-	/*
-	 * Lastly, we'll attempt to use the fallback value (if provided).
-	 * Otherwise, we'll attempt to grab the custom CSS property attached
-	 * to :root (document.documentElement).
-	 */
-	if ( last.includes( ',' ) ) {
-		// Sanitize the fallback
-		last = last.split( ',' )[ 1 ];
-	} else {
-		// Attempt to get value from :root
-		last = getRootPropertyValue( last );
+		for ( const entry of entries ) {
+			const parsedValue = sanitizeParens( entry );
+			const [ customProp, customFallback ] = parsedValue.split( ',' );
+
+			if ( customFallback !== undefined ) {
+				// We'll use the fallback value if defined.
+				fallback = customFallback;
+			} else {
+				// Otherwise, we'll attempt to get the CSS variable from :root.
+				fallback = getRootPropertyValue( customProp );
+			}
+
+			if ( fallback ) {
+				hasFallbackValue = true;
+				/*
+				 * If a valid fallback value is discovered, we'll replace it in
+				 * our temporary transformedValue.
+				 */
+				transformedValue = transformedValue.replace( match, fallback );
+			}
+		}
 	}
 
-	return [ prop, last ];
+	// We only want to return a value if we're able to locate a fallback value.
+	value = hasFallbackValue ? sanitizeParens( transformedValue ) : undefined;
+
+	return [ prop, value ];
 }
 /**
  * Interprets and retrieves the CSS fallback value of a declaration rule.
  *
  * @param {string} declaration A CSS declaration rule to parse.
- * @return {string} A CSS declaration rule with a fallback (if applicable).
+ * @return {?string} A CSS declaration rule with a fallback (if applicable).
  */
 export function getFallbackDeclaration( declaration ) {
 	if ( ! hasVariable( declaration ) ) return undefined;
@@ -102,3 +145,62 @@ export function getFallbackDeclaration( declaration ) {
 
 	return value ? `${ prop }:${ value }` : undefined;
 }
+
+/**
+ * Parses the incoming content from stylis to add fallback CSS values for
+ * variables.
+ *
+ * @param {string} content Stylis content to parse.
+ * @return {string} The transformed content with CSS variable fallbacks.
+ */
+export function transformContent( content ) {
+	/*
+	 * Attempts to deconstruct the content to retrieve prop/value
+	 * CSS declaration pairs.
+	 *
+	 * Example:
+	 * background-color:var(--bg, black); font-size:14px;
+	 *
+	 * Becomes...
+	 * ["background-color:var(--bg, black)", " font-size:14px"]
+	 */
+	const declarations = content.split( ';' ).filter( Boolean );
+
+	/*
+	 * With the declaration collection, we'll iterate over every declaration
+	 * to provide fallbacks (if applicable.)
+	 */
+	const parsed = declarations.reduce( ( styles, declaration ) => {
+		// Retrieve the fallback a CSS variable is used in this declaration.
+		if ( hasVariable( declaration ) ) {
+			const fallback = getFallbackDeclaration( declaration );
+			/*
+			 * Prepend the fallback in our styles set.
+			 *
+			 * Example:
+			 * [
+			 * 	 ...styles,
+			 *   'background-color:var(--bg, black);'
+			 * ]
+			 *
+			 * Becomes...
+			 * [
+			 * 	 ...styles,
+			 *   'background:black;',
+			 *   'background-color:var(--bg, black);'
+			 * ]
+			 */
+			return [ ...styles, fallback, declaration ];
+		}
+		// If no CSS variable is used, we return the declaration untouched.
+		return [ ...styles, declaration ];
+	}, [] );
+
+	/*
+	 * We'll rejoin our declarations with a ; separator.
+	 * Note: We need to add a ; at the end for stylis to interpret correctly.
+	 */
+	return `${ parsed.join( ';' ) };`;
+}
+
+export const memoizedTransformContent = memoize( transformContent );

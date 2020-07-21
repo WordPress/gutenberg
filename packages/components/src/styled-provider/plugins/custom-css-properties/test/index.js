@@ -61,7 +61,7 @@ describe( 'stylisPluginCssCustomProperties', () => {
 				expect( result ).toEqual( 'filter:blur(10px)' );
 			} );
 
-			test.skip( 'should use fallback with nested parentheses value', () => {
+			test( 'should use fallback with nested parentheses value', () => {
 				const dec =
 					'transform:translate3d(var(--x,5px),var(--y,10px),var( --z, 0))';
 				const result = getFallbackDeclaration( dec );
