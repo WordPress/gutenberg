@@ -55,10 +55,10 @@ function gutenberg_customize_register( $wp_customize ) {
 			'sanitize_callback' => 'gutenberg_customize_sanitize',
 		)
 	);
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+	if ( get_theme_support( 'block-based-widgets' ) ) {
 		$wp_customize->add_section(
 			'gutenberg_widget_blocks',
-			array( 'title' => __( 'Widget Blocks (Experimental)', 'gutenberg' ) )
+			array( 'title' => __( 'Widget Blocks', 'gutenberg' ) )
 		);
 		$wp_customize->add_control(
 			new WP_Customize_Widget_Blocks_Control(
@@ -75,6 +75,21 @@ function gutenberg_customize_register( $wp_customize ) {
 add_action( 'customize_register', 'gutenberg_customize_register' );
 
 /**
+ * Removes the core 'Widgets' panel from the Customizer if block based widgets are enabled.
+ *
+ * @param array $components Core Customizer components list.
+ * @return array (Maybe) modified components list.
+ */
+function gutenberg_remove_widgets_panel( $components ) {
+    $i = array_search( 'widgets', $components );
+    if ( false !== $i ) {
+        unset( $components[ $i ] );
+    }
+    return $components;
+}
+add_filter( 'customize_loaded_components', 'gutenberg_remove_widgets_panel' );
+
+/*
  * Filters the Customizer widget settings arguments.
  * This is needed because the Customizer registers settings for the raw registered widgets, without going through the `sidebars_widgets` filter.
  * The `WP_Customize_Widgets` class expects sidebars to have an array of widgets registered, not a post ID.
