@@ -33,7 +33,7 @@ Try your best to make your block's name functional and unique to make it stand o
 The description really helps to communicate what your block does.The quicker a user understands how your block will help them, the more likely it is a user will use your block. Users will be reading your block's description within the Block Editor where space can be limited. Try to keep it short and concise.
 
 **Not So Good**: The best way to show images on your website using jQuery and CSS.
-**Good**: An easy to use, responsive, Image gallery block. 
+**Good**: A responsive image gallery block. 
 
 **Tip**: It’s not about marketing your block, in fact we want to avoid marketing in blocks. You can read more about it in the [plugin guidelines]. Stick to being as clear as you can. The Block Directory will provide metrics to let users know how awesome your block is!
 
