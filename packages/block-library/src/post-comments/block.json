@@ -12,10 +12,6 @@
 	],
 	"supports": {
 		"html": false,
-		"align": [
-			"wide",
-			"full"
-		],
 		"__experimentalFontSize": true,
 		"__experimentalColor": {
 			"gradients": true,
