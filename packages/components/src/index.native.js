@@ -38,6 +38,7 @@ export { default as ExternalLink } from './external-link';
 export { default as TextControl } from './text-control';
 export { default as ToggleControl } from './toggle-control';
 export { default as SelectControl } from './select-control';
+export { default as __experimentalStyledProvider } from './styled-provider';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
 export { default as UnsupportedFooterControl } from './unsupported-footer-control';
