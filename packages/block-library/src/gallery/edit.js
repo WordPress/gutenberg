@@ -138,11 +138,6 @@ class GalleryEdit extends Component {
 		this.setAttributes( {
 			images: newImages.map( ( newImage ) => ( {
 				...pickRelevantMediaFiles( newImage, sizeSlug ),
-				caption: this.selectCaption(
-					newImage,
-					images,
-					attachmentCaptions
-				),
 				// The id value is stored in a data attribute, so when the
 				// block is parsed it's converted to a string. Converting
 				// to a string here ensures it's type is consistent.
