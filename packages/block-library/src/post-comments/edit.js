@@ -13,6 +13,7 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { RawHTML } from '@wordpress/element';
 
 function PostCommentsDisplay( { postId } ) {
 	return useSelect(
@@ -27,7 +28,9 @@ function PostCommentsDisplay( { postId } ) {
 			// TODO: "No Comments" placeholder should be editable.
 			return comments && comments.length
 				? comments.map( ( comment ) => (
-						<p key={ comment.id }>{ comment.content.raw }</p>
+						<p key={ comment.id }>
+							<RawHTML>{ comment.content.raw }</RawHTML>
+						</p>
 				  ) )
 				: __( 'No comments.' );
 		},
