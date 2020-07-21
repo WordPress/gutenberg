@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fill } from 'lodash';
+import { repeat } from 'lodash';
 import memoize from 'memize';
 
 const VAR_REG_EXP = new RegExp( /var\(.*?\)[ \) ]*/, 'g' );
@@ -74,8 +74,7 @@ function sanitizeParens( value ) {
 
 	if ( parenStartCount > parenEndCount ) {
 		// We need to append ) to the end if there are any missing.
-		const collection = Array( parenAppendCound );
-		const append = fill( collection, ')' ).join( '' );
+		const append = repeat( ')', parenAppendCound );
 		result = `${ value }${ append }`;
 	} else {
 		// Otherwise, we need to trim the extra parens at the end.
