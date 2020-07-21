@@ -85,7 +85,7 @@ export function* installBlockType( block ) {
 			links: { ...block.links, ...links },
 		} );
 
-		yield loadAssets( assets );
+		yield loadAssets( block );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
 		if (
 			! registeredBlocks.length ||
