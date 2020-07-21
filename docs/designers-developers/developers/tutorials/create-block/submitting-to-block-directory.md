@@ -20,7 +20,7 @@ It is important to the Block Directory and our end users to provide easy to unde
 
 ### Name your block based on what it does
 
-Users typically search the block directory within the Block Editor and do so in the context of a task. For example, when building their post, a user may search the Block Directory for an “image gallery”. Naming your block accordingly will help the Block Directory surface it when it's needed.
+Users typically search the Block Directory within the Block Editor and do so in the context of a task. For example, when building their post, a user may search the Block Directory for an “image gallery”. Naming your block accordingly will help the Block Directory surface it when it's needed.
 
 **Not So Good**: WebTeam5 Image Works
 **Good**: Responsive Image Slider by WebTeam5
@@ -35,7 +35,7 @@ The description really helps to communicate what your block does.The quicker a u
 **Not So Good**: The best way to show images on your website using jQuery and CSS.
 **Good**: An easy to use, responsive, Image gallery block. 
 
-**Tip**: It’s not about marketing your block, in fact we want to avoid marketing in blocks. You can read more about it in the [plugin guidelines]. Stick to being as clear as you can. The block directory will provide metrics to let users know how awesome your block is!
+**Tip**: It’s not about marketing your block, in fact we want to avoid marketing in blocks. You can read more about it in the [plugin guidelines]. Stick to being as clear as you can. The Block Directory will provide metrics to let users know how awesome your block is!
 
 ### Add Keywords for broader context
 
