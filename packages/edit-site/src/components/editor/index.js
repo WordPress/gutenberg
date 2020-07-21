@@ -171,51 +171,42 @@ function Editor() {
 						>
 							<BlockContextProvider value={ blockContext }>
 								<FocusReturnProvider>
-									<GlobalStylesProvider
-										entityId={
-											settings.__experimentalGlobalStylesUserEntityId
-										}
-										globalContext={
-											settings.__experimentalGlobalStylesGlobalContext
-										}
-										baseStyles={
-											settings.__experimentalGlobalStylesBaseStyles
-										}
-										blockData={
-											settings.__experimentalGlobalStylesBlockData
-										}
-									>
-										<KeyboardShortcuts.Register />
-										<SidebarComplementaryAreaFills />
-										<InterfaceSkeleton
-											labels={ interfaceLabels }
-											leftSidebar={
-												isInserterOpen && (
-													<div className="edit-site-editor__inserter-panel">
-														<div className="edit-site-editor__inserter-panel-header">
-															<Button
-																icon={ close }
-																onClick={ () =>
+								<GlobalStylesProvider
+									entityId={ settings.__experimentalGlobalStylesUserEntityId }
+									globalContext={ settings.__experimentalGlobalStylesGlobalContext }
+									baseStyles={ settings.__experimentalGlobalStylesBaseStyles }
+									blockData={ settings.__experimentalGlobalStylesBlockData }
+								>
+									<KeyboardShortcuts.Register />
+									<SidebarComplementaryAreaFills />
+									<InterfaceSkeleton
+										labels={ interfaceLabels }
+										leftSidebar={
+											isInserterOpen && (
+												<div className="edit-site-editor__inserter-panel">
+													<div className="edit-site-editor__inserter-panel-header">
+														<Button
+															icon={ close }
+															onClick={ () =>
+																setIsInserterOpen(
+																	false
+																)
+															}
+														/>
+													</div>
+													<div className="edit-site-editor__inserter-panel-content">
+														<Library
+															showInserterHelpPanel
+															onSelect={ () => {
+																if (
+																	isMobile
+																) {
 																	setIsInserterOpen(
 																		false
-																	)
+																	);
 																}
-															/>
-														</div>
-														<div className="edit-site-editor__inserter-panel-content">
-															<Library
-																showInserterHelpPanel
-																onSelect={ () => {
-																	if (
-																		isMobile
-																	) {
-																		setIsInserterOpen(
-																			false
-																		);
-																	}
-																} }
-															/>
-														</div>
+															} }
+														/>
 													</div>
 												</div>
 											)
@@ -257,41 +248,41 @@ function Editor() {
 												<KeyboardShortcuts />
 											</BlockSelectionClearer>
 										}
-											actions={
-												<>
-													<EntitiesSavedStates
-														isOpen={
-															isEntitiesSavedStatesOpen
-														}
-														close={
-															closeEntitiesSavedStates
-														}
-													/>
-													{ ! isEntitiesSavedStatesOpen && (
-														<div className="edit-site-editor__toggle-save-panel">
-															<Button
-																isSecondary
-																className="edit-site-editor__toggle-save-panel-button"
-																onClick={
-																	openEntitiesSavedStates
-																}
-																aria-expanded={
-																	false
-																}
-															>
-																{ __(
-																	'Open save panel'
-																) }
-															</Button>
-														</div>
-													) }
-												</>
-											}
-											footer={ <BlockBreadcrumb /> }
-										/>
-										<Popover.Slot />
-										<PluginArea />
-									</GlobalStylesProvider>
+										actions={
+											<>
+												<EntitiesSavedStates
+													isOpen={
+														isEntitiesSavedStatesOpen
+													}
+													close={
+														closeEntitiesSavedStates
+													}
+												/>
+												{ ! isEntitiesSavedStatesOpen && (
+													<div className="edit-site-editor__toggle-save-panel">
+														<Button
+															isSecondary
+															className="edit-site-editor__toggle-save-panel-button"
+															onClick={
+																openEntitiesSavedStates
+															}
+															aria-expanded={
+																false
+															}
+														>
+															{ __(
+																'Open save panel'
+															) }
+														</Button>
+													</div>
+												) }
+											</>
+										}
+										footer={ <BlockBreadcrumb /> }
+									/>
+									<Popover.Slot />
+									<PluginArea />
+								</GlobalStylesProvider>
 								</FocusReturnProvider>
 							</BlockContextProvider>
 						</EntityProvider>
