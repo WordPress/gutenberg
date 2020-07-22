@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+import { Button } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import Navigation from '../';
@@ -82,7 +88,21 @@ const data = [
 ];
 
 function Example() {
-	return <Navigation data={ data } initial="home" />;
+	const [ active, setActive ] = useState( 'home' );
+	const onSelect = ( slug ) => {
+		setActive( slug );
+	};
+	return (
+		<div style={ { display: 'flex' } }>
+			<Navigation data={ data } active={ active } onSelect={ onSelect } />
+			<div>
+				<Button onClick={ () => onSelect( 'tax' ) }>Link to Tax</Button>
+				<Button onClick={ () => onSelect( 'payouts' ) }>
+					Link to Payouts
+				</Button>
+			</div>
+		</div>
+	);
 }
 
 export const _default = () => {

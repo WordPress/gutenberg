@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 
 /**
@@ -11,11 +10,10 @@ import Button from '../button';
 import Text from '../text';
 import Item from './item';
 
-const Navigation = ( { data, initial } ) => {
-	const initialActive = data.find( ( item ) => item.slug === initial );
-	const [ active, setActive ] = useState( initialActive );
-	const parent = data.find( ( item ) => item.slug === active.parent );
-	const items = data.filter( ( item ) => item.parent === active.parent );
+const Navigation = ( { data, active, onSelect } ) => {
+	const activeItem = data.find( ( item ) => item.slug === active );
+	const parent = data.find( ( item ) => item.slug === activeItem.parent );
+	const items = data.filter( ( item ) => item.parent === activeItem.parent );
 
 	const goBack = () => {
 		if ( ! parent.parent ) {
@@ -26,7 +24,7 @@ const Navigation = ( { data, initial } ) => {
 			( item ) => item.parent === parent.parent
 		);
 		if ( parentalSiblings.length ) {
-			setActive( parentalSiblings[ 0 ] );
+			onSelect( parentalSiblings[ 0 ].slug );
 		}
 	};
 
@@ -50,8 +48,8 @@ const Navigation = ( { data, initial } ) => {
 							key={ item.slug }
 							data={ data }
 							item={ item }
-							setActive={ setActive }
-							isActive={ item.slug === active.slug }
+							onSelect={ onSelect }
+							isActive={ item.slug === active }
 						/>
 					) : null
 				) }
@@ -63,8 +61,8 @@ const Navigation = ( { data, initial } ) => {
 							key={ item.slug }
 							data={ data }
 							item={ item }
-							setActive={ setActive }
-							isActive={ item.slug === active.slug }
+							onSelect={ onSelect }
+							isActive={ item.slug === active }
 						/>
 					) : null
 				) }
