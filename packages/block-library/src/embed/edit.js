@@ -170,8 +170,8 @@ const EmbedEdit = ( props ) => {
 	const label = sprintf( __( '%s URL' ), title );
 
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
-	const showEmbedPlacholder = ! preview || cannotEmbed || isEditingURL;
-	if ( showEmbedPlacholder ) {
+	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
+	if ( showEmbedPlaceholder ) {
 		return (
 			<EmbedPlaceholder
 				icon={ icon }
