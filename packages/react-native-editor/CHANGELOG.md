@@ -1,9 +1,3 @@
-1.34.0
-------
-* [***] Media editing support in Cover block.
-
-1.33.0
-------
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
 
 <!--
@@ -16,6 +10,10 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.34.0
+
+* [***] Media editing support in Cover block.
 
 ## 1.33.0
 
