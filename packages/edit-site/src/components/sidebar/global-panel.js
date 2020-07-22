@@ -9,15 +9,16 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useGlobalStylesContext } from '../editor/global-styles-provider';
-import { FONT_SIZE, BACKGROUND_COLOR, LINK_COLOR } from '../editor/utils';
+import { GLOBAL_CONTEXT, FONT_SIZE, BACKGROUND_COLOR, LINK_COLOR } from '../editor/utils';
 
 export default () => {
 	const {
-		globalContext: { supports },
+		contexts,
 		getProperty,
 		setProperty,
 	} = useGlobalStylesContext();
 
+	const { supports } = contexts[ GLOBAL_CONTEXT ];
 	const panels = [];
 	const colorSettings = [];
 
@@ -26,14 +27,14 @@ export default () => {
 			<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
 				<FontSizePicker
 					value={ getProperty(
-						'global',
+						GLOBAL_CONTEXT,
 						'typography',
 						'fontSize',
 						'px'
 					) }
 					onChange={ ( value ) =>
 						setProperty(
-							'global',
+							GLOBAL_CONTEXT,
 							'typography',
 							'fontSize',
 							value,
@@ -47,18 +48,18 @@ export default () => {
 
 	if ( supports.includes( BACKGROUND_COLOR ) ) {
 		colorSettings.push( {
-			value: getProperty( 'global', 'color', 'background' ),
+			value: getProperty( GLOBAL_CONTEXT, 'color', 'background' ),
 			onChange: ( value ) =>
-				setProperty( 'global', 'color', 'background', value ),
+				setProperty( GLOBAL_CONTEXT, 'color', 'background', value ),
 			label: __( 'Background color' ),
 		} );
 	}
 
 	if ( supports.includes( LINK_COLOR ) ) {
 		colorSettings.push( {
-			value: getProperty( 'global', 'color', 'link' ),
+			value: getProperty( GLOBAL_CONTEXT, 'color', 'link' ),
 			onChange: ( value ) =>
-				setProperty( 'global', 'color', 'link', value ),
+				setProperty( GLOBAL_CONTEXT, 'color', 'link', value ),
 			label: __( 'Link color' ),
 		} );
 	}

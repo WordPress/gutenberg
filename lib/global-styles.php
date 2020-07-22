@@ -665,10 +665,9 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	if ( ! empty( $screen ) &&
 		gutenberg_is_edit_site_page( $screen->id ) &&
 		gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		$settings['__experimentalGlobalStylesUserEntityId']  = gutenberg_experimental_global_styles_get_user_cpt_id();
-		$settings['__experimentalGlobalStylesGlobalContext'] = gutenberg_experimental_global_styles_get_global_context();
-		$settings['__experimentalGlobalStylesBlockData']     = gutenberg_experimental_global_styles_get_block_data();
-		$settings['__experimentalGlobalStylesBaseStyles']    = gutenberg_experimental_global_styles_merge_trees(
+		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
+		$settings['__experimentalGlobalStylesContexts']     = gutenberg_experimental_global_styles_get_block_data();
+		$settings['__experimentalGlobalStylesBaseStyles']   = gutenberg_experimental_global_styles_merge_trees(
 			gutenberg_experimental_global_styles_get_core(),
 			gutenberg_experimental_global_styles_get_theme()
 		);

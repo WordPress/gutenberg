@@ -6,3 +6,4 @@ export const LINE_HEIGHT = 'line-height';
 export const PRESET_COLOR = 'color';
 export const PRESET_FONT_SIZE = 'font-size';
 export const PRESET_GRADIENT = 'gradient';
+export const GLOBAL_CONTEXT = 'global';

@@ -22,9 +22,8 @@ export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 export default ( {
 	children,
 	entityId,
-	globalContext,
 	baseStyles,
-	blockData,
+	contexts,
 } ) => {
 	const {
 		userStyles,
@@ -33,7 +32,7 @@ export default ( {
 	} = useGlobalStylesFromEntities( entityId );
 
 	useGlobalStylesEffectToUpdateStylesheet(
-		blockData,
+		contexts,
 		baseStyles,
 		userStyles
 	);
@@ -43,8 +42,7 @@ export default ( {
 			value={ {
 				getProperty,
 				setProperty,
-				blockData,
-				globalContext,
+				contexts
 			} }
 		>
 			{ children }
@@ -116,7 +114,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 };
 
 const useGlobalStylesEffectToUpdateStylesheet = (
-	blockData,
+	contexts,
 	baseStyles,
 	userStyles
 ) => {
@@ -133,7 +131,7 @@ const useGlobalStylesEffectToUpdateStylesheet = (
 		}
 
 		styleNode.innerText = getGlobalStyles(
-			blockData,
+			contexts,
 			baseStyles,
 			userStyles
 		);

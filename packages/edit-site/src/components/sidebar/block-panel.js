@@ -15,24 +15,25 @@ import { getBlockType } from '@wordpress/blocks';
  */
 import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import {
-	FONT_SIZE,
-	LINE_HEIGHT,
-	TEXT_COLOR,
 	BACKGROUND_COLOR,
+	FONT_SIZE,
+	GLOBAL_CONTEXT,
+	LINE_HEIGHT,
 	LINK_COLOR,
+	TEXT_COLOR,
 } from '../editor/utils';
 
 export default () => {
-	const { getProperty, setProperty, blockData } = useGlobalStylesContext();
+	const { getProperty, setProperty, contexts } = useGlobalStylesContext();
 	return (
 		<>
-			{ Object.keys( blockData )
+			{ Object.keys( contexts )
 				.map( ( context ) => {
-					const { supports, name, selector } = blockData[ context ];
+					const { supports, name, selector } = contexts[ context ];
 					const panels = [];
 
 					/* This is shown in the global panel */
-					if ( 'global' === name ) {
+					if ( GLOBAL_CONTEXT === name ) {
 						return null;
 					}
 
