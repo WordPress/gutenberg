@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { Icon, arrowLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,28 +18,37 @@ const Navigation = ( { data, initial } ) => {
 	const items = data.filter( ( item ) => item.parent === active.parent );
 
 	const goBack = () => {
+		if ( ! parent.parent ) {
+			// We are at top level, will need to handle this case.
+			return;
+		}
 		const parentalSiblings = data.filter(
 			( item ) => item.parent === parent.parent
 		);
-		setActive( parentalSiblings[ 0 ] );
+		if ( parentalSiblings.length ) {
+			setActive( parentalSiblings[ 0 ] );
+		}
 	};
 
 	return (
-		<>
+		<div className="components-navigation">
 			<Button onClick={ goBack } isPrimary>
+				<Icon icon={ arrowLeft } />
 				{ parent.back }
 			</Button>
 			<Text variant="title.large">{ parent.title }</Text>
-			{ items.map( ( item ) => (
-				<Item
-					key={ item.slug }
-					data={ data }
-					item={ item }
-					setActive={ setActive }
-					isActive={ item.slug === active.slug }
-				/>
-			) ) }
-		</>
+			<div className="components-navigation-items">
+				{ items.map( ( item ) => (
+					<Item
+						key={ item.slug }
+						data={ data }
+						item={ item }
+						setActive={ setActive }
+						isActive={ item.slug === active.slug }
+					/>
+				) ) }
+			</div>
+		</div>
 	);
 };
 

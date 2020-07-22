@@ -1,0 +1,17 @@
+.components-navigation {
+	max-width: 250px;
+}
+
+.components-navigation-items {
+	display: flex;
+	flex-direction: column;
+}
+
+.components-navigation-item {
+	display: flex;
+	justify-content: space-between;
+
+	&.is-active {
+		border-bottom: 2px solid var(--wp-admin-theme-color);
+	}
+}
