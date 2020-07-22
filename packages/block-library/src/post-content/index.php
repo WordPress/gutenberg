@@ -48,6 +48,14 @@ add_action( 'init', 'register_block_core_post_content' );
  * @param WP_Post    $post                The post resource data.
  */
 function disallow_core_post_content_block_outside_templates( $allowed_block_types, $post ) {
+	/**
+	 * The following if clause can be removed once Gutenberg requires a WordPress version
+	 * that includes https://github.com/WordPress/wordpress-develop/pull/419.
+	 */
+	if ( true === $allowed_block_types ) {
+		$allowed_block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+	}
+
 	if ( in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
 		return $allowed_block_types;
 	}
