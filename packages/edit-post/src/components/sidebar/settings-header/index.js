@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -20,13 +15,12 @@ const SettingsHeader = ( { sidebarName } ) => {
 		const currentPostType = select( 'core/editor' ).getCurrentPostType();
 		const postType = select( 'core' ).getPostType( currentPostType );
 
-		// translators: Default label for the Document sidebar tab, not selected.
-		const defaultDocumentLabel = __( 'Document' );
-
-		return get(
-			postType,
-			[ 'labels', 'singular_name' ],
-			defaultDocumentLabel
+		return (
+			// Disable reason: Post type labels object is shaped like this.
+			// eslint-disable-next-line camelcase
+			postType?.labels?.singular_name ??
+			// translators: Default label for the Document sidebar tab, not selected.
+			__( 'Document' )
 		);
 	} );
 
