@@ -43,6 +43,40 @@ const data = [
 		slug: 'payouts',
 		parent: 'orders',
 	},
+	{
+		title: 'Settings',
+		slug: 'settings',
+		parent: 'root',
+		back: 'WooCommerce Home',
+		isSecondary: true,
+	},
+	{
+		title: 'Extensions',
+		slug: 'extensions',
+		parent: 'root',
+		back: 'WooCommerce Home',
+		isSecondary: true,
+	},
+	{
+		title: 'General',
+		slug: 'general',
+		parent: 'settings',
+	},
+	{
+		title: 'Tax',
+		slug: 'tax',
+		parent: 'settings',
+	},
+	{
+		title: 'My extensions',
+		slug: 'my_extensions',
+		parent: 'extensions',
+	},
+	{
+		title: 'Marketplace',
+		slug: 'marketplace',
+		parent: 'extensions',
+	},
 ];
 
 function Example() {

@@ -40,15 +40,30 @@ const Navigation = ( { data, initial } ) => {
 				<Text variant="title.medium">{ parent.title }</Text>
 			</div>
 			<div className="components-navigation-items">
-				{ items.map( ( item ) => (
-					<Item
-						key={ item.slug }
-						data={ data }
-						item={ item }
-						setActive={ setActive }
-						isActive={ item.slug === active.slug }
-					/>
-				) ) }
+				{ items.map( ( item ) =>
+					! item.isSecondary ? (
+						<Item
+							key={ item.slug }
+							data={ data }
+							item={ item }
+							setActive={ setActive }
+							isActive={ item.slug === active.slug }
+						/>
+					) : null
+				) }
+			</div>
+			<div className="components-navigation-items is-secondary">
+				{ items.map( ( item ) =>
+					item.isSecondary ? (
+						<Item
+							key={ item.slug }
+							data={ data }
+							item={ item }
+							setActive={ setActive }
+							isActive={ item.slug === active.slug }
+						/>
+					) : null
+				) }
 			</div>
 		</div>
 	);
