@@ -405,7 +405,7 @@ class URLInput extends Component {
 			label,
 			instanceId,
 			placeholder = __( 'Paste URL or type to search' ),
-			renderControl,
+			__experimentalRenderControl: renderControl,
 			value = '',
 			autoFocus = true,
 		} = this.props;
@@ -418,10 +418,8 @@ class URLInput extends Component {
 			suggestionOptionIdPrefix,
 		} = this.state;
 
-		const id = `url-input-control-${ instanceId }`;
-
 		const controlProps = {
-			id,
+			id: `url-input-control-${ instanceId }`,
 			label,
 		};
 
