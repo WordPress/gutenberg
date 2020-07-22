@@ -2,7 +2,7 @@
 	"apiVersion": 2,
 	"name": "core/image",
 	"category": "media",
-	"usesContext": [ "gallery/imageSettings" ],
+	"usesContext": [ "allowBlockAlign", "allowResize" ],
 	"attributes": {
 		"align": {
 			"type": "string"

@@ -30,16 +30,18 @@
 			"type": "string",
 			"default": "large"
 		},
-		"imageSettings": {
-			"type": "object",
-			"default": {
-				"allowResize": false,
-				"allowAlign": false
-			}
+		"allowBlockAlign": {
+			"type": "boolean",
+			"default": false
+		},
+		"allowResize": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"providesContext": {
-		"gallery/imageSettings": "imageSettings"
+		"allowBlockAlign": "allowBlockAlign",
+		"allowResize": "allowResize"
 	},
 	"supports": {
 		"anchor": true,

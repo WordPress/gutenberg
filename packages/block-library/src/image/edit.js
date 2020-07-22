@@ -110,14 +110,10 @@ export function ImageEdit( {
 	} );
 
 	const allowResize =
-		context[ 'gallery/imageSettings' ]?.allowResize !== undefined
-			? context[ 'gallery/imageSettings' ].allowResize
-			: true;
+		context.allowResize !== undefined ? context.allowResize : true;
 
 	const allowAlign =
-		context[ 'gallery/imageSettings' ]?.allowAlign !== undefined
-			? context[ 'gallery/imageSettings' ].allowAlign
-			: true;
+		context.allowBlockAlign !== undefined ? context.allowBlockAlign : true;
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
