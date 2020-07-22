@@ -35,11 +35,27 @@ function focusFirstTabbableIn( container ) {
 }
 
 function useIsAccessibleToolbar( ref ) {
+	/*
+	 * By default, we'll assume the starting accessible state of the Toolbar
+	 * is true, as it seems to be the most common case.
+	 *
+	 * Transitioning from an (initial) false to true state causes the
+	 * <Toolbar /> component to mount twice, which is causing undesired
+	 * side-effects. These side-effects appear to only affect certain
+	 * E2E tests.
+	 *
+	 * This was initial discovered in this pull-request:
+	 * https://github.com/WordPress/gutenberg/pull/23425
+	 */
+	const initialAccessibleToolbarState = true;
+
 	// By default, it's gonna render NavigableMenu. If all the tabbable elements
 	// inside the toolbar are ToolbarItem components (or derived components like
 	// ToolbarButton), then we can wrap them with the accessible Toolbar
 	// component.
-	const [ isAccessibleToolbar, setIsAccessibleToolbar ] = useState( false );
+	const [ isAccessibleToolbar, setIsAccessibleToolbar ] = useState(
+		initialAccessibleToolbarState
+	);
 
 	const determineIsAccessibleToolbar = useCallback( () => {
 		const tabbables = focus.tabbable.find( ref.current );

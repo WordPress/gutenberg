@@ -42,7 +42,7 @@ function RangeControl(
 		beforeIcon,
 		className,
 		currentInput,
-		color: colorProp = color( 'ui.brand' ),
+		color: colorProp = color( 'ui.theme' ),
 		disabled = false,
 		help,
 		initialPosition,
