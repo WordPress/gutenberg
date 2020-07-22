@@ -1,28 +1,34 @@
 .wp-block-gallery,
-.blocks-gallery-grid {
-	display: flex;
-	flex-wrap: wrap;
-	list-style-type: none;
-	padding: 0;
-	// Some themes give all <ul> default margin instead of padding.
+.blocks-gallery-grid,
+.blocks-gallery-image,
+.blocks-gallery-item {
 	margin: 0;
+	padding: 0;
+}
+
+.wp-block-gallery {
+	.blocks-gallery-grid {
+		display: flex;
+		flex-wrap: wrap;
+		list-style-type: none;
+
+		// Offset parent, by the amount of spacing for each thumbnail.
+		margin-left: -1 * $grid-unit-10;
+		margin-right: -1 * $grid-unit-10;
+	}
 
 	.blocks-gallery-image,
 	.blocks-gallery-item {
-		// Add space between thumbnails, and unset right most thumbnails later.
-		margin: 0 1em 1em 0;
+		// Add space between thumbnails.
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
+		padding-bottom: $grid-unit-20;
+
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
 		justify-content: center;
 		position: relative;
-
-		// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-		width: calc(50% - 1em);
-
-		&:nth-of-type(even) {
-			margin-right: 0;
-		}
 
 		figure {
 			margin: 0;
@@ -40,8 +46,10 @@
 			display: block;
 			max-width: 100%;
 			height: auto;
+		}
 
-			// IE doesn't handle cropping, so we need an explicit width here.
+		// IE doesn't handle cropping, so we need an explicit width here.
+		img {
 			width: 100%;
 
 			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
@@ -51,27 +59,28 @@
 		}
 
 		figcaption {
+			// Offset caption, by the amount of spacing for each thumbnail.
 			position: absolute;
-			bottom: 0;
-			width: 100%;
-			max-height: 100%;
+			left: $grid-unit-10;
+			right: $grid-unit-10;
+			bottom: $grid-unit-20;
+			max-height: calc(100% - #{ $grid-unit-20 });
+
+			margin: 0;
+			padding: 40px 10px 9px;
+
+			width: auto;
 			overflow: auto;
-			padding: 3em 0.77em 0.7em;
+
 			color: $white;
 			text-align: center;
-			font-size: 0.8em;
+			font-size: $default-font-size;
 			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
-			box-sizing: border-box;
-			margin: 0;
 
 			img {
 				display: inline;
 			}
 		}
-	}
-
-	figcaption {
-		flex-grow: 1;
 	}
 
 	// Cropped
@@ -92,10 +101,15 @@
 		}
 	}
 
+	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
+	.blocks-gallery-image,
+	.blocks-gallery-item {
+		width: 50%;
+	}
+
 	&.columns-1 .blocks-gallery-image,
 	&.columns-1 .blocks-gallery-item {
 		width: 100%;
-		margin-right: 0;
 	}
 
 	// Beyond mobile viewports, we allow up to 8 columns.
@@ -103,24 +117,9 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc(#{ 100% / $i } - #{ 1em * ( $i - 1 ) / $i });
-				margin-right: 1em;
+				width: calc(100% / #{ $i });
 			}
 		}
-
-		// Unset the right margin on every rightmost gallery item to ensure center balance.
-		@for $column-count from 1 through 8 {
-			&.columns-#{ $column-count } .blocks-gallery-image:nth-of-type(#{ $column-count }n),
-			&.columns-#{ $column-count } .blocks-gallery-item:nth-of-type(#{ $column-count }n) {
-				margin-right: 0;
-			}
-		}
-	}
-
-	// Last item always needs margins reset.
-	.blocks-gallery-image:last-child,
-	.blocks-gallery-item:last-child {
-		margin-right: 0;
 	}
 
 	// Apply max-width to floated items that have no intrinsic width.
