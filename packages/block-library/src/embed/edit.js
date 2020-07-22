@@ -73,7 +73,7 @@ const EmbedEdit = ( props ) => {
 				getThemeSupports,
 			} = select( 'core' );
 			if ( ! attributesUrl ) {
-				return { fetching: false, cannotEmbed: true };
+				return { fetching: false, cannotEmbed: false };
 			}
 
 			const embedPreview = getEmbedPreview( attributesUrl );

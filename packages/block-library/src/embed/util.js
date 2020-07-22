@@ -1,11 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	DEFAULT_EMBED_BLOCK,
-	WORDPRESS_EMBED_BLOCK,
-	ASPECT_RATIOS,
-} from './constants';
+import { ASPECT_RATIOS } from './constants';
 
 /**
  * External dependencies
@@ -18,7 +14,7 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { createBlock, getBlockType } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -26,6 +22,12 @@ import { _x } from '@wordpress/i18n';
  */
 import variations from './variations';
 import { embedContentIcon } from './icons';
+import metadata from './block.json';
+
+const { name: DEFAULT_EMBED_BLOCK } = metadata;
+const WP_VARIATION = variations.find( ( { name } ) => name === 'wordpress' );
+
+/** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
  * @typedef {Object} EmbedInformation
@@ -61,19 +63,14 @@ export const matchesPatterns = ( url, patterns = [] ) =>
 	patterns.some( ( pattern ) => url.match( pattern ) );
 
 /**
- * Finds the block name that should be used for the URL, based on the
- * structure of the URL.
+ * Finds the block variation that should be used for the URL,
+ * based on the provided URL and the variation's patterns.
  *
  * @param {string}  url The URL to test.
- * @return {string} The name of the block that should be used for this URL, e.g. core-embed/twitter
+ * @return {WPBlockVariation} The block variation that should be used for this URL
  */
-export const findBlock = ( url ) => {
-	const match = variations.some( ( { patterns } ) =>
-		matchesPatterns( url, patterns )
-	);
-	return match?.name || DEFAULT_EMBED_BLOCK;
-	// TODO check if get by selector
-};
+export const findMoreSuitableBlock = ( url ) =>
+	variations.find( ( { patterns } ) => matchesPatterns( url, patterns ) );
 
 export const isFromWordPress = ( html ) =>
 	html.includes( 'class="wp-embedded-content"' );
@@ -107,55 +104,56 @@ export const getPhotoHtml = ( photo ) => {
 export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 	const {
 		preview,
-		name,
-		attributes: { url },
+		// name,
+		attributes: { url, providerNameSlug },
 	} = props;
 
-	if ( ! url ) {
-		return;
-	}
+	if ( ! url ) return;
 
-	const matchingBlock = findBlock( url );
+	const matchedBlock = findMoreSuitableBlock( url );
 
-	if ( ! getBlockType( matchingBlock ) ) {
-		return;
-	}
-	// TODO check for WP block by provider
+	// TODO as we only have variations of core/embed we only have to check for core/embed
+	// but this is used by [image,video,audio], check better when it will be their time to handle in this PR
+	// if ( ! getBlockType( matchedBlockName ) ) {
+	// 	return;
+	// }
+
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
-	if (
-		WORDPRESS_EMBED_BLOCK !== name &&
-		DEFAULT_EMBED_BLOCK !== matchingBlock
-	) {
-		// At this point, we have discovered a more suitable block for this url, so transform it.
-		if ( name !== matchingBlock ) {
-			// TODO maybe pass here more attributes, like provider??
-			return createBlock( matchingBlock, { url } );
-		}
+
+	const isCurrentBlockWP =
+		providerNameSlug === WP_VARIATION.attributes.providerNameSlug;
+	// if current block is not WordPress and a more suitable block found
+	// that is different from the current one, create the new matched block
+	const shouldCreateNewBlock =
+		! isCurrentBlockWP &&
+		matchedBlock &&
+		( matchedBlock.attributes.providerNameSlug !== providerNameSlug ||
+			! providerNameSlug ); // this is here as audio,image,video don't provide this any prop besides url (handle differently??)
+	if ( shouldCreateNewBlock ) {
+		return createBlock( DEFAULT_EMBED_BLOCK, {
+			url,
+			...matchedBlock.attributes,
+		} );
 	}
 
-	if ( ! preview ) {
+	// We can't match the URL for WordPress embeds, we have to check the HTML instead.
+	if ( ! preview || ! isFromWordPress( preview.html ) || isCurrentBlockWP ) {
 		return;
 	}
-
-	const { html } = preview;
-	// We can't match the URL for WordPress embeds, we have to check the HTML instead.
-	if ( isFromWordPress( html ) ) {
-		// If this is not the WordPress embed block, transform it into one.
-		if ( WORDPRESS_EMBED_BLOCK !== name ) {
-			return createBlock( WORDPRESS_EMBED_BLOCK, {
-				url,
-				// By now we have the preview, but when the new block first renders, it
-				// won't have had all the attributes set, and so won't get the correct
-				// type and it won't render correctly. So, we pass through the current attributes
-				// here so that the initial render works when we switch to the WordPress
-				// block. This only affects the WordPress block because it can't be
-				// rendered in the usual Sandbox (it has a sandbox of its own) and it
-				// relies on the preview to set the correct render type.
-				...attributesFromPreview,
-			} );
-		}
-	}
+	// This is not the WordPress embed block so transform it into one.
+	return createBlock( DEFAULT_EMBED_BLOCK, {
+		url,
+		...WP_VARIATION.attributes,
+		// By now we have the preview, but when the new block first renders, it
+		// won't have had all the attributes set, and so won't get the correct
+		// type and it won't render correctly. So, we pass through the current attributes
+		// here so that the initial render works when we switch to the WordPress
+		// block. This only affects the WordPress block because it can't be
+		// rendered in the usual Sandbox (it has a sandbox of its own) and it
+		// relies on the preview to set the correct render type.
+		...attributesFromPreview,
+	} );
 };
 
 /**
