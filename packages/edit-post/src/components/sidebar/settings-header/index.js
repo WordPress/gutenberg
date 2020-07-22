@@ -17,6 +17,9 @@ const BLOCK_SELECTED_LABEL = __( 'Block (selected)' );
 
 const SettingsHeader = ( { sidebarName } ) => {
 	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
+	const openDocumentSettings = () =>
+		openGeneralSidebar( 'edit-post/document' );
+	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );
 
 	const documentLabel = useSelect( ( select ) => {
 		const currentPostType = select( 'core/editor' ).getCurrentPostType();
@@ -48,7 +51,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 		<ul>
 			<li>
 				<Button
-					onClick={ () => openGeneralSidebar( 'edit-post/document' ) }
+					onClick={ openDocumentSettings }
 					className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
 					aria-label={ documentAriaLabel }
 					data-label={ documentLabel }
@@ -58,7 +61,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 			</li>
 			<li>
 				<Button
-					onClick={ () => openGeneralSidebar( 'edit-post/block' ) }
+					onClick={ openBlockSettings }
 					className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
 					aria-label={ blockAriaLabel }
 					data-label={ BLOCK_LABEL }
