@@ -234,7 +234,7 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	// If no render_callback, assume styles have been previously handled.
-	if ( ! $block_type || ! $block_type->render_callback ) {
+	if ( ! $block_type || ! $block_type->render_callback || empty( $block_type->supports ) ) {
 		return $block_content;
 	}
 	// Check what style features the block supports.
