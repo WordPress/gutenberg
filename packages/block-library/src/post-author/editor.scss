@@ -1,7 +1,6 @@
 .wp-block-post-author {
 	display: flex;
 	flex-wrap: wrap;
-	line-height: 1.5;
 
 	.wp-block-post-author__byline {
 		font-size: 0.5em;
@@ -33,4 +32,8 @@
 		margin: 0 0 $grid-unit-10;
 		font-size: 0.7em;
 	}
+}
+
+.wp-block[data-type="core/post-author"].has-link-color .wp-block-post-author a {
+	color: var(--wp--style--color--link);
 }

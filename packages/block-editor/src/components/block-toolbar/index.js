@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
@@ -21,7 +21,7 @@ import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import BlockDraggable from '../block-draggable';
-import { useShowMoversGestures, useToggleBlockHighlight } from './utils';
+import { useShowMoversGestures } from './utils';
 import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
 export default function BlockToolbar( {
@@ -65,13 +65,15 @@ export default function BlockToolbar( {
 		};
 	}, [] );
 
-	const toggleBlockHighlight = useToggleBlockHighlight( blockClientId );
+	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
 	const nodeRef = useRef();
 
 	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
 		{
 			ref: nodeRef,
-			onChange: toggleBlockHighlight,
+			onChange( isFocused ) {
+				toggleBlockHighlight( blockClientId, isFocused );
+			},
 		}
 	);
 
@@ -107,6 +109,7 @@ export default function BlockToolbar( {
 			<div
 				className="block-editor-block-toolbar__mover-switcher-container"
 				ref={ nodeRef }
+				{ ...showMoversGestures }
 			>
 				{ ! isMultiToolbar && (
 					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
@@ -125,7 +128,6 @@ export default function BlockToolbar( {
 							onDraggableEnd,
 						} ) => (
 							<div
-								{ ...showMoversGestures }
 								className="block-editor-block-toolbar__block-switcher-wrapper"
 								draggable={ isDraggable && ! hideDragHandle }
 								onDragStart={ onDraggableStart }

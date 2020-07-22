@@ -43,6 +43,8 @@ function MediaPlaceholder( props ) {
 		getStylesFromColorScheme,
 		multiple,
 		value = [],
+		children,
+		height,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -107,6 +109,7 @@ function MediaPlaceholder( props ) {
 					<Text style={ emptyStateTitleStyle }>
 						{ placeholderTitle }
 					</Text>
+					{ children }
 					<Text style={ styles.emptyStateDescription }>
 						{ instructions }
 					</Text>
@@ -164,7 +167,10 @@ function MediaPlaceholder( props ) {
 						>
 							<View
 								style={ [
-									emptyStateContainerStyle,
+									[
+										emptyStateContainerStyle,
+										height && { height },
+									],
 									isAppender && appenderStyle,
 								] }
 							>

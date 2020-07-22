@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "8.5.1",
+	"version": "8.6.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -170,13 +170,13 @@
 		"lint-staged": "9.2.5",
 		"lodash": "4.17.15",
 		"make-dir": "3.0.0",
-		"metro": "0.58.0",
 		"metro-react-native-babel-preset": "0.57.0",
 		"metro-react-native-babel-transformer": "0.56.0",
 		"mkdirp": "0.5.1",
 		"nock": "12.0.3",
 		"node-sass": "4.13.1",
 		"node-watch": "0.6.0",
+		"patch-package": "6.2.2",
 		"postcss": "7.0.32",
 		"postcss-loader": "3.0.0",
 		"prettier": "npm:wp-prettier@2.0.5",
@@ -235,6 +235,7 @@
 		"lint:md-docs": "wp-scripts lint-md-docs",
 		"native": "npm run --prefix packages/react-native-editor",
 		"pot-to-php": "./bin/pot-to-php.js",
+		"postinstall": "patch-package",
 		"publish:check": "lerna updated",
 		"publish:dev": "npm run clean:package-types && npm run build:packages && lerna publish prerelease --preid rc --dist-tag next",
 		"publish:patch": "npm run clean:package-types && npm run build:packages && lerna publish --dist-tag patch",
@@ -306,8 +307,5 @@
 			"                                                `---'"
 		],
 		"welcome-build-command": "npm run dev"
-	},
-	"resolutions": {
-		"metro-config": "0.58.0"
 	}
 }
