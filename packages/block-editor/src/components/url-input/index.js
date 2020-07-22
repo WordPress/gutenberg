@@ -403,6 +403,7 @@ class URLInput extends Component {
 
 		const {
 			loading,
+			suggestions,
 			showSuggestions,
 			selectedSuggestion,
 			suggestionsListboxId,
@@ -441,7 +442,10 @@ class URLInput extends Component {
 		};
 
 		if ( renderControl ) {
-			return renderControl( controlProps, inputProps, loading );
+			return renderControl( controlProps, inputProps, {
+				isLoading: loading,
+				suggestionsVisible: showSuggestions && !! suggestions.length,
+			} );
 		}
 
 		return (

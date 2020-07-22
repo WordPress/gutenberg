@@ -1,0 +1,56 @@
+
+// Specificity hack
+.block-editor-block-toolbar.block-editor-block-toolbar {
+
+	[data-experimental-toolbar-item]:focus .components-input-control__container {
+		//box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color);
+		outline: var(--wp-admin-theme-color) auto 2px;
+	}
+
+	.toolbar-link-control__input-group {
+		flex-grow: 1;
+		margin: 0;
+		height: 45px;
+		min-height: 0;
+	}
+
+	.toolbar-link-control__input-wrapper {
+		display: flex;
+
+		.components-base-control {
+			display: flex;
+			height: 100%;
+		}
+
+		.components-base-control__field {
+			display: flex;
+			margin: 0;
+		}
+
+		.components-input-control__input {
+			min-width: 280px;
+			padding-left: 0;
+		}
+	}
+
+	.toolbar-link-control__input-control {
+		height: 45px;
+		border: 1px solid #ccc;
+		flex-grow: 1;
+		align-self: center;
+		font-size: 13px;
+	}
+
+	.toolbar-link-control__affix-wrapper {
+		width: $grid-unit-50;
+		text-align: center;
+
+		.components-spinner {
+			margin: 0;
+		}
+	}
+}
+
+.block-editor-link-control__search-results-wrapper.is-toolbar-results {
+	margin-top: 0;
+}

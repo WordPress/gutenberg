@@ -7,7 +7,12 @@ import { noop, omit } from 'lodash';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useRef,
+	useState,
+	useImperativeHandle,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -33,8 +38,12 @@ const LinkControlSearchInput = forwardRef(
 			onSelect = noop,
 			showSuggestions = true,
 			renderSuggestions = ( props ) => (
-				<LinkControlSearchResults { ...props } />
+				<LinkControlSearchResults
+					{ ...props }
+					className="is-vertically-retracted"
+				/>
 			),
+			renderControl = null,
 			fetchSuggestions = null,
 			allowDirectEntry = true,
 			showInitialSuggestions = false,
@@ -117,6 +126,13 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
+		const urlInputRef = useRef();
+		useImperativeHandle( ref, () => ( {
+			selectFocusedSuggestion: () => {
+				onSuggestionSelected( focusedSuggestion || { url: value } );
+			},
+		} ) );
+
 		return (
 			<form onSubmit={ onFormSubmit }>
 				<URLInput
@@ -124,15 +140,15 @@ const LinkControlSearchInput = forwardRef(
 					value={ value }
 					onChange={ onInputChange }
 					placeholder={ placeholder ?? __( 'Search or type url' ) }
-					__experimentalRenderSuggestions={
-						showSuggestions ? handleRenderSuggestions : null
-					}
+					disableSuggestions={ ! showSuggestions }
+					__experimentalRenderSuggestions={ handleRenderSuggestions }
 					__experimentalFetchLinkSuggestions={ searchHandler }
 					__experimentalHandleURLSuggestions={ true }
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
-					ref={ ref }
+					__experimentalRenderControl={ renderControl }
+					ref={ urlInputRef }
 				/>
 				{ children }
 			</form>

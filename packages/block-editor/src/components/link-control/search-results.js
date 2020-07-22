@@ -20,6 +20,7 @@ import { CREATE_TYPE } from './constants';
 export default function LinkControlSearchResults( {
 	instanceId,
 	withCreateSuggestion,
+	className,
 	currentInputValue,
 	handleSuggestionClick,
 	suggestionsListProps,
@@ -75,8 +76,13 @@ export default function LinkControlSearchResults( {
 		</span>
 	);
 
+	const wrapperClass = classnames(
+		'block-editor-link-control__search-results-wrapper',
+		className
+	);
+
 	return (
-		<div className="block-editor-link-control__search-results-wrapper">
+		<div className={ wrapperClass }>
 			{ searchResultsLabel }
 			<div
 				{ ...suggestionsListProps }

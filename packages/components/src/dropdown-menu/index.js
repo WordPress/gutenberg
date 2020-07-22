@@ -40,6 +40,7 @@ function DropdownMenu( {
 	icon = 'menu',
 	label,
 	popoverProps,
+	onToggle: dropdownOnToggle,
 	toggleProps,
 	menuProps,
 	disableOpenOnArrowDown = false,
@@ -86,6 +87,7 @@ function DropdownMenu( {
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
 			popoverProps={ mergedPopoverProps }
+			onToggle={ dropdownOnToggle }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( disableOpenOnArrowDown ) {

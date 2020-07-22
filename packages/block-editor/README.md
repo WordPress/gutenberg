@@ -210,6 +210,10 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="BlockToolbarLinkControl" href="#BlockToolbarLinkControl">#</a> **BlockToolbarLinkControl**
+
+Undocumented declaration.
+
 <a name="BlockVerticalAlignmentToolbar" href="#BlockVerticalAlignmentToolbar">#</a> **BlockVerticalAlignmentToolbar**
 
 _Related_
