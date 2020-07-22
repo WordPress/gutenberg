@@ -176,14 +176,9 @@ export function getClassNames(
 		const aspectRatioClassNames = {
 			'wp-has-aspect-ratio': false,
 		};
-		for (
-			let ratioIndex = 0;
-			ratioIndex < ASPECT_RATIOS.length;
-			ratioIndex++
-		) {
-			const aspectRatioToRemove = ASPECT_RATIOS[ ratioIndex ];
-			aspectRatioClassNames[ aspectRatioToRemove.className ] = false;
-		}
+		ASPECT_RATIOS.forEach( ( { className } ) => {
+			aspectRatioClassNames[ className ] = false;
+		} );
 		return classnames( existingClassNames, aspectRatioClassNames );
 	}
 
@@ -238,13 +233,7 @@ export function fallback( url, onReplace ) {
  * @return {Object} Attributes and values.
  */
 export const getAttributesFromPreview = memoize(
-	(
-		preview,
-		title,
-		currentClassNames,
-		isResponsive,
-		allowResponsive = true // is the default needed
-	) => {
+	( preview, title, currentClassNames, isResponsive, allowResponsive ) => {
 		if ( ! preview ) {
 			return {};
 		}
@@ -256,7 +245,7 @@ export const getAttributesFromPreview = memoize(
 		// because not all embed code gives us a provider name.
 		const { html, provider_name: providerName } = preview;
 		const providerNameSlug = kebabCase(
-			( providerName ?? title ).toLowerCase()
+			( providerName || title ).toLowerCase()
 		);
 
 		if ( isFromWordPress( html ) ) {
