@@ -20,11 +20,7 @@ import { __ } from '@wordpress/i18n';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
-export default function PostTitleEdit( {
-	attributes,
-	setAttributes,
-	context,
-} ) {
+function PostTitleEditor( { attributes, setAttributes, context } ) {
 	const { level, textAlign } = attributes;
 	const { postType, postId } = context;
 	const tagName = 0 === level ? 'p' : 'h' + level;
