@@ -391,7 +391,7 @@
 
 	// Hide the inserter above the selected block.
 	&.is-inserter-hidden .block-editor-inserter__toggle {
-		opacity: 0;
+		visibility: hidden;
 		pointer-events: none;
 	}
 }

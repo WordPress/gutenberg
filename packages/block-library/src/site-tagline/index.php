@@ -13,7 +13,7 @@
  * @return string The render.
  */
 function render_block_core_site_tagline( $attributes ) {
-	$align_class_name = empty( $attributes['align'] ) ? '' : ' ' . "has-text-align-{$attributes['align']}";
+	$align_class_name = empty( $attributes['textAlign'] ) ? '' : ' ' . "has-text-align-{$attributes['textAlign']}";
 
 	return sprintf(
 		'<p class="%1$s">%2$s</p>',
