@@ -380,7 +380,7 @@ const Cover = ( {
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					backgroundColor={ customColor }
 					hideContent={
-						customColor != '' && customColor !== undefined
+						customColor !== '' && customColor !== undefined
 					}
 					icon={ placeholderIcon }
 					labels={ {
