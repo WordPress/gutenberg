@@ -32,11 +32,17 @@ const Navigation = ( { data, initial } ) => {
 
 	return (
 		<div className="components-navigation">
-			<Button onClick={ goBack } isPrimary>
+			<Button
+				className="components-navigation-back"
+				onClick={ goBack }
+				isPrimary
+			>
 				<Icon icon={ arrowLeft } />
 				{ parent.back }
 			</Button>
-			<Text variant="title.large">{ parent.title }</Text>
+			<div className="components-navigation-title">
+				<Text variant="title.medium">{ parent.title }</Text>
+			</div>
 			<div className="components-navigation-items">
 				{ items.map( ( item ) => (
 					<Item

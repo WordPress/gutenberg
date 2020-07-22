@@ -12,6 +12,7 @@ import { Icon, chevronRight } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../button';
+import Text from '../text';
 
 const Item = ( { data, item, setActive, isActive } ) => {
 	const children = data.filter( ( d ) => d.parent === item.slug );
@@ -24,7 +25,9 @@ const Item = ( { data, item, setActive, isActive } ) => {
 	} );
 	return (
 		<Button className={ classes } onClick={ onSelect } key={ item.slug }>
-			{ item.title }
+			<Text variant="body.small">
+				<span>{ item.title }</span>
+			</Text>
 			{ children.length ? <Icon icon={ chevronRight } /> : null }
 		</Button>
 	);

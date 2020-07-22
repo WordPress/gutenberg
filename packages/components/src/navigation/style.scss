@@ -1,5 +1,14 @@
 .components-navigation {
-	max-width: 250px;
+	width: 272px;
+	padding: 35px 30px;
+}
+
+.components-navigation-back {
+	margin-bottom: 64px;
+}
+
+.components-navigation-title {
+	margin-bottom: 24px;
 }
 
 .components-navigation-items {
@@ -10,8 +19,9 @@
 .components-navigation-item {
 	display: flex;
 	justify-content: space-between;
+	margin-left: -12px;
 
-	&.is-active {
+	&.is-active span {
 		border-bottom: 2px solid var(--wp-admin-theme-color);
 	}
 }
