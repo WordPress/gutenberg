@@ -32,11 +32,16 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 			container: ref.current,
 		} );
 
-		clipboard.current.on( 'success', ( { clearSelection } ) => {
+		clipboard.current.on( 'success', ( { clearSelection, trigger } ) => {
 			// Clearing selection will move focus back to the triggering button,
 			// ensuring that it is not reset to the body, and further that it is
 			// kept within the rendered node.
 			clearSelection();
+
+			// Handle ClipboardJS focus bug, see https://github.com/zenorocha/clipboard.js/issues/680
+			if ( trigger ) {
+				trigger.focus();
+			}
 
 			if ( timeout ) {
 				setHasCopied( true );

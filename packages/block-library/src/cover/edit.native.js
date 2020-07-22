@@ -274,7 +274,7 @@ const Cover = ( {
 
 	const colorPickerControls = (
 		<InspectorControls>
-			<BottomSheetConsumer dontCount={ true }>
+			<BottomSheetConsumer excludeFromSettings={ true }>
 				{ ( {
 					shouldEnableBottomSheetScroll,
 					shouldDisableBottomSheetMaxHeight,
@@ -301,7 +301,7 @@ const Cover = ( {
 							isBottomSheetContentScrolling
 						}
 						bottomLabelText={ __( 'Select a color' ) }
-						dontCount={ true }
+						excludeFromSettings={ true }
 					/>
 				) }
 			</BottomSheetConsumer>
@@ -395,6 +395,9 @@ const Cover = ( {
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					backgroundColor={ customColor }
+					hideContent={
+						customColor != '' && customColor !== undefined
+					}
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),

@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 8.6.0-rc.1 =
+
+The changelog will be provided later.
+
+
 = 8.5.1 =
 
 ### Bug Fixes

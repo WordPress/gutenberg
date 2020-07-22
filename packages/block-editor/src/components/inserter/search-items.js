@@ -54,28 +54,42 @@ export const searchBlockItems = (
 		return items;
 	}
 
-	return searchItems( items, searchTerm, {
+	const config = {
 		getCategory: ( item ) =>
 			find( categories, { slug: item.category } )?.title,
 		getCollection: ( item ) =>
 			collections[ item.name.split( '/' )[ 0 ] ]?.title,
-		getVariations: ( item ) =>
-			( item.variations || [] ).map( ( variation ) => variation.title ),
-	} ).map( ( item ) => {
+		getVariations: ( { variations = [] } ) =>
+			Array.from(
+				variations.reduce(
+					( accumulator, { title, keywords = [] } ) => {
+						accumulator.add( title );
+						keywords.forEach( ( keyword ) =>
+							accumulator.add( keyword )
+						);
+						return accumulator;
+					},
+					new Set()
+				)
+			),
+	};
+	return searchItems( items, searchTerm, config ).map( ( item ) => {
 		if ( isEmpty( item.variations ) ) {
 			return item;
 		}
 
-		const matchedVariations = item.variations.filter( ( variation ) => {
-			return (
-				intersectionWith(
-					normalizedSearchTerms,
-					normalizeSearchTerm( variation.title ),
-					( termToMatch, labelTerm ) =>
-						labelTerm.includes( termToMatch )
-				).length > 0
-			);
-		} );
+		const matchedVariations = item.variations.filter(
+			( { title, keywords = [] } ) => {
+				return (
+					intersectionWith(
+						normalizedSearchTerms,
+						normalizeSearchTerm( title ).concat( keywords ),
+						( termToMatch, labelTerm ) =>
+							labelTerm.includes( termToMatch )
+					).length > 0
+				);
+			}
+		);
 		// When no variations matched, fallback to all variations.
 		if ( isEmpty( matchedVariations ) ) {
 			return item;
@@ -96,7 +110,7 @@ export const searchBlockItems = (
  * @param {Object} config     Search Config.
  * @return {Array}            Filtered item list.
  */
-export const searchItems = ( items, searchTerm, config = {} ) => {
+export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
 	const normalizedSearchTerms = normalizeSearchTerm( searchTerm );
 	if ( normalizedSearchTerms.length === 0 ) {
 		return items;

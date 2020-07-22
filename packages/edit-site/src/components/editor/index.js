@@ -52,8 +52,7 @@ function Editor() {
 		deviceType,
 		sidebarIsOpened,
 		settings,
-		templateId,
-		templatePartId,
+		entityId,
 		templateType,
 		page,
 		template,
@@ -71,6 +70,14 @@ function Editor() {
 		const _templateId = getTemplateId();
 		const _templatePartId = getTemplatePartId();
 		const _templateType = getTemplateType();
+
+		// The currently selected entity to display. Typically template or template part.
+		let _entityId;
+		if ( _templateType ) {
+			_entityId =
+				_templateType === 'wp_template' ? _templateId : _templatePartId;
+		}
+
 		return {
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -78,16 +85,17 @@ function Editor() {
 				'core/interface'
 			).getActiveComplementaryArea( 'core/edit-site' ),
 			settings: getSettings(),
-			templateId: _templateId,
-			templatePartId: _templatePartId,
 			templateType: _templateType,
 			page: getPage(),
-			template: _select( 'core' ).getEntityRecord(
-				'postType',
-				_templateType,
-				_templateType === 'wp_template' ? _templateId : _templatePartId
-			),
+			template: _templateType
+				? _select( 'core' ).getEntityRecord(
+						'postType',
+						_templateType,
+						_entityId
+				  )
+				: null,
 			select: _select,
+			entityId: _entityId,
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
@@ -125,25 +133,26 @@ function Editor() {
 	// and Query Pagination blocks.
 	const blockContext = useMemo(
 		() => ( {
-			...page.context,
-			query: page.context.query || { categoryIds: [] },
+			...page?.context,
+			query: page?.context.query || { categoryIds: [] },
 			queryContext: [
-				page.context.queryContext || { page: 1 },
+				page?.context.queryContext || { page: 1 },
 				( newQueryContext ) =>
 					setPage( {
 						...page,
 						context: {
-							...page.context,
+							...page?.context,
 							queryContext: {
-								...page.context.queryContext,
+								...page?.context.queryContext,
 								...newQueryContext,
 							},
 						},
 					} ),
 			],
 		} ),
-		[ page.context ]
+		[ page?.context ]
 	);
+
 	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -154,11 +163,7 @@ function Editor() {
 						<EntityProvider
 							kind="postType"
 							type={ templateType }
-							id={
-								templateType === 'wp_template'
-									? templateId
-									: templatePartId
-							}
+							id={ entityId }
 						>
 							<BlockContextProvider value={ blockContext }>
 								<FocusReturnProvider>
