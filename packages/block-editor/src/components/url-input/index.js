@@ -59,14 +59,6 @@ class URLInput extends Component {
 		};
 	}
 
-	getDerivedStateFromProps( { instanceId, state } ) {
-		return {
-			...state,
-			suggestionsListboxId: `block-editor-url-input-suggestions-${ instanceId }`,
-			suggestionOptionIdPrefix: `block-editor-url-input-suggestion-${ instanceId }`,
-		};
-	}
-
 	componentDidUpdate( prevProps ) {
 		const { showSuggestions, selectedSuggestion } = this.state;
 		const { value } = this.props;
@@ -363,6 +355,7 @@ class URLInput extends Component {
 	static getDerivedStateFromProps(
 		{
 			value,
+			instanceId,
 			disableSuggestions,
 			__experimentalShowInitialSuggestions = false,
 		},
@@ -382,6 +375,8 @@ class URLInput extends Component {
 
 		return {
 			showSuggestions: shouldShowSuggestions,
+			suggestionsListboxId: `block-editor-url-input-suggestions-${ instanceId }`,
+			suggestionOptionIdPrefix: `block-editor-url-input-suggestion-${ instanceId }`,
 		};
 	}
 
