@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import apiFetch from '@wordpress/api-fetch';
+
+/**
  * Load an asset for a block
  *
  * @param {HTMLElement} el A HTML Element asset to inject.
@@ -52,8 +57,10 @@ export function loadAssets( assets ) {
 
 const controls = {
 	LOAD_ASSETS() {
-		return window
-			.fetch( document.location )
+		return apiFetch( {
+			url: document.location.href,
+			parse: false,
+		} )
 			.then( ( response ) => response.text() )
 			.then( ( data ) => {
 				const doc = new window.DOMParser().parseFromString(
