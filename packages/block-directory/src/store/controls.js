@@ -33,8 +33,8 @@ export const loadAsset = ( el ) => {
 
 		// Resolve <link rel="stylesheet"> and inline <script> immediately.
 		if (
-			'link' === newNode.nodeName ||
-			( 'script' === newNode.nodeName && ! newNode.src )
+			'link' === newNode.nodeName.toLowerCase() ||
+			( 'script' === newNode.nodeName.toLowerCase() && ! newNode.src )
 		) {
 			resolve();
 		}
