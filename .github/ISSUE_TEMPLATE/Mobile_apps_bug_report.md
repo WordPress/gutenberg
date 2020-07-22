@@ -22,12 +22,12 @@ If applicable, add screenshots to help explain your problem.
 
 **Editor version (please complete the following information):**
 - WordPress version: [e.g: 5.3.2]
-- Does the website has the Gutenberg plugin installed, or is it using the block editor that comes by default? [e.g: "gutenberg plugin", "default"]
+- Does the website have the Gutenberg plugin installed, or is it using the block editor that comes by default? [e.g: "gutenberg plugin", "default"]
 - If the Gutenberg plugin is installed, which version is it? [e.g., 7.6]
 
 **Smartphone (please complete the following information):**
  - Device: [e.g. iPhone6, Pixel 3]
- - OS: [e.g. iOS 8.1, Android 18.1]
+ - OS: [e.g. iOS 8.1, Android 10.0]
  - WordPress App Version [e.g. 15.3] or Demo App Version [branch name or git commit hash]
 
 **Additional context**
