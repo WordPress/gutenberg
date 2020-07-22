@@ -284,7 +284,6 @@ class GalleryImage extends Component {
 									aria-disabled={ isLastItem }
 									disabled={ ! isSelected }
 								/>
-								<View style={ separatorStyle }></View>
 							</View>
 						</View>
 					</View>
