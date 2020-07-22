@@ -1,3 +1,10 @@
+/**
+ * Load an asset for a block
+ *
+ * @param {HTMLElement} el A HTML Element asset to inject.
+ *
+ * @return {Promise} Promise which will resolve when the asset is loaded.
+ */
 export const loadAsset = ( el ) => {
 	return new Promise( ( resolve, reject ) => {
 		// const newNode = el.cloneNode( true ); // <script> elements don't trigger onload.
