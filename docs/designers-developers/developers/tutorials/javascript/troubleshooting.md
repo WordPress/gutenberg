@@ -6,7 +6,7 @@ If you're having trouble getting your JavaScript code to work, here are a few ti
 
 The console log is a JavaScript developer's best friend. It is a good practice to work with it open, as it displays errors and notices in one place. See Mozilla's [JavaScript console](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools#The_JavaScript_console) documentation for more.
 
-To open the JavaScript console, use the correct key combination foryour broswer and OS
+To open the JavaScript console, find the correct key combination for your broswer and OS:
 
 | Browser | Windows      | Linux        | Mac       |
 | ------- | ------------ | ------------ | --------- |
@@ -14,6 +14,8 @@ To open the JavaScript console, use the correct key combination foryour broswer 
 | Chrome  | Ctrl+Shift+J | Ctrl+Shift+J | Cmd+Opt+J |
 | Edge    | Ctrl+Shift+J | Ctrl+Shift+J | Cmd+Opt+J |
 | Safari  |              |              | Cmd+Opt+C |
+
+### First Step
 
 Your first step in debugging should be to check the JavaScript console for any errors. Here is an example, which shows a syntax error on line 6:
 
@@ -53,7 +55,7 @@ Add a test message to confirm your JavaScript is loading, add a `console.log("He
 
 ## Confirm all dependencies are loading
 
-The console log will show an error if a dependency your JavaScript code uses has not been declared and loaded in the browser. In the example, if `myguten.js` script is enqueued without declaring the `wp-blocks` dependency, the console log will show:
+The console log will show an error if a dependency your JavaScript code uses has not been declared and loaded in the browser. In the JavaScript tutorial example, if `myguten.js` script is enqueued without declaring the `wp-blocks` dependency, the console log will show:
 
 <img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/js-tutorial-error-blocks-undefined.png" width=448 title="error wp.blocks is undefined"/>
 
@@ -66,3 +68,5 @@ wp_enqueue_script(
 	array( 'wp-blocks' )
 );
 ```
+
+For automated dependency management, it is recommended to [use wp-scripts to build step your JavaScript](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md#dependency-management).
