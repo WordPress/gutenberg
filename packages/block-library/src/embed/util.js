@@ -27,8 +27,18 @@ import { _x } from '@wordpress/i18n';
 import variations from './variations';
 import { embedContentIcon } from './icons';
 
-// TODO jsdoc
-// TODO tests
+/**
+ * @typedef {Object} EmbedInformation
+ * @property {string} title The embed block's title
+ * @property {WPComponent} icon The embed block's icon
+ */
+
+/**
+ * Returns the embed block's information by matching the provided service provider
+ *
+ * @param {string} provider The embed block's provider
+ * @return {EmbedInformation} The embed block's information
+ */
 export const getEmbedInfoByProvider = ( provider ) => {
 	const defaultEmbedInfo = {
 		title: _x( 'Embed', 'block title' ),
