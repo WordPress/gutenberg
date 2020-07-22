@@ -1,7 +1,6 @@
 .wp-block-post-author {
 	display: flex;
 	flex-wrap: wrap;
-	line-height: 1.5;
 
 	&__byline {
 		width: 100%;
@@ -28,5 +27,9 @@
 		font-weight: bold;
 		margin: 0;
 	}
+}
 
+.wp-block-post-author.has-link-color a,
+.wp-block-post-author.has-background.has-link-color a {
+	color: var(--wp--style--color--link);
 }

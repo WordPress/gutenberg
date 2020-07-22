@@ -1,37 +1,50 @@
-1.33.0
-------
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+<!--
+For each user feature we should also add a importance categorization label  to indicate the relevance of the change for end users of GB Mobile. The format is the following:
+[***] → Major new features, significant updates to core flows, or impactful fixes (e.g. a crash that impacts a lot of users) — things our users should be aware of.
+
+[**] → Changes our users will probably notice, but doesn’t impact core flows. Most fixes.
+
+[*] → Minor enhancements and fixes that address annoyances — things our users can miss.
+-->
+
+## Unreleased
+
+## 1.33.0
+
 * [***] Media editing support in Media & Text block.
 * [***] New block: Social Icons
 
-1.32.0
-------
+## 1.32.0
+
 * [***] Adds Copy, Cut, Paste, and Duplicate functionality to blocks
 * [***] Add support for mentions.
 * [***] Users can now individually edit unsupported blocks found in posts or pages.
 * [*] [iOS] Improved editor loading experience with Ghost Effect. 
 
-1.31.1
-------
+## 1.31.1
+
 * Fix for pullquote stylying in dark mode.
 * Fix for button style.
 
-1.31.0
-------
+## 1.31.0
+
 * [**] Add support for customizing gradient type and angle in Buttons and Cover blocks.
 * [*] Show content information (block, word and characters counts).
 * [*] [Android] Fix handling of upload completion while re-opening the editor
 
-1.30.0
-------
+## 1.30.0
+
 * [**] Adds editor support for theme defined colors and theme defined gradients on cover and button blocks.
 * [*] Support for breaking out of captions/citation authors by pressing enter on the following blocks: image, video, gallery, quote, and pullquote.
 
-1.29.1
-------
+## 1.29.1
+
 * Revert Creating undo levels less frequently
 
-1.29.0
-------
+## 1.29.0
+
 * [**] Add support for changing overlay color settings in Cover block
 * Add enter/exit animation in FloatingToolbar
 * [***] New block: Verse
@@ -42,16 +55,17 @@
 * [**] Tooltip for page template selection buttons
 * [*] Fix button alignment in page templates and make strings consistent
 * [*] Add support for displaying radial gradients in Buttons and Cover blocks
-1.28.2
-------
+
+## 1.28.2
+
 * [***] Disable Pullquote Block on Android
 
-1.28.1
-------
+## 1.28.1
+
 * [**] Avoid crash when editor selection state becomes invalid
 
-1.28.0
-------
+## 1.28.0
+
 * [***] New block: Pullquote
 * [**] Add support for changing background and text color in Buttons block
 * [*] Fix the icons and buttons in Gallery, Paragraph, List and MediaText block on RTL mode
@@ -59,12 +73,12 @@
 * [**] [iOS] Add support for the subscript `<sub>` and superscript `<sup>`HTML elements in text blocks
 * [**] Update page templates to use recently added blocks
 
-1.27.1
-------
+## 1.27.1
+
 * Remove Subscription Button from the Blog template since it didn't have an initial functionality and it is hard to configure for users.
 
-1.27.0
-------
+## 1.27.0
+
 * Block Editor: Add dialog for mentioning other users in your post
 * Prefill caption for image blocks when available on the Media library
 * New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
@@ -77,8 +91,8 @@
 * Fix Quote block so it visually reflects selected alignment
 * Fix bug where buttons in page templates were not rendering correctly on web
 
-1.26.0
-------
+## 1.26.0
+
 * [iOS] Disable ripple effect in all BottomSheet's controls.
 * [Android] Disable ripple effect for Slider control
 * New block: Columns
@@ -86,8 +100,8 @@
 * Make Starter Page Template picker buttons visible only when the screen height is enough
 * Fix a bug which caused to show URL settings modal randomly when changing the device orientation multiple times during the time Starter Page Template Preview is open
 
-1.25.0
-------
+## 1.25.0
+
 * New block: Cover
 * [Android] Dark Mode
 * [Android] Improve icon on the "Take a Video" media option
@@ -97,15 +111,15 @@
 * Block Editor: When editing link settings, tapping the keyboard return button now closes the settings panel as well as closing the keyboard.
 * [Android] Show an "Edit" button overlay on selected image blocks
 
-1.24.0
-------
+## 1.24.0
+
 * New block: Latest Posts
 * Fix Quote block's left border not being visible in Dark Mode
 * Added Starter Page Templates: when you create a new page, we now show you a few templates to get started more quickly.
 * Fix crash when pasting HTML content with embeded images on paragraphs
 
-1.23.0
-------
+## 1.23.0
+
 * New block: Group
 * Add support for upload options in Gallery block
 * Add support for size options in the Image block
@@ -117,8 +131,8 @@
 * [iOS] Fix issue where alignment of paragraph blocks was not always being respected when splitting the paragraph or reading the post's html content.
 * We’ve introduced a new toolbar that floats above the block you’re editing, which makes navigating your blocks easier — especially complex ones.
 
-1.22.0
-------
+## 1.22.0
+
 * Make inserter to show options on long-press to add before/after
 * Retry displaying image when connectivity restores
 * [iOS] Show an "Edit" button overlay on selected image blocks
@@ -126,34 +140,34 @@
 * Add support for image size options in the gallery block
 * Fix issue that sometimes prevented merging paragraph blocks
 
-1.21.0
-------
+## 1.21.0
+
 * Reduced padding around text on Rich Text based blocks.
 * [Android] Improved stability on very long posts.
 
-1.20.0
-------
+## 1.20.0
+
 * Fix bug where image placeholders would sometimes not be shown
 * Fix crash on undo
 * Style fixes on the navigation UI
 * [iOS] Fix focus issue
 * New block: Shortcode. You can now create and edit Shortcode blocks in the editor.
 
-1.19.0
-------
+## 1.19.0
+
 * Add support for changing Settings in List Block.
 * [iOS] Fix crash dismissing bottom-sheet after device rotation.
 * [Android] Add support for Preformatted block.
 * New block: Gallery. You can now create image galleries using WordPress Media library. Upload feature is coming soon.
 * Add support for Video block settings
 
-1.18.0
-------
+## 1.18.0
+
 * [iOS] Added native fullscreen preview when clicking image from Image Block
 * New block: Spacer
 
-1.17.0
-------
+## 1.17.0
+
 * Include block title in Unsupported block's UI
 * Show new-block-indicator when no blocks at all and when at the last block
 * Use existing links in the clipboard to prefill url field when inserting new link.
@@ -165,25 +179,26 @@
 * [iOS] Add support for Preformatted block.
 * [Android] Fix issue when removing image/page break block crashes the app
 
-1.16.1
-------
+## 1.16.1
+
 * [iOS] Fix tap on links bug that reappear on iOS 13.2
 
-1.16.0
-------
+## 1.16.0
+
 * [Android] Add support for pexels images
 * Add left, center, and right image alignment controls
-1.15.3
-------
+
+## 1.15.3
+
 * [iOS] Fix a layout bug in RCTAztecView in iOS 13.2
 
-1.15.2
-------
+## 1.15.2
+
 * Fix issue when copy/paste photos from other apps, was not inserting an image on the post.
 * Fix issue where the block inserter layout wasn't correct after device rotation.
 
-1.15.0
-------
+## 1.15.0
+
 * Fix issue when multiple media selection adds only one image or video block on Android
 * Fix issue when force Touch app shortcut doesn't work properly selecting "New Photo Post" on iOS
 * Add Link Target (Open in new tab) to Image Block.
@@ -191,49 +206,49 @@
 * [iOS] Update to iOS 11 and Swift 5
 * New block: Media & Text
 
-1.14.0
-------
+## 1.14.0
+
 * Fix a bug on iOS 13.0 were tapping on a link opens Safari
 * Fix a link editing issue, where trying to add a empty link at the start of another link would remove the existing link.
 * Fix missing content on long posts in html mode on Android
 
-1.12.0
-------
+## 1.12.0
+
 * Add rich text styling to video captions
 * Prevent keyboard dismissal when switching between caption and text block on Android
 * Blocks that would be replaced are now hidden when add block bottom sheet displays
 * Tapping on empty editor area now always inserts new block at end of post
 
-1.11.0
-------
+## 1.11.0
+
 * Toolbar scroll position now resets when its content changes.
 * Dark Mode for iOS.
 
-1.10.0
-------
+## 1.10.0
+
 * Adding a block from the post title now shows the add block here indicator.
 * Deselect post title any time a block is added
 * Fix loss of center alignment in image captions on Android
 
-1.9.0
-------
+## 1.9.0
+
 * Enable video block on Android platform
 * Tapping on an empty editor area will create a new paragraph block
 * Fix content loss issue when loading unsupported blocks containing inner blocks.
 * Adding a block from the Post Title now inserts the block at the top of the Post.
 
-1.8.0
-------
+## 1.8.0
+
 * Fix pasting simple text on Post Title
 * Remove editable empty line after list on the List block
 * Performance improvements on rich text editing
 
-1.7.0
-------
+## 1.7.0
+
 * Fixed keyboard flickering issue after pressing Enter repeatedly on the Post Title.
 * New blocks are available: video/quote/more
 
-1.6.0
-------
+## 1.6.0
+
 * Fixed issue with link settings where “Open in New Tab” was always OFF on open.
 * Added UI to display a warning when a block has invalid content.

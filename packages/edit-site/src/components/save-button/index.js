@@ -22,7 +22,6 @@ export default function SaveButton( { openEntitiesSavedStates } ) {
 			isSaving: some( dirtyEntityRecords, ( record ) =>
 				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
-			templateType: select( 'core/edit-site' ).getTemplateType(),
 		};
 	} );
 
