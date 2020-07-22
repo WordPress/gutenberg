@@ -1,50 +1,28 @@
-/**
- * WordPress dependencies
- */
-import { getPath } from '@wordpress/url';
-
-/**
- * Loads a JavaScript file.
- *
- * @param {string} asset The url for this file.
- *
- * @return {Promise} Promise which will resolve when the asset is loaded.
- */
-export const loadScript = ( asset ) => {
-	if ( ! asset || ! /\.js$/.test( getPath( asset ) ) ) {
-		return Promise.reject( new Error( 'No script found.' ) );
-	}
+export const loadAsset = ( el ) => {
 	return new Promise( ( resolve, reject ) => {
-		const existing = document.querySelector( `script[src="${ asset }"]` );
-		if ( existing ) {
-			existing.parentNode.removeChild( existing );
+		// const newNode = el.cloneNode( true ); // <script> elements don't trigger onload.
+		const newNode = document.createElement( el.nodeName );
+
+		[ 'id', 'rel', 'src', 'href', 'type' ].forEach( ( attr ) => {
+			if ( el[ attr ] ) {
+				newNode[ attr ] = el[ attr ];
+			}
+		} );
+
+		// Append inline <script> contents.
+		if ( el.innerHTML ) {
+			newNode.appendChild( document.createTextNode( el.innerHTML ) );
 		}
-		const script = document.createElement( 'script' );
-		script.src = asset;
-		script.onload = () => resolve( true );
-		script.onerror = () => reject( new Error( 'Error loading script.' ) );
-		document.body.appendChild( script );
-	} );
-};
 
-/**
- * Loads a CSS file.
- *
- * @param {string} asset The url for this file.
- *
- * @return {Promise} Promise which will resolve when the asset is added.
- */
-export const loadStyle = ( asset ) => {
-	if ( ! asset || ! /\.css$/.test( getPath( asset ) ) ) {
-		return Promise.reject( new Error( 'No style found.' ) );
-	}
-	return new Promise( ( resolve, reject ) => {
-		const link = document.createElement( 'link' );
-		link.rel = 'stylesheet';
-		link.href = asset;
-		link.onload = () => resolve( true );
-		link.onerror = () => reject( new Error( 'Error loading style.' ) );
-		document.body.appendChild( link );
+		newNode.onload = () => resolve( true );
+		newNode.onerror = () => reject( new Error( 'Error loading asset.' ) );
+
+		document.body.appendChild( newNode );
+
+		// Resolve an inline <script>, as it has no load events.
+		if ( ! el.src && ! el.href ) {
+			resolve();
+		}
 	} );
 };
 
@@ -63,14 +41,31 @@ export function loadAssets( assets ) {
 }
 
 const controls = {
-	LOAD_ASSETS( { assets } ) {
-		const scripts = assets.map( ( asset ) =>
-			getPath( asset ).match( /\.js$/ ) !== null
-				? loadScript( asset )
-				: loadStyle( asset )
-		);
+	LOAD_ASSETS() {
+		return window.fetch( document.location )
+			.then( ( response ) => response.text() )
+			.then( ( data ) => {
+				const doc = new window.DOMParser().parseFromString(
+					data,
+					'text/html'
+				);
 
-		return Promise.all( scripts );
+				const remoteAssets = Array.from(
+					doc.querySelectorAll( 'link[rel="stylesheet"],script' )
+				);
+
+				const newAssets = remoteAssets.filter(
+					( asset ) =>
+						asset.id && ! document.getElementById( asset.id )
+				);
+
+				return new Promise( async ( resolve ) => {
+					for ( const i in newAssets ) {
+						await loadAsset( newAssets[ i ] );
+					}
+					resolve();
+				} );
+			} );
 	},
 };
 
