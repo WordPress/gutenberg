@@ -70,7 +70,6 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
-		allowResize = true,
 	},
 	setAttributes,
 	isSelected,
@@ -80,6 +79,7 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
+	allowResize,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );

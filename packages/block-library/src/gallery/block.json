@@ -29,7 +29,17 @@
 		"sizeSlug": {
 			"type": "string",
 			"default": "large"
+		},
+		"imageSettings": {
+			"type": "object",
+			"default": {
+				"allowResize": false,
+				"allowAlign": false
+			}
 		}
+	},
+	"providesContext": {
+		"gallery/imageSettings": "imageSettings"
 	},
 	"supports": {
 		"anchor": true,

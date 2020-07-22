@@ -2,6 +2,7 @@
 	"apiVersion": 2,
 	"name": "core/image",
 	"category": "media",
+	"usesContext": [ "gallery/imageSettings" ],
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -68,9 +69,6 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
-		},
-		"allowResize": {
-			"type": "boolean"
 		}
 	},
 	"supports": {
