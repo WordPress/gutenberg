@@ -10,7 +10,8 @@ data class GutenbergProps(
     val editorTheme: Bundle?,
     val translations: Bundle,
     val isDarkMode: Boolean,
-    val htmlModeEnabled: Boolean
+    val htmlModeEnabled: Boolean,
+    val isModalLayoutPickerEnabled: Boolean
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
@@ -24,6 +25,7 @@ data class GutenbergProps(
         putBundle(PROP_CAPABILITIES, Bundle().apply {
             putBoolean(PROP_CAPABILITIES_MENTIONS, enableMentions)
             putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
+            putBoolean(PROP_NAME_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled)
         })
 
         editorTheme?.also {
@@ -52,5 +54,6 @@ data class GutenbergProps(
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
+        const val PROP_NAME_MODAL_LAYOUT_PICKER = "modalLayoutPicker"
     }
 }
