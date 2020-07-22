@@ -20,7 +20,7 @@ const { Fill, Slot } = createSlotFill( 'InspectorControls' );
  *
  * In some cases we don't want to show the block settings button
  * even if the the inspector controls have children. We can exclude
- * those childen by passing the 'dontCount' prop
+ * those childen by passing the 'excludeFromSettings' prop
  * (e.g. The color picker control of the Cover block is triggered
  * by a separate swatch button)
  * */
@@ -40,7 +40,7 @@ const FillWithSettingsButton = ( { children, ...props } ) => {
 				}
 			</Fill>
 			{ React.Children.toArray( children ).filter(
-				( child ) => child.props.dontCount !== true
+				( child ) => child.props.excludeFromSettings !== true
 			).length > 0 && <BlockSettingsButton /> }
 		</>
 	);
