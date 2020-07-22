@@ -28,9 +28,12 @@ function PostCommentsDisplay( { postId } ) {
 			// TODO: "No Comments" placeholder should be editable.
 			return comments && comments.length
 				? comments.map( ( comment ) => (
-						<p key={ comment.id }>
-							<RawHTML>{ comment.content.raw }</RawHTML>
-						</p>
+						<RawHTML
+							className="wp-block-post-comments__comment"
+							key={ comment.id }
+						>
+							{ comment.content.rendered }
+						</RawHTML>
 				  ) )
 				: __( 'No comments.' );
 		},
