@@ -276,6 +276,7 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
 		'link-color'       => array( '__experimentalColor', 'linkColor' ),
 		'line-height'      => array( '__experimentalLineHeight' ),
 		'font-size'        => array( '__experimentalFontSize' ),
+		'block-align'      => array( 'align' ),
 	);
 
 	$supported_features = array();
