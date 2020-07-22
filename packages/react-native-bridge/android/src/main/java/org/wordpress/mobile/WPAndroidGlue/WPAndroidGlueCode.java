@@ -114,7 +114,6 @@ public class WPAndroidGlueCode {
     public static final String PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor";
     private static final String PROP_NAME_COLORS = "colors";
     private static final String PROP_NAME_GRADIENTS = "gradients";
-    private static final String PROP_NAME_MODAL_LAYOUT_PICKER = "modalLayoutPicker";
 
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
@@ -435,8 +434,7 @@ public class WPAndroidGlueCode {
                              @Nullable Boolean isSiteUsingWpComRestApi,
                              @Nullable Bundle editorTheme,
                              boolean isUnsupportedBlockEditorEnabled,
-                             boolean enableMentionsFlag,
-                             boolean isModalLayoutPickerEnabled) {
+                             boolean enableMentionsFlag) {
         mIsDarkMode = isDarkMode;
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
@@ -474,7 +472,6 @@ public class WPAndroidGlueCode {
             capabilities.putBoolean(PROP_NAME_CAPABILITIES_MENTIONS, isSiteUsingWpComRestApi && enableMentionsFlag);
         }
         capabilities.putBoolean(PROP_NAME_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, isUnsupportedBlockEditorEnabled);
-        capabilities.putBoolean(PROP_NAME_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled);
         initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
 
         Serializable colors = editorTheme != null ? editorTheme.getSerializable(PROP_NAME_COLORS) : null;
