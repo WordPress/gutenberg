@@ -28,9 +28,10 @@ export default () => {
 		<>
 			{ Object.keys( blockData )
 				.map( ( context ) => {
-					const { supports, name } = blockData[ context ];
+					const { supports, name, selector } = blockData[ context ];
 					const panels = [];
 
+					/* This is shown in the global panel */
 					if ( 'global' === name ) {
 						return null;
 					}
@@ -132,10 +133,13 @@ export default () => {
 					 * in the sidebar we attach the selector (h1, h2)
 					 * to the title for those blocks.
 					 */
-					const blockType = getBlockType(name);
+					const blockType = getBlockType( name );
 					let panelTitle = blockType.title;
-					if ( 'object' === typeof blockType?.supports?.__experimentalSelector ) {
-						panelTitle +=  ` (${ blockData[ context ].selector })`
+					if (
+						'object' ===
+						typeof blockType?.supports?.__experimentalSelector
+					) {
+						panelTitle += ` (${ selector })`;
 					}
 
 					return panels.length > 0 ? (
