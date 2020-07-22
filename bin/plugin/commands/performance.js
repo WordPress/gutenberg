@@ -246,18 +246,21 @@ async function runPerformanceTests( branches, options ) {
 	const testSuites = [ 'post-editor', 'site-editor' ];
 
 	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
-	const results = {};
-	for ( const testSuite of testSuites ) {
-		results[ testSuite ] = {};
-		for ( const branch of branches ) {
-			results[ testSuite ][
-				branch
-			] = await getPerformanceResultsForBranch(
-				performanceTestDirectory,
-				environmentDirectory,
-				testSuite,
-				branch
-			);
+	let results = {};
+	for ( const branch of branches ) {
+		for ( const testSuite of testSuites ) {
+			results = {
+				...results,
+				[ testSuite ]: {
+					...results[ testSuite ],
+					[ branch ]: await getPerformanceResultsForBranch(
+						performanceTestDirectory,
+						environmentDirectory,
+						testSuite,
+						branch
+					),
+				},
+			};
 		}
 	}
 
