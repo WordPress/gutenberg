@@ -66,9 +66,13 @@ const controls = {
 						asset.id && ! document.getElementById( asset.id )
 				);
 
-				return new Promise( async ( resolve ) => {
+				return new Promise( async ( resolve, reject ) => {
 					for ( const i in newAssets ) {
-						await loadAsset( newAssets[ i ] );
+						try {
+							await loadAsset( newAssets[ i ] );
+						} catch ( e ) {
+							reject( e );
+						}
 					}
 					resolve();
 				} );
