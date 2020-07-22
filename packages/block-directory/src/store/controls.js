@@ -26,10 +26,11 @@ export const loadAsset = ( el ) => {
 
 		document.body.appendChild( newNode );
 
-		// Resolve an inline <script>, as it has no load events.
-		if ( ! el.src && ! el.href ) {
+		// Resolve <link rel="stlesheet"> and inline <script> immediately.
+		if ( 'link' === newNode.nodeName || ( 'script' === newNode.nodeName && ! newNode.src ) ) {
 			resolve();
 		}
+
 	} );
 };
 
