@@ -28,7 +28,7 @@ If applicable, add screenshots to help explain your problem.
 **Smartphone (please complete the following information):**
  - Device: [e.g. iPhone6, Pixel 3]
  - OS: [e.g. iOS 8.1, Android 18.1]
- - App Version [e.g. 22]
+ - WordPress App Version [e.g. 15.3]
 
 **Additional context**
 - To report a security issue, please visit the WordPress HackerOne program: https://hackerone.com/wordpress.
