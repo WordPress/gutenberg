@@ -8,6 +8,7 @@ import {
 	FontSizePicker,
 	PanelColorSettings,
 } from '@wordpress/block-editor';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -26,8 +27,8 @@ export default () => {
 	return (
 		<>
 			{ Object.keys( blockData )
-				.map( ( selector ) => {
-					const { supports, name } = blockData[ selector ];
+				.map( ( context ) => {
+					const { supports, name } = blockData[ context ];
 					const panels = [];
 
 					if ( 'global' === name ) {
@@ -38,14 +39,14 @@ export default () => {
 						panels.push(
 							<FontSizePicker
 								value={ getProperty(
-									selector,
+									context,
 									'typography',
 									'fontSize',
 									'px'
 								) }
 								onChange={ ( value ) =>
 									setProperty(
-										selector,
+										context,
 										'typography',
 										'fontSize',
 										value,
@@ -60,13 +61,13 @@ export default () => {
 						panels.push(
 							<LineHeightControl
 								value={ getProperty(
-									selector,
+									context,
 									'typography',
 									'lineHeight'
 								) }
 								onChange={ ( value ) =>
 									setProperty(
-										selector,
+										context,
 										'typography',
 										'lineHeight',
 										value
@@ -82,20 +83,20 @@ export default () => {
 						supports.includes( BACKGROUND_COLOR )
 					) {
 						settings.push( {
-							value: getProperty( selector, 'color', 'text' ),
+							value: getProperty( context, 'color', 'text' ),
 							onChange: ( value ) =>
-								setProperty( selector, 'color', 'text', value ),
+								setProperty( context, 'color', 'text', value ),
 							label: __( 'Text color' ),
 						} );
 						settings.push( {
 							value: getProperty(
-								selector,
+								context,
 								'color',
 								'background'
 							),
 							onChange: ( value ) =>
 								setProperty(
-									selector,
+									context,
 									'color',
 									'background',
 									value
@@ -108,9 +109,9 @@ export default () => {
 
 					if ( supports.includes( LINK_COLOR ) ) {
 						settings.push( {
-							value: getProperty( selector, 'color', 'link' ),
+							value: getProperty( context, 'color', 'link' ),
 							onChange: ( value ) =>
-								setProperty( selector, 'color', 'link', value ),
+								setProperty( context, 'color', 'link', value ),
 							label: __( 'Link color' ),
 						} );
 					}
@@ -124,8 +125,21 @@ export default () => {
 						);
 					}
 
+					/*
+					 * Some block (eg: core/heading) are split in different
+					 * contexts (eg: core/heading/h1, core/heading/h2).
+					 * Because each context maps to a different UI section
+					 * in the sidebar we attach the selector (h1, h2)
+					 * to the title for those blocks.
+					 */
+					const blockType = getBlockType(name);
+					let panelTitle = blockType.title;
+					if ( 'object' === typeof blockType?.supports?.__experimentalSelector ) {
+						panelTitle +=  ` (${ blockData[ context ].selector })`
+					}
+
 					return panels.length > 0 ? (
-						<PanelBody title={ selector } initialOpen={ false }>
+						<PanelBody title={ panelTitle } initialOpen={ false }>
 							{ panels }
 						</PanelBody>
 					) : null;
