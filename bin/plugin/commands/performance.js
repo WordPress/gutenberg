@@ -246,14 +246,14 @@ async function runPerformanceTests( branches, options ) {
 	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
 	let results = {};
 	for ( const branch of branches ) {
-		for ( const testSuite of testSuites ) {
-			await setUpGitBranch( branch, environmentDirectory );
-			log(
-				'>> Running the test on the ' +
-					formats.success( branch ) +
-					' branch'
-			);
+		await setUpGitBranch( branch, environmentDirectory );
+		log(
+			'>> Running the test on the ' +
+				formats.success( branch ) +
+				' branch'
+		);
 
+		for ( const testSuite of testSuites ) {
 			results = {
 				...results,
 				[ testSuite ]: {
