@@ -421,7 +421,7 @@ class URLInput extends Component {
 			value,
 			required: true,
 			autoFocus,
-
+			className: 'block-editor-url-input__input',
 			type: 'text',
 			onChange: this.onChange,
 			onFocus: this.onFocus,
