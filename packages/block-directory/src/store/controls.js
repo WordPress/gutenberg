@@ -69,6 +69,7 @@ const controls = {
 				return new Promise( async ( resolve, reject ) => {
 					for ( const i in newAssets ) {
 						try {
+							// Load each asset in order, as they may depend upon an earlier loaded script.
 							await loadAsset( newAssets[ i ] );
 						} catch ( e ) {
 							reject( e );
