@@ -10,11 +10,6 @@ import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
-// translators: Label for the Block Settings Sidebar tab, not selected.
-const BLOCK_LABEL = __( 'Block' );
-// translators: Label for the Block Settings Sidebar tab, selected.
-const BLOCK_SELECTED_LABEL = __( 'Block (selected)' );
-
 const SettingsHeader = ( { sidebarName } ) => {
 	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
 	const openDocumentSettings = () =>
@@ -43,8 +38,10 @@ const SettingsHeader = ( { sidebarName } ) => {
 
 	const [ blockAriaLabel, blockActiveClass ] =
 		sidebarName === 'edit-post/block'
-			? [ BLOCK_SELECTED_LABEL, 'is-active' ]
-			: [ BLOCK_LABEL, '' ];
+			? // translators: ARIA label for the Block Settings Sidebar tab, selected.
+			  [ __( 'Block (selected)' ), 'is-active' ]
+			: // translators: ARIA label for the Block Settings Sidebar tab, not selected.
+			  [ __( 'Block' ), '' ];
 
 	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
@@ -64,9 +61,13 @@ const SettingsHeader = ( { sidebarName } ) => {
 					onClick={ openBlockSettings }
 					className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
 					aria-label={ blockAriaLabel }
-					data-label={ BLOCK_LABEL }
+					// translators: Data label for the Block Settings Sidebar tab.
+					data-label={ __( 'Block' ) }
 				>
-					{ BLOCK_LABEL }
+					{
+						// translators: Text label for the Block Settings Sidebar tab.
+						__( 'Block' )
+					}
 				</Button>
 			</li>
 		</ul>
