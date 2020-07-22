@@ -26,7 +26,7 @@ export const loadAsset = ( el ) => {
 
 		document.body.appendChild( newNode );
 
-		// Resolve <link rel="stlesheet"> and inline <script> immediately.
+		// Resolve <link rel="stylesheet"> and inline <script> immediately.
 		if ( 'link' === newNode.nodeName || ( 'script' === newNode.nodeName && ! newNode.src ) ) {
 			resolve();
 		}
