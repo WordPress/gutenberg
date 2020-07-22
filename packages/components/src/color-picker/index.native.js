@@ -56,6 +56,10 @@ function ColorPicker( {
 		styles.colorText,
 		styles.colorTextDark
 	);
+	const selectColorTextStyle = usePreferredColorSchemeStyle(
+		styles.selectColorText,
+		styles.selectColorTextDark
+	);
 	const footerStyle = usePreferredColorSchemeStyle(
 		styles.footer,
 		styles.footerDark
@@ -159,7 +163,9 @@ function ColorPicker( {
 					</View>
 				</TouchableWithoutFeedback>
 				{ bottomLabelText ? (
-					<Text style={ colorTextStyle }>{ bottomLabelText }</Text>
+					<Text style={ selectColorTextStyle }>
+						{ bottomLabelText }
+					</Text>
 				) : (
 					<Text style={ colorTextStyle } selectable>
 						{ currentColor.toUpperCase() }

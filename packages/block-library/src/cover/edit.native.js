@@ -379,6 +379,9 @@ const Cover = ( {
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					backgroundColor={ customColor }
+					hideContent={
+						customColor != '' && customColor !== undefined
+					}
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
