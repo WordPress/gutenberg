@@ -35,7 +35,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 	const [ documentAriaLabel, documentActiveClass ] =
 		sidebarName === 'edit-post/document'
 			? // translators: ARIA label for the Document sidebar tab, selected.
-			  [ sprintf( __( '%1$s (selected)' ), documentLabel ), 'is-active' ]
+			  [ sprintf( __( '%s (selected)' ), documentLabel ), 'is-active' ]
 			: [ documentLabel, '' ];
 
 	const [ blockAriaLabel, blockActiveClass ] =
