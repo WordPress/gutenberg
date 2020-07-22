@@ -9,16 +9,26 @@ import { useSelect } from '@wordpress/data';
  */
 import PostContentInnerBlocks from './inner-blocks';
 
-export default function PostContentEdit( { context: { postId, postType } } ) {
-	const { id, type } = useSelect( ( select ) => {
-		return select( 'core/editor' ).getCurrentPost() ?? {};
-	} );
+export default function PostContentEdit( {
+	context: { postId: contextPostId, postType: contextPostType },
+} ) {
+	const { id: currentPostId, type: currentPostType } = useSelect(
+		( select ) => select( 'core/editor' ).getCurrentPost() ?? {}
+	);
 
 	// Only render InnerBlocks if the context is different from the active post
 	// to avoid infinite recursion of post content.
-	if ( postId && postType && postId !== id && postType !== type ) {
+	if (
+		contextPostId &&
+		contextPostType &&
+		contextPostId !== currentPostId &&
+		contextPostType !== currentPostType
+	) {
 		return (
-			<PostContentInnerBlocks postType={ postType } postId={ postId } />
+			<PostContentInnerBlocks
+				postType={ contextPostType }
+				postId={ contextPostId }
+			/>
 		);
 	}
 	return (
