@@ -50,14 +50,6 @@ export default function PostCommentsEdit( {
 		return (
 			<Warning>{ __( 'Post comments block: no post found.' ) }</Warning>
 		);
-	} else if ( postType !== 'post' ) {
-		return (
-			<Warning>
-				{ __(
-					'Post comments block: Comments are only available in posts. Please add this block to a post instead.'
-				) }
-			</Warning>
-		);
 	}
 
 	return (
