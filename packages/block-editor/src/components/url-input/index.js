@@ -381,23 +381,19 @@ class URLInput extends Component {
 	}
 
 	render() {
-		const { className, isFullWidth } = this.props;
-
 		return (
-			<div
-				className={ classnames( 'block-editor-url-input', className, {
-					'is-full-width': isFullWidth,
-				} ) }
-			>
+			<>
 				{ this.renderControl() }
 				{ this.renderSuggestions() }
-			</div>
+			</>
 		);
 	}
 
 	renderControl() {
 		const {
 			label,
+			className,
+			isFullWidth,
 			instanceId,
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
@@ -416,6 +412,9 @@ class URLInput extends Component {
 		const controlProps = {
 			id: `url-input-control-${ instanceId }`,
 			label,
+			className: classnames( 'block-editor-url-input', className, {
+				'is-full-width': isFullWidth,
+			} ),
 		};
 
 		const inputProps = {
