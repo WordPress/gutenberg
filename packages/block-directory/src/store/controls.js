@@ -42,7 +42,8 @@ export function loadAssets( assets ) {
 
 const controls = {
 	LOAD_ASSETS() {
-		return window.fetch( document.location )
+		return window
+			.fetch( document.location )
 			.then( ( response ) => response.text() )
 			.then( ( data ) => {
 				const doc = new window.DOMParser().parseFromString(
@@ -50,11 +51,9 @@ const controls = {
 					'text/html'
 				);
 
-				const remoteAssets = Array.from(
+				const newAssets = Array.from(
 					doc.querySelectorAll( 'link[rel="stylesheet"],script' )
-				);
-
-				const newAssets = remoteAssets.filter(
+				).filter(
 					( asset ) =>
 						asset.id && ! document.getElementById( asset.id )
 				);
