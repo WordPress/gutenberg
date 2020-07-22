@@ -160,7 +160,7 @@ const Cover = ( {
 			requestImageUploadCancelDialog( id );
 		} else if ( shouldShowFailure ) {
 			requestImageFailedRetryDialog( id );
-		} else if ( backgroundType === MEDIA_TYPE_IMAGE ) {
+		} else if ( backgroundType === MEDIA_TYPE_IMAGE && url ) {
 			requestImageFullscreenPreview( url );
 		}
 	};
