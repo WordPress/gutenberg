@@ -237,6 +237,7 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 	if ( ! $block_type || ! $block_type->render_callback ) {
 		return $block_content;
 	}
+
 	// Check what style features the block supports.
 	$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
 
@@ -414,7 +415,7 @@ function gutenberg_experimental_build_css_typography( $attributes, $block_attrib
  * @param  array $attributes comprehensive list of attributes to be applied.
  * @param  array $block_attributes block attributes.
  * @param  array $supports style features the block attributes.
- * @return array Font size CSS classes and inline styles.
+ * @return array Block alignment CSS classes and inline styles.
  */
 function gutenberg_build_css_block_alignment( $attributes, $block_attributes, $supports ) {
 	if ( in_array( 'block-align', $supports, true ) ) {
