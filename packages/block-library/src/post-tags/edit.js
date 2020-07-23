@@ -60,7 +60,7 @@ export default function PostTagsEdit( { context } ) {
 		return (
 			<Warning>
 				{ __(
-					'Post tags block: Tags are only available in posts. Please add this block to a post instead.'
+					'Post tags block: Tags are not available for this post type.'
 				) }
 			</Warning>
 		);
