@@ -2,19 +2,15 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 
-const {
-	clearTimeout,
-	requestAnimationFrame,
-	cancelAnimationFrame,
-	setTimeout,
-} = window;
-const DEBOUNCE_TIMEOUT = 250;
+const { clearTimeout, setTimeout } = window;
+
+const DEBOUNCE_TIMEOUT = 200;
 
 /**
  * Hook that creates a showMover state, as well as debounced show/hide callbacks.
@@ -167,42 +163,4 @@ export function useShowMoversGestures( {
 			onMouseLeave: debouncedHideMovers,
 		},
 	};
-}
-
-let requestAnimationFrameId;
-
-/**
- * Hook that toggles the highlight (outline) state of a block
- *
- * @param {string} clientId The block's clientId
- *
- * @return {Function} Callback function to toggle highlight state.
- */
-export function useToggleBlockHighlight( clientId ) {
-	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
-
-	const updateBlockHighlight = useCallback(
-		( isFocused ) => {
-			toggleBlockHighlight( clientId, isFocused );
-		},
-		[ clientId ]
-	);
-
-	useEffect( () => {
-		// On mount, we make sure to cancel any pending animation frame request
-		// that hasn't been completed yet. Components like NavigableToolbar may
-		// mount and unmount quickly.
-		if ( requestAnimationFrameId ) {
-			cancelAnimationFrame( requestAnimationFrameId );
-		}
-		return () => {
-			// Sequences state change to enable editor updates (e.g. cursor
-			// position) to render correctly.
-			requestAnimationFrameId = requestAnimationFrame( () => {
-				updateBlockHighlight( false );
-			} );
-		};
-	}, [] );
-
-	return updateBlockHighlight;
 }
