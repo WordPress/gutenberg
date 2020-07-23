@@ -18,11 +18,9 @@ import { useQueryContext } from '../query';
 const TEMPLATE = [ [ 'core/post-title' ], [ 'core/post-content' ] ];
 export default function QueryLoopEdit( {
 	clientId,
-	context: { query: _query, queryContext },
+	context: { query: _query = {}, queryContext },
 } ) {
-	const perPage = _query?.perPage;
-	const offset = _query?.offset;
-	const categoryIds = _query?.categoryIds;
+	const { perPage, offset, categoryIds } = _query;
 	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
 
