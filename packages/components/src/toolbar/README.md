@@ -13,10 +13,6 @@ Toolbar can be used to group related options. To emphasize groups of related ico
 
 ### Usage
 
-#### Selected action
-
-Only one option in a toolbar can be selected and active at a time. Selecting one option deselects any other.
-
 ### Best practices
 
 Toolbars should:
