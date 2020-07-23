@@ -8,6 +8,7 @@ import {
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
+import { settings } from './index';
 import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
@@ -53,7 +54,13 @@ const EmbedEdit = ( props ) => {
 		insertBlocksAfter,
 	} = props;
 
-	const { icon, title } = getEmbedInfoByProvider( providerNameSlug );
+	const defaultEmbedInfo = {
+		title: settings.title,
+		icon: settings.icon,
+	};
+	const { icon, title } =
+		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
+
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const [ mergedAttributes, setMergedAttributes ] = useState( attributes );

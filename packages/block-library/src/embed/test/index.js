@@ -18,7 +18,7 @@ import {
 	createUpgradedEmbedBlock,
 	getEmbedInfoByProvider,
 } from '../util';
-import { embedContentIcon, embedInstagramIcon } from '../icons';
+import { embedInstagramIcon } from '../icons';
 
 describe( 'core/embed', () => {
 	test( 'block edit matches snapshot', () => {
@@ -100,16 +100,17 @@ describe( 'core/embed', () => {
 	} );
 	describe( 'getEmbedInfoByProvider', () => {
 		it( 'should return embed info from existent variation', () => {
-			expect( getEmbedInfoByProvider( 'instagram' ) ).toEqual( {
-				icon: embedInstagramIcon,
-				title: 'Instagram',
-			} );
+			expect( getEmbedInfoByProvider( 'instagram' ) ).toEqual(
+				expect.objectContaining( {
+					icon: embedInstagramIcon,
+					title: 'Instagram',
+				} )
+			);
 		} );
-		it( 'should return default information if not found in variations', () => {
-			expect( getEmbedInfoByProvider( 'i do not exist' ) ).toEqual( {
-				icon: embedContentIcon,
-				title: 'Embed',
-			} );
+		it( 'should return undefined if not found in variations', () => {
+			expect(
+				getEmbedInfoByProvider( 'i do not exist' )
+			).toBeUndefined();
 		} );
 	} );
 } );

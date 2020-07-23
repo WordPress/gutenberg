@@ -15,13 +15,11 @@ import memoize from 'memize';
  */
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import variations from './variations';
-import { embedContentIcon } from './icons';
 import metadata from './block.json';
 
 const { name: DEFAULT_EMBED_BLOCK } = metadata;
@@ -30,27 +28,13 @@ const WP_VARIATION = variations.find( ( { name } ) => name === 'wordpress' );
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
- * @typedef {Object} EmbedInformation
- * @property {string} title The embed block's title
- * @property {WPComponent} icon The embed block's icon
- */
-
-/**
  * Returns the embed block's information by matching the provided service provider
  *
  * @param {string} provider The embed block's provider
- * @return {EmbedInformation} The embed block's information
+ * @return {WPBlockVariation} The embed block's information
  */
-export const getEmbedInfoByProvider = ( provider ) => {
-	const defaultEmbedInfo = {
-		title: _x( 'Embed', 'block title' ),
-		icon: embedContentIcon,
-	};
-	const { title, icon } =
-		variations.find( ( { name } ) => name === provider ) ||
-		defaultEmbedInfo;
-	return { title, icon };
-};
+export const getEmbedInfoByProvider = ( provider ) =>
+	variations.find( ( { name } ) => name === provider );
 
 /**
  * Returns true if any of the regular expressions match the URL.
