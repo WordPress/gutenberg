@@ -104,7 +104,6 @@ const EmbedEdit = ( props ) => {
 	/**
 	 * @return {Object} Attributes derived from the preview, merged with the current attributes.
 	 */
-	// TODO maybe use `useCallback` ?? or even better useMemo // or state? with mergedAttributes?
 	const getMergedAttributes = () => {
 		return {
 			...attributes,
@@ -147,6 +146,14 @@ const EmbedEdit = ( props ) => {
 	// Handle incoming preview
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
+			// Even though we set attributes that get derived from the preview,
+			// we don't access them directly because for the initial render,
+			// the `setAttributes` call will not have taken effect. If we're
+			// rendering responsive content, setting the responsive classes
+			// after the preview has been rendered can result in unwanted
+			// clipping or scrollbars. The `getAttributesFromPreview` function
+			// that `getMergedAttributes` uses is memoized so that we're not
+			// calculating them on every render.
 			setMergedAttributes( getMergedAttributes() );
 			setAttributes( mergedAttributes );
 			if ( onReplace ) {
@@ -195,19 +202,6 @@ const EmbedEdit = ( props ) => {
 		);
 	}
 
-	// Even though we set attributes that get derived from the preview,
-	// we don't access them directly because for the initial render,
-	// the `setAttributes` call will not have taken effect. If we're
-	// rendering responsive content, setting the responsive classes
-	// after the preview has been rendered can result in unwanted
-	// clipping or scrollbars. The `getAttributesFromPreview` function
-	// that `getMergedAttributes` uses is memoized so that we're not
-	// calculating them on every render.
-	const finalClassName = classnames(
-		mergedAttributes.className,
-		props.className // TODO why props here??
-	);
-
 	return (
 		<>
 			<EmbedControls
@@ -222,7 +216,10 @@ const EmbedEdit = ( props ) => {
 			<EmbedPreview
 				preview={ preview }
 				previewable={ previewable }
-				className={ finalClassName }
+				className={ classnames(
+					mergedAttributes.className,
+					props.className
+				) }
 				url={ url }
 				type={ mergedAttributes.type }
 				caption={ caption }
