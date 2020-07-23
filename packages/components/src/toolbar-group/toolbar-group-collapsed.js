@@ -20,7 +20,7 @@ function ToolbarGroupCollapsed( { controls = [], ...props } ) {
 			controls={ controls }
 			toggleProps={ {
 				...toggleProps,
-				'data-experimental-toolbar-item': true,
+				'data-toolbar-item': true,
 			} }
 			{ ...props }
 		/>

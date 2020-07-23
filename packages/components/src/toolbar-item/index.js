@@ -24,7 +24,7 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
 		return null;
 	}
 
-	const allProps = { ...props, ref, 'data-experimental-toolbar-item': true };
+	const allProps = { ...props, ref, 'data-toolbar-item': true };
 
 	if ( ! accessibleToolbarState ) {
 		if ( Component ) {

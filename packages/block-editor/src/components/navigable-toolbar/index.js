@@ -24,7 +24,7 @@ function useUpdateLayoutEffect( effect, deps ) {
 }
 
 function hasOnlyToolbarItem( elements ) {
-	const dataProp = 'experimentalToolbarItem';
+	const dataProp = 'toolbarItem';
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
 }
 

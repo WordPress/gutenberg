@@ -54,7 +54,7 @@ function ToolbarButton(
 					) }
 					isPressed={ isActive }
 					disabled={ isDisabled }
-					data-experimental-toolbar-item
+					data-toolbar-item
 					{ ...extraProps }
 					{ ...props }
 				>
