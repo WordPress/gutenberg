@@ -10,7 +10,7 @@ import { startsWith } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { link } from '@wordpress/icons';
-import { BottomSheet, } from '@wordpress/components';
+import { BottomSheet } from '@wordpress/components';
 import { getProtocol, prependHTTP } from '@wordpress/url';
 
 /**
@@ -46,47 +46,47 @@ export const createDirectEntry = ( value ) => {
 };
 
 export const LinkPicker = ( {
-  value: initialValue,
-  onLinkPicked,
-  onCancel: cancel,
+	value: initialValue,
+	onLinkPicked,
+	onCancel: cancel,
 } ) => {
-  const [ value, setValue ] = useState( initialValue );
-  const directEntry = createDirectEntry( value );
+	const [ value, setValue ] = useState( initialValue );
+	const directEntry = createDirectEntry( value );
 
-  // the title of a direct entry is displayed as the raw input value, but if we
-  // are replacing empty text, we want to use the generated url
-  const pickLink = ( { title, url, isDirectEntry } ) => {
-    onLinkPicked( { title: isDirectEntry ? url : title, url } );
-  };
+	// the title of a direct entry is displayed as the raw input value, but if we
+	// are replacing empty text, we want to use the generated url
+	const pickLink = ( { title, url, isDirectEntry } ) => {
+		onLinkPicked( { title: isDirectEntry ? url : title, url } );
+	};
 
-  const onSubmit = () => pickLink( directEntry );
-  
-  return (
-    <View>
-      <NavigationHeader
-        screen={ __( 'Add URL' ) }
-        leftButtonOnPress={ cancel }
-      />
-      <BottomSheet.Cell
-        icon={ link }
-        label={ __( 'URL' ) }
-        value={ value }
-        placeholder={ __( 'Search or type URL' ) }
-        autoCapitalize="none"
-        autoCorrect={ false }
-        keyboardType="url"
-        onChangeValue={ setValue }
-        onSubmit={ onSubmit }
-        /* eslint-disable-next-line jsx-a11y/no-autofocus */
-        autoFocus={ true }
-      />
-      { !! value && (
-        <LinkPickerResults
-          query={ value }
-          onLinkPicked={ pickLink }
-          directEntry={ directEntry }
-        />
-      ) }
-    </View>
-  );
-}
+	const onSubmit = () => pickLink( directEntry );
+
+	return (
+		<View>
+			<NavigationHeader
+				screen={ __( 'Add URL' ) }
+				leftButtonOnPress={ cancel }
+			/>
+			<BottomSheet.Cell
+				icon={ link }
+				label={ __( 'URL' ) }
+				value={ value }
+				placeholder={ __( 'Search or type URL' ) }
+				autoCapitalize="none"
+				autoCorrect={ false }
+				keyboardType="url"
+				onChangeValue={ setValue }
+				onSubmit={ onSubmit }
+				/* eslint-disable-next-line jsx-a11y/no-autofocus */
+				autoFocus={ true }
+			/>
+			{ !! value && (
+				<LinkPickerResults
+					query={ value }
+					onLinkPicked={ pickLink }
+					directEntry={ directEntry }
+				/>
+			) }
+		</View>
+	);
+};

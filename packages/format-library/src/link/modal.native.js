@@ -168,72 +168,86 @@ class ModalLinkUI extends Component {
 						onReplaceSubsheet: replaceSubsheet,
 						onHardwareButtonPress: setBackHandler,
 						shouldDisableBottomSheetMaxHeight: setMaxHeightEnabled,
-						} ) => {
+					} ) => {
+						// subsheet depth is limited to 1 so we can revert to default
+						// back behavior when returning from the subsheet
+						const goBack = () => {
+							replaceSubsheet( null, {}, () =>
+								setBackHandler( null )
+							);
+							this.setState( { isFullScreen: false } );
+						};
 
-							// subsheet depth is limited to 1 so we can revert to default
-							// back behavior when returning from the subsheet
-							const goBack = () => {
-								replaceSubsheet( null, {}, () => setBackHandler( null ) );
-								this.setState( { isFullScreen: false } )
+						// we only set text to title if there was no initial text
+						const onLinkPicked = ( { url, title } ) => {
+							if ( ! text ) {
+								this.setState( {
+									inputValue: url,
+									text: title,
+								} );
+							} else {
+								this.setState( { inputValue: url } );
 							}
+							goBack();
+						};
 
-							// we only set text to title if there was no initial text
-							const onLinkPicked = ( { url, title } ) => {
-								if ( ! text ) {
-									this.setState( { inputValue: url, text: title } );
-								} else {
-									this.setState( { inputValue: url } );
-								}
-								goBack();
-							};
+						const onLinkCellPressed = () => {
+							setMaxHeightEnabled( false );
+							this.setState( { isFullScreen: true } );
+							replaceSubsheet( 'picker', {}, () =>
+								setBackHandler( goBack )
+							);
+						};
 
-							switch ( subsheet ) {
-								case 'picker':
-									return (
-										<LinkPicker
+						switch ( subsheet ) {
+							case 'picker':
+								return (
+									<LinkPicker
+										value={ inputValue }
+										onLinkPicked={ onLinkPicked }
+										onCancel={ goBack }
+									/>
+								);
+							default:
+								return (
+									<>
+										<BottomSheet.LinkCell
 											value={ inputValue }
-											onLinkPicked={ onLinkPicked }
-											onCancel={ goBack }
+											onPress={ onLinkCellPressed }
 										/>
-									);
-								default:
-									return (
-										<>
-											<BottomSheet.LinkCell
-												value={ inputValue }
-												onPress={ () => {
-													setMaxHeightEnabled( false );
-													this.setState( { isFullScreen: true } );
-													replaceSubsheet( 'picker', {}, () => {
-														setBackHandler( goBack );
-													} );
-												} }
-											/>
-											<BottomSheet.Cell
-												icon={ textColor }
-												label={ __( 'Link text' ) }
-												value={ text }
-												placeholder={ __( 'Add link text' ) }
-												onChangeValue={ this.onChangeText }
-												onSubmit={ this.onDismiss }
-											/>
-											<BottomSheet.SwitchCell
-												icon={ external }
-												label={ __( 'Open in new tab' ) }
-												value={ this.state.opensInNewWindow }
-												onValueChange={ this.onChangeOpensInNewWindow }
-												separatorType={ 'fullWidth' }
-											/>
-											<BottomSheet.Cell
-												label={ __( 'Remove link' ) }
-												labelStyle={ styles.clearLinkButton }
-												separatorType={ 'none' }
-												onPress={ this.removeLink }
-											/>
-										</>
-									);
-							}
-						} }
+										<BottomSheet.Cell
+											icon={ textColor }
+											label={ __( 'Link text' ) }
+											value={ text }
+											placeholder={ __(
+												'Add link text'
+											) }
+											onChangeValue={ this.onChangeText }
+											onSubmit={ this.onDismiss }
+										/>
+										<BottomSheet.SwitchCell
+											icon={ external }
+											label={ __( 'Open in new tab' ) }
+											value={
+												this.state.opensInNewWindow
+											}
+											onValueChange={
+												this.onChangeOpensInNewWindow
+											}
+											separatorType={ 'fullWidth' }
+										/>
+										<BottomSheet.Cell
+											label={ __( 'Remove link' ) }
+											labelStyle={
+												styles.clearLinkButton
+											}
+											separatorType={ 'none' }
+											onPress={ this.removeLink }
+										/>
+									</>
+								);
+						}
+					} }
 				</BottomSheetConsumer>
 			</BottomSheet>
 		);
