@@ -33,6 +33,7 @@ describe( 'Toolbar', () => {
 			const { container } = render( <Toolbar /> );
 
 			expect( container.innerHTML ).toBe( '' );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should render an empty node, when controls are empty', () => {
