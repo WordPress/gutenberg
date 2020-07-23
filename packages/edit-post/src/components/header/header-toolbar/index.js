@@ -15,10 +15,7 @@ import {
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 } from '@wordpress/editor';
-import {
-	Button,
-	__experimentalToolbarItem as ToolbarItem,
-} from '@wordpress/components';
+import { Button, ToolbarItem } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 
 function HeaderToolbar() {

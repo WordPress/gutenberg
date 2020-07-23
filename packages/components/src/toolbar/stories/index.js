@@ -23,7 +23,7 @@ import {
 	Path,
 	ToolbarButton,
 	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	DropdownMenu,
 } from '../../';
 
