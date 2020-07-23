@@ -25,27 +25,15 @@ const mergeTrees = ( baseData, userData ) => {
 			mergedTree[ context ].styles.color = {};
 		}
 
-		// TODO: this needs to account for presets as well
-		if ( userData?.[ context ]?.styles?.typography?.fontSize ) {
-			mergedTree[ context ].styles.typography.fontSize =
-				userData[ context ].styles.typography.fontSize;
-		}
-		if ( userData?.[ context ]?.styles?.typography?.lineHeight ) {
-			mergedTree[ context ].styles.typography.lineHeight =
-				userData[ context ].styles.typography.lineHeight;
-		}
-		if ( userData?.[ context ]?.styles?.color?.link ) {
-			mergedTree[ context ].styles.color.link =
-				userData[ context ].styles.color.link;
-		}
-		if ( userData?.[ context ]?.styles?.color?.background ) {
-			mergedTree[ context ].styles.color.background =
-				userData[ context ].styles.color.background;
-		}
-		if ( userData?.[ context ]?.styles?.color?.text ) {
-			mergedTree[ context ].styles.color.text =
-				userData[ context ].styles.color.text;
-		}
+		mergedTree[ context ].styles.typography = {
+			...mergedTree[ context ].styles.typography,
+			...userData[ context ]?.styles?.typography
+		};
+
+		mergedTree[ context ].styles.color = {
+			...mergedTree[ context ].styles.color,
+			...userData[ context ]?.styles?.color
+		};
 	} );
 
 	return mergedTree;
