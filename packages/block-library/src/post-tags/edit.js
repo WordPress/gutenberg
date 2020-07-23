@@ -54,7 +54,7 @@ export default function PostTagsEdit( { context } ) {
 		 * @todo By default, only posts can be grouped by tags. Therefore, without any configuration,
 		 * the post tags block will have no tags for pages. Plugins, however, can modify this behavior.
 		 * In the future, instead of only evaluating posts, we should check whether the
-		 * post_tag taxonomy is registered for the page post type.
+		 * post_tag taxonomy is registered for the current post type.
 		 */
 	} else if ( context.postType !== 'post' ) {
 		return (
