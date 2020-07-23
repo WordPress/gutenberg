@@ -27,48 +27,4 @@ describe( 'Toolbar', () => {
 			).toBeTruthy();
 		} );
 	} );
-
-	describe( 'ToolbarGroup', () => {
-		it( 'should render an empty node, when controls are not passed', () => {
-			const { container } = render( <Toolbar /> );
-
-			expect( container.innerHTML ).toBe( '' );
-			expect( console ).toHaveWarned();
-		} );
-
-		it( 'should render an empty node, when controls are empty', () => {
-			const { container } = render( <Toolbar controls={ [] } /> );
-
-			expect( container.innerHTML ).toBe( '' );
-			expect( console ).toHaveWarned();
-		} );
-
-		it( 'should render a list of controls with buttons', () => {
-			const controls = [
-				{
-					icon: 'wordpress',
-					title: 'WordPress',
-					subscript: 'wp',
-					onClick: () => {},
-					isActive: false,
-				},
-			];
-			const { getByLabelText } = render(
-				<Toolbar controls={ controls } />
-			);
-
-			const toolbarButton = getByLabelText( 'WordPress' );
-			expect( toolbarButton.getAttribute( 'aria-label' ) ).toBe(
-				'WordPress'
-			);
-			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
-				'false'
-			);
-			expect( toolbarButton.getAttribute( 'data-subscript' ) ).toBe(
-				'wp'
-			);
-			expect( toolbarButton.getAttribute( 'type' ) ).toBe( 'button' );
-			expect( console ).toHaveWarned();
-		} );
-	} );
 } );
