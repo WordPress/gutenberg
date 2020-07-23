@@ -20,17 +20,11 @@ function render_block_core_post_tags( $attributes, $content, $block ) {
 
 	$post_tags = get_the_tags( $block->context['postId'] );
 	if ( ! empty( $post_tags ) ) {
-		$output  = '';
-		$output .= '<div>';
-
+		$output = '';
 		foreach ( $post_tags as $tag ) {
 			$output .= '<a href="' . get_tag_link( $tag->term_id ) . '">' . $tag->name . '</a>' . ' | ';
 		}
-
-		$output  = trim( $output, ' | ' );
-		$output .= '</div>';
-
-		return $output;
+		return trim( $output, ' | ' );
 	}
 }
 
