@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { createHigherOrderComponent, compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
 import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,59 +17,56 @@ import BlockStyles from '../components/block-styles';
 import DefaultStylePicker from '../components/default-style-picker';
 
 export const withInspectorControls = createHigherOrderComponent(
-	compose( [
-		withSelect( ( select ) => {
-			const { getSelectedBlockClientId, getBlockName } = select(
-				'core/block-editor'
-			);
-			const { getBlockStyles } = select( 'core/blocks' );
-			const selectedBlockClientId = getSelectedBlockClientId();
-			const selectedBlockName =
-				selectedBlockClientId && getBlockName( selectedBlockClientId );
-			const blockType =
-				selectedBlockClientId && getBlockType( selectedBlockName );
-			const blockStyles =
-				selectedBlockClientId && getBlockStyles( selectedBlockName );
-			return {
-				blockType,
-				selectedBlockClientId,
-				hasBlockStyles: blockStyles && blockStyles.length > 0,
-			};
-		} ),
+	( WrappedComponent ) => ( props ) => {
+		const { blockType, selectedBlockClientId, hasBlockStyles } = useSelect(
+			( select ) => {
+				const { getSelectedBlockClientId, getBlockName } = select(
+					'core/block-editor'
+				);
+				const { getBlockStyles } = select( 'core/blocks' );
+				const blockClientId = getSelectedBlockClientId();
+				const selectedBlockName =
+					blockClientId && getBlockName( blockClientId );
+				const blockStyles =
+					blockClientId && getBlockStyles( selectedBlockName );
 
-		( WrappedComponent ) => ( props ) => {
-			if ( ! props?.hasBlockStyles ) {
-				return <WrappedComponent { ...props } />;
-			}
+				return {
+					blockType:
+						blockClientId && getBlockType( selectedBlockName ),
+					selectedBlockClientId: blockClientId,
+					hasBlockStyles: blockStyles && blockStyles.length > 0,
+				};
+			},
+			[]
+		);
 
-			const { selectedBlockClientId, blockType } = props;
+		if ( ! hasBlockStyles ) {
+			return <WrappedComponent { ...props } />;
+		}
 
-			return (
-				<Fragment>
-					<InspectorControls>
-						<div>
-							<PanelBody title={ __( 'Styles' ) }>
-								<BlockStyles
-									clientId={ selectedBlockClientId }
+		return (
+			<Fragment>
+				<InspectorControls>
+					<div>
+						<PanelBody title={ __( 'Styles' ) }>
+							<BlockStyles clientId={ selectedBlockClientId } />
+							{ hasBlockSupport(
+								blockType.name,
+								'defaultStylePicker',
+								true
+							) && (
+								<DefaultStylePicker
+									blockName={ blockType.name }
 								/>
-								{ hasBlockSupport(
-									blockType.name,
-									'defaultStylePicker',
-									true
-								) && (
-									<DefaultStylePicker
-										blockName={ blockType.name }
-									/>
-								) }
-							</PanelBody>
-						</div>
-					</InspectorControls>
+							) }
+						</PanelBody>
+					</div>
+				</InspectorControls>
 
-					<WrappedComponent { ...props } />
-				</Fragment>
-			);
-		},
-	] ),
+				<WrappedComponent { ...props } />
+			</Fragment>
+		);
+	},
 	'withInspectorControls'
 );
 
