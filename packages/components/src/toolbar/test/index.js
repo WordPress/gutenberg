@@ -40,6 +40,7 @@ describe( 'Toolbar', () => {
 			const { container } = render( <Toolbar controls={ [] } /> );
 
 			expect( container.innerHTML ).toBe( '' );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should render a list of controls with buttons', () => {
@@ -67,6 +68,7 @@ describe( 'Toolbar', () => {
 				'wp'
 			);
 			expect( toolbarButton.getAttribute( 'type' ) ).toBe( 'button' );
+			expect( console ).toHaveWarned();
 		} );
 	} );
 } );
