@@ -93,6 +93,9 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  * @property {WPBlockVariationScope[]} [scope] The list of scopes where the variation
  *                                             is applicable. When not provided, it
  *                                             assumes all available scopes.
+ * @property {string[]} [keywords]             An array of terms (which can be translated)
+ *                                             that help users discover the variation
+ *                                             while searching.
  */
 
 /**

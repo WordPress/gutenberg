@@ -28,11 +28,16 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		$filter_excerpt_length
 	);
 
-	$output = '<p>' . get_the_excerpt( $block->context['postId'] );
+	$classes = 'wp-block-post-excerpt';
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= ' has-text-align-' . $attributes['textAlign'];
+	}
+
+	$output = sprintf( '<div class="%1$s">', esc_attr( $classes ) ) . '<p class="wp-block-post-excerpt__excerpt">' . get_the_excerpt( $block->context['postId'] );
 	if ( ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'] ) {
-		$output .= '</p>' . '<p>' . $more_text . '</p>';
+		$output .= '</p>' . '<p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
 	} else {
-		$output .= ' ' . $more_text . '</p>';
+		$output .= ' ' . $more_text . '</p>' . '</div>';
 	}
 
 	remove_filter(

@@ -1630,14 +1630,21 @@ export function automaticChangeStatus( state, action ) {
  * @return {string} Updated state.
  */
 export function highlightedBlock( state, action ) {
-	const { clientId, isHighlighted } = action;
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_HIGHLIGHT':
+			const { clientId, isHighlighted } = action;
 
-	if ( action.type === 'TOGGLE_BLOCK_HIGHLIGHT' ) {
-		if ( isHighlighted ) {
-			return clientId;
-		} else if ( state === clientId ) {
-			return null;
-		}
+			if ( isHighlighted ) {
+				return clientId;
+			} else if ( state === clientId ) {
+				return null;
+			}
+
+			return state;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
+			}
 	}
 
 	return state;

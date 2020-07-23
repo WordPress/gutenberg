@@ -8,7 +8,7 @@
 		margin: 0;
 
 		&:not(:last-child)::after {
-			content: "\2192"; // This becomes →.
+			content: "\2192" #{'/*rtl:"\2190"*/'}; // This becomes → for LTR and ← for RTL.
 		}
 	}
 }

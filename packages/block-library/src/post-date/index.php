@@ -18,7 +18,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$align_class_name = empty( $attributes['align'] ) ? '' : ' ' . "has-text-align-{$attributes['align']}";
+	$align_class_name = empty( $attributes['textAlign'] ) ? '' : ' ' . "has-text-align-{$attributes['textAlign']}";
 
 	return sprintf(
 		'<div class="%1$s"><time datetime="%2$s">%3$s</time></div>',

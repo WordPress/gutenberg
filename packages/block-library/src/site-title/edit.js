@@ -16,7 +16,7 @@ import {
 } from '@wordpress/block-editor';
 
 export default function SiteTitleEdit( { attributes, setAttributes } ) {
-	const { level, align } = attributes;
+	const { level, textAlign } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
 	const tagName = 0 === level ? 'p' : 'h' + level;
 
@@ -24,9 +24,9 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 		<>
 			<BlockControls>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>
@@ -37,7 +37,7 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 				value={ title }
 				onChange={ setTitle }
 				className={ classnames( {
-					[ `has-text-align-${ align }` ]: align,
+					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 				allowedFormats={ [] }
 				disableLineBreaks
