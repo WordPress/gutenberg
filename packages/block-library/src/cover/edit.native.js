@@ -378,6 +378,7 @@ const Cover = ( {
 					<TouchableWithoutFeedback onPress={ openMediaOptions }>
 						<View style={ styles.selectImage }>
 							<Icon
+								size={ 16 }
 								icon={ image }
 								{ ...styles.selectImageIcon }
 							/>

@@ -83,17 +83,20 @@
 }
 
 .selectImage {
-	width: 36px;
-	height: 36px;
-	border-radius: 12px;
-	justify-content: center;
-	align-items: center;
+	width: 30px;
+	height: 30px;
+	background-color: $gray-dark;
+	border-radius: 22px;
+	position: absolute;
+	top: 5px;
+	right: 5px;
 }
 
 .selectImageIcon {
 	fill: $white;
-	width: 100%;
-	height: 100%;
+	position: absolute;
+	top: 7px;
+	left: 7px;
 }
 
 .clearMediaButton {
