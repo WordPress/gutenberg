@@ -289,19 +289,6 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
 }
 
 /**
- * Return the data for the global context.
- *
- * @return array
- */
-function gutenberg_experimental_global_styles_get_global_context() {
-	return array(
-		'selector' => ':root',
-		'name'     => 'global',
-		'supports' => array( 'font-size', 'background-color', '--wp--style--color--link' ),
-	);
-}
-
-/**
  * Retrieves the block data (selector/supports).
  *
  * @return array
