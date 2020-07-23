@@ -26,11 +26,7 @@ function render_block_core_post_tags( $attributes, $content, $block ) {
 		foreach ( $post_tags as $tag ) {
 			$output .= '<a href="' . get_tag_link( $tag->term_id ) . '">' . $tag->name . '</a>' . ' | ';
 		}
-
-		$output  = trim( $output, ' | ' );
-		$output .= '</div>';
-
-		return $output;
+		return trim( $output, ' | ' );
 	}
 }
 
