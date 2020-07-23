@@ -1,15 +1,15 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import {
-	FONT_SIZE,
-	TEXT_COLOR,
-	BACKGROUND_COLOR,
-	LINE_HEIGHT,
-	LINK_COLOR,
-	PRESET_COLOR,
-	PRESET_FONT_SIZE,
-	PRESET_GRADIENT,
+	STYLE_PROPS,
+	PRESET_CATEGORIES,
+	LINK_COLOR_DECLARATION,
 } from './utils';
 
 const mergeTrees = ( baseData, userData ) => {
@@ -27,12 +27,12 @@ const mergeTrees = ( baseData, userData ) => {
 
 		mergedTree[ context ].styles.typography = {
 			...mergedTree[ context ].styles.typography,
-			...userData[ context ]?.styles?.typography
+			...userData[ context ]?.styles?.typography,
 		};
 
 		mergedTree[ context ].styles.color = {
 			...mergedTree[ context ].styles.color,
-			...userData[ context ]?.styles?.color
+			...userData[ context ]?.styles?.color,
 		};
 	} );
 
@@ -41,9 +41,9 @@ const mergeTrees = ( baseData, userData ) => {
 
 export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
 	const styles = [];
-	// TODO: this needs to be integrated in the processing.
-	// See comment in the server
-	styles.push( 'a { color: var(--wp--style--color--link, #00e); }' );
+	// Can this be converted to a context, as the global context?
+	// See comment in the server.
+	styles.push( LINK_COLOR_DECLARATION );
 	const tree = mergeTrees( baseTree, userTree );
 
 	/**
@@ -56,44 +56,17 @@ export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
 	 */
 	const getBlockStylesDeclarations = ( blockSupports, blockStyles ) => {
 		const declarations = [];
-		if (
-			blockSupports.includes( FONT_SIZE ) &&
-			blockStyles?.typography?.fontSize
-		) {
-			declarations.push(
-				`${ FONT_SIZE }: ${ blockStyles.typography.fontSize }`
-			);
-		}
-		if (
-			blockSupports.includes( LINE_HEIGHT ) &&
-			blockStyles?.typography?.lineHeight
-		) {
-			declarations.push(
-				`line-height: ${ blockStyles.typography.lineHeight }`
-			);
-		}
-		if (
-			blockSupports.includes( TEXT_COLOR ) &&
-			blockStyles?.color?.text
-		) {
-			declarations.push( `color: ${ blockStyles.color.text }` );
-		}
-		if (
-			blockSupports.includes( BACKGROUND_COLOR ) &&
-			blockStyles?.color?.background
-		) {
-			declarations.push(
-				`background-color: ${ blockStyles.color.background }`
-			);
-		}
-		if (
-			blockSupports.includes( LINK_COLOR ) &&
-			blockStyles?.color?.link
-		) {
-			declarations.push(
-				`--wp--style--color--link: ${ blockStyles.color.link }`
-			);
-		}
+		Object.keys( STYLE_PROPS ).forEach( ( key ) => {
+			if (
+				blockSupports.includes( key ) &&
+				get( blockStyles, STYLE_PROPS[ key ], false )
+			) {
+				declarations.push(
+					`${ key }: ${ get( blockStyles, STYLE_PROPS[ key ] ) }`
+				)
+			}
+		} );
+
 		return declarations;
 	};
 
@@ -106,7 +79,7 @@ export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
 	 */
 	const getBlockPresetsDeclarations = ( blockPresets ) => {
 		const declarations = [];
-		[ PRESET_COLOR, PRESET_FONT_SIZE, PRESET_GRADIENT ].forEach(
+		PRESET_CATEGORIES.forEach(
 			( category ) => {
 				if ( blockPresets?.[ category ] ) {
 					blockPresets[ category ].forEach( ( { slug, value } ) =>
@@ -121,25 +94,23 @@ export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
 	};
 
 	const getBlockSelector = ( selector ) => {
-		// TODO: look at how to hook into the styles generation
+		// Can we hook into the styles generation mechanism
 		// so we can avoid having to increase the class specificity here
-		// and remap :root.
+		// and remap :root?
 		if ( ':root' === selector ) {
 			selector = '';
 		}
 		return `.editor-styles-wrapper.editor-styles-wrapper ${ selector }`;
 	};
 
-	Object.keys( blockData ).forEach( ( blockName ) => {
-		const blockSelector = getBlockSelector(
-			blockData[ blockName ].selector
-		);
+	Object.keys( blockData ).forEach( ( context ) => {
+		const blockSelector = getBlockSelector( blockData[ context ].selector );
 		const blockDeclarations = [
 			...getBlockStylesDeclarations(
-				blockData[ blockName ].supports,
-				tree[ blockName ].styles
+				blockData[ context ].supports,
+				tree[ context ].styles
 			),
-			...getBlockPresetsDeclarations( tree[ blockName ].presets ),
+			...getBlockPresetsDeclarations( tree[ context ].presets ),
 		];
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(
