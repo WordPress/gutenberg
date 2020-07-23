@@ -13,8 +13,7 @@
 		"html": false,
 		"lightBlockWrapper": true,
 		"__experimentalColor": {
-			"gradients": true,
-			"linkColor": true
+			"gradients": true
 		},
 		"__experimentalFontSize": true,
 		"__experimentalLineHeight": true
