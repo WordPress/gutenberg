@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
 
 * [***] Media editing support in Media & Text block.
 * [***] New block: Social Icons
+* [*] Cover block placeholder is updated to allow users start the block with a background color
 
 ## 1.32.0
 
