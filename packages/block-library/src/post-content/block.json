@@ -7,10 +7,6 @@
 	],
 	"supports": {
 		"align": [ "wide", "full" ],
-		"html": false,
-		"__experimentalColor": {
-			"gradients": true,
-			"linkColor": true
-		}
+		"html": false
 	}
 }
