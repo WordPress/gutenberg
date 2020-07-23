@@ -105,7 +105,7 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 	const {
 		preview,
 		// name,
-		attributes: { url, providerNameSlug },
+		attributes: { url, providerNameSlug } = {},
 	} = props;
 
 	if ( ! url ) return;
@@ -120,7 +120,7 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
-
+	// TODO WP provider is `wordpress` ??
 	const isCurrentBlockWP =
 		providerNameSlug === WP_VARIATION.attributes.providerNameSlug;
 	// if current block is not WordPress and a more suitable block found

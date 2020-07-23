@@ -11,9 +11,9 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getEmbedEditComponent } from '../edit';
+import { EmbedEdit } from '../edit';
 import {
-	findBlock,
+	findMoreSuitableBlock,
 	getClassNames,
 	createUpgradedEmbedBlock,
 	getEmbedInfoByProvider,
@@ -22,23 +22,26 @@ import { embedContentIcon, embedInstagramIcon } from '../icons';
 
 describe( 'core/embed', () => {
 	test( 'block edit matches snapshot', () => {
-		const EmbedEdit = getEmbedEditComponent( 'Embed', 'embed-generic' );
+		// const EmbedEditTest = EmbedEdit( 'Embed', 'embed-generic' );
 		const wrapper = render( <EmbedEdit attributes={ {} } /> );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
-	describe( 'findBlock', () => {
-		test( 'findBlock matches a URL to a block name', () => {
+	describe( 'findMoreSuitableBlock', () => {
+		test( 'findMoreSuitableBlock matches a URL to a block name', () => {
 			const twitterURL = 'https://twitter.com/notnownikki';
 			const youtubeURL = 'https://www.youtube.com/watch?v=bNnfuvC1LlU';
 			const unknownURL = 'https://example.com/';
 
-			expect( findBlock( twitterURL ) ).toEqual( 'core-embed/twitter' );
-			expect( findBlock( youtubeURL ) ).toEqual( 'core-embed/youtube' );
-			expect( findBlock( unknownURL ) ).toEqual( 'core/embed' );
+			expect( findMoreSuitableBlock( twitterURL ) ).toEqual(
+				expect.objectContaining( { name: 'twitter' } )
+			);
+			expect( findMoreSuitableBlock( youtubeURL ) ).toEqual(
+				expect.objectContaining( { name: 'youtube' } )
+			);
+			expect( findMoreSuitableBlock( unknownURL ) ).toBeUndefined();
 		} );
 	} );
-
 	describe( 'getClassNames', () => {
 		test( 'getClassNames returns aspect ratio class names for iframes with width and height', () => {
 			const html = '<iframe height="9" width="16"></iframe>';
