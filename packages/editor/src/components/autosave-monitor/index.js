@@ -8,7 +8,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 export class AutosaveMonitor extends Component {
 	constructor( props ) {
 		super( props );
-		this.needsAutosave = props.isDirty && props.isAutosaveable;
+		this.needsAutosave = !! ( props.isDirty && props.isAutosaveable );
 	}
 
 	componentDidMount() {
