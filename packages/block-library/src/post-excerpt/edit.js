@@ -40,7 +40,7 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 }
 
 function PostExcerptEditor( {
-	attributes: { align, wordCount, moreText, showMoreOnNewLine },
+	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
 	context: { postId, postType },
@@ -60,9 +60,9 @@ function PostExcerptEditor( {
 		<>
 			<BlockControls>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( newAlign ) =>
-						setAttributes( { align: newAlign } )
+						setAttributes( { textAlign: newAlign } )
 					}
 				/>
 			</BlockControls>
@@ -92,7 +92,7 @@ function PostExcerptEditor( {
 			</InspectorControls>
 			<div
 				className={ classnames( 'wp-block-post-excerpt', {
-					[ `has-text-align-${ align }` ]: align,
+					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
 				<RichText

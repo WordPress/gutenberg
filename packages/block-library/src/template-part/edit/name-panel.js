@@ -30,6 +30,7 @@ export default function TemplatePartNamePanel( { postId, setAttributes } ) {
 					setSlug( newSlug );
 					setAttributes( { slug: newSlug } );
 				} }
+				onFocus={ ( event ) => event.target.select() }
 			/>
 		</div>
 	);

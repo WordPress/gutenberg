@@ -2,7 +2,7 @@
 	"name": "core/post-excerpt",
 	"category": "design",
 	"attributes": {
-		"align": {
+		"textAlign": {
 			"type": "string"
 		},
 		"wordCount": {

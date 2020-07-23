@@ -28,6 +28,7 @@ import {
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -172,6 +173,9 @@ function ButtonEdit( props ) {
 		},
 		[ setAttributes ]
 	);
+	const { colors } = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getSettings();
+	}, [] );
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -192,7 +196,7 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
-	const colorProps = getColorAndStyleProps( attributes );
+	const colorProps = getColorAndStyleProps( attributes, colors, true );
 
 	return (
 		<>
