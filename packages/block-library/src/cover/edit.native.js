@@ -279,7 +279,7 @@ const Cover = ( {
 	);
 
 	const colorPickerControls = (
-		<InspectorControls>
+		<InspectorControls hideBlockSettingsButton={ true }>
 			<BottomSheetConsumer>
 				{ ( {
 					shouldEnableBottomSheetScroll,
@@ -298,12 +298,11 @@ const Cover = ( {
 							setCustomColor( color );
 							setColor( color );
 						} }
-						onNavigationBack={ closeSettingsBottomSheet }
-						onCloseBottomSheet={ onCloseBottomSheet }
-						onHardwareButtonPress={ onCloseBottomSheet }
-						onBottomSheetClosed={ () => {
+						onNavigationBack={ () => {
 							setCustomColorPickerShowing( false );
+							closeSettingsBottomSheet();
 						} }
+						onCloseBottomSheet={ onCloseBottomSheet }
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
@@ -383,7 +382,7 @@ const Cover = ( {
 	if ( ! hasBackground || isCustomColorPickerShowing ) {
 		return (
 			<View>
-				{ isCustomColorPickerShowing && colorPickerControls }
+				{ colorPickerControls }
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					backgroundColor={ customColor }
