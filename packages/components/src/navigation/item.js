@@ -20,7 +20,7 @@ const Item = ( { data, item, setActive, isActive } ) => {
 		const next = children.length ? children[ 0 ] : item;
 		setActive( next );
 	};
-	const classes = classnames( 'components-navigation-item', {
+	const classes = classnames( 'components-navigation__menu-item', {
 		'is-active': isActive,
 	} );
 	return (

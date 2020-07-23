@@ -32,14 +32,14 @@ const Navigation = ( { data, initial } ) => {
 
 	return (
 		<div className="components-navigation">
-			<Button className="components-navigation-back" onClick={ goBack }>
+			<Button className="components-navigation__back" onClick={ goBack }>
 				<Icon icon={ arrowLeft } />
 				{ parent.back }
 			</Button>
-			<div className="components-navigation-title">
+			<div className="components-navigation__title">
 				<Text variant="title.medium">{ parent.title }</Text>
 			</div>
-			<div className="components-navigation-items">
+			<div className="components-navigation__menu-items">
 				{ items.map( ( item ) =>
 					! item.isSecondary ? (
 						<Item
@@ -52,7 +52,7 @@ const Navigation = ( { data, initial } ) => {
 					) : null
 				) }
 			</div>
-			<div className="components-navigation-items is-secondary">
+			<div className="components-navigation__menu-items is-secondary">
 				{ items.map( ( item ) =>
 					item.isSecondary ? (
 						<Item

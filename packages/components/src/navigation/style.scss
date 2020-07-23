@@ -5,24 +5,24 @@
 	color: #ccd0d4;
 }
 
-.components-navigation-back {
+.components-navigation__back {
 	margin-bottom: 64px;
 	background-color: #23282d;
 	padding: 3px 6px;
 	color: #ccd0d4;
 }
 
-.components-navigation-title {
+.components-navigation__title {
 	// For now
 	margin-bottom: 40px;
 }
 
-.components-navigation-items {
+.components-navigation__menu-items {
 	display: flex;
 	flex-direction: column;
 }
 
-.components-navigation-item {
+.components-navigation__menu-item {
 	display: flex;
 	justify-content: space-between;
 	margin-left: -12px;
