@@ -56,7 +56,7 @@ const EmbedEdit = ( props ) => {
 	const { icon, title } = getEmbedInfoByProvider( providerNameSlug );
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
-	// const [ mergedAttributes, setMergedAttributes ] = useState( attributes );
+	const [ mergedAttributes, setMergedAttributes ] = useState( attributes );
 	const { invalidateResolution } = useDispatch( 'core/data' );
 
 	const {
@@ -147,7 +147,7 @@ const EmbedEdit = ( props ) => {
 	// Handle incoming preview
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
-			const mergedAttributes = getMergedAttributes();
+			setMergedAttributes( getMergedAttributes() );
 			setAttributes( mergedAttributes );
 			if ( onReplace ) {
 				const upgradedBlock = createUpgradedEmbedBlock(
@@ -203,9 +203,8 @@ const EmbedEdit = ( props ) => {
 	// clipping or scrollbars. The `getAttributesFromPreview` function
 	// that `getMergedAttributes` uses is memoized so that we're not
 	// calculating them on every render.
-	const previewAttributes = getMergedAttributes();
 	const finalClassName = classnames(
-		previewAttributes.className,
+		mergedAttributes.className,
 		props.className // TODO why props here??
 	);
 
@@ -215,7 +214,7 @@ const EmbedEdit = ( props ) => {
 				showEditButton={ preview && ! cannotEmbed }
 				themeSupportsResponsive={ themeSupportsResponsive }
 				blockSupportsResponsive={ responsive }
-				allowResponsive={ previewAttributes.allowResponsive }
+				allowResponsive={ allowResponsive }
 				getResponsiveHelp={ getResponsiveHelp }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
@@ -225,7 +224,7 @@ const EmbedEdit = ( props ) => {
 				previewable={ previewable }
 				className={ finalClassName }
 				url={ url }
-				type={ previewAttributes.type }
+				type={ mergedAttributes.type }
 				caption={ caption }
 				onCaptionChange={ ( value ) =>
 					setAttributes( { caption: value } )

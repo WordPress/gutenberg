@@ -114,7 +114,7 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 
 	// TODO as we only have variations of core/embed we only have to check for core/embed
 	// but this is used by [image,video,audio], check better when it will be their time to handle in this PR
-	// if ( ! getBlockType( matchedBlockName ) ) {
+	// if ( ! getBlockType( DEFAULT_EMBED_BLOCK ) ) {
 	// 	return;
 	// }
 
