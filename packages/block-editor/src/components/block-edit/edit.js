@@ -13,7 +13,6 @@ import {
 	hasBlockSupport,
 	getBlockType,
 } from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
 import { useContext, useMemo } from '@wordpress/element';
 
 /**
@@ -38,17 +37,6 @@ export const Edit = ( props ) => {
 
 	// Assign context values using the block type's declared context needs.
 	const context = useMemo( () => {
-		if ( blockType && blockType.context ) {
-			deprecated( 'Block type "context" option', {
-				alternative: '"usesContext"',
-				version: '8.6.0',
-				hint: `Block "${ name }".`,
-				link:
-					'https://developer.wordpress.org/block-editor/developers/block-api/block-context/',
-			} );
-			return pick( blockContext, blockType.context );
-		}
-
 		return blockType && blockType.usesContext
 			? pick( blockContext, blockType.usesContext )
 			: DEFAULT_BLOCK_CONTEXT;
