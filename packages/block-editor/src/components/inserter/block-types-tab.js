@@ -119,7 +119,7 @@ export function BlockTypesTab( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
-	const hasItems = ! isEmpty( filteredItems );
+	const hasItems = ! isEmpty( filteredItems ) || hasChildItems;
 
 	return (
 		<div>
