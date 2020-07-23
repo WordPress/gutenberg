@@ -63,7 +63,7 @@ export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
 			) {
 				declarations.push(
 					`${ key }: ${ get( blockStyles, STYLE_PROPS[ key ] ) }`
-				)
+				);
 			}
 		} );
 
@@ -79,17 +79,15 @@ export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
 	 */
 	const getBlockPresetsDeclarations = ( blockPresets ) => {
 		const declarations = [];
-		PRESET_CATEGORIES.forEach(
-			( category ) => {
-				if ( blockPresets?.[ category ] ) {
-					blockPresets[ category ].forEach( ( { slug, value } ) =>
-						declarations.push(
-							`--wp--preset--${ category }--${ slug }: ${ value }`
-						)
-					);
-				}
+		PRESET_CATEGORIES.forEach( ( category ) => {
+			if ( blockPresets?.[ category ] ) {
+				blockPresets[ category ].forEach( ( { slug, value } ) =>
+					declarations.push(
+						`--wp--preset--${ category }--${ slug }: ${ value }`
+					)
+				);
 			}
-		);
+		} );
 		return declarations;
 	};
 
