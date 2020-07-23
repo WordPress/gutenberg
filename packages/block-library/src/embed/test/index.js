@@ -11,7 +11,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { EmbedEdit } from '../edit';
+import EmbedEdit from '../edit';
 import {
 	findMoreSuitableBlock,
 	getClassNames,
@@ -20,13 +20,16 @@ import {
 } from '../util';
 import { embedInstagramIcon } from '../icons';
 
+jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
+
 describe( 'core/embed', () => {
 	test( 'block edit matches snapshot', () => {
-		// const EmbedEditTest = EmbedEdit( 'Embed', 'embed-generic' );
 		const wrapper = render( <EmbedEdit attributes={ {} } /> );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
+} );
+describe( 'utils', () => {
 	describe( 'findMoreSuitableBlock', () => {
 		test( 'findMoreSuitableBlock matches a URL to a block name', () => {
 			const twitterURL = 'https://twitter.com/notnownikki';
