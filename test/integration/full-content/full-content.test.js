@@ -73,7 +73,15 @@ describe( 'full post content fixture', () => {
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.GUTENBERG_PHASE === 2 ) {
-			__experimentalRegisterExperimentalCoreBlocks( settings );
+			/**
+			 * We're loading these blocks with a `wp_template` post context,
+			 * since most of them are meant to be used in Site Editor templates,
+			 * to the point that e.g. the Post Content block is unavailable in
+			 * a Post Editor (`post`) context.
+			 */
+			__experimentalRegisterExperimentalCoreBlocks( settings, {
+				postType: 'wp_template',
+			} );
 		}
 	} );
 
