@@ -16,7 +16,7 @@ export const _default = () => {
 	const icon = text( 'Icon', 'wordpress' );
 
 	return (
-		<Toolbar accessibilityLabel="Example Toolbar">
+		<Toolbar label="Example Toolbar">
 			<ToolbarButton icon={ icon } label={ label } />
 		</Toolbar>
 	);

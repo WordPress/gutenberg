@@ -113,7 +113,7 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	if ( isAccessibleToolbar ) {
 		return (
 			<Toolbar
-				accessibilityLabel={ props[ 'aria-label' ] }
+				label={ props[ 'aria-label' ] }
 				ref={ wrapper }
 				{ ...props }
 			>
