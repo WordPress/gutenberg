@@ -457,7 +457,7 @@ const Cover = ( {
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				isReplacingMedia={ true }
+				isReplacingMedia={ ! hasOnlyColorBackground }
 				onSelect={ onSelectMedia }
 				render={ renderBackground }
 			/>
