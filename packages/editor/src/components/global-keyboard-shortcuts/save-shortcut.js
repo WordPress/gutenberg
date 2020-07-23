@@ -39,7 +39,10 @@ function SaveShortcut( { resetBlocksOnSave } ) {
 			// blurring the textarea.
 			if ( resetBlocksOnSave ) {
 				const postEdits = getPostEdits();
-				if ( postEdits.content ) {
+				if (
+					postEdits.content &&
+					typeof postEdits.content === 'string'
+				) {
 					const blocks = parse( postEdits.content );
 					resetEditorBlocks( blocks );
 				}
