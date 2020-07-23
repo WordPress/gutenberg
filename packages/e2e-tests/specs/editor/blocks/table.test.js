@@ -24,7 +24,7 @@ const createButtonLabel = 'Create Table';
  */
 async function changeCellAlignment( align ) {
 	await clickBlockToolbarButton( 'Change column alignment' );
-	await clickButton( `Align column ${ capitalize( align ) }` );
+	await clickButton( `Align column ${align}` );
 }
 
 describe( 'Table', () => {
