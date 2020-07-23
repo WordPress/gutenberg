@@ -45,7 +45,7 @@ const Navigation = ( { data, initial } ) => {
 			</div>
 			<div className="components-navigation__menu-items">
 				{ items.map( ( item ) =>
-					item.menu === 'primary' ? (
+					item.menu !== 'secondary' ? (
 						<Item
 							key={ item.slug }
 							data={ data }
