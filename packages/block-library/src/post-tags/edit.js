@@ -47,6 +47,15 @@ export default function PostTagsEdit( { context } ) {
 				{ __( 'Post tags block: No post found for this block.' ) }
 			</Warning>
 		);
+
+		/**
+		 * Do not render the block when viewing a page (as opposed to a post)
+		 *
+		 * @todo By default, only posts can be grouped by tags. Therefore, without any configuration,
+		 * the post tags block will have no tags for pages. Plugins, however, can modify this behavior.
+		 * In the future, instead of only evaluating posts, we should check whether the
+		 * post_tag taxonomy is registered for the page post type.
+		 */
 	} else if ( context.postType !== 'post' ) {
 		/**
 		 * Do not render the block when viewing a page (as opposed to a post)
