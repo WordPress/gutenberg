@@ -22,7 +22,7 @@
 		},
 		"responsive": {
 			"type": "boolean",
-			"default": true
+			"default": false
 		},
 		"previewable": {
 			"type": "boolean",
