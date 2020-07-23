@@ -29,25 +29,6 @@ export default function PostCommentsFormEdit( {
 		postId
 	);
 
-	if ( ! commentStatus ) {
-		return (
-			<Warning>
-				{ __(
-					'Post Comments Form block: Comments are not enabled for this post type.'
-				) }
-			</Warning>
-		);
-	}
-	if ( 'open' !== commentStatus ) {
-		return (
-			<Warning>
-				{ __(
-					'Post Comments Form block: Comments to this post are not allowed.'
-				) }
-			</Warning>
-		);
-	}
-
 	return (
 		<>
 			<BlockControls>
@@ -63,7 +44,23 @@ export default function PostCommentsFormEdit( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
-				{ __( 'Post Comments Form' ) }
+				{ ! commentStatus && (
+					<Warning>
+						{ __(
+							'Post Comments Form block: comments are not enabled for this post type.'
+						) }
+					</Warning>
+				) }
+
+				{ 'open' !== commentStatus && (
+					<Warning>
+						{ __(
+							'Post Comments Form block: comments to this post are not allowed.'
+						) }
+					</Warning>
+				) }
+
+				{ 'open' === commentStatus && __( 'Post Comments Form' ) }
 			</Block.div>
 		</>
 	);
