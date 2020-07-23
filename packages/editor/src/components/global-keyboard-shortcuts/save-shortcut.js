@@ -5,7 +5,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 
-function SaveShortcut( { persistOnSave } ) {
+function SaveShortcut( { resetBlocksOnSave } ) {
 	const { resetEditorBlocks, savePost } = useDispatch( 'core/editor' );
 	const { isEditedPostDirty, getPostEdits } = useSelect( ( select ) => {
 		const {
@@ -37,7 +37,7 @@ function SaveShortcut( { persistOnSave } ) {
 			// save to work correctly. Usually this happens when the textarea
 			// for the code editors blurs, but the shortcut can be used without
 			// blurring the textarea.
-			if ( persistOnSave ) {
+			if ( resetBlocksOnSave ) {
 				const postEdits = getPostEdits();
 				if ( postEdits.content ) {
 					const blocks = parse( postEdits.content );
