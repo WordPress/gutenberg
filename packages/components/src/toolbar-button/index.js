@@ -6,7 +6,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useContext, forwardRef } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
@@ -31,9 +30,6 @@ function ToolbarButton(
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ! accessibleToolbarState ) {
-		deprecated( 'Rendering ToolbarButton without a parent Toolbar', {
-			alternative: 'Button',
-		} );
 		return (
 			<ToolbarButtonContainer className={ containerClassName }>
 				<Button
