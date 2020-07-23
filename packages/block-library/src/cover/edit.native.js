@@ -373,7 +373,7 @@ const Cover = ( {
 					) }
 				</View>
 			</TouchableWithoutFeedback>
-			{ hasOnlyColorBackground && (
+			{ hasOnlyColorBackground && isParentSelected && (
 				<View style={ styles.selectImageContainer }>
 					<TouchableWithoutFeedback onPress={ openMediaOptions }>
 						<View style={ styles.selectImage }>
