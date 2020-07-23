@@ -114,6 +114,7 @@ const Cover = ( {
 		isCustomColorPickerShowing,
 		setCustomColorPickerShowing,
 	] = useState( false );
+
 	const [ customColor, setCustomColor ] = useState( '' );
 
 	// Used to set a default color for its InnerBlocks
@@ -184,6 +185,13 @@ const Cover = ( {
 			gradient: undefined,
 			customGradient: undefined,
 		} );
+	}
+
+	function openColorPicker() {
+		if ( isParentSelected ) {
+			openGeneralSidebar();
+			setCustomColorPickerShowing( true );
+		}
 	}
 
 	const backgroundColor = getStylesFromColorScheme(
@@ -272,7 +280,7 @@ const Cover = ( {
 
 	const colorPickerControls = (
 		<InspectorControls>
-			<BottomSheetConsumer excludeFromSettings={ true }>
+			<BottomSheetConsumer>
 				{ ( {
 					shouldEnableBottomSheetScroll,
 					shouldDisableBottomSheetMaxHeight,
@@ -290,16 +298,16 @@ const Cover = ( {
 							setCustomColor( color );
 							setColor( color );
 						} }
-						onNavigationBack={ () => {
-							setCustomColorPickerShowing( false );
-							closeSettingsBottomSheet();
-						} }
+						onNavigationBack={ closeSettingsBottomSheet }
 						onCloseBottomSheet={ onCloseBottomSheet }
+						onHardwareButtonPress={ onCloseBottomSheet }
+						onBottomSheetClosed={ () => {
+							setCustomColorPickerShowing( false );
+						} }
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
 						bottomLabelText={ __( 'Select a color' ) }
-						excludeFromSettings={ true }
 					/>
 				) }
 			</BottomSheetConsumer>
@@ -375,7 +383,7 @@ const Cover = ( {
 	if ( ! hasBackground || isCustomColorPickerShowing ) {
 		return (
 			<View>
-				{ colorPickerControls }
+				{ isCustomColorPickerShowing && colorPickerControls }
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					backgroundColor={ customColor }
@@ -402,12 +410,7 @@ const Cover = ( {
 								styles.paletteVerticalSeparator
 							}
 							setColor={ setColor }
-							onCustomPress={ () => {
-								if ( isParentSelected ) {
-									openGeneralSidebar();
-									setCustomColorPickerShowing( true );
-								}
-							} }
+							onCustomPress={ openColorPicker }
 							defaultSettings={ coverDefaultPalette }
 							shouldShowCustomLabel={ false }
 							shouldShowCustomVerticalSeparator={ false }

@@ -26,6 +26,7 @@ function ColorPicker( {
 	isGradientColor,
 	onNavigationBack,
 	onCloseBottomSheet,
+	onBottomSheetClosed,
 	bottomLabelText,
 } ) {
 	const isIOS = Platform.OS === 'ios';
@@ -87,7 +88,10 @@ function ColorPicker( {
 		}
 		setColor( activeColor );
 		shouldDisableBottomSheetMaxHeight( false );
-		onCloseBottomSheet( () => setColor( savedColor ) );
+		onCloseBottomSheet( () => {
+			setColor( savedColor );
+			onBottomSheetClosed && onBottomSheetClosed();
+		} );
 	}, [] );
 
 	function onHuePickerChange( { hue: h } ) {
@@ -101,7 +105,9 @@ function ColorPicker( {
 
 	function onButtonPress( action ) {
 		onNavigationBack();
-		onCloseBottomSheet( null );
+		onCloseBottomSheet(
+			() => onBottomSheetClosed && onBottomSheetClosed()
+		);
 		shouldDisableBottomSheetMaxHeight( true );
 		setColor( action === 'apply' ? currentColor : savedColor );
 	}
