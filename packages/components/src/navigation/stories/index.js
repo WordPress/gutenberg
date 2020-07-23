@@ -36,24 +36,6 @@ const data = [
 		parent: 'analytics',
 	},
 	{
-		title: 'More',
-		slug: 'more',
-		parent: 'root',
-		back: 'WooCommerce Home',
-		menu: 'primary',
-	},
-	{
-		title: 'Even More',
-		slug: 'even_more',
-		back: 'More',
-		parent: 'more',
-	},
-	{
-		title: 'Lastly',
-		slug: 'lastly',
-		parent: 'even_more',
-	},
-	{
 		title: 'All orders',
 		slug: 'all_orders',
 		parent: 'orders',

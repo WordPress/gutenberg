@@ -33,7 +33,7 @@ const Navigation = ( { data, initial } ) => {
 	return (
 		<div className="components-navigation">
 			<Button
-				isPrimary
+				isSecondary
 				className="components-navigation__back"
 				onClick={ goBack }
 			>

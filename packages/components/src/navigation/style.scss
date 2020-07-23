@@ -1,8 +1,6 @@
 .components-navigation {
 	width: 272px;
 	padding: 35px 30px;
-	background: #191e23;
-	color: #ccd0d4;
 }
 
 .components-navigation__back {
@@ -10,7 +8,6 @@
 }
 
 .components-navigation__title {
-	// For now
 	margin-bottom: 40px;
 }
 
@@ -19,7 +16,6 @@
 	flex-direction: column;
 
 	&.is-secondary {
-		// For now
 		margin-top: 24px;
 	}
 }
@@ -27,8 +23,6 @@
 .components-navigation__menu-item {
 	display: flex;
 	justify-content: space-between;
-	margin-left: -12px;
-	color: #8f98a1;
 
 	&.is-active span {
 		border-bottom: 2px solid var(--wp-admin-theme-color);
