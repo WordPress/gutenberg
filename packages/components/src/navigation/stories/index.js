@@ -10,18 +10,20 @@ export default {
 
 const data = [
 	{ title: 'WooCommerce', slug: 'root', back: 'Dashboard' },
-	{ title: 'Home', slug: 'home', parent: 'root' },
+	{ title: 'Home', slug: 'home', parent: 'root', menu: 'primary' },
 	{
 		title: 'Analytics',
 		slug: 'analytics',
 		parent: 'root',
 		back: 'WooCommerce Home',
+		menu: 'primary',
 	},
 	{
 		title: 'Orders',
 		slug: 'orders',
 		parent: 'root',
 		back: 'WooCommerce Home',
+		menu: 'primary',
 	},
 	{
 		title: 'Overview',
@@ -48,14 +50,14 @@ const data = [
 		slug: 'settings',
 		parent: 'root',
 		back: 'WooCommerce Home',
-		isSecondary: true,
+		menu: 'secondary',
 	},
 	{
 		title: 'Extensions',
 		slug: 'extensions',
 		parent: 'root',
 		back: 'WooCommerce Home',
-		isSecondary: true,
+		menu: 'secondary',
 	},
 	{
 		title: 'General',

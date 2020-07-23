@@ -17,6 +17,11 @@
 .components-navigation__menu-items {
 	display: flex;
 	flex-direction: column;
+
+	&.is-secondary {
+		// For now
+		margin-top: 24px;
+	}
 }
 
 .components-navigation__menu-item {
