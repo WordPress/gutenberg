@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -36,26 +36,13 @@ import {
  */
 const variations = [
 	{
-		isDefault: true,
-		name: 'embed',
-		title: _x( 'Embed', 'block title' ),
-		icon: embedContentIcon,
-		description: __(
-			'Embed videos, images, tweets, audio, and other content from external sources.'
-		),
-		// Unknown embeds should not be responsive by default.
-		// TODO check when transforms to other embed by pattern...
-		attributes: { responsive: false },
-	},
-	{
 		name: 'twitter',
 		title: 'Twitter',
 		icon: embedTwitterIcon,
 		keywords: [ 'tweet', __( 'social' ) ],
 		description: __( 'Embed a tweet.' ),
 		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
-		// TODO - create util for basic RegEx
-		attributes: { providerNameSlug: 'twitter' },
+		attributes: { providerNameSlug: 'twitter', responsive: true },
 	},
 	{
 		name: 'youtube',
@@ -67,7 +54,7 @@ const variations = [
 			/^https?:\/\/((m|www)\.)?youtube\.com\/.+/i,
 			/^https?:\/\/youtu\.be\/.+/i,
 		],
-		attributes: { providerNameSlug: 'youtube' },
+		attributes: { providerNameSlug: 'youtube', responsive: true },
 	},
 	{
 		name: 'facebook',
@@ -79,6 +66,7 @@ const variations = [
 		attributes: {
 			providerNameSlug: 'facebook',
 			previewable: false,
+			responsive: true,
 		},
 	},
 	{
@@ -88,7 +76,7 @@ const variations = [
 		keywords: [ __( 'image' ), __( 'social' ) ],
 		description: __( 'Embed an Instagram post.' ),
 		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
-		attributes: { providerNameSlug: 'instagram' },
+		attributes: { providerNameSlug: 'instagram', responsive: true },
 	},
 	{
 		name: 'wordpress',
@@ -98,7 +86,6 @@ const variations = [
 		description: __( 'Embed a WordPress post.' ),
 		attributes: {
 			providerNameSlug: 'wordpress',
-			responsive: false,
 		},
 	},
 	{
@@ -108,7 +95,7 @@ const variations = [
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed SoundCloud content.' ),
 		patterns: [ /^https?:\/\/(www\.)?soundcloud\.com\/.+/i ],
-		attributes: { providerNameSlug: 'soundcloud' },
+		attributes: { providerNameSlug: 'soundcloud', responsive: true },
 	},
 	{
 		name: 'spotify',
@@ -117,7 +104,7 @@ const variations = [
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed Spotify content.' ),
 		patterns: [ /^https?:\/\/(open|play)\.spotify\.com\/.+/i ],
-		attributes: { providerNameSlug: 'spotify' },
+		attributes: { providerNameSlug: 'spotify', responsive: true },
 	},
 	{
 		name: 'flickr',
@@ -129,7 +116,7 @@ const variations = [
 			/^https?:\/\/(www\.)?flickr\.com\/.+/i,
 			/^https?:\/\/flic\.kr\/.+/i,
 		],
-		attributes: { providerNameSlug: 'flickr' },
+		attributes: { providerNameSlug: 'flickr', responsive: true },
 	},
 	{
 		name: 'vimeo',
@@ -138,7 +125,7 @@ const variations = [
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a Vimeo video.' ),
 		patterns: [ /^https?:\/\/(www\.)?vimeo\.com\/.+/i ],
-		attributes: { providerNameSlug: 'vimeo' },
+		attributes: { providerNameSlug: 'vimeo', responsive: true },
 	},
 	{
 		name: 'animoto',
@@ -146,7 +133,7 @@ const variations = [
 		icon: embedAnimotoIcon,
 		description: __( 'Embed an Animoto video.' ),
 		patterns: [ /^https?:\/\/(www\.)?(animoto|video214)\.com\/.+/i ],
-		attributes: { providerNameSlug: 'animoto' },
+		attributes: { providerNameSlug: 'animoto', responsive: true },
 	},
 	{
 		name: 'cloudup',
@@ -154,7 +141,7 @@ const variations = [
 		icon: embedContentIcon,
 		description: __( 'Embed Cloudup content.' ),
 		patterns: [ /^https?:\/\/cloudup\.com\/.+/i ],
-		attributes: { providerNameSlug: 'cloudup' },
+		attributes: { providerNameSlug: 'cloudup', responsive: true },
 	},
 	{
 		// Deprecated since CollegeHumor content is now powered by YouTube
@@ -164,7 +151,7 @@ const variations = [
 		description: __( 'Embed CollegeHumor content.' ),
 		scope: [ 'block' ],
 		patterns: [],
-		attributes: { providerNameSlug: 'collegehumor' },
+		attributes: { providerNameSlug: 'collegehumor', responsive: true },
 	},
 	{
 		name: 'crowdsignal',
@@ -185,7 +172,7 @@ const variations = [
 		patterns: [
 			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i,
 		],
-		attributes: { providerNameSlug: 'crowdsignal' },
+		attributes: { providerNameSlug: 'crowdsignal', responsive: true },
 	},
 	{
 		name: 'dailymotion',
@@ -194,7 +181,7 @@ const variations = [
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a Dailymotion video.' ),
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
-		attributes: { providerNameSlug: 'dailymotion' },
+		attributes: { providerNameSlug: 'dailymotion', responsive: true },
 	},
 	{
 		name: 'imgur',
@@ -202,7 +189,7 @@ const variations = [
 		icon: embedPhotoIcon,
 		description: __( 'Embed Imgur content.' ),
 		patterns: [ /^https?:\/\/(.+\.)?imgur\.com\/.+/i ],
-		attributes: { providerNameSlug: 'imgur' },
+		attributes: { providerNameSlug: 'imgur', responsive: true },
 	},
 	{
 		name: 'issuu',
@@ -210,7 +197,7 @@ const variations = [
 		icon: embedContentIcon,
 		description: __( 'Embed Issuu content.' ),
 		patterns: [ /^https?:\/\/(www\.)?issuu\.com\/.+/i ],
-		attributes: { providerNameSlug: 'issuu' },
+		attributes: { providerNameSlug: 'issuu', responsive: true },
 	},
 	{
 		name: 'kickstarter',
@@ -221,7 +208,7 @@ const variations = [
 			/^https?:\/\/(www\.)?kickstarter\.com\/.+/i,
 			/^https?:\/\/kck\.st\/.+/i,
 		],
-		attributes: { providerNameSlug: 'kickstarter' },
+		attributes: { providerNameSlug: 'kickstarter', responsive: true },
 	},
 	{
 		name: 'meetup-com',
@@ -229,7 +216,7 @@ const variations = [
 		icon: embedContentIcon,
 		description: __( 'Embed Meetup.com content.' ),
 		patterns: [ /^https?:\/\/(www\.)?meetu(\.ps|p\.com)\/.+/i ],
-		attributes: { providerNameSlug: 'meetup-com' },
+		attributes: { providerNameSlug: 'meetup-com', responsive: true },
 	},
 	{
 		name: 'mixcloud',
@@ -238,7 +225,7 @@ const variations = [
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed Mixcloud content.' ),
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
-		attributes: { providerNameSlug: 'mixcloud' },
+		attributes: { providerNameSlug: 'mixcloud', responsive: true },
 	},
 	{
 		// Deprecated in favour of the crowdsignal block
@@ -248,7 +235,7 @@ const variations = [
 		description: __( 'Embed Polldaddy content.' ),
 		scope: [ 'block' ],
 		patterns: [],
-		attributes: { providerNameSlug: 'polldaddy' },
+		attributes: { providerNameSlug: 'polldaddy', responsive: true },
 	},
 	{
 		name: 'reddit',
@@ -256,7 +243,7 @@ const variations = [
 		icon: embedRedditIcon,
 		description: __( 'Embed a Reddit thread.' ),
 		patterns: [ /^https?:\/\/(www\.)?reddit\.com\/.+/i ],
-		attributes: { providerNameSlug: 'reddit' },
+		attributes: { providerNameSlug: 'reddit', responsive: true },
 	},
 	{
 		name: 'reverbnation',
@@ -264,7 +251,7 @@ const variations = [
 		icon: embedAudioIcon,
 		description: __( 'Embed ReverbNation content.' ),
 		patterns: [ /^https?:\/\/(www\.)?reverbnation\.com\/.+/i ],
-		attributes: { providerNameSlug: 'reverbnation' },
+		attributes: { providerNameSlug: 'reverbnation', responsive: true },
 	},
 	{
 		name: 'screencast',
@@ -272,7 +259,7 @@ const variations = [
 		icon: embedVideoIcon,
 		description: __( 'Embed Screencast content.' ),
 		patterns: [ /^https?:\/\/(www\.)?screencast\.com\/.+/i ],
-		attributes: { providerNameSlug: 'screencast' },
+		attributes: { providerNameSlug: 'screencast', responsive: true },
 	},
 	{
 		name: 'scribd',
@@ -280,7 +267,7 @@ const variations = [
 		icon: embedContentIcon,
 		description: __( 'Embed Scribd content.' ),
 		patterns: [ /^https?:\/\/(www\.)?scribd\.com\/.+/i ],
-		attributes: { providerNameSlug: 'scribd' },
+		attributes: { providerNameSlug: 'scribd', responsive: true },
 	},
 	{
 		name: 'slideshare',
@@ -288,7 +275,7 @@ const variations = [
 		icon: embedContentIcon,
 		description: __( 'Embed Slideshare content.' ),
 		patterns: [ /^https?:\/\/(.+?\.)?slideshare\.net\/.+/i ],
-		attributes: { providerNameSlug: 'slideshare' },
+		attributes: { providerNameSlug: 'slideshare', responsive: true },
 	},
 	{
 		name: 'smugmug',
@@ -296,7 +283,11 @@ const variations = [
 		icon: embedPhotoIcon,
 		description: __( 'Embed SmugMug content.' ),
 		patterns: [ /^https?:\/\/(.+\.)?smugmug\.com\/.*/i ],
-		attributes: { providerNameSlug: 'smugmug', previewable: false },
+		attributes: {
+			providerNameSlug: 'smugmug',
+			previewable: false,
+			responsive: true,
+		},
 	},
 	{
 		// Deprecated in favour of the speaker-deck block.
@@ -305,7 +296,7 @@ const variations = [
 		icon: embedAudioIcon,
 		scope: [ 'block' ],
 		patterns: [],
-		attributes: { providerNameSlug: 'speaker' },
+		attributes: { providerNameSlug: 'speaker', responsive: true },
 	},
 	{
 		name: 'speaker-deck',
@@ -324,7 +315,7 @@ const variations = [
 		],
 		description: __( 'Embed Speaker Deck content.' ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
-		attributes: { providerNameSlug: 'speaker-deck' },
+		attributes: { providerNameSlug: 'speaker-deck', responsive: true },
 	},
 	{
 		name: 'tiktok',
@@ -333,7 +324,7 @@ const variations = [
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a TikTok video.' ),
 		patterns: [ /^https?:\/\/(www\.)?tiktok\.com\/.+/i ],
-		attributes: { providerNameSlug: 'tiktok' },
+		attributes: { providerNameSlug: 'tiktok', responsive: true },
 	},
 	{
 		name: 'ted',
@@ -341,7 +332,7 @@ const variations = [
 		icon: embedVideoIcon,
 		description: __( 'Embed a TED video.' ),
 		patterns: [ /^https?:\/\/(www\.|embed\.)?ted\.com\/.+/i ],
-		attributes: { providerNameSlug: 'ted' },
+		attributes: { providerNameSlug: 'ted', responsive: true },
 	},
 	{
 		name: 'tumblr',
@@ -350,7 +341,7 @@ const variations = [
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Tumblr post.' ),
 		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],
-		attributes: { providerNameSlug: 'tumblr' },
+		attributes: { providerNameSlug: 'tumblr', responsive: true },
 	},
 	{
 		name: 'videopress',
@@ -359,7 +350,7 @@ const variations = [
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a VideoPress video.' ),
 		patterns: [ /^https?:\/\/videopress\.com\/.+/i ],
-		attributes: { providerNameSlug: 'videopress' },
+		attributes: { providerNameSlug: 'videopress', responsive: true },
 	},
 	{
 		name: 'wordpress-tv',
@@ -367,7 +358,7 @@ const variations = [
 		icon: embedVideoIcon,
 		description: __( 'Embed a WordPress.tv video.' ),
 		patterns: [ /^https?:\/\/wordpress\.tv\/.+/i ],
-		attributes: { providerNameSlug: 'wordpress-tv' },
+		attributes: { providerNameSlug: 'wordpress-tv', responsive: true },
 	},
 	{
 		name: 'amazon-kindle',
@@ -379,7 +370,7 @@ const variations = [
 			/^https?:\/\/([a-z0-9-]+\.)?(amazon|amzn)(\.[a-z]{2,4})+\/.+/i,
 			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
 		],
-		attributes: { providerNameSlug: 'amazon-kindle', responsive: false },
+		attributes: { providerNameSlug: 'amazon-kindle' },
 	},
 ];
 
