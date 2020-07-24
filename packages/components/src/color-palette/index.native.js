@@ -190,6 +190,11 @@ function ColorPalette( {
 		styles.customTextDark
 	);
 
+	const customIndicatorWrapperStyle = [
+		styles.customIndicatorWrapper,
+		customIndicatorWrapperStyles,
+	];
+
 	return (
 		<ScrollView
 			contentContainerStyle={ styles.contentContainer }
@@ -239,10 +244,7 @@ function ColorPalette( {
 			} ) }
 			{ shouldShowCustomIndicator && (
 				<View
-					style={ [
-						styles.customIndicatorWrapper,
-						customIndicatorWrapperStyles,
-					] }
+					style={ customIndicatorWrapperStyle }
 					onLayout={ onCustomIndicatorLayout }
 				>
 					{ shouldShowCustomVerticalSeparator && (
@@ -254,12 +256,7 @@ function ColorPalette( {
 						accessibilityState={ { selected: isSelectedCustom() } }
 						accessibilityHint={ accessibilityHint }
 					>
-						<View
-							style={ [
-								styles.customIndicatorWrapper,
-								customIndicatorWrapperStyles,
-							] }
-						>
+						<View style={ customIndicatorWrapperStyle }>
 							<ColorIndicator
 								withCustomPicker={ ! isGradientSegment }
 								color={ customIndicatorColor }

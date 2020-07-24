@@ -10,12 +10,15 @@ import Video from 'react-native-video';
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
 	mediaUploadSync,
 } from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import {
 	Icon,
-	ImageWithFocalPoint,
+	Image,
+	ImageEditingButton,
+	IMAGE_DEFAULT_FOCAL_POINT,
 	PanelBody,
 	RangeControl,
 	BottomSheet,
@@ -40,7 +43,7 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { cover as icon, replace, image } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
@@ -116,7 +119,10 @@ const Cover = ( {
 		isCustomColorPickerShowing,
 		setCustomColorPickerShowing,
 	] = useState( false );
+
 	const [ customColor, setCustomColor ] = useState( '' );
+
+	const openMediaOptionsRef = useRef();
 
 	// Used to set a default color for its InnerBlocks
 	// since there's no system to inherit styles yet
@@ -165,6 +171,8 @@ const Cover = ( {
 			requestImageUploadCancelDialog( id );
 		} else if ( shouldShowFailure ) {
 			requestImageFailedRetryDialog( id );
+		} else if ( backgroundType === MEDIA_TYPE_IMAGE && url ) {
+			requestImageFullscreenPreview( url );
 		}
 	};
 
@@ -178,6 +186,11 @@ const Cover = ( {
 		setIsVideoLoading( false );
 	};
 
+	const onClearMedia = () => {
+		setAttributes( { id: undefined, url: undefined } );
+		closeSettingsBottomSheet();
+	};
+
 	function setColor( color ) {
 		setAttributes( {
 			// clear all related attributes (only one should be set)
@@ -186,6 +199,13 @@ const Cover = ( {
 			gradient: undefined,
 			customGradient: undefined,
 		} );
+	}
+
+	function openColorPicker() {
+		if ( isParentSelected ) {
+			openGeneralSidebar();
+			setCustomColorPickerShowing( true );
+		}
 	}
 
 	const backgroundColor = getStylesFromColorScheme(
@@ -205,6 +225,10 @@ const Cover = ( {
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url ? backgroundColor : {},
+		isParentSelected &&
+			! isUploadInProgress &&
+			! didUploadFail &&
+			styles.overlaySelected,
 	];
 
 	const placeholderIconStyle = getStylesFromColorScheme(
@@ -262,10 +286,7 @@ const Cover = ( {
 						leftAlign
 						label={ __( 'Clear Media' ) }
 						labelStyle={ styles.clearMediaButton }
-						onPress={ () => {
-							setAttributes( { id: undefined, url: undefined } );
-							closeSettingsBottomSheet();
-						} }
+						onPress={ onClearMedia }
 					/>
 				</PanelBody>
 			) : null }
@@ -274,11 +295,12 @@ const Cover = ( {
 
 	const colorPickerControls = (
 		<InspectorControls>
-			<BottomSheetConsumer excludeFromSettings={ true }>
+			<BottomSheetConsumer>
 				{ ( {
 					shouldEnableBottomSheetScroll,
 					shouldDisableBottomSheetMaxHeight,
 					onCloseBottomSheet,
+					onHardwareButtonPress,
 					isBottomSheetContentScrolling,
 				} ) => (
 					<ColorPicker
@@ -292,36 +314,35 @@ const Cover = ( {
 							setCustomColor( color );
 							setColor( color );
 						} }
-						onNavigationBack={ () => {
-							setCustomColorPickerShowing( false );
-							closeSettingsBottomSheet();
-						} }
+						onNavigationBack={ closeSettingsBottomSheet }
 						onCloseBottomSheet={ onCloseBottomSheet }
+						onHardwareButtonPress={ onHardwareButtonPress }
+						onBottomSheetClosed={ () => {
+							setCustomColorPickerShowing( false );
+						} }
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
 						bottomLabelText={ __( 'Select a color' ) }
-						excludeFromSettings={ true }
 					/>
 				) }
 			</BottomSheetConsumer>
 		</InspectorControls>
 	);
 
-	const renderBackground = ( {
-		open: openMediaOptions,
-		getMediaOptions,
-	} ) => (
-		<>
+	const renderBackground = ( getMediaOptions ) => (
+		</>
 			<TouchableWithoutFeedback
 				accessible={ ! isParentSelected }
 				onPress={ onMediaPressed }
-				onLongPress={ openMediaOptions }
+				onLongPress={ openMediaOptionsRef.current }
 				disabled={ ! isParentSelected }
 			>
 				<View style={ [ styles.background, backgroundColor ] }>
 					{ getMediaOptions() }
-					{ isParentSelected && toolbarControls( openMediaOptions ) }
+					{ isParentSelected &&
+						backgroundType === VIDEO_BACKGROUND_TYPE &&
+						toolbarControls( openMediaOptionsRef.current ) }
 					<MediaUploadProgress
 						mediaId={ id }
 						onUpdateMediaProgress={ () => {
@@ -348,6 +369,39 @@ const Cover = ( {
 							setDidUploadFail( false );
 							setAttributes( { id: undefined, url: undefined } );
 						} }
+					/>
+
+					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+						<View style={ styles.imageContainer }>
+							<Image
+								editButton={ false }
+								focalPoint={
+									focalPoint || IMAGE_DEFAULT_FOCAL_POINT
+								}
+								isSelected={ isParentSelected }
+								isUploadFailed={ didUploadFail }
+								isUploadInProgress={ isUploadInProgress }
+								onSelectMediaUploadOption={ onSelectMedia }
+								openMediaOptions={ openMediaOptionsRef.current }
+								url={ url }
+							/>
+						</View>
+					) }
+
+					{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+					<Video
+						muted
+						disableFocus
+						repeat
+						resizeMode={ 'cover' }
+						source={ { uri: url } }
+						onLoad={ onVideoLoad }
+						onLoadStart={ onVideoLoadStart }
+						style={ [
+							styles.background,
+							// Hide Video component since it has black background while loading the source
+							{ opacity: isVideoLoading ? 0 : 1 },
+						] }
 					/>
 					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 						<ImageWithFocalPoint
@@ -392,7 +446,7 @@ const Cover = ( {
 	if ( ! hasBackground || isCustomColorPickerShowing ) {
 		return (
 			<View>
-				{ colorPickerControls }
+				{ isCustomColorPickerShowing && colorPickerControls }
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
 					backgroundColor={ customColor }
@@ -419,12 +473,7 @@ const Cover = ( {
 								styles.paletteVerticalSeparator
 							}
 							setColor={ setColor }
-							onCustomPress={ () => {
-								if ( isParentSelected ) {
-									openGeneralSidebar();
-									setCustomColorPickerShowing( true );
-								}
-							} }
+							onCustomPress={ openColorPicker }
 							defaultSettings={ coverDefaultPalette }
 							shouldShowCustomLabel={ false }
 							shouldShowCustomVerticalSeparator={ false }
@@ -439,6 +488,30 @@ const Cover = ( {
 		<View style={ styles.backgroundContainer }>
 			{ controls }
 
+			{ url &&
+				openMediaOptionsRef.current &&
+				isParentSelected &&
+				! isUploadInProgress &&
+				! didUploadFail && (
+					<View style={ styles.imageEditButton }>
+						<ImageEditingButton
+							onSelectMediaUploadOption={ onSelectMedia }
+							openMediaOptions={ openMediaOptionsRef.current }
+							pickerOptions={ [
+								{
+									destructiveButton: true,
+									id: 'clearMedia',
+									label: __( 'Clear Media' ),
+									onPress: onClearMedia,
+									separated: true,
+									value: 'clearMedia',
+								},
+							] }
+							url={ url }
+						/>
+					</View>
+				) }
+
 			<View
 				pointerEvents="box-none"
 				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
@@ -446,20 +519,25 @@ const Cover = ( {
 				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>
 
-			<View pointerEvents="none" style={ overlayStyles }>
-				{ gradientValue && (
-					<Gradient
-						gradientValue={ gradientValue }
-						style={ styles.background }
-					/>
-				) }
+			<View pointerEvents="none" style={ styles.overlayContainer }>
+				<View style={ overlayStyles }>
+					{ gradientValue && (
+						<Gradient
+							gradientValue={ gradientValue }
+							style={ styles.background }
+						/>
+					) }
+				</View>
 			</View>
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				isReplacingMedia={ ! hasOnlyColorBackground }
 				onSelect={ onSelectMedia }
-				render={ renderBackground }
+				render={ ( { open, getMediaOptions } ) => {
+					openMediaOptionsRef.current = open;
+					return renderBackground( getMediaOptions );
+				} }
 			/>
 
 			{ shouldShowFailure && (

@@ -330,7 +330,7 @@ describe( 'Navigation', () => {
 
 			await clickCreateButton();
 
-			// await page.waitFor( 50000000 );
+			await page.waitForSelector( '.wp-block-navigation__container' );
 
 			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
 			// block previews.
