@@ -16,7 +16,7 @@ import {
 import { __ } from '@wordpress/i18n';
 
 export default function SiteTaglineEdit( { attributes, setAttributes } ) {
-	const { align } = attributes;
+	const { textAlign } = attributes;
 	const [ siteTagline, setSiteTagline ] = useEntityProp(
 		'root',
 		'site',
@@ -28,16 +28,16 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 			<BlockControls>
 				<AlignmentToolbar
 					onChange={ ( newAlign ) =>
-						setAttributes( { align: newAlign } )
+						setAttributes( { textAlign: newAlign } )
 					}
-					value={ align }
+					value={ textAlign }
 				/>
 			</BlockControls>
 
 			<RichText
 				allowedFormats={ [] }
 				className={ classnames( {
-					[ `has-text-align-${ align }` ]: align,
+					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 				onChange={ setSiteTagline }
 				placeholder={ __( 'Site Tagline' ) }

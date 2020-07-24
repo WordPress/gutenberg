@@ -217,7 +217,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 				if ( primaryKeys.length ) {
 					const entity = getEntity( state, kind, name );
 					primaryKeys.forEach( ( primaryKey ) => {
-						const entityRecord = getEntityRecord(
+						const entityRecord = getEditedEntityRecord(
 							state,
 							kind,
 							name,

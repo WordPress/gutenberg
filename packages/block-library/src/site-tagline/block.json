@@ -2,7 +2,7 @@
 	"name": "core/site-tagline",
 	"category": "design",
 	"attributes": {
-		"align": {
+		"textAlign": {
 			"type": "string"
 		}
 	},

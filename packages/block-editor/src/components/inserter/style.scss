@@ -19,10 +19,6 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
-	.block-editor-inserter__search {
-		top: -$grid-unit-15;
-	}
-
 	.block-editor-inserter__tabs .components-tab-panel__tabs {
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
 	}
@@ -30,6 +26,10 @@ $block-inserter-tabs-height: 44px;
 	.block-editor-inserter__main-area {
 		overflow: visible;
 		height: auto;
+	}
+
+	.block-editor-inserter__preview-container {
+		display: none;
 	}
 }
 
@@ -158,7 +158,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__panel-content {
-	padding: 0 $grid-unit-20;
+	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__panel-title {
@@ -175,7 +175,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__popover .block-editor-block-types-list {
-	margin: 0 -8px;
+	margin: -8px;
 }
 
 .block-editor-inserter__reusable-blocks-panel {
@@ -281,12 +281,12 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__quick-inserter .block-editor-inserter__panel-content {
-	padding: 0 $grid-unit-10;
+	padding: $grid-unit-10;
 }
 
 .block-editor-inserter__quick-inserter.has-search .block-editor-inserter__panel-content,
 .block-editor-inserter__quick-inserter.has-expand .block-editor-inserter__panel-content {
-	padding: 0 $grid-unit-20;
+	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter-patterns {
@@ -310,7 +310,6 @@ $block-inserter-tabs-height: 44px;
 	width: 100%;
 	height: ($button-size + $grid-unit-10);
 	border-radius: 0;
-	margin-top: $grid-unit-20;
 
 	&:hover {
 		color: $white;
