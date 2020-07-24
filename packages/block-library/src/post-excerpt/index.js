@@ -15,7 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Excerpt' ),
-	description: __( 'Add the post excerpt of this post.' ),
+	description: __( "Display a post's excerpt." ),
 	icon,
 	edit,
 };
