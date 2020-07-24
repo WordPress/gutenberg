@@ -7,7 +7,7 @@ import { Text, View, StyleSheet } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { postList, globe, page } from '@wordpress/icons';
+import { globe } from '@wordpress/icons';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
@@ -22,13 +22,14 @@ import {
 	suggestionContainerStyle,
 	hidden,
 } from './link-suggestion-styles.scss';
+import { posts, pages, empty } from '../gridicons';
 
 const { compose } = StyleSheet;
 
 const icons = {
 	URL: globe,
-	post: postList,
-	page,
+	post: posts,
+	page: pages,
 };
 
 // we use some Cell styles here with a column flex-direction
@@ -58,7 +59,7 @@ function LinkSuggestionItemCell( {
 
 	return (
 		<Cell
-			icon={ icons[ type ] }
+			icon={ icons[ type ] || empty }
 			onPress={ pickLink }
 			separatorType={ 'none' }
 			cellContainerStyle={ itemContainerStyle }
