@@ -91,9 +91,13 @@ function ColorPicker( {
 		shouldDisableBottomSheetMaxHeight( false );
 		onCloseBottomSheet( () => {
 			setColor( savedColor );
-			onBottomSheetClosed && onBottomSheetClosed();
+			if ( onBottomSheetClosed ) {
+				onBottomSheetClosed();
+			}
 		} );
-		onHardwareButtonPress && onHardwareButtonPress( onButtonPress );
+		if ( onHardwareButtonPress ) {
+			onHardwareButtonPress( onButtonPress );
+		}
 	}, [] );
 
 	function onHuePickerChange( { hue: h } ) {
@@ -110,7 +114,9 @@ function ColorPicker( {
 		onCloseBottomSheet( null );
 		shouldDisableBottomSheetMaxHeight( true );
 		setColor( action === 'apply' ? currentColor : savedColor );
-		onBottomSheetClosed && onBottomSheetClosed();
+		if ( onBottomSheetClosed ) {
+			onBottomSheetClosed();
+		}
 	}
 
 	return (
