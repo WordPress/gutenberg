@@ -28,9 +28,9 @@ After activated, go to the block editor and use the inserter to search and add y
 
 The create a block tutorials breaks down to the following sections.
 
-1. [WordPress Plugin](/docs/designers-developers/developers/tutorials/create-block/wp-plugin.md)
-2. [Anatomy of a Gutenberg Block ](/docs/designers-developers/developers/tutorials/create-block/block-anatomy.md)
-3. [Block Attributes](/docs/designers-developers/developers/tutorials/create-block/block-attributes.md)
-4. [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/block-code.md)
-5. [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)
-6. [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/finishing.md)
+1. [WordPress Plugin](/docs/designers-developers/developers/tutorials/create-block/create-block-1-wp-plugin.md)
+2. [Anatomy of a Gutenberg Block ](/docs/designers-developers/developers/tutorials/create-block/create-block-2-block-anatomy.md)
+3. [Block Attributes](/docs/designers-developers/developers/tutorials/create-block/create-block-3-block-attributes.md)
+4. [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/create-block-4-block-code.md)
+5. [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/create-block-5-author-experience.md)
+6. [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/create-block-6-finishing.md)
