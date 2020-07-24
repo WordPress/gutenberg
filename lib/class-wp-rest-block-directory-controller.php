@@ -122,6 +122,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$block = array(
 			'name'                => $block_data['name'],
 			'title'               => ( $block_data['title'] ? $block_data['title'] : $plugin['name'] ),
+			'slug'                => $plugin['slug'],
 			'description'         => wp_trim_words( $plugin['description'], 30, '...' ),
 			'id'                  => $plugin['slug'],
 			'rating'              => $plugin['rating'] / 20,
@@ -132,6 +133,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			'author'              => wp_strip_all_tags( $plugin['author'] ),
 			'icon'                => ( isset( $plugin['icons']['1x'] ) ? $plugin['icons']['1x'] : 'block-default' ),
 			'assets'              => array(),
+			'translations'        => array(),
 			'last_updated'        => $plugin['last_updated'],
 			'humanized_updated'   => sprintf(
 				/* translators: %s: Human-readable time difference. */
@@ -141,17 +143,22 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		);
 
 		foreach ( $plugin['block_assets'] as $asset ) {
+			$asset_url = '';
 			// Allow for fully qualified URLs in future.
 			if ( 'https' === wp_parse_url( $asset, PHP_URL_SCHEME ) && ! empty( wp_parse_url( $asset, PHP_URL_HOST ) ) ) {
-				$block['assets'][] = esc_url_raw(
+				$asset_url = esc_url_raw(
 					$asset,
 					array( 'https' )
 				);
 			} else {
-				$block['assets'][] = esc_url_raw(
+				$asset_url = esc_url_raw(
 					add_query_arg( 'v', strtotime( $block['last_updated'] ), 'https://ps.w.org/' . $plugin['slug'] . $asset ),
 					array( 'https' )
 				);
+			}
+			$block['assets'][] = $asset_url;
+			if ( isset( $plugin['block_translations'][ $asset ] ) ) {
+				$block['translations'][ $asset_url ] = $plugin['block_translations'][ $asset ];
 			}
 		}
 
