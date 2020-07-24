@@ -27,6 +27,7 @@ function ColorPicker( {
 	onNavigationBack,
 	onCloseBottomSheet,
 	onBottomSheetClosed,
+	onHardwareButtonPress,
 	bottomLabelText,
 } ) {
 	const isIOS = Platform.OS === 'ios';
@@ -92,6 +93,7 @@ function ColorPicker( {
 			setColor( savedColor );
 			onBottomSheetClosed && onBottomSheetClosed();
 		} );
+		onHardwareButtonPress && onHardwareButtonPress( onButtonPress );
 	}, [] );
 
 	function onHuePickerChange( { hue: h } ) {

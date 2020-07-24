@@ -285,6 +285,7 @@ const Cover = ( {
 					shouldEnableBottomSheetScroll,
 					shouldDisableBottomSheetMaxHeight,
 					onCloseBottomSheet,
+					onHardwareButtonPress,
 					isBottomSheetContentScrolling,
 				} ) => (
 					<ColorPicker
@@ -300,10 +301,7 @@ const Cover = ( {
 						} }
 						onNavigationBack={ closeSettingsBottomSheet }
 						onCloseBottomSheet={ onCloseBottomSheet }
-						onHardwareButtonPress={ () => {
-							setCustomColorPickerShowing( false );
-							onCloseBottomSheet();
-						} }
+						onHardwareButtonPress={ onHardwareButtonPress }
 						onBottomSheetClosed={ () => {
 							setCustomColorPickerShowing( false );
 						} }
