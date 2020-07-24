@@ -131,8 +131,8 @@ const MOCK_BLOCKS_RESPONSES = [
 		onRequestMatch: createResponse(
 			'<html><head><script id="mock-block-js" src="https://fake_url.com/block.js"></script></head><body></body></html>',
 			'text/html; charset=UTF-8'
-		)
-	}
+		),
+	},
 ];
 
 function getResponseObject( obj, contentType ) {
@@ -190,7 +190,9 @@ describe( 'adding blocks from block directory', () => {
 		// Add the block
 		await addBtn.click();
 
-		await page.waitForSelector( '.is-root-container div[data-type="' + MOCK_BLOCK1.name + '"]' );
+		await page.waitForSelector(
+			'div[data-type="' + MOCK_BLOCK1.name + '"]'
+		);
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();
