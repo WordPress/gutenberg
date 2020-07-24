@@ -12,3 +12,12 @@ Blocks treat Paragraphs, Headings, Media, and Embeds all as components that, whe
 
 The Editor offers rich new value to users with visual, drag-and-drop creation tools and powerful developer enhancements with modern vendor packages, reusable components, rich APIs and hooks to modify and extend the editor through Custom Blocks, Custom Block Styles and Plugins.
 
+## Quick Links
+
+-   Beginners: The [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md) walks through creating a block plugin using the `@wordpress/create-block` package; a quick and easy way to start creating your own block.
+
+-   [Gutenberg Architecture](/docs/architecture/readme.md) covers the conceptual and tool choices going into the Gutenberg project, from repository structure to packages and tools.
+
+-   [Block API Reference](/docs/designers-developers/developers/block-api/README.md)
+
+-   [Contributors Guide](/docs/contributors/readme.md) covers how **you** can help; be it code, design, documentation, language, or triage, we need you to help make Gutenberg.

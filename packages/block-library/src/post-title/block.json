@@ -6,7 +6,7 @@
 		"postType"
 	],
 	"attributes": {
-		"align": {
+		"textAlign": {
 			"type": "string"
 		},
 		"level": {

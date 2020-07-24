@@ -15,8 +15,6 @@ jobs:
         ]
 
     steps:
-    - run: brew install watchman
-
     - name: checkout
       uses: actions/checkout@v2
 

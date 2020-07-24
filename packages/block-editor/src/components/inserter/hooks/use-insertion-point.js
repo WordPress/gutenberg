@@ -112,7 +112,7 @@ function useInsertionPoint( {
 			// translators: %d: the name of the block that has been added
 			const message = _n(
 				'%d block added.',
-				'%d blocks added',
+				'%d blocks added.',
 				blocks.length
 			);
 			speak( message );

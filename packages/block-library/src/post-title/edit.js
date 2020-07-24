@@ -25,7 +25,7 @@ export default function PostTitleEdit( {
 	setAttributes,
 	context,
 } ) {
-	const { level, align } = attributes;
+	const { level, textAlign } = attributes;
 	const { postType, postId } = context;
 	const tagName = 0 === level ? 'p' : 'h' + level;
 
@@ -55,16 +55,16 @@ export default function PostTitleEdit( {
 					/>
 				</ToolbarGroup>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>
 			<Block
 				tagName={ tagName }
 				className={ classnames( {
-					[ `has-text-align-${ align }` ]: align,
+					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
 				{ post.title || __( 'Post Title' ) }

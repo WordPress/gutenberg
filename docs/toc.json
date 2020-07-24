@@ -78,7 +78,8 @@
 			{ "docs/contributors/scripts.md": [] },
 			{ "docs/contributors/managing-packages.md": [] },
 			{ "docs/contributors/release.md": [] },
-			{ "docs/contributors/native-mobile.md": [] }
+			{ "docs/contributors/native-mobile.md": [] },
+			{ "docs/contributors/getting-started-native-mobile.md": [] }
 		] },
 		{ "docs/contributors/design.md": [
 			{ "docs/contributors/principles/the-block.md": [] },
@@ -102,6 +103,14 @@
 			{ "docs/designers-developers/developers/tutorials/javascript/scope-your-code.md": [] },
 			{ "docs/designers-developers/developers/tutorials/javascript/js-build-setup.md": [] },
 			{ "docs/designers-developers/developers/tutorials/javascript/esnext-js.md": [] }
+		] },
+		{ "docs/designers-developers/developers/tutorials/create-block/readme.md": [
+			{ "docs/designers-developers/developers/tutorials/create-block/wp-plugin.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/block-anatomy.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/block-attributes.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/block-code.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/author-experience.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/finishing.md": [] }
 		] },
 		{ "docs/designers-developers/developers/tutorials/block-tutorial/readme.md": [
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md": [] },
@@ -132,6 +141,9 @@
 			{ "docs/designers-developers/developers/tutorials/format-api/1-register-format.md": [] },
 			{ "docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md": [] },
 			{ "docs/designers-developers/developers/tutorials/format-api/3-apply-format.md": [] }
+		] },
+		{ "docs/designers-developers/developers/tutorials/block-based-themes/README.md": [
+			{ "docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md": [] }
 		] }
 	] },
 	{ "packages/components/README.md": "{{components}}" },
