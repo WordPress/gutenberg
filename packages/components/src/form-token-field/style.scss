@@ -14,6 +14,10 @@
 		border-color: $light-gray-700;
 	}
 
+	&.is-active {
+		@include input-style__focus();
+	}
+
 	// Token input
 	input[type="text"].components-form-token-field__input {
 		display: inline-block;
