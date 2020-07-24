@@ -34,6 +34,8 @@ function ColumnEdit( {
 	isParentSelected,
 	contentStyle,
 	columnCount,
+	columnWidths,
+	columnIndex,
 } ) {
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -77,6 +79,7 @@ function ColumnEdit( {
 							} );
 						} }
 						toFixed={ 1 }
+						columnsPreview={ { columnWidths, columnIndex } }
 					/>
 				</PanelBody>
 				<PanelBody>
@@ -128,6 +131,8 @@ export default compose( [
 			getBlockCount,
 			getBlockRootClientId,
 			getSelectedBlockClientId,
+			getBlocks,
+			getBlockOrder,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -138,6 +143,14 @@ export default compose( [
 
 		const columnCount = getBlockCount( parentId );
 
+		const blockOrder = getBlockOrder( parentId );
+
+		const columnIndex = blockOrder.indexOf( clientId );
+
+		const columnWidths = getBlocks( parentId ).map(
+			( block ) => block.attributes.width || 100 / columnCount
+		);
+
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
 
@@ -146,6 +159,8 @@ export default compose( [
 			isParentSelected,
 			isSelected,
 			columnCount,
+			columnWidths,
+			columnIndex,
 		};
 	} ),
 	withPreferredColorScheme,

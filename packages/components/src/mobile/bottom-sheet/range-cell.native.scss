@@ -31,3 +31,20 @@
 	flex-direction: column;
 	align-items: flex-start;
 }
+
+.columnsPreview {
+	min-height: 21px;
+	min-width: 38px;
+	border-color: $light-gray-400;
+	flex-direction: row;
+	margin-right: 10px;
+	border-width: $border-width;
+}
+
+.columnsPreviewDark {
+	border-color: $gray-70;
+}
+
+.columnIndicator {
+	background-color: $blue-wordpress;
+}

@@ -167,6 +167,7 @@ class BottomSheetRangeCell extends Component {
 				: '#909090',
 			thumbTintColor = Platform.OS === 'android' && '#00669b',
 			getStylesFromColorScheme,
+			columnsPreview,
 			...cellProps
 		} = this.props;
 
@@ -187,6 +188,11 @@ class BottomSheetRangeCell extends Component {
 			styles.sliderDarkTextInput
 		);
 
+		const columnsPreviewStyle = getStylesFromColorScheme(
+			styles.columnsPreview,
+			styles.columnsPreviewDark
+		);
+
 		return (
 			<Cell
 				{ ...cellProps }
@@ -205,6 +211,25 @@ class BottomSheetRangeCell extends Component {
 				}
 			>
 				<View style={ styles.container }>
+					{ columnsPreview && (
+						<View style={ columnsPreviewStyle }>
+							{ columnsPreview.columnWidths.map(
+								( columnWidth, index ) => {
+									return (
+										<View
+											style={ [
+												index ===
+													columnsPreview.columnIndex &&
+													styles.columnIndicator,
+												{ flex: columnWidth },
+											] }
+											key={ index }
+										></View>
+									);
+								}
+							) }
+						</View>
+					) }
 					<Slider
 						value={ this.validateInput( sliderValue ) }
 						defaultValue={ defaultValue }
