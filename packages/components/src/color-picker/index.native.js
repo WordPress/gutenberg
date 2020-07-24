@@ -105,11 +105,10 @@ function ColorPicker( {
 
 	function onButtonPress( action ) {
 		onNavigationBack();
-		onCloseBottomSheet(
-			() => onBottomSheetClosed && onBottomSheetClosed()
-		);
+		onCloseBottomSheet( null );
 		shouldDisableBottomSheetMaxHeight( true );
 		setColor( action === 'apply' ? currentColor : savedColor );
+		onBottomSheetClosed && onBottomSheetClosed();
 	}
 
 	return (

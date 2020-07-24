@@ -300,7 +300,10 @@ const Cover = ( {
 						} }
 						onNavigationBack={ closeSettingsBottomSheet }
 						onCloseBottomSheet={ onCloseBottomSheet }
-						onHardwareButtonPress={ onCloseBottomSheet }
+						onHardwareButtonPress={ () => {
+							setCustomColorPickerShowing( false );
+							onCloseBottomSheet();
+						} }
 						onBottomSheetClosed={ () => {
 							setCustomColorPickerShowing( false );
 						} }
