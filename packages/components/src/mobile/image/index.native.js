@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -15,11 +15,10 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { MediaEdit } from '../media-edit';
-import { getImageWithFocalPointStyles } from '../image-with-focalpoint';
+import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
-import SvgIconCustomize from './icon-customize';
+import ImageEditingButton from './image-editing-button';
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
@@ -27,35 +26,22 @@ const ICON_TYPE = {
 	UPLOAD: 'upload',
 };
 
-function editImageComponent( { open, mediaOptions } ) {
-	return (
-		<TouchableWithoutFeedback onPress={ open }>
-			<View style={ styles.editContainer }>
-				<View style={ styles.edit }>
-					{ mediaOptions() }
-					<Icon
-						size={ 16 }
-						icon={ SvgIconCustomize }
-						{ ...styles.iconCustomise }
-					/>
-				</View>
-			</View>
-		</TouchableWithoutFeedback>
-	);
-}
+export const IMAGE_DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
 const ImageComponent = ( {
 	align,
 	alt,
+	editButton = true,
+	focalPoint,
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
+	mediaPickerOptions,
 	onSelectMediaUploadOption,
 	openMediaOptions,
 	retryMessage,
 	url,
 	width: imageWidth,
-	focalPoint,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
@@ -110,10 +96,13 @@ const ImageComponent = ( {
 		styles.iconUploadDark
 	);
 
-	const placeholderStyles = usePreferredColorSchemeStyle(
-		styles.imageContainerUpload,
-		styles.imageContainerUploadDark
-	);
+	const placeholderStyles = [
+		usePreferredColorSchemeStyle(
+			styles.imageContainerUpload,
+			styles.imageContainerUploadDark
+		),
+		focalPoint && styles.imageContainerUploadWithFocalpoint,
+	];
 
 	const customWidth =
 		imageData?.width < containerSize?.width ? imageData?.width : '100%';
@@ -192,12 +181,14 @@ const ImageComponent = ( {
 							aspectRatio={ imageData?.aspectRatio }
 							style={ imageStyles }
 							source={ { uri: url } }
-							{ ...( ! focalPoint && { resizeMethod: 'scale' } ) }
+							{ ...( ! focalPoint && {
+								resizeMethod: 'scale',
+							} ) }
 						/>
 					</View>
 				) }
 
-				{ isUploadFailed && (
+				{ isUploadFailed && retryMessage && (
 					<View
 						style={ [
 							styles.imageContainer,
@@ -212,15 +203,19 @@ const ImageComponent = ( {
 						</Text>
 					</View>
 				) }
-				{ isSelected &&
+
+				{ editButton &&
+					isSelected &&
+					imageData &&
 					! isUploadInProgress &&
-					! isUploadFailed &&
-					( imageData || focalPoint ) && (
-						<MediaEdit
-							onSelect={ onSelectMediaUploadOption }
-							source={ { uri: url } }
-							openReplaceMediaOptions={ openMediaOptions }
-							render={ editImageComponent }
+					! isUploadFailed && (
+						<ImageEditingButton
+							onSelectMediaUploadOption={
+								onSelectMediaUploadOption
+							}
+							openMediaOptions={ openMediaOptions }
+							url={ url }
+							pickerOptions={ mediaPickerOptions }
 						/>
 					) }
 			</View>
