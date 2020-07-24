@@ -331,7 +331,7 @@ const Cover = ( {
 	);
 
 	const renderBackground = ( getMediaOptions ) => (
-		</>
+		<>
 			<TouchableWithoutFeedback
 				accessible={ ! isParentSelected }
 				onPress={ onMediaPressed }
