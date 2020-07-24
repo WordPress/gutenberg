@@ -1,12 +1,9 @@
 .wp-block-post-excerpt {
-
 	.wp-block-post-excerpt__excerpt.is-inline {
 		display: inline-block;
 	}
-
-
 }
 
-.wp-block[data-type="core/post-excerpt"].has-link-color .wp-block-post-excerpt a {
+.block-editor-block-list__block[data-type="core/post-excerpt"].has-link-color .wp-block-post-excerpt a {
 	color: var(--wp--style--color--link);
 }
