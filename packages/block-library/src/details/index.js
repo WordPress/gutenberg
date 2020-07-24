@@ -10,7 +10,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 
-const { name, category } = metadata;
+const { name, category, attributes } = metadata;
 
 export { metadata, name };
 
@@ -19,5 +19,6 @@ export const settings = {
 	category,
 	edit,
 	save,
-	keywords: [ __( 'accordion' ) ]
+	keywords: [ __( 'accordion' ) ],
+	attributes,
 };

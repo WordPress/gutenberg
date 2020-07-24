@@ -1,4 +1,13 @@
 {
 	"name": "core/details",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"open": {
+			"type": "boolean",
+			"defalut": false
+		},
+		"content": {
+			"type": "string"
+		}
+	}
 }
