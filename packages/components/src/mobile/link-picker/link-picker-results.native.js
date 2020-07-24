@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { FlatList } from 'react-native';
+import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,7 +11,9 @@ import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
-const perPage = 20;
+const PER_PAGE = 20;
+const REQUEST_DEBOUNCE_DELAY = 400;
+const MINIMUM_QUERY_SIZE = 2;
 
 export default function LinkPickerResults( {
 	query,
@@ -23,39 +26,47 @@ export default function LinkPickerResults( {
 	const pendingRequest = useRef();
 	const clearRequest = () => ( pendingRequest.current = null );
 
-	const { fetchLinkSuggestions } = useSelect( ( select ) => {
+	// a stable debounced function to fetch suggestions and append
+	const { fetchMoreSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		return {
-			fetchLinkSuggestions: async ( { query: search } ) =>
-				await getSettings().__experimentalFetchLinkSuggestions(
+		const fetchLinkSuggestions = async ( { search } ) => {
+			if ( MINIMUM_QUERY_SIZE <= search.length ) {
+				return await getSettings().__experimentalFetchLinkSuggestions(
 					search,
-					{ page: nextPage.current, perPage }
-				),
+					{ page: nextPage.current, PER_PAGE }
+				);
+			}
+		};
+		const fetchMore = async ( {
+			query: search,
+			links: currentSuggestions,
+		} ) => {
+			// return early if we've already detected the end of data or we are
+			// already awaiting a response
+			if ( pendingRequest.current || hasAllSuggestions.current ) {
+				return;
+			}
+			const request = fetchLinkSuggestions( { search } );
+			pendingRequest.current = request;
+			const suggestions = await request;
+
+			// only update links for the most recent request
+			if ( suggestions && request === pendingRequest.current ) {
+				// since we don't have the response header, we check if the results
+				// are truncated to determine we've reached the end
+				if ( suggestions.length < PER_PAGE ) {
+					hasAllSuggestions.current = true;
+				}
+				setLinks( [ ...currentSuggestions, ...suggestions ] );
+				nextPage.current++;
+			}
+
+			clearRequest();
+		};
+		return {
+			fetchMoreSuggestions: debounce( fetchMore, REQUEST_DEBOUNCE_DELAY ),
 		};
 	}, [] );
-
-	const fetchMoreSuggestions = async ( { currentSuggestions = links } ) => {
-		// return early if we've already detected the end of data
-		if ( pendingRequest.current || hasAllSuggestions.current ) {
-			return;
-		}
-		const request = fetchLinkSuggestions( { query } );
-		pendingRequest.current = request;
-		const suggestions = await request;
-
-		// only update links for the most recent request
-		if ( request === pendingRequest.current ) {
-			// since we don't have the response header, we check if the results
-			// are truncated to determine we've reached the end
-			if ( suggestions.length < perPage ) {
-				hasAllSuggestions.current = true;
-			}
-			setLinks( [ ...currentSuggestions, ...suggestions ] );
-			nextPage.current++;
-		}
-
-		clearRequest();
-	};
 
 	// prevent setting state when unmounted
 	useEffect( () => clearRequest, [] );
@@ -66,8 +77,10 @@ export default function LinkPickerResults( {
 		nextPage.current = 1;
 		hasAllSuggestions.current = false;
 		setLinks( [ directEntry ] );
-		fetchMoreSuggestions( { currentSuggestions: [ directEntry ] } );
+		fetchMoreSuggestions( { query, links: [ directEntry ] } );
 	}, [ query ] );
+
+	const onEndReached = () => fetchMoreSuggestions( { query, links } );
 
 	return (
 		<BottomSheetConsumer>
@@ -82,9 +95,9 @@ export default function LinkPickerResults( {
 						/>
 					) }
 					keyExtractor={ ( { url, type } ) => `${ url }-${ type }` }
-					onEndReached={ fetchMoreSuggestions }
+					onEndReached={ onEndReached }
 					onEndReachedThreshold={ 0.1 }
-					initialNumToRender={ perPage }
+					initialNumToRender={ PER_PAGE }
 					{ ...listProps }
 				/>
 			) }
