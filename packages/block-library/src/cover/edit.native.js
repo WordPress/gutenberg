@@ -431,9 +431,6 @@ const Cover = ( {
 							customIndicatorWrapperStyles={
 								styles.paletteCustomIndicatorWrapper
 							}
-							customVerticalSeparatorStyles={
-								styles.paletteVerticalSeparator
-							}
 							setColor={ setColor }
 							onCustomPress={ openColorPicker }
 							defaultSettings={ coverDefaultPalette }
