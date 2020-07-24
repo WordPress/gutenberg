@@ -3,7 +3,6 @@
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
 import Video from 'react-native-video';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +26,8 @@ import {
 	ToolbarGroup,
 	Gradient,
 	ColorPalette,
+	ColorPicker,
+	BottomSheetConsumer,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -81,6 +82,7 @@ const Cover = ( {
 	onFocus,
 	overlayColor,
 	setAttributes,
+	openGeneralSidebar,
 	settings,
 	closeSettingsBottomSheet,
 } ) => {
@@ -111,6 +113,13 @@ const Cover = ( {
 		overlayColor.color ||
 		gradientValue
 	);
+
+	const [
+		isCustomColorPickerShowing,
+		setCustomColorPickerShowing,
+	] = useState( false );
+
+	const [ customColor, setCustomColor ] = useState( '' );
 
 	const openMediaOptionsRef = useRef();
 
@@ -189,6 +198,13 @@ const Cover = ( {
 			gradient: undefined,
 			customGradient: undefined,
 		} );
+	}
+
+	function openColorPicker() {
+		if ( isParentSelected ) {
+			openGeneralSidebar();
+			setCustomColorPickerShowing( true );
+		}
 	}
 
 	const backgroundColor = getStylesFromColorScheme(
@@ -277,6 +293,43 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
+	const colorPickerControls = (
+		<InspectorControls>
+			<BottomSheetConsumer>
+				{ ( {
+					shouldEnableBottomSheetScroll,
+					shouldDisableBottomSheetMaxHeight,
+					onCloseBottomSheet,
+					onHardwareButtonPress,
+					isBottomSheetContentScrolling,
+				} ) => (
+					<ColorPicker
+						shouldEnableBottomSheetScroll={
+							shouldEnableBottomSheetScroll
+						}
+						shouldDisableBottomSheetMaxHeight={
+							shouldDisableBottomSheetMaxHeight
+						}
+						setColor={ ( color ) => {
+							setCustomColor( color );
+							setColor( color );
+						} }
+						onNavigationBack={ closeSettingsBottomSheet }
+						onCloseBottomSheet={ onCloseBottomSheet }
+						onHardwareButtonPress={ onHardwareButtonPress }
+						onBottomSheetClosed={ () => {
+							setCustomColorPickerShowing( false );
+						} }
+						isBottomSheetContentScrolling={
+							isBottomSheetContentScrolling
+						}
+						bottomLabelText={ __( 'Select a color' ) }
+					/>
+				) }
+			</BottomSheetConsumer>
+		</InspectorControls>
+	);
+
 	const renderBackground = ( getMediaOptions ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
@@ -354,11 +407,16 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
-	if ( ! hasBackground ) {
+	if ( ! hasBackground || isCustomColorPickerShowing ) {
 		return (
 			<View>
+				{ isCustomColorPickerShowing && colorPickerControls }
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
+					backgroundColor={ customColor }
+					hideContent={
+						customColor !== '' && customColor !== undefined
+					}
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -372,11 +430,14 @@ const Cover = ( {
 							customColorIndicatorStyles={
 								styles.paletteColorIndicator
 							}
+							customIndicatorWrapperStyles={
+								styles.paletteCustomIndicatorWrapper
+							}
 							setColor={ setColor }
-							onCustomPress={ noop }
+							onCustomPress={ openColorPicker }
 							defaultSettings={ coverDefaultPalette }
-							shouldShowCustomIndicatorOption={ false }
 							shouldShowCustomLabel={ false }
+							shouldShowCustomVerticalSeparator={ false }
 						/>
 					</View>
 				</MediaPlaceholder>
@@ -473,12 +534,14 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+
 		return {
+			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			closeSettingsBottomSheet() {
 				dispatch( 'core/edit-post' ).closeGeneralSidebar();
 			},
 		};
 	} ),
-
 	withPreferredColorScheme,
 ] )( Cover );
