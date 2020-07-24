@@ -86,11 +86,14 @@ if ( ! class_exists( 'WP_Block_List' ) ) {
 require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/utils.php';
 
+if ( gutenberg_is_experiment_enabled( 'full-site-editing' ) ) {
+	require dirname( __FILE__ ) . '/templates.php';
+	require dirname( __FILE__ ) . '/template-parts.php';
+	require dirname( __FILE__ ) . '/template-loader.php';
+}
+
 require dirname( __FILE__ ) . '/block-patterns.php';
 require dirname( __FILE__ ) . '/blocks.php';
-require dirname( __FILE__ ) . '/templates.php';
-require dirname( __FILE__ ) . '/template-parts.php';
-require dirname( __FILE__ ) . '/template-loader.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/block-directory.php';
 require dirname( __FILE__ ) . '/demo.php';
