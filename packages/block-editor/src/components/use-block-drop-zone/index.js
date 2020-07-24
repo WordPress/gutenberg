@@ -290,11 +290,13 @@ export default function useBlockDropZone( {
 				( sourceRootClientId === '' &&
 					targetRootClientId === undefined );
 
+			const draggedBlockCount = sourceClientIds.length;
+
 			// If the block is kept at the same level and moved downwards,
 			// subtract to account for blocks shifting upward to occupy its old position.
 			const insertIndex =
 				isAtSameLevel && sourceBlockIndex < targetBlockIndex
-					? targetBlockIndex - 1
+					? targetBlockIndex - draggedBlockCount
 					: targetBlockIndex;
 
 			moveBlocksToPosition(
