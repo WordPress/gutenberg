@@ -86,10 +86,13 @@ if ( ! class_exists( 'WP_Block_List' ) ) {
 require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/utils.php';
 
+// Include FSE related files only if the experiment is enabled.
 if ( gutenberg_is_experiment_enabled( 'full-site-editing' ) ) {
 	require dirname( __FILE__ ) . '/templates.php';
 	require dirname( __FILE__ ) . '/template-parts.php';
 	require dirname( __FILE__ ) . '/template-loader.php';
+	require dirname( __FILE__ ) . '/edit-site-page.php';
+	require dirname( __FILE__ ) . '/edit-site-export.php';
 }
 
 require dirname( __FILE__ ) . '/block-patterns.php';
@@ -102,8 +105,7 @@ require dirname( __FILE__ ) . '/widgets-page.php';
 require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
-require dirname( __FILE__ ) . '/edit-site-page.php';
-require dirname( __FILE__ ) . '/edit-site-export.php';
+require dirname( __FILE__ ) . '/editor-features.php';
 require dirname( __FILE__ ) . '/global-styles.php';
 require dirname( __FILE__ ) . '/block-supports/index.php';
 require dirname( __FILE__ ) . '/block-supports/align.php';
