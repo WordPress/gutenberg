@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { capitalize } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -24,7 +19,7 @@ const createButtonLabel = 'Create Table';
  */
 async function changeCellAlignment( align ) {
 	await clickBlockToolbarButton( 'Change column alignment' );
-	await clickButton( `Align column ${align}` );
+	await clickButton( `Align column ${align.toLowerCase()}` );
 }
 
 describe( 'Table', () => {
