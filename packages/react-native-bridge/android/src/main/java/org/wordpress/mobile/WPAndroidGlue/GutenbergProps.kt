@@ -2,7 +2,7 @@ package org.wordpress.mobile.WPAndroidGlue
 
 import android.os.Bundle
 
-data class GutenbergProps(
+data class GutenbergProps @JvmOverloads constructor(
     val enableMentions: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
     val localeSlug: String,
@@ -11,7 +11,7 @@ data class GutenbergProps(
     val translations: Bundle,
     val isDarkMode: Boolean,
     val htmlModeEnabled: Boolean,
-    val isModalLayoutPickerEnabled: Boolean
+    val isModalLayoutPickerEnabled: Boolean = false
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
