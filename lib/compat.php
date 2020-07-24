@@ -656,3 +656,42 @@ function gutenberg_preload_edit_post( $preload_paths ) {
 }
 
 add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );
+
+/**
+ * Override post type labels for Reusable Block custom post type.
+ *
+ * This shim can be removed when the Gutenberg plugin requires a WordPress
+ * version that has the ticket below.
+ *
+ * @see TODO: Add Trac Link.
+ *
+ * @since 8.6.0
+ *
+ * @return array Array of new labels for Reusable Block post type.
+ */
+function gutenberg_override_reusable_block_post_type_labels() {
+	return array(
+		'name'                     => _x( 'Reusable Blocks', 'post type general name' ),
+		'singular_name'            => _x( 'Reusable Block', 'post type singular name' ),
+		'menu_name'                => _x( 'Reusable Blocks', 'admin menu' ),
+		'name_admin_bar'           => _x( 'Reusable Block', 'add new on admin bar' ),
+		'add_new'                  => _x( 'Add New', 'Block' ),
+		'add_new_item'             => __( 'Add New Reusable Block' ),
+		'new_item'                 => __( 'New Reusable Block' ),
+		'edit_item'                => __( 'Edit Reusable Block' ),
+		'view_item'                => __( 'View Reusable Block' ),
+		'all_items'                => __( 'All Reusable Blocks' ),
+		'search_items'             => __( 'Search Reusable Blocks' ),
+		'not_found'                => __( 'No reusable blocks found.' ),
+		'not_found_in_trash'       => __( 'No reusable blocks found in Trash.' ),
+		'filter_items_list'        => __( 'Filter reusable blocks list' ),
+		'items_list_navigation'    => __( 'Reusable Blocks list navigation' ),
+		'items_list'               => __( 'Reusable Blocks list' ),
+		'item_published'           => __( 'Reusable Block published.' ),
+		'item_published_privately' => __( 'Reusable Block published privately.' ),
+		'item_reverted_to_draft'   => __( 'Reusable Block reverted to draft.' ),
+		'item_scheduled'           => __( 'Reusable Block scheduled.' ),
+		'item_updated'             => __( 'Reusable Block updated.' ),
+	);
+}
+add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
