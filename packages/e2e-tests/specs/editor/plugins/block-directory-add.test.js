@@ -185,7 +185,7 @@ describe( 'adding blocks from block directory', () => {
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-    } );
+	} );
 
 	it( 'Should not see Block Directory results after install', async () => {
 		// Setup our mocks
@@ -208,6 +208,5 @@ describe( 'adding blocks from block directory', () => {
 		);
 
 		expect( hiddenBtn ).toBeNull();
-
 	} );
 } );
