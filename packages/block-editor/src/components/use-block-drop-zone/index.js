@@ -293,7 +293,8 @@ export default function useBlockDropZone( {
 			const draggedBlockCount = sourceClientIds.length;
 
 			// If the block is kept at the same level and moved downwards,
-			// subtract to account for blocks shifting upward to occupy its old position.
+			// subtract to take into account that the blocks being dragged
+			// were removed from the block list.
 			const insertIndex =
 				isAtSameLevel && sourceBlockIndex < targetBlockIndex
 					? targetBlockIndex - draggedBlockCount
