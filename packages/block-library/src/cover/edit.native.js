@@ -10,12 +10,15 @@ import Video from 'react-native-video';
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
 	mediaUploadSync,
 } from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import {
 	Icon,
-	ImageWithFocalPoint,
+	Image,
+	ImageEditingButton,
+	IMAGE_DEFAULT_FOCAL_POINT,
 	PanelBody,
 	RangeControl,
 	BottomSheet,
@@ -40,7 +43,7 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
@@ -117,6 +120,8 @@ const Cover = ( {
 
 	const [ customColor, setCustomColor ] = useState( '' );
 
+	const openMediaOptionsRef = useRef();
+
 	// Used to set a default color for its InnerBlocks
 	// since there's no system to inherit styles yet
 	// the RichText component will check if there are
@@ -164,6 +169,8 @@ const Cover = ( {
 			requestImageUploadCancelDialog( id );
 		} else if ( shouldShowFailure ) {
 			requestImageFailedRetryDialog( id );
+		} else if ( backgroundType === MEDIA_TYPE_IMAGE && url ) {
+			requestImageFullscreenPreview( url );
 		}
 	};
 
@@ -175,6 +182,11 @@ const Cover = ( {
 
 	const onVideoLoad = () => {
 		setIsVideoLoading( false );
+	};
+
+	const onClearMedia = () => {
+		setAttributes( { id: undefined, url: undefined } );
+		closeSettingsBottomSheet();
 	};
 
 	function setColor( color ) {
@@ -211,6 +223,10 @@ const Cover = ( {
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url ? backgroundColor : {},
+		isParentSelected &&
+			! isUploadInProgress &&
+			! didUploadFail &&
+			styles.overlaySelected,
 	];
 
 	const placeholderIconStyle = getStylesFromColorScheme(
@@ -268,10 +284,7 @@ const Cover = ( {
 						leftAlign
 						label={ __( 'Clear Media' ) }
 						labelStyle={ styles.clearMediaButton }
-						onPress={ () => {
-							setAttributes( { id: undefined, url: undefined } );
-							closeSettingsBottomSheet();
-						} }
+						onPress={ onClearMedia }
 					/>
 				</PanelBody>
 			) : null }
@@ -315,19 +328,18 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
-	const renderBackground = ( {
-		open: openMediaOptions,
-		getMediaOptions,
-	} ) => (
+	const renderBackground = ( getMediaOptions ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
 			onPress={ onMediaPressed }
-			onLongPress={ openMediaOptions }
+			onLongPress={ openMediaOptionsRef.current }
 			disabled={ ! isParentSelected }
 		>
 			<View style={ [ styles.background, backgroundColor ] }>
 				{ getMediaOptions() }
-				{ isParentSelected && toolbarControls( openMediaOptions ) }
+				{ isParentSelected &&
+					backgroundType === VIDEO_BACKGROUND_TYPE &&
+					toolbarControls( openMediaOptionsRef.current ) }
 				<MediaUploadProgress
 					mediaId={ id }
 					onUpdateMediaProgress={ () => {
@@ -355,12 +367,24 @@ const Cover = ( {
 						setAttributes( { id: undefined, url: undefined } );
 					} }
 				/>
+
 				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-					<ImageWithFocalPoint
-						focalPoint={ focalPoint }
-						url={ url }
-					/>
+					<View style={ styles.imageContainer }>
+						<Image
+							editButton={ false }
+							focalPoint={
+								focalPoint || IMAGE_DEFAULT_FOCAL_POINT
+							}
+							isSelected={ isParentSelected }
+							isUploadFailed={ didUploadFail }
+							isUploadInProgress={ isUploadInProgress }
+							onSelectMediaUploadOption={ onSelectMedia }
+							openMediaOptions={ openMediaOptionsRef.current }
+							url={ url }
+						/>
+					</View>
 				) }
+
 				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
 					<Video
 						muted
@@ -426,6 +450,30 @@ const Cover = ( {
 		<View style={ styles.backgroundContainer }>
 			{ controls }
 
+			{ url &&
+				openMediaOptionsRef.current &&
+				isParentSelected &&
+				! isUploadInProgress &&
+				! didUploadFail && (
+					<View style={ styles.imageEditButton }>
+						<ImageEditingButton
+							onSelectMediaUploadOption={ onSelectMedia }
+							openMediaOptions={ openMediaOptionsRef.current }
+							pickerOptions={ [
+								{
+									destructiveButton: true,
+									id: 'clearMedia',
+									label: __( 'Clear Media' ),
+									onPress: onClearMedia,
+									separated: true,
+									value: 'clearMedia',
+								},
+							] }
+							url={ url }
+						/>
+					</View>
+				) }
+
 			<View
 				pointerEvents="box-none"
 				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
@@ -433,20 +481,25 @@ const Cover = ( {
 				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>
 
-			<View pointerEvents="none" style={ overlayStyles }>
-				{ gradientValue && (
-					<Gradient
-						gradientValue={ gradientValue }
-						style={ styles.background }
-					/>
-				) }
+			<View pointerEvents="none" style={ styles.overlayContainer }>
+				<View style={ overlayStyles }>
+					{ gradientValue && (
+						<Gradient
+							gradientValue={ gradientValue }
+							style={ styles.background }
+						/>
+					) }
+				</View>
 			</View>
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				isReplacingMedia={ true }
 				onSelect={ onSelectMedia }
-				render={ renderBackground }
+				render={ ( { open, getMediaOptions } ) => {
+					openMediaOptionsRef.current = open;
+					return renderBackground( getMediaOptions );
+				} }
 			/>
 
 			{ shouldShowFailure && (
