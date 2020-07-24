@@ -663,7 +663,7 @@ add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see TODO: Add Trac Link.
+ * @see https://core.trac.wordpress.org/ticket/50755
  *
  * @since 8.6.0
  *
