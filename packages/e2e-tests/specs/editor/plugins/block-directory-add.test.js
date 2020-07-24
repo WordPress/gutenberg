@@ -188,9 +188,7 @@ describe( 'adding blocks from block directory', () => {
 		// Add the block
 		await addBtn.click();
 
-		await page.waitForSelector(
-			`div[data-type="${ MOCK_BLOCK1.name }"]`
-		);
+		await page.waitForSelector( `div[data-type="${ MOCK_BLOCK1.name }"]` );
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();
