@@ -60,7 +60,7 @@ describe( 'deleteEntityRecord', () => {
 			'DELETE_ENTITY_RECORD_FINISH'
 		);
 
-		expect( fulfillment.next().value ).not.toBe( false );
+		expect( fulfillment.next() ).toMatchObject( {"done": true, "value": undefined} );
 	} );
 } );
 

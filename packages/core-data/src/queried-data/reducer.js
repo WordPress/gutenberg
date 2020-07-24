@@ -160,7 +160,7 @@ const queries = ( state = {}, action ) => {
 			}, {} );
 			forEach( newState, ( queryItems, key ) => {
 				newState[ key ] = filter( queryItems, ( queryId ) => {
-					return !! removedItems[ queryId ] === false;
+					return ! removedItems[ queryId ];
 				} );
 			} );
 			return newState;
