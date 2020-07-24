@@ -97,6 +97,7 @@ const Cover = ( {
 		customOverlayColor,
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
 	const coverDefaultPalette = {
@@ -171,7 +172,7 @@ const Cover = ( {
 			requestImageUploadCancelDialog( id );
 		} else if ( shouldShowFailure ) {
 			requestImageFailedRetryDialog( id );
-		} else if ( backgroundType === MEDIA_TYPE_IMAGE && url ) {
+		} else if ( isImage && url ) {
 			requestImageFullscreenPreview( url );
 		}
 	};
@@ -225,7 +226,8 @@ const Cover = ( {
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url ? backgroundColor : {},
-		isParentSelected &&
+		isImage &&
+			isParentSelected &&
 			! isUploadInProgress &&
 			! didUploadFail &&
 			styles.overlaySelected,
@@ -469,9 +471,6 @@ const Cover = ( {
 							customIndicatorWrapperStyles={
 								styles.paletteCustomIndicatorWrapper
 							}
-							customVerticalSeparatorStyles={
-								styles.paletteVerticalSeparator
-							}
 							setColor={ setColor }
 							onCustomPress={ openColorPicker }
 							defaultSettings={ coverDefaultPalette }
@@ -488,7 +487,8 @@ const Cover = ( {
 		<View style={ styles.backgroundContainer }>
 			{ controls }
 
-			{ url &&
+			{ isImage &&
+				url &&
 				openMediaOptionsRef.current &&
 				isParentSelected &&
 				! isUploadInProgress &&
