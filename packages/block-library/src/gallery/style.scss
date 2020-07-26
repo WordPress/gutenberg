@@ -1,12 +1,12 @@
-.wp-block-gallery,
-.blocks-gallery-grid,
-.block-editor-block-list__layout {
-	display: flex;
-	flex-wrap: wrap;
-	list-style-type: none;
-	padding: 0;
-	// Some themes give all <ul> default margin instead of padding.
-	margin: 0;
+.wp-block-gallery {
+	.block-editor-block-list__layout {
+		display: flex;
+		flex-wrap: wrap;
+		list-style-type: none;
+		padding: 0;
+		// Some themes give all <ul> default margin instead of padding.
+		margin: 0;
+	}
 
 	.wp-block-image {
 		// Add space between thumbnails, and unset right most thumbnails later.
@@ -49,7 +49,7 @@
 
 		figcaption {
 			position: absolute;
-			margin-bottom: 0px;
+			margin-bottom: 0;
 			bottom: 0;
 			width: 100%;
 			max-height: 100%;
@@ -72,8 +72,6 @@
 	}
 
 	// Cropped
-	&.is-cropped .blocks-gallery-image,
-	&.is-cropped .blocks-gallery-item,
 	&.is-cropped .wp-block-image {
 		a,
 		img {
@@ -91,8 +89,6 @@
 	}
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-	& .blocks-gallery-image,
-	& .blocks-gallery-item,
 	& .wp-block-image {
 		width: calc( 50% - #{$grid-unit-20} );
 
@@ -101,8 +97,6 @@
 		}
 	}
 
-	&.columns-1 .blocks-gallery-image,
-	&.columns-1 .blocks-gallery-item,
 	&.columns-1 .wp-block-image {
 		width: 100%;
 		margin-right: 0;
@@ -111,8 +105,6 @@
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
-			&.columns-#{ $i } .blocks-gallery-image,
-			&.columns-#{ $i } .blocks-gallery-item,
 			&.columns-#{ $i } .wp-block-image {
 				width: calc(
 					#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i}
@@ -126,14 +118,6 @@
 			&.columns-#{
 				$column-count
 				}
-				.blocks-gallery-image:nth-of-type( #{ $column-count }n ),
-			&.columns-#{
-				$column-count
-				}
-				.blocks-gallery-item:nth-of-type( #{ $column-count }n ),
-			&.columns-#{
-				$column-count
-				}
 				.wp-block-image:nth-of-type( #{ $column-count }n ) {
 				margin-right: 0;
 			}
@@ -141,8 +125,6 @@
 	}
 
 	// Last item always needs margins reset.
-	.blocks-gallery-image:last-child,
-	.blocks-gallery-item:last-child,
 	.wp-block-image:last-child {
 		margin-right: 0;
 	}
@@ -156,7 +138,7 @@
 
 	// If the gallery is centered, center the content inside as well.
 	&.aligncenter {
-		.blocks-gallery-item figure {
+		figure.wp-block-image {
 			justify-content: center;
 		}
 	}
