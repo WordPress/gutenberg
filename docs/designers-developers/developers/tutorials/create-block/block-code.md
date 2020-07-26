@@ -41,7 +41,7 @@ Note: the block classname is prefixed with `wp-block`. The `create-block/gutenpr
 }
 ```
 
-After updating, reload the post and refresh the brwoser. If you are using a browser that supports color fonts (Firefox) then you will see it styled.
+After updating, reload the post and refresh the browser. If you are using a browser that supports color fonts (Firefox) then you will see it styled.
 
 ## Use Sass for Style (optional)
 
