@@ -109,7 +109,7 @@ class BottomSheetRangeCell extends Component {
 			return Math.min( Math.max( text, minimumValue ), maximumValue );
 		}
 		return Math.min(
-			Math.max( text.replace( /[^0-9.]\,/g, '' ), minimumValue ),
+			Math.max( text.replace( /[^0-9.]/g, '' ), minimumValue ),
 			maximumValue
 		);
 	}
@@ -214,11 +214,13 @@ class BottomSheetRangeCell extends Component {
 						<View style={ columnsPreviewStyle }>
 							{ columnsPreview.columnWidths.map(
 								( columnWidth, index ) => {
+									const isSelected =
+										index ===
+										columnsPreview.selectedColumnIndex;
 									return (
 										<View
 											style={ [
-												index ===
-													columnsPreview.columnIndex &&
+												isSelected &&
 													styles.columnIndicator,
 												{ flex: columnWidth },
 											] }

@@ -34,7 +34,6 @@ class MenuItem extends Component {
 			item,
 			itemWidth,
 			maxWidth,
-			style,
 		} = this.props;
 
 		const modalIconWrapperStyle = getStylesFromColorScheme(
@@ -65,9 +64,7 @@ class MenuItem extends Component {
 				accessibilityLabel={ item.title }
 				onPress={ this.onPress }
 			>
-				<View
-					style={ [ styles.modalItem, style, { width: maxWidth } ] }
-				>
+				<View style={ [ styles.modalItem, { width: maxWidth } ] }>
 					<View
 						style={ [
 							modalIconWrapperStyle,

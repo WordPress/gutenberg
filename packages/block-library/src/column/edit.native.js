@@ -24,9 +24,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import styles from './editor.scss';
+import { getEffectiveColumnWidth } from '../columns/utils';
 
 function ColumnEdit( {
-	attributes: { verticalAlignment, width },
+	attributes,
 	setAttributes,
 	hasChildren,
 	isSelected,
@@ -34,11 +35,19 @@ function ColumnEdit( {
 	isParentSelected,
 	contentStyle,
 	columnCount,
-	columnWidths,
-	columnIndex,
+	columnsPreview,
+	block,
 } ) {
+	const { verticalAlignment } = attributes;
+
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
+	};
+
+	const onWidthChange = ( width ) => {
+		setAttributes( {
+			width,
+		} );
 	};
 
 	if ( ! isSelected && ! hasChildren ) {
@@ -72,14 +81,10 @@ function ColumnEdit( {
 						min={ 1 }
 						max={ 100 }
 						step={ 0.1 }
-						value={ width || 100 / columnCount }
-						onChange={ ( nextWidth ) => {
-							setAttributes( {
-								width: nextWidth,
-							} );
-						} }
+						value={ getEffectiveColumnWidth( block, columnCount ) }
+						onChange={ onWidthChange }
 						toFixed={ 1 }
-						columnsPreview={ { columnWidths, columnIndex } }
+						columnsPreview={ columnsPreview }
 					/>
 				</PanelBody>
 				<PanelBody>
@@ -133,6 +138,7 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlocks,
 			getBlockOrder,
+			getBlock,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -140,27 +146,26 @@ export default compose( [
 
 		const parentId = getBlockRootClientId( clientId );
 		const hasChildren = !! getBlockCount( clientId );
-
-		const columnCount = getBlockCount( parentId );
-
-		const blockOrder = getBlockOrder( parentId );
-
-		const columnIndex = blockOrder.indexOf( clientId );
-
-		const columnWidths = getBlocks( parentId ).map(
-			( block ) => block.attributes.width || 100 / columnCount
-		);
-
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
+
+		const block = getBlock( selectedBlockClientId );
+		const blockOrder = getBlockOrder( parentId );
+
+		const selectedColumnIndex = blockOrder.indexOf( clientId );
+		const columnCount = getBlockCount( parentId );
+		const columnWidths = getBlocks( parentId ).map( ( column ) =>
+			getEffectiveColumnWidth( column, columnCount )
+		);
+		const columnsPreview = { columnWidths, selectedColumnIndex };
 
 		return {
 			hasChildren,
 			isParentSelected,
 			isSelected,
 			columnCount,
-			columnWidths,
-			columnIndex,
+			columnsPreview,
+			block,
 		};
 	} ),
 	withPreferredColorScheme,

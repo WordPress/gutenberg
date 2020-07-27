@@ -79,6 +79,7 @@ function ColumnsEditContainer( {
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
+
 	const { verticalAlignment } = attributes;
 	const { width } = sizes || {};
 

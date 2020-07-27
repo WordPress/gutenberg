@@ -51,6 +51,15 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 		styles.cancelButtonDark
 	);
 
+	const onVariationSelect = ( variation ) => {
+		replaceInnerBlocks(
+			clientId,
+			createBlocksFromInnerBlocksTemplate( variation.innerBlocks ),
+			false
+		);
+		onClose();
+	};
+
 	return (
 		<BottomSheet
 			isVisible={ isVisible }
@@ -92,17 +101,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 						<MenuItem
 							item={ v }
 							key={ v.name }
-							style={ styles.menuItem }
-							onSelect={ () => {
-								replaceInnerBlocks(
-									clientId,
-									createBlocksFromInnerBlocksTemplate(
-										v.innerBlocks
-									),
-									false
-								);
-								onClose();
-							} }
+							onSelect={ () => onVariationSelect( v ) }
 						/>
 					);
 				} ) }
