@@ -252,9 +252,12 @@ const Cover = ( {
 		</BlockControls>
 	);
 
-	const addMediaButton = ( open ) => (
+	const addMediaButton = () => (
 		<View style={ styles.selectImageContainer }>
-			<TouchableWithoutFeedback onPress={ open }>
+			<TouchableWithoutFeedback
+				style={ styles.selectImageContainer }
+				onPress={ openMediaOptionsRef.current }
+			>
 				<View style={ styles.selectImage }>
 					<Icon
 						size={ 16 }
@@ -349,9 +352,7 @@ const Cover = ( {
 	const renderContent = ( getMediaOptions ) => (
 		<>
 			{ renderBackground( getMediaOptions ) }
-			{ isParentSelected &&
-				hasOnlyColorBackground &&
-				addMediaButton( openMediaOptionsRef.current ) }
+			{ isParentSelected && hasOnlyColorBackground && addMediaButton() }
 		</>
 	);
 
