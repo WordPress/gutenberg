@@ -2,10 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
+
 /**
  * Internal dependencies
  */
-import { Block } from './styles/flex-styles';
+import Item from './item';
 
 /**
  * WordPress dependencies
@@ -15,7 +16,7 @@ import { forwardRef } from '@wordpress/element';
 function FlexBlock( { className, ...props }, ref ) {
 	const classes = classnames( 'components-flex__block', className );
 
-	return <Block { ...props } className={ classes } ref={ ref } />;
+	return <Item { ...props } className={ classes } isBlock ref={ ref } />;
 }
 
 export default forwardRef( FlexBlock );

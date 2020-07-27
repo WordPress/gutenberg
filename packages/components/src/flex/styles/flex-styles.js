@@ -67,12 +67,17 @@ export const Flex = styled.div`
 	${ reversedStyles };
 `;
 
+const itemBlock = ( { isBlock } ) => {
+	if ( ! isBlock ) return '';
+	return css`
+		flex: 1;
+	`;
+};
+
 export const Item = styled.div`
 	box-sizing: border-box;
 	min-width: 0;
 	max-width: 100%;
-`;
 
-export const Block = styled( Item )`
-	flex: 1;
+	${ itemBlock };
 `;

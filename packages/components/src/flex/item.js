@@ -13,10 +13,17 @@ import { Item } from './styles/flex-styles';
  */
 import { forwardRef } from '@wordpress/element';
 
-function FlexItem( { className, ...props }, ref ) {
+function FlexItem( { className, isBlock, ...props }, ref ) {
 	const classes = classnames( 'components-flex__item', className );
 
-	return <Item { ...props } className={ classes } ref={ ref } />;
+	return (
+		<Item
+			{ ...props }
+			className={ classes }
+			isBlock={ isBlock }
+			ref={ ref }
+		/>
+	);
 }
 
 export default forwardRef( FlexItem );
