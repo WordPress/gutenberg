@@ -171,7 +171,9 @@ export default function useBlockSync( {
 
 				// Inform the controlling entity that changes have been made to
 				// the block-editor store they should be aware about.
-				const updateParent = isPersistent ? onChange : onInput;
+				const updateParent = isPersistent
+					? onChangeRef.current
+					: onInputRef.current;
 				updateParent( blocks, {
 					selectionStart: getSelectionStart(),
 					selectionEnd: getSelectionEnd(),

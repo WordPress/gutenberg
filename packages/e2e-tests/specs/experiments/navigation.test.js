@@ -335,7 +335,7 @@ describe( 'Navigation', () => {
 			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
 			// block previews.
 			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Content"][role="region"] li[aria-label="Block: Link"]',
+				'[aria-label="Editor content"][role="region"] li[aria-label="Block: Link"]',
 				( els ) => els.length
 			);
 
@@ -361,7 +361,7 @@ describe( 'Navigation', () => {
 			// Scope element selector to the "Editor content" as otherwise it picks up on
 			// Block Style live previews.
 			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Content"][role="region"] li[aria-label="Block: Link"]',
+				'[aria-label="Editor content"][role="region"] li[aria-label="Block: Link"]',
 				( els ) => els.length
 			);
 
