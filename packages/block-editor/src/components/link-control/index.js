@@ -318,7 +318,7 @@ function LinkControl( {
 		// to the text value of the `<input>`. This is because `title` is used
 		// when creating the suggestion. Similarly `url` is used when using keyboard to select
 		// the suggestion (the <form> `onSubmit` handler falls-back to `url`).
-		return isURLLike( val )
+		return isURLLike( val ) || ! createSuggestion
 			? results
 			: results.concat( {
 					// the `id` prop is intentionally ommitted here because it
