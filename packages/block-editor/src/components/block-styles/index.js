@@ -110,18 +110,21 @@ function BlockStyles( {
 		return null;
 	}
 
-	if ( ! type.styles && ! find( styles, 'isDefault' ) ) {
-		styles.unshift( {
-			name: 'default',
-			label: _x( 'Default', 'block style' ),
-			isDefault: true,
-		} );
-	}
+	const renderedStyles = find( styles, 'isDefault' )
+		? styles
+		: [
+				{
+					name: 'default',
+					label: _x( 'Default', 'block style' ),
+					isDefault: true,
+				},
+				...styles,
+		  ];
 
-	const activeStyle = getActiveStyle( styles, className );
+	const activeStyle = getActiveStyle( renderedStyles, className );
 	return (
 		<div className="block-editor-block-styles">
-			{ styles.map( ( style ) => {
+			{ renderedStyles.map( ( style ) => {
 				const styleClassName = replaceActiveStyle(
 					className,
 					activeStyle,
