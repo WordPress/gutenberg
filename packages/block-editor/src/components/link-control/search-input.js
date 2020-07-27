@@ -41,7 +41,10 @@ const LinkControlSearchInput = forwardRef(
 		},
 		ref
 	) => {
-		const genericSearchHandler = useSearchHandler( allowDirectEntry );
+		const genericSearchHandler = useSearchHandler(
+			allowDirectEntry,
+			withCreateSuggestion
+		);
 		const searchHandler = showSuggestions
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
