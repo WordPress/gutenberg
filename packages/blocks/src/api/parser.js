@@ -442,7 +442,16 @@ export function createBlockWithFallback( blockNode ) {
 	// canonical form 'core/embed'.
 	if ( name && name.indexOf( 'core-embed/' ) === 0 ) {
 		// Capture `core-embed/instagram` into `{"providerNameSlug":"instagram"}`
-		attributes.providerNameSlug = name.substring( 11 );
+		const providerSlug = name.substring( 11 );
+		const deprecated = {
+			speaker: 'speaker-deck',
+			polldaddy: 'crowdsignal',
+		};
+		attributes.providerNameSlug = Object.keys( deprecated ).includes(
+			providerSlug
+		)
+			? deprecated[ providerSlug ]
+			: providerSlug;
 		name = 'core/embed';
 	}
 

@@ -158,16 +158,6 @@ const variations = [
 		title: 'Crowdsignal',
 		icon: embedContentIcon,
 		keywords: [ 'polldaddy', __( 'survey' ) ],
-		transform: [
-			{
-				type: 'block',
-				blocks: [ 'polldaddy' ],
-				transform: ( content ) =>
-					createBlock( 'crowdsignal', {
-						content,
-					} ),
-			},
-		],
 		description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
 		patterns: [
 			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i,
@@ -228,16 +218,6 @@ const variations = [
 		attributes: { providerNameSlug: 'mixcloud', responsive: true },
 	},
 	{
-		// Deprecated in favour of the crowdsignal block
-		name: 'polldaddy',
-		title: 'Polldaddy',
-		icon: embedContentIcon,
-		description: __( 'Embed Polldaddy content.' ),
-		scope: [ 'block' ],
-		patterns: [],
-		attributes: { providerNameSlug: 'polldaddy', responsive: true },
-	},
-	{
 		name: 'reddit',
 		title: 'Reddit',
 		icon: embedRedditIcon,
@@ -290,29 +270,9 @@ const variations = [
 		},
 	},
 	{
-		// Deprecated in favour of the speaker-deck block.
-		name: 'speaker',
-		title: 'Speaker',
-		icon: embedAudioIcon,
-		scope: [ 'block' ],
-		patterns: [],
-		attributes: { providerNameSlug: 'speaker', responsive: true },
-	},
-	{
 		name: 'speaker-deck',
 		title: 'Speaker Deck',
 		icon: embedContentIcon,
-		transform: [
-			{
-				type: 'block',
-				blocks: [ 'speaker' ],
-				transform: ( content ) => {
-					return createBlock( 'speaker-deck', {
-						content,
-					} );
-				},
-			},
-		],
 		description: __( 'Embed Speaker Deck content.' ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 		attributes: { providerNameSlug: 'speaker-deck', responsive: true },
