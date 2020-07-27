@@ -8,6 +8,10 @@
 	],
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		]
 	}
 }
