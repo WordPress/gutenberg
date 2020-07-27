@@ -413,7 +413,9 @@ class BottomSheet extends Component {
 								<>{ children }</>
 							</TouchableHighlight>
 						</BottomSheetProvider>
-						<View style={ { height: safeAreaBottomInset } } />
+						{ ! isChildrenScrollable && (
+							<View style={ { height: safeAreaBottomInset } } />
+						) }
 					</WrapperView>
 				</KeyboardAvoidingView>
 			</Modal>
