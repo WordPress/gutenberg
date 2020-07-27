@@ -438,6 +438,14 @@ export function createBlockWithFallback( blockNode ) {
 		name = Platform.OS === 'web' ? 'core/social-link' : name;
 	}
 
+	// Convert derivative blocks such as 'core-embed/instagram' to the
+	// canonical form 'core/embed'.
+	if ( name && name.indexOf( 'core-embed/' ) === 0 ) {
+		// Capture `core-embed/instagram` into `{"providerNameSlug":"instagram"}`
+		attributes.providerNameSlug = name.substring( 11 );
+		name = 'core/embed';
+	}
+
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
