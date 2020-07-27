@@ -94,7 +94,7 @@ export default function LinkPickerResults( {
 
 	return (
 		<BottomSheetConsumer>
-			{ ( { listProps } ) => (
+			{ ( { listProps: { contentContainerStyle, ...listProps } } ) => (
 				<FlatList
 					data={ links }
 					keyboardShouldPersistTaps="always"
@@ -109,6 +109,10 @@ export default function LinkPickerResults( {
 					onEndReachedThreshold={ 0.1 }
 					initialNumToRender={ PER_PAGE }
 					ListFooterComponent={ isLoading && LoadingSpinner }
+					contentContainerStyle={ [
+						contentContainerStyle,
+						{ paddingBottom: 350 },
+					] }
 					{ ...listProps }
 				/>
 			) }
