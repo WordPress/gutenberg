@@ -87,7 +87,7 @@ require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/utils.php';
 
 // Include FSE related files only if the experiment is enabled.
-if ( gutenberg_is_experiment_enabled( 'full-site-editing' ) ) {
+if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 	require dirname( __FILE__ ) . '/templates.php';
 	require dirname( __FILE__ ) . '/template-parts.php';
 	require dirname( __FILE__ ) . '/template-loader.php';
