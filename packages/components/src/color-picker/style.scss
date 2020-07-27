@@ -227,10 +227,10 @@
 	padding-top: 16px;
 	display: flex;
 	align-items: flex-end;
-	min-width: 22em;
+	min-width: 260px;
 
 	@include break-small() {
-		min-width: 25em;
+		min-width: 315px;
 	}
 
 	fieldset {
