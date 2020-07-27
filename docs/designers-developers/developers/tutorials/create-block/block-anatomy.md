@@ -52,7 +52,7 @@ The results of the save function is what the editor will insert into the **post_
 If you look at the generated `src/index.js` file, the block title and description are wrapped in a function that looks like this:
 
 ```js
-__( 'Gutenpride', 'create_block' );
+__( 'Gutenpride', 'create-block' );
 ```
 
 This is an internationalization wrapper that allows for the string "Gutenpride" to be translated. The second parameter, "create_block" is called the text domain and gives context for where the string is from. The JavaScript internationalization, often abbreviated i18n, matches the core WordPress internationalization process. See the [I18n for WordPress documentation](https://codex.wordpress.org/I18n_for_WordPress_Developers) for more details.
