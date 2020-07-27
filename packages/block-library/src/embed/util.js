@@ -14,7 +14,7 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -82,25 +82,18 @@ export const getPhotoHtml = ( photo ) => {
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
  * @param {Object} props                  The block's props.
- * @param {Object} attributesFromPreview  Attributes generated from the block's most up to date preview.
+ * @param {Object} [attributesFromPreview]  Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
-export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
-	const {
-		preview,
-		// name,
-		attributes: { url, providerNameSlug } = {},
-	} = props;
+export const createUpgradedEmbedBlock = (
+	props,
+	attributesFromPreview = {}
+) => {
+	const { preview, attributes: { url, providerNameSlug } = {} } = props;
 
-	if ( ! url ) return;
+	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
 
 	const matchedBlock = findMoreSuitableBlock( url );
-
-	// TODO as we only have variations of core/embed we only have to check for core/embed
-	// but this is used by [image,video,audio], check better when it will be their time to handle in this PR
-	// if ( ! getBlockType( DEFAULT_EMBED_BLOCK ) ) {
-	// 	return;
-	// }
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
@@ -113,7 +106,7 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 		! isCurrentBlockWP &&
 		matchedBlock &&
 		( matchedBlock.attributes.providerNameSlug !== providerNameSlug ||
-			! providerNameSlug ); // this is here as audio,image,video don't provide this any prop besides url (handle differently??)
+			! providerNameSlug );
 	if ( shouldCreateNewBlock ) {
 		return createBlock( DEFAULT_EMBED_BLOCK, {
 			url,

@@ -19,13 +19,16 @@ import {
 	getEmbedInfoByProvider,
 } from '../util';
 import { embedInstagramIcon } from '../icons';
+import variations from '../variations';
+import metadata from '../block.json';
+
+const { name: DEFAULT_EMBED_BLOCK, attributes } = metadata;
 
 jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
 
 describe( 'core/embed', () => {
 	test( 'block edit matches snapshot', () => {
 		const wrapper = render( <EmbedEdit attributes={ {} } /> );
-
 		expect( wrapper ).toMatchSnapshot();
 	} );
 } );
@@ -71,34 +74,46 @@ describe( 'utils', () => {
 		} );
 	} );
 	describe( 'createUpgradedEmbedBlock', () => {
-		test( 'createUpgradedEmbedBlock bails early when block type does not exist', () => {
-			const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-
-			expect(
-				createUpgradedEmbedBlock(
-					{ attributes: { url: youtubeURL } },
-					{}
-				)
-			).toBeUndefined();
+		describe( 'do not create new block', () => {
+			it( 'when block type does not exist', () => {
+				const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w';
+				expect(
+					createUpgradedEmbedBlock( {
+						attributes: { url: youtubeURL },
+					} )
+				).toBeUndefined();
+			} );
+			it( 'when no url provided', () => {
+				expect(
+					createUpgradedEmbedBlock( { name: 'some name' } )
+				).toBeUndefined();
+			} );
 		} );
 
-		test( 'createUpgradedEmbedBlock returns a YouTube embed block when given a YouTube URL', () => {
+		it( 'should return a YouTube embed block when given a YouTube URL', () => {
 			const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
-			registerBlockType( 'core-embed/youtube', {
-				title: 'YouTube',
+			registerBlockType( DEFAULT_EMBED_BLOCK, {
+				title: 'Embed',
 				category: 'embed',
+				attributes,
+				variations,
 			} );
 
-			const result = createUpgradedEmbedBlock(
-				{ attributes: { url: youtubeURL } },
-				{}
+			const result = createUpgradedEmbedBlock( {
+				attributes: { url: youtubeURL },
+			} );
+
+			unregisterBlockType( DEFAULT_EMBED_BLOCK );
+
+			expect( result ).toEqual(
+				expect.objectContaining( {
+					name: DEFAULT_EMBED_BLOCK,
+					attributes: expect.objectContaining( {
+						providerNameSlug: 'youtube',
+					} ),
+				} )
 			);
-
-			unregisterBlockType( 'core-embed/youtube' );
-
-			expect( result ).not.toBeUndefined();
-			expect( result.name ).toBe( 'core-embed/youtube' );
 		} );
 	} );
 	describe( 'getEmbedInfoByProvider', () => {
