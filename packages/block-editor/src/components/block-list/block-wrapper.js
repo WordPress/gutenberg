@@ -248,7 +248,8 @@ const BlockComponent = forwardRef(
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
-				onKeyDown={ onKeyDown }
+				// Only allow shortcuts when a blocks is selected.
+				onKeyDown={ isSelected ? onKeyDown : undefined }
 				// Only allow selection to be started from a selected block.
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
 				// No need to have these listeners for hover class in edit mode.
