@@ -3,16 +3,12 @@
  */
 import createEmotionCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/core';
+import stylisPluginCssVariables from 'stylis-plugin-css-variables';
 import memoize from 'memize';
-
-/**
- * Internal dependencies
- */
-import { stylisPluginCssCustomProperties } from './plugins';
 
 const createCustomCache = memoize( () => {
 	return createEmotionCache( {
-		stylisPlugins: [ stylisPluginCssCustomProperties() ],
+		stylisPlugins: [ stylisPluginCssVariables() ],
 	} );
 } );
 
