@@ -11,6 +11,11 @@ import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import LoadingSpinner from './loading-spinner';
+
 const PER_PAGE = 20;
 const REQUEST_DEBOUNCE_DELAY = 400;
 const MINIMUM_QUERY_SIZE = 2;
@@ -24,7 +29,11 @@ export default function LinkPickerResults( {
 	const hasAllSuggestions = useRef( false );
 	const nextPage = useRef( 1 );
 	const pendingRequest = useRef();
-	const clearRequest = () => ( pendingRequest.current = null );
+	const [ isLoading, setIsLoading ] = useState( false );
+	const clearRequest = () => {
+		setIsLoading( false );
+		pendingRequest.current = null;
+	};
 
 	// a stable debounced function to fetch suggestions and append
 	const { fetchMoreSuggestions } = useSelect( ( select ) => {
@@ -46,6 +55,7 @@ export default function LinkPickerResults( {
 			if ( pendingRequest.current || hasAllSuggestions.current ) {
 				return;
 			}
+			setIsLoading( true );
 			const request = fetchLinkSuggestions( { search } );
 			pendingRequest.current = request;
 			const suggestions = await request;
@@ -98,6 +108,7 @@ export default function LinkPickerResults( {
 					onEndReached={ onEndReached }
 					onEndReachedThreshold={ 0.1 }
 					initialNumToRender={ PER_PAGE }
+					ListFooterComponent={ isLoading && LoadingSpinner }
 					{ ...listProps }
 				/>
 			) }
