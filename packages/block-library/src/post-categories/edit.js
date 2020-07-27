@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	AlignmentToolbar,
 	BlockControls,
+	Warning,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -55,6 +56,7 @@ export default function PostCategoriesEdit( {
 		[ categories ]
 	);
 
+	const hasPost = postId && postType;
 	const hasCategories = categoryLinks && categoryLinks.length > 0;
 
 	return (
@@ -78,7 +80,14 @@ export default function PostCategoriesEdit( {
 						' | ',
 						curr,
 					] ) }
-				{ ! hasCategories && __( 'No categories.' ) }
+
+				{ hasPost && ! hasCategories && __( 'No categories.' ) }
+
+				{ ! hasPost && (
+					<Warning>
+						{ __( 'Post Categories block: post not found.' ) }
+					</Warning>
+				) }
 			</Block.div>
 		</>
 	);
