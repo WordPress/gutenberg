@@ -8,7 +8,7 @@ import { Text, View, StyleSheet } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { globe } from '@wordpress/icons';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -27,23 +27,19 @@ const icons = {
 };
 
 // we use some Cell styles here with a column flex-direction
-function LinkSuggestionItemCell( {
-	suggestion,
-	onLinkPicked,
-	getStylesFromColorScheme,
-} ) {
+function LinkSuggestionItemCell( { suggestion, onLinkPicked } ) {
 	const { title: contentTitle, url, type, isDirectEntry } = suggestion;
 	const title = isDirectEntry ? url : contentTitle;
 	const summary = isDirectEntry ? __( 'Add this link' ) : url;
 
 	const pickLink = () => onLinkPicked( suggestion );
 
-	const cellTitleStyle = getStylesFromColorScheme(
+	const cellTitleStyle = usePreferredColorSchemeStyle(
 		cellStyles.cellLabel,
 		cellStyles.cellTextDark
 	);
 
-	const cellSummaryStyle = getStylesFromColorScheme(
+	const cellSummaryStyle = usePreferredColorSchemeStyle(
 		cellStyles.cellValue,
 		cellStyles.cellTextDark
 	);
@@ -83,4 +79,4 @@ function LinkSuggestionItemCell( {
 	);
 }
 
-export default withPreferredColorScheme( LinkSuggestionItemCell );
+export default LinkSuggestionItemCell;
