@@ -15,13 +15,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import Cell from './cell';
 import cellStyles from './styles.scss';
-import {
-	itemContainerStyle,
-	suggestionTitleStyle,
-	suggestionSummaryStyle,
-	suggestionContainerStyle,
-	hidden,
-} from './link-suggestion-styles.scss';
+import suggestionStyles from './link-suggestion-styles.scss';
 import { posts, pages, empty } from '../gridicons';
 
 const { compose } = StyleSheet;
@@ -54,19 +48,22 @@ function LinkSuggestionItemCell( {
 		cellStyles.cellTextDark
 	);
 
-	const titleStyle = compose( cellTitleStyle, suggestionTitleStyle );
-	const summaryStyle = compose( cellSummaryStyle, suggestionSummaryStyle );
+	const titleStyle = compose( cellTitleStyle, suggestionStyles.titleStyle );
+	const summaryStyle = compose(
+		cellSummaryStyle,
+		suggestionStyles.summaryStyle
+	);
 
 	return (
 		<Cell
 			icon={ icons[ type ] || empty }
 			onPress={ pickLink }
 			separatorType={ 'none' }
-			cellContainerStyle={ itemContainerStyle }
-			labelStyle={ hidden }
-			valueStyle={ hidden }
+			cellContainerStyle={ suggestionStyles.itemContainerStyle }
+			labelStyle={ suggestionStyles.hidden }
+			valueStyle={ suggestionStyles.hidden }
 		>
-			<View style={ suggestionContainerStyle }>
+			<View style={ suggestionStyles.containerStyle }>
 				<Text
 					style={ titleStyle }
 					numberOfLines={ 1 }
