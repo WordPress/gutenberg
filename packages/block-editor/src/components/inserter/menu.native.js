@@ -131,7 +131,7 @@ export class InserterMenu extends Component {
 			<BottomSheet
 				isVisible={ true }
 				onClose={ this.onClose }
-				contentStyle={ [ styles.content, bottomPadding ] }
+				contentStyle={ bottomPadding }
 				hideHeader
 				isChildrenScrollable
 			>

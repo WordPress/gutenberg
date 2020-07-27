@@ -246,6 +246,44 @@ class BottomSheet extends Component {
 		return onClose();
 	}
 
+	getContentStyle() {
+		// Check if there is paddingBottom in contentStyle and add the safeAreaBottomInset
+		const { contentStyle } = this.props;
+		const { safeAreaBottomInset } = this.state;
+
+		if ( ! contentStyle ) {
+			return {
+				flexGrow: 1,
+				paddingBottom: safeAreaBottomInset,
+			};
+		}
+		if ( contentStyle.paddingBottom ) {
+			return {
+				...contentStyle,
+				flexGrow: 1,
+				paddingBottom: contentStyle.paddingBottom + safeAreaBottomInset,
+			};
+		}
+		// If Array, get the latest paddingBottom
+		if ( Array.isArray( contentStyle ) ) {
+			const paddingBottom = contentStyle.reduce( ( prev, curr ) => {
+				return curr && curr.paddingBottom ? curr.paddingBottom : prev;
+			}, 0 );
+			return [
+				...contentStyle,
+				{
+					flexGrow: 1,
+					paddingBottom: paddingBottom + safeAreaBottomInset,
+				},
+			];
+		}
+
+		return [
+			contentStyle,
+			{ flexGrow: 1, paddingBottom: safeAreaBottomInset },
+		];
+	}
+
 	onReplaceSubsheet( destination, extraProps, callback ) {
 		performLayoutAnimation();
 
@@ -329,11 +367,7 @@ class BottomSheet extends Component {
 				styles.content,
 				hideHeader && styles.emptyHeader,
 				contentStyle,
-				isChildrenScrollable && {
-					flexGrow: 1,
-					paddingBottom:
-						safeAreaBottomInset || styles.content.paddingRight,
-				},
+				isChildrenScrollable && this.getContentStyle(),
 			],
 			style: isMaxHeightSet ? { maxHeight } : {},
 			scrollEnabled,
