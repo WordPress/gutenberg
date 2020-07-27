@@ -35,7 +35,7 @@ The main plugin file created is the PHP file `gutenpride.php`, at the top of thi
  * Author:          The WordPress Contributors
  * License:         GPL-2.0-or-later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:     create-block
+ * Text Domain:     gutenpride
  *
  * @package         create-block
  */
