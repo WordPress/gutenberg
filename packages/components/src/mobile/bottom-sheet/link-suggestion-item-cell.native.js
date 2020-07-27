@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -17,8 +17,6 @@ import Cell from './cell';
 import cellStyles from './styles.scss';
 import suggestionStyles from './link-suggestion-styles.scss';
 import { posts, pages, empty } from '../gridicons';
-
-const { compose } = StyleSheet;
 
 const icons = {
 	URL: globe,
@@ -44,11 +42,8 @@ function LinkSuggestionItemCell( { suggestion, onLinkPicked } ) {
 		cellStyles.cellTextDark
 	);
 
-	const titleStyle = compose( cellTitleStyle, suggestionStyles.titleStyle );
-	const summaryStyle = compose(
-		cellSummaryStyle,
-		suggestionStyles.summaryStyle
-	);
+	const titleStyle = [ cellTitleStyle, suggestionStyles.titleStyle ];
+	const summaryStyle = [ cellSummaryStyle, suggestionStyles.summaryStyle ];
 
 	return (
 		<Cell
