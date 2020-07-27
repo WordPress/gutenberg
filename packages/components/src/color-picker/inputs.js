@@ -178,7 +178,7 @@ export class Inputs extends Component {
 			return (
 				<fieldset>
 					<VisuallyHidden as="legend">
-						{ __( 'Color value in RGB' ) }
+						{ __( 'Color value in RGBA' ) }
 					</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
@@ -231,7 +231,7 @@ export class Inputs extends Component {
 			return (
 				<fieldset>
 					<VisuallyHidden as="legend">
-						{ __( 'Color value in HSL' ) }
+						{ __( 'Color value in HSLA' ) }
 					</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input

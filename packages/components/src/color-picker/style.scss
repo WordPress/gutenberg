@@ -227,6 +227,11 @@
 	padding-top: 16px;
 	display: flex;
 	align-items: flex-end;
+	min-width: 22em;
+
+	@include break-small() {
+		min-width: 25em;
+	}
 
 	fieldset {
 		flex: 1;
@@ -237,6 +242,7 @@
 
 	.components-color-picker__inputs-fields .components-text-control__input[type="number"] {
 		padding: 6px 8px;
+		margin: 0;
 	}
 }
 
