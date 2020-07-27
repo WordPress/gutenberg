@@ -125,13 +125,10 @@ export class InserterMenu extends Component {
 		const { items } = this.props;
 		const { numberOfColumns } = this.state;
 
-		const bottomPadding = styles.contentBottomPadding;
-
 		return (
 			<BottomSheet
 				isVisible={ true }
 				onClose={ this.onClose }
-				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
 				isChildrenScrollable
 			>

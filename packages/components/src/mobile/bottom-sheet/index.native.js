@@ -248,6 +248,15 @@ class BottomSheet extends Component {
 		return onClose();
 	}
 
+	getContentStyle() {
+		const { safeAreaBottomInset } = this.state;
+		return {
+			flexGrow: 1,
+			paddingBottom:
+				safeAreaBottomInset + styles.scrollableContent.paddingBottom,
+		};
+	}
+
 	onReplaceSubsheet( destination, extraProps, callback ) {
 		performLayoutAnimation();
 
@@ -331,11 +340,8 @@ class BottomSheet extends Component {
 				styles.content,
 				hideHeader && styles.emptyHeader,
 				contentStyle,
-				isChildrenScrollable && {
-					flexGrow: 1,
-					paddingBottom:
-						safeAreaBottomInset || styles.content.paddingRight,
-				},
+				isChildrenScrollable && this.getContentStyle(),
+				contentStyle,
 			],
 			style: isMaxHeightSet ? { maxHeight } : {},
 			scrollEnabled,
@@ -409,7 +415,9 @@ class BottomSheet extends Component {
 								<>{ children }</>
 							</TouchableHighlight>
 						</BottomSheetProvider>
-						<View style={ { height: safeAreaBottomInset } } />
+						{ ! isChildrenScrollable && (
+							<View style={ { height: safeAreaBottomInset } } />
+						) }
 					</WrapperView>
 				</KeyboardAvoidingView>
 			</Modal>
