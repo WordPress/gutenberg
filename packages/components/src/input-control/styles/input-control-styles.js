@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
  */
 import Flex from '../../flex';
 import Text from '../../text';
+import { controlGroupStyles } from '../../control-group';
 import { color, rtl, reduceMotion } from '../../utils/style-mixins';
 
 const FLOATING_LABEL_TRANSITION_SPEED = '60ms';
@@ -48,6 +49,8 @@ export const Root = styled( Flex )`
 	${ rootFloatLabelStyles };
 	${ rootFocusedStyles };
 	${ rootLabelPositionStyles };
+
+	${ controlGroupStyles };
 `;
 
 const containerDisabledStyles = ( { disabled } ) => {
@@ -222,7 +225,21 @@ const labelFontSize = ( { isFloatingLabel, size } ) => {
 	return css( { fontSize, lineHeight } );
 };
 
-const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
+const labelPosition = ( {
+	isFloatingLabel,
+	isFloating,
+	labelPosition: labelPositionProp,
+	size,
+} ) => {
+	if ( labelPositionProp === 'bottom' ) {
+		return css`
+			margin-top: 2px;
+			padding: 0;
+			width: 100%;
+			max-width: 100%;
+		`;
+	}
+
 	const paddingBottom = isFloatingLabel ? 0 : 4;
 	const position = isFloatingLabel ? 'absolute' : null;
 	const pointerEvents = isFloating ? null : 'none';
@@ -291,8 +308,8 @@ const BaseLabel = styled( Text )`
 
 		${ laberColor };
 		${ labelFontSize };
-		${ labelPosition };
 		${ labelTruncation };
+		${ labelPosition };
 		${ reduceMotion( 'transition' ) };
 
 		${ rtl( { left: 0 } ) }

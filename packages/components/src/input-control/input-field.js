@@ -34,6 +34,7 @@ function InputField(
 		onDragStart = noop,
 		onFocus = noop,
 		onKeyDown = noop,
+		onPressEnter = noop,
 		onUpdateValue,
 		onValidate = noop,
 		size = 'default',
@@ -150,6 +151,8 @@ function InputField(
 					event.preventDefault();
 					handleOnCommit( event );
 				}
+
+				onPressEnter( event );
 				break;
 		}
 	};

@@ -1,99 +1,17 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { DOWN, ENTER, UP } from '@wordpress/keycodes';
-import { pure } from '@wordpress/compose';
-import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Button from '../button';
-import InputControl from '../input-control';
-import NumberControl from '../number-control';
-import VisuallyHidden from '../visually-hidden';
-import { isValidHex } from './utils';
-
-/* Wrapper for TextControl, only used to handle intermediate state while typing. */
-export class Input extends Component {
-	constructor() {
-		super( ...arguments );
-		this.handleBlur = this.handleBlur.bind( this );
-		this.handleChange = this.handleChange.bind( this );
-		this.handleKeyDown = this.handleKeyDown.bind( this );
-	}
-
-	handleBlur() {
-		const { value, valueKey, onChange, source } = this.props;
-		onChange( {
-			source,
-			state: 'commit',
-			value,
-			valueKey,
-		} );
-	}
-
-	handleChange( value ) {
-		const { valueKey, onChange, source } = this.props;
-		if ( value.length > 4 && isValidHex( value ) ) {
-			onChange( {
-				source,
-				state: 'commit',
-				value,
-				valueKey,
-			} );
-		} else {
-			onChange( {
-				source,
-				state: 'draft',
-				value,
-				valueKey,
-			} );
-		}
-	}
-
-	handleKeyDown( { keyCode } ) {
-		if ( keyCode !== ENTER && keyCode !== UP && keyCode !== DOWN ) {
-			return;
-		}
-		const { value, valueKey, onChange, source } = this.props;
-		onChange( {
-			source,
-			state: 'commit',
-			value,
-			valueKey,
-		} );
-	}
-
-	render() {
-		// const { label, value,  ...props } = this.props;
-
-		const { label, value, type, ...props } = this.props;
-		const InputComponent = type === 'number' ? NumberControl : InputControl;
-
-		return (
-			<InputComponent
-				className="components-color-picker__inputs-field"
-				label={ label }
-				value={ value }
-				onChange={ ( newValue ) => this.handleChange( newValue ) }
-				onBlur={ this.handleBlur }
-				onKeyDown={ this.handleKeyDown }
-				{ ...omit( props, [ 'onChange', 'valueKey', 'source' ] ) }
-			/>
-		);
-	}
-}
-
-const PureButton = pure( Button );
+import { Flex, FlexBlock, FlexItem } from '../flex';
+import SelectControl from '../select-control';
+import Input from './input';
+import InputGroup from './input-group';
+import InputAlpha from './input-alpha';
 
 export class Inputs extends Component {
 	constructor( { hsl } ) {
@@ -102,7 +20,6 @@ export class Inputs extends Component {
 		const view = hsl.a === 1 ? 'rgb' : 'rgb';
 		this.state = { view };
 
-		this.toggleViews = this.toggleViews.bind( this );
 		this.resetDraftValues = this.resetDraftValues.bind( this );
 		this.handleChange = this.handleChange.bind( this );
 		this.normalizeValue = this.normalizeValue.bind( this );
@@ -113,28 +30,6 @@ export class Inputs extends Component {
 			return { view: 'rgb' };
 		}
 		return null;
-	}
-
-	toggleViews() {
-		if ( this.state.view === 'hex' ) {
-			this.setState( { view: 'rgb' }, this.resetDraftValues );
-
-			speak( __( 'RGB mode active' ) );
-		} else if ( this.state.view === 'rgb' ) {
-			this.setState( { view: 'hsl' }, this.resetDraftValues );
-
-			speak( __( 'Hue/saturation/lightness mode active' ) );
-		} else if ( this.state.view === 'hsl' ) {
-			if ( this.props.hsl.a === 1 ) {
-				this.setState( { view: 'hex' }, this.resetDraftValues );
-
-				speak( __( 'Hex color mode active' ) );
-			} else {
-				this.setState( { view: 'rgb' }, this.resetDraftValues );
-
-				speak( __( 'RGB mode active' ) );
-			}
-		}
 	}
 
 	resetDraftValues() {
@@ -171,11 +66,13 @@ export class Inputs extends Component {
 			return (
 				<div className="components-color-picker__inputs-fields">
 					<Input
+						label={ __( 'Hex' ) }
+						hideLabelFromVision
 						source={ this.state.view }
-						label={ __( 'Color value in hexadecimal' ) }
 						valueKey="hex"
 						value={ this.props.hex }
 						onChange={ this.handleChange }
+						type="text"
 					/>
 				</div>
 			);
@@ -184,125 +81,110 @@ export class Inputs extends Component {
 				? __( 'Color value in RGB' )
 				: __( 'Color value in RGBA' );
 			return (
-				<fieldset>
-					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
-					<div className="components-color-picker__inputs-fields">
-						<Input
+				<InputGroup legend={ legend }>
+					<Input
+						source={ this.state.view }
+						label={ __( 'red' ) }
+						labelText="R"
+						valueKey="r"
+						value={ this.props.rgb.r }
+						onChange={ this.handleChange }
+						max="255"
+					/>
+					<Input
+						source={ this.state.view }
+						label={ __( 'green' ) }
+						labelText="G"
+						valueKey="g"
+						value={ this.props.rgb.g }
+						onChange={ this.handleChange }
+						max="255"
+					/>
+					<Input
+						source={ this.state.view }
+						label={ __( 'blue' ) }
+						labelText="B"
+						valueKey="b"
+						value={ this.props.rgb.b }
+						onChange={ this.handleChange }
+						max="255"
+					/>
+					{ disableAlpha ? null : (
+						<InputAlpha
 							source={ this.state.view }
-							label="r"
-							valueKey="r"
-							value={ this.props.rgb.r }
+							value={ this.props.rgb.a }
 							onChange={ this.handleChange }
-							type="number"
-							min="0"
-							max="255"
 						/>
-						<Input
-							source={ this.state.view }
-							label="g"
-							valueKey="g"
-							value={ this.props.rgb.g }
-							onChange={ this.handleChange }
-							type="number"
-							min="0"
-							max="255"
-						/>
-						<Input
-							source={ this.state.view }
-							label="b"
-							valueKey="b"
-							value={ this.props.rgb.b }
-							onChange={ this.handleChange }
-							type="number"
-							min="0"
-							max="255"
-						/>
-						{ disableAlpha ? null : (
-							<Input
-								source={ this.state.view }
-								label="a"
-								valueKey="a"
-								value={ this.props.rgb.a }
-								onChange={ this.handleChange }
-								type="number"
-								min="0"
-								max="1"
-								step="0.01"
-							/>
-						) }
-					</div>
-				</fieldset>
+					) }
+				</InputGroup>
 			);
 		} else if ( this.state.view === 'hsl' ) {
 			const legend = disableAlpha
 				? __( 'Color value in HSL' )
 				: __( 'Color value in HSLA' );
 			return (
-				<fieldset>
-					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
-					<div className="components-color-picker__inputs-fields">
-						<Input
+				<InputGroup legend={ legend }>
+					<Input
+						source={ this.state.view }
+						label={ __( 'hue' ) }
+						labelText="H"
+						valueKey="h"
+						value={ this.props.hsl.h }
+						onChange={ this.handleChange }
+						max="359"
+					/>
+					<Input
+						source={ this.state.view }
+						label={ __( 'saturation' ) }
+						labelText="S"
+						valueKey="s"
+						value={ this.props.hsl.s }
+						onChange={ this.handleChange }
+						max="100"
+					/>
+					<Input
+						source={ this.state.view }
+						label={ __( 'lightness' ) }
+						labelText="L"
+						valueKey="l"
+						value={ this.props.hsl.l }
+						onChange={ this.handleChange }
+						max="100"
+					/>
+					{ disableAlpha ? null : (
+						<InputAlpha
 							source={ this.state.view }
-							label="h"
-							valueKey="h"
-							value={ this.props.hsl.h }
+							value={ this.props.hsl.a }
 							onChange={ this.handleChange }
-							type="number"
-							min="0"
-							max="359"
 						/>
-						<Input
-							source={ this.state.view }
-							label="s"
-							valueKey="s"
-							value={ this.props.hsl.s }
-							onChange={ this.handleChange }
-							type="number"
-							min="0"
-							max="100"
-						/>
-						<Input
-							source={ this.state.view }
-							label="l"
-							valueKey="l"
-							value={ this.props.hsl.l }
-							onChange={ this.handleChange }
-							type="number"
-							min="0"
-							max="100"
-						/>
-						{ disableAlpha ? null : (
-							<Input
-								source={ this.state.view }
-								label="a"
-								valueKey="a"
-								value={ this.props.hsl.a }
-								onChange={ this.handleChange }
-								type="number"
-								min="0"
-								max="1"
-								step="0.05"
-							/>
-						) }
-					</div>
-				</fieldset>
+					) }
+				</InputGroup>
 			);
 		}
 	}
 
 	render() {
 		return (
-			<div className="components-color-picker__inputs-wrapper">
-				{ this.renderFields() }
-				<div className="components-color-picker__inputs-toggle-wrapper">
-					<PureButton
-						className="components-color-picker__inputs-toggle"
-						icon={ chevronDown }
-						label={ __( 'Change color format' ) }
-						onClick={ this.toggleViews }
+			<Flex
+				className="components-color-picker__inputs-wrapper"
+				align="top"
+			>
+				<FlexItem className="components-color-picker__inputs-toggle-wrapper">
+					<SelectControl
+						value={ this.state.view }
+						onChange={ ( next ) => {
+							this.setState( { view: next } );
+							this.resetDraftValues();
+						} }
+						options={ [
+							{ value: 'rgb', label: 'RGB' },
+							{ value: 'hsl', label: 'HSL' },
+							{ value: 'hex', label: 'Hex' },
+						] }
 					/>
-				</div>
-			</div>
+				</FlexItem>
+				<FlexBlock>{ this.renderFields() }</FlexBlock>
+			</Flex>
 		);
 	}
 }

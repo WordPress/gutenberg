@@ -12,10 +12,12 @@ const htmlArrowStyles = ( { hideHTMLArrows } ) => {
 	if ( ! hideHTMLArrows ) return ``;
 
 	return css`
-		&::-webkit-outer-spin-button,
-		&::-webkit-inner-spin-button {
-			-webkit-appearance: none !important;
-			margin: 0 !important;
+		input {
+			&::-webkit-outer-spin-button,
+			&::-webkit-inner-spin-button {
+				-webkit-appearance: none !important;
+				margin: 0 !important;
+			}
 		}
 	`;
 };

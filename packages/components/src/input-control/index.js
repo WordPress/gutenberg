@@ -16,6 +16,7 @@ import { useState, forwardRef } from '@wordpress/element';
 import Backdrop from './backdrop';
 import InputField from './input-field';
 import Label from './label';
+import { useControlGroupContext } from '../control-group';
 import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
 import { isValueEmpty } from '../utils/values';
 
@@ -40,6 +41,7 @@ export function InputControl(
 		labelPosition = 'top',
 		onBlur = noop,
 		onChange = noop,
+		onPressEnter = noop,
 		onFocus = noop,
 		onValidate = noop,
 		onKeyDown = noop,
@@ -53,6 +55,7 @@ export function InputControl(
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const [ isFilled, setIsFilled ] = useState( ! isValueEmpty( value ) );
+	const controlGroupContext = useControlGroupContext();
 
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
@@ -75,6 +78,7 @@ export function InputControl(
 
 	return (
 		<Root
+			{ ...controlGroupContext }
 			className={ classes }
 			gap={ 3 }
 			isFloatingLabel={ isFloatingLabelSet }
@@ -89,6 +93,7 @@ export function InputControl(
 				isFilled={ isFilled }
 				isFloating={ isFloating }
 				isFloatingLabel={ isFloatingLabel }
+				labelPosition={ labelPosition }
 				size={ size }
 			>
 				{ label }
@@ -116,6 +121,7 @@ export function InputControl(
 					onChange={ onChange }
 					onFocus={ handleOnFocus }
 					onKeyDown={ onKeyDown }
+					onPressEnter={ onPressEnter }
 					onUpdateValue={ setIsFilled }
 					onValidate={ onValidate }
 					ref={ ref }

@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  */
 import { text } from './styles/text-mixins';
 
-const Text = styled.p(
+const Text = styled.span(
 	`
 	box-sizing: border-box;
 	margin: 0;
