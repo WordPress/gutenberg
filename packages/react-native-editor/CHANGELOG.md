@@ -14,6 +14,7 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.34.0
 
 * [***] Media editing support in Cover block.
+* [*] Fixed a bug on the Heading block, where a heading with a link and string formatting showed a white shadow in dark mode.
 
 ## 1.33.0
 
