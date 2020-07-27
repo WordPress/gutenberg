@@ -52,7 +52,7 @@ export default function Edit( { attributes, className, setAttributes } ) {
 	return (
 		<div className={ className }>
 			<TextControl
-				label={ __( 'Message', 'create-block' ) }
+				label={ __( 'Message', 'gutenpride' ) }
 				value={ attributes.message }
 				onChange={ ( val ) => setAttributes( { message: val } ) }
 			/>

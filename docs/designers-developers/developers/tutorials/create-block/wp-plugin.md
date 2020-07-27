@@ -108,7 +108,7 @@ function create_block_gutenpride_block_init() {
 		$script_asset['dependencies'],
 		$script_asset['version']
 	);
-	wp_set_script_translations( 'create-block-gutenpride-block-editor', 'create-block' );
+	wp_set_script_translations( 'create-block-gutenpride-block-editor', 'gutenpride' );
 
 	$editor_css = 'editor.css';
 	wp_register_style(
