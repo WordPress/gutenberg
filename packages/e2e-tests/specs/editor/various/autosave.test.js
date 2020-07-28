@@ -79,6 +79,7 @@ describe( 'autosave', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'before save' );
 		await saveDraftWithKeyboard();
+		await sleep( 1 );
 		await page.keyboard.type( ' after save' );
 
 		// Wait long enough for local autosave to kick in
