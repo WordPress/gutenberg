@@ -47,7 +47,7 @@ function ToolSelector( props, ref ) {
 
 	const onSwitchMode = ( mode ) => {
 		setNavigationMode( mode === 'edit' ? false : true );
-		setBrowseMode( mode === 'browse' ? false : true );
+		setBrowseMode( mode === 'browse' );
 		setTool( mode );
 	};
 	return (
