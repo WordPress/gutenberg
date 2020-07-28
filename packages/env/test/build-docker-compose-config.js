@@ -6,7 +6,9 @@ const buildDockerComposeConfig = require( '../lib/build-docker-compose-config' )
 // The basic config keys which build docker compose config requires.
 const CONFIG = {
 	mappings: {},
-	excludes: [],
+	excludes: [
+		{ path: '/var/www/html/wp-content/plugins/test-name/node_modules' },
+	],
 	pluginSources: [],
 	themeSources: [],
 	port: 8888,
@@ -34,6 +36,7 @@ describe( 'buildDockerComposeConfig', () => {
 			'wordpress:/var/www/html', // WordPress root
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins', // Mapped plugins root
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name:delegated', // Mapped plugin
+			'/var/www/html/wp-content/plugins/test-name/node_modules', // Excluded path
 		] );
 	} );
 
