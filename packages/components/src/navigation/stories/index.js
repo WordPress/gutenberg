@@ -1,7 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Navigation from '../';
+import NavigationBackButton from '../back-button';
+import NavigationMenu from '../menu';
+import NavigationTitle from '../title';
 
 export default {
 	title: 'Components/Navigation',
@@ -9,80 +17,94 @@ export default {
 };
 
 const data = [
-	{ title: 'WooCommerce', slug: 'root', back: 'Dashboard' },
-	{ title: 'Home', slug: 'home', parent: 'root', menu: 'primary' },
+	{ title: 'Home', id: 'home' },
 	{
 		title: 'Analytics',
-		slug: 'analytics',
-		parent: 'root',
-		back: 'WooCommerce Home',
-		menu: 'primary',
+		id: 'analytics',
 	},
 	{
 		title: 'Orders',
-		slug: 'orders',
-		parent: 'root',
-		back: 'WooCommerce Home',
-		menu: 'primary',
+		id: 'orders',
 	},
 	{
 		title: 'Overview',
-		slug: 'overview',
+		id: 'overview',
 		parent: 'analytics',
 	},
 	{
 		title: 'Products report',
-		slug: 'products',
+		id: 'products',
 		parent: 'analytics',
 	},
 	{
 		title: 'All orders',
-		slug: 'all_orders',
+		id: 'all_orders',
 		parent: 'orders',
 	},
 	{
 		title: 'Payouts',
-		slug: 'payouts',
+		id: 'payouts',
 		parent: 'orders',
 	},
 	{
 		title: 'Settings',
-		slug: 'settings',
-		parent: 'root',
-		back: 'WooCommerce Home',
+		id: 'settings',
 		menu: 'secondary',
 	},
 	{
 		title: 'Extensions',
-		slug: 'extensions',
-		parent: 'root',
-		back: 'WooCommerce Home',
+		id: 'extensions',
 		menu: 'secondary',
 	},
 	{
 		title: 'General',
-		slug: 'general',
+		id: 'general',
 		parent: 'settings',
 	},
 	{
 		title: 'Tax',
-		slug: 'tax',
+		id: 'tax',
 		parent: 'settings',
 	},
 	{
 		title: 'My extensions',
-		slug: 'my_extensions',
+		id: 'my_extensions',
 		parent: 'extensions',
 	},
 	{
 		title: 'Marketplace',
-		slug: 'marketplace',
+		id: 'marketplace',
 		parent: 'extensions',
 	},
 ];
 
 function Example() {
-	return <Navigation data={ data } initial="home" />;
+	const [ active, setActive ] = useState( 'home' );
+	const activeItem = data.find( ( item ) => item.id === active );
+	const parentItem =
+		activeItem && activeItem.parent
+			? data.find( ( item ) => item.id === activeItem.parent )
+			: null;
+	const title = parentItem ? parentItem.title : 'WooCommerce Home';
+	const items = data.map( ( item ) => {
+		item.onClick = () => setActive( item.id );
+		return item;
+	} );
+
+	return (
+		<Navigation active={ active } items={ items }>
+			{ activeItem && activeItem.parent && (
+				<NavigationBackButton
+					onClick={ () => setActive( activeItem.parent ) }
+				>
+					{ title }
+				</NavigationBackButton>
+			) }
+			<NavigationTitle>{ title }</NavigationTitle>
+			<NavigationMenu />
+			<NavigationMenu id={ 'secondary' } />
+		</Navigation>
+	);
 }
 
 export const _default = () => {
