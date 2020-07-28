@@ -9,3 +9,5 @@ export const ASPECT_RATIOS = [
 	{ ratio: '0.56', className: 'wp-embed-aspect-9-16' },
 	{ ratio: '0.50', className: 'wp-embed-aspect-1-2' },
 ];
+
+export const WP_EMBED_TYPE = 'wp-embed';
