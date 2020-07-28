@@ -28,6 +28,7 @@ function BlockList(
 		className,
 		rootClientId,
 		renderAppender,
+		__experimentalItemWrapper: ItemWrapper,
 		__experimentalTagName = 'div',
 		__experimentalAppenderTagName,
 		__experimentalPassedProps = {},
@@ -91,7 +92,7 @@ function BlockList(
 
 				const isDropTarget = dropTargetIndex === index;
 
-				return (
+				const blockListBlock = (
 					<AsyncModeProvider
 						key={ clientId }
 						value={ ! isBlockInSelection }
@@ -113,6 +114,11 @@ function BlockList(
 						/>
 					</AsyncModeProvider>
 				);
+
+				if ( ItemWrapper ) {
+					return <ItemWrapper>{ blockListBlock }</ItemWrapper>;
+				}
+				return blockListBlock;
 			} ) }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }

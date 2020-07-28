@@ -40,6 +40,7 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		__experimentalItemWrapper: itemWrapper,
 		template,
 		templateLock,
 		forwardedRef,
@@ -93,6 +94,7 @@ function UncontrolledInnerBlocks( props ) {
 			{ ...props }
 			ref={ forwardedRef }
 			rootClientId={ clientId }
+			__experimentalItemWrapper={ itemWrapper }
 			className={ classes }
 		/>
 	);
