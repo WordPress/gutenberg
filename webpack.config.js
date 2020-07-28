@@ -68,7 +68,7 @@ module.exports = {
 	}, {} ),
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './build/[basename]/index.min.js',
+		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
