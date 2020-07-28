@@ -27,6 +27,7 @@ import {
 	EnablePublishSidebarOption,
 	EnablePanelOption,
 	EnableFeature,
+	ShowIconLabels,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 
@@ -105,6 +106,9 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 				</PageAttributesCheck>
 			</Section>
 			<MetaBoxesSection title={ __( 'Advanced panels' ) } />
+			<Section title={ __( 'Icon Labels' ) }>
+				<ShowIconLabels label="Show Icon Labels" />
+			</Section>
 		</Modal>
 	);
 }
@@ -125,6 +129,8 @@ export default compose(
 	withDispatch( ( dispatch ) => {
 		return {
 			closeModal: () => dispatch( 'core/edit-post' ).closeModal(),
+			toggleIconLabels: () =>
+				dispatch( 'core/edit-post' ).toggleFeature( 'showIconLabels' ),
 		};
 	} )
 )( OptionsModal );

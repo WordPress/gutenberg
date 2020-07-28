@@ -67,5 +67,12 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
   <WithSelect(MetaBoxesSection)
     title="Advanced panels"
   />
+  <Section
+    title="Icon Labels"
+  >
+    <WithSelect(WithDispatch(BaseOption))
+      label="Show Icon Labels"
+    />
+  </Section>
 </WithInstanceId(Modal)>
 `;
