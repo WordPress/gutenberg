@@ -93,13 +93,11 @@ function Example() {
 
 	return (
 		<Navigation active={ active } items={ items }>
-			{ activeItem && activeItem.parent && (
-				<NavigationBackButton
-					onClick={ () => setActive( activeItem.parent ) }
-				>
-					{ title }
-				</NavigationBackButton>
-			) }
+			<NavigationBackButton
+				nullText="Dashboard"
+				rootText="WooCommerce Home"
+				onClick={ ( item ) => setActive( item.id ) }
+			/>
 			<NavigationTitle>{ title }</NavigationTitle>
 			<NavigationMenu />
 			<NavigationMenu id={ 'secondary' } />
