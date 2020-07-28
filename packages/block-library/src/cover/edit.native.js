@@ -253,11 +253,8 @@ const Cover = ( {
 	);
 
 	const addMediaButton = () => (
-		<View style={ styles.selectImageContainer }>
-			<TouchableWithoutFeedback
-				style={ styles.selectImageContainer }
-				onPress={ openMediaOptionsRef.current }
-			>
+		<TouchableWithoutFeedback onPress={ openMediaOptionsRef.current }>
+			<View style={ styles.selectImageContainer }>
 				<View style={ styles.selectImage }>
 					<Icon
 						size={ 16 }
@@ -265,8 +262,8 @@ const Cover = ( {
 						{ ...styles.selectImageIcon }
 					/>
 				</View>
-			</TouchableWithoutFeedback>
-		</View>
+			</View>
+		</TouchableWithoutFeedback>
 	);
 
 	const controls = (
