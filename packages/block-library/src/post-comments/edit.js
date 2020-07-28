@@ -42,8 +42,6 @@ function PostCommentsDisplay( { postId } ) {
 	);
 }
 
-const BlockWrapper = Block.div;
-
 export default function PostCommentsEdit( {
 	attributes,
 	setAttributes,
@@ -69,13 +67,13 @@ export default function PostCommentsEdit( {
 				/>
 			</BlockControls>
 
-			<BlockWrapper
+			<Block.div
 				className={ classnames( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
 				<PostCommentsDisplay postId={ postId } />
-			</BlockWrapper>
+			</Block.div>
 		</>
 	);
 }

@@ -55,8 +55,6 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		} );
 	}
 
-	const BlockWrapper = Block.div;
-
 	return (
 		<>
 			<InspectorControls>
@@ -114,7 +112,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 
-			<BlockWrapper
+			<Block.div
 				className={ classnames( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
@@ -153,7 +151,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						</p>
 					) }
 				</div>
-			</BlockWrapper>
+			</Block.div>
 		</>
 	);
 }

@@ -58,8 +58,6 @@ function PostExcerptEditor( {
 		postType
 	);
 
-	const BlockWrapper = Block.div;
-
 	return (
 		<>
 			<BlockControls>
@@ -94,7 +92,7 @@ function PostExcerptEditor( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockWrapper
+			<Block.div
 				className={ classnames( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
@@ -137,7 +135,7 @@ function PostExcerptEditor( {
 						}
 					/>
 				) }
-			</BlockWrapper>
+			</Block.div>
 		</>
 	);
 }
