@@ -208,7 +208,13 @@ export function fallback( url, onReplace ) {
  * @return {Object} Attributes and values.
  */
 export const getAttributesFromPreview = memoize(
-	( preview, title, currentClassNames, isResponsive, allowResponsive ) => {
+	(
+		preview,
+		title,
+		currentClassNames,
+		isResponsive,
+		allowResponsive = true
+	) => {
 		if ( ! preview ) {
 			return {};
 		}

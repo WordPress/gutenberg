@@ -42,9 +42,6 @@ const EmbedEdit = ( props ) => {
 			providerNameSlug,
 			previewable,
 			responsive,
-			allowResponsive,
-			caption,
-			className,
 			url: attributesUrl,
 		},
 		attributes,
@@ -63,7 +60,6 @@ const EmbedEdit = ( props ) => {
 
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
-	const [ mergedAttributes, setMergedAttributes ] = useState( attributes );
 	const { invalidateResolution } = useDispatch( 'core/data' );
 
 	const {
@@ -112,6 +108,7 @@ const EmbedEdit = ( props ) => {
 	 * @return {Object} Attributes derived from the preview, merged with the current attributes.
 	 */
 	const getMergedAttributes = () => {
+		const { allowResponsive, className } = attributes;
 		return {
 			...attributes,
 			...getAttributesFromPreview(
@@ -125,6 +122,7 @@ const EmbedEdit = ( props ) => {
 	};
 
 	const toggleResponsive = () => {
+		const { allowResponsive, className } = attributes;
 		const { html } = preview;
 		const newAllowResponsive = ! allowResponsive;
 
@@ -161,12 +159,11 @@ const EmbedEdit = ( props ) => {
 			// clipping or scrollbars. The `getAttributesFromPreview` function
 			// that `getMergedAttributes` uses is memoized so that we're not
 			// calculating them on every render.
-			setMergedAttributes( getMergedAttributes() );
-			setAttributes( mergedAttributes );
+			setAttributes( getMergedAttributes() );
 			if ( onReplace ) {
 				const upgradedBlock = createUpgradedEmbedBlock(
 					props,
-					mergedAttributes
+					getMergedAttributes()
 				);
 
 				if ( upgradedBlock ) {
@@ -209,6 +206,21 @@ const EmbedEdit = ( props ) => {
 		);
 	}
 
+	// Even though we set attributes that get derived from the preview,
+	// we don't access them directly because for the initial render,
+	// the `setAttributes` call will not have taken effect. If we're
+	// rendering responsive content, setting the responsive classes
+	// after the preview has been rendered can result in unwanted
+	// clipping or scrollbars. The `getAttributesFromPreview` function
+	// that `getMergedAttributes` uses is memoized so that we're not
+	const {
+		caption,
+		type,
+		allowResponsive,
+		className: classFromPreview,
+	} = getMergedAttributes();
+	const className = classnames( classFromPreview, props.className );
+
 	return (
 		<>
 			<EmbedControls
@@ -223,12 +235,9 @@ const EmbedEdit = ( props ) => {
 			<EmbedPreview
 				preview={ preview }
 				previewable={ previewable }
-				className={ classnames(
-					mergedAttributes.className,
-					props.className
-				) }
+				className={ className }
 				url={ url }
-				type={ mergedAttributes.type }
+				type={ type }
 				caption={ caption }
 				onCaptionChange={ ( value ) =>
 					setAttributes( { caption: value } )
