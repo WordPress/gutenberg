@@ -52,7 +52,7 @@ describe( 'readConfig', () => {
 			}
 		} );
 
-		it( 'should infer a core config when ran from a core directory', async () => {
+		it( 'should infer a core config when run from a core directory', async () => {
 			readFile.mockImplementation( () =>
 				Promise.reject( { code: 'ENOENT' } )
 			);
@@ -64,7 +64,7 @@ describe( 'readConfig', () => {
 			expect( config.env.development.themeSources ).toHaveLength( 0 );
 		} );
 
-		it( 'should infer a plugin config when ran from a plugin directory', async () => {
+		it( 'should infer a plugin config when run from a plugin directory', async () => {
 			readFile.mockImplementation( () =>
 				Promise.reject( { code: 'ENOENT' } )
 			);
@@ -76,7 +76,7 @@ describe( 'readConfig', () => {
 			expect( config.env.development.themeSources ).toHaveLength( 0 );
 		} );
 
-		it( 'should infer a theme config when ran from a theme directory', async () => {
+		it( 'should infer a theme config when run from a theme directory', async () => {
 			readFile.mockImplementation( () =>
 				Promise.reject( { code: 'ENOENT' } )
 			);

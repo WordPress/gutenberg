@@ -33,7 +33,7 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( volumes ).toEqual( [
 			'wordpress:/var/www/html', // WordPress root
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins', // Mapped plugins root
-			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name', // Mapped plugin
+			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name:delegated', // Mapped plugin
 		] );
 	} );
 
@@ -65,7 +65,7 @@ describe( 'buildDockerComposeConfig', () => {
 
 		const localSources = [
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins',
-			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name',
+			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name:delegated',
 			'/path/to/local/theme:/var/www/html/wp-content/themes/test-theme',
 		];
 
