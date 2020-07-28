@@ -192,6 +192,11 @@ class BottomSheetRangeCell extends Component {
 			styles.columnsPreviewDark
 		);
 
+		const columnIndicatorStyle = getStylesFromColorScheme(
+			styles.columnIndicator,
+			styles.columnIndicatorDark
+		);
+
 		return (
 			<Cell
 				{ ...cellProps }
@@ -221,7 +226,7 @@ class BottomSheetRangeCell extends Component {
 										<View
 											style={ [
 												isSelected &&
-													styles.columnIndicator,
+													columnIndicatorStyle,
 												{ flex: columnWidth },
 											] }
 											key={ index }

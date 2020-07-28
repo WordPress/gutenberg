@@ -159,7 +159,7 @@ function ColumnsEditContainer( {
 				<PanelBody>
 					<UnsupportedFooterControl
 						label={ __(
-							'Note: columns may stack on small screens'
+							'Note: Column layout may vary between themes and screen sizes'
 						) }
 						textAlign="center"
 					/>

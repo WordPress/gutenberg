@@ -40,18 +40,23 @@
 }
 
 .columnsPreview {
-	min-height: 21px;
-	min-width: 38px;
-	border-color: $light-gray-400;
+	min-height: 18px;
+	min-width: 24px;
+	border-color: $toolbar-button;
 	flex-direction: row;
 	margin-right: 10px;
 	border-width: $border-width;
+	border-radius: $radius-block-ui;
 }
 
 .columnsPreviewDark {
-	border-color: $gray-70;
+	border-color: $gray-20;
 }
 
 .columnIndicator {
-	background-color: $blue-wordpress;
+	background-color: $toolbar-button;
+}
+
+.columnIndicatorDark {
+	background-color: $gray-20;
 }

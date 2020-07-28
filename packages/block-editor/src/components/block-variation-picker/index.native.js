@@ -108,7 +108,9 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 			</ScrollView>
 			<PanelBody>
 				<UnsupportedFooterControl
-					label={ __( 'Note: columns may stack on small screens' ) }
+					label={ __(
+						'Note: Column layout may vary between themes and screen sizes'
+					) }
 					textAlign="center"
 				/>
 			</PanelBody>
