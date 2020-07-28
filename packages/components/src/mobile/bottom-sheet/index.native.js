@@ -253,7 +253,6 @@ class BottomSheet extends Component {
 			paddingBottom:
 				( safeAreaBottomInset || 0 ) +
 				styles.scrollableContent.paddingBottom,
-				safeAreaBottomInset + styles.scrollableContent.paddingBottom,
 		};
 	}
 
