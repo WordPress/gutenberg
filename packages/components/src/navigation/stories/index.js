@@ -90,7 +90,7 @@ function Example() {
 			<NavigationBackButton
 				nullText="Dashboard"
 				rootText="WooCommerce Home"
-				onClick={ ( item ) => setActive( item.id ) }
+				onClick={ ( item ) => ( item ? setActive( item.id ) : null ) }
 			/>
 			<NavigationTitle rootText="WooCommerce Home" />
 			<NavigationMenu />
