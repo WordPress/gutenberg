@@ -51,8 +51,9 @@ function gutenberg_register_block_patterns() {
 		register_block_pattern( 'core/text-two-columns-with-images', gutenberg_load_block_pattern( 'text-two-columns-with-images' ) );
 		register_block_pattern( 'core/text-three-columns-buttons', gutenberg_load_block_pattern( 'text-three-columns-buttons' ) );
 		register_block_pattern( 'core/large-header', gutenberg_load_block_pattern( 'large-header' ) );
-		register_block_pattern( 'core/large-header-paragraph', gutenberg_load_block_pattern( 'large-header-paragraph' ) );
+		register_block_pattern( 'core/large-header-button', gutenberg_load_block_pattern( 'large-header-button' ) );
 		register_block_pattern( 'core/three-buttons', gutenberg_load_block_pattern( 'three-buttons' ) );
+		register_block_pattern( 'core/heading-paragraph', gutenberg_load_block_pattern( 'heading-paragraph' ) );
 		register_block_pattern( 'core/quote', gutenberg_load_block_pattern( 'quote' ) );
 	}
 

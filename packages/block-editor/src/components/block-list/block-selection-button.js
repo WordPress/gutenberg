@@ -63,7 +63,7 @@ function BlockSelectionButton( { clientId, rootClientId, ...props } ) {
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
 		ref.current.focus();
-	} );
+	}, [] );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;

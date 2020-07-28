@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 8.6.1 =
+
+### Bug Fixes:
+
+ - Fix the plugin translations.
+
+
 = 8.6.0 =
 
 ### Features

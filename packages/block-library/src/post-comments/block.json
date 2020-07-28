@@ -1,7 +1,26 @@
 {
 	"name": "core/post-comments",
 	"category": "design",
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		}
+	},
 	"usesContext": [
-		"postId"
-	]
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		],
+		"__experimentalFontSize": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
+		},
+		"__experimentalLineHeight": true
+	}
 }

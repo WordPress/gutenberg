@@ -18,11 +18,16 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$classes = 'wp-block-post-comments-form';
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= ' has-text-align-' . $attributes['textAlign'];
+	}
+
 	ob_start();
 	comment_form( array(), $block->context['postId'] );
 	$form = ob_get_clean();
 
-	return $form;
+	return sprintf( '<div class="%1$s">%2$s</div>', esc_attr( $classes ), $form );
 }
 
 /**

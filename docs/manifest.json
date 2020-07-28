@@ -408,6 +408,12 @@
 		"parent": "develop"
 	},
 	{
+		"title": "Getting Started for the React Native based Mobile Gutenberg",
+		"slug": "getting-started-native-mobile",
+		"markdown_source": "../docs/contributors/getting-started-native-mobile.md",
+		"parent": "develop"
+	},
+	{
 		"title": "Design Contributions",
 		"slug": "design",
 		"markdown_source": "../docs/contributors/design.md",

@@ -52,7 +52,17 @@ import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
 
 const interfaceLabels = {
-	leftSidebar: __( 'Block Library' ),
+	leftSidebar: __( 'Block library' ),
+	/* translators: accessibility text for the editor top bar landmark region. */
+	header: __( 'Editor top bar' ),
+	/* translators: accessibility text for the editor content landmark region. */
+	body: __( 'Editor content' ),
+	/* translators: accessibility text for the editor settings landmark region. */
+	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
+	/* translators: accessibility text for the editor footer landmark region. */
+	footer: __( 'Editor footer' ),
 };
 
 function Layout() {
