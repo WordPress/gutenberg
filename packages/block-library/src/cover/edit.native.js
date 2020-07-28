@@ -44,7 +44,7 @@ import {
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { cover as icon, replace } from '@wordpress/icons';
+import { cover as icon, replace, image } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
 /**
@@ -113,6 +113,8 @@ const Cover = ( {
 		overlayColor.color ||
 		gradientValue
 	);
+
+	const hasOnlyColorBackground = ! url && hasBackground;
 
 	const [
 		isCustomColorPickerShowing,
@@ -250,6 +252,20 @@ const Cover = ( {
 		</BlockControls>
 	);
 
+	const addMediaButton = () => (
+		<TouchableWithoutFeedback onPress={ openMediaOptionsRef.current }>
+			<View style={ styles.selectImageContainer }>
+				<View style={ styles.selectImage }>
+					<Icon
+						size={ 16 }
+						icon={ image }
+						{ ...styles.selectImageIcon }
+					/>
+				</View>
+			</View>
+		</TouchableWithoutFeedback>
+	);
+
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
@@ -328,6 +344,13 @@ const Cover = ( {
 				) }
 			</BottomSheetConsumer>
 		</InspectorControls>
+	);
+
+	const renderContent = ( getMediaOptions ) => (
+		<>
+			{ renderBackground( getMediaOptions ) }
+			{ isParentSelected && hasOnlyColorBackground && addMediaButton() }
+		</>
 	);
 
 	const renderBackground = ( getMediaOptions ) => (
@@ -494,11 +517,11 @@ const Cover = ( {
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				isReplacingMedia={ true }
+				isReplacingMedia={ ! hasOnlyColorBackground }
 				onSelect={ onSelectMedia }
 				render={ ( { open, getMediaOptions } ) => {
 					openMediaOptionsRef.current = open;
-					return renderBackground( getMediaOptions );
+					return renderContent( getMediaOptions );
 				} }
 			/>
 
