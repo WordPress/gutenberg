@@ -208,6 +208,7 @@ describe( 'Embedding content', () => {
 
 		// Photo content. Should render valid figure element.
 		await insertEmbed( 'https://cloudup.com/cQFlxqtY4ob' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async () => {
@@ -230,6 +231,7 @@ describe( 'Embedding content', () => {
 		await insertEmbed( 'https://twitter.com/notnownikki/' );
 		// The twitter block should appear correctly.
 		await page.waitForSelector( 'figure.wp-block-embed' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should allow the user to try embedding a failed URL again', async () => {
@@ -257,6 +259,7 @@ describe( 'Embedding content', () => {
 		] );
 		await clickButton( 'Try again' );
 		await page.waitForSelector( 'figure.wp-block-embed' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should switch to the WordPress block correctly', async () => {
@@ -279,5 +282,6 @@ describe( 'Embedding content', () => {
 
 		// Check the block has become a WordPress block.
 		await page.waitForSelector( 'figure.wp-block-embed' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
