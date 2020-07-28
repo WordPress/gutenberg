@@ -6,7 +6,8 @@ import {
 	useIsFocused,
 	useNavigation,
 } from '@react-navigation/native';
-import { View } from 'react-native';
+import { CardStyleInterpolators } from '@react-navigation/stack';
+import { View, InteractionManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -24,6 +25,7 @@ const BottomSheetScreen = ( { children } ) => {
 		shouldEnableBottomSheetMaxHeight,
 		setHeight,
 	} = useContext( BottomSheetContext );
+
 	useFocusEffect(
 		useCallback( () => {
 			onHandleHardwareButtonPress( () => {
@@ -37,14 +39,15 @@ const BottomSheetScreen = ( { children } ) => {
 			} );
 
 			if ( heightRef.current.maxHeight !== 0 ) {
-				setHeight( heightRef.current.maxHeight );
+				InteractionManager.runAfterInteractions( () => {
+					setHeight( heightRef.current.maxHeight );
+				} );
 			}
 			return () => {};
 		}, [] )
 	);
 	const onLayout = ( { nativeEvent } ) => {
 		const { height } = nativeEvent.layout;
-
 		if ( heightRef.current.maxHeight !== height && isFocused ) {
 			heightRef.current.maxHeight = height;
 			setHeight( height );
@@ -55,11 +58,7 @@ const BottomSheetScreen = ( { children } ) => {
 };
 
 BottomSheetScreen.options = {
-	cardStyleInterpolator: ( { current } ) => ( {
-		cardStyle: {
-			opacity: current.progress,
-		},
-	} ),
+	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 };
 
 export default BottomSheetScreen;

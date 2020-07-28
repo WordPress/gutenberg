@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
-
+import { View, InteractionManager } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -14,21 +13,32 @@ import { useState, useContext } from '@wordpress/element';
 import { performLayoutAnimation } from '../layout-animation';
 
 function BottomSheetNavigationContainer( { children, animate } ) {
-	const [ height, setMaxHeight ] = useState( 1 );
-
 	const context = useContext( BottomSheetContext );
+	const [ height, setMaxHeight ] = useState( context.currentHeight || 1 );
+
 	const setHeight = ( maxHeight ) => {
 		if ( height !== maxHeight && maxHeight > 50 ) {
 			if ( animate ) {
-				performLayoutAnimation( 300 );
+				InteractionManager.runAfterInteractions( () => {
+					performLayoutAnimation();
+					setMaxHeight( maxHeight );
+				} );
+			} else {
+				setMaxHeight( maxHeight );
 			}
-			setMaxHeight( maxHeight );
 		}
 	};
-
 	return (
-		<View style={ { height } }>
-			<BottomSheetProvider value={ { ...context, setHeight } }>
+		<View
+			style={
+				animate && context.currentHeight
+					? { height: context.currentHeight }
+					: { height }
+			}
+		>
+			<BottomSheetProvider
+				value={ { ...context, setHeight, currentHeight: height } }
+			>
 				{ children }
 			</BottomSheetProvider>
 		</View>
