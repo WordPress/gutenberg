@@ -145,12 +145,11 @@
 <p><?php _e( 'Any block can opt into these alignments. The embed block has them also, and is responsive out of the box:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-// TODO change all previous references of core-embed...
-<!-- wp:core-embed/vimeo {"url":"https://vimeo.com/22439234","type":"video","providerNameSlug":"vimeo","align":"wide","className":"wp-has-aspect-ratio wp-embed-aspect-16-9"} -->
-<figure class="wp-block-embed-vimeo alignwide wp-block-embed is-type-video is-provider-vimeo wp-has-aspect-ratio wp-embed-aspect-16-9"><div class="wp-block-embed__wrapper">
+<!-- wp:embed {"url":"https://vimeo.com/22439234","type":"video","providerNameSlug":"vimeo","align":"wide","className":"wp-has-aspect-ratio wp-embed-aspect-16-9"} -->
+<figure class="alignwide wp-block-embed is-type-video is-provider-vimeo wp-has-aspect-ratio wp-embed-aspect-16-9"><div class="wp-block-embed__wrapper">
 https://vimeo.com/22439234
 </div></figure>
-<!-- /wp:core-embed/vimeo -->
+<!-- /wp:embed -->
 
 <!-- wp:paragraph -->
 <p><?php _e( 'You can build any block you like, static or dynamic, decorative or plain. Here&#8217;s a pullquote block:', 'gutenberg' ); ?></p>

@@ -81,8 +81,8 @@ export const moreItem = {
 };
 
 export const youtubeItem = {
-	id: 'core-embed/youtube',
-	name: 'core-embed/youtube',
+	id: 'core/embed',
+	name: 'core/embed',
 	initialAttributes: {},
 	title: 'YouTube',
 	category: 'embed',
