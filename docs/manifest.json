@@ -547,8 +547,8 @@
 	},
 	{
 		"title": "Block Attributes",
-		"slug": "block-attributes",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/block-attributes.md",
+		"slug": "attributes",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/attributes.md",
 		"parent": "create-block"
 	},
 	{
