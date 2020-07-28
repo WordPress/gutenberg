@@ -27,6 +27,7 @@ function GroupEdit( { attributes, className, clientId } ) {
 						: () => <InnerBlocks.ButtonBlockAppender />
 				}
 				__experimentalTagName="div"
+				__experimentalItemWrapper="section"
 				__experimentalPassedProps={ {
 					className: 'wp-block-group__inner-container',
 				} }

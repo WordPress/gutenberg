@@ -9,7 +9,7 @@ export default function save( { attributes } ) {
 	return (
 		<Tag>
 			<div className="wp-block-group__inner-container">
-				<InnerBlocks.Content />
+				<InnerBlocks.Content __experimentalItemWrapper="section" />
 			</div>
 		</Tag>
 	);
