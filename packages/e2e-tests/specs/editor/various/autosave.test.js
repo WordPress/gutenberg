@@ -219,7 +219,7 @@ describe( 'autosave', () => {
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 1 );
+		).toBeGreaterThanOrEqual( 1 );
 
 		// Trigger remote autosave
 		await page.evaluate( () =>
@@ -295,14 +295,14 @@ describe( 'autosave', () => {
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 1 );
+		).toBeGreaterThanOrEqual( 1 );
 
 		// Bring network down and attempt to save
 		toggleOfflineMode( true );
 		saveDraftWithKeyboard();
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 1 );
+		).toBeGreaterThanOrEqual( 1 );
 	} );
 
 	it( "shouldn't conflict with server-side autosave", async () => {
@@ -326,7 +326,7 @@ describe( 'autosave', () => {
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 1 );
+		).toBeGreaterThanOrEqual( 1 );
 
 		await page.reload();
 
