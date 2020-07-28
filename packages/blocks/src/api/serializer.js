@@ -6,7 +6,12 @@ import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, cloneElement, renderToString } from '@wordpress/element';
+import {
+	Component,
+	RawHTML,
+	cloneElement,
+	renderToString,
+} from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -342,7 +347,11 @@ export function serializeBlock(
 	}
 
 	if ( Wrapper ) {
-		return renderToString( <Wrapper>{ unwrappedContent }</Wrapper> );
+		return renderToString(
+			<Wrapper>
+				<RawHTML>{ unwrappedContent }</RawHTML>
+			</Wrapper>
+		);
 	}
 	return unwrappedContent;
 }
