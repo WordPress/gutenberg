@@ -3,7 +3,6 @@
  */
 import moment from 'moment';
 import memoize from 'memize';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -40,7 +39,7 @@ class CalendarEdit extends Component {
 
 	getServerSideAttributes( attributes, date ) {
 		return {
-			...omit( attributes, [ 'align' ] ),
+			...attributes,
 			...this.getYearMonth( date ),
 		};
 	}

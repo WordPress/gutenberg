@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-/**
  * WordPress dependencies
  */
 import { PanelBody, ToggleControl, Disabled } from '@wordpress/components';
@@ -40,7 +36,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 			<Disabled>
 				<ServerSideRender
 					block="core/archives"
-					attributes={ omit( attributes, [ 'align' ] ) }
+					attributes={ attributes }
 				/>
 			</Disabled>
 		</>

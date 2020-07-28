@@ -94,7 +94,6 @@ export function addAttribute( settings ) {
 			...settings.attributes,
 			align: {
 				type: 'string',
-				enum: ALL_ALIGNMENTS,
 			},
 		};
 	}
