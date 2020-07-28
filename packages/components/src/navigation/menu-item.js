@@ -14,23 +14,19 @@ import { Icon, chevronRight } from '@wordpress/icons';
 import Button from '../button';
 import Text from '../text';
 
-const Item = ( { data, item, setActive, isActive } ) => {
-	const children = data.filter( ( d ) => d.parent === item.slug );
-	const onSelect = () => {
-		const next = children.length ? children[ 0 ] : item;
-		setActive( next );
-	};
+const NavigationMenuItem = ( { children, hasChildren, isActive, onClick } ) => {
 	const classes = classnames( 'components-navigation__menu-item', {
 		'is-active': isActive,
 	} );
+
 	return (
-		<Button className={ classes } onClick={ onSelect } key={ item.slug }>
+		<Button className={ classes } onClick={ onClick }>
 			<Text variant="body.small">
-				<span>{ item.title }</span>
+				<span>{ children }</span>
 			</Text>
-			{ children.length ? <Icon icon={ chevronRight } /> : null }
+			{ hasChildren ? <Icon icon={ chevronRight } /> : null }
 		</Button>
 	);
 };
 
-export default Item;
+export default NavigationMenuItem;
