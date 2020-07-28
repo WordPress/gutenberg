@@ -57,10 +57,45 @@ describe( 'BoxControl', () => {
 		it( 'should reset values when clicking Reset, if controlled', () => {
 			const Example = () => {
 				const [ state, setState ] = useState();
+
 				return (
 					<BoxControl
-						value={ state }
+						values={ state }
 						onChange={ ( next ) => setState( next ) }
+					/>
+				);
+			};
+			const { container, getByText } = render( <Example /> );
+			const input = container.querySelector( 'input' );
+			const unitSelect = container.querySelector( 'select' );
+
+			fireEvent.change( input, { target: { value: '100px' } } );
+			fireEvent.keyDown( input, { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '100' );
+			expect( unitSelect.value ).toBe( 'px' );
+
+			fireEvent.click( getByText( /Reset/ ) );
+
+			expect( input.value ).toBe( '' );
+			expect( unitSelect.value ).toBe( 'px' );
+		} );
+
+		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', () => {
+			const Example = () => {
+				const [ state, setState ] = useState();
+
+				return (
+					<BoxControl
+						values={ state }
+						onChange={ ( next ) => {
+							if ( next.top ) {
+								setState( next );
+							} else {
+								// This reverts it to being uncontrolled
+								setState( undefined );
+							}
+						} }
 					/>
 				);
 			};
