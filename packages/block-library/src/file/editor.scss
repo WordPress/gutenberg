@@ -1,11 +1,23 @@
 .wp-block-file {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 0;
 
 	.wp-block-file__content-wrapper {
 		flex-grow: 1;
+	}
+
+	.wp-block-file__embed {
+		margin-bottom: 1em;
+	}
+
+	.wp-block-file__embed-overlay {
+		position: absolute;
+		left: 0;
+		right: 0;
+		height: 800px;
 	}
 
 	.wp-block-file__textlink {

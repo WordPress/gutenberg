@@ -9,9 +9,11 @@ export default function FileBlockInspector( {
 	hrefs,
 	openInNewWindow,
 	showDownloadButton,
+	showInlineEmbed,
 	changeLinkDestinationOption,
 	changeOpenInNewWindow,
 	changeShowDownloadButton,
+	changeShowInlineEmbed,
 } ) {
 	const { href, textLinkHref, attachmentPage } = hrefs;
 
@@ -26,6 +28,15 @@ export default function FileBlockInspector( {
 	return (
 		<>
 			<InspectorControls>
+				{ href.endsWith( '.pdf' ) && (
+					<PanelBody title={ __( 'PDF settings' ) }>
+						<ToggleControl
+							label={ __( 'Show inline embed' ) }
+							checked={ showInlineEmbed }
+							onChange={ changeShowInlineEmbed }
+						/>
+					</PanelBody>
+				) }
 				<PanelBody title={ __( 'Text link settings' ) }>
 					<SelectControl
 						label={ __( 'Link to' ) }

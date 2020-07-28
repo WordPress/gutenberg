@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
+import { __, sprintf } from '@wordpress/i18n';
 
 export default function save( { attributes } ) {
 	const {
@@ -11,11 +12,26 @@ export default function save( { attributes } ) {
 		textLinkTarget,
 		showDownloadButton,
 		downloadButtonText,
+		showInlineEmbed,
 	} = attributes;
 
 	return (
 		href && (
 			<div>
+				{ showInlineEmbed && (
+					<object
+						className="wp-block-file__embed"
+						data={ href }
+						type="application/pdf"
+						width="100%"
+						height="800"
+						aria-label={ sprintf(
+							/* translators: Placeholder is the filename. */
+							__( 'Embed of %s.' ),
+							fileName
+						) }
+					/>
+				) }
 				{ ! RichText.isEmpty( fileName ) && (
 					<a
 						href={ textLinkHref }

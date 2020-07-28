@@ -33,6 +33,9 @@
 			"type": "string",
 			"source": "html",
 			"selector": "a[download]"
+		},
+		"showInlineEmbed": {
+			"type": "boolean"
 		}
 	},
 	"supports": {

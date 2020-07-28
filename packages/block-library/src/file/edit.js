@@ -40,6 +40,7 @@ class FileEdit extends Component {
 		this.changeShowDownloadButton = this.changeShowDownloadButton.bind(
 			this
 		);
+		this.changeShowInlineEmbed = this.changeShowInlineEmbed.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 
 		this.state = {
@@ -129,6 +130,10 @@ class FileEdit extends Component {
 		this.props.setAttributes( { showDownloadButton: newValue } );
 	}
 
+	changeShowInlineEmbed( newValue ) {
+		this.props.setAttributes( { showInlineEmbed: newValue } );
+	}
+
 	render() {
 		const {
 			className,
@@ -146,6 +151,7 @@ class FileEdit extends Component {
 			textLinkTarget,
 			showDownloadButton,
 			downloadButtonText,
+			showInlineEmbed,
 		} = attributes;
 		const { hasError, showCopyConfirmation } = this.state;
 		const attachmentPage = media && media.link;
@@ -183,6 +189,8 @@ class FileEdit extends Component {
 							.changeLinkDestinationOption,
 						changeOpenInNewWindow: this.changeOpenInNewWindow,
 						changeShowDownloadButton: this.changeShowDownloadButton,
+						showInlineEmbed,
+						changeShowInlineEmbed: this.changeShowInlineEmbed,
 					} }
 				/>
 				<BlockControls>
@@ -202,6 +210,23 @@ class FileEdit extends Component {
 								animateClassName
 							) }
 						>
+							{ showInlineEmbed && (
+								<>
+									<object
+										className="wp-block-file__embed"
+										data={ href }
+										type="application/pdf"
+										width="100%"
+										height="800"
+										aria-label={ __(
+											'Embed of the selected PDF file.'
+										) }
+									/>
+									{ ! isSelected && (
+										<div className="wp-block-file__embed-overlay" />
+									) }
+								</>
+							) }
 							<div className={ 'wp-block-file__content-wrapper' }>
 								<div className="wp-block-file__textlink">
 									<RichText
