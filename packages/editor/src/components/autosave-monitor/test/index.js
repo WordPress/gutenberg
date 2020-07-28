@@ -90,10 +90,53 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	describe( '#autosaveTimerHandler()', () => {
-		it( 'should schedule itself in another {interval} ms', () => {} );
-		it( 'should schedule itself in 1000 ms if the post is not autosaveable at a time', () => {} );
-		it( 'should call autosave if needsAutosave=true', () => {} );
-		it( 'should not call autosave if needsAutosave is not true', () => {} );
+		it( 'should schedule itself in another {interval} ms', () => {
+			wrapper.setProps( {
+				isAutosaveable: true,
+				interval: 5,
+			} );
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 1 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 2 );
+			expect( setTimeout ).lastCalledWith( expect.any( Function ), 5000 );
+		} );
+
+		it( 'should schedule itself in 1000 ms if the post is not autosaveable at a time', () => {
+			wrapper.setProps( {
+				isAutosaveable: false,
+				interval: 5,
+			} );
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 1 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 2 );
+			expect( setTimeout ).lastCalledWith( expect.any( Function ), 1000 );
+		} );
+
+		it( 'should call autosave if needsAutosave=true', () => {
+			const autosave = jest.fn();
+			wrapper.setProps( {
+				isAutosaveable: true,
+				interval: 5,
+				autosave,
+			} );
+			wrapper.instance().needsAutosave = true;
+			expect( autosave ).toHaveBeenCalledTimes( 0 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( autosave ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should not call autosave if needsAutosave is not true', () => {
+			const autosave = jest.fn();
+			wrapper.setProps( {
+				isAutosaveable: true,
+				interval: 5,
+				autosave,
+			} );
+			wrapper.instance().needsAutosave = false;
+			expect( autosave ).toHaveBeenCalledTimes( 0 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( autosave ).toHaveBeenCalledTimes( 0 );
+		} );
 	} );
 
 	describe( '#render()', () => {
