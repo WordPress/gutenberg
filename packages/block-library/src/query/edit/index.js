@@ -3,7 +3,11 @@
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
-import { BlockControls, InnerBlocks } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	InnerBlocks,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -25,7 +29,7 @@ export default function QueryEdit( {
 		}
 	}, [ queryId, instanceId ] );
 	return (
-		<>
+		<Block.div>
 			<BlockControls>
 				<QueryToolbar
 					query={ query }
@@ -37,7 +41,7 @@ export default function QueryEdit( {
 			<QueryProvider>
 				<InnerBlocks template={ TEMPLATE } />
 			</QueryProvider>
-		</>
+		</Block.div>
 	);
 }
 

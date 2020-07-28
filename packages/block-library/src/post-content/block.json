@@ -6,7 +6,7 @@
 		"postType"
 	],
 	"supports": {
-		"align": true,
-		"html": false
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }
