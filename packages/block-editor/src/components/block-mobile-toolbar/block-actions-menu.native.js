@@ -99,7 +99,7 @@ const BlockActionsMenu = ( {
 
 	const pasteButtonOption = {
 		id: 'pasteButtonOption',
-		label: __( 'Paste block' ),
+		label: __( 'Paste block after' ),
 		value: 'pasteButtonOption',
 	};
 

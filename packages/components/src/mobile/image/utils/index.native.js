@@ -1,18 +1,3 @@
-/**
- * External dependencies
- */
-import { Image, View } from 'react-native';
-
-/**
- * WordPress dependencies
- */
-import { useState, useEffect, memo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import styles from './style.scss';
-
 function getFocalPointOffset( imageRatio, container, imageSize, focusPoint ) {
 	const containerCenter = Math.floor( container / 2 );
 	const scaledImage = Math.floor( imageSize / imageRatio );
@@ -71,45 +56,3 @@ export function getImageWithFocalPointStyles(
 
 	return imageStyle;
 }
-
-const ImageWithFocalPoint = ( { focalPoint, url } ) => {
-	const [ originalImageData, setOriginalImageData ] = useState( null );
-	const [ containerSize, setContainerSize ] = useState( null );
-
-	useEffect( () => {
-		if ( url ) {
-			Image.getSize( url, ( width, height ) => {
-				setOriginalImageData( {
-					width,
-					height,
-					aspectRatio: width / height,
-				} );
-			} );
-		}
-	}, [ url ] );
-
-	const onContainerLayout = ( event ) => {
-		const { height, width } = event.nativeEvent.layout;
-		setContainerSize( { width, height } );
-	};
-
-	return (
-		<View style={ styles.container } onLayout={ onContainerLayout }>
-			<Image
-				aspectRatio={ originalImageData?.aspectRatio }
-				style={ [
-					styles.image,
-					{ height: containerSize?.height },
-					getImageWithFocalPointStyles(
-						focalPoint,
-						containerSize,
-						originalImageData
-					),
-				] }
-				source={ { uri: url } }
-			/>
-		</View>
-	);
-};
-
-export default memo( ImageWithFocalPoint );

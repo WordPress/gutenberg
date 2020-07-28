@@ -9,6 +9,8 @@ import { omit, noop, isFunction } from 'lodash';
 import { Component, forwardRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
+const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
+
 function cycleValue( value, total, offset ) {
 	const nextValue = value + offset;
 	if ( nextValue < 0 ) {
@@ -96,8 +98,11 @@ class NavigableContainer extends Component {
 			event.stopImmediatePropagation();
 
 			// When navigating a collection of items, prevent scroll containers
-			// from scrolling.
-			if ( event.target.getAttribute( 'role' ) === 'menuitem' ) {
+			// from scrolling. The preventDefault also prevents Voiceover from
+			// 'handling' the event, as voiceover will try to use arrow keys
+			// for highlighting text.
+			const targetRole = event.target.getAttribute( 'role' );
+			if ( MENU_ITEM_ROLES.includes( targetRole ) ) {
 				event.preventDefault();
 			}
 		}

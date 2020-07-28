@@ -35,6 +35,7 @@
 @import "./text-columns/style.scss";
 @import "./video/style.scss";
 @import "./post-excerpt/style.scss";
+@import "./post-comments/style.scss";
 
 // The following selectors have increased specificity (using the :root prefix)
 // to assure colors take effect over another base class color, mainly to let

@@ -5,7 +5,10 @@ import {
 	clickBlockAppender,
 	clickBlockToolbarButton,
 	createNewPost,
+	getCurrentPostContent,
 	switchEditorModeTo,
+	pressKeyTimes,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
@@ -133,5 +136,30 @@ describe( 'Editing modes (visual/HTML)', () => {
 			'.edit-post-header-toolbar__inserter-toggle:disabled, .edit-post-header-toolbar__inserter-toggle[aria-disabled="true"]'
 		);
 		expect( disabledInserter ).not.toBeNull();
+	} );
+
+	// Test for regressions of https://github.com/WordPress/gutenberg/issues/24054.
+	it( 'saves content when using the shortcut in the Code Editor', async () => {
+		await switchEditorModeTo( 'Code' );
+
+		const textContent = await page.evaluate(
+			() => document.querySelector( '.editor-post-text-editor' ).value
+		);
+		const editPosition = textContent.indexOf( 'Hello' );
+
+		// Replace the word 'Hello' with 'Hi'.
+		await page.click( '.editor-post-title__input' );
+		await page.keyboard.press( 'Tab' );
+		await pressKeyTimes( 'ArrowRight', editPosition );
+		await pressKeyTimes( 'Delete', 5 );
+		await page.keyboard.type( 'Hi' );
+
+		// Save the post using the shortcut.
+		await pressKeyWithModifier( 'primary', 's' );
+		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
+
+		await switchEditorModeTo( 'Visual' );
+
+		expect( await getCurrentPostContent() ).toMatchSnapshot();
 	} );
 } );
