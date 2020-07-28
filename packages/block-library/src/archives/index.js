@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
  */
 import metadata from './block.json';
 import edit from './edit';
-import deprecated from './deprecated';
 
 const { name } = metadata;
 
@@ -21,5 +20,4 @@ export const settings = {
 	icon,
 	example: {},
 	edit,
-	deprecated,
 };
