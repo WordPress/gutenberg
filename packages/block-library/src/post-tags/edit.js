@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { Warning } from '@wordpress/block-editor';
+import { Warning, __experimentalBlock as Block } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -32,6 +32,7 @@ function PostTagsDisplay( { context } ) {
 		},
 		[ tags ]
 	);
+
 	return (
 		tagLinks &&
 		( tagLinks.length === 0
@@ -41,8 +42,10 @@ function PostTagsDisplay( { context } ) {
 }
 
 export default function PostTagsEdit( { context } ) {
+	let display = <PostTagsDisplay context={ context } />;
+
 	if ( ! context.postType || ! context.postId ) {
-		return (
+		display = (
 			<Warning>
 				{ __( 'Post tags block: No post found for this block.' ) }
 			</Warning>
@@ -57,7 +60,7 @@ export default function PostTagsEdit( { context } ) {
 		 * post_tag taxonomy is registered for the current post type.
 		 */
 	} else if ( context.postType !== 'post' ) {
-		return (
+		display = (
 			<Warning>
 				{ __(
 					'Post tags block: Tags are not available for this post type.'
@@ -66,5 +69,5 @@ export default function PostTagsEdit( { context } ) {
 		);
 	}
 
-	return <PostTagsDisplay context={ context } />;
+	return <Block.div>{ display }</Block.div>;
 }
