@@ -50,8 +50,14 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 	let candidateDistance;
 
 	elements.forEach( ( element, index ) => {
-		// Ensure the element is a block. It should have the `wp-block` class.
-		if ( ! element.classList.contains( 'wp-block' ) ) {
+		// Ensure the element is a block (has the `wp-block` class) or is an
+		// InnerBlocks item wrapper.
+		if (
+			! element.classList.contains( 'wp-block' ) &&
+			! element.classList.contains(
+				'block-editor-block-list-block__wrapper'
+			)
+		) {
 			return;
 		}
 

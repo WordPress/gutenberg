@@ -199,7 +199,11 @@ function BlockListBlock( {
 	}
 
 	if ( Wrapper ) {
-		blockEdit = <Wrapper>{ blockEdit }</Wrapper>;
+		blockEdit = (
+			<Wrapper className="block-editor-block-list-block__wrapper">
+				{ blockEdit }
+			</Wrapper>
+		);
 	}
 
 	const value = {
