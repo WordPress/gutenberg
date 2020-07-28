@@ -3,10 +3,12 @@
  */
 import Text from '../text';
 
-const NavigationTitle = ( { children } ) => {
+const NavigationTitle = ( { parentItem, rootText } ) => {
 	return (
 		<div className="components-navigation__title">
-			<Text variant="title.medium">{ children }</Text>
+			<Text variant="title.medium">
+				{ parentItem ? parentItem.title : rootText }
+			</Text>
 		</div>
 	);
 };

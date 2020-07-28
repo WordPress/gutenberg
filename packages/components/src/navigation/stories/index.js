@@ -80,12 +80,6 @@ const data = [
 
 function Example() {
 	const [ active, setActive ] = useState( 'home' );
-	const activeItem = data.find( ( item ) => item.id === active );
-	const parentItem =
-		activeItem && activeItem.parent
-			? data.find( ( item ) => item.id === activeItem.parent )
-			: null;
-	const title = parentItem ? parentItem.title : 'WooCommerce Home';
 	const items = data.map( ( item ) => {
 		item.onClick = () => setActive( item.id );
 		return item;
@@ -98,7 +92,7 @@ function Example() {
 				rootText="WooCommerce Home"
 				onClick={ ( item ) => setActive( item.id ) }
 			/>
-			<NavigationTitle>{ title }</NavigationTitle>
+			<NavigationTitle rootText="WooCommerce Home" />
 			<NavigationMenu />
 			<NavigationMenu id={ 'secondary' } />
 		</Navigation>
