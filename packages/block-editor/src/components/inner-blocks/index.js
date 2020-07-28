@@ -159,7 +159,9 @@ ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
 ForwardedInnerBlocks.Content = withBlockContentContext(
-	( { BlockContent } ) => <BlockContent />
+	( { BlockContent, __experimentalItemWrapper } ) => (
+		<BlockContent __experimentalItemWrapper={ __experimentalItemWrapper } />
+	)
 );
 
 /**

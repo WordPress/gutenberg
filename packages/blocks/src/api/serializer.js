@@ -21,10 +21,15 @@ import {
 import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
 
+/** @typedef {import('@wordpress/element').WPElement} WPElement */
+
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
  *
- * @property {boolean} isInnerBlocks Whether we are serializing inner blocks.
+ * @property {boolean}   isInnerBlocks           Whether we are serializing
+ *                                               inner blocks.
+ * @property {WPElement} [__experimentalWrapper] Wrapper for block. (Outside of
+ *                                               comment delimiters.)
  */
 
 /**
@@ -307,20 +312,39 @@ export function getCommentDelimitedContent(
  *
  * @return {string} Serialized block.
  */
-export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
+export function serializeBlock(
+	block,
+	{ isInnerBlocks = false, __experimentalWrapper: Wrapper } = {}
+) {
 	const blockName = block.name;
 	const saveContent = getBlockContent( block );
+
+	// Serialized block content before wrapping it with an InnerBlocks item
+	// wrapper.
+	let unwrappedContent;
 
 	if (
 		blockName === getUnregisteredTypeHandlerName() ||
 		( ! isInnerBlocks && blockName === getFreeformContentHandlerName() )
 	) {
-		return saveContent;
+		unwrappedContent = saveContent;
+	} else {
+		const blockType = getBlockType( blockName );
+		const saveAttributes = getCommentAttributes(
+			blockType,
+			block.attributes
+		);
+		unwrappedContent = getCommentDelimitedContent(
+			blockName,
+			saveAttributes,
+			saveContent
+		);
 	}
 
-	const blockType = getBlockType( blockName );
-	const saveAttributes = getCommentAttributes( blockType, block.attributes );
-	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+	if ( Wrapper ) {
+		return renderToString( <Wrapper>{ unwrappedContent }</Wrapper> );
+	}
+	return unwrappedContent;
 }
 
 /**
