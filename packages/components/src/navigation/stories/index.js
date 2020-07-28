@@ -94,6 +94,7 @@ function Example() {
 			/>
 			<NavigationTitle rootText="WooCommerce Home" />
 			<NavigationMenu />
+			<br />
 			<NavigationMenu id={ 'secondary' } />
 		</Navigation>
 	);
