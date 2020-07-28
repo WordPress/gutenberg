@@ -282,6 +282,5 @@ describe( 'Embedding content', () => {
 
 		// Check the block has become a WordPress block.
 		await page.waitForSelector( 'figure.wp-block-embed' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

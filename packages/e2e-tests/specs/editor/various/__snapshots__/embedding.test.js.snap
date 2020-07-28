@@ -65,11 +65,3 @@ https://twitter.com/notnownikki/
 </div></figure>
 <!-- /wp:embed -->"
 `;
-
-exports[`Embedding content should switch to the WordPress block correctly 1`] = `
-"<!-- wp:embed {\\"url\\":\\"http://localhost:8889/?p=177\\",\\"type\\":\\"wp-embed\\",\\"providerNameSlug\\":\\"gutenberg\\",\\"className\\":\\"\\"} -->
-<figure class=\\"wp-block-embed is-type-wp-embed is-provider-gutenberg\\"><div class=\\"wp-block-embed__wrapper\\">
-http://localhost:8889/?p=177
-</div></figure>
-<!-- /wp:embed -->"
-`;
