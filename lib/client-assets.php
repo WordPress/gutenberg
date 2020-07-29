@@ -330,7 +330,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-components',
 		gutenberg_url( 'build/components/style.css' ),
-		array(),
+		array( 'dashicons' ),
 		filemtime( gutenberg_dir_path() . 'build/components/style.css' )
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
