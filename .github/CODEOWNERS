@@ -101,9 +101,9 @@
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @etoledom @guarani @cameronvoell
-/packages/rich-text                             @ellatrix @etoledom @guarani @cameronvoell
-/packages/block-editor/src/components/rich-text @ellatrix @etoledom @guarani @cameronvoell
+/packages/format-library                        @ellatrix @etoledom @cameronvoell @guarani
+/packages/rich-text                             @ellatrix @etoledom @cameronvoell @guarani
+/packages/block-editor/src/components/rich-text @ellatrix @etoledom @cameronvoell @guarani
 
 # Project Management
 /.github                                        @youknowriad @mapk @karmatosed
