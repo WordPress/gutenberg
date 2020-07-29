@@ -6,7 +6,7 @@ import { Warning, __experimentalBlock as Block } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-function PostTagsDisplay( { context } ) {
+export default function PostTagsEdit( { context } ) {
 	const [ tags ] = useEntityProp(
 		'postType',
 		context.postType,
@@ -42,16 +42,11 @@ function PostTagsDisplay( { context } ) {
 		[ tags ]
 	);
 
-	return (
+	let display =
 		tagLinks &&
 		( tagLinks.length === 0
 			? __( 'No tags.' )
-			: tagLinks.reduce( ( prev, curr ) => [ prev, ' | ', curr ] ) )
-	);
-}
-
-export default function PostTagsEdit( { context } ) {
-	let display = <PostTagsDisplay context={ context } />;
+			: tagLinks.reduce( ( prev, curr ) => [ prev, ' | ', curr ] ) );
 
 	if ( ! context.postType || ! context.postId ) {
 		display = (
