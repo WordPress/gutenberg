@@ -19,6 +19,7 @@ import styles from './styles';
 const PER_PAGE = 20;
 const REQUEST_DEBOUNCE_DELAY = 400;
 const MINIMUM_QUERY_SIZE = 2;
+const meetsThreshold = ( query ) => MINIMUM_QUERY_SIZE <= query.length;
 
 export default function LinkPickerResults( {
 	query,
@@ -26,12 +27,10 @@ export default function LinkPickerResults( {
 	directEntry,
 } ) {
 	const [ links, setLinks ] = useState( [ directEntry ] );
-	const hasAllSuggestions = useRef( false );
+	const [ hasAllSuggestions, setHasAllSuggestions ] = useState( false );
 	const nextPage = useRef( 1 );
 	const pendingRequest = useRef();
-	const [ isLoading, setIsLoading ] = useState( false );
 	const clearRequest = () => {
-		setIsLoading( false );
 		pendingRequest.current = null;
 	};
 
@@ -39,7 +38,7 @@ export default function LinkPickerResults( {
 	const { fetchMoreSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		const fetchLinkSuggestions = async ( { search } ) => {
-			if ( MINIMUM_QUERY_SIZE <= search.length ) {
+			if ( meetsThreshold( search ) ) {
 				return await getSettings().__experimentalFetchLinkSuggestions(
 					search,
 					{ page: nextPage.current, PER_PAGE }
@@ -52,10 +51,9 @@ export default function LinkPickerResults( {
 		} ) => {
 			// return early if we've already detected the end of data or we are
 			// already awaiting a response
-			if ( pendingRequest.current || hasAllSuggestions.current ) {
+			if ( hasAllSuggestions || pendingRequest.current ) {
 				return;
 			}
-			setIsLoading( true );
 			const request = fetchLinkSuggestions( { search } );
 			pendingRequest.current = request;
 			const suggestions = await request;
@@ -65,7 +63,7 @@ export default function LinkPickerResults( {
 				// since we don't have the response header, we check if the results
 				// are truncated to determine we've reached the end
 				if ( suggestions.length < PER_PAGE ) {
-					hasAllSuggestions.current = true;
+					setHasAllSuggestions( true );
 				}
 				setLinks( [ ...currentSuggestions, ...suggestions ] );
 				nextPage.current++;
@@ -85,14 +83,14 @@ export default function LinkPickerResults( {
 	useEffect( () => {
 		clearRequest();
 		nextPage.current = 1;
-		hasAllSuggestions.current = false;
+		setHasAllSuggestions( false );
 		setLinks( [ directEntry ] );
 		fetchMoreSuggestions( { query, links: [ directEntry ] } );
 	}, [ query ] );
 
 	const onEndReached = () => fetchMoreSuggestions( { query, links } );
 
-	const footer = ! hasAllSuggestions.current && (
+	const spinner = ! hasAllSuggestions && meetsThreshold( query ) && (
 		<View style={ styles.spinner }>
 			<ActivityIndicator animating />
 		</View>
@@ -114,7 +112,7 @@ export default function LinkPickerResults( {
 					onEndReached={ onEndReached }
 					onEndReachedThreshold={ 0.1 }
 					initialNumToRender={ PER_PAGE }
-					ListFooterComponent={ footer }
+					ListFooterComponent={ spinner }
 					{ ...listProps }
 				/>
 			) }
