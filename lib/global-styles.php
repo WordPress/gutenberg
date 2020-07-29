@@ -535,25 +535,13 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 	return $tree;
 }
 
-/**
- * Returns the stylesheet resulting of merging
- * core's, theme's, and user's origins.
- *
- * @return string
- */
-function gutenberg_experimental_global_styles_get_stylesheet() {
-	$gs_merged = array();
-	$gs_core   = gutenberg_experimental_global_styles_get_core();
-	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
-	$gs_user   = gutenberg_experimental_global_styles_get_user();
+function gutenberg_experimental_global_styles_get_merged_origins() {
+	$core   = gutenberg_experimental_global_styles_get_core();
+	$theme  = gutenberg_experimental_global_styles_get_theme();
+	$user   = gutenberg_experimental_global_styles_get_user();
+	$merged = gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user );
 
-	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
-
-	$stylesheet = gutenberg_experimental_global_styles_resolver( $gs_merged );
-	if ( empty( $stylesheet ) ) {
-		return;
-	}
-	return $stylesheet;
+	return $merged;
 }
 
 /**
@@ -561,8 +549,11 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet();
+	$merged     = gutenberg_experimental_global_styles_get_merged_origins();
+	$stylesheet = gutenberg_experimental_global_styles_resolver( $merged );
+	if ( empty( $stylesheet ) ) {
+		return;
+	}
 
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $stylesheet );
@@ -573,27 +564,18 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * Returns the default config for editor features,
  * or an empty array if none found.
  *
+ * @param array $config Config to extract values from.
  * @return array Default features config for the editor.
  */
-function gutenberg_experimental_global_styles_get_editor_features() {
-	$empty_config = array();
-	$config_path  = __DIR__ . '/experimental-default-theme.json';
-	if ( ! file_exists( $config_path ) ) {
-		return $empty_config;
-	}
-
-	$theme_config = json_decode(
-		@file_get_contents( $config_path ),
-		true
-	);
+function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 	if (
-		empty( $theme_config['global']['features'] ) ||
-		! is_array( $theme_config['global']['features'] )
+		empty( $config['global']['features'] ) ||
+		! is_array( $config['global']['features'] )
 	) {
-		return $empty_config;
+		return array();
 	}
 
-	return $theme_config['global']['features'];
+	return $config['global']['features'];
 }
 
 /**
@@ -618,10 +600,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// Add the styles for the editor via the settings
 	// so they get processed as if they were added via add_editor_styles:
 	// they will get the editor wrapper class.
-	$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet() );
+	$merged     = gutenberg_experimental_global_styles_get_merged_origins();
+	$stylesheet = gutenberg_experimental_global_styles_resolver( $merged );
+	$settings['styles'][] = array( 'css' => $stylesheet );
 
-	$editor_features                    = gutenberg_experimental_global_styles_get_editor_features();
-	$settings['__experimentalFeatures'] = $editor_features;
+	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
 
 	return $settings;
 }
