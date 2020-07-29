@@ -19,7 +19,7 @@ const createButtonLabel = 'Create Table';
  */
 async function changeCellAlignment( align ) {
 	await clickBlockToolbarButton( 'Change column alignment' );
-	await clickButton( `Align column ${align.toLowerCase()}` );
+	await clickButton( `Align column ${ align.toLowerCase() }` );
 }
 
 describe( 'Table', () => {
