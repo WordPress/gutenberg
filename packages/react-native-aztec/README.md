@@ -201,6 +201,21 @@ Called when then selection of the native component changed.
 
 ## Example
 
+```jsx
+import RCTAztecView from '@wordpress/react-native-aztec';
+
+const RichText = () => (
+	<>
+		<RCTAztecView 
+			text={ {
+				text: "<h1>This is a Heading</h1>",
+				selection: { start:0, end: 0 }
+			}} 
+		/>			
+	</>
+);
+```
+
 # License
 
 GPL v2
