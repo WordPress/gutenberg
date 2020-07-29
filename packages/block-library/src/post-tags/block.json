@@ -1,6 +1,11 @@
 {
 	"name": "core/post-tags",
 	"category": "design",
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		}
+	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,

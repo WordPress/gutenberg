@@ -1,12 +1,24 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { Warning, __experimentalBlock as Block } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	Warning,
+	__experimentalBlock as Block,
+	AlignmentToolbar,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-export default function PostTagsEdit( { context } ) {
+export default function PostTagsEdit( { context, attributes, setAttributes } ) {
+	const { textAlign } = attributes;
+
 	const [ tags ] = useEntityProp(
 		'postType',
 		context.postType,
@@ -65,5 +77,23 @@ export default function PostTagsEdit( { context } ) {
 		);
 	}
 
-	return <Block.div>{ display }</Block.div>;
+	return (
+		<>
+			<BlockControls>
+				<AlignmentToolbar
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+			</BlockControls>
+			<Block.div
+				className={ classnames( {
+					[ `has-text-align-${ textAlign }` ]: textAlign,
+				} ) }
+			>
+				{ display }
+			</Block.div>
+		</>
+	);
 }
