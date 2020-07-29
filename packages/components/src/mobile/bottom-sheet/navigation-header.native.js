@@ -91,11 +91,20 @@ function BottomSheetNavigationHeader( {
 					accessibilityHint={ __( 'Applies the setting' ) }
 				>
 					<View style={ styles.bottomSheetApplyButton }>
-						<Icon
-							icon={ check }
-							size={ 24 }
-							style={ applyButtonStyle }
-						/>
+						{ isIOS ? (
+							<Text
+								style={ bottomSheetButtonTextStyle }
+								maxFontSizeMultiplier={ 2 }
+							>
+								{ __( 'Apply' ) }
+							</Text>
+						) : (
+							<Icon
+								icon={ check }
+								size={ 24 }
+								style={ applyButtonStyle }
+							/>
+						) }
 					</View>
 				</TouchableWithoutFeedback>
 			) : (
