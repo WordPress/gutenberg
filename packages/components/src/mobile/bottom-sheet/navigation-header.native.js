@@ -2,18 +2,24 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback, Text, Platform } from 'react-native';
+
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon, chevronLeft, arrowLeft } from '@wordpress/icons';
+import { check, Icon, chevronLeft, arrowLeft } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
-function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
+function BottomSheetNavigationHeader( {
+	leftButtonOnPress,
+	screen,
+	applyButtonOnPress,
+} ) {
 	const isIOS = Platform.OS === 'ios';
 
 	const bottomSheetHeaderTitleStyle = usePreferredColorSchemeStyle(
@@ -31,6 +37,10 @@ function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
 	const arrowLeftStyle = usePreferredColorSchemeStyle(
 		styles.arrowLeftIcon,
 		styles.arrowLeftIconDark
+	);
+	const applyButtonStyle = usePreferredColorSchemeStyle(
+		styles.applyButton,
+		styles.applyButtonDark
 	);
 
 	return (
@@ -73,7 +83,24 @@ function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
 			>
 				{ screen }
 			</Text>
-			<View style={ styles.bottomSheetRightSpace } />
+			{ !! applyButtonOnPress ? (
+				<TouchableWithoutFeedback
+					onPress={ applyButtonOnPress }
+					accessibilityRole={ 'button' }
+					accessibilityLabel={ __( 'Apply' ) }
+					accessibilityHint={ __( 'Applies the setting' ) }
+				>
+					<View style={ styles.bottomSheetApplyButton }>
+						<Icon
+							icon={ check }
+							size={ 24 }
+							style={ applyButtonStyle }
+						/>
+					</View>
+				</TouchableWithoutFeedback>
+			) : (
+				<View style={ styles.bottomSheetRightSpace } />
+			) }
 		</View>
 	);
 }

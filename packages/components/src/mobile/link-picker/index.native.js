@@ -66,6 +66,7 @@ export const LinkPicker = ( {
 			<NavigationHeader
 				screen={ __( 'Link to' ) }
 				leftButtonOnPress={ cancel }
+				applyButtonOnPress={ onSubmit }
 			/>
 			<BottomSheet.Cell
 				style={ styles.omniCell }
