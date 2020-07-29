@@ -9,7 +9,6 @@ import { startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { link } from '@wordpress/icons';
 import { BottomSheet } from '@wordpress/components';
 import { getProtocol, prependHTTP } from '@wordpress/url';
 
@@ -18,6 +17,7 @@ import { getProtocol, prependHTTP } from '@wordpress/url';
  */
 import LinkPickerResults from './link-picker-results';
 import NavigationHeader from '../bottom-sheet/navigation-header';
+import styles from './styles';
 
 // this creates a search suggestion for adding a url directly
 export const createDirectEntry = ( value ) => {
@@ -68,8 +68,8 @@ export const LinkPicker = ( {
 				leftButtonOnPress={ cancel }
 			/>
 			<BottomSheet.Cell
-				icon={ link }
-				label={ __( 'URL' ) }
+				style={ styles.omniCell }
+				valueStyle={ styles.omniInput }
 				value={ value }
 				placeholder={ __( 'Search or type URL' ) }
 				autoCapitalize="none"
