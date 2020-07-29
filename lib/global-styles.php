@@ -570,6 +570,33 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 }
 
 /**
+ * Returns the default config for editor features,
+ * or an empty array if none found.
+ *
+ * @return array Default features config for the editor.
+ */
+function gutenberg_experimental_global_styles_get_editor_features() {
+	$empty_config = array();
+	$config_path  = __DIR__ . '/experimental-default-theme.json';
+	if ( ! file_exists( $config_path ) ) {
+		return $empty_config;
+	}
+
+	$theme_config = json_decode(
+		@file_get_contents( $config_path ),
+		true
+	);
+	if (
+		empty( $theme_config['global']['features'] ) ||
+		! is_array( $theme_config['global']['features'] )
+	) {
+		return $empty_config;
+	}
+
+	return $theme_config['global']['features'];
+}
+
+/**
  * Adds the necessary data for the Global Styles client UI to the block settings.
  *
  * @param array $settings Existing block editor settings.
@@ -592,6 +619,9 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// so they get processed as if they were added via add_editor_styles:
 	// they will get the editor wrapper class.
 	$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet() );
+
+	$editor_features                    = gutenberg_experimental_global_styles_get_editor_features();
+	$settings['__experimentalFeatures'] = $editor_features;
 
 	return $settings;
 }
