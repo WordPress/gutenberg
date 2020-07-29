@@ -23,6 +23,7 @@ export const settings = {
 	),
 	icon,
 	keywords: [ __( 'link' ) ],
+	example: {},
 	transforms,
 	edit,
 	save,
