@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { link } from '@wordpress/icons';
+import { link, Icon, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -21,6 +21,8 @@ export default function LinkCell( { value, onPress } ) {
 			value={ value || __( 'Search or type URL' ) }
 			valueStyle={ !! value ? undefined : placeholderColor }
 			onPress={ onPress }
-		/>
+		>
+			<Icon icon={ chevronRight }></Icon>
+		</Cell>
 	);
 }
