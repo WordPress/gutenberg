@@ -20,7 +20,7 @@ export function PageAttributesCheck( {
 	);
 
 	// Only render fields if post type supports page attributes or available templates exist.
-	if ( ! supportsPageAttributes && isEmpty( availableTemplates ) ) {
+	if ( ! supportsPageAttributes || isEmpty( availableTemplates ) ) {
 		return null;
 	}
 
