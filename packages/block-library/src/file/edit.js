@@ -106,6 +106,7 @@ class FileEdit extends Component {
 				fileName: media.title,
 				textLinkHref: media.url,
 				id: media.id,
+				showInlineEmbed: media.url.endsWith( '.pdf' ),
 			} );
 		}
 	}
