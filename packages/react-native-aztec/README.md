@@ -1,7 +1,199 @@
 # react-native-aztec
 
-This package provides a component, AztecView, that wraps around the Aztec Android and Aztec iOS libraris in a React Native component.
+This package provides a component, AztecView, that wraps around the Aztec Android and Aztec iOS libraries in a React Native component.
 This component provides rich text editing capabilities that emulate a subset of the HTML functionality.
+
+# `RCTAztecView`
+
+Render a rich text area that displays the HTML content provided.
+
+## Properties
+
+### `text: Object`
+
+HTML string to make editable. The HTML should be valid, and valid inside the `tagName`, if provided.
+
+
+- Type: `Object`, 
+- Required: Yes
+
+### blockType 
+
+The block type
+
+- Type: `Object`
+- Required: No
+- Android only
+
+### isMultiline
+
+By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
+
+- Type: `Boolean`
+- Required: No
+
+### activeFormats
+
+The formats that are currently active. This is reflected on current state of the cursor.
+
+- Type: `Array`
+- Required: No
+
+### disableEditingMenu
+
+If active disables the contextual menu that allows setting text attributes like Bold/Italic/Strikethrough.
+
+- Type: `Boolean`
+- Required: No
+
+### maxImagesWidth
+
+The maximum width an image that is part of content provided can have
+
+- Type: `Number`
+- Required: No
+
+### minWidth
+
+The minimum width the component can have
+
+- Type: `Number`
+- Required: No
+
+
+### maxWidth
+
+The maximum width the component can have
+
+- Type: `Number`
+- Required: No
+
+### fontFamily
+
+The font family that will be used as default to display the HTML content
+
+- Type: `String`
+- Required: No
+
+### fontSize
+
+The font size that will be used as default to display the HTML content
+
+- Type: `Number`
+- Required: No
+
+### fontWeight
+
+The font weight that will be used as default to display the HTML content
+
+- Type: `String`
+- Required: No
+
+### fontStyle
+
+The font style (bold, italic, ) that will be used as default to display the HTML content
+
+- Type: `String`
+- Required: No
+
+### deleteEnter 
+
+- Type: `Boolean`
+- Required: No
+- Android Only
+
+### color
+
+Text color
+
+- Type: `Color`
+- Required: No
+
+
+### selectionColor
+
+The color to use for the caret and for the selection background
+
+- Type: `Color`
+- Required: No
+
+### placeholder
+
+Placeholder text to show when the field is empty.
+
+- Type: `String`
+- Required: No
+
+### placeholderTextColor
+
+Placeholder text color.
+
+- Type: `Color`
+- Required: No
+
+### textAlign
+
+The alignment for the text displayed. Possible values: Left, Right, Center, Justify
+
+- Type: `String`
+- Required: No
+
+### onChange( value: Event )
+
+- Type: `function`
+- Required: No
+
+### onKeyDown( value: Event )
+
+Called when a key that belongs the triggerKeyCodes props is pressed.
+
+- Type: `function`
+- Required: No
+
+### onFocus( value: Event )
+
+Called when then native component is focused on, for example when tapped.
+
+- Type: `function`
+- Required: No
+
+### onBlur( value: Event )
+
+Called when then native component lost the focus.
+
+- Type: `function`
+- Required: No
+
+### onPaste( value: Event )
+
+Called when then native component has content pasted in.
+
+- Type: `function`
+- Required: No
+
+### onContentSizeChange( value: Event )
+
+Called when then native component size changed.
+
+- Type: `function`
+- Required: No
+
+### onCaretVerticalPositionChange( value: Event )
+
+Called when the vertical position of the caret changed. This can be used to scroll the container of the component to keep
+the caret in focus.
+
+- Type: `function`
+- Required: Yes
+
+### onSelectionChange( value: Event )
+
+Called when then selection of the native component changed.
+
+- Type: `function`
+- Required: Yes
+
+## Example
 
 # License
 
