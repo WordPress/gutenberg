@@ -35,7 +35,7 @@ The main plugin file created is the PHP file `gutenpride.php`, at the top of thi
  * Author:          The WordPress Contributors
  * License:         GPL-2.0-or-later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:     create-block
+ * Text Domain:     gutenpride
  *
  * @package         create-block
  */
@@ -108,6 +108,7 @@ function create_block_gutenpride_block_init() {
 		$script_asset['dependencies'],
 		$script_asset['version']
 	);
+	wp_set_script_translations( 'create-block-gutenpride-block-editor', 'gutenpride' );
 
 	$editor_css = 'editor.css';
 	wp_register_style(
@@ -137,6 +138,8 @@ add_action( 'init', 'create_block_gutenpride_block_init' );
 The build process creates a secondary asset file that contains the list of dependencies and a file version based on the timestamp, this is the `index.asset.php` file.
 
 The `wp_register_script` function registers a name, called the handle, and relates that name to the script file. The dependencies are used to specify if the script requires including other libraries. The version is specified so the browser will reload if the file changed.
+
+The `wp_set_script_translations` function tells WordPress to load translations for this script, if they exist. See more about [translations & internationalization.](/docs/designers-developers/developers/internationalization.md)
 
 The `register_block_type` function registers the block we are going to create and specifies the editor_script file handle registered. So now when the editor loads it will load this script.
 

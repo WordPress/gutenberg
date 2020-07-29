@@ -118,6 +118,7 @@ export { default as plusCircleFilled } from './library/plus-circle-filled';
 export { default as plusCircle } from './library/plus-circle';
 export { default as plus } from './library/plus';
 export { default as postDate } from './library/post-date';
+export { default as postExcerpt } from './library/post-excerpt';
 export { default as postList } from './library/post-list';
 export { default as postTitle } from './library/post-title';
 export { default as preformatted } from './library/preformatted';

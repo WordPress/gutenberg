@@ -49,7 +49,8 @@ export const handleEntitySearch = async (
 	val,
 	args,
 	fetchSearchSuggestions,
-	directEntryHandler
+	directEntryHandler,
+	withCreateSuggestion
 ) => {
 	let results = await Promise.all( [
 		fetchSearchSuggestions( val, {
@@ -87,7 +88,7 @@ export const handleEntitySearch = async (
 	// to the text value of the `<input>`. This is because `title` is used
 	// when creating the suggestion. Similarly `url` is used when using keyboard to select
 	// the suggestion (the <form> `onSubmit` handler falls-back to `url`).
-	return isURLLike( val )
+	return isURLLike( val ) || ! withCreateSuggestion
 		? results
 		: results.concat( {
 				// the `id` prop is intentionally ommitted here because it
@@ -99,7 +100,10 @@ export const handleEntitySearch = async (
 		  } );
 };
 
-export default function useSearchHandler( allowDirectEntry ) {
+export default function useSearchHandler(
+	allowDirectEntry,
+	withCreateSuggestion
+) {
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return {
@@ -120,9 +124,10 @@ export default function useSearchHandler( allowDirectEntry ) {
 						val,
 						args,
 						fetchSearchSuggestions,
-						directEntryHandler
+						directEntryHandler,
+						withCreateSuggestion
 				  );
 		},
-		[ directEntryHandler, fetchSearchSuggestions ]
+		[ directEntryHandler, fetchSearchSuggestions, withCreateSuggestion ]
 	);
 }

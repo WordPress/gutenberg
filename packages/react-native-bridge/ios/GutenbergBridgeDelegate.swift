@@ -16,6 +16,7 @@ public struct MediaInfo {
 public enum Capabilities: String {
     case mentions
     case unsupportedBlockEditor
+    case modalLayoutPicker
 }
 
 /// Wrapper for single block data

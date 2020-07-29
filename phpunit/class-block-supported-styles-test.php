@@ -460,6 +460,62 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests support for block alignment.
+	 */
+	function test_block_alignment() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(
+				'align' => true,
+			),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'align' => 'wide',
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'wp-block-example foo-bar-class alignwide';
+		$expected_styles  = 'test:style; ';
+
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
+	 * Tests block alignment requires support to be added.
+	 */
+	function test_block_alignment_unsupported() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'align' => 'wide',
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'wp-block-example foo-bar-class';
+		$expected_styles  = 'test:style;';
+
+		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
 	 * Tests all support flags together to ensure they work together as expected.
 	 */
 	function test_all_supported() {
@@ -472,6 +528,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 				),
 				'__experimentalFontSize'   => true,
 				'__experimentalLineHeight' => true,
+				'align'                    => true,
 			),
 			'render_callback' => true,
 		);
@@ -480,6 +537,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block = array(
 			'blockName'    => 'core/example',
 			'attrs'        => array(
+				'align' => 'wide',
 				'style' => array(
 					'color'      => array(
 						'text'       => '#000',
@@ -498,7 +556,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background';
+		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background alignwide';
 		$expected_styles  = 'test:style; color: #000; background-color: #fff; background: some-gradient; font-size: 10px; line-height: 20;';
 
 		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
@@ -521,6 +579,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block = array(
 			'blockName'    => 'core/example',
 			'attrs'        => array(
+				'align' => 'wide',
 				'style' => array(
 					'color'      => array(
 						'text'       => '#000',
@@ -552,6 +611,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes' => array(),
 			'supports'   => array(
+				'align'                    => true,
 				'__experimentalColor'      => array(
 					'gradients' => true,
 					'linkColor' => true,
@@ -566,6 +626,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'blockName'    => 'core/example',
 			'attrs'        => array(
 				'style' => array(
+					'align'      => 'wide',
 					'color'      => array(
 						'text'       => '#000',
 						'background' => '#fff',

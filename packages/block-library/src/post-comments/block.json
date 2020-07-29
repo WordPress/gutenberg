@@ -12,6 +12,11 @@
 	],
 	"supports": {
 		"html": false,
+		"lightBlockWrapper": true,
+		"align": [
+			"wide",
+			"full"
+		],
 		"__experimentalFontSize": true,
 		"__experimentalColor": {
 			"gradients": true,

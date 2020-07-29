@@ -656,3 +656,42 @@ function gutenberg_preload_edit_post( $preload_paths ) {
 }
 
 add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );
+
+/**
+ * Override post type labels for Reusable Block custom post type.
+ *
+ * This shim can be removed when the Gutenberg plugin requires a WordPress
+ * version that has the ticket below.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50755
+ *
+ * @since 8.6.0
+ *
+ * @return array Array of new labels for Reusable Block post type.
+ */
+function gutenberg_override_reusable_block_post_type_labels() {
+	return array(
+		'name'                     => _x( 'Reusable Blocks', 'post type general name', 'gutenberg' ),
+		'singular_name'            => _x( 'Reusable Block', 'post type singular name', 'gutenberg' ),
+		'menu_name'                => _x( 'Reusable Blocks', 'admin menu', 'gutenberg' ),
+		'name_admin_bar'           => _x( 'Reusable Block', 'add new on admin bar', 'gutenberg' ),
+		'add_new'                  => _x( 'Add New', 'Reusable Block', 'gutenberg' ),
+		'add_new_item'             => __( 'Add New Reusable Block', 'gutenberg' ),
+		'new_item'                 => __( 'New Reusable Block', 'gutenberg' ),
+		'edit_item'                => __( 'Edit Reusable Block', 'gutenberg' ),
+		'view_item'                => __( 'View Reusable Block', 'gutenberg' ),
+		'all_items'                => __( 'All Reusable Blocks', 'gutenberg' ),
+		'search_items'             => __( 'Search Reusable Blocks', 'gutenberg' ),
+		'not_found'                => __( 'No reusable blocks found.', 'gutenberg' ),
+		'not_found_in_trash'       => __( 'No reusable blocks found in Trash.', 'gutenberg' ),
+		'filter_items_list'        => __( 'Filter reusable blocks list', 'gutenberg' ),
+		'items_list_navigation'    => __( 'Reusable Blocks list navigation', 'gutenberg' ),
+		'items_list'               => __( 'Reusable Blocks list', 'gutenberg' ),
+		'item_published'           => __( 'Reusable Block published.', 'gutenberg' ),
+		'item_published_privately' => __( 'Reusable Block published privately.', 'gutenberg' ),
+		'item_reverted_to_draft'   => __( 'Reusable Block reverted to draft.', 'gutenberg' ),
+		'item_scheduled'           => __( 'Reusable Block scheduled.', 'gutenberg' ),
+		'item_updated'             => __( 'Reusable Block updated.', 'gutenberg' ),
+	);
+}
+add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
