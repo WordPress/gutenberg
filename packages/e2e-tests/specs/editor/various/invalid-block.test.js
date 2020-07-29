@@ -36,8 +36,14 @@ describe( 'invalid blocks', () => {
 		expect( console ).toHaveErrored();
 		expect( console ).toHaveWarned();
 
-		// Click on the 'resolve' button
-		await page.click( '.block-editor-warning__actions button' );
+		// Click on the 'three-dots' menu toggle
+		await page.click(
+			'.block-editor-warning__actions button[aria-label="More options"]'
+		);
+
+		// Click on the 'Resolve' button
+		const [ resolveButton ] = await page.$x( '//button[text()="Resolve"]' );
+		await resolveButton.click();
 
 		// Check we get the resolve modal with the appropriate contents
 		const htmlBlockContent = await page.$eval(
