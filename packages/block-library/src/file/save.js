@@ -13,6 +13,7 @@ export default function save( { attributes } ) {
 		showDownloadButton,
 		downloadButtonText,
 		showInlineEmbed,
+		embedHeight,
 	} = attributes;
 
 	return (
@@ -23,8 +24,10 @@ export default function save( { attributes } ) {
 						className="wp-block-file__embed"
 						data={ href }
 						type="application/pdf"
-						width="100%"
-						height="800"
+						style={ {
+							width: '100%',
+							height: `${ embedHeight }px`,
+						} }
 						aria-label={ sprintf(
 							/* translators: Placeholder is the filename. */
 							__( 'Embed of %s.' ),

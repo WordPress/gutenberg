@@ -7,9 +7,14 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { Animate, ClipboardButton, withNotices } from '@wordpress/components';
+import {
+	Animate,
+	ClipboardButton,
+	withNotices,
+	ResizableBox,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	BlockIcon,
@@ -25,6 +30,9 @@ import { file as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import FileBlockInspector from './inspector';
+
+export const MIN_EMBED_HEIGHT = 200;
+export const MAX_EMBED_HEIGHT = 2000;
 
 class FileEdit extends Component {
 	constructor() {
@@ -42,6 +50,8 @@ class FileEdit extends Component {
 		);
 		this.changeShowInlineEmbed = this.changeShowInlineEmbed.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
+		this.handleOnResizeStop = this.handleOnResizeStop.bind( this );
+		this.changeEmbedHeight = this.changeEmbedHeight.bind( this );
 
 		this.state = {
 			hasError: false,
@@ -134,6 +144,24 @@ class FileEdit extends Component {
 		this.props.setAttributes( { showInlineEmbed: newValue } );
 	}
 
+	handleOnResizeStop( event, direction, elt, delta ) {
+		const { attributes, setAttributes, onResizeStop } = this.props;
+		const { embedHeight } = attributes;
+
+		onResizeStop();
+
+		const newHeight = parseInt( embedHeight + delta.height, 10 );
+		setAttributes( { embedHeight: newHeight } );
+	}
+
+	changeEmbedHeight( newValue ) {
+		const embedHeight = Math.max(
+			parseInt( newValue, 10 ),
+			MIN_EMBED_HEIGHT
+		);
+		this.props.setAttributes( { embedHeight } );
+	}
+
 	render() {
 		const {
 			className,
@@ -142,6 +170,7 @@ class FileEdit extends Component {
 			setAttributes,
 			noticeUI,
 			media,
+			onResizeStart,
 		} = this.props;
 		const {
 			id,
@@ -152,6 +181,7 @@ class FileEdit extends Component {
 			showDownloadButton,
 			downloadButtonText,
 			showInlineEmbed,
+			embedHeight,
 		} = attributes;
 		const { hasError, showCopyConfirmation } = this.state;
 		const attachmentPage = media && media.link;
@@ -191,6 +221,8 @@ class FileEdit extends Component {
 						changeShowDownloadButton: this.changeShowDownloadButton,
 						showInlineEmbed,
 						changeShowInlineEmbed: this.changeShowInlineEmbed,
+						embedHeight,
+						changeEmbedHeight: this.changeEmbedHeight,
 					} }
 				/>
 				<BlockControls>
@@ -211,13 +243,30 @@ class FileEdit extends Component {
 							) }
 						>
 							{ showInlineEmbed && (
-								<>
+								<ResizableBox
+									size={ { height: embedHeight } }
+									minHeight={ MIN_EMBED_HEIGHT }
+									maxHeight={ MAX_EMBED_HEIGHT }
+									minWidth="100%"
+									grid={ [ 10, 10 ] }
+									enable={ {
+										top: false,
+										right: false,
+										bottom: true,
+										left: false,
+										topRight: false,
+										bottomRight: false,
+										bottomLeft: false,
+										topLeft: false,
+									} }
+									onResizeStart={ onResizeStart }
+									onResizeStop={ this.handleOnResizeStop }
+									showHandle={ isSelected }
+								>
 									<object
 										className="wp-block-file__embed"
 										data={ href }
 										type="application/pdf"
-										width="100%"
-										height="800"
 										aria-label={ __(
 											'Embed of the selected PDF file.'
 										) }
@@ -225,7 +274,7 @@ class FileEdit extends Component {
 									{ ! isSelected && (
 										<div className="wp-block-file__embed-overlay" />
 									) }
-								</>
+								</ResizableBox>
 							) }
 							<div className={ 'wp-block-file__content-wrapper' }>
 								<div className="wp-block-file__textlink">
@@ -296,6 +345,14 @@ export default compose( [
 		return {
 			media: id === undefined ? undefined : getMedia( id ),
 			mediaUpload,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			onResizeStart: () => toggleSelection( false ),
+			onResizeStop: () => toggleSelection( true ),
 		};
 	} ),
 	withNotices,

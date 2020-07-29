@@ -2,8 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
+import {
+	PanelBody,
+	RangeControl,
+	SelectControl,
+	ToggleControl,
+} from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './edit';
 
 export default function FileBlockInspector( {
 	hrefs,
@@ -14,6 +24,8 @@ export default function FileBlockInspector( {
 	changeOpenInNewWindow,
 	changeShowDownloadButton,
 	changeShowInlineEmbed,
+	embedHeight,
+	changeEmbedHeight,
 } ) {
 	const { href, textLinkHref, attachmentPage } = hrefs;
 
@@ -34,6 +46,13 @@ export default function FileBlockInspector( {
 							label={ __( 'Show inline embed' ) }
 							checked={ showInlineEmbed }
 							onChange={ changeShowInlineEmbed }
+						/>
+						<RangeControl
+							label={ __( 'Height in pixels' ) }
+							min={ MIN_EMBED_HEIGHT }
+							max={ Math.max( MAX_EMBED_HEIGHT, embedHeight ) }
+							value={ embedHeight }
+							onChange={ changeEmbedHeight }
 						/>
 					</PanelBody>
 				) }

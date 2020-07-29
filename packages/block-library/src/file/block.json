@@ -36,6 +36,10 @@
 		},
 		"showInlineEmbed": {
 			"type": "boolean"
+		},
+		"embedHeight": {
+			"type": "number",
+			"default": 800
 		}
 	},
 	"supports": {
