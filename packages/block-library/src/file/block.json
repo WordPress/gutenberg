@@ -37,6 +37,9 @@
 		"showInlineEmbed": {
 			"type": "boolean"
 		},
+		"embedId": {
+			"type": "string"
+		},
 		"embedHeight": {
 			"type": "number"
 		}

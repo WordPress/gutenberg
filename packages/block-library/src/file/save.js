@@ -13,6 +13,7 @@ export default function save( { attributes } ) {
 		showDownloadButton,
 		downloadButtonText,
 		showInlineEmbed,
+		embedId,
 		embedHeight,
 	} = attributes;
 
@@ -20,20 +21,23 @@ export default function save( { attributes } ) {
 		href && (
 			<div>
 				{ showInlineEmbed && (
-					<object
-						className="wp-block-file__embed"
-						data={ href }
-						type="application/pdf"
-						style={ {
-							width: '100%',
-							height: `${ embedHeight }px`,
-						} }
-						aria-label={ sprintf(
-							/* translators: Placeholder is the filename. */
-							__( 'Embed of %s.' ),
-							fileName
-						) }
-					/>
+					<>
+						<object
+							className="wp-block-file__embed"
+							id={ `wp-block-file__embed-${ embedId }` }
+							data={ href }
+							type="application/pdf"
+							style={ {
+								width: '100%',
+								height: `${ embedHeight }px`,
+							} }
+							aria-label={ sprintf(
+								/* translators: Placeholder is the filename. */
+								__( 'Embed of %s.' ),
+								fileName
+							) }
+						/>
+					</>
 				) }
 				{ ! RichText.isEmpty( fileName ) && (
 					<a
