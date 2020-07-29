@@ -44,7 +44,7 @@ async function clearSessionStorage() {
 async function readSessionStorageAutosave( postId ) {
 	return page.evaluate(
 		( key ) => window.sessionStorage.getItem( key ),
-		`wp-autosave-block-editor-post-${ postId }`
+		`wp-autosave-block-editor-post-${ postId ? postId : 'auto-draft' }`
 	);
 }
 
