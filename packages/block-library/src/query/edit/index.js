@@ -29,7 +29,7 @@ export default function QueryEdit( {
 		}
 	}, [ queryId, instanceId ] );
 	return (
-		<Block.div>
+		<>
 			<BlockControls>
 				<QueryToolbar
 					query={ query }
@@ -38,10 +38,12 @@ export default function QueryEdit( {
 					}
 				/>
 			</BlockControls>
-			<QueryProvider>
-				<InnerBlocks template={ TEMPLATE } />
-			</QueryProvider>
-		</Block.div>
+			<Block.div>
+				<QueryProvider>
+					<InnerBlocks template={ TEMPLATE } />
+				</QueryProvider>
+			</Block.div>
+		</>
 	);
 }
 
