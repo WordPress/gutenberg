@@ -23,6 +23,7 @@ import {
 	UnsupportedFooterControl,
 } from '@wordpress/components';
 import { Icon, close } from '@wordpress/icons';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,26 +31,49 @@ import { Icon, close } from '@wordpress/icons';
 import MenuItem from '../inserter/menu-item';
 import styles from './style.scss';
 
+const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
+
+function createBlocksFromInnerBlocksTemplate( innerBlocksTemplate ) {
+	return map(
+		innerBlocksTemplate,
+		( [ name, attributes, innerBlocks = [] ] ) =>
+			createBlock(
+				name,
+				attributes,
+				createBlocksFromInnerBlocksTemplate( innerBlocks )
+			)
+	);
+}
+
 function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
-	const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-		return map(
-			innerBlocksTemplate,
-			( [ name, attributes, innerBlocks = [] ] ) =>
-				createBlock(
-					name,
-					attributes,
-					createBlocksFromInnerBlocksTemplate( innerBlocks )
-				)
-		);
-	};
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 	const isIOS = Platform.OS === 'ios';
 
 	const cancelButtonStyle = usePreferredColorSchemeStyle(
 		styles.cancelButton,
 		styles.cancelButtonDark
 	);
+
+	const leftButton = useMemo( () => (
+		<TouchableWithoutFeedback onPress={ onClose } hitSlop={ hitSlop }>
+			<View>
+				{ isIOS ? (
+					<Text
+						style={ cancelButtonStyle }
+						maxFontSizeMultiplier={ 2 }
+					>
+						{ __( 'Cancel' ) }
+					</Text>
+				) : (
+					<Icon
+						icon={ close }
+						size={ 24 }
+						style={ styles.closeIcon }
+					/>
+				) }
+			</View>
+		</TouchableWithoutFeedback>
+	) );
 
 	const onVariationSelect = ( variation ) => {
 		replaceInnerBlocks(
@@ -66,29 +90,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 			onClose={ onClose }
 			title={ __( 'Select a layout' ) }
 			contentStyle={ styles.contentStyle }
-			leftButton={
-				<TouchableWithoutFeedback
-					onPress={ onClose }
-					hitSlop={ hitSlop }
-				>
-					<View>
-						{ isIOS ? (
-							<Text
-								style={ cancelButtonStyle }
-								maxFontSizeMultiplier={ 2 }
-							>
-								{ __( 'Cancel' ) }
-							</Text>
-						) : (
-							<Icon
-								icon={ close }
-								size={ 24 }
-								style={ styles.closeIcon }
-							/>
-						) }
-					</View>
-				</TouchableWithoutFeedback>
-			}
+			leftButton={ leftButton }
 		>
 			<ScrollView
 				horizontal

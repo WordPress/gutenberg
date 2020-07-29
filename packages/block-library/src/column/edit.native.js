@@ -34,9 +34,8 @@ function ColumnEdit( {
 	getStylesFromColorScheme,
 	isParentSelected,
 	contentStyle,
-	columnCount,
-	columnsPreview,
-	block,
+	columnWidths,
+	selectedColumnIndex,
 } ) {
 	const { verticalAlignment } = attributes;
 
@@ -66,6 +65,35 @@ function ColumnEdit( {
 		);
 	}
 
+	const getRangePreview = () => {
+		const columnsPreviewStyle = getStylesFromColorScheme(
+			styles.columnsPreview,
+			styles.columnsPreviewDark
+		);
+
+		const columnIndicatorStyle = getStylesFromColorScheme(
+			styles.columnIndicator,
+			styles.columnIndicatorDark
+		);
+
+		return (
+			<View style={ columnsPreviewStyle }>
+				{ columnWidths.map( ( width, index ) => {
+					const isSelectedColumn = index === selectedColumnIndex;
+					return (
+						<View
+							style={ [
+								isSelectedColumn && columnIndicatorStyle,
+								{ flex: width },
+							] }
+							key={ index }
+						/>
+					);
+				} ) }
+			</View>
+		);
+	};
+
 	return (
 		<>
 			<BlockControls>
@@ -81,10 +109,10 @@ function ColumnEdit( {
 						min={ 1 }
 						max={ 100 }
 						step={ 0.1 }
-						value={ getEffectiveColumnWidth( block, columnCount ) }
+						value={ columnWidths[ selectedColumnIndex ] }
 						onChange={ onWidthChange }
 						toFixed={ 1 }
-						columnsPreview={ columnsPreview }
+						rangePreview={ getRangePreview() }
 					/>
 				</PanelBody>
 				<PanelBody>
@@ -138,7 +166,6 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlocks,
 			getBlockOrder,
-			getBlock,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -149,7 +176,6 @@ export default compose( [
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
 
-		const block = getBlock( selectedBlockClientId );
 		const blockOrder = getBlockOrder( parentId );
 
 		const selectedColumnIndex = blockOrder.indexOf( clientId );
@@ -157,15 +183,13 @@ export default compose( [
 		const columnWidths = getBlocks( parentId ).map( ( column ) =>
 			getEffectiveColumnWidth( column, columnCount )
 		);
-		const columnsPreview = { columnWidths, selectedColumnIndex };
 
 		return {
 			hasChildren,
 			isParentSelected,
 			isSelected,
-			columnCount,
-			columnsPreview,
-			block,
+			selectedColumnIndex,
+			columnWidths,
 		};
 	} ),
 	withPreferredColorScheme,
