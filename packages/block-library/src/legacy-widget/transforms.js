@@ -4,7 +4,7 @@
 import { createBlock } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
 
-let legacyWidgetTransforms = [
+const legacyWidgetTransforms = [
 	{
 		block: 'core/calendar',
 		widget: 'WP_Widget_Calendar',
@@ -186,13 +186,13 @@ let legacyWidgetTransforms = [
 	};
 } );
 
-legacyWidgetTransforms = applyFilters(
-	'blocks.legacyWidget.transforms',
-	legacyWidgetTransforms
-);
-
 const transforms = {
-	to: legacyWidgetTransforms,
+	get to() {
+		return applyFilters(
+			'blocks.legacyWidget.transforms',
+			legacyWidgetTransforms
+		);
+	},
 };
 
 export default transforms;
