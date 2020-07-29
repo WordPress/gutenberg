@@ -225,11 +225,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block
-		await clickBlockToolbarButton( 'More options' );
-		const convertButton = await page.waitForXPath(
-			'//button[text()="Convert to Regular Block"]'
-		);
-		await convertButton.click();
+		await clickBlockToolbarButton( 'Convert to regular blocks', 'content' );
 
 		// Check that we have a paragraph block on the page
 		const block = await page.$(
@@ -331,11 +327,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block
-		await clickBlockToolbarButton( 'More options' );
-		const convertButton = await page.waitForXPath(
-			'//button[text()="Convert to Regular Block"]'
-		);
-		await convertButton.click();
+		await clickBlockToolbarButton( 'Convert to regular blocks', 'content' );
 
 		// Check that we have two paragraph blocks on the page
 		expect( await getEditedPostContent() ).toMatchSnapshot();

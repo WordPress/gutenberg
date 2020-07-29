@@ -51,9 +51,6 @@ export function* installBlockType( block ) {
 	let success = false;
 	yield clearErrorNotice( id );
 	try {
-		if ( ! Array.isArray( assets ) || ! assets.length ) {
-			throw new Error( __( 'Block has no assets.' ) );
-		}
 		yield setIsInstalling( block.id, true );
 
 		// If we have a wp:plugin link, the plugin is installed but inactive.

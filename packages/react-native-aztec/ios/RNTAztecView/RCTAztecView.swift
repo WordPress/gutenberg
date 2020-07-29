@@ -542,7 +542,9 @@ class RCTAztecView: Aztec.TextView {
 
     var linkTextColor: UIColor {
         set {
-            linkTextAttributes = [.foregroundColor: newValue, .underlineStyle: NSNumber(value: NSUnderlineStyle.single.rawValue)]
+            let shadow = NSShadow()
+            shadow.shadowColor = newValue
+            linkTextAttributes = [.foregroundColor: newValue, .underlineStyle: NSNumber(value: NSUnderlineStyle.single.rawValue), .shadow: shadow]
         }
         get {
             return linkTextAttributes[.foregroundColor] as? UIColor ?? UIColor.blue
