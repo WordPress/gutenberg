@@ -16,7 +16,7 @@
 function render_block_core_file( $attributes, $content ) {
 	$script = '';
 	if ( ! empty( $attributes['showInlineEmbed'] ) && ! empty( $attributes['embedId'] ) ) {
-		$script =<<<HTML
+		$script = <<<HTML
 			<script>
 				var ua = window.navigator.userAgent;
 				if (
