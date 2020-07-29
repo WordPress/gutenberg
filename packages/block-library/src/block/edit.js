@@ -7,10 +7,17 @@ import { partial } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Spinner, Disabled } from '@wordpress/components';
+import {
+	Placeholder,
+	Spinner,
+	Disabled,
+	ToolbarButton,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
+	BlockControls,
 	BlockEditorProvider,
 	BlockList,
 	WritingFlow,
@@ -105,6 +112,7 @@ class ReusableBlockEdit extends Component {
 
 	render() {
 		const {
+			convertToStatic,
 			isSelected,
 			reusableBlock,
 			isFetching,
@@ -148,21 +156,32 @@ class ReusableBlockEdit extends Component {
 		}
 
 		return (
-			<div className="block-library-block__reusable-block-container">
-				{ ( isSelected || isEditing ) && (
-					<ReusableBlockEditPanel
-						isEditing={ isEditing }
-						title={ title !== null ? title : reusableBlock.title }
-						isSaving={ isSaving && ! reusableBlock.isTemporary }
-						isEditDisabled={ ! canUpdateBlock }
-						onEdit={ this.startEditing }
-						onChangeTitle={ this.setTitle }
-						onSave={ this.save }
-						onCancel={ this.stopEditing }
-					/>
-				) }
-				{ element }
-			</div>
+			<>
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton onClick={ convertToStatic }>
+							{ __( 'Convert to regular blocks' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+				<div className="block-library-block__reusable-block-container">
+					{ ( isSelected || isEditing ) && (
+						<ReusableBlockEditPanel
+							isEditing={ isEditing }
+							title={
+								title !== null ? title : reusableBlock.title
+							}
+							isSaving={ isSaving && ! reusableBlock.isTemporary }
+							isEditDisabled={ ! canUpdateBlock }
+							onEdit={ this.startEditing }
+							onChangeTitle={ this.setTitle }
+							onSave={ this.save }
+							onCancel={ this.stopEditing }
+						/>
+					) }
+					{ element }
+				</div>
+			</>
 		);
 	}
 }
@@ -197,6 +216,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
+			__experimentalConvertBlockToStatic: convertBlockToStatic,
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 			__experimentalUpdateReusableBlock: updateReusableBlock,
 			__experimentalSaveReusableBlock: saveReusableBlock,
@@ -207,6 +227,9 @@ export default compose( [
 			fetchReusableBlock: partial( fetchReusableBlocks, ref ),
 			onChange: partial( updateReusableBlock, ref ),
 			onSave: partial( saveReusableBlock, ref ),
+			convertToStatic() {
+				convertBlockToStatic( ownProps.clientId );
+			},
 		};
 	} ),
 ] )( ReusableBlockEdit );

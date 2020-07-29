@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, flowRight } from 'lodash';
+import { map, flowRight, omit, forEach, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -86,8 +86,10 @@ function items( state = {}, action ) {
 					return accumulator;
 				}, {} ),
 			};
+		case 'REMOVE_ITEMS':
+			const newState = omit( state, action.itemIds );
+			return newState;
 	}
-
 	return state;
 }
 
@@ -100,7 +102,7 @@ function items( state = {}, action ) {
  *
  * @return {Object} Next state.
  */
-const queries = flowRight( [
+const receiveQueries = flowRight( [
 	// Limit to matching action type so we don't attempt to replace action on
 	// an unhandled action.
 	ifMatchingAction( ( action ) => 'query' in action ),
@@ -137,6 +139,35 @@ const queries = flowRight( [
 		perPage
 	);
 } );
+
+/**
+ * Reducer tracking queries state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Next state.
+ */
+const queries = ( state = {}, action ) => {
+	switch ( action.type ) {
+		case 'RECEIVE_ITEMS':
+			return receiveQueries( state, action );
+		case 'REMOVE_ITEMS':
+			const newState = { ...state };
+			const removedItems = action.itemIds.reduce( ( result, itemId ) => {
+				result[ itemId ] = true;
+				return result;
+			}, {} );
+			forEach( newState, ( queryItems, key ) => {
+				newState[ key ] = filter( queryItems, ( queryId ) => {
+					return ! removedItems[ queryId ];
+				} );
+			} );
+			return newState;
+		default:
+			return state;
+	}
+};
 
 export default combineReducers( {
 	items,
