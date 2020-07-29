@@ -253,7 +253,8 @@ class BottomSheet extends Component {
 		return {
 			flexGrow: 1,
 			paddingBottom:
-				safeAreaBottomInset + styles.scrollableContent.paddingBottom,
+				( safeAreaBottomInset || 0 ) +
+				styles.scrollableContent.paddingBottom,
 		};
 	}
 
