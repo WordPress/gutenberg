@@ -8,6 +8,7 @@ import {
 } from '@react-navigation/native';
 import { CardStyleInterpolators } from '@react-navigation/stack';
 import { View, InteractionManager } from 'react-native';
+import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,6 +27,8 @@ const BottomSheetScreen = ( { children } ) => {
 		setHeight,
 	} = useContext( BottomSheetContext );
 
+	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [] );
+
 	useFocusEffect(
 		useCallback( () => {
 			onHandleHardwareButtonPress( () => {
@@ -37,7 +40,6 @@ const BottomSheetScreen = ( { children } ) => {
 				onHandleHardwareButtonPress( null );
 				return false;
 			} );
-
 			if ( heightRef.current.maxHeight !== 0 ) {
 				InteractionManager.runAfterInteractions( () => {
 					setHeight( heightRef.current.maxHeight );
@@ -50,7 +52,7 @@ const BottomSheetScreen = ( { children } ) => {
 		const { height } = nativeEvent.layout;
 		if ( heightRef.current.maxHeight !== height && isFocused ) {
 			heightRef.current.maxHeight = height;
-			setHeight( height );
+			setHeightDebounce( height, true );
 		}
 	};
 

@@ -16,9 +16,11 @@ function BottomSheetNavigationContainer( { children, animate } ) {
 	const context = useContext( BottomSheetContext );
 	const [ height, setMaxHeight ] = useState( context.currentHeight || 1 );
 
-	const setHeight = ( maxHeight ) => {
-		if ( height !== maxHeight && maxHeight > 50 ) {
-			if ( animate ) {
+	const setHeight = ( maxHeight, layout ) => {
+		if ( height !== maxHeight && maxHeight > 1 ) {
+			if ( animate && layout && height === 1 ) {
+				setMaxHeight( maxHeight );
+			} else if ( animate ) {
 				InteractionManager.runAfterInteractions( () => {
 					performLayoutAnimation();
 					setMaxHeight( maxHeight );
@@ -28,14 +30,9 @@ function BottomSheetNavigationContainer( { children, animate } ) {
 			}
 		}
 	};
+
 	return (
-		<View
-			style={
-				animate && context.currentHeight
-					? { height: context.currentHeight }
-					: { height }
-			}
-		>
+		<View style={ { height } }>
 			<BottomSheetProvider
 				value={ { ...context, setHeight, currentHeight: height } }
 			>
