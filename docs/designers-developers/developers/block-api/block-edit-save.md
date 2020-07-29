@@ -399,8 +399,8 @@ Clicking the "3-dot" menu on the side of the block displays three options:
 - **Resolve**: Open Resolve Block dialog box with two buttons:
   - **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
   - **Convert to Blocks**: Protects the original markup from the saved post content and convert the block from its original type to the validated block type.
+- **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
 - **Convert to Classic Block**: Protects the original markup from the saved post content as correct. Since the block will be converted from its original type to the Classic block type, it will no longer be possible to edit the content using controls available for the original block type.
-- **Attempt Block Recovery**: Attempts recovery action as much as possible.
 
 ### Validation FAQ
 
