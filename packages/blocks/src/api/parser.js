@@ -452,6 +452,11 @@ export function createBlockWithFallback( blockNode ) {
 		)
 			? deprecated[ providerSlug ]
 			: providerSlug;
+		// this is needed as the `responsive` attribute was passed
+		// in a different way before the refactoring to block variations
+		if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
+			attributes.responsive = true;
+		}
 		name = 'core/embed';
 	}
 
