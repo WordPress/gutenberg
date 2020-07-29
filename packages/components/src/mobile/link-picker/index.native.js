@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { useState } from 'react';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { startsWith } from 'lodash';
 
 /**
@@ -62,7 +62,7 @@ export const LinkPicker = ( {
 	const onSubmit = () => pickLink( directEntry );
 
 	return (
-		<View style={ { height: '100%' } }>
+		<SafeAreaView style={ { height: '100%' } }>
 			<NavigationHeader
 				screen={ __( 'Link to' ) }
 				leftButtonOnPress={ cancel }
@@ -88,6 +88,6 @@ export const LinkPicker = ( {
 					directEntry={ directEntry }
 				/>
 			) }
-		</View>
+		</SafeAreaView>
 	);
 };
