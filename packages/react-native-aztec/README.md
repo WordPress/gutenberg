@@ -7,7 +7,24 @@ This component provides rich text editing capabilities that emulate a subset of 
 
 Render a rich text area that displays the HTML content provided.
 
-## Properties
+## Usage
+
+```jsx
+import RCTAztecView from '@wordpress/react-native-aztec';
+
+const RichText = () => (
+	<>
+		<RCTAztecView 
+			text={ {
+				text: "<h1>This is a Heading</h1>",
+				selection: { start:0, end: 0 }
+			}} 
+		/>			
+	</>
+);
+```
+
+## Props
 
 ### text
 
@@ -198,23 +215,6 @@ Called when then selection of the native component changed.
 
 - Type: `function`
 - Required: Yes
-
-## Example
-
-```jsx
-import RCTAztecView from '@wordpress/react-native-aztec';
-
-const RichText = () => (
-	<>
-		<RCTAztecView 
-			text={ {
-				text: "<h1>This is a Heading</h1>",
-				selection: { start:0, end: 0 }
-			}} 
-		/>			
-	</>
-);
-```
 
 # License
 
