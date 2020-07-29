@@ -135,73 +135,92 @@ export default function InsertionPoint( { children, containerRef } ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
-	const { isMultiSelecting, isInserterVisible, selectedClientId } = useSelect(
-		( select ) => {
-			const {
-				isMultiSelecting: _isMultiSelecting,
-				isBlockInsertionPointVisible,
-				getBlockInsertionPoint,
-				getBlockOrder,
-			} = select( 'core/block-editor' );
+	const {
+		isMultiSelecting,
+		isInserterVisible,
+		selectedClientId,
+		blockOrder,
+	} = useSelect( ( select ) => {
+		const {
+			isMultiSelecting: _isMultiSelecting,
+			isBlockInsertionPointVisible,
+			getBlockInsertionPoint,
+			getBlockOrder,
+		} = select( 'core/block-editor' );
 
-			const insertionPoint = getBlockInsertionPoint();
-			const order = getBlockOrder( insertionPoint.rootClientId );
+		const insertionPoint = getBlockInsertionPoint();
+		const order = getBlockOrder( insertionPoint.rootClientId );
 
-			return {
-				isMultiSelecting: _isMultiSelecting(),
-				isInserterVisible: isBlockInsertionPointVisible(),
-				selectedClientId: order[ insertionPoint.index ],
-			};
-		},
-		[]
-	);
+		return {
+			isMultiSelecting: _isMultiSelecting(),
+			isInserterVisible: isBlockInsertionPointVisible(),
+			selectedClientId: order[ insertionPoint.index ],
+			blockOrder: order,
+		};
+	}, [] );
+
+	// function onMouseMove( event ) {
+	// 	if (
+	// 		! event.target.classList.contains(
+	// 			'block-editor-block-list__layout'
+	// 		)
+	// 	) {
+	// 		if ( isInserterShown ) {
+	// 			setIsInserterShown( false );
+	// 		}
+	// 		return;
+	// 	}
+	//
+	// 	const rect = event.target.getBoundingClientRect();
+	// 	const offset = event.clientY - rect.top;
+	// 	const element = Array.from( event.target.children ).find(
+	// 		( blockEl ) => {
+	// 			return blockEl.offsetTop > offset;
+	// 		}
+	// 	);
+	//
+	// 	if ( ! element ) {
+	// 		return;
+	// 	}
+	//
+	// 	const clientId = element.id.slice( 'block-'.length );
+	//
+	// 	if ( ! clientId ) {
+	// 		return;
+	// 	}
+	//
+	// 	const elementRect = element.getBoundingClientRect();
+	//
+	// 	if (
+	// 		event.clientX > elementRect.right ||
+	// 		event.clientX < elementRect.left
+	// 	) {
+	// 		if ( isInserterShown ) {
+	// 			setIsInserterShown( false );
+	// 		}
+	// 		return;
+	// 	}
+	//
+	// 	setIsInserterShown( true );
+	// 	setInserterClientId( clientId );
+	// }
 
 	function onMouseMove( event ) {
-		if (
-			! event.target.classList.contains(
-				'block-editor-block-list__layout'
-			)
-		) {
-			if ( isInserterShown ) {
-				setIsInserterShown( false );
-			}
+		const clientId = event.target.id.slice( 'block-'.length );
+		const index = blockOrder.findIndex( ( id ) => id === clientId );
+
+		// when there is no match return
+		if ( index === -1 ) {
+			setIsInserterShown( false );
 			return;
 		}
 
-		const rect = event.target.getBoundingClientRect();
-		const offset = event.clientY - rect.top;
-		const element = Array.from( event.target.children ).find(
-			( blockEl ) => {
-				return blockEl.offsetTop > offset;
-			}
-		);
-
-		if ( ! element ) {
-			return;
+		// first element should show only bottom inserter
+		if ( index >= 0 ) {
+			setIsInserterShown( true );
+			setInserterClientId( clientId );
 		}
-
-		const clientId = element.id.slice( 'block-'.length );
-
-		if ( ! clientId ) {
-			return;
-		}
-
-		const elementRect = element.getBoundingClientRect();
-
-		if (
-			event.clientX > elementRect.right ||
-			event.clientX < elementRect.left
-		) {
-			if ( isInserterShown ) {
-				setIsInserterShown( false );
-			}
-			return;
-		}
-
-		setIsInserterShown( true );
-		setInserterClientId( clientId );
 	}
-
 	const isVisible = isInserterShown || isInserterForced || isInserterVisible;
 
 	return (
@@ -218,15 +237,7 @@ export default function InsertionPoint( { children, containerRef } ) {
 					showInsertionPoint={ isInserterVisible }
 				/>
 			) }
-			<div
-				onMouseMove={
-					! isInserterForced && ! isMultiSelecting
-						? onMouseMove
-						: undefined
-				}
-			>
-				{ children }
-			</div>
+			<div onMouseMove={ onMouseMove }> { children } </div>
 		</>
 	);
 }
