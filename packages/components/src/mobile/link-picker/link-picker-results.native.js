@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { FlatList } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import LoadingSpinner from './loading-spinner';
+import styles from './styles';
 
 const PER_PAGE = 20;
 const REQUEST_DEBOUNCE_DELAY = 400;
@@ -92,6 +92,12 @@ export default function LinkPickerResults( {
 
 	const onEndReached = () => fetchMoreSuggestions( { query, links } );
 
+	const footer = ! hasAllSuggestions.current && (
+		<View style={ styles.spinner }>
+			<ActivityIndicator animating />
+		</View>
+	);
+
 	return (
 		<BottomSheetConsumer>
 			{ ( { listProps } ) => (
@@ -108,7 +114,7 @@ export default function LinkPickerResults( {
 					onEndReached={ onEndReached }
 					onEndReachedThreshold={ 0.1 }
 					initialNumToRender={ PER_PAGE }
-					ListFooterComponent={ isLoading && LoadingSpinner }
+					ListFooterComponent={ footer }
 					{ ...listProps }
 				/>
 			) }
