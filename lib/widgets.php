@@ -105,11 +105,6 @@ add_action( 'admin_footer-widgets.php', 'gutenberg_print_save_widgets_nonce' );
  */
 function gutenberg_get_legacy_widget_settings() {
 	$settings = array();
-	/**
-	 * TODO: The hardcoded array should be replaced with a mechanism to allow
-	 * core and third party blocks to specify they already have equivalent
-	 * blocks, and maybe even allow them to have a migration function.
-	 */
 	$core_widgets = array(
 		'WP_Widget_Pages',
 		'WP_Widget_Calendar',

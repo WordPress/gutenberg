@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
-const legacyWidgetTransforms = [
+let legacyWidgetTransforms = [
 	{
 		block: 'core/calendar',
 		widget: 'WP_Widget_Calendar',
@@ -184,6 +185,11 @@ const legacyWidgetTransforms = [
 		},
 	};
 } );
+
+legacyWidgetTransforms = applyFilters(
+	'blocks.legacyWidgetTransforms',
+	legacyWidgetTransforms
+);
 
 const transforms = {
 	to: legacyWidgetTransforms,
