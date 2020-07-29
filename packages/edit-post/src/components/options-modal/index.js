@@ -27,7 +27,6 @@ import {
 	EnablePublishSidebarOption,
 	EnablePanelOption,
 	EnableFeature,
-	ShowIconLabels,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 
@@ -106,8 +105,11 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 				</PageAttributesCheck>
 			</Section>
 			<MetaBoxesSection title={ __( 'Advanced panels' ) } />
-			<Section title={ __( 'Icon Labels' ) }>
-				<ShowIconLabels label="Show Icon Labels" />
+			<Section title={ __( 'Labels' ) }>
+				<EnableFeature
+					featureName="showIconLabels"
+					label={ __( 'Show button text labels' ) }
+				/>
 			</Section>
 		</Modal>
 	);
