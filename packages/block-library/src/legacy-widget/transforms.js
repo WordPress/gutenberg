@@ -187,7 +187,7 @@ let legacyWidgetTransforms = [
 } );
 
 legacyWidgetTransforms = applyFilters(
-	'blocks.legacyWidgetTransforms',
+	'blocks.legacyWidget.transforms',
 	legacyWidgetTransforms
 );
 
