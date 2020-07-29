@@ -23,7 +23,7 @@ Object with current HTML string to make editable and selection/caret position.
 
 ### blockType 
 
-The block type
+The block type, should contain a tagName prop that indicates what is the HTML tag that this editor displays.
 
 - Type: `Object`
 - Required: No
@@ -52,14 +52,14 @@ If active disables the contextual menu that allows setting text attributes like 
 
 ### maxImagesWidth
 
-The maximum width an image that is part of content provided can have
+The maximum width an image that is part of content provided can have.
 
 - Type: `Number`
 - Required: No
 
 ### minWidth
 
-The minimum width the component can have
+The minimum width the component can have.
 
 - Type: `Number`
 - Required: No
@@ -67,40 +67,42 @@ The minimum width the component can have
 
 ### maxWidth
 
-The maximum width the component can have
+The maximum width the component can have.
 
 - Type: `Number`
 - Required: No
 
 ### fontFamily
 
-The font family that will be used as default to display the HTML content
+The font family that will be used as default to display the HTML content.
 
 - Type: `String`
 - Required: No
 
 ### fontSize
 
-The font size that will be used as default to display the HTML content
+The font size that will be used as default to display the HTML content.
 
 - Type: `Number`
 - Required: No
 
 ### fontWeight
 
-The font weight that will be used as default to display the HTML content
+The font weight that will be used as default to display the HTML content.
 
 - Type: `String`
 - Required: No
 
 ### fontStyle
 
-The font style (bold, italic, ) that will be used as default to display the HTML content
+The font style (bold, italic, ) that will be used as default to display the HTML content.
 
 - Type: `String`
 - Required: No
 
 ### deleteEnter 
+
+When active removes the new line resulting from an enter keypress when that enter keypress is splitting the block.
 
 - Type: `Boolean`
 - Required: No
@@ -108,7 +110,7 @@ The font style (bold, italic, ) that will be used as default to display the HTML
 
 ### color
 
-Text color
+Text color.
 
 - Type: `Color`
 - Required: No
@@ -116,7 +118,7 @@ Text color
 
 ### selectionColor
 
-The color to use for the caret and for the selection background
+The color to use for the caret and for the selection background.
 
 - Type: `Color`
 - Required: No
@@ -137,7 +139,7 @@ Placeholder text color.
 
 ### textAlign
 
-The alignment for the text displayed. Possible values: Left, Right, Center, Justify
+The alignment for the text displayed. Possible values: Left, Right, Center, Justify.
 
 - Type: `String`
 - Required: No
