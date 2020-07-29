@@ -403,3 +403,25 @@ Using the Gutenberg plugin (version 8.3 or later), link color control is availab
 ```php
 add_theme_support('experimental-link-color');
 ```
+
+If a theme opts in, it should [define default link colors](https://developer.wordpress.org/block-editor/developers/themes/theme-json/#color-properties) in `experimental-theme.json` (or in its theme styles if no `experimental-theme.json` is present). For example:
+
+```css
+{ 
+    "global": {
+        "styles": {
+            "color": {
+                "link": "hotpink"
+            }
+        }
+    }
+}
+```
+
+If the theme styles the link color in its stylesheets (editor and front-end), it should ensure it maps to the `--wp--style--color--link` CSS variable:
+
+```css
+a {
+    color: var(--wp--style--color--link);
+}
+```
