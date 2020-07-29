@@ -10,7 +10,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { addAction, removeAction } from '@wordpress/hooks';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import {
 	withInstanceId,
 	compose,
@@ -29,10 +29,11 @@ export class HTMLTextInput extends Component {
 
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
-		addAction(
-			'native-editor.persist-html',
-			'core/editor',
-			this.stopEditing
+		this.getHTMLForParent = this.getHTMLForParent.bind( this );
+		addFilter(
+			'native.persist-html',
+			'html-text-input',
+			this.getHTMLForParent
 		);
 
 		this.state = {};
@@ -50,7 +51,7 @@ export class HTMLTextInput extends Component {
 	}
 
 	componentWillUnmount() {
-		removeAction( 'native-editor.persist-html', 'core/editor' );
+		removeFilter( 'native.persist-html', 'html-text-input' );
 		//TODO: Blocking main thread
 		this.stopEditing();
 	}
@@ -58,6 +59,10 @@ export class HTMLTextInput extends Component {
 	edit( html ) {
 		this.props.onChange( html );
 		this.setState( { value: html, isDirty: true } );
+	}
+
+	getHTMLForParent() {
+		return this.state.value;
 	}
 
 	stopEditing() {

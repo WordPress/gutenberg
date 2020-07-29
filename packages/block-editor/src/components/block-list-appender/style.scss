@@ -11,22 +11,12 @@
 
 	// Animate appearance.
 	.block-list-appender__toggle {
+		padding: 0;
 		opacity: 1;
 		transform: scale(1);
 		transition: all 0.1s ease;
 		@include reduce-motion("transition");
 	}
-}
-
-.block-list-appender.is-drop-target > div::before {
-	content: "";
-	position: absolute;
-	right: -$grid-unit-10;
-	left: -$grid-unit-10;
-	top: -$grid-unit-10;
-	bottom: -$grid-unit-10;
-	border-radius: $radius-block-ui;
-	border: 3px solid theme(primary);
 }
 
 .block-list-appender > .block-editor-inserter {

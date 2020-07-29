@@ -1,14 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	createContext,
-	useContext,
-	useState,
-	useMemo,
-	useCallback,
-} from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
 	DropZoneProvider,
@@ -18,60 +12,94 @@ import {
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
 import {
+	BlockContextProvider,
 	BlockSelectionClearer,
 	BlockBreadcrumb,
 	__unstableEditorStyles as EditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
+	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
+import {
+	FullscreenMode,
+	InterfaceSkeleton,
+	ComplementaryArea,
+} from '@wordpress/interface';
 import { EntitiesSavedStates } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Notices from '../notices';
 import Header from '../header';
-import Sidebar from '../sidebar';
+import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
-const Context = createContext();
-export function useEditorContext() {
-	return useContext( Context );
-}
+const interfaceLabels = {
+	leftSidebar: __( 'Block Library' ),
+};
 
-function Editor( { settings: _settings } ) {
+function Editor() {
+	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const [ settings, setSettings ] = useState( _settings );
-	const template = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecord(
-				'postType',
-				settings.templateType,
-				settings.templateId
-			),
-		[ settings.templateType, settings.templateId ]
-	);
 
-	const context = useMemo( () => ( { settings, setSettings } ), [
+	const {
+		isFullscreenActive,
+		deviceType,
+		sidebarIsOpened,
 		settings,
-		setSettings,
-	] );
+		entityId,
+		templateType,
+		page,
+		template,
+		select,
+	} = useSelect( ( _select ) => {
+		const {
+			isFeatureActive,
+			__experimentalGetPreviewDeviceType,
+			getSettings,
+			getTemplateId,
+			getTemplatePartId,
+			getTemplateType,
+			getPage,
+		} = _select( 'core/edit-site' );
+		const _templateId = getTemplateId();
+		const _templatePartId = getTemplatePartId();
+		const _templateType = getTemplateType();
 
-	const { isFullscreenActive } = useSelect( ( select ) => {
+		// The currently selected entity to display. Typically template or template part.
+		let _entityId;
+		if ( _templateType ) {
+			_entityId =
+				_templateType === 'wp_template' ? _templateId : _templatePartId;
+		}
+
 		return {
-			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
-				'fullscreenMode'
-			),
+			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
+			deviceType: __experimentalGetPreviewDeviceType(),
+			sidebarIsOpened: !! _select(
+				'core/interface'
+			).getActiveComplementaryArea( 'core/edit-site' ),
+			settings: getSettings(),
+			templateType: _templateType,
+			page: getPage(),
+			template: _templateType
+				? _select( 'core' ).getEntityRecord(
+						'postType',
+						_templateType,
+						_entityId
+				  )
+				: null,
+			select: _select,
+			entityId: _entityId,
 		};
 	}, [] );
-
-	const deviceType = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
-	}, [] );
+	const { editEntityRecord } = useDispatch( 'core' );
+	const { setPage } = useDispatch( 'core/edit-site' );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
@@ -84,11 +112,48 @@ function Editor( { settings: _settings } ) {
 		[]
 	);
 	const closeEntitiesSavedStates = useCallback(
-		() => setIsEntitiesSavedStatesOpen( false ),
-		[]
+		( entitiesToSave ) => {
+			if ( entitiesToSave ) {
+				const { getEditedEntityRecord } = select( 'core' );
+				entitiesToSave.forEach( ( { kind, name, key } ) => {
+					const record = getEditedEntityRecord( kind, name, key );
+					editEntityRecord( kind, name, key, {
+						status: 'publish',
+						title: record.slug,
+					} );
+				} );
+			}
+			setIsEntitiesSavedStatesOpen( false );
+		},
+		[ select ]
 	);
 
-	return template ? (
+	// Set default query for misplaced Query Loop blocks, and
+	// provide the root `queryContext` for top-level Query Loop
+	// and Query Pagination blocks.
+	const blockContext = useMemo(
+		() => ( {
+			...page?.context,
+			query: page?.context.query || { categoryIds: [] },
+			queryContext: [
+				page?.context.queryContext || { page: 1 },
+				( newQueryContext ) =>
+					setPage( {
+						...page,
+						context: {
+							...page?.context,
+							queryContext: {
+								...page?.context.queryContext,
+								...newQueryContext,
+							},
+						},
+					} ),
+			],
+		} ),
+		[ page?.context ]
+	);
+
+	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -97,28 +162,79 @@ function Editor( { settings: _settings } ) {
 					<EntityProvider kind="root" type="site">
 						<EntityProvider
 							kind="postType"
-							type={ settings.templateType }
-							id={ settings.templateId }
+							type={ templateType }
+							id={ entityId }
 						>
-							<Context.Provider value={ context }>
+							<BlockContextProvider value={ blockContext }>
 								<FocusReturnProvider>
 									<KeyboardShortcuts.Register />
+									<SidebarComplementaryAreaFills />
 									<InterfaceSkeleton
-										sidebar={ ! isMobile && <Sidebar /> }
+										labels={ interfaceLabels }
+										leftSidebar={
+											isInserterOpen && (
+												<div className="edit-site-editor__inserter-panel">
+													<div className="edit-site-editor__inserter-panel-header">
+														<Button
+															icon={ close }
+															onClick={ () =>
+																setIsInserterOpen(
+																	false
+																)
+															}
+														/>
+													</div>
+													<div className="edit-site-editor__inserter-panel-content">
+														<Library
+															showInserterHelpPanel
+															onSelect={ () => {
+																if (
+																	isMobile
+																) {
+																	setIsInserterOpen(
+																		false
+																	);
+																}
+															} }
+														/>
+													</div>
+												</div>
+											)
+										}
+										sidebar={
+											sidebarIsOpened && (
+												<ComplementaryArea.Slot scope="core/edit-site" />
+											)
+										}
 										header={
 											<Header
 												openEntitiesSavedStates={
 													openEntitiesSavedStates
 												}
+												isInserterOpen={
+													isInserterOpen
+												}
+												onToggleInserter={ () =>
+													setIsInserterOpen(
+														! isInserterOpen
+													)
+												}
 											/>
 										}
 										content={
 											<BlockSelectionClearer
+												className="edit-site-visual-editor"
 												style={ inlineStyles }
 											>
 												<Notices />
 												<Popover.Slot name="block-toolbar" />
-												<BlockEditor />
+												{ template && (
+													<BlockEditor
+														setIsInserterOpen={
+															setIsInserterOpen
+														}
+													/>
+												) }
 												<KeyboardShortcuts />
 											</BlockSelectionClearer>
 										}
@@ -157,12 +273,12 @@ function Editor( { settings: _settings } ) {
 									<Popover.Slot />
 									<PluginArea />
 								</FocusReturnProvider>
-							</Context.Provider>
+							</BlockContextProvider>
 						</EntityProvider>
 					</EntityProvider>
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</>
-	) : null;
+	);
 }
 export default Editor;

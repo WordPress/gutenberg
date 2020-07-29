@@ -17,5 +17,9 @@
 		"instance": {
 			"type": "object"
 		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false
 	}
 }

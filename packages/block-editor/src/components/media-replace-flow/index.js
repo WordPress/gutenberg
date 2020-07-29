@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { uniqueId } from 'lodash';
+import { uniqueId, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,8 +14,9 @@ import {
 	NavigableMenu,
 	MenuItem,
 	ToolbarGroup,
-	Button,
+	ToolbarButton,
 	Dropdown,
+	withFilters,
 } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
@@ -36,6 +37,7 @@ const MediaReplaceFlow = ( {
 	accept,
 	onSelect,
 	onSelectURL,
+	onFilesUpload = noop,
 	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
@@ -86,6 +88,7 @@ const MediaReplaceFlow = ( {
 
 	const uploadFiles = ( event ) => {
 		const files = event.target.files;
+		onFilesUpload( files );
 		const setMedia = ( [ media ] ) => {
 			selectMedia( media );
 		};
@@ -105,24 +108,29 @@ const MediaReplaceFlow = ( {
 		}
 	};
 
+	const POPOVER_PROPS = {
+		isAlternate: true,
+	};
+
 	return (
 		<Dropdown
+			popoverProps={ POPOVER_PROPS }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarGroup className="media-replace-flow">
-					<Button
+					<ToolbarButton
 						ref={ editMediaButtonRef }
 						aria-expanded={ isOpen }
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
 					>
 						{ name }
-					</Button>
+					</ToolbarButton>
 				</ToolbarGroup>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>
-					<NavigableMenu>
+					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
 						<MediaUpload
 							value={ mediaId }
 							onSelect={ ( media ) => selectMedia( media ) }
@@ -194,4 +202,5 @@ export default compose( [
 			removeNotice,
 		};
 	} ),
+	withFilters( 'editor.MediaReplaceFlow' ),
 ] )( MediaReplaceFlow );

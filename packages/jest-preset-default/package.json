@@ -1,13 +1,13 @@
 {
 	"name": "@wordpress/jest-preset-default",
-	"version": "6.0.0",
+	"version": "6.2.0",
 	"description": "Default Jest preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"jest",
-		"jest-preset",
 		"preset",
 		"react",
 		"enzyme"

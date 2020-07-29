@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { BottomSheet } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	ColorSettings,
+	colorsUtils,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -14,6 +19,7 @@ import styles from './container.native.scss';
 function BottomSheetSettings( {
 	editorSidebarOpened,
 	closeGeneralSidebar,
+	settings,
 	...props
 } ) {
 	return (
@@ -24,7 +30,23 @@ function BottomSheetSettings( {
 			contentStyle={ styles.content }
 			{ ...props }
 		>
-			<InspectorControls.Slot />
+			<BottomSheetConsumer>
+				{ ( { currentScreen, extraProps, ...bottomSheetProps } ) => {
+					switch ( currentScreen ) {
+						case colorsUtils.subsheets.color:
+							return (
+								<ColorSettings
+									defaultSettings={ settings }
+									{ ...bottomSheetProps }
+									{ ...extraProps }
+								/>
+							);
+						case colorsUtils.subsheets.settings:
+						default:
+							return <InspectorControls.Slot />;
+					}
+				} }
+			</BottomSheetConsumer>
 		</BottomSheet>
 	);
 }
@@ -32,8 +54,9 @@ function BottomSheetSettings( {
 export default compose( [
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-
+		const { getSettings } = select( 'core/block-editor' );
 		return {
+			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};
 	} ),

@@ -26,7 +26,9 @@ import {
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
-import { link } from '@wordpress/icons';
+import { link, linkOff } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -40,9 +42,14 @@ const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_BORDER_RADIUS_POSITION = 5;
 
 function BorderPanel( { borderRadius = '', setAttributes } ) {
+	const initialBorderRadius = borderRadius;
 	const setBorderRadius = useCallback(
 		( newBorderRadius ) => {
-			setAttributes( { borderRadius: newBorderRadius } );
+			if ( newBorderRadius === undefined )
+				setAttributes( {
+					borderRadius: initialBorderRadius,
+				} );
+			else setAttributes( { borderRadius: newBorderRadius } );
 		},
 		[ setAttributes ]
 	);
@@ -69,10 +76,21 @@ function URLPicker( {
 	onToggleOpenInNewTab,
 } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+	const urlIsSet = !! url;
+	const urlIsSetandSelected = urlIsSet && isSelected;
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
+		return false; // prevents default behaviour for event
 	};
-	const linkControl = isURLPickerOpen && (
+	const unlinkButton = () => {
+		setAttributes( {
+			url: undefined,
+			linkTarget: undefined,
+			rel: undefined,
+		} );
+		setIsURLPickerOpen( false );
+	};
+	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
 		<Popover
 			position="bottom center"
 			onClose={ () => setIsURLPickerOpen( false ) }
@@ -97,13 +115,25 @@ function URLPicker( {
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						name="link"
-						icon={ link }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
-					/>
+					{ ! urlIsSet && (
+						<ToolbarButton
+							name="link"
+							icon={ link }
+							title={ __( 'Link' ) }
+							shortcut={ displayShortcut.primary( 'k' ) }
+							onClick={ openLinkControl }
+						/>
+					) }
+					{ urlIsSetandSelected && (
+						<ToolbarButton
+							name="link"
+							icon={ linkOff }
+							title={ __( 'Unlink' ) }
+							shortcut={ displayShortcut.primaryShift( 'k' ) }
+							onClick={ unlinkButton }
+							isActive={ true }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			{ isSelected && (
@@ -111,6 +141,7 @@ function URLPicker( {
 					bindGlobal
 					shortcuts={ {
 						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
 					} }
 				/>
 			) }
@@ -120,7 +151,14 @@ function URLPicker( {
 }
 
 function ButtonEdit( props ) {
-	const { attributes, setAttributes, className, isSelected } = props;
+	const {
+		attributes,
+		setAttributes,
+		className,
+		isSelected,
+		onReplace,
+		mergeBlocks,
+	} = props;
 	const {
 		borderRadius,
 		linkTarget,
@@ -135,6 +173,9 @@ function ButtonEdit( props ) {
 		},
 		[ setAttributes ]
 	);
+	const { colors } = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getSettings();
+	}, [] );
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -155,7 +196,7 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
-	const colorProps = getColorAndStyleProps( attributes );
+	const colorProps = getColorAndStyleProps( attributes, colors, true );
 
 	return (
 		<>
@@ -180,6 +221,15 @@ function ButtonEdit( props ) {
 							: undefined,
 						...colorProps.style,
 					} }
+					onSplit={ ( value ) =>
+						createBlock( 'core/button', {
+							...attributes,
+							text: value,
+						} )
+					}
+					onReplace={ onReplace }
+					onMerge={ mergeBlocks }
+					identifier="text"
 				/>
 			</Block.div>
 			<URLPicker

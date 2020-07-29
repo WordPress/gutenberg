@@ -90,7 +90,7 @@ export function next( tag, text, index = 0 ) {
  * @return {string} Text with shortcodes replaced.
  */
 export function replace( tag, text, callback ) {
-	return text.replace( regexp( tag ), function(
+	return text.replace( regexp( tag ), function (
 		match,
 		left,
 		$3,
@@ -266,7 +266,7 @@ export function fromMatch( match ) {
  * @return {WPShortcode} Shortcode instance.
  */
 const shortcode = extend(
-	function( options ) {
+	function ( options ) {
 		extend(
 			this,
 			pick( options || {}, 'tag', 'attrs', 'type', 'content' )

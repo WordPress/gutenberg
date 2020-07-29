@@ -55,6 +55,7 @@ const {
 	isBlockInsertionPointVisible,
 	isSelectionEnabled,
 	canInsertBlockType,
+	canInsertBlocks,
 	getInserterItems,
 	isValidTemplate,
 	getTemplate,
@@ -62,9 +63,6 @@ const {
 	getBlockListSettings,
 	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
-	INSERTER_UTILITY_HIGH,
-	INSERTER_UTILITY_MEDIUM,
-	INSERTER_UTILITY_LOW,
 	getLowestCommonAncestorWithSelectedBlock,
 } = selectors;
 
@@ -87,7 +85,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-a', {
 			save: ( props ) => props.attributes.text,
-			category: 'formatting',
+			category: 'design',
 			title: 'Test Block A',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -95,7 +93,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-b', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block B',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -106,7 +104,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-c', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block C',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -115,7 +113,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
-			category: 'common',
+			category: 'text',
 			title: 'Test Freeform Content Handler',
 			icon: 'test',
 			attributes: {
@@ -127,7 +125,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/post-content-child', {
 			save: () => null,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block Post Content Child',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -220,6 +218,7 @@ describe( 'selectors', () => {
 					cache: {
 						123: {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -239,6 +238,7 @@ describe( 'selectors', () => {
 					order: {},
 					parents: {},
 					cache: {},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -269,6 +269,7 @@ describe( 'selectors', () => {
 						123: {},
 						456: {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -311,6 +312,7 @@ describe( 'selectors', () => {
 						123: {},
 						23: {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -328,6 +330,78 @@ describe( 'selectors', () => {
 					innerBlocks: [],
 				},
 			] );
+		} );
+		it( 'only returns a new value if the cache key of a direct child changes', () => {
+			const cacheRef = {};
+			const state = {
+				blocks: {
+					byClientId: {
+						23: { clientId: 23, name: 'core/heading' },
+					},
+					attributes: {
+						23: {},
+					},
+					order: {
+						'': [ 23 ],
+					},
+					parents: {
+						23: '',
+					},
+					cache: {
+						23: cacheRef,
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			const oldBlocks = getBlocks( state );
+
+			const newStateSameCache = {
+				blocks: {
+					byClientId: {
+						23: { clientId: 23, name: 'core/heading' },
+					},
+					attributes: {
+						23: {},
+					},
+					order: {
+						'': [ 23 ],
+					},
+					parents: {
+						23: '',
+					},
+					cache: {
+						23: cacheRef,
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			// Makes sure blocks are referentially equal if the cache key stays the same.
+			const newBlocks = getBlocks( newStateSameCache );
+			expect( oldBlocks ).toBe( newBlocks );
+
+			const newStateNewCache = {
+				blocks: {
+					byClientId: {
+						23: { clientId: 23, name: 'core/heading' },
+					},
+					attributes: {
+						23: {},
+					},
+					order: {
+						'': [ 23 ],
+					},
+					parents: {
+						23: '',
+					},
+					cache: {
+						23: {},
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			// Blocks are referentially different if the cache key changes.
+			const newBlocksNewCache = getBlocks( newStateNewCache );
+			expect( oldBlocks ).not.toBe( newBlocksNewCache );
 		} );
 	} );
 
@@ -365,6 +439,7 @@ describe( 'selectors', () => {
 						'client-id-03': {},
 						'client-id-04': {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -418,6 +493,7 @@ describe( 'selectors', () => {
 						'client-id-04': {},
 						'client-id-05': {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -534,6 +610,7 @@ describe( 'selectors', () => {
 						'uuid-28': 'uuid-24',
 						'uuid-30': 'uuid-28',
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 			expect(
@@ -907,6 +984,7 @@ describe( 'selectors', () => {
 					cache: {
 						23: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				selectionStart: { clientId: 23 },
 				selectionEnd: { clientId: 23 },
@@ -2199,6 +2277,59 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'canInsertBlocks', () => {
+		it( 'should allow blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						1: { name: 'core/test-block-a' },
+						2: { name: 'core/test-block-b' },
+						3: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						1: {},
+						2: {},
+						3: {},
+					},
+				},
+				blockListSettings: {
+					1: {
+						allowedBlocks: [
+							'core/test-block-b',
+							'core/test-block-c',
+						],
+					},
+				},
+				settings: {},
+			};
+			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( true );
+		} );
+
+		it( 'should deny blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						1: { name: 'core/test-block-a' },
+						2: { name: 'core/test-block-b' },
+						3: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						1: {},
+						2: {},
+						3: {},
+					},
+				},
+				blockListSettings: {
+					1: {
+						allowedBlocks: [ 'core/test-block-c' ],
+					},
+				},
+				settings: {},
+			};
+			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'getInserterItems', () => {
 		it( 'should properly list block type and reusable block items', () => {
 			const state = {
@@ -2239,11 +2370,11 @@ describe( 'selectors', () => {
 				icon: {
 					src: 'test',
 				},
-				category: 'formatting',
+				category: 'design',
 				keywords: [ 'testing' ],
 				variations: [],
 				isDisabled: false,
-				utility: 0,
+				utility: 1,
 				frecency: 0,
 			} );
 			const reusableBlockItem = items.find(
@@ -2260,57 +2391,9 @@ describe( 'selectors', () => {
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
-				utility: 0,
+				utility: 1,
 				frecency: 0,
 			} );
-		} );
-
-		it( 'should order items by descending utility and frecency', () => {
-			const state = {
-				blocks: {
-					byClientId: {},
-					attributes: {},
-					order: {},
-					parents: {},
-					cache: {},
-				},
-				settings: {
-					__experimentalReusableBlocks: [
-						{
-							id: 1,
-							isTemporary: false,
-							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
-						},
-						{
-							id: 2,
-							isTemporary: false,
-							clientId: 'block2',
-							title: 'Reusable Block 2',
-							content: '<!-- /wp:test-block-b -->',
-						},
-					],
-				},
-				preferences: {
-					insertUsage: {
-						'core/block/1': { count: 10, time: 1000 },
-						'core/block/2': { count: 20, time: 1000 },
-					},
-				},
-				blockListSettings: {},
-			};
-			const itemIDs = getInserterItems( state ).map(
-				( item ) => item.id
-			);
-			expect( itemIDs ).toEqual( [
-				'core/post-content-child',
-				'core/block/2',
-				'core/block/1',
-				'core/test-block-b',
-				'core/test-freeform',
-				'core/test-block-a',
-			] );
 		} );
 
 		it( 'should correctly cache the return values', () => {
@@ -2335,6 +2418,7 @@ describe( 'selectors', () => {
 						block3: {},
 						block4: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2376,9 +2460,9 @@ describe( 'selectors', () => {
 			);
 			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
+				'core/test-block-a',
 				'core/test-block-b',
 				'core/test-freeform',
-				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
 			] );
@@ -2389,9 +2473,9 @@ describe( 'selectors', () => {
 				'block4'
 			);
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
+				'core/test-block-a',
 				'core/test-block-b',
 				'core/test-freeform',
-				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
 			] );
@@ -2418,6 +2502,7 @@ describe( 'selectors', () => {
 					cache: {
 						block1: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				preferences: {
 					insertUsage: {},
@@ -2432,29 +2517,7 @@ describe( 'selectors', () => {
 			expect( testBlockBItem.isDisabled ).toBe( true );
 		} );
 
-		it( 'should give common blocks a low utility', () => {
-			const state = {
-				blocks: {
-					byClientId: {},
-					attributes: {},
-					order: {},
-					parents: {},
-					cache: {},
-				},
-				preferences: {
-					insertUsage: {},
-				},
-				blockListSettings: {},
-				settings: {},
-			};
-			const items = getInserterItems( state );
-			const testBlockBItem = items.find(
-				( item ) => item.id === 'core/test-block-b'
-			);
-			expect( testBlockBItem.utility ).toBe( INSERTER_UTILITY_LOW );
-		} );
-
-		it( 'should give used blocks a medium utility and set a frecency', () => {
+		it( 'should set a frecency', () => {
 			const state = {
 				blocks: {
 					byClientId: {},
@@ -2475,42 +2538,7 @@ describe( 'selectors', () => {
 			const reusableBlock2Item = items.find(
 				( item ) => item.id === 'core/test-block-b'
 			);
-			expect( reusableBlock2Item.utility ).toBe(
-				INSERTER_UTILITY_MEDIUM
-			);
 			expect( reusableBlock2Item.frecency ).toBe( 2.5 );
-		} );
-
-		it( 'should give contextual blocks a high utility', () => {
-			const state = {
-				blocks: {
-					byClientId: {
-						block1: { name: 'core/test-block-b' },
-					},
-					attributes: {
-						block1: { attribute: {} },
-					},
-					order: {
-						'': [ 'block1' ],
-					},
-					parents: {
-						block1: '',
-					},
-					cache: {
-						block1: {},
-					},
-				},
-				preferences: {
-					insertUsage: {},
-				},
-				blockListSettings: {},
-				settings: {},
-			};
-			const items = getInserterItems( state, 'block1' );
-			const testBlockCItem = items.find(
-				( item ) => item.id === 'core/test-block-c'
-			);
-			expect( testBlockCItem.utility ).toBe( INSERTER_UTILITY_HIGH );
 		} );
 	} );
 

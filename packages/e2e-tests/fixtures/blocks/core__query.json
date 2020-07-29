@@ -1,0 +1,17 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/query",
+        "isValid": true,
+        "attributes": {
+            "query": {
+                "perPage": 3,
+                "pages": 1,
+                "offset": 0,
+                "categoryIds": []
+            }
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

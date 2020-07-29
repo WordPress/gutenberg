@@ -11,7 +11,8 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, Platform } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -32,9 +33,23 @@ import ColorPanel from './color-panel';
 export const COLOR_SUPPORT_KEY = '__experimentalColor';
 
 const hasColorSupport = ( blockType ) =>
-	hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
+	Platform.OS === 'web' && hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+const hasLinkColorSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return isObject( colorSupport ) && !! colorSupport.linkColor;
+};
 
 const hasGradientSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return isObject( colorSupport ) && !! colorSupport.gradients;
@@ -117,6 +132,7 @@ export function addSaveProps( props, blockType, attributes ) {
 				backgroundColor ||
 				style?.color?.background ||
 				( hasGradient && ( gradient || style?.color?.gradient ) ),
+			'has-link-color': style?.color?.link,
 		}
 	);
 	props.className = newClassName ? newClassName : undefined;
@@ -147,6 +163,15 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
+const getLinkColorFromAttributeValue = ( colors, value ) => {
+	const attributeParsed = /var:preset\|color\|(.+)/.exec( value );
+	if ( attributeParsed && attributeParsed[ 1 ] ) {
+		return getColorObjectByAttributeValues( colors, attributeParsed[ 1 ] )
+			.color;
+	}
+	return value;
+};
+
 /**
  * Inspector control panel containing the color related configuration
  *
@@ -156,9 +181,13 @@ export function addEditProps( settings ) {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
-	const { colors, gradients } = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings();
-	}, [] );
+	const { colors, gradients, __experimentalEnableLinkColor } = useSelect(
+		( select ) => {
+			return select( 'core/block-editor' ).getSettings();
+		},
+		[]
+	);
+
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
 	// synchronously causing our two callbacks to override changes
@@ -241,9 +270,27 @@ export function ColorEdit( props ) {
 		};
 	};
 
+	const onChangeLinkColor = ( value ) => {
+		const colorObject = getColorObjectByColorValue( colors, value );
+		props.setAttributes( {
+			style: {
+				...props.attributes.style,
+				color: {
+					...props.attributes.style?.color,
+					link: colorObject?.slug
+						? `var:preset|color|${ colorObject.slug }`
+						: value,
+				},
+			},
+		} );
+	};
+
 	return (
 		<ColorPanel
-			enableContrastChecking={ ! gradient && ! style?.color?.gradient }
+			enableContrastChecking={
+				// Turn on contrast checker for web only since it's not supported on mobile yet.
+				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
+			}
 			clientId={ props.clientId }
 			settings={ [
 				{
@@ -268,10 +315,67 @@ export function ColorEdit( props ) {
 						? onChangeGradient
 						: undefined,
 				},
+				...( __experimentalEnableLinkColor &&
+				hasLinkColorSupport( blockName )
+					? [
+							{
+								label: __( 'Link Color' ),
+								onColorChange: onChangeLinkColor,
+								colorValue: getLinkColorFromAttributeValue(
+									colors,
+									style?.color?.link
+								),
+								clearable: !! props.attributes.style?.color
+									?.link,
+							},
+					  ]
+					: [] ),
 			] }
 		/>
 	);
 }
+
+/**
+ * This adds inline styles for color palette colors.
+ * Ideally, this is not needed and themes should load their palettes on the editor.
+ *
+ * @param  {Function} BlockListBlock Original component
+ * @return {Function}                Wrapped component
+ */
+export const withColorPaletteStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const { name, attributes } = props;
+		const { backgroundColor, textColor } = attributes;
+		const colors = useSelect( ( select ) => {
+			return select( 'core/block-editor' ).getSettings().colors;
+		}, [] );
+
+		if ( ! hasColorSupport( name ) ) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		const extraStyles = {
+			color: textColor
+				? getColorObjectByAttributeValues( colors, textColor )?.color
+				: undefined,
+			backgroundColor: backgroundColor
+				? getColorObjectByAttributeValues( colors, backgroundColor )
+						?.color
+				: undefined,
+		};
+
+		let wrapperProps = props.wrapperProps;
+		wrapperProps = {
+			...props.wrapperProps,
+			style: {
+				...extraStyles,
+				...props.wrapperProps?.style,
+			},
+		};
+
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	}
+);
 
 addFilter(
 	'blocks.registerBlockType',
@@ -289,4 +393,10 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/color/addEditProps',
 	addEditProps
+);
+
+addFilter(
+	'editor.BlockListBlock',
+	'core/color/with-color-palette-styles',
+	withColorPaletteStyles
 );

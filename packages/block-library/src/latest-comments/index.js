@@ -19,10 +19,6 @@ export const settings = {
 	description: __( 'Display a list of your most recent comments.' ),
 	icon,
 	keywords: [ __( 'recent comments' ) ],
-	supports: {
-		align: true,
-		html: false,
-	},
 	example: {},
 	edit,
 };

@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Button from '../button';
 import ButtonGroup from '../button-group';
+import TimeZone from './timezone';
 
 /**
  * Module Constants
@@ -31,7 +32,7 @@ class TimePicker extends Component {
 			year: '',
 			hours: '',
 			minutes: '',
-			am: true,
+			am: '',
 			date: null,
 		};
 		this.changeDate = this.changeDate.bind( this );
@@ -89,7 +90,7 @@ class TimePicker extends Component {
 		const month = selected.format( 'MM' );
 		const year = selected.format( 'YYYY' );
 		const minutes = selected.format( 'mm' );
-		const am = selected.format( 'A' );
+		const am = selected.format( 'H' ) <= 11 ? 'AM' : 'PM';
 		const hours = selected.format( is12Hour ? 'hh' : 'HH' );
 		const date = currentTime ? moment( currentTime ) : moment();
 		this.setState( { day, month, year, minutes, hours, am, date } );
@@ -99,6 +100,9 @@ class TimePicker extends Component {
 		const { is12Hour } = this.props;
 		const { am, hours, date } = this.state;
 		const value = parseInt( hours, 10 );
+		if ( value === date.hour() ) {
+			return;
+		}
 		if (
 			! isInteger( value ) ||
 			( is12Hour && ( value < 1 || value > 12 ) ) ||
@@ -121,6 +125,9 @@ class TimePicker extends Component {
 	updateMinutes() {
 		const { minutes, date } = this.state;
 		const value = parseInt( minutes, 10 );
+		if ( value === date.minute() ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 0 || value > 59 ) {
 			this.syncState( this.props );
 			return;
@@ -132,6 +139,9 @@ class TimePicker extends Component {
 	updateDay() {
 		const { day, date } = this.state;
 		const value = parseInt( day, 10 );
+		if ( value === date.date() ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 1 || value > 31 ) {
 			this.syncState( this.props );
 			return;
@@ -143,6 +153,9 @@ class TimePicker extends Component {
 	updateMonth() {
 		const { month, date } = this.state;
 		const value = parseInt( month, 10 );
+		if ( value === date.month() + 1 ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 1 || value > 12 ) {
 			this.syncState( this.props );
 			return;
@@ -154,6 +167,9 @@ class TimePicker extends Component {
 	updateYear() {
 		const { year, date } = this.state;
 		const value = parseInt( year, 10 );
+		if ( value === date.year() ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 0 || value > 9999 ) {
 			this.syncState( this.props );
 			return;
@@ -262,6 +278,7 @@ class TimePicker extends Component {
 	render() {
 		const { is12Hour } = this.props;
 		const { year, minutes, hours, am } = this.state;
+
 		return (
 			<div className={ classnames( 'components-datetime__time' ) }>
 				<fieldset>
@@ -338,6 +355,8 @@ class TimePicker extends Component {
 								</Button>
 							</ButtonGroup>
 						) }
+
+						<TimeZone />
 					</div>
 				</fieldset>
 			</div>

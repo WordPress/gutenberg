@@ -107,9 +107,12 @@ describe( 'DOM', () => {
 		const NON_TEXT_INPUT_TYPES = [
 			'button',
 			'checkbox',
-			'image',
 			'hidden',
+			'file',
 			'radio',
+			'image',
+			'range',
+			'reset',
 			'submit',
 		];
 
@@ -118,7 +121,13 @@ describe( 'DOM', () => {
 		 *
 		 * @type {string[]}
 		 */
-		const TEXT_INPUT_TYPES = [ 'text', 'password', 'search', 'url' ];
+		const TEXT_INPUT_TYPES = [
+			'text',
+			'password',
+			'search',
+			'url',
+			'email',
+		];
 
 		it( 'should return false for non-text input elements', () => {
 			NON_TEXT_INPUT_TYPES.forEach( ( type ) => {

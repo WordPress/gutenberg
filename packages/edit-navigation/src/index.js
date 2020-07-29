@@ -6,6 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
+import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -20,6 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import Layout from './components/layout';
+import './store';
 
 /**
  * Fetches link suggestions from the API. This function is an exact copy of a function found at:

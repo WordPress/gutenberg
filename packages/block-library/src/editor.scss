@@ -17,6 +17,7 @@
 @import "./classic/editor.scss";
 @import "./gallery/editor.scss";
 @import "./group/editor.scss";
+@import "./heading/editor.scss";
 @import "./html/editor.scss";
 @import "./image/editor.scss";
 @import "./latest-comments/editor.scss";
@@ -36,6 +37,7 @@
 @import "./search/editor.scss";
 @import "./separator/editor.scss";
 @import "./shortcode/editor.scss";
+@import "./site-logo/editor.scss";
 @import "./social-link/editor.scss";
 @import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
@@ -46,6 +48,7 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
+@import "./widget-area/editor.scss";
 
 /**
  * Import styles from internal editor components used by the blocks.

@@ -1,10 +1,33 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import {
+	AlignmentToolbar,
+	BlockControls,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
+import { ToolbarGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-export default function PostTitleEdit( { context } ) {
+/**
+ * Internal dependencies
+ */
+import HeadingLevelDropdown from '../heading/heading-level-dropdown';
+
+export default function PostTitleEdit( {
+	attributes,
+	setAttributes,
+	context,
+} ) {
+	const { level, textAlign } = attributes;
 	const { postType, postId } = context;
+	const tagName = 0 === level ? 'p' : 'h' + level;
 
 	const post = useSelect(
 		( select ) =>
@@ -20,5 +43,33 @@ export default function PostTitleEdit( { context } ) {
 		return null;
 	}
 
-	return <h2>{ post.title }</h2>;
+	const BlockWrapper = Block[ tagName ];
+
+	return (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
+					<HeadingLevelDropdown
+						selectedLevel={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+				</ToolbarGroup>
+				<AlignmentToolbar
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+			</BlockControls>
+			<BlockWrapper
+				className={ classnames( {
+					[ `has-text-align-${ textAlign }` ]: textAlign,
+				} ) }
+			>
+				{ post.title || __( 'Post Title' ) }
+			</BlockWrapper>
+		</>
+	);
 }

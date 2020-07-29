@@ -55,6 +55,7 @@ function RangeControl( {
 			afterIcon={ afterIcon }
 			allowReset={ allowReset }
 			defaultValue={ initialSliderValue }
+			separatorType={ separatorType }
 			{ ...props }
 		/>
 	);

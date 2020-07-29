@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import ToolbarGroup from '../toolbar-group';
@@ -14,10 +19,15 @@ import ToolbarContainer from './toolbar-container';
  *
  * To add controls, simply pass `ToolbarButton` components as children.
  *
- * @param {Object} props             Component props.
- * @param {string} [props.className] Class to set on the container div.
+ * @param {Object} props                                    Component props.
+ * @param {string} [props.className]                        Class to set on the container div.
+ * @param {string} [props.__experimentalAccessibilityLabel] ARIA label for toolbar container.
+ * @param {Object} ref                                      React Element ref.
  */
-function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
+function Toolbar(
+	{ className, __experimentalAccessibilityLabel, ...props },
+	ref
+) {
 	if ( __experimentalAccessibilityLabel ) {
 		return (
 			<ToolbarContainer
@@ -27,12 +37,16 @@ function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
 					className
 				) }
 				accessibilityLabel={ __experimentalAccessibilityLabel }
+				ref={ ref }
 				{ ...props }
 			/>
 		);
 	}
-
+	// When the __experimentalAccessibilityLabel prop is not passed, Toolbar will
+	// fallback to ToolbarGroup. This should be deprecated as soon as the new API
+	// gets stable.
+	// See https://github.com/WordPress/gutenberg/pull/20008#issuecomment-624503410
 	return <ToolbarGroup { ...props } className={ className } />;
 }
 
-export default Toolbar;
+export default forwardRef( Toolbar );

@@ -1,21 +1,21 @@
 .block-directory-downloadable-block-info__content {
+	margin: 0 0 $grid-unit-20;
 	font-size: $default-font-size;
 }
 
-.block-directory-downloadable-block-info__row {
+.block-directory-downloadable-block-info__meta {
 	display: flex;
-	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 2px;
 	color: $dark-gray-400;
-	margin-top: $grid-unit-10;
 	font-size: 12px;
+}
 
-	.block-directory-downloadable-block-info__column {
-		display: flex;
-		align-items: center;
+.block-directory-downloadable-block-info__meta:last-child {
+	margin-bottom: 0;
+}
 
-		.dashicon {
-			font-size: 16px;
-			margin-right: 4px;
-		}
-	}
+.block-directory-downloadable-block-info__icon {
+	margin-right: 4px;
+	fill: $dark-gray-400;
 }

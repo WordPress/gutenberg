@@ -8,6 +8,6 @@ import { wpDataSelect } from './wp-data-select';
  *
  * @return {Promise} Promise resolving with an array containing all blocks in the document.
  */
-export function getAllBlocks() {
+export async function getAllBlocks() {
 	return wpDataSelect( 'core/block-editor', 'getBlocks' );
 }

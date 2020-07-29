@@ -4,6 +4,9 @@
 import { compact, get } from 'lodash';
 
 export function serializeGradientColor( { type, value } ) {
+	if ( type === 'literal' || type === 'hex' ) {
+		return value;
+	}
 	return `${ type }(${ value.join( ',' ) })`;
 }
 

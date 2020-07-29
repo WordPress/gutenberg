@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost } from '@wordpress/e2e-test-utils';
+import { createNewPost, showBlockToolbar } from '@wordpress/e2e-test-utils';
 
 describe( 'block mover', () => {
 	beforeEach( async () => {
@@ -18,9 +18,7 @@ describe( 'block mover', () => {
 		// Select a block so the block mover is rendered.
 		await page.focus( '.block-editor-block-list__block' );
 
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		await showBlockToolbar();
 
 		const blockMover = await page.$$( '.block-editor-block-mover' );
 		// There should be a block mover.
@@ -35,9 +33,7 @@ describe( 'block mover', () => {
 		// Select a block so the block mover has the possibility of being rendered.
 		await page.focus( '.block-editor-block-list__block' );
 
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		await showBlockToolbar();
 
 		// Ensure no block mover exists when only one block exists on the page.
 		const blockMover = await page.$$( '.block-editor-block-mover' );

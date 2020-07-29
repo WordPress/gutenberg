@@ -575,6 +575,11 @@ export function isClosedByToken( currentToken, nextToken ) {
  * @return {boolean} Whether HTML strings are equivalent.
  */
 export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
+	// Short-circuit if markup is identical.
+	if ( actual === expected ) {
+		return true;
+	}
+
 	// Tokenize input content and reserialized save content
 	const [ actualTokens, expectedTokens ] = [
 		actual,

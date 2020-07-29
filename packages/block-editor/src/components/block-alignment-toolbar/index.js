@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import {
@@ -12,11 +12,6 @@ import {
 	stretchFullWidth,
 	stretchWide,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { withBlockEditContext } from '../block-edit/context';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
@@ -45,6 +40,10 @@ const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
 const DEFAULT_CONTROL = 'center';
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
+const POPOVER_PROPS = {
+	isAlternate: true,
+};
+
 export function BlockAlignmentToolbar( {
 	value,
 	onChange,
@@ -67,7 +66,8 @@ export function BlockAlignmentToolbar( {
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	return (
-		<Toolbar
+		<ToolbarGroup
+			popoverProps={ POPOVER_PROPS }
 			isCollapsed={ isCollapsed }
 			icon={
 				activeAlignmentControl
@@ -88,11 +88,6 @@ export function BlockAlignmentToolbar( {
 }
 
 export default compose(
-	withBlockEditContext( ( { clientId } ) => {
-		return {
-			clientId,
-		};
-	} ),
 	withSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		const settings = getSettings();

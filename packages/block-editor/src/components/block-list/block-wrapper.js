@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { first, last, omit } from 'lodash';
-import { animated } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
@@ -11,12 +10,12 @@ import { animated } from 'react-spring/web.cjs';
 import {
 	useRef,
 	useEffect,
-	useLayoutEffect,
+	useState,
 	useContext,
 	forwardRef,
 } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -24,59 +23,72 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../utils/dom';
-import useMovingAnimation from './moving-animation';
-import { Context, BlockNodes } from './root-container';
+import useMovingAnimation from '../use-moving-animation';
+import { Context, SetBlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
-import ELEMENTS from './block-elements';
+import ELEMENTS from './block-wrapper-elements';
 
 const BlockComponent = forwardRef(
-	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
+	(
+		{ children, tagName: TagName = 'div', __unstableIsHtml, ...props },
+		wrapper
+	) => {
 		const onSelectionStart = useContext( Context );
-		const [ , setBlockNodes ] = useContext( BlockNodes );
+		const setBlockNodes = useContext( SetBlockNodes );
 		const {
 			clientId,
 			rootClientId,
 			isSelected,
 			isFirstMultiSelected,
 			isLastMultiSelected,
-			isMultiSelecting,
-			isNavigationMode,
 			isPartOfMultiSelection,
 			enableAnimation,
 			index,
 			className,
-			isLocked,
 			name,
 			mode,
 			blockTitle,
 			wrapperProps,
 		} = useContext( BlockListBlockContext );
-		const { initialPosition } = useSelect(
+		const {
+			initialPosition,
+			shouldFocusFirstElement,
+			isNavigationMode,
+		} = useSelect(
 			( select ) => {
-				if ( ! isSelected ) {
-					return {};
-				}
+				const {
+					getSelectedBlocksInitialCaretPosition,
+					isMultiSelecting: _isMultiSelecting,
+					isNavigationMode: _isNavigationMode,
+				} = select( 'core/block-editor' );
 
 				return {
-					initialPosition: select(
-						'core/block-editor'
-					).getSelectedBlocksInitialCaretPosition(),
+					shouldFocusFirstElement:
+						isSelected &&
+						! _isMultiSelecting() &&
+						! _isNavigationMode(),
+					initialPosition: isSelected
+						? getSelectedBlocksInitialCaretPosition()
+						: undefined,
+					isNavigationMode: _isNavigationMode,
 				};
 			},
 			[ isSelected ]
 		);
-		const { removeBlock, insertDefaultBlock } = useDispatch(
+		const { insertDefaultBlock, removeBlock } = useDispatch(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
 		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
+		const [ isHovered, setHovered ] = useState( false );
+
 		// Provide the selected node, or the first and last nodes of a multi-
 		// selection, so it can be used to position the contextual block toolbar.
 		// We only provide what is necessary, and remove the nodes again when they
 		// are no longer selected.
-		useLayoutEffect( () => {
+		useEffect( () => {
 			if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
 				const node = wrapper.current;
 				setBlockNodes( ( nodes ) => ( {
@@ -130,13 +142,13 @@ const BlockComponent = forwardRef(
 		};
 
 		useEffect( () => {
-			if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
+			if ( shouldFocusFirstElement ) {
 				focusTabbable();
 			}
-		}, [ isSelected, isMultiSelecting, isNavigationMode ] );
+		}, [ shouldFocusFirstElement ] );
 
 		// Block Reordering animation
-		const animationStyle = useMovingAnimation(
+		useMovingAnimation(
 			wrapper,
 			isSelected || isPartOfMultiSelection,
 			isSelected || isFirstMultiSelected,
@@ -194,10 +206,38 @@ const BlockComponent = forwardRef(
 		const htmlSuffix =
 			mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
-		const Animated = animated[ tagName ];
 
-		const blockWrapper = (
-			<Animated
+		function onMouseOver( event ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			event.preventDefault();
+
+			if ( isHovered ) {
+				return;
+			}
+
+			setHovered( true );
+		}
+
+		function onMouseOut( event ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			event.preventDefault();
+
+			if ( ! isHovered ) {
+				return;
+			}
+
+			setHovered( false );
+		}
+
+		return (
+			// eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
+			<TagName
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
@@ -209,40 +249,30 @@ const BlockComponent = forwardRef(
 					className,
 					props.className,
 					wrapperProps && wrapperProps.className,
-					! isAligned && 'wp-block'
+					{
+						'is-hovered': isHovered,
+						'wp-block': ! isAligned,
+					}
 				) }
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
-				// Only allow shortcuts when a blocks is selected and not locked.
-				onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
+				// Only allow shortcuts when a blocks is selected.
+				onKeyDown={ isSelected ? onKeyDown : undefined }
 				// Only allow selection to be started from a selected block.
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
+				// No need to have these listeners for hover class in edit mode.
+				onMouseOver={ isNavigationMode ? onMouseOver : undefined }
+				onMouseOut={ isNavigationMode ? onMouseOut : undefined }
 				tabIndex="0"
 				style={ {
 					...( wrapperProps ? wrapperProps.style : {} ),
 					...( props.style || {} ),
-					...animationStyle,
 				} }
 			>
 				{ children }
-			</Animated>
+			</TagName>
 		);
-
-		// For aligned blocks, provide a wrapper element so the block can be
-		// positioned relative to the block column.
-		if ( isAligned ) {
-			const alignmentWrapperProps = {
-				'data-align': wrapperProps[ 'data-align' ],
-			};
-			return (
-				<div className="wp-block" { ...alignmentWrapperProps }>
-					{ blockWrapper }
-				</div>
-			);
-		}
-
-		return blockWrapper;
 	}
 );
 

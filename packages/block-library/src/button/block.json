@@ -1,6 +1,9 @@
 {
 	"name": "core/button",
-	"category": "layout",
+	"category": "design",
+	"parent": [
+		"core/buttons"
+	],
 	"attributes": {
 		"url": {
 			"type": "string",
@@ -49,5 +52,12 @@
 		"gradient": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"alignWide": false,
+		"reusable": false,
+		"lightBlockWrapper": true
 	}
 }

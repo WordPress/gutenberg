@@ -15,7 +15,7 @@ import withGlobalEvents from '../';
 import Listener from '../listener';
 
 jest.mock( '../listener', () => {
-	const ActualListener = require.requireActual( '../listener' ).default;
+	const ActualListener = jest.requireActual( '../listener' ).default;
 
 	return class extends ActualListener {
 		constructor() {

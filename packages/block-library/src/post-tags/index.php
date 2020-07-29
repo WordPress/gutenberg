@@ -8,14 +8,17 @@
 /**
  * Renders the `core/post-tags` block on the server.
  *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  * @return string Returns the filtered post tags for the current post wrapped inside "a" tags.
  */
-function render_block_core_post_tags() {
-	$post = gutenberg_get_post_from_context();
-	if ( ! $post ) {
+function render_block_core_post_tags( $attributes, $content, $block ) {
+	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
-	$post_tags = get_the_tags();
+
+	$post_tags = get_the_tags( $block->context['postId'] );
 	if ( ! empty( $post_tags ) ) {
 		$output = '';
 		foreach ( $post_tags as $tag ) {

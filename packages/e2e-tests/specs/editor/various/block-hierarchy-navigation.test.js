@@ -13,7 +13,7 @@ import {
 async function openBlockNavigator() {
 	await pressKeyWithModifier( 'access', 'o' );
 	await page.waitForSelector(
-		'.block-editor-block-navigation__item-button.is-selected'
+		'.block-editor-block-navigation-leaf.is-selected'
 	);
 }
 
@@ -30,7 +30,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'First column' );
 
@@ -38,7 +38,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Block navigation"]' );
 		const columnsBlockMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]"
+				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Columns')]"
 			)
 		 )[ 0 ];
 		await columnsBlockMenuItem.click();
@@ -46,7 +46,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Tweak the columns count.
 		await openDocumentSettingsSidebar();
 		await page.focus(
-			'.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]'
+			'.block-editor-block-inspector [aria-label="Columns"][type="number"]'
 		);
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -57,7 +57,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Block navigation"]' );
 		const lastColumnsBlockMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
+				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Column')]"
 			)
 		 )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
@@ -66,7 +66,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'Third column' );
 
@@ -82,7 +82,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'First column' );
 
@@ -101,7 +101,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the last column in the columns block.
 		await openBlockNavigator();
-		await pressKeyTimes( 'Tab', 4 );
+		await pressKeyTimes( 'ArrowDown', 4 );
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
@@ -109,7 +109,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'Third column' );
 
@@ -121,7 +121,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		await insertBlock( 'Paragraph' );
 
-		// Add content so there is a block in the hierachy.
+		// Add content so there is a block in the hierarchy.
 		await page.keyboard.type( textString );
 
 		// Create an image block too.
@@ -163,7 +163,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Block navigation"]' );
 		const groupMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Group')]"
+				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Group')]"
 			)
 		 )[ 0 ];
 		await groupMenuItem.click();

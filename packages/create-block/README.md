@@ -15,11 +15,12 @@ Visit the [Gutenberg handbook](https://developer.wordpress.org/block-editor/deve
 ![Demo](https://make.wordpress.org/core/files/2020/02/74508276-f0648280-4efe-11ea-9cc0-a607b43d1bcf.gif)
 
 You just need to provide the `slug` which is the target location for scaffolded files and the internal block name.
-  ```bash
-  $ npm init @wordpress/block todo-list
-  $ cd todo-list
-  $ npm start
-  ```
+
+```bash
+$ npx @wordpress/create-block todo-list
+$ cd todo-list
+$ npm start
+```
 
 _(requires `node` version `10.0.0` or above, and `npm` version `6.9.0` or above)_
 
@@ -30,19 +31,22 @@ You don’t need to install or configure tools like [webpack](https://webpack.js
 The following command generates PHP, JS and CSS code for registering a block.
 
 ```bash
-$ npm init @wordpress/block [options] [slug]
+$ npx @wordpress/create-block [options] [slug]
 ```
 
 `[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values unless overriden with some of the options listed below.
 
 Options:
-```
+
+```sh
 -V, --version                output the version number
--t, --template <name>        template type name, allowed values: "es5", "esnext" (default: "esnext")
+-t, --template <name>        block template type name, allowed values: "es5", "esnext" (default: "esnext")
 --namespace <value>          internal namespace for the block name
 --title <value>              display title for the block
 --short-description <value>  short description for the block
 --category <name>            category name for the block
+--wp-scripts                 enable integration with `@wordpress/scripts` package
+--no-wp-scripts              disable integration with `@wordpress/scripts` package
 -h, --help                   output usage information
 ```
 
@@ -50,18 +54,23 @@ _Please note that `--version` and `--help` options don't work with `npm init`. Y
 
 More examples:
 
-1. Interactive mode - it gives a chance to customize a few most important options before the code gets generated.
-  ```bash
-  $ npm init @wordpress/block
-  ```
+1. Interactive mode - without giving a project name, the script will run in interactive mode giving a chance to customize the important options before generating the files.
+
+```bash
+$ npx @wordpress/create-block
+```
+
 2. ES5 template – it is also possible to pick ES5 template when you don't want to deal with a build step (`npm start`) which enables ESNext and JSX support.
-  ```bash
-  $ npm init @wordpress/block --template es5
-  ```
+
+```bash
+$ npx @wordpress/create-block --template es5
+```
+
 3. Help – you need to use `npx` to output usage information.
-  ```bash
-  $ npx @wordpress/create-block --help
-  ```
+
+```bash
+$ npx @wordpress/create-block --help
+```
 
 When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name, and the `category`. In most cases, we recommended pairing blocks with plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
 
@@ -72,31 +81,37 @@ Inside that bootstrapped directory _(it doesn't apply to `es5` template)_, you c
 ```bash
 $ npm start
 ```
+
 Starts the build for development. [Learn more](/packages/scripts#start).
 
 ```bash
 $ npm run build
 ```
+
 Builds the code for production. [Learn more](/packages/scripts#build).
 
 ```bash
 $ npm run format:js
 ```
+
 Formats JavaScript files. [Learn more](/packages/scripts#format-js).
 
 ```bash
 $ npm run lint:css
 ```
+
 Lints CSS files. [Learn more](/packages/scripts#lint-style).
 
 ```bash
 $ npm run lint:js
 ```
+
 Lints JavaScript files. [Learn more](/packages/scripts#lint-js).
 
 ```bash
 $ npm run packages-update
 ```
+
 Updates WordPress packages to the latest version. [Learn more](/packages/scripts#packages-update).
 
 ## WP-CLI

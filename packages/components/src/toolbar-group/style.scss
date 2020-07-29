@@ -1,6 +1,6 @@
 .components-toolbar-group {
 	min-height: $block-toolbar-height;
-	border-right: $border-width solid $dark-gray-primary;
+	border-right: $border-width solid $gray-900;
 	background-color: $white;
 	display: inline-flex;
 	flex-shrink: 0;
@@ -19,7 +19,7 @@
 .components-toolbar {
 	min-height: $block-toolbar-height;
 	margin: 0;
-	border: $border-width solid $dark-gray-primary;
+	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	display: inline-flex;
@@ -49,7 +49,7 @@ div.components-toolbar {
 			display: inline-block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $light-gray-500;
+			background-color: $gray-200;
 			position: absolute;
 			top: 8px;
 			left: -3px;
@@ -79,6 +79,7 @@ div.components-toolbar {
 
 // First button in a group.
 .components-accessible-toolbar .components-toolbar-group > .components-button:first-child.has-icon,
+.components-accessible-toolbar .components-toolbar-group > div:first-child > .components-button.has-icon,
 .components-toolbar div:first-child .components-button.has-icon {
 	min-width: $block-toolbar-height - $grid-unit-15 / 2;
 	padding-left: $grid-unit-15 - $border-width;
@@ -92,6 +93,7 @@ div.components-toolbar {
 
 // Last button in a group.
 .components-accessible-toolbar .components-toolbar-group > .components-button:last-child.has-icon,
+.components-accessible-toolbar .components-toolbar-group > div:last-child > .components-button.has-icon,
 .components-toolbar div:last-child .components-button.has-icon {
 	min-width: $block-toolbar-height - $grid-unit-15 / 2;
 	padding-left: $grid-unit-15 / 2;
@@ -104,7 +106,8 @@ div.components-toolbar {
 }
 
 // Single buttons should remain 48px.
-.components-accessible-toolbar .components-toolbar-group > .components-button:first-child:last-child.has-icon,
+.components-accessible-toolbar .components-toolbar-group > .components-button:first-of-type:last-of-type.has-icon,
+.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon,
 .components-toolbar div:first-child:last-child > .components-button.has-icon {
 	min-width: $block-toolbar-height;
 	padding-left: $grid-unit-15;

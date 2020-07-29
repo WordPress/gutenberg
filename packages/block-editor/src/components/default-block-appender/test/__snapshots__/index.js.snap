@@ -27,8 +27,9 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     value="Start writing or type / to choose a block"
   />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
     isAppender={true}
-    position="top right"
+    position="bottom right"
   />
 </div>
 `;
@@ -48,8 +49,9 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
     value="Start writing or type / to choose a block"
   />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
     isAppender={true}
-    position="top right"
+    position="bottom right"
   />
 </div>
 `;
@@ -69,8 +71,9 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
     value=""
   />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
     isAppender={true}
-    position="top right"
+    position="bottom right"
   />
 </div>
 `;

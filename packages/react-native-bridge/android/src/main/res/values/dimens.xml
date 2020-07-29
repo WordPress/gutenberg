@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="progress_bar_height">3dp</dimen>
+
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="toolbar_content_offset">72dp</dimen>
+    <dimen name="toolbar_content_offset_end">0dp</dimen>
+
+</resources>

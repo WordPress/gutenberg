@@ -21,9 +21,6 @@ export const settings = {
 	description: __( 'Add a link to a downloadable file.' ),
 	icon,
 	keywords: [ __( 'document' ), __( 'pdf' ), __( 'download' ) ],
-	supports: {
-		align: true,
-	},
 	transforms,
 	edit,
 	save,

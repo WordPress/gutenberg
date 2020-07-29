@@ -22,17 +22,17 @@ const TEMPLATE = [
 	[ 'core/social-link', { service: 'youtube' } ],
 ];
 
-export const SocialLinksEdit = function() {
+export function SocialLinksEdit() {
 	return (
 		<InnerBlocks
 			allowedBlocks={ ALLOWED_BLOCKS }
 			templateLock={ false }
 			template={ TEMPLATE }
-			__experimentalMoverDirection={ 'horizontal' }
+			orientation="horizontal"
 			__experimentalTagName={ Block.ul }
 			__experimentalAppenderTagName="li"
 		/>
 	);
-};
+}
 
 export default SocialLinksEdit;

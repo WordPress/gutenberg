@@ -34,8 +34,7 @@ class WP_REST_Widget_Forms extends WP_REST_Controller {
 	public function register_routes() {
 			register_rest_route(
 				$this->namespace,
-				// Regex representing a PHP class extracted from http://php.net/manual/en/language.oop5.basic.php.
-				'/' . $this->rest_base . '/(?P<widget_class>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/',
+				'/' . $this->rest_base . '/(?P<widget_class>[^/]*)/',
 				array(
 					'args' => array(
 						'widget_class'     => array(
@@ -96,6 +95,7 @@ class WP_REST_Widget_Forms extends WP_REST_Controller {
 	 * @return boolean| True if the widget being referenced exists and false otherwise.
 	 */
 	private function is_valid_widget( $widget_class ) {
+		$widget_class = urldecode( $widget_class );
 		global $wp_widget_factory;
 		if ( ! $widget_class ) {
 			return false;
@@ -114,7 +114,7 @@ class WP_REST_Widget_Forms extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function compute_new_widget( $request ) {
-		$widget_class     = $request->get_param( 'widget_class' );
+		$widget_class     = urldecode( $request->get_param( 'widget_class' ) );
 		$instance         = $request->get_param( 'instance' );
 		$instance_changes = $request->get_param( 'instance_changes' );
 

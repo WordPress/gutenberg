@@ -14,7 +14,7 @@ describe( 'controls', () => {
 	describe( 'should call registry-aware controls', () => {
 		it( 'registers multiple selectors to the public API', () => {
 			const action1 = jest.fn( () => ( { type: 'NOTHING' } ) );
-			const action2 = function*() {
+			const action2 = function* () {
 				yield { type: 'DISPATCH', store: 'store1', action: 'action1' };
 			};
 			registry.registerStore( 'store1', {

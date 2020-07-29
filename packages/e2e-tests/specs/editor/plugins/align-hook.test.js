@@ -37,7 +37,10 @@ describe( 'Align Hook Works As Expected', () => {
 	} );
 
 	const getAlignmentToolbarLabels = async () => {
-		await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+		const element = await page.waitForSelector(
+			CHANGE_ALIGNMENT_BUTTON_SELECTOR
+		);
+		await element.click();
 
 		const buttonLabels = await page.evaluate( () => {
 			return Array.from(
@@ -64,7 +67,10 @@ describe( 'Align Hook Works As Expected', () => {
 			await insertBlock( blockName );
 
 			// verify no alignment button is in pressed state
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			const element = await page.waitForSelector(
+				CHANGE_ALIGNMENT_BUTTON_SELECTOR
+			);
+			await element.click();
 			const pressedButtons = await page.$$(
 				'.components-dropdown-menu__menu button.is-active'
 			);
@@ -89,7 +95,10 @@ describe( 'Align Hook Works As Expected', () => {
 				'.components-dropdown-menu__menu button.is-active';
 			// set the specified alignment.
 			await insertBlock( blockName );
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			const element = await page.waitForSelector(
+				CHANGE_ALIGNMENT_BUTTON_SELECTOR
+			);
+			await element.click();
 			await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
 
 			// verify the button of the specified alignment is pressed.
@@ -196,7 +205,10 @@ describe( 'Align Hook Works As Expected', () => {
 		it( 'Applies the selected alignment by default', async () => {
 			await insertBlock( BLOCK_NAME );
 			// verify the correct alignment button is pressed
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			const element = await page.waitForSelector(
+				CHANGE_ALIGNMENT_BUTTON_SELECTOR
+			);
+			await element.click();
 			const selectedAlignmentControls = await page.$x(
 				SELECTED_ALIGNMENT_CONTROL_SELECTOR
 			);
@@ -213,7 +225,10 @@ describe( 'Align Hook Works As Expected', () => {
 		it( 'Can remove the default alignment and the align attribute equals none but alignnone class is not applied', async () => {
 			await insertBlock( BLOCK_NAME );
 			// remove the alignment.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			const element = await page.waitForSelector(
+				CHANGE_ALIGNMENT_BUTTON_SELECTOR
+			);
+			await element.click();
 			const [ selectedAlignmentControl ] = await page.$x(
 				SELECTED_ALIGNMENT_CONTROL_SELECTOR
 			);

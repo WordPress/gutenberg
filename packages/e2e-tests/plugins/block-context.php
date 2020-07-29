@@ -32,13 +32,13 @@ function gutenberg_test_register_context_blocks() {
 	register_block_type(
 		'gutenberg/test-context-provider',
 		array(
-			'attributes'      => array(
+			'attributes'       => array(
 				'recordId' => array(
 					'type'    => 'number',
 					'default' => 0,
 				),
 			),
-			'providesContext' => array(
+			'provides_context' => array(
 				'gutenberg/recordId' => 'recordId',
 			),
 		)
@@ -47,7 +47,20 @@ function gutenberg_test_register_context_blocks() {
 	register_block_type(
 		'gutenberg/test-context-consumer',
 		array(
-			'context' => array( 'gutenberg/recordId' ),
+			'uses_context'    => array(
+				'gutenberg/recordId',
+				'postId',
+				'postType',
+			),
+			'render_callback' => function( $attributes, $content, $block ) {
+				$ordered_context = array(
+					$block->context['gutenberg/recordId'],
+					$block->context['postId'],
+					$block->context['postType'],
+				);
+
+				return implode( ',', $ordered_context );
+			},
 		)
 	);
 }

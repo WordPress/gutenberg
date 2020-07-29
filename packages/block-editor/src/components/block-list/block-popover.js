@@ -17,7 +17,7 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BlockBreadcrumb from './breadcrumb';
+import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { BlockNodes } from './root-container';
@@ -46,9 +46,7 @@ function selector( select ) {
 function BlockPopover( {
 	clientId,
 	rootClientId,
-	align,
 	isValid,
-	moverDirection,
 	isEmptyDefaultBlock,
 	capturingClientId,
 } ) {
@@ -64,7 +62,7 @@ function BlockPopover( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
-	const [ blockNodes ] = useContext( BlockNodes );
+	const blockNodes = useContext( BlockNodes );
 
 	const showEmptyBlockSideInserter =
 		! isNavigationMode && isEmptyDefaultBlock && isValid;
@@ -155,18 +153,10 @@ function BlockPopover( {
 			__unstableSticky={ ! showEmptyBlockSideInserter }
 			__unstableSlotName="block-toolbar"
 			__unstableBoundaryParent
-			// Allow subpixel positioning for the block movement animation.
-			__unstableAllowVerticalSubpixelPosition={
-				moverDirection !== 'horizontal' && node
-			}
-			__unstableAllowHorizontalSubpixelPosition={
-				moverDirection === 'horizontal' && node
-			}
+			// Observe movement for block animations (especially horizontal).
+			__unstableObserveElement={ node }
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
-			// Popover calculates the width once. Trigger a reset by remounting
-			// the component.
-			key={ shouldShowContextualToolbar }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -189,6 +179,7 @@ function BlockPopover( {
 					<Inserter
 						clientId={ clientId }
 						rootClientId={ rootClientId }
+						__experimentalIsQuick
 					/>
 				</div>
 			) }
@@ -197,23 +188,21 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
-					data-align={ align }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
-				<BlockBreadcrumb
+				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
-					moverDirection={ moverDirection }
-					data-align={ align }
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (
 				<div className="block-editor-block-list__empty-block-inserter">
 					<Inserter
-						position="top right"
+						position="bottom right"
 						rootClientId={ rootClientId }
 						clientId={ clientId }
+						__experimentalIsQuick
 					/>
 				</div>
 			) }
@@ -228,7 +217,6 @@ function wrapperSelector( select ) {
 		getBlockRootClientId,
 		__unstableGetBlockWithoutInnerBlocks,
 		getBlockParents,
-		getBlockListSettings,
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( 'core/block-editor' );
 
@@ -239,12 +227,9 @@ function wrapperSelector( select ) {
 		return;
 	}
 
-	const rootClientId = getBlockRootClientId( clientId );
 	const { name, attributes = {}, isValid } =
 		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
-	const { __experimentalMoverDirection } =
-		getBlockListSettings( rootClientId ) || {};
 
 	// Get Block List Settings for all ancestors of the current Block clientId
 	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
@@ -271,9 +256,7 @@ function wrapperSelector( select ) {
 		clientId,
 		rootClientId: getBlockRootClientId( clientId ),
 		name,
-		align: attributes.align,
 		isValid,
-		moverDirection: __experimentalMoverDirection,
 		isEmptyDefaultBlock:
 			name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		capturingClientId,
@@ -291,9 +274,7 @@ export default function WrappedBlockPopover() {
 		clientId,
 		rootClientId,
 		name,
-		align,
 		isValid,
-		moverDirection,
 		isEmptyDefaultBlock,
 		capturingClientId,
 	} = selected;
@@ -306,9 +287,7 @@ export default function WrappedBlockPopover() {
 		<BlockPopover
 			clientId={ clientId }
 			rootClientId={ rootClientId }
-			align={ align }
 			isValid={ isValid }
-			moverDirection={ moverDirection }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
 			capturingClientId={ capturingClientId }
 		/>

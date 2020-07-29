@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -26,6 +26,8 @@ import {
 	TAB,
 	isKeyboardEvent,
 	ESCAPE,
+	ENTER,
+	SPACE,
 } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -93,10 +95,18 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
  * @param {Element} target           Currently focused text field.
  * @param {boolean} isReverse        True if considering as the first field.
  * @param {Element} containerElement Element containing all blocks.
+ * @param {boolean} onlyVertical     Wether to only consider tabbable elements
+ *                                   that are visually above or under the
+ *                                   target.
  *
  * @return {?Element} Optimal tab target, if one exists.
  */
-export function getClosestTabbable( target, isReverse, containerElement ) {
+export function getClosestTabbable(
+	target,
+	isReverse,
+	containerElement,
+	onlyVertical
+) {
 	// Since the current focus target is not guaranteed to be a text field,
 	// find all focusables. Tabbability is considered later.
 	let focusableNodes = focus.focusable.find( containerElement );
@@ -112,10 +122,27 @@ export function getClosestTabbable( target, isReverse, containerElement ) {
 		focusableNodes.indexOf( target ) + 1
 	);
 
+	let targetRect;
+
+	if ( onlyVertical ) {
+		targetRect = target.getBoundingClientRect();
+	}
+
 	function isTabCandidate( node, i, array ) {
 		// Not a candidate if the node is not tabbable.
 		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
 			return false;
+		}
+
+		if ( onlyVertical ) {
+			const nodeRect = node.getBoundingClientRect();
+
+			if (
+				nodeRect.left >= targetRect.right ||
+				nodeRect.right <= targetRect.left
+			) {
+				return false;
+			}
 		}
 
 		// Prefer text fields...
@@ -178,9 +205,16 @@ function selector( select ) {
 		hasMultiSelection,
 		getBlockOrder,
 		isNavigationMode,
+		hasBlockMovingClientId,
+		getBlockIndex,
+		getBlockRootClientId,
+		getClientIdsOfDescendants,
+		canInsertBlockType,
+		getBlockName,
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
+		getSettings,
 	} = select( 'core/block-editor' );
 
 	const selectedBlockClientId = getSelectedBlockClientId();
@@ -201,15 +235,25 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		blocks: getBlockOrder(),
 		isNavigationMode: isNavigationMode(),
+		hasBlockMovingClientId,
+		getBlockIndex,
+		getBlockRootClientId,
+		getClientIdsOfDescendants,
+		canInsertBlockType,
+		getBlockName,
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
+		keepCaretInsideBlock: getSettings().keepCaretInsideBlock,
 	};
 }
 
 /**
  * Handles selection and navigation across blocks. This component should be
  * wrapped around BlockList.
+ *
+ * @param {Object}    props          Component properties.
+ * @param {WPElement} props.children Children to be rendered.
  */
 export default function WritingFlow( { children } ) {
 	const container = useRef();
@@ -238,21 +282,32 @@ export default function WritingFlow( { children } ) {
 		hasMultiSelection,
 		blocks,
 		isNavigationMode,
+		hasBlockMovingClientId,
 		isSelectionEnabled,
 		blockSelectionStart,
 		isMultiSelecting,
+		getBlockIndex,
+		getBlockRootClientId,
+		getClientIdsOfDescendants,
+		canInsertBlockType,
+		getBlockName,
+		keepCaretInsideBlock,
 	} = useSelect( selector, [] );
 	const {
 		multiSelect,
 		selectBlock,
 		clearSelectedBlock,
 		setNavigationMode,
+		setBlockMovingClientId,
+		moveBlockToPosition,
 	} = useDispatch( 'core/block-editor' );
+
+	const [ canInsertMovingBlock, setCanInsertMovingBlock ] = useState( false );
 
 	function onMouseDown( event ) {
 		verticalRect.current = null;
 
-		// Clicking inside a selected block should exit navigation mode.
+		// Clicking inside a selected block should exit navigation mode and block moving mode.
 		if (
 			isNavigationMode &&
 			selectedBlockClientId &&
@@ -262,6 +317,18 @@ export default function WritingFlow( { children } ) {
 			)
 		) {
 			setNavigationMode( false );
+			setBlockMovingClientId( null );
+		} else if (
+			isNavigationMode &&
+			hasBlockMovingClientId() &&
+			getBlockClientId( event.target )
+		) {
+			setCanInsertMovingBlock(
+				canInsertBlockType(
+					getBlockName( hasBlockMovingClientId() ),
+					getBlockRootClientId( getBlockClientId( event.target ) )
+				)
+			);
 		}
 
 		// Multi-select blocks when Shift+clicking.
@@ -342,6 +409,8 @@ export default function WritingFlow( { children } ) {
 		const isRight = keyCode === RIGHT;
 		const isTab = keyCode === TAB;
 		const isEscape = keyCode === ESCAPE;
+		const isEnter = keyCode === ENTER;
+		const isSpace = keyCode === SPACE;
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
@@ -355,11 +424,69 @@ export default function WritingFlow( { children } ) {
 		if ( isNavigationMode ) {
 			const navigateUp = ( isTab && isShift ) || isUp;
 			const navigateDown = ( isTab && ! isShift ) || isDown;
-			const focusedBlockUid = navigateUp
-				? selectionBeforeEndClientId
-				: selectionAfterEndClientId;
+			// Move out of current nesting level (no effect if at root level).
+			const navigateOut = isLeft;
+			// Move into next nesting level (no effect if the current block has no innerBlocks).
+			const navigateIn = isRight;
 
-			if ( navigateDown || navigateUp ) {
+			let focusedBlockUid;
+			if ( navigateUp ) {
+				focusedBlockUid = selectionBeforeEndClientId;
+			} else if ( navigateDown ) {
+				focusedBlockUid = selectionAfterEndClientId;
+			} else if ( navigateOut ) {
+				focusedBlockUid =
+					getBlockRootClientId( selectedBlockClientId ) ??
+					selectedBlockClientId;
+			} else if ( navigateIn ) {
+				focusedBlockUid =
+					getClientIdsOfDescendants( [
+						selectedBlockClientId,
+					] )[ 0 ] ?? selectedBlockClientId;
+			}
+			const startingBlockClientId = hasBlockMovingClientId();
+
+			if ( startingBlockClientId && focusedBlockUid ) {
+				setCanInsertMovingBlock(
+					canInsertBlockType(
+						getBlockName( startingBlockClientId ),
+						getBlockRootClientId( focusedBlockUid )
+					)
+				);
+			}
+			if ( isEscape && startingBlockClientId ) {
+				setBlockMovingClientId( null );
+				setCanInsertMovingBlock( false );
+			}
+			if ( ( isEnter || isSpace ) && startingBlockClientId ) {
+				const sourceRoot = getBlockRootClientId(
+					startingBlockClientId
+				);
+				const destRoot = getBlockRootClientId( selectedBlockClientId );
+				const sourceBlockIndex = getBlockIndex(
+					startingBlockClientId,
+					sourceRoot
+				);
+				let destinationBlockIndex = getBlockIndex(
+					selectedBlockClientId,
+					destRoot
+				);
+				if (
+					sourceBlockIndex < destinationBlockIndex &&
+					sourceRoot === destRoot
+				) {
+					destinationBlockIndex -= 1;
+				}
+				moveBlockToPosition(
+					startingBlockClientId,
+					sourceRoot,
+					destRoot,
+					destinationBlockIndex
+				);
+				selectBlock( startingBlockClientId );
+				setBlockMovingClientId( null );
+			}
+			if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
 				if ( focusedBlockUid ) {
 					event.preventDefault();
 					selectBlock( focusedBlockUid );
@@ -513,11 +640,16 @@ export default function WritingFlow( { children } ) {
 			// Moving from block multi-selection to single block selection
 			moveSelection( isReverse );
 			event.preventDefault();
-		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
+		} else if (
+			isVertical &&
+			isVerticalEdge( target, isReverse ) &&
+			! keepCaretInsideBlock
+		) {
 			const closestTabbable = getClosestTabbable(
 				target,
 				isReverse,
-				container.current
+				container.current,
+				true
 			);
 
 			if ( closestTabbable ) {
@@ -531,7 +663,8 @@ export default function WritingFlow( { children } ) {
 		} else if (
 			isHorizontal &&
 			getSelection().isCollapsed &&
-			isHorizontalEdge( target, isReverseDir )
+			isHorizontalEdge( target, isReverseDir ) &&
+			! keepCaretInsideBlock
 		) {
 			const closestTabbable = getClosestTabbable(
 				target,
@@ -559,6 +692,8 @@ export default function WritingFlow( { children } ) {
 
 	const className = classnames( 'block-editor-writing-flow', {
 		'is-navigate-mode': isNavigationMode,
+		'is-block-moving-mode': !! hasBlockMovingClientId(),
+		'can-insert-moving-block': canInsertMovingBlock,
 	} );
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture

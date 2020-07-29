@@ -1,58 +1,60 @@
 /**
  * WordPress dependencies
  */
+import { getPathAndQueryString } from '@wordpress/url';
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { addQueryArgs } from '@wordpress/url';
-import { select } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Browser dependencies
+ * Internal dependencies
  */
-const { fetch } = window;
+import { findTemplate } from '../../utils';
 
 export default function NavigateToLink( {
-	url,
-	templateIds,
-	activeId,
-	onActiveIdChange,
+	type,
+	id,
+	activePage,
+	onActivePageChange,
 } ) {
+	const pageEntity = useSelect(
+		( select ) =>
+			type &&
+			id &&
+			type !== 'URL' &&
+			select( 'core' ).getEntityRecord( 'postType', type, id ),
+		[ type, id ]
+	);
+
+	const registry = useRegistry();
 	const [ templateId, setTemplateId ] = useState();
 	useEffect( () => {
-		const effect = async () => {
-			try {
-				const { success, data } = await fetch(
-					addQueryArgs( url, { '_wp-find-template': true } )
-				).then( ( res ) => res.json() );
-				if ( success ) {
-					let newTemplateId = data.ID;
-					if ( newTemplateId === null ) {
-						const { getEntityRecord } = select( 'core' );
-						newTemplateId = templateIds
-							.map( ( id ) =>
-								getEntityRecord( 'postType', 'wp_template', id )
-							)
-							.find(
-								( template ) => template.slug === data.post_name
-							).id;
-					}
-					setTemplateId( newTemplateId );
-				} else {
-					throw new Error();
-				}
-			} catch ( err ) {
-				setTemplateId( null );
-			}
-		};
-		effect();
-	}, [ url, templateIds ] );
+		if ( pageEntity )
+			findTemplate(
+				pageEntity.link,
+				registry.__experimentalResolveSelect( 'core' ).getEntityRecords
+			).then(
+				( newTemplateId ) => setTemplateId( newTemplateId ),
+				() => setTemplateId( null )
+			);
+	}, [ pageEntity?.link, registry ] );
+
 	const onClick = useMemo( () => {
-		if ( ! templateId || templateId === activeId ) {
-			return null;
-		}
-		return () => onActiveIdChange( templateId );
-	}, [ templateId, activeId, onActiveIdChange ] );
+		if ( ! pageEntity || ! templateId ) return null;
+		const path = getPathAndQueryString( pageEntity.link );
+		if ( path === activePage.path ) return null;
+		return () =>
+			onActivePageChange( {
+				type,
+				slug: pageEntity.slug,
+				path,
+				context: {
+					postType: pageEntity.type,
+					postId: pageEntity.id,
+				},
+			} );
+	}, [ pageEntity, templateId, activePage.path, onActivePageChange ] );
 	return (
 		onClick && (
 			<Button

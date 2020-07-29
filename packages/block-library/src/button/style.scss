@@ -43,7 +43,7 @@ $blocks-button__height: 56px;
 // the first selector is required for old buttons markup
 
 .wp-block-button.no-border-radius,
-.wp-block-button__link.wp-block-button.no-border-radius {
+.wp-block-button__link.no-border-radius {
 	border-radius: 0 !important;
 }
 

@@ -34,14 +34,14 @@ As seen in the above example, it is recommended that you include a namespace as 
 
 ### Consuming Block Context
 
-A block can inherit a context value from an ancestor provider by assigning a `context` property in its registered settings. This should be assigned as an array of the context names the block seeks to inherit.
+A block can inherit a context value from an ancestor provider by assigning a `usesContext` property in its registered settings. This should be assigned as an array of the context names the block seeks to inherit.
 
 `record-title/block.json`
 
 ```json
 {
 	"name": "my-plugin/record-title",
-	"context": [ "my-plugin/recordId" ]
+	"usesContext": [ "my-plugin/recordId" ]
 }
 ```
 
@@ -63,4 +63,14 @@ registerBlockType( 'my-plugin/record-title', {
 
 ### PHP
 
-_The PHP implementation of block context is currently experimental and subject to breaking changes. It will be documented in the future once the API has stabilized._
+A block's context values are available from the `context` property of the `$block` argument passed as the third argument to the `render_callback` function.
+
+`record-title/index.php`
+
+```php
+register_block_type( 'my-plugin/record-title', array(
+	'render_callback' => function( $attributes, $content, $block ) {
+		return 'The current record ID is: ' . $block->context['my-plugin/recordId'];
+	},
+) );
+```

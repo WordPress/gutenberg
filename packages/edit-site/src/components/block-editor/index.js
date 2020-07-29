@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
-import { uploadMedia } from '@wordpress/media-utils';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -13,53 +12,34 @@ import {
 	WritingFlow,
 	ObserveTyping,
 	BlockList,
-	ButtonBlockerAppender,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useEditorContext } from '../editor';
 import NavigateToLink from '../navigate-to-link';
-import Sidebar from '../sidebar';
+import { SidebarInspectorFill } from '../sidebar';
 
-export default function BlockEditor() {
-	const { settings: _settings, setSettings } = useEditorContext();
-	const canUserCreateMedia = useSelect( ( select ) => {
-		const _canUserCreateMedia = select( 'core' ).canUser(
-			'create',
-			'media'
-		);
-		return _canUserCreateMedia || _canUserCreateMedia !== false;
-	}, [] );
-	const settings = useMemo( () => {
-		if ( ! canUserCreateMedia ) {
-			return _settings;
-		}
-		return {
-			..._settings,
-			mediaUpload( { onError, ...rest } ) {
-				uploadMedia( {
-					wpAllowedMimeTypes: _settings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
-					...rest,
-				} );
-			},
-		};
-	}, [ canUserCreateMedia, _settings ] );
+export default function BlockEditor( { setIsInserterOpen } ) {
+	const { settings, templateType, page } = useSelect(
+		( select ) => {
+			const { getSettings, getTemplateType, getPage } = select(
+				'core/edit-site'
+			);
+			return {
+				settings: getSettings( setIsInserterOpen ),
+				templateType: getTemplateType(),
+				page: getPage(),
+			};
+		},
+		[ setIsInserterOpen ]
+	);
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		settings.templateType
+		templateType
 	);
-	const setActiveTemplateId = useCallback(
-		( newTemplateId ) =>
-			setSettings( ( prevSettings ) => ( {
-				...prevSettings,
-				templateId: newTemplateId,
-				templateType: 'wp_template',
-			} ) ),
-		[]
-	);
+
+	const { setPage } = useDispatch( 'core/edit-site' );
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -74,28 +54,20 @@ export default function BlockEditor() {
 					( fillProps ) => (
 						<NavigateToLink
 							{ ...fillProps }
-							templateIds={ settings.templateIds }
-							activeId={ settings.templateId }
-							onActiveIdChange={ setActiveTemplateId }
+							activePage={ page }
+							onActivePageChange={ setPage }
 						/>
 					),
-					[
-						settings.templateIds,
-						settings.templateId,
-						setActiveTemplateId,
-					]
+					[ page ]
 				) }
 			</__experimentalLinkControl.ViewerFill>
-			<Sidebar.InspectorFill>
+			<SidebarInspectorFill>
 				<BlockInspector />
-			</Sidebar.InspectorFill>
+			</SidebarInspectorFill>
 			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
 				<WritingFlow>
 					<ObserveTyping>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							renderAppender={ ButtonBlockerAppender }
-						/>
+						<BlockList className="edit-site-block-editor__block-list" />
 					</ObserveTyping>
 				</WritingFlow>
 			</div>

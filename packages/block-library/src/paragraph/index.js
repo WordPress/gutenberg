@@ -40,14 +40,6 @@ export const settings = {
 			dropCap: true,
 		},
 	},
-	supports: {
-		className: false,
-		__unstablePasteTextInline: true,
-		lightBlockWrapper: true,
-		__experimentalColor: true,
-		__experimentalLineHeight: true,
-		__experimentalFontSize: true,
-	},
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {
 			const { content } = attributes;

@@ -15,7 +15,7 @@ import BlockTitle from '../block-title';
  *
  * @return {WPElement} Block Breadcrumb.
  */
-const BlockBreadcrumb = function() {
+function BlockBreadcrumb() {
 	const { selectBlock, clearSelectedBlock } = useDispatch(
 		'core/block-editor'
 	);
@@ -85,6 +85,6 @@ const BlockBreadcrumb = function() {
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
-};
+}
 
 export default BlockBreadcrumb;

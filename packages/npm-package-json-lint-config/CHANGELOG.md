@@ -1,4 +1,6 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
 
 ## 3.0.0 (2020-04-15)
 
@@ -10,7 +12,7 @@
 
 ### Breaking Change
 
-- Added `type` and `react-native` to the order of preferred properties. 
+- Added `type` and `react-native` to the order of preferred properties.
 
 ## 1.2.0 (2019-03-06)
 

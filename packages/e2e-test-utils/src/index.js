@@ -21,9 +21,19 @@ export { getAllBlocks } from './get-all-blocks';
 export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
+export { getCurrentPostContent } from './get-current-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
-export { insertBlock } from './insert-block';
+export {
+	insertBlock,
+	insertPattern,
+	insertReusableBlock,
+	searchForBlock,
+	searchForPattern,
+	searchForReusableBlock,
+	openGlobalBlockInserter,
+	closeGlobalBlockInserter,
+} from './inserter';
 export { installPlugin } from './install-plugin';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
@@ -33,17 +43,13 @@ export {
 	disableFocusLossObservation,
 } from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
-export {
-	openGlobalBlockInserter,
-	closeGlobalBlockInserter,
-} from './open-global-block-inserter';
 export { openPublishPanel } from './open-publish-panel';
+export { trashAllPosts } from './posts';
 export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';
 export { publishPost } from './publish-post';
 export { publishPostWithPrePublishChecksDisabled } from './publish-post-with-pre-publish-checks-disabled';
 export { saveDraft } from './save-draft';
-export { searchForBlock } from './search-for-block';
 export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
 export { setPostContent } from './set-post-content';
@@ -57,5 +63,6 @@ export { transformBlockTo } from './transform-block-to';
 export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
+export { showBlockToolbar } from './show-block-toolbar';
 
 export * from './mocks';

@@ -23,11 +23,6 @@ export const settings = {
 	),
 	icon,
 	transforms,
-	supports: {
-		customClassName: false,
-		className: false,
-		html: false,
-	},
 	edit,
 	save,
 };

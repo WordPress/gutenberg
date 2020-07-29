@@ -1,4 +1,4 @@
 /**
  * Function declaration example.
  */
-export default function() {}
+export default function () {}

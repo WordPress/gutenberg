@@ -1,17 +1,43 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody, UnsupportedFooterControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import {
+	ColorControl,
+	BottomSheetConsumer,
+	PanelBody,
+} from '@wordpress/components';
 
-const PanelColorGradientSettings = () => {
+export default function PanelColorGradientSettings( { settings, title } ) {
 	return (
-		<PanelBody>
-			<UnsupportedFooterControl
-				label={ __( 'Color settings are coming soon.' ) }
-				separatorType="none"
-			/>
+		<PanelBody title={ title }>
+			<BottomSheetConsumer>
+				{ ( { onReplaceSubsheet } ) =>
+					settings.map(
+						( {
+							onColorChange,
+							colorValue,
+							onGradientChange,
+							gradientValue,
+							label,
+						} ) => (
+							<ColorControl
+								onPress={ () => {
+									onReplaceSubsheet( 'Color', {
+										onColorChange,
+										colorValue: gradientValue || colorValue,
+										gradientValue,
+										onGradientChange,
+										label,
+									} );
+								} }
+								key={ `color-setting-${ label }` }
+								label={ label }
+								color={ gradientValue || colorValue }
+							/>
+						)
+					)
+				}
+			</BottomSheetConsumer>
 		</PanelBody>
 	);
-};
-export default PanelColorGradientSettings;
+}

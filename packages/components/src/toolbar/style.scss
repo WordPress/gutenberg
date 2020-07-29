@@ -1,10 +1,10 @@
 .components-accessible-toolbar {
 	display: inline-flex;
-	border: $border-width solid $dark-gray-primary;
+	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 	flex-shrink: 0;
 
-	.components-toolbar-group:last-child {
+	& > .components-toolbar-group:last-child {
 		border-right: none;
 	}
 }
@@ -32,8 +32,7 @@
 			position: absolute;
 			display: block;
 			border-radius: $radius-block-ui;
-			height: 32px;
-			min-width: 32px;
+			height: $grid-unit-40;
 
 			// Position the focus rectangle.
 			left: $grid-unit-10;
@@ -63,7 +62,7 @@
 			}
 
 			&::before {
-				background: $dark-gray-primary;
+				background: $gray-900;
 			}
 		}
 

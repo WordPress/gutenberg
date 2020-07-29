@@ -188,6 +188,27 @@ example: {
 
 If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
 
+It's also possible to extend the block preview with inner blocks via `innerBlocks`. For example:
+
+```js
+example: {
+    attributes: {
+        cover: 'https://example.com/image.jpg',
+    },
+    innerBlocks: [
+    {
+        name: 'core/paragraph',
+        attributes: {
+            /* translators: example text. */
+            content: __(
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
+            ),
+        },
+    },
+    ],
+},
+```
+
 #### variations (optional)
 
 - **Type:** `Object[]`
@@ -217,6 +238,7 @@ variations: [
 		title: __( 'Twitter' ),
 		icon: TwitterIcon,
 		attributes: { service: 'twitter' },
+		keywords: [ __('tweet') ],
 	},
 ],
 ```
@@ -226,12 +248,13 @@ An object describing a variation defined for the block type can contain the foll
 - `name` (type `string`) – The unique and machine-readable name.
 - `title` (type `string`) – A human-readable variation title.
 - `description` (optional, type `string`) – A detailed variation description.
-- `icon` (optional, type `String` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
+- `icon` (optional, type `string` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
 - `isDefault` (optional, type `boolean`) – Indicates whether the current variation is the default one. Defaults to `false`.
 - `attributes` (optional, type `Object`) – Values that override block attributes.
 - `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
 - `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
-- `scope` (optional, type `String[]`) - the list of scopes where the variation is applicable. When not provided, it assumes all available scopes. Available options: `block`, `inserter`.
+- `scope` (optional, type `string[]`) - the list of scopes where the variation is applicable. When not provided, it assumes all available scopes. Available options: `block`, `inserter`.
+- `keywords` (optional, type `string[]`) - An array of terms (which can be translated) that help users discover the variation while searching.
 
 It's also possible to override the default block style variation using the `className` attribute when defining block variations.
 
@@ -251,7 +274,7 @@ variations: [
 
 -   **Type:** `Object`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](./block-transforms.md) for more info about each available transformation.
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](/docs/designers-developers/developers/block-api/block-transforms.md) for more info about each available transformation.
 
 #### parent (optional)
 

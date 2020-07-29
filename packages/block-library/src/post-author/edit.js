@@ -7,73 +7,43 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { useRef, useState } from '@wordpress/element';
-import { useEntityProp } from '@wordpress/core-data';
 import {
 	AlignmentToolbar,
 	BlockControls,
-	FontSizePicker,
 	InspectorControls,
 	RichText,
-	__experimentalUseColors,
-	BlockColorsStyleSelector,
-	withFontSizes,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-const DEFAULT_AVATAR_SIZE = 24;
+function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
+	const { postType, postId } = context;
 
-async function getAuthorDetails( authorId, setAuthorDetails ) {
-	const authorDetails = await apiFetch( {
-		path: '/wp/v2/users/' + authorId + '?context=edit',
-	} );
-	setAuthorDetails( authorDetails );
-}
+	const { authorId, authorDetails, authors } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getUser, getAuthors } = select(
+				'core'
+			);
+			const _authorId = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			)?.author;
 
-function PostAuthorDisplay( {
-	postAuthor,
-	setPostAuthor,
-	authorDetails,
-	setAuthorDetails,
-	props,
-} ) {
-	const ref = useRef();
-
-	const { authors } = useSelect( ( select ) => ( {
-		authors: select( 'core' ).getAuthors(),
-	} ) );
-
-	const { isSelected, fontSize, setFontSize } = props;
-	const {
-		TextColor,
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		ColorPanel,
-	} = __experimentalUseColors(
-		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'background-color' },
-		],
-		{
-			contrastCheckers: [
-				{
-					backgroundColor: true,
-					textColor: true,
-					fontSize: fontSize.size,
-				},
-			],
-			colorDetector: { targetRef: ref },
-			colorPanelProps: {
-				initialOpen: true,
-			},
+			return {
+				authorId: _authorId,
+				authorDetails: _authorId ? getUser( _authorId ) : null,
+				authors: getAuthors(),
+			};
 		},
-		[ fontSize.size ]
+		[ postType, postId ]
 	);
 
-	const { align, showAvatar, showBio, byline } = props.attributes;
+	const { editEntityRecord } = useDispatch( 'core' );
+
+	const { textAlign, showAvatar, showBio, byline } = attributes;
 
 	const avatarSizes = [];
 	if ( authorDetails ) {
@@ -85,50 +55,39 @@ function PostAuthorDisplay( {
 		} );
 	}
 
-	let avatarSize = DEFAULT_AVATAR_SIZE;
-	if ( !! props.attributes.avatarSize ) {
-		avatarSize = props.attributes.avatarSize;
-	}
-
-	const blockClassNames = classnames( 'wp-block-post-author', {
-		[ fontSize.class ]: fontSize.class,
-	} );
-	const blockInlineStyles = {
-		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-	};
-
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Author Settings' ) }>
 					<SelectControl
 						label={ __( 'Author' ) }
-						value={ postAuthor }
+						value={ authorId }
 						options={ authors.map( ( { id, name } ) => {
 							return {
 								value: id,
 								label: name,
 							};
 						} ) }
-						onChange={ ( newAuthorId ) => {
-							setPostAuthor( newAuthorId );
-							getAuthorDetails( newAuthorId, setAuthorDetails );
+						onChange={ ( nextAuthorId ) => {
+							editEntityRecord( 'postType', postType, postId, {
+								author: nextAuthorId,
+							} );
 						} }
 					/>
 					<ToggleControl
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }
 						onChange={ () =>
-							props.setAttributes( { showAvatar: ! showAvatar } )
+							setAttributes( { showAvatar: ! showAvatar } )
 						}
 					/>
 					{ showAvatar && (
 						<SelectControl
 							label={ __( 'Avatar size' ) }
-							value={ props.attributes.avatarSize }
+							value={ attributes.avatarSize }
 							options={ avatarSizes }
 							onChange={ ( size ) => {
-								props.setAttributes( {
+								setAttributes( {
 									avatarSize: Number( size ),
 								} );
 							} }
@@ -138,116 +97,63 @@ function PostAuthorDisplay( {
 						label={ __( 'Show bio' ) }
 						checked={ showBio }
 						onChange={ () =>
-							props.setAttributes( { showBio: ! showBio } )
+							setAttributes( { showBio: ! showBio } )
 						}
-					/>
-				</PanelBody>
-				<PanelBody title={ __( 'Text settings' ) }>
-					<FontSizePicker
-						value={ fontSize.size }
-						onChange={ setFontSize }
 					/>
 				</PanelBody>
 			</InspectorControls>
 
-			{ InspectorControlsColorPanel }
-
 			<BlockControls>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						props.setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				<BlockColorsStyleSelector
-					TextColor={ TextColor }
-					BackgroundColor={ BackgroundColor }
-				>
-					{ ColorPanel }
-				</BlockColorsStyleSelector>
 			</BlockControls>
 
-			<TextColor>
-				<BackgroundColor>
-					<div
-						ref={ ref }
-						className={ classnames( blockClassNames, {
-							[ `has-text-align-${ align }` ]: align,
-						} ) }
-						style={ blockInlineStyles }
-					>
-						{ showAvatar && authorDetails && (
-							<div className="wp-block-post-author__avatar">
-								<img
-									width={ avatarSize }
-									src={
-										authorDetails.avatar_urls[ avatarSize ]
-									}
-									alt={ authorDetails.name }
-								/>
-							</div>
-						) }
-						<div className="wp-block-post-author__content">
-							{ ( ! RichText.isEmpty( byline ) ||
-								isSelected ) && (
-								<RichText
-									className="wp-block-post-author__byline"
-									multiline={ false }
-									placeholder={ __( 'Write byline …' ) }
-									withoutInteractiveFormatting
-									allowedFormats={ [
-										'core/bold',
-										'core/italic',
-										'core/strikethrough',
-									] }
-									value={ byline }
-									onChange={ ( value ) =>
-										props.setAttributes( { byline: value } )
-									}
-								/>
-							) }
-							<p className="wp-block-post-author__name">
-								{ authorDetails.name }
-							</p>
-							{ showBio && (
-								<p className={ 'wp-block-post-author__bio' }>
-									{ authorDetails.description }
-								</p>
-							) }
-						</div>
+			<Block.div
+				className={ classnames( {
+					[ `has-text-align-${ textAlign }` ]: textAlign,
+				} ) }
+			>
+				{ showAvatar && authorDetails && (
+					<div className="wp-block-post-author__avatar">
+						<img
+							width={ attributes.avatarSize }
+							src={
+								authorDetails.avatar_urls[
+									attributes.avatarSize
+								]
+							}
+							alt={ authorDetails.name }
+						/>
 					</div>
-				</BackgroundColor>
-			</TextColor>
+				) }
+				<div className="wp-block-post-author__content">
+					{ ( ! RichText.isEmpty( byline ) || isSelected ) && (
+						<RichText
+							className="wp-block-post-author__byline"
+							multiline={ false }
+							placeholder={ __( 'Write byline …' ) }
+							value={ byline }
+							onChange={ ( value ) =>
+								setAttributes( { byline: value } )
+							}
+						/>
+					) }
+					<p className="wp-block-post-author__name">
+						{ authorDetails?.name || __( 'Post Author' ) }
+					</p>
+					{ showBio && (
+						<p className="wp-block-post-author__bio">
+							{ authorDetails?.description }
+						</p>
+					) }
+				</div>
+			</Block.div>
 		</>
 	);
 }
 
-function PostAuthorEdit( props ) {
-	const [ postAuthor, setPostAuthor ] = useEntityProp(
-		'postType',
-		'post',
-		'author'
-	);
-
-	const [ authorDetails, setAuthorDetails ] = useState( false );
-
-	if ( ! postAuthor ) {
-		return 'Post Author Placeholder';
-	}
-
-	if ( ! authorDetails ) {
-		getAuthorDetails( postAuthor, setAuthorDetails );
-	}
-
-	return (
-		<PostAuthorDisplay
-			postAuthor={ postAuthor }
-			setPostAuthor={ setPostAuthor }
-			authorDetails={ authorDetails }
-			setAuthorDetails={ setAuthorDetails }
-			props={ props }
-		/>
-	);
-}
-
-export default withFontSizes( 'fontSize' )( PostAuthorEdit );
+export default PostAuthorEdit;

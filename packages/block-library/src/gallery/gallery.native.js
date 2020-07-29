@@ -7,7 +7,6 @@ import { isEmpty } from 'lodash';
 /**
  * Internal dependencies
  */
-import { mediaUploadSync } from 'react-native-gutenberg-bridge';
 import GalleryImage from './gallery-image';
 import { defaultColumnsNumber } from './shared';
 import styles from './gallery-styles.scss';
@@ -19,6 +18,8 @@ import Tiles from './tiles';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockCaption } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
+import { mediaUploadSync } from '@wordpress/react-native-bridge';
+import { useSelect } from '@wordpress/data';
 
 const TILE_SPACING = 15;
 
@@ -29,6 +30,10 @@ const MAX_DISPLAYED_COLUMNS_NARROW = 2;
 export const Gallery = ( props ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 	useEffect( mediaUploadSync, [] );
+
+	const isRTL = useSelect( ( select ) => {
+		return !! select( 'core/block-editor' ).getSettings().isRTL;
+	}, [] );
 
 	const {
 		clientId,
@@ -45,6 +50,7 @@ export const Gallery = ( props ) => {
 		isSelected,
 		isNarrow,
 		onFocus,
+		insertBlocksAfter,
 	} = props;
 
 	const {
@@ -116,6 +122,7 @@ export const Gallery = ( props ) => {
 							}
 							caption={ img.caption }
 							aria-label={ ariaLabel }
+							isRTL={ isRTL }
 						/>
 					);
 				} ) }
@@ -137,6 +144,7 @@ export const Gallery = ( props ) => {
 				}
 				onFocus={ focusGalleryCaption }
 				onBlur={ onBlur } // always assign onBlur as props
+				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</View>
 	);

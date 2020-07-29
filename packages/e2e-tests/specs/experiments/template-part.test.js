@@ -6,34 +6,28 @@ import {
 	insertBlock,
 	disablePrePublishChecks,
 	visitAdminPage,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import {
-	enableExperimentalFeatures,
-	disableExperimentalFeatures,
-} from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
+import { useExperimentalFeatures } from '../../experimental-features';
 
 describe( 'Template Part', () => {
+	useExperimentalFeatures( [
+		'#gutenberg-full-site-editing',
+		'#gutenberg-full-site-editing-demo',
+	] );
+
 	beforeAll( async () => {
-		await enableExperimentalFeatures( [
-			'#gutenberg-full-site-editing',
-			'#gutenberg-full-site-editing-demo',
-		] );
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
-		await disableExperimentalFeatures( [
-			'#gutenberg-full-site-editing',
-			'#gutenberg-full-site-editing-demo',
-		] );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	describe( 'Template part block', () => {
@@ -51,7 +45,7 @@ describe( 'Template Part', () => {
 			await page.click(
 				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
 			);
-			const [ switchToHeaderTemplatePartButton ] = await page.$x(
+			const switchToHeaderTemplatePartButton = await page.waitForXPath(
 				'//button[contains(text(), "header")]'
 			);
 			await switchToHeaderTemplatePartButton.click();
@@ -60,12 +54,8 @@ describe( 'Template Part', () => {
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'Header Template Part 123' );
 
-			// Save it, without saving the front page template.
+			// Save it.
 			await page.click( '.edit-site-save-button__button' );
-			const [ frontPageCheckbox ] = await page.$x(
-				'//strong[contains(text(),"Front Page")]/../preceding-sibling::span/input'
-			);
-			await frontPageCheckbox.click();
 			await page.click( '.editor-entities-saved-states__save-button' );
 			await page.waitForSelector(
 				'.edit-site-save-button__button:not(.is-busy)'
@@ -90,72 +80,58 @@ describe( 'Template Part', () => {
 
 	describe( 'Template part placeholder', () => {
 		// Test constants for template part.
-		const testSlug = 'test-template-part';
-		const testTheme = 'test-theme';
 		const testContent = 'some words...';
 
 		// Selectors
-		const chooseButtonSelector =
-			'//div[contains(@class,"is-selected")]//button[text()="Choose"]';
 		const entitiesSaveSelector =
 			'.editor-entities-saved-states__save-button';
 		const savePostSelector = '.editor-post-publish-button__button';
 		const templatePartSelector = '*[data-type="core/template-part"]';
 		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
-		const templatePartButtonSelector = `${ templatePartSelector } button`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
+		const createNewButtonSelector =
+			'//button[contains(text(), "New template part")]';
+		const chooseExistingButtonSelector =
+			'//button[contains(text(), "Choose existing")]';
 
-		it( 'Should prompt to create when no match found', async () => {
+		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
-			await page.keyboard.type( testSlug );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testTheme );
-			// Should say 'Create'
-			const placeholderButton = await page.$(
-				templatePartButtonSelector
+			const [ createNewButton ] = await page.$x(
+				createNewButtonSelector
 			);
-			const text = await page.evaluate(
-				( element ) => element.textContent,
-				placeholderButton
+			await createNewButton.click();
+
+			const newTemplatePart = await page.waitForSelector(
+				activatedTemplatePartSelector
 			);
-			expect( text ).toBe( 'Create' );
+			expect( newTemplatePart ).toBeTruthy();
 
 			// Finish creating template part, insert some text, and save.
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Enter' );
-			await page.waitForSelector( activatedTemplatePartSelector );
-			await page.click( templatePartSelector );
+			await page.click( '.block-editor-button-block-appender' );
+			await page.click( '.editor-block-list-item-paragraph' );
 			await page.keyboard.type( testContent );
 			await page.click( savePostSelector );
 			await page.click( entitiesSaveSelector );
 		} );
 
-		it( 'Should prompt to Choose when match found', async () => {
+		it( 'Should preview newly added template part', async () => {
 			await createNewPost();
-			await disablePrePublishChecks();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			await page.keyboard.type( testSlug );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testTheme );
-			// Should say 'Choose'
-			const placeholderButton = await page.waitForXPath(
-				chooseButtonSelector
+			const [ chooseExistingButton ] = await page.$x(
+				chooseExistingButtonSelector
 			);
-			expect( placeholderButton ).not.toBeNull();
-		} );
-
-		it( 'Should dispaly a preview when match is found', async () => {
-			const [ preview ] = await page.$x( testContentSelector );
+			await chooseExistingButton.click();
+			const preview = await page.waitForXPath( testContentSelector );
 			expect( preview ).toBeTruthy();
 		} );
 
-		it( 'Should insert the desired template part', async () => {
-			const [ placeholderButton ] = await page.$x( chooseButtonSelector );
-			await placeholderButton.click();
+		it( 'Should insert template part when preview is selected', async () => {
+			const [ preview ] = await page.$x( testContentSelector );
+			await preview.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
 			const templatePartContent = await page.waitForXPath(
 				testContentSelector

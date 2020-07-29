@@ -3,7 +3,15 @@
  */
 import { NativeModules } from 'react-native';
 
-jest.mock( 'react-native-gutenberg-bridge', () => {
+jest.mock( '@wordpress/element', () => {
+	return {
+		__esModule: true,
+		...jest.requireActual( '@wordpress/element' ),
+		render: jest.fn(),
+	};
+} );
+
+jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
 		removeEventListener: jest.fn(),
@@ -14,12 +22,15 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		subscribeAndroidModalClosed: jest.fn(),
+		subscribeUpdateTheme: jest.fn(),
 		subscribePreferredColorScheme: () => 'light',
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
 		requestMediaPicker: jest.fn(),
+		requestUnsupportedBlockFallback: jest.fn(),
+		subscribeReplaceBlock: jest.fn(),
 		mediaSources: {
 			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 			deviceCamera: 'DEVICE_CAMERA',
@@ -67,8 +78,6 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
-jest.mock( 'react-native-recyclerview-list' );
-
 jest.mock( '@react-native-community/slider', () => () => 'Slider', {
 	virtual: true,
 } );
@@ -82,6 +91,14 @@ if ( ! global.window.matchMedia ) {
 }
 
 jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
+	virtual: true,
+} );
+
+jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
+	virtual: true,
+} );
+
+jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
 } );
 

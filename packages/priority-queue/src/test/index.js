@@ -5,7 +5,7 @@ import { createQueue } from '../';
 import requestIdleCallback from '../request-idle-callback';
 
 jest.mock( '../request-idle-callback', () => {
-	const emitter = new ( require.requireActual( 'events' ).EventEmitter )();
+	const emitter = new ( jest.requireActual( 'events' ).EventEmitter )();
 
 	return Object.assign(
 		( callback ) =>

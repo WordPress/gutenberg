@@ -3,7 +3,7 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
-import { first, last, nth } from 'lodash';
+import { first, last, nth, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -19,6 +19,10 @@ const mockFetchSearchSuggestions = jest.fn();
 
 jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
+} ) );
+
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
 /**
@@ -83,6 +87,56 @@ describe( 'Basic rendering', () => {
 
 		expect( searchInput ).not.toBeNull();
 		expect( container.innerHTML ).toMatchSnapshot();
+	} );
+
+	it( 'should not render protocol in links', async () => {
+		mockFetchSearchSuggestions.mockImplementation( () =>
+			Promise.resolve( [
+				{
+					id: uniqueId(),
+					title: 'Hello Page',
+					type: 'Page',
+					info: '2 days ago',
+					url: `http://example.com/?p=${ uniqueId() }`,
+				},
+				{
+					id: uniqueId(),
+					title: 'Hello Post',
+					type: 'Post',
+					info: '19 days ago',
+					url: `https://example.com/${ uniqueId() }`,
+				},
+			] )
+		);
+
+		const searchTerm = 'Hello';
+
+		act( () => {
+			render( <LinkControl />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// Find all elements with link
+		// Filter out the element with the text 'ENTER' because it doesn't contain link
+		const linkElements = Array.from(
+			container.querySelectorAll(
+				'.block-editor-link-control__search-item-info'
+			)
+		).filter( ( elem ) => ! elem.innerHTML.includes( 'ENTER' ) );
+
+		linkElements.forEach( ( elem ) => {
+			expect( elem.innerHTML ).not.toContain( '://' );
+		} );
 	} );
 
 	describe( 'forceIsEditingLink', () => {
@@ -225,6 +279,8 @@ describe( 'Searching for a link', () => {
 		expect( searchResultElements ).toHaveLength(
 			fauxEntitySuggestions.length
 		);
+
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
 
 		// Sanity check that a search suggestion shows up corresponding to the data
 		expect( firstSearchResultItemHTML ).toEqual(
@@ -516,6 +572,8 @@ describe( 'Default search suggestions', () => {
 		// it should match any url that's like ?p= and also include a URL option
 		expect( searchResultElements ).toHaveLength( 5 );
 
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+
 		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 	} );
 
@@ -566,6 +624,34 @@ describe( 'Default search suggestions', () => {
 
 		expect( searchResultElements ).toHaveLength( 3 );
 	} );
+
+	it( 'should not display initial suggestions when there are no recently updated pages/posts', async () => {
+		const noResults = [];
+		// Force API returning empty results for recently updated Pages.
+		mockFetchSearchSuggestions.mockImplementation( () =>
+			Promise.resolve( noResults )
+		);
+
+		act( () => {
+			render( <LinkControl showInitialSuggestions />, container );
+		} );
+
+		await eventLoopTick();
+
+		const searchInput = getURLInput();
+
+		const searchResultElements = getSearchResults();
+
+		const searchResultLabel = container.querySelector(
+			'.block-editor-link-control__search-results-label'
+		);
+
+		expect( searchResultLabel ).toBeFalsy();
+
+		expect( searchResultElements ).toHaveLength( 0 );
+
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
+	} );
 } );
 
 describe( 'Creating Entities (eg: Posts, Pages)', () => {
@@ -589,7 +675,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createSuggestion = ( title ) =>
 				new Promise( ( resolve ) => {
-					resolver = resolve;
+					resolver = ( arg ) => {
+						resolve( arg );
+					};
 					resolvedEntity = {
 						title,
 						id: 123,
@@ -1030,8 +1118,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					result.innerHTML.includes( 'New page' )
 				)
 			);
-
-			expect( createButton ).not.toBeFalsy(); // shouldn't exist!
 		} );
 	} );
 } );

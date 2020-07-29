@@ -240,6 +240,21 @@ export function getLinearGradientRepresentationOfARadial( gradientAST ) {
 	} );
 }
 
+const DIRECTIONAL_ORIENTATION_ANGLE_MAP = {
+	top: 0,
+	'top right': 45,
+	'right top': 45,
+	right: 90,
+	'right bottom': 135,
+	'bottom right': 135,
+	bottom: 180,
+	'bottom left': 225,
+	'left bottom': 225,
+	left: 270,
+	'top left': 315,
+	'left top': 315,
+};
+
 export function getGradientParsed( value ) {
 	let hasGradient = !! value;
 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
@@ -255,6 +270,15 @@ export function getGradientParsed( value ) {
 		gradientValue = DEFAULT_GRADIENT;
 	}
 
+	if (
+		gradientAST.orientation &&
+		gradientAST.orientation.type === 'directional'
+	) {
+		gradientAST.orientation.type = 'angular';
+		gradientAST.orientation.value = DIRECTIONAL_ORIENTATION_ANGLE_MAP[
+			gradientAST.orientation.value
+		].toString();
+	}
 	return {
 		hasGradient,
 		gradientAST,

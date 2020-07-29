@@ -1,5 +1,5 @@
 /**
- * Node dependencies
+ * External dependencies
  */
 const { camelCase, nth, upperFirst } = require( 'lodash' );
 const fs = require( 'fs' );

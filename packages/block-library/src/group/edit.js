@@ -20,15 +20,17 @@ function GroupEdit( { attributes, className, clientId } ) {
 
 	return (
 		<BlockWrapper className={ className }>
-			<div className="wp-block-group__inner-container">
-				<InnerBlocks
-					renderAppender={
-						hasInnerBlocks
-							? undefined
-							: () => <InnerBlocks.ButtonBlockAppender />
-					}
-				/>
-			</div>
+			<InnerBlocks
+				renderAppender={
+					hasInnerBlocks
+						? undefined
+						: () => <InnerBlocks.ButtonBlockAppender />
+				}
+				__experimentalTagName="div"
+				__experimentalPassedProps={ {
+					className: 'wp-block-group__inner-container',
+				} }
+			/>
 		</BlockWrapper>
 	);
 }

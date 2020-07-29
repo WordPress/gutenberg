@@ -20,6 +20,7 @@ function gutenberg_test_cpt_locking() {
 			),
 		),
 		array( 'core/quote' ),
+		array( 'core/columns' ),
 	);
 	register_post_type(
 		'locked-all-post',

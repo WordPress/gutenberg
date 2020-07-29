@@ -8,6 +8,7 @@ export { getPath } from './get-path';
 export { isValidPath } from './is-valid-path';
 export { getQueryString } from './get-query-string';
 export { isValidQueryString } from './is-valid-query-string';
+export { getPathAndQueryString } from './get-path-and-query-string';
 export { getFragment } from './get-fragment';
 export { isValidFragment } from './is-valid-fragment';
 export { addQueryArgs } from './add-query-args';

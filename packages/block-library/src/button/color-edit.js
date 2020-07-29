@@ -7,7 +7,7 @@ import { pickBy, isEqual, isObject, identity, mapValues } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -22,6 +22,8 @@ import {
 	ContrastChecker,
 	InspectorControls,
 } from '@wordpress/block-editor';
+
+const isWebPlatform = Platform.OS === 'web';
 
 // The code in this file is copied entirely from the "color" and "style" support flags
 // The flag can't be used at the moment because of the extra wrapper around
@@ -56,8 +58,12 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
+	const title = isWebPlatform
+		? __( 'Color settings' )
+		: __( 'Color Settings' );
+
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
+		if ( isWebPlatform && ! enableContrastChecking ) {
 			return;
 		}
 
@@ -86,11 +92,11 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
 	return (
 		<InspectorControls>
 			<PanelColorGradientSettings
-				title={ __( 'Color settings' ) }
+				title={ title }
 				initialOpen={ false }
 				settings={ settings }
 			>
-				{ enableContrastChecking && (
+				{ isWebPlatform && enableContrastChecking && (
 					<ContrastChecker
 						backgroundColor={ detectedBackgroundColor }
 						textColor={ detectedColor }

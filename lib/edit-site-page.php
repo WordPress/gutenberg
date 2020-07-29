@@ -32,7 +32,7 @@ function gutenberg_is_edit_site_page( $page ) {
 }
 
 /**
- * Load editor styles (this is copied form edit-form-blocks.php).
+ * Load editor styles (this is copied from edit-form-blocks.php).
  * Ideally the code is extracted into a reusable function.
  *
  * @return array Editor Styles Setting.
@@ -88,10 +88,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global
-		$_wp_current_template_hierarchy,
-		$_wp_current_template_part_ids,
-		$current_screen;
+	global $current_screen;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -130,6 +127,7 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 
 	$settings = array(
+		'alignWide'              => get_theme_support( 'align-wide' ),
 		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
 		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 		'imageSizes'             => $available_image_sizes,
@@ -145,55 +143,7 @@ function gutenberg_edit_site_init( $hook ) {
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
-
-	// Get all templates by triggering `./template-loader.php`'s logic.
-	$template_getters  = array(
-		'get_embed_template',
-		'get_404_template',
-		'get_search_template',
-		'get_home_template',
-		'get_privacy_policy_template',
-		'get_post_type_archive_template',
-		'get_taxonomy_template',
-		'get_attachment_template',
-		'get_single_template',
-		'get_page_template',
-		'get_singular_template',
-		'get_category_template',
-		'get_tag_template',
-		'get_author_template',
-		'get_date_template',
-		'get_archive_template',
-	);
-	$template_ids      = array();
-	$template_part_ids = array();
-	foreach ( $template_getters as $template_getter ) {
-		call_user_func( $template_getter ); // This sets $_wp_current_template_hierarchy.
-
-		$current_template_post = gutenberg_find_template_post( $_wp_current_template_hierarchy );
-		if ( isset( $current_template_post ) ) {
-			$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
-		}
-		if ( isset( $_wp_current_template_part_ids ) ) {
-			$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
-		}
-
-		$_wp_current_template_hierarchy = null;
-		$_wp_current_template_part_ids  = null;
-	}
-	get_front_page_template();
-	get_index_template();
-	$current_template_post                             = gutenberg_find_template_post( $_wp_current_template_hierarchy );
-	$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
-	if ( isset( $_wp_current_template_part_ids ) ) {
-		$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
-	}
-	$settings['templateId']      = $current_template_post->ID;
-	$settings['homeTemplateId']  = $current_template_post->ID;
-	$settings['templateType']    = 'wp_template';
-	$settings['templateIds']     = array_values( $template_ids );
-	$settings['templatePartIds'] = array_values( $template_part_ids );
-	$settings['styles']          = gutenberg_get_editor_styles();
+	$settings['styles'] = gutenberg_get_editor_styles();
 
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.
@@ -203,11 +153,11 @@ function gutenberg_edit_site_init( $hook ) {
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.
 	$preload_paths = array(
-		'/',
+		'/?context=edit',
 		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?per_page=-1&context=edit',
+		'/wp/v2/taxonomies?context=edit',
+		'/wp/v2/pages?context=edit',
 		'/wp/v2/themes?status=active',
-		sprintf( '/wp/v2/templates/%s?context=edit', $current_template_post->ID ),
 		array( '/wp/v2/media', 'OPTIONS' ),
 	);
 	$preload_data  = array_reduce(
@@ -263,3 +213,33 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
+
+/**
+ * Register a core site setting for front page information.
+ */
+function register_site_editor_homepage_settings() {
+	register_setting(
+		'general',
+		'show_on_front',
+		array(
+			'show_in_rest' => array(
+				'name' => 'show_on_front',
+			),
+			'type'         => 'string',
+			'description'  => __( 'What to show on the front page', 'gutenberg' ),
+		)
+	);
+
+	register_setting(
+		'general',
+		'page_on_front',
+		array(
+			'show_in_rest' => array(
+				'name' => 'page_on_front',
+			),
+			'type'         => 'number',
+			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
+		)
+	);
+}
+add_action( 'rest_api_init', 'register_site_editor_homepage_settings', 10 );
