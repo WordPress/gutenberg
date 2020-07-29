@@ -18,7 +18,7 @@ export default function LinkCell( { value, onPress } ) {
 			icon={ link }
 			label={ __( 'Link to' ) }
 			// since this is not actually editable, we treat value as a placeholder
-			value={ value || __( 'Add URL' ) }
+			value={ value || __( 'Search or type URL' ) }
 			valueStyle={ !! value ? undefined : placeholderColor }
 			onPress={ onPress }
 		/>

@@ -64,7 +64,7 @@ export const LinkPicker = ( {
 	return (
 		<View style={ { height: '100%' } }>
 			<NavigationHeader
-				screen={ __( 'Add URL' ) }
+				screen={ __( 'Link to' ) }
 				leftButtonOnPress={ cancel }
 			/>
 			<BottomSheet.Cell
