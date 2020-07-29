@@ -9,12 +9,16 @@ Render a rich text area that displays the HTML content provided.
 
 ## Properties
 
-### `text: Object`
+### text
 
-HTML string to make editable. The HTML should be valid, and valid inside the `tagName`, if provided.
+Object with current HTML string to make editable and selection/caret position.
 
-
-- Type: `Object`, 
+- Type: `Object`, with the following attributes:
+  - text: HTML content
+  - selection:
+	- start, start position of selection
+	- end: end position of selection
+  - eventCount: if it has a value it's because this change was originated from the native event.
 - Required: Yes
 
 ### blockType 
