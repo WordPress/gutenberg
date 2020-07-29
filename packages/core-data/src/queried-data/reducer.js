@@ -117,7 +117,8 @@ export function itemIsComplete( state = {}, action ) {
 	// fields are not consistent across all entity types, this would require
 	// introspection on the REST schema for each entity to know which fields
 	// compose a complete item for that entity.
-	const isCompleteQuery = ! query || ! Array.isArray( getQueryParts( query ).fields );
+	const isCompleteQuery =
+		! query || ! Array.isArray( getQueryParts( query ).fields );
 
 	return {
 		...state,

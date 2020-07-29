@@ -60,7 +60,9 @@ export function getQueryParts( query ) {
 				break;
 
 			case 'include':
-				parts.include = getNormalizedCommaSeparable( value ).map( Number );
+				parts.include = getNormalizedCommaSeparable( value ).map(
+					Number
+				);
 				break;
 
 			case '_fields':

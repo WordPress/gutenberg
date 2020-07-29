@@ -27,7 +27,9 @@ const queriedItemsCacheByState = new WeakMap();
  * @return {?Array} Query items.
  */
 function getQueriedItemsUncached( state, query ) {
-	const { stableKey, page, perPage, include, fields } = getQueryParts( query );
+	const { stableKey, page, perPage, include, fields } = getQueryParts(
+		query
+	);
 
 	let itemIds;
 	if ( Array.isArray( include ) && ! stableKey ) {

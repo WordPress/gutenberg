@@ -203,6 +203,7 @@ describe( 'reducer', () => {
 		const state = reducer( original, removeItems( kind, name, 3 ) );
 
 		expect( state ).toEqual( {
+			itemIsComplete: {},
 			items: {
 				1: { id: 1, name: 'abc' },
 				2: { id: 2, name: 'def' },

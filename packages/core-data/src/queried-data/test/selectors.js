@@ -72,9 +72,7 @@ describe( 'getQueriedItems', () => {
 
 		const result = getQueriedItems( state, { include: [ 1 ] } );
 
-		expect( result ).toEqual( [
-			{ id: 1 },
-		] );
+		expect( result ).toEqual( [ { id: 1 } ] );
 	} );
 
 	it( 'should dynamically construct fields-filtered item from available data', () => {
