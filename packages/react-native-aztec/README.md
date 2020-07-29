@@ -132,7 +132,6 @@ Text color.
 - Type: `Color`
 - Required: No
 
-
 ### selectionColor
 
 The color to use for the caret and for the selection background.
@@ -207,14 +206,32 @@ Called when the vertical position of the caret changed. This can be used to scro
 the caret in focus.
 
 - Type: `function`
-- Required: Yes
+- Required: No
 
 ### onSelectionChange( value: Event )
 
 Called when then selection of the native component changed.
 
 - Type: `function`
-- Required: Yes
+- Required: No
+
+## Native Implementation details
+
+### iOS
+
+On iOS we are using a native view called RCTAztecView that inherits an Aztec TextView class.
+RCTAztecView adds the following custom behaviours to the TextView class:
+
+ - It overlays on top a UILabel to display as an placholder text
+ - Overrides the `onPaste` method to intercept paste actions and send them to the JS implementation
+ - Overrides the `insertText` and `deleteBackward` methods in order to detect the following keypresses:
+   - delete/backspace to allow handling of custom merge actions
+   - enter/new lines to allow handling of custom split actions
+   - detection any of triggerKeyCodes
+ - Set as the `characterToReplaceLastEmptyLine` property in the HTMLConverter to be zero width space character to avoid the insertion of a newline at the end of the text blocks
+ - Disables the `shouldCollapseSpaces` flag in the HTMLConverter in order to maintain all spaces inserted by the user
+  
+### Android
 
 # License
 
