@@ -101,12 +101,14 @@ class FileEdit extends Component {
 	onSelectFile( media ) {
 		if ( media && media.url ) {
 			this.setState( { hasError: false } );
+			const isPdf = media.url.endsWith( '.pdf' );
 			this.props.setAttributes( {
 				href: media.url,
 				fileName: media.title,
 				textLinkHref: media.url,
 				id: media.id,
-				showInlineEmbed: media.url.endsWith( '.pdf' ),
+				showInlineEmbed: isPdf ? true : undefined,
+				embedHeight: isPdf ? 800 : undefined,
 			} );
 		}
 	}

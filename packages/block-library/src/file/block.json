@@ -38,8 +38,7 @@
 			"type": "boolean"
 		},
 		"embedHeight": {
-			"type": "number",
-			"default": 800
+			"type": "number"
 		}
 	},
 	"supports": {
