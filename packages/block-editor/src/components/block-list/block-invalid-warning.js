@@ -43,39 +43,31 @@ export class BlockInvalidWarning extends Component {
 		const { compare } = this.state;
 		const hiddenActions = [
 			{
+				// translators: Button to fix block content
+				title: _x( 'Resolve', 'imperative verb' ),
+				onClick: this.onCompare,
+			},
+			hasHTMLBlock && {
+				title: __( 'Convert to HTML' ),
+				onClick: convertToHTML,
+			},
+			{
 				title: __( 'Convert to Classic Block' ),
 				onClick: convertToClassic,
 			},
-			{
-				title: __( 'Attempt Block Recovery' ),
-				onClick: attemptBlockRecovery,
-			},
-		];
+		].filter( Boolean );
 
 		return (
 			<>
 				<Warning
 					actions={ [
 						<Button
-							key="convert"
-							onClick={ this.onCompare }
-							isSecondary={ hasHTMLBlock }
-							isPrimary={ ! hasHTMLBlock }
+							key="recover"
+							onClick={ attemptBlockRecovery }
+							isPrimary
 						>
-							{
-								// translators: Button to fix block content
-								_x( 'Resolve', 'imperative verb' )
-							}
+							{ __( 'Attempt Block Recovery' ) }
 						</Button>,
-						hasHTMLBlock && (
-							<Button
-								key="edit"
-								onClick={ convertToHTML }
-								isPrimary
-							>
-								{ __( 'Convert to HTML' ) }
-							</Button>
-						),
 					] }
 					secondaryActions={ hiddenActions }
 				>
