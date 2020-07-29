@@ -173,8 +173,8 @@ export function getClassNames(
 			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
 			if ( aspectRatio >= potentialRatio.ratio ) {
 				return classnames( existingClassNames, {
-					[ potentialRatio.className ]: allowResponsive,
-					'wp-has-aspect-ratio': allowResponsive,
+					[ potentialRatio.className ]: true,
+					'wp-has-aspect-ratio': true,
 				} );
 			}
 		}
