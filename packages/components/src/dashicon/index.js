@@ -1,6 +1,10 @@
-
 function Dashicon( { icon, size = 20, className, ...extraProps } ) {
-	const iconClass = [ 'dashicon', 'dashicons', 'dashicons-' + icon, className ]
+	const iconClass = [
+		'dashicon',
+		'dashicons',
+		'dashicons-' + icon,
+		className,
+	]
 		.filter( Boolean )
 		.join( ' ' );
 
