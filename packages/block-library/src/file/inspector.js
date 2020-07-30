@@ -44,6 +44,9 @@ export default function FileBlockInspector( {
 					<PanelBody title={ __( 'PDF settings' ) }>
 						<ToggleControl
 							label={ __( 'Show inline embed' ) }
+							help={ __(
+								"This won't display on browsers that don't support embedded PDFs, which includes most phones and tablets."
+							) }
 							checked={ showInlineEmbed }
 							onChange={ changeShowInlineEmbed }
 						/>
