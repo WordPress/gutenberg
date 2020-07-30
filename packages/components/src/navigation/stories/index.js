@@ -11,7 +11,6 @@ import NavigationBackButton from '../back-button';
 import NavigationPane from '../pane';
 import NavigationMenu from '../menu';
 import NavigationTitle from '../title';
-import NavigationMenuItem from '../menu-item';
 
 export default {
 	title: 'Components/Navigation',
@@ -107,47 +106,21 @@ function Example() {
 								? 'WooCommerce'
 								: currentLevel.title }
 						</NavigationTitle>
-						<NavigationMenu>
-							{ currentItems
-								.filter( ( item ) => item.menu !== 'secondary' )
-								.map( ( item ) => (
-									<NavigationMenuItem
-										hasChildren={ item.children.length > 0 }
-										isActive={ item.id === active }
-										key={ item.id }
-										onClick={ () =>
-											item.children.length
-												? setActive(
-														item.children[ 0 ].id
-												  )
-												: setActive( item.id )
-										}
-									>
-										{ item.title }
-									</NavigationMenuItem>
-								) ) }
-						</NavigationMenu>
+						<NavigationMenu
+							activeId={ active }
+							items={ currentItems.filter(
+								( item ) => item.menu !== 'secondary'
+							) }
+							onSelect={ ( item ) => setActive( item.id ) }
+						/>
 						<br />
-						<NavigationMenu>
-							{ currentItems
-								.filter( ( item ) => item.menu === 'secondary' )
-								.map( ( item ) => (
-									<NavigationMenuItem
-										hasChildren={ item.children.length > 0 }
-										isActive={ item.id === active }
-										key={ item.id }
-										onClick={ () =>
-											item.children.length
-												? setActive(
-														item.children[ 0 ].id
-												  )
-												: setActive( item.id )
-										}
-									>
-										{ item.title }
-									</NavigationMenuItem>
-								) ) }
-						</NavigationMenu>
+						<NavigationMenu
+							activeId={ active }
+							items={ currentItems.filter(
+								( item ) => item.menu === 'secondary'
+							) }
+							onSelect={ ( item ) => setActive( item.id ) }
+						/>
 					</NavigationPane>
 				);
 			} }
