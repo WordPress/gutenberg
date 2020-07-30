@@ -47,7 +47,7 @@ export default function PostTagsEdit( { context } ) {
 				{ __( 'Post tags block: No post found for this block.' ) }
 			</Warning>
 		);
-
+	} else if ( context.postType !== 'post' ) {
 		/**
 		 * Do not render the block when viewing a page (as opposed to a post)
 		 *
@@ -56,7 +56,6 @@ export default function PostTagsEdit( { context } ) {
 		 * In the future, instead of only evaluating posts, we should check whether the
 		 * post_tag taxonomy is registered for the current post type.
 		 */
-	} else if ( context.postType !== 'post' ) {
 		display = (
 			<Warning>
 				{ __(
