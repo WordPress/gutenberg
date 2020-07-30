@@ -56,23 +56,23 @@ export class ServerSideRender extends Component {
 		const {
 			block,
 			attributes = null,
-			requestBody,
+			httpMethod = 'GET',
 			urlQueryArgs = {},
 		} = props;
 
-		// If requestBody, make a POST request, with the attributes in the request body instead of the URL.
+		// If httpMethod is 'POST', send the attributes in the request body instead of the URL.
 		// This allows sending a larger attributes object than in a GET request, where the attributes are in the URL.
-		const urlAttributes = requestBody ? null : attributes;
+		const isPostRequest = 'POST' === httpMethod;
+		const urlAttributes = isPostRequest ? null : attributes;
 		const path = rendererPath( block, urlAttributes, urlQueryArgs );
-		const method = requestBody ? 'POST' : 'GET';
-		const data = requestBody ? { attributes } : null;
+		const data = isPostRequest ? { attributes } : null;
 
 		// Store the latest fetch request so that when we process it, we can
 		// check if it is the current request, to avoid race conditions on slow networks.
 		const fetchRequest = ( this.currentFetchRequest = apiFetch( {
 			path,
-			method,
 			data,
+			method: httpMethod
 		} )
 			.then( ( response ) => {
 				if (
