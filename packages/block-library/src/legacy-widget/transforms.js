@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { applyFilters } from '@wordpress/hooks';
 
 const legacyWidgetTransforms = [
 	{
@@ -187,12 +186,7 @@ const legacyWidgetTransforms = [
 } );
 
 const transforms = {
-	get to() {
-		return applyFilters(
-			'blocks.legacyWidget.transforms',
-			legacyWidgetTransforms
-		);
-	},
+	to: legacyWidgetTransforms,
 };
 
 export default transforms;
