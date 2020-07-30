@@ -166,6 +166,7 @@ class BottomSheetRangeCell extends Component {
 			thumbTintColor = ! isIOS && '#00669b',
 			getStylesFromColorScheme,
 			rangePreview,
+			cellContainerStyle,
 			...cellProps
 		} = this.props;
 
@@ -194,7 +195,10 @@ class BottomSheetRangeCell extends Component {
 		return (
 			<Cell
 				{ ...cellProps }
-				cellContainerStyle={ styles.cellContainerStyles }
+				cellContainerStyle={ [
+					styles.cellContainerStyles,
+					cellContainerStyle,
+				] }
 				cellRowContainerStyle={ cellRowContainerStyle }
 				accessibilityRole={ 'none' }
 				value={ '' }

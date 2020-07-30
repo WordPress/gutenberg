@@ -29,6 +29,8 @@ import { createBlock } from '@wordpress/blocks';
  */
 import variations from './variations';
 import styles from './editor.scss';
+import { getColumnWidths } from './utils';
+import ColumnsPreview from '../column/column-preview';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
@@ -76,6 +78,8 @@ function ColumnsEditContainer( {
 	isSelected,
 	onAddNextColumn,
 	onDeleteBlock,
+	innerColumns,
+	updateInnerColumnWidth,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
@@ -140,6 +144,10 @@ function ColumnsEditContainer( {
 		return null;
 	};
 
+	const columnWidths = Object.values(
+		getColumnWidths( innerColumns, columnCount )
+	);
+
 	return (
 		<>
 			<InspectorControls>
@@ -155,6 +163,34 @@ function ColumnsEditContainer( {
 						max={ columnCount + 1 }
 						type="stepper"
 					/>
+					{ innerColumns.map( ( column, index ) => {
+						return (
+							<RangeControl
+								min={ 1 }
+								max={ 100 }
+								step={ 0.1 }
+								value={ columnWidths[ index ] }
+								onChange={ ( value ) =>
+									updateInnerColumnWidth(
+										value,
+										column.clientId
+									)
+								}
+								cellContainerStyle={ {
+									flexDirection: 'row',
+									paddingVertical: 8,
+								} }
+								toFixed={ 1 }
+								rangePreview={
+									<ColumnsPreview
+										columnWidths={ columnWidths }
+										selectedColumnIndex={ index }
+									/>
+								}
+								key={ column.id }
+							/>
+						);
+					} ) }
 				</PanelBody>
 				<PanelBody>
 					<UnsupportedFooterControl
@@ -218,6 +254,13 @@ const ColumnsEditContainerWrapper = withDispatch(
 				updateBlockAttributes( innerBlockClientId, {
 					verticalAlignment,
 				} );
+			} );
+		},
+		updateInnerColumnWidth( value, columnId ) {
+			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
+
+			updateBlockAttributes( columnId, {
+				width: value,
 			} );
 		},
 		updateBlockSettings( settings ) {
@@ -299,7 +342,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected } = props;
-	const { columnCount, isDefaultColumns } = useSelect(
+	const { columnCount, isDefaultColumns, innerColumns } = useSelect(
 		( select ) => {
 			const { getBlockCount, getBlock } = select( 'core/block-editor' );
 			const block = getBlock( clientId );
@@ -312,6 +355,7 @@ const ColumnsEdit = ( props ) => {
 			return {
 				columnCount: getBlockCount( clientId ),
 				isDefaultColumns: ! compact( isContentEmpty ).length,
+				innerColumns: innerBlocks,
 			};
 		},
 		[ clientId ]
@@ -329,6 +373,7 @@ const ColumnsEdit = ( props ) => {
 		<>
 			<ColumnsEditContainerWrapper
 				columnCount={ columnCount }
+				innerColumns={ innerColumns }
 				{ ...props }
 			/>
 			<BlockVariationPicker
