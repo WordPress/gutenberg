@@ -163,18 +163,10 @@ function QuickInserter( {
 		[]
 	);
 
-	const clientIdFromInserter = useSelect(
-		( select ) => {
-			const { getBlockIndex, getBlockOrder } = select(
-				'core/block-editor'
-			);
-			// We have to select the previous block because the menu inserter
-			// inserts block after the selected
-			return getBlockOrder( destinationRootClientId )[
-				getBlockIndex( clientId, destinationRootClientId ) - 1
-			];
-		},
-		[ clientId, destinationRootClientId ]
+	const previousBlockClientId = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getPreviousBlockClientId( clientId ),
+		[ clientId ]
 	);
 
 	useEffect( () => {
@@ -202,7 +194,9 @@ function QuickInserter( {
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected
 	const onBrowseAll = () => {
-		selectBlock( clientIdFromInserter );
+		// We have to select the previous block because the menu inserter
+		// inserts the new block after the selected one.
+		selectBlock( previousBlockClientId );
 		setInserterIsOpened( true );
 	};
 
