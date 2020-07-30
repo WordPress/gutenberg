@@ -401,10 +401,8 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 		$has_named_background_default  = isset( $block_type->attributes['backgroundColor']['default'] );
 		$has_custom_background_default = isset( $block_type->attributes['style']['default']['color']['background'] );
 
-		echo '<script>console.log("maybe?");</script>';
 		// Check backrgound support and apply default background if exists.
 		if ( in_array( 'background-color', $supports, true ) && ( $has_named_background_default || $has_custom_background_default ) ) {
-			echo '<script>console.log("maybe? - 1A");</script>';
 			if ( $has_named_background_default ) {
 				$attributes['css_classes'][] = 'has-background';
 				$attributes['css_classes'][] = sprintf( 'has-%s-background-color', $block_type->attributes['backgroundColor']['default'] );
@@ -415,7 +413,6 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 		}
 		// Check gradient support and apply default background if exists.
 		elseif ( in_array( 'background', $supports, true ) ) {
-			echo '<script>console.log("maybe? - 2A");</script>';
 			if ( isset( $block_type->attributes['gradient']['default'] ) ) {
 				$attributes['css_classes'][] = 'has-background';
 				$attributes['css_classes'][] = sprintf( 'has-%s-gradient-background', $block_type->attributes['gradient']['default'] );
