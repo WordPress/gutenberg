@@ -444,12 +444,16 @@ function gutenberg_build_css_block_alignment( $attributes, $block_attributes, $s
 	if ( in_array( 'block-align', $supports, true ) ) {
 		$has_block_alignment = array_key_exists( 'align', $block_attributes );
 
-		if ( $has_block_alignment && $block_attributes['align'] !== '' ) {
-			$attributes['css_classes'][] = sprintf( 'align%s', $block_attributes['align'] );
-		}
-		// Fallback to default value if defined.
-		elseif ( isset( $block_type->attributes['align']['default'] ) ) {
-			$attributes['css_classes'][] = sprintf( 'align%s', $block_type->attributes['align']['default'] );
+		// Don't apply style or default if attribute is saved to be ''.
+		// This is used as the none option when a default value is defined.
+		if ( $block_attributes['align'] !== '' ) {
+			if ( $has_block_alignment ) {
+				$attributes['css_classes'][] = sprintf( 'align%s', $block_attributes['align'] );
+			}
+			// Fallback to default value if defined.
+			elseif ( isset( $block_type->attributes['align']['default'] ) ) {
+				$attributes['css_classes'][] = sprintf( 'align%s', $block_type->attributes['align']['default'] );
+			}
 		}
 	}
 
