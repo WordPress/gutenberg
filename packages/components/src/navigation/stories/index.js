@@ -8,8 +8,10 @@ import { useState } from '@wordpress/element';
  */
 import Navigation from '../';
 import NavigationBackButton from '../back-button';
+import NavigationPane from '../pane';
 import NavigationMenu from '../menu';
 import NavigationTitle from '../title';
+import NavigationMenuItem from '../menu-item';
 
 export default {
 	title: 'Components/Navigation',
@@ -80,22 +82,75 @@ const data = [
 
 function Example() {
 	const [ active, setActive ] = useState( 'home' );
-	const items = data.map( ( item ) => {
-		item.onClick = () => setActive( item.id );
-		return item;
-	} );
 
 	return (
-		<Navigation active={ active } items={ items }>
-			<NavigationBackButton
-				nullText="Dashboard"
-				rootText="WooCommerce Home"
-				onClick={ ( item ) => ( item ? setActive( item.id ) : null ) }
-			/>
-			<NavigationTitle rootText="WooCommerce Home" />
-			<NavigationMenu />
-			<br />
-			<NavigationMenu id={ 'secondary' } />
+		<Navigation
+			activeId={ active }
+			items={ data }
+			rootTitle="WooCommerce Home"
+		>
+			{ ( { currentItems, currentLevel, parentItems, parentLevel } ) => {
+				return (
+					<NavigationPane>
+						<NavigationBackButton
+							onClick={ () =>
+								parentLevel
+									? setActive( parentItems[ 0 ].id )
+									: ( window.location =
+											'https://wordpress.com' )
+							}
+						>
+							{ ! parentLevel ? 'Dashboard' : parentLevel.title }
+						</NavigationBackButton>
+						<NavigationTitle>
+							{ currentLevel.id === 'root'
+								? 'WooCommerce'
+								: currentLevel.title }
+						</NavigationTitle>
+						<NavigationMenu>
+							{ currentItems
+								.filter( ( item ) => item.menu !== 'secondary' )
+								.map( ( item ) => (
+									<NavigationMenuItem
+										hasChildren={ item.children.length > 0 }
+										isActive={ item.id === active }
+										key={ item.id }
+										onClick={ () =>
+											item.children.length
+												? setActive(
+														item.children[ 0 ].id
+												  )
+												: setActive( item.id )
+										}
+									>
+										{ item.title }
+									</NavigationMenuItem>
+								) ) }
+						</NavigationMenu>
+						<br />
+						<NavigationMenu>
+							{ currentItems
+								.filter( ( item ) => item.menu === 'secondary' )
+								.map( ( item ) => (
+									<NavigationMenuItem
+										hasChildren={ item.children.length > 0 }
+										isActive={ item.id === active }
+										key={ item.id }
+										onClick={ () =>
+											item.children.length
+												? setActive(
+														item.children[ 0 ].id
+												  )
+												: setActive( item.id )
+										}
+									>
+										{ item.title }
+									</NavigationMenuItem>
+								) ) }
+						</NavigationMenu>
+					</NavigationPane>
+				);
+			} }
 		</Navigation>
 	);
 }
