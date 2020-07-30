@@ -40,7 +40,7 @@ import { normalizeBlockType } from './utils';
  * @param {Object} attributes  Block attributes.
  * @param {?Array} innerBlocks Nested blocks.
  *
- * @return {(Object|boolean)} Block object or false if the block name is not a registered block.
+ * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 	// Get the type definition associated with a registered block.
