@@ -252,18 +252,6 @@ class BottomSheet extends Component {
 		};
 	}
 
-	onReplaceSubsheet( destination, extraProps, callback ) {
-		performLayoutAnimation();
-
-		this.setState(
-			{
-				currentScreen: destination,
-				extraProps: extraProps || {},
-			},
-			callback
-		);
-	}
-
 	render() {
 		const {
 			title = '',
