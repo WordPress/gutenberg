@@ -305,9 +305,9 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 	// Text Colors.
 	// Check support for text colors.
 	if ( in_array( 'color', $supports, true ) ) {
-		$has_named_text_color         = array_key_exists( 'textColor', $block_attributes );
-		$has_custom_text_color        = isset( $block_attributes['style']['color']['text'] );
-		$has_named_text_color_default = isset( $block_type->attributes['textColor']['default'] );
+		$has_named_text_color          = array_key_exists( 'textColor', $block_attributes );
+		$has_custom_text_color         = isset( $block_attributes['style']['color']['text'] );
+		$has_named_text_color_default  = isset( $block_type->attributes['textColor']['default'] );
 		$has_custom_text_color_default = isset( $block_type->attributes['style']['default']['color']['text'] );
 
 		// Apply required generic class.
@@ -330,15 +330,15 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 
 	// Link Colors.
 	if ( in_array( 'link-color', $supports, true ) ) {
-		$has_link_color = isset( $block_attributes['style']['color']['link'] );
+		$has_link_color         = isset( $block_attributes['style']['color']['link'] );
 		$has_link_color_default = isset( $block_type->attributes['style']['default']['color']['link'] );
 
+		// Apply required class and style.
 		if ( $has_link_color || $has_link_color_default ) {
-			// Apply required class and style.
 			$attributes['css_classes'][] = 'has-link-color';
 		}
 
-		if( $has_link_color ) {
+		if ( $has_link_color ) {
 			// If link is a named color.
 			if ( strpos( $block_attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
 				// Get the name from the string and add proper styles.
@@ -361,14 +361,12 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 				$attributes['inline_styles'][] = sprintf( '--wp--style--color--link: %s;', $block_type->attributes['style']['default']['color']['link'] );
 			}
 		}
-
-
 	}
 
 	// Background Colors.
 	if ( in_array( 'background-color', $supports, true ) ) {
-		$has_named_background_color         = array_key_exists( 'backgroundColor', $block_attributes );
-		$has_custom_background_color        = isset( $block_attributes['style']['color']['background'] );
+		$has_named_background_color  = array_key_exists( 'backgroundColor', $block_attributes );
+		$has_custom_background_color = isset( $block_attributes['style']['color']['background'] );
 
 		// Apply required background class.
 		if ( $has_custom_background_color || $has_named_background_color ) {
@@ -384,8 +382,8 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 
 	// Gradients.
 	if ( in_array( 'background', $supports, true ) ) {
-		$has_named_gradient         = array_key_exists( 'gradient', $block_attributes );
-		$has_custom_gradient        = isset( $block_attributes['style']['color']['gradient'] );
+		$has_named_gradient  = array_key_exists( 'gradient', $block_attributes );
+		$has_custom_gradient = isset( $block_attributes['style']['color']['gradient'] );
 
 		if ( $has_named_gradient || $has_custom_gradient ) {
 			$attributes['css_classes'][] = 'has-background';
@@ -406,7 +404,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 				$attributes['css_classes'][] = 'has-background';
 				$attributes['css_classes'][] = sprintf( 'has-%s-background-color', $block_type->attributes['backgroundColor']['default'] );
 			} elseif ( isset( $block_type->attributes['style']['default']['color']['background'] ) ) {
-				$attributes['css_classes'][] = 'has-background';
+				$attributes['css_classes'][]   = 'has-background';
 				$attributes['inline_styles'][] = sprintf( 'background-color: %s;', $block_type->attributes['style']['default']['color']['background'] );
 			}
 		}
@@ -416,7 +414,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 				$attributes['css_classes'][] = 'has-background';
 				$attributes['css_classes'][] = sprintf( 'has-%s-gradient-background', $block_type->attributes['gradient']['default'] );
 			} elseif ( isset( $block_type->attributes['style']['default']['color']['gradient'] ) ) {
-				$attributes['css_classes'][] = 'has-background';
+				$attributes['css_classes'][]   = 'has-background';
 				$attributes['inline_styles'][] = sprintf( 'background: %s;', $block_type->attributes['style']['default']['color']['gradient'] );
 			}
 		}
