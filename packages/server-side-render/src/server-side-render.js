@@ -72,7 +72,7 @@ export class ServerSideRender extends Component {
 		const fetchRequest = ( this.currentFetchRequest = apiFetch( {
 			path,
 			data,
-			method: httpMethod
+			method: httpMethod,
 		} )
 			.then( ( response ) => {
 				if (
