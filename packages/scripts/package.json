@@ -74,7 +74,8 @@
 		"webpack": "^4.42.0",
 		"webpack-bundle-analyzer": "^3.6.1",
 		"webpack-cli": "^3.3.11",
-		"webpack-livereload-plugin": "^2.3.0"
+		"webpack-livereload-plugin": "^2.3.0",
+		"webpack-plugin-ramdisk": "^0.1.4"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -6,6 +6,7 @@ const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
+const { WebpackPluginRamdisk } = require('webpack-plugin-ramdisk');
 const path = require( 'path' );
 
 /**
@@ -143,6 +144,8 @@ const config = {
 		],
 	},
 	plugins: [
+		// Trying to minimize disk IO
+		new WebpackPluginRamdisk(),
 		// During rebuilds, all webpack assets that are not used anymore
 		// will be removed automatically.
 		new CleanWebpackPlugin(),
