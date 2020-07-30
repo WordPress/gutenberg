@@ -270,13 +270,13 @@ function gutenberg_experimental_global_styles_get_theme() {
  */
 function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
 	$style_features = array(
-		'color'            => array( '__experimentalColor' ),
-		'background-color' => array( '__experimentalColor' ),
-		'background'       => array( '__experimentalColor', 'gradients' ),
-		'link-color'       => array( '__experimentalColor', 'linkColor' ),
-		'line-height'      => array( '__experimentalLineHeight' ),
-		'font-size'        => array( '__experimentalFontSize' ),
-		'block-align'      => array( 'align' ),
+		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
+		'background-color'         => array( '__experimentalColor' ),
+		'background'               => array( '__experimentalColor', 'gradients' ),
+		'block-align'              => array( 'align' ),
+		'color'                    => array( '__experimentalColor' ),
+		'font-size'                => array( '__experimentalFontSize' ),
+		'line-height'              => array( '__experimentalLineHeight' ),
 	);
 
 	$supported_features = array();
