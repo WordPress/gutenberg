@@ -43,9 +43,7 @@ describe.each( [
 				},
 			},
 		} );
-		expect( getEntityRecord( state, 'foo', 'bar', 'baz' ) ).toBe(
-			undefined
-		);
+		expect( selector( state, 'foo', 'bar', 'baz' ) ).toBe( undefined );
 	} );
 
 	it( 'should return null for unknown record’s key', () => {
@@ -64,9 +62,7 @@ describe.each( [
 				},
 			},
 		} );
-		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toBe(
-			null
-		);
+		expect( selector( state, 'root', 'postType', 'post' ) ).toBe( null );
 	} );
 
 	it( 'should return a record by key', () => {
