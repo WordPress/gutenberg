@@ -502,7 +502,7 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 				$user[ $block_name ][ $subtree ]
 			);
 		}
-		foreach ( array( 'typography', 'color' ) as $subtree ) {
+		foreach ( array_keys( $core[ $block_name ]['styles'] ) as $subtree ) {
 			$result[ $block_name ]['styles'][ $subtree ] = array_merge(
 				$core[ $block_name ]['styles'][ $subtree ],
 				$theme[ $block_name ]['styles'][ $subtree ],
