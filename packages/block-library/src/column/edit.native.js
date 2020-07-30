@@ -24,7 +24,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import styles from './editor.scss';
-import { getEffectiveColumnWidth } from '../columns/utils';
+import ColumnsPreview from './column-preview';
+import { getColumnWidths } from '../columns/utils';
 
 function ColumnEdit( {
 	attributes,
@@ -34,7 +35,8 @@ function ColumnEdit( {
 	getStylesFromColorScheme,
 	isParentSelected,
 	contentStyle,
-	columnWidths,
+	columns,
+	columnCount,
 	selectedColumnIndex,
 } ) {
 	const { verticalAlignment } = attributes;
@@ -48,6 +50,10 @@ function ColumnEdit( {
 			width,
 		} );
 	};
+
+	const columnWidths = Object.values(
+		getColumnWidths( columns, columnCount )
+	);
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -64,35 +70,6 @@ function ColumnEdit( {
 			/>
 		);
 	}
-
-	const getRangePreview = () => {
-		const columnsPreviewStyle = getStylesFromColorScheme(
-			styles.columnsPreview,
-			styles.columnsPreviewDark
-		);
-
-		const columnIndicatorStyle = getStylesFromColorScheme(
-			styles.columnIndicator,
-			styles.columnIndicatorDark
-		);
-
-		return (
-			<View style={ columnsPreviewStyle }>
-				{ columnWidths.map( ( width, index ) => {
-					const isSelectedColumn = index === selectedColumnIndex;
-					return (
-						<View
-							style={ [
-								isSelectedColumn && columnIndicatorStyle,
-								{ flex: width },
-							] }
-							key={ index }
-						/>
-					);
-				} ) }
-			</View>
-		);
-	};
 
 	return (
 		<>
@@ -112,7 +89,12 @@ function ColumnEdit( {
 						value={ columnWidths[ selectedColumnIndex ] }
 						onChange={ onWidthChange }
 						toFixed={ 1 }
-						rangePreview={ getRangePreview() }
+						rangePreview={
+							<ColumnsPreview
+								columnWidths={ columnWidths }
+								selectedColumnIndex={ selectedColumnIndex }
+							/>
+						}
 					/>
 				</PanelBody>
 				<PanelBody>
@@ -180,16 +162,15 @@ export default compose( [
 
 		const selectedColumnIndex = blockOrder.indexOf( clientId );
 		const columnCount = getBlockCount( parentId );
-		const columnWidths = getBlocks( parentId ).map( ( column ) =>
-			getEffectiveColumnWidth( column, columnCount )
-		);
+		const columns = getBlocks( parentId );
 
 		return {
 			hasChildren,
 			isParentSelected,
 			isSelected,
 			selectedColumnIndex,
-			columnWidths,
+			columns,
+			columnCount,
 		};
 	} ),
 	withPreferredColorScheme,
