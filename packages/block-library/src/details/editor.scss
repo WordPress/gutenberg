@@ -1,6 +1,15 @@
 .wp-block-details {
-	.twistie,
-	.pseudo-summary {
-		display: inline;
+	.block-library-details__pseudo-summary {
+		margin-left: -1.25em;
+	}
+
+	.block-library-details__pseudo-summary::before {
+		content: "▶ ";
+	}
+}
+
+.wp-block-details.is-open {
+	.block-library-details__pseudo-summary::before {
+		content: "▼ ";
 	}
 }

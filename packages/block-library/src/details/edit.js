@@ -1,12 +1,36 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { InnerBlocks, RichText } from '@wordpress/block-editor';
-import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
-export default ( { attributes, className, setAttributes } ) => {
-	const toggleOpen = () => setAttributes( { open: ! attributes.open } );
+export default ( {
+	attributes,
+	className,
+	clientId,
+	isSelected,
+	setAttributes,
+} ) => {
+	const innerBlockSelected = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).hasSelectedInnerBlock( clientId ),
+		[ clientId ]
+	);
+
+	const showInnerBlocks = isSelected || innerBlockSelected;
+
+	const classes = classnames(
+		{
+			'is-open': showInnerBlocks,
+		},
+		className
+	);
 
 	/* You may be wondering why we don't just use a <details> element here.
 	 * The problem we are trying to solve is that a <summary> is basically a
@@ -21,18 +45,17 @@ export default ( { attributes, className, setAttributes } ) => {
 	 * keyboard users to toggle the <details>.
 	 */
 	return (
-		<div className={ className }>
-			<Button isTertiary className="twistie" onClick={ toggleOpen }>
-				{ attributes.open ? '▼' : '▶' }
-			</Button>
-			<RichText
-				tagName="div"
-				className="pseudo-summary"
-				value={ attributes.content }
-				onChange={ ( content ) => setAttributes( { content } ) }
-				placeholder={ __( 'Visible Content' ) }
-			/>
-			{ attributes.open && <InnerBlocks /> }
-		</div>
+		<>
+			<div className={ classes }>
+				<RichText
+					tagName="div"
+					className="block-library-details__pseudo-summary"
+					value={ attributes.content }
+					onChange={ ( content ) => setAttributes( { content } ) }
+					placeholder={ __( 'Visible Content' ) }
+				/>
+				{ showInnerBlocks && <InnerBlocks /> }
+			</div>
+		</>
 	);
 };
