@@ -17,25 +17,18 @@ export default function PostTagsEdit( { context } ) {
 		( select ) => {
 			const { getEntityRecord } = select( 'core' );
 			let loaded = true;
-			let links;
 
-			if ( tags ) {
-				links = tags.map( ( tagId ) => {
-					const tag = getEntityRecord(
-						'taxonomy',
-						'post_tag',
-						tagId
-					);
-					if ( ! tag ) {
-						return ( loaded = false );
-					}
-					return (
-						<a key={ tagId } href={ tag.link }>
-							{ tag.name }
-						</a>
-					);
-				} );
-			}
+			const links = tags?.map( ( tagId ) => {
+				const tag = getEntityRecord( 'taxonomy', 'post_tag', tagId );
+				if ( ! tag ) {
+					return ( loaded = false );
+				}
+				return (
+					<a key={ tagId } href={ tag.link }>
+						{ tag.name }
+					</a>
+				);
+			} );
 
 			return loaded && links;
 		},
