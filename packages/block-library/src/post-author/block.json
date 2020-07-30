@@ -18,6 +18,20 @@
 		},
 		"byline": {
 			"type": "string"
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"color": {
+					"gradient": "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(0,212,255,1) 100%)",
+					"text": "#0F0",
+					"link": "#F00"
+				},
+				"typography": {
+					"fontSize": "33",
+					"lineHeight": "2.0"
+				}
+			}
 		}
 	},
 	"usesContext": [
