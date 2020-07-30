@@ -27,7 +27,7 @@ export const browserSupportsPdfs = function () {
 	// IE only supports PDFs when there's an ActiveX object available for it.
 	if (
 		!! ( window.ActiveXObject || 'ActiveXObject' in window ) &&
-		!! (
+		! (
 			createActiveXObject( 'AcroPDF.PDF' ) ||
 			createActiveXObject( 'PDF.PdfCtrl' )
 		)
