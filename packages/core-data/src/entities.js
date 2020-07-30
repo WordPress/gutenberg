@@ -63,6 +63,14 @@ export const defaultEntities = [
 		label: __( 'Widget area' ),
 	},
 	{
+		name: 'sidebar',
+		kind: 'root',
+		baseURL: '/wp-rest-api-sidebars/v1/sidebars?with-widgets',
+		plural: 'sidebars',
+		transientEdits: { blocks: true },
+		label: __( 'Sidebar' ),
+	},
+	{
 		label: __( 'User' ),
 		name: 'user',
 		kind: 'root',
