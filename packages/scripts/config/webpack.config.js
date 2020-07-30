@@ -6,7 +6,7 @@ const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
-const { WebpackPluginRamdisk } = require('webpack-plugin-ramdisk');
+const { WebpackPluginRamdisk } = require( 'webpack-plugin-ramdisk' );
 const path = require( 'path' );
 
 /**
