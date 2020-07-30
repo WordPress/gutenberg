@@ -49,14 +49,6 @@ describe( 'block factory', () => {
 	} );
 
 	describe( 'createBlock()', () => {
-		it( 'should trigger a warning and return false if the blockType is not registered', () => {
-			const name = 'not/registered';
-			const createAttempt = createBlock( name );
-			expect( console ).toHaveWarnedWith(
-				`Block type '${ name }' is not registered.`
-			);
-			expect( createAttempt ).toBe( false );
-		} );
 		it( 'should create a block given its blockType, attributes, inner blocks', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {

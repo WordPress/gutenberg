@@ -22,7 +22,6 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
-import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -48,8 +47,7 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 	const blockType = getBlockType( name );
 
 	if ( undefined === blockType ) {
-		warning( `Block type '${ name }' is not registered.` );
-		return false;
+		throw new Error( `Block type '${ name }' is not registered.` );
 	}
 
 	// Ensure attributes contains only values defined by block type, and merge
