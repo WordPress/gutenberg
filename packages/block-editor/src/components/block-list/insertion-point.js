@@ -135,75 +135,26 @@ export default function InsertionPoint( { children, containerRef } ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const [ inserterClientId, setInserterClientId ] = useState( [] );
-	const {
-		isMultiSelecting,
-		isInserterVisible,
-		selectedClientId,
-		blockOrder,
-	} = useSelect( ( select ) => {
-		const {
-			isMultiSelecting: _isMultiSelecting,
-			isBlockInsertionPointVisible,
-			getBlockInsertionPoint,
-			getBlockOrder,
-		} = select( 'core/block-editor' );
+	const { isMultiSelecting, isInserterVisible, blockOrder } = useSelect(
+		( select ) => {
+			const {
+				isMultiSelecting: _isMultiSelecting,
+				isBlockInsertionPointVisible,
+				getBlockInsertionPoint,
+				getBlockOrder,
+			} = select( 'core/block-editor' );
 
-		const insertionPoint = getBlockInsertionPoint();
-		const order = getBlockOrder( insertionPoint.rootClientId );
+			const insertionPoint = getBlockInsertionPoint();
+			const order = getBlockOrder( insertionPoint.rootClientId );
 
-		return {
-			isMultiSelecting: _isMultiSelecting(),
-			isInserterVisible: isBlockInsertionPointVisible(),
-			selectedClientId: order[ insertionPoint.index ],
-			blockOrder: order,
-		};
-	}, [] );
-
-	// function onMouseMove( event ) {
-	// 	if (
-	// 		! event.target.classList.contains(
-	// 			'block-editor-block-list__layout'
-	// 		)
-	// 	) {
-	// 		if ( isInserterShown ) {
-	// 			setIsInserterShown( false );
-	// 		}
-	// 		return;
-	// 	}
-	//
-	// 	const rect = event.target.getBoundingClientRect();
-	// 	const offset = event.clientY - rect.top;
-	// 	const element = Array.from( event.target.children ).find(
-	// 		( blockEl ) => {
-	// 			return blockEl.offsetTop > offset;
-	// 		}
-	// 	);
-	//
-	// 	if ( ! element ) {
-	// 		return;
-	// 	}
-	//
-	// 	const clientId = element.id.slice( 'block-'.length );
-	//
-	// 	if ( ! clientId ) {
-	// 		return;
-	// 	}
-	//
-	// 	const elementRect = element.getBoundingClientRect();
-	//
-	// 	if (
-	// 		event.clientX > elementRect.right ||
-	// 		event.clientX < elementRect.left
-	// 	) {
-	// 		if ( isInserterShown ) {
-	// 			setIsInserterShown( false );
-	// 		}
-	// 		return;
-	// 	}
-	//
-	// 	setIsInserterShown( true );
-	// 	setInserterClientId( clientId );
-	// }
+			return {
+				isMultiSelecting: _isMultiSelecting(),
+				isInserterVisible: isBlockInsertionPointVisible(),
+				blockOrder: order,
+			};
+		},
+		[]
+	);
 
 	function onMouseMove( event ) {
 		const clientId = event.target.id.slice( 'block-'.length );
@@ -218,20 +169,24 @@ export default function InsertionPoint( { children, containerRef } ) {
 
 		setIsInserterShown( true );
 
+		// first element should have only bottom inserter
 		if ( index === 0 ) {
 			// eslint-disable-next-line no-unused-vars
-			const [ _, first, ...rest ] = blockOrder;
-			setInserterClientId( [ first ] );
+			const [ firstTop, firstBottom, ...rest ] = blockOrder;
+			setInserterClientId( [ firstBottom ] );
 			return;
 		}
 
+		// last element should have only top inserter
 		if ( index === blockOrder.length ) {
-			const lastElement = blockOrder.slice( -1 );
-			setInserterClientId( [ lastElement ] );
+			const lastTop = blockOrder.slice( -1 );
+			setInserterClientId( [ lastTop ] );
 			return;
 		}
 
-		setInserterClientId( [ blockOrder[ index ], blockOrder[ index + 1 ] ] );
+		const top = blockOrder[ index ];
+		const bottom = blockOrder[ index + 1 ];
+		setInserterClientId( [ top, bottom ] );
 	}
 	const isVisible = isInserterShown || isInserterForced || isInserterVisible;
 
