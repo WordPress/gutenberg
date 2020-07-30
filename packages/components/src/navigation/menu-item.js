@@ -20,12 +20,14 @@ const NavigationMenuItem = ( { children, hasChildren, isActive, onClick } ) => {
 	} );
 
 	return (
-		<Button className={ classes } onClick={ onClick }>
-			<Text variant="body.small">
-				<span>{ children }</span>
-			</Text>
-			{ hasChildren ? <Icon icon={ chevronRight } /> : null }
-		</Button>
+		<li className={ classes }>
+			<Button className={ classes } onClick={ onClick }>
+				<Text variant="body.small">
+					<span>{ children }</span>
+				</Text>
+				{ hasChildren ? <Icon icon={ chevronRight } /> : null }
+			</Button>
+		</li>
 	);
 };
 
