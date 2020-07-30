@@ -535,6 +535,12 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 	return $tree;
 }
 
+/**
+ * Takes data from the different origins (core, theme, and user)
+ * and returns the merged result.
+ *
+ * @return array Merged trees.
+ */
 function gutenberg_experimental_global_styles_get_merged_origins() {
 	$core   = gutenberg_experimental_global_styles_get_core();
 	$theme  = gutenberg_experimental_global_styles_get_theme();
@@ -600,8 +606,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// Add the styles for the editor via the settings
 	// so they get processed as if they were added via add_editor_styles:
 	// they will get the editor wrapper class.
-	$merged     = gutenberg_experimental_global_styles_get_merged_origins();
-	$stylesheet = gutenberg_experimental_global_styles_resolver( $merged );
+	$merged               = gutenberg_experimental_global_styles_get_merged_origins();
+	$stylesheet           = gutenberg_experimental_global_styles_resolver( $merged );
 	$settings['styles'][] = array( 'css' => $stylesheet );
 
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
