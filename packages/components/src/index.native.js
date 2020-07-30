@@ -10,6 +10,7 @@ export {
 } from '@wordpress/primitives';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
+export { default as ColorPicker } from './color-picker';
 export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
@@ -66,12 +67,12 @@ export { default as ModalHeaderBar } from './mobile/modal-header-bar';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
-export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
 export { LinkPicker } from './mobile/link-picker';
 export { default as LinkSettings } from './mobile/link-settings';
-export { default as Image } from './mobile/image';
+export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
+export { default as ImageEditingButton } from './mobile/image/image-editing-button';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';

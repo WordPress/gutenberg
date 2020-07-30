@@ -139,6 +139,7 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	render() {
+		const isIOS = Platform.OS === 'ios';
 		const {
 			value,
 			defaultValue,
@@ -150,10 +151,8 @@ class BottomSheetRangeCell extends Component {
 			minimumTrackTintColor = preferredColorScheme === 'light'
 				? '#00669b'
 				: '#5198d9',
-			maximumTrackTintColor = Platform.OS === 'ios'
-				? '#e9eff3'
-				: '#909090',
-			thumbTintColor = Platform.OS === 'android' && '#00669b',
+			maximumTrackTintColor = isIOS ? '#e9eff3' : '#909090',
+			thumbTintColor = ! isIOS && '#00669b',
 			getStylesFromColorScheme,
 			...cellProps
 		} = this.props;
@@ -175,11 +174,16 @@ class BottomSheetRangeCell extends Component {
 			styles.sliderDarkTextInput
 		);
 
+		const cellRowContainerStyle = [
+			styles.cellRowStyles,
+			isIOS ? styles.cellRowStylesIOS : styles.cellRowStylesAndroid,
+		];
+
 		return (
 			<Cell
 				{ ...cellProps }
 				cellContainerStyle={ styles.cellContainerStyles }
-				cellRowContainerStyle={ styles.cellRowStyles }
+				cellRowContainerStyle={ cellRowContainerStyle }
 				accessibilityRole={ 'none' }
 				value={ '' }
 				editable={ false }

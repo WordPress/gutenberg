@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "8.6.0",
+	"version": "8.6.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -214,7 +214,7 @@
 		"changelog": "./bin/plugin/cli.js changelog",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
-		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && exit 1 );",
+		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && git diff --exit-code && exit 1 );",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
 		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js",

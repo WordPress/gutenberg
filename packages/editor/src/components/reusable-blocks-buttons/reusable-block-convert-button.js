@@ -8,15 +8,15 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Menu controls to convert block(s) to reusable block or vice-versa.
+ * Menu control to convert block(s) to reusable block.
  *
  * @param {Object}   props           Component props.
  * @param {string[]} props.clientIds Client ids of selected blocks.
  *
- * @return {import('@wordpress/element').WPComponent} The menu controls or null.
+ * @return {import('@wordpress/element').WPComponent} The menu control or null.
  */
 export default function ReusableBlockConvertButton( { clientIds } ) {
-	const { isReusable, isVisible } = useSelect(
+	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( 'core' );
 			const { getBlocksByClientId, canInsertBlockType } = select(
@@ -28,71 +28,53 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
-			const _isReusable =
+			const isReusable =
 				blocks.length === 1 &&
 				blocks[ 0 ] &&
 				isReusableBlock( blocks[ 0 ] ) &&
 				!! getReusableBlock( blocks[ 0 ].attributes.ref );
 
-			// Show 'Convert to Regular Block' when selected block is a reusable block.
-			const _isVisible =
-				_isReusable ||
-				// Hide 'Add to Reusable blocks' when reusable blocks are disabled.
-				( canInsertBlockType( 'core/block' ) &&
-					blocks.every(
-						( block ) =>
-							// Guard against the case where a regular block has *just* been converted.
-							!! block &&
-							// Hide 'Add to Reusable blocks' on invalid blocks.
-							block.isValid &&
-							// Hide 'Add to Reusable blocks' when block doesn't support being made reusable.
-							hasBlockSupport( block.name, 'reusable', true )
-					) &&
-					// Hide 'Add to Reusable blocks' when current doesn't have permission to do that.
-					!! canUser( 'create', 'blocks' ) );
+			const _canConvert =
+				// Hide when this is already a reusable block.
+				! isReusable &&
+				// Hide when reusable blocks are disabled.
+				canInsertBlockType( 'core/block' ) &&
+				blocks.every(
+					( block ) =>
+						// Guard against the case where a regular block has *just* been converted.
+						!! block &&
+						// Hide on invalid blocks.
+						block.isValid &&
+						// Hide when block doesn't support being made reusable.
+						hasBlockSupport( block.name, 'reusable', true )
+				) &&
+				// Hide when current doesn't have permission to do that.
+				!! canUser( 'create', 'blocks' );
 
-			return {
-				isReusable: _isReusable,
-				isVisible: _isVisible,
-			};
+			return _canConvert;
 		},
 		[ clientIds ]
 	);
 
 	const {
 		__experimentalConvertBlockToReusable: convertBlockToReusable,
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
 	} = useDispatch( 'core/editor' );
 
-	if ( ! isVisible ) {
+	if ( ! canConvert ) {
 		return null;
 	}
 
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { onClose } ) => (
-				<>
-					{ ! isReusable && (
-						<MenuItem
-							onClick={ () => {
-								convertBlockToReusable( clientIds );
-								onClose();
-							} }
-						>
-							{ __( 'Add to Reusable blocks' ) }
-						</MenuItem>
-					) }
-					{ isReusable && (
-						<MenuItem
-							onClick={ () => {
-								convertBlockToStatic( clientIds[ 0 ] );
-								onClose();
-							} }
-						>
-							{ __( 'Convert to Regular Block' ) }
-						</MenuItem>
-					) }
-				</>
+				<MenuItem
+					onClick={ () => {
+						convertBlockToReusable( clientIds );
+						onClose();
+					} }
+				>
+					{ __( 'Add to Reusable blocks' ) }
+				</MenuItem>
 			) }
 		</BlockSettingsMenuControls>
 	);

@@ -1,56 +1,6 @@
-# Block Type Registration RFC
+# Block Type Metadata
 
-This RFC is intended to serve both as a specification and as documentation for the implementation of runtime-agnostic block type registration.
-
-## Requirements
-
-Behind any block type registration is some abstract concept of a unit of content. This content type can be described without consideration of any particular technology. In much the same way, we should be able to describe the core constructs of a block type in a way which can be interpreted in any runtime.
-
-In more practical terms, an implementation should fulfill requirements that:
-
--   A block type registration should be declarative and context-agnostic. Any runtime (PHP, JS, or other) should be able to interpret the basics of a block type (see "Block API" in the sections below) and should be able to fetch or retrieve the definitions of the context-specific implementation details. The following things should be made possible:
-    -   Fetching the available block types through REST APIs.
-    -   Fetching block objects from posts through REST APIs.
--   This API should be backward compatible with what we have at the moment.
--   It should be possible to statically analyze a block type in order to support advanced use-cases required by one of the [9 projects](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) for 2019 in WordPress: "Building a WordPress.org directory for discovering blocks, and a way to seamlessly install them.". The block directory should not need to parse JavaScript or PHP files to retrieve their definitions similar to how it happens for plugins as of today.
-
-It can statically analyze the files of any plugin to retrieve blocks and their properties.
-
--   It should not require a build tool compilation step (e.g. Babel, Webpack) to author code which would be referenced in a block type definition.
--   There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions. It practical terms, it means that the editor should be able to be loaded without enqueuing all the assets (scripts and styles) of all block types. What it needs is the basic metadata (`title`, `description`, `category`, `icon`, etc…) to start with. It should be fine to defer loading all other code (`edit`, `save`, `transforms`, and other JavaScript implementations) until it is explicitly used (inserted into the post content).
-
-## References
-
--   Issue: [Block API: Server-side awareness of block types](https://github.com/WordPress/gutenberg/issues/2751)
--   Follow-up issue: [Expose available blocks via an API](https://github.com/WordPress/gutenberg/issues/4116)
--   Current documentation: [/docs/designers-developers/developers/block-api/block-registration.md](/docs/designers-developers/developers/block-api/block-registration.md)
--   Make WordPress.org post: [The Block Directory, and a new type of plugin](https://make.wordpress.org/meta/2019/03/08/the-block-directory-and-a-new-type-of-plugin/)
-
-## Previous attempts
-
-Initial support for server-defined block attributes was merged as part of [#2529](https://github.com/WordPress/gutenberg/pull/2529). PHP block type registrations are merged with those defined in the JavaScript runtime. While this enabled blocks to be defined within PHP, the majority of block types continue to be defined within JavaScript alone. The support was reserved for the exclusive use of [dynamic block types](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md), in large part because [`edit` and `save` behaviors](/docs/designers-developers/developers/block-api/block-edit-save.md) must still be implemented in JavaScript, and because a solution hadn't been considered for how to create individual block bundles during the build process, nor how to load such bundles efficiently if it were to come to be implemented.
-
-A demonstration for how block registration could be made filterable in PHP was explored in [#5802](https://github.com/WordPress/gutenberg/pull/5802). The purpose here was to explore how plugins could have better control over the registration.
-
-Another exploration in [#5652](https://github.com/WordPress/gutenberg/pull/5652) considered using JSON as a file format to share block type definitions between JavaScript and PHP.
-
-### Conclusions
-
--   The current approaches to client-side block type registration cannot support the proposed requirement to have all block types known outside the browser context.
--   Using a statically-defined, JSON-formatted block type definition enables easy integration in both JavaScript and PHP runtimes.
--   Registering a block type in PHP would allow for attribute default values to be assigned as dynamically generated from some external state (e.g. a database value, or localized string).
--   By default, JSON does not support localization or dynamic values.
--   On the server, a block type `icon` property can only be assigned as a string and thus cannot support SVGs and component-based icons.
-
----
-
-## Introduction
-
-Blocks are the fundamental elements of the editor. They are the primary way in which plugins and themes can register their own functionality and extend the capabilities of the editor.
-
-## Registering a block type
-
-To register a new block type, start by creating a `block.json` file. This file:
+To register a new block type using metadata that can be shared between codebase that uses JavaScript and PHP, start by creating a `block.json` file. This file:
 
 -   Gives a name to the block type.
 -   Defines some important metadata about the registered block type (title, category, icon, description, keywords).
@@ -403,35 +353,6 @@ Block type editor style definition. It will only be enqueued in the context of t
 
 Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
 
-## Backward compatibility
-
-The following properties are going to be supported for backward compatibility reasons on the client-side only. Some of them might be replaced with alternative APIs in the future:
-
--   `edit` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
--   `save` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
--   `transforms` - see the [Transforms](/docs/designers-developers/developers/block-api/block-registration.md#transforms-optional) documentation for more details.
--   `deprecated` - see the [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) documentation for more details.
--   `merge` - undocumented as of today. Its role is to handle merging multiple blocks into one.
--   `getEditWrapperProps` - undocumented as well. Its role is to inject additional props to the block edit's component wrapper.
-
-**Example**:
-
-```js
-wp.blocks.registerBlockType( 'my-block/name', {
-	edit: function () {
-		// Edit definition goes here.
-	},
-	save: function () {
-		// Save definition goes here.
-	},
-	getEditWrapperProps: function () {
-		// Implementation goes here.
-	},
-} );
-```
-
-In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function on the server.
-
 ## Assets
 
 ### `WPDefinedAsset`
@@ -493,11 +414,11 @@ return array(
 );
 ```
 
-## Internationalization
+## Internationalization (not implemented)
 
-Localized properties are automatically wrapped in `_x` function calls on the backend and the frontend of WordPress. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle when it defines metadata definition.
+Localized properties will be automatically wrapped in `_x` function calls on the backend and the frontend of WordPress. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle when it defines metadata definition.
 
-WordPress string discovery automatically translates these strings using the `textdomain` property specified in the `block.json` file.
+WordPress string discovery automatically will translate these strings using the `textdomain` property specified in the `block.json` file.
 
 **Example:**
 
@@ -564,4 +485,31 @@ register_block_type_from_metadata(
 
 The existing registration mechanism (both server side and frontend) will continue to work, it will serve as low-level implementation detail for the `block.json` based registration.
 
-Core Blocks will be migrated iteratively and third-party blocks will see warnings appearing in the console to encourage them to refactor the block registration API used.
+Once all details are ready, Core Blocks will be migrated iteratively and third-party blocks will see warnings appearing in the console to encourage them to refactor the block registration API used.
+
+The following properties are going to be supported for backward compatibility reasons on the client-side only. Some of them might be replaced with alternative APIs in the future:
+
+-   `edit` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
+-   `save` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
+-   `transforms` - see the [Transforms](/docs/designers-developers/developers/block-api/block-registration.md#transforms-optional) documentation for more details.
+-   `deprecated` - see the [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) documentation for more details.
+-   `merge` - undocumented as of today. Its role is to handle merging multiple blocks into one.
+-   `getEditWrapperProps` - undocumented as well. Its role is to inject additional props to the block edit's component wrapper.
+
+**Example**:
+
+```js
+wp.blocks.registerBlockType( 'my-block/name', {
+	edit: function () {
+		// Edit definition goes here.
+	},
+	save: function () {
+		// Save definition goes here.
+	},
+	getEditWrapperProps: function () {
+		// Implementation goes here.
+	},
+} );
+```
+
+In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using both [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) and `register_block_type_from_metadata` functions on the server.
