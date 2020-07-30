@@ -6,7 +6,7 @@
 		"postType"
 	],
 	"attributes": {
-		"align": {
+		"textAlign": {
 			"type": "string"
 		},
 		"level": {
@@ -17,6 +17,11 @@
 	"supports": {
 		"html": false,
 		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true
+		},
+		"__experimentalFontSize": true,
+		"__experimentalLineHeight": true,
 		"__experimentalSelector": {
 			"core/post-title/h1": "h1",
 			"core/post-title/h2": "h2",

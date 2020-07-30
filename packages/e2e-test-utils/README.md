@@ -254,6 +254,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with a string containing the block title.
 
+<a name="getCurrentPostContent" href="#getCurrentPostContent">#</a> **getCurrentPostContent**
+
+Returns a promise which resolves with the current post content (HTML string).
+
+_Returns_
+
+-   `Promise`: Promise resolving with current post content markup.
+
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
 Returns a promise which resolves with the edited post content (HTML string).

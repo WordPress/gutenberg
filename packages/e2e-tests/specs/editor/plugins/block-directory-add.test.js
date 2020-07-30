@@ -123,6 +123,14 @@ const MOCK_BLOCKS_RESPONSES = [
 			'application/javascript; charset=utf-8'
 		),
 	},
+	{
+		// Mock the post-new page as requested via apiFetch for determining new CSS/JS assets.
+		match: ( request ) => request.url().includes( '/post-new.php' ),
+		onRequestMatch: createResponse(
+			`<html><head><script id="mock-block-js" src="${ MOCK_BLOCK1.assets[ 0 ] }"></script></head><body/></html>`,
+			'text/html; charset=UTF-8'
+		),
+	},
 ];
 
 function getResponseObject( obj, contentType ) {
@@ -180,8 +188,7 @@ describe( 'adding blocks from block directory', () => {
 		// Add the block
 		await addBtn.click();
 
-		// Delay to let block script load
-		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+		await page.waitForSelector( `div[data-type="${ MOCK_BLOCK1.name }"]` );
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();

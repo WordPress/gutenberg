@@ -1,18 +1,33 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useEntityProp, useEntityId } from '@wordpress/core-data';
+import { useEntityProp } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-import { InspectorControls, RichText } from '@wordpress/block-editor';
+import {
+	AlignmentToolbar,
+	BlockControls,
+	InspectorControls,
+	RichText,
+	Warning,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function usePostContentExcerpt( wordCount ) {
-	const [ , , { raw: rawPostContent } ] = useEntityProp(
+function usePostContentExcerpt( wordCount, postId, postType ) {
+	// Don't destrcuture items from content here, it can be undefined.
+	const [ , , content ] = useEntityProp(
 		'postType',
-		'post',
-		'content'
+		postType,
+		'content',
+		postId
 	);
+	const rawPostContent = content?.raw;
 	return useMemo( () => {
 		if ( ! rawPostContent ) {
 			return '';
@@ -26,18 +41,33 @@ function usePostContentExcerpt( wordCount ) {
 }
 
 function PostExcerptEditor( {
-	attributes: { wordCount, moreText, showMoreOnNewLine },
+	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
+	context: { postId, postType },
 } ) {
 	const [ excerpt, setExcerpt ] = useEntityProp(
 		'postType',
-		'post',
-		'excerpt'
+		postType,
+		'excerpt',
+		postId
 	);
-	const postContentExcerpt = usePostContentExcerpt( wordCount );
+	const postContentExcerpt = usePostContentExcerpt(
+		wordCount,
+		postId,
+		postType
+	);
+
 	return (
 		<>
+			<BlockControls>
+				<AlignmentToolbar
+					value={ textAlign }
+					onChange={ ( newAlign ) =>
+						setAttributes( { textAlign: newAlign } )
+					}
+				/>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
 					{ ! excerpt && (
@@ -62,19 +92,40 @@ function PostExcerptEditor( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<RichText
-				className={
-					! showMoreOnNewLine &&
-					'wp-block-post-excerpt__excerpt is-inline'
-				}
-				placeholder={ postContentExcerpt }
-				value={ excerpt || ( isSelected ? '' : postContentExcerpt ) }
-				onChange={ setExcerpt }
-				keepPlaceholderOnFocus
-			/>
-			{ ! showMoreOnNewLine && ' ' }
-			{ showMoreOnNewLine ? (
-				<p>
+			<Block.div
+				className={ classnames( {
+					[ `has-text-align-${ textAlign }` ]: textAlign,
+				} ) }
+			>
+				<RichText
+					className={
+						! showMoreOnNewLine &&
+						'wp-block-post-excerpt__excerpt is-inline'
+					}
+					placeholder={ postContentExcerpt }
+					value={
+						excerpt ||
+						( isSelected
+							? ''
+							: postContentExcerpt ||
+							  __( 'No post excerpt found' ) )
+					}
+					onChange={ setExcerpt }
+					keepPlaceholderOnFocus
+				/>
+				{ ! showMoreOnNewLine && ' ' }
+				{ showMoreOnNewLine ? (
+					<p className="wp-block-post-excerpt__more-text">
+						<RichText
+							tagName="a"
+							placeholder={ __( 'Read more…' ) }
+							value={ moreText }
+							onChange={ ( newMoreText ) =>
+								setAttributes( { moreText: newMoreText } )
+							}
+						/>
+					</p>
+				) : (
 					<RichText
 						tagName="a"
 						placeholder={ __( 'Read more…' ) }
@@ -83,17 +134,8 @@ function PostExcerptEditor( {
 							setAttributes( { moreText: newMoreText } )
 						}
 					/>
-				</p>
-			) : (
-				<RichText
-					tagName="a"
-					placeholder={ __( 'Read more…' ) }
-					value={ moreText }
-					onChange={ ( newMoreText ) =>
-						setAttributes( { moreText: newMoreText } )
-					}
-				/>
-			) }
+				) }
+			</Block.div>
 		</>
 	);
 }
@@ -102,15 +144,19 @@ export default function PostExcerptEdit( {
 	attributes,
 	setAttributes,
 	isSelected,
+	context,
 } ) {
-	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return __( 'Post Excerpt' );
+	if ( ! context.postType || ! context.postId ) {
+		return (
+			<Warning>{ __( 'Post excerpt block: no post found.' ) }</Warning>
+		);
 	}
 	return (
 		<PostExcerptEditor
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			isSelected={ isSelected }
+			context={ context }
 		/>
 	);
 }

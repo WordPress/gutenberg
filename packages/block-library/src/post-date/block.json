@@ -2,7 +2,7 @@
 	"name": "core/post-date",
 	"category": "design",
 	"attributes": {
-		"align": {
+		"textAlign": {
 			"type": "string"
 		},
 		"format": {

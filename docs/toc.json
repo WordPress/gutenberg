@@ -78,7 +78,8 @@
 			{ "docs/contributors/scripts.md": [] },
 			{ "docs/contributors/managing-packages.md": [] },
 			{ "docs/contributors/release.md": [] },
-			{ "docs/contributors/native-mobile.md": [] }
+			{ "docs/contributors/native-mobile.md": [] },
+			{ "docs/contributors/getting-started-native-mobile.md": [] }
 		] },
 		{ "docs/contributors/design.md": [
 			{ "docs/contributors/principles/the-block.md": [] },

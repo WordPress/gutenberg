@@ -26,6 +26,9 @@ function ColorPicker( {
 	isGradientColor,
 	onNavigationBack,
 	onHandleClosingBottomSheet,
+	onBottomSheetClosed,
+	onHandleHardwareButtonPress,
+	bottomLabelText,
 } ) {
 	const isIOS = Platform.OS === 'ios';
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
@@ -55,6 +58,10 @@ function ColorPicker( {
 		styles.colorText,
 		styles.colorTextDark
 	);
+	const selectColorTextStyle = usePreferredColorSchemeStyle(
+		styles.selectColorText,
+		styles.selectColorTextDark
+	);
 	const footerStyle = usePreferredColorSchemeStyle(
 		styles.footer,
 		styles.footerDark
@@ -82,7 +89,15 @@ function ColorPicker( {
 		}
 		setColor( activeColor );
 		shouldEnableBottomSheetMaxHeight( false );
-		onHandleClosingBottomSheet( () => setColor( savedColor ) );
+		onHandleClosingBottomSheet( () => {
+			setColor( savedColor );
+			if ( onBottomSheetClosed ) {
+				onBottomSheetClosed();
+			}
+		} );
+		if ( onHandleHardwareButtonPress ) {
+			onHandleHardwareButtonPress( onButtonPress );
+		}
 	}, [] );
 
 	function onHuePickerChange( { hue: h } ) {
@@ -99,6 +114,9 @@ function ColorPicker( {
 		onHandleClosingBottomSheet( null );
 		shouldEnableBottomSheetMaxHeight( true );
 		setColor( action === 'apply' ? currentColor : savedColor );
+		if ( onBottomSheetClosed ) {
+			onBottomSheetClosed();
+		}
 	}
 
 	return (
@@ -157,9 +175,15 @@ function ColorPicker( {
 						) }
 					</View>
 				</TouchableWithoutFeedback>
-				<Text style={ colorTextStyle } selectable>
-					{ currentColor.toUpperCase() }
-				</Text>
+				{ bottomLabelText ? (
+					<Text style={ selectColorTextStyle }>
+						{ bottomLabelText }
+					</Text>
+				) : (
+					<Text style={ colorTextStyle } selectable>
+						{ currentColor.toUpperCase() }
+					</Text>
+				) }
 				<TouchableWithoutFeedback
 					onPress={ () => onButtonPress( 'apply' ) }
 					hitSlop={ hitSlop }

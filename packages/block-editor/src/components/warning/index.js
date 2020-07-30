@@ -31,6 +31,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 						{ secondaryActions && (
 							<Dropdown
 								className="block-editor-warning__secondary"
+								contentClassName="block-editor-warning__dropdown"
 								position="bottom left"
 								renderToggle={ ( { isOpen, onToggle } ) => (
 									<Button
