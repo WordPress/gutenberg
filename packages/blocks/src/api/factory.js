@@ -22,6 +22,7 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -40,11 +41,16 @@ import { normalizeBlockType } from './utils';
  * @param {Object} attributes  Block attributes.
  * @param {?Array} innerBlocks Nested blocks.
  *
- * @return {Object} Block object.
+ * @return {(Object|boolean)} Block object or false if the block name is not a registered block.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
+
+	if ( undefined === blockType ) {
+		warning( `Block type '${ name }' is not registered.` );
+		return false;
+	}
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.

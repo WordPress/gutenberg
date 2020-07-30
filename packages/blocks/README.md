@@ -203,7 +203,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Block object.
+-   `(Object|boolean)`: Block object or false if the block name is not a registered block.
 
 <a name="doBlocksMatchTemplate" href="#doBlocksMatchTemplate">#</a> **doBlocksMatchTemplate**
 
