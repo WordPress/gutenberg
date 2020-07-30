@@ -14,7 +14,7 @@ import {
 	Button,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
@@ -163,11 +163,27 @@ function QuickInserter( {
 		[]
 	);
 
+	const clientIdFromInserter = useSelect(
+		( select ) => {
+			const { getBlockIndex, getBlockOrder } = select(
+				'core/block-editor'
+			);
+			// We have to select the previous block because the menu inserter
+			// inserts block after the selected
+			return getBlockOrder( destinationRootClientId )[
+				getBlockIndex( clientId, destinationRootClientId ) - 1
+			];
+		},
+		[ clientId, destinationRootClientId ]
+	);
+
 	useEffect( () => {
 		if ( setInserterIsOpened ) {
 			setInserterIsOpened( false );
 		}
 	}, [ setInserterIsOpened ] );
+
+	const { selectBlock } = useDispatch( 'core/block-editor' );
 
 	// Announce search results on change
 	useEffect( () => {
@@ -182,6 +198,13 @@ function QuickInserter( {
 		);
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
+
+	// When clicking Browse All select the appropriate block so as
+	// the insertion point can work as expected
+	const onBrowseAll = () => {
+		selectBlock( clientIdFromInserter );
+		setInserterIsOpened( true );
+	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
@@ -218,7 +241,7 @@ function QuickInserter( {
 			{ setInserterIsOpened && (
 				<Button
 					className="block-editor-inserter__quick-inserter-expand"
-					onClick={ () => setInserterIsOpened( true ) }
+					onClick={ onBrowseAll }
 					aria-label={ __(
 						'Browse all. This will open the main inserter panel in the editor toolbar.'
 					) }
