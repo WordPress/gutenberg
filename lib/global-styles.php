@@ -298,7 +298,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 	$block_data = array(
 		'global' => array(
 			'selector' => ':root',
-			'supports' => array( 'background-color' ),
+			'supports' => array( '--wp--style--color--link', 'background-color', 'font-size' ),
 		),
 	);
 
