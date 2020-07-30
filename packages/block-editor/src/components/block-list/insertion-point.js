@@ -98,43 +98,43 @@ function InsertionPointPopover( {
 	isInserterForced,
 	setIsInserterForced,
 	containerRef,
-	showInsertionPoint,
 } ) {
-	const element = getBlockDOMNode( clientId );
+	return clientId.map( ( id, index ) => {
+		const element = getBlockDOMNode( id );
 
-	return (
-		<Popover
-			noArrow
-			animate={ false }
-			anchorRef={ element }
-			position="top right left"
-			focusOnMount={ false }
-			className="block-editor-block-list__insertion-point-popover"
-			__unstableSlotName="block-toolbar"
-		>
-			<div
-				className="block-editor-block-list__insertion-point"
-				style={ { width: element?.offsetWidth } }
+		return (
+			<Popover
+				key={ `${ index }${ id }` }
+				noArrow
+				animate={ false }
+				anchorRef={ element }
+				position="top right left"
+				focusOnMount={ false }
+				className="block-editor-block-list__insertion-point-popover"
+				__unstableSlotName="block-toolbar"
 			>
-				{ showInsertionPoint && (
+				<div
+					className="block-editor-block-list__insertion-point"
+					style={ { width: element?.offsetWidth } }
+				>
 					<div className="block-editor-block-list__insertion-point-indicator" />
-				) }
-				{ ( isInserterShown || isInserterForced ) && (
-					<InsertionPointInserter
-						clientId={ clientId }
-						setIsInserterForced={ setIsInserterForced }
-						containerRef={ containerRef }
-					/>
-				) }
-			</div>
-		</Popover>
-	);
+					{ ( isInserterShown || isInserterForced ) && (
+						<InsertionPointInserter
+							clientId={ clientId }
+							setIsInserterForced={ setIsInserterForced }
+							containerRef={ containerRef }
+						/>
+					) }
+				</div>
+			</Popover>
+		);
+	} );
 }
 
 export default function InsertionPoint( { children, containerRef } ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
-	const [ inserterClientId, setInserterClientId ] = useState( null );
+	const [ inserterClientId, setInserterClientId ] = useState( [] );
 	const {
 		isMultiSelecting,
 		isInserterVisible,
@@ -211,15 +211,27 @@ export default function InsertionPoint( { children, containerRef } ) {
 
 		// when there is no match return
 		if ( index === -1 ) {
+			setInserterClientId( [] );
 			setIsInserterShown( false );
 			return;
 		}
 
-		// first element should show only bottom inserter
-		if ( index >= 0 ) {
-			setIsInserterShown( true );
-			setInserterClientId( clientId );
+		setIsInserterShown( true );
+
+		if ( index === 0 ) {
+			// eslint-disable-next-line no-unused-vars
+			const [ _, first, ...rest ] = blockOrder;
+			setInserterClientId( [ first ] );
+			return;
 		}
+
+		if ( index === blockOrder.length ) {
+			const lastElement = blockOrder.slice( -1 );
+			setInserterClientId( [ lastElement ] );
+			return;
+		}
+
+		setInserterClientId( [ blockOrder[ index ], blockOrder[ index + 1 ] ] );
 	}
 	const isVisible = isInserterShown || isInserterForced || isInserterVisible;
 
@@ -227,9 +239,7 @@ export default function InsertionPoint( { children, containerRef } ) {
 		<>
 			{ ! isMultiSelecting && isVisible && (
 				<InsertionPointPopover
-					clientId={
-						isInserterVisible ? selectedClientId : inserterClientId
-					}
+					clientId={ inserterClientId }
 					isInserterShown={ isInserterShown }
 					isInserterForced={ isInserterForced }
 					setIsInserterForced={ setIsInserterForced }
