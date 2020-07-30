@@ -319,7 +319,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 			$attributes['css_classes'][] = sprintf( 'has-%s-color', $block_attributes['textColor'] );
 		} elseif ( $has_custom_text_color ) {
 			$attributes['inline_styles'][] = sprintf( 'color: %s;', $block_attributes['style']['color']['text'] );
-		// Fallback to default value if defined.
+			// Fallback to default value if defined.
 		} elseif ( $has_named_text_color_default ) {
 			$attributes['css_classes'][] = sprintf( 'has-%s-color', $block_type->attributes['textColor']['default'] );
 		} elseif ( $has_custom_text_color_default ) {
@@ -347,7 +347,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 			} else {
 				$attributes['inline_styles'][] = sprintf( '--wp--style--color--link: %s;', $block_attributes['style']['color']['link'] );
 			}
-		// Fallback to default value if defined.
+			// Fallback to default value if defined.
 		} elseif ( $has_link_color_default ) {
 			// If link is a named color.
 			if ( strpos( $block_type->attributes['style']['default']['color']['link'], 'var:preset|color|' ) !== false ) {
@@ -408,7 +408,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 				$attributes['css_classes'][]   = 'has-background';
 				$attributes['inline_styles'][] = sprintf( 'background-color: %s;', $block_type->attributes['style']['default']['color']['background'] );
 			}
-		// Check gradient support and apply default background if exists.
+			// Check gradient support and apply default background if exists.
 		} elseif ( in_array( 'background', $supports, true ) ) {
 			if ( isset( $block_type->attributes['gradient']['default'] ) ) {
 				$attributes['css_classes'][] = 'has-background';
@@ -444,7 +444,7 @@ function gutenberg_experimental_build_css_typography( $attributes, $block_attrib
 			$attributes['css_classes'][] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
 		} elseif ( $has_custom_font_size ) {
 			$attributes['inline_styles'][] = sprintf( 'font-size: %spx;', $block_attributes['style']['typography']['fontSize'] );
-		// Fallback to default value if defined.
+			// Fallback to default value if defined.
 		} elseif ( isset( $block_type->attributes['fontSize']['default'] ) ) {
 			$attributes['css_classes'][] = sprintf( 'has-%s-font-size', $block_type->attributes['fontSize']['default'] );
 		} elseif ( isset( $block_type->attributes['style']['default']['typography']['fontSize'] ) ) {
@@ -458,7 +458,7 @@ function gutenberg_experimental_build_css_typography( $attributes, $block_attrib
 		// Add the style (no classes for line-height).
 		if ( $has_line_height ) {
 			$attributes['inline_styles'][] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
-		// Fallback to default value if defined.
+			// Fallback to default value if defined.
 		} elseif ( isset( $block_type->attributes['style']['default']['typography']['lineHeight'] ) ) {
 			$attributes['inline_styles'][] = sprintf( 'line-height: %s;', $block_type->attributes['style']['default']['typography']['lineHeight'] );
 		}
@@ -486,7 +486,7 @@ function gutenberg_build_css_block_alignment( $attributes, $block_attributes, $s
 		if ( '' !== $block_attributes['align'] ) {
 			if ( $has_block_alignment ) {
 				$attributes['css_classes'][] = sprintf( 'align%s', $block_attributes['align'] );
-			// Fallback to default value if defined.
+				// Fallback to default value if defined.
 			} elseif ( isset( $block_type->attributes['align']['default'] ) ) {
 				$attributes['css_classes'][] = sprintf( 'align%s', $block_type->attributes['align']['default'] );
 			}
