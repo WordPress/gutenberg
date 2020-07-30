@@ -15,24 +15,47 @@
  */
 function render_block_core_file( $attributes, $content ) {
 	$script = '';
-	if ( ! empty( $attributes['showInlineEmbed'] ) && ! empty( $attributes['embedId'] ) ) {
+	if ( ! empty( $attributes['showInlineEmbed'] ) ) {
 		$script = <<<HTML
 			<script>
-				var ua = window.navigator.userAgent;
-				if (
-					// Most mobile devices include "Mobi" in their UA.
-					ua.indexOf( 'Mobi' ) > -1 ||
-					// Android tablets are the noteable exception.
-					ua.indexOf( 'Android' ) > -1 ||
-					(
-						// iPad pretends to be a Mac.
-						ua.indexOf( 'Macintosh' ) > -1 &&
-						navigator.maxTouchPoints &&
-						navigator.maxTouchPoints > 2
-					)
-				) {
-					document.getElementById( 'wp-block-file__embed-{$attributes['embedId']}' ).style.display = 'none';
-				}
+				( function () {
+					var ua = window.navigator.userAgent,
+						canEmbed = true,
+						embeds, axo;
+					if (
+						// Most mobile devices include "Mobi" in their UA.
+						ua.indexOf( 'Mobi' ) > -1 ||
+						// Android tablets are the noteable exception.
+						ua.indexOf( 'Android' ) > -1 ||
+						(
+							// iPad pretends to be a Mac.
+							ua.indexOf( 'Macintosh' ) > -1 &&
+							navigator.maxTouchPoints &&
+							navigator.maxTouchPoints > 2
+						)
+					) {
+						canEmbed = false;
+					}
+
+					// IE only supports PDFs when there's an ActiveX object available for it.
+					if ( window.ActiveXObject || 'ActiveXObject' in window )
+					try {
+						axo = new ActiveXObject( 'AcroPDF.PDF' );
+						axo = undefined;
+						axo = new ActiveXObject( 'PDF.PdfCtrl' );
+						axo = undefined;
+					} catch( e ) {
+						axo = undefined;
+						canEmbed = false;
+					}
+
+					if ( ! canEmbed ) {
+						embeds = document.getElementsByClassName( 'wp-block-file__embed' );
+						Array.prototype.forEach.call( embeds, function ( embed ) {
+							embed.style.display = 'none';
+						} );
+					}
+				} )();
 			</script>
 HTML;
 	}

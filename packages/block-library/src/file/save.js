@@ -13,7 +13,6 @@ export default function save( { attributes } ) {
 		showDownloadButton,
 		downloadButtonText,
 		showInlineEmbed,
-		embedId,
 		embedHeight,
 	} = attributes;
 
@@ -24,7 +23,6 @@ export default function save( { attributes } ) {
 					<>
 						<object
 							className="wp-block-file__embed"
-							id={ `wp-block-file__embed-${ embedId }` }
 							data={ href }
 							type="application/pdf"
 							style={ {

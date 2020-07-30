@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -31,23 +30,10 @@ import { file as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import FileBlockInspector from './inspector';
+import { browserSupportsPdfs } from './utils';
 
 export const MIN_EMBED_HEIGHT = 200;
 export const MAX_EMBED_HEIGHT = 2000;
-
-// It's not 100% accurate, but the vast majority of these UAs don't support embedded PDFs.
-const UA_SUPPORTS_PDFS = ! (
-	// Most mobile devices include "Mobi" in their UA.
-	(
-		window.navigator.userAgent.indexOf( 'Mobi' ) > -1 ||
-		// Android tablets are the noteable exception.
-		window.navigator.userAgent.indexOf( 'Android' ) > -1 ||
-		// iPad pretends to be a Mac.
-		( window.navigator.userAgent.indexOf( 'Macintosh' ) > -1 &&
-			window.navigator.maxTouchPoints &&
-			window.navigator.maxTouchPoints > 2 )
-	)
-);
 
 class FileEdit extends Component {
 	constructor() {
@@ -104,6 +90,8 @@ class FileEdit extends Component {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
 		}
+
+		this.browserSupportsPdfs = browserSupportsPdfs();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -123,7 +111,6 @@ class FileEdit extends Component {
 				textLinkHref: media.url,
 				id: media.id,
 				showInlineEmbed: isPdf ? true : undefined,
-				embedId: isPdf ? uuid() : undefined,
 				embedHeight: isPdf ? 800 : undefined,
 			} );
 		}
@@ -227,7 +214,7 @@ class FileEdit extends Component {
 			'is-transient': isBlobURL( href ),
 		} );
 
-		const displayInlineEmbed = UA_SUPPORTS_PDFS && showInlineEmbed;
+		const displayInlineEmbed = this.browserSupportsPdfs && showInlineEmbed;
 
 		return (
 			<>
