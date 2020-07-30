@@ -111,20 +111,16 @@ export function getEntity( state, kind, name ) {
  * @param {number}  key   Record's key
  * @param {?Object} query Optional query.
  *
- * @return {Object?|undefined} Record.
+ * @return {Object?|null} Record.
  */
 export function getEntityRecord( state, kind, name, key, query ) {
-	// Queried data state is prepopulated for all known entities. If this is not
-	// assigned for the given parameters, then it is known to not exist. Thus, a
-	// return value of `undefined` is used instead of `null` (where `null` is
-	// otherwise used to represent an unknown state).
 	const queriedState = get( state.entities.data, [
 		kind,
 		name,
 		'queriedData',
 	] );
 	if ( ! queriedState ) {
-		return;
+		return null;
 	}
 
 	if ( query === undefined ) {
@@ -148,7 +144,7 @@ export function getEntityRecord( state, kind, name, key, query ) {
  * @param {string} name   Entity name.
  * @param {number} key    Record's key
  *
- * @return {Object?} Record.
+ * @return {Object|null} Record.
  */
 export function __experimentalGetEntityRecordNoResolver(
 	state,

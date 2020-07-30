@@ -166,7 +166,7 @@ _Parameters_
 
 _Returns_
 
--   `(?Object|undefined)`: Record.
+-   `(?Object|null)`: Record.
 
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 
