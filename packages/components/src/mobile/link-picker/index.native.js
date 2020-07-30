@@ -3,7 +3,7 @@
  */
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native';
-import { startsWith } from 'lodash';
+import { lowerCase, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,7 @@ import styles from './styles';
 export const createDirectEntry = ( value ) => {
 	let type = 'URL';
 
-	const protocol = getProtocol( value ) || '';
+	const protocol = lowerCase( getProtocol( value ) ) || '';
 
 	if ( protocol.includes( 'mailto' ) ) {
 		type = 'mailto';
