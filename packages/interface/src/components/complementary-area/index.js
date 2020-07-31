@@ -94,6 +94,7 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 	isActiveByDefault,
+	showTooltip,
 } ) {
 	const { isActive, isPinned, activeArea, isSmall } = useSelect(
 		( select ) => {
@@ -143,6 +144,7 @@ function ComplementaryArea( {
 						aria-expanded={ isActive }
 						label={ title }
 						icon={ icon }
+						showTooltip={ showTooltip }
 					/>
 				</PinnedItems>
 			) }

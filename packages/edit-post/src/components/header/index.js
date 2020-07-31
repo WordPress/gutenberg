@@ -7,6 +7,9 @@ import {
 	PinnedItems,
 	__experimentalMainDashboardButton as MainDashboardButton,
 } from '@wordpress/interface';
+import { Button, Dropdown } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,21 +21,38 @@ import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
-	const { hasActiveMetaboxes, isPublishSidebarOpened, isSaving } = useSelect(
+	const {
+		hasActiveMetaboxes,
+		isPublishSidebarOpened,
+		isSaving,
+		showIconLabels,
+	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isPublishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
 		} ),
 		[]
+	);
+
+	const isLargeViewport = useViewportMatch( 'large' );
+
+	const overflowItems = (
+		<>
+			<PinnedItems.Slot scope="core/edit-post" />
+			<MoreMenu showTooltip={ ! showIconLabels } />
+		</>
 	);
 
 	return (
 		<div className="edit-post-header">
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose />
+				<FullscreenModeClose showTooltip={ ! showIconLabels } />
 			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar />
@@ -61,8 +81,23 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 						setEntitiesSavedStatesCallback
 					}
 				/>
-				<PinnedItems.Slot scope="core/edit-post" />
-				<MoreMenu />
+				{ ( isLargeViewport || ! showIconLabels ) && overflowItems }
+				{ showIconLabels && ! isLargeViewport && (
+					<Dropdown
+						contentClassName="edit-post-header__dropdown"
+						position="bottom right"
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<Button
+								className="button-toggle"
+								aria-expanded={ isOpen }
+								icon={ chevronDown }
+								isSecondary
+								onClick={ onToggle }
+							/>
+						) }
+						renderContent={ () => overflowItems }
+					/>
+				) }
 			</div>
 		</div>
 	);

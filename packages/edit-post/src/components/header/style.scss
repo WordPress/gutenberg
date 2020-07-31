@@ -116,3 +116,46 @@
 		padding-bottom: 0;
 	}
 }
+
+.show-icon-labels .edit-post-header,
+.edit-post-header__dropdown {
+	.components-button.has-icon {
+		width: auto;
+
+		// Hide the button icons when labels are set to display...
+		svg {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+			margin: 0 0.5em;
+		}
+	}
+	// Exception for drodpdown toggle buttons.
+	// Temporary exception for block toolbar (pending design).
+	.edit-post-header-toolbar__block-toolbar .components-button.has-icon,
+	.components-button.has-icon.button-toggle {
+		svg {
+			display: block;
+		}
+		&::after {
+			content: none;
+		}
+	}
+}
+
+.edit-post-header__dropdown {
+	.components-popover__content {
+		min-width: 0;
+
+		> div * {
+			white-space: nowrap;
+			display: block;
+		}
+		.components-button.has-icon {
+			margin: 0;
+			padding: 6px;
+		}
+	}
+}

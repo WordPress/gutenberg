@@ -15,8 +15,8 @@ import {
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 } from '@wordpress/editor';
-import { Button, ToolbarItem } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
+import { Button, Dropdown, ToolbarItem } from '@wordpress/components';
+import { plus, chevronDown } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
 function HeaderToolbar() {
@@ -28,6 +28,7 @@ function HeaderToolbar() {
 		isInserterOpened,
 		isTextModeEnabled,
 		previewDeviceType,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
@@ -52,9 +53,14 @@ function HeaderToolbar() {
 			previewDeviceType: select(
 				'core/edit-post'
 			).__experimentalGetPreviewDeviceType(),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const isWideViewport = useViewportMatch( 'wide' );
+	const isSmallViewport = useViewportMatch( 'small', '<' );
 
 	const displayBlockToolbar =
 		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
@@ -64,6 +70,36 @@ function HeaderToolbar() {
 		  __( 'Document and block tools' )
 		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
 		  __( 'Document tools' );
+
+	const overflowItems = (
+		<>
+			{ isLargeViewport && (
+				<ToolbarItem
+					as={ ToolSelector }
+					showTooltip={ ! showIconLabels }
+					disabled={ isTextModeEnabled }
+				/>
+			) }
+			<ToolbarItem
+				as={ EditorHistoryUndo }
+				showTooltip={ ! showIconLabels }
+			/>
+			<ToolbarItem
+				as={ EditorHistoryRedo }
+				showTooltip={ ! showIconLabels }
+			/>
+			<ToolbarItem
+				as={ TableOfContents }
+				hasOutlineItemsDisabled={ isTextModeEnabled }
+				showTooltip={ ! showIconLabels }
+			/>
+			<ToolbarItem
+				as={ BlockNavigationDropdown }
+				isDisabled={ isTextModeEnabled }
+				showTooltip={ ! showIconLabels }
+			/>
+		</>
+	);
 
 	return (
 		<NavigableToolbar
@@ -93,23 +129,25 @@ function HeaderToolbar() {
 					'Add block',
 					'Generic label for block inserter button'
 				) }
+				showTooltip={ ! showIconLabels }
 			/>
-			{ isLargeViewport && (
-				<ToolbarItem
-					as={ ToolSelector }
-					disabled={ isTextModeEnabled }
+			{ ( isWideViewport || ! showIconLabels ) && overflowItems }
+			{ ! isWideViewport && ! isSmallViewport && showIconLabels && (
+				<Dropdown
+					contentClassName="edit-post-header__dropdown"
+					position="bottom right"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<Button
+							className="button-toggle"
+							aria-expanded={ isOpen }
+							icon={ chevronDown }
+							isSecondary
+							onClick={ onToggle }
+						/>
+					) }
+					renderContent={ () => overflowItems }
 				/>
 			) }
-			<ToolbarItem as={ EditorHistoryUndo } />
-			<ToolbarItem as={ EditorHistoryRedo } />
-			<ToolbarItem
-				as={ TableOfContents }
-				hasOutlineItemsDisabled={ isTextModeEnabled }
-			/>
-			<ToolbarItem
-				as={ BlockNavigationDropdown }
-				isDisabled={ isTextModeEnabled }
-			/>
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />

@@ -113,3 +113,12 @@
 	height: 32px;
 	padding: 0;
 }
+// Always display block toolbar under main toolbar when text labels are visible
+.show-icon-labels .edit-post-header-toolbar__block-toolbar {
+	@include break-wide {
+		position: absolute;
+		top: $header-height + $border-width;
+		left: 0;
+		right: 0;
+	}
+}

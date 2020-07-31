@@ -29,7 +29,7 @@ function TableOfContents( { hasOutlineItemsDisabled, ...props }, ref ) {
 					onClick={ hasBlocks ? onToggle : undefined }
 					icon={ info }
 					aria-expanded={ isOpen }
-					label={ __( 'Content structure' ) }
+					label={ __( 'Outline' ) }
 					tooltipPosition="bottom"
 					aria-disabled={ ! hasBlocks }
 				/>

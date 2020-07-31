@@ -28,7 +28,7 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	native: false,
 } );
 
-const SettingsSidebar = () => {
+const SettingsSidebar = ( { showTooltip } ) => {
 	const { sidebarName, keyboardShortcut } = useSelect( ( select ) => {
 		// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
 		// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
@@ -64,6 +64,7 @@ const SettingsSidebar = () => {
 			toggleShortcut={ keyboardShortcut }
 			icon={ cog }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+			showTooltip={ showTooltip }
 		>
 			{ sidebarName === 'edit-post/document' && (
 				<>

@@ -22,13 +22,13 @@ const TOGGLE_PROPS = {
 	tooltipPosition: 'bottom',
 };
 
-const MoreMenu = () => (
+const MoreMenu = ( { showTooltip } ) => (
 	<DropdownMenu
 		className="edit-post-more-menu"
 		icon={ moreVertical }
-		label={ __( 'More tools & options' ) }
+		label={ __( 'Options' ) }
 		popoverProps={ POPOVER_PROPS }
-		toggleProps={ TOGGLE_PROPS }
+		toggleProps={ { showTooltip, ...TOGGLE_PROPS } }
 	>
 		{ ( { onClose } ) => (
 			<>
