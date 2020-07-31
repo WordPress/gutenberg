@@ -173,7 +173,7 @@ export default function useBlockDropZone( {
 	element,
 	// An undefined value represents a top-level block. Default to an empty
 	// string for this so that `targetRootClientId` can be easily compared to
-	// values return by the `getRootBlockClientId` selector, which also uses
+	// values returned by the `getRootBlockClientId` selector, which also uses
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
 } ) {
