@@ -16,6 +16,10 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
       featureName="mostUsedBlocks"
       label="Enable the Most Used Blocks category in the block library"
     />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="showIconLabels"
+      label="Show button text labels"
+    />
   </Section>
   <Section
     title="Keyboard options"
@@ -67,12 +71,5 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
   <WithSelect(MetaBoxesSection)
     title="Advanced panels"
   />
-  <Section
-    title="Icon Labels"
-  >
-    <WithSelect(WithDispatch(BaseOption))
-      label="Show Icon Labels"
-    />
-  </Section>
 </WithInstanceId(Modal)>
 `;

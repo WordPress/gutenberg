@@ -54,6 +54,10 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 						'Enable the Most Used Blocks category in the block library'
 					) }
 				/>
+				<EnableFeature
+					featureName="showIconLabels"
+					label={ __( 'Show button text labels' ) }
+				/>
 			</Section>
 			<Section title={ __( 'Keyboard options' ) }>
 				<EnableFeature
@@ -105,12 +109,6 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 				</PageAttributesCheck>
 			</Section>
 			<MetaBoxesSection title={ __( 'Advanced panels' ) } />
-			<Section title={ __( 'Labels' ) }>
-				<EnableFeature
-					featureName="showIconLabels"
-					label={ __( 'Show button text labels' ) }
-				/>
-			</Section>
 		</Modal>
 	);
 }
