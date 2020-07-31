@@ -46,12 +46,15 @@ function convertWidgetToBlock( widget ) {
 		}
 	}
 
-	// @TODO: reuse the rendered string we got from the API
 	return createBlock(
 		'core/legacy-widget',
 		{
 			id: widget.id,
 			widgetClass: widget.widget_class,
+			instance: widget.settings,
+			idBase: widget.id_base,
+			number: widget.number,
+
 			rendered: widget.rendered,
 			form: widget.form,
 		},
