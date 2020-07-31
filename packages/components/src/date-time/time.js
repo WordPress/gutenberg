@@ -73,7 +73,9 @@ class TimePicker extends Component {
 	changeDate( newDate ) {
 		const dateWithStartOfMinutes = newDate.clone().startOf( 'minute' );
 		this.setState( { date: dateWithStartOfMinutes } );
-		this.props.onChange( newDate.format( TIMEZONELESS_FORMAT ) );
+		this.props.onChange(
+			dateWithStartOfMinutes.format( TIMEZONELESS_FORMAT )
+		);
 	}
 
 	getMaxHours() {
