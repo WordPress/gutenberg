@@ -2,7 +2,7 @@
 	"name": "core/details",
 	"category": "layout",
 	"attributes": {
-		"open": {
+		"initialOpen": {
 			"type": "boolean",
 			"default": false
 		},
