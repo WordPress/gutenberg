@@ -428,7 +428,6 @@
 	}
 }
 
-
 .block-editor-block-list__insertion-point-inserter,
 .block-editor-block-list__block-popover-inserter {
 	.block-editor-inserter__toggle.components-button {
@@ -438,6 +437,13 @@
 		@include reduce-motion("animation");
 	}
 }
+
+.block-editor-block-list__insertion-point-indicator {
+	animation: block-editor-inserter__toggle__fade-in-animation-delayed 0.3s ease;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+}
+
 
 @keyframes block-editor-inserter__toggle__fade-in-animation-delayed {
 	0% {

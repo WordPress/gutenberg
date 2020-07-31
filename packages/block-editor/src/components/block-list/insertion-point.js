@@ -162,7 +162,6 @@ export default function InsertionPoint( { children, containerRef } ) {
 
 		// when there is no match return
 		if ( index === -1 ) {
-			setInserterClientId( [] );
 			setIsInserterShown( false );
 			return;
 		}
@@ -202,7 +201,9 @@ export default function InsertionPoint( { children, containerRef } ) {
 					showInsertionPoint={ isInserterVisible }
 				/>
 			) }
-			<div onMouseMove={ onMouseMove }> { children } </div>
+			<div onMouseMove={ ! isInserterForced ? onMouseMove : undefined }>
+				{ children }
+			</div>
 		</>
 	);
 }
