@@ -24,11 +24,22 @@ const icons = {
 	page: pages,
 };
 
+const getSummaryForType = ( type ) => {
+	switch ( type ) {
+		case 'mailto':
+			return __( 'Add this email link' );
+		case 'tel':
+			return __( 'Add this telephone link' );
+		default:
+			return __( 'Add this link' );
+	}
+};
+
 // we use some Cell styles here with a column flex-direction
 function LinkSuggestionItemCell( { suggestion, onLinkPicked } ) {
 	const { title: contentTitle, url, type, isDirectEntry } = suggestion;
 	const title = isDirectEntry ? url : contentTitle;
-	const summary = isDirectEntry ? __( 'Add this link' ) : url;
+	const summary = isDirectEntry ? getSummaryForType( type ) : url;
 
 	const pickLink = () => onLinkPicked( suggestion );
 
