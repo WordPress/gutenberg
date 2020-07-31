@@ -11,6 +11,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	Warning,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
@@ -66,13 +67,13 @@ export default function PostCommentsEdit( {
 				/>
 			</BlockControls>
 
-			<div
-				className={ classnames( 'wp-block-post-comments', {
+			<Block.div
+				className={ classnames( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
 				<PostCommentsDisplay postId={ postId } />
-			</div>
+			</Block.div>
 		</>
 	);
 }
