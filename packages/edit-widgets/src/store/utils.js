@@ -10,21 +10,13 @@ export const KIND = 'root';
  *
  * @type {string}
  */
-export const POST_TYPE = 'postType';
-
-/**
- * Builds an ID for a new navigation post.
- *
- * @param {number} menuId Menu id.
- * @return {string} An ID.
- */
-export const buildSidebarPostId = ( menuId ) => `sidebar-post-${ menuId }`;
+export const WIDGET_ENTITY_TYPE = 'widgetArea';
 
 /**
  * Builds a query to resolve sidebars.
  *
  * @return {Object} Query.
  */
-export function buildSidebarsPostsQuery() {
-	return { type: 'sidebar-page' };
+export function buildWidgetAreasQuery() {
+	return {};
 }

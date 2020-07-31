@@ -6,7 +6,7 @@ import { createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { KIND, POST_TYPE, buildSidebarsPostsQuery } from './utils';
+import { KIND, WIDGET_ENTITY_TYPE, buildWidgetAreasQuery } from './utils';
 
 /**
  * Returns a "stub" sidebar post reflecting the contents of a sidebar with id=sidebarId. The
@@ -16,18 +16,16 @@ import { KIND, POST_TYPE, buildSidebarsPostsQuery } from './utils';
  * @param {number} menuId The id sidebar menu to create a post from.
  * @return {null|Object} Post once the resolver fetches it, otherwise null
  */
-export const getSidebarsPosts = createRegistrySelector(
-	( select ) => ( state ) => {
-		// When the record is unavailable, calling getEditedEntityRecord triggers a http
-		// request via it's related resolver. Let's return nothing until getNavigationPostForMenu
-		// resolver marks the record as resolved.
-		const postsQuery = buildSidebarsPostsQuery();
-		if ( ! hasResolvedSidebarsPost( state, postsQuery ) ) {
-			return null;
-		}
-		return select( 'core' ).getEntityRecords( KIND, POST_TYPE, postsQuery );
+export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
+	if ( ! hasResolvedWidgetAreas() ) {
+		return null;
 	}
-);
+
+	const query = buildWidgetAreasQuery();
+	return select( 'core' )
+		.getEntityRecords( KIND, WIDGET_ENTITY_TYPE, query )
+		.filter( ( { id } ) => id !== 'wp_inactive_widgets' );
+} );
 
 /**
  * Returns true if the navigation post related to menuId was already resolved.
@@ -35,12 +33,30 @@ export const getSidebarsPosts = createRegistrySelector(
  * @param {number} menuId The id of menu.
  * @return {boolean} True if the navigation post related to menuId was already resolved, false otherwise.
  */
-export const hasResolvedSidebarsPost = createRegistrySelector(
-	( select ) => ( state, query ) => {
-		return select( 'core' ).hasFinishedResolution( 'getEntityRecords', [
+export const hasResolvedWidgetAreas = createRegistrySelector(
+	( select ) => () => {
+		const query = buildWidgetAreasQuery();
+		const resolutionFinished = select(
+			'core'
+		).hasFinishedResolution( 'getEntityRecords', [
 			KIND,
-			POST_TYPE,
+			WIDGET_ENTITY_TYPE,
 			query,
 		] );
+		if ( ! resolutionFinished ) {
+			return false;
+		}
+
+		const areas = select( 'core' ).getEntityRecords(
+			KIND,
+			WIDGET_ENTITY_TYPE,
+			query
+		);
+		const contentAssigned = ! areas.length || 'content' in areas[ 0 ];
+		if ( ! contentAssigned ) {
+			return false;
+		}
+
+		return true;
 	}
 );

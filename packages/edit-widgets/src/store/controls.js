@@ -7,7 +7,7 @@ import { createRegistryControl } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { buildSidebarsPostsQuery } from './utils';
+import { buildWidgetAreasQuery } from './utils';
 
 /**
  * Trigger an API Fetch request.
@@ -85,10 +85,10 @@ export function getNavigationPostForMenu( menuId ) {
  * @param query
  * @return {Object} Action.
  */
-export function resolveSidebars() {
+export function resolveWidgetAreas( query = buildWidgetAreasQuery() ) {
 	return {
 		type: 'RESOLVE_SIDEBARS',
-		query: {},
+		query,
 	};
 }
 
@@ -167,7 +167,7 @@ const controls = {
 	RESOLVE_SIDEBARS: createRegistryControl( ( registry ) => ( { query } ) => {
 		return registry
 			.__experimentalResolveSelect( 'core' )
-			.getSidebars( query );
+			.getEntityRecords( 'root', 'widgetArea', query ); //getWidgetAreas( query );
 	} ),
 };
 

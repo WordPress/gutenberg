@@ -31,10 +31,10 @@ export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	...props
 } ) {
-	const { sidebarsPosts, hasUploadPermissions } = useSelect( ( select ) => {
-		const { getSidebarsPosts } = select( 'core/edit-widgets' );
+	const { widgetAreas, hasUploadPermissions } = useSelect( ( select ) => {
+		const { getWidgetAreas } = select( 'core/edit-widgets' );
 		return {
-			sidebarsPosts: getSidebarsPosts() || EMPTY_ARRAY,
+			widgetAreas: getWidgetAreas() || EMPTY_ARRAY,
 			hasUploadPermissions: defaultTo(
 				select( 'core' ).canUser( 'create', 'media' ),
 				true
@@ -44,15 +44,18 @@ export default function WidgetAreasBlockEditorProvider( {
 
 	const [ blocks, setBlocks ] = useState( [] );
 	useEffect( () => {
-		if ( ! sidebarsPosts || ! sidebarsPosts.length || blocks.length > 0 ) {
+		if ( ! widgetAreas || ! widgetAreas.length || blocks.length > 0 ) {
 			return;
 		}
 		setBlocks(
-			sidebarsPosts.map( ( post ) => {
-				return post.blocks[ 0 ];
+			widgetAreas.map( ( { id, name } ) => {
+				return createBlock( 'core/widget-area', {
+					id,
+					name,
+				} );
 			} )
 		);
-	}, [ sidebarsPosts, blocks ] );
+	}, [ widgetAreas, blocks ] );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;

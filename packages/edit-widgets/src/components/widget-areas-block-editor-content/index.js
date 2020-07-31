@@ -18,6 +18,7 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 
 export default function WidgetAreasBlockEditorContent() {
 	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
+
 	return (
 		<>
 			<KeyboardShortcuts />

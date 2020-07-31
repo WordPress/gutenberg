@@ -8,6 +8,11 @@ import { throttle } from 'lodash';
  */
 import { parse, serialize } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { KIND, WIDGET_ENTITY_TYPE } from '../../store/utils';
+
 /*
 Widget area edits made in the Customizer are synced to Customizer
 changesets as an object, encoded as a JSON string, where the keys
@@ -48,21 +53,17 @@ const waitForSelectValue = ( listener, value, changeTrigger ) => {
 
 // Get widget areas from the store in an `id => blocks` mapping.
 const getWidgetAreasObject = () => {
-	const { getEntityRecords, getEditedEntityRecord } = window.wp.data.select(
-		'core'
-	);
+	const { getEditedEntityRecord } = window.wp.data.select( 'core' );
+	const { getWidgetAreas } = window.wp.data.select( 'core/edit-widgets' );
 
-	return getEntityRecords( 'root', 'widgetArea' ).reduce(
-		( widgetAreasObject, { id } ) => {
-			widgetAreasObject[ id ] = getEditedEntityRecord(
-				'root',
-				'widgetArea',
-				id
-			).blocks;
-			return widgetAreasObject;
-		},
-		{}
-	);
+	return getWidgetAreas().reduce( ( widgetAreasObject, { id } ) => {
+		widgetAreasObject[ id ] = getEditedEntityRecord(
+			KIND,
+			WIDGET_ENTITY_TYPE,
+			id
+		).blocks;
+		return widgetAreasObject;
+	}, {} );
 };
 
 // Serialize the provided blocks and render them in the widget area with the provided ID.
@@ -142,21 +143,18 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 			waitForSelectValue(
 				() =>
 					window.wp.data
-						.select( 'core' )
-						.hasFinishedResolution( 'getEntityRecords', [
-							'root',
-							'widgetArea',
-						] ),
+						.select( 'core/edit-widgets' )
+						.hasResolvedWidgetAreas(),
 				true,
 				() =>
 					window.wp.data
-						.select( 'core' )
-						.getEntityRecords( 'root', 'widgetArea' )
+						.select( 'core/edit-widgets' )
+						.getWidgetAreas()
 			).then( () => {
 				Object.keys( widgetAreas ).forEach( ( id ) => {
 					window.wp.data
 						.dispatch( 'core' )
-						.editEntityRecord( 'root', 'widgetArea', id, {
+						.editEntityRecord( KIND, WIDGET_ENTITY_TYPE, id, {
 							content: serialize( widgetAreas[ id ] ),
 							blocks: widgetAreas[ id ],
 						} );

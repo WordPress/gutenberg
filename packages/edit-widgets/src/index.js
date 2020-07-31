@@ -12,6 +12,7 @@ import {
  * Internal dependencies
  */
 import './store';
+export { buildSidebarPostId } from './store/utils';
 import './hooks';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 import CustomizerEditWidgetsInitializer from './components/customizer-edit-widgets-initializer';

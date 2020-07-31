@@ -45,6 +45,7 @@ class LegacyWidgetEdit extends Component {
 		const widgetObject =
 			( id && availableLegacyWidgets[ id ] ) ||
 			( widgetClass && availableLegacyWidgets[ widgetClass ] );
+
 		if ( ! id && ! widgetClass ) {
 			return (
 				<LegacyWidgetPlaceholder
