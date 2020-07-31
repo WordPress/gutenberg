@@ -6,8 +6,7 @@ import {
 	useIsFocused,
 	useNavigation,
 } from '@react-navigation/native';
-import { CardStyleInterpolators } from '@react-navigation/stack';
-import { View, InteractionManager } from 'react-native';
+import { View } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -41,9 +40,9 @@ const BottomSheetScreen = ( { children } ) => {
 				return false;
 			} );
 			if ( heightRef.current.maxHeight !== 0 ) {
-				InteractionManager.runAfterInteractions( () => {
-					setHeight( heightRef.current.maxHeight );
-				} );
+				// InteractionManager.runAfterInteractions( () => {
+				setHeight( heightRef.current.maxHeight );
+				// } );
 			}
 			return () => {};
 		}, [] )
@@ -59,8 +58,17 @@ const BottomSheetScreen = ( { children } ) => {
 	return <View onLayout={ onLayout }>{ children }</View>;
 };
 
-BottomSheetScreen.options = {
-	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+const OuterBottomSheetScreen = ( { name, stack, children, ...otherProps } ) => {
+	const ScreenView = useRef( () => (
+		<BottomSheetScreen>{ children }</BottomSheetScreen>
+	) );
+	return (
+		<stack.Screen
+			name={ name }
+			component={ ScreenView.current }
+			{ ...otherProps }
+		/>
+	);
 };
 
-export default BottomSheetScreen;
+export default OuterBottomSheetScreen;

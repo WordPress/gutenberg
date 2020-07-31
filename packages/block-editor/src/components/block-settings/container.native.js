@@ -4,13 +4,12 @@
 /**
  * External dependencies
  */
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { InspectorControls } from '@wordpress/block-editor';
 import { BottomSheet, ColorSettings } from '@wordpress/components';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -29,18 +28,6 @@ function BottomSheetSettings( {
 	settings,
 	...props
 } ) {
-	const MainScreen = useRef( () => (
-		<BottomSheet.NavigationScreen>
-			<InspectorControls.Slot />
-		</BottomSheet.NavigationScreen>
-	) );
-
-	const DetailsScreen = useRef( () => (
-		<BottomSheet.NavigationScreen>
-			<ColorSettings defaultSettings={ settings } />
-		</BottomSheet.NavigationScreen>
-	) );
-
 	const backgroundStyle = usePreferredColorSchemeStyle(
 		styles.background,
 		styles.backgroundDark
@@ -61,26 +48,22 @@ function BottomSheetSettings( {
 			contentStyle={ styles.content }
 			{ ...props }
 		>
-			<BottomSheet.NavigationContainer animate>
-				<NavigationContainer theme={ MyTheme }>
-					<Stack.Navigator
-						screenOptions={ {
-							headerShown: false,
-							gestureEnabled: false,
-						} }
-					>
-						<Stack.Screen
-							options={ BottomSheet.NavigationScreen.options }
-							name={ blockSettingsScreens.settings }
-							component={ MainScreen.current }
-						/>
-						<Stack.Screen
-							options={ BottomSheet.NavigationScreen.options }
-							name={ blockSettingsScreens.color }
-							component={ DetailsScreen.current }
-						/>
-					</Stack.Navigator>
-				</NavigationContainer>
+			<BottomSheet.NavigationContainer
+				animate
+				main
+				theme={ MyTheme }
+				stack={ Stack }
+			>
+				{ BottomSheet.NavigationScreen( {
+					name: blockSettingsScreens.settings,
+					stack: Stack,
+					children: <InspectorControls.Slot />,
+				} ) }
+				{ BottomSheet.NavigationScreen( {
+					name: blockSettingsScreens.color,
+					stack: Stack,
+					children: <ColorSettings defaultSettings={ settings } />,
+				} ) }
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);

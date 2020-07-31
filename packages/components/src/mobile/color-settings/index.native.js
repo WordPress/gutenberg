@@ -6,7 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 /**
  * WordPress dependencies
  */
-import { useEffect, useContext, useRef } from '@wordpress/element';
+import { useEffect, useContext } from '@wordpress/element';
 import { BottomSheetContext, BottomSheet } from '@wordpress/components';
 import { useRoute } from '@react-navigation/native';
 
@@ -33,49 +33,24 @@ function ColorSettings( { defaultSettings } ) {
 		onHandleClosingBottomSheet( null );
 	}, [] );
 
-	const PaletteScreenView = useRef( () => (
-		<BottomSheet.NavigationScreen>
-			<PaletteScreen />
-		</BottomSheet.NavigationScreen>
-	) );
-
-	const PickerScreenView = useRef( () => (
-		<BottomSheet.NavigationScreen>
-			<PickerScreen />
-		</BottomSheet.NavigationScreen>
-	) );
-
-	const GradientPickerView = useRef( () => (
-		<BottomSheet.NavigationScreen>
-			<GradientPickerScreen />
-		</BottomSheet.NavigationScreen>
-	) );
-
 	return (
-		<BottomSheet.NavigationContainer>
-			<Stack.Navigator
-				screenOptions={ {
-					headerShown: false,
-					gestureEnabled: false,
-				} }
-			>
-				<Stack.Screen
-					name={ colorsUtils.screens.palette }
-					component={ PaletteScreenView.current }
-					options={ BottomSheet.NavigationScreen.options }
-					initialParams={ { defaultSettings, ...route.params } }
-				/>
-				<Stack.Screen
-					name={ colorsUtils.screens.picker }
-					component={ PickerScreenView.current }
-					options={ BottomSheet.NavigationScreen.options }
-				/>
-				<Stack.Screen
-					name={ colorsUtils.screens.gradientPicker }
-					component={ GradientPickerView.current }
-					options={ BottomSheet.NavigationScreen.options }
-				/>
-			</Stack.Navigator>
+		<BottomSheet.NavigationContainer stack={ Stack }>
+			{ BottomSheet.NavigationScreen( {
+				name: colorsUtils.screens.palette,
+				stack: Stack,
+				initialParams: { defaultSettings, ...route.params },
+				children: <PaletteScreen />,
+			} ) }
+			{ BottomSheet.NavigationScreen( {
+				name: colorsUtils.screens.picker,
+				stack: Stack,
+				children: <PickerScreen />,
+			} ) }
+			{ BottomSheet.NavigationScreen( {
+				name: colorsUtils.screens.gradientPicker,
+				stack: Stack,
+				children: <GradientPickerScreen />,
+			} ) }
 		</BottomSheet.NavigationContainer>
 	);
 }
