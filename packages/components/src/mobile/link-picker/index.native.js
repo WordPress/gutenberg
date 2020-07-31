@@ -11,6 +11,8 @@ import { lowerCase, startsWith } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
 import { getProtocol, prependHTTP } from '@wordpress/url';
+import { link } from '@wordpress/icons';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -61,6 +63,11 @@ export const LinkPicker = ( {
 
 	const onSubmit = () => pickLink( directEntry );
 
+	const omniCellStyle = usePreferredColorSchemeStyle(
+		styles.omniCell,
+		styles.omniCellDark
+	);
+
 	return (
 		<SafeAreaView style={ { height: '100%' } }>
 			<NavigationHeader
@@ -69,7 +76,8 @@ export const LinkPicker = ( {
 				applyButtonOnPress={ onSubmit }
 			/>
 			<BottomSheet.Cell
-				style={ styles.omniCell }
+				icon={ link }
+				style={ omniCellStyle }
 				valueStyle={ styles.omniInput }
 				value={ value }
 				placeholder={ __( 'Search or type URL' ) }
@@ -80,6 +88,7 @@ export const LinkPicker = ( {
 				onSubmit={ onSubmit }
 				/* eslint-disable-next-line jsx-a11y/no-autofocus */
 				autoFocus={ true }
+				separatorType="none"
 			/>
 			{ !! value && (
 				<LinkPickerResults
