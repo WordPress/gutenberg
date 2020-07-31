@@ -28,7 +28,8 @@ export default ( {
 		[ clientId ]
 	);
 
-	const showInnerBlocks = attributes.initialOpen || isSelected || innerBlockSelected;
+	const showInnerBlocks =
+		attributes.initialOpen || isSelected || innerBlockSelected;
 
 	const classes = classnames(
 		{
@@ -54,7 +55,9 @@ export default ( {
 			<InspectorControls>
 				<ToggleControl
 					label={ __( 'Open by default' ) }
-					onChange={ ( initialOpen ) => setAttributes( { initialOpen } ) }
+					onChange={ ( initialOpen ) =>
+						setAttributes( { initialOpen } )
+					}
 					checked={ attributes.initialOpen }
 				/>
 			</InspectorControls>
