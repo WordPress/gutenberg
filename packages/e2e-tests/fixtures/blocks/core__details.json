@@ -1,0 +1,36 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/details",
+        "isValid": true,
+        "attributes": {
+            "initialOpen": false,
+            "content": "This is the summary "
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/heading",
+                "isValid": true,
+                "attributes": {
+                    "content": "More here",
+                    "level": 2
+                },
+                "innerBlocks": [],
+                "originalContent": "<h2>More here</h2>"
+            },
+            {
+                "clientId": "_clientId_1",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "",
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p></p>"
+            }
+        ],
+        "originalContent": "<details class=\"wp-block-details\">\n\t<summary>This is the summary </summary>\n\t\n\n\t\n</details>"
+    }
+]

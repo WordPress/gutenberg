@@ -1,0 +1,46 @@
+[
+    {
+        "blockName": "core/details",
+        "attrs": {
+            "content": "This is the summary ",
+            "initialOpen": false
+        },
+        "innerBlocks": [
+            {
+                "blockName": "core/heading",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t<h2>More here</h2>\n\t",
+                "innerContent": [
+                    "\n\t<h2>More here</h2>\n\t"
+                ]
+            },
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t<p></p>\n\t",
+                "innerContent": [
+                    "\n\t<p></p>\n\t"
+                ]
+            }
+        ],
+        "innerHTML": "\n<details class=\"wp-block-details\">\n\t<summary>This is the summary </summary>\n\t\n\n\t\n</details>\n",
+        "innerContent": [
+            "\n<details class=\"wp-block-details\">\n\t<summary>This is the summary </summary>\n\t",
+            null,
+            "\n\n\t",
+            null,
+            "\n</details>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]
