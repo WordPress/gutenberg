@@ -26,6 +26,7 @@
 	],
 	"supports": {
 		"html": false,
+		"lightBlockWrapper": true,
 		"__experimentalFontSize": true,
 		"__experimentalColor": {
 			"gradients": true,

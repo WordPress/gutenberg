@@ -14,6 +14,7 @@ import {
 	InspectorControls,
 	RichText,
 	Warning,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -56,6 +57,7 @@ function PostExcerptEditor( {
 		postId,
 		postType
 	);
+
 	return (
 		<>
 			<BlockControls>
@@ -90,8 +92,8 @@ function PostExcerptEditor( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div
-				className={ classnames( 'wp-block-post-excerpt', {
+			<Block.div
+				className={ classnames( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
@@ -133,7 +135,7 @@ function PostExcerptEditor( {
 						}
 					/>
 				) }
-			</div>
+			</Block.div>
 		</>
 	);
 }
