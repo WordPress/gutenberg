@@ -1,11 +1,10 @@
 .wp-block-details {
 	.block-library-details__pseudo-summary {
-		margin-left: -1.25em;
+		&::before {
+			content: "▶ ";
+		}
 	}
 
-	.block-library-details__pseudo-summary::before {
-		content: "▶ ";
-	}
 }
 
 .wp-block-details.is-open {

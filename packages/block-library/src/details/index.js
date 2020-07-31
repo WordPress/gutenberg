@@ -16,9 +16,11 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Details' ),
+	description: __( 'Create a toggle to show and hide blocks' ),
 	category,
 	edit,
 	save,
-	keywords: [ __( 'accordion' ) ],
+	// details and summary are not translated because they are the HTML tags
+	keywords: [ 'details', 'summary' ],
 	attributes,
 };

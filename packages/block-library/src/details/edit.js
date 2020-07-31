@@ -6,9 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, RichText } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	RichText,
+	InspectorControls,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { ToggleControl } from '@wordpress/components';
 
 export default ( {
 	attributes,
@@ -23,7 +28,7 @@ export default ( {
 		[ clientId ]
 	);
 
-	const showInnerBlocks = isSelected || innerBlockSelected;
+	const showInnerBlocks = attributes.open || isSelected || innerBlockSelected;
 
 	const classes = classnames(
 		{
@@ -46,13 +51,21 @@ export default ( {
 	 */
 	return (
 		<>
+			<InspectorControls>
+				<ToggleControl
+					label={ __( 'Open by default' ) }
+					onChange={ ( open ) => setAttributes( { open } ) }
+					checked={ attributes.open }
+				/>
+			</InspectorControls>
 			<div className={ classes }>
 				<RichText
 					tagName="div"
 					className="block-library-details__pseudo-summary"
 					value={ attributes.content }
 					onChange={ ( content ) => setAttributes( { content } ) }
-					placeholder={ __( 'Visible Content' ) }
+					placeholder={ __( 'Write a summary…' ) }
+					aria-label={ __( 'Summary text' ) }
 				/>
 				{ showInnerBlocks && <InnerBlocks /> }
 			</div>

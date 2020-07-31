@@ -2,6 +2,10 @@
 	"name": "core/details",
 	"category": "layout",
 	"attributes": {
+		"open": {
+			"type": "boolean",
+			"default": false
+		},
 		"content": {
 			"type": "string"
 		}
