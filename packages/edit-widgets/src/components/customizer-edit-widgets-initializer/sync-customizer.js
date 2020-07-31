@@ -11,7 +11,7 @@ import { parse, serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { KIND, WIDGET_ENTITY_TYPE } from '../../store/utils';
+import { KIND, WIDGET_AREA_ENTITY_TYPE } from '../../store/utils';
 
 /*
 Widget area edits made in the Customizer are synced to Customizer
@@ -59,7 +59,7 @@ const getWidgetAreasObject = () => {
 	return getWidgetAreas().reduce( ( widgetAreasObject, { id } ) => {
 		widgetAreasObject[ id ] = getEditedEntityRecord(
 			KIND,
-			WIDGET_ENTITY_TYPE,
+			WIDGET_AREA_ENTITY_TYPE,
 			id
 		).blocks;
 		return widgetAreasObject;
@@ -154,7 +154,7 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 				Object.keys( widgetAreas ).forEach( ( id ) => {
 					window.wp.data
 						.dispatch( 'core' )
-						.editEntityRecord( KIND, WIDGET_ENTITY_TYPE, id, {
+						.editEntityRecord( KIND, WIDGET_AREA_ENTITY_TYPE, id, {
 							content: serialize( widgetAreas[ id ] ),
 							blocks: widgetAreas[ id ],
 						} );

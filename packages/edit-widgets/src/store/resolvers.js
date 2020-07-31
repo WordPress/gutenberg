@@ -7,7 +7,7 @@ import { parse, createBlock, serialize } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { resolveWidgetAreas, select, dispatch } from './controls';
-import { KIND, WIDGET_ENTITY_TYPE, buildWidgetAreasQuery } from './utils';
+import { KIND, WIDGET_AREA_ENTITY_TYPE, buildWidgetAreasQuery } from './utils';
 
 export function* getWidgetAreas() {
 	const query = buildWidgetAreasQuery();
@@ -16,7 +16,7 @@ export function* getWidgetAreas() {
 		'core',
 		'getEntityRecords',
 		KIND,
-		WIDGET_ENTITY_TYPE,
+		WIDGET_AREA_ENTITY_TYPE,
 		query
 	);
 	widgetAreas = widgetAreas.map( ( sidebar ) => ( {
@@ -30,7 +30,7 @@ export function* getWidgetAreas() {
 		'core',
 		'receiveEntityRecords',
 		KIND,
-		WIDGET_ENTITY_TYPE,
+		WIDGET_AREA_ENTITY_TYPE,
 		widgetAreas,
 		query
 	);

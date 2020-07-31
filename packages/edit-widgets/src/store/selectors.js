@@ -6,7 +6,7 @@ import { createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { KIND, WIDGET_ENTITY_TYPE, buildWidgetAreasQuery } from './utils';
+import { KIND, WIDGET_AREA_ENTITY_TYPE, buildWidgetAreasQuery } from './utils';
 
 /**
  * Returns a "stub" sidebar post reflecting the contents of a sidebar with id=sidebarId. The
@@ -23,9 +23,51 @@ export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 
 	const query = buildWidgetAreasQuery();
 	return select( 'core' )
-		.getEntityRecords( KIND, WIDGET_ENTITY_TYPE, query )
+		.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query )
 		.filter( ( { id } ) => id !== 'wp_inactive_widgets' );
 } );
+
+export const getEditedWidgetAreas = createRegistrySelector(
+	( select ) => ( state, ids ) => {
+		let widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+		if ( ! widgetAreas ) {
+			return [];
+		}
+		if ( ids ) {
+			widgetAreas = widgetAreas.filter( ( { id } ) =>
+				ids.includes( id )
+			);
+		}
+		return widgetAreas.filter( ( { id } ) =>
+			select( 'core' ).hasEditsForEntityRecord(
+				KIND,
+				WIDGET_AREA_ENTITY_TYPE,
+				id
+			)
+		);
+	}
+);
+
+export const isSavingWidgetAreas = createRegistrySelector(
+	( select ) => ( state, ids ) => {
+		if ( ! ids ) {
+			ids = select( 'core/edit-widgets' )
+				.getWidgetAreas()
+				?.map( ( { id } ) => id );
+		}
+		for ( const id in ids ) {
+			const isSaving = select( 'core' ).isSavingEntityRecord(
+				KIND,
+				WIDGET_AREA_ENTITY_TYPE,
+				id
+			);
+			if ( isSaving ) {
+				return true;
+			}
+		}
+		return false;
+	}
+);
 
 /**
  * Returns true if the navigation post related to menuId was already resolved.
@@ -40,7 +82,7 @@ export const hasResolvedWidgetAreas = createRegistrySelector(
 			'core'
 		).hasFinishedResolution( 'getEntityRecords', [
 			KIND,
-			WIDGET_ENTITY_TYPE,
+			WIDGET_AREA_ENTITY_TYPE,
 			query,
 		] );
 		if ( ! resolutionFinished ) {
@@ -49,7 +91,7 @@ export const hasResolvedWidgetAreas = createRegistrySelector(
 
 		const areas = select( 'core' ).getEntityRecords(
 			KIND,
-			WIDGET_ENTITY_TYPE,
+			WIDGET_AREA_ENTITY_TYPE,
 			query
 		);
 		const contentAssigned = ! areas.length || 'content' in areas[ 0 ];

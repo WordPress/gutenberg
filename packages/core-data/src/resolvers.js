@@ -54,7 +54,7 @@ export function* getCurrentUser() {
 export function* getEntityRecord( kind, name, key = '' ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( entity ) {
 		return;
 	}
 	const record = yield apiFetch( {
