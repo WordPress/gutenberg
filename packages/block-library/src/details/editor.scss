@@ -1,6 +1,7 @@
 .wp-block-details {
 	.block-library-details__pseudo-summary {
 		&::before {
+			display: inline-block;
 			content: "▶ ";
 		}
 	}
@@ -9,6 +10,6 @@
 
 .wp-block-details.is-open {
 	.block-library-details__pseudo-summary::before {
-		content: "▼ ";
+		transform: rotate(90deg);
 	}
 }
