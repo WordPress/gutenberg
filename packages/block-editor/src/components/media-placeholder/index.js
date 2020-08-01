@@ -157,7 +157,7 @@ export function MediaPlaceholder( {
 			setMedia = ( [ media ] ) => onSelect( media );
 		}
 		mediaUpload( {
-			allowedTypes,
+			allowedTypes: allowedTypes.length > 0 ? allowedTypes : undefined,
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
