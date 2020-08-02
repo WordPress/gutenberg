@@ -18,7 +18,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-export const FONT_SIZE_SUPPORT_KEY = '__experimentalFontSize';
+export const FONT_SIZE_SUPPORT_KEY = '__experimentalStyles.typography.fontSize';
 
 /**
  * Filters registered block settings, extending attributes to include

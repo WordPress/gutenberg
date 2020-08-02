@@ -30,7 +30,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import ColorPanel from './color-panel';
 
-export const COLOR_SUPPORT_KEY = '__experimentalColor';
+export const COLOR_SUPPORT_KEY = '__experimentalStyles.color';
 
 const hasColorSupport = ( blockType ) =>
 	Platform.OS === 'web' && hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
@@ -42,7 +42,7 @@ const hasLinkColorSupport = ( blockType ) => {
 
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.linkColor;
+	return isObject( colorSupport ) && !! colorSupport.link;
 };
 
 const hasGradientSupport = ( blockType ) => {
@@ -52,7 +52,7 @@ const hasGradientSupport = ( blockType ) => {
 
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.gradients;
+	return isObject( colorSupport ) && !! colorSupport.gradient;
 };
 
 /**

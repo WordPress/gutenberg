@@ -10,7 +10,8 @@ import { useSelect } from '@wordpress/data';
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
 
-export const LINE_HEIGHT_SUPPORT_KEY = '__experimentalLineHeight';
+export const LINE_HEIGHT_SUPPORT_KEY =
+	'__experimentalStyles.typography.lineHeight';
 
 /**
  * Inspector control panel containing the line height related configuration
