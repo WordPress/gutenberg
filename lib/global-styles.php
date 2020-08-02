@@ -6,6 +6,44 @@
  */
 
 /**
+ * Returns the paths to get the information about a particular
+ * style property from the block.json or the theme.json.
+ */
+function gutenberg_experimental_global_styles_get_mappings() {
+	$mappings = array(
+		'line-height'              => array(
+			'theme_json' => array( 'typography', 'lineHeight' ),
+			'block_json' => array( '__experimentalLineHeight' ),
+		),
+		'font-size'                => array(
+			'block_json' => array( '__experimentalFontSize' ),
+			'theme_json' => array( 'typography', 'fontSize' ),
+		),
+		'background'               => array(
+			'block_json' => array( '__experimentalColor', 'gradients' ),
+			'theme_json' => array( 'color', 'gradient' ),
+		),
+		'background-color'         => array(
+			'block_json' => array( '__experimentalColor' ),
+			'theme_json' => array( 'color', 'background' ),
+		),
+		'color'                    => array(
+			'block_json' => array( '__experimentalColor' ),
+			'theme_json' => array( 'color', 'text' ),
+		),
+		'--wp--style--color--link' => array(
+			'block_json' => array( '__experimentalColor', 'linkColor' ),
+			'theme_json' => array( 'color', 'link' ),
+		),
+		'block-align'      => array(
+			'block_json' => array( 'align' ),
+		),
+	);
+
+	return $mappings;
+}
+
+/**
  * Whether the current theme has a theme.json file.
  *
  * @return boolean
@@ -269,19 +307,11 @@ function gutenberg_experimental_global_styles_get_theme() {
  * @return array Style features supported by the block.
  */
 function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
-	$style_features = array(
-		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
-		'background-color'         => array( '__experimentalColor' ),
-		'background'               => array( '__experimentalColor', 'gradients' ),
-		'block-align'              => array( 'align' ),
-		'color'                    => array( '__experimentalColor' ),
-		'font-size'                => array( '__experimentalFontSize' ),
-		'line-height'              => array( '__experimentalLineHeight' ),
-	);
+	$mappings = gutenberg_experimental_global_styles_get_mappings();
 
 	$supported_features = array();
-	foreach ( $style_features as $style_feature => $path ) {
-		if ( gutenberg_experimental_get( $supports, $path ) ) {
+	foreach ( $mappings as $style_feature => $path ) {
+		if ( gutenberg_experimental_get( $supports, $path['block_json'] ) ) {
 			$supported_features[] = $style_feature;
 		}
 	}
@@ -370,19 +400,12 @@ function gutenberg_experimental_global_styles_get_block_data() {
  * @return array Containing a set of css rules.
  */
 function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
-	$mappings = array(
-		'line-height'              => array( 'typography', 'lineHeight' ),
-		'font-size'                => array( 'typography', 'fontSize' ),
-		'background'               => array( 'color', 'gradient' ),
-		'background-color'         => array( 'color', 'background' ),
-		'color'                    => array( 'color', 'text' ),
-		'--wp--style--color--link' => array( 'color', 'link' ),
-	);
+	$mappings = gutenberg_experimental_global_styles_get_mappings();
 
 	$result = array();
 
 	foreach ( $mappings as $key => $path ) {
-		$value = gutenberg_experimental_get( $styles, $path, null );
+		$value = gutenberg_experimental_get( $styles, $path['theme_json'], null );
 		if ( null !== $value ) {
 			$result[ $key ] = $value;
 		}
