@@ -24,11 +24,8 @@ const getYearMonth = memoize( ( date ) => {
 
 export default function CalendarEdit( { attributes } ) {
 	const date = useSelect( ( select ) => {
-		const coreEditorSelect = select( 'core/editor' );
-		if ( ! coreEditorSelect ) {
-			return;
-		}
-		const { getEditedPostAttribute } = coreEditorSelect;
+		const { getEditedPostAttribute } = select( 'core/editor' );
+
 		const postType = getEditedPostAttribute( 'type' );
 		// Dates are used to overwrite year and month used on the calendar.
 		// This overwrite should only happen for 'post' post types.
