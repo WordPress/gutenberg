@@ -18,6 +18,14 @@
 		"__experimentalColor": {
 			"gradients": true,
 			"linkColor": true
+		},
+		"__experimentalStyles": {
+			"color": {
+				"background": true,
+				"gradient": true,
+				"link": true,
+				"text": true
+			}
 		}
 	}
 }

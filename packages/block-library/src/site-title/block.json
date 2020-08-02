@@ -17,6 +17,17 @@
 			"gradients": true
 		},
 		"__experimentalFontSize": true,
-		"__experimentalLineHeight": true
+		"__experimentalLineHeight": true,
+		"__experimentalStyles": {
+			"color": {
+				"background": true,
+				"gradient": true,
+				"text": true
+			},
+			"typography": {
+				"fontSize": true,
+				"lineHeight": true
+			}
+		}
 	}
 }

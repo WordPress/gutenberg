@@ -32,6 +32,18 @@
 			"gradients": true,
 			"linkColor": true
 		},
-		"__experimentalLineHeight": true
+		"__experimentalLineHeight": true,
+		"__experimentalStyles": {
+			"color": {
+				"background": true,
+				"gradient": true,
+				"link": true,
+				"text": true
+			},
+			"typography": {
+				"fontSize": true,
+				"lineHeight": true
+			}
+		}
 	}
 }

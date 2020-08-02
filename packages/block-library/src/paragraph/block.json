@@ -41,6 +41,17 @@
 			}
 		},
 		"__experimentalSelector": "p",
+		"__experimentalStyles": {
+			"color": {
+				"background": true,
+				"link": true,
+				"text": true
+			},
+			"typography": {
+				"fontSize": true,
+				"lineHeight": true
+			}
+		},
 		"__unstablePasteTextInline": true
 	}
 }

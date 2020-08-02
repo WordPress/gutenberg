@@ -36,6 +36,17 @@
 			"core/heading/h5": "h5",
 			"core/heading/h6": "h6"
 		},
+		"__experimentalStyles": {
+			"color": {
+				"background": true,
+				"link": true,
+				"text": true
+			},
+			"typography": {
+				"fontSize": true,
+				"lineHeight": true
+			}
+		},
 		"__unstablePasteTextInline": true
 	}
 }
