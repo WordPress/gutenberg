@@ -24,12 +24,6 @@
 	"supports": {
 		"html": false,
 		"lightBlockWrapper": true,
-		"__experimentalFontSize": true,
-		"__experimentalColor": {
-			"gradients": true,
-			"linkColor": true
-		},
-		"__experimentalLineHeight": true,
 		"__experimentalStyles": {
 			"color": {
 				"background": true,

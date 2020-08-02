@@ -85,10 +85,6 @@
 		],
 		"html": false,
 		"lightBlockWrapper": true,
-		"__experimentalColor": {
-			"gradients": true,
-			"linkColor": true
-		},
 		"__experimentalStyles": {
 			"color": {
 				"background": true,
