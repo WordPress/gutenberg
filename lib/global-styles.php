@@ -16,7 +16,7 @@ function gutenberg_experimental_global_styles_get_mappings() {
 		'background'               => array( 'color', 'gradient' ),
 		'background-color'         => array( 'color', 'background' ),
 		'color'                    => array( 'color', 'text' ),
-		'--wp--style--color--link' => array( 'color', 'link' )
+		'--wp--style--color--link' => array( 'color', 'link' ),
 	);
 }
 
@@ -286,18 +286,15 @@ function gutenberg_experimental_global_styles_get_theme() {
 function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
 	$mappings = array_merge(
 		gutenberg_experimental_global_styles_get_mappings(),
-		// TODO: remove from here and access directly from lib/blocks.php
+		// TODO: remove from here and access directly from lib/blocks.php.
 		array(
-			'block-align' => array( 'align' )
+			'block-align' => array( 'align' ),
 		)
 	);
 
 	$supported_features = array();
 	foreach ( $mappings as $style_feature => $path ) {
-		if ( gutenberg_experimental_get(
-				$supports,
-				array_merge( array( '__experimentalStyles' ) , $path )
-		) ) {
+		if ( gutenberg_experimental_get( $supports, array_merge( array( '__experimentalStyles' ), $path ) ) ) {
 			$supported_features[] = $style_feature;
 		}
 	}
