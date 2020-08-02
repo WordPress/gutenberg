@@ -10,37 +10,14 @@
  * style property from the block.json or the theme.json.
  */
 function gutenberg_experimental_global_styles_get_mappings() {
-	$mappings = array(
-		'line-height'              => array(
-			'theme_json' => array( 'typography', 'lineHeight' ),
-			'block_json' => array( '__experimentalLineHeight' ),
-		),
-		'font-size'                => array(
-			'block_json' => array( '__experimentalFontSize' ),
-			'theme_json' => array( 'typography', 'fontSize' ),
-		),
-		'background'               => array(
-			'block_json' => array( '__experimentalColor', 'gradients' ),
-			'theme_json' => array( 'color', 'gradient' ),
-		),
-		'background-color'         => array(
-			'block_json' => array( '__experimentalColor' ),
-			'theme_json' => array( 'color', 'background' ),
-		),
-		'color'                    => array(
-			'block_json' => array( '__experimentalColor' ),
-			'theme_json' => array( 'color', 'text' ),
-		),
-		'--wp--style--color--link' => array(
-			'block_json' => array( '__experimentalColor', 'linkColor' ),
-			'theme_json' => array( 'color', 'link' ),
-		),
-		'block-align'      => array(
-			'block_json' => array( 'align' ),
-		),
+	return array(
+		'line-height'              => array( 'typography', 'lineHeight' ),
+		'font-size'                => array( 'typography', 'fontSize' ),
+		'background'               => array( 'color', 'gradient' ),
+		'background-color'         => array( 'color', 'background' ),
+		'color'                    => array( 'color', 'text' ),
+		'--wp--style--color--link' => array( 'color', 'link' )
 	);
-
-	return $mappings;
 }
 
 /**
@@ -307,11 +284,20 @@ function gutenberg_experimental_global_styles_get_theme() {
  * @return array Style features supported by the block.
  */
 function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
-	$mappings = gutenberg_experimental_global_styles_get_mappings();
+	$mappings = array_merge(
+		gutenberg_experimental_global_styles_get_mappings(),
+		// TODO: remove from here and access directly from lib/blocks.php
+		array(
+			'block-align' => array( 'align' )
+		)
+	);
 
 	$supported_features = array();
 	foreach ( $mappings as $style_feature => $path ) {
-		if ( gutenberg_experimental_get( $supports, $path['block_json'] ) ) {
+		if ( gutenberg_experimental_get(
+				$supports,
+				array_merge( array( '__experimentalStyles' ) , $path )
+		) ) {
 			$supported_features[] = $style_feature;
 		}
 	}
@@ -405,7 +391,7 @@ function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
 	$result = array();
 
 	foreach ( $mappings as $key => $path ) {
-		$value = gutenberg_experimental_get( $styles, $path['theme_json'], null );
+		$value = gutenberg_experimental_get( $styles, $path, null );
 		if ( null !== $value ) {
 			$result[ $key ] = $value;
 		}
