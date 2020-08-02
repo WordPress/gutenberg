@@ -99,7 +99,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 					'color' => array(
 						'background' => true,
 						'text'       => true,
-					)
+					),
 				),
 			),
 			'render_callback' => true,
@@ -136,7 +136,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 					'color' => array(
 						'background' => true,
 						'text'       => true,
-					)
+					),
 				),
 			),
 			'render_callback' => true,
@@ -179,7 +179,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 						'background' => true,
 						'link'       => true,
 						'text'       => true,
-					)
+					),
 				),
 			),
 			'render_callback' => true,
@@ -214,7 +214,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 						'background' => true,
 						'link'       => true,
 						'text'       => true,
-					)
+					),
 				),
 			),
 			'render_callback' => true,
@@ -249,7 +249,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 						'background' => true,
 						'gradient'   => true,
 						'text'       => true,
-					)
+					),
 				),
 			),
 			'render_callback' => true,
@@ -284,7 +284,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 						'background' => true,
 						'gradient'   => true,
 						'text'       => true,
-					)
+					),
 				),
 			),
 			'render_callback' => true,
@@ -352,7 +352,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'supports'        => array(
 				'__experimentalStyles' => array(
 					'typography' => array(
-						'fontSize' => true
+						'fontSize' => true,
 					),
 				),
 			),
@@ -385,7 +385,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'supports'        => array(
 				'__experimentalStyles' => array(
 					'typography' => array(
-						'fontSize' => true
+						'fontSize' => true,
 					),
 				),
 			),
@@ -446,7 +446,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'supports'        => array(
 				'__experimentalStyles' => array(
 					'typography' => array(
-						'lineHeight' => true
+						'lineHeight' => true,
 					),
 				),
 			),
@@ -563,14 +563,14 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 				'__experimentalStyles' => array(
 					'color'      => array(
 						'gradient' => true,
-						'link' => true,
+						'link'     => true,
 					),
 					'typography' => array(
 						'fontSize'   => true,
 						'lineHeight' => true,
 					),
 				),
-				'align'                    => true,
+				'align'                => true,
 			),
 			'render_callback' => true,
 		);
@@ -614,7 +614,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'supports'        => array(
 				'__experimentalStyles' => array(
 					'typography' => array(
-						'fontSize' => true
+						'fontSize' => true,
 					),
 				),
 			),
@@ -657,7 +657,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes' => array(),
 			'supports'   => array(
-				'align'                    => true,
+				'align'                => true,
 				'__experimentalStyles' => array(
 					'color'      => array(
 						'gradient' => true,
