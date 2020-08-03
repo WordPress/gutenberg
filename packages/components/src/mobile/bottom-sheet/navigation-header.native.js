@@ -19,6 +19,7 @@ function BottomSheetNavigationHeader( {
 	leftButtonOnPress,
 	screen,
 	applyButtonOnPress,
+	isFullscreen,
 } ) {
 	const isIOS = Platform.OS === 'ios';
 
@@ -43,8 +44,26 @@ function BottomSheetNavigationHeader( {
 		styles.applyButtonDark
 	);
 
-	return (
-		<View style={ styles.bottomSheetHeader }>
+	const renderBackButton = () => {
+		let backIcon;
+		let backText;
+
+		if ( isIOS ) {
+			backIcon = isFullscreen ? undefined : (
+				<Icon
+					icon={ chevronLeft }
+					size={ 40 }
+					style={ chevronLeftStyle }
+				/>
+			);
+			backText = isFullscreen ? __( 'Close' ) : __( 'Back' );
+		} else {
+			backIcon = (
+				<Icon icon={ arrowLeft } size={ 24 } style={ arrowLeftStyle } />
+			);
+		}
+
+		return (
 			<TouchableWithoutFeedback
 				onPress={ leftButtonOnPress }
 				accessibilityRole={ 'button' }
@@ -54,29 +73,25 @@ function BottomSheetNavigationHeader( {
 				) }
 			>
 				<View style={ styles.bottomSheetBackButton }>
-					{ isIOS ? (
-						<>
-							<Icon
-								icon={ chevronLeft }
-								size={ 40 }
-								style={ chevronLeftStyle }
-							/>
+					<>
+						{ backIcon }
+						{ backText && (
 							<Text
 								style={ bottomSheetButtonTextStyle }
 								maxFontSizeMultiplier={ 2 }
 							>
-								{ __( 'Back' ) }
+								{ backText }
 							</Text>
-						</>
-					) : (
-						<Icon
-							icon={ arrowLeft }
-							size={ 24 }
-							style={ arrowLeftStyle }
-						/>
-					) }
+						) }
+					</>
 				</View>
 			</TouchableWithoutFeedback>
+		);
+	};
+
+	return (
+		<View style={ styles.bottomSheetHeader }>
+			{ renderBackButton() }
 			<Text
 				style={ bottomSheetHeaderTitleStyle }
 				maxFontSizeMultiplier={ 3 }

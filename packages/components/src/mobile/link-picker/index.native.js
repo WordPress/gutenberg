@@ -74,6 +74,7 @@ export const LinkPicker = ( {
 				screen={ __( 'Link to' ) }
 				leftButtonOnPress={ cancel }
 				applyButtonOnPress={ onSubmit }
+				isFullscreen
 			/>
 			<BottomSheet.Cell
 				icon={ link }
