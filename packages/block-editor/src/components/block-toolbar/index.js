@@ -106,40 +106,33 @@ export default function BlockToolbar( {
 
 	return (
 		<Wrapper className={ classes }>
-			<div
-				className="block-editor-block-toolbar__mover-switcher-container"
-				ref={ nodeRef }
-				{ ...showMoversGestures }
-			>
+			<div ref={ nodeRef } { ...showMoversGestures }>
 				{ ! isMultiToolbar && (
 					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
 						<BlockParentSelector clientIds={ blockClientIds } />
 					</div>
 				) }
-
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<BlockDraggable
-						clientIds={ blockClientIds }
-						cloneClassname="block-editor-block-toolbar__drag-clone"
-					>
-						{ ( {
-							isDraggable,
-							onDraggableStart,
-							onDraggableEnd,
-						} ) => (
-							<div
-								className="block-editor-block-toolbar__block-switcher-wrapper"
-								draggable={ isDraggable && ! hideDragHandle }
-								onDragStart={ onDraggableStart }
-								onDragEnd={ onDraggableEnd }
-							>
-								<BlockSwitcher clientIds={ blockClientIds } />
-								<BlockMover clientIds={ blockClientIds } />
-							</div>
-						) }
-					</BlockDraggable>
+					<BlockSwitcher clientIds={ blockClientIds } />
 				) }
 			</div>
+			{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
+				<BlockDraggable
+					clientIds={ blockClientIds }
+					cloneClassname="block-editor-block-toolbar__drag-clone"
+				>
+					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+						<div
+							className="block-editor-block-toolbar__drag-handle-area"
+							draggable={ isDraggable && ! hideDragHandle }
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+						>
+							<BlockMover clientIds={ blockClientIds } />
+						</div>
+					) }
+				</BlockDraggable>
+			) }
 			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot
