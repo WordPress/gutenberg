@@ -221,29 +221,23 @@ function BlockListBlock( {
 
 	let block;
 
-	if ( isValid ) {
-		if ( mode === 'html' ) {
-			block = (
-				<Block.div __unstableIsHtml>
-					<BlockHtml clientId={ clientId } />
-				</Block.div>
-			);
-		} else if ( lightBlockWrapper ) {
-			block = blockEdit;
-		} else {
-			block = (
-				<Block.div { ...wrapperProps }>
-					{ blockEdit }
-				</Block.div>
-			);
-		}
-	} else {
+	if ( ! isValid ) {
 		block = (
 			<Block.div>
 				<BlockInvalidWarning clientId={ clientId } />
 				<div>{ getSaveElement( blockType, attributes ) }</div>
 			</Block.div>
 		);
+	} else if ( mode === 'html' ) {
+		block = (
+			<Block.div __unstableIsHtml>
+				<BlockHtml clientId={ clientId } />
+			</Block.div>
+		);
+	} else if ( lightBlockWrapper ) {
+		block = blockEdit;
+	} else {
+		block = <Block.div { ...wrapperProps }>{ blockEdit }</Block.div>;
 	}
 
 	return (
