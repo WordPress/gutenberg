@@ -197,10 +197,6 @@ function BlockListBlock( {
 		);
 	}
 
-	if ( mode !== 'visual' ) {
-		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
-	}
-
 	const value = {
 		clientId,
 		rootClientId,
@@ -229,10 +225,15 @@ function BlockListBlock( {
 			</Block.div>
 		);
 	} else if ( mode === 'html' ) {
+		// Render blockEdit so the inspector controls don't disappear.
+		// See #8969.
 		block = (
-			<Block.div __unstableIsHtml>
-				<BlockHtml clientId={ clientId } />
-			</Block.div>
+			<>
+				<div style={ { display: 'none' } }>{ blockEdit }</div>
+				<Block.div __unstableIsHtml>
+					<BlockHtml clientId={ clientId } />
+				</Block.div>
+			</>
 		);
 	} else if ( lightBlockWrapper ) {
 		block = blockEdit;
