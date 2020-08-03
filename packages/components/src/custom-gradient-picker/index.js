@@ -4,6 +4,11 @@
 import { get, omit } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import AnglePickerControl from '../angle-picker-control';
@@ -79,9 +84,10 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	return (
 		<SelectControl
 			className="components-custom-gradient-picker__type-picker"
-			value={ hasGradient && type }
-			options={ GRADIENT_OPTIONS }
+			label={ __( 'Type' ) }
 			onChange={ handleOnChange }
+			options={ GRADIENT_OPTIONS }
+			value={ hasGradient && type }
 		/>
 	);
 };
