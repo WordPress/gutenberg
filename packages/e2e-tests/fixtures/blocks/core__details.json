@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "initialOpen": false,
-            "content": "This is the summary "
+            "summaryContent": "This is the summary "
         },
         "innerBlocks": [
             {

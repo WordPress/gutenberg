@@ -65,8 +65,8 @@ export default ( {
 				<RichText
 					tagName="div"
 					className="block-library-details__pseudo-summary"
-					value={ attributes.content }
-					onChange={ ( content ) => setAttributes( { content } ) }
+					value={ attributes.summaryContent }
+					onChange={ ( summaryContent ) => setAttributes( { summaryContent } ) }
 					placeholder={ __( 'Write a summary…' ) }
 					aria-label={ __( 'Summary text' ) }
 				/>

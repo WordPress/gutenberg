@@ -2,7 +2,7 @@
     {
         "blockName": "core/details",
         "attrs": {
-            "content": "This is the summary ",
+            "summaryContent": "This is the summary ",
             "initialOpen": false
         },
         "innerBlocks": [
