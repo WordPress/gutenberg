@@ -50,4 +50,7 @@
 	// Set z-index as if it's displayed on the bottom, otherwise the modal
 	// dialog popover might overlap if displayed on the bottom.
 	z-index: z-index(".components-popover.block-editor-warning__dropdown");
+	.components-menu-item__button {
+		padding: 6px 12px;
+	}
 }
