@@ -219,33 +219,37 @@ function BlockListBlock( {
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
+	let block;
+
+	if ( isValid ) {
+		if ( mode === 'html' ) {
+			block = (
+				<Block.div __unstableIsHtml>
+					<BlockHtml clientId={ clientId } />
+				</Block.div>
+			);
+		} else if ( lightBlockWrapper ) {
+			block = blockEdit;
+		} else {
+			block = (
+				<Block.div { ...wrapperProps }>
+					{ blockEdit }
+				</Block.div>
+			);
+		}
+	} else {
+		block = (
+			<Block.div>
+				<BlockInvalidWarning clientId={ clientId } />
+				<div>{ getSaveElement( blockType, attributes ) }</div>
+			</Block.div>
+		);
+	}
+
 	return (
 		<BlockListBlockContext.Provider value={ memoizedValue }>
 			<BlockCrashBoundary onError={ onBlockError }>
-				{ isValid && lightBlockWrapper && (
-					<>
-						{ blockEdit }
-						{ mode === 'html' && (
-							<Block.div __unstableIsHtml>
-								<BlockHtml clientId={ clientId } />
-							</Block.div>
-						) }
-					</>
-				) }
-				{ isValid && ! lightBlockWrapper && (
-					<Block.div { ...wrapperProps }>
-						{ blockEdit }
-						{ mode === 'html' && (
-							<BlockHtml clientId={ clientId } />
-						) }
-					</Block.div>
-				) }
-				{ ! isValid && (
-					<Block.div>
-						<BlockInvalidWarning clientId={ clientId } />
-						<div>{ getSaveElement( blockType, attributes ) }</div>
-					</Block.div>
-				) }
+				{ block }
 			</BlockCrashBoundary>
 			{ !! hasError && (
 				<Block.div>
