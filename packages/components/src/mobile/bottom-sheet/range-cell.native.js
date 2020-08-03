@@ -167,6 +167,7 @@ class BottomSheetRangeCell extends Component {
 			getStylesFromColorScheme,
 			rangePreview,
 			cellContainerStyle,
+			withTextInput = true,
 			...cellProps
 		} = this.props;
 
@@ -232,20 +233,22 @@ class BottomSheetRangeCell extends Component {
 						style={ styles.slider }
 						accessibilityRole={ 'adjustable' }
 					/>
-					<TextInput
-						style={ [
-							defaultSliderStyle,
-							borderStyles.borderStyle,
-							hasFocus && borderStyles.isSelected,
-							{ width: 40 * fontScale },
-						] }
-						onChangeText={ this.handleChange }
-						onFocus={ this.handleToggleFocus }
-						onBlur={ this.handleToggleFocus }
-						keyboardType="numeric"
-						returnKeyType="done"
-						value={ `${ sliderValue }` }
-					/>
+					{ withTextInput && (
+						<TextInput
+							style={ [
+								defaultSliderStyle,
+								borderStyles.borderStyle,
+								hasFocus && borderStyles.isSelected,
+								{ width: 40 * fontScale },
+							] }
+							onChangeText={ this.handleChange }
+							onFocus={ this.handleToggleFocus }
+							onBlur={ this.handleToggleFocus }
+							keyboardType="numeric"
+							returnKeyType="done"
+							value={ `${ sliderValue }` }
+						/>
+					) }
 				</View>
 			</Cell>
 		);

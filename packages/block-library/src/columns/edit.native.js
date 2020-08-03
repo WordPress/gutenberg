@@ -176,10 +176,7 @@ function ColumnsEditContainer( {
 										column.clientId
 									)
 								}
-								cellContainerStyle={ {
-									flexDirection: 'row',
-									paddingVertical: 8,
-								} }
+								cellContainerStyle={ styles.cellContainerStyle }
 								toFixed={ 1 }
 								rangePreview={
 									<ColumnsPreview
@@ -188,6 +185,7 @@ function ColumnsEditContainer( {
 									/>
 								}
 								key={ column.id }
+								withTextInput={ false }
 							/>
 						);
 					} ) }

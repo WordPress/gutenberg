@@ -15,3 +15,9 @@
 	padding-left: $grid-unit;
 	padding-right: $grid-unit;
 }
+
+.cellContainerStyle {
+	flex-direction: row;
+	padding-top: $grid-unit-10;
+	padding-bottom: $grid-unit-10;
+}
