@@ -85,7 +85,6 @@ function ColumnEdit( {
 						label={ __( 'Percentage width' ) }
 						min={ 1 }
 						max={ 100 }
-						step={ 0.1 }
 						value={ columnWidths[ selectedColumnIndex ] }
 						onChange={ onWidthChange }
 						toFixed={ 1 }

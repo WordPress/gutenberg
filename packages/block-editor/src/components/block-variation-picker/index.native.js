@@ -54,26 +54,29 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 		styles.cancelButtonDark
 	);
 
-	const leftButton = useMemo( () => (
-		<TouchableWithoutFeedback onPress={ onClose } hitSlop={ hitSlop }>
-			<View>
-				{ isIOS ? (
-					<Text
-						style={ cancelButtonStyle }
-						maxFontSizeMultiplier={ 2 }
-					>
-						{ __( 'Cancel' ) }
-					</Text>
-				) : (
-					<Icon
-						icon={ close }
-						size={ 24 }
-						style={ styles.closeIcon }
-					/>
-				) }
-			</View>
-		</TouchableWithoutFeedback>
-	) );
+	const leftButton = useMemo(
+		() => (
+			<TouchableWithoutFeedback onPress={ onClose } hitSlop={ hitSlop }>
+				<View>
+					{ isIOS ? (
+						<Text
+							style={ cancelButtonStyle }
+							maxFontSizeMultiplier={ 2 }
+						>
+							{ __( 'Cancel' ) }
+						</Text>
+					) : (
+						<Icon
+							icon={ close }
+							size={ 24 }
+							style={ styles.closeIcon }
+						/>
+					) }
+				</View>
+			</TouchableWithoutFeedback>
+		),
+		[ onClose, cancelButtonStyle ]
+	);
 
 	const onVariationSelect = ( variation ) => {
 		replaceInnerBlocks(

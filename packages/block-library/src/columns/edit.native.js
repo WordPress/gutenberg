@@ -289,7 +289,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 			if ( isAddingColumn ) {
 				// Get verticalAlignment from Columns block to set the same to new Column
-				const { verticalAlignment } = getBlockAttributes( clientId );
+				const { verticalAlignment } =
+					getBlockAttributes( clientId ) || {};
 
 				innerBlocks = [
 					...innerBlocks,
