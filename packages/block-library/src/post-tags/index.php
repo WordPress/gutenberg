@@ -20,11 +20,17 @@ function render_block_core_post_tags( $attributes, $content, $block ) {
 
 	$post_tags = get_the_tags( $block->context['postId'] );
 	if ( ! empty( $post_tags ) ) {
-		$output = '';
+		$classes = 'wp-block-post-tags';
+		$output  = sprintf( '<div class="%1$s">', esc_attr( $classes ) );
+
 		foreach ( $post_tags as $tag ) {
 			$output .= '<a href="' . get_tag_link( $tag->term_id ) . '">' . $tag->name . '</a>' . ' | ';
 		}
-		return trim( $output, ' | ' );
+
+		$output  = trim( $output, ' | ' );
+		$output .= '</div>';
+
+		return $output;
 	}
 }
 
