@@ -12,6 +12,7 @@
 	],
 	"supports": {
 		"html": false,
+		"lightBlockWrapper": true,
 		"align": [
 			"wide",
 			"full"

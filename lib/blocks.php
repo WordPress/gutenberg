@@ -320,7 +320,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 	}
 
 	// Link Colors.
-	if ( in_array( 'link-color', $supports, true ) ) {
+	if ( in_array( '--wp--style--color--link', $supports, true ) ) {
 		$has_link_color = isset( $block_attributes['style']['color']['link'] );
 		// Apply required class and style.
 		if ( $has_link_color ) {
