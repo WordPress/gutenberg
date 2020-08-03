@@ -39,8 +39,10 @@
 		// Focus style.
 		// Overrides .components-toolbar-group styles
 		&::before {
-			left: 0 !important;
-			right: 0 !important;
+			@include break-small() {
+				left: $grid-unit-10 !important;
+				right: $grid-unit-10 !important;
+			}
 		}
 	}
 
