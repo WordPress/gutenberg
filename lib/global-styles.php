@@ -308,7 +308,8 @@ function gutenberg_experimental_global_styles_get_block_data() {
 						'__experimentalSelector' => ':root',
 						'__experimentalFontSize' => true,
 						'__experimentalColor' => array(
-							'linkColor' => true
+							'linkColor' => true,
+							'gradients' => true,
 						)
 					)
 				)
