@@ -11,11 +11,6 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreHorizontal } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import BlockIcon from '../block-icon';
-
 function Warning( { className, actions, children, secondaryActions } ) {
 	return (
 		<div className={ classnames( className, 'block-editor-warning' ) }>
@@ -36,7 +31,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 						{ secondaryActions && (
 							<DropdownMenu
 								className="block-editor-warning__secondary"
-								icon={ <BlockIcon icon={ moreHorizontal } /> }
+								icon={ moreHorizontal }
 								label={ __( 'More options' ) }
 								popoverProps={ {
 									position: 'bottom left',
