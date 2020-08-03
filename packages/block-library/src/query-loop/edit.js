@@ -7,6 +7,7 @@ import {
 	BlockContextProvider,
 	InnerBlocks,
 	BlockPreview,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 
 /**
@@ -54,25 +55,28 @@ export default function QueryLoopEdit( {
 			} ) ),
 		[ posts ]
 	);
-	return blockContexts
-		? blockContexts.map( ( blockContext ) => (
-				<BlockContextProvider
-					key={ blockContext.postId }
-					value={ blockContext }
-				>
-					{ blockContext ===
-					( activeBlockContext || blockContexts[ 0 ] ) ? (
-						<InnerBlocks template={ TEMPLATE } />
-					) : (
-						<BlockPreview
-							blocks={ blocks }
-							__experimentalLive
-							__experimentalOnClick={ () =>
-								setActiveBlockContext( blockContext )
-							}
-						/>
-					) }
-				</BlockContextProvider>
-		  ) )
-		: null;
+	return (
+		<Block.div>
+			{ blockContexts &&
+				blockContexts.map( ( blockContext ) => (
+					<BlockContextProvider
+						key={ blockContext.postId }
+						value={ blockContext }
+					>
+						{ blockContext ===
+						( activeBlockContext || blockContexts[ 0 ] ) ? (
+							<InnerBlocks template={ TEMPLATE } />
+						) : (
+							<BlockPreview
+								blocks={ blocks }
+								__experimentalLive
+								__experimentalOnClick={ () =>
+									setActiveBlockContext( blockContext )
+								}
+							/>
+						) }
+					</BlockContextProvider>
+				) ) }
+		</Block.div>
+	);
 }

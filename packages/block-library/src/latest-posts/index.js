@@ -19,10 +19,6 @@ export const settings = {
 	description: __( 'Display a list of your most recent posts.' ),
 	icon,
 	keywords: [ __( 'recent posts' ) ],
-	supports: {
-		align: true,
-		html: false,
-	},
 	example: {},
 	edit,
 	deprecated,

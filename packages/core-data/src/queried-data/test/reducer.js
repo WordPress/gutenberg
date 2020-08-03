@@ -7,6 +7,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import reducer, { getMergedItemIds } from '../reducer';
+import { removeItems } from '../actions';
 
 describe( 'getMergedItemIds', () => {
 	it( 'should receive a page', () => {
@@ -48,6 +49,20 @@ describe( 'getMergedItemIds', () => {
 		const result = getMergedItemIds( original, [ 7 ], 3, 3 );
 
 		expect( result ).toEqual( [ 1, 2, 3, 4, 5, 6, 7 ] );
+	} );
+
+	it( 'should return a copy of nextItemIds if it represents all ids (single id removed) (page=1 and perPage=-1)', () => {
+		const original = deepFreeze( [ 1, 2, 3 ] );
+		const result = getMergedItemIds( original, [ 1, 3 ], 1, -1 );
+
+		expect( result ).toEqual( [ 1, 3 ] );
+	} );
+
+	it( 'should return a copy of nextItemIds if it represents all ids (single id removed and another one added) (page=1 and perPage=-1)', () => {
+		const original = deepFreeze( [ 1, 2, 3 ] );
+		const result = getMergedItemIds( original, [ 1, 3, 4 ], 1, -1 );
+
+		expect( result ).toEqual( [ 1, 3, 4 ] );
 	} );
 } );
 
@@ -97,6 +112,36 @@ describe( 'reducer', () => {
 				1: { id: 1, name: 'abc' },
 			},
 			queries: {},
+		} );
+	} );
+
+	it( 'deletes an item', () => {
+		const kind = 'root';
+		const name = 'menu';
+		const original = deepFreeze( {
+			items: {
+				1: { id: 1, name: 'abc' },
+				2: { id: 2, name: 'def' },
+				3: { id: 3, name: 'ghi' },
+				4: { id: 4, name: 'klm' },
+			},
+			queries: {
+				'': [ 1, 2, 3, 4 ],
+				's=a': [ 1, 3 ],
+			},
+		} );
+		const state = reducer( original, removeItems( kind, name, 3 ) );
+
+		expect( state ).toEqual( {
+			items: {
+				1: { id: 1, name: 'abc' },
+				2: { id: 2, name: 'def' },
+				4: { id: 4, name: 'klm' },
+			},
+			queries: {
+				'': [ 1, 2, 4 ],
+				's=a': [ 1 ],
+			},
 		} );
 	} );
 } );

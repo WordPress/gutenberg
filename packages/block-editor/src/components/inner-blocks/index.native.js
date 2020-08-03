@@ -36,7 +36,7 @@ function UncontrolledInnerBlocks( props ) {
 		template,
 		templateLock,
 		templateInsertUpdatesSelection,
-		__experimentalMoverDirection,
+		orientation,
 		renderAppender,
 		renderFooterAppender,
 		parentWidth,
@@ -48,11 +48,13 @@ function UncontrolledInnerBlocks( props ) {
 		marginVertical,
 		marginHorizontal,
 		horizontalAlignment,
+		filterInnerBlocks,
 	} = props;
 
-	const block = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getBlock( clientId )
-	);
+	const block = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+		[ clientId ]
+	) || { innerBlocks: [] };
 
 	useNestedSettingsUpdate( clientId, allowedBlocks, templateLock );
 
@@ -71,7 +73,7 @@ function UncontrolledInnerBlocks( props ) {
 			renderAppender={ renderAppender }
 			renderFooterAppender={ renderFooterAppender }
 			withFooter={ false }
-			__experimentalMoverDirection={ __experimentalMoverDirection }
+			orientation={ orientation }
 			parentWidth={ parentWidth }
 			horizontalAlignment={ horizontalAlignment }
 			horizontal={ horizontal }
@@ -79,6 +81,7 @@ function UncontrolledInnerBlocks( props ) {
 			contentStyle={ contentStyle }
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
+			filterInnerBlocks={ filterInnerBlocks }
 		/>
 	);
 

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/notices';
 import '@wordpress/block-editor';
 import {
 	registerBlockType,
@@ -64,6 +65,8 @@ import * as socialLink from './social-link';
 import * as widgetArea from './widget-area';
 
 // Full Site Editing Blocks
+import * as siteLogo from './site-logo';
+import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
@@ -165,10 +168,7 @@ export const registerCoreBlocks = () => {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
-
-	if ( group ) {
-		setGroupingBlockName( group.name );
-	}
+	setGroupingBlockName( group.name );
 };
 
 /**
@@ -200,6 +200,8 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing
 						? [
+								siteLogo,
+								siteTagline,
 								siteTitle,
 								templatePart,
 								query,

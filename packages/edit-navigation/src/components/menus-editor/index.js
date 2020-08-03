@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -11,25 +16,46 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+const { DOMParser } = window;
 
 /**
  * Internal dependencies
  */
-import CreateMenuPanel from './create-menu-panel';
-import MenuEditor from '../menu-editor';
+import CreateMenuArea from './create-menu-area';
+import NavigationEditor from '../navigation-editor';
 
 export default function MenusEditor( { blockEditorSettings } ) {
-	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
-		const { getMenus, hasFinishedResolution } = select( 'core' );
-		return {
-			menus: getMenus(),
-			hasLoadedMenus: hasFinishedResolution( 'getMenus' ),
-		};
-	}, [] );
-
+	const [ menuId, setMenuId ] = useState();
+	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
 	const [ hasCompletedFirstLoad, setHasCompletedFirstLoad ] = useState(
 		false
 	);
+
+	const noticeId = useRef();
+
+	const { menus, hasLoadedMenus, menuDeleteError } = useSelect(
+		( select ) => {
+			const {
+				getMenus,
+				hasFinishedResolution,
+				getLastEntityDeleteError,
+			} = select( 'core' );
+			const query = { per_page: -1 };
+			return {
+				menus: getMenus( query ),
+				hasLoadedMenus: hasFinishedResolution( 'getMenus', [ query ] ),
+				menuDeleteError: getLastEntityDeleteError(
+					'root',
+					'menu',
+					menuId
+				),
+			};
+		},
+		[ menuId ]
+	);
+
+	const { deleteMenu } = useDispatch( 'core' );
+	const { createErrorNotice, removeNotice } = useDispatch( 'core/notices' );
 
 	useEffect( () => {
 		if ( ! hasCompletedFirstLoad && hasLoadedMenus ) {
@@ -37,14 +63,26 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		}
 	}, [ hasLoadedMenus ] );
 
-	const [ menuId, setMenuId ] = useState();
-	const [ stateMenus, setStateMenus ] = useState();
-	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
+	// Handle REST API Error messages.
+	useEffect( () => {
+		if ( menuDeleteError ) {
+			// Error messages from the REST API often contain HTML.
+			// createErrorNotice does not support HTML in error text, so first
+			// strip HTML out using DOMParser.
+			const document = new DOMParser().parseFromString(
+				menuDeleteError.message,
+				'text/html'
+			);
+			const errorText = document.body.textContent || '';
+			noticeId.current = uniqueId(
+				'navigation-editor/menu-editor/edit-navigation-delete-menu-error'
+			);
+			createErrorNotice( errorText, { id: noticeId.current } );
+		}
+	}, [ menuDeleteError ] );
 
 	useEffect( () => {
 		if ( menus?.length ) {
-			setStateMenus( menus );
-
 			// Only set menuId if it's currently unset.
 			if ( ! menuId ) {
 				setMenuId( menus[ 0 ].id );
@@ -56,7 +94,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		return <Spinner />;
 	}
 
-	const hasMenus = !! stateMenus?.length;
+	const hasMenus = !! menus?.length;
 	const isCreateMenuPanelVisible =
 		hasCompletedFirstLoad && ( ! hasMenus || showCreateMenuPanel );
 
@@ -74,12 +112,12 @@ export default function MenusEditor( { blockEditorSettings } ) {
 							<SelectControl
 								className="edit-navigation-menus-editor__menu-select-control"
 								label={ __( 'Select navigation to edit:' ) }
-								options={ stateMenus?.map( ( menu ) => ( {
+								options={ menus?.map( ( menu ) => ( {
 									value: menu.id,
 									label: menu.name,
 								} ) ) }
 								onChange={ ( selectedMenuId ) =>
-									setMenuId( selectedMenuId )
+									setMenuId( Number( selectedMenuId ) )
 								}
 								value={ menuId }
 							/>
@@ -94,8 +132,8 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				</CardBody>
 			</Card>
 			{ isCreateMenuPanelVisible && (
-				<CreateMenuPanel
-					menus={ stateMenus }
+				<CreateMenuArea
+					menus={ menus }
 					onCancel={
 						// User can only cancel out of menu creation if there
 						// are other menus to fall back to showing.
@@ -110,18 +148,16 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				/>
 			) }
 			{ hasMenus && (
-				<MenuEditor
+				<NavigationEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
-					onDeleteMenu={ ( deletedMenu ) => {
-						const newStateMenus = stateMenus.filter( ( menu ) => {
-							return menu.id !== deletedMenu;
+					onDeleteMenu={ async () => {
+						removeNotice( noticeId.current );
+						const deletedMenu = await deleteMenu( menuId, {
+							force: 'true',
 						} );
-						setStateMenus( newStateMenus );
-						if ( newStateMenus.length ) {
-							setMenuId( newStateMenus[ 0 ].id );
-						} else {
-							setMenuId();
+						if ( deletedMenu ) {
+							setMenuId( false );
 						}
 					} }
 				/>

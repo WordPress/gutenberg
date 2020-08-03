@@ -15,9 +15,6 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Query' ),
-	supports: {
-		html: false,
-	},
 	edit,
 	save,
 };

@@ -20,7 +20,7 @@ function BlockNavigation( {
 	rootBlocks,
 	selectedBlockClientId,
 	selectBlock,
-	__experimentalWithBlockNavigationSlots,
+	__experimentalFeatures,
 } ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
@@ -34,16 +34,14 @@ function BlockNavigation( {
 	return (
 		<div className="block-editor-block-navigation__container">
 			<p className="block-editor-block-navigation__label">
-				{ __( 'Block navigation' ) }
+				{ __( 'List view' ) }
 			</p>
 			{ hasHierarchy && (
 				<BlockNavigationTree
 					blocks={ [ rootBlock ] }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
-					__experimentalWithBlockNavigationSlots={
-						__experimentalWithBlockNavigationSlots
-					}
+					__experimentalFeatures={ __experimentalFeatures }
 					showNestedBlocks
 				/>
 			) }
@@ -52,9 +50,7 @@ function BlockNavigation( {
 					blocks={ rootBlocks }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
-					__experimentalWithBlockNavigationSlots={
-						__experimentalWithBlockNavigationSlots
-					}
+					__experimentalFeatures={ __experimentalFeatures }
 				/>
 			) }
 		</div>

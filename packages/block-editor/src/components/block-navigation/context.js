@@ -4,7 +4,7 @@
 import { createContext, useContext } from '@wordpress/element';
 
 export const BlockNavigationContext = createContext( {
-	__experimentalWithBlockNavigationSlots: false,
+	__experimentalFeatures: false,
 } );
 
 export const useBlockNavigationContext = () =>

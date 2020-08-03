@@ -18,10 +18,6 @@ export const settings = {
 	title: __( 'Archives' ),
 	description: __( 'Display a monthly archive of your posts.' ),
 	icon,
-	supports: {
-		align: true,
-		html: false,
-	},
 	example: {},
 	edit,
 };

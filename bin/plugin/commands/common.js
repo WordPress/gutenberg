@@ -5,7 +5,7 @@ const fs = require( 'fs' );
 const rimraf = require( 'rimraf' );
 const semver = require( 'semver' );
 
-/*
+/**
  * Internal dependencies
  */
 const { log, formats } = require( '../lib/logger' );

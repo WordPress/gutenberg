@@ -6,17 +6,13 @@ import { View, TouchableWithoutFeedback, Text } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
-
-/**
- * WordPress dependencies
- */
+} from '@wordpress/react-native-bridge';
 import {
 	Icon,
 	ToolbarButton,
@@ -200,6 +196,7 @@ class VideoEdit extends React.Component {
 		const toolbarEditButton = (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+				isReplacingMedia={ true }
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
@@ -343,7 +340,7 @@ class VideoEdit extends React.Component {
 						accessibilityLabelCreator={ ( caption ) =>
 							isEmpty( caption )
 								? /* translators: accessibility text. Empty video caption. */
-								  'Video caption. Empty'
+								  __( 'Video caption. Empty' )
 								: sprintf(
 										/* translators: accessibility text. %s: video caption. */
 										__( 'Video caption. %s' ),
@@ -354,6 +351,7 @@ class VideoEdit extends React.Component {
 						isSelected={ this.state.isCaptionSelected }
 						onFocus={ this.onFocusCaption }
 						onBlur={ this.props.onBlur } // always assign onBlur as props
+						insertBlocksAfter={ this.props.insertBlocksAfter }
 					/>
 				</View>
 			</TouchableWithoutFeedback>

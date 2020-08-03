@@ -64,7 +64,7 @@ function wrapFigureContent( element, beforeElement = element ) {
  *
  * @return {void}
  */
-export default function( node, doc, schema ) {
+export default function figureContentReducer( node, doc, schema ) {
 	if ( ! isFigureContent( node, schema ) ) {
 		return;
 	}

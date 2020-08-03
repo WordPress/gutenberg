@@ -87,7 +87,7 @@ class ModalLinkUI extends Component {
 			opensInNewWindow,
 			text: linkText,
 		} );
-
+		let newAttributes;
 		if ( isCollapsed( value ) && ! isActive ) {
 			// insert link
 			const toInsert = applyFormat(
@@ -96,8 +96,7 @@ class ModalLinkUI extends Component {
 				0,
 				linkText.length
 			);
-			const newAttributes = insert( value, toInsert );
-			onChange( { ...newAttributes, needsSelectionUpdate: true } );
+			newAttributes = insert( value, toInsert );
 		} else if ( text !== getTextContent( slice( value ) ) ) {
 			// edit text in selected link
 			const toInsert = applyFormat(
@@ -106,18 +105,15 @@ class ModalLinkUI extends Component {
 				0,
 				text.length
 			);
-			const newAttributes = insert(
-				value,
-				toInsert,
-				value.start,
-				value.end
-			);
-			onChange( { ...newAttributes, needsSelectionUpdate: true } );
+			newAttributes = insert( value, toInsert, value.start, value.end );
 		} else {
 			// transform selected text into link
-			const newAttributes = applyFormat( value, format );
-			onChange( { ...newAttributes, needsSelectionUpdate: true } );
+			newAttributes = applyFormat( value, format );
 		}
+		//move selection to end of link
+		newAttributes.start = newAttributes.end;
+		newAttributes.activeFormats = [];
+		onChange( { ...newAttributes, needsSelectionUpdate: true } );
 
 		if ( ! isValidHref( url ) ) {
 			speak(

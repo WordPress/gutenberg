@@ -1,10 +1,25 @@
 {
 	"name": "core/post-date",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
+		"textAlign": {
+			"type": "string"
+		},
 		"format": {
 			"type": "string"
 		}
 	},
-	"context": [ "postId" ]
+	"usesContext": [
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true
+		},
+		"__experimentalFontSize": true,
+		"__experimentalLineHeight": true
+	}
 }

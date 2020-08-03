@@ -30,13 +30,6 @@ export const settings = {
 			text: __( 'Call to Action' ),
 		},
 	},
-	supports: {
-		align: true,
-		alignWide: false,
-		reusable: false,
-		lightBlockWrapper: true,
-	},
-	parent: [ 'core/buttons' ],
 	styles: [
 		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
@@ -46,6 +39,6 @@ export const settings = {
 	deprecated,
 	merge: ( a, { text = '' } ) => ( {
 		...a,
-		text: a.text + text,
+		text: ( a.text || '' ) + text,
 	} ),
 };

@@ -1,6 +1,6 @@
 {
 	"name": "core/gallery",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"images": {
 			"type": "array",
@@ -50,7 +50,7 @@
 			"type": "array",
 			"items": {
 				"type": "number"
-  			},
+			},
 			"default": []
 		},
 		"columns": {
@@ -75,5 +75,9 @@
 			"type": "string",
 			"default": "large"
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true
 	}
 }

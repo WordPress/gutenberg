@@ -62,13 +62,20 @@ function replaceMediaQueryWithWidthEvaluation( ruleText, widthValue ) {
 }
 
 /**
- * Function that manipulates media queries from stylesheets to simulate a given viewport width.
+ * Function that manipulates media queries from stylesheets to simulate a given
+ * viewport width.
  *
- * @param {string} marker CSS selector string defining start and end of manipulable styles.
- * @param {number} width Viewport width to simulate.
+ * @param {string}  marker CSS selector string defining start and end of
+ *                         manipulable styles.
+ * @param {number?} width  Viewport width to simulate. If provided null, the
+ *                         stylesheets will not be modified.
  */
 export default function useSimulatedMediaQuery( marker, width ) {
 	useEffect( () => {
+		if ( ! width ) {
+			return;
+		}
+
 		const styleSheets = getStyleSheetsThatMatchHostname();
 		const originalStyles = [];
 		styleSheets.forEach( ( styleSheet, styleSheetIndex ) => {

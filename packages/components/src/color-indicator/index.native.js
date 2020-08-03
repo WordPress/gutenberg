@@ -6,7 +6,7 @@ import { View, Animated } from 'react-native';
  * WordPress dependencies
  */
 import { Icon, check } from '@wordpress/icons';
-import { LinearGradient } from '@wordpress/components';
+import { Gradient } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -39,13 +39,13 @@ function ColorIndicator( {
 
 	if ( isGradient( color ) ) {
 		return (
-			<LinearGradient
+			<Gradient
 				style={ [ styles.circleOption, style ] }
 				gradientValue={ color }
 			>
 				<View style={ outlineStyle } />
 				{ isSelected && <SelectedIcon opacity={ opacity } /> }
-			</LinearGradient>
+			</Gradient>
 		);
 	} else if ( withCustomPicker ) {
 		return (
@@ -53,9 +53,13 @@ function ColorIndicator( {
 				<View style={ outlineStyle } />
 				{ color.map( ( gradientValue ) => {
 					return (
-						<LinearGradient
+						<Gradient
 							gradientValue={ gradientValue }
-							style={ [ styles.circleOption, styles.absolute ] }
+							style={ [
+								styles.circleOption,
+								styles.absolute,
+								style,
+							] }
 							key={ gradientValue }
 						/>
 					);

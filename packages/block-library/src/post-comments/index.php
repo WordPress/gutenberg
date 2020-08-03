@@ -30,15 +30,22 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 	ob_start();
 	comments_template();
 	$post = $post_before;
-	return ob_get_clean();
+
+	$classes = 'wp-block-post-comments';
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= ' has-text-align-' . $attributes['textAlign'];
+	}
+
+	$output = sprintf( '<div class="%1$s">', esc_attr( $classes ) ) . ob_get_clean() . '</div>';
+	return $output;
 }
 
 /**
  * Registers the `core/post-comments` block on the server.
  */
 function register_block_core_post_comments() {
-	register_block_type(
-		'core/post-comments',
+	register_block_type_from_metadata(
+		__DIR__ . '/post-comments',
 		array(
 			'render_callback' => 'render_block_core_post_comments',
 		)

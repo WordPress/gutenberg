@@ -1,19 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { useRovingTabIndexContext } from './roving-tab-index-context';
 
-export default function RovingTabIndexItem( {
-	children,
-	as: Component,
-	...props
-} ) {
-	const ref = useRef();
+export default forwardRef( function RovingTabIndexItem(
+	{ children, as: Component, ...props },
+	forwardedRef
+) {
+	const localRef = useRef();
+	const ref = forwardedRef || localRef;
 	const {
 		lastFocusedElement,
 		setLastFocusedElement,
@@ -32,4 +32,4 @@ export default function RovingTabIndexItem( {
 	}
 
 	return <Component { ...allProps }>{ children }</Component>;
-}
+} );

@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { columns as icon } from '@wordpress/icons';
-import { Platform } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -23,12 +23,6 @@ export const settings = {
 	description: __(
 		'Add a block that displays content in multiple columns, then add whatever content blocks you’d like.'
 	),
-	supports: {
-		align: [ 'wide', 'full' ],
-		html: false,
-		lightBlockWrapper: true,
-		__experimentalColor: Platform.OS === 'web' && { gradients: true },
-	},
 	variations,
 	example: {
 		innerBlocks: [

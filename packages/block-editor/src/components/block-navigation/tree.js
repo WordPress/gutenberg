@@ -17,15 +17,18 @@ import { BlockNavigationContext } from './context';
  * recursive component (it renders itself), so this ensures TreeGrid is only
  * present at the very top of the navigation grid.
  *
- * @param {Object} props
+ * @param {Object} props                        Components props.
+ * @param {Object} props.__experimentalFeatures Object used in context provider.
  */
 export default function BlockNavigationTree( {
-	__experimentalWithBlockNavigationSlots,
+	__experimentalFeatures,
 	...props
 } ) {
 	const contextValue = useMemo(
-		() => ( { __experimentalWithBlockNavigationSlots } ),
-		[ __experimentalWithBlockNavigationSlots ]
+		() => ( {
+			__experimentalFeatures,
+		} ),
+		[ __experimentalFeatures ]
 	);
 
 	return (

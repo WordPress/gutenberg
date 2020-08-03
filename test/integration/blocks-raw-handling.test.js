@@ -30,7 +30,7 @@ describe( 'Blocks raw handling', () => {
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {
 			title: 'Test Gallery',
-			category: 'common',
+			category: 'text',
 			attributes: {
 				ids: {
 					type: 'array',
@@ -63,7 +63,7 @@ describe( 'Blocks raw handling', () => {
 
 		registerBlockType( 'test/non-inline-block', {
 			title: 'Test Non Inline Block',
-			category: 'common',
+			category: 'text',
 			supports: {
 				pasteTextInline: false,
 			},

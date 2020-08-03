@@ -17,6 +17,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} disableCustomColors Whether or not the custom colors are disabled
  * @property {Array} fontSizes Available font sizes
  * @property {boolean} disableCustomFontSizes Whether or not the custom font sizes are disabled
+ * @property {boolean} imageEditing Image Editing settings set to false to disable.
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing
  * @property {boolean|Array} allowedBlockTypes Allowed block types
@@ -25,6 +26,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} focusMode Whether the focus mode is enabled or not
  * @property {Array} styles Editor Styles
  * @property {boolean} isRTL Whether the editor is in RTL mode
+ * @property {boolean} keepCaretInsideBlock Whether caret should move between blocks in edit mode
  * @property {string} bodyPlaceholder Empty post placeholder
  * @property {string} titlePlaceholder Empty title placeholder
  * @property {boolean} codeEditingEnabled Whether or not the user can switch to the code editor
@@ -129,6 +131,9 @@ export const SETTINGS_DEFAULTS = {
 		{ slug: 'large', name: __( 'Large' ) },
 		{ slug: 'full', name: __( 'Full Size' ) },
 	],
+
+	// Allow plugin to disable Image Editor if need be
+	imageEditing: true,
 
 	// This is current max width of the block inner area
 	// It's used to constraint image resizing and this value could be overridden later by themes

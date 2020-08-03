@@ -133,11 +133,24 @@ export const ALERT = {
 	green: '#4ab866',
 };
 
+export const ADMIN = {
+	theme: `var( --wp-admin-theme-color, ${ BLUE.wordpress[ 700 ] })`,
+	themeDark10: `var( --wp-admin-theme-color-darker-10, ${ BLUE.medium.focus })`,
+};
+
 // Namespaced values for raw colors hex codes
 export const UI = {
+	theme: ADMIN.theme,
 	background: BASE.white,
-	border: BASE.black,
-	borderFocus: BLUE.medium.focus,
+	backgroundDisabled: LIGHT_GRAY[ 200 ],
+	border: G2.darkGray.primary,
+	borderFocus: ADMIN.themeDark10,
+	borderDisabled: DARK_GRAY[ 700 ],
+	borderLight: LIGHT_GRAY[ 600 ],
+	label: DARK_GRAY[ 500 ],
+	textDisabled: DARK_GRAY[ 150 ],
+	textDark: BASE.white,
+	textLight: BASE.black,
 };
 
 export const COLORS = {
@@ -150,6 +163,7 @@ export const COLORS = {
 	lightGrayLight: LIGHT_OPACITY_LIGHT,
 	blue: merge( {}, BLUE, G2.blue ),
 	alert: ALERT,
+	admin: ADMIN,
 	ui: UI,
 };
 

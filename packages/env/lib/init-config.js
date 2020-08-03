@@ -12,7 +12,7 @@ const { readConfig } = require( './config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
- * @typedef {import('./config').Config} Config
+ * @typedef {import('./config').WPConfig} WPConfig
  */
 
 /**
@@ -20,10 +20,10 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
  * ./.wp-env.json, creates ~/.wp-env, and creates ~/.wp-env/docker-compose.yml.
  *
  * @param {Object}  options
- * @param {Object}  options.spinner initConfigA CLI spinner which indicates progress.
+ * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.debug   True if debug mode is enabled.
  *
- * @return {Config} The-env config object.
+ * @return {WPConfig} The-env config object.
  */
 module.exports = async function initConfig( { spinner, debug } ) {
 	const configPath = path.resolve( '.wp-env.json' );

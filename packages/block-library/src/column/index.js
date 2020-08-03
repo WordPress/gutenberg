@@ -17,14 +17,8 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Column' ),
-	parent: [ 'core/columns' ],
 	icon,
 	description: __( 'A single column within a columns block.' ),
-	supports: {
-		reusable: false,
-		html: false,
-		lightBlockWrapper: true,
-	},
 	edit,
 	save,
 };

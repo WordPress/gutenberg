@@ -119,6 +119,19 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
+
+React hook returns an array which items get asynchronously appended from a source array.
+This behavior is useful if we want to render a list of items asynchronously for performance reasons.
+
+_Parameters_
+
+-   _list_ `Array`: Source array.
+
+_Returns_
+
+-   `Array`: Async array.
+
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
 Copies the text to the clipboard when the element is clicked.
@@ -163,6 +176,19 @@ _Parameters_
 _Returns_
 
 -   `boolean`: return value of the media query.
+
+<a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
+
+Use something's value from the previous render.
+Based on <https://usehooks.com/usePrevious/>.
+
+_Parameters_
+
+-   _value_ `T`: The value to track.
+
+_Returns_
+
+-   `(T|undefined)`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
@@ -215,6 +241,27 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether viewport matches query.
+
+<a name="useWarnOnChange" href="#useWarnOnChange">#</a> **useWarnOnChange**
+
+Hook that performs a shallow comparison between the preview value of an object
+and the new one, if there's a difference, it prints it to the console.
+this is useful in performance related work, to check why a component re-renders.
+
+_Usage_
+
+```jsx
+function MyComponent(props) {
+   useWarnOnChange(props);
+
+   return "Something";
+}
+```
+
+_Parameters_
+
+-   _object_ `Object`: Object which changes to compare.
+-   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 

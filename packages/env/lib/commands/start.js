@@ -19,13 +19,20 @@ const rimraf = util.promisify( require( 'rimraf' ) );
 const retry = require( '../retry' );
 const stop = require( './stop' );
 const initConfig = require( '../init-config' );
-const downloadSource = require( '../download-source' );
+const downloadSources = require( '../download-sources' );
 const {
 	checkDatabaseConnection,
 	makeContentDirectoriesWritable,
 	configureWordPress,
-	copyCoreFiles,
+	setupWordPressDirectories,
 } = require( '../wordpress' );
+const { didCacheChange, setCache } = require( '../cache' );
+const md5 = require( '../md5' );
+
+/**
+ * @typedef {import('../config').Config} Config
+ */
+const CONFIG_CACHE_KEY = 'config_checksum';
 
 /**
  * Starts the development server.
@@ -33,8 +40,31 @@ const {
  * @param {Object}  options
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {boolean} options.update  If true, update sources.
  */
-module.exports = async function start( { spinner, debug } ) {
+module.exports = async function start( { spinner, debug, update } ) {
+	spinner.text = 'Reading configuration.';
+	await checkForLegacyInstall( spinner );
+
+	const config = await initConfig( { spinner, debug } );
+
+	if ( ! config.detectedLocalConfig ) {
+		const { configDirectoryPath } = config;
+		spinner.warn(
+			`Warning: could not find a .wp-env.json configuration file and could not determine if '${ configDirectoryPath }' is a WordPress installation, a plugin, or a theme.`
+		);
+		spinner.start();
+	}
+
+	// Check if the hash of the config has changed. If so, run configuration.
+	const configHash = md5( config );
+	const workDirectoryPath = config.workDirectoryPath;
+	const shouldConfigureWp =
+		update ||
+		( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
+			workDirectoryPath,
+		} ) );
+
 	/**
 	 * If the Docker image is already running and the `wp-env` files have been
 	 * deleted, the start command will not complete successfully. Stopping
@@ -46,64 +76,22 @@ module.exports = async function start( { spinner, debug } ) {
 	 *
 	 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
 	 */
-	await stop( { spinner, debug } );
-
-	await checkForLegacyInstall( spinner );
-
-	const config = await initConfig( { spinner, debug } );
-
-	spinner.text = 'Downloading WordPress.';
-
-	const progresses = {};
-	const getProgressSetter = ( id ) => ( progress ) => {
-		progresses[ id ] = progress;
-		spinner.text =
-			'Downloading WordPress.\n' +
-			Object.entries( progresses )
-				.map(
-					( [ key, value ] ) =>
-						`  - ${ key }: ${ ( value * 100 ).toFixed( 0 ) }/100%`
-				)
-				.join( '\n' );
-	};
+	if ( shouldConfigureWp ) {
+		await stop( { spinner, debug } );
+		spinner.text = 'Downloading sources.';
+	}
 
 	await Promise.all( [
-		// Preemptively start the database while we wait for sources to download.
 		dockerCompose.upOne( 'mysql', {
 			config: config.dockerComposeConfigPath,
 			log: config.debug,
 		} ),
-
-		( async () => {
-			if ( config.coreSource ) {
-				await downloadSource( config.coreSource, {
-					onProgress: getProgressSetter( 'core' ),
-					spinner,
-					debug: config.debug,
-				} );
-				await copyCoreFiles(
-					config.coreSource.path,
-					config.coreSource.testsPath
-				);
-			}
-		} )(),
-
-		...config.pluginSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
-
-		...config.themeSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
+		shouldConfigureWp && downloadSources( config, spinner ),
 	] );
+
+	if ( shouldConfigureWp ) {
+		await setupWordPressDirectories( config );
+	}
 
 	spinner.text = 'Starting WordPress.';
 
@@ -112,34 +100,46 @@ module.exports = async function start( { spinner, debug } ) {
 		log: config.debug,
 	} );
 
-	if ( config.coreSource === null ) {
-		// Don't chown wp-content when it exists on the user's local filesystem.
+	// Only run WordPress install/configuration when config has changed.
+	if ( shouldConfigureWp ) {
+		spinner.text = 'Configuring WordPress.';
+
+		if ( config.coreSource === null ) {
+			// Don't chown wp-content when it exists on the user's local filesystem.
+			await Promise.all( [
+				makeContentDirectoriesWritable( 'development', config ),
+				makeContentDirectoriesWritable( 'tests', config ),
+			] );
+		}
+
+		try {
+			await checkDatabaseConnection( config );
+		} catch ( error ) {
+			// Wait 30 seconds for MySQL to accept connections.
+			await retry( () => checkDatabaseConnection( config ), {
+				times: 30,
+				delay: 1000,
+			} );
+
+			// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
+			await sleep( 4000 );
+		}
+
+		// Retry WordPress installation in case MySQL *still* wasn't ready.
 		await Promise.all( [
-			makeContentDirectoriesWritable( 'development', config ),
-			makeContentDirectoriesWritable( 'tests', config ),
+			retry( () => configureWordPress( 'development', config, spinner ), {
+				times: 2,
+			} ),
+			retry( () => configureWordPress( 'tests', config, spinner ), {
+				times: 2,
+			} ),
 		] );
-	}
 
-	try {
-		await checkDatabaseConnection( config );
-	} catch ( error ) {
-		// Wait 30 seconds for MySQL to accept connections.
-		await retry( () => checkDatabaseConnection( config ), {
-			times: 30,
-			delay: 1000,
+		// Set the cache key once everything has been configured.
+		await setCache( CONFIG_CACHE_KEY, configHash, {
+			workDirectoryPath,
 		} );
-
-		// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
-		await sleep( 4000 );
 	}
-
-	// Retry WordPress installation in case MySQL *still* wasn't ready.
-	await Promise.all( [
-		retry( () => configureWordPress( 'development', config ), {
-			times: 2,
-		} ),
-		retry( () => configureWordPress( 'tests', config ), { times: 2 } ),
-	] );
 
 	spinner.text = 'WordPress started.';
 };

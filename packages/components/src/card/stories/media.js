@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-/* eslint-disable import/no-extraneous-dependencies */
 import { boolean, number, select, text } from '@storybook/addon-knobs';
-/* eslint-enable import/no-extraneous-dependencies */
 import styled from '@emotion/styled';
 
 /**
@@ -122,11 +120,11 @@ const HorizontallyAlignedCard = styled( Card )`
 		flex-direction: row-reverse;
 	}
 
-	${StyledCardBody} {
+	${ StyledCardBody } {
 		flex: 1;
 	}
 
-	${StyledCardMedia} {
+	${ StyledCardMedia } {
 		&.is-left {
 			border-radius: 3px 0 0 3px;
 		}

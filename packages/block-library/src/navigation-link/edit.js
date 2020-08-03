@@ -9,14 +9,13 @@ import { escape, get, head, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, withDispatch, withSelect } from '@wordpress/data';
 import {
-	ExternalLink,
 	KeyboardShortcuts,
 	PanelBody,
 	Popover,
+	TextControl,
 	TextareaControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -29,7 +28,6 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
-	__experimentalBlockNavigationEditor as BlockNavigationEditor,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
@@ -54,15 +52,18 @@ function NavigationLinkEdit( {
 	backgroundColor,
 	rgbTextColor,
 	rgbBackgroundColor,
-	saveEntityRecord,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
+	insertBlocksAfter,
+	mergeBlocks,
+	onReplace,
 } ) {
-	const { label, opensInNewTab, url, nofollow, description } = attributes;
+	const { label, opensInNewTab, url, description, rel } = attributes;
 	const link = {
 		url,
 		opensInNewTab,
 	};
+	const { saveEntityRecord } = useDispatch( 'core' );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
@@ -105,7 +106,7 @@ function NavigationLinkEdit( {
 	}, [ url ] );
 
 	/**
-	 * Focus the navigation link label text and select it.
+	 * Focus the Link label text and select it.
 	 */
 	function selectLabelText() {
 		ref.current.focus();
@@ -159,30 +160,6 @@ function NavigationLinkEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'SEO settings' ) }>
-					<ToggleControl
-						checked={ nofollow }
-						onChange={ ( nofollowValue ) => {
-							setAttributes( { nofollow: nofollowValue } );
-						} }
-						label={ __( 'Add nofollow to link' ) }
-						help={
-							<Fragment>
-								{ __(
-									"Don't let search engines follow this link."
-								) }
-								<ExternalLink
-									className="wp-block-navigation-link__nofollow-external-link"
-									href={ __(
-										'https://codex.wordpress.org/Nofollow'
-									) }
-								>
-									{ __( "What's this?" ) }
-								</ExternalLink>
-							</Fragment>
-						}
-					/>
-				</PanelBody>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextareaControl
 						value={ description || '' }
@@ -194,14 +171,16 @@ function NavigationLinkEdit( {
 							'The description will be displayed in the menu if the current theme supports it.'
 						) }
 					/>
+					<TextControl
+						value={ rel || '' }
+						onChange={ ( relValue ) => {
+							setAttributes( { rel: relValue } );
+						} }
+						label={ __( 'Link rel' ) }
+						autoComplete="off"
+					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockNavigationEditor
-				value={ label }
-				onChange={ ( labelValue ) =>
-					setAttributes( { label: labelValue } )
-				}
-			/>
 			<Block.li
 				className={ classnames( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
@@ -221,10 +200,18 @@ function NavigationLinkEdit( {
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
+						identifier="label"
 						className="wp-block-navigation-link__label"
 						value={ label }
 						onChange={ ( labelValue ) =>
 							setAttributes( { label: labelValue } )
+						}
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( 'core/navigation-link' )
+							)
 						}
 						placeholder={ itemLabelPlaceholder }
 						keepPlaceholderOnFocus
@@ -245,11 +232,8 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
-								createSuggestion={
-									userCanCreatePages
-										? handleCreatePage
-										: undefined
-								}
+								withCreateSuggestion={ userCanCreatePages }
+								createSuggestion={ handleCreatePage }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -396,9 +380,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
-		const { saveEntityRecord } = dispatch( 'core' );
 		return {
-			saveEntityRecord,
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 

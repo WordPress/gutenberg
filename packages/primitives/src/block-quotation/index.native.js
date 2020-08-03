@@ -19,7 +19,6 @@ export const BlockQuotation = withPreferredColorScheme( ( props ) => {
 		styles.wpBlockQuoteLight,
 		styles.wpBlockQuoteDark
 	);
-
 	const newChildren = Children.map( props.children, ( child ) => {
 		if ( child && child.props.identifier === 'citation' ) {
 			return cloneElement( child, {
@@ -27,10 +26,7 @@ export const BlockQuotation = withPreferredColorScheme( ( props ) => {
 			} );
 		}
 		if ( child && child.props.identifier === 'value' ) {
-			return cloneElement( child, {
-				tagsToEliminate: [ 'div' ],
-				style: styles.wpBlockQuoteValue,
-			} );
+			return cloneElement( child, { tagsToEliminate: [ 'div' ] } );
 		}
 		return child;
 	} );

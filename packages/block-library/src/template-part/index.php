@@ -19,7 +19,7 @@ function render_block_core_template_part( $attributes ) {
 		// If we have a post ID, which means this template part
 		// is user-customized, render the corresponding post content.
 		$content = get_post( $attributes['postId'] )->post_content;
-	} elseif ( wp_get_theme()->get( 'TextDomain' ) === $attributes['theme'] ) {
+	} elseif ( isset( $attributes['theme'] ) && wp_get_theme()->get( 'TextDomain' ) === $attributes['theme'] ) {
 		$template_part_query = new WP_Query(
 			array(
 				'post_type'      => 'wp_template_part',
@@ -63,7 +63,7 @@ function render_block_core_template_part( $attributes ) {
 	}
 	$content = do_shortcode( $content );
 
-	return str_replace( ']]>', ']]&gt;', $content );
+	return '<div class="wp-block-template-part">' . str_replace( ']]>', ']]&gt;', $content ) . '</div>';
 }
 
 /**

@@ -1,0 +1,38 @@
+.block-editor-block-draggable-chip-wrapper {
+	position: absolute;
+	top: -$block-toolbar-height - $grid-unit-15;
+}
+
+.block-editor-block-draggable-chip {
+	background-color: $gray-900;
+	border-radius: $radius-block-ui;
+	border: $border-width solid $gray-900;
+	box-shadow: 0 4px 6px rgba($black, 0.3);
+	color: $white;
+	cursor: grabbing;
+	display: inline-flex;
+	height: $block-toolbar-height;
+	min-width: $button-size * 2;
+	padding: 0 $grid-unit-15;
+	user-select: none;
+
+	svg {
+		fill: currentColor;
+	}
+
+	.block-editor-block-draggable-chip__content {
+		margin: auto;
+	}
+
+	.components-flex__item {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+}
+
+// This hides the block being dragged.
+// The effect is that the block being dragged appears to be "lifted".
+.is-dragging.is-selected,
+.is-dragging.is-multi-selected {
+	display: none !important;
+}

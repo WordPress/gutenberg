@@ -101,9 +101,6 @@ export const settings = {
 		},
 		{ name: 'stripes', label: __( 'Stripes' ) },
 	],
-	supports: {
-		align: true,
-	},
 	transforms,
 	edit,
 	save,

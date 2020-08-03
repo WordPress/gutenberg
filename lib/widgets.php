@@ -44,6 +44,12 @@ add_action( 'admin_print_styles', 'gutenberg_block_editor_admin_print_styles' );
  */
 function gutenberg_block_editor_admin_print_scripts() {
 	if ( gutenberg_is_block_editor() ) {
+		/** This action is documented in wp-admin/includes/ajax-actions.php */
+		do_action( 'load-widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		/** This action is documented in wp-admin/includes/ajax-actions.php */
+		do_action( 'widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		/** This action is documented in wp-admin/widgets.php */
+		do_action( 'sidebar_admin_setup' );
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_scripts-widgets.php' );
 	}
@@ -68,21 +74,28 @@ add_action( 'admin_print_footer_scripts', 'gutenberg_block_editor_admin_print_fo
  */
 function gutenberg_block_editor_admin_footer() {
 	if ( gutenberg_is_block_editor() ) {
-		// The function wpWidgets.save needs this nonce to work as expected.
-		echo implode(
-			"\n",
-			array(
-				'<form method="post">',
-				wp_nonce_field( 'save-sidebar-widgets', '_wpnonce_widgets', false ),
-				'</form>',
-			)
-		);
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_footer-widgets.php' );
 	}
 }
 add_action( 'admin_footer', 'gutenberg_block_editor_admin_footer' );
+
+/**
+ * Adds a save widgets nonce required by the legacy widgets block.
+ */
+function gutenberg_print_save_widgets_nonce() {
+	// The function wpWidgets.save needs this nonce to work as expected.
+	echo implode(
+		"\n",
+		array(
+			'<form method="post">',
+			wp_nonce_field( 'save-sidebar-widgets', '_wpnonce_widgets', false ),
+			'</form>',
+		)
+	);
+}
+add_action( 'admin_footer-widgets.php', 'gutenberg_print_save_widgets_nonce' );
 
 
 /**

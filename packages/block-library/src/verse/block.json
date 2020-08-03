@@ -1,6 +1,6 @@
 {
 	"name": "core/verse",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"content": {
 			"type": "string",
@@ -12,5 +12,9 @@
 		"textAlign": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"lightBlockWrapper": true
 	}
 }

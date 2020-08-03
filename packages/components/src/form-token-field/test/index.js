@@ -31,7 +31,7 @@ const charCodes = {
 	comma: 44,
 };
 
-describe( 'FormTokenField', function() {
+describe( 'FormTokenField', () => {
 	let wrapper, wrapperElement, textInputElement, textInputComponent;
 
 	function setText( text ) {
@@ -95,7 +95,7 @@ describe( 'FormTokenField', function() {
 		return selectedSuggestions[ 0 ] || null;
 	}
 
-	beforeEach( function() {
+	beforeEach( () => {
 		wrapper = TestUtils.renderIntoDocument( <TokenFieldWrapper /> );
 		/* eslint-disable react/no-find-dom-node */
 		wrapperElement = () => ReactDOM.findDOMNode( wrapper );
@@ -110,15 +110,15 @@ describe( 'FormTokenField', function() {
 		TestUtils.Simulate.focus( textInputElement() );
 	} );
 
-	describe( 'displaying tokens', function() {
-		it( 'should render default tokens', function() {
+	describe( 'displaying tokens', () => {
+		it( 'should render default tokens', () => {
 			wrapper.setState( {
 				isExpanded: true,
 			} );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
-		it( 'should display tokens with escaped special characters properly', function() {
+		it( 'should display tokens with escaped special characters properly', () => {
 			wrapper.setState( {
 				tokens: fixtures.specialTokens.textEscaped,
 				isExpanded: true,
@@ -128,7 +128,7 @@ describe( 'FormTokenField', function() {
 			);
 		} );
 
-		it( 'should display tokens with special characters properly', function() {
+		it( 'should display tokens with special characters properly', () => {
 			// This test is not as realistic as the previous one: if a WP site
 			// contains tag names with special characters, the API will always
 			// return the tag names already escaped.  However, this is still
@@ -145,8 +145,8 @@ describe( 'FormTokenField', function() {
 		} );
 	} );
 
-	describe( 'suggestions', function() {
-		it( 'should not render suggestions unless we type at least two characters', function() {
+	describe( 'suggestions', () => {
+		it( 'should not render suggestions unless we type at least two characters', () => {
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -157,14 +157,14 @@ describe( 'FormTokenField', function() {
 			);
 		} );
 
-		it( 'should remove already added tags from suggestions', function() {
+		it( 'should remove already added tags from suggestions', () => {
 			wrapper.setState( {
 				tokens: Object.freeze( [ 'of', 'and' ] ),
 			} );
 			expect( getSuggestionsText() ).not.toEqual( getTokensHTML() );
 		} );
 
-		it( 'suggestions that begin with match are boosted', function() {
+		it( 'suggestions that begin with match are boosted', () => {
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -174,7 +174,7 @@ describe( 'FormTokenField', function() {
 			);
 		} );
 
-		it( 'should match against the unescaped values of suggestions with special characters', function() {
+		it( 'should match against the unescaped values of suggestions with special characters', () => {
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
 				isExpanded: true,
@@ -185,7 +185,7 @@ describe( 'FormTokenField', function() {
 			);
 		} );
 
-		it( 'should match against the unescaped values of suggestions with special characters (including spaces)', function() {
+		it( 'should match against the unescaped values of suggestions with special characters (including spaces)', () => {
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
 				isExpanded: true,
@@ -196,7 +196,7 @@ describe( 'FormTokenField', function() {
 			);
 		} );
 
-		it( 'should not match against the escaped values of suggestions with special characters', function() {
+		it( 'should not match against the escaped values of suggestions with special characters', () => {
 			setText( 'amp' );
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
@@ -207,7 +207,7 @@ describe( 'FormTokenField', function() {
 			);
 		} );
 
-		it( 'should match suggestions even with trailing spaces', function() {
+		it( 'should match suggestions even with trailing spaces', () => {
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -217,7 +217,7 @@ describe( 'FormTokenField', function() {
 			);
 		} );
 
-		it( 'should manage the selected suggestion based on both keyboard and mouse events', function() {
+		it( 'should manage the selected suggestion based on both keyboard and mouse events', () => {
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -254,7 +254,7 @@ describe( 'FormTokenField', function() {
 			expect( getTokensHTML() ).toEqual( [ 'foo', 'bar', 'with' ] );
 		} );
 
-		it( 'should re-render when suggestions prop has changed', function() {
+		it( 'should re-render when suggestions prop has changed', () => {
 			wrapper.setState( {
 				tokenSuggestions: [],
 				isExpanded: true,
@@ -277,19 +277,19 @@ describe( 'FormTokenField', function() {
 		} );
 	} );
 
-	describe( 'adding tokens', function() {
-		it( 'should not allow adding blank tokens with Tab', function() {
+	describe( 'adding tokens', () => {
+		it( 'should not allow adding blank tokens with Tab', () => {
 			sendKeyDown( keyCodes.tab );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
-		it( 'should not allow adding whitespace tokens with Tab', function() {
+		it( 'should not allow adding whitespace tokens with Tab', () => {
 			setText( '   ' );
 			sendKeyDown( keyCodes.tab );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
-		it( 'should add a token when Enter pressed', function() {
+		it( 'should add a token when Enter pressed', () => {
 			setText( 'baz' );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
@@ -297,38 +297,38 @@ describe( 'FormTokenField', function() {
 			expect( textNode.props.value ).toBe( '' );
 		} );
 
-		it( 'should not allow adding blank tokens with Enter', function() {
+		it( 'should not allow adding blank tokens with Enter', () => {
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
-		it( 'should not allow adding whitespace tokens with Enter', function() {
+		it( 'should not allow adding whitespace tokens with Enter', () => {
 			setText( '   ' );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
-		it( 'should not allow adding whitespace tokens with comma', function() {
+		it( 'should not allow adding whitespace tokens with comma', () => {
 			setText( '   ' );
 			sendKeyPress( charCodes.comma );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
-		it( 'should add a token when comma pressed', function() {
+		it( 'should add a token when comma pressed', () => {
 			setText( 'baz' );
 			sendKeyPress( charCodes.comma );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
 		} );
 
-		it( 'should trim token values when adding', function() {
+		it( 'should trim token values when adding', () => {
 			setText( '  baz  ' );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
 		} );
 	} );
 
-	describe( 'removing tokens', function() {
-		it( 'should remove tokens when X icon clicked', function() {
+	describe( 'removing tokens', () => {
+		it( 'should remove tokens when X icon clicked', () => {
 			const forClickNode = wrapperElement().querySelector(
 				'.components-form-token-field__remove-token'
 			).firstChild;

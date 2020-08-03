@@ -7,7 +7,7 @@ import {
 	insertBlock,
 	clickBlockAppender,
 	pressKeyWithModifier,
-	openDocumentSettingsSidebar,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -23,7 +23,8 @@ describe( 'RichText', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await insertBlock( 'Heading' );
-		await openDocumentSettingsSidebar();
+		await page.waitForSelector( '[aria-label="Change heading level"]' );
+		await page.click( '[aria-label="Change heading level"]' );
 		await page.click( '[aria-label="Heading 3"]' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -84,12 +85,10 @@ describe( 'RichText', () => {
 	it( 'should return focus when pressing formatting button', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Some ' );
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		await showBlockToolbar();
 		await page.click( '[aria-label="Bold"]' );
 		await page.keyboard.type( 'bold' );
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		await showBlockToolbar();
 		await page.click( '[aria-label="Bold"]' );
 		await page.keyboard.type( '.' );
 

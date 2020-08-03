@@ -9,7 +9,7 @@
 
 	var baseBlock = {
 		icon: 'cart',
-		category: 'common',
+		category: 'text',
 		edit: function( props ) {
 			return el(
 				'div',
@@ -43,7 +43,7 @@
 				title: 'Test Align True',
 				supports: {
 					align: true,
-				}
+				},
 			},
 			baseBlock
 		)
@@ -56,7 +56,7 @@
 				title: 'Test Align Array',
 				supports: {
 					align: [ 'left', 'center' ],
-				}
+				},
 			},
 			baseBlock
 		)
@@ -75,7 +75,7 @@
 				},
 				supports: {
 					align: true,
-				}
+				},
 			},
 			baseBlock
 		)

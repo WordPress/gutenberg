@@ -33,9 +33,6 @@ export const settings = {
 			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
 	},
-	supports: {
-		lightBlockWrapper: true,
-	},
 	keywords: [ __( 'poetry' ), __( 'poem' ) ],
 	transforms,
 	deprecated,

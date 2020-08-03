@@ -12,7 +12,7 @@
 				selector: 'p',
 			},
 		},
-		category: 'formatting',
+		category: 'text',
 		edit: function( { attributes, setAttributes } ) {
 			return el( RichText, {
 				tagName: 'p',
@@ -58,9 +58,11 @@
 				},
 			},
 		},
-		category: 'formatting',
+		category: 'text',
 		edit: function( { attributes, setAttributes } ) {
-			return el( 'blockquote', {},
+			return el(
+				'blockquote',
+				{},
 				el( RichText, {
 					multiline: 'p',
 					value: toRichTextValue( attributes.value ),
@@ -73,7 +75,9 @@
 			);
 		},
 		save: function( { attributes } ) {
-			return el( 'blockquote', {},
+			return el(
+				'blockquote',
+				{},
 				el( RichText.Content, {
 					value: toRichTextValue( attributes.value ),
 				} )

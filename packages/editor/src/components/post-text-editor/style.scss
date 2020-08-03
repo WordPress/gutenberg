@@ -1,5 +1,5 @@
 .edit-post-text-editor__body textarea.editor-post-text-editor {
-	border: $border-width solid $light-gray-secondary;
+	border: $border-width solid $gray-400;
 	display: block;
 	margin: 0;
 	width: 100%;
@@ -7,10 +7,15 @@
 	resize: none;
 	overflow: hidden;
 	font-family: $editor-html-font;
-	line-height: 150%;
+	line-height: 2.4;
 	border-radius: 0;
-	padding: $grid-unit-20;
 	min-height: 200px;
+
+	// Same padding as title.
+	padding: $grid-unit-20;
+	@include break-small() {
+		padding: $grid-unit-30;
+	}
 
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
 	font-size: $mobile-text-min-font-size !important;
@@ -19,7 +24,7 @@
 	}
 
 	&:focus {
-		border: $border-width solid $dark-gray-primary;
+		border: $border-width solid $gray-900;
 		box-shadow: none;
 
 		// Elevate the z-index on focus so the focus style is uncropped.

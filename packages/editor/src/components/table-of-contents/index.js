@@ -3,15 +3,20 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { info } from '@wordpress/icons';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import TableOfContentsPanel from './panel';
 
-function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
+function TableOfContents( { hasOutlineItemsDisabled, ...props }, ref ) {
+	const hasBlocks = useSelect(
+		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+		[]
+	);
 	return (
 		<Dropdown
 			position="bottom"
@@ -19,6 +24,8 @@ function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
+					{ ...props }
+					ref={ ref }
 					onClick={ hasBlocks ? onToggle : undefined }
 					icon={ info }
 					aria-expanded={ isOpen }
@@ -37,8 +44,4 @@ function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
 	);
 }
 
-export default withSelect( ( select ) => {
-	return {
-		hasBlocks: !! select( 'core/block-editor' ).getBlockCount(),
-	};
-} )( TableOfContents );
+export default forwardRef( TableOfContents );

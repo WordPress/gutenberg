@@ -18,7 +18,6 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 
 export class BlockMover extends Component {
@@ -51,8 +50,7 @@ export class BlockMover extends Component {
 			isLocked,
 			isHidden,
 			rootClientId,
-			hideDragHandle,
-			__experimentalOrientation: orientation,
+			orientation,
 		} = this.props;
 		const { isFocused } = this.state;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
@@ -64,44 +62,37 @@ export class BlockMover extends Component {
 		// to an unfocused state (body as active element) without firing blur on,
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
-			<BlockDraggable clientIds={ clientIds }>
-				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
-					<div
-						className={ classnames( 'block-editor-block-mover', {
-							'is-visible': isFocused || ! isHidden,
-							'is-horizontal': orientation === 'horizontal',
-						} ) }
-						draggable={ isDraggable && ! hideDragHandle }
-						onDragStart={ onDraggableStart }
-						onDragEnd={ onDraggableEnd }
+			<div
+				className={ classnames( 'block-editor-block-mover', {
+					'is-visible': isFocused || ! isHidden,
+					'is-horizontal': orientation === 'horizontal',
+				} ) }
+			>
+				<ToolbarGroup>
+					<ToolbarItem
+						onFocus={ this.onFocus }
+						onBlur={ this.onBlur }
 					>
-						<ToolbarGroup>
-							<ToolbarItem
-								onFocus={ this.onFocus }
-								onBlur={ this.onBlur }
-							>
-								{ ( itemProps ) => (
-									<BlockMoverUpButton
-										clientIds={ clientIds }
-										{ ...itemProps }
-									/>
-								) }
-							</ToolbarItem>
-							<ToolbarItem
-								onFocus={ this.onFocus }
-								onBlur={ this.onBlur }
-							>
-								{ ( itemProps ) => (
-									<BlockMoverDownButton
-										clientIds={ clientIds }
-										{ ...itemProps }
-									/>
-								) }
-							</ToolbarItem>
-						</ToolbarGroup>
-					</div>
-				) }
-			</BlockDraggable>
+						{ ( itemProps ) => (
+							<BlockMoverUpButton
+								clientIds={ clientIds }
+								{ ...itemProps }
+							/>
+						) }
+					</ToolbarItem>
+					<ToolbarItem
+						onFocus={ this.onFocus }
+						onBlur={ this.onBlur }
+					>
+						{ ( itemProps ) => (
+							<BlockMoverDownButton
+								clientIds={ clientIds }
+								{ ...itemProps }
+							/>
+						) }
+					</ToolbarItem>
+				</ToolbarGroup>
+			</div>
 		);
 	}
 }
@@ -110,6 +101,7 @@ export default withSelect( ( select, { clientIds } ) => {
 	const {
 		getBlock,
 		getBlockIndex,
+		getBlockListSettings,
 		getTemplateLock,
 		getBlockOrder,
 		getBlockRootClientId,
@@ -134,5 +126,6 @@ export default withSelect( ( select, { clientIds } ) => {
 		firstIndex,
 		isFirst,
 		isLast,
+		orientation: getBlockListSettings( rootClientId )?.orientation,
 	};
 } )( BlockMover );

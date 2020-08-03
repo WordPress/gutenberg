@@ -35,8 +35,10 @@ function DownloadableBlockInfo( {
 					className="block-directory-downloadable-block-info__icon"
 					icon={ update }
 				/>
-				{ // translators: %s: Humanized date of last update e.g: "2 months ago".
-				sprintf( __( 'Updated %s' ), humanizedUpdated ) }
+				{
+					// translators: %s: Humanized date of last update e.g: "2 months ago".
+					sprintf( __( 'Updated %s' ), humanizedUpdated )
+				}
 			</div>
 		</Fragment>
 	);

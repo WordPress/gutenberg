@@ -14,9 +14,5 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Query Pagination' ),
-	supports: {
-		reusable: false,
-		html: false,
-	},
 	edit,
 };
