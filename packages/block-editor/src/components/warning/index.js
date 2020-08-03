@@ -37,6 +37,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 									position: 'bottom left',
 									className: 'block-editor-warning__dropdown',
 								} }
+								noIcons
 							>
 								{ () => (
 									<MenuGroup>
