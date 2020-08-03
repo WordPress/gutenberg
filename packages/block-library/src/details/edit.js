@@ -66,7 +66,9 @@ export default ( {
 					tagName="div"
 					className="block-library-details__pseudo-summary"
 					value={ attributes.summaryContent }
-					onChange={ ( summaryContent ) => setAttributes( { summaryContent } ) }
+					onChange={ ( summaryContent ) =>
+						setAttributes( { summaryContent } )
+					}
 					placeholder={ __( 'Write a summary…' ) }
 					aria-label={ __( 'Summary text' ) }
 				/>
