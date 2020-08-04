@@ -65,7 +65,7 @@ export const defaultEntities = [
 	{
 		name: 'widgetArea',
 		kind: 'root',
-		baseURL: '/wp-rest-api-sidebars/v1/sidebars?with-widgets',
+		baseURL: '/wp-rest-api-sidebars/v1/sidebars',
 		plural: 'widgetAreas',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),

@@ -24,7 +24,7 @@ import { useMemo } from '@wordpress/element';
  */
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import { KIND, WIDGET_AREA_ENTITY_TYPE } from '../../store/utils';
+import { KIND, POST_TYPE, buildWidgetAreaPostId } from '../../store/utils';
 
 const EMPTY_ARRAY = [];
 export default function WidgetAreasBlockEditorContent( {
@@ -103,8 +103,8 @@ function WidgetAreaEditor( { widgetArea, blockEditorSettings } ) {
 
 	const [ blocks, onInput, _onChange ] = useEntityBlockEditor(
 		KIND,
-		WIDGET_AREA_ENTITY_TYPE,
-		{ id: widgetArea.id }
+		POST_TYPE,
+		{ id: buildWidgetAreaPostId( widgetArea.id ) }
 	);
 
 	return (

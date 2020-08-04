@@ -129,6 +129,7 @@ function gutenberg_get_legacy_widget_settings() {
 		'WP_Nav_Menu_Widget',
 		'WP_Widget_Custom_HTML',
 	);
+	$core_widgets = array();
 
 	$has_permissions_to_manage_widgets = current_user_can( 'edit_theme_options' );
 	$available_legacy_widgets          = array();
@@ -137,6 +138,7 @@ function gutenberg_get_legacy_widget_settings() {
 		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
 			$available_legacy_widgets[ $class ] = array(
 				'name'              => html_entity_decode( $widget_obj->name ),
+				'id_base'           => $widget_obj->id_base,
 				// wp_widget_description is not being used because its input parameter is a Widget Id.
 				// Widgets id's reference to a specific widget instance.
 				// Here we are iterating on all the available widget classes even if no widget instance exists for them.

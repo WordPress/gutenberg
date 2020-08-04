@@ -54,12 +54,14 @@ class LegacyWidgetEdit extends Component {
 						hasPermissionsToManageWidgets
 					}
 					onChangeWidget={ ( newWidget ) => {
-						const { isReferenceWidget } = availableLegacyWidgets[
-							newWidget
-						];
+						const {
+							isReferenceWidget,
+							id_base: idBase,
+						} = availableLegacyWidgets[ newWidget ];
 						setAttributes( {
 							instance: {},
 							id: isReferenceWidget ? newWidget : undefined,
+							idBase,
 							widgetClass: isReferenceWidget
 								? undefined
 								: newWidget,

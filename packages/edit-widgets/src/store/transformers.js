@@ -45,6 +45,7 @@ export function transformBlockToWidget( block, relatedWidget = {} ) {
 
 	return {
 		...relatedWidget,
+		id_base: 'block',
 		widget_class: 'WP_Widget_Block',
 		settings: {
 			content: serialize( block ),

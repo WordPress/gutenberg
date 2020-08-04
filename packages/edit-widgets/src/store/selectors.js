@@ -11,7 +11,13 @@ import { createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { buildWidgetAreasQuery, KIND, WIDGET_AREA_ENTITY_TYPE } from './utils';
+import {
+	buildWidgetAreasQuery,
+	buildWidgetAreaPostId,
+	KIND,
+	POST_TYPE,
+	WIDGET_AREA_ENTITY_TYPE,
+} from './utils';
 
 export const getWidgets = createRegistrySelector( ( select ) => () => {
 	const initialWidgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
@@ -48,8 +54,8 @@ export const getEditedWidgetAreas = createRegistrySelector(
 			.filter( ( { id } ) =>
 				select( 'core' ).hasEditsForEntityRecord(
 					KIND,
-					WIDGET_AREA_ENTITY_TYPE,
-					id
+					POST_TYPE,
+					buildWidgetAreaPostId( id )
 				)
 			)
 			.map( ( { id } ) =>
@@ -107,8 +113,7 @@ export const hasResolvedWidgetAreas = createRegistrySelector(
 			WIDGET_AREA_ENTITY_TYPE,
 			query
 		);
-		const contentAssigned = ! areas.length || 'blocks' in areas[ 0 ];
-		if ( ! contentAssigned ) {
+		if ( ! areas.length ) {
 			return false;
 		}
 

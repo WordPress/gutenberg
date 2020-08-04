@@ -8,7 +8,13 @@ import { invert } from 'lodash';
  */
 import { dispatch, select, getWidgetToClientIdMapping } from './controls';
 import { transformBlockToWidget } from './transformers';
-import { KIND, WIDGET_AREA_ENTITY_TYPE } from './utils';
+import {
+	buildWidgetAreaPostId,
+	buildWidgetAreasQuery,
+	KIND,
+	POST_TYPE,
+	WIDGET_AREA_ENTITY_TYPE,
+} from './utils';
 
 export function* saveEditedWidgetAreas() {
 	const editedWidgetAreas = yield select(
@@ -25,7 +31,14 @@ export function* saveEditedWidgetAreas() {
 
 	// @TODO: Batch save and concurrency
 	for ( const widgetArea of editedWidgetAreas ) {
-		const widgetAreaBlock = widgetArea.blocks[ 0 ];
+		const post = yield select(
+			'core',
+			'getEditedEntityRecord',
+			KIND,
+			POST_TYPE,
+			buildWidgetAreaPostId( widgetArea.id )
+		);
+		const widgetAreaBlock = post.blocks[ 0 ];
 		const widgetsBlocks = widgetAreaBlock.innerBlocks;
 		const newWidgets = widgetsBlocks.map( ( block ) => {
 			const widgetId = clientIdToWidgetId[ block.clientId ];
@@ -33,25 +46,21 @@ export function* saveEditedWidgetAreas() {
 			return transformBlockToWidget( block, oldWidget );
 		} );
 
-		yield* saveWidgetArea( widgetArea, newWidgets );
+		yield dispatch(
+			'core',
+			'editEntityRecord',
+			KIND,
+			WIDGET_AREA_ENTITY_TYPE,
+			widgetArea.id,
+			{ widgets: newWidgets }
+		);
+
+		yield dispatch(
+			'core',
+			'saveEditedEntityRecord',
+			KIND,
+			WIDGET_AREA_ENTITY_TYPE,
+			widgetArea.id
+		);
 	}
-}
-
-export function* saveWidgetArea( widgetArea, newWidgets ) {
-	yield dispatch(
-		'core',
-		'editEntityRecord',
-		KIND,
-		WIDGET_AREA_ENTITY_TYPE,
-		widgetArea.id,
-		{ widgets: newWidgets }
-	);
-
-	yield dispatch(
-		'core',
-		'saveEditedEntityRecord',
-		KIND,
-		WIDGET_AREA_ENTITY_TYPE,
-		widgetArea.id
-	);
 }
