@@ -312,9 +312,9 @@ function gutenberg_experimental_global_styles_get_block_data() {
 							'gradients' => true,
 						),
 					),
-				),
+				)
 			),
-		),
+		)
 	);
 	foreach ( $blocks as $block_name => $block_type ) {
 		if ( empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
