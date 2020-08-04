@@ -1,7 +1,7 @@
 # Resources
 
 ## Figma
-The [WordPress Design team](https://make.wordpress.org/design/) uses [Figma](https://www.figma.com/) to collaborate and share work. If you'd like to contribute, join the [#design channel](https://app.slack.com/client/T024MFP4J/C02S78ZAL) in [Slack](https://make.wordpress.org/chat/) and ask the team to set you up with a free Figma account. This will give you access to a helpful library of components used in WordPress. They are stable, fully supported, up to date, and ready for use in designs and prototypes. 
+The [WordPress Design team](https://make.wordpress.org/design/) uses [Figma](https://www.figma.com/) to collaborate and share work. If you'd like to contribute, join the [#design channel](https://app.slack.com/client/T024MFP4J/C02S78ZAL) in [Slack](https://make.wordpress.org/chat/) and ask the team to set you up with a free Figma account. This will give you access to a helpful library of components used in WordPress. They are stable, fully supported, up to date, and ready for use in designs and prototypes.
 
 ### How to contribute
 
@@ -35,13 +35,13 @@ The [WordPress Design team](https://make.wordpress.org/design/) uses [Figma](htt
 
 ![How to turn on Figma libraries gif](https://wordpress.org/gutenberg/files/2019/08/figma-howtoturnonlibraries.gif)
 
-1. Click the **Team Library** icon in the **Assets** Panel: 
+1. Click the **Team Library** icon in the **Assets** Panel:
 
 ![Hovering over the team library icon](https://wordpress.org/gutenberg/files/2019/08/figma-turn-on-libraries-e1564770916643.png)
 
 2. The **Library** modal will open and allow you to view a list of available libraries. Toggle to _Enable_ or _Disable_ a specific library:
 
-![Switching on the WordPress components libray in Figma](https://wordpress.org/gutenberg/files/2019/08/figma-libraries-e1564770879415.png)
+![Switching on the WordPress components library in Figma](https://wordpress.org/gutenberg/files/2019/08/figma-libraries-e1564770879415.png)
 
 **How to refine or contribute to the WordPress components React library _(Coming soon)_**
 

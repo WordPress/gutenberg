@@ -4,9 +4,9 @@ Let's get you started creating your first block for the WordPress Block Editor. 
 
 The tutorial includes setting up your development environment, tools, and getting comfortable with the new development model. If you are already comfortable, try the quick start below, otherwise step through whatever part of the tutorial you need.
 
-## Prerequisities
+## Prerequisites
 
-The first thing you need is a development enviornment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md).
+The first thing you need is a development environment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md).
 
 ## Quick Start
 
