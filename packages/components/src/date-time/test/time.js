@@ -223,4 +223,52 @@ describe( 'TimePicker', () => {
 			screen.getByText( 'PM' ).classList.contains( 'is-primary' )
 		).toBe( true );
 	} );
+
+	it( 'should have different layouts/orders for 12/24 hour formats', () => {
+		const onChangeSpy = jest.fn();
+
+		const { rerender } = render(
+			<form aria-label="form">
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					is12Hour={ false }
+				/>
+			</form>
+		);
+
+		const form = screen.getByRole( 'form' );
+
+		let monthInputIndex = [].indexOf.call(
+			form.elements,
+			screen.getByLabelText( 'Month' )
+		);
+		let dayInputIndex = [].indexOf.call(
+			form.elements,
+			screen.getByLabelText( 'Day' )
+		);
+
+		expect( monthInputIndex < dayInputIndex ).toBe( true );
+
+		rerender(
+			<form aria-label="form">
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					is12Hour
+				/>
+			</form>
+		);
+
+		monthInputIndex = [].indexOf.call(
+			form.elements,
+			screen.getByLabelText( 'Month' )
+		);
+		dayInputIndex = [].indexOf.call(
+			form.elements,
+			screen.getByLabelText( 'Day' )
+		);
+
+		expect( monthInputIndex > dayInputIndex ).toBe( true );
+	} );
 } );
