@@ -234,15 +234,17 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	// If no render_callback, assume styles have been previously handled.
-	if ( ! $block_type || ! $block_type->render_callback ) {
+	if ( ! $block_type || ! $block_type->render_callback || empty( $block_type->supports ) ) {
 		return $block_content;
 	}
+
 	// Check what style features the block supports.
 	$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
 
 	$attributes = array();
 	$attributes = gutenberg_experimental_build_css_colors( $attributes, $block['attrs'], $supports );
 	$attributes = gutenberg_experimental_build_css_typography( $attributes, $block['attrs'], $supports );
+	$attributes = gutenberg_build_css_block_alignment( $attributes, $block['attrs'], $supports );
 
 	if ( ! count( $attributes ) ) {
 		return $block_content;
@@ -290,8 +292,8 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles', 10, 2 );
 
 /**
- * Build an array with CSS classes and inline styles defining the colors
- * which will be applied to the block markup in the front-end.
+ * Add CSS classes and inline styles for colors to the incoming attributes array.
+ * This will be applied to the block markup in the front-end.
  *
  * @param  array $attributes comprehensive list of attributes to be applied.
  * @param  array $block_attributes block attributes.
@@ -318,7 +320,7 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 	}
 
 	// Link Colors.
-	if ( in_array( 'link-color', $supports, true ) ) {
+	if ( in_array( '--wp--style--color--link', $supports, true ) ) {
 		$has_link_color = isset( $block_attributes['style']['color']['link'] );
 		// Apply required class and style.
 		if ( $has_link_color ) {
@@ -372,8 +374,8 @@ function gutenberg_experimental_build_css_colors( $attributes, $block_attributes
 }
 
 /**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the block markup in the front-end.
+ * Add CSS classes and inline styles for font sizes to the incoming attributes array.
+ * This will be applied to the block markup in the front-end.
  *
  * @param  array $attributes comprehensive list of attributes to be applied.
  * @param  array $block_attributes block attributes.
@@ -400,6 +402,27 @@ function gutenberg_experimental_build_css_typography( $attributes, $block_attrib
 		// Add the style (no classes for line-height).
 		if ( $has_line_height ) {
 			$attributes['inline_styles'][] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
+		}
+	}
+
+	return $attributes;
+}
+
+/**
+ * Add CSS classes for block alignment to the incoming attributes array.
+ * This will be applied to the block markup in the front-end.
+ *
+ * @param  array $attributes comprehensive list of attributes to be applied.
+ * @param  array $block_attributes block attributes.
+ * @param  array $supports style features the block attributes.
+ * @return array Block alignment CSS classes and inline styles.
+ */
+function gutenberg_build_css_block_alignment( $attributes, $block_attributes, $supports ) {
+	if ( in_array( 'block-align', $supports, true ) ) {
+		$has_block_alignment = array_key_exists( 'align', $block_attributes );
+
+		if ( $has_block_alignment ) {
+			$attributes['css_classes'][] = sprintf( 'align%s', $block_attributes['align'] );
 		}
 	}
 

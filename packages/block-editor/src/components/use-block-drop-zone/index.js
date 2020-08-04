@@ -171,7 +171,11 @@ function parseDropEvent( event ) {
  */
 export default function useBlockDropZone( {
 	element,
-	rootClientId: targetRootClientId,
+	// An undefined value represents a top-level block. Default to an empty
+	// string for this so that `targetRootClientId` can be easily compared to
+	// values returned by the `getRootBlockClientId` selector, which also uses
+	// an empty string to represent top-level blocks.
+	rootClientId: targetRootClientId = '',
 } ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
@@ -285,16 +289,14 @@ export default function useBlockDropZone( {
 				return;
 			}
 
-			const isAtSameLevel =
-				sourceRootClientId === targetRootClientId ||
-				( sourceRootClientId === '' &&
-					targetRootClientId === undefined );
-
 			// If the block is kept at the same level and moved downwards,
-			// subtract to account for blocks shifting upward to occupy its old position.
+			// subtract to take into account that the blocks being dragged
+			// were removed from the block list.
+			const isAtSameLevel = sourceRootClientId === targetRootClientId;
+			const draggedBlockCount = sourceClientIds.length;
 			const insertIndex =
 				isAtSameLevel && sourceBlockIndex < targetBlockIndex
-					? targetBlockIndex - 1
+					? targetBlockIndex - draggedBlockCount
 					: targetBlockIndex;
 
 			moveBlocksToPosition(

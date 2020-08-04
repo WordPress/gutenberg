@@ -158,31 +158,6 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should set an error if the plugin has no assets', () => {
-			const generator = installBlockType( { ...block, assets: [] } );
-
-			expect( generator.next().value ).toEqual( {
-				type: 'CLEAR_ERROR_NOTICE',
-				blockId: block.id,
-			} );
-
-			expect( generator.next().value ).toMatchObject( {
-				type: 'SET_ERROR_NOTICE',
-				blockId: block.id,
-			} );
-
-			expect( generator.next().value ).toEqual( {
-				type: 'SET_INSTALLING_BLOCK',
-				blockId: block.id,
-				isInstalling: false,
-			} );
-
-			expect( generator.next() ).toEqual( {
-				value: false,
-				done: true,
-			} );
-		} );
-
 		it( "should set an error if the plugin can't install", () => {
 			const generator = installBlockType( block );
 

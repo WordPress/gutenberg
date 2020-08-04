@@ -200,4 +200,23 @@ describe( 'TimePicker', () => {
 		pmButton.simulate( 'click' );
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T11:00:00' );
 	} );
+
+	it( 'should truncate at the minutes on change', () => {
+		const onChangeSpy = jest.fn();
+
+		const wrapper = shallow(
+			<TimePicker
+				currentTime="1986-10-18T23:12:35"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
+
+		const minuteInput = wrapper.find( 'input[aria-label="Minutes"]' );
+
+		minuteInput.simulate( 'change', { target: { value: '22' } } );
+		minuteInput.simulate( 'blur' );
+
+		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T23:22:00' );
+	} );
 } );

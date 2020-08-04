@@ -11,10 +11,16 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.34.0
+
+* [***] Media editing support in Cover block.
+* [*] Fixed a bug on the Heading block, where a heading with a link and string formatting showed a white shadow in dark mode.
+
 ## 1.33.0
 
 * [***] Media editing support in Media & Text block.
 * [***] New block: Social Icons
+* [*] Cover block placeholder is updated to allow users start the block with a background color
 
 ## 1.32.0
 
