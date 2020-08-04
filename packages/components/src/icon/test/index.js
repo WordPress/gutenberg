@@ -11,12 +11,17 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import Dashicon from '../../dashicon';
 import Icon from '../';
 import { Path, SVG } from '../../';
 
 describe( 'Icon', () => {
 	const className = 'example-class';
-	const svg = <SVG><Path d="M5 4v3h5.5v12h3V7H19V4z" /></SVG>;
+	const svg = (
+		<SVG>
+			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+		</SVG>
+	);
 	const style = { fill: 'red' };
 
 	it( 'renders nothing when icon omitted', () => {
@@ -28,11 +33,21 @@ describe( 'Icon', () => {
 	it( 'renders a dashicon by slug', () => {
 		const wrapper = shallow( <Icon icon="format-image" /> );
 
-		expect( wrapper.find( 'Dashicon' ).prop( 'icon' ) ).toBe( 'format-image' );
+		expect( wrapper.find( 'Dashicon' ).prop( 'icon' ) ).toBe(
+			'format-image'
+		);
 	} );
 
-	it( 'renders a dashicon and with a default size of 20', () => {
+	it( 'renders a dashicon by slug and with a default size of 20', () => {
 		const wrapper = shallow( <Icon icon="format-image" /> );
+
+		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
+	} );
+
+	it( 'renders a dashicon by element and with a default size of 20', () => {
+		const wrapper = shallow(
+			<Icon icon={ <Dashicon icon="format-image" /> } />
+		);
 
 		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
 	} );
@@ -63,7 +78,16 @@ describe( 'Icon', () => {
 	} );
 
 	it( 'renders an svg element and passes the size as its width and height', () => {
-		const wrapper = shallow( <Icon icon={ <SVG width={ 64 } height={ 64 }><Path d="M5 4v3h5.5v12h3V7H19V4z" /></SVG> } size={ 32 } /> );
+		const wrapper = shallow(
+			<Icon
+				icon={
+					<SVG width={ 64 } height={ 64 }>
+						<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+					</SVG>
+				}
+				size={ 32 }
+			/>
+		);
 
 		expect( wrapper.prop( 'width' ) ).toBe( 64 );
 		expect( wrapper.prop( 'height' ) ).toBe( 64 );
@@ -82,22 +106,21 @@ describe( 'Icon', () => {
 				return <span />;
 			}
 		}
-		const wrapper = shallow(
-			<Icon icon={ MyComponent } />
-		);
+		const wrapper = shallow( <Icon icon={ MyComponent } /> );
 
 		expect( wrapper.name() ).toBe( 'MyComponent' );
 	} );
 
 	describe( 'props passing', () => {
 		class MyComponent extends Component {
-			render( ) {
+			render() {
 				return <span className={ this.props.className } />;
 			}
 		}
 
 		describe.each( [
 			[ 'dashicon', { icon: 'format-image' } ],
+			[ 'dashicon element', { icon: <Dashicon icon="format-image" /> } ],
 			[ 'element', { icon: <span /> } ],
 			[ 'svg element', { icon: svg } ],
 			[ 'component', { icon: MyComponent } ],
@@ -116,7 +139,13 @@ describe( 'Icon', () => {
 			} );
 
 			it( 'should pass through all other props', () => {
-				const wrapper = shallow( <Icon { ...props } style={ style } className={ className } /> );
+				const wrapper = shallow(
+					<Icon
+						{ ...props }
+						style={ style }
+						className={ className }
+					/>
+				);
 
 				expect( wrapper.prop( 'style' ) ).toBe( style );
 				expect( wrapper.prop( 'className' ) ).toBe( className );

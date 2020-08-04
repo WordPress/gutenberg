@@ -1,0 +1,23 @@
+{
+	"name": "core/social-link",
+	"category": "widgets",
+	"parent": [
+		"core/social-links"
+	],
+	"attributes": {
+		"url": {
+			"type": "string"
+		},
+		"service": {
+			"type": "string"
+		},
+		"label": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}

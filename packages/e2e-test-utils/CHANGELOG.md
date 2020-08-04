@@ -1,3 +1,33 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 4.5.0 (2020-04-15)
+
+### Enhancements
+
+- `visitAdminPage` will now throw an error (emit a test failure) when there are unexpected errors on hte page.
+
+### New Features
+
+- Added `getPageError` function, returning a promise which resolves to an error message present in the page, if any exists.
+
+## 4.0.0 (2019-12-19)
+
+### Breaking Changes
+
+- The disableNavigationMode utility was removed. By default, the editor is in edit mode now.
+
+### Improvements
+
+- `setBrowserViewport` accepts an object of `width`, `height` values, to assign a viewport of arbitrary size.
+
+## 3.0.0 (2019-11-14)
+
+### Breaking Changes
+
+- The util function `enableExperimentalFeatures` was removed. It is now available for internal usage in the `e2e-tests` package.
+
 ## 2.0.0 (2019-05-21)
 
 ### Requirements
@@ -23,7 +53,7 @@
 
 ## 1.0.0 (2019-03-06)
 
-### New Features 
+### New Features
 
 -   Initial release.
 

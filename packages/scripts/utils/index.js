@@ -5,6 +5,7 @@ const {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
+	getNodeArgsFromCLI,
 	hasArgInCLI,
 	hasFileArgInCLI,
 	spawnScript,
@@ -12,31 +13,30 @@ const {
 const {
 	getWebpackArgs,
 	hasBabelConfig,
+	getJestOverrideConfigFile,
 	hasJestConfig,
+	hasPrettierConfig,
+	hasPostCSSConfig,
 } = require( './config' );
-const {
-	fromConfigRoot,
-	hasProjectFile,
-} = require( './file' );
-const {
-	hasPackageProp,
-} = require( './package' );
-const {
-	camelCaseDash,
-} = require( './string' );
+const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
+const { hasPackageProp } = require( './package' );
 
 module.exports = {
-	camelCaseDash,
+	fromProjectRoot,
 	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
+	getNodeArgsFromCLI,
 	getWebpackArgs,
 	hasBabelConfig,
 	hasArgInCLI,
 	hasFileArgInCLI,
+	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPackageProp,
+	hasPrettierConfig,
+	hasPostCSSConfig,
 	hasProjectFile,
 	spawnScript,
 };

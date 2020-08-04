@@ -12,7 +12,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes, capitalize } from 'lodash';
+import { get, mapValues, includes, capitalize, xor } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,6 +23,17 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { isAppleOS } from './platform';
+
+/**
+ * @typedef {'primary'|'primaryShift'|'primaryAlt'|'secondary'|'access'|'ctrl'|'alt'|'ctrlShift'|'shift'|'shiftAlt'} WPKeycodeModifier
+ */
+
+/**
+ * An object of handler functions for each of the possible modifier
+ * combinations. A handler will return a value for a given key.
+ *
+ * @typedef {Record<WPKeycodeModifier, (key:string)=>any>} WPKeycodeHandlerByModifier
+ */
 
 /**
  * Keycode for BACKSPACE key.
@@ -84,6 +95,10 @@ export const COMMAND = 'meta';
  * Keycode for SHIFT key.
  */
 export const SHIFT = 'shift';
+/**
+ * Keycode for ZERO key.
+ */
+export const ZERO = 48;
 
 /**
  * Object that contains functions that return the available modifier
@@ -101,11 +116,14 @@ export const SHIFT = 'shift';
  * - `shiftAlt`
  */
 export const modifiers = {
-	primary: ( _isApple ) => _isApple() ? [ COMMAND ] : [ CTRL ],
-	primaryShift: ( _isApple ) => _isApple() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],
-	primaryAlt: ( _isApple ) => _isApple() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
-	secondary: ( _isApple ) => _isApple() ? [ SHIFT, ALT, COMMAND ] : [ CTRL, SHIFT, ALT ],
-	access: ( _isApple ) => _isApple() ? [ CTRL, ALT ] : [ SHIFT, ALT ],
+	primary: ( _isApple ) => ( _isApple() ? [ COMMAND ] : [ CTRL ] ),
+	primaryShift: ( _isApple ) =>
+		_isApple() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],
+	primaryAlt: ( _isApple ) =>
+		_isApple() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
+	secondary: ( _isApple ) =>
+		_isApple() ? [ SHIFT, ALT, COMMAND ] : [ CTRL, SHIFT, ALT ],
+	access: ( _isApple ) => ( _isApple() ? [ CTRL, ALT ] : [ SHIFT, ALT ] ),
 	ctrl: () => [ CTRL ],
 	alt: () => [ ALT ],
 	ctrlShift: () => [ CTRL, SHIFT ],
@@ -118,7 +136,7 @@ export const modifiers = {
  * E.g. rawShortcut.primary( 'm' ) will return 'meta+m' on Mac.
  * These are intended for user with the KeyboardShortcuts component or TinyMCE.
  *
- * @type {Object} Keyed map of functions to raw shortcuts.
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to raw shortcuts.
  */
 export const rawShortcut = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
@@ -130,7 +148,8 @@ export const rawShortcut = mapValues( modifiers, ( modifier ) => {
  * Return an array of the parts of a keyboard shortcut chord for display
  * E.g displayShortcutList.primary( 'm' ) will return [ '⌘', 'M' ] on Mac.
  *
- * @type {Object} keyed map of functions to shortcut sequences
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to shortcut
+ *                                    sequences.
  */
 export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
@@ -142,15 +161,18 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 			[ SHIFT ]: isApple ? '⇧' : 'Shift',
 		};
 
-		const modifierKeys = modifier( _isApple ).reduce( ( accumulator, key ) => {
-			const replacementKey = get( replacementKeyMap, key, key );
-			// If on the Mac, adhere to platform convention and don't show plus between keys.
-			if ( isApple ) {
-				return [ ...accumulator, replacementKey ];
-			}
+		const modifierKeys = modifier( _isApple ).reduce(
+			( accumulator, key ) => {
+				const replacementKey = get( replacementKeyMap, key, key );
+				// If on the Mac, adhere to platform convention and don't show plus between keys.
+				if ( isApple ) {
+					return [ ...accumulator, replacementKey ];
+				}
 
-			return [ ...accumulator, replacementKey, '+' ];
-		}, [] );
+				return [ ...accumulator, replacementKey, '+' ];
+			},
+			[]
+		);
 
 		const capitalizedCharacter = capitalize( character );
 		return [ ...modifierKeys, capitalizedCharacter ];
@@ -161,15 +183,23 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
  * An object that contains functions to display shortcuts.
  * E.g. displayShortcut.primary( 'm' ) will return '⌘M' on Mac.
  *
- * @type {Object} Keyed map of functions to display shortcuts.
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to display
+ *                                    shortcuts.
  */
-export const displayShortcut = mapValues( displayShortcutList, ( shortcutList ) => {
-	return ( character, _isApple = isAppleOS ) => shortcutList( character, _isApple ).join( '' );
-} );
+export const displayShortcut = mapValues(
+	displayShortcutList,
+	( shortcutList ) => {
+		return ( character, _isApple = isAppleOS ) =>
+			shortcutList( character, _isApple ).join( '' );
+	}
+);
 
 /**
  * An object that contains functions to return an aria label for a keyboard shortcut.
  * E.g. shortcutAriaLabel.primary( '.' ) will return 'Command + Period' on Mac.
+ *
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to shortcut ARIA
+ *                                    labels.
  */
 export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
@@ -194,18 +224,33 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 } );
 
 /**
+ * From a given KeyboardEvent, returns an array of active modifier constants for
+ * the event.
+ *
+ * @param {KeyboardEvent} event Keyboard event.
+ *
+ * @return {Array<ALT|CTRL|COMMAND|SHIFT>} Active modifier constants.
+ */
+function getEventModifiers( event ) {
+	return [ ALT, CTRL, COMMAND, SHIFT ].filter(
+		( key ) => event[ `${ key }Key` ]
+	);
+}
+
+/**
  * An object that contains functions to check if a keyboard event matches a
  * predefined shortcut combination.
  * E.g. isKeyboardEvent.primary( event, 'm' ) will return true if the event
  * signals pressing ⌘M.
  *
- * @type {Object} Keyed map of functions to match events.
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to match events.
  */
 export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 	return ( event, character, _isApple = isAppleOS ) => {
 		const mods = getModifiers( _isApple );
+		const eventMods = getEventModifiers( event );
 
-		if ( ! mods.every( ( key ) => event[ `${ key }Key` ] ) ) {
+		if ( xor( mods, eventMods ).length ) {
 			return false;
 		}
 

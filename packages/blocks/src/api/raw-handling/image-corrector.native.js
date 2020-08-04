@@ -1,4 +1,3 @@
-
 /**
  * This method check for copy pasted img elements to see if they don't have suspicious attributes.
  *
@@ -6,7 +5,7 @@
  *
  * @return {void}
  */
-export default function( node ) {
+export default function imageCorrector( node ) {
 	if ( node.nodeName !== 'IMG' ) {
 		return;
 	}

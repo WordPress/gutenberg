@@ -1,4 +1,4 @@
-# Inspector Controls
+# InspectorControls
 
 <img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/inspector.png" with="281" height="527" alt="inspector">
 
@@ -25,7 +25,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 
 	icon: 'universal-access-alt',
 
-	category: 'layout',
+	category: 'design',
 
 	attributes: {
 		content: {
@@ -235,7 +235,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 const {
 	CheckboxControl,
 	RadioControl,
@@ -253,7 +253,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 
 	icon: 'universal-access-alt',
 
-	category: 'layout',
+	category: 'design',
 
 	attributes: {
 		content: {

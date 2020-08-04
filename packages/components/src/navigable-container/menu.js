@@ -14,11 +14,10 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
  */
 import NavigableContainer from './container';
 
-export function NavigableMenu( {
-	role = 'menu',
-	orientation = 'vertical',
-	...rest
-}, ref ) {
+export function NavigableMenu(
+	{ role = 'menu', orientation = 'vertical', ...rest },
+	ref
+) {
 	const eventToOffset = ( evt ) => {
 		const { keyCode } = evt;
 
@@ -39,6 +38,11 @@ export function NavigableMenu( {
 			return 1;
 		} else if ( includes( previous, keyCode ) ) {
 			return -1;
+		} else if ( includes( [ DOWN, UP, LEFT, RIGHT ], keyCode ) ) {
+			// Key press should be handled, e.g. have event propagation and
+			// default behavior handled by NavigableContainer but not result
+			// in an offset.
+			return 0;
 		}
 	};
 

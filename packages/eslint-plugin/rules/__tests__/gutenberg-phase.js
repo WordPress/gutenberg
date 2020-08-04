@@ -14,9 +14,12 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-const ACCESS_ERROR = 'The `GUTENBERG_PHASE` constant should be accessed using `process.env.GUTENBERG_PHASE`.';
-const EQUALITY_ERROR = 'The `GUTENBERG_PHASE` constant should only be used in a strict equality comparison with a primitive number.';
-const IF_ERROR = 'The `GUTENBERG_PHASE` constant should only be used as part of the condition in an if statement or ternary expression.';
+const ACCESS_ERROR =
+	'The `GUTENBERG_PHASE` constant should be accessed using `process.env.GUTENBERG_PHASE`.';
+const EQUALITY_ERROR =
+	'The `GUTENBERG_PHASE` constant should only be used in a strict equality comparison with a primitive number.';
+const IF_ERROR =
+	'The `GUTENBERG_PHASE` constant should only be used as part of the condition in an if statement or ternary expression.';
 
 ruleTester.run( 'gutenberg-phase', rule, {
 	valid: [

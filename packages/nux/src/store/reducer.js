@@ -15,10 +15,7 @@ import { combineReducers } from '@wordpress/data';
 export function guides( state = [], action ) {
 	switch ( action.type ) {
 		case 'TRIGGER_GUIDE':
-			return [
-				...state,
-				action.tipIds,
-			];
+			return [ ...state, action.tipIds ];
 	}
 
 	return state;

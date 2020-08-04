@@ -9,7 +9,11 @@ import {
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
 
-export default function SubheadEdit( { attributes, setAttributes, className } ) {
+export default function SubheadEdit( {
+	attributes,
+	setAttributes,
+	className,
+} ) {
 	const { align, content, placeholder } = attributes;
 
 	deprecated( 'The Subheading block', {

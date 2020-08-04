@@ -38,7 +38,7 @@ _Parameters_
 
 _Returns_
 
--   `?File`: The file for the blob URL.
+-   `(File|undefined)`: The file for the blob URL.
 
 <a name="isBlobURL" href="#isBlobURL">#</a> **isBlobURL**
 

@@ -110,9 +110,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the tip is in a guide and it is not the current tip', () => {
 			const state = {
-				guides: [
-					[ 'test/tip-1', 'test/tip-2', 'test/tip-3' ],
-				],
+				guides: [ [ 'test/tip-1', 'test/tip-2', 'test/tip-3' ] ],
 				preferences: {
 					areTipsEnabled: true,
 					dismissedTips: {},

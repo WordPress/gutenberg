@@ -50,9 +50,7 @@ function createRemoveHook( hooks, removeAll ) {
 			// Try to find the specified callback to remove.
 			const handlers = hooks[ hookName ].handlers;
 			for ( let i = handlers.length - 1; i >= 0; i-- ) {
-				if (
-					handlers[ i ].namespace === namespace
-				) {
+				if ( handlers[ i ].namespace === namespace ) {
 					handlers.splice( i, 1 );
 					handlersRemoved++;
 					// This callback may also be part of a hook that is
@@ -61,7 +59,10 @@ function createRemoveHook( hooks, removeAll ) {
 					// otherwise we need to decrease the execution index of any
 					// other runs by 1 to account for the removed element.
 					( hooks.__current || [] ).forEach( ( hookInfo ) => {
-						if ( hookInfo.name === hookName && hookInfo.currentIndex >= i ) {
+						if (
+							hookInfo.name === hookName &&
+							hookInfo.currentIndex >= i
+						) {
 							hookInfo.currentIndex--;
 						}
 					} );

@@ -6,18 +6,27 @@ import { times, unescape } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
+import {
+	PanelBody,
+	Placeholder,
+	Spinner,
+	ToggleControl,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { InspectorControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { pin } from '@wordpress/icons';
 
 class CategoriesEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.toggleDisplayAsDropdown = this.toggleDisplayAsDropdown.bind( this );
+		this.toggleDisplayAsDropdown = this.toggleDisplayAsDropdown.bind(
+			this
+		);
 		this.toggleShowPostCounts = this.toggleShowPostCounts.bind( this );
 		this.toggleShowHierarchy = this.toggleShowHierarchy.bind( this );
 	}
@@ -53,7 +62,9 @@ class CategoriesEdit extends Component {
 			return categories;
 		}
 
-		return categories.filter( ( category ) => category.parent === parentId );
+		return categories.filter(
+			( category ) => category.parent === parentId
+		);
 	}
 
 	getCategoryListClassName( level ) {
@@ -75,7 +86,9 @@ class CategoriesEdit extends Component {
 
 		return (
 			<ul className={ this.getCategoryListClassName( 0 ) }>
-				{ categories.map( ( category ) => this.renderCategoryListItem( category, 0 ) ) }
+				{ categories.map( ( category ) =>
+					this.renderCategoryListItem( category, 0 )
+				) }
 			</ul>
 		);
 	}
@@ -86,21 +99,32 @@ class CategoriesEdit extends Component {
 
 		return (
 			<li key={ category.id }>
-				<a href={ category.link } target="_blank" rel="noreferrer noopener">{ this.renderCategoryName( category ) }</a>
-				{ showPostCounts &&
+				<a
+					href={ category.link }
+					target="_blank"
+					rel="noreferrer noopener"
+				>
+					{ this.renderCategoryName( category ) }
+				</a>
+				{ showPostCounts && (
 					<span className="wp-block-categories__post-count">
-						{ ' ' }({ category.count })
+						{ ' ' }
+						({ category.count })
 					</span>
-				}
+				) }
 
-				{
-					showHierarchy &&
-					!! childCategories.length && (
-						<ul className={ this.getCategoryListClassName( level + 1 ) }>
-							{ childCategories.map( ( childCategory ) => this.renderCategoryListItem( childCategory, level + 1 ) ) }
-						</ul>
-					)
-				}
+				{ showHierarchy && !! childCategories.length && (
+					<ul
+						className={ this.getCategoryListClassName( level + 1 ) }
+					>
+						{ childCategories.map( ( childCategory ) =>
+							this.renderCategoryListItem(
+								childCategory,
+								level + 1
+							)
+						) }
+					</ul>
+				) }
 			</li>
 		);
 	}
@@ -113,11 +137,16 @@ class CategoriesEdit extends Component {
 		const selectId = `blocks-category-select-${ instanceId }`;
 		return (
 			<>
-				<label htmlFor={ selectId } className="screen-reader-text">
+				<VisuallyHidden as="label" htmlFor={ selectId }>
 					{ __( 'Categories' ) }
-				</label>
-				<select id={ selectId } className="wp-block-categories__dropdown">
-					{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
+				</VisuallyHidden>
+				<select
+					id={ selectId }
+					className="wp-block-categories__dropdown"
+				>
+					{ categories.map( ( category ) =>
+						this.renderCategoryDropdownItem( category, 0 )
+					) }
 				</select>
 			</>
 		);
@@ -131,16 +160,13 @@ class CategoriesEdit extends Component {
 			<option key={ category.id }>
 				{ times( level * 3, () => '\xa0' ) }
 				{ this.renderCategoryName( category ) }
-				{
-					!! showPostCounts ?
-						` (${ category.count })` :
-						''
-				}
+				{ !! showPostCounts ? ` (${ category.count })` : '' }
 			</option>,
 			showHierarchy &&
-			!! childCategories.length && (
-				childCategories.map( ( childCategory ) => this.renderCategoryDropdownItem( childCategory, level + 1 ) )
-			),
+				!! childCategories.length &&
+				childCategories.map( ( childCategory ) =>
+					this.renderCategoryDropdownItem( childCategory, level + 1 )
+				),
 		];
 	}
 
@@ -150,19 +176,19 @@ class CategoriesEdit extends Component {
 
 		const inspectorControls = (
 			<InspectorControls>
-				<PanelBody title={ __( 'Categories Settings' ) }>
+				<PanelBody title={ __( 'Categories settings' ) }>
 					<ToggleControl
-						label={ __( 'Display as Dropdown' ) }
+						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ this.toggleDisplayAsDropdown }
 					/>
 					<ToggleControl
-						label={ __( 'Show Hierarchy' ) }
+						label={ __( 'Show hierarchy' ) }
 						checked={ showHierarchy }
 						onChange={ this.toggleShowHierarchy }
 					/>
 					<ToggleControl
-						label={ __( 'Show Post Counts' ) }
+						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ this.toggleShowPostCounts }
 					/>
@@ -174,10 +200,7 @@ class CategoriesEdit extends Component {
 			return (
 				<>
 					{ inspectorControls }
-					<Placeholder
-						icon="admin-post"
-						label={ __( 'Categories' ) }
-					>
+					<Placeholder icon={ pin } label={ __( 'Categories' ) }>
 						<Spinner />
 					</Placeholder>
 				</>
@@ -188,11 +211,9 @@ class CategoriesEdit extends Component {
 			<>
 				{ inspectorControls }
 				<div className={ this.props.className }>
-					{
-						displayAsDropdown ?
-							this.renderCategoryDropdown() :
-							this.renderCategoryList()
-					}
+					{ displayAsDropdown
+						? this.renderCategoryDropdown()
+						: this.renderCategoryList() }
 				</div>
 			</>
 		);
@@ -206,7 +227,11 @@ export default compose(
 
 		return {
 			categories: getEntityRecords( 'taxonomy', 'category', query ),
-			isRequesting: isResolving( 'core', 'getEntityRecords', [ 'taxonomy', 'category', query ] ),
+			isRequesting: isResolving( 'core', 'getEntityRecords', [
+				'taxonomy',
+				'category',
+				query,
+			] ),
 		};
 	} ),
 	withInstanceId

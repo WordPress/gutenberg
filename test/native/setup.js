@@ -3,7 +3,15 @@
  */
 import { NativeModules } from 'react-native';
 
-jest.mock( 'react-native-gutenberg-bridge', () => {
+jest.mock( '@wordpress/element', () => {
+	return {
+		__esModule: true,
+		...jest.requireActual( '@wordpress/element' ),
+		render: jest.fn(),
+	};
+} );
+
+jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
 		removeEventListener: jest.fn(),
@@ -13,11 +21,31 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
+		subscribeAndroidModalClosed: jest.fn(),
+		subscribeUpdateTheme: jest.fn(),
+		subscribePreferredColorScheme: () => 'light',
 		editorDidMount: jest.fn(),
+		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
-		requestMediaPickFromMediaLibrary: jest.fn(),
-		requestMediaPickFromDeviceLibrary: jest.fn(),
-		requestMediaPickFromDeviceCamera: jest.fn(),
+		getOtherMediaOptions: jest.fn(),
+		requestMediaPicker: jest.fn(),
+		requestUnsupportedBlockFallback: jest.fn(),
+		subscribeReplaceBlock: jest.fn(),
+		mediaSources: {
+			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
+			deviceCamera: 'DEVICE_CAMERA',
+			siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
+		},
+	};
+} );
+
+jest.mock( 'react-native-dark-mode', () => {
+	return {
+		initialMode: 'light',
+		eventEmitter: {
+			on: jest.fn(),
+		},
+		useDarkModeContext: () => 'light',
 	};
 } );
 
@@ -50,7 +78,9 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
-jest.mock( 'react-native-recyclerview-list' );
+jest.mock( '@react-native-community/slider', () => () => 'Slider', {
+	virtual: true,
+} );
 
 if ( ! global.window.matchMedia ) {
 	global.window.matchMedia = () => ( {
@@ -59,6 +89,18 @@ if ( ! global.window.matchMedia ) {
 		removeListener: () => {},
 	} );
 }
+
+jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
+	virtual: true,
+} );
+
+jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
+	virtual: true,
+} );
+
+jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
+	virtual: true,
+} );
 
 // Overwrite some native module mocks from `react-native` jest preset:
 // https://github.com/facebook/react-native/blob/master/jest/setup.js
@@ -75,6 +117,8 @@ Object.keys( mockNativeModules ).forEach( ( module ) => {
 	try {
 		jest.doMock( module, () => mockNativeModules[ module ] ); // needed by FacebookSDK-test
 	} catch ( error ) {
-		jest.doMock( module, () => mockNativeModules[ module ], { virtual: true } );
+		jest.doMock( module, () => mockNativeModules[ module ], {
+			virtual: true,
+		} );
 	}
 } );

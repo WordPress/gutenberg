@@ -1,9 +1,6 @@
-/**
- * Internal dependencies
- */
-import fetchAllMiddleware from '../fetch-all-middleware';
-
 describe( 'Fetch All Middleware', () => {
+	beforeEach( jest.resetModules );
+
 	it( 'should defer with the same options to the next middleware', async () => {
 		expect.hasAssertions();
 		const originalOptions = { path: '/posts' };
@@ -12,14 +9,17 @@ describe( 'Fetch All Middleware', () => {
 			return Promise.resolve( 'ok' );
 		};
 
-		await fetchAllMiddleware( originalOptions, next );
+		await require( '../fetch-all-middleware' ).default(
+			originalOptions,
+			next
+		);
 	} );
 
 	it( 'should paginate the request', async () => {
 		expect.hasAssertions();
 		const originalOptions = { url: '/posts?per_page=-1' };
 		let counter = 1;
-		const next = ( options ) => {
+		jest.doMock( '../../index.js', () => ( options ) => {
 			if ( counter === 1 ) {
 				expect( options.url ).toBe( '/posts?per_page=100' );
 			} else {
@@ -29,9 +29,9 @@ describe( 'Fetch All Middleware', () => {
 				status: 200,
 				headers: {
 					get() {
-						return options.url === '/posts?per_page=100' ?
-							'</posts?per_page=100&page=2>; rel="next"' :
-							'';
+						return options.url === '/posts?per_page=100'
+							? '</posts?per_page=100&page=2>; rel="next"'
+							: '';
 					},
 				},
 				json() {
@@ -42,9 +42,11 @@ describe( 'Fetch All Middleware', () => {
 			counter++;
 
 			return response;
-		};
-
-		const result = await fetchAllMiddleware( originalOptions, next );
+		} );
+		const result = await require( '../fetch-all-middleware' ).default(
+			originalOptions,
+			() => {}
+		);
 
 		expect( result ).toEqual( [ 'item', 'item' ] );
 	} );

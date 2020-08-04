@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	isFunction,
-	isString,
-	map,
-	negate,
-} from 'lodash';
+import { isFunction, isString, map, negate } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +22,7 @@ class SlotComponent extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.isUnmounted = false;
 		this.bindNode = this.bindNode.bind( this );
 	}
 
@@ -38,7 +34,7 @@ class SlotComponent extends Component {
 
 	componentWillUnmount() {
 		const { unregisterSlot } = this.props;
-
+		this.isUnmounted = true;
 		unregisterSlot( this.props.name, this );
 	}
 
@@ -55,16 +51,21 @@ class SlotComponent extends Component {
 		this.node = node;
 	}
 
-	render() {
-		const { children, name, bubblesVirtually = false, fillProps = {}, getFills, className } = this.props;
-
-		if ( bubblesVirtually ) {
-			return <div ref={ this.bindNode } className={ className } />;
+	forceUpdate() {
+		if ( this.isUnmounted ) {
+			return;
 		}
+		super.forceUpdate();
+	}
+
+	render() {
+		const { children, name, fillProps = {}, getFills } = this.props;
 
 		const fills = map( getFills( name, this ), ( fill ) => {
 			const fillKey = fill.occurrence;
-			const fillChildren = isFunction( fill.children ) ? fill.children( fillProps ) : fill.children;
+			const fillChildren = isFunction( fill.children )
+				? fill.children( fillProps )
+				: fill.children;
 
 			return Children.map( fillChildren, ( child, childIndex ) => {
 				if ( ! child || isString( child ) ) {
@@ -81,11 +82,7 @@ class SlotComponent extends Component {
 			negate( isEmptyElement )
 		);
 
-		return (
-			<>
-				{ isFunction( children ) ? children( fills ) : fills }
-			</>
-		);
+		return <>{ isFunction( children ) ? children( fills ) : fills }</>;
 	}
 }
 

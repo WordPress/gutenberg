@@ -23,7 +23,10 @@ class CustomTemplatedPathPlugin {
 		this.handlers = [];
 
 		for ( const [ key, handler ] of Object.entries( handlers ) ) {
-			const regexp = new RegExp( `\\[${ escapeStringRegexp( key ) }\\]`, 'gi' );
+			const regexp = new RegExp(
+				`\\[${ escapeStringRegexp( key ) }\\]`,
+				'gi'
+			);
 			this.handlers.push( [ regexp, handler ] );
 		}
 	}
@@ -34,18 +37,27 @@ class CustomTemplatedPathPlugin {
 	 * @param {Object} compiler Webpack compiler
 	 */
 	apply( compiler ) {
-		compiler.hooks.compilation.tap( 'CustomTemplatedPathPlugin', ( compilation ) => {
-			compilation.mainTemplate.hooks.assetPath.tap( 'CustomTemplatedPathPlugin', ( path, data ) => {
-				for ( let i = 0; i < this.handlers.length; i++ ) {
-					const [ regexp, handler ] = this.handlers[ i ];
-					if ( regexp.test( path ) ) {
-						path = path.replace( regexp, handler( path, data ) );
-					}
-				}
+		compiler.hooks.compilation.tap(
+			'CustomTemplatedPathPlugin',
+			( compilation ) => {
+				compilation.mainTemplate.hooks.assetPath.tap(
+					'CustomTemplatedPathPlugin',
+					( path, data ) => {
+						for ( let i = 0; i < this.handlers.length; i++ ) {
+							const [ regexp, handler ] = this.handlers[ i ];
+							if ( regexp.test( path ) ) {
+								path = path.replace(
+									regexp,
+									handler( path, data )
+								);
+							}
+						}
 
-				return path;
-			} );
-		} );
+						return path;
+					}
+				);
+			}
+		);
 	}
 }
 

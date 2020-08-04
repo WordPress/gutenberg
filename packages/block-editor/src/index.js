@@ -4,13 +4,14 @@
 import '@wordpress/blocks';
 import '@wordpress/rich-text';
 import '@wordpress/viewport';
+import '@wordpress/keyboard-shortcuts';
+import '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import './store';
-import './hooks';
-
+import { AlignmentHookSettingsProvider as __experimentalAlignmentHookSettingsProvider } from './hooks';
+export { __experimentalAlignmentHookSettingsProvider };
 export * from './components';
 export * from './utils';
 export { storeConfig } from './store';

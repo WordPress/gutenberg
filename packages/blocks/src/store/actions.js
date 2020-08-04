@@ -3,6 +3,8 @@
  */
 import { castArray } from 'lodash';
 
+/** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+
 /**
  * Returns an action object used in signalling that block types have been added.
  *
@@ -59,6 +61,38 @@ export function removeBlockStyles( blockName, styleNames ) {
 	return {
 		type: 'REMOVE_BLOCK_STYLES',
 		styleNames: castArray( styleNames ),
+		blockName,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that new block variations have been added.
+ *
+ * @param {string}                              blockName  Block name.
+ * @param {WPBlockVariation|WPBlockVariation[]} variations Block variations.
+ *
+ * @return {Object} Action object.
+ */
+export function addBlockVariations( blockName, variations ) {
+	return {
+		type: 'ADD_BLOCK_VARIATIONS',
+		variations: castArray( variations ),
+		blockName,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that block variations have been removed.
+ *
+ * @param {string}          blockName      Block name.
+ * @param {string|string[]} variationNames Block variation names.
+ *
+ * @return {Object} Action object.
+ */
+export function removeBlockVariations( blockName, variationNames ) {
+	return {
+		type: 'REMOVE_BLOCK_VARIATIONS',
+		variationNames: castArray( variationNames ),
 		blockName,
 	};
 }
@@ -150,5 +184,37 @@ export function updateCategory( slug, category ) {
 		type: 'UPDATE_CATEGORY',
 		slug,
 		category,
+	};
+}
+
+/**
+ * Returns an action object used to add block collections
+ *
+ * @param {string} namespace       The namespace of the blocks to put in the collection
+ * @param {string} title           The title to display in the block inserter
+ * @param {Object} icon (optional) The icon to display in the block inserter
+ *
+ * @return {Object} Action object.
+ */
+export function addBlockCollection( namespace, title, icon ) {
+	return {
+		type: 'ADD_BLOCK_COLLECTION',
+		namespace,
+		title,
+		icon,
+	};
+}
+
+/**
+ * Returns an action object used to remove block collections
+ *
+ * @param {string} namespace       The namespace of the blocks to put in the collection
+ *
+ * @return {Object} Action object.
+ */
+export function removeBlockCollection( namespace ) {
+	return {
+		type: 'REMOVE_BLOCK_COLLECTION',
+		namespace,
 	};
 }

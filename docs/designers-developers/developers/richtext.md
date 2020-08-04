@@ -26,6 +26,40 @@ There are a number of core blocks using the RichText component. The JavaScript e
 ## Example
 
 {% codetabs %}
+{% ESNext %}
+```js
+import { registerBlockType } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
+
+registerBlockType( /* ... */, {
+	// ...
+
+	attributes: {
+		content: {
+			type: 'string',
+			source: 'html',
+			selector: 'h2',
+		},
+	},
+
+	edit( { className, attributes, setAttributes } ) {
+		return (
+			<RichText
+				tagName="h2" // The tag here is the element output and editable in the admin
+				className={ className }
+				value={ attributes.content } // Any existing content, either from the database or an attribute default
+				formattingControls={ [ 'bold', 'italic' ] } // Allow the content to be made bold or italic, but do not allow other formatting options
+				onChange={ ( content ) => setAttributes( { content } ) } // Store updated content as a block attribute
+				placeholder={ __( 'Heading...' ) } // Display this text before any content has been added by the user
+			/>
+		);
+	},
+
+	save( { attributes } ) {
+		return <RichText.Content tagName="h2" value={ attributes.content } />; // Saves <h2>Content added in the editor...</h2> to the database for frontend display
+	}
+} );
+```
 {% ES5 %}
 ```js
 wp.blocks.registerBlockType( /* ... */, {
@@ -56,40 +90,6 @@ wp.blocks.registerBlockType( /* ... */, {
 		return wp.element.createElement( wp.editor.RichText.Content, {
 			tagName: 'h2', value: props.attributes.content // Saves <h2>Content added in the editor...</h2> to the database for frontend display
 		} );
-	}
-} );
-```
-{% ESNext %}
-```js
-const { registerBlockType } = wp.blocks;
-const { RichText } = wp.editor;
-
-registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'h2',
-		},
-	},
-
-	edit( { className, attributes, setAttributes } ) {
-		return (
-			<RichText
-				tagName="h2" // The tag here is the element output and editable in the admin
-				className={ className }
-				value={ attributes.content } // Any existing content, either from the database or an attribute default
-				formattingControls={ [ 'bold', 'italic' ] } // Allow the content to be made bold or italic, but do not allow other formatting options
-				onChange={ ( content ) => setAttributes( { content } ) } // Store updated content as a block attribute
-				placeholder={ __( 'Heading...' ) } // Display this text before any content has been added by the user
-			/>
-		);
-	},
-
-	save( { attributes } ) {
-		return <RichText.Content tagName="h2" value={ attributes.content } />; // Saves <h2>Content added in the editor...</h2> to the database for frontend display
 	}
 } );
 ```

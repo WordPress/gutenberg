@@ -30,7 +30,10 @@ export function split( { formats, replacements, text, start, end }, string ) {
 		const startIndex = nextStart;
 		const value = {
 			formats: formats.slice( startIndex, startIndex + substring.length ),
-			replacements: replacements.slice( startIndex, startIndex + substring.length ),
+			replacements: replacements.slice(
+				startIndex,
+				startIndex + substring.length
+			),
 			text: substring,
 		};
 

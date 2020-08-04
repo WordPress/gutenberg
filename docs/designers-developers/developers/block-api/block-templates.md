@@ -32,12 +32,12 @@ function myplugin_register_template() {
 add_action( 'init', 'myplugin_register_template' );
 ```
 
-The following example in JavaScript creates a new block using [InnerBlocks](/packages/block-editor/src/components/inner-blocks/README.md) and templates, when inserted creates a set of blocks based off the template.
+The following example in JavaScript creates a new block using [InnerBlocks](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md) and templates, when inserted creates a set of blocks based off the template.
 
 ```js
 const el = wp.element.createElement;
 const { registerBlockType } = wp.blocks;
-const { InnerBlocks } = wp.editor;
+const { InnerBlocks } = wp.blockEditor;
 
 const BLOCKS_TEMPLATE = [
 	[ 'core/image', {} ],

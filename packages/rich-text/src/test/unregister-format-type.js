@@ -32,7 +32,9 @@ describe( 'unregisterFormatType', () => {
 
 	it( 'should fail if the format is not registered', () => {
 		const oldFormat = unregisterFormatType( 'core/test-format' );
-		expect( console ).toHaveErroredWith( 'Format core/test-format is not registered.' );
+		expect( console ).toHaveErroredWith(
+			'Format core/test-format is not registered.'
+		);
 		expect( oldFormat ).toBeUndefined();
 	} );
 

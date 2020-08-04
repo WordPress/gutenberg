@@ -12,7 +12,8 @@ function getSelectOptions( tree, level = 0 ) {
 	return flatMap( tree, ( treeNode ) => [
 		{
 			value: treeNode.id,
-			label: repeat( '\u00A0', level * 3 ) + unescapeString( treeNode.name ),
+			label:
+				repeat( '\u00A0', level * 3 ) + unescapeString( treeNode.name ),
 		},
 		...getSelectOptions( treeNode.children || [], level + 1 ),
 	] );

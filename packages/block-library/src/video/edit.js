@@ -6,11 +6,7 @@ import {
 	BaseControl,
 	Button,
 	Disabled,
-	IconButton,
 	PanelBody,
-	SelectControl,
-	ToggleControl,
-	Toolbar,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -20,26 +16,22 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
+	MediaReplaceFlow,
 	RichText,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
-import {
-	__,
-	sprintf,
-} from '@wordpress/i18n';
-import {
-	compose,
-	withInstanceId,
-} from '@wordpress/compose';
-import {
-	withSelect,
-} from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { compose, withInstanceId } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
+import { video as icon } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
-import icon from './icon';
+import VideoCommonSettings from './edit-common-settings';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -47,15 +39,8 @@ const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 class VideoEdit extends Component {
 	constructor() {
 		super( ...arguments );
-		// edit component has its own src in the state so it can be edited
-		// without setting the actual value outside of the edit UI
-		this.state = {
-			editing: ! this.props.attributes.src,
-		};
-
 		this.videoPlayer = createRef();
 		this.posterImageButton = createRef();
-		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
 		this.onRemovePoster = this.onRemovePoster.bind( this );
@@ -79,7 +64,6 @@ class VideoEdit extends Component {
 						setAttributes( { src: url } );
 					},
 					onError: ( message ) => {
-						this.setState( { editing: true } );
 						noticeOperations.createErrorNotice( message );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
@@ -94,31 +78,21 @@ class VideoEdit extends Component {
 		}
 	}
 
-	toggleAttribute( attribute ) {
-		return ( newValue ) => {
-			this.props.setAttributes( { [ attribute ]: newValue } );
-		};
-	}
-
 	onSelectURL( newSrc ) {
 		const { attributes, setAttributes } = this.props;
 		const { src } = attributes;
 
-		// Set the block's src from the edit component's state, and switch off
-		// the editing UI.
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
-			const embedBlock = createUpgradedEmbedBlock(
-				{ attributes: { url: newSrc } }
-			);
+			const embedBlock = createUpgradedEmbedBlock( {
+				attributes: { url: newSrc },
+			} );
 			if ( undefined !== embedBlock ) {
 				this.props.onReplace( embedBlock );
 				return;
 			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
-
-		this.setState( { editing: false } );
 	}
 
 	onSelectPoster( image ) {
@@ -140,60 +114,43 @@ class VideoEdit extends Component {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	getAutoplayHelp( checked ) {
-		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
-	}
-
 	render() {
+		const { id, caption, controls, poster, src } = this.props.attributes;
 		const {
-			autoplay,
-			caption,
-			controls,
-			loop,
-			muted,
-			playsInline,
-			poster,
-			preload,
-			src,
-		} = this.props.attributes;
-		const {
-			className,
 			instanceId,
 			isSelected,
 			noticeUI,
+			attributes,
 			setAttributes,
+			insertBlocksAfter,
 		} = this.props;
-		const { editing } = this.state;
-		const switchToEditing = () => {
-			this.setState( { editing: true } );
-		};
 		const onSelectVideo = ( media ) => {
 			if ( ! media || ! media.url ) {
-				// in this case there was an error and we should continue in the editing state
-				// previous attributes should be removed because they may be temporary blob urls
+				// in this case there was an error
+				// previous attributes should be removed
+				// because they may be temporary blob urls
 				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
 				return;
 			}
 			// sets the block's attribute and updates the edit component from the
-			// selected media, then switches off the editing UI
+			// selected media
 			setAttributes( { src: media.url, id: media.id } );
-			this.setState( { src: media.url, editing: false } );
 		};
 
-		if ( editing ) {
+		if ( ! src ) {
 			return (
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					className={ className }
-					onSelect={ onSelectVideo }
-					onSelectURL={ this.onSelectURL }
-					accept="video/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ this.props.attributes }
-					notices={ noticeUI }
-					onError={ this.onUploadError }
-				/>
+				<Block.div>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						onSelect={ onSelectVideo }
+						onSelectURL={ this.onSelectURL }
+						accept="video/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ this.props.attributes }
+						notices={ noticeUI }
+						onError={ this.onUploadError }
+					/>
+				</Block.div>
 			);
 		}
 		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
@@ -201,94 +158,74 @@ class VideoEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit video' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</Toolbar>
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="video/*"
+						onSelect={ onSelectVideo }
+						onSelectURL={ this.onSelectURL }
+						onError={ this.onUploadError }
+					/>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Video Settings' ) }>
-						<ToggleControl
-							label={ __( 'Autoplay' ) }
-							onChange={ this.toggleAttribute( 'autoplay' ) }
-							checked={ autoplay }
-							help={ this.getAutoplayHelp }
-						/>
-						<ToggleControl
-							label={ __( 'Loop' ) }
-							onChange={ this.toggleAttribute( 'loop' ) }
-							checked={ loop }
-						/>
-						<ToggleControl
-							label={ __( 'Muted' ) }
-							onChange={ this.toggleAttribute( 'muted' ) }
-							checked={ muted }
-						/>
-						<ToggleControl
-							label={ __( 'Playback Controls' ) }
-							onChange={ this.toggleAttribute( 'controls' ) }
-							checked={ controls }
-						/>
-						<ToggleControl
-							label={ __( 'Play inline' ) }
-							onChange={ this.toggleAttribute( 'playsInline' ) }
-							checked={ playsInline }
-						/>
-						<SelectControl
-							label={ __( 'Preload' ) }
-							value={ preload }
-							onChange={ ( value ) => setAttributes( { preload: value } ) }
-							options={ [
-								{ value: 'auto', label: __( 'Auto' ) },
-								{ value: 'metadata', label: __( 'Metadata' ) },
-								{ value: 'none', label: __( 'None' ) },
-							] }
+					<PanelBody title={ __( 'Video settings' ) }>
+						<VideoCommonSettings
+							setAttributes={ setAttributes }
+							attributes={ attributes }
 						/>
 						<MediaUploadCheck>
-							<BaseControl
-								className="editor-video-poster-control"
-							>
+							<BaseControl className="editor-video-poster-control">
 								<BaseControl.VisualLabel>
-									{ __( 'Poster Image' ) }
+									{ __( 'Poster image' ) }
 								</BaseControl.VisualLabel>
 								<MediaUpload
-									title={ __( 'Select Poster Image' ) }
+									title={ __( 'Select poster image' ) }
 									onSelect={ this.onSelectPoster }
-									allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
+									allowedTypes={
+										VIDEO_POSTER_ALLOWED_MEDIA_TYPES
+									}
 									render={ ( { open } ) => (
 										<Button
-											isDefault
+											isPrimary
 											onClick={ open }
 											ref={ this.posterImageButton }
-											aria-describedby={ videoPosterDescription }
+											aria-describedby={
+												videoPosterDescription
+											}
 										>
-											{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
+											{ ! this.props.attributes.poster
+												? __( 'Select' )
+												: __( 'Replace' ) }
 										</Button>
 									) }
 								/>
-								<p
-									id={ videoPosterDescription }
-									hidden
-								>
-									{ this.props.attributes.poster ?
-										sprintf( __( 'The current poster image url is %s' ), this.props.attributes.poster ) :
-										__( 'There is no poster image currently selected' )
-									}
+								<p id={ videoPosterDescription } hidden>
+									{ this.props.attributes.poster
+										? sprintf(
+												/* translators: %s: poster image URL. */
+												__(
+													'The current poster image url is %s'
+												),
+												this.props.attributes.poster
+										  )
+										: __(
+												'There is no poster image currently selected'
+										  ) }
 								</p>
-								{ !! this.props.attributes.poster &&
-									<Button onClick={ this.onRemovePoster } isLink isDestructive>
-										{ __( 'Remove Poster Image' ) }
+								{ !! this.props.attributes.poster && (
+									<Button
+										onClick={ this.onRemovePoster }
+										isTertiary
+									>
+										{ __( 'Remove' ) }
 									</Button>
-								}
+								) }
 							</BaseControl>
 						</MediaUploadCheck>
 					</PanelBody>
 				</InspectorControls>
-				<figure className={ className }>
+				<Block.figure>
 					{ /*
 						Disable the video tag so the user clicking on it won't play the
 						video when the controls are enabled.
@@ -306,11 +243,18 @@ class VideoEdit extends Component {
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
 							inlineToolbar
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/paragraph' )
+								)
+							}
 						/>
 					) }
-				</figure>
+				</Block.figure>
 			</>
 		);
 	}
@@ -319,10 +263,8 @@ class VideoEdit extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		const { __experimentalMediaUpload } = getSettings();
-		return {
-			mediaUpload: __experimentalMediaUpload,
-		};
+		const { mediaUpload } = getSettings();
+		return { mediaUpload };
 	} ),
 	withNotices,
 	withInstanceId,

@@ -2,86 +2,51 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import ToolbarButton from '../toolbar-button';
-import DropdownMenu from '../dropdown-menu';
+import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 
 /**
- * Renders a toolbar with controls.
+ * Renders a toolbar.
  *
- * The `controls` prop accepts an array of sets. A set is an array of controls.
- * Controls have the following shape:
+ * To add controls, simply pass `ToolbarButton` components as children.
  *
- * ```
- * {
- *   icon: string,
- *   title: string,
- *   subscript: string,
- *   onClick: Function,
- *   isActive: boolean,
- *   isDisabled: boolean
- * }
- * ```
- *
- * For convenience it is also possible to pass only an array of controls. It is
- * then assumed this is the only set.
- *
- * Either `controls` or `children` is required, otherwise this components
- * renders nothing.
- *
- * @param {Object}        props
- * @param {Array}        [props.controls]  The controls to render in this toolbar.
- * @param {ReactElement} [props.children]  Any other things to render inside the
- *                                         toolbar besides the controls.
- * @param {string}       [props.className] Class to set on the container div.
- *
- * @return {ReactElement} The rendered toolbar.
+ * @param {Object} props                                    Component props.
+ * @param {string} [props.className]                        Class to set on the container div.
+ * @param {string} [props.__experimentalAccessibilityLabel] ARIA label for toolbar container.
+ * @param {Object} ref                                      React Element ref.
  */
-function Toolbar( { controls = [], children, className, isCollapsed, icon, label, ...otherProps } ) {
-	if (
-		( ! controls || ! controls.length ) &&
-		! children
-	) {
-		return null;
-	}
-
-	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets = controls;
-	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-		controlSets = [ controlSets ];
-	}
-
-	if ( isCollapsed ) {
+function Toolbar(
+	{ className, __experimentalAccessibilityLabel, ...props },
+	ref
+) {
+	if ( __experimentalAccessibilityLabel ) {
 		return (
-			<DropdownMenu
-				hasArrowIndicator
-				icon={ icon }
-				label={ label }
-				controls={ controlSets }
-				className={ classnames( 'components-toolbar', className ) }
+			<ToolbarContainer
+				// `ToolbarGroup` already uses components-toolbar for compatibility reasons
+				className={ classnames(
+					'components-accessible-toolbar',
+					className
+				) }
+				accessibilityLabel={ __experimentalAccessibilityLabel }
+				ref={ ref }
+				{ ...props }
 			/>
 		);
 	}
-
-	return (
-		<ToolbarContainer className={ classnames( 'components-toolbar', className ) } { ...otherProps }>
-			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
-				controlSet.map( ( control, indexOfControl ) => (
-					<ToolbarButton
-						key={ [ indexOfSet, indexOfControl ].join() }
-						containerClassName={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
-						{ ...control }
-					/>
-				) )
-			) ) }
-			{ children }
-		</ToolbarContainer>
-	);
+	// When the __experimentalAccessibilityLabel prop is not passed, Toolbar will
+	// fallback to ToolbarGroup. This should be deprecated as soon as the new API
+	// gets stable.
+	// See https://github.com/WordPress/gutenberg/pull/20008#issuecomment-624503410
+	return <ToolbarGroup { ...props } className={ className } />;
 }
 
-export default Toolbar;
+export default forwardRef( Toolbar );

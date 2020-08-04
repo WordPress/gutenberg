@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextShortcut, __unstableRichTextInputEvent } from '@wordpress/block-editor';
+import {
+	RichTextShortcut,
+	__unstableRichTextInputEvent,
+} from '@wordpress/block-editor';
 
 const name = 'core/underline';
 
@@ -23,7 +26,8 @@ export const underline = {
 					attributes: {
 						style: 'text-decoration: underline;',
 					},
-				} ) );
+				} )
+			);
 		};
 
 		return (

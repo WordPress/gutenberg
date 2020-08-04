@@ -1,0 +1,20 @@
+[
+    {
+        "blockName": "core/social-link-flickr",
+        "attrs": {
+            "url": "https://example.com/"
+        },
+        "innerBlocks": [],
+        "innerHTML": "",
+        "innerContent": []
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

@@ -2,7 +2,7 @@
  * A function that adds two parameters.
  *
  * @deprecated Use native addition instead.
- * @since v2
+ * @since 2.0.0
  *
  * @see addition
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators

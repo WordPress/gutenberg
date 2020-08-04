@@ -15,6 +15,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
+import { DEFAULT_ENTITY_KEY } from './entities';
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -25,9 +26,15 @@ import { getQueriedItems } from './queried-data';
  *
  * @return {boolean} Whether a request is in progress for an embed preview.
  */
-export const isRequestingEmbedPreview = createRegistrySelector( ( select ) => ( state, url ) => {
-	return select( 'core/data' ).isResolving( REDUCER_KEY, 'getEmbedPreview', [ url ] );
-} );
+export const isRequestingEmbedPreview = createRegistrySelector(
+	( select ) => ( state, url ) => {
+		return select( 'core/data' ).isResolving(
+			REDUCER_KEY,
+			'getEmbedPreview',
+			[ url ]
+		);
+	}
+);
 
 /**
  * Returns all available authors.
@@ -104,8 +111,65 @@ export function getEntity( state, kind, name ) {
  * @return {Object?} Record.
  */
 export function getEntityRecord( state, kind, name, key ) {
-	return get( state.entities.data, [ kind, name, 'queriedData', 'items', key ] );
+	return get( state.entities.data, [
+		kind,
+		name,
+		'queriedData',
+		'items',
+		key,
+	] );
 }
+
+/**
+ * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
+ *
+ * @param {Object} state  State tree
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {number} key    Record's key
+ *
+ * @return {Object?} Record.
+ */
+export function __experimentalGetEntityRecordNoResolver(
+	state,
+	kind,
+	name,
+	key
+) {
+	return getEntityRecord( state, kind, name, key );
+}
+
+/**
+ * Returns the entity's record object by key,
+ * with its attributes mapped to their raw values.
+ *
+ * @param {Object} state  State tree.
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {number} key    Record's key.
+ *
+ * @return {Object?} Object with the entity's raw attributes.
+ */
+export const getRawEntityRecord = createSelector(
+	( state, kind, name, key ) => {
+		const record = getEntityRecord( state, kind, name, key );
+		return (
+			record &&
+			Object.keys( record ).reduce( ( accumulator, _key ) => {
+				// Because edits are the "raw" attribute values,
+				// we return those from record selectors to make rendering,
+				// comparisons, and joins with edits easier.
+				accumulator[ _key ] = get(
+					record[ _key ],
+					'raw',
+					record[ _key ]
+				);
+				return accumulator;
+			}, {} )
+		);
+	},
+	( state ) => [ state.entities.data ]
+);
 
 /**
  * Returns the Entity's records.
@@ -115,15 +179,72 @@ export function getEntityRecord( state, kind, name, key ) {
  * @param {string}  name   Entity name.
  * @param {?Object} query  Optional terms query.
  *
- * @return {Array} Records.
+ * @return {?Array} Records.
  */
 export function getEntityRecords( state, kind, name, query ) {
-	const queriedState = get( state.entities.data, [ kind, name, 'queriedData' ] );
+	const queriedState = get( state.entities.data, [
+		kind,
+		name,
+		'queriedData',
+	] );
 	if ( ! queriedState ) {
 		return [];
 	}
 	return getQueriedItems( queriedState, query );
 }
+
+/**
+ * Returns the  list of dirty entity records.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {[{ title: string, key: string, name: string, kind: string }]} The list of updated records
+ */
+export const __experimentalGetDirtyEntityRecords = createSelector(
+	( state ) => {
+		const {
+			entities: { data },
+		} = state;
+		const dirtyRecords = [];
+		Object.keys( data ).forEach( ( kind ) => {
+			Object.keys( data[ kind ] ).forEach( ( name ) => {
+				const primaryKeys = Object.keys(
+					data[ kind ][ name ].edits
+				).filter( ( primaryKey ) =>
+					hasEditsForEntityRecord( state, kind, name, primaryKey )
+				);
+
+				if ( primaryKeys.length ) {
+					const entity = getEntity( state, kind, name );
+					primaryKeys.forEach( ( primaryKey ) => {
+						const entityRecord = getEditedEntityRecord(
+							state,
+							kind,
+							name,
+							primaryKey
+						);
+						dirtyRecords.push( {
+							// We avoid using primaryKey because it's transformed into a string
+							// when it's used as an object key.
+							key:
+								entityRecord[
+									entity.key || DEFAULT_ENTITY_KEY
+								],
+							title: ! entity.getTitle
+								? ''
+								: entity.getTitle( entityRecord ),
+							name,
+							kind,
+						} );
+					} );
+				}
+			} );
+		} );
+
+		return dirtyRecords;
+	},
+	( state ) => [ state.entities.data ]
+);
 
 /**
  * Returns the specified entity record's edits.
@@ -155,9 +276,11 @@ export function getEntityRecordEdits( state, kind, name, recordId ) {
  */
 export const getEntityRecordNonTransientEdits = createSelector(
 	( state, kind, name, recordId ) => {
-		const { transientEdits = {} } = getEntity( state, kind, name );
-		const edits =
-							getEntityRecordEdits( state, kind, name, recordId ) || [];
+		const { transientEdits } = getEntity( state, kind, name ) || {};
+		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
+		if ( ! transientEdits ) {
+			return edits;
+		}
 		return Object.keys( edits ).reduce( ( acc, key ) => {
 			if ( ! transientEdits[ key ] ) {
 				acc[ key ] = edits[ key ];
@@ -180,7 +303,12 @@ export const getEntityRecordNonTransientEdits = createSelector(
  * @return {boolean} Whether the entity record has edits or not.
  */
 export function hasEditsForEntityRecord( state, kind, name, recordId ) {
-	return Object.keys( getEntityRecordNonTransientEdits( state, kind, name, recordId ) ).length > 0;
+	return (
+		isSavingEntityRecord( state, kind, name, recordId ) ||
+		Object.keys(
+			getEntityRecordNonTransientEdits( state, kind, name, recordId )
+		).length > 0
+	);
 }
 
 /**
@@ -194,16 +322,10 @@ export function hasEditsForEntityRecord( state, kind, name, recordId ) {
  * @return {Object?} The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
-	( state, kind, name, recordId ) => {
-		const record = getEntityRecord( state, kind, name, recordId );
-		return {
-			...Object.keys( record ).reduce( ( acc, key ) => {
-				acc[ key ] = get( record[ key ], 'raw', record[ key ] );
-				return acc;
-			}, {} ),
-			...getEntityRecordEdits( state, kind, name, recordId ),
-		};
-	},
+	( state, kind, name, recordId ) => ( {
+		...getRawEntityRecord( state, kind, name, recordId ),
+		...getEntityRecordEdits( state, kind, name, recordId ),
+	} ),
 	( state ) => [ state.entities.data ]
 );
 
@@ -237,12 +359,29 @@ export function isAutosavingEntityRecord( state, kind, name, recordId ) {
  * @return {boolean} Whether the entity record is saving or not.
  */
 export function isSavingEntityRecord( state, kind, name, recordId ) {
-	const { pending, isAutosave } = get(
+	return get(
 		state.entities.data,
-		[ kind, name, 'saving', recordId ],
-		{}
+		[ kind, name, 'saving', recordId, 'pending' ],
+		false
 	);
-	return Boolean( pending && ! isAutosave );
+}
+
+/**
+ * Returns true if the specified entity record is deleting, and false otherwise.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {boolean} Whether the entity record is deleting or not.
+ */
+export function isDeletingEntityRecord( state, kind, name, recordId ) {
+	return get(
+		state.entities.data,
+		[ kind, name, 'deleting', recordId, 'pending' ],
+		false
+	);
 }
 
 /**
@@ -256,7 +395,33 @@ export function isSavingEntityRecord( state, kind, name, recordId ) {
  * @return {Object?} The entity record's save error.
  */
 export function getLastEntitySaveError( state, kind, name, recordId ) {
-	return get( state.entities.data, [ kind, name, 'saving', recordId, 'error' ] );
+	return get( state.entities.data, [
+		kind,
+		name,
+		'saving',
+		recordId,
+		'error',
+	] );
+}
+
+/**
+ * Returns the specified entity record's last delete error.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {Object?} The entity record's save error.
+ */
+export function getLastEntityDeleteError( state, kind, name, recordId ) {
+	return get( state.entities.data, [
+		kind,
+		name,
+		'deleting',
+		recordId,
+		'error',
+	] );
 }
 
 /**
@@ -320,6 +485,17 @@ export function hasUndo( state ) {
  */
 export function hasRedo( state ) {
 	return Boolean( getRedoEdit( state ) );
+}
+
+/**
+ * Return the current theme.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object}      The current theme.
+ */
+export function getCurrentTheme( state ) {
+	return state.themes[ state.currentTheme ];
 }
 
 /**
@@ -455,6 +631,38 @@ export function getAutosave( state, postType, postId, authorId ) {
  *
  * @return {boolean} True if the REST request was completed. False otherwise.
  */
-export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
-	return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [ postType, postId ] );
-} );
+export const hasFetchedAutosaves = createRegistrySelector(
+	( select ) => ( state, postType, postId ) => {
+		return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [
+			postType,
+			postId,
+		] );
+	}
+);
+
+/**
+ * Returns a new reference when edited values have changed. This is useful in
+ * inferring where an edit has been made between states by comparison of the
+ * return values using strict equality.
+ *
+ * @example
+ *
+ * ```
+ * const hasEditOccurred = (
+ *    getReferenceByDistinctEdits( beforeState ) !==
+ *    getReferenceByDistinctEdits( afterState )
+ * );
+ * ```
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {*} A value whose reference will change only when an edit occurs.
+ */
+export const getReferenceByDistinctEdits = createSelector(
+	() => [],
+	( state ) => [
+		state.undo.length,
+		state.undo.offset,
+		state.undo.flattenedUndo,
+	]
+);

@@ -9,20 +9,14 @@ const FIXTURES_DIR = path.join( __dirname, 'blocks' );
 
 function readFixtureFile( fixturesDir, filename ) {
 	try {
-		return fs.readFileSync(
-			path.join( fixturesDir, filename ),
-			'utf8'
-		);
+		return fs.readFileSync( path.join( fixturesDir, filename ), 'utf8' );
 	} catch ( err ) {
 		return null;
 	}
 }
 
 function writeFixtureFile( fixturesDir, filename, content ) {
-	fs.writeFileSync(
-		path.join( fixturesDir, filename ),
-		content
-	);
+	fs.writeFileSync( path.join( fixturesDir, filename ), content );
 }
 
 export function blockNameToFixtureBasename( blockName ) {
@@ -37,7 +31,8 @@ export function getAvailableBlockFixturesBasenames() {
 	//  - fixture.serialized.html : re-serialized content
 	// Get the "base" name for each fixture first.
 	return uniq(
-		fs.readdirSync( FIXTURES_DIR )
+		fs
+			.readdirSync( FIXTURES_DIR )
 			.filter( ( f ) => /(\.html|\.json)$/.test( f ) )
 			.map( ( f ) => f.replace( /\..+$/, '' ) )
 	);

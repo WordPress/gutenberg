@@ -56,6 +56,8 @@ describe( 'AdminNotices', () => {
 		] );
 
 		// Verify all but `<aside>` are removed.
-		expect( document.getElementById( 'wpbody-content' ).childElementCount ).toBe( 1 );
+		expect(
+			document.getElementById( 'wpbody-content' ).childElementCount
+		).toBe( 1 );
 	} );
 } );

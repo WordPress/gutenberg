@@ -1,4 +1,8 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.6.0 (2019-08-29)
 
 ### Bug Fix
 

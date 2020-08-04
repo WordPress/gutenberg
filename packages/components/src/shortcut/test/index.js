@@ -16,11 +16,7 @@ describe( 'Shortcut', () => {
 	} );
 
 	it( 'renders the shortcut display text when a string is passed as the shortcut', () => {
-		const wrapper = shallow(
-			<Shortcut
-				shortcut="shortcut text"
-			/>
-		);
+		const wrapper = shallow( <Shortcut shortcut="shortcut text" /> );
 
 		expect( wrapper.text() ).toBe( 'shortcut text' );
 	} );

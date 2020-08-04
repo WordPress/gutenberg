@@ -1,0 +1,18 @@
+{
+	"name": "core/widget-area",
+	"category": "widgets",
+	"attributes": {
+		"id": {
+			"type": "string"
+		},
+		"name": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false,
+		"inserter": false,
+		"customClassName": false,
+		"__experimentalToolbar": false
+	}
+}

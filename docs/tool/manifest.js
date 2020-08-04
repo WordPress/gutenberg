@@ -1,12 +1,15 @@
 /**
- * Node dependencies
+ * External dependencies
  */
 const { camelCase, nth, upperFirst } = require( 'lodash' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
 
 const baseRepoUrl = '..';
-const componentPaths = glob( 'packages/components/src/*/**/README.md' );
+const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+	// Don't expose documentation for mobile only components just yet.
+	ignore: '**/mobile/*/README.md',
+} );
 const packagePaths = glob( 'packages/*/package.json' ).map(
 	( fileName ) => fileName.split( '/' )[ 1 ]
 );
@@ -82,9 +85,13 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 			parent,
 		} );
 		if ( Array.isArray( children ) && children.length ) {
-			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
+			pageItems = pageItems.concat(
+				generateRootManifestFromTOCItems( children, slug )
+			);
 		} else if ( children === '{{components}}' ) {
-			pageItems = pageItems.concat( getComponentManifest( componentPaths ) );
+			pageItems = pageItems.concat(
+				getComponentManifest( componentPaths )
+			);
 		} else if ( children === '{{packages}}' ) {
 			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );
 		}

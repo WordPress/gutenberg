@@ -24,7 +24,8 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 	} );
 
 	it( 'does nothing if the scope variable is already defined', () => {
-		const original = 'const React = require("react");\n\nlet foo = <bar />;';
+		const original =
+			'const React = require("react");\n\nlet foo = <bar />;';
 		const string = getTransformedCode( original );
 
 		expect( string ).toBe( original );
@@ -52,7 +53,9 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 			isDefault: false,
 		} );
 
-		expect( string ).toBe( 'import { createElement } from "@wordpress/element";\n' + original );
+		expect( string ).toBe(
+			'import { createElement } from "@wordpress/element";\n' + original
+		);
 	} );
 
 	it( 'adds import for scope variable even when defined inside the local scope', () => {
@@ -64,7 +67,9 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 			isDefault: false,
 		} );
 
-		expect( string ).toBe( 'import { createElement } from "@wordpress/element";\n' + original );
+		expect( string ).toBe(
+			'import { createElement } from "@wordpress/element";\n' + original
+		);
 	} );
 
 	it( 'does nothing if the outer scope variable is already defined when using custom options', () => {
@@ -81,7 +86,8 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 	} );
 
 	it( 'adds only Fragment when required', () => {
-		const original = 'const {\n  createElement\n} = wp.element;\nlet foo = <><bar /></>;';
+		const original =
+			'const {\n  createElement\n} = wp.element;\nlet foo = <><bar /></>;';
 		const string = getTransformedCode( original, {
 			scopeVariable: 'createElement',
 			scopeVariableFrag: 'Fragment',
@@ -95,7 +101,8 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 	} );
 
 	it( 'adds only createElement when required', () => {
-		const original = 'const {\n  Fragment\n} = wp.element;\nlet foo = <><bar /></>;';
+		const original =
+			'const {\n  Fragment\n} = wp.element;\nlet foo = <><bar /></>;';
 		const string = getTransformedCode( original, {
 			scopeVariable: 'createElement',
 			scopeVariableFrag: 'Fragment',

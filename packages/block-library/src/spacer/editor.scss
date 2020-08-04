@@ -1,8 +1,17 @@
-.block-library-spacer__resize-container.is-selected {
-	background: $light-gray-200;
+.block-library-spacer__resize-container.has-show-handle {
+	background: $gray-100;
+
+	.is-dark-theme & {
+		background: rgba($white, 0.15);
+	}
 }
 
 .block-library-spacer__resize-container {
 	clear: both;
 	margin-bottom: $default-block-margin;
+
+	// Don't show the horizontal indicator.
+	.components-resizable-box__handle::before {
+		content: none;
+	}
 }

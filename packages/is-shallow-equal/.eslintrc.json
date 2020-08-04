@@ -1,7 +1,17 @@
 {
 	"root": true,
-	"extends": "plugin:@wordpress/eslint-plugin/es5",
+	"extends": [
+		"plugin:@wordpress/eslint-plugin/es5"
+	],
 	"env": {
 		"node": true
-	}
+	},
+	"overrides": [
+		{
+			"files": [ "@(test|benchmark)/*.js" ],
+			"extends": [
+				"plugin:@wordpress/eslint-plugin/recommended"
+			]
+		}
+	]
 }

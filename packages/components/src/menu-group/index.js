@@ -7,27 +7,21 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
-export function MenuGroup( {
-	children,
-	className = '',
-	instanceId,
-	label,
-} ) {
+export function MenuGroup( { children, className = '', label } ) {
+	const instanceId = useInstanceId( MenuGroup );
+
 	if ( ! Children.count( children ) ) {
 		return null;
 	}
 
 	const labelId = `components-menu-group-label-${ instanceId }`;
-	const classNames = classnames(
-		className,
-		'components-menu-group'
-	);
+	const classNames = classnames( className, 'components-menu-group' );
 
 	return (
 		<div className={ classNames }>
-			{ label &&
+			{ label && (
 				<div
 					className="components-menu-group__label"
 					id={ labelId }
@@ -35,7 +29,7 @@ export function MenuGroup( {
 				>
 					{ label }
 				</div>
-			}
+			) }
 			<div role="group" aria-labelledby={ label ? labelId : null }>
 				{ children }
 			</div>
@@ -43,4 +37,4 @@ export function MenuGroup( {
 	);
 }
 
-export default withInstanceId( MenuGroup );
+export default MenuGroup;

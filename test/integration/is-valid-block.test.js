@@ -13,7 +13,8 @@ describe( 'isValidBlockContent', () => {
 	it( 'should use the namespace in the classname for non-core blocks', () => {
 		const valid = isValidBlockContent(
 			{
-				save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+				save: ( { attributes } ) =>
+					createElement( 'div', null, attributes.fruit ),
 				name: 'myplugin/fruit',
 			},
 			{ fruit: 'Bananas' },
@@ -26,9 +27,14 @@ describe( 'isValidBlockContent', () => {
 	it( 'should include additional classes in block attributes', () => {
 		const valid = isValidBlockContent(
 			{
-				save: ( { attributes } ) => createElement( 'div', {
-					className: 'fruit',
-				}, attributes.fruit ),
+				save: ( { attributes } ) =>
+					createElement(
+						'div',
+						{
+							className: 'fruit',
+						},
+						attributes.fruit
+					),
 				name: 'myplugin/fruit',
 			},
 			{
@@ -44,7 +50,8 @@ describe( 'isValidBlockContent', () => {
 	it( 'should not add a className if falsy', () => {
 		const valid = isValidBlockContent(
 			{
-				save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+				save: ( { attributes } ) =>
+					createElement( 'div', null, attributes.fruit ),
 				name: 'myplugin/fruit',
 				supports: {
 					className: false,

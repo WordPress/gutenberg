@@ -27,11 +27,13 @@ const transforms = {
 					const blobURL = createBlobURL( file );
 
 					// File will be uploaded in componentDidMount()
-					blocks.push( createBlock( 'core/file', {
-						href: blobURL,
-						fileName: file.name,
-						textLinkHref: blobURL,
-					} ) );
+					blocks.push(
+						createBlock( 'core/file', {
+							href: blobURL,
+							fileName: file.name,
+							textLinkHref: blobURL,
+						} )
+					);
 				} );
 
 				return blocks;
@@ -46,6 +48,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.src,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -58,6 +61,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.src,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -70,6 +74,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.url,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -91,6 +96,7 @@ const transforms = {
 					src: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -110,6 +116,7 @@ const transforms = {
 					src: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -129,6 +136,7 @@ const transforms = {
 					url: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},

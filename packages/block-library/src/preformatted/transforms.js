@@ -1,32 +1,32 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
 		{
 			type: 'block',
 			blocks: [ 'core/code', 'core/paragraph' ],
-			transform: ( { content } ) =>
+			transform: ( { content, anchor } ) =>
 				createBlock( 'core/preformatted', {
 					content,
+					anchor,
 				} ),
 		},
 		{
 			type: 'raw',
-			isMatch: ( node ) => (
+			isMatch: ( node ) =>
 				node.nodeName === 'PRE' &&
 				! (
 					node.children.length === 1 &&
 					node.firstChild.nodeName === 'CODE'
-				)
-			),
-			schema: {
+				),
+			schema: ( { phrasingContentSchema } ) => ( {
 				pre: {
-					children: getPhrasingContentSchema(),
+					children: phrasingContentSchema,
 				},
-			},
+			} ),
 		},
 	],
 	to: [
@@ -35,6 +35,11 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				createBlock( 'core/paragraph', attributes ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/code' ],
+			transform: ( attributes ) => createBlock( 'core/code', attributes ),
 		},
 	],
 };

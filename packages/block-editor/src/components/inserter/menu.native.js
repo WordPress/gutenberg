@@ -1,104 +1,160 @@
 /**
  * External dependencies
  */
-import { FlatList, View, Text, TouchableHighlight } from 'react-native';
-import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
+import {
+	FlatList,
+	View,
+	TouchableHighlight,
+	TouchableWithoutFeedback,
+	Dimensions,
+} from 'react-native';
+import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import {
-	createBlock,
-	isUnmodifiedDefaultBlock,
-} from '@wordpress/blocks';
+import { createBlock, rawHandler } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import MenuItem from './menu-item.native';
+
+const MIN_COL_NUM = 3;
 
 export class InserterMenu extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.onClose = this.onClose.bind( this );
+		this.onLayout = this.onLayout.bind( this );
+		this.renderItem = this.renderItem.bind( this );
+		this.state = {
+			numberOfColumns: MIN_COL_NUM,
+		};
+
+		Dimensions.addEventListener( 'change', this.onLayout );
+	}
+
 	componentDidMount() {
-		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
-			this.props.onSelect( {
-				name: 'core/' + payload.mediaType,
-				initialAttributes: {
-					id: payload.mediaId,
-					[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
-				},
-			} );
-		} );
-		this.onOpen();
-	}
-
-	componentWillUnmount() {
-		if ( this.subscriptionParentMediaAppend ) {
-			this.subscriptionParentMediaAppend.remove();
-		}
-		this.onClose();
-	}
-
-	calculateNumberOfColumns() {
-		const bottomSheetWidth = BottomSheet.getWidth();
-		const { paddingLeft: itemPaddingLeft, paddingRight: itemPaddingRight } = styles.modalItem;
-		const { paddingLeft: containerPaddingLeft, paddingRight: containerPaddingRight } = styles.content;
-		const { width: itemWidth } = styles.modalIconWrapper;
-		const itemTotalWidth = itemWidth + itemPaddingLeft + itemPaddingRight;
-		const containerTotalWidth = bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
-		return Math.floor( containerTotalWidth / itemTotalWidth );
-	}
-
-	onOpen() {
 		this.props.showInsertionPoint();
 	}
 
-	onClose() {
+	componentWillUnmount() {
 		this.props.hideInsertionPoint();
+		Dimensions.removeEventListener( 'change', this.onLayout );
+	}
+
+	calculateMinItemWidth( bottomSheetWidth ) {
+		const { paddingLeft, paddingRight } = styles.columnPadding;
+		return (
+			( bottomSheetWidth - 2 * ( paddingLeft + paddingRight ) ) /
+			MIN_COL_NUM
+		);
+	}
+
+	calculateItemWidth() {
+		const {
+			paddingLeft: itemPaddingLeft,
+			paddingRight: itemPaddingRight,
+		} = styles.modalItem;
+		const { width: itemWidth } = styles.modalIconWrapper;
+		return itemWidth + itemPaddingLeft + itemPaddingRight;
+	}
+
+	calculateColumnsProperties() {
+		const bottomSheetWidth = BottomSheet.getWidth();
+		const { paddingLeft, paddingRight } = styles.columnPadding;
+		const itemTotalWidth = this.calculateItemWidth();
+		const containerTotalWidth =
+			bottomSheetWidth - ( paddingLeft + paddingRight );
+		const numofColumns = Math.floor( containerTotalWidth / itemTotalWidth );
+
+		if ( numofColumns < MIN_COL_NUM ) {
+			return {
+				numOfColumns: MIN_COL_NUM,
+				itemWidth: this.calculateMinItemWidth( bottomSheetWidth ),
+				maxWidth: containerTotalWidth / MIN_COL_NUM,
+			};
+		}
+		return {
+			numOfColumns: numofColumns,
+			maxWidth: containerTotalWidth / numofColumns,
+		};
+	}
+
+	onClose() {
+		// if should replace but didn't insert any block
+		// re-insert default block
+		if ( this.props.shouldReplaceBlock ) {
+			this.props.insertDefaultBlock();
+		}
+		this.props.onDismiss();
+	}
+
+	onLayout() {
+		const {
+			numOfColumns,
+			itemWidth,
+			maxWidth,
+		} = this.calculateColumnsProperties();
+		const numberOfColumns = numOfColumns;
+
+		this.setState( { numberOfColumns, itemWidth, maxWidth } );
+	}
+
+	renderItem( { item } ) {
+		const { itemWidth, maxWidth } = this.state;
+		const { onSelect } = this.props;
+		return (
+			<MenuItem
+				item={ item }
+				itemWidth={ itemWidth }
+				maxWidth={ maxWidth }
+				onSelect={ onSelect }
+			/>
+		);
 	}
 
 	render() {
-		const numberOfColumns = this.calculateNumberOfColumns();
-		const bottomPadding = styles.contentBottomPadding;
+		const { items } = this.props;
+		const { numberOfColumns } = this.state;
 
 		return (
 			<BottomSheet
 				isVisible={ true }
-				onClose={ this.props.onDismiss }
-				contentStyle={ [ styles.content, bottomPadding ] }
+				onClose={ this.onClose }
 				hideHeader
+				isChildrenScrollable
 			>
-				<FlatList
-					scrollEnabled={ false }
-					key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-					keyboardShouldPersistTaps="always"
-					numColumns={ numberOfColumns }
-					data={ this.props.items }
-					ItemSeparatorComponent={ () =>
-						<View style={ styles.rowSeparator } />
-					}
-					keyExtractor={ ( item ) => item.name }
-					renderItem={ ( { item } ) =>
-						<TouchableHighlight
-							style={ styles.touchableArea }
-							underlayColor="transparent"
-							activeOpacity={ .5 }
-							accessibilityLabel={ item.title }
-							onPress={ () => this.props.onSelect( item ) }>
-							<View style={ styles.modalItem }>
-								<View style={ styles.modalIconWrapper }>
-									<View style={ styles.modalIcon }>
-										<Icon icon={ item.icon.src } fill={ styles.modalIcon.fill } size={ styles.modalIcon.width } />
-									</View>
-								</View>
-								<Text style={ styles.modalItemLabel }>{ item.title }</Text>
-							</View>
-						</TouchableHighlight>
-					}
-				/>
+				<TouchableHighlight accessible={ false }>
+					<BottomSheetConsumer>
+						{ ( { listProps } ) => (
+							<FlatList
+								onLayout={ this.onLayout }
+								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+								keyboardShouldPersistTaps="always"
+								numColumns={ numberOfColumns }
+								data={ items }
+								ItemSeparatorComponent={ () => (
+									<TouchableWithoutFeedback
+										accessible={ false }
+									>
+										<View style={ styles.rowSeparator } />
+									</TouchableWithoutFeedback>
+								) }
+								keyExtractor={ ( item ) => item.name }
+								renderItem={ this.renderItem }
+								{ ...listProps }
+							/>
+						) }
+					</BottomSheetConsumer>
+				</TouchableHighlight>
 			</BottomSheet>
 		);
 	}
@@ -111,106 +167,118 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
+			getSettings,
+			canInsertBlockType,
 		} = select( 'core/block-editor' );
-		const {
-			getChildBlockNames,
-		} = select( 'core/blocks' );
+		const { getChildBlockNames, getBlockType } = select( 'core/blocks' );
+		const { getClipboard } = select( 'core/editor' );
 
 		let destinationRootClientId = rootClientId;
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
 			const end = getBlockSelectionEnd();
 			if ( end ) {
-				destinationRootClientId = getBlockRootClientId( end ) || undefined;
+				destinationRootClientId =
+					getBlockRootClientId( end ) || undefined;
 			}
 		}
-		const destinationRootBlockName = getBlockName( destinationRootClientId );
+		const destinationRootBlockName = getBlockName(
+			destinationRootClientId
+		);
+
+		const {
+			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
+		} = getSettings();
+		const clipboard = getClipboard();
+		const clipboardBlock =
+			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
+		const shouldAddClipboardBlock =
+			clipboardBlock &&
+			canInsertBlockType( clipboardBlock.name, destinationRootClientId );
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: getInserterItems( destinationRootClientId ),
+			items: shouldAddClipboardBlock
+				? [
+						{
+							...pick( getBlockType( clipboardBlock.name ), [
+								'name',
+								'icon',
+							] ),
+							id: 'clipboard',
+							initialAttributes: clipboardBlock.attributes,
+							innerBlocks: clipboardBlock.innerBlocks,
+						},
+						...getInserterItems( destinationRootClientId ),
+				  ]
+				: getInserterItems( destinationRootClientId ),
 			destinationRootClientId,
+			shouldInsertAtTheTop,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			showInsertionPoint,
 			hideInsertionPoint,
+			removeBlock,
+			resetBlocks,
+			clearSelectedBlock,
+			insertBlock,
+			insertDefaultBlock,
 		} = dispatch( 'core/block-editor' );
-
-		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
-		// This breaks the withDispatch not containing any logic rule.
-		// Since it's a function only called when the event handlers are called,
-		// it's fine to extract it.
-		// eslint-disable-next-line no-restricted-syntax
-		function getInsertionIndex() {
-			const {
-				getBlock,
-				getBlockIndex,
-				getBlockSelectionEnd,
-				getBlockOrder,
-			} = select( 'core/block-editor' );
-			const {
-				isPostTitleSelected,
-			} = select( 'core/editor' );
-			const { clientId, destinationRootClientId, isAppender } = ownProps;
-
-			// if post title is selected insert as first block
-			if ( isPostTitleSelected() ) {
-				return 0;
-			}
-
-			// If the clientId is defined, we insert at the position of the block.
-			if ( clientId ) {
-				return getBlockIndex( clientId, destinationRootClientId );
-			}
-
-			// If there a selected block,
-			const end = getBlockSelectionEnd();
-			if ( ! isAppender && end ) {
-				// and the last selected block is unmodified (empty), it will be replaced
-				if ( isUnmodifiedDefaultBlock( getBlock( end ) ) ) {
-					return getBlockIndex( end, destinationRootClientId );
-				}
-
-				// we insert after the selected block.
-				return getBlockIndex( end, destinationRootClientId ) + 1;
-			}
-
-			// Otherwise, we insert at the end of the current rootClientId
-			return getBlockOrder( destinationRootClientId ).length;
-		}
 
 		return {
 			showInsertionPoint() {
-				const index = getInsertionIndex();
-				showInsertionPoint( ownProps.destinationRootClientId, index );
+				if ( ownProps.shouldReplaceBlock ) {
+					const { getBlockOrder, getBlockCount } = select(
+						'core/block-editor'
+					);
+
+					const count = getBlockCount();
+					// Check if there is a rootClientId because that means it is a nested replacable block and we don't want to clear/reset all blocks.
+					if ( count === 1 && ! ownProps.rootClientId ) {
+						// removing the last block is not possible with `removeBlock` action
+						// it always inserts a default block if the last of the blocks have been removed
+						clearSelectedBlock();
+						resetBlocks( [] );
+					} else {
+						const blockToReplace = getBlockOrder(
+							ownProps.destinationRootClientId
+						)[ ownProps.insertionIndex ];
+
+						removeBlock( blockToReplace, false );
+					}
+				}
+				showInsertionPoint(
+					ownProps.destinationRootClientId,
+					ownProps.insertionIndex
+				);
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
-				const {
-					replaceBlocks,
-					insertBlock,
-				} = dispatch( 'core/block-editor' );
-				const {
-					getSelectedBlock,
-				} = select( 'core/block-editor' );
-				const { isAppender } = ownProps;
-				const { name, initialAttributes } = item;
-				const selectedBlock = getSelectedBlock();
-				const insertedBlock = createBlock( name, initialAttributes );
-				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-					replaceBlocks( selectedBlock.clientId, insertedBlock );
-				} else {
-					insertBlock(
-						insertedBlock,
-						getInsertionIndex(),
-						ownProps.destinationRootClientId
-					);
-				}
+				const { name, initialAttributes, innerBlocks } = item;
+
+				const insertedBlock = createBlock(
+					name,
+					initialAttributes,
+					innerBlocks
+				);
+
+				insertBlock(
+					insertedBlock,
+					ownProps.insertionIndex,
+					ownProps.destinationRootClientId
+				);
 
 				ownProps.onSelect();
 			},
+			insertDefaultBlock() {
+				insertDefaultBlock(
+					{},
+					ownProps.destinationRootClientId,
+					ownProps.insertionIndex
+				);
+			},
 		};
 	} ),
-	withInstanceId,
+	withInstanceId
 )( InserterMenu );

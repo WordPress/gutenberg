@@ -1,13 +1,22 @@
 /**
  * Gets the all format objects at the start of the selection.
  *
- * @param {Object} value Value to inspect.
+ * @param {Object}        value                Value to inspect.
+ * @param {Array<Array>}  value.formats        Formats object data values.
+ * @param {number}        value.start          Index to start from.
+ * @param {number}        value.end            Index to end.
+ * @param {Array}         value.activeFormats  Array to return if there are active formats.
+ * @param {Array}         EMPTY_ACTIVE_FORMATS Array to return if there are no active
+ *                                             formats.
  *
  * @return {?Object} Active format objects.
  */
-export function getActiveFormats( { formats, start, end, activeFormats } ) {
+export function getActiveFormats(
+	{ formats, start, end, activeFormats },
+	EMPTY_ACTIVE_FORMATS = []
+) {
 	if ( start === undefined ) {
-		return [];
+		return EMPTY_ACTIVE_FORMATS;
 	}
 
 	if ( start === end ) {
@@ -16,8 +25,8 @@ export function getActiveFormats( { formats, start, end, activeFormats } ) {
 			return activeFormats;
 		}
 
-		const formatsBefore = formats[ start - 1 ] || [];
-		const formatsAfter = formats[ start ] || [];
+		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
+		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
 
 		// By default, select the lowest amount of formats possible (which means
 		// the caret is positioned outside the format boundary). The user can
@@ -29,5 +38,5 @@ export function getActiveFormats( { formats, start, end, activeFormats } ) {
 		return formatsAfter;
 	}
 
-	return formats[ start ] || [];
+	return formats[ start ] || EMPTY_ACTIVE_FORMATS;
 }

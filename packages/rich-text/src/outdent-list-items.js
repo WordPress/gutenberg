@@ -6,6 +6,7 @@ import { LINE_SEPARATOR } from './special-characters';
 import { getLineIndex } from './get-line-index';
 import { getParentLineIndex } from './get-parent-line-index';
 import { getLastChildIndex } from './get-last-child-index';
+import { canOutdentListItems } from './can-outdent-list-items';
 
 /**
  * Outdents any selected list items if possible.
@@ -15,16 +16,15 @@ import { getLastChildIndex } from './get-last-child-index';
  * @return {Object} The changed value.
  */
 export function outdentListItems( value ) {
-	const { text, replacements, start, end } = value;
-	const startingLineIndex = getLineIndex( value, start );
-
-	// Return early if the starting line index cannot be further outdented.
-	if ( replacements[ startingLineIndex ] === undefined ) {
+	if ( ! canOutdentListItems( value ) ) {
 		return value;
 	}
 
+	const { text, replacements, start, end } = value;
+	const startingLineIndex = getLineIndex( value, start );
 	const newFormats = replacements.slice( 0 );
-	const parentFormats = replacements[ getParentLineIndex( value, startingLineIndex ) ] || [];
+	const parentFormats =
+		replacements[ getParentLineIndex( value, startingLineIndex ) ] || [];
 	const endingLineIndex = getLineIndex( value, end );
 	const lastChildIndex = getLastChildIndex( value, endingLineIndex );
 

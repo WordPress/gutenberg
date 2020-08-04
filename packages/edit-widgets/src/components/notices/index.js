@@ -14,7 +14,7 @@ function Notices() {
 		return {
 			notices: select( 'core/notices' ).getNotices(),
 		};
-	} );
+	}, [] );
 	const snackbarNotices = filter( notices, {
 		type: 'snackbar',
 	} );

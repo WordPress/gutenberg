@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { without } from 'lodash';
+import { without, first, last } from 'lodash';
 
 /**
  * Internal dependencies
@@ -125,11 +125,56 @@ function compareObjectTabbables( a, b ) {
 	return aTabIndex - bTabIndex;
 }
 
-export function find( context ) {
-	return findFocusable( context )
+/**
+ * Givin focusable elements, filters out tabbable element.
+ *
+ * @param {Array} focusables Focusable elements to filter.
+ *
+ * @return {Array} Tabbable elements.
+ */
+function filterTabbable( focusables ) {
+	return focusables
 		.filter( isTabbableIndex )
 		.map( mapElementToObjectTabbable )
 		.sort( compareObjectTabbables )
 		.map( mapObjectTabbableToElement )
 		.reduce( createStatefulCollapseRadioGroup(), [] );
+}
+
+export function find( context ) {
+	return filterTabbable( findFocusable( context ) );
+}
+
+/**
+ * Given a focusable element, find the preceding tabbable element.
+ *
+ * @param {Element} element The focusable element before which to look. Defaults
+ *                          to the active element.
+ */
+export function findPrevious( element = document.activeElement ) {
+	const focusables = findFocusable( document.body );
+	const index = focusables.indexOf( element );
+
+	// Remove all focusables after and including `element`.
+	focusables.length = index;
+
+	return last( filterTabbable( focusables ) );
+}
+
+/**
+ * Given a focusable element, find the next tabbable element.
+ *
+ * @param {Element} element The focusable element after which to look. Defaults
+ *                          to the active element.
+ */
+export function findNext( element = document.activeElement ) {
+	const focusables = findFocusable( document.body );
+	const index = focusables.indexOf( element );
+
+	// Remove all focusables before and inside `element`.
+	const remaining = focusables
+		.slice( index + 1 )
+		.filter( ( node ) => ! element.contains( node ) );
+
+	return first( filterTabbable( remaining ) );
 }

@@ -30,7 +30,7 @@ Verifies if publish checks are enabled.
 
 _Returns_
 
--   `boolean`: Boolean which represents the state of prepublish checks.
+-   `Promise<boolean>`: Boolean which represents the state of prepublish checks.
 
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
@@ -46,7 +46,8 @@ Clicks a block toolbar button.
 
 _Parameters_
 
--   _buttonAriaLabel_ `string`: The aria label of the button to click.
+-   _label_ `string`: The text string of the button label.
+-   _type_ `[string]`: The type of button label: 'ariaLabel' or 'content'.
 
 <a name="clickButton" href="#clickButton">#</a> **clickButton**
 
@@ -71,6 +72,10 @@ Clicks on More Menu item, searches for the button with the text provided and cli
 _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
+
+<a name="closeGlobalBlockInserter" href="#closeGlobalBlockInserter">#</a> **closeGlobalBlockInserter**
+
+Undocumented declaration.
 
 <a name="createEmbeddingMatcher" href="#createEmbeddingMatcher">#</a> **createEmbeddingMatcher**
 
@@ -102,7 +107,12 @@ Creates new post.
 
 _Parameters_
 
--   _obj_ `Object`: Object to create new post, along with tips enabling option.
+-   _object_ `Object`: Object to create new post, along with tips enabling option.
+-   _object.postType_ `[string]`: Post type of the new post.
+-   _object.title_ `[string]`: Title of the new post.
+-   _object.content_ `[string]`: Content of the new post.
+-   _object.excerpt_ `[string]`: Excerpt of the new post.
+-   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
 <a name="createURL" href="#createURL">#</a> **createURL**
 
@@ -137,13 +147,9 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
-<a name="disableNavigationMode" href="#disableNavigationMode">#</a> **disableNavigationMode**
+<a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
 
-Triggers edit mode if not already active.
-
-_Returns_
-
--   `Promise`: Promise resolving after enabling the keyboard edit mode.
+Removes the focus loss listener that `enableFocusLossObservation()` adds.
 
 <a name="disablePrePublishChecks" href="#disablePrePublishChecks">#</a> **disablePrePublishChecks**
 
@@ -163,6 +169,11 @@ _Parameters_
 _Returns_
 
 -   `Promise`: Promise resolving when drag completes.
+
+<a name="enableFocusLossObservation" href="#enableFocusLossObservation">#</a> **enableFocusLossObservation**
+
+Adds an event listener to the document which throws an error if there is a
+loss of focus.
 
 <a name="enablePageDialogAccept" href="#enablePageDialogAccept">#</a> **enablePageDialogAccept**
 
@@ -203,7 +214,7 @@ _Parameters_
 
 _Returns_
 
--   `?ElementHandle`: Object that represents an in-page DOM element.
+-   `Promise<(ElementHandle|undefined)>`: Object that represents an in-page DOM element.
 
 <a name="getAllBlockInserterItemTitles" href="#getAllBlockInserterItemTitles">#</a> **getAllBlockInserterItemTitles**
 
@@ -243,6 +254,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with a string containing the block title.
 
+<a name="getCurrentPostContent" href="#getCurrentPostContent">#</a> **getCurrentPostContent**
+
+Returns a promise which resolves with the current post content (HTML string).
+
+_Returns_
+
+-   `Promise`: Promise resolving with current post content markup.
+
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
 Returns a promise which resolves with the edited post content (HTML string).
@@ -250,6 +269,21 @@ Returns a promise which resolves with the edited post content (HTML string).
 _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
+
+<a name="getPageError" href="#getPageError">#</a> **getPageError**
+
+Returns a promise resolving to one of either a string or null. A string will
+be resolved if an error message is present in the contents of the page. If no
+error is present, a null value will be resolved instead. This requires the
+environment be configured to display errors.
+
+_Related_
+
+-   <http://php.net/manual/en/function.error-reporting.php>
+
+_Returns_
+
+-   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
 
 <a name="hasBlockSwitcher" href="#hasBlockSwitcher">#</a> **hasBlockSwitcher**
 
@@ -262,12 +296,30 @@ _Returns_
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
 Opens the inserter, searches for the given term, then selects the first
-result that appears.
+result that appears. It then waits briefly for the block list to update.
 
 _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
--   _panelName_ `string`: The inserter panel to open (if it's closed by default).
+
+<a name="insertPattern" href="#insertPattern">#</a> **insertPattern**
+
+Opens the inserter, searches for the given pattern, then selects the first
+result that appears. It then waits briefly for the block list to update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="insertReusableBlock" href="#insertReusableBlock">#</a> **insertReusableBlock**
+
+Opens the inserter, searches for the given reusable block, then selects the
+first result that appears. It then waits briefly for the block list to
+update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
 
 <a name="installPlugin" href="#installPlugin">#</a> **installPlugin**
 
@@ -299,6 +351,10 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean indicating if the focused block is the default block.
 
+<a name="isOfflineMode" href="#isOfflineMode">#</a> **isOfflineMode**
+
+Undocumented declaration.
+
 <a name="loginUser" href="#loginUser">#</a> **loginUser**
 
 Performs log in with specified username and password.
@@ -322,15 +378,6 @@ _Parameters_
 _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
-
-<a name="observeFocusLoss" href="#observeFocusLoss">#</a> **observeFocusLoss**
-
-Binds to the document on page load which throws an error if a `focusout`
-event occurs without a related target (i.e. focus loss).
-
-<a name="openAllBlockInserterCategories" href="#openAllBlockInserterCategories">#</a> **openAllBlockInserterCategories**
-
-Opens all block inserter categories.
 
 <a name="openDocumentSettingsSidebar" href="#openDocumentSettingsSidebar">#</a> **openDocumentSettingsSidebar**
 
@@ -398,6 +445,22 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="searchForPattern" href="#searchForPattern">#</a> **searchForPattern**
+
+Search for pattern in the global inserter
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="searchForReusableBlock" href="#searchForReusableBlock">#</a> **searchForReusableBlock**
+
+Search for reusable block in the global inserter.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
 <a name="selectBlockByClientId" href="#selectBlockByClientId">#</a> **selectBlockByClientId**
 
 Given the clientId of a block, selects the block on the editor.
@@ -412,7 +475,7 @@ Sets browser viewport to specified type.
 
 _Parameters_
 
--   _type_ `string`: String to represent dimensions type; can be either small or large.
+-   _viewport_ `WPViewport`: Viewport name or dimensions object to assign.
 
 <a name="setPostContent" href="#setPostContent">#</a> **setPostContent**
 
@@ -455,6 +518,11 @@ _Parameters_
 
 -   _mocks_ `Array`: Array of mock settings.
 
+<a name="showBlockToolbar" href="#showBlockToolbar">#</a> **showBlockToolbar**
+
+The block toolbar is not always visible while typing.
+Call this function to reveal it.
+
 <a name="switchEditorModeTo" href="#switchEditorModeTo">#</a> **switchEditorModeTo**
 
 Switches editor mode.
@@ -473,6 +541,14 @@ running the test is not already the admin user).
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
 
+<a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
+
+Toggles the More Menu.
+
+<a name="toggleOfflineMode" href="#toggleOfflineMode">#</a> **toggleOfflineMode**
+
+Undocumented declaration.
+
 <a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
 
 Toggles the screen option with the given label.
@@ -489,6 +565,18 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+<a name="trashAllPosts" href="#trashAllPosts">#</a> **trashAllPosts**
+
+Navigates to the post listing screen and bulk-trashes any posts which exist.
+
+_Parameters_
+
+-   _postType_ `string`: String slug for type of post to trash.
+
+_Returns_
+
+-   `Promise`: Promise resolving once posts have been trashed.
 
 <a name="uninstallPlugin" href="#uninstallPlugin">#</a> **uninstallPlugin**
 
@@ -517,7 +605,7 @@ without the new dimensions being applied.
 _Parameters_
 
 -   _width_ `number`: Width of the window.
--   _height_ `height`: Height of the window.
+-   _height_ `number`: Height of the window.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

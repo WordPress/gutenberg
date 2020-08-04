@@ -3,7 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton, RichTextShortcut, __unstableRichTextInputEvent } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	RichTextShortcut,
+	__unstableRichTextInputEvent,
+} from '@wordpress/block-editor';
+import { formatBold } from '@wordpress/icons';
 
 const name = 'core/bold';
 const title = __( 'Bold' );
@@ -13,8 +18,15 @@ export const bold = {
 	title,
 	tagName: 'strong',
 	className: null,
-	edit( { isActive, value, onChange } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
+	edit( { isActive, value, onChange, onFocus } ) {
+		function onToggle() {
+			onChange( toggleFormat( value, { type: name } ) );
+		}
+
+		function onClick() {
+			onToggle();
+			onFocus();
+		}
 
 		return (
 			<>
@@ -25,9 +37,9 @@ export const bold = {
 				/>
 				<RichTextToolbarButton
 					name="bold"
-					icon="editor-bold"
+					icon={ formatBold }
 					title={ title }
-					onClick={ onToggle }
+					onClick={ onClick }
 					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="b"

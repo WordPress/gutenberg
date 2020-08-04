@@ -60,7 +60,10 @@ describe( 'selectors', () => {
 
 	describe( 'getFormatTypeForBareElement', () => {
 		it( 'should get a format type', () => {
-			const result = getFormatTypeForBareElement( defaultState, 'strong' );
+			const result = getFormatTypeForBareElement(
+				defaultState,
+				'strong'
+			);
 
 			expect( result ).toEqual( formatTypeBareTag );
 		} );
@@ -68,7 +71,10 @@ describe( 'selectors', () => {
 
 	describe( 'getFormatTypeForClassName', () => {
 		it( 'should get a format type', () => {
-			const result = getFormatTypeForClassName( defaultState, 'class-name' );
+			const result = getFormatTypeForClassName(
+				defaultState,
+				'class-name'
+			);
 
 			expect( result ).toEqual( formatTypeClassName );
 		} );

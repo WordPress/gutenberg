@@ -1,102 +1,110 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Popover from '../popover';
 
-class Dropdown extends Component {
-	constructor() {
-		super( ...arguments );
+function useObservableState( initialState, onStateChange ) {
+	const [ state, setState ] = useState( initialState );
+	return [
+		state,
+		( value ) => {
+			setState( value );
+			if ( onStateChange ) {
+				onStateChange( value );
+			}
+		},
+	];
+}
 
-		this.toggle = this.toggle.bind( this );
-		this.close = this.close.bind( this );
-		this.closeIfFocusOutside = this.closeIfFocusOutside.bind( this );
+export default function Dropdown( {
+	renderContent,
+	renderToggle,
+	position = 'bottom right',
+	className,
+	contentClassName,
+	expandOnMobile,
+	headerTitle,
+	focusOnMount,
+	popoverProps,
+	onClose,
+	onToggle,
+} ) {
+	const containerRef = useRef();
+	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
-		this.containerRef = createRef();
+	useEffect(
+		() => () => {
+			if ( onToggle ) {
+				onToggle( false );
+			}
+		},
+		[]
+	);
 
-		this.state = {
-			isOpen: false,
-		};
-	}
-
-	componentWillUnmount() {
-		const { isOpen } = this.state;
-		const { onToggle } = this.props;
-		if ( isOpen && onToggle ) {
-			onToggle( false );
-		}
-	}
-
-	componentDidUpdate( prevProps, prevState ) {
-		const { isOpen } = this.state;
-		const { onToggle } = this.props;
-		if ( prevState.isOpen !== isOpen && onToggle ) {
-			onToggle( isOpen );
-		}
-	}
-
-	toggle() {
-		this.setState( ( state ) => ( {
-			isOpen: ! state.isOpen,
-		} ) );
+	function toggle() {
+		setIsOpen( ! isOpen );
 	}
 
 	/**
 	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
 	 * intentionally distinct from `onClose` since focus loss from the popover
 	 * is expected to occur when using the Dropdown's toggle button, in which
-	 * case the correct behavior is to keep the dropdown closed.
+	 * case the correct behavior is to keep the dropdown closed. The same applies
+	 * in case when focus is moved to the modal dialog.
 	 */
-	closeIfFocusOutside() {
-		if ( ! this.containerRef.current.contains( document.activeElement ) ) {
-			this.close();
+	function closeIfFocusOutside() {
+		if (
+			! containerRef.current.contains( document.activeElement ) &&
+			! document.activeElement.closest( '[role="dialog"]' )
+		) {
+			close();
 		}
 	}
 
-	close() {
-		this.setState( { isOpen: false } );
+	function close() {
+		if ( onClose ) {
+			onClose();
+		}
+		setIsOpen( false );
 	}
 
-	render() {
-		const { isOpen } = this.state;
-		const {
-			renderContent,
-			renderToggle,
-			position = 'bottom',
-			className,
-			contentClassName,
-			expandOnMobile,
-			headerTitle,
-			focusOnMount,
-			popoverProps,
-		} = this.props;
+	const args = { isOpen, onToggle: toggle, onClose: close };
 
-		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
-
-		return (
-			<div className={ className } ref={ this.containerRef }>
-				{ renderToggle( args ) }
-				{ isOpen && (
-					<Popover
-						className={ contentClassName }
-						position={ position }
-						onClose={ this.close }
-						onFocusOutside={ this.closeIfFocusOutside }
-						expandOnMobile={ expandOnMobile }
-						headerTitle={ headerTitle }
-						focusOnMount={ focusOnMount }
-						{ ...popoverProps }
-					>
-						{ renderContent( args ) }
-					</Popover>
-				) }
-			</div>
-		);
-	}
+	return (
+		<div
+			className={ classnames( 'components-dropdown', className ) }
+			ref={ containerRef }
+		>
+			{ renderToggle( args ) }
+			{ isOpen && (
+				<Popover
+					position={ position }
+					onClose={ close }
+					onFocusOutside={ closeIfFocusOutside }
+					expandOnMobile={ expandOnMobile }
+					headerTitle={ headerTitle }
+					focusOnMount={ focusOnMount }
+					{ ...popoverProps }
+					anchorRef={ containerRef.current }
+					className={ classnames(
+						'components-dropdown__content',
+						popoverProps ? popoverProps.className : undefined,
+						contentClassName
+					) }
+				>
+					{ renderContent( args ) }
+				</Popover>
+			) }
+		</div>
+	);
 }
-
-export default Dropdown;

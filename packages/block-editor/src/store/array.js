@@ -36,6 +36,6 @@ export function moveTo( array, from, to, count = 1 ) {
 	return insertAt(
 		withoutMovedElements,
 		array.slice( from, from + count ),
-		to,
+		to
 	);
 }

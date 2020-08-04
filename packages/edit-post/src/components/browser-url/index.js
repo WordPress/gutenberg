@@ -42,15 +42,20 @@ export class BrowserURL extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { postId, postStatus, postType } = this.props;
+		const { postId, postStatus, postType, isSavingPost } = this.props;
 		const { historyId } = this.state;
 
-		if ( postStatus === 'trash' ) {
+		// Posts are still dirty while saving so wait for saving to finish
+		// to avoid the unsaved changes warning when trashing posts.
+		if ( postStatus === 'trash' && ! isSavingPost ) {
 			this.setTrashURL( postId, postType );
 			return;
 		}
 
-		if ( ( postId !== prevProps.postId || postId !== historyId ) && postStatus !== 'auto-draft' ) {
+		if (
+			( postId !== prevProps.postId || postId !== historyId ) &&
+			postStatus !== 'auto-draft'
+		) {
 			this.setBrowserURL( postId );
 		}
 	}
@@ -92,12 +97,13 @@ export class BrowserURL extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const { getCurrentPost } = select( 'core/editor' );
+	const { getCurrentPost, isSavingPost } = select( 'core/editor' );
 	const { id, status, type } = getCurrentPost();
 
 	return {
 		postId: id,
 		postStatus: status,
 		postType: type,
+		isSavingPost: isSavingPost(),
 	};
 } )( BrowserURL );

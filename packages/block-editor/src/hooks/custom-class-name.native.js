@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, difference, compact } from 'lodash';
+import { difference, compact } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -24,12 +24,13 @@ import {
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
-		// Use Lodash's assign to gracefully handle if attributes are undefined
-		settings.attributes = assign( settings.attributes, {
+		// Gracefully handle if settings.attributes is undefined.
+		settings.attributes = {
+			...settings.attributes,
 			className: {
 				type: 'string',
 			},
-		} );
+		};
 	}
 
 	return settings;
@@ -47,8 +48,14 @@ export function addAttribute( settings ) {
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'customClassName', true ) && attributes.className ) {
-		extraProps.className = classnames( extraProps.className, attributes.className );
+	if (
+		hasBlockSupport( blockType, 'customClassName', true ) &&
+		attributes.className
+	) {
+		extraProps.className = classnames(
+			extraProps.className,
+			attributes.className
+		);
 	}
 
 	return extraProps;
@@ -112,6 +119,18 @@ export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 	return blockAttributes;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
-addFilter( 'blocks.getBlockAttributes', 'core/custom-class-name/addParsedDifference', addParsedDifference );
+addFilter(
+	'blocks.registerBlockType',
+	'core/custom-class-name/attribute',
+	addAttribute
+);
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/custom-class-name/save-props',
+	addSaveProps
+);
+addFilter(
+	'blocks.getBlockAttributes',
+	'core/custom-class-name/addParsedDifference',
+	addParsedDifference
+);

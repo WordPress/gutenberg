@@ -11,7 +11,12 @@ import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
+import { EntityProvider } from '@wordpress/core-data';
+import {
+	BlockEditorProvider,
+	BlockContextProvider,
+	__unstableEditorStyles as EditorStyles,
+} from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -24,11 +29,23 @@ import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
-const fetchLinkSuggestions = async ( search ) => {
+/**
+ * Fetches link suggestions from the API. This function is an exact copy of a function found at:
+ *
+ * wordpress/editor/src/components/provider/index.js
+ *
+ * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
+ * Until we refactor it, just copying the code is the simplest solution.
+ *
+ * @param {Object} search
+ * @param {number} perPage
+ * @return {Promise<Object[]>} List of suggestions
+ */
+const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
 	const posts = await apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
-			per_page: 20,
+			per_page: perPage,
 			type: 'post',
 		} ),
 	} );
@@ -37,6 +54,7 @@ const fetchLinkSuggestions = async ( search ) => {
 		id: post.id,
 		url: post.url,
 		title: decodeEntities( post.title ) || __( '(no title)' ),
+		type: post.subtype || post.type,
 	} ) );
 };
 
@@ -48,17 +66,27 @@ class EditorProvider extends Component {
 			maxSize: 1,
 		} );
 
+		this.getDefaultBlockContext = memize( this.getDefaultBlockContext, {
+			maxSize: 1,
+		} );
+
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( props.recovery ) {
 			return;
 		}
 
 		props.updatePostLock( props.settings.postLock );
-		props.setupEditor( props.post, props.initialEdits, props.settings.template );
+		props.setupEditor(
+			props.post,
+			props.initialEdits,
+			props.settings.template
+		);
 
 		if ( props.settings.autosave ) {
 			props.createWarningNotice(
-				__( 'There is an autosave of this post that is more recent than the version below.' ),
+				__(
+					'There is an autosave of this post that is more recent than the version below.'
+				),
 				{
 					id: 'autosave-exists',
 					actions: [
@@ -75,11 +103,27 @@ class EditorProvider extends Component {
 	getBlockEditorSettings(
 		settings,
 		reusableBlocks,
+		__experimentalFetchReusableBlocks,
 		hasUploadPermissions,
-		canUserUseUnfilteredHTML
+		canUserUseUnfilteredHTML,
+		undo,
+		shouldInsertAtTheTop
 	) {
 		return {
 			...pick( settings, [
+				'__experimentalBlockDirectory',
+				'__experimentalBlockPatterns',
+				'__experimentalBlockPatternCategories',
+				'__experimentalEnableCustomSpacing',
+				'__experimentalEnableLegacyWidgetBlock',
+				'__experimentalEnableLinkColor',
+				'__experimentalEnableFullSiteEditing',
+				'__experimentalEnableFullSiteEditingDemo',
+				'__experimentalFeatures',
+				'__experimentalGlobalStylesUserEntityId',
+				'__experimentalGlobalStylesBase',
+				'__experimentalPreferredStyleVariations',
+				'__experimentalSetIsInserterOpened',
 				'alignWide',
 				'allowedBlockTypes',
 				'availableLegacyWidgets',
@@ -88,43 +132,42 @@ class EditorProvider extends Component {
 				'colors',
 				'disableCustomColors',
 				'disableCustomFontSizes',
+				'disableCustomGradients',
+				'enableCustomUnits',
+				'enableCustomLineHeight',
 				'focusMode',
 				'fontSizes',
+				'gradients',
 				'hasFixedToolbar',
 				'hasPermissionsToManageWidgets',
+				'imageEditing',
 				'imageSizes',
+				'imageDimensions',
 				'isRTL',
+				'keepCaretInsideBlock',
 				'maxWidth',
+				'onUpdateDefaultBlockStyles',
 				'styles',
 				'template',
 				'templateLock',
 				'titlePlaceholder',
-				'__experimentalEnableLegacyWidgetBlock',
-				'__experimentalEnableMenuBlock',
 			] ),
+			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
+			__experimentalFetchReusableBlocks,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
+			__experimentalUndo: undo,
+			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 		};
+	}
+
+	getDefaultBlockContext( postId, postType ) {
+		return { postId, postType };
 	}
 
 	componentDidMount() {
 		this.props.updateEditorSettings( this.props.settings );
-
-		if ( ! this.props.settings.styles ) {
-			return;
-		}
-
-		const updatedStyles = transformStyles( this.props.settings.styles, '.editor-styles-wrapper' );
-
-		map( updatedStyles, ( updatedCSS ) => {
-			if ( updatedCSS ) {
-				const node = document.createElement( 'style' );
-				node.innerHTML = updatedCSS;
-				document.body.appendChild( node );
-			}
-		} );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -141,13 +184,19 @@ class EditorProvider extends Component {
 		const {
 			canUserUseUnfilteredHTML,
 			children,
+			post,
 			blocks,
 			resetEditorBlocks,
+			selectionStart,
+			selectionEnd,
 			isReady,
 			settings,
 			reusableBlocks,
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
+			isPostTitleSelected,
+			__experimentalFetchReusableBlocks,
+			undo,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -157,22 +206,45 @@ class EditorProvider extends Component {
 		const editorSettings = this.getBlockEditorSettings(
 			settings,
 			reusableBlocks,
+			__experimentalFetchReusableBlocks,
 			hasUploadPermissions,
-			canUserUseUnfilteredHTML
+			canUserUseUnfilteredHTML,
+			undo,
+			isPostTitleSelected
+		);
+
+		const defaultBlockContext = this.getDefaultBlockContext(
+			post.id,
+			post.type
 		);
 
 		return (
-			<BlockEditorProvider
-				value={ blocks }
-				onInput={ resetEditorBlocksWithoutUndoLevel }
-				onChange={ resetEditorBlocks }
-				settings={ editorSettings }
-				useSubRegistry={ false }
-			>
-				{ children }
-				<ReusableBlocksButtons />
-				<ConvertToGroupButtons />
-			</BlockEditorProvider>
+			<>
+				<EditorStyles styles={ settings.styles } />
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ post.type }
+						id={ post.id }
+					>
+						<BlockContextProvider value={ defaultBlockContext }>
+							<BlockEditorProvider
+								value={ blocks }
+								onInput={ resetEditorBlocksWithoutUndoLevel }
+								onChange={ resetEditorBlocks }
+								selectionStart={ selectionStart }
+								selectionEnd={ selectionEnd }
+								settings={ editorSettings }
+								useSubRegistry={ false }
+							>
+								{ children }
+								<ReusableBlocksButtons />
+								<ConvertToGroupButtons />
+							</BlockEditorProvider>
+						</BlockContextProvider>
+					</EntityProvider>
+				</EntityProvider>
+			</>
 		);
 	}
 }
@@ -184,7 +256,10 @@ export default compose( [
 			canUserUseUnfilteredHTML,
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
+			getEditorSelectionStart,
+			getEditorSelectionEnd,
 			__experimentalGetReusableBlocks,
+			isPostTitleSelected,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
 
@@ -192,8 +267,15 @@ export default compose( [
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
+			selectionStart: getEditorSelectionStart(),
+			selectionEnd: getEditorSelectionEnd(),
 			reusableBlocks: __experimentalGetReusableBlocks(),
-			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
+			hasUploadPermissions: defaultTo(
+				canUser( 'create', 'media' ),
+				true
+			),
+			// This selector is only defined on mobile.
+			isPostTitleSelected: isPostTitleSelected && isPostTitleSelected(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -202,7 +284,9 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			updateEditorSettings,
+			__experimentalFetchReusableBlocks,
 			__experimentalTearDownEditor,
+			undo,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
@@ -212,12 +296,15 @@ export default compose( [
 			createWarningNotice,
 			resetEditorBlocks,
 			updateEditorSettings,
-			resetEditorBlocksWithoutUndoLevel( blocks ) {
+			resetEditorBlocksWithoutUndoLevel( blocks, options ) {
 				resetEditorBlocks( blocks, {
+					...options,
 					__unstableShouldCreateUndoLevel: false,
 				} );
 			},
 			tearDownEditor: __experimentalTearDownEditor,
+			__experimentalFetchReusableBlocks,
+			undo,
 		};
 	} ),
 ] )( EditorProvider );

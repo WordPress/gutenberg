@@ -14,9 +14,7 @@ describe( 'reducer', () => {
 				type: 'TRIGGER_GUIDE',
 				tipIds: [ 'test/tip-1', 'test/tip-2' ],
 			} );
-			expect( state ).toEqual( [
-				[ 'test/tip-1', 'test/tip-2' ],
-			] );
+			expect( state ).toEqual( [ [ 'test/tip-1', 'test/tip-2' ] ] );
 		} );
 	} );
 
@@ -46,10 +44,13 @@ describe( 'reducer', () => {
 		} );
 
 		it( 'should mark tips as dismissed', () => {
-			const state = dismissedTips( {}, {
-				type: 'DISMISS_TIP',
-				id: 'test/tip',
-			} );
+			const state = dismissedTips(
+				{},
+				{
+					type: 'DISMISS_TIP',
+					id: 'test/tip',
+				}
+			);
 			expect( state ).toEqual( {
 				'test/tip': true,
 			} );

@@ -1,0 +1,36 @@
+.columnPlaceholderNotSelected {
+	padding-top: $block-selected-to-content;
+}
+
+.columnPlaceholder {
+	flex: 1;
+	padding: $block-selected-to-content;
+	background-color: $white;
+	border: $border-width dashed $gray;
+	border-radius: 4px;
+}
+
+.columnPlaceholderDark {
+	background-color: $black;
+	border: $border-width dashed $gray-70;
+}
+
+.innerBlocksBottomSpace {
+	margin-bottom: $block-selected-to-content;
+}
+
+.is-vertically-aligned-top {
+	justify-content: flex-start;
+}
+
+.is-vertically-aligned-center {
+	justify-content: center;
+}
+
+.is-vertically-aligned-bottom {
+	justify-content: flex-end;
+}
+
+.flexBase {
+	flex: 1;
+}

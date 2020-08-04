@@ -12,6 +12,7 @@
 	width: 36px;
 	margin: auto;
 	margin-top: 6px;
+	margin-bottom: 6px;
 	border-radius: 2px;
 }
 
@@ -21,9 +22,14 @@
 	width: 100%;
 }
 
-.emptyHeaderSpace {
-	height: 14;
+.separatorDark {
+	background-color: $gray-70;
 }
+
+.emptyHeader {
+	margin-top: $grid-unit-20 / 2;
+}
+
 
 .background {
 	background-color: $white;
@@ -34,8 +40,16 @@
 	padding-bottom: 0;
 }
 
+.backgroundDark {
+	background-color: $background-dark-elevated;
+}
+
 .content {
 	padding: 0 16px 0 16px;
+}
+
+.scrollableContent {
+	padding-bottom: 20px;
 }
 
 .head {
@@ -68,12 +82,22 @@
 	padding: 5px;
 }
 
+.resetButton {
+	font-size: 17px;
+	color: $blue-wordpress;
+}
+
+.resetButtonDark {
+	color: $blue-30;
+}
+
 // Cell
 
 .cellContainer {
 	flex-direction: row;
 	min-height: 48;
 	align-items: center;
+	justify-content: space-between;
 }
 
 .clipToBounds {
@@ -86,9 +110,14 @@
 	width: 100%;
 }
 
+.cellSeparatorDark {
+	background-color: $gray-70;
+}
+
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
+	flex-shrink: 0;
 }
 
 .cellIcon {
@@ -97,24 +126,128 @@
 
 .cellLabel {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	margin-right: 12px;
+	flex-shrink: 1;
 }
 
 .cellLabelCentered {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	flex: 1;
 	text-align: center;
 }
 
+.cellLabelLeftAlignNoIcon {
+	font-size: 17px;
+	color: $gray-dark;
+	flex: 1;
+	margin-left: 0;
+}
+
 .cellValue {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	text-align: right;
 	flex: 1;
 }
 
+.cellTextDark {
+	color: $white;
+}
+
 .cellValueRTL {
 	text-align: left;
+}
+
+.icon {
+	color: $toolbar-button;
+}
+
+.iconDark {
+	color: #c3c4c7;
+}
+
+// Unsupported Footer Cell
+
+.unsupportedFooterCell {
+	font-size: $text-editor-font-size;
+	color: $gray;
+}
+
+// Color Cell
+
+.colorCircle {
+	width: 2 * $grid-unit-20;
+	height: 2 * $grid-unit-20;
+	border-radius: $grid-unit-20;
+}
+
+// Radio Cell
+
+.selectedIcon {
+	color: $blue-50;
+}
+
+.selectedIconDark {
+	color: $blue-30;
+}
+
+// Navigation Header
+
+.bottomSheetHeader {
+	flex-direction: row;
+	align-items: center;
+	padding-right: $grid-unit-20;
+	padding-left: $grid-unit-20;
+	min-height: 44px;
+}
+
+.bottomSheetBackButton {
+	flex-direction: row;
+	align-items: center;
+	flex: 1;
+}
+
+.chevronLeftIcon {
+	color: $blue-50;
+	margin-left: -13px;
+	margin-right: -13px;
+}
+
+.chevronLeftIconDark {
+	color: $blue-30;
+}
+
+.bottomSheetHeaderTitle {
+	color: $light-primary;
+	text-align: center;
+	font-weight: 600;
+	font-size: 16px;
+	flex: 2;
+}
+
+.bottomSheetHeaderTitleDark {
+	color: $dark-primary;
+}
+
+.bottomSheetButtonText {
+	color: $blue-50;
+	font-size: 16px;
+}
+
+.bottomSheetButtonTextDark {
+	color: $blue-30;
+}
+
+.bottomSheetRightSpace {
+	flex: 1;
+}
+
+.arrowLeftIcon {
+	color: $gray-60;
+}
+
+.arrowLeftIconDark {
+	color: $dark-secondary;
 }

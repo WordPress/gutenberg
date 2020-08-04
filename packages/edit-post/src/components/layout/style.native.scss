@@ -5,6 +5,19 @@
 	background-color: #fff;
 }
 
+.containerDark {
+	background-color: $background-dark-elevated;
+}
+
+.background {
+	flex: 1;
+	background-color: $white;
+}
+
+.backgroundDark {
+	background-color: $black;
+}
+
 .toolbarKeyboardAvoidingView {
 	position: absolute;
 	bottom: 0;

@@ -17,12 +17,48 @@ export default class TokenList {
 	constructor( initialValue = '' ) {
 		this.value = initialValue;
 
-		[ 'entries', 'forEach', 'keys', 'values' ].forEach( ( fn ) => {
-			this[ fn ] = ( function() {
-				return this._valueAsArray[ fn ]( ...arguments );
-			} ).bind( this );
-		} );
+		// Disable reason: These are type hints on the class.
+		/* eslint-disable no-unused-expressions */
+		/** @type {string} */
+		this._currentValue;
+
+		/** @type {string[]} */
+		this._valueAsArray;
+		/* eslint-enable no-unused-expressions */
 	}
+
+	// Disable reason: JSDoc lint doesn't understand TypeScript types
+	/* eslint-disable jsdoc/valid-types */
+
+	/**
+	 * @param {Parameters<Array<string>['entries']>} args
+	 */
+	entries( ...args ) {
+		return this._valueAsArray.entries( ...args );
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['forEach']>} args
+	 */
+	forEach( ...args ) {
+		return this._valueAsArray.forEach( ...args );
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['keys']>} args
+	 */
+	keys( ...args ) {
+		return this._valueAsArray.keys( ...args );
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['values']>} args
+	 */
+	values( ...args ) {
+		return this._valueAsArray.values( ...args );
+	}
+
+	/* eslint-enable jsdoc/valid-types */
 
 	/**
 	 * Returns the associated set as string.
@@ -78,7 +114,7 @@ export default class TokenList {
 	 *
 	 * @return {IterableIterator<string>} TokenList iterator.
 	 */
-	* [ Symbol.iterator ]() {
+	*[ Symbol.iterator ]() {
 		return yield* this._valueAsArray;
 	}
 
@@ -89,7 +125,7 @@ export default class TokenList {
 	 *
 	 * @param {number} index Index at which to return token.
 	 *
-	 * @return {?string} Token at index.
+	 * @return {string|undefined} Token at index.
 	 */
 	item( index ) {
 		return this._valueAsArray[ index ];
@@ -138,8 +174,8 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-toggle
 	 *
-	 * @param {string}   token Token to toggle.
-	 * @param {?boolean} force Presence to force.
+	 * @param {string}  token   Token to toggle.
+	 * @param {boolean} [force] Presence to force.
 	 *
 	 * @return {boolean} Whether token is present after toggle.
 	 */

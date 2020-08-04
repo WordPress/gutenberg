@@ -23,18 +23,6 @@ describe( 'annotations', () => {
 		} );
 
 		expect( state ).toEqual( {
-			blockClientId: [ {
-				id: 'annotationId',
-				blockClientId: 'blockClientId',
-				richTextIdentifier: 'identifier',
-				source: 'default',
-				selector: 'block',
-			} ],
-		} );
-	} );
-
-	it( 'allows an annotation to be removed', () => {
-		const state = annotations( {
 			blockClientId: [
 				{
 					id: 'annotationId',
@@ -44,10 +32,27 @@ describe( 'annotations', () => {
 					selector: 'block',
 				},
 			],
-		}, {
-			type: 'ANNOTATION_REMOVE',
-			annotationId: 'annotationId',
 		} );
+	} );
+
+	it( 'allows an annotation to be removed', () => {
+		const state = annotations(
+			{
+				blockClientId: [
+					{
+						id: 'annotationId',
+						blockClientId: 'blockClientId',
+						richTextIdentifier: 'identifier',
+						source: 'default',
+						selector: 'block',
+					},
+				],
+			},
+			{
+				type: 'ANNOTATION_REMOVE',
+				annotationId: 'annotationId',
+			}
+		);
 
 		expect( state ).toEqual( { blockClientId: [] } );
 	} );
@@ -67,17 +72,16 @@ describe( 'annotations', () => {
 			source: 'other-source',
 			selector: 'block',
 		};
-		const state = annotations( {
-			blockClientId: [
-				annotation1,
-			],
-			blockClientId2: [
-				annotation2,
-			],
-		}, {
-			type: 'ANNOTATION_REMOVE_SOURCE',
-			source: 'default',
-		} );
+		const state = annotations(
+			{
+				blockClientId: [ annotation1 ],
+				blockClientId2: [ annotation2 ],
+			},
+			{
+				type: 'ANNOTATION_REMOVE_SOURCE',
+				source: 'default',
+			}
+		);
 
 		expect( state ).toEqual( {
 			blockClientId: [],
@@ -117,26 +121,29 @@ describe( 'annotations', () => {
 	} );
 
 	it( 'moves annotations when said action is dispatched', () => {
-		const state = annotations( {
-			blockClientId: [
-				{
-					id: 'annotationId',
-					blockClientId: 'blockClientId',
-					richTextIdentifier: 'identifier',
-					source: 'default',
-					selector: 'range',
-					range: {
-						start: 0,
-						end: 100,
+		const state = annotations(
+			{
+				blockClientId: [
+					{
+						id: 'annotationId',
+						blockClientId: 'blockClientId',
+						richTextIdentifier: 'identifier',
+						source: 'default',
+						selector: 'range',
+						range: {
+							start: 0,
+							end: 100,
+						},
 					},
-				},
-			],
-		}, {
-			type: 'ANNOTATION_UPDATE_RANGE',
-			annotationId: 'annotationId',
-			start: 50,
-			end: 75,
-		} );
+				],
+			},
+			{
+				type: 'ANNOTATION_UPDATE_RANGE',
+				annotationId: 'annotationId',
+				start: 50,
+				end: 75,
+			}
+		);
 
 		expect( state ).toEqual( {
 			blockClientId: [

@@ -11,6 +11,85 @@ When the user selects a block, a number of control buttons may be shown in a too
 You can also customize the toolbar to include controls specific to your block type. If the return value of your block type's `edit` function includes a `BlockControls` element, those controls will be shown in the selected block's toolbar.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+import { registerBlockType } from '@wordpress/blocks';
+
+import {
+	RichText,
+	AlignmentToolbar,
+	BlockControls,
+} from '@wordpress/block-editor';
+
+registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
+	title: 'Example: Controls (esnext)',
+	icon: 'universal-access-alt',
+	category: 'design',
+	attributes: {
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'p',
+		},
+		alignment: {
+			type: 'string',
+			default: 'none',
+		},
+	},
+	example: {
+		attributes: {
+			content: 'Hello World',
+			alignment: 'right',
+		},
+	},
+	edit: ( props ) => {
+		const {
+			attributes: {
+				content,
+				alignment,
+			},
+			className,
+		} = props;
+
+		const onChangeContent = ( newContent ) => {
+			props.setAttributes( { content: newContent } );
+		};
+
+		const onChangeAlignment = ( newAlignment ) => {
+			props.setAttributes( { alignment: newAlignment === undefined ? 'none' : newAlignment } );
+		};
+
+		return (
+			<div>
+				{
+					<BlockControls>
+						<AlignmentToolbar
+							value={ alignment }
+							onChange={ onChangeAlignment }
+						/>
+					</BlockControls>
+				}
+				<RichText
+					className={ className }
+					style={ { textAlign: alignment } }
+					tagName="p"
+					onChange={ onChangeContent }
+					value={ content }
+				/>
+			</div>
+		);
+	},
+	save: ( props ) => {
+		return (
+			<RichText.Content
+				className={ `gutenberg-examples-align-${ props.attributes.alignment }` }
+				tagName="p"
+				value={ props.attributes.content }
+			/>
+		);
+	},
+} );
+```
 {% ES5 %}
 ```js
 ( function( blocks, editor, element ) {
@@ -22,7 +101,7 @@ You can also customize the toolbar to include controls specific to your block ty
 	blocks.registerBlockType( 'gutenberg-examples/example-04-controls', {
 		title: 'Example: Controls',
 		icon: 'universal-access-alt',
-		category: 'layout',
+		category: 'design',
 
 		attributes: {
 			content: {
@@ -35,7 +114,12 @@ You can also customize the toolbar to include controls specific to your block ty
 				default: 'none',
 			},
 		},
-
+		example: {
+			attributes: {
+				content: 'Hello World',
+				alignment: 'right',
+			},
+		},
 		edit: function( props ) {
 			var content = props.attributes.content;
 			var alignment = props.attributes.alignment;
@@ -88,79 +172,6 @@ You can also customize the toolbar to include controls specific to your block ty
 	window.wp.element
 ) );
 ```
-{% ESNext %}
-```js
-const { registerBlockType } = wp.blocks;
-
-const {
-	RichText,
-	AlignmentToolbar,
-	BlockControls,
-} = wp.editor;
-
-registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
-	title: 'Example: Controls (esnext)',
-	icon: 'universal-access-alt',
-	category: 'layout',
-	attributes: {
-		content: {
-			type: 'array',
-			source: 'children',
-			selector: 'p',
-		},
-		alignment: {
-			type: 'string',
-			default: 'none',
-		},
-	},
-	edit: ( props ) => {
-		const {
-			attributes: {
-				content,
-				alignment,
-			},
-			className,
-		} = props;
-
-		const onChangeContent = ( newContent ) => {
-			props.setAttributes( { content: newContent } );
-		};
-
-		const onChangeAlignment = ( newAlignment ) => {
-			props.setAttributes( { alignment: newAlignment === undefined ? 'none' : newAlignment } );
-		};
-
-		return (
-			<div>
-				{
-					<BlockControls>
-						<AlignmentToolbar
-							value={ alignment }
-							onChange={ onChangeAlignment }
-						/>
-					</BlockControls>
-				}
-				<RichText
-					className={ className }
-					style={ { textAlign: alignment } }
-					tagName="p"
-					onChange={ onChangeContent }
-					value={ content }
-				/>
-			</div>
-		);
-	},
-	save: ( props ) => {
-		return (
-			<RichText.Content
-				className={ `gutenberg-examples-align-${ props.attributes.alignment }` }
-				tagName="p"
-				value={ props.attributes.content }
-			/>
-		);
-	},
-} );
-```
 {% end %}
 
 Note that `BlockControls` is only visible when the block is currently selected and in visual editing mode. `BlockControls` are not shown when editing a block in HTML editing mode.
@@ -176,3 +187,6 @@ If you have settings that affects only selected content inside a block (example:
 The Block Tab is shown in place of the Document Tab when a block is selected.
 
 Similar to rendering a toolbar, if you include an `InspectorControls` element in the return value of your block type's `edit` function, those controls will be shown in the Settings Sidebar region.
+
+Block controls rendered in both the toolbar and sidebar will also be used when
+multiple blocks of the same type are selected.

@@ -47,27 +47,35 @@ describe( 'core/embed', () => {
 	test( 'getClassNames preserves exsiting class names when removing responsive classes', () => {
 		const html = '<iframe height="9" width="16"></iframe>';
 		const expected = 'lovely';
-		expect( getClassNames( html, 'lovely wp-embed-aspect-16-9 wp-has-aspect-ratio', false ) ).toEqual( expected );
+		expect(
+			getClassNames(
+				html,
+				'lovely wp-embed-aspect-16-9 wp-has-aspect-ratio',
+				false
+			)
+		).toEqual( expected );
 	} );
 
 	test( 'createUpgradedEmbedBlock bails early when block type does not exist', () => {
 		const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
-		expect( createUpgradedEmbedBlock( { attributes: { url: youtubeURL } }, {} ) ).toBeUndefined();
+		expect(
+			createUpgradedEmbedBlock( { attributes: { url: youtubeURL } }, {} )
+		).toBeUndefined();
 	} );
 
 	test( 'createUpgradedEmbedBlock returns a YouTube embed block when given a YouTube URL', () => {
 		const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
-		registerBlockType(
-			'core-embed/youtube',
-			{
-				title: 'YouTube',
-				category: 'embed',
-			}
-		);
+		registerBlockType( 'core-embed/youtube', {
+			title: 'YouTube',
+			category: 'embed',
+		} );
 
-		const result = createUpgradedEmbedBlock( { attributes: { url: youtubeURL } }, {} );
+		const result = createUpgradedEmbedBlock(
+			{ attributes: { url: youtubeURL } },
+			{}
+		);
 
 		unregisterBlockType( 'core-embed/youtube' );
 

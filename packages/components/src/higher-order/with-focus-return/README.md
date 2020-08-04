@@ -40,7 +40,7 @@ const MyComponentWithFocusReturn = withState( {
 				onChange={ ( text ) => setState( { text } ) }
 			/>
 			{ text && <EnhancedComponent /> }
-			{ text && <Button isDefault onClick={ unmount }>Unmount</Button> }
+			{ text && <Button isSecondary onClick={ unmount }>Unmount</Button> }
 		</div>
 	);
 } ); 

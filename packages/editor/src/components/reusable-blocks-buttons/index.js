@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalBlockSettingsMenuPluginsExtension } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -12,22 +11,12 @@ import ReusableBlockDeleteButton from './reusable-block-delete-button';
 
 function ReusableBlocksButtons( { clientIds } ) {
 	return (
-		<__experimentalBlockSettingsMenuPluginsExtension>
-			{ ( { onClose } ) => (
-				<>
-					<ReusableBlockConvertButton
-						clientIds={ clientIds }
-						onToggle={ onClose }
-					/>
-					{ clientIds.length === 1 && (
-						<ReusableBlockDeleteButton
-							clientId={ clientIds[ 0 ] }
-							onToggle={ onClose }
-						/>
-					) }
-				</>
+		<>
+			<ReusableBlockConvertButton clientIds={ clientIds } />
+			{ clientIds.length === 1 && (
+				<ReusableBlockDeleteButton clientId={ clientIds[ 0 ] } />
 			) }
-		</__experimentalBlockSettingsMenuPluginsExtension>
+		</>
 	);
 }
 

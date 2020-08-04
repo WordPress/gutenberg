@@ -1,0 +1,11 @@
+.columnsContainer {
+	max-width: $content-width;
+}
+
+.innerBlocksSelected {
+	margin-bottom: $block-edge-to-content;
+}
+
+.columnMargin {
+	margin: $block-edge-to-content / 2;
+}

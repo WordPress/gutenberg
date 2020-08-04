@@ -18,24 +18,92 @@ describe( 'figureContentReducer', () => {
 		},
 	};
 
-	it( 'should move embedded content from paragraph', () => {
-		const input = '<p><strong>test<img class="one"></strong><img class="two"></p>';
-		const output = '<figure><img class="one"></figure><figure><img class="two"></figure><p><strong>test</strong></p>';
+	it( 'should wrap image in figure', () => {
+		const input = '<img>';
+		const output = '<figure><img></figure>';
 
-		expect( deepFilterHTML( input, [ figureContentReducer ], schema ) ).toEqual( output );
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( output );
 	} );
 
-	it( 'should move an anchor with just an image from paragraph', () => {
-		const input = '<p><a href="#"><img class="one"></a><strong>test</strong></p>';
-		const output = '<figure><a href="#"><img class="one"></a></figure><p><strong>test</strong></p>';
+	it( 'should move lone embedded content from paragraph', () => {
+		const input = '<p><img></p>';
+		const output = '<figure><img></figure><p></p>';
 
-		expect( deepFilterHTML( input, [ figureContentReducer ], schema ) ).toEqual( output );
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( output );
 	} );
 
-	it( 'should move multiple images', () => {
-		const input = '<p><a href="#"><img class="one"></a><img class="two"><strong>test</strong></p>';
-		const output = '<figure><a href="#"><img class="one"></a></figure><figure><img class="two"></figure><p><strong>test</strong></p>';
+	it( 'should move multiple lone embedded content from paragraph', () => {
+		const input = '<p><img><img></p>';
+		const output = '<figure><img></figure><figure><img></figure><p></p>';
 
-		expect( deepFilterHTML( input, [ figureContentReducer ], schema ) ).toEqual( output );
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( output );
+	} );
+
+	it( 'should move aligned embedded content from paragraph (1)', () => {
+		const input = '<p><img class="alignright">test</p>';
+		const output = '<figure><img class="alignright"></figure><p>test</p>';
+
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( output );
+	} );
+
+	it( 'should move aligned embedded content from paragraph (2)', () => {
+		const input = '<p>test<img class="alignright"></p>';
+		const output = '<figure><img class="alignright"></figure><p>test</p>';
+
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( output );
+	} );
+
+	it( 'should move aligned embedded content from paragraph (3)', () => {
+		const input = '<p>test<img class="alignright">test</p>';
+		const output =
+			'<figure><img class="alignright"></figure><p>testtest</p>';
+
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( output );
+	} );
+
+	it( 'should not move embedded content from paragraph (1)', () => {
+		const input = '<p><img>test</p>';
+
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( input );
+	} );
+
+	it( 'should not move embedded content from paragraph (2)', () => {
+		const input = '<p>test<img></p>';
+
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( input );
+	} );
+
+	it( 'should not move embedded content from paragraph (3)', () => {
+		const input = '<p>test<img>test</p>';
+
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( input );
+	} );
+
+	it( 'should move an anchor with an image', () => {
+		const input = '<p><a href="#"><img class="alignleft"></a>test</p>';
+		const output =
+			'<figure><a href="#"><img class="alignleft"></a></figure><p>test</p>';
+
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( output );
 	} );
 } );

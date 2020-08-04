@@ -1,0 +1,23 @@
+{
+	"name": "core/search",
+	"category": "widgets",
+	"attributes": {
+		"className": {
+			"type": "string"
+		},
+		"label": {
+			"type": "string"
+		},
+		"placeholder": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonText": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"align": true,
+		"html": false
+	}
+}

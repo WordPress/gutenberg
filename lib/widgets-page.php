@@ -74,6 +74,7 @@ function gutenberg_widgets_init( $hook ) {
 			'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
 			'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 			'imageSizes'             => $available_image_sizes,
+			'isRTL'                  => is_rtl(),
 			'maxUploadFileSize'      => $max_upload_size,
 		),
 		gutenberg_get_legacy_widget_settings()
@@ -97,7 +98,7 @@ function gutenberg_widgets_init( $hook ) {
 				wp.editWidgets.%s( "widgets-editor", %s );
 			} );',
 			$initializer_name,
-			wp_json_encode( $settings )
+			wp_json_encode( gutenberg_experiments_editor_settings( $settings ) )
 		)
 	);
 
@@ -108,6 +109,7 @@ function gutenberg_widgets_init( $hook ) {
 	);
 
 	wp_enqueue_script( 'wp-edit-widgets' );
+	wp_enqueue_script( 'admin-widgets' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-edit-widgets' );
 	wp_enqueue_style( 'wp-format-library' );

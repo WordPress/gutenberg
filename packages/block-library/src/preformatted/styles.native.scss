@@ -1,0 +1,25 @@
+%wpBlockPreformattedLightColor {
+	background-color: $gray-light;
+}
+
+%wpBlockPreformattedDarkColor {
+	background-color: $gray-100;
+}
+
+.wpBlockPreformattedLight {
+	@extend %wpBlockPreformattedLightColor;
+	padding: 12px 16px;
+	border-radius: 4px;
+}
+
+.wpRichTextLight {
+	@extend %wpBlockPreformattedLightColor;
+}
+
+.wpBlockPreformattedDark {
+	@extend %wpBlockPreformattedDarkColor;
+}
+
+.wpRichTextDark {
+	@extend %wpBlockPreformattedDarkColor;
+}

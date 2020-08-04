@@ -14,7 +14,7 @@ Animation can help reinforce a sense of hierarchy and spatial orientation. This 
 
 - Animations should never block a user interaction. They should be fast, almost always complete in less than 0.2 seconds.
 - A user should not have to wait for an animation to finish before they can interact.
-- Animations should be performant. Use `transform` CSS properties when you can, these render elements on the GPU, making them smooth. 
+- Animations should be performant. Use `transform` CSS properties when you can, these render elements on the GPU, making them smooth.
 - If an animation can't be made fast & performant, leave it out.
 
 ### Simple
@@ -26,15 +26,15 @@ Animation can help reinforce a sense of hierarchy and spatial orientation. This 
 
 In creating consistent animations, we have to establish physical rules for how elements behave when animated. When all animations follow these rules, they feel consistent, related, and predictable. An animation should match user expectations, if it doesn't, it's probably not the right animation for the job.
 
-Reuse animations if one already exists for your task. 
+Reuse animations if one already exists for your task.
 
 ## Accessibility Considerations
 
 - Animations should be subtle. Be cognizent of users with [vestibular disorders triggered by motion](https://www.ncbi.nlm.nih.gov/pubmed/29017000).
 - Don't animate elements that are currently reporting content to adaptive technology (e.g., an `aria-live` region that's receiving updates). This can cause confusion wherein the technology tries to parse a region that's actively changing.
 - Avoid animations that aren't directly triggered by user behaviors.
-- Whenever possible, ensure that animations respect the OS-level "Reduce Motion" settings. This can be done by utilizing the [`prefers-reduce-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) media query. Gutenberg includes a `@reduce-motion` mixin for this, to be used alongside rules that include a CSS `animate` property. 
+- Whenever possible, ensure that animations respect the OS-level "Reduce Motion" settings. This can be done by utilizing the [`prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) media query. Gutenberg includes a `@reduce-motion` mixin for this, to be used alongside rules that include a CSS `animate` property.
 
 ## Inventory of Reused Animations
 
-The generic `Animate` component is used to animate different parts of the interface. See [the component documentation](/packages/components/src/animate/README.md) for more details about the available animations. 
+The generic `Animate` component is used to animate different parts of the interface. See [the component documentation](/packages/components/src/animate/README.md) for more details about the available animations.

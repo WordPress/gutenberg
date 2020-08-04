@@ -1,6 +1,6 @@
 # Add a Button to the Toolbar
 
-Now that the format is available, the next step is to surface it to the UI. You can make use of the [`RichTextToolbarButton`](/packages/editor/src/components/rich-text/README.md#RichTextToolbarButton) component to extend the format toolbar.
+Now that the format is available, the next step is to surface it to the UI. You can make use of the [`RichTextToolbarButton`](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/rich-text#richtexttoolbarbutton) component to extend the format toolbar.
 
 Paste this code in `my-custom-format.js`:
 
@@ -31,8 +31,8 @@ Paste this code in `my-custom-format.js`:
 ```
 {% ESNext %}
 ```js
-const { registerFormatType } = wp.richText;
-const { RichTextToolbarButton } = wp.blockEditor;
+import { registerFormatType } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 
 const MyCustomButton = props => {
 	return <RichTextToolbarButton
@@ -113,10 +113,10 @@ The following sample code renders the previously shown button only on Paragraph 
 ```
 {% ESNext %}
 ```js
-const { compose, ifCondition } = wp.compose;
-const { registerFormatType } = wp.richText;
-const { RichTextToolbarButton } = wp.blockEditor;
-const { withSelect } = wp.data;
+import { compose, ifCondition } from '@wordpress/compose';
+import { registerFormatType } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { withSelect } from '@wordpress/data';
 
 const MyCustomButton = props => {
 	return <RichTextToolbarButton

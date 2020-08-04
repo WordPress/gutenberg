@@ -65,7 +65,9 @@ export function removeFormat(
 }
 
 function filterFormats( formats, index, formatType ) {
-	const newFormats = formats[ index ].filter( ( { type } ) => type !== formatType );
+	const newFormats = formats[ index ].filter(
+		( { type } ) => type !== formatType
+	);
 
 	if ( newFormats.length ) {
 		formats[ index ] = newFormats;

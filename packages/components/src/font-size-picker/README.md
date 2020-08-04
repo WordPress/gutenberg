@@ -72,6 +72,8 @@ The property `size` contains a number with the font size value, in `px`.
 The `name` property includes a label for that font size e.g.: `Small`.
 The `slug` property is a string with a unique identifier for the font size. Used for the class generation process.
 
+**Note:** The slugs `default` and `custom` are reserved and cannot be used.
+
 - Type: `Array`
 - Required: No
 

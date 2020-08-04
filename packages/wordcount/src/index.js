@@ -31,12 +31,18 @@ function loadSettings( type, userSettings ) {
 	settings.shortcodes = settings.l10n.shortcodes || {};
 
 	if ( settings.shortcodes && settings.shortcodes.length ) {
-		settings.shortcodesRegExp = new RegExp( '\\[\\/?(?:' + settings.shortcodes.join( '|' ) + ')[^\\]]*?\\]', 'g' );
+		settings.shortcodesRegExp = new RegExp(
+			'\\[\\/?(?:' + settings.shortcodes.join( '|' ) + ')[^\\]]*?\\]',
+			'g'
+		);
 	}
 
 	settings.type = type || settings.l10n.type;
 
-	if ( settings.type !== 'characters_excluding_spaces' && settings.type !== 'characters_including_spaces' ) {
+	if (
+		settings.type !== 'characters_excluding_spaces' &&
+		settings.type !== 'characters_including_spaces'
+	) {
 		settings.type = 'words';
 	}
 
@@ -60,7 +66,7 @@ function matchWords( text, regex, settings ) {
 		stripSpaces.bind( this, settings ),
 		stripHTMLEntities.bind( this, settings ),
 		stripConnectors.bind( this, settings ),
-		stripRemovables.bind( this, settings ),
+		stripRemovables.bind( this, settings )
 	)( text );
 	text = text + '\n';
 	return text.match( regex );
@@ -82,7 +88,7 @@ function matchCharacters( text, regex, settings ) {
 		stripShortcodes.bind( this, settings ),
 		stripSpaces.bind( this, settings ),
 		transposeAstralsToCountableChar.bind( this, settings ),
-		transposeHTMLEntitiesToCountableChars.bind( this, settings ),
+		transposeHTMLEntitiesToCountableChars.bind( this, settings )
 	)( text );
 	text = text + '\n';
 	return text.match( regex );
@@ -112,9 +118,10 @@ export function count( text, type, userSettings ) {
 	if ( text ) {
 		const settings = loadSettings( type, userSettings );
 		const matchRegExp = settings[ type + 'RegExp' ];
-		const results = ( 'words' === settings.type ) ?
-			matchWords( text, matchRegExp, settings ) :
-			matchCharacters( text, matchRegExp, settings );
+		const results =
+			'words' === settings.type
+				? matchWords( text, matchRegExp, settings )
+				: matchCharacters( text, matchRegExp, settings );
 
 		return results ? results.length : 0;
 	}

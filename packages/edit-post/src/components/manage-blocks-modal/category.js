@@ -19,7 +19,7 @@ import EditPostSettings from '../edit-post-settings';
 
 function BlockManagerCategory( {
 	instanceId,
-	category,
+	title,
 	blockTypes,
 	hiddenBlockTypes,
 	toggleVisible,
@@ -27,17 +27,14 @@ function BlockManagerCategory( {
 } ) {
 	const settings = useContext( EditPostSettings );
 	const { allowedBlockTypes } = settings;
-	const filteredBlockTypes = useMemo(
-		() => {
-			if ( allowedBlockTypes === true ) {
-				return blockTypes;
-			}
-			return blockTypes.filter( ( { name } ) => {
-				return includes( allowedBlockTypes || [], name );
-			} );
-		},
-		[ allowedBlockTypes, blockTypes ]
-	);
+	const filteredBlockTypes = useMemo( () => {
+		if ( allowedBlockTypes === true ) {
+			return blockTypes;
+		}
+		return blockTypes.filter( ( { name } ) => {
+			return includes( allowedBlockTypes || [], name );
+		} );
+	}, [ allowedBlockTypes, blockTypes ] );
 
 	if ( ! filteredBlockTypes.length ) {
 		return null;
@@ -48,7 +45,8 @@ function BlockManagerCategory( {
 		...hiddenBlockTypes
 	);
 
-	const titleId = 'edit-post-manage-blocks-modal__category-title-' + instanceId;
+	const titleId =
+		'edit-post-manage-blocks-modal__category-title-' + instanceId;
 
 	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
 
@@ -72,7 +70,7 @@ function BlockManagerCategory( {
 				onChange={ toggleAllVisible }
 				className="edit-post-manage-blocks-modal__category-title"
 				aria-checked={ ariaChecked }
-				label={ <span id={ titleId }>{ category.title }</span> }
+				label={ <span id={ titleId }>{ title }</span> }
 			/>
 			<BlockTypesChecklist
 				blockTypes={ filteredBlockTypes }
@@ -93,10 +91,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			showBlockTypes,
-			hideBlockTypes,
-		} = dispatch( 'core/edit-post' );
+		const { showBlockTypes, hideBlockTypes } = dispatch( 'core/edit-post' );
 
 		return {
 			toggleVisible( blockName, nextIsChecked ) {

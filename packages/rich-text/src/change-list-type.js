@@ -44,9 +44,11 @@ export function changeListType( value, newFormat ) {
 		}
 
 		changed = true;
-		newReplacements[ index ] = newReplacements[ index ].map( ( format, i ) => {
-			return i < startCount || i > endCount ? format : newFormat;
-		} );
+		newReplacements[ index ] = newReplacements[ index ].map(
+			( format, i ) => {
+				return i < startCount || i > endCount ? format : newFormat;
+			}
+		);
 	}
 
 	if ( ! changed ) {

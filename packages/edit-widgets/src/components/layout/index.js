@@ -1,40 +1,40 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import {
-	navigateRegions,
-	Popover,
-	SlotFillProvider,
-} from '@wordpress/components';
-
+import { Popover } from '@wordpress/components';
+import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
+import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
 import Header from '../header';
 import Sidebar from '../sidebar';
-import WidgetAreas from '../widget-areas';
-import Notices from '../notices';
+import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
+import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
 function Layout( { blockEditorSettings } ) {
+	const hasSidebarEnabled = useSelect( ( select ) => {
+		return !! select( 'core/interface' ).getActiveComplementaryArea(
+			'core/edit-widgets'
+		);
+	} );
 	return (
-		<SlotFillProvider>
-			<Header />
+		<WidgetAreasBlockEditorProvider
+			blockEditorSettings={ blockEditorSettings }
+		>
+			<InterfaceSkeleton
+				header={ <Header /> }
+				sidebar={
+					hasSidebarEnabled && (
+						<ComplementaryArea.Slot scope="core/edit-widgets" />
+					)
+				}
+				content={ <WidgetAreasBlockEditorContent /> }
+			/>
 			<Sidebar />
-			<Notices />
-			<div
-				className="edit-widgets-layout__content"
-				role="region"
-				aria-label={ __( 'Widgets screen content' ) }
-				tabIndex="-1"
-			>
-				<WidgetAreas
-					blockEditorSettings={ blockEditorSettings }
-				/>
-			</div>
 			<Popover.Slot />
-		</SlotFillProvider>
+		</WidgetAreasBlockEditorProvider>
 	);
 }
 
-export default navigateRegions( Layout );
+export default Layout;

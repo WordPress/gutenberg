@@ -38,6 +38,10 @@ Name | Type | Default | Description
 --- | --- | --- | ---
 `origin` | `string` | `top center` | Point of origin (`top`, `bottom`,` middle right`, `left`, `center`).
 
+### loading
+
+This animation is meant to be used to indicate that activity is happening in the background. It is an infinitely-looping fade from 50% to full opacity. This animation has no options, and should be removed as soon as its relevant operation is completed. 
+
 ### slide-in
 
 This animation is meant for sidebars and sliding menus. It shows the height and width of the animated element moving from a hidden position to its normal one.

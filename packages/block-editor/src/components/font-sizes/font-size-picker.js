@@ -4,16 +4,13 @@
 import { FontSizePicker } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
-export default withSelect(
-	( select ) => {
-		const {
-			disableCustomFontSizes,
-			fontSizes,
-		} = select( 'core/block-editor' ).getSettings();
+export default withSelect( ( select ) => {
+	const { disableCustomFontSizes, fontSizes } = select(
+		'core/block-editor'
+	).getSettings();
 
-		return {
-			disableCustomFontSizes,
-			fontSizes,
-		};
-	}
-)( FontSizePicker );
+	return {
+		disableCustomFontSizes,
+		fontSizes,
+	};
+} )( FontSizePicker );

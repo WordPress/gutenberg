@@ -12,4 +12,15 @@ describe( 'Babel preset default', () => {
 			value: 2,
 		} );
 	} );
+
+	test( 'support for optional chaining', () => {
+		const obj = {
+			foo: {
+				bar: 42,
+			},
+		};
+
+		expect( obj?.foo?.bar ).toEqual( 42 );
+		expect( obj?.foo?.baz ).toEqual( undefined );
+	} );
 } );

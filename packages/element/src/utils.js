@@ -1,11 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	isArray,
-	isNumber,
-	isString,
-} from 'lodash';
+import { isArray, isNumber, isString } from 'lodash';
 
 /**
  * Checks if the provided WP element is empty.

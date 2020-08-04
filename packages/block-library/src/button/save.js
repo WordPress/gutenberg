@@ -6,38 +6,31 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { RichText } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import getColorAndStyleProps from './color-props';
 
 export default function save( { attributes } ) {
-	const {
-		url,
-		text,
-		title,
-		backgroundColor,
-		textColor,
-		customBackgroundColor,
-		customTextColor,
-		linkTarget,
-		rel,
-	} = attributes;
-
-	const textClass = getColorClassName( 'color', textColor );
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-
-	const buttonClasses = classnames( 'wp-block-button__link', {
-		'has-text-color': textColor || customTextColor,
-		[ textClass ]: textClass,
-		'has-background': backgroundColor || customBackgroundColor,
-		[ backgroundClass ]: backgroundClass,
-	} );
-
+	const { borderRadius, linkTarget, rel, text, title, url } = attributes;
+	const colorProps = getColorAndStyleProps( attributes );
+	const buttonClasses = classnames(
+		'wp-block-button__link',
+		colorProps.className,
+		{
+			'no-border-radius': borderRadius === 0,
+		}
+	);
 	const buttonStyle = {
-		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
-		color: textClass ? undefined : customTextColor,
+		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+		...colorProps.style,
 	};
+
+	// The use of a `title` attribute here is soft-deprecated, but still applied
+	// if it had already been assigned, for the sake of backward-compatibility.
+	// A title will no longer be assigned for new or updated button block links.
 
 	return (
 		<div>

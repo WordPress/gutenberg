@@ -20,15 +20,24 @@ import { combineReducers } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Module Constants
+ * @typedef {Object} WPBlockCategory
+ *
+ * @property {string} slug  Unique category slug.
+ * @property {string} title Category label, for display in user interface.
+ */
+
+/**
+ * Default set of categories.
+ *
+ * @type {WPBlockCategory[]}
  */
 export const DEFAULT_CATEGORIES = [
-	{ slug: 'common', title: __( 'Common Blocks' ) },
-	{ slug: 'formatting', title: __( 'Formatting' ) },
-	{ slug: 'layout', title: __( 'Layout Elements' ) },
+	{ slug: 'text', title: __( 'Text' ) },
+	{ slug: 'media', title: __( 'Media' ) },
+	{ slug: 'design', title: __( 'Design' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
 	{ slug: 'embed', title: __( 'Embeds' ) },
-	{ slug: 'reusable', title: __( 'Reusable Blocks' ) },
+	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
 
 /**
@@ -45,7 +54,9 @@ export function blockTypes( state = {}, action ) {
 			return {
 				...state,
 				...keyBy(
-					map( action.blockTypes, ( blockType ) => omit( blockType, 'styles ' ) ),
+					map( action.blockTypes, ( blockType ) =>
+						omit( blockType, 'styles ' )
+					),
 					'name'
 				),
 			};
@@ -69,27 +80,87 @@ export function blockStyles( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues( keyBy( action.blockTypes, 'name' ), ( blockType ) => {
-					return uniqBy( [
-						...get( blockType, [ 'styles' ], [] ),
-						...get( state, [ blockType.name ], [] ),
-					], ( style ) => style.name );
-				} ),
+				...mapValues(
+					keyBy( action.blockTypes, 'name' ),
+					( blockType ) => {
+						return uniqBy(
+							[
+								...get( blockType, [ 'styles' ], [] ),
+								...get( state, [ blockType.name ], [] ),
+							],
+							( style ) => style.name
+						);
+					}
+				),
 			};
 		case 'ADD_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: uniqBy( [
-					...get( state, [ action.blockName ], [] ),
-					...( action.styles ),
-				], ( style ) => style.name ),
+				[ action.blockName ]: uniqBy(
+					[
+						...get( state, [ action.blockName ], [] ),
+						...action.styles,
+					],
+					( style ) => style.name
+				),
 			};
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
 				[ action.blockName ]: filter(
 					get( state, [ action.blockName ], [] ),
-					( style ) => action.styleNames.indexOf( style.name ) === -1,
+					( style ) => action.styleNames.indexOf( style.name ) === -1
+				),
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the block variations.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function blockVariations( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_TYPES':
+			return {
+				...state,
+				...mapValues(
+					keyBy( action.blockTypes, 'name' ),
+					( blockType ) => {
+						return uniqBy(
+							[
+								...get( blockType, [ 'variations' ], [] ),
+								...get( state, [ blockType.name ], [] ),
+							],
+							( variation ) => variation.name
+						);
+					}
+				),
+			};
+		case 'ADD_BLOCK_VARIATIONS':
+			return {
+				...state,
+				[ action.blockName ]: uniqBy(
+					[
+						...get( state, [ action.blockName ], [] ),
+						...action.variations,
+					],
+					( variation ) => variation.name
+				),
+			};
+		case 'REMOVE_BLOCK_VARIATIONS':
+			return {
+				...state,
+				[ action.blockName ]: filter(
+					get( state, [ action.blockName ], [] ),
+					( variation ) =>
+						action.variationNames.indexOf( variation.name ) === -1
 				),
 			};
 	}
@@ -121,18 +192,26 @@ export function createBlockNameSetterReducer( setActionType ) {
 	};
 }
 
-export const defaultBlockName = createBlockNameSetterReducer( 'SET_DEFAULT_BLOCK_NAME' );
-export const freeformFallbackBlockName = createBlockNameSetterReducer( 'SET_FREEFORM_FALLBACK_BLOCK_NAME' );
-export const unregisteredFallbackBlockName = createBlockNameSetterReducer( 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME' );
-export const groupingBlockName = createBlockNameSetterReducer( 'SET_GROUPING_BLOCK_NAME' );
+export const defaultBlockName = createBlockNameSetterReducer(
+	'SET_DEFAULT_BLOCK_NAME'
+);
+export const freeformFallbackBlockName = createBlockNameSetterReducer(
+	'SET_FREEFORM_FALLBACK_BLOCK_NAME'
+);
+export const unregisteredFallbackBlockName = createBlockNameSetterReducer(
+	'SET_UNREGISTERED_FALLBACK_BLOCK_NAME'
+);
+export const groupingBlockName = createBlockNameSetterReducer(
+	'SET_GROUPING_BLOCK_NAME'
+);
 
 /**
  * Reducer managing the categories
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {WPBlockCategory[]} state  Current state.
+ * @param {Object}            action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {WPBlockCategory[]} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {
@@ -159,12 +238,30 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 	return state;
 }
 
+export function collections( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_COLLECTION':
+			return {
+				...state,
+				[ action.namespace ]: {
+					title: action.title,
+					icon: action.icon,
+				},
+			};
+		case 'REMOVE_BLOCK_COLLECTION':
+			return omit( state, action.namespace );
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blockTypes,
 	blockStyles,
+	blockVariations,
 	defaultBlockName,
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,
 	groupingBlockName,
 	categories,
+	collections,
 } );

@@ -6,8 +6,8 @@ Replace the existing `console.log()` code in your `myguten.js` file with:
 
 ```js
 wp.blocks.registerBlockStyle( 'core/quote', {
-    name: 'fancy-quote',
-    label: 'Fancy Quote'
+	name: 'fancy-quote',
+	label: 'Fancy Quote',
 } );
 ```
 
@@ -64,4 +64,3 @@ add_action( 'enqueue_block_assets', 'myguten_stylesheet' );
 Now when you view in the editor and publish, you will see your Fancy Quote style, a delicious tomato color text:
 
 ![Fancy Quote with Style](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/fancy-quote-with-style.png)
-

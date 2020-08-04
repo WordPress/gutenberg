@@ -29,6 +29,24 @@ import {
 import { isString } from 'lodash';
 
 /**
+ * Object containing a React element.
+ *
+ * @typedef {import('react').ReactElement} WPElement
+ */
+
+/**
+ * Object containing a React component.
+ *
+ * @typedef {import('react').ComponentType} WPComponent
+ */
+
+/**
+ * Object containing a React synthetic event.
+ *
+ * @typedef {import('react').SyntheticEvent} WPSyntheticEvent
+ */
+
+/**
  * Object that provides utilities for dealing with React children.
  */
 export { Children };
@@ -63,8 +81,8 @@ export { createContext };
  *
  * @param {?(string|Function)} type     Tag name or element creator
  * @param {Object}             props    Element properties, either attribute
- *                                       set to apply to DOM node or values to
- *                                       pass through to element creator
+ *                                      set to apply to DOM node or values to
+ *                                      pass through to element creator
  * @param {...WPElement}       children Descendant elements
  *
  * @return {WPElement} Element.
@@ -99,7 +117,7 @@ export { forwardRef };
 export { Fragment };
 
 /**
- * Checks if an object is a valid WPElement
+ * Checks if an object is a valid WPElement.
  *
  * @param {Object} objectToCheck The object to be checked.
  *
@@ -185,7 +203,7 @@ export { Suspense };
  * @return {Array} The concatenated value.
  */
 export function concatChildren( ...childrenArguments ) {
-	return childrenArguments.reduce( ( result, children, i ) => {
+	return childrenArguments.reduce( ( accumulator, children, i ) => {
 		Children.forEach( children, ( child, j ) => {
 			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
@@ -193,10 +211,10 @@ export function concatChildren( ...childrenArguments ) {
 				} );
 			}
 
-			result.push( child );
+			accumulator.push( child );
 		} );
 
-		return result;
+		return accumulator;
 	}, [] );
 }
 
@@ -209,11 +227,18 @@ export function concatChildren( ...childrenArguments ) {
  * @return {?Object} The updated children object.
  */
 export function switchChildrenNodeName( children, nodeName ) {
-	return children && Children.map( children, ( elt, index ) => {
-		if ( isString( elt ) ) {
-			return createElement( nodeName, { key: index }, elt );
-		}
-		const { children: childrenProp, ...props } = elt.props;
-		return createElement( nodeName, { key: index, ...props }, childrenProp );
-	} );
+	return (
+		children &&
+		Children.map( children, ( elt, index ) => {
+			if ( isString( elt ) ) {
+				return createElement( nodeName, { key: index }, elt );
+			}
+			const { children: childrenProp, ...props } = elt.props;
+			return createElement(
+				nodeName,
+				{ key: index, ...props },
+				childrenProp
+			);
+		} )
+	);
 }

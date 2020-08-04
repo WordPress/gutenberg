@@ -11,7 +11,9 @@ import BaseOption from './base';
 
 export default compose(
 	withSelect( ( select, { panelName } ) => {
-		const { isEditorPanelEnabled, isEditorPanelRemoved } = select( 'core/edit-post' );
+		const { isEditorPanelEnabled, isEditorPanelRemoved } = select(
+			'core/edit-post'
+		);
 		return {
 			isRemoved: isEditorPanelRemoved( panelName ),
 			isChecked: isEditorPanelEnabled( panelName ),
@@ -19,6 +21,7 @@ export default compose(
 	} ),
 	ifCondition( ( { isRemoved } ) => ! isRemoved ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
-		onChange: () => dispatch( 'core/edit-post' ).toggleEditorPanelEnabled( panelName ),
+		onChange: () =>
+			dispatch( 'core/edit-post' ).toggleEditorPanelEnabled( panelName ),
 	} ) )
 )( BaseOption );

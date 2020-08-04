@@ -32,9 +32,18 @@ function isDirectory( file ) {
  * @return {boolean} Whether file is a directory.
  */
 function hasModuleField( file ) {
-	const { module } = require( path.resolve( PACKAGES_DIR, file, 'package.json' ) );
+	let pkg;
+	try {
+		pkg = require( path.resolve( PACKAGES_DIR, file, 'package.json' ) );
+	} catch {
+		// If, for whatever reason, the package's `package.json` cannot be read,
+		// consider it as an invalid candidate. In most cases, this can happen
+		// when lingering directories are left in the working path when changing
+		// to an older branch where a package did not yet exist.
+		return false;
+	}
 
-	return ! isEmpty( module );
+	return ! isEmpty( pkg.module );
 }
 
 /**

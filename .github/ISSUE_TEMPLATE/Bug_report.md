@@ -20,6 +20,11 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Editor version (please complete the following information):**
+- WordPress version: [e.g: 5.3.2]
+- Does the website has Gutenberg plugin installed, or is it using the block editor that comes by default? [e.g: "gutenberg plugin", "default"]
+- If the Gutenberg plugin is installed, which version is it? [e.g., 7.6]
+
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
  - Browser [e.g. chrome, safari]
@@ -32,5 +37,4 @@ If applicable, add screenshots to help explain your problem.
  - Version [e.g. 22]
 
 **Additional context**
-- Please add the version of Gutenberg you are using in the description.
 - To report a security issue, please visit the WordPress HackerOne program: https://hackerone.com/wordpress.

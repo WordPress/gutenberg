@@ -1,0 +1,19 @@
+{
+	"name": "core/template-part",
+	"category": "design",
+	"attributes": {
+		"postId": {
+			"type": "number"
+		},
+		"slug": {
+			"type": "string"
+		},
+		"theme": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"align": true,
+		"html": false
+	}
+}

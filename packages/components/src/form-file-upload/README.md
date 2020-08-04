@@ -17,7 +17,7 @@ const MyFormFileUpload = () => (
 
 ## Props
 
-The component accepts the following props. Props not included in this set will be passed to the `IconButton` component.
+The component accepts the following props. Props not included in this set will be passed to the `Button` component.
 
 ### accept
 
@@ -30,7 +30,7 @@ More information about this string is available in https://developer.mozilla.org
 
 ### children
 
-Children are passed as children of `IconButton`.
+Children are passed as children of `Button`.
 
 - Type: `Boolean`
 - Required: No

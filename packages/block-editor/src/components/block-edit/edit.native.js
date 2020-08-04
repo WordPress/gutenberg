@@ -14,9 +14,7 @@ export const Edit = ( props ) => {
 
 	const Component = blockType.edit;
 
-	return (
-		<Component { ...props } />
-	);
+	return <Component { ...props } />;
 };
 
 export default withFilters( 'editor.BlockEdit' )( Edit );

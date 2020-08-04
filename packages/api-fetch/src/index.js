@@ -13,6 +13,11 @@ import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
+import mediaUploadMiddleware from './middlewares/media-upload';
+import {
+	parseResponseAndNormalizeError,
+	parseAndThrowError,
+} from './utils/response';
 
 /**
  * Default set of header values which should be sent with every request unless
@@ -70,58 +75,36 @@ const defaultFetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const responsePromise = window.fetch(
-		url || path,
-		{
-			...DEFAULT_OPTIONS,
-			...remainingOptions,
-			body,
-			headers,
-		}
-	);
+	const responsePromise = window.fetch( url || path, {
+		...DEFAULT_OPTIONS,
+		...remainingOptions,
+		body,
+		headers,
+	} );
 
-	const parseResponse = ( response ) => {
-		if ( parse ) {
-			if ( response.status === 204 ) {
-				return null;
-			}
-
-			return response.json ? response.json() : Promise.reject( response );
-		}
-
-		return response;
-	};
-
-	return responsePromise
-		.then( checkStatus )
-		.then( parseResponse )
-		.catch( ( response ) => {
-			if ( ! parse ) {
-				throw response;
-			}
-
-			const invalidJsonError = {
-				code: 'invalid_json',
-				message: __( 'The response is not a valid JSON response.' ),
-			};
-
-			if ( ! response || ! response.json ) {
-				throw invalidJsonError;
-			}
-
-			return response.json()
-				.catch( () => {
-					throw invalidJsonError;
-				} )
-				.then( ( error ) => {
-					const unknownError = {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
+	return (
+		responsePromise
+			// Return early if fetch errors. If fetch error, there is most likely no
+			// network connection. Unfortunately fetch just throws a TypeError and
+			// the message might depend on the browser.
+			.then(
+				( value ) =>
+					Promise.resolve( value )
+						.then( checkStatus )
+						.catch( ( response ) =>
+							parseAndThrowError( response, parse )
+						)
+						.then( ( response ) =>
+							parseResponseAndNormalizeError( response, parse )
+						),
+				() => {
+					throw {
+						code: 'fetch_error',
+						message: __( 'You are probably offline.' ),
 					};
-
-					throw error || unknownError;
-				} );
-		} );
+				}
+			)
+	);
 };
 
 let fetchHandler = defaultFetchHandler;
@@ -149,7 +132,7 @@ function apiFetch( options ) {
 		return step( workingOptions, next );
 	};
 
-	return new Promise( function( resolve, reject ) {
+	return new Promise( ( resolve, reject ) => {
 		createRunStep( 0 )( options )
 			.then( resolve )
 			.catch( ( error ) => {
@@ -158,14 +141,13 @@ function apiFetch( options ) {
 				}
 
 				// If the nonce is invalid, refresh it and try again.
-				window.fetch( apiFetch.nonceEndpoint )
+				window
+					.fetch( apiFetch.nonceEndpoint )
 					.then( checkStatus )
 					.then( ( data ) => data.text() )
 					.then( ( text ) => {
 						apiFetch.nonceMiddleware.nonce = text;
-						apiFetch( options )
-							.then( resolve )
-							.catch( reject );
+						apiFetch( options ).then( resolve ).catch( reject );
 					} )
 					.catch( reject );
 			} );
@@ -179,5 +161,6 @@ apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
+apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
 
 export default apiFetch;

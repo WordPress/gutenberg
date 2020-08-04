@@ -1,6 +1,9 @@
 {
 	"name": "core/button",
-	"category": "layout",
+	"category": "design",
+	"parent": [
+		"core/buttons"
+	],
 	"attributes": {
 		"url": {
 			"type": "string",
@@ -19,18 +22,6 @@
 			"source": "html",
 			"selector": "a"
 		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"textColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
-		},
-		"customTextColor": {
-			"type": "string"
-		},
 		"linkTarget": {
 			"type": "string",
 			"source": "attribute",
@@ -45,6 +36,28 @@
 		},
 		"placeholder": {
 			"type": "string"
+		},
+		"borderRadius": {
+			"type": "number"
+		},
+		"style": {
+			"type": "object"
+		},
+		"backgroundColor": {
+			"type": "string"
+		},
+		"textColor": {
+			"type": "string"
+		},
+		"gradient": {
+			"type": "string"
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"alignWide": false,
+		"reusable": false,
+		"lightBlockWrapper": true
 	}
 }

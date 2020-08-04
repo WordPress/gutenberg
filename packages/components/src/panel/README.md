@@ -1,5 +1,6 @@
 # Panel
- Panels expand and collapse multiple sections of content.
+
+Panels expand and collapse multiple sections of content.
 
 ![](https://make.wordpress.org/design/files/2019/03/panel.png)
 
@@ -29,15 +30,15 @@ Panels show and hide details of list items by expanding and collapsing list cont
 
 Use Panels when it’s helpful to:
 
-- See an overview of multiple, related sections of content.
-- Show and hide those sections as needed.
-- Hide information that is lower priority that users don’t need to see all the time.
-- View more than one section at a time.
+-   See an overview of multiple, related sections of content.
+-   Show and hide those sections as needed.
+-   Hide information that is lower priority that users don’t need to see all the time.
+-   View more than one section at a time.
 
 Consider an alternative component when:
 
-- There’s crucial information or error messages that require immediate action.
-- You need to quickly switch between only a few sections (consider using Tabs instead).
+-   There’s crucial information or error messages that require immediate action.
+-   You need to quickly switch between only a few sections (consider using Tabs instead).
 
 ### Behavior
 
@@ -59,17 +60,12 @@ The `Panel` creates a container with a header that can take collapsible `PanelBo
 
 ```jsx
 import { Panel, PanelBody, PanelRow } from '@wordpress/components';
- 
+import { more } from '@wordpress/icons';
+
 const MyPanel = () => (
 	<Panel header="My Panel">
-		<PanelBody
-			title="My Block Settings"
-			icon="welcome-widgets-menus"
-			initialOpen={ true }
-		>
-			<PanelRow>
-				My Panel Inputs and Labels
-			</PanelRow>
+		<PanelBody title="My Block Settings" icon={ more } initialOpen={ true }>
+			<PanelRow>My Panel Inputs and Labels</PanelRow>
 		</PanelBody>
 	</Panel>
 );
@@ -85,20 +81,21 @@ const MyPanel = () => (
 
 The class that will be added with `components-panel`. If no `className` is passed only `components-panel__body` and `is-opened` is used.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ###### header
 
 Title of the `Panel`. Text will be rendered inside an `<h2>` tag.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ---
+
 #### PanelBody
 
-The `PanelBody` creates a collapsible container that can be toggled open or closed. 
+The `PanelBody` creates a collapsible container that can be toggled open or closed.
 
 ##### Props
 
@@ -106,47 +103,47 @@ The `PanelBody` creates a collapsible container that can be toggled open or clos
 
 Title of the `PanelBody`. This shows even when it is closed.
 
-- Type: `String`
-- Required: No
-
+-   Type: `String`
+-   Required: No
 
 ###### opened
 
 If opened is true then the `Panel` will remain open regardless of the `initialOpen` prop and the panel will be prevented from being closed.
 
-- Type: `Boolean`
-- Required: No
+-   Type: `Boolean`
+-   Required: No
 
 ###### className
 
 The class that will be added with `components-panel__body`, if the panel is currently open, the `is-opened` class will also be passed to the classes of the wrapper div. If no `className` is passed then only `components-panel__body` and `is-opened` is used.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ###### icon
 
 An icon to be shown next to the `PanelBody` title.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ###### onToggle
 
 A function that is called when the user clicks on the `PanelBody` title after the open state is changed.
 
-- Type: `function`
-- Required: No
+-   Type: `function`
+-   Required: No
 
 ###### initialOpen
 
 Whether or not the panel will start open.
 
-- Type: `Boolean`
-- Required: No
-- Default: true
+-   Type: `Boolean`
+-   Required: No
+-   Default: true
 
 ---
+
 #### PanelRow
 
 The is a generic container for panel content. Default styles add a top margin and arrange items in a flex row.
@@ -155,10 +152,11 @@ The is a generic container for panel content. Default styles add a top margin an
 
 ###### className
 
-The class that will be added with `components-panel__row`.  to the classes of the wrapper div. If no `className` is passed only `components-panel__row` is used.
+The class that will be added with `components-panel__row`. to the classes of the wrapper div. If no `className` is passed only `components-panel__row` is used.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
+
 ---
 
 #### PanelHeader
@@ -171,8 +169,9 @@ This is a simple container for a header component. This is used by the `Panel` c
 
 The text that will be rendered as the title of the `Panel`. Will be rendered in an `<h2>` tag.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ## Related components
-- To divide related sections of content accessed by a horizontal menu, use  `TabPanel`
+
+-   To divide related sections of content accessed by a horizontal menu, use `TabPanel`

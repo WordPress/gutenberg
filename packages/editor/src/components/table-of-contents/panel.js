@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,12 +10,23 @@ import { withSelect } from '@wordpress/data';
 import WordCount from '../word-count';
 import DocumentOutline from '../document-outline';
 
-function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, hasOutlineItemsDisabled, onRequestClose } ) {
+function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
+	const { headingCount, paragraphCount, numberOfBlocks } = useSelect(
+		( select ) => {
+			const { getGlobalBlockCount } = select( 'core/block-editor' );
+			return {
+				headingCount: getGlobalBlockCount( 'core/heading' ),
+				paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
+				numberOfBlocks: getGlobalBlockCount(),
+			};
+		},
+		[]
+	);
 	return (
 		/*
-		* Disable reason: The `list` ARIA role is redundant but
-		* Safari+VoiceOver won't announce the list otherwise.
-		*/
+		 * Disable reason: The `list` ARIA role is redundant but
+		 * Safari+VoiceOver won't announce the list otherwise.
+		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<>
 			<div
@@ -24,10 +35,7 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, h
 				aria-label={ __( 'Document Statistics' ) }
 				tabIndex="0"
 			>
-				<ul
-					role="list"
-					className="table-of-contents__counts"
-				>
+				<ul role="list" className="table-of-contents__counts">
 					<li className="table-of-contents__count">
 						{ __( 'Words' ) }
 						<WordCount />
@@ -58,7 +66,10 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, h
 					<h2 className="table-of-contents__title">
 						{ __( 'Document Outline' ) }
 					</h2>
-					<DocumentOutline onSelect={ onRequestClose } hasOutlineItemsDisabled={ hasOutlineItemsDisabled } />
+					<DocumentOutline
+						onSelect={ onRequestClose }
+						hasOutlineItemsDisabled={ hasOutlineItemsDisabled }
+					/>
 				</>
 			) }
 		</>
@@ -66,11 +77,4 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, h
 	);
 }
 
-export default withSelect( ( select ) => {
-	const { getGlobalBlockCount } = select( 'core/block-editor' );
-	return {
-		headingCount: getGlobalBlockCount( 'core/heading' ),
-		paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
-		numberOfBlocks: getGlobalBlockCount(),
-	};
-} )( TableOfContentsPanel );
+export default TableOfContentsPanel;

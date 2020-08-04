@@ -15,7 +15,7 @@ module.exports = {
 	blockCode: {
 		fontFamily: 'serif',
 	},
-	'rich-text': {
+	richText: {
 		fontFamily: 'serif',
 		minHeight: 30,
 	},
@@ -65,5 +65,32 @@ module.exports = {
 	},
 	iconUploading: {
 		fill: 'gray',
+	},
+	placeholder: {
+		color: 'gray',
+	},
+	richTextPlaceholder: {
+		color: 'gray',
+	},
+	unsupportedBlockIcon: {
+		color: 'white',
+	},
+	infoIcon: {
+		size: 36,
+	},
+	infoSheetIcon: {
+		color: 'gray',
+	},
+	blockToolbar: {
+		height: 44,
+	},
+	headerToolbar: {
+		height: 44,
+	},
+	blockBorder: {
+		width: 1,
+	},
+	defaultBlock: {
+		marginTop: 16,
 	},
 };

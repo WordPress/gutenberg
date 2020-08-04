@@ -2,14 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import {
-	getColorClassName,
-	RichText,
-} from '@wordpress/block-editor';
+import { getColorClassName, RichText } from '@wordpress/block-editor';
 
 const blockSupports = {
 	className: false,
@@ -33,18 +31,119 @@ const blockAttributes = {
 	placeholder: {
 		type: 'string',
 	},
-	textColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
+};
+
+const migrateCustomColors = ( attributes ) => {
+	if ( ! attributes.customTextColor ) {
+		return attributes;
+	}
+	const style = {
+		color: {
+			text: attributes.customTextColor,
+		},
+	};
+	return {
+		...omit( attributes, [ 'customTextColor' ] ),
+		style,
+	};
 };
 
 const deprecated = [
 	{
 		supports: blockSupports,
-		attributes: blockAttributes,
+		attributes: {
+			...blockAttributes,
+			customTextColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+		},
+		migrate: migrateCustomColors,
+		save( { attributes } ) {
+			const {
+				align,
+				content,
+				customTextColor,
+				level,
+				textColor,
+			} = attributes;
+			const tagName = 'h' + level;
+
+			const textClass = getColorClassName( 'color', textColor );
+
+			const className = classnames( {
+				[ textClass ]: textClass,
+				'has-text-color': textColor || customTextColor,
+				[ `has-text-align-${ align }` ]: align,
+			} );
+
+			return (
+				<RichText.Content
+					className={ className ? className : undefined }
+					tagName={ tagName }
+					style={ {
+						color: textClass ? undefined : customTextColor,
+					} }
+					value={ content }
+				/>
+			);
+		},
+	},
+	{
+		attributes: {
+			...blockAttributes,
+			customTextColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+		},
+		migrate: migrateCustomColors,
+		save( { attributes } ) {
+			const {
+				align,
+				content,
+				customTextColor,
+				level,
+				textColor,
+			} = attributes;
+			const tagName = 'h' + level;
+
+			const textClass = getColorClassName( 'color', textColor );
+
+			const className = classnames( {
+				[ textClass ]: textClass,
+				[ `has-text-align-${ align }` ]: align,
+			} );
+
+			return (
+				<RichText.Content
+					className={ className ? className : undefined }
+					tagName={ tagName }
+					style={ {
+						color: textClass ? undefined : customTextColor,
+					} }
+					value={ content }
+				/>
+			);
+		},
+		supports: blockSupports,
+	},
+	{
+		supports: blockSupports,
+		attributes: {
+			...blockAttributes,
+			customTextColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+		},
+		migrate: migrateCustomColors,
 		save( { attributes } ) {
 			const {
 				align,

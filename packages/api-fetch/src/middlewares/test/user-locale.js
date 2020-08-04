@@ -73,7 +73,9 @@ describe( 'User locale middleware', () => {
 		};
 
 		const callback = ( options ) => {
-			expect( options.url ).toBe( 'http://wp.org/wp-json/wp/v2/posts?_locale=user' );
+			expect( options.url ).toBe(
+				'http://wp.org/wp-json/wp/v2/posts?_locale=user'
+			);
 		};
 
 		userLocaleMiddleware( requestOptions, callback );
@@ -88,7 +90,9 @@ describe( 'User locale middleware', () => {
 		};
 
 		const callback = ( options ) => {
-			expect( options.url ).toBe( 'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=user' );
+			expect( options.url ).toBe(
+				'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=user'
+			);
 		};
 
 		userLocaleMiddleware( requestOptions, callback );
@@ -103,7 +107,9 @@ describe( 'User locale middleware', () => {
 		};
 
 		const callback = ( options ) => {
-			expect( options.url ).toBe( 'http://wp.org/wp-json/wp/v2/posts?_locale=foo' );
+			expect( options.url ).toBe(
+				'http://wp.org/wp-json/wp/v2/posts?_locale=foo'
+			);
 		};
 
 		userLocaleMiddleware( requestOptions, callback );
@@ -118,7 +124,9 @@ describe( 'User locale middleware', () => {
 		};
 
 		const callback = ( options ) => {
-			expect( options.url ).toBe( 'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=foo' );
+			expect( options.url ).toBe(
+				'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=foo'
+			);
 		};
 
 		userLocaleMiddleware( requestOptions, callback );

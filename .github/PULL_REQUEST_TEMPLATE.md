@@ -1,3 +1,5 @@
+<!-- Learn the overall process and best practices for pull requests at https://github.com/WordPress/gutenberg/blob/master/docs/contributors/repository-management.md#pull-requests. -->
+
 ## Description
 <!-- Please describe what you have changed or added -->
 
@@ -20,3 +22,4 @@
 - [ ] My code follows the accessibility standards. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/accessibility-coding-standards/ -->
 - [ ] My code has proper inline documentation. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/ -->
 - [ ] I've included developer documentation if appropriate. <!-- Handbook: https://developer.wordpress.org/block-editor/ -->
+- [ ] I've updated all React Native files affected by any refactorings/renamings in this PR. <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/master/docs/contributors/native-mobile.md -->

@@ -14,7 +14,9 @@ import { Component } from '@wordpress/element';
 import fixtures from './fixtures';
 import TokenField from '../../';
 
-const { specialSuggestions: { default: suggestions } } = fixtures;
+const {
+	specialSuggestions: { default: suggestions },
+} = fixtures;
 
 function unescapeAndFormatSpaces( str ) {
 	const nbsp = String.fromCharCode( 160 );
@@ -35,7 +37,9 @@ class TokenFieldWrapper extends Component {
 	render() {
 		return (
 			<TokenField
-				suggestions={ this.state.isExpanded ? this.state.tokenSuggestions : null }
+				suggestions={
+					this.state.isExpanded ? this.state.tokenSuggestions : null
+				}
 				value={ this.state.tokens }
 				displayTransform={ unescapeAndFormatSpaces }
 				onChange={ this.onTokensChange }

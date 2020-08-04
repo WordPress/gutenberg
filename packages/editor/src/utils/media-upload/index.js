@@ -21,7 +21,7 @@ import { uploadMedia } from '@wordpress/media-utils';
  * @param   {Function} $0.onError           Function called when an error happens.
  * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  */
-export default function( {
+export default function mediaUpload( {
 	additionalData = {},
 	allowedTypes,
 	filesList,
@@ -31,7 +31,8 @@ export default function( {
 } ) {
 	const { getCurrentPostId, getEditorSettings } = select( 'core/editor' );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
-	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
+	maxUploadFileSize =
+		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
 	uploadMedia( {
 		allowedTypes,

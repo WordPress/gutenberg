@@ -13,7 +13,9 @@ describe( 'MetaBoxesSection', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
 				areCustomFieldsRegistered={ false }
-				metaBoxes={ [ { id: 'postcustom', title: 'This should not render' } ] }
+				metaBoxes={ [
+					{ id: 'postcustom', title: 'This should not render' },
+				] }
 			/>
 		);
 		expect( wrapper.isEmptyRender() ).toBe( true );
@@ -22,9 +24,11 @@ describe( 'MetaBoxesSection', () => {
 	it( 'renders a Custom Fields option', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
-				title="Advanced Panels"
+				title="Advanced panels"
 				areCustomFieldsRegistered
-				metaBoxes={ [ { id: 'postcustom', title: 'This should not render' } ] }
+				metaBoxes={ [
+					{ id: 'postcustom', title: 'This should not render' },
+				] }
 			/>
 		);
 		expect( wrapper ).toMatchSnapshot();
@@ -33,7 +37,7 @@ describe( 'MetaBoxesSection', () => {
 	it( 'renders meta box options', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
-				title="Advanced Panels"
+				title="Advanced panels"
 				areCustomFieldsRegistered={ false }
 				metaBoxes={ [
 					{ id: 'postcustom', title: 'This should not render' },
@@ -48,7 +52,7 @@ describe( 'MetaBoxesSection', () => {
 	it( 'renders a Custom Fields option and meta box options', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
-				title="Advanced Panels"
+				title="Advanced panels"
 				areCustomFieldsRegistered
 				metaBoxes={ [
 					{ id: 'postcustom', title: 'This should not render' },

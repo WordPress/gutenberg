@@ -15,7 +15,7 @@ $ npm install @wordpress/npm-package-json-lint-config
 Add this to your `package.json` file:
 
 ```json
-"npmPackageJsonLintConfig": {
+"npmpackagejsonlint": {
 	"extends": "@wordpress/npm-package-json-lint-config",
 },
 ```
@@ -31,7 +31,7 @@ Or to a `.npmpackagejsonlintrc.json` file in the root of your repo:
 To add, modify, or override any [npm-package-json-lint](https://github.com/tclindner/npm-package-json-lint/wiki) rules add this to your `package.json` file:
 
 ```json
-"npmPackageJsonLintConfig": {
+"npmpackagejsonlint": {
 	"extends": "@wordpress/npm-package-json-lint-config",
 	"rules": {
 		"valid-values-author": [

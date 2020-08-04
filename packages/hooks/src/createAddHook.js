@@ -39,7 +39,9 @@ function createAddHook( hooks ) {
 		// Validate numeric priority
 		if ( 'number' !== typeof priority ) {
 			// eslint-disable-next-line no-console
-			console.error( 'If specified, the hook priority must be a number.' );
+			console.error(
+				'If specified, the hook priority must be a number.'
+			);
 			return;
 		}
 
@@ -69,7 +71,10 @@ function createAddHook( hooks ) {
 			// problem; otherwise we need to increase the execution index of
 			// any other runs by 1 to account for the added element.
 			( hooks.__current || [] ).forEach( ( hookInfo ) => {
-				if ( hookInfo.name === hookName && hookInfo.currentIndex >= i ) {
+				if (
+					hookInfo.name === hookName &&
+					hookInfo.currentIndex >= i
+				) {
 					hookInfo.currentIndex++;
 				}
 			} );

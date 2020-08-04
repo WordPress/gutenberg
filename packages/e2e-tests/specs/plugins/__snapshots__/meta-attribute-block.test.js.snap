@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Block with a meta attribute Should persist the meta attribute properly 1`] = `"<!-- wp:test/test-meta-attribute-block /-->"`;
