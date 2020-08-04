@@ -43,6 +43,8 @@ export default function PostTitleEdit( {
 		return null;
 	}
 
+	const BlockWrapper = Block[ tagName ];
+
 	return (
 		<>
 			<BlockControls>
@@ -61,14 +63,13 @@ export default function PostTitleEdit( {
 					} }
 				/>
 			</BlockControls>
-			<Block
-				tagName={ tagName }
+			<BlockWrapper
 				className={ classnames( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
 				{ post.title || __( 'Post Title' ) }
-			</Block>
+			</BlockWrapper>
 		</>
 	);
 }

@@ -3,7 +3,6 @@
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
 import Video from 'react-native-video';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +26,8 @@ import {
 	ToolbarGroup,
 	Gradient,
 	ColorPalette,
+	ColorPicker,
+	BottomSheetConsumer,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -43,7 +44,7 @@ import {
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { cover as icon, replace } from '@wordpress/icons';
+import { cover as icon, replace, image } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
 /**
@@ -81,6 +82,7 @@ const Cover = ( {
 	onFocus,
 	overlayColor,
 	setAttributes,
+	openGeneralSidebar,
 	settings,
 	closeSettingsBottomSheet,
 } ) => {
@@ -95,6 +97,7 @@ const Cover = ( {
 		customOverlayColor,
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
 	const coverDefaultPalette = {
@@ -110,6 +113,15 @@ const Cover = ( {
 		overlayColor.color ||
 		gradientValue
 	);
+
+	const hasOnlyColorBackground = ! url && hasBackground;
+
+	const [
+		isCustomColorPickerShowing,
+		setCustomColorPickerShowing,
+	] = useState( false );
+
+	const [ customColor, setCustomColor ] = useState( '' );
 
 	const openMediaOptionsRef = useRef();
 
@@ -160,7 +172,7 @@ const Cover = ( {
 			requestImageUploadCancelDialog( id );
 		} else if ( shouldShowFailure ) {
 			requestImageFailedRetryDialog( id );
-		} else if ( backgroundType === MEDIA_TYPE_IMAGE && url ) {
+		} else if ( isImage && url ) {
 			requestImageFullscreenPreview( url );
 		}
 	};
@@ -190,6 +202,13 @@ const Cover = ( {
 		} );
 	}
 
+	function openColorPicker() {
+		if ( isParentSelected ) {
+			openGeneralSidebar();
+			setCustomColorPickerShowing( true );
+		}
+	}
+
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
 		styles.backgroundSolidDark
@@ -207,7 +226,8 @@ const Cover = ( {
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url ? backgroundColor : {},
-		isParentSelected &&
+		isImage &&
+			isParentSelected &&
 			! isUploadInProgress &&
 			! didUploadFail &&
 			styles.overlaySelected,
@@ -230,6 +250,20 @@ const Cover = ( {
 				/>
 			</ToolbarGroup>
 		</BlockControls>
+	);
+
+	const addMediaButton = () => (
+		<TouchableWithoutFeedback onPress={ openMediaOptionsRef.current }>
+			<View style={ styles.selectImageContainer }>
+				<View style={ styles.selectImage }>
+					<Icon
+						size={ 16 }
+						icon={ image }
+						{ ...styles.selectImageIcon }
+					/>
+				</View>
+			</View>
+		</TouchableWithoutFeedback>
 	);
 
 	const controls = (
@@ -273,6 +307,50 @@ const Cover = ( {
 				</PanelBody>
 			) : null }
 		</InspectorControls>
+	);
+
+	const colorPickerControls = (
+		<InspectorControls>
+			<BottomSheetConsumer>
+				{ ( {
+					shouldEnableBottomSheetScroll,
+					shouldDisableBottomSheetMaxHeight,
+					onCloseBottomSheet,
+					onHardwareButtonPress,
+					isBottomSheetContentScrolling,
+				} ) => (
+					<ColorPicker
+						shouldEnableBottomSheetScroll={
+							shouldEnableBottomSheetScroll
+						}
+						shouldDisableBottomSheetMaxHeight={
+							shouldDisableBottomSheetMaxHeight
+						}
+						setColor={ ( color ) => {
+							setCustomColor( color );
+							setColor( color );
+						} }
+						onNavigationBack={ closeSettingsBottomSheet }
+						onCloseBottomSheet={ onCloseBottomSheet }
+						onHardwareButtonPress={ onHardwareButtonPress }
+						onBottomSheetClosed={ () => {
+							setCustomColorPickerShowing( false );
+						} }
+						isBottomSheetContentScrolling={
+							isBottomSheetContentScrolling
+						}
+						bottomLabelText={ __( 'Select a color' ) }
+					/>
+				) }
+			</BottomSheetConsumer>
+		</InspectorControls>
+	);
+
+	const renderContent = ( getMediaOptions ) => (
+		<>
+			{ renderBackground( getMediaOptions ) }
+			{ isParentSelected && hasOnlyColorBackground && addMediaButton() }
+		</>
 	);
 
 	const renderBackground = ( getMediaOptions ) => (
@@ -352,11 +430,16 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
-	if ( ! hasBackground ) {
+	if ( ! hasBackground || isCustomColorPickerShowing ) {
 		return (
 			<View>
+				{ isCustomColorPickerShowing && colorPickerControls }
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
+					backgroundColor={ customColor }
+					hideContent={
+						customColor !== '' && customColor !== undefined
+					}
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -370,11 +453,14 @@ const Cover = ( {
 							customColorIndicatorStyles={
 								styles.paletteColorIndicator
 							}
+							customIndicatorWrapperStyles={
+								styles.paletteCustomIndicatorWrapper
+							}
 							setColor={ setColor }
-							onCustomPress={ noop }
+							onCustomPress={ openColorPicker }
 							defaultSettings={ coverDefaultPalette }
-							shouldShowCustomIndicatorOption={ false }
 							shouldShowCustomLabel={ false }
+							shouldShowCustomVerticalSeparator={ false }
 						/>
 					</View>
 				</MediaPlaceholder>
@@ -386,7 +472,8 @@ const Cover = ( {
 		<View style={ styles.backgroundContainer }>
 			{ controls }
 
-			{ url &&
+			{ isImage &&
+				url &&
 				openMediaOptionsRef.current &&
 				isParentSelected &&
 				! isUploadInProgress &&
@@ -430,11 +517,11 @@ const Cover = ( {
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				isReplacingMedia={ true }
+				isReplacingMedia={ ! hasOnlyColorBackground }
 				onSelect={ onSelectMedia }
 				render={ ( { open, getMediaOptions } ) => {
 					openMediaOptionsRef.current = open;
-					return renderBackground( getMediaOptions );
+					return renderContent( getMediaOptions );
 				} }
 			/>
 
@@ -470,12 +557,14 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+
 		return {
+			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			closeSettingsBottomSheet() {
 				dispatch( 'core/edit-post' ).closeGeneralSidebar();
 			},
 		};
 	} ),
-
 	withPreferredColorScheme,
 ] )( Cover );

@@ -187,7 +187,7 @@ describe( 'Order of block keyboard navigation', () => {
 		expect( await getActiveLabel() ).toBe( 'Multiple selected blocks' );
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Document' );
+		await expect( await getActiveLabel() ).toBe( 'Post' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await getActiveLabel() ).toBe(

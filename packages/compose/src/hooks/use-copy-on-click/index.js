@@ -29,7 +29,6 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 		// Clipboard listens to click events.
 		clipboard.current = new Clipboard( ref.current, {
 			text: () => ( typeof text === 'function' ? text() : text ),
-			container: ref.current,
 		} );
 
 		clipboard.current.on( 'success', ( { clearSelection, trigger } ) => {

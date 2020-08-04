@@ -7,6 +7,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import reducer, { getMergedItemIds } from '../reducer';
+import { removeItems } from '../actions';
 
 describe( 'getMergedItemIds', () => {
 	it( 'should receive a page', () => {
@@ -111,6 +112,36 @@ describe( 'reducer', () => {
 				1: { id: 1, name: 'abc' },
 			},
 			queries: {},
+		} );
+	} );
+
+	it( 'deletes an item', () => {
+		const kind = 'root';
+		const name = 'menu';
+		const original = deepFreeze( {
+			items: {
+				1: { id: 1, name: 'abc' },
+				2: { id: 2, name: 'def' },
+				3: { id: 3, name: 'ghi' },
+				4: { id: 4, name: 'klm' },
+			},
+			queries: {
+				'': [ 1, 2, 3, 4 ],
+				's=a': [ 1, 3 ],
+			},
+		} );
+		const state = reducer( original, removeItems( kind, name, 3 ) );
+
+		expect( state ).toEqual( {
+			items: {
+				1: { id: 1, name: 'abc' },
+				2: { id: 2, name: 'def' },
+				4: { id: 4, name: 'klm' },
+			},
+			queries: {
+				'': [ 1, 2, 4 ],
+				's=a': [ 1 ],
+			},
 		} );
 	} );
 } );
