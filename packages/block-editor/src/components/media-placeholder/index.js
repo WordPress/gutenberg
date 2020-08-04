@@ -53,7 +53,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 
 export function MediaPlaceholder( {
 	value = {},
-	allowedTypes = [],
+	allowedTypes,
 	className,
 	icon,
 	labels = {},
@@ -87,7 +87,7 @@ export function MediaPlaceholder( {
 	}, [ value ] );
 
 	const onlyAllowsImages = () =>
-		allowedTypes.every(
+		( allowedTypes ?? [] ).every(
 			( allowedType ) =>
 				allowedType === 'image' || allowedType.startsWith( 'image/' )
 		);
@@ -157,7 +157,7 @@ export function MediaPlaceholder( {
 			setMedia = ( [ media ] ) => onSelect( media );
 		}
 		mediaUpload( {
-			allowedTypes: allowedTypes.length > 0 ? allowedTypes : undefined,
+			allowedTypes,
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
@@ -178,8 +178,10 @@ export function MediaPlaceholder( {
 		}
 
 		if ( instructions === undefined || title === undefined ) {
-			const [ firstAllowedType ] = allowedTypes;
-			const isOneType = 1 === allowedTypes.length;
+			const typesAllowed = allowedTypes ?? [];
+
+			const [ firstAllowedType ] = typesAllowed;
+			const isOneType = 1 === typesAllowed.length;
 			const isAudio = isOneType && 'audio' === firstAllowedType;
 			const isImage = isOneType && 'image' === firstAllowedType;
 			const isVideo = isOneType && 'video' === firstAllowedType;
