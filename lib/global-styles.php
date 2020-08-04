@@ -574,7 +574,7 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
 
 	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
 
-	return $gs_merged;
+	return gutenberg_experimental_global_styles_resolver( $gs_merged );
 }
 
 /**
