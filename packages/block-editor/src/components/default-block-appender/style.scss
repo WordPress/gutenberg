@@ -57,6 +57,8 @@
 	position: absolute;
 	top: 0;
 	height: $button-size-small + $grid-unit-10;
+	display: flex;
+	align-items: center;
 
 	.block-editor-inserter__toggle {
 		margin-right: 0;
