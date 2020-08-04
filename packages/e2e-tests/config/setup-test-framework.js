@@ -228,6 +228,7 @@ async function simulateAdverseConditions() {
 
 	if ( SLOW_NETWORK || OFFLINE ) {
 		// See: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+		// The values below simulate fast 3G conditions as per https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274
 		await client.send( 'Network.emulateNetworkConditions', {
 			// Network connectivity is absent
 			offline: Boolean( OFFLINE || false ),
