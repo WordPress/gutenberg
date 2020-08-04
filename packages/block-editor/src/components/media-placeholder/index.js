@@ -87,7 +87,7 @@ export function MediaPlaceholder( {
 	}, [ value ] );
 
 	const onlyAllowsImages = () => {
-		if ( ! allowedTypes ) {
+		if ( ! allowedTypes || allowedTypes.length === 0 ) {
 			return false;
 		}
 
