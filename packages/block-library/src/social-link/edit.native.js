@@ -16,7 +16,7 @@ import {
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { link, Icon } from '@wordpress/icons';
-import { withSelect, useDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
@@ -47,12 +47,10 @@ const SocialLinkEdit = ( {
 	isSelected,
 	onFocus,
 	name,
-	clientId,
 } ) => {
 	const { url, service = name } = attributes;
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
 	const [ hasUrl, setHasUrl ] = useState( !! url );
-	const { updateBlock } = useDispatch( 'core/block-editor' );
 
 	const activeIcon =
 		styles[ `wp-social-link-${ service }` ] || styles[ `wp-social-link` ];
@@ -69,14 +67,9 @@ const SocialLinkEdit = ( {
 
 	// When new social icon is added link sheet is opened automatically
 	useEffect( () => {
-		updateSocialIconName( true );
 		if ( isSelected && ! url ) {
 			setIsLinkSheetVisible( true );
 		}
-
-		return () => {
-			updateSocialIconName( false );
-		};
 	}, [] );
 
 	useEffect( () => {
@@ -106,14 +99,6 @@ const SocialLinkEdit = ( {
 	const { backgroundColor, color, stroke } = hasUrl
 		? activeIcon
 		: interpolationColors;
-
-	function updateSocialIconName( withService ) {
-		const base = 'core/social-link';
-		updateBlock( clientId, {
-			name: withService ? `${ base }-${ service }` : base,
-			attributes: { service },
-		} );
-	}
 
 	function animateColors() {
 		Animated.sequence( [
