@@ -432,10 +432,18 @@ THROTTLE_CPU=4 npm run test-e2e
 Related: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
 
 ```
-DOWNLOAD_THROUGHPUT=125000 npm run test-e2e
+SLOW_NETWORK=true npm run test-e2e
 ```
 
-`DOWNLOAD_THROUGHPUT` is a numeric value representing bytes-per-second network download (in this example, a 1Mbps download speed).
+`SLOW_NETWORK` emulates a network speed equivalent to "Fast 3G" in the Chrome devtools.
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions and https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274
+
+```
+OFFLINE=true npm run test-e2e
+```
+
+`OFFLINE` emulates network disconnection.
 
 Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
 
