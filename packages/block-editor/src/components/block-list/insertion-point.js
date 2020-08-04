@@ -99,12 +99,11 @@ function InsertionPointPopover( {
 	setIsInserterForced,
 	containerRef,
 } ) {
-	return clientId.map( ( id, index ) => {
-		const element = getBlockDOMNode( id );
+	const element = getBlockDOMNode( clientId );
 
-		return (
+	return (
+		<>
 			<Popover
-				key={ `${ index }${ id }` }
 				noArrow
 				animate={ false }
 				anchorRef={ element }
@@ -127,14 +126,37 @@ function InsertionPointPopover( {
 					) }
 				</div>
 			</Popover>
-		);
-	} );
+			<Popover
+				noArrow
+				animate={ false }
+				anchorRef={ element }
+				position="bottom right left"
+				focusOnMount={ false }
+				className="block-editor-block-list__insertion-point-popover"
+				__unstableSlotName="block-toolbar"
+			>
+				<div
+					className="block-editor-block-list__insertion-point"
+					style={ { width: element?.offsetWidth } }
+				>
+					<div className="block-editor-block-list__insertion-point-indicator" />
+					{ ( isInserterShown || isInserterForced ) && (
+						<InsertionPointInserter
+							clientId={ clientId }
+							setIsInserterForced={ setIsInserterForced }
+							containerRef={ containerRef }
+						/>
+					) }
+				</div>
+			</Popover>
+		</>
+	);
 }
 
 export default function InsertionPoint( { children, containerRef } ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
-	const [ inserterClientId, setInserterClientId ] = useState( [] );
+	const [ inserterClientId, setInserterClientId ] = useState( null );
 	const { isMultiSelecting, isInserterVisible, blockOrder } = useSelect(
 		( select ) => {
 			const {
@@ -167,25 +189,7 @@ export default function InsertionPoint( { children, containerRef } ) {
 		}
 
 		setIsInserterShown( true );
-
-		// first element should have only bottom inserter
-		if ( index === 0 ) {
-			// eslint-disable-next-line no-unused-vars
-			const [ firstTop, firstBottom, ...rest ] = blockOrder;
-			setInserterClientId( [ firstBottom ] );
-			return;
-		}
-
-		// last element should have only top inserter
-		if ( index === blockOrder.length ) {
-			const lastTop = blockOrder.slice( -1 );
-			setInserterClientId( [ lastTop ] );
-			return;
-		}
-
-		const top = blockOrder[ index ];
-		const bottom = blockOrder[ index + 1 ];
-		setInserterClientId( [ top, bottom ] );
+		setInserterClientId( clientId );
 	}
 	const isVisible = isInserterShown || isInserterForced || isInserterVisible;
 
