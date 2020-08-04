@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -14,6 +9,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { ToggleControl } from '@wordpress/components';
+import { useEffect, useRef } from '@wordpress/element';
+import { SPACE } from '@wordpress/keycodes';
 
 export default ( {
 	attributes,
@@ -22,34 +19,38 @@ export default ( {
 	isSelected,
 	setAttributes,
 } ) => {
-	const innerBlockSelected = useSelect(
+	const summaryRef = useRef( null );
+
+	useEffect( () => {
+		if ( ! summaryRef.current ) {
+			return;
+		}
+
+		const keyDownListener = ( e ) => {
+			if ( e.keyCode === SPACE ) {
+				e.preventDefault();
+			}
+		};
+
+		const clickListener = ( e ) => e.preventDefault();
+
+		summaryRef.current.addEventListener( 'keyup', keyDownListener );
+		summaryRef.current.addEventListener( 'click', clickListener );
+		return () => {
+			summaryRef.current.removeEventListener( 'keyup', keyDownListener );
+			summaryRef.current.removeEventListener( 'click', clickListener );
+		};
+	}, [ summaryRef.current ] );
+
+	const isInnerBlockSelected = useSelect(
 		( select ) =>
 			select( 'core/block-editor' ).hasSelectedInnerBlock( clientId ),
 		[ clientId ]
 	);
 
 	const showInnerBlocks =
-		attributes.initialOpen || isSelected || innerBlockSelected;
+		attributes.initialOpen || isSelected || isInnerBlockSelected;
 
-	const classes = classnames(
-		{
-			'is-open': showInnerBlocks,
-		},
-		className
-	);
-
-	/* You may be wondering why we don't just use a <details> element here.
-	 * The problem we are trying to solve is that a <summary> is basically a
-	 * button, and when it has focus, it eats the space key.
-	 *
-	 * That's a problem if you want to use a <RichText> component inside your
-	 * <summary>. Each time you press space, it toggles the rest of the
-	 * <details>, and it doesn't even add a space to your <RichText>.
-	 *
-	 * Then there's the fact that the space exists for a11y reasons. If you
-	 * catch the event and preventDefault() then you've remove the way for
-	 * keyboard users to toggle the <details>.
-	 */
 	return (
 		<>
 			<InspectorControls>
@@ -61,19 +62,19 @@ export default ( {
 					checked={ attributes.initialOpen }
 				/>
 			</InspectorControls>
-			<div className={ classes }>
-				<RichText
-					tagName="div"
-					className="block-library-details__pseudo-summary"
-					value={ attributes.summaryContent }
-					onChange={ ( summaryContent ) =>
-						setAttributes( { summaryContent } )
-					}
-					placeholder={ __( 'Write a summary…' ) }
-					aria-label={ __( 'Summary text' ) }
-				/>
-				{ showInnerBlocks && <InnerBlocks /> }
-			</div>
+			<details className={ className } open={ showInnerBlocks }>
+				<summary ref={ summaryRef }>
+					<RichText
+						value={ attributes.summaryContent }
+						onChange={ ( summaryContent ) =>
+							setAttributes( { summaryContent } )
+						}
+						placeholder={ __( 'Write a summary…' ) }
+						aria-label={ __( 'Summary text' ) }
+					/>
+				</summary>
+				<InnerBlocks />
+			</details>
 		</>
 	);
 };
