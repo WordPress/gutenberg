@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { serialize } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -29,7 +29,16 @@ export function* getWidgetAreas() {
 			widgetIdToClientId[ widget.id ] = block.clientId;
 			blocks.push( block );
 		}
-		widgetArea.content = serialize( blocks );
+		widgetArea.blocks = [
+			createBlock(
+				'core/widget-area',
+				{
+					id: widgetArea.id,
+					name: widgetArea.name,
+				},
+				blocks
+			),
+		];
 	}
 
 	yield {

@@ -2,18 +2,13 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { EntityProvider } from '@wordpress/core-data';
 import { Panel, PanelBody } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import WidgetAreaInnerBlocks from './inner-blocks';
+import { InnerBlocks } from '@wordpress/block-editor';
 
 export default function WidgetAreaEdit( {
 	clientId,
 	className,
-	attributes: { id, name },
+	attributes: { name },
 } ) {
 	const index = useSelect(
 		( select ) => select( 'core/block-editor' ).getBlockIndex( clientId ),
@@ -22,9 +17,10 @@ export default function WidgetAreaEdit( {
 	return (
 		<Panel className={ className }>
 			<PanelBody title={ name } initialOpen={ index === 0 }>
-				<EntityProvider kind="root" type="widgetArea" id={ id }>
-					<WidgetAreaInnerBlocks />
-				</EntityProvider>
+				<InnerBlocks
+					templateLock={ false }
+					renderAppender={ InnerBlocks.ButtonBlockAppender }
+				/>
 			</PanelBody>
 		</Panel>
 	);

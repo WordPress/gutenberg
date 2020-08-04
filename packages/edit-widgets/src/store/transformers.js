@@ -30,21 +30,24 @@ export function transformWidgetToBlock( widget ) {
 export function transformBlockToWidget( block, relatedWidget = {} ) {
 	const { name, attributes } = block;
 	if ( name === 'core/legacy-widget' ) {
-		return {
+		const widget = {
+			...relatedWidget,
 			id: attributes.id,
 			widget_class: attributes.widgetClass,
 			number: attributes.number,
 			id_base: attributes.idBase,
 			settings: attributes.instance,
 		};
+		delete widget.form;
+		delete widget.rendered;
+		return widget;
 	}
 
 	return {
-		id: attributes.id,
+		...relatedWidget,
 		widget_class: 'WP_Widget_Block',
-		number: attributes.number,
-		id_base: attributes.idBase,
-		settings: attributes.instance,
-		content: serialize( block ),
+		settings: {
+			content: serialize( block ),
+		},
 	};
 }

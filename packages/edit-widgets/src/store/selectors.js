@@ -23,7 +23,7 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 } );
 
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
-	if ( ! hasResolvedWidgetAreas() ) {
+	if ( ! hasResolvedWidgetAreas( query ) ) {
 		return null;
 	}
 
@@ -90,8 +90,7 @@ export const isSavingWidgetAreas = createRegistrySelector(
  * @return {boolean} True if the navigation post related to menuId was already resolved, false otherwise.
  */
 export const hasResolvedWidgetAreas = createRegistrySelector(
-	( select ) => () => {
-		const query = buildWidgetAreasQuery();
+	( select, query = buildWidgetAreasQuery() ) => () => {
 		const resolutionFinished = select(
 			'core'
 		).hasFinishedResolution( 'getEntityRecords', [
@@ -108,7 +107,7 @@ export const hasResolvedWidgetAreas = createRegistrySelector(
 			WIDGET_AREA_ENTITY_TYPE,
 			query
 		);
-		const contentAssigned = ! areas.length || 'content' in areas[ 0 ];
+		const contentAssigned = ! areas.length || 'blocks' in areas[ 0 ];
 		if ( ! contentAssigned ) {
 			return false;
 		}
