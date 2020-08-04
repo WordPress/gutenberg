@@ -82,7 +82,7 @@ function ColumnEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
 					<RangeControl
-						label={ __( 'Percentage width' ) }
+						label={ __( 'Width' ) }
 						min={ 1 }
 						max={ 100 }
 						value={ columnWidths[ selectedColumnIndex ] }
