@@ -84,8 +84,14 @@ export default function WidgetAreasBlockEditorProvider( {
 					<FocusReturnProvider>
 						<BlockEditorProvider
 							value={ blocks }
-							onInput={ ( newBlocks ) => setBlocks( newBlocks ) }
-							onChange={ ( newBlocks ) => setBlocks( newBlocks ) }
+							onInput={ ( newBlocks ) => {
+								console.log( newBlocks );
+								setBlocks( newBlocks );
+							} }
+							onChange={ ( newBlocks ) => {
+								console.log( newBlocks );
+								setBlocks( newBlocks );
+							} }
 							settings={ settings }
 							{ ...props }
 						/>

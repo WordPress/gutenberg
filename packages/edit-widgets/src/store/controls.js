@@ -50,15 +50,13 @@ export function isProcessingPost( postId ) {
 }
 
 /**
- * Selects menuItemId -> clientId mapping (necessary for saving the navigation).
+ * Selects widgetId -> clientId mapping (necessary for saving the navigation).
  *
- * @param {number} postId Navigation post ID.
  * @return {Object} Action.
  */
-export function getMenuItemToClientIdMapping( postId ) {
+export function getWidgetToClientIdMapping() {
 	return {
-		type: 'GET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		postId,
+		type: 'GET_WIDGET_TO_CLIENT_ID_MAPPING',
 	};
 }
 
@@ -152,9 +150,9 @@ const controls = {
 		}
 	),
 
-	GET_MENU_ITEM_TO_CLIENT_ID_MAPPING: createRegistryControl(
-		( registry ) => ( { postId } ) => {
-			return getState( registry ).mapping[ postId ] || {};
+	GET_WIDGET_TO_CLIENT_ID_MAPPING: createRegistryControl(
+		( registry ) => () => {
+			return getState( registry ).mapping || {};
 		}
 	),
 
@@ -172,6 +170,6 @@ const controls = {
 };
 
 const getState = ( registry ) =>
-	registry.stores[ 'core/edit-navigation' ].store.getState();
+	registry.stores[ 'core/edit-widgets' ].store.getState();
 
 export default controls;

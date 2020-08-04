@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { keyBy } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
@@ -6,16 +11,17 @@ import { createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { KIND, WIDGET_AREA_ENTITY_TYPE, buildWidgetAreasQuery } from './utils';
+import { buildWidgetAreasQuery, KIND, WIDGET_AREA_ENTITY_TYPE } from './utils';
 
-/**
- * Returns a "stub" sidebar post reflecting the contents of a sidebar with id=sidebarId. The
- * post is meant as a convenient to only exists in runtime and should never be saved. It
- * enables a convenient way of editing the navigation by using a regular post editor.
- *
- * @param {number} menuId The id sidebar menu to create a post from.
- * @return {null|Object} Post once the resolver fetches it, otherwise null
- */
+export const getWidgets = createRegistrySelector( ( select ) => () => {
+	const initialWidgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+
+	return keyBy(
+		initialWidgetAreas.flatMap( ( area ) => area.widgets ),
+		( widget ) => widget.id
+	);
+} );
+
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	if ( ! hasResolvedWidgetAreas() ) {
 		return null;
@@ -38,13 +44,21 @@ export const getEditedWidgetAreas = createRegistrySelector(
 				ids.includes( id )
 			);
 		}
-		return widgetAreas.filter( ( { id } ) =>
-			select( 'core' ).hasEditsForEntityRecord(
-				KIND,
-				WIDGET_AREA_ENTITY_TYPE,
-				id
+		return widgetAreas
+			.filter( ( { id } ) =>
+				select( 'core' ).hasEditsForEntityRecord(
+					KIND,
+					WIDGET_AREA_ENTITY_TYPE,
+					id
+				)
 			)
-		);
+			.map( ( { id } ) =>
+				select( 'core' ).getEditedEntityRecord(
+					KIND,
+					WIDGET_AREA_ENTITY_TYPE,
+					id
+				)
+			);
 	}
 );
 

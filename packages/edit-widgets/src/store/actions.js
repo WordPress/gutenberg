@@ -1,35 +1,49 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { parse, serialize } from '@wordpress/blocks';
+import { invert } from 'lodash';
+
 /**
  * Internal dependencies
  */
-import { resolveWidgetAreas, select, dispatch } from './controls';
+import { select, getWidgetToClientIdMapping } from './controls';
+import { transformBlockToWidget } from './transformers';
 
 export function* saveEditedWidgetAreas() {
-	const widgetAreas = yield select(
+	const editedWidgetAreas = yield select(
 		'core/edit-widgets',
 		'getEditedWidgetAreas'
 	);
-	if ( ! widgetAreas ) {
+	if ( ! editedWidgetAreas?.length ) {
 		return;
 	}
 
-	// @TODO: Batch save
-	for ( const widgetArea in widgetAreas ) {
-		// @TODO: Concurrency?
-		yield* saveWidgetArea( widgetArea );
+	const widgets = yield select( 'core/edit-widgets', 'getWidgets' );
+	const widgetIdToClientId = yield getWidgetToClientIdMapping();
+	const clientIdToWidgetId = invert( widgetIdToClientId );
+	console.log(
+		widgets,
+		widgetIdToClientId,
+		clientIdToWidgetId
+	)
+
+	// @TODO: Batch save and concurrency
+	for ( const widgetArea of editedWidgetAreas ) {
+		const areaWidgets = widgetArea.blocks.map( ( block ) => {
+			const widgetId = clientIdToWidgetId[ block.clientId ];
+			const oldWidget = widgets[ widgetId ];
+			const newWidget = transformBlockToWidget( block, oldWidget );
+			console.log( block.clientId, oldWidget, newWidget );
+		} );
+
+		// yield* saveWidgetArea( widgetArea );
 	}
 }
 
 export function* saveWidgetArea( widgetArea ) {
-	console.log( 'saving widget area', widgetArea );
+	const widgets = widgetArea.blocks.map( transformBlockToWidget );
+	console.log( 'saving widget area', widgetArea.blocks, widgets );
 	// return;
-	// const blocks = parse( widgetArea.content );
-	// const widgets = blocks.map( convertBlockToWidget );
 	// Update the entity with widgets list
 	// Save the entity by sending an API request
 }
-
-// function convertBlockToWidget( block ) {}
