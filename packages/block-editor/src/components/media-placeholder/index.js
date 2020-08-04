@@ -86,11 +86,16 @@ export function MediaPlaceholder( {
 		setSrc( value?.src ?? '' );
 	}, [ value ] );
 
-	const onlyAllowsImages = () =>
-		( allowedTypes ?? [] ).every(
+	const onlyAllowsImages = () => {
+		if ( ! allowedTypes ) {
+			return false;
+		}
+
+		return allowedTypes.every(
 			( allowedType ) =>
 				allowedType === 'image' || allowedType.startsWith( 'image/' )
 		);
+	};
 
 	const onChangeSrc = ( event ) => {
 		setSrc( event.target.value );
