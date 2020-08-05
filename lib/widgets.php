@@ -129,7 +129,6 @@ function gutenberg_get_legacy_widget_settings() {
 		'WP_Nav_Menu_Widget',
 		'WP_Widget_Custom_HTML',
 	);
-	$core_widgets = array();
 
 	$has_permissions_to_manage_widgets = current_user_can( 'edit_theme_options' );
 	$available_legacy_widgets          = array();
