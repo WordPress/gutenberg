@@ -16,7 +16,7 @@ The tools are used to convert the JavaScript we are going to write into a format
 
 For Mac and Linux, it is recommended to use the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm). Using `nvm` to install node allows installing specific versions, plus installs locally in your home directory and avoids any global permission issues.
 
-For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, the long term support (LTS) version is recommeneded. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
+For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, the long term support (LTS) version is recommended. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
 
 Here are the quick instructions to install using nvm, see the [full installation instructions](https://github.com/nvm-sh/nvm#installing-and-updating) for additional details.
 
@@ -108,7 +108,7 @@ A block is just a plugin, so any WordPress environment can be used for developme
 
 -   [WampServer](http://www.wampserver.com/en/) or [MAMP](https://www.mamp.info/) environments, both are quite similar to Local, combining a web server, PHP, and database. However these tools are not WordPress specific, so if you are not already using them, Local might be an easier option
 
--   Remote server - you could work on remote server that is easy to setup, since most hosts have a standard WordPress install. However, this may require additonal development time to sync to the server.
+-   Remote server - you could work on remote server that is easy to setup, since most hosts have a standard WordPress install. However, this may require additional development time to sync to the server.
 
 The important part is having a WordPress site installed, and know where and how to update files in the plugins directory.
 
