@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -100,6 +100,13 @@ function Editor() {
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
 	const { setPage } = useDispatch( 'core/edit-site' );
+
+	const { setNavigationMode } = useDispatch( 'core/block-editor' );
+
+	// Set editor to navigation mode on component mount.
+	useEffect( () => {
+		setNavigationMode( true );
+	}, [ true ] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
