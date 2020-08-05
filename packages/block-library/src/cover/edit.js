@@ -91,7 +91,8 @@ function CoverHeightInput( {
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
 
-	const handleOnChange = ( unprocessedValue ) => {
+	const handleOnInput = ( e ) => {
+		const unprocessedValue = e.target.value;
 		const inputValue =
 			unprocessedValue !== ''
 				? parseInt( unprocessedValue, 10 )
@@ -121,7 +122,7 @@ function CoverHeightInput( {
 				isResetValueOnUnitChange
 				min={ min }
 				onBlur={ handleOnBlur }
-				onChange={ handleOnChange }
+				onInput={ handleOnInput }
 				onUnitChange={ onUnitChange }
 				step="1"
 				style={ { maxWidth: 80 } }
