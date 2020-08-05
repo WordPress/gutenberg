@@ -40,9 +40,7 @@ const BottomSheetScreen = ( { children } ) => {
 				return false;
 			} );
 			if ( heightRef.current.maxHeight !== 0 ) {
-				// InteractionManager.runAfterInteractions( () => {
 				setHeight( heightRef.current.maxHeight );
-				// } );
 			}
 			return () => {};
 		}, [] )

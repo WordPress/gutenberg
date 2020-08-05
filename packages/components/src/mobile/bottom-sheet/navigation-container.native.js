@@ -3,7 +3,6 @@
  */
 import { View, Easing } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { CardStyleInterpolators } from '@react-navigation/stack';
 
 /**
  * WordPress dependencies
@@ -23,6 +22,14 @@ const AnimationSpec = {
 	},
 };
 
+const fadeConfig = ( { current } ) => {
+	return {
+		cardStyle: {
+			opacity: current.progress,
+		},
+	};
+};
+
 const options = {
 	transitionSpec: {
 		open: AnimationSpec,
@@ -30,7 +37,7 @@ const options = {
 	},
 	headerShown: false,
 	gestureEnabled: false,
-	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+	cardStyleInterpolator: fadeConfig,
 };
 
 function BottomSheetNavigationContainer( {
@@ -48,10 +55,8 @@ function BottomSheetNavigationContainer( {
 			if ( animate && layout && height === 1 ) {
 				setMaxHeight( maxHeight );
 			} else if ( animate ) {
-				// InteractionManager.runAfterInteractions( () => {
 				performLayoutAnimation( 190 );
 				setMaxHeight( maxHeight );
-				// } );
 			} else {
 				setMaxHeight( maxHeight );
 			}
