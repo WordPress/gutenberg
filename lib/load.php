@@ -105,7 +105,6 @@ require dirname( __FILE__ ) . '/widgets-page.php';
 require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
-require dirname( __FILE__ ) . '/editor-features.php';
 require dirname( __FILE__ ) . '/global-styles.php';
 require dirname( __FILE__ ) . '/block-supports/index.php';
 require dirname( __FILE__ ) . '/block-supports/align.php';
