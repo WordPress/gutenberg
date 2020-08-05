@@ -17,7 +17,7 @@
 function gutenberg_apply_typography_support( $attributes, $block_attributes, $block_type ) {
 	$has_font_size_support   = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontSize' ), false );
 	$has_line_height_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalLineHeight' ), false );
-	
+
 	// Font Size.
 	if ( $has_font_size_support ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
