@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -174,7 +174,7 @@ class LegacyWidgetEdit extends Component {
 			<ServerSideRender
 				className="wp-block-legacy-widget__preview"
 				block="core/legacy-widget"
-				attributes={ attributes }
+				attributes={ omit( attributes, 'id' ) }
 			/>
 		);
 	}

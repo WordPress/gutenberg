@@ -156,30 +156,6 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 		$widget_obj->_set( - 1 );
 		ob_start();
 
-		if ( ! empty( $instance_changes ) ) {
-			$old_instance = $instance;
-			$instance     = $widget_obj->update( $instance_changes, $old_instance );
-
-			/**
-			 * Filters a widget's settings before saving.
-			 *
-			 * Returning false will effectively short-circuit the widget's ability
-			 * to update settings. The old setting will be returned.
-			 *
-			 * @param array $instance The current widget instance's settings.
-			 * @param array $instance_changes Array of new widget settings.
-			 * @param array $old_instance Array of old widget settings.
-			 * @param WP_Widget $widget_ob The widget instance.
-			 *
-			 * @since 5.2.0
-			 *
-			 */
-			$instance = apply_filters( 'widget_update_callback', $instance, $instance_changes, $old_instance, $widget_obj );
-			if ( false === $instance ) {
-				$instance = $old_instance;
-			}
-		}
-
 		$instance = apply_filters( 'widget_form_callback', $instance, $widget_obj );
 
 		$return = null;
@@ -215,85 +191,6 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 		);
 	}
 
-	/**
-	 * Returns the new widget instance and the form that represents it.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 *
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-	 * @since 5.7.0
-	 * @access public
-	 *
-	 */
-	public function compute_widget_preview( $request ) {
-		$widget_class     = urldecode( $request->get_param( 'widget_class' ) );
-		$instance         = $request->get_param( 'instance' );
-		$instance_changes = $request->get_param( 'instance_changes' );
-
-		global $wp_widget_factory;
-		$widget_obj = $wp_widget_factory->widgets[ $widget_class ];
-
-		$widget_obj->_set( - 1 );
-		ob_start();
-
-		if ( ! empty( $instance_changes ) ) {
-			$old_instance = $instance;
-			$instance     = $widget_obj->update( $instance_changes, $old_instance );
-
-			/**
-			 * Filters a widget's settings before saving.
-			 *
-			 * Returning false will effectively short-circuit the widget's ability
-			 * to update settings. The old setting will be returned.
-			 *
-			 * @param array $instance The current widget instance's settings.
-			 * @param array $instance_changes Array of new widget settings.
-			 * @param array $old_instance Array of old widget settings.
-			 * @param WP_Widget $widget_ob The widget instance.
-			 *
-			 * @since 5.2.0
-			 *
-			 */
-			$instance = apply_filters( 'widget_update_callback', $instance, $instance_changes, $old_instance, $widget_obj );
-			if ( false === $instance ) {
-				$instance = $old_instance;
-			}
-		}
-
-		$instance = apply_filters( 'widget_form_callback', $instance, $widget_obj );
-
-		$return = null;
-		if ( false !== $instance ) {
-			$return = $widget_obj->form( $instance );
-
-			/**
-			 * Fires at the end of the widget control form.
-			 *
-			 * Use this hook to add extra fields to the widget form. The hook
-			 * is only fired if the value passed to the 'widget_form_callback'
-			 * hook is not false.
-			 *
-			 * Note: If the widget has no form, the text echoed from the default
-			 * form method can be hidden using CSS.
-			 *
-			 * @param WP_Widget $widget_obj The widget instance (passed by reference).
-			 * @param null $return Return null if new fields are added.
-			 * @param array $instance An array of the widget's settings.
-			 *
-			 * @since 5.2.0
-			 *
-			 */
-			do_action_ref_array( 'in_widget_form', array( &$widget_obj, &$return, $instance ) );
-		}
-		$form = ob_get_clean();
-
-		return rest_ensure_response(
-			array(
-				'instance' => $instance,
-				'form'     => $form,
-			)
-		);
-	}
 }
 /**
  * End: Include for phase 2
