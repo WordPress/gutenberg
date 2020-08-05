@@ -18,7 +18,7 @@ function gutenberg_register_block_supports() {
 	}
 }
 
-add_action( 'init', 'gutenberg_register_block_supports', 11 );
+add_action( 'init', 'gutenberg_register_block_supports', 21 );
 
 /**
  * Filters the frontend output of blocks and apply the block support flags transformations.
