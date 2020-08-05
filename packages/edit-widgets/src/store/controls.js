@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { default as triggerApiFetch } from '@wordpress/api-fetch';
 import { createRegistryControl } from '@wordpress/data';
 
 /**
@@ -50,7 +49,7 @@ export function isProcessingPost( postId ) {
 }
 
 /**
- * Selects widgetId -> clientId mapping (necessary for saving the navigation).
+ * Selects widgetId -> clientId mapping (necessary for saving widgets).
  *
  * @return {Object} Action.
  */
@@ -79,8 +78,7 @@ export function getNavigationPostForMenu( menuId ) {
 /**
  * Resolves menu items for given menu id.
  *
- * @param {number} menuId Menu ID.
- * @param query
+ * @param {Object} query Query.
  * @return {Object} Action.
  */
 export function resolveWidgetAreas( query = buildWidgetAreasQuery() ) {
@@ -125,10 +123,6 @@ export function dispatch( registryName, actionName, ...args ) {
 }
 
 const controls = {
-	API_FETCH( { request } ) {
-		return triggerApiFetch( request );
-	},
-
 	SELECT: createRegistryControl(
 		( registry ) => ( { registryName, selectorName, args } ) => {
 			return registry.select( registryName )[ selectorName ]( ...args );
