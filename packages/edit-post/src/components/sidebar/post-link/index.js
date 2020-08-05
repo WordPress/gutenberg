@@ -31,7 +31,7 @@ function PostLink( {
 	postSlug,
 	postTypeLabel,
 } ) {
-	let prefixElement, postNameElement, suffixElement;
+	let prefixElement, postNameElement, suffixElement, permalink;
 	if ( isEditable ) {
 		prefixElement = permalinkPrefix && (
 			<span className="edit-post-post-link__link-prefix">
@@ -48,6 +48,9 @@ function PostLink( {
 				{ permalinkSuffix }
 			</span>
 		);
+
+		// Using array join prevents undefined/null values
+		permalink = [ permalinkPrefix, postSlug, permalinkSuffix ].join( '' );
 	}
 
 	return (
@@ -104,8 +107,18 @@ function PostLink( {
 			<div className="edit-post-post-link__preview-link-container">
 				<ExternalLink
 					className="edit-post-post-link__link"
-					href={ postLink }
+					href={ isEditable ? permalink : postLink }
 					target="_blank"
+					onClick={ ( event ) => {
+						// This shows the permalink in the status bar,
+						// while uses the postLink to open in a new window.
+						event.preventDefault();
+						window.open(
+							postLink,
+							'_blank',
+							'noreferrer,noopener'
+						);
+					} }
 				>
 					{ isEditable ? (
 						<>
