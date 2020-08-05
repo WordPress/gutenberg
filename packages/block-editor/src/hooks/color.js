@@ -1,8 +1,10 @@
+/* global wp */
 /**
  * External dependencies
  */
 import classnames from 'classnames';
 import { isObject } from 'lodash';
+import tinycolor from 'tinycolor2';
 
 /**
  * WordPress dependencies
@@ -136,6 +138,19 @@ export function addSaveProps( props, blockType, attributes ) {
 		}
 	);
 	props.className = newClassName ? newClassName : undefined;
+
+	// Add "has-background-color-light" and "has-background-color-dark" classes,
+	// depending on the luminosity of the selected background color.
+	if ( backgroundColor ) {
+		props.className += tinycolor(
+			getColorObjectByAttributeValues(
+				wp.data.select( 'core/block-editor' ).getSettings().colors,
+				backgroundColor
+			).color
+		).isLight()
+			? ' has-background-color-light'
+			: ' has-background-color-dark';
+	}
 
 	return props;
 }
