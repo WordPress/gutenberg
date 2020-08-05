@@ -15,7 +15,7 @@
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_apply_colors_support( $attributes, $block_attributes, $block_type ) {
-	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), true );
+	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), false );
 	$has_text_colors_support       = is_array( $color_support ) || $color_support;
 	$has_background_colors_support = $has_text_colors_support;
 	$has_link_colors_support       = $has_text_colors_support && gutenberg_experimental_get( $color_support, array( 'linkColor' ), false );
