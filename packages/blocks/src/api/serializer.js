@@ -31,10 +31,12 @@ import BlockContentProvider from '../block-content-provider';
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
  *
- * @property {boolean}   isInnerBlocks           Whether we are serializing
- *                                               inner blocks.
- * @property {WPElement} [__experimentalWrapper] Wrapper for block. (Outside of
- *                                               comment delimiters.)
+ * @property {boolean}   isInnerBlocks            Whether we are serializing
+ *                                                inner blocks.
+ * @property {WPElement} [__experimentalCallback] Callback to define HTML
+ *                                                surrounding block, outside of
+ *                                                the comment delimiters. Used
+ *                                                by InnerBlocks API.
  */
 
 /**
@@ -319,7 +321,7 @@ export function getCommentDelimitedContent(
  */
 export function serializeBlock(
 	block,
-	{ isInnerBlocks = false, __experimentalWrapper: Wrapper } = {}
+	{ isInnerBlocks = false, __experimentalCallback: wrapperCallback } = {}
 ) {
 	const blockName = block.name;
 	const saveContent = getBlockContent( block );
@@ -346,11 +348,9 @@ export function serializeBlock(
 		);
 	}
 
-	if ( Wrapper ) {
+	if ( wrapperCallback ) {
 		return renderToString(
-			<Wrapper>
-				<RawHTML>{ unwrappedContent }</RawHTML>
-			</Wrapper>
+			wrapperCallback( <RawHTML>{ unwrappedContent }</RawHTML> )
 		);
 	}
 	return unwrappedContent;

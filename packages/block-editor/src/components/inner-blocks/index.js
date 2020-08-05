@@ -40,7 +40,7 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
-		__experimentalItemWrapper: itemWrapper,
+		__experimentalItemCallback: itemCallback,
 		template,
 		templateLock,
 		forwardedRef,
@@ -94,7 +94,7 @@ function UncontrolledInnerBlocks( props ) {
 			{ ...props }
 			ref={ forwardedRef }
 			rootClientId={ clientId }
-			__experimentalItemWrapper={ itemWrapper }
+			__experimentalItemCallback={ itemCallback }
 			className={ classes }
 		/>
 	);
@@ -159,8 +159,10 @@ ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
 ForwardedInnerBlocks.Content = withBlockContentContext(
-	( { BlockContent, __experimentalItemWrapper } ) => (
-		<BlockContent __experimentalItemWrapper={ __experimentalItemWrapper } />
+	( { BlockContent, __experimentalItemCallback } ) => (
+		<BlockContent
+			__experimentalItemCallback={ __experimentalItemCallback }
+		/>
 	)
 );
 

@@ -28,7 +28,7 @@ function BlockList(
 		className,
 		rootClientId,
 		renderAppender,
-		__experimentalItemWrapper,
+		__experimentalItemCallback,
 		__experimentalTagName = 'div',
 		__experimentalAppenderTagName,
 		__experimentalPassedProps = {},
@@ -111,7 +111,9 @@ function BlockList(
 									isDropTarget &&
 									orientation === 'horizontal',
 							} ) }
-							__experimentalWrapper={ __experimentalItemWrapper }
+							__experimentalCallback={
+								__experimentalItemCallback
+							}
 						/>
 					</AsyncModeProvider>
 				);
