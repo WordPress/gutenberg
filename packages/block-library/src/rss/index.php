@@ -80,10 +80,6 @@ function render_block_core_rss( $attributes ) {
 	}
 
 	$class = 'wp-block-rss';
-	if ( isset( $attributes['align'] ) ) {
-		$class .= ' align' . $attributes['align'];
-	}
-
 	if ( isset( $attributes['blockLayout'] ) && 'grid' === $attributes['blockLayout'] ) {
 		$class .= ' is-grid';
 	}

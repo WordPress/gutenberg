@@ -56,6 +56,22 @@ WordPress comes with specific [debug systems](https://wordpress.org/support/arti
 
 See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenberg/tree/master/packages/env#troubleshooting-common-problems).
 
+## Using MAMP
+
+You can also develop with MAMP by cloning and installing Gutenberg as a regular plugin in a WP install, but you'll require some extra configuration to be able to run the e2e tests.
+
+Change the current directory to the plugins folder and symlink all e2e test plugins:
+
+```bash
+ln -s gutenberg/packages/e2e-tests/plugins/* .
+```
+
+You'll need to run this again if new plugins are added. To run e2e tests:
+
+```bash
+WP_BASE_URL=http://localhost:8888/gutenberg npm run test-e2e
+```
+
 ## On A Remote Server
 
 You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.

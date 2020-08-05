@@ -199,7 +199,7 @@ PODS:
     - React
   - react-native-safe-area-context (3.0.7):
     - React
-  - react-native-slider (2.0.7):
+  - react-native-slider (3.0.2):
     - React
   - react-native-video (5.0.2):
     - React
@@ -417,8 +417,8 @@ SPEC CHECKSUMS:
   react-native-keyboard-aware-scroll-view: ffa9152671fec9a571197ed2d02e0fcb90206e60
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
   react-native-safe-area-context: c39fc20a20cd66ebf1d56c6f8b8711142fbfee98
-  react-native-slider: f81b89fa0c1f9a65742d33f889a194ca6653a985
-  react-native-video: 961749da457e73bf0b5565edfbaffc25abfb8974
+  react-native-slider: ecb7f25c14f2348d1c1f629a6f2be7611d22a066
+  react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72

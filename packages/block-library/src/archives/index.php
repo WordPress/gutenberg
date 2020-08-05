@@ -19,10 +19,6 @@ function render_block_core_archives( $attributes ) {
 
 	$class = 'wp-block-archives';
 
-	if ( isset( $attributes['align'] ) ) {
-		$class .= " align{$attributes['align']}";
-	}
-
 	if ( isset( $attributes['className'] ) ) {
 		$class .= " {$attributes['className']}";
 	}

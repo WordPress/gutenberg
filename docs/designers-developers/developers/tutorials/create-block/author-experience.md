@@ -2,7 +2,7 @@
 
 ## Background
 
-One of the primary tenets of Gutenberg is as a WYSIWYG editor, what you see in the editor, should be as close to what you get when published. Keep this in mind when building blocks.
+One of the primary tenets of Gutenberg as a WYSIWYG editor is that what you see in the editor should be as close as possible to what you get when published. Keep this in mind when building blocks.
 
 ## Placeholder
 
