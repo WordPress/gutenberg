@@ -113,12 +113,26 @@
 	height: 32px;
 	padding: 0;
 }
-// Always display block toolbar under main toolbar when text labels are visible
-.show-icon-labels .edit-post-header-toolbar__block-toolbar {
-	@include break-wide {
-		position: absolute;
-		top: $header-height + $border-width;
-		left: 0;
-		right: 0;
+
+.show-icon-labels {
+	// Always display block toolbar under main toolbar when text labels are visible
+	.edit-post-header-toolbar__block-toolbar {
+		@include break-wide {
+			position: absolute;
+			top: $header-height + $border-width;
+			left: 0;
+			right: 0;
+			border-bottom: $border-width solid $gray-200;
+			padding: 0;
+
+			.block-editor-block-toolbar .components-toolbar-group,
+			.block-editor-block-toolbar .components-toolbar {
+				height: auto;
+				padding: 0;
+			}
+		}
+	}
+	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle {
+		height: 36px;
 	}
 }

@@ -52,7 +52,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	return (
 		<div className="edit-post-header">
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose showTooltip={ ! showIconLabels } />
+				<FullscreenModeClose />
 			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar />

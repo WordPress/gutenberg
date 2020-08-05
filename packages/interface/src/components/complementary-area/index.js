@@ -94,9 +94,9 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 	isActiveByDefault,
-	showTooltip,
+	showIconLabels = false,
 } ) {
-	const { isActive, isPinned, activeArea, isSmall } = useSelect(
+	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea, isItemPinned } = select(
 				'core/interface'
@@ -109,6 +109,7 @@ function ComplementaryArea( {
 				isSmall: select( 'core/viewport' ).isViewportMatch(
 					'< medium'
 				),
+				isLarge: select( 'core/viewport' ).isViewportMatch( 'large' ),
 			};
 		},
 		[ identifier, scope ]
@@ -140,11 +141,13 @@ function ComplementaryArea( {
 					<ComplementaryAreaToggle
 						scope={ scope }
 						identifier={ identifier }
-						isPressed={ isActive }
+						isPressed={
+							isActive && ( ! showIconLabels || isLarge )
+						}
 						aria-expanded={ isActive }
 						label={ title }
 						icon={ icon }
-						showTooltip={ showTooltip }
+						showTooltip={ ! showIconLabels }
 					/>
 				</PinnedItems>
 			) }

@@ -133,8 +133,10 @@
 		}
 	}
 	// Exception for drodpdown toggle buttons.
+	// Exception for the fullscreen mode button.
 	// Temporary exception for block toolbar (pending design).
 	.edit-post-header-toolbar__block-toolbar .components-button.has-icon,
+	.edit-post-fullscreen-mode-close.has-icon,
 	.components-button.has-icon.button-toggle {
 		svg {
 			display: block;
@@ -142,6 +144,10 @@
 		&::after {
 			content: none;
 		}
+	}
+	// Undo the width override for fullscreen mode button.
+	.edit-post-fullscreen-mode-close.has-icon {
+		width: $header-height;
 	}
 }
 
