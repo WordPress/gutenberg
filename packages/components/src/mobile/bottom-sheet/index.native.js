@@ -343,19 +343,19 @@ class BottomSheet extends Component {
 		const WrapperView = isChildrenScrollable ? View : ScrollView;
 
 		const getHeader = () => (
-			<View>
+			<>
 				<View style={ styles.bottomSheetHeader }>
-					<View style={ { flex: 1 } }>{ leftButton }</View>
+					<View style={ styles.flex }>{ leftButton }</View>
 					<Text
 						style={ bottomSheetHeaderTitleStyle }
 						maxFontSizeMultiplier={ 3 }
 					>
 						{ title }
 					</Text>
-					<View style={ { flex: 1 } }>{ rightButton }</View>
+					<View style={ styles.flex }>{ rightButton }</View>
 				</View>
 				{ withHeaderSeparator && <View style={ styles.separator } /> }
-			</View>
+			</>
 		);
 
 		return (
