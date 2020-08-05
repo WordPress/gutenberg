@@ -60,6 +60,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Plugins_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-plugins-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Sidebars_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-sidebars-controller.php';
+	}
 	if ( ! class_exists( 'WP_Widget_Block' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-widget-block.php';
 	}

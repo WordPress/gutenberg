@@ -71,11 +71,11 @@ class LegacyWidgetEditDomManager extends Component {
 							if ( this.shouldTriggerInstanceUpdate() ) {
 								if ( isReferenceWidget ) {
 									if ( this.containerRef.current ) {
-										window.wpWidgets.save(
-											window.jQuery(
-												this.containerRef.current
-											)
-										);
+										// window.wpWidgets.save(
+										// 	window.jQuery(
+										// 		this.containerRef.current
+										// 	)
+										// );
 									}
 								}
 								this.props.onInstanceChange(

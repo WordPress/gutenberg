@@ -200,6 +200,15 @@ function gutenberg_register_plugins_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
 
 /**
+ * Registers the Sidebars REST API routes.
+ */
+function gutenberg_register_sidebars_endpoint() {
+	$sidebars = new WP_REST_Sidebars_Controller();
+	$sidebars->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_sidebars_endpoint' );
+
+/**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
  *
  * @param array  $args Current registered post type args.
