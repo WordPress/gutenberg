@@ -8,6 +8,8 @@ const Navigation = ( { activeId, children, items: rawItems, rootTitle } ) => {
 				...item,
 				children: itemChildren,
 				parent: item.parent || 'root',
+				isActive: item.id === activeId,
+				hasChildren: itemChildren.length > 0,
 			};
 		} );
 	};
@@ -28,12 +30,14 @@ const Navigation = ( { activeId, children, items: rawItems, rootTitle } ) => {
 		: items.filter( ( item ) => item.parent === 'root' );
 	const parentItems = parentLevel
 		? items.filter( ( item ) => item.parent === parentLevel.id )
-		: items.filter( ( item ) => item.parent === 'root' );
+		: [];
+	const backItem = parentItems.length ? parentItems[ 0 ] : null;
 
 	return (
 		<div className="components-navigation">
 			{ children( {
 				activeId,
+				backItem,
 				currentItems,
 				currentLevel,
 				parentItems,

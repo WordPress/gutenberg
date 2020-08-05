@@ -14,16 +14,21 @@ import { Icon, chevronRight } from '@wordpress/icons';
 import Button from '../button';
 import Text from '../text';
 
-const NavigationMenuItem = ( { children, hasChildren, isActive, onClick } ) => {
+const NavigationMenuItem = ( props ) => {
+	const { children, hasChildren, isActive, onClick, title } = props;
 	const classes = classnames( 'components-navigation__menu-item', {
 		'is-active': isActive,
 	} );
 
+	const handleClick = () => {
+		onClick( children.length ? children[ 0 ] : props );
+	};
+
 	return (
 		<li className={ classes }>
-			<Button className={ classes } onClick={ onClick }>
+			<Button className={ classes } onClick={ handleClick }>
 				<Text variant="body.small">
-					<span>{ children }</span>
+					<span>{ title }</span>
 				</Text>
 				{ hasChildren ? <Icon icon={ chevronRight } /> : null }
 			</Button>

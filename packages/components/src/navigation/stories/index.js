@@ -1,16 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Navigation from '../';
-import NavigationBackButton from '../back-button';
-import NavigationPane from '../pane';
 import NavigationMenu from '../menu';
-import NavigationTitle from '../title';
+import NavigationMenuItem from '../menu-item';
 
 export default {
 	title: 'Components/Navigation',
@@ -18,110 +17,61 @@ export default {
 };
 
 const data = [
-	{ title: 'Home', id: 'home' },
 	{
-		title: 'Analytics',
-		id: 'analytics',
+		title: 'Item 1',
+		id: 'item-1',
 	},
 	{
-		title: 'Orders',
-		id: 'orders',
+		title: 'Item 2',
+		id: 'item-2',
 	},
 	{
-		title: 'Overview',
-		id: 'overview',
-		parent: 'analytics',
+		title: 'Category',
+		id: 'item-3',
 	},
 	{
-		title: 'Products report',
-		id: 'products',
-		parent: 'analytics',
+		title: 'Child 1',
+		id: 'child-1',
+		parent: 'item-3',
 	},
 	{
-		title: 'All orders',
-		id: 'all_orders',
-		parent: 'orders',
-	},
-	{
-		title: 'Payouts',
-		id: 'payouts',
-		parent: 'orders',
-	},
-	{
-		title: 'Settings',
-		id: 'settings',
-		menu: 'secondary',
-	},
-	{
-		title: 'Extensions',
-		id: 'extensions',
-		menu: 'secondary',
-	},
-	{
-		title: 'General',
-		id: 'general',
-		parent: 'settings',
-	},
-	{
-		title: 'Tax',
-		id: 'tax',
-		parent: 'settings',
-	},
-	{
-		title: 'My extensions',
-		id: 'my_extensions',
-		parent: 'extensions',
-	},
-	{
-		title: 'Marketplace',
-		id: 'marketplace',
-		parent: 'extensions',
+		title: 'Child 2',
+		id: 'child-2',
+		parent: 'item-3',
 	},
 ];
 
 function Example() {
-	const [ active, setActive ] = useState( 'home' );
+	const [ active, setActive ] = useState( 'item-1' );
 
 	return (
-		<Navigation
-			activeId={ active }
-			items={ data }
-			rootTitle="WooCommerce Home"
-		>
-			{ ( { currentItems, currentLevel, parentItems, parentLevel } ) => {
+		<Navigation activeId={ active } items={ data } rootTitle="Home">
+			{ ( { currentItems, currentLevel, backItem } ) => {
 				return (
-					<NavigationPane>
-						<NavigationBackButton
-							onClick={ () =>
-								parentLevel
-									? setActive( parentItems[ 0 ].id )
-									: ( window.location =
-											'https://wordpress.com' )
-							}
-						>
-							{ ! parentLevel ? 'Dashboard' : parentLevel.title }
-						</NavigationBackButton>
-						<NavigationTitle>
-							{ currentLevel.id === 'root'
-								? 'WooCommerce'
-								: currentLevel.title }
-						</NavigationTitle>
-						<NavigationMenu
-							activeId={ active }
-							items={ currentItems.filter(
-								( item ) => item.menu !== 'secondary'
-							) }
-							onSelect={ ( item ) => setActive( item.id ) }
-						/>
-						<br />
-						<NavigationMenu
-							activeId={ active }
-							items={ currentItems.filter(
-								( item ) => item.menu === 'secondary'
-							) }
-							onSelect={ ( item ) => setActive( item.id ) }
-						/>
-					</NavigationPane>
+					<>
+						{ backItem && (
+							<Button
+								isPrimary
+								onClick={ () => setActive( backItem.id ) }
+							>
+								Back
+							</Button>
+						) }
+						<h1>{ currentLevel.title }</h1>
+						<NavigationMenu>
+							{ currentItems.map( ( item ) => {
+								return (
+									<NavigationMenuItem
+										{ ...item }
+										key={ item.id }
+										onClick={ ( selected ) =>
+											setActive( selected.id )
+										}
+									/>
+								);
+							} ) }
+						</NavigationMenu>
+					</>
 				);
 			} }
 		</Navigation>
