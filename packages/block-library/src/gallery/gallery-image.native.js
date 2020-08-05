@@ -195,7 +195,7 @@ class GalleryImage extends Component {
 		} = this.props;
 
 		const { isUploadInProgress, captionSelected } = this.state;
-		const { isUploadFailed, retryMessage, openMediaOptions } = params;
+		const { isUploadFailed, retryMessage } = params;
 		const resizeMode = isCropped ? 'cover' : 'contain';
 
 		const captionPlaceholderStyle = getStylesFromColorScheme(
@@ -234,7 +234,6 @@ class GalleryImage extends Component {
 						},
 					] }
 					onSelectMediaUploadOption={ this.onSelectMedia }
-					openMediaOptions={ openMediaOptions }
 					resizeMode={ resizeMode }
 					url={ url }
 				/>
@@ -296,6 +295,7 @@ class GalleryImage extends Component {
 							<ScrollView
 								nestedScrollEnabled
 								keyboardShouldPersistTaps="handled"
+								bounces={ false }
 							>
 								<Caption
 									inlineToolbar

@@ -96,6 +96,7 @@ $caption-padding-vertical: 8px;
 	bottom: 2;
 	left: 2;
 	right: 2;
+	top: 45;
 }
 
 @mixin caption-shared {
@@ -128,9 +129,10 @@ $caption-padding-vertical: 8px;
 	// constrain height to gallery image height for caption scroll
 	max-height: $gallery-image-container-height;
 	position: absolute;
-	bottom: - $overlay-border-width;
-	left: - $overlay-border-width;
-	right: - $overlay-border-width;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	top: 0;
 	padding-top: $caption-padding-vertical;
 	padding-bottom: $overlay-border-width + $caption-padding-vertical;
 	padding-left: $overlay-border-width;
