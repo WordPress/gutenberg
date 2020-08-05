@@ -15,10 +15,11 @@
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_apply_colors_support( $attributes, $block_attributes, $block_type ) {
-	$has_text_colors_support       = $block_type->supports && array_key_exists( '__experimentalColor', $block_type->supports );
+	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), true );
+	$has_text_colors_support       = is_array( $color_support ) || $color_support;
 	$has_background_colors_support = $has_text_colors_support;
-	$has_link_colors_support       = $has_text_colors_support && array_key_exists( 'linkColor', $block_type->supports['__experimentalColor'] );
-	$has_gradients_support         = $has_text_colors_support && array_key_exists( 'gradients', $block_type->supports['__experimentalColor'] );
+	$has_link_colors_support       = $has_text_colors_support && gutenberg_experimental_get( $color_support, array( 'linkColor' ), false );
+	$has_gradients_support         = $has_text_colors_support && gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
 
 	// Text Colors.
 	// Check support for text colors.
