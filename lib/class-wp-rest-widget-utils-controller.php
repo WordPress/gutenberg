@@ -14,7 +14,7 @@
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Widget_Forms extends WP_REST_Controller {
+class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructs the controller.
@@ -23,7 +23,7 @@ class WP_REST_Widget_Forms extends WP_REST_Controller {
 	 */
 	public function __construct() {
 		$this->namespace = '__experimental';
-		$this->rest_base = 'widget-forms';
+		$this->rest_base = 'widget-utils';
 	}
 
 	/**
@@ -34,7 +34,7 @@ class WP_REST_Widget_Forms extends WP_REST_Controller {
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<widget_class>[^/]*)/',
+			'/' . $this->rest_base . '/form/(?P<widget_class>[^/]*)/',
 			array(
 				'args' => array(
 					'widget_class'     => array(
@@ -56,8 +56,37 @@ class WP_REST_Widget_Forms extends WP_REST_Controller {
 				),
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
-					'permission_callback' => array( $this, 'compute_new_widget_permissions_check' ),
-					'callback'            => array( $this, 'compute_new_widget' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'callback'            => array( $this, 'compute_widget_form' ),
+				),
+			)
+		);
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/preview/(?P<widget_class>[^/]*)/',
+			array(
+				'args' => array(
+					'widget_class'     => array(
+						'description'       => __( 'Class name of the widget.', 'gutenberg' ),
+						'type'              => 'string',
+						'required'          => true,
+						'validate_callback' => array( $this, 'is_valid_widget' ),
+					),
+					'instance'         => array(
+						'description' => __( 'Current widget instance', 'gutenberg' ),
+						'type'        => 'object',
+						'default'     => array(),
+					),
+					'instance_changes' => array(
+						'description' => __( 'Array of instance changes', 'gutenberg' ),
+						'type'        => 'object',
+						'default'     => array(),
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'callback'            => array( $this, 'compute_widget_preview' ),
 				),
 			)
 		);
@@ -71,7 +100,7 @@ class WP_REST_Widget_Forms extends WP_REST_Controller {
 	 * @access public
 	 *
 	 */
-	public function compute_new_widget_permissions_check() {
+	public function permissions_check() {
 		// Verify if the current user has edit_theme_options capability.
 		// This capability is required to access the widgets screen.
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -116,7 +145,87 @@ class WP_REST_Widget_Forms extends WP_REST_Controller {
 	 * @access public
 	 *
 	 */
-	public function compute_new_widget( $request ) {
+	public function compute_widget_form( $request ) {
+		$widget_class     = urldecode( $request->get_param( 'widget_class' ) );
+		$instance         = $request->get_param( 'instance' );
+		$instance_changes = $request->get_param( 'instance_changes' );
+
+		global $wp_widget_factory;
+		$widget_obj = $wp_widget_factory->widgets[ $widget_class ];
+
+		$widget_obj->_set( - 1 );
+		ob_start();
+
+		if ( ! empty( $instance_changes ) ) {
+			$old_instance = $instance;
+			$instance     = $widget_obj->update( $instance_changes, $old_instance );
+
+			/**
+			 * Filters a widget's settings before saving.
+			 *
+			 * Returning false will effectively short-circuit the widget's ability
+			 * to update settings. The old setting will be returned.
+			 *
+			 * @param array $instance The current widget instance's settings.
+			 * @param array $instance_changes Array of new widget settings.
+			 * @param array $old_instance Array of old widget settings.
+			 * @param WP_Widget $widget_ob The widget instance.
+			 *
+			 * @since 5.2.0
+			 *
+			 */
+			$instance = apply_filters( 'widget_update_callback', $instance, $instance_changes, $old_instance, $widget_obj );
+			if ( false === $instance ) {
+				$instance = $old_instance;
+			}
+		}
+
+		$instance = apply_filters( 'widget_form_callback', $instance, $widget_obj );
+
+		$return = null;
+		if ( false !== $instance ) {
+			$return = $widget_obj->form( $instance );
+
+			/**
+			 * Fires at the end of the widget control form.
+			 *
+			 * Use this hook to add extra fields to the widget form. The hook
+			 * is only fired if the value passed to the 'widget_form_callback'
+			 * hook is not false.
+			 *
+			 * Note: If the widget has no form, the text echoed from the default
+			 * form method can be hidden using CSS.
+			 *
+			 * @param WP_Widget $widget_obj The widget instance (passed by reference).
+			 * @param null $return Return null if new fields are added.
+			 * @param array $instance An array of the widget's settings.
+			 *
+			 * @since 5.2.0
+			 *
+			 */
+			do_action_ref_array( 'in_widget_form', array( &$widget_obj, &$return, $instance ) );
+		}
+		$form = ob_get_clean();
+
+		return rest_ensure_response(
+			array(
+				'instance' => $instance,
+				'form'     => $form,
+			)
+		);
+	}
+
+	/**
+	 * Returns the new widget instance and the form that represents it.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 * @since 5.7.0
+	 * @access public
+	 *
+	 */
+	public function compute_widget_preview( $request ) {
 		$widget_class     = urldecode( $request->get_param( 'widget_class' ) );
 		$instance         = $request->get_param( 'instance' );
 		$instance_changes = $request->get_param( 'instance_changes' );
