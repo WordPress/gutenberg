@@ -97,24 +97,17 @@ export const isSavingWidgetAreas = createRegistrySelector(
  */
 export const hasResolvedWidgetAreas = createRegistrySelector(
 	( select, query = buildWidgetAreasQuery() ) => () => {
-		const resolutionFinished = select(
-			'core'
-		).hasFinishedResolution( 'getEntityRecords', [
-			KIND,
-			WIDGET_AREA_ENTITY_TYPE,
-			query,
-		] );
-		if ( ! resolutionFinished ) {
-			return false;
-		}
-
 		const areas = select( 'core' ).getEntityRecords(
 			KIND,
 			WIDGET_AREA_ENTITY_TYPE,
 			query
 		);
-		if ( ! areas.length ) {
-			return false;
+		if ( ! areas?.length ) {
+			return select( 'core' ).hasFinishedResolution( 'getEntityRecords', [
+				KIND,
+				WIDGET_AREA_ENTITY_TYPE,
+				query,
+			] );
 		}
 
 		return true;

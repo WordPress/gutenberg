@@ -16,7 +16,7 @@ import { cog } from '@wordpress/icons';
  */
 import './sync-customizer';
 import Header from '../header';
-import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
+// import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
 function CustomizerEditWidgetsInitializer( { settings } ) {
@@ -29,9 +29,9 @@ function CustomizerEditWidgetsInitializer( { settings } ) {
 		[ settings ]
 	);
 	return (
-		<WidgetAreasBlockEditorProvider
-			blockEditorSettings={ blockEditorSettings }
-		>
+		// <WidgetAreasBlockEditorProvider
+		// 	blockEditorSettings={ blockEditorSettings }
+		// >
 			<div
 				className="edit-widgets-customizer-edit-widgets-initializer__content"
 				role="region"
@@ -51,7 +51,7 @@ function CustomizerEditWidgetsInitializer( { settings } ) {
 					<BlockInspector />
 				</ComplementaryArea>
 			</div>
-		</WidgetAreasBlockEditorProvider>
+		// </WidgetAreasBlockEditorProvider>
 	);
 }
 

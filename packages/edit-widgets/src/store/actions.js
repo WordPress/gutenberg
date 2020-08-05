@@ -4,6 +4,11 @@
 import { invert } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { dispatch, select, getWidgetToClientIdMapping } from './controls';
@@ -24,13 +29,35 @@ export function* saveEditedWidgetAreas() {
 	if ( ! editedWidgetAreas?.length ) {
 		return;
 	}
+	try {
+		yield* saveWidgetAreas( editedWidgetAreas );
+		yield dispatch(
+			'core/notices',
+			'createSuccessNotice',
+			__( 'Widgets saved.' ),
+			{
+				type: 'snackbar',
+			}
+		);
+	} catch ( e ) {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			__( 'There was an error.' ),
+			{
+				type: 'snackbar',
+			}
+		);
+	}
+}
 
+export function* saveWidgetAreas( widgetAreas ) {
 	const widgets = yield select( 'core/edit-widgets', 'getWidgets' );
 	const widgetIdToClientId = yield getWidgetToClientIdMapping();
 	const clientIdToWidgetId = invert( widgetIdToClientId );
 
-	// @TODO: Batch save and concurrency
-	for ( const widgetArea of editedWidgetAreas ) {
+	// @TODO: Batch save / concurrency
+	for ( const widgetArea of widgetAreas ) {
 		const post = yield select(
 			'core',
 			'getEditedEntityRecord',
@@ -63,4 +90,14 @@ export function* saveEditedWidgetAreas() {
 			widgetArea.id
 		);
 	}
+
+	// saveEditedEntityRecord resets the resolution status, let's fix it manually
+	yield dispatch(
+		'core',
+		'finishResolution',
+		'getEntityRecord',
+		KIND,
+		WIDGET_AREA_ENTITY_TYPE,
+		buildWidgetAreasQuery()
+	);
 }
