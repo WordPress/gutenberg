@@ -156,7 +156,7 @@
 		"parent": "filters"
 	},
 	{
-		"title": "Editor Filters (Experimental)",
+		"title": "Editor Filters",
 		"slug": "editor-filters",
 		"markdown_source": "../docs/designers-developers/developers/filters/editor-filters.md",
 		"parent": "filters"
@@ -547,8 +547,8 @@
 	},
 	{
 		"title": "Block Attributes",
-		"slug": "block-attributes",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/block-attributes.md",
+		"slug": "attributes",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/attributes.md",
 		"parent": "create-block"
 	},
 	{
