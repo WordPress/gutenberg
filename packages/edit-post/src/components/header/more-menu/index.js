@@ -28,7 +28,11 @@ const MoreMenu = ( { showTooltip } ) => (
 		icon={ moreVertical }
 		label={ __( 'Options' ) }
 		popoverProps={ POPOVER_PROPS }
-		toggleProps={ { showTooltip, ...TOGGLE_PROPS } }
+		toggleProps={ {
+			showTooltip,
+			isTertiary: ! showTooltip,
+			...TOGGLE_PROPS,
+		} }
 	>
 		{ ( { onClose } ) => (
 			<>
