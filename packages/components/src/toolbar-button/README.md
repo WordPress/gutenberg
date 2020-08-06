@@ -1,19 +1,26 @@
 # ToolbarButton
 
-A ToolbarButton can be used to add actions to your block control, usually inside a ToolbarGroup. It has similar features to the [Button](/packages/components/src/button/README.md) component. Using `ToolbarButton` will ensure the correct styling for a button in a toolbar, and also that keyboard interactions in a toolbar are consistent with the [WAI ARIA toolbar pattern](https://www.w3.org/TR/wai-aria-practices/#toolbar).
+A ToolbarButton can be used to add actions to your block control, usually inside a [Toolbar](/packages/components/src/toolbar/README.md) or [ToolbarGroup](/packages/components/src/toolbar-group/README.md).
+
+It has similar features to the [Button](/packages/components/src/button/README.md) component. Using `ToolbarButton` will ensure the correct styling for a button in a toolbar, and also that keyboard interactions in a toolbar are consistent with the [WAI-ARIA toolbar pattern](https://www.w3.org/TR/wai-aria-practices/#toolbar).
 
 ## Usage
 
 ```jsx
-import { ToolbarButton } from "@wordpress/components";
-import { edit } from "@wordpress/icons";
- 
-const MyToolbarButton = () => (
-    <MyToolbarButton
-        title="Edit"
-        icon={ edit }
-        onClick={ onEdit } />
-);
+import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { edit } from '@wordpress/icons';
+
+function MyToolbar() {
+	return (
+		<Toolbar label="Options">
+			<ToolbarButton
+				icon={ edit }
+				label="Edit"
+				onClick={ () => alert( 'Editing' ) }
+			/>
+		</Toolbar>
+	);
+}
 ```
 
 ## Props
