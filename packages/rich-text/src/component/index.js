@@ -178,6 +178,12 @@ function RichText( {
 } ) {
 	const [ activeFormats = [], setActiveFormats ] = useState();
 
+	// For backward compatibility, fall back to tagName if it's a string.
+	// tagName can now be a component for light blocks.
+	if ( ! multilineRootTag && typeof TagName === 'string' ) {
+		multilineRootTag = TagName;
+	}
+
 	function getDoc() {
 		return ref.current.ownerDocument;
 	}

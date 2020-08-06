@@ -120,9 +120,6 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	if ( ! empty( $attributes['className'] ) ) {
 		$class .= ' ' . $attributes['className'];
 	}
-	if ( isset( $attributes['align'] ) ) {
-		$class .= " align{$attributes['align']}";
-	}
 	if ( $attributes['displayAvatar'] ) {
 		$class .= ' has-avatars';
 	}

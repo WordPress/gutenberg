@@ -53,7 +53,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 
 export function MediaPlaceholder( {
 	value = {},
-	allowedTypes = [],
+	allowedTypes,
 	className,
 	icon,
 	labels = {},
@@ -86,11 +86,16 @@ export function MediaPlaceholder( {
 		setSrc( value?.src ?? '' );
 	}, [ value ] );
 
-	const onlyAllowsImages = () =>
-		allowedTypes.every(
+	const onlyAllowsImages = () => {
+		if ( ! allowedTypes || allowedTypes.length === 0 ) {
+			return false;
+		}
+
+		return allowedTypes.every(
 			( allowedType ) =>
 				allowedType === 'image' || allowedType.startsWith( 'image/' )
 		);
+	};
 
 	const onChangeSrc = ( event ) => {
 		setSrc( event.target.value );
@@ -178,8 +183,10 @@ export function MediaPlaceholder( {
 		}
 
 		if ( instructions === undefined || title === undefined ) {
-			const [ firstAllowedType ] = allowedTypes;
-			const isOneType = 1 === allowedTypes.length;
+			const typesAllowed = allowedTypes ?? [];
+
+			const [ firstAllowedType ] = typesAllowed;
+			const isOneType = 1 === typesAllowed.length;
 			const isAudio = isOneType && 'audio' === firstAllowedType;
 			const isImage = isOneType && 'image' === firstAllowedType;
 			const isVideo = isOneType && 'video' === firstAllowedType;
