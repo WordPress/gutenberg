@@ -25,6 +25,7 @@ const AnimatedKeyboardAvoidingView = Animated.createAnimatedComponent(
 );
 
 const MIN_HEIGHT = 44;
+const ANIMATION_DURATION = 200;
 
 export const KeyboardAvoidingView = ( {
 	parentHeight,
@@ -71,7 +72,7 @@ export const KeyboardAvoidingView = ( {
 		} else
 			Animated.timing( animatedHeight, {
 				toValue: MIN_HEIGHT,
-				duration: 150,
+				duration: ANIMATION_DURATION,
 				useNativeDriver: false,
 			} ).start();
 	}
