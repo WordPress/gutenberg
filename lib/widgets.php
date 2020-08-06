@@ -105,7 +105,17 @@ add_action( 'admin_footer-widgets.php', 'gutenberg_print_save_widgets_nonce' );
  */
 function gutenberg_get_legacy_widget_settings() {
 	$settings = array();
-	$core_widgets = array(
+
+	/**
+	 * Filters the list of widget classes that should **not** be offered by the legacy widget block.
+	 *
+	 * Returning an empty array will make all the widgets available.
+	 *
+	 * @param array $widgets An array of excluded widgets classnames.
+	 *
+	 * @since 5.6.0
+	 */
+	$widgets_to_exclude_from_legacy_widget_block = apply_filters( 'widgets_to_exclude_from_legacy_widget_block', array(
 		'WP_Widget_Pages',
 		'WP_Widget_Calendar',
 		'WP_Widget_Archives',
@@ -123,7 +133,7 @@ function gutenberg_get_legacy_widget_settings() {
 		'WP_Widget_Tag_Cloud',
 		'WP_Nav_Menu_Widget',
 		'WP_Widget_Custom_HTML',
-	);
+	) );
 
 	$has_permissions_to_manage_widgets = current_user_can( 'edit_theme_options' );
 	$available_legacy_widgets          = array();
@@ -139,7 +149,7 @@ function gutenberg_get_legacy_widget_settings() {
 					html_entity_decode( $widget_obj->widget_options['description'] ) :
 					null,
 				'isReferenceWidget' => false,
-				'isHidden'          => in_array( $class, $core_widgets, true ),
+				'isHidden'          => in_array( $class, $widgets_to_exclude_from_legacy_widget_block, true ),
 			);
 		}
 	}
