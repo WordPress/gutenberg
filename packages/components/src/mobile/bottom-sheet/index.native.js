@@ -335,8 +335,8 @@ class BottomSheet extends Component {
 			<Modal
 				isVisible={ isVisible }
 				style={ styles.bottomModal }
-				animationInTiming={ 300 }
-				animationOutTiming={ 250 }
+				animationInTiming={ 400 }
+				animationOutTiming={ 300 }
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 0.2 }
