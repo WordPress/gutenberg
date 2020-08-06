@@ -6,11 +6,7 @@ import classnames from 'classnames';
 
 const lineClassName = 'block-editor-block-navigator-descender-line';
 
-export default function DescenderLines( {
-	level,
-	isLastRow,
-	terminatedLevels,
-} ) {
+export default function DescenderLines( { level } ) {
 	return times( level - 1, ( index ) => {
 		// The first 'level' that has a descender line is level 2.
 		// Add 2 to the zero-based index below to reflect that.
@@ -22,8 +18,6 @@ export default function DescenderLines( {
 				aria-hidden="true"
 				className={ classnames( lineClassName, {
 					'has-item': hasItem,
-					'is-last-row': isLastRow,
-					'is-terminated': terminatedLevels.includes( currentLevel ),
 				} ) }
 			/>
 		);
