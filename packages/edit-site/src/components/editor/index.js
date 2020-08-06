@@ -57,6 +57,7 @@ function Editor() {
 		page,
 		template,
 		select,
+		hasSelectedBlock,
 	} = useSelect( ( _select ) => {
 		const {
 			isFeatureActive,
@@ -96,6 +97,9 @@ function Editor() {
 				: null,
 			select: _select,
 			entityId: _entityId,
+			hasSelectedBlock: !! _select(
+				'core/block-editor'
+			).getSelectedBlock(),
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
@@ -103,10 +107,12 @@ function Editor() {
 
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
-	// Set editor to navigation mode on component mount.
+	// Set editor to navigation mode whenever no blocks are selected.
 	useEffect( () => {
-		setNavigationMode( true );
-	}, [ true ] );
+		if ( ! hasSelectedBlock ) {
+			setNavigationMode( true );
+		}
+	}, [ hasSelectedBlock ] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
