@@ -236,7 +236,6 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		'3.42.0'
 	);
 
-
 	/*
 	 * This script registration and the corresponding function should be removed
 	 * removed once the plugin is updated to support WordPress 5.6.0 and newer.
