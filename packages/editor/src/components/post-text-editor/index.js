@@ -14,24 +14,20 @@ import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
 export default function PostTextEditor() {
-	const val = useSelect(
+	const postContent = useSelect(
 		( select ) => select( 'core/editor' ).getEditedPostContent(),
 		[]
 	);
 
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
-	const [ value, setValue ] = useState( val );
+	const [ value, setValue ] = useState( postContent );
 	const [ isDirty, setIsDirty ] = useState( false );
 	const instanceId = useInstanceId( PostTextEditor );
 
-	if ( ! isDirty && value !== val ) {
-		setValue( val );
+	if ( ! isDirty && value !== postContent ) {
+		setValue( postContent );
 	}
-
-	const onChange = ( content ) => {
-		editPost( { content } );
-	};
 
 	const onPersist = ( content ) => {
 		const blocks = parse( content );
@@ -50,12 +46,12 @@ export default function PostTextEditor() {
 	 *
 	 * @param {Event} event Change event.
 	 */
-	const edit = ( event ) => {
-		const v = event.target.value;
+	const onChange = ( event ) => {
+		const newValue = event.target.value;
 
-		onChange( v );
+		editPost( { content: newValue } );
 
-		setValue( v );
+		setValue( newValue );
 		setIsDirty( true );
 	};
 
@@ -83,7 +79,7 @@ export default function PostTextEditor() {
 				autoComplete="off"
 				dir="auto"
 				value={ value }
-				onChange={ edit }
+				onChange={ onChange }
 				onBlur={ stopEditing }
 				className="editor-post-text-editor"
 				id={ `post-content-${ instanceId }` }
