@@ -198,9 +198,9 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		global $wp_registered_sidebars;
+		$fields = $this->get_fields_for_response( $request );
 
-		$sidebars = array();
-
+		$data = array();
 		foreach ( (array) wp_get_sidebars_widgets() as $id => $widgets ) {
 			$sidebar = compact( 'id', 'widgets' );
 
@@ -214,14 +214,14 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 				$sidebar['status'] = 'inactive';
 			}
 
-			if ( 1 || $request->has_param( 'with-widgets' ) ) {
+			if ( rest_is_field_included( 'widgets', $fields ) ) {
 				$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
 			}
 
-			$sidebars[] = $sidebar;
+			$data[] = $this->prepare_item_for_response( $sidebar, $request )->get_data();
 		}
 
-		return new WP_REST_Response( $sidebars, 200 );
+		return rest_ensure_response( $data );
 	}
 
 	/**
@@ -232,15 +232,14 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function get_item( $request ) {
+		$fields  = $this->get_fields_for_response( $request );
 		$sidebar = self::get_sidebar( $request['id'] );
 
-		$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
+		if ( rest_is_field_included( 'widgets', $fields ) ) {
+			$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
+		}
 
-		ob_start();
-		dynamic_sidebar( $request['id'] );
-		$sidebar['rendered'] = ob_get_clean();
-
-		return new WP_REST_Response( $sidebar, 200 );
+		return $this->prepare_item_for_response( $sidebar, $request );
 	}
 
 	/**
@@ -352,6 +351,155 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		}
 
 		return $widgets;
+	}
+
+	/**
+	 * Prepare a single sidebar output for response
+	 *
+	 * @param array           $sidebar Sidebar instance.
+	 * @param WP_REST_Request $request Request object.
+	 *
+	 * @return WP_REST_Response $data
+	 */
+	public function prepare_item_for_response( $sidebar, $request ) {
+		$schema = $this->get_item_schema();
+		$data   = array();
+		foreach ( $schema['properties'] as $property_id => $property ) {
+			if ( isset( $sidebar[ $property_id ] ) && gettype( $sidebar[ $property_id ] ) === $property['type'] ) {
+				$data[ $property_id ] = $sidebar[ $property_id ];
+			} elseif ( isset( $property['default'] ) ) {
+				$data[ $property_id ] = $property['default'];
+			}
+		}
+
+		foreach ( $sidebar['widgets'] as $widget_id => $widget ) {
+			$widget_data = array();
+			foreach ( $schema['properties']['widgets']['items'] as $property_id => $property ) {
+				if ( isset( $widget[ $property_id ] ) && gettype( $widget[ $property_id ] ) === $property['type'] ) {
+					$widget_data[ $property_id ] = $widget[ $property_id ];
+				} elseif (' settings' === $property_id && 'array' === gettype( $widget[ $property_id ] ) ) {
+					$widget_data[ $property_id ] = $widget['settings'];
+				} elseif ( isset( $property['default'] ) ) {
+					$widget_data[ $property_id ] = $property['default'];
+				}
+			}
+			$data['widgets'][ $widget_id ] = $widget_data;
+		}
+
+		$response = rest_ensure_response( $data );
+
+		/**
+		 * Filters a sidebar location returned from the REST API.
+		 *
+		 * Allows modification of the menu location data right before it is
+		 * returned.
+		 *
+		 * @param WP_REST_Response $response The response object.
+		 * @param object           $sidebar The original status object.
+		 * @param WP_REST_Request  $request  Request used to generate the response.
+		 */
+		return apply_filters( 'rest_prepare_menu_location', $response, $sidebar, $request );
+	}
+
+	/**
+	 * Retrieves the block type' schema, conforming to JSON Schema.
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'sidebar',
+			'type'       => 'object',
+			'properties' => array(
+				'id'          => array(
+					'description' => __( 'ID of sidebar.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'name'        => array(
+					'description' => __( 'Unique name identifying the block type.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'description' => array(
+					'description' => __( 'Description of block type.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'status'      => array(
+					'description' => __( 'Sstatus of sidebar.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'widgets'     => array(
+					'description' => __( 'Nested widgets.', 'gutenberg' ),
+					'type'        => 'array',
+					'items'       => array(
+						'id'           => array(
+							'description' => __( 'Unique identifier for the widget.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'id_base'      => array(
+							'description' => __( 'Type of widget for the object.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'widget_class' => array(
+							'description' => __( 'Class name of the widget implementation.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'name'         => array(
+							'description' => __( 'Name of the widget.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'description'  => array(
+							'description' => __( 'Description of the widget.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'number'       => array(
+							'description' => __( 'Number of the widget.', 'gutenberg' ),
+							'type'        => 'integer',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'rendered'     => array(
+							'description' => __( 'HTML representation of the widget.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+							'readonly'    => true,
+						),
+						'settings'     => array(
+							'description' => __( 'Settings of the widget.', 'gutenberg' ),
+							'type'        => 'object',
+							'context'     => array( 'view', 'edit', 'embed' ),
+							'default'     => array(),
+						),
+					),
+					'default'     => array(),
+					'context'     => array( 'embed', 'view', 'edit' ),
+				),
+			),
+		);
+
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 
 }
