@@ -136,8 +136,8 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 */
 	public function update_item( $request ) {
 		global $wp_registered_widget_updates;
-		$sidebar_id    = $request->get_param( 'id' );
-		$input_widgets = $request->get_param( 'widgets' );
+		$sidebar_id    = $request['id'];
+		$input_widgets = $request['widgets'];
 
 		$numbers = array();
 		foreach ( $wp_registered_widget_updates as $id_base => $control ) {
@@ -230,12 +230,12 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function get_item( $request ) {
-		$sidebar = self::get_sidebar( $request->get_param( 'id' ) );
+		$sidebar = self::get_sidebar( $request['id'] );
 
 		$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
 
 		ob_start();
-		dynamic_sidebar( $request->get_param( 'id' ) );
+		dynamic_sidebar( $request['id'] );
 		$sidebar['rendered'] = ob_get_clean();
 
 		return new WP_REST_Response( $sidebar, 200 );
