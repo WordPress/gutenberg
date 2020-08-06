@@ -53,7 +53,7 @@ class WP_Widget_Block extends WP_Widget {
 	 * @param array $instance Settings for the current Block widget instance.
 	 */
 	public function widget( $args, $instance ) {
-		echo do_blocks( $instance[ 'content' ] );
+		echo do_blocks( $instance['content'] );
 	}
 
 	/**
@@ -67,8 +67,8 @@ class WP_Widget_Block extends WP_Widget {
 	 * @return array Settings to save or bool false to cancel saving.
 	 */
 	public function update( $new_instance, $old_instance ) {
-		$instance          = array_merge( $this->default_instance, $old_instance );
-		$instance['title'] = sanitize_text_field( $new_instance['title'] );
+		$instance            = array_merge( $this->default_instance, $old_instance );
+		$instance['title']   = sanitize_text_field( $new_instance['title'] );
 		$instance['content'] = $new_instance['content'];
 		return $instance;
 	}
@@ -82,7 +82,7 @@ class WP_Widget_Block extends WP_Widget {
 	 */
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, $this->default_instance );
-		echo do_blocks( $instance[ 'content' ] );
+		echo do_blocks( $instance['content'] );
 		?>
 		<input id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" class="title sync-input" type="hidden" value="<?php echo esc_attr( $instance['title'] ); ?>"/>
 		<textarea id="<?php echo $this->get_field_id( 'content' ); ?>" name="<?php echo $this->get_field_name( 'content' ); ?>"  class="content sync-input" hidden><?php echo esc_textarea( $instance['content'] ); ?></textarea>

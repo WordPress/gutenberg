@@ -98,7 +98,6 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 * @since 5.2.0
 	 * @access public
-	 *
 	 */
 	public function permissions_check() {
 		// Verify if the current user has edit_theme_options capability.
@@ -132,7 +131,7 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 		}
 
 		return isset( $wp_widget_factory->widgets[ $widget_class ] ) &&
-		       ( $wp_widget_factory->widgets[ $widget_class ] instanceof WP_Widget );
+			( $wp_widget_factory->widgets[ $widget_class ] instanceof WP_Widget );
 	}
 
 	/**
@@ -143,12 +142,10 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 * @since 5.7.0
 	 * @access public
-	 *
 	 */
 	public function compute_widget_form( $request ) {
 		$widget_class     = urldecode( $request->get_param( 'widget_class' ) );
 		$instance         = $request->get_param( 'instance' );
-		$instance_changes = $request->get_param( 'instance_changes' );
 
 		global $wp_widget_factory;
 		$widget_obj = $wp_widget_factory->widgets[ $widget_class ];
@@ -177,7 +174,6 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 			 * @param array $instance An array of the widget's settings.
 			 *
 			 * @since 5.2.0
-			 *
 			 */
 			do_action_ref_array( 'in_widget_form', array( &$widget_obj, &$return, $instance ) );
 		}

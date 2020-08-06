@@ -1,5 +1,4 @@
 <?php
-
 /**
  * An extension for the WP REST API that exposes endpoints for sidebars and widgets.
  *
@@ -24,6 +23,7 @@
  * @copyright 2015 Martin Pettersson
  * @license   GPLv2
  * @link      https://github.com/martin-pettersson/wp-rest-api-sidebars
+ * @package   gutenberg
  */
 
 /**
@@ -44,82 +44,92 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Registers the controllers routes
+	 * Registers the controllers routes.
 	 *
-	 * @return null
+	 * @return void
 	 */
 	public function register_routes() {
-		// lists all sidebars
+		// Lists all sidebars.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base, [
-			[
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => [ $this, 'get_items' ],
-			],
-		] );
-
-		// lists a single sidebar based on the given id
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\w-]+)',
-			[
-				[
+			'/' . $this->rest_base,
+			array(
+				array(
 					'methods'  => WP_REST_Server::READABLE,
-					'callback' => [ $this, 'get_item' ],
-					'args'     => [
-						'id' => [
-							'description'       => 'The id of a registered sidebar',
-							'type'              => 'string',
-							'validate_callback' => function ( $id ) {
-								return ! is_null( self::get_sidebar( $id ) );
-							},
-						],
-					],
-				],
-			]
+					'callback' => array( $this, 'get_items' ),
+				),
+			)
 		);
 
-		// lists a single sidebar based on the given id
+		// Lists a single sidebar based on the given id.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\w-]+)',
-			[
-				[
-					'methods'  => WP_REST_Server::EDITABLE,
-					'callback' => [ $this, 'update_item' ],
-					'args'     => [
-						'id' => [
-							'description'       => 'The id of a registered sidebar',
+			array(
+				array(
+					'methods'  => WP_REST_Server::READABLE,
+					'callback' => array( $this, 'get_item' ),
+					'args'     => array(
+						'id' => array(
+							'description'       => __( 'The id of a registered sidebar', 'gutenberg' ),
 							'type'              => 'string',
 							'validate_callback' => function ( $id ) {
 								return ! is_null( self::get_sidebar( $id ) );
 							},
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
+		);
+
+		// Update a single sidebar based on the given id.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\w-]+)',
+			array(
+				array(
+					'methods'  => WP_REST_Server::EDITABLE,
+					'callback' => array( $this, 'update_item' ),
+					'args'     => array(
+						'id'      => array(
+							'description'       => __( 'The id of a registered sidebar', 'gutenberg' ),
+							'type'              => 'string',
+							'validate_callback' => function ( $id ) {
+								return ! is_null( self::get_sidebar( $id ) );
+							},
+						),
+						'widgets' => array(
+							'description' => __( 'The list of widgets to save', 'gutenberg' ),
+							'type'        => 'array',
+						),
+					),
+				),
+			)
 		);
 	}
 
+	/**
+	 * Upodates af sidebars.
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
+	 * @return WP_REST_Response
+	 * @global array $wp_registered_widget_updates
+	 */
 	public function update_item( $request ) {
 		global $wp_registered_widget_updates;
 		$sidebar_id    = $request->get_param( 'id' );
 		$input_widgets = $request->get_param( 'widgets' );
 
-		if ( ! is_array( $input_widgets ) ) {
-			return;
-		}
-
-		$numbers = [];
+		$numbers = array();
 		foreach ( $wp_registered_widget_updates as $id_base => $control ) {
 			$numbers[ $id_base ] = $control['callback'][0]->number + 1;
 		}
 
-		$created_widgets = [];
+		$created_widgets = array();
 
-		// Create and update widgets
-		$sidebar_widgets_ids = [];
+		// Create and update widgets.
+		$sidebar_widgets_ids = array();
 		foreach ( $input_widgets as $input_widget ) {
 			if ( ! isset( $wp_registered_widget_updates[ $input_widget['id_base'] ] ) ) {
 				continue;
@@ -131,31 +141,27 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 				$input_widget['id']     = $id;
 				$input_widget['number'] = $number;
-				$created_widgets[]      = [
+				$created_widgets[]      = array(
 					'id'      => $id,
 					'number'  => $number,
 					'id_base' => $input_widget['id_base'],
-				];
+				);
 			}
 
 			$_POST = $input_widget;
 
 			$_POST[ 'widget-' . $input_widget['id_base'] ][ $input_widget['number'] ] = $input_widget['settings'];
-			call_user_func_array( $update_control['callback'], [] );
+			call_user_func_array( $update_control['callback'], array() );
 			$update_control['callback'][0]->updated = false;
 
 			$sidebar_widgets_ids[] = $input_widget['id'];
 		}
 
-		// Update sidebar to only have the widgets we just processed
+		// Update sidebar to only have the widgets we just processed.
 		$sidebars                = wp_get_sidebars_widgets();
 		$sidebars[ $sidebar_id ] = $sidebar_widgets_ids;
 		wp_set_sidebars_widgets( $sidebars );
 
-//		return new WP_REST_Response( [
-//			'success'         => true,
-//			'created_widgets' => $created_widgets,
-//		], 200 );
 		$request = new WP_REST_Request( 'GET' );
 		$request->set_param( 'id', $sidebar_id );
 
@@ -165,21 +171,15 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Returns a list of sidebars (active or inactive)
 	 *
-	 * @param WP_REST_Request $request
+	 * @param WP_REST_Request $request The request instance.
 	 *
 	 * @return WP_REST_Response
 	 * @global array $wp_registered_sidebars
-	 *
 	 */
 	public function get_items( $request ) {
-		// do type checking here as the method declaration must be compatible with parent
-		if ( ! $request instanceof WP_REST_Request ) {
-			throw new InvalidArgumentException( __METHOD__ . ' expects an instance of WP_REST_Request' );
-		}
-
 		global $wp_registered_sidebars;
 
-		$sidebars = [];
+		$sidebars = array();
 
 		foreach ( (array) wp_get_sidebars_widgets() as $id => $widgets ) {
 			$sidebar = compact( 'id', 'widgets' );
@@ -207,16 +207,11 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Returns the given sidebar
 	 *
-	 * @param WP_REST_Request $request
+	 * @param WP_REST_Request $request The request instance.
 	 *
 	 * @return WP_REST_Response
 	 */
 	public function get_item( $request ) {
-		// do type checking here as the method declaration must be compatible with parent
-		if ( ! $request instanceof WP_REST_Request ) {
-			throw new InvalidArgumentException( __METHOD__ . ' expects an instance of WP_REST_Request' );
-		}
-
 		$sidebar = self::get_sidebar( $request->get_param( 'id' ) );
 
 		$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
@@ -233,11 +228,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 *
 	 * Note: The id can be either an index, the id or the name of a sidebar
 	 *
-	 * @param string $id
+	 * @param string $id ID of the sidebar.
 	 *
 	 * @return array|null
 	 * @global array $wp_registered_sidebars
-	 *
 	 */
 	public static function get_sidebar( $id ) {
 		global $wp_registered_sidebars;
@@ -248,7 +242,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			$id = sanitize_title( $id );
 
 			foreach ( (array) $wp_registered_sidebars as $key => $sidebar ) {
-				if ( sanitize_title( $sidebar['name'] ) == $id ) {
+				if ( sanitize_title( $sidebar['name'] ) === $id ) {
 					return $sidebar;
 				}
 			}
@@ -266,35 +260,37 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Returns a list of widgets for the given sidebar id
 	 *
-	 * @param string $sidebar_id
+	 * @param string $sidebar_id ID of the sidebar.
 	 *
 	 * @return array
 	 * @global array $wp_registered_widgets
 	 * @global array $wp_registered_sidebars
-	 *
 	 */
 	public static function get_widgets( $sidebar_id ) {
 		global $wp_registered_widgets, $wp_registered_sidebars;
 
-		$widgets          = [];
+		$widgets          = array();
 		$sidebars_widgets = (array) wp_get_sidebars_widgets();
 
 		if ( isset( $wp_registered_sidebars[ $sidebar_id ] ) && isset( $sidebars_widgets[ $sidebar_id ] ) ) {
 			foreach ( $sidebars_widgets[ $sidebar_id ] as $widget_id ) {
-				// just to be sure
+				// Just to be sure.
 				if ( isset( $wp_registered_widgets[ $widget_id ] ) ) {
 					$widget = $wp_registered_widgets[ $widget_id ];
 
-					// get the widget output
+					// Get the widget output.
 					if ( is_callable( $widget['callback'] ) ) {
-						// @note: everything up to ob_start is taken from the dynamic_sidebar function
+						// @note: everything up to ob_start is taken from the dynamic_sidebar function.
 						$widget_parameters = array_merge(
-							[
-								array_merge( $wp_registered_sidebars[ $sidebar_id ], [
-									'widget_id'   => $widget_id,
-									'widget_name' => $widget['name'],
-								] ),
-							],
+							array(
+								array_merge(
+									$wp_registered_sidebars[ $sidebar_id ],
+									array(
+										'widget_id'   => $widget_id,
+										'widget_name' => $widget['name'],
+									)
+								),
+							),
 							(array) $widget['params']
 						);
 
