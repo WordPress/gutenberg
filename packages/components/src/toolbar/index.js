@@ -29,6 +29,8 @@ function Toolbar( { className, label, ...props }, ref ) {
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
 			alternative: 'ToolbarGroup component',
+			link:
+				'https://developer.wordpress.org/block-editor/components/toolbar/',
 		} );
 		return <ToolbarGroup { ...props } className={ className } />;
 	}
