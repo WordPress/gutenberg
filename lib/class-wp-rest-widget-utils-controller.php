@@ -144,8 +144,8 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function compute_widget_form( $request ) {
-		$widget_class     = urldecode( $request->get_param( 'widget_class' ) );
-		$instance         = $request->get_param( 'instance' );
+		$widget_class = urldecode( $request->get_param( 'widget_class' ) );
+		$instance     = $request->get_param( 'instance' );
 
 		global $wp_widget_factory;
 		$widget_obj = $wp_widget_factory->widgets[ $widget_class ];

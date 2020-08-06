@@ -31,14 +31,14 @@ class WP_Widget_Block extends WP_Widget {
 	public function __construct() {
 		$widget_ops  = array(
 			'classname'                   => 'widget_block',
-			'description'                 => __( 'Gutenberg block.' ),
+			'description'                 => __( 'Gutenberg block.', 'gutenberg' ),
 			'customize_selective_refresh' => true,
 		);
 		$control_ops = array(
 			'width'  => 400,
 			'height' => 350,
 		);
-		parent::__construct( 'block', __( 'Gutenberg Block' ), $widget_ops, $control_ops );
+		parent::__construct( 'block', __( 'Gutenberg Block', 'gutenberg' ), $widget_ops, $control_ops );
 	}
 
 	/**

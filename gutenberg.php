@@ -182,7 +182,9 @@ function register_site_icon_url( $response ) {
 
 add_filter( 'rest_index', 'register_site_icon_url' );
 
-
+/**
+ * Registers the WP_Widget_Block widget
+ */
 function gutenberg_register_widgets() {
 	register_widget( 'WP_Widget_Block' );
 }
