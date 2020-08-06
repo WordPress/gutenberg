@@ -111,7 +111,7 @@ function BlockList(
 									isDropTarget &&
 									orientation === 'horizontal',
 							} ) }
-							__experimentalCallback={
+							__experimentalRenderCallback={
 								__experimentalItemCallback
 							}
 						/>

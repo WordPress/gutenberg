@@ -93,7 +93,7 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
-	__experimentalCallback: wrapperCallback,
+	__experimentalRenderCallback: renderCallback,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -198,8 +198,8 @@ function BlockListBlock( {
 		);
 	}
 
-	if ( wrapperCallback ) {
-		blockEdit = wrapperCallback( blockEdit );
+	if ( renderCallback ) {
+		blockEdit = renderCallback( blockEdit );
 	}
 
 	const value = {

@@ -280,7 +280,7 @@ export class BlockList extends Component {
 				onCaretVerticalPositionChange={
 					this.onCaretVerticalPositionChange
 				}
-				__experimentalCallback={ __experimentalItemCallback }
+				__experimentalRenderCallback={ __experimentalItemCallback }
 			/>
 		);
 	}

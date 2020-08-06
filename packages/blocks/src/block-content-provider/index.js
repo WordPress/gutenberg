@@ -37,7 +37,7 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
 		// Value is an array of blocks, so defer to block serializer
 		const html = serialize( innerBlocks, {
 			isInnerBlocks: true,
-			__experimentalCallback: __experimentalItemCallback,
+			__experimentalRenderCallback: __experimentalItemCallback,
 		} );
 
 		// Use special-cased raw HTML tag to avoid default escaping
