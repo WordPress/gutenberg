@@ -198,10 +198,6 @@ function BlockListBlock( {
 		);
 	}
 
-	if ( renderCallback ) {
-		blockEdit = renderCallback( blockEdit );
-	}
-
 	const value = {
 		clientId,
 		rootClientId,
@@ -244,6 +240,10 @@ function BlockListBlock( {
 		block = blockEdit;
 	} else {
 		block = <Block.div { ...wrapperProps }>{ blockEdit }</Block.div>;
+	}
+
+	if ( renderCallback ) {
+		block = renderCallback( block );
 	}
 
 	return (
