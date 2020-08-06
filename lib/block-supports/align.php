@@ -11,7 +11,10 @@
  * @param  array $block_type Block Type.
  */
 function gutenberg_register_alignment_support( $block_type ) {
-	$has_align_support = gutenberg_experimental_get( $block_type->supports, array( 'align' ), false );
+	$has_align_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$has_align_support = gutenberg_experimental_get( $block_type->supports, array( 'align' ), false );
+	}
 	if ( $has_align_support ) {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
