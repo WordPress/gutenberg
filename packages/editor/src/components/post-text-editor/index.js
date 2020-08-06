@@ -29,12 +29,6 @@ export default function PostTextEditor() {
 		setValue( postContent );
 	}
 
-	const onPersist = ( content ) => {
-		const blocks = parse( content );
-
-		resetEditorBlocks( blocks );
-	};
-
 	/**
 	 * Handles a textarea change event to notify the onChange prop callback and
 	 * reflect the new value in the component's own state. This marks the start
@@ -62,7 +56,9 @@ export default function PostTextEditor() {
 	 */
 	const stopEditing = () => {
 		if ( isDirty ) {
-			onPersist( value );
+			const blocks = parse( value );
+			resetEditorBlocks( blocks );
+
 			setIsDirty( false );
 		}
 	};
