@@ -17,7 +17,7 @@ import {
 	MediaPlaceholder,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
@@ -100,6 +100,7 @@ export function ImageEdit( {
 	}, [ caption ] );
 
 	const ref = useRef();
+	const [ state, setState ] = useState( { hasError: false } );
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return getSettings().mediaUpload;
@@ -168,6 +169,7 @@ export function ImageEdit( {
 			...mediaAttributes,
 			...additionalAttributes,
 		} );
+		setState( { hasError: false } );
 	}
 
 	function onSelectURL( newURL ) {
@@ -209,6 +211,7 @@ export function ImageEdit( {
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
 					noticeOperations.createErrorNotice( message );
+					setState( { hasError: true } );
 				},
 			} );
 		}
@@ -270,6 +273,20 @@ export function ImageEdit( {
 	// Focussing the image caption after inserting an image relies on the
 	// component remounting. This needs to be fixed.
 	const key = !! url;
+
+	if ( state.hasError ) {
+		return (
+			<Block.figure ref={ ref } className={ classes } key={ key }>
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					notices={ noticeUI }
+					onError={ onUploadError }
+					accept="image/*"
+				/>
+			</Block.figure>
+		);
+	}
 
 	return (
 		<>
