@@ -6,6 +6,47 @@
  */
 
 /**
+ * Registers the style and colors block attributes for block types that support it.
+ *
+ * @param  array $block_type Block Type.
+ */
+function gutenberg_register_colors_support( $block_type ) {
+	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), false );
+	$has_text_colors_support       = is_array( $color_support ) || $color_support;
+	$has_background_colors_support = $has_text_colors_support;
+	$has_gradients_support         = $has_text_colors_support && gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
+
+	if ( ! $block_type->attributes ) {
+		$block_type->attributes = array();
+	}
+
+	if ( $has_text_colors_support && ! array_key_exists( 'style', $block_type->attributes ) ) {
+		$block_type->attributes['style'] = array(
+			'type' => 'object',
+		);
+	}
+
+	if ( $has_background_colors_support && ! array_key_exists( 'backgroundColor', $block_type->attributes ) ) {
+		$block_type->attributes['backgroundColor'] = array(
+			'type' => 'string',
+		);
+	}
+
+	if ( $has_text_colors_support && ! array_key_exists( 'textColor', $block_type->attributes ) ) {
+		$block_type->attributes['textColor'] = array(
+			'type' => 'string',
+		);
+	}
+
+	if ( $has_gradients_support && ! array_key_exists( 'gradient', $block_type->attributes ) ) {
+		$block_type->attributes['gradient'] = array(
+			'type' => 'string',
+		);
+	}
+}
+
+
+/**
  * Add CSS classes and inline styles for colors to the incoming attributes array.
  * This will be applied to the block markup in the front-end.
  *
