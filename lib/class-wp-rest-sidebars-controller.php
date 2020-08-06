@@ -61,7 +61,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			)
 		);
 
-		// Lists a single sidebar based on the given id.
+		// Lists/updates a single sidebar based on the given id.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\w-]+)',
@@ -80,14 +80,6 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						),
 					),
 				),
-			)
-		);
-
-		// Update a single sidebar based on the given id.
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\w-]+)',
-			array(
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'update_item' ),
