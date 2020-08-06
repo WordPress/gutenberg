@@ -34,7 +34,8 @@ function gutenberg_register_alignment_support( $block_type ) {
  * @return array Block alignment CSS classes and inline styles.
  */
 function gutenberg_apply_alignment_support( $attributes, $block_attributes, $block_type ) {
-	if ( $block_type->supports && array_key_exists( 'align', $block_type->supports ) ) {
+	$has_align_support = gutenberg_experimental_get( $block_type->supports, array( 'align' ), false );
+	if ( $has_align_support ) {
 		$has_block_alignment = array_key_exists( 'align', $block_attributes );
 
 		if ( $has_block_alignment ) {
