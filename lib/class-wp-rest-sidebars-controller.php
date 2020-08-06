@@ -67,9 +67,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			'/' . $this->rest_base . '/(?P<id>[\w-]+)',
 			array(
 				array(
-					'methods'  => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_item' ),
-					'args'     => array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => array(
 						'id' => array(
 							'description'       => __( 'The id of a registered sidebar', 'gutenberg' ),
 							'type'              => 'string',
@@ -88,9 +89,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			'/' . $this->rest_base . '/(?P<id>[\w-]+)',
 			array(
 				array(
-					'methods'  => WP_REST_Server::EDITABLE,
-					'callback' => array( $this, 'update_item' ),
-					'args'     => array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'update_item' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => array(
 						'id'      => array(
 							'description'       => __( 'The id of a registered sidebar', 'gutenberg' ),
 							'type'              => 'string',
@@ -109,7 +111,31 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Upodates af sidebars.
+	 * Checks if the user has permissions to make the request.
+	 *
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 * @since 5.6.0
+	 * @access public
+	 */
+	public function permissions_check() {
+		// Verify if the current user has edit_theme_options capability.
+		// This capability is required to access the widgets screen.
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
+			return new WP_Error(
+				'widgets_cannot_access',
+				__( 'Sorry, you are not allowed to access widgets on this site.', 'gutenberg' ),
+				array(
+					'status' => rest_authorization_required_code(),
+				)
+			);
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Updates the sidebar.
 	 *
 	 * @param WP_REST_Request $request The request instance.
 	 *
