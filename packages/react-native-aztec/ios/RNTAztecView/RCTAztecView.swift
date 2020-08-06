@@ -306,9 +306,11 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Edits
 
     open override func insertText(_ text: String) {
-        guard !interceptEnter(text), !interceptTriggersKeyCodes(text) else {
+        guard !interceptEnter(text) else {
             return
         }
+
+        interceptTriggersKeyCodes(text)
 
         super.insertText(text)
         updatePlaceholderVisibility()
@@ -374,13 +376,13 @@ class RCTAztecView: Aztec.TextView {
         return true
     }
 
-    private func interceptTriggersKeyCodes(_ text: String) -> Bool {
+    private func interceptTriggersKeyCodes(_ text: String) {
         guard let keyCodes = triggerKeyCodes,
             keyCodes.count > 0,
             let onKeyDown = onKeyDown,
             text.count == 1
         else {
-            return false
+            return
         }
         for value in keyCodes {
             guard let keyString = value as? String,
@@ -393,9 +395,8 @@ class RCTAztecView: Aztec.TextView {
             var eventData = [AnyHashable:Any]()
             eventData = add(keyCode: keyCode, to: eventData)
             onKeyDown(eventData)
-            return true
+            return
         }
-        return false;
     }
 
     private func isNewLineBeforeSelectionAndNotEndOfContent() -> Bool {
