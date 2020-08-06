@@ -1,16 +1,16 @@
 .wp-block-latest-comments__comment {
-	font-size: 15px;
+	font-size: 1rem;
 	line-height: 1.1;
 	list-style: none;
 	margin-bottom: 1em;
 
 	.has-avatars & {
-		min-height: 36px;
+		min-height: 2.25rem;
 		list-style: none;
 
 		.wp-block-latest-comments__comment-meta,
 		.wp-block-latest-comments__comment-excerpt {
-			margin-left: 52px;
+			margin-left: 3.25rem;
 		}
 	}
 
@@ -21,23 +21,23 @@
 }
 
 .wp-block-latest-comments__comment-excerpt p {
-	font-size: 14px;
+	font-size: 0.875rem;
 	line-height: 1.8;
-	margin: 5px 0 20px;
+	margin: 0.3125rem 0 1.25rem;
 }
 
 .wp-block-latest-comments__comment-date {
 	color: $dark-gray-100;
 	display: block;
-	font-size: 12px;
+	font-size: 0.75rem;
 }
 
 .wp-block-latest-comments .avatar,
 .wp-block-latest-comments__comment-avatar {
-	border-radius: 24px;
+	border-radius: 1.5rem;
 	display: block;
 	float: left;
-	height: 40px;
-	margin-right: 12px;
-	width: 40px;
+	height: 2.5rem;
+	margin-right: 0.75rem;
+	width: 2.5rem;
 }
