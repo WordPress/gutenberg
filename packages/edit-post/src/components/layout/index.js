@@ -50,6 +50,7 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
+import PopoverWrapper from './popover-wrapper';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block library' ),
@@ -178,29 +179,35 @@ function Layout() {
 					leftSidebar={
 						mode === 'visual' &&
 						isInserterOpened && (
-							<div className="edit-post-layout__inserter-panel">
-								<div className="edit-post-layout__inserter-panel-header">
-									<Button
-										icon={ close }
-										onClick={ () =>
-											setIsInserterOpened( false )
-										}
-									/>
-								</div>
-								<div className="edit-post-layout__inserter-panel-content">
-									<Library
-										showMostUsedBlocks={
-											showMostUsedBlocks
-										}
-										showInserterHelpPanel
-										onSelect={ () => {
-											if ( isMobileViewport ) {
-												setIsInserterOpened( false );
+							<PopoverWrapper
+								onClose={ () => setIsInserterOpened( false ) }
+							>
+								<div className="edit-post-layout__inserter-panel">
+									<div className="edit-post-layout__inserter-panel-header">
+										<Button
+											icon={ close }
+											onClick={ () =>
+												setIsInserterOpened( false )
 											}
-										} }
-									/>
+										/>
+									</div>
+									<div className="edit-post-layout__inserter-panel-content">
+										<Library
+											showMostUsedBlocks={
+												showMostUsedBlocks
+											}
+											showInserterHelpPanel
+											onSelect={ () => {
+												if ( isMobileViewport ) {
+													setIsInserterOpened(
+														false
+													);
+												}
+											} }
+										/>
+									</div>
 								</div>
-							</div>
+							</PopoverWrapper>
 						)
 					}
 					sidebar={

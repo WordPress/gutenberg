@@ -20,8 +20,10 @@ import {
 	__experimentalToolbarItem as ToolbarItem,
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
+import { useRef } from '@wordpress/element';
 
 function HeaderToolbar() {
+	const inserterButton = useRef();
 	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
 	const {
 		hasFixedToolbar,
@@ -72,11 +74,22 @@ function HeaderToolbar() {
 			aria-label={ toolbarAriaLabel }
 		>
 			<ToolbarItem
+				ref={ inserterButton }
 				as={ Button }
 				className="edit-post-header-toolbar__inserter-toggle"
 				isPrimary
 				isPressed={ isInserterOpened }
-				onClick={ () => setIsInserterOpened( ! isInserterOpened ) }
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				onClick={ () => {
+					if ( isInserterOpened ) {
+						// Focusing the inserter button closes the inserter popover
+						inserterButton.current.focus();
+					} else {
+						setIsInserterOpened( true );
+					}
+				} }
 				disabled={ ! isInserterEnabled }
 				icon={ plus }
 				label={ _x(
