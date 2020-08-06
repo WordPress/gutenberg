@@ -166,9 +166,11 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 				);
 			}
 
-			$_POST = $input_widget;
+			$field  = 'widget-' . $input_widget['id_base'];
+			$number = $input_widget['number'];
+			$_POST  = $input_widget;
 
-			$_POST[ 'widget-' . $input_widget['id_base'] ][ $input_widget['number'] ] = $input_widget['settings'];
+			$_POST[ $field ][ $number ] = wp_slash( $input_widget['settings'] );
 			call_user_func_array( $update_control['callback'], array() );
 			$update_control['callback'][0]->updated = false;
 
