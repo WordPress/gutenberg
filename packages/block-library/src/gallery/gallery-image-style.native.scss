@@ -45,7 +45,6 @@ $caption-padding-vertical: 8px;
 
 .separator {
 	border-right-color: $gray-30;
-	// border-right-width: StyleSheet.hairlineWidth;
 	border-right-width: 1px;
 	height: 20px;
 }
@@ -118,20 +117,14 @@ $caption-padding-vertical: 8px;
 	color: #ccc;
 }
 
-/*
-.captionDark {
-	background-color: #0007;
-}
-*/
-
 // expand caption container to compensate for overlay border
 .captionExpandedContainer {
 	// constrain height to gallery image height for caption scroll
 	max-height: $gallery-image-container-height;
 	position: absolute;
 	bottom: 0;
-	left: $overlay-border-width;
-	right: $overlay-border-width;
+	left: 0;
+	right: 0;
 	padding-top: $caption-padding-vertical;
 	padding-bottom: $overlay-border-width + $caption-padding-vertical;
 	padding-left: $overlay-border-width;

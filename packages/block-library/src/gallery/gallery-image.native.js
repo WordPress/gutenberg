@@ -213,7 +213,7 @@ class GalleryImage extends Component {
 
 		const captionStyle = shouldShowCaptionExpanded
 			? style.captionExpanded
-			: getStylesFromColorScheme( style.caption, style.captionDark );
+			: style.caption;
 
 		return (
 			<>
