@@ -8,7 +8,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import Cell from './cell';
 import styles from './styles.scss';
 
-function UnsupportedFooterCell( props ) {
+function FooterMessageCell( props ) {
 	const { ...cellProps } = props;
 
 	return (
@@ -22,4 +22,4 @@ function UnsupportedFooterCell( props ) {
 	);
 }
 
-export default withPreferredColorScheme( UnsupportedFooterCell );
+export default withPreferredColorScheme( FooterMessageCell );

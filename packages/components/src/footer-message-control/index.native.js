@@ -1,19 +1,19 @@
 /**
  * Internal dependencies
  */
-import UnsupportedFooterCell from '../mobile/bottom-sheet/unsupported-footer-cell';
+import FooterMessageCell from '../mobile/bottom-sheet/footer-message-cell';
 
-function UnsupportedFooterControl( {
+function FooterMessageControl( {
 	label,
 	help,
 	instanceId,
 	className,
 	...props
 } ) {
-	const id = `inspector-unsupported-footer-control-${ instanceId }`;
+	const id = `inspector-footer-message-control-${ instanceId }`;
 
 	return (
-		<UnsupportedFooterCell
+		<FooterMessageCell
 			label={ label }
 			id={ id }
 			help={ help }
@@ -24,4 +24,4 @@ function UnsupportedFooterControl( {
 	);
 }
 
-export default UnsupportedFooterControl;
+export default FooterMessageControl;
