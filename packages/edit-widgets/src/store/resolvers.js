@@ -13,6 +13,7 @@ import {
 	WIDGET_AREA_ENTITY_TYPE,
 	buildWidgetAreasQuery,
 	buildWidgetAreaPostId,
+	buildWidgetAreasPostId,
 } from './utils';
 import { transformWidgetToBlock } from './transformers';
 
@@ -27,33 +28,31 @@ export function* getWidgetAreas() {
 		query
 	);
 
+	const widgetAreaBlocks = [];
 	const widgetIdToClientId = {};
 	for ( const widgetArea of widgetAreas ) {
-		const blocks = [];
+		const widgetBlocks = [];
 		for ( const widget of widgetArea.widgets ) {
 			const block = transformWidgetToBlock( widget );
 			widgetIdToClientId[ widget.id ] = block.clientId;
-			blocks.push( block );
+			widgetBlocks.push( block );
 		}
 
 		// Persist the actual post containing the navigation block
-		const widgetAreaBlock = createBlock(
-			'core/widget-area',
-			{
-				id: widgetArea.id,
-				name: widgetArea.name,
-			},
-			blocks
+		yield persistStubPost(
+			buildWidgetAreaPostId( widgetArea.id ),
+			widgetBlocks
 		);
 
-		// Dispatch startResolution and finishResolution to skip the execution of the real getEntityRecord resolver - it would
-		// issue an http request and fail.
-		const stubPost = createStubPost( widgetArea.id, widgetAreaBlock );
-		const args = [ KIND, POST_TYPE, stubPost.id ];
-		yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
-		yield persistPost( stubPost );
-		yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
+		widgetAreaBlocks.push(
+			createBlock( 'core/widget-area', {
+				id: widgetArea.id,
+				name: widgetArea.name,
+			} )
+		);
 	}
+
+	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
 
 	yield {
 		type: 'SET_WIDGET_TO_CLIENT_ID_MAPPING',
@@ -61,27 +60,30 @@ export function* getWidgetAreas() {
 	};
 }
 
-const createStubPost = ( widgetAreaId, widgetAreaBlock ) => {
-	const id = buildWidgetAreaPostId( widgetAreaId );
-	return {
-		id,
-		slug: id,
-		status: 'draft',
-		type: 'page',
-		blocks: [ widgetAreaBlock ],
-		meta: {
-			widgetAreaId,
-		},
-	};
-};
-
-const persistPost = ( post ) =>
-	dispatch(
+const persistStubPost = function* ( id, blocks ) {
+	const stubPost = createStubPost( id, blocks );
+	const args = [ KIND, POST_TYPE, id ];
+	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
+	yield dispatch(
 		'core',
 		'receiveEntityRecords',
 		KIND,
 		POST_TYPE,
-		post,
-		{ id: post.id },
+		stubPost,
+		{ id: stubPost.id },
 		false
 	);
+	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
+	return stubPost;
+};
+
+const createStubPost = ( id, blocks ) => ( {
+	id,
+	slug: id,
+	status: 'draft',
+	type: 'page',
+	blocks,
+	meta: {
+		widgetAreaId: id,
+	},
+} );

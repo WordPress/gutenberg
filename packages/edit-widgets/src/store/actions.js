@@ -65,8 +65,7 @@ export function* saveWidgetAreas( widgetAreas ) {
 			POST_TYPE,
 			buildWidgetAreaPostId( widgetArea.id )
 		);
-		const widgetAreaBlock = post.blocks[ 0 ];
-		const widgetsBlocks = widgetAreaBlock.innerBlocks;
+		const widgetsBlocks = post.blocks;
 		const newWidgets = widgetsBlocks.map( ( block ) => {
 			const widgetId = clientIdToWidgetId[ block.clientId ];
 			const oldWidget = widgets[ widgetId ];
@@ -88,6 +87,15 @@ export function* saveWidgetAreas( widgetAreas ) {
 			KIND,
 			WIDGET_AREA_ENTITY_TYPE,
 			widgetArea.id
+		);
+
+		yield dispatch(
+			'core',
+			'receiveEntityRecords',
+			KIND,
+			POST_TYPE,
+			post,
+			undefined
 		);
 	}
 

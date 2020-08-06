@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { defaultTo } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -6,21 +11,71 @@ import {
 	SlotFillProvider,
 	FocusReturnProvider,
 } from '@wordpress/components';
-import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
+import { uploadMedia } from '@wordpress/media-utils';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+import {
+	BlockEditorProvider,
+	BlockEditorKeyboardShortcuts,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import { useEntityBlockEditor } from '@wordpress/core-data';
+import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 
-export default function WidgetAreasBlockEditorProvider( { children } ) {
+export default function WidgetAreasBlockEditorProvider( {
+	blockEditorSettings,
+	...props
+} ) {
+	const { hasUploadPermissions } = useSelect( ( select ) => ( {
+		hasUploadPermissions: defaultTo(
+			select( 'core' ).canUser( 'create', 'media' ),
+			true
+		),
+	} ) );
+
+	const settings = useMemo( () => {
+		let mediaUploadBlockEditor;
+		if ( hasUploadPermissions ) {
+			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
+				uploadMedia( {
+					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
+					onError: ( { message } ) => onError( message ),
+					...argumentsObject,
+				} );
+			};
+		}
+		return {
+			...blockEditorSettings,
+			mediaUpload: mediaUploadBlockEditor,
+			templateLock: 'all',
+		};
+	}, [ blockEditorSettings, hasUploadPermissions ] );
+
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		KIND,
+		POST_TYPE,
+		{ id: buildWidgetAreasPostId() }
+	);
+
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<DropZoneProvider>
-					<FocusReturnProvider>{ children }</FocusReturnProvider>
+					<FocusReturnProvider>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ onInput }
+							onChange={ onChange }
+							settings={ settings }
+							{ ...props }
+						/>
+					</FocusReturnProvider>
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</>

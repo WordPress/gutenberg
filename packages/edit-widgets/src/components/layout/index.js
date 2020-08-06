@@ -14,31 +14,32 @@ import Sidebar from '../sidebar';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
 function Layout( { blockEditorSettings } ) {
-	const hasSidebarEnabled = useSelect( ( select ) => {
-		return !! select( 'core/interface' ).getActiveComplementaryArea(
-			'core/edit-widgets'
-		);
-	} );
+	const hasSidebarEnabled = useSelect(
+		( select ) =>
+			!! select( 'core/interface' ).getActiveComplementaryArea(
+				'core/edit-widgets'
+			)
+	);
 	return (
-		<>
-			<WidgetAreasBlockEditorProvider>
-				<InterfaceSkeleton
-					header={ <Header /> }
-					sidebar={
-						hasSidebarEnabled && (
-							<ComplementaryArea.Slot scope="core/edit-widgets" />
-						)
-					}
-					content={
-						<WidgetAreasBlockEditorContent
-							blockEditorSettings={ blockEditorSettings }
-						/>
-					}
-				/>
-				<Sidebar />
-				<Popover.Slot />
-			</WidgetAreasBlockEditorProvider>
-		</>
+		<WidgetAreasBlockEditorProvider
+			blockEditorSettings={ blockEditorSettings }
+		>
+			<InterfaceSkeleton
+				header={ <Header /> }
+				sidebar={
+					hasSidebarEnabled && (
+						<ComplementaryArea.Slot scope="core/edit-widgets" />
+					)
+				}
+				content={
+					<WidgetAreasBlockEditorContent
+						blockEditorSettings={ blockEditorSettings }
+					/>
+				}
+			/>
+			<Sidebar />
+			<Popover.Slot />
+		</WidgetAreasBlockEditorProvider>
 	);
 }
 

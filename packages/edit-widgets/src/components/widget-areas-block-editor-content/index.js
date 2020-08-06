@@ -1,40 +1,23 @@
 /**
- * External dependencies
- */
-import { defaultTo } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Popover } from '@wordpress/components';
-import { uploadMedia } from '@wordpress/media-utils';
 import {
-	BlockEditorProvider,
+	BlockList,
 	BlockEditorKeyboardShortcuts,
 	WritingFlow,
 	ObserveTyping,
-	BlockList,
 } from '@wordpress/block-editor';
-import { useEntityBlockEditor } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import { KIND, POST_TYPE, buildWidgetAreaPostId } from '../../store/utils';
 
-const EMPTY_ARRAY = [];
-export default function WidgetAreasBlockEditorContent( {
-	blockEditorSettings,
-} ) {
+export default function WidgetAreasBlockEditorContent( {} ) {
 	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
-	const widgetAreas = useSelect( ( select ) => {
-		const { getWidgetAreas } = select( 'core/edit-widgets' );
-		return getWidgetAreas() || EMPTY_ARRAY;
-	} );
 
 	return (
 		<>
@@ -54,67 +37,11 @@ export default function WidgetAreasBlockEditorContent( {
 				>
 					<WritingFlow>
 						<ObserveTyping>
-							{ widgetAreas.map( ( widgetArea ) => {
-								return (
-									<WidgetAreaEditor
-										key={ widgetArea.id }
-										blockEditorSettings={
-											blockEditorSettings
-										}
-										widgetArea={ widgetArea }
-									/>
-								);
-							} ) }
+							<BlockList className="edit-widgets-main-block-list" />
 						</ObserveTyping>
 					</WritingFlow>
 				</div>
 			</div>
 		</>
-	);
-}
-
-function WidgetAreaEditor( { widgetArea, blockEditorSettings } ) {
-	const { hasUploadPermissions } = useSelect( ( select ) => {
-		return {
-			hasUploadPermissions: defaultTo(
-				select( 'core' ).canUser( 'create', 'media' ),
-				true
-			),
-		};
-	} );
-
-	const settings = useMemo( () => {
-		let mediaUploadBlockEditor;
-		if ( hasUploadPermissions ) {
-			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
-				uploadMedia( {
-					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
-					...argumentsObject,
-				} );
-			};
-		}
-		return {
-			...blockEditorSettings,
-			mediaUpload: mediaUploadBlockEditor,
-			templateLock: 'all',
-		};
-	}, [ blockEditorSettings, hasUploadPermissions ] );
-
-	const [ blocks, onInput, _onChange ] = useEntityBlockEditor(
-		KIND,
-		POST_TYPE,
-		{ id: buildWidgetAreaPostId( widgetArea.id ) }
-	);
-
-	return (
-		<BlockEditorProvider
-			value={ blocks }
-			onInput={ onInput }
-			onChange={ _onChange }
-			settings={ settings }
-		>
-			<BlockList className="edit-widgets-main-block-list" />
-		</BlockEditorProvider>
 	);
 }
