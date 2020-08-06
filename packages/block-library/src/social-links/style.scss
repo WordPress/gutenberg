@@ -17,18 +17,23 @@
 
 .wp-social-link {
 	display: block;
-	width: 36px;
-	height: 36px;
-	border-radius: 36px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
-	margin-right: 8px;
+	width: 2.25rem;
+	height: 2.25rem;
+	border-radius: 2.25rem; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
+	margin-right: 0.5rem;
 	transition: transform 0.1s ease;
 	@include reduce-motion("transition");
 
 	a {
-		padding: 6px;
+		padding: 0.375rem;
 		display: block;
 		line-height: 0;
 		transition: transform 0.1s ease;
+
+		svg {
+			width: 1.5rem;
+			height: 1.5rem;
+		}
 	}
 
 	a,
@@ -65,10 +70,10 @@
 		background: none;
 
 		// Make these bigger.
-		padding: 4px;
+		padding: 0.25rem;
 		svg {
-			width: 28px;
-			height: 28px;
+			width: 1.75rem;
+			height: 1.75rem;
 		}
 	}
 
