@@ -377,7 +377,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			foreach ( $schema['properties']['widgets']['items'] as $property_id => $property ) {
 				if ( isset( $widget[ $property_id ] ) && gettype( $widget[ $property_id ] ) === $property['type'] ) {
 					$widget_data[ $property_id ] = $widget[ $property_id ];
-				} elseif (' settings' === $property_id && 'array' === gettype( $widget[ $property_id ] ) ) {
+				} elseif ( 'settings' === $property_id && 'array' === gettype( $widget[ $property_id ] ) ) {
 					$widget_data[ $property_id ] = $widget['settings'];
 				} elseif ( isset( $property['default'] ) ) {
 					$widget_data[ $property_id ] = $property['default'];
