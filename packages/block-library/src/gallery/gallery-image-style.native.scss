@@ -92,9 +92,9 @@ $caption-padding-vertical: 8px;
 	flex-direction: row;
 	align-items: flex-end;
 	position: absolute;
-	bottom: 2;
-	left: 2;
-	right: 2;
+	bottom: $overlay-border-width;
+	left: $overlay-border-width;
+	right: $overlay-border-width;
 	top: 45;
 }
 
