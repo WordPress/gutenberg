@@ -21,12 +21,7 @@ import {
 import { Component } from '@wordpress/element';
 import { Icon, Image } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Caption,
-	MediaUpload,
-	MediaUploadProgress,
-	MEDIA_TYPE_IMAGE,
-} from '@wordpress/block-editor';
+import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
 import { getProtocol } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
@@ -334,48 +329,27 @@ class GalleryImage extends Component {
 		);
 
 		return (
-			<MediaUpload
-				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
-				onSelect={ this.onSelectMedia }
-				render={ ( { open, getMediaOptions } ) => {
-					return (
-						<TouchableWithoutFeedback
-							onPress={ this.onMediaPressed }
-							onLongPress={ open }
-							accessible={ ! isSelected } // We need only child views to be accessible after the selection
-							accessibilityLabel={ this.accessibilityLabelImageContainer() } // if we don't set this explicitly it reads system provided accessibilityLabels of all child components and those include pretty technical words which don't make sense
-							accessibilityRole={ 'imagebutton' } // this makes VoiceOver to read a description of image provided by system on iOS and lets user know this is a button which conveys the message of tappablity
-						>
-							<View style={ containerStyle }>
-								{ getMediaOptions() }
-								<MediaUploadProgress
-									mediaId={ id }
-									onUpdateMediaProgress={
-										this.updateMediaProgress
-									}
-									onFinishMediaUploadWithSuccess={
-										this.finishMediaUploadWithSuccess
-									}
-									onFinishMediaUploadWithFailure={
-										this.finishMediaUploadWithFailure
-									}
-									onMediaUploadStateReset={ onRemove }
-									renderContent={ ( {
-										isUploadFailed,
-										retryMessage,
-									} ) => {
-										return this.renderContent( {
-											isUploadFailed,
-											retryMessage,
-											openMediaOptions: open,
-										} );
-									} }
-								/>
-							</View>
-						</TouchableWithoutFeedback>
-					);
-				} }
-			/>
+			<TouchableWithoutFeedback
+				onPress={ this.onMediaPressed }
+				accessible={ ! isSelected } // We need only child views to be accessible after the selection
+				accessibilityLabel={ this.accessibilityLabelImageContainer() } // if we don't set this explicitly it reads system provided accessibilityLabels of all child components and those include pretty technical words which don't make sense
+				accessibilityRole={ 'imagebutton' } // this makes VoiceOver to read a description of image provided by system on iOS and lets user know this is a button which conveys the message of tappablity
+			>
+				<View style={ containerStyle }>
+					<MediaUploadProgress
+						mediaId={ id }
+						onUpdateMediaProgress={ this.updateMediaProgress }
+						onFinishMediaUploadWithSuccess={
+							this.finishMediaUploadWithSuccess
+						}
+						onFinishMediaUploadWithFailure={
+							this.finishMediaUploadWithFailure
+						}
+						onMediaUploadStateReset={ onRemove }
+						renderContent={ this.renderContent }
+					/>
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 
