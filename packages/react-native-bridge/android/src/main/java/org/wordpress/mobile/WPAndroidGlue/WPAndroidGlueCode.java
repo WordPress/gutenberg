@@ -558,6 +558,16 @@ public class WPAndroidGlueCode {
                                             .appendNewMediaBlock(mediaId, mediaUri, mediaType);
     }
 
+    public void appendNewGalleryBlock(ArrayList<Media> images) {
+        if (isMediaSelectedCallbackRegistered() && mMediaPickedByUserOnBlock) {
+            mMediaPickedByUserOnBlock = false;
+            mAppendsMultipleSelectedToSiblingBlocks = false;
+            // we still must invoke callback, so we use an empty array
+            mMediaSelectedCallback.onMediaFileSelected(new ArrayList<>());
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().appendNewGalleryBlock(images);
+        }
+    }
+
     public void setPreferredColorScheme(boolean isDarkMode) {
         if (mIsDarkMode != isDarkMode) {
             mIsDarkMode = isDarkMode;
