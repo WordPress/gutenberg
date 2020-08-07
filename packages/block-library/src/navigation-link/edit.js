@@ -65,6 +65,8 @@ function NavigationLinkEdit( {
 	};
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const [ isDragEnter, setIsDragEnter ] = useState( false );
+	const listItemRef = useRef( null );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
@@ -104,6 +106,29 @@ function NavigationLinkEdit( {
 			}
 		}
 	}, [ url ] );
+
+	// Set isDragEnter to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
+	useEffect( () => {
+		function handleDragEnd() {
+			setIsDragEnter( false );
+		}
+
+		function handleDragEnter( e ) {
+			if ( listItemRef.current.contains( e.target ) ) {
+				setIsDragEnter( true );
+			} else {
+				setIsDragEnter( false );
+			}
+		}
+
+		document.addEventListener( 'dragend', handleDragEnd );
+		document.addEventListener( 'dragenter', handleDragEnter );
+
+		return () => {
+			document.removeEventListener( 'dragend', handleDragEnd );
+			document.removeEventListener( 'dragenter', handleDragEnter );
+		};
+	}, [] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -185,6 +210,7 @@ function NavigationLinkEdit( {
 				className={ classnames( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
+					'is-drag-enter': isDragEnter,
 					'has-link': !! url,
 					'has-child': hasDescendants,
 					'has-text-color': rgbTextColor,
@@ -196,6 +222,7 @@ function NavigationLinkEdit( {
 					color: rgbTextColor,
 					backgroundColor: rgbBackgroundColor,
 				} }
+				ref={ listItemRef }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
