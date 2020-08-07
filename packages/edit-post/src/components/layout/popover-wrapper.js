@@ -29,7 +29,7 @@ const FocusManaged = withConstrainedTabbing(
 	withFocusReturn( ( { children } ) => children )
 );
 
-export default function PopoverWrapper( { onClose, children } ) {
+export default function PopoverWrapper( { onClose, children, className } ) {
 	// Event handlers
 	const maybeClose = ( event ) => {
 		// Close on escape
@@ -43,7 +43,11 @@ export default function PopoverWrapper( { onClose, children } ) {
 	//   - onMouseDown is disabled as this can cause interactions with other DOM elements
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div onKeyDown={ maybeClose } onMouseDown={ stopPropagation }>
+		<div
+			className={ className }
+			onKeyDown={ maybeClose }
+			onMouseDown={ stopPropagation }
+		>
 			<DetectOutside onFocusOutside={ onClose }>
 				<FocusManaged>{ children }</FocusManaged>
 			</DetectOutside>

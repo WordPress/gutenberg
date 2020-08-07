@@ -180,6 +180,7 @@ function Layout() {
 						mode === 'visual' &&
 						isInserterOpened && (
 							<PopoverWrapper
+								className="edit-post-layout__inserter-panel-popover-wrapper"
 								onClose={ () => setIsInserterOpened( false ) }
 							>
 								<div className="edit-post-layout__inserter-panel">
