@@ -48,45 +48,11 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 						'type'        => 'object',
 						'default'     => array(),
 					),
-					'instance_changes' => array(
-						'description' => __( 'Array of instance changes', 'gutenberg' ),
-						'type'        => 'object',
-						'default'     => array(),
-					),
 				),
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'callback'            => array( $this, 'compute_widget_form' ),
-				),
-			)
-		);
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/preview/(?P<widget_class>[^/]*)/',
-			array(
-				'args' => array(
-					'widget_class'     => array(
-						'description'       => __( 'Class name of the widget.', 'gutenberg' ),
-						'type'              => 'string',
-						'required'          => true,
-						'validate_callback' => array( $this, 'is_valid_widget' ),
-					),
-					'instance'         => array(
-						'description' => __( 'Current widget instance', 'gutenberg' ),
-						'type'        => 'object',
-						'default'     => array(),
-					),
-					'instance_changes' => array(
-						'description' => __( 'Array of instance changes', 'gutenberg' ),
-						'type'        => 'object',
-						'default'     => array(),
-					),
-				),
-				array(
-					'methods'             => WP_REST_Server::EDITABLE,
-					'permission_callback' => array( $this, 'permissions_check' ),
-					'callback'            => array( $this, 'compute_widget_preview' ),
 				),
 			)
 		);
