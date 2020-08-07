@@ -9,11 +9,9 @@ import Cell from './cell';
 import styles from './styles.scss';
 
 function FooterMessageCell( props ) {
-	const { ...cellProps } = props;
-
 	return (
 		<Cell
-			{ ...cellProps }
+			{ ...props }
 			editable={ false }
 			value={ '' }
 			accessibilityRole={ 'text' }
