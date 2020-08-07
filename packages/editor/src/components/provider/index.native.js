@@ -93,20 +93,36 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentMediaAppend = subscribeMediaAppend(
-			( payload ) => {
-				const blockName = 'core/' + payload.mediaType;
-				const newBlock = createBlock( blockName, {
-					id: payload.mediaId,
-					[ payload.mediaType === 'image'
-						? 'url'
-						: 'src' ]: payload.mediaUrl,
-				} );
+			( { mediaType, mediaId, mediaUrl, images } ) => {
+				const {
+					selectedBlockClientId,
+					selectedBlockIndex,
+					blockCount,
+					insertBlock,
+					replaceBlock,
+				} = this.props;
 
-				const indexAfterSelected = this.props.selectedBlockIndex + 1;
-				const insertionIndex =
-					indexAfterSelected || this.props.blockCount;
+				const blockName = 'core/' + mediaType;
 
-				this.props.insertBlock( newBlock, insertionIndex );
+				let attributes, isReplacing;
+				if ( mediaType === 'gallery' ) {
+					attributes = { images };
+					isReplacing = true;
+				} else {
+					attributes = {
+						id: mediaId,
+						[ mediaType === 'image' ? 'url' : 'src' ]: mediaUrl,
+					};
+				}
+
+				const newBlock = createBlock( blockName, attributes );
+
+				if ( isReplacing ) {
+					replaceBlock( selectedBlockClientId, newBlock );
+				} else {
+					const insertionIndex = selectedBlockIndex + 1 || blockCount;
+					insertBlock( newBlock, insertionIndex );
+				}
 			}
 		);
 
@@ -264,6 +280,7 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
+			selectedBlockClientId,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
