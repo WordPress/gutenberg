@@ -27,6 +27,7 @@ import {
 	parse,
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
+import { Platform } from '@wordpress/element';
 
 /**
  * A block selection object.
@@ -74,6 +75,14 @@ const EMPTY_ARRAY = [];
  */
 export function getBlockName( state, clientId ) {
 	const block = state.blocks.byClientId[ clientId ];
+	const socialLinkName = 'core/social-link';
+
+	if ( Platform.OS !== 'web' && block?.name === socialLinkName ) {
+		const attributes = state.blocks.attributes[ clientId ].service;
+		const { service } = attributes;
+
+		return service ? `${ socialLinkName }-${ service }` : socialLinkName;
+	}
 	return block ? block.name : null;
 }
 
