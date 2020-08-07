@@ -10,6 +10,7 @@ import { BlockControls } from '@wordpress/block-editor';
  */
 import useTemplatePartPost from './use-template-part-post';
 import TemplatePartNamePanel from './name-panel';
+import TemplatePartLabel from './label';
 import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 
@@ -29,11 +30,18 @@ export default function TemplatePartEdit( {
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part
 	// content loading.
-	const { innerBlocks } = useSelect(
+	const { innerBlocks, hasSelectedInnerBlock } = useSelect(
 		( select ) => {
-			const { getBlocks } = select( 'core/block-editor' );
+			const {
+				getBlocks,
+				hasSelectedInnerBlock: getHasSelectedInnerBlock,
+			} = select( 'core/block-editor' );
 			return {
 				innerBlocks: getBlocks( clientId ),
+				hasSelectedInnerBlock: getHasSelectedInnerBlock(
+					clientId,
+					true
+				),
 			};
 		},
 		[ clientId ]
@@ -67,10 +75,15 @@ export default function TemplatePartEdit( {
 						setAttributes={ setAttributes }
 					/>
 				</BlockControls>
-				<TemplatePartInnerBlocks
-					postId={ postId }
-					hasInnerBlocks={ innerBlocks.length > 0 }
-				/>
+				<div style={ { position: 'relative' } }>
+					{ hasSelectedInnerBlock && (
+						<TemplatePartLabel postId={ postId } slug={ slug } />
+					) }
+					<TemplatePartInnerBlocks
+						postId={ postId }
+						hasInnerBlocks={ innerBlocks.length > 0 }
+					/>
+				</div>
 			</>
 		);
 	}
