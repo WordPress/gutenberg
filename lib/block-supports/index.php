@@ -51,7 +51,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	// Suppress warnings from this method from polluting the front-end.
 	// @codingStandardsIgnoreStart
-	if ( ! @$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
+	if ( ! @$dom->loadHTML( mb_convert_encoding( $block_content, 'HTML-ENTITIES', 'UTF-8' ), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
 	// @codingStandardsIgnoreEnd
 		return $block_content;
 	}
