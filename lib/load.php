@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param string $name The name of the experiment.
  *
  * @return bool True when the experiment is enabled.
+ *
  */
 function gutenberg_is_experiment_enabled( $name ) {
 	$experiments = get_option( 'gutenberg-experiments' );
@@ -35,9 +36,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		}
 		if ( ! class_exists( 'WP_REST_Sidebars_Controller' ) ) {
 			require_once dirname( __FILE__ ) . '/class-wp-rest-sidebars-controller.php';
-		}
-		if ( ! class_exists( 'WP_Widget_Block' ) ) {
-			require_once dirname( __FILE__ ) . '/class-wp-widget-block.php';
 		}
 	}
 	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
@@ -86,6 +84,12 @@ if ( ! class_exists( 'WP_Block' ) ) {
 if ( ! class_exists( 'WP_Block_List' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block-list.php';
 }
+if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+	if ( ! class_exists( 'WP_Widget_Block' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-widget-block.php';
+	}
+	require_once dirname( __FILE__ ) . '/widgets-page.php';
+}
 
 require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/utils.php';
@@ -99,7 +103,6 @@ require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/block-directory.php';
 require dirname( __FILE__ ) . '/demo.php';
 require dirname( __FILE__ ) . '/widgets.php';
-require dirname( __FILE__ ) . '/widgets-page.php';
 require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
