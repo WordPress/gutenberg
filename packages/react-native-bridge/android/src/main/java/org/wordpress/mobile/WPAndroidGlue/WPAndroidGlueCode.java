@@ -227,7 +227,7 @@ public class WPAndroidGlueCode {
                 mAppendsMultipleSelectedToSiblingBlocks = mediaType == MediaType.IMAGE && !allowMultipleSelection;
                 mMediaSelectedCallback = mediaSelectedCallback;
                 if (mediaType == MediaType.IMAGE) {
-                    mOnMediaLibraryButtonListener.onUploadPhotoButtonClicked(true);
+                    mOnMediaLibraryButtonListener.onUploadPhotoButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.VIDEO) {
                     mOnMediaLibraryButtonListener.onUploadVideoButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.MEDIA) {
