@@ -34,6 +34,7 @@
 		@include break-small() {
 			padding: 0 !important;
 			height: $block-toolbar-height/2;
+			width: $block-toolbar-height;
 		}
 
 		// Focus style.
