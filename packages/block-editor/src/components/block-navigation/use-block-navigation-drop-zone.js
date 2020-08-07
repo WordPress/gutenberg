@@ -55,6 +55,15 @@ function getDropTargetBlocksData(
 	} );
 }
 
+function isPointContainedByRect( point, rect ) {
+	return (
+		rect.left <= point.x &&
+		rect.right >= point.x &&
+		rect.top <= point.y &&
+		rect.bottom >= point.y
+	);
+}
+
 // Block navigation is always a vertical list, so only allow dropping
 // to the above or below a block.
 const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
@@ -64,7 +73,7 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 	let candidateBlockData;
 	let candidateDistance;
 
-	blocksData.forEach( ( blockData ) => {
+	for ( const blockData of blocksData ) {
 		const rect = blockData.element.getBoundingClientRect();
 		const [ distance, edge ] = getDistanceToNearestEdge(
 			position,
@@ -77,7 +86,17 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 			candidateBlockData = blockData;
 			candidateEdge = edge;
 		}
-	} );
+
+		// If the mouse position is within the block, break early
+		// as the user would intend to drop either before or after
+		// this block.
+		//
+		// This solves an issue where some rows in the block navigation
+		// tree overlap slightly due to sub-pixel rendering.
+		if ( isPointContainedByRect( position, rect ) ) {
+			break;
+		}
+	}
 
 	if ( ! candidateBlockData ) {
 		return;
