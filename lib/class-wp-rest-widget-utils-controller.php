@@ -37,13 +37,13 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 			'/' . $this->rest_base . '/form/(?P<widget_class>[^/]*)/',
 			array(
 				'args' => array(
-					'widget_class'     => array(
+					'widget_class' => array(
 						'description'       => __( 'Class name of the widget.', 'gutenberg' ),
 						'type'              => 'string',
 						'required'          => true,
 						'validate_callback' => array( $this, 'is_valid_widget' ),
 					),
-					'instance'         => array(
+					'instance'     => array(
 						'description' => __( 'Current widget instance', 'gutenberg' ),
 						'type'        => 'object',
 						'default'     => array(),

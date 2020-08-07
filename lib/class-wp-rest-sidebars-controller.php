@@ -55,9 +55,11 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			'/' . $this->rest_base,
 			array(
 				array(
-					'methods'  => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_items' ),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
 				),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 
@@ -75,7 +77,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 							'description'       => __( 'The id of a registered sidebar', 'gutenberg' ),
 							'type'              => 'string',
 							'validate_callback' => function ( $id ) {
-								return ! is_null( self::get_sidebar( $id ) );
+								return self::get_sidebar( $id )[0];
 							},
 						),
 					),
@@ -84,20 +86,9 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'update_item' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
-					'args'                => array(
-						'id'      => array(
-							'description'       => __( 'The id of a registered sidebar', 'gutenberg' ),
-							'type'              => 'string',
-							'validate_callback' => function ( $id ) {
-								return ! is_null( self::get_sidebar( $id ) );
-							},
-						),
-						'widgets' => array(
-							'description' => __( 'The list of widgets to save', 'gutenberg' ),
-							'type'        => 'array',
-						),
-					),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 				),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 	}
@@ -135,11 +126,11 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 * @global array $wp_registered_widget_updates
 	 */
 	public function update_item( $request ) {
-		global $wp_registered_widget_updates;
+		global $wp_registered_widget_updates, $wp_registered_widgets;
 		$sidebar_id    = $request['id'];
 		$input_widgets = $request['widgets'];
 
-		// Initialize $numbers
+		// Initialize $numbers.
 		$numbers = array();
 		foreach ( $wp_registered_widget_updates as $id_base => $control ) {
 			if ( is_array( $control['callback'] ) ) {
@@ -152,7 +143,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		foreach ( $input_widgets as $input_widget ) {
 			ob_start();
 			if ( isset( $wp_registered_widget_updates[ $input_widget['id_base'] ] ) ) {
-				// Class-based widget
+				// Class-based widget.
 				$update_control = $wp_registered_widget_updates[ $input_widget['id_base'] ];
 				if ( ! isset( $input_widget['id'] ) ) {
 					$number = $numbers[ $input_widget['id_base'] ] ++;
@@ -161,16 +152,34 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					$input_widget['id']     = $id;
 					$input_widget['number'] = $number;
 				}
-				$field  = 'widget-' . $input_widget['id_base'];
-				$number = $input_widget['number'];
-				$_POST  = $input_widget;
+				$field                      = 'widget-' . $input_widget['id_base'];
+				$number                     = $input_widget['number'];
+				$_POST                      = $input_widget;
 				$_POST[ $field ][ $number ] = wp_slash( $input_widget['settings'] );
 				call_user_func( $update_control['callback'] );
 				$update_control['callback'][0]->updated = false;
+
+				// Just because we saved new widget doesn't mean it was added to $wp_registered_widgets.
+				// Let's make sure it's there so that it's included in the response.
+				if ( ! isset( $wp_registered_widgets[ $input_widget['id'] ] ) ) {
+					$first_widget_id = substr( $input_widget['id'], 0, strrpos( $input_widget['id'], '-' ) ) . '-1';
+
+					if ( isset( $wp_registered_widgets[ $first_widget_id ] ) ) {
+						$wp_registered_widgets[ $input_widget['id'] ] = $wp_registered_widgets[ $first_widget_id ];
+						$widget_class                                 = get_class( $update_control['callback'][0] );
+						$new_object                                   = new $widget_class(
+							$input_widget['id_base'],
+							$input_widget['name'],
+							$input_widget['settings']
+						);
+						$new_object->_register();
+						$wp_registered_widgets[ $input_widget['id'] ]['callback'][0] = $new_object;
+					}
+				}
 			} elseif ( $wp_registered_widget_updates[ $input_widget['id'] ] ) {
-				// Old-style widget
+				// Old-style widget.
 				$update_control = $wp_registered_widget_updates[ $input_widget['id'] ];
-				$_POST = wp_slash( $input_widget['settings'] );
+				$_POST          = wp_slash( $input_widget['settings'] );
 				call_user_func( $update_control['callback'] );
 			}
 			ob_end_clean();
@@ -198,26 +207,9 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 * @global array $wp_registered_sidebars
 	 */
 	public function get_items( $request ) {
-		global $wp_registered_sidebars;
-		$fields = $this->get_fields_for_response( $request );
-
 		$data = array();
 		foreach ( (array) wp_get_sidebars_widgets() as $id => $widgets ) {
-			$sidebar = compact( 'id', 'widgets' );
-
-			if ( isset( $wp_registered_sidebars[ $id ] ) ) {
-				$registered_sidebar = $wp_registered_sidebars[ $id ];
-
-				$sidebar['status']      = 'active';
-				$sidebar['name']        = $registered_sidebar['name'];
-				$sidebar['description'] = $registered_sidebar['description'];
-			} else {
-				$sidebar['status'] = 'inactive';
-			}
-
-			if ( rest_is_field_included( 'widgets', $fields ) ) {
-				$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
-			}
+			$sidebar = self::get_sidebar( $id )[0];
 
 			$data[] = $this->prepare_item_for_response( $sidebar, $request )->get_data();
 		}
@@ -233,12 +225,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function get_item( $request ) {
-		$fields  = $this->get_fields_for_response( $request );
-		$sidebar = self::get_sidebar( $request['id'] );
-
-		if ( rest_is_field_included( 'widgets', $fields ) ) {
-			$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
-		}
+		$sidebar = self::get_sidebar( $request['id'] )[0];
 
 		return $this->prepare_item_for_response( $sidebar, $request );
 	}
@@ -263,18 +250,18 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 			foreach ( (array) $wp_registered_sidebars as $key => $sidebar ) {
 				if ( sanitize_title( $sidebar['name'] ) === $id ) {
-					return $sidebar;
+					return array( true, $sidebar );
 				}
 			}
 		}
 
 		foreach ( (array) $wp_registered_sidebars as $key => $sidebar ) {
 			if ( $key === $id ) {
-				return $sidebar;
+				return array( true, $sidebar );
 			}
 		}
 
-		return null;
+		return array( false, array( 'id' => $id ) );
 	}
 
 	/**
@@ -322,8 +309,14 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 								$classname .= '_' . get_class( $cn );
 							}
 						}
-						$classname                             = ltrim( $classname, '_' );
-						$widget_parameters[0]['before_widget'] = sprintf( $widget_parameters[0]['before_widget'], $widget_id, $classname );
+						$classname = ltrim( $classname, '_' );
+						if ( isset( $widget_parameters[0]['before_widget'] ) ) {
+							$widget_parameters[0]['before_widget'] = sprintf(
+								$widget_parameters[0]['before_widget'],
+								$widget_id,
+								$classname
+							);
+						}
 
 						ob_start();
 
@@ -357,12 +350,32 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Prepare a single sidebar output for response
 	 *
-	 * @param array           $sidebar Sidebar instance.
-	 * @param WP_REST_Request $request Request object.
+	 * @param array           $raw_sidebar Sidebar instance.
+	 * @param WP_REST_Request $request     Request object.
 	 *
 	 * @return WP_REST_Response $data
 	 */
-	public function prepare_item_for_response( $sidebar, $request ) {
+	public function prepare_item_for_response( $raw_sidebar, $request ) {
+		global $wp_registered_sidebars;
+
+		$id      = $raw_sidebar['id'];
+		$sidebar = array( 'id' => $id );
+
+		if ( isset( $wp_registered_sidebars[ $id ] ) ) {
+			$registered_sidebar = $wp_registered_sidebars[ $id ];
+
+			$sidebar['status']      = 'active';
+			$sidebar['name']        = isset( $registered_sidebar['name'] ) ? $registered_sidebar['name'] : '';
+			$sidebar['description'] = isset( $registered_sidebar['description'] ) ? $registered_sidebar['description'] : '';
+		} else {
+			$sidebar['status'] = 'inactive';
+		}
+
+		$fields = $this->get_fields_for_response( $request );
+		if ( rest_is_field_included( 'widgets', $fields ) ) {
+			$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
+		}
+
 		$schema = $this->get_item_schema();
 		$data   = array();
 		foreach ( $schema['properties'] as $property_id => $property ) {
@@ -375,7 +388,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 		foreach ( $sidebar['widgets'] as $widget_id => $widget ) {
 			$widget_data = array();
-			foreach ( $schema['properties']['widgets']['items'] as $property_id => $property ) {
+			foreach ( $schema['properties']['widgets']['items']['properties'] as $property_id => $property ) {
 				if ( isset( $widget[ $property_id ] ) && gettype( $widget[ $property_id ] ) === $property['type'] ) {
 					$widget_data[ $property_id ] = $widget[ $property_id ];
 				} elseif ( 'settings' === $property_id && 'array' === gettype( $widget[ $property_id ] ) ) {
@@ -396,10 +409,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		 * returned.
 		 *
 		 * @param WP_REST_Response $response The response object.
-		 * @param object           $sidebar The original status object.
-		 * @param WP_REST_Request  $request  Request used to generate the response.
+		 * @param object $sidebar The original status object.
+		 * @param WP_REST_Request $request Request used to generate the response.
 		 */
-		return apply_filters( 'rest_prepare_menu_location', $response, $sidebar, $request );
+		return apply_filters( 'rest_prepare_sidebar', $response, $sidebar, $request );
 	}
 
 	/**
@@ -450,47 +463,50 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					'description' => __( 'Nested widgets.', 'gutenberg' ),
 					'type'        => 'array',
 					'items'       => array(
-						'id'           => array(
-							'description' => __( 'Unique identifier for the widget.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-						),
-						'id_base'      => array(
-							'description' => __( 'Type of widget for the object.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-						),
-						'widget_class' => array(
-							'description' => __( 'Class name of the widget implementation.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-						),
-						'name'         => array(
-							'description' => __( 'Name of the widget.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-						),
-						'description'  => array(
-							'description' => __( 'Description of the widget.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-						),
-						'number'       => array(
-							'description' => __( 'Number of the widget.', 'gutenberg' ),
-							'type'        => 'integer',
-							'context'     => array( 'view', 'edit', 'embed' ),
-						),
-						'rendered'     => array(
-							'description' => __( 'HTML representation of the widget.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-							'readonly'    => true,
-						),
-						'settings'     => array(
-							'description' => __( 'Settings of the widget.', 'gutenberg' ),
-							'type'        => 'object',
-							'context'     => array( 'view', 'edit', 'embed' ),
-							'default'     => array(),
+						'type'       => 'object',
+						'properties' => array(
+							'id'           => array(
+								'description' => __( 'Unique identifier for the widget.', 'gutenberg' ),
+								'type'        => 'string',
+								'context'     => array( 'view', 'edit', 'embed' ),
+							),
+							'id_base'      => array(
+								'description' => __( 'Type of widget for the object.', 'gutenberg' ),
+								'type'        => 'string',
+								'context'     => array( 'view', 'edit', 'embed' ),
+							),
+							'widget_class' => array(
+								'description' => __( 'Class name of the widget implementation.', 'gutenberg' ),
+								'type'        => 'string',
+								'context'     => array( 'view', 'edit', 'embed' ),
+							),
+							'name'         => array(
+								'description' => __( 'Name of the widget.', 'gutenberg' ),
+								'type'        => 'string',
+								'context'     => array( 'view', 'edit', 'embed' ),
+							),
+							'description'  => array(
+								'description' => __( 'Description of the widget.', 'gutenberg' ),
+								'type'        => 'string',
+								'context'     => array( 'view', 'edit', 'embed' ),
+							),
+							'number'       => array(
+								'description' => __( 'Number of the widget.', 'gutenberg' ),
+								'type'        => 'integer',
+								'context'     => array( 'view', 'edit', 'embed' ),
+							),
+							'rendered'     => array(
+								'description' => __( 'HTML representation of the widget.', 'gutenberg' ),
+								'type'        => 'string',
+								'context'     => array( 'view', 'edit', 'embed' ),
+								'readonly'    => true,
+							),
+							'settings'     => array(
+								'description' => __( 'Settings of the widget.', 'gutenberg' ),
+								'type'        => 'object',
+								'context'     => array( 'view', 'edit', 'embed' ),
+								'default'     => array(),
+							),
 						),
 					),
 					'default'     => array(),
@@ -507,11 +523,11 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves a widget instance.
 	 *
-	 * @since 5.7.0
-	 *
 	 * @param array  $sidebar sidebar data available at $wp_registered_sidebars.
 	 * @param string $id Identifier of the widget instance.
+	 *
 	 * @return array Array containing the widget instance.
+	 * @since 5.7.0
 	 */
 	public static function get_sidebar_widget_instance( $sidebar, $id ) {
 		list( $object, $number, $name ) = static::get_widget_info( $id );
@@ -537,11 +553,11 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		 *
 		 * Returning false will effectively short-circuit display of the widget.
 		 *
-		 * @since 2.8.0
+		 * @param array $instance The current widget instance's settings.
+		 * @param WP_Widget $this The current widget instance.
+		 * @param array $args An array of default widget arguments.
 		 *
-		 * @param array     $instance The current widget instance's settings.
-		 * @param WP_Widget $this     The current widget instance.
-		 * @param array     $args     An array of default widget arguments.
+		 * @since 2.8.0
 		 */
 		$instance = apply_filters( 'widget_display_callback', $instance, $object, $args );
 
@@ -555,10 +571,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Given a widget id returns an array containing information about the widget.
 	 *
-	 * @since 5.7.0
-	 *
 	 * @param string $widget_id Identifier of the widget.
+	 *
 	 * @return array Array containing the the widget object, the number, and the name.
+	 * @since 5.7.0
 	 */
 	private static function get_widget_info( $widget_id ) {
 		global $wp_registered_widgets;
@@ -575,6 +591,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		$object = $wp_registered_widgets[ $widget_id ]['callback'][0];
 		$number = $wp_registered_widgets[ $widget_id ]['params'][0]['number'];
 		$name   = $wp_registered_widgets[ $widget_id ]['name'];
+
 		return array( $object, $number, $name );
 	}
 

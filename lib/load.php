@@ -17,7 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param string $name The name of the experiment.
  *
  * @return bool True when the experiment is enabled.
- *
  */
 function gutenberg_is_experiment_enabled( $name ) {
 	$experiments = get_option( 'gutenberg-experiments' );
