@@ -18,6 +18,7 @@ function getDropTargetBlocksData(
 	dragEventType,
 	getRootClientId,
 	getBlockIndex,
+	getBlockCount,
 	getDraggedBlockClientIds,
 	canInsertBlocks
 ) {
@@ -45,6 +46,7 @@ function getDropTargetBlocksData(
 			blockIndex: getBlockIndex( clientId, rootClientId ),
 			element: blockElement,
 			orientation: 'vertical',
+			innerBlockCount: getBlockCount( clientId ),
 			canInsertDraggedBlocksAsSibling: isBlockDrag
 				? canInsertBlocks( draggedBlockClientIds, rootClientId )
 				: true,
@@ -64,7 +66,10 @@ function isPointContainedByRect( point, rect ) {
 	);
 }
 
-function isDroppingToInnerBlocks( point, rect ) {
+function isDroppingToInnerBlocks( point, rect, innerBlockCount ) {
+	if ( innerBlockCount > 0 ) {
+		return true;
+	}
 	const blockCenterX = rect.left + rect.width / 2;
 	return point.x > blockCenterX;
 }
@@ -87,21 +92,26 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 			ALLOWED_DROP_EDGES
 		);
 
-		if ( candidateDistance === undefined || distance < candidateDistance ) {
+		const isCursorWithinBlock = isPointContainedByRect( position, rect );
+		if (
+			candidateDistance === undefined ||
+			distance < candidateDistance ||
+			isCursorWithinBlock
+		) {
 			candidateDistance = distance;
 			candidateBlockData = blockData;
 			candidateEdge = edge;
 			candidateRect = rect;
-		}
 
-		// If the mouse position is within the block, break early
-		// as the user would intend to drop either before or after
-		// this block.
-		//
-		// This solves an issue where some rows in the block navigation
-		// tree overlap slightly due to sub-pixel rendering.
-		if ( isPointContainedByRect( position, rect ) ) {
-			break;
+			// If the mouse position is within the block, break early
+			// as the user would intend to drop either before or after
+			// this block.
+			//
+			// This solves an issue where some rows in the block navigation
+			// tree overlap slightly due to sub-pixel rendering.
+			if ( isCursorWithinBlock ) {
+				break;
+			}
 		}
 	}
 
@@ -116,7 +126,11 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 	if (
 		isDraggingBelow &&
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
-		isDroppingToInnerBlocks( position, candidateRect )
+		isDroppingToInnerBlocks(
+			position,
+			candidateRect,
+			candidateBlockData.innerBlockCount
+		)
 	) {
 		return {
 			rootClientId: candidateBlockData.clientId,
@@ -136,18 +150,21 @@ export default function useBlockNavigationDropZone( ref ) {
 		canInsertBlocks,
 		getBlockRootClientId,
 		getBlockIndex,
+		getBlockCount,
 		getDraggedBlockClientIds,
 	} = useSelect( ( select ) => {
 		const {
 			canInsertBlocks: _canInsertBlocks,
 			getBlockRootClientId: _getBlockRootClientId,
 			getBlockIndex: _getBlockIndex,
+			getBlockCount: _getBlockCount,
 			getDraggedBlockClientIds: _getDraggedBlockClientIds,
 		} = select( 'core/block-editor' );
 		return {
 			canInsertBlocks: _canInsertBlocks,
 			getBlockRootClientId: _getBlockRootClientId,
 			getBlockIndex: _getBlockIndex,
+			getBlockCount: _getBlockCount,
 			getDraggedBlockClientIds: _getDraggedBlockClientIds,
 		};
 	}, [] );
@@ -181,6 +198,7 @@ export default function useBlockNavigationDropZone( ref ) {
 				dragEventType,
 				getBlockRootClientId,
 				getBlockIndex,
+				getBlockCount,
 				getDraggedBlockClientIds,
 				canInsertBlocks
 			);
