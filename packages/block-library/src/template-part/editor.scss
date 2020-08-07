@@ -61,10 +61,9 @@
 
 .wp-block-template-part__name-panel {
 	background-color: $white;
-	border-radius: $radius-block-ui;
 	box-shadow: 0 0 0 $border-width $gray-900;
 	outline: 1px solid transparent;
-	padding: ($grid-unit-10 - $border-width - $border-width) $grid-unit-15;
+	padding: $grid-unit-10 $grid-unit-15;
 
 	.components-base-control__field {
 		align-items: center;
