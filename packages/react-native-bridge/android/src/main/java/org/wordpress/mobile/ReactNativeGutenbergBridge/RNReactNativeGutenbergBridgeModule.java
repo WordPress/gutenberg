@@ -170,14 +170,16 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void requestMediaPickFrom(String mediaSource, ReadableArray filter, Boolean allowMultipleSelection, final Callback onMediaSelected) {
         MediaType mediaType = getMediaTypeFromFilter(filter);
+        MediaSelectedCallback mediaSelectedCallback = getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected);
+
         if (mediaSource.equals(MEDIA_SOURCE_MEDIA_LIBRARY)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection, mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(mediaSelectedCallback, allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_LIBRARY)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection, mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(mediaSelectedCallback, allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(mediaSelectedCallback, mediaType);
         } else {
-            mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection);
+            mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, mediaSelectedCallback, allowMultipleSelection);
         }
     }
 
