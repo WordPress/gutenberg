@@ -387,5 +387,15 @@ describe( 'UnitControl', () => {
 
 			expect( select.value ).toBe( 'em' );
 		} );
+
+		it( 'should fallback to default unit if parsed unit is invalid', () => {
+			const { container: testContainer } = testRender(
+				<UnitControl value={ '10null' } />
+			);
+
+			const select = testContainer.querySelector( 'select' );
+
+			expect( select.value ).toBe( 'px' );
+		} );
 	} );
 } );

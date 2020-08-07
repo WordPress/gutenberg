@@ -35,7 +35,7 @@ The main plugin file created is the PHP file `gutenpride.php`, at the top of thi
  * Author:          The WordPress Contributors
  * License:         GPL-2.0-or-later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:     create-block
+ * Text Domain:     gutenpride
  *
  * @package         create-block
  */
@@ -108,6 +108,7 @@ function create_block_gutenpride_block_init() {
 		$script_asset['dependencies'],
 		$script_asset['version']
 	);
+	wp_set_script_translations( 'create-block-gutenpride-block-editor', 'gutenpride' );
 
 	$editor_css = 'editor.css';
 	wp_register_style(
@@ -138,6 +139,8 @@ The build process creates a secondary asset file that contains the list of depen
 
 The `wp_register_script` function registers a name, called the handle, and relates that name to the script file. The dependencies are used to specify if the script requires including other libraries. The version is specified so the browser will reload if the file changed.
 
+The `wp_set_script_translations` function tells WordPress to load translations for this script, if they exist. See more about [translations & internationalization.](/docs/designers-developers/developers/internationalization.md)
+
 The `register_block_type` function registers the block we are going to create and specifies the editor_script file handle registered. So now when the editor loads it will load this script.
 
 With the above in place, create a new post to load the editor and check the you can add the block in the inserter. You can use `/` to search, or click the box with the [+] and search for "Gutenpride" to find the block.
@@ -146,7 +149,7 @@ With the above in place, create a new post to load the editor and check the you 
 
 It is a good skill to learn and get comfortable using the web console. This is where JavaScript errors are shown and a nice way to test out snippets of JavaScript. See [Firefox Developer Tools documentation](https://developer.mozilla.org/en-US/docs/Tools).
 
-To open the developer tools in Firefox, use the menu selecting Web Developer : Toggle Tools, on Chrome, select More Tools -> Developers Tools. For both browers, the keyboard shortcut on Windows is Ctrl+Shift+I, or on Mac Cmd+Shift+I. On Windows & Linux, the F12 key also works. You can then click Console to view logs.
+To open the developer tools in Firefox, use the menu selecting Web Developer : Toggle Tools, on Chrome, select More Tools -> Developers Tools. For both browsers, the keyboard shortcut on Windows is Ctrl+Shift+I, or on Mac Cmd+Shift+I. On Windows & Linux, the F12 key also works. You can then click Console to view logs.
 
 Try running `npm run start` that will start the watch process for automatic rebuilds. If you then make an update to `src/index.js` file, you will see the build run, and if you reload the WordPress editor you'll see the change.
 

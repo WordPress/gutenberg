@@ -145,18 +145,6 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 	$settings['styles'] = gutenberg_get_editor_styles();
 
-	$settings['editSiteInitialState'] = array();
-
-	$settings['editSiteInitialState']['templateType'] = 'wp_template';
-	$settings['editSiteInitialState']['showOnFront']  = get_option( 'show_on_front' );
-	$settings['editSiteInitialState']['page']         = array(
-		'path'    => '/',
-		'context' => 'page' === $settings['editSiteInitialState']['showOnFront'] ? array(
-			'postType' => 'page',
-			'postId'   => get_option( 'page_on_front' ),
-		) : array(),
-	);
-
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.
 	global $post;
@@ -225,3 +213,29 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
+
+/**
+ * Register a core site setting for front page information.
+ */
+function register_site_editor_homepage_settings() {
+	register_setting(
+		'general',
+		'show_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'string',
+			'description'  => __( 'What to show on the front page', 'gutenberg' ),
+		)
+	);
+
+	register_setting(
+		'general',
+		'page_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'number',
+			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
+		)
+	);
+}
+add_action( 'init', 'register_site_editor_homepage_settings', 10 );

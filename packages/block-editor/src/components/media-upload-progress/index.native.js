@@ -126,7 +126,7 @@ export class MediaUploadProgress extends React.Component {
 		);
 
 		return (
-			<View style={ styles.mediaUploadProgress }>
+			<View style={ styles.mediaUploadProgress } pointerEvents="box-none">
 				{ showSpinner && (
 					<View style={ styles.progressBar }>
 						<Spinner progress={ progress } />

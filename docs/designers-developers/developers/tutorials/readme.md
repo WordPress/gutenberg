@@ -6,7 +6,7 @@
 
 -   Beginners: The [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md) walks through creating a block plugin using the `@wordpress/create-block` package; a quick and easy way to start creating your own block.
 
--   Intermediate: The [Block Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) covers different aspects of block developement. The documentation is slightly dated but still valid, if you are new to block development, start with the Create Block Tutorial above.
+-   Intermediate: The [Block Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) covers different aspects of block development. The documentation is slightly dated but still valid, if you are new to block development, start with the Create Block Tutorial above.
 
 -   See the [Meta Boxes Tutorial](/docs/designers-developers/developers/tutorials/metabox/readme.md) for new ways of extending the editor storing and using post meta data.
 

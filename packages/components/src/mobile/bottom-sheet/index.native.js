@@ -246,6 +246,16 @@ class BottomSheet extends Component {
 		return onClose();
 	}
 
+	getContentStyle() {
+		const { safeAreaBottomInset } = this.state;
+		return {
+			flexGrow: 1,
+			paddingBottom:
+				( safeAreaBottomInset || 0 ) +
+				styles.scrollableContent.paddingBottom,
+		};
+	}
+
 	onReplaceSubsheet( destination, extraProps, callback ) {
 		performLayoutAnimation();
 
@@ -269,7 +279,9 @@ class BottomSheet extends Component {
 			contentStyle = {},
 			getStylesFromColorScheme,
 			onDismiss,
+			isChildrenScrollable,
 			children,
+			withHeaderSeparator = false,
 			...rest
 		} = this.props;
 		const {
@@ -299,22 +311,51 @@ class BottomSheet extends Component {
 			},
 		} );
 
-		const getHeader = () => (
-			<View>
-				<View style={ styles.head }>
-					<View style={ { flex: 1 } }>{ leftButton }</View>
-					<View style={ styles.titleContainer }>
-						<Text style={ styles.title }>{ title }</Text>
-					</View>
-					<View style={ { flex: 1 } }>{ rightButton }</View>
-				</View>
-				<View style={ styles.separator } />
-			</View>
-		);
-
 		const backgroundStyle = getStylesFromColorScheme(
 			styles.background,
 			styles.backgroundDark
+		);
+
+		const bottomSheetHeaderTitleStyle = getStylesFromColorScheme(
+			styles.bottomSheetHeaderTitle,
+			styles.bottomSheetHeaderTitleDark
+		);
+
+		const listProps = {
+			disableScrollViewPanResponder: true,
+			bounces,
+			onScroll: this.onScroll,
+			onScrollBeginDrag: this.onScrollBeginDrag,
+			onScrollEndDrag: this.onScrollEndDrag,
+			scrollEventThrottle: 16,
+			contentContainerStyle: [
+				styles.content,
+				hideHeader && styles.emptyHeader,
+				contentStyle,
+				isChildrenScrollable && this.getContentStyle(),
+				contentStyle,
+			],
+			style: isMaxHeightSet ? { maxHeight } : {},
+			scrollEnabled,
+			automaticallyAdjustContentInsets: false,
+		};
+
+		const WrapperView = isChildrenScrollable ? View : ScrollView;
+
+		const getHeader = () => (
+			<>
+				<View style={ styles.bottomSheetHeader }>
+					<View style={ styles.flex }>{ leftButton }</View>
+					<Text
+						style={ bottomSheetHeaderTitleStyle }
+						maxFontSizeMultiplier={ 3 }
+					>
+						{ title }
+					</Text>
+					<View style={ styles.flex }>{ rightButton }</View>
+				</View>
+				{ withHeaderSeparator && <View style={ styles.separator } /> }
+			</>
 		);
 
 		return (
@@ -356,21 +397,10 @@ class BottomSheet extends Component {
 				>
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
-					<ScrollView
-						disableScrollViewPanResponder
-						bounces={ bounces }
-						onScroll={ this.onScroll }
-						onScrollBeginDrag={ () => this.isScrolling( true ) }
-						onScrollEndDrag={ () => this.isScrolling( false ) }
-						scrollEventThrottle={ 16 }
-						style={ isMaxHeightSet ? { maxHeight } : {} }
-						contentContainerStyle={ [
-							styles.content,
-							hideHeader && styles.emptyHeader,
-							contentStyle,
-						] }
-						scrollEnabled={ scrollEnabled }
-						automaticallyAdjustContentInsets={ false }
+					<WrapperView
+						{ ...( isChildrenScrollable
+							? { style: listProps.style }
+							: listProps ) }
 					>
 						<BottomSheetProvider
 							value={ {
@@ -386,14 +416,17 @@ class BottomSheet extends Component {
 								onReplaceSubsheet: this.onReplaceSubsheet,
 								extraProps,
 								currentScreen,
+								listProps,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>
 								<>{ children }</>
 							</TouchableHighlight>
 						</BottomSheetProvider>
-						<View style={ { height: safeAreaBottomInset } } />
-					</ScrollView>
+						{ ! isChildrenScrollable && (
+							<View style={ { height: safeAreaBottomInset } } />
+						) }
+					</WrapperView>
 				</KeyboardAvoidingView>
 			</Modal>
 		);

@@ -31,7 +31,7 @@
   "dependencies": {
     "@babel/runtime": "^7.9.2",
     "@react-native-community/blur": "3.6.0",
-    "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#5ad284d92b8d886e366445bf215be741ed53ddc6",
+    "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#d263ff16cdd9fb7352b354342522ff030f220f42",
     "@wordpress/api-fetch": "file:../api-fetch",
     "@wordpress/block-editor": "file:../block-editor",
     "@wordpress/block-library": "file:../block-library",

@@ -78,7 +78,8 @@
 			{ "docs/contributors/scripts.md": [] },
 			{ "docs/contributors/managing-packages.md": [] },
 			{ "docs/contributors/release.md": [] },
-			{ "docs/contributors/native-mobile.md": [] }
+			{ "docs/contributors/native-mobile.md": [] },
+			{ "docs/contributors/getting-started-native-mobile.md": [] }
 		] },
 		{ "docs/contributors/design.md": [
 			{ "docs/contributors/principles/the-block.md": [] },
@@ -106,7 +107,7 @@
 		{ "docs/designers-developers/developers/tutorials/create-block/readme.md": [
 			{ "docs/designers-developers/developers/tutorials/create-block/wp-plugin.md": [] },
 			{ "docs/designers-developers/developers/tutorials/create-block/block-anatomy.md": [] },
-			{ "docs/designers-developers/developers/tutorials/create-block/block-attributes.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/attributes.md": [] },
 			{ "docs/designers-developers/developers/tutorials/create-block/block-code.md": [] },
 			{ "docs/designers-developers/developers/tutorials/create-block/author-experience.md": [] },
 			{ "docs/designers-developers/developers/tutorials/create-block/finishing.md": [] }
