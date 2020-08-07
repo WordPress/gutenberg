@@ -150,7 +150,7 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 		global $wp_widget_factory;
 		$widget_obj = $wp_widget_factory->widgets[ $widget_class ];
 
-		$widget_obj->_set( - 1 );
+		$widget_obj->_set( -1 );
 		ob_start();
 
 		$instance = apply_filters( 'widget_form_callback', $instance, $widget_obj );
