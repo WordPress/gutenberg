@@ -10,7 +10,6 @@ import { flow, get, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
-import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -434,8 +433,7 @@ export function createBlockWithFallback( blockNode ) {
 	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
 		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
 		attributes.service = name.substring( 17 );
-		// Display social link service name for mobile platform
-		name = Platform.OS === 'web' ? 'core/social-link' : name;
+		name = 'core/social-link';
 	}
 
 	// Fallback content may be upgraded from classic editor expecting implicit

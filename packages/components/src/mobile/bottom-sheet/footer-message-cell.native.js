@@ -8,12 +8,10 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import Cell from './cell';
 import styles from './styles.scss';
 
-function UnsupportedFooterCell( props ) {
-	const { textAlign = 'left', ...cellProps } = props;
-
+function FooterMessageCell( { textAlign, ...props } ) {
 	return (
 		<Cell
-			{ ...cellProps }
+			{ ...props }
 			editable={ false }
 			value={ '' }
 			accessibilityRole={ 'text' }
@@ -22,4 +20,4 @@ function UnsupportedFooterCell( props ) {
 	);
 }
 
-export default withPreferredColorScheme( UnsupportedFooterCell );
+export default withPreferredColorScheme( FooterMessageCell );
