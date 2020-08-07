@@ -40,8 +40,16 @@ $tree-item-height: 36px;
 		color: $dark-gray-600;
 		border-radius: 2px;
 
-		&.is-drop-target {
+		&.is-dropping-before {
 			border-top: 2px solid blue;
+		}
+
+		&.is-dropping-after {
+			border-bottom: 2px solid green;
+		}
+
+		&.is-dropping-to-inner-blocks {
+			border-bottom: 2px solid red;
 		}
 
 		.components-modal__content & {

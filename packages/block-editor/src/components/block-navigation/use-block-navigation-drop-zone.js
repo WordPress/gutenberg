@@ -64,6 +64,11 @@ function isPointContainedByRect( point, rect ) {
 	);
 }
 
+function isDroppingToInnerBlocks( point, rect ) {
+	const blockCenterX = rect.left + rect.width / 2;
+	return point.x > blockCenterX;
+}
+
 // Block navigation is always a vertical list, so only allow dropping
 // to the above or below a block.
 const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
@@ -72,6 +77,7 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 	let candidateEdge;
 	let candidateBlockData;
 	let candidateDistance;
+	let candidateRect;
 
 	for ( const blockData of blocksData ) {
 		const rect = blockData.element.getBoundingClientRect();
@@ -85,6 +91,7 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 			candidateDistance = distance;
 			candidateBlockData = blockData;
 			candidateEdge = edge;
+			candidateRect = rect;
 		}
 
 		// If the mouse position is within the block, break early
@@ -104,9 +111,13 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 
 	const isDraggingBelow = candidateEdge === 'bottom';
 
-	// If the user is dragging towards the bottom of the block interpret that
-	// they're trying to next the dragged block.
-	if ( isDraggingBelow && candidateBlockData.canInsertDraggedBlocksAsChild ) {
+	// If the user is dragging towards the bottom of the block check whether
+	// they might be inserting as a child.
+	if (
+		isDraggingBelow &&
+		candidateBlockData.canInsertDraggedBlocksAsChild &&
+		isDroppingToInnerBlocks( position, candidateRect )
+	) {
 		return {
 			rootClientId: candidateBlockData.clientId,
 			blockIndex: 0,
@@ -114,7 +125,6 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 	}
 
 	const offset = isDraggingBelow ? 1 : 0;
-
 	return {
 		rootClientId: candidateBlockData.rootClientId,
 		blockIndex: candidateBlockData.blockIndex + offset,
