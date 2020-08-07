@@ -12,32 +12,32 @@ import { ToggleControl } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
 import { SPACE } from '@wordpress/keycodes';
 
-export default ( {
+export default function DetalsEdit( {
 	attributes,
 	className,
 	clientId,
 	isSelected,
 	setAttributes,
-} ) => {
+} ) {
 	const summaryRef = useRef( null );
+
+	const keyUpListener = ( e ) => {
+		if ( e.keyCode === SPACE ) {
+			e.preventDefault();
+		}
+	};
+
+	const clickListener = ( e ) => e.preventDefault();
 
 	useEffect( () => {
 		if ( ! summaryRef.current ) {
 			return;
 		}
 
-		const keyDownListener = ( e ) => {
-			if ( e.keyCode === SPACE ) {
-				e.preventDefault();
-			}
-		};
-
-		const clickListener = ( e ) => e.preventDefault();
-
-		summaryRef.current.addEventListener( 'keyup', keyDownListener );
+		summaryRef.current.addEventListener( 'keyup', keyUpListener );
 		summaryRef.current.addEventListener( 'click', clickListener );
 		return () => {
-			summaryRef.current.removeEventListener( 'keyup', keyDownListener );
+			summaryRef.current.removeEventListener( 'keyup', keyUpListener );
 			summaryRef.current.removeEventListener( 'click', clickListener );
 		};
 	}, [ summaryRef.current ] );
@@ -63,18 +63,18 @@ export default ( {
 				/>
 			</InspectorControls>
 			<details className={ className } open={ showInnerBlocks }>
-				<summary ref={ summaryRef }>
-					<RichText
-						value={ attributes.summaryContent }
-						onChange={ ( summaryContent ) =>
-							setAttributes( { summaryContent } )
-						}
-						placeholder={ __( 'Write a summary…' ) }
-						aria-label={ __( 'Summary text' ) }
-					/>
-				</summary>
+				<RichText
+					tagName="summary"
+					value={ attributes.summaryContent }
+					onChange={ ( summaryContent ) =>
+						setAttributes( { summaryContent } )
+					}
+					ref={ summaryRef }
+					placeholder={ __( 'Write a summary…' ) }
+					aria-label={ __( 'Summary text' ) }
+				/>
 				<InnerBlocks />
 			</details>
 		</>
 	);
-};
+}
