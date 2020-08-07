@@ -35,6 +35,7 @@ export default function WidgetAreasBlockEditorProvider( {
 			select( 'core' ).canUser( 'create', 'media' ),
 			true
 		),
+		widgetAreas: select( 'core/edit-widgets' ).getWidgetAreas(),
 	} ) );
 
 	const settings = useMemo( () => {
