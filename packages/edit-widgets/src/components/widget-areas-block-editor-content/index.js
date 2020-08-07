@@ -16,7 +16,7 @@ import { useDispatch } from '@wordpress/data';
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
-export default function WidgetAreasBlockEditorContent( {} ) {
+export default function WidgetAreasBlockEditorContent() {
 	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
 
 	return (
