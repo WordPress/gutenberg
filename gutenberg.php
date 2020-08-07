@@ -186,7 +186,9 @@ add_filter( 'rest_index', 'register_site_icon_url' );
  * Registers the WP_Widget_Block widget
  */
 function gutenberg_register_widgets() {
-	register_widget( 'WP_Widget_Block' );
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+		register_widget( 'WP_Widget_Block' );
+	}
 }
 
 add_action( 'widgets_init', 'gutenberg_register_widgets' );

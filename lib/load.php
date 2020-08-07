@@ -29,8 +29,16 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	/**
 	* Start: Include for phase 2
 	*/
-	if ( ! class_exists( 'WP_REST_Widget_Utils_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-widget-utils-controller.php';
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+		if ( ! class_exists( 'WP_REST_Widget_Utils_Controller' ) ) {
+			require dirname( __FILE__ ) . '/class-wp-rest-widget-utils-controller.php';
+		}
+		if ( ! class_exists( 'WP_REST_Sidebars_Controller' ) ) {
+			require_once dirname( __FILE__ ) . '/class-wp-rest-sidebars-controller.php';
+		}
+		if ( ! class_exists( 'WP_Widget_Block' ) ) {
+			require_once dirname( __FILE__ ) . '/class-wp-widget-block.php';
+		}
 	}
 	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-block-directory-controller.php';
@@ -55,12 +63,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 	if ( ! class_exists( 'WP_REST_Plugins_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-plugins-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Sidebars_Controller' ) ) {
-		require_once dirname( __FILE__ ) . '/class-wp-rest-sidebars-controller.php';
-	}
-	if ( ! class_exists( 'WP_Widget_Block' ) ) {
-		require_once dirname( __FILE__ ) . '/class-wp-widget-block.php';
 	}
 	/**
 	* End: Include for phase 2
