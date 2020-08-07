@@ -561,16 +561,6 @@ _Related_
 
 Undocumented declaration.
 
-<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
-
-Function that manipulates media queries from stylesheets to simulate a given
-viewport width.
-
-_Parameters_
-
--   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
--   _width_ `?number`: Viewport width to simulate. If provided null, the stylesheets will not be modified.
-
 <a name="Warning" href="#Warning">#</a> **Warning**
 
 Undocumented declaration.

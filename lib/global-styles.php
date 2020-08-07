@@ -270,13 +270,12 @@ function gutenberg_experimental_global_styles_get_theme() {
  */
 function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
 	$style_features = array(
-		'color'            => array( '__experimentalColor' ),
-		'background-color' => array( '__experimentalColor' ),
-		'background'       => array( '__experimentalColor', 'gradients' ),
-		'link-color'       => array( '__experimentalColor', 'linkColor' ),
-		'line-height'      => array( '__experimentalLineHeight' ),
-		'font-size'        => array( '__experimentalFontSize' ),
-		'block-align'      => array( 'align' ),
+		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
+		'background-color'         => array( '__experimentalColor' ),
+		'background'               => array( '__experimentalColor', 'gradients' ),
+		'color'                    => array( '__experimentalColor' ),
+		'font-size'                => array( '__experimentalFontSize' ),
+		'line-height'              => array( '__experimentalLineHeight' ),
 	);
 
 	$supported_features = array();
@@ -295,15 +294,28 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
  * @return array
  */
 function gutenberg_experimental_global_styles_get_block_data() {
-	$block_data = array(
-		'global' => array(
-			'selector' => ':root',
-			'supports' => array( 'background-color' ),
-		),
-	);
+	$block_data = array();
 
 	$registry = WP_Block_Type_Registry::get_instance();
-	foreach ( $registry->get_all_registered() as $block_name => $block_type ) {
+	$blocks   = array_merge(
+		$registry->get_all_registered(),
+		array(
+			'global' => new WP_Block_Type(
+				'global',
+				array(
+					'supports' => array(
+						'__experimentalSelector' => ':root',
+						'__experimentalFontSize' => true,
+						'__experimentalColor'    => array(
+							'linkColor' => true,
+							'gradients' => true,
+						),
+					),
+				)
+			),
+		)
+	);
+	foreach ( $blocks as $block_name => $block_type ) {
 		if ( empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
 			continue;
 		}

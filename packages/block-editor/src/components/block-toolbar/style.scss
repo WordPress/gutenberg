@@ -87,23 +87,6 @@
 	}
 }
 
-.block-editor-block-toolbar__mover-switcher-container {
-	display: flex;
-}
-
-.block-editor-block-toolbar__block-switcher-wrapper {
-	display: flex;
-
-	// Drag and drop is only enabled in contextual toolbars.
-	&:not([draggable="false"]) * {
-		cursor: grab;
-	}
-
-	.block-editor-block-switcher {
-		display: block;
-	}
-}
-
 .block-editor-block-toolbar-animated-width-container {
 	position: relative;
 	overflow: hidden;
