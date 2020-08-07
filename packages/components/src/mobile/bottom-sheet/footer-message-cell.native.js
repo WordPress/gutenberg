@@ -15,7 +15,7 @@ function FooterMessageCell( { textAlign, ...props } ) {
 			editable={ false }
 			value={ '' }
 			accessibilityRole={ 'text' }
-			labelStyle={ [ styles.unsupportedFooterCell, { textAlign } ] }
+			labelStyle={ [ styles.footerMessageCell, { textAlign } ] }
 		/>
 	);
 }

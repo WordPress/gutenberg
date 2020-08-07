@@ -17,7 +17,7 @@ import {
 import {
 	PanelBody,
 	RangeControl,
-	UnsupportedFooterControl,
+	FooterMessageControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -97,7 +97,7 @@ function ColumnEdit( {
 					/>
 				</PanelBody>
 				<PanelBody>
-					<UnsupportedFooterControl
+					<FooterMessageControl
 						label={ __(
 							'Note: Column layout may vary between themes and screen sizes'
 						) }
