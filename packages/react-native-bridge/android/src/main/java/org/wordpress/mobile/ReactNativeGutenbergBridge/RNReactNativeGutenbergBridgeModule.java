@@ -120,6 +120,17 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         emitToJS(EVENT_NAME_MEDIA_APPEND, writableMap);
     }
 
+    public void appendNewGalleryBlock(List<Media> images) {
+        WritableMap writableMap = new WritableNativeMap();
+        WritableArray writableArray = new WritableNativeArray();
+        for (RNMedia image : images) {
+            writableArray.pushMap(image.toMap());
+        }
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE, "gallery");
+        writableMap.putArray("images", writableArray);
+        emitToJS(EVENT_NAME_MEDIA_APPEND, writableMap);
+    }
+
     public void setPreferredColorScheme(boolean isDarkMode) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putBoolean(MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK, isDarkMode);
