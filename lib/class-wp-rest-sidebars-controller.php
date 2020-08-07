@@ -247,7 +247,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 *
 	 * Note: The id can be either an index, the id or the name of a sidebar
 	 *
-	 * @param string $id ID of the sidebar.
+	 * @param string|int $id ID of the sidebar.
 	 *
 	 * @return array|null
 	 * @global array $wp_registered_sidebars
@@ -503,4 +503,3 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	}
 
 }
-
