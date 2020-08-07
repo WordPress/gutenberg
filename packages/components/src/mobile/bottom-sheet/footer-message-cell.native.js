@@ -8,7 +8,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import Cell from './cell';
 import styles from './styles.scss';
 
-function FooterMessageCell( { textAlign, ...props } ) {
+function FooterMessageCell( { textAlign = 'center', ...props } ) {
 	return (
 		<Cell
 			{ ...props }

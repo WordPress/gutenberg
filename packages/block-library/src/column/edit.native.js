@@ -101,7 +101,6 @@ function ColumnEdit( {
 						label={ __(
 							'Note: Column layout may vary between themes and screen sizes'
 						) }
-						textAlign="center"
 					/>
 				</PanelBody>
 			</InspectorControls>

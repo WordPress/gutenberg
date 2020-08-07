@@ -116,7 +116,6 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 					label={ __(
 						'Note: Column layout may vary between themes and screen sizes'
 					) }
-					textAlign="center"
 				/>
 			</PanelBody>
 		</BottomSheet>
