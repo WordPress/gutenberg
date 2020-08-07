@@ -273,7 +273,6 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
 		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
 		'background-color'         => array( '__experimentalColor' ),
 		'background'               => array( '__experimentalColor', 'gradients' ),
-		'block-align'              => array( 'align' ),
 		'color'                    => array( '__experimentalColor' ),
 		'font-size'                => array( '__experimentalFontSize' ),
 		'line-height'              => array( '__experimentalLineHeight' ),
@@ -295,15 +294,28 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
  * @return array
  */
 function gutenberg_experimental_global_styles_get_block_data() {
-	$block_data = array(
-		'global' => array(
-			'selector' => ':root',
-			'supports' => array( 'background-color' ),
-		),
-	);
+	$block_data = array();
 
 	$registry = WP_Block_Type_Registry::get_instance();
-	foreach ( $registry->get_all_registered() as $block_name => $block_type ) {
+	$blocks   = array_merge(
+		$registry->get_all_registered(),
+		array(
+			'global' => new WP_Block_Type(
+				'global',
+				array(
+					'supports' => array(
+						'__experimentalSelector' => ':root',
+						'__experimentalFontSize' => true,
+						'__experimentalColor'    => array(
+							'linkColor' => true,
+							'gradients' => true,
+						),
+					),
+				)
+			),
+		)
+	);
+	foreach ( $blocks as $block_name => $block_type ) {
 		if ( empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
 			continue;
 		}

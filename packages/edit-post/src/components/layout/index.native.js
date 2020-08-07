@@ -129,7 +129,7 @@ class Layout extends Component {
 				) }
 				onLayout={ this.onRootViewLayout }
 			>
-				<AutosaveMonitor />
+				<AutosaveMonitor disableIntervalChecks />
 				<View
 					style={ getStylesFromColorScheme(
 						styles.background,
@@ -153,7 +153,6 @@ class Layout extends Component {
 					<KeyboardAvoidingView
 						parentHeight={ this.state.rootViewHeight }
 						style={ toolbarKeyboardAvoidingViewStyle }
-						withAnimatedHeight
 					>
 						{ isTemplatePickerAvailable && (
 							<__experimentalPageTemplatePicker
