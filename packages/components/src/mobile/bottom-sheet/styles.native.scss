@@ -168,11 +168,12 @@
 	color: #c3c4c7;
 }
 
-// Unsupported Footer Cell
+// Footer Message Cell
 
-.unsupportedFooterCell {
+.footerMessageCell {
 	font-size: $text-editor-font-size;
 	color: $gray;
+	flex: 1;
 }
 
 // Color Cell
@@ -249,4 +250,8 @@
 
 .arrowLeftIconDark {
 	color: $dark-secondary;
+}
+
+.flex {
+	flex: 1;
 }

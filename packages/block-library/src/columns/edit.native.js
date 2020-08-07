@@ -2,18 +2,23 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { dropRight, times } from 'lodash';
+import { dropRight, times, map, compact, delay } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import {
+	PanelBody,
+	RangeControl,
+	FooterMessageControl,
+} from '@wordpress/components';
 import {
 	InspectorControls,
 	InnerBlocks,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
+	BlockVariationPicker,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState, useMemo } from '@wordpress/element';
@@ -22,6 +27,7 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import variations from './variations';
 import styles from './editor.scss';
 
 /**
@@ -150,6 +156,13 @@ function ColumnsEditContainer( {
 						type="stepper"
 					/>
 				</PanelBody>
+				<PanelBody>
+					<FooterMessageControl
+						label={ __(
+							'Note: Column layout may vary between themes and screen sizes'
+						) }
+					/>
+				</PanelBody>
 			</InspectorControls>
 			<BlockControls>
 				<BlockVerticalAlignmentToolbar
@@ -173,6 +186,7 @@ function ColumnsEditContainer( {
 							columnCount === 1 ? onDeleteBlock : undefined
 						}
 						contentStyle={ contentStyle }
+						parentWidth={ width }
 					/>
 				) }
 			</View>
@@ -231,7 +245,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 			if ( isAddingColumn ) {
 				// Get verticalAlignment from Columns block to set the same to new Column
-				const { verticalAlignment } = getBlockAttributes( clientId );
+				const { verticalAlignment } =
+					getBlockAttributes( clientId ) || {};
 
 				innerBlocks = [
 					...innerBlocks,
@@ -283,20 +298,46 @@ const ColumnsEditContainerWrapper = withDispatch(
 )( ColumnsEditContainer );
 
 const ColumnsEdit = ( props ) => {
-	const { clientId } = props;
-	const { columnCount } = useSelect(
+	const { clientId, isSelected } = props;
+	const { columnCount, isDefaultColumns } = useSelect(
 		( select ) => {
-			const { getBlockCount } = select( 'core/block-editor' );
+			const { getBlockCount, getBlock } = select( 'core/block-editor' );
+			const block = getBlock( clientId );
+			const innerBlocks = block?.innerBlocks;
+			const isContentEmpty = map(
+				innerBlocks,
+				( innerBlock ) => innerBlock.innerBlocks.length
+			);
 
 			return {
 				columnCount: getBlockCount( clientId ),
+				isDefaultColumns: ! compact( isContentEmpty ).length,
 			};
 		},
 		[ clientId ]
 	);
 
+	const [ isVisible, setIsVisible ] = useState( false );
+
+	useEffect( () => {
+		if ( isSelected && isDefaultColumns ) {
+			delay( () => setIsVisible( true ), 100 );
+		}
+	}, [] );
+
 	return (
-		<ColumnsEditContainerWrapper columnCount={ columnCount } { ...props } />
+		<>
+			<ColumnsEditContainerWrapper
+				columnCount={ columnCount }
+				{ ...props }
+			/>
+			<BlockVariationPicker
+				variations={ variations }
+				onClose={ () => setIsVisible( false ) }
+				clientId={ clientId }
+				isVisible={ isVisible }
+			/>
+		</>
 	);
 };
 

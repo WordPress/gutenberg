@@ -165,6 +165,7 @@ class BottomSheetRangeCell extends Component {
 			maximumTrackTintColor = isIOS ? '#e9eff3' : '#909090',
 			thumbTintColor = ! isIOS && '#00669b',
 			getStylesFromColorScheme,
+			rangePreview,
 			...cellProps
 		} = this.props;
 
@@ -208,6 +209,7 @@ class BottomSheetRangeCell extends Component {
 				}
 			>
 				<View style={ styles.container }>
+					{ rangePreview }
 					<Slider
 						value={ this.validateInput( sliderValue ) }
 						defaultValue={ defaultValue }
