@@ -12,10 +12,20 @@ export class AutosaveMonitor extends Component {
 	}
 
 	componentDidMount() {
-		this.setAutosaveTimer();
+		if ( ! this.props.disableIntervalChecks ) {
+			this.setAutosaveTimer();
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
+		if (
+			this.props.disableIntervalChecks &&
+			this.props.editsReference !== prevProps.editsReference
+		) {
+			this.props.autosave();
+			return;
+		}
+
 		if ( ! this.props.isDirty && prevProps.isDirty ) {
 			this.needsAutosave = false;
 			return;
