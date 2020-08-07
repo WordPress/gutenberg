@@ -1,3 +1,7 @@
+1.33.1
+------
+* Fixed a bug in the @-mentions feature where dismissing the @-mentions UI removed the @ character from the post.
+
 1.33.0
 ------
 * [***] Media editing support in Media & Text block.
