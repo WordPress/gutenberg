@@ -334,7 +334,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					if ( isset( $widget['callback'][0] ) ) {
 						$instance               = $widget['callback'][0];
 						$widget['widget_class'] = get_class( $instance );
-						$widget['settings']     = \Experimental_WP_Widget_Blocks_Manager::get_sidebar_widget_instance(
+						$widget['settings']     = static::get_sidebar_widget_instance(
 							$wp_registered_sidebars[ $sidebar_id ],
 							$widget_id
 						);
@@ -500,6 +500,80 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		$this->schema = $schema;
 
 		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Retrieves a widget instance.
+	 *
+	 * @since 5.7.0
+	 *
+	 * @param array  $sidebar sidebar data available at $wp_registered_sidebars.
+	 * @param string $id Identifier of the widget instance.
+	 * @return array Array containing the widget instance.
+	 */
+	public static function get_sidebar_widget_instance( $sidebar, $id ) {
+		list( $object, $number, $name ) = static::get_widget_info( $id );
+		if ( ! $object ) {
+			return array();
+		}
+
+		$object->_set( $number );
+
+		$instances = $object->get_settings();
+		$instance  = $instances[ $number ];
+
+		$args = array_merge(
+			$sidebar,
+			array(
+				'widget_id'   => $id,
+				'widget_name' => $name,
+			)
+		);
+
+		/**
+		 * Filters the settings for a particular widget instance.
+		 *
+		 * Returning false will effectively short-circuit display of the widget.
+		 *
+		 * @since 2.8.0
+		 *
+		 * @param array     $instance The current widget instance's settings.
+		 * @param WP_Widget $this     The current widget instance.
+		 * @param array     $args     An array of default widget arguments.
+		 */
+		$instance = apply_filters( 'widget_display_callback', $instance, $object, $args );
+
+		if ( false === $instance ) {
+			return array();
+		}
+
+		return $instance;
+	}
+
+	/**
+	 * Given a widget id returns an array containing information about the widget.
+	 *
+	 * @since 5.7.0
+	 *
+	 * @param string $widget_id Identifier of the widget.
+	 * @return array Array containing the the widget object, the number, and the name.
+	 */
+	private static function get_widget_info( $widget_id ) {
+		global $wp_registered_widgets;
+
+		if (
+			! isset( $wp_registered_widgets[ $widget_id ]['callback'][0] ) ||
+			! isset( $wp_registered_widgets[ $widget_id ]['params'][0]['number'] ) ||
+			! isset( $wp_registered_widgets[ $widget_id ]['name'] ) ||
+			! ( $wp_registered_widgets[ $widget_id ]['callback'][0] instanceof WP_Widget )
+		) {
+			return array( null, null, null );
+		}
+
+		$object = $wp_registered_widgets[ $widget_id ]['callback'][0];
+		$number = $wp_registered_widgets[ $widget_id ]['params'][0]['number'];
+		$name   = $wp_registered_widgets[ $widget_id ]['name'];
+		return array( $object, $number, $name );
 	}
 
 }
