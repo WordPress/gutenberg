@@ -209,11 +209,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	public function get_items( $request ) {
 		$data = array();
 		foreach ( (array) wp_get_sidebars_widgets() as $id => $widgets ) {
-			$sidebar = self::get_sidebar( $id )[0];
+			$sidebar = self::get_sidebar( $id )[1];
 
 			$data[] = $this->prepare_item_for_response( $sidebar, $request )->get_data();
 		}
-
 		return rest_ensure_response( $data );
 	}
 
@@ -225,7 +224,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function get_item( $request ) {
-		$sidebar = self::get_sidebar( $request['id'] )[0];
+		$sidebar = self::get_sidebar( $request['id'] )[1];
 
 		return $this->prepare_item_for_response( $sidebar, $request );
 	}
