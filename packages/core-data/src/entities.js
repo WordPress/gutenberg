@@ -55,10 +55,10 @@ export const defaultEntities = [
 		label: __( 'Taxonomy' ),
 	},
 	{
-		name: 'widgetArea',
+		name: 'sidebar',
 		kind: 'root',
 		baseURL: '/__experimental/sidebars',
-		plural: 'widgetAreas',
+		plural: 'sidebars',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),
 	},

@@ -10,7 +10,7 @@ export const KIND = 'root';
  *
  * @type {string}
  */
-export const WIDGET_AREA_ENTITY_TYPE = 'widgetArea';
+export const WIDGET_AREA_ENTITY_TYPE = 'sidebar';
 
 /**
  * "post type" of the widget area post.
