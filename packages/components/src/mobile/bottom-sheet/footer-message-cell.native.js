@@ -6,7 +6,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
-import styles from './styles.scss';
+import styles from './styles';
 
 function FooterMessageCell( props ) {
 	return (
