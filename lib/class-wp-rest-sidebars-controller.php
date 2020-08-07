@@ -139,45 +139,46 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		$sidebar_id    = $request['id'];
 		$input_widgets = $request['widgets'];
 
+		// Initialize $numbers
 		$numbers = array();
 		foreach ( $wp_registered_widget_updates as $id_base => $control ) {
-			$numbers[ $id_base ] = $control['callback'][0]->number + 1;
+			if ( is_array( $control['callback'] ) ) {
+				$numbers[ $id_base ] = $control['callback'][0]->number + 1;
+			}
 		}
-
-		$created_widgets = array();
 
 		// Create and update widgets.
 		$sidebar_widgets_ids = array();
 		foreach ( $input_widgets as $input_widget ) {
-			if ( ! isset( $wp_registered_widget_updates[ $input_widget['id_base'] ] ) ) {
-				continue;
+			ob_start();
+			if ( isset( $wp_registered_widget_updates[ $input_widget['id_base'] ] ) ) {
+				// Class-based widget
+				$update_control = $wp_registered_widget_updates[ $input_widget['id_base'] ];
+				if ( ! isset( $input_widget['id'] ) ) {
+					$number = $numbers[ $input_widget['id_base'] ] ++;
+					$id     = $input_widget['id_base'] . '-' . $number;
+
+					$input_widget['id']     = $id;
+					$input_widget['number'] = $number;
+				}
+				$field  = 'widget-' . $input_widget['id_base'];
+				$number = $input_widget['number'];
+				$_POST  = $input_widget;
+				$_POST[ $field ][ $number ] = wp_slash( $input_widget['settings'] );
+				call_user_func( $update_control['callback'] );
+				$update_control['callback'][0]->updated = false;
+			} elseif ( $wp_registered_widget_updates[ $input_widget['id'] ] ) {
+				// Old-style widget
+				$update_control = $wp_registered_widget_updates[ $input_widget['id'] ];
+				$_POST = wp_slash( $input_widget['settings'] );
+				call_user_func( $update_control['callback'] );
 			}
-			$update_control = $wp_registered_widget_updates[ $input_widget['id_base'] ];
-			if ( ! isset( $input_widget['id'] ) ) {
-				$number = $numbers[ $input_widget['id_base'] ] ++;
-				$id     = $input_widget['id_base'] . '-' . $number;
-
-				$input_widget['id']     = $id;
-				$input_widget['number'] = $number;
-				$created_widgets[]      = array(
-					'id'      => $id,
-					'number'  => $number,
-					'id_base' => $input_widget['id_base'],
-				);
-			}
-
-			$field  = 'widget-' . $input_widget['id_base'];
-			$number = $input_widget['number'];
-			$_POST  = $input_widget;
-
-			$_POST[ $field ][ $number ] = wp_slash( $input_widget['settings'] );
-			call_user_func_array( $update_control['callback'], array() );
-			$update_control['callback'][0]->updated = false;
+			ob_end_clean();
 
 			$sidebar_widgets_ids[] = $input_widget['id'];
 		}
 
-		// Update sidebar to only have the widgets we just processed.
+		// Update sidebar to only consist of the widgets we just processed.
 		$sidebars                = wp_get_sidebars_widgets();
 		$sidebars[ $sidebar_id ] = $sidebar_widgets_ids;
 		wp_set_sidebars_widgets( $sidebars );
@@ -331,7 +332,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						$widget['rendered'] = ob_get_clean();
 					}
 
-					if ( isset( $widget['callback'][0] ) ) {
+					if ( is_array( $widget['callback'] ) && isset( $widget['callback'][0] ) ) {
 						$instance               = $widget['callback'][0];
 						$widget['widget_class'] = get_class( $instance );
 						$widget['settings']     = static::get_sidebar_widget_instance(
