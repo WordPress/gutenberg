@@ -846,5 +846,11 @@ public class WPAndroidGlueCode {
     private boolean isMediaSelectedCallbackRegistered() {
         return mMediaSelectedCallback != null;
     }
+
+    public void updateCapabilities(GutenbergProps gutenbergProps) {
+        mRnReactNativeGutenbergBridgePackage
+                .getRNReactNativeGutenbergBridgeModule()
+                .updateCapabilities(gutenbergProps.getUpdatedCapabilitiesProps());
+    }
 }
 
