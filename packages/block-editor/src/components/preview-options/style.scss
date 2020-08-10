@@ -16,12 +16,15 @@
 	.components-popover__content {
 		overflow-y: visible;
 	}
-	.components-menu-group {
-		&:first-child {
-			padding-bottom: $grid-unit-10;
-		}
-		&:last-child {
-			margin-bottom: 0;
+
+	&.edit-post-post-preview-dropdown {
+		.components-menu-group {
+			&:first-child {
+				padding-bottom: $grid-unit-10;
+			}
+			&:last-child {
+				margin-bottom: 0;
+			}
 		}
 	}
 
