@@ -30,7 +30,7 @@ export default function save( { attributes } ) {
 								height: `${ embedHeight }px`,
 							} }
 							aria-label={ sprintf(
-								/* translators: Placeholder is the filename. */
+								/* translators: %s: filename. */
 								__( 'Embed of %s.' ),
 								fileName
 							) }
