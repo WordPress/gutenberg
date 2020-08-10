@@ -44,5 +44,6 @@
 	"supports": {
 		"anchor": true,
 		"align": true
-	}
+	},
+	"script": "utils.js"
 }

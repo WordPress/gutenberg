@@ -7,7 +7,9 @@ const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
 const { get, escapeRegExp, compact } = require( 'lodash' );
-const { basename, sep } = require( 'path' );
+const { basename, sep, resolve } = require( 'path' );
+const glob = require( 'fast-glob' );
+const fs = require( 'fs' );
 
 /**
  * WordPress dependencies
@@ -40,6 +42,26 @@ const gutenbergPackages = Object.keys( dependencies )
 			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
+
+const blockLibraryScripts = glob
+	.sync( './packages/block-library/src/*/block.json' )
+	.map( ( blockFile ) => {
+		const blockConfigData = fs.readFileSync( blockFile, 'utf8' );
+		const blockConfig = JSON.parse( blockConfigData );
+		if ( blockConfig.script ) {
+			const scriptPath = resolve(
+				blockFile.replace( 'block.json', '' ),
+				blockConfig.script
+			);
+
+			if ( fs.existsSync( scriptPath ) ) {
+				return scriptPath;
+			}
+		}
+
+		return false;
+	} )
+	.filter( ( blockFile ) => !! blockFile );
 
 module.exports = {
 	optimization: {
@@ -212,6 +234,18 @@ module.exports = {
 				to: 'build/block-library/blocks/[1]/block.json',
 			},
 		] ),
+		new CopyWebpackPlugin(
+			blockLibraryScripts.map( ( scriptFile ) => ( {
+				from: scriptFile,
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }[\\w-]+\\.js$`
+				),
+				to: 'build/block-library/blocks/[1].js',
+				transform( content ) {
+					return content.toString().replace( /^export /gm, '' );
+				},
+			} ) )
+		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	].filter( Boolean ),
 	watchOptions: {

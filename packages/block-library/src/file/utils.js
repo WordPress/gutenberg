@@ -54,3 +54,18 @@ const createActiveXObject = function ( type ) {
 	}
 	return ax;
 };
+
+/**
+ * Hides all .wp-block-file__embed elements on the document. This function is only intended
+ * to be run on the front-end, it may have weird side effects running in the block editor.
+ */
+export const hidePdfEmbedsOnUnsupportedBrowsers = function () {
+	if ( ! browserSupportsPdfs() ) {
+		const embeds = document.getElementsByClassName(
+			'wp-block-file__embed'
+		);
+		Array.prototype.forEach.call( embeds, function ( embed ) {
+			embed.style.display = 'none';
+		} );
+	}
+};

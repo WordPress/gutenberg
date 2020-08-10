@@ -6,69 +6,23 @@
  */
 
 /**
- * Renders the `core/file` block on server.
+ * When the `core/file` block is rendering, check if we need to enqueue the `'wp-block-library-file` script.
  *
  * @param array $attributes The block attributes.
  * @param array $content    The block content.
  *
- * @return string Returns the modified block content.
+ * @return string Returns the block content.
  */
 function render_block_core_file( $attributes, $content ) {
-	$script = '';
 	if ( ! empty( $attributes['showInlineEmbed'] ) ) {
-		$script = <<<HTML
-			<script>
-				( function () {
-					var ua = window.navigator.userAgent,
-						canEmbed = true,
-						embeds, axo;
-
-					function createActiveXObject( type ) {
-						var ax;
-						try {
-							ax = new window.ActiveXObject( type );
-						} catch ( e ) {
-							ax = undefined;
-						}
-						return ax;
-					};
-
-					if (
-						// Most mobile devices include "Mobi" in their UA.
-						ua.indexOf( 'Mobi' ) > -1 ||
-						// Android tablets are the noteable exception.
-						ua.indexOf( 'Android' ) > -1 ||
-						(
-							// iPad pretends to be a Mac.
-							ua.indexOf( 'Macintosh' ) > -1 &&
-							navigator.maxTouchPoints &&
-							navigator.maxTouchPoints > 2
-						)
-					) {
-						canEmbed = false;
-					}
-
-					// IE only supports PDFs when there's an ActiveX object available for it.
-					if ( !! ( window.ActiveXObject || 'ActiveXObject' in window ) &&
-						! (
-							createActiveXObject( 'AcroPDF.PDF' ) ||
-							createActiveXObject( 'PDF.PdfCtrl' )
-						) ) {
-						canEmbed = false;
-					}
-
-					if ( ! canEmbed ) {
-						embeds = document.getElementsByClassName( 'wp-block-file__embed' );
-						Array.prototype.forEach.call( embeds, function ( embed ) {
-							embed.style.display = 'none';
-						} );
-					}
-				} )();
-			</script>
-HTML;
+		// Check if it's already enqueued, so we don't add the inline script multiple times.
+		if ( ! in_array( 'wp-block-library-file', wp_scripts()->queue, true ) ) {
+			wp_enqueue_script( 'wp-block-library-file', plugins_url( '/file.js', __FILE__ ) );
+			wp_add_inline_script( 'wp-block-library-file', 'hidePdfEmbedsOnUnsupportedBrowsers();' );
+		}
 	}
 
-	return $content . $script;
+	return $content;
 }
 
 /**
