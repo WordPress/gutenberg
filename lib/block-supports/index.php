@@ -84,6 +84,6 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		$block_root->setAttribute( 'style', $new_styles );
 	}
 
-	return $dom->saveHtml();
+	return mb_convert_encoding( $dom->saveHtml(), 'UTF-8', 'HTML-ENTITIES' );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
