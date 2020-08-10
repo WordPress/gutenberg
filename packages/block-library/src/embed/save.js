@@ -18,6 +18,7 @@ export default function save( { attributes } ) {
 	const embedClassName = classnames( 'wp-block-embed', {
 		[ `is-type-${ type }` ]: type,
 		[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
+		[ `wp-block-embed-${ providerNameSlug }` ]: providerNameSlug,
 	} );
 
 	return (
