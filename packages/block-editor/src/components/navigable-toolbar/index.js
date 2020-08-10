@@ -64,6 +64,8 @@ function useIsAccessibleToolbar( ref ) {
 		if ( ! onlyToolbarItem ) {
 			deprecated( 'Using custom components as toolbar controls', {
 				alternative: 'ToolbarItem or ToolbarButton components',
+				link:
+					'https://developer.wordpress.org/block-editor/components/toolbar-button/',
 			} );
 		}
 		setIsAccessibleToolbar( onlyToolbarItem );

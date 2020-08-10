@@ -25,6 +25,8 @@ function MyToolbar() {
 }
 ```
 
+### Inside BlockControls
+
 If you're working on a custom block and you want to add controls to the block toolbar, you should use [BlockControls](/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md) instead. Optinally wrapping it with [ToolbarGroup](/packages/components/src/toolbar-group/README.md).
 
 ```jsx

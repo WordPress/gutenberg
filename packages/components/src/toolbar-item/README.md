@@ -1,6 +1,6 @@
 # ToolbarItem
 
-A ToolbarItem is a generic headless component that can be used to make any custom component a [Toolbar](/packages/components/src/toolbar/README.md) item.
+A ToolbarItem is a generic headless component that can be used to make any custom component a [Toolbar](/packages/components/src/toolbar/README.md) item. It should be inside a [Toolbar](/packages/components/src/toolbar/README.md) or [ToolbarGroup](/packages/components/src/toolbar-group/README.md) when used to create general interfaces. If you're using it to add controls to your custom block, you should consider using [BlockControls](/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md).
 
 ## Usage
 
@@ -43,6 +43,26 @@ function MyToolbar() {
 				) }
 			</ToolbarItem>
 		</Toolbar>
+	);
+}
+```
+
+### Inside BlockControls
+
+If you're working on a custom block and you want to add controls to the block toolbar, you should use [BlockControls](/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md) instead. Optinally wrapping it with [ToolbarGroup](/packages/components/src/toolbar-group/README.md).
+
+```jsx
+import { BlockControls } from '@wordpress/block-editor';
+import { Toolbar, ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
+import { edit } from '@wordpress/icons';
+
+function Edit() {
+	return (
+		<BlockControls>
+			<ToolbarGroup>
+				<ToolbarItem as={ Button }>I am a toolbar button</ToolbarItem>
+			</ToolbarGroup>
+		</BlockControls>
 	);
 }
 ```
