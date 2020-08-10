@@ -21,9 +21,10 @@ function BlockTypesList( {
 	onHover = () => {},
 	children,
 	label,
+	limit,
 } ) {
 	const composite = useCompositeState();
-	const normalizedItems = includeVariationsInInserterItems( items );
+	const normalizedItems = includeVariationsInInserterItems( items, limit );
 	const orderId = normalizedItems.reduce(
 		( acc, item ) => acc + '--' + item.id,
 		''
