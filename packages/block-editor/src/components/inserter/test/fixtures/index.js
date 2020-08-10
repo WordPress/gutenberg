@@ -25,6 +25,21 @@ export const paragraphItem = {
 	keywords: [ 'random' ],
 };
 
+export const withSingleVariationItem = {
+	id: 'core/embed',
+	name: 'core/embed',
+	description: 'core description',
+	initialAttributes: {},
+	category: 'embed',
+	variations: [
+		{
+			name: 'youtube',
+			title: 'YouTube',
+			description: 'youtube description',
+		},
+	],
+};
+
 export const withVariationsItem = {
 	id: 'core/block-with-variations',
 	name: 'core/block-with-variations',
@@ -81,8 +96,8 @@ export const moreItem = {
 };
 
 export const youtubeItem = {
-	id: 'core-embed/youtube',
-	name: 'core-embed/youtube',
+	id: 'core/embed',
+	name: 'core/embed',
 	initialAttributes: {},
 	title: 'YouTube',
 	category: 'embed',
