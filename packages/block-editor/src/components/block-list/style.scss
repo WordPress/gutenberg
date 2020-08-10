@@ -550,6 +550,12 @@
 			&.is-down-button svg {
 				margin-bottom: 3px;
 			}
+
+			&:focus::before {
+				left: 0 !important;
+				min-width: 0;
+				width: 100%;
+			}
 		}
 	}
 }
