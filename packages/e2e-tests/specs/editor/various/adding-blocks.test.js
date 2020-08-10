@@ -248,13 +248,12 @@ describe( 'adding blocks', () => {
 		);
 		await browseAll.click();
 		const inserterMenuInputSelector =
-			'.block-editor-inserter__menu .block-editor-inserter__search-input';
-		await page.waitForSelector( inserterMenuInputSelector );
-		const inserterMenuSearchInput = await page.$(
+			'.edit-post-layout__inserter-panel .block-editor-inserter__search-input';
+		const inserterMenuSearchInput = await page.waitForSelector(
 			inserterMenuInputSelector
 		);
 		inserterMenuSearchInput.type( 'cover' );
-		const coverBlock = await page.$(
+		const coverBlock = await page.waitForSelector(
 			'.block-editor-block-types-list .editor-block-list-item-cover'
 		);
 		await coverBlock.click();
