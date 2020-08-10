@@ -76,7 +76,7 @@ class MenuItem extends Component {
 					>
 						<View style={ modalIconStyle }>
 							<Icon
-								icon={ item.icon.src }
+								icon={ item.icon.src || item.icon }
 								fill={ modalIconStyle.fill }
 								size={ modalIconStyle.width }
 							/>

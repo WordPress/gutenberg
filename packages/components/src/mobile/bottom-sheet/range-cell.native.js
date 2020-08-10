@@ -59,6 +59,12 @@ class BottomSheetRangeCell extends Component {
 		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
 	}
 
+	toFixed( num ) {
+		const { toFixed = 0 } = this.props;
+		const fixed = Math.pow( 10, toFixed );
+		return Math.floor( num * fixed ) / fixed;
+	}
+
 	getFontScale() {
 		return PixelRatio.getFontScale() < 1 ? 1 : PixelRatio.getFontScale();
 	}
@@ -70,8 +76,15 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	handleChange( text ) {
+		text =
+			typeof text === 'number'
+				? this.toFixed( text )
+				: text.replace( ',', '.' );
+
 		if ( ! isNaN( Number( text ) ) ) {
-			this.setState( { sliderValue: text } );
+			this.setState( {
+				sliderValue: text,
+			} );
 			this.announceCurrentValue( text );
 		}
 	}
@@ -81,7 +94,7 @@ class BottomSheetRangeCell extends Component {
 
 		if ( validateInput ) {
 			const sliderValue = this.validateInput( this.state.sliderValue );
-			this.handleValueSave( sliderValue );
+			this.handleValueSave( this.toFixed( sliderValue ) );
 		}
 
 		this.setState( newState );
@@ -96,19 +109,17 @@ class BottomSheetRangeCell extends Component {
 			return Math.min( Math.max( text, minimumValue ), maximumValue );
 		}
 		return Math.min(
-			Math.max(
-				text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' ),
-				minimumValue
-			),
+			Math.max( text.replace( /[^0-9.]/g, '' ), minimumValue ),
 			maximumValue
 		);
 	}
 
 	handleValueSave( text ) {
 		if ( ! isNaN( Number( text ) ) ) {
-			this.onChangeValue( text );
-			this.setState( { sliderValue: text } );
-			this.announceCurrentValue( text );
+			const value = this.toFixed( text );
+			this.onChangeValue( value );
+			this.setState( { sliderValue: value } );
+			this.announceCurrentValue( value );
 		}
 	}
 
@@ -154,6 +165,7 @@ class BottomSheetRangeCell extends Component {
 			maximumTrackTintColor = isIOS ? '#e9eff3' : '#909090',
 			thumbTintColor = ! isIOS && '#00669b',
 			getStylesFromColorScheme,
+			rangePreview,
 			...cellProps
 		} = this.props;
 
@@ -197,6 +209,7 @@ class BottomSheetRangeCell extends Component {
 				}
 			>
 				<View style={ styles.container }>
+					{ rangePreview }
 					<Slider
 						value={ this.validateInput( sliderValue ) }
 						defaultValue={ defaultValue }
@@ -225,7 +238,7 @@ class BottomSheetRangeCell extends Component {
 						onChangeText={ this.handleChange }
 						onFocus={ this.handleToggleFocus }
 						onBlur={ this.handleToggleFocus }
-						keyboardType="number-pad"
+						keyboardType="numeric"
 						returnKeyType="done"
 						value={ `${ sliderValue }` }
 					/>
