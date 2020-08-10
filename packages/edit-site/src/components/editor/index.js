@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -57,6 +57,7 @@ function Editor() {
 		page,
 		template,
 		select,
+		isFocusModeActive,
 	} = useSelect( ( _select ) => {
 		const {
 			isFeatureActive,
@@ -80,6 +81,7 @@ function Editor() {
 
 		return {
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
+			isFocusModeActive: isFeatureActive( 'focusMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
 			sidebarIsOpened: !! _select(
 				'core/interface'
@@ -99,7 +101,14 @@ function Editor() {
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
-	const { setPage } = useDispatch( 'core/edit-site' );
+	const { setPage, toggleFeature } = useDispatch( 'core/edit-site' );
+
+	// Disable focus mode on load (focusMode used for template part visibility in site editor).
+	useEffect( () => {
+		if ( isFocusModeActive ) {
+			toggleFeature( 'focusMode' );
+		}
+	}, [] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
