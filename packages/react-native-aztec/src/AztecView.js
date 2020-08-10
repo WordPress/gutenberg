@@ -97,7 +97,7 @@ class AztecView extends React.Component {
 		const newEvent = {
 			...event,
 			keyCode: event.nativeEvent.keyCode,
-			preventDefault: () => {},
+			preventDefault: event.preventDefault,
 		};
 		onKeyDown( newEvent );
 	}
