@@ -193,8 +193,12 @@ function QuickInserter( {
 	const onBrowseAll = () => {
 		// We have to select the previous block because the menu inserter
 		// inserts the new block after the selected one.
+		// Ideally, this selection shouldn't focus the block to avoid the setTimeout.
 		selectBlock( previousBlockClientId );
-		setInsererIsOpened( true );
+		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+		setTimeout( () => {
+			setInsererIsOpened( true );
+		} );
 	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
