@@ -8,11 +8,12 @@ import {
 	Dimensions,
 	View,
 } from 'react-native';
+import SafeArea from 'react-native-safe-area';
 
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
 /**
@@ -25,7 +26,6 @@ const AnimatedKeyboardAvoidingView = Animated.createAnimatedComponent(
 );
 
 const MIN_HEIGHT = 44;
-const ANIMATION_DURATION = 200;
 
 export const KeyboardAvoidingView = ( {
 	parentHeight,
@@ -33,7 +33,6 @@ export const KeyboardAvoidingView = ( {
 	withAnimatedHeight = false,
 	...otherProps
 } ) => {
-	const [ keyboardHeight, setKeyboardHeight ] = useState( 0 );
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const { height = 0 } = sizes || {};
 
@@ -51,30 +50,26 @@ export const KeyboardAvoidingView = ( {
 		};
 	}, [] );
 
-	useEffect( () => {
-		animate();
-	}, [ keyboardHeight ] );
-
 	function onKeyboardWillShow( { endCoordinates } ) {
-		setKeyboardHeight( endCoordinates.height );
+		SafeArea.getSafeAreaInsetsForRootView().then( ( result ) => {
+			animatedHeight.setValue(
+				endCoordinates.height +
+					MIN_HEIGHT -
+					result.safeAreaInsets.bottom
+			);
+		} );
 	}
 
-	function onKeyboardWillHide() {
-		setKeyboardHeight( 0 );
+	function onKeyboardWillHide( { duration } ) {
+		animate( duration );
 	}
 
-	const paddedKeyboardHeight =
-		keyboardHeight + MIN_HEIGHT - ( style.bottom || 0 );
-
-	function animate() {
-		if ( keyboardHeight ) {
-			animatedHeight.setValue( paddedKeyboardHeight );
-		} else
-			Animated.timing( animatedHeight, {
-				toValue: MIN_HEIGHT,
-				duration: ANIMATION_DURATION,
-				useNativeDriver: false,
-			} ).start();
+	function animate( duration ) {
+		Animated.timing( animatedHeight, {
+			toValue: MIN_HEIGHT,
+			duration,
+			useNativeDriver: false,
+		} ).start();
 	}
 
 	return (
