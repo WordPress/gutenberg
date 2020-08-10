@@ -144,9 +144,35 @@ function ColumnsEditContainer( {
 		return null;
 	};
 
-	const columnWidths = Object.values(
-		getColumnWidths( innerColumns, columnCount )
-	);
+	const getColumnsSliders = () => {
+		const columnWidths = Object.values(
+			getColumnWidths( innerColumns, columnCount )
+		);
+
+		return innerColumns.map( ( column, index ) => {
+			return (
+				<RangeControl
+					min={ 1 }
+					max={ 100 }
+					step={ 0.1 }
+					value={ columnWidths[ index ] }
+					onChange={ ( value ) =>
+						updateInnerColumnWidth( value, column.clientId )
+					}
+					cellContainerStyle={ styles.cellContainerStyle }
+					toFixed={ 1 }
+					rangePreview={
+						<ColumnsPreview
+							columnWidths={ columnWidths }
+							selectedColumnIndex={ index }
+						/>
+					}
+					key={ column.id }
+					withTextInput={ false }
+				/>
+			);
+		} );
+	};
 
 	return (
 		<>
@@ -163,32 +189,7 @@ function ColumnsEditContainer( {
 						max={ columnCount + 1 }
 						type="stepper"
 					/>
-					{ innerColumns.map( ( column, index ) => {
-						return (
-							<RangeControl
-								min={ 1 }
-								max={ 100 }
-								step={ 0.1 }
-								value={ columnWidths[ index ] }
-								onChange={ ( value ) =>
-									updateInnerColumnWidth(
-										value,
-										column.clientId
-									)
-								}
-								cellContainerStyle={ styles.cellContainerStyle }
-								toFixed={ 1 }
-								rangePreview={
-									<ColumnsPreview
-										columnWidths={ columnWidths }
-										selectedColumnIndex={ index }
-									/>
-								}
-								key={ column.id }
-								withTextInput={ false }
-							/>
-						);
-					} ) }
+					{ getColumnsSliders() }
 				</PanelBody>
 				<PanelBody>
 					<FooterMessageControl
