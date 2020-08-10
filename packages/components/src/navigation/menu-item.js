@@ -15,13 +15,25 @@ import Button from '../button';
 import Text from '../text';
 
 const NavigationMenuItem = ( props ) => {
-	const { children, hasChildren, isActive, onClick, title } = props;
+	const {
+		children,
+		hasChildren,
+		id,
+		isActive,
+		onClick,
+		setActiveLevel,
+		title,
+	} = props;
 	const classes = classnames( 'components-navigation__menu-item', {
 		'is-active': isActive,
 	} );
 
 	const handleClick = () => {
-		onClick( children.length ? children[ 0 ] : props );
+		if ( children.length ) {
+			setActiveLevel( id );
+			return;
+		}
+		onClick( props );
 	};
 
 	return (

@@ -46,20 +46,22 @@ function Example() {
 
 	return (
 		<Navigation activeId={ active } items={ data } rootTitle="Home">
-			{ ( { currentItems, currentLevel, backItem } ) => {
+			{ ( { level, levelItems, parentLevel, setActiveLevel } ) => {
 				return (
 					<>
-						{ backItem && (
+						{ parentLevel && (
 							<Button
 								isPrimary
-								onClick={ () => setActive( backItem.id ) }
+								onClick={ () =>
+									setActiveLevel( parentLevel.id )
+								}
 							>
 								Back
 							</Button>
 						) }
-						<h1>{ currentLevel.title }</h1>
+						<h1>{ level.title }</h1>
 						<NavigationMenu>
-							{ currentItems.map( ( item ) => {
+							{ levelItems.map( ( item ) => {
 								return (
 									<NavigationMenuItem
 										{ ...item }
@@ -67,6 +69,7 @@ function Example() {
 										onClick={ ( selected ) =>
 											setActive( selected.id )
 										}
+										setActiveLevel={ setActiveLevel }
 									/>
 								);
 							} ) }

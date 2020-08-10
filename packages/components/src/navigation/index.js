@@ -1,4 +1,11 @@
+/**
+ * WordPress dependencies
+ */
+import { useEffect, useState } from '@wordpress/element';
+
 const Navigation = ( { activeId, children, items: rawItems, rootTitle } ) => {
+	const [ activeLevel, setActiveLevel ] = useState( 'root' );
+
 	const mapItemData = ( items ) => {
 		return items.map( ( item ) => {
 			const itemChildren = rawItems.filter(
@@ -19,29 +26,27 @@ const Navigation = ( { activeId, children, items: rawItems, rootTitle } ) => {
 	];
 
 	const activeItem = items.find( ( item ) => item.id === activeId );
-	const currentLevel = activeItem
-		? items.find( ( item ) => item.id === activeItem.parent )
-		: { id: 'root', title: rootTitle };
-	const parentLevel = currentLevel
-		? items.find( ( item ) => item.id === currentLevel.parent )
-		: null;
-	const currentItems = currentLevel
-		? items.filter( ( item ) => item.parent === currentLevel.id )
-		: items.filter( ( item ) => item.parent === 'root' );
-	const parentItems = parentLevel
-		? items.filter( ( item ) => item.parent === parentLevel.id )
-		: [];
-	const backItem = parentItems.length ? parentItems[ 0 ] : null;
+	const level = items.find( ( item ) => item.id === activeLevel );
+	const levelItems = items.filter( ( item ) => item.parent === level.id );
+	const parentLevel =
+		level.id === 'root'
+			? null
+			: items.find( ( item ) => item.id === level.parent );
+
+	useEffect( () => {
+		if ( activeItem ) {
+			setActiveLevel( activeItem.parent );
+		}
+	}, [] );
 
 	return (
 		<div className="components-navigation">
 			{ children( {
 				activeId,
-				backItem,
-				currentItems,
-				currentLevel,
-				parentItems,
+				level,
+				levelItems,
 				parentLevel,
+				setActiveLevel,
 			} ) }
 		</div>
 	);
