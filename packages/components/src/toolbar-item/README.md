@@ -54,7 +54,6 @@ If you're working on a custom block and you want to add controls to the block to
 ```jsx
 import { BlockControls } from '@wordpress/block-editor';
 import { Toolbar, ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
-import { edit } from '@wordpress/icons';
 
 function Edit() {
 	return (
