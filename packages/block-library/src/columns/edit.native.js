@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
 	RangeControl,
-	UnsupportedFooterControl,
+	FooterMessageControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -191,11 +191,10 @@ function ColumnsEditContainer( {
 					} ) }
 				</PanelBody>
 				<PanelBody>
-					<UnsupportedFooterControl
+					<FooterMessageControl
 						label={ __(
 							'Note: Column layout may vary between themes and screen sizes'
 						) }
-						textAlign="center"
 					/>
 				</PanelBody>
 			</InspectorControls>

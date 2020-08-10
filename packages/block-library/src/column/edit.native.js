@@ -17,7 +17,7 @@ import {
 import {
 	PanelBody,
 	RangeControl,
-	UnsupportedFooterControl,
+	FooterMessageControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -82,7 +82,7 @@ function ColumnEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
 					<RangeControl
-						label={ __( 'Percentage width' ) }
+						label={ __( 'Width' ) }
 						min={ 1 }
 						max={ 100 }
 						value={ columnWidths[ selectedColumnIndex ] }
@@ -97,11 +97,10 @@ function ColumnEdit( {
 					/>
 				</PanelBody>
 				<PanelBody>
-					<UnsupportedFooterControl
+					<FooterMessageControl
 						label={ __(
 							'Note: Column layout may vary between themes and screen sizes'
 						) }
-						textAlign="center"
 					/>
 				</PanelBody>
 			</InspectorControls>

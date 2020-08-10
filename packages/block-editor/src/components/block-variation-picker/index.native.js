@@ -20,7 +20,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
 	BottomSheet,
-	UnsupportedFooterControl,
+	FooterMessageControl,
 } from '@wordpress/components';
 import { Icon, close } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
@@ -112,11 +112,10 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 				} ) }
 			</ScrollView>
 			<PanelBody>
-				<UnsupportedFooterControl
+				<FooterMessageControl
 					label={ __(
 						'Note: Column layout may vary between themes and screen sizes'
 					) }
-					textAlign="center"
 				/>
 			</PanelBody>
 		</BottomSheet>

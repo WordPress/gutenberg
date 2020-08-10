@@ -222,9 +222,7 @@ function register_site_editor_homepage_settings() {
 		'general',
 		'show_on_front',
 		array(
-			'show_in_rest' => array(
-				'name' => 'show_on_front',
-			),
+			'show_in_rest' => true,
 			'type'         => 'string',
 			'description'  => __( 'What to show on the front page', 'gutenberg' ),
 		)
@@ -234,12 +232,10 @@ function register_site_editor_homepage_settings() {
 		'general',
 		'page_on_front',
 		array(
-			'show_in_rest' => array(
-				'name' => 'page_on_front',
-			),
+			'show_in_rest' => true,
 			'type'         => 'number',
 			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
 		)
 	);
 }
-add_action( 'rest_api_init', 'register_site_editor_homepage_settings', 10 );
+add_action( 'init', 'register_site_editor_homepage_settings', 10 );

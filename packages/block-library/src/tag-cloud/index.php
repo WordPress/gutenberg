@@ -13,9 +13,7 @@
  * @return string Returns the tag cloud for selected taxonomy.
  */
 function render_block_core_tag_cloud( $attributes ) {
-	$class = isset( $attributes['align'] ) ?
-		"wp-block-tag-cloud align{$attributes['align']}" :
-		'wp-block-tag-cloud';
+	$class = 'wp-block-tag-cloud';
 
 	if ( isset( $attributes['className'] ) ) {
 		$class .= ' ' . $attributes['className'];

@@ -1,10 +1,20 @@
 {
 	"name": "core/post-tags",
 	"category": "design",
-	"usesContext": [
-		"postId"
-	],
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		}
+	},
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
-		"html": false
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalFontSize": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
+		},
+		"__experimentalLineHeight": true
 	}
 }
