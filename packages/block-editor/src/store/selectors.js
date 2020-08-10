@@ -78,7 +78,7 @@ export function getBlockName( state, clientId ) {
 	const socialLinkName = 'core/social-link';
 
 	if ( Platform.OS !== 'web' && block?.name === socialLinkName ) {
-		const attributes = state.blocks.attributes[ clientId ].service;
+		const attributes = state.blocks.attributes[ clientId ];
 		const { service } = attributes;
 
 		return service ? `${ socialLinkName }-${ service }` : socialLinkName;
