@@ -1,4 +1,10 @@
 .wp-block-file {
+	.wp-block[data-align="left"] > &,
+	.wp-block[data-align="right"] > & {
+		// Stop file block from collapsing when floated.
+		height: auto;
+	}
+
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;

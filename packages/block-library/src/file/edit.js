@@ -58,6 +58,8 @@ class FileEdit extends Component {
 			hasError: false,
 			showCopyConfirmation: false,
 		};
+
+		this.browserSupportsPdfs = browserSupportsPdfs();
 	}
 
 	componentDidMount() {
@@ -90,8 +92,6 @@ class FileEdit extends Component {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
 		}
-
-		this.browserSupportsPdfs = browserSupportsPdfs();
 	}
 
 	componentDidUpdate( prevProps ) {
