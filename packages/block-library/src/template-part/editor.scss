@@ -122,5 +122,9 @@
 
 	&:hover:not(.is-selected):not(.has-child-selected) {
 		cursor: pointer;
+
+		* {
+			pointer-events: none;
+		}
 	}
 }
