@@ -73,7 +73,7 @@ const variations = [
 	},
 	{
 		// Deprecate Instagram per FB policy
-		// See: https://developers.facebook.com/docs/plugins/oembed-legacy
+		// See: https://developers.facebook.com/docs/instagram/oembed-legacy
 		name: 'instagram',
 		title: 'Instagram',
 		icon: embedInstagramIcon,
