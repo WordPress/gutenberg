@@ -9,7 +9,12 @@ import { escape, get, head, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch, withDispatch, withSelect } from '@wordpress/data';
+import {
+	useSelect,
+	useDispatch,
+	withDispatch,
+	withSelect,
+} from '@wordpress/data';
 import {
 	KeyboardShortcuts,
 	PanelBody,
@@ -70,6 +75,11 @@ function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
+	const isDraggingBlocks = useSelect(
+		( select ) => select( 'core/block-editor' ).isDraggingBlocks(),
+		[]
+	);
+
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
 	// This can't be done in the useState call because it cconflicts
@@ -107,13 +117,19 @@ function NavigationLinkEdit( {
 		}
 	}, [ url ] );
 
-	// Set isDragEnter to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
 	useEffect( () => {
+		function handleDragStart( e ) {
+			// Check the first time when the dragging starts
+			handleDragEnter( e );
+		}
+
+		// Set isDragEnter to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
 		function handleDragEnd() {
 			setIsDragEnter( false );
 		}
 
 		function handleDragEnter( e ) {
+			// Check if the current target is inside the item element
 			if ( listItemRef.current.contains( e.target ) ) {
 				setIsDragEnter( true );
 			} else {
@@ -121,10 +137,14 @@ function NavigationLinkEdit( {
 			}
 		}
 
+		// Bind these events to the document to catch all drag events.
+		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
+		document.addEventListener( 'dragstart', handleDragStart );
 		document.addEventListener( 'dragend', handleDragEnd );
 		document.addEventListener( 'dragenter', handleDragEnter );
 
 		return () => {
+			document.removeEventListener( 'dragstart', handleDragStart );
 			document.removeEventListener( 'dragend', handleDragEnd );
 			document.removeEventListener( 'dragenter', handleDragEnter );
 		};
@@ -208,8 +228,12 @@ function NavigationLinkEdit( {
 			</InspectorControls>
 			<Block.li
 				className={ classnames( {
-					'is-editing': isSelected || isParentOfSelectedBlock,
-					'is-selected': isSelected,
+					'is-editing':
+						( isSelected || isParentOfSelectedBlock ) &&
+						// Don't show the element as editing while dragging
+						! isDraggingBlocks,
+					// Don't select the element while dragging
+					'is-selected': isSelected && ! isDraggingBlocks,
 					'is-drag-enter': isDragEnter,
 					'has-link': !! url,
 					'has-child': hasDescendants,
@@ -309,7 +333,9 @@ function NavigationLinkEdit( {
 					renderAppender={
 						( isSelected && hasDescendants ) ||
 						( isImmediateParentOfSelectedBlock &&
-							! selectedBlockHasDescendants )
+							! selectedBlockHasDescendants ) ||
+						// Show the appender while dragging to allow inserting element between item and the appender
+						( isDraggingBlocks && hasDescendants )
 							? InnerBlocks.DefaultAppender
 							: false
 					}
@@ -319,7 +345,10 @@ function NavigationLinkEdit( {
 						className: classnames(
 							'wp-block-navigation__container',
 							{
-								'is-parent-of-selected-block': isParentOfSelectedBlock,
+								'is-parent-of-selected-block':
+									isParentOfSelectedBlock &&
+									// Don't select as parent of selected block while dragging
+									! isDraggingBlocks,
 							}
 						),
 					} }
