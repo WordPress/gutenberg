@@ -6,7 +6,7 @@
  */
 
 /**
- * Registers the attributes block attribute for block types that support it.
+ * Registers the align block attribute for block types that support it.
  *
  * @param  array $block_type Block Type.
  */
@@ -17,10 +17,12 @@ function gutenberg_register_alignment_support( $block_type ) {
 			$block_type->attributes = array();
 		}
 
-		$block_type->attributes['align'] = array(
-			'type' => 'string',
-			'enum' => array( 'left', 'center', 'right', 'wide', 'full', '' ),
-		);
+		if ( ! array_key_exists( 'align', $block_type->attributes ) ) {
+			$block_type->attributes['align'] = array(
+				'type' => 'string',
+				'enum' => array( 'left', 'center', 'right', 'wide', 'full', '' ),
+			);
+		}
 	}
 }
 

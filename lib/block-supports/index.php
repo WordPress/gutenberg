@@ -15,6 +15,8 @@ function gutenberg_register_block_supports() {
 	// instead of mutating the block type.
 	foreach ( $registered_block_types as $block_type ) {
 		gutenberg_register_alignment_support( $block_type );
+		gutenberg_register_colors_support( $block_type );
+		gutenberg_register_typography_support( $block_type );
 	}
 }
 
