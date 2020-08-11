@@ -678,7 +678,7 @@
 	/* stylelint-enable function-comma-space-after */
 }
 
-// It is important to include these styles in all built stylesheets
+// It is important to include these styles in all built stylesheets.
 // This allows to CSS variables post CSS plugin to generate fallbacks.
 :root {
 	@include admin-scheme(#007cba);
