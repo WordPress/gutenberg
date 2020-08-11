@@ -254,7 +254,7 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 
 	// Suppress warnings from this method from polluting the front-end.
 	// @codingStandardsIgnoreStart
-	if ( ! @$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
+	if ( ! @$dom->loadHTML( mb_convert_encoding( $block_content, 'HTML-ENTITIES', 'UTF-8' ), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
 	// @codingStandardsIgnoreEnd
 		return $block_content;
 	}
@@ -287,7 +287,7 @@ function gutenberg_experimental_apply_classnames_and_styles( $block_content, $bl
 		$block_root->setAttribute( 'style', $new_styles );
 	}
 
-	return $dom->saveHtml();
+	return mb_convert_encoding( $dom->saveHtml(), 'UTF-8', 'HTML-ENTITIES' );
 }
 add_filter( 'render_block', 'gutenberg_experimental_apply_classnames_and_styles', 10, 2 );
 
