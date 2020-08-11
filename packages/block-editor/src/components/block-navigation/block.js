@@ -45,16 +45,24 @@ export default function BlockNavigationBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
+	const { clientId } = block;
 	const isDragging = useSelect(
-		( select ) =>
-			select( 'core/block-editor' ).isBlockBeingDragged( block.clientId ),
-		[ block.clientId ]
+		( select ) => {
+			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
+				'core/block-editor'
+			);
+
+			return (
+				isBlockBeingDragged( clientId ) ||
+				isAncestorBeingDragged( clientId )
+			);
+		},
+		[ clientId ]
 	);
 
 	const { selectBlock: selectEditorBlock } = useDispatch(
 		'core/block-editor'
 	);
-	const { clientId } = block;
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -90,7 +98,7 @@ export default function BlockNavigationBlock( {
 			position={ position }
 			rowCount={ rowCount }
 			path={ path }
-			id={ `block-navigation-block-${ block.clientId }` }
+			id={ `block-navigation-block-${ clientId }` }
 			data-block={ clientId }
 		>
 			<TreeGridCell
