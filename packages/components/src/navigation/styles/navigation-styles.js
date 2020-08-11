@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/core';
 import styled from '@emotion/styled';
 
-const horizontalPadding = css`
-	padding-left: 30px;
-	padding-right: 30px;
-`;
+const horizontalPadding = '30px';
 
 export const Root = styled.div`
 	width: 272px;
 	padding: 35px 0px;
+	> *:not( .components-navigation__menu ) {
+		margin-left: ${ horizontalPadding };
+		margin-right: ${ horizontalPadding };
+	}
 `;
 
 export const Menu = styled.ul`
@@ -28,7 +28,8 @@ export const MenuItem = styled.li`
 		width: 100%;
 		padding-top: 8px;
 		padding-bottom: 8px;
-		${ horizontalPadding }
+		padding-left: ${ horizontalPadding };
+		padding-right: ${ horizontalPadding };
 	}
 	&.is-active span {
 		border-bottom: 2px solid var( --wp-admin-theme-color );
