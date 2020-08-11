@@ -7,11 +7,33 @@ import {
 	someOtherItem,
 	withVariationsItem,
 	withSingleVariationItem,
+	withDefaultVariationItem,
 } from './fixtures';
 import { includeVariationsInInserterItems } from '../utils';
 
 describe( 'inserter utils', () => {
 	describe( 'includeVariationsInInserterItems', () => {
+		it( 'should let a block type be replaced with the default variation', () => {
+			// The base block type is replaced with the default variation
+			expect(
+				includeVariationsInInserterItems( [ withDefaultVariationItem ] )
+			).toEqual( [
+				expect.objectContaining( {
+					id: 'core/block-with-default-variation-special',
+				} ),
+			] );
+			// The base block type is supplemented by non-default variations
+			expect(
+				includeVariationsInInserterItems( [ withSingleVariationItem ] )
+			).toEqual( [
+				expect.objectContaining( {
+					id: 'core/embed',
+				} ),
+				expect.objectContaining( {
+					id: 'core/embed-youtube',
+				} ),
+			] );
+		} );
 		it( 'should return items if limit is equal to items length', () => {
 			const items = [ moreItem, paragraphItem, someOtherItem ];
 			const res = includeVariationsInInserterItems( items, 3 );

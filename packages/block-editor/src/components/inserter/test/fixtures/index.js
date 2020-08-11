@@ -40,6 +40,21 @@ export const withSingleVariationItem = {
 	],
 };
 
+export const withDefaultVariationItem = {
+	id: 'core/block-with-default-variation',
+	name: 'core/block-with-default-variation',
+	description: 'core description',
+	initialAttributes: {},
+	category: 'text',
+	variations: [
+		{
+			name: 'special',
+			title: 'Special',
+			isDefault: true,
+		},
+	],
+};
+
 export const withVariationsItem = {
 	id: 'core/block-with-variations',
 	name: 'core/block-with-variations',
