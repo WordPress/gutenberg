@@ -1,74 +1,47 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { Icon, arrowLeft } from '@wordpress/icons';
+import { useEffect, useState } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import Button from '../button';
-import Text from '../text';
-import Item from './item';
+const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
+	const [ activeLevel, setActiveLevel ] = useState( 'root' );
 
-const Navigation = ( { data, initial } ) => {
-	const initialActive = data.find( ( item ) => item.slug === initial );
-	const [ active, setActive ] = useState( initialActive );
-	const parent = data.find( ( item ) => item.slug === active.parent );
-	const items = data.filter( ( item ) => item.parent === active.parent );
-
-	const goBack = () => {
-		if ( ! parent.parent ) {
-			// We are at top level, will need to handle this case.
-			return;
-		}
-		const parentalSiblings = data.filter(
-			( item ) => item.parent === parent.parent
-		);
-		if ( parentalSiblings.length ) {
-			setActive( parentalSiblings[ 0 ] );
-		}
+	const mapItemData = ( items ) => {
+		return items.map( ( item ) => {
+			const itemChildren = data.filter( ( i ) => i.parent === item.id );
+			return {
+				...item,
+				children: itemChildren,
+				parent: item.parent || 'root',
+				isActive: item.id === activeItemId,
+				hasChildren: itemChildren.length > 0,
+			};
+		} );
 	};
+	const items = [ { id: 'root', title: rootTitle }, ...mapItemData( data ) ];
+
+	const activeItem = items.find( ( item ) => item.id === activeItemId );
+	const level = items.find( ( item ) => item.id === activeLevel );
+	const levelItems = items.filter( ( item ) => item.parent === level.id );
+	const parentLevel =
+		level.id === 'root'
+			? null
+			: items.find( ( item ) => item.id === level.parent );
+
+	useEffect( () => {
+		if ( activeItem ) {
+			setActiveLevel( activeItem.parent );
+		}
+	}, [] );
 
 	return (
 		<div className="components-navigation">
-			<Button
-				isSecondary
-				className="components-navigation__back"
-				onClick={ goBack }
-			>
-				<Icon icon={ arrowLeft } />
-				{ parent.back }
-			</Button>
-			<div className="components-navigation__title">
-				<Text variant="title.medium">{ parent.title }</Text>
-			</div>
-			<div className="components-navigation__menu-items">
-				{ items.map( ( item ) =>
-					item.menu !== 'secondary' ? (
-						<Item
-							key={ item.slug }
-							data={ data }
-							item={ item }
-							setActive={ setActive }
-							isActive={ item.slug === active.slug }
-						/>
-					) : null
-				) }
-			</div>
-			<div className="components-navigation__menu-items is-secondary">
-				{ items.map( ( item ) =>
-					item.menu === 'secondary' ? (
-						<Item
-							key={ item.slug }
-							data={ data }
-							item={ item }
-							setActive={ setActive }
-							isActive={ item.slug === active.slug }
-						/>
-					) : null
-				) }
-			</div>
+			{ children( {
+				level,
+				levelItems,
+				parentLevel,
+				setActiveLevel,
+			} ) }
 		</div>
 	);
 };
