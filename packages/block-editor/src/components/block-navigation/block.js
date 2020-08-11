@@ -45,17 +45,10 @@ export default function BlockNavigationBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
-	const { isDraggingBlocks, getDraggedBlockClientIds } = useSelect(
-		( select ) => {
-			const {
-				isDraggingBlocks: _isDraggingBlocks,
-				getDraggedBlockClientIds: _getDraggedBlockClientIds,
-			} = select( 'core/block-editor' );
-			return {
-				isDraggingBlocks: _isDraggingBlocks(),
-				getDraggedBlockClientIds: _getDraggedBlockClientIds,
-			};
-		}
+	const isDragging = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).isBlockBeingDragged( block.clientId ),
+		[ block.clientId ]
 	);
 
 	const { selectBlock: selectEditorBlock } = useDispatch(
@@ -82,12 +75,6 @@ export default function BlockNavigationBlock( {
 			cellRef.current.focus();
 		}
 	}, [ withExperimentalFeatures, isSelected ] );
-
-	let isDragging = false;
-	if ( isDraggingBlocks ) {
-		const draggedBlockClientIds = getDraggedBlockClientIds();
-		isDragging = !! draggedBlockClientIds.includes( block.clientId );
-	}
 
 	return (
 		<BlockNavigationLeaf
