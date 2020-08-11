@@ -848,9 +848,7 @@ public class WPAndroidGlueCode {
     }
 
     public void updateCapabilities(GutenbergProps gutenbergProps) {
-        mRnReactNativeGutenbergBridgePackage
-                .getRNReactNativeGutenbergBridgeModule()
-                .updateCapabilities(gutenbergProps.getUpdatedCapabilitiesProps());
+        mDeferredEventEmitter.updateCapabilities(gutenbergProps.getUpdatedCapabilitiesProps());
     }
 }
 

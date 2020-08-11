@@ -30,6 +30,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter {
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_STATE = "state";
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS = "progress";
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_SERVER_ID = "mediaServerId";
+    private static final String MAP_KEY_UPDATE_CAPABILITIES = "updateCapabilities";
 
 
     /**
@@ -120,5 +121,9 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter {
     @Override
     public void onMediaFileUploadFailed(int mediaId) {
         setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
+    }
+
+    public void updateCapabilities(WritableMap capabilities) {
+        queueActionToJS(MAP_KEY_UPDATE_CAPABILITIES, capabilities);
     }
 }

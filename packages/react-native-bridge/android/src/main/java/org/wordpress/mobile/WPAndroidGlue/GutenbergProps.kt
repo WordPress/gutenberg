@@ -36,11 +36,9 @@ data class GutenbergProps @JvmOverloads constructor(
     }
 
     fun getUpdatedCapabilitiesProps() = WritableNativeMap().apply {
-        putMap(PROP_CAPABILITIES, WritableNativeMap().apply {
-            putBoolean(PROP_CAPABILITIES_MENTIONS, enableMentions)
-            putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
-            putBoolean(PROP_CAPABILITIES_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled)
-        })
+        putBoolean(PROP_CAPABILITIES_MENTIONS, enableMentions)
+        putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
+        putBoolean(PROP_CAPABILITIES_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled)
     }
 
     companion object {
