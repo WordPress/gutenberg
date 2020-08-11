@@ -123,6 +123,7 @@
 	&:hover:not(.is-selected):not(.has-child-selected) {
 		cursor: pointer;
 
+		// Disable pointer events on children, prevents inserter from capturing hover state etc.
 		* {
 			pointer-events: none;
 		}
