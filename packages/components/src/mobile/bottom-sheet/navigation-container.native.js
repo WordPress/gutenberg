@@ -40,6 +40,8 @@ const options = {
 	cardStyleInterpolator: fadeConfig,
 };
 
+const ANIMATION_DURATION = 190;
+
 function BottomSheetNavigationContainer( {
 	children,
 	animate,
@@ -48,25 +50,25 @@ function BottomSheetNavigationContainer( {
 	stack,
 } ) {
 	const context = useContext( BottomSheetContext );
-	const [ height, setMaxHeight ] = useState( context.currentHeight || 1 );
+	const [ currentHeight, setCurrentHeight ] = useState( context.currentHeight || 1 );
 
-	const setHeight = ( maxHeight, layout ) => {
-		if ( height !== maxHeight && maxHeight > 1 ) {
-			if ( animate && layout && height === 1 ) {
-				setMaxHeight( maxHeight );
+	const setHeight = ( height, layout ) => {
+		if ( currentHeight !== height && height > 1 ) {
+			if ( animate && layout && currentHeight === 1 ) {
+				setCurrentHeight( height );
 			} else if ( animate ) {
-				performLayoutAnimation( 190 );
-				setMaxHeight( maxHeight );
+				performLayoutAnimation( ANIMATION_DURATION );
+				setCurrentHeight( height );
 			} else {
-				setMaxHeight( maxHeight );
+				setCurrentHeight( height );
 			}
 		}
 	};
 
 	return (
-		<View style={ { height } }>
+		<View style={ { height: currentHeight } }>
 			<BottomSheetProvider
-				value={ { ...context, setHeight, currentHeight: height } }
+				value={ { ...context, setHeight, currentHeight } }
 			>
 				{ main ? (
 					<NavigationContainer theme={ theme }>
