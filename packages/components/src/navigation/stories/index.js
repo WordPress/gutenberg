@@ -41,6 +41,15 @@ const data = [
 		id: 'child-2',
 		parent: 'item-3',
 	},
+	{
+		title: 'Custom link',
+		id: 'item-4',
+		linkTag: 'a',
+		href: 'https://wordpress.com',
+		linkTagProps: {
+			target: '_blank',
+		},
+	},
 ];
 
 function Example() {
