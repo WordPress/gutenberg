@@ -167,7 +167,7 @@ function ColumnsEditContainer( {
 							selectedColumnIndex={ index }
 						/>
 					}
-					key={ column.id }
+					key={ column.clientId }
 					withTextInput={ false }
 				/>
 			);
