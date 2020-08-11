@@ -29,10 +29,33 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
  * @return {Array} Normalized inserter items.
  */
 export function includeVariationsInInserterItems( items, limit = Infinity ) {
-	if ( items.length >= limit ) {
+	const itemsLength = items.length;
+	if ( itemsLength >= limit ) {
 		// No need to iterate for variations
 		return items.slice( 0, limit );
 	}
+
+	// If there is a limit set but the items are fewer than the limit,
+	// add the variations to fill the limit with order of blocks.
+	// It should be handled better when decided how to choose the variations to fill.
+	if ( Number.isFinite( limit ) ) {
+		let itemsToAdd = limit - itemsLength;
+		let variationsToAdd = [];
+		for ( const item of items ) {
+			const { variations = [] } = item;
+			const variationsLength = variations.length;
+			if ( variationsLength ) {
+				const variationMapper = getItemFromVariation( item );
+				variationsToAdd = variationsToAdd.concat(
+					variations.slice( 0, itemsToAdd ).map( variationMapper )
+				);
+				itemsToAdd -= variationsLength;
+				if ( itemsToAdd < 1 ) break;
+			}
+		}
+		return items.concat( variationsToAdd );
+	}
+
 	// Show all available blocks with variations
 	return items.reduce( ( result, item ) => {
 		const { variations = [] } = item;
