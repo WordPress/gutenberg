@@ -23,6 +23,7 @@ const TOGGLE_PROPS = {
 };
 
 const MoreMenu = ( { showTooltip } ) => (
+	/* translators: button label text should, if possible, be under 16 characters. */
 	<DropdownMenu
 		className="edit-post-more-menu"
 		icon={ moreVertical }

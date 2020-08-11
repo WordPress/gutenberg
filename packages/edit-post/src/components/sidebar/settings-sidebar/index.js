@@ -55,6 +55,7 @@ const SettingsSidebar = () => {
 	}, [] );
 
 	return (
+		/* translators: button label text should, if possible, be under 16 characters. */
 		<PluginSidebarEditPost
 			identifier={ sidebarName }
 			header={ <SettingsHeader sidebarName={ sidebarName } /> }

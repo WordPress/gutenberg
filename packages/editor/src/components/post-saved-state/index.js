@@ -137,6 +137,7 @@ export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
 		return null;
 	}
 
+	/* translators: button label text should, if possible, be under 16 characters. */
 	const label = isPending ? __( 'Save as pending' ) : __( 'Save draft' );
 
 	if ( ! isLargeViewport ) {

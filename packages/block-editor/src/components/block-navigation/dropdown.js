@@ -47,6 +47,7 @@ function BlockNavigationDropdownToggle( {
 	);
 
 	return (
+		/* translators: button label text should, if possible, be under 16 characters. */
 		<Button
 			{ ...props }
 			ref={ innerRef }

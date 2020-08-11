@@ -19,6 +19,7 @@ export function PublishButtonLabel( {
 	isAutosaving,
 	hasNonPostEntityChanges,
 } ) {
+	/* translators: button label text should, if possible, be under 16 characters. */
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
 	} else if ( isPublished && isSaving && ! isAutosaving ) {

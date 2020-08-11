@@ -26,6 +26,7 @@ function TableOfContents(
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
+				/* translators: button label text should, if possible, be under 16 characters. */
 				<Button
 					{ ...props }
 					ref={ ref }

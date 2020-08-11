@@ -39,6 +39,7 @@ function ToolSelector( props, ref ) {
 	return (
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
+				/* translators: button label text should, if possible, be under 16 characters. */
 				<Button
 					{ ...props }
 					ref={ ref }

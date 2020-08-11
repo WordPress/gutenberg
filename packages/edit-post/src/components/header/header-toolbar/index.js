@@ -112,6 +112,8 @@ function HeaderToolbar() {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
+			{ /* translators: button label text should, if possible, be under 16
+			characters. */ }
 			<ToolbarItem
 				ref={ inserterButton }
 				as={ Button }
