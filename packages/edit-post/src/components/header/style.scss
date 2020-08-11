@@ -133,7 +133,10 @@
 		}
 	}
 	.is-tertiary {
-		color: $gray-900;
+		&:active {
+			box-shadow: 0 0 0 1.5px var(--wp-admin-theme-color);
+			background-color: transparent;
+		}
 	}
 	// Exception for drodpdown toggle buttons.
 	// Exception for the fullscreen mode button.
