@@ -158,7 +158,7 @@ const TemplatePartEditor = ( {
 				/>
 			</BlockControls>
 			<div style={ { position: 'relative' } }>
-				{ ( isSelected || hasSelectedInnerBlock ) && (
+				{ hasSelectedInnerBlock && (
 					<TemplatePartNotice postId={ postId } slug={ slug } />
 				) }
 				<TemplatePartInnerBlocks
