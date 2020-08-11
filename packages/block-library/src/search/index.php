@@ -60,9 +60,6 @@ function render_block_core_search( $attributes ) {
 	}
 
 	$class = 'wp-block-search';
-	if ( isset( $attributes['className'] ) ) {
-		$class .= ' ' . $attributes['className'];
-	}
 
 	return sprintf(
 		'<form class="%s" role="search" method="get" action="%s">%s</form>',

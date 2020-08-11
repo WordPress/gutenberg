@@ -14,11 +14,6 @@
  */
 function render_block_core_tag_cloud( $attributes ) {
 	$class = 'wp-block-tag-cloud';
-
-	if ( isset( $attributes['className'] ) ) {
-		$class .= ' ' . $attributes['className'];
-	}
-
 	$args = array(
 		'echo'       => false,
 		'taxonomy'   => $attributes['taxonomy'],
