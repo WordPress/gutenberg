@@ -24,9 +24,6 @@ export default function TemplatePartEdit( {
 
 	// Resolve the post ID if not set, and load its post.
 	const postId = useTemplatePartPost( _postId, slug, theme );
-	useEffect( () => {
-		setAttributes( { postId } );
-	}, [ postId ] );
 
 	// Set the post ID, once found, so that edits persist,
 	// but wait until the third inner blocks change,
