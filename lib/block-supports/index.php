@@ -75,7 +75,20 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	$classes_to_add = esc_attr( implode( ' ', array_key_exists( 'css_classes', $attributes ) ? $attributes['css_classes'] : array() ) );
 	$styles_to_add  = esc_attr( implode( ' ', array_key_exists( 'inline_styles', $attributes ) ? $attributes['inline_styles'] : array() ) );
 	$new_classes    = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . $classes_to_add ) ) );
-	$new_styles     = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . $styles_to_add ) ) );
+	// Normalize styles for dedupe.
+	$all_styles        = explode( ';', $current_styles . $styles_to_add );
+	$normalized_styles = array();
+	foreach ( $all_styles as $style ) {
+		if ( '' === $style ) {
+			continue;
+		}
+		// Split key and value of style.
+		$split_style = explode( ':', $style );
+		// Trim whitespace and recombine the style in a consistent form.
+		$style               = trim( $split_style[0] ) . ': ' . trim( $split_style[1] ) . ';';
+		$normalized_styles[] = $style;
+	}
+	$new_styles = implode( ' ', array_unique( $normalized_styles ) );
 
 	// Apply new styles and classes.
 	if ( ! empty( $new_classes ) ) {
