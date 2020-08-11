@@ -3,6 +3,11 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { Root } from './styles/navigation-styles';
+
 const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevel, setActiveLevel ] = useState( 'root' );
 
@@ -35,14 +40,14 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	}, [] );
 
 	return (
-		<div className="components-navigation">
+		<Root className="components-navigation">
 			{ children( {
 				level,
 				levelItems,
 				parentLevel,
 				setActiveLevel,
 			} ) }
-		</div>
+		</Root>
 	);
 };
 
