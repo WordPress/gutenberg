@@ -2,62 +2,94 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map } from 'lodash';
+import { find, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import {
 	AlignmentToolbar,
 	BlockControls,
 	Warning,
 	__experimentalBlock as Block,
+	__experimentalBlockVariationPicker as BlockVariationPicker,
 } from '@wordpress/block-editor';
+import { Spinner } from '@wordpress/components';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import useHierarchicalTerms from './use-hierarchical-terms';
+import useHierarchicalTermLinks from './use-hierarchical-term-links';
+
+function HierarchicalTermPicker( {
+	hierarchicalTerms,
+	isLoadingHierarchicalTerms,
+	setAttributes,
+} ) {
+	if ( isLoadingHierarchicalTerms ) {
+		return <Spinner />;
+	}
+
+	const variations = map( hierarchicalTerms, ( term ) => ( {
+		/* eslint-disable camelcase */
+		name: term?.slug,
+		title: term?.name,
+		description: term?.description,
+		is_default: 'category' === term?.slug,
+		attributes: {
+			term: { restBase: term?.rest_base, slug: term?.slug },
+		},
+		/* eslint-enable camelcase */
+	} ) );
+
+	return (
+		<BlockVariationPicker
+			variations={ variations }
+			onSelect={ ( variation ) => {
+				setAttributes( variation.attributes );
+			} }
+		/>
+	);
+}
 
 export default function PostCategoriesEdit( {
 	attributes,
 	context,
 	setAttributes,
 } ) {
-	const { textAlign } = attributes;
+	const { term, textAlign } = attributes;
 	const { postId, postType } = context;
 
-	const [ categories ] = useEntityProp(
-		'postType',
-		postType,
-		'categories',
-		postId
-	);
+	const [ selectedTerm, setSelectedTerm ] = useState();
 
-	const categoryLinks = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( 'core' );
-			let loaded = true;
-			const links = map( categories, ( categoryId ) => {
-				const category = getEntityRecord(
-					'taxonomy',
-					'category',
-					categoryId
-				);
-				if ( ! category ) {
-					return ( loaded = false );
-				}
-				return (
-					<a key={ categoryId } href={ category.link }>
-						{ category.name }
-					</a>
-				);
-			} );
-			return loaded && links;
-		},
-		[ categories ]
-	);
+	const {
+		hierarchicalTerms,
+		isLoadingHierarchicalTerms,
+	} = useHierarchicalTerms();
+
+	const {
+		hierarchicalTermLinks,
+		isLoadingHierarchicalTermLinks,
+	} = useHierarchicalTermLinks( {
+		postId,
+		postType,
+		term,
+	} );
+
+	useEffect( () => {
+		if ( selectedTerm || ! term?.slug ) {
+			return;
+		}
+
+		setSelectedTerm( find( hierarchicalTerms, { slug: term.slug } ) );
+	} );
 
 	const hasPost = postId && postType;
-	const hasCategories = categoryLinks && categoryLinks.length > 0;
+	const hasHierarchicalTermLinks =
+		hierarchicalTermLinks && hierarchicalTermLinks.length > 0;
 
 	return (
 		<>
@@ -74,14 +106,34 @@ export default function PostCategoriesEdit( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
-				{ hasCategories &&
-					categoryLinks.reduce( ( prev, curr ) => [
+				{ hasPost && ! term && (
+					<HierarchicalTermPicker
+						hierarchicalTerms={ hierarchicalTerms }
+						isLoadingHierarchicalTerms={
+							isLoadingHierarchicalTerms
+						}
+						setAttributes={ setAttributes }
+					/>
+				) }
+
+				{ hasPost && isLoadingHierarchicalTermLinks && <Spinner /> }
+
+				{ hasPost &&
+					hasHierarchicalTermLinks &&
+					! isLoadingHierarchicalTermLinks &&
+					hierarchicalTermLinks.reduce( ( prev, curr ) => [
 						prev,
 						' | ',
 						curr,
 					] ) }
 
-				{ hasPost && ! hasCategories && __( 'No categories.' ) }
+				{ hasPost &&
+					!! term &&
+					! isLoadingHierarchicalTermLinks &&
+					! hasHierarchicalTermLinks &&
+					// eslint-disable-next-line camelcase
+					( selectedTerm?.labels?.no_terms ||
+						__( 'Term items not found.' ) ) }
 
 				{ ! hasPost && (
 					<Warning>
