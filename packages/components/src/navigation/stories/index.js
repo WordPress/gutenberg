@@ -1,7 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Navigation from '../';
+import NavigationMenu from '../menu';
+import NavigationMenuItem from '../menu-item';
 
 export default {
 	title: 'Components/Navigation',
@@ -9,80 +17,68 @@ export default {
 };
 
 const data = [
-	{ title: 'WooCommerce', slug: 'root', back: 'Dashboard' },
-	{ title: 'Home', slug: 'home', parent: 'root', menu: 'primary' },
 	{
-		title: 'Analytics',
-		slug: 'analytics',
-		parent: 'root',
-		back: 'WooCommerce Home',
-		menu: 'primary',
+		title: 'Item 1',
+		id: 'item-1',
 	},
 	{
-		title: 'Orders',
-		slug: 'orders',
-		parent: 'root',
-		back: 'WooCommerce Home',
-		menu: 'primary',
+		title: 'Item 2',
+		id: 'item-2',
 	},
 	{
-		title: 'Overview',
-		slug: 'overview',
-		parent: 'analytics',
+		title: 'Category',
+		id: 'item-3',
 	},
 	{
-		title: 'Products report',
-		slug: 'products',
-		parent: 'analytics',
+		title: 'Child 1',
+		id: 'child-1',
+		parent: 'item-3',
 	},
 	{
-		title: 'All orders',
-		slug: 'all_orders',
-		parent: 'orders',
-	},
-	{
-		title: 'Payouts',
-		slug: 'payouts',
-		parent: 'orders',
-	},
-	{
-		title: 'Settings',
-		slug: 'settings',
-		parent: 'root',
-		back: 'WooCommerce Home',
-		menu: 'secondary',
-	},
-	{
-		title: 'Extensions',
-		slug: 'extensions',
-		parent: 'root',
-		back: 'WooCommerce Home',
-		menu: 'secondary',
-	},
-	{
-		title: 'General',
-		slug: 'general',
-		parent: 'settings',
-	},
-	{
-		title: 'Tax',
-		slug: 'tax',
-		parent: 'settings',
-	},
-	{
-		title: 'My extensions',
-		slug: 'my_extensions',
-		parent: 'extensions',
-	},
-	{
-		title: 'Marketplace',
-		slug: 'marketplace',
-		parent: 'extensions',
+		title: 'Child 2',
+		id: 'child-2',
+		parent: 'item-3',
 	},
 ];
 
 function Example() {
-	return <Navigation data={ data } initial="home" />;
+	const [ active, setActive ] = useState( 'item-1' );
+
+	return (
+		<Navigation activeItemId={ active } data={ data } rootTitle="Home">
+			{ ( { level, levelItems, parentLevel, setActiveLevel } ) => {
+				return (
+					<>
+						{ parentLevel && (
+							<Button
+								isPrimary
+								onClick={ () =>
+									setActiveLevel( parentLevel.id )
+								}
+							>
+								Back
+							</Button>
+						) }
+						<h1>{ level.title }</h1>
+						<NavigationMenu>
+							{ levelItems.map( ( item ) => {
+								return (
+									<NavigationMenuItem
+										{ ...item }
+										key={ item.id }
+										onClick={ ( selected ) =>
+											setActive( selected.id )
+										}
+										setActiveLevel={ setActiveLevel }
+									/>
+								);
+							} ) }
+						</NavigationMenu>
+					</>
+				);
+			} }
+		</Navigation>
+	);
 }
 
 export const _default = () => {
