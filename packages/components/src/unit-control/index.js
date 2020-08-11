@@ -51,6 +51,10 @@ function UnitControl(
 	const classes = classnames( 'components-unit-control', className );
 
 	const handleOnChange = ( next, changeProps ) => {
+		if ( next === '' ) {
+			onChange( '', changeProps );
+			return;
+		}
 		/**
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
