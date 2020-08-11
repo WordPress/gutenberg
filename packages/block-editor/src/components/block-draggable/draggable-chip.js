@@ -23,7 +23,7 @@ export default function BlockDraggableChip( { clientIds } ) {
 			const [ firstId ] = clientIds;
 			const blockName = getBlockName( firstId );
 
-			return getBlockType( blockName ).icon;
+			return getBlockType( blockName )?.icon;
 		},
 		[ clientIds ]
 	);
