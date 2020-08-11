@@ -28,6 +28,10 @@ $tree-item-height: 36px;
 	// Use position relative for row animation.
 	position: relative;
 
+	&.is-dragging {
+		display: none;
+	}
+
 	.block-editor-block-navigation-block-contents {
 		display: flex;
 		align-items: center;

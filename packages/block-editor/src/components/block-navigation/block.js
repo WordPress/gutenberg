@@ -15,7 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -45,6 +45,19 @@ export default function BlockNavigationBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
+	const { isDraggingBlocks, getDraggedBlockClientIds } = useSelect(
+		( select ) => {
+			const {
+				isDraggingBlocks: _isDraggingBlocks,
+				getDraggedBlockClientIds: _getDraggedBlockClientIds,
+			} = select( 'core/block-editor' );
+			return {
+				isDraggingBlocks: _isDraggingBlocks(),
+				getDraggedBlockClientIds: _getDraggedBlockClientIds,
+			};
+		}
+	);
+
 	const { selectBlock: selectEditorBlock } = useDispatch(
 		'core/block-editor'
 	);
@@ -70,10 +83,17 @@ export default function BlockNavigationBlock( {
 		}
 	}, [ withExperimentalFeatures, isSelected ] );
 
+	let isDragging = false;
+	if ( isDraggingBlocks ) {
+		const draggedBlockClientIds = getDraggedBlockClientIds();
+		isDragging = !! draggedBlockClientIds.includes( block.clientId );
+	}
+
 	return (
 		<BlockNavigationLeaf
 			className={ classnames( {
 				'is-selected': isSelected,
+				'is-dragging': isDragging,
 			} ) }
 			onMouseEnter={ () => setIsHovered( true ) }
 			onMouseLeave={ () => setIsHovered( false ) }
