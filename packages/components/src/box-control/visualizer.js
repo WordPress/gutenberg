@@ -13,10 +13,11 @@ import {
 	BottomView,
 	LeftView,
 } from './styles/box-control-visualizer-styles';
-import { DEFAULT_VALUES } from './utils';
+import { DEFAULT_VALUES, DEFAULT_VISUALIZER_VALUES } from './utils';
 
 export default function BoxControlVisualizer( {
 	children,
+	showValues = DEFAULT_VISUALIZER_VALUES,
 	values: valuesProp = DEFAULT_VALUES,
 	...props
 } ) {
@@ -27,51 +28,55 @@ export default function BoxControlVisualizer( {
 			isPositionAbsolute={ isPositionAbsolute }
 			aria-hidden="true"
 		>
-			<Sides values={ valuesProp } />
+			<Sides showValues={ showValues } values={ valuesProp } />
 			{ children }
 		</Container>
 	);
 }
 
-function Sides( { values } ) {
+function Sides( { showValues = DEFAULT_VISUALIZER_VALUES, values } ) {
 	const { top, right, bottom, left } = values;
 
 	return (
 		<>
-			<Top value={ top } />
-			<Right value={ right } />
-			<Bottom value={ bottom } />
-			<Left value={ left } />
+			<Top isVisible={ showValues.top } value={ top } />
+			<Right isVisible={ showValues.right } value={ right } />
+			<Bottom isVisible={ showValues.bottom } value={ bottom } />
+			<Left isVisible={ showValues.left } value={ left } />
 		</>
 	);
 }
 
-function Top( { value } ) {
+function Top( { isVisible = false, value } ) {
 	const height = value;
 	const animationProps = useSideAnimation( height );
+	const isActive = animationProps.isActive || isVisible;
 
-	return <TopView { ...animationProps } style={ { height } } />;
+	return <TopView isActive={ isActive } style={ { height } } />;
 }
 
-function Right( { value } ) {
+function Right( { isVisible = false, value } ) {
 	const width = value;
 	const animationProps = useSideAnimation( width );
+	const isActive = animationProps.isActive || isVisible;
 
-	return <RightView { ...animationProps } style={ { width } } />;
+	return <RightView isActive={ isActive } style={ { width } } />;
 }
 
-function Bottom( { value } ) {
+function Bottom( { isVisible = false, value } ) {
 	const height = value;
 	const animationProps = useSideAnimation( height );
+	const isActive = animationProps.isActive || isVisible;
 
-	return <BottomView { ...animationProps } style={ { height } } />;
+	return <BottomView isActive={ isActive } style={ { height } } />;
 }
 
-function Left( { value } ) {
+function Left( { isVisible = false, value } ) {
 	const width = value;
 	const animationProps = useSideAnimation( width );
+	const isActive = animationProps.isActive || isVisible;
 
-	return <LeftView { ...animationProps } style={ { width } } />;
+	return <LeftView isActive={ isActive } style={ { width } } />;
 }
 
 /**

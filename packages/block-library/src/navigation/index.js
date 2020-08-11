@@ -70,11 +70,6 @@ export const settings = {
 		],
 	},
 
-	styles: [
-		{ name: 'light', label: __( 'Light' ), isDefault: true },
-		{ name: 'dark', label: __( 'Dark' ) },
-	],
-
 	edit,
 
 	save,

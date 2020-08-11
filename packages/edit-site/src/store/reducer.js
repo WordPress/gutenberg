@@ -86,17 +86,6 @@ export function settings( state = {}, action ) {
 }
 
 /**
- * Reducer returning the home template ID.
- *
- * @param {Object} state Current state.
- *
- * @return {Object} Updated state.
- */
-export function homeTemplateId( state ) {
-	return state;
-}
-
-/**
  * Reducer returning the template ID.
  *
  * @param {Object} state  Current state.
@@ -107,7 +96,6 @@ export function homeTemplateId( state ) {
 export function templateId( state, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
-		case 'ADD_TEMPLATE':
 		case 'SET_PAGE':
 			return action.templateId;
 	}
@@ -140,46 +128,15 @@ export function templatePartId( state, action ) {
  *
  * @return {Object} Updated state.
  */
-export function templateType( state, action ) {
+export function templateType( state = 'wp_template', action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
-		case 'ADD_TEMPLATE':
 		case 'SET_PAGE':
 			return 'wp_template';
 		case 'SET_TEMPLATE_PART':
 			return 'wp_template_part';
 	}
 
-	return state;
-}
-
-/**
- * Reducer returning the list of template IDs.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function templateIds( state = [], action ) {
-	switch ( action.type ) {
-		case 'ADD_TEMPLATE':
-			return [ ...state, action.templateId ];
-		case 'REMOVE_TEMPLATE':
-			return state.filter( ( id ) => id !== action.templateId );
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the list of template part IDs.
- *
- * @param {Object} state Current state.
- *
- * @return {Object} Updated state.
- */
-export function templatePartIds( state = [] ) {
 	return state;
 }
 
@@ -191,7 +148,7 @@ export function templatePartIds( state = [] ) {
  *
  * @return {Object} Updated state.
  */
-export function page( state = {}, action ) {
+export function page( state, action ) {
 	switch ( action.type ) {
 		case 'SET_PAGE':
 			return action.page;
@@ -201,13 +158,19 @@ export function page( state = {}, action ) {
 }
 
 /**
- * Reducer returning the site's `show_on_front` setting.
+ * Reducer for information about the site's homepage.
  *
  * @param {Object} state Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function showOnFront( state ) {
+export function homeTemplateId( state, action ) {
+	switch ( action.type ) {
+		case 'SET_HOME_TEMPLATE':
+			return action.homeTemplateId;
+	}
+
 	return state;
 }
 
@@ -215,12 +178,9 @@ export default combineReducers( {
 	preferences,
 	deviceType,
 	settings,
-	homeTemplateId,
 	templateId,
 	templatePartId,
 	templateType,
-	templateIds,
-	templatePartIds,
 	page,
-	showOnFront,
+	homeTemplateId,
 } );

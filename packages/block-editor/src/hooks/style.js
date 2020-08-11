@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { has, get } from 'lodash';
+import { has, get, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,38 +9,41 @@ import { has, get } from 'lodash';
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import InspectorControls from '../components/inspector-controls';
-import SpacingPanelControl from '../components/spacing-panel-control';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
-import { LINE_HEIGHT_SUPPORT_KEY, LineHeightEdit } from './line-height';
-import { FONT_SIZE_SUPPORT_KEY, FontSizeEdit } from './font-size';
+import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import {
 	PADDING_SUPPORT_KEY,
 	PaddingEdit,
 	paddingStyleMappings,
 } from './padding';
+import SpacingPanelControl from '../components/spacing-panel-control';
 
 const styleSupportKeys = [
+	...TYPOGRAPHY_SUPPORT_KEYS,
 	COLOR_SUPPORT_KEY,
-	LINE_HEIGHT_SUPPORT_KEY,
-	FONT_SIZE_SUPPORT_KEY,
 	PADDING_SUPPORT_KEY,
-];
-
-const typographySupportKeys = [
-	LINE_HEIGHT_SUPPORT_KEY,
-	FONT_SIZE_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
+
+const VARIABLE_REFERENCE_PREFIX = 'var:';
+const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+function compileStyleValue( uncompiledValue ) {
+	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+		const variable = uncompiledValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return uncompiledValue;
+}
 
 /**
  * Returns the inline styles to add depending on the style object
@@ -56,14 +59,21 @@ export function getInlineStyles( styles = {} ) {
 		background: [ 'color', 'gradient' ],
 		backgroundColor: [ 'color', 'background' ],
 		color: [ 'color', 'text' ],
+		'--wp--style--color--link': [ 'color', 'link' ],
 	};
 
 	const output = {};
-	Object.entries( mappings ).forEach( ( [ styleKey, objectKey ] ) => {
-		if ( has( styles, objectKey ) ) {
-			output[ styleKey ] = get( styles, objectKey );
+	Object.entries( mappings ).forEach(
+		( [ styleKey, ...otherObjectKeys ] ) => {
+			const [ objectKeys ] = otherObjectKeys;
+
+			if ( has( styles, objectKeys ) ) {
+				output[ styleKey ] = compileStyleValue(
+					get( styles, objectKeys )
+				);
+			}
 		}
-	} );
+	);
 
 	return output;
 }
@@ -148,9 +158,6 @@ export function addEditProps( settings ) {
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		const hasTypographySupport = typographySupportKeys.some( ( key ) =>
-			hasBlockSupport( blockName, key )
-		);
 
 		const hasPaddingSupport = hasBlockSupport(
 			blockName,
@@ -158,14 +165,7 @@ export const withBlockControls = createHigherOrderComponent(
 		);
 
 		return [
-			Platform.OS === 'web' && hasTypographySupport && (
-				<InspectorControls key="typography">
-					<PanelBody title={ __( 'Typography' ) }>
-						<FontSizeEdit { ...props } />
-						<LineHeightEdit { ...props } />
-					</PanelBody>
-				</InspectorControls>
-			),
+			<TypographyPanel key="typography" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
 			hasPaddingSupport && (

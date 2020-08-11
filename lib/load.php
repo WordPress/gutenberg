@@ -57,15 +57,14 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Image_Editor_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-image-editor-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Plugins_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-plugins-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
 
 	require dirname( __FILE__ ) . '/rest-api.php';
-}
-
-if ( ! class_exists( 'WP_Block_Styles_Registry' ) ) {
-	require dirname( __FILE__ ) . '/class-wp-block-styles-registry.php';
 }
 
 if ( ! class_exists( 'WP_Block_Patterns_Registry' ) ) {
@@ -87,10 +86,17 @@ if ( ! class_exists( 'WP_Block_List' ) ) {
 require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/utils.php';
 
+// Include FSE related files only if the experiment is enabled.
+if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
+	require dirname( __FILE__ ) . '/templates.php';
+	require dirname( __FILE__ ) . '/template-parts.php';
+	require dirname( __FILE__ ) . '/template-loader.php';
+	require dirname( __FILE__ ) . '/edit-site-page.php';
+	require dirname( __FILE__ ) . '/edit-site-export.php';
+}
+
+require dirname( __FILE__ ) . '/block-patterns.php';
 require dirname( __FILE__ ) . '/blocks.php';
-require dirname( __FILE__ ) . '/templates.php';
-require dirname( __FILE__ ) . '/template-parts.php';
-require dirname( __FILE__ ) . '/template-loader.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/block-directory.php';
 require dirname( __FILE__ ) . '/demo.php';
@@ -99,6 +105,8 @@ require dirname( __FILE__ ) . '/widgets-page.php';
 require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
-require dirname( __FILE__ ) . '/edit-site-page.php';
-require dirname( __FILE__ ) . '/editor-features.php';
 require dirname( __FILE__ ) . '/global-styles.php';
+require dirname( __FILE__ ) . '/block-supports/index.php';
+require dirname( __FILE__ ) . '/block-supports/align.php';
+require dirname( __FILE__ ) . '/block-supports/colors.php';
+require dirname( __FILE__ ) . '/block-supports/typography.php';

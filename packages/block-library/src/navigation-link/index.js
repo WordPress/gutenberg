@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { mapMarker as icon } from '@wordpress/icons';
+import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,7 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Navigation Link' ),
+	title: __( 'Link' ),
 	icon,
 	description: __( 'Add a page, link, or another item to your navigation.' ),
 	__experimentalLabel: ( { label } ) => label,
@@ -28,4 +29,48 @@ export const settings = {
 	},
 	edit,
 	save,
+
+	deprecated: [
+		{
+			isEligible( attributes ) {
+				return attributes.nofollow;
+			},
+
+			attributes: {
+				label: {
+					type: 'string',
+				},
+				type: {
+					type: 'string',
+				},
+				nofollow: {
+					type: 'boolean',
+				},
+				description: {
+					type: 'string',
+				},
+				id: {
+					type: 'number',
+				},
+				opensInNewTab: {
+					type: 'boolean',
+					default: false,
+				},
+				url: {
+					type: 'string',
+				},
+			},
+
+			migrate( { nofollow, ...rest } ) {
+				return {
+					rel: nofollow ? 'nofollow' : '',
+					...rest,
+				};
+			},
+
+			save() {
+				return <InnerBlocks.Content />;
+			},
+		},
+	],
 };

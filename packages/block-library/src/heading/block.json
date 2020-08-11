@@ -23,7 +23,9 @@
 		"anchor": true,
 		"className": false,
 		"lightBlockWrapper": true,
-		"__experimentalColor": true,
+		"__experimentalColor": {
+			"linkColor": true
+		},
 		"__experimentalFontSize": true,
 		"__experimentalLineHeight": true,
 		"__experimentalSelector": {

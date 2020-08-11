@@ -3,7 +3,7 @@
  */
 import { navigateRegions } from '@wordpress/components';
 import {
-	useSimulatedMediaQuery,
+	__experimentalUseSimulatedMediaQuery as useSimulatedMediaQuery,
 	BlockInspector,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';

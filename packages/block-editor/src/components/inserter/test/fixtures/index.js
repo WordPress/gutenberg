@@ -22,6 +22,22 @@ export const paragraphItem = {
 	category: 'text',
 	isDisabled: false,
 	utility: 1,
+	keywords: [ 'random' ],
+};
+
+export const withSingleVariationItem = {
+	id: 'core/embed',
+	name: 'core/embed',
+	description: 'core description',
+	initialAttributes: {},
+	category: 'embed',
+	variations: [
+		{
+			name: 'youtube',
+			title: 'YouTube',
+			description: 'youtube description',
+		},
+	],
 };
 
 export const withVariationsItem = {
@@ -44,6 +60,7 @@ export const withVariationsItem = {
 		{
 			name: 'variation-three',
 			title: 'Variation Three',
+			keywords: [ 'music', 'random' ],
 		},
 	],
 };
@@ -79,8 +96,8 @@ export const moreItem = {
 };
 
 export const youtubeItem = {
-	id: 'core-embed/youtube',
-	name: 'core-embed/youtube',
+	id: 'core/embed',
+	name: 'core/embed',
 	initialAttributes: {},
 	title: 'YouTube',
 	category: 'embed',

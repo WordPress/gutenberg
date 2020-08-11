@@ -14,7 +14,6 @@
 		padding: 6px;
 		outline: none;
 		cursor: pointer;
-		margin-bottom: $grid-unit-05;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -26,7 +25,7 @@
 			display: block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $light-gray-500;
+			background-color: $gray-200;
 			position: absolute;
 			top: -3px;
 			left: 0;
@@ -37,8 +36,8 @@
 		&.is-active svg {
 			// Block UI appearance.
 			color: $white;
-			background: $dark-gray-primary;
-			box-shadow: 0 0 0 $border-width $dark-gray-primary;
+			background: $gray-900;
+			box-shadow: 0 0 0 $border-width $gray-900;
 			border-radius: $border-width;
 		}
 
@@ -80,8 +79,12 @@
 
 	.components-menu-group + .components-menu-group {
 		margin-top: 0;
-		border-top: $border-width solid $light-gray-secondary;
+		border-top: $border-width solid $gray-400;
 		padding: $grid-unit-15;
+
+		.is-alternate & {
+			border-color: $gray-900;
+		}
 	}
 }
 

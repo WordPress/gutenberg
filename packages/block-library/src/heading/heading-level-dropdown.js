@@ -69,9 +69,7 @@ export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
 			renderContent={ () => (
 				<Toolbar
 					className="block-library-heading-level-toolbar"
-					__experimentalAccessibilityLabel={ __(
-						'Change heading level'
-					) }
+					label={ __( 'Change heading level' ) }
 				>
 					<ToolbarGroup
 						isCollapsed={ false }
@@ -92,15 +90,6 @@ export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
 								isActive,
 								onClick() {
 									onChange( targetLevel );
-								},
-								// Temporary workaround for macOS Firefox/Safari issue
-								// where clicking buttons in the heading level toolbar
-								// doesn't work.
-								// TODO: Replace this with a more general solution.
-								// https://github.com/WordPress/gutenberg/pull/20246#pullrequestreview-417338057
-								onMouseDown( event ) {
-									event.preventDefault();
-									event.currentTarget.focus();
 								},
 							};
 						} ) }

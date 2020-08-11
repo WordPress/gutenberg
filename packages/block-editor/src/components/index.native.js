@@ -28,7 +28,6 @@ export {
 	MEDIA_TYPE_VIDEO,
 } from './media-upload';
 export { default as MediaUploadProgress } from './media-upload-progress';
-export { default as MediaEdit } from './media-edit';
 export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
 export { default as BlockCaption } from './block-caption';
@@ -47,6 +46,7 @@ export {
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';
+export { default as BlockVariationPicker } from './block-variation-picker';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';

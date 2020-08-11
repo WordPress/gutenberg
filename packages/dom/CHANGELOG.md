@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.11.0 (2020-06-15)
+
+### New Feature
+
+- Add `documentHasUncollapsedSelection` to inquire about ranges of selected text in the document, including the separately managed selections inside <input> and <textarea> elements.
+
 ## 2.10.0 (2020-05-28)
 
 ### New Feature

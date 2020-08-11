@@ -1,13 +1,14 @@
 {
 	"name": "core/query-loop",
 	"category": "design",
-	"context": [
+	"usesContext": [
 		"queryId",
 		"query",
 		"queryContext"
 	],
 	"supports": {
 		"reusable": false,
+		"lightBlockWrapper": true,
 		"html": false
 	}
 }

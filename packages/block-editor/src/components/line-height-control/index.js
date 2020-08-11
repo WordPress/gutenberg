@@ -8,7 +8,6 @@ import { ZERO } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../use-editor-feature';
 import {
 	BASE_DEFAULT_VALUE,
 	RESET_VALUE,
@@ -17,14 +16,6 @@ import {
 } from './utils';
 
 export default function LineHeightControl( { value: lineHeight, onChange } ) {
-	// Don't render the controls if disabled by editor settings
-	const isDisabled = useEditorFeature(
-		'__experimentalDisableCustomLineHeight'
-	);
-	if ( isDisabled ) {
-		return null;
-	}
-
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const handleOnKeyDown = ( event ) => {

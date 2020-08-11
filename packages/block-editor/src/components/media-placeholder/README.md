@@ -140,6 +140,15 @@ Callback called when an upload error happens.
 - Required: No
 - Platform: Web
 
+### onFilesPreUpload
+Callback called before to start to upload the files.
+It receives an array with the files to upload before to the final process. It means that it's possible these files couldn't be uploaded.    
+
+- Type: `Function`
+- Required: No
+- Default: `Function` noop
+- Platform: Web
+
 ### onSelect
 
 Callback called when the files are selected/uploaded.

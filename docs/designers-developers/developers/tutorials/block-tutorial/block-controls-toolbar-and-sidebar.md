@@ -187,3 +187,6 @@ If you have settings that affects only selected content inside a block (example:
 The Block Tab is shown in place of the Document Tab when a block is selected.
 
 Similar to rendering a toolbar, if you include an `InspectorControls` element in the return value of your block type's `edit` function, those controls will be shown in the Settings Sidebar region.
+
+Block controls rendered in both the toolbar and sidebar will also be used when
+multiple blocks of the same type are selected.

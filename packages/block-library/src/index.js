@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/notices';
 import '@wordpress/block-editor';
 import {
 	registerBlockType,
@@ -46,7 +47,6 @@ import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
-import * as richImage from './rich-image';
 import * as rss from './rss';
 import * as search from './search';
 import * as group from './group';
@@ -65,6 +65,8 @@ import * as socialLink from './social-link';
 import * as widgetArea from './widget-area';
 
 // Full Site Editing Blocks
+import * as siteLogo from './site-logo';
+import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
@@ -132,8 +134,6 @@ export const registerCoreBlocks = () => {
 		column,
 		cover,
 		embed,
-		...embed.common,
-		...embed.others,
 		file,
 		group,
 		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
@@ -198,6 +198,8 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing
 						? [
+								siteLogo,
+								siteTagline,
 								siteTitle,
 								templatePart,
 								query,
@@ -216,8 +218,5 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 						  ]
 						: [] ),
 				].forEach( registerBlock );
-
-				// Attach rich image tools to the image and cover blocks.
-				richImage.registerBlock();
 		  }
 		: undefined;

@@ -6,6 +6,10 @@ const gitRepoOwner = 'WordPress';
  * @property {string} slug Slug.
  * @property {string} name Name.
  * @property {string} team Github Team Name.
+ * @property {string} versionMilestoneFormat printf template for milestone
+ *                                           version name. Expected to be called
+ *                                           with a merged object of the config
+ *                                           and semver-parsed version parts.
  * @property {string} githubRepositoryOwner Github Repository Owner.
  * @property {string} githubRepositoryName Github Repository Name.
  * @property {string} pluginEntryPoint Plugin Entry Point File.
@@ -22,6 +26,7 @@ const config = {
 	slug: 'gutenberg',
 	name: 'Gutenberg',
 	team: 'Gutenberg Core',
+	versionMilestoneFormat: '%(name)s %(major)s.%(minor)s',
 	githubRepositoryOwner: gitRepoOwner,
 	githubRepositoryName: 'gutenberg',
 	pluginEntryPoint: 'gutenberg.php',

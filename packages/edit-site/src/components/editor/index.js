@@ -52,12 +52,12 @@ function Editor() {
 		deviceType,
 		sidebarIsOpened,
 		settings,
-		templateId,
-		templatePartId,
+		entityId,
 		templateType,
 		page,
 		template,
-	} = useSelect( ( select ) => {
+		select,
+	} = useSelect( ( _select ) => {
 		const {
 			isFeatureActive,
 			__experimentalGetPreviewDeviceType,
@@ -66,28 +66,39 @@ function Editor() {
 			getTemplatePartId,
 			getTemplateType,
 			getPage,
-		} = select( 'core/edit-site' );
+		} = _select( 'core/edit-site' );
 		const _templateId = getTemplateId();
 		const _templatePartId = getTemplatePartId();
 		const _templateType = getTemplateType();
+
+		// The currently selected entity to display. Typically template or template part.
+		let _entityId;
+		if ( _templateType ) {
+			_entityId =
+				_templateType === 'wp_template' ? _templateId : _templatePartId;
+		}
+
 		return {
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
-			sidebarIsOpened: !! select(
+			sidebarIsOpened: !! _select(
 				'core/interface'
 			).getActiveComplementaryArea( 'core/edit-site' ),
 			settings: getSettings(),
-			templateId: _templateId,
-			templatePartId: _templatePartId,
 			templateType: _templateType,
 			page: getPage(),
-			template: select( 'core' ).getEntityRecord(
-				'postType',
-				_templateType,
-				_templateType === 'wp_template' ? _templateId : _templatePartId
-			),
+			template: _templateType
+				? _select( 'core' ).getEntityRecord(
+						'postType',
+						_templateType,
+						_entityId
+				  )
+				: null,
+			select: _select,
+			entityId: _entityId,
 		};
 	}, [] );
+	const { editEntityRecord } = useDispatch( 'core' );
 	const { setPage } = useDispatch( 'core/edit-site' );
 
 	const inlineStyles = useResizeCanvas( deviceType );
@@ -101,8 +112,22 @@ function Editor() {
 		[]
 	);
 	const closeEntitiesSavedStates = useCallback(
-		() => setIsEntitiesSavedStatesOpen( false ),
-		[]
+		( entitiesToSave ) => {
+			if ( entitiesToSave ) {
+				const { getEditedEntityRecord } = select( 'core' );
+				entitiesToSave.forEach( ( { kind, name, key } ) => {
+					const record = getEditedEntityRecord( kind, name, key );
+
+					const edits = record.slug
+						? { status: 'publish', title: record.slug }
+						: { status: 'publish' };
+
+					editEntityRecord( kind, name, key, edits );
+				} );
+			}
+			setIsEntitiesSavedStatesOpen( false );
+		},
+		[ select ]
 	);
 
 	// Set default query for misplaced Query Loop blocks, and
@@ -110,26 +135,27 @@ function Editor() {
 	// and Query Pagination blocks.
 	const blockContext = useMemo(
 		() => ( {
-			...page.context,
-			query: page.context.query || { categoryIds: [] },
+			...page?.context,
+			query: page?.context.query || { categoryIds: [] },
 			queryContext: [
-				page.context.queryContext || { page: 1 },
+				page?.context.queryContext || { page: 1 },
 				( newQueryContext ) =>
 					setPage( {
 						...page,
 						context: {
-							...page.context,
+							...page?.context,
 							queryContext: {
-								...page.context.queryContext,
+								...page?.context.queryContext,
 								...newQueryContext,
 							},
 						},
 					} ),
 			],
 		} ),
-		[ page.context ]
+		[ page?.context ]
 	);
-	return template ? (
+
+	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -139,11 +165,7 @@ function Editor() {
 						<EntityProvider
 							kind="postType"
 							type={ templateType }
-							id={
-								templateType === 'wp_template'
-									? templateId
-									: templatePartId
-							}
+							id={ entityId }
 						>
 							<BlockContextProvider value={ blockContext }>
 								<FocusReturnProvider>
@@ -208,7 +230,13 @@ function Editor() {
 											>
 												<Notices />
 												<Popover.Slot name="block-toolbar" />
-												<BlockEditor />
+												{ template && (
+													<BlockEditor
+														setIsInserterOpen={
+															setIsInserterOpen
+														}
+													/>
+												) }
 												<KeyboardShortcuts />
 											</BlockSelectionClearer>
 										}
@@ -253,6 +281,6 @@ function Editor() {
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</>
-	) : null;
+	);
 }
 export default Editor;

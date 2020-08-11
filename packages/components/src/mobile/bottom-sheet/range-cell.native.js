@@ -58,6 +58,12 @@ class BottomSheetRangeCell extends Component {
 		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
 	}
 
+	toFixed( num ) {
+		const { toFixed = 0 } = this.props;
+		const fixed = Math.pow( 10, toFixed );
+		return Math.floor( num * fixed ) / fixed;
+	}
+
 	getFontScale() {
 		return PixelRatio.getFontScale() < 1 ? 1 : PixelRatio.getFontScale();
 	}
@@ -90,7 +96,7 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	removeNonDigit( text ) {
-		return text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' );
+		return text.replace( /[^0-9.]/g, '' );
 	}
 
 	updateValue( value ) {
@@ -101,11 +107,19 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	onChangeValue( initialValue ) {
+		initialValue =
+			typeof text === 'number'
+				? this.toFixed( initialValue )
+				: initialValue.replace( ',', '.' );
 		this.setState( { inputValue: initialValue } );
 		this.updateValue( initialValue );
 	}
 
 	onChangeText( textValue ) {
+		textValue =
+			typeof textValue === 'number'
+				? this.toFixed( textValue )
+				: textValue.replace( ',', '.' );
 		const value = this.validateInput( textValue );
 		this.setState( {
 			inputValue: this.removeNonDigit( textValue ),
@@ -123,12 +137,14 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	onSubmitEditing( { nativeEvent: { text } } ) {
-		const validValue = this.validateInput( text );
+		if ( ! isNaN( Number( text ) ) ) {
+			const validValue = this.validateInput( text );
 
-		if ( this.state.inputValue !== validValue ) {
-			this.setState( { inputValue: validValue } );
-			this.announceCurrentValue( `${ validValue }` );
-			this.props.onChange( parseInt( validValue ) );
+			if ( this.state.inputValue !== validValue ) {
+				this.setState( { inputValue: validValue } );
+				this.announceCurrentValue( `${ validValue }` );
+				this.props.onChange( parseInt( validValue ) );
+			}
 		}
 	}
 
@@ -155,6 +171,7 @@ class BottomSheetRangeCell extends Component {
 				: '#909090',
 			thumbTintColor = Platform.OS === 'android' && '#00669b',
 			getStylesFromColorScheme,
+			rangePreview,
 			...cellProps
 		} = this.props;
 
@@ -199,6 +216,7 @@ class BottomSheetRangeCell extends Component {
 				}
 			>
 				<View style={ styles.container }>
+					{ rangePreview }
 					<Slider
 						value={ this.validateInput( sliderValue ) }
 						defaultValue={ defaultValue }
@@ -227,7 +245,7 @@ class BottomSheetRangeCell extends Component {
 						onSubmitEditing={ this.onSubmitEditing }
 						onFocus={ this.handleToggleFocus }
 						onBlur={ this.handleToggleFocus }
-						keyboardType="number-pad"
+						keyboardType="numeric"
 						returnKeyType="done"
 						defaultValue={ `${ inputValue }` }
 						value={ inputValue }

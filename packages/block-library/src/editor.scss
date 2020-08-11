@@ -33,11 +33,11 @@
 @import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
 @import "./quote/editor.scss";
-@import "./rich-image/editor.scss";
 @import "./rss/editor.scss";
 @import "./search/editor.scss";
 @import "./separator/editor.scss";
 @import "./shortcode/editor.scss";
+@import "./site-logo/editor.scss";
 @import "./social-link/editor.scss";
 @import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
@@ -49,6 +49,8 @@
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
 @import "./widget-area/editor.scss";
+@import "./query-loop/editor.scss";
+@import "./query/editor.scss";
 
 /**
  * Import styles from internal editor components used by the blocks.

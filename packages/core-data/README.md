@@ -54,6 +54,17 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="deleteEntityRecord" href="#deleteEntityRecord">#</a> **deleteEntityRecord**
+
+Action triggered to delete an entity record.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the deleted entity.
+-   _name_ `string`: Name of the deleted entity.
+-   _recordId_ `string`: Record ID of the deleted entity.
+-   _query_ `?Object`: Special query parameters for the DELETE API call.
+
 <a name="editEntityRecord" href="#editEntityRecord">#</a> **editEntityRecord**
 
 Returns an action object that triggers an
@@ -217,6 +228,7 @@ _Parameters_
 -   _name_ `string`: Name of the received entity.
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
+-   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 
 <a name="undo" href="#undo">#</a> **undo**
 
@@ -439,6 +451,21 @@ _Returns_
 
 -   `?Array`: Records.
 
+<a name="getLastEntityDeleteError" href="#getLastEntityDeleteError">#</a> **getLastEntityDeleteError**
+
+Returns the specified entity record's last delete error.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `number`: Record ID.
+
+_Returns_
+
+-   `?Object`: The entity record's save error.
+
 <a name="getLastEntitySaveError" href="#getLastEntitySaveError">#</a> **getLastEntitySaveError**
 
 Returns the specified entity record's last save error.
@@ -631,6 +658,21 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the entity record is autosaving or not.
+
+<a name="isDeletingEntityRecord" href="#isDeletingEntityRecord">#</a> **isDeletingEntityRecord**
+
+Returns true if the specified entity record is deleting, and false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `number`: Record ID.
+
+_Returns_
+
+-   `boolean`: Whether the entity record is deleting or not.
 
 <a name="isPreviewEmbedFallback" href="#isPreviewEmbedFallback">#</a> **isPreviewEmbedFallback**
 
