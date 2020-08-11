@@ -50,7 +50,9 @@ function BottomSheetNavigationContainer( {
 	stack,
 } ) {
 	const context = useContext( BottomSheetContext );
-	const [ currentHeight, setCurrentHeight ] = useState( context.currentHeight || 1 );
+	const [ currentHeight, setCurrentHeight ] = useState(
+		context.currentHeight || 1
+	);
 
 	const setHeight = ( height, layout ) => {
 		if ( currentHeight !== height && height > 1 ) {
