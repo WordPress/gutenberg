@@ -79,12 +79,12 @@
 
 .wp-block-template-part__notice-container {
 	position: absolute;
-	top: 100%;
+	bottom: 100%;
 	width: 100%;
 
 	.wp-block-template-part__notice-layout {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-start;
 	}
 
 	.wp-block-template-part__notice-text {
