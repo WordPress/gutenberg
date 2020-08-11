@@ -3,29 +3,24 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 
-const Navigation = ( { activeId, children, items: rawItems, rootTitle } ) => {
+const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevel, setActiveLevel ] = useState( 'root' );
 
 	const mapItemData = ( items ) => {
 		return items.map( ( item ) => {
-			const itemChildren = rawItems.filter(
-				( i ) => i.parent === item.id
-			);
+			const itemChildren = data.filter( ( i ) => i.parent === item.id );
 			return {
 				...item,
 				children: itemChildren,
 				parent: item.parent || 'root',
-				isActive: item.id === activeId,
+				isActive: item.id === activeItemId,
 				hasChildren: itemChildren.length > 0,
 			};
 		} );
 	};
-	const items = [
-		{ id: 'root', title: rootTitle },
-		...mapItemData( rawItems ),
-	];
+	const items = [ { id: 'root', title: rootTitle }, ...mapItemData( data ) ];
 
-	const activeItem = items.find( ( item ) => item.id === activeId );
+	const activeItem = items.find( ( item ) => item.id === activeItemId );
 	const level = items.find( ( item ) => item.id === activeLevel );
 	const levelItems = items.filter( ( item ) => item.parent === level.id );
 	const parentLevel =
@@ -42,7 +37,6 @@ const Navigation = ( { activeId, children, items: rawItems, rootTitle } ) => {
 	return (
 		<div className="components-navigation">
 			{ children( {
-				activeId,
 				level,
 				levelItems,
 				parentLevel,

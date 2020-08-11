@@ -45,7 +45,7 @@ function Example() {
 	const [ active, setActive ] = useState( 'item-1' );
 
 	return (
-		<Navigation activeId={ active } items={ data } rootTitle="Home">
+		<Navigation activeItemId={ active } data={ data } rootTitle="Home">
 			{ ( { level, levelItems, parentLevel, setActiveLevel } ) => {
 				return (
 					<>
