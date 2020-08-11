@@ -102,27 +102,24 @@ class BottomSheetRangeCell extends Component {
 	updateValue( value ) {
 		const { onChange } = this.props;
 		const validValue = this.validateInput( value );
+
 		this.announceCurrentValue( `${ validValue }` );
-		onChange( parseInt( validValue ) );
+		onChange( validValue );
 	}
 
 	onChangeValue( initialValue ) {
-		initialValue =
-			typeof text === 'number'
-				? this.toFixed( initialValue )
-				: initialValue.replace( ',', '.' );
+		initialValue = this.toFixed( initialValue );
 		this.setState( { inputValue: initialValue } );
 		this.updateValue( initialValue );
 	}
 
 	onChangeText( textValue ) {
-		textValue =
-			typeof textValue === 'number'
-				? this.toFixed( textValue )
-				: textValue.replace( ',', '.' );
+		const inputValue = this.removeNonDigit( textValue );
+		textValue = inputValue.replace( ',', '.' );
+		textValue = this.toFixed( textValue );
 		const value = this.validateInput( textValue );
 		this.setState( {
-			inputValue: this.removeNonDigit( textValue ),
+			inputValue,
 			sliderValue: value,
 		} );
 		this.updateValue( value );
@@ -138,12 +135,13 @@ class BottomSheetRangeCell extends Component {
 
 	onSubmitEditing( { nativeEvent: { text } } ) {
 		if ( ! isNaN( Number( text ) ) ) {
+			text = this.toFixed( text.replace( ',', '.' ) );
 			const validValue = this.validateInput( text );
 
 			if ( this.state.inputValue !== validValue ) {
 				this.setState( { inputValue: validValue } );
 				this.announceCurrentValue( `${ validValue }` );
-				this.props.onChange( parseInt( validValue ) );
+				this.props.onChange( validValue );
 			}
 		}
 	}
