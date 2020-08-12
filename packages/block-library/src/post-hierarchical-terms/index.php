@@ -11,39 +11,39 @@
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string Returns the filtered post categories for the current post wrapped inside "a" tags.
+ * @return string Returns the filtered post hierarchical terms for the current post wrapped inside "a" tags.
  */
 function render_block_core_post_hierarchical_terms( $attributes, $content, $block ) {
-	if ( ! isset( $block->context['postId'] ) ) {
+	if ( ! isset( $block->context['postId'] ) || ! isset( $attributes['term'] ) ) {
 		return '';
 	}
 
-	$post_categories = get_the_category( $block->context['postId'] );
-	if ( empty( $post_categories ) ) {
+	$post_hierarchical_terms = get_the_terms( $block->context['postId'], $attributes['term'] );
+	if ( empty( $post_hierarchical_terms ) ) {
 		return '';
 	}
 
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : ' ' . "has-text-align-{$attributes['textAlign']}";
 
-	$category_links = '';
-	foreach ( $post_categories as $category ) {
-		$category_links .= sprintf(
+	$terms_links = '';
+	foreach ( $post_hierarchical_terms as $term ) {
+		$terms_links .= sprintf(
 			'<a href="%1$s">%2$s</a> | ',
-			get_category_link( $category->term_id ),
-			esc_html( $category->name )
+			get_term_link( $term->term_id ),
+			esc_html( $term->name )
 		);
 	}
-	$category_links = trim( $category_links, ' | ' );
+	$terms_links = trim( $terms_links, ' | ' );
 
 	return sprintf(
 		'<div class="%1$s">%2$s</div>',
 		'wp-block-post-hierarchical-terms' . esc_attr( $align_class_name ),
-		$category_links
+		$terms_links
 	);
 }
 
 /**
- * Registers the `core/post-categories` block on the server.
+ * Registers the `core/post-hierarchical-terms` block on the server.
  */
 function register_block_core_post_hierarchical_terms() {
 	register_block_type_from_metadata(

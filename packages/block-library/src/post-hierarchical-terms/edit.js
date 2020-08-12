@@ -86,7 +86,7 @@ export default function PostHierarchicalTermsEdit( {
 		return (
 			<Block.div>
 				<Warning>
-					{ __( 'Post Categories block: post not found.' ) }
+					{ __( 'Post Hierarchical Terms block: post not found.' ) }
 				</Warning>
 			</Block.div>
 		);
