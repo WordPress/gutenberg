@@ -16,7 +16,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Details' ),
-	description: __( 'Create a toggle to show and hide blocks' ),
+	description: __( 'Create a toggle to show and hide content.' ),
 	category,
 	edit,
 	save,
