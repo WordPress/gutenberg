@@ -3,7 +3,7 @@
 	"category": "design",
 	"attributes": {
 		"term": {
-			"type": "object"
+			"type": "string"
 		},
 		"textAlign": {
 			"type": "string"

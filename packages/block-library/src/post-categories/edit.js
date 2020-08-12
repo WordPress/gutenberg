@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find, map } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,60 +15,59 @@ import {
 	__experimentalBlockVariationPicker as BlockVariationPicker,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import useHierarchicalTerms from './use-hierarchical-terms';
 import useHierarchicalTermLinks from './use-hierarchical-term-links';
-
-function HierarchicalTermPicker( {
-	hierarchicalTerms,
-	isLoadingHierarchicalTerms,
-	setAttributes,
-} ) {
-	if ( isLoadingHierarchicalTerms ) {
-		return <Spinner />;
-	}
-
-	const variations = map( hierarchicalTerms, ( term ) => ( {
-		/* eslint-disable camelcase */
-		name: term?.slug,
-		title: term?.name,
-		description: term?.description,
-		is_default: 'category' === term?.slug,
-		attributes: {
-			term: { restBase: term?.rest_base, slug: term?.slug },
-		},
-		/* eslint-enable camelcase */
-	} ) );
-
-	return (
-		<BlockVariationPicker
-			variations={ variations }
-			onSelect={ ( variation ) => {
-				setAttributes( variation.attributes );
-			} }
-		/>
-	);
-}
 
 export default function PostCategoriesEdit( {
 	attributes,
+	clientId,
 	context,
+	name,
 	setAttributes,
 } ) {
 	const { term, textAlign } = attributes;
 	const { postId, postType } = context;
 
-	const [ selectedTerm, setSelectedTerm ] = useState();
+	const { blockType, defaultVariation, variations } = useSelect(
+		( select ) => {
+			const {
+				getBlockVariations,
+				getBlockType,
+				getDefaultBlockVariation,
+			} = select( 'core/blocks' );
 
-	const {
-		hierarchicalTerms,
-		isLoadingHierarchicalTerms,
-	} = useHierarchicalTerms();
+			return {
+				blockType: getBlockType( name ),
+				defaultVariation: getDefaultBlockVariation( name, 'block' ),
+				variations: getBlockVariations( name, 'block' ),
+			};
+		},
+		[ clientId, name ]
+	);
+
+	const selectedTerm = useSelect(
+		( select ) => {
+			if ( ! term ) return {};
+			const taxonomies = select( 'core' ).getTaxonomies( {
+				per_page: -1,
+			} );
+			return (
+				find(
+					taxonomies,
+					( taxonomy ) =>
+						taxonomy.slug === term &&
+						taxonomy.hierarchical &&
+						taxonomy.visibility.show_ui
+				) || {}
+			);
+		},
+		[ term ]
+	);
 
 	const {
 		hierarchicalTermLinks,
@@ -76,20 +75,37 @@ export default function PostCategoriesEdit( {
 	} = useHierarchicalTermLinks( {
 		postId,
 		postType,
-		term,
-	} );
-
-	useEffect( () => {
-		if ( selectedTerm || ! term?.slug ) {
-			return;
-		}
-
-		setSelectedTerm( find( hierarchicalTerms, { slug: term.slug } ) );
+		term: selectedTerm,
 	} );
 
 	const hasPost = postId && postType;
 	const hasHierarchicalTermLinks =
 		hierarchicalTermLinks && hierarchicalTermLinks.length > 0;
+
+	if ( ! hasPost ) {
+		return (
+			<Block.div>
+				<Warning>
+					{ __( 'Post Categories block: post not found.' ) }
+				</Warning>
+			</Block.div>
+		);
+	}
+
+	if ( ! term ) {
+		return (
+			<Block.div>
+				<BlockVariationPicker
+					icon={ blockType?.icon?.src }
+					label={ blockType?.title }
+					onSelect={ ( variation = defaultVariation ) => {
+						setAttributes( variation.attributes );
+					} }
+					variations={ variations }
+				/>
+			</Block.div>
+		);
+	}
 
 	return (
 		<>
@@ -106,20 +122,9 @@ export default function PostCategoriesEdit( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
-				{ hasPost && ! term && (
-					<HierarchicalTermPicker
-						hierarchicalTerms={ hierarchicalTerms }
-						isLoadingHierarchicalTerms={
-							isLoadingHierarchicalTerms
-						}
-						setAttributes={ setAttributes }
-					/>
-				) }
+				{ isLoadingHierarchicalTermLinks && <Spinner /> }
 
-				{ hasPost && isLoadingHierarchicalTermLinks && <Spinner /> }
-
-				{ hasPost &&
-					hasHierarchicalTermLinks &&
+				{ hasHierarchicalTermLinks &&
 					! isLoadingHierarchicalTermLinks &&
 					hierarchicalTermLinks.reduce( ( prev, curr ) => [
 						prev,
@@ -127,19 +132,11 @@ export default function PostCategoriesEdit( {
 						curr,
 					] ) }
 
-				{ hasPost &&
-					!! term &&
-					! isLoadingHierarchicalTermLinks &&
+				{ ! isLoadingHierarchicalTermLinks &&
 					! hasHierarchicalTermLinks &&
 					// eslint-disable-next-line camelcase
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
-
-				{ ! hasPost && (
-					<Warning>
-						{ __( 'Post Categories block: post not found.' ) }
-					</Warning>
-				) }
 			</Block.div>
 		</>
 	);

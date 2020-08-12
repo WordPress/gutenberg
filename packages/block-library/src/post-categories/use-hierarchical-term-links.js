@@ -10,10 +10,12 @@ import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 export default function useHierarchicalTermLinks( { postId, postType, term } ) {
+	const { rest_base: restBase, slug } = term;
+
 	const [ hierarchicalTermItems ] = useEntityProp(
 		'postType',
 		postType,
-		term?.restBase,
+		restBase,
 		postId
 	);
 
@@ -24,7 +26,7 @@ export default function useHierarchicalTermLinks( { postId, postType, term } ) {
 			let loaded = true;
 
 			const links = map( hierarchicalTermItems, ( itemId ) => {
-				const item = getEntityRecord( 'taxonomy', term?.slug, itemId );
+				const item = getEntityRecord( 'taxonomy', slug, itemId );
 
 				if ( ! item ) {
 					return ( loaded = false );
