@@ -110,10 +110,10 @@
 
 	&.has-child-selected {
 		&::after {
-			box-shadow: 0 0 0 $border-width-focus $gray-700;
+			box-shadow: 0 0 0 $border-width $gray-600;
 			// Show a light color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 $border-width-focus $gray-200;
+				box-shadow: 0 0 0 $border-width $gray-200;
 			}
 		}
 	}
