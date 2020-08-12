@@ -20,7 +20,7 @@ import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
 
 const BREAKPOINTS = {
-	wide: 1020,
+	wide: 1024,
 	small: 600,
 };
 
@@ -59,16 +59,21 @@ export class BlockListItem extends Component {
 	}
 
 	getMarginHorizontal() {
-		const { blockAlignment, marginHorizontal } = this.props;
+		const { blockAlignment, hasParents, marginHorizontal } = this.props;
 		const { width } = this.state;
 
 		switch ( blockAlignment ) {
 			case 'full':
 				return styles.fullAlignment.marginLeft;
 			case 'wide':
-				return width > BREAKPOINTS.small && width < BREAKPOINTS.wide
-					? styles.wideAlignmentCanvas.marginLeft
-					: styles.wideAlignment.marginLeft;
+				if ( width > BREAKPOINTS.small && width <= BREAKPOINTS.wide ) {
+					return ! hasParents
+						? styles.wideAlignmentParent.marginLeft
+						: styles.wideAlignment.marginLeft;
+				}
+				return ! hasParents
+					? marginHorizontal
+					: styles.wideAlignmentSmall.marginLeft;
 			default:
 				return marginHorizontal;
 		}

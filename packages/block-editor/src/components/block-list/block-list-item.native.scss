@@ -10,10 +10,14 @@
 	padding: $block-edge-to-content;
 }
 
-.wideAlignmentCanvas {
-	margin-left: 44px;
+.wideAlignment {
+	margin-left: $block-edge-to-content * 4;
 }
 
-.wideAlignment {
-	margin-left: $block-edge-to-content;
+.wideAlignmentParent {
+	margin-left: $block-edge-to-content * 3;
+}
+
+.wideAlignmentSmall {
+	margin-left: $block-edge-to-content * 2;
 }
