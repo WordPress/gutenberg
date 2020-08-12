@@ -65,6 +65,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
+	// Merge and dedupe new and existing classes and styles.
 	$current_classes = explode( ' ', trim( $block_root->getAttribute( 'class' ) ) );
 	$classes_to_add  = array_key_exists( 'css_classes', $attributes ) ? $attributes['css_classes'] : array();
 	$new_classes     = array_unique( array_filter( array_merge( $current_classes, $classes_to_add ) ) );
