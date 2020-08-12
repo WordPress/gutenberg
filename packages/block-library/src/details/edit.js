@@ -8,7 +8,12 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	Panel,
+	PanelBody,
+	PanelRow,
+} from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
 import { SPACE } from '@wordpress/keycodes';
 
@@ -54,13 +59,19 @@ export default function DetalsEdit( {
 	return (
 		<>
 			<InspectorControls>
-				<ToggleControl
-					label={ __( 'Open by default' ) }
-					onChange={ ( initialOpen ) =>
-						setAttributes( { initialOpen } )
-					}
-					checked={ attributes.initialOpen }
-				/>
+				<Panel>
+					<PanelBody>
+						<PanelRow>
+							<ToggleControl
+								label={ __( 'Open by default' ) }
+								onChange={ ( initialOpen ) =>
+									setAttributes( { initialOpen } )
+								}
+								checked={ attributes.initialOpen }
+							/>
+						</PanelRow>
+					</PanelBody>
+				</Panel>
 			</InspectorControls>
 			<details className={ className } open={ showInnerBlocks }>
 				<RichText
