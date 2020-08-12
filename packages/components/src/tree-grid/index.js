@@ -151,14 +151,14 @@ function TreeGrid( { children, ...props }, ref ) {
 	/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 	return (
 		<RovingTabIndexContainer>
-			<table
-				{ ...props }
-				role="treegrid"
-				onKeyDown={ onKeyDown }
-				ref={ ref }
-			>
-				<tbody>{ children }</tbody>
-			</table>
+			<div
+        { ...props }
+        role="treegrid"
+        onKeyDown={ onKeyDown }
+        ref={ ref }
+      >
+				<div>{ children }</div>
+			</div>
 		</RovingTabIndexContainer>
 	);
 	/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */

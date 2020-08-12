@@ -13,12 +13,12 @@ export default forwardRef( function TreeGridCell(
 	ref
 ) {
 	return (
-		<td { ...props } role="gridcell">
+		<div { ...props } role="gridcell">
 			{ withoutGridItem ? (
 				children
 			) : (
 				<TreeGridItem ref={ ref }>{ children }</TreeGridItem>
 			) }
-		</td>
+		</div>
 	);
 } );

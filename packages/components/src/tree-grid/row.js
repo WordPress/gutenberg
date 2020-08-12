@@ -14,7 +14,7 @@ function TreeGridRow(
 		// linting rule fails when validating this markup.
 		//
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
-		<tr
+		<div
 			{ ...props }
 			ref={ ref }
 			role="row"
@@ -24,7 +24,7 @@ function TreeGridRow(
 			aria-expanded={ isExpanded }
 		>
 			{ children }
-		</tr>
+		</div>
 	);
 }
 
