@@ -94,15 +94,15 @@ then the nested template part's child blocks will not be returned. This way,
 the template block itself is considered part of the parent, but the children
 are not.
 
-You can override this behavior with the includeControlledInnerBlocks. So if
-you call `getBlock( TP, true )`, it will return all nested blocks, including
-all child inner block controllers and their children.
+You can override this behavior with the includeControlledInnerBlocks setting.
+So if you call `getBlock( TP, { WPGetBlockSettings: true } )`, it will return
+all nested blocks, including all child inner block controllers and their children.
 
 _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block client ID.
--   _includeControlledInnerBlocks_ `?boolean`: If true, include controlleld inner block subtrees. The default behavior is to exclude controlled inner blocks (false).
+-   _settings_ `?WPGetBlockSettings`: A settings object.
 
 _Returns_
 
@@ -283,7 +283,7 @@ _Returns_
 Returns all block objects for the current post being edited as an array in
 the order they appear in the post. Note that this will exclude child blocks
 of nested inner block controllers unless the `includeControlledInnerBlocks`
-parameter is set to true.
+setting is set to true.
 
 Note: It's important to memoize this selector to avoid return a new instance
 on each call. We use the block cache state for each top-level block of the
@@ -295,7 +295,7 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
--   _includeControlledInnerBlocks_ `?boolean`: If true, include controlleld inner block subtrees. The default behavior is to exclude controlled inner blocks (false).
+-   _settings_ `?WPGetBlockSettings`: A settings object.
 
 _Returns_
 
