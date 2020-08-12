@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -48,6 +48,12 @@ function UnitControl(
 		initial: initialUnit,
 	} );
 
+	/*
+	 * Storing parsed unit changes to be applied during the onChange callback
+	 * cycle.
+	 */
+	const nextParsedUnitRef = useRef();
+
 	const classes = classnames( 'components-unit-control', className );
 
 	const handleOnChange = ( next, changeProps ) => {
@@ -55,7 +61,8 @@ function UnitControl(
 			onChange( '', changeProps );
 			return;
 		}
-		/**
+
+		/*
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
 		 */
@@ -65,7 +72,22 @@ function UnitControl(
 			value,
 			unit
 		);
-		const nextValue = `${ parsedValue }${ parsedUnit }`;
+		const nextParsedUnit = nextParsedUnitRef.current;
+
+		/*
+		 * If we've noticed a (parsed) unit change, which would have been
+		 * stored in nextParsedUnitRef, we'll update our local unit set,
+		 * as well as fire the onUnitChange callback.
+		 */
+		if ( nextParsedUnit ) {
+			onUnitChange( nextParsedUnit, changeProps );
+			setUnit( nextParsedUnit );
+			// We have to reset this ref value to properly track new changes.
+			nextParsedUnitRef.current = null;
+		}
+
+		const nextUnit = nextParsedUnit || parsedUnit;
+		const nextValue = `${ parsedValue }${ nextUnit }`;
 
 		onChange( nextValue, changeProps );
 	};
@@ -98,7 +120,7 @@ function UnitControl(
 		const { type, payload } = action;
 		const event = payload?.event;
 
-		/**
+		/*
 		 * Customizes the commit interaction.
 		 *
 		 * This occurs when pressing ENTER to fire a change.
@@ -119,7 +141,15 @@ function UnitControl(
 
 			// Update unit if the incoming parsed unit is different.
 			if ( unit !== parsedUnit ) {
-				handleOnUnitChange( parsedUnit, { event } );
+				/*
+				 * We start by storing the next parsedUnit value in our
+				 * nextParsedUnitRef. We can't set the unit during this
+				 * stateReducer callback as it cause state update
+				 * conflicts within React's render cycle.
+				 *
+				 * https://github.com/facebook/react/issues/18178
+				 */
+				nextParsedUnitRef.current = parsedUnit;
 			}
 		}
 
