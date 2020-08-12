@@ -21,6 +21,6 @@ export const settings = {
 	edit,
 	save,
 	// details and summary are not translated because they are the HTML tags
-	keywords: [ 'details', 'summary' ],
+	keywords: [ 'details', 'summary', __( 'faq' ) ],
 	attributes,
 };
