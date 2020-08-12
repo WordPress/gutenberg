@@ -29,11 +29,6 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
  * @return {Array} Normalized inserter items.
  */
 export function includeVariationsInInserterItems( items, limit = Infinity ) {
-	if ( items.length >= limit ) {
-		// No need to iterate for variations
-		return items.slice( 0, limit );
-	}
-
 	// Exclude any block type item that is to be replaced by a default
 	// variation.
 	const filteredItems = items.filter(
