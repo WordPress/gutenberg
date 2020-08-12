@@ -1164,6 +1164,13 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+
+	// The parent block doesn't have settings indicating it doesn't support
+	// inner blocks, return false.
+	if ( rootClientId && parentBlockListSettings === undefined ) {
+		return false;
+	}
+
 	const parentAllowedBlocks = get( parentBlockListSettings, [
 		'allowedBlocks',
 	] );
