@@ -38,7 +38,6 @@ const PaletteScreen = () => {
 		defaultSettings,
 	} = route.params || {};
 	const { segments, isGradient } = colorsUtils;
-
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const isGradientColor = isGradient( currentValue );
 	const selectedSegmentIndex = isGradientColor ? 1 : 0;
@@ -71,16 +70,14 @@ const PaletteScreen = () => {
 	function onCustomPress() {
 		if ( isSolidSegment ) {
 			navigation.navigate( colorsUtils.screens.picker, {
-				setColor,
-				isGradientColor,
 				currentValue,
+				setColor,
 			} );
 		} else {
 			navigation.navigate( colorsUtils.screens.gradientPicker, {
 				setColor,
 				isGradientColor,
 				currentValue,
-				isSolidSegment,
 			} );
 		}
 	}
@@ -123,7 +120,6 @@ const PaletteScreen = () => {
 			</View>
 		);
 	}
-
 	return (
 		<View>
 			<NavigationHeader

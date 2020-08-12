@@ -14,7 +14,12 @@ import { debounce } from 'lodash';
  */
 import { BottomSheetContext } from '@wordpress/components';
 
-import { useRef, useCallback, useContext } from '@wordpress/element';
+import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
 
 const BottomSheetScreen = ( { children } ) => {
 	const navigation = useNavigation();
@@ -23,8 +28,9 @@ const BottomSheetScreen = ( { children } ) => {
 	const {
 		onHandleHardwareButtonPress,
 		shouldEnableBottomSheetMaxHeight,
-		setHeight,
 	} = useContext( BottomSheetContext );
+
+	const { setHeight } = useContext( BottomSheetNavigationContext );
 
 	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [] );
 
@@ -53,7 +59,9 @@ const BottomSheetScreen = ( { children } ) => {
 		}
 	};
 
-	return <View onLayout={ onLayout }>{ children }</View>;
+	return useMemo( () => {
+		return <View onLayout={ onLayout }>{ children }</View>;
+	}, [ children, isFocused ] );
 };
 
 const OuterBottomSheetScreen = ( { name, stack, children, ...otherProps } ) => {

@@ -7,12 +7,15 @@ import { NavigationContainer } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
-import { BottomSheetContext, BottomSheetProvider } from '@wordpress/components';
-import { useState, useContext } from '@wordpress/element';
+import { useState, useContext, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import { performLayoutAnimation } from '../layout-animation';
+import {
+	BottomSheetNavigationContext,
+	BottomSheetNavigationProvider,
+} from './bottom-sheet-navigation-context';
 
 const AnimationSpec = {
 	animation: 'timing',
@@ -49,7 +52,7 @@ function BottomSheetNavigationContainer( {
 	theme,
 	stack,
 } ) {
-	const context = useContext( BottomSheetContext );
+	const context = useContext( BottomSheetNavigationContext );
 	const [ currentHeight, setCurrentHeight ] = useState(
 		context.currentHeight || 1
 	);
@@ -66,26 +69,27 @@ function BottomSheetNavigationContainer( {
 			}
 		}
 	};
-
-	return (
-		<View style={ { height: currentHeight } }>
-			<BottomSheetProvider
-				value={ { ...context, setHeight, currentHeight } }
-			>
-				{ main ? (
-					<NavigationContainer theme={ theme }>
+	return useMemo( () => {
+		return (
+			<View style={ { height: currentHeight } }>
+				<BottomSheetNavigationProvider
+					value={ { setHeight, currentHeight } }
+				>
+					{ main ? (
+						<NavigationContainer theme={ theme }>
+							<stack.Navigator screenOptions={ options }>
+								{ children }
+							</stack.Navigator>
+						</NavigationContainer>
+					) : (
 						<stack.Navigator screenOptions={ options }>
 							{ children }
 						</stack.Navigator>
-					</NavigationContainer>
-				) : (
-					<stack.Navigator screenOptions={ options }>
-						{ children }
-					</stack.Navigator>
-				) }
-			</BottomSheetProvider>
-		</View>
-	);
+					) }
+				</BottomSheetNavigationProvider>
+			</View>
+		);
+	}, [ currentHeight ] );
 }
 
 export default BottomSheetNavigationContainer;
