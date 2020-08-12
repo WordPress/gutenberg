@@ -61,10 +61,6 @@ export const KeyboardAvoidingView = ( {
 	}
 
 	function onKeyboardWillHide( { duration } ) {
-		animate( duration );
-	}
-
-	function animate( duration ) {
 		Animated.timing( animatedHeight, {
 			toValue: MIN_HEIGHT,
 			duration,
