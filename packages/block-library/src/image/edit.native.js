@@ -34,6 +34,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
+	BlockStyles,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol } from '@wordpress/url';
@@ -321,7 +322,13 @@ export class ImageEdit extends React.Component {
 
 	render() {
 		const { isCaptionSelected } = this.state;
-		const { attributes, isSelected, image, imageSizes } = this.props;
+		const {
+			attributes,
+			isSelected,
+			image,
+			imageSizes,
+			clientId,
+		} = this.props;
 		const {
 			align,
 			url,
@@ -331,6 +338,7 @@ export class ImageEdit extends React.Component {
 			id,
 			linkTarget,
 			sizeSlug,
+			className,
 		} = attributes;
 
 		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
@@ -395,6 +403,9 @@ export class ImageEdit extends React.Component {
 						valuePlaceholder={ __( 'None' ) }
 						onChangeValue={ this.updateAlt }
 					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Style' ) }>
+					{ image && <BlockStyles clientId={ clientId } /> }
 				</PanelBody>
 			</InspectorControls>
 		);
@@ -469,6 +480,7 @@ export class ImageEdit extends React.Component {
 										retryMessage={ retryMessage }
 										url={ url }
 										width={ width }
+										style={ styles[ className ] }
 									/>
 								);
 							} }

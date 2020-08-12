@@ -19,3 +19,8 @@
 .iconPlaceholderDark {
 	fill: $white;
 }
+
+.is-style-rounded {
+	border-radius: 9999px;
+	overflow: hidden;
+}

@@ -41,6 +41,7 @@ const ImageComponent = ( {
 	openMediaOptions,
 	retryMessage,
 	url,
+	style,
 	width: imageWidth,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
@@ -179,7 +180,7 @@ const ImageComponent = ( {
 					<View style={ focalPoint && styles.focalPointContent }>
 						<Image
 							aspectRatio={ imageData?.aspectRatio }
-							style={ imageStyles }
+							style={ [ imageStyles, style ] }
 							source={ { uri: url } }
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',

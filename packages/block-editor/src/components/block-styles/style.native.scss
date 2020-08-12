@@ -1,0 +1,38 @@
+.placeholder {
+	height: 40px;
+	margin-bottom: $grid-unit;
+	background-color: $light-quaternary;
+	width: 100%;
+}
+
+.placeholderDark {
+	background-color: $dark-quaternary;
+}
+
+.container {
+	padding-left: $grid-unit-20 / 2;
+	padding-right: $grid-unit-20 / 2;
+	align-items: center;
+}
+
+.rounded {
+	border-radius: 20px;
+	overflow: hidden;
+}
+
+.label {
+	color: $gray-dark;
+}
+
+.labelDark {
+	color: $white;
+}
+
+.active {
+	border-color: $light-quaternary;
+	border-width: 2px;
+}
+
+.activeDark {
+	border-color: $dark-quaternary;
+}
