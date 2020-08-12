@@ -14,7 +14,7 @@
  */
 function render_block_core_tag_cloud( $attributes ) {
 	$class = 'wp-block-tag-cloud';
-	$args = array(
+	$args  = array(
 		'echo'       => false,
 		'taxonomy'   => $attributes['taxonomy'],
 		'show_count' => $attributes['showTagCounts'],
