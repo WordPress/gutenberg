@@ -87,8 +87,7 @@
 
 .block-editor-block-list__block[data-type="core/template-part"] {
 	&.is-selected,
-	&.has-child-selected,
-	&:hover {
+	&.has-child-selected {
 		&::after {
 			top: $border-width;
 			bottom: $border-width;
@@ -109,23 +108,13 @@
 		}
 	}
 
-	&.has-child-selected,
-	&:hover:not(.is-selected) {
+	&.has-child-selected {
 		&::after {
 			box-shadow: 0 0 0 $border-width-focus $gray-700;
 			// Show a light color for dark themes.
 			.is-dark-theme & {
 				box-shadow: 0 0 0 $border-width-focus $gray-200;
 			}
-		}
-	}
-
-	&:hover:not(.is-selected):not(.has-child-selected) {
-		cursor: pointer;
-
-		// Disable pointer events on children, prevents inserter from capturing hover state etc.
-		* {
-			pointer-events: none;
 		}
 	}
 }
