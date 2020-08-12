@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { details as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,6 +18,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Details' ),
 	description: __( 'Create a toggle to show and hide content.' ),
+	icon,
 	category,
 	edit,
 	save,
