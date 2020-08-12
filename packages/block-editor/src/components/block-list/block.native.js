@@ -102,6 +102,35 @@ class BlockListBlock extends Component {
 		);
 	}
 
+	getBlockStyles() {
+		const {
+			attributes,
+			hasParents,
+			isDimmed,
+			isInnerBlockSelected,
+			isSelected,
+			marginHorizontal,
+			marginVertical,
+		} = this.props;
+		const { align } = attributes;
+		const isFullWidth = align === 'full';
+
+		return [
+			{ marginVertical, marginHorizontal, flex: 1 },
+			isDimmed && styles.dimmed,
+			isFullWidth &&
+				! hasParents &&
+				( isSelected || isInnerBlockSelected ) && {
+					paddingHorizontal: styles.fullWidthPadding.paddingLeft,
+				},
+			isFullWidth &&
+				hasParents &&
+				isInnerBlockSelected && {
+					paddingHorizontal: styles.fullWidthPadding.paddingLeft,
+				},
+		];
+	}
+
 	renderBlockTitle() {
 		return (
 			<View style={ styles.blockTitle }>
@@ -120,15 +149,13 @@ class BlockListBlock extends Component {
 			isValid,
 			order,
 			title,
-			isDimmed,
 			isTouchable,
 			onDeleteBlock,
 			isStackedHorizontally,
 			isParentSelected,
 			getStylesFromColorScheme,
-			marginVertical,
-			marginHorizontal,
 			isInnerBlockSelected,
+			hasParents,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
@@ -136,7 +163,7 @@ class BlockListBlock extends Component {
 		}
 
 		const { blockWidth } = this.state;
-
+		const { align } = attributes;
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
 			attributes,
@@ -158,15 +185,15 @@ class BlockListBlock extends Component {
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
-						style={ [
-							{ marginVertical, marginHorizontal, flex: 1 },
-							isDimmed && styles.dimmed,
-						] }
+						style={ this.getBlockStyles() }
 					>
 						{ isSelected && (
 							<View
 								style={ [
 									styles.solidBorder,
+									align === 'full' &&
+										! hasParents &&
+										styles.solidBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
@@ -256,6 +283,7 @@ export default compose( [
 
 		const parents = getBlockParents( clientId, true );
 		const parentId = parents[ 0 ] || '';
+		const hasParents = !! parents.length;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -284,6 +312,7 @@ export default compose( [
 			isParentSelected ||
 			parentId === '';
 		return {
+			hasParents,
 			icon,
 			name: name || 'core/missing',
 			order,

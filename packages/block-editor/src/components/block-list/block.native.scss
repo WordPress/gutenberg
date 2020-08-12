@@ -57,6 +57,11 @@
 	border-style: solid;
 }
 
+.solidBorderFullWidth {
+	left: 0;
+	right: 0;
+}
+
 .dashedBorder {
 	position: absolute;
 	top: -$dashed-border-space;
@@ -66,4 +71,8 @@
 	border-width: $block-selected-border-width;
 	border-radius: 2px;
 	border-style: dashed;
+}
+
+.fullWidthPadding {
+	padding: $block-selected-to-content;
 }

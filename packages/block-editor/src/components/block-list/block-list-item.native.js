@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
+import SafeArea from 'react-native-safe-area';
 
 /**
  * WordPress dependencies
@@ -16,14 +17,84 @@ import { ReadableContentView } from '@wordpress/components';
  */
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
+import styles from './block-list-item.native.scss';
 
-const stretchStyle = {
-	flex: 1,
+const BREAKPOINTS = {
+	wide: 1020,
+	small: 600,
 };
 
+const ALIGNMENTS = [ 'wide', 'full' ];
+
 export class BlockListItem extends Component {
+	constructor( props ) {
+		super( props );
+		const { blockAlignment } = props;
+
+		this.onWidthChange = this.onWidthChange.bind( this );
+		this.state = {
+			width: Dimensions.get( 'window' ).width,
+		};
+
+		if ( ALIGNMENTS.includes( blockAlignment ) ) {
+			Dimensions.addEventListener( 'change', this.onWidthChange );
+		}
+	}
+
+	componentWillUnmount() {
+		const { blockAlignment } = this.props;
+
+		if ( ALIGNMENTS.includes( blockAlignment ) ) {
+			Dimensions.removeEventListener( 'change', this.onWidthChange );
+		}
+	}
+
+	onWidthChange() {
+		SafeArea.getSafeAreaInsetsForRootView().then( ( insets ) => {
+			const { left, right } = insets.safeAreaInsets;
+			this.setState( {
+				width: Dimensions.get( 'window' ).width - ( left + right ),
+			} );
+		} );
+	}
+
+	getMarginHorizontal() {
+		const { blockAlignment, marginHorizontal } = this.props;
+		const { width } = this.state;
+
+		switch ( blockAlignment ) {
+			case 'full':
+				return styles.fullAlignment.marginLeft;
+			case 'wide':
+				return width > BREAKPOINTS.small && width < BREAKPOINTS.wide
+					? styles.wideAlignmentCanvas.marginLeft
+					: styles.wideAlignment.marginLeft;
+			default:
+				return marginHorizontal;
+		}
+	}
+
+	getContentStyles( readableContentViewStyle ) {
+		const { blockAlignment, hasParents } = this.props;
+		const { width } = this.state;
+		const isFullWidth = blockAlignment === 'full';
+
+		return [
+			readableContentViewStyle,
+			isFullWidth &&
+				! hasParents && {
+					width,
+				},
+			isFullWidth &&
+				hasParents && {
+					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
+				},
+		];
+	}
+
 	render() {
 		const {
+			blockAlignment,
 			clientId,
 			isReadOnly,
 			shouldShowInsertionPointBefore,
@@ -33,11 +104,15 @@ export class BlockListItem extends Component {
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
-			contentResizeMode === 'stretch' && stretchStyle;
+			contentResizeMode === 'stretch' && styles.stretch;
+
 		return (
-			<ReadableContentView style={ readableContentViewStyle }>
+			<ReadableContentView
+				align={ blockAlignment }
+				style={ readableContentViewStyle }
+			>
 				<View
-					style={ readableContentViewStyle }
+					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 				>
 					{ shouldShowInsertionPointBefore && (
@@ -48,6 +123,7 @@ export class BlockListItem extends Component {
 						showTitle={ false }
 						clientId={ clientId }
 						{ ...restProps }
+						marginHorizontal={ this.getMarginHorizontal() }
 					/>
 					{ ! shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter && (
@@ -67,6 +143,8 @@ export default compose( [
 				getBlockInsertionPoint,
 				isBlockInsertionPointVisible,
 				getSettings,
+				getBlockParents,
+				__unstableGetBlockWithoutInnerBlocks,
 			} = select( 'core/block-editor' );
 
 			const blockClientIds = getBlockOrder( rootClientId );
@@ -92,10 +170,18 @@ export default compose( [
 
 			const isReadOnly = getSettings().readOnly;
 
+			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+			const { attributes } = block || {};
+			const { align } = attributes || {};
+			const parents = getBlockParents( clientId, true );
+			const hasParents = !! parents.length;
+
 			return {
 				shouldShowInsertionPointBefore,
 				shouldShowInsertionPointAfter,
 				isReadOnly,
+				hasParents,
+				blockAlignment: align,
 			};
 		}
 	),

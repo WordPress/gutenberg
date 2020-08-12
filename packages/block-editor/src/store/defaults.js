@@ -37,7 +37,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
  */
 export const SETTINGS_DEFAULTS = {
-	alignWide: false,
+	alignWide: true,
 	colors: [
 		{
 			name: __( 'Black' ),

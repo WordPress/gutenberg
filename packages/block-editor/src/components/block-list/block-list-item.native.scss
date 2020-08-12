@@ -1,0 +1,19 @@
+.stretch {
+	flex: 1;
+}
+
+.fullAlignment {
+	margin-left: 0;
+}
+
+.fullAlignmentPadding {
+	padding: $block-edge-to-content;
+}
+
+.wideAlignmentCanvas {
+	margin-left: 44px;
+}
+
+.wideAlignment {
+	margin-left: $block-edge-to-content;
+}
