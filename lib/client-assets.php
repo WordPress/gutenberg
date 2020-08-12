@@ -245,7 +245,8 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		'lodash',
 		'https://unpkg.com/lodash@4.17.19/lodash.js',
 		array(),
-		'4.17.19'
+		'4.17.19',
+		true
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
