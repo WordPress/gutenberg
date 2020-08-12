@@ -51,7 +51,7 @@
 		}
 
 		@include break-medium {
-			left: $grid-unit-30;
+			left: 1.5rem;
 
 			// Nested submenus sit to the left on large breakpoints
 			.wp-block-navigation__container {

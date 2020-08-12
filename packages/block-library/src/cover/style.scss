@@ -92,7 +92,7 @@
 	}
 
 	.wp-block-cover__inner-container {
-		width: calc(100% - 70px);
+		width: calc(100% - 4.375rem);
 		z-index: z-index(".wp-block-cover__inner-container");
 		color: $white;
 	}
@@ -218,6 +218,6 @@ section.wp-block-cover-image > h2,
 	z-index: 1;
 	margin-bottom: 0;
 	max-width: $content-width;
-	padding: $block-padding;
+	padding: 0.875rem;
 	text-align: center;
 }
