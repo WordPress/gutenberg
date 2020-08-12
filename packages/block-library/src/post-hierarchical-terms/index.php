@@ -1,19 +1,19 @@
 <?php
 /**
- * Server-side rendering of the `core/post-categories` block.
+ * Server-side rendering of the `core/post-hierarchical-terms` block.
  *
  * @package WordPress
  */
 
 /**
- * Renders the `core/post-categories` block on the server.
+ * Renders the `core/post-hierarchical-terms` block on the server.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
  * @return string Returns the filtered post categories for the current post wrapped inside "a" tags.
  */
-function render_block_core_post_categories( $attributes, $content, $block ) {
+function render_block_core_post_hierarchical_terms( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
@@ -37,7 +37,7 @@ function render_block_core_post_categories( $attributes, $content, $block ) {
 
 	return sprintf(
 		'<div class="%1$s">%2$s</div>',
-		'wp-block-post-categories' . esc_attr( $align_class_name ),
+		'wp-block-post-hierarchical-terms' . esc_attr( $align_class_name ),
 		$category_links
 	);
 }
@@ -45,12 +45,12 @@ function render_block_core_post_categories( $attributes, $content, $block ) {
 /**
  * Registers the `core/post-categories` block on the server.
  */
-function register_block_core_post_categories() {
+function register_block_core_post_hierarchical_terms() {
 	register_block_type_from_metadata(
-		__DIR__ . '/post-categories',
+		__DIR__ . '/post-hierarchical-terms',
 		array(
-			'render_callback' => 'render_block_core_post_categories',
+			'render_callback' => 'render_block_core_post_hierarchical_terms',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_post_categories' );
+add_action( 'init', 'register_block_core_post_hierarchical_terms' );

@@ -1,6 +1,6 @@
 [
     {
-        "blockName": "core/post-categories",
+        "blockName": "core/post-hierarchical-terms",
         "attrs": {},
         "innerBlocks": [],
         "innerHTML": "",

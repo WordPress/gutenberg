@@ -23,7 +23,7 @@ import { __ } from '@wordpress/i18n';
  */
 import useHierarchicalTermLinks from './use-hierarchical-term-links';
 
-export default function PostCategoriesEdit( {
+export default function PostHierarchicalTermsEdit( {
 	attributes,
 	clientId,
 	context,

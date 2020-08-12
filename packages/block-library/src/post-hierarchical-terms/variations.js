@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 const variations = [
 	{
 		name: 'category',
-		title: __( 'Categories' ),
+		title: __( 'Post Categories' ),
 		icon: 'category',
 		is_default: true,
 		attributes: { term: 'category' },
