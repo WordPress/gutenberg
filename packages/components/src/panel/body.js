@@ -11,6 +11,7 @@ import mergeRefs from 'react-merge-refs';
 import { useReducedMotion } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -38,6 +39,13 @@ export function PanelBody(
 		setIsOpened( next );
 		onToggle( next );
 	};
+
+	children = applyFilters(
+		'editor.PanelBody.children',
+		children,
+		className,
+		isOpened
+	);
 
 	// Runs after initial render
 	useUpdateEffect( () => {
