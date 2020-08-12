@@ -3,6 +3,12 @@
  */
 import styled from '@emotion/styled';
 
+/**
+ * Internal dependencies
+ */
+import { LIGHT_GRAY } from '../../utils/colors-values';
+import Text from '../../text';
+
 const horizontalPadding = '30px';
 
 export const Root = styled.div`
@@ -21,6 +27,10 @@ export const Menu = styled.ul`
 	flex-direction: column;
 `;
 
+export const MenuItemText = styled( Text )`
+	margin-right: auto;
+`;
+
 export const MenuItem = styled.li`
 	display: flex;
 	justify-content: space-between;
@@ -31,7 +41,18 @@ export const MenuItem = styled.li`
 		padding-left: ${ horizontalPadding };
 		padding-right: ${ horizontalPadding };
 	}
-	&.is-active span {
+	svg {
+		margin-left: 8px;
+	}
+	&.is-active ${ MenuItemText } {
 		border-bottom: 2px solid var( --wp-admin-theme-color );
 	}
+`;
+
+export const Badge = styled.span`
+	margin-left: 8px;
+	display: inline-flex;
+	padding: 4px 12px;
+	border-radius: 2px;
+	background-color: ${ LIGHT_GRAY[ 300 ] };
 `;
