@@ -168,7 +168,7 @@ function ColumnsEditContainer( {
 						/>
 					}
 					key={ column.clientId }
-					withTextInput={ false }
+					shouldDisplayTextInput={ false }
 				/>
 			);
 		} );

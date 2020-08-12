@@ -167,7 +167,7 @@ class BottomSheetRangeCell extends Component {
 			getStylesFromColorScheme,
 			rangePreview,
 			cellContainerStyle,
-			withTextInput = true,
+			shouldDisplayTextInput = true,
 			...cellProps
 		} = this.props;
 
@@ -233,7 +233,7 @@ class BottomSheetRangeCell extends Component {
 						style={ styles.slider }
 						accessibilityRole={ 'adjustable' }
 					/>
-					{ withTextInput && (
+					{ shouldDisplayTextInput && (
 						<TextInput
 							style={ [
 								defaultSliderStyle,
