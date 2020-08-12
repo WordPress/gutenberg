@@ -1,58 +1,101 @@
-.block-editor-block-navigation__popover .components-popover__content > div {
-	padding: 6px; //GRID UNITS PLEASE
+/*
+General structure. I'll delete this at some point. -shaun
+
+block-editor-block-navigation__container
+	block-editor-block-navigation-tree
+		div
+			block-editor-block-navigation-leaf
+				block-editor-block-navigation-block__contents-cell
+					block-editor-block-navigation-block__contents-container
+						block-editor-block-navigation-block-contents (block-editor-block-navigation-block-select-button)
+							block-editor-block-icon
+							(text - block label)
+							block-editor-block-navigation-block-select-button__description
+				block-editor-block-navigation-block__mover-cell
+					components-button block-editor-block-mover-button is-up-button has-icon
+				block-editor-block-navigation-block__mover-cell
+					components-button block-editor-block-mover-button is-down-button has-icon
+*/
+
+// The root container for the tree.
+.block-editor-block-navigation__container {
+	min-width: $sidebar-width;
 }
 
-.block-editor-block-navigation__label {
-	margin: 0 0 6px 0; //GRID UNITS PLEASE
-}
-
-.block-editor-block-navigation-tree {
-	width: 100%;
-	border-collapse: collapse;
-	padding: 0;
-	margin: 0;
-}
-
-//block-editor-block-navigation-block__contents-container
-//block-editor-block-navigation-leaf is-selected
-
+// Each row within the tree.
 .block-editor-block-navigation-leaf {
-	border-radius: 2px;
 	position: relative;
+	border-radius: 2px;
+
+	&.is-selected,
+	&.is-selected .block-editor-block-navigation-block-contents,
+	&.is-selected .block-editor-block-navigation-block__mover-cell .components-button {
+		background: $gray-900;
+		color: $white;
+	}
 
 	&:hover {
-		background: #efefef;
-	}
-
-	&.is-selected {
-		//background: #313131;
-		//color: #fff;
+		.block-editor-block-navigator-descender-line {
+			border-left-color: $gray-900;
+		}
 	}
 }
 
-.block-editor-block-navigation-block__contents-container {
-	display: flex;
-}
-
+// The main block button, containing the block icon
+// and label. Pressing this selects the block.
 .block-editor-block-navigation-block-contents {
-	padding: $grid-unit-10;
-	display: flex;
-	align-items: center;
 	width: 100%;
+
+	.block-editor-block-icon {
+		margin-right: $grid-unit-15;
+	}
+
+	&:hover {
+		background: $gray-100;
+	}
+
+	// This ensures that the focused item's outline doesn't
+	// appear below another element.
+	&:focus {
+		position: relative;
+		z-index: 1;
+	}
 }
 
-// Hide block number and level description. (i.e. Block 2 of 3, Level 2)
-// I believe this is useful for screen readers.
+// The block mover buttons, both up and down.
+.block-editor-block-navigation-block__mover-cell {
+	position: absolute;
+	top: 0;
+
+	// Needed to over power the z-index of the buttons
+	// while focused.
+	z-index: 2;
+
+	&.is-up-button {
+		right: $grid-unit-50;
+	}
+
+	&.is-down-button {
+		right: 0;
+	}
+}
+
+// This is used to indent nested blocks. They stack
+// as nesting increases, creating a larger indentation.
+.block-editor-block-navigator-descender-line {
+	position: relative;
+	flex-shrink: 0;
+	width: 6px;
+	height: 2px;
+	border-left: 2px solid $gray-600;
+	margin-left: 10px;
+}
+
+
+// Hide block number and level description. (i.e. Block 2 of
+// 3, Level 2). This is mostly useful for screen readers.
 .block-editor-block-navigation-block-slot__description,
 .block-editor-block-navigation-block-select-button__description,
 .block-editor-block-navigation-appender__description {
 	display: none;
-}
-
-// Indent children
-//block-editor-block-navigator-descender-line has-item
-.block-editor-block-navigator-descender-line {
-	position: relative;
-	flex-shrink: 0;
-	width: $grid-unit-15;
 }
