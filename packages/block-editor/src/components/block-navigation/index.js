@@ -8,7 +8,6 @@ import { noop } from 'lodash';
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,9 +32,6 @@ function BlockNavigation( {
 
 	return (
 		<div className="block-editor-block-navigation__container">
-			<p className="block-editor-block-navigation__label">
-				{ __( 'List view' ) }
-			</p>
 			{ hasHierarchy && (
 				<BlockNavigationTree
 					blocks={ [ rootBlock ] }
@@ -51,6 +47,7 @@ function BlockNavigation( {
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
 					__experimentalFeatures={ __experimentalFeatures }
+					showNestedBlocks
 				/>
 			) }
 		</div>
