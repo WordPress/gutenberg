@@ -65,10 +65,6 @@ export default function BlockNavigationBlock( {
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const hasVisibleMovers = isHovered || isFocused;
-	const moverCellClassName = classnames(
-		'block-editor-block-navigation-block__mover-cell',
-		{ 'is-visible': hasVisibleMovers }
-	);
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
 	} = useBlockNavigationContext();
@@ -120,74 +116,85 @@ export default function BlockNavigationBlock( {
 					</div>
 				) }
 			</TreeGridCell>
-			{ hasRenderedMovers && (
-				<>
-					<TreeGridCell
-						className={ moverCellClassName }
-						withoutGridItem
-					>
-						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
-								<BlockMoverUpButton
-									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
-								/>
-							) }
-						</TreeGridItem>
-					</TreeGridCell>
-					<TreeGridCell
-						className={ moverCellClassName }
-						withoutGridItem
-					>
-						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
-								<BlockMoverDownButton
-									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
-								/>
-							) }
-						</TreeGridItem>
-					</TreeGridCell>
-				</>
-			) }
 
-			<TreeGridCell className={ blockNavigationBlockSettingsClassName }>
-				{ ( { ref, tabIndex, onFocus } ) => (
-					<BlockSettingsDropdown
-						clientIds={ [ clientId ] }
-						icon={ moreVertical }
-						toggleProps={ {
-							ref,
-							tabIndex,
-							onFocus,
-						} }
-						disableOpenOnArrowDown
-						__experimentalSelectBlock={ onClick }
-					>
-						{ ( { onClose } ) => (
-							<MenuGroup>
-								<MenuItem
-									onClick={ async () => {
-										// If clientId is already selected, it won't be focused (see block-wrapper.js)
-										// This removes the selection first to ensure the focus will always switch.
-										await selectEditorBlock( null );
-										await selectEditorBlock( clientId );
-										onClose();
-									} }
-								>
-									{ __( 'Go to block' ) }
-								</MenuItem>
-							</MenuGroup>
+			<>
+				<TreeGridCell
+					className={ classnames(
+						'block-editor-block-navigation-block__mover-cell',
+						{ 'is-visible': hasVisibleMovers },
+						'is-up-button'
+					) }
+					withoutGridItem
+				>
+					<TreeGridItem>
+						{ ( { ref, tabIndex, onFocus } ) => (
+							<BlockMoverUpButton
+								orientation="vertical"
+								clientIds={ [ clientId ] }
+								ref={ ref }
+								tabIndex={ tabIndex }
+								onFocus={ onFocus }
+							/>
 						) }
-					</BlockSettingsDropdown>
-				) }
-			</TreeGridCell>
+					</TreeGridItem>
+				</TreeGridCell>
+				<TreeGridCell
+					className={ classnames(
+						'block-editor-block-navigation-block__mover-cell',
+						{ 'is-visible': hasVisibleMovers },
+						'is-down-button'
+					) }
+					withoutGridItem
+				>
+					<TreeGridItem>
+						{ ( { ref, tabIndex, onFocus } ) => (
+							<BlockMoverDownButton
+								orientation="vertical"
+								clientIds={ [ clientId ] }
+								ref={ ref }
+								tabIndex={ tabIndex }
+								onFocus={ onFocus }
+							/>
+						) }
+					</TreeGridItem>
+				</TreeGridCell>
+			</>
+
+			{ withExperimentalFeatures && (
+				<TreeGridCell
+					className={ blockNavigationBlockSettingsClassName }
+				>
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<BlockSettingsDropdown
+							clientIds={ [ clientId ] }
+							icon={ moreVertical }
+							toggleProps={ {
+								ref,
+								tabIndex,
+								onFocus,
+							} }
+							disableOpenOnArrowDown
+							__experimentalSelectBlock={ onClick }
+						>
+							{ ( { onClose } ) => (
+								<MenuGroup>
+									<MenuItem
+										onClick={ async () => {
+											// If clientId is already selected, it won't be focused (see block-wrapper.js)
+											// This removes the selection first to ensure the focus will always switch.
+											await selectEditorBlock( null );
+											await selectEditorBlock( clientId );
+											onClose();
+										} }
+									>
+										{ __( 'Go to block' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
+						</BlockSettingsDropdown>
+					) }
+				</TreeGridCell>
+			) }
 		</BlockNavigationLeaf>
 	);
 }
