@@ -527,6 +527,12 @@ function RichText( {
 	function handleSpace( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
+		// Fix space in <summary> element
+		if ( keyCode === SPACE && TagName === 'summary' ) {
+			handleChange( insert( createRecord(), ' ' ) );
+			return;
+		}
+
 		if (
 			// Only override when no modifiers are pressed.
 			shiftKey ||
