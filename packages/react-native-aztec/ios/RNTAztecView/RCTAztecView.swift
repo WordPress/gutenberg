@@ -134,7 +134,7 @@ class RCTAztecView: Aztec.TextView {
         delegate = self
         textContainerInset = .zero
         contentInset = .zero
-        textContainer.lineFragmentPadding = 0        
+        textContainer.lineFragmentPadding = 0
         addPlaceholder()
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
@@ -195,6 +195,14 @@ class RCTAztecView: Aztec.TextView {
             // This fixes the position of the label after "fixing" (partially) the constraints.
             placeholderHorizontalConstraint.constant = leftTextInsetInRTLLayout
         }
+    }
+
+    override func sizeThatFits(_ size: CGSize) -> CGSize {
+        // Set the Placeholder height as the minimum TextView height.
+        let minimumHeight = placeholderLabel.frame.height
+        let fittingSize = super.sizeThatFits(size)
+        let height = max(fittingSize.height, minimumHeight)
+        return CGSize(width: fittingSize.width, height: height)
     }
 
     func updateContentSizeInRN() {
