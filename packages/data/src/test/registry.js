@@ -9,18 +9,7 @@ import { castArray, mapValues } from 'lodash';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 
-// This makes the prioriy queue synchronous to ease unit testing resolvers.
-jest.mock( '@wordpress/priority-queue', () => {
-	return {
-		createQueue() {
-			return {
-				add( ctx, callback ) {
-					callback();
-				},
-			};
-		},
-	};
-} );
+jest.useFakeTimers();
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -274,11 +263,14 @@ describe( 'createRegistry', () => {
 			} );
 
 			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
+			jest.runAllTimers();
 			expect( value ).toBe( 'OK' );
 			expect( resolver ).toHaveBeenCalledWith( 'arg1', 'arg2' );
 			registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
+			jest.runAllTimers();
 			expect( resolver ).toHaveBeenCalledTimes( 1 );
 			registry.select( 'demo' ).getValue( 'arg3', 'arg4' );
+			jest.runAllTimers();
 			expect( resolver ).toHaveBeenCalledTimes( 2 );
 		} );
 
@@ -295,6 +287,7 @@ describe( 'createRegistry', () => {
 			} );
 
 			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
+			jest.runAllTimers();
 			expect( value ).toBe( 'OK' );
 		} );
 
@@ -330,21 +323,29 @@ describe( 'createRegistry', () => {
 
 			store.dispatch( { type: 'SET_PAGE', page: 4, result: [] } );
 			registry.select( 'demo' ).getPage( 1 );
+			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 2 );
+			jest.runAllTimers();
 
 			expect( fulfill ).toHaveBeenCalledTimes( 2 );
 
 			registry.select( 'demo' ).getPage( 1 );
+			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 2 );
+			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 3, {} );
+			jest.runAllTimers();
 
 			// Expected: First and second page fulfillments already triggered, so
 			// should only be one more than previous assertion set.
 			expect( fulfill ).toHaveBeenCalledTimes( 3 );
 
 			registry.select( 'demo' ).getPage( 1 );
+			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 2 );
+			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 3, {} );
+			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 4 );
 
 			// Expected:
@@ -379,6 +380,7 @@ describe( 'createRegistry', () => {
 			] );
 
 			registry.select( 'demo' ).getValue();
+			jest.runAllTimers();
 
 			return promise;
 		} );
@@ -405,6 +407,7 @@ describe( 'createRegistry', () => {
 			] );
 
 			registry.select( 'demo' ).getValue();
+			jest.runAllTimers();
 
 			return promise;
 		} );
@@ -429,6 +432,7 @@ describe( 'createRegistry', () => {
 			shouldThrow = true;
 
 			registry.select( 'demo' ).getValue();
+			jest.runAllTimers();
 
 			return new Promise( ( resolve ) => process.nextTick( resolve ) );
 		} );
@@ -453,7 +457,9 @@ describe( 'createRegistry', () => {
 			);
 
 			registry.select( 'demo' ).getValue();
+			jest.runAllTimers();
 			registry.select( 'demo' ).getValue();
+			jest.runAllTimers();
 
 			return promise;
 		} );
@@ -484,6 +490,7 @@ describe( 'createRegistry', () => {
 				() => registry.select( 'demo' ).getValue() === 'OK'
 			);
 			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK
+			jest.runAllTimers();
 			await promise;
 
 			// Invalidate the cache
@@ -493,6 +500,7 @@ describe( 'createRegistry', () => {
 				() => registry.select( 'demo' ).getValue() === 'NOTOK'
 			);
 			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK
+			jest.runAllTimers();
 			await promise;
 		} );
 	} );

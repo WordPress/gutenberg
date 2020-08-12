@@ -4,12 +4,12 @@
 import { createStore, applyMiddleware } from 'redux';
 import { flowRight, get, mapValues } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
+import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
  */
 import createReduxRoutineMiddleware from '@wordpress/redux-routine';
-import { createQueue } from '@wordpress/priority-queue';
 
 /**
  * Internal dependencies
@@ -19,6 +19,34 @@ import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
+
+/**
+ * Create a cache to track whether resolvers started running or not.
+ *
+ * @return {Object} Resolvers Cache.
+ */
+function createResolversCache() {
+	const cache = {};
+	return {
+		isRunning( selectorName, args ) {
+			return cache[ selectorName ] && cache[ selectorName ].get( args );
+		},
+
+		clear( selectorName, args ) {
+			if ( cache[ selectorName ] ) {
+				cache[ selectorName ].delete( args );
+			}
+		},
+
+		markAsRunning( selectorName, args ) {
+			if ( ! cache[ selectorName ] ) {
+				cache[ selectorName ] = new EquivalentKeyMap();
+			}
+
+			cache[ selectorName ].set( args, true );
+		},
+	};
+}
 
 /**
  * @typedef {WPDataRegistry} WPDataRegistry
@@ -38,7 +66,7 @@ import * as metadataActions from './metadata/actions';
 export default function createNamespace( key, options, registry ) {
 	const reducer = options.reducer;
 	const store = createReduxStore( key, options, registry );
-	const resolversQueue = createQueue();
+	const resolversCache = createResolversCache();
 
 	let resolvers;
 	const actions = mapActions(
@@ -70,7 +98,7 @@ export default function createNamespace( key, options, registry ) {
 			options.resolvers,
 			selectors,
 			store,
-			resolversQueue
+			resolversCache
 		);
 		resolvers = result.resolvers;
 		selectors = result.selectors;
@@ -221,13 +249,13 @@ function mapActions( actions, store ) {
  * Resolvers are side effects invoked once per argument set of a given selector call,
  * used in ensuring that the data needs for the selector are satisfied.
  *
- * @param {Object} resolvers   Resolvers to register.
- * @param {Object} selectors   The current selectors to be modified.
- * @param {Object} store       The redux store to which the resolvers should be mapped.
- * @param {Object} queue       Resolvers async queue.
- * @return {Object}            An object containing updated selectors and resolvers.
+ * @param {Object} resolvers      Resolvers to register.
+ * @param {Object} selectors      The current selectors to be modified.
+ * @param {Object} store          The redux store to which the resolvers should be mapped.
+ * @param {Object} queue          Resolvers async queue.
+ * @param {Object} resolversCache Resolvers Cache.
  */
-function mapResolvers( resolvers, selectors, store, queue ) {
+function mapResolvers( resolvers, selectors, store, resolversCache ) {
 	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
 		const { fulfill: resolverFulfill = resolver } = resolver;
 		return { ...resolver, fulfill: resolverFulfill };
@@ -244,8 +272,9 @@ function mapResolvers( resolvers, selectors, store, queue ) {
 			async function fulfillSelector() {
 				const state = store.getState();
 				if (
-					typeof resolver.isFulfilled === 'function' &&
-					resolver.isFulfilled( state, ...args )
+					resolversCache.isRunning( selectorName, args ) ||
+					( typeof resolver.isFulfilled === 'function' &&
+						resolver.isFulfilled( state, ...args ) )
 				) {
 					return;
 				}
@@ -262,7 +291,10 @@ function mapResolvers( resolvers, selectors, store, queue ) {
 					return;
 				}
 
-				queue.add( {}, async () => {
+				resolversCache.markAsRunning( selectorName, args );
+
+				setTimeout( async () => {
+					resolversCache.clear( selectorName, args );
 					store.dispatch(
 						metadataActions.startResolution( selectorName, args )
 					);
