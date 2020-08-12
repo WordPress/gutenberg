@@ -57,7 +57,7 @@ export default function BlockTitle( { clientId } ) {
 	const label = getBlockLabel( blockType, attributes );
 
 	// Label will often fall back to the title if no label is defined for the
-	// clurrent label context. We do not want "Paragraph: Paragraph".
+	// current label context. We do not want "Paragraph: Paragraph".
 	if ( label !== title ) {
 		return `${ title }: ${ truncate( label, { length: 15 } ) }`;
 	}
