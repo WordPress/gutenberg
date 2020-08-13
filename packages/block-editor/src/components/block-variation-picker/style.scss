@@ -26,15 +26,17 @@
 	margin: $grid-unit-20 0;
 	padding: 0;
 	list-style: none;
+	text-align: center;
 
 	> li {
 		list-style: none;
-		margin: $grid-unit-10 $grid-unit-10 0 0;
+		margin: $grid-unit-10 ( $grid-unit-10 + $grid-unit-15 ) 0 0;
 		flex-shrink: 1;
 		max-width: 100px;
 
 		button {
-			display: flex;
+			display: inline-flex;
+			margin-right: 0;
 		}
 	}
 
@@ -46,8 +48,6 @@
 		font-family: $default-font;
 		font-size: 12px;
 		display: block;
-		margin-right: $grid-unit-15;
-		text-align: center;
 	}
 }
 
