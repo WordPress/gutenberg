@@ -205,19 +205,19 @@ export class PostPreviewButton extends Component {
 				ref={ this.buttonRef }
 				role={ role }
 			>
-				{ this.props.textContent
-					? this.props.textContent
-					: 
+				{ this.props.textContent ? (
+					this.props.textContent
+				) : (
 					<>
 						{ _x( 'Preview', 'imperative verb' ) }
 						<VisuallyHidden as="span">
-						{
-							/* translators: accessibility text */
-							__( '(opens in a new tab)' )
-						}
+							{
+								/* translators: accessibility text */
+								__( '(opens in a new tab)' )
+							}
 						</VisuallyHidden>
 					</>
-					}
+				) }
 			</Button>
 		);
 	}
