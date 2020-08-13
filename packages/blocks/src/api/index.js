@@ -43,6 +43,7 @@ export {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
+	getBlockVariations,
 	isReusableBlock,
 	getChildBlockNames,
 	hasChildBlocks,

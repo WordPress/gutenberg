@@ -348,6 +348,19 @@ _Returns_
 
 -   `Array`: Block settings.
 
+<a name="getBlockVariations" href="#getBlockVariations">#</a> **getBlockVariations**
+
+Returns an array with the variations of a given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of block (example: “core/columns”).
+-   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+
+_Returns_
+
+-   `(Array<WPBlockVariation>|void)`: Block variations.
+
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
 Returns all the block categories.
