@@ -35,6 +35,8 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
  * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
  * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
+ * @property {Array} __experimentalBlockPatterns Array of objects representing the block patterns
+ * @property {Array} __experimentalBlockPatternCategories Array of objects representing the block pattern categories
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -156,6 +158,9 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalEnableFullSiteEditing: false,
 	__experimentalEnableFullSiteEditingDemo: false,
 	__mobileEnablePageTemplates: false,
+	__experimentalBlockPatterns: [],
+	__experimentalBlockPatternCategories: [],
+
 	gradients: [
 		{
 			name: __( 'Vivid cyan blue to vivid purple' ),
