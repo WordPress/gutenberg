@@ -37,6 +37,7 @@ export default function BlockNavigationBlock( {
 	position,
 	level,
 	rowCount,
+	siblingBlockCount,
 	showBlockMovers,
 	terminatedLevels,
 	path,
@@ -49,9 +50,7 @@ export default function BlockNavigationBlock( {
 	);
 	const { clientId } = block;
 
-	// Subtract 1 from rowCount, as it includes the block appender.
-	const siblingCount = rowCount - 1;
-	const hasSiblings = siblingCount > 1;
+	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const hasVisibleMovers = isHovered || isFocused;
 	const moverCellClassName = classnames(
@@ -102,7 +101,7 @@ export default function BlockNavigationBlock( {
 							onClick={ () => onClick( block.clientId ) }
 							isSelected={ isSelected }
 							position={ position }
-							siblingCount={ siblingCount }
+							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							ref={ ref }
 							tabIndex={ tabIndex }
