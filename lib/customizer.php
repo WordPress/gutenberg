@@ -75,32 +75,6 @@ function gutenberg_customize_register( $wp_customize ) {
 add_action( 'customize_register', 'gutenberg_customize_register' );
 
 /**
- * Specifies how to save the `gutenberg_widget_blocks` setting. It parses the JSON string and updates the
- * referenced widget areas with the new content.
- *
- * @param string                $value   The value that is being published.
- * @param \WP_Customize_Setting $setting The setting instance.
- */
-function gutenberg_customize_update( $value, $setting ) {
-	foreach ( json_decode( $value ) as $sidebar_id => $sidebar_content ) {
-		$id_referenced_in_sidebar = Experimental_WP_Widget_Blocks_Manager::get_post_id_referenced_in_sidebar( $sidebar_id );
-
-		$post_id = wp_insert_post(
-			array(
-				'ID'           => $id_referenced_in_sidebar,
-				'post_content' => $sidebar_content,
-				'post_type'    => 'wp_area',
-			)
-		);
-
-		if ( 0 === $id_referenced_in_sidebar ) {
-			Experimental_WP_Widget_Blocks_Manager::reference_post_id_in_sidebar( $sidebar_id, $post_id );
-		}
-	}
-}
-add_action( 'customize_update_gutenberg_widget_blocks', 'gutenberg_customize_update', 10, 2 );
-
-/**
  * Filters the Customizer widget settings arguments.
  * This is needed because the Customizer registers settings for the raw registered widgets, without going through the `sidebars_widgets` filter.
  * The `WP_Customize_Widgets` class expects sidebars to have an array of widgets registered, not a post ID.

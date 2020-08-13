@@ -166,6 +166,8 @@ class BottomSheetRangeCell extends Component {
 			thumbTintColor = ! isIOS && '#00669b',
 			getStylesFromColorScheme,
 			rangePreview,
+			cellContainerStyle,
+			shouldDisplayTextInput = true,
 			...cellProps
 		} = this.props;
 
@@ -194,7 +196,11 @@ class BottomSheetRangeCell extends Component {
 		return (
 			<Cell
 				{ ...cellProps }
-				cellContainerStyle={ styles.cellContainerStyles }
+				cellContainerStyle={ [
+					styles.cellContainerStyles,
+					cellContainerStyle,
+				] }
+				cellRowContainerStyle={ containerStyle }
 				accessibilityRole={ 'none' }
 				value={ '' }
 				editable={ false }
@@ -227,20 +233,22 @@ class BottomSheetRangeCell extends Component {
 						style={ styles.slider }
 						accessibilityRole={ 'adjustable' }
 					/>
-					<TextInput
-						style={ [
-							defaultSliderStyle,
-							borderStyles.borderStyle,
-							hasFocus && borderStyles.isSelected,
-							{ width: 40 * fontScale },
-						] }
-						onChangeText={ this.handleChange }
-						onFocus={ this.handleToggleFocus }
-						onBlur={ this.handleToggleFocus }
-						keyboardType="numeric"
-						returnKeyType="done"
-						value={ `${ sliderValue }` }
-					/>
+					{ shouldDisplayTextInput && (
+						<TextInput
+							style={ [
+								defaultSliderStyle,
+								borderStyles.borderStyle,
+								hasFocus && borderStyles.isSelected,
+								{ width: 40 * fontScale },
+							] }
+							onChangeText={ this.handleChange }
+							onFocus={ this.handleToggleFocus }
+							onBlur={ this.handleToggleFocus }
+							keyboardType="numeric"
+							returnKeyType="done"
+							value={ `${ sliderValue }` }
+						/>
+					) }
 				</View>
 			</Cell>
 		);

@@ -120,7 +120,7 @@ export const SETTINGS_DEFAULTS = {
 		},
 		{
 			name: _x( 'Huge', 'font size name' ),
-			size: 48,
+			size: 42,
 			slug: 'huge',
 		},
 	],

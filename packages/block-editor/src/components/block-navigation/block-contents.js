@@ -12,7 +12,15 @@ import BlockNavigationBlockSelectButton from './block-select-button';
 
 const BlockNavigationBlockContents = forwardRef(
 	(
-		{ onClick, block, isSelected, position, siblingCount, level, ...props },
+		{
+			onClick,
+			block,
+			isSelected,
+			position,
+			siblingBlockCount,
+			level,
+			...props
+		},
 		ref
 	) => {
 		const {
@@ -27,7 +35,7 @@ const BlockNavigationBlockContents = forwardRef(
 				onClick={ onClick }
 				isSelected={ isSelected }
 				position={ position }
-				siblingCount={ siblingCount }
+				siblingBlockCount={ siblingBlockCount }
 				level={ level }
 				{ ...props }
 			/>
@@ -39,7 +47,7 @@ const BlockNavigationBlockContents = forwardRef(
 				onClick={ onClick }
 				isSelected={ isSelected }
 				position={ position }
-				siblingCount={ siblingCount }
+				siblingBlockCount={ siblingBlockCount }
 				level={ level }
 				{ ...props }
 			/>

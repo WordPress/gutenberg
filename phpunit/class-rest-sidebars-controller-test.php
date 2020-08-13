@@ -1,0 +1,410 @@
+<?php
+/**
+ * REST API: REST_Sidebars_Controller_Test class
+ *
+ * @package    WordPress
+ * @subpackage REST_API
+ */
+
+/**
+ * Tests for REST API for Menus.
+ *
+ * @see WP_Test_REST_Controller_Testcase
+ */
+class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
+	/**
+	 * @var int
+	 */
+	public $menu_id;
+
+	/**
+	 * @var int
+	 */
+	protected static $admin_id;
+
+	/**
+	 * @var int
+	 */
+	protected static $editor_id;
+
+	/**
+	 * @var int
+	 */
+	protected static $subscriber_id;
+
+	/**
+	 * @var int
+	 */
+	protected static $per_page = 50;
+
+	/**
+	 * REST_Sidebars_Controller_Test constructor.
+	 */
+	public function __construct() {
+		parent::__construct();
+		require_once dirname( __FILE__ ) . '/../lib/class-wp-rest-sidebars-controller.php';
+		add_filter(
+			'rest_api_init',
+			function () {
+				$sidebars = new WP_REST_Sidebars_Controller();
+				$sidebars->register_routes();
+			}
+		);
+	}
+
+	/**
+	 * Create fake data before our tests run.
+	 *
+	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
+	 */
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$admin_id      = $factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		self::$editor_id     = $factory->user->create(
+			array(
+				'role' => 'editor',
+			)
+		);
+		self::$subscriber_id = $factory->user->create(
+			array(
+				'role' => 'subscriber',
+			)
+		);
+	}
+
+	/**
+	 *
+	 */
+	public function setUp() {
+		parent::setUp();
+
+		wp_set_current_user( self::$admin_id );
+
+		// Unregister all widgets and sidebars.
+		global $wp_registered_sidebars, $_wp_sidebars_widgets;
+		$wp_registered_sidebars = array();
+		$_wp_sidebars_widgets   = array();
+		update_option( 'sidebars_widgets', array() );
+	}
+
+	private function setup_widget( $option_name, $number, $settings ) {
+		update_option(
+			$option_name,
+			array(
+				$number => $settings,
+			)
+		);
+	}
+
+	private function setup_sidebar( $id, $attrs = array(), $widgets = array() ) {
+		global $wp_registered_sidebars;
+		update_option(
+			'sidebars_widgets',
+			array(
+				$id => $widgets,
+			)
+		);
+		$wp_registered_sidebars[ $id ] = array_merge(
+			array(
+				'id'            => $id,
+				'before_widget' => '',
+				'after_widget'  => '',
+				'before_title'  => '',
+				'after_title'   => '',
+			),
+			$attrs
+		);
+
+		global $wp_registered_widgets;
+		foreach ( $wp_registered_widgets as $wp_registered_widget ) {
+			if ( is_array( $wp_registered_widget['callback'] ) ) {
+				$wp_registered_widget['callback'][0]->_register();
+			}
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function test_register_routes() {
+		$routes = rest_get_server()->get_routes();
+		$this->assertArrayHasKey( '/__experimental/sidebars', $routes );
+		$this->assertArrayHasKey( '/__experimental/sidebars/(?P<id>[\w-]+)', $routes );
+	}
+
+	/**
+	 *
+	 */
+	public function test_context_param() {
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items() {
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( array(), $data );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_basic_sidebar() {
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			array(
+				array(
+					'id'          => 'sidebar-1',
+					'name'        => 'Test sidebar',
+					'description' => '',
+					'status'      => 'active',
+					'widgets'     => array(),
+				),
+			),
+			$data
+		);
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_active_sidebar_with_widgets() {
+		$this->setup_widget(
+			'widget_rss',
+			1,
+			array(
+				'title' => 'RSS test',
+			)
+		);
+		$this->setup_widget(
+			'widget_text',
+			1,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array( 'text-1', 'rss-1' )
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			array(
+				array(
+					'id'          => 'sidebar-1',
+					'name'        => 'Test sidebar',
+					'description' => '',
+					'status'      => 'active',
+					'widgets'     => array(
+						array(
+							'id'           => 'text-1',
+							'settings'     => array(
+								'text' => 'Custom text test',
+							),
+							'id_base'      => 'text',
+							'widget_class' => 'WP_Widget_Text',
+							'name'         => 'Text',
+							'description'  => 'Arbitrary text.',
+							'number'       => 1,
+							'rendered'     => '			<div class="textwidget">Custom text test</div>' . "\n		",
+						),
+						array(
+							'id'           => 'rss-1',
+							'settings'     => array(
+								'title' => 'RSS test',
+							),
+							'id_base'      => 'rss',
+							'widget_class' => 'WP_Widget_RSS',
+							'name'         => 'RSS',
+							'description'  => 'Entries from any RSS or Atom feed.',
+							'number'       => 1,
+							'rendered'     => '',
+						),
+					),
+				),
+			),
+			$data
+		);
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item() {
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			array(
+				'id'          => 'sidebar-1',
+				'name'        => 'Test sidebar',
+				'description' => '',
+				'status'      => 'active',
+				'widgets'     => array(),
+			),
+			$data
+		);
+	}
+
+	/**
+	 * The test_update_item() method does not exist for sidebar.
+	 */
+	public function test_create_item() {
+	}
+
+	/**
+	 *
+	 */
+	public function test_update_item() {
+		$this->setup_widget(
+			'widget_rss',
+			1,
+			array(
+				'title' => 'RSS test',
+			)
+		);
+		$this->setup_widget(
+			'widget_text',
+			1,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array( 'text-1', 'rss-1' )
+		);
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(
+					array(
+						'id'           => 'text-1',
+						'settings'     => array(
+							'text' => 'Updated text test',
+						),
+						'id_base'      => 'text',
+						'widget_class' => 'WP_Widget_Text',
+						'name'         => 'Text',
+						'description'  => 'Arbitrary text.',
+						'number'       => 1,
+					),
+					array(
+						'id'           => 'text-2',
+						'settings'     => array(
+							'text' => 'Another text widget',
+						),
+						'id_base'      => 'text',
+						'widget_class' => 'WP_Widget_Text',
+						'name'         => 'Text',
+						'description'  => 'Arbitrary text.',
+						'number'       => 2,
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			array(
+				'id'          => 'sidebar-1',
+				'name'        => 'Test sidebar',
+				'description' => '',
+				'status'      => 'active',
+				'widgets'     => array(
+					array(
+						'id'           => 'text-1',
+						'settings'     => array(
+							'text'   => 'Updated text test',
+							'title'  => '',
+							'filter' => false,
+						),
+						'id_base'      => 'text',
+						'widget_class' => 'WP_Widget_Text',
+						'name'         => 'Text',
+						'description'  => 'Arbitrary text.',
+						'number'       => 1,
+						'rendered'     => '			<div class="textwidget">Updated text test</div>' . "\n		",
+					),
+					array(
+						'id'           => 'text-2',
+						'settings'     => array(
+							'text'   => 'Another text widget',
+							'title'  => '',
+							'filter' => false,
+						),
+						'id_base'      => 'text',
+						'widget_class' => 'WP_Widget_Text',
+						'name'         => 'Text',
+						'description'  => 'Arbitrary text.',
+						'number'       => 2,
+						'rendered'     => '			<div class="textwidget">Another text widget</div>' . "\n		",
+					),
+				),
+			),
+			$data
+		);
+	}
+
+	/**
+	 * The test_delete_item() method does not exist for sidebar.
+	 */
+	public function test_delete_item() {
+	}
+
+	/**
+	 * The test_prepare_item() method does not exist for sidebar.
+	 */
+	public function test_prepare_item() {
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_schema() {
+		wp_set_current_user( self::$admin_id );
+		$request    = new WP_REST_Request( 'OPTIONS', '/__experimental/sidebars' );
+		$response   = rest_get_server()->dispatch( $request );
+		$data       = $response->get_data();
+		$properties = $data['schema']['properties'];
+
+		$this->assertEquals( 5, count( $properties ) );
+		$this->assertArrayHasKey( 'id', $properties );
+		$this->assertArrayHasKey( 'name', $properties );
+		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'status', $properties );
+		$this->assertArrayHasKey( 'widgets', $properties );
+	}
+}

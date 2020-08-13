@@ -15,6 +15,8 @@ function gutenberg_register_block_supports() {
 	// instead of mutating the block type.
 	foreach ( $registered_block_types as $block_type ) {
 		gutenberg_register_alignment_support( $block_type );
+		gutenberg_register_colors_support( $block_type );
+		gutenberg_register_typography_support( $block_type );
 	}
 }
 
@@ -51,7 +53,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	// Suppress warnings from this method from polluting the front-end.
 	// @codingStandardsIgnoreStart
-	if ( ! @$dom->loadHTML( $block_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
+	if ( ! @$dom->loadHTML( mb_convert_encoding( $block_content, 'HTML-ENTITIES', 'UTF-8' ), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
 	// @codingStandardsIgnoreEnd
 		return $block_content;
 	}
@@ -84,6 +86,6 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		$block_root->setAttribute( 'style', $new_styles );
 	}
 
-	return $dom->saveHtml();
+	return mb_convert_encoding( $dom->saveHtml(), 'UTF-8', 'HTML-ENTITIES' );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );

@@ -122,7 +122,6 @@ describe( 'Sidebar', () => {
 	it( 'should be possible to programmatically remove Document Settings panels', async () => {
 		await createNewPost();
 		await enableFocusLossObservation();
-
 		await openDocumentSettingsSidebar();
 
 		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeDefined();
@@ -147,19 +146,27 @@ describe( 'Sidebar', () => {
 			removeEditorPanel( 'post-status' );
 		} );
 
+		const getPanelToggleSelector = ( panelTitle ) => {
+			return `//div[contains(@class, "edit-post-sidebar")]//button[contains(@class, "components-panel__body-toggle") and contains(text(),"${ panelTitle }")]`;
+		};
+
 		expect(
-			await findSidebarPanelWithTitle( 'Categories' )
-		).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeUndefined();
+			await page.$x( getPanelToggleSelector( 'Categories' ) )
+		).toEqual( [] );
+		expect( await page.$x( getPanelToggleSelector( 'Tags' ) ) ).toEqual(
+			[]
+		);
 		expect(
-			await findSidebarPanelWithTitle( 'Featured image' )
-		).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeUndefined();
+			await page.$x( getPanelToggleSelector( 'Featured image' ) )
+		).toEqual( [] );
+		expect( await page.$x( getPanelToggleSelector( 'Excerpt' ) ) ).toEqual(
+			[]
+		);
 		expect(
-			await findSidebarPanelWithTitle( 'Discussion' )
-		).toBeUndefined();
+			await page.$x( getPanelToggleSelector( 'Discussion' ) )
+		).toEqual( [] );
 		expect(
-			await findSidebarPanelWithTitle( 'Status & visibility' )
-		).toBeUndefined();
+			await page.$x( getPanelToggleSelector( 'Status & visibility' ) )
+		).toEqual( [] );
 	} );
 } );

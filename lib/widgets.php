@@ -145,6 +145,7 @@ function gutenberg_get_legacy_widget_settings() {
 		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
 			$available_legacy_widgets[ $class ] = array(
 				'name'              => html_entity_decode( $widget_obj->name ),
+				'id_base'           => $widget_obj->id_base,
 				// wp_widget_description is not being used because its input parameter is a Widget Id.
 				// Widgets id's reference to a specific widget instance.
 				// Here we are iterating on all the available widget classes even if no widget instance exists for them.
@@ -250,8 +251,6 @@ function gutenberg_create_wp_area_post_type() {
 	);
 }
 add_action( 'init', 'gutenberg_create_wp_area_post_type' );
-
-add_filter( 'sidebars_widgets', 'Experimental_WP_Widget_Blocks_Manager::swap_out_sidebars_blocks_for_block_widgets' );
 
 /**
  * Function to enqueue admin-widgets as part of the block editor assets.

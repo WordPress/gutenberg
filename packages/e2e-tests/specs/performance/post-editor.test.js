@@ -123,6 +123,7 @@ describe( 'Post Editor Performance', () => {
 		}
 
 		// Measuring typing performance
+		await page.waitForSelector( '.edit-post-layout' );
 		await insertBlock( 'Paragraph' );
 		i = 200;
 		const traceFile = __dirname + '/trace.json';
