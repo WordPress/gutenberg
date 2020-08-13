@@ -13,6 +13,7 @@
 }
 
 .block-editor-post-preview__dropdown-content {
+	display: none;
 	.components-popover__content {
 		overflow-y: visible;
 	}
@@ -32,5 +33,24 @@
 		padding: $grid-unit-10 $grid-unit-15;
 		margin-left: -$grid-unit-15;
 		margin-right: -$grid-unit-15;
+	}
+}
+
+.edit-post-header__settings,
+.edit-site-header__actions {
+	@include break-small () {
+		.editor-post-preview {
+			display: none;
+		}
+
+		.block-editor-post-preview__dropdown {
+			display: flex;
+		}
+	}
+}
+
+@include break-small () {
+	.block-editor-post-preview__dropdown-content {
+		display: block;
 	}
 }
