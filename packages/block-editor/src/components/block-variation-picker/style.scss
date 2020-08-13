@@ -26,13 +26,13 @@
 	margin: $grid-unit-20 0;
 	padding: 0;
 	list-style: none;
-	text-align: center;
 
 	> li {
 		list-style: none;
 		margin: $grid-unit-10 ( $grid-unit-10 + $grid-unit-15 ) 0 0;
 		flex-shrink: 1;
 		max-width: 100px;
+		text-align: center;
 
 		button {
 			display: inline-flex;
