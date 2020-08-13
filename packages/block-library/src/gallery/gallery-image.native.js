@@ -210,6 +210,17 @@ class GalleryImage extends Component {
 			? style.captionExpanded
 			: style.caption;
 
+		const mediaPickerOptions = [
+			{
+				destructiveButton: true,
+				id: 'removeImage',
+				label: __( 'Remove' ),
+				onPress: onRemove,
+				separated: true,
+				value: 'removeImage',
+			},
+		];
+
 		return (
 			<>
 				<Image
@@ -218,16 +229,7 @@ class GalleryImage extends Component {
 					isSelected={ isSelected }
 					isUploadFailed={ isUploadFailed }
 					isUploadInProgress={ isUploadInProgress }
-					mediaPickerOptions={ [
-						{
-							destructiveButton: true,
-							id: 'removeImage',
-							label: __( 'Remove' ),
-							onPress: onRemove,
-							separated: true,
-							value: 'removeImage',
-						},
-					] }
+					mediaPickerOptions={ mediaPickerOptions }
 					onSelectMediaUploadOption={ this.onSelectMedia }
 					resizeMode={ resizeMode }
 					url={ url }
@@ -264,7 +266,7 @@ class GalleryImage extends Component {
 									aria-disabled={ isFirstItem }
 									disabled={ ! isSelected }
 								/>
-								<View style={ separatorStyle }></View>
+								<View style={ separatorStyle } />
 								<Button
 									style={ buttonStyle }
 									icon={ isRTL ? arrowLeft : arrowRight }

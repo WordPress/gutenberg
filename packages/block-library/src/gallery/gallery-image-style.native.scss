@@ -1,7 +1,6 @@
 $gallery-image-container-height: 150px;
 $overlay-border-width: 2px;
 $caption-background-color: rgba(0, 0, 0, 0.4);
-$caption-padding-vertical: 8px;
 
 .galleryImageContainer {
 	flex: 1;
@@ -109,8 +108,8 @@ $caption-padding-vertical: 8px;
 .caption {
 	@include caption-shared;
 	background-color: $caption-background-color;
-	padding-top: $caption-padding-vertical;
-	padding-bottom: $caption-padding-vertical;
+	padding-top: $grid-unit;
+	padding-bottom: $grid-unit;
 }
 
 .captionPlaceholder {
@@ -125,8 +124,8 @@ $caption-padding-vertical: 8px;
 	bottom: 0;
 	left: 0;
 	right: 0;
-	padding-top: $caption-padding-vertical;
-	padding-bottom: $overlay-border-width + $caption-padding-vertical;
+	padding-top: $grid-unit;
+	padding-bottom: $overlay-border-width + $grid-unit;
 	padding-left: $overlay-border-width;
 	padding-right: $overlay-border-width;
 	// use caption background color on container when expanded
