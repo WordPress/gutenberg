@@ -59,6 +59,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 	foreach ( $recent_posts as $post ) {
 		$post_link = esc_url( get_permalink( $post ) );
+
 		$list_items_markup .= '<li>';
 
 		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
@@ -82,8 +83,7 @@ function render_block_core_latest_posts( $attributes ) {
 					'style' => $image_style,
 				)
 			);
-			$addLinkToFeaturedImage = $attributes['addLinkToFeaturedImage'];
-			if ( $addLinkToFeaturedImage ) {
+			if ( $attributes['addLinkToFeaturedImage'] ) {
 				$featured_image = sprintf(
 					'<a href="%1$s">%2$s</a>',
 					$post_link,
