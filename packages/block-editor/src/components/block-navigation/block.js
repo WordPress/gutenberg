@@ -64,14 +64,15 @@ export default function BlockNavigationBlock( {
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
+
+	// I'm not using the classnames that come from this,
+	// but maybe I should? -shaun
 	const hasVisibleMovers = isHovered || isFocused;
+
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
 	} = useBlockNavigationContext();
-	const blockNavigationBlockSettingsClassName = classnames(
-		'block-editor-block-navigation-block__menu-cell',
-		{ 'is-visible': hasVisibleMovers }
-	);
+	
 	useEffect( () => {
 		if ( withExperimentalFeatures && isSelected ) {
 			cellRef.current.focus();
@@ -97,7 +98,6 @@ export default function BlockNavigationBlock( {
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-block__contents-cell"
-				colSpan={ hasRenderedMovers ? undefined : 2 }
 				ref={ cellRef }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
@@ -117,53 +117,35 @@ export default function BlockNavigationBlock( {
 				) }
 			</TreeGridCell>
 
-			<>
-				<TreeGridCell
-					className={ classnames(
-						'block-editor-block-navigation-block__mover-cell',
-						{ 'is-visible': hasVisibleMovers },
-						'is-up-button'
+			<TreeGridCell
+				className="block-editor-block-navigation-block__options-cell"
+				withoutGridItem
+			>
+				<TreeGridItem>
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<BlockMoverUpButton
+							orientation="vertical"
+							clientIds={ [ clientId ] }
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
+						/>
 					) }
-					withoutGridItem
-				>
-					<TreeGridItem>
-						{ ( { ref, tabIndex, onFocus } ) => (
-							<BlockMoverUpButton
-								orientation="vertical"
-								clientIds={ [ clientId ] }
-								ref={ ref }
-								tabIndex={ tabIndex }
-								onFocus={ onFocus }
-							/>
-						) }
-					</TreeGridItem>
-				</TreeGridCell>
-				<TreeGridCell
-					className={ classnames(
-						'block-editor-block-navigation-block__mover-cell',
-						{ 'is-visible': hasVisibleMovers },
-						'is-down-button'
-					) }
-					withoutGridItem
-				>
-					<TreeGridItem>
-						{ ( { ref, tabIndex, onFocus } ) => (
-							<BlockMoverDownButton
-								orientation="vertical"
-								clientIds={ [ clientId ] }
-								ref={ ref }
-								tabIndex={ tabIndex }
-								onFocus={ onFocus }
-							/>
-						) }
-					</TreeGridItem>
-				</TreeGridCell>
-			</>
+				</TreeGridItem>
 
-			{ withExperimentalFeatures && (
-				<TreeGridCell
-					className={ blockNavigationBlockSettingsClassName }
-				>
+				<TreeGridItem>
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<BlockMoverDownButton
+							orientation="vertical"
+							clientIds={ [ clientId ] }
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
+						/>
+					) }
+				</TreeGridItem>
+
+				<TreeGridItem>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
 							clientIds={ [ clientId ] }
@@ -193,8 +175,8 @@ export default function BlockNavigationBlock( {
 							) }
 						</BlockSettingsDropdown>
 					) }
-				</TreeGridCell>
-			) }
+				</TreeGridItem>
+			</TreeGridCell>
 		</BlockNavigationLeaf>
 	);
 }

@@ -26,17 +26,55 @@ block-editor-block-navigation__container
 .block-editor-block-navigation-leaf {
 	position: relative;
 	border-radius: 2px;
+	border: 1px solid transparent;
 
-	&.is-selected,
-	&.is-selected .block-editor-block-navigation-block-contents,
-	&.is-selected .block-editor-block-navigation-block__mover-cell .components-button {
-		background: $gray-900;
-		color: $white;
+	// Hide block options by default. We use opacity so
+	// you can still use the keyboard to navigate.
+	.block-editor-block-navigation-block__options-cell {
+		opacity: 0;
 	}
 
 	&:hover {
+		border: 1px solid var(--wp-admin-theme-color);
+
+		// Descender indicators are darker when the row has
+		// focus or is hovered.
 		.block-editor-block-navigator-descender-line {
 			border-left-color: $gray-900;
+		}
+
+		// Show the block options when the row is hovered.
+		.block-editor-block-navigation-block__options-cell {
+			opacity: 1;
+		}
+	}
+
+	&:focus-within {
+		border: 1px solid $gray-200;
+
+		// Show the block options when any element in
+		// the row is focused.
+		.block-editor-block-navigation-block__options-cell {
+			opacity: 1;
+		}
+	}
+
+	&.is-selected,
+	&.is-selected:hover {
+		&,
+		.block-editor-block-navigation-block-contents,
+		.block-editor-block-navigation-block__options-cell .components-button {
+			background: $gray-900;
+			color: $white;
+		}
+
+		.block-editor-block-navigator-descender-line {
+			border-left-color: $white;
+		}
+
+		// Always show the options for the selected block.
+		.block-editor-block-navigation-block__options-cell {
+			opacity: 1;
 		}
 	}
 }
@@ -45,39 +83,22 @@ block-editor-block-navigation__container
 // and label. Pressing this selects the block.
 .block-editor-block-navigation-block-contents {
 	width: 100%;
+	position: relative;
 
 	.block-editor-block-icon {
 		margin-right: $grid-unit-15;
 	}
 
 	&:hover {
-		background: $gray-100;
-	}
-
-	// This ensures that the focused item's outline doesn't
-	// appear below another element.
-	&:focus {
-		position: relative;
-		z-index: 1;
+		color: $gray-900;
 	}
 }
 
-// The block mover buttons, both up and down.
-.block-editor-block-navigation-block__mover-cell {
+// The block options, including the movers and more menu.
+.block-editor-block-navigation-block__options-cell {
 	position: absolute;
 	top: 0;
-
-	// Needed to over power the z-index of the buttons
-	// while focused.
-	z-index: 2;
-
-	&.is-up-button {
-		right: $grid-unit-50;
-	}
-
-	&.is-down-button {
-		right: 0;
-	}
+	right: 0;
 }
 
 // This is used to indent nested blocks. They stack
@@ -85,12 +106,11 @@ block-editor-block-navigation__container
 .block-editor-block-navigator-descender-line {
 	position: relative;
 	flex-shrink: 0;
-	width: 6px;
+	width: 2px;
 	height: 2px;
-	border-left: 2px solid $gray-600;
-	margin-left: 10px;
+	border-left: 2px solid $gray-700;
+	margin: 0 6px 0;
 }
-
 
 // Hide block number and level description. (i.e. Block 2 of
 // 3, Level 2). This is mostly useful for screen readers.
