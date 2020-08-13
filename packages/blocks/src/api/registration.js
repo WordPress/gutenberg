@@ -534,23 +534,6 @@ export const getBlockVariations = ( blockName, scope ) => {
 };
 
 /**
- * Returns an array with the variations of a given block type.
- *
- * @param {string}                blockVariation Block type variation.
- * @param {string}                blockName      Name of block (example: “core/columns”).
- * @param {WPBlockVariationScope} [scope]        Block variation scope name.
- *
- * @return {(WPBlockVariation[]|void)} Block variations.
- */
-export const hasBlockVariation = ( blockVariation, blockName, scope ) => {
-	return select( 'core/blocks' ).hasBlockVariation(
-		blockVariation,
-		blockName,
-		scope
-	);
-};
-
-/**
  * Registers a new block variation for the given block type.
  *
  * @param {string}           blockName Name of the block (example: “core/columns”).
