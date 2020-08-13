@@ -29,15 +29,15 @@ import TimeZone from './timezone';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 /**
- * <NumberInput>
- * A shared component to parse, validate, and handle remounting of the underlying <input> element
+ * <UpdateOnBlurAsIntegerField>
+ * A shared component to parse, validate, and handle remounting of the underlying form field element like <input> and <select>.
  *
- * @param {Object} props Component props
- * @param {string} props.as Render the component as specific element tag, defaults to "input"
- * @param {number | string} props.value The default value of the component
- * @param {Function} props.onUpdate Call back when blurred and validated
+ * @param {Object}        props          Component props.
+ * @param {string}        props.as       Render the component as specific element tag, defaults to "input".
+ * @param {number|string} props.value    The default value of the component which will be parsed to integer.
+ * @param {Function}      props.onUpdate Call back when blurred and validated.
  */
-function NumberInput( { as, value, onUpdate, ...props } ) {
+function UpdateOnBlurAsIntegerField( { as, value, onUpdate, ...props } ) {
 	function handleBlur( event ) {
 		const { target } = event;
 
@@ -47,22 +47,22 @@ function NumberInput( { as, value, onUpdate, ...props } ) {
 
 		const parsedValue = parseInt( target.value, 10 );
 
-		// Run basic number validation on the input
+		// Run basic number validation on the input.
 		if (
 			! isInteger( parsedValue ) ||
 			( typeof props.max !== 'undefined' && parsedValue > props.max ) ||
 			( typeof props.min !== 'undefined' && parsedValue < props.min )
 		) {
-			// If validation failed, reset the value to the previous valid value
+			// If validation failed, reset the value to the previous valid value.
 			target.value = value;
 		} else {
-			// Otherwise, it's valid, call onUpdate
+			// Otherwise, it's valid, call onUpdate.
 			onUpdate( target.name, parsedValue );
 		}
 	}
 
 	return createElement( as || 'input', {
-		// Re-mount the input value to accept the latest value as the defaultValue
+		// Re-mount the input value to accept the latest value as the defaultValue.
 		key: value,
 		defaultValue: value,
 		onBlur: handleBlur,
@@ -73,18 +73,20 @@ function NumberInput( { as, value, onUpdate, ...props } ) {
 /**
  * <TimePicker>
  *
- * @param {Object} props Component props
- * @param {boolean} props.is12Hour Should the time picker showed in 12 hour format or 24 hour format
- * @param {Date | string | number} props.currentTime The initial current time the time picker should render
- * @param {Function} props.onChange Callback function when the date changed
+ * @typedef {Date|string|number} WPValidDateTimeFormat
+ *
+ * @param {Object}                props             Component props.
+ * @param {boolean}               props.is12Hour    Should the time picker showed in 12 hour format or 24 hour format.
+ * @param {WPValidDateTimeFormat} props.currentTime The initial current time the time picker should render.
+ * @param {Function}              props.onChange    Callback function when the date changed.
  */
 export function TimePicker( { is12Hour, currentTime, onChange } ) {
 	const [ date, setDate ] = useState( () =>
-		// Truncate the date at the minutes, see: #15495
+		// Truncate the date at the minutes, see: #15495.
 		moment( currentTime ).startOf( 'minutes' )
 	);
 
-	// Reset the state when currentTime changed
+	// Reset the state when currentTime changed.
 	useEffect( () => {
 		setDate( moment( currentTime ).startOf( 'minutes' ) );
 	}, [ currentTime ] );
@@ -113,7 +115,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 	}
 
 	function update( name, value ) {
-		// Clone the date and call the specific setter function according to `name`
+		// Clone the date and call the specific setter function according to `name`.
 		const newDate = date.clone()[ name ]( value );
 		changeDate( newDate );
 	}
@@ -140,11 +142,11 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 
 	const dayFormat = (
 		<div className="components-datetime__time-field components-datetime__time-field-day">
-			<NumberInput
+			<UpdateOnBlurAsIntegerField
 				aria-label={ __( 'Day' ) }
 				className="components-datetime__time-field-day-input"
 				type="number"
-				// The correct function to call in moment.js is "date" not "day"
+				// The correct function to call in moment.js is "date" not "day".
 				name="date"
 				value={ day }
 				step={ 1 }
@@ -157,13 +159,13 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 
 	const monthFormat = (
 		<div className="components-datetime__time-field components-datetime__time-field-month">
-			<NumberInput
+			<UpdateOnBlurAsIntegerField
 				as="select"
 				aria-label={ __( 'Month' ) }
 				className="components-datetime__time-field-month-select"
 				name="month"
 				value={ month }
-				// The value starts from 0, so we have to -1 when setting month
+				// The value starts from 0, so we have to -1 when setting month.
 				onUpdate={ ( key, value ) => update( key, value - 1 ) }
 			>
 				<option value="01">{ __( 'January' ) }</option>
@@ -178,7 +180,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 				<option value="10">{ __( 'October' ) }</option>
 				<option value="11">{ __( 'November' ) }</option>
 				<option value="12">{ __( 'December' ) }</option>
-			</NumberInput>
+			</UpdateOnBlurAsIntegerField>
 		</div>
 	);
 
@@ -204,7 +206,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 					{ dayMonthFormat }
 
 					<div className="components-datetime__time-field components-datetime__time-field-year">
-						<NumberInput
+						<UpdateOnBlurAsIntegerField
 							aria-label={ __( 'Year' ) }
 							className="components-datetime__time-field-year-input"
 							type="number"
@@ -225,7 +227,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 				</legend>
 				<div className="components-datetime__time-wrapper">
 					<div className="components-datetime__time-field components-datetime__time-field-time">
-						<NumberInput
+						<UpdateOnBlurAsIntegerField
 							aria-label={ __( 'Hours' ) }
 							className="components-datetime__time-field-hours-input"
 							type="number"
@@ -242,7 +244,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 						>
 							:
 						</span>
-						<NumberInput
+						<UpdateOnBlurAsIntegerField
 							aria-label={ __( 'Minutes' ) }
 							className="components-datetime__time-field-minutes-input"
 							type="number"
