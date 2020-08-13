@@ -1,21 +1,14 @@
 /**
  * WordPress dependencies
  */
-/**
- * External dependencies
- */
-import { DefaultTheme } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { InspectorControls } from '@wordpress/block-editor';
 import { BottomSheet, ColorSettings } from '@wordpress/components';
-import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
 import styles from './container.native.scss';
-
-const Stack = createStackNavigator();
 
 export const blockSettingsScreens = {
 	settings: 'Settings',
@@ -28,18 +21,6 @@ function BottomSheetSettings( {
 	settings,
 	...props
 } ) {
-	const backgroundStyle = usePreferredColorSchemeStyle(
-		styles.background,
-		styles.backgroundDark
-	);
-
-	const MyTheme = {
-		...DefaultTheme,
-		colors: {
-			...DefaultTheme.colors,
-			background: backgroundStyle.backgroundColor,
-		},
-	};
 	return (
 		<BottomSheet
 			isVisible={ editorSidebarOpened }
@@ -48,12 +29,7 @@ function BottomSheetSettings( {
 			contentStyle={ styles.content }
 			{ ...props }
 		>
-			<BottomSheet.NavigationContainer
-				animate
-				main
-				theme={ MyTheme }
-				stack={ Stack }
-			>
+			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.settings }
 				>

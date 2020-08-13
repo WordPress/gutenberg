@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
 /**
@@ -20,8 +19,6 @@ import PaletteScreen from './palette.screen';
 
 import { colorsUtils } from './utils';
 
-const Stack = createStackNavigator();
-
 const ColorSettingsMemo = React.memo(
 	( {
 		defaultSettings,
@@ -38,7 +35,7 @@ const ColorSettingsMemo = React.memo(
 			onHandleClosingBottomSheet( null );
 		}, [] );
 		return (
-			<BottomSheet.NavigationContainer stack={ Stack }>
+			<BottomSheet.NavigationContainer>
 				<BottomSheet.NavigationScreen
 					name={ colorsUtils.screens.palette }
 					initialParams={ {

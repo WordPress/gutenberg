@@ -21,7 +21,7 @@ import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
  */
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
 
-const BottomSheetScreen = ( { children } ) => {
+const BottomSheetNavigationScreen = ( { children } ) => {
 	const navigation = useNavigation();
 	const heightRef = useRef( { maxHeight: 0 } );
 	const isFocused = useIsFocused();
@@ -64,4 +64,4 @@ const BottomSheetScreen = ( { children } ) => {
 	}, [ children, isFocused ] );
 };
 
-export default BottomSheetScreen;
+export default BottomSheetNavigationScreen;

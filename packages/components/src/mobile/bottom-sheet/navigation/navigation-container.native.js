@@ -2,20 +2,32 @@
  * External dependencies
  */
 import { View, Easing } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 /**
  * WordPress dependencies
  */
-import { useState, useContext, useMemo, Children } from '@wordpress/element';
+import {
+	useState,
+	useContext,
+	useMemo,
+	Children,
+	useRef,
+} from '@wordpress/element';
+
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
-import { performLayoutAnimation } from '../layout-animation';
+import { performLayoutAnimation } from '../../layout-animation';
 import {
 	BottomSheetNavigationContext,
 	BottomSheetNavigationProvider,
 } from './bottom-sheet-navigation-context';
+
+import styles from './styles.scss';
 
 const AnimationSpec = {
 	animation: 'timing',
@@ -45,17 +57,25 @@ const options = {
 
 const ANIMATION_DURATION = 190;
 
-function BottomSheetNavigationContainer( {
-	children,
-	animate,
-	main,
-	theme,
-	stack,
-} ) {
+function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
+	const Stack = useRef( createStackNavigator() ).current;
 	const context = useContext( BottomSheetNavigationContext );
 	const [ currentHeight, setCurrentHeight ] = useState(
 		context.currentHeight || 1
 	);
+
+	const backgroundStyle = usePreferredColorSchemeStyle(
+		styles.background,
+		styles.backgroundDark
+	);
+
+	const _theme = theme || {
+		...DefaultTheme,
+		colors: {
+			...DefaultTheme.colors,
+			background: backgroundStyle.backgroundColor,
+		},
+	};
 
 	const setHeight = ( height, layout ) => {
 		if ( currentHeight !== height && height > 1 ) {
@@ -74,7 +94,7 @@ function BottomSheetNavigationContainer( {
 		return Children.map( children, ( child ) => {
 			const { name, ...otherProps } = child.props;
 			return (
-				<stack.Screen
+				<Stack.Screen
 					name={ name }
 					{ ...otherProps }
 					children={ () => child }
@@ -90,15 +110,15 @@ function BottomSheetNavigationContainer( {
 					value={ { setHeight, currentHeight } }
 				>
 					{ main ? (
-						<NavigationContainer theme={ theme }>
-							<stack.Navigator screenOptions={ options }>
+						<NavigationContainer theme={ _theme }>
+							<Stack.Navigator screenOptions={ options }>
 								{ screens }
-							</stack.Navigator>
+							</Stack.Navigator>
 						</NavigationContainer>
 					) : (
-						<stack.Navigator screenOptions={ options }>
+						<Stack.Navigator screenOptions={ options }>
 							{ screens }
-						</stack.Navigator>
+						</Stack.Navigator>
 					) }
 				</BottomSheetNavigationProvider>
 			</View>
