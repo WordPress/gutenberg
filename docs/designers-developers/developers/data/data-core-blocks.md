@@ -190,6 +190,21 @@ _Returns_
 
 -   `boolean`: Whether block supports feature.
 
+<a name="hasBlockVariation" href="#hasBlockVariation">#</a> **hasBlockVariation**
+
+Returns block variations by block name.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _blockVariation_ `string`: Block type variation.
+-   _blockName_ `string`: Block type name.
+-   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+
+_Returns_
+
+-   `(Array<WPBlockVariation>|void)`: Block variations.
+
 <a name="hasChildBlocks" href="#hasChildBlocks">#</a> **hasChildBlocks**
 
 Returns a boolean indicating if a block has child blocks or not.
