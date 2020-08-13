@@ -149,7 +149,7 @@ function BlockListBlock( {
 		{
 			'wp-block': ! isAligned,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			// Don't select the item while dragging
+			// Don't select the item while dragging.
 			'is-selected': isSelected && ! isDragging,
 			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
@@ -160,7 +160,7 @@ function BlockListBlock( {
 			'is-focused':
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
-			// Don't select child while dragging
+			// Don't select child while dragging.
 			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 		},
 		className

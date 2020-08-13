@@ -44,12 +44,21 @@ import { link as linkIcon } from '@wordpress/icons';
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
 
+/**
+ * A React hook to determine if it's dragging within the target element.
+ *
+ * @typedef {import('@wordpress/element').RefObject} RefObject
+ *
+ * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
+ *
+ * @return {boolean} Is dragging within the target element.
+ */
 const useIsDraggingWithin = ( elementRef ) => {
 	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
 
 	useEffect( () => {
 		function handleDragStart( event ) {
-			// Check the first time when the dragging starts
+			// Check the first time when the dragging starts.
 			handleDragEnter( event );
 		}
 
@@ -59,7 +68,7 @@ const useIsDraggingWithin = ( elementRef ) => {
 		}
 
 		function handleDragEnter( event ) {
-			// Check if the current target is inside the item element
+			// Check if the current target is inside the item element.
 			if ( elementRef.current.contains( event.target ) ) {
 				setIsDraggingWithin( true );
 			} else {
@@ -236,9 +245,9 @@ function NavigationLinkEdit( {
 				className={ classnames( {
 					'is-editing':
 						( isSelected || isParentOfSelectedBlock ) &&
-						// Don't show the element as editing while dragging
+						// Don't show the element as editing while dragging.
 						! isDraggingBlocks,
-					// Don't select the element while dragging
+					// Don't select the element while dragging.
 					'is-selected': isSelected && ! isDraggingBlocks,
 					'is-dragging-within': isDraggingWithin,
 					'has-link': !! url,
@@ -340,7 +349,7 @@ function NavigationLinkEdit( {
 						( isSelected && hasDescendants ) ||
 						( isImmediateParentOfSelectedBlock &&
 							! selectedBlockHasDescendants ) ||
-						// Show the appender while dragging to allow inserting element between item and the appender
+						// Show the appender while dragging to allow inserting element between item and the appender.
 						( isDraggingBlocks && hasDescendants )
 							? InnerBlocks.DefaultAppender
 							: false
@@ -353,7 +362,7 @@ function NavigationLinkEdit( {
 							{
 								'is-parent-of-selected-block':
 									isParentOfSelectedBlock &&
-									// Don't select as parent of selected block while dragging
+									// Don't select as parent of selected block while dragging.
 									! isDraggingBlocks,
 							}
 						),

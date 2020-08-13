@@ -629,7 +629,7 @@
 }
 
 // Hide the popover block editor list while dragging.
-// Using a hacky animation to delay hiding the element so that dragging can still work
+// Using a hacky animation to delay hiding the element so that dragging can still work.
 @keyframes hide-during-dragging {
 	to {
 		position: fixed;
@@ -666,7 +666,7 @@
 
 	.is-dragging-components-draggable & {
 		opacity: 0;
-		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details
+		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
 		animation: hide-during-dragging 1ms linear forwards;
 	}
 }
