@@ -687,4 +687,60 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
+
+	/**
+	 * Tests custom classname server-side block support.
+	 */
+	function test_custom_classnames_support() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'className' => 'my-custom-classname',
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_styles  = 'test:style; ';
+		$expected_classes = 'wp-block-example foo-bar-class my-custom-classname';
+
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
+	 * Tests custom classname server-side block support opt-out.
+	 */
+	function test_custom_classnames_support_opt_out() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(
+				'customClassName' => false
+			),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'className' => 'my-custom-classname',
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_styles  = 'test:style;';
+		$expected_classes = 'wp-block-example foo-bar-class';
+
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
 }
