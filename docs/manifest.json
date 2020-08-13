@@ -156,7 +156,7 @@
 		"parent": "filters"
 	},
 	{
-		"title": "Editor Filters (Experimental)",
+		"title": "Editor Filters",
 		"slug": "editor-filters",
 		"markdown_source": "../docs/designers-developers/developers/filters/editor-filters.md",
 		"parent": "filters"
@@ -1197,6 +1197,18 @@
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
 		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolbarGroup",
+		"slug": "toolbar-group",
+		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolbarItem",
+		"slug": "toolbar-item",
+		"markdown_source": "../packages/components/src/toolbar-item/README.md",
 		"parent": "components"
 	},
 	{

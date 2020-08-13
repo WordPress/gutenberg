@@ -32,7 +32,7 @@
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
 		"node-fetch": "^2.6.0"
 	},
 	"peerDependencies": {

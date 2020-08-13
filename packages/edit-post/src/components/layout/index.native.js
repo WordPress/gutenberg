@@ -129,7 +129,7 @@ class Layout extends Component {
 				) }
 				onLayout={ this.onRootViewLayout }
 			>
-				<AutosaveMonitor />
+				<AutosaveMonitor disableIntervalChecks />
 				<View
 					style={ getStylesFromColorScheme(
 						styles.background,

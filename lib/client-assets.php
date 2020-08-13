@@ -235,6 +235,19 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		array(),
 		'3.42.0'
 	);
+
+	/*
+	 * This script registration and the corresponding function should be removed
+	 * removed once the plugin is updated to support WordPress 5.6.0 and newer.
+	 */
+	gutenberg_register_vendor_script(
+		$scripts,
+		'lodash',
+		'https://unpkg.com/lodash@4.17.19/lodash.js',
+		array(),
+		'4.17.19',
+		true
+	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 

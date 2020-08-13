@@ -35,7 +35,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/plugins": "file:../plugins",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

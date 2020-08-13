@@ -6,12 +6,20 @@ import {
 	Animated,
 	Keyboard,
 	Dimensions,
+	View,
 } from 'react-native';
+import SafeArea from 'react-native-safe-area';
 
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
 
 const AnimatedKeyboardAvoidingView = Animated.createAnimatedComponent(
 	IOSKeyboardAvoidingView
@@ -25,7 +33,9 @@ export const KeyboardAvoidingView = ( {
 	withAnimatedHeight = false,
 	...otherProps
 } ) => {
-	const [ keyboardHeight, setKeyboardHeight ] = useState( 0 );
+	const [ resizeObserver, sizes ] = useResizeObserver();
+	const { height = 0 } = sizes || {};
+
 	const animatedHeight = useRef( new Animated.Value( MIN_HEIGHT ) ).current;
 
 	const { height: fullHeight } = Dimensions.get( 'window' );
@@ -40,25 +50,20 @@ export const KeyboardAvoidingView = ( {
 		};
 	}, [] );
 
-	useEffect( () => {
-		animate();
-	}, [ keyboardHeight ] );
-
 	function onKeyboardWillShow( { endCoordinates } ) {
-		setKeyboardHeight( endCoordinates.height );
+		SafeArea.getSafeAreaInsetsForRootView().then( ( result ) => {
+			animatedHeight.setValue(
+				endCoordinates.height +
+					MIN_HEIGHT -
+					result.safeAreaInsets.bottom
+			);
+		} );
 	}
 
-	function onKeyboardWillHide() {
-		setKeyboardHeight( 0 );
-	}
-
-	const paddedKeyboardHeight =
-		keyboardHeight + MIN_HEIGHT - ( style.bottom || 0 );
-
-	function animate() {
+	function onKeyboardWillHide( { duration } ) {
 		Animated.timing( animatedHeight, {
-			toValue: keyboardHeight ? paddedKeyboardHeight : MIN_HEIGHT,
-			duration: keyboardHeight ? 0 : 150,
+			toValue: MIN_HEIGHT,
+			duration,
 			useNativeDriver: false,
 		} ).start();
 	}
@@ -73,7 +78,20 @@ export const KeyboardAvoidingView = ( {
 					? [ style, { height: animatedHeight } ]
 					: style
 			}
-		/>
+		>
+			<View
+				style={ [
+					{
+						top: -height + MIN_HEIGHT,
+					},
+					styles.animatedChildStyle,
+					! withAnimatedHeight && styles.defaultChildStyle,
+				] }
+			>
+				{ resizeObserver }
+				{ otherProps.children }
+			</View>
+		</AnimatedKeyboardAvoidingView>
 	);
 };
 
