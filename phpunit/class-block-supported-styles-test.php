@@ -153,7 +153,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-red-color has-background has-black-background-color';
-		$expected_styles  = 'test:style; ';
+		$expected_styles  = 'test: style;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -189,7 +189,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_styles  = 'test:style; color: #000; background-color: #fff;';
+		$expected_styles  = 'test: style; color: #000; background-color: #fff;';
 		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
@@ -221,7 +221,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'wp-block-example foo-bar-class has-link-color';
-		$expected_styles  = 'test:style; --wp--style--color--link:var(--wp--preset--color--red);';
+		$expected_styles  = 'test: style; --wp--style--color--link: var(--wp--preset--color--red);';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -252,7 +252,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'wp-block-example foo-bar-class has-link-color';
-		$expected_styles  = 'test:style; --wp--style--color--link: #fff;';
+		$expected_styles  = 'test: style; --wp--style--color--link: #fff;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -283,7 +283,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'wp-block-example foo-bar-class has-background has-red-gradient-background';
-		$expected_styles  = 'test:style; ';
+		$expected_styles  = 'test: style;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -314,7 +314,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'wp-block-example foo-bar-class has-background';
-		$expected_styles  = 'test:style; background: some-gradient-style;';
+		$expected_styles  = 'test: style; background: some-gradient-style;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -379,7 +379,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'wp-block-example foo-bar-class has-large-font-size';
-		$expected_styles  = 'test:style; ';
+		$expected_styles  = 'test: style;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -407,8 +407,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class ';
-		$expected_styles  = 'test:style; font-size: 10px;';
+		$expected_classes = 'wp-block-example foo-bar-class';
+		$expected_styles  = 'test: style; font-size: 10px;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -464,8 +464,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class ';
-		$expected_styles  = 'test:style; line-height: 10;';
+		$expected_classes = 'wp-block-example foo-bar-class';
+		$expected_styles  = 'test: style; line-height: 10;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -521,7 +521,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'wp-block-example foo-bar-class alignwide';
-		$expected_styles  = 'test:style; ';
+		$expected_styles  = 'test: style;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -595,7 +595,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background alignwide';
-		$expected_styles  = 'test:style; color: #000; background-color: #fff; background: some-gradient; font-size: 10px; line-height: 20;';
+		$expected_styles  = 'test: style; color: #000; background-color: #fff; background: some-gradient; font-size: 10px; line-height: 20;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -636,8 +636,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class ';
-		$expected_styles  = 'test:style; font-size: 10px;';
+		$expected_classes = 'wp-block-example foo-bar-class';
+		$expected_styles  = 'test: style; font-size: 10px;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
