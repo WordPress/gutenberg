@@ -130,10 +130,9 @@ add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_block_nav_menu_item', 
  *
  * @see https://core.trac.wordpress.org/ticket/50544
  *
- * @param array    $menu_items The menu items, sorted by each menu item's menu order.
- * @param stdClass $args       An object containing wp_nav_menu() arguments.
+ * @param array $menu_items The menu items, sorted by each menu item's menu order.
  */
-function gutenberg_remove_block_nav_menu_items( $menu_items, $args ) {
+function gutenberg_remove_block_nav_menu_items( $menu_items ) {
 	if ( current_theme_supports( 'block-nav-menus' ) ) {
 		return $menu_items;
 	}
@@ -145,7 +144,7 @@ function gutenberg_remove_block_nav_menu_items( $menu_items, $args ) {
 		}
 	);
 }
-add_filter( 'wp_nav_menu_objects', 'gutenberg_remove_block_nav_menu_items', 10, 2 );
+add_filter( 'wp_nav_menu_objects', 'gutenberg_remove_block_nav_menu_items', 10 );
 
 /**
  * Recursively converts a list of menu items into a list of blocks. This is a
