@@ -8,6 +8,9 @@ import { isRangeEqual } from './is-range-equal';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
+const NS_SVG = 'http://www.w3.org/2000/svg';
+const NS_XLINK = 'http://www.w3.org/1999/xlink';
+
 /**
  * Creates a path as an array of indices from the given root node to the given
  * node.
@@ -64,18 +67,36 @@ function append( element, child ) {
 	if ( typeof child === 'string' ) {
 		child = element.ownerDocument.createTextNode( child );
 	}
-
-	const { type, attributes } = child;
-
-	if ( type ) {
-		child = element.ownerDocument.createElement( type );
-
-		for ( const key in attributes ) {
-			child.setAttribute( key, attributes[ key ] );
-		}
+	if ( 'type' in child ) {
+		child = contextuallyCreate( element, child );
 	}
 
 	return element.appendChild( child );
+}
+
+function contextuallyCreate( element, child ) {
+	const { ownerDocument: doc, namespaceURI } = element;
+	const { type, attributes } = child;
+	const [ childNode, addAttribute ] =
+		type === 'svg' || namespaceURI === NS_SVG
+			? [
+					doc.createElementNS( NS_SVG, type ),
+					( node, key, value ) => {
+						if ( key === 'xlink:href' ) {
+							node.setAttributeNS( NS_XLINK, key, value );
+						} else {
+							node.setAttribute( key, value );
+						}
+					},
+			  ]
+			: [
+					doc.createElement( type ),
+					( node, key, value ) => node.setAttribute( key, value ),
+			  ];
+	for ( const key in attributes ) {
+		addAttribute( childNode, key, attributes[ key ] );
+	}
+	return childNode;
 }
 
 function appendText( node, text ) {
