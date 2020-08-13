@@ -34,8 +34,8 @@ import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import ColorCell from './color-cell';
 import RadioCell from './radio-cell';
-import NavigationScreen from './navigation/navigation-screen';
-import NavigationContainer from './navigation/navigation-container';
+import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
+import NavigationContainer from './bottom-sheet-navigation/navigation-container';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
