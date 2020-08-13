@@ -722,7 +722,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'customClassName' => false
+				'customClassName' => false,
 			),
 			'render_callback' => true,
 		);
