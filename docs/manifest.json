@@ -1038,6 +1038,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BottomSheetNavigation",
+		"slug": "bottom-sheet-navigation",
+		"markdown_source": "../packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Modal",
 		"slug": "modal",
 		"markdown_source": "../packages/components/src/modal/README.md",
