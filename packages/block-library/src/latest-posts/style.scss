@@ -20,7 +20,7 @@
 		padding: 0;
 
 		li {
-			margin: 0 1.25rem 1.25rem 0;
+			margin: 0 1.25em 1.25em 0;
 			width: 100%;
 		}
 	}
@@ -28,7 +28,7 @@
 	@include break-small {
 		@for $i from 2 through 6 {
 			&.columns-#{ $i } li {
-				width: calc((100% / #{ $i }) - 1.25rem);
+				width: calc((100% / #{ $i }) - 1.25em);
 			}
 		}
 	}
@@ -38,12 +38,12 @@
 .wp-block-latest-posts__post-author {
 	display: block;
 	color: $dark-gray-300;
-	font-size: 0.8125rem;
+	font-size: 0.8125em;
 }
 
 .wp-block-latest-posts__post-excerpt {
-	margin-top: 0.5rem;
-	margin-bottom: 1rem;
+	margin-top: 0.5em;
+	margin-bottom: 1em;
 }
 
 .wp-block-latest-posts__featured-image {
