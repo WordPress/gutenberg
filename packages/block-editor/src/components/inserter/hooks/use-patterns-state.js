@@ -21,8 +21,8 @@ import { __, sprintf } from '@wordpress/i18n';
 const usePatternsState = ( onInsert ) => {
 	const { patternCategories, patterns } = useSelect( ( select ) => {
 		const {
-			__experimentalBlockPatterns,
-			__experimentalBlockPatternCategories,
+			__experimentalBlockPatterns = [],
+			__experimentalBlockPatternCategories = [],
 		} = select( 'core/block-editor' ).getSettings();
 		return {
 			patterns: __experimentalBlockPatterns,
