@@ -405,9 +405,9 @@ class LatestPostsEdit extends Component {
 							'wp-block-latest-posts__featured-image': true,
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
 						} );
-						const showFeaturedImage =
+						const renderFeaturedImage =
 							displayFeaturedImage && imageSourceUrl;
-						const featuredImage = showFeaturedImage && (
+						const featuredImage = renderFeaturedImage && (
 							<img
 								src={ imageSourceUrl }
 								alt=""
@@ -445,7 +445,7 @@ class LatestPostsEdit extends Component {
 
 						return (
 							<li key={ i }>
-								{ showFeaturedImage && (
+								{ renderFeaturedImage && (
 									<div className={ imageClasses }>
 										{ addLinkToFeaturedImage ? (
 											<a
