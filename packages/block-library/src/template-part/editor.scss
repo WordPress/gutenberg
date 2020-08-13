@@ -92,9 +92,9 @@
 		align-items: center;
 		border: 1px solid $gray-600;
 		border-bottom: none;
-		border-top-right-radius: 2px;
-		border-top-left-radius: 2px;
-		padding: 2px 6px;
+		border-top-right-radius: $radius-block-ui;
+		border-top-left-radius: $radius-block-ui;
+		padding: 0 6px;
 	}
 
 	.wp-block-template-part__label-text {
