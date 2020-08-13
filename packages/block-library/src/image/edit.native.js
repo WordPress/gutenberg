@@ -354,6 +354,7 @@ export class ImageEdit extends React.Component {
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
+					controls={ [ 'left', 'center', 'right' ] }
 				/>
 			</BlockControls>
 		);
