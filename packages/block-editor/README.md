@@ -499,6 +499,8 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
 -   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
+-   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
+-   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
