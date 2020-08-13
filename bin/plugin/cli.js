@@ -9,7 +9,10 @@ const program = require( 'commander' );
  * Internal dependencies
  */
 const { releaseRC, releaseStable } = require( './commands/release' );
-const { prepublishNpmStablePackages } = require( './commands/packages' );
+const {
+	prepareLatestDistTag,
+	prepareNextDistTag,
+} = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
 const { runPerformanceTests } = require( './commands/performance' );
 
@@ -28,12 +31,20 @@ program
 	.action( releaseStable );
 
 program
-	.command( 'prepublish-packages-stable' )
+	.command( 'prepare-packages-stable' )
 	.alias( 'npm-stable' )
 	.description(
-		'Prepublish to npm steps for the next stable version of WordPress packages'
+		'Prepares the packages to be published to npm as stable (latest dist-tag, production version)'
 	)
-	.action( prepublishNpmStablePackages );
+	.action( prepareLatestDistTag );
+
+program
+	.command( 'prepare-packages-rc' )
+	.alias( 'npm-rc' )
+	.description(
+		'Prepares the packages to be published to npm as RC (next dist-tag, RC version)'
+	)
+	.action( prepareNextDistTag );
 
 program
 	.command( 'release-plugin-changelog' )
@@ -46,6 +57,11 @@ program
 program
 	.command( 'performance-tests [branches...]' )
 	.alias( 'perf' )
+	.option( '-c, --ci', 'Run in CI (non interactive)' )
+	.option(
+		'--tests-branch <branch>',
+		"Use this branch's performance test files"
+	)
 	.description(
 		'Runs performance tests on two separate branches and outputs the result'
 	)

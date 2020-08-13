@@ -90,9 +90,16 @@ module.exports = function cli() {
 			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
 				'8889',
 				'http://localhost:8889'
-			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file.`
+			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first insall, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
 		),
-		() => {},
+		( args ) => {
+			args.option( 'update', {
+				type: 'boolean',
+				describe:
+					'Download source updates and apply WordPress configuration.',
+				default: false,
+			} );
+		},
 		withSpinner( env.start )
 	);
 	yargs.command(
@@ -140,7 +147,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'run <container> [command..]',
-		"Runs an arbitrary command in one of the underlying Docker containers, for example it's useful for running wp cli commands.",
+		'Runs an arbitrary command in one of the underlying Docker containers. For example, it can be useful for running wp cli commands. You can also use it to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance.',
 		( args ) => {
 			args.positional( 'container', {
 				type: 'string',
@@ -157,10 +164,18 @@ module.exports = function cli() {
 		'$0 run cli wp user list',
 		'Runs `wp user list` wp-cli command which lists WordPress users.'
 	);
+	yargs.example(
+		'$0 run cli wp shell',
+		'Open the interactive WordPress shell for the development instance.'
+	);
+	yargs.example(
+		'$0 run tests-cli bash',
+		'Open a bash session in the WordPress tests instance.'
+	);
 	yargs.command(
 		'destroy',
 		wpRed(
-			'Destroy the WordPress environment. Delete docker containers and remove local files.'
+			'Destroy the WordPress environment. Deletes docker containers, volumes, and networks associated with the WordPress environment and removes local files.'
 		),
 		() => {},
 		withSpinner( env.destroy )

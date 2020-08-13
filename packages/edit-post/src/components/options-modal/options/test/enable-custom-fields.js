@@ -34,7 +34,7 @@ describe( 'EnableCustomFieldsOption', () => {
 
 	it( 'renders an unchecked checkbox and a confirmation message when toggled off', () => {
 		const renderer = new TestRenderer.create(
-			( <EnableCustomFieldsOption areCustomFieldsEnabled /> )
+			<EnableCustomFieldsOption areCustomFieldsEnabled />
 		);
 		act( () => {
 			renderer.root.findByType( BaseOption ).props.onChange( false );
@@ -44,7 +44,7 @@ describe( 'EnableCustomFieldsOption', () => {
 
 	it( 'renders a checked checkbox and a confirmation message when toggled on', () => {
 		const renderer = new TestRenderer.create(
-			( <EnableCustomFieldsOption areCustomFieldsEnabled={ false } /> )
+			<EnableCustomFieldsOption areCustomFieldsEnabled={ false } />
 		);
 		act( () => {
 			renderer.root.findByType( BaseOption ).props.onChange( true );
@@ -63,7 +63,7 @@ describe( 'CustomFieldsConfirmation', () => {
 			} ) );
 
 		const renderer = new TestRenderer.create(
-			( <CustomFieldsConfirmation /> )
+			<CustomFieldsConfirmation />
 		);
 		act( () => {
 			renderer.root.findByType( Button ).props.onClick();

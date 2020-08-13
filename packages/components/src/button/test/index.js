@@ -35,13 +35,6 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'is-primary' ) ).toBe( true );
 		} );
 
-		it( 'should render a button element with is-large class', () => {
-			const button = shallow( <Button isSecondary isLarge /> );
-			expect( button.hasClass( 'is-large' ) ).toBe( true );
-			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
-			expect( button.hasClass( 'is-primary' ) ).toBe( false );
-		} );
-
 		it( 'should render a button element with is-small class', () => {
 			const button = shallow( <Button isSecondary isSmall /> );
 			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
@@ -104,12 +97,9 @@ describe( 'Button', () => {
 				/>
 			);
 			expect( iconButton.find( 'Icon' ).dive() ).not.toBeNull();
-			expect(
-				iconButton
-					.find( '.test' )
-					.shallow()
-					.text()
-			).toBe( 'Test' );
+			expect( iconButton.find( '.test' ).shallow().text() ).toBe(
+				'Test'
+			);
 		} );
 
 		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', () => {

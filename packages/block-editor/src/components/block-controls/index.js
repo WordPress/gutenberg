@@ -16,18 +16,28 @@ import {
 /**
  * Internal dependencies
  */
-import { ifBlockEditSelected } from '../block-edit/context';
+import useDisplayBlockControls from '../use-display-block-controls';
 
 const { Fill, Slot } = createSlotFill( 'BlockControls' );
 
-function BlockControlsSlot( props ) {
+function BlockControlsSlot( { __experimentalIsExpanded = false, ...props } ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
-	return <Slot { ...props } fillProps={ accessibleToolbarState } />;
+	return (
+		<Slot
+			name={ buildSlotName( __experimentalIsExpanded ) }
+			{ ...props }
+			fillProps={ accessibleToolbarState }
+		/>
+	);
 }
 
-function BlockControlsFill( { controls, children } ) {
+function BlockControlsFill( { controls, __experimentalIsExpanded, children } ) {
+	if ( ! useDisplayBlockControls() ) {
+		return null;
+	}
+
 	return (
-		<Fill>
+		<Fill name={ buildSlotName( __experimentalIsExpanded ) }>
 			{ ( fillProps ) => {
 				// Children passed to BlockControlsFill will not have access to any
 				// React Context whose Provider is part of the BlockControlsSlot tree.
@@ -44,7 +54,10 @@ function BlockControlsFill( { controls, children } ) {
 	);
 }
 
-const BlockControls = ifBlockEditSelected( BlockControlsFill );
+const buildSlotName = ( isExpanded ) =>
+	`BlockControls${ isExpanded ? '-expanded' : '' }`;
+
+const BlockControls = BlockControlsFill;
 
 BlockControls.Slot = BlockControlsSlot;
 

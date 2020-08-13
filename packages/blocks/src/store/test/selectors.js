@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
+import { keyBy, omit } from 'lodash';
 
 import deepFreeze from 'deep-freeze';
 
@@ -9,13 +9,75 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	getBlockSupport,
 	getChildBlockNames,
 	getDefaultBlockVariation,
 	getGroupingBlockName,
 	isMatchingSearchTerm,
+	getCategories,
 } from '../selectors';
 
 describe( 'selectors', () => {
+	describe( 'getBlockSupport', () => {
+		const blockName = 'block/name';
+		const getState = ( blocks ) => {
+			return deepFreeze( {
+				blockTypes: keyBy( blocks, 'name' ),
+			} );
+		};
+
+		it( 'returns default value when config entry not found', () => {
+			const state = getState( [] );
+
+			expect(
+				getBlockSupport( state, blockName, 'unknown', 'default' )
+			).toBe( 'default' );
+		} );
+
+		it( 'returns value when config found but falsy', () => {
+			const state = getState( [
+				{
+					name: blockName,
+					supports: {
+						falsy: '',
+					},
+				},
+			] );
+
+			expect(
+				getBlockSupport( state, blockName, 'falsy', 'default' )
+			).toBe( '' );
+		} );
+
+		it( 'works with configs stored as nested objects', () => {
+			const state = getState( [
+				{
+					name: blockName,
+					supports: {
+						features: {
+							foo: {
+								bar: 'value',
+							},
+						},
+					},
+				},
+			] );
+
+			expect(
+				getBlockSupport( state, blockName, 'features.foo.bar' )
+			).toBe( 'value' );
+		} );
+	} );
+
+	describe( 'getCategories', () => {
+		it( 'returns categories state', () => {
+			const categories = [ { slug: 'text', text: 'Text' } ];
+			const state = deepFreeze( { categories } );
+
+			expect( getCategories( state ) ).toEqual( categories );
+		} );
+	} );
+
 	describe( 'getChildBlockNames', () => {
 		it( 'should return an empty array if state is empty', () => {
 			const state = {};
@@ -232,8 +294,8 @@ describe( 'selectors', () => {
 		const name = 'core/paragraph';
 		const blockType = {
 			title: 'Paragraph',
-			category: 'common',
-			keywords: [ 'text' ],
+			category: 'text',
+			keywords: [ 'body' ],
 		};
 
 		const state = {
@@ -301,7 +363,7 @@ describe( 'selectors', () => {
 				const result = isMatchingSearchTerm(
 					state,
 					nameOrType,
-					'TEXT'
+					'BODY'
 				);
 
 				expect( result ).toBe( true );
@@ -312,7 +374,7 @@ describe( 'selectors', () => {
 					const result = isMatchingSearchTerm(
 						state,
 						nameOrType,
-						'COMMON'
+						'TEXT'
 					);
 
 					expect( result ).toBe( true );

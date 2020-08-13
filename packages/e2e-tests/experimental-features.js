@@ -27,19 +27,13 @@ async function setExperimentalFeaturesState( features, enable ) {
 }
 
 /**
- * Enables experimental features from the plugin settings section.
+ * Establishes test lifecycle to enable experimental feature for the duration of
+ * the grouped test block.
  *
- * @param {Array} features Array of {string} selectors of settings to enable. Assumes they can be enabled with one click.
+ * @param {Array} features Array of {string} selectors of settings to enable.
+ *                         Assumes they can be enabled with one click.
  */
-export async function enableExperimentalFeatures( features ) {
-	await setExperimentalFeaturesState( features, true );
-}
-
-/**
- * Disables experimental features from the plugin settings section.
- *
- * @param {Array} features Array of {string} selectors of settings to disable. Assumes they can be disabled with one click.
- */
-export async function disableExperimentalFeatures( features ) {
-	await setExperimentalFeaturesState( features, false );
+export function useExperimentalFeatures( features ) {
+	beforeAll( () => setExperimentalFeaturesState( features, true ) );
+	afterAll( () => setExperimentalFeaturesState( features, false ) );
 }

@@ -173,7 +173,9 @@ class LegacyWidgetEditHandler extends Component {
 
 		if ( widgetClass ) {
 			apiFetch( {
-				path: `/__experimental/widget-forms/${ widgetClass }/`,
+				path: `/__experimental/widget-forms/${ encodeURIComponent(
+					widgetClass
+				) }/`,
 				data: {
 					instance,
 					instance_changes: instanceChanges,

@@ -6,36 +6,11 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
-import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { useEditorContext } from '../editor';
-
 export default function SaveButton( { openEntitiesSavedStates } ) {
-	const { settings } = useEditorContext();
-	const [ , setStatus ] = useEntityProp(
-		'postType',
-		settings.templateType,
-		'status'
-	);
-	const [ , setTitle ] = useEntityProp(
-		'postType',
-		settings.templateType,
-		'title'
-	);
-	const [ slug ] = useEntityProp( 'postType', settings.templateType, 'slug' );
-	// Publish template if not done yet.
-	useEffect( () => {
-		setStatus( 'publish' );
-		setTitle( slug );
-	}, [ slug ] );
-
 	const { isDirty, isSaving } = useSelect( ( select ) => {
 		const {
 			__experimentalGetDirtyEntityRecords,
@@ -49,8 +24,8 @@ export default function SaveButton( { openEntitiesSavedStates } ) {
 			),
 		};
 	} );
-	const disabled = ! isDirty || isSaving;
 
+	const disabled = ! isDirty || isSaving;
 	return (
 		<>
 			<Button

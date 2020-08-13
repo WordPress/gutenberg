@@ -12,7 +12,7 @@ import {
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,16 +45,14 @@ function ButtonsEdit( {
 		}
 	}, [ sizes ] );
 
-	function renderFooterAppender() {
-		return (
-			<View style={ styles.appenderContainer }>
-				<InnerBlocks.ButtonBlockAppender
-					isFloating={ true }
-					onAddBlock={ onAddNextButton }
-				/>
-			</View>
-		);
-	}
+	const renderFooterAppender = useRef( () => (
+		<View style={ styles.appenderContainer }>
+			<InnerBlocks.ButtonBlockAppender
+				isFloating={ true }
+				onAddBlock={ onAddNextButton }
+			/>
+		</View>
+	) );
 
 	// Inside buttons block alignment options are not supported.
 	const alignmentHooksSetting = {
@@ -68,9 +66,9 @@ function ButtonsEdit( {
 				allowedBlocks={ ALLOWED_BLOCKS }
 				template={ BUTTONS_TEMPLATE }
 				renderFooterAppender={
-					shouldRenderFooterAppender && renderFooterAppender
+					shouldRenderFooterAppender && renderFooterAppender.current
 				}
-				__experimentalMoverDirection="horizontal"
+				orientation="horizontal"
 				horizontalAlignment={ align }
 				onDeleteBlock={ shouldDelete ? onDelete : undefined }
 				onAddBlock={ onAddNextButton }
@@ -105,13 +103,10 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId }, registry ) => {
-		const { replaceInnerBlocks, selectBlock, removeBlock } = dispatch(
+		const { selectBlock, removeBlock, insertBlock } = dispatch(
 			'core/block-editor'
 		);
-		const { getBlocks, getBlockOrder } = registry.select(
-			'core/block-editor'
-		);
-		const innerBlocks = getBlocks( clientId );
+		const { getBlockOrder } = registry.select( 'core/block-editor' );
 
 		return {
 			// The purpose of `onAddNextButton` is giving the ability to automatically
@@ -129,9 +124,7 @@ export default compose(
 
 				const insertedBlock = createBlock( 'core/button' );
 
-				innerBlocks.splice( index + 1, 0, insertedBlock );
-
-				replaceInnerBlocks( clientId, innerBlocks, true );
+				insertBlock( insertedBlock, index, clientId );
 				selectBlock( insertedBlock.clientId );
 			},
 			onDelete: () => {

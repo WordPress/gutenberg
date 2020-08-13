@@ -1,6 +1,6 @@
 {
 	"name": "core/more",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"customText": {
 			"type": "string"

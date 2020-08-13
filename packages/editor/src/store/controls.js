@@ -32,20 +32,23 @@ export function getRegistry() {
  *
  * @see https://github.com/WordPress/wordpress-develop/blob/6dad32d2aed47e6c0cf2aee8410645f6d7aba6bd/src/wp-login.php#L103
  *
- * @param {string} postId  Post ID.
- * @return {string}        sessionStorage key
+ * @param {string}  postId     Post ID.
+ * @param {boolean} isPostNew  Whether post new.
+ * @return {string}            sessionStorage key
  */
-function postKey( postId ) {
-	return `wp-autosave-block-editor-post-${ postId }`;
+function postKey( postId, isPostNew ) {
+	return `wp-autosave-block-editor-post-${
+		isPostNew ? 'auto-draft' : postId
+	}`;
 }
 
-export function localAutosaveGet( postId ) {
-	return window.sessionStorage.getItem( postKey( postId ) );
+export function localAutosaveGet( postId, isPostNew ) {
+	return window.sessionStorage.getItem( postKey( postId, isPostNew ) );
 }
 
-export function localAutosaveSet( postId, title, content, excerpt ) {
+export function localAutosaveSet( postId, isPostNew, title, content, excerpt ) {
 	window.sessionStorage.setItem(
-		postKey( postId ),
+		postKey( postId, isPostNew ),
 		JSON.stringify( {
 			post_title: title,
 			content,
@@ -54,8 +57,8 @@ export function localAutosaveSet( postId, title, content, excerpt ) {
 	);
 }
 
-export function localAutosaveClear( postId ) {
-	window.sessionStorage.removeItem( postKey( postId ) );
+export function localAutosaveClear( postId, isPostNew ) {
+	window.sessionStorage.removeItem( postKey( postId, isPostNew ) );
 }
 
 const controls = {
@@ -68,8 +71,8 @@ const controls = {
 		} )
 	),
 	GET_REGISTRY: createRegistryControl( ( registry ) => () => registry ),
-	LOCAL_AUTOSAVE_SET( { postId, title, content, excerpt } ) {
-		localAutosaveSet( postId, title, content, excerpt );
+	LOCAL_AUTOSAVE_SET( { postId, isPostNew, title, content, excerpt } ) {
+		localAutosaveSet( postId, isPostNew, title, content, excerpt );
 	},
 };
 

@@ -52,45 +52,56 @@ import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
 
 const interfaceLabels = {
-	leftSidebar: __( 'Block Library' ),
+	leftSidebar: __( 'Block library' ),
+	/* translators: accessibility text for the editor top bar landmark region. */
+	header: __( 'Editor top bar' ),
+	/* translators: accessibility text for the editor content landmark region. */
+	body: __( 'Editor content' ),
+	/* translators: accessibility text for the editor settings landmark region. */
+	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
+	/* translators: accessibility text for the editor footer landmark region. */
+	footer: __( 'Editor footer' ),
 };
 
 function Layout() {
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		'core/edit-post'
-	);
+	const {
+		openGeneralSidebar,
+		closeGeneralSidebar,
+		setIsInserterOpened,
+	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
 		isFullscreenActive,
 		isRichEditingEnabled,
-		editorSidebarOpened,
-		pluginSidebarOpened,
-		publishSidebarOpened,
+		sidebarIsOpened,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
+		showMostUsedBlocks,
+		isInserterOpened,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
 			),
-			editorSidebarOpened: select(
-				'core/edit-post'
-			).isEditorSidebarOpened(),
-			pluginSidebarOpened: select(
-				'core/edit-post'
-			).isPluginSidebarOpened(),
-			publishSidebarOpened: select(
-				'core/edit-post'
-			).isPublishSidebarOpened(),
+			sidebarIsOpened: !! (
+				select( 'core/interface' ).getActiveComplementaryArea(
+					'core/edit-post'
+				) || select( 'core/edit-post' ).isPublishSidebarOpened()
+			),
 			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
 				'fullscreenMode'
 			),
+			showMostUsedBlocks: select( 'core/edit-post' ).isFeatureActive(
+				'mostUsedBlocks'
+			),
+			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
@@ -105,8 +116,6 @@ function Layout() {
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 		};
 	}, [] );
-	const sidebarIsOpened =
-		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
@@ -120,14 +129,14 @@ function Layout() {
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
 		if ( sidebarIsOpened && ! isHugeViewport ) {
-			setIsInserterOpen( false );
+			setIsInserterOpened( false );
 		}
 	}, [ sidebarIsOpened, isHugeViewport ] );
 	useEffect( () => {
-		if ( isInserterOpen && ! isHugeViewport ) {
+		if ( isInserterOpened && ! isHugeViewport ) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpen, isHugeViewport ] );
+	}, [ isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
 	// Note 'thruthy' callback implies an open panel.
@@ -154,16 +163,13 @@ function Layout() {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
+			<SettingsSidebar />
 			<FocusReturnProvider>
 				<InterfaceSkeleton
 					className={ className }
 					labels={ interfaceLabels }
 					header={
 						<Header
-							isInserterOpen={ isInserterOpen }
-							onToggleInserter={ () =>
-								setIsInserterOpen( ! isInserterOpen )
-							}
 							setEntitiesSavedStatesCallback={
 								setEntitiesSavedStatesCallback
 							}
@@ -171,22 +177,25 @@ function Layout() {
 					}
 					leftSidebar={
 						mode === 'visual' &&
-						isInserterOpen && (
+						isInserterOpened && (
 							<div className="edit-post-layout__inserter-panel">
 								<div className="edit-post-layout__inserter-panel-header">
 									<Button
 										icon={ close }
 										onClick={ () =>
-											setIsInserterOpen( false )
+											setIsInserterOpened( false )
 										}
 									/>
 								</div>
 								<div className="edit-post-layout__inserter-panel-content">
 									<Library
+										showMostUsedBlocks={
+											showMostUsedBlocks
+										}
 										showInserterHelpPanel
 										onSelect={ () => {
 											if ( isMobileViewport ) {
-												setIsInserterOpen( false );
+												setIsInserterOpened( false );
 											}
 										} }
 									/>
@@ -213,7 +222,6 @@ function Layout() {
 										</Button>
 									</div>
 								) }
-								<SettingsSidebar />
 								<ComplementaryArea.Slot scope="core/edit-post" />
 							</>
 						)

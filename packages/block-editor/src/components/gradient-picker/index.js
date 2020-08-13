@@ -33,7 +33,7 @@ function GradientPickerWithGradients( props ) {
 	);
 }
 
-export default function( props ) {
+export default function ( props ) {
 	const ComponentToUse =
 		props.gradients !== undefined &&
 		props.disableCustomGradients !== undefined

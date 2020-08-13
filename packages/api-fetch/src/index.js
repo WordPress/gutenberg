@@ -132,7 +132,7 @@ function apiFetch( options ) {
 		return step( workingOptions, next );
 	};
 
-	return new Promise( function( resolve, reject ) {
+	return new Promise( ( resolve, reject ) => {
 		createRunStep( 0 )( options )
 			.then( resolve )
 			.catch( ( error ) => {
@@ -147,9 +147,7 @@ function apiFetch( options ) {
 					.then( ( data ) => data.text() )
 					.then( ( text ) => {
 						apiFetch.nonceMiddleware.nonce = text;
-						apiFetch( options )
-							.then( resolve )
-							.catch( reject );
+						apiFetch( options ).then( resolve ).catch( reject );
 					} )
 					.catch( reject );
 			} );

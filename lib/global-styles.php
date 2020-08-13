@@ -80,6 +80,13 @@ function gutenberg_experimental_global_styles_get_from_file( $file_path ) {
 			file_get_contents( $file_path ),
 			true
 		);
+
+		$json_decoding_error = json_last_error();
+		if ( JSON_ERROR_NONE !== $json_decoding_error ) {
+			error_log( 'Error when decoding file schema: ' . json_last_error_msg() );
+			return $config;
+		}
+
 		if ( is_array( $decoded_file ) ) {
 			$config = $decoded_file;
 		}
@@ -97,6 +104,13 @@ function gutenberg_experimental_global_styles_get_user() {
 	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish' ) );
 	if ( array_key_exists( 'post_content', $user_cpt ) ) {
 		$decoded_data = json_decode( $user_cpt['post_content'], true );
+
+		$json_decoding_error = json_last_error();
+		if ( JSON_ERROR_NONE !== $json_decoding_error ) {
+			error_log( 'Error when decoding user schema: ' . json_last_error_msg() );
+			return $config;
+		}
+
 		if ( is_array( $decoded_data ) ) {
 			$config = $decoded_data;
 		}
@@ -171,7 +185,7 @@ function gutenberg_experimental_global_styles_get_user_cpt_id() {
  */
 function gutenberg_experimental_global_styles_get_core() {
 	$config = gutenberg_experimental_global_styles_get_from_file(
-		dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json'
+		__DIR__ . '/experimental-default-theme.json'
 	);
 
 	return $config;
@@ -185,34 +199,28 @@ function gutenberg_experimental_global_styles_get_core() {
 function gutenberg_experimental_global_styles_get_theme_presets() {
 	$theme_presets = array();
 
-	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
-	if ( is_array( $theme_colors ) ) {
-		foreach ( $theme_colors as $color ) {
-			$theme_presets['global']['presets']['color'][] = array(
-				'slug'  => $color['slug'],
-				'value' => $color['color'],
-			);
-		}
+	$theme_colors = gutenberg_experimental_get( get_theme_support( 'editor-color-palette' ), array( '0' ) );
+	foreach ( $theme_colors as $color ) {
+		$theme_presets['global']['presets']['color'][] = array(
+			'slug'  => $color['slug'],
+			'value' => $color['color'],
+		);
 	}
 
-	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[0];
-	if ( is_array( $theme_gradients ) ) {
-		foreach ( $theme_gradients as $gradient ) {
-			$theme_presets['global']['presets']['gradient'][] = array(
-				'slug'  => $gradient['slug'],
-				'value' => $gradient['gradient'],
-			);
-		}
+	$theme_gradients = gutenberg_experimental_get( get_theme_support( 'editor-gradient-presets' ), array( '0' ) );
+	foreach ( $theme_gradients as $gradient ) {
+		$theme_presets['global']['presets']['gradient'][] = array(
+			'slug'  => $gradient['slug'],
+			'value' => $gradient['gradient'],
+		);
 	}
 
-	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[0];
-	if ( is_array( $theme_font_sizes ) ) {
-		foreach ( $theme_font_sizes as $font_size ) {
-			$theme_presets['global']['presets']['font-size'][] = array(
-				'slug'  => $font_size['slug'],
-				'value' => $font_size['size'],
-			);
-		}
+	$theme_font_sizes = gutenberg_experimental_get( get_theme_support( 'editor-font-sizes' ), array( '0' ) );
+	foreach ( $theme_font_sizes as $font_size ) {
+		$theme_presets['global']['presets']['font-size'][] = array(
+			'slug'  => $font_size['slug'],
+			'value' => $font_size['size'],
+		);
 	}
 
 	return $theme_presets;
@@ -254,64 +262,145 @@ function gutenberg_experimental_global_styles_get_theme() {
 }
 
 /**
+ * Returns the style features a particular block supports.
+ *
+ * @param array $supports The block supports array.
+ *
+ * @return array Style features supported by the block.
+ */
+function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
+	$style_features = array(
+		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
+		'background-color'         => array( '__experimentalColor' ),
+		'background'               => array( '__experimentalColor', 'gradients' ),
+		'color'                    => array( '__experimentalColor' ),
+		'font-size'                => array( '__experimentalFontSize' ),
+		'line-height'              => array( '__experimentalLineHeight' ),
+	);
+
+	$supported_features = array();
+	foreach ( $style_features as $style_feature => $path ) {
+		if ( gutenberg_experimental_get( $supports, $path ) ) {
+			$supported_features[] = $style_feature;
+		}
+	}
+
+	return $supported_features;
+}
+
+/**
  * Retrieves the block data (selector/supports).
  *
  * @return array
  */
 function gutenberg_experimental_global_styles_get_block_data() {
-	// TODO: this data should be taken from the block registry.
-	//
-	// At the moment this array replicates the current capabilities
-	// declared by blocks via __experimentalLineHeight,
-	// __experimentalColor, and __experimentalFontSize.
-	$block_data = array(
-		'global'          => array(
-			'selector' => ':root',
-			'supports' => array(), // By being blank, the 'global' section won't output any style yet.
-		),
-		'core/paragraph'  => array(
-			'selector' => 'p',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h1' => array(
-			'selector' => 'h1',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h2' => array(
-			'selector' => 'h2',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h3' => array(
-			'selector' => 'h3',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h4' => array(
-			'selector' => 'h4',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h5' => array(
-			'selector' => 'h5',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h6' => array(
-			'selector' => 'h6',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/columns'    => array(
-			'selector' => '.wp-block-columns',
-			'supports' => array( 'color' ),
-		),
-		'core/group'      => array(
-			'selector' => '.wp-block-group',
-			'supports' => array( 'color' ),
-		),
-		'core/media-text' => array(
-			'selector' => '.wp-block-media-text',
-			'supports' => array( 'color' ),
-		),
+	$block_data = array();
+
+	$registry = WP_Block_Type_Registry::get_instance();
+	$blocks   = array_merge(
+		$registry->get_all_registered(),
+		array(
+			'global' => new WP_Block_Type(
+				'global',
+				array(
+					'supports' => array(
+						'__experimentalSelector' => ':root',
+						'__experimentalFontSize' => true,
+						'__experimentalColor'    => array(
+							'linkColor' => true,
+							'gradients' => true,
+						),
+					),
+				)
+			),
+		)
 	);
+	foreach ( $blocks as $block_name => $block_type ) {
+		if ( empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
+			continue;
+		}
+
+		$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
+		if ( empty( $supports ) ) {
+			continue;
+		}
+
+		/*
+		 * Assign the selector for the block.
+		 *
+		 * Some blocks can declare multiple selectors:
+		 *
+		 * - core/heading represents the H1-H6 HTML elements
+		 * - core/list represents the UL and OL HTML elements
+		 * - core/group is meant to represent DIV and other HTML elements
+		 *
+		 * Some other blocks don't provide a selector,
+		 * so we generate a class for them based on their name:
+		 *
+		 * - 'core/group' => '.wp-block-group'
+		 * - 'my-custom-library/block-name' => '.wp-block-my-custom-library-block-name'
+		 *
+		 * Note that, for core blocks, we don't add the `core/` prefix to its class name.
+		 * This is for historical reasons, as they come with a class without that infix.
+		 *
+		 */
+		if (
+			isset( $block_type->supports['__experimentalSelector'] ) &&
+			is_string( $block_type->supports['__experimentalSelector'] )
+		) {
+			$block_data[ $block_name ] = array(
+				'selector' => $block_type->supports['__experimentalSelector'],
+				'supports' => $supports,
+			);
+		} elseif (
+			isset( $block_type->supports['__experimentalSelector'] ) &&
+			is_array( $block_type->supports['__experimentalSelector'] )
+		) {
+			foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector ) {
+				$block_data[ $key ] = array(
+					'selector' => $selector,
+					'supports' => $supports,
+				);
+			}
+		} else {
+			$block_data[ $block_name ] = array(
+				'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
+				'supports' => $supports,
+			);
+		}
+	}
 
 	return $block_data;
+}
+
+/**
+ * Given an array contain the styles shape returns the css for this styles.
+ * A similar function exists on the client at /packages/block-editor/src/hooks/style.js.
+ *
+ * @param array $styles  Array containing the styles shape from global styles.
+ *
+ * @return array Containing a set of css rules.
+ */
+function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
+	$mappings = array(
+		'line-height'              => array( 'typography', 'lineHeight' ),
+		'font-size'                => array( 'typography', 'fontSize' ),
+		'background'               => array( 'color', 'gradient' ),
+		'background-color'         => array( 'color', 'background' ),
+		'color'                    => array( 'color', 'text' ),
+		'--wp--style--color--link' => array( 'color', 'link' ),
+	);
+
+	$result = array();
+
+	foreach ( $mappings as $key => $path ) {
+		$value = gutenberg_experimental_get( $styles, $path, null );
+		if ( null !== $value ) {
+			$result[ $key ] = $value;
+		}
+	}
+	return $result;
+
 }
 
 /**
@@ -352,9 +441,22 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
 		$stylesheet .= gutenberg_experimental_global_styles_resolver_styles(
 			$block_data[ $block_name ]['selector'],
 			$block_data[ $block_name ]['supports'],
-			array_merge( $tree[ $block_name ]['styles'], $css_variables )
+			array_merge(
+				gutenberg_experimental_global_styles_flatten_styles_tree( $tree[ $block_name ]['styles'] ),
+				$css_variables
+			)
 		);
 	}
+
+	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		// To support all themes, we added in the block-library stylesheet
+		// a style rule such as .has-link-color a { color: var(--wp--style--color--link, #00e); }
+		// so that existing link colors themes used didn't break.
+		// We add this here to make it work for themes that opt-in to theme.json
+		// In the future, we may do this differently.
+		$stylesheet .= 'a { color: var(--wp--style--color--link, #00e); }';
+	}
+
 	return $stylesheet;
 }
 
@@ -370,6 +472,7 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
 function gutenberg_experimental_global_styles_resolver_styles( $block_selector, $block_supports, $block_styles ) {
 	$css_rule         = '';
 	$css_declarations = '';
+
 	foreach ( $block_styles as $property => $value ) {
 		// Only convert to CSS:
 		//
@@ -404,11 +507,18 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 	$result = gutenberg_experimental_global_styles_normalize_schema( array() );
 
 	foreach ( array_keys( $core ) as $block_name ) {
-		foreach ( array( 'presets', 'styles', 'features' ) as $subtree ) {
+		foreach ( array( 'presets', 'features' ) as $subtree ) {
 			$result[ $block_name ][ $subtree ] = array_merge(
 				$core[ $block_name ][ $subtree ],
 				$theme[ $block_name ][ $subtree ],
 				$user[ $block_name ][ $subtree ]
+			);
+		}
+		foreach ( array_keys( $core[ $block_name ]['styles'] ) as $subtree ) {
+			$result[ $block_name ]['styles'][ $subtree ] = array_merge(
+				$core[ $block_name ]['styles'][ $subtree ],
+				$theme[ $block_name ]['styles'][ $subtree ],
+				$user[ $block_name ]['styles'][ $subtree ]
 			);
 		}
 	}
@@ -425,7 +535,10 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
  */
 function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 	$block_schema = array(
-		'styles'   => array(),
+		'styles'   => array(
+			'typography' => array(),
+			'color'      => array(),
+		),
 		'features' => array(),
 		'presets'  => array(),
 	);
@@ -445,24 +558,18 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 }
 
 /**
- * Returns the stylesheet resulting of merging
- * core's, theme's, and user's origins.
+ * Takes data from the different origins (core, theme, and user)
+ * and returns the merged result.
  *
- * @return string
+ * @return array Merged trees.
  */
-function gutenberg_experimental_global_styles_get_stylesheet() {
-	$gs_merged = array();
-	$gs_core   = gutenberg_experimental_global_styles_get_core();
-	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
-	$gs_user   = gutenberg_experimental_global_styles_get_user();
+function gutenberg_experimental_global_styles_get_merged_origins() {
+	$core   = gutenberg_experimental_global_styles_get_core();
+	$theme  = gutenberg_experimental_global_styles_get_theme();
+	$user   = gutenberg_experimental_global_styles_get_user();
+	$merged = gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user );
 
-	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
-
-	$stylesheet = gutenberg_experimental_global_styles_resolver( $gs_merged );
-	if ( empty( $stylesheet ) ) {
-		return;
-	}
-	return $stylesheet;
+	return $merged;
 }
 
 /**
@@ -470,15 +577,33 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+	$merged     = gutenberg_experimental_global_styles_get_merged_origins();
+	$stylesheet = gutenberg_experimental_global_styles_resolver( $merged );
+	if ( empty( $stylesheet ) ) {
 		return;
 	}
-
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet();
 
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $stylesheet );
 	wp_enqueue_style( 'global-styles' );
+}
+
+/**
+ * Returns the default config for editor features,
+ * or an empty array if none found.
+ *
+ * @param array $config Config to extract values from.
+ * @return array Default features config for the editor.
+ */
+function gutenberg_experimental_global_styles_get_editor_features( $config ) {
+	if (
+		empty( $config['global']['features'] ) ||
+		! is_array( $config['global']['features'] )
+	) {
+		return array();
+	}
+
+	return $config['global']['features'];
 }
 
 /**
@@ -488,23 +613,26 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		return $settings;
+
+	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
+
+		$global_styles = gutenberg_experimental_global_styles_merge_trees(
+			gutenberg_experimental_global_styles_get_core(),
+			gutenberg_experimental_global_styles_get_theme()
+		);
+
+		$settings['__experimentalGlobalStylesBase'] = $global_styles;
 	}
-
-	$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
-
-	$global_styles = gutenberg_experimental_global_styles_merge_trees(
-		gutenberg_experimental_global_styles_get_core(),
-		gutenberg_experimental_global_styles_get_theme()
-	);
-
-	$settings['__experimentalGlobalStylesBase'] = $global_styles;
 
 	// Add the styles for the editor via the settings
 	// so they get processed as if they were added via add_editor_styles:
 	// they will get the editor wrapper class.
-	$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet() );
+	$merged               = gutenberg_experimental_global_styles_get_merged_origins();
+	$stylesheet           = gutenberg_experimental_global_styles_resolver( $merged );
+	$settings['styles'][] = array( 'css' => $stylesheet );
+
+	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
 
 	return $settings;
 }

@@ -58,6 +58,10 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
+	const title = isWebPlatform
+		? __( 'Color settings' )
+		: __( 'Color Settings' );
+
 	useEffect( () => {
 		if ( isWebPlatform && ! enableContrastChecking ) {
 			return;
@@ -88,7 +92,7 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
 	return (
 		<InspectorControls>
 			<PanelColorGradientSettings
-				title={ __( 'Color settings' ) }
+				title={ title }
 				initialOpen={ false }
 				settings={ settings }
 			>

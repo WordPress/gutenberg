@@ -25,7 +25,7 @@ describe( 'DocumentOutline', () => {
 	let paragraph, headingH1, headingParent, headingChild, nestedHeading;
 	beforeAll( () => {
 		registerBlockType( 'core/heading', {
-			category: 'common',
+			category: 'text',
 			title: 'Heading',
 			edit: () => {},
 			save: () => {},
@@ -41,14 +41,14 @@ describe( 'DocumentOutline', () => {
 		} );
 
 		registerBlockType( 'core/paragraph', {
-			category: 'common',
+			category: 'text',
 			title: 'Paragraph',
 			edit: () => {},
 			save: () => {},
 		} );
 
 		registerBlockType( 'core/columns', {
-			category: 'common',
+			category: 'text',
 			title: 'Paragraph',
 			edit: () => {},
 			save: () => {},

@@ -9,7 +9,7 @@ const { v4: uuid } = require( 'uuid' );
 const path = require( 'path' );
 const os = require( 'os' );
 
-/*
+/**
  * Internal dependencies
  */
 const { log, formats } = require( './logger' );

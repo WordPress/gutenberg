@@ -1,6 +1,6 @@
 {
 	"name": "core/query",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"queryId": {
 			"type": "number"
@@ -20,6 +20,7 @@
 		"query": "query"
 	},
 	"supports": {
-		"html": false
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }

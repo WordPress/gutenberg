@@ -10,6 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -22,6 +23,13 @@ const inserterToggleProps = { isPrimary: true };
 
 function Header( { isCustomizer } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const rootClientId = useSelect( ( select ) => {
+		const { getBlockRootClientId, getBlockSelectionEnd } = select(
+			'core/block-editor'
+		);
+		return getBlockRootClientId( getBlockSelectionEnd() );
+	}, [] );
+
 	return (
 		<>
 			<div className="edit-widgets-header">
@@ -30,22 +38,27 @@ function Header( { isCustomizer } ) {
 						position="bottom right"
 						showInserterHelpPanel
 						toggleProps={ inserterToggleProps }
+						rootClientId={ rootClientId }
 					/>
 					<UndoButton />
 					<RedoButton />
 					<BlockNavigationDropdown />
 				</NavigableMenu>
 				{ ! isCustomizer && (
-					<>
-						<h1 className="edit-widgets-header__title">
-							{ __( 'Block Areas' ) } { __( '(experimental)' ) }
-						</h1>
-						<div className="edit-widgets-header__actions">
-							<SaveButton />
-							<PinnedItems.Slot scope="core/edit-widgets" />
-						</div>
-					</>
+					<h1 className="edit-widgets-header__title">
+						{ __( 'Block Areas' ) } { __( '(experimental)' ) }
+					</h1>
 				) }
+				<div className="edit-widgets-header__actions">
+					{ ! isCustomizer && <SaveButton /> }
+					<PinnedItems.Slot
+						scope={
+							isCustomizer
+								? 'core/edit-widgets-customizer'
+								: 'core/edit-widgets'
+						}
+					/>
+				</div>
 			</div>
 			{ ( ! isLargeViewport || isCustomizer ) && (
 				<div className="edit-widgets-header__block-toolbar">

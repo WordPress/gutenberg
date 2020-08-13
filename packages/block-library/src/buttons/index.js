@@ -23,6 +23,18 @@ export const settings = {
 	),
 	icon,
 	keywords: [ __( 'link' ) ],
+	example: {
+		innerBlocks: [
+			{
+				name: 'core/button',
+				attributes: { text: __( 'Find out more' ) },
+			},
+			{
+				name: 'core/button',
+				attributes: { text: __( 'Contact us' ) },
+			},
+		],
+	},
 	transforms,
 	edit,
 	save,

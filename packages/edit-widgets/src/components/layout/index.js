@@ -3,8 +3,7 @@
  */
 import { Popover } from '@wordpress/components';
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
-import { useViewportMatch } from '@wordpress/compose';
-
+import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
@@ -14,8 +13,11 @@ import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provide
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
 function Layout( { blockEditorSettings } ) {
-	const isMobile = useViewportMatch( 'medium', '<' );
-
+	const hasSidebarEnabled = useSelect( ( select ) => {
+		return !! select( 'core/interface' ).getActiveComplementaryArea(
+			'core/edit-widgets'
+		);
+	} );
 	return (
 		<WidgetAreasBlockEditorProvider
 			blockEditorSettings={ blockEditorSettings }
@@ -23,15 +25,13 @@ function Layout( { blockEditorSettings } ) {
 			<InterfaceSkeleton
 				header={ <Header /> }
 				sidebar={
-					! isMobile && (
-						<>
-							<ComplementaryArea.Slot scope="core/edit-widgets" />
-							<Sidebar />
-						</>
+					hasSidebarEnabled && (
+						<ComplementaryArea.Slot scope="core/edit-widgets" />
 					)
 				}
 				content={ <WidgetAreasBlockEditorContent /> }
 			/>
+			<Sidebar />
 			<Popover.Slot />
 		</WidgetAreasBlockEditorProvider>
 	);

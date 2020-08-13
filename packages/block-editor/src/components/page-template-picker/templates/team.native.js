@@ -226,13 +226,16 @@ const Team = {
 		},
 		{
 			name: 'core/buttons',
+			attributes: {
+				align: 'center',
+			},
 			innerBlocks: [
 				{
 					name: 'core/button',
 					attributes: {
 						url: '',
 						// translators: sample content for "Team" page template
-						text: __( 'Get in Touch!' ),
+						text: __( 'Get in Touch' ),
 						borderRadius: 4,
 						className: 'aligncenter',
 					},

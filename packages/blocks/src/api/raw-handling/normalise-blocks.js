@@ -9,7 +9,7 @@ import { isPhrasingContent } from './phrasing-content';
  */
 const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 
-export default function( HTML ) {
+export default function normaliseBlocks( HTML ) {
 	const decuDoc = document.implementation.createHTMLDocument( '' );
 	const accuDoc = document.implementation.createHTMLDocument( '' );
 

@@ -12,6 +12,7 @@
 	"supports": {
 		"html": false,
 		"inserter": false,
-		"customClassName": false
+		"customClassName": false,
+		"__experimentalToolbar": false
 	}
 }

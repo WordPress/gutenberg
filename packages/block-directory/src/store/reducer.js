@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -11,28 +17,22 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export const downloadableBlocks = (
-	state = {
-		results: {},
-		filterValue: undefined,
-		isRequestingDownloadableBlocks: true,
-	},
-	action
-) => {
+export const downloadableBlocks = ( state = {}, action ) => {
 	switch ( action.type ) {
 		case 'FETCH_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
-				isRequestingDownloadableBlocks: true,
+				[ action.filterValue ]: {
+					isRequesting: true,
+				},
 			};
 		case 'RECEIVE_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
-				results: {
-					...state.results,
-					[ action.filterValue ]: action.downloadableBlocks,
+				[ action.filterValue ]: {
+					results: action.downloadableBlocks,
+					isRequesting: false,
 				},
-				isRequestingDownloadableBlocks: false,
 			};
 	}
 	return state;
@@ -49,7 +49,7 @@ export const downloadableBlocks = (
 export const blockManagement = (
 	state = {
 		installedBlockTypes: [],
-		isInstalling: false,
+		isInstalling: {},
 	},
 	action
 ) => {
@@ -72,27 +72,14 @@ export const blockManagement = (
 		case 'SET_INSTALLING_BLOCK':
 			return {
 				...state,
-				isInstalling: action.isInstalling,
+				isInstalling: {
+					...state.isInstalling,
+					[ action.blockId ]: action.isInstalling,
+				},
 			};
 	}
 	return state;
 };
-
-/**
- * Reducer returning an array of downloadable blocks.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function hasPermission( state = true, action ) {
-	if ( action.type === 'SET_INSTALL_BLOCKS_PERMISSION' ) {
-		return action.hasPermission;
-	}
-
-	return state;
-}
 
 /**
  * Reducer returning an object of error notices.
@@ -102,21 +89,18 @@ export function hasPermission( state = true, action ) {
  *
  * @return {Object} Updated state.
  */
-export const errorNotices = (
-	state = {
-		notices: {},
-	},
-	action
-) => {
+export const errorNotices = ( state = {}, action ) => {
 	switch ( action.type ) {
-		case 'SET_ERROR_NOTICE_ID':
+		case 'SET_ERROR_NOTICE':
 			return {
 				...state,
-				notices: {
-					...state.notices,
-					[ action.blockId ]: action.noticeId,
+				[ action.blockId ]: {
+					message: action.message,
+					isFatal: action.isFatal,
 				},
 			};
+		case 'CLEAR_ERROR_NOTICE':
+			return omit( state, action.blockId );
 	}
 	return state;
 };
@@ -124,6 +108,5 @@ export const errorNotices = (
 export default combineReducers( {
 	downloadableBlocks,
 	blockManagement,
-	hasPermission,
 	errorNotices,
 } );

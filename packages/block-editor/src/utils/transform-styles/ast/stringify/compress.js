@@ -35,7 +35,7 @@ inherits( Compiler, Base );
  * Compile `node`.
  */
 
-Compiler.prototype.compile = function( node ) {
+Compiler.prototype.compile = function ( node ) {
 	return node.stylesheet.rules.map( this.visit, this ).join( '' );
 };
 
@@ -43,7 +43,7 @@ Compiler.prototype.compile = function( node ) {
  * Visit comment node.
  */
 
-Compiler.prototype.comment = function( node ) {
+Compiler.prototype.comment = function ( node ) {
 	return this.emit( '', node.position );
 };
 
@@ -51,7 +51,7 @@ Compiler.prototype.comment = function( node ) {
  * Visit import node.
  */
 
-Compiler.prototype.import = function( node ) {
+Compiler.prototype.import = function ( node ) {
 	return this.emit( '@import ' + node.import + ';', node.position );
 };
 
@@ -59,7 +59,7 @@ Compiler.prototype.import = function( node ) {
  * Visit media node.
  */
 
-Compiler.prototype.media = function( node ) {
+Compiler.prototype.media = function ( node ) {
 	return (
 		this.emit( '@media ' + node.media, node.position ) +
 		this.emit( '{' ) +
@@ -72,7 +72,7 @@ Compiler.prototype.media = function( node ) {
  * Visit document node.
  */
 
-Compiler.prototype.document = function( node ) {
+Compiler.prototype.document = function ( node ) {
 	const doc = '@' + ( node.vendor || '' ) + 'document ' + node.document;
 
 	return (
@@ -87,7 +87,7 @@ Compiler.prototype.document = function( node ) {
  * Visit charset node.
  */
 
-Compiler.prototype.charset = function( node ) {
+Compiler.prototype.charset = function ( node ) {
 	return this.emit( '@charset ' + node.charset + ';', node.position );
 };
 
@@ -95,7 +95,7 @@ Compiler.prototype.charset = function( node ) {
  * Visit namespace node.
  */
 
-Compiler.prototype.namespace = function( node ) {
+Compiler.prototype.namespace = function ( node ) {
 	return this.emit( '@namespace ' + node.namespace + ';', node.position );
 };
 
@@ -103,7 +103,7 @@ Compiler.prototype.namespace = function( node ) {
  * Visit supports node.
  */
 
-Compiler.prototype.supports = function( node ) {
+Compiler.prototype.supports = function ( node ) {
 	return (
 		this.emit( '@supports ' + node.supports, node.position ) +
 		this.emit( '{' ) +
@@ -116,7 +116,7 @@ Compiler.prototype.supports = function( node ) {
  * Visit keyframes node.
  */
 
-Compiler.prototype.keyframes = function( node ) {
+Compiler.prototype.keyframes = function ( node ) {
 	return (
 		this.emit(
 			'@' + ( node.vendor || '' ) + 'keyframes ' + node.name,
@@ -132,7 +132,7 @@ Compiler.prototype.keyframes = function( node ) {
  * Visit keyframe node.
  */
 
-Compiler.prototype.keyframe = function( node ) {
+Compiler.prototype.keyframe = function ( node ) {
 	const decls = node.declarations;
 
 	return (
@@ -147,7 +147,7 @@ Compiler.prototype.keyframe = function( node ) {
  * Visit page node.
  */
 
-Compiler.prototype.page = function( node ) {
+Compiler.prototype.page = function ( node ) {
 	const sel = node.selectors.length ? node.selectors.join( ', ' ) : '';
 
 	return (
@@ -162,7 +162,7 @@ Compiler.prototype.page = function( node ) {
  * Visit font-face node.
  */
 
-Compiler.prototype[ 'font-face' ] = function( node ) {
+Compiler.prototype[ 'font-face' ] = function ( node ) {
 	return (
 		this.emit( '@font-face', node.position ) +
 		this.emit( '{' ) +
@@ -175,7 +175,7 @@ Compiler.prototype[ 'font-face' ] = function( node ) {
  * Visit host node.
  */
 
-Compiler.prototype.host = function( node ) {
+Compiler.prototype.host = function ( node ) {
 	return (
 		this.emit( '@host', node.position ) +
 		this.emit( '{' ) +
@@ -188,7 +188,7 @@ Compiler.prototype.host = function( node ) {
  * Visit custom-media node.
  */
 
-Compiler.prototype[ 'custom-media' ] = function( node ) {
+Compiler.prototype[ 'custom-media' ] = function ( node ) {
 	return this.emit(
 		'@custom-media ' + node.name + ' ' + node.media + ';',
 		node.position
@@ -199,7 +199,7 @@ Compiler.prototype[ 'custom-media' ] = function( node ) {
  * Visit rule node.
  */
 
-Compiler.prototype.rule = function( node ) {
+Compiler.prototype.rule = function ( node ) {
 	const decls = node.declarations;
 	if ( ! decls.length ) {
 		return '';
@@ -217,7 +217,7 @@ Compiler.prototype.rule = function( node ) {
  * Visit declaration node.
  */
 
-Compiler.prototype.declaration = function( node ) {
+Compiler.prototype.declaration = function ( node ) {
 	return (
 		this.emit( node.property + ':' + node.value, node.position ) +
 		this.emit( ';' )

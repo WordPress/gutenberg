@@ -4,11 +4,11 @@
 import items, {
 	categories,
 	collections,
-	textItem,
-	advancedTextItem,
+	paragraphItem,
+	advancedParagraphItem,
 	moreItem,
 	youtubeItem,
-	textEmbedItem,
+	paragraphEmbedItem,
 } from './fixtures';
 import { normalizeSearchTerm, searchBlockItems } from '../search-items';
 
@@ -45,8 +45,12 @@ describe( 'searchBlockItems', () => {
 
 	it( 'should search items using the title ignoring case', () => {
 		expect(
-			searchBlockItems( items, categories, collections, 'TEXT' )
-		).toEqual( [ textItem, advancedTextItem, textEmbedItem ] );
+			searchBlockItems( items, categories, collections, 'paragraph' )
+		).toEqual( [
+			paragraphItem,
+			advancedParagraphItem,
+			paragraphEmbedItem,
+		] );
 	} );
 
 	it( 'should search items using the keywords and partial terms', () => {
@@ -57,7 +61,7 @@ describe( 'searchBlockItems', () => {
 
 	it( 'should search items using the categories', () => {
 		expect(
-			searchBlockItems( items, categories, collections, 'LAYOUT' )
+			searchBlockItems( items, categories, collections, 'DESIGN' )
 		).toEqual( [ moreItem ] );
 	} );
 
@@ -105,6 +109,47 @@ describe( 'searchBlockItems', () => {
 		);
 		expect( filteredItems[ 0 ].variations[ 1 ].title ).toBe(
 			'Variation Three'
+		);
+	} );
+
+	it( 'should search in variation keywords if exist', () => {
+		const filteredItems = searchBlockItems(
+			items,
+			categories,
+			collections,
+			'music'
+		);
+		expect( filteredItems ).toHaveLength( 1 );
+		const [ { title, variations } ] = filteredItems;
+		expect( title ).toBe( 'With Variations' );
+		expect( variations[ 0 ].title ).toBe( 'Variation Three' );
+	} );
+
+	it( 'should search in both blocks/variation keywords if exist', () => {
+		const filteredItems = searchBlockItems(
+			items,
+			categories,
+			collections,
+			'random'
+		);
+		expect( filteredItems ).toHaveLength( 2 );
+		expect( filteredItems ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( { title: 'Paragraph' } ),
+				expect.objectContaining( {
+					title: 'With Variations',
+					variations: [
+						{
+							name: 'variation-three',
+							title: 'Variation Three',
+							keywords: expect.arrayContaining( [
+								'music',
+								'random',
+							] ),
+						},
+					],
+				} ),
+			] )
 		);
 	} );
 } );

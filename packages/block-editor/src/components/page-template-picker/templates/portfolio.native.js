@@ -184,19 +184,22 @@ const Portfolio = {
 			attributes: {
 				align: 'center',
 				// translators: sample content for "Portfolio" page template
-				content: __( "Let's build something together." ),
+				content: __( "Let's build something together!" ),
 				level: 2,
 			},
 		},
 		{
 			name: 'core/buttons',
+			attributes: {
+				align: 'center',
+			},
 			innerBlocks: [
 				{
 					name: 'core/button',
 					attributes: {
 						url: '',
 						// translators: sample content for "Portfolio" page template
-						text: __( 'Get in touch!' ),
+						text: __( 'Get in Touch' ),
 						linkTarget: '',
 						rel: '',
 						className: 'aligncenter',

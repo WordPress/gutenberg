@@ -4,9 +4,14 @@
 import { castArray, get, isEqual, find } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
-import { receiveItems, receiveQueriedItems } from './queried-data';
+import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { select, apiFetch } from './controls';
 
@@ -140,6 +145,58 @@ export function receiveEmbedPreview( url, preview ) {
 }
 
 /**
+ * Action triggered to delete an entity record.
+ *
+ * @param {string}  kind              Kind of the deleted entity.
+ * @param {string}  name              Name of the deleted entity.
+ * @param {string}  recordId          Record ID of the deleted entity.
+ * @param {?Object} query             Special query parameters for the DELETE API call.
+ */
+export function* deleteEntityRecord( kind, name, recordId, query ) {
+	const entities = yield getKindEntities( kind );
+	const entity = find( entities, { kind, name } );
+	let error;
+	let deletedRecord = false;
+	if ( ! entity ) {
+		return;
+	}
+
+	yield {
+		type: 'DELETE_ENTITY_RECORD_START',
+		kind,
+		name,
+		recordId,
+	};
+
+	try {
+		let path = `${ entity.baseURL }/${ recordId }`;
+
+		if ( query ) {
+			path = addQueryArgs( path, query );
+		}
+
+		deletedRecord = yield apiFetch( {
+			path,
+			method: 'DELETE',
+		} );
+
+		yield removeItems( kind, name, recordId, true );
+	} catch ( _error ) {
+		error = _error;
+	}
+
+	yield {
+		type: 'DELETE_ENTITY_RECORD_FINISH',
+		kind,
+		name,
+		recordId,
+		error,
+	};
+
+	return deletedRecord;
+}
+
+/**
  * Returns an action object that triggers an
  * edit to an entity record.
  *
@@ -249,10 +306,11 @@ export function __unstableCreateUndoLevel() {
 /**
  * Action triggered to save an entity record.
  *
- * @param {string} kind    Kind of the received entity.
- * @param {string} name    Name of the received entity.
- * @param {Object} record  Record to be saved.
- * @param {Object} options Saving options.
+ * @param {string}  kind                       Kind of the received entity.
+ * @param {string}  name                       Name of the received entity.
+ * @param {Object}  record                     Record to be saved.
+ * @param {Object}  options                    Saving options.
+ * @param {boolean} [options.isAutosave=false] Whether this is an autosave.
  */
 export function* saveEntityRecord(
 	kind,

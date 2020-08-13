@@ -127,6 +127,7 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 
 	$settings = array(
+		'alignWide'              => get_theme_support( 'align-wide' ),
 		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
 		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 		'imageSizes'             => $available_image_sizes,
@@ -142,44 +143,7 @@ function gutenberg_edit_site_init( $hook ) {
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
-
-	$template_ids      = array();
-	$template_part_ids = array();
-	foreach ( get_template_types() as $template_type ) {
-		// Skip 'embed' for now because it is not a regular template type.
-		// Skip 'index' because it's a fallback that we handle differently.
-		if ( in_array( $template_type, array( 'embed', 'index' ), true ) ) {
-			continue;
-		}
-
-		$current_template = gutenberg_find_template_post_and_parts( $template_type );
-		if ( isset( $current_template ) ) {
-			$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
-			$template_part_ids = $template_part_ids + $current_template['template_part_ids'];
-		}
-	}
-
-	$current_template_id = $template_ids['front-page'];
-
-	$settings['templateId']      = $current_template_id;
-	$settings['homeTemplateId']  = $current_template_id;
-	$settings['templateType']    = 'wp_template';
-	$settings['templateIds']     = array_values( $template_ids );
-	$settings['templatePartIds'] = array_values( $template_part_ids );
-	$settings['styles']          = gutenberg_get_editor_styles();
-
-	$settings['showOnFront'] = get_option( 'show_on_front' );
-	$settings['page']        = array(
-		'path'    => '/',
-		'context' => 'page' === $settings['showOnFront'] ? array(
-			'postType' => 'page',
-			'postId'   => get_option( 'page_on_front' ),
-		) : array(
-			'query' => array(
-				'categoryIds' => array(),
-			),
-		),
-	);
+	$settings['styles'] = gutenberg_get_editor_styles();
 
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.
@@ -189,12 +153,11 @@ function gutenberg_edit_site_init( $hook ) {
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.
 	$preload_paths = array(
-		'/',
+		'/?context=edit',
 		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?per_page=100&context=edit',
-		'/wp/v2/pages?per_page=100&context=edit',
+		'/wp/v2/taxonomies?context=edit',
+		'/wp/v2/pages?context=edit',
 		'/wp/v2/themes?status=active',
-		sprintf( '/wp/v2/templates/%s?context=edit', $current_template_id ),
 		array( '/wp/v2/media', 'OPTIONS' ),
 	);
 	$preload_data  = array_reduce(
@@ -250,3 +213,29 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
+
+/**
+ * Register a core site setting for front page information.
+ */
+function register_site_editor_homepage_settings() {
+	register_setting(
+		'general',
+		'show_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'string',
+			'description'  => __( 'What to show on the front page', 'gutenberg' ),
+		)
+	);
+
+	register_setting(
+		'general',
+		'page_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'number',
+			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
+		)
+	);
+}
+add_action( 'init', 'register_site_editor_homepage_settings', 10 );

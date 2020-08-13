@@ -16,8 +16,8 @@ import { useState, forwardRef } from '@wordpress/element';
 import Backdrop from './backdrop';
 import InputField from './input-field';
 import Label from './label';
-import { Container, Root, Suffix } from './styles/input-control-styles';
-import { isValueEmpty } from './utils';
+import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
+import { isValueEmpty } from '../utils/values';
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( InputControl );
@@ -37,11 +37,13 @@ export function InputControl(
 		isPressEnterToChange = false,
 		isFloatingLabel = false,
 		label,
+		labelPosition = 'top',
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
 		onValidate = noop,
 		onKeyDown = noop,
+		prefix,
 		size = 'default',
 		suffix,
 		value,
@@ -74,8 +76,11 @@ export function InputControl(
 	return (
 		<Root
 			className={ classes }
+			gap={ 3 }
 			isFloatingLabel={ isFloatingLabelSet }
 			isFocused={ isFocused }
+			justify="left"
+			labelPosition={ labelPosition }
 		>
 			<Label
 				className="components-input-control__label"
@@ -92,7 +97,13 @@ export function InputControl(
 				className="components-input-control__container"
 				disabled={ disabled }
 				isFocused={ isFocused }
+				labelPosition={ labelPosition }
 			>
+				{ prefix && (
+					<Prefix className="components-input-control__prefix">
+						{ prefix }
+					</Prefix>
+				) }
 				<InputField
 					{ ...props }
 					className="components-input-control__input"

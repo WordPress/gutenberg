@@ -3,9 +3,12 @@
 /**
  * External dependencies
  */
-import RCTAztecView from 'react-native-aztec';
+/**
+ * WordPress dependencies
+ */
+import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
-import { addMention } from 'react-native-gutenberg-bridge';
+import { addMention } from '@wordpress/react-native-bridge';
 import { get, pickBy } from 'lodash';
 import memize from 'memize';
 
@@ -24,7 +27,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { BACKSPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
 import { Icon, atSymbol } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -37,6 +40,7 @@ import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { insert } from '../insert';
+import { getTextContent } from '../get-text-content';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
@@ -82,8 +86,10 @@ export class RichText extends Component {
 			this
 		);
 		this.onChange = this.onChange.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
+		this.handleMention = this.handleMention.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
@@ -100,8 +106,8 @@ export class RichText extends Component {
 			this
 		);
 		this.valueToFormat = this.valueToFormat.bind( this );
-		this.willTrimSpaces = this.willTrimSpaces.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
+		this.showMention = this.showMention.bind( this );
 		this.insertString = this.insertString.bind( this );
 		this.state = {
 			activeFormats: [],
@@ -199,7 +205,7 @@ export class RichText extends Component {
 	}
 
 	onFormatChange( record ) {
-		const { start, end, activeFormats = [] } = record;
+		const { start = 0, end = 0, activeFormats = [] } = record;
 		const changeHandlers = pickBy( this.props, ( v, key ) =>
 			key.startsWith( 'format_on_change_functions_' )
 		);
@@ -315,7 +321,20 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'content size change';
 	}
 
+	onKeyDown( event ) {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		this.handleDelete( event );
+		this.handleEnter( event );
+		this.handleMention( event );
+	}
+
 	handleEnter( event ) {
+		if ( event.keyCode !== ENTER ) {
+			return;
+		}
 		const { onEnter } = this.props;
 
 		if ( ! onEnter ) {
@@ -331,7 +350,11 @@ export class RichText extends Component {
 	}
 
 	handleDelete( event ) {
-		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
+		const { keyCode } = event;
+
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
+			return;
+		}
 		const isReverse = keyCode === BACKSPACE;
 
 		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
@@ -382,6 +405,35 @@ export class RichText extends Component {
 
 		event.preventDefault();
 		this.lastAztecEventType = 'input';
+	}
+
+	handleMention( event ) {
+		const { keyCode } = event;
+
+		if ( keyCode !== '@'.charCodeAt( 0 ) ) {
+			return;
+		}
+		const record = this.getRecord();
+		const text = getTextContent( record );
+		// Only start the mention UI if the selection is on the start of text or the character before is a space
+		if (
+			text.length === 0 ||
+			record.start === 0 ||
+			text.charAt( record.start - 1 ) === ' '
+		) {
+			this.showMention();
+		} else {
+			this.insertString( record, '@' );
+		}
+	}
+
+	showMention() {
+		const record = this.getRecord();
+		addMention()
+			.then( ( mentionUserId ) => {
+				this.insertString( record, `@${ mentionUserId } ` );
+			} )
+			.catch( () => {} );
 	}
 
 	/**
@@ -674,29 +726,6 @@ export class RichText extends Component {
 		}
 	}
 
-	willTrimSpaces( html ) {
-		const { tagName } = this.props;
-
-		// aztec won't trim spaces in a case of <pre> block, so we are excluding it
-		if ( tagName === 'pre' ) {
-			return false;
-		}
-
-		// regex for detecting spaces around block element html tags
-		const blockHtmlElements =
-			'(div|br|blockquote|ul|ol|li|p|pre|h1|h2|h3|h4|h5|h6|iframe|hr)';
-		const leadingOrTrailingSpaces = new RegExp(
-			`(\\s+)<\/?${ blockHtmlElements }>|<\/?${ blockHtmlElements }>(\\s+)`,
-			'g'
-		);
-		const matches = html.match( leadingOrTrailingSpaces );
-		if ( matches && matches.length > 0 ) {
-			return true;
-		}
-
-		return false;
-	}
-
 	getHtmlToRender( record, tagName ) {
 		// Save back to HTML from React tree
 		let value = this.valueToFormat( record );
@@ -740,7 +769,9 @@ export class RichText extends Component {
 			formatTypes,
 			parentBlockStyles,
 			withoutInteractiveFormatting,
+			accessibilityLabel,
 			capabilities,
+			disableEditingMenu = false,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -769,51 +800,30 @@ export class RichText extends Component {
 
 			// On AztecAndroid, setting the caret to an out-of-bounds position will crash the editor so, let's check for some cases.
 			if ( ! this.isIOS ) {
-				// Aztec performs some html text cleanup while parsing it so, its internal representation gets out-of-sync with the
-				// representation of the format-lib on the RN side. We need to avoid trying to set the caret position because it may
-				// be outside the text bounds and crash Aztec, at least on Android.
-				if ( this.willTrimSpaces( html ) ) {
-					// the html will get trimmed by the cleaning up functions in Aztec and caret position will get out-of-sync.
-					// So, skip forcing it, let Aztec just do its best and just log the fact.
+				// The following regular expression is used in Aztec here:
+				// https://github.com/wordpress-mobile/AztecEditor-Android/blob/b1fad439d56fa6d4aa0b78526fef355c59d00dd3/aztec/src/main/kotlin/org/wordpress/aztec/AztecParser.kt#L656
+				const brBeforeParaMatches = html.match( /(<br>)+<\/p>$/g );
+				if ( brBeforeParaMatches ) {
 					console.warn(
-						'RichText value will be trimmed for spaces! Avoiding setting the caret position manually.'
+						'Oops, BR tag(s) at the end of content. Aztec will remove them, adapting the selection...'
 					);
-					selection = null;
-				} else if (
-					this.props.selectionStart > record.text.length ||
-					this.props.selectionEnd > record.text.length
-				) {
-					console.warn(
-						'Oops, selection will land outside the text, skipping setting it...'
-					);
-					selection = null;
-				} else {
-					// The following regular expression is used in Aztec here:
-					// https://github.com/wordpress-mobile/AztecEditor-Android/blob/b1fad439d56fa6d4aa0b78526fef355c59d00dd3/aztec/src/main/kotlin/org/wordpress/aztec/AztecParser.kt#L656
-					const brBeforeParaMatches = html.match( /(<br>)+<\/p>$/g );
-					if ( brBeforeParaMatches ) {
-						console.warn(
-							'Oops, BR tag(s) at the end of content. Aztec will remove them, adapting the selection...'
-						);
-						const count = (
-							brBeforeParaMatches[ 0 ].match( /br/g ) || []
-						).length;
-						if ( count > 0 ) {
-							let newSelectionStart =
-								this.props.selectionStart - count;
-							if ( newSelectionStart < 0 ) {
-								newSelectionStart = 0;
-							}
-							let newSelectionEnd =
-								this.props.selectionEnd - count;
-							if ( newSelectionEnd < 0 ) {
-								newSelectionEnd = 0;
-							}
-							selection = {
-								start: newSelectionStart,
-								end: newSelectionEnd,
-							};
+					const count = (
+						brBeforeParaMatches[ 0 ].match( /br/g ) || []
+					).length;
+					if ( count > 0 ) {
+						let newSelectionStart =
+							this.props.selectionStart - count;
+						if ( newSelectionStart < 0 ) {
+							newSelectionStart = 0;
 						}
+						let newSelectionEnd = this.props.selectionEnd - count;
+						if ( newSelectionEnd < 0 ) {
+							newSelectionEnd = 0;
+						}
+						selection = {
+							start: newSelectionStart,
+							end: newSelectionEnd,
+						};
 					}
 				}
 			}
@@ -840,6 +850,7 @@ export class RichText extends Component {
 						onFocus: () => {},
 					} ) }
 				<RCTAztecView
+					accessibilityLabel={ accessibilityLabel }
 					ref={ ( ref ) => {
 						this._editor = ref;
 
@@ -859,6 +870,7 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
+						linkTextColor: defaultTextDecorationColor,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
@@ -869,8 +881,13 @@ export class RichText extends Component {
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
-					onEnter={ this.handleEnter }
-					onBackspace={ this.handleDelete }
+					onKeyDown={ this.onKeyDown }
+					triggerKeyCodes={
+						disableEditingMenu === false &&
+						isMentionsSupported( capabilities )
+							? [ '@' ]
+							: []
+					}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
@@ -884,7 +901,6 @@ export class RichText extends Component {
 						( parentBlockStyles && parentBlockStyles.color ) ||
 						defaultColor
 					}
-					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={
@@ -892,7 +908,7 @@ export class RichText extends Component {
 					}
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
-					disableEditingMenu={ this.props.disableEditingMenu }
+					disableEditingMenu={ disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
@@ -912,29 +928,18 @@ export class RichText extends Component {
 							onFocus={ () => {} }
 						/>
 						<BlockFormatControls>
-							{ // eslint-disable-next-line no-undef
-							__DEV__ && isMentionsSupported( capabilities ) && (
-								<Toolbar>
-									<ToolbarButton
-										title={ __( 'Insert mention' ) }
-										icon={ <Icon icon={ atSymbol } /> }
-										onClick={ () => {
-											addMention()
-												.then( ( mentionUserId ) => {
-													let stringToInsert = `@${ mentionUserId }`;
-													if ( this.isIOS ) {
-														stringToInsert += ' ';
-													}
-													this.insertString(
-														record,
-														stringToInsert
-													);
-												} )
-												.catch( () => {} );
-										} }
-									/>
-								</Toolbar>
-							) }
+							{
+								// eslint-disable-next-line no-undef
+								isMentionsSupported( capabilities ) && (
+									<Toolbar>
+										<ToolbarButton
+											title={ __( 'Insert mention' ) }
+											icon={ <Icon icon={ atSymbol } /> }
+											onClick={ this.showMention }
+										/>
+									</Toolbar>
+								)
+							}
 						</BlockFormatControls>
 					</>
 				) }

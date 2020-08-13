@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, has, includes, without } from 'lodash';
+import { get, has, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -94,6 +94,9 @@ export function addAttribute( settings ) {
 			...settings.attributes,
 			align: {
 				type: 'string',
+				// Allow for '' since it is used by updateAlignment function
+				// in withToolbarControls for special cases with defined default values.
+				enum: [ ...ALL_ALIGNMENTS, '' ],
 			},
 		};
 	}
@@ -189,7 +192,7 @@ export const withDataAlign = createHigherOrderComponent(
 		);
 
 		let wrapperProps = props.wrapperProps;
-		if ( includes( validAlignments, align ) ) {
+		if ( validAlignments.includes( align ) ) {
 			wrapperProps = { ...wrapperProps, 'data-align': align };
 		}
 
@@ -210,13 +213,14 @@ export function addAssignedAlign( props, blockType, attributes ) {
 	const { align } = attributes;
 	const blockAlign = getBlockSupport( blockType, 'align' );
 	const hasWideBlockSupport = hasBlockSupport( blockType, 'alignWide', true );
-	const isAlignValid = includes(
-		// Compute valid alignments without taking into account,
-		// if the theme supports wide alignments or not.
-		// This way changing themes does not impacts the block save.
-		getValidAlignments( blockAlign, hasWideBlockSupport ),
-		align
-	);
+
+	// Compute valid alignments without taking into account if
+	// the theme supports wide alignments or not.
+	// This way changing themes does not impact the block save.
+	const isAlignValid = getValidAlignments(
+		blockAlign,
+		hasWideBlockSupport
+	).includes( align );
 	if ( isAlignValid ) {
 		props.className = classnames( `align${ align }`, props.className );
 	}

@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Button from '../button';
 import ButtonGroup from '../button-group';
+import TimeZone from './timezone';
 
 /**
  * Module Constants
@@ -31,7 +32,7 @@ class TimePicker extends Component {
 			year: '',
 			hours: '',
 			minutes: '',
-			am: true,
+			am: '',
 			date: null,
 		};
 		this.changeDate = this.changeDate.bind( this );
@@ -72,7 +73,9 @@ class TimePicker extends Component {
 	changeDate( newDate ) {
 		const dateWithStartOfMinutes = newDate.clone().startOf( 'minute' );
 		this.setState( { date: dateWithStartOfMinutes } );
-		this.props.onChange( newDate.format( TIMEZONELESS_FORMAT ) );
+		this.props.onChange(
+			dateWithStartOfMinutes.format( TIMEZONELESS_FORMAT )
+		);
 	}
 
 	getMaxHours() {
@@ -89,7 +92,7 @@ class TimePicker extends Component {
 		const month = selected.format( 'MM' );
 		const year = selected.format( 'YYYY' );
 		const minutes = selected.format( 'mm' );
-		const am = selected.format( 'A' );
+		const am = selected.format( 'H' ) <= 11 ? 'AM' : 'PM';
 		const hours = selected.format( is12Hour ? 'hh' : 'HH' );
 		const date = currentTime ? moment( currentTime ) : moment();
 		this.setState( { day, month, year, minutes, hours, am, date } );
@@ -277,6 +280,7 @@ class TimePicker extends Component {
 	render() {
 		const { is12Hour } = this.props;
 		const { year, minutes, hours, am } = this.state;
+
 		return (
 			<div className={ classnames( 'components-datetime__time' ) }>
 				<fieldset>
@@ -353,6 +357,8 @@ class TimePicker extends Component {
 								</Button>
 							</ButtonGroup>
 						) }
+
+						<TimeZone />
 					</div>
 				</fieldset>
 			</div>
