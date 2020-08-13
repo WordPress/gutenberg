@@ -29,28 +29,30 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
  * @return {Array} Normalized inserter items.
  */
 export function includeVariationsInInserterItems( items, limit = Infinity ) {
-	if ( items.length >= limit ) {
-		// No need to iterate for variations
-		return items.slice( 0, limit );
+	// Exclude any block type item that is to be replaced by a default
+	// variation.
+	const filteredItems = items.filter(
+		( { variations = [] } ) =>
+			! variations.some( ( { isDefault } ) => isDefault )
+	);
+
+	// Fill `variationsToAdd` until there are as many items in total as
+	// `limit`.
+	const variationsToAdd = [];
+	if ( filteredItems.length < limit ) {
+		// Show all available blocks with variations
+		for ( const item of items ) {
+			if ( filteredItems.length + variationsToAdd.length >= limit ) {
+				break;
+			}
+
+			const { variations = [] } = item;
+			if ( variations.length ) {
+				const variationMapper = getItemFromVariation( item );
+				variationsToAdd.push( ...variations.map( variationMapper ) );
+			}
+		}
 	}
-	// Show all available blocks with variations
-	return items.reduce( ( result, item ) => {
-		const { variations = [] } = item;
-		const hasDefaultVariation = variations.some(
-			( { isDefault } ) => isDefault
-		);
 
-		// If there is no default inserter variation provided,
-		// then default block type is displayed.
-		if ( ! hasDefaultVariation ) {
-			result.push( item );
-		}
-
-		if ( variations.length ) {
-			const variationMapper = getItemFromVariation( item );
-			result.push( ...variations.map( variationMapper ) );
-		}
-
-		return result;
-	}, [] );
+	return [ ...filteredItems, ...variationsToAdd ].slice( 0, limit );
 }

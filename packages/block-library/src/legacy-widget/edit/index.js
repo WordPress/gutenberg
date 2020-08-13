@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,6 +45,7 @@ class LegacyWidgetEdit extends Component {
 		const widgetObject =
 			( id && availableLegacyWidgets[ id ] ) ||
 			( widgetClass && availableLegacyWidgets[ widgetClass ] );
+
 		if ( ! id && ! widgetClass ) {
 			return (
 				<LegacyWidgetPlaceholder
@@ -53,12 +54,14 @@ class LegacyWidgetEdit extends Component {
 						hasPermissionsToManageWidgets
 					}
 					onChangeWidget={ ( newWidget ) => {
-						const { isReferenceWidget } = availableLegacyWidgets[
-							newWidget
-						];
+						const {
+							isReferenceWidget,
+							id_base: idBase,
+						} = availableLegacyWidgets[ newWidget ];
 						setAttributes( {
 							instance: {},
 							id: isReferenceWidget ? newWidget : undefined,
+							idBase,
 							widgetClass: isReferenceWidget
 								? undefined
 								: newWidget,
@@ -171,7 +174,7 @@ class LegacyWidgetEdit extends Component {
 			<ServerSideRender
 				className="wp-block-legacy-widget__preview"
 				block="core/legacy-widget"
-				attributes={ attributes }
+				attributes={ omit( attributes, 'id' ) }
 			/>
 		);
 	}
