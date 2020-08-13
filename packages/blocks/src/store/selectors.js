@@ -95,21 +95,6 @@ export function getBlockVariations( state, blockName, scope ) {
 }
 
 /**
- * Returns block variations by block name.
- *
- * @param {Object}                state          Data state.
- * @param {string}                blockVariation Block type variation.
- * @param {string}                blockName      Block type name.
- * @param {WPBlockVariationScope} [scope]        Block variation scope name.
- *
- * @return {(WPBlockVariation[]|void)} Block variations.
- */
-export function hasBlockVariation( state, blockVariation, blockName, scope ) {
-	const variations = getBlockVariations( state, blockName, scope );
-	return variations.some( ( { name } ) => name === blockVariation );
-}
-
-/**
  * Returns the default block variation for the given block type.
  * When there are multiple variations annotated as the default one,
  * the last added item is picked. This simplifies registering overrides.
