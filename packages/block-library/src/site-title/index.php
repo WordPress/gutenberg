@@ -14,7 +14,7 @@
  */
 function render_block_core_site_title( $attributes ) {
 	$tag_name         = 'h1';
-	$align_class_name = empty( $attributes['textAlign'] ) ? '' : ' ' . "has-text-align-{$attributes['textAlign']}";
+	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
@@ -23,7 +23,7 @@ function render_block_core_site_title( $attributes ) {
 	return sprintf(
 		'<%1$s class="%2$s">%3$s</%1$s>',
 		$tag_name,
-		'wp-block-site-title' . esc_attr( $align_class_name ),
+		esc_attr( $align_class_name ),
 		get_bloginfo( 'name' )
 	);
 }

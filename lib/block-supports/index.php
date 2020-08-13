@@ -42,6 +42,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	}
 
 	$attributes = array();
+	$attributes = gutenberg_apply_generated_classname_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_colors_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_alignment_support( $attributes, $block['attrs'], $block_type );

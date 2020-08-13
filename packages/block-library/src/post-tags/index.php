@@ -20,9 +20,9 @@ function render_block_core_post_tags( $attributes, $content, $block ) {
 
 	$post_tags = get_the_tags( $block->context['postId'] );
 	if ( ! empty( $post_tags ) ) {
-		$classes = 'wp-block-post-tags';
+		$classes = '';
 		if ( isset( $attributes['textAlign'] ) ) {
-			$classes .= ' has-text-align-' . $attributes['textAlign'];
+			$classes .= 'has-text-align-' . $attributes['textAlign'];
 		}
 
 		$output = sprintf( '<div class="%1$s">', esc_attr( $classes ) );
