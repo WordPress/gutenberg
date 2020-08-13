@@ -31,7 +31,7 @@ export default function BlockTitle( { clientId } ) {
 	const { attributes, name } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return null;
+				return {};
 			}
 			const { getBlockName, getBlockAttributes } = select(
 				'core/block-editor'
