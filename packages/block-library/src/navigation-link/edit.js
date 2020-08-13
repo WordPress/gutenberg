@@ -44,6 +44,45 @@ import { link as linkIcon } from '@wordpress/icons';
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
 
+const useIsDraggingWithin = ( elementRef ) => {
+	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
+
+	useEffect( () => {
+		function handleDragStart( event ) {
+			// Check the first time when the dragging starts
+			handleDragEnter( event );
+		}
+
+		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
+		function handleDragEnd() {
+			setIsDraggingWithin( false );
+		}
+
+		function handleDragEnter( event ) {
+			// Check if the current target is inside the item element
+			if ( elementRef.current.contains( event.target ) ) {
+				setIsDraggingWithin( true );
+			} else {
+				setIsDraggingWithin( false );
+			}
+		}
+
+		// Bind these events to the document to catch all drag events.
+		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
+		document.addEventListener( 'dragstart', handleDragStart );
+		document.addEventListener( 'dragend', handleDragEnd );
+		document.addEventListener( 'dragenter', handleDragEnter );
+
+		return () => {
+			document.removeEventListener( 'dragstart', handleDragStart );
+			document.removeEventListener( 'dragend', handleDragEnd );
+			document.removeEventListener( 'dragenter', handleDragEnter );
+		};
+	}, [] );
+
+	return isDraggingWithin;
+};
+
 function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
@@ -70,8 +109,8 @@ function NavigationLinkEdit( {
 	};
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	const [ isDragEnter, setIsDragEnter ] = useState( false );
 	const listItemRef = useRef( null );
+	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
@@ -116,39 +155,6 @@ function NavigationLinkEdit( {
 			}
 		}
 	}, [ url ] );
-
-	useEffect( () => {
-		function handleDragStart( e ) {
-			// Check the first time when the dragging starts
-			handleDragEnter( e );
-		}
-
-		// Set isDragEnter to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
-		function handleDragEnd() {
-			setIsDragEnter( false );
-		}
-
-		function handleDragEnter( e ) {
-			// Check if the current target is inside the item element
-			if ( listItemRef.current.contains( e.target ) ) {
-				setIsDragEnter( true );
-			} else {
-				setIsDragEnter( false );
-			}
-		}
-
-		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
-		document.addEventListener( 'dragstart', handleDragStart );
-		document.addEventListener( 'dragend', handleDragEnd );
-		document.addEventListener( 'dragenter', handleDragEnter );
-
-		return () => {
-			document.removeEventListener( 'dragstart', handleDragStart );
-			document.removeEventListener( 'dragend', handleDragEnd );
-			document.removeEventListener( 'dragenter', handleDragEnter );
-		};
-	}, [] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -234,7 +240,7 @@ function NavigationLinkEdit( {
 						! isDraggingBlocks,
 					// Don't select the element while dragging
 					'is-selected': isSelected && ! isDraggingBlocks,
-					'is-drag-enter': isDragEnter,
+					'is-dragging-within': isDraggingWithin,
 					'has-link': !! url,
 					'has-child': hasDescendants,
 					'has-text-color': rgbTextColor,

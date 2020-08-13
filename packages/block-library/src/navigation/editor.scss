@@ -49,7 +49,7 @@ $navigation-item-height: 46px;
 	&.is-selected,
 	&.has-child-selected,
 	// Show the submenu list when is dragging and drag enter the list item
-	body.is-dragging-components-draggable &.is-drag-enter {
+	body.is-dragging-components-draggable &.is-dragging-within {
 		> .wp-block-navigation__container {
 			opacity: 1;
 			visibility: visible;
