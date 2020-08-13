@@ -50,13 +50,11 @@
 		"showSubmenuIcon": "showSubmenuIcon"
 	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
-		"lightBlockWrapper": true
+		"lightBlockWrapper": true,
+		"__experimentalFontSize": true
 	}
 }
