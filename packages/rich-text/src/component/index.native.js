@@ -263,7 +263,12 @@ export class RichText extends Component {
 				result = this.removeTag( element, result );
 			} );
 		}
-		return result;
+
+		const multilineResult = this.getHtmlForRecordCreation(
+			result,
+			this.multilineTag
+		);
+		return multilineResult;
 	}
 
 	removeRootTag( tag, html ) {
