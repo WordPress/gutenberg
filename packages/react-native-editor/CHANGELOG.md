@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+# 1.35.0
+
+* [**] Add settings to allow changing column widths
+
 ## 1.34.0
 
 * [***] Media editing support in Cover block.

@@ -70,6 +70,7 @@ describe( 'new editor state', () => {
 		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
 		// Reload the browser so a post is loaded with a title.
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		const activeElementClasses = await page.evaluate( () => {
 			return Object.values( document.activeElement.classList );
