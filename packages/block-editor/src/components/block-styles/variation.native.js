@@ -7,12 +7,14 @@ import {
 	Text,
 	Dimensions,
 	Image,
+	Animated,
+	Easing,
 } from 'react-native';
 /**
  * WordPress dependencies
  */
 import { BottomSheet } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -25,12 +27,12 @@ const MAX_ITEM_WIDTH = 120;
 function StyleVariation( { onPress, isActive, style, url } ) {
 	const [ itemWidth, setItemWidth ] = useState( MAX_ITEM_WIDTH );
 	const { label, name } = style;
+	const opacity = useRef( new Animated.Value( 1 ) ).current;
 
 	function onLayout() {
-		const columnsNum = Math.floor(
-			BottomSheet.getWidth() / MAX_ITEM_WIDTH
-		);
-		setItemWidth( BottomSheet.getWidth() / ( columnsNum + 0.5 ) );
+		const columnsNum =
+			Math.floor( BottomSheet.getWidth() / MAX_ITEM_WIDTH ) + 0.5;
+		setItemWidth( BottomSheet.getWidth() / columnsNum );
 	}
 
 	useEffect( () => {
@@ -47,12 +49,33 @@ function StyleVariation( { onPress, isActive, style, url } ) {
 		styles.labelDark
 	);
 
+	const animateOutline = () => {
+		opacity.setValue( 0 );
+		Animated.timing( opacity, {
+			toValue: 1,
+			duration: 100,
+			useNativeDriver: true,
+			easing: Easing.linear,
+		} ).start();
+	};
+
 	return (
-		<TouchableWithoutFeedback onPress={ onPress }>
+		<TouchableWithoutFeedback
+			onPress={ () => {
+				onPress();
+				animateOutline();
+			} }
+		>
 			<View style={ styles.container }>
 				<View style={ [ styles.imageWrapper, { width: itemWidth } ] }>
 					{ isActive && (
-						<View style={ [ styles.outline, styles[ name ] ] } />
+						<Animated.View
+							style={ [
+								styles.outline,
+								{ opacity },
+								styles[ name ],
+							] }
+						/>
 					) }
 					<Image
 						style={ [ styles.image, styles[ name ] ] }
