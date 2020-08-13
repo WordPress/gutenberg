@@ -7,7 +7,7 @@ import { NavigationContainer } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
-import { useState, useContext, useMemo } from '@wordpress/element';
+import { useState, useContext, useMemo, Children } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -69,6 +69,20 @@ function BottomSheetNavigationContainer( {
 			}
 		}
 	};
+
+	const screens = useMemo( () => {
+		return Children.map( children, ( child ) => {
+			const { name, ...otherProps } = child.props;
+			return (
+				<stack.Screen
+					name={ name }
+					{ ...otherProps }
+					children={ () => child }
+				/>
+			);
+		} );
+	}, [ children ] );
+
 	return useMemo( () => {
 		return (
 			<View style={ { height: currentHeight } }>
@@ -78,12 +92,12 @@ function BottomSheetNavigationContainer( {
 					{ main ? (
 						<NavigationContainer theme={ theme }>
 							<stack.Navigator screenOptions={ options }>
-								{ children }
+								{ screens }
 							</stack.Navigator>
 						</NavigationContainer>
 					) : (
 						<stack.Navigator screenOptions={ options }>
-							{ children }
+							{ screens }
 						</stack.Navigator>
 					) }
 				</BottomSheetNavigationProvider>

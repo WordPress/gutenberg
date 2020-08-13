@@ -54,16 +54,16 @@ function BottomSheetSettings( {
 				theme={ MyTheme }
 				stack={ Stack }
 			>
-				{ BottomSheet.NavigationScreen( {
-					name: blockSettingsScreens.settings,
-					stack: Stack,
-					children: <InspectorControls.Slot />,
-				} ) }
-				{ BottomSheet.NavigationScreen( {
-					name: blockSettingsScreens.color,
-					stack: Stack,
-					children: <ColorSettings defaultSettings={ settings } />,
-				} ) }
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.settings }
+				>
+					<InspectorControls.Slot />
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.color }
+				>
+					<ColorSettings defaultSettings={ settings } />
+				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);

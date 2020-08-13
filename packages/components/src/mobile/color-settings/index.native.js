@@ -39,29 +39,29 @@ const ColorSettingsMemo = React.memo(
 		}, [] );
 		return (
 			<BottomSheet.NavigationContainer stack={ Stack }>
-				{ BottomSheet.NavigationScreen( {
-					name: colorsUtils.screens.palette,
-					stack: Stack,
-					initialParams: {
+				<BottomSheet.NavigationScreen
+					name={ colorsUtils.screens.palette }
+					initialParams={ {
 						defaultSettings,
 						onColorChange,
 						colorValue,
 						gradientValue,
 						onGradientChange,
 						label,
-					},
-					children: <PaletteScreen />,
-				} ) }
-				{ BottomSheet.NavigationScreen( {
-					name: colorsUtils.screens.picker,
-					stack: Stack,
-					children: <PickerScreen />,
-				} ) }
-				{ BottomSheet.NavigationScreen( {
-					name: colorsUtils.screens.gradientPicker,
-					stack: Stack,
-					children: <GradientPickerScreen />,
-				} ) }
+					} }
+				>
+					<PaletteScreen />
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ colorsUtils.screens.picker }
+				>
+					<PickerScreen />
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ colorsUtils.screens.gradientPicker }
+				>
+					<GradientPickerScreen />
+				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		);
 	}

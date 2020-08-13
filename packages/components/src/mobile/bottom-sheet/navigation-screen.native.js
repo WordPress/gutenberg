@@ -64,17 +64,4 @@ const BottomSheetScreen = ( { children } ) => {
 	}, [ children, isFocused ] );
 };
 
-const OuterBottomSheetScreen = ( { name, stack, children, ...otherProps } ) => {
-	const ScreenView = useRef( () => (
-		<BottomSheetScreen>{ children }</BottomSheetScreen>
-	) );
-	return (
-		<stack.Screen
-			name={ name }
-			component={ ScreenView.current }
-			{ ...otherProps }
-		/>
-	);
-};
-
-export default OuterBottomSheetScreen;
+export default BottomSheetScreen;
