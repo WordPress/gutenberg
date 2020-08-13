@@ -14,15 +14,19 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { createBlock, getBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	getBlockType,
+	getBlockVariations,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import variations from './variations';
 import metadata from './block.json';
 
 const { name: DEFAULT_EMBED_BLOCK } = metadata;
+const variations = getBlockVariations( DEFAULT_EMBED_BLOCK );
 const WP_VARIATION = variations.find( ( { name } ) => name === 'wordpress' );
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -98,7 +102,8 @@ export const createUpgradedEmbedBlock = (
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
 	const isCurrentBlockWP =
-		providerNameSlug === WP_VARIATION.attributes.providerNameSlug ||
+		( WP_VARIATION &&
+			providerNameSlug === WP_VARIATION.attributes.providerNameSlug ) ||
 		type === WP_EMBED_TYPE;
 	// if current block is not WordPress and a more suitable block found
 	// that is different from the current one, create the new matched block
@@ -121,7 +126,7 @@ export const createUpgradedEmbedBlock = (
 	// This is not the WordPress embed block so transform it into one.
 	return createBlock( DEFAULT_EMBED_BLOCK, {
 		url,
-		...WP_VARIATION.attributes,
+		...WP_VARIATION?.attributes,
 		// By now we have the preview, but when the new block first renders, it
 		// won't have had all the attributes set, and so won't get the correct
 		// type and it won't render correctly. So, we pass through the current attributes
