@@ -122,6 +122,7 @@ class LatestPostsEdit extends Component {
 			featuredImageSizeSlug,
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
+			addLinkToFeaturedImage,
 		} = attributes;
 		const categorySuggestions = categoriesList.reduce(
 			( accumulator, category ) => ( {
@@ -264,6 +265,15 @@ class LatestPostsEdit extends Component {
 									isCollapsed={ false }
 								/>
 							</BaseControl>
+							<ToggleControl
+								label={ __( 'Add link to featured image' ) }
+								checked={ addLinkToFeaturedImage }
+								onChange={ ( value ) =>
+									setAttributes( {
+										addLinkToFeaturedImage: value,
+									} )
+								}
+							/>
 						</>
 					) }
 				</PanelBody>
@@ -391,11 +401,22 @@ class LatestPostsEdit extends Component {
 							'';
 
 						const imageSourceUrl = post.featuredImageSourceUrl;
-
 						const imageClasses = classnames( {
 							'wp-block-latest-posts__featured-image': true,
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
 						} );
+						const showFeaturedImage =
+							displayFeaturedImage && imageSourceUrl;
+						const featuredImage = showFeaturedImage && (
+							<img
+								src={ imageSourceUrl }
+								alt=""
+								style={ {
+									maxWidth: featuredImageSizeWidth,
+									maxHeight: featuredImageSizeHeight,
+								} }
+							/>
+						);
 
 						const needsReadMore =
 							excerptLength <
@@ -424,17 +445,18 @@ class LatestPostsEdit extends Component {
 
 						return (
 							<li key={ i }>
-								{ displayFeaturedImage && (
+								{ showFeaturedImage && (
 									<div className={ imageClasses }>
-										{ imageSourceUrl && (
-											<img
-												src={ imageSourceUrl }
-												alt=""
-												style={ {
-													maxWidth: featuredImageSizeWidth,
-													maxHeight: featuredImageSizeHeight,
-												} }
-											/>
+										{ addLinkToFeaturedImage ? (
+											<a
+												href={ post.link }
+												target="_blank"
+												rel="noreferrer noopener"
+											>
+												{ featuredImage }
+											</a>
+										) : (
+											featuredImage
 										) }
 									</div>
 								) }

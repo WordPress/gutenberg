@@ -58,7 +58,7 @@ function render_block_core_latest_posts( $attributes ) {
 	$list_items_markup = '';
 
 	foreach ( $recent_posts as $post ) {
-
+		$post_link = esc_url( get_permalink( $post ) );
 		$list_items_markup .= '<li>';
 
 		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
@@ -75,16 +75,25 @@ function render_block_core_latest_posts( $attributes ) {
 				$image_classes .= ' align' . $attributes['featuredImageAlign'];
 			}
 
+			$featured_image = get_the_post_thumbnail(
+				$post,
+				$attributes['featuredImageSizeSlug'],
+				array(
+					'style' => $image_style,
+				)
+			);
+			$addLinkToFeaturedImage = $attributes['addLinkToFeaturedImage'];
+			if ( $addLinkToFeaturedImage ) {
+				$featured_image = sprintf(
+					'<a href="%1$s">%2$s</a>',
+					$post_link,
+					$featured_image
+				);
+			}
 			$list_items_markup .= sprintf(
 				'<div class="%1$s">%2$s</div>',
 				$image_classes,
-				get_the_post_thumbnail(
-					$post,
-					$attributes['featuredImageSizeSlug'],
-					array(
-						'style' => $image_style,
-					)
-				)
+				$featured_image
 			);
 		}
 
@@ -94,7 +103,7 @@ function render_block_core_latest_posts( $attributes ) {
 		}
 		$list_items_markup .= sprintf(
 			'<a href="%1$s">%2$s</a>',
-			esc_url( get_permalink( $post ) ),
+			$post_link,
 			$title
 		);
 

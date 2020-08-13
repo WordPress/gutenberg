@@ -17,7 +17,8 @@
             "displayFeaturedImage": false,
             "featuredImageSizeSlug": "thumbnail",
             "featuredImageSizeWidth": null,
-            "featuredImageSizeHeight": null
+			"featuredImageSizeHeight": null,
+			"addLinkToFeaturedImage": false
         },
         "innerBlocks": [],
         "originalContent": ""

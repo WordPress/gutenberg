@@ -47,6 +47,9 @@
 }
 
 .wp-block-latest-posts__featured-image {
+	a {
+		display: inline-block;
+	}
 	img {
 		height: auto;
 		width: auto;
