@@ -1,30 +1,33 @@
+$outline-space: 3px;
+$image-height: 64px;
+
 .image {
-	height: 58px;
-	margin-left: 3px;
-	margin-right: 3px;
-	margin-top: 3px;
-	margin-bottom: 3px;
+	height: $image-height - 2 * $outline-space;
+	margin-left: $outline-space;
+	margin-right: $outline-space;
+	margin-top: $outline-space;
+	margin-bottom: $outline-space;
 }
 
 .container {
 	padding-right: $grid-unit;
 	padding-bottom: $grid-unit;
-	align-items: center;
 }
 
 .imageWrapper {
-	height: 64px;
-	justify-content: center;
+	height: $image-height;
+	width: 100%;
 }
 
 .rounded {
-	border-radius: 32px;
+	border-radius: $image-height / 2;
 	overflow: hidden;
 }
 
 .label {
 	color: $gray-dark;
 	padding-top: $grid-unit;
+	text-align: center;
 }
 
 .labelDark {
@@ -32,7 +35,7 @@
 }
 
 .outline {
-	height: 64px;
+	height: $image-height;
 	border-color: $blue-wordpress;
 	border-width: 1px;
 	position: absolute;

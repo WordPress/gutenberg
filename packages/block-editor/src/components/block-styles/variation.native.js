@@ -6,9 +6,9 @@ import {
 	TouchableWithoutFeedback,
 	Text,
 	Dimensions,
-	Image,
 	Animated,
 	Easing,
+	Image,
 } from 'react-native';
 /**
  * WordPress dependencies
@@ -66,8 +66,8 @@ function StyleVariation( { onPress, isActive, style, url } ) {
 				animateOutline();
 			} }
 		>
-			<View style={ styles.container }>
-				<View style={ [ styles.imageWrapper, { width: itemWidth } ] }>
+			<View style={ [ styles.container, { width: itemWidth } ] }>
+				<View style={ styles.imageWrapper }>
 					{ isActive && (
 						<Animated.View
 							style={ [
