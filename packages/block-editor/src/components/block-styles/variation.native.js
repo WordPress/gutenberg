@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback, Text, Dimensions } from 'react-native';
+import {
+	View,
+	TouchableWithoutFeedback,
+	Text,
+	Dimensions,
+	Image,
+} from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -16,13 +22,15 @@ import styles from './style.scss';
 
 const MAX_ITEM_WIDTH = 120;
 
-function StyleVariation( { onPress, isActive, style } ) {
+function StyleVariation( { onPress, isActive, style, url } ) {
 	const [ itemWidth, setItemWidth ] = useState( MAX_ITEM_WIDTH );
 	const { label, name } = style;
 
 	function onLayout() {
-		const columnsNum = BottomSheet.getWidth() / MAX_ITEM_WIDTH;
-		setItemWidth( `${ 100 / columnsNum }%` );
+		const columnsNum = Math.floor(
+			BottomSheet.getWidth() / MAX_ITEM_WIDTH
+		);
+		setItemWidth( BottomSheet.getWidth() / ( columnsNum + 0.5 ) );
 	}
 
 	useEffect( () => {
@@ -39,31 +47,18 @@ function StyleVariation( { onPress, isActive, style } ) {
 		styles.labelDark
 	);
 
-	const placeholderStyle = usePreferredColorSchemeStyle(
-		styles.placeholder,
-		styles.placeholderDark
-	);
-
-	const activeStyle = usePreferredColorSchemeStyle(
-		styles.active,
-		styles.activeDark
-	);
-
 	return (
 		<TouchableWithoutFeedback onPress={ onPress }>
-			<View
-				style={ [
-					styles.container,
-					{ flexGrow: 1, width: itemWidth, maxWidth: MAX_ITEM_WIDTH },
-				] }
-			>
-				<View
-					style={ [
-						placeholderStyle,
-						isActive && activeStyle,
-						styles[ name ],
-					] }
-				/>
+			<View style={ styles.container }>
+				<View style={ [ styles.imageWrapper, { width: itemWidth } ] }>
+					{ isActive && (
+						<View style={ [ styles.outline, styles[ name ] ] } />
+					) }
+					<Image
+						style={ [ styles.image, styles[ name ] ] }
+						source={ { uri: url } }
+					/>
+				</View>
 				<Text style={ labelStyle }>{ label }</Text>
 			</View>
 		</TouchableWithoutFeedback>

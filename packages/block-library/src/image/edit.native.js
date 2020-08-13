@@ -368,7 +368,13 @@ export class ImageEdit extends React.Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) }>
+				<PanelBody title={ __( 'Image settings' ) } />
+				<PanelBody style={ styles.panelBody }>
+					{ image && (
+						<BlockStyles clientId={ clientId } url={ url } />
+					) }
+				</PanelBody>
+				<PanelBody>
 					<TextControl
 						icon={ link }
 						label={ __( 'Link To' ) }
@@ -403,9 +409,6 @@ export class ImageEdit extends React.Component {
 						valuePlaceholder={ __( 'None' ) }
 						onChangeValue={ this.updateAlt }
 					/>
-				</PanelBody>
-				<PanelBody title={ __( 'Style' ) }>
-					{ image && <BlockStyles clientId={ clientId } /> }
 				</PanelBody>
 			</InspectorControls>
 		);

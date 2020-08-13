@@ -1,38 +1,42 @@
-.placeholder {
-	height: 40px;
-	margin-bottom: $grid-unit;
-	background-color: $light-quaternary;
-	width: 100%;
-}
-
-.placeholderDark {
-	background-color: $dark-quaternary;
+.image {
+	height: 58px;
+	margin-left: 3px;
+	margin-right: 3px;
+	margin-top: 3px;
+	margin-bottom: 3px;
 }
 
 .container {
-	padding-left: $grid-unit-20 / 2;
-	padding-right: $grid-unit-20 / 2;
+	padding-right: $grid-unit;
+	padding-bottom: $grid-unit;
 	align-items: center;
 }
 
+.imageWrapper {
+	height: 64px;
+	justify-content: center;
+}
+
 .rounded {
-	border-radius: 20px;
+	border-radius: 32px;
 	overflow: hidden;
 }
 
 .label {
 	color: $gray-dark;
+	padding-top: $grid-unit;
 }
 
 .labelDark {
 	color: $white;
 }
 
-.active {
-	border-color: $light-quaternary;
-	border-width: 2px;
-}
-
-.activeDark {
-	border-color: $dark-quaternary;
+.outline {
+	height: 64px;
+	border-color: $blue-wordpress;
+	border-width: 1px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
 }

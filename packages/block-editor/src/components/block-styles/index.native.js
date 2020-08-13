@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { find } from 'lodash';
 
 /**
@@ -16,7 +16,7 @@ import { _x } from '@wordpress/i18n';
 import { getActiveStyle, replaceActiveStyle } from './utils';
 import StyleVariation from './variation';
 
-function BlockStyles( { clientId } ) {
+function BlockStyles( { clientId, url } ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
@@ -48,7 +48,14 @@ function BlockStyles( { clientId } ) {
 
 	const activeStyle = getActiveStyle( renderedStyles, className );
 	return (
-		<View style={ { flexDirection: 'row' } }>
+		<ScrollView
+			horizontal
+			showsHorizontalScrollIndicator={ false }
+			contentContainerStyle={ {
+				paddingLeft: 16,
+				paddingRight: 16,
+			} }
+		>
 			{ renderedStyles.map( ( style ) => {
 				const styleClassName = replaceActiveStyle(
 					className,
@@ -69,10 +76,11 @@ function BlockStyles( { clientId } ) {
 						isActive={ isActive }
 						key={ style.name }
 						style={ style }
+						url={ url }
 					/>
 				);
 			} ) }
-		</View>
+		</ScrollView>
 	);
 }
 
