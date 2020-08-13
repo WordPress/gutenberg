@@ -1,5 +1,4 @@
 .block-editor-post-preview__dropdown {
-	display: none;
 	margin-right: $grid-unit-15;
 	padding: 0;
 }
@@ -13,7 +12,6 @@
 }
 
 .block-editor-post-preview__dropdown-content {
-	display: none;
 	.components-popover__content {
 		overflow-y: visible;
 	}
@@ -42,15 +40,5 @@
 		.editor-post-preview {
 			display: none;
 		}
-
-		.block-editor-post-preview__dropdown {
-			display: flex;
-		}
-	}
-}
-
-@include break-small () {
-	.block-editor-post-preview__dropdown-content {
-		display: block;
 	}
 }
