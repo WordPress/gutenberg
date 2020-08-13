@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { get, omit } from 'lodash';
-import { useRoute, useNavigation } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
@@ -22,17 +21,16 @@ import {
 } from './constants';
 import styles from './style.scss';
 
-function CustomGradientPicker() {
-	const route = useRoute();
-	const navigation = useNavigation();
-	const { setColor, currentValue, isGradientColor } = route.params;
+function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	const [ gradientOrientation, setGradientOrientation ] = useState(
 		HORIZONTAL_GRADIENT_ORIENTATION
 	);
 
+	const [ currentColor, setCurrentColor ] = useState( currentValue );
+
 	const { getGradientType, gradients, gradientOptions } = colorsUtils;
-	const { gradientAST } = getGradientParsed( currentValue );
-	const gradientType = getGradientType( currentValue );
+	const { gradientAST } = getGradientParsed( currentColor );
+	const gradientType = getGradientType( currentColor );
 
 	function isLinearGradient( type ) {
 		return type === gradients.linear;
@@ -65,7 +63,7 @@ function CustomGradientPicker() {
 
 	function onGradientTypeChange( type ) {
 		const gradientColor = getGradientColor( type );
-		navigation.setParams( { currentValue: gradientColor } );
+		setCurrentColor( gradientColor );
 		setColor( gradientColor );
 	}
 
@@ -78,8 +76,8 @@ function CustomGradientPicker() {
 			},
 		} );
 
-		if ( isGradientColor && gradientColor !== currentValue ) {
-			navigation.setParams( { currentValue: gradientColor } );
+		if ( isGradientColor && gradientColor !== currentColor ) {
+			setCurrentColor( gradientColor );
 			setColor( gradientColor );
 		}
 	}

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
@@ -17,13 +17,19 @@ import NavigationHeader from '../bottom-sheet/navigation-header';
 
 const GradientPickerScreen = () => {
 	const navigation = useNavigation();
+	const route = useRoute();
+	const { setColor, currentValue, isGradientColor } = route.params;
 	return (
 		<View>
 			<NavigationHeader
 				screen={ __( 'Customize Gradient' ) }
 				leftButtonOnPress={ navigation.goBack }
 			/>
-			<CustomGradientPicker />
+			<CustomGradientPicker
+				setColor={ setColor }
+				currentValue={ currentValue }
+				isGradientColor={ isGradientColor }
+			/>
 		</View>
 	);
 };
