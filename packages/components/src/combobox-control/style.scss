@@ -51,6 +51,10 @@
 	padding: 0;
 	position: absolute;
 	z-index: z-index(".components-popover");
+
+	&:not(:empty) {
+		border: $border-width solid $gray-900;
+	}
 }
 
 .components-combobox-control__item {
