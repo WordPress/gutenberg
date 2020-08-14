@@ -11,9 +11,11 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
-# 1.35.0
+## 1.35.0
 
+* [***] Fixed empty text fields on RTL layout. Now they are selectable and placeholders are visible.
 * [**] Add settings to allow changing column widths
+* [**] Media editing support in Gallery block.
 
 ## 1.34.0
 
