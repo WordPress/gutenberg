@@ -26,12 +26,6 @@
 		"rgbBackgroundColor": {
 			"type": "string"
 		},
-		"fontSize": {
-			"type": "string"
-		},
-		"customFontSize": {
-			"type": "number"
-		},
 		"itemsJustification": {
 			"type": "string"
 		},
