@@ -38,3 +38,8 @@ $image-height: 64px;
 	left: -$outline-space;
 	right: -$outline-space;
 }
+
+.content {
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+}

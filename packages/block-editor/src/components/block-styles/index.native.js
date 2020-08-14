@@ -15,6 +15,7 @@ import { _x } from '@wordpress/i18n';
  */
 import { getActiveStyle, replaceActiveStyle } from './utils';
 import StylePreview from './preview';
+import containerStyles from './style.scss';
 
 function BlockStyles( { clientId, url } ) {
 	const selector = ( select ) => {
@@ -51,10 +52,7 @@ function BlockStyles( { clientId, url } ) {
 		<ScrollView
 			horizontal
 			showsHorizontalScrollIndicator={ false }
-			contentContainerStyle={ {
-				paddingLeft: 16,
-				paddingRight: 16,
-			} }
+			contentContainerStyle={ containerStyles.content }
 		>
 			{ renderedStyles.map( ( style ) => {
 				const styleClassName = replaceActiveStyle(
