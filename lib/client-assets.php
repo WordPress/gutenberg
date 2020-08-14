@@ -208,6 +208,20 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
 function gutenberg_register_vendor_scripts( $scripts ) {
 	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
+	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+	gutenberg_register_vendor_script(
+		$scripts,
+		'react',
+		'https://unpkg.com/react@16.13.1/umd/react' . $react_suffix . '.js',
+		array( 'wp-polyfill' )
+	);
+	gutenberg_register_vendor_script(
+		$scripts,
+		'react-dom',
+		'https://unpkg.com/react-dom@16.13.1/umd/react-dom' . $react_suffix . '.js',
+		array( 'react' )
+	);
+
 	/*
 	 * This script registration and the corresponding function should be removed
 	 * once the plugin is updated to support WordPress 5.4.0 and newer.
