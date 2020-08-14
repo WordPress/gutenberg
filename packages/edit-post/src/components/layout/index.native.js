@@ -153,7 +153,6 @@ class Layout extends Component {
 					<KeyboardAvoidingView
 						parentHeight={ this.state.rootViewHeight }
 						style={ toolbarKeyboardAvoidingViewStyle }
-						withAnimatedHeight
 					>
 						{ isTemplatePickerAvailable && (
 							<__experimentalPageTemplatePicker
