@@ -24,7 +24,7 @@ module.exports = function ( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/(react-native|@react-native-community)/,
+				exclude: /node_modules\/(react-native|@react-native-community|@react-navigation)/,
 			},
 			{
 				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
@@ -39,7 +39,7 @@ module.exports = function ( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/(react-native|@react-native-community)/,
+				exclude: /node_modules\/(react-native|@react-native-community|@react-navigation)/,
 			},
 		],
 		env: {
