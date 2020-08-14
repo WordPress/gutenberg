@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 8.7.1 =
+
+###  Bug Fixes
+
+ - Block Supports: Add missing UTF-8 conversion.
+ - File block: Fix upload pdf file using Upload button but can using Media Library link.
+
+
 = 8.7.0 =
 
 ### Enhancements

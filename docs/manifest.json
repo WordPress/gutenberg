@@ -1200,6 +1200,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToolbarGroup",
+		"slug": "toolbar-group",
+		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolbarItem",
+		"slug": "toolbar-item",
+		"markdown_source": "../packages/components/src/toolbar-item/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Toolbar",
 		"slug": "toolbar",
 		"markdown_source": "../packages/components/src/toolbar/README.md",

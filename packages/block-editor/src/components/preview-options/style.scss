@@ -17,20 +17,20 @@
 		overflow-y: visible;
 	}
 
+	&.edit-post-post-preview-dropdown {
+		.components-menu-group {
+			&:first-child {
+				padding-bottom: $grid-unit-10;
+			}
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
 	.components-menu-group + .components-menu-group {
-		border-top: $border-width solid $gray-400;
 		padding: $grid-unit-10 $grid-unit-15;
 		margin-left: -$grid-unit-15;
 		margin-right: -$grid-unit-15;
-	}
-}
-
-@include break-small() {
-	.editor-post-preview {
-		display: none;
-	}
-
-	.block-editor-post-preview__dropdown {
-		display: flex;
 	}
 }

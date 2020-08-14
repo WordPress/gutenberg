@@ -26,12 +26,6 @@
 		"rgbBackgroundColor": {
 			"type": "string"
 		},
-		"fontSize": {
-			"type": "string"
-		},
-		"customFontSize": {
-			"type": "number"
-		},
 		"itemsJustification": {
 			"type": "string"
 		},
@@ -50,13 +44,11 @@
 		"showSubmenuIcon": "showSubmenuIcon"
 	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
-		"lightBlockWrapper": true
+		"lightBlockWrapper": true,
+		"__experimentalFontSize": true
 	}
 }
