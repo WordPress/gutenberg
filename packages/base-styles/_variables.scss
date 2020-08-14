@@ -100,7 +100,8 @@ $radius-round: 50%;
 $radius-block-ui: 2px;
 
 /**
- * Block Paddings.
+ * Block paddings.
  */
-$block-bg-padding--v: 1.25em; // Padding for Blocks with a background color (eg: paragraph or group)
-$block-bg-padding--h: 2.375em; // Padding for Blocks with a background color (eg: paragraph or group)
+// Padding for blocks with a background color (e.g. paragraph or group).
+$block-bg-padding--v: 1.25em;
+$block-bg-padding--h: 2.375em;
