@@ -70,6 +70,7 @@ function InserterMenu( {
 	const onInsert = ( blocks ) => {
 		onInsertBlocks( blocks );
 		onSelect();
+		setFilterValue();
 	};
 
 	const onHover = ( item ) => {
