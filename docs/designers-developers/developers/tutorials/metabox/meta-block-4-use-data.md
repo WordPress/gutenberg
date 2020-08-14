@@ -35,7 +35,7 @@ function myguten_render_paragraph( $block_attributes, $content ) {
 	}
 }
 
-register_block_type( 'core/paragraph', array(
+register_block_type( 'myguten/meta-block', array(
 	'render_callback' => 'myguten_render_paragraph',
 ) );
 ```
