@@ -16,7 +16,7 @@ export default function TemplatePartLabel( { postId, slug } ) {
 		<div className="wp-block-template-part__label-container">
 			<div className="wp-block-template-part__label-layout">
 				<div className="wp-block-template-part__label-content">
-					<Icon icon="controls-repeat" size={ 12 } />
+					<Icon icon="controls-repeat" size={ 13 } />
 					<span className="wp-block-template-part__label-text">
 						{ title || slug }
 					</span>
