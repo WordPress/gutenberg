@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+* [**] Add support for rounded style in Image block
+
 ## 1.35.0
 
 * [**] Add settings to allow changing column widths
