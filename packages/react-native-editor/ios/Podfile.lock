@@ -21,7 +21,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Gutenberg (1.33.1):
+  - Gutenberg (1.33.2):
     - React (= 0.61.5)
     - React-CoreModules (= 0.61.5)
     - React-RCTImage (= 0.61.5)
@@ -243,7 +243,7 @@ PODS:
     - React
   - RNSVG (9.13.6-gb):
     - React
-  - RNTAztecView (1.33.1):
+  - RNTAztecView (1.33.2):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.3)
   - WordPress-Aztec-iOS (1.19.3)
