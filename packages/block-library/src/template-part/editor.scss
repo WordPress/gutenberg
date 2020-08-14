@@ -90,7 +90,7 @@
 	.wp-block-template-part__label-content {
 		display: flex;
 		align-items: center;
-		border: 1px solid $gray-600;
+		border: $border-width solid $gray-600;
 		border-bottom: none;
 		border-top-right-radius: $radius-block-ui;
 		border-top-left-radius: $radius-block-ui;
