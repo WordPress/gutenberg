@@ -8,10 +8,6 @@ import { addQueryArgs } from '@wordpress/url';
  */
 const { fetch } = window;
 
-// Naive cache to avoid running expensive template resolution for the same path
-// multiple times.
-const TEMPLATE_ID_CACHE = {};
-
 /**
  * Find the template for a given page path.
  *
@@ -21,9 +17,6 @@ const TEMPLATE_ID_CACHE = {};
  * @return {number} The found template ID.
  */
 export default async function findTemplate( path, getEntityRecords ) {
-	if ( TEMPLATE_ID_CACHE[ path ] ) {
-		return TEMPLATE_ID_CACHE[ path ];
-	}
 	const { data } = await fetch(
 		addQueryArgs( path, { '_wp-find-template': true } )
 	).then( ( res ) => res.json() );
@@ -37,6 +30,6 @@ export default async function findTemplate( path, getEntityRecords ) {
 			} )
 		 )[ 0 ].id;
 	}
-	TEMPLATE_ID_CACHE[ path ] = newTemplateId;
+
 	return newTemplateId;
 }

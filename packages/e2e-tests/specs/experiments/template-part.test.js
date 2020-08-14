@@ -43,11 +43,9 @@ describe( 'Template Part', () => {
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.
-			const openDropdownSelector =
-				'button.components-dropdown-menu__toggle[aria-label="Switch Template"]';
-			await page.waitForSelector( openDropdownSelector );
-			await page.click( openDropdownSelector );
-
+			await page.click(
+				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
+			);
 			const switchToHeaderTemplatePartButton = await page.waitForXPath(
 				'//button[contains(text(), "header")]'
 			);
