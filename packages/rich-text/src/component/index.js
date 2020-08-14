@@ -527,7 +527,7 @@ function RichText( {
 	function handleSpace( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
-		// Fix space in <summary> element
+		// Allow space characters to be typed in a <summary>.
 		if ( keyCode === SPACE && TagName === 'summary' ) {
 			handleChange( insert( createRecord(), ' ' ) );
 			return;
