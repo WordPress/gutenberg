@@ -14,7 +14,7 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getActiveStyle, replaceActiveStyle } from './utils';
-import StyleVariation from './variation';
+import StylePreview from './preview';
 
 function BlockStyles( { clientId, url } ) {
 	const selector = ( select ) => {
@@ -71,7 +71,7 @@ function BlockStyles( { clientId, url } ) {
 				};
 
 				return (
-					<StyleVariation
+					<StylePreview
 						onPress={ onStylePress }
 						isActive={ isActive }
 						key={ style.name }

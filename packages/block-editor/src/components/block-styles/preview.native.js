@@ -24,7 +24,7 @@ import styles from './style.scss';
 
 const MAX_ITEM_WIDTH = 120;
 
-function StyleVariation( { onPress, isActive, style, url } ) {
+function StylePreview( { onPress, isActive, style, url } ) {
 	const [ itemWidth, setItemWidth ] = useState( MAX_ITEM_WIDTH );
 	const { label, name } = style;
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
@@ -88,4 +88,4 @@ function StyleVariation( { onPress, isActive, style, url } ) {
 	);
 }
 
-export default StyleVariation;
+export default StylePreview;

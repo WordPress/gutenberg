@@ -3,15 +3,11 @@ $image-height: 64px;
 
 .image {
 	height: $image-height - 2 * $outline-space;
-	margin-left: $outline-space;
-	margin-right: $outline-space;
-	margin-top: $outline-space;
-	margin-bottom: $outline-space;
 }
 
 .container {
+	padding-top: $grid-unit + $outline-space;
 	padding-right: $grid-unit;
-	padding-bottom: $grid-unit;
 }
 
 .imageWrapper {
@@ -26,7 +22,6 @@ $image-height: 64px;
 
 .label {
 	color: $gray-dark;
-	padding-top: $grid-unit;
 	text-align: center;
 }
 
@@ -39,7 +34,7 @@ $image-height: 64px;
 	border-color: $blue-wordpress;
 	border-width: 1px;
 	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
+	top: -$outline-space;
+	left: -$outline-space;
+	right: -$outline-space;
 }
