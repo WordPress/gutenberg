@@ -13,7 +13,7 @@ import SafeArea from 'react-native-safe-area';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
 /**
@@ -26,6 +26,11 @@ const AnimatedKeyboardAvoidingView = Animated.createAnimatedComponent(
 );
 
 const MIN_HEIGHT = 44;
+let initialBottomInset = 0;
+
+SafeArea.getSafeAreaInsetsForRootView().then( ( result ) => {
+	initialBottomInset = result.safeAreaInsets.bottom;
+} );
 
 export const KeyboardAvoidingView = ( {
 	parentHeight,
@@ -34,6 +39,9 @@ export const KeyboardAvoidingView = ( {
 	...otherProps
 } ) => {
 	const [ resizeObserver, sizes ] = useResizeObserver();
+	const [ safeAreaBottomInset, setSafeAreaBottomInset ] = useState(
+		initialBottomInset
+	);
 	const { height = 0 } = sizes || {};
 
 	const animatedHeight = useRef( new Animated.Value( MIN_HEIGHT ) ).current;
@@ -44,20 +52,29 @@ export const KeyboardAvoidingView = ( {
 	useEffect( () => {
 		Keyboard.addListener( 'keyboardWillShow', onKeyboardWillShow );
 		Keyboard.addListener( 'keyboardWillHide', onKeyboardWillHide );
+		SafeArea.addEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			onSafeAreaInsetsUpdate
+		);
+
 		return () => {
 			Keyboard.removeListener( 'keyboardWillShow', onKeyboardWillShow );
 			Keyboard.removeListener( 'keyboardWillHide', onKeyboardWillHide );
+			SafeArea.removeEventListener(
+				'safeAreaInsetsForRootViewDidChange',
+				onSafeAreaInsetsUpdate
+			);
 		};
 	}, [] );
 
+	function onSafeAreaInsetsUpdate( { safeAreaInsets } ) {
+		setSafeAreaBottomInset( safeAreaInsets.bottom );
+	}
+
 	function onKeyboardWillShow( { endCoordinates } ) {
-		SafeArea.getSafeAreaInsetsForRootView().then( ( result ) => {
-			animatedHeight.setValue(
-				endCoordinates.height +
-					MIN_HEIGHT -
-					result.safeAreaInsets.bottom
-			);
-		} );
+		animatedHeight.setValue(
+			endCoordinates.height + MIN_HEIGHT - safeAreaBottomInset
+		);
 	}
 
 	function onKeyboardWillHide( { duration } ) {
