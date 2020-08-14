@@ -36,8 +36,8 @@ function the_gutenberg_widgets( $page = 'gutenberg_page_gutenberg-widgets' ) {
  * @param string $hook Page.
  */
 function gutenberg_widgets_init( $hook ) {
-	if ( 'gutenberg_page_gutenberg-widgets' !== $hook && 'gutenberg_customizer' !== $hook ) {
-			return;
+	if ( ! in_array( $hook, array( 'gutenberg_page_gutenberg-widgets', 'gutenberg_customizer', 'widgets.php' ), true ) ) {
+		return;
 	}
 
 	$initializer_name = 'gutenberg_page_gutenberg-widgets' === $hook

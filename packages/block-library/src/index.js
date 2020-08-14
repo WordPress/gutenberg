@@ -66,6 +66,7 @@ import * as widgetArea from './widget-area';
 
 // Full Site Editing Blocks
 import * as siteLogo from './site-logo';
+import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
@@ -133,8 +134,6 @@ export const registerCoreBlocks = () => {
 		column,
 		cover,
 		embed,
-		...embed.common,
-		...embed.others,
 		file,
 		group,
 		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
@@ -199,8 +198,9 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing
 						? [
-								siteTitle,
 								siteLogo,
+								siteTagline,
+								siteTitle,
 								templatePart,
 								query,
 								queryLoop,

@@ -129,7 +129,7 @@ describe( 'state', () => {
 
 	describe( 'templateType()', () => {
 		it( 'should apply default state', () => {
-			expect( templateType( undefined, {} ) ).toEqual( undefined );
+			expect( templateType( undefined, {} ) ).toEqual( 'wp_template' );
 		} );
 
 		it( 'should default to returning the same state', () => {

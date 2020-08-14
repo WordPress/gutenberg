@@ -101,6 +101,7 @@ class FileEdit extends Component {
 
 	onUploadError( message ) {
 		const { noticeOperations } = this.props;
+		this.setState( { hasError: true } );
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
 	}

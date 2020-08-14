@@ -259,10 +259,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
-    func gutenbergCapabilities() -> [String : Bool]? {
+    func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
-            "mentions": true,
-            "unsupportedBlockEditor": true,
+            .mentions: true,
+            .unsupportedBlockEditor: true,
         ]
     }
 

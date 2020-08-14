@@ -481,6 +481,7 @@ _Properties_
 -   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
 -   _fontSizes_ `Array`: Available font sizes
 -   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
+-   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
@@ -559,16 +560,6 @@ _Related_
 <a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
 
 Undocumented declaration.
-
-<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
-
-Function that manipulates media queries from stylesheets to simulate a given
-viewport width.
-
-_Parameters_
-
--   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
--   _width_ `?number`: Viewport width to simulate. If provided null, the stylesheets will not be modified.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 

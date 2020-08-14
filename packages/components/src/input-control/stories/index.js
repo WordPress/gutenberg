@@ -27,6 +27,15 @@ function Example() {
 		isFloatingLabel: boolean( 'isFloatingLabel', false ),
 		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
 		label: text( 'label', 'Value' ),
+		labelPosition: select(
+			'labelPosition',
+			{
+				top: 'top',
+				side: 'side',
+				bottom: 'bottom',
+			},
+			'top'
+		),
 		placeholder: text( 'placeholder', 'Placeholder' ),
 		size: select(
 			'size',

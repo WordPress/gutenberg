@@ -372,7 +372,6 @@ class ButtonEdit extends Component {
 						__unstableMobileNoFocusOnMount={ ! isSelected }
 						selectionColor={ textColor }
 						onBlur={ () => {
-							this.onToggleButtonFocus( false );
 							this.onSetMaxWidth();
 						} }
 						onReplace={ onReplace }

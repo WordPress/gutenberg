@@ -11,7 +11,7 @@ import {
 	DropdownMenu,
 	ToolbarButton,
 	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	MenuGroup,
 	Popover,
 } from '@wordpress/components';

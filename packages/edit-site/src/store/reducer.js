@@ -128,7 +128,7 @@ export function templatePartId( state, action ) {
  *
  * @return {Object} Updated state.
  */
-export function templateType( state, action ) {
+export function templateType( state = 'wp_template', action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
 		case 'SET_PAGE':

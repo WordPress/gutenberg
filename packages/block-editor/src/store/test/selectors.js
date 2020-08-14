@@ -2160,7 +2160,7 @@ describe( 'selectors', () => {
 			).toBe( false );
 		} );
 
-		it( 'should allow blocks that restrict parent to be inserted into an allowed parent', () => {
+		it( 'should allow blocks to be inserted into an allowed parent', () => {
 			const state = {
 				blocks: {
 					byClientId: {
@@ -2170,7 +2170,29 @@ describe( 'selectors', () => {
 						block1: {},
 					},
 				},
-				blockListSettings: {},
+				blockListSettings: {
+					block1: {},
+				},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType( state, 'core/test-block-c', 'block1' )
+			).toBe( true );
+		} );
+
+		it( 'should deny blocks from being inserted into a block that does not allow inner blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-b' },
+					},
+					attributes: {
+						block1: {},
+					},
+				},
+				blockListSettings: {
+					block1: {},
+				},
 				settings: {},
 			};
 			expect(
@@ -2441,12 +2463,16 @@ describe( 'selectors', () => {
 				preferences: {
 					insertUsage: {},
 				},
-				blockListSettings: {},
+				blockListSettings: {
+					block3: {},
+					block4: {},
+				},
 			};
 
 			const stateSecondBlockRestricted = {
 				...state,
 				blockListSettings: {
+					...state.blockListSettings,
 					block4: {
 						allowedBlocks: [ 'core/test-block-b' ],
 					},
@@ -2472,6 +2498,7 @@ describe( 'selectors', () => {
 				stateSecondBlockRestricted,
 				'block4'
 			);
+			expect( secondBlockFirstCall ).not.toBe( secondBlockSecondCall );
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
 				'core/test-block-b',

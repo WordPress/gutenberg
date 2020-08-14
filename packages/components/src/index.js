@@ -99,7 +99,7 @@ export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
-export { default as __experimentalToolbarItem } from './toolbar-item';
+export { default as ToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
 export {
 	default as __experimentalTreeGrid,

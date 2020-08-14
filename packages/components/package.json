@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "10.0.1",
+	"version": "10.0.3",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -48,7 +48,7 @@
 		"dom-scroll-into-view": "^1.2.1",
 		"downshift": "^5.4.0",
 		"gradient-parser": "^0.1.5",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",
 		"re-resizable": "^6.4.0",

@@ -17,6 +17,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} disableCustomColors Whether or not the custom colors are disabled
  * @property {Array} fontSizes Available font sizes
  * @property {boolean} disableCustomFontSizes Whether or not the custom font sizes are disabled
+ * @property {boolean} imageEditing Image Editing settings set to false to disable.
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing
  * @property {boolean|Array} allowedBlockTypes Allowed block types
@@ -119,7 +120,7 @@ export const SETTINGS_DEFAULTS = {
 		},
 		{
 			name: _x( 'Huge', 'font size name' ),
-			size: 48,
+			size: 42,
 			slug: 'huge',
 		},
 	],
@@ -130,6 +131,9 @@ export const SETTINGS_DEFAULTS = {
 		{ slug: 'large', name: __( 'Large' ) },
 		{ slug: 'full', name: __( 'Full Size' ) },
 	],
+
+	// Allow plugin to disable Image Editor if need be
+	imageEditing: true,
 
 	// This is current max width of the block inner area
 	// It's used to constraint image resizing and this value could be overridden later by themes

@@ -75,15 +75,13 @@ export function* addTemplate( template ) {
  * Removes a template, and updates the current page and template.
  *
  * @param {number} templateId The template ID.
- *
- * @return {Object} Action object used to set the current page and template.
  */
 export function* removeTemplate( templateId ) {
 	yield apiFetch( {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	return dispatch(
+	yield dispatch(
 		'core/edit-site',
 		'setPage',
 		yield select( 'core/edit-site', 'getPage' )
@@ -118,7 +116,7 @@ export function setHomeTemplateId( homeTemplateId ) {
 }
 
 /**
- * Resolves the template for a page displays both.
+ * Resolves the template for a page and displays both.
  *
  * @param {Object}  page         The page object.
  * @param {string}  page.type    The page type.
@@ -126,25 +124,22 @@ export function setHomeTemplateId( homeTemplateId ) {
  * @param {string}  page.path    The page path.
  * @param {Object}  page.context The page context.
  *
- * @return {Object} Action object.
+ * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
 	const templateId = yield findTemplate( page.path );
-	return {
+	yield {
 		type: 'SET_PAGE',
 		page,
 		templateId,
 	};
+	return templateId;
 }
 
 /**
  * Displays the site homepage for editing in the editor.
  */
 export function* showHomepage() {
-	const templateId = yield findTemplate( '/' );
-
-	yield setHomeTemplateId( templateId );
-
 	const {
 		show_on_front: showOnFront,
 		page_on_front: frontpageId,
@@ -161,5 +156,6 @@ export function* showHomepage() {
 				: {},
 	};
 
-	yield setPage( page );
+	const homeTemplate = yield* setPage( page );
+	yield setHomeTemplateId( homeTemplate );
 }

@@ -45,7 +45,6 @@ const BlockComponent = forwardRef(
 			enableAnimation,
 			index,
 			className,
-			isLocked,
 			name,
 			mode,
 			blockTitle,
@@ -71,6 +70,7 @@ const BlockComponent = forwardRef(
 					initialPosition: isSelected
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
+					isNavigationMode: _isNavigationMode,
 				};
 			},
 			[ isSelected ]
@@ -79,7 +79,6 @@ const BlockComponent = forwardRef(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
-		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
 		const [ isHovered, setHovered ] = useState( false );
@@ -251,14 +250,13 @@ const BlockComponent = forwardRef(
 					wrapperProps && wrapperProps.className,
 					{
 						'is-hovered': isHovered,
-						'wp-block': ! isAligned,
 					}
 				) }
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
-				// Only allow shortcuts when a blocks is selected and not locked.
-				onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
+				// Only allow shortcuts when a blocks is selected.
+				onKeyDown={ isSelected ? onKeyDown : undefined }
 				// Only allow selection to be started from a selected block.
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
 				// No need to have these listeners for hover class in edit mode.

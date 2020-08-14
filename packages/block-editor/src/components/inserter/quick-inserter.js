@@ -14,7 +14,7 @@ import {
 	Button,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
@@ -79,6 +79,8 @@ function QuickInserterList( {
 						items={ shownBlockTypes }
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
+						label={ __( 'Blocks' ) }
+						limit={ SHOWN_BLOCK_TYPES }
 					/>
 				</InserterPanel>
 			) }
@@ -162,11 +164,19 @@ function QuickInserter( {
 		[]
 	);
 
+	const previousBlockClientId = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getPreviousBlockClientId( clientId ),
+		[ clientId ]
+	);
+
 	useEffect( () => {
 		if ( setInserterIsOpened ) {
 			setInserterIsOpened( false );
 		}
 	}, [ setInserterIsOpened ] );
+
+	const { selectBlock } = useDispatch( 'core/block-editor' );
 
 	// Announce search results on change
 	useEffect( () => {
@@ -181,6 +191,19 @@ function QuickInserter( {
 		);
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
+
+	// When clicking Browse All select the appropriate block so as
+	// the insertion point can work as expected
+	const onBrowseAll = () => {
+		// We have to select the previous block because the menu inserter
+		// inserts the new block after the selected one.
+		// Ideally, this selection shouldn't focus the block to avoid the setTimeout.
+		selectBlock( previousBlockClientId );
+		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+		setTimeout( () => {
+			setInserterIsOpened( true );
+		} );
+	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
@@ -217,7 +240,7 @@ function QuickInserter( {
 			{ setInserterIsOpened && (
 				<Button
 					className="block-editor-inserter__quick-inserter-expand"
-					onClick={ () => setInserterIsOpened( true ) }
+					onClick={ onBrowseAll }
 					aria-label={ __(
 						'Browse all. This will open the main inserter panel in the editor toolbar.'
 					) }

@@ -21,6 +21,10 @@ jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
 } ) );
 
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
+} ) );
+
 /**
  * Wait for next tick of event loop. This is required
  * because the `fetchSearchSuggestions` Promise will
@@ -671,7 +675,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createSuggestion = ( title ) =>
 				new Promise( ( resolve ) => {
-					resolver = resolve;
+					resolver = ( arg ) => {
+						resolve( arg );
+					};
 					resolvedEntity = {
 						title,
 						id: 123,
@@ -1112,8 +1118,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					result.innerHTML.includes( 'New page' )
 				)
 			);
-
-			expect( createButton ).not.toBeFalsy(); // shouldn't exist!
 		} );
 	} );
 } );

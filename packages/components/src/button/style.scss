@@ -160,6 +160,28 @@
 	}
 
 	/**
+	 * Destructive buttons.
+	 */
+
+	&.is-destructive {
+		color: $alert-red;
+		box-shadow: inset 0 0 0 $border-width $alert-red;
+
+		&:hover:not(:disabled) {
+			color: darken($alert-red, 20%);
+			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+		}
+
+		&:focus:not(:disabled) {
+			color: var(--wp-admin-theme-color);
+		}
+
+		&:active:not(:disabled) {
+			background: $light-gray-600;
+		}
+	}
+
+	/**
 	 * Link buttons.
 	 */
 
@@ -184,6 +206,7 @@
 		&:hover:not(:disabled),
 		&:active:not(:disabled) {
 			color: #00a0d2;
+			box-shadow: none;
 		}
 
 		&:focus {
@@ -192,27 +215,20 @@
 				0 0 0 $border-width #5b9dd9,
 				0 0 $border-width-focus $border-width rgba(30, 140, 190, 0.8);
 		}
-	}
 
-	/**
-	 * Buttons that indicate destructive actions.
-	 */
+		// Link buttons that are red to indicate destructive behavior.
+		&.is-destructive {
+			color: $alert-red;
 
-	&.is-destructive {
-		color: darken($alert-red, 15%);
+			&:active:not(:disabled),
+			&:hover:not(:disabled) {
+				color: darken($alert-red, 20%);
+				background: none;
+			}
 
-		&.is-secondary {
-			box-shadow: inset 0 0 0 $border-width darken($alert-red, 15%);
-		}
-
-		&:hover:not(:disabled),
-		&:active:not(:disabled) {
-			color: darken($alert-red, 20%);
-			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
-		}
-
-		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus darken($alert-red, 20%);
+			&:focus:not(:disabled) {
+				color: var(--wp-admin-theme-color);
+			}
 		}
 	}
 

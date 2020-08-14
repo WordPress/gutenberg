@@ -88,6 +88,7 @@ export default function Header( {
 				<Button
 					isPrimary
 					isPressed={ isInserterOpen }
+					className="edit-site-header-toolbar__inserter-toggle"
 					onClick={ onToggleInserter }
 					icon={ plus }
 					label={ _x(

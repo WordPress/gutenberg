@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "2.21.1",
+	"version": "2.21.3",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,7 +25,7 @@
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

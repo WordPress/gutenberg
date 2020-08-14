@@ -153,9 +153,7 @@ function InserterMenu( {
 				</div>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
-				<div className="block-editor-inserter__preview-container">
-					<InserterPreviewPanel item={ hoveredItem } />
-				</div>
+				<InserterPreviewPanel item={ hoveredItem } />
 			) }
 		</div>
 	);

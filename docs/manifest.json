@@ -132,7 +132,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Patterns (Experimental)",
+		"title": "Block Patterns",
 		"slug": "block-patterns",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-patterns.md",
 		"parent": "block-api"
@@ -156,7 +156,7 @@
 		"parent": "filters"
 	},
 	{
-		"title": "Editor Filters (Experimental)",
+		"title": "Editor Filters",
 		"slug": "editor-filters",
 		"markdown_source": "../docs/designers-developers/developers/filters/editor-filters.md",
 		"parent": "filters"
@@ -408,6 +408,12 @@
 		"parent": "develop"
 	},
 	{
+		"title": "Getting Started for the React Native based Mobile Gutenberg",
+		"slug": "getting-started-native-mobile",
+		"markdown_source": "../docs/contributors/getting-started-native-mobile.md",
+		"parent": "develop"
+	},
+	{
 		"title": "Design Contributions",
 		"slug": "design",
 		"markdown_source": "../docs/contributors/design.md",
@@ -520,6 +526,48 @@
 		"slug": "esnext-js",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/esnext-js.md",
 		"parent": "javascript"
+	},
+	{
+		"title": "Create a Block Tutorial",
+		"slug": "create-block",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/readme.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "WordPress Plugin",
+		"slug": "wp-plugin",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/wp-plugin.md",
+		"parent": "create-block"
+	},
+	{
+		"title": "Anatomy of a Block",
+		"slug": "block-anatomy",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/block-anatomy.md",
+		"parent": "create-block"
+	},
+	{
+		"title": "Block Attributes",
+		"slug": "attributes",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/attributes.md",
+		"parent": "create-block"
+	},
+	{
+		"title": "Code Implementation",
+		"slug": "block-code",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/block-code.md",
+		"parent": "create-block"
+	},
+	{
+		"title": "Authoring Experience",
+		"slug": "author-experience",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/author-experience.md",
+		"parent": "create-block"
+	},
+	{
+		"title": "Finishing Touches",
+		"slug": "finishing",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/finishing.md",
+		"parent": "create-block"
 	},
 	{
 		"title": "Blocks",
@@ -676,6 +724,18 @@
 		"slug": "3-apply-format",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/format-api/3-apply-format.md",
 		"parent": "format-api"
+	},
+	{
+		"title": "Creating a block-based theme",
+		"slug": "block-based-themes",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-themes/README.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Adding blocks to your theme",
+		"slug": "block-based-themes-2-adding-blocks",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md",
+		"parent": "block-based-themes"
 	},
 	{
 		"title": "Component Reference",
@@ -978,6 +1038,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BottomSheetNavigation",
+		"slug": "bottom-sheet-navigation",
+		"markdown_source": "../packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Modal",
 		"slug": "modal",
 		"markdown_source": "../packages/components/src/modal/README.md",
@@ -1137,6 +1203,18 @@
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
 		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolbarGroup",
+		"slug": "toolbar-group",
+		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolbarItem",
+		"slug": "toolbar-item",
+		"markdown_source": "../packages/components/src/toolbar-item/README.md",
 		"parent": "components"
 	},
 	{

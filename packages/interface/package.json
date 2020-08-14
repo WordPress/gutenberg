@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interface",
-	"version": "0.7.1",
+	"version": "0.7.3",
 	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -35,7 +35,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/plugins": "file:../plugins",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

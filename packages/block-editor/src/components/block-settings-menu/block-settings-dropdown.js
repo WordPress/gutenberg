@@ -14,7 +14,7 @@ import {
 	ClipboardButton,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { moreHorizontal } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
@@ -92,7 +92,7 @@ export function BlockSettingsDropdown( {
 				blocks,
 			} ) => (
 				<DropdownMenu
-					icon={ moreHorizontal }
+					icon={ moreVertical }
 					label={ __( 'More options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }

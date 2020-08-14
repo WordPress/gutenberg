@@ -94,6 +94,9 @@ export function addAttribute( settings ) {
 			...settings.attributes,
 			align: {
 				type: 'string',
+				// Allow for '' since it is used by updateAlignment function
+				// in withToolbarControls for special cases with defined default values.
+				enum: [ ...ALL_ALIGNMENTS, '' ],
 			},
 		};
 	}

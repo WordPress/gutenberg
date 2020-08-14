@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
-} from '@wordpress/components';
+import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 
 /**
  * Internal dependencies

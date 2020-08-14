@@ -35,7 +35,11 @@ export { default as Caption } from './caption';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 
-export { BottomSheetSettings, BlockSettingsButton } from './block-settings';
+export {
+	BottomSheetSettings,
+	BlockSettingsButton,
+	blockSettingsScreens,
+} from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
 // Content Related Components
@@ -46,6 +50,7 @@ export {
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';
+export { default as BlockVariationPicker } from './block-variation-picker';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
