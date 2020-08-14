@@ -7,26 +7,17 @@ import { debounce } from 'lodash';
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { withSelect, withDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
+import { compose, withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import PostAuthorCheck from './check';
 
-function PostAuthor() {
-	const { authors, postAuthor } = useSelect( ( select ) => {
-		const { getAuthor, getAuthors } = select( 'core' );
-		const { getEditedPostAttribute } = select( 'core/editor' );
-		return {
-			authors: getAuthors(),
-			postAuthor: getAuthor( getEditedPostAttribute( 'author' ) ),
-		};
-	} );
-
-	const dispatch = useDispatch();
+function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
 
 	const authorsForField = useMemo( () => {
 		return authors.map( ( author ) => {
@@ -59,7 +50,7 @@ function PostAuthor() {
 			return;
 		}
 		setFieldValue( selectedItem.name );
-		dispatch( 'core/editor' ).editPost( { author: selectedItem.key } );
+		onUpdateAuthor( selectedItem.key );
 	};
 
 	/**
@@ -131,4 +122,19 @@ function PostAuthor() {
 	);
 }
 
-export default PostAuthor;
+export default compose( [
+	withSelect( ( select ) => {
+		const { getAuthor, getAuthors } = select( 'core' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		return {
+			authors: getAuthors(),
+			postAuthor: getAuthor( getEditedPostAttribute( 'author' ) ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		onUpdateAuthor( author ) {
+			dispatch( 'core/editor' ).editPost( { author } );
+		},
+	} ) ),
+	withInstanceId,
+] )( PostAuthor );
