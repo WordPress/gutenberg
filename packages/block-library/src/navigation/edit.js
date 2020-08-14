@@ -12,8 +12,6 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	BlockControls,
-	FontSizePicker,
-	withFontSizes,
 	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
@@ -39,12 +37,10 @@ function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
 	clientId,
-	fontSize,
 	hasExistingNavItems,
 	isImmediateParentOfSelectedBlock,
 	isSelected,
 	setAttributes,
-	setFontSize,
 	updateInnerBlocks,
 	className,
 } ) {
@@ -52,7 +48,6 @@ function Navigation( {
 	// HOOKS
 	//
 	const ref = useRef();
-
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
@@ -64,15 +59,13 @@ function Navigation( {
 				{
 					backgroundColor: true,
 					textColor: true,
-					fontSize: fontSize.size,
 				},
 			],
 			colorDetector: { targetRef: ref },
 			colorPanelProps: {
 				initialOpen: true,
 			},
-		},
-		[ fontSize.size ]
+		}
 	);
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
@@ -109,13 +102,8 @@ function Navigation( {
 		);
 	}
 
-	const blockInlineStyles = {
-		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-	};
-
 	const blockClassNames = classnames( className, {
 		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		[ fontSize.class ]: fontSize.class,
 		'is-vertical': attributes.orientation === 'vertical',
 	} );
 
@@ -167,14 +155,6 @@ function Navigation( {
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
-				<PanelBody title={ __( 'Text settings' ) }>
-					<FontSizePicker
-						value={ fontSize.size }
-						onChange={ setFontSize }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<InspectorControls>
 				<PanelBody title={ __( 'Display settings' ) }>
 					<ToggleControl
 						checked={ attributes.showSubmenuIcon }
@@ -187,10 +167,7 @@ function Navigation( {
 			</InspectorControls>
 			<TextColor>
 				<BackgroundColor>
-					<Block.nav
-						className={ blockClassNames }
-						style={ blockInlineStyles }
-					>
+					<Block.nav className={ blockClassNames }>
 						<InnerBlocks
 							ref={ ref }
 							allowedBlocks={ [
@@ -227,7 +204,6 @@ function Navigation( {
 }
 
 export default compose( [
-	withFontSizes( 'fontSize' ),
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
 		const {

@@ -1,6 +1,6 @@
 # Store Post Meta with a Block
 
-Typically, blocks store their attribute values in the serialised block HTML. However, you can also create a block that saves its attribute values as post meta, which can be accessed programatically anywhere in your template.
+Typically, blocks store their attribute values in the serialised block HTML. However, you can also create a block that saves its attribute values as post meta, which can be accessed programmatically anywhere in your template.
 
 In this short tutorial you will create one of these blocks, which will prompt a user for a single value, and save it as post meta.
 

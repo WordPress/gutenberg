@@ -231,7 +231,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 				if ( primaryKeys.length ) {
 					const entity = getEntity( state, kind, name );
 					primaryKeys.forEach( ( primaryKey ) => {
-						const entityRecord = getEntityRecord(
+						const entityRecord = getEditedEntityRecord(
 							state,
 							kind,
 							name,
@@ -381,6 +381,24 @@ export function isSavingEntityRecord( state, kind, name, recordId ) {
 }
 
 /**
+ * Returns true if the specified entity record is deleting, and false otherwise.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {boolean} Whether the entity record is deleting or not.
+ */
+export function isDeletingEntityRecord( state, kind, name, recordId ) {
+	return get(
+		state.entities.data,
+		[ kind, name, 'deleting', recordId, 'pending' ],
+		false
+	);
+}
+
+/**
  * Returns the specified entity record's last save error.
  *
  * @param {Object} state    State tree.
@@ -395,6 +413,26 @@ export function getLastEntitySaveError( state, kind, name, recordId ) {
 		kind,
 		name,
 		'saving',
+		recordId,
+		'error',
+	] );
+}
+
+/**
+ * Returns the specified entity record's last delete error.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {Object?} The entity record's save error.
+ */
+export function getLastEntityDeleteError( state, kind, name, recordId ) {
+	return get( state.entities.data, [
+		kind,
+		name,
+		'deleting',
 		recordId,
 		'error',
 	] );
@@ -636,5 +674,9 @@ export const hasFetchedAutosaves = createRegistrySelector(
  */
 export const getReferenceByDistinctEdits = createSelector(
 	() => [],
-	( state ) => [ state.undo.length, state.undo.offset ]
+	( state ) => [
+		state.undo.length,
+		state.undo.offset,
+		state.undo.flattenedUndo,
+	]
 );

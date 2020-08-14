@@ -9,10 +9,6 @@
  * Registers block editor 'wp_template_part' post type.
  */
 function gutenberg_register_template_part_post_type() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
-		return;
-	}
-
 	$labels = array(
 		'name'                  => __( 'Template Parts', 'gutenberg' ),
 		'singular_name'         => __( 'Template Part', 'gutenberg' ),

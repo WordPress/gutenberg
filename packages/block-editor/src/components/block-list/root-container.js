@@ -79,11 +79,7 @@ function RootContainer( { children, className }, ref ) {
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 
 	return (
-		<InsertionPoint
-			hasMultiSelection={ hasMultiSelection }
-			selectedBlockClientId={ selectedBlockClientId }
-			containerRef={ ref }
-		>
+		<InsertionPoint containerRef={ ref }>
 			<BlockNodes.Provider value={ blockNodes }>
 				<BlockPopover />
 				<div

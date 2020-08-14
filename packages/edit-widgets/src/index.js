@@ -11,6 +11,7 @@ import {
 /**
  * Internal dependencies
  */
+import './store';
 import './hooks';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 import CustomizerEditWidgetsInitializer from './components/customizer-edit-widgets-initializer';

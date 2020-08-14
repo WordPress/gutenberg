@@ -99,7 +99,7 @@ const BlockActionsMenu = ( {
 
 	const pasteButtonOption = {
 		id: 'pasteButtonOption',
-		label: __( 'Paste block' ),
+		label: __( 'Paste block after' ),
 		value: 'pasteButtonOption',
 	};
 
@@ -124,6 +124,10 @@ const BlockActionsMenu = ( {
 		switch ( value ) {
 			case deleteOption.value:
 				onDelete();
+				createInfoNotice(
+					// translators: displayed right after the block is removed.
+					__( 'Block removed' )
+				);
 				break;
 			case settingsOption.value:
 				openGeneralSidebar();

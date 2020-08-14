@@ -57,6 +57,14 @@
 
 	@include break-small () {
 		padding-right: $grid-unit-20;
+
+		.editor-post-preview {
+			display: none;
+		}
+
+		.block-editor-post-preview__dropdown {
+			display: flex;
+		}
 	}
 }
 
@@ -77,13 +85,6 @@
 		@include break-small() {
 			margin-right: $grid-unit-15;
 		}
-	}
-
-	.components-button.editor-post-save-draft,
-	.components-button.editor-post-switch-to-draft,
-	.components-button.editor-post-preview,
-	.components-button.block-editor-post-preview__button-toggle {
-		color: $gray-900;
 	}
 
 	.components-button.block-editor-post-preview__dropdown,

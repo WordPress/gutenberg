@@ -5,6 +5,13 @@ import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import metadata from './block.json';
+
+const { name: EMBED_BLOCK } = metadata;
+
+/**
  * Default transforms for generic embeds.
  */
 const transforms = {
@@ -15,7 +22,7 @@ const transforms = {
 				node.nodeName === 'P' &&
 				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
 			transform: ( node ) => {
-				return createBlock( 'core/embed', {
+				return createBlock( EMBED_BLOCK, {
 					url: node.textContent.trim(),
 				} );
 			},

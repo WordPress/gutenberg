@@ -31,20 +31,23 @@ describe( 'Template Part', () => {
 	} );
 
 	describe( 'Template part block', () => {
-		beforeEach( () =>
-			visitAdminPage(
+		beforeEach( async () => {
+			await visitAdminPage(
 				'admin.php',
 				addQueryArgs( '', {
 					page: 'gutenberg-edit-site',
 				} ).slice( 1 )
-			)
-		);
+			);
+			await page.waitForSelector( '.edit-site-visual-editor' );
+		} );
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
-			);
+			const openDropdownSelector =
+				'button.components-dropdown-menu__toggle[aria-label="Switch Template"]';
+			await page.waitForSelector( openDropdownSelector );
+			await page.click( openDropdownSelector );
+
 			const switchToHeaderTemplatePartButton = await page.waitForXPath(
 				'//button[contains(text(), "header")]'
 			);

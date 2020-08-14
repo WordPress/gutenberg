@@ -50,8 +50,8 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 	let candidateDistance;
 
 	elements.forEach( ( element, index ) => {
-		// Ensure the element is a block. It should have the `data-block` attribute.
-		if ( ! element.dataset.block ) {
+		// Ensure the element is a block. It should have the `wp-block` class.
+		if ( ! element.classList.contains( 'wp-block' ) ) {
 			return;
 		}
 
@@ -171,7 +171,11 @@ function parseDropEvent( event ) {
  */
 export default function useBlockDropZone( {
 	element,
-	rootClientId: targetRootClientId,
+	// An undefined value represents a top-level block. Default to an empty
+	// string for this so that `targetRootClientId` can be easily compared to
+	// values returned by the `getRootBlockClientId` selector, which also uses
+	// an empty string to represent top-level blocks.
+	rootClientId: targetRootClientId = '',
 } ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
@@ -260,7 +264,10 @@ export default function useBlockDropZone( {
 				return;
 			}
 
-			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
+			const sourceBlockIndex = getBlockIndex(
+				sourceClientIds[ 0 ],
+				sourceRootClientId
+			);
 
 			// If the user is dropping to the same position, return early.
 			if (
@@ -282,16 +289,14 @@ export default function useBlockDropZone( {
 				return;
 			}
 
-			const isAtSameLevel =
-				sourceRootClientId === targetRootClientId ||
-				( sourceRootClientId === '' &&
-					targetRootClientId === undefined );
-
 			// If the block is kept at the same level and moved downwards,
-			// subtract to account for blocks shifting upward to occupy its old position.
+			// subtract to take into account that the blocks being dragged
+			// were removed from the block list.
+			const isAtSameLevel = sourceRootClientId === targetRootClientId;
+			const draggedBlockCount = sourceClientIds.length;
 			const insertIndex =
 				isAtSameLevel && sourceBlockIndex < targetBlockIndex
-					? targetBlockIndex - 1
+					? targetBlockIndex - draggedBlockCount
 					: targetBlockIndex;
 
 			moveBlocksToPosition(
@@ -322,17 +327,14 @@ export default function useBlockDropZone( {
 	useEffect( () => {
 		if ( position ) {
 			const blockElements = Array.from( element.current.children );
+
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				position,
 				orientation
 			);
 
-			if ( targetIndex === undefined ) {
-				return;
-			}
-
-			setTargetBlockIndex( targetIndex );
+			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 		}
 	}, [ position ] );
 

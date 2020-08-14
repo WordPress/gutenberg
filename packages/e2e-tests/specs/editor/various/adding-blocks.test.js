@@ -34,6 +34,7 @@ describe( 'adding blocks', () => {
 	it( 'Should insert content using the placeholder and the regular inserter', async () => {
 		// This ensures the editor is loaded in navigation mode.
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Set a tall viewport. The typewriter's intrinsic height can be enough
 		// to scroll the page on a shorter viewport, thus obscuring the presence
@@ -44,7 +45,9 @@ describe( 'adding blocks', () => {
 		await clickAtBottom(
 			await page.$( '.interface-interface-skeleton__content' )
 		);
-		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
+		expect(
+			await page.waitForSelector( '[data-type="core/paragraph"]' )
+		).not.toBeNull();
 		await page.keyboard.type( 'Paragraph block' );
 
 		// Using the slash command
@@ -158,7 +161,6 @@ describe( 'adding blocks', () => {
 
 		// Tab to the block list
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 
 		// Expect the block list to be the active element.
 		activeElementClassList = await page.evaluate(
@@ -215,6 +217,49 @@ describe( 'adding blocks', () => {
 
 		// The snapshot should show a buttons block followed by a paragraph.
 		// The buttons block should contain a single button.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/24262
+	it( 'inserts a block in proper place after having clicked `Browse All` from inline inserter', async () => {
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'First paragraph' );
+		await insertBlock( 'Heading' );
+		await page.keyboard.type( 'Heading' );
+		await page.keyboard.press( 'Enter' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Second paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Third paragraph' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Using the between inserter
+		const insertionPoint = await page.$( '[data-type="core/heading"]' );
+		const rect = await insertionPoint.boundingBox();
+		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
+			steps: 10,
+		} );
+		await page.waitForSelector(
+			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
+		);
+		await page.click(
+			'.block-editor-block-list__insertion-point .block-editor-inserter__toggle'
+		);
+
+		const browseAll = await page.waitForSelector(
+			'button.block-editor-inserter__quick-inserter-expand'
+		);
+		await browseAll.click();
+		const inserterMenuInputSelector =
+			'.edit-post-layout__inserter-panel .block-editor-inserter__search-input';
+		const inserterMenuSearchInput = await page.waitForSelector(
+			inserterMenuInputSelector
+		);
+		inserterMenuSearchInput.type( 'cover' );
+		const coverBlock = await page.waitForSelector(
+			'.block-editor-block-types-list .editor-block-list-item-cover'
+		);
+		await coverBlock.click();
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

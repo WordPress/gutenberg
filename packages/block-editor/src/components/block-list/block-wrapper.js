@@ -15,7 +15,7 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { ENTER } from '@wordpress/keycodes';
+import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -45,7 +45,6 @@ const BlockComponent = forwardRef(
 			enableAnimation,
 			index,
 			className,
-			isLocked,
 			name,
 			mode,
 			blockTitle,
@@ -71,13 +70,15 @@ const BlockComponent = forwardRef(
 					initialPosition: isSelected
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
+					isNavigationMode: _isNavigationMode,
 				};
 			},
 			[ isSelected ]
 		);
-		const { insertDefaultBlock } = useDispatch( 'core/block-editor' );
+		const { insertDefaultBlock, removeBlock } = useDispatch(
+			'core/block-editor'
+		);
 		const fallbackRef = useRef();
-		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
 		const [ isHovered, setHovered ] = useState( false );
@@ -169,7 +170,11 @@ const BlockComponent = forwardRef(
 				props.onKeyDown( event );
 			}
 
-			if ( keyCode !== ENTER ) {
+			if (
+				keyCode !== ENTER &&
+				keyCode !== BACKSPACE &&
+				keyCode !== DELETE
+			) {
 				return;
 			}
 
@@ -181,6 +186,8 @@ const BlockComponent = forwardRef(
 
 			if ( keyCode === ENTER ) {
 				insertDefaultBlock( {}, rootClientId, index + 1 );
+			} else {
+				removeBlock( clientId );
 			}
 		};
 
@@ -243,14 +250,13 @@ const BlockComponent = forwardRef(
 					wrapperProps && wrapperProps.className,
 					{
 						'is-hovered': isHovered,
-						'wp-block': ! isAligned,
 					}
 				) }
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
-				// Only allow shortcuts when a blocks is selected and not locked.
-				onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
+				// Only allow shortcuts when a blocks is selected.
+				onKeyDown={ isSelected ? onKeyDown : undefined }
 				// Only allow selection to be started from a selected block.
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
 				// No need to have these listeners for hover class in edit mode.

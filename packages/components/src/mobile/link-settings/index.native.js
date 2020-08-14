@@ -21,7 +21,7 @@ import BottomSheet from '../bottom-sheet';
 import PanelBody from '../../panel/body';
 import TextControl from '../../text-control';
 import ToggleControl from '../../toggle-control';
-import UnsupportedFooterControl from '../../unsupported-footer-control';
+import FooterMessageControl from '../../footer-message-control';
 import PanelActions from '../../panel/actions';
 import LinkRelIcon from './link-rel';
 
@@ -46,7 +46,7 @@ function LinkSettings( {
 	//	* linkLabel - uses `TextControl` component to set `attributes.label`
 	//	* openInNewTab - uses `ToggleControl` component to set `attributes.linkTarget` and `attributes.rel`
 	//	* linkRel - uses `TextControl` component to set `attributes.rel`
-	//	* footer - uses `UnsupportedFooterControl` component to display message, e.g. about missing functionality
+	//	* footer - uses `FooterMessageControl` component to display message, e.g. about missing functionality
 	// Available properties:
 	//	* label - control component label, e.g. `Button Link URL`
 	//	* placeholder - control component placeholder, e.g. `Add URL`
@@ -241,7 +241,10 @@ function LinkSettings( {
 			</PanelBody>
 			{ options.footer && (
 				<PanelBody style={ styles.linkSettingsPanel }>
-					<UnsupportedFooterControl label={ options.footer.label } />
+					<FooterMessageControl
+						label={ options.footer.label }
+						textAlign="left"
+					/>
 				</PanelBody>
 			) }
 			{ actions && <PanelActions actions={ actions } /> }

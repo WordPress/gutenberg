@@ -2,7 +2,7 @@
 
 ## Background
 
-One of the primary tenets of Gutenberg is as a WYSIWYG editor, what you see in the editor, should be as close to what you get when published. Keep this in mind when building blocks.
+One of the primary tenets of Gutenberg as a WYSIWYG editor is that what you see in the editor should be as close as possible to what you get when published. Keep this in mind when building blocks.
 
 ## Placeholder
 
@@ -56,6 +56,7 @@ This can be used inside a block to control what shows when a parameter is set or
 					/>
 				</div>
 			}
+		</div>
 	);
 ```
 
@@ -138,4 +139,4 @@ export default function Edit( { attributes, className, setAttributes } ) {
 }
 ```
 
-Next Section: [Finishing Touches](finishing.md)
+Next Section: [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/finishing.md)

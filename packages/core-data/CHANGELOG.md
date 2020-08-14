@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Feature
+
+- The `deleteEntityRecord` and `removeItems` actions have been added.
+- The `isDeletingEntityRecord` and `getLastEntityDeleteError` selectors have been added.
+- A `delete<entity.name>` helper is created for every registered entity.
+
 ## 2.3.0 (2019-05-21)
 
 ### New features
