@@ -26,11 +26,6 @@ const AnimatedKeyboardAvoidingView = Animated.createAnimatedComponent(
 );
 
 const MIN_HEIGHT = 44;
-let initialBottomInset = 0;
-
-SafeArea.getSafeAreaInsetsForRootView().then( ( result ) => {
-	initialBottomInset = result.safeAreaInsets.bottom;
-} );
 
 export const KeyboardAvoidingView = ( {
 	parentHeight,
@@ -39,9 +34,8 @@ export const KeyboardAvoidingView = ( {
 	...otherProps
 } ) => {
 	const [ resizeObserver, sizes ] = useResizeObserver();
-	const [ safeAreaBottomInset, setSafeAreaBottomInset ] = useState(
-		initialBottomInset
-	);
+	const [ isKeyboardOpen, setIsKeyboardOpen ] = useState( false );
+	const [ safeAreaBottomInset, setSafeAreaBottomInset ] = useState( 0 );
 	const { height = 0 } = sizes || {};
 
 	const animatedHeight = useRef( new Animated.Value( MIN_HEIGHT ) ).current;
@@ -72,12 +66,17 @@ export const KeyboardAvoidingView = ( {
 	}
 
 	function onKeyboardWillShow( { endCoordinates } ) {
-		animatedHeight.setValue(
-			endCoordinates.height + MIN_HEIGHT - safeAreaBottomInset
+		setIsKeyboardOpen( true );
+		SafeArea.getSafeAreaInsetsForRootView().then(
+			( { safeAreaInsets } ) => {
+				setSafeAreaBottomInset( safeAreaInsets.bottom );
+			}
 		);
+		animatedHeight.setValue( endCoordinates.height + MIN_HEIGHT );
 	}
 
 	function onKeyboardWillHide( { duration } ) {
+		setIsKeyboardOpen( false );
 		Animated.timing( animatedHeight, {
 			toValue: MIN_HEIGHT,
 			duration,
@@ -92,7 +91,15 @@ export const KeyboardAvoidingView = ( {
 			keyboardVerticalOffset={ keyboardVerticalOffset }
 			style={
 				withAnimatedHeight
-					? [ style, { height: animatedHeight } ]
+					? [
+							style,
+							{
+								height: animatedHeight,
+								marginBottom: isKeyboardOpen
+									? -safeAreaBottomInset
+									: 0,
+							},
+					  ]
 					: style
 			}
 		>
