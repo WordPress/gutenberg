@@ -47,13 +47,13 @@ function BlockNavigationDropdownToggle( {
 	);
 
 	return (
-		/* translators: button label text should, if possible, be under 16 characters. */
 		<Button
 			{ ...props }
 			ref={ innerRef }
 			icon={ MenuIcon }
 			aria-expanded={ isOpen }
 			onClick={ isEnabled ? onToggle : undefined }
+			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Block navigation' ) }
 			className="block-editor-block-navigation"
 			shortcut={ shortcut }

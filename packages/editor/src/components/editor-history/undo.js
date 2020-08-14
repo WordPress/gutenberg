@@ -15,11 +15,11 @@ function EditorHistoryUndo( props, ref ) {
 	);
 	const { undo } = useDispatch( 'core/editor' );
 	return (
-		/* translators: button label text should, if possible, be under 16 characters. */
 		<Button
 			{ ...props }
 			ref={ ref }
 			icon={ undoIcon }
+			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
 			// If there are no undo levels we don't want to actually disable this

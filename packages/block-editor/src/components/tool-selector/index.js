@@ -39,13 +39,13 @@ function ToolSelector( props, ref ) {
 	return (
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				/* translators: button label text should, if possible, be under 16 characters. */
 				<Button
 					{ ...props }
 					ref={ ref }
 					icon={ isNavigationTool ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
+					/* translators: button label text should, if possible, be under 16 characters. */
 					label={ __( 'Tools' ) }
 				/>
 			) }
