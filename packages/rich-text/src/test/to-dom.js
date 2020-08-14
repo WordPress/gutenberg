@@ -109,3 +109,32 @@ describe( 'applyValue', () => {
 		} );
 	} );
 } );
+
+describe( 'toDom-SVG', () => {
+	let body;
+	beforeAll( () => {
+		const svg = { type: 'svg' };
+		const use = { type: 'use', attributes: { 'xlink:href': '#logo' } };
+		body = toDom( {
+			value: {
+				start: 0,
+				end: 1,
+				formats: [ [ svg ] ],
+				replacements: [ use ],
+				text: '\ufffc',
+			},
+		} ).body;
+	} );
+
+	it( 'should create nodes with svg namespace', () => {
+		const target = body.firstElementChild;
+		expect( target.namespaceURI ).toEqual( 'http://www.w3.org/2000/svg' );
+	} );
+
+	it( 'should create attribute xlink:href with xlink namespace', () => {
+		const target = body
+			.querySelector( 'use' )
+			.getAttributeNode( 'xlink:href' );
+		expect( target.namespaceURI ).toEqual( 'http://www.w3.org/1999/xlink' );
+	} );
+} );
