@@ -81,8 +81,6 @@ $block-padding: 14px; // Space between block footprint and focus boundaries. The
 $block-spacing: 4px; // Vertical space between blocks.
 $block-side-ui-width: $button-size; // Width of the movers/drag handle UI.
 $block-side-ui-clearance: 2px; // Space between movers/drag handle UI, and block.
-$block-bg-padding--v: 1.25em; // padding for Blocks with a background color (eg: paragraph or group)
-$block-bg-padding--h: 2.375em; // padding for Blocks with a background color (eg: paragraph or group)
 $dimmed-opacity: 1;
 
 $block-edge-to-content: 16px;
@@ -100,3 +98,9 @@ $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $b
 
 $radius-round: 50%;
 $radius-block-ui: 2px;
+
+/**
+ * Block Paddings.
+ */
+$block-bg-padding--v: 1.25em; // Padding for Blocks with a background color (eg: paragraph or group)
+$block-bg-padding--h: 2.375em; // Padding for Blocks with a background color (eg: paragraph or group)
