@@ -142,7 +142,7 @@ export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
 			category,
 			collection,
 			...variations,
-			item.name
+			item.name,
 		].join( ' ' );
 
 		const unmatchedTerms = removeMatchingTerms(
