@@ -44,11 +44,11 @@ export class MediaEdit extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { pickerOptions } = this.props;
+		const { pickerOptions, openReplaceMediaOptions } = this.props;
 
 		return compact( [
 			editOption,
-			replaceOption,
+			openReplaceMediaOptions && replaceOption,
 			...( pickerOptions ? pickerOptions : [] ),
 		] );
 	}
@@ -71,7 +71,12 @@ export class MediaEdit extends React.Component {
 	}
 
 	onPickerSelect( value ) {
-		const { onSelect, pickerOptions, multiple = false } = this.props;
+		const {
+			onSelect,
+			pickerOptions,
+			multiple = false,
+			openReplaceMediaOptions,
+		} = this.props;
 
 		switch ( value ) {
 			case MEDIA_EDITOR:
@@ -91,7 +96,9 @@ export class MediaEdit extends React.Component {
 					return;
 				}
 
-				this.props.openReplaceMediaOptions();
+				if ( openReplaceMediaOptions ) {
+					openReplaceMediaOptions();
+				}
 		}
 	}
 

@@ -11,9 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
-# 1.35.0
+## 1.35.0
 
 * [**] Add settings to allow changing column widths
+* [**] Media editing support in Gallery block.
 
 ## 1.34.0
 
