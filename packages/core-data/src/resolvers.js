@@ -31,9 +31,7 @@ import getQueryParts from './queried-data/get-query-parts';
  * Requests authors from the REST API.
  */
 export function* getAuthors( query = {} ) {
-	const path = addQueryArgs( '/wp/v2/users/?who=authors&per_page=100', {
-		...query,
-	} );
+	const path = addQueryArgs( '/wp/v2/users/?who=authors&per_page=100', query );
 
 	const users = yield apiFetch( {
 		path,
