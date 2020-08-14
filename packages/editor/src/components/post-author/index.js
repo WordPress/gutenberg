@@ -17,12 +17,14 @@ import { ComboboxControl } from '@wordpress/components';
 import PostAuthorCheck from './check';
 
 function PostAuthor() {
-	const authors = useSelect( ( select ) => select( 'core' ).getAuthors() );
-	const postAuthor = useSelect( ( select ) =>
-		select( 'core' ).getAuthor(
-			select( 'core/editor' ).getEditedPostAttribute( 'author' )
-		)
-	);
+	const { authors, postAuthor } = useSelect( ( select ) => {
+		const { getAuthor, getAuthors } = select( 'core' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		return {
+			authors: getAuthors(),
+			postAuthor: getAuthor( getEditedPostAttribute( 'author' ) ),
+		};
+	} );
 
 	const dispatch = useDispatch();
 
