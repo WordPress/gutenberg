@@ -75,7 +75,7 @@ export default function TemplatePartEdit( {
 						setAttributes={ setAttributes }
 					/>
 				</BlockControls>
-				<div style={ { position: 'relative' } }>
+				<div className=".wp-block-template-part__container">
 					{ hasSelectedInnerBlock && (
 						<TemplatePartLabel postId={ postId } slug={ slug } />
 					) }
