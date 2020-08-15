@@ -37,8 +37,8 @@ class FixStyleWebpackPlugin {
 							}
 							compilation.updateAsset( file, ( oldSource ) => {
 								return new ConcatSource(
-									oldSource,
-									'\n\n' + styleFileAsset.source.source()
+									styleFileAsset.source.source() + '\n\n',
+									oldSource
 								);
 							} );
 						}

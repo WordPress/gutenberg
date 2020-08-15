@@ -28,7 +28,7 @@ function BlockNavigationBlockSelectButton(
 		isSelected,
 		onClick,
 		position,
-		siblingCount,
+		siblingBlockCount,
 		level,
 		tabIndex,
 		onFocus,
@@ -43,7 +43,7 @@ function BlockNavigationBlockSelectButton(
 	const descriptionId = `block-navigation-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
-		siblingCount,
+		siblingBlockCount,
 		level
 	);
 

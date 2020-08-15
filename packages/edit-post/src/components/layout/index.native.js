@@ -16,7 +16,12 @@ import {
 	FloatingToolbar,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView } from '@wordpress/components';
+import {
+	HTMLTextInput,
+	KeyboardAvoidingView,
+	NoticeList,
+	withSiteCapabilities,
+} from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
@@ -124,7 +129,7 @@ class Layout extends Component {
 				) }
 				onLayout={ this.onRootViewLayout }
 			>
-				<AutosaveMonitor />
+				<AutosaveMonitor disableIntervalChecks />
 				<View
 					style={ getStylesFromColorScheme(
 						styles.background,
@@ -135,6 +140,7 @@ class Layout extends Component {
 					{ ! isHtmlView && Platform.OS === 'android' && (
 						<FloatingToolbar />
 					) }
+					<NoticeList />
 				</View>
 				<View
 					style={ {
@@ -176,5 +182,6 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	withSiteCapabilities,
 	__experimentalWithPageTemplatePicker,
 ] )( Layout );

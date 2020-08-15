@@ -108,15 +108,4 @@
 			grid-row: 2;
 		}
 	}
-
-	.wp-block-media-text.is-stacked-on-mobile.has-media-on-the-right {
-		.wp-block-media-text__media {
-			grid-column: 1;
-			grid-row: 2;
-		}
-		.wp-block-media-text__content {
-			grid-column: 1;
-			grid-row: 1;
-		}
-	}
 }

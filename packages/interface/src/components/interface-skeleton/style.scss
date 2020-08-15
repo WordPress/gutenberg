@@ -85,7 +85,7 @@ html.interface-interface-skeleton__html-container {
 	bottom: 0;
 	left: 0;
 	background: $white;
-	color: $dark-gray-primary;
+	color: $gray-900;
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	@include break-medium() {
@@ -97,22 +97,22 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__sidebar {
 	@include break-medium() {
 		overflow: auto;
-		border-left: $border-width solid $light-gray-500;
+		border-left: $border-width solid $gray-100;
 	}
 }
 
 .interface-interface-skeleton__left-sidebar {
 	@include break-medium() {
-		border-right: $border-width solid $light-gray-500;
+		border-right: $border-width solid $gray-100;
 	}
 }
 
 .interface-interface-skeleton__header {
 	flex-shrink: 0;
 	height: auto;  // Keep the height flexible.
-	border-bottom: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $gray-100;
 	z-index: z-index(".interface-interface-skeleton__header");
-	color: $dark-gray-primary;
+	color: $gray-900;
 
 	// On Mobile the header is sticky.
 	position: sticky;
@@ -128,8 +128,8 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__footer {
 	height: auto;  // Keep the height flexible.
 	flex-shrink: 0;
-	border-top: $border-width solid $light-gray-500;
-	color: $dark-gray-primary;
+	border-top: $border-width solid $gray-100;
+	color: $gray-900;
 
 	// On Mobile the footer is hidden
 	display: none;
@@ -146,7 +146,7 @@ html.interface-interface-skeleton__html-container {
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
-	color: $dark-gray-primary;
+	color: $gray-900;
 
 	&:focus {
 		top: auto;

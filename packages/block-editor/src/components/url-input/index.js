@@ -27,6 +27,7 @@ import { isURL } from '@wordpress/url';
 // as being considered from the input.
 const stopEventPropagation = ( event ) => event.stopPropagation();
 
+/* eslint-disable jsx-a11y/no-autofocus */
 class URLInput extends Component {
 	constructor( props ) {
 		super( props );
@@ -52,6 +53,9 @@ class URLInput extends Component {
 			suggestions: [],
 			showSuggestions: false,
 			selectedSuggestion: null,
+
+			suggestionsListboxId: '',
+			suggestionOptionIdPrefix: '',
 		};
 	}
 
@@ -64,10 +68,10 @@ class URLInput extends Component {
 		if (
 			showSuggestions &&
 			selectedSuggestion !== null &&
+			this.suggestionNodes[ selectedSuggestion ] &&
 			! this.scrollingIntoView
 		) {
 			this.scrollingIntoView = true;
-
 			scrollIntoView(
 				this.suggestionNodes[ selectedSuggestion ],
 				this.autocompleteRef.current,
@@ -351,6 +355,7 @@ class URLInput extends Component {
 	static getDerivedStateFromProps(
 		{
 			value,
+			instanceId,
 			disableSuggestions,
 			__experimentalShowInitialSuggestions = false,
 		},
@@ -370,19 +375,88 @@ class URLInput extends Component {
 
 		return {
 			showSuggestions: shouldShowSuggestions,
+			suggestionsListboxId: `block-editor-url-input-suggestions-${ instanceId }`,
+			suggestionOptionIdPrefix: `block-editor-url-input-suggestion-${ instanceId }`,
 		};
 	}
 
 	render() {
+		return (
+			<>
+				{ this.renderControl() }
+				{ this.renderSuggestions() }
+			</>
+		);
+	}
+
+	renderControl() {
 		const {
 			label,
-			instanceId,
 			className,
 			isFullWidth,
-			__experimentalRenderSuggestions: renderSuggestions,
+			instanceId,
 			placeholder = __( 'Paste URL or type to search' ),
+			__experimentalRenderControl: renderControl,
 			value = '',
 			autoFocus = true,
+		} = this.props;
+
+		const {
+			loading,
+			showSuggestions,
+			selectedSuggestion,
+			suggestionsListboxId,
+			suggestionOptionIdPrefix,
+		} = this.state;
+
+		const controlProps = {
+			id: `url-input-control-${ instanceId }`,
+			label,
+			className: classnames( 'block-editor-url-input', className, {
+				'is-full-width': isFullWidth,
+			} ),
+		};
+
+		const inputProps = {
+			value,
+			required: true,
+			autoFocus,
+			className: 'block-editor-url-input__input',
+			type: 'text',
+			onChange: this.onChange,
+			onFocus: this.onFocus,
+			onInput: stopEventPropagation,
+			placeholder,
+			onKeyDown: this.onKeyDown,
+			role: 'combobox',
+			'aria-label': __( 'URL' ),
+			'aria-expanded': showSuggestions,
+			'aria-autocomplete': 'list',
+			'aria-owns': suggestionsListboxId,
+			'aria-activedescendant':
+				selectedSuggestion !== null
+					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
+					: undefined,
+			ref: this.inputRef,
+		};
+
+		if ( renderControl ) {
+			return renderControl( controlProps, inputProps, loading );
+		}
+
+		return (
+			<BaseControl { ...controlProps }>
+				<input { ...inputProps } />
+				{ loading && <Spinner /> }
+			</BaseControl>
+		);
+	}
+
+	renderSuggestions() {
+		const {
+			className,
+			__experimentalRenderSuggestions: renderSuggestions,
+			value = '',
 			__experimentalShowInitialSuggestions = false,
 		} = this.props;
 
@@ -390,13 +464,10 @@ class URLInput extends Component {
 			showSuggestions,
 			suggestions,
 			selectedSuggestion,
+			suggestionsListboxId,
+			suggestionOptionIdPrefix,
 			loading,
 		} = this.state;
-
-		const id = `url-input-control-${ instanceId }`;
-
-		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
-		const suggestionOptionIdPrefix = `block-editor-url-input-suggestion-${ instanceId }`;
 
 		const suggestionsListProps = {
 			id: suggestionsListboxId,
@@ -414,101 +485,67 @@ class URLInput extends Component {
 			};
 		};
 
-		/* eslint-disable jsx-a11y/no-autofocus */
-		return (
-			<BaseControl
-				label={ label }
-				id={ id }
-				className={ classnames( 'block-editor-url-input', className, {
-					'is-full-width': isFullWidth,
-				} ) }
-			>
-				<input
-					className="block-editor-url-input__input"
-					autoFocus={ autoFocus }
-					type="text"
-					aria-label={ __( 'URL' ) }
-					required
-					value={ value }
-					onChange={ this.onChange }
-					onFocus={ this.onFocus }
-					onInput={ stopEventPropagation }
-					placeholder={ placeholder }
-					onKeyDown={ this.onKeyDown }
-					role="combobox"
-					aria-expanded={ showSuggestions }
-					aria-autocomplete="list"
-					aria-owns={ suggestionsListboxId }
-					aria-activedescendant={
-						selectedSuggestion !== null
-							? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
-							: undefined
-					}
-					ref={ this.inputRef }
-				/>
+		if (
+			isFunction( renderSuggestions ) &&
+			showSuggestions &&
+			!! suggestions.length
+		) {
+			return renderSuggestions( {
+				suggestions,
+				selectedSuggestion,
+				suggestionsListProps,
+				buildSuggestionItemProps,
+				isLoading: loading,
+				handleSuggestionClick: this.handleOnClick,
+				isInitialSuggestions:
+					__experimentalShowInitialSuggestions &&
+					! ( value && value.length ),
+			} );
+		}
 
-				{ loading && <Spinner /> }
-
-				{ isFunction( renderSuggestions ) &&
-					showSuggestions &&
-					!! suggestions.length &&
-					renderSuggestions( {
-						suggestions,
-						selectedSuggestion,
-						suggestionsListProps,
-						buildSuggestionItemProps,
-						isLoading: loading,
-						handleSuggestionClick: this.handleOnClick,
-						isInitialSuggestions:
-							__experimentalShowInitialSuggestions &&
-							! ( value && value.length ),
-					} ) }
-
-				{ ! isFunction( renderSuggestions ) &&
-					showSuggestions &&
-					!! suggestions.length && (
-						<Popover
-							position="bottom"
-							noArrow
-							focusOnMount={ false }
-						>
-							<div
-								{ ...suggestionsListProps }
-								className={ classnames(
-									'block-editor-url-input__suggestions',
-									`${ className }__suggestions`
+		if (
+			! isFunction( renderSuggestions ) &&
+			showSuggestions &&
+			!! suggestions.length
+		) {
+			return (
+				<Popover position="bottom" noArrow focusOnMount={ false }>
+					<div
+						{ ...suggestionsListProps }
+						className={ classnames(
+							'block-editor-url-input__suggestions',
+							`${ className }__suggestions`
+						) }
+					>
+						{ suggestions.map( ( suggestion, index ) => (
+							<Button
+								{ ...buildSuggestionItemProps(
+									suggestion,
+									index
 								) }
+								key={ suggestion.id }
+								className={ classnames(
+									'block-editor-url-input__suggestion',
+									{
+										'is-selected':
+											index === selectedSuggestion,
+									}
+								) }
+								onClick={ () =>
+									this.handleOnClick( suggestion )
+								}
 							>
-								{ suggestions.map( ( suggestion, index ) => (
-									<Button
-										{ ...buildSuggestionItemProps(
-											suggestion,
-											index
-										) }
-										key={ suggestion.id }
-										className={ classnames(
-											'block-editor-url-input__suggestion',
-											{
-												'is-selected':
-													index ===
-													selectedSuggestion,
-											}
-										) }
-										onClick={ () =>
-											this.handleOnClick( suggestion )
-										}
-									>
-										{ suggestion.title }
-									</Button>
-								) ) }
-							</div>
-						</Popover>
-					) }
-			</BaseControl>
-		);
-		/* eslint-enable jsx-a11y/no-autofocus */
+								{ suggestion.title }
+							</Button>
+						) ) }
+					</div>
+				</Popover>
+			);
+		}
+		return null;
 	}
 }
+/* eslint-enable jsx-a11y/no-autofocus */
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md

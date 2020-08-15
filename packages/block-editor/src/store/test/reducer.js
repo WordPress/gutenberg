@@ -1489,8 +1489,8 @@ describe( 'state', () => {
 				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 0,
 			} );
 
@@ -1526,8 +1526,8 @@ describe( 'state', () => {
 				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 2,
 			} );
 
@@ -1563,8 +1563,8 @@ describe( 'state', () => {
 				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 1,
 			} );
 
@@ -1573,6 +1573,79 @@ describe( 'state', () => {
 				'ribs',
 				'veggies',
 			] );
+		} );
+
+		it( 'should move multiple blocks', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs', 'veggies' ],
+				index: 0,
+			} );
+
+			expect( state.order[ '' ] ).toEqual( [
+				'ribs',
+				'veggies',
+				'chicken',
+			] );
+		} );
+
+		it( 'should move multiple blocks to different parent', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs', 'veggies' ],
+				fromRootClientId: '',
+				toRootClientId: 'chicken',
+				index: 0,
+			} );
+
+			expect( state.order[ '' ] ).toEqual( [ 'chicken' ] );
+			expect( state.order.chicken ).toEqual( [ 'ribs', 'veggies' ] );
 		} );
 
 		describe( 'blocks', () => {
@@ -2331,7 +2404,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'bacon',
-						name: 'core-embed/twitter',
+						name: 'core/embed',
 					},
 				],
 				time: 123456,
@@ -2339,10 +2412,10 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				insertUsage: {
-					'core-embed/twitter': {
+					'core/embed': {
 						time: 123456,
 						count: 1,
-						insert: { name: 'core-embed/twitter' },
+						insert: { name: 'core/embed' },
 					},
 				},
 			} );
@@ -2350,10 +2423,10 @@ describe( 'state', () => {
 			const twoRecentBlocks = preferences(
 				deepFreeze( {
 					insertUsage: {
-						'core-embed/twitter': {
+						'core/embed': {
 							time: 123456,
 							count: 1,
-							insert: { name: 'core-embed/twitter' },
+							insert: { name: 'core/embed' },
 						},
 					},
 				} ),
@@ -2362,7 +2435,7 @@ describe( 'state', () => {
 					blocks: [
 						{
 							clientId: 'eggs',
-							name: 'core-embed/twitter',
+							name: 'core/embed',
 						},
 						{
 							clientId: 'bacon',
@@ -2376,10 +2449,10 @@ describe( 'state', () => {
 
 			expect( twoRecentBlocks ).toEqual( {
 				insertUsage: {
-					'core-embed/twitter': {
+					'core/embed': {
 						time: 123457,
 						count: 2,
-						insert: { name: 'core-embed/twitter' },
+						insert: { name: 'core/embed' },
 					},
 					'core/block/123': {
 						time: 123457,

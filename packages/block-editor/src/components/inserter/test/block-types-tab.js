@@ -36,7 +36,13 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 const debouncedSpeak = jest.fn();
 
 function InserterBlockList( props ) {
-	return <BlockTypesTab debouncedSpeak={ debouncedSpeak } { ...props } />;
+	return (
+		<BlockTypesTab
+			debouncedSpeak={ debouncedSpeak }
+			onHover={ () => {} }
+			{ ...props }
+		/>
+	);
 }
 
 const initializeAllClosedMenuState = ( propOverrides ) => {
@@ -112,25 +118,6 @@ describe( 'InserterMenu', () => {
 		expect( blocks ).toHaveLength( 2 );
 		expect( blocks[ 0 ].textContent ).toBe( 'YouTube' );
 		expect( blocks[ 1 ].textContent ).toBe( 'A Paragraph Embed' );
-
-		assertNoResultsMessageNotToBePresent( container );
-	} );
-
-	it( 'should show reusable items in the reusable tab', () => {
-		const { container } = initializeAllClosedMenuState();
-		const reusableTabContent = container.querySelectorAll(
-			'.block-editor-inserter__panel-content'
-		)[ 5 ];
-		const reusableTabTitle = container.querySelectorAll(
-			'.block-editor-inserter__panel-title'
-		)[ 5 ];
-		const blocks = reusableTabContent.querySelectorAll(
-			'.block-editor-block-types-list__item-title'
-		);
-
-		expect( reusableTabTitle.textContent ).toBe( 'Reusable' );
-		expect( blocks ).toHaveLength( 1 );
-		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
 
 		assertNoResultsMessageNotToBePresent( container );
 	} );
@@ -218,44 +205,17 @@ describe( 'InserterMenu', () => {
 		assertNoResultsMessageNotToBePresent( container );
 	} );
 
-	it( 'should allow searching for reusable blocks by title', () => {
-		const { container } = render(
-			<InserterBlockList filterValue="my reusable" />
-		);
-
-		const matchingCategories = container.querySelectorAll(
-			'.block-editor-inserter__panel-title'
-		);
-
-		expect( matchingCategories ).toHaveLength( 2 );
-		expect( matchingCategories[ 0 ].textContent ).toBe( 'Core' ); // "Core" namespace collection
-		expect( matchingCategories[ 1 ].textContent ).toBe( 'Reusable' );
-
-		const blocks = container.querySelectorAll(
-			'.block-editor-block-types-list__item-title'
-		);
-
-		// There are two buttons present for 1 total distinct result. The
-		// additional one accounts for the collection result (repeated).
-		expect( blocks ).toHaveLength( 2 );
-		expect( debouncedSpeak ).toHaveBeenCalledWith( '1 result found.' );
-		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
-		expect( blocks[ 1 ].textContent ).toBe( 'My reusable block' );
-
-		assertNoResultsMessageNotToBePresent( container );
-	} );
-
 	it( 'should speak after any change in search term', () => {
 		// The search result count should always be announced any time the user
 		// changes the search term, even if it results in the same count.
 		//
 		// See: https://github.com/WordPress/gutenberg/pull/22279#discussion_r423317161
 		const { rerender } = render(
-			<InserterBlockList filterValue="my reusab" />
+			<InserterBlockList filterValue="Advanced Para" />
 		);
 
-		rerender( <InserterBlockList filterValue="my reusable" /> );
-		rerender( <InserterBlockList filterValue="my reusable" /> );
+		rerender( <InserterBlockList filterValue="Advanced Paragraph" /> );
+		rerender( <InserterBlockList filterValue="Advanced Paragraph" /> );
 
 		expect( debouncedSpeak ).toHaveBeenCalledTimes( 2 );
 		expect( debouncedSpeak.mock.calls[ 0 ][ 0 ] ).toBe( '1 result found.' );

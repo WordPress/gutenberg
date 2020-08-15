@@ -10,7 +10,6 @@ import { flow, get, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
-
 /**
  * Internal dependencies
  */
@@ -435,6 +434,27 @@ export function createBlockWithFallback( blockNode ) {
 		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
 		attributes.service = name.substring( 17 );
 		name = 'core/social-link';
+	}
+
+	// Convert derivative blocks such as 'core-embed/instagram' to the
+	// canonical form 'core/embed'.
+	if ( name && name.indexOf( 'core-embed/' ) === 0 ) {
+		// Capture `core-embed/instagram` into `{"providerNameSlug":"instagram"}`
+		const providerSlug = name.substring( 11 );
+		const deprecated = {
+			speaker: 'speaker-deck',
+			polldaddy: 'crowdsignal',
+		};
+		attributes.providerNameSlug =
+			providerSlug in deprecated
+				? deprecated[ providerSlug ]
+				: providerSlug;
+		// this is needed as the `responsive` attribute was passed
+		// in a different way before the refactoring to block variations
+		if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
+			attributes.responsive = true;
+		}
+		name = 'core/embed';
 	}
 
 	// Fallback content may be upgraded from classic editor expecting implicit

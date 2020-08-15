@@ -3,12 +3,13 @@
  */
 import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { EntityProvider } from '@wordpress/core-data';
+import { BlockControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import useTemplatePartPost from './use-template-part-post';
+import TemplatePartNamePanel from './name-panel';
 import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 
@@ -28,8 +29,13 @@ export default function TemplatePartEdit( {
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part
 	// content loading.
-	const innerBlocks = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlocks( clientId ),
+	const { innerBlocks } = useSelect(
+		( select ) => {
+			const { getBlocks } = select( 'core/block-editor' );
+			return {
+				innerBlocks: getBlocks( clientId ),
+			};
+		},
 		[ clientId ]
 	);
 	const { editEntityRecord } = useDispatch( 'core' );
@@ -54,13 +60,18 @@ export default function TemplatePartEdit( {
 	if ( postId ) {
 		// Part of a template file, post ID already resolved.
 		return (
-			<EntityProvider
-				kind="postType"
-				type="wp_template_part"
-				id={ postId }
-			>
-				<TemplatePartInnerBlocks />
-			</EntityProvider>
+			<>
+				<BlockControls>
+					<TemplatePartNamePanel
+						postId={ postId }
+						setAttributes={ setAttributes }
+					/>
+				</BlockControls>
+				<TemplatePartInnerBlocks
+					postId={ postId }
+					hasInnerBlocks={ innerBlocks.length > 0 }
+				/>
+			</>
 		);
 	}
 	if ( ! initialSlug.current && ! initialTheme.current ) {

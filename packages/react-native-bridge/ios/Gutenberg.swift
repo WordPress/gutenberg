@@ -13,7 +13,9 @@ public class Gutenberg: NSObject {
     private var extraModules: [RCTBridgeModule];
 
     public lazy var rootView: UIView = {
-        return RCTRootView(bridge: bridge, moduleName: "gutenberg", initialProperties: initialProps)
+        let view = RCTRootView(bridge: bridge, moduleName: "gutenberg", initialProperties: initialProps)
+        view.loadingView = dataSource.loadingView
+        return view
     }()
 
     public var delegate: GutenbergBridgeDelegate? {
@@ -66,8 +68,11 @@ public class Gutenberg: NSObject {
             initialProps["translations"] = translations
         }
 
-        if let capabilities = dataSource.gutenbergCapabilities() {
-            initialProps["capabilities"] = capabilities
+        let capabilities = dataSource.gutenbergCapabilities()
+        if capabilities.isEmpty == false {
+            initialProps["capabilities"] = Dictionary<String, Bool>(uniqueKeysWithValues: capabilities.map { key, value in
+                (key.rawValue, value)
+            })
         }
 
         let editorTheme = dataSource.gutenbergEditorTheme()
@@ -222,7 +227,7 @@ extension Gutenberg {
 }
 
 public extension Gutenberg.MediaSource {
-    public init(id: String, label: String, types: [Gutenberg.MediaType]) {
+    init(id: String, label: String, types: [Gutenberg.MediaType]) {
         self.id = id
         self.label = label
         self.types = Set(types)

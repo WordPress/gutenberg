@@ -4,15 +4,6 @@
 	border-radius: 8px 8px 8px 8px;
 }
 
-.content {
-	padding: 0 0 0 0;
-	align-items: center;
-}
-
-.contentBottomPadding {
-	padding-bottom: 20px;
-}
-
 .rowSeparator {
 	height: 12px;
 }
@@ -77,4 +68,14 @@
 
 .columnPadding {
 	padding: $grid-unit-20;
+}
+
+.clipboardBlock {
+	background-color: transparent;
+	border-width: 1px;
+	border-color: $light-gray-400;
+}
+
+.clipboardBlockDark {
+	border-color: $gray-70;
 }

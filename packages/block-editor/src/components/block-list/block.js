@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useMemo } from '@wordpress/element';
+import {
+	useState,
+	createContext,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveElement,
@@ -38,6 +43,30 @@ import { Block } from './block-wrapper';
 
 export const BlockListBlockContext = createContext();
 
+/**
+ * Merges wrapper props with special handling for classNames and styles.
+ *
+ * @param {Object} propsA
+ * @param {Object} propsB
+ *
+ * @return {Object} Merged props.
+ */
+function mergeWrapperProps( propsA, propsB ) {
+	const newProps = {
+		...propsA,
+		...propsB,
+	};
+
+	if ( propsA && propsB && propsA.className && propsB.className ) {
+		newProps.className = classnames( propsA.className, propsB.className );
+	}
+	if ( propsA && propsB && propsA.style && propsB.style ) {
+		newProps.style = { ...propsA.style, ...propsB.style };
+	}
+
+	return newProps;
+}
+
 function BlockListBlock( {
 	mode,
 	isFocusMode,
@@ -64,6 +93,7 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
+	__experimentalRenderCallback: renderCallback,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -81,7 +111,7 @@ function BlockListBlock( {
 		[ clientId ]
 	);
 	const { removeBlock } = useDispatch( 'core/block-editor' );
-	const onRemove = () => removeBlock( clientId );
+	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
@@ -97,10 +127,10 @@ function BlockListBlock( {
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
-		wrapperProps = {
-			...wrapperProps,
-			...blockType.getEditWrapperProps( attributes ),
-		};
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
 	}
 
 	const generatedClassName =
@@ -168,10 +198,6 @@ function BlockListBlock( {
 		);
 	}
 
-	if ( mode !== 'visual' ) {
-		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
-	}
-
 	const value = {
 		clientId,
 		rootClientId,
@@ -190,33 +216,40 @@ function BlockListBlock( {
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
+	let block;
+
+	if ( ! isValid ) {
+		block = (
+			<Block.div>
+				<BlockInvalidWarning clientId={ clientId } />
+				<div>{ getSaveElement( blockType, attributes ) }</div>
+			</Block.div>
+		);
+	} else if ( mode === 'html' ) {
+		// Render blockEdit so the inspector controls don't disappear.
+		// See #8969.
+		block = (
+			<>
+				<div style={ { display: 'none' } }>{ blockEdit }</div>
+				<Block.div __unstableIsHtml>
+					<BlockHtml clientId={ clientId } />
+				</Block.div>
+			</>
+		);
+	} else if ( lightBlockWrapper ) {
+		block = blockEdit;
+	} else {
+		block = <Block.div { ...wrapperProps }>{ blockEdit }</Block.div>;
+	}
+
+	if ( renderCallback ) {
+		block = renderCallback( block );
+	}
+
 	return (
 		<BlockListBlockContext.Provider value={ memoizedValue }>
 			<BlockCrashBoundary onError={ onBlockError }>
-				{ isValid && lightBlockWrapper && (
-					<>
-						{ blockEdit }
-						{ mode === 'html' && (
-							<Block.div __unstableIsHtml>
-								<BlockHtml clientId={ clientId } />
-							</Block.div>
-						) }
-					</>
-				) }
-				{ isValid && ! lightBlockWrapper && (
-					<Block.div { ...wrapperProps }>
-						{ blockEdit }
-						{ mode === 'html' && (
-							<BlockHtml clientId={ clientId } />
-						) }
-					</Block.div>
-				) }
-				{ ! isValid && (
-					<Block.div>
-						<BlockInvalidWarning clientId={ clientId } />
-						<div>{ getSaveElement( blockType, attributes ) }</div>
-					</Block.div>
-				) }
+				{ block }
 			</BlockCrashBoundary>
 			{ !! hasError && (
 				<Block.div>

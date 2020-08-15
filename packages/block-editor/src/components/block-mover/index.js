@@ -7,10 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
-} from '@wordpress/components';
+import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -50,7 +47,7 @@ export class BlockMover extends Component {
 			isLocked,
 			isHidden,
 			rootClientId,
-			__experimentalOrientation: orientation,
+			orientation,
 		} = this.props;
 		const { isFocused } = this.state;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
@@ -101,6 +98,7 @@ export default withSelect( ( select, { clientIds } ) => {
 	const {
 		getBlock,
 		getBlockIndex,
+		getBlockListSettings,
 		getTemplateLock,
 		getBlockOrder,
 		getBlockRootClientId,
@@ -125,5 +123,6 @@ export default withSelect( ( select, { clientIds } ) => {
 		firstIndex,
 		isFirst,
 		isLast,
+		orientation: getBlockListSettings( rootClientId )?.orientation,
 	};
 } )( BlockMover );

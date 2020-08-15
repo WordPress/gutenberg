@@ -71,7 +71,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("↳ Content changed: \(changed)")
         print("↳ Title: \(title)")
         print("↳ HTML: \(html)")
-        print("↳ Content Info: \(contentInfo)")
+        print("↳ Content Info: \(String(describing: contentInfo))")
         self.contentInfo = contentInfo
     }
 
@@ -259,8 +259,11 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
-    func gutenbergCapabilities() -> [String : Bool]? {
-        return ["mentions": true]
+    func gutenbergCapabilities() -> [Capabilities : Bool] {
+        return [
+            .mentions: true,
+            .unsupportedBlockEditor: true,
+        ]
     }
 
     func aztecAttachmentDelegate() -> TextViewAttachmentDelegate {

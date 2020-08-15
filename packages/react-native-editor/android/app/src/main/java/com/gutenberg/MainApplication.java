@@ -31,6 +31,11 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -155,9 +160,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
                                                                     String content,
                                                                     String blockId,
-                                                                    String blockName) {
+                                                                    String blockName,
+                                                                    String blockTitle) {
                 mReplaceUnsupportedBlockCallback = replaceUnsupportedBlockCallback;
-                openGutenbergWebView(content, blockId, blockName);
+                openGutenbergWebView(content, blockId, blockTitle);
             }
 
             @Override
@@ -184,6 +190,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new ReactAztecPackage(null, null),
                         new LinearGradientPackage(),
                         new RNGetRandomValuesPackage(),
+                        new RNCMaskedViewPackage(),
+                        new RNGestureHandlerPackage(),
+                        new ReanimatedPackage(),
+                        new SafeAreaContextPackage(),
+                        new RNScreensPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 

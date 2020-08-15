@@ -3,14 +3,13 @@
  */
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockDraggableChip from './draggable-chip';
 import useScrollWhenDragging from './use-scroll-when-dragging';
-import { BlockNodes } from '../block-list/root-container';
 
 const BlockDraggable = ( {
 	children,
@@ -19,38 +18,29 @@ const BlockDraggable = ( {
 	onDragStart,
 	onDragEnd,
 } ) => {
-	const { srcRootClientId, index, isDraggable } = useSelect(
+	const { srcRootClientId, isDraggable } = useSelect(
 		( select ) => {
-			const {
-				getBlockIndex,
-				getBlockRootClientId,
-				getTemplateLock,
-			} = select( 'core/block-editor' );
-			const rootClientId =
-				clientIds.length === 1
-					? getBlockRootClientId( clientIds[ 0 ] )
-					: null;
+			const { getBlockRootClientId, getTemplateLock } = select(
+				'core/block-editor'
+			);
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
 
 			return {
-				index: getBlockIndex( clientIds[ 0 ], rootClientId ),
 				srcRootClientId: rootClientId,
-				isDraggable: clientIds.length === 1 && 'all' !== templateLock,
+				isDraggable: 'all' !== templateLock,
 			};
 		},
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
-	const [ firstClientId ] = clientIds;
-	const blockNodes = useContext( BlockNodes );
-	const blockElement = blockNodes ? blockNodes[ firstClientId ] : undefined;
 	const [
 		startScrolling,
 		scrollOnDragOver,
 		stopScrolling,
-	] = useScrollWhenDragging( blockElement );
+	] = useScrollWhenDragging();
 
 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
 		'core/block-editor'
@@ -71,8 +61,7 @@ const BlockDraggable = ( {
 
 	const transferData = {
 		type: 'block',
-		srcIndex: index,
-		srcClientId: clientIds[ 0 ],
+		srcClientIds: clientIds,
 		srcRootClientId,
 	};
 

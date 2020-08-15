@@ -332,8 +332,8 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 				),
 			};
 			break;
-		case 'MOVE_BLOCK_TO_POSITION': {
-			const updatedBlockUids = [ action.clientId ];
+		case 'MOVE_BLOCKS_TO_POSITION': {
+			const updatedBlockUids = [ ...action.clientIds ];
 			if ( action.fromRootClientId ) {
 				updatedBlockUids.push( action.fromRootClientId );
 			}
@@ -905,24 +905,25 @@ export const blocks = flow(
 				};
 			}
 
-			case 'MOVE_BLOCK_TO_POSITION': {
+			case 'MOVE_BLOCKS_TO_POSITION': {
 				const {
 					fromRootClientId = '',
 					toRootClientId = '',
-					clientId,
+					clientIds,
 				} = action;
 				const { index = state[ toRootClientId ].length } = action;
 
 				// Moving inside the same parent block
 				if ( fromRootClientId === toRootClientId ) {
 					const subState = state[ toRootClientId ];
-					const fromIndex = subState.indexOf( clientId );
+					const fromIndex = subState.indexOf( clientIds[ 0 ] );
 					return {
 						...state,
 						[ toRootClientId ]: moveTo(
 							state[ toRootClientId ],
 							fromIndex,
-							index
+							index,
+							clientIds.length
 						),
 					};
 				}
@@ -932,11 +933,11 @@ export const blocks = flow(
 					...state,
 					[ fromRootClientId ]: without(
 						state[ fromRootClientId ],
-						clientId
+						...clientIds
 					),
 					[ toRootClientId ]: insertAt(
 						state[ toRootClientId ],
-						clientId,
+						clientIds,
 						index
 					),
 				};
@@ -1069,10 +1070,13 @@ export const blocks = flow(
 					),
 				};
 
-			case 'MOVE_BLOCK_TO_POSITION': {
+			case 'MOVE_BLOCKS_TO_POSITION': {
 				return {
 					...state,
-					[ action.clientId ]: action.toRootClientId || '',
+					...action.clientIds.reduce( ( accumulator, id ) => {
+						accumulator[ id ] = action.toRootClientId || '';
+						return accumulator;
+					}, {} ),
 				};
 			}
 
@@ -1626,14 +1630,21 @@ export function automaticChangeStatus( state, action ) {
  * @return {string} Updated state.
  */
 export function highlightedBlock( state, action ) {
-	const { clientId, isHighlighted } = action;
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_HIGHLIGHT':
+			const { clientId, isHighlighted } = action;
 
-	if ( action.type === 'TOGGLE_BLOCK_HIGHLIGHT' ) {
-		if ( isHighlighted ) {
-			return clientId;
-		} else if ( state === clientId ) {
-			return null;
-		}
+			if ( isHighlighted ) {
+				return clientId;
+			} else if ( state === clientId ) {
+				return null;
+			}
+
+			return state;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
+			}
 	}
 
 	return state;

@@ -128,6 +128,7 @@ class Inserter extends Component {
 		if ( isQuick ) {
 			return (
 				<QuickInserter
+					onSelect={ onClose }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
@@ -135,6 +136,7 @@ class Inserter extends Component {
 				/>
 			);
 		}
+
 		return (
 			<InserterMenu
 				onSelect={ onClose }
@@ -183,14 +185,11 @@ export default compose( [
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
-			getBlockSelectionEnd,
 		} = select( 'core/block-editor' );
 		const { getBlockVariations } = select( 'core/blocks' );
 
 		rootClientId =
-			rootClientId ||
-			getBlockRootClientId( clientId || getBlockSelectionEnd() ) ||
-			undefined;
+			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 

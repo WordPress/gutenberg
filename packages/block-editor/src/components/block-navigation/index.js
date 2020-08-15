@@ -34,7 +34,7 @@ function BlockNavigation( {
 	return (
 		<div className="block-editor-block-navigation__container">
 			<p className="block-editor-block-navigation__label">
-				{ __( 'Block navigation' ) }
+				{ __( 'List view' ) }
 			</p>
 			{ hasHierarchy && (
 				<BlockNavigationTree
@@ -67,10 +67,11 @@ export default compose(
 		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			rootBlocks: getBlocks(),
+			rootBlocks: getBlocks( '', { includeControlledInnerBlocks: true } ),
 			rootBlock: selectedBlockClientId
 				? getBlock(
-						getBlockHierarchyRootClientId( selectedBlockClientId )
+						getBlockHierarchyRootClientId( selectedBlockClientId ),
+						{ includeControlledInnerBlocks: true }
 				  )
 				: null,
 			selectedBlockClientId,

@@ -1,20 +1,19 @@
 /**
  * WordPress dependencies
  */
-import {
-	BottomSheet,
-	BottomSheetConsumer,
-	ColorSettings,
-	colorsUtils,
-} from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 import { InspectorControls } from '@wordpress/block-editor';
-
+import { BottomSheet, ColorSettings } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
 import styles from './container.native.scss';
+
+export const blockSettingsScreens = {
+	settings: 'Settings',
+	color: 'Color',
+};
 
 function BottomSheetSettings( {
 	editorSidebarOpened,
@@ -30,23 +29,18 @@ function BottomSheetSettings( {
 			contentStyle={ styles.content }
 			{ ...props }
 		>
-			<BottomSheetConsumer>
-				{ ( { currentScreen, extraProps, ...bottomSheetProps } ) => {
-					switch ( currentScreen ) {
-						case colorsUtils.subsheets.color:
-							return (
-								<ColorSettings
-									defaultSettings={ settings }
-									{ ...bottomSheetProps }
-									{ ...extraProps }
-								/>
-							);
-						case colorsUtils.subsheets.settings:
-						default:
-							return <InspectorControls.Slot />;
-					}
-				} }
-			</BottomSheetConsumer>
+			<BottomSheet.NavigationContainer animate main>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.settings }
+				>
+					<InspectorControls.Slot />
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.color }
+				>
+					<ColorSettings defaultSettings={ settings } />
+				</BottomSheet.NavigationScreen>
+			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
 }

@@ -42,6 +42,7 @@ export default function DevicePreview() {
 						className={
 							'edit-post-header-preview__button-external'
 						}
+						role="menuitem"
 						forceIsAutosaveable={ hasActiveMetaboxes }
 						forcePreviewLink={ isSaving ? null : undefined }
 						textContent={

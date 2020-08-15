@@ -67,7 +67,7 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/quote' ],
+			blocks: [ 'core/quote', 'core/pullquote' ],
 			transform: ( { value, anchor } ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
@@ -162,6 +162,23 @@ const transforms = {
 			blocks: [ 'core/quote' ],
 			transform: ( { values, anchor } ) => {
 				return createBlock( 'core/quote', {
+					value: toHTMLString( {
+						value: create( {
+							html: values,
+							multilineTag: 'li',
+							multilineWrapperTags: [ 'ul', 'ol' ],
+						} ),
+						multilineTag: 'p',
+					} ),
+					anchor,
+				} );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/pullquote' ],
+			transform: ( { values, anchor } ) => {
+				return createBlock( 'core/pullquote', {
 					value: toHTMLString( {
 						value: create( {
 							html: values,

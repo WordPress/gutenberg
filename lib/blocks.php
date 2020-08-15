@@ -61,6 +61,7 @@ function gutenberg_reregister_core_block_types() {
 		'latest-posts.php'    => 'core/latest-posts',
 		'legacy-widget.php'   => 'core/legacy-widget',
 		'navigation.php'      => 'core/navigation',
+		'navigation-link.php' => 'core/navigation-link',
 		'rss.php'             => 'core/rss',
 		'search.php'          => 'core/search',
 		'shortcode.php'       => 'core/shortcode',
@@ -85,6 +86,8 @@ function gutenberg_reregister_core_block_types() {
 				'query.php'               => 'core/query',
 				'query-loop.php'          => 'core/query-loop',
 				'query-pagination.php'    => 'core/query-pagination',
+				'site-logo.php'           => 'core/site-logo',
+				'site-tagline.php'        => 'core/site-tagline',
 				'site-title.php'          => 'core/site-title',
 				'template-part.php'       => 'core/template-part',
 			)

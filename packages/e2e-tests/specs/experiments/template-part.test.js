@@ -6,6 +6,7 @@ import {
 	insertBlock,
 	disablePrePublishChecks,
 	visitAdminPage,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -13,7 +14,6 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { useExperimentalFeatures } from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Template Part', () => {
 	useExperimentalFeatures( [
@@ -22,23 +22,24 @@ describe( 'Template Part', () => {
 	] );
 
 	beforeAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	describe( 'Template part block', () => {
-		beforeEach( () =>
-			visitAdminPage(
+		beforeEach( async () => {
+			await visitAdminPage(
 				'admin.php',
 				addQueryArgs( '', {
 					page: 'gutenberg-edit-site',
 				} ).slice( 1 )
-			)
-		);
+			);
+			await page.waitForSelector( '.edit-site-visual-editor' );
+		} );
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.
@@ -80,8 +81,6 @@ describe( 'Template Part', () => {
 
 	describe( 'Template part placeholder', () => {
 		// Test constants for template part.
-		const testSlug = 'test-template-part';
-		const testTheme = 'test-theme';
 		const testContent = 'some words...';
 
 		// Selectors
@@ -92,9 +91,9 @@ describe( 'Template Part', () => {
 		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
 		const createNewButtonSelector =
-			'//button[contains(text(), "Create new")]';
-		const disabledButtonSelector =
-			'.wp-block-template-part__placeholder-create-button[disabled]';
+			'//button[contains(text(), "New template part")]';
+		const chooseExistingButtonSelector =
+			'//button[contains(text(), "Choose existing")]';
 
 		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
@@ -105,12 +104,6 @@ describe( 'Template Part', () => {
 				createNewButtonSelector
 			);
 			await createNewButton.click();
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testSlug );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testTheme );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Enter' );
 
 			const newTemplatePart = await page.waitForSelector(
 				activatedTemplatePartSelector
@@ -118,7 +111,8 @@ describe( 'Template Part', () => {
 			expect( newTemplatePart ).toBeTruthy();
 
 			// Finish creating template part, insert some text, and save.
-			await page.click( templatePartSelector );
+			await page.click( '.block-editor-button-block-appender' );
+			await page.click( '.editor-block-list-item-paragraph' );
 			await page.keyboard.type( testContent );
 			await page.click( savePostSelector );
 			await page.click( entitiesSaveSelector );
@@ -128,6 +122,10 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
+			const [ chooseExistingButton ] = await page.$x(
+				chooseExistingButtonSelector
+			);
+			await chooseExistingButton.click();
 			const preview = await page.waitForXPath( testContentSelector );
 			expect( preview ).toBeTruthy();
 		} );
@@ -140,25 +138,6 @@ describe( 'Template Part', () => {
 				testContentSelector
 			);
 			expect( templatePartContent ).toBeTruthy();
-		} );
-
-		it( 'Should disable create button for slug/theme combo', async () => {
-			await createNewPost();
-			// Create new template part.
-			await insertBlock( 'Template Part' );
-			const [ createNewButton ] = await page.$x(
-				createNewButtonSelector
-			);
-			await createNewButton.click();
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testSlug );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testTheme );
-
-			const disabledButton = await page.waitForSelector(
-				disabledButtonSelector
-			);
-			expect( disabledButton ).toBeTruthy();
 		} );
 	} );
 } );
