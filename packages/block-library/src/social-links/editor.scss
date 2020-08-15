@@ -11,19 +11,7 @@
 // When that happens, leverage that instead of the following overrides.
 .editor-styles-wrapper .wp-block-social-link {
 	margin: 0;
-	margin-right: 0.5em;
-
-	> button {
-		padding: 0.375em;
-		line-height: 0;
-		font-size: 1em;
-		display: block;
-
-		svg {
-			width: 1.5em;
-			height: 1.5em;
-		}
-	}
+	margin-right: 8px;
 }
 
 .editor-styles-wrapper .wp-block-social-links {
@@ -51,7 +39,7 @@
 // Selected/unselected states.
 // Unselected block is preview, selected has additional options.
 [data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) .wp-block-social-links {
-	min-height: 2.25em; // This height matches the height of the buttons and ensures an empty block doesn't collapse.
+	min-height: 36px; // This height matches the height of the buttons and ensures an empty block doesn't collapse.
 }
 
 // Disappear but show on hover or nav mode focus.
