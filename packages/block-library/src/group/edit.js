@@ -27,12 +27,6 @@ function GroupEdit( { attributes, className, clientId } ) {
 						: () => <InnerBlocks.ButtonBlockAppender />
 				}
 				__experimentalTagName="div"
-				__experimentalItemCallback={ ( item ) => (
-					<>
-						<section>{ item }</section>
-						<p>You can do cool/weird stuff like this now.</p>
-					</>
-				) }
 				__experimentalPassedProps={ {
 					className: 'wp-block-group__inner-container',
 				} }

@@ -9,14 +9,7 @@ export default function save( { attributes } ) {
 	return (
 		<Tag>
 			<div className="wp-block-group__inner-container">
-				<InnerBlocks.Content
-					__experimentalItemCallback={ ( item ) => (
-						<>
-							<section>{ item }</section>
-							<p>You can do cool/weird stuff like this now.</p>
-						</>
-					) }
-				/>
+				<InnerBlocks.Content />
 			</div>
 		</Tag>
 	);
