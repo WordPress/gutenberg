@@ -17,10 +17,7 @@ import memize from 'memize';
  */
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import {
-	Toolbar,
-	ToolbarButton,
-} from '@wordpress/components';
+import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
