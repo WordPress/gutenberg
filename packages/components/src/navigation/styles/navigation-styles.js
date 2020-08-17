@@ -49,7 +49,7 @@ export const MenuItem = styled.li`
 	}
 `;
 
-export const Badge = styled.span`
+export const BadgeUI = styled.span`
 	margin-left: 8px;
 	display: inline-flex;
 	padding: 4px 12px;
