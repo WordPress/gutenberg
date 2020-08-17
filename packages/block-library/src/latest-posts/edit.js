@@ -400,7 +400,12 @@ class LatestPostsEdit extends Component {
 							excerptElement.innerText ||
 							'';
 
-						const imageSourceUrl = post.featuredImageSourceUrl;
+						const {
+							featuredImageInfo: {
+								url: imageSourceUrl,
+								alt: featuredImageAlt,
+							} = {},
+						} = post;
 						const imageClasses = classnames( {
 							'wp-block-latest-posts__featured-image': true,
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
@@ -410,7 +415,7 @@ class LatestPostsEdit extends Component {
 						const featuredImage = renderFeaturedImage && (
 							<img
 								src={ imageSourceUrl }
-								alt=""
+								alt={ featuredImageAlt }
 								style={ {
 									maxWidth: featuredImageSizeWidth,
 									maxHeight: featuredImageSizeHeight,
@@ -564,24 +569,28 @@ export default withSelect( ( select, props ) => {
 		latestPosts: ! Array.isArray( posts )
 			? posts
 			: posts.map( ( post ) => {
-					if ( post.featured_media ) {
-						const image = getMedia( post.featured_media );
-						let url = get(
-							image,
-							[
-								'media_details',
-								'sizes',
-								featuredImageSizeSlug,
-								'source_url',
-							],
-							null
-						);
-						if ( ! url ) {
-							url = get( image, 'source_url', null );
-						}
-						return { ...post, featuredImageSourceUrl: url };
+					if ( ! post.featured_media ) return post;
+
+					const image = getMedia( post.featured_media );
+					let url = get(
+						image,
+						[
+							'media_details',
+							'sizes',
+							featuredImageSizeSlug,
+							'source_url',
+						],
+						null
+					);
+					if ( ! url ) {
+						url = get( image, 'source_url', null );
 					}
-					return post;
+					const featuredImageInfo = {
+						url,
+						// eslint-disable-next-line camelcase
+						alt: image?.alt_text,
+					};
+					return { ...post, featuredImageInfo };
 			  } ),
 	};
 } )( LatestPostsEdit );
