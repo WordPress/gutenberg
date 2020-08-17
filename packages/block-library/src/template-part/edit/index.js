@@ -30,14 +30,16 @@ export default function TemplatePartEdit( {
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part
 	// content loading.
-	const { innerBlocks, hasSelectedInnerBlock } = useSelect(
+	const { isNavigationMode, innerBlocks, hasSelectedInnerBlock } = useSelect(
 		( select ) => {
 			const {
 				getBlocks,
 				hasSelectedInnerBlock: getHasSelectedInnerBlock,
+				isNavigationMode: _isNavigationMode,
 			} = select( 'core/block-editor' );
 			return {
 				innerBlocks: getBlocks( clientId ),
+				isNavigationMode: _isNavigationMode,
 				hasSelectedInnerBlock: getHasSelectedInnerBlock(
 					clientId,
 					true
@@ -65,6 +67,8 @@ export default function TemplatePartEdit( {
 		}
 	}, [ innerBlocks ] );
 
+	const shouldDisplayLabel = ! isNavigationMode() && hasSelectedInnerBlock;
+
 	if ( postId ) {
 		// Part of a template file, post ID already resolved.
 		return (
@@ -76,7 +80,7 @@ export default function TemplatePartEdit( {
 					/>
 				</BlockControls>
 				<div className="wp-block-template-part__container">
-					{ hasSelectedInnerBlock && (
+					{ shouldDisplayLabel && (
 						<TemplatePartLabel postId={ postId } slug={ slug } />
 					) }
 					<TemplatePartInnerBlocks
