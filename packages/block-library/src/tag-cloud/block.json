@@ -2,9 +2,6 @@
 	"name": "core/tag-cloud",
 	"category": "widgets",
 	"attributes": {
-		"className": {
-			"type": "string"
-		},
 		"taxonomy": {
 			"type": "string",
 			"default": "post_tag"

@@ -162,10 +162,6 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' has-author';
 	}
 
-	if ( isset( $attributes['className'] ) ) {
-		$class .= ' ' . $attributes['className'];
-	}
-
 	return sprintf(
 		'<ul class="%1$s">%2$s</ul>',
 		esc_attr( $class ),

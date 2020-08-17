@@ -19,10 +19,6 @@ function render_block_core_archives( $attributes ) {
 
 	$class = 'wp-block-archives';
 
-	if ( isset( $attributes['className'] ) ) {
-		$class .= " {$attributes['className']}";
-	}
-
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
 
 		$class .= ' wp-block-archives-dropdown';
