@@ -7,14 +7,14 @@ export const Root = styled.div`
 	width: 100%;
 `;
 
-export const Menu = styled.ul`
+export const MenuUI = styled.ul`
 	padding: 0;
 	margin: 0 0 32px 0;
 	display: flex;
 	flex-direction: column;
 `;
 
-export const MenuItem = styled.li`
+export const MenuItemUI = styled.li`
 	button {
 		width: 100%;
 	}
