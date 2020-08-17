@@ -120,15 +120,15 @@ class BlockListBlock extends Component {
 			isValid,
 			order,
 			title,
+			isDimmed,
 			isTouchable,
 			onDeleteBlock,
 			isStackedHorizontally,
 			isParentSelected,
 			getStylesFromColorScheme,
-			isInnerBlockSelected,
 			marginHorizontal,
 			marginVertical,
-			isDimmed,
+			isInnerBlockSelected,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
