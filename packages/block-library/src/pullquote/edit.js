@@ -66,13 +66,13 @@ class PullQuoteEdit extends Component {
 		}
 
 		if ( shouldSetTextColor ) {
-			if ( ! colorValue && this.wasTextColorAutomaticallyComputed ) {
+			if ( colorValue ) {
+				this.wasTextColorAutomaticallyComputed = true;
+				setTextColor( colorUtils.getMostReadableColor( colorValue ) );
+			} else if ( this.wasTextColorAutomaticallyComputed ) {
 				// We have to unset our previously computed text color on unsetting the main color.
 				this.wasTextColorAutomaticallyComputed = false;
 				setTextColor();
-			} else {
-				this.wasTextColorAutomaticallyComputed = true;
-				setTextColor( colorUtils.getMostReadableColor( colorValue ) );
 			}
 		}
 	}
