@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
-import SafeArea from 'react-native-safe-area';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -24,71 +23,73 @@ const BREAKPOINTS = {
 	small: 600,
 };
 
-const ALIGNMENTS = [ 'wide', 'full' ];
+const stretchStyle = {
+	flex: 1,
+};
 
 export class BlockListItem extends Component {
-	constructor( props ) {
-		super( props );
-		const { blockAlignment } = props;
+	constructor() {
+		super( ...arguments );
 
-		this.onWidthChange = this.onWidthChange.bind( this );
+		this.onLayout = this.onLayout.bind( this );
+
 		this.state = {
-			width: Dimensions.get( 'window' ).width,
+			blockWidth: 0,
 		};
-
-		if ( ALIGNMENTS.includes( blockAlignment ) ) {
-			Dimensions.addEventListener( 'change', this.onWidthChange );
-		}
 	}
 
-	componentWillUnmount() {
-		const { blockAlignment } = this.props;
+	onLayout( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const { blockWidth } = this.state;
 
-		if ( ALIGNMENTS.includes( blockAlignment ) ) {
-			Dimensions.removeEventListener( 'change', this.onWidthChange );
+		if ( blockWidth !== layout.width ) {
+			this.setState( { blockWidth: layout.width } );
 		}
-	}
-
-	onWidthChange() {
-		SafeArea.getSafeAreaInsetsForRootView().then( ( insets ) => {
-			const { left, right } = insets.safeAreaInsets;
-			this.setState( {
-				width: Dimensions.get( 'window' ).width - ( left + right ),
-			} );
-		} );
 	}
 
 	getMarginHorizontal() {
-		const { blockAlignment, hasParents, marginHorizontal } = this.props;
-		const { width } = this.state;
+		const {
+			blockAlignment,
+			hasParents,
+			marginHorizontal,
+			parentBlockAlignment,
+			numberOfParents,
+		} = this.props;
+		const { blockWidth } = this.state;
+		const isParentBlockFullWidth = parentBlockAlignment === 'full';
 
 		switch ( blockAlignment ) {
 			case 'full':
-				return styles.fullAlignment.marginLeft;
+				return 0;
 			case 'wide':
-				if ( width > BREAKPOINTS.small && width <= BREAKPOINTS.wide ) {
-					return ! hasParents
-						? styles.wideAlignmentParent.marginLeft
+				if (
+					blockWidth > BREAKPOINTS.small &&
+					blockWidth <= BREAKPOINTS.wide
+				) {
+					return hasParents &&
+						numberOfParents >= 1 &&
+						! isParentBlockFullWidth
+						? marginHorizontal
 						: styles.wideAlignment.marginLeft;
 				}
-				return ! hasParents
-					? marginHorizontal
-					: styles.wideAlignmentSmall.marginLeft;
+				return marginHorizontal;
 			default:
+				if ( isParentBlockFullWidth && numberOfParents === 1 ) {
+					return marginHorizontal * 2;
+				}
 				return marginHorizontal;
 		}
 	}
 
 	getContentStyles( readableContentViewStyle ) {
 		const { blockAlignment, hasParents } = this.props;
-		const { width } = this.state;
 		const isFullWidth = blockAlignment === 'full';
 
 		return [
 			readableContentViewStyle,
 			isFullWidth &&
 				! hasParents && {
-					width,
+					width: styles.fullAlignment.width,
 				},
 			isFullWidth &&
 				hasParents && {
@@ -109,7 +110,7 @@ export class BlockListItem extends Component {
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
-			contentResizeMode === 'stretch' && styles.stretch;
+			contentResizeMode === 'stretch' && stretchStyle;
 
 		return (
 			<ReadableContentView
@@ -119,6 +120,7 @@ export class BlockListItem extends Component {
 				<View
 					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
+					onLayout={ this.onLayout }
 				>
 					{ shouldShowInsertionPointBefore && (
 						<BlockInsertionPoint />
@@ -148,6 +150,7 @@ export default compose( [
 				getBlockInsertionPoint,
 				isBlockInsertionPointVisible,
 				getSettings,
+				getBlockCount,
 				getBlockParents,
 				__unstableGetBlockWithoutInnerBlocks,
 			} = select( 'core/block-editor' );
@@ -180,13 +183,22 @@ export default compose( [
 			const { align } = attributes || {};
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
+			const hasInnerBlocks = !! getBlockCount( clientId );
+			const parentBlock = hasParents
+				? __unstableGetBlockWithoutInnerBlocks( parents[ 0 ] )
+				: {};
+			const { align: parentBlockAlignment } =
+				parentBlock?.attributes || {};
 
 			return {
 				shouldShowInsertionPointBefore,
 				shouldShowInsertionPointAfter,
 				isReadOnly,
 				hasParents,
+				hasInnerBlocks,
 				blockAlignment: align,
+				parentBlockAlignment,
+				numberOfParents: parents.length,
 			};
 		}
 	),

@@ -4,6 +4,7 @@
 
 .fullAlignment {
 	margin-left: 0;
+	width: 100%;
 }
 
 .fullAlignmentPadding {
@@ -12,12 +13,4 @@
 
 .wideAlignment {
 	margin-left: $block-edge-to-content * 4;
-}
-
-.wideAlignmentParent {
-	margin-left: $block-edge-to-content * 3;
-}
-
-.wideAlignmentSmall {
-	margin-left: $block-edge-to-content * 2;
 }

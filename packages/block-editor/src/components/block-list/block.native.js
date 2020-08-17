@@ -102,35 +102,6 @@ class BlockListBlock extends Component {
 		);
 	}
 
-	getBlockStyles() {
-		const {
-			attributes,
-			hasParents,
-			isDimmed,
-			isInnerBlockSelected,
-			isSelected,
-			marginHorizontal,
-			marginVertical,
-		} = this.props;
-		const { align } = attributes;
-		const isFullWidth = align === 'full';
-
-		return [
-			{ marginVertical, marginHorizontal, flex: 1 },
-			isDimmed && styles.dimmed,
-			isFullWidth &&
-				! hasParents &&
-				( isSelected || isInnerBlockSelected ) && {
-					paddingHorizontal: styles.fullWidthPadding.paddingLeft,
-				},
-			isFullWidth &&
-				hasParents &&
-				isInnerBlockSelected && {
-					paddingHorizontal: styles.fullWidthPadding.paddingLeft,
-				},
-		];
-	}
-
 	renderBlockTitle() {
 		return (
 			<View style={ styles.blockTitle }>
@@ -155,7 +126,9 @@ class BlockListBlock extends Component {
 			isParentSelected,
 			getStylesFromColorScheme,
 			isInnerBlockSelected,
-			hasParents,
+			marginHorizontal,
+			marginVertical,
+			isDimmed,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
@@ -171,6 +144,7 @@ class BlockListBlock extends Component {
 		);
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
+		const isFullWidth = align === 'full';
 
 		return (
 			<TouchableWithoutFeedback
@@ -185,14 +159,16 @@ class BlockListBlock extends Component {
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
-						style={ this.getBlockStyles() }
+						style={ [
+							{ marginVertical, marginHorizontal, flex: 1 },
+							isDimmed && styles.dimmed,
+						] }
 					>
 						{ isSelected && (
 							<View
 								style={ [
 									styles.solidBorder,
 									align === 'full' &&
-										! hasParents &&
 										styles.solidBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
@@ -233,6 +209,7 @@ class BlockListBlock extends Component {
 									}
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
+									isFullWidth={ isFullWidth }
 								/>
 							) }
 						</View>
@@ -283,7 +260,6 @@ export default compose( [
 
 		const parents = getBlockParents( clientId, true );
 		const parentId = parents[ 0 ] || '';
-		const hasParents = !! parents.length;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -312,7 +288,6 @@ export default compose( [
 			isParentSelected ||
 			parentId === '';
 		return {
-			hasParents,
 			icon,
 			name: name || 'core/missing',
 			order,
