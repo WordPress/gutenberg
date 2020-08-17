@@ -98,7 +98,9 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	removeNonDigit( text ) {
-		return text.replace( /[^0-9.]/g, '' );
+		const rg = /^([0-9]+\.?([0-9]+)?)/;
+		const result = text.match( rg );
+		return result ? result[ 0 ] : '';
 	}
 
 	updateValue( value ) {
