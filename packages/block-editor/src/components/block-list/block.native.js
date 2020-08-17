@@ -126,8 +126,8 @@ class BlockListBlock extends Component {
 			isStackedHorizontally,
 			isParentSelected,
 			getStylesFromColorScheme,
-			marginHorizontal,
 			marginVertical,
+			marginHorizontal,
 			isInnerBlockSelected,
 		} = this.props;
 
@@ -168,8 +168,7 @@ class BlockListBlock extends Component {
 							<View
 								style={ [
 									styles.solidBorder,
-									align === 'full' &&
-										styles.solidBorderFullWidth,
+									isFullWidth && styles.solidBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
