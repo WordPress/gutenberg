@@ -88,10 +88,6 @@ function render_block_core_rss( $attributes ) {
 		$class .= ' columns-' . $attributes['columns'];
 	}
 
-	if ( isset( $attributes['className'] ) ) {
-		$class .= ' ' . $attributes['className'];
-	}
-
 	return sprintf( '<ul class="%s">%s</ul>', esc_attr( $class ), $list_items );
 }
 

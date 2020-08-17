@@ -191,7 +191,7 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 		// Wait for the autocomplete suggestion item to appear.
 		await page.waitForXPath( suggestionPath );
 		// Set the suggestion
-		const [ suggestion ] = await page.$x( suggestionPath );
+		const suggestion = await page.waitForXPath( suggestionPath );
 
 		// Select it (so we're clicking the right one, even if it's further down the list)
 		await suggestion.click();
@@ -218,15 +218,13 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 }
 
 async function selectDropDownOption( optionText ) {
-	await page.waitForSelector(
+	const selectToggle = await page.waitForSelector(
 		'.wp-block-navigation-placeholder__select-control button'
 	);
-	await page.click(
-		'.wp-block-navigation-placeholder__select-control button'
+	await selectToggle.click();
+	const theOption = await page.waitForXPath(
+		`//li[text()="${ optionText }"]`
 	);
-
-	const [ theOption ] = await page.$x( `//li[text()="${ optionText }"]` );
-
 	await theOption.click();
 }
 
@@ -238,7 +236,7 @@ async function clickCreateButton() {
 	);
 
 	// Then locate...
-	const [ createNavigationButton ] = await page.$x(
+	const createNavigationButton = await page.waitForXPath(
 		`//button[text()="${ buttonText }"][not(@disabled)]`
 	);
 

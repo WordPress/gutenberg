@@ -7,7 +7,6 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
 
 class LegacyWidgetEditDomManager extends Component {
 	constructor() {
@@ -23,7 +22,6 @@ class LegacyWidgetEditDomManager extends Component {
 
 	componentDidMount() {
 		this.triggerWidgetEvent( 'widget-added' );
-		this.previousFormData = new window.FormData( this.formRef.current );
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -53,7 +51,6 @@ class LegacyWidgetEditDomManager extends Component {
 		}
 		if ( shouldTriggerWidgetUpdateEvent ) {
 			this.triggerWidgetEvent( 'widget-updated' );
-			this.previousFormData = new window.FormData( this.formRef.current );
 		}
 		return false;
 	}
@@ -67,22 +64,9 @@ class LegacyWidgetEditDomManager extends Component {
 						className="form"
 						ref={ this.formRef }
 						method="post"
-						onBlur={ () => {
-							if ( this.shouldTriggerInstanceUpdate() ) {
-								if ( isReferenceWidget ) {
-									if ( this.containerRef.current ) {
-										window.wpWidgets.save(
-											window.jQuery(
-												this.containerRef.current
-											)
-										);
-									}
-								}
-								this.props.onInstanceChange(
-									this.retrieveUpdatedInstance()
-								);
-							}
-						} }
+						onBlur={ () =>
+							this.props.onInstanceChange( this.getFormData() )
+						}
 					>
 						<div
 							ref={ this.widgetContentRef }
@@ -131,40 +115,13 @@ class LegacyWidgetEditDomManager extends Component {
 		);
 	}
 
-	shouldTriggerInstanceUpdate() {
-		if ( ! this.formRef.current ) {
-			return false;
-		}
-		if ( ! this.previousFormData ) {
-			return true;
-		}
-		const currentFormData = new window.FormData( this.formRef.current );
-		const currentFormDataKeys = Array.from( currentFormData.keys() );
-		const previousFormDataKeys = Array.from( this.previousFormData.keys() );
-		if ( currentFormDataKeys.length !== previousFormDataKeys.length ) {
-			return true;
-		}
-		for ( const rawKey of currentFormDataKeys ) {
-			if (
-				! isShallowEqual(
-					currentFormData.getAll( rawKey ),
-					this.previousFormData.getAll( rawKey )
-				)
-			) {
-				this.previousFormData = currentFormData;
-				return true;
-			}
-		}
-		return false;
-	}
-
 	triggerWidgetEvent( event ) {
 		window
 			.jQuery( window.document )
 			.trigger( event, [ window.jQuery( this.containerRef.current ) ] );
 	}
 
-	retrieveUpdatedInstance() {
+	getFormData() {
 		if ( this.formRef.current ) {
 			const form = this.formRef.current;
 			const formData = new window.FormData( form );

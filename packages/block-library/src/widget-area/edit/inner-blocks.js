@@ -7,7 +7,7 @@ import { InnerBlocks } from '@wordpress/block-editor';
 export default function WidgetAreaInnerBlocks() {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'root',
-		'widgetArea'
+		'postType'
 	);
 	return (
 		<InnerBlocks

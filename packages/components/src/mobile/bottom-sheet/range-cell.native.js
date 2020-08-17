@@ -26,6 +26,8 @@ import Cell from './cell';
 import styles from './range-cell.scss';
 import borderStyles from './borderStyles.scss';
 
+const isIOS = Platform.OS === 'ios';
+
 class BottomSheetRangeCell extends Component {
 	constructor( props ) {
 		super( props );
@@ -164,12 +166,12 @@ class BottomSheetRangeCell extends Component {
 			minimumTrackTintColor = preferredColorScheme === 'light'
 				? '#00669b'
 				: '#5198d9',
-			maximumTrackTintColor = Platform.OS === 'ios'
-				? '#e9eff3'
-				: '#909090',
-			thumbTintColor = Platform.OS === 'android' && '#00669b',
+			maximumTrackTintColor = isIOS ? '#e9eff3' : '#909090',
+			thumbTintColor = ! isIOS && '#00669b',
 			getStylesFromColorScheme,
 			rangePreview,
+			cellContainerStyle,
+			shouldDisplayTextInput = true,
 			...cellProps
 		} = this.props;
 
@@ -196,11 +198,19 @@ class BottomSheetRangeCell extends Component {
 			styles.sliderDarkTextInput
 		);
 
+		const containerStyle = [
+			styles.container,
+			isIOS ? styles.containerIOS : styles.containerAndroid,
+		];
+
 		return (
 			<Cell
 				{ ...cellProps }
-				cellContainerStyle={ styles.cellContainerStyles }
-				cellRowContainerStyle={ styles.cellRowStyles }
+				cellContainerStyle={ [
+					styles.cellContainerStyles,
+					cellContainerStyle,
+				] }
+				cellRowContainerStyle={ containerStyle }
 				accessibilityRole={ 'none' }
 				value={ '' }
 				editable={ false }
@@ -213,7 +223,7 @@ class BottomSheetRangeCell extends Component {
 					__( 'Double tap to change the value using slider' )
 				}
 			>
-				<View style={ styles.container }>
+				<View style={ containerStyle }>
 					{ rangePreview }
 					<Slider
 						value={ this.validateInput( sliderValue ) }
@@ -232,22 +242,24 @@ class BottomSheetRangeCell extends Component {
 						style={ styles.slider }
 						accessibilityRole={ 'adjustable' }
 					/>
-					<TextInput
-						style={ [
-							defaultSliderStyle,
-							borderStyles.borderStyle,
-							hasFocus && borderStyles.isSelected,
-							{ width: 40 * fontScale },
-						] }
-						onChangeText={ this.onChangeText }
-						onSubmitEditing={ this.onSubmitEditing }
-						onFocus={ this.handleToggleFocus }
-						onBlur={ this.handleToggleFocus }
-						keyboardType="numeric"
-						returnKeyType="done"
-						defaultValue={ `${ inputValue }` }
-						value={ inputValue }
-					/>
+					{ shouldDisplayTextInput && (
+						<TextInput
+							style={ [
+								defaultSliderStyle,
+								borderStyles.borderStyle,
+								hasFocus && borderStyles.isSelected,
+								{ width: 40 * fontScale },
+							] }
+							onChangeText={ this.onChangeText }
+							onSubmitEditing={ this.onSubmitEditing }
+							onFocus={ this.handleToggleFocus }
+							onBlur={ this.handleToggleFocus }
+							keyboardType="numeric"
+							returnKeyType="done"
+							defaultValue={ `${ inputValue }` }
+							value={ inputValue }
+						/>
+					) }
 				</View>
 			</Cell>
 		);
