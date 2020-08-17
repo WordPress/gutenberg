@@ -163,6 +163,10 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentUpdateTheme ) {
 			this.subscriptionParentUpdateTheme.remove();
 		}
+
+		if ( this.subscriptionParentUpdateCapabilities ) {
+			this.subscriptionParentUpdateCapabilities.remove();
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
