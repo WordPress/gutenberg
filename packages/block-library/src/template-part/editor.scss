@@ -110,7 +110,11 @@
 
 	&.has-child-selected {
 		&::after {
-			box-shadow: 0 0 0 $border-width $gray-600;
+			box-shadow: 0 0 0 $border-width $gray-200;
+
+			.is-dark-theme & {
+				box-shadow: 0 0 0 $border-width-focus $gray-700;
+			}
 		}
 	}
 }
