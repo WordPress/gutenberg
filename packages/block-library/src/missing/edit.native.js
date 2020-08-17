@@ -7,7 +7,7 @@ import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
-import { BottomSheet, Icon, withSiteCapabilities } from '@wordpress/components';
+import { BottomSheet, Icon } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
