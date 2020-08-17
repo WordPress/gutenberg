@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { postCommentsForm as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,5 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Comments Form' ),
+	description: __( "Display a post's comments form." ),
+	icon,
 	edit,
 };
