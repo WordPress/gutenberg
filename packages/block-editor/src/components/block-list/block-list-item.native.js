@@ -150,7 +150,6 @@ export default compose( [
 				getBlockInsertionPoint,
 				isBlockInsertionPointVisible,
 				getSettings,
-				getBlockCount,
 				getBlockParents,
 				__unstableGetBlockWithoutInnerBlocks,
 			} = select( 'core/block-editor' );
@@ -183,7 +182,6 @@ export default compose( [
 			const { align } = attributes || {};
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
-			const hasInnerBlocks = !! getBlockCount( clientId );
 			const parentBlock = hasParents
 				? __unstableGetBlockWithoutInnerBlocks( parents[ 0 ] )
 				: {};
@@ -195,7 +193,6 @@ export default compose( [
 				shouldShowInsertionPointAfter,
 				isReadOnly,
 				hasParents,
-				hasInnerBlocks,
 				blockAlignment: align,
 				parentBlockAlignment,
 				numberOfParents: parents.length,
