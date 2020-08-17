@@ -31,7 +31,8 @@ const isIOS = Platform.OS === 'ios';
 class BottomSheetRangeCell extends Component {
 	constructor( props ) {
 		super( props );
-		this.handleToggleFocus = this.handleToggleFocus.bind( this );
+		this.onInputFocus = this.onInputFocus.bind( this );
+		this.onInputBlur = this.onInputBlur.bind( this );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
 		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
@@ -56,7 +57,6 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	componentWillUnmount() {
-		this.handleToggleFocus();
 		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
 	}
 
@@ -76,11 +76,17 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
-	handleToggleFocus() {
-		this.setState( ( state ) => ( {
-			...state,
-			hasFocus: ! state.hasFocus,
-		} ) );
+	onInputFocus() {
+		this.setState( {
+			hasFocus: true,
+		} );
+	}
+
+	onInputBlur() {
+		this.onChangeText( '' + this.state.sliderValue );
+		this.setState( {
+			hasFocus: false,
+		} );
 	}
 
 	validateInput( text ) {
@@ -98,8 +104,9 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	removeNonDigit( text ) {
-		const rg = /^([0-9]+\.?([0-9]+)?)/;
-		const result = text.match( rg );
+		const { toFixed } = this.props;
+		const regex = toFixed > 0 ? /^(\d+\.?(\d+)?)/ : /^([\d]+)/;
+		const result = text.match( regex );
 		return result ? result[ 0 ] : '';
 	}
 
@@ -254,8 +261,8 @@ class BottomSheetRangeCell extends Component {
 							] }
 							onChangeText={ this.onChangeText }
 							onSubmitEditing={ this.onSubmitEditing }
-							onFocus={ this.handleToggleFocus }
-							onBlur={ this.handleToggleFocus }
+							onFocus={ this.onInputFocus }
+							onBlur={ this.onInputBlur }
 							keyboardType="numeric"
 							returnKeyType="done"
 							defaultValue={ `${ inputValue }` }
