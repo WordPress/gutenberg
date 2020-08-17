@@ -65,27 +65,37 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
-	// Some inline styles may be added without ending ';', add this if necessary.
-	$current_styles = trim( $block_root->getAttribute( 'style' ), ' ' );
-	if ( strlen( $current_styles ) > 0 && substr( $current_styles, -1 ) !== ';' ) {
-		$current_styles = $current_styles . ';';
-	};
-
 	// Merge and dedupe new and existing classes and styles.
-	$classes_to_add = esc_attr( implode( ' ', array_key_exists( 'css_classes', $attributes ) ? $attributes['css_classes'] : array() ) );
-	$styles_to_add  = esc_attr( implode( ' ', array_key_exists( 'inline_styles', $attributes ) ? $attributes['inline_styles'] : array() ) );
-	$new_classes    = implode( ' ', array_unique( explode( ' ', ltrim( $block_root->getAttribute( 'class' ) . ' ' ) . $classes_to_add ) ) );
-	$new_styles     = implode( ' ', array_unique( explode( ' ', $current_styles . ' ' . $styles_to_add ) ) );
+	$current_classes = explode( ' ', trim( $block_root->getAttribute( 'class' ) ) );
+	$classes_to_add  = array_key_exists( 'css_classes', $attributes ) ? $attributes['css_classes'] : array();
+	$new_classes     = array_unique( array_filter( array_merge( $current_classes, $classes_to_add ) ) );
+
+	$current_styles = preg_split( '/\s*;\s*/', trim( $block_root->getAttribute( 'style' ) ) );
+	$styles_to_add  = array_key_exists( 'inline_styles', $attributes ) ? $attributes['inline_styles'] : array();
+	$new_styles     = array_unique( array_map( 'gutenberg_normalize_css_rule', array_filter( array_merge( $current_styles, $styles_to_add ) ) ) );
 
 	// Apply new styles and classes.
 	if ( ! empty( $new_classes ) ) {
-		$block_root->setAttribute( 'class', $new_classes );
+		$block_root->setAttribute( 'class', esc_attr( implode( ' ', $new_classes ) ) );
 	}
 
 	if ( ! empty( $new_styles ) ) {
-		$block_root->setAttribute( 'style', $new_styles );
+		$block_root->setAttribute( 'style', esc_attr( implode( '; ', $new_styles ) . ';' ) );
 	}
 
 	return mb_convert_encoding( $dom->saveHtml(), 'UTF-8', 'HTML-ENTITIES' );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
+
+/**
+ * Normalizes spacing in a string representing a CSS rule
+ *
+ * @example
+ * 'color  :red;' becomes 'color:red'
+ *
+ * @param  string $css_rule_string CSS rule.
+ * @return string Normalized CSS rule.
+ */
+function gutenberg_normalize_css_rule( $css_rule_string ) {
+	return trim( implode( ': ', preg_split( '/\s*:\s*/', $css_rule_string, 2 ) ), ';' );
+}

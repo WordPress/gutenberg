@@ -33,12 +33,14 @@ const ImageComponent = ( {
 	alt,
 	editButton = true,
 	focalPoint,
+	height: imageHeight,
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
 	mediaPickerOptions,
 	onSelectMediaUploadOption,
 	openMediaOptions,
+	resizeMode,
 	retryMessage,
 	url,
 	width: imageWidth,
@@ -102,10 +104,13 @@ const ImageComponent = ( {
 			styles.imageContainerUploadDark
 		),
 		focalPoint && styles.imageContainerUploadWithFocalpoint,
+		imageHeight && { height: imageHeight },
 	];
 
 	const customWidth =
-		imageData?.width < containerSize?.width ? imageData?.width : '100%';
+		imageData?.width < containerSize?.width
+			? imageData?.width
+			: styles.wide.width;
 
 	const imageContainerStyles = [
 		styles.imageContent,
@@ -115,6 +120,7 @@ const ImageComponent = ( {
 					? imageWidth
 					: customWidth,
 		},
+		resizeMode && { width: styles.wide.width },
 		focalPoint && styles.focalPointContainer,
 	];
 
@@ -138,6 +144,7 @@ const ImageComponent = ( {
 						? containerSize?.width / imageData?.aspectRatio
 						: undefined,
 			},
+		imageHeight && { height: imageHeight },
 	];
 
 	return (
@@ -178,12 +185,15 @@ const ImageComponent = ( {
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
 						<Image
-							aspectRatio={ imageData?.aspectRatio }
+							{ ...( ! resizeMode && {
+								aspectRatio: imageData?.aspectRatio,
+							} ) }
 							style={ imageStyles }
 							source={ { uri: url } }
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
 							} ) }
+							resizeMode={ resizeMode }
 						/>
 					</View>
 				) }
