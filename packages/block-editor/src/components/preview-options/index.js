@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useViewportMatch } from '@wordpress/compose';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
@@ -17,6 +18,9 @@ export default function PreviewOptions( {
 	deviceType,
 	setDeviceType,
 } ) {
+	const isMobile = useViewportMatch( 'small', '<' );
+	if ( isMobile ) return null;
+
 	const popoverProps = {
 		className: classnames(
 			className,

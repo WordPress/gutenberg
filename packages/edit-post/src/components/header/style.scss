@@ -57,14 +57,6 @@
 
 	@include break-small () {
 		padding-right: $grid-unit-20;
-
-		.editor-post-preview {
-			display: none;
-		}
-
-		.block-editor-post-preview__dropdown {
-			display: flex;
-		}
 	}
 }
 
