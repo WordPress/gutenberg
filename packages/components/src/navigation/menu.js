@@ -1,5 +1,12 @@
+/**
+ * Internal dependencies
+ */
+import { MenuUI } from './styles/navigation-styles';
+
 const NavigationMenu = ( { children } ) => {
-	return <ul className="components-navigation__menu">{ children }</ul>;
+	return (
+		<MenuUI className="components-navigation__menu">{ children }</MenuUI>
+	);
 };
 
 export default NavigationMenu;
