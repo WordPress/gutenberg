@@ -37,4 +37,112 @@ describe( 'Nonce middleware', () => {
 
 		nonceMiddleware( requestOptions, callback );
 	} );
+
+	it( 'should add a nonce header to requests with withNonce set to true', () => {
+		expect.hasAssertions();
+
+		const nonce = 'nonce';
+		const nonceMiddleware = createNonceMiddleware( nonce );
+		const requestOptions = {
+			method: 'GET',
+			path: '/wp/v2/posts',
+			withNonce: true,
+		};
+		const callback = ( options ) => {
+			expect( options.headers ).toHaveProperty( 'X-WP-Nonce' );
+		};
+
+		nonceMiddleware( requestOptions, callback );
+	} );
+
+	it( 'should not add a nonce header to requests with withNonce set to false', () => {
+		expect.hasAssertions();
+
+		const nonce = 'nonce';
+		const nonceMiddleware = createNonceMiddleware( nonce );
+		const requestOptions = {
+			method: 'GET',
+			path: '/wp/v2/posts',
+			withNonce: false,
+		};
+		const callback = ( options ) => {
+			expect( options.headers ).toBeUndefined();
+		};
+
+		nonceMiddleware( requestOptions, callback );
+	} );
+
+	it( 'should add a nonce header if shouldSendNonce returns true', () => {
+		expect.hasAssertions();
+
+		const nonce = 'nonce';
+		const nonceMiddleware = createNonceMiddleware( nonce, {
+			shouldSendNonce: () => true,
+		} );
+		const requestOptions = {
+			method: 'GET',
+			path: '/wp/v2/posts',
+		};
+		const callback = ( options ) => {
+			expect( options.headers ).toHaveProperty( 'X-WP-Nonce' );
+		};
+
+		nonceMiddleware( requestOptions, callback );
+	} );
+
+	it( 'should not add a nonce header if shouldSendNonce returns false', () => {
+		expect.hasAssertions();
+
+		const nonce = 'nonce';
+		const nonceMiddleware = createNonceMiddleware( nonce, {
+			shouldSendNonce: () => false,
+		} );
+		const requestOptions = {
+			method: 'GET',
+			path: '/wp/v2/posts',
+		};
+		const callback = ( options ) => {
+			expect( options.headers ).toBeUndefined();
+		};
+
+		nonceMiddleware( requestOptions, callback );
+	} );
+
+	it( 'should not add a nonce header if withNonce is false but shouldSendNonce returns true', () => {
+		expect.hasAssertions();
+
+		const nonce = 'nonce';
+		const nonceMiddleware = createNonceMiddleware( nonce, {
+			shouldSendNonce: () => true,
+		} );
+		const requestOptions = {
+			method: 'GET',
+			path: '/wp/v2/posts',
+			withNonce: false,
+		};
+		const callback = ( options ) => {
+			expect( options.headers ).toBeUndefined();
+		};
+
+		nonceMiddleware( requestOptions, callback );
+	} );
+
+	it( 'should not add a nonce header if withNonce is true but shouldSendNonce returns false', () => {
+		expect.hasAssertions();
+
+		const nonce = 'nonce';
+		const nonceMiddleware = createNonceMiddleware( nonce, {
+			shouldSendNonce: () => false,
+		} );
+		const requestOptions = {
+			method: 'GET',
+			path: '/wp/v2/posts',
+			withNonce: true,
+		};
+		const callback = ( options ) => {
+			expect( options.headers ).toBeUndefined();
+		};
+
+		nonceMiddleware( requestOptions, callback );
+	} );
 } );
