@@ -37,36 +37,59 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
  * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
  * Until we refactor it, just copying the code is the simplest solution.
  *
- * @param {Object} search
- * @param {number} perPage
+ * @param {string} search
+ * @param {Object} arguments
+ * @param {number} [arguments.perPage=20]
+ * @param {string} [arguments.type='post']
+ * @param {string} [arguments.subtype]
  * @return {Promise<Object[]>} List of suggestions
  */
-const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
-	const posts = apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			search,
-			per_page: perPage,
-			type: 'post',
-		} ),
-	} );
+const fetchLinkSuggestions = async (
+	search,
+	{ perPage = 20, type, subtype } = {}
+) => {
+	const queries = [];
 
-	const terms = apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			search,
-			per_page: perPage,
-			type: 'term',
-		} ),
-	} );
+	if ( ! type || type === 'post' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					per_page: perPage,
+					type: 'post',
+					subtype,
+				} ),
+			} )
+		);
+	}
 
-	const formats = apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			search,
-			per_page: perPage,
-			type: 'post-format',
-		} ),
-	} );
+	if ( ! type || type === 'term' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					per_page: perPage,
+					type: 'term',
+					subtype,
+				} ),
+			} )
+		);
+	}
 
-	return Promise.all( [ posts, terms, formats ] ).then( ( results ) => {
+	if ( ! type || type === 'post-format' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					per_page: perPage,
+					type: 'post-format',
+					subtype,
+				} ),
+			} )
+		);
+	}
+
+	return Promise.all( queries ).then( ( results ) => {
 		return map( flatten( results ), ( post ) => ( {
 			id: post.id,
 			url: post.url,

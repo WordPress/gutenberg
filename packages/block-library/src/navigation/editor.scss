@@ -14,6 +14,10 @@ $navigation-item-height: 46px;
 }
 
 // Polish the Appender.
+.wp-block-navigation__container {
+	min-height: $navigation-item-height;
+}
+
 .wp-block-navigation .block-list-appender {
 	margin: 0;
 	display: flex;

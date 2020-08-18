@@ -45,16 +45,18 @@ export const handleDirectEntry = ( val ) => {
 	] );
 };
 
-export const handleEntitySearch = async (
+const handleEntitySearch = async (
 	val,
-	args,
+	{ isInitialSuggestions, type, subtype },
 	fetchSearchSuggestions,
 	directEntryHandler,
 	withCreateSuggestion
 ) => {
 	let results = await Promise.all( [
 		fetchSearchSuggestions( val, {
-			...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
+			...( isInitialSuggestions
+				? { perPage: 3, type, subtype }
+				: { type, subtype } ),
 		} ),
 		directEntryHandler( val ),
 	] );
@@ -65,12 +67,12 @@ export const handleEntitySearch = async (
 	// just for good measure. That way once the actual results run out we always
 	// have a URL option to fallback on.
 	results =
-		couldBeURL && ! args.isInitialSuggestions
+		couldBeURL && ! isInitialSuggestions
 			? results[ 0 ].concat( results[ 1 ] )
 			: results[ 0 ];
 
 	// If displaying initial suggestions just return plain results.
-	if ( args.isInitialSuggestions ) {
+	if ( isInitialSuggestions ) {
 		return results;
 	}
 
@@ -101,6 +103,7 @@ export const handleEntitySearch = async (
 };
 
 export default function useSearchHandler(
+	{ type, subtype },
 	allowDirectEntry,
 	withCreateSuggestion
 ) {
@@ -117,12 +120,12 @@ export default function useSearchHandler(
 		: handleNoop;
 
 	return useCallback(
-		( val, args ) => {
+		( val, { isInitialSuggestions } ) => {
 			return isURLLike( val )
-				? directEntryHandler( val, args )
+				? directEntryHandler( val, { isInitialSuggestions } )
 				: handleEntitySearch(
 						val,
-						args,
+						{ isInitialSuggestions, type, subtype },
 						fetchSearchSuggestions,
 						directEntryHandler,
 						withCreateSuggestion

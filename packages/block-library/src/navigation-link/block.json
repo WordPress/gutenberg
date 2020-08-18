@@ -17,7 +17,13 @@
 		"rel": {
 			"type": "string"
 		},
-		"id": {
+		"objectType": {
+			"type": "string"
+		},
+		"objectName": {
+			"type": "string"
+		},
+		"objectId": {
 			"type": "number"
 		},
 		"opensInNewTab": {

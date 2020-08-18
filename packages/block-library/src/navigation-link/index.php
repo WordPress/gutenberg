@@ -132,15 +132,33 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		'<a class="wp-block-navigation-link__content" ';
 
 	// Start appending HTML attributes to anchor tag.
-	if ( isset( $attributes['url'] ) ) {
-		$html .= ' href="' . esc_url( $attributes['url'] ) . '"';
+
+	if (
+		isset( $attributes['objectType'] ) &&
+		isset( $attributes['objectName'] ) &&
+		isset( $attributes['objectId'] )
+	) {
+		if ( 'post_type' === $attributes['objectType'] ) {
+			$url = get_permalink( $attributes['objectId'] );
+		} elseif ( 'taxonomy' === $attributes['objectType'] ) {
+			$url = get_term_link( $attributes['objectId'] );
+		} elseif ( 'post_type_archive' === $attributes['objectType'] ) {
+			$url = get_post_type_archive_link( $attributes['objectName'] );
+		}
+	}
+
+	if ( ! isset( $url ) && isset( $attributes['url'] ) ) {
+		$url = $attributes['url'];
+	}
+
+	if ( isset( $url ) ) {
+		$html .= ' href="' . esc_url( $url ) . '"';
 	}
 
 	if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
 		$html .= ' target="_blank"  ';
 	}
 
-	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['rel'] ) ) {
 		$html .= ' rel="' . esc_attr( $attributes['rel'] ) . '"';
 	} elseif ( isset( $attributes['nofollow'] ) && $attributes['nofollow'] ) {

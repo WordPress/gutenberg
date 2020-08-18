@@ -2,13 +2,13 @@
  * External dependencies
  */
 
-import { escape } from 'lodash';
+import { escape, some } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, parse } from '@wordpress/blocks';
 import {
 	Button,
 	CustomSelectControl,
@@ -78,28 +78,63 @@ function getSelectedMenu( selectedCreateOption ) {
 /**
  * A recursive function that maps menu item nodes to blocks.
  *
- * @param {Object[]} nodes An array of menu items.
- *
+ * @param {Object[]} menuItems An array of menu items.
  * @return {WPBlock[]} An array of blocks.
  */
-function mapMenuItemsToBlocks( nodes ) {
-	return nodes.map( ( { title, type, link: url, id, children } ) => {
-		const innerBlocks =
-			children && children.length ? mapMenuItemsToBlocks( children ) : [];
+function mapMenuItemsToBlocks( menuItems ) {
+	return menuItems.map( ( menuItem ) => {
+		if ( menuItem.type === 'block' ) {
+			const [ block ] = parse( menuItem.content.raw );
 
-		return createBlock(
-			'core/navigation-link',
-			{
-				type,
-				id,
-				url,
-				label: ! title.rendered
-					? __( '(no title)' )
-					: escape( title.rendered ),
-				opensInNewTab: false,
-			},
-			innerBlocks
-		);
+			if ( ! block ) {
+				return createBlock( 'core/freeform', {
+					content: menuItem.content,
+				} );
+			}
+
+			return block;
+		}
+
+		const attributes = {
+			label: ! menuItem.title.rendered
+				? __( '(no title)' )
+				: escape( menuItem.title.rendered ),
+			opensInNewTab: menuItem.target === '_blank',
+		};
+
+		if ( menuItem.description ) {
+			attributes.description = menuItem.description;
+		}
+
+		if ( menuItem.xfn?.length && some( menuItem.xfn ) ) {
+			attributes.rel = menuItem.xfn.join( ' ' );
+		}
+
+		if ( menuItem.type ) {
+			attributes.objectType = menuItem.type;
+		}
+
+		if ( menuItem.object ) {
+			attributes.objectName = menuItem.object;
+		}
+
+		if ( menuItem.object_id ) {
+			attributes.objectId = menuItem.object_id;
+		}
+
+		if ( menuItem.classes?.length && some( menuItem.classes ) ) {
+			attributes.className = menuItem.classes.join( ' ' );
+		}
+
+		if ( menuItem.url ) {
+			attributes.url = menuItem.url;
+		}
+
+		const innerBlocks = menuItem.children?.length
+			? mapMenuItemsToBlocks( menuItem.children )
+			: [];
+
+		return createBlock( 'core/navigation-link', attributes, innerBlocks );
 	} );
 }
 
@@ -263,7 +298,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		const { key } = selectedCreateOption;
 		switch ( key ) {
 			case CREATE_EMPTY_OPTION_VALUE: {
-				const blocks = [ createBlock( 'core/navigation-link' ) ];
+				const blocks = [];
 				onCreate( blocks );
 				return;
 			}

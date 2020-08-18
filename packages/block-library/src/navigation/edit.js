@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -72,6 +72,8 @@ function Navigation( {
 		clientId
 	);
 
+	const [ isPlaceholderAllowed, setIsPlaceholderAllowed ] = useState( true );
+
 	//
 	// HANDLERS
 	//
@@ -86,12 +88,13 @@ function Navigation( {
 	}
 
 	// If we don't have existing items then show the Placeholder
-	if ( ! hasExistingNavItems ) {
+	if ( ! hasExistingNavItems && isPlaceholderAllowed ) {
 		return (
 			<Block.div>
 				<NavigationPlaceholder
 					ref={ ref }
 					onCreate={ ( blocks, selectNavigationBlock ) => {
+						setIsPlaceholderAllowed( false );
 						updateInnerBlocks( blocks );
 						if ( selectNavigationBlock ) {
 							selectBlock( clientId );

@@ -109,6 +109,7 @@ function LinkControl( {
 	createSuggestion,
 	withCreateSuggestion,
 	inputValue: propInputValue = '',
+	suggestionsQuery = {},
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -209,6 +210,7 @@ function LinkControl( {
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }
+							suggestionsQuery={ suggestionsQuery }
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button
