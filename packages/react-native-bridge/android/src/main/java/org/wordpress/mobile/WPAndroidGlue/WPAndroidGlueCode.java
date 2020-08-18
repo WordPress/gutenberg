@@ -848,7 +848,7 @@ public class WPAndroidGlueCode {
     }
 
     public void updateCapabilities(GutenbergProps gutenbergProps) {
-        mDeferredEventEmitter.updateCapabilities(gutenbergProps.getUpdatedCapabilitiesProps());
+        mDeferredEventEmitter.updateCapabilities(gutenbergProps);
     }
 }
 

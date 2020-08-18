@@ -4,6 +4,7 @@ import android.util.Pair;
 
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 
@@ -123,7 +124,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter {
         setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
     }
 
-    public void updateCapabilities(WritableMap capabilities) {
-        queueActionToJS(MAP_KEY_UPDATE_CAPABILITIES, capabilities);
+    public void updateCapabilities(GutenbergProps gutenbergProps) {
+        queueActionToJS(MAP_KEY_UPDATE_CAPABILITIES, Arguments.makeNativeMap(gutenbergProps.getUpdatedCapabilitiesProps()));
     }
 }
