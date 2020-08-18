@@ -320,7 +320,7 @@ add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
 function gutenberg_output_block_menu_item_custom_fields( $item_id, $item ) {
 	if ( 'block' === $item->type ) {
 		?>
-		<p class="description description-wide">
+		<p class="field-content description description-wide">
 			<label for="edit-menu-item-content-<?php echo $item_id; ?>">
 				<?php _e( 'Content', 'gutenberg' ); ?><br />
 				<textarea readonly><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
@@ -352,7 +352,7 @@ function gutenberg_add_block_menu_item_styles_to_nav_menus( $hook ) {
 			 * actually remove the field from
 			 * `Walker_Nav_Menu_Edit::start_el()`.
 			 */
-			.menu-item-block .description:first-child {
+			.menu-item-block .description:not(.field-content) {
 				display: none;
 			}
 
