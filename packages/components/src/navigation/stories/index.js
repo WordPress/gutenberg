@@ -28,11 +28,13 @@ const data = [
 	{
 		title: 'Category',
 		id: 'item-3',
+		badge: '2',
 	},
 	{
 		title: 'Child 1',
 		id: 'child-1',
 		parent: 'item-3',
+		badge: '1',
 	},
 	{
 		title: 'Child 2',
