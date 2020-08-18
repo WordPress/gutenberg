@@ -73,12 +73,12 @@ add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content',
  */
 function gutenberg_setup_block_nav_menu_item( $menu_item ) {
 	if ( 'block' === $menu_item->type ) {
-		$menu_item->type_label = __( 'Gutenberg Block', 'gutenberg' );
+		$menu_item->type_label = __( 'Block', 'gutenberg' );
 		$menu_item->content    = ! isset( $menu_item->content ) ? get_post_meta( $menu_item->db_id, '_menu_item_content', true ) : $menu_item->content;
 
 		// Set to make the menu item display nicely in nav-menus.php.
 		$menu_item->object = 'block';
-		$menu_item->title  = __( 'Gutenberg Block', 'gutenberg' );
+		$menu_item->title  = __( 'Block', 'gutenberg' );
 	}
 
 	return $menu_item;
