@@ -26,8 +26,6 @@ import {
 import metadata from './block.json';
 
 const { name: DEFAULT_EMBED_BLOCK } = metadata;
-const variations = getBlockVariations( DEFAULT_EMBED_BLOCK );
-const WP_VARIATION = variations.find( ( { name } ) => name === 'wordpress' );
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -38,7 +36,9 @@ const WP_VARIATION = variations.find( ( { name } ) => name === 'wordpress' );
  * @return {WPBlockVariation} The embed block's information
  */
 export const getEmbedInfoByProvider = ( provider ) =>
-	variations.find( ( { name } ) => name === provider );
+	getBlockVariations( DEFAULT_EMBED_BLOCK )?.find(
+		( { name } ) => name === provider
+	);
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -58,7 +58,9 @@ export const matchesPatterns = ( url, patterns = [] ) =>
  * @return {WPBlockVariation} The block variation that should be used for this URL
  */
 export const findMoreSuitableBlock = ( url ) =>
-	variations.find( ( { patterns } ) => matchesPatterns( url, patterns ) );
+	getBlockVariations( DEFAULT_EMBED_BLOCK )?.find( ( { patterns } ) =>
+		matchesPatterns( url, patterns )
+	);
 
 export const isFromWordPress = ( html ) =>
 	html.includes( 'class="wp-embedded-content"' );
@@ -98,6 +100,10 @@ export const createUpgradedEmbedBlock = (
 	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
 
 	const matchedBlock = findMoreSuitableBlock( url );
+
+	const WP_VARIATION = getBlockVariations( DEFAULT_EMBED_BLOCK )?.find(
+		( { name } ) => name === 'wordpress'
+	);
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
