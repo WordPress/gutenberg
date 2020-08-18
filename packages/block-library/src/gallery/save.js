@@ -28,7 +28,13 @@ export default function save( { attributes } ) {
 			}` }
 		>
 			<ul>
-				<InnerBlocks.Content />
+				<InnerBlocks.Content
+					__experimentalItemCallback={ ( item ) => (
+						<>
+							<li class="wp-block-gallery__image">{ item }</li>
+						</>
+					) }
+				/>
 			</ul>
 
 			{ ! RichText.isEmpty( caption ) && (
