@@ -321,7 +321,10 @@ function gutenberg_output_block_menu_item_custom_fields( $item_id, $item ) {
 	if ( 'block' === $item->type ) {
 		?>
 		<p class="description description-wide">
-			<textarea readonly><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
+			<label for="edit-menu-item-content-<?php echo $item_id; ?>">
+				<?php _e( 'Content', 'gutenberg' ); ?><br />
+				<textarea readonly><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
+			</label>
 		</p>
 		<?php
 	}
