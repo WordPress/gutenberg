@@ -76,6 +76,22 @@ _Returns_
 
 -   `?Node`: Offset parent.
 
+<a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
+
+Get schema of possible paths for phrasing content.
+
+_Related_
+
+-   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
+
+_Parameters_
+
+-   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
+
+_Returns_
+
+-   `Object`: Schema.
+
 <a name="getRectangleFromRange" href="#getRectangleFromRange">#</a> **getRectangleFromRange**
 
 Get the rectangle of a given Range.
@@ -113,6 +129,19 @@ _Parameters_
 _Returns_
 
 -   `void`: 
+
+<a name="isEmpty" href="#isEmpty">#</a> **isEmpty**
+
+Recursively checks if an element is empty. An element is not empty if it
+contains text or contains elements with attributes such as images.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: Wether or not the element is empty.
 
 <a name="isEntirelySelected" href="#isEntirelySelected">#</a> **isEntirelySelected**
 
@@ -152,6 +181,26 @@ _Parameters_
 _Returns_
 
 -   `boolean`: True if the element is input and holds a number.
+
+<a name="isPhrasingContent" href="#isPhrasingContent">#</a> **isPhrasingContent**
+
+Find out whether or not the given node is phrasing content.
+
+_Related_
+
+-   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
+
+_Parameters_
+
+-   _node_ `Element`: The node to test.
+
+_Returns_
+
+-   `boolean`: True if phrasing content, false if not.
+
+<a name="isTextContent" href="#isTextContent">#</a> **isTextContent**
+
+Undocumented declaration.
 
 <a name="isTextField" href="#isTextField">#</a> **isTextField**
 
@@ -212,6 +261,20 @@ _Parameters_
 _Returns_
 
 -   `void`: 
+
+<a name="removeInvalidHTML" href="#removeInvalidHTML">#</a> **removeInvalidHTML**
+
+Given a schema, unwraps or removes nodes, attributes and classes on HTML.
+
+_Parameters_
+
+-   _HTML_ `string`: The HTML to clean up.
+-   _schema_ `Object`: Schema for the HTML.
+-   _inline_ `Object`: Whether to clean for inline mode.
+
+_Returns_
+
+-   `string`: The cleaned up HTML.
 
 <a name="replace" href="#replace">#</a> **replace**
 
