@@ -60,6 +60,8 @@ const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
 
+const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
+
 export class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
@@ -234,7 +236,13 @@ export class ImageEdit extends React.Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		this.props.setAttributes( { align: nextAlign } );
+		const extraUpdatedAttributes = WIDE_ALIGNMENTS.includes( nextAlign )
+			? { width: undefined, height: undefined }
+			: {};
+		this.props.setAttributes( {
+			...extraUpdatedAttributes,
+			align: nextAlign,
+		} );
 	}
 
 	onSetLinkDestination( href ) {
@@ -319,19 +327,17 @@ export class ImageEdit extends React.Component {
 		);
 	}
 
+	getWidth() {
+		const { attributes } = this.props;
+		const { align, width } = attributes;
+
+		return WIDE_ALIGNMENTS.includes( align ) ? '100%' : width;
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
 		const { attributes, isSelected, image, imageSizes } = this.props;
-		const {
-			align,
-			url,
-			width,
-			alt,
-			href,
-			id,
-			linkTarget,
-			sizeSlug,
-		} = attributes;
+		const { align, url, alt, href, id, linkTarget, sizeSlug } = attributes;
 
 		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
 			value: slug,
@@ -354,7 +360,6 @@ export class ImageEdit extends React.Component {
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
-					controls={ [ 'left', 'center', 'right' ] }
 				/>
 			</BlockControls>
 		);
@@ -469,7 +474,7 @@ export class ImageEdit extends React.Component {
 										openMediaOptions={ openMediaOptions }
 										retryMessage={ retryMessage }
 										url={ url }
-										width={ width }
+										width={ this.getWidth() }
 									/>
 								);
 							} }

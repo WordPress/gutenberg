@@ -9,7 +9,6 @@ import { View } from 'react-native';
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { InnerBlocks, withColors } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,11 +22,11 @@ function GroupEdit( {
 	getStylesFromColorScheme,
 } ) {
 	const { align } = attributes;
-	const renderAppender = useRef( () => (
+	const renderAppender = () => (
 		<View style={ [ align === 'full' && styles.fullWidthAppender ] }>
 			<InnerBlocks.ButtonBlockAppender />
 		</View>
-	) );
+	);
 
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
@@ -48,9 +47,7 @@ function GroupEdit( {
 
 	return (
 		<View style={ isSelected && hasInnerBlocks && styles.innerBlocks }>
-			<InnerBlocks
-				renderAppender={ isSelected && renderAppender.current }
-			/>
+			<InnerBlocks renderAppender={ isSelected && renderAppender } />
 		</View>
 	);
 }

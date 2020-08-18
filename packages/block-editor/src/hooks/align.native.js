@@ -9,7 +9,11 @@ import { without } from 'lodash';
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 
-const SUPPORTED_WIDE_ALIGNMENTS_BLOCKS = [ 'core/cover', 'core/group' ];
+const SUPPORTED_WIDE_ALIGNMENTS_BLOCKS = [
+	'core/cover',
+	'core/group',
+	'core/image',
+];
 const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
 const ALIGNMENTS = [ 'left', 'center', 'right' ];
 
