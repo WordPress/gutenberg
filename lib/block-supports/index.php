@@ -56,13 +56,13 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	// Suppress warnings from this method from polluting the front-end.
 	// @codingStandardsIgnoreStart
-	if ( ! @$dom->loadHTML( mb_convert_encoding( $block_content, 'HTML-ENTITIES', 'UTF-8' ), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
+	if ( ! @$dom->loadHTML( '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $block_content . '</body></html>', LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
 	// @codingStandardsIgnoreEnd
 		return $block_content;
 	}
 
 	$xpath      = new DOMXPath( $dom );
-	$block_root = $xpath->query( '/*' )[0];
+	$block_root = $xpath->query( '/html/body/*' )[0];
 
 	if ( empty( $block_root ) ) {
 		return $block_content;
@@ -86,7 +86,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		$block_root->setAttribute( 'style', esc_attr( implode( '; ', $new_styles ) . ';' ) );
 	}
 
-	return mb_convert_encoding( $dom->saveHtml(), 'UTF-8', 'HTML-ENTITIES' );
+	return preg_replace( array( '/^<html><head><meta http-equiv="Content-Type" content="text\/html; charset=utf-8"><\/head><body>/', '/<\/body><\/html>$/' ), '', $dom->saveHtml() );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 
