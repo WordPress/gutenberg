@@ -1,7 +1,6 @@
 package org.wordpress.mobile.WPAndroidGlue
 
 import android.os.Bundle
-import com.facebook.react.bridge.WritableNativeMap
 
 data class GutenbergProps @JvmOverloads constructor(
     val enableMentions: Boolean,
