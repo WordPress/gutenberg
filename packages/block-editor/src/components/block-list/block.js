@@ -93,6 +93,7 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
+	__experimentalRenderCallback: renderCallback,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -239,6 +240,10 @@ function BlockListBlock( {
 		block = blockEdit;
 	} else {
 		block = <Block.div { ...wrapperProps }>{ blockEdit }</Block.div>;
+	}
+
+	if ( renderCallback ) {
+		block = renderCallback( block );
 	}
 
 	return (

@@ -197,6 +197,8 @@ PODS:
     - React
   - react-native-safe-area (0.5.1):
     - React
+  - react-native-safe-area-context (3.1.1):
+    - React
   - react-native-slider (3.0.2):
     - React
   - react-native-video (5.0.2):
@@ -241,6 +243,14 @@ PODS:
     - ReactCommon/jscallinvoker (= 0.61.5)
   - ReactNativeDarkMode (0.0.10):
     - React
+  - RNCMaskedView (0.1.10):
+    - React
+  - RNGestureHandler (1.6.0):
+    - React
+  - RNReanimated (1.9.0):
+    - React
+  - RNScreens (2.9.0):
+    - React
   - RNSVG (9.13.6-gb):
     - React
   - RNTAztecView (1.34.0):
@@ -272,6 +282,7 @@ DEPENDENCIES:
   - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
   - react-native-keyboard-aware-scroll-view (from `../../../node_modules/react-native-keyboard-aware-scroll-view`)
   - react-native-safe-area (from `../../../node_modules/react-native-safe-area`)
+  - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-slider (from `../../../node_modules/@react-native-community/slider`)"
   - react-native-video (from `../../../node_modules/react-native-video`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -286,6 +297,10 @@ DEPENDENCIES:
   - ReactCommon/jscallinvoker (from `../../../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
   - ReactNativeDarkMode (from `../../../node_modules/react-native-dark-mode`)
+  - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
+  - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
+  - RNReanimated (from `../../../node_modules/react-native-reanimated`)
+  - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - RNTAztecView (from `../../react-native-aztec/RNTAztecView.podspec`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
@@ -336,6 +351,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-keyboard-aware-scroll-view"
   react-native-safe-area:
     :path: "../../../node_modules/react-native-safe-area"
+  react-native-safe-area-context:
+    :path: "../../../node_modules/react-native-safe-area-context"
   react-native-slider:
     :path: "../../../node_modules/@react-native-community/slider"
   react-native-video:
@@ -362,6 +379,14 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon"
   ReactNativeDarkMode:
     :path: "../../../node_modules/react-native-dark-mode"
+  RNCMaskedView:
+    :path: "../../../node_modules/@react-native-community/masked-view"
+  RNGestureHandler:
+    :path: "../../../node_modules/react-native-gesture-handler"
+  RNReanimated:
+    :path: "../../../node_modules/react-native-reanimated"
+  RNScreens:
+    :path: "../../../node_modules/react-native-screens"
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
@@ -391,8 +416,9 @@ SPEC CHECKSUMS:
   react-native-get-random-values: 8940331a943a46c165d3ed05802c09c392f8dd46
   react-native-keyboard-aware-scroll-view: ffa9152671fec9a571197ed2d02e0fcb90206e60
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
+  react-native-safe-area-context: 4c3249e4840225c61fcd215b136af0a737bccb79
   react-native-slider: ecb7f25c14f2348d1c1f629a6f2be7611d22a066
-  react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
+  react-native-video: 961749da457e73bf0b5565edfbaffc25abfb8974
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
@@ -404,6 +430,10 @@ SPEC CHECKSUMS:
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
+  RNCMaskedView: f5c7d14d6847b7b44853f7acb6284c1da30a3459
+  RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
+  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
+  RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
   RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
   RNTAztecView: b2a8bbc94328376f6cd7a238e826f5d49b20ae1a
   WordPress-Aztec-iOS: b7ac8b30f746992e85d9668453ac87c2cdcecf4f

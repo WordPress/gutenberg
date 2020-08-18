@@ -17,6 +17,7 @@ function gutenberg_register_block_supports() {
 		gutenberg_register_alignment_support( $block_type );
 		gutenberg_register_colors_support( $block_type );
 		gutenberg_register_typography_support( $block_type );
+		gutenberg_register_custom_classname_support( $block_type );
 	}
 }
 
@@ -41,9 +42,11 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	}
 
 	$attributes = array();
+	$attributes = gutenberg_apply_generated_classname_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_colors_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_alignment_support( $attributes, $block['attrs'], $block_type );
+	$attributes = gutenberg_apply_custom_classname_support( $attributes, $block['attrs'], $block_type );
 
 	if ( ! count( $attributes ) ) {
 		return $block_content;

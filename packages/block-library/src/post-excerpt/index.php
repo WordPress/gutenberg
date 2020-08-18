@@ -28,9 +28,9 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		$filter_excerpt_length
 	);
 
-	$classes = 'wp-block-post-excerpt';
+	$classes = '';
 	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= ' has-text-align-' . $attributes['textAlign'];
+		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
 
 	$output = sprintf( '<div class="%1$s">', esc_attr( $classes ) ) . '<p class="wp-block-post-excerpt__excerpt">' . get_the_excerpt( $block->context['postId'] );

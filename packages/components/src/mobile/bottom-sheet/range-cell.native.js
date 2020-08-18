@@ -188,9 +188,9 @@ class BottomSheetRangeCell extends Component {
 			styles.sliderDarkTextInput
 		);
 
-		const cellRowContainerStyle = [
-			styles.cellRowStyles,
-			isIOS ? styles.cellRowStylesIOS : styles.cellRowStylesAndroid,
+		const containerStyle = [
+			styles.container,
+			isIOS ? styles.containerIOS : styles.containerAndroid,
 		];
 
 		return (
@@ -200,7 +200,7 @@ class BottomSheetRangeCell extends Component {
 					styles.cellContainerStyles,
 					cellContainerStyle,
 				] }
-				cellRowContainerStyle={ cellRowContainerStyle }
+				cellRowContainerStyle={ containerStyle }
 				accessibilityRole={ 'none' }
 				value={ '' }
 				editable={ false }
@@ -213,7 +213,7 @@ class BottomSheetRangeCell extends Component {
 					__( 'Double tap to change the value using slider' )
 				}
 			>
-				<View style={ styles.container }>
+				<View style={ containerStyle }>
 					{ rangePreview }
 					<Slider
 						value={ this.validateInput( sliderValue ) }
