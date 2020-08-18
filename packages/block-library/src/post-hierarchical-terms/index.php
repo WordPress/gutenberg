@@ -37,7 +37,7 @@ function render_block_core_post_hierarchical_terms( $attributes, $content, $bloc
 
 	return sprintf(
 		'<div class="%1$s">%2$s</div>',
-		'wp-block-post-hierarchical-terms' . esc_attr( $align_class_name ),
+		esc_attr( $align_class_name ),
 		$terms_links
 	);
 }
