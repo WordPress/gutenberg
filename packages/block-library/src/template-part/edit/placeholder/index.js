@@ -57,7 +57,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 						>
 							{ __( 'Choose existing' ) }
 						</Button>
-						<Button onClick={ onCreate }>
+						<Button isTertiary onClick={ onCreate }>
 							{ __( 'New template part' ) }
 						</Button>
 					</>
