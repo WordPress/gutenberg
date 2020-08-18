@@ -16,9 +16,16 @@ import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import { deepFilterHTML, getBlockContentSchema } from './utils';
 
-import { getPhrasingContentSchema } from './phrasing-content';
-
 export { pasteHandler } from './paste-handler';
+
+/**
+ * WordPress dependencies
+ */
+import { getPhrasingContentSchema } from '@wordpress/dom';
+
+/**
+ * @deprecated since 5.6. Callers should import getPhrasingContentSchema directly from '@wordpress/dom' package.
+ */
 export { getPhrasingContentSchema };
 
 function getRawTransformations() {
