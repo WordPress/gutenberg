@@ -31,7 +31,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

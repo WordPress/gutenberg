@@ -134,7 +134,7 @@ class RCTAztecView: Aztec.TextView {
         delegate = self
         textContainerInset = .zero
         contentInset = .zero
-        textContainer.lineFragmentPadding = 0        
+        textContainer.lineFragmentPadding = 0
         addPlaceholder()
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
@@ -195,6 +195,14 @@ class RCTAztecView: Aztec.TextView {
             // This fixes the position of the label after "fixing" (partially) the constraints.
             placeholderHorizontalConstraint.constant = leftTextInsetInRTLLayout
         }
+    }
+
+    override func sizeThatFits(_ size: CGSize) -> CGSize {
+        // Set the Placeholder height as the minimum TextView height.
+        let minimumHeight = placeholderLabel.frame.height
+        let fittingSize = super.sizeThatFits(size)
+        let height = max(fittingSize.height, minimumHeight)
+        return CGSize(width: fittingSize.width, height: height)
     }
 
     func updateContentSizeInRN() {
@@ -306,9 +314,11 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Edits
 
     open override func insertText(_ text: String) {
-        guard !interceptEnter(text), !interceptTriggersKeyCodes(text) else {
+        guard !interceptEnter(text) else {
             return
         }
+
+        interceptTriggersKeyCodes(text)
 
         super.insertText(text)
         updatePlaceholderVisibility()
@@ -374,13 +384,13 @@ class RCTAztecView: Aztec.TextView {
         return true
     }
 
-    private func interceptTriggersKeyCodes(_ text: String) -> Bool {
+    private func interceptTriggersKeyCodes(_ text: String) {
         guard let keyCodes = triggerKeyCodes,
             keyCodes.count > 0,
             let onKeyDown = onKeyDown,
             text.count == 1
         else {
-            return false
+            return
         }
         for value in keyCodes {
             guard let keyString = value as? String,
@@ -393,9 +403,8 @@ class RCTAztecView: Aztec.TextView {
             var eventData = [AnyHashable:Any]()
             eventData = add(keyCode: keyCode, to: eventData)
             onKeyDown(eventData)
-            return true
+            return
         }
-        return false;
     }
 
     private func isNewLineBeforeSelectionAndNotEndOfContent() -> Bool {

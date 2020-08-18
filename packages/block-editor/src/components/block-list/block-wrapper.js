@@ -79,7 +79,6 @@ const BlockComponent = forwardRef(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
-		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
 		const [ isHovered, setHovered ] = useState( false );
@@ -251,7 +250,6 @@ const BlockComponent = forwardRef(
 					wrapperProps && wrapperProps.className,
 					{
 						'is-hovered': isHovered,
-						'wp-block': ! isAligned,
 					}
 				) }
 				data-block={ clientId }

@@ -37,7 +37,7 @@
 		"execa": "^4.0.2",
 		"fast-glob": "^2.2.7",
 		"inquirer": "^7.1.0",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
 		"make-dir": "^3.0.0",
 		"mustache": "^4.0.0",
 		"write-pkg": "^4.0.0"

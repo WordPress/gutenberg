@@ -66,6 +66,19 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Retrieves block content from the rendered block string
+	 * (i.e. what's wrapped by the block wrapper `<div />`).
+	 *
+	 * @param string $block String of rendered block to check.
+	 */
+	private function get_content_from_block( $block ) {
+		$start_index = strpos( $block, '>' ) + 1;
+		$split_arr   = substr( $block, $start_index );
+		$end_index   = strpos( $split_arr, '<' );
+		return substr( $split_arr, 0, $end_index );
+	}
+
+	/**
 	 * Runs assertions that the rendered output has expected class/style attrs.
 	 *
 	 * @param array  $block Block to render.
@@ -73,7 +86,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 * @param string $expected_styles Expected output styles attr string.
 	 */
 	private function assert_styles_and_classes_match( $block, $expected_classes, $expected_styles ) {
-		$styled_block = apply_filters( 'render_block', $this->block_content, $block );
+		$styled_block = apply_filters( 'render_block', self::BLOCK_MARKUP, $block );
 		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
 
@@ -82,11 +95,36 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Example block content to test with.
+	 * Runs assertions that the rendered output has expected content and class/style attrs.
+	 *
+	 * @param array  $block Block to render.
+	 * @param string $expected_classes Expected output class attr string.
+	 * @param string $expected_styles Expected output styles attr string.
+	 */
+	private function assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles ) {
+		$styled_block = apply_filters( 'render_block', self::BLOCK_MARKUP, $block );
+		$content      = $this->get_content_from_block( $styled_block );
+		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+
+		$this->assertEquals( self::BLOCK_CONTENT, $content );
+		$this->assertEquals( $expected_classes, $class_list );
+		$this->assertEquals( $expected_styles, $style_list );
+	}
+
+	/**
+	 * Block content to test with (i.e. what's wrapped by the block wrapper `<div />`).
 	 *
 	 * @var string
 	 */
-	private $block_content = '<div class="wp-block-example foo-bar-class" style="test:style;">So say we all.</div>';
+	const BLOCK_CONTENT = 'Some non-Latin chärs to make sure DOM öperations don\'t mess them up: こんにちは';
+
+	/**
+	 * Example block markup string to test with.
+	 *
+	 * @var string
+	 */
+	const BLOCK_MARKUP = '<div class="foo-bar-class" style="test:style;">' . self::BLOCK_CONTENT . '</div>';
 
 	/**
 	 * Tests color support for named color support for named colors.
@@ -114,10 +152,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-red-color has-background has-black-background-color';
-		$expected_styles  = 'test:style; ';
+		$expected_classes = 'foo-bar-class wp-block-example has-text-color has-red-color has-background has-black-background-color';
+		$expected_styles  = 'test: style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -151,10 +189,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_styles  = 'test:style; color: #000; background-color: #fff;';
-		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background';
+		$expected_styles  = 'test: style; color: #000; background-color: #fff;';
+		$expected_classes = 'foo-bar-class wp-block-example has-text-color has-background';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -182,10 +220,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class has-link-color';
-		$expected_styles  = 'test:style; --wp--style--color--link:var(--wp--preset--color--red);';
+		$expected_classes = 'foo-bar-class wp-block-example has-link-color';
+		$expected_styles  = 'test: style; --wp--style--color--link: var(--wp--preset--color--red);';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -213,10 +251,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class has-link-color';
-		$expected_styles  = 'test:style; --wp--style--color--link: #fff;';
+		$expected_classes = 'foo-bar-class wp-block-example has-link-color';
+		$expected_styles  = 'test: style; --wp--style--color--link: #fff;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -244,10 +282,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class has-background has-red-gradient-background';
-		$expected_styles  = 'test:style; ';
+		$expected_classes = 'foo-bar-class wp-block-example has-background has-red-gradient-background';
+		$expected_styles  = 'test: style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -275,10 +313,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class has-background';
-		$expected_styles  = 'test:style; background: some-gradient-style;';
+		$expected_classes = 'foo-bar-class wp-block-example has-background';
+		$expected_styles  = 'test: style; background: some-gradient-style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -311,10 +349,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class';
-		$expected_styles  = 'test:style;';
+		$expected_classes = 'foo-bar-class wp-block-example';
+		$expected_styles  = 'test: style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -340,10 +378,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class has-large-font-size';
-		$expected_styles  = 'test:style; ';
+		$expected_classes = 'foo-bar-class wp-block-example has-large-font-size';
+		$expected_styles  = 'test: style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -369,10 +407,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class ';
-		$expected_styles  = 'test:style; font-size: 10px;';
+		$expected_classes = 'foo-bar-class wp-block-example';
+		$expected_styles  = 'test: style; font-size: 10px;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -397,10 +435,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class';
-		$expected_styles  = 'test:style;';
+		$expected_classes = 'foo-bar-class wp-block-example';
+		$expected_styles  = 'test: style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -426,10 +464,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class ';
-		$expected_styles  = 'test:style; line-height: 10;';
+		$expected_classes = 'foo-bar-class wp-block-example';
+		$expected_styles  = 'test: style; line-height: 10;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -453,10 +491,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class';
-		$expected_styles  = 'test:style;';
+		$expected_classes = 'foo-bar-class wp-block-example';
+		$expected_styles  = 'test: style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -482,10 +520,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class alignwide';
-		$expected_styles  = 'test:style; ';
+		$expected_classes = 'foo-bar-class wp-block-example alignwide';
+		$expected_styles  = 'test: style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -509,10 +547,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class';
-		$expected_styles  = 'test:style;';
+		$expected_classes = 'foo-bar-class wp-block-example';
+		$expected_styles  = 'test: style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -556,10 +594,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class has-text-color has-background alignwide';
-		$expected_styles  = 'test:style; color: #000; background-color: #fff; background: some-gradient; font-size: 10px; line-height: 20;';
+		$expected_classes = 'foo-bar-class wp-block-example has-text-color has-background alignwide';
+		$expected_styles  = 'test: style; color: #000; background-color: #fff; background: some-gradient; font-size: 10px; line-height: 20;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -598,10 +636,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class ';
-		$expected_styles  = 'test:style; font-size: 10px;';
+		$expected_classes = 'foo-bar-class wp-block-example';
+		$expected_styles  = 'test: style; font-size: 10px;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 
 	/**
@@ -644,9 +682,92 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_classes = 'wp-block-example foo-bar-class';
+		$expected_classes = 'foo-bar-class';
 		$expected_styles  = 'test:style;';
 
-		$this->assert_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
+	 * Tests custom classname server-side block support.
+	 */
+	function test_custom_classnames_support() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'className' => 'my-custom-classname',
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_styles  = 'test: style;';
+		$expected_classes = 'foo-bar-class wp-block-example my-custom-classname';
+
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
+	 * Tests custom classname server-side block support opt-out.
+	 */
+	function test_custom_classnames_support_opt_out() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(
+				'customClassName' => false,
+			),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'className' => 'my-custom-classname',
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_styles  = 'test: style;';
+		$expected_classes = 'foo-bar-class wp-block-example';
+
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
+	 * Tests generated classname server-side block support opt-out.
+	 */
+	function test_generatted_classnames_support_opt_out() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(
+				'className' => false,
+			),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_styles  = 'test:style;';
+		$expected_classes = 'foo-bar-class';
+
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
 }

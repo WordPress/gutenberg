@@ -86,8 +86,6 @@ export const coreBlocks = [
 	column,
 	cover,
 	embed,
-	...embed.common,
-	...embed.others,
 	file,
 	html,
 	mediaText,

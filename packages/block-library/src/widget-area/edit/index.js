@@ -19,10 +19,15 @@ export default function WidgetAreaEdit( {
 		( select ) => select( 'core/block-editor' ).getBlockIndex( clientId ),
 		[ clientId ]
 	);
+
 	return (
 		<Panel className={ className }>
 			<PanelBody title={ name } initialOpen={ index === 0 }>
-				<EntityProvider kind="root" type="widgetArea" id={ id }>
+				<EntityProvider
+					kind="root"
+					type="postType"
+					id={ `widget-area-${ id }` }
+				>
 					<WidgetAreaInnerBlocks />
 				</EntityProvider>
 			</PanelBody>

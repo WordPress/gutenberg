@@ -35,7 +35,7 @@ class NoticeList extends Component {
 		}
 
 		return (
-			<View style={ styles.list } key={ notices.lenght }>
+			<View style={ styles.list } key={ notices.length }>
 				{ shouldStack ? (
 					notices
 						.reverse()

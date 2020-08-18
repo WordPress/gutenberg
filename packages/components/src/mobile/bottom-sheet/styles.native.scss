@@ -168,11 +168,12 @@
 	color: #c3c4c7;
 }
 
-// Unsupported Footer Cell
+// Footer Message Cell
 
-.unsupportedFooterCell {
+.footerMessageCell {
 	font-size: $text-editor-font-size;
 	color: $gray;
+	flex: 1;
 }
 
 // Color Cell
@@ -217,8 +218,7 @@
 
 .chevronLeftIcon {
 	color: $blue-50;
-	margin-left: -13px;
-	margin-right: -13px;
+	margin-left: -11px;
 }
 
 .chevronLeftIconDark {
@@ -270,4 +270,8 @@
 
 .applyButtonDark {
 	color: $blue-30;
+}
+
+.flex {
+	flex: 1;
 }
