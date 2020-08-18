@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import createNonceMiddleware from '../nonce';
+import createNonceMiddleware, { sameHostFilter } from '../nonce';
 
 describe( 'Nonce middleware', () => {
 	it( 'should add a nonce header to the request', () => {
@@ -144,5 +144,45 @@ describe( 'Nonce middleware', () => {
 		};
 
 		nonceMiddleware( requestOptions, callback );
+	} );
+} );
+
+describe( 'sameHostFilter', () => {
+	let oldWindow;
+	beforeAll( () => {
+		oldWindow = global.window;
+		global.window = Object.create( window );
+		Object.defineProperty( window, 'location', {
+			value: {
+				host: 'wordpress.org',
+				protocol: 'https:',
+			},
+		} );
+	} );
+	afterAll( () => {
+		global.window = oldWindow;
+	} );
+	it( 'should return true if only path is specified (without a URL)', () => {
+		expect( sameHostFilter( { path: '/' } ) ).toBe( true );
+	} );
+	it( 'should return true for a URL from the same host', () => {
+		const urls = [
+			'https://wordpress.org/',
+			'https://wordpress.org/a',
+			'https://wordpress.org/b/c',
+		];
+		urls.forEach( ( url ) => {
+			expect( sameHostFilter( { url } ) ).toBe( true );
+		} );
+	} );
+	it( 'should return false for a URL from a different host', () => {
+		const urls = [
+			'http://wordpress.org/',
+			'https://wordpress.orgg/',
+			'https://make.wordpress.org/',
+		];
+		urls.forEach( ( url ) => {
+			expect( sameHostFilter( { url } ) ).toBe( false );
+		} );
 	} );
 } );
