@@ -6,10 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import {
-	getBlockContentSchema,
-	isPlain,
-} from '../utils';
+import { getBlockContentSchema, isPlain } from '../utils';
 
 jest.mock( '@wordpress/data', () => {
 	return {
