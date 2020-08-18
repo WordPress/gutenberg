@@ -6,7 +6,7 @@ import {
 	useIsFocused,
 	useNavigation,
 } from '@react-navigation/native';
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -21,7 +21,9 @@ import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
  */
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
 
-const BottomSheetNavigationScreen = ( { children } ) => {
+const { height: windowHeight } = Dimensions.get( 'window' );
+
+const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 	const navigation = useNavigation();
 	const heightRef = useRef( { maxHeight: 0 } );
 	const isFocused = useIsFocused();
@@ -45,13 +47,18 @@ const BottomSheetNavigationScreen = ( { children } ) => {
 				onHandleHardwareButtonPress( null );
 				return false;
 			} );
-			if ( heightRef.current.maxHeight !== 0 ) {
+			if ( fullScreen ) {
+				setHeight( windowHeight * 0.9 );
+			} else if ( heightRef.current.maxHeight !== 0 ) {
 				setHeight( heightRef.current.maxHeight );
 			}
 			return () => {};
 		}, [] )
 	);
 	const onLayout = ( { nativeEvent } ) => {
+		if ( fullScreen ) {
+			return;
+		}
 		const { height } = nativeEvent.layout;
 		if ( heightRef.current.maxHeight !== height && isFocused ) {
 			heightRef.current.maxHeight = height;

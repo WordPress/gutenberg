@@ -2,18 +2,29 @@
  * External dependencies
  */
 import React from 'react';
-
+import {
+	useNavigation,
+	useRoute,
+	useFocusEffect,
+} from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import {
+	Component,
+	useState,
+	useContext,
+	useCallback,
+	useEffect,
+} from '@wordpress/element';
 import { prependHTTP } from '@wordpress/url';
+
 import {
 	BottomSheet,
-	BottomSheetConsumer,
 	LinkPicker,
 	withSpokenMessages,
+	BottomSheetContext,
 } from '@wordpress/components';
 import {
 	create,
@@ -32,59 +43,98 @@ import { createLinkFormat, isValidHref } from './utils';
 
 import styles from './modal.scss';
 
+const linkSettingsScreens = {
+	settings: 'linkSettings',
+	picker: 'linkPicker',
+};
+
 class ModalLinkUI extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.submitLink = this.submitLink.bind( this );
-		this.onChangeInputValue = this.onChangeInputValue.bind( this );
-		this.onChangeText = this.onChangeText.bind( this );
-		this.onChangeOpensInNewWindow = this.onChangeOpensInNewWindow.bind(
-			this
-		);
-		this.removeLink = this.removeLink.bind( this );
-		this.onDismiss = this.onDismiss.bind( this );
-
 		this.state = {
-			inputValue: '',
-			text: '',
-			opensInNewWindow: false,
-			isFullScreen: false,
+			isChildrenScrollable: false,
 		};
 	}
 
-	componentDidUpdate( oldProps ) {
-		if ( oldProps === this.props ) {
-			return;
-		}
-
+	render() {
+		const { isVisible, ...restProps } = this.props;
 		const {
-			activeAttributes: { url, target },
+			activeAttributes: { url },
 		} = this.props;
-		const opensInNewWindow = target === '_blank';
 
-		this.setState( {
-			inputValue: url || '',
-			text: getTextContent( slice( this.props.value ) ),
-			opensInNewWindow,
+		return (
+			<BottomSheet
+				isVisible={ isVisible }
+				hideHeader
+				isChildrenScrollable={ this.state.isChildrenScrollable }
+			>
+				<BottomSheet.NavigationContainer animate main>
+					<BottomSheet.NavigationScreen
+						name={ linkSettingsScreens.settings }
+						initialParams={ { inputValue: url || '' } }
+					>
+						<LinkSettingsScreen
+							{ ...restProps }
+							onFocus={ () => {
+								this.setState( {
+									isChildrenScrollable: false,
+								} );
+							} }
+						/>
+					</BottomSheet.NavigationScreen>
+					<BottomSheet.NavigationScreen
+						name={ linkSettingsScreens.picker }
+						fullScreen
+					>
+						<LinkPickerScreen
+							onFocus={ () => {
+								this.setState( { isChildrenScrollable: true } );
+							} }
+						/>
+					</BottomSheet.NavigationScreen>
+				</BottomSheet.NavigationContainer>
+			</BottomSheet>
+		);
+	}
+}
+
+export default withSpokenMessages( ModalLinkUI );
+
+const LinkSettingsScreen = ( {
+	onRemove,
+	onClose,
+	onChange,
+	speak,
+	value,
+	isActive,
+	activeAttributes,
+	onFocus,
+} ) => {
+	const [ text, setText ] = useState( getTextContent( slice( value ) ) );
+	const [ opensInNewWindow, setOpensInNewWindows ] = useState(
+		activeAttributes.target === '_blank'
+	);
+
+	const {
+		shouldEnableBottomSheetMaxHeight,
+		onHandleClosingBottomSheet,
+	} = useContext( BottomSheetContext );
+
+	const navigation = useNavigation();
+	const route = useRoute();
+	const { inputValue } = route.params || {};
+	const onLinkCellPressed = () => {
+		shouldEnableBottomSheetMaxHeight( false );
+		navigation.navigate( linkSettingsScreens.picker, { inputValue } );
+	};
+	useEffect( () => {
+		onHandleClosingBottomSheet( () => {
+			submit();
 		} );
-	}
+	}, [ inputValue, opensInNewWindow, text ] );
 
-	onChangeInputValue( inputValue ) {
-		this.setState( { inputValue } );
-	}
-
-	onChangeText( text ) {
-		this.setState( { text } );
-	}
-
-	onChangeOpensInNewWindow( opensInNewWindow ) {
-		this.setState( { opensInNewWindow } );
-	}
-
-	submitLink() {
-		const { isActive, onChange, speak, value } = this.props;
-		const { inputValue, opensInNewWindow, text } = this.state;
+	const submitLink = () => {
 		const url = prependHTTP( inputValue );
 		const linkText = text || inputValue;
 		const format = createLinkFormat( {
@@ -119,7 +169,6 @@ class ModalLinkUI extends Component {
 		newAttributes.start = newAttributes.end;
 		newAttributes.activeFormats = [];
 		onChange( { ...newAttributes, needsSelectionUpdate: true } );
-
 		if ( ! isValidHref( url ) ) {
 			speak(
 				__(
@@ -133,125 +182,85 @@ class ModalLinkUI extends Component {
 			speak( __( 'Link inserted' ), 'assertive' );
 		}
 
-		this.props.onClose();
-	}
+		onClose();
+	};
 
-	removeLink() {
-		this.props.onRemove();
-		this.props.onClose();
-	}
+	const removeLink = () => {
+		onRemove();
+		onClose();
+	};
 
-	onDismiss() {
-		if ( this.state.inputValue === '' ) {
-			this.removeLink();
+	const submit = () => {
+		if ( inputValue === '' ) {
+			removeLink();
 		} else {
-			this.submitLink();
+			submitLink();
 		}
-		this.setState( { isFullScreen: false } );
-	}
+	};
 
-	render() {
-		const { isVisible } = this.props;
-		const { inputValue, isFullScreen, text } = this.state;
+	useFocusEffect(
+		useCallback( () => {
+			const { params = {} } = route;
+			onFocus();
+			if ( ! text && params.text ) {
+				setText( params.text );
+			}
+			return () => {};
+		}, [ route.params.text, text, onFocus ] )
+	);
 
-		return (
-			<BottomSheet
-				isVisible={ isVisible }
-				onClose={ this.onDismiss }
-				hideHeader
-				style={ { flex: isFullScreen ? 1 : undefined } }
-				isChildrenScrollable={ isFullScreen }
-			>
-				<BottomSheetConsumer>
-					{ ( {
-						currentScreen: subsheet,
-						onReplaceSubsheet: replaceSubsheet,
-						onHardwareButtonPress: setBackHandler,
-						shouldDisableBottomSheetMaxHeight: setMaxHeightEnabled,
-					} ) => {
-						// subsheet depth is limited to 1 so we can revert to default
-						// back behavior when returning from the subsheet
-						const goBack = () => {
-							replaceSubsheet( null, {}, () =>
-								setBackHandler( null )
-							);
-							this.setState( { isFullScreen: false } );
-						};
+	return (
+		<>
+			<BottomSheet.LinkCell
+				value={ inputValue }
+				onPress={ onLinkCellPressed }
+			/>
+			<BottomSheet.Cell
+				icon={ textColor }
+				label={ __( 'Link text' ) }
+				value={ text }
+				placeholder={ __( 'Add link text' ) }
+				onChangeValue={ setText }
+				onSubmit={ submit }
+			/>
+			<BottomSheet.SwitchCell
+				icon={ external }
+				label={ __( 'Open in new tab' ) }
+				value={ opensInNewWindow }
+				onValueChange={ setOpensInNewWindows }
+				separatorType={ 'fullWidth' }
+			/>
+			<BottomSheet.Cell
+				label={ __( 'Remove link' ) }
+				labelStyle={ styles.clearLinkButton }
+				separatorType={ 'none' }
+				onPress={ removeLink }
+			/>
+		</>
+	);
+};
 
-						// we only set text to title if there was no initial text
-						const onLinkPicked = ( { url, title } ) => {
-							if ( ! text ) {
-								this.setState( {
-									inputValue: url,
-									text: title,
-								} );
-							} else {
-								this.setState( { inputValue: url } );
-							}
-							goBack();
-						};
-
-						const onLinkCellPressed = () => {
-							setMaxHeightEnabled( false );
-							this.setState( { isFullScreen: true } );
-							replaceSubsheet( 'picker', {}, () =>
-								setBackHandler( goBack )
-							);
-						};
-
-						switch ( subsheet ) {
-							case 'picker':
-								return (
-									<LinkPicker
-										value={ inputValue }
-										onLinkPicked={ onLinkPicked }
-										onCancel={ goBack }
-									/>
-								);
-							default:
-								return (
-									<>
-										<BottomSheet.LinkCell
-											value={ inputValue }
-											onPress={ onLinkCellPressed }
-										/>
-										<BottomSheet.Cell
-											icon={ textColor }
-											label={ __( 'Link text' ) }
-											value={ text }
-											placeholder={ __(
-												'Add link text'
-											) }
-											onChangeValue={ this.onChangeText }
-											onSubmit={ this.onDismiss }
-										/>
-										<BottomSheet.SwitchCell
-											icon={ external }
-											label={ __( 'Open in new tab' ) }
-											value={
-												this.state.opensInNewWindow
-											}
-											onValueChange={
-												this.onChangeOpensInNewWindow
-											}
-											separatorType={ 'fullWidth' }
-										/>
-										<BottomSheet.Cell
-											label={ __( 'Remove link' ) }
-											labelStyle={
-												styles.clearLinkButton
-											}
-											separatorType={ 'none' }
-											onPress={ this.removeLink }
-										/>
-									</>
-								);
-						}
-					} }
-				</BottomSheetConsumer>
-			</BottomSheet>
-		);
-	}
-}
-
-export default withSpokenMessages( ModalLinkUI );
+const LinkPickerScreen = ( { onFocus } ) => {
+	const navigation = useNavigation();
+	const route = useRoute();
+	const onLinkPicked = ( { url, title } ) => {
+		navigation.navigate( linkSettingsScreens.settings, {
+			inputValue: url,
+			text: title,
+		} );
+	};
+	useFocusEffect(
+		useCallback( () => {
+			onFocus();
+			return () => {};
+		}, [ onFocus ] )
+	);
+	const { inputValue } = route.params;
+	return (
+		<LinkPicker
+			value={ inputValue }
+			onLinkPicked={ onLinkPicked }
+			onCancel={ navigation.goBack }
+		/>
+	);
+};
