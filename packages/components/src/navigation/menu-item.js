@@ -12,11 +12,12 @@ import { Icon, chevronRight } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../button';
-import { MenuItemUI } from './styles/navigation-styles';
+import { MenuItemUI, BadgeUI } from './styles/navigation-styles';
 import Text from '../text';
 
 const NavigationMenuItem = ( props ) => {
 	const {
+		badge,
 		children,
 		hasChildren,
 		id,
@@ -43,6 +44,7 @@ const NavigationMenuItem = ( props ) => {
 				<Text variant="body.small">
 					<span>{ title }</span>
 				</Text>
+				{ badge && <BadgeUI>{ badge }</BadgeUI> }
 				{ hasChildren ? <Icon icon={ chevronRight } /> : null }
 			</Button>
 		</MenuItemUI>
