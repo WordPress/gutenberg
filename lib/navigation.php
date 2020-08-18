@@ -16,7 +16,11 @@
  * `'menu-item-content'` on a menu item. When merged to Core, this functionality
  * should exist in `wp_update_nav_menu_item()`.
  *
- * 2) The `customize_save` ajax action supports setting `'content'` on a nav
+ * 2) Updating a menu via nav-menus.php supports setting `'menu-item-content'`
+ * on a menu item. When merged to Core, this functionality should exist in
+ * `wp_nav_menu_update_menu_items()`.
+ *
+ * 3) The `customize_save` ajax action supports setting `'content'` on a nav
  * menu item. When merged to Core, this functionality should exist in
  * `WP_Customize_Manager::save()`.
  *
@@ -32,8 +36,15 @@
 function gutenberg_update_nav_menu_item_content( $menu_id, $menu_item_db_id, $args ) {
 	global $wp_customize;
 
+	// Support setting content in nav-menus.php by grabbing the value from
+	// $_POST. This belongs in `wp_nav_menu_update_menu_items()`.
+	if ( isset( $_POST['menu-item-content'][ $menu_item_db_id ] ) ) {
+		$args['menu-item-content'] = wp_unslash( $_POST['menu-item-content'][ $menu_item_db_id ] );
+	}
+
 	// Support setting content in customize_save admin-ajax.php requests by
-	// grabbing the unsanitized $_POST values.
+	// grabbing the unsanitized $_POST values. This belongs in
+	// `WP_Customize_Manager::save()`.
 	if ( isset( $wp_customize ) ) {
 		$values = $wp_customize->unsanitized_post_values();
 		if ( isset( $values[ "nav_menu_item[$menu_item_db_id]" ]['content'] ) ) {
@@ -44,6 +55,8 @@ function gutenberg_update_nav_menu_item_content( $menu_id, $menu_item_db_id, $ar
 			}
 		}
 	}
+
+	// Everything else belongs in `wp_update_nav_menu_item()`.
 
 	$defaults = array(
 		'menu-item-content' => '',
@@ -323,7 +336,7 @@ function gutenberg_output_block_menu_item_custom_fields( $item_id, $item ) {
 		<p class="field-content description description-wide">
 			<label for="edit-menu-item-content-<?php echo $item_id; ?>">
 				<?php _e( 'Content', 'gutenberg' ); ?><br />
-				<textarea readonly><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
+				<textarea readonly name="menu-item-content[<?php echo $item_id; ?>]"><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
 			</label>
 		</p>
 		<?php
