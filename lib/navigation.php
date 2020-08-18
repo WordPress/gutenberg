@@ -70,6 +70,8 @@ add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content',
  * @see https://core.trac.wordpress.org/ticket/50544
  *
  * @param object $menu_item The menu item object.
+ *
+ * @return object Updated menu item object.
  */
 function gutenberg_setup_block_nav_menu_item( $menu_item ) {
 	if ( 'block' === $menu_item->type ) {
@@ -104,6 +106,8 @@ add_filter( 'wp_setup_nav_menu_item', 'gutenberg_setup_block_nav_menu_item' );
  * @param WP_Post  $item        Menu item data object.
  * @param int      $depth       Depth of menu item. Used for padding.
  * @param stdClass $args        An object of wp_nav_menu() arguments.
+ *
+ * @return string The menu item's updated HTML output.
  */
 function gutenberg_output_block_nav_menu_item( $item_output, $item, $depth, $args ) {
 	if ( 'block' === $item->type ) {
@@ -131,6 +135,8 @@ add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_block_nav_menu_item', 
  * @see https://core.trac.wordpress.org/ticket/50544
  *
  * @param array $menu_items The menu items, sorted by each menu item's menu order.
+ *
+ * @return array Updated menu items, sorted by each menu item's menu order.
  */
 function gutenberg_remove_block_nav_menu_items( $menu_items ) {
 	if ( current_theme_supports( 'block-nav-menus' ) ) {
@@ -155,7 +161,8 @@ add_filter( 'wp_nav_menu_objects', 'gutenberg_remove_block_nav_menu_items', 10 )
  *
  * @param array $menu_items The menu items to convert, sorted by each menu item's menu order.
  * @param array $menu_items_by_parent_id All menu items, indexed by their parent's ID.
- * @return array
+
+ * @return array Updated menu items, sorted by each menu item's menu order.
  */
 function gutenberg_convert_menu_items_to_blocks(
 	$menu_items,
@@ -222,6 +229,8 @@ function gutenberg_convert_menu_items_to_blocks(
  *
  * @param string|null $output Nav menu output to short-circuit with. Default null.
  * @param stdClass    $args   An object containing wp_nav_menu() arguments.
+ *
+ * @return string|null Nav menu output to short-circuit with.
  */
 function gutenberg_output_block_nav_menu( $output, $args ) {
 	if ( ! current_theme_supports( 'block-nav-menus' ) ) {
