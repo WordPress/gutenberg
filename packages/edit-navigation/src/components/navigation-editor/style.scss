@@ -56,6 +56,13 @@
 	> :first-child button {
 		padding-left: 0;
 	}
+
+	&.is-selected .block-editor-block-icon svg,
+	&.is-selected:focus .block-editor-block-icon svg {
+		color: $dark-gray-600;
+		background: transparent;
+		box-shadow: none;
+	}
 }
 
 .edit-navigation-editor__navigation-structure-panel {
