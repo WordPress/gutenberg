@@ -395,19 +395,7 @@ _Returns_
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
-Get schema of possible paths for phrasing content.
-
-_Related_
-
--   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
-
-_Parameters_
-
--   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
-
-_Returns_
-
--   `Object`: Schema.
+Undocumented declaration.
 
 <a name="getPossibleBlockTransformations" href="#getPossibleBlockTransformations">#</a> **getPossibleBlockTransformations**
 

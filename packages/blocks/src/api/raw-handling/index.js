@@ -4,6 +4,12 @@
 import { flatMap, filter, compact } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+import { getPhrasingContentSchema } from '@wordpress/dom';
+
+/**
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
@@ -18,15 +24,12 @@ import { deepFilterHTML, getBlockContentSchema } from './utils';
 
 export { pasteHandler } from './paste-handler';
 
-/**
- * WordPress dependencies
- */
-import { getPhrasingContentSchema } from '@wordpress/dom';
-
-/**
- * @deprecated since 5.6. Callers should import getPhrasingContentSchema directly from '@wordpress/dom' package.
- */
-export { getPhrasingContentSchema };
+export function deprecatedGetPhrasingContentSchema( context ) {
+	deprecated( 'wp.blocks.getPhrasingContentSchema', {
+		alternative: 'wp.dom.getPhrasingContentSchema',
+	} );
+	return getPhrasingContentSchema( context );
+}
 
 function getRawTransformations() {
 	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(

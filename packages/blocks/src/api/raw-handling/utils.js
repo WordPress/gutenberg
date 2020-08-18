@@ -14,11 +14,6 @@ import { isPhrasingContent } from '@wordpress/dom';
 import { hasBlockSupport } from '..';
 
 /**
- * Browser dependencies
- */
-const { ELEMENT_NODE, TEXT_NODE } = window.Node;
-
-/**
  * Given raw transforms from blocks, merges all schemas into one.
  *
  * @param {Array}  transforms            Block transforms, of the `raw` type.
