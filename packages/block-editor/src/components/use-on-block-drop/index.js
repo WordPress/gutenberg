@@ -158,9 +158,9 @@ export function onFileDrop(
 /**
  * A function that returns an event handler function for block-related HTML drop events.
  *
- * @param {string}   targetRootClientId    The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
- * @param {Function} insertBlocks          A function that inserts blocks.
+ * @param {string}   targetRootClientId The root client id where the block(s) will be inserted.
+ * @param {number}   targetBlockIndex   The index where the block(s) will be inserted.
+ * @param {Function} insertBlocks       A function that inserts blocks.
  *
  * @return {Function} The event handler for a block-related HTML drop event.
  */
@@ -181,10 +181,10 @@ export function onHTMLDrop(
 /**
  * A React hook for handling block drop events.
  *
- * @param {string}   targetRootClientId        The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex          The index where the block(s) will be inserted.
+ * @param {string} targetRootClientId The root client id where the block(s) will be inserted.
+ * @param {number} targetBlockIndex   The index where the block(s) will be inserted.
  *
- * @return {Function[]} An object that contains the event handlers `onDrop`, `onFileDrop` and `onHTMLDrop`.
+ * @return {Object} An object that contains the event handlers `onDrop`, `onFileDrop` and `onHTMLDrop`.
  */
 export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 	const {
