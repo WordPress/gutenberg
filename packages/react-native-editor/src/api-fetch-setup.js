@@ -1,14 +1,7 @@
 /**
- * External dependencies
- */
-/**
  * WordPress dependencies
  */
 import { fetchRequest } from '@wordpress/react-native-bridge';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 
 const setTimeoutPromise = ( delay ) =>
@@ -43,10 +36,9 @@ const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
 };
 
 export const isPathSupported = ( path ) =>
-	[
-		/wp\/v2\/(media|categories)\/?\d*?.*/i,
-		/wpcom\/v2\/gutenberg\/.*/i,
-	].some( ( pattern ) => pattern.test( path ) );
+	[ /wp\/v2\/(media|categories)\/?\d*?.*/i ].some( ( pattern ) =>
+		pattern.test( path )
+	);
 
 export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );
