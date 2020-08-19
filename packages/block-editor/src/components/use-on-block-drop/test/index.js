@@ -199,7 +199,6 @@ describe( 'onBlockDrop', () => {
 					return JSON.stringify( {
 						type: 'block',
 						srcRootClientId: '0',
-						// The dragged block is being dropped as a child of itself.
 						srcClientIds: [ '5' ],
 					} );
 				},
@@ -224,7 +223,6 @@ describe( 'onBlockDrop', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 		const getBlockIndex = jest.fn( () => 1 );
-		// Dragged block is being dropped as a descendant of itself.
 		const getClientIdsOfDescendants = () => [];
 		const moveBlocksToPosition = jest.fn();
 
@@ -234,7 +232,6 @@ describe( 'onBlockDrop', () => {
 					return JSON.stringify( {
 						type: 'block',
 						srcRootClientId: sourceRootClientId,
-						// The dragged block is being dropped as a child of itself.
 						srcClientIds: sourceClientIds,
 					} );
 				},
