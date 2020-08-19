@@ -100,7 +100,7 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 			const index = blocksData.indexOf( blockData );
 			const previousBlockData = blocksData[ index - 1 ];
 
-			// If dragging near the top of a block and then preceding block
+			// If dragging near the top of a block and the preceding block
 			// is at the same level, use the preceding block as the candidate
 			// instead, as later it makes determining a nesting drop easier.
 			if (
