@@ -93,6 +93,25 @@ describe( 'utils', () => {
 	} );
 	describe( 'createUpgradedEmbedBlock', () => {
 		describe( 'do not create new block', () => {
+			it( 'when block type does not exist', () => {
+				const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w';
+
+				unregisterBlockType( DEFAULT_EMBED_BLOCK );
+
+				expect(
+					createUpgradedEmbedBlock( {
+						attributes: { url: youtubeURL },
+					} )
+				).toBeUndefined();
+
+				registerBlockType( DEFAULT_EMBED_BLOCK, {
+					title: 'Embed',
+					category: 'embed',
+					attributes,
+					variations,
+				} );
+			} );
+
 			it( 'when block variation does not exist', () => {
 				const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w';
 
