@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import createNonceMiddleware, { sameHostFilter } from './middlewares/nonce';
+import createNonceMiddleware from './middlewares/nonce';
 import createRootURLMiddleware from './middlewares/root-url';
 import createPreloadingMiddleware from './middlewares/preloading';
 import fetchAllMiddleware from './middlewares/fetch-all-middleware';
@@ -158,7 +158,6 @@ apiFetch.use = registerMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
 
 apiFetch.createNonceMiddleware = createNonceMiddleware;
-apiFetch.sameHostFilter = sameHostFilter;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
