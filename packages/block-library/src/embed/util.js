@@ -108,7 +108,7 @@ export const createUpgradedEmbedBlock = (
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
 	const isCurrentBlockWP =
-		WP_VARIATION && // Is the WordPress variation of the embed block registered?
+		WP_VARIATION && // Check if the WordPress variation of the embed block is registered.
 		( providerNameSlug === WP_VARIATION.attributes.providerNameSlug ||
 			type === WP_EMBED_TYPE );
 	// if current block is not WordPress and a more suitable block found
