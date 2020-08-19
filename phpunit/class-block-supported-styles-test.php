@@ -72,10 +72,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 * @param string $block String of rendered block to check.
 	 */
 	private function get_content_from_block( $block ) {
-		$start_index = strpos( $block, '>' ) + 1;
+		$start_index = strpos( $block, '>' ) + 1; // First occurrence of '>'.
 		$split_arr   = substr( $block, $start_index );
-		$end_index   = strpos( $split_arr, '<' );
-		return substr( $split_arr, 0, $end_index );
+		$end_index   = strrpos( $split_arr, '<' ); // Last occurrence of '<'.
+		return substr( $split_arr, 0, $end_index ); // String between first '>' and last '<'.
 	}
 
 	/**
@@ -117,7 +117,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 *
 	 * @var string
 	 */
-	const BLOCK_CONTENT = 'Some non-Latin chärs to make sure DOM öperations don\'t mess them up: こんにちは';
+	const BLOCK_CONTENT = '
+		<p data-image-description="&lt;p&gt;Test!&lt;/p&gt;">Test</p>
+		<p>äöü</p>
+		<p>ß</p>
+		<p>系の家庭に</p>
+		<p>Example &lt;p&gt;Test!&lt;/p&gt;</p>
+	';
 
 	/**
 	 * Example block markup string to test with.
