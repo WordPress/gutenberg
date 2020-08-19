@@ -3,15 +3,19 @@
  */
 import { createMissingMenuItems } from '../actions';
 import {
-	getNavigationPostForMenu,
-	isProcessingPost,
 	resolveMenuItems,
 	getMenuItemToClientIdMapping,
-	getPendingActions,
 	dispatch,
 	apiFetch,
 } from '../controls';
 import { menuItemsQuery } from '../utils';
+
+jest.mock( '../utils', () => {
+	const utils = require.requireActual( '../utils' );
+	// Mock serializeProcessing to always return the callback for easier testing and less boilerplate.
+	utils.serializeProcessing = ( callback ) => callback;
+	return utils;
+} );
 
 describe( 'createMissingMenuItems', () => {
 	it( 'create missing menu for navigation block', () => {
@@ -47,26 +51,10 @@ describe( 'createMissingMenuItems', () => {
 
 		const action = createMissingMenuItems( post );
 
-		// Entering `serializeProcessing`
-		expect( action.next().value ).toEqual( isProcessingPost( post.id ) );
-		expect( action.next( false ).value ).toEqual(
-			expect.objectContaining( {
-				type: 'POP_PENDING_ACTION',
-				postId: post.id,
-			} )
-		);
-		expect( action.next().value ).toEqual( {
-			type: 'START_PROCESSING_POST',
-			postId: post.id,
-		} );
-		expect( action.next().value ).toEqual(
-			getNavigationPostForMenu( post.meta.menuId )
-		);
-
-		// Entering `createMissingMenuItems`
 		expect( action.next( post ).value ).toEqual(
 			getMenuItemToClientIdMapping( post.id )
 		);
+
 		expect( action.next( mapping ).value ).toEqual(
 			apiFetch( {
 				path: `/__experimental/menu-items`,
@@ -78,9 +66,11 @@ describe( 'createMissingMenuItems', () => {
 				},
 			} )
 		);
+
 		expect( action.next( menuItemPlaceholder ).value ).toEqual(
 			resolveMenuItems( post.meta.menuId )
 		);
+
 		expect( action.next( menuItems ).value ).toEqual(
 			dispatch(
 				'core',
@@ -92,6 +82,7 @@ describe( 'createMissingMenuItems', () => {
 				false
 			)
 		);
+
 		expect( action.next().value ).toEqual( {
 			type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
 			postId: post.id,
@@ -100,14 +91,6 @@ describe( 'createMissingMenuItems', () => {
 			},
 		} );
 
-		// Exiting `serializeProcessing`
-		expect( action.next().value ).toEqual(
-			expect.objectContaining( {
-				type: 'FINISH_PROCESSING_POST',
-				postId: post.id,
-			} )
-		);
-		expect( action.next().value ).toEqual( getPendingActions( post.id ) );
 		expect( action.next( [] ).done ).toBe( true );
 	} );
 
@@ -191,26 +174,10 @@ describe( 'createMissingMenuItems', () => {
 
 		const action = createMissingMenuItems( post );
 
-		// Entering `serializeProcessing`
-		expect( action.next().value ).toEqual( isProcessingPost( post.id ) );
-		expect( action.next( false ).value ).toEqual(
-			expect.objectContaining( {
-				type: 'POP_PENDING_ACTION',
-				postId: post.id,
-			} )
-		);
-		expect( action.next().value ).toEqual( {
-			type: 'START_PROCESSING_POST',
-			postId: post.id,
-		} );
-		expect( action.next().value ).toEqual(
-			getNavigationPostForMenu( post.meta.menuId )
-		);
-
-		// Entering `createMissingMenuItems`
 		expect( action.next( post ).value ).toEqual(
 			getMenuItemToClientIdMapping( post.id )
 		);
+
 		expect( action.next( mapping ).value ).toEqual(
 			apiFetch( {
 				path: `/__experimental/menu-items`,
@@ -222,9 +189,11 @@ describe( 'createMissingMenuItems', () => {
 				},
 			} )
 		);
+
 		expect( action.next( menuItemPlaceholder ).value ).toEqual(
 			resolveMenuItems( post.meta.menuId )
 		);
+
 		expect( action.next( menuItems ).value ).toEqual(
 			dispatch(
 				'core',
@@ -236,6 +205,7 @@ describe( 'createMissingMenuItems', () => {
 				false
 			)
 		);
+
 		expect( action.next().value ).toEqual( {
 			type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
 			postId: post.id,
@@ -246,14 +216,6 @@ describe( 'createMissingMenuItems', () => {
 			},
 		} );
 
-		// Exiting `serializeProcessing`
-		expect( action.next().value ).toEqual(
-			expect.objectContaining( {
-				type: 'FINISH_PROCESSING_POST',
-				postId: post.id,
-			} )
-		);
-		expect( action.next().value ).toEqual( getPendingActions( post.id ) );
 		expect( action.next( [] ).done ).toBe( true );
 	} );
 } );
