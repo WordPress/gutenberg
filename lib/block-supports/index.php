@@ -53,7 +53,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	}
 
 	// We need to wrap the block in order to handle UTF-8 properly.
-	$wrapper_left = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>';
+	$wrapper_left  = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>';
 	$wrapper_right = '</body></html>';
 
 	$dom = new DOMDocument( '1.0', 'utf-8' );
