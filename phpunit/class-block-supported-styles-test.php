@@ -74,7 +74,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	private function get_content_from_block( $block ) {
 		$start_index = strpos( $block, '>' ) + 1;
 		$split_arr   = substr( $block, $start_index );
-		$end_index   = strpos( $split_arr, '<' );
+		$end_index   = strrpos( $split_arr, '<' );
 		return substr( $split_arr, 0, $end_index );
 	}
 
