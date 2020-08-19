@@ -97,9 +97,26 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 			isCursorWithinBlock
 		) {
 			candidateDistance = distance;
-			candidateBlockData = blockData;
-			candidateEdge = edge;
-			candidateRect = rect;
+
+			const index = blocksData.indexOf( blockData );
+			const previousBlockData = blocksData[ index - 1 ];
+
+			// If dragging near the top of a block and then preceding block
+			// is at the same level, use the preceding block as the candidate
+			// instead, as later it makes determining a nesting drop easier.
+			if (
+				edge === 'top' &&
+				previousBlockData &&
+				previousBlockData.rootClientId === blockData.rootClientId
+			) {
+				candidateBlockData = previousBlockData;
+				candidateEdge = 'bottom';
+				candidateRect = previousBlockData.element.getBoundingClientRect();
+			} else {
+				candidateBlockData = blockData;
+				candidateEdge = edge;
+				candidateRect = rect;
+			}
 
 			// If the mouse position is within the block, break early
 			// as the user would intend to drop either before or after
@@ -120,7 +137,7 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 	const isDraggingBelow = candidateEdge === 'bottom';
 
 	// If the user is dragging towards the bottom of the block check whether
-	// they might be inserting as a child.
+	// they might be trying to insert the block as a child.
 	if (
 		isDraggingBelow &&
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
