@@ -17,7 +17,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  *
  * @return {Object} An object with block drag and drop data.
  */
-function parseDropEvent( event ) {
+export function parseDropEvent( event ) {
 	let result = {
 		srcRootClientId: null,
 		srcClientIds: null,
@@ -52,7 +52,7 @@ function parseDropEvent( event ) {
  *
  * @return {Function} The event handler for a block drop event.
  */
-function onBlockDrop(
+export function onBlockDrop(
 	targetRootClientId,
 	targetBlockIndex,
 	getBlockIndex,
@@ -127,7 +127,7 @@ function onBlockDrop(
  *
  * @return {Function} The event handler for a block-related file drop event.
  */
-function onFileDrop(
+export function onFileDrop(
 	targetRootClientId,
 	targetBlockIndex,
 	hasUploadPermissions,
@@ -164,7 +164,11 @@ function onFileDrop(
  *
  * @return {Function} The event handler for a block-related HTML drop event.
  */
-function onHTMLDrop( targetRootClientId, targetBlockIndex, insertBlocks ) {
+export function onHTMLDrop(
+	targetRootClientId,
+	targetBlockIndex,
+	insertBlocks
+) {
 	return ( HTML ) => {
 		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
