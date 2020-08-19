@@ -1,22 +1,63 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	__experimentalBlock as Block,
+	BlockControls,
+	RichText,
+} from '@wordpress/block-editor';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	ToolbarGroup,
+	Button,
+	ToolbarButton,
+} from '@wordpress/components';
+import { button } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 export default function SearchEdit( { className, attributes, setAttributes } ) {
-	const { label, placeholder, buttonText } = attributes;
+	const {
+		label,
+		showLabel,
+		placeholder,
+		buttonText,
+		buttonPosition,
+		buttonUseIcon,
+	} = attributes;
 
-	return (
-		<div className={ className }>
-			<RichText
-				className="wp-block-search__label"
-				aria-label={ __( 'Label text' ) }
-				placeholder={ __( 'Add label…' ) }
-				withoutInteractiveFormatting
-				value={ label }
-				onChange={ ( html ) => setAttributes( { label: html } ) }
-			/>
+	const getBlockClassNames = () => {
+		return classnames(
+			className,
+			'button-inside' === buttonPosition
+				? 'wp-block-search__button-inside'
+				: undefined,
+			'button-outside' === buttonPosition
+				? 'wp-block-search__button-outside'
+				: undefined,
+			'no-button' === buttonPosition
+				? 'wp-block-search__no-button'
+				: undefined,
+			'button-only' === buttonPosition
+				? 'wp-block-search__button-only'
+				: undefined,
+			buttonUseIcon && 'no-button' !== buttonPosition
+				? 'wp-block-search__text-button'
+				: undefined,
+			! buttonUseIcon && 'no-button' !== buttonPosition
+				? 'wp-block-search__icon-button'
+				: undefined
+		);
+	};
+
+	const renderTextField = () => {
+		return (
 			<input
 				className="wp-block-search__input"
 				aria-label={ __( 'Optional placeholder text' ) }
@@ -31,14 +72,134 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 					setAttributes( { placeholder: event.target.value } )
 				}
 			/>
-			<RichText
-				className="wp-block-search__button"
-				aria-label={ __( 'Button text' ) }
-				placeholder={ __( 'Add button text…' ) }
-				withoutInteractiveFormatting
-				value={ buttonText }
-				onChange={ ( html ) => setAttributes( { buttonText: html } ) }
-			/>
-		</div>
+		);
+	};
+
+	const renderButton = () => {
+		return (
+			<>
+				{ buttonUseIcon && (
+					<Button icon="search" className="wp-block-search__button" />
+				) }
+
+				{ ! buttonUseIcon && (
+					<RichText
+						className="wp-block-search__button"
+						aria-label={ __( 'Button text' ) }
+						placeholder={ __( 'Add button text…' ) }
+						withoutInteractiveFormatting
+						value={ buttonText }
+						onChange={ ( html ) =>
+							setAttributes( { buttonText: html } )
+						}
+					/>
+				) }
+			</>
+		);
+	};
+
+	return (
+		<Block.div className={ getBlockClassNames() }>
+			<BlockControls>
+				<ToolbarGroup>
+					<DropdownMenu
+						icon={ button }
+						label={ __( 'Change Button Position' ) }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup className="wp-block-search__button-position-menu">
+								<MenuItem
+									icon={ button }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'no-button',
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'No Button' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ button }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'button-inside',
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'Button Inside' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ button }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'button-outside',
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'Button Outside' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ button }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'button-only',
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'Button Only' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+
+					{ 'no-button' !== buttonPosition && (
+						<ToolbarButton
+							title={ __( 'Use Icon Button' ) }
+							icon={ button }
+							onClick={ () => {
+								setAttributes( {
+									buttonUseIcon: ! buttonUseIcon,
+								} );
+							} }
+							className={
+								buttonUseIcon ? 'is-pressed' : undefined
+							}
+						/>
+					) }
+				</ToolbarGroup>
+			</BlockControls>
+
+			{ showLabel && (
+				<RichText
+					className="wp-block-search__label"
+					aria-label={ __( 'Label text' ) }
+					placeholder={ __( 'Add label…' ) }
+					withoutInteractiveFormatting
+					value={ label }
+					onChange={ ( html ) => setAttributes( { label: html } ) }
+				/>
+			) }
+
+			{ 'button-outside' === buttonPosition && (
+				<>
+					{ renderTextField() }
+					{ renderButton() }
+				</>
+			) }
+
+			{ 'button-inside' === buttonPosition && (
+				<div className="wp-block-search__inside-wrapper">
+					{ renderTextField() }
+					{ renderButton() }
+				</div>
+			) }
+
+			{ 'button-only' === buttonPosition && renderButton() }
+			{ 'no-button' === buttonPosition && renderTextField() }
+		</Block.div>
 	);
 }

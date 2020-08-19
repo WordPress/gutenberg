@@ -1,5 +1,6 @@
 .wp-block-search {
-	&__input {
+	&__input,
+	&__inside-wrapper {
 		border-radius: $radius-block-ui;
 		border: 1px solid $dark-gray-200;
 		color: $dark-gray-placeholder;
@@ -20,5 +21,22 @@
 		font-family: $default-font;
 		font-size: $default-font-size;
 		padding: 6px 10px;
+		color: $dark-gray-700;
+	}
+
+	&__inside-wrapper {
+		display: flex;
+		flex: auto;
+		padding: $grid-unit-05;
+
+		.wp-block-search__input {
+			border-radius: 0;
+			border: none;
+			padding: 0 0 0 4px;
+		}
+
+		.wp-block-search__button {
+			padding: 2px 8px;
+		}
 	}
 }

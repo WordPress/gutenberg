@@ -5,16 +5,29 @@
 		"label": {
 			"type": "string"
 		},
+		"showLabel": {
+			"type": "bool",
+			"default": false
+		},
 		"placeholder": {
 			"type": "string",
 			"default": ""
 		},
 		"buttonText": {
 			"type": "string"
+		},
+		"buttonPosition": {
+			"type": "string",
+			"default": "button-outside"
+		},
+		"buttonUseIcon": {
+			"type": "bool",
+			"default": false
 		}
 	},
 	"supports": {
 		"align": true,
-		"html": false
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }
