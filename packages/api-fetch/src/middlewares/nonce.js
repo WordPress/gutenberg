@@ -1,5 +1,12 @@
 function createNonceMiddleware( nonce, middlewareOptions = {} ) {
-	const { shouldSendNonce = sameHostFilter } = middlewareOptions;
+	let { requestFilter, siteUrl } = middlewareOptions;
+	if ( ! requestFilter ) {
+		if ( siteUrl ) {
+			requestFilter = createSameSiteFilter( siteUrl );
+		} else {
+			requestFilter = createSameHostFilter( window.location.href );
+		}
+	}
 	function middleware( options, next ) {
 		const { headers = {} } = options;
 
@@ -15,7 +22,7 @@ function createNonceMiddleware( nonce, middlewareOptions = {} ) {
 			return next( options );
 		}
 
-		if ( ! shouldSendNonce( options ) ) {
+		if ( ! requestFilter( options ) ) {
 			return next( options );
 		}
 
@@ -33,25 +40,57 @@ function createNonceMiddleware( nonce, middlewareOptions = {} ) {
 	return middleware;
 }
 
-export function sameHostFilter( options ) {
-	// Same-host request, safe to send nonce
-	if ( options.path && ! options.url ) {
-		return true;
-	}
+export default createNonceMiddleware;
 
-	if ( options.url ) {
-		const parsed = new URL( options.url );
-		const current = window.location;
-		// Same-host request, safe to send nonce
+export function createSameHostFilter( referenceUrl ) {
+	return function ( options ) {
+		if ( options.path && ! options.url ) {
+			return true;
+		}
+
+		if ( options.url && isSameHost( options.url, referenceUrl ) ) {
+			return true;
+		}
+
+		return false;
+	};
+}
+
+function isSameHost( targetUrl, referenceUrl ) {
+	const parsed = new URL( targetUrl );
+	const reference = new URL( referenceUrl );
+	return (
+		parsed.host === reference.host && parsed.protocol === reference.protocol
+	);
+}
+
+export function createSameSiteFilter( referenceUrl ) {
+	return function ( options ) {
+		if ( options.path && ! options.url ) {
+			return isUnderPath( options.path, referenceUrl );
+		}
+
 		if (
-			parsed.host === current.host &&
-			parsed.protocol === current.protocol
+			options.url &&
+			isSameHost( options.url, referenceUrl ) &&
+			isUnderPath( options.url, referenceUrl )
 		) {
 			return true;
 		}
-	}
 
-	return false;
+		return false;
+	};
 }
-
-export default createNonceMiddleware;
+function isUnderPath( targetUrl, referenceUrl ) {
+	let targetPathname;
+	if ( targetUrl.startsWith( '/' ) ) {
+		targetPathname = targetUrl;
+	} else {
+		const parsed = new URL( targetUrl );
+		targetPathname = parsed.pathname;
+	}
+	const reference = new URL( referenceUrl );
+	return (
+		! reference.pathname || targetPathname.startsWith( reference.pathname )
+	);
+}

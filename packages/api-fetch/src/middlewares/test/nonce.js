@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-import createNonceMiddleware, { sameHostFilter } from '../nonce';
+import createNonceMiddleware, {
+	createSameHostFilter,
+	createSameSiteFilter,
+} from '../nonce';
 
 describe( 'Nonce middleware', () => {
 	it( 'should add a nonce header to the request', () => {
@@ -72,12 +75,12 @@ describe( 'Nonce middleware', () => {
 		nonceMiddleware( requestOptions, callback );
 	} );
 
-	it( 'should add a nonce header if shouldSendNonce returns true', () => {
+	it( 'should add a nonce header if requestFilter returns true', () => {
 		expect.hasAssertions();
 
 		const nonce = 'nonce';
 		const nonceMiddleware = createNonceMiddleware( nonce, {
-			shouldSendNonce: () => true,
+			requestFilter: () => true,
 		} );
 		const requestOptions = {
 			method: 'GET',
@@ -90,12 +93,12 @@ describe( 'Nonce middleware', () => {
 		nonceMiddleware( requestOptions, callback );
 	} );
 
-	it( 'should not add a nonce header if shouldSendNonce returns false', () => {
+	it( 'should not add a nonce header if requestFilter returns false', () => {
 		expect.hasAssertions();
 
 		const nonce = 'nonce';
 		const nonceMiddleware = createNonceMiddleware( nonce, {
-			shouldSendNonce: () => false,
+			requestFilter: () => false,
 		} );
 		const requestOptions = {
 			method: 'GET',
@@ -108,12 +111,12 @@ describe( 'Nonce middleware', () => {
 		nonceMiddleware( requestOptions, callback );
 	} );
 
-	it( 'should not add a nonce header if withNonce is false but shouldSendNonce returns true', () => {
+	it( 'should not add a nonce header if withNonce is false but requestFilter returns true', () => {
 		expect.hasAssertions();
 
 		const nonce = 'nonce';
 		const nonceMiddleware = createNonceMiddleware( nonce, {
-			shouldSendNonce: () => true,
+			requestFilter: () => true,
 		} );
 		const requestOptions = {
 			method: 'GET',
@@ -127,12 +130,12 @@ describe( 'Nonce middleware', () => {
 		nonceMiddleware( requestOptions, callback );
 	} );
 
-	it( 'should not add a nonce header if withNonce is true but shouldSendNonce returns false', () => {
+	it( 'should not add a nonce header if withNonce is true but requestFilter returns false', () => {
 		expect.hasAssertions();
 
 		const nonce = 'nonce';
 		const nonceMiddleware = createNonceMiddleware( nonce, {
-			shouldSendNonce: () => false,
+			requestFilter: () => false,
 		} );
 		const requestOptions = {
 			method: 'GET',
@@ -147,21 +150,10 @@ describe( 'Nonce middleware', () => {
 	} );
 } );
 
-describe( 'sameHostFilter', () => {
-	let oldWindow;
-	beforeAll( () => {
-		oldWindow = global.window;
-		global.window = Object.create( window );
-		Object.defineProperty( window, 'location', {
-			value: {
-				host: 'wordpress.org',
-				protocol: 'https:',
-			},
-		} );
-	} );
-	afterAll( () => {
-		global.window = oldWindow;
-	} );
+describe( 'createSameHostFilter', () => {
+	const sameHostFilter = createSameHostFilter(
+		'https://wordpress.org/a/b/c'
+	);
 	it( 'should return true if only path is specified (without a URL)', () => {
 		expect( sameHostFilter( { path: '/' } ) ).toBe( true );
 	} );
@@ -183,6 +175,52 @@ describe( 'sameHostFilter', () => {
 		];
 		urls.forEach( ( url ) => {
 			expect( sameHostFilter( { url } ) ).toBe( false );
+		} );
+	} );
+} );
+
+describe( 'createSameSiteFilter', () => {
+	const sameSiteFilter = createSameSiteFilter(
+		'https://wordpress.org/a/b/c'
+	);
+	it( 'should return true if a matching path is specified (without a URL)', () => {
+		const paths = [
+			'/a/b/c/',
+			'/a/b/c',
+			'/a/b/c/?def',
+			'/a/b/c/gh/i/j/?kl#mn',
+		];
+		paths.forEach( ( path ) =>
+			expect( sameSiteFilter( { path } ) ).toBe( true )
+		);
+	} );
+	it( 'should return false if a non-matching path is specified (without a URL)', () => {
+		const paths = [ '/', '/a/b/d/', '/a/a/b/c' ];
+		paths.forEach( ( path ) =>
+			expect( sameSiteFilter( { path } ) ).toBe( false )
+		);
+	} );
+	it( 'should return true for a URL under the reference path', () => {
+		const urls = [
+			'https://wordpress.org/a/b/c/',
+			'https://wordpress.org/a/b/c/?def',
+			'https://wordpress.org/a/b/c/gh/i/j/?kl#mn',
+		];
+		urls.forEach( ( url ) => {
+			expect( sameSiteFilter( { url } ) ).toBe( true );
+		} );
+	} );
+	it( 'should return false for a URL from a different host or with a non-matching path', () => {
+		const urls = [
+			'http://wordpress.org/',
+			'https://wordpress.orgg/a/b/c',
+			'https://make.wordpress.org/',
+			'https://wordpress.org/',
+			'https://wordpress.org/a',
+			'https://wordpress.org/b/c',
+		];
+		urls.forEach( ( url ) => {
+			expect( sameSiteFilter( { url } ) ).toBe( false );
 		} );
 	} );
 } );
