@@ -14,6 +14,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     private let block: Block
     private let jsInjection: FallbackJavascriptInjection
     private let coverView = UIView()
+    private let customInjectionSources: [SourceFile]
 
     public lazy var webView: WKWebView = {
         let configuration = WKWebViewConfiguration()
@@ -22,10 +23,11 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
         return WKWebView(frame: .zero, configuration: configuration)
     }()
 
-    public init(block: Block, userId: String, isWPOrg: Bool = true) throws {
+    public init(block: Block, userId: String, isWPOrg: Bool = true, customSources: [SourceFile] = []) throws {
         self.block = block
         self.isWPOrg = isWPOrg
         jsInjection = try FallbackJavascriptInjection(blockHTML: block.content, userId: userId)
+        customInjectionSources = customSources
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -112,7 +114,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
 
     private func evaluateJavascript(_ script: WKUserScript) {
         webView.evaluateJavaScript(script.source) { (response, error) in
-            if let response = response {
+            if let response = response as? String, response.isEmpty == false {
                 print("\(response)")
             }
             if let error = error {
@@ -124,14 +126,27 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     private func save(_ newContent: String) {
         delegate?.webController(controller: self, didPressSave: block.replacingContent(with: newContent))
     }
+
+    private func onGutenbergReady() {
+        injectExternalSources()
+        evaluateJavascript(jsInjection.preventAutosavesScript)
+        evaluateJavascript(jsInjection.insertBlockScript)
+        DispatchQueue.main.async { [weak self] in
+            self?.removeCoverViewAnimated()
+        }
+    }
 }
 
 extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
-    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        if !isWPOrg && navigationResponse.response.url?.absoluteString.contains("/wp-admin/post-new.php") ?? false {
-            evaluateJavascript(jsInjection.insertBlockScript)
-        }
-        decisionHandler(.allow)
+    func injectExternalSources() {
+        customInjectionSources.compactMap {
+            do {
+                return try $0.getContent().toJsScript()
+            } catch {
+                assertionFailure("Error loading JS source: \($0). Error: \(error)")
+                return nil
+            }
+        }.forEach(evaluateJavascript)
     }
 
     public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
@@ -148,10 +163,7 @@ extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
         // Injectic Editor specific CSS when everything is loaded to avoid overwritting parameters if gutenberg CSS load later.
         evaluateJavascript(jsInjection.preventAutosavesScript)
         evaluateJavascript(jsInjection.injectEditorCssScript)
-        if isWPOrg {
-            evaluateJavascript(jsInjection.insertBlockScript)
-        }
-        removeCoverViewAnimated()
+        evaluateJavascript(jsInjection.gutenbergObserverScript)
     }
 }
 
@@ -173,6 +185,8 @@ extension GutenbergWebSingleBlockViewController: WKScriptMessageHandler {
             delegate?.webController(controller: self, didLog: body)
         case .htmlPostContent:
             save(body)
+        case .gutenbergReady:
+            onGutenbergReady()
         }
     }
 }
