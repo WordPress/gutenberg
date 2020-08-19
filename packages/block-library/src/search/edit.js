@@ -19,7 +19,7 @@ import {
 	Button,
 	ToolbarButton,
 } from '@wordpress/components';
-import { button } from '@wordpress/icons';
+import { button, title, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 export default function SearchEdit( { className, attributes, setAttributes } ) {
@@ -79,7 +79,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 		return (
 			<>
 				{ buttonUseIcon && (
-					<Button icon="search" className="wp-block-search__button" />
+					<Button icon={ search } className="wp-block-search__button" />
 				) }
 
 				{ ! buttonUseIcon && (
@@ -101,6 +101,21 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 	return (
 		<Block.div className={ getBlockClassNames() }>
 			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						title={ __( 'Toggle Label' ) }
+						icon={ title }
+						onClick={ () => {
+							setAttributes( {
+								showLabel: ! showLabel,
+							} );
+						} }
+						className={
+							showLabel ? 'is-pressed' : undefined
+						}
+					/>
+				</ToolbarGroup>
+
 				<ToolbarGroup>
 					<DropdownMenu
 						icon={ button }
