@@ -41,36 +41,22 @@ const NavigationMenuItem = ( props ) => {
 		onClick( props );
 	};
 
-	const linkContents = (
-		<>
-			<Text variant="body.small">
-				<span>{ title }</span>
-			</Text>
-			{ badge && <BadgeUI>{ badge }</BadgeUI> }
-			{ hasChildren ? <Icon icon={ chevronRight } /> : null }
-		</>
-	);
+	const LinkComponentTag = LinkComponent ? LinkComponent : Button;
 
 	return (
 		<MenuItemUI className={ classes }>
-			{ LinkComponent ? (
-				<LinkComponent
-					className={ classes }
-					onClick={ handleClick }
-					{ ...linkProps }
-				>
-					{ linkContents }
-				</LinkComponent>
-			) : (
-				<Button
-					className={ classes }
-					href={ href }
-					onClick={ handleClick }
-					{ ...linkProps }
-				>
-					{ linkContents }
-				</Button>
-			) }
+			<LinkComponentTag
+				className={ classes }
+				href={ href }
+				onClick={ handleClick }
+				{ ...linkProps }
+			>
+				<Text variant="body.small">
+					<span>{ title }</span>
+				</Text>
+				{ badge && <BadgeUI>{ badge }</BadgeUI> }
+				{ hasChildren ? <Icon icon={ chevronRight } /> : null }
+			</LinkComponentTag>
 		</MenuItemUI>
 	);
 };
