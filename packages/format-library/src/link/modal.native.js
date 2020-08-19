@@ -12,7 +12,6 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import {
-	Component,
 	useState,
 	useContext,
 	useCallback,
@@ -48,56 +47,21 @@ const linkSettingsScreens = {
 	picker: 'linkPicker',
 };
 
-class ModalLinkUI extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.state = {
-			isChildrenScrollable: false,
-		};
-	}
-
-	render() {
-		const { isVisible, ...restProps } = this.props;
-		const {
-			activeAttributes: { url },
-		} = this.props;
-
-		return (
-			<BottomSheet
-				isVisible={ isVisible }
-				hideHeader
-				isChildrenScrollable={ this.state.isChildrenScrollable }
+const ModalLinkUI = ( { isVisible, ...restProps } ) => (
+	<BottomSheet isVisible={ isVisible } hideHeader>
+		<BottomSheet.NavigationContainer animate main>
+			<BottomSheet.NavigationScreen name={ linkSettingsScreens.settings }>
+				<LinkSettingsScreen { ...restProps } />
+			</BottomSheet.NavigationScreen>
+			<BottomSheet.NavigationScreen
+				name={ linkSettingsScreens.picker }
+				fullScreen
 			>
-				<BottomSheet.NavigationContainer animate main>
-					<BottomSheet.NavigationScreen
-						name={ linkSettingsScreens.settings }
-						initialParams={ { inputValue: url || '' } }
-					>
-						<LinkSettingsScreen
-							{ ...restProps }
-							onFocus={ () => {
-								this.setState( {
-									isChildrenScrollable: false,
-								} );
-							} }
-						/>
-					</BottomSheet.NavigationScreen>
-					<BottomSheet.NavigationScreen
-						name={ linkSettingsScreens.picker }
-						fullScreen
-					>
-						<LinkPickerScreen
-							onFocus={ () => {
-								this.setState( { isChildrenScrollable: true } );
-							} }
-						/>
-					</BottomSheet.NavigationScreen>
-				</BottomSheet.NavigationContainer>
-			</BottomSheet>
-		);
-	}
-}
+				<LinkPickerScreen />
+			</BottomSheet.NavigationScreen>
+		</BottomSheet.NavigationContainer>
+	</BottomSheet>
+);
 
 export default withSpokenMessages( ModalLinkUI );
 
@@ -109,7 +73,6 @@ const LinkSettingsScreen = ( {
 	value,
 	isActive,
 	activeAttributes,
-	onFocus,
 } ) => {
 	const [ text, setText ] = useState( getTextContent( slice( value ) ) );
 	const [ opensInNewWindow, setOpensInNewWindows ] = useState(
@@ -123,7 +86,7 @@ const LinkSettingsScreen = ( {
 
 	const navigation = useNavigation();
 	const route = useRoute();
-	const { inputValue } = route.params || {};
+	const { inputValue = activeAttributes.url || '' } = route.params || {};
 	const onLinkCellPressed = () => {
 		shouldEnableBottomSheetMaxHeight( false );
 		navigation.navigate( linkSettingsScreens.picker, { inputValue } );
@@ -201,12 +164,11 @@ const LinkSettingsScreen = ( {
 	useFocusEffect(
 		useCallback( () => {
 			const { params = {} } = route;
-			onFocus();
 			if ( ! text && params.text ) {
 				setText( params.text );
 			}
 			return () => {};
-		}, [ route.params.text, text, onFocus ] )
+		}, [ route.params?.text, text ] )
 	);
 
 	return (
@@ -240,7 +202,7 @@ const LinkSettingsScreen = ( {
 	);
 };
 
-const LinkPickerScreen = ( { onFocus } ) => {
+const LinkPickerScreen = () => {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const onLinkPicked = ( { url, title } ) => {
@@ -249,12 +211,7 @@ const LinkPickerScreen = ( { onFocus } ) => {
 			text: title,
 		} );
 	};
-	useFocusEffect(
-		useCallback( () => {
-			onFocus();
-			return () => {};
-		}, [ onFocus ] )
-	);
+
 	const { inputValue } = route.params;
 	return (
 		<LinkPicker

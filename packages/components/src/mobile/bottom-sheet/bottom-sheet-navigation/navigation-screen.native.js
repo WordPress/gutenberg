@@ -48,7 +48,7 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 				return false;
 			} );
 			if ( fullScreen ) {
-				setHeight( windowHeight * 0.9 );
+				setHeight( windowHeight );
 			} else if ( heightRef.current.maxHeight !== 0 ) {
 				setHeight( heightRef.current.maxHeight );
 			}
