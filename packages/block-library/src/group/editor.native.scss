@@ -27,7 +27,12 @@
 	margin-bottom: $block-edge-to-content;
 }
 
+.fullWidth {
+	margin-left: $block-edge-to-content;
+	margin-right: $block-edge-to-content;
+}
+
 .fullWidthAppender {
-	margin-left: $solid-border-space;
-	margin-right: $solid-border-space;
+	margin-left: $block-edge-to-content;
+	margin-right: $block-edge-to-content;
 }

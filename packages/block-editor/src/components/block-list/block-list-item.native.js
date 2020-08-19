@@ -56,7 +56,8 @@ export class BlockListItem extends Component {
 			numberOfParents,
 		} = this.props;
 		const { blockWidth } = this.state;
-		const isParentBlockFullWidth = parentBlockAlignment === 'full';
+		const isParentBlockFullWidth =
+			parentBlockAlignment === 'full' && numberOfParents === 1;
 
 		switch ( blockAlignment ) {
 			case 'full':
@@ -72,9 +73,12 @@ export class BlockListItem extends Component {
 						? marginHorizontal
 						: styles.wideAlignment.marginLeft;
 				}
-				return marginHorizontal;
+
+				return isParentBlockFullWidth
+					? marginHorizontal * 2
+					: marginHorizontal;
 			default:
-				if ( isParentBlockFullWidth && numberOfParents === 1 ) {
+				if ( isParentBlockFullWidth ) {
 					return marginHorizontal * 2;
 				}
 				return marginHorizontal;
