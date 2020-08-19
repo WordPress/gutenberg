@@ -56,8 +56,8 @@ export function createSameHostFilter( referenceUrl ) {
 	};
 }
 
-function isSameHost( targetUrl, referenceUrl ) {
-	const parsed = new URL( targetUrl );
+function isSameHost( subjectUrl, referenceUrl ) {
+	const parsed = new URL( subjectUrl );
 	const reference = new URL( referenceUrl );
 	return (
 		parsed.host === reference.host && parsed.protocol === reference.protocol
@@ -81,12 +81,12 @@ export function createSameSiteFilter( referenceUrl ) {
 		return false;
 	};
 }
-function isUnderPath( targetUrl, referenceUrl ) {
+function isUnderPath( subjectUrl, referenceUrl ) {
 	let targetPathname;
-	if ( targetUrl.startsWith( '/' ) ) {
-		targetPathname = targetUrl;
+	if ( subjectUrl.startsWith( '/' ) ) {
+		targetPathname = subjectUrl;
 	} else {
-		const parsed = new URL( targetUrl );
+		const parsed = new URL( subjectUrl );
 		targetPathname = parsed.pathname;
 	}
 	const reference = new URL( referenceUrl );
