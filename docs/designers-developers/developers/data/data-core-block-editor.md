@@ -232,6 +232,19 @@ _Returns_
 
 -   `Array`: Ordered client IDs of editor blocks.
 
+<a name="getBlockParent" href="#getBlockParent">#</a> **getBlockParent**
+
+Given a block client ID, returns the direct parent.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find root client ID.
+
+_Returns_
+
+-   `string`: ClientID of the parent block.
+
 <a name="getBlockParents" href="#getBlockParents">#</a> **getBlockParents**
 
 Given a block client ID, returns the list of all its parents from top to bottom.

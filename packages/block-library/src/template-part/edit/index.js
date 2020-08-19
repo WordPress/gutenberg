@@ -30,20 +30,21 @@ export default function TemplatePartEdit( {
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part
 	// content loading.
-	const { isNavigationMode, innerBlocks, hasSelectedInnerBlock } = useSelect(
+	const { isNavigationMode, directParentId, innerBlocks } = useSelect(
 		( select ) => {
 			const {
 				getBlocks,
-				hasSelectedInnerBlock: getHasSelectedInnerBlock,
+				getSelectedBlockClientId,
 				isNavigationMode: _isNavigationMode,
+				getBlockParent,
 			} = select( 'core/block-editor' );
+
+			const selectedBlockClientId = getSelectedBlockClientId();
+
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isNavigationMode: _isNavigationMode,
-				hasSelectedInnerBlock: getHasSelectedInnerBlock(
-					clientId,
-					true
-				),
+				directParentId: getBlockParent( selectedBlockClientId ),
 			};
 		},
 		[ clientId ]
@@ -67,7 +68,8 @@ export default function TemplatePartEdit( {
 		}
 	}, [ innerBlocks ] );
 
-	const shouldDisplayLabel = ! isNavigationMode() && hasSelectedInnerBlock;
+	const isParentOfSelectedBlock = directParentId === clientId;
+	const shouldDisplayLabel = ! isNavigationMode() && isParentOfSelectedBlock;
 
 	if ( postId ) {
 		// Part of a template file, post ID already resolved.

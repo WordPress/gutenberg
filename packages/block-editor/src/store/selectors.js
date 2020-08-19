@@ -482,6 +482,21 @@ export const getBlockParents = createSelector(
 );
 
 /**
+ * Given a block client ID, returns the direct parent.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find root client ID.
+ *
+ * @return {string} ClientID of the parent block.
+ */
+export const getBlockParent = createSelector(
+	( state, clientId ) => {
+		return state.blocks.parents[ clientId ];
+	},
+	( state ) => [ state.blocks.parents ]
+);
+
+/**
  * Given a block client ID and a block name,
  * returns the list of all its parents from top to bottom,
  * filtered by the given name.
