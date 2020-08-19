@@ -34,10 +34,7 @@ import { menuItemsQuery } from './utils';
 export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 	const menuId = post.meta.menuId;
 
-	const mapping = yield {
-		type: 'GET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		postId: post.id,
-	};
+	const mapping = yield getMenuItemToClientIdMapping( post.id );
 	const clientIdToMenuId = invert( mapping );
 
 	const stack = [ post.blocks[ 0 ] ];
