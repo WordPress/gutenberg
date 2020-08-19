@@ -336,7 +336,7 @@ function gutenberg_output_block_menu_item_custom_fields( $item_id, $item ) {
 		<p class="field-content description description-wide">
 			<label for="edit-menu-item-content-<?php echo $item_id; ?>">
 				<?php _e( 'Content', 'gutenberg' ); ?><br />
-				<textarea readonly name="menu-item-content[<?php echo $item_id; ?>]"><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
+				<textarea id="edit-menu-item-content-<?php echo $item_id; ?>" class="widefat" rows="3" cols="20" name="menu-item-content[<?php echo $item_id; ?>]" readonly><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
 			</label>
 		</p>
 		<?php
@@ -367,11 +367,6 @@ function gutenberg_add_block_menu_item_styles_to_nav_menus( $hook ) {
 			 */
 			.menu-item-block .description:not(.field-content) {
 				display: none;
-			}
-
-			.menu-item-block textarea {
-				width: 100%;
-				min-height: 100px;
 			}
 CSS;
 		wp_add_inline_style( 'nav-menus', $css );
