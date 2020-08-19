@@ -136,6 +136,12 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 		};
 	}
 
+	// If dropping as a sibling, but block cannot be inserted in
+	// this context, return early.
+	if ( ! candidateBlockData.canInsertDraggedBlocksAsSibling ) {
+		return;
+	}
+
 	const offset = isDraggingBelow ? 1 : 0;
 	return {
 		rootClientId: candidateBlockData.rootClientId,
