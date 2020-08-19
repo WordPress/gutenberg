@@ -52,6 +52,7 @@ window.sendGutenbergReadyMessage = () => {
 		// TODO: Fix for Android
 		window.wpwebkit.postMessage();
 	}
+	window.readyMessageSent = true;
 };
 
 window.isGutenbergReady = () => {
@@ -67,7 +68,10 @@ window.startObservingGutenberg = () => {
 		}
 
 		const unsubscribe = window.wp.data.subscribe( () => {
-			if ( window.isGutenbergReady() ) {
+			if (
+				window.isGutenbergReady() &&
+				window.readyMessageSent !== true
+			) {
 				unsubscribe();
 				window.sendGutenbergReadyMessage();
 			}
