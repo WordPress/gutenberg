@@ -72,9 +72,9 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 * @param string $block String of rendered block to check.
 	 */
 	private function get_content_from_block( $block ) {
-		$start_index = strpos( $block, '>' ) + 1; // First occurrence of '<'
+		$start_index = strpos( $block, '>' ) + 1; // First occurrence of '>'
 		$split_arr   = substr( $block, $start_index );
-		$end_index   = strrpos( $split_arr, '<' ); // Last occurrence of '>'
+		$end_index   = strrpos( $split_arr, '<' ); // Last occurrence of '<'
 		return substr( $split_arr, 0, $end_index ); // String between first '>' and last '<'
 	}
 
