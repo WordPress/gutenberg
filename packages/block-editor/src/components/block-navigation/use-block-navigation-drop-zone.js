@@ -9,9 +9,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useOnHTMLDrop from '../use-block-drop-zone/use-on-html-drop';
-import useOnFileDrop from '../use-block-drop-zone/use-on-file-drop';
-import useOnBlockDrop from '../use-block-drop-zone/use-on-block-drop';
+import useOnBlockDrop from '../use-on-block-drop';
 
 function getDropTargetBlocksData(
 	ref,
@@ -175,16 +173,15 @@ export default function useBlockNavigationDropZone( ref ) {
 		blockIndex: targetBlockIndex,
 	} = target;
 
-	const onHTMLDrop = useOnHTMLDrop( targetRootClientId, targetBlockIndex );
-	const onFilesDrop = useOnFileDrop( targetRootClientId, targetBlockIndex );
-	const onDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+	const dropEventHandlers = useOnBlockDrop(
+		targetRootClientId,
+		targetBlockIndex
+	);
 
 	const { position, type: dragEventType } = useDropZone( {
 		element: ref,
-		onFilesDrop,
-		onHTMLDrop,
-		onDrop,
 		withPosition: true,
+		...dropEventHandlers,
 	} );
 
 	const hasPosition = !! position;
