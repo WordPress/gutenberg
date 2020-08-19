@@ -19,8 +19,20 @@ import {
 	Button,
 	ToolbarButton,
 } from '@wordpress/components';
-import { button, title, search } from '@wordpress/icons';
+import { search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import {
+	buttonOnly,
+	buttonOutside,
+	buttonInside,
+	noButton,
+	buttonWithIcon,
+	toggleLabel,
+} from './icons';
 
 export default function SearchEdit( { className, attributes, setAttributes } ) {
 	const {
@@ -56,6 +68,19 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 		);
 	};
 
+	const getButtonPositionIcon = () => {
+		switch ( buttonPosition ) {
+			case 'button-inside':
+				return buttonInside;
+			case 'button-outside':
+				return buttonOutside;
+			case 'no-button':
+				return noButton;
+			case 'button-only':
+				return buttonOnly;
+		}
+	};
+
 	const renderTextField = () => {
 		return (
 			<input
@@ -79,7 +104,10 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 		return (
 			<>
 				{ buttonUseIcon && (
-					<Button icon={ search } className="wp-block-search__button" />
+					<Button
+						icon={ search }
+						className="wp-block-search__button"
+					/>
 				) }
 
 				{ ! buttonUseIcon && (
@@ -103,28 +131,26 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						title={ __( 'Toggle Label' ) }
-						icon={ title }
+						title={ __( 'Toggle Search Label' ) }
+						icon={ toggleLabel }
 						onClick={ () => {
 							setAttributes( {
 								showLabel: ! showLabel,
 							} );
 						} }
-						className={
-							showLabel ? 'is-pressed' : undefined
-						}
+						className={ showLabel ? 'is-pressed' : undefined }
 					/>
 				</ToolbarGroup>
 
 				<ToolbarGroup>
 					<DropdownMenu
-						icon={ button }
+						icon={ getButtonPositionIcon() }
 						label={ __( 'Change Button Position' ) }
 					>
 						{ ( { onClose } ) => (
 							<MenuGroup className="wp-block-search__button-position-menu">
 								<MenuItem
-									icon={ button }
+									icon={ noButton }
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'no-button',
@@ -135,18 +161,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 									{ __( 'No Button' ) }
 								</MenuItem>
 								<MenuItem
-									icon={ button }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-inside',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Inside' ) }
-								</MenuItem>
-								<MenuItem
-									icon={ button }
+									icon={ buttonOutside }
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'button-outside',
@@ -157,7 +172,18 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 									{ __( 'Button Outside' ) }
 								</MenuItem>
 								<MenuItem
-									icon={ button }
+									icon={ buttonInside }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'button-inside',
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'Button Inside' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ buttonOnly }
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'button-only',
@@ -173,8 +199,8 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 
 					{ 'no-button' !== buttonPosition && (
 						<ToolbarButton
-							title={ __( 'Use Icon Button' ) }
-							icon={ button }
+							title={ __( 'Use Button with Icon' ) }
+							icon={ buttonWithIcon }
 							onClick={ () => {
 								setAttributes( {
 									buttonUseIcon: ! buttonUseIcon,
