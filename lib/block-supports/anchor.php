@@ -34,7 +34,7 @@ function gutenberg_register_anchor_support( $block_type ) {
  * @param  array         $block_attributes Block attributes.
  * @param  WP_Block_Type $block_type       Block Type.
  *
- * @return array Block CSS classes and inline styles.
+ * @return array Block anchor.
  */
 function gutenberg_apply_anchor_support( $attributes, $block_attributes, $block_type ) {
 	$has_anchor_support = gutenberg_experimental_get( $block_type->supports, array( 'anchor' ), true );
