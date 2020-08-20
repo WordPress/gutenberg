@@ -19,7 +19,6 @@
 		}
 	},
 	"supports": {
-		"anchor": true,
 		"html": false,
 		"customClassName": false
 	}
