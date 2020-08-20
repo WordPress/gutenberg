@@ -7,6 +7,7 @@ import {
 	useRoute,
 	useFocusEffect,
 } from '@react-navigation/native';
+import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -16,6 +17,7 @@ import {
 	useContext,
 	useCallback,
 	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { prependHTTP } from '@wordpress/url';
 
@@ -47,21 +49,34 @@ const linkSettingsScreens = {
 	picker: 'linkPicker',
 };
 
-const ModalLinkUI = ( { isVisible, ...restProps } ) => (
-	<BottomSheet isVisible={ isVisible } hideHeader>
-		<BottomSheet.NavigationContainer animate main>
-			<BottomSheet.NavigationScreen name={ linkSettingsScreens.settings }>
-				<LinkSettingsScreen { ...restProps } />
-			</BottomSheet.NavigationScreen>
-			<BottomSheet.NavigationScreen
-				name={ linkSettingsScreens.picker }
-				fullScreen
-			>
-				<LinkPickerScreen />
-			</BottomSheet.NavigationScreen>
-		</BottomSheet.NavigationContainer>
-	</BottomSheet>
-);
+const ModalLinkUI = ( { isVisible, ...restProps } ) => {
+	const [ fullHeight, setFullHeight ] = useState( false );
+	return (
+		<BottomSheet
+			isChildrenScrollable
+			style={ fullHeight && { flex: 1 } }
+			isVisible={ isVisible }
+			hideHeader
+		>
+			<BottomSheet.NavigationContainer animate main>
+				<BottomSheet.NavigationScreen
+					name={ linkSettingsScreens.settings }
+				>
+					<LinkSettingsScreen
+						{ ...restProps }
+						setFullHeight={ setFullHeight }
+					/>
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ linkSettingsScreens.picker }
+					fullScreen
+				>
+					<LinkPickerScreen setFullHeight={ setFullHeight } />
+				</BottomSheet.NavigationScreen>
+			</BottomSheet.NavigationContainer>
+		</BottomSheet>
+	);
+};
 
 export default withSpokenMessages( ModalLinkUI );
 
@@ -73,6 +88,7 @@ const LinkSettingsScreen = ( {
 	value,
 	isActive,
 	activeAttributes,
+	setFullHeight,
 } ) => {
 	const [ text, setText ] = useState( getTextContent( slice( value ) ) );
 	const [ opensInNewWindow, setOpensInNewWindows ] = useState(
@@ -82,6 +98,7 @@ const LinkSettingsScreen = ( {
 	const {
 		shouldEnableBottomSheetMaxHeight,
 		onHandleClosingBottomSheet,
+		listProps,
 	} = useContext( BottomSheetContext );
 
 	const navigation = useNavigation();
@@ -163,46 +180,60 @@ const LinkSettingsScreen = ( {
 
 	useFocusEffect(
 		useCallback( () => {
+			setFullHeight( false );
 			const { params = {} } = route;
 			if ( ! text && params.text ) {
 				setText( params.text );
 			}
 			return () => {};
-		}, [ route.params?.text, text ] )
+		}, [ route.params?.text, text, setFullHeight ] )
 	);
 
-	return (
-		<>
-			<BottomSheet.LinkCell
-				value={ inputValue }
-				onPress={ onLinkCellPressed }
-			/>
-			<BottomSheet.Cell
-				icon={ textColor }
-				label={ __( 'Link text' ) }
-				value={ text }
-				placeholder={ __( 'Add link text' ) }
-				onChangeValue={ setText }
-				onSubmit={ submit }
-			/>
-			<BottomSheet.SwitchCell
-				icon={ external }
-				label={ __( 'Open in new tab' ) }
-				value={ opensInNewWindow }
-				onValueChange={ setOpensInNewWindows }
-				separatorType={ 'fullWidth' }
-			/>
-			<BottomSheet.Cell
-				label={ __( 'Remove link' ) }
-				labelStyle={ styles.clearLinkButton }
-				separatorType={ 'none' }
-				onPress={ removeLink }
-			/>
-		</>
-	);
+	return useMemo( () => {
+		return (
+			<>
+				<View
+					style={ {
+						...listProps.contentContainerStyle,
+						...listProps.style,
+						paddingBottom: 0,
+						paddingHorizontal: 16,
+					} }
+				>
+					<BottomSheet.LinkCell
+						value={ inputValue }
+						onPress={ onLinkCellPressed }
+					/>
+					<BottomSheet.Cell
+						icon={ textColor }
+						label={ __( 'Link text' ) }
+						value={ text }
+						placeholder={ __( 'Add link text' ) }
+						onChangeValue={ setText }
+						onSubmit={ submit }
+					/>
+					<BottomSheet.SwitchCell
+						icon={ external }
+						label={ __( 'Open in new tab' ) }
+						value={ opensInNewWindow }
+						onValueChange={ setOpensInNewWindows }
+						separatorType={ 'fullWidth' }
+					/>
+				</View>
+				<View style={ { marginBottom: 16 } }>
+					<BottomSheet.Cell
+						label={ __( 'Remove link' ) }
+						labelStyle={ styles.clearLinkButton }
+						separatorType={ 'none' }
+						onPress={ removeLink }
+					/>
+				</View>
+			</>
+		);
+	}, [ inputValue, text, opensInNewWindow ] );
 };
 
-const LinkPickerScreen = () => {
+const LinkPickerScreen = ( { setFullHeight } ) => {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const onLinkPicked = ( { url, title } ) => {
@@ -212,12 +243,21 @@ const LinkPickerScreen = () => {
 		} );
 	};
 
-	const { inputValue } = route.params;
-	return (
-		<LinkPicker
-			value={ inputValue }
-			onLinkPicked={ onLinkPicked }
-			onCancel={ navigation.goBack }
-		/>
+	useFocusEffect(
+		useCallback( () => {
+			setFullHeight( true );
+			return () => {};
+		}, [ setFullHeight ] )
 	);
+
+	const { inputValue } = route.params;
+	return useMemo( () => {
+		return (
+			<LinkPicker
+				value={ inputValue }
+				onLinkPicked={ onLinkPicked }
+				onCancel={ navigation.goBack }
+			/>
+		);
+	}, [ inputValue, navigation ] );
 };

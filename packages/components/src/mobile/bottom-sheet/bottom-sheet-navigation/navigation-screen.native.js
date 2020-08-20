@@ -6,7 +6,7 @@ import {
 	useIsFocused,
 	useNavigation,
 } from '@react-navigation/native';
-import { View, Dimensions } from 'react-native';
+import { View, Dimensions, Keyboard, Platform } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -14,7 +14,13 @@ import { debounce } from 'lodash';
  */
 import { BottomSheetContext } from '@wordpress/components';
 
-import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
+import {
+	useRef,
+	useCallback,
+	useContext,
+	useMemo,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,6 +41,30 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 	const { setHeight } = useContext( BottomSheetNavigationContext );
 
 	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [] );
+	useEffect( () => {
+		const keyboardDidShowListener = Keyboard.addListener(
+			Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+			( e ) => {
+				if ( fullScreen && isFocused ) {
+					const { height: keyboardHeight } = e.endCoordinates;
+					setHeight( windowHeight - keyboardHeight );
+				}
+			}
+		);
+		const keyboardDidHideListener = Keyboard.addListener(
+			Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+			() => {
+				if ( fullScreen && isFocused ) {
+					setHeight( windowHeight );
+				}
+			}
+		);
+
+		return () => {
+			keyboardDidHideListener.remove();
+			keyboardDidShowListener.remove();
+		};
+	}, [ isFocused, setHeight ] );
 
 	useFocusEffect(
 		useCallback( () => {
