@@ -77,6 +77,31 @@ function gutenberg_navigation_init( $hook ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
 
+	$menus         = wp_get_nav_menus();
+	$first_menu_id = count( $menus ) ? $menus[0]->term_id : null;
+
+	$preload_paths = array(
+		'/__experimental/menus?per_page=100&context=edit&_locale=user',
+		array( '/wp/v2/pages', 'OPTIONS' ),
+	);
+	if ( $first_menu_id ) {
+		$preload_paths[] = "/__experimental/menu-items?menus=$first_menu_id&per_page=100&context=edit&_locale=user";
+		$preload_paths[] = "/__experimental/menus/$first_menu_id?context=edit";
+	}
+	$preload_data = array_reduce(
+		$preload_paths,
+		'rest_preload_api_request',
+		array()
+	);
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data )
+		),
+		'after'
+	);
+
 	wp_add_inline_script(
 		'wp-edit-navigation',
 		sprintf(
