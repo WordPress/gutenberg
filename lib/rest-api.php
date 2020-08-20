@@ -136,7 +136,7 @@ add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 )
  * @since 5.0.0
  */
 function gutenberg_register_rest_widget_updater_routes() {
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+	if ( get_theme_support( 'block-based-widgets' ) ) {
 		$widget_forms = new WP_REST_Widget_Utils_Controller();
 		$widget_forms->register_routes();
 	}
@@ -194,7 +194,7 @@ add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
  * Registers the Sidebars REST API routes.
  */
 function gutenberg_register_sidebars_endpoint() {
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+	if ( get_theme_support( 'block-based-widgets' ) ) {
 		$sidebars = new WP_REST_Sidebars_Controller();
 		$sidebars->register_routes();
 	}

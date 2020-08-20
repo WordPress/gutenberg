@@ -266,7 +266,7 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_widget_scripts' );
  * Registers the WP_Widget_Block widget
  */
 function gutenberg_register_widgets() {
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+	if ( get_theme_support( 'block-based-widgets' ) ) {
 		register_widget( 'WP_Widget_Block' );
 	}
 }
