@@ -35,9 +35,9 @@ $tree-item-height: 36px;
 	.block-editor-block-navigation-block-contents {
 		display: flex;
 		align-items: center;
-		width: calc(100% - 0.8em);
+		width: 100%;
 		height: auto;
-		padding: $grid-unit-15 6px;
+		padding: $grid-unit-20 6px;
 		margin-top: auto;
 		margin-bottom: auto;
 		text-align: left;
