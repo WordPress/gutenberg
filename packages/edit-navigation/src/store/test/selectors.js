@@ -19,19 +19,19 @@ describe( 'getNavigationPostForMenu', () => {
 			} ) ),
 		};
 
+		const menuId = 123;
+
 		const defaultRegistry = getNavigationPostForMenu.registry;
 		getNavigationPostForMenu.registry = registry;
 		hasResolvedNavigationPost.registry = registry;
 
-		expect( getNavigationPostForMenu( 'state', 'menuId' ) ).toBe(
-			'record'
-		);
+		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( 'record' );
 
 		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( getEditedEntityRecord ).toHaveBeenCalledWith(
 			KIND,
 			POST_TYPE,
-			buildNavigationPostId( 'menuId' )
+			buildNavigationPostId( menuId )
 		);
 
 		getNavigationPostForMenu.registry = defaultRegistry;
@@ -48,11 +48,13 @@ describe( 'getNavigationPostForMenu', () => {
 			} ) ),
 		};
 
+		const menuId = 123;
+
 		const defaultRegistry = getNavigationPostForMenu.registry;
 		getNavigationPostForMenu.registry = registry;
 		hasResolvedNavigationPost.registry = registry;
 
-		expect( getNavigationPostForMenu( 'state', 'menuId' ) ).toBe( null );
+		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( null );
 
 		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( getEditedEntityRecord ).not.toHaveBeenCalled();
@@ -65,22 +67,23 @@ describe( 'getNavigationPostForMenu', () => {
 describe( 'hasResolvedNavigationPost', () => {
 	it( 'returns if it has resolved navigation post yet', () => {
 		const hasFinishedResolution = jest.fn( () => true );
-
 		const registry = {
 			select: jest.fn( () => ( {
 				hasFinishedResolution,
 			} ) ),
 		};
 
+		const menuId = 123;
+
 		const defaultRegistry = getNavigationPostForMenu.registry;
 		hasResolvedNavigationPost.registry = registry;
 
-		expect( hasResolvedNavigationPost( 'state', 'menuId' ) ).toBe( true );
+		expect( hasResolvedNavigationPost( 'state', menuId ) ).toBe( true );
 
 		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( hasFinishedResolution ).toHaveBeenCalledWith(
 			'getEntityRecord',
-			[ KIND, POST_TYPE, buildNavigationPostId( 'menuId' ) ]
+			[ KIND, POST_TYPE, buildNavigationPostId( menuId ) ]
 		);
 
 		hasResolvedNavigationPost.registry = defaultRegistry;

@@ -25,9 +25,11 @@ jest.mock( '@wordpress/blocks', () => {
 
 describe( 'getNavigationPostForMenu', () => {
 	it( 'gets navigation post for menu id', () => {
-		const generator = getNavigationPostForMenu( 'menuId' );
+		const menuId = 123;
 
-		const id = buildNavigationPostId( 'menuId' );
+		const generator = getNavigationPostForMenu( menuId );
+
+		const id = buildNavigationPostId( menuId );
 		const stubPost = {
 			id,
 			slug: id,
@@ -35,7 +37,7 @@ describe( 'getNavigationPostForMenu', () => {
 			type: 'page',
 			blocks: [ undefined ],
 			meta: {
-				menuId: 'menuId',
+				menuId,
 			},
 		};
 
@@ -61,9 +63,7 @@ describe( 'getNavigationPostForMenu', () => {
 			] )
 		);
 
-		expect( generator.next().value ).toEqual(
-			resolveMenuItems( 'menuId' )
-		);
+		expect( generator.next().value ).toEqual( resolveMenuItems( menuId ) );
 
 		const menuItems = [
 			{
@@ -132,7 +132,7 @@ describe( 'getNavigationPostForMenu', () => {
 				},
 			],
 			meta: {
-				menuId: 'menuId',
+				menuId,
 			},
 		};
 
