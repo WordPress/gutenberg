@@ -1,4 +1,14 @@
 /**
+ * External dependencies
+ */
+import { keyBy, omit } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { serialize } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -96,4 +106,76 @@ export function serializeProcessing( callback ) {
 			}
 		}
 	};
+}
+
+export function computeCustomizedAttribute(
+	blocks,
+	menuId,
+	menuItemsByClientId
+) {
+	const blocksList = blocksTreeToFlatList( blocks );
+	const dataList = blocksList.map( ( { block, parentId, position } ) =>
+		blockToRequestItem( block, parentId, position )
+	);
+
+	// Create an object like { "nav_menu_item[12]": {...}} }
+	const computeKey = ( item ) => `nav_menu_item[${ item.id }]`;
+	const dataObject = keyBy( dataList, computeKey );
+
+	// Deleted menu items should be sent as false, e.g. { "nav_menu_item[13]": false }
+	for ( const clientId in menuItemsByClientId ) {
+		const key = computeKey( menuItemsByClientId[ clientId ] );
+		if ( ! ( key in dataObject ) ) {
+			dataObject[ key ] = false;
+		}
+	}
+
+	return JSON.stringify( dataObject );
+
+	function blocksTreeToFlatList( innerBlocks, parentId = 0 ) {
+		return innerBlocks.flatMap( ( block, index ) =>
+			[ { block, parentId, position: index + 1 } ].concat(
+				blocksTreeToFlatList(
+					block.innerBlocks,
+					getMenuItemForBlock( block )?.id
+				)
+			)
+		);
+	}
+
+	function blockToRequestItem( block, parentId, position ) {
+		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
+
+		let attributes;
+
+		if ( block.name === 'core/navigation-link' ) {
+			attributes = {
+				type: 'custom',
+				title: block.attributes?.label,
+				original_title: '',
+				url: block.attributes.url,
+			};
+		} else {
+			attributes = {
+				type: 'block',
+				content: serialize( block ),
+			};
+		}
+
+		return {
+			...menuItem,
+			...attributes,
+			position,
+			classes: ( menuItem.classes || [] ).join( ' ' ),
+			xfn: ( menuItem.xfn || [] ).join( ' ' ),
+			nav_menu_term_id: menuId,
+			menu_item_parent: parentId,
+			status: 'publish',
+			_invalid: false,
+		};
+	}
+
+	function getMenuItemForBlock( block ) {
+		return omit( menuItemsByClientId[ block.clientId ] || {}, '_links' );
+	}
 }

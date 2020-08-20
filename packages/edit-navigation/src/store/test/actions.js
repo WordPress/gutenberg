@@ -1,14 +1,19 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
-import { createMissingMenuItems } from '../actions';
+import { createMissingMenuItems, saveNavigationPost } from '../actions';
 import {
 	resolveMenuItems,
 	getMenuItemToClientIdMapping,
 	dispatch,
 	apiFetch,
 } from '../controls';
-import { menuItemsQuery } from '../utils';
+import { menuItemsQuery, computeCustomizedAttribute } from '../utils';
 
 jest.mock( '../utils', () => {
 	const utils = require.requireActual( '../utils' );
@@ -217,5 +222,235 @@ describe( 'createMissingMenuItems', () => {
 		} );
 
 		expect( action.next( [] ).done ).toBe( true );
+	} );
+} );
+
+describe( 'saveNavigationPost', () => {
+	it( 'should convert all the blocks into menu items and batch save them at once', () => {
+		const post = {
+			id: 'navigation-post-1',
+			slug: 'navigation-post-1',
+			type: 'page',
+			meta: {
+				menuId: 1,
+			},
+			blocks: [
+				{
+					attributes: { showSubmenuIcon: true },
+					clientId: 'navigation-block-client-id',
+					innerBlocks: [
+						{
+							attributes: {
+								label: 'wp.org',
+								opensInNewTab: false,
+								url: 'http://wp.org',
+							},
+							clientId: 'navigation-link-block-client-id-1',
+							innerBlocks: [],
+							isValid: true,
+							name: 'core/navigation-link',
+						},
+						{
+							attributes: {
+								label: 'wp.com',
+								opensInNewTab: false,
+								url: 'http://wp.com',
+							},
+							clientId: 'navigation-link-block-client-id-2',
+							innerBlocks: [],
+							isValid: true,
+							name: 'core/navigation-link',
+						},
+					],
+					isValid: true,
+					name: 'core/navigation',
+				},
+			],
+		};
+
+		const menuItems = [
+			{
+				id: 100,
+				title: {
+					raw: 'wp.com',
+					rendered: 'wp.com',
+				},
+				url: 'http://wp.com',
+				menu_order: 1,
+				menus: [ 1 ],
+			},
+			{
+				id: 101,
+				title: {
+					raw: 'wp.org',
+					rendered: 'wp.org',
+				},
+				url: 'http://wp.org',
+				menu_order: 2,
+				menus: [ 1 ],
+			},
+		];
+
+		const mapping = {
+			100: 'navigation-link-block-client-id-1',
+			101: 'navigation-link-block-client-id-2',
+		};
+
+		const action = saveNavigationPost( post );
+
+		expect( action.next().value ).toEqual(
+			resolveMenuItems( post.meta.menuId )
+		);
+
+		expect( action.next( menuItems ).value ).toEqual(
+			getMenuItemToClientIdMapping( post.id )
+		);
+
+		expect( action.next( mapping ).value ).toEqual(
+			apiFetch( {
+				path: '/__experimental/customizer-nonces/get-save-nonce',
+			} )
+		);
+
+		const batchSaveApiFetch = action.next( {
+			nonce: 'nonce',
+			stylesheet: 'stylesheet',
+		} ).value;
+
+		expect( batchSaveApiFetch.request.body.get( 'customized' ) ).toEqual(
+			computeCustomizedAttribute(
+				post.blocks[ 0 ].innerBlocks,
+				post.meta.menuId,
+				{
+					'navigation-link-block-client-id-1': menuItems[ 0 ],
+					'navigation-link-block-client-id-2': menuItems[ 1 ],
+				}
+			)
+		);
+
+		expect( action.next( { success: true } ).value ).toEqual(
+			dispatch(
+				'core/notices',
+				'createSuccessNotice',
+				__( 'Navigation saved.' ),
+				{
+					type: 'snackbar',
+				}
+			)
+		);
+	} );
+
+	it( 'should handle error and show error notifications', () => {
+		const post = {
+			id: 'navigation-post-1',
+			slug: 'navigation-post-1',
+			type: 'page',
+			meta: {
+				menuId: 1,
+			},
+			blocks: [
+				{
+					attributes: { showSubmenuIcon: true },
+					clientId: 'navigation-block-client-id',
+					innerBlocks: [
+						{
+							attributes: {
+								label: 'wp.org',
+								opensInNewTab: false,
+								url: 'http://wp.org',
+							},
+							clientId: 'navigation-link-block-client-id-1',
+							innerBlocks: [],
+							isValid: true,
+							name: 'core/navigation-link',
+						},
+						{
+							attributes: {
+								label: 'wp.com',
+								opensInNewTab: false,
+								url: 'http://wp.com',
+							},
+							clientId: 'navigation-link-block-client-id-2',
+							innerBlocks: [],
+							isValid: true,
+							name: 'core/navigation-link',
+						},
+					],
+					isValid: true,
+					name: 'core/navigation',
+				},
+			],
+		};
+
+		const menuItems = [
+			{
+				id: 100,
+				title: {
+					raw: 'wp.com',
+					rendered: 'wp.com',
+				},
+				url: 'http://wp.com',
+				menu_order: 1,
+				menus: [ 1 ],
+			},
+			{
+				id: 101,
+				title: {
+					raw: 'wp.org',
+					rendered: 'wp.org',
+				},
+				url: 'http://wp.org',
+				menu_order: 2,
+				menus: [ 1 ],
+			},
+		];
+
+		const mapping = {
+			100: 'navigation-link-block-client-id-1',
+			101: 'navigation-link-block-client-id-2',
+		};
+
+		const action = saveNavigationPost( post );
+
+		expect( action.next().value ).toEqual(
+			resolveMenuItems( post.meta.menuId )
+		);
+
+		expect( action.next( menuItems ).value ).toEqual(
+			getMenuItemToClientIdMapping( post.id )
+		);
+
+		expect( action.next( mapping ).value ).toEqual(
+			apiFetch( {
+				path: '/__experimental/customizer-nonces/get-save-nonce',
+			} )
+		);
+
+		const batchSaveApiFetch = action.next( {
+			nonce: 'nonce',
+			stylesheet: 'stylesheet',
+		} ).value;
+
+		expect( batchSaveApiFetch.request.body.get( 'customized' ) ).toEqual(
+			computeCustomizedAttribute(
+				post.blocks[ 0 ].innerBlocks,
+				post.meta.menuId,
+				{
+					'navigation-link-block-client-id-1': menuItems[ 0 ],
+					'navigation-link-block-client-id-2': menuItems[ 1 ],
+				}
+			)
+		);
+
+		expect( action.next( { success: false } ).value ).toEqual(
+			dispatch(
+				'core/notices',
+				'createErrorNotice',
+				__( 'There was an error.' ),
+				{
+					type: 'snackbar',
+				}
+			)
+		);
 	} );
 } );
