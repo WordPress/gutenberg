@@ -116,18 +116,10 @@ const ColorPicker = ( { name, value, onChange } ) => {
 	return <ColorPalette value={ activeColor } onChange={ onColorChange } />;
 };
 
-const InlineColorUI = ( {
-	name,
-	value,
-	onChange,
-	onClose,
-	isActive,
-	addingColor,
-} ) => {
+const InlineColorUI = ( { name, value, onChange, onClose, addingColor } ) => {
 	return (
 		<ColorPopoverAtLink
 			value={ value }
-			isActive={ isActive }
 			addingColor={ addingColor }
 			onClose={ onClose }
 			className="components-inline-color-popover"
