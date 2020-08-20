@@ -13,7 +13,7 @@ import {
 	InspectorControls,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import { PanelBody, TextControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -51,7 +51,7 @@ function ColumnEdit( {
 		} );
 	};
 
-	const hasWidth = Number.isFinite( width );
+	const hasWidth = ( isNaN( width ) && width ) || Number.isFinite( width );
 
 	return (
 		<>
@@ -63,17 +63,12 @@ function ColumnEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
-					<RangeControl
-						label={ __( 'Percentage width' ) }
+					<TextControl
+						label={ __( 'Width' ) }
 						value={ width || '' }
 						onChange={ ( nextWidth ) => {
 							setAttributes( { width: nextWidth } );
 						} }
-						min={ 0 }
-						max={ 100 }
-						step={ 0.1 }
-						required
-						allowReset
 						placeholder={
 							width === undefined ? __( 'Auto' ) : undefined
 						}
@@ -90,7 +85,7 @@ function ColumnEdit( {
 				__experimentalTagName={ Block.div }
 				__experimentalPassedProps={ {
 					className: classes,
-					style: hasWidth ? { flexBasis: width + '%' } : undefined,
+					style: hasWidth ? { flexBasis: width } : undefined,
 				} }
 			/>
 		</>

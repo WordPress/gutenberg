@@ -7,6 +7,7 @@ import { column as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
@@ -21,4 +22,5 @@ export const settings = {
 	description: __( 'A single column within a columns block.' ),
 	edit,
 	save,
+	deprecated,
 };
