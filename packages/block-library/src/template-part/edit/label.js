@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { capitalize } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
@@ -12,13 +17,14 @@ export default function TemplatePartLabel( { postId, slug } ) {
 		postId
 	);
 
+	const label = capitalize( title || slug );
 	return (
 		<div className="wp-block-template-part__label-container">
 			<div className="wp-block-template-part__label-layout">
 				<div className="wp-block-template-part__label-content">
 					<Icon icon="controls-repeat" size={ 13 } />
 					<span className="wp-block-template-part__label-text">
-						{ title || slug }
+						{ label }
 					</span>
 				</div>
 			</div>
