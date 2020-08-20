@@ -18,6 +18,9 @@ import controls, {
 } from '../controls';
 import { menuItemsQuery } from '../utils';
 
+// Mock it to prevent calling window.fetch in test environment
+jest.mock( '@wordpress/api-fetch', () => jest.fn( ( request ) => request ) );
+
 describe( 'apiFetch', () => {
 	it( 'has the correct type and payload', () => {
 		expect( apiFetch( { foo: 'bar' } ) ).toEqual( {
@@ -104,9 +107,11 @@ describe( 'dispatch', () => {
 
 describe( 'controls', () => {
 	it( 'triggers API_FETCH', () => {
-		expect( controls.API_FETCH( { request: { foo: 'bar' } } ) ).toEqual(
-			triggerApiFetch( { foo: 'bar' } )
-		);
+		expect( controls.API_FETCH( { request: { foo: 'bar' } } ) ).toEqual( {
+			foo: 'bar',
+		} );
+
+		expect( triggerApiFetch ).toHaveBeenCalledWith( { foo: 'bar' } );
 	} );
 
 	it( 'triggers SELECT', () => {
