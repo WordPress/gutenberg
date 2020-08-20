@@ -268,39 +268,37 @@ describe( 'computeCustomizedAttribute', () => {
 					menuItemsByClientId
 				)
 			)
-		).toMatchInlineSnapshot( `
-		Object {
-		  "nav_menu_item[100]": Object {
-		    "_invalid": false,
-		    "classes": "",
-		    "id": 100,
-		    "menu_item_parent": 0,
-		    "menu_order": 1,
-		    "nav_menu_term_id": 123,
-		    "original_title": "",
-		    "position": 1,
-		    "status": "publish",
-		    "title": "wp.org",
-		    "type": "custom",
-		    "url": "http://wp.org",
-		    "xfn": "",
-		  },
-		  "nav_menu_item[101]": Object {
-		    "_invalid": false,
-		    "classes": "",
-		    "id": 101,
-		    "menu_item_parent": 0,
-		    "menu_order": 2,
-		    "nav_menu_term_id": 123,
-		    "original_title": "",
-		    "position": 2,
-		    "status": "publish",
-		    "title": "wp.com",
-		    "type": "custom",
-		    "url": "http://wp.com",
-		    "xfn": "",
-		  },
-		}
-	` );
+		).toEqual( {
+			'nav_menu_item[100]': {
+				_invalid: false,
+				classes: '',
+				id: 100,
+				menu_item_parent: 0,
+				menu_order: 1,
+				nav_menu_term_id: 123,
+				original_title: '',
+				position: 1,
+				status: 'publish',
+				title: 'wp.org',
+				type: 'custom',
+				url: 'http://wp.org',
+				xfn: '',
+			},
+			'nav_menu_item[101]': {
+				_invalid: false,
+				classes: '',
+				id: 101,
+				menu_item_parent: 0,
+				menu_order: 2,
+				nav_menu_term_id: 123,
+				original_title: '',
+				position: 2,
+				status: 'publish',
+				title: 'wp.com',
+				type: 'custom',
+				url: 'http://wp.com',
+				xfn: '',
+			},
+		} );
 	} );
 } );
