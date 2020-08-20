@@ -36,9 +36,10 @@ const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
 };
 
 export const isPathSupported = ( path ) =>
-	[ /wp\/v2\/(media|categories)\/?\d*?.*/i ].some( ( pattern ) =>
-		pattern.test( path )
-	);
+	[
+		// Please add only wp.org API paths here!
+		/wp\/v2\/(media|categories)\/?\d*?.*/i,
+	].some( ( pattern ) => pattern.test( path ) );
 
 export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );
