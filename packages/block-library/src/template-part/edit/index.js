@@ -30,21 +30,25 @@ export default function TemplatePartEdit( {
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part
 	// content loading.
-	const { isNavigationMode, directParentId, innerBlocks } = useSelect(
+	const { isNavigationMode, parentId, innerBlocks } = useSelect(
 		( select ) => {
 			const {
 				getBlocks,
-				getSelectedBlockClientId,
+				getSelectionStart,
 				isNavigationMode: _isNavigationMode,
 				getBlockParent,
 			} = select( 'core/block-editor' );
 
-			const selectedBlockClientId = getSelectedBlockClientId();
+			// Only sibling blocks can be multi-selected. This
+			// means that the parent should be the same for all
+			// multi-selected blocks. We arbitrarily select the first
+			// multi-selected block.
+			const selectedBlockClientId = getSelectionStart()?.clientId;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isNavigationMode: _isNavigationMode,
-				directParentId: getBlockParent( selectedBlockClientId ),
+				parentId: getBlockParent( selectedBlockClientId ),
 			};
 		},
 		[ clientId ]
@@ -68,7 +72,7 @@ export default function TemplatePartEdit( {
 		}
 	}, [ innerBlocks ] );
 
-	const isParentOfSelectedBlock = directParentId === clientId;
+	const isParentOfSelectedBlock = parentId === clientId;
 	const shouldDisplayLabel = ! isNavigationMode() && isParentOfSelectedBlock;
 
 	if ( postId ) {
