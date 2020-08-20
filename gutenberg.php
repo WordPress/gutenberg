@@ -53,9 +53,12 @@ function gutenberg_menu() {
 			'gutenberg-widgets',
 			'the_gutenberg_widgets'
 		);
-		$submenu['themes.php'] = array_filter( $submenu['themes.php'], function( $current_menu_item ) {
-			return isset( $current_menu_item[ 2 ] ) && $current_menu_item[ 2 ] !== 'widgets.php';
-		} );
+		$submenu['themes.php'] = array_filter(
+			$submenu['themes.php'],
+			function( $current_menu_item ) {
+				return isset( $current_menu_item[2] ) && 'widgets.php' !== $current_menu_item[2];
+			}
+		);
 	}
 
 	if ( get_option( 'gutenberg-experiments' ) ) {

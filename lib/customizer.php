@@ -85,15 +85,15 @@ function gutenberg_remove_widgets_panel( $components ) {
 		return $components;
 	}
 
-    $i = array_search( 'widgets', $components );
-    if ( false !== $i ) {
-        unset( $components[ $i ] );
-    }
-    return $components;
+	$i = array_search( 'widgets', $components, true );
+	if ( false !== $i ) {
+		unset( $components[ $i ] );
+	}
+	return $components;
 }
 add_filter( 'customize_loaded_components', 'gutenberg_remove_widgets_panel' );
 
-/*
+/**
  * Filters the Customizer widget settings arguments.
  * This is needed because the Customizer registers settings for the raw registered widgets, without going through the `sidebars_widgets` filter.
  * The `WP_Customize_Widgets` class expects sidebars to have an array of widgets registered, not a post ID.
