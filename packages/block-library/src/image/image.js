@@ -103,7 +103,10 @@ export default function Image( {
 			'mediaUpload',
 		] );
 	} );
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const {
+		toggleSelection,
+		__unstableMarkLastChangeAsPersistent,
+	} = useDispatch( 'core/block-editor' );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		'core/notices'
 	);
@@ -473,6 +476,7 @@ export default function Image( {
 						width: parseInt( currentWidth + delta.width, 10 ),
 						height: parseInt( currentHeight + delta.height, 10 ),
 					} );
+					__unstableMarkLastChangeAsPersistent();
 				} }
 			>
 				{ img }
