@@ -311,8 +311,11 @@
 	&[data-align="right"] {
 		width: 100%;
 
-		// When images are floated, the block itself should collapse to zero height.
-		height: 0;
+		&::after {
+			content: "";
+			clear: both;
+			display: table;
+		}
 
 		&::before {
 			content: none;
