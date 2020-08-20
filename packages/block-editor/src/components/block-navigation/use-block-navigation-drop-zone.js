@@ -43,6 +43,7 @@ function getDropTargetBlocksData(
 			rootClientId,
 			blockIndex: getBlockIndex( clientId, rootClientId ),
 			element: blockElement,
+			isDraggedBlock: draggedBlockClientIds.includes( clientId ),
 			innerBlockCount: getBlockCount( clientId ),
 			canInsertDraggedBlocksAsSibling: isBlockDrag
 				? canInsertBlocks( draggedBlockClientIds, rootClientId )
@@ -82,6 +83,10 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 	let candidateRect;
 
 	for ( const blockData of blocksData ) {
+		if ( blockData.isDraggedBlock ) {
+			continue;
+		}
+
 		const rect = blockData.element.getBoundingClientRect();
 		const [ distance, edge ] = getDistanceToNearestEdge(
 			position,
@@ -106,7 +111,8 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 			if (
 				edge === 'top' &&
 				previousBlockData &&
-				previousBlockData.rootClientId === blockData.rootClientId
+				previousBlockData.rootClientId === blockData.rootClientId &&
+				! previousBlockData.isDraggedBlock
 			) {
 				candidateBlockData = previousBlockData;
 				candidateEdge = 'bottom';
@@ -147,8 +153,8 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 		)
 	) {
 		return {
-			rootClientId: candidateBlockData.clientId,
-			blockIndex: 0,
+			clientId: candidateBlockData.clientId,
+			position: 'inside',
 		};
 	}
 
@@ -158,10 +164,9 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 		return;
 	}
 
-	const offset = isDraggingBelow ? 1 : 0;
 	return {
-		rootClientId: candidateBlockData.rootClientId,
-		blockIndex: candidateBlockData.blockIndex + offset,
+		clientId: candidateBlockData.clientId,
+		position: candidateEdge,
 	};
 }
 

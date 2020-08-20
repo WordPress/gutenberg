@@ -1,12 +1,6 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -32,44 +26,7 @@ const BlockNavigationBlockContents = forwardRef(
 	) => {
 		const {
 			__experimentalFeatures: withBlockNavigationSlots,
-			blockDropTarget = {},
 		} = useBlockNavigationContext();
-
-		const rootClientId = useSelect(
-			( select ) =>
-				select( 'core/block-editor' ).getBlockRootClientId(
-					block.clientId
-				) || '',
-			[ block.rootClientId ]
-		);
-
-		const {
-			rootClientId: dropTargetRootClientId,
-			blockIndex: dropTargetBlockIndex,
-		} = blockDropTarget;
-
-		const blockIndex = position - 1;
-
-		const isDroppingBefore =
-			dropTargetRootClientId === rootClientId &&
-			blockIndex === dropTargetBlockIndex;
-		const isDroppingAfter =
-			dropTargetRootClientId === rootClientId &&
-			position === siblingBlockCount &&
-			dropTargetBlockIndex === siblingBlockCount;
-		const isDroppingToInnerBlocks =
-			block.clientId === dropTargetRootClientId &&
-			! block.innerBlocks?.length &&
-			dropTargetBlockIndex === 0;
-
-		const className = classnames(
-			'block-editor-block-navigation-block-contents',
-			{
-				'is-dropping-before': isDroppingBefore,
-				'is-dropping-after': isDroppingAfter,
-				'is-dropping-to-inner-blocks': isDroppingToInnerBlocks,
-			}
-		);
 
 		return (
 			<BlockDraggable
@@ -80,7 +37,7 @@ const BlockNavigationBlockContents = forwardRef(
 					withBlockNavigationSlots ? (
 						<BlockNavigationBlockSlot
 							ref={ ref }
-							className={ className }
+							className="block-editor-block-navigation-block-contents"
 							block={ block }
 							onClick={ onClick }
 							isSelected={ isSelected }
@@ -95,7 +52,7 @@ const BlockNavigationBlockContents = forwardRef(
 					) : (
 						<BlockNavigationBlockSelectButton
 							ref={ ref }
-							className={ className }
+							className="block-editor-block-navigation-block-contents"
 							block={ block }
 							onClick={ onClick }
 							isSelected={ isSelected }
