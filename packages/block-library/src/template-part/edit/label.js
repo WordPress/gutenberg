@@ -18,11 +18,12 @@ export default function TemplatePartLabel( { postId, slug } ) {
 	);
 
 	const label = capitalize( title || slug );
+
 	return (
 		<div className="wp-block-template-part__label-container">
 			<div className="wp-block-template-part__label-layout">
 				<div className="wp-block-template-part__label-content">
-					<Icon icon="controls-repeat" size={ 13 } />
+					<Icon icon="block-default" size={ 13 } />
 					<span className="wp-block-template-part__label-text">
 						{ label }
 					</span>
