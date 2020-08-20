@@ -16,6 +16,13 @@ export default {
 	component: Navigation,
 };
 
+// Example Link component from a router such as React Router
+const CustomRouterLink = ( { children, onClick } ) => {
+	// Here I'm passing the onClick prop for simplicity, but behavior can be
+	// anything here.
+	return <Button onClick={ onClick }>{ children }</Button>;
+};
+
 const data = [
 	{
 		title: 'Item 1',
@@ -40,6 +47,19 @@ const data = [
 		title: 'Child 2',
 		id: 'child-2',
 		parent: 'item-3',
+	},
+	{
+		title: 'External link',
+		id: 'item-4',
+		href: 'https://wordpress.com',
+		linkProps: {
+			target: '_blank',
+		},
+	},
+	{
+		title: 'Internal link',
+		id: 'item-5',
+		LinkComponent: CustomRouterLink,
 	},
 ];
 
