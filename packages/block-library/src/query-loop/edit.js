@@ -19,7 +19,7 @@ const TEMPLATE = [ [ 'core/post-title' ], [ 'core/post-content' ] ];
 export default function QueryLoopEdit( {
 	clientId,
 	context: {
-		query: { perPage, offset, categoryIds, order } = {},
+		query: { perPage, offset, categoryIds, order, orderBy } = {},
 		queryContext,
 	},
 } ) {
@@ -32,6 +32,7 @@ export default function QueryLoopEdit( {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				categories: categoryIds,
 				order,
+				orderby: orderBy,
 			};
 			if ( perPage ) {
 				query.per_page = perPage;
@@ -45,7 +46,7 @@ export default function QueryLoopEdit( {
 				blocks: select( 'core/block-editor' ).getBlocks( clientId ),
 			};
 		},
-		[ perPage, page, offset, categoryIds, order, clientId ]
+		[ perPage, page, offset, categoryIds, order, orderBy, clientId ]
 	);
 
 	const blockContexts = useMemo(
