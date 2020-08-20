@@ -320,7 +320,9 @@ describe( 'onFilesDrop', () => {
 	} );
 
 	it( 'does nothing if the block has no matching file transforms', () => {
-		findTransform.mockImplementation( () => {} );
+		// Test the scenario of 'no transforms' by mocking findTransform
+		// to have no return value.
+		findTransform.mockImplementation( noop );
 		const updateBlockAttributes = noop;
 		const insertBlocks = jest.fn();
 		const targetRootClientId = '1';
@@ -341,6 +343,9 @@ describe( 'onFilesDrop', () => {
 	} );
 
 	it( 'inserts blocks if a valid transform can be found', () => {
+		// Mock findTransform to return a valid transform. The implementation
+		// of the transform isn't important just that there is a callable 'transform'
+		// function that returns a value.
 		const blocks = 'blocks';
 		const transformation = { transform: jest.fn( () => blocks ) };
 		findTransform.mockImplementation( () => transformation );
