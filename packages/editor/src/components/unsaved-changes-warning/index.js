@@ -28,6 +28,10 @@ class UnsavedChangesWarning extends Component {
 	warnIfUnsavedChanges( event ) {
 		const { isDirty } = this.props;
 
+		// We need to call the selector directly in the listener to avoid race
+		// conditions with `BrowserURL` where `componentDidUpdate` gets the
+		// new value of `isEditedPostDirty` before this component does,
+		// causing this component to incorrectly think a trashed post is still dirty.
 		if ( isDirty() ) {
 			event.returnValue = __(
 				'You have unsaved changes. If you proceed, they will be lost.'
