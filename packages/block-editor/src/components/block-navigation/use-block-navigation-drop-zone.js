@@ -43,7 +43,9 @@ function getDropTargetBlocksData(
 			rootClientId,
 			blockIndex: getBlockIndex( clientId, rootClientId ),
 			element: blockElement,
-			isDraggedBlock: draggedBlockClientIds.includes( clientId ),
+			isDraggedBlock: isBlockDrag
+				? draggedBlockClientIds.includes( clientId )
+				: false,
 			innerBlockCount: getBlockCount( clientId ),
 			canInsertDraggedBlocksAsSibling: isBlockDrag
 				? canInsertBlocks( draggedBlockClientIds, rootClientId )
