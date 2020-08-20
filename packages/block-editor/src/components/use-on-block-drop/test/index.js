@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { parseDropEvent, onFileDrop, onHTMLDrop, onBlockDrop } from '..';
+import { parseDropEvent, onFilesDrop, onHTMLDrop, onBlockDrop } from '..';
 /**
  * WordPress dependencies
  */
@@ -298,7 +298,7 @@ describe( 'onBlockDrop', () => {
 	} );
 } );
 
-describe( 'onFileDrop', () => {
+describe( 'onFilesDrop', () => {
 	it( 'does nothing if hasUploadPermissions is false', () => {
 		const updateBlockAttributes = jest.fn();
 		const insertBlocks = jest.fn();
@@ -306,7 +306,7 @@ describe( 'onFileDrop', () => {
 		const targetBlockIndex = 0;
 		const uploadPermissions = false;
 
-		const onFileDropHandler = onFileDrop(
+		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
 			targetBlockIndex,
 			uploadPermissions,
@@ -327,7 +327,7 @@ describe( 'onFileDrop', () => {
 		const targetBlockIndex = 0;
 		const uploadPermissions = true;
 
-		const onFileDropHandler = onFileDrop(
+		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
 			targetBlockIndex,
 			uploadPermissions,
@@ -350,7 +350,7 @@ describe( 'onFileDrop', () => {
 		const targetBlockIndex = 0;
 		const uploadPermissions = true;
 
-		const onFileDropHandler = onFileDrop(
+		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
 			targetBlockIndex,
 			uploadPermissions,

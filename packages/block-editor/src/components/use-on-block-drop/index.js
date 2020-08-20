@@ -127,7 +127,7 @@ export function onBlockDrop(
  *
  * @return {Function} The event handler for a block-related file drop event.
  */
-export function onFileDrop(
+export function onFilesDrop(
 	targetRootClientId,
 	targetBlockIndex,
 	hasUploadPermissions,
@@ -184,7 +184,7 @@ export function onHTMLDrop(
  * @param {string} targetRootClientId The root client id where the block(s) will be inserted.
  * @param {number} targetBlockIndex   The index where the block(s) will be inserted.
  *
- * @return {Object} An object that contains the event handlers `onDrop`, `onFileDrop` and `onHTMLDrop`.
+ * @return {Object} An object that contains the event handlers `onDrop`, `onFilesDrop` and `onHTMLDrop`.
  */
 export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 	const {
@@ -219,7 +219,7 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 			getClientIdsOfDescendants,
 			moveBlocksToPosition
 		),
-		onFileDrop: onFileDrop(
+		onFilesDrop: onFilesDrop(
 			targetRootClientId,
 			targetBlockIndex,
 			hasUploadPermissions,
