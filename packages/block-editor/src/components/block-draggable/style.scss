@@ -32,7 +32,6 @@
 
 // This hides the block being dragged.
 // The effect is that the block being dragged appears to be "lifted".
-.is-dragging.is-selected,
-.is-dragging.is-multi-selected {
+.is-dragging {
 	display: none !important;
 }
