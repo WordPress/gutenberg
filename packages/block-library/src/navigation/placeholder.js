@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-
-import { escape } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -93,9 +91,7 @@ function mapMenuItemsToBlocks( nodes ) {
 				type,
 				id,
 				url,
-				label: ! title.rendered
-					? __( '(no title)' )
-					: escape( title.rendered ),
+				label: ! title.rendered ? __( '(no title)' ) : title.rendered,
 				opensInNewTab: false,
 			},
 			innerBlocks
@@ -136,9 +132,7 @@ function convertPagesToBlocks( pages ) {
 			type,
 			id,
 			url,
-			label: ! title.rendered
-				? __( '(no title)' )
-				: escape( title.rendered ),
+			label: ! title.rendered ? __( '(no title)' ) : title.rendered,
 			opensInNewTab: false,
 		} )
 	);
