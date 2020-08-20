@@ -18,7 +18,10 @@ import { useQueryContext } from '../query';
 const TEMPLATE = [ [ 'core/post-title' ], [ 'core/post-content' ] ];
 export default function QueryLoopEdit( {
 	clientId,
-	context: { query: { perPage, offset, categoryIds } = {}, queryContext },
+	context: {
+		query: { perPage, offset, categoryIds, order } = {},
+		queryContext,
+	},
 } ) {
 	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
@@ -28,6 +31,7 @@ export default function QueryLoopEdit( {
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				categories: categoryIds,
+				order,
 			};
 			if ( perPage ) {
 				query.per_page = perPage;
@@ -41,7 +45,7 @@ export default function QueryLoopEdit( {
 				blocks: select( 'core/block-editor' ).getBlocks( clientId ),
 			};
 		},
-		[ perPage, page, offset, categoryIds, clientId ]
+		[ perPage, page, offset, categoryIds, order, clientId ]
 	);
 
 	const blockContexts = useMemo(

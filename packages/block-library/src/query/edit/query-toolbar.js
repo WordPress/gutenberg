@@ -7,6 +7,7 @@ import {
 	Dropdown,
 	ToolbarButton,
 	RangeControl,
+	SelectControl,
 	FormTokenField,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -38,6 +39,10 @@ export default function QueryToolbar( { query, setQuery } ) {
 		},
 		[]
 	);
+	const orderOptions = [
+		{ value: 'desc', label: __( 'Descending' ) },
+		{ value: 'asc', label: __( 'Ascending' ) },
+	];
 	return (
 		<Toolbar>
 			<Dropdown
@@ -75,6 +80,14 @@ export default function QueryToolbar( { query, setQuery } ) {
 							value={ query.offset }
 							onChange={ ( value ) =>
 								setQuery( { offset: value ?? 0 } )
+							}
+						/>
+						<SelectControl
+							label={ __( 'Order' ) }
+							value={ query.order }
+							options={ orderOptions }
+							onChange={ ( value ) =>
+								setQuery( { order: value } )
 							}
 						/>
 						{ categories && (
