@@ -58,6 +58,13 @@ export function BlockTypesTab( {
 		[ rootClientId ]
 	);
 
+	const hasAllowedBlocks = useSelect( ( select ) => {
+		const { __experimentalGetAllowedBlocks } = select(
+			'core/block-editor'
+		);
+		return __experimentalGetAllowedBlocks( rootClientId ) !== undefined;
+	} );
+
 	const filteredItems = useMemo( () => {
 		return searchBlockItems( items, categories, collections, filterValue );
 	}, [ filterValue, items, categories, collections ] );
@@ -217,6 +224,7 @@ export function BlockTypesTab( {
 					filterValue,
 					hasItems,
 					hasChildItems,
+					hasAllowedBlocks,
 				} }
 			>
 				{ ( fills ) => {

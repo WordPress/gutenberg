@@ -27,8 +27,14 @@ function InserterMenuDownloadableBlocksPanel() {
 				filterValue,
 				hasItems,
 				hasChildItems,
+				hasAllowedBlocks,
 			} ) => {
-				if ( hasItems || hasChildItems || ! filterValue ) {
+				if (
+					hasItems ||
+					hasChildItems ||
+					hasAllowedBlocks ||
+					! filterValue
+				) {
 					return null;
 				}
 
