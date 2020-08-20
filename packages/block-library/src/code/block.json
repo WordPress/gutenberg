@@ -10,7 +10,6 @@
 	},
 	"supports": {
 		"anchor": true,
-		"html": false,
 		"lightBlockWrapper": true
 	}
 }
