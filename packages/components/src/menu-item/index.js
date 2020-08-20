@@ -8,6 +8,7 @@ import { isString } from 'lodash';
  * WordPress dependencies
  */
 import { cloneElement, forwardRef } from '@wordpress/element';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,6 +26,7 @@ import Button from '../button';
  * @param {WPIcon}        props.icon              Button's `icon` prop.
  * @param {string|Object} props.shortcut          Shortcut's `shortcut` prop.
  * @param {boolean}       props.isSelected        Whether or not the menu item is currently selected.
+ * @param {boolean}       props.externalLink      If the menuitem displays an external link, with icon and hidden text
  * @param {string}        [props.role="menuitem"] ARIA role of the menu item.
  * @param {Object}        ref                     React Element ref.
  *
@@ -38,6 +40,7 @@ export function MenuItem(
 		icon,
 		shortcut,
 		isSelected,
+		externalLink,
 		role = 'menuitem',
 		...props
 	},
@@ -60,6 +63,12 @@ export function MenuItem(
 		} );
 	}
 
+	if ( externalLink ) {
+		icon = cloneElement( external, {
+			className: 'components-menu-items__item-icon',
+		} );
+	}
+
 	return (
 		<Button
 			ref={ ref }
@@ -71,6 +80,7 @@ export function MenuItem(
 					: undefined
 			}
 			role={ role }
+			externalLink={ externalLink }
 			className={ className }
 			{ ...props }
 		>

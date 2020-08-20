@@ -38,6 +38,7 @@ registerPlugin( 'edit-post', {
 							<CopyContentMenuItem />
 							<MenuItem
 								role="menuitem"
+								externalLink={ true }
 								href={ __(
 									'https://wordpress.org/support/article/wordpress-editor/'
 								) }

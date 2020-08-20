@@ -9,12 +9,14 @@ import { isArray } from 'lodash';
  */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
+import VisuallyHidden from '../visually-hidden';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
@@ -39,6 +41,7 @@ export function Button( props, ref ) {
 		tooltipPosition,
 		shortcut,
 		label,
+		externalLink,
 		children,
 		__experimentalIsFocusable: isFocusable,
 		...additionalProps
@@ -112,6 +115,11 @@ export function Button( props, ref ) {
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }
+			{ externalLink && (
+				<VisuallyHidden as="span">
+					{ __( '(opens in a new tab)' ) }
+				</VisuallyHidden>
+			) }
 		</Tag>
 	);
 
