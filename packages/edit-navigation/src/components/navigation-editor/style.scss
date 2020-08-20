@@ -110,3 +110,14 @@
 	text-align: left;
 	border-top: 1px solid $gray-200;
 }
+
+.edit-navigation-block-inspector {
+	.components-button {
+		margin-left: $grid-unit-20;
+
+		&[aria-expanded="true"] {
+			color: $white;
+			background-color: $gray-900;
+		}
+	}
+}
