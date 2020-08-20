@@ -22,6 +22,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		'post_type' => 'post',
 		'offset' => isset( $block->context['query']['perPage'] ) ? ( $block->context['query']['perPage'] * ( $page - 1 ) + $block->context['query']['offset'] ) : 0,
 		'order' => isset( $block->context['query']['order'] ) ? strtoupper( $block->context['query']['order'] ) : 'DESC',
+		'orderby' => isset( $block->context['query']['orderBy'] ) ? $block->context['query']['orderBy'] : 'date',
 	);
 	if ( isset( $block->context['query']['categoryIds'] ) ) {
 		$query['category__in'] = $block->context['query']['categoryIds'];

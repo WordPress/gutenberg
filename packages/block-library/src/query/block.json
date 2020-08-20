@@ -12,7 +12,8 @@
 				"pages": 1,
 				"offset": 0,
 				"categoryIds": [],
-				"order": "desc"
+				"order": "desc",
+				"orderBy": "date"
 			}
 		}
 	},
