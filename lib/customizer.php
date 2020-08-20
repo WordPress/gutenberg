@@ -81,6 +81,10 @@ add_action( 'customize_register', 'gutenberg_customize_register' );
  * @return array (Maybe) modified components list.
  */
 function gutenberg_remove_widgets_panel( $components ) {
+	if ( ! get_theme_support( 'block-based-widgets' ) ) {
+		return $components;
+	}
+
     $i = array_search( 'widgets', $components );
     if ( false !== $i ) {
         unset( $components[ $i ] );
