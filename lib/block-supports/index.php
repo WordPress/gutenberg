@@ -18,6 +18,7 @@ function gutenberg_register_block_supports() {
 		gutenberg_register_colors_support( $block_type );
 		gutenberg_register_typography_support( $block_type );
 		gutenberg_register_custom_classname_support( $block_type );
+		gutenberg_register_anchor_support( $block_type );
 	}
 }
 
@@ -47,6 +48,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	$attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_alignment_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_custom_classname_support( $attributes, $block['attrs'], $block_type );
+	$attributes = gutenberg_apply_anchor_support( $attributes, $block['attrs'], $block_type );
 
 	if ( ! count( $attributes ) ) {
 		return $block_content;
@@ -81,13 +83,17 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	$styles_to_add  = array_key_exists( 'inline_styles', $attributes ) ? $attributes['inline_styles'] : array();
 	$new_styles     = array_unique( array_map( 'gutenberg_normalize_css_rule', array_filter( array_merge( $current_styles, $styles_to_add ) ) ) );
 
-	// Apply new styles and classes.
+	// Apply new styles, classes and anchor.
 	if ( ! empty( $new_classes ) ) {
 		$block_root->setAttribute( 'class', esc_attr( implode( ' ', $new_classes ) ) );
 	}
 
 	if ( ! empty( $new_styles ) ) {
 		$block_root->setAttribute( 'style', esc_attr( implode( '; ', $new_styles ) . ';' ) );
+	}
+
+	if ( ! empty( $attributes['anchor'] ) ) {
+		$block_root->setAttribute( 'id', esc_attr( $attributes['anchor'] ) );
 	}
 
 	return str_replace( array( $wrapper_left, $wrapper_right ), '', $dom->saveHtml() );

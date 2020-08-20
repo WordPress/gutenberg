@@ -39,14 +39,20 @@ export function addAttribute( settings ) {
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
 		// Gracefully handle if settings.attributes is undefined.
-		settings.attributes = {
-			...settings.attributes,
-			anchor: {
+		let anchor = {
+			type: 'string',
+		};
+		if ( settings.save.length ) {
+			anchor = {
 				type: 'string',
 				source: 'attribute',
 				attribute: 'id',
 				selector: '*',
-			},
+			};
+		}
+		settings.attributes = {
+			...settings.attributes,
+			anchor,
 		};
 	}
 
