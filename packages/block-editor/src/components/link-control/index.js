@@ -88,6 +88,7 @@ import { ViewerFill } from './viewer-slot';
  * @property {boolean=}                             showSuggestions        Whether to present suggestions when typing the URL.
  * @property {boolean=}                             showInitialSuggestions Whether to present initial suggestions immediately.
  * @property {boolean=}                             withCreateSuggestion   Whether to allow creation of link value from suggestion.
+ * @property {Object=}                              suggestionsQuery       Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
  */
 
 /**
@@ -109,6 +110,7 @@ function LinkControl( {
 	createSuggestion,
 	withCreateSuggestion,
 	inputValue: propInputValue = '',
+	suggestionsQuery = {},
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -209,6 +211,7 @@ function LinkControl( {
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }
+							suggestionsQuery={ suggestionsQuery }
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button

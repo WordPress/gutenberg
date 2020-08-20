@@ -38,10 +38,12 @@ const LinkControlSearchInput = forwardRef(
 			fetchSuggestions = null,
 			allowDirectEntry = true,
 			showInitialSuggestions = false,
+			suggestionsQuery = {},
 		},
 		ref
 	) => {
 		const genericSearchHandler = useSearchHandler(
+			suggestionsQuery,
 			allowDirectEntry,
 			withCreateSuggestion
 		);
