@@ -51,16 +51,7 @@ function gutenberg_register_template_part_post_type() {
 		),
 	);
 
-	$meta_args = array(
-		'object_subtype' => 'wp_template_part',
-		'type'           => 'string',
-		'description'    => 'The theme that provided the template part, if any.',
-		'single'         => true,
-		'show_in_rest'   => true,
-	);
-
 	register_post_type( 'wp_template_part', $args );
-	register_meta( 'post', 'theme', $meta_args );
 }
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
 
@@ -203,10 +194,13 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 	}
 
 	if ( $request['theme'] ) {
-		$meta_query   = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
-		$meta_query[] = array(
-			'key'   => 'theme',
-			'value' => $request['theme'],
+		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
+		$tax_query[] = array(
+			array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'slug',
+				'terms'    => $request['theme'],
+			),
 		);
 
 		// Ensure auto-drafts of all theme supplied template parts are created.
@@ -237,7 +231,7 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 			}
 		};
 
-		$args['meta_query'] = $meta_query;
+		$args['tax_query'] = $tax_query;
 	}
 
 	return $args;

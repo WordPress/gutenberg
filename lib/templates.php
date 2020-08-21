@@ -56,6 +56,22 @@ function gutenberg_register_template_post_type() {
 add_action( 'init', 'gutenberg_register_template_post_type' );
 
 /**
+ * Registers block editor 'wp_theme' taxonomy.
+ */
+function gutenberg_register_wp_theme_taxonomy() {
+
+	// Register wp_theme taxonomy.
+	register_taxonomy(
+		'wp_theme',
+		array( 'wp_template', 'wp_template_part' ),
+		array(
+			'public' => true,
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
+
+/**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
  *
  * Any user who can 'edit_theme_options' will have access.
