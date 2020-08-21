@@ -132,8 +132,8 @@ class Draggable extends Component {
 		// HTML node and inject it into the cloneWrapper.
 		if ( this.dragComponentRef.current ) {
 			// Position clone right over the cursor (24px padding).
-			this.cloneWrapper.style.top = `${ event.clientY + 24 }px`;
-			this.cloneWrapper.style.left = `${ event.clientX - 24 }px`;
+			this.cloneWrapper.style.top = `${ event.clientY }px`;
+			this.cloneWrapper.style.left = `${ event.clientX }px`;
 
 			const clonedDragComponent = document.createElement( 'div' );
 			clonedDragComponent.innerHTML = this.dragComponentRef.current.innerHTML;
