@@ -67,6 +67,7 @@ export { default as MenuItemsChoice } from './menu-items-choice';
 export { default as Modal } from './modal';
 export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
+export { default as __experimentalNavigation } from './navigation';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';

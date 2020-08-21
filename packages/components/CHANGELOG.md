@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Introduce `Navigation` component as `__experimentalNavigation` for displahing a heirarchy of items.
+
 ## 10.0.0 (2020-07-07)
 
 ### Breaking Change
