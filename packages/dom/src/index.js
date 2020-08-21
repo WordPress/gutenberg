@@ -11,3 +11,4 @@ import * as tabbable from './tabbable';
 export const focus = { focusable, tabbable };
 
 export * from './dom';
+export * from './phrasing-content';

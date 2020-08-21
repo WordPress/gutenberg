@@ -19,12 +19,13 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
 
 	if ( typeof children !== 'function' && ! Component ) {
 		warning(
-			'`ToolbarItem` is a generic headless component. You must pass either a `children` prop as a function or an `as` prop as a component.'
+			'`ToolbarItem` is a generic headless component. You must pass either a `children` prop as a function or an `as` prop as a component. ' +
+				'See https://developer.wordpress.org/block-editor/components/toolbar-item/'
 		);
 		return null;
 	}
 
-	const allProps = { ...props, ref, 'data-experimental-toolbar-item': true };
+	const allProps = { ...props, ref, 'data-toolbar-item': true };
 
 	if ( ! accessibleToolbarState ) {
 		if ( Component ) {

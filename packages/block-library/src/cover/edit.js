@@ -103,6 +103,9 @@ function CoverHeightInput( {
 		}
 		setTemporaryInput( null );
 		onChange( inputValue );
+		if ( inputValue === undefined ) {
+			onUnitChange();
+		}
 	};
 
 	const handleOnBlur = () => {

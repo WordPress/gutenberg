@@ -109,6 +109,7 @@ describe( 'autosave', () => {
 		);
 		// Reload without saving on the server
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		const notice = await page.$eval(
 			'.components-notice__content',
@@ -184,6 +185,7 @@ describe( 'autosave', () => {
 		).toBe( 1 );
 
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 		const notice = await page.$eval(
 			'.components-notice__content',
 			( element ) => element.innerText
@@ -321,6 +323,7 @@ describe( 'autosave', () => {
 		).toBeGreaterThanOrEqual( 1 );
 
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// FIXME: Occasionally, upon reload, there is no server-provided
 		// autosave value available, despite our having previously explicitly

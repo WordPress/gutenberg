@@ -156,7 +156,7 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 		const isApple = _isApple();
 		const replacementKeyMap = {
 			[ ALT ]: isApple ? '⌥' : 'Alt',
-			[ CTRL ]: isApple ? '^' : 'Ctrl',
+			[ CTRL ]: isApple ? '⌃' : 'Ctrl', // Make sure ⌃ is the U+2303 UP ARROWHEAD unicode character and not the caret character.
 			[ COMMAND ]: '⌘',
 			[ SHIFT ]: isApple ? '⇧' : 'Shift',
 		};

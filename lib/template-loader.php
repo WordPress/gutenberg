@@ -38,10 +38,6 @@ function get_template_types() {
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
-	if ( ! post_type_exists( 'wp_template' ) ) {
-		return;
-	}
-
 	foreach ( get_template_types() as $template_type ) {
 		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
 			continue;
@@ -426,7 +422,7 @@ function gutenberg_strip_php_suffix( $template_file ) {
 function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
 	global $post;
 
-	if ( ! $post || ! post_type_exists( 'wp_template' ) || ! post_type_exists( 'wp_template_part' ) ) {
+	if ( ! $post ) {
 		return $settings;
 	}
 

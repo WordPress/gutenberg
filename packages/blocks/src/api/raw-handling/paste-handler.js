@@ -4,6 +4,11 @@
 import { flatMap, filter, compact } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
+
+/**
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
@@ -27,13 +32,7 @@ import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
 import brRemover from './br-remover';
-import { getPhrasingContentSchema } from './phrasing-content';
-import {
-	deepFilterHTML,
-	isPlain,
-	removeInvalidHTML,
-	getBlockContentSchema,
-} from './utils';
+import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 
 /**

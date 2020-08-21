@@ -147,6 +147,7 @@ export function BlockTypesTab( {
 							onSelect={ onSelectItem }
 							onHover={ onHover }
 							label={ _x( 'Most used', 'blocks' ) }
+							limit={ MAX_SUGGESTED_ITEMS }
 						/>
 					</InserterPanel>
 				) }

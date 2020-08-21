@@ -9,7 +9,7 @@
 import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
 import { addMention } from '@wordpress/react-native-bridge';
-import { get, pickBy } from 'lodash';
+import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -99,7 +99,7 @@ export class RichText extends Component {
 		this.formatToValue = memize( this.formatToValue.bind( this ), {
 			maxSize: 1,
 		} );
-
+		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
@@ -308,7 +308,7 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
-
+		this.debounceCreateUndoLevel();
 		const refresh = this.value !== contentWithoutRootTag;
 		this.value = contentWithoutRootTag;
 

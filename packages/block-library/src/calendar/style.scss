@@ -14,7 +14,6 @@
 	table {
 		width: 100%;
 		border-collapse: collapse;
-		font-family: $default-font;
 	}
 
 	table th {
@@ -24,10 +23,6 @@
 
 	a {
 		text-decoration: underline;
-	}
-
-	tfoot a {
-		color: var(--wp-admin-theme-color);
 	}
 
 	table tbody,

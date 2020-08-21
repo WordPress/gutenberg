@@ -28,7 +28,7 @@ export default function TemplatePartNamePanel( { postId, setAttributes } ) {
 					setTitle( value );
 					const newSlug = cleanForSlug( value );
 					setSlug( newSlug );
-					setAttributes( { slug: newSlug } );
+					setAttributes( { slug: newSlug, postId } );
 				} }
 				onFocus={ ( event ) => event.target.select() }
 			/>

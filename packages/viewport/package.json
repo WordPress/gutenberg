@@ -25,7 +25,7 @@
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -9,7 +9,12 @@ import { escape, get, head, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch, withDispatch, withSelect } from '@wordpress/data';
+import {
+	useSelect,
+	useDispatch,
+	withDispatch,
+	withSelect,
+} from '@wordpress/data';
 import {
 	KeyboardShortcuts,
 	PanelBody,
@@ -39,6 +44,54 @@ import { link as linkIcon } from '@wordpress/icons';
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
 
+/**
+ * A React hook to determine if it's dragging within the target element.
+ *
+ * @typedef {import('@wordpress/element').RefObject} RefObject
+ *
+ * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
+ *
+ * @return {boolean} Is dragging within the target element.
+ */
+const useIsDraggingWithin = ( elementRef ) => {
+	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
+
+	useEffect( () => {
+		function handleDragStart( event ) {
+			// Check the first time when the dragging starts.
+			handleDragEnter( event );
+		}
+
+		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
+		function handleDragEnd() {
+			setIsDraggingWithin( false );
+		}
+
+		function handleDragEnter( event ) {
+			// Check if the current target is inside the item element.
+			if ( elementRef.current.contains( event.target ) ) {
+				setIsDraggingWithin( true );
+			} else {
+				setIsDraggingWithin( false );
+			}
+		}
+
+		// Bind these events to the document to catch all drag events.
+		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
+		document.addEventListener( 'dragstart', handleDragStart );
+		document.addEventListener( 'dragend', handleDragEnd );
+		document.addEventListener( 'dragenter', handleDragEnter );
+
+		return () => {
+			document.removeEventListener( 'dragstart', handleDragStart );
+			document.removeEventListener( 'dragend', handleDragEnd );
+			document.removeEventListener( 'dragenter', handleDragEnter );
+		};
+	}, [] );
+
+	return isDraggingWithin;
+};
+
 function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
@@ -65,8 +118,15 @@ function NavigationLinkEdit( {
 	};
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const listItemRef = useRef( null );
+	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
+
+	const isDraggingBlocks = useSelect(
+		( select ) => select( 'core/block-editor' ).isDraggingBlocks(),
+		[]
+	);
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -183,8 +243,13 @@ function NavigationLinkEdit( {
 			</InspectorControls>
 			<Block.li
 				className={ classnames( {
-					'is-editing': isSelected || isParentOfSelectedBlock,
-					'is-selected': isSelected,
+					'is-editing':
+						( isSelected || isParentOfSelectedBlock ) &&
+						// Don't show the element as editing while dragging.
+						! isDraggingBlocks,
+					// Don't select the element while dragging.
+					'is-selected': isSelected && ! isDraggingBlocks,
+					'is-dragging-within': isDraggingWithin,
 					'has-link': !! url,
 					'has-child': hasDescendants,
 					'has-text-color': rgbTextColor,
@@ -196,6 +261,7 @@ function NavigationLinkEdit( {
 					color: rgbTextColor,
 					backgroundColor: rgbBackgroundColor,
 				} }
+				ref={ listItemRef }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
@@ -282,7 +348,9 @@ function NavigationLinkEdit( {
 					renderAppender={
 						( isSelected && hasDescendants ) ||
 						( isImmediateParentOfSelectedBlock &&
-							! selectedBlockHasDescendants )
+							! selectedBlockHasDescendants ) ||
+						// Show the appender while dragging to allow inserting element between item and the appender.
+						( isDraggingBlocks && hasDescendants )
 							? InnerBlocks.DefaultAppender
 							: false
 					}
@@ -292,7 +360,10 @@ function NavigationLinkEdit( {
 						className: classnames(
 							'wp-block-navigation__container',
 							{
-								'is-parent-of-selected-block': isParentOfSelectedBlock,
+								'is-parent-of-selected-block':
+									isParentOfSelectedBlock &&
+									// Don't select as parent of selected block while dragging.
+									! isDraggingBlocks,
 							}
 						),
 					} }
