@@ -12,8 +12,8 @@ import { useEntityProp } from '@wordpress/core-data';
 import { Icon } from '@wordpress/components';
 
 function detectOverlap( e1, e2 ) {
-	const rect1 = e1.getBoundingClientRect();
-	const rect2 = e2.getBoundingClientRect();
+	const rect1 = e1 && e1.getBoundingClientRect();
+	const rect2 = e2 && e2.getBoundingClientRect();
 
 	let overlap = null;
 	if ( rect1 && rect2 ) {
@@ -69,10 +69,12 @@ export default function TemplatePartLabel( {
 			className={ cx( 'wp-block-template-part__label-container', {
 				overlapped: isOverlapped,
 			} ) }
-			ref={ labelElement }
 		>
 			<div className="wp-block-template-part__label-layout">
-				<div className="wp-block-template-part__label-content">
+				<div
+					ref={ labelElement }
+					className="wp-block-template-part__label-content"
+				>
 					<Icon icon="block-default" size={ 13 } />
 					<span className="wp-block-template-part__label-text">
 						{ label }
