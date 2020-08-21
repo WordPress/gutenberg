@@ -20,6 +20,7 @@ import styles from './block-list-item.native.scss';
 
 const BREAKPOINTS = {
 	wide: 1024,
+	medium: 700,
 	small: 600,
 };
 
@@ -50,7 +51,6 @@ export class BlockListItem extends Component {
 	getMarginHorizontal() {
 		const {
 			blockAlignment,
-			hasParents,
 			marginHorizontal,
 			parentBlockAlignment,
 			numberOfParents,
@@ -58,31 +58,32 @@ export class BlockListItem extends Component {
 		const { blockWidth } = this.state;
 		const isParentBlockFullWidth =
 			parentBlockAlignment === 'full' && numberOfParents === 1;
+		const hasWiderCanvas =
+			blockWidth > BREAKPOINTS.small && blockWidth <= BREAKPOINTS.wide;
 
-		switch ( blockAlignment ) {
-			case 'full':
-				return 0;
-			case 'wide':
-				if (
-					blockWidth > BREAKPOINTS.small &&
-					blockWidth <= BREAKPOINTS.wide
-				) {
-					return hasParents &&
-						numberOfParents >= 1 &&
-						! isParentBlockFullWidth
-						? marginHorizontal
-						: styles.wideAlignment.marginLeft;
-				}
+		if ( blockAlignment === 'full' ) {
+			return 0;
+		}
 
-				return isParentBlockFullWidth
-					? marginHorizontal * 2
-					: marginHorizontal;
-			default:
-				if ( isParentBlockFullWidth ) {
+		if ( blockAlignment === 'wide' ) {
+			if ( hasWiderCanvas && numberOfParents === 0 ) {
+				return marginHorizontal * 3;
+			} else if ( hasWiderCanvas && isParentBlockFullWidth ) {
+				if ( blockWidth < BREAKPOINTS.medium ) {
 					return marginHorizontal * 2;
 				}
-				return marginHorizontal;
+				return (
+					marginHorizontal *
+					( blockWidth === BREAKPOINTS.wide ? 3 : 4 )
+				);
+			}
+
+			return isParentBlockFullWidth
+				? marginHorizontal * 2
+				: marginHorizontal;
 		}
+
+		return isParentBlockFullWidth ? marginHorizontal * 2 : marginHorizontal;
 	}
 
 	getContentStyles( readableContentViewStyle ) {
