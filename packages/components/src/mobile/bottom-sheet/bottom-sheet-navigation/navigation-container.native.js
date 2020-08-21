@@ -63,6 +63,7 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 	const [ currentHeight, setCurrentHeight ] = useState(
 		context.currentHeight || 1
 	);
+	const [ isFullScreen, setIsFullScreen ] = useState( false );
 
 	const backgroundStyle = usePreferredColorSchemeStyle(
 		styles.background,
@@ -90,6 +91,13 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 		}
 	};
 
+	const setFullScreen = ( full ) => {
+		if ( full !== isFullScreen ) {
+			performLayoutAnimation( ANIMATION_DURATION );
+			setIsFullScreen( full );
+		}
+	};
+
 	const screens = useMemo( () => {
 		return Children.map( children, ( child ) => {
 			const { name, ...otherProps } = child.props;
@@ -105,9 +113,9 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 
 	return useMemo( () => {
 		return (
-			<View style={ { height: currentHeight } }>
+			<View style={ { height: isFullScreen ? '100%' : currentHeight } }>
 				<BottomSheetNavigationProvider
-					value={ { setHeight, currentHeight } }
+					value={ { setHeight, currentHeight, setFullScreen } }
 				>
 					{ main ? (
 						<NavigationContainer theme={ _theme }>
@@ -123,7 +131,7 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 				</BottomSheetNavigationProvider>
 			</View>
 		);
-	}, [ currentHeight ] );
+	}, [ currentHeight, isFullScreen ] );
 }
 
 export default BottomSheetNavigationContainer;

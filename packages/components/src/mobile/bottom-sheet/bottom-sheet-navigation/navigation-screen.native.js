@@ -6,7 +6,7 @@ import {
 	useIsFocused,
 	useNavigation,
 } from '@react-navigation/native';
-import { View, Dimensions, Keyboard, Platform } from 'react-native';
+import { View } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -14,20 +14,12 @@ import { debounce } from 'lodash';
  */
 import { BottomSheetContext } from '@wordpress/components';
 
-import {
-	useRef,
-	useCallback,
-	useContext,
-	useMemo,
-	useEffect,
-} from '@wordpress/element';
+import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
-
-const { height: windowHeight } = Dimensions.get( 'window' );
 
 const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 	const navigation = useNavigation();
@@ -36,35 +28,14 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 	const {
 		onHandleHardwareButtonPress,
 		shouldEnableBottomSheetMaxHeight,
+		setIsFullScreen,
 	} = useContext( BottomSheetContext );
 
-	const { setHeight } = useContext( BottomSheetNavigationContext );
+	const { setHeight, setFullScreen } = useContext(
+		BottomSheetNavigationContext
+	);
 
 	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [] );
-	useEffect( () => {
-		const keyboardDidShowListener = Keyboard.addListener(
-			Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-			( e ) => {
-				if ( fullScreen && isFocused ) {
-					const { height: keyboardHeight } = e.endCoordinates;
-					setHeight( windowHeight - keyboardHeight );
-				}
-			}
-		);
-		const keyboardDidHideListener = Keyboard.addListener(
-			Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-			() => {
-				if ( fullScreen && isFocused ) {
-					setHeight( windowHeight );
-				}
-			}
-		);
-
-		return () => {
-			keyboardDidHideListener.remove();
-			keyboardDidShowListener.remove();
-		};
-	}, [ isFocused, setHeight ] );
 
 	useFocusEffect(
 		useCallback( () => {
@@ -78,18 +49,25 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 				return false;
 			} );
 			if ( fullScreen ) {
-				setHeight( windowHeight );
+				setFullScreen( true );
+				setIsFullScreen( true );
 			} else if ( heightRef.current.maxHeight !== 0 ) {
 				setHeight( heightRef.current.maxHeight );
 			}
-			return () => {};
-		}, [] )
+			return () => {
+				if ( fullScreen ) {
+					setIsFullScreen( false );
+					setFullScreen( false );
+				}
+			};
+		}, [ setFullScreen ] )
 	);
 	const onLayout = ( { nativeEvent } ) => {
 		if ( fullScreen ) {
 			return;
 		}
 		const { height } = nativeEvent.layout;
+		setFullScreen( false );
 		if ( heightRef.current.maxHeight !== height && isFocused ) {
 			heightRef.current.maxHeight = height;
 			setHeightDebounce( height, true );

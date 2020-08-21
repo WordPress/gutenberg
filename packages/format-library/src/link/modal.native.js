@@ -50,28 +50,19 @@ const linkSettingsScreens = {
 };
 
 const ModalLinkUI = ( { isVisible, ...restProps } ) => {
-	const [ fullHeight, setFullHeight ] = useState( false );
 	return (
-		<BottomSheet
-			isChildrenScrollable
-			style={ fullHeight && { flex: 1 } }
-			isVisible={ isVisible }
-			hideHeader
-		>
+		<BottomSheet isChildrenScrollable isVisible={ isVisible } hideHeader>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen
 					name={ linkSettingsScreens.settings }
 				>
-					<LinkSettingsScreen
-						{ ...restProps }
-						setFullHeight={ setFullHeight }
-					/>
+					<LinkSettingsScreen { ...restProps } />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
 					name={ linkSettingsScreens.picker }
 					fullScreen
 				>
-					<LinkPickerScreen setFullHeight={ setFullHeight } />
+					<LinkPickerScreen />
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
@@ -88,7 +79,6 @@ const LinkSettingsScreen = ( {
 	value,
 	isActive,
 	activeAttributes,
-	setFullHeight,
 } ) => {
 	const [ text, setText ] = useState( getTextContent( slice( value ) ) );
 	const [ opensInNewWindow, setOpensInNewWindows ] = useState(
@@ -180,13 +170,12 @@ const LinkSettingsScreen = ( {
 
 	useFocusEffect(
 		useCallback( () => {
-			setFullHeight( false );
 			const { params = {} } = route;
 			if ( ! text && params.text ) {
 				setText( params.text );
 			}
 			return () => {};
-		}, [ route.params?.text, text, setFullHeight ] )
+		}, [ route.params?.text, text ] )
 	);
 
 	return useMemo( () => {
@@ -233,7 +222,7 @@ const LinkSettingsScreen = ( {
 	}, [ inputValue, text, opensInNewWindow ] );
 };
 
-const LinkPickerScreen = ( { setFullHeight } ) => {
+const LinkPickerScreen = () => {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const onLinkPicked = ( { url, title } ) => {
@@ -242,13 +231,6 @@ const LinkPickerScreen = ( { setFullHeight } ) => {
 			text: title,
 		} );
 	};
-
-	useFocusEffect(
-		useCallback( () => {
-			setFullHeight( true );
-			return () => {};
-		}, [ setFullHeight ] )
-	);
 
 	const { inputValue } = route.params;
 	return useMemo( () => {
@@ -259,5 +241,5 @@ const LinkPickerScreen = ( { setFullHeight } ) => {
 				onCancel={ navigation.goBack }
 			/>
 		);
-	}, [ inputValue, navigation ] );
+	}, [ inputValue ] );
 };
