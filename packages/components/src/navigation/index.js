@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
@@ -6,6 +11,7 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import Animate from '../animate';
 import { Root } from './styles/navigation-styles';
 import Button from '../button';
 
@@ -25,15 +31,23 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 			};
 		} );
 	};
-	const items = [ { id: 'root', title: rootTitle }, ...mapItemData( data ) ];
 
+	const getRootItem = ( items ) => {
+		const itemChildren = items.filter( ( i ) => i.parent === 'root' );
+		return {
+			id: 'root',
+			parent: null,
+			title: rootTitle,
+			children: itemChildren,
+			isActive: false,
+			hasChildren: itemChildren.length > 0,
+		};
+	};
+
+	const mappedItems = mapItemData( data );
+	const items = [ getRootItem( mappedItems ), ...mappedItems ];
+	const levels = items.filter( ( item ) => item.hasChildren );
 	const activeItem = items.find( ( item ) => item.id === activeItemId );
-	const level = items.find( ( item ) => item.id === activeLevel );
-	const levelItems = items.filter( ( item ) => item.parent === level.id );
-	const parentLevel =
-		level.id === 'root'
-			? null
-			: items.find( ( item ) => item.id === level.parent );
 
 	useEffect( () => {
 		if ( activeItem ) {
@@ -58,12 +72,32 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 
 	return (
 		<Root className="components-navigation">
-			{ children( {
-				level,
-				levelItems,
-				parentLevel,
-				NavigationBackButton,
-			} ) }
+			{ levels.map(
+				( level ) =>
+					activeLevel === level.id && (
+						<Animate type="slide-in" key={ level.id }>
+							{ ( { className: animateClassName } ) => (
+								<div
+									className={ classnames(
+										'components-navigation__level',
+										animateClassName
+									) }
+								>
+									{ children( {
+										level,
+										levelItems: items.filter(
+											( i ) => i.parent === level.id
+										),
+										NavigationBackButton,
+										parentLevel: items.find(
+											( i ) => i.id === level.parent
+										),
+									} ) }
+								</div>
+							) }
+						</Animate>
+					)
+			) }
 		</Root>
 	);
 };
