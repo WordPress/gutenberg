@@ -1,6 +1,9 @@
 .block-editor-block-draggable-chip-wrapper {
 	position: absolute;
-	top: -$block-toolbar-height - $grid-unit-15;
+	// Offset position by half the height of the draggable chip
+	// so that the cursor is centered over the left part of the chip.
+	top: -#{$block-toolbar-height / 2};
+	left: -#{$block-toolbar-height / 2};
 }
 
 .block-editor-block-draggable-chip {
@@ -32,7 +35,6 @@
 
 // This hides the block being dragged.
 // The effect is that the block being dragged appears to be "lifted".
-.is-dragging.is-selected,
-.is-dragging.is-multi-selected {
+.is-dragging {
 	display: none !important;
 }

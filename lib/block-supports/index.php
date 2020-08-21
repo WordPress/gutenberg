@@ -52,17 +52,21 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
+	// We need to wrap the block in order to handle UTF-8 properly.
+	$wrapper_left  = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>';
+	$wrapper_right = '</body></html>';
+
 	$dom = new DOMDocument( '1.0', 'utf-8' );
 
 	// Suppress warnings from this method from polluting the front-end.
 	// @codingStandardsIgnoreStart
-	if ( ! @$dom->loadHTML( mb_convert_encoding( $block_content, 'HTML-ENTITIES', 'UTF-8' ), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
+	if ( ! @$dom->loadHTML( $wrapper_left . $block_content . $wrapper_right , LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
 	// @codingStandardsIgnoreEnd
 		return $block_content;
 	}
 
 	$xpath      = new DOMXPath( $dom );
-	$block_root = $xpath->query( '/*' )[0];
+	$block_root = $xpath->query( '/html/body/*' )[0];
 
 	if ( empty( $block_root ) ) {
 		return $block_content;
@@ -86,7 +90,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		$block_root->setAttribute( 'style', esc_attr( implode( '; ', $new_styles ) . ';' ) );
 	}
 
-	return mb_convert_encoding( $dom->saveHtml(), 'UTF-8', 'HTML-ENTITIES' );
+	return str_replace( array( $wrapper_left, $wrapper_right ), '', $dom->saveHtml() );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 
