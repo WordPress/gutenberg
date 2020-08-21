@@ -46,34 +46,50 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 	 *               total count for the matching search results.
 	 */
 	public function search_items( WP_REST_Request $request ) {
-		$term_search = '';
-		if ( ! empty( $request['search'] ) ) {
-			$term_search = $request['search'];
-		}
-
-		$term_search = apply_filters( 'rest_term_search_query', $term_search, $request );
-
 		$taxonomies = $request[ WP_REST_Search_Controller::PROP_SUBTYPE ];
 		if ( in_array( WP_REST_Search_Controller::TYPE_ANY, $taxonomies, true ) ) {
 			$taxonomies = $this->subtypes;
 		}
 
-		$terms = get_terms(
-			array(
-				'taxonomy'   => $taxonomies,
-				'name__like' => $term_search,
-				'hide_empty' => false,
-			)
+		$page     = (int) $request['page'];
+		$per_page = (int) $request['per_page'];
+
+		$query_args = array(
+			'taxonomy'   => $taxonomies,
+			'hide_empty' => false,
+			'offset'     => ( $page - 1 ) * $per_page,
+			'number'     => $per_page,
+			'fields'     => 'ids',
 		);
 
-		$found_ids = array();
-		foreach ( $terms as $term ) {
-			$found_ids[] = $term->term_id;
+		if ( ! empty( $request['search'] ) ) {
+			$query_args['name__like'] = $request['search'];
 		}
+
+		/**
+		 * Filters the query arguments for a search request.
+		 *
+		 * Enables adding extra arguments or setting defaults for a term search request.
+		 *
+		 * @since 5.1.0
+		 *
+		 * @param array           $query_args Key value array of query var to query value.
+		 * @param WP_REST_Request $request    The request used.
+		 */
+		$query_args = apply_filters( 'rest_term_search_query', $query_args, $request );
+
+		$query = new WP_Term_Query();
+
+		$found_ids = $query->query( $query_args );
+
+		unset( $query_args['offset'], $query_args['number'] );
+		$query_args['fields'] = 'count';
+
+		$total = (int) $query->query( $query_args );
 
 		return array(
 			self::RESULT_IDS   => $found_ids,
-			self::RESULT_TOTAL => count( $found_ids ),
+			self::RESULT_TOTAL => $total,
 		);
 	}
 
