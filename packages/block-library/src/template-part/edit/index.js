@@ -30,7 +30,12 @@ export default function TemplatePartEdit( {
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part
 	// content loading.
-	const { isNavigationMode, parentId, innerBlocks } = useSelect(
+	const {
+		isNavigationMode,
+		parentId,
+		innerBlocks,
+		selectedBlockClientId,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlocks,
@@ -43,12 +48,13 @@ export default function TemplatePartEdit( {
 			// means that the parent should be the same for all
 			// multi-selected blocks. We arbitrarily select the first
 			// multi-selected block.
-			const selectedBlockClientId = getSelectionStart()?.clientId;
+			const _selectedBlockClientId = getSelectionStart()?.clientId;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isNavigationMode: _isNavigationMode,
-				parentId: getBlockParent( selectedBlockClientId ),
+				parentId: getBlockParent( _selectedBlockClientId ),
+				selectedBlockClientId: _selectedBlockClientId,
 			};
 		},
 		[ clientId ]
@@ -87,7 +93,11 @@ export default function TemplatePartEdit( {
 				</BlockControls>
 				<div className="wp-block-template-part__container">
 					{ shouldDisplayLabel && (
-						<TemplatePartLabel postId={ postId } slug={ slug } />
+						<TemplatePartLabel
+							postId={ postId }
+							slug={ slug }
+							selectedBlockClientId={ selectedBlockClientId }
+						/>
 					) }
 					<TemplatePartInnerBlocks
 						postId={ postId }
