@@ -2,15 +2,11 @@
 /**
  * REST API: WP_REST_Post_Format_Search_Handler class
  *
- * @package WordPress
- * @subpackage REST_API
- * @since 5.5.0
+ * @package Gutenberg
  */
 
 /**
  * Core class representing a search handler for post formats in the REST API.
- *
- * @since 5.5.0
  *
  * @see WP_REST_Search_Handler
  */
@@ -18,8 +14,6 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 
 	/**
 	 * Constructor.
-	 *
-	 * @since 5.0.0
 	 */
 	public function __construct() {
 		$this->type = 'post-format';
@@ -27,8 +21,6 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 
 	/**
 	 * Searches the object type content for a given search request.
-	 *
-	 * @since 5.0.0
 	 *
 	 * @param WP_REST_Request $request Full REST request.
 	 * @return array Associative array containing an `WP_REST_Search_Handler::RESULT_IDS` containing
@@ -68,8 +60,6 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 	/**
 	 * Prepares the search result for a given ID.
 	 *
-	 * @since 5.0.0
-	 *
 	 * @param int   $id     Item ID.
 	 * @param array $fields Fields to include for the item.
 	 * @return array Associative array containing all fields for the item.
@@ -102,14 +92,11 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 	}
 
 	/**
-	 * Prepares links for the search result of a given ID.
+	 * Prepares links for the search result.
 	 *
-	 * @since 5.0.0
-	 *
-	 * @param int $id Item ID.
 	 * @return array Links for the given item.
 	 */
-	public function prepare_item_links( $id ) {
+	public function prepare_item_links() {
 		return array();
 	}
 
