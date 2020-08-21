@@ -476,7 +476,7 @@ export default function Image( {
 						width: parseInt( currentWidth + delta.width, 10 ),
 						height: parseInt( currentHeight + delta.height, 10 ),
 					} );
-					__unstableMarkLastChangeAsPersistent();
+					markLastChangeAsPersistent();
 				} }
 			>
 				{ img }
