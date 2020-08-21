@@ -105,7 +105,7 @@ export default function Image( {
 	} );
 	const {
 		toggleSelection,
-		__unstableMarkLastChangeAsPersistent,
+		__unstableMarkLastChangeAsPersistent: markLastChangeAsPersistent,
 	} = useDispatch( 'core/block-editor' );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		'core/notices'
