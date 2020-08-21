@@ -21,7 +21,7 @@ function gutenberg_is_block_editor() {
 		(
 			$screen->is_block_editor() ||
 			'gutenberg_page_gutenberg-widgets' === $screen->id ||
-			gutenberg_is_edit_site_page( $screen->id )
+			( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $screen->id ) )
 		);
 }
 
@@ -105,29 +105,37 @@ add_action( 'admin_footer-widgets.php', 'gutenberg_print_save_widgets_nonce' );
  */
 function gutenberg_get_legacy_widget_settings() {
 	$settings = array();
+
 	/**
-	 * TODO: The hardcoded array should be replaced with a mechanism to allow
-	 * core and third party blocks to specify they already have equivalent
-	 * blocks, and maybe even allow them to have a migration function.
+	 * Filters the list of widget classes that should **not** be offered by the legacy widget block.
+	 *
+	 * Returning an empty array will make all the widgets available.
+	 *
+	 * @param array $widgets An array of excluded widgets classnames.
+	 *
+	 * @since 5.6.0
 	 */
-	$core_widgets = array(
-		'WP_Widget_Pages',
-		'WP_Widget_Calendar',
-		'WP_Widget_Archives',
-		'WP_Widget_Media_Audio',
-		'WP_Widget_Media_Image',
-		'WP_Widget_Media_Gallery',
-		'WP_Widget_Media_Video',
-		'WP_Widget_Meta',
-		'WP_Widget_Search',
-		'WP_Widget_Text',
-		'WP_Widget_Categories',
-		'WP_Widget_Recent_Posts',
-		'WP_Widget_Recent_Comments',
-		'WP_Widget_RSS',
-		'WP_Widget_Tag_Cloud',
-		'WP_Nav_Menu_Widget',
-		'WP_Widget_Custom_HTML',
+	$widgets_to_exclude_from_legacy_widget_block = apply_filters(
+		'widgets_to_exclude_from_legacy_widget_block',
+		array(
+			'WP_Widget_Pages',
+			'WP_Widget_Calendar',
+			'WP_Widget_Archives',
+			'WP_Widget_Media_Audio',
+			'WP_Widget_Media_Image',
+			'WP_Widget_Media_Gallery',
+			'WP_Widget_Media_Video',
+			'WP_Widget_Meta',
+			'WP_Widget_Search',
+			'WP_Widget_Text',
+			'WP_Widget_Categories',
+			'WP_Widget_Recent_Posts',
+			'WP_Widget_Recent_Comments',
+			'WP_Widget_RSS',
+			'WP_Widget_Tag_Cloud',
+			'WP_Nav_Menu_Widget',
+			'WP_Widget_Custom_HTML',
+		)
 	);
 
 	$has_permissions_to_manage_widgets = current_user_can( 'edit_theme_options' );
@@ -137,6 +145,7 @@ function gutenberg_get_legacy_widget_settings() {
 		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
 			$available_legacy_widgets[ $class ] = array(
 				'name'              => html_entity_decode( $widget_obj->name ),
+				'id_base'           => $widget_obj->id_base,
 				// wp_widget_description is not being used because its input parameter is a Widget Id.
 				// Widgets id's reference to a specific widget instance.
 				// Here we are iterating on all the available widget classes even if no widget instance exists for them.
@@ -144,7 +153,7 @@ function gutenberg_get_legacy_widget_settings() {
 					html_entity_decode( $widget_obj->widget_options['description'] ) :
 					null,
 				'isReferenceWidget' => false,
-				'isHidden'          => in_array( $class, $core_widgets, true ),
+				'isHidden'          => in_array( $class, $widgets_to_exclude_from_legacy_widget_block, true ),
 			);
 		}
 	}
@@ -242,8 +251,6 @@ function gutenberg_create_wp_area_post_type() {
 	);
 }
 add_action( 'init', 'gutenberg_create_wp_area_post_type' );
-
-add_filter( 'sidebars_widgets', 'Experimental_WP_Widget_Blocks_Manager::swap_out_sidebars_blocks_for_block_widgets' );
 
 /**
  * Function to enqueue admin-widgets as part of the block editor assets.

@@ -3,6 +3,7 @@
  */
 import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { BlockControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,7 +17,6 @@ export default function TemplatePartEdit( {
 	attributes: { postId: _postId, slug, theme },
 	setAttributes,
 	clientId,
-	isSelected,
 } ) {
 	const initialPostId = useRef( _postId );
 	const initialSlug = useRef( slug );
@@ -29,18 +29,11 @@ export default function TemplatePartEdit( {
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part
 	// content loading.
-	const { innerBlocks, hasSelectedInnerBlock } = useSelect(
+	const { innerBlocks } = useSelect(
 		( select ) => {
-			const {
-				getBlocks,
-				hasSelectedInnerBlock: getHasSelectedInnerBlock,
-			} = select( 'core/block-editor' );
+			const { getBlocks } = select( 'core/block-editor' );
 			return {
 				innerBlocks: getBlocks( clientId ),
-				hasSelectedInnerBlock: getHasSelectedInnerBlock(
-					clientId,
-					true
-				),
 			};
 		},
 		[ clientId ]
@@ -68,12 +61,12 @@ export default function TemplatePartEdit( {
 		// Part of a template file, post ID already resolved.
 		return (
 			<>
-				{ ( isSelected || hasSelectedInnerBlock ) && (
+				<BlockControls>
 					<TemplatePartNamePanel
 						postId={ postId }
 						setAttributes={ setAttributes }
 					/>
-				) }
+				</BlockControls>
 				<TemplatePartInnerBlocks
 					postId={ postId }
 					hasInnerBlocks={ innerBlocks.length > 0 }

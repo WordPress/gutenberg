@@ -50,14 +50,12 @@ import { ViewerFill } from './viewer-slot';
  * @property {string} title Human-readable label to show in user interface.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Properties associated with a link control value, composed as a union of the
  * default properties and any custom settings values.
  *
  * @typedef {WPLinkControlDefaultValue&WPLinkControlSettingsValue} WPLinkControlValue
  */
-/* eslint-enable */
 
 /** @typedef {(nextValue:WPLinkControlValue)=>void} WPLinkControlOnChangeProp */
 

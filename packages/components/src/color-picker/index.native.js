@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback, Platform } from 'react-native';
+import React from 'react';
 import HsvColorPicker from 'react-native-hsv-color-picker';
 import tinycolor from 'tinycolor2';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -19,23 +20,27 @@ import styles from './style.scss';
 
 function ColorPicker( {
 	shouldEnableBottomSheetScroll,
-	shouldDisableBottomSheetMaxHeight,
+	shouldEnableBottomSheetMaxHeight,
 	isBottomSheetContentScrolling,
 	setColor,
 	activeColor,
 	isGradientColor,
 	onNavigationBack,
-	onCloseBottomSheet,
+	onHandleClosingBottomSheet,
 	onBottomSheetClosed,
-	onHardwareButtonPress,
+	onHandleHardwareButtonPress,
 	bottomLabelText,
 } ) {
+	const didMount = useRef( false );
 	const isIOS = Platform.OS === 'ios';
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
-
-	const [ hue, setHue ] = useState( 0 );
-	const [ sat, setSaturation ] = useState( 0.5 );
-	const [ val, setValue ] = useState( 0.5 );
+	const { h: initH, s: initS, v: initV } =
+		! isGradientColor && activeColor
+			? tinycolor( activeColor ).toHsv()
+			: { h: 0, s: 0.5, v: 0.5 };
+	const [ hue, setHue ] = useState( initH );
+	const [ sat, setSaturation ] = useState( initS );
+	const [ val, setValue ] = useState( initV );
 	const [ savedColor ] = useState( activeColor );
 
 	const {
@@ -71,32 +76,24 @@ function ColorPicker( {
 		`hsv ${ hue } ${ sat } ${ val }`
 	).toHexString();
 
-	function setHSVFromHex( color ) {
-		const { h, s, v } = tinycolor( color ).toHsv();
-
-		setHue( h );
-		setSaturation( s );
-		setValue( v );
-	}
-
 	useEffect( () => {
+		if ( ! didMount.current ) {
+			didMount.current = true;
+			return;
+		}
 		setColor( currentColor );
 	}, [ currentColor ] );
 
 	useEffect( () => {
-		if ( ! isGradientColor && activeColor ) {
-			setHSVFromHex( activeColor );
-		}
-		setColor( activeColor );
-		shouldDisableBottomSheetMaxHeight( false );
-		onCloseBottomSheet( () => {
+		shouldEnableBottomSheetMaxHeight( false );
+		onHandleClosingBottomSheet( () => {
 			setColor( savedColor );
 			if ( onBottomSheetClosed ) {
 				onBottomSheetClosed();
 			}
 		} );
-		if ( onHardwareButtonPress ) {
-			onHardwareButtonPress( onButtonPress );
+		if ( onHandleHardwareButtonPress ) {
+			onHandleHardwareButtonPress( onButtonPress );
 		}
 	}, [] );
 
@@ -111,8 +108,8 @@ function ColorPicker( {
 
 	function onButtonPress( action ) {
 		onNavigationBack();
-		onCloseBottomSheet( null );
-		shouldDisableBottomSheetMaxHeight( true );
+		onHandleClosingBottomSheet( null );
+		shouldEnableBottomSheetMaxHeight( true );
 		setColor( action === 'apply' ? currentColor : savedColor );
 		if ( onBottomSheetClosed ) {
 			onBottomSheetClosed();

@@ -56,6 +56,14 @@ $tree-item-height: 36px;
 		margin-right: 6px;
 	}
 
+	&.is-selected .block-editor-block-icon svg,
+	&.is-selected:focus .block-editor-block-icon svg {
+		color: $white;
+		background: $gray-900;
+		box-shadow: 0 0 0 $border-width $gray-900;
+		border-radius: $border-width;
+	}
+
 	.block-editor-block-navigation-block__menu-cell,
 	.block-editor-block-navigation-block__mover-cell,
 	.block-editor-block-navigation-block__contents-cell {

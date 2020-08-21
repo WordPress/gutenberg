@@ -130,7 +130,7 @@ async function configureWordPress( environment, config, spinner ) {
 		[
 			'sh',
 			'-c',
-			'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php',
+			'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php && chmod 777 /var/www/html/phpunit-wp-config.php',
 		],
 		{
 			config: config.dockerComposeConfigPath,

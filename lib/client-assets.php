@@ -120,7 +120,7 @@ function gutenberg_override_translation_file( $file, $handle ) {
 	}
 
 	// Ignore scripts that are not found in the expected `build/` location.
-	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.min.js';
+	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.js';
 	if ( ! file_exists( $script_path ) ) {
 		return $file;
 	}
@@ -208,6 +208,20 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
 function gutenberg_register_vendor_scripts( $scripts ) {
 	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
+	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+	gutenberg_register_vendor_script(
+		$scripts,
+		'react',
+		'https://unpkg.com/react@16.13.1/umd/react' . $react_suffix . '.js',
+		array( 'wp-polyfill' )
+	);
+	gutenberg_register_vendor_script(
+		$scripts,
+		'react-dom',
+		'https://unpkg.com/react-dom@16.13.1/umd/react-dom' . $react_suffix . '.js',
+		array( 'react' )
+	);
+
 	/*
 	 * This script registration and the corresponding function should be removed
 	 * once the plugin is updated to support WordPress 5.4.0 and newer.
@@ -235,6 +249,19 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		array(),
 		'3.42.0'
 	);
+
+	/*
+	 * This script registration and the corresponding function should be removed
+	 * removed once the plugin is updated to support WordPress 5.6.0 and newer.
+	 */
+	gutenberg_register_vendor_script(
+		$scripts,
+		'lodash',
+		'https://unpkg.com/lodash@4.17.19/lodash.js',
+		array(),
+		'4.17.19',
+		true
+	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
@@ -247,9 +274,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_packages_scripts( $scripts ) {
-	foreach ( glob( gutenberg_dir_path() . 'build/*/index.min.js' ) as $path ) {
+	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
-		// For example, `…/build/a11y/index.min.js` becomes `wp-a11y`.
+		// For example, `…/build/a11y/index.js` becomes `wp-a11y`.
 		$handle = 'wp-' . basename( dirname( $path ) );
 
 		// Replace `.js` extension with `.asset.php` to find the generated dependencies file.

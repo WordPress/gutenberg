@@ -47,6 +47,9 @@
 }
 
 .wp-block-latest-posts__featured-image {
+	a {
+		display: inline-block;
+	}
 	img {
 		height: auto;
 		width: auto;
@@ -65,6 +68,14 @@
 	}
 }
 
-.edit-post-visual-editor .wp-block-latest-posts.is-grid li {
-	margin-bottom: 20px;
+.block-editor-image-alignment-control__row {
+	.components-base-control__field {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		.components-base-control__label {
+			margin-bottom: 0;
+		}
+	}
 }

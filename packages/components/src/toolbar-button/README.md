@@ -1,19 +1,52 @@
 # ToolbarButton
 
-A ToolbarButton can be used to add actions to your block control, usually inside a ToolbarGroup. It has similar features to the [Button](/packages/components/src/button/README.md) component. Using `ToolbarButton` will ensure the correct styling for a button in a toolbar, and also that keyboard interactions in a toolbar are consistent with the [WAI ARIA toolbar pattern](https://www.w3.org/TR/wai-aria-practices/#toolbar).
+ToolbarButton can be used to add actions to a toolbar, usually inside a [Toolbar](/packages/components/src/toolbar/README.md) or [ToolbarGroup](/packages/components/src/toolbar-group/README.md) when used to create general interfaces. If you're using it to add controls to your custom block, you should consider using [BlockControls](/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md).
+
+It has similar features to the [Button](/packages/components/src/button/README.md) component. Using `ToolbarButton` will ensure the correct styling for a button in a toolbar, and also that keyboard interactions in a toolbar are consistent with the [WAI-ARIA toolbar pattern](https://www.w3.org/TR/wai-aria-practices/#toolbar).
 
 ## Usage
 
+To create general interfaces, you'll want to render ToolbarButton in a [Toolbar](/packages/components/src/toolbar/README.md) component.
+
 ```jsx
-import { ToolbarButton } from "@wordpress/components";
-import { edit } from "@wordpress/icons";
- 
-const MyToolbarButton = () => (
-    <MyToolbarButton
-        title="Edit"
-        icon={ edit }
-        onClick={ onEdit } />
-);
+import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { edit } from '@wordpress/icons';
+
+function MyToolbar() {
+	return (
+		<Toolbar label="Options">
+			<ToolbarButton
+				icon={ edit }
+				label="Edit"
+				onClick={ () => alert( 'Editing' ) }
+			/>
+		</Toolbar>
+	);
+}
+```
+
+### Inside BlockControls
+
+If you're working on a custom block and you want to add controls to the block toolbar, you should use [BlockControls](/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md) instead. Optinally wrapping it with [ToolbarGroup](/packages/components/src/toolbar-group/README.md).
+
+```jsx
+import { BlockControls } from '@wordpress/block-editor';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import { edit } from '@wordpress/icons';
+
+function Edit() {
+	return (
+		<BlockControls>
+			<ToolbarGroup>
+				<ToolbarButton
+					icon={ edit }
+					label="Edit"
+					onClick={ () => alert( 'Editing' ) }
+				/>
+			</ToolbarGroup>
+		</BlockControls>
+	);
+}
 ```
 
 ## Props

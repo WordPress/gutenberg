@@ -25,7 +25,7 @@ import {
 	InterfaceSkeleton,
 	ComplementaryArea,
 } from '@wordpress/interface';
-import { EntitiesSavedStates } from '@wordpress/editor';
+import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
 import { close } from '@wordpress/icons';
@@ -57,7 +57,9 @@ function Editor() {
 		page,
 		template,
 		select,
+		hasDirtyEntityRecords,
 	} = useSelect( ( _select ) => {
+		const { __experimentalGetDirtyEntityRecords } = _select( 'core' );
 		const {
 			isFeatureActive,
 			__experimentalGetPreviewDeviceType,
@@ -96,6 +98,8 @@ function Editor() {
 				: null,
 			select: _select,
 			entityId: _entityId,
+			hasDirtyEntityRecords: () =>
+				__experimentalGetDirtyEntityRecords().length > 0,
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
@@ -117,10 +121,12 @@ function Editor() {
 				const { getEditedEntityRecord } = select( 'core' );
 				entitiesToSave.forEach( ( { kind, name, key } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
-					editEntityRecord( kind, name, key, {
-						status: 'publish',
-						title: record.slug,
-					} );
+
+					const edits = record.slug
+						? { status: 'publish', title: record.slug }
+						: { status: 'publish' };
+
+					editEntityRecord( kind, name, key, edits );
 				} );
 			}
 			setIsEntitiesSavedStatesOpen( false );
@@ -157,6 +163,7 @@ function Editor() {
 		<>
 			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
+			<UnsavedChangesWarning isDirty={ hasDirtyEntityRecords } />
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<EntityProvider kind="root" type="site">

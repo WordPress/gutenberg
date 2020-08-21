@@ -63,7 +63,7 @@ function render_block_core_template_part( $attributes ) {
 	}
 	$content = do_shortcode( $content );
 
-	return '<div class="wp-block-template-part">' . str_replace( ']]>', ']]&gt;', $content ) . '</div>';
+	return '<div>' . str_replace( ']]>', ']]&gt;', $content ) . '</div>';
 }
 
 /**

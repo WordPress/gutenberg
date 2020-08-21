@@ -7,12 +7,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
 	RichText,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -54,14 +54,6 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 			} );
 		} );
 	}
-
-	const classNames = useMemo( () => {
-		return {
-			block: classnames( 'wp-block-post-author', {
-				[ `has-text-align-${ textAlign }` ]: textAlign,
-			} ),
-		};
-	}, [ textAlign ] );
 
 	return (
 		<>
@@ -120,7 +112,11 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 
-			<div className={ classNames.block }>
+			<Block.div
+				className={ classnames( {
+					[ `has-text-align-${ textAlign }` ]: textAlign,
+				} ) }
+			>
 				{ showAvatar && authorDetails && (
 					<div className="wp-block-post-author__avatar">
 						<img
@@ -155,7 +151,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						</p>
 					) }
 				</div>
-			</div>
+			</Block.div>
 		</>
 	);
 }

@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Dropdown, MenuGroup, MenuItem } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
@@ -17,27 +18,30 @@ export default function PreviewOptions( {
 	deviceType,
 	setDeviceType,
 } ) {
+	const isMobile = useViewportMatch( 'small', '<' );
+	if ( isMobile ) return null;
+
+	const popoverProps = {
+		className: classnames(
+			className,
+			'block-editor-post-preview__dropdown-content'
+		),
+		position: 'bottom left',
+	};
+	const toggleProps = {
+		isTertiary: true,
+		className: 'block-editor-post-preview__button-toggle',
+		disabled: ! isEnabled,
+		children: __( 'Preview' ),
+	};
 	return (
-		<Dropdown
+		<DropdownMenu
 			className="block-editor-post-preview__dropdown"
-			contentClassName={ classnames(
-				className,
-				'block-editor-post-preview__dropdown-content'
-			) }
-			popoverProps={ { role: 'menu' } }
-			position="bottom left"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					isTertiary
-					onClick={ onToggle }
-					className="block-editor-post-preview__button-toggle"
-					aria-expanded={ isOpen }
-					disabled={ ! isEnabled }
-				>
-					{ __( 'Preview' ) }
-				</Button>
-			) }
-			renderContent={ () => (
+			popoverProps={ popoverProps }
+			toggleProps={ toggleProps }
+			icon={ null }
+		>
+			{ () => (
 				<>
 					<MenuGroup>
 						<MenuItem
@@ -65,6 +69,6 @@ export default function PreviewOptions( {
 					{ children }
 				</>
 			) }
-		/>
+		</DropdownMenu>
 	);
 }

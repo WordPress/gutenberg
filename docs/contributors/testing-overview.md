@@ -432,10 +432,18 @@ THROTTLE_CPU=4 npm run test-e2e
 Related: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
 
 ```
-DOWNLOAD_THROUGHPUT=125000 npm run test-e2e
+SLOW_NETWORK=true npm run test-e2e
 ```
 
-`DOWNLOAD_THROUGHPUT` is a numeric value representing bytes-per-second network download (in this example, a 1Mbps download speed).
+`SLOW_NETWORK` emulates a network speed equivalent to "Fast 3G" in the Chrome devtools.
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions and https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274
+
+```
+OFFLINE=true npm run test-e2e
+```
+
+`OFFLINE` emulates network disconnection.
 
 Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
 
@@ -450,6 +458,8 @@ Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If yo
 ```bash
 npm run test-php
 ```
+
+_Note: The phpunit commands require `wp-env` to be running and composer dependencies to be installed. The package script will start wp-env for you if it is not already running._
 
 Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint-php`.
 

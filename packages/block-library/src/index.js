@@ -134,8 +134,6 @@ export const registerCoreBlocks = () => {
 		column,
 		cover,
 		embed,
-		...embed.common,
-		...embed.others,
 		file,
 		group,
 		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context

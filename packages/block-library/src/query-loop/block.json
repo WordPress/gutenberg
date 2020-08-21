@@ -8,6 +8,7 @@
 	],
 	"supports": {
 		"reusable": false,
+		"lightBlockWrapper": true,
 		"html": false
 	}
 }

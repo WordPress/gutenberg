@@ -93,6 +93,7 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
+	__experimentalRenderCallback: renderCallback,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -149,7 +150,8 @@ function BlockListBlock( {
 		{
 			'wp-block': ! isAligned,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			'is-selected': isSelected,
+			// Don't select the item while dragging.
+			'is-selected': isSelected && ! isDragging,
 			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
@@ -159,7 +161,8 @@ function BlockListBlock( {
 			'is-focused':
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
-			'has-child-selected': isAncestorOfSelectedBlock,
+			// Don't select child while dragging.
+			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 		},
 		className
 	);
@@ -197,10 +200,6 @@ function BlockListBlock( {
 		);
 	}
 
-	if ( mode !== 'visual' ) {
-		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
-	}
-
 	const value = {
 		clientId,
 		rootClientId,
@@ -219,33 +218,40 @@ function BlockListBlock( {
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
+	let block;
+
+	if ( ! isValid ) {
+		block = (
+			<Block.div>
+				<BlockInvalidWarning clientId={ clientId } />
+				<div>{ getSaveElement( blockType, attributes ) }</div>
+			</Block.div>
+		);
+	} else if ( mode === 'html' ) {
+		// Render blockEdit so the inspector controls don't disappear.
+		// See #8969.
+		block = (
+			<>
+				<div style={ { display: 'none' } }>{ blockEdit }</div>
+				<Block.div __unstableIsHtml>
+					<BlockHtml clientId={ clientId } />
+				</Block.div>
+			</>
+		);
+	} else if ( lightBlockWrapper ) {
+		block = blockEdit;
+	} else {
+		block = <Block.div { ...wrapperProps }>{ blockEdit }</Block.div>;
+	}
+
+	if ( renderCallback ) {
+		block = renderCallback( block );
+	}
+
 	return (
 		<BlockListBlockContext.Provider value={ memoizedValue }>
 			<BlockCrashBoundary onError={ onBlockError }>
-				{ isValid && lightBlockWrapper && (
-					<>
-						{ blockEdit }
-						{ mode === 'html' && (
-							<Block.div __unstableIsHtml>
-								<BlockHtml clientId={ clientId } />
-							</Block.div>
-						) }
-					</>
-				) }
-				{ isValid && ! lightBlockWrapper && (
-					<Block.div { ...wrapperProps }>
-						{ blockEdit }
-						{ mode === 'html' && (
-							<BlockHtml clientId={ clientId } />
-						) }
-					</Block.div>
-				) }
-				{ ! isValid && (
-					<Block.div>
-						<BlockInvalidWarning clientId={ clientId } />
-						<div>{ getSaveElement( blockType, attributes ) }</div>
-					</Block.div>
-				) }
+				{ block }
 			</BlockCrashBoundary>
 			{ !! hasError && (
 				<Block.div>

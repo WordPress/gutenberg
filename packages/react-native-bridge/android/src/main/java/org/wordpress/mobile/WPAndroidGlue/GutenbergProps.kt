@@ -28,9 +28,9 @@ data class GutenbergProps @JvmOverloads constructor(
             putBoolean(PROP_CAPABILITIES_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled)
         })
 
-        editorTheme?.also {
-            getSerializable(PROP_COLORS)?.let { putSerializable(PROP_COLORS, it) }
-            getSerializable(PROP_GRADIENTS)?.let { putSerializable(PROP_GRADIENTS, it) }
+        editorTheme?.also { theme ->
+            theme.getSerializable(PROP_COLORS)?.let { putSerializable(PROP_COLORS, it) }
+            theme.getSerializable(PROP_GRADIENTS)?.let { putSerializable(PROP_GRADIENTS, it) }
         }
     }
 

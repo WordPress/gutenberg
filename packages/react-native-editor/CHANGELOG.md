@@ -11,10 +11,20 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.35.0
+
+* [***] Fixed empty text fields on RTL layout. Now they are selectable and placeholders are visible.
+* [**] Add settings to allow changing column widths
+* [**] Media editing support in Gallery block.
+
 ## 1.34.0
 
 * [***] Media editing support in Cover block.
 * [*] Fixed a bug on the Heading block, where a heading with a link and string formatting showed a white shadow in dark mode.
+
+## 1.33.1
+
+* Fixed a bug in the @-mentions feature where dismissing the @-mentions UI removed the @ character from the post.
 
 ## 1.33.0
 

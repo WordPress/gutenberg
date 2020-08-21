@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+- The `UnsavedChangesWarning` component now accepts a required `isDirty` prop. Making it less tightly coupled so we can reuse it for site editing.
+
 ## 9.4.0 (2019-06-12)
 
 ### Deprecations
