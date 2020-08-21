@@ -28,31 +28,45 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 	 *               total count for the matching search results.
 	 */
 	public function search_items( WP_REST_Request $request ) {
+		$format_strings = get_post_format_strings();
+		$format_slugs   = array_keys( $format_strings );
 
-		$formats         = get_post_format_strings();
-		$format_fake_ids = array_keys( $formats );
-
+		$query = '';
 		if ( ! empty( $request['search'] ) ) {
-			$format_search = $request['search'];
+			$query = $request['search'];
 		}
 
-		$format_search = apply_filters( 'rest_post_format_search_query', $format_search, $request );
+		/**
+		 * Filters the post format search query.
+		 *
+		 * @param string          $query   Search query.
+		 * @param WP_REST_Request $request The request used.
+		 */
+		$query = apply_filters( 'rest_post_format_search_query', $query, $request );
 
 		$found_ids = array();
-		foreach ( $format_fake_ids as $format_fake_id => $format_slug ) {
-			$format_title       = $formats[ $format_slug ];
-			$format_slug_match  = stripos( $format_slug, $format_search ) !== false;
-			$format_title_match = stripos( $format_title, $format_search ) !== false;
-			if ( $format_slug_match || $format_title_match ) {
-				$format_index_url = get_post_format_link( $format_fake_ids[ $format_fake_id ] );
-				if ( $format_index_url ) {
-					$found_ids[] = $format_fake_id;
+		foreach ( $format_slugs as $index => $format_slug ) {
+			if ( ! empty( $query ) ) {
+				$format_string       = get_post_format_string( $format_slug );
+				$format_slug_match   = stripos( $format_slug, $query ) !== false;
+				$format_string_match = stripos( $format_string, $query ) !== false;
+				if ( ! $format_slug_match && ! $format_string_match ) {
+					continue;
 				}
+			}
+
+			$format_link = get_post_format_link( $format_slug );
+			if ( $format_link ) {
+				// Formats don't have an ID, so fake one using the array index.
+				$found_ids[] = $index + 1;
 			}
 		}
 
+		$page     = (int) $request['page'];
+		$per_page = (int) $request['per_page'];
+
 		return array(
-			self::RESULT_IDS   => $found_ids,
+			self::RESULT_IDS   => array_slice( $found_ids, ( $page - 1 ) * $per_page, $per_page ),
 			self::RESULT_TOTAL => count( $found_ids ),
 		);
 	}
@@ -65,10 +79,9 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 	 * @return array Associative array containing all fields for the item.
 	 */
 	public function prepare_item( $id, array $fields ) {
-		$formats          = get_post_format_strings();
-		$format_fake_ids  = array_keys( $formats );
-		$format           = $formats[ $format_fake_ids[ $id ] ];
-		$format_index_url = get_post_format_link( $format_fake_ids[ $id ] );
+		$format_strings = get_post_format_strings();
+		$format_slugs   = array_keys( $format_strings );
+		$format_slug    = $format_slugs[ $id - 1 ];
 
 		$data = array();
 
@@ -77,11 +90,11 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 		}
 
 		if ( in_array( WP_REST_Search_Controller::PROP_TITLE, $fields, true ) ) {
-			$data[ WP_REST_Search_Controller::PROP_TITLE ] = $format;
+			$data[ WP_REST_Search_Controller::PROP_TITLE ] = get_post_format_string( $format_slug );
 		}
 
 		if ( in_array( WP_REST_Search_Controller::PROP_URL, $fields, true ) ) {
-			$data[ WP_REST_Search_Controller::PROP_URL ] = $format_index_url;
+			$data[ WP_REST_Search_Controller::PROP_URL ] = get_post_format_link( $format_slug );
 		}
 
 		if ( in_array( WP_REST_Search_Controller::PROP_TYPE, $fields, true ) ) {
@@ -94,9 +107,10 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 	/**
 	 * Prepares links for the search result.
 	 *
+	 * @param string $id Item ID.
 	 * @return array Links for the given item.
 	 */
-	public function prepare_item_links() {
+	public function prepare_item_links( $id ) {
 		return array();
 	}
 
