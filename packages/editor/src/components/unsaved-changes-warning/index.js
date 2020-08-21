@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 class UnsavedChangesWarning extends Component {
 	constructor() {
@@ -28,10 +29,6 @@ class UnsavedChangesWarning extends Component {
 	warnIfUnsavedChanges( event ) {
 		const { isDirty } = this.props;
 
-		// We need to call the selector directly in the listener to avoid race
-		// conditions with `BrowserURL` where `componentDidUpdate` gets the
-		// new value of `isEditedPostDirty` before this component does,
-		// causing this component to incorrectly think a trashed post is still dirty.
 		if ( isDirty() ) {
 			event.returnValue = __(
 				'You have unsaved changes. If you proceed, they will be lost.'
@@ -45,4 +42,14 @@ class UnsavedChangesWarning extends Component {
 	}
 }
 
-export default UnsavedChangesWarning;
+export default withSelect( ( select ) => ( {
+	// We need to call the selector directly in the listener to avoid race
+	// conditions with `BrowserURL` where `componentDidUpdate` gets the
+	// new value of `isEditedPostDirty` before this component does,
+	// causing this component to incorrectly think a trashed post is still dirty.
+	isDirty: () => {
+		const { __experimentalGetDirtyEntityRecords } = select( 'core' );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		return dirtyEntityRecords.length > 0;
+	},
+} ) )( UnsavedChangesWarning );
