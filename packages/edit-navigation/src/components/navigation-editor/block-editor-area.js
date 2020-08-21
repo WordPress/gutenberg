@@ -100,7 +100,7 @@ export default function BlockEditorArea( {
 					{ __( 'Save navigation' ) }
 				</Button>
 				<Dropdown
-					className="edit-navigation-block-inspector"
+					className="edit-navigation-editor__block-inspector"
 					position="bottom right"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
