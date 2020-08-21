@@ -110,7 +110,7 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 	 * @param string $id Item ID.
 	 * @return array Links for the given item.
 	 */
-	public function prepare_item_links( $id ) {
+	public function prepare_item_links( $id ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return array();
 	}
 
