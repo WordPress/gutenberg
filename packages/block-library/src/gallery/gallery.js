@@ -46,7 +46,7 @@ export const Gallery = ( props ) => {
 				allowedBlocks={ [ 'core/image' ] }
 				__experimentalTagName="ul"
 				__experimentalItemCallback={ ( item ) => (
-					<li class="wp-block-gallery__image">{ item }</li>
+					<li className="wp-block-gallery__image">{ item }</li>
 				) }
 			></InnerBlocks>
 

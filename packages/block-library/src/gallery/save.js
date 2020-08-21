@@ -30,7 +30,7 @@ export default function save( { attributes } ) {
 			<ul>
 				<InnerBlocks.Content
 					__experimentalItemCallback={ ( item ) => (
-						<li class="wp-block-gallery__image">{ item }</li>
+						<li className="wp-block-gallery__image">{ item }</li>
 					) }
 				/>
 			</ul>
