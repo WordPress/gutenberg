@@ -43,7 +43,7 @@ function disableInsertingNonNavigationBlocks( settings, name ) {
  * @param {number} perPage
  * @return {Promise<Object[]>} List of suggestions
  */
-async function fetchLinkSuggestions( search, { perPage = 20 } = {} ) {
+function fetchLinkSuggestions( search, { perPage = 20 } = {} ) {
 	const posts = apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
@@ -69,11 +69,11 @@ async function fetchLinkSuggestions( search, { perPage = 20 } = {} ) {
 	} );
 
 	return Promise.all( [ posts, terms, formats ] ).then( ( results ) => {
-		return map( flatten( results ), ( post ) => ( {
-			id: post.id,
-			url: post.url,
-			title: decodeEntities( post.title ) || __( '(no title)' ),
-			type: post.subtype || post.type,
+		return map( flatten( results ), ( result ) => ( {
+			id: result.id,
+			url: result.url,
+			title: decodeEntities( result.title ) || __( '(no title)' ),
+			type: result.subtype || result.type,
 		} ) );
 	} );
 }
