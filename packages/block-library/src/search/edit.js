@@ -18,6 +18,7 @@ import {
 	ToolbarGroup,
 	Button,
 	ToolbarButton,
+	ResizableBox,
 } from '@wordpress/components';
 import { search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -34,15 +35,24 @@ import {
 	toggleLabel,
 } from './icons';
 
-export default function SearchEdit( { className, attributes, setAttributes } ) {
+export default function SearchEdit( {
+	className,
+	attributes,
+	setAttributes,
+	toggleSelection,
+} ) {
 	const {
 		label,
 		showLabel,
 		placeholder,
+		width,
+		align,
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
 	} = attributes;
+
+	const MIN_WIDTH = 120;
 
 	const getBlockClassNames = () => {
 		return classnames(
@@ -79,6 +89,17 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 			case 'button-only':
 				return buttonOnly;
 		}
+	};
+
+	const getResizableSides = () => {
+		if ( 'button-only' === buttonPosition ) {
+			return {};
+		}
+
+		return {
+			right: align === 'right' ? false : true,
+			left: align === 'right' ? true : false,
+		};
 	};
 
 	const renderTextField = () => {
@@ -126,93 +147,95 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 		);
 	};
 
-	return (
-		<Block.div className={ getBlockClassNames() }>
-			<BlockControls>
-				<ToolbarGroup>
+	const controls = (
+		<BlockControls>
+			<ToolbarGroup>
+				<ToolbarButton
+					title={ __( 'Toggle Search Label' ) }
+					icon={ toggleLabel }
+					onClick={ () => {
+						setAttributes( {
+							showLabel: ! showLabel,
+						} );
+					} }
+					className={ showLabel ? 'is-pressed' : undefined }
+				/>
+			</ToolbarGroup>
+
+			<ToolbarGroup>
+				<DropdownMenu
+					icon={ getButtonPositionIcon() }
+					label={ __( 'Change Button Position' ) }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup className="wp-block-search__button-position-menu">
+							<MenuItem
+								icon={ noButton }
+								onClick={ () => {
+									setAttributes( {
+										buttonPosition: 'no-button',
+									} );
+									onClose();
+								} }
+							>
+								{ __( 'No Button' ) }
+							</MenuItem>
+							<MenuItem
+								icon={ buttonOutside }
+								onClick={ () => {
+									setAttributes( {
+										buttonPosition: 'button-outside',
+									} );
+									onClose();
+								} }
+							>
+								{ __( 'Button Outside' ) }
+							</MenuItem>
+							<MenuItem
+								icon={ buttonInside }
+								onClick={ () => {
+									setAttributes( {
+										buttonPosition: 'button-inside',
+									} );
+									onClose();
+								} }
+							>
+								{ __( 'Button Inside' ) }
+							</MenuItem>
+							<MenuItem
+								icon={ buttonOnly }
+								onClick={ () => {
+									setAttributes( {
+										buttonPosition: 'button-only',
+									} );
+									onClose();
+								} }
+							>
+								{ __( 'Button Only' ) }
+							</MenuItem>
+						</MenuGroup>
+					) }
+				</DropdownMenu>
+
+				{ 'no-button' !== buttonPosition && (
 					<ToolbarButton
-						title={ __( 'Toggle Search Label' ) }
-						icon={ toggleLabel }
+						title={ __( 'Use Button with Icon' ) }
+						icon={ buttonWithIcon }
 						onClick={ () => {
 							setAttributes( {
-								showLabel: ! showLabel,
+								buttonUseIcon: ! buttonUseIcon,
 							} );
 						} }
-						className={ showLabel ? 'is-pressed' : undefined }
+						className={ buttonUseIcon ? 'is-pressed' : undefined }
 					/>
-				</ToolbarGroup>
+				) }
+			</ToolbarGroup>
+		</BlockControls>
+	);
 
-				<ToolbarGroup>
-					<DropdownMenu
-						icon={ getButtonPositionIcon() }
-						label={ __( 'Change Button Position' ) }
-					>
-						{ ( { onClose } ) => (
-							<MenuGroup className="wp-block-search__button-position-menu">
-								<MenuItem
-									icon={ noButton }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'no-button',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'No Button' ) }
-								</MenuItem>
-								<MenuItem
-									icon={ buttonOutside }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-outside',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Outside' ) }
-								</MenuItem>
-								<MenuItem
-									icon={ buttonInside }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-inside',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Inside' ) }
-								</MenuItem>
-								<MenuItem
-									icon={ buttonOnly }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-only',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Only' ) }
-								</MenuItem>
-							</MenuGroup>
-						) }
-					</DropdownMenu>
-
-					{ 'no-button' !== buttonPosition && (
-						<ToolbarButton
-							title={ __( 'Use Button with Icon' ) }
-							icon={ buttonWithIcon }
-							onClick={ () => {
-								setAttributes( {
-									buttonUseIcon: ! buttonUseIcon,
-								} );
-							} }
-							className={
-								buttonUseIcon ? 'is-pressed' : undefined
-							}
-						/>
-					) }
-				</ToolbarGroup>
-			</BlockControls>
+	return (
+		<Block.div className={ getBlockClassNames() }>
+			{ controls }
 
 			{ showLabel && (
 				<RichText
@@ -225,22 +248,35 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 				/>
 			) }
 
-			{ 'button-outside' === buttonPosition && (
-				<>
-					{ renderTextField() }
-					{ renderButton() }
-				</>
-			) }
+			<ResizableBox
+				size={ {
+					width,
+				} }
+				className="wp-block-search__inside-wrapper"
+				minWidth={ MIN_WIDTH }
+				bounds={ align === undefined ? 'parent' : 'window' }
+				enable={ getResizableSides() }
+				onResizeStop={ ( event, direction, elt, delta ) => {
+					setAttributes( {
+						width: parseInt( width + delta.width, 10 ),
+					} );
+					toggleSelection( true );
+				} }
+				onResizeStart={ () => {
+					toggleSelection( false );
+				} }
+			>
+				{ ( 'button-inside' === buttonPosition ||
+					'button-outside' === buttonPosition ) && (
+					<>
+						{ renderTextField() }
+						{ renderButton() }
+					</>
+				) }
 
-			{ 'button-inside' === buttonPosition && (
-				<div className="wp-block-search__inside-wrapper">
-					{ renderTextField() }
-					{ renderButton() }
-				</div>
-			) }
-
-			{ 'button-only' === buttonPosition && renderButton() }
-			{ 'no-button' === buttonPosition && renderTextField() }
+				{ 'button-only' === buttonPosition && renderButton() }
+				{ 'no-button' === buttonPosition && renderTextField() }
+			</ResizableBox>
 		</Block.div>
 	);
 }

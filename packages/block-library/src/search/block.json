@@ -13,6 +13,10 @@
 			"type": "string",
 			"default": ""
 		},
+		"width": {
+			"type": "number",
+			"default": 250
+		},
 		"buttonText": {
 			"type": "string"
 		},
@@ -26,7 +30,7 @@
 		}
 	},
 	"supports": {
-		"align": true,
+		"align": [ "left", "center", "right" ],
 		"html": false,
 		"lightBlockWrapper": true
 	}
