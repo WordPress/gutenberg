@@ -9,7 +9,9 @@ import classnames from 'classnames';
 import {
 	__experimentalBlock as Block,
 	BlockControls,
+	InspectorControls,
 	RichText,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/block-editor';
 import {
 	DropdownMenu,
@@ -19,7 +21,10 @@ import {
 	Button,
 	ToolbarButton,
 	ResizableBox,
+	PanelBody,
+	BaseControl,
 } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -53,6 +58,8 @@ export default function SearchEdit( {
 	} = attributes;
 
 	const MIN_WIDTH = 120;
+	const unitControlInstanceId = useInstanceId( UnitControl );
+	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 
 	const getBlockClassNames = () => {
 		return classnames(
@@ -148,89 +155,107 @@ export default function SearchEdit( {
 	};
 
 	const controls = (
-		<BlockControls>
-			<ToolbarGroup>
-				<ToolbarButton
-					title={ __( 'Toggle Search Label' ) }
-					icon={ toggleLabel }
-					onClick={ () => {
-						setAttributes( {
-							showLabel: ! showLabel,
-						} );
-					} }
-					className={ showLabel ? 'is-pressed' : undefined }
-				/>
-			</ToolbarGroup>
-
-			<ToolbarGroup>
-				<DropdownMenu
-					icon={ getButtonPositionIcon() }
-					label={ __( 'Change Button Position' ) }
-				>
-					{ ( { onClose } ) => (
-						<MenuGroup className="wp-block-search__button-position-menu">
-							<MenuItem
-								icon={ noButton }
-								onClick={ () => {
-									setAttributes( {
-										buttonPosition: 'no-button',
-									} );
-									onClose();
-								} }
-							>
-								{ __( 'No Button' ) }
-							</MenuItem>
-							<MenuItem
-								icon={ buttonOutside }
-								onClick={ () => {
-									setAttributes( {
-										buttonPosition: 'button-outside',
-									} );
-									onClose();
-								} }
-							>
-								{ __( 'Button Outside' ) }
-							</MenuItem>
-							<MenuItem
-								icon={ buttonInside }
-								onClick={ () => {
-									setAttributes( {
-										buttonPosition: 'button-inside',
-									} );
-									onClose();
-								} }
-							>
-								{ __( 'Button Inside' ) }
-							</MenuItem>
-							<MenuItem
-								icon={ buttonOnly }
-								onClick={ () => {
-									setAttributes( {
-										buttonPosition: 'button-only',
-									} );
-									onClose();
-								} }
-							>
-								{ __( 'Button Only' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-				</DropdownMenu>
-
-				{ 'no-button' !== buttonPosition && (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
 					<ToolbarButton
-						title={ __( 'Use Button with Icon' ) }
-						icon={ buttonWithIcon }
+						title={ __( 'Toggle Search Label' ) }
+						icon={ toggleLabel }
 						onClick={ () => {
 							setAttributes( {
-								buttonUseIcon: ! buttonUseIcon,
+								showLabel: ! showLabel,
 							} );
 						} }
-						className={ buttonUseIcon ? 'is-pressed' : undefined }
+						className={ showLabel ? 'is-pressed' : undefined }
 					/>
-				) }
-			</ToolbarGroup>
-		</BlockControls>
+				</ToolbarGroup>
+
+				<ToolbarGroup>
+					<DropdownMenu
+						icon={ getButtonPositionIcon() }
+						label={ __( 'Change Button Position' ) }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup className="wp-block-search__button-position-menu">
+								<MenuItem
+									icon={ noButton }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'no-button',
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'No Button' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ buttonOutside }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'button-outside',
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'Button Outside' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ buttonInside }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'button-inside',
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'Button Inside' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ buttonOnly }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'button-only',
+										} );
+										onClose();
+									} }
+								>
+									{ __( 'Button Only' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+
+					{ 'no-button' !== buttonPosition && (
+						<ToolbarButton
+							title={ __( 'Use Button with Icon' ) }
+							icon={ buttonWithIcon }
+							onClick={ () => {
+								setAttributes( {
+									buttonUseIcon: ! buttonUseIcon,
+								} );
+							} }
+							className={ buttonUseIcon ? 'is-pressed' : undefined }
+						/>
+					) }
+				</ToolbarGroup>
+			</BlockControls>
+
+			<InspectorControls>
+				<PanelBody title={ __( 'Display Settings' ) }>
+					<BaseControl label={ __( 'Width' ) } id={ unitControlInputId }>
+						<UnitControl
+							id={ unitControlInputId }
+							min={ MIN_WIDTH }
+							onChange={ ( newWidth ) =>
+								setAttributes( { width: newWidth } )
+							}
+							style={ { maxWidth: 80 } }
+							value={ width }
+						/>
+					</BaseControl>
+				</PanelBody>
+			</InspectorControls>
+		</>
 	);
 
 	return (
