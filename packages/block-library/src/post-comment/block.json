@@ -6,5 +6,10 @@
 	"description": "Example block written with ESNext standard and JSX support – build step required.",
 	"supports": {
 		"html": false
+	},
+	"attributes": {
+		"commentId": {
+			"type": "number"
+		}
 	}
 }
