@@ -28,12 +28,19 @@ function render_block_core_search( $attributes ) {
 	);
 
 	$input_id       = 'wp-block-search__input-' . ++$instance_id;
+	$classnames     = classnames_for_block_core_search( $attributes );
+
+	$show_label	     = ( isset( $attributes['showLabel'] ) && ! $attributes['showLabel'] ) ? false : true;
+	$show_input		 = ( isset( $attributes['buttonPosition'] ) && 'button-only' == $attributes['buttonPosition'] ) ? false : true;
+	$show_button	 = ( isset( $attributes['buttonPosition'] ) && 'no-button' == $attributes['buttonPosition'] ) ? false : true;
+	$use_icon_button = ( isset( $attributes['buttonUseIcon'] ) && ! $attributes['buttonUseIcon'] ) ? false : true;
+
 	$label_markup   = '';
 	$input_markup	= '';
 	$button_markup  = '';
 	$width_styles   = '';
 
-	if ( ! empty( $attributes['showLabel'] ) ) {
+	if ( $show_label ) {
 		if ( ! empty( $attributes['label'] ) ) {
 			$label_markup = sprintf(
 				'<label for="%s" class="wp-block-search__label">%s</label>',
@@ -49,7 +56,7 @@ function render_block_core_search( $attributes ) {
 		}
 	}
 
-	if ( ! empty( $attributes['buttonPosition'] ) && 'button-only' !== $attributes['buttonPosition'] ) {
+	if ( $show_input ) {
 		$input_markup = sprintf(
 			'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" required />',
 			$input_id,
@@ -58,10 +65,23 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
-	if ( ! empty( $attributes['buttonText'] ) ) {
+	if ( $show_button ) {
+		$button_internal_markup = '';
+
+		if ( ! $use_icon_button ) {
+			if ( ! empty( $attributes['buttonText'] ) ) {
+				$button_internal_markup = $attributes['buttonText'];
+			}
+		} else {
+			$button_internal_markup =
+				'<svg id="search-icon" class="search-icon" viewBox="0 0 24 24">
+			        <path d="M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"></path>
+			    </svg>';
+		}
+
 		$button_markup = sprintf(
 			'<button type="submit" class="wp-block-search__button">%s</button>',
-			$attributes['buttonText']
+			$button_internal_markup
 		);
 	}
 
@@ -78,8 +98,9 @@ function render_block_core_search( $attributes ) {
 	);
 
 	return sprintf(
-		'<form role="search" method="get" action="%s">%s</form>',
+		'<form role="search" method="get" action="%s" class="%s">%s</form>',
 		esc_url( home_url( '/' ) ),
+		$classnames,
 		$label_markup . $field_markup
 	);
 }
@@ -96,3 +117,40 @@ function register_block_core_search() {
 	);
 }
 add_action( 'init', 'register_block_core_search' );
+
+/**
+ * Builds the correct top level classnames for the 'core/search' block.
+ */
+function classnames_for_block_core_search( $attributes ) {
+	$classnames = [];
+
+	if ( ! empty( $attributes['buttonPosition'] ) ) {
+		if ( 'button-inside' == $attributes['buttonPosition'] ) {
+			$classnames[] = 'wp-block-search__button-inside';
+		}
+
+		if ( 'button-outside' == $attributes['buttonPosition'] ) {
+			$classnames[] = 'wp-block-search__button-outside';
+		}
+
+		if ( 'no-button' == $attributes['buttonPosition'] ) {
+			$classnames[] = 'wp-block-search__no-button';
+		}
+
+		if ( 'button-only' == $attributes['buttonPosition'] ) {
+			$classnames[] = 'wp-block-search__button-only';
+		}
+	}
+
+	if ( isset( $attributes['buttonUseIcon'] ) ) {
+		if ( ! empty( $attributes['buttonPosition'] ) && 'no-button' !== $attributes['buttonPosition'] ) {
+			if ( $attributes['buttonUseIcon'] ) {
+				$classnames[] = 'wp-block-search__icon-button';
+			} else {
+				$classnames[] = 'wp-block-search__text-button';
+			}
+		}
+	}
+
+	return implode( ' ', $classnames );
+}

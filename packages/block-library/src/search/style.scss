@@ -16,6 +16,11 @@
 
 	.wp-block-search__button {
 		margin-left: 0.625em;
+
+		svg {
+			width: 25px;
+			height: 25px;
+		}
 	}
 
 	&.wp-block-search__button-only {
