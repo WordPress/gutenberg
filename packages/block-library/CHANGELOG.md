@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Breaking Change
+### Enhancement
 
 - Site title is now a link.
 
