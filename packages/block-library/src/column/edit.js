@@ -86,8 +86,11 @@ function ColumnEdit( {
 			return true;
 		}
 
-		// Skip checking if calc().
-		if ( 0 <= width.indexOf( 'calc(' ) && 0 <= width.indexOf( ')' ) ) {
+		// Skip checking if calc() or val().
+		if (
+			( 0 <= width.indexOf( 'calc(' ) && 0 <= width.indexOf( ')' ) ) ||
+			( 0 <= width.indexOf( 'var(--' ) && 0 <= width.indexOf( ')' ) )
+		) {
 			return true;
 		}
 
