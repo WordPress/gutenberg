@@ -2,13 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Placeholder, TextControl } from '@wordpress/components';
+import { Placeholder, TextControl, Button } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
 import { useEntityProp } from '@wordpress/core-data';
 
 // TODO: JSDOC types
 export default function Edit( { className, attributes, setAttributes } ) {
 	const { commentId } = attributes;
+	const [ commentIdInput, setCommentIdInput ] = useState( commentId );
 
 	const [ content ] = useEntityProp(
 		'root',
@@ -26,10 +28,17 @@ export default function Edit( { className, attributes, setAttributes } ) {
 			>
 				<TextControl
 					value={ commentId }
-					onChange={ ( val ) =>
-						setAttributes( { commentId: parseInt( val ) } )
-					}
+					onChange={ ( val ) => setCommentIdInput( parseInt( val ) ) }
 				/>
+
+				<Button
+					isPrimary
+					onClick={ () => {
+						setAttributes( { commentId: commentIdInput } );
+					} }
+				>
+					{ __( 'Save' ) }
+				</Button>
 			</Placeholder>
 		);
 	}
