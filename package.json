@@ -142,7 +142,7 @@
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-require-context-hook": "1.0.0",
 		"benchmark": "2.1.4",
-		"browserslist": "4.9.1",
+		"browserslist": "4.14.0",
 		"chalk": "4.0.0",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
