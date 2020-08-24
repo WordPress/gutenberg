@@ -76,12 +76,7 @@ function ColumnEdit( {
 		// Return true for values that can be passed-on as-is.
 		if (
 			! width ||
-			'' === width ||
-			0 === width ||
-			'0' === width ||
-			'auto' === width ||
-			'inherit' === width ||
-			'initial' === width
+			[ '0', 'auto', 'inherit', 'initial' ].includes( width )
 		) {
 			return true;
 		}
