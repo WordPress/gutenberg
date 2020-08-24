@@ -250,7 +250,7 @@ class LatestPostsEdit extends Component {
 									} )
 								}
 							/>
-							<BaseControl>
+							<BaseControl className="block-editor-image-alignment-control__row">
 								<BaseControl.VisualLabel>
 									{ __( 'Image alignment' ) }
 								</BaseControl.VisualLabel>

@@ -14,16 +14,18 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { createBlock, getBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	getBlockType,
+	getBlockVariations,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import variations from './variations';
 import metadata from './block.json';
 
 const { name: DEFAULT_EMBED_BLOCK } = metadata;
-const WP_VARIATION = variations.find( ( { name } ) => name === 'wordpress' );
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -34,7 +36,9 @@ const WP_VARIATION = variations.find( ( { name } ) => name === 'wordpress' );
  * @return {WPBlockVariation} The embed block's information
  */
 export const getEmbedInfoByProvider = ( provider ) =>
-	variations.find( ( { name } ) => name === provider );
+	getBlockVariations( DEFAULT_EMBED_BLOCK )?.find(
+		( { name } ) => name === provider
+	);
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -54,7 +58,9 @@ export const matchesPatterns = ( url, patterns = [] ) =>
  * @return {WPBlockVariation} The block variation that should be used for this URL
  */
 export const findMoreSuitableBlock = ( url ) =>
-	variations.find( ( { patterns } ) => matchesPatterns( url, patterns ) );
+	getBlockVariations( DEFAULT_EMBED_BLOCK )?.find( ( { patterns } ) =>
+		matchesPatterns( url, patterns )
+	);
 
 export const isFromWordPress = ( html ) =>
 	html.includes( 'class="wp-embedded-content"' );
@@ -98,8 +104,7 @@ export const createUpgradedEmbedBlock = (
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
 	const isCurrentBlockWP =
-		providerNameSlug === WP_VARIATION.attributes.providerNameSlug ||
-		type === WP_EMBED_TYPE;
+		providerNameSlug === 'wordpress' || type === WP_EMBED_TYPE;
 	// if current block is not WordPress and a more suitable block found
 	// that is different from the current one, create the new matched block
 	const shouldCreateNewBlock =
@@ -114,14 +119,24 @@ export const createUpgradedEmbedBlock = (
 		} );
 	}
 
+	const wpVariation = getBlockVariations( DEFAULT_EMBED_BLOCK )?.find(
+		( { name } ) => name === 'wordpress'
+	);
+
 	// We can't match the URL for WordPress embeds, we have to check the HTML instead.
-	if ( ! preview || ! isFromWordPress( preview.html ) || isCurrentBlockWP ) {
+	if (
+		! wpVariation ||
+		! preview ||
+		! isFromWordPress( preview.html ) ||
+		isCurrentBlockWP
+	) {
 		return;
 	}
+
 	// This is not the WordPress embed block so transform it into one.
 	return createBlock( DEFAULT_EMBED_BLOCK, {
 		url,
-		...WP_VARIATION.attributes,
+		...wpVariation.attributes,
 		// By now we have the preview, but when the new block first renders, it
 		// won't have had all the attributes set, and so won't get the correct
 		// type and it won't render correctly. So, we pass through the current attributes
