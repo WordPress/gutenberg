@@ -85,7 +85,6 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 				options={ {
 					origin: isNavigatingBack ? 'right' : 'left',
 				} }
-				key={ level.id }
 			>
 				{ ( { className: animateClassName } ) => (
 					<div
