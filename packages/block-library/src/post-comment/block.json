@@ -1,0 +1,10 @@
+{
+	"name": "create-block/post-comment",
+	"title": "Post Comment",
+	"category": "widgets",
+	"icon": "smiley",
+	"description": "Example block written with ESNext standard and JSX support – build step required.",
+	"supports": {
+		"html": false
+	}
+}
