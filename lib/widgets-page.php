@@ -71,7 +71,6 @@ function gutenberg_widgets_init( $hook ) {
 
 	$settings = array_merge(
 		array(
-			'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
 			'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 			'imageSizes'             => $available_image_sizes,
 			'isRTL'                  => is_rtl(),
@@ -90,6 +89,7 @@ function gutenberg_widgets_init( $hook ) {
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
+	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
 	wp_add_inline_script(
 		'wp-edit-widgets',
