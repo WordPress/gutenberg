@@ -27,30 +27,36 @@ function render_block_core_search( $attributes ) {
 		)
 	);
 
-	$input_id      = 'wp-block-search__input-' . ++$instance_id;
-	$label_markup  = '';
-	$button_markup = '';
+	$input_id       = 'wp-block-search__input-' . ++$instance_id;
+	$label_markup   = '';
+	$input_markup	= '';
+	$button_markup  = '';
+	$width_styles   = '';
 
-	if ( ! empty( $attributes['label'] ) ) {
-		$label_markup = sprintf(
-			'<label for="%s" class="wp-block-search__label">%s</label>',
-			$input_id,
-			$attributes['label']
-		);
-	} else {
-		$label_markup = sprintf(
-			'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
-			$input_id,
-			__( 'Search' )
-		);
+	if ( ! empty( $attributes['showLabel'] ) ) {
+		if ( ! empty( $attributes['label'] ) ) {
+			$label_markup = sprintf(
+				'<label for="%s" class="wp-block-search__label">%s</label>',
+				$input_id,
+				$attributes['label']
+			);
+		} else {
+			$label_markup = sprintf(
+				'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
+				$input_id,
+				__( 'Search' )
+			);
+		}
 	}
 
-	$input_markup = sprintf(
-		'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" required />',
-		$input_id,
-		esc_attr( get_search_query() ),
-		esc_attr( $attributes['placeholder'] )
-	);
+	if ( ! empty( $attributes['buttonPosition'] ) && 'button-only' !== $attributes['buttonPosition'] ) {
+		$input_markup = sprintf(
+			'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" required />',
+			$input_id,
+			esc_attr( get_search_query() ),
+			esc_attr( $attributes['placeholder'] )
+		);
+	}
 
 	if ( ! empty( $attributes['buttonText'] ) ) {
 		$button_markup = sprintf(
@@ -59,10 +65,22 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
+	if ( ! empty( $attributes['width'] ) ) {
+		if ( ! empty( $attributes['buttonPosition'] ) && 'button-only' !== $attributes['buttonPosition'] ) {
+			$width_styles = ' style="width: ' . $attributes['width'] . 'px;"';
+		}
+	}
+
+	$field_markup = sprintf(
+		'<div class="wp-block-search__inside-wrapper"%s>%s</div>',
+		$width_styles,
+		$input_markup . $button_markup
+	);
+
 	return sprintf(
 		'<form role="search" method="get" action="%s">%s</form>',
 		esc_url( home_url( '/' ) ),
-		$label_markup . $input_markup . $button_markup
+		$label_markup . $field_markup
 	);
 }
 

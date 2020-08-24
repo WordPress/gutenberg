@@ -25,12 +25,6 @@
 		color: $dark-gray-700;
 	}
 
-	.wp-block-search__inside-wrapper {
-		display: flex;
-		flex: auto;
-		flex-wrap: nowrap;
-	}
-
 	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
 		padding: $grid-unit-05;
 

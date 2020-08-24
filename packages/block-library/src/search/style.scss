@@ -1,4 +1,10 @@
 .wp-block-search {
+	.wp-block-search__inside-wrapper {
+		display: flex;
+		flex: auto;
+		flex-wrap: nowrap;
+	}
+
 	.wp-block-search__label {
 		width: 100%;
 	}

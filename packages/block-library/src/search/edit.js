@@ -234,7 +234,9 @@ export default function SearchEdit( {
 									buttonUseIcon: ! buttonUseIcon,
 								} );
 							} }
-							className={ buttonUseIcon ? 'is-pressed' : undefined }
+							className={
+								buttonUseIcon ? 'is-pressed' : undefined
+							}
 						/>
 					) }
 				</ToolbarGroup>
@@ -242,7 +244,10 @@ export default function SearchEdit( {
 
 			<InspectorControls>
 				<PanelBody title={ __( 'Display Settings' ) }>
-					<BaseControl label={ __( 'Width' ) } id={ unitControlInputId }>
+					<BaseControl
+						label={ __( 'Width' ) }
+						id={ unitControlInputId }
+					>
 						<UnitControl
 							id={ unitControlInputId }
 							min={ MIN_WIDTH }
