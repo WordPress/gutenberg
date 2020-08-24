@@ -59,6 +59,8 @@ export function getInlineStyles( styles = {} ) {
 		background: [ 'color', 'gradient' ],
 		backgroundColor: [ 'color', 'background' ],
 		color: [ 'color', 'text' ],
+		'--wp--style--color--text': [ 'color', 'text' ],
+		'--wp--style--color--background': [ 'color', 'background' ],
 		'--wp--style--color--link': [ 'color', 'link' ],
 	};
 

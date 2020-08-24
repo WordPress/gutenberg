@@ -362,6 +362,12 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 				? getColorObjectByAttributeValues( colors, backgroundColor )
 						?.color
 				: undefined,
+			'--wp--style--color--text': textColor
+				? `var(--wp--preset--color--${ textColor })`
+				: undefined,
+			'--wp--style--color--background': backgroundColor
+				? `var(--wp--preset--color--${ backgroundColor })`
+				: undefined,
 		};
 
 		let wrapperProps = props.wrapperProps;
