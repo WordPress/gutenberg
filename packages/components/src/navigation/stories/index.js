@@ -84,7 +84,7 @@ function Example() {
 
 	return (
 		<Navigation activeItemId={ active } data={ data } rootTitle="Home">
-			{ ( { level, levelItems, parentLevel, NavigationBackButton } ) => {
+			{ ( { level, parentLevel, NavigationBackButton } ) => {
 				return (
 					<>
 						{ parentLevel && (
@@ -95,7 +95,7 @@ function Example() {
 						) }
 						<h1>{ level.title }</h1>
 						<NavigationMenu>
-							{ levelItems.map( ( item ) => {
+							{ level.children.map( ( item ) => {
 								return (
 									<NavigationMenuItem
 										{ ...item }

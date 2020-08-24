@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,36 +19,45 @@ import Button from '../button';
 const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevel, setActiveLevel ] = useState( 'root' );
 
-	const mapItemData = ( items ) => {
-		return items.map( ( item ) => {
-			const itemChildren = data.filter( ( i ) => i.parent === item.id );
-			return {
-				...item,
-				children: itemChildren,
-				parent: item.parent || 'root',
-				isActive: item.id === activeItemId,
-				hasChildren: itemChildren.length > 0,
-				setActiveLevel,
-			};
-		} );
-	};
-
-	const getRootItem = ( items ) => {
-		const itemChildren = items.filter( ( i ) => i.parent === 'root' );
+	const appendItemData = ( item ) => {
 		return {
-			id: 'root',
-			parent: null,
-			title: rootTitle,
-			children: itemChildren,
-			isActive: false,
-			hasChildren: itemChildren.length > 0,
+			...item,
+			children: [],
+			parent: item.id === 'root' ? null : item.parent || 'root',
+			isActive: item.id === activeItemId,
+			setActiveLevel,
 		};
 	};
 
-	const mappedItems = mapItemData( data );
-	const items = [ getRootItem( mappedItems ), ...mappedItems ];
-	const levels = items.filter( ( item ) => item.hasChildren );
-	const activeItem = items.find( ( item ) => item.id === activeItemId );
+	const getLevels = ( mappedItems ) => {
+		const levels = new Set();
+
+		mappedItems.forEach( ( item ) => {
+			const parentItem = mappedItems.get( item.parent );
+			if ( parentItem ) {
+				parentItem.children.push( item );
+				parentItem.hasChildren = true;
+				levels.add( parentItem );
+			}
+		} );
+
+		return levels;
+	};
+
+	const items = new Map(
+		[
+			{ id: 'root', parent: null, title: rootTitle },
+			...data,
+		].map( ( item ) => [ item.id, appendItemData( item ) ] )
+	);
+
+	const levels = getLevels( items );
+	const parentLevel = items.get( level.parent );
+	const activeItem = items.get( activeItemId );
+	const previousActiveLevel = usePrevious( activeLevel );
+	const isNavigatingBack =
+		previousActiveLevel &&
+		items.get( previousActiveLevel ).parent === activeLevel;
 
 	useEffect( () => {
 		if ( activeItem ) {
@@ -72,10 +82,16 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 
 	return (
 		<Root className="components-navigation">
-			{ levels.map(
+			{ Array.from( levels ).map(
 				( level ) =>
 					activeLevel === level.id && (
-						<Animate type="slide-in" key={ level.id }>
+						<Animate
+							type="slide-in"
+							options={ {
+								origin: isNavigatingBack ? 'right' : 'left',
+							} }
+							key={ level.id }
+						>
 							{ ( { className: animateClassName } ) => (
 								<div
 									className={ classnames(
@@ -85,13 +101,8 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 								>
 									{ children( {
 										level,
-										levelItems: items.filter(
-											( i ) => i.parent === level.id
-										),
 										NavigationBackButton,
-										parentLevel: items.find(
-											( i ) => i.id === level.parent
-										),
+										parentLevel,
 									} ) }
 								</div>
 							) }
