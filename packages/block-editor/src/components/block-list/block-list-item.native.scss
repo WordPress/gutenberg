@@ -10,3 +10,7 @@
 .fullAlignmentPadding {
 	padding: $block-edge-to-content;
 }
+
+.wideMargin {
+	margin: $block-edge-to-content * 4;
+}

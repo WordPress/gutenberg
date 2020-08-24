@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -20,8 +20,8 @@ import styles from './block-list-item.native.scss';
 
 const BREAKPOINTS = {
 	wide: 1024,
-	medium: 700,
-	small: 600,
+	medium: 740,
+	small: 480,
 };
 
 const stretchStyle = {
@@ -58,32 +58,33 @@ export class BlockListItem extends Component {
 		const { blockWidth } = this.state;
 		const isParentBlockFullWidth =
 			parentBlockAlignment === 'full' && numberOfParents === 1;
-		const hasWiderCanvas =
-			blockWidth > BREAKPOINTS.small && blockWidth <= BREAKPOINTS.wide;
 
 		if ( blockAlignment === 'full' ) {
 			return 0;
 		}
 
 		if ( blockAlignment === 'wide' ) {
-			if ( hasWiderCanvas && numberOfParents === 0 ) {
-				return marginHorizontal * 3;
-			} else if ( hasWiderCanvas && isParentBlockFullWidth ) {
-				if ( blockWidth < BREAKPOINTS.medium ) {
-					return marginHorizontal * 2;
-				}
-				return (
-					marginHorizontal *
-					( blockWidth === BREAKPOINTS.wide ? 3 : 4 )
-				);
+			const screenWidth = Dimensions.get( 'window' ).width;
+			const isWithinConstraints =
+				blockWidth > BREAKPOINTS.small && blockWidth < BREAKPOINTS.wide;
+
+			if ( screenWidth > BREAKPOINTS.wide ) {
+				return marginHorizontal;
 			}
 
-			return isParentBlockFullWidth
-				? marginHorizontal * 2
-				: marginHorizontal;
+			if (
+				isWithinConstraints &&
+				blockWidth - styles.wideMargin.marginLeft >= BREAKPOINTS.medium
+			) {
+				return blockWidth > screenWidth
+					? marginHorizontal * 3
+					: marginHorizontal * 2;
+			}
 		}
 
-		return isParentBlockFullWidth ? marginHorizontal * 2 : marginHorizontal;
+		return isParentBlockFullWidth && blockWidth < BREAKPOINTS.small
+			? marginHorizontal * 2
+			: marginHorizontal;
 	}
 
 	getContentStyles( readableContentViewStyle ) {
