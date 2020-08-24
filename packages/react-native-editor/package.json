@@ -67,9 +67,9 @@
   "react-native-safe-area-context": "git+https://github.com/wordpress-mobile/react-native-safe-area-context.git#1e3c0d34f31b59fb79f71ec0b4c39c513f684871",
   "react-native-sass-transformer": "^1.1.1",
   "react-native-screens": "git+https://github.com/wordpress-mobile/react-native-screens.git#835843f4c3697bba5c330d05d8fc270d50ca9d2a",
-  "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
+  "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#7a04d30e76c1a85257dd581c154e9c98fbdbaf8b",
   "react-native-url-polyfill": "^1.1.2",
-  "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f"
+  "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#9bcb723e5755678a69fcb7d0a17145e50a475e9f"
   },
   "publishConfig": {
   "access": "public"
