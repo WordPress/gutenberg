@@ -1650,6 +1650,25 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning current the currently selected block toolbar id.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {string} Current block toolbar id.
+ */
+export function toolbarId( state, action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_TOOLBAR_ID':
+			const { id } = action;
+
+			return id;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1671,4 +1690,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
+	toolbarId,
 } );

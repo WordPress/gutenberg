@@ -1100,3 +1100,15 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Returns an action object that sets whether the block has controlled innerblocks.
+ *
+ * @param {string} id The current block toolbar's id.
+ */
+export function setBlockToolbarId( id ) {
+	return {
+		type: 'SET_BLOCK_TOOLBAR_ID',
+		id,
+	};
+}

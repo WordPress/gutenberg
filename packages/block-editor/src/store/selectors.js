@@ -497,6 +497,20 @@ export const getBlockParent = createSelector(
 );
 
 /**
+ * Returns the current id of the Block toolbar
+ *
+ * @param {Object} state    Editor state.
+ *
+ * @return {string} Id of the currently focused block toolbar.
+ */
+export const getToolbarId = createSelector(
+	( state ) => {
+		return state.toolbarId;
+	},
+	( state ) => [ state.toolbarId ]
+);
+
+/**
  * Given a block client ID and a block name,
  * returns the list of all its parents from top to bottom,
  * filtered by the given name.

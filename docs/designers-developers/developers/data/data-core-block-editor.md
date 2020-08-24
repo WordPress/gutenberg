@@ -694,6 +694,18 @@ _Returns_
 
 -   `?string`: Block Template Lock
 
+<a name="getToolbarId" href="#getToolbarId">#</a> **getToolbarId**
+
+Returns the current id of the Block toolbar
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Id of the currently focused block toolbar.
+
 <a name="hasBlockMovingClientId" href="#hasBlockMovingClientId">#</a> **hasBlockMovingClientId**
 
 Returns whether block moving mode is enabled.
@@ -1313,6 +1325,14 @@ Generator that triggers an action used to enable or disable the block moving mod
 _Parameters_
 
 -   _hasBlockMovingClientId_ `(string|null)`: Enable/Disable block moving mode.
+
+<a name="setBlockToolbarId" href="#setBlockToolbarId">#</a> **setBlockToolbarId**
+
+Returns an action object that sets whether the block has controlled innerblocks.
+
+_Parameters_
+
+-   _id_ `string`: The current block toolbar's id.
 
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 

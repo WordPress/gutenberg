@@ -8,6 +8,7 @@ import cx from 'classnames';
  * WordPress dependencies
  */
 import { useRef, useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { Icon } from '@wordpress/components';
 
@@ -25,43 +26,32 @@ function detectOverlap( e1, e2 ) {
 		);
 		return overlap;
 	}
+
+	return false;
 }
 
-function useOverlapDetection(
-	firstElement,
-	secondElement,
-	selectedBlockClientId
-) {
-	const [ isOverlapped, setIsOverlapped ] = useState( false );
-
-	useEffect( () => {
-		setIsOverlapped( detectOverlap( firstElement.current, secondElement ) );
-	}, [ selectedBlockClientId ] );
-
-	return isOverlapped;
-}
-
-export default function TemplatePartLabel( {
-	postId,
-	slug,
-	selectedBlockClientId,
-} ) {
+export default function TemplatePartLabel( { postId, slug } ) {
 	const [ title ] = useEntityProp(
 		'postType',
 		'wp_template_part',
 		'title',
 		postId
 	);
-	const labelElement = useRef( null );
-	const toolbarElement = document.getElementsByClassName(
-		'block-editor-block-contextual-toolbar-wrapper'
-	)[ 0 ];
 
-	const isOverlapped = useOverlapDetection(
-		labelElement,
-		toolbarElement,
-		selectedBlockClientId
-	);
+	const { toolbarId } = useSelect( ( select ) => {
+		const { getToolbarId } = select( 'core/block-editor' );
+		return { toolbarId: getToolbarId() };
+	} );
+
+	const labelElement = useRef( null );
+	const [ toolbarElement, setToolbarElement ] = useState( null );
+
+	useEffect( () => {
+		const toolbar = document.getElementById( toolbarId );
+		setToolbarElement( toolbar );
+	}, [ toolbarId ] );
+
+	const isOverlapped = detectOverlap( labelElement.current, toolbarElement );
 	const label = capitalize( title || slug );
 
 	return (

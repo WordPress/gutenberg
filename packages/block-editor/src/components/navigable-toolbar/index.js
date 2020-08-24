@@ -9,6 +9,7 @@ import {
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -108,6 +109,13 @@ function useToolbarFocus( ref, focusOnMount, isAccessibleToolbar ) {
 
 function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	const wrapper = useRef();
+
+	const { setBlockToolbarId } = useDispatch( 'core/block-editor' );
+
+	useEffect( () => {
+		setBlockToolbarId( wrapper.current.id );
+	}, [ wrapper.current ] );
+
 	const isAccessibleToolbar = useIsAccessibleToolbar( wrapper );
 
 	useToolbarFocus( wrapper, focusOnMount, isAccessibleToolbar );
