@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+- Add level controls to Site Title block
+
 ## 2.12.0 (2020-01-13)
 
 ### Bug Fixes
