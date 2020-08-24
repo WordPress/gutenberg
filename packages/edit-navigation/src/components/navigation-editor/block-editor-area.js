@@ -12,6 +12,7 @@ import {
 	NavigableToolbar,
 	ObserveTyping,
 	WritingFlow,
+	BlockInspector,
 } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
 import {
@@ -21,10 +22,12 @@ import {
 	CardBody,
 	CardFooter,
 	CheckboxControl,
+	Dropdown,
 	Popover,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -96,6 +99,19 @@ export default function BlockEditorArea( {
 				<Button isPrimary onClick={ saveBlocks }>
 					{ __( 'Save navigation' ) }
 				</Button>
+				<Dropdown
+					className="edit-navigation-editor__block-inspector"
+					position="bottom right"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<Button
+							icon={ cog }
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+							label="Block inspector"
+						/>
+					) }
+					renderContent={ () => <BlockInspector /> }
+				/>
 			</CardHeader>
 			<CardBody>
 				<NavigableToolbar

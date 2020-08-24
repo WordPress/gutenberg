@@ -47,11 +47,24 @@ $navigation-item-height: 46px;
 	}
 
 	&.is-selected,
-	&.has-child-selected {
+	&.has-child-selected,
+	// Show the submenu list when is dragging and drag enter the list item.
+	body.is-dragging-components-draggable &.is-dragging-within {
 		> .wp-block-navigation__container {
 			opacity: 1;
 			visibility: visible;
 		}
+	}
+}
+
+body.is-dragging-components-draggable .wp-block-navigation-link > .wp-block-navigation__container {
+	// Set opacity to 1 to still be able to show the draggable chip.
+	opacity: 1;
+	visibility: hidden;
+
+	// Show the chip but hide the submenu list.
+	.block-editor-block-draggable-chip-wrapper {
+		visibility: visible;
 	}
 }
 
@@ -95,7 +108,7 @@ $colors-selector-size: 22px;
 		min-width: $colors-selector-size;
 		height: $colors-selector-size;
 		min-height: $colors-selector-size;
-		line-height: ($colors-selector-size - 2);
+		line-height: ( $colors-selector-size - 2 );
 		padding: 2px;
 
 		> svg {
@@ -145,7 +158,6 @@ $color-control-label-height: 20px;
 }
 
 .wp-block-navigation-placeholder {
-
 	.components-spinner {
 		margin-top: -4px;
 		margin-left: 4px;
@@ -165,7 +177,6 @@ $color-control-label-height: 20px;
 
 	// Styles for when there are Menus present in the dropdown.
 	.components-custom-select-control.has-menus .components-custom-select-control__item {
-
 		// Creates a faux divider between the menu options if present
 		&.is-create-empty-option {
 			position: relative; // positioning context for pseudo
@@ -195,7 +206,6 @@ $color-control-label-height: 20px;
 		font-family: $default-font;
 		font-size: $default-font-size;
 	}
-
 }
 
 .wp-block-navigation .block-editor-button-block-appender {

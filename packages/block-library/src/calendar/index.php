@@ -32,8 +32,7 @@ function render_block_core_calendar( $attributes ) {
 	}
 
 	$output = sprintf(
-		'<div class="%1$s">%2$s</div>',
-		esc_attr( 'wp-block-calendar' ),
+		'<div>%1$s</div>',
 		get_calendar( true, false )
 	);
 

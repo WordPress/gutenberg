@@ -94,6 +94,47 @@ function items( state = {}, action ) {
 }
 
 /**
+ * Reducer tracking item completeness, keyed by ID. A complete item is one for
+ * which all fields are known. This is used in supporting `_fields` queries,
+ * where not all properties associated with an entity are necessarily returned.
+ * In such cases, completeness is used as an indication of whether it would be
+ * safe to use queried data for a non-`_fields`-limited request.
+ *
+ * @param {Object<string,boolean>} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object<string,boolean>} Next state.
+ */
+export function itemIsComplete( state = {}, action ) {
+	const { type, query, key = DEFAULT_ENTITY_KEY } = action;
+	if ( type !== 'RECEIVE_ITEMS' ) {
+		return state;
+	}
+
+	// An item is considered complete if it is received without an associated
+	// fields query. Ideally, this would be implemented in such a way where the
+	// complete aggregate of all fields would satisfy completeness. Since the
+	// fields are not consistent across all entity types, this would require
+	// introspection on the REST schema for each entity to know which fields
+	// compose a complete item for that entity.
+	const isCompleteQuery =
+		! query || ! Array.isArray( getQueryParts( query ).fields );
+
+	return {
+		...state,
+		...action.items.reduce( ( result, item ) => {
+			const itemId = item[ key ];
+
+			// Defer to completeness if already assigned. Technically the
+			// data may be outdated if receiving items for a field subset.
+			result[ itemId ] = state[ itemId ] || isCompleteQuery;
+
+			return result;
+		}, {} ),
+	};
+}
+
+/**
  * Reducer tracking queries state, keyed by stable query key. Each reducer
  * query object includes `itemIds` and `requestingPageByPerPage`.
  *
@@ -171,5 +212,6 @@ const queries = ( state = {}, action ) => {
 
 export default combineReducers( {
 	items,
+	itemIsComplete,
 	queries,
 } );

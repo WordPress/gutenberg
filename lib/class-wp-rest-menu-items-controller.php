@@ -440,10 +440,10 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
-		// If menu item is type html, then content is required.
-		if ( 'html' === $prepared_nav_item['menu-item-type'] ) {
+		// If menu item is type block, then content is required.
+		if ( 'block' === $prepared_nav_item['menu-item-type'] ) {
 			if ( empty( $prepared_nav_item['menu-item-content'] ) ) {
-				return new WP_Error( 'rest_content_required', __( 'Content required if menu item of type html.', 'gutenberg' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_content_required', __( 'Content required if menu item of type block.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -819,7 +819,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		$schema['properties']['type'] = array(
 			'description' => __( 'The family of objects originally represented, such as "post_type" or "taxonomy".', 'gutenberg' ),
 			'type'        => 'string',
-			'enum'        => array( 'taxonomy', 'post_type', 'post_type_archive', 'custom', 'html' ),
+			'enum'        => array( 'taxonomy', 'post_type', 'post_type_archive', 'custom', 'block' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'default'     => 'custom',
 		);
@@ -894,7 +894,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		);
 
 		$schema['properties']['content'] = array(
-			'description' => __( 'HTML content to display for this menu item. May contain blocks.', 'gutenberg' ),
+			'description' => __( 'HTML content to display for this block menu item.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'object',
 			'arg_options' => array(
