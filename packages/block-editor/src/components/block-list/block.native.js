@@ -168,7 +168,6 @@ class BlockListBlock extends Component {
 							<View
 								style={ [
 									styles.solidBorder,
-									isFullWidth && styles.solidBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
