@@ -114,13 +114,15 @@ function InserterMenu( {
 	);
 
 	const searchFormPlaceholder = () => {
-		if ( activeTab === 'blocks' ) {
-			return __( 'Search for a block' );
-		} else if ( activeTab === 'patterns' ) {
+		if ( activeTab === 'reusable' ) {
+			return __( 'Search for a reusable block' );
+		}
+
+		if ( activeTab === 'patterns' ) {
 			return __( 'Search for a pattern' );
 		}
 
-		return __( 'Search for a reusable block' );
+		return __( 'Search for a block' );
 	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
