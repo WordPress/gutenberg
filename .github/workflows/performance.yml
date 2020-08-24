@@ -37,4 +37,4 @@ jobs:
         npm ci
 
     - name: Run the performance tests
-      run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA master
+      run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA master --tests-branch $GITHUB_SHA

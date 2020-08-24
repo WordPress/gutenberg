@@ -92,7 +92,7 @@ div.components-toolbar {
 }
 
 // Last button in a group.
-.components-accessible-toolbar .components-toolbar-group > .components-button:last-child.has-icon,
+.components-accessible-toolbar .components-toolbar-group > .components-button:last-of-type.has-icon,
 .components-accessible-toolbar .components-toolbar-group > div:last-child > .components-button.has-icon,
 .components-toolbar div:last-child .components-button.has-icon {
 	min-width: $block-toolbar-height - $grid-unit-15 / 2;

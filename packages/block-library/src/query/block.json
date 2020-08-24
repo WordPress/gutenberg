@@ -20,6 +20,7 @@
 		"query": "query"
 	},
 	"supports": {
-		"html": false
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }

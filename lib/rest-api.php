@@ -136,21 +136,12 @@ add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 )
  * @since 5.0.0
  */
 function gutenberg_register_rest_widget_updater_routes() {
-	$widget_forms = new WP_REST_Widget_Forms();
-	$widget_forms->register_routes();
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+		$widget_forms = new WP_REST_Widget_Utils_Controller();
+		$widget_forms->register_routes();
+	}
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
-
-/**
- * Registers the widget area REST API routes.
- *
- * @since 5.7.0
- */
-function gutenberg_register_rest_widget_areas() {
-	$widget_areas_controller = new WP_REST_Widget_Areas_Controller();
-	$widget_areas_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
 
 /**
  * Registers the block directory.
@@ -198,6 +189,17 @@ function gutenberg_register_plugins_endpoint() {
 	$plugins->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
+
+/**
+ * Registers the Sidebars REST API routes.
+ */
+function gutenberg_register_sidebars_endpoint() {
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+		$sidebars = new WP_REST_Sidebars_Controller();
+		$sidebars->register_routes();
+	}
+}
+add_action( 'rest_api_init', 'gutenberg_register_sidebars_endpoint' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
@@ -316,7 +318,15 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  * @since 7.x.0
  */
 function gutenberg_register_image_editor() {
-	$image_editor = new WP_REST_Image_Editor_Controller();
-	$image_editor->register_routes();
+	global $wp_version;
+
+	// Strip '-src' from the version string. Messes up version_compare().
+	$version = str_replace( '-src', '', $wp_version );
+
+	// Only register routes for versions older than WP 5.5.
+	if ( version_compare( $version, '5.5-beta', '<' ) ) {
+		$image_editor = new WP_REST_Image_Editor_Controller();
+		$image_editor->register_routes();
+	}
 }
 add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );

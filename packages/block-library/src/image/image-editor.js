@@ -20,7 +20,7 @@ import {
 import {
 	ToolbarGroup,
 	ToolbarButton,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	Spinner,
 	RangeControl,
 	DropdownMenu,
@@ -195,7 +195,7 @@ export default function ImageEditor( {
 		attrs.src = url;
 
 		apiFetch( {
-			path: `wp/v2/media/${ id }/edit`,
+			path: `/wp/v2/media/${ id }/edit`,
 			method: 'POST',
 			data: attrs,
 		} )

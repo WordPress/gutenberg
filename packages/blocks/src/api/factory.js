@@ -46,6 +46,10 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
+	if ( undefined === blockType ) {
+		throw new Error( `Block type '${ name }' is not registered.` );
+	}
+
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
 	const sanitizedAttributes = reduce(

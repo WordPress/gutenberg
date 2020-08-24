@@ -2,6 +2,7 @@
  * External dependencies
  */
 const { readFileSync, existsSync } = require( 'fs' );
+const path = require( 'path' );
 const chalk = require( 'chalk' );
 
 function average( array ) {
@@ -17,14 +18,16 @@ const title = chalk.bold;
 const success = chalk.bold.green;
 
 class PerformanceReporter {
-	onRunComplete() {
-		const path = __dirname + '/../specs/performance/results.json';
+	onTestResult( test ) {
+		const dirname = path.dirname( test.path );
+		const basename = path.basename( test.path, '.js' );
+		const filepath = path.join( dirname, basename + '.results.json' );
 
-		if ( ! existsSync( path ) ) {
+		if ( ! existsSync( filepath ) ) {
 			return;
 		}
 
-		const results = readFileSync( path, 'utf8' );
+		const results = readFileSync( filepath, 'utf8' );
 		const { load, domcontentloaded, type, focus } = JSON.parse( results );
 
 		if ( load && load.length ) {

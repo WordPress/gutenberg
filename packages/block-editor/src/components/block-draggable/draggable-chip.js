@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { Flex, FlexItem } from '@wordpress/components';
@@ -43,8 +43,8 @@ export default function BlockDraggableChip( { clientIds } ) {
 							<BlockIcon icon={ icon } />
 						) : (
 							sprintf(
-								/* translators: %d: number of blocks. */
-								__( '%d blocks' ),
+								/* translators: %d: Number of blocks. */
+								_n( '%d block', '%d blocks', clientIds.length ),
 								clientIds.length
 							)
 						) }
