@@ -58,7 +58,7 @@ export default function SearchEdit( {
 		buttonUseIcon,
 	} = attributes;
 
-	const MIN_WIDTH = 120;
+	const MIN_WIDTH = 220;
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 
@@ -285,7 +285,6 @@ export default function SearchEdit( {
 				} }
 				className="wp-block-search__inside-wrapper"
 				minWidth={ MIN_WIDTH }
-				bounds={ align === undefined ? 'parent' : 'window' }
 				enable={ getResizableSides() }
 				onResizeStart={ () => {
 					toggleSelection( false );
