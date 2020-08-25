@@ -13,11 +13,11 @@
 class WP_REST_Post_Format_Search_Handler_Test extends WP_Test_REST_Controller_Testcase {
 
 	/**
-	 * Term associated with a post format.
+	 * Test post ID that we'll give a format to.
 	 *
-	 * @var array
+	 * @var int
 	 */
-	private static $my_post_format_term = array();
+	private static $my_post_id = array();
 
 	/**
 	 * Create fake data before our tests run.
@@ -25,20 +25,20 @@ class WP_REST_Post_Format_Search_Handler_Test extends WP_Test_REST_Controller_Te
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$my_post_format_term = $factory->term->create(
+		self::$my_post_id = $factory->post->create(
 			array(
-				'taxonomy' => 'post_format',
-				'name'     => 'Aside',
-				'slug'     => 'post-format-aside',
+				'post_title' => 'Test post',
 			)
 		);
+
+		set_post_format( self::$my_post_id, 'aside' );
 	}
 
 	/**
 	 * Delete our fake data after our tests run.
 	 */
 	public static function wpTearDownAfterClass() {
-		wp_delete_term( self::$my_post_format_term, true );
+		wp_delete_post( self::$my_post_id );
 	}
 
 	/**
@@ -52,10 +52,8 @@ class WP_REST_Post_Format_Search_Handler_Test extends WP_Test_REST_Controller_Te
 			)
 		);
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEqualSets(
-			array(
-				'Aside',
-			),
+		$this->assertContains(
+			'Aside',
 			wp_list_pluck( $response->get_data(), 'title' )
 		);
 	}
@@ -73,12 +71,27 @@ class WP_REST_Post_Format_Search_Handler_Test extends WP_Test_REST_Controller_Te
 		);
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEqualSets(
-			array(
-				'Aside',
-			),
+		$this->assertContains(
+			'Aside',
 			wp_list_pluck( $response->get_data(), 'title' )
 		);
+	}
+
+	/**
+	 * Searching for a post format that doesn't exist should return an empty
+	 * result.
+	 */
+	public function test_get_items_search_for_missing_post_format() {
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'search'   => 'Doesn\'t exist',
+				'type'     => 'post-format',
+			)
+		);
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEmpty( $response->get_data() );
 	}
 
 	public function test_register_routes() {
