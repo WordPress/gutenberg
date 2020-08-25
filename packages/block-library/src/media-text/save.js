@@ -36,12 +36,15 @@ export default function save( { attributes } ) {
 	} = attributes;
 	const newRel = isEmpty( rel ) ? undefined : rel;
 
-	const classes = classnames( {
+	const imageClasses = classnames( {
 		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 	} );
+	const imageClassName = imageClasses === '' ? null : imageClasses;
 
-	let image = <img src={ mediaUrl } alt={ mediaAlt } className={ classes } />;
+	let image = (
+		<img src={ mediaUrl } alt={ mediaAlt } className={ imageClassName } />
+	);
 
 	if ( href ) {
 		image = (
