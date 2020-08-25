@@ -69,3 +69,5 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 };
 
 export default Navigation;
+export { default as NavigationMenu } from './menu';
+export { default as NavigationMenuItem } from './menu-item';
