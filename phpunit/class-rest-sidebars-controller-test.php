@@ -683,8 +683,8 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 */
 	public function test_update_item_slashing() {
-		$this->setup_widget( 'widget_text', 1, array( 'text' => 'Custom text test', ) );
-		$this->setup_sidebar( 'sidebar-1', array( 'name' => 'Test sidebar', ), array( 'text-1', 'rss-1' ) );
+		$this->setup_widget( 'widget_text', 1, array( 'text' => 'Custom text test' ) );
+		$this->setup_sidebar( 'sidebar-1', array( 'name' => 'Test sidebar' ), array( 'text-1', 'rss-1' ) );
 
 		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
 		$request->set_body_params(
