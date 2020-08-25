@@ -24,6 +24,7 @@ export default function save( { attributes } ) {
 		mediaType,
 		mediaUrl,
 		mediaWidth,
+		mediaSizeSlug,
 		mediaId,
 		verticalAlignment,
 		imageFill,
@@ -35,17 +36,12 @@ export default function save( { attributes } ) {
 	} = attributes;
 	const newRel = isEmpty( rel ) ? undefined : rel;
 
-	let image = (
-		<img
-			src={ mediaUrl }
-			alt={ mediaAlt }
-			className={
-				mediaId && mediaType === 'image'
-					? `wp-image-${ mediaId }`
-					: null
-			}
-		/>
-	);
+	const classes = classnames( {
+		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
+		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
+	} );
+
+	let image = <img src={ mediaUrl } alt={ mediaAlt } className={ classes } />;
 
 	if ( href ) {
 		image = (
