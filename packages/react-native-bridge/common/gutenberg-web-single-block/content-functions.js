@@ -49,8 +49,7 @@ window.sendGutenbergReadyMessage = () => {
 		window.webkit.messageHandlers.gutenbergReady.postMessage( '' );
 	} else {
 		// Android
-		// TODO: Fix for Android
-		window.wpwebkit.postMessage();
+		window.wpwebkit.gutenbergReady();
 	}
 	window.readyMessageSent = true;
 };

@@ -2,7 +2,6 @@ package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,6 +21,7 @@ import org.wordpress.android.util.AppLog;
 import org.wordpress.android.util.helpers.WPWebChromeClient;
 import org.wordpress.mobile.FileUtils;
 
+import java.util.List;
 import java.util.Locale;
 
 public class GutenbergWebViewActivity extends AppCompatActivity {
@@ -43,6 +43,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gutenberg_web_view);
+
+        WebView.setWebContentsDebuggingEnabled(true);
 
         setupToolbar();
 
@@ -204,25 +206,42 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 injectWPBarsCssScript = removeWhiteSpace(removeNewLines(injectWPBarsCssScript));
                 evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript));
 
-                final Handler handler = new Handler();
-                handler.postDelayed(() -> {
-                    String preventAutosaves = getFileContentFromAssets("gutenberg-web-single-block/prevent-autosaves.js");
-                    evaluateJavaScript(preventAutosaves);
-
-                    String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
-                    String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
-                    insertBlock = String.format(insertBlock, blockContent);
-                    evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
-
-                    view.setVisibility(View.VISIBLE);
-                }, 2000);
-            }
-
-            private void evaluateJavaScript(String script) {
-                mWebView.evaluateJavascript(script, value ->
-                        AppLog.e(AppLog.T.EDITOR, value));
+                String injectGutenbergObserver = getFileContentFromAssets("gutenberg-web-single-block/gutenberg-observer.js");
+                evaluateJavaScript(injectGutenbergObserver);
             }
         });
+    }
+
+    private void evaluateJavaScript(String script) {
+        mWebView.evaluateJavascript(script, value ->
+                AppLog.e(AppLog.T.EDITOR, value));
+    }
+
+    private void onGutenbergReady() {
+        injectExternalSources();
+        preventAutoSavesScript();
+        insertBlockScript();
+        mWebView.setVisibility(View.VISIBLE);
+    }
+
+    private void injectExternalSources() {
+        List<String> list = FileUtils.getAssetFileList(this, "unsupported-block-editor");
+        for (String path : list) {
+            String externalJSSource = getFileContentFromAssets(path);
+            evaluateJavaScript(externalJSSource);
+        }
+    }
+
+    private void preventAutoSavesScript() {
+        String preventAutosaves = getFileContentFromAssets("gutenberg-web-single-block/prevent-autosaves.js");
+        evaluateJavaScript(preventAutosaves);
+    }
+
+    private void insertBlockScript() {
+        String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
+        String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
+        insertBlock = String.format(insertBlock, blockContent);
+        evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
     }
 
     @Override
@@ -254,6 +273,16 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             if (content != null && content.length() > 0) {
                 saveContent(content);
             }
+        }
+
+        @JavascriptInterface
+        public void gutenbergReady() {
+            GutenbergWebViewActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    onGutenbergReady();
+                }
+            });
         }
     }
 }
