@@ -21,18 +21,35 @@ import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
  */
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
 
-const BottomSheetNavigationScreen = ( { children } ) => {
+const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 	const navigation = useNavigation();
 	const heightRef = useRef( { maxHeight: 0 } );
 	const isFocused = useIsFocused();
 	const {
 		onHandleHardwareButtonPress,
 		shouldEnableBottomSheetMaxHeight,
+		setIsFullScreen,
 	} = useContext( BottomSheetContext );
 
-	const { setHeight } = useContext( BottomSheetNavigationContext );
+	const { setHeight, setNavigationFullScreen } = useContext(
+		BottomSheetNavigationContext
+	);
 
-	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [] );
+	const setHeightDebounce = useCallback(
+		debounce( ( height ) => {
+			setHeight( height, true );
+			setNavigationFullScreen( false );
+		}, 10 ),
+		[ setNavigationFullScreen ]
+	);
+
+	const setFullHeight = useCallback(
+		( isFull ) => {
+			setIsFullScreen( isFull );
+			setNavigationFullScreen( isFull );
+		},
+		[ setNavigationFullScreen, setIsFullScreen ]
+	);
 
 	useFocusEffect(
 		useCallback( () => {
@@ -45,17 +62,24 @@ const BottomSheetNavigationScreen = ( { children } ) => {
 				onHandleHardwareButtonPress( null );
 				return false;
 			} );
-			if ( heightRef.current.maxHeight !== 0 ) {
+			if ( fullScreen ) {
+				setFullHeight( true );
+			} else if ( heightRef.current.maxHeight !== 0 ) {
 				setHeight( heightRef.current.maxHeight );
+				setFullHeight( false );
 			}
 			return () => {};
-		}, [] )
+		}, [ setFullHeight ] )
 	);
 	const onLayout = ( { nativeEvent } ) => {
 		const { height } = nativeEvent.layout;
+
 		if ( heightRef.current.maxHeight !== height && isFocused ) {
 			heightRef.current.maxHeight = height;
-			setHeightDebounce( height, true );
+			if ( fullScreen ) {
+				return;
+			}
+			setHeightDebounce( height );
 		}
 	};
 

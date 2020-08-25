@@ -50,6 +50,8 @@ class BottomSheet extends Component {
 			this
 		);
 
+		this.setIsFullScreen = this.setIsFullScreen.bind( this );
+
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
@@ -72,6 +74,7 @@ class BottomSheet extends Component {
 			handleClosingBottomSheet: null,
 			handleHardwareButtonPress: null,
 			isMaxHeightSet: true,
+			isFullScreen: this.props.isFullScreen || false,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -231,6 +234,16 @@ class BottomSheet extends Component {
 		this.onShouldSetBottomSheetMaxHeight( true );
 	}
 
+	setIsFullScreen( isFullScreen ) {
+		if ( isFullScreen !== this.state.isFullScreen ) {
+			if ( isFullScreen ) {
+				this.setState( { isFullScreen, isMaxHeightSet: false } );
+			} else {
+				this.setState( { isFullScreen, isMaxHeightSet: true } );
+			}
+		}
+	}
+
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { handleHardwareButtonPress } = this.state;
@@ -275,6 +288,7 @@ class BottomSheet extends Component {
 			isScrolling,
 			scrollEnabled,
 			isMaxHeightSet,
+			isFullScreen,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -303,6 +317,12 @@ class BottomSheet extends Component {
 			styles.bottomSheetHeaderTitleDark
 		);
 
+		let listStyle = {};
+		if ( isFullScreen ) {
+			listStyle = { flexGrow: 1 };
+		} else if ( isMaxHeightSet ) {
+			listStyle = { maxHeight };
+		}
 		const listProps = {
 			disableScrollViewPanResponder: true,
 			bounces,
@@ -316,8 +336,9 @@ class BottomSheet extends Component {
 				contentStyle,
 				isChildrenScrollable && this.getContentStyle(),
 				contentStyle,
+				isFullScreen && { flexGrow: 1 },
 			],
-			style: isMaxHeightSet ? { maxHeight } : {},
+			style: listStyle,
 			scrollEnabled,
 			automaticallyAdjustContentInsets: false,
 		};
@@ -373,6 +394,7 @@ class BottomSheet extends Component {
 					style={ {
 						...backgroundStyle,
 						borderColor: 'rgba(0, 0, 0, 0.1)',
+						flex: isFullScreen ? 1 : undefined,
 						...style,
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }
@@ -396,6 +418,7 @@ class BottomSheet extends Component {
 								onHandleHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
 								listProps,
+								setIsFullScreen: this.setIsFullScreen,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>
