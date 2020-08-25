@@ -100,7 +100,7 @@ const LinkSettingsScreen = ( {
 	};
 	useEffect( () => {
 		onHandleClosingBottomSheet( () => {
-			submit();
+			submit( inputValue );
 		} );
 	}, [ inputValue, opensInNewWindow, text ] );
 
@@ -155,18 +155,21 @@ const LinkSettingsScreen = ( {
 		onClose();
 	};
 
-	const removeLink = () => {
+	const removeLink = useCallback( () => {
 		onRemove();
 		onClose();
-	};
+	}, [ onRemove, onClose ] );
 
-	const submit = () => {
-		if ( inputValue === '' ) {
-			removeLink();
-		} else {
-			submitLink();
-		}
-	};
+	const submit = useCallback(
+		( submitValue ) => {
+			if ( submitValue === '' ) {
+				removeLink();
+			} else {
+				submitLink();
+			}
+		},
+		[ removeLink ]
+	);
 
 	useFocusEffect(
 		useCallback( () => {
