@@ -23,10 +23,10 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	);
 
 	if ( isset( $block->context['query'] ) ) {
-		$query['offset'] = isset( $block->context['query']['perPage'] )
-			? ( $block->context['query']['perPage'] * ( $page - 1 ) + $block->context['query']['offset'] )
-			: 0;
-
+		$query['offset'] = 0;
+		if ( isset( $block->context['query']['perPage'] ) ) {
+			$query['offset'] = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
+		}
 		if ( isset( $block->context['query']['categoryIds'] ) ) {
 			$query['category__in'] = $block->context['query']['categoryIds'];
 		}
