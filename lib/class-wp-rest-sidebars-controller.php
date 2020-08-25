@@ -321,7 +321,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 						call_user_func_array( $widget['callback'], $widget_parameters );
 
-						$widget['rendered'] = ob_get_clean();
+						$widget['rendered'] = trim( ob_get_clean() );
 					}
 
 					if ( is_array( $widget['callback'] ) && isset( $widget['callback'][0] ) ) {
