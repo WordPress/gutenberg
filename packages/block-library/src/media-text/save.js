@@ -13,6 +13,7 @@ import { InnerBlocks } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { imageFillStyles } from './media-container';
+import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
 
@@ -24,7 +25,6 @@ export default function save( { attributes } ) {
 		mediaType,
 		mediaUrl,
 		mediaWidth,
-		mediaSizeSlug,
 		mediaId,
 		verticalAlignment,
 		imageFill,
@@ -34,6 +34,7 @@ export default function save( { attributes } ) {
 		linkTarget,
 		rel,
 	} = attributes;
+	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = isEmpty( rel ) ? undefined : rel;
 
 	const imageClasses = classnames( {

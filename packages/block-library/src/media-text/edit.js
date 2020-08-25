@@ -33,6 +33,7 @@ import { pullLeft, pullRight } from '@wordpress/icons';
  * Internal dependencies
  */
 import MediaContainer from './media-container';
+import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 /**
  * Constants
@@ -125,10 +126,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		mediaType,
 		mediaUrl,
 		mediaWidth,
-		mediaSizeSlug,
 		rel,
 		verticalAlignment,
 	} = attributes;
+	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
 	const image = useSelect(
 		( select ) =>
