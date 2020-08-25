@@ -45,6 +45,7 @@ export default function SearchEdit( {
 	attributes,
 	setAttributes,
 	toggleSelection,
+	isSelected,
 } ) {
 	const {
 		label,
@@ -286,15 +287,16 @@ export default function SearchEdit( {
 				minWidth={ MIN_WIDTH }
 				bounds={ align === undefined ? 'parent' : 'window' }
 				enable={ getResizableSides() }
+				onResizeStart={ () => {
+					toggleSelection( false );
+				} }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					setAttributes( {
 						width: parseInt( width + delta.width, 10 ),
 					} );
 					toggleSelection( true );
 				} }
-				onResizeStart={ () => {
-					toggleSelection( false );
-				} }
+				showHandle={ isSelected }
 			>
 				{ ( 'button-inside' === buttonPosition ||
 					'button-outside' === buttonPosition ) && (
