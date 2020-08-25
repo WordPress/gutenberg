@@ -81,6 +81,7 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	return (
 		<Root className="components-navigation">
 			<Animate
+				key={ level.id }
 				type="slide-in"
 				options={ {
 					origin: isNavigatingBack ? 'right' : 'left',
