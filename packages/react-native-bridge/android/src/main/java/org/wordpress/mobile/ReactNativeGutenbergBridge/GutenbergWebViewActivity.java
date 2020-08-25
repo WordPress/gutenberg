@@ -21,6 +21,7 @@ import org.wordpress.android.util.AppLog;
 import org.wordpress.android.util.helpers.WPWebChromeClient;
 import org.wordpress.mobile.FileUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -225,11 +226,15 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void injectExternalSources() {
-        List<String> list = FileUtils.getAssetFileList(this, "unsupported-block-editor");
+        List<String> list = getExternalSources();
         for (String path : list) {
             String externalJSSource = getFileContentFromAssets(path);
             evaluateJavaScript(externalJSSource);
         }
+    }
+
+    protected List<String> getExternalSources() {
+        return new ArrayList<>();
     }
 
     private void preventAutoSavesScript() {
