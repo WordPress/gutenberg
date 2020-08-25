@@ -210,7 +210,7 @@ function computeCustomizedAttribute( blocks, menuId, menuItemsByClientId ) {
 			};
 		} else {
 			attributes = {
-				type: 'html',
+				type: 'block',
 				content: serialize( block ),
 			};
 		}

@@ -113,16 +113,16 @@ function createNavigationBlock( menuItems ) {
 }
 
 function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
-	if ( menuItem.type === 'html' ) {
-		const parsedBlocks = parse( menuItem.content.raw );
+	if ( menuItem.type === 'block' ) {
+		const [ block ] = parse( menuItem.content.raw );
 
-		if ( parsedBlocks.length !== 1 ) {
+		if ( ! block ) {
 			return createBlock( 'core/freeform', {
 				originalContent: menuItem.content.raw,
 			} );
 		}
 
-		return parsedBlocks[ 0 ];
+		return createBlock( block.name, block.attributes, innerBlocks );
 	}
 
 	const attributes = {

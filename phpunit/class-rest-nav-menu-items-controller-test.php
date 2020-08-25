@@ -451,16 +451,16 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * Tests that a HTML menu item can be created.
+	 * Tests that a block menu item can be created.
 	 */
-	public function test_create_item_html() {
+	public function test_create_item_block() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$params = $this->set_menu_item_data(
 			array(
-				'type'    => 'html',
-				'content' => '<!-- wp:paragraph --><p>HTML content</p><!-- /wp:paragraph -->',
+				'type'    => 'block',
+				'content' => '<!-- wp:paragraph --><p>Block content</p><!-- /wp:paragraph -->',
 			)
 		);
 		$request->set_body_params( $params );
@@ -469,15 +469,15 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
-	 * Tests that a HTML menu item can be created.
+	 * Tests that a block menu item can be created.
 	 */
-	public function test_create_item_invalid_html_content() {
+	public function test_create_item_invalid_block_content() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$params = $this->set_menu_item_data(
 			array(
-				'type' => 'html',
+				'type' => 'block',
 			)
 		);
 		$request->set_body_params( $params );
@@ -735,7 +735,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		}
 
 		// Check content.
-		if ( 'html' === $data['type'] ) {
+		if ( 'block' === $data['type'] ) {
 			$menu_item_content = get_post_meta( $post->ID, '_menu_item_content', true );
 			$this->assertEquals( apply_filters( 'the_content', $menu_item_content ), $data['content']['rendered'] );
 			if ( 'edit' === $context ) {

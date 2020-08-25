@@ -31,11 +31,25 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 		setIsFullScreen,
 	} = useContext( BottomSheetContext );
 
-	const { setHeight, setFullScreen } = useContext(
+	const { setHeight, setNavigationFullScreen } = useContext(
 		BottomSheetNavigationContext
 	);
 
-	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [] );
+	const setHeightDebounce = useCallback(
+		debounce( ( height ) => {
+			setHeight( height, true );
+			setNavigationFullScreen( false );
+		}, 10 ),
+		[ setNavigationFullScreen, setHeight ]
+	);
+
+	const setFullHeight = useCallback(
+		( isFull ) => {
+			setIsFullScreen( isFull );
+			setNavigationFullScreen( isFull );
+		},
+		[ setNavigationFullScreen, setIsFullScreen ]
+	);
 
 	useFocusEffect(
 		useCallback( () => {
@@ -49,28 +63,26 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 				return false;
 			} );
 			if ( fullScreen ) {
-				setFullScreen( true );
-				setIsFullScreen( true );
+				setFullHeight( true );
 			} else if ( heightRef.current.maxHeight !== 0 ) {
 				setHeight( heightRef.current.maxHeight );
+				setFullHeight( false );
 			}
-			return () => {
-				if ( fullScreen ) {
-					setIsFullScreen( false );
-					setFullScreen( false );
-				}
-			};
-		}, [ setFullScreen ] )
+			return () => {};
+		}, [ setFullHeight ] )
 	);
 	const onLayout = ( { nativeEvent } ) => {
 		if ( fullScreen ) {
 			return;
 		}
 		const { height } = nativeEvent.layout;
-		setFullScreen( false );
+
 		if ( heightRef.current.maxHeight !== height && isFocused ) {
 			heightRef.current.maxHeight = height;
-			setHeightDebounce( height, true );
+			if ( fullScreen ) {
+				return;
+			}
+			setHeightDebounce( height );
 		}
 	};
 

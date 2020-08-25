@@ -91,10 +91,10 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 		}
 	};
 
-	const setFullScreen = ( full ) => {
-		if ( full !== isFullScreen ) {
+	const setNavigationFullScreen = ( isFull ) => {
+		if ( isFull !== isFullScreen ) {
 			performLayoutAnimation( ANIMATION_DURATION );
-			setIsFullScreen( full );
+			setIsFullScreen( isFull );
 		}
 	};
 
@@ -113,9 +113,17 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 
 	return useMemo( () => {
 		return (
-			<View style={ { height: isFullScreen ? '100%' : currentHeight } }>
+			<View
+				style={ {
+					height: isFullScreen ? '100%' : currentHeight,
+				} }
+			>
 				<BottomSheetNavigationProvider
-					value={ { setHeight, currentHeight, setFullScreen } }
+					value={ {
+						setHeight,
+						currentHeight,
+						setNavigationFullScreen,
+					} }
 				>
 					{ main ? (
 						<NavigationContainer theme={ _theme }>

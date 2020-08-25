@@ -238,7 +238,11 @@ class BottomSheet extends Component {
 
 	setIsFullScreen( isFullScreen ) {
 		if ( isFullScreen !== this.state.isFullScreen ) {
-			this.setState( { isFullScreen } );
+			if ( isFullScreen ) {
+				this.setState( { isFullScreen, isMaxHeightSet: false } );
+			} else {
+				this.setState( { isFullScreen, isMaxHeightSet: true } );
+			}
 		}
 	}
 
@@ -315,6 +319,12 @@ class BottomSheet extends Component {
 			styles.bottomSheetHeaderTitleDark
 		);
 
+		let listStyle = {};
+		if ( isFullScreen ) {
+			listStyle = { flexGrow: 1 };
+		} else if ( isMaxHeightSet ) {
+			listStyle = { maxHeight };
+		}
 		const listProps = {
 			disableScrollViewPanResponder: true,
 			bounces,
@@ -328,8 +338,9 @@ class BottomSheet extends Component {
 				contentStyle,
 				isChildrenScrollable && this.getContentStyle(),
 				contentStyle,
+				isFullScreen && { flexGrow: 1 },
 			],
-			style: isMaxHeightSet ? { maxHeight } : {},
+			style: listStyle,
 			scrollEnabled,
 			automaticallyAdjustContentInsets: false,
 		};
