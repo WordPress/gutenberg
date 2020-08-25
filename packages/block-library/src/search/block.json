@@ -7,7 +7,7 @@
 		},
 		"showLabel": {
 			"type": "bool",
-			"default": false
+			"default": true
 		},
 		"placeholder": {
 			"type": "string",
@@ -15,7 +15,7 @@
 		},
 		"width": {
 			"type": "number",
-			"default": 250
+			"default": 460
 		},
 		"buttonText": {
 			"type": "string"

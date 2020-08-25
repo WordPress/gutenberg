@@ -30,10 +30,10 @@ function render_block_core_search( $attributes ) {
 	$input_id       = 'wp-block-search__input-' . ++$instance_id;
 	$classnames     = classnames_for_block_core_search( $attributes );
 
-	$show_label	     = ( isset( $attributes['showLabel'] ) && ! $attributes['showLabel'] ) ? false : true;
-	$show_input		 = ( isset( $attributes['buttonPosition'] ) && 'button-only' == $attributes['buttonPosition'] ) ? false : true;
-	$show_button	 = ( isset( $attributes['buttonPosition'] ) && 'no-button' == $attributes['buttonPosition'] ) ? false : true;
-	$use_icon_button = ( isset( $attributes['buttonUseIcon'] ) && ! $attributes['buttonUseIcon'] ) ? false : true;
+	$show_label	     = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
+	$use_icon_button = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
+	$show_input		 = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' == $attributes['buttonPosition'] ) ? false : true;
+	$show_button	 = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' == $attributes['buttonPosition'] ) ? false : true;
 
 	$label_markup   = '';
 	$input_markup	= '';
