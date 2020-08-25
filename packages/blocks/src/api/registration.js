@@ -522,6 +522,18 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 };
 
 /**
+ * Returns an array with the variations of a given block type.
+ *
+ * @param {string}                blockName Name of block (example: “core/columns”).
+ * @param {WPBlockVariationScope} [scope]   Block variation scope name.
+ *
+ * @return {(WPBlockVariation[]|void)} Block variations.
+ */
+export const getBlockVariations = ( blockName, scope ) => {
+	return select( 'core/blocks' ).getBlockVariations( blockName, scope );
+};
+
+/**
  * Registers a new block variation for the given block type.
  *
  * @param {string}           blockName Name of the block (example: “core/columns”).
