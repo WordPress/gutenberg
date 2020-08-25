@@ -176,11 +176,23 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						$wp_registered_widgets[ $input_widget['id'] ]['callback'][0] = $new_object;
 					}
 				}
-			} elseif ( $wp_registered_widget_updates[ $input_widget['id'] ] ) {
-				// Old-style widget.
-				$update_control = $wp_registered_widget_updates[ $input_widget['id'] ];
-				$_POST          = wp_slash( $input_widget['settings'] );
-				call_user_func( $update_control['callback'] );
+			} else {
+				$registered_widget_id = null;
+				if ( isset( $wp_registered_widget_updates[ $input_widget['id'] ] ) ) {
+					$registered_widget_id = $input_widget['id'];
+				} else {
+					$numberless_id = substr( $input_widget['id'], 0, strrpos( $input_widget['id'], '-' ) );
+					if ( isset( $wp_registered_widget_updates[ $numberless_id ] ) ) {
+						$registered_widget_id = $numberless_id;
+					}
+				}
+
+				if ( $registered_widget_id ) {
+					// Old-style widget.
+					$update_control = $wp_registered_widget_updates[ $registered_widget_id ];
+					$_POST          = wp_slash( $input_widget['settings'] );
+					call_user_func( $update_control['callback'] );
+				}
 			}
 			ob_end_clean();
 
@@ -213,6 +225,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 			$data[] = $this->prepare_item_for_response( $sidebar, $request )->get_data();
 		}
+
 		return rest_ensure_response( $data );
 	}
 
@@ -349,8 +362,8 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Prepare a single sidebar output for response
 	 *
-	 * @param array           $raw_sidebar Sidebar instance.
-	 * @param WP_REST_Request $request     Request object.
+	 * @param array $raw_sidebar Sidebar instance.
+	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return WP_REST_Response $data
 	 */
@@ -522,7 +535,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves a widget instance.
 	 *
-	 * @param array  $sidebar sidebar data available at $wp_registered_sidebars.
+	 * @param array $sidebar sidebar data available at $wp_registered_sidebars.
 	 * @param string $id Identifier of the widget instance.
 	 *
 	 * @return array Array containing the widget instance.
