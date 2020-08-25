@@ -55,7 +55,7 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 		);
 
 		if ( ! empty( $request['search'] ) ) {
-			$query_args['name__like'] = $request['search'];
+			$query_args['search'] = $request['search'];
 		}
 
 		/**
