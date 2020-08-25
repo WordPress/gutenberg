@@ -23,12 +23,10 @@ export default function InstallButton( { attributes, block, clientId } ) {
 				installBlockType( block ).then( ( success ) => {
 					if ( success ) {
 						const blockType = getBlockType( block.name );
-						console.log( attributes.originalUndelimitedContent );
 						const oldAttributes = getBlockAttributes(
 							blockType,
 							attributes.originalUndelimitedContent
 						);
-						console.log( oldAttributes );
 						replaceBlock(
 							clientId,
 							createBlock( blockType.name, oldAttributes )
