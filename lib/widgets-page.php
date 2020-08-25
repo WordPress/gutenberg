@@ -38,6 +38,7 @@ function the_gutenberg_widgets( $page = 'gutenberg_page_gutenberg-widgets' ) {
 function gutenberg_widgets_init( $hook ) {
 	if ( $hook === 'widgets.php' ) {
 		wp_enqueue_style( 'wp-block-library' );
+		wp_enqueue_style( 'wp-block-library-theme' );
 		return;
 	}
 	if ( ! in_array( $hook, array( 'gutenberg_page_gutenberg-widgets', 'gutenberg_customizer', ), true ) ) {
