@@ -42,6 +42,10 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	}, [] );
 
 	const NavigationBackButton = ( { children: backButtonChildren } ) => {
+		if ( ! parentLevel ) {
+			return null;
+		}
+
 		return (
 			<Button
 				isPrimary
