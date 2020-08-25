@@ -51,7 +51,6 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 			'hide_empty' => false,
 			'offset'     => ( $page - 1 ) * $per_page,
 			'number'     => $per_page,
-			'fields'     => 'ids',
 		);
 
 		if ( ! empty( $request['search'] ) ) {
@@ -68,8 +67,9 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 		 */
 		$query_args = apply_filters( 'rest_term_search_query', $query_args, $request );
 
-		$query     = new WP_Term_Query();
-		$found_ids = $query->query( $query_args );
+		$query       = new WP_Term_Query();
+		$found_terms = $query->query( $query_args );
+		$found_ids   = wp_list_pluck( $found_terms, 'term_id' );
 
 		unset( $query_args['offset'], $query_args['number'] );
 
