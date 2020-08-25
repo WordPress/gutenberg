@@ -30,6 +30,7 @@ function InserterMenu( {
 	showInserterHelpPanel,
 	showMostUsedBlocks,
 } ) {
+	const [ activeTab, setActiveTab ] = useState( 'blocks' );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [
@@ -112,6 +113,18 @@ function InserterMenu( {
 		/>
 	);
 
+	const searchFormPlaceholder = () => {
+		if ( activeTab === 'reusable' ) {
+			return __( 'Search for a reusable block' );
+		}
+
+		if ( activeTab === 'patterns' ) {
+			return __( 'Search for a pattern' );
+		}
+
+		return __( 'Search for a block' );
+	};
+
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
 	// Popover's focusOnMount.
@@ -133,11 +146,13 @@ function InserterMenu( {
 							setFilterValue( value );
 						} }
 						value={ filterValue }
+						placeholder={ searchFormPlaceholder() }
 					/>
 					{ ( showPatterns || hasReusableBlocks ) && (
 						<InserterTabs
 							showPatterns={ showPatterns }
 							showReusableBlocks={ hasReusableBlocks }
+							onSelect={ setActiveTab }
 						>
 							{ ( tab ) => {
 								if ( tab.name === 'blocks' ) {
