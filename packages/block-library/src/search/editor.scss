@@ -1,5 +1,5 @@
 .wp-block-search {
-	&__input,
+	.wp-block-search__input,
 	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
 		border-radius: $radius-block-ui;
 		border: 1px solid $dark-gray-200;
@@ -14,7 +14,7 @@
 		}
 	}
 
-	&__button {
+	.wp-block-search__button {
 		background: #f7f7f7;
 		border-radius: $radius-block-ui;
 		border: 1px solid #ccc;

@@ -12,14 +12,16 @@
 	.wp-block-search__input {
 		flex-grow: 1;
 		min-width: 50px;
+		border: 1px solid $dark-gray-200;
 	}
 
 	.wp-block-search__button {
 		margin-left: 0.625em;
+		word-break: normal;
 
 		svg {
-			width: 25px;
-			height: 25px;
+			min-width: 25px;
+			min-height: 25px;
 		}
 	}
 
@@ -28,4 +30,24 @@
 			margin-left: 0;
 		}
 	}
+
+	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
+		padding: $grid-unit-05;
+		border: 1px solid $dark-gray-200;
+
+		.wp-block-search__input {
+			border-radius: 0;
+			border: none;
+			padding: 0 0 0 4px;
+
+			&:focus {
+				outline: none;
+			}
+		}
+
+		.wp-block-search__button {
+			padding: 2px 8px;
+		}
+	}
 }
+
