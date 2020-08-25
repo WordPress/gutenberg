@@ -32,7 +32,7 @@
 		}
 
 		.block-editor-block-styles__item-preview {
-			border: 2px solid $gray-900;
+			outline: 2px solid $gray-900;
 		}
 	}
 }
@@ -48,7 +48,6 @@
 	align-items: center;
 	flex-grow: 1;
 	min-height: 80px;
-	border: 2px solid transparent;
 }
 
 .block-editor-block-switcher__styles__menugroup {
