@@ -27,9 +27,9 @@ class UnsavedChangesWarning extends Component {
 	 * @return {?string} Warning prompt message, if unsaved changes exist.
 	 */
 	warnIfUnsavedChanges( event ) {
-		const { isEditedPostDirty } = this.props;
+		const { isDirty } = this.props;
 
-		if ( isEditedPostDirty() ) {
+		if ( isDirty() ) {
 			event.returnValue = __(
 				'You have unsaved changes. If you proceed, they will be lost.'
 			);
@@ -47,5 +47,9 @@ export default withSelect( ( select ) => ( {
 	// conditions with `BrowserURL` where `componentDidUpdate` gets the
 	// new value of `isEditedPostDirty` before this component does,
 	// causing this component to incorrectly think a trashed post is still dirty.
-	isEditedPostDirty: select( 'core/editor' ).isEditedPostDirty,
+	isDirty: () => {
+		const { __experimentalGetDirtyEntityRecords } = select( 'core' );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		return dirtyEntityRecords.length > 0;
+	},
 } ) )( UnsavedChangesWarning );

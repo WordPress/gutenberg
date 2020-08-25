@@ -1,11 +1,6 @@
-// Default background and font color
-.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
-	.wp-block-navigation-link:not(.has-text-color) {
-		color: $gray-900;
-	}
-	.wp-block-navigation__container {
-		background-color: $white;
-	}
+// Default text color.
+.wp-block-navigation-link:not(.has-text-color) {
+	color: currentColor;
 }
 
 // Justification.
@@ -20,4 +15,3 @@
 .items-justified-right > ul {
 	justify-content: flex-end;
 }
-

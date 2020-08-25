@@ -74,6 +74,10 @@
 		"featuredImageSizeHeight": {
 			"type": "number",
 			"default": null
+		},
+		"addLinkToFeaturedImage": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, includes, get, hasIn, compact } from 'lodash';
+import { find, includes, get, hasIn, compact, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,9 +22,9 @@ import {
 	receiveUserPermission,
 	receiveAutosaves,
 } from './actions';
-import { getKindEntities } from './entities';
-import { apiFetch, resolveSelect } from './controls';
-import { ifNotResolved } from './utils';
+import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { apiFetch, select, resolveSelect } from './controls';
+import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
 
 /**
  * Requests authors from the REST API.
@@ -47,20 +47,63 @@ export function* getCurrentUser() {
 /**
  * Requests an entity's record from the REST API.
  *
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {number} key    Record's key
+ * @param {string}           kind  Entity kind.
+ * @param {string}           name  Entity name.
+ * @param {number|string}    key   Record's key
+ * @param {Object|undefined} query Optional object of query parameters to
+ *                                 include with request.
  */
-export function* getEntityRecord( kind, name, key = '' ) {
+export function* getEntityRecord( kind, name, key = '', query ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
 	}
-	const record = yield apiFetch( {
-		path: `${ entity.baseURL }/${ key }?context=edit`,
+
+	if ( query !== undefined && query._fields ) {
+		// If requesting specific fields, items and query assocation to said
+		// records are stored by ID reference. Thus, fields must always include
+		// the ID.
+		query = {
+			...query,
+			_fields: uniq( [
+				...( getNormalizedCommaSeparable( query._fields ) || [] ),
+				entity.key || DEFAULT_ENTITY_KEY,
+			] ).join(),
+		};
+	}
+
+	// Disable reason: While true that an early return could leave `path`
+	// unused, it's important that path is derived using the query prior to
+	// additional query modifications in the condition below, since those
+	// modifications are relevant to how the data is tracked in state, and not
+	// for how the request is made to the REST API.
+
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const path = addQueryArgs( entity.baseURL + '/' + key, {
+		...query,
+		context: 'edit',
 	} );
-	yield receiveEntityRecords( kind, name, record );
+
+	if ( query !== undefined ) {
+		query = { ...query, include: [ key ] };
+
+		// The resolution cache won't consider query as reusable based on the
+		// fields, so it's tested here, prior to initiating the REST request,
+		// and without causing `getEntityRecords` resolution to occur.
+		const hasRecords = yield select(
+			'hasEntityRecords',
+			kind,
+			name,
+			query
+		);
+		if ( hasRecords ) {
+			return;
+		}
+	}
+
+	const record = yield apiFetch( { path } );
+	yield receiveEntityRecords( kind, name, record, query );
 }
 
 /**
@@ -92,6 +135,20 @@ export function* getEntityRecords( kind, name, query = {} ) {
 	if ( ! entity ) {
 		return;
 	}
+
+	if ( query._fields ) {
+		// If requesting specific fields, items and query assocation to said
+		// records are stored by ID reference. Thus, fields must always include
+		// the ID.
+		query = {
+			...query,
+			_fields: uniq( [
+				...( getNormalizedCommaSeparable( query._fields ) || [] ),
+				entity.key || DEFAULT_ENTITY_KEY,
+			] ).join(),
+		};
+	}
+
 	const path = addQueryArgs( entity.baseURL, {
 		...query,
 		context: 'edit',

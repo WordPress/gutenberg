@@ -15,7 +15,7 @@ export {
 export {
 	pasteHandler,
 	rawHandler,
-	getPhrasingContentSchema,
+	deprecatedGetPhrasingContentSchema as getPhrasingContentSchema,
 } from './raw-handling';
 export {
 	default as serialize,
@@ -43,6 +43,7 @@ export {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
+	getBlockVariations,
 	isReusableBlock,
 	getChildBlockNames,
 	hasChildBlocks,
