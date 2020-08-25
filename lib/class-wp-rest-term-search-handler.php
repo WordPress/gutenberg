@@ -68,14 +68,17 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 		 */
 		$query_args = apply_filters( 'rest_term_search_query', $query_args, $request );
 
-		$query = new WP_Term_Query();
-
+		$query     = new WP_Term_Query();
 		$found_ids = $query->query( $query_args );
 
 		unset( $query_args['offset'], $query_args['number'] );
-		$query_args['fields'] = 'count';
 
-		$total = (int) $query->query( $query_args );
+		$total = wp_count_terms( $query_args );
+
+		// wp_count_terms() can return a falsey value when the term has no children.
+		if ( ! $total ) {
+			$total = 0;
+		}
 
 		return array(
 			self::RESULT_IDS   => $found_ids,
