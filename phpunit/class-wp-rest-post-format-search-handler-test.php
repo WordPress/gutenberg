@@ -25,6 +25,8 @@ class WP_REST_Post_Format_Search_Handler_Test extends WP_Test_REST_Controller_Te
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
+		add_theme_support( 'post-formats' );
+
 		self::$my_post_id = $factory->post->create(
 			array(
 				'post_title' => 'Test post',
@@ -39,6 +41,8 @@ class WP_REST_Post_Format_Search_Handler_Test extends WP_Test_REST_Controller_Te
 	 */
 	public static function wpTearDownAfterClass() {
 		wp_delete_post( self::$my_post_id );
+
+		remove_theme_support( 'post-formats' );
 	}
 
 	/**
