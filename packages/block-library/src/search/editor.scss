@@ -1,4 +1,12 @@
 .wp-block-search {
+	.wp-block-search__input {
+		padding: $grid-unit-10;
+	}
+
+	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
+		padding: $grid-unit-05;
+	}
+
 	.wp-block-search__input,
 	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
 		border-radius: $radius-block-ui;
@@ -6,7 +14,6 @@
 		color: $dark-gray-placeholder;
 		font-family: $default-font;
 		font-size: $default-font-size;
-		padding: $grid-unit-10;
 		background-color: $white;
 
 		&:focus {
@@ -23,19 +30,5 @@
 		font-size: $default-font-size;
 		padding: 6px 10px;
 		color: $dark-gray-700;
-	}
-
-	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
-		padding: $grid-unit-05;
-
-		.wp-block-search__input {
-			border-radius: 0;
-			border: none;
-			padding: 0 0 0 4px;
-		}
-
-		.wp-block-search__button {
-			padding: 2px 8px;
-		}
 	}
 }
