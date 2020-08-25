@@ -20,10 +20,10 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 
 	$query = array(
 		'post_type' => 'post',
+		'offset'    => 0,
 	);
 
 	if ( isset( $block->context['query'] ) ) {
-		$query['offset'] = 0;
 		if ( isset( $block->context['query']['perPage'] ) ) {
 			$query['offset'] = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
 		}
