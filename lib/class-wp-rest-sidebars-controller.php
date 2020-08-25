@@ -290,8 +290,9 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 		$widgets          = array();
 		$sidebars_widgets = (array) wp_get_sidebars_widgets();
+		$is_registered_sidebar = $sidebar_id === 'wp_inactive_widgets' || isset( $wp_registered_sidebars[ $sidebar_id ] );
 
-		if ( isset( $wp_registered_sidebars[ $sidebar_id ] ) && isset( $sidebars_widgets[ $sidebar_id ] ) ) {
+		if ( $is_registered_sidebar && isset( $sidebars_widgets[ $sidebar_id ] ) ) {
 			foreach ( $sidebars_widgets[ $sidebar_id ] as $widget_id ) {
 				// Just to be sure.
 				if ( isset( $wp_registered_widgets[ $widget_id ] ) ) {
@@ -381,6 +382,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			$sidebar['description'] = isset( $registered_sidebar['description'] ) ? $registered_sidebar['description'] : '';
 		} else {
 			$sidebar['status'] = 'inactive';
+		}
+
+		if ( $sidebar['id'] === 'wp_inactive_widgets' && empty( $sidebar['name'] ) ) {
+			$sidebar['name'] = __( 'Inactive widgets', 'gutenberg' );
 		}
 
 		$fields = $this->get_fields_for_response( $request );
