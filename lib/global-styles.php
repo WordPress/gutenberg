@@ -567,9 +567,9 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
  * @return array Merged trees
  */
 function gutenberg_experimental_global_styles_get_merged_origins() {
-	$core   = gutenberg_experimental_global_styles_get_core();
-	$theme  = gutenberg_experimental_global_styles_get_theme();
-	$user   = gutenberg_experimental_global_styles_get_user();
+	$core  = gutenberg_experimental_global_styles_get_core();
+	$theme = gutenberg_experimental_global_styles_get_theme();
+	$user  = gutenberg_experimental_global_styles_get_user();
 
 	return gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user );
 }
