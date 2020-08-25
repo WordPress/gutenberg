@@ -40,7 +40,7 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 			setHeight( height, true );
 			setNavigationFullScreen( false );
 		}, 10 ),
-		[ setNavigationFullScreen ]
+		[ setNavigationFullScreen, setHeight ]
 	);
 
 	const setFullHeight = useCallback(
