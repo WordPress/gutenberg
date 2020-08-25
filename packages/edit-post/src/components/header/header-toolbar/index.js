@@ -16,7 +16,7 @@ import {
 	EditorHistoryUndo,
 } from '@wordpress/editor';
 import { Button, Dropdown, ToolbarItem } from '@wordpress/components';
-import { plus, chevronDown } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
 function HeaderToolbar() {
@@ -148,10 +148,15 @@ function HeaderToolbar() {
 						<Button
 							className="button-toggle"
 							aria-expanded={ isOpen }
-							icon={ chevronDown }
 							isSecondary
 							onClick={ onToggle }
-						/>
+						>
+							{
+								/* translators: button label text should, if possible, be under 16
+			characters. */
+								__( 'Tools' )
+							}
+						</Button>
 					) }
 					renderContent={ () => overflowItems }
 				/>

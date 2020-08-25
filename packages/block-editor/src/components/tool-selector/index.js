@@ -46,13 +46,13 @@ function ToolSelector( props, ref ) {
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
 					/* translators: button label text should, if possible, be under 16 characters. */
-					label={ __( 'Tools' ) }
+					label={ __( 'Modes' ) }
 				/>
 			) }
 			position="bottom right"
 			renderContent={ () => (
 				<>
-					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
+					<NavigableMenu role="menu" aria-label={ __( 'Modes' ) }>
 						<MenuItemsChoice
 							value={ isNavigationTool ? 'select' : 'edit' }
 							onSelect={ onSwitchMode }
