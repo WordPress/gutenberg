@@ -9,7 +9,7 @@ import {
 } from '@wordpress/interface';
 import { Button, Dropdown } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { chevronDown } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -90,10 +90,16 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							<Button
 								className="button-toggle"
 								aria-expanded={ isOpen }
-								icon={ chevronDown }
 								isSecondary
 								onClick={ onToggle }
-							/>
+							>
+								{
+									/* translators: button label text should, if possible, be under 16
+			characters. */
+
+									__( 'Options' )
+								}
+							</Button>
 						) }
 						renderContent={ () => overflowItems }
 					/>
