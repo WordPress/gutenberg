@@ -288,9 +288,9 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	public static function get_widgets( $sidebar_id ) {
 		global $wp_registered_widgets, $wp_registered_sidebars;
 
-		$widgets          = array();
-		$sidebars_widgets = (array) wp_get_sidebars_widgets();
-		$is_registered_sidebar = $sidebar_id === 'wp_inactive_widgets' || isset( $wp_registered_sidebars[ $sidebar_id ] );
+		$widgets               = array();
+		$sidebars_widgets      = (array) wp_get_sidebars_widgets();
+		$is_registered_sidebar = 'wp_inactive_widgets' === $sidebar_id || isset( $wp_registered_sidebars[ $sidebar_id ] );
 
 		if ( $is_registered_sidebar && isset( $sidebars_widgets[ $sidebar_id ] ) ) {
 			foreach ( $sidebars_widgets[ $sidebar_id ] as $widget_id ) {
@@ -384,7 +384,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			$sidebar['status'] = 'inactive';
 		}
 
-		if ( $sidebar['id'] === 'wp_inactive_widgets' && empty( $sidebar['name'] ) ) {
+		if ( 'wp_inactive_widgets' === $sidebar['id'] && empty( $sidebar['name'] ) ) {
 			$sidebar['name'] = __( 'Inactive widgets', 'gutenberg' );
 		}
 
