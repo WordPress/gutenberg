@@ -14,7 +14,7 @@ import {
 
 const mergeTrees = ( baseData, userData ) => {
 	// Deep clone from base data.
-	// We don't use cloneDeep from lodash here 
+	// We don't use cloneDeep from lodash here
 	// because we know the data is JSON compatible,
 	// see https://github.com/lodash/lodash/issues/1984
 	const mergedTree = JSON.parse( JSON.stringify( baseData ) );
