@@ -142,7 +142,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		$sidebar_widgets_ids = array();
 		foreach ( $input_widgets as $input_widget ) {
 			ob_start();
-			if ( isset( $wp_registered_widget_updates[ $input_widget['id_base'] ] ) ) {
+			if ( isset( $input_widget['id_base'] ) && isset( $wp_registered_widget_updates[ $input_widget['id_base'] ] ) ) {
 				// Class-based widget.
 				$update_control = $wp_registered_widget_updates[ $input_widget['id_base'] ];
 				if ( ! isset( $input_widget['id'] ) ) {
@@ -362,7 +362,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Prepare a single sidebar output for response
 	 *
-	 * @param array $raw_sidebar Sidebar instance.
+	 * @param array           $raw_sidebar Sidebar instance.
 	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return WP_REST_Response $data
@@ -403,7 +403,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			foreach ( $schema['properties']['widgets']['items']['properties'] as $property_id => $property ) {
 				if ( isset( $widget[ $property_id ] ) && gettype( $widget[ $property_id ] ) === $property['type'] ) {
 					$widget_data[ $property_id ] = $widget[ $property_id ];
-				} elseif ( 'settings' === $property_id && 'array' === gettype( $widget[ $property_id ] ) ) {
+				} elseif ( 'settings' === $property_id && isset( $widget[ $property_id ] ) && 'array' === gettype( $widget[ $property_id ] ) ) {
 					$widget_data[ $property_id ] = $widget['settings'];
 				} elseif ( isset( $property['default'] ) ) {
 					$widget_data[ $property_id ] = $property['default'];
@@ -535,7 +535,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves a widget instance.
 	 *
-	 * @param array $sidebar sidebar data available at $wp_registered_sidebars.
+	 * @param array  $sidebar sidebar data available at $wp_registered_sidebars.
 	 * @param string $id Identifier of the widget instance.
 	 *
 	 * @return array Array containing the widget instance.
