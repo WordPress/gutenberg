@@ -185,6 +185,21 @@ class WP_REST_Term_Search_Handler_Test extends WP_Test_REST_Controller_Testcase 
 		);
 	}
 
+	/**
+	 * Searching for a term that doesn't exist should return an empty result.
+	 */
+	public function test_get_items_search_for_missing_term() {
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'search'   => 'Doesn\'t exist',
+				'type'     => 'term',
+			)
+		);
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEmpty( $response->get_data() );
+	}
 
 	public function test_register_routes() {
 		$this->markTestSkipped( 'Covered by Search controller tests.' );
