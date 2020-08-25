@@ -14,29 +14,26 @@ import {
 
 const mergeTrees = ( baseData, userData ) => {
 	// Deep clone from base data.
+	//
 	// We don't use cloneDeep from lodash here
 	// because we know the data is JSON compatible,
 	// see https://github.com/lodash/lodash/issues/1984
 	const mergedTree = JSON.parse( JSON.stringify( baseData ) );
 
+	const styleKeys = [ 'typography', 'color' ];
 	Object.keys( userData ).forEach( ( context ) => {
-		// Normalize object shape
-		if ( ! mergedTree[ context ].styles?.typography ) {
-			mergedTree[ context ].styles.typography = {};
-		}
-		if ( ! mergedTree[ context ].styles?.color ) {
-			mergedTree[ context ].styles.color = {};
-		}
+		styleKeys.forEach( ( key ) => {
+			// Normalize object shape: make sure the key exists under styles.
+			if ( ! mergedTree[ context ].styles?.[ key ] ) {
+				mergedTree[ context ].styles[ key ] = {};
+			}
 
-		mergedTree[ context ].styles.typography = {
-			...mergedTree[ context ].styles.typography,
-			...userData[ context ]?.styles?.typography,
-		};
-
-		mergedTree[ context ].styles.color = {
-			...mergedTree[ context ].styles.color,
-			...userData[ context ]?.styles?.color,
-		};
+			// Merge data: base + user.
+			mergedTree[ context ].styles[ key ] = {
+				...mergedTree[ context ].styles[ key ],
+				...userData[ context ]?.styles?.[ key ],
+			};
+		} );
 	} );
 
 	return mergedTree;
