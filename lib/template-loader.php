@@ -187,28 +187,7 @@ function create_auto_draft_for_template_part_block( $block ) {
 					} else {
 
 						// Get the term used for this theme.
-						$theme_tax_id = get_term_by( 'slug', $block['attrs']['theme'], 'wp_theme' );
-
-						// If a term for this theme doesn't exist, create it.
-						if ( ! $theme_tax_id ) {
-
-							// Acts as a fallback.
-							$theme_tax_id = 0;
-
-							// Insert the term.
-							$wp_theme_term = wp_insert_term(
-								$block['attrs']['theme'],
-								'wp_theme',
-								array(
-									'slug' => $block['attrs']['theme'],
-								)
-							);
-
-							// If all went well, retrieve the term-ID.
-							if ( ! is_wp_error( $wp_theme_term ) ) {
-								$theme_tax_id = $wp_theme_term['term_id'];
-							}
-						}
+						$wp_theme_term = get_term_by( 'slug', $block['attrs']['theme'], 'wp_theme' );
 
 						// Insert the post.
 						$template_part_id = wp_insert_post(
@@ -218,11 +197,16 @@ function create_auto_draft_for_template_part_block( $block ) {
 								'post_status'  => 'auto-draft',
 								'post_type'    => 'wp_template_part',
 								'post_name'    => $block['attrs']['slug'],
-								'tax_input'    => array(
-									'wp_theme' => array( $theme_tax_id ),
-								),
 							)
 						);
+
+						if ( $wp_theme_term ) {
+							// If the term was found, assign it to this post.
+							wp_set_object_terms( $template_part_id, $wp_theme_term->term_id, 'wp_theme' );
+						} else {
+							// Using a string instead of integer will create the term and assign it to the post.
+							wp_set_object_terms( $template_part_id, $block['attrs']['theme'], 'wp_theme' );
+						}
 					}
 				}
 			}
