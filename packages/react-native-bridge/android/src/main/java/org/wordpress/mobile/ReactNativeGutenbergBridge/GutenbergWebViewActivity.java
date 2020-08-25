@@ -260,13 +260,11 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
     @Override
     public void finish() {
-        runOnUiThread(new Runnable() {
-            @Override public void run() {
-                mWebView.removeJavascriptInterface(JAVA_SCRIPT_INTERFACE_NAME);
-                mWebView.clearHistory();
-                mWebView.clearFormData();
-                mWebView.clearCache(true);
-            }
+        runOnUiThread(() -> {
+            mWebView.removeJavascriptInterface(JAVA_SCRIPT_INTERFACE_NAME);
+            mWebView.clearHistory();
+            mWebView.clearFormData();
+            mWebView.clearCache(true);
         });
 
         super.finish();
@@ -282,12 +280,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void gutenbergReady() {
-            GutenbergWebViewActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    onGutenbergReady();
-                }
-            });
+            GutenbergWebViewActivity.this.runOnUiThread(() -> onGutenbergReady());
         }
     }
 }
