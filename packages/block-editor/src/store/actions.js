@@ -718,11 +718,14 @@ export function stopTyping() {
 /**
  * Returns an action object used in signalling that the user has begun to drag blocks.
  *
+ * @param {string[]} clientIds An array of client ids being dragged
+ *
  * @return {Object} Action object.
  */
-export function startDraggingBlocks() {
+export function startDraggingBlocks( clientIds ) {
 	return {
 		type: 'START_DRAGGING_BLOCKS',
+		clientIds,
 	};
 }
 
