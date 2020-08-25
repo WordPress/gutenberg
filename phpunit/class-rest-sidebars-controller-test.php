@@ -716,7 +716,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					array(
 						'id'           => 'text-1',
 						'settings'     => array(
-							'text'   => 'Updated \\" \\\' > text test',
+							'text'   => 'Updated \\" \\\' &gt; text test',
 							'title'  => '',
 							'filter' => false,
 						),
@@ -725,7 +725,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 						'name'         => 'Text',
 						'description'  => 'Arbitrary text.',
 						'number'       => 1,
-						'rendered'     => '			<div class="textwidget">Updated \\" \\\' > text test</div>' . "\n		",
+						'rendered'     => '			<div class="textwidget">Updated \\" \\\' &gt; text test</div>' . "\n		",
 					),
 				),
 			),
