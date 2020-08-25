@@ -28,6 +28,8 @@ const stretchStyle = {
 	flex: 1,
 };
 
+const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
+
 export class BlockListItem extends Component {
 	constructor() {
 		super( ...arguments );
@@ -48,6 +50,51 @@ export class BlockListItem extends Component {
 		}
 	}
 
+	getWideMargins() {
+		const {
+			marginHorizontal,
+			parentBlockAlignment,
+			numberOfParents,
+		} = this.props;
+		const { blockWidth } = this.state;
+		const screenWidth = Dimensions.get( 'window' ).width;
+
+		if ( screenWidth > BREAKPOINTS.wide ) {
+			return marginHorizontal * 2;
+		} else if (
+			screenWidth <= BREAKPOINTS.small &&
+			numberOfParents === 0
+		) {
+			return marginHorizontal;
+		}
+
+		if (
+			blockWidth - styles.fullAlignmentPadding.paddingLeft <=
+			BREAKPOINTS.medium
+		) {
+			if ( numberOfParents === 0 ) {
+				return marginHorizontal * 3;
+			} else if (
+				parentBlockAlignment === 'full' &&
+				blockWidth > BREAKPOINTS.small
+			) {
+				return marginHorizontal * 4;
+			}
+		}
+
+		if (
+			blockWidth > BREAKPOINTS.small &&
+			blockWidth < BREAKPOINTS.wide &&
+			blockWidth - styles.wideMargin.marginLeft >= BREAKPOINTS.medium
+		) {
+			return blockWidth > screenWidth
+				? marginHorizontal * 4
+				: marginHorizontal * 3;
+		}
+
+		return marginHorizontal * 2;
+	}
+
 	getMarginHorizontal() {
 		const {
 			blockAlignment,
@@ -56,33 +103,18 @@ export class BlockListItem extends Component {
 			numberOfParents,
 		} = this.props;
 		const { blockWidth } = this.state;
-		const isParentBlockFullWidth =
-			parentBlockAlignment === 'full' && numberOfParents === 1;
 
 		if ( blockAlignment === 'full' ) {
 			return 0;
 		}
 
 		if ( blockAlignment === 'wide' ) {
-			const screenWidth = Dimensions.get( 'window' ).width;
-			const isWithinConstraints =
-				blockWidth > BREAKPOINTS.small && blockWidth < BREAKPOINTS.wide;
-
-			if ( screenWidth > BREAKPOINTS.wide ) {
-				return marginHorizontal;
-			}
-
-			if (
-				isWithinConstraints &&
-				blockWidth - styles.wideMargin.marginLeft >= BREAKPOINTS.medium
-			) {
-				return blockWidth > screenWidth
-					? marginHorizontal * 3
-					: marginHorizontal * 2;
-			}
+			return this.getWideMargins();
 		}
 
-		return isParentBlockFullWidth && blockWidth < BREAKPOINTS.small
+		return WIDE_ALIGNMENTS.includes( parentBlockAlignment ) &&
+			numberOfParents === 1 &&
+			blockWidth < BREAKPOINTS.small
 			? marginHorizontal * 2
 			: marginHorizontal;
 	}

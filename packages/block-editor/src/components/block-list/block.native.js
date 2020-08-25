@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -145,6 +145,7 @@ class BlockListBlock extends Component {
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const isFullWidth = align === 'full';
+		const screenWidth = Dimensions.get( 'window' ).width;
 
 		return (
 			<TouchableWithoutFeedback
@@ -168,6 +169,9 @@ class BlockListBlock extends Component {
 							<View
 								style={ [
 									styles.solidBorder,
+									isFullWidth &&
+										blockWidth < screenWidth &&
+										styles.solidBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark

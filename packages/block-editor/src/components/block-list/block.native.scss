@@ -18,6 +18,11 @@
 	border-color: $gray-70;
 }
 
+.solidBorderFullWidth {
+	left: 0;
+	right: 0;
+}
+
 .dimmed {
 	opacity: $dimmed-opacity;
 }
