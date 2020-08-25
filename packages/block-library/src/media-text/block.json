@@ -63,6 +63,10 @@
 			"type": "number",
 			"default": 50
 		},
+		"mediaSizeSlug": {
+			"type": "string",
+			"default": "full"
+		},
 		"isStackedOnMobile": {
 			"type": "boolean",
 			"default": true
