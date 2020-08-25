@@ -3,6 +3,7 @@
  */
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { Icon, arrowLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -49,6 +50,21 @@ const data = [
 		parent: 'item-3',
 	},
 	{
+		title: 'Nested Category',
+		id: 'child-3',
+		parent: 'item-3',
+	},
+	{
+		title: 'Sub Child 1',
+		id: 'sub-child-1',
+		parent: 'child-3',
+	},
+	{
+		title: 'Sub Child 2',
+		id: 'sub-child-2',
+		parent: 'child-3',
+	},
+	{
 		title: 'External link',
 		id: 'item-4',
 		href: 'https://wordpress.com',
@@ -68,18 +84,14 @@ function Example() {
 
 	return (
 		<Navigation activeItemId={ active } data={ data } rootTitle="Home">
-			{ ( { level, levelItems, parentLevel, setActiveLevel } ) => {
+			{ ( { level, levelItems, parentLevel, NavigationBackButton } ) => {
 				return (
 					<>
 						{ parentLevel && (
-							<Button
-								isPrimary
-								onClick={ () =>
-									setActiveLevel( parentLevel.id )
-								}
-							>
-								Back
-							</Button>
+							<NavigationBackButton>
+								<Icon icon={ arrowLeft } />
+								{ parentLevel.title }
+							</NavigationBackButton>
 						) }
 						<h1>{ level.title }</h1>
 						<NavigationMenu>
@@ -91,7 +103,6 @@ function Example() {
 										onClick={ ( selected ) =>
 											setActive( selected.id )
 										}
-										setActiveLevel={ setActiveLevel }
 									/>
 								);
 							} ) }

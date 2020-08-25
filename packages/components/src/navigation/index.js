@@ -7,6 +7,7 @@ import { useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { Root } from './styles/navigation-styles';
+import Button from '../button';
 
 const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevel, setActiveLevel ] = useState( 'root' );
@@ -20,6 +21,7 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 				parent: item.parent || 'root',
 				isActive: item.id === activeItemId,
 				hasChildren: itemChildren.length > 0,
+				setActiveLevel,
 			};
 		} );
 	};
@@ -39,13 +41,28 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		}
 	}, [] );
 
+	const NavigationBackButton = ( { children: backButtonChildren } ) => {
+		if ( ! parentLevel ) {
+			return null;
+		}
+
+		return (
+			<Button
+				isPrimary
+				onClick={ () => setActiveLevel( parentLevel.id ) }
+			>
+				{ backButtonChildren }
+			</Button>
+		);
+	};
+
 	return (
 		<Root className="components-navigation">
 			{ children( {
 				level,
 				levelItems,
 				parentLevel,
-				setActiveLevel,
+				NavigationBackButton,
 			} ) }
 		</Root>
 	);
