@@ -6,6 +6,15 @@
  * @subpackage REST_API
  */
 
+require_once dirname( __FILE__ ) . '/../lib/class-wp-rest-sidebars-controller.php';
+add_filter(
+	'rest_api_init',
+	function () {
+		$sidebars = new WP_REST_Sidebars_Controller();
+		$sidebars->register_routes();
+	}
+);
+
 /**
  * Tests for REST API for Menus.
  *
@@ -35,22 +44,12 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
 	 */
-	protected static $per_page = 50;
+	protected static $author_id;
 
 	/**
-	 * REST_Sidebars_Controller_Test constructor.
+	 * @var int
 	 */
-	public function __construct() {
-		parent::__construct();
-		require_once dirname( __FILE__ ) . '/../lib/class-wp-rest-sidebars-controller.php';
-		add_filter(
-			'rest_api_init',
-			function () {
-				$sidebars = new WP_REST_Sidebars_Controller();
-				$sidebars->register_routes();
-			}
-		);
-	}
+	protected static $per_page = 50;
 
 	/**
 	 * Create fake data before our tests run.
@@ -66,6 +65,11 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		self::$editor_id     = $factory->user->create(
 			array(
 				'role' => 'editor',
+			)
+		);
+		self::$author_id     = $factory->user->create(
+			array(
+				'role' => 'author',
 			)
 		);
 		self::$subscriber_id = $factory->user->create(
@@ -150,6 +154,17 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data     = $response->get_data();
 
 		$this->assertEquals( array(), $data );
+	}
+
+	/**
+	 * @dataProvider users_without_permissions
+	 */
+	public function test_get_items_permission( $user_id ) {
+		wp_set_current_user( $user_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 401, $response->get_status() );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
 	}
 
 	/**
@@ -275,6 +290,24 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * @dataProvider users_without_permissions
+	 */
+	public function test_get_item_permission( $user_id ) {
+		wp_set_current_user( $user_id );
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 401, $response->get_status() );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+	}
+
+	/**
 	 * The test_update_item() method does not exist for sidebar.
 	 */
 	public function test_create_item() {
@@ -379,6 +412,22 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * @dataProvider users_without_permissions
+	 */
+	public function test_update_item_permission( $user_id ) {
+		wp_set_current_user( $user_id );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(),
+			) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 401, $response->get_status() );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+	}
+
+	/**
 	 * The test_delete_item() method does not exist for sidebar.
 	 */
 	public function test_delete_item() {
@@ -406,5 +455,12 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'widgets', $properties );
+	}
+
+	public function users_without_permissions() {
+		return array(
+			array( self::$subscriber_id ),
+			array( self::$author_id ),
+		);
 	}
 }
