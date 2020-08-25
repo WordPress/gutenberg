@@ -84,14 +84,14 @@ function Example() {
 
 	return (
 		<Navigation activeItemId={ active } data={ data } rootTitle="Home">
-			{ ( { level, levelItems, parentLevel, NavigationBack } ) => {
+			{ ( { level, levelItems, parentLevel, NavigationBackButton } ) => {
 				return (
 					<>
 						{ parentLevel && (
-							<NavigationBack>
+							<NavigationBackButton>
 								<Icon icon={ arrowLeft } />
 								{ parentLevel.title }
-							</NavigationBack>
+							</NavigationBackButton>
 						) }
 						<h1>{ level.title }</h1>
 						<NavigationMenu>
