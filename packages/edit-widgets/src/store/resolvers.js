@@ -44,6 +44,10 @@ export function* getWidgetAreas() {
 			widgetBlocks
 		);
 
+		if ( widgetArea.id === 'wp_inactive_widgets' ) {
+			continue;
+		}
+
 		widgetAreaBlocks.push(
 			createBlock( 'core/widget-area', {
 				id: widgetArea.id,
