@@ -10,7 +10,6 @@ import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
-import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -267,11 +266,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     @Override
     public void finish() {
         runOnUiThread(() -> {
-            WebStorage.getInstance().deleteAllData();
-
-            CookieManager.getInstance().removeAllCookies(null);
-            CookieManager.getInstance().flush();
-
             mWebView.removeJavascriptInterface(JAVA_SCRIPT_INTERFACE_NAME);
             mWebView.clearHistory();
             mWebView.clearFormData();
