@@ -23,7 +23,7 @@ import LevelToolbar from './level-toolbar';
 export default function SiteTitleEdit( { attributes, setAttributes } ) {
 	const { level, textAlign } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
-	const tagName = 0 === level ? 'p' : `h${ level }`;
+	const tagName = level === 0 ? 'p' : `h${ level }`;
 
 	return (
 		<>
