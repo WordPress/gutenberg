@@ -36,7 +36,11 @@ function the_gutenberg_widgets( $page = 'gutenberg_page_gutenberg-widgets' ) {
  * @param string $hook Page.
  */
 function gutenberg_widgets_init( $hook ) {
-	if ( ! in_array( $hook, array( 'gutenberg_page_gutenberg-widgets', 'gutenberg_customizer', 'widgets.php' ), true ) ) {
+	if ( $hook === 'widgets.php' ) {
+		wp_enqueue_style( 'wp-block-library' );
+		return;
+	}
+	if ( ! in_array( $hook, array( 'gutenberg_page_gutenberg-widgets', 'gutenberg_customizer', ), true ) ) {
 		return;
 	}
 
