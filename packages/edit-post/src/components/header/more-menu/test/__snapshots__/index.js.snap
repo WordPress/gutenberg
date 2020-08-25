@@ -14,7 +14,7 @@ exports[`MoreMenu should match snapshot 1`] = `
         />
       </SVG>
     }
-    label="Options"
+    label="More options"
     popoverProps={
       Object {
         "className": "edit-post-more-menu__content",
@@ -58,7 +58,7 @@ exports[`MoreMenu should match snapshot 1`] = `
             </SVG>
           }
           isTertiary={true}
-          label="Options"
+          label="More options"
           onClick={[Function]}
           onKeyDown={[Function]}
           showTooltip={true}
@@ -66,12 +66,12 @@ exports[`MoreMenu should match snapshot 1`] = `
         >
           <Tooltip
             position="bottom"
-            text="Options"
+            text="More options"
           >
             <button
               aria-expanded={false}
               aria-haspopup="true"
-              aria-label="Options"
+              aria-label="More options"
               className="components-button components-dropdown-menu__toggle is-tertiary has-icon"
               onBlur={[Function]}
               onClick={[Function]}
