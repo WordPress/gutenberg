@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { pick, get, map, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +17,7 @@ import {
 	InspectorControls,
 	__experimentalBlock as Block,
 	__experimentalImageURLInputUI as ImageURLInputUI,
+	__experimentalImageSizeControl as ImageSizeControl,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -123,6 +125,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		mediaType,
 		mediaUrl,
 		mediaWidth,
+		mediaSizeSlug,
 		rel,
 		verticalAlignment,
 	} = attributes;
@@ -187,6 +190,35 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const onVerticalAlignmentChange = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
 	};
+
+	const { imageSizes } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return pick( getSettings(), [ 'imageSizes' ] );
+	} );
+	const imageSizeOptions = map(
+		filter( imageSizes, ( { slug } ) =>
+			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
+		),
+		( { name, slug } ) => ( { value: slug, label: name } )
+	);
+	const updateImage = ( newMediaSizeSlug ) => {
+		const newUrl = get( image, [
+			'media_details',
+			'sizes',
+			newMediaSizeSlug,
+			'source_url',
+		] );
+
+		if ( ! newUrl ) {
+			return null;
+		}
+
+		setAttributes( {
+			mediaUrl: newUrl,
+			mediaSizeSlug: newMediaSizeSlug,
+		} );
+	};
+
 	const mediaTextGeneralSettings = (
 		<PanelBody title={ __( 'Media & Text settings' ) }>
 			<ToggleControl
@@ -234,6 +266,14 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 							) }
 						</>
 					}
+				/>
+			) }
+			{ mediaType === 'image' && (
+				<ImageSizeControl
+					onChangeImage={ updateImage }
+					slug={ mediaSizeSlug }
+					imageSizeOptions={ imageSizeOptions }
+					isResizable={ false }
 				/>
 			) }
 		</PanelBody>
