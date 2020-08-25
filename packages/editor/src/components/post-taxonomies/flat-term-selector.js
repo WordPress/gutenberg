@@ -27,13 +27,13 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Module constants
  */
+const MAX_TERMS_SUGGESTIONS = 20;
 const DEFAULT_QUERY = {
-	per_page: 20,
+	per_page: MAX_TERMS_SUGGESTIONS,
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name',
 };
-const MAX_TERMS_SUGGESTIONS = 20;
 const isSameTermName = ( termA, termB ) =>
 	termA.toLowerCase() === termB.toLowerCase();
 
@@ -223,7 +223,7 @@ class FlatTermSelector extends Component {
 	searchTerms( search = '' ) {
 		invoke( this.searchRequest, [ 'abort' ] );
 		if ( search.length >= 3 ) {
-			this.searchRequest = this.fetchTerms({search});
+			this.searchRequest = this.fetchTerms( { search } );
 		}
 	}
 
