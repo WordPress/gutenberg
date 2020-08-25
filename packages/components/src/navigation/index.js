@@ -49,10 +49,10 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	};
 
 	const items = mapItems( data );
-	const parentLevel = items.get( level.parent );
 	const activeItem = items.get( activeItemId );
 	const previousActiveLevelId = usePrevious( activeLevelId );
 	const level = items.get( activeLevelId );
+	const parentLevel = level && items.get( level.parent );
 	const isNavigatingBack =
 		previousActiveLevelId &&
 		items.get( previousActiveLevelId ).parent === activeLevelId;
