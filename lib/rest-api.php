@@ -339,7 +339,10 @@ add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );
  * @return array Title updated list of handlers.
  */
 function gutenberg_post_format_search_handler( $search_handlers ) {
-	$search_handlers[] = new WP_REST_Post_Format_Search_Handler();
+	if ( current_theme_supports( 'post-formats' ) ) {
+		$search_handlers[] = new WP_REST_Post_Format_Search_Handler();
+	}
+
 	return $search_handlers;
 }
 add_filter( 'wp_rest_search_handlers', 'gutenberg_post_format_search_handler', 10, 5 );

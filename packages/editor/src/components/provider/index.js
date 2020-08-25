@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick, defaultTo, flatten } from 'lodash';
+import { map, pick, defaultTo, flatten, partialRight } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -37,11 +37,18 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
  * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
  * Until we refactor it, just copying the code is the simplest solution.
  *
- * @param {Object} search
- * @param {number} perPage
+ * @param {string} search
+ * @param {Object} [searchArguments]
+ * @param {number} [searchArguments.perPage=20]
+ * @param {Object} [editorSettings]
+ * @param {boolean} [editorSettings.disablePostFormats=false]
  * @return {Promise<Object[]>} List of suggestions
  */
-const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) => {
+const fetchLinkSuggestions = (
+	search,
+	{ perPage = 20 } = {},
+	{ disablePostFormats = false } = {}
+) => {
 	const posts = apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
@@ -58,16 +65,21 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) => {
 		} ),
 	} );
 
-	const formats = apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			search,
-			per_page: perPage,
-			type: 'post-format',
-		} ),
-	} );
+	let formats;
+	if ( disablePostFormats ) {
+		formats = Promise.resolve( [] );
+	} else {
+		formats = apiFetch( {
+			path: addQueryArgs( '/wp/v2/search', {
+				search,
+				per_page: perPage,
+				type: 'post-format',
+			} ),
+		} );
+	}
 
 	return Promise.all( [ posts, terms, formats ] ).then( ( results ) => {
-		return map( flatten( results ), ( result ) => ( {
+		return map( flatten( results ).slice( 0, perPage ), ( result ) => ( {
 			id: result.id,
 			url: result.url,
 			title: decodeEntities( result.title ) || __( '(no title)' ),
@@ -173,7 +185,10 @@ class EditorProvider extends Component {
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchReusableBlocks,
-			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions: partialRight(
+				fetchLinkSuggestions,
+				settings
+			),
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
