@@ -31,25 +31,28 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 		$format_strings = get_post_format_strings();
 		$format_slugs   = array_keys( $format_strings );
 
-		$query = '';
+		$query_args = array();
+
 		if ( ! empty( $request['search'] ) ) {
-			$query = $request['search'];
+			$query_args['search'] = $request['search'];
 		}
 
 		/**
-		 * Filters the post format search query.
+		 * Filters the query arguments for a search request.
 		 *
-		 * @param string          $query   Search query.
-		 * @param WP_REST_Request $request The request used.
+		 * Enables adding extra arguments or setting defaults for a post format search request.
+		 *
+		 * @param array           $query_args Key value array of query var to query value.
+		 * @param WP_REST_Request $request    The request used.
 		 */
-		$query = apply_filters( 'rest_post_format_search_query', $query, $request );
+		$query_args = apply_filters( 'rest_post_format_search_query', $query_args, $request );
 
 		$found_ids = array();
 		foreach ( $format_slugs as $index => $format_slug ) {
-			if ( ! empty( $query ) ) {
+			if ( ! empty( $query_args['search'] ) ) {
 				$format_string       = get_post_format_string( $format_slug );
-				$format_slug_match   = stripos( $format_slug, $query ) !== false;
-				$format_string_match = stripos( $format_string, $query ) !== false;
+				$format_slug_match   = stripos( $format_slug, $query_args['search'] ) !== false;
+				$format_string_match = stripos( $format_string, $query_args['search'] ) !== false;
 				if ( ! $format_slug_match && ! $format_string_match ) {
 					continue;
 				}
