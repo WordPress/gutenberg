@@ -81,12 +81,17 @@ const fetchLinkSuggestions = async (
 	}
 
 	return Promise.all( [ posts, terms, formats ] ).then( ( results ) => {
-		return map( flatten( results ).slice( 0, perPage ), ( result ) => ( {
-			id: result.id,
-			url: result.url,
-			title: decodeEntities( result.title ) || __( '(no title)' ),
-			type: result.subtype || result.type,
-		} ) );
+		return map(
+			flatten( results )
+				.filter( ( result ) => !! result.id )
+				.slice( 0, perPage ),
+			( result ) => ( {
+				id: result.id,
+				url: result.url,
+				title: decodeEntities( result.title ) || __( '(no title)' ),
+				type: result.subtype || result.type,
+			} )
+		);
 	} );
 };
 
