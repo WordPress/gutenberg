@@ -26,13 +26,13 @@ class LegacyWidgetEditHandler extends Component {
 		this.widgetNonce = null;
 		this.instanceUpdating = null;
 		this.onInstanceChange = this.onInstanceChange.bind( this );
-		this.requestWidgetUpdater = this.requestWidgetUpdater.bind( this );
+		this.requestWidgetForm = this.requestWidgetForm.bind( this );
 	}
 
 	componentDidMount() {
 		this.isStillMounted = true;
 		this.trySetNonce();
-		this.requestWidgetUpdater( undefined, ( response ) => {
+		this.requestWidgetForm( undefined, ( response ) => {
 			this.props.onInstanceChange( null, !! response.form );
 		} );
 	}
@@ -41,11 +41,8 @@ class LegacyWidgetEditHandler extends Component {
 		if ( ! this.widgetNonce ) {
 			this.trySetNonce();
 		}
-		if (
-			prevProps.instance !== this.props.instance &&
-			this.instanceUpdating !== this.props.instance
-		) {
-			this.requestWidgetUpdater( undefined, ( response ) => {
+		if ( prevProps.widgetClass !== this.props.widgetClass ) {
+			this.requestWidgetForm( undefined, ( response ) => {
 				this.props.onInstanceChange( null, !! response.form );
 			} );
 		}
@@ -126,20 +123,10 @@ class LegacyWidgetEditHandler extends Component {
 	}
 
 	onInstanceChange( instanceChanges ) {
-		const { id } = this.props;
-		if ( id ) {
-			// For reference widgets there is no need to query an endpoint,
-			// the widget is already saved with ajax.
-			this.props.onInstanceChange( instanceChanges, true );
-			return;
-		}
-		this.requestWidgetUpdater( instanceChanges, ( response ) => {
-			this.instanceUpdating = response.instance;
-			this.props.onInstanceChange( response.instance, !! response.form );
-		} );
+		this.props.onInstanceChange( instanceChanges, true );
 	}
 
-	requestWidgetUpdater( instanceChanges, callback ) {
+	requestWidgetForm( updatedInstance, callback ) {
 		const { id, idBase, instance, widgetClass } = this.props;
 		const { isStillMounted } = this;
 		if ( ! id && ! widgetClass ) {
@@ -173,12 +160,14 @@ class LegacyWidgetEditHandler extends Component {
 
 		if ( widgetClass ) {
 			apiFetch( {
-				path: `/__experimental/widget-forms/${ encodeURIComponent(
+				path: `/__experimental/widget-utils/form/${ encodeURIComponent(
 					widgetClass
 				) }/`,
 				data: {
-					instance,
-					instance_changes: instanceChanges,
+					instance: {
+						...instance,
+						...updatedInstance,
+					},
 				},
 				method: 'POST',
 			} ).then( ( response ) => {

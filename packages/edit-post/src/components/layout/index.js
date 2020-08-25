@@ -50,9 +50,20 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
+import PopoverWrapper from './popover-wrapper';
 
 const interfaceLabels = {
-	leftSidebar: __( 'Block Library' ),
+	leftSidebar: __( 'Block library' ),
+	/* translators: accessibility text for the editor top bar landmark region. */
+	header: __( 'Editor top bar' ),
+	/* translators: accessibility text for the editor content landmark region. */
+	body: __( 'Editor content' ),
+	/* translators: accessibility text for the editor settings landmark region. */
+	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
+	/* translators: accessibility text for the editor footer landmark region. */
+	footer: __( 'Editor footer' ),
 };
 
 function Layout() {
@@ -168,29 +179,36 @@ function Layout() {
 					leftSidebar={
 						mode === 'visual' &&
 						isInserterOpened && (
-							<div className="edit-post-layout__inserter-panel">
-								<div className="edit-post-layout__inserter-panel-header">
-									<Button
-										icon={ close }
-										onClick={ () =>
-											setIsInserterOpened( false )
-										}
-									/>
-								</div>
-								<div className="edit-post-layout__inserter-panel-content">
-									<Library
-										showMostUsedBlocks={
-											showMostUsedBlocks
-										}
-										showInserterHelpPanel
-										onSelect={ () => {
-											if ( isMobileViewport ) {
-												setIsInserterOpened( false );
+							<PopoverWrapper
+								className="edit-post-layout__inserter-panel-popover-wrapper"
+								onClose={ () => setIsInserterOpened( false ) }
+							>
+								<div className="edit-post-layout__inserter-panel">
+									<div className="edit-post-layout__inserter-panel-header">
+										<Button
+											icon={ close }
+											onClick={ () =>
+												setIsInserterOpened( false )
 											}
-										} }
-									/>
+										/>
+									</div>
+									<div className="edit-post-layout__inserter-panel-content">
+										<Library
+											showMostUsedBlocks={
+												showMostUsedBlocks
+											}
+											showInserterHelpPanel
+											onSelect={ () => {
+												if ( isMobileViewport ) {
+													setIsInserterOpened(
+														false
+													);
+												}
+											} }
+										/>
+									</div>
 								</div>
-							</div>
+							</PopoverWrapper>
 						)
 					}
 					sidebar={

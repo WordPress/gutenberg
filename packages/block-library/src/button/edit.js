@@ -28,6 +28,7 @@ import {
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -41,9 +42,14 @@ const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_BORDER_RADIUS_POSITION = 5;
 
 function BorderPanel( { borderRadius = '', setAttributes } ) {
+	const initialBorderRadius = borderRadius;
 	const setBorderRadius = useCallback(
 		( newBorderRadius ) => {
-			setAttributes( { borderRadius: newBorderRadius } );
+			if ( newBorderRadius === undefined )
+				setAttributes( {
+					borderRadius: initialBorderRadius,
+				} );
+			else setAttributes( { borderRadius: newBorderRadius } );
 		},
 		[ setAttributes ]
 	);
@@ -167,6 +173,9 @@ function ButtonEdit( props ) {
 		},
 		[ setAttributes ]
 	);
+	const { colors } = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getSettings();
+	}, [] );
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -187,7 +196,7 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
-	const colorProps = getColorAndStyleProps( attributes );
+	const colorProps = getColorAndStyleProps( attributes, colors, true );
 
 	return (
 		<>

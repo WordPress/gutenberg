@@ -9,14 +9,18 @@ import { escape, get, head, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { withDispatch, withSelect } from '@wordpress/data';
 import {
-	ExternalLink,
+	useSelect,
+	useDispatch,
+	withDispatch,
+	withSelect,
+} from '@wordpress/data';
+import {
 	KeyboardShortcuts,
 	PanelBody,
 	Popover,
+	TextControl,
 	TextareaControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -40,6 +44,54 @@ import { link as linkIcon } from '@wordpress/icons';
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
 
+/**
+ * A React hook to determine if it's dragging within the target element.
+ *
+ * @typedef {import('@wordpress/element').RefObject} RefObject
+ *
+ * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
+ *
+ * @return {boolean} Is dragging within the target element.
+ */
+const useIsDraggingWithin = ( elementRef ) => {
+	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
+
+	useEffect( () => {
+		function handleDragStart( event ) {
+			// Check the first time when the dragging starts.
+			handleDragEnter( event );
+		}
+
+		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
+		function handleDragEnd() {
+			setIsDraggingWithin( false );
+		}
+
+		function handleDragEnter( event ) {
+			// Check if the current target is inside the item element.
+			if ( elementRef.current.contains( event.target ) ) {
+				setIsDraggingWithin( true );
+			} else {
+				setIsDraggingWithin( false );
+			}
+		}
+
+		// Bind these events to the document to catch all drag events.
+		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
+		document.addEventListener( 'dragstart', handleDragStart );
+		document.addEventListener( 'dragend', handleDragEnd );
+		document.addEventListener( 'dragenter', handleDragEnter );
+
+		return () => {
+			document.removeEventListener( 'dragstart', handleDragStart );
+			document.removeEventListener( 'dragend', handleDragEnd );
+			document.removeEventListener( 'dragenter', handleDragEnter );
+		};
+	}, [] );
+
+	return isDraggingWithin;
+};
+
 function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
@@ -53,21 +105,28 @@ function NavigationLinkEdit( {
 	backgroundColor,
 	rgbTextColor,
 	rgbBackgroundColor,
-	saveEntityRecord,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
 	insertBlocksAfter,
 	mergeBlocks,
 	onReplace,
 } ) {
-	const { label, opensInNewTab, url, nofollow, description } = attributes;
+	const { label, opensInNewTab, url, description, rel } = attributes;
 	const link = {
 		url,
 		opensInNewTab,
 	};
+	const { saveEntityRecord } = useDispatch( 'core' );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const listItemRef = useRef( null );
+	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
+
+	const isDraggingBlocks = useSelect(
+		( select ) => select( 'core/block-editor' ).isDraggingBlocks(),
+		[]
+	);
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -161,30 +220,6 @@ function NavigationLinkEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'SEO settings' ) }>
-					<ToggleControl
-						checked={ nofollow }
-						onChange={ ( nofollowValue ) => {
-							setAttributes( { nofollow: nofollowValue } );
-						} }
-						label={ __( 'Add nofollow to link' ) }
-						help={
-							<Fragment>
-								{ __(
-									"Don't let search engines follow this link."
-								) }
-								<ExternalLink
-									className="wp-block-navigation-link__nofollow-external-link"
-									href={ __(
-										'https://codex.wordpress.org/Nofollow'
-									) }
-								>
-									{ __( "What's this?" ) }
-								</ExternalLink>
-							</Fragment>
-						}
-					/>
-				</PanelBody>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextareaControl
 						value={ description || '' }
@@ -196,12 +231,25 @@ function NavigationLinkEdit( {
 							'The description will be displayed in the menu if the current theme supports it.'
 						) }
 					/>
+					<TextControl
+						value={ rel || '' }
+						onChange={ ( relValue ) => {
+							setAttributes( { rel: relValue } );
+						} }
+						label={ __( 'Link rel' ) }
+						autoComplete="off"
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<Block.li
 				className={ classnames( {
-					'is-editing': isSelected || isParentOfSelectedBlock,
-					'is-selected': isSelected,
+					'is-editing':
+						( isSelected || isParentOfSelectedBlock ) &&
+						// Don't show the element as editing while dragging.
+						! isDraggingBlocks,
+					// Don't select the element while dragging.
+					'is-selected': isSelected && ! isDraggingBlocks,
+					'is-dragging-within': isDraggingWithin,
 					'has-link': !! url,
 					'has-child': hasDescendants,
 					'has-text-color': rgbTextColor,
@@ -213,6 +261,7 @@ function NavigationLinkEdit( {
 					color: rgbTextColor,
 					backgroundColor: rgbBackgroundColor,
 				} }
+				ref={ listItemRef }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
@@ -249,11 +298,8 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
-								createSuggestion={
-									userCanCreatePages
-										? handleCreatePage
-										: undefined
-								}
+								withCreateSuggestion={ userCanCreatePages }
+								createSuggestion={ handleCreatePage }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -302,7 +348,9 @@ function NavigationLinkEdit( {
 					renderAppender={
 						( isSelected && hasDescendants ) ||
 						( isImmediateParentOfSelectedBlock &&
-							! selectedBlockHasDescendants )
+							! selectedBlockHasDescendants ) ||
+						// Show the appender while dragging to allow inserting element between item and the appender.
+						( isDraggingBlocks && hasDescendants )
 							? InnerBlocks.DefaultAppender
 							: false
 					}
@@ -312,7 +360,10 @@ function NavigationLinkEdit( {
 						className: classnames(
 							'wp-block-navigation__container',
 							{
-								'is-parent-of-selected-block': isParentOfSelectedBlock,
+								'is-parent-of-selected-block':
+									isParentOfSelectedBlock &&
+									// Don't select as parent of selected block while dragging.
+									! isDraggingBlocks,
 							}
 						),
 					} }
@@ -400,9 +451,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
-		const { saveEntityRecord } = dispatch( 'core' );
 		return {
-			saveEntityRecord,
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 

@@ -9,7 +9,7 @@ import {
 	isEmpty,
 	map,
 	throttle,
-	unescape as unescapeString,
+	unescape as lodashUnescapeString,
 	uniqBy,
 } from 'lodash';
 
@@ -33,9 +33,15 @@ const DEFAULT_QUERY = {
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name',
+}
+
+// Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
+const unescapeString = ( arg ) => {
+	return lodashUnescapeString( arg.replace( '&#039;', "'" ) );
 };
 const isSameTermName = ( termA, termB ) =>
-	termA.toLowerCase() === termB.toLowerCase();
+	unescapeString( termA ).toLowerCase() ===
+	unescapeString( termB ).toLowerCase();
 
 /**
  * Returns a term object with name unescaped.

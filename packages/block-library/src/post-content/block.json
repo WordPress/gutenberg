@@ -6,7 +6,7 @@
 		"postType"
 	],
 	"supports": {
-		"align": true,
+		"align": [ "wide", "full" ],
 		"html": false
 	}
 }

@@ -1,8 +1,12 @@
-# Create Block Tutorial
+# Create a Block Tutorial
 
-Let's get you started creating your first block for the WordPress Block Editor. We will create a simple block that allows the user to type a message and styles it.
+Let's get you started creating your first block for the WordPress Block Editor. We will create a simple block that allows the user to type a message and style it.
 
 The tutorial includes setting up your development environment, tools, and getting comfortable with the new development model. If you are already comfortable, try the quick start below, otherwise step through whatever part of the tutorial you need.
+
+## Prerequisites
+
+The first thing you need is a development environment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md).
 
 ## Quick Start
 
@@ -22,11 +26,11 @@ After activated, go to the block editor and use the inserter to search and add y
 
 ## Table of Contents
 
-1. [Development Environment](devenv.md)
-2. [WordPress Plugin](wp-plugin.md)
-3. [ESNext Syntax](esnext-js.md)
-4. [Anatomy of a Gutenberg Block](block-anatomy.md)
-5. [Block Attributes](block-attributes.md)
-6. [Code Implementation](block-code.md)
-7. [Authoring Experience](author-experience.md)
-8. [Finishing Touches](finishing.md)
+The create a block tutorials breaks down to the following sections.
+
+1. [WordPress Plugin](/docs/designers-developers/developers/tutorials/create-block/wp-plugin.md)
+2. [Anatomy of a Gutenberg Block ](/docs/designers-developers/developers/tutorials/create-block/block-anatomy.md)
+3. [Block Attributes](/docs/designers-developers/developers/tutorials/create-block/attributes.md)
+4. [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/block-code.md)
+5. [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)
+6. [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/finishing.md)

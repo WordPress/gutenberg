@@ -10,7 +10,6 @@ import {
 	getTemplatePartId,
 	getTemplateType,
 	getPage,
-	getShowOnFront,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -140,13 +139,6 @@ describe( 'selectors', () => {
 		it( 'returns the page object', () => {
 			const state = { page: {} };
 			expect( getPage( state ) ).toBe( state.page );
-		} );
-	} );
-
-	describe( 'getShowOnFront', () => {
-		it( 'returns the `show_on_front` setting', () => {
-			const state = { showOnFront: {} };
-			expect( getShowOnFront( state ) ).toBe( state.showOnFront );
 		} );
 	} );
 } );

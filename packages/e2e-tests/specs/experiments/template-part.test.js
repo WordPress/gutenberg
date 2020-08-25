@@ -31,14 +31,15 @@ describe( 'Template Part', () => {
 	} );
 
 	describe( 'Template part block', () => {
-		beforeEach( () =>
-			visitAdminPage(
+		beforeEach( async () => {
+			await visitAdminPage(
 				'admin.php',
 				addQueryArgs( '', {
 					page: 'gutenberg-edit-site',
 				} ).slice( 1 )
-			)
-		);
+			);
+			await page.waitForSelector( '.edit-site-visual-editor' );
+		} );
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.

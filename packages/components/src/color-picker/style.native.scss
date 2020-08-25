@@ -42,6 +42,17 @@
 	color: $dark-primary;
 }
 
+.selectColorText {
+	text-align: center;
+	color: $gray;
+	font-size: 16px;
+	line-height: 24px;
+}
+
+.selectColorTextDark {
+	color: $dark-primary;
+}
+
 .picker {
 	padding: $grid-unit-20;
 	border-radius: $grid-unit-20 / 2;

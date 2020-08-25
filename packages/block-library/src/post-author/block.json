@@ -2,7 +2,7 @@
 	"name": "core/post-author",
 	"category": "design",
 	"attributes": {
-		"align": {
+		"textAlign": {
 			"type": "string"
 		},
 		"avatarSize": {
@@ -18,18 +18,6 @@
 		},
 		"byline": {
 			"type": "string"
-		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"textColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
-		},
-		"customTextColor": {
-			"type": "string"
 		}
 	},
 	"usesContext": [
@@ -38,6 +26,12 @@
 	],
 	"supports": {
 		"html": false,
-		"__experimentalFontSize": true
+		"lightBlockWrapper": true,
+		"__experimentalFontSize": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
+		},
+		"__experimentalLineHeight": true
 	}
 }

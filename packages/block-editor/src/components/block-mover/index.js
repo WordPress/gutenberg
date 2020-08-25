@@ -7,10 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
-} from '@wordpress/components';
+import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';

@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
+import { Fragment } from '@wordpress/element';
 import { Icon, update, chartLine } from '@wordpress/icons';
 
 function DownloadableBlockInfo( {
@@ -13,7 +14,7 @@ function DownloadableBlockInfo( {
 	return (
 		<Fragment>
 			<p className="block-directory-downloadable-block-info__content">
-				{ description }
+				{ decodeEntities( description ) }
 			</p>
 			<div className="block-directory-downloadable-block-info__meta">
 				<Icon

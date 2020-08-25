@@ -12,7 +12,7 @@ import ToolbarItem from '../toolbar-item';
 
 function ToolbarGroupCollapsed( { controls = [], ...props } ) {
 	// It'll contain state if `ToolbarGroup` is being used within
-	// `<Toolbar __experimentalAccessibilityLabel="label" />`
+	// `<Toolbar label="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	const renderDropdownMenu = ( toggleProps ) => (
@@ -20,7 +20,7 @@ function ToolbarGroupCollapsed( { controls = [], ...props } ) {
 			controls={ controls }
 			toggleProps={ {
 				...toggleProps,
-				'data-experimental-toolbar-item': true,
+				'data-toolbar-item': true,
 			} }
 			{ ...props }
 		/>

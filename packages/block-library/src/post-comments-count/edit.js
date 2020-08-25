@@ -1,16 +1,34 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useEntityId } from '@wordpress/core-data';
+import {
+	AlignmentToolbar,
+	BlockControls,
+	Warning,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 
-function PostCommentsCountDisplay( { className } ) {
-	const postId = useEntityId( 'postType', 'post' );
+export default function PostCommentsCountEdit( {
+	attributes,
+	context,
+	setAttributes,
+} ) {
+	const { textAlign } = attributes;
+	const { postId } = context;
 	const [ commentsCount, setCommentsCount ] = useState();
 	useEffect( () => {
+		if ( ! postId ) {
+			return;
+		}
 		const currentPostId = postId;
 		apiFetch( {
 			path: addQueryArgs( '/wp/v2/comments', {
@@ -24,16 +42,30 @@ function PostCommentsCountDisplay( { className } ) {
 			}
 		} );
 	}, [ postId ] );
-	return (
-		<span className={ className }>
-			{ commentsCount !== undefined && commentsCount }
-		</span>
-	);
-}
 
-export default function PostCommentsCountEdit( { className } ) {
-	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return __( 'Post Comments Count' );
-	}
-	return <PostCommentsCountDisplay className={ className } />;
+	return (
+		<>
+			<BlockControls>
+				<AlignmentToolbar
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+			</BlockControls>
+			<Block.div
+				className={ classnames( {
+					[ `has-text-align-${ textAlign }` ]: textAlign,
+				} ) }
+			>
+				{ postId && commentsCount !== undefined ? (
+					commentsCount
+				) : (
+					<Warning>
+						{ __( 'Post Comments Count block: post not found.' ) }
+					</Warning>
+				) }
+			</Block.div>
+		</>
+	);
 }

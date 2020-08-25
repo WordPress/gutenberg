@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^26.0.0` to requiring `^30.2.2`.
+
+### Bug Fixes
+
+-   The recommended configuration will now respect local Prettier configuration. These are merged to the default WordPress configuration.
+
 ## 7.1.0-rc.0 (2020-06-24)
 
 ### Enhancements

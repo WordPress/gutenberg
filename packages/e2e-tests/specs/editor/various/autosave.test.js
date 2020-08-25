@@ -44,7 +44,7 @@ async function clearSessionStorage() {
 async function readSessionStorageAutosave( postId ) {
 	return page.evaluate(
 		( key ) => window.sessionStorage.getItem( key ),
-		`wp-autosave-block-editor-post-${ postId }`
+		`wp-autosave-block-editor-post-${ postId ? postId : 'auto-draft' }`
 	);
 }
 
@@ -76,9 +76,14 @@ describe( 'autosave', () => {
 	} );
 
 	it( 'should save to sessionStorage', async () => {
+		// Wait for the original timeout to kick in, it will schedule
+		// another run using the updated interval length of AUTOSAVE_INTERVAL_SECONDS
+		await sleep( 15 );
+
 		await clickBlockAppender();
 		await page.keyboard.type( 'before save' );
 		await saveDraftWithKeyboard();
+		await sleep( 1 );
 		await page.keyboard.type( ' after save' );
 
 		// Wait long enough for local autosave to kick in
@@ -88,19 +93,6 @@ describe( 'autosave', () => {
 		const autosave = await readSessionStorageAutosave( id );
 		const { content } = JSON.parse( autosave );
 		expect( content ).toBe( wrapParagraph( 'before save after save' ) );
-
-		// Test throttling by scattering typing
-		await page.keyboard.type( ' 1' );
-		await sleep( AUTOSAVE_INTERVAL_SECONDS - 4 );
-		await page.keyboard.type( '2' );
-		await sleep( 2 );
-		await page.keyboard.type( '3' );
-		await sleep( 2 );
-
-		const newAutosave = await readSessionStorageAutosave( id );
-		expect( JSON.parse( newAutosave ).content ).toBe(
-			wrapParagraph( 'before save after save 123' )
-		);
 	} );
 
 	it( 'should recover from sessionStorage', async () => {
@@ -117,6 +109,7 @@ describe( 'autosave', () => {
 		);
 		// Reload without saving on the server
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		const notice = await page.$eval(
 			'.components-notice__content',
@@ -192,6 +185,7 @@ describe( 'autosave', () => {
 		).toBe( 1 );
 
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 		const notice = await page.$eval(
 			'.components-notice__content',
 			( element ) => element.innerText
@@ -219,7 +213,7 @@ describe( 'autosave', () => {
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 1 );
+		).toBeGreaterThanOrEqual( 1 );
 
 		// Trigger remote autosave
 		await page.evaluate( () =>
@@ -295,14 +289,14 @@ describe( 'autosave', () => {
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 1 );
+		).toBeGreaterThanOrEqual( 1 );
 
 		// Bring network down and attempt to save
 		toggleOfflineMode( true );
 		saveDraftWithKeyboard();
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 1 );
+		).toBeGreaterThanOrEqual( 1 );
 	} );
 
 	it( "shouldn't conflict with server-side autosave", async () => {
@@ -326,9 +320,10 @@ describe( 'autosave', () => {
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 1 );
+		).toBeGreaterThanOrEqual( 1 );
 
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// FIXME: Occasionally, upon reload, there is no server-provided
 		// autosave value available, despite our having previously explicitly
