@@ -414,7 +414,7 @@ function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
  *
  * @return string Stylesheet.
  */
-function gutenberg_experimental_global_styles_resolver( $tree ) {
+function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 	$stylesheet = '';
 	$block_data = gutenberg_experimental_global_styles_get_block_data();
 	foreach ( array_keys( $tree ) as $block_name ) {
@@ -564,17 +564,14 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
  * Takes data from the different origins (core, theme, and user)
  * and returns the merged result.
  *
- * @return string
+ * @return array Merged trees
  */
-function gutenberg_experimental_global_styles_get_stylesheet() {
-	$gs_merged = array();
-	$gs_core   = gutenberg_experimental_global_styles_get_core();
-	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
-	$gs_user   = gutenberg_experimental_global_styles_get_user();
+function gutenberg_experimental_global_styles_get_merged_origins() {
+	$core   = gutenberg_experimental_global_styles_get_core();
+	$theme  = gutenberg_experimental_global_styles_get_theme();
+	$user   = gutenberg_experimental_global_styles_get_user();
 
-	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
-
-	return gutenberg_experimental_global_styles_resolver( $gs_merged );
+	return gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user );
 }
 
 /**
@@ -582,7 +579,12 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet();
+	$gs_merged  = gutenberg_experimental_global_styles_get_merged_origins();
+	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $gs_merged );
+	if ( empty( $stylesheet ) ) {
+		return;
+	}
+
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $stylesheet );
 	wp_enqueue_style( 'global-styles' );
@@ -648,6 +650,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		return false;
 	}
 	$screen = get_current_screen();
+	$merged = gutenberg_experimental_global_styles_get_merged_origins();
 
 	if ( ! empty( $screen ) &&
 		gutenberg_is_edit_site_page( $screen->id ) &&
@@ -665,7 +668,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// Add the styles for the editor via the settings
 		// so they get processed as if they were added via add_editor_styles:
 		// they will get the editor wrapper class.
-		$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet() );
+		$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $merged ) );
 	}
 
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
