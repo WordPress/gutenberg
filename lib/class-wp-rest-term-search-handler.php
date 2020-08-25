@@ -18,11 +18,11 @@ class WP_REST_Term_Search_Handler extends WP_REST_Search_Handler {
 	public function __construct() {
 		$this->type = 'term';
 
-		// Support all public post types except attachments.
 		$this->subtypes = array_values(
 			get_taxonomies(
 				array(
-					'public' => true,
+					'public'       => true,
+					'show_in_rest' => true,
 				),
 				'names'
 			)
