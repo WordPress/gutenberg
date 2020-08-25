@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+- Site title is now a link.
+
 ### New Features
 
 - Add heading level controls to Site Title block.
