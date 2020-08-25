@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, set } from 'lodash';
+import { map, set, flatten, partialRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,12 +39,19 @@ function disableInsertingNonNavigationBlocks( settings, name ) {
  * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
  * Until we refactor it, just copying the code is the simplest solution.
  *
- * @param {Object} search
- * @param {number} perPage
+ * @param {string} search
+ * @param {Object} [searchArguments]
+ * @param {number} [searchArguments.perPage=20]
+ * @param {Object} [editorSettings]
+ * @param {boolean} [editorSettings.disablePostFormats=false]
  * @return {Promise<Object[]>} List of suggestions
  */
-async function fetchLinkSuggestions( search, { perPage = 20 } = {} ) {
-	const posts = await apiFetch( {
+const fetchLinkSuggestions = (
+	search,
+	{ perPage = 20 } = {},
+	{ disablePostFormats = false } = {}
+) => {
+	const posts = apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
 			per_page: perPage,
@@ -52,13 +59,36 @@ async function fetchLinkSuggestions( search, { perPage = 20 } = {} ) {
 		} ),
 	} );
 
-	return map( posts, ( post ) => ( {
-		id: post.id,
-		url: post.url,
-		title: decodeEntities( post.title ) || __( '(no title)' ),
-		type: post.subtype || post.type,
-	} ) );
-}
+	const terms = apiFetch( {
+		path: addQueryArgs( '/wp/v2/search', {
+			search,
+			per_page: perPage,
+			type: 'term',
+		} ),
+	} );
+
+	let formats;
+	if ( disablePostFormats ) {
+		formats = Promise.resolve( [] );
+	} else {
+		formats = apiFetch( {
+			path: addQueryArgs( '/wp/v2/search', {
+				search,
+				per_page: perPage,
+				type: 'post-format',
+			} ),
+		} );
+	}
+
+	return Promise.all( [ posts, terms, formats ] ).then( ( results ) => {
+		return map( flatten( results ).slice( 0, perPage ), ( result ) => ( {
+			id: result.id,
+			url: result.url,
+			title: decodeEntities( result.title ) || __( '(no title)' ),
+			type: result.subtype || result.type,
+		} ) );
+	} );
+};
 
 export function initialize( id, settings ) {
 	if ( ! settings.blockNavMenus ) {
@@ -75,7 +105,10 @@ export function initialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 
-	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+	settings.__experimentalFetchLinkSuggestions = partialRight(
+		fetchLinkSuggestions,
+		settings
+	);
 
 	render(
 		<Layout blockEditorSettings={ settings } />,
