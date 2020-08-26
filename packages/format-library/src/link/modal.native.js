@@ -209,7 +209,7 @@ const LinkSettingsScreen = ( {
 						separatorType={ 'fullWidth' }
 					/>
 				</View>
-				<View style={ { marginBottom: 16 } }>
+				<View style={ { marginBottom: 32 } }>
 					<BottomSheet.Cell
 						label={ __( 'Remove link' ) }
 						labelStyle={ styles.clearLinkButton }
