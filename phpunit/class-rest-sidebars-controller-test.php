@@ -302,7 +302,6 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 401, $response->get_status() );
 		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
 	}
 
