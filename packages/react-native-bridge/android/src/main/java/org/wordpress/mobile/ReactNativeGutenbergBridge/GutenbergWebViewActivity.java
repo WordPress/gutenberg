@@ -36,7 +36,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private static final String JAVA_SCRIPT_INTERFACE_NAME = "wpwebkit";
 
     protected WebView mWebView;
-    private View mForegroundView;
+    protected View mForegroundView;
+    protected boolean mIsRedirected;
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,8 +48,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.gutenberg_web_view);
         mForegroundView = findViewById(R.id.foreground_view);
-
-        WebView.setWebContentsDebuggingEnabled(true);
 
         // Set settings
         WebSettings settings = mWebView.getSettings();
@@ -151,27 +150,13 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
     private void setupWebViewClient() {
         mWebView.setWebViewClient(new WebViewClient() {
-            private boolean mIsRedirected;
-            private boolean mIsJetpackSsoRedirected;
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                boolean shouldOverrideUrlLoading = isUrlOverridden(view, url);
 
-                if (isJetpackSsoEnabled()) {
-                    if (!mIsJetpackSsoRedirected) {
-                        mIsJetpackSsoRedirected = true;
-                        view.loadUrl(urlToLoad());
-                        return true;
-                    }
-
-                    if (url.contains(urlToLoad())) {
-                        mForegroundView.setVisibility(View.VISIBLE);
-                        mIsRedirected = true;
-                    }
-                } else {
-                    if (!mIsRedirected) {
-                        mIsRedirected = true;
-                    }
+                if (shouldOverrideUrlLoading) {
+                    return true;
                 }
 
                 return super.shouldOverrideUrlLoading(view, url);
@@ -231,7 +216,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
 
                     // We need some extra time to hide all unwanted html elements
-                    mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1000);
+                    mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
                 }, 2000);
             }
 
@@ -251,12 +236,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         }
     }
 
-    protected boolean isJetpackSsoEnabled() {
-        return false;
-    }
+    protected boolean isUrlOverridden(WebView view, String url) {
+        if (!mIsRedirected) {
+            mIsRedirected = true;
+        }
 
-    protected String urlToLoad() {
-        return "";
+        return false;
     }
 
     protected long getUserId() {

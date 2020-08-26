@@ -36,7 +36,7 @@
         android:id="@+id/foreground_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/blue_wordpress"/>
+        android:background="@color/white"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"
