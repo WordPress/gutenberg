@@ -722,7 +722,7 @@ export function stopTyping() {
  *
  * @return {Object} Action object.
  */
-export function startDraggingBlocks( clientIds ) {
+export function startDraggingBlocks( clientIds = [] ) {
 	return {
 		type: 'START_DRAGGING_BLOCKS',
 		clientIds,

@@ -1863,7 +1863,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if a block is not being dragged', () => {
 			const state = {
-				draggedBlocks: null,
+				draggedBlocks: [],
 			};
 			expect( isDraggingBlocks( state ) ).toBe( false );
 		} );
@@ -1896,7 +1896,7 @@ describe( 'selectors', () => {
 
 		it( 'returns false if no blocks are being dragged', () => {
 			const state = {
-				draggedBlocks: null,
+				draggedBlocks: [],
 			};
 			expect( isBlockBeingDragged( state, 'block-1' ) ).toBe( false );
 		} );
@@ -1931,7 +1931,7 @@ describe( 'selectors', () => {
 
 		it( 'returns false if no blocks are being dragged', () => {
 			const state = {
-				draggedBlocks: null,
+				draggedBlocks: [],
 				blocks: {
 					parents: {
 						'block-1': 'block-1_parent',

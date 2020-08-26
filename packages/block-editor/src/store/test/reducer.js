@@ -2068,7 +2068,7 @@ describe( 'state', () => {
 	describe( 'draggedBlocks', () => {
 		it( 'should store the dragged client ids when a user starts dragging blocks', () => {
 			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
-			const state = draggedBlocks( null, {
+			const state = draggedBlocks( [], {
 				type: 'START_DRAGGING_BLOCKS',
 				clientIds,
 			} );
@@ -2076,13 +2076,13 @@ describe( 'state', () => {
 			expect( state ).toBe( clientIds );
 		} );
 
-		it( 'should set the state to null when a user stops dragging blocks', () => {
+		it( 'should set the state to an empty array when a user stops dragging blocks', () => {
 			const previousState = [ 'block-1', 'block-2', 'block-3' ];
 			const state = draggedBlocks( previousState, {
 				type: 'STOP_DRAGGING_BLOCKS',
 			} );
 
-			expect( state ).toBe( null );
+			expect( state ).toEqual( [] );
 		} );
 	} );
 

@@ -1036,7 +1036,7 @@ export function isTyping( state ) {
  * @return {boolean} Whether user is dragging blocks.
  */
 export function isDraggingBlocks( state ) {
-	return !! state.draggedBlocks;
+	return !! state.draggedBlocks.length;
 }
 
 /**
@@ -1065,7 +1065,7 @@ export function getDraggedBlockClientIds( state ) {
  * @return {boolean} Whether the block is being dragged.
  */
 export function isBlockBeingDragged( state, clientId ) {
-	return !! state.draggedBlocks && state.draggedBlocks.includes( clientId );
+	return state.draggedBlocks.includes( clientId );
 }
 
 /**
@@ -1079,7 +1079,7 @@ export function isBlockBeingDragged( state, clientId ) {
 export function isAncestorBeingDragged( state, clientId ) {
 	// Return early if no blocks are being dragged rather than
 	// the more expensive check for parents.
-	if ( ! state.draggedBlocks ) {
+	if ( ! state.draggedBlocks.length ) {
 		return false;
 	}
 
