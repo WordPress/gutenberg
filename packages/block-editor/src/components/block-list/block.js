@@ -100,11 +100,11 @@ function BlockListBlock( {
 	// (editor.BlockListBlock filter)
 	const { isDragging, isHighlighted } = useSelect(
 		( select ) => {
-			const { isDraggingBlocks, isBlockHighlighted } = select(
+			const { isBlockBeingDragged, isBlockHighlighted } = select(
 				'core/block-editor'
 			);
 			return {
-				isDragging: isDraggingBlocks(),
+				isDragging: isBlockBeingDragged( clientId ),
 				isHighlighted: isBlockHighlighted( clientId ),
 			};
 		},
@@ -154,8 +154,7 @@ function BlockListBlock( {
 			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
-			'is-dragging':
-				isDragging && ( isSelected || isPartOfMultiSelection ),
+			'is-dragging': isDragging,
 			'is-typing': isTypingWithinBlock,
 			'is-focused':
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
