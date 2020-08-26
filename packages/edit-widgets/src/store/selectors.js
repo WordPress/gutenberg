@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy } from 'lodash';
+import { invert, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,6 +38,12 @@ export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 		.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query )
 		.filter( ( { id } ) => id !== 'wp_inactive_widgets' );
 } );
+
+export const getWidgetIdForClientId = ( state, clientId ) => {
+	const widgetIdToClientId = state.mapping;
+	const clientIdToWidgetId = invert( widgetIdToClientId );
+	return clientIdToWidgetId[ clientId ];
+};
 
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {

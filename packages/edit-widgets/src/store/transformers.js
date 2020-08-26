@@ -17,7 +17,6 @@ export function transformWidgetToBlock( widget ) {
 		{
 			rendered: widget.rendered,
 			form: widget.form,
-			id: widget.id,
 			widgetClass: widget.widget_class,
 			instance: widget.settings,
 			idBase: widget.id_base,
@@ -33,7 +32,6 @@ export function transformBlockToWidget( block, relatedWidget = {} ) {
 		const widget = {
 			...relatedWidget,
 			widget_class: attributes.widgetClass,
-			number: attributes.number,
 			id_base: attributes.idBase,
 			settings: attributes.instance,
 		};
