@@ -1,16 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { NavigableMenu } from '@wordpress/components';
-import {
-	BlockNavigationDropdown,
-	BlockToolbar,
-	Inserter,
-} from '@wordpress/block-editor';
+import { __, _x } from '@wordpress/i18n';
+import { Button, NavigableMenu } from '@wordpress/components';
+import { BlockNavigationDropdown, BlockToolbar } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,26 +15,32 @@ import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 
-const inserterToggleProps = { isPrimary: true };
-
-function Header( { isCustomizer } ) {
+function Header( {
+	isCustomizer,
+	isInserterOpen,
+	onInserterToggle,
+	rootClientId,
+} ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const rootClientId = useSelect( ( select ) => {
-		const { getBlockRootClientId, getBlockSelectionEnd } = select(
-			'core/block-editor'
-		);
-		return getBlockRootClientId( getBlockSelectionEnd() );
-	}, [] );
 
 	return (
 		<>
 			<div className="edit-widgets-header">
 				<NavigableMenu>
-					<Inserter
-						position="bottom right"
-						showInserterHelpPanel
-						toggleProps={ inserterToggleProps }
-						rootClientId={ rootClientId }
+					<Button
+						icon={ plus }
+						label={ _x(
+							'Add block',
+							'Generic label for block inserter button'
+						) }
+						tooltipPosition="bottom"
+						onClick={ onInserterToggle }
+						className="block-editor-inserter__toggle"
+						aria-haspopup={ 'true' }
+						aria-expanded={ isInserterOpen }
+						disabled={ ! rootClientId }
+						isPressed={ isInserterOpen }
+						isPrimary
 					/>
 					<UndoButton />
 					<RedoButton />

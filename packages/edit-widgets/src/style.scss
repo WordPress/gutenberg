@@ -63,5 +63,15 @@ body.gutenberg_page_gutenberg-widgets {
 	display: none;
 }
 
+.edit-widgets-layout__inserter-panel-header {
+	padding-top: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	display: flex;
+	justify-content: flex-end;
+
+	@include break-medium() {
+		display: none;
+	}
+}
 
 @include wordpress-admin-schemes();
