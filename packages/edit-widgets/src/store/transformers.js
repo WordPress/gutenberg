@@ -32,7 +32,6 @@ export function transformBlockToWidget( block, relatedWidget = {} ) {
 	if ( name === 'core/legacy-widget' ) {
 		const widget = {
 			...relatedWidget,
-			id: attributes.id,
 			widget_class: attributes.widgetClass,
 			number: attributes.number,
 			id_base: attributes.idBase,
