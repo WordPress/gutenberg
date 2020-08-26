@@ -50,7 +50,7 @@ export default function BlockNavigationBlock( {
 	const { clientId } = block;
 
 	// Subtract 1 from rowCount, as it includes the block appender.
-	const siblingCount = rowCount - 1;
+	const siblingCount = rowCount - 1 + 0;
 	const hasSiblings = siblingCount > 1;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const hasVisibleMovers = isHovered || isFocused;
