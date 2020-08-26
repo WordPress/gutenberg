@@ -288,11 +288,13 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	public static function get_widgets( $sidebar_id ) {
 		global $wp_registered_widgets, $wp_registered_sidebars;
 
-		$widgets               = array();
-		$sidebars_widgets      = (array) wp_get_sidebars_widgets();
-		$is_registered_sidebar = 'wp_inactive_widgets' === $sidebar_id || isset( $wp_registered_sidebars[ $sidebar_id ] );
+		$widgets            = array();
+		$sidebars_widgets   = (array) wp_get_sidebars_widgets();
+		$registered_sidebar = isset( $wp_registered_sidebars[ $sidebar_id ] ) ? $wp_registered_sidebars[ $sidebar_id ] : (
+			'wp_inactive_widgets' === $sidebar_id ? array() : null
+		);
 
-		if ( $is_registered_sidebar && isset( $sidebars_widgets[ $sidebar_id ] ) ) {
+		if ( null !== $registered_sidebar && isset( $sidebars_widgets[ $sidebar_id ] ) ) {
 			foreach ( $sidebars_widgets[ $sidebar_id ] as $widget_id ) {
 				// Just to be sure.
 				if ( isset( $wp_registered_widgets[ $widget_id ] ) ) {
@@ -304,7 +306,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						$widget_parameters = array_merge(
 							array(
 								array_merge(
-									$wp_registered_sidebars[ $sidebar_id ],
+									$registered_sidebar,
 									array(
 										'widget_id'   => $widget_id,
 										'widget_name' => $widget['name'],
@@ -342,7 +344,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						$instance               = $widget['callback'][0];
 						$widget['widget_class'] = get_class( $instance );
 						$widget['settings']     = static::get_sidebar_widget_instance(
-							$wp_registered_sidebars[ $sidebar_id ],
+							$registered_sidebar,
 							$widget_id
 						);
 						$widget['number']       = (int) $widget['params'][0]['number'];
