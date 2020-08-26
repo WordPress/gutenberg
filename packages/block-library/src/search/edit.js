@@ -169,9 +169,6 @@ export default function SearchEdit( {
 						} }
 						className={ showLabel ? 'is-pressed' : undefined }
 					/>
-				</ToolbarGroup>
-
-				<ToolbarGroup>
 					<DropdownMenu
 						icon={ getButtonPositionIcon() }
 						label={ __( 'Change Button Position' ) }
