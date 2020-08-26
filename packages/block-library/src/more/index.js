@@ -21,7 +21,7 @@ export const settings = {
 	description: __(
 		'Content before this block will be shown in the excerpt on your archives page.'
 	),
-	keywords: [ __( 'read' ) ], // Show in search results when looking for "Read More".
+	keywords: [ __( 'read more' ) ],
 	icon,
 	example: {},
 	__experimentalLabel( attributes, { context } ) {
