@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import { lowerCase, startsWith } from 'lodash';
 
@@ -57,11 +57,13 @@ export const LinkPicker = ( {
 
 	// the title of a direct entry is displayed as the raw input value, but if we
 	// are replacing empty text, we want to use the generated url
-	const pickLink = useCallback( ( { title, url, isDirectEntry } ) => {
+	const pickLink = ( { title, url, isDirectEntry } ) => {
 		onLinkPicked( { title: isDirectEntry ? url : title, url } );
-	}, [] );
+	};
 
-	const onSubmit = useCallback( () => pickLink( directEntry ), [] );
+	const onSubmit = () => {
+		pickLink( directEntry );
+	};
 
 	const omniCellStyle = usePreferredColorSchemeStyle(
 		styles.omniCell,

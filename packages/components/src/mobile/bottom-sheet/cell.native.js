@@ -40,8 +40,8 @@ class BottomSheetCell extends Component {
 		);
 	}
 
-	componentDidUpdate() {
-		if ( this.state.isEditingValue ) {
+	componentDidUpdate( prevProps, prevState ) {
+		if ( ! prevState.isEditingValue && this.state.isEditingValue ) {
 			this._valueTextInput.focus();
 		}
 	}

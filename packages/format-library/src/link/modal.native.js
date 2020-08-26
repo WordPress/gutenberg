@@ -155,21 +155,18 @@ const LinkSettingsScreen = ( {
 		onClose();
 	};
 
-	const removeLink = useCallback( () => {
+	const removeLink = () => {
 		onRemove();
 		onClose();
-	}, [ onRemove, onClose ] );
+	};
 
-	const submit = useCallback(
-		( submitValue ) => {
-			if ( submitValue === '' ) {
-				removeLink();
-			} else {
-				submitLink();
-			}
-		},
-		[ removeLink ]
-	);
+	const submit = ( submitValue ) => {
+		if ( submitValue === '' ) {
+			removeLink();
+		} else {
+			submitLink();
+		}
+	};
 
 	useFocusEffect(
 		useCallback( () => {
