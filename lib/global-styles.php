@@ -603,7 +603,7 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 		return array();
 	}
 
-	// Deprecated theme supports
+	// Deprecated theme supports.
 	if ( null !== get_theme_support( 'disable-custom-colors' ) ) {
 		$config['global']['features']['colors']['allowCustom'] = ! get_theme_support( 'disable-custom-colors' );
 	}

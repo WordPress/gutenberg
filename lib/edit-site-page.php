@@ -143,7 +143,7 @@ function gutenberg_edit_site_init( $hook ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
 	$settings['styles'] = gutenberg_get_editor_styles();
-	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$settings           = gutenberg_experimental_global_styles_settings( $settings );
 
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.

@@ -75,7 +75,7 @@ function gutenberg_navigation_init( $hook ) {
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
-	
+
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
 	wp_add_inline_script(
