@@ -35,22 +35,12 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
 	 */
-	protected static $per_page = 50;
+	protected static $author_id;
 
 	/**
-	 * REST_Sidebars_Controller_Test constructor.
+	 * @var int
 	 */
-	public function __construct() {
-		parent::__construct();
-		require_once dirname( __FILE__ ) . '/../lib/class-wp-rest-sidebars-controller.php';
-		add_filter(
-			'rest_api_init',
-			function () {
-				$sidebars = new WP_REST_Sidebars_Controller();
-				$sidebars->register_routes();
-			}
-		);
-	}
+	protected static $per_page = 50;
 
 	/**
 	 * Create fake data before our tests run.
@@ -66,6 +56,11 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		self::$editor_id     = $factory->user->create(
 			array(
 				'role' => 'editor',
+			)
+		);
+		self::$author_id     = $factory->user->create(
+			array(
+				'role' => 'author',
 			)
 		);
 		self::$subscriber_id = $factory->user->create(
@@ -150,6 +145,36 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data     = $response->get_data();
 
 		$this->assertEquals( array(), $data );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_no_permission() {
+		wp_set_current_user( 0 );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_wrong_permission_author() {
+		wp_set_current_user( self::$author_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_wrong_permission_subscriber() {
+		wp_set_current_user( self::$subscriber_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
 	}
 
 	/**
@@ -272,6 +297,57 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			),
 			$data
 		);
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_no_permission() {
+		wp_set_current_user( 0 );
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_wrong_permission_author() {
+		wp_set_current_user( self::$author_id );
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_wrong_permission_subscriber() {
+		wp_set_current_user( self::$subscriber_id );
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
 	}
 
 	/**
@@ -556,6 +632,54 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 *
+	 */
+	public function test_update_item_no_permission() {
+		wp_set_current_user( 0 );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_update_item_wrong_permission_author() {
+		wp_set_current_user( self::$author_id );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_update_item_wrong_permission_subscriber() {
+		wp_set_current_user( self::$subscriber_id );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+	}
+
+	/**
 	 * The test_delete_item() method does not exist for sidebar.
 	 */
 	public function test_delete_item() {
@@ -584,4 +708,5 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'widgets', $properties );
 	}
+
 }
