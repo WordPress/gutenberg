@@ -26,7 +26,7 @@ const NavigationMenuItem = ( props ) => {
 		LinkComponent,
 		linkProps,
 		onClick,
-		setActiveLevel,
+		setActiveLevelId,
 		title,
 	} = props;
 	const classes = classnames( 'components-navigation__menu-item', {
@@ -35,7 +35,7 @@ const NavigationMenuItem = ( props ) => {
 
 	const handleClick = () => {
 		if ( children.length ) {
-			setActiveLevel( id );
+			setActiveLevelId( id );
 			return;
 		}
 		onClick( props );
