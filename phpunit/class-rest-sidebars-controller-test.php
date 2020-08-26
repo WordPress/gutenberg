@@ -148,13 +148,33 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 * @dataProvider users_without_permissions
+	 *
 	 */
-	public function test_get_items_permission( $user_id ) {
-		wp_set_current_user( $user_id );
+	public function test_get_items_no_permission() {
+		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_wrong_permission_author() {
+		wp_set_current_user( self::$author_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_wrong_permission_subscriber() {
+		wp_set_current_user( self::$subscriber_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
 	}
 
 	/**
@@ -280,10 +300,44 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 * @dataProvider users_without_permissions
+	 *
 	 */
-	public function test_get_item_permission( $user_id ) {
-		wp_set_current_user( $user_id );
+	public function test_get_item_no_permission() {
+		wp_set_current_user( 0 );
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_wrong_permission_author() {
+		wp_set_current_user( self::$author_id );
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_wrong_permission_subscriber() {
+		wp_set_current_user( self::$subscriber_id );
 		$this->setup_sidebar(
 			'sidebar-1',
 			array(
@@ -401,10 +455,42 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 * @dataProvider users_without_permissions
+	 *
 	 */
-	public function test_update_item_permission( $user_id ) {
-		wp_set_current_user( $user_id );
+	public function test_update_item_no_permission() {
+		wp_set_current_user( 0 );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_update_item_wrong_permission_author() {
+		wp_set_current_user( self::$author_id );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_update_item_wrong_permission_subscriber() {
+		wp_set_current_user( self::$subscriber_id );
 
 		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
 		$request->set_body_params(
@@ -446,10 +532,4 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'widgets', $properties );
 	}
 
-	public function users_without_permissions() {
-		return array(
-			array( self::$subscriber_id ),
-			array( self::$author_id ),
-		);
-	}
 }
