@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { mapMarker as icon } from '@wordpress/icons';
+import {
+	category as categoryIcon,
+	mapMarker as linkIcon,
+	page as pageIcon,
+	postTitle as postIcon,
+	tag as tagIcon,
+} from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
@@ -19,7 +25,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Link' ),
 
-	icon,
+	icon: linkIcon,
 
 	description: __( 'Add a page, link, or another item to your navigation.' ),
 
@@ -33,25 +39,29 @@ export const settings = {
 		},
 		{
 			name: 'post',
-			title: __( 'Post' ),
+			icon: postIcon,
+			title: __( 'Post Link' ),
 			description: __( 'A link to a post.' ),
 			attributes: { type: 'post' },
 		},
 		{
 			name: 'page',
-			title: __( 'Page' ),
+			icon: pageIcon,
+			title: __( 'Page Link' ),
 			description: __( 'A link to a page.' ),
 			attributes: { type: 'page' },
 		},
 		{
 			name: 'category',
-			title: __( 'Category' ),
+			icon: categoryIcon,
+			title: __( 'Category Link' ),
 			description: __( 'A link to a category.' ),
 			attributes: { type: 'category' },
 		},
 		{
 			name: 'tag',
-			title: __( 'Tag' ),
+			icon: tagIcon,
+			title: __( 'Tag Link' ),
 			description: __( 'A link to a tag.' ),
 			attributes: { type: 'tag' },
 		},
