@@ -129,7 +129,7 @@
 				"dropCap": false
 			},
 			"colors": {
-				"allowCustom": true
+				"custom": true
 			}
 		}
 	}

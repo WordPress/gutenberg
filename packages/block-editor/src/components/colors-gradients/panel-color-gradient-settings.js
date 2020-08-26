@@ -153,7 +153,7 @@ const PanelColorGradientSettingsSelect = ( props ) => {
 		return pick( settings, colorsAndGradientKeys );
 	} );
 	colorGradientSettings.disableCustomColors = ! useEditorFeature(
-		'colors.allowCustom'
+		'colors.custom'
 	);
 	return (
 		<PanelColorGradientSettingsInner

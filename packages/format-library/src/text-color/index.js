@@ -27,7 +27,7 @@ const title = __( 'Text Color' );
 const EMPTY_ARRAY = [];
 
 function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
-	const allowCustomControl = useEditorFeature( 'colors.allowCustom' );
+	const allowCustomControl = useEditorFeature( 'colors.custom' );
 	const { colors } = useSelect( ( select ) => {
 		const blockEditorSelect = select( 'core/block-editor' );
 		let settings;
