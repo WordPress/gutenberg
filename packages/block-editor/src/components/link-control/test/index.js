@@ -725,7 +725,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
+					result.innerHTML.includes( 'Create:' )
 				)
 			);
 
@@ -822,7 +822,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'New page' )
+				result.innerHTML.includes( 'Create:' )
 			)
 		);
 
@@ -895,7 +895,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const form = container.querySelector( 'form' );
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'New page' )
+				result.innerHTML.includes( 'Create:' )
 			)
 		);
 
@@ -949,7 +949,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 				const createButton = first(
 					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'New page' )
+						result.innerHTML.includes( 'Create:' )
 					)
 				);
 
@@ -1074,7 +1074,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 			let createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
+					result.innerHTML.includes( 'Create:' )
 				)
 			);
 
