@@ -50,8 +50,11 @@ const handleEntitySearch = async (
 	suggestionsQuery,
 	fetchSearchSuggestions,
 	directEntryHandler,
-	withCreateSuggestion
+	withCreateSuggestion,
+	withURLSuggestion
 ) => {
+	const { isInitialSuggestions } = suggestionsQuery;
+
 	let results = await Promise.all( [
 		fetchSearchSuggestions( val, suggestionsQuery ),
 		directEntryHandler( val ),
@@ -62,13 +65,14 @@ const handleEntitySearch = async (
 	// If it's potentially a URL search then concat on a URL search suggestion
 	// just for good measure. That way once the actual results run out we always
 	// have a URL option to fallback on.
-	results =
-		couldBeURL && ! suggestionsQuery.isInitialSuggestions
-			? results[ 0 ].concat( results[ 1 ] )
-			: results[ 0 ];
+	if ( couldBeURL && withURLSuggestion && ! isInitialSuggestions ) {
+		results = results[ 0 ].concat( results[ 1 ] );
+	} else {
+		results = results[ 0 ];
+	}
 
 	// If displaying initial suggestions just return plain results.
-	if ( suggestionsQuery.isInitialSuggestions ) {
+	if ( isInitialSuggestions ) {
 		return results;
 	}
 
@@ -101,7 +105,8 @@ const handleEntitySearch = async (
 export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
-	withCreateSuggestion
+	withCreateSuggestion,
+	withURLSuggestion
 ) {
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -124,7 +129,8 @@ export default function useSearchHandler(
 						{ ...suggestionsQuery, isInitialSuggestions },
 						fetchSearchSuggestions,
 						directEntryHandler,
-						withCreateSuggestion
+						withCreateSuggestion,
+						withURLSuggestion
 				  );
 		},
 		[ directEntryHandler, fetchSearchSuggestions, withCreateSuggestion ]

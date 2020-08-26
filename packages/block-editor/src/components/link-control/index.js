@@ -76,19 +76,21 @@ import { ViewerFill } from './viewer-slot';
 /**
  * @typedef WPLinkControlProps
  *
- * @property {(WPLinkControlSetting[])=}            settings               An array of settings objects. Each object will used to
- *                                                                         render a `ToggleControl` for that setting.
- * @property {boolean=}                             forceIsEditingLink     If passed as either `true` or `false`, controls the
- *                                                                         internal editing state of the component to respective
- *                                                                         show or not show the URL input field.
- * @property {WPLinkControlValue=}                  value                  Current link value.
- * @property {WPLinkControlOnChangeProp=}           onChange               Value change handler, called with the updated value if
- *                                                                         the user selects a new link or updates settings.
- * @property {boolean=}                             noDirectEntry          Whether to disable direct entries or not.
- * @property {boolean=}                             showSuggestions        Whether to present suggestions when typing the URL.
- * @property {boolean=}                             showInitialSuggestions Whether to present initial suggestions immediately.
- * @property {boolean=}                             withCreateSuggestion   Whether to allow creation of link value from suggestion.
- * @property {Object=}                              suggestionsQuery       Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
+ * @property {(WPLinkControlSetting[])=}  settings                   An array of settings objects. Each object will used to
+ *                                                                   render a `ToggleControl` for that setting.
+ * @property {boolean=}                   forceIsEditingLink         If passed as either `true` or `false`, controls the
+ *                                                                   internal editing state of the component to respective
+ *                                                                   show or not show the URL input field.
+ * @property {WPLinkControlValue=}        value                      Current link value.
+ * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
+ *                                                                   the user selects a new link or updates settings.
+ * @property {boolean=}                   noDirectEntry              Whether to disable direct entries or not.
+ * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.
+ * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
+ * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
+ * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
+ * @property {boolean=}                   noURLSuggestion            Whether to disable suggesting the search query as a URL.
+ * @property {string|Function|undefined}  createSuggestionButtonText Text to use in the button that creates a suggestion.
  */
 
 /**
@@ -111,6 +113,8 @@ function LinkControl( {
 	withCreateSuggestion,
 	inputValue: propInputValue = '',
 	suggestionsQuery = {},
+	noURLSuggestion = false,
+	createSuggestionButtonText,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -212,6 +216,10 @@ function LinkControl( {
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }
 							suggestionsQuery={ suggestionsQuery }
+							withURLSuggestion={ ! noURLSuggestion }
+							createSuggestionButtonText={
+								createSuggestionButtonText
+							}
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button

@@ -25,7 +25,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
@@ -35,7 +35,13 @@ import {
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import {
+	Fragment,
+	useState,
+	useEffect,
+	useRef,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
 
@@ -128,6 +134,7 @@ function NavigationLinkEdit( {
 	rgbBackgroundColor,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
+	userCanCreatePosts = false,
 	insertBlocksAfter,
 	mergeBlocks,
 	onReplace,
@@ -199,15 +206,24 @@ function NavigationLinkEdit( {
 		selection.addRange( range );
 	}
 
-	async function handleCreatePage( pageTitle ) {
-		const page = await saveEntityRecord( 'postType', 'page', {
+	let userCanCreate = false;
+	if ( ! type || type === 'page' ) {
+		userCanCreate = userCanCreatePages;
+	} else if ( type === 'post' ) {
+		userCanCreate = userCanCreatePosts;
+	}
+
+	async function handleCreate( pageTitle ) {
+		const postType = type || 'page';
+
+		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
 			status: 'publish',
 		} );
 
 		return {
 			id: page.id,
-			type,
+			postType,
 			title: page.title.rendered,
 			url: page.link,
 		};
@@ -318,8 +334,28 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
-								withCreateSuggestion={ userCanCreatePages }
-								createSuggestion={ handleCreatePage }
+								withCreateSuggestion={ userCanCreate }
+								createSuggestion={ handleCreate }
+								createSuggestionButtonText={ ( searchTerm ) => {
+									let format;
+									if ( type === 'post' ) {
+										/* translators: %s: search term. */
+										format = __(
+											'Create post: <mark>%s</mark>'
+										);
+									} else {
+										/* translators: %s: search term. */
+										format = __(
+											'Create page: <mark>%s</mark>'
+										);
+									}
+									return createInterpolateElement(
+										sprintf( format, searchTerm ),
+										{ mark: <mark /> }
+									);
+								} }
+								noDirectEntry={ !! type }
+								noURLSuggestion={ !! type }
 								suggestionsQuery={ getSuggestionsQuery( type ) }
 								onChange={ ( {
 									title: newTitle = '',
@@ -445,11 +481,6 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
-		const userCanCreatePages = select( 'core' ).canUser(
-			'create',
-			'pages'
-		);
-
 		return {
 			isParentOfSelectedBlock,
 			isImmediateParentOfSelectedBlock,
@@ -458,7 +489,8 @@ export default compose( [
 			showSubmenuIcon,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
-			userCanCreatePages,
+			userCanCreatePages: select( 'core' ).canUser( 'create', 'pages' ),
+			userCanCreatePosts: select( 'core' ).canUser( 'create', 'posts' ),
 			rgbTextColor: getColorObjectByColorSlug(
 				colors,
 				navigationBlockAttributes.textColor,
