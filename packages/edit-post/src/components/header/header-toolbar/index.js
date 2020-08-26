@@ -133,10 +133,7 @@ function HeaderToolbar() {
 				icon={ plus }
 				/* translators: button label text should, if possible, be under 16
 			characters. */
-				label={ _x(
-					'Add block',
-					'Generic label for block inserter button'
-				) }
+				label={ _x( 'Add', 'Generic label for block inserter button' ) }
 				showTooltip={ ! showIconLabels }
 			/>
 			{ ( isWideViewport || ! showIconLabels ) && overflowItems }

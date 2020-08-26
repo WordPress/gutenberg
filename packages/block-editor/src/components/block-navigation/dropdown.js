@@ -54,7 +54,7 @@ function BlockNavigationDropdownToggle( {
 			aria-expanded={ isOpen }
 			onClick={ isEnabled ? onToggle : undefined }
 			/* translators: button label text should, if possible, be under 16 characters. */
-			label={ __( 'Block navigation' ) }
+			label={ __( 'Outline' ) }
 			className="block-editor-block-navigation"
 			shortcut={ shortcut }
 			aria-disabled={ ! isEnabled }

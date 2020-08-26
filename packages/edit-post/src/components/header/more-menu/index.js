@@ -27,7 +27,7 @@ const MoreMenu = ( { showTooltip } ) => (
 		className="edit-post-more-menu"
 		icon={ moreVertical }
 		/* translators: button label text should, if possible, be under 16 characters. */
-		label={ __( 'More options' ) }
+		label={ __( 'Options' ) }
 		popoverProps={ POPOVER_PROPS }
 		toggleProps={ {
 			showTooltip,

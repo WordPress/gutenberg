@@ -33,7 +33,7 @@ function TableOfContents(
 					icon={ info }
 					aria-expanded={ isOpen }
 					/* translators: button label text should, if possible, be under 16 characters. */
-					label={ __( 'Outline' ) }
+					label={ __( 'Details' ) }
 					tooltipPosition="bottom"
 					aria-disabled={ ! hasBlocks }
 				/>
