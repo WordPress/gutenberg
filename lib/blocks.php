@@ -118,10 +118,6 @@ function gutenberg_reregister_core_block_types() {
 	}
 
 	foreach ( $block_names as $file => $block_names ) {
-		if ( ! file_exists( $blocks_dir . $file ) ) {
-			return;
-		}
-
 		if ( is_string( $block_names ) ) {
 			if ( $registry->is_registered( $block_names ) ) {
 				$registry->unregister( $block_names );
