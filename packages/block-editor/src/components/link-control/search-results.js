@@ -28,6 +28,7 @@ export default function LinkControlSearchResults( {
 	selectedSuggestion,
 	isLoading,
 	isInitialSuggestions,
+	createSuggestionButtonText,
 } ) {
 	const resultsListClasses = classnames(
 		'block-editor-link-control__search-results',
@@ -87,6 +88,7 @@ export default function LinkControlSearchResults( {
 						return (
 							<LinkControlSearchCreate
 								searchTerm={ currentInputValue }
+								buttonText={ createSuggestionButtonText }
 								onClick={ () =>
 									handleSuggestionClick( suggestion )
 								}

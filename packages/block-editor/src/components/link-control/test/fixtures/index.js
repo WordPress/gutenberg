@@ -38,10 +38,10 @@ export const fauxEntitySuggestions = [
 /* eslint-disable no-unused-vars */
 export const fetchFauxEntitySuggestions = (
 	val = '',
-	{ perPage = null } = {}
+	{ isInitialSuggestions } = {}
 ) => {
-	const suggestions = perPage
-		? take( fauxEntitySuggestions, perPage )
+	const suggestions = isInitialSuggestions
+		? take( fauxEntitySuggestions, 3 )
 		: fauxEntitySuggestions;
 	return Promise.resolve( suggestions );
 };
