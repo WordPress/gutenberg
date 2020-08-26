@@ -1,0 +1,26 @@
+{
+	"name": "core/post-hierarchical-terms",
+	"category": "design",
+	"attributes": {
+		"term": {
+			"type": "string"
+		},
+		"textAlign": {
+			"type": "string"
+		}
+	},
+	"usesContext": [
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalFontSize": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
+		},
+		"__experimentalLineHeight": true
+	}
+}
