@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Animate, Button, Panel, Slot, Fill } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { starEmpty, starFilled } from '@wordpress/icons';
+import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
 
 /**
@@ -146,7 +146,7 @@ function ComplementaryArea( {
 						}
 						aria-expanded={ isActive }
 						label={ title }
-						icon={ icon }
+						icon={ showIconLabels ? check : icon }
 						showTooltip={ ! showIconLabels }
 					/>
 				</PinnedItems>

@@ -23,8 +23,8 @@ exports[`MoreMenu should match snapshot 1`] = `
     }
     toggleProps={
       Object {
-        "isTertiary": true,
-        "showTooltip": undefined,
+        "isTertiary": undefined,
+        "showTooltip": true,
         "tooltipPosition": "bottom",
       }
     }
@@ -57,7 +57,6 @@ exports[`MoreMenu should match snapshot 1`] = `
               />
             </SVG>
           }
-          isTertiary={true}
           label="Options"
           onClick={[Function]}
           onKeyDown={[Function]}
@@ -72,7 +71,7 @@ exports[`MoreMenu should match snapshot 1`] = `
               aria-expanded={false}
               aria-haspopup="true"
               aria-label="Options"
-              className="components-button components-dropdown-menu__toggle is-tertiary has-icon"
+              className="components-button components-dropdown-menu__toggle has-icon"
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}

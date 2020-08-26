@@ -7,9 +7,7 @@ import {
 	PinnedItems,
 	__experimentalMainDashboardButton as MainDashboardButton,
 } from '@wordpress/interface';
-import { Button, Dropdown } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -41,13 +39,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	);
 
 	const isLargeViewport = useViewportMatch( 'large' );
-
-	const overflowItems = (
-		<>
-			<PinnedItems.Slot scope="core/edit-post" />
-			<MoreMenu showTooltip={ ! showIconLabels } />
-		</>
-	);
 
 	return (
 		<div className="edit-post-header">
@@ -81,28 +72,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 						setEntitiesSavedStatesCallback
 					}
 				/>
-				{ ( isLargeViewport || ! showIconLabels ) && overflowItems }
+				{ ( isLargeViewport || ! showIconLabels ) && (
+					<>
+						<PinnedItems.Slot scope="core/edit-post" />
+						<MoreMenu showIconLabels={ showIconLabels } />
+					</>
+				) }
 				{ showIconLabels && ! isLargeViewport && (
-					<Dropdown
-						contentClassName="edit-post-header__dropdown"
-						position="bottom right"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								className="button-toggle"
-								aria-expanded={ isOpen }
-								isTertiary
-								onClick={ onToggle }
-							>
-								{
-									/* translators: button label text should, if possible, be under 16
-			characters. */
-
-									__( 'Options' )
-								}
-							</Button>
-						) }
-						renderContent={ () => overflowItems }
-					/>
+					<MoreMenu showIconLabels={ showIconLabels } />
 				) }
 			</div>
 		</div>

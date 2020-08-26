@@ -117,6 +117,7 @@
 	}
 }
 
+.show-icon-labels.interface-pinned-items,
 .show-icon-labels .edit-post-header,
 .edit-post-header__dropdown {
 	.components-button.has-icon {
@@ -129,7 +130,7 @@
 		// ... and display labels.
 		&::after {
 			content: attr(aria-label);
-			margin: 0 0.5em;
+			// margin: 0 0.5em;
 		}
 		&[aria-disabled="true"] {
 			background-color: transparent;
@@ -176,3 +177,32 @@
 		}
 	}
 }
+
+.show-icon-labels.interface-pinned-items {
+	padding: 6px $grid-unit-15 $grid-unit-15;
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: -$grid-unit-15;
+	margin-right: -$grid-unit-15;
+	border-bottom: 1px solid $gray-400;
+	display: block;
+
+	> .components-button.has-icon {
+		margin: 0;
+		padding: 6px 6px 6px $grid-unit;
+		width: 14.625rem;
+		justify-content: flex-start;
+
+		&[aria-expanded="true"] svg {
+			display: block;
+			max-width: $grid-unit-30;
+		}
+		&[aria-expanded="false"] {
+			padding-left: $grid-unit-50;
+		}
+		svg {
+			margin-right: 8px;
+		}
+	}
+}
+
