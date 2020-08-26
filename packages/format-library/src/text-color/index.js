@@ -90,7 +90,6 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 					name={ name }
 					addingColor={ isAddingColor }
 					onClose={ disableIsAddingColor }
-					isActive={ isActive }
 					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }

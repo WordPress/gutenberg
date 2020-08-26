@@ -394,6 +394,33 @@ describe( 'Searching for a link', () => {
 			);
 		}
 	);
+
+	it( 'should not display a URL suggestion as a default fallback when noURLSuggestion is passed.', async () => {
+		act( () => {
+			render( <LinkControl noURLSuggestion />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'couldbeurlorentitysearchterm' },
+			} );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+
+		const searchResultElements = getSearchResults();
+
+		// We should see a search result for each of the expect search suggestions and nothing else
+		expect( searchResultElements ).toHaveLength(
+			fauxEntitySuggestions.length
+		);
+	} );
 } );
 
 describe( 'Manual link entry', () => {
@@ -725,7 +752,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
+					result.innerHTML.includes( 'Create:' )
 				)
 			);
 
@@ -822,7 +849,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'New page' )
+				result.innerHTML.includes( 'Create:' )
 			)
 		);
 
@@ -895,7 +922,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const form = container.querySelector( 'form' );
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'New page' )
+				result.innerHTML.includes( 'Create:' )
 			)
 		);
 
@@ -925,6 +952,50 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		);
 	} );
 
+	it( 'should allow customisation of button text', async () => {
+		const entityNameText = 'A new page to be created';
+
+		const LinkControlConsumer = () => {
+			return (
+				<LinkControl
+					createSuggestion={ () => {} }
+					createSuggestionButtonText="Custom suggestion text"
+				/>
+			);
+		};
+
+		act( () => {
+			render( <LinkControlConsumer />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: entityNameText },
+			} );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		const searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
+
+		const createButton = first(
+			Array.from( searchResultElements ).filter( ( result ) =>
+				result.innerHTML.includes( 'Custom suggestion text' )
+			)
+		);
+
+		expect( createButton ).not.toBeNull();
+	} );
+
 	describe( 'Do not show create option', () => {
 		it.each( [ [ undefined ], [ null ], [ false ] ] )(
 			'should not show not show an option to create an entity when "createSuggestion" handler is %s',
@@ -949,7 +1020,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 				const createButton = first(
 					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'New page' )
+						result.innerHTML.includes( 'Create:' )
 					)
 				);
 
@@ -1074,7 +1145,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 			let createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
+					result.innerHTML.includes( 'Create:' )
 				)
 			);
 

@@ -25,7 +25,7 @@ import {
 	InterfaceSkeleton,
 	ComplementaryArea,
 } from '@wordpress/interface';
-import { EntitiesSavedStates } from '@wordpress/editor';
+import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
 import { close } from '@wordpress/icons';
@@ -159,6 +159,7 @@ function Editor() {
 		<>
 			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
+			<UnsavedChangesWarning />
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<EntityProvider kind="root" type="site">

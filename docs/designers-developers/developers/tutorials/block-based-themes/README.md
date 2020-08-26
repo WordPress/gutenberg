@@ -9,8 +9,6 @@ how to add presets for global styles, and how to add blocks and export the templ
 Full site editing is an experimental feature and the workflow in this tutorial is likely to change.
 This tutorial was written for Gutenberg version 8.5.
 
-Additional documentation for block-based themes is available at https://developer.wordpress.org/block-editor/developers/themes/block-based-themes/
-
 ## Table of Contents
  1. [What is needed to create a block-based theme?](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
  2. [Creating the theme](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-theme)
@@ -193,7 +191,7 @@ If you used a different theme name, adjust the value for the theme key.
 
 Eventually, you will be able to create and combine templates and template parts directly in the site editor.
 
-### Experimental-theme.json -Global styles
+### Experimental-theme.json - Global styles
 
 The purpose of the experimental-theme.json file is to make it easier to style blocks by setting defaults.
 
