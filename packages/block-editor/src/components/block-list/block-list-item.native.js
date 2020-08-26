@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -19,8 +19,7 @@ import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
 
 const BREAKPOINTS = {
-	wide: 1024,
-	medium: 740,
+	medium: 700,
 	small: 480,
 };
 
@@ -51,48 +50,24 @@ export class BlockListItem extends Component {
 	}
 
 	getWideMargins() {
-		const {
-			marginHorizontal,
-			parentBlockAlignment,
-			numberOfParents,
-		} = this.props;
+		const { marginHorizontal, parentBlockAlignment } = this.props;
 		const { blockWidth } = this.state;
-		const screenWidth = Dimensions.get( 'window' ).width;
 
-		if ( screenWidth > BREAKPOINTS.wide ) {
-			return marginHorizontal * 2;
-		} else if (
-			screenWidth <= BREAKPOINTS.small &&
-			numberOfParents === 0
-		) {
-			return marginHorizontal;
-		}
-
-		if (
-			blockWidth - styles.fullAlignmentPadding.paddingLeft <=
-			BREAKPOINTS.medium
-		) {
-			if ( numberOfParents === 0 ) {
-				return marginHorizontal * 3;
-			} else if (
-				parentBlockAlignment === 'full' &&
-				blockWidth > BREAKPOINTS.small
+		if ( parentBlockAlignment === 'full' ) {
+			if (
+				blockWidth <= BREAKPOINTS.small ||
+				( blockWidth >= BREAKPOINTS.small &&
+					blockWidth <= BREAKPOINTS.medium )
 			) {
-				return marginHorizontal * 4;
+				return marginHorizontal * 2;
 			}
 		}
 
-		if (
-			blockWidth > BREAKPOINTS.small &&
-			blockWidth < BREAKPOINTS.wide &&
-			blockWidth - styles.wideMargin.marginLeft >= BREAKPOINTS.medium
-		) {
-			return blockWidth > screenWidth
-				? marginHorizontal * 4
-				: marginHorizontal * 3;
+		if ( parentBlockAlignment === 'wide' ) {
+			return marginHorizontal * 2;
 		}
 
-		return marginHorizontal * 2;
+		return marginHorizontal;
 	}
 
 	getMarginHorizontal() {
@@ -100,7 +75,6 @@ export class BlockListItem extends Component {
 			blockAlignment,
 			marginHorizontal,
 			parentBlockAlignment,
-			numberOfParents,
 		} = this.props;
 		const { blockWidth } = this.state;
 
@@ -113,7 +87,6 @@ export class BlockListItem extends Component {
 		}
 
 		return WIDE_ALIGNMENTS.includes( parentBlockAlignment ) &&
-			numberOfParents === 1 &&
 			blockWidth < BREAKPOINTS.small
 			? marginHorizontal * 2
 			: marginHorizontal;
@@ -233,7 +206,6 @@ export default compose( [
 				hasParents,
 				blockAlignment: align,
 				parentBlockAlignment,
-				numberOfParents: parents.length,
 			};
 		}
 	),
