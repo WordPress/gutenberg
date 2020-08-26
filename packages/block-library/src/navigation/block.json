@@ -5,9 +5,6 @@
 		"orientation": {
 			"type": "string"
 		},
-		"className": {
-			"type": "string"
-		},
 		"textColor": {
 			"type": "string"
 		},

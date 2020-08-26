@@ -2,9 +2,6 @@
 	"name": "core/latest-posts",
 	"category": "widgets",
 	"attributes": {
-		"className": {
-			"type": "string"
-		},
 		"categories": {
 			"type": "array",
 			"items": {
@@ -77,6 +74,10 @@
 		"featuredImageSizeHeight": {
 			"type": "number",
 			"default": null
+		},
+		"addLinkToFeaturedImage": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

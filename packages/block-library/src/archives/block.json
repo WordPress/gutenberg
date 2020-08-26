@@ -2,9 +2,6 @@
 	"name": "core/archives",
 	"category": "widgets",
 	"attributes": {
-		"className": {
-			"type": "string"
-		},
 		"displayAsDropdown": {
 			"type": "boolean",
 			"default": false

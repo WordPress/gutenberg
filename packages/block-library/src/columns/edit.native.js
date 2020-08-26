@@ -341,7 +341,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected } = props;
-	const { columnCount, isDefaultColumns, innerColumns } = useSelect(
+	const { columnCount, isDefaultColumns, innerColumns = [] } = useSelect(
 		( select ) => {
 			const { getBlockCount, getBlock } = select( 'core/block-editor' );
 			const block = getBlock( clientId );

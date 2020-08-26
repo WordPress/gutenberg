@@ -1,5 +1,4 @@
 .block-editor-post-preview__dropdown {
-	display: none;
 	margin-right: $grid-unit-15;
 	padding: 0;
 }
@@ -32,5 +31,14 @@
 		padding: $grid-unit-10 $grid-unit-15;
 		margin-left: -$grid-unit-15;
 		margin-right: -$grid-unit-15;
+	}
+}
+
+.edit-post-header__settings,
+.edit-site-header__actions {
+	@include break-small () {
+		.editor-post-preview {
+			display: none;
+		}
 	}
 }

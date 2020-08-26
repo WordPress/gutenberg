@@ -122,6 +122,7 @@ class LatestPostsEdit extends Component {
 			featuredImageSizeSlug,
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
+			addLinkToFeaturedImage,
 		} = attributes;
 		const categorySuggestions = categoriesList.reduce(
 			( accumulator, category ) => ( {
@@ -249,7 +250,7 @@ class LatestPostsEdit extends Component {
 									} )
 								}
 							/>
-							<BaseControl>
+							<BaseControl className="block-editor-image-alignment-control__row">
 								<BaseControl.VisualLabel>
 									{ __( 'Image alignment' ) }
 								</BaseControl.VisualLabel>
@@ -264,6 +265,15 @@ class LatestPostsEdit extends Component {
 									isCollapsed={ false }
 								/>
 							</BaseControl>
+							<ToggleControl
+								label={ __( 'Add link to featured image' ) }
+								checked={ addLinkToFeaturedImage }
+								onChange={ ( value ) =>
+									setAttributes( {
+										addLinkToFeaturedImage: value,
+									} )
+								}
+							/>
 						</>
 					) }
 				</PanelBody>
@@ -390,12 +400,28 @@ class LatestPostsEdit extends Component {
 							excerptElement.innerText ||
 							'';
 
-						const imageSourceUrl = post.featuredImageSourceUrl;
-
+						const {
+							featuredImageInfo: {
+								url: imageSourceUrl,
+								alt: featuredImageAlt,
+							} = {},
+						} = post;
 						const imageClasses = classnames( {
 							'wp-block-latest-posts__featured-image': true,
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
 						} );
+						const renderFeaturedImage =
+							displayFeaturedImage && imageSourceUrl;
+						const featuredImage = renderFeaturedImage && (
+							<img
+								src={ imageSourceUrl }
+								alt={ featuredImageAlt }
+								style={ {
+									maxWidth: featuredImageSizeWidth,
+									maxHeight: featuredImageSizeHeight,
+								} }
+							/>
+						);
 
 						const needsReadMore =
 							excerptLength <
@@ -424,17 +450,18 @@ class LatestPostsEdit extends Component {
 
 						return (
 							<li key={ i }>
-								{ displayFeaturedImage && (
+								{ renderFeaturedImage && (
 									<div className={ imageClasses }>
-										{ imageSourceUrl && (
-											<img
-												src={ imageSourceUrl }
-												alt=""
-												style={ {
-													maxWidth: featuredImageSizeWidth,
-													maxHeight: featuredImageSizeHeight,
-												} }
-											/>
+										{ addLinkToFeaturedImage ? (
+											<a
+												href={ post.link }
+												target="_blank"
+												rel="noreferrer noopener"
+											>
+												{ featuredImage }
+											</a>
+										) : (
+											featuredImage
 										) }
 									</div>
 								) }
@@ -542,24 +569,28 @@ export default withSelect( ( select, props ) => {
 		latestPosts: ! Array.isArray( posts )
 			? posts
 			: posts.map( ( post ) => {
-					if ( post.featured_media ) {
-						const image = getMedia( post.featured_media );
-						let url = get(
-							image,
-							[
-								'media_details',
-								'sizes',
-								featuredImageSizeSlug,
-								'source_url',
-							],
-							null
-						);
-						if ( ! url ) {
-							url = get( image, 'source_url', null );
-						}
-						return { ...post, featuredImageSourceUrl: url };
+					if ( ! post.featured_media ) return post;
+
+					const image = getMedia( post.featured_media );
+					let url = get(
+						image,
+						[
+							'media_details',
+							'sizes',
+							featuredImageSizeSlug,
+							'source_url',
+						],
+						null
+					);
+					if ( ! url ) {
+						url = get( image, 'source_url', null );
 					}
-					return post;
+					const featuredImageInfo = {
+						url,
+						// eslint-disable-next-line camelcase
+						alt: image?.alt_text,
+					};
+					return { ...post, featuredImageInfo };
 			  } ),
 	};
 } )( LatestPostsEdit );
