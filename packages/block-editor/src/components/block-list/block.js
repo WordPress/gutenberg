@@ -150,8 +150,6 @@ function BlockListBlock( {
 		{
 			'wp-block': ! isAligned,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			// We don't want the selected submenus to be opened by default while dragging,
-			// we only want them to be opened when we're dragging entering them.
 			'is-selected': isSelected && ! isDragging,
 			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
@@ -162,7 +160,6 @@ function BlockListBlock( {
 			'is-focused':
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
-			// Same as "is-selected" above, we don't want the parent menu to be opened while dragging.
 			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 		},
 		className
