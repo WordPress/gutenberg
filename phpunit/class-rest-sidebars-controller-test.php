@@ -379,6 +379,98 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 *
+	 */
+	public function test_update_item_legacy_widget_1() {
+		$this->do_test_update_item_legacy_widget( 'testwidget-1' );
+	}
+
+	/**
+	 *
+	 */
+	public function test_update_item_legacy_widget_2() {
+		$this->do_test_update_item_legacy_widget( 'testwidget' );
+	}
+
+	/**
+	 *
+	 */
+	public function do_test_update_item_legacy_widget( $widget_id ) {
+		// @TODO: Use @dataProvider instead (it doesn't work with custom constructors like the one we have in this class)
+		wp_register_widget_control(
+			$widget_id,
+			'WP test widget',
+			function() {
+				$settings = get_option( 'widget_testwidget' );
+
+				// check if anything's been sent.
+				if ( isset( $_POST['update_testwidget'] ) ) {
+					$settings['id']    = $_POST['test_id'];
+					$settings['title'] = $_POST['test_title'];
+
+					update_option( 'widget_testwidget', $settings );
+				}
+			},
+			100,
+			200
+		);
+		wp_register_sidebar_widget(
+			$widget_id,
+			'WP test widget',
+			function() {
+				$settings = get_option( 'widget_testwidget' ) ? get_option( 'widget_testwidget' ) : array(
+					'id'    => '',
+					'title' => '',
+				);
+				echo '<h1>' . $settings['id'] . '</h1><span>' . $settings['title'] . '</span>';
+			}
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array( $widget_id )
+		);
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(
+					array(
+						'id'       => $widget_id,
+						'name'     => 'WP test widget',
+						'settings' => array(
+							'test_id'           => 'My test id',
+							'test_title'        => 'My test title',
+							'update_testwidget' => true,
+						),
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			array(
+				'id'          => 'sidebar-1',
+				'name'        => 'Test sidebar',
+				'description' => '',
+				'status'      => 'active',
+				'widgets'     => array(
+					array(
+						'id'       => $widget_id,
+						'settings' => array(),
+						'rendered' => '<h1>My test id</h1><span>My test title</span>',
+						'name'     => 'WP test widget',
+					),
+				),
+			),
+			$data
+		);
+	}
+
+	/**
 	 * The test_delete_item() method does not exist for sidebar.
 	 */
 	public function test_delete_item() {
