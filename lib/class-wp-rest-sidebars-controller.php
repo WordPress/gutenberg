@@ -288,10 +288,13 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	public static function get_widgets( $sidebar_id ) {
 		global $wp_registered_widgets, $wp_registered_sidebars;
 
-		$widgets          = array();
-		$sidebars_widgets = (array) wp_get_sidebars_widgets();
+		$widgets            = array();
+		$sidebars_widgets   = (array) wp_get_sidebars_widgets();
+		$registered_sidebar = isset( $wp_registered_sidebars[ $sidebar_id ] ) ? $wp_registered_sidebars[ $sidebar_id ] : (
+			'wp_inactive_widgets' === $sidebar_id ? array() : null
+		);
 
-		if ( isset( $wp_registered_sidebars[ $sidebar_id ] ) && isset( $sidebars_widgets[ $sidebar_id ] ) ) {
+		if ( null !== $registered_sidebar && isset( $sidebars_widgets[ $sidebar_id ] ) ) {
 			foreach ( $sidebars_widgets[ $sidebar_id ] as $widget_id ) {
 				// Just to be sure.
 				if ( isset( $wp_registered_widgets[ $widget_id ] ) ) {
@@ -303,7 +306,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						$widget_parameters = array_merge(
 							array(
 								array_merge(
-									$wp_registered_sidebars[ $sidebar_id ],
+									$registered_sidebar,
 									array(
 										'widget_id'   => $widget_id,
 										'widget_name' => $widget['name'],
@@ -341,7 +344,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						$instance               = $widget['callback'][0];
 						$widget['widget_class'] = get_class( $instance );
 						$widget['settings']     = static::get_sidebar_widget_instance(
-							$wp_registered_sidebars[ $sidebar_id ],
+							$registered_sidebar,
 							$widget_id
 						);
 						$widget['number']       = (int) $widget['params'][0]['number'];
@@ -381,6 +384,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			$sidebar['description'] = isset( $registered_sidebar['description'] ) ? $registered_sidebar['description'] : '';
 		} else {
 			$sidebar['status'] = 'inactive';
+		}
+
+		if ( 'wp_inactive_widgets' === $sidebar['id'] && empty( $sidebar['name'] ) ) {
+			$sidebar['name'] = __( 'Inactive widgets', 'gutenberg' );
 		}
 
 		$fields = $this->get_fields_for_response( $request );

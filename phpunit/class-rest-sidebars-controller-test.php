@@ -471,6 +471,91 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 *
+	 */
+	public function test_get_items_inactive_widgets() {
+		$this->setup_widget(
+			'widget_rss',
+			1,
+			array(
+				'title' => 'RSS test',
+			)
+		);
+		$this->setup_widget(
+			'widget_text',
+			1,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array( 'text-1' )
+		);
+		update_option(
+			'sidebars_widgets',
+			array_merge(
+				get_option( 'sidebars_widgets' ),
+				array(
+					'wp_inactive_widgets' => array( 'rss-1', 'rss' ),
+				)
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			array(
+				array(
+					'id'          => 'sidebar-1',
+					'name'        => 'Test sidebar',
+					'description' => '',
+					'status'      => 'active',
+					'widgets'     => array(
+						array(
+							'id'           => 'text-1',
+							'settings'     => array(
+								'text' => 'Custom text test',
+							),
+							'id_base'      => 'text',
+							'widget_class' => 'WP_Widget_Text',
+							'name'         => 'Text',
+							'description'  => 'Arbitrary text.',
+							'number'       => 1,
+							'rendered'     => '<div class="textwidget">Custom text test</div>',
+						),
+					),
+				),
+				array(
+					'id'          => 'wp_inactive_widgets',
+					'name'        => 'Inactive widgets',
+					'description' => '',
+					'status'      => 'inactive',
+					'widgets'     => array(
+						array(
+							'id'           => 'rss-1',
+							'settings'     => array(
+								'title' => 'RSS test',
+							),
+							'id_base'      => 'rss',
+							'widget_class' => 'WP_Widget_RSS',
+							'name'         => 'RSS',
+							'description'  => 'Entries from any RSS or Atom feed.',
+							'number'       => 1,
+							'rendered'     => '',
+						),
+					),
+				),
+			),
+			$data
+		);
+	}
+
+	/**
 	 * The test_delete_item() method does not exist for sidebar.
 	 */
 	public function test_delete_item() {
