@@ -600,11 +600,14 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 		empty( $config['global']['features'] ) ||
 		! is_array( $config['global']['features'] )
 	) {
-		return array();
+		$config['global']['features'] = array();
 	}
 
 	// Deprecated theme supports.
 	if ( null !== get_theme_support( 'disable-custom-colors' ) ) {
+		if ( ! isset( $config['global']['features']['colors'] ) ) {
+			$config['global']['features']['colors'] = array();
+		}
 		$config['global']['features']['colors']['custom'] = ! get_theme_support( 'disable-custom-colors' );
 	}
 
