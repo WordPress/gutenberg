@@ -260,7 +260,6 @@ class BottomSheet extends Component {
 	getContentStyle() {
 		const { safeAreaBottomInset } = this.state;
 		return {
-			flexGrow: 1,
 			paddingBottom:
 				( safeAreaBottomInset || 0 ) +
 				styles.scrollableContent.paddingBottom,
@@ -341,6 +340,7 @@ class BottomSheet extends Component {
 				isFullScreen && { flexGrow: 1 },
 			],
 			style: listStyle,
+			safeAreaBottomInset,
 			scrollEnabled,
 			automaticallyAdjustContentInsets: false,
 		};

@@ -182,12 +182,10 @@ const LinkSettingsScreen = ( {
 		return (
 			<>
 				<View
-					style={ {
-						...listProps.contentContainerStyle,
-						...listProps.style,
-						paddingBottom: 0,
-						paddingHorizontal: 16,
-					} }
+					style={ [
+						listProps.contentContainerStyle,
+						{ paddingBottom: 0 },
+					] }
 				>
 					<BottomSheet.LinkCell
 						value={ inputValue }
@@ -208,8 +206,6 @@ const LinkSettingsScreen = ( {
 						onValueChange={ setOpensInNewWindows }
 						separatorType={ 'fullWidth' }
 					/>
-				</View>
-				<View style={ { marginBottom: 32 } }>
 					<BottomSheet.Cell
 						label={ __( 'Remove link' ) }
 						labelStyle={ styles.clearLinkButton }
@@ -217,9 +213,14 @@ const LinkSettingsScreen = ( {
 						onPress={ removeLink }
 					/>
 				</View>
+				<View
+					style={ {
+						height: listProps.safeAreaBottomInset,
+					} }
+				></View>
 			</>
 		);
-	}, [ inputValue, text, opensInNewWindow ] );
+	}, [ inputValue, text, opensInNewWindow, listProps.safeAreaBottomInset ] );
 };
 
 const LinkPickerScreen = () => {
