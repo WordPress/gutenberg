@@ -118,6 +118,7 @@ function gutenberg_get_legacy_widget_settings() {
 	$widgets_to_exclude_from_legacy_widget_block = apply_filters(
 		'widgets_to_exclude_from_legacy_widget_block',
 		array(
+			'WP_Widget_Block',
 			'WP_Widget_Pages',
 			'WP_Widget_Calendar',
 			'WP_Widget_Archives',

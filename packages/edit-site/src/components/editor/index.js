@@ -57,9 +57,7 @@ function Editor() {
 		page,
 		template,
 		select,
-		hasDirtyEntityRecords,
 	} = useSelect( ( _select ) => {
-		const { __experimentalGetDirtyEntityRecords } = _select( 'core' );
 		const {
 			isFeatureActive,
 			__experimentalGetPreviewDeviceType,
@@ -98,8 +96,6 @@ function Editor() {
 				: null,
 			select: _select,
 			entityId: _entityId,
-			hasDirtyEntityRecords: () =>
-				__experimentalGetDirtyEntityRecords().length > 0,
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
@@ -163,7 +159,7 @@ function Editor() {
 		<>
 			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
-			<UnsavedChangesWarning isDirty={ hasDirtyEntityRecords } />
+			<UnsavedChangesWarning />
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<EntityProvider kind="root" type="site">

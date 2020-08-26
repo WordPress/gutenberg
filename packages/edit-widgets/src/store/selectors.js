@@ -75,7 +75,10 @@ export const isSavingWidgetAreas = createRegistrySelector(
 				.getWidgetAreas()
 				?.map( ( { id } ) => id );
 		}
-		for ( const id in ids ) {
+		if ( ! ids ) {
+			return false;
+		}
+		for ( const id of ids ) {
 			const isSaving = select( 'core' ).isSavingEntityRecord(
 				KIND,
 				WIDGET_AREA_ENTITY_TYPE,

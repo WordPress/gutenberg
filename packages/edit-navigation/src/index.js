@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, set } from 'lodash';
+import { map, set, flatten, partialRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,31 +34,77 @@ function disableInsertingNonNavigationBlocks( settings, name ) {
 /**
  * Fetches link suggestions from the API. This function is an exact copy of a function found at:
  *
- * wordpress/editor/src/components/provider/index.js
+ * packages/editor/src/components/provider/index.js
  *
  * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
  * Until we refactor it, just copying the code is the simplest solution.
  *
- * @param {Object} search
- * @param {number} perPage
+ * @param {string} search
+ * @param {Object} [searchArguments]
+ * @param {number} [searchArguments.isInitialSuggestions]
+ * @param {number} [searchArguments.type]
+ * @param {number} [searchArguments.subtype]
+ * @param {Object} [editorSettings]
+ * @param {boolean} [editorSettings.disablePostFormats=false]
  * @return {Promise<Object[]>} List of suggestions
  */
-async function fetchLinkSuggestions( search, { perPage = 20 } = {} ) {
-	const posts = await apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			search,
-			per_page: perPage,
-			type: 'post',
-		} ),
-	} );
+const fetchLinkSuggestions = (
+	search,
+	{ isInitialSuggestions, type, subtype } = {},
+	{ disablePostFormats = false } = {}
+) => {
+	const perPage = isInitialSuggestions ? 3 : 20;
 
-	return map( posts, ( post ) => ( {
-		id: post.id,
-		url: post.url,
-		title: decodeEntities( post.title ) || __( '(no title)' ),
-		type: post.subtype || post.type,
-	} ) );
-}
+	const queries = [];
+
+	if ( ! type || type === 'post' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					per_page: perPage,
+					type: 'post',
+					subtype,
+				} ),
+			} )
+		);
+	}
+
+	if ( ! type || type === 'term' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					per_page: perPage,
+					type: 'term',
+					subtype,
+				} ),
+			} )
+		);
+	}
+
+	if ( ! disablePostFormats && ( ! type || type === 'post-format' ) ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					per_page: perPage,
+					type: 'post-format',
+					subtype,
+				} ),
+			} )
+		);
+	}
+
+	return Promise.all( queries ).then( ( results ) => {
+		return map( flatten( results ).slice( 0, perPage ), ( result ) => ( {
+			id: result.id,
+			url: result.url,
+			title: decodeEntities( result.title ) || __( '(no title)' ),
+			type: result.subtype || result.type,
+		} ) );
+	} );
+};
 
 export function initialize( id, settings ) {
 	if ( ! settings.blockNavMenus ) {
@@ -75,7 +121,10 @@ export function initialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 
-	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+	settings.__experimentalFetchLinkSuggestions = partialRight(
+		fetchLinkSuggestions,
+		settings
+	);
 
 	render(
 		<Layout blockEditorSettings={ settings } />,

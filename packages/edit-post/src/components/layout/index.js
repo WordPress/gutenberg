@@ -86,7 +86,6 @@ function Layout() {
 		hasBlockSelected,
 		showMostUsedBlocks,
 		isInserterOpened,
-		isEditedPostDirty,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -116,7 +115,6 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			isEditedPostDirty: select( 'core/editor' ).isEditedPostDirty,
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -161,7 +159,7 @@ function Layout() {
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
-			<UnsavedChangesWarning isDirty={ isEditedPostDirty } />
+			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />

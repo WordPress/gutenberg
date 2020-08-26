@@ -28,6 +28,11 @@ $navigation-item-height: 46px;
 	padding: $grid-unit-20;
 }
 
+// Ensure that an empty block has space around the appender.
+.wp-block-navigation__container {
+	min-height: $navigation-item-height;
+}
+
 // Ensure sub-menus stay open and visible when a nested block is selected.
 .wp-block-navigation__container.is-parent-of-selected-block {
 	visibility: visible;
@@ -49,7 +54,7 @@ $navigation-item-height: 46px;
 	&.is-selected,
 	&.has-child-selected,
 	// Show the submenu list when is dragging and drag enter the list item.
-	body.is-dragging-components-draggable &.is-dragging-within {
+	.is-dragging-components-draggable &.is-dragging-within {
 		> .wp-block-navigation__container {
 			opacity: 1;
 			visibility: visible;
@@ -57,7 +62,7 @@ $navigation-item-height: 46px;
 	}
 }
 
-body.is-dragging-components-draggable .wp-block-navigation-link > .wp-block-navigation__container {
+.is-dragging-components-draggable .wp-block-navigation-link > .wp-block-navigation__container {
 	// Set opacity to 1 to still be able to show the draggable chip.
 	opacity: 1;
 	visibility: hidden;
