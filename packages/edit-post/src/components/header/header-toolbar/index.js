@@ -145,7 +145,7 @@ function HeaderToolbar() {
 						<Button
 							className="button-toggle"
 							aria-expanded={ isOpen }
-							isSecondary
+							isTertiary
 							onClick={ onToggle }
 						>
 							{

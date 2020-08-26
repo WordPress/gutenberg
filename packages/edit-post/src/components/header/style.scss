@@ -131,6 +131,9 @@
 			content: attr(aria-label);
 			margin: 0 0.5em;
 		}
+		&[aria-disabled="true"] {
+			background-color: transparent;
+		}
 	}
 	.is-tertiary {
 		&:active {
@@ -158,8 +161,8 @@
 }
 
 .edit-post-header__dropdown {
+
 	.components-popover__content {
-		min-width: 0;
 
 		> div * {
 			white-space: nowrap;
@@ -168,6 +171,8 @@
 		.components-button.has-icon {
 			margin: 0;
 			padding: 6px;
+			width: 14.625rem;
+			text-align: left;
 		}
 	}
 }
