@@ -14,21 +14,21 @@
  * @return string Return the post comment's content.
  */
 function render_block_core_post_comment_author( $attributes, $content, $block ) {
-	$commentId = null;
+	$comment_id = null;
 
 	if ( ! empty( $block->context['commentId'] ) ) {
-		$commentId = $block->context['commentId'];
+		$comment_id = $block->context['commentId'];
 	}
 
 	if ( ! empty( $attributes['commentId'] ) ) {
-		$commentId = $attributes['commentId'];
+		$comment_id = $attributes['commentId'];
 	}
 
-	if ( ! $commentId ) {
+	if ( ! $comment_id ) {
 		return '';
 	}
 
-	return sprintf( '<div>%1$s</div>', get_comment_author( $commentId ) );
+	return sprintf( '<div>%1$s</div>', get_comment_author( $comment_id ) );
 }
 
 /**
