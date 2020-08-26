@@ -2,9 +2,6 @@
 	"name": "core/latest-comments",
 	"category": "widgets",
 	"attributes": {
-		"className": {
-			"type": "string"
-		},
 		"commentsToShow": {
 			"type": "number",
 			"default": 5,

@@ -13,11 +13,11 @@
  * @return string The render.
  */
 function render_block_core_site_tagline( $attributes ) {
-	$align_class_name = empty( $attributes['textAlign'] ) ? '' : ' ' . "has-text-align-{$attributes['textAlign']}";
+	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
 	return sprintf(
 		'<p class="%1$s">%2$s</p>',
-		'wp-block-site-tagline' . esc_attr( $align_class_name ),
+		esc_attr( $align_class_name ),
 		get_bloginfo( 'description' )
 	);
 }

@@ -348,6 +348,19 @@ _Returns_
 
 -   `Array`: Block settings.
 
+<a name="getBlockVariations" href="#getBlockVariations">#</a> **getBlockVariations**
+
+Returns an array with the variations of a given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of block (example: “core/columns”).
+-   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+
+_Returns_
+
+-   `(Array<WPBlockVariation>|void)`: Block variations.
+
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
 Returns all the block categories.
@@ -395,19 +408,7 @@ _Returns_
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
-Get schema of possible paths for phrasing content.
-
-_Related_
-
--   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
-
-_Parameters_
-
--   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
-
-_Returns_
-
--   `Object`: Schema.
+Undocumented declaration.
 
 <a name="getPossibleBlockTransformations" href="#getPossibleBlockTransformations">#</a> **getPossibleBlockTransformations**
 

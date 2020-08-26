@@ -224,34 +224,6 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 
 	/*
 	 * This script registration and the corresponding function should be removed
-	 * once the plugin is updated to support WordPress 5.4.0 and newer.
-	 *
-	 * See: `gutenberg_add_url_polyfill`
-	 */
-	gutenberg_register_vendor_script(
-		$scripts,
-		'wp-polyfill-url',
-		'https://unpkg.com/core-js-url-browser@3.6.4/url' . $suffix . '.js',
-		array(),
-		'3.6.4'
-	);
-
-	/*
-	 * This script registration and the corresponding function should be removed
-	 * removed once the plugin is updated to support WordPress 5.4.0 and newer.
-	 *
-	 * See: `gutenberg_add_dom_rect_polyfill`
-	 */
-	gutenberg_register_vendor_script(
-		$scripts,
-		'wp-polyfill-dom-rect',
-		'https://unpkg.com/polyfill-library@3.42.0/polyfills/DOMRect/polyfill.js',
-		array(),
-		'3.42.0'
-	);
-
-	/*
-	 * This script registration and the corresponding function should be removed
 	 * removed once the plugin is updated to support WordPress 5.6.0 and newer.
 	 */
 	gutenberg_register_vendor_script(
