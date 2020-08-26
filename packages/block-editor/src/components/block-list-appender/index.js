@@ -27,9 +27,14 @@ function BlockListAppender( {
 	isLocked,
 	renderAppender: CustomAppender,
 	className,
+	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	if ( isLocked || CustomAppender === false ) {
+	const hasSiblingsSelected =
+		selectedBlockClientId &&
+		blockClientIds.includes( selectedBlockClientId );
+
+	if ( isLocked || CustomAppender === false || ! hasSiblingsSelected ) {
 		return null;
 	}
 
@@ -79,9 +84,12 @@ function BlockListAppender( {
 }
 
 export default withSelect( ( select, { rootClientId } ) => {
-	const { getBlockOrder, canInsertBlockType, getTemplateLock } = select(
-		'core/block-editor'
-	);
+	const {
+		getBlockOrder,
+		canInsertBlockType,
+		getTemplateLock,
+		getSelectedBlockClientId,
+	} = select( 'core/block-editor' );
 
 	return {
 		isLocked: !! getTemplateLock( rootClientId ),
@@ -90,5 +98,6 @@ export default withSelect( ( select, { rootClientId } ) => {
 			getDefaultBlockName(),
 			rootClientId
 		),
+		selectedBlockClientId: getSelectedBlockClientId(),
 	};
 } )( BlockListAppender );
