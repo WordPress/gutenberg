@@ -6,15 +6,6 @@
  * @subpackage REST_API
  */
 
-require_once dirname( __FILE__ ) . '/../lib/class-wp-rest-sidebars-controller.php';
-add_filter(
-	'rest_api_init',
-	function () {
-		$sidebars = new WP_REST_Sidebars_Controller();
-		$sidebars->register_routes();
-	}
-);
-
 /**
  * Tests for REST API for Menus.
  *
