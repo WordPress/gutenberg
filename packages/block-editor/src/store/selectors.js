@@ -1079,7 +1079,7 @@ export function isBlockBeingDragged( state, clientId ) {
 export function isAncestorBeingDragged( state, clientId ) {
 	// Return early if no blocks are being dragged rather than
 	// the more expensive check for parents.
-	if ( ! state.draggedBlocks.length ) {
+	if ( ! isDraggingBlocks( state ) ) {
 		return false;
 	}
 
