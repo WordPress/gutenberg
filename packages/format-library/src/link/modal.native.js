@@ -181,12 +181,7 @@ const LinkSettingsScreen = ( {
 	return useMemo( () => {
 		return (
 			<>
-				<View
-					style={ [
-						listProps.contentContainerStyle,
-						{ paddingBottom: 0 },
-					] }
-				>
+				<View style={ styles.container }>
 					<BottomSheet.LinkCell
 						value={ inputValue }
 						onPress={ onLinkCellPressed }
