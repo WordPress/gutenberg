@@ -2,23 +2,13 @@
  * External dependencies
  */
 import React from 'react';
-import {
-	useNavigation,
-	useRoute,
-	useFocusEffect,
-} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useState,
-	useContext,
-	useCallback,
-	useEffect,
-	useMemo,
-} from '@wordpress/element';
+import { useState, useContext, useEffect, useMemo } from '@wordpress/element';
 import { prependHTTP } from '@wordpress/url';
 
 import {
@@ -168,15 +158,15 @@ const LinkSettingsScreen = ( {
 		}
 	};
 
-	useFocusEffect(
-		useCallback( () => {
+	useEffect( () => {
+		const unsubscribe = navigation.addListener( 'focus', () => {
 			const { params = {} } = route;
 			if ( ! text && params.text ) {
 				setText( params.text );
 			}
-			return () => {};
-		}, [ route.params?.text, text ] )
-	);
+		} );
+		return unsubscribe;
+	}, [ navigation, route.params?.text, text ] );
 
 	return useMemo( () => {
 		return (
@@ -212,7 +202,7 @@ const LinkSettingsScreen = ( {
 					style={ {
 						height: listProps.safeAreaBottomInset,
 					} }
-				></View>
+				/>
 			</>
 		);
 	}, [ inputValue, text, opensInNewWindow, listProps.safeAreaBottomInset ] );
