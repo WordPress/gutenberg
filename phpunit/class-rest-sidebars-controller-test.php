@@ -526,7 +526,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 							'name'         => 'Text',
 							'description'  => 'Arbitrary text.',
 							'number'       => 1,
-							'rendered'     => '			<div class="textwidget">Custom text test</div>' . "\n		",
+							'rendered'     => '<div class="textwidget">Custom text test</div>',
 						),
 					),
 				),
