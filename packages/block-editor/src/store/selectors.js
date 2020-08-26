@@ -40,16 +40,6 @@ import { Platform } from '@wordpress/element';
  *                                 text value. See `wp.richText.create`.
  */
 
-/**
- * Settings which can be passed to the getBlock or getBlocks selectors.
- *
- * @typedef {Object} WPGetBlockSettings
- * @property {boolean} includeControlledInnerBlocks If true, include nested child
- *                                                  blocks of inner block controllers.
- *                                                  The default of false excludes
- *                                                  nested blocks of inner block controllers.
- */
-
 // Module constants
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
@@ -143,18 +133,13 @@ export function getBlockAttributes( state, clientId ) {
  * the template block itself is considered part of the parent, but the children
  * are not.
  *
- * You can override this behavior with the includeControlledInnerBlocks setting.
- * So if you call `getBlock( TP, { WPGetBlockSettings: true } )`, it will return
- * all nested blocks, including all child inner block controllers and their children.
- *
- * @param {Object}              state    Editor state.
- * @param {string}              clientId Block client ID.
- * @param {?WPGetBlockSettings} settings A settings object.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
  *
  * @return {Object} Parsed block object.
  */
 export const getBlock = createSelector(
-	( state, clientId, { includeControlledInnerBlocks = false } = {} ) => {
+	( state, clientId ) => {
 		const block = state.blocks.byClientId[ clientId ];
 		if ( ! block ) {
 			return null;
@@ -163,13 +148,9 @@ export const getBlock = createSelector(
 		return {
 			...block,
 			attributes: getBlockAttributes( state, clientId ),
-			innerBlocks:
-				! includeControlledInnerBlocks &&
-				areInnerBlocksControlled( state, clientId )
-					? EMPTY_ARRAY
-					: getBlocks( state, clientId, {
-							includeControlledInnerBlocks,
-					  } ),
+			innerBlocks: areInnerBlocksControlled( state, clientId )
+				? EMPTY_ARRAY
+				: getBlocks( state, clientId ),
 		};
 	},
 	( state, clientId ) => [
@@ -203,8 +184,7 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 /**
  * Returns all block objects for the current post being edited as an array in
  * the order they appear in the post. Note that this will exclude child blocks
- * of nested inner block controllers unless the `includeControlledInnerBlocks`
- * setting is set to true.
+ * of nested inner block controllers.
  *
  * Note: It's important to memoize this selector to avoid return a new instance
  * on each call. We use the block cache state for each top-level block of the
@@ -212,16 +192,15 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
  * associated with the given entity, and does not refresh when changes are made
  * to blocks which are part of different inner block controllers.
  *
- * @param {Object}              state        Editor state.
- * @param {?string}             rootClientId Optional root client ID of block list.
- * @param {?WPGetBlockSettings} settings     A settings object.
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Post blocks.
  */
 export const getBlocks = createSelector(
-	( state, rootClientId, { includeControlledInnerBlocks = false } = {} ) => {
+	( state, rootClientId ) => {
 		return map( getBlockOrder( state, rootClientId ), ( clientId ) =>
-			getBlock( state, clientId, { includeControlledInnerBlocks } )
+			getBlock( state, clientId )
 		);
 	},
 	( state, rootClientId ) =>
@@ -229,6 +208,55 @@ export const getBlocks = createSelector(
 			state.blocks.order[ rootClientId || '' ],
 			( id ) => state.blocks.cache[ id ]
 		)
+);
+
+/**
+ * Same as getBlock, except it will include controlled inner blocks which would
+ * normally be excluded.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Client ID of the block to get.
+ *
+ * @return {Object} The block.
+ */
+export const __unstableGetBlockWithControlledInnerBlocks = createSelector(
+	( state, clientId ) => {
+		const block = state.blocks.byClientId[ clientId ];
+		if ( ! block ) {
+			return null;
+		}
+
+		return {
+			...block,
+			attributes: getBlockAttributes( state, clientId ),
+			innerBlocks: __unstableGetBlocksWithControlledInnerBlocks(
+				state,
+				clientId
+			),
+		};
+	},
+	( state, clientId ) => [ state.blocks.cache[ clientId ] ]
+);
+
+/**
+ * Same as getBlocks, except it will include controlled inner blocks which would
+ * normally be excluded.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Post blocks.
+ */
+export const __unstableGetBlocksWithControlledInnerBlocks = createSelector(
+	( state, rootClientId ) =>
+		map( getBlockOrder( state, rootClientId ), ( clientId ) =>
+			__unstableGetBlockWithControlledInnerBlocks( state, clientId )
+		),
+	( state ) => [
+		state.blocks.byClientId,
+		state.blocks.order,
+		state.blocks.attributes,
+	]
 );
 
 /**
