@@ -20,7 +20,7 @@ function gutenberg_is_block_editor() {
 	return ! empty( $screen ) &&
 		(
 			$screen->is_block_editor() ||
-			'gutenberg_page_gutenberg-widgets' === $screen->id ||
+			'appearance_page_gutenberg-widgets' === $screen->id ||
 			( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $screen->id ) )
 		);
 }
@@ -261,3 +261,14 @@ function gutenberg_enqueue_widget_scripts() {
 }
 
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_widget_scripts' );
+
+/**
+ * Registers the WP_Widget_Block widget
+ */
+function gutenberg_register_widgets() {
+	if ( get_theme_support( 'widgets-block-editor' ) ) {
+		register_widget( 'WP_Widget_Block' );
+	}
+}
+
+add_action( 'widgets_init', 'gutenberg_register_widgets' );
