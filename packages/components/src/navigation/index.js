@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 
 /**
@@ -48,7 +48,11 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		return items;
 	};
 
-	const items = mapItems( data );
+	const items = useMemo( () => mapItems( data ), [
+		data,
+		activeItemId,
+		rootTitle,
+	] );
 	const activeItem = items.get( activeItemId );
 	const previousActiveLevelId = usePrevious( activeLevelId );
 	const level = items.get( activeLevelId );
