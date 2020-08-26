@@ -15,7 +15,13 @@ import {
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 } from '@wordpress/editor';
-import { Button, Dropdown, ToolbarItem } from '@wordpress/components';
+import {
+	Button,
+	DropdownMenu,
+	ToolbarItem,
+	MenuItemsChoice,
+	MenuGroup,
+} from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
@@ -29,6 +35,7 @@ function HeaderToolbar() {
 		isTextModeEnabled,
 		previewDeviceType,
 		showIconLabels,
+		isNavigationTool,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
@@ -56,6 +63,7 @@ function HeaderToolbar() {
 			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
 			),
+			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -71,26 +79,14 @@ function HeaderToolbar() {
 		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
 		  __( 'Document tools' );
 
+	const { setNavigationMode } = useDispatch( 'core/block-editor' );
+
+	const onSwitchMode = ( mode ) => {
+		setNavigationMode( mode === 'edit' ? false : true );
+	};
+
 	const overflowItems = (
 		<>
-			{ isLargeViewport && (
-				<ToolbarItem
-					as={ ToolSelector }
-					showTooltip={ ! showIconLabels }
-					disabled={ isTextModeEnabled }
-					isTertiary={ showIconLabels }
-				/>
-			) }
-			<ToolbarItem
-				as={ EditorHistoryUndo }
-				showTooltip={ ! showIconLabels }
-				isTertiary={ showIconLabels }
-			/>
-			<ToolbarItem
-				as={ EditorHistoryRedo }
-				showTooltip={ ! showIconLabels }
-				isTertiary={ showIconLabels }
-			/>
 			<ToolbarItem
 				as={ TableOfContents }
 				hasOutlineItemsDisabled={ isTextModeEnabled }
@@ -136,27 +132,72 @@ function HeaderToolbar() {
 				label={ _x( 'Add', 'Generic label for block inserter button' ) }
 				showTooltip={ ! showIconLabels }
 			/>
-			{ ( isWideViewport || ! showIconLabels ) && overflowItems }
-			{ ! isWideViewport && ! isSmallViewport && showIconLabels && (
-				<Dropdown
-					contentClassName="edit-post-header__dropdown"
-					position="bottom right"
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button
-							className="button-toggle"
-							aria-expanded={ isOpen }
-							isTertiary
-							onClick={ onToggle }
-						>
-							{
-								/* translators: button label text should, if possible, be under 16
-			characters. */
-								__( 'Tools' )
-							}
-						</Button>
+			{ ( isWideViewport || ! showIconLabels ) && (
+				<>
+					{ isLargeViewport && (
+						<ToolbarItem
+							as={ ToolSelector }
+							showTooltip={ ! showIconLabels }
+							isTertiary={ showIconLabels }
+							disabled={ isTextModeEnabled }
+						/>
 					) }
-					renderContent={ () => overflowItems }
-				/>
+					<ToolbarItem
+						as={ EditorHistoryUndo }
+						showTooltip={ ! showIconLabels }
+						isTertiary={ showIconLabels }
+					/>
+					<ToolbarItem
+						as={ EditorHistoryRedo }
+						showTooltip={ ! showIconLabels }
+						isTertiary={ showIconLabels }
+					/>
+					{ overflowItems }
+				</>
+			) }
+			{ ! isWideViewport && ! isSmallViewport && showIconLabels && (
+				<DropdownMenu
+					position="bottom right"
+					label={
+						/* translators: button label text should, if possible, be under 16
+	characters. */
+						__( 'Tools' )
+					}
+				>
+					{ () => (
+						<div className="edit-post-header__dropdown">
+							<MenuGroup label={ __( 'Modes' ) }>
+								<MenuItemsChoice
+									value={
+										isNavigationTool ? 'select' : 'edit'
+									}
+									onSelect={ onSwitchMode }
+									choices={ [
+										{
+											value: 'edit',
+											label: <>{ __( 'Edit' ) }</>,
+										},
+										{
+											value: 'select',
+											label: <>{ __( 'Select' ) }</>,
+										},
+									] }
+								/>
+							</MenuGroup>
+							<MenuGroup label={ __( 'Edit' ) }>
+								<EditorHistoryUndo
+									showTooltip={ ! showIconLabels }
+									isTertiary={ showIconLabels }
+								/>
+								<EditorHistoryRedo
+									showTooltip={ ! showIconLabels }
+									isTertiary={ showIconLabels }
+								/>
+							</MenuGroup>
+							<MenuGroup>{ overflowItems }</MenuGroup>
+						</div>
+					) }
+				</DropdownMenu>
 			) }
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
