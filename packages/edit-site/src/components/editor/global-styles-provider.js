@@ -11,38 +11,29 @@ import { getGlobalStyles } from './global-styles-renderer';
 
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
-	getProperty: ( context, family, name, units ) => {},
-	setProperty: ( context, family, name, value, units ) => {},
+	getProperty: ( context, family, name ) => {},
+	setProperty: ( context, family, name, value ) => {},
 	globalContext: {},
 	/* eslint-enable no-unused-vars */
 } );
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
-export default ( {
-	children,
-	entityId,
-	baseStyles,
-	contexts,
-} ) => {
+export default ( { children, entityId, baseStyles, contexts } ) => {
 	const {
 		userStyles,
 		getProperty,
 		setProperty,
 	} = useGlobalStylesFromEntities( entityId );
 
-	useGlobalStylesEffectToUpdateStylesheet(
-		contexts,
-		baseStyles,
-		userStyles
-	);
+	useGlobalStylesEffectToUpdateStylesheet( contexts, baseStyles, userStyles );
 
 	return (
 		<GlobalStylesContext.Provider
 			value={ {
 				getProperty,
 				setProperty,
-				contexts
+				contexts,
 			} }
 		>
 			{ children }
@@ -76,21 +67,10 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 		return userData?.content ? JSON.parse( userData.content ) : {};
 	} );
 
-	const fromUnits = {
-		noop: ( value ) => value,
-		px: ( value ) => ( value ? +value.replace( 'px', '' ) : value ),
-	};
-	const toUnits = {
-		noop: ( value ) => value,
-		px: ( value ) => ( value ? value + 'px' : value ),
-	};
+	const getProperty = ( context, family, name ) =>
+		userStyles?.[ context ]?.styles?.[ family ]?.[ name ];
 
-	const getProperty = ( context, family, name, units = 'noop' ) =>
-		fromUnits[ units ](
-			userStyles?.[ context ]?.styles?.[ family ]?.[ name ]
-		);
-
-	const setProperty = ( context, family, name, value, units = 'noop' ) =>
+	const setProperty = ( context, family, name, value ) =>
 		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
 			content: JSON.stringify( {
 				...userStyles,
@@ -99,7 +79,7 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 						...userStyles?.[ context ]?.styles,
 						[ family ]: {
 							...userStyles?.[ context ]?.styles?.[ family ],
-							[ name ]: toUnits[ units ]( value ),
+							[ name ]: value,
 						},
 					},
 				},

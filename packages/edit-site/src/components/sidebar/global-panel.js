@@ -9,14 +9,17 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useGlobalStylesContext } from '../editor/global-styles-provider';
-import { GLOBAL_CONTEXT, FONT_SIZE, BACKGROUND_COLOR, LINK_COLOR } from '../editor/utils';
+import {
+	GLOBAL_CONTEXT,
+	FONT_SIZE,
+	BACKGROUND_COLOR,
+	LINK_COLOR,
+	fromPx,
+	toPx,
+} from '../editor/utils';
 
 export default () => {
-	const {
-		contexts,
-		getProperty,
-		setProperty,
-	} = useGlobalStylesContext();
+	const { contexts, getProperty, setProperty } = useGlobalStylesContext();
 
 	const { supports } = contexts[ GLOBAL_CONTEXT ];
 	const panels = [];
@@ -26,19 +29,15 @@ export default () => {
 		panels.push(
 			<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
 				<FontSizePicker
-					value={ getProperty(
-						GLOBAL_CONTEXT,
-						'typography',
-						'fontSize',
-						'px'
+					value={ fromPx(
+						getProperty( GLOBAL_CONTEXT, 'typography', 'fontSize' )
 					) }
 					onChange={ ( value ) =>
 						setProperty(
 							GLOBAL_CONTEXT,
 							'typography',
 							'fontSize',
-							value,
-							'px'
+							toPx( value )
 						)
 					}
 				/>

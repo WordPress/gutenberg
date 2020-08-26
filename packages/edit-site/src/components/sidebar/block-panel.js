@@ -21,6 +21,8 @@ import {
 	LINE_HEIGHT,
 	LINK_COLOR,
 	TEXT_COLOR,
+	fromPx,
+	toPx,
 } from '../editor/utils';
 
 export default () => {
@@ -40,19 +42,19 @@ export default () => {
 					if ( supports.includes( FONT_SIZE ) ) {
 						panels.push(
 							<FontSizePicker
-								value={ getProperty(
-									context,
-									'typography',
-									'fontSize',
-									'px'
+								value={ fromPx(
+									getProperty(
+										context,
+										'typography',
+										'fontSize'
+									)
 								) }
 								onChange={ ( value ) =>
 									setProperty(
 										context,
 										'typography',
 										'fontSize',
-										value,
-										'px'
+										toPx( value )
 									)
 								}
 							/>
