@@ -98,6 +98,11 @@ const ImageComponent = ( {
 		styles.iconUploadDark
 	);
 
+	const imageBorderStyles = usePreferredColorSchemeStyle(
+		styles.imageBorder,
+		styles.imageBorderDark
+	);
+
 	const placeholderStyles = [
 		usePreferredColorSchemeStyle(
 			styles.imageContainerUpload,
@@ -170,7 +175,7 @@ const ImageComponent = ( {
 				{ isSelected && ! ( isUploadInProgress || isUploadFailed ) && (
 					<View
 						style={ [
-							styles.imageBorder,
+							imageBorderStyles,
 							{ height: containerSize?.height },
 						] }
 					/>
