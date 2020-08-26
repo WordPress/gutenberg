@@ -120,7 +120,7 @@ function gutenberg_display_experiment_section() {
  */
 function gutenberg_experiments_editor_settings( $settings ) {
 	$experiments_settings = array(
-		'__experimentalEnableLegacyWidgetBlock'   => get_theme_support( 'block-based-widgets' ),
+		'__experimentalEnableLegacyWidgetBlock'   => get_theme_support( 'widgets-block-editor' ),
 		'__experimentalEnableFullSiteEditing'     => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
 		'__experimentalEnableFullSiteEditingDemo' => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ),
 	);

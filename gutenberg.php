@@ -45,7 +45,7 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( get_theme_support( 'block-based-widgets' ) ) {
+	if ( get_theme_support( 'widgets-block-editor' ) ) {
 		add_theme_page(
 			__( 'Widgets', 'gutenberg' ),
 			__( 'Widgets', 'gutenberg' ),
@@ -188,4 +188,4 @@ function register_site_icon_url( $response ) {
 
 add_filter( 'rest_index', 'register_site_icon_url' );
 
-add_theme_support( 'block-based-widgets' );
+add_theme_support( 'widgets-block-editor' );

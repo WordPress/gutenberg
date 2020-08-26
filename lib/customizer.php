@@ -55,7 +55,7 @@ function gutenberg_customize_register( $wp_customize ) {
 			'sanitize_callback' => 'gutenberg_customize_sanitize',
 		)
 	);
-	if ( get_theme_support( 'block-based-widgets' ) ) {
+	if ( get_theme_support( 'widgets-block-editor' ) ) {
 		$wp_customize->add_section(
 			'gutenberg_widget_blocks',
 			array( 'title' => __( 'Widget Blocks', 'gutenberg' ) )
@@ -81,7 +81,7 @@ add_action( 'customize_register', 'gutenberg_customize_register' );
  * @return array (Maybe) modified components list.
  */
 function gutenberg_remove_widgets_panel( $components ) {
-	if ( ! get_theme_support( 'block-based-widgets' ) ) {
+	if ( ! get_theme_support( 'widgets-block-editor' ) ) {
 		return $components;
 	}
 
