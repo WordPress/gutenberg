@@ -9,6 +9,7 @@ The block breadcrumb trail displays the hierarchy of the current block selection
 ## Table of contents
 
 1. [Development guidelines](#development-guidelines)
+2. [Related components](#related-components)
 
 
 ## Development guidelines
@@ -18,11 +19,13 @@ The block breadcrumb trail displays the hierarchy of the current block selection
 Renders a block breadcrumb with default style.
 
 ```jsx
-import { 
-  BlockBreadcrumb,
-  BlockEditorProvider  } from '@wordpress/block-editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 
-<BlockEditorProvider>
-    <BlockBreadcrumb/>
-</BlockEditorProvider>
+<div className="add-your-class-name">
+    <BlockBreadcrumb />
+</div>
 ```
+
+## Related components
+
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a `BlockEditorProvider` in the components tree. 
