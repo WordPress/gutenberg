@@ -189,14 +189,11 @@ export const registerCoreBlocks = () => {
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
 		? ( settings ) => {
-				const {
-					__experimentalEnableLegacyWidgetBlock,
-					__experimentalEnableFullSiteEditing,
-				} = settings;
+				const { __experimentalEnableFullSiteEditing } = settings;
 
 				[
 					widgetArea,
-					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
+					legacyWidget,
 					navigation,
 					navigationLink,
 
