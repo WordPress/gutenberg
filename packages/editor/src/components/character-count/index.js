@@ -1,15 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { count as characterCount } from '@wordpress/wordcount';
 
-function CharacterCount( { content } ) {
+export default function CharacterCount() {
+	const content = useSelect( ( select ) =>
+		select( 'core/editor' ).getEditedPostAttribute( 'content' )
+	);
+
 	return characterCount( content, 'characters_including_spaces' );
 }
-
-export default withSelect( ( select ) => {
-	return {
-		content: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
-	};
-} )( CharacterCount );
