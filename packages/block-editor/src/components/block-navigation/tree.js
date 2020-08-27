@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockNavigationBranch from './branch';
 import { BlockNavigationContext } from './context';
-import BlockNavigationDropIndicator from './drop-indicator';
 import useBlockNavigationDropZone from './use-block-navigation-drop-zone';
 
 /**
@@ -37,17 +36,14 @@ export default function BlockNavigationTree( {
 	);
 
 	return (
-		<>
-			<TreeGrid
-				className="block-editor-block-navigation-tree"
-				aria-label={ __( 'Block navigation structure' ) }
-				ref={ treeGridRef }
-			>
-				<BlockNavigationContext.Provider value={ contextValue }>
-					<BlockNavigationBranch { ...props } />
-				</BlockNavigationContext.Provider>
-			</TreeGrid>
-			<BlockNavigationDropIndicator dropTarget={ blockDropTarget } />
-		</>
+		<TreeGrid
+			className="block-editor-block-navigation-tree"
+			aria-label={ __( 'Block navigation structure' ) }
+			ref={ treeGridRef }
+		>
+			<BlockNavigationContext.Provider value={ contextValue }>
+				<BlockNavigationBranch { ...props } />
+			</BlockNavigationContext.Provider>
+		</TreeGrid>
 	);
 }
