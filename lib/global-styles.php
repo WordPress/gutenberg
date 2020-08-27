@@ -579,6 +579,10 @@ function gutenberg_experimental_global_styles_get_merged_origins() {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
+	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		return;
+	}
+
 	$gs_merged  = gutenberg_experimental_global_styles_get_merged_origins();
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $gs_merged );
 	if ( empty( $stylesheet ) ) {
@@ -646,15 +650,16 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	if ( ! function_exists( 'get_current_screen' ) ) {
-		return false;
+	if (
+		! gutenberg_experimental_global_styles_has_theme_json_support() ||
+		! function_exists( 'get_current_screen' ) ) {
+		return $settings;
 	}
+
 	$screen = get_current_screen();
 	$merged = gutenberg_experimental_global_styles_get_merged_origins();
 
-	if ( ! empty( $screen ) &&
-		gutenberg_is_edit_site_page( $screen->id ) &&
-		gutenberg_experimental_global_styles_has_theme_json_support() ) {
+	if ( ! empty( $screen ) && gutenberg_is_edit_site_page( $screen->id ) ) {
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 		$settings['__experimentalGlobalStylesContexts']     = gutenberg_experimental_global_styles_get_block_data();
 		$settings['__experimentalGlobalStylesBaseStyles']   = gutenberg_experimental_global_styles_merge_trees(
