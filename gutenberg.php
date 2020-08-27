@@ -45,7 +45,7 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( get_theme_support( 'widgets-block-editor' ) ) {
+	if ( gutenberg_use_widgets_block_editor() ) {
 		add_theme_page(
 			__( 'Widgets', 'gutenberg' ),
 			__( 'Widgets', 'gutenberg' ),
