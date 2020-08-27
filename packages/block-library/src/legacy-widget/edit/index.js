@@ -39,14 +39,15 @@ class LegacyWidgetEdit extends Component {
 			hasPermissionsToManageWidgets,
 			isSelected,
 			setAttributes,
+			widgetId,
 		} = this.props;
 		const { isPreview, hasEditForm } = this.state;
-		const { id, widgetClass } = attributes;
+		const { widgetClass } = attributes;
 		const widgetObject =
-			( id && availableLegacyWidgets[ id ] ) ||
+			( widgetId && availableLegacyWidgets[ widgetId ] ) ||
 			( widgetClass && availableLegacyWidgets[ widgetClass ] );
 
-		if ( ! id && ! widgetClass ) {
+		if ( ! widgetId && ! widgetClass ) {
 			return (
 				<LegacyWidgetPlaceholder
 					availableLegacyWidgets={ availableLegacyWidgets }
@@ -123,8 +124,8 @@ class LegacyWidgetEdit extends Component {
 					<LegacyWidgetEditHandler
 						isSelected={ isSelected }
 						isVisible={ ! isPreview }
-						id={ id }
-						idBase={ attributes.idBase || attributes.id }
+						id={ widgetId }
+						idBase={ attributes.idBase || widgetId }
 						number={ attributes.number }
 						widgetName={ get( widgetObject, [ 'name' ] ) }
 						widgetClass={ attributes.widgetClass }
@@ -180,7 +181,10 @@ class LegacyWidgetEdit extends Component {
 	}
 }
 
-export default withSelect( ( select ) => {
+export default withSelect( ( select, { clientId } ) => {
+	const widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
+		clientId
+	);
 	const editorSettings = select( 'core/block-editor' ).getSettings();
 	const {
 		availableLegacyWidgets,
@@ -189,5 +193,6 @@ export default withSelect( ( select ) => {
 	return {
 		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,
+		widgetId,
 	};
 } )( LegacyWidgetEdit );

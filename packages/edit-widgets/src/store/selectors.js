@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy } from 'lodash';
+import { invert, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -40,6 +40,12 @@ export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 		query
 	);
 } );
+
+export const getWidgetIdForClientId = ( state, clientId ) => {
+	const widgetIdToClientId = state.mapping;
+	const clientIdToWidgetId = invert( widgetIdToClientId );
+	return clientIdToWidgetId[ clientId ];
+};
 
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
