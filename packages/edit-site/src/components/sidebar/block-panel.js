@@ -2,15 +2,13 @@
  * WordPress dependencies
  */
 import { PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { PanelColorSettings } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { BACKGROUND_COLOR, LINK_COLOR, TEXT_COLOR } from '../editor/utils';
 import TypographyPanel from './typography-panel';
+import ColorPanel from './color-panel';
 
 export default ( { getProperty, setProperty, contexts } ) => {
 	return (
@@ -28,49 +26,13 @@ export default ( { getProperty, setProperty, contexts } ) => {
 						/>
 					);
 
-					const settings = [];
-					if (
-						supports.includes( TEXT_COLOR ) &&
-						supports.includes( BACKGROUND_COLOR )
-					) {
-						settings.push( {
-							value: getProperty( key, 'color', 'text' ),
-							onChange: ( value ) =>
-								setProperty( key, 'color', 'text', value ),
-							label: __( 'Text color' ),
-						} );
-						settings.push( {
-							value: getProperty( key, 'color', 'background' ),
-							onChange: ( value ) =>
-								setProperty(
-									key,
-									'color',
-									'background',
-									value
-								),
-							label: __( 'Background color' ),
-						} );
-					}
-
-					// TODO: do gradients
-
-					if ( supports.includes( LINK_COLOR ) ) {
-						settings.push( {
-							value: getProperty( key, 'color', 'link' ),
-							onChange: ( value ) =>
-								setProperty( key, 'color', 'link', value ),
-							label: __( 'Link color' ),
-						} );
-					}
-
-					if ( settings.length > 0 ) {
-						panels.push(
-							<PanelColorSettings
-								title={ __( 'Color' ) }
-								colorSettings={ settings }
-							/>
-						);
-					}
+					panels.push(
+						<ColorPanel
+							context={ { supports, name: key } }
+							getProperty={ getProperty }
+							setProperty={ setProperty }
+						/>
+					);
 
 					/*
 					 * Some block (eg: core/heading) are split in different
