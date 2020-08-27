@@ -14,21 +14,11 @@
  * @return string Return the post comment's content.
  */
 function render_block_core_post_comment_author( $attributes, $content, $block ) {
-	$comment_id = null;
-
-	if ( ! empty( $block->context['commentId'] ) ) {
-		$comment_id = $block->context['commentId'];
-	}
-
-	if ( ! empty( $attributes['commentId'] ) ) {
-		$comment_id = $attributes['commentId'];
-	}
-
-	if ( ! $comment_id ) {
+	if ( ! isset( $block->context['commentId'] ) ) {
 		return '';
 	}
 
-	return sprintf( '<div>%1$s</div>', get_comment_author( $comment_id ) );
+	return sprintf( '<div>%1$s</div>', get_comment_author( $block->context['commentId'] ) );
 }
 
 /**
@@ -38,9 +28,6 @@ function register_block_core_post_comment_author() {
 	register_block_type_from_metadata(
 		__DIR__ . '/post-comment-author',
 		array(
-			'attributes' => [
-				'commentId' => 'number'
-			],
 			'render_callback' => 'render_block_core_post_comment_author',
 		)
 	);

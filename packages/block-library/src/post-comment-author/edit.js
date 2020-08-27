@@ -1,19 +1,30 @@
 /**
  * WordPress dependencies
  */
-import ServerSideRender from '@wordpress/server-side-render';
+import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 // TODO: JSDOC types
 export default function Edit( { attributes, context } ) {
 	const { className } = attributes;
 	const { commentId } = context;
 
-	return (
-		<p className={ className }>
-			<ServerSideRender
-				block="core/post-comment-author"
-				attributes={ { commentId } }
-			/>
-		</p>
-	);
+	const displayName = useSelect( ( select ) => {
+		const { getEntityRecord } = select( 'core' );
+
+		const comment = getEntityRecord( 'root', 'comment', commentId );
+		if ( comment && ! comment.authorName ) {
+			const user = getEntityRecord( 'root', 'user', comment.author );
+
+			if ( ! user || ! user.name ) {
+				return __( 'Anonymous' );
+			}
+
+			return user.name;
+		}
+
+		return comment ? comment.authorName : '';
+	} );
+
+	return <p className={ className }>{ displayName }</p>;
 }
