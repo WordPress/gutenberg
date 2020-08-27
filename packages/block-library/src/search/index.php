@@ -85,9 +85,9 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
-	if ( ! empty( $attributes['width'] ) ) {
+	if ( ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] ) ) {
 		if ( ! empty( $attributes['buttonPosition'] ) && 'button-only' !== $attributes['buttonPosition'] ) {
-			$width_styles = ' style="width: ' . $attributes['width'] . 'px;"';
+			$width_styles = ' style="width: ' . $attributes['width'] . $attributes['widthUnit'] . ';"';
 		}
 	}
 
