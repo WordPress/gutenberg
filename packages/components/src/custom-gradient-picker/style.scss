@@ -47,13 +47,11 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 		position: absolute;
 		top: $components-custom-gradient-picker__padding;
 
+		&:focus,
 		&.is-active {
-			background: #fafafa;
-			color: #23282d;
-			border-color: #999;
 			box-shadow:
 				0 0 0 1px $white,
-				0 0 0 3px var(--wp-admin-theme-color);
+				0 0 0 3px $gray-900;
 		}
 	}
 }
