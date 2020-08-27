@@ -38,7 +38,9 @@ function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
 				<ul role="list" className="table-of-contents__counts">
 					<li className="table-of-contents__count">
 						{ __( 'Words' ) }
-						<WordCount />
+						<span className="table-of-contents__number">
+							<WordCount />
+						</span>
 					</li>
 					<li className="table-of-contents__count">
 						{ __( 'Headings' ) }
