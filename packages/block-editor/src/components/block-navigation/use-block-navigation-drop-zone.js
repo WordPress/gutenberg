@@ -3,7 +3,7 @@
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -214,12 +214,11 @@ export default function useBlockNavigationDropZone( ref ) {
 	} );
 
 	const hasPosition = !! position;
-	const blocksData = useRef();
 
 	// When the user starts dragging, build a list of block elements.
-	useEffect( () => {
+	const blocksData = useMemo( () => {
 		if ( hasPosition ) {
-			blocksData.current = getDropTargetBlocksData(
+			return getDropTargetBlocksData(
 				ref,
 				dragEventType,
 				getBlockRootClientId,
@@ -235,9 +234,10 @@ export default function useBlockNavigationDropZone( ref ) {
 	useEffect( () => {
 		if ( position ) {
 			const newTarget = getBlockNavigationDropTarget(
-				blocksData.current,
+				blocksData,
 				position
 			);
+
 			if ( target ) {
 				setTarget( newTarget );
 			}
