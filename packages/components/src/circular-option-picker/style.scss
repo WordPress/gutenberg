@@ -15,7 +15,7 @@ $color-palette-circle-spacing: 12px;
 	display: inline-block;
 	height: $color-palette-circle-size;
 	width: $color-palette-circle-size;
-	margin-right: $color-palette-circle-spacing;
+	margin-right: $color-palette-circle-spacing + $grid-unit-05;
 	margin-bottom: $color-palette-circle-spacing;
 	vertical-align: top;
 	transform: scale(1);
@@ -30,6 +30,11 @@ $color-palette-circle-spacing: 12px;
 	& > div {
 		height: 100%;
 		width: 100%;
+	}
+
+	// Remove right margin on every 6th item so it aligns with gradient control.
+	&:nth-child(6n+6) {
+		margin-right: 0;
 	}
 }
 
