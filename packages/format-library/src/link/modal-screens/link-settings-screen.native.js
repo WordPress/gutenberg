@@ -169,7 +169,7 @@ const LinkSettingsScreen = ( {
 				</View>
 				<View
 					style={ {
-						height: listProps.safeAreaBottomInset,
+						height: listProps.safeAreaBottomInset || 1,
 					} }
 				/>
 			</>

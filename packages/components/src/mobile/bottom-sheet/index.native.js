@@ -68,6 +68,7 @@ class BottomSheet extends Component {
 
 		this.state = {
 			safeAreaBottomInset: 0,
+			safeAreaTopInset: 0,
 			bounces: false,
 			maxHeight: 0,
 			keyboardHeight: 0,
@@ -141,13 +142,19 @@ class BottomSheet extends Component {
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
-		const { safeAreaBottomInset } = this.state;
+		const { safeAreaBottomInset, safeAreaTopInset } = this.state;
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
 		const { safeAreaInsets } = result;
-		if ( safeAreaBottomInset !== safeAreaInsets.bottom ) {
-			this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
+		if (
+			safeAreaBottomInset !== safeAreaInsets.bottom ||
+			safeAreaTopInset !== safeAreaInsets.top
+		) {
+			this.setState( {
+				safeAreaBottomInset: safeAreaInsets.bottom,
+				safeAreaTopInset: safeAreaInsets.top,
+			} );
 		}
 	}
 
@@ -286,6 +293,7 @@ class BottomSheet extends Component {
 			maxHeight,
 			bounces,
 			safeAreaBottomInset,
+			safeAreaTopInset,
 			isScrolling,
 			scrollEnabled,
 			isMaxHeightSet,
@@ -396,6 +404,10 @@ class BottomSheet extends Component {
 					style={ {
 						...backgroundStyle,
 						borderColor: 'rgba(0, 0, 0, 0.1)',
+						marginTop:
+							Platform.OS === 'ios' && isFullScreen
+								? safeAreaTopInset
+								: 0,
 						flex: isFullScreen ? 1 : undefined,
 						...style,
 					} }

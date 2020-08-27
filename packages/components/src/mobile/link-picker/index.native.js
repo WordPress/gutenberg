@@ -2,16 +2,17 @@
  * External dependencies
  */
 import { useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, TouchableOpacity } from 'react-native';
 import { lowerCase, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+
 import { __ } from '@wordpress/i18n';
-import { BottomSheet } from '@wordpress/components';
+import { BottomSheet, Icon } from '@wordpress/components';
 import { getProtocol, prependHTTP } from '@wordpress/url';
-import { link } from '@wordpress/icons';
+import { link, closeCircleFilled } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -65,9 +66,18 @@ export const LinkPicker = ( {
 		pickLink( directEntry );
 	};
 
+	const clear = () => {
+		setValue( '' );
+	};
+
 	const omniCellStyle = usePreferredColorSchemeStyle(
 		styles.omniCell,
 		styles.omniCellDark
+	);
+
+	const iconStyle = usePreferredColorSchemeStyle(
+		styles.icon,
+		styles.iconDark
 	);
 
 	return (
@@ -92,7 +102,20 @@ export const LinkPicker = ( {
 				/* eslint-disable-next-line jsx-a11y/no-autofocus */
 				autoFocus={ true }
 				separatorType="none"
-			/>
+			>
+				{ value !== '' && (
+					<TouchableOpacity
+						onPress={ clear }
+						style={ styles.clearIcon }
+					>
+						<Icon
+							icon={ closeCircleFilled }
+							color={ iconStyle.color }
+							size={ 24 }
+						/>
+					</TouchableOpacity>
+				) }
+			</BottomSheet.Cell>
 			{ !! value && (
 				<LinkPickerResults
 					query={ value }
