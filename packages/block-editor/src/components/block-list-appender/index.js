@@ -30,11 +30,7 @@ function BlockListAppender( {
 	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	const hasSiblingsSelected =
-		selectedBlockClientId &&
-		blockClientIds.includes( selectedBlockClientId );
-
-	if ( isLocked || CustomAppender === false || ! hasSiblingsSelected ) {
+	if ( isLocked || CustomAppender === false ) {
 		return null;
 	}
 
@@ -45,6 +41,14 @@ function BlockListAppender( {
 	} else if ( canInsertDefaultBlock ) {
 		// Render the default block appender when renderAppender has not been
 		// provided and the context supports use of the default appender.
+		const isDocumentAppender = ! rootClientId;
+		const isAnotherDefaultAppenderAlreadyDisplayed =
+			selectedBlockClientId &&
+			! blockClientIds.includes( selectedBlockClientId );
+
+		if ( ! isDocumentAppender && isAnotherDefaultAppenderAlreadyDisplayed )
+			return null;
+
 		appender = (
 			<DefaultBlockAppender
 				rootClientId={ rootClientId }
