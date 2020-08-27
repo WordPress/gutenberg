@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createContext, useContext, useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -19,12 +19,12 @@ const GlobalStylesContext = createContext( {
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
-export default ( { children, entityId, baseStyles, contexts } ) => {
+export default ( { children, baseStyles, contexts } ) => {
 	const {
 		userStyles,
 		getProperty,
 		setProperty,
-	} = useGlobalStylesFromEntities( entityId );
+	} = useGlobalStylesFromEntities();
 
 	useGlobalStylesEffectToUpdateStylesheet( contexts, baseStyles, userStyles );
 
@@ -48,31 +48,20 @@ export default ( { children, entityId, baseStyles, contexts } ) => {
  *
  * @return {Object} User data as well as getters and setters.
  */
-const useGlobalStylesFromEntities = ( entityId ) => {
-	const { editEntityRecord } = useDispatch( 'core' );
-	const userStyles = useSelect( ( select ) => {
-		// Trigger entity retrieval
-		select( 'core' ).getEntityRecord(
-			'postType',
-			'wp_global_styles',
-			entityId
-		);
-
-		const userData = select( 'core' ).getEditedEntityRecord(
-			'postType',
-			'wp_global_styles',
-			entityId
-		);
-
-		return userData?.content ? JSON.parse( userData.content ) : {};
-	} );
+const useGlobalStylesFromEntities = () => {
+	const [ content, setContent ] = useEntityProp(
+		'postType',
+		'wp_global_styles',
+		'content'
+	);
+	const userStyles = content ? JSON.parse( content ) : {};
 
 	const getProperty = ( context, family, name ) =>
 		userStyles?.[ context ]?.styles?.[ family ]?.[ name ];
 
 	const setProperty = ( context, family, name, value ) =>
-		editEntityRecord( 'postType', 'wp_global_styles', entityId, {
-			content: JSON.stringify( {
+		setContent(
+			JSON.stringify( {
 				...userStyles,
 				[ context ]: {
 					styles: {
@@ -83,8 +72,8 @@ const useGlobalStylesFromEntities = ( entityId ) => {
 						},
 					},
 				},
-			} ),
-		} );
+			} )
+		);
 
 	return {
 		userStyles,
