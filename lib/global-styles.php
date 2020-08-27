@@ -583,8 +583,8 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	$gs_merged  = gutenberg_experimental_global_styles_get_merged_origins();
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $gs_merged );
+	$merged     = gutenberg_experimental_global_styles_get_merged_origins();
+	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $merged );
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
