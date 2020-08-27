@@ -38,6 +38,7 @@ class LegacyWidgetEdit extends Component {
 			availableLegacyWidgets,
 			hasPermissionsToManageWidgets,
 			isSelected,
+			prerenderedEditForm,
 			setAttributes,
 			widgetId,
 		} = this.props;
@@ -127,6 +128,7 @@ class LegacyWidgetEdit extends Component {
 						id={ widgetId }
 						idBase={ attributes.idBase || widgetId }
 						number={ attributes.number }
+						prerenderedEditForm={ prerenderedEditForm }
 						widgetName={ get( widgetObject, [ 'name' ] ) }
 						widgetClass={ attributes.widgetClass }
 						instance={ attributes.instance }

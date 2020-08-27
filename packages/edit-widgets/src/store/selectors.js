@@ -28,6 +28,13 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 	);
 } );
 
+export const getWidget = createRegistrySelector(
+	( select ) => ( state, id ) => {
+		const widgets = select( 'core/edit-widgets' ).getWidgets();
+		return widgets[ id ];
+	}
+);
+
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	if ( ! hasResolvedWidgetAreas( query ) ) {
 		return null;
