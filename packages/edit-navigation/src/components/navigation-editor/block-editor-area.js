@@ -81,12 +81,33 @@ export default function BlockEditorArea( {
 		}
 	}, [ menuId ] );
 
-	// Select the navigation block when it becomes available
+	// Select the navigation block when it becomes available or when user clicks
+	// away from the navigation area.
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	useEffect( () => {
-		if ( rootBlockId ) {
-			selectBlock( rootBlockId );
-		}
+		const selectNavigation = () => {
+			if ( rootBlockId ) {
+				selectBlock( rootBlockId );
+			}
+		};
+
+		const detectClickOutside = ( event ) => {
+			const navigationContainer = document.querySelector(
+				'.wp-block-navigation'
+			);
+			if (
+				navigationContainer &&
+				! navigationContainer.contains( event.target )
+			) {
+				selectNavigation();
+			}
+		};
+
+		selectNavigation();
+
+		document.addEventListener( 'click', detectClickOutside );
+		return () =>
+			document.removeEventListener( 'click', detectClickOutside );
 	}, [ rootBlockId ] );
 
 	return (
