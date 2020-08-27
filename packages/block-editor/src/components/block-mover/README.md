@@ -15,7 +15,7 @@ Block movers allow moving blocks inside the editor using up and down buttons.
 
 ### Usage
 
-Renders ....
+Shows the block mover buttons in the block toolbar.
 
 ```jsx
 import { BlockMover } from '@wordpress/block-editor';
@@ -68,3 +68,4 @@ The orientation of the block movers, vertical or horizontal.
 
 
 ## Related components
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [BlockEditorProvider](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree.
