@@ -155,7 +155,8 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 		)
 	) {
 		return {
-			clientId: candidateBlockData.clientId,
+			rootClientId: candidateBlockData.clientId,
+			blockIndex: 0,
 			position: 'inside',
 		};
 	}
@@ -166,8 +167,11 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 		return;
 	}
 
+	const offset = isDraggingBelow ? 1 : 0;
 	return {
+		rootClientId: candidateBlockData.rootClientId,
 		clientId: candidateBlockData.clientId,
+		blockIndex: candidateBlockData.blockIndex + offset,
 		position: candidateEdge,
 	};
 }

@@ -22,8 +22,17 @@ export default function BlockNavigationDropIndicator( { dropTarget } ) {
 		if ( ! dropTarget ) {
 			return;
 		}
-		const { clientId, position } = dropTarget;
-		const blockRect = getBlockRect( clientId );
+
+		const { rootClientId, clientId, position } = dropTarget;
+
+		const dropTargetClientId =
+			position === 'inside' ? rootClientId : clientId;
+
+		const blockRect = getBlockRect( dropTargetClientId );
+
+		if ( ! blockRect ) {
+			return;
+		}
 
 		if ( position === 'top' ) {
 			return {
