@@ -198,7 +198,7 @@ function gutenberg_register_widgets() {
 			if($arg[0]['widget_name'] === 'Block'){
 				$arg[0]['before_form'] = '';
 				$arg[0]['before_widget_content'] = '<div class="widget-content">';
-				$arg[0]['after_widget_content'] = '</div><form>';
+				$arg[0]['after_widget_content'] = '</div><form class="block-widget-form">';
 				$arg[0]['after_form'] = '</form>';
 			}
 			return $arg;
