@@ -349,9 +349,9 @@ function gutenberg_experimental_global_styles_get_block_data() {
 			is_string( $block_type->supports['__experimentalSelector'] )
 		) {
 			$block_data[ $block_name ] = array(
-				'selector' => $block_type->supports['__experimentalSelector'],
-				'supports' => $supports,
-				'name'     => $block_name,
+				'selector'  => $block_type->supports['__experimentalSelector'],
+				'supports'  => $supports,
+				'blockName' => $block_name,
 			);
 		} elseif (
 			isset( $block_type->supports['__experimentalSelector'] ) &&
@@ -359,16 +359,16 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		) {
 			foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector ) {
 				$block_data[ $key ] = array(
-					'selector' => $selector,
-					'supports' => $supports,
-					'name'     => $block_name,
+					'selector'  => $selector,
+					'supports'  => $supports,
+					'blockName' => $block_name,
 				);
 			}
 		} else {
 			$block_data[ $block_name ] = array(
-				'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
-				'supports' => $supports,
-				'name'     => $block_name,
+				'selector'  => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
+				'supports'  => $supports,
+				'blockName' => $block_name,
 			);
 		}
 	}

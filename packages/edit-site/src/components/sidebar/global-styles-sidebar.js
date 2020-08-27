@@ -45,15 +45,19 @@ export default ( { identifier, title, icon } ) => {
 								const {
 									supports,
 									selector,
-									name: blockName,
+									blockName,
 								} = contexts[ name ];
 
 								/*
-								 * Some block (eg: core/heading) are split in different
+								 * We use the block's name as the panel title.
+								 *
+								 * Some blocks (eg: core/heading) can represent different
 								 * contexts (eg: core/heading/h1, core/heading/h2).
-								 * Because each context maps to a different UI section
-								 * in the sidebar we attach the selector (h1, h2)
-								 * to the title for those blocks.
+								 * For those, we attach the selector (h1) after the block's name.
+								 *
+								 * The title can't be accessed in the server,
+								 * as it's translatable and the block.json doesn't
+								 * have it yet.
 								 */
 								const blockType = getBlockType( blockName );
 								let panelTitle = blockType.title;
