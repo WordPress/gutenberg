@@ -66,10 +66,7 @@ function isPointContainedByRect( point, rect ) {
 	);
 }
 
-function isDroppingToInnerBlocks( point, rect, innerBlockCount ) {
-	if ( innerBlockCount > 0 ) {
-		return true;
-	}
+function isNestingGesture( point, rect ) {
 	const blockCenterX = rect.left + rect.width / 2;
 	return point.x > blockCenterX;
 }
@@ -144,15 +141,14 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 	const isDraggingBelow = candidateEdge === 'bottom';
 
 	// If the user is dragging towards the bottom of the block check whether
-	// they might be trying to insert the block as a child.
+	// they might be trying to nest the block as a child.
+	// If the block already has inner blocks, this should always be treated
+	// as nesting since the next block in the tree will be the first child.
 	if (
 		isDraggingBelow &&
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
-		isDroppingToInnerBlocks(
-			position,
-			candidateRect,
-			candidateBlockData.innerBlockCount
-		)
+		( candidateBlockData.innerBlockCount > 0 ||
+			isNestingGesture( position, candidateRect ) )
 	) {
 		return {
 			rootClientId: candidateBlockData.clientId,
