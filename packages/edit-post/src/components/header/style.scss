@@ -163,6 +163,14 @@
 	.components-menu-items-choice .components-menu-items__item-icon.components-menu-items__item-icon {
 		display: block;
 	}
+	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle,
+	.interface-pinned-items .components-button {
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
+	}
+	.components-dropdown-menu__toggle {
+		margin-left: $grid-unit-15;
+	}
 }
 
 .edit-post-header__dropdown {
