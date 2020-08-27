@@ -11,7 +11,7 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.appearance_page_gutenberg-widgets {
+body.gutenberg_page_gutenberg-widgets {
 	@include wp-admin-reset( ".blocks-widgets-container" );
 }
 

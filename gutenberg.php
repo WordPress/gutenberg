@@ -45,23 +45,17 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( get_theme_support( 'widgets-block-editor' ) ) {
-		add_theme_page(
-			__( 'Widgets', 'gutenberg' ),
-			__( 'Widgets', 'gutenberg' ),
-			'edit_theme_options',
-			'gutenberg-widgets',
-			'the_gutenberg_widgets'
-		);
-		$submenu['themes.php'] = array_filter(
-			$submenu['themes.php'],
-			function( $current_menu_item ) {
-				return isset( $current_menu_item[2] ) && 'widgets.php' !== $current_menu_item[2];
-			}
-		);
-	}
-
 	if ( get_option( 'gutenberg-experiments' ) ) {
+		if ( array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
+			add_submenu_page(
+				'gutenberg',
+				__( 'Widgets (beta)', 'gutenberg' ),
+				__( 'Widgets (beta)', 'gutenberg' ),
+				'edit_theme_options',
+				'gutenberg-widgets',
+				'the_gutenberg_widgets'
+			);
+		}
 		if ( array_key_exists( 'gutenberg-navigation', get_option( 'gutenberg-experiments' ) ) ) {
 			add_submenu_page(
 				'gutenberg',
@@ -107,7 +101,7 @@ function gutenberg_menu() {
 		'the_gutenberg_experiments'
 	);
 }
-add_action( 'admin_menu', 'gutenberg_menu', 9 );
+add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
  * Display a version notice and deactivate the Gutenberg plugin.
@@ -188,4 +182,13 @@ function register_site_icon_url( $response ) {
 
 add_filter( 'rest_index', 'register_site_icon_url' );
 
-add_theme_support( 'widgets-block-editor' );
+/**
+ * Registers the WP_Widget_Block widget
+ */
+function gutenberg_register_widgets() {
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+		register_widget( 'WP_Widget_Block' );
+	}
+}
+
+add_action( 'widgets_init', 'gutenberg_register_widgets' );
