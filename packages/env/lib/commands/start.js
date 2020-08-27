@@ -104,7 +104,7 @@ module.exports = async function start( { spinner, debug, update } ) {
 		} catch {
 			// Note: we do not care about this error condition because it will
 			// mostly happen when the volume already exists. This error would not
-			// stop wp-env from working correctlyl.
+			// stop wp-env from working correctly.
 		}
 
 		await dockerCompose.pullAll( dockerComposeConfig );
