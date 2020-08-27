@@ -126,7 +126,7 @@ The WordPress [wp-env package](https://www.npmjs.com/package/@wordpress/env) let
 
 The `wp-env` package requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
-After you have installed Docker, go ahead and install the `wp-env` tool. This command will install the tool globally meaning allowing you to run it in any directory:
+After you have installed Docker, go ahead and install the `wp-env` tool. This command will install the tool globally, this means you can run it from any directory:
 
 ```sh
 npm -g install @wordpress/env
@@ -162,15 +162,31 @@ If you want a generic environment, or working with multiple plugins and themes, 
 You can specify different WordPress versions, plugins, themes, and other configuratio for the Docker container. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson) for details.
 
 
+#### Troubleshooting
+
+If you run into an issue, when trying to run `wp-env` a common one is `Error while running docker-compose command.`
+
+- Check that Docker Desktop is started and running.
+- Check Docker Desktop dashboard for logs, restart, or remove existing VMs.
+
+If you see the error: `Host is already in use by another container`
+
+- The container is already running, or another one is. You can stop an existing container running use `wp-env stop` from the directory you started it.
+
+If you see the error: `No .wp-env.json file found` or `Invalid .wp-env.json`
+
+- You need to create a valid .wp-env.json file. Try a file with just `{}`
+
+
 ### Alternative to Docker
 
-A block is just a plugin, so any WordPress environment can be used for development. A couple of alternatives that might be easier, since they do not require Docker install and setup.
+Docker is just one method to run a local WordPress environment. Block development and extending WordPress is done using normal plugins, so any WordPress environment can be used. A couple of alternatives that you can consider, that do not require installing Docker.
 
 -   [Local by Flywheel](https://localbyflywheel.com/) - Local is a single application you download and install. You will need to know where the plugin directory is located after install. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`
 
--   [WampServer](http://www.wampserver.com/en/) or [MAMP](https://www.mamp.info/) environments, both are quite similar to Local, combining a web server, PHP, and database. However these tools are not WordPress specific, so if you are not already using them, Local might be an easier option
+-   [WampServer](http://www.wampserver.com/en/) or [MAMP](https://www.mamp.info/) environments, both are quite similar to Local, combining a web server, PHP, and database. However these tools are not WordPress specific, so if you are not already using them, Local might be an easier option.
 
--   Remote server - you could work on remote server that is easy to setup, since most hosts have a standard WordPress install. However, this may require additional development time to sync to the server.
+-   Remote server - you can work on a remote server, most hosts provide a quick WordPress setup. However, this will require additional time thorughout development syncing to the server, or working directly on the remote server.
 
 The important part is having a WordPress site installed, and know where and how to update files in the plugins directory.
 
@@ -182,3 +198,27 @@ Alternative editors include [Sublime Text](https://www.sublimetext.com/) that is
 
 You can use any editor you're comfortable with, it is more a personal preference. The development setup for WordPress block editor is a common JavaScript environment and most editors have plugins and suppport. The key is having a way to open, edit, and save text files.
 
+## Uninstall - Start Over
+
+Here are a few instructions if you need to start over, or want to remove what was installed.
+
+* You can remove the local environment data for a specific project:
+
+```
+wp-env destroy
+```
+
+* To completely uninstall wp-env tool:
+
+```
+npm -g uninstall @wordpress/env
+```
+
+* To uninstall Docker, or Visual Studio Code use your OS method to remove packages. For example, on Windows run "Add or remove programs".
+
+* To uninstall Node/NVM, delete the directories:
+
+```
+rm -rf ~/.nvm
+rm -rf ~/.npm
+```
