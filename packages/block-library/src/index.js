@@ -83,6 +83,7 @@ import * as postCommentsForm from './post-comments-form';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
+import * as postHierarchicalTerms from './post-hierarchical-terms';
 import * as postTags from './post-tags';
 
 /**
@@ -218,6 +219,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postDate,
 								postExcerpt,
 								postFeaturedImage,
+								postHierarchicalTerms,
 								postTags,
 						  ]
 						: [] ),
