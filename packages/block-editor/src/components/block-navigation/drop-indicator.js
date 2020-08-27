@@ -23,10 +23,10 @@ export default function BlockNavigationDropIndicator( { dropTarget } ) {
 			return;
 		}
 
-		const { rootClientId, clientId, position } = dropTarget;
+		const { rootClientId, clientId, dropPosition } = dropTarget;
 
 		const dropTargetClientId =
-			position === 'inside' ? rootClientId : clientId;
+			dropPosition === 'inside' ? rootClientId : clientId;
 
 		const blockRect = getBlockRect( dropTargetClientId );
 
@@ -34,14 +34,14 @@ export default function BlockNavigationDropIndicator( { dropTarget } ) {
 			return;
 		}
 
-		if ( position === 'top' ) {
+		if ( dropPosition === 'top' ) {
 			return {
 				top: blockRect.top,
 				height: 0,
 				left: blockRect.left,
 				width: blockRect.width,
 			};
-		} else if ( position === 'inside' || position === 'bottom' ) {
+		} else if ( dropPosition === 'inside' || dropPosition === 'bottom' ) {
 			return {
 				top: blockRect.bottom,
 				height: 0,
@@ -55,7 +55,7 @@ export default function BlockNavigationDropIndicator( { dropTarget } ) {
 		() =>
 			classnames( 'block-navigation-drop-indicator', {
 				'is-hidden': ! dropTarget,
-				'is-dropping-inside': dropTarget?.position === 'inside',
+				'is-dropping-inside': dropTarget?.dropPosition === 'inside',
 			} ),
 		[ dropTarget ]
 	);

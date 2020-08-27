@@ -11,6 +11,49 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { getDistanceToNearestEdge } from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
 
+/** @typedef {import('../../utils/math').WPPoint} WPPoint */
+
+/**
+ * The type of a drag event.
+ *
+ * @typedef {'default'|'file'|'html'} WPDragEventType
+ */
+
+/**
+ * An array representing data for blocks in the DOM used by drag and drop.
+ *
+ * @typedef {Object} WPBlockNavigationDropZoneBlocks
+ * @property {string}  clientId                        The client id for the block.
+ * @property {string}  rootClientId                    The root client id for the block.
+ * @property {number}  blockIndex                      The block's index.
+ * @property {Element} element                         The DOM element representing the block.
+ * @property {number}  innerBlockCount                 The number of inner blocks the block has.
+ * @property {boolean} isDraggedBlock                  Whether the block is currently being dragged.
+ * @property {boolean} canInsertDraggedBlocksAsSibling Whether the dragged block can be a sibling of this block.
+ * @property {boolean} canInsertDraggedBlocksAsChild   Whether the dragged block can be a child of this block.
+ */
+
+/**
+ * An object containing details of a drop target.
+ *
+ * @typedef {Object} WPBlockNavigationDropZoneTarget
+ * @property {string}                   blockIndex   The insertion index.
+ * @property {string}                   rootClientId The root client id for the block.
+ * @property {string|undefined}         clientId     The client id for the block.
+ * @property {'top'|'bottom'|'inside'}  dropPosition The position relative to the block that the user is dropping to.
+ *                                                   'inside' refers to nesting as an inner block.
+ */
+
+/**
+ * A react hook that returns data about blocks used for computing where a user
+ * can drop to when dragging and dropping blocks.
+ *
+ * @param {Object}          ref           A React ref of a containing element for block navigation.
+ * @param {WPPoint}         position      The current drag position.
+ * @param {WPDragEventType} dragEventType The drag event type.
+ *
+ * @return {WPBlockNavigationDropZoneBlocks} An array representing data for each block in the block navigation DOM.
+ */
 function useDropTargetBlocksData( ref, position, dragEventType ) {
 	const {
 		getBlockRootClientId,
@@ -77,6 +120,14 @@ function useDropTargetBlocksData( ref, position, dragEventType ) {
 	}, [ hasPosition ] );
 }
 
+/**
+ * Is the point contained by the rectangle.
+ *
+ * @param {WPPoint} point The point.
+ * @param {DOMRect} rect  The rectangle.
+ *
+ * @return {boolean} True if the point is contained by the rectangle, false otherwise.
+ */
 function isPointContainedByRect( point, rect ) {
 	return (
 		rect.left <= point.x &&
@@ -86,6 +137,16 @@ function isPointContainedByRect( point, rect ) {
 	);
 }
 
+/**
+ * Determines whether the user positioning the dragged block to nest as an
+ * inner block.
+ *
+ * Presently this is determined by whether the cursor is on the right hand side
+ * of the block.
+ *
+ * @param {WPPoint} point The point representing the cursor position when dragging.
+ * @param {DOMRect} rect  The rectangle.
+ */
 function isNestingGesture( point, rect ) {
 	const blockCenterX = rect.left + rect.width / 2;
 	return point.x > blockCenterX;
@@ -95,6 +156,14 @@ function isNestingGesture( point, rect ) {
 // to the above or below a block.
 const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
 
+/**
+ * Given blocks data and the cursor position, compute the drop target.
+ *
+ * @param {WPBlockNavigationDropZoneBlocks} blocksData Data about the blocks in block navigation.
+ * @param {WPPoint} position The point representing the cursor position when dragging.
+ *
+ * @return {WPBlockNavigationDropZoneTarget} An object containing data about the drop target.
+ */
 function getBlockNavigationDropTarget( blocksData, position ) {
 	let candidateEdge;
 	let candidateBlockData;
@@ -173,7 +242,7 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 		return {
 			rootClientId: candidateBlockData.clientId,
 			blockIndex: 0,
-			position: 'inside',
+			dropPosition: 'inside',
 		};
 	}
 
@@ -188,10 +257,17 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 		rootClientId: candidateBlockData.rootClientId,
 		clientId: candidateBlockData.clientId,
 		blockIndex: candidateBlockData.blockIndex + offset,
-		position: candidateEdge,
+		dropPosition: candidateEdge,
 	};
 }
 
+/**
+ * A react hook for implementing a drop zone in block navigation.
+ *
+ * @param {Object} ref A React ref of a containing element for block navigation.
+ *
+ * @return {WPBlockNavigationDropZoneTarget} The drop target.
+ */
 export default function useBlockNavigationDropZone( ref ) {
 	const [ target = {}, setTarget ] = useState();
 	const {
