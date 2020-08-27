@@ -88,6 +88,14 @@ const useGlobalStylesEffectToUpdateStylesheet = (
 	userStyles
 ) => {
 	useEffect( () => {
+		if (
+			typeof contexts !== 'object' ||
+			typeof baseStyles !== 'object' ||
+			typeof userStyles !== 'object'
+		) {
+			return;
+		}
+
 		const embeddedStylesheetId = 'global-styles-inline-css';
 		let styleNode = document.getElementById( embeddedStylesheetId );
 
