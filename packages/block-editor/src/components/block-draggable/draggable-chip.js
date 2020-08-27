@@ -36,9 +36,6 @@ export default function BlockDraggableChip( { clientIds } ) {
 					className="block-editor-block-draggable-chip__content"
 				>
 					<FlexItem>
-						<BlockIcon icon={ handle } />
-					</FlexItem>
-					<FlexItem>
 						{ icon ? (
 							<BlockIcon icon={ icon } />
 						) : (
@@ -48,6 +45,9 @@ export default function BlockDraggableChip( { clientIds } ) {
 								clientIds.length
 							)
 						) }
+					</FlexItem>
+					<FlexItem>
+						<BlockIcon icon={ handle } />
 					</FlexItem>
 				</Flex>
 			</div>
