@@ -171,6 +171,12 @@
 	.components-dropdown-menu__toggle {
 		margin-left: $grid-unit-15;
 	}
+	// The inserter has a custom label, different from its aria-label, so we don't want to display both.
+	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle {
+		&::after {
+			content: none;
+		}
+	}
 }
 
 .edit-post-header__dropdown {
