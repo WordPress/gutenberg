@@ -283,6 +283,7 @@ export default function useBlockNavigationDropZone( ref ) {
 	const { position, type: dragEventType } = useDropZone( {
 		element: ref,
 		withPosition: true,
+		__experimentalIsModal: true,
 		...dropEventHandlers,
 	} );
 

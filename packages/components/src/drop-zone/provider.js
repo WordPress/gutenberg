@@ -149,11 +149,22 @@ class DropZoneProvider extends Component {
 				)
 		);
 
+		const hasActiveModalDropZone = some( hoveredDropZones, ( zone ) => {
+			return (
+				zone.__experimentalIsModal &&
+				zone.element.current.contains( event.target )
+			);
+		} );
+
 		// Find the leaf dropzone not containing another dropzone
 		const hoveredDropZone = find( hoveredDropZones, ( zone ) => {
 			const container = zone.isRelative
 				? zone.element.current.parentElement
 				: zone.element.current;
+
+			if ( hasActiveModalDropZone && ! zone.__experimentalIsModal ) {
+				return false;
+			}
 
 			return ! some(
 				hoveredDropZones,
@@ -193,6 +204,9 @@ class DropZoneProvider extends Component {
 
 		// Notifying the dropzones
 		toUpdate.forEach( ( dropZone ) => {
+			if ( ! dropZone ) {
+				return;
+			}
 			const index = this.dropZones.indexOf( dropZone );
 			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
 			dropZone.setState( {

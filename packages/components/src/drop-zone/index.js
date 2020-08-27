@@ -22,6 +22,7 @@ export function useDropZone( {
 	onDrop,
 	isDisabled,
 	withPosition,
+	__experimentalIsModal = false,
 	__unstableIsRelative = false,
 } ) {
 	const { addDropZone, removeDropZone } = useContext( Context );
@@ -40,6 +41,7 @@ export function useDropZone( {
 				onHTMLDrop,
 				setState,
 				withPosition,
+				__experimentalIsModal,
 				isRelative: __unstableIsRelative,
 			};
 			addDropZone( dropZone );
@@ -70,6 +72,7 @@ function DropZoneComponent( {
 	onFilesDrop,
 	onHTMLDrop,
 	onDrop,
+	__experimentalIsModal = false,
 } ) {
 	const element = useRef();
 	const { isDraggingOverDocument, isDraggingOverElement, type } = useDropZone(
@@ -78,6 +81,7 @@ function DropZoneComponent( {
 			onFilesDrop,
 			onHTMLDrop,
 			onDrop,
+			__experimentalIsModal,
 			__unstableIsRelative: true,
 		}
 	);
