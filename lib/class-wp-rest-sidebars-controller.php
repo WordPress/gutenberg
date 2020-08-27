@@ -279,20 +279,23 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Returns a list of widgets for the given sidebar id
 	 *
-	 * @param string $sidebar_id ID of the sidebar.
+	 * @param string          $sidebar_id ID of the sidebar.
+	 * @param WP_REST_Request $request    Request object.
 	 *
 	 * @return array
 	 * @global array $wp_registered_widgets
 	 * @global array $wp_registered_sidebars
 	 */
-	public static function get_widgets( $sidebar_id ) {
-		global $wp_registered_widgets, $wp_registered_sidebars;
+	public static function get_widgets( $sidebar_id, $request ) {
+		global $wp_registered_widgets, $wp_registered_sidebars, $wp_registered_widget_controls;
 
 		$widgets            = array();
 		$sidebars_widgets   = (array) wp_get_sidebars_widgets();
-		$registered_sidebar = isset( $wp_registered_sidebars[ $sidebar_id ] ) ? $wp_registered_sidebars[ $sidebar_id ] : (
+		$registered_sidebar = isset( $wp_registered_sidebars[ $sidebar_id ] )
+			? $wp_registered_sidebars[ $sidebar_id ]
+			: (
 			'wp_inactive_widgets' === $sidebar_id ? array() : null
-		);
+			);
 
 		if ( null !== $registered_sidebar && isset( $sidebars_widgets[ $sidebar_id ] ) ) {
 			foreach ( $sidebars_widgets[ $sidebar_id ] as $widget_id ) {
@@ -334,9 +337,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						}
 
 						ob_start();
-
 						call_user_func_array( $widget['callback'], $widget_parameters );
-
 						$widget['rendered'] = trim( ob_get_clean() );
 					}
 
@@ -349,6 +350,17 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						);
 						$widget['number']       = (int) $widget['params'][0]['number'];
 						$widget['id_base']      = $instance->id_base;
+					}
+
+					if ( 'edit' === $request['context'] && isset( $wp_registered_widget_controls[ $widget_id ]['callback'] ) ) {
+						$control   = $wp_registered_widget_controls[ $widget_id ];
+						$arguments = array();
+						if ( ! empty( $widget['number'] ) ) {
+							$arguments[0] = array( 'number' => $widget['number'] );
+						}
+						ob_start();
+						call_user_func_array( $control['callback'], $arguments );
+						$widget['rendered_form'] = trim( ob_get_clean() );
 					}
 
 					unset( $widget['params'] );
@@ -392,7 +404,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 		$fields = $this->get_fields_for_response( $request );
 		if ( rest_is_field_included( 'widgets', $fields ) ) {
-			$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
+			$sidebar['widgets'] = self::get_widgets( $sidebar['id'], $request );
 		}
 
 		$schema = $this->get_item_schema();
@@ -484,43 +496,49 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					'items'       => array(
 						'type'       => 'object',
 						'properties' => array(
-							'id'           => array(
+							'id'            => array(
 								'description' => __( 'Unique identifier for the widget.', 'gutenberg' ),
 								'type'        => 'string',
 								'context'     => array( 'view', 'edit', 'embed' ),
 							),
-							'id_base'      => array(
+							'id_base'       => array(
 								'description' => __( 'Type of widget for the object.', 'gutenberg' ),
 								'type'        => 'string',
 								'context'     => array( 'view', 'edit', 'embed' ),
 							),
-							'widget_class' => array(
+							'widget_class'  => array(
 								'description' => __( 'Class name of the widget implementation.', 'gutenberg' ),
 								'type'        => 'string',
 								'context'     => array( 'view', 'edit', 'embed' ),
 							),
-							'name'         => array(
+							'name'          => array(
 								'description' => __( 'Name of the widget.', 'gutenberg' ),
 								'type'        => 'string',
 								'context'     => array( 'view', 'edit', 'embed' ),
 							),
-							'description'  => array(
+							'description'   => array(
 								'description' => __( 'Description of the widget.', 'gutenberg' ),
 								'type'        => 'string',
 								'context'     => array( 'view', 'edit', 'embed' ),
 							),
-							'number'       => array(
+							'number'        => array(
 								'description' => __( 'Number of the widget.', 'gutenberg' ),
 								'type'        => 'integer',
 								'context'     => array( 'view', 'edit', 'embed' ),
 							),
-							'rendered'     => array(
+							'rendered'      => array(
 								'description' => __( 'HTML representation of the widget.', 'gutenberg' ),
 								'type'        => 'string',
-								'context'     => array( 'view', 'edit', 'embed' ),
+								'context'     => array( 'view', 'embed' ),
 								'readonly'    => true,
 							),
-							'settings'     => array(
+							'rendered_form' => array(
+								'description' => __( 'HTML representation of the widget admin form.', 'gutenberg' ),
+								'type'        => 'string',
+								'context'     => array( 'edit' ),
+								'readonly'    => true,
+							),
+							'settings'      => array(
 								'description' => __( 'Settings of the widget.', 'gutenberg' ),
 								'type'        => 'object',
 								'context'     => array( 'view', 'edit', 'embed' ),

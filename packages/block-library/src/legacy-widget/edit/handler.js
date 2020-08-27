@@ -18,10 +18,10 @@ import LegacyWidgetEditDomManager from './dom-manager';
 const { XMLHttpRequest, FormData } = window;
 
 class LegacyWidgetEditHandler extends Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 		this.state = {
-			form: null,
+			form: props.prerenderedEditForm,
 		};
 		this.widgetNonce = null;
 		this.instanceUpdating = null;
@@ -32,9 +32,11 @@ class LegacyWidgetEditHandler extends Component {
 	componentDidMount() {
 		this.isStillMounted = true;
 		this.trySetNonce();
-		this.requestWidgetForm( undefined, ( response ) => {
-			this.props.onInstanceChange( null, !! response.form );
-		} );
+		if ( ! this.props.prerenderedEditForm ) {
+			this.requestWidgetForm( undefined, ( response ) => {
+				this.props.onInstanceChange( null, !! response.form );
+			} );
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
