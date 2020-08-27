@@ -3,12 +3,12 @@
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { getDistanceToNearestEdge } from '@wordpress/dom';
 import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { getDistanceToNearestEdge } from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
 
 function getDropTargetBlocksData(
