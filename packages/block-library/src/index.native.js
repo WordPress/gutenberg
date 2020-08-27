@@ -191,6 +191,7 @@ addFilter(
  * ```
  */
 export const registerCoreBlocks = () => {
+	// When adding new blocks to this list please also update ../react-naive-bridge/common/supportedBlocks.json
 	[
 		paragraph,
 		heading,
