@@ -279,8 +279,8 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	/**
 	 * Returns a list of widgets for the given sidebar id
 	 *
-	 * @param string $sidebar_id ID of the sidebar.
-	 * @param WP_REST_Request $request Request object.
+	 * @param string          $sidebar_id ID of the sidebar.
+	 * @param WP_REST_Request $request    Request object.
 	 *
 	 * @return array
 	 * @global array $wp_registered_widgets
