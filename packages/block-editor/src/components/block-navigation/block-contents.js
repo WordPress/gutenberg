@@ -35,32 +35,32 @@ const BlockNavigationBlockContents = forwardRef(
 			blockDropTarget = {},
 		} = useBlockNavigationContext();
 
+		const { clientId } = block;
+
 		const rootClientId = useSelect(
 			( select ) =>
 				select( 'core/block-editor' ).getBlockRootClientId(
-					block.clientId
+					clientId
 				) || '',
-			[ block.rootClientId ]
+			[ clientId ]
 		);
 
 		const {
 			rootClientId: dropTargetRootClientId,
-			blockIndex: dropTargetBlockIndex,
+			clientId: dropTargetClientId,
+			dropPosition,
 		} = blockDropTarget;
-
-		const blockIndex = position - 1;
 
 		const isDroppingBefore =
 			dropTargetRootClientId === rootClientId &&
-			blockIndex === dropTargetBlockIndex;
+			dropTargetClientId === clientId &&
+			dropPosition === 'top';
 		const isDroppingAfter =
 			dropTargetRootClientId === rootClientId &&
-			position === siblingBlockCount &&
-			dropTargetBlockIndex === siblingBlockCount;
+			dropTargetClientId === clientId &&
+			dropPosition === 'bottom';
 		const isDroppingToInnerBlocks =
-			block.clientId === dropTargetRootClientId &&
-			! block.innerBlocks?.length &&
-			dropTargetBlockIndex === 0;
+			dropTargetRootClientId === clientId && dropPosition === 'inside';
 
 		const className = classnames(
 			'block-editor-block-navigation-block-contents',

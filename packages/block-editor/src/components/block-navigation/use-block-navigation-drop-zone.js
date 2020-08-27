@@ -171,6 +171,10 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 	let candidateRect;
 
 	for ( const blockData of blocksData ) {
+		if ( blockData.isDraggedBlock ) {
+			continue;
+		}
+
 		const rect = blockData.element.getBoundingClientRect();
 		const [ distance, edge ] = getDistanceToNearestEdge(
 			position,
@@ -195,7 +199,8 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 			if (
 				edge === 'top' &&
 				previousBlockData &&
-				previousBlockData.rootClientId === blockData.rootClientId
+				previousBlockData.rootClientId === blockData.rootClientId &&
+				! previousBlockData.isDraggedBlock
 			) {
 				candidateBlockData = previousBlockData;
 				candidateEdge = 'bottom';
