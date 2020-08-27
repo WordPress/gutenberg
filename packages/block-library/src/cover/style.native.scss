@@ -17,14 +17,8 @@
 .content {
 	justify-content: center;
 	width: 100%;
-	padding-top: $block-edge-to-content;
-	padding-bottom: $block-edge-to-content;
+	padding: $block-edge-to-content;
 	z-index: 3;
-}
-
-.contentPadding {
-	padding-left: $block-edge-to-content;
-	padding-right: $block-edge-to-content;
 }
 
 .overlay {

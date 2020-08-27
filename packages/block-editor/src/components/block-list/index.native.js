@@ -387,7 +387,9 @@ class EmptyListComponent extends Component {
 
 		return (
 			<View style={ styles.defaultAppender }>
-				<ReadableContentView align="full">
+				<ReadableContentView
+					align={ renderAppender ? 'full' : undefined }
+				>
 					<BlockListAppender
 						rootClientId={ rootClientId }
 						renderAppender={ renderAppender }

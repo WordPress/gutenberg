@@ -19,15 +19,13 @@ import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
 
 const BREAKPOINTS = {
-	medium: 700,
-	small: 480,
+	medium: 480,
+	small: 375,
 };
 
 const stretchStyle = {
 	flex: 1,
 };
-
-const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
 
 export class BlockListItem extends Component {
 	constructor() {
@@ -50,20 +48,19 @@ export class BlockListItem extends Component {
 	}
 
 	getWideMargins() {
-		const { marginHorizontal, parentBlockAlignment } = this.props;
+		const {
+			marginHorizontal,
+			parentBlockAlignment,
+			numberOfParents,
+		} = this.props;
 		const { blockWidth } = this.state;
 
-		if ( parentBlockAlignment === 'full' ) {
-			if (
-				blockWidth <= BREAKPOINTS.small ||
-				( blockWidth >= BREAKPOINTS.small &&
-					blockWidth <= BREAKPOINTS.medium )
-			) {
-				return marginHorizontal * 2;
-			}
-		}
-
-		if ( parentBlockAlignment === 'wide' ) {
+		if (
+			parentBlockAlignment === 'full' &&
+			blockWidth > BREAKPOINTS.small &&
+			blockWidth < BREAKPOINTS.medium &&
+			numberOfParents === 1
+		) {
 			return marginHorizontal * 2;
 		}
 
@@ -86,10 +83,14 @@ export class BlockListItem extends Component {
 			return this.getWideMargins();
 		}
 
-		return WIDE_ALIGNMENTS.includes( parentBlockAlignment ) &&
-			blockWidth < BREAKPOINTS.small
-			? marginHorizontal * 2
-			: marginHorizontal;
+		if (
+			parentBlockAlignment === 'full' &&
+			blockWidth <= BREAKPOINTS.medium
+		) {
+			return marginHorizontal * 2;
+		}
+
+		return marginHorizontal;
 	}
 
 	getContentStyles( readableContentViewStyle ) {
@@ -206,6 +207,7 @@ export default compose( [
 				hasParents,
 				blockAlignment: align,
 				parentBlockAlignment,
+				numberOfParents: parents.length,
 			};
 		}
 	),

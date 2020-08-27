@@ -74,7 +74,6 @@ const INNER_BLOCKS_TEMPLATE = [
 ];
 const COVER_MAX_HEIGHT = 1000;
 const COVER_DEFAULT_HEIGHT = 300;
-const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
 
 const Cover = ( {
 	attributes,
@@ -88,7 +87,6 @@ const Cover = ( {
 	closeSettingsBottomSheet,
 } ) => {
 	const {
-		align,
 		backgroundType,
 		dimRatio,
 		focalPoint,
@@ -506,12 +504,7 @@ const Cover = ( {
 
 			<View
 				pointerEvents="box-none"
-				style={ [
-					styles.content,
-					! WIDE_ALIGNMENTS.includes( align ) &&
-						styles.contentPadding,
-					{ minHeight: CONTAINER_HEIGHT },
-				] }
+				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
 			>
 				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>
