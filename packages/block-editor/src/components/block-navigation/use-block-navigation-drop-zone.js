@@ -11,18 +11,17 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { getDistanceToNearestEdge } from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
 
-function getDropTargetBlocksData(
-	ref,
-	dragEventType,
-	getRootClientId,
-	getBlockIndex,
-	getBlockCount,
-	getDraggedBlockClientIds,
-	canInsertBlocks
-) {
+function getDropTargetBlocksData( ref, dragEventType, selectors ) {
 	if ( ! ref.current ) {
 		return;
 	}
+	const {
+		getBlockRootClientId,
+		getBlockIndex,
+		getBlockCount,
+		getDraggedBlockClientIds,
+		canInsertBlocks,
+	} = selectors;
 
 	const isBlockDrag = dragEventType === 'default';
 
@@ -36,7 +35,7 @@ function getDropTargetBlocksData(
 
 	return blockElements.map( ( blockElement ) => {
 		const clientId = blockElement.dataset.block;
-		const rootClientId = getRootClientId( clientId );
+		const rootClientId = getBlockRootClientId( clientId );
 
 		return {
 			clientId,
@@ -173,26 +172,20 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 }
 
 export default function useBlockNavigationDropZone( ref ) {
-	const {
-		canInsertBlocks,
-		getBlockRootClientId,
-		getBlockIndex,
-		getBlockCount,
-		getDraggedBlockClientIds,
-	} = useSelect( ( select ) => {
+	const blocksDataSelectors = useSelect( ( select ) => {
 		const {
-			canInsertBlocks: _canInsertBlocks,
-			getBlockRootClientId: _getBlockRootClientId,
-			getBlockIndex: _getBlockIndex,
-			getBlockCount: _getBlockCount,
-			getDraggedBlockClientIds: _getDraggedBlockClientIds,
+			canInsertBlocks,
+			getBlockRootClientId,
+			getBlockIndex,
+			getBlockCount,
+			getDraggedBlockClientIds,
 		} = select( 'core/block-editor' );
 		return {
-			canInsertBlocks: _canInsertBlocks,
-			getBlockRootClientId: _getBlockRootClientId,
-			getBlockIndex: _getBlockIndex,
-			getBlockCount: _getBlockCount,
-			getDraggedBlockClientIds: _getDraggedBlockClientIds,
+			canInsertBlocks,
+			getBlockRootClientId,
+			getBlockIndex,
+			getBlockCount,
+			getDraggedBlockClientIds,
 		};
 	}, [] );
 
@@ -221,11 +214,7 @@ export default function useBlockNavigationDropZone( ref ) {
 			return getDropTargetBlocksData(
 				ref,
 				dragEventType,
-				getBlockRootClientId,
-				getBlockIndex,
-				getBlockCount,
-				getDraggedBlockClientIds,
-				canInsertBlocks
+				blocksDataSelectors
 			);
 		}
 	}, [ hasPosition ] );
