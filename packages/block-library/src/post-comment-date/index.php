@@ -18,7 +18,14 @@ function render_block_core_post_comment_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	return sprintf( '<div><time datetime="%1$s">%2$s</time></div>', get_comment_date( 'c', $block->context['commentId'] ), get_comment_date( '', $block->context['commentId'] ) );
+	return sprintf(
+		'<div><time datetime="%1$s">%2$s</time></div>',
+		get_comment_date( 'c', $block->context['commentId'] ),
+		get_comment_date(
+			isset( $attributes['format'] ) ? $attributes['format'] : '',
+			$block->context['commentId']
+		)
+	);
 }
 
 /**
