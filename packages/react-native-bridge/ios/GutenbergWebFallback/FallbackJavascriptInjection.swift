@@ -1,6 +1,6 @@
 import WebKit
 
-private struct SourceFile {
+internal struct SourceFile {
     enum SourceFileError: Error {
         case sourceFileNotFound(String)
     }
@@ -30,6 +30,7 @@ extension SourceFile {
     static let insertBlock = SourceFile(name: "insert-block", type: .js)
     static let localStorage  = SourceFile(name: "local-storage-overrides", type: .json)
     static let preventAutosaves = SourceFile(name: "prevent-autosaves", type: .js)
+    static let supportedBlocks = SourceFile(name: "supported-blocks", type: .json)
 }
 
 public struct FallbackJavascriptInjection {
