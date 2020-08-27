@@ -680,6 +680,60 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Tests if the endpoint correctly handles "slashable" characters such as " or '.
+	 */
+	public function test_update_item_slashing() {
+		$this->setup_widget( 'widget_text', 1, array( 'text' => 'Custom text test' ) );
+		$this->setup_sidebar( 'sidebar-1', array( 'name' => 'Test sidebar' ), array( 'text-1', 'rss-1' ) );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(
+					array(
+						'id'           => 'text-1',
+						'settings'     => array(
+							'text' => 'Updated \\" \\\' text test',
+						),
+						'id_base'      => 'text',
+						'widget_class' => 'WP_Widget_Text',
+						'name'         => 'Text',
+						'description'  => 'Arbitrary text.',
+						'number'       => 1,
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			array(
+				'id'          => 'sidebar-1',
+				'name'        => 'Test sidebar',
+				'description' => '',
+				'status'      => 'active',
+				'widgets'     => array(
+					array(
+						'id'           => 'text-1',
+						'settings'     => array(
+							'text'   => 'Updated \\" \\\' text test',
+							'title'  => '',
+							'filter' => false,
+						),
+						'id_base'      => 'text',
+						'widget_class' => 'WP_Widget_Text',
+						'name'         => 'Text',
+						'description'  => 'Arbitrary text.',
+						'number'       => 1,
+						'rendered'     => '<div class="textwidget">Updated \\" \\\' text test</div>',
+					),
+				),
+			),
+			$data
+		);
+	}
+
+	/**
 	 * The test_delete_item() method does not exist for sidebar.
 	 */
 	public function test_delete_item() {
@@ -708,5 +762,4 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'widgets', $properties );
 	}
-
 }
