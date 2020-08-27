@@ -118,7 +118,7 @@ export default function BlockToolbar( {
 			{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 				<BlockMover
 					clientIds={ blockClientIds }
-					hideDragHandle={ ! hideDragHandle }
+					hideDragHandle={ hideDragHandle }
 				/>
 			) }
 			{ shouldShowVisualToolbar && (
