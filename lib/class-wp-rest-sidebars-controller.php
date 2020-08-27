@@ -285,7 +285,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 * @global array $wp_registered_widgets
 	 * @global array $wp_registered_sidebars
 	 */
-	public static function get_widgets( $sidebar_id ) {
+	public static function get_widgets( $sidebar_id, $request ) {
 		global $wp_registered_widgets, $wp_registered_sidebars, $wp_registered_widget_controls;
 
 		$widgets            = array();
@@ -351,7 +351,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 						$widget['id_base']      = $instance->id_base;
 					}
 
-					if ( isset( $wp_registered_widget_controls[ $widget_id ]['callback'] ) ) {
+					if ( $request['context'] === 'edit' && isset( $wp_registered_widget_controls[ $widget_id ]['callback'] ) ) {
 						$control   = $wp_registered_widget_controls[ $widget_id ];
 						$arguments = array();
 						if ( ! empty( $widget['number'] ) ) {
@@ -403,7 +403,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 		$fields = $this->get_fields_for_response( $request );
 		if ( rest_is_field_included( 'widgets', $fields ) ) {
-			$sidebar['widgets'] = self::get_widgets( $sidebar['id'] );
+			$sidebar['widgets'] = self::get_widgets( $sidebar['id'], $request );
 		}
 
 		$schema = $this->get_item_schema();
