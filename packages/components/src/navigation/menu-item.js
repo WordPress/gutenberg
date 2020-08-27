@@ -38,6 +38,9 @@ const NavigationMenuItem = ( props ) => {
 			setActiveLevelId( id );
 			return;
 		}
+		if ( ! onClick ) {
+			return;
+		}
 		onClick( props );
 	};
 

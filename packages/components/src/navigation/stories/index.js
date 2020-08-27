@@ -100,8 +100,11 @@ function Example() {
 									<NavigationMenuItem
 										{ ...item }
 										key={ item.id }
-										onClick={ ( selected ) =>
-											setActive( selected.id )
+										onClick={
+											! item.href
+												? ( selected ) =>
+														setActive( selected.id )
+												: null
 										}
 									/>
 								);
