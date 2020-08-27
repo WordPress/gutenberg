@@ -45,3 +45,16 @@
 	bottom: 0;
 	opacity: 0;
 }
+
+.wp-block[data-align="left"],
+.wp-block[data-align="right"] {
+	> .wp-block-embed {
+		max-width: 360px;
+		width: 100%;
+
+		// Unless these have a min-width, they collapse when floated.
+		.wp-block-embed__wrapper {
+			min-width: $break-zoomed-in;
+		}
+	}
+}
