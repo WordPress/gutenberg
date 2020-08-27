@@ -37,7 +37,14 @@ export function useCustomUnits( unitsProp ) {
 			select( 'core/block-editor' ).getSettings().enableCustomUnits,
 		[]
 	);
-	const isDisabled = ! settings;
+	const hasConfigs = Array.isArray( settings );
+
+	let isDisabled = false;
+
+	if ( hasConfigs ) {
+		const [ enabledFlag ] = settings;
+		isDisabled = enabledFlag === false;
+	}
 
 	// Adjust units based on add_theme_support( 'custom-units' );
 	let units;
@@ -51,7 +58,7 @@ export function useCustomUnits( unitsProp ) {
 	 * Note: If there are unit argument (e.g. 'em'), these units are enabled
 	 * within the control.
 	 */
-	if ( Array.isArray( settings ) ) {
+	if ( hasConfigs ) {
 		units = filterUnitsWithSettings( settings, unitsProp );
 	} else {
 		units = isDisabled ? false : unitsProp;

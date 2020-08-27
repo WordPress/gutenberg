@@ -280,16 +280,18 @@ add_theme_support( 'custom-line-height' );
 
 ### Support custom units
 
-In addition to pixels, users can use other units to define sizes, paddings... The available units are: px, em, rem, vh, vw. Themes can enable support for this feature with the following code:
-
-```php
-add_theme_support( 'custom-units' );
-```
+In addition to pixels, users can use other units to define sizes, paddings... The available units are: px, em, rem, vh, vw.
 
 Themes can also filter the available custom units.
 
 ```php
 add_theme_support( 'custom-units', 'rem', 'em' );
+```
+
+Custom units are available by default. However, themes can disable support for this feature with the following code:
+
+```php
+add_theme_support( 'custom-units', false );
 ```
 
 ### Disabling the default block patterns.
