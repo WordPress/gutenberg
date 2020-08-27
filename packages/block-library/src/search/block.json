@@ -14,8 +14,7 @@
 			"default": ""
 		},
 		"width": {
-			"type": "number",
-			"default": 460
+			"type": "string"
 		},
 		"buttonText": {
 			"type": "string"

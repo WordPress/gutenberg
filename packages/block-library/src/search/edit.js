@@ -19,6 +19,7 @@ import {
 	MenuItem,
 	ToolbarGroup,
 	Button,
+	ButtonGroup,
 	ToolbarButton,
 	ResizableBox,
 	PanelBody,
@@ -40,6 +41,18 @@ import {
 	toggleLabel,
 } from './icons';
 
+/**
+ * Constants
+ */
+const MIN_WIDTH = 220;
+const MIN_WIDTH_UNIT = 'px';
+const PC_WIDTH_DEFAULT = 50;
+const PX_WIDTH_DEFAULT = 350;
+const CSS_UNITS = [
+	{ value: '%', label: '%', default: PC_WIDTH_DEFAULT },
+	{ value: 'px', label: 'px', default: PX_WIDTH_DEFAULT },
+];
+
 export default function SearchEdit( {
 	className,
 	attributes,
@@ -52,13 +65,13 @@ export default function SearchEdit( {
 		showLabel,
 		placeholder,
 		width,
+		widthUnit,
 		align,
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
 	} = attributes;
 
-	const MIN_WIDTH = 220;
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 
@@ -248,13 +261,52 @@ export default function SearchEdit( {
 					>
 						<UnitControl
 							id={ unitControlInputId }
-							min={ MIN_WIDTH }
-							onChange={ ( newWidth ) =>
-								setAttributes( { width: newWidth } )
-							}
+							min={ `${ MIN_WIDTH }${ MIN_WIDTH_UNIT }` }
+							onChange={ ( newWidth ) => {
+								setAttributes( {
+									width: parseInt( newWidth, 10 ),
+								} );
+							} }
+							onUnitChange={ ( newUnit ) => {
+								setAttributes( {
+									width:
+										'%' === newUnit
+											? PC_WIDTH_DEFAULT
+											: PX_WIDTH_DEFAULT,
+									widthUnit: newUnit,
+								} );
+							} }
 							style={ { maxWidth: 80 } }
-							value={ width }
+							value={ `${ width }${ widthUnit }` }
+							unit={ widthUnit }
+							units={ CSS_UNITS }
 						/>
+
+						<ButtonGroup
+							className="wp-block-search__components-button-group"
+							aria-label={ __( 'Percentage Width' ) }
+						>
+							{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+								return (
+									<Button
+										key={ widthValue }
+										isSmall
+										isPrimary={
+											`${ widthValue }%` ===
+											`${ width }${ widthUnit }`
+										}
+										onClick={ () =>
+											setAttributes( {
+												width: widthValue,
+												widthUnit: '%',
+											} )
+										}
+									>
+										{ widthValue }%
+									</Button>
+								);
+							} ) }
+						</ButtonGroup>
 					</BaseControl>
 				</PanelBody>
 			</InspectorControls>
@@ -278,12 +330,17 @@ export default function SearchEdit( {
 
 			<ResizableBox
 				size={ {
-					width,
+					width: `${ width }${ widthUnit }`,
 				} }
 				className="wp-block-search__inside-wrapper"
+				isResetValueOnUnitChange
 				minWidth={ MIN_WIDTH }
 				enable={ getResizableSides() }
-				onResizeStart={ () => {
+				onResizeStart={ ( event, direction, elt ) => {
+					setAttributes( {
+						width: parseInt( elt.offsetWidth, 10 ),
+						widthUnit: 'px',
+					} );
 					toggleSelection( false );
 				} }
 				onResizeStop={ ( event, direction, elt, delta ) => {
