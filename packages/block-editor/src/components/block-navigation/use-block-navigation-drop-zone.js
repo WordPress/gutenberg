@@ -11,49 +11,70 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { getDistanceToNearestEdge } from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
 
-function getDropTargetBlocksData( ref, dragEventType, selectors ) {
-	if ( ! ref.current ) {
-		return;
-	}
+function useDropTargetBlocksData( ref, position, dragEventType ) {
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
 		getBlockCount,
 		getDraggedBlockClientIds,
 		canInsertBlocks,
-	} = selectors;
-
-	const isBlockDrag = dragEventType === 'default';
-
-	const draggedBlockClientIds = isBlockDrag
-		? getDraggedBlockClientIds()
-		: undefined;
-
-	const blockElements = Array.from(
-		ref.current.querySelectorAll( '[data-block]' )
-	);
-
-	return blockElements.map( ( blockElement ) => {
-		const clientId = blockElement.dataset.block;
-		const rootClientId = getBlockRootClientId( clientId );
-
+	} = useSelect( ( select ) => {
+		const {
+			canInsertBlocks: _canInsertBlocks,
+			getBlockRootClientId: _getBlockRootClientId,
+			getBlockIndex: _getBlockIndex,
+			getBlockCount: _getBlockCount,
+			getDraggedBlockClientIds: _getDraggedBlockClientIds,
+		} = select( 'core/block-editor' );
 		return {
-			clientId,
-			rootClientId,
-			blockIndex: getBlockIndex( clientId, rootClientId ),
-			element: blockElement,
-			isDraggedBlock: isBlockDrag
-				? draggedBlockClientIds.includes( clientId )
-				: false,
-			innerBlockCount: getBlockCount( clientId ),
-			canInsertDraggedBlocksAsSibling: isBlockDrag
-				? canInsertBlocks( draggedBlockClientIds, rootClientId )
-				: true,
-			canInsertDraggedBlocksAsChild: isBlockDrag
-				? canInsertBlocks( draggedBlockClientIds, clientId )
-				: true,
+			canInsertBlocks: _canInsertBlocks,
+			getBlockRootClientId: _getBlockRootClientId,
+			getBlockIndex: _getBlockIndex,
+			getBlockCount: _getBlockCount,
+			getDraggedBlockClientIds: _getDraggedBlockClientIds,
 		};
-	} );
+	}, [] );
+
+	// Compute data about blocks only when the user
+	// starts dragging, as determined by `hasPosition`.
+	const hasPosition = !! position;
+	return useMemo( () => {
+		if ( ! ref.current || ! hasPosition ) {
+			return;
+		}
+
+		const isBlockDrag = dragEventType === 'default';
+
+		const draggedBlockClientIds = isBlockDrag
+			? getDraggedBlockClientIds()
+			: undefined;
+
+		const blockElements = Array.from(
+			ref.current.querySelectorAll( '[data-block]' )
+		);
+
+		return blockElements.map( ( blockElement ) => {
+			const clientId = blockElement.dataset.block;
+			const rootClientId = getBlockRootClientId( clientId );
+
+			return {
+				clientId,
+				rootClientId,
+				blockIndex: getBlockIndex( clientId, rootClientId ),
+				element: blockElement,
+				isDraggedBlock: isBlockDrag
+					? draggedBlockClientIds.includes( clientId )
+					: false,
+				innerBlockCount: getBlockCount( clientId ),
+				canInsertDraggedBlocksAsSibling: isBlockDrag
+					? canInsertBlocks( draggedBlockClientIds, rootClientId )
+					: true,
+				canInsertDraggedBlocksAsChild: isBlockDrag
+					? canInsertBlocks( draggedBlockClientIds, clientId )
+					: true,
+			};
+		} );
+	}, [ hasPosition ] );
 }
 
 function isPointContainedByRect( point, rect ) {
@@ -172,23 +193,6 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 }
 
 export default function useBlockNavigationDropZone( ref ) {
-	const blocksDataSelectors = useSelect( ( select ) => {
-		const {
-			canInsertBlocks,
-			getBlockRootClientId,
-			getBlockIndex,
-			getBlockCount,
-			getDraggedBlockClientIds,
-		} = select( 'core/block-editor' );
-		return {
-			canInsertBlocks,
-			getBlockRootClientId,
-			getBlockIndex,
-			getBlockCount,
-			getDraggedBlockClientIds,
-		};
-	}, [] );
-
 	const [ target = {}, setTarget ] = useState();
 	const {
 		rootClientId: targetRootClientId,
@@ -206,18 +210,7 @@ export default function useBlockNavigationDropZone( ref ) {
 		...dropEventHandlers,
 	} );
 
-	const hasPosition = !! position;
-
-	// When the user starts dragging, build a list of block elements.
-	const blocksData = useMemo( () => {
-		if ( hasPosition ) {
-			return getDropTargetBlocksData(
-				ref,
-				dragEventType,
-				blocksDataSelectors
-			);
-		}
-	}, [ hasPosition ] );
+	const blocksData = useDropTargetBlocksData( ref, position, dragEventType );
 
 	// Calculate the drop target based on the drag position.
 	useEffect( () => {
