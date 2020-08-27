@@ -4,8 +4,6 @@
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalLineHeightControl as LineHeightControl,
-	FontSizePicker,
 	PanelColorSettings,
 } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
@@ -15,63 +13,26 @@ import { getBlockType } from '@wordpress/blocks';
  */
 import {
 	BACKGROUND_COLOR,
-	FONT_SIZE,
-	LINE_HEIGHT,
 	LINK_COLOR,
 	TEXT_COLOR,
-	fromPx,
-	toPx,
 } from '../editor/utils';
+import TypographyPanel from './typography-panel';
 
 export default ( { getProperty, setProperty, contexts } ) => {
 	return (
 		<>
 			{ Object.keys( contexts )
-				.map( ( context ) => {
-					const { supports, name, selector } = contexts[ context ];
+				.map( ( key ) => {
+					const { supports, name, selector } = contexts[ key ];
 					const panels = [];
 
-					if ( supports.includes( FONT_SIZE ) ) {
-						panels.push(
-							<FontSizePicker
-								value={ fromPx(
-									getProperty(
-										context,
-										'typography',
-										'fontSize'
-									)
-								) }
-								onChange={ ( value ) =>
-									setProperty(
-										context,
-										'typography',
-										'fontSize',
-										toPx( value )
-									)
-								}
-							/>
-						);
-					}
-
-					if ( supports.includes( LINE_HEIGHT ) ) {
-						panels.push(
-							<LineHeightControl
-								value={ getProperty(
-									context,
-									'typography',
-									'lineHeight'
-								) }
-								onChange={ ( value ) =>
-									setProperty(
-										context,
-										'typography',
-										'lineHeight',
-										value
-									)
-								}
-							/>
-						);
-					}
+					panels.push(
+						<TypographyPanel
+							context={ { supports, name: key } }
+							getProperty={ getProperty }
+							setProperty={ setProperty }
+						/>
+					);
 
 					const settings = [];
 					if (
@@ -79,20 +40,20 @@ export default ( { getProperty, setProperty, contexts } ) => {
 						supports.includes( BACKGROUND_COLOR )
 					) {
 						settings.push( {
-							value: getProperty( context, 'color', 'text' ),
+							value: getProperty( key, 'color', 'text' ),
 							onChange: ( value ) =>
-								setProperty( context, 'color', 'text', value ),
+								setProperty( key, 'color', 'text', value ),
 							label: __( 'Text color' ),
 						} );
 						settings.push( {
 							value: getProperty(
-								context,
+								key,
 								'color',
 								'background'
 							),
 							onChange: ( value ) =>
 								setProperty(
-									context,
+									key,
 									'color',
 									'background',
 									value
@@ -105,9 +66,9 @@ export default ( { getProperty, setProperty, contexts } ) => {
 
 					if ( supports.includes( LINK_COLOR ) ) {
 						settings.push( {
-							value: getProperty( context, 'color', 'link' ),
+							value: getProperty( key, 'color', 'link' ),
 							onChange: ( value ) =>
-								setProperty( context, 'color', 'link', value ),
+								setProperty( key, 'color', 'link', value ),
 							label: __( 'Link color' ),
 						} );
 					}

@@ -1,45 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { FontSizePicker, PanelColorSettings } from '@wordpress/block-editor';
-import { PanelBody } from '@wordpress/components';
+import { PanelColorSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import {
-	GLOBAL_CONTEXT,
-	FONT_SIZE,
-	BACKGROUND_COLOR,
-	LINK_COLOR,
-	fromPx,
-	toPx,
-} from '../editor/utils';
+import { GLOBAL_CONTEXT, BACKGROUND_COLOR, LINK_COLOR } from '../editor/utils';
+import TypographyPanel from './typography-panel';
 
 export default ( { context, getProperty, setProperty } ) => {
 	const panels = [];
 	const { supports } = context;
 
-	if ( supports.includes( FONT_SIZE ) ) {
-		panels.push(
-			<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
-				<FontSizePicker
-					value={ fromPx(
-						getProperty( GLOBAL_CONTEXT, 'typography', 'fontSize' )
-					) }
-					onChange={ ( value ) =>
-						setProperty(
-							GLOBAL_CONTEXT,
-							'typography',
-							'fontSize',
-							toPx( value )
-						)
-					}
-				/>
-			</PanelBody>
-		);
-	}
+	panels.push(
+		<TypographyPanel
+			context={ { supports, name: GLOBAL_CONTEXT } }
+			getProperty={ getProperty }
+			setProperty={ setProperty }
+		/>
+	);
 
 	const colorSettings = [];
 
@@ -70,5 +51,5 @@ export default ( { context, getProperty, setProperty } ) => {
 		);
 	}
 
-	return panels;
+	return panels.filter( Boolean );
 };
