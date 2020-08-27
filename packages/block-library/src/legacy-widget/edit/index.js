@@ -187,6 +187,7 @@ export default withSelect( ( select, { clientId } ) => {
 	const widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
 		clientId
 	);
+	const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
 	const editorSettings = select( 'core/block-editor' ).getSettings();
 	const {
 		availableLegacyWidgets,
@@ -196,5 +197,6 @@ export default withSelect( ( select, { clientId } ) => {
 		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,
 		widgetId,
+		prerenderedEditForm: widget.rendered_form,
 	};
 } )( LegacyWidgetEdit );
