@@ -3,19 +3,13 @@
  */
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	PanelColorSettings,
-} from '@wordpress/block-editor';
+import { PanelColorSettings } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import {
-	BACKGROUND_COLOR,
-	LINK_COLOR,
-	TEXT_COLOR,
-} from '../editor/utils';
+import { BACKGROUND_COLOR, LINK_COLOR, TEXT_COLOR } from '../editor/utils';
 import TypographyPanel from './typography-panel';
 
 export default ( { getProperty, setProperty, contexts } ) => {
@@ -46,11 +40,7 @@ export default ( { getProperty, setProperty, contexts } ) => {
 							label: __( 'Text color' ),
 						} );
 						settings.push( {
-							value: getProperty(
-								key,
-								'color',
-								'background'
-							),
+							value: getProperty( key, 'color', 'background' ),
 							onChange: ( value ) =>
 								setProperty(
 									key,
