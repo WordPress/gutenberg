@@ -8,7 +8,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import {
 	GLOBAL_CONTEXT,
 	FONT_SIZE,
@@ -18,12 +17,9 @@ import {
 	toPx,
 } from '../editor/utils';
 
-export default () => {
-	const { contexts, getProperty, setProperty } = useGlobalStylesContext();
-
-	const { supports } = contexts[ GLOBAL_CONTEXT ];
+export default ( { context, getProperty, setProperty } ) => {
 	const panels = [];
-	const colorSettings = [];
+	const { supports } = context;
 
 	if ( supports.includes( FONT_SIZE ) ) {
 		panels.push(
@@ -44,6 +40,8 @@ export default () => {
 			</PanelBody>
 		);
 	}
+
+	const colorSettings = [];
 
 	if ( supports.includes( BACKGROUND_COLOR ) ) {
 		colorSettings.push( {

@@ -13,11 +13,9 @@ import { getBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
 import {
 	BACKGROUND_COLOR,
 	FONT_SIZE,
-	GLOBAL_CONTEXT,
 	LINE_HEIGHT,
 	LINK_COLOR,
 	TEXT_COLOR,
@@ -25,19 +23,13 @@ import {
 	toPx,
 } from '../editor/utils';
 
-export default () => {
-	const { getProperty, setProperty, contexts } = useGlobalStylesContext();
+export default ( { getProperty, setProperty, contexts } ) => {
 	return (
 		<>
 			{ Object.keys( contexts )
 				.map( ( context ) => {
 					const { supports, name, selector } = contexts[ context ];
 					const panels = [];
-
-					/* This is shown in the global panel */
-					if ( GLOBAL_CONTEXT === name ) {
-						return null;
-					}
 
 					if ( supports.includes( FONT_SIZE ) ) {
 						panels.push(
