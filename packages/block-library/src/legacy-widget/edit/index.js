@@ -132,6 +132,18 @@ class LegacyWidgetEdit extends Component {
 						widgetName={ get( widgetObject, [ 'name' ] ) }
 						widgetClass={ attributes.widgetClass }
 						instance={ attributes.instance }
+						onFormMount={ ( formData ) => {
+							// Function-based widgets don't come with an object of settings, only
+							// with a pre-rendered HTML form. Extracting settings from that HTML
+							// before this stage is not trivial (think embedded <script>). An alternative
+							// proposed here serializes the form back into widget settings immediately after
+							// it's mounted.
+							if ( ! attributes.widgetClass ) {
+								this.props.setAttributes( {
+									instance: formData,
+								} );
+							}
+						} }
 						onInstanceChange={ ( newInstance, newHasEditForm ) => {
 							if ( newInstance ) {
 								this.props.setAttributes( {
@@ -172,12 +184,15 @@ class LegacyWidgetEdit extends Component {
 	}
 
 	renderWidgetPreview() {
-		const { attributes } = this.props;
+		const { widgetId, attributes } = this.props;
 		return (
 			<ServerSideRender
 				className="wp-block-legacy-widget__preview"
 				block="core/legacy-widget"
-				attributes={ omit( attributes, 'id' ) }
+				attributes={ {
+					id: widgetId,
+					...omit( attributes, 'id' ),
+				} }
 			/>
 		);
 	}
