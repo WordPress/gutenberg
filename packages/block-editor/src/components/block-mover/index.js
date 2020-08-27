@@ -7,7 +7,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
+
+import { dragHandle } from '@wordpress/icons';
+import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -15,6 +17,7 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 
 function BlockMover( {
@@ -47,22 +50,42 @@ function BlockMover( {
 			} ) }
 		>
 			<ToolbarGroup>
-				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
-					{ ( itemProps ) => (
-						<BlockMoverUpButton
-							clientIds={ clientIds }
-							{ ...itemProps }
+				<ToolbarGroup className="block-editor-block-mover__move-button-container">
+					<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
+						{ ( itemProps ) => (
+							<BlockMoverUpButton
+								clientIds={ clientIds }
+								{ ...itemProps }
+							/>
+						) }
+					</ToolbarItem>
+					<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
+						{ ( itemProps ) => (
+							<BlockMoverDownButton
+								clientIds={ clientIds }
+								{ ...itemProps }
+							/>
+						) }
+					</ToolbarItem>
+				</ToolbarGroup>
+				<BlockDraggable
+					clientIds={ clientIds }
+					cloneClassname="block-editor-block-mover__drag-clone"
+				>
+					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+						<Button
+							icon={ dragHandle }
+							className="block-editor-block-mover__drag-handle"
+							aria-hidden="true"
+							// Should not be able to tab to drag handle as this
+							// button can only be used with a pointer device.
+							tabIndex="-1"
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+							draggable={ isDraggable }
 						/>
 					) }
-				</ToolbarItem>
-				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
-					{ ( itemProps ) => (
-						<BlockMoverDownButton
-							clientIds={ clientIds }
-							{ ...itemProps }
-						/>
-					) }
-				</ToolbarItem>
+				</BlockDraggable>
 			</ToolbarGroup>
 		</div>
 	);

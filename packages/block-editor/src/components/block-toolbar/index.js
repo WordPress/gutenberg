@@ -20,7 +20,6 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
-import BlockDraggable from '../block-draggable';
 import { useShowMoversGestures } from './utils';
 import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
@@ -117,21 +116,10 @@ export default function BlockToolbar( {
 				) }
 			</div>
 			{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-				<BlockDraggable
+				<BlockMover
 					clientIds={ blockClientIds }
-					cloneClassname="block-editor-block-toolbar__drag-clone"
-				>
-					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
-						<div
-							className="block-editor-block-toolbar__drag-handle-area"
-							draggable={ isDraggable && ! hideDragHandle }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-						>
-							<BlockMover clientIds={ blockClientIds } />
-						</div>
-					) }
-				</BlockDraggable>
+					hideDragHandle={ ! hideDragHandle }
+				/>
 			) }
 			{ shouldShowVisualToolbar && (
 				<>

@@ -13,19 +13,20 @@
 
 // Show the mover in a single button under the contextual toolbar.
 .block-editor-block-mover {
-	.components-toolbar-group,
+	.block-editor-block-mover__move-button-container,
 	.components-toolbar {
 		flex: 1;
 
 		// Increase touch targets on mobile.
 		flex-direction: row;
+		border-right: none !important;
 
 		@include break-small() {
 			flex-direction: column;
 		}
 	}
 
-	&.is-horizontal .components-toolbar-group,
+	&.is-horizontal .block-editor-block-mover__move-button-container,
 	&.is-horizontal .components-toolbar {
 		flex-direction: row;
 	}
@@ -44,6 +45,16 @@
 				left: $grid-unit-10 !important;
 				right: $grid-unit-10 !important;
 			}
+		}
+	}
+
+	.block-editor-block-mover__drag-handle {
+		min-width: 32px !important;
+		width: 32px;
+		padding-right: 16px !important;
+
+		svg {
+			transform: rotate(90deg);
 		}
 	}
 
