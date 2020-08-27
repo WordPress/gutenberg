@@ -19,8 +19,8 @@ import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
 
 const BREAKPOINTS = {
-	medium: 480,
-	small: 375,
+	medium: 700,
+	small: 420,
 };
 
 const stretchStyle = {
