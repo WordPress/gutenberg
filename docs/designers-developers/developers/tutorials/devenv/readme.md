@@ -1,14 +1,65 @@
 # Development Environment
 
-The development environment setup guide is for setting up your local development environment for JavaScript development; creating plugins and tools for extending WordPress and the block editor.
+This guide is for setting up your local environment for JavaScript development for creating plugins and tools to extend WordPress and the block editor.
 
-A development environment is a catch-all term for the setup on your computer to work. The three main pieces needed for our development environment are:
+A development environment is a catch-all term for what you need setup on your computer to work. The three main pieces needed for our development environment are:
 
 1. Node/NPM Development Tools
 2. WordPress Development Site
 3. Code Editor
 
-## Development Tools
+## Quickstart
+
+For experienced developers, here is a summary of the guide, see each section for more details and explanations.
+
+**1. Install Node development tools**
+
+Download and install [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm)
+
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+```
+
+Quit and restart terminal
+```
+nvm install --lts
+```
+
+**2. WordPress Development Site**
+
+First download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) follows instructions on their site for your OS.
+
+- Install WordPress environment tool
+
+```
+npm -g install @wordpress/env
+```
+
+Create a minimal `.wp-env.json` file:
+
+```json
+{
+	"core": null
+}
+```
+
+You can specify various features and plugins, see documentation for full details. For this `"core": null` indicates no version specified so by default will use the latest version.
+
+ Start the environment:
+
+ ```
+ wp-env start
+ ```
+
+You will have a full WordPress site installed, navigate to: http://localhost:8888/ the defualt user is "admin" and default password is "password"
+
+
+**3. Code Editor**
+
+You can use any code editor, [Visual Studio Code](https://code.visualstudio.com/) is a popular open-source tool, follow instructions on their site for your OS.
+
+
+## Node Development Tools
 
 The tools needed for development are **Node** and **NPM**. **Nodejs** is a runtime environment that allows running JavaScript outside of the browser. NPM is the Node Package Manager, it is used for installing dependencies and running scripts. The script `npx` is also installed with Nodejs—this script is used to run packages not yet installed—we will use `npx` to bootstrap a block.
 
@@ -75,7 +126,7 @@ The WordPress [wp-env package](https://www.npmjs.com/package/@wordpress/env) let
 
 The `wp-env` package requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
-After you have installed Docker, go ahead and install `wp-env` globally from the command-line using:
+After you have installed Docker, go ahead and install the `wp-env` tool. This command will install the tool globally meaning allowing you to run it in any directory:
 
 ```sh
 npm -g install @wordpress/env
@@ -88,17 +139,28 @@ wp-env --version
 > 1.6.0
 ```
 
-The `wp-env` script is used to create a Docker WordPress environment, to use start from your plugin directory—if you are following the create block tutorial, this would be in the generated directory.
+The `wp-env` script is used to create a Docker WordPress environment. You can use this script to start an environment from your plugin directory, for example if you are following the create block tutorial, this would be in the generated directory like so:
 
 ```sh
+npx @wordpress/create-block starter-block
+cd starter-block
 wp-env start
 ```
 
 You can access your environment in your browser at: [http://localhost:8888/](http://localhost:8888/), the default username is `admin` and default password is `password`. For more information controlling the Docker environment see the [@wordpress/env package readme](/packages/env/README.md).
 
-If you are developing a single plugin, you should run `wp-env start` from that plugin working directory—it will mount and activate the plugin automatically. Note: This also works for themes, run from the directory you are developing the theme.
+When using the script while developing a single plugin, when you run `wp-env start` it will mount and activate the plugin automatically. Note: This also works for themes, run from the directory you are developing the theme.
 
-If you want a single environment for all your plugins/themes, you need to create a `.wp-env.json` in a working directory and add the plugins/themes to it. You then run `wp-env start` from the same directory as that config file. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson).
+If you want a generic environment, or working with multiple plugins and themes, you need to create a `.wp-env.json` file in a working directory. A minimal default file is:
+
+```json
+{
+	"core": null
+}
+```
+
+You can specify different WordPress versions, plugins, themes, and other configuratio for the Docker container. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson) for details.
+
 
 ### Alternative to Docker
 
@@ -119,3 +181,4 @@ The important part is having a WordPress site installed, and know where and how 
 Alternative editors include [Sublime Text](https://www.sublimetext.com/) that is also available across platforms, though is a commercial product; or other free alternatives include [Vim](https://www.vim.org/), [Atom](https://atom.io/), and [Notepad++](https://notepad-plus-plus.org/) all support standard JavaScript style development.
 
 You can use any editor you're comfortable with, it is more a personal preference. The development setup for WordPress block editor is a common JavaScript environment and most editors have plugins and suppport. The key is having a way to open, edit, and save text files.
+
