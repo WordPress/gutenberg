@@ -1,18 +1,15 @@
 $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handles inside, that leaves 12px padding, half of which is 6.
 
-.components-custom-gradient-picker {
-	margin-top: $grid-unit-10;
-}
-
 .components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
 	opacity: 0.4;
 }
 
 .components-custom-gradient-picker__gradient-bar {
+	margin-top: $grid-unit-15;
 	width: 100%;
 	height: $button-size;
 	border-radius: $button-size;
-	margin-bottom: $grid-unit-10;
+	margin-bottom: $grid-unit-15;
 	padding-left: $components-custom-gradient-picker__padding;
 	padding-right: $button-size - $components-custom-gradient-picker__padding;
 
@@ -75,6 +72,8 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 }
 
 .components-custom-gradient-picker .components-custom-gradient-picker__ui-line {
+	margin-bottom: $grid-unit-20;
+
 	.components-base-control.components-angle-picker,
 	.components-base-control.components-custom-gradient-picker__type-picker {
 		margin-bottom: 0;
