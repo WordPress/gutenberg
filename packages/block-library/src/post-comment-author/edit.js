@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
-// TODO: JSDOC types
 export default function Edit( { attributes, context } ) {
 	const { className } = attributes;
 	const { commentId } = context;
