@@ -201,18 +201,20 @@ function gutenberg_register_widgets() {
 	if ( 'widgets.php' === $pagenow ) {
 		add_filter(
 			'dynamic_sidebar_params',
-			function ( $arg ) {
-				if ( 'Block' === $arg[0]['widget_name'] ) {
-					$arg[0]['before_form']           = '';
-					$arg[0]['before_widget_content'] = '<div class="widget-content">';
-					$arg[0]['after_widget_content']  = '</div><form class="block-widget-form">';
-					$arg[0]['after_form']            = '</form>';
-				}
-
-				return $arg;
-			}
+			'gutenberg_override_sidebar_params_for_block_widget'
 		);
 	}
+}
+
+function gutenberg_override_sidebar_params_for_block_widget( $arg ) {
+	if ( 'Block' === $arg[0]['widget_name'] ) {
+		$arg[0]['before_form']           = '';
+		$arg[0]['before_widget_content'] = '<div class="widget-content">';
+		$arg[0]['after_widget_content']  = '</div><form class="block-widget-form">';
+		$arg[0]['after_form']            = '</form>';
+	}
+
+	return $arg;
 }
 
 add_action( 'widgets_init', 'gutenberg_register_widgets' );
