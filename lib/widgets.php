@@ -26,6 +26,25 @@ function gutenberg_is_block_editor() {
 }
 
 /**
+ * Whether or not to use the block editor to manage widgets. Defaults to true
+ * unless a theme has removed support for widgets-block-editor or a plugin has
+ * filtered the return value of this function.
+ *
+ * @return boolean Whether or not to use the block editor to manage widgets.
+ */
+function gutenberg_use_widgets_block_editor() {
+	/**
+	 * Filters whether or not to use the block editor to manage widgets.
+	 *
+	 * @param boolean $use_widgets_block_editor Whether or not to use the block editor to manage widgets.
+	 */
+	return apply_filters(
+		'gutenberg_use_widgets_block_editor',
+		get_theme_support( 'widgets-block-editor' )
+	);
+}
+
+/**
  * Emulates the Widgets screen `admin_print_styles` when at the block editor
  * screen.
  */
@@ -283,7 +302,7 @@ function gutenberg_override_sidebar_params_for_block_widget( $arg ) {
  * Registers the WP_Widget_Block widget
  */
 function gutenberg_register_widgets() {
-	if ( ! get_theme_support( 'gutenberg-widget-experiments' ) ) {
+	if ( ! gutenberg_use_widgets_block_editor() ) {
 		return;
 	}
 
