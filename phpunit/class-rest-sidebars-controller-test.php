@@ -543,7 +543,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_set_current_user( self::$superadmin_id );
 		if ( is_multisite() ) {
 			$this->assertEquals(
-				'<div class="textwidget"><script>alert(1)</script></div>',
+				'<div class="textwidget">alert(1)</div>',
 				$this->update_text_widget_with_raw_html( '<script>alert(1)</script>' )
 			);
 		} else {
