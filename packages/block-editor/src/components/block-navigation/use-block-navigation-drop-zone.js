@@ -62,19 +62,13 @@ function useDropTargetBlocksData( ref, position, dragEventType ) {
 		getDraggedBlockClientIds,
 		canInsertBlocks,
 	} = useSelect( ( select ) => {
-		const {
-			canInsertBlocks: _canInsertBlocks,
-			getBlockRootClientId: _getBlockRootClientId,
-			getBlockIndex: _getBlockIndex,
-			getBlockCount: _getBlockCount,
-			getDraggedBlockClientIds: _getDraggedBlockClientIds,
-		} = select( 'core/block-editor' );
+		const selectors = select( 'core/block-editor' );
 		return {
-			canInsertBlocks: _canInsertBlocks,
-			getBlockRootClientId: _getBlockRootClientId,
-			getBlockIndex: _getBlockIndex,
-			getBlockCount: _getBlockCount,
-			getDraggedBlockClientIds: _getDraggedBlockClientIds,
+			canInsertBlocks: selectors.canInsertBlocks,
+			getBlockRootClientId: selectors.getBlockRootClientId,
+			getBlockIndex: selectors.getBlockIndex,
+			getBlockCount: selectors.getBlockCount,
+			getDraggedBlockClientIds: selectors.getDraggedBlockClientIds,
 		};
 	}, [] );
 
