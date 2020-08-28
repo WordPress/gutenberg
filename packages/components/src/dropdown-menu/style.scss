@@ -63,7 +63,7 @@
 	}
 
 	.components-menu-group {
-		padding: $grid-unit-15 $grid-unit-10;
+		padding: $grid-unit-15;
 		margin-top: 0;
 		margin-bottom: 0;
 		margin-left: -$grid-unit-15;
@@ -81,7 +81,7 @@
 	.components-menu-group + .components-menu-group {
 		margin-top: 0;
 		border-top: $border-width solid $gray-400;
-		padding: $grid-unit-15 $grid-unit-10;
+		padding: $grid-unit-15;
 
 		.is-alternate & {
 			border-color: $gray-900;
