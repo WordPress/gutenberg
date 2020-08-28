@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { pick, get, map, filter } from 'lodash';
+import { map, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,6 +57,11 @@ const applyWidthConstraints = ( width ) =>
 
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
+
+function getImageSourceUrlBySizeSlug( image, slug ) {
+	// eslint-disable-next-line camelcase
+	return image?.media_details?.sizes?.[ slug ]?.source_url;
+}
 
 function attributesFromMedia( {
 	attributes: { linkDestination, href },
@@ -192,23 +197,18 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		setAttributes( { verticalAlignment: alignment } );
 	};
 
-	const { imageSizes } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return pick( getSettings(), [ 'imageSizes' ] );
+	const imageSizes = useSelect( ( select ) => {
+		const settings = select( 'core/block-editor' ).getSettings();
+		return settings?.imageSizes;
 	} );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
-			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
+			getImageSourceUrlBySizeSlug( image, slug )
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
 	const updateImage = ( newMediaSizeSlug ) => {
-		const newUrl = get( image, [
-			'media_details',
-			'sizes',
-			newMediaSizeSlug,
-			'source_url',
-		] );
+		const newUrl = getImageSourceUrlBySizeSlug( image, newMediaSizeSlug );
 
 		if ( ! newUrl ) {
 			return null;
