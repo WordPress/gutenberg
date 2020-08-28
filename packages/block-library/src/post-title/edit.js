@@ -20,7 +20,11 @@ import { __ } from '@wordpress/i18n';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
-function PostTitleEditor( { attributes, setAttributes, context } ) {
+export default function PostTitleEdit( {
+	attributes,
+	setAttributes,
+	context,
+} ) {
 	const { level, textAlign } = attributes;
 	const { postType, postId } = context;
 	const tagName = 0 === level ? 'p' : 'h' + level;
@@ -67,22 +71,5 @@ function PostTitleEditor( { attributes, setAttributes, context } ) {
 				{ post.title || __( 'Post Title' ) }
 			</BlockWrapper>
 		</>
-	);
-}
-
-export default function PostTitleEdit( {
-	attributes,
-	setAttributes,
-	context,
-} ) {
-	if ( ! context.postType || context.postType === 'wp_template' ) {
-		return <p>{ __( 'This is a placeholder for post title.' ) }</p>;
-	}
-	return (
-		<PostTitleEditor
-			attributes={ attributes }
-			setAttributes={ setAttributes }
-			context={ context }
-		/>
 	);
 }
