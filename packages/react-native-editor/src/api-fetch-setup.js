@@ -2,16 +2,11 @@
  * WordPress dependencies
  */
 import { fetchRequest } from '@wordpress/react-native-bridge';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 
 const SUPPORTED_ENDPOINTS = [
 	/wp\/v2\/(media|categories)\/?\d*?.*/i,
 	/wp\/v2\/search\?.*/i,
-	/wpcom\/v2\/gutenberg\/.*/i,
 ];
 
 const setTimeoutPromise = ( delay ) =>

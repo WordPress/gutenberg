@@ -600,7 +600,15 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 		empty( $config['global']['features'] ) ||
 		! is_array( $config['global']['features'] )
 	) {
-		return array();
+		$config['global']['features'] = array();
+	}
+
+	// Deprecated theme supports.
+	if ( get_theme_support( 'disable-custom-colors' ) ) {
+		if ( ! isset( $config['global']['features']['colors'] ) ) {
+			$config['global']['features']['colors'] = array();
+		}
+		$config['global']['features']['colors']['custom'] = false;
 	}
 
 	return $config['global']['features'];
@@ -633,6 +641,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$settings['styles'][] = array( 'css' => $stylesheet );
 
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
+	// Unsetting deprecated settings defined by Core.
+	unset( $settings['disableCustomColors'] );
 
 	return $settings;
 }
