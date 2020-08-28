@@ -3,7 +3,7 @@
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,6 +12,7 @@ import { getDistanceToNearestEdge } from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 /**
  * The type of a drag event.
@@ -52,7 +53,7 @@ import useOnBlockDrop from '../use-on-block-drop';
  * @param {WPPoint}         position      The current drag position.
  * @param {WPDragEventType} dragEventType The drag event type.
  *
- * @return {WPBlockNavigationDropZoneBlocks} An array representing data for each block in the block navigation DOM.
+ * @return {RefObject<WPBlockNavigationDropZoneBlocks>} A React ref containing the blocks data.
  */
 function useDropTargetBlocksData( ref, position, dragEventType ) {
 	const {
@@ -71,11 +72,13 @@ function useDropTargetBlocksData( ref, position, dragEventType ) {
 			getDraggedBlockClientIds: selectors.getDraggedBlockClientIds,
 		};
 	}, [] );
+	const blocksData = useRef();
 
 	// Compute data about blocks only when the user
 	// starts dragging, as determined by `hasPosition`.
 	const hasPosition = !! position;
-	return useMemo( () => {
+
+	useEffect( () => {
 		if ( ! ref.current || ! hasPosition ) {
 			return;
 		}
@@ -90,7 +93,7 @@ function useDropTargetBlocksData( ref, position, dragEventType ) {
 			ref.current.querySelectorAll( '[data-block]' )
 		);
 
-		return blockElements.map( ( blockElement ) => {
+		blocksData.current = blockElements.map( ( blockElement ) => {
 			const clientId = blockElement.dataset.block;
 			const rootClientId = getBlockRootClientId( clientId );
 
@@ -112,6 +115,8 @@ function useDropTargetBlocksData( ref, position, dragEventType ) {
 			};
 		} );
 	}, [ hasPosition ] );
+
+	return blocksData;
 }
 
 /**
@@ -286,7 +291,7 @@ export default function useBlockNavigationDropZone( ref ) {
 	useEffect( () => {
 		if ( position ) {
 			const newTarget = getBlockNavigationDropTarget(
-				blocksData,
+				blocksData.current,
 				position
 			);
 
