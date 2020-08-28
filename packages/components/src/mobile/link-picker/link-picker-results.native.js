@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import styles from './styles';
+import styles from './styles.scss';
 
 const PER_PAGE = 20;
 const REQUEST_DEBOUNCE_DELAY = 400;

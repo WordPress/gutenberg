@@ -20,7 +20,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import LinkPickerResults from './link-picker-results';
 import NavigationHeader from '../bottom-sheet/navigation-header';
-import styles from './styles';
+import styles from './styles.scss';
 
 // this creates a search suggestion for adding a url directly
 export const createDirectEntry = ( value ) => {
