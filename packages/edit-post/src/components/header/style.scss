@@ -130,7 +130,6 @@
 		// ... and display labels.
 		&::after {
 			content: attr(aria-label);
-			// margin: 0 0.5em;
 		}
 		&[aria-disabled="true"] {
 			background-color: transparent;
@@ -219,4 +218,3 @@
 		}
 	}
 }
-
