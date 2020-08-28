@@ -211,15 +211,16 @@ export const getBlocks = createSelector(
 );
 
 /**
- * Same as getBlock, except it will include controlled inner blocks which would
- * normally be excluded.
+ * Similar to getBlock, except it will include the entire nested block tree as
+ * inner blocks. The normal getBlock selector will exclude sections of the block
+ * tree which belong to different entities.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Client ID of the block to get.
  *
- * @return {Object} The block.
+ * @return {Object} The block with all
  */
-export const __unstableGetBlockWithControlledInnerBlocks = createSelector(
+export const __unstableGetBlockWithBlockTree = createSelector(
 	( state, clientId ) => {
 		const block = state.blocks.byClientId[ clientId ];
 		if ( ! block ) {
@@ -229,28 +230,26 @@ export const __unstableGetBlockWithControlledInnerBlocks = createSelector(
 		return {
 			...block,
 			attributes: getBlockAttributes( state, clientId ),
-			innerBlocks: __unstableGetBlocksWithControlledInnerBlocks(
-				state,
-				clientId
-			),
+			innerBlocks: __unstableGetBlockTree( state, clientId ),
 		};
 	},
 	( state, clientId ) => [ state.blocks.cache[ clientId ] ]
 );
 
 /**
- * Same as getBlocks, except it will include controlled inner blocks which would
- * normally be excluded.
+ * Similar to getBlocks, except this selector returns the entire block tree
+ * represented in the block-editor store from the given root regardless of any
+ * inner block controllers.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Post blocks.
  */
-export const __unstableGetBlocksWithControlledInnerBlocks = createSelector(
-	( state, rootClientId ) =>
+export const __unstableGetBlockTree = createSelector(
+	( state, rootClientId = '' ) =>
 		map( getBlockOrder( state, rootClientId ), ( clientId ) =>
-			__unstableGetBlockWithControlledInnerBlocks( state, clientId )
+			__unstableGetBlockWithBlockTree( state, clientId )
 		),
 	( state ) => [
 		state.blocks.byClientId,
