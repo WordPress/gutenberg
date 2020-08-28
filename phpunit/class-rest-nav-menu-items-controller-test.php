@@ -210,7 +210,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 
 		$response = rest_get_server()->dispatch( $request );
 
-		if ( ! MULTISITE ) {
+		if ( ! is_multisite() ) {
 			// Check that title.raw is the unescaped title and that
 			// title.rendered has been run through the_title.
 			$this->assertEquals(
