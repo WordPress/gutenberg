@@ -14,15 +14,10 @@ export default function Edit( { attributes, context } ) {
 		const comment = getEntityRecord( 'root', 'comment', commentId );
 		if ( comment && ! comment.authorName ) {
 			const user = getEntityRecord( 'root', 'user', comment.author );
-
-			if ( ! user || ! user.name ) {
-				return __( 'Anonymous' );
-			}
-
-			return user.name;
+			return user?.name ?? __( 'Anonymous' );
 		}
 
-		return comment ? comment.authorName : '';
+		return comment?.authorName ?? '';
 	} );
 
 	return <p className={ className }>{ displayName }</p>;
