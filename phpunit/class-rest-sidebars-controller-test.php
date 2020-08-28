@@ -30,6 +30,11 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
 	 */
+	protected static $admin_id_without_unfiltered_html;
+
+	/**
+	 * @var int
+	 */
 	protected static $editor_id;
 
 	/**
@@ -62,11 +67,17 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		if ( is_multisite() ) {
 			update_site_option( 'site_admins', array( 'superadmin' ) );
 		}
-		self::$admin_id      = $factory->user->create(
+		self::$admin_id                         = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
 		);
+		self::$admin_id_without_unfiltered_html = $factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		get_user_by( 'id', self::$admin_id_without_unfiltered_html )->remove_cap( 'unfiltered_html' );
 		self::$editor_id     = $factory->user->create(
 			array(
 				'role' => 'editor',
@@ -534,6 +545,11 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		} else {
 			$this->assertEquals(
 				'<div class="textwidget"><script>alert(1)</script></div>',
+				$this->update_text_widget_with_raw_html( '<script>alert(1)</script>' )
+			);
+			wp_set_current_user( self::$admin_id_without_unfiltered_html );
+			$this->assertEquals(
+				'<div class="textwidget">alert(1)</div>',
 				$this->update_text_widget_with_raw_html( '<script>alert(1)</script>' )
 			);
 		}
