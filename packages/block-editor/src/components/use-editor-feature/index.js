@@ -13,6 +13,13 @@ import { useSelect } from '@wordpress/data';
  */
 import { useBlockEditContext } from '../block-edit';
 
+const deprecatedFlags = {
+	'colors.custom': ( settings ) =>
+		settings.disableCustomColors === undefined
+			? undefined
+			: ! settings.disableCustomColors,
+};
+
 /**
  * Hook that retrieves the setting for the given editor feature.
  * It works with nested objects using by finding the value at path.
@@ -28,22 +35,23 @@ import { useBlockEditContext } from '../block-edit';
  */
 export default function useEditorFeature( featurePath ) {
 	const { name: blockName } = useBlockEditContext();
-	const path = `__experimentalFeatures.${ featurePath }`;
 
 	const setting = useSelect(
 		( select ) => {
-			const { getBlockSupport } = select( 'core/blocks' );
-
-			const blockSupportValue = getBlockSupport( blockName, path );
-			if ( blockSupportValue !== undefined ) {
-				return blockSupportValue;
-			}
-
+			const path = `__experimentalFeatures.${ featurePath }`;
 			const { getSettings } = select( 'core/block-editor' );
+			const settings = getSettings();
 
-			return get( getSettings(), path );
+			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
+				? deprecatedFlags[ featurePath ]( settings )
+				: undefined;
+
+			if ( deprecatedSettingsValue !== undefined ) {
+				return deprecatedSettingsValue;
+			}
+			return get( settings, path );
 		},
-		[ blockName, path ]
+		[ blockName, featurePath ]
 	);
 
 	return setting;
