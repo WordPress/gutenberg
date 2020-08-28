@@ -9,7 +9,7 @@ import { get, omit } from 'lodash';
 import { Component } from '@wordpress/element';
 import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { update } from '@wordpress/icons';
@@ -40,6 +40,7 @@ class LegacyWidgetEdit extends Component {
 			isSelected,
 			prerenderedEditForm,
 			setAttributes,
+			setWidgetId,
 			widgetId,
 		} = this.props;
 		const { isPreview, hasEditForm } = this.state;
@@ -60,9 +61,11 @@ class LegacyWidgetEdit extends Component {
 							isReferenceWidget,
 							id_base: idBase,
 						} = availableLegacyWidgets[ newWidget ];
+						if ( isReferenceWidget ) {
+							setWidgetId( newWidget );
+						}
 						setAttributes( {
 							instance: {},
-							id: isReferenceWidget ? newWidget : undefined,
 							idBase,
 							widgetClass: isReferenceWidget
 								? undefined
@@ -190,7 +193,7 @@ class LegacyWidgetEdit extends Component {
 				className="wp-block-legacy-widget__preview"
 				block="core/legacy-widget"
 				attributes={ {
-					id: widgetId,
+					widgetId,
 					...omit( attributes, 'id' ),
 				} }
 			/>
@@ -212,6 +215,17 @@ export default withSelect( ( select, { clientId } ) => {
 		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,
 		widgetId,
-		prerenderedEditForm: widget.rendered_form,
+		prerenderedEditForm: widget ? widget.rendered_form : '',
 	};
-} )( LegacyWidgetEdit );
+} )(
+	withDispatch( ( dispatch, { clientId } ) => {
+		return {
+			setWidgetId( id ) {
+				dispatch( 'core/edit-widgets' ).setWidgetIdForClientId(
+					clientId,
+					id
+				);
+			},
+		};
+	} )( LegacyWidgetEdit )
+);

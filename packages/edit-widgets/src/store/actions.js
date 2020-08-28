@@ -109,3 +109,11 @@ export function* saveWidgetAreas( widgetAreas ) {
 		buildWidgetAreasQuery()
 	);
 }
+
+export function setWidgetIdForClientId( clientId, widgetId ) {
+	return {
+		type: 'SET_WIDGET_ID_FOR_CLIENT_ID',
+		clientId,
+		widgetId,
+	};
+}
