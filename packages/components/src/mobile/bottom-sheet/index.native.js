@@ -409,11 +409,15 @@ class BottomSheet extends Component {
 								? safeAreaTopInset
 								: 0,
 						flex: isFullScreen ? 1 : undefined,
+						paddingTop:
+							Platform.OS === 'android' && isFullScreen ? 8 : 0,
 						...style,
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
-					<View style={ styles.dragIndicator } />
+					{ ! ( Platform.OS === 'android' && isFullScreen ) && (
+						<View style={ styles.dragIndicator } />
+					) }
 					{ ! hideHeader && getHeader() }
 					<WrapperView
 						{ ...( isChildrenScrollable
