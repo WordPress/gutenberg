@@ -210,13 +210,29 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertEquals(
-			array(
-				'rendered' => '<strong>Foo</strong> &#038; bar',
-				'raw'      => '<strong>Foo</strong> & bar',
-			),
-			$response->get_data()['title']
-		);
+		if ( ! MULTISITE ) {
+			// Check that title.raw is the unescaped title and that
+			// title.rendered has been run through the_title.
+			$this->assertEquals(
+				array(
+					'rendered' => '<strong>Foo</strong> &#038; bar',
+					'raw'      => '<strong>Foo</strong> & bar',
+				),
+				$response->get_data()['title']
+			);
+		} else {
+			// In a multisite, administrators do not have unfiltered_html and
+			// post_title is ran through wp_kses before being saved in the
+			// database. Running the title through the_title does nothing in
+			// this case.
+			$this->assertEquals(
+				array(
+					'rendered' => '<strong>Foo</strong> &amp; bar',
+					'raw'      => '<strong>Foo</strong> &amp; bar',
+				),
+				$response->get_data()['title']
+			);
+		}
 
 		wp_delete_post( $menu_item_id );
 	}
