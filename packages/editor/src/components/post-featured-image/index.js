@@ -51,7 +51,7 @@ function PostFeaturedImage( {
 		</p>
 	);
 
-	let mediaWidth, mediaHeight, mediaSourceUrl, buttonDescribedBy;
+	let mediaWidth, mediaHeight, mediaSourceUrl;
 	if ( media ) {
 		const mediaSize = applyFilters(
 			'editor.PostFeaturedImage.imageSize',
@@ -89,26 +89,33 @@ function PostFeaturedImage( {
 				mediaSourceUrl = media.source_url;
 			}
 		}
-		buttonDescribedBy = sprintf(
-			// Translators: %s: The selected image slug.
-			__(
-				'The current image has no alternative text. The file name is: %s'
-			),
-			media.slug
-		);
-		if ( media.alt_text ) {
-			buttonDescribedBy = sprintf(
-				// Translators: %s: The selected image alt text.
-				__( 'Current image: %s' ),
-				media.alt_text
-			);
-		}
 	}
 
 	return (
 		<PostFeaturedImageCheck>
 			{ noticeUI }
 			<div className="editor-post-featured-image">
+				{ media && (
+					<div
+						id={ `editor-post-featured-image-${ featuredImageId }-describedby` }
+						className={ 'hidden' }
+					>
+						{ media.alt_text &&
+							sprintf(
+								// Translators: %s: The selected image alt text.
+								__( 'Current image: %s' ),
+								media.alt_text
+							) }
+						{ ! media.alt_text &&
+							sprintf(
+								// Translators: %s: The selected image slug.
+								__(
+									'The current image has no alternative text. The file name is: %s'
+								),
+								media.slug
+							) }
+					</div>
+				) }
 				<MediaUploadCheck fallback={ instructions }>
 					<MediaUpload
 						title={
@@ -140,7 +147,7 @@ function PostFeaturedImage( {
 									aria-describedby={
 										! featuredImageId
 											? null
-											: buttonDescribedBy
+											: `editor-post-featured-image-${ featuredImageId }-describedby`
 									}
 								>
 									{ !! featuredImageId && media && (
