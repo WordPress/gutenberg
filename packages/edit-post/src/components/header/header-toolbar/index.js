@@ -180,11 +180,11 @@ function HeaderToolbar() {
 									choices={ [
 										{
 											value: 'edit',
-											label: <>{ __( 'Edit' ) }</>,
+											label: __( 'Edit' ),
 										},
 										{
 											value: 'select',
-											label: <>{ __( 'Select' ) }</>,
+											label: __( 'Select' ),
 										},
 									] }
 								/>

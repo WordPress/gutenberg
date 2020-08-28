@@ -174,9 +174,13 @@
 	}
 	.components-dropdown-menu__toggle {
 		margin-left: $grid-unit;
+		padding-left: $grid-unit;
+		padding-right: $grid-unit;
 
 		@include break-small {
 			margin-left: $grid-unit-15;
+			padding-left: $grid-unit-15;
+			padding-right: $grid-unit-15;
 		}
 	}
 	// The inserter has a custom label, different from its aria-label, so we don't want to display both.
@@ -199,6 +203,7 @@
 }
 
 .edit-post-header__dropdown {
+	.components-menu-item__button.components-menu-item__button,
 	.components-button.editor-history__undo,
 	.components-button.editor-history__redo,
 	.table-of-contents .components-button,
