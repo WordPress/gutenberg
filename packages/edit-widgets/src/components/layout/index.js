@@ -83,6 +83,8 @@ function Layout( { blockEditorSettings } ) {
 								</div>
 								<div className="edit-widgets-layout__inserter-panel-content">
 									<Library
+										// eslint-disable-next-line jsx-a11y/no-autofocus
+										autoFocus={ false }
 										rootClientId={ rootClientId }
 										showMostUsedBlocks={ false }
 										showInserterHelpPanel

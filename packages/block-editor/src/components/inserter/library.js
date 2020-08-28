@@ -21,6 +21,7 @@ function InserterLibrary( {
 	showMostUsedBlocks = false,
 	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 	onSelect = noop,
+	autoFocus,
 } ) {
 	const destinationRootClientId = useSelect(
 		( select ) => {
@@ -35,6 +36,8 @@ function InserterLibrary( {
 
 	return (
 		<InserterMenu
+			// eslint-disable-next-line jsx-a11y/no-autofocus
+			autoFocus={ autoFocus }
 			onSelect={ onSelect }
 			rootClientId={ destinationRootClientId }
 			clientId={ clientId }

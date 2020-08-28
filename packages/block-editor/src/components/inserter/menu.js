@@ -29,6 +29,7 @@ function InserterMenu( {
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
+	autoFocus,
 } ) {
 	const [ activeTab, setActiveTab ] = useState( 'blocks' );
 	const [ filterValue, setFilterValue ] = useState( '' );
@@ -147,6 +148,7 @@ function InserterMenu( {
 						} }
 						value={ filterValue }
 						placeholder={ searchFormPlaceholder() }
+						autoFocus={ autoFocus }
 					/>
 					{ ( showPatterns || hasReusableBlocks ) && (
 						<InserterTabs

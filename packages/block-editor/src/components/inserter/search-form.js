@@ -12,7 +12,13 @@ import { VisuallyHidden, Button } from '@wordpress/components';
 import { Icon, search, closeSmall } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
-function InserterSearchForm( { className, onChange, value, placeholder } ) {
+function InserterSearchForm( {
+	className,
+	onChange,
+	value,
+	placeholder,
+	autoFocus = true,
+} ) {
 	const instanceId = useInstanceId( InserterSearchForm );
 	const searchInput = useRef();
 
@@ -39,7 +45,7 @@ function InserterSearchForm( { className, onChange, value, placeholder } ) {
 				id={ `block-editor-inserter__search-${ instanceId }` }
 				type="search"
 				placeholder={ placeholder }
-				autoFocus
+				autoFocus={ autoFocus }
 				onChange={ ( event ) => onChange( event.target.value ) }
 				autoComplete="off"
 				value={ value || '' }
