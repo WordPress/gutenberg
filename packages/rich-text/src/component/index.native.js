@@ -83,7 +83,7 @@ export class RichText extends Component {
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
 		this.restoreParagraphTags = this.restoreParagraphTags.bind( this );
-		this.onChange = this.onChange.bind( this );
+		this.onChangeFromAztec = this.onChangeFromAztec.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
@@ -149,7 +149,6 @@ export class RichText extends Component {
 	 */
 	createRecord() {
 		const { preserveWhiteSpace } = this.props;
-
 		const value = {
 			start: this.selectionStart,
 			end: this.selectionEnd,
@@ -247,7 +246,6 @@ export class RichText extends Component {
 				result = this.removeTag( element, result );
 			} );
 		}
-
 		return result;
 	}
 
@@ -269,7 +267,7 @@ export class RichText extends Component {
 	/*
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
-	onChange( event ) {
+	onChangeFromAztec( event ) {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -871,7 +869,7 @@ export class RichText extends Component {
 						defaultPlaceholderTextColor
 					}
 					deleteEnter={ this.props.deleteEnter }
-					onChange={ this.onChange }
+					onChange={ this.onChangeFromAztec }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
