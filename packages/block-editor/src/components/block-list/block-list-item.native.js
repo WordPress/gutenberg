@@ -186,7 +186,6 @@ export default compose( [
 				hasParents,
 				blockAlignment: align,
 				parentBlockAlignment,
-				numberOfParents: parents.length,
 			};
 		}
 	),
