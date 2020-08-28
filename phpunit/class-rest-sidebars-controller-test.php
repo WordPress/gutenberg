@@ -53,7 +53,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$superadmin_id  = $factory->user->create(
+		self::$superadmin_id = $factory->user->create(
 			array(
 				'role'       => 'administrator',
 				'user_login' => 'superadmin',
@@ -567,7 +567,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array(
 				'name' => 'Test sidebar',
 			),
-			array( 'text-1', )
+			array( 'text-1' )
 		);
 
 		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
@@ -589,7 +589,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 		return $data['widgets'][0]['rendered'];
 	}
 
