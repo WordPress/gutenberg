@@ -83,6 +83,50 @@ Navigation supports the following props.
 
 An array of config objects for each menu item.
 
+Config objects can be represented
+
+#### `config.title`
+
+-   Type: `string`
+-   Required: Yes
+
+A menu item's title.
+
+#### `config.id`
+
+-   Type: `string|Number`
+-   Required: Yes
+
+A menu item's id.
+
+#### `config.parent`
+
+-   Type: `string|Number`
+-   Required: No
+
+Specify a menu item's parent id.
+
+#### `config.href`
+
+-   Type: `string`
+-   Required: No
+
+Turn a menu item into a link by supplying a url.
+
+#### `config.linkProps`
+
+-   Type: `object`
+-   Required: No
+
+Supply an properties passed to the menu-item.
+
+#### `config.LinkComponent`
+
+-   Type: `Node`
+-   Required: No
+
+Supply a React component to render as the menu item. This is useful for router link components for internal navigation.
+
 ### `activeItemId`
 
 -   Type: `string`
