@@ -8,7 +8,7 @@ import { link, Icon, chevronRight } from '@wordpress/icons';
  * Internal dependencies
  */
 import Cell from './cell';
-import styles from './styles';
+import styles from './styles.scss';
 
 const { placeholderColor } = styles;
 
