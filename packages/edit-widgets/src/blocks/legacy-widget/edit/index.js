@@ -44,12 +44,13 @@ class LegacyWidgetEdit extends Component {
 			widgetId,
 		} = this.props;
 		const { isPreview, hasEditForm } = this.state;
-		const { widgetClass } = attributes;
+		const { widgetClass, referenceWidgetName } = attributes;
 		const widgetObject =
 			( widgetId && availableLegacyWidgets[ widgetId ] ) ||
-			( widgetClass && availableLegacyWidgets[ widgetClass ] );
-
-		if ( ! widgetId && ! widgetClass ) {
+			( widgetClass && availableLegacyWidgets[ widgetClass ] ) ||
+			( referenceWidgetName &&
+				availableLegacyWidgets[ referenceWidgetName ] );
+		if ( ! widgetObject ) {
 			return (
 				<LegacyWidgetPlaceholder
 					availableLegacyWidgets={ availableLegacyWidgets }
@@ -67,6 +68,9 @@ class LegacyWidgetEdit extends Component {
 						setAttributes( {
 							instance: {},
 							idBase,
+							referenceWidgetName: isReferenceWidget
+								? newWidget
+								: undefined,
 							widgetClass: isReferenceWidget
 								? undefined
 								: newWidget,
@@ -128,8 +132,10 @@ class LegacyWidgetEdit extends Component {
 					<LegacyWidgetEditHandler
 						isSelected={ isSelected }
 						isVisible={ ! isPreview }
-						id={ widgetId }
-						idBase={ attributes.idBase || widgetId }
+						id={ widgetId || referenceWidgetName }
+						idBase={
+							attributes.idBase || widgetId || referenceWidgetName
+						}
 						number={ attributes.number }
 						prerenderedEditForm={ prerenderedEditForm }
 						widgetName={ get( widgetObject, [ 'name' ] ) }
@@ -193,7 +199,7 @@ class LegacyWidgetEdit extends Component {
 				className="wp-block-legacy-widget__preview"
 				block="core/legacy-widget"
 				attributes={ {
-					widgetId,
+					widgetId: widgetId || attributes.referenceWidgetName,
 					...omit( attributes, 'id' ),
 				} }
 			/>

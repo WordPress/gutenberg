@@ -8,6 +8,9 @@
 		"widgetId": {
 			"type": "string"
 		},
+		"referenceWidgetName": {
+			"type": "string"
+		},
 		"idBase": {
 			"type": "string"
 		},

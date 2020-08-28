@@ -137,11 +137,11 @@ function gutenberg_get_legacy_widget_settings() {
 	$widgets_to_exclude_from_legacy_widget_block = apply_filters(
 		'widgets_to_exclude_from_legacy_widget_block',
 		array(
-			'WP_Widget_Block',
-			'WP_Widget_Pages',
-			'WP_Widget_Calendar',
-			'WP_Widget_Archives',
-			'WP_Widget_Media_Audio',
+//			'WP_Widget_Block',
+//			'WP_Widget_Pages',
+//			'WP_Widget_Calendar',
+//			'WP_Widget_Archives',
+//			'WP_Widget_Media_Audio',
 			'WP_Widget_Media_Image',
 			'WP_Widget_Media_Gallery',
 			'WP_Widget_Media_Video',
@@ -323,3 +323,43 @@ function gutenberg_register_widgets() {
 }
 
 add_action( 'widgets_init', 'gutenberg_register_widgets' );
+
+function marquee_greeting_init() {
+	wp_register_sidebar_widget(
+		'marquee_greeting',
+		'Marquee Greeting',
+		function() {
+			$greeting = get_option( 'marquee_greeting', 'Hello!' );
+			printf( '<marquee>%s</marquee>', esc_html( $greeting ) );
+		}
+	);
+
+	wp_register_widget_control(
+		'marquee_greeting',
+		'Marquee Greeting',
+		function() {
+			if ( isset( $_POST['marquee-greeting'] ) ) {
+				update_option(
+					'marquee_greeting',
+					sanitize_text_field( $_POST['marquee-greeting'] )
+				);
+			}
+
+			$greeting = get_option( 'marquee_greeting' );
+			?>
+			<p>
+				<label for="marquee-greeting">Greeting:</label>
+				<input
+					id="marquee-greeting"
+					class="widefat"
+					name="marquee-greeting"
+					type="text"
+					value="<?= esc_attr( $greeting ) ?>"
+					placeholder="Hello!"
+				/>
+			</p>
+			<?php
+		}
+	);
+}
+add_action( 'init', 'marquee_greeting_init' );
