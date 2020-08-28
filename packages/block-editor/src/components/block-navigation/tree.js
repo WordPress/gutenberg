@@ -26,7 +26,12 @@ export default function BlockNavigationTree( {
 	...props
 } ) {
 	const treeGridRef = useRef();
-	const blockDropTarget = useBlockNavigationDropZone( treeGridRef );
+	let blockDropTarget = useBlockNavigationDropZone( treeGridRef );
+
+	if ( ! __experimentalFeatures ) {
+		blockDropTarget = undefined;
+	}
+
 	const contextValue = useMemo(
 		() => ( {
 			__experimentalFeatures,

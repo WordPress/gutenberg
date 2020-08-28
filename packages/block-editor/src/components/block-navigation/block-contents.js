@@ -31,7 +31,7 @@ const BlockNavigationBlockContents = forwardRef(
 		ref
 	) => {
 		const {
-			__experimentalFeatures: withBlockNavigationSlots,
+			__experimentalFeatures,
 			blockDropTarget = {},
 		} = useBlockNavigationContext();
 
@@ -77,7 +77,7 @@ const BlockNavigationBlockContents = forwardRef(
 				elementId={ `block-navigation-block-${ block.clientId }` }
 			>
 				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) =>
-					withBlockNavigationSlots ? (
+					__experimentalFeatures ? (
 						<BlockNavigationBlockSlot
 							ref={ ref }
 							className={ className }
@@ -87,7 +87,7 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ isDraggable }
+							draggable={ isDraggable && __experimentalFeatures }
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
 							{ ...props }
@@ -102,7 +102,7 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ isDraggable }
+							draggable={ isDraggable && __experimentalFeatures }
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
 							{ ...props }
