@@ -68,7 +68,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		if ( is_multisite() ) {
 			update_site_option( 'site_admins', array( 'superadmin' ) );
 		}
-		self::$admin_id                         = $factory->user->create(
+		self::$admin_id      = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
