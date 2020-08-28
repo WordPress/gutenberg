@@ -19,6 +19,7 @@ import { useSelect } from '@wordpress/data';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
+import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 
 const inserterToggleProps = { isPrimary: true };
 
@@ -28,7 +29,21 @@ function Header( { isCustomizer } ) {
 		const { getBlockRootClientId, getBlockSelectionEnd } = select(
 			'core/block-editor'
 		);
-		return getBlockRootClientId( getBlockSelectionEnd() );
+		const selectedRootId = getBlockRootClientId( getBlockSelectionEnd() );
+		if ( selectedRootId ) {
+			return selectedRootId;
+		}
+
+		// Default to the first widget area
+		const { getEntityRecord } = select( 'core' );
+		const widgetAreasPost = getEntityRecord(
+			KIND,
+			POST_TYPE,
+			buildWidgetAreasPostId()
+		);
+		if ( widgetAreasPost ) {
+			return widgetAreasPost?.blocks[ 0 ]?.clientId;
+		}
 	}, [] );
 
 	return (
