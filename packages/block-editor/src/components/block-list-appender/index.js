@@ -42,12 +42,18 @@ function BlockListAppender( {
 		// Render the default block appender when renderAppender has not been
 		// provided and the context supports use of the default appender.
 		const isDocumentAppender = ! rootClientId;
+		const isParentSelected = selectedBlockClientId !== rootClientId;
 		const isAnotherDefaultAppenderAlreadyDisplayed =
 			selectedBlockClientId &&
 			! blockClientIds.includes( selectedBlockClientId );
 
-		if ( ! isDocumentAppender && isAnotherDefaultAppenderAlreadyDisplayed )
+		if (
+			! isDocumentAppender &&
+			! isParentSelected &&
+			isAnotherDefaultAppenderAlreadyDisplayed
+		) {
 			return null;
+		}
 
 		appender = (
 			<DefaultBlockAppender
