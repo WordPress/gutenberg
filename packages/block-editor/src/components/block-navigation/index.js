@@ -67,7 +67,7 @@ export default compose(
 		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			rootBlocks: __unstableGetBlockTree( '' ),
+			rootBlocks: __unstableGetBlockTree(),
 			rootBlock: selectedBlockClientId
 				? __unstableGetBlockWithBlockTree(
 						getBlockHierarchyRootClientId( selectedBlockClientId )
