@@ -59,6 +59,9 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'user_login' => 'superadmin',
 			)
 		);
+		if ( is_multisite() ) {
+			update_site_option( 'site_admins', array( 'superadmin' ) );
+		}
 		self::$admin_id      = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -543,7 +546,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_set_current_user( self::$superadmin_id );
 		if ( is_multisite() ) {
 			$this->assertEquals(
-				'<div class="textwidget">alert(1)</div>',
+				'<div class="textwidget"><script>alert(1)</script></div>',
 				$this->update_text_widget_with_raw_html( '<script>alert(1)</script>' )
 			);
 		} else {
