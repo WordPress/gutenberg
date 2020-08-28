@@ -82,9 +82,7 @@ export class RichText extends Component {
 
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
-		this.getHtmlForRecordCreation = this.getHtmlForRecordCreation.bind(
-			this
-		);
+		this.restoreParagraphTags = this.restoreParagraphTags.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
@@ -151,19 +149,12 @@ export class RichText extends Component {
 	 */
 	createRecord() {
 		const { preserveWhiteSpace } = this.props;
-		let htmlForCreate = this.value;
-		if ( ! this.isIOS ) {
-			htmlForCreate = this.getHtmlForRecordCreation(
-				this.value,
-				this.multilineTag
-			);
-		}
 
 		const value = {
 			start: this.selectionStart,
 			end: this.selectionEnd,
 			...create( {
-				html: htmlForCreate,
+				html: this.value,
 				range: null,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -173,13 +164,6 @@ export class RichText extends Component {
 		const start = Math.min( this.selectionStart, value.text.length );
 		const end = Math.min( this.selectionEnd, value.text.length );
 		return { ...value, start, end };
-	}
-
-	getHtmlForRecordCreation( value, tag ) {
-		if ( tag === 'p' && ( ! value || ! value.startsWith( '<p>' ) ) ) {
-			return '<p>' + value + '</p>';
-		}
-		return value;
 	}
 
 	valueToFormat( value ) {
@@ -264,11 +248,7 @@ export class RichText extends Component {
 			} );
 		}
 
-		const multilineResult = this.getHtmlForRecordCreation(
-			result,
-			this.multilineTag
-		);
-		return multilineResult;
+		return result;
 	}
 
 	removeRootTag( tag, html ) {
@@ -308,14 +288,29 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
+		let formattedContent = contentWithoutRootTag;
+		if ( ! this.isIOS ) {
+			formattedContent = this.restoreParagraphTags(
+				contentWithoutRootTag,
+				this.multilineTag
+			);
+		}
+
 		this.debounceCreateUndoLevel();
-		const refresh = this.value !== contentWithoutRootTag;
-		this.value = contentWithoutRootTag;
+		const refresh = this.value !== formattedContent;
+		this.value = formattedContent;
 
 		// we don't want to refresh if our goal is just to create a record
 		if ( refresh ) {
-			this.props.onChange( contentWithoutRootTag );
+			this.props.onChange( formattedContent );
 		}
+	}
+
+	restoreParagraphTags( value, tag ) {
+		if ( tag === 'p' && ( ! value || ! value.startsWith( '<p>' ) ) ) {
+			return '<p>' + value + '</p>';
+		}
+		return value;
 	}
 
 	/*
@@ -607,15 +602,8 @@ export class RichText extends Component {
 		}
 
 		if ( this.props.format === 'string' ) {
-			let htmlForCreate = value;
-			if ( ! this.isIOS ) {
-				htmlForCreate = this.getHtmlForRecordCreation(
-					value,
-					this.multilineTag
-				);
-			}
 			return create( {
-				html: htmlForCreate,
+				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 				preserveWhiteSpace,
