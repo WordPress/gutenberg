@@ -9,7 +9,6 @@ In addition to presenting the structure of the blocks in the editor, the BlockNa
 ![Block navigation](https://make.wordpress.org/core/files/2020/08/block-navigation.png)
 ![View of a group block navigation](https://make.wordpress.org/core/files/2020/08/view-of-group-block-navigation.png)
 
-
 ## Table of contents
 
 1. [Development guidelines](#development-guidelines)
@@ -22,9 +21,14 @@ In addition to presenting the structure of the blocks in the editor, the BlockNa
 Renders a block navigation with default syles.
 
 ```jsx
+import { BlockNavigation } from '@wordpress/block-editor';
 
+<BlockNavigation
+	onSelect={ onClose }
+	__experimentalFeatures={ __experimentalFeatures }
+/>
 ```
 
-### Props
-
 ## Related components
+
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [BlockEditorProvider](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree.
