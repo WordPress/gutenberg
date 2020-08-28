@@ -525,7 +525,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_store_html_as_admin() {
 		if ( is_multisite() ) {
 			$this->assertEquals(
-				'<div class="textwidget">&lt;script&gt;alert(1)&lt;/script&gt;</div>',
+				'<div class="textwidget">alert(1)</div>',
 				$this->update_text_widget_with_raw_html( '<script>alert(1)</script>' )
 			);
 		} else {
