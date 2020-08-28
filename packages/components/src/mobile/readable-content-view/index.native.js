@@ -19,6 +19,7 @@ const BREAKPOINTS = {
 	wide: 1024,
 	big: 820,
 	medium: 768,
+	small: 680,
 };
 
 const ReadableContentView = ( { align, reversed, children, style } ) => {
@@ -49,6 +50,10 @@ const ReadableContentView = ( { align, reversed, children, style } ) => {
 	function getWideStyles() {
 		if ( windowRatio >= PIXEL_RATIO && windowWidth < BREAKPOINTS.big ) {
 			return styles.wideLandscape;
+		}
+
+		if ( windowWidth <= BREAKPOINTS.small ) {
+			return { maxWidth: windowWidth };
 		}
 
 		if (

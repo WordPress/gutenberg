@@ -183,9 +183,6 @@ class BlockListBlock extends Component {
 							<View
 								style={ [
 									styles.dashedBorder,
-									isFullWidth &&
-										blockWidth < screenWidth &&
-										styles.borderFullWidth,
 									getStylesFromColorScheme(
 										styles.dashedBorderColor,
 										styles.dashedBorderColorDark

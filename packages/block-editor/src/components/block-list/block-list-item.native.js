@@ -20,7 +20,6 @@ import styles from './block-list-item.native.scss';
 
 const BREAKPOINTS = {
 	medium: 700,
-	small: 420,
 };
 
 const stretchStyle = {
@@ -47,26 +46,6 @@ export class BlockListItem extends Component {
 		}
 	}
 
-	getWideMargins() {
-		const {
-			marginHorizontal,
-			parentBlockAlignment,
-			numberOfParents,
-		} = this.props;
-		const { blockWidth } = this.state;
-
-		if (
-			parentBlockAlignment === 'full' &&
-			blockWidth > BREAKPOINTS.small &&
-			blockWidth < BREAKPOINTS.medium &&
-			numberOfParents === 1
-		) {
-			return marginHorizontal * 2;
-		}
-
-		return marginHorizontal;
-	}
-
 	getMarginHorizontal() {
 		const {
 			blockAlignment,
@@ -80,7 +59,7 @@ export class BlockListItem extends Component {
 		}
 
 		if ( blockAlignment === 'wide' ) {
-			return this.getWideMargins();
+			return marginHorizontal;
 		}
 
 		if (
