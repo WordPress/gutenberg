@@ -74,6 +74,7 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 
 		return (
 			<Button
+				className="components-navigation__back-button"
 				isPrimary
 				onClick={ () => setActiveLevelId( parentLevel.id ) }
 			>

@@ -50,14 +50,22 @@ const NavigationMenuItem = ( props ) => {
 		<MenuItemUI className={ classes }>
 			<LinkComponentTag
 				className={ classes }
-				href={ href }
+				href={ ! children.length ? href : null }
 				onClick={ handleClick }
 				{ ...linkProps }
 			>
-				<Text variant="body.small">
-					<span>{ title }</span>
+				<Text
+					className="components-navigation__menu-item-title"
+					variant="body.small"
+					as="span"
+				>
+					{ title }
 				</Text>
-				{ badge && <BadgeUI>{ badge }</BadgeUI> }
+				{ badge && (
+					<BadgeUI className="components-navigation__menu-item-badge">
+						{ badge }
+					</BadgeUI>
+				) }
 				{ hasChildren ? <Icon icon={ chevronRight } /> : null }
 			</LinkComponentTag>
 		</MenuItemUI>
