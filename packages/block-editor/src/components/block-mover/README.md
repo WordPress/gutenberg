@@ -19,7 +19,7 @@ Shows the block mover buttons in the block toolbar.
 
 ```jsx
 import { BlockMover } from '@wordpress/block-editor';
-<BlockMover clientIds={ [ clientId ] } />
+const MyMover = () => <BlockMover clientIds={ [ clientId ] } />;
 ```
 
 ### Props
