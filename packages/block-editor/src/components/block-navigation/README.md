@@ -23,10 +23,10 @@ Renders a block navigation with default syles.
 ```jsx
 import { BlockNavigation } from '@wordpress/block-editor';
 
-<BlockNavigation
+const MyNavigation = () => <BlockNavigation
 	onSelect={ onClose }
 	__experimentalFeatures={ __experimentalFeatures }
-/>
+/>;
 ```
 
 ## Related components
