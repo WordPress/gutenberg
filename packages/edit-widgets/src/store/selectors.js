@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy } from 'lodash';
+import { invert, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,6 +28,13 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 	);
 } );
 
+export const getWidget = createRegistrySelector(
+	( select ) => ( state, id ) => {
+		const widgets = select( 'core/edit-widgets' ).getWidgets();
+		return widgets[ id ];
+	}
+);
+
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	if ( ! hasResolvedWidgetAreas( query ) ) {
 		return null;
@@ -40,6 +47,12 @@ export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 		query
 	);
 } );
+
+export const getWidgetIdForClientId = ( state, clientId ) => {
+	const widgetIdToClientId = state.mapping;
+	const clientIdToWidgetId = invert( widgetIdToClientId );
+	return clientIdToWidgetId[ clientId ];
+};
 
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
