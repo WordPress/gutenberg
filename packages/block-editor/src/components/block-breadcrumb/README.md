@@ -21,7 +21,7 @@ Renders a block breadcrumb with default style.
 ```jsx
 import { BlockBreadcrumb } from '@wordpress/block-editor';
 
-const MyBreadcrumb = () => <BlockBreadcrumb />
+const MyBreadcrumb = () => <BlockBreadcrumb />;
 ```
 
 ## Related components
