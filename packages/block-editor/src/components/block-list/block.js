@@ -100,11 +100,11 @@ function BlockListBlock( {
 	// (editor.BlockListBlock filter)
 	const { isDragging, isHighlighted } = useSelect(
 		( select ) => {
-			const { isDraggingBlocks, isBlockHighlighted } = select(
+			const { isBlockBeingDragged, isBlockHighlighted } = select(
 				'core/block-editor'
 			);
 			return {
-				isDragging: isDraggingBlocks(),
+				isDragging: isBlockBeingDragged( clientId ),
 				isHighlighted: isBlockHighlighted( clientId ),
 			};
 		},
@@ -150,18 +150,15 @@ function BlockListBlock( {
 		{
 			'wp-block': ! isAligned,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			// Don't select the item while dragging.
 			'is-selected': isSelected && ! isDragging,
 			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
-			'is-dragging':
-				isDragging && ( isSelected || isPartOfMultiSelection ),
+			'is-dragging': isDragging,
 			'is-typing': isTypingWithinBlock,
 			'is-focused':
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
-			// Don't select child while dragging.
 			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 		},
 		className

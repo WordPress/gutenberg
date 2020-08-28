@@ -61,6 +61,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Plugins_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-plugins-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Post_Format_Search_Handler' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-post-format-search-handler.php';
+	}
+	if ( ! class_exists( 'WP_REST_Term_Search_Handler' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-term-search-handler.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
