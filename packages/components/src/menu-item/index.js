@@ -75,12 +75,10 @@ export function MenuItem(
 			{ ...props }
 		>
 			{ children }
-			{ ! icon && (
-				<Shortcut
-					className="components-menu-item__shortcut"
-					shortcut={ shortcut }
-				/>
-			) }
+			<Shortcut
+				className="components-menu-item__shortcut"
+				shortcut={ shortcut }
+			/>
 			{ icon && <Icon icon={ icon } /> }
 		</Button>
 	);
