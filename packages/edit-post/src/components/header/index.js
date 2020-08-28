@@ -58,6 +58,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
 					/>
 				) }
 				<DevicePreview />
