@@ -6,7 +6,12 @@ import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, cloneElement, renderToString } from '@wordpress/element';
+import {
+	Component,
+	RawHTML,
+	cloneElement,
+	renderToString,
+} from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -21,10 +26,16 @@ import {
 import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
 
+/** @typedef {import('@wordpress/element').WPElement} WPElement */
+
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
  *
- * @property {boolean} isInnerBlocks Whether we are serializing inner blocks.
+ * @property {boolean}   isInnerBlocks
+ * Whether we are serializing inner blocks.
+ * @property {WPElement} [__experimentalRenderCallback]
+ * Callback to define HTML surrounding block, outside of the comment
+ * delimiters. Used by InnerBlocks API.
  */
 
 /**
@@ -307,20 +318,41 @@ export function getCommentDelimitedContent(
  *
  * @return {string} Serialized block.
  */
-export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
+export function serializeBlock(
+	block,
+	{ isInnerBlocks = false, __experimentalRenderCallback: renderCallback } = {}
+) {
 	const blockName = block.name;
 	const saveContent = getBlockContent( block );
+
+	// Serialized block content before wrapping it with an InnerBlocks item
+	// wrapper.
+	let unwrappedContent;
 
 	if (
 		blockName === getUnregisteredTypeHandlerName() ||
 		( ! isInnerBlocks && blockName === getFreeformContentHandlerName() )
 	) {
-		return saveContent;
+		unwrappedContent = saveContent;
+	} else {
+		const blockType = getBlockType( blockName );
+		const saveAttributes = getCommentAttributes(
+			blockType,
+			block.attributes
+		);
+		unwrappedContent = getCommentDelimitedContent(
+			blockName,
+			saveAttributes,
+			saveContent
+		);
 	}
 
-	const blockType = getBlockType( blockName );
-	const saveAttributes = getCommentAttributes( blockType, block.attributes );
-	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+	if ( renderCallback ) {
+		return renderToString(
+			renderCallback( <RawHTML>{ unwrappedContent }</RawHTML> )
+		);
+	}
+	return unwrappedContent;
 }
 
 /**

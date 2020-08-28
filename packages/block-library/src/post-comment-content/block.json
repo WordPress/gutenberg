@@ -1,0 +1,8 @@
+{
+	"name": "core/post-comment-content",
+	"category": "design",
+	"usesContext": [ "commentId" ],
+	"supports": {
+		"html": false
+	}
+}

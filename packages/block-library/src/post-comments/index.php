@@ -31,9 +31,9 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 	comments_template();
 	$post = $post_before;
 
-	$classes = 'wp-block-post-comments';
+	$classes = '';
 	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= ' has-text-align-' . $attributes['textAlign'];
+		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
 
 	$output = sprintf( '<div class="%1$s">', esc_attr( $classes ) ) . ob_get_clean() . '</div>';
