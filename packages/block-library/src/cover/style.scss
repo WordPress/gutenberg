@@ -10,6 +10,7 @@
 	justify-content: center;
 	align-items: center;
 	padding: $grid-unit-20;
+	box-sizing: border-box;
 
 	&.has-parallax {
 		background-attachment: fixed;
