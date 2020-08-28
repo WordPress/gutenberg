@@ -2,10 +2,10 @@
  * WordPress dependencies
  */
 import { Button, Popover } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { close } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 /**
@@ -29,6 +29,10 @@ function Layout( { blockEditorSettings } ) {
 				'core/edit-widgets'
 			)
 	);
+	const { disableComplementaryArea } = useDispatch( 'core/interface' );
+	const disableSidebar = () => {
+		disableComplementaryArea( 'core/edit-widgets' );
+	};
 
 	const rootClientId = useSelect( ( select ) => {
 		const { getBlockRootClientId, getBlockSelectionEnd } = select(
@@ -52,6 +56,17 @@ function Layout( { blockEditorSettings } ) {
 	}, [] );
 
 	const [ isInserterOpened, setIsInserterOpened ] = useState( true );
+	// Make sure that either inserter or sidebar are visible, but not both at the same time:
+	useEffect( () => {
+		if ( isInserterOpened ) {
+			disableSidebar();
+		}
+	}, [ isInserterOpened ] );
+	useEffect( () => {
+		if ( hasSidebarEnabled ) {
+			setIsInserterOpened( false );
+		}
+	}, [ hasSidebarEnabled ] );
 	return (
 		<WidgetAreasBlockEditorProvider
 			blockEditorSettings={ blockEditorSettings }
@@ -60,9 +75,12 @@ function Layout( { blockEditorSettings } ) {
 				header={
 					<Header
 						isInserterOpen={ isInserterOpened }
-						onInserterToggle={ () =>
-							setIsInserterOpened( ! isInserterOpened )
-						}
+						onInserterToggle={ () => {
+							if ( ! isInserterOpened && hasSidebarEnabled ) {
+								disableSidebar();
+							}
+							setIsInserterOpened( ! isInserterOpened );
+						} }
 						rootClientId={ rootClientId }
 					/>
 				}
