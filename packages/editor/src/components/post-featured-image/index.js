@@ -6,7 +6,7 @@ import { has, get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 import {
 	DropZone,
@@ -51,7 +51,7 @@ function PostFeaturedImage( {
 		</p>
 	);
 
-	let mediaWidth, mediaHeight, mediaSourceUrl;
+	let mediaWidth, mediaHeight, mediaSourceUrl, buttonDescribedBy;
 	if ( media ) {
 		const mediaSize = applyFilters(
 			'editor.PostFeaturedImage.imageSize',
@@ -89,6 +89,20 @@ function PostFeaturedImage( {
 				mediaSourceUrl = media.source_url;
 			}
 		}
+		buttonDescribedBy = sprintf(
+			// Translators: %s: The selected image slug.
+			__(
+				'The current image has no alternative text. The file name is: %s'
+			),
+			media.slug
+		);
+		if ( media.alt_text ) {
+			buttonDescribedBy = sprintf(
+				// Translators: %s: The selected image alt text.
+				__( 'Current image: %s' ),
+				media.alt_text
+			);
+		}
 	}
 
 	return (
@@ -122,6 +136,11 @@ function PostFeaturedImage( {
 										! featuredImageId
 											? null
 											: __( 'Edit or update the image' )
+									}
+									aria-describedby={
+										! featuredImageId
+											? null
+											: buttonDescribedBy
 									}
 								>
 									{ !! featuredImageId && media && (
