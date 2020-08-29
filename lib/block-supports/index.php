@@ -35,6 +35,8 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
+	$block = gutenberg_apply_default_block_attribute_values( $block );
+
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	// If no render_callback, assume styles have been previously handled.
 	if ( ! $block_type || ! $block_type->render_callback ) {
@@ -105,4 +107,26 @@ add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
  */
 function gutenberg_normalize_css_rule( $css_rule_string ) {
 	return trim( implode( ': ', preg_split( '/\s*:\s*/', $css_rule_string, 2 ) ), ';' );
+}
+
+/**
+ * Applies default values to block attributes if no values are set.
+ *
+ * @param  object $block The block to apply default values to.
+ * @return object The block with default values applied to its attributes.
+ */
+function gutenberg_apply_default_block_attribute_values( $block ) {
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	// If no render_callback, assume default values have been previously handled.
+	if ( ! $block_type || ! $block_type->render_callback ) {
+		return $block;
+	}
+
+	foreach ( $block_type->attributes as $attribute_name => $attribute_value ) {
+		if ( ! isset( $block['attrs'][ $attribute_name ] ) && isset( $attribute_value['default'] ) ) {
+			$block['attrs'][ $attribute_name ] = $attribute_value['default'];
+		}
+	}
+
+	return $block;
 }
