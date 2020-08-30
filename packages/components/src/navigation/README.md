@@ -106,7 +106,7 @@ A menu item's id.
 -   Type: `string|Number`
 -   Required: No
 
-Specify a menu item's parent id.
+Specify a menu item's parent id. Defaults to the menu item's parent if none is provided.
 
 #### `config.href`
 
