@@ -74,7 +74,7 @@ const MyNavigation = () => {
 };
 ```
 
-## Props
+## Navigation Props
 
 Navigation supports the following props.
 
@@ -142,3 +142,14 @@ The active screen id.
 -   Required: No
 
 A top level title.
+
+## NavigationMenuItem Props
+
+NavigationMenuItem supports the following props.
+
+### `onClick`
+
+-   Type: `function`
+-   Required: No
+
+A callback to handle selection of a menu item.
