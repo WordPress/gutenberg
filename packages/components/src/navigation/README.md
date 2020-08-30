@@ -120,7 +120,7 @@ Turn a menu item into a link by supplying a url.
 -   Type: `object`
 -   Required: No
 
-Supply an properties passed to the menu-item.
+Supply properties passed to the menu-item.
 
 #### `config.LinkComponent`
 
