@@ -10,8 +10,6 @@ import {
 	__experimentalNavigationMenu as NavigationMenu,
 	__experimentalNavigationMenuItem as NavigationMenuItem,
 } from '@wordpress/components';
-import NavigationMenu from '@wordpress/components';
-import NavigationMenuItem from '@wordpress/components';
 import { useState } from '@wordpress/compose';
 
 const data = [
