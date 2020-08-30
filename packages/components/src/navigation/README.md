@@ -5,7 +5,11 @@ Render a flat array of menu items into a waterfall style hierarchy navigation.
 ## Usage
 
 ```jsx
-import Navigation from '@wordpress/components';
+import {
+	__experimentalNavigation as Navigation,
+	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationMenuItem as NavigationMenuItem,
+} from '@wordpress/components';
 import NavigationMenu from '@wordpress/components';
 import NavigationMenuItem from '@wordpress/components';
 import { useState } from '@wordpress/compose';
