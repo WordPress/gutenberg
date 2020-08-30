@@ -1,6 +1,6 @@
 # Navigation
 
-Render a heirarchy of menu items into a waterfall style navigation.
+Render a flat array of menu items into a waterfall style hierarchy navigation.
 
 ## Usage
 
