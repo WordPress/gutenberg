@@ -32,7 +32,8 @@
 		}
 
 		.block-editor-block-styles__item-preview {
-			outline: 2px solid $gray-900;
+			padding: 0;
+			border: 2px solid $gray-900;
 		}
 	}
 }
@@ -40,7 +41,7 @@
 // Show a little preview thumbnail for style variations.
 .block-editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
-	padding: 0;
+	padding: 2px;
 	border-radius: $radius-block-ui;
 	display: flex;
 	overflow: hidden;
