@@ -1,6 +1,6 @@
 # Block Inspector
 
-The Block inspector is one of the panels on the right sidebar of the editor; it is mainly used to view and modify the settings of the selected block.
+The Block inspector is one of the panels that is displayed in the editor; it is mainly used to view and modify the settings of the selected block.
 
 ![Paragraph block inspector](https://make.wordpress.org/core/files/2020/08/paragraph-block-inspector.png)
 
