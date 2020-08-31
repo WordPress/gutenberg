@@ -35,7 +35,10 @@
 		@include break-small() {
 			padding: 0 !important;
 			height: $block-toolbar-height/2;
-			width: $block-toolbar-height;
+			width: $button-size;
+
+			// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+			min-width: $button-size !important;
 		}
 
 		// Focus style.
