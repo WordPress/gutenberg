@@ -104,22 +104,22 @@ export default ( { identifier, title, icon } ) => {
 					}
 
 					/* Global Context */
-					const { supports, name } = contexts[ GLOBAL_CONTEXT ];
+					const { supports, blockName } = contexts[ GLOBAL_CONTEXT ];
 					return [
 						<TypographyPanel
-							key={ 'typography-panel-' + name }
+							key={ 'typography-panel-' + blockName }
 							context={ {
 								supports,
-								name,
+								name: blockName,
 							} }
 							getProperty={ getProperty }
 							setProperty={ setProperty }
 						/>,
 						<ColorPanel
-							key={ 'color-panel-' + name }
+							key={ 'color-panel-' + blockName }
 							context={ {
 								supports,
-								name,
+								name: blockName,
 							} }
 							getProperty={ getProperty }
 							setProperty={ setProperty }
