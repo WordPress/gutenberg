@@ -41,7 +41,7 @@ function gutenberg_get_block_default_classname( $block_name ) {
  * @return array Block CSS classes and inline styles.
  */
 function gutenberg_apply_generated_classname_support( $attributes, $block_attributes, $block_type ) {
-	$has_generated_classname_support = false;
+	$has_generated_classname_support = true;
 	if ( property_exists( $block_type, 'supports' ) ) {
 		$has_generated_classname_support = gutenberg_experimental_get( $block_type->supports, array( 'className' ), true );
 	}
