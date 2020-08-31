@@ -128,7 +128,7 @@
 			"typography": {
 				"dropCap": true
 			},
-			"colors": {
+			"color": {
 				"custom": true
 			}
 		}

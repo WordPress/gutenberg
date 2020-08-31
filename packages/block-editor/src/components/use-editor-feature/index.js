@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
 import { useBlockEditContext } from '../block-edit';
 
 const deprecatedFlags = {
-	'colors.custom': ( settings ) =>
+	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined
 			: ! settings.disableCustomColors,

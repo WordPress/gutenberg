@@ -605,10 +605,10 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 
 	// Deprecated theme supports.
 	if ( get_theme_support( 'disable-custom-colors' ) ) {
-		if ( ! isset( $config['global']['features']['colors'] ) ) {
-			$config['global']['features']['colors'] = array();
+		if ( ! isset( $config['global']['features']['color'] ) ) {
+			$config['global']['features']['color'] = array();
 		}
-		$config['global']['features']['colors']['custom'] = false;
+		$config['global']['features']['color']['custom'] = false;
 	}
 
 	return $config['global']['features'];
