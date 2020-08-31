@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -51,15 +51,13 @@ const renderPane = () => ( { level, NavigationBackButton } ) => {
 
 describe( 'Navigation', () => {
 	it( 'should render the panes and active item', async () => {
-		const { container } = render(
+		render(
 			<Navigation activeItemId={ 'item-2' } data={ sampleData }>
 				{ renderPane() }
 			</Navigation>
 		);
 
-		const menuItems = container.querySelectorAll(
-			'.components-navigation__menu-item'
-		);
+		const menuItems = screen.getAllByRole( 'listitem' );
 
 		expect( menuItems.length ).toBe( 3 );
 		expect( menuItems[ 0 ].textContent ).toBe( 'Item 1' );
@@ -72,15 +70,12 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should set an active category on click', async () => {
-		const { container, getByText } = render(
-			<Navigation data={ sampleData }>{ renderPane() }</Navigation>
-		);
+		render( <Navigation data={ sampleData }>{ renderPane() }</Navigation> );
 
-		fireEvent.click( getByText( 'Category' ) );
-		const categoryTitle = container.querySelector( 'h2' );
-		const menuItems = container.querySelectorAll(
-			'.components-navigation__menu-item'
-		);
+		fireEvent.click( screen.getByRole( 'button', { name: 'Category' } ) );
+		const categoryTitle = screen.getByRole( 'heading' );
+		const menuItems = screen.getAllByRole( 'listitem' );
+
 		expect( categoryTitle.textContent ).toBe( 'Category' );
 		expect( menuItems.length ).toBe( 2 );
 		expect( menuItems[ 0 ].textContent ).toBe( 'Child 1' );
@@ -88,11 +83,11 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should render the root title', async () => {
-		const { container, rerender } = render(
+		const { rerender } = render(
 			<Navigation data={ sampleData }>{ renderPane() }</Navigation>
 		);
 
-		const emptyTitle = container.querySelector( 'h2' );
+		const emptyTitle = screen.getByRole( 'heading' );
 		expect( emptyTitle.textContent ).toBe( '' );
 
 		rerender(
@@ -101,12 +96,12 @@ describe( 'Navigation', () => {
 			</Navigation>
 		);
 
-		const rootTitle = container.querySelector( 'h2' );
+		const rootTitle = screen.getByRole( 'heading' );
 		expect( rootTitle.textContent ).toBe( 'Home' );
 	} );
 
 	it( 'should render badges', async () => {
-		const { container } = render(
+		render(
 			<Navigation
 				data={ [ { id: 'item-1', title: 'Item 1', badge: 21 } ] }
 			>
@@ -114,24 +109,22 @@ describe( 'Navigation', () => {
 			</Navigation>
 		);
 
-		const menuItem = container.querySelector(
-			'.components-navigation__menu-item'
-		);
+		const menuItem = screen.getByRole( 'listitem' );
 		expect( menuItem.textContent ).toBe( 'Item 1' + '21' );
 	} );
 
 	it( 'should navigate up a level when clicking the back button', async () => {
-		const { container, getByText } = render(
+		render(
 			<Navigation data={ sampleData } rootTitle="Home">
 				{ renderPane() }
 			</Navigation>
 		);
 
-		fireEvent.click( getByText( 'Category' ) );
-		let levelTitle = container.querySelector( 'h2' );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Category' } ) );
+		let levelTitle = screen.getByRole( 'heading' );
 		expect( levelTitle.textContent ).toBe( 'Category' );
-		fireEvent.click( getByText( 'Back' ) );
-		levelTitle = container.querySelector( 'h2' );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Back' } ) );
+		levelTitle = screen.getByRole( 'heading' );
 		expect( levelTitle.textContent ).toBe( 'Home' );
 	} );
 } );
