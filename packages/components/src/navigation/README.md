@@ -87,42 +87,42 @@ An array of config objects for each menu item.
 
 Config objects can be represented
 
-#### `config.title`
+#### `data.title`
 
 -   Type: `string`
 -   Required: Yes
 
 A menu item's title.
 
-#### `config.id`
+#### `data.id`
 
 -   Type: `string|Number`
 -   Required: Yes
 
 A menu item's id.
 
-#### `config.parent`
+#### `data.parent`
 
 -   Type: `string|Number`
 -   Required: No
 
 Specify a menu item's parent id. Defaults to the menu item's parent if none is provided.
 
-#### `config.href`
+#### `data.href`
 
 -   Type: `string`
 -   Required: No
 
 Turn a menu item into a link by supplying a url.
 
-#### `config.linkProps`
+#### `data.linkProps`
 
 -   Type: `object`
 -   Required: No
 
 Supply properties passed to the menu-item.
 
-#### `config.LinkComponent`
+#### `data.LinkComponent`
 
 -   Type: `Node`
 -   Required: No

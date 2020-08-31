@@ -67,7 +67,7 @@ const data = [
 	{
 		title: 'External link',
 		id: 'item-4',
-		href: 'https://wordpress.com',
+		href: 'https://wordpress.org',
 		linkProps: {
 			target: '_blank',
 		},
