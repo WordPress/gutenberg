@@ -118,7 +118,7 @@ function gutenberg_normalize_css_rule( $css_rule_string ) {
 function gutenberg_apply_default_block_attribute_values( $block ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	// If no render_callback, assume default values have been previously handled.
-	if ( ! $block_type || ! $block_type->render_callback ) {
+	if ( ! $block_type || ! $block_type->render_callback || ! $block_type->attributes ) {
 		return $block;
 	}
 
