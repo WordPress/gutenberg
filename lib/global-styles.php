@@ -316,7 +316,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		)
 	);
 	foreach ( $blocks as $block_name => $block_type ) {
-		if ( empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
+		if ( ! property_exists( $block_type, 'supports' ) || empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
 			continue;
 		}
 
