@@ -42,6 +42,7 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
  * @param {number} [searchArguments.isInitialSuggestions]
  * @param {number} [searchArguments.type]
  * @param {number} [searchArguments.subtype]
+ * @param {number} [searchArguments.page]
  * @param {Object} [editorSettings]
  * @param {boolean} [editorSettings.disablePostFormats=false]
  * @return {Promise<Object[]>} List of suggestions
@@ -49,7 +50,7 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
 
 const fetchLinkSuggestions = async (
 	search,
-	{ page, isInitialSuggestions, type, subtype } = {},
+	{ isInitialSuggestions, type, subtype, page } = {},
 	{ disablePostFormats = false } = {}
 ) => {
 	const perPage = isInitialSuggestions ? 3 : 20;
