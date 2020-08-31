@@ -547,6 +547,7 @@
 				svg {
 					margin-top: 2px;
 					transition: ease-in-out transform 0.1s;
+					@include reduce-motion("transition");
 				}
 				&:focus,
 				&:hover {
@@ -560,6 +561,7 @@
 				svg {
 					margin-bottom: 3px;
 					transition: ease-in-out transform 0.1s;
+					@include reduce-motion("transition");
 				}
 				&:focus,
 				&:hover {
