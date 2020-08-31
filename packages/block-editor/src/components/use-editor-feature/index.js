@@ -39,16 +39,17 @@ export default function useEditorFeature( featurePath ) {
 	const setting = useSelect(
 		( select ) => {
 			const path = `__experimentalFeatures.${ featurePath }`;
-			const { getSettings } = select( 'core/block-editor' );
-			const settings = getSettings();
 
+			// 1 - Use deprecated settings, if available.
+			const settings = select( 'core/block-editor' ).getSettings();
 			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
 				? deprecatedFlags[ featurePath ]( settings )
 				: undefined;
-
 			if ( deprecatedSettingsValue !== undefined ) {
 				return deprecatedSettingsValue;
 			}
+
+			// 2 - Use global __experimentalFeatures otherwise.
 			return get( settings, path );
 		},
 		[ blockName, featurePath ]
