@@ -596,27 +596,22 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array Default features config for the editor.
  */
 function gutenberg_experimental_global_styles_get_editor_features( $config ) {
-	$features = array();
-	foreach ( array_keys( $config ) as $context ) {
-		if (
-			empty( $config[ $context ]['features'] ) ||
-			! is_array( $config[ $context ]['features'] )
-		) {
-			$features[ $context ] = array();
-		} else {
-			$features[ $context ] = $config[ $context ]['features'];
-		}
+	if (
+		empty( $config['global']['features'] ) ||
+		! is_array( $config['global']['features'] )
+	) {
+		$config['global']['features'] = array();
 	}
 
 	// Deprecated theme supports.
 	if ( get_theme_support( 'disable-custom-colors' ) ) {
-		if ( ! isset( $features['global']['color'] ) ) {
-			$features['global']['color'] = array();
+		if ( ! isset( $config['global']['features']['color'] ) ) {
+			$config['global']['features']['color'] = array();
 		}
-		$features['global']['color']['custom'] = false;
+		$config['global']['features']['color']['custom'] = false;
 	}
 
-	return $features;
+	return $config['global']['features'];
 }
 
 /**

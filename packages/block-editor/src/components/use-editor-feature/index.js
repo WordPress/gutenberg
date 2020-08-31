@@ -38,6 +38,8 @@ export default function useEditorFeature( featurePath ) {
 
 	const setting = useSelect(
 		( select ) => {
+			const path = `__experimentalFeatures.${ featurePath }`;
+
 			// 1 - Use deprecated settings, if available.
 			const settings = select( 'core/block-editor' ).getSettings();
 			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
@@ -47,14 +49,8 @@ export default function useEditorFeature( featurePath ) {
 				return deprecatedSettingsValue;
 			}
 
-			// 2 - Use __experimental features otherwise.
-			// We cascade to the global value if the block one is not available.
-			//
-			// TODO: make it work for blocks that define multiple selectors
-			// such as core/heading or core/post-title.
-			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
-			const blockPath = `__experimentalFeatures.${ blockName }.${ featurePath }`;
-			return get( settings, blockPath ) ?? get( settings, globalPath );
+			// 2 - Use global __experimentalFeatures otherwise.
+			return get( settings, path );
 		},
 		[ blockName, featurePath ]
 	);
