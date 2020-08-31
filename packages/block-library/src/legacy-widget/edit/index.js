@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,14 +38,17 @@ class LegacyWidgetEdit extends Component {
 			availableLegacyWidgets,
 			hasPermissionsToManageWidgets,
 			isSelected,
+			prerenderedEditForm,
 			setAttributes,
+			widgetId,
 		} = this.props;
 		const { isPreview, hasEditForm } = this.state;
-		const { id, widgetClass } = attributes;
+		const { widgetClass } = attributes;
 		const widgetObject =
-			( id && availableLegacyWidgets[ id ] ) ||
+			( widgetId && availableLegacyWidgets[ widgetId ] ) ||
 			( widgetClass && availableLegacyWidgets[ widgetClass ] );
-		if ( ! id && ! widgetClass ) {
+
+		if ( ! widgetId && ! widgetClass ) {
 			return (
 				<LegacyWidgetPlaceholder
 					availableLegacyWidgets={ availableLegacyWidgets }
@@ -53,12 +56,14 @@ class LegacyWidgetEdit extends Component {
 						hasPermissionsToManageWidgets
 					}
 					onChangeWidget={ ( newWidget ) => {
-						const { isReferenceWidget } = availableLegacyWidgets[
-							newWidget
-						];
+						const {
+							isReferenceWidget,
+							id_base: idBase,
+						} = availableLegacyWidgets[ newWidget ];
 						setAttributes( {
 							instance: {},
 							id: isReferenceWidget ? newWidget : undefined,
+							idBase,
 							widgetClass: isReferenceWidget
 								? undefined
 								: newWidget,
@@ -120,9 +125,10 @@ class LegacyWidgetEdit extends Component {
 					<LegacyWidgetEditHandler
 						isSelected={ isSelected }
 						isVisible={ ! isPreview }
-						id={ id }
-						idBase={ attributes.idBase || attributes.id }
+						id={ widgetId }
+						idBase={ attributes.idBase || widgetId }
 						number={ attributes.number }
+						prerenderedEditForm={ prerenderedEditForm }
 						widgetName={ get( widgetObject, [ 'name' ] ) }
 						widgetClass={ attributes.widgetClass }
 						instance={ attributes.instance }
@@ -171,13 +177,17 @@ class LegacyWidgetEdit extends Component {
 			<ServerSideRender
 				className="wp-block-legacy-widget__preview"
 				block="core/legacy-widget"
-				attributes={ attributes }
+				attributes={ omit( attributes, 'id' ) }
 			/>
 		);
 	}
 }
 
-export default withSelect( ( select ) => {
+export default withSelect( ( select, { clientId } ) => {
+	const widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
+		clientId
+	);
+	const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
 	const editorSettings = select( 'core/block-editor' ).getSettings();
 	const {
 		availableLegacyWidgets,
@@ -186,5 +196,7 @@ export default withSelect( ( select ) => {
 	return {
 		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,
+		widgetId,
+		prerenderedEditForm: widget.rendered_form,
 	};
 } )( LegacyWidgetEdit );

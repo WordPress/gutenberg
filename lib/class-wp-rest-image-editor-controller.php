@@ -300,6 +300,12 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			return $new_attachment_id;
 		}
 
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			// Set a custom header with the attachment_id.
+			// Used by the browser/client to resume creating image sub-sizes after a PHP fatal error.
+			header( 'X-WP-Upload-Attachment-ID: ' . $new_attachment_id );
+		}
+
 		// Generate image sub-sizes and meta.
 		$new_image_meta = wp_generate_attachment_metadata( $new_attachment_id, $saved['path'] );
 

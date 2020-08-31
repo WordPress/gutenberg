@@ -49,6 +49,7 @@ function UncontrolledInnerBlocks( props ) {
 		marginHorizontal,
 		horizontalAlignment,
 		filterInnerBlocks,
+		__experimentalItemCallback,
 	} = props;
 
 	const block = useSelect(
@@ -82,6 +83,7 @@ function UncontrolledInnerBlocks( props ) {
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
 			filterInnerBlocks={ filterInnerBlocks }
+			__experimentalItemCallback={ __experimentalItemCallback }
 		/>
 	);
 

@@ -25,7 +25,7 @@ import {
 	TextControl,
 	ToggleControl,
 	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 } from '@wordpress/components';
 import {
 	alignLeft,

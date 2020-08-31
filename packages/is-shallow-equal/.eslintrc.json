@@ -6,6 +6,11 @@
 	"env": {
 		"node": true
 	},
+	"settings": {
+		"jsdoc": {
+			"mode": "typescript"
+		}
+	},
 	"overrides": [
 		{
 			"files": [ "@(test|benchmark)/*.js" ],

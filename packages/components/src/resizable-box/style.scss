@@ -108,6 +108,26 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	@include reduce-motion("animation");
 }
 
+/* This CSS is shown only to Safari, which has a bug with table-caption making it jumpy.
+See https://bugs.webkit.org/show_bug.cgi?id=187903. */
+@media not all and (min-resolution: 0.001dpcm) {
+	@supports (-webkit-appearance:none) {
+		.components-resizable-box__side-handle.components-resizable-box__handle-top:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-bottom:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-top:active::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
+			animation: none;
+		}
+
+		.components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-right:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-left:active::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
+			animation: none;
+		}
+	}
+}
+
 @keyframes components-resizable-box__top-bottom-animation {
 	from {
 		transform: scaleX(0);

@@ -28,6 +28,7 @@ function BlockList(
 		className,
 		rootClientId,
 		renderAppender,
+		__experimentalItemCallback,
 		__experimentalTagName = 'div',
 		__experimentalAppenderTagName,
 		__experimentalPassedProps = {},
@@ -110,6 +111,9 @@ function BlockList(
 									isDropTarget &&
 									orientation === 'horizontal',
 							} ) }
+							__experimentalRenderCallback={
+								__experimentalItemCallback
+							}
 						/>
 					</AsyncModeProvider>
 				);

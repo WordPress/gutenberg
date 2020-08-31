@@ -27,6 +27,7 @@ import {
 	parse,
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
+import { Platform } from '@wordpress/element';
 
 /**
  * A block selection object.
@@ -37,6 +38,16 @@ import { SVG, Rect, G, Path } from '@wordpress/components';
  * @property {string} attributeKey A block attribute key.
  * @property {number} offset       An attribute value offset, based on the rich
  *                                 text value. See `wp.richText.create`.
+ */
+
+/**
+ * Settings which can be passed to the getBlock or getBlocks selectors.
+ *
+ * @typedef {Object} WPGetBlockSettings
+ * @property {boolean} includeControlledInnerBlocks If true, include nested child
+ *                                                  blocks of inner block controllers.
+ *                                                  The default of false excludes
+ *                                                  nested blocks of inner block controllers.
  */
 
 // Module constants
@@ -74,6 +85,14 @@ const EMPTY_ARRAY = [];
  */
 export function getBlockName( state, clientId ) {
 	const block = state.blocks.byClientId[ clientId ];
+	const socialLinkName = 'core/social-link';
+
+	if ( Platform.OS !== 'web' && block?.name === socialLinkName ) {
+		const attributes = state.blocks.attributes[ clientId ];
+		const { service } = attributes;
+
+		return service ? `${ socialLinkName }-${ service }` : socialLinkName;
+	}
 	return block ? block.name : null;
 }
 
@@ -124,13 +143,18 @@ export function getBlockAttributes( state, clientId ) {
  * the template block itself is considered part of the parent, but the children
  * are not.
  *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block client ID.
+ * You can override this behavior with the includeControlledInnerBlocks setting.
+ * So if you call `getBlock( TP, { WPGetBlockSettings: true } )`, it will return
+ * all nested blocks, including all child inner block controllers and their children.
+ *
+ * @param {Object}              state    Editor state.
+ * @param {string}              clientId Block client ID.
+ * @param {?WPGetBlockSettings} settings A settings object.
  *
  * @return {Object} Parsed block object.
  */
 export const getBlock = createSelector(
-	( state, clientId ) => {
+	( state, clientId, { includeControlledInnerBlocks = false } = {} ) => {
 		const block = state.blocks.byClientId[ clientId ];
 		if ( ! block ) {
 			return null;
@@ -139,9 +163,13 @@ export const getBlock = createSelector(
 		return {
 			...block,
 			attributes: getBlockAttributes( state, clientId ),
-			innerBlocks: areInnerBlocksControlled( state, clientId )
-				? EMPTY_ARRAY
-				: getBlocks( state, clientId ),
+			innerBlocks:
+				! includeControlledInnerBlocks &&
+				areInnerBlocksControlled( state, clientId )
+					? EMPTY_ARRAY
+					: getBlocks( state, clientId, {
+							includeControlledInnerBlocks,
+					  } ),
 		};
 	},
 	( state, clientId ) => [
@@ -175,7 +203,8 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 /**
  * Returns all block objects for the current post being edited as an array in
  * the order they appear in the post. Note that this will exclude child blocks
- * of nested inner block controllers.
+ * of nested inner block controllers unless the `includeControlledInnerBlocks`
+ * setting is set to true.
  *
  * Note: It's important to memoize this selector to avoid return a new instance
  * on each call. We use the block cache state for each top-level block of the
@@ -183,15 +212,16 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
  * associated with the given entity, and does not refresh when changes are made
  * to blocks which are part of different inner block controllers.
  *
- * @param {Object}  state        Editor state.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object}              state        Editor state.
+ * @param {?string}             rootClientId Optional root client ID of block list.
+ * @param {?WPGetBlockSettings} settings     A settings object.
  *
  * @return {Object[]} Post blocks.
  */
 export const getBlocks = createSelector(
-	( state, rootClientId ) => {
+	( state, rootClientId, { includeControlledInnerBlocks = false } = {} ) => {
 		return map( getBlockOrder( state, rootClientId ), ( clientId ) =>
-			getBlock( state, clientId )
+			getBlock( state, clientId, { includeControlledInnerBlocks } )
 		);
 	},
 	( state, rootClientId ) =>
@@ -1006,7 +1036,57 @@ export function isTyping( state ) {
  * @return {boolean} Whether user is dragging blocks.
  */
 export function isDraggingBlocks( state ) {
-	return state.isDraggingBlocks;
+	return !! state.draggedBlocks.length;
+}
+
+/**
+ * Returns the client ids of any blocks being directly dragged.
+ *
+ * This does not include children of a parent being dragged.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string[]} Array of dragged block client ids.
+ */
+export function getDraggedBlockClientIds( state ) {
+	return state.draggedBlocks;
+}
+
+/**
+ * Returns whether the block is being dragged.
+ *
+ * Only returns true if the block is being directly dragged,
+ * not if the block is a child of a parent being dragged.
+ * See `isAncestorBeingDragged` for child blocks.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client id for block to check.
+ *
+ * @return {boolean} Whether the block is being dragged.
+ */
+export function isBlockBeingDragged( state, clientId ) {
+	return state.draggedBlocks.includes( clientId );
+}
+
+/**
+ * Returns whether a parent/ancestor of the block is being dragged.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client id for block to check.
+ *
+ * @return {boolean} Whether the block's ancestor is being dragged.
+ */
+export function isAncestorBeingDragged( state, clientId ) {
+	// Return early if no blocks are being dragged rather than
+	// the more expensive check for parents.
+	if ( ! isDraggingBlocks( state ) ) {
+		return false;
+	}
+
+	const parents = getBlockParents( state, clientId );
+	return some( parents, ( parentClientId ) =>
+		isBlockBeingDragged( state, parentClientId )
+	);
 }
 
 /**
@@ -1155,6 +1235,13 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+
+	// The parent block doesn't have settings indicating it doesn't support
+	// inner blocks, return false.
+	if ( rootClientId && parentBlockListSettings === undefined ) {
+		return false;
+	}
+
 	const parentAllowedBlocks = get( parentBlockListSettings, [
 		'allowedBlocks',
 	] );

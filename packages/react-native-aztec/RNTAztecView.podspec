@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.summary          = 'Aztec editor for React Native'
   s.license          = package['license']
   s.homepage         = package['homepage']
-  s.authors          = 'Automattic'
+  s.authors          = package['author']
   s.source            = { :git => 'https://github.com/WordPress/gutenberg.git' }
   s.source_files     = 'ios/RNTAztecView/*.{h,m,swift}'
   s.public_header_files = 'ios/RNTAztecView/*.h'

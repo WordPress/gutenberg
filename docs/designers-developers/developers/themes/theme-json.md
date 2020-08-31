@@ -161,14 +161,22 @@ Each block will declare which style properties it exposes. This has been coined 
 
 | Context | Background | Gradient | Link | Text |
 | --- | --- | --- | --- | --- |
-| Global | Yes | - | - | - |
-| Paragraph | Yes | - | Yes | Yes |
-| Heading [1] | Yes | - | Yes | Yes |
-| Group | Yes | Yes | Yes | Yes |
+| Global | Yes | Yes | Yes | Yes |
 | Columns | Yes | Yes | Yes | Yes |
+| Group | Yes | Yes | Yes | Yes |
+| Heading [1] | Yes | - | Yes | Yes |
 | Media & text | Yes | Yes | Yes | Yes |
-| Site Title | Yes | Yes | - | Yes |
+| Paragraph | Yes | - | Yes | Yes |
+| Post Author | Yes | Yes | Yes | Yes |
+| Post Comments | Yes | Yes | Yes | Yes |
+| Post Comments Count | Yes | Yes | - | Yes |
+| Post Comments Form | Yes | Yes | Yes | Yes |
+| Post Date | Yes | Yes | - | Yes |
+| Post Excerpt | Yes | Yes | Yes | Yes |
+| Post Tags | Yes | Yes | Yes | Yes |
+| Post Title | Yes | Yes | - | Yes |
 | Site Tagline | Yes | Yes | - | Yes |
+| Site Title | Yes | Yes | - | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 
@@ -176,14 +184,22 @@ Each block will declare which style properties it exposes. This has been coined 
 
 | Context | Font Size | Line Height |
 | --- | --- | --- |
-| Global | - | - |
-| Paragraph | Yes | Yes |
-| Heading [1] | Yes | Yes |
-| Group | - | - |
+| Global | Yes | - |
 | Columns | - | - |
+| Group | - | - |
+| Heading [1] | Yes | Yes |
 | Media & text | - | - |
-| Site Title | Yes | Yes |
+| Paragraph | Yes | Yes |
+| Post Author | Yes | Yes |
+| Post Comments | Yes | Yes |
+| Post Comments Count | Yes | Yes |
+| Post Comments Form | Yes | Yes |
+| Post Date | Yes | Yes |
+| Post Excerpt | Yes | Yes |
+| Post Tags | Yes | Yes |
+| Post Title | Yes | Yes |
 | Site Tagline | Yes | Yes |
+| Site Title | Yes | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 

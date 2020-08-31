@@ -71,7 +71,7 @@ const BlockDraggable = ( {
 			elementId={ `block-${ clientIds[ 0 ] }` }
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				startDraggingBlocks();
+				startDraggingBlocks( clientIds );
 				isDragging.current = true;
 
 				startScrolling( event );

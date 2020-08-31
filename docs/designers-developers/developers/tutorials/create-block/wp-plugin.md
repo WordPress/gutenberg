@@ -8,7 +8,7 @@ A WordPress plugin is a set of files within the site's `wp-content/plugins` dire
 
 ### Switch to Working Directory
 
-(1A) If you do not plan to use `wp-env` change to your local WordPress plugin directory. For example in Local it is: `~\Local Sites\mywp\wp-content\plugins`
+(1A) If you do not plan to use `wp-env`, change to your local WordPress plugin directory. For example in Local it is: `~\Local Sites\mywp\wp-content\plugins`
 
 -or-
 
@@ -55,7 +55,7 @@ Let's confirm the plugin is loaded and working.
 wp-env start
 ```
 
-This will start your local WordPress site and use the current directory as your plugin directory. In your browser, go to [https://localhost:8888/wp-admin/] and login, the default username is "admin" and password is "password", no quotes.
+This will start your local WordPress site and use the current directory as your plugin directory. In your browser, go to https://localhost:8888/wp-admin/ and login, the default username is "admin" and password is "password", no quotes.
 
 ### Confirm Plugin Installed
 
@@ -67,7 +67,7 @@ For more on creating a WordPress plugin see [Plugin Basics](https://developer.wo
 
 The `package.json` file defines the JavaScript properties for your project. This is a standard file used by NPM for defining properties and scripts it can run, the file and process is not specific to WordPress.
 
-A `package.json` file was created with the create script, this defines the dependecies and scripts needed. you can install dependencies. The only initial dependency is the `@wordpress/scripts` package that bundles the tools and configurations needed to build blocks.
+A `package.json` file was created with the create script, this defines the dependecies and scripts needed. You can install dependencies. The only initial dependency is the `@wordpress/scripts` package that bundles the tools and configurations needed to build blocks.
 
 In `package.json`, there is a `scripts` property that defines what command to run when using `npm run (cmd)`. In our generated `package.json` file, the two main scripts point to the commands in the `wp-scripts` package:
 
@@ -143,7 +143,7 @@ The `wp_set_script_translations` function tells WordPress to load translations f
 
 The `register_block_type` function registers the block we are going to create and specifies the editor_script file handle registered. So now when the editor loads it will load this script.
 
-With the above in place, create a new post to load the editor and check the you can add the block in the inserter. You can use `/` to search, or click the box with the [+] and search for "Gutenpride" to find the block.
+With the above in place, create a new post to load the editor and check your plugin is in the inserter. You can use `/` to search, or click the box with the [+] and search for "Gutenpride" to find the block.
 
 ## Troubleshooting
 
@@ -153,7 +153,7 @@ To open the developer tools in Firefox, use the menu selecting Web Developer : T
 
 Try running `npm run start` that will start the watch process for automatic rebuilds. If you then make an update to `src/index.js` file, you will see the build run, and if you reload the WordPress editor you'll see the change.
 
-For more info, see the build section of the [Getting Started with JavaScript tutorial](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md) in the WordPress Handbook.
+For more info, see the build section of the [Getting Started with JavaScript tutorial](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md) in the Block Editor Handbook.
 
 ## Summary
 

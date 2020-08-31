@@ -2,9 +2,6 @@
 	"name": "core/calendar",
 	"category": "widgets",
 	"attributes": {
-		"className": {
-			"type": "string"
-		},
 		"month": {
 			"type": "integer"
 		},

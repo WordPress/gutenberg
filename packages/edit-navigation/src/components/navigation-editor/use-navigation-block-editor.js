@@ -23,7 +23,7 @@ export default function useNavigationBlockEditor( post ) {
 			await _onChange( updatedBlocks );
 			createMissingMenuItems( post );
 		},
-		[ blocks, onChange ]
+		[ blocks, _onChange ]
 	);
 
 	return [ blocks, onInput, onChange ];

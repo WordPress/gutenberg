@@ -18,9 +18,10 @@ const getGradientType = ( color ) => {
 };
 
 export const colorsUtils = {
-	subsheets: {
-		settings: 'Settings',
-		color: 'Color',
+	screens: {
+		gradientPicker: 'GradientPicker',
+		picker: 'Picker',
+		palette: 'Palette',
 	},
 	segments: [ 'Solid', 'Gradient' ],
 	gradients,

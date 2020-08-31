@@ -35,7 +35,7 @@ const usePatternsState = ( onInsert ) => {
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: block pattern title. */
-				__( 'Pattern "%s" inserted.' ),
+				__( 'Block pattern "%s" inserted.' ),
 				pattern.title
 			),
 			{

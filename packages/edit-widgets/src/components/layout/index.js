@@ -2,22 +2,24 @@
  * WordPress dependencies
  */
 import { Popover } from '@wordpress/components';
-import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
+import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
+
 /**
  * Internal dependencies
  */
+import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import Header from '../header';
 import Sidebar from '../sidebar';
-import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
 function Layout( { blockEditorSettings } ) {
-	const hasSidebarEnabled = useSelect( ( select ) => {
-		return !! select( 'core/interface' ).getActiveComplementaryArea(
-			'core/edit-widgets'
-		);
-	} );
+	const hasSidebarEnabled = useSelect(
+		( select ) =>
+			!! select( 'core/interface' ).getActiveComplementaryArea(
+				'core/edit-widgets'
+			)
+	);
 	return (
 		<WidgetAreasBlockEditorProvider
 			blockEditorSettings={ blockEditorSettings }
@@ -29,7 +31,11 @@ function Layout( { blockEditorSettings } ) {
 						<ComplementaryArea.Slot scope="core/edit-widgets" />
 					)
 				}
-				content={ <WidgetAreasBlockEditorContent /> }
+				content={
+					<WidgetAreasBlockEditorContent
+						blockEditorSettings={ blockEditorSettings }
+					/>
+				}
 			/>
 			<Sidebar />
 			<Popover.Slot />

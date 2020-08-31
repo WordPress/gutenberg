@@ -15,8 +15,14 @@
 .block-editor-block-mover {
 	.components-toolbar-group,
 	.components-toolbar {
-		flex-direction: column;
 		flex: 1;
+
+		// Increase touch targets on mobile.
+		flex-direction: row;
+
+		@include break-small() {
+			flex-direction: column;
+		}
 	}
 
 	&.is-horizontal .components-toolbar-group,
@@ -25,42 +31,48 @@
 	}
 
 	.block-editor-block-mover-button {
-		height: $block-toolbar-height/2;
-		width: $block-toolbar-height;
-		padding: 0 !important;
+		@include break-small() {
+			padding: 0 !important;
+			height: $block-toolbar-height/2;
+			width: $block-toolbar-height;
+		}
 
 		// Focus style.
 		// Overrides .components-toolbar-group styles
 		&::before {
-			left: $grid-unit-10 !important;
-			right: $grid-unit-10 !important;
+			@include break-small() {
+				left: $grid-unit-10 !important;
+				right: $grid-unit-10 !important;
+			}
 		}
 	}
 
 	// Position the icons correctly.
-	.components-toolbar-group .block-editor-block-mover-button.is-up-button,
-	.components-toolbar .block-editor-block-mover-button.is-up-button {
-		svg {
-			margin-bottom: -$grid-unit-10;
+	@include break-small() {
+		.components-toolbar-group .block-editor-block-mover-button.is-up-button,
+		.components-toolbar .block-editor-block-mover-button.is-up-button {
+			svg {
+				margin-bottom: -$grid-unit-10;
+			}
+
+			// Focus style.
+			&::before {
+				bottom: 0;
+				height: calc(100% - #{ $border-width });
+			}
 		}
 
-		// Focus style.
-		&::before {
-			bottom: 0;
-			height: calc(100% - #{ $grid-unit-10 });
-		}
-	}
+		.components-toolbar-group .block-editor-block-mover-button.is-down-button,
+		.components-toolbar .block-editor-block-mover-button.is-down-button {
+			svg {
+				margin-top: -$grid-unit-10;
+			}
 
-	.components-toolbar-group .block-editor-block-mover-button.is-down-button,
-	.components-toolbar .block-editor-block-mover-button.is-down-button {
-		svg {
-			margin-top: -$grid-unit-10;
-		}
-
-		// Focus style.
-		&::before {
-			top: 0;
-			height: calc(100% - #{ $grid-unit-10 });
+			// Focus style.
+			&::before {
+				top: 0;
+				height: calc(100% - #{ $border-width });
+			}
 		}
 	}
 
@@ -70,14 +82,13 @@
 			height: $block-toolbar-height;
 			// Overrides .components-toolbar-group styles
 			width: $block-toolbar-height / 2;
-			min-width: $grid-unit-30;
 			padding-left: 0;
 			padding-right: 0;
 
 			// Focus style.
 			&::before {
-				top: $grid-unit-10;
-				bottom: $grid-unit-10;
+				top: 0;
+				bottom: 0;
 				min-width: 0;
 				width: auto;
 				height: auto;
@@ -95,7 +106,7 @@
 			// Focus style.
 			// Overrides .components-toolbar-group styles
 			&::before {
-				left: $grid-unit-10 !important;
+				left: 0 !important;
 				right: 0 !important;
 			}
 		}
@@ -111,7 +122,8 @@
 			// Overrides .components-toolbar-group styles
 			&::before {
 				left: 0 !important;
-				right: $grid-unit-10 !important;
+				right: 0 !important;
+				width: calc(100% + #{ $border-width });
 			}
 		}
 	}

@@ -32,7 +32,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"jest-matcher-utils": "^25.3.0",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.19"
 	},
 	"peerDependencies": {
 		"jest": ">=24"
