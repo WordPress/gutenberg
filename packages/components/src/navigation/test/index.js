@@ -10,6 +10,10 @@ import Navigation from '../';
 import NavigationMenu from '../menu';
 import NavigationMenuItem from '../menu-item';
 
+const CustomComponent = ( { onClick } ) => {
+	return <button onClick={ onClick }>customize me</button>;
+};
+
 const sampleData = [
 	{
 		title: 'Item 1',
@@ -18,10 +22,19 @@ const sampleData = [
 	{
 		title: 'Item 2',
 		id: 'item-2',
+		href: 'http://example.com',
+		linkProps: {
+			target: '_blank',
+		},
 	},
 	{
 		title: 'Category',
 		id: 'category',
+	},
+	{
+		title: 'Item 3',
+		id: 'item-3',
+		LinkComponent: CustomComponent,
 	},
 	{
 		title: 'Child 1',
@@ -59,14 +72,42 @@ describe( 'Navigation', () => {
 
 		const menuItems = screen.getAllByRole( 'listitem' );
 
-		expect( menuItems.length ).toBe( 3 );
+		expect( menuItems.length ).toBe( 4 );
 		expect( menuItems[ 0 ].textContent ).toBe( 'Item 1' );
 		expect( menuItems[ 1 ].textContent ).toBe( 'Item 2' );
 		expect( menuItems[ 2 ].textContent ).toBe( 'Category' );
+		expect( menuItems[ 3 ].textContent ).toBe( 'customize me' );
 		expect( menuItems[ 0 ].classList.contains( 'is-active' ) ).toBe(
 			false
 		);
 		expect( menuItems[ 1 ].classList.contains( 'is-active' ) ).toBe( true );
+	} );
+
+	it( 'should render anchor links when menu item supplies an href', async () => {
+		render(
+			<Navigation activeItemId={ 'item-2' } data={ sampleData }>
+				{ renderPane() }
+			</Navigation>
+		);
+
+		const linkItem = screen.getByRole( 'link', { name: 'Item 2' } );
+
+		expect( linkItem ).toBeDefined();
+		expect( linkItem.target ).toBe( '_blank' );
+	} );
+
+	it( 'should render a custom component when menu item supplies one', async () => {
+		render(
+			<Navigation activeItemId={ 'item-2' } data={ sampleData }>
+				{ renderPane() }
+			</Navigation>
+		);
+
+		const customItem = screen.getByRole( 'button', {
+			name: 'customize me',
+		} );
+
+		expect( customItem ).toBeDefined();
 	} );
 
 	it( 'should set an active category on click', async () => {
