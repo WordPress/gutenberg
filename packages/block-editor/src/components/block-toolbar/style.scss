@@ -53,10 +53,10 @@
 	// Switcher.
 	.block-editor-block-switcher .components-dropdown-menu__toggle,
 	.block-editor-block-switcher__no-switcher-icon {
-		min-width: $button-size !important;
-		width: $button-size !important;
-		padding-left: $grid-unit-10 !important;
-		padding-right: $grid-unit-05 !important;
+		min-width: $block-toolbar-height - $grid-unit-15 / 2 !important;
+		width: $block-toolbar-height - $grid-unit-15 / 2 !important;
+		padding-left: $grid-unit-15 - $border-width !important;
+		padding-right: $grid-unit-15 / 2 !important;
 
 		.block-editor-block-icon {
 			width: $button-size-small !important;
@@ -64,8 +64,7 @@
 		}
 
 		&:focus::before {
-			left: $grid-unit-05 !important;
-			right: 0 !important;
+			right: $grid-unit-05 !important;
 		}
 	}
 }

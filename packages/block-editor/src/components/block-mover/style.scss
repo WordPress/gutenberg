@@ -33,12 +33,12 @@
 
 	.block-editor-block-mover-button {
 		@include break-small() {
-			padding: 0 !important;
-			height: $block-toolbar-height/2;
-			width: $button-size;
-
 			// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
-			min-width: $button-size !important;
+			height: $block-toolbar-height/2;
+			width: $block-toolbar-height - $grid-unit-15 / 2;
+			padding-right: $grid-unit-15 - $border-width !important;
+			padding-left: $grid-unit-15 / 2 !important;
+			min-width: $block-toolbar-height - $grid-unit-15 / 2 !important;
 		}
 
 		// Focus style.
