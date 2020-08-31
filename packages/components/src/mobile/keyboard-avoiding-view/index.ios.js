@@ -44,6 +44,11 @@ export const KeyboardAvoidingView = ( {
 	const keyboardVerticalOffset = fullHeight - parentHeight;
 
 	useEffect( () => {
+		SafeArea.getSafeAreaInsetsForRootView().then(
+			( { safeAreaInsets } ) => {
+				setSafeAreaBottomInset( safeAreaInsets.bottom );
+			}
+		);
 		Keyboard.addListener( 'keyboardWillShow', onKeyboardWillShow );
 		Keyboard.addListener( 'keyboardWillHide', onKeyboardWillHide );
 		SafeArea.addEventListener(
@@ -67,11 +72,7 @@ export const KeyboardAvoidingView = ( {
 
 	function onKeyboardWillShow( { endCoordinates } ) {
 		setIsKeyboardOpen( true );
-		SafeArea.getSafeAreaInsetsForRootView().then(
-			( { safeAreaInsets } ) => {
-				setSafeAreaBottomInset( safeAreaInsets.bottom );
-			}
-		);
+
 		animatedHeight.setValue( endCoordinates.height + MIN_HEIGHT );
 	}
 
