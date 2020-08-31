@@ -483,7 +483,7 @@ export class ImageEdit extends React.Component {
 										retryMessage={ retryMessage }
 										url={ url }
 										width={ width }
-										imageShapeStyle={ styles[ className ] }
+										shapeStyle={ styles[ className ] }
 									/>
 								);
 							} }

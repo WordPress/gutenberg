@@ -82,7 +82,11 @@ function StylePreview( { onPress, isActive, style, url } ) {
 						source={ { uri: url } }
 					/>
 				</View>
-				<Text style={ labelStyle }>{ label }</Text>
+				<Text
+					style={ [ labelStyle, isActive && styles.labelSelected ] }
+				>
+					{ label }
+				</Text>
 			</View>
 		</TouchableWithoutFeedback>
 	);

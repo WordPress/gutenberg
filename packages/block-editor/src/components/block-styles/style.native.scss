@@ -8,6 +8,8 @@ $image-height: 64px;
 .container {
 	padding-top: $grid-unit + $outline-space;
 	padding-right: $grid-unit;
+	padding-left: $outline-space;
+	margin-left: -$outline-space;
 }
 
 .imageWrapper {
@@ -27,6 +29,10 @@ $image-height: 64px;
 
 .labelDark {
 	color: $white;
+}
+
+.labelSelected {
+	color: $blue-wordpress;
 }
 
 .outline {
