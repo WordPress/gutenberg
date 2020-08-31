@@ -126,9 +126,9 @@
 		},
 		"features": {
 			"typography": {
-				"dropCap": false
+				"dropCap": true
 			},
-			"colors": {
+			"color": {
 				"custom": true
 			}
 		}

@@ -17,7 +17,7 @@ import useEditorFeature from '../use-editor-feature';
 const withDisableCustomColors = createHigherOrderComponent(
 	( WrappedComponent ) => {
 		return ( props ) => {
-			const disableCustomColors = ! useEditorFeature( 'colors.custom' );
+			const disableCustomColors = ! useEditorFeature( 'color.custom' );
 
 			return (
 				<WrappedComponent

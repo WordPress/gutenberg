@@ -51,7 +51,8 @@ function Disabled( { className, children, ...props } ) {
 				focusable.setAttribute( 'tabindex', -1 );
 			}
 
-			if ( focusable.hasAttribute( 'tabindex' ) ) {
+			const tabIndex = focusable.getAttribute( 'tabindex' );
+			if ( tabIndex !== null && tabIndex !== '-1' ) {
 				focusable.removeAttribute( 'tabindex' );
 			}
 

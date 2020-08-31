@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import Flex from '../../flex';
+import Flex, { FlexItem } from '../../flex';
 import Text from '../../text';
 import { color, rtl, reduceMotion } from '../../utils/style-mixins';
 
@@ -187,6 +187,7 @@ export const Input = styled.input`
 		box-shadow: none !important;
 		color: ${ color( 'black' ) };
 		display: block;
+		margin: 0;
 		outline: none;
 		padding-left: 8px;
 		padding-right: 8px;
@@ -268,7 +269,6 @@ const labelTruncation = ( { isFloating } ) => {
 	if ( isFloating ) return '';
 
 	return css`
-		max-width: calc( 100% - 10px );
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -300,6 +300,10 @@ const BaseLabel = styled( Text )`
 `;
 
 export const Label = ( props ) => <BaseLabel { ...props } as="label" />;
+
+export const LabelWrapper = styled( FlexItem )`
+	max-width: calc( 100% - 10px );
+`;
 
 const fieldsetTopStyles = ( { isFloatingLabel } ) => {
 	const top = isFloatingLabel ? -5 : 0;
