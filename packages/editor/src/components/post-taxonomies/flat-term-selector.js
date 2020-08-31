@@ -33,7 +33,7 @@ const DEFAULT_QUERY = {
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name',
-}
+};
 
 // Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
 const unescapeString = ( arg ) => {
