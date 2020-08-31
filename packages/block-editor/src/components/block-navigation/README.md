@@ -25,7 +25,6 @@ import { BlockNavigation } from '@wordpress/block-editor';
 
 const MyNavigation = () => <BlockNavigation
 	onSelect={ onClose }
-	__experimentalFeatures={ __experimentalFeatures }
 />;
 ```
 
