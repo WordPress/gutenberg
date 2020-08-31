@@ -40,14 +40,7 @@ export default function useEditorFeature( featurePath ) {
 		( select ) => {
 			const path = `__experimentalFeatures.${ featurePath }`;
 
-			// 1 - Use block.json, if available.
-			const { getBlockSupport } = select( 'core/blocks' );
-			const blockSupportValue = getBlockSupport( blockName, path );
-			if ( blockSupportValue !== undefined ) {
-				return blockSupportValue;
-			}
-
-			// 2 - Use deprecated settings, if available.
+			// 1 - Use deprecated settings, if available.
 			const settings = select( 'core/block-editor' ).getSettings();
 			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
 				? deprecatedFlags[ featurePath ]( settings )
@@ -56,7 +49,7 @@ export default function useEditorFeature( featurePath ) {
 				return deprecatedSettingsValue;
 			}
 
-			// 3 - Use global __experimentalFeatures otherwise.
+			// 2 - Use global __experimentalFeatures otherwise.
 			return get( settings, path );
 		},
 		[ blockName, featurePath ]
