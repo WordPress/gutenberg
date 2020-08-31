@@ -607,6 +607,53 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that default values are applied if none are saved.
+	 */
+	function test_default_values_applied() {
+		$block_type_settings = array(
+			'attributes'      => array(
+				'textColor'       => array( 'default' => 'red' ),
+				'backgroundColor' => array( 'default' => 'black' ),
+				'style' => array(
+					'default' => array(
+						'color' => array(
+							'link' => 'var:preset|color|red',
+						),
+						'typography' => array(
+							'fontSize' => '10',
+							'lineHeight' => '10',
+						),
+					),
+				),
+			),
+			'supports'        => array(
+				'__experimentalColor'      => array(
+					'gradients' => true,
+					'linkColor' => true,
+				),
+				'__experimentalFontSize'   => true,
+				'__experimentalLineHeight' => true,
+				'align'                    => true,
+			),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'foo-bar-class wp-block-example has-text-color has-red-color has-link-color has-background has-black-background-color';
+		$expected_styles  = 'test: style; --wp--style--color--link: var(--wp--preset--color--red); font-size: 10px; line-height: 10;';
+
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
 	 * Tests that only styles for the supported flag are added.
 	 * Verify one support enabled does not imply multiple supports enabled.
 	 */
