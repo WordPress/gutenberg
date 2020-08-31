@@ -600,7 +600,7 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 	foreach ( array_keys( $config ) as $context ) {
 		if (
 			empty( $config[ $context ]['features'] ) ||
-			! is_array( $config[ $context ]['features'])
+			! is_array( $config[ $context ]['features'] )
 		) {
 			$features[ $context ] = array();
 		} else {
