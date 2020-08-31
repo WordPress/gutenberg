@@ -6,7 +6,7 @@ import { pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __experimentalGradientPicker } from '@wordpress/components';
+import { __experimentalGradientPicker as GradientPicker } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 function GradientPickerWithGradients( props ) {
@@ -19,7 +19,7 @@ function GradientPickerWithGradients( props ) {
 		[]
 	);
 	return (
-		<__experimentalGradientPicker
+		<GradientPicker
 			gradients={
 				props.gradients !== undefined ? props.gradient : gradients
 			}
@@ -37,7 +37,7 @@ export default function ( props ) {
 	const ComponentToUse =
 		props.gradients !== undefined &&
 		props.disableCustomGradients !== undefined
-			? __experimentalGradientPicker
+			? GradientPicker
 			: GradientPickerWithGradients;
 	return <ComponentToUse { ...props } />;
 }

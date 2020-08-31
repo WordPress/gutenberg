@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 export const INSERT_POINT_WIDTH = 23;
 export const GRADIENT_MARKERS_WIDTH = 18;
 export const MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_MARKER =
@@ -16,3 +21,8 @@ export const HORIZONTAL_GRADIENT_ORIENTATION = {
 	type: 'angular',
 	value: 90,
 };
+
+export const GRADIENT_OPTIONS = [
+	{ value: 'linear-gradient', label: __( 'Linear' ) },
+	{ value: 'radial-gradient', label: __( 'Radial' ) },
+];
