@@ -20,6 +20,11 @@
 	}
 }
 
+// Indent the popover to match the button position.
+.block-editor-block-switcher__popover {
+	margin-left: 6px;
+}
+
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	width: $block-toolbar-height;
 
