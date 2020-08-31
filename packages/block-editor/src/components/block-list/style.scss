@@ -544,11 +544,11 @@
 	.block-editor-block-mover:not(.is-horizontal) {
 		.block-editor-block-mover-button {
 			&.is-up-button svg {
-				margin-top: 1px;
+				margin-top: 2px;
 			}
 
 			&.is-down-button svg {
-				margin-bottom: 1px;
+				margin-bottom: 3px;
 			}
 
 			&:focus::before {
