@@ -50,49 +50,43 @@ function BlockMover( {
 				'is-horizontal': orientation === 'horizontal',
 			} ) }
 		>
-			<ToolbarGroup>
-				<ToolbarGroup className="block-editor-block-mover__move-button-container">
-					<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
-						{ ( itemProps ) => (
-							<BlockMoverUpButton
-								clientIds={ clientIds }
-								{ ...itemProps }
-							/>
-						) }
-					</ToolbarItem>
-					<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
-						{ ( itemProps ) => (
-							<BlockMoverDownButton
-								clientIds={ clientIds }
-								{ ...itemProps }
-							/>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
-				{ ! hideDragHandle && (
-					<BlockDraggable
-						clientIds={ clientIds }
-						cloneClassname="block-editor-block-mover__drag-clone"
-					>
-						{ ( {
-							isDraggable,
-							onDraggableStart,
-							onDraggableEnd,
-						} ) => (
-							<Button
-								icon={ dragHandle }
-								className="block-editor-block-mover__drag-handle"
-								aria-hidden="true"
-								// Should not be able to tab to drag handle as this
-								// button can only be used with a pointer device.
-								tabIndex="-1"
-								onDragStart={ onDraggableStart }
-								onDragEnd={ onDraggableEnd }
-								draggable={ isDraggable }
-							/>
-						) }
-					</BlockDraggable>
-				) }
+			{ ! hideDragHandle && (
+				<BlockDraggable
+					clientIds={ clientIds }
+					cloneClassname="block-editor-block-mover__drag-clone"
+				>
+					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+						<Button
+							icon={ dragHandle }
+							className="block-editor-block-mover__drag-handle"
+							aria-hidden="true"
+							// Should not be able to tab to drag handle as this
+							// button can only be used with a pointer device.
+							tabIndex="-1"
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+							draggable={ isDraggable }
+						/>
+					) }
+				</BlockDraggable>
+			) }
+			<ToolbarGroup className="block-editor-block-mover__move-button-container">
+				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
+					{ ( itemProps ) => (
+						<BlockMoverUpButton
+							clientIds={ clientIds }
+							{ ...itemProps }
+						/>
+					) }
+				</ToolbarItem>
+				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
+					{ ( itemProps ) => (
+						<BlockMoverDownButton
+							clientIds={ clientIds }
+							{ ...itemProps }
+						/>
+					) }
+				</ToolbarItem>
 			</ToolbarGroup>
 		</div>
 	);

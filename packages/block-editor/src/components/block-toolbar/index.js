@@ -10,6 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -112,15 +113,15 @@ export default function BlockToolbar( {
 					</div>
 				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<BlockSwitcher clientIds={ blockClientIds } />
+					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+						<BlockSwitcher clientIds={ blockClientIds } />
+						<BlockMover
+							clientIds={ blockClientIds }
+							hideDragHandle={ hideDragHandle }
+						/>
+					</ToolbarGroup>
 				) }
 			</div>
-			{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-				<BlockMover
-					clientIds={ blockClientIds }
-					hideDragHandle={ hideDragHandle }
-				/>
-			) }
 			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot

@@ -6,7 +6,8 @@
 	flex-shrink: 0;
 	flex-wrap: wrap;
 
-	& & {
+	// Unset for nested toolbar groups. Increase specificity.
+	& .components-toolbar-group.components-toolbar-group {
 		border-width: 0;
 		margin: 0;
 	}

@@ -49,14 +49,12 @@
 	}
 
 	.block-editor-block-mover__drag-handle {
-		min-width: 32px !important;
-		width: 32px;
-		padding-right: 16px !important;
+		width: $button-size-small;
 		cursor: grab;
 
-		svg {
-			transform: rotate(90deg);
-		}
+		// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+		min-width: $button-size-small !important;
+		padding: 0 !important;
 	}
 
 	// Position the icons correctly.
