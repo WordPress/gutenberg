@@ -202,6 +202,8 @@ You can use any editor you're comfortable with, it is more a personal preference
 
 Here are a few instructions if you need to start over, or want to remove what was installed.
 
+### Local Environment
+
 * You can remove the local environment data for a specific project:
 
 ```
@@ -214,11 +216,22 @@ wp-env destroy
 npm -g uninstall @wordpress/env
 ```
 
-* To uninstall Docker, or Visual Studio Code use your OS method to remove packages. For example, on Windows run "Add or remove programs".
+* To uninstall Docker, or Visual Studio Code use your OS method to remove packages. For example, on Windows run "Add or remove programs". You can additionally uninstall from the Docker Desktop app, click the bug icon at the top to switch to this Troubleshoot screen. Click Uninstallt or remove.
 
-* To uninstall Node/NVM, delete the directories:
+![Docker Troubleshoot Screenshot](https://developer.wordpress.org/files/2020/08/docker-uninstall-screen.png)
+
+
+### Uninstall Node/NVM
+
+To uninstall Node/NVM, delete the NVM directory, this is typically installed at `$HOME/.nvm`. If you the `$NVM_DIR` environment variable is set you can remove using:
 
 ```
-rm -rf ~/.nvm
-rm -rf ~/.npm
+rm -rf "$NVM_DIR"
 ```
+
+or
+
+```
+rm -rf "$HOME/.nvm"
+```
+
