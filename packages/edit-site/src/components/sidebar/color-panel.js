@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { PanelColorSettings } from '@wordpress/block-editor';
+import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -26,35 +26,36 @@ export default ( {
 
 	if ( supports.includes( TEXT_COLOR ) ) {
 		settings.push( {
-			value: getProperty( name, 'color', 'text' ),
-			onChange: ( value ) => setProperty( name, 'color', 'text', value ),
+			colorValue: getProperty( name, 'color', 'text' ),
+			onColorChange: ( value ) =>
+				setProperty( name, 'color', 'text', value ),
 			label: __( 'Text color' ),
 		} );
 	}
 
+	// TODO: do gradients
 	if ( supports.includes( BACKGROUND_COLOR ) ) {
 		settings.push( {
-			value: getProperty( name, 'color', 'background' ),
-			onChange: ( value ) =>
+			colorValue: getProperty( name, 'color', 'background' ),
+			onColorChange: ( value ) =>
 				setProperty( name, 'color', 'background', value ),
 			label: __( 'Background color' ),
 		} );
 	}
 
-	// TODO: do gradients
-
 	if ( supports.includes( LINK_COLOR ) ) {
 		settings.push( {
-			value: getProperty( name, 'color', 'link' ),
-			onChange: ( value ) => setProperty( name, 'color', 'link', value ),
+			colorValue: getProperty( name, 'color', 'link' ),
+			onColorChange: ( value ) =>
+				setProperty( name, 'color', 'link', value ),
 			label: __( 'Link color' ),
 		} );
 	}
 
 	return (
-		<PanelColorSettings
+		<PanelColorGradientSettings
 			title={ __( 'Color' ) }
-			colorSettings={ settings }
+			settings={ settings }
 		/>
 	);
 };
