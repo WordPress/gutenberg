@@ -223,13 +223,13 @@ npm -g uninstall @wordpress/env
 
 ### Uninstall Node/NVM
 
-To uninstall Node/NVM, delete the NVM directory, this is typically installed at `$HOME/.nvm`. If you the `$NVM_DIR` environment variable is set you can remove using:
+To uninstall Node/NVM, delete the NVM directory, this is typically installed at `$HOME/.nvm`. If the `$NVM_DIR` environment variable is set you can remove using:
 
 ```
 rm -rf "$NVM_DIR"
 ```
 
-or
+or, delete directly using:
 
 ```
 rm -rf "$HOME/.nvm"
