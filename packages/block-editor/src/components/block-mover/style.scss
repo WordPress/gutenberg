@@ -58,6 +58,11 @@
 		// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
 		min-width: $button-size-small !important;
 		padding: 0 !important;
+
+		&:focus::before {
+			left: 0 !important;
+			right: 0 !important;
+		}
 	}
 
 	// Position the icons correctly.
