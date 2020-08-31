@@ -50,7 +50,7 @@ const NavigationMenuItem = ( props ) => {
 		<MenuItemUI className={ classes }>
 			<LinkComponentTag
 				className={ classes }
-				href={ ! children.length ? href : null }
+				href={ ! children.length ? href : undefined }
 				onClick={ handleClick }
 				{ ...linkProps }
 			>
