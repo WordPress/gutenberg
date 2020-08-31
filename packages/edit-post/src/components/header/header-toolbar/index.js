@@ -97,7 +97,7 @@ function HeaderToolbar() {
 			{ isLargeViewport && (
 				<ToolbarItem
 					as={ ToolSelector }
-					disabled={ ! isTextModeEnabled }
+					disabled={ isTextModeEnabled }
 				/>
 			) }
 			<ToolbarItem as={ EditorHistoryUndo } />
