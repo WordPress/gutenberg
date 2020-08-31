@@ -219,7 +219,7 @@ export const registerCoreBlocks = () => {
 		cover,
 		socialLink,
 		socialLinks,
-		iOSOnly( pullquote ),
+		pullquote,
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );
