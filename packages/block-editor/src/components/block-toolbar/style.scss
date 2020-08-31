@@ -60,6 +60,11 @@
 			width: $button-size-small !important;
 			margin: 0 !important;
 		}
+
+		&:focus::before {
+			left: $grid-unit-05 !important;
+			right: 0 !important;
+		}
 	}
 }
 
