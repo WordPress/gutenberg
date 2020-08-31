@@ -479,7 +479,7 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 		// 1) The style attributes the block has declared support for.
 		// 2) Any CSS custom property attached to the node.
 		if ( in_array( $property, $block_supports, true ) || strstr( $property, '--' ) ) {
-			$css_declarations .= $property . ': ' . $value . ';';
+			$css_declarations .= $property . ':' . $value . ';';
 		}
 	}
 	if ( '' !== $css_declarations ) {
