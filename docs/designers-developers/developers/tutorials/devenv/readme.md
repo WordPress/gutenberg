@@ -35,7 +35,7 @@ First download, install, and start [Docker Desktop](https://www.docker.com/produ
 npm -g install @wordpress/env
 ```
 
-Create a minimal `.wp-env.json` file:
+Create a minimal `.wp-env.json` file with the following content:
 
 ```json
 {
