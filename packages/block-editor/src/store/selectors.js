@@ -233,7 +233,11 @@ export const __unstableGetBlockWithBlockTree = createSelector(
 			innerBlocks: __unstableGetBlockTree( state, clientId ),
 		};
 	},
-	( state, clientId ) => [ state.blocks.cache[ clientId ] ]
+	( state ) => [
+		state.blocks.byClientId,
+		state.blocks.order,
+		state.blocks.attributes,
+	]
 );
 
 /**
