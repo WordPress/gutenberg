@@ -9,7 +9,7 @@ import { get, omit } from 'lodash';
 import { Component } from '@wordpress/element';
 import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { update } from '@wordpress/icons';
@@ -38,15 +38,18 @@ class LegacyWidgetEdit extends Component {
 			availableLegacyWidgets,
 			hasPermissionsToManageWidgets,
 			isSelected,
+			prerenderedEditForm,
 			setAttributes,
+			setWidgetId,
+			widgetId,
 		} = this.props;
 		const { isPreview, hasEditForm } = this.state;
-		const { id, widgetClass } = attributes;
+		const { widgetClass } = attributes;
 		const widgetObject =
-			( id && availableLegacyWidgets[ id ] ) ||
+			( widgetId && availableLegacyWidgets[ widgetId ] ) ||
 			( widgetClass && availableLegacyWidgets[ widgetClass ] );
 
-		if ( ! id && ! widgetClass ) {
+		if ( ! widgetId && ! widgetClass ) {
 			return (
 				<LegacyWidgetPlaceholder
 					availableLegacyWidgets={ availableLegacyWidgets }
@@ -58,9 +61,11 @@ class LegacyWidgetEdit extends Component {
 							isReferenceWidget,
 							id_base: idBase,
 						} = availableLegacyWidgets[ newWidget ];
+						if ( isReferenceWidget ) {
+							setWidgetId( newWidget );
+						}
 						setAttributes( {
 							instance: {},
-							id: isReferenceWidget ? newWidget : undefined,
 							idBase,
 							widgetClass: isReferenceWidget
 								? undefined
@@ -123,12 +128,25 @@ class LegacyWidgetEdit extends Component {
 					<LegacyWidgetEditHandler
 						isSelected={ isSelected }
 						isVisible={ ! isPreview }
-						id={ id }
-						idBase={ attributes.idBase || attributes.id }
+						id={ widgetId }
+						idBase={ attributes.idBase || widgetId }
 						number={ attributes.number }
+						prerenderedEditForm={ prerenderedEditForm }
 						widgetName={ get( widgetObject, [ 'name' ] ) }
 						widgetClass={ attributes.widgetClass }
 						instance={ attributes.instance }
+						onFormMount={ ( formData ) => {
+							// Function-based widgets don't come with an object of settings, only
+							// with a pre-rendered HTML form. Extracting settings from that HTML
+							// before this stage is not trivial (think embedded <script>). An alternative
+							// proposed here serializes the form back into widget settings immediately after
+							// it's mounted.
+							if ( ! attributes.widgetClass ) {
+								this.props.setAttributes( {
+									instance: formData,
+								} );
+							}
+						} }
 						onInstanceChange={ ( newInstance, newHasEditForm ) => {
 							if ( newInstance ) {
 								this.props.setAttributes( {
@@ -169,18 +187,25 @@ class LegacyWidgetEdit extends Component {
 	}
 
 	renderWidgetPreview() {
-		const { attributes } = this.props;
+		const { widgetId, attributes } = this.props;
 		return (
 			<ServerSideRender
 				className="wp-block-legacy-widget__preview"
 				block="core/legacy-widget"
-				attributes={ omit( attributes, 'id' ) }
+				attributes={ {
+					widgetId,
+					...omit( attributes, 'id' ),
+				} }
 			/>
 		);
 	}
 }
 
-export default withSelect( ( select ) => {
+export default withSelect( ( select, { clientId } ) => {
+	const widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
+		clientId
+	);
+	const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
 	const editorSettings = select( 'core/block-editor' ).getSettings();
 	const {
 		availableLegacyWidgets,
@@ -189,5 +214,18 @@ export default withSelect( ( select ) => {
 	return {
 		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,
+		widgetId,
+		prerenderedEditForm: widget ? widget.rendered_form : '',
 	};
-} )( LegacyWidgetEdit );
+} )(
+	withDispatch( ( dispatch, { clientId } ) => {
+		return {
+			setWidgetId( id ) {
+				dispatch( 'core/edit-widgets' ).setWidgetIdForClientId(
+					clientId,
+					id
+				);
+			},
+		};
+	} )( LegacyWidgetEdit )
+);

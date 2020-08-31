@@ -2,9 +2,6 @@
 	"name": "core/search",
 	"category": "widgets",
 	"attributes": {
-		"className": {
-			"type": "string"
-		},
 		"label": {
 			"type": "string"
 		},

@@ -4,6 +4,12 @@
 import { flatMap, filter, compact } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+import { getPhrasingContentSchema } from '@wordpress/dom';
+
+/**
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
@@ -16,10 +22,14 @@ import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import { deepFilterHTML, getBlockContentSchema } from './utils';
 
-import { getPhrasingContentSchema } from './phrasing-content';
-
 export { pasteHandler } from './paste-handler';
-export { getPhrasingContentSchema };
+
+export function deprecatedGetPhrasingContentSchema( context ) {
+	deprecated( 'wp.blocks.getPhrasingContentSchema', {
+		alternative: 'wp.dom.getPhrasingContentSchema',
+	} );
+	return getPhrasingContentSchema( context );
+}
 
 function getRawTransformations() {
 	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(

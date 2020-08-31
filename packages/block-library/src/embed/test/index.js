@@ -6,7 +6,12 @@ import { render } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	unregisterBlockType,
+	registerBlockVariation,
+	unregisterBlockVariation,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -33,6 +38,19 @@ describe( 'core/embed', () => {
 	} );
 } );
 describe( 'utils', () => {
+	beforeAll( () => {
+		registerBlockType( DEFAULT_EMBED_BLOCK, {
+			title: 'Embed',
+			category: 'embed',
+			attributes,
+			variations,
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( DEFAULT_EMBED_BLOCK );
+	} );
+
 	describe( 'findMoreSuitableBlock', () => {
 		test( 'findMoreSuitableBlock matches a URL to a block name', () => {
 			const twitterURL = 'https://twitter.com/notnownikki';
@@ -77,11 +95,38 @@ describe( 'utils', () => {
 		describe( 'do not create new block', () => {
 			it( 'when block type does not exist', () => {
 				const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w';
+
+				unregisterBlockType( DEFAULT_EMBED_BLOCK );
+
 				expect(
 					createUpgradedEmbedBlock( {
 						attributes: { url: youtubeURL },
 					} )
 				).toBeUndefined();
+
+				registerBlockType( DEFAULT_EMBED_BLOCK, {
+					title: 'Embed',
+					category: 'embed',
+					attributes,
+					variations,
+				} );
+			} );
+
+			it( 'when block variation does not exist', () => {
+				const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w';
+
+				unregisterBlockVariation( DEFAULT_EMBED_BLOCK, 'youtube' );
+
+				expect(
+					createUpgradedEmbedBlock( {
+						attributes: { url: youtubeURL },
+					} )
+				).toBeUndefined();
+
+				registerBlockVariation(
+					DEFAULT_EMBED_BLOCK,
+					variations.find( ( { name } ) => name === 'youtube' )
+				);
 			} );
 			it( 'when no url provided', () => {
 				expect(
@@ -93,18 +138,9 @@ describe( 'utils', () => {
 		it( 'should return a YouTube embed block when given a YouTube URL', () => {
 			const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
-			registerBlockType( DEFAULT_EMBED_BLOCK, {
-				title: 'Embed',
-				category: 'embed',
-				attributes,
-				variations,
-			} );
-
 			const result = createUpgradedEmbedBlock( {
 				attributes: { url: youtubeURL },
 			} );
-
-			unregisterBlockType( DEFAULT_EMBED_BLOCK );
 
 			expect( result ).toEqual(
 				expect.objectContaining( {

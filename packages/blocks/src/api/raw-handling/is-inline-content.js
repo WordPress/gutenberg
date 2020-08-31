@@ -4,9 +4,9 @@
 import { difference } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { isTextContent } from './phrasing-content';
+import { isTextContent } from '@wordpress/dom';
 
 /**
  * Checks if the given node should be considered inline content, optionally

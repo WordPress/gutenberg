@@ -23,16 +23,17 @@ function render_block_core_site_logo( $attributes ) {
 
 	add_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
 	$custom_logo = get_custom_logo();
-	$class_name  = 'wp-block-site-logo';
+	$classnames  = array();
 	if ( ! empty( $attributes['className'] ) ) {
-		$class_name .= " {$attributes['className']}";
+		$classnames[] = $attributes['className'];
 	}
 
 	if ( ! empty( $attributes['align'] ) && in_array( $attributes['align'], array( 'center', 'left', 'right' ), true ) ) {
-		$class_name .= " align{$attributes['align']}";
+		$classnames[] = "align{$attributes['align']}";
 	}
 
-	$html = sprintf( '<div class="%s"><a href="' . get_bloginfo( 'url' ) . '" rel="home" title="' . get_bloginfo( 'name' ) . '">%s</a></div>', $class_name, $custom_logo );
+	$class_name = implode( ' ', $classnames );
+	$html       = sprintf( '<div class="%s"><a href="' . get_bloginfo( 'url' ) . '" rel="home" title="' . get_bloginfo( 'name' ) . '">%s</a></div>', $class_name, $custom_logo );
 	remove_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
 	return $html;
 }
