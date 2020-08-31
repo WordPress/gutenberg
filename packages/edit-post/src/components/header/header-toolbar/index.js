@@ -94,7 +94,12 @@ function HeaderToolbar() {
 					'Generic label for block inserter button'
 				) }
 			/>
-			{ isLargeViewport && <ToolbarItem as={ ToolSelector } disabled={ ! isInserterEnabled } /> }
+			{ isLargeViewport && (
+				<ToolbarItem
+					as={ ToolSelector }
+					disabled={ ! isTextModeEnabled }
+				/>
+			) }
 			<ToolbarItem as={ EditorHistoryUndo } />
 			<ToolbarItem as={ EditorHistoryRedo } />
 			<ToolbarItem
