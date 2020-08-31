@@ -24,6 +24,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
+import useEditorFeature from '../use-editor-feature';
 
 // translators: first %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(Color: %s)' );
@@ -177,6 +178,10 @@ function ColorGradientControlSelect( props ) {
 		const settings = select( 'core/block-editor' ).getSettings();
 		return pick( settings, colorsAndGradientKeys );
 	} );
+	colorGradientSettings.disableCustomColors = ! useEditorFeature(
+		'colors.custom'
+	);
+
 	return (
 		<ColorGradientControlInner
 			{ ...{ ...colorGradientSettings, ...props } }

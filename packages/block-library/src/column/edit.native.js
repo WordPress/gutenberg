@@ -8,6 +8,7 @@ import { View } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
 import {
 	InnerBlocks,
 	BlockControls,
@@ -38,12 +39,19 @@ function ColumnEdit( {
 	columns,
 	columnCount,
 	selectedColumnIndex,
+	parentAlignment,
 } ) {
 	const { verticalAlignment } = attributes;
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
 	};
+
+	useEffect( () => {
+		if ( ! verticalAlignment && parentAlignment ) {
+			updateAlignment( parentAlignment );
+		}
+	}, [] );
 
 	const onWidthChange = ( width ) => {
 		setAttributes( {
@@ -146,6 +154,7 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlocks,
 			getBlockOrder,
+			getBlockAttributes,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -162,6 +171,9 @@ export default compose( [
 		const columnCount = getBlockCount( parentId );
 		const columns = getBlocks( parentId );
 
+		const parentAlignment = getBlockAttributes( parentId )
+			?.verticalAlignment;
+
 		return {
 			hasChildren,
 			isParentSelected,
@@ -169,6 +181,7 @@ export default compose( [
 			selectedColumnIndex,
 			columns,
 			columnCount,
+			parentAlignment,
 		};
 	} ),
 	withPreferredColorScheme,

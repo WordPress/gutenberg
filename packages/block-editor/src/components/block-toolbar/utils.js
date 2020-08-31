@@ -31,7 +31,10 @@ export function useDebouncedShowMovers( {
 	const timeoutRef = useRef();
 
 	const handleOnChange = ( nextIsFocused ) => {
-		setShowMovers( nextIsFocused );
+		if ( ref?.current ) {
+			setShowMovers( nextIsFocused );
+		}
+
 		onChange( nextIsFocused );
 	};
 

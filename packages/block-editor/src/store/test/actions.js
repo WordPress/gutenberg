@@ -24,6 +24,8 @@ import {
 	startTyping,
 	stopMultiSelect,
 	stopTyping,
+	startDraggingBlocks,
+	stopDraggingBlocks,
 	toggleBlockMode,
 	toggleSelection,
 	updateBlock,
@@ -843,6 +845,24 @@ describe( 'actions', () => {
 		it( 'should return the STOP_TYPING action', () => {
 			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
+			} );
+		} );
+	} );
+
+	describe( 'startDraggingBlocks', () => {
+		it( 'should return the START_DRAGGING_BLOCKS action with the list of clientIds passed', () => {
+			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
+			expect( startDraggingBlocks( clientIds ) ).toEqual( {
+				type: 'START_DRAGGING_BLOCKS',
+				clientIds,
+			} );
+		} );
+	} );
+
+	describe( 'stopDraggingBlocks', () => {
+		it( 'should return the STOP_DRAGGING_BLOCKS action', () => {
+			expect( stopDraggingBlocks() ).toEqual( {
+				type: 'STOP_DRAGGING_BLOCKS',
 			} );
 		} );
 	} );

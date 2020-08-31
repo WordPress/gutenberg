@@ -245,8 +245,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	const createFromMenu = useCallback( () => {
 		// If an empty menu was selected, create an empty block.
 		if ( ! menuItems.length ) {
-			const blocks = [ createBlock( 'core/navigation-link' ) ];
-			onCreate( blocks );
+			onCreate( [] );
 			return;
 		}
 
@@ -263,8 +262,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		const { key } = selectedCreateOption;
 		switch ( key ) {
 			case CREATE_EMPTY_OPTION_VALUE: {
-				const blocks = [ createBlock( 'core/navigation-link' ) ];
-				onCreate( blocks );
+				onCreate( [] );
 				return;
 			}
 

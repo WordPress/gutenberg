@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy } from 'lodash';
+import { invert, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,16 +28,31 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 	);
 } );
 
+export const getWidget = createRegistrySelector(
+	( select ) => ( state, id ) => {
+		const widgets = select( 'core/edit-widgets' ).getWidgets();
+		return widgets[ id ];
+	}
+);
+
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	if ( ! hasResolvedWidgetAreas( query ) ) {
 		return null;
 	}
 
 	const query = buildWidgetAreasQuery();
-	return select( 'core' )
-		.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query )
-		.filter( ( { id } ) => id !== 'wp_inactive_widgets' );
+	return select( 'core' ).getEntityRecords(
+		KIND,
+		WIDGET_AREA_ENTITY_TYPE,
+		query
+	);
 } );
+
+export const getWidgetIdForClientId = ( state, clientId ) => {
+	const widgetIdToClientId = state.mapping;
+	const clientIdToWidgetId = invert( widgetIdToClientId );
+	return clientIdToWidgetId[ clientId ];
+};
 
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
@@ -75,7 +90,10 @@ export const isSavingWidgetAreas = createRegistrySelector(
 				.getWidgetAreas()
 				?.map( ( { id } ) => id );
 		}
-		for ( const id in ids ) {
+		if ( ! ids ) {
+			return false;
+		}
+		for ( const id of ids ) {
 			const isSaving = select( 'core' ).isSavingEntityRecord(
 				KIND,
 				WIDGET_AREA_ENTITY_TYPE,
