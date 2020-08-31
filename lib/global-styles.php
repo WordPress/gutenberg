@@ -470,7 +470,6 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
  * @return string The corresponding CSS rule.
  */
 function gutenberg_experimental_global_styles_resolver_styles( $block_selector, $block_supports, $block_styles ) {
-	$css_rule         = '';
 	$css_declarations = '';
 
 	foreach ( $block_styles as $property => $value ) {
@@ -483,10 +482,10 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 		}
 	}
 	if ( '' !== $css_declarations ) {
-		$css_rule .= $block_selector . '{' . $css_declarations . '}';
+		return $block_selector . '{' . $css_declarations . '}';
 	}
 
-	return $css_rule;
+	return '';
 }
 
 /**
