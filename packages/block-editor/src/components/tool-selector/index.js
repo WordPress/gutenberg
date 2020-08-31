@@ -26,10 +26,29 @@ const selectIcon = (
 );
 
 function ToolSelector( props, ref ) {
-	const isNavigationTool = useSelect(
-		( select ) => select( 'core/block-editor' ).isNavigationMode(),
-		[]
-	);
+	const {
+		isInserterEnabled,
+		isNavigationTool
+	} = useSelect( ( select ) => {
+		const {
+			hasInserterItems,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+			isNavigationMode,
+		} = select( 'core/block-editor' );
+		return {
+			// This setting (richEditingEnabled) should not live in the block editor's setting.
+			isInserterEnabled:
+				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+				select( 'core/editor' ).getEditorSettings()
+					.richEditingEnabled &&
+				hasInserterItems(
+					getBlockRootClientId( getBlockSelectionEnd() )
+				),
+			isNavigationMode,
+		};
+	}, [] );
+
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	const onSwitchMode = ( mode ) => {
@@ -46,6 +65,7 @@ function ToolSelector( props, ref ) {
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
 					label={ __( 'Tools' ) }
+					disabled={ ! isInserterEnabled }
 				/>
 			) }
 			position="bottom right"
