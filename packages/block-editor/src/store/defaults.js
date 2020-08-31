@@ -14,7 +14,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
  * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
  * @property {Array} colors Palette colors
- * @property {boolean} disableCustomColors Whether or not the custom colors are disabled
  * @property {Array} fontSizes Available font sizes
  * @property {boolean} disableCustomFontSizes Whether or not the custom font sizes are disabled
  * @property {boolean} imageEditing Image Editing settings set to false to disable.
