@@ -59,7 +59,7 @@ const gutenbergFormatNamesToAztec = {
 	'core/strikethrough': 'strikethrough',
 };
 
-const EMPTY_MULTILINE_PARAGRAPH = '<p></p>';
+const EMPTY_PARAGRAPH_TAGS = '<p></p>';
 
 export class RichText extends Component {
 	constructor( {
@@ -728,7 +728,7 @@ export class RichText extends Component {
 		// On android if content is empty we need to send no content or else the placeholder will not show.
 		if (
 			! this.isIOS &&
-			( value === '' || value === EMPTY_MULTILINE_PARAGRAPH )
+			( value === '' || value === EMPTY_PARAGRAPH_TAGS )
 		) {
 			return '';
 		}
