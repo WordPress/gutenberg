@@ -33,6 +33,10 @@ function InserterMenu( {
 	const [ activeTab, setActiveTab ] = useState( 'blocks' );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		null
+	);
+
 	const [
 		destinationRootClientId,
 		onInsertBlocks,
@@ -83,6 +87,10 @@ function InserterMenu( {
 		setHoveredItem( item );
 	};
 
+	const onClickPatternCategory = ( patternCategory ) => {
+		setSelectedPatternCategory( patternCategory );
+	};
+
 	const blocksTab = (
 		<>
 			<div className="block-editor-inserter__block-list">
@@ -109,6 +117,8 @@ function InserterMenu( {
 		<BlockPatternsTabs
 			onInsert={ onInsertPattern }
 			filterValue={ filterValue }
+			onClickCategory={ onClickPatternCategory }
+			selectedCategory={ selectedPatternCategory }
 		/>
 	);
 

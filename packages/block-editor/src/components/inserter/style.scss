@@ -161,12 +161,40 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 }
 
-.block-editor-inserter__panel-title {
+.block-editor-inserter__panel-title,
+.block-editor-inserter__panel-title button,
+.block-editor-inserter__panel-header-dropdown-content button {
 	margin: 0 $grid-unit-15 0 0;
 	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 500;
+}
+
+.block-editor-inserter__panel-title button {
+	padding: 0 5px;
+	height: auto;
+	margin-right: 0;
+	color: var(--wp-admin-theme-color);
+
+	&::after {
+		content: " \25BC";
+		padding-left: 5px;
+	}
+}
+
+.block-editor-inserter__panel-header-dropdown-content {
+	button {
+		color: $gray-900;
+	}
+
+	svg {
+		visibility: hidden;
+	}
+
+	.is-selected svg {
+		visibility: visible;
+	}
 }
 
 .block-editor-inserter__block-list {
