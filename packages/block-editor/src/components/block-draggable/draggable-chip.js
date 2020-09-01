@@ -5,7 +5,7 @@ import { _n, sprintf } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { Flex, FlexItem } from '@wordpress/components';
-import { handle } from '@wordpress/icons';
+import { dragHandle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -47,7 +47,7 @@ export default function BlockDraggableChip( { clientIds } ) {
 						) }
 					</FlexItem>
 					<FlexItem>
-						<BlockIcon icon={ handle } />
+						<BlockIcon icon={ dragHandle } />
 					</FlexItem>
 				</Flex>
 			</div>

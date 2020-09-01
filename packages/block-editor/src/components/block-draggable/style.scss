@@ -1,9 +1,8 @@
 .block-editor-block-draggable-chip-wrapper {
 	position: absolute;
-	// Offset position by half the height of the draggable chip
-	// so that the cursor is centered over the left part of the chip.
+	// Offset position so that cursor is centered over the drag handle.
 	top: -#{$block-toolbar-height / 2};
-	left: -#{$block-toolbar-height / 2};
+	left: -#{$button-size * 1.5};
 }
 
 .block-editor-block-draggable-chip {
