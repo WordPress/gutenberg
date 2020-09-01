@@ -1,0 +1,27 @@
+/**
+ * WordPress dependencies
+ */
+import { __experimentalSearchForm as SearchForm } from '@wordpress/block-editor';
+import { useState } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import TemplatePartPreviews from './template-part-previews';
+
+export default function TemplatePartSelection( { setAttributes } ) {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	return (
+		<>
+			<SearchForm
+				onChange={ setFilterValue }
+				className="wp-block-template-part__placeholder-preview-search-form"
+			/>
+			<div className="wp-block-template-part__placeholder-preview-container">
+				<TemplatePartPreviews
+					setAttributes={ setAttributes }
+					filterValue={ filterValue }
+				/>
+			</div>
+		</>
+	);
+}
