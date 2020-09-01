@@ -614,13 +614,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'attributes'      => array(
 				'textColor'       => array( 'default' => 'red' ),
 				'backgroundColor' => array( 'default' => 'black' ),
-				'style' => array(
+				'style'           => array(
 					'default' => array(
-						'color' => array(
+						'color'      => array(
 							'link' => 'var:preset|color|red',
 						),
 						'typography' => array(
-							'fontSize' => '10',
+							'fontSize'   => '10',
 							'lineHeight' => '10',
 						),
 					),
