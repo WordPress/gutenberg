@@ -17,7 +17,7 @@ import { groupBy, uniq, deburr } from 'lodash';
 
 function PreviewPlaceholder() {
 	return (
-		<div className="wp-block-template-part__placeholder-preview-item is-placeholder" />
+		<div className="wp-block-template-part__selection-preview-item is-placeholder" />
 	);
 }
 
@@ -49,7 +49,7 @@ function TemplatePartItem( { templatePart, setAttributes } ) {
 
 	return (
 		<div
-			className="wp-block-template-part__placeholder-preview-item"
+			className="wp-block-template-part__selection-preview-item"
 			role="button"
 			onClick={ onClick }
 			onKeyDown={ ( event ) => {
@@ -61,7 +61,7 @@ function TemplatePartItem( { templatePart, setAttributes } ) {
 			aria-label={ templatePart.slug }
 		>
 			<BlockPreview blocks={ blocks } />
-			<div className="wp-block-template-part__placeholder-preview-item-title">
+			<div className="wp-block-template-part__selection-preview-item-title">
 				{ templatePart.slug }
 			</div>
 		</div>
@@ -71,13 +71,13 @@ function TemplatePartItem( { templatePart, setAttributes } ) {
 function PanelGroup( { title, icon, children } ) {
 	return (
 		<>
-			<div className="wp-block-template-part__placeholder-panel-group-header">
-				<span className="wp-block-template-part__placeholder-panel-group-title">
+			<div className="wp-block-template-part__selection-panel-group-header">
+				<span className="wp-block-template-part__selection-panel-group-title">
 					{ title }
 				</span>
 				<Icon icon={ icon } />
 			</div>
-			<div className="wp-block-template-part__placeholder-panel-group-content">
+			<div className="wp-block-template-part__selection-panel-group-content">
 				{ children }
 			</div>
 		</>

@@ -14,9 +14,9 @@ export default function TemplatePartSelection( { setAttributes } ) {
 		<>
 			<SearchForm
 				onChange={ setFilterValue }
-				className="wp-block-template-part__placeholder-preview-search-form"
+				className="wp-block-template-part__selection-preview-search-form"
 			/>
-			<div className="wp-block-template-part__placeholder-preview-container">
+			<div className="wp-block-template-part__selection-preview-container">
 				<TemplatePartPreviews
 					setAttributes={ setAttributes }
 					filterValue={ filterValue }
