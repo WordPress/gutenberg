@@ -89,7 +89,7 @@ function Example() {
 					style={ { position: 'absolute', bottom: 0 } }
 					onClick={ () => setActive( 'child-2' ) }
 				>
-					Direct link to Child 2
+					Non-navigation link to Child 2
 				</Button>
 			) : null }
 			<Navigation activeItemId={ active } data={ data } rootTitle="Home">
