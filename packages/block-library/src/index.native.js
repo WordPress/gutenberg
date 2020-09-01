@@ -191,6 +191,7 @@ addFilter(
  * ```
  */
 export const registerCoreBlocks = () => {
+	// When adding new blocks to this list please also consider updating /src/block-support/supportedBlocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
 		heading,
