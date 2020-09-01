@@ -13,6 +13,7 @@ export default function TemplatePartSelection( { setAttributes, onClose } ) {
 	return (
 		<>
 			<SearchForm
+				value={ filterValue }
 				onChange={ setFilterValue }
 				className="wp-block-template-part__selection-preview-search-form"
 			/>
