@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
@@ -35,44 +30,6 @@ const deprecated = [
 
 			return (
 				<blockquote style={ { textAlign: align ? align : null } }>
-					<RichText.Content multiline value={ value } />
-					{ ! RichText.isEmpty( citation ) && (
-						<RichText.Content tagName="cite" value={ citation } />
-					) }
-				</blockquote>
-			);
-		},
-	},
-	{
-		attributes: {
-			...blockAttributes,
-			style: {
-				type: 'number',
-				default: 1,
-			},
-		},
-
-		migrate( attributes ) {
-			if ( attributes.style === 2 ) {
-				return {
-					...omit( attributes, [ 'style' ] ),
-					className: attributes.className
-						? attributes.className + ' is-style-large'
-						: 'is-style-large',
-				};
-			}
-
-			return attributes;
-		},
-
-		save( { attributes } ) {
-			const { align, value, citation, style } = attributes;
-
-			return (
-				<blockquote
-					className={ style === 2 ? 'is-large' : '' }
-					style={ { textAlign: align ? align : null } }
-				>
 					<RichText.Content multiline value={ value } />
 					{ ! RichText.isEmpty( citation ) && (
 						<RichText.Content tagName="cite" value={ citation } />
