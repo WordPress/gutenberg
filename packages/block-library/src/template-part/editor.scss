@@ -7,6 +7,10 @@
 	}
 }
 
+.wp-block-template-part__preview-dropdown-button {
+	border-right: $border-width solid $gray-900;
+}
+
 .wp-block-template-part__selection-preview-search-form {
 	border-bottom: $border-width solid $gray-200;
 }
