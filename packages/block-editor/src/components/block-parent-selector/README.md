@@ -24,7 +24,7 @@ Renders block parent selector icon in a <ToolbarButton /> component.
 import { Button } from '@wordpress/components';
 
 const MyBlockParentSelector = () => (
-	<BlockParentSelector clientIds={ blockClientId } />
+	<BlockParentSelector clientIds={ blockClientIds } />
 );
 ```
 
