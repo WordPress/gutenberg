@@ -83,37 +83,49 @@ function Example() {
 	const [ active, setActive ] = useState( 'item-1' );
 
 	return (
-		<Navigation activeItemId={ active } data={ data } rootTitle="Home">
-			{ ( { level, parentLevel, NavigationBackButton } ) => {
-				return (
-					<>
-						{ parentLevel && (
-							<NavigationBackButton>
-								<Icon icon={ arrowLeft } />
-								{ parentLevel.title }
-							</NavigationBackButton>
-						) }
-						<h1>{ level.title }</h1>
-						<NavigationMenu>
-							{ level.children.map( ( item ) => {
-								return (
-									<NavigationMenuItem
-										{ ...item }
-										key={ item.id }
-										onClick={
-											! item.href
-												? ( selected ) =>
-														setActive( selected.id )
-												: null
-										}
-									/>
-								);
-							} ) }
-						</NavigationMenu>
-					</>
-				);
-			} }
-		</Navigation>
+		<>
+			{ active !== 'child-2' ? (
+				<Button
+					style={ { position: 'absolute', bottom: 0 } }
+					onClick={ () => setActive( 'child-2' ) }
+				>
+					Direct link to Child 2
+				</Button>
+			) : null }
+			<Navigation activeItemId={ active } data={ data } rootTitle="Home">
+				{ ( { level, parentLevel, NavigationBackButton } ) => {
+					return (
+						<>
+							{ parentLevel && (
+								<NavigationBackButton>
+									<Icon icon={ arrowLeft } />
+									{ parentLevel.title }
+								</NavigationBackButton>
+							) }
+							<h1>{ level.title }</h1>
+							<NavigationMenu>
+								{ level.children.map( ( item ) => {
+									return (
+										<NavigationMenuItem
+											{ ...item }
+											key={ item.id }
+											onClick={
+												! item.href
+													? ( selected ) =>
+															setActive(
+																selected.id
+															)
+													: null
+											}
+										/>
+									);
+								} ) }
+							</NavigationMenu>
+						</>
+					);
+				} }
+			</Navigation>
+		</>
 	);
 }
 

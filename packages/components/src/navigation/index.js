@@ -65,7 +65,7 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		if ( activeItem ) {
 			setActiveLevelId( activeItem.parent );
 		}
-	}, [] );
+	}, [ activeItem ] );
 
 	const NavigationBackButton = ( { children: backButtonChildren } ) => {
 		if ( ! parentLevel ) {
