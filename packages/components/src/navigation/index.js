@@ -100,24 +100,22 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 					origin: isNavigatingBack ? 'right' : 'left',
 				} }
 			>
-				{ ( { className: animateClassName } ) => {
-					return (
-						<div
-							className={ classnames(
-								'components-navigation__level',
-								{
-									[ animateClassName ]: ! isMounted.current,
-								}
-							) }
-						>
-							{ children( {
-								level,
-								NavigationBackButton,
-								parentLevel,
-							} ) }
-						</div>
-					);
-				} }
+				{ ( { className: animateClassName } ) => (
+					<div
+						className={ classnames(
+							'components-navigation__level',
+							{
+								[ animateClassName ]: ! isMounted.current,
+							}
+						) }
+					>
+						{ children( {
+							level,
+							NavigationBackButton,
+							parentLevel,
+						} ) }
+					</div>
+				) }
 			</Animate>
 		</Root>
 	);
