@@ -20,6 +20,7 @@ export default function TemplatePartInnerBlocks( {
 			onInput={ onInput }
 			onChange={ onChange }
 			renderAppender={ hasInnerBlocks ? undefined : renderAppender }
+			entityId={ `wp_template_part_${ id }` }
 		/>
 	);
 }

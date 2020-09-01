@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { last, noop } from 'lodash';
+const { v4: uuid } = require( 'uuid' );
 
 /**
  * WordPress dependencies
@@ -18,6 +19,56 @@ import { useRegistry } from '@wordpress/data';
  * @param {Object}   options The updated block options, such as selectionStart
  *                           and selectionEnd.
  */
+
+const entityTracker = {};
+const entitiesToLocal = {};
+const localToEntities = {};
+
+function initBlockIdTrackers( instanceId ) {
+	if ( ! entitiesToLocal[ instanceId ] ) {
+		entitiesToLocal[ instanceId ] = {};
+	}
+	if ( ! localToEntities[ instanceId ] ) {
+		localToEntities[ instanceId ] = {};
+	}
+}
+
+function mapBlocksToLocalIds( instanceId, blocks ) {
+	initBlockIdTrackers( instanceId );
+	// Note: actual implementation would have to account for nested innerBlocks.
+	return blocks.map( ( block ) => {
+		if ( ! entitiesToLocal[ instanceId ][ block.clientId ] ) {
+			const localId = uuid();
+			entitiesToLocal[ instanceId ][ block.clientId ] = localId;
+			localToEntities[ instanceId ][ localId ] = block.clientId;
+		}
+		return {
+			...block,
+			innerBlocks: mapBlocksToLocalIds( instanceId, block.innerBlocks ),
+			clientId: entitiesToLocal[ instanceId ][ block.clientId ],
+		};
+	} );
+}
+
+function mapBlocksToEntityIds( instanceId, blocks ) {
+	initBlockIdTrackers( instanceId );
+	// Note: actual implementation would have to account for nested innerBlocks.
+	return blocks.map( ( block ) => {
+		if ( ! localToEntities[ instanceId ][ block.clientId ] ) {
+			// This entityId could be more tricky when inserting new blocks.
+			// Would need to verify how clientIds for new blocks are generated,
+			// and if that would be compatible with change here.
+			const entityBlockId = uuid();
+			localToEntities[ instanceId ][ block.clientId ] = entityBlockId;
+			entitiesToLocal[ instanceId ][ entityBlockId ] = block.clientId;
+		}
+		return {
+			...block,
+			innerBlocks: mapBlocksToEntityIds( instanceId, block.innerBlocks ),
+			id: localToEntities[ instanceId ][ block.clientId ],
+		};
+	} );
+}
 
 /**
  * useBlockSync is a side effect which handles bidirectional sync between the
@@ -49,6 +100,7 @@ import { useRegistry } from '@wordpress/data';
  *                                is used to initalize the block-editor store
  *                                and for resetting the blocks to incoming
  *                                changes like undo.
+ * @param {string} props.entityId TODO
  * @param {Object} props.selectionStart The selection start vlaue from the
  *                                controlling component.
  * @param {Object} props.selectionEnd The selection end vlaue from the
@@ -63,15 +115,17 @@ import { useRegistry } from '@wordpress/data';
  *                                for the given clientId. When this is called,
  *                                controlling sources do not become dirty.
  */
-export default function useBlockSync( {
+function useBlockSync( {
 	clientId = null,
 	value: controlledBlocks,
 	selectionStart: controlledSelectionStart,
 	selectionEnd: controlledSelectionEnd,
 	onChange = noop,
 	onInput = noop,
+	entityId,
 } ) {
 	const registry = useRegistry();
+	const instanceId = useRef( uuid() ).current;
 
 	const {
 		resetBlocks,
@@ -84,6 +138,22 @@ export default function useBlockSync( {
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 
+	useEffect( () => {
+		if ( ! entityId || ! instanceId ) {
+			return;
+		}
+		if ( ! entityTracker[ entityId ] ) {
+			entityTracker[ entityId ] = {};
+		}
+		entityTracker[ entityId ][ instanceId ] = true;
+
+		return () => delete entityTracker[ entityId ][ instanceId ];
+	}, [ entityId ] );
+
+	const shouldUseLocalBlockIds = () => {
+		return !! entityTracker[ entityId ]?.[ instanceId ];
+	};
+
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
 			return;
@@ -93,12 +163,16 @@ export default function useBlockSync( {
 		// controlled inner blocks when the change was caused by an entity,
 		// and so it would already be persisted.
 		__unstableMarkNextChangeAsNotPersistent();
+		const incomingBlocks = shouldUseLocalBlockIds()
+			? mapBlocksToLocalIds( instanceId, controlledBlocks )
+			: controlledBlocks;
+
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, controlledBlocks, false );
+			replaceInnerBlocks( clientId, incomingBlocks, false );
 		} else {
-			resetBlocks( controlledBlocks );
+			resetBlocks( incomingBlocks );
 		}
 	};
 
@@ -174,7 +248,12 @@ export default function useBlockSync( {
 				const updateParent = isPersistent
 					? onChangeRef.current
 					: onInputRef.current;
-				updateParent( blocks, {
+
+				const outgoingBlocks = shouldUseLocalBlockIds()
+					? mapBlocksToEntityIds( instanceId, blocks )
+					: blocks;
+
+				updateParent( outgoingBlocks, {
 					selectionStart: getSelectionStart(),
 					selectionEnd: getSelectionEnd(),
 				} );
@@ -199,6 +278,7 @@ export default function useBlockSync( {
 			) {
 				pendingChanges.current.outgoing = [];
 			}
+			// TODO: problematic if getBlocks has alternate client IDs
 		} else if ( getBlocks( clientId ) !== controlledBlocks ) {
 			// Reset changing value in all other cases than the sync described
 			// above. Since this can be reached in an update following an out-
@@ -217,3 +297,5 @@ export default function useBlockSync( {
 		}
 	}, [ controlledBlocks, clientId ] );
 }
+
+export default useBlockSync;
