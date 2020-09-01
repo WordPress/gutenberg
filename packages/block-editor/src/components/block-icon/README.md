@@ -23,3 +23,8 @@ import { BlockIcon } from '@wordpress/block-editor';
 
 const MyIcon = () => <BlockIcon />;
 ```
+
+
+## Related components
+
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree. 
