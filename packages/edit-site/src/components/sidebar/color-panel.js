@@ -33,12 +33,15 @@ export default ( {
 		} );
 	}
 
-	// TODO: do gradients
+	// TODO: check for gradient support, etc
 	if ( supports.includes( BACKGROUND_COLOR ) ) {
 		settings.push( {
 			colorValue: getProperty( name, 'color', 'background' ),
 			onColorChange: ( value ) =>
 				setProperty( name, 'color', 'background', value ),
+			gradientValue: getProperty( name, 'color', 'gradient' ),
+			onGradientChange: ( value ) =>
+				setProperty( name, 'color', 'gradient', value ),
 			label: __( 'Background color' ),
 		} );
 	}
