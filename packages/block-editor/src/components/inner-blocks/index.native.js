@@ -18,7 +18,7 @@ import getBlockContext from './get-block-context';
  */
 import BlockList from '../block-list';
 import { useBlockEditContext } from '../block-edit/context';
-import useBlockSync from '../provider/use-block-sync';
+import useBlockSync from '../use-block-sync';
 import { BlockContextProvider } from '../block-context';
 
 /**

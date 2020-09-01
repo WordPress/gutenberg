@@ -21,6 +21,7 @@ export default function TemplatePartInnerBlocks( {
 			onChange={ onChange }
 			__experimentalTagName="div"
 			renderAppender={ hasInnerBlocks ? undefined : renderAppender }
+			entityId={ `wp_template_part_${ id }` }
 		/>
 	);
 }

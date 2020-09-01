@@ -2,12 +2,24 @@
  * External dependencies
  */
 import { last, noop } from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import {
+	setupEntityInstance,
+	removeEntityInstance,
+	isDuplicateEntityInstance,
+} from './entity-instances';
+import { mapBlocks, mapBlockId } from './block-id-map';
+import { DIRECTION_OUT, DIRECTION_IN } from './constants';
 
 /**
  * A function to call when the block value has been updated in the block-editor
@@ -49,6 +61,10 @@ import { useRegistry } from '@wordpress/data';
  *                                is used to initalize the block-editor store
  *                                and for resetting the blocks to incoming
  *                                changes like undo.
+ * @param {string} props.entityId An ID which should identify the "thing" to which
+ *                                the blocks belong. This is used to keep track
+ *                                of times when two different components need to
+ *                                sync the same blocks.
  * @param {Object} props.selectionStart The selection start vlaue from the
  *                                controlling component.
  * @param {Object} props.selectionEnd The selection end vlaue from the
@@ -70,8 +86,10 @@ export default function useBlockSync( {
 	selectionEnd: controlledSelectionEnd,
 	onChange = noop,
 	onInput = noop,
+	entityId,
 } ) {
 	const registry = useRegistry();
+	const instanceId = useRef( uuid() ).current;
 
 	const {
 		resetBlocks,
@@ -84,6 +102,14 @@ export default function useBlockSync( {
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 
+	useEffect( () => {
+		setupEntityInstance( entityId, instanceId );
+		return () => removeEntityInstance();
+	}, [ entityId, instanceId ] );
+
+	const shouldMapBlockIds = () =>
+		isDuplicateEntityInstance( entityId, instanceId );
+
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
 			return;
@@ -93,12 +119,16 @@ export default function useBlockSync( {
 		// controlled inner blocks when the change was caused by an entity,
 		// and so it would already be persisted.
 		__unstableMarkNextChangeAsNotPersistent();
+		const incomingBlocks = shouldMapBlockIds()
+			? mapBlocks( controlledBlocks, instanceId, DIRECTION_IN )
+			: controlledBlocks;
+
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, controlledBlocks, false );
+			replaceInnerBlocks( clientId, incomingBlocks, false );
 		} else {
-			resetBlocks( controlledBlocks );
+			resetBlocks( incomingBlocks );
 		}
 	};
 
@@ -174,10 +204,32 @@ export default function useBlockSync( {
 				const updateParent = isPersistent
 					? onChangeRef.current
 					: onInputRef.current;
-				updateParent( blocks, {
-					selectionStart: getSelectionStart(),
-					selectionEnd: getSelectionEnd(),
-				} );
+
+				const shouldMapIds = shouldMapBlockIds();
+				const outgoingBlocks = shouldMapIds
+					? mapBlocks( blocks, instanceId, DIRECTION_OUT )
+					: blocks;
+
+				updateParent(
+					outgoingBlocks,
+					shouldMapIds
+						? {
+								selectionStart: mapBlockId(
+									getSelectionStart(),
+									instanceId,
+									DIRECTION_OUT
+								),
+								selectionEnd: mapBlockId(
+									getSelectionEnd(),
+									instanceId,
+									DIRECTION_OUT
+								),
+						  }
+						: {
+								selectionStart: getSelectionStart(),
+								selectionEnd: getSelectionEnd(),
+						  }
+				);
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
 		} );
@@ -199,6 +251,7 @@ export default function useBlockSync( {
 			) {
 				pendingChanges.current.outgoing = [];
 			}
+			// TODO: problematic if getBlocks has alternate client IDs
 		} else if ( getBlocks( clientId ) !== controlledBlocks ) {
 			// Reset changing value in all other cases than the sync described
 			// above. Since this can be reached in an update following an out-
@@ -209,9 +262,22 @@ export default function useBlockSync( {
 			setControlledBlocks();
 
 			if ( controlledSelectionStart && controlledSelectionEnd ) {
+				const shouldMapIds = shouldMapBlockIds();
 				resetSelection(
-					controlledSelectionStart,
-					controlledSelectionEnd
+					shouldMapIds
+						? mapBlockId(
+								controlledSelectionStart,
+								instanceId,
+								DIRECTION_IN
+						  )
+						: controlledSelectionStart,
+					shouldMapIds
+						? mapBlockId(
+								controlledSelectionEnd,
+								instanceId,
+								DIRECTION_IN
+						  )
+						: controlledSelectionEnd
 				);
 			}
 		}

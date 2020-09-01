@@ -26,7 +26,7 @@ import getBlockContext from './get-block-context';
 import BlockList from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
-import useBlockSync from '../provider/use-block-sync';
+import useBlockSync from '../use-block-sync';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
