@@ -615,6 +615,12 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 		}
 		$features['global']['color']['custom'] = false;
 	}
+	if ( get_theme_support( 'disable-custom-gradients' ) ) {
+		if ( ! isset( $features['global']['gradient'] ) ) {
+			$features['global']['gradient'] = array();
+		}
+		$features['global']['gradient']['custom'] = false;
+	}
 
 	return $features;
 }
@@ -646,8 +652,10 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$settings['styles'][] = array( 'css' => $stylesheet );
 
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
+
 	// Unsetting deprecated settings defined by Core.
 	unset( $settings['disableCustomColors'] );
+	unset( $settings['disableCustomGradients'] );
 
 	return $settings;
 }

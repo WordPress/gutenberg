@@ -130,6 +130,9 @@
 			},
 			"color": {
 				"custom": true
+			},
+			"gradient": {
+				"custom": true
 			}
 		}
 	}
