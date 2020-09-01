@@ -776,4 +776,41 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
+
+	/**
+	 * Ensures libxml_internal_errors is being used instead of @ warning suppression
+	 */
+	public function test_render_block_suppresses_warnings_without_at_suppression() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		// Custom error handler's see Warnings even if they are suppressed by the @ symbol.
+		$errors = array();
+		set_error_handler(
+			function ( $errno = 0, $errstr = '' ) use ( &$errors ) {
+				$errors[] = $errstr;
+				return false;
+			}
+		);
+
+		// HTML5 elements like <time> are not supported by the DOMDocument parser used by the block supports feature.
+		// This specific example is emitted by the "Display post date" setting in the latest-posts block.
+		apply_filters( 'render_block', '<div><time datetime="2020-06-18T04:01:43+10:00" class="wp-block-latest-posts__post-date">June 18, 2020</time></div>', $block );
+
+		restore_error_handler();
+
+		$this->assertEmpty( $errors, 'Libxml errors should be dropped.' );
+	}
 }
