@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { LIGHT_GRAY } from '../../utils/colors-values';
+import Text from '../../text';
 
 export const Root = styled.div`
 	width: 100%;
@@ -23,9 +24,13 @@ export const MenuItemUI = styled.li`
 	button {
 		width: 100%;
 	}
-	&.is-active span {
-		border-bottom: 2px solid var( --wp-admin-theme-color );
+	&.is-active {
+		background-color: ${ LIGHT_GRAY[ 300 ] };
 	}
+`;
+
+export const MenuItemTitleUI = styled( Text )`
+	margin-right: auto;
 `;
 
 export const BadgeUI = styled.span`
@@ -33,5 +38,4 @@ export const BadgeUI = styled.span`
 	display: inline-flex;
 	padding: 4px 12px;
 	border-radius: 2px;
-	background-color: ${ LIGHT_GRAY[ 300 ] };
 `;

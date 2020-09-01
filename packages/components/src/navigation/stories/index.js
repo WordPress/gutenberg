@@ -3,7 +3,11 @@
  */
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { Icon, arrowLeft } from '@wordpress/icons';
+
+/**
+ * External dependencies
+ */
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
@@ -92,42 +96,51 @@ function Example() {
 					Non-navigation link to Child 2
 				</Button>
 			) : null }
-			<Navigation activeItemId={ active } data={ data } rootTitle="Home">
-				{ ( { level, parentLevel, NavigationBackButton } ) => {
-					return (
-						<>
-							{ parentLevel && (
-								<NavigationBackButton>
-									<Icon icon={ arrowLeft } />
-									{ parentLevel.title }
-								</NavigationBackButton>
-							) }
-							<h1>{ level.title }</h1>
-							<NavigationMenu>
-								{ level.children.map( ( item ) => {
-									return (
-										<NavigationMenuItem
-											{ ...item }
-											key={ item.id }
-											onClick={
-												! item.href
-													? ( selected ) =>
-															setActive(
-																selected.id
-															)
-													: null
-											}
-										/>
-									);
-								} ) }
-							</NavigationMenu>
-						</>
-					);
-				} }
-			</Navigation>
+			<Container>
+				<Navigation
+					activeItemId={ active }
+					data={ data }
+					rootTitle="Home"
+				>
+					{ ( { level, parentLevel, NavigationBackButton } ) => {
+						return (
+							<>
+								{ parentLevel && (
+									<NavigationBackButton>
+										{ parentLevel.title }
+									</NavigationBackButton>
+								) }
+								<h1>{ level.title }</h1>
+								<NavigationMenu>
+									{ level.children.map( ( item ) => {
+										return (
+											<NavigationMenuItem
+												{ ...item }
+												key={ item.id }
+												onClick={
+													! item.href
+														? ( selected ) =>
+																setActive(
+																	selected.id
+																)
+														: null
+												}
+											/>
+										);
+									} ) }
+								</NavigationMenu>
+							</>
+						);
+					} }
+				</Navigation>
+			</Container>
 		</>
 	);
 }
+
+const Container = styled.div`
+	max-width: 246px;
+`;
 
 export const _default = () => {
 	return <Example />;

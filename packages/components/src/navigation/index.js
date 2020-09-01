@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { Icon, chevronLeft } from '@wordpress/icons';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 
@@ -83,9 +84,10 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		return (
 			<Button
 				className="components-navigation__back-button"
-				isPrimary
+				isTertiary
 				onClick={ () => setActiveLevelId( parentLevel.id ) }
 			>
+				<Icon icon={ chevronLeft } />
 				{ backButtonChildren }
 			</Button>
 		);

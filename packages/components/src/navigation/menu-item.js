@@ -12,8 +12,11 @@ import { Icon, chevronRight } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../button';
-import { MenuItemUI, BadgeUI } from './styles/navigation-styles';
-import Text from '../text';
+import {
+	MenuItemUI,
+	MenuItemTitleUI,
+	BadgeUI,
+} from './styles/navigation-styles';
 
 const NavigationMenuItem = ( props ) => {
 	const {
@@ -54,13 +57,13 @@ const NavigationMenuItem = ( props ) => {
 				onClick={ handleClick }
 				{ ...linkProps }
 			>
-				<Text
+				<MenuItemTitleUI
 					className="components-navigation__menu-item-title"
 					variant="body.small"
 					as="span"
 				>
 					{ title }
-				</Text>
+				</MenuItemTitleUI>
 				{ badge && (
 					<BadgeUI className="components-navigation__menu-item-badge">
 						{ badge }
