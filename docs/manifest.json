@@ -78,6 +78,12 @@
 		"parent": "principles"
 	},
 	{
+		"title": "My Test Title",
+		"slug": "my-test-file",
+		"markdown_source": "../docs/contributors/my-test-file.md",
+		"parent": "principles"
+	},
+	{
 		"title": "Developer Documentation",
 		"slug": "developers",
 		"markdown_source": "../docs/designers-developers/developers/README.md",
