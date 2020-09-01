@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { matchPath, useLocation } from 'react-router-dom';
 
 /**
  * WordPress dependencies
@@ -18,13 +19,20 @@ import Button from '../button';
 
 const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevelId, setActiveLevelId ] = useState( 'root' );
+	const location = useLocation();
 
 	const appendItemData = ( item ) => {
+		const match = matchPath( location, {
+			path: item.href,
+			exact: true,
+			strict: false,
+		} );
+
 		return {
 			...item,
 			children: [],
 			parent: item.id === 'root' ? null : item.parent || 'root',
-			isActive: item.id === activeItemId,
+			isActive: !! match,
 			setActiveLevelId,
 		};
 	};
@@ -45,12 +53,15 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 			}
 		} );
 
+		// @todo Store active Item ID so we can retrieve below.
+
 		return items;
 	};
 
 	const items = useMemo( () => mapItems( data ), [
-		data,
 		activeItemId,
+		data,
+		location,
 		rootTitle,
 	] );
 	const activeItem = items.get( activeItemId );
