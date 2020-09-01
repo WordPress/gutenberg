@@ -22,7 +22,7 @@ Renders a block icon with default style.
 import { BlockIcon } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
 
-const MyIcon = () => <BlockIcon icon={ blockType.icon } />
+const MyBlockIcon = () => <BlockIcon icon={ blockType.icon } />
 ```
 
 
