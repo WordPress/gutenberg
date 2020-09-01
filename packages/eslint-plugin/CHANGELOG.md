@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Enable `react-hooks/exhaustive-deps` rules to react config.
+
 ### Enhancements
 
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^26.0.0` to requiring `^30.2.2`.
