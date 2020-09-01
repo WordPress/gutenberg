@@ -61,7 +61,11 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		previousActiveLevelId &&
 		items.get( previousActiveLevelId ).parent === activeLevelId;
 
+	let onMount = false;
+
 	useEffect( () => {
+		onMount = true;
+
 		if ( activeItem ) {
 			setActiveLevelId( activeItem.parent );
 		}
@@ -83,30 +87,36 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		);
 	};
 
+	const render = ( { className: animateClassName } ) => (
+		<div
+			className={ classnames(
+				'components-navigation__level',
+				animateClassName
+			) }
+		>
+			{ children( {
+				level,
+				NavigationBackButton,
+				parentLevel,
+			} ) }
+		</div>
+	);
+
 	return (
 		<Root className="components-navigation">
-			<Animate
-				key={ level.id }
-				type="slide-in"
-				options={ {
-					origin: isNavigatingBack ? 'right' : 'left',
-				} }
-			>
-				{ ( { className: animateClassName } ) => (
-					<div
-						className={ classnames(
-							'components-navigation__level',
-							animateClassName
-						) }
-					>
-						{ children( {
-							level,
-							NavigationBackButton,
-							parentLevel,
-						} ) }
-					</div>
-				) }
-			</Animate>
+			{ onMount ? (
+				render( {} )
+			) : (
+				<Animate
+					key={ level.id }
+					type="slide-in"
+					options={ {
+						origin: isNavigatingBack ? 'right' : 'left',
+					} }
+				>
+					{ render }
+				</Animate>
+			) }
 		</Root>
 	);
 };
