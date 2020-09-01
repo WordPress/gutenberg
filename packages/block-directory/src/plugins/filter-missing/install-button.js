@@ -3,12 +3,8 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
+import { createBlock, getBlockType, parse } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	createBlock,
-	getBlockAttributes,
-	getBlockType,
-} from '@wordpress/blocks';
 
 export default function InstallButton( { attributes, block, clientId } ) {
 	const isInstallingBlock = useSelect( ( select ) =>
@@ -23,14 +19,19 @@ export default function InstallButton( { attributes, block, clientId } ) {
 				installBlockType( block ).then( ( success ) => {
 					if ( success ) {
 						const blockType = getBlockType( block.name );
-						const oldAttributes = getBlockAttributes(
-							blockType,
-							attributes.originalUndelimitedContent
+						const [ originalBlock ] = parse(
+							attributes.originalContent
 						);
-						replaceBlock(
-							clientId,
-							createBlock( blockType.name, oldAttributes )
-						);
+						if ( originalBlock ) {
+							replaceBlock(
+								clientId,
+								createBlock(
+									blockType.name,
+									originalBlock.attributes,
+									originalBlock.innerBlocks
+								)
+							);
+						}
 					}
 				} )
 			}
