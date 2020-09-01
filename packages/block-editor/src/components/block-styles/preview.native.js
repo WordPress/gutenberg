@@ -59,6 +59,11 @@ function StylePreview( { onPress, isActive, style, url } ) {
 		} ).start();
 	};
 
+	const innerOutlineStyle = usePreferredColorSchemeStyle(
+		styles.innerOutline,
+		styles.innerOutlineDark
+	);
+
 	return (
 		<TouchableWithoutFeedback
 			onPress={ () => {
@@ -69,13 +74,22 @@ function StylePreview( { onPress, isActive, style, url } ) {
 			<View style={ [ styles.container, { width: itemWidth } ] }>
 				<View style={ styles.imageWrapper }>
 					{ isActive && (
-						<Animated.View
-							style={ [
-								styles.outline,
-								{ opacity },
-								styles[ name ],
-							] }
-						/>
+						<>
+							<Animated.View
+								style={ [
+									styles.outline,
+									{ opacity },
+									styles[ name ],
+								] }
+							/>
+							<Animated.View
+								style={ [
+									innerOutlineStyle,
+									{ opacity },
+									styles[ name ],
+								] }
+							/>
+						</>
 					) }
 					<Image
 						style={ [ styles.image, styles[ name ] ] }
