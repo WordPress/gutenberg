@@ -11,7 +11,9 @@
 				"perPage": 3,
 				"pages": 1,
 				"offset": 0,
-				"categoryIds": []
+				"categoryIds": [],
+				"order": "desc",
+				"orderBy": "date"
 			}
 		}
 	},
