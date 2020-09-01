@@ -41,7 +41,7 @@ export default function LinkPickerResults( {
 			if ( meetsThreshold( search ) ) {
 				return await getSettings().__experimentalFetchLinkSuggestions(
 					search,
-					{ page: nextPage.current, PER_PAGE }
+					{ page: nextPage.current, type: 'post', perPage: PER_PAGE }
 				);
 			}
 		};

@@ -50,10 +50,10 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
 
 const fetchLinkSuggestions = async (
 	search,
-	{ isInitialSuggestions, type, subtype, page } = {},
+	{ isInitialSuggestions, type, subtype, page, perPage: perPageArg } = {},
 	{ disablePostFormats = false } = {}
 ) => {
-	const perPage = isInitialSuggestions ? 3 : 20;
+	const perPage = perPageArg || isInitialSuggestions ? 3 : 20;
 
 	const queries = [];
 
