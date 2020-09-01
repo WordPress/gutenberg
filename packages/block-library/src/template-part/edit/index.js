@@ -86,9 +86,10 @@ export default function TemplatePartEdit( {
 								icon={ update }
 							/>
 						) }
-						renderContent={ () => (
+						renderContent={ ( { onClose } ) => (
 							<TemplatePartSelection
 								setAttributes={ setAttributes }
+								onClose={ onClose }
 							/>
 						) }
 					/>

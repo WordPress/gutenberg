@@ -21,7 +21,7 @@ function PreviewPlaceholder() {
 	);
 }
 
-function TemplatePartItem( { templatePart, setAttributes } ) {
+function TemplatePartItem( { templatePart, setAttributes, onClose } ) {
 	const {
 		id,
 		slug,
@@ -45,6 +45,7 @@ function TemplatePartItem( { templatePart, setAttributes } ) {
 				type: 'snackbar',
 			}
 		);
+		onClose();
 	}, [ id, slug, theme ] );
 
 	return (
@@ -84,7 +85,7 @@ function PanelGroup( { title, icon, children } ) {
 	);
 }
 
-function TemplatePartsByTheme( { templateParts, setAttributes } ) {
+function TemplatePartsByTheme( { templateParts, setAttributes, onClose } ) {
 	const templatePartsByTheme = useMemo( () => {
 		return Object.values( groupBy( templateParts, 'meta.theme' ) );
 	}, [ templateParts ] );
@@ -101,6 +102,7 @@ function TemplatePartsByTheme( { templateParts, setAttributes } ) {
 						key={ templatePart.id }
 						templatePart={ templatePart }
 						setAttributes={ setAttributes }
+						onClose={ onClose }
 					/>
 				) : (
 					<PreviewPlaceholder key={ templatePart.id } />
@@ -114,6 +116,7 @@ function TemplatePartSearchResults( {
 	templateParts,
 	setAttributes,
 	filterValue,
+	onClose,
 } ) {
 	const filteredTPs = useMemo( () => {
 		// Filter based on value.
@@ -164,6 +167,7 @@ function TemplatePartSearchResults( {
 					key={ templatePart.id }
 					templatePart={ templatePart }
 					setAttributes={ setAttributes }
+					onClose={ onClose }
 				/>
 			) : (
 				<PreviewPlaceholder key={ templatePart.id } />
@@ -172,7 +176,11 @@ function TemplatePartSearchResults( {
 	) );
 }
 
-export default function TemplateParts( { setAttributes, filterValue } ) {
+export default function TemplateParts( {
+	setAttributes,
+	filterValue,
+	onClose,
+} ) {
 	const templateParts = useSelect( ( select ) => {
 		const publishedTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
@@ -212,6 +220,7 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 				templateParts={ templateParts }
 				setAttributes={ setAttributes }
 				filterValue={ filterValue }
+				onClose={ onClose }
 			/>
 		);
 	}
@@ -220,6 +229,7 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 		<TemplatePartsByTheme
 			templateParts={ templateParts }
 			setAttributes={ setAttributes }
+			onClose={ onClose }
 		/>
 	);
 }

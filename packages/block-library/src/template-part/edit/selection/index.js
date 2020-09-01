@@ -8,7 +8,7 @@ import { useState } from '@wordpress/element';
  */
 import TemplatePartPreviews from './template-part-previews';
 
-export default function TemplatePartSelection( { setAttributes } ) {
+export default function TemplatePartSelection( { setAttributes, onClose } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	return (
 		<>
@@ -20,6 +20,7 @@ export default function TemplatePartSelection( { setAttributes } ) {
 				<TemplatePartPreviews
 					setAttributes={ setAttributes }
 					filterValue={ filterValue }
+					onClose={ onClose }
 				/>
 			</div>
 		</>

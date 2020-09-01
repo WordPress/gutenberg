@@ -60,8 +60,11 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 						</Button>
 					</>
 				) }
-				renderContent={ () => (
-					<TemplatePartSelection setAttributes={ setAttributes } />
+				renderContent={ ( { onClose } ) => (
+					<TemplatePartSelection
+						setAttributes={ setAttributes }
+						onClose={ onClose }
+					/>
 				) }
 			/>
 		</Placeholder>
