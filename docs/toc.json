@@ -13,7 +13,8 @@
 		{ "docs/designers-developers/faq.md": [] },
 		{ "docs/contributors/versions-in-wordpress.md": [] },
 		{ "docs/contributors/history.md": [] },
-		{ "docs/contributors/outreach.md": [] }
+		{ "docs/contributors/outreach.md": [] },
+		{ "docs/contributors/my-test-file.md": [] }
 	] },
 	{ "docs/designers-developers/developers/README.md": [
 		{ "docs/designers-developers/developers/block-api/README.md": [
