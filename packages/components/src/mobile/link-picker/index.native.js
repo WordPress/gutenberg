@@ -12,7 +12,7 @@ import { lowerCase, startsWith } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { BottomSheet, Icon } from '@wordpress/components';
 import { getProtocol, prependHTTP } from '@wordpress/url';
-import { link, closeCircleFilled } from '@wordpress/icons';
+import { link, cancelCircleFilled } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -109,7 +109,7 @@ export const LinkPicker = ( {
 						style={ styles.clearIcon }
 					>
 						<Icon
-							icon={ closeCircleFilled }
+							icon={ cancelCircleFilled }
 							color={ iconStyle.color }
 							size={ 24 }
 						/>
