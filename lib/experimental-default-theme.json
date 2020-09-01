@@ -175,6 +175,7 @@
 						"slug": "capitalize"
 					}
 				]
+				"fontWeight": true
 			},
 			"spacing": {
 				"customPadding": false,

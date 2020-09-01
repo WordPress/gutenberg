@@ -31,12 +31,18 @@ import {
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	useIsTextTransformDisabled,
 } from './text-transform';
+import {
+	FONT_WEIGHT_SUPPORT_KEY,
+	FontWeightEdit,
+	useIsFontWeightDisabled,
+} from './font-weight';
 
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
+	FONT_WEIGHT_SUPPORT_KEY,
 ];
 
 export function TypographyPanel( props ) {
@@ -49,6 +55,7 @@ export function TypographyPanel( props ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
 				<FontFamilyEdit { ...props } />
+				<FontWeightEdit { ...props } />
 				<FontSizeEdit { ...props } />
 				<LineHeightEdit { ...props } />
 				<TextDecorationAndTransformEdit { ...props } />
@@ -72,6 +79,7 @@ function useIsTypographyDisabled( props = {} ) {
 		useIsLineHeightDisabled( props ),
 		useIsFontFamilyDisabled( props ),
 		useIsTextTransformDisabled( props ),
+		useIsFontWeightDisabled( props ),
 	];
 
 	return configs.filter( Boolean ).length === configs.length;

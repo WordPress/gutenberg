@@ -25,4 +25,5 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	paddingRight: [ 'spacing', 'padding', 'right' ],
 	paddingTop: [ 'spacing', 'padding', 'top' ],
 	fontFamily: [ 'typography', 'fontFamily' ],
+	fontWeight: [ 'typography', 'fontWeight' ],
 };
