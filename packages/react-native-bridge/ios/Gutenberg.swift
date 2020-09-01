@@ -9,6 +9,20 @@ import RNTAztecView
 
 @objc
 public class Gutenberg: NSObject {
+    public static func supportedBlocks(isDev: Bool = false) -> [String] {
+        guard let json = try? SourceFile.supportedBlocks.getContent() else { return [] }
+        let data = Data(json.utf8)
+        guard let blockSupport = try? JSONSerialization.jsonObject(with: data, options: []) as? [String : [String]] else { return [] }
+        var supportedBlocks = [String]()
+        supportedBlocks += blockSupport["common"] ?? []
+        supportedBlocks += blockSupport["iOSOnly"] ?? []
+
+        if isDev {
+            supportedBlocks += blockSupport["devOnly"] ?? []
+        }
+
+        return supportedBlocks
+    }
 
     private var extraModules: [RCTBridgeModule];
 
