@@ -24,7 +24,7 @@ describe( 'PublishButtonLabel', () => {
 	it( 'should show scheduling if scheduled and saving in progress', () => {
 		const label = PublishButtonLabel( {
 			hasPublishAction: true,
-			isBeingScheduled: true,
+			isScheduling: true,
 			isSaving: true,
 		} );
 		expect( label ).toBe( 'Scheduling…' );

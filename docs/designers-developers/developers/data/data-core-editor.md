@@ -807,6 +807,7 @@ Returns true if post is already scheduled.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
+-   _currentPost_ `?Object`: Explicit current post for bypassing registry selector.
 
 _Returns_
 
@@ -1041,6 +1042,18 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether post is being saved.
+
+<a name="isSchedulingPost" href="#isSchedulingPost">#</a> **isSchedulingPost**
+
+Returns true if the post is being scheduled, or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether post is being scheduled.
 
 <a name="isSelectionEnabled" href="#isSelectionEnabled">#</a> **isSelectionEnabled**
 
