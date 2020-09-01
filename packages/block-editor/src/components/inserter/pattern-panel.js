@@ -14,7 +14,6 @@ function PatternInserterPanel( {
 } ) {
 	const renderToggle = ( { isOpen, onToggle } ) => (
 		<h2 className="block-editor-inserter__panel-title">
-			{ __( 'Viewing' ) }:
 			<Button onClick={ onToggle } aria-expanded={ isOpen }>
 				{ title ? title : selectedCategory.label }
 			</Button>

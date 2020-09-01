@@ -172,9 +172,9 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__panel-title button {
-	padding: 0 5px;
+	padding: $grid-unit-10;
+	margin: -$grid-unit-10;
 	height: auto;
-	margin-right: 0;
 	color: var(--wp-admin-theme-color);
 
 	&::after {
