@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 
 /**
@@ -67,10 +67,12 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		}
 	}, [ activeItem ] );
 
-	let onMount = false;
+	const isMounted = useRef( true );
 
 	useEffect( () => {
-		onMount = true;
+		if ( isMounted.current ) {
+			isMounted.current = false;
+		}
 	}, [] );
 
 	const NavigationBackButton = ( { children: backButtonChildren } ) => {
@@ -89,36 +91,34 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		);
 	};
 
-	const render = ( { className: animateClassName } ) => (
-		<div
-			className={ classnames(
-				'components-navigation__level',
-				animateClassName
-			) }
-		>
-			{ children( {
-				level,
-				NavigationBackButton,
-				parentLevel,
-			} ) }
-		</div>
-	);
-
 	return (
 		<Root className="components-navigation">
-			{ onMount ? (
-				render( {} )
-			) : (
-				<Animate
-					key={ level.id }
-					type="slide-in"
-					options={ {
-						origin: isNavigatingBack ? 'right' : 'left',
-					} }
-				>
-					{ render }
-				</Animate>
-			) }
+			<Animate
+				key={ level.id }
+				type="slide-in"
+				options={ {
+					origin: isNavigatingBack ? 'right' : 'left',
+				} }
+			>
+				{ ( { className: animateClassName } ) => {
+					return (
+						<div
+							className={ classnames(
+								'components-navigation__level',
+								{
+									[ animateClassName ]: ! isMounted.current,
+								}
+							) }
+						>
+							{ children( {
+								level,
+								NavigationBackButton,
+								parentLevel,
+							} ) }
+						</div>
+					);
+				} }
+			</Animate>
 		</Root>
 	);
 };
