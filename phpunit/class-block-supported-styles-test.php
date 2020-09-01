@@ -805,7 +805,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			}
 		);
 
-		// HTML5 elemetns like <time> are not supported by the DOMDocument parser used by the block supports feature.
+		// HTML5 elements like <time> are not supported by the DOMDocument parser used by the block supports feature.
 		// This specific example is emitted by the "Display post date" setting in the latest-posts block.
 		apply_filters( 'render_block', '<div><time datetime="2020-06-18T04:01:43+10:00" class="wp-block-latest-posts__post-date">June 18, 2020</time></div>', $block );
 
