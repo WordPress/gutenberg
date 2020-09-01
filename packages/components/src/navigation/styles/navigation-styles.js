@@ -13,15 +13,27 @@ export const Root = styled.div`
 	width: 100%;
 `;
 
-export const MenuUI = styled.ul`
-	padding: 0;
-	margin: 0 0 32px 0;
+export const MenuUI = styled.div`
+	margin-top: 24px;
 	display: flex;
 	flex-direction: column;
+	ul {
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+`;
+
+export const MenuTitleUI = styled( Text )`
+	padding: 4px 0 4px 16px;
+	margin-bottom: 8px;
 `;
 
 export const MenuItemUI = styled.li`
-	button {
+	button,
+	a {
+		padding-left: 16px;
+		padding-right: 16px;
 		width: 100%;
 	}
 	&.is-active {
