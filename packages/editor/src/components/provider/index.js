@@ -101,7 +101,9 @@ const fetchLinkSuggestions = async (
 
 	return Promise.all( queries ).then( ( results ) => {
 		return map(
-			flatten( results ).slice( 0, perPage * queries.length ),
+			flatten( results )
+				.filter( ( result ) => !! result.id )
+				.slice( 0, perPage ),
 			( result ) => ( {
 				id: result.id,
 				url: result.url,
