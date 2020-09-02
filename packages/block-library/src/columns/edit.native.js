@@ -159,12 +159,7 @@ function ColumnsEditContainer( {
 					onChange={ ( value ) =>
 						updateInnerColumnWidth( value, column.clientId )
 					}
-					cellRowContainerStyle={ { paddingTop: 0 } }
-					cellContainerStyle={ {
-						marginTop: 8,
-						marginBottom: 8,
-						minHeight: 48,
-					} }
+					cellContainerStyle={ styles.cellContainerStyle }
 					toFixed={ 1 }
 					rangePreview={
 						<ColumnsPreview
