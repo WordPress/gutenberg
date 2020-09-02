@@ -32,6 +32,9 @@ function BlockNavigationBlockSelectButton(
 		level,
 		tabIndex,
 		onFocus,
+		onDragStart,
+		onDragEnd,
+		draggable,
 	},
 	ref
 ) {
@@ -59,6 +62,9 @@ function BlockNavigationBlockSelectButton(
 				ref={ ref }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
+				onDragStart={ onDragStart }
+				onDragEnd={ onDragEnd }
+				draggable={ draggable }
 			>
 				<BlockIcon icon={ blockType.icon } showColors />
 				{ blockDisplayName }
