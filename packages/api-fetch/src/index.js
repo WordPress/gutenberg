@@ -120,19 +120,16 @@ function setFetchHandler( newFetchHandler ) {
 }
 
 function apiFetch( options ) {
-	const steps = [ ...middlewares, fetchHandler ];
+	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
+	// converting `middlewares = [ m1, m2, m3 ]` into:
+	// ```
+	// opts1 => m1( opts1, opts2 => m2( opts2, opts3 => m3( opts3, fetchHandler ) ) );
+	// ```
+	const enhancedHandler = middlewares.reduceRight( ( next, middleware ) => {
+		return ( workingOptions ) => middleware( workingOptions, next );
+	}, fetchHandler );
 
-	const createRunStep = ( index ) => ( workingOptions ) => {
-		const step = steps[ index ];
-		if ( index === steps.length - 1 ) {
-			return step( workingOptions );
-		}
-
-		const next = createRunStep( index + 1 );
-		return step( workingOptions, next );
-	};
-
-	return createRunStep( 0 )( options ).catch( ( error ) => {
+	return enhancedHandler( options ).catch( ( error ) => {
 		if ( error.code !== 'rest_cookie_invalid_nonce' ) {
 			return Promise.reject( error );
 		}
