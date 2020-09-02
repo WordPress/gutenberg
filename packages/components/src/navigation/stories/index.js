@@ -53,6 +53,13 @@ const data = [
 		title: 'Nested Category',
 		id: 'child-3',
 		parent: 'item-3',
+		group: 'grouping-1',
+	},
+	{
+		title: 'Child 4',
+		id: 'child-4',
+		parent: 'item-3',
+		group: 'grouping-1',
 	},
 	{
 		title: 'Sub Child 1',
@@ -78,6 +85,37 @@ const data = [
 		LinkComponent: CustomRouterLink,
 	},
 ];
+
+const tryThis = ( { level, setActive } ) => (
+	<NavigationMenu>
+		{ level.children.map( ( item ) => {
+			if ( item.type === 'grouping' ) {
+				return item.groupings.map( ( groupItem ) => (
+					<NavigationMenuItem
+						{ ...groupItem }
+						key={ groupItem.id }
+						onClick={
+							! groupItem.href
+								? ( selected ) => setActive( selected.id )
+								: null
+						}
+					/>
+				) );
+			}
+			return (
+				<NavigationMenuItem
+					{ ...item }
+					key={ item.id }
+					onClick={
+						! item.href
+							? ( selected ) => setActive( selected.id )
+							: null
+					}
+				/>
+			);
+		} ) }
+	</NavigationMenu>
+);
 
 function Example() {
 	const [ active, setActive ] = useState( 'item-1' );
