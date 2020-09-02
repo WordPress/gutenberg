@@ -33,11 +33,9 @@ export default ( {
 						getProperty( name, 'typography.fontSize' )
 					) }
 					onChange={ ( value ) =>
-						setProperty(
-							name,
-							'typography.fontSize',
-							toPx( value )
-						)
+						setProperty( name, {
+							'typography.fontSize': toPx( value ),
+						} )
 					}
 				/>
 			) }
@@ -45,7 +43,7 @@ export default ( {
 				<LineHeightControl
 					value={ getProperty( name, 'typography.lineHeight' ) }
 					onChange={ ( value ) =>
-						setProperty( name, 'typography.lineHeight', value )
+						setProperty( name, { 'typography.lineHeight': value } )
 					}
 				/>
 			) }

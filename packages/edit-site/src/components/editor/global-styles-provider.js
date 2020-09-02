@@ -64,9 +64,11 @@ const useGlobalStylesFromEntities = () => {
 	const getProperty = ( context, path ) =>
 		get( userStyles?.[ context ]?.styles, path );
 
-	const setProperty = ( context, path, value ) => {
+	const setProperty = ( context, newValues ) => {
 		const newContent = { ...userStyles };
-		set( newContent, `${ context }.styles.${ path }`, value );
+		Object.keys( newValues ).forEach( ( key ) => {
+			set( newContent, `${ context }.styles.${ key }`, newValues[ key ] );
+		} );
 		setContent( JSON.stringify( newContent ) );
 	};
 
