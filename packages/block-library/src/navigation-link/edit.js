@@ -139,7 +139,15 @@ function NavigationLinkEdit( {
 	mergeBlocks,
 	onReplace,
 } ) {
-	const { label, type, opensInNewTab, url, description, rel } = attributes;
+	const {
+		label,
+		type,
+		opensInNewTab,
+		url,
+		description,
+		rel,
+		title,
+	} = attributes;
 	const link = {
 		url,
 		opensInNewTab,
@@ -266,6 +274,14 @@ function NavigationLinkEdit( {
 						help={ __(
 							'The description will be displayed in the menu if the current theme supports it.'
 						) }
+					/>
+					<TextControl
+						value={ title || '' }
+						onChange={ ( titleValue ) => {
+							setAttributes( { title: titleValue } );
+						} }
+						label={ __( 'Link title' ) }
+						autoComplete="off"
 					/>
 					<TextControl
 						value={ rel || '' }

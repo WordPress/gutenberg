@@ -11,7 +11,10 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_colors_support( $block_type ) {
-	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), false );
+	$color_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$color_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), false );
+	}
 	$has_text_colors_support       = is_array( $color_support ) || $color_support;
 	$has_background_colors_support = $has_text_colors_support;
 	$has_gradients_support         = $has_text_colors_support && gutenberg_experimental_get( $color_support, array( 'gradients' ), false );

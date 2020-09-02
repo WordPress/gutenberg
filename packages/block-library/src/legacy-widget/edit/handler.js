@@ -107,6 +107,7 @@ class LegacyWidgetEditHandler extends Component {
 							this.widgetEditDomManagerRef = ref;
 						} }
 						onInstanceChange={ this.onInstanceChange }
+						onMount={ this.props.onFormMount }
 						number={ number ? number : instanceId * -1 }
 						id={ id }
 						idBase={ idBase }

@@ -22,6 +22,9 @@ class LegacyWidgetEditDomManager extends Component {
 
 	componentDidMount() {
 		this.triggerWidgetEvent( 'widget-added' );
+		if ( this.props.onMount ) {
+			this.props.onMount( this.getFormData() );
+		}
 	}
 
 	shouldComponentUpdate( nextProps ) {

@@ -3,10 +3,9 @@
  */
 import { createNewPost, pressKeyTimes } from '@wordpress/e2e-test-utils';
 
-const moreMenuButtonSelector =
-	'.components-button[aria-label="More tools & options"]';
+const moreMenuButtonSelector = '.components-button[aria-label="Options"]';
 const moreMenuDropdownSelector =
-	'.components-dropdown-menu__menu[aria-label="More tools & options"]';
+	'.components-dropdown-menu__menu[aria-label="Options"]';
 const menuItemsSelector = [ 'menuitem', 'menuitemcheckbox', 'menuitemradio' ]
 	.map( ( role ) => `${ moreMenuDropdownSelector } [role="${ role }"]` )
 	.join( ',' );
