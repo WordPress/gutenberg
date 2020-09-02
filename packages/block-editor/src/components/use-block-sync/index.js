@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { last, noop } from 'lodash';
-import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -13,13 +12,7 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	setupEntityInstance,
-	removeEntityInstance,
-	isDuplicateEntityInstance,
-} from './entity-instances';
-import { mapBlocks, mapBlockId } from './block-id-map';
-import { DIRECTION_OUT, DIRECTION_IN } from './constants';
+import useBlockManager from './block-manager';
 
 /**
  * A function to call when the block value has been updated in the block-editor
@@ -89,7 +82,7 @@ export default function useBlockSync( {
 	entityId,
 } ) {
 	const registry = useRegistry();
-	const instanceId = useRef( uuid() ).current;
+	const BlockManager = useBlockManager( entityId );
 
 	const {
 		resetBlocks,
@@ -102,14 +95,6 @@ export default function useBlockSync( {
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 
-	useEffect( () => {
-		setupEntityInstance( entityId, instanceId );
-		return () => removeEntityInstance();
-	}, [ entityId, instanceId ] );
-
-	const shouldMapBlockIds = () =>
-		isDuplicateEntityInstance( entityId, instanceId );
-
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
 			return;
@@ -119,9 +104,9 @@ export default function useBlockSync( {
 		// controlled inner blocks when the change was caused by an entity,
 		// and so it would already be persisted.
 		__unstableMarkNextChangeAsNotPersistent();
-		const incomingBlocks = shouldMapBlockIds()
-			? mapBlocks( controlledBlocks, instanceId, DIRECTION_IN )
-			: controlledBlocks;
+		const incomingBlocks = BlockManager.updateIncomingBlocks(
+			controlledBlocks
+		);
 
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
@@ -205,31 +190,18 @@ export default function useBlockSync( {
 					? onChangeRef.current
 					: onInputRef.current;
 
-				const shouldMapIds = shouldMapBlockIds();
-				const outgoingBlocks = shouldMapIds
-					? mapBlocks( blocks, instanceId, DIRECTION_OUT )
-					: blocks;
-
-				updateParent(
-					outgoingBlocks,
-					shouldMapIds
-						? {
-								selectionStart: mapBlockId(
-									getSelectionStart(),
-									instanceId,
-									DIRECTION_OUT
-								),
-								selectionEnd: mapBlockId(
-									getSelectionEnd(),
-									instanceId,
-									DIRECTION_OUT
-								),
-						  }
-						: {
-								selectionStart: getSelectionStart(),
-								selectionEnd: getSelectionEnd(),
-						  }
+				const outgoingBlocks = BlockManager.updateOutgoingBlocks(
+					blocks
 				);
+
+				updateParent( outgoingBlocks, {
+					selectionStart: BlockManager.getOutgoingBlockId(
+						getSelectionStart()
+					),
+					selectionEnd: BlockManager.getOutgoingBlockId(
+						getSelectionEnd()
+					),
+				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
 		} );
@@ -262,22 +234,9 @@ export default function useBlockSync( {
 			setControlledBlocks();
 
 			if ( controlledSelectionStart && controlledSelectionEnd ) {
-				const shouldMapIds = shouldMapBlockIds();
 				resetSelection(
-					shouldMapIds
-						? mapBlockId(
-								controlledSelectionStart,
-								instanceId,
-								DIRECTION_IN
-						  )
-						: controlledSelectionStart,
-					shouldMapIds
-						? mapBlockId(
-								controlledSelectionEnd,
-								instanceId,
-								DIRECTION_IN
-						  )
-						: controlledSelectionEnd
+					BlockManager.getIncomingBlockId( controlledSelectionStart ),
+					BlockManager.getOutgoingBlockId( controlledSelectionEnd )
 				);
 			}
 		}
