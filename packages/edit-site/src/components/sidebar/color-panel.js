@@ -7,7 +7,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { BACKGROUND_COLOR, LINK_COLOR, TEXT_COLOR } from '../editor/utils';
+import {
+	BACKGROUND_COLOR,
+	LINK_COLOR,
+	TEXT_COLOR,
+	GRADIENT_COLOR,
+} from '../editor/utils';
 
 export default ( {
 	context: { supports, name },
@@ -17,6 +22,7 @@ export default ( {
 	if (
 		! supports.includes( TEXT_COLOR ) &&
 		! supports.includes( BACKGROUND_COLOR ) &&
+		! supports.includes( GRADIENT_COLOR ) &&
 		! supports.includes( LINK_COLOR )
 	) {
 		return null;
@@ -34,14 +40,41 @@ export default ( {
 	}
 
 	// TODO: check for gradient support, etc
-	if ( supports.includes( BACKGROUND_COLOR ) ) {
-		settings.push( {
+	/*
+	 * We want to send the entities API both colors
+	 * in a single request. This is to avod race conditions
+	 * that override the previous callback.
+	 */
+	let setColor;
+	const colorPromise = new Promise(
+		( resolve ) => ( setColor = ( value ) => resolve( value ) )
+	);
+	let setGradient;
+	const gradientPromise = new Promise(
+		( resolve ) => ( setGradient = ( value ) => resolve( value ) )
+	);
+	Promise.all( [ colorPromise, gradientPromise ] ).then( ( values ) => {
+		setProperty( name, { ...values[ 0 ], ...values[ 1 ] } );
+	} );
+	if (
+		supports.includes( BACKGROUND_COLOR ) &&
+		supports.includes( GRADIENT_COLOR )
+	) {
+		const backgroundSettings = {
 			colorValue: getProperty( name, 'color.background' ),
 			onColorChange: ( value ) =>
-				setProperty( name, { 'color.background': value } ),
+				setColor( { 'color.background': value } ),
+		};
+
+		const gradientSettings = {
 			gradientValue: getProperty( name, 'color.gradient' ),
 			onGradientChange: ( value ) =>
-				setProperty( name, { 'color.gradient': value } ),
+				setGradient( { 'color.gradient': value } ),
+		};
+
+		settings.push( {
+			...backgroundSettings,
+			...gradientSettings,
 			label: __( 'Background color' ),
 		} );
 	}
