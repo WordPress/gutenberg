@@ -1,17 +1,14 @@
 // TODO jsdoc and tests
-export const getTaxonomyInfo = ( terms ) => ( {
+export const getTermsInfo = ( terms ) => ( {
 	terms,
 	...terms?.reduce(
-		( acc, term ) => ( {
-			mapById: {
-				...acc.mapById,
-				[ term.id ]: term,
-			},
-			mapByName: {
-				...acc.mapByName,
-				[ term.name ]: term,
-			},
-		} ),
-		{ mapById: {}, mapByName: {} }
+		( accumulator, term ) => {
+			const { mapById, mapByName, names } = accumulator;
+			mapById[ term.id ] = term;
+			mapByName[ term.name ] = term;
+			names.push( term.name );
+			return accumulator;
+		},
+		{ mapById: {}, mapByName: {}, names: [] }
 	),
 } );

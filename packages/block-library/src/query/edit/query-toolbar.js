@@ -15,7 +15,7 @@ import { postList } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getTaxonomyInfo } from '../utils';
+import { getTermsInfo } from '../utils';
 
 export default function QueryToolbar( { query, setQuery } ) {
 	const { categories, tags } = useSelect( ( select ) => {
@@ -23,10 +23,22 @@ export default function QueryToolbar( { query, setQuery } ) {
 		const _categories = getEntityRecords( 'taxonomy', 'category' );
 		const _tags = getEntityRecords( 'taxonomy', 'post_tag' );
 		return {
-			categories: getTaxonomyInfo( _categories ),
-			tags: getTaxonomyInfo( _tags ),
+			categories: getTermsInfo( _categories ),
+			tags: getTermsInfo( _tags ),
 		};
 	}, [] );
+
+	// Handles categories and tags changes.
+	const onTermsChange = ( terms, queryProperty ) => ( newTermNames ) => {
+		const termIds = newTermNames.map(
+			( name ) => terms.mapByName[ name ]?.id
+		);
+		if ( termIds.includes( undefined ) ) return;
+		setQuery( { [ queryProperty ]: termIds } );
+	};
+	const onCategoriesChange = onTermsChange( categories, 'categoryIds' );
+	const onTagsChange = onTermsChange( tags, 'tagIds' );
+
 	return (
 		<Toolbar>
 			<Dropdown
@@ -77,19 +89,8 @@ export default function QueryToolbar( { query, setQuery } ) {
 												.name,
 									} )
 								) }
-								suggestions={ categories.terms.map(
-									( { name } ) => name
-								) }
-								onChange={ ( newCategoryNames ) => {
-									const categoryIds = newCategoryNames.map(
-										( categoryName ) =>
-											categories.mapByName[ categoryName ]
-												?.id
-									);
-									if ( categoryIds.includes( undefined ) )
-										return;
-									setQuery( { categoryIds } );
-								} }
+								suggestions={ categories.names }
+								onChange={ onCategoriesChange }
 							/>
 						) }
 						{ tags?.terms && (
@@ -101,17 +102,8 @@ export default function QueryToolbar( { query, setQuery } ) {
 										value: tags.mapById[ tagId ].name,
 									} )
 								) }
-								suggestions={ tags.terms.map(
-									( { name } ) => name
-								) }
-								onChange={ ( newTagNames ) => {
-									const tagIds = newTagNames.map(
-										( tagName ) =>
-											tags.mapByName[ tagName ]?.id
-									);
-									if ( tagIds.includes( undefined ) ) return;
-									setQuery( { tagIds } );
-								} }
+								suggestions={ tags.names }
+								onChange={ onTagsChange }
 							/>
 						) }
 					</>
