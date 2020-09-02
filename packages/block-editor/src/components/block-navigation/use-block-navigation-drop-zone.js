@@ -115,8 +115,10 @@ function useDropTargetBlocksData( ref, position, dragEventType ) {
 			};
 		} );
 	}, [
-		hasPosition,
+		// `ref` shouldn't actually change during a drag operation, but
+		// is specified for completeness as it's used within the hook.
 		ref,
+		hasPosition,
 		dragEventType,
 		canInsertBlocks,
 		getBlockCount,
