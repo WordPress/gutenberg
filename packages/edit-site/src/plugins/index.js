@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
+import { download } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,7 +25,7 @@ registerPlugin( 'edit-site', {
 				<ToolsMoreMenuGroup>
 					<MenuItem
 						role="menuitem"
-						icon="download"
+						icon={ download }
 						onClick={ () =>
 							apiFetch( {
 								path: '/__experimental/edit-site/v1/export',
