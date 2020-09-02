@@ -53,7 +53,7 @@ const renderPane = () => ( { level, NavigationBackButton } ) => {
 		<>
 			<h2>{ level.title }</h2>
 			<NavigationBackButton>Back</NavigationBackButton>
-			<NavigationMenu>
+			<NavigationMenu title="Menu title">
 				{ level.children.map( ( item ) => {
 					return <NavigationMenuItem { ...item } key={ item.id } />;
 				} ) }
@@ -152,6 +152,22 @@ describe( 'Navigation', () => {
 
 		const menuItem = screen.getByRole( 'listitem' );
 		expect( menuItem.textContent ).toBe( 'Item 1' + '21' );
+	} );
+
+	it( 'should render menu titles when items exist', async () => {
+		const { rerender } = render(
+			<Navigation data={ [] }>{ renderPane() }</Navigation>
+		);
+
+		const emptyMenu = screen.queryByText( 'Menu title' );
+		expect( emptyMenu ).toBeNull();
+
+		rerender(
+			<Navigation data={ sampleData }>{ renderPane() }</Navigation>
+		);
+
+		const menuTitle = screen.queryByText( 'Menu title' );
+		expect( menuTitle ).not.toBeNull();
 	} );
 
 	it( 'should navigate up a level when clicking the back button', async () => {
