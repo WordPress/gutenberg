@@ -36,11 +36,7 @@ const BlockInspector = ( {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
-				{ bubblesVirtually ? (
-					<InspectorControls.Slot bubblesVirtually />
-				) : (
-					<InspectorControls.Slot />
-				) }
+				<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			</div>
 		);
 	}
@@ -84,11 +80,7 @@ const BlockInspector = ( {
 					</PanelBody>
 				</div>
 			) }
-			{ bubblesVirtually ? (
-				<InspectorControls.Slot bubblesVirtually />
-			) : (
-				<InspectorControls.Slot />
-			) }
+			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			<div>
 				<AdvancedControls
 					slotName={ InspectorAdvancedControls.slotName }
@@ -114,11 +106,9 @@ const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			{ bubblesVirtually ? (
-				<InspectorAdvancedControls.Slot bubblesVirtually />
-			) : (
-				<InspectorAdvancedControls.Slot />
-			) }
+			<InspectorAdvancedControls.Slot
+				bubblesVirtually={ bubblesVirtually }
+			/>
 		</PanelBody>
 	);
 };
