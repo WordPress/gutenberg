@@ -26,7 +26,7 @@ export default ( {
 
 	if ( supports.includes( TEXT_COLOR ) ) {
 		settings.push( {
-			colorValue: getProperty( name, 'color', 'text' ),
+			colorValue: getProperty( name, 'color.text' ),
 			onColorChange: ( value ) =>
 				setProperty( name, 'color.text', value ),
 			label: __( 'Text color' ),
@@ -36,10 +36,10 @@ export default ( {
 	// TODO: check for gradient support, etc
 	if ( supports.includes( BACKGROUND_COLOR ) ) {
 		settings.push( {
-			colorValue: getProperty( name, 'color', 'background' ),
+			colorValue: getProperty( name, 'color.background' ),
 			onColorChange: ( value ) =>
 				setProperty( name, 'color.background', value ),
-			gradientValue: getProperty( name, 'color', 'gradient' ),
+			gradientValue: getProperty( name, 'color.gradient' ),
 			onGradientChange: ( value ) =>
 				setProperty( name, 'color.gradient', value ),
 			label: __( 'Background color' ),
@@ -48,7 +48,7 @@ export default ( {
 
 	if ( supports.includes( LINK_COLOR ) ) {
 		settings.push( {
-			colorValue: getProperty( name, 'color', 'link' ),
+			colorValue: getProperty( name, 'color.link' ),
 			onColorChange: ( value ) =>
 				setProperty( name, 'color.link', value ),
 			label: __( 'Link color' ),
