@@ -295,7 +295,7 @@ export default function useBlockNavigationDropZone( ref ) {
 				position
 			);
 
-			if ( target ) {
+			if ( newTarget ) {
 				setTarget( newTarget );
 			}
 		}
