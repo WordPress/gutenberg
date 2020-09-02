@@ -9,7 +9,11 @@ import { View } from 'react-native';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { ReadableContentView } from '@wordpress/components';
+import {
+	ReadableContentView,
+	WIDE_ALIGNMENTS,
+	ALIGNMENT_BREAKPOINTS,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,10 +21,6 @@ import { ReadableContentView } from '@wordpress/components';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
-
-const BREAKPOINTS = {
-	medium: 700,
-};
 
 const stretchStyle = {
 	flex: 1,
@@ -54,17 +54,17 @@ export class BlockListItem extends Component {
 		} = this.props;
 		const { blockWidth } = this.state;
 
-		if ( blockAlignment === 'full' ) {
+		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.full ) {
 			return 0;
 		}
 
-		if ( blockAlignment === 'wide' ) {
+		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.wide ) {
 			return marginHorizontal;
 		}
 
 		if (
-			parentBlockAlignment === 'full' &&
-			blockWidth <= BREAKPOINTS.medium
+			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full &&
+			blockWidth <= ALIGNMENT_BREAKPOINTS.medium
 		) {
 			return marginHorizontal * 2;
 		}
@@ -74,7 +74,7 @@ export class BlockListItem extends Component {
 
 	getContentStyles( readableContentViewStyle ) {
 		const { blockAlignment, hasParents } = this.props;
-		const isFullWidth = blockAlignment === 'full';
+		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
 
 		return [
 			readableContentViewStyle,

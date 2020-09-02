@@ -7,7 +7,7 @@ import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { GlobalStylesContext } from '@wordpress/components';
+import { GlobalStylesContext, WIDE_ALIGNMENTS } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -144,7 +144,7 @@ class BlockListBlock extends Component {
 		);
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
-		const isFullWidth = align === 'full';
+		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		const screenWidth = Dimensions.get( 'window' ).width;
 
 		return (

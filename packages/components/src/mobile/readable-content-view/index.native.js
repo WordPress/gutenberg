@@ -7,7 +7,7 @@ import { View, Dimensions } from 'react-native';
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-
+import { ALIGNMENT_BREAKPOINTS, WIDE_ALIGNMENTS } from '@wordpress/components';
 /**
  * Internal dependencies
  */
@@ -15,20 +15,10 @@ import styles from './style.scss';
 
 const PIXEL_RATIO = 2;
 
-const BREAKPOINTS = {
-	wide: 1024,
-	big: 820,
-	medium: 768,
-	small: 680,
-};
-
 const ReadableContentView = ( { align, reversed, children, style } ) => {
-	const [ windowWidth, setWindowWidth ] = useState(
-		Dimensions.get( 'window' ).width
-	);
-	const [ windowRatio, setWindowRatio ] = useState(
-		Dimensions.get( 'window' ).width / Dimensions.get( 'window' ).height
-	);
+	const { width, height } = Dimensions.get( 'window' );
+	const [ windowWidth, setWindowWidth ] = useState( width );
+	const [ windowRatio, setWindowRatio ] = useState( width / height );
 
 	function onDimensionsChange( { window } ) {
 		setWindowWidth( window.width );
@@ -36,29 +26,32 @@ const ReadableContentView = ( { align, reversed, children, style } ) => {
 	}
 
 	useEffect( () => {
-		if ( align === 'wide' ) {
+		if ( align === WIDE_ALIGNMENTS.alignments.wide ) {
 			Dimensions.addEventListener( 'change', onDimensionsChange );
 		}
 
 		return () => {
-			if ( align === 'wide' ) {
+			if ( align === WIDE_ALIGNMENTS.alignments.wide ) {
 				Dimensions.removeEventListener( 'change', onDimensionsChange );
 			}
 		};
 	}, [ align ] );
 
 	function getWideStyles() {
-		if ( windowRatio >= PIXEL_RATIO && windowWidth < BREAKPOINTS.big ) {
+		if (
+			windowRatio >= PIXEL_RATIO &&
+			windowWidth < ALIGNMENT_BREAKPOINTS.large
+		) {
 			return styles.wideLandscape;
 		}
 
-		if ( windowWidth <= BREAKPOINTS.small ) {
+		if ( windowWidth <= ALIGNMENT_BREAKPOINTS.small ) {
 			return { maxWidth: windowWidth };
 		}
 
 		if (
-			windowWidth >= BREAKPOINTS.medium &&
-			windowWidth < BREAKPOINTS.wide
+			windowWidth >= ALIGNMENT_BREAKPOINTS.medium &&
+			windowWidth < ALIGNMENT_BREAKPOINTS.wide
 		) {
 			return styles.wideMedium;
 		}
@@ -73,7 +66,8 @@ const ReadableContentView = ( { align, reversed, children, style } ) => {
 						: styles.centeredContent,
 					style,
 					styles[ align ],
-					align === 'wide' && getWideStyles(),
+					align === WIDE_ALIGNMENTS.alignments.wide &&
+						getWideStyles(),
 				] }
 			>
 				{ children }

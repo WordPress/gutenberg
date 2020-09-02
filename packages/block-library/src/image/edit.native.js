@@ -24,6 +24,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	Image,
+	WIDE_ALIGNMENTS,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -60,8 +61,6 @@ const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
 
-const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
-
 export class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
@@ -96,7 +95,6 @@ export class ImageEdit extends React.Component {
 
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
-
 		// This will warn when we have `id` defined, while `url` is undefined.
 		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
 		// where a cancelled image upload was resulting in a subsequent crash.
@@ -236,7 +234,9 @@ export class ImageEdit extends React.Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = WIDE_ALIGNMENTS.includes( nextAlign )
+		const extraUpdatedAttributes = Object.values(
+			WIDE_ALIGNMENTS.alignments
+		).includes( nextAlign )
 			? { width: undefined, height: undefined }
 			: {};
 		this.props.setAttributes( {
@@ -331,7 +331,9 @@ export class ImageEdit extends React.Component {
 		const { attributes } = this.props;
 		const { align, width } = attributes;
 
-		return WIDE_ALIGNMENTS.includes( align ) ? '100%' : width;
+		return Object.values( WIDE_ALIGNMENTS.alignments ).includes( align )
+			? '100%'
+			: width;
 	}
 
 	render() {

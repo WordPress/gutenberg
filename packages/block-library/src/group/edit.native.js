@@ -10,6 +10,7 @@ import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { InnerBlocks, withColors } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
+import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,7 +24,7 @@ function GroupEdit( {
 	getStylesFromColorScheme,
 } ) {
 	const { align } = attributes;
-	const isFullWidth = align === 'full';
+	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 
 	const renderAppender = useCallback(
 		() => (

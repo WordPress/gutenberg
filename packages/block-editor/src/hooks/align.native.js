@@ -8,13 +8,8 @@ import { without } from 'lodash';
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
-const SUPPORTED_WIDE_ALIGNMENTS_BLOCKS = [
-	'core/cover',
-	'core/group',
-	'core/image',
-];
-const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
 const ALIGNMENTS = [ 'left', 'center', 'right' ];
 
 export { AlignmentHookSettingsProvider } from './align.js';
@@ -25,7 +20,7 @@ addFilter(
 	'core/react-native-editor/align',
 	( settings, name ) => {
 		if (
-			! SUPPORTED_WIDE_ALIGNMENTS_BLOCKS.includes( name ) &&
+			! WIDE_ALIGNMENTS.supportedBlocks.includes( name ) &&
 			hasBlockSupport( settings, 'align' )
 		) {
 			const blockAlign = settings.supports.align;
@@ -33,7 +28,10 @@ addFilter(
 			settings.supports = {
 				...settings.supports,
 				align: Array.isArray( blockAlign )
-					? without( blockAlign, ...WIDE_ALIGNMENTS )
+					? without(
+							blockAlign,
+							...Object.values( WIDE_ALIGNMENTS.alignments )
+					  )
 					: blockAlign,
 				alignWide: false,
 			};
