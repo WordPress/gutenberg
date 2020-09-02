@@ -67,11 +67,11 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		}
 	}, [ activeItem ] );
 
-	const isMounted = useRef( true );
+	const isMounted = useRef( false );
 
 	useEffect( () => {
-		if ( isMounted.current ) {
-			isMounted.current = false;
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
 		}
 	}, [] );
 
@@ -105,7 +105,7 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 						className={ classnames(
 							'components-navigation__level',
 							{
-								[ animateClassName ]: ! isMounted.current,
+								[ animateClassName ]: isMounted.current,
 							}
 						) }
 					>
