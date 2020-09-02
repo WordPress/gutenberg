@@ -23,6 +23,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from './style.scss';
 
 const MAX_ITEM_WIDTH = 120;
+const HALF_COLUMN = 0.5;
 
 function StylePreview( { onPress, isActive, style, url } ) {
 	const [ itemWidth, setItemWidth ] = useState( MAX_ITEM_WIDTH );
@@ -31,7 +32,8 @@ function StylePreview( { onPress, isActive, style, url } ) {
 
 	function onLayout() {
 		const columnsNum =
-			Math.floor( BottomSheet.getWidth() / MAX_ITEM_WIDTH ) + 0.5;
+			// To indicate scroll availabilty, there is a need to display additional half the column
+			Math.floor( BottomSheet.getWidth() / MAX_ITEM_WIDTH ) + HALF_COLUMN;
 		setItemWidth( BottomSheet.getWidth() / columnsNum );
 	}
 
