@@ -103,9 +103,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	private function assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles ) {
 		$styled_block = apply_filters( 'render_block', self::BLOCK_MARKUP, $block );
-		$content      = $this->get_content_from_block( $styled_block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+
+		// Ensure blocks to not add extra whitespace.
+		$this->assertEquals( $styled_block, trim( $styled_block ) );
+
+		$content    = $this->get_content_from_block( $styled_block );
+		$class_list = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list = $this->get_attribute_from_block( 'style', $styled_block );
 
 		$this->assertEquals( self::BLOCK_CONTENT, $content );
 		$this->assertEquals( $expected_classes, $class_list );
