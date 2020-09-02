@@ -26,6 +26,12 @@ public struct SourceFile {
         }
         return try String(contentsOfFile: path, encoding: .utf8)
     }
+
+    public func jsScript(with argument: String? = nil) throws -> WKUserScript {
+        let content = try getContent()
+        let formatted = String(format: content, argument ?? [])
+        return formatted.toJsScript()
+    }
 }
 
 extension SourceFile {
@@ -66,7 +72,7 @@ public struct FallbackJavascriptInjection {
     /// - Throws: Throws an error if any required source doesn't exist.
     public init(blockHTML: String, userId: String) throws {
         func script(with source: SourceFile, argument: String? = nil) throws -> WKUserScript {
-            String(format: try source.getContent(), argument ?? []).toJsScript()
+            try source.jsScript(with: argument)
         }
 
         func getInjectCssScript(with source: SourceFile) throws -> WKUserScript {

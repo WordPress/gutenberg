@@ -14,7 +14,6 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     private let block: Block
     private let jsInjection: FallbackJavascriptInjection
     private let coverView = UIView()
-    private let customInjectionSources: [SourceFile]
 
     public lazy var webView: WKWebView = {
         let configuration = WKWebViewConfiguration()
@@ -23,11 +22,10 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
         return WKWebView(frame: .zero, configuration: configuration)
     }()
 
-    public init(block: Block, userId: String, isWPOrg: Bool = true, customSources: [SourceFile] = []) throws {
+    public init(block: Block, userId: String, isWPOrg: Bool = true) throws {
         self.block = block
         self.isWPOrg = isWPOrg
         jsInjection = try FallbackJavascriptInjection(blockHTML: block.content, userId: userId)
-        customInjectionSources = customSources
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -54,6 +52,14 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     open func getRequest(for webView: WKWebView, completion: @escaping (URLRequest) -> Void) {
         let request = URLRequest(url: URL(string: "https://wordpress.org/gutenberg/")!)
         completion(request)
+    }
+
+    open func onPageLoadScripts() -> [WKUserScript] {
+        return []
+    }
+
+    open func onGutenbergReadyScripts() -> [WKUserScript] {
+        return []
     }
 
     public func cleanUp() {
@@ -128,7 +134,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     }
 
     private func onGutenbergReady() {
-        injectExternalSources()
+        onGutenbergReadyScripts().forEach(evaluateJavascript)
         evaluateJavascript(jsInjection.preventAutosavesScript)
         evaluateJavascript(jsInjection.insertBlockScript)
         DispatchQueue.main.async { [weak self] in
@@ -138,17 +144,6 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
 }
 
 extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
-    func injectExternalSources() {
-        customInjectionSources.compactMap {
-            do {
-                return try $0.getContent().toJsScript()
-            } catch {
-                assertionFailure("Error loading JS source: \($0). Error: \(error)")
-                return nil
-            }
-        }.forEach(evaluateJavascript)
-    }
-
     public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         // At this point, user scripts are not loaded yet, so we need to inject the
         // script that inject css manually before actually injecting the css.
@@ -156,6 +151,7 @@ extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
         evaluateJavascript(jsInjection.injectEditorCssScript)
         evaluateJavascript(jsInjection.injectWPBarsCssScript)
         evaluateJavascript(jsInjection.injectLocalStorageScript)
+        onPageLoadScripts().forEach(evaluateJavascript)
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
