@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { set }from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createContext, useContext, useEffect } from '@wordpress/element';
@@ -59,21 +64,11 @@ const useGlobalStylesFromEntities = () => {
 	const getProperty = ( context, family, name ) =>
 		userStyles?.[ context ]?.styles?.[ family ]?.[ name ];
 
-	const setProperty = ( context, family, name, value ) =>
-		setContent(
-			JSON.stringify( {
-				...userStyles,
-				[ context ]: {
-					styles: {
-						...userStyles?.[ context ]?.styles,
-						[ family ]: {
-							...userStyles?.[ context ]?.styles?.[ family ],
-							[ name ]: value,
-						},
-					},
-				},
-			} )
-		);
+	const setProperty = ( context, family, name, value ) => {
+		const newContent = { ...userStyles };
+		set( newContent, `${ context }.styles.${ family }.${ name }`, value );
+		setContent( JSON.stringify( newContent ) );
+	};
 
 	return {
 		userStyles,
