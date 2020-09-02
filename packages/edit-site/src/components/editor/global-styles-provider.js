@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set }from 'lodash';
+import { set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import { getGlobalStyles } from './global-styles-renderer';
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
 	getProperty: ( context, family, name ) => {},
-	setProperty: ( context, family, name, value ) => {},
+	setProperty: ( context, path, value ) => {},
 	globalContext: {},
 	/* eslint-enable no-unused-vars */
 } );
@@ -64,9 +64,9 @@ const useGlobalStylesFromEntities = () => {
 	const getProperty = ( context, family, name ) =>
 		userStyles?.[ context ]?.styles?.[ family ]?.[ name ];
 
-	const setProperty = ( context, family, name, value ) => {
+	const setProperty = ( context, path, value ) => {
 		const newContent = { ...userStyles };
-		set( newContent, `${ context }.styles.${ family }.${ name }`, value );
+		set( newContent, `${ context }.styles.${ path }`, value );
 		setContent( JSON.stringify( newContent ) );
 	};
 
