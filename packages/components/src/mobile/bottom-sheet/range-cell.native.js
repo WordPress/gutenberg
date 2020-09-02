@@ -180,6 +180,7 @@ class BottomSheetRangeCell extends Component {
 			getStylesFromColorScheme,
 			rangePreview,
 			cellContainerStyle,
+			cellRowContainerStyle,
 			shouldDisplayTextInput = true,
 			...cellProps
 		} = this.props;
@@ -210,6 +211,7 @@ class BottomSheetRangeCell extends Component {
 		const containerStyle = [
 			styles.container,
 			isIOS ? styles.containerIOS : styles.containerAndroid,
+			cellRowContainerStyle,
 		];
 
 		return (
