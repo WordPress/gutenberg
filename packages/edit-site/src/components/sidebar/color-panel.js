@@ -28,7 +28,7 @@ export default ( {
 		settings.push( {
 			colorValue: getProperty( name, 'color.text' ),
 			onColorChange: ( value ) =>
-				setProperty( name, {'color.text': value} ),
+				setProperty( name, { 'color.text': value } ),
 			label: __( 'Text color' ),
 		} );
 	}
@@ -38,10 +38,10 @@ export default ( {
 		settings.push( {
 			colorValue: getProperty( name, 'color.background' ),
 			onColorChange: ( value ) =>
-				setProperty( name, {'color.background': value} ),
+				setProperty( name, { 'color.background': value } ),
 			gradientValue: getProperty( name, 'color.gradient' ),
 			onGradientChange: ( value ) =>
-				setProperty( name, {'color.gradient': value} ),
+				setProperty( name, { 'color.gradient': value } ),
 			label: __( 'Background color' ),
 		} );
 	}
@@ -50,7 +50,7 @@ export default ( {
 		settings.push( {
 			colorValue: getProperty( name, 'color.link' ),
 			onColorChange: ( value ) =>
-				setProperty( name, {'color.link': value} ),
+				setProperty( name, { 'color.link': value } ),
 			label: __( 'Link color' ),
 		} );
 	}
