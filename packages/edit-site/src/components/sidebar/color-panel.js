@@ -45,33 +45,48 @@ export default ( {
 	 * in a single request. This is to avod race conditions
 	 * that override the previous callback.
 	 */
-	let setColor;
-	const colorPromise = new Promise(
-		( resolve ) => ( setColor = ( value ) => resolve( value ) )
+	let setBackground;
+	let backgroundSettings;
+	const backgroundPromise = new Promise(
+		( resolve ) => ( setBackground = ( value ) => resolve( value ) )
 	);
 	let setGradient;
+	let gradientSettings;
 	const gradientPromise = new Promise(
 		( resolve ) => ( setGradient = ( value ) => resolve( value ) )
 	);
-	Promise.all( [ colorPromise, gradientPromise ] ).then( ( values ) => {
+	Promise.all( [ backgroundPromise, gradientPromise ] ).then( ( values ) => {
 		setProperty( name, { ...values[ 0 ], ...values[ 1 ] } );
 	} );
-	if (
-		supports.includes( BACKGROUND_COLOR ) &&
-		supports.includes( GRADIENT_COLOR )
-	) {
-		const backgroundSettings = {
+	if ( supports.includes( BACKGROUND_COLOR ) ) {
+		backgroundSettings = {
 			colorValue: getProperty( name, 'color.background' ),
 			onColorChange: ( value ) =>
-				setColor( { 'color.background': value } ),
+				setBackground( { 'color.background': value } ),
 		};
-
-		const gradientSettings = {
+	} else {
+		backgroundSettings = {};
+		// Resolve the background promise, as to fire the setProperty
+		// callback when the gradient promise is resolved.
+		setBackground( undefined );
+	}
+	if ( supports.includes( GRADIENT_COLOR ) ) {
+		gradientSettings = {
 			gradientValue: getProperty( name, 'color.gradient' ),
 			onGradientChange: ( value ) =>
 				setGradient( { 'color.gradient': value } ),
 		};
+	} else {
+		gradientSettings = {};
+		// Resolve the gradient promise, as to fire the setProperty
+		// callback when the background promise is resolved.
+		setGradient( undefined );
+	}
 
+	if (
+		supports.includes( GRADIENT_COLOR ) ||
+		supports.includes( BACKGROUND_COLOR )
+	) {
 		settings.push( {
 			...backgroundSettings,
 			...gradientSettings,
