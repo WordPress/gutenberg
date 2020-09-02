@@ -173,7 +173,7 @@ export default function SearchEdit( {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						title={ __( 'Toggle Search Label' ) }
+						title={ __( 'Toggle search label' ) }
 						icon={ toggleLabel }
 						onClick={ () => {
 							setAttributes( {
@@ -184,7 +184,7 @@ export default function SearchEdit( {
 					/>
 					<DropdownMenu
 						icon={ getButtonPositionIcon() }
-						label={ __( 'Change Button Position' ) }
+						label={ __( 'Change button position' ) }
 					>
 						{ ( { onClose } ) => (
 							<MenuGroup className="wp-block-search__button-position-menu">
@@ -238,7 +238,7 @@ export default function SearchEdit( {
 
 					{ 'no-button' !== buttonPosition && (
 						<ToolbarButton
-							title={ __( 'Use Button with Icon' ) }
+							title={ __( 'Use button with icon' ) }
 							icon={ buttonWithIcon }
 							onClick={ () => {
 								setAttributes( {
