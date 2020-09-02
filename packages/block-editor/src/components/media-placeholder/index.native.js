@@ -47,6 +47,7 @@ function MediaPlaceholder( props ) {
 		height,
 		backgroundColor,
 		hideContent,
+		autoOpenMediaOptions,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -178,6 +179,7 @@ function MediaPlaceholder( props ) {
 								] }
 							>
 								{ getMediaOptions() }
+								{ autoOpenMediaOptions && open() }
 								{ ! hideContent && renderContent() }
 							</View>
 						</TouchableWithoutFeedback>

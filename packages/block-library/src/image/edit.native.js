@@ -64,8 +64,12 @@ export class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
+		const { attributes, isSelected } = this.props;
+		const { url } = attributes;
+		const autoOpenMediaOptions = isSelected && ! url;
 		this.state = {
 			isCaptionSelected: false,
+			autoOpenMediaOptions,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -320,7 +324,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { isCaptionSelected } = this.state;
+		const { isCaptionSelected, autoOpenMediaOptions } = this.state;
 		const { attributes, isSelected, image, imageSizes } = this.props;
 		const {
 			align,
@@ -407,6 +411,7 @@ export class ImageEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
+						autoOpenMediaOptions={ autoOpenMediaOptions }
 					/>
 				</View>
 			);
