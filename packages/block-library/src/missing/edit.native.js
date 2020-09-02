@@ -36,13 +36,15 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	componentDidMount() {
-		const explanation = isUnsupportedBlockEditorSupported( this.props.capabilities )
-							? __(
-									"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
-							  )
-							: __(
-									'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
-							  );
+		const explanation = isUnsupportedBlockEditorSupported(
+			this.props.capabilities
+		)
+			? __(
+					"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
+			  )
+			: __(
+					'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
+			  );
 
 		// addStrings( { 'missing-block-detail': explanation } );
 	}
@@ -113,7 +115,7 @@ export class UnsupportedBlockEdit extends Component {
 			styles.actionButtonDark
 		);
 
-		console.log("---> Strings in Missing: ", this.props.uiStrings);
+		console.log( '---> Strings in Missing: ', this.props.uiStrings );
 
 		return (
 			<BottomSheet
@@ -158,7 +160,7 @@ export class UnsupportedBlockEdit extends Component {
 							: __(
 									'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
 							  ) } */}
-						{ this.props.uiStrings['missing-block-detail'] }
+						{ this.props.uiStrings[ 'missing-block-detail' ] }
 					</Text>
 				</View>
 				{ isUnsupportedBlockEditorSupported && (

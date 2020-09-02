@@ -142,7 +142,7 @@ class Editor extends Component {
 			meta: [],
 		};
 
-		console.log("---> Strings in EDITOR: ", props);
+		console.log( '---> Strings in EDITOR: ', props );
 
 		return (
 			<SlotFillProvider>
