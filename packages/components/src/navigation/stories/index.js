@@ -110,8 +110,7 @@ function Example() {
 										{ parentLevel.title }
 									</NavigationBackButton>
 								) }
-								<h1>{ level.title }</h1>
-								<NavigationMenu title="Menu">
+								<NavigationMenu title={ level.title }>
 									{ level.children.map( ( item ) => {
 										return (
 											<NavigationMenuItem

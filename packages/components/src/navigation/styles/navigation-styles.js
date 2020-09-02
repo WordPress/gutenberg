@@ -6,15 +6,21 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { LIGHT_GRAY } from '../../utils/colors-values';
+import { BASE, G2 } from '../../utils/colors-values';
+import Button from '../../button';
 import Text from '../../text';
 
 export const Root = styled.div`
 	width: 100%;
+	background-color: ${ G2.darkGray.primary };
+	color: #f0f0f0;
+	padding: 8px;
+	overflow: hidden;
 `;
 
 export const MenuUI = styled.div`
 	margin-top: 24px;
+	margin-bottom: 24px;
 	display: flex;
 	flex-direction: column;
 	ul {
@@ -30,14 +36,51 @@ export const MenuTitleUI = styled( Text )`
 `;
 
 export const MenuItemUI = styled.li`
+	border-radius: 2px;
+	color: ${ G2.lightGray.ui };
+
 	button,
 	a {
 		padding-left: 16px;
 		padding-right: 16px;
 		width: 100%;
+		color: ${ G2.lightGray.ui };
+
+		&:hover,
+		&:focus:not( [aria-disabled='true'] ):active,
+		&:active:not( [aria-disabled='true'] ):active {
+			color: #ddd;
+		}
 	}
+
 	&.is-active {
-		background-color: ${ LIGHT_GRAY[ 300 ] };
+		background-color: ${ BASE.black };
+		color: ${ G2.lightGray.secondary };
+
+		button,
+		a {
+			color: ${ G2.lightGray.secondary };
+		}
+	}
+
+	svg path {
+		color: ${ G2.lightGray.ui };
+	}
+`;
+
+export const BackButtonUi = styled( Button )`
+	&.is-tertiary {
+		color: ${ G2.lightGray.ui };
+
+		&:hover:not( :disabled ) {
+			color: #ddd;
+			box-shadow: none;
+		}
+
+		&:active:not( :disabled ) {
+			background: transparent;
+			color: #ddd;
+		}
 	}
 `;
 
