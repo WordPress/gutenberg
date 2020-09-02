@@ -2,7 +2,7 @@
 	position: absolute;
 	// Offset position so that cursor is centered over the drag handle.
 	top: -#{$block-toolbar-height / 2};
-	left: -#{$button-size * 1.5};
+	left: 0;
 }
 
 .block-editor-block-draggable-chip {
