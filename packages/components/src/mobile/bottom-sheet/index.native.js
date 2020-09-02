@@ -409,8 +409,9 @@ class BottomSheet extends Component {
 								? safeAreaTopInset
 								: 0,
 						flex: isFullScreen ? 1 : undefined,
-						paddingTop:
-							Platform.OS === 'android' && isFullScreen ? 8 : 0,
+						...( Platform.OS === 'android' && isFullScreen
+							? styles.backgroundFullScreen
+							: {} ),
 						...style,
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }

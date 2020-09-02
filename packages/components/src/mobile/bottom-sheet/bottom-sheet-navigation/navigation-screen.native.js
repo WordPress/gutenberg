@@ -2,11 +2,11 @@
  * External dependencies
  */
 import {
-	useFocusEffect,
 	useIsFocused,
 	useNavigation,
+	useFocusEffect,
 } from '@react-navigation/native';
-import { View } from 'react-native';
+import { View, Keyboard } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -55,6 +55,7 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 		useCallback( () => {
 			onHandleHardwareButtonPress( () => {
 				if ( navigation.canGoBack() ) {
+					Keyboard.dismiss();
 					shouldEnableBottomSheetMaxHeight( true );
 					navigation.goBack();
 					return true;

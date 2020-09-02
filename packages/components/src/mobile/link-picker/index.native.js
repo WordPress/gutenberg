@@ -110,7 +110,7 @@ export const LinkPicker = ( {
 					>
 						<Icon
 							icon={ cancelCircleFilled }
-							color={ iconStyle.color }
+							fill={ iconStyle.color }
 							size={ 24 }
 						/>
 					</TouchableOpacity>
