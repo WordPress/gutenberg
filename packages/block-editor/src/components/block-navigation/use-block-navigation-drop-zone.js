@@ -114,7 +114,16 @@ function useDropTargetBlocksData( ref, position, dragEventType ) {
 					: true,
 			};
 		} );
-	}, [ hasPosition ] );
+	}, [
+		hasPosition,
+		ref,
+		dragEventType,
+		canInsertBlocks,
+		getBlockCount,
+		getBlockIndex,
+		getBlockRootClientId,
+		getDraggedBlockClientIds,
+	] );
 
 	return blocksData;
 }
@@ -299,7 +308,7 @@ export default function useBlockNavigationDropZone( ref ) {
 				setTarget( newTarget );
 			}
 		}
-	}, [ position ] );
+	}, [ blocksData, position ] );
 
 	if ( position ) {
 		return target;
