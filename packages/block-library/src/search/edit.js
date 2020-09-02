@@ -263,8 +263,14 @@ export default function SearchEdit( {
 							id={ unitControlInputId }
 							min={ `${ MIN_WIDTH }${ MIN_WIDTH_UNIT }` }
 							onChange={ ( newWidth ) => {
+								const filteredWidth =
+									widthUnit === '%' &&
+									parseInt( newWidth, 10 ) > 100
+										? 100
+										: newWidth;
+
 								setAttributes( {
-									width: parseInt( newWidth, 10 ),
+									width: parseInt( filteredWidth, 10 ),
 								} );
 							} }
 							onUnitChange={ ( newUnit ) => {
