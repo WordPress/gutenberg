@@ -45,8 +45,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gutenberg_web_view);
 
-        WebView.setWebContentsDebuggingEnabled(true);
-
         setupToolbar();
 
         mWebView = findViewById(R.id.gutenberg_web_view);
@@ -138,7 +136,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         finish();
     }
 
-    private String getFileContentFromAssets(String assetsFileName) {
+    protected String getFileContentFromAssets(String assetsFileName) {
         return FileUtils.getHtmlFromFile(this, assetsFileName);
     }
 
@@ -184,6 +182,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     );
                 }
 
+                injectOnPageLoadExternalSources();
+
                 super.onPageCommitVisible(view, url);
             }
 
@@ -219,21 +219,35 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void onGutenbergReady() {
-        injectExternalSources();
+        injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
-        mWebView.postDelayed(() -> mWebView.setVisibility(View.VISIBLE), 1500);
+        mWebView.postDelayed(new Runnable() {
+            @Override public void run() {
+                mWebView.setVisibility(View.VISIBLE);
+            }
+        }, 1000);
     }
 
-    private void injectExternalSources() {
-        List<String> list = getExternalSources();
-        for (String path : list) {
-            String externalJSSource = getFileContentFromAssets(path);
-            evaluateJavaScript(externalJSSource);
+    private void injectOnGutenbergReadyExternalSources() {
+        List<String> list = getOnGutenbergReadyExternalSources();
+        for (String file : list) {
+            evaluateJavaScript(file);
         }
     }
 
-    protected List<String> getExternalSources() {
+    protected List<String> getOnGutenbergReadyExternalSources() {
+        return new ArrayList<>();
+    }
+
+    private void injectOnPageLoadExternalSources() {
+        List<String> list = getOnPageLoadExternalSources();
+        for (String file : list) {
+            evaluateJavaScript(file);
+        }
+    }
+
+    protected List<String> getOnPageLoadExternalSources() {
         return new ArrayList<>();
     }
 
