@@ -96,7 +96,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		$block_root->setAttribute( 'style', esc_attr( implode( '; ', $new_styles ) . ';' ) );
 	}
 
-	return str_replace( array( $wrapper_left, $wrapper_right ), '', $dom->saveHtml() );
+	return $dom->saveHtml( $block_root );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 
