@@ -76,6 +76,7 @@ export default function QueryControls( {
 				label={ __( 'Category' ) }
 				noOptionLabel={ __( 'All' ) }
 				selectedCategoryId={ selectedCategoryId }
+				onChange={ onCategoryChange }
 			/>
 		),
 		categorySuggestions && onCategoryChange && (

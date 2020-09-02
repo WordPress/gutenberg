@@ -136,10 +136,8 @@ add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 )
  * @since 5.0.0
  */
 function gutenberg_register_rest_widget_updater_routes() {
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
-		$widget_forms = new WP_REST_Widget_Utils_Controller();
-		$widget_forms->register_routes();
-	}
+	$widget_forms = new WP_REST_Widget_Utils_Controller();
+	$widget_forms->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
 
@@ -194,10 +192,8 @@ add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
  * Registers the Sidebars REST API routes.
  */
 function gutenberg_register_sidebars_endpoint() {
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
-		$sidebars = new WP_REST_Sidebars_Controller();
-		$sidebars->register_routes();
-	}
+	$sidebars = new WP_REST_Sidebars_Controller();
+	$sidebars->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_sidebars_endpoint' );
 
@@ -330,3 +326,32 @@ function gutenberg_register_image_editor() {
 	}
 }
 add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );
+
+/**
+ * Registers the post format search handler.
+ *
+ * @param string $search_handlers     Title list of current handlers.
+ *
+ * @return array Title updated list of handlers.
+ */
+function gutenberg_post_format_search_handler( $search_handlers ) {
+	if ( current_theme_supports( 'post-formats' ) ) {
+		$search_handlers[] = new WP_REST_Post_Format_Search_Handler();
+	}
+
+	return $search_handlers;
+}
+add_filter( 'wp_rest_search_handlers', 'gutenberg_post_format_search_handler', 10, 5 );
+
+/**
+ * Registers the terms search handler.
+ *
+ * @param string $search_handlers Title list of current handlers.
+ *
+ * @return array Title updated list of handlers.
+ */
+function gutenberg_term_search_handler( $search_handlers ) {
+	$search_handlers[] = new WP_REST_Term_Search_Handler();
+	return $search_handlers;
+}
+add_filter( 'wp_rest_search_handlers', 'gutenberg_term_search_handler', 10, 5 );

@@ -8,10 +8,13 @@
 /**
  * Registers the style and colors block attributes for block types that support it.
  *
- * @param  array $block_type Block Type.
+ * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_colors_support( $block_type ) {
-	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), false );
+	$color_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$color_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), false );
+	}
 	$has_text_colors_support       = is_array( $color_support ) || $color_support;
 	$has_background_colors_support = $has_text_colors_support;
 	$has_gradients_support         = $has_text_colors_support && gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
@@ -50,9 +53,10 @@ function gutenberg_register_colors_support( $block_type ) {
  * Add CSS classes and inline styles for colors to the incoming attributes array.
  * This will be applied to the block markup in the front-end.
  *
- * @param  array $attributes comprehensive list of attributes to be applied.
- * @param  array $block_attributes block attributes.
- * @param  array $block_type Block type.
+ * @param  array         $attributes       Comprehensive list of attributes to be applied.
+ * @param  array         $block_attributes Block attributes.
+ * @param  WP_Block_Type $block_type       Block type.
+ *
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_apply_colors_support( $attributes, $block_attributes, $block_type ) {

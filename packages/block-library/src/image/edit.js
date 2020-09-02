@@ -88,6 +88,17 @@ export function ImageEdit( {
 		height,
 		sizeSlug,
 	} = attributes;
+
+	const altRef = useRef();
+	useEffect( () => {
+		altRef.current = alt;
+	}, [ alt ] );
+
+	const captionRef = useRef();
+	useEffect( () => {
+		captionRef.current = caption;
+	}, [ caption ] );
+
 	const ref = useRef();
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -116,14 +127,14 @@ export function ImageEdit( {
 		// If the current image is temporary but an alt text was meanwhile
 		// written by the user, make sure the text is not overwritten.
 		if ( isTemporaryImage( id, url ) ) {
-			if ( alt ) {
+			if ( altRef.current ) {
 				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
 			}
 		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
+		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
 			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
 		}
 

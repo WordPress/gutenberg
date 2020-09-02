@@ -316,7 +316,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		)
 	);
 	foreach ( $blocks as $block_name => $block_type ) {
-		if ( empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
+		if ( ! property_exists( $block_type, 'supports' ) || empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
 			continue;
 		}
 
@@ -596,14 +596,27 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array Default features config for the editor.
  */
 function gutenberg_experimental_global_styles_get_editor_features( $config ) {
-	if (
-		empty( $config['global']['features'] ) ||
-		! is_array( $config['global']['features'] )
-	) {
-		return array();
+	$features = array();
+	foreach ( array_keys( $config ) as $context ) {
+		if (
+			empty( $config[ $context ]['features'] ) ||
+			! is_array( $config[ $context ]['features'] )
+		) {
+			$features[ $context ] = array();
+		} else {
+			$features[ $context ] = $config[ $context ]['features'];
+		}
 	}
 
-	return $config['global']['features'];
+	// Deprecated theme supports.
+	if ( get_theme_support( 'disable-custom-colors' ) ) {
+		if ( ! isset( $features['global']['color'] ) ) {
+			$features['global']['color'] = array();
+		}
+		$features['global']['color']['custom'] = false;
+	}
+
+	return $features;
 }
 
 /**
@@ -633,6 +646,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$settings['styles'][] = array( 'css' => $stylesheet );
 
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
+	// Unsetting deprecated settings defined by Core.
+	unset( $settings['disableCustomColors'] );
 
 	return $settings;
 }

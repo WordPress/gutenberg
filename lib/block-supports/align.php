@@ -8,10 +8,13 @@
 /**
  * Registers the align block attribute for block types that support it.
  *
- * @param  array $block_type Block Type.
+ * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_alignment_support( $block_type ) {
-	$has_align_support = gutenberg_experimental_get( $block_type->supports, array( 'align' ), false );
+	$has_align_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$has_align_support = gutenberg_experimental_get( $block_type->supports, array( 'align' ), false );
+	}
 	if ( $has_align_support ) {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
@@ -30,13 +33,17 @@ function gutenberg_register_alignment_support( $block_type ) {
  * Add CSS classes for block alignment to the incoming attributes array.
  * This will be applied to the block markup in the front-end.
  *
- * @param  array $attributes comprehensive list of attributes to be applied.
- * @param  array $block_attributes block attributes.
- * @param  array $block_type Block Type.
+ * @param array         $attributes       Comprehensive list of attributes to be applied.
+ * @param array         $block_attributes Block attributes.
+ * @param WP_Block_Type $block_type       Block Type.
+ *
  * @return array Block alignment CSS classes and inline styles.
  */
 function gutenberg_apply_alignment_support( $attributes, $block_attributes, $block_type ) {
-	$has_align_support = gutenberg_experimental_get( $block_type->supports, array( 'align' ), false );
+	$has_align_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$has_align_support = gutenberg_experimental_get( $block_type->supports, array( 'align' ), false );
+	}
 	if ( $has_align_support ) {
 		$has_block_alignment = array_key_exists( 'align', $block_attributes );
 

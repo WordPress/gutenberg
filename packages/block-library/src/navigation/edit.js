@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -48,7 +48,13 @@ function Navigation( {
 	// HOOKS
 	//
 	const ref = useRef();
+
+	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
+		! hasExistingNavItems
+	);
+
 	const { selectBlock } = useDispatch( 'core/block-editor' );
+
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
@@ -85,13 +91,17 @@ function Navigation( {
 		};
 	}
 
-	// If we don't have existing items then show the Placeholder
-	if ( ! hasExistingNavItems ) {
+	//
+	// RENDER
+	//
+
+	if ( isPlaceholderShown ) {
 		return (
 			<Block.div>
 				<NavigationPlaceholder
 					ref={ ref }
 					onCreate={ ( blocks, selectNavigationBlock ) => {
+						setIsPlaceholderShown( false );
 						updateInnerBlocks( blocks );
 						if ( selectNavigationBlock ) {
 							selectBlock( clientId );
@@ -107,7 +117,6 @@ function Navigation( {
 		'is-vertical': attributes.orientation === 'vertical',
 	} );
 
-	// UI State: rendered Block UI
 	return (
 		<>
 			<BlockControls>

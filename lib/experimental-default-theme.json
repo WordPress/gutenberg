@@ -126,7 +126,10 @@
 		},
 		"features": {
 			"typography": {
-				"dropCap": false
+				"dropCap": true
+			},
+			"color": {
+				"custom": true
 			}
 		}
 	}

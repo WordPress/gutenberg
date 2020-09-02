@@ -3,7 +3,7 @@
 
 	th,
 	tbody td {
-		padding: 4px;
+		padding: 0.25em;
 		border: 1px solid $gray-200;
 	}
 
@@ -14,7 +14,6 @@
 	table {
 		width: 100%;
 		border-collapse: collapse;
-		font-family: $default-font;
 	}
 
 	table th {
