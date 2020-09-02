@@ -4,6 +4,10 @@
 import { MenuUI, MenuTitleUI } from './styles/navigation-styles';
 
 const NavigationMenu = ( { children, title } ) => {
+	if ( ! children.length ) {
+		return null;
+	}
+
 	return (
 		<MenuUI className="components-navigation__menu">
 			{ title && (
