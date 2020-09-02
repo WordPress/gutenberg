@@ -418,6 +418,23 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 		}
 	}
 
+	if ( isset( $wp_query->tax_query->queried_terms['post_tag'] ) ) {
+		$context['query'] = array( 'tagIds' => array() );
+
+		foreach ( $wp_query->tax_query->queried_terms['post_tag']['terms'] as $tag_slug_or_id ) {
+			$tag_ID = $tag_slug_or_id;
+
+			if ( 'slug' === $wp_query->tax_query->queried_terms['post_tag']['field'] ) {
+				$tag = get_term_by( 'slug', $tag_slug_or_id, 'post_tag' );
+
+				if ( $tag ) {
+					$tag_ID = $tag->term_id;
+				}
+			}
+			$context['query']['tagIds'][] = $tag_ID;
+		}
+	}
+
 	/**
 	 * Filters the default context provided to a rendered block.
 	 *

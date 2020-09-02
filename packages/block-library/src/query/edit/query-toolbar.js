@@ -12,32 +12,21 @@ import {
 import { __ } from '@wordpress/i18n';
 import { postList } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { getTaxonomyInfo } from '../utils';
+
 export default function QueryToolbar( { query, setQuery } ) {
-	const { categories, categoriesMapById, categoriesMapByName } = useSelect(
-		( select ) => {
-			const _categories = select( 'core' ).getEntityRecords(
-				'taxonomy',
-				'category'
-			);
-			return {
-				categories: _categories,
-				..._categories?.reduce(
-					( acc, category ) => ( {
-						categoriesMapById: {
-							...acc.categoriesMapById,
-							[ category.id ]: category,
-						},
-						categoriesMapByName: {
-							...acc.categoriesMapByName,
-							[ category.name ]: category,
-						},
-					} ),
-					{ categoriesMapById: {}, categoriesMapByName: {} }
-				),
-			};
-		},
-		[]
-	);
+	const { categories, tags } = useSelect( ( select ) => {
+		const { getEntityRecords } = select( 'core' );
+		const _categories = getEntityRecords( 'taxonomy', 'category' );
+		const _tags = getEntityRecords( 'taxonomy', 'post_tag' );
+		return {
+			categories: getTaxonomyInfo( _categories ),
+			tags: getTaxonomyInfo( _tags ),
+		};
+	}, [] );
 	return (
 		<Toolbar>
 			<Dropdown
@@ -77,29 +66,51 @@ export default function QueryToolbar( { query, setQuery } ) {
 								setQuery( { offset: value ?? 0 } )
 							}
 						/>
-						{ categories && (
+						{ categories?.terms && (
 							<FormTokenField
 								label={ __( 'Categories' ) }
 								value={ query.categoryIds.map(
 									( categoryId ) => ( {
 										id: categoryId,
 										value:
-											categoriesMapById[ categoryId ]
+											categories.mapById[ categoryId ]
 												.name,
 									} )
 								) }
-								suggestions={ categories.map(
-									( category ) => category.name
+								suggestions={ categories.terms.map(
+									( { name } ) => name
 								) }
 								onChange={ ( newCategoryNames ) => {
 									const categoryIds = newCategoryNames.map(
 										( categoryName ) =>
-											categoriesMapByName[ categoryName ]
+											categories.mapByName[ categoryName ]
 												?.id
 									);
 									if ( categoryIds.includes( undefined ) )
 										return;
 									setQuery( { categoryIds } );
+								} }
+							/>
+						) }
+						{ tags?.terms && (
+							<FormTokenField
+								label={ __( 'Tags' ) }
+								value={ ( query.tagIds || [] ).map(
+									( tagId ) => ( {
+										id: tagId,
+										value: tags.mapById[ tagId ].name,
+									} )
+								) }
+								suggestions={ tags.terms.map(
+									( { name } ) => name
+								) }
+								onChange={ ( newTagNames ) => {
+									const tagIds = newTagNames.map(
+										( tagName ) =>
+											tags.mapByName[ tagName ]?.id
+									);
+									if ( tagIds.includes( undefined ) ) return;
+									setQuery( { tagIds } );
 								} }
 							/>
 						) }
