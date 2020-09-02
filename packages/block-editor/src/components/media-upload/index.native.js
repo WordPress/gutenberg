@@ -13,10 +13,17 @@ import {
 	requestMediaPicker,
 	mediaSources,
 } from '@wordpress/react-native-bridge';
-import { capturePhoto, captureVideo, image, wordpress } from '@wordpress/icons';
+import {
+	capturePhoto,
+	captureVideo,
+	image,
+	wordpress,
+	close,
+} from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
+export const MEDIA_UPLOAD_CANCEL = `cancel_media_upload`;
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
@@ -85,11 +92,19 @@ export class MediaUpload extends React.Component {
 			mediaLibrary: true,
 		};
 
+		const cancelMediaUpload = {
+			value: MEDIA_UPLOAD_CANCEL,
+			label: __( 'Cancel' ),
+			types: [ MEDIA_TYPE_IMAGE ],
+			icon: close,
+		};
+
 		const internalSources = [
 			deviceLibrarySource,
 			cameraImageSource,
 			cameraVideoSource,
 			siteLibrarySource,
+			cancelMediaUpload,
 		];
 
 		return internalSources.concat( this.state.otherMediaOptions );
@@ -138,7 +153,17 @@ export class MediaUpload extends React.Component {
 	}
 
 	onPickerSelect( value ) {
-		const { allowedTypes = [], onSelect, multiple = false } = this.props;
+		const {
+			allowedTypes = [],
+			onSelect,
+			multiple = false,
+			onMediaUploadCanceled,
+		} = this.props;
+
+		if ( value === MEDIA_UPLOAD_CANCEL ) {
+			onMediaUploadCanceled();
+			return;
+		}
 		const mediaSource = this.getAllSources()
 			.filter( ( source ) => source.value === value )
 			.shift();
