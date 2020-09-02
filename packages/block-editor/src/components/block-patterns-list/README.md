@@ -22,8 +22,6 @@ import { BlockPatternList } from '@wordpress/block-editor';
 
 const MyBreadcrumb = () => (
 	<BlockPatternList
-		shownPatterns={ currentShownPatterns }
-		blockPatterns={ filteredPatterns }
 		onClickPattern={ onClick }
 	/>
 );
