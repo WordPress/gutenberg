@@ -20,7 +20,11 @@ Renders the variations of a block.
 ```jsx
 import { Button } from '@wordpress/components';
 
-const MyButton = () => <Button isSecondary>Click me!</Button>;
+const MyBlockVariationPicker = () => (
+	<BlockVariationPicker
+		variations={ variations }
+	/>
+);
 ```
 
 ### Props
@@ -47,4 +51,4 @@ The different variations of the block.
 
 ## Related components
 
-Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [BlockEditorProvider](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree. 
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [BlockEditorProvider](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree.
