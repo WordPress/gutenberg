@@ -7,7 +7,7 @@ import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet, Icon, withUIStrings } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
@@ -33,6 +33,18 @@ export class UnsupportedBlockEdit extends Component {
 		this.setState( {
 			showHelp: ! this.state.showHelp,
 		} );
+	}
+
+	componentDidMount() {
+		const explanation = isUnsupportedBlockEditorSupported( this.props.capabilities )
+							? __(
+									"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
+							  )
+							: __(
+									'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
+							  );
+
+		// addStrings( { 'missing-block-detail': explanation } );
 	}
 
 	componentWillUnmount() {
@@ -101,6 +113,8 @@ export class UnsupportedBlockEdit extends Component {
 			styles.actionButtonDark
 		);
 
+		console.log("---> Strings in Missing: ", this.props.uiStrings);
+
 		return (
 			<BottomSheet
 				isVisible={ this.state.showHelp }
@@ -137,13 +151,14 @@ export class UnsupportedBlockEdit extends Component {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ isUnsupportedBlockEditorSupported
+						{/* { isUnsupportedBlockEditorSupported
 							? __(
 									"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
 							  )
 							: __(
 									'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
-							  ) }
+							  ) } */}
+						{ this.props.uiStrings['missing-block-detail'] }
 					</Text>
 				</View>
 				{ isUnsupportedBlockEditorSupported && (
@@ -231,4 +246,5 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	withUIStrings,
 ] )( UnsupportedBlockEdit );

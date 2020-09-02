@@ -14,7 +14,7 @@ import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
-import { SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider, UIStringsContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -142,17 +142,21 @@ class Editor extends Component {
 			meta: [],
 		};
 
+		console.log("---> Strings in EDITOR: ", props);
+
 		return (
 			<SlotFillProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<Layout setTitleRef={ this.setTitleRef } />
-				</EditorProvider>
+				<UIStringsContext.Provider value={ this.props.uiStrings || {} }>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ normalizedPost }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<Layout setTitleRef={ this.setTitleRef } />
+					</EditorProvider>
+				</UIStringsContext.Provider>
 			</SlotFillProvider>
 		);
 	}
