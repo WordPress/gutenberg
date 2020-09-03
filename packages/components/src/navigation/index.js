@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 
 /**
@@ -67,6 +67,14 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		}
 	}, [ activeItem ] );
 
+	const isMounted = useRef( false );
+
+	useEffect( () => {
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
+		}
+	}, [] );
+
 	const NavigationBackButton = ( { children: backButtonChildren } ) => {
 		if ( ! parentLevel ) {
 			return null;
@@ -96,7 +104,9 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 					<div
 						className={ classnames(
 							'components-navigation__level',
-							animateClassName
+							{
+								[ animateClassName ]: isMounted.current,
+							}
 						) }
 					>
 						{ children( {
