@@ -380,9 +380,9 @@ function gutenberg_render_the_template() {
 	// (e.g. `.wp-site-blocks > *`).
 	echo '<div class="wp-site-blocks">';
 	$blocks = parse_blocks( $content );
-    foreach ( $blocks as $block ) {
+	foreach ( $blocks as $block ) {
 		gutenberg_render_the_block_partial( $block );
-    }
+	}
 	echo '</div>';
 }
 
