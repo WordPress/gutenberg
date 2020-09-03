@@ -3,9 +3,6 @@
  */
 
 .wp-block-group {
-	// Zero out the baseline margin that is set for every block in the editor.
-	margin-top: 0;
-	margin-bottom: 0;
 
 	// Ensure not rendering outside the element
 	// as -1px causes overflow-x scrollbars

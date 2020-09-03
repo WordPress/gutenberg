@@ -136,6 +136,9 @@
 			},
 			"fontSize": {
 				"custom": true
+			},
+			"lineHeight": {
+				"custom": false
 			}
 		}
 	}
