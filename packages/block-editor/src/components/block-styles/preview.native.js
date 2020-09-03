@@ -66,6 +66,16 @@ function StylePreview( { onPress, isActive, style, url } ) {
 		styles.innerOutlineDark
 	);
 
+	const getOutline = ( outlineStyles ) =>
+		outlineStyles.map( ( outlineStyle ) => {
+			return (
+				<Animated.View
+					style={ [ outlineStyle, { opacity }, styles[ name ] ] }
+					key={ outlineStyle }
+				/>
+			);
+		} );
+
 	return (
 		<TouchableWithoutFeedback
 			onPress={ () => {
@@ -75,24 +85,8 @@ function StylePreview( { onPress, isActive, style, url } ) {
 		>
 			<View style={ [ styles.container, { width: itemWidth } ] }>
 				<View style={ styles.imageWrapper }>
-					{ isActive && (
-						<>
-							<Animated.View
-								style={ [
-									styles.outline,
-									{ opacity },
-									styles[ name ],
-								] }
-							/>
-							<Animated.View
-								style={ [
-									innerOutlineStyle,
-									{ opacity },
-									styles[ name ],
-								] }
-							/>
-						</>
-					) }
+					{ isActive &&
+						getOutline( [ styles.outline, innerOutlineStyle ] ) }
 					<Image
 						style={ [ styles.image, styles[ name ] ] }
 						source={ { uri: url } }
