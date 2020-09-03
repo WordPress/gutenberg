@@ -646,16 +646,27 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	if (
-		! gutenberg_experimental_global_styles_has_theme_json_support() ||
-		! function_exists( 'get_current_screen' ) ) {
-		return $settings;
-	}
-
-	$screen = get_current_screen();
 	$merged = gutenberg_experimental_global_styles_get_merged_origins();
 
-	if ( ! empty( $screen ) && gutenberg_is_edit_site_page( $screen->id ) ) {
+	// STEP 1: ADD FEATURES
+	// These need to be added to settings always.
+	// We also need to unset the deprecated settings defined by core.
+	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
+	unset( $settings['disableCustomColors'] );
+	unset( $settings['disableCustomGradients'] );
+	unset( $settings['disableCustomFontSizes'] );
+	unset( $settings['enableCustomLineHeight'] );
+
+	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
+	// The client needs some information to be able to access/update the user styles.
+	// We only do this if the theme has support for theme.json, though,
+	// as an indicator that the theme will know how to combine this with its stylesheet.
+	$screen = get_current_screen();
+	if (
+		! empty( $screen ) &&
+		gutenberg_is_edit_site_page( $screen->id ) &&
+		gutenberg_experimental_global_styles_has_theme_json_support()
+	) {
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 		$settings['__experimentalGlobalStylesContexts']     = gutenberg_experimental_global_styles_get_block_data();
 		$settings['__experimentalGlobalStylesBaseStyles']   = gutenberg_experimental_global_styles_merge_trees(
@@ -663,22 +674,14 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			gutenberg_experimental_global_styles_get_theme()
 		);
 	} else {
-		// We are in a block editor context, as this function
-		// is hooked to the block_editor_settings filter.
+		// STEP 3 - OTHERWISE, ADD STYLES
 		//
-		// Add the styles for the editor via the settings
-		// so they get processed as if they were added via add_editor_styles:
-		// they will get the editor wrapper class.
+		// If we are in a block editor context, but not in edit-site,
+		// we need to add the styles via the settings. This is because
+		// we want them processed as if they were added via add_editor_styles,
+		// which adds the editor wrapper class.
 		$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $merged ) );
 	}
-
-	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
-
-	// Unsetting deprecated settings defined by Core.
-	unset( $settings['disableCustomColors'] );
-	unset( $settings['disableCustomGradients'] );
-	unset( $settings['disableCustomFontSizes'] );
-	unset( $settings['enableCustomLineHeight'] );
 
 	return $settings;
 }
