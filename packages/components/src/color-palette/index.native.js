@@ -24,7 +24,6 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
 import { colorsUtils } from '../mobile/color-settings/utils';
-import { performLayoutAnimation } from '../mobile/layout-animation';
 
 const ANIMATION_DURATION = 200;
 
@@ -40,6 +39,11 @@ function ColorPalette( {
 	currentSegment,
 	onCustomPress,
 	shouldEnableBottomSheetScroll,
+	shouldShowCustomIndicatorOption = true,
+	shouldShowCustomLabel = true,
+	shouldShowCustomVerticalSeparator = true,
+	customColorIndicatorStyles,
+	customIndicatorWrapperStyles,
 } ) {
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
@@ -66,7 +70,8 @@ function ColorPalette( {
 		: customSwatchGradients;
 	const isCustomGradientColor = isGradientColor && isSelectedCustom();
 	const shouldShowCustomIndicator =
-		! isGradientSegment || isCustomGradientColor;
+		shouldShowCustomIndicatorOption &&
+		( ! isGradientSegment || isCustomGradientColor );
 
 	const accessibilityHint = isGradientSegment
 		? __( 'Navigates to customize the gradient' )
@@ -132,7 +137,6 @@ function ColorPalette( {
 			contentWidth - scrollPosition - customIndicatorWidth < width;
 
 		if ( isCustomGradientColor ) {
-			performLayoutAnimation();
 			if ( ! isIOS ) {
 				// Scroll position on Android doesn't adjust automatically when removing the last item from the horizontal list.
 				// https://github.com/facebook/react-native/issues/27504
@@ -184,6 +188,11 @@ function ColorPalette( {
 		styles.customTextDark
 	);
 
+	const customIndicatorWrapperStyle = [
+		styles.customIndicatorWrapper,
+		customIndicatorWrapperStyles,
+	];
+
 	return (
 		<ScrollView
 			contentContainerStyle={ styles.contentContainer }
@@ -222,7 +231,10 @@ function ColorPalette( {
 								color={ color }
 								isSelected={ isSelected( color ) }
 								opacity={ opacity }
-								style={ styles.colorIndicator }
+								style={ [
+									styles.colorIndicator,
+									customColorIndicatorStyles,
+								] }
 							/>
 						</Animated.View>
 					</TouchableWithoutFeedback>
@@ -230,28 +242,35 @@ function ColorPalette( {
 			} ) }
 			{ shouldShowCustomIndicator && (
 				<View
-					style={ styles.customIndicatorWrapper }
+					style={ customIndicatorWrapperStyle }
 					onLayout={ onCustomIndicatorLayout }
 				>
-					<View style={ verticalSeparatorStyle } />
+					{ shouldShowCustomVerticalSeparator && (
+						<View style={ verticalSeparatorStyle } />
+					) }
 					<TouchableWithoutFeedback
 						onPress={ onCustomPress }
 						accessibilityRole={ 'button' }
 						accessibilityState={ { selected: isSelectedCustom() } }
 						accessibilityHint={ accessibilityHint }
 					>
-						<View style={ styles.customIndicatorWrapper }>
+						<View style={ customIndicatorWrapperStyle }>
 							<ColorIndicator
 								withCustomPicker={ ! isGradientSegment }
 								color={ customIndicatorColor }
 								isSelected={ isSelectedCustom() }
-								style={ styles.colorIndicator }
+								style={ [
+									styles.colorIndicator,
+									customColorIndicatorStyles,
+								] }
 							/>
-							<Text style={ customTextStyle }>
-								{ isIOS
-									? customText
-									: customText.toUpperCase() }
-							</Text>
+							{ shouldShowCustomLabel && (
+								<Text style={ customTextStyle }>
+									{ isIOS
+										? customText
+										: customText.toUpperCase() }
+								</Text>
+							) }
 						</View>
 					</TouchableWithoutFeedback>
 				</View>

@@ -31,14 +31,15 @@ describe( 'Template Part', () => {
 	} );
 
 	describe( 'Template part block', () => {
-		beforeEach( () =>
-			visitAdminPage(
+		beforeEach( async () => {
+			await visitAdminPage(
 				'admin.php',
 				addQueryArgs( '', {
 					page: 'gutenberg-edit-site',
 				} ).slice( 1 )
-			)
-		);
+			);
+			await page.waitForSelector( '.edit-site-visual-editor' );
+		} );
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.
@@ -90,7 +91,7 @@ describe( 'Template Part', () => {
 		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
 		const createNewButtonSelector =
-			'//button[contains(text(), "New section")]';
+			'//button[contains(text(), "New template part")]';
 		const chooseExistingButtonSelector =
 			'//button[contains(text(), "Choose existing")]';
 
@@ -98,7 +99,7 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Create new template part.
-			await insertBlock( 'Section' );
+			await insertBlock( 'Template Part' );
 			const [ createNewButton ] = await page.$x(
 				createNewButtonSelector
 			);
@@ -120,7 +121,7 @@ describe( 'Template Part', () => {
 		it( 'Should preview newly added template part', async () => {
 			await createNewPost();
 			// Try to insert the template part we created.
-			await insertBlock( 'Section' );
+			await insertBlock( 'Template Part' );
 			const [ chooseExistingButton ] = await page.$x(
 				chooseExistingButtonSelector
 			);

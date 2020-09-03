@@ -20,7 +20,7 @@ import {
 import {
 	ToolbarGroup,
 	ToolbarButton,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	Spinner,
 	RangeControl,
 	DropdownMenu,

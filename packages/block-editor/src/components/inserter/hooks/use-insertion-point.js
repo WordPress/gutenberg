@@ -27,6 +27,7 @@ import { speak } from '@wordpress/a11y';
  * @return {Array} Insertion Point State (rootClientID, onInsertBlocks and onToggle).
  */
 function useInsertionPoint( {
+	onSelect,
 	rootClientId,
 	clientId,
 	isAppender,
@@ -115,6 +116,10 @@ function useInsertionPoint( {
 				blocks.length
 			);
 			speak( message );
+		}
+
+		if ( onSelect ) {
+			onSelect();
 		}
 	};
 

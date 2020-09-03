@@ -12,7 +12,7 @@
  *
  * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
  */
-function the_gutenberg_widgets( $page = 'gutenberg_page_gutenberg-widgets' ) {
+function the_gutenberg_widgets( $page = 'appearance_page_gutenberg-widgets' ) {
 	?>
 	<div
 		id="widgets-editor"
@@ -36,11 +36,20 @@ function the_gutenberg_widgets( $page = 'gutenberg_page_gutenberg-widgets' ) {
  * @param string $hook Page.
  */
 function gutenberg_widgets_init( $hook ) {
-	if ( 'gutenberg_page_gutenberg-widgets' !== $hook && 'gutenberg_customizer' !== $hook ) {
-			return;
+	if ( 'widgets.php' === $hook ) {
+		wp_enqueue_style( 'wp-block-library' );
+		wp_enqueue_style( 'wp-block-library-theme' );
+		wp_add_inline_style(
+			'wp-block-library-theme',
+			'.block-widget-form .widget-control-save { display: none; }'
+		);
+		return;
+	}
+	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets', 'gutenberg_customizer' ), true ) ) {
+		return;
 	}
 
-	$initializer_name = 'gutenberg_page_gutenberg-widgets' === $hook
+	$initializer_name = 'appearance_page_gutenberg-widgets' === $hook
 		? 'initialize'
 		: 'customizerInitialize';
 
@@ -71,7 +80,6 @@ function gutenberg_widgets_init( $hook ) {
 
 	$settings = array_merge(
 		array(
-			'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
 			'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 			'imageSizes'             => $available_image_sizes,
 			'isRTL'                  => is_rtl(),
@@ -90,6 +98,7 @@ function gutenberg_widgets_init( $hook ) {
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
+	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
 	wp_add_inline_script(
 		'wp-edit-widgets',

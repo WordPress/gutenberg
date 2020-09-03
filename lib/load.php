@@ -29,12 +29,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	/**
 	* Start: Include for phase 2
 	*/
-	if ( ! class_exists( 'WP_REST_Widget_Forms' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-widget-forms.php';
+	if ( ! class_exists( 'WP_REST_Widget_Utils_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-widget-utils-controller.php';
 	}
-	if ( ! class_exists( 'WP_REST_Widget_Areas_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-experimental-wp-widget-blocks-manager.php';
-		require dirname( __FILE__ ) . '/class-wp-rest-widget-areas-controller.php';
+	if ( ! class_exists( 'WP_REST_Sidebars_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-sidebars-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-block-directory-controller.php';
@@ -60,6 +59,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Plugins_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-plugins-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Post_Format_Search_Handler' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-post-format-search-handler.php';
+	}
+	if ( ! class_exists( 'WP_REST_Term_Search_Handler' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-term-search-handler.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
@@ -82,24 +87,37 @@ if ( ! class_exists( 'WP_Block' ) ) {
 if ( ! class_exists( 'WP_Block_List' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block-list.php';
 }
+if ( ! class_exists( 'WP_Widget_Block' ) ) {
+	require_once dirname( __FILE__ ) . '/class-wp-widget-block.php';
+}
+require_once dirname( __FILE__ ) . '/widgets-page.php';
 
 require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/utils.php';
 
+// Include FSE related files only if the experiment is enabled.
+if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
+	require dirname( __FILE__ ) . '/templates.php';
+	require dirname( __FILE__ ) . '/template-parts.php';
+	require dirname( __FILE__ ) . '/template-loader.php';
+	require dirname( __FILE__ ) . '/edit-site-page.php';
+	require dirname( __FILE__ ) . '/edit-site-export.php';
+}
+
 require dirname( __FILE__ ) . '/block-patterns.php';
 require dirname( __FILE__ ) . '/blocks.php';
-require dirname( __FILE__ ) . '/templates.php';
-require dirname( __FILE__ ) . '/template-parts.php';
-require dirname( __FILE__ ) . '/template-loader.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/block-directory.php';
 require dirname( __FILE__ ) . '/demo.php';
 require dirname( __FILE__ ) . '/widgets.php';
-require dirname( __FILE__ ) . '/widgets-page.php';
+require dirname( __FILE__ ) . '/navigation.php';
 require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
-require dirname( __FILE__ ) . '/edit-site-page.php';
-require dirname( __FILE__ ) . '/edit-site-export.php';
-require dirname( __FILE__ ) . '/editor-features.php';
 require dirname( __FILE__ ) . '/global-styles.php';
+require dirname( __FILE__ ) . '/block-supports/index.php';
+require dirname( __FILE__ ) . '/block-supports/align.php';
+require dirname( __FILE__ ) . '/block-supports/colors.php';
+require dirname( __FILE__ ) . '/block-supports/typography.php';
+require dirname( __FILE__ ) . '/block-supports/custom-classname.php';
+require dirname( __FILE__ ) . '/block-supports/generated-classname.php';

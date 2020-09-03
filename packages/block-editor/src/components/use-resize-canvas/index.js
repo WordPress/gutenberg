@@ -51,6 +51,7 @@ export default function useResizeCanvas( deviceType ) {
 	const marginValue = () => ( window.innerHeight < 800 ? 36 : 72 );
 
 	const contentInlineStyles = ( device ) => {
+		const height = device === 'Mobile' ? '768px' : '1024px';
 		switch ( device ) {
 			case 'Tablet':
 			case 'Mobile':
@@ -58,7 +59,9 @@ export default function useResizeCanvas( deviceType ) {
 					width: getCanvasWidth( device ),
 					margin: marginValue() + 'px auto',
 					flexGrow: 0,
-					maxHeight: device === 'Mobile' ? '768px' : '1024px',
+					height,
+					minHeight: height,
+					maxHeight: height,
 					overflowY: 'auto',
 				};
 			default:

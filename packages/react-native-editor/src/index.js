@@ -82,6 +82,8 @@ const setupInitHooks = () => {
 	);
 };
 
+let blocksRegistered = false;
+
 const setupLocale = ( locale, extraTranslations ) => {
 	const setLocaleData = require( '@wordpress/i18n' ).setLocaleData;
 
@@ -104,6 +106,15 @@ const setupLocale = ( locale, extraTranslations ) => {
 	if ( gutenbergTranslations || extraTranslations ) {
 		setLocaleData( translations );
 	}
+
+	if ( blocksRegistered ) {
+		return;
+	}
+
+	const registerCoreBlocks = require( '@wordpress/block-library' )
+		.registerCoreBlocks;
+	registerCoreBlocks();
+	blocksRegistered = true;
 };
 
 reactNativeSetup();

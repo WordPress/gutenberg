@@ -32,6 +32,7 @@
 		}
 
 		.block-editor-block-styles__item-preview {
+			margin: 0;
 			border: 2px solid $gray-900;
 		}
 	}
@@ -41,6 +42,7 @@
 .block-editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
 	padding: 0;
+	margin: 2px;
 	border-radius: $radius-block-ui;
 	display: flex;
 	overflow: hidden;
@@ -48,6 +50,7 @@
 	align-items: center;
 	flex-grow: 1;
 	min-height: 80px;
+	max-height: 160px;
 }
 
 .block-editor-block-switcher__styles__menugroup {

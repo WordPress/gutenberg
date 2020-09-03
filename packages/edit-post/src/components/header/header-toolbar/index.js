@@ -15,10 +15,7 @@ import {
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 } from '@wordpress/editor';
-import {
-	Button,
-	__experimentalToolbarItem as ToolbarItem,
-} from '@wordpress/components';
+import { Button, ToolbarItem } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
@@ -97,7 +94,12 @@ function HeaderToolbar() {
 					'Generic label for block inserter button'
 				) }
 			/>
-			{ isLargeViewport && <ToolbarItem as={ ToolSelector } /> }
+			{ isLargeViewport && (
+				<ToolbarItem
+					as={ ToolSelector }
+					disabled={ isTextModeEnabled }
+				/>
+			) }
 			<ToolbarItem as={ EditorHistoryUndo } />
 			<ToolbarItem as={ EditorHistoryRedo } />
 			<ToolbarItem

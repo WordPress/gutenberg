@@ -58,7 +58,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-block-navigation',
 			category: 'global',
-			description: __( 'Open the block navigation menu.' ),
+			description: __( 'Open the block list view.' ),
 			keyCombination: {
 				modifier: 'access',
 				character: 'o',

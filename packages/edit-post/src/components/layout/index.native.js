@@ -20,6 +20,7 @@ import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
+	withSiteCapabilities,
 } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
@@ -128,7 +129,7 @@ class Layout extends Component {
 				) }
 				onLayout={ this.onRootViewLayout }
 			>
-				<AutosaveMonitor />
+				<AutosaveMonitor disableIntervalChecks />
 				<View
 					style={ getStylesFromColorScheme(
 						styles.background,
@@ -181,5 +182,6 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	withSiteCapabilities,
 	__experimentalWithPageTemplatePicker,
 ] )( Layout );

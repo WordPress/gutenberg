@@ -51,11 +51,11 @@ export function setTemplate( templateId ) {
 }
 
 /**
- * Returns an action object used to add a template.
+ * Adds a new template, and sets it as the current template.
  *
  * @param {Object} template The template.
  *
- * @return {Object} Action object.
+ * @return {Object} Action object used to set the current template.
  */
 export function* addTemplate( template ) {
 	const newTemplate = yield dispatch(
@@ -66,17 +66,15 @@ export function* addTemplate( template ) {
 		template
 	);
 	return {
-		type: 'ADD_TEMPLATE',
+		type: 'SET_TEMPLATE',
 		templateId: newTemplate.id,
 	};
 }
 
 /**
- * Returns an action object used to remove a template.
+ * Removes a template, and updates the current page and template.
  *
  * @param {number} templateId The template ID.
- *
- * @return {Object} Action object.
  */
 export function* removeTemplate( templateId ) {
 	yield apiFetch( {
@@ -88,10 +86,6 @@ export function* removeTemplate( templateId ) {
 		'setPage',
 		yield select( 'core/edit-site', 'getPage' )
 	);
-	return {
-		type: 'REMOVE_TEMPLATE',
-		templateId,
-	};
 }
 
 /**
@@ -109,21 +103,59 @@ export function setTemplatePart( templatePartId ) {
 }
 
 /**
- * Resolves the template for a page and sets them.
+ * Updates the homeTemplateId state with the templateId of the page resolved
+ * from the given path.
  *
- * @param {Object} page         The page object.
- * @param {string} page.type    The page type.
- * @param {string} page.slug    The page slug.
- * @param {string} page.path    The page path.
- * @param {Object} page.context The page context.
+ * @param {number} homeTemplateId The template ID for the homepage.
+ */
+export function setHomeTemplateId( homeTemplateId ) {
+	return {
+		type: 'SET_HOME_TEMPLATE',
+		homeTemplateId,
+	};
+}
+
+/**
+ * Resolves the template for a page and displays both.
  *
- * @return {Object} Action object.
+ * @param {Object}  page         The page object.
+ * @param {string}  page.type    The page type.
+ * @param {string}  page.slug    The page slug.
+ * @param {string}  page.path    The page path.
+ * @param {Object}  page.context The page context.
+ *
+ * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
 	const templateId = yield findTemplate( page.path );
-	return {
+	yield {
 		type: 'SET_PAGE',
 		page,
 		templateId,
 	};
+	return templateId;
+}
+
+/**
+ * Displays the site homepage for editing in the editor.
+ */
+export function* showHomepage() {
+	const {
+		show_on_front: showOnFront,
+		page_on_front: frontpageId,
+	} = yield select( 'core', 'getEntityRecord', 'root', 'site' );
+
+	const page = {
+		path: '/',
+		context:
+			showOnFront === 'page'
+				? {
+						postType: 'page',
+						postId: frontpageId,
+				  }
+				: {},
+	};
+
+	const homeTemplate = yield* setPage( page );
+	yield setHomeTemplateId( homeTemplate );
 }

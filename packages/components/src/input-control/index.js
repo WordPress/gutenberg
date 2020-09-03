@@ -13,10 +13,8 @@ import { useState, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Backdrop from './backdrop';
+import InputBase from './input-base';
 import InputField from './input-field';
-import Label from './label';
-import { Container, Root, Suffix } from './styles/input-control-styles';
 import { isValueEmpty } from '../utils/values';
 
 function useUniqueId( idProp ) {
@@ -29,7 +27,6 @@ function useUniqueId( idProp ) {
 export function InputControl(
 	{
 		__unstableStateReducer: stateReducer = ( state ) => state,
-		children,
 		className,
 		disabled = false,
 		hideLabelFromVision = false,
@@ -37,11 +34,13 @@ export function InputControl(
 		isPressEnterToChange = false,
 		isFloatingLabel = false,
 		label,
+		labelPosition = 'top',
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
 		onValidate = noop,
 		onKeyDown = noop,
+		prefix,
 		size = 'default',
 		suffix,
 		value,
@@ -72,65 +71,46 @@ export function InputControl(
 		! hideLabelFromVision && isFloatingLabel && label;
 
 	return (
-		<Root
+		<InputBase
 			className={ classes }
-			isFloatingLabel={ isFloatingLabelSet }
+			disabled={ disabled }
+			gap={ 3 }
+			hideLabelFromVision={ hideLabelFromVision }
+			id={ id }
+			isFilled={ isInputFilled }
+			isFloatingLabel={ isFloatingLabel }
 			isFocused={ isFocused }
+			justify="left"
+			label={ label }
+			labelPosition={ labelPosition }
+			prefix={ prefix }
+			size={ size }
+			suffix={ suffix }
 		>
-			<Label
-				className="components-input-control__label"
-				hideLabelFromVision={ hideLabelFromVision }
-				htmlFor={ id }
-				isFilled={ isFilled }
-				isFloating={ isFloating }
-				isFloatingLabel={ isFloatingLabel }
-				size={ size }
-			>
-				{ label }
-			</Label>
-			<Container
-				className="components-input-control__container"
+			<InputField
+				{ ...props }
+				className="components-input-control__input"
 				disabled={ disabled }
-				isFocused={ isFocused }
-			>
-				<InputField
-					{ ...props }
-					className="components-input-control__input"
-					disabled={ disabled }
-					id={ id }
-					isFloating={ isFloating }
-					isFloatingLabelSet={ isFloatingLabelSet }
-					isPressEnterToChange={ isPressEnterToChange }
-					onBlur={ handleOnBlur }
-					onChange={ onChange }
-					onFocus={ handleOnFocus }
-					onKeyDown={ onKeyDown }
-					onUpdateValue={ setIsFilled }
-					onValidate={ onValidate }
-					ref={ ref }
-					setIsFocused={ setIsFocused }
-					size={ size }
-					stateReducer={ stateReducer }
-					value={ value }
-				/>
-				{ suffix && (
-					<Suffix className="components-input-control__suffix">
-						{ suffix }
-					</Suffix>
-				) }
-				<Backdrop
-					aria-hidden="true"
-					disabled={ disabled }
-					isFloating={ isFloating }
-					isFloatingLabel={ isFloatingLabelSet }
-					isFocused={ isFocused }
-					label={ label }
-					size={ size }
-				/>
-				{ children }
-			</Container>
-		</Root>
+				id={ id }
+				isFloating={ isFloating }
+				isFloatingLabelSet={ isFloatingLabelSet }
+				isPressEnterToChange={ isPressEnterToChange }
+				onBlur={ handleOnBlur }
+				onChange={ onChange }
+				onFocus={ handleOnFocus }
+				onKeyDown={ onKeyDown }
+				onUpdateValue={ setIsFilled }
+				onValidate={ onValidate }
+				ref={ ref }
+				setIsFocused={ setIsFocused }
+				size={ size }
+				stateReducer={ stateReducer }
+				value={ value }
+			/>
+		</InputBase>
 	);
 }
 
-export default forwardRef( InputControl );
+const ForwardedComponent = forwardRef( InputControl );
+
+export default ForwardedComponent;

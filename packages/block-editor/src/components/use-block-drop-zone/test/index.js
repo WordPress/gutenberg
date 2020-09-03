@@ -83,22 +83,6 @@ describe( 'getNearestBlockIndex', () => {
 		expect( result ).toBeUndefined();
 	} );
 
-	it( 'returns `undefined` if the elements do not have the `wp-block` class', () => {
-		const nonBlockElements = [
-			{ classList: createMockClassList( 'some-other-class' ) },
-		];
-		const position = { x: 0, y: 0 };
-		const orientation = 'horizontal';
-
-		const result = getNearestBlockIndex(
-			nonBlockElements,
-			position,
-			orientation
-		);
-
-		expect( result ).toBeUndefined();
-	} );
-
 	describe( 'Vertical block lists', () => {
 		const orientation = 'vertical';
 

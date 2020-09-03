@@ -101,7 +101,7 @@ function gutenberg_experimental_global_styles_get_from_file( $file_path ) {
  */
 function gutenberg_experimental_global_styles_get_user() {
 	$config   = array();
-	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish' ) );
+	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt();
 	if ( array_key_exists( 'post_content', $user_cpt ) ) {
 		$decoded_data = json_decode( $user_cpt['post_content'], true );
 
@@ -125,13 +125,13 @@ function gutenberg_experimental_global_styles_get_user() {
  *
  * It can also create and return a new draft CPT.
  *
+ * @param bool  $should_create_cpt Whether a new CPT should be created if no one was found.
+ *                                   False by default.
  * @param array $post_status_filter  Filter CPT by post status.
  *                                   ['publish'] by default, so it only fetches published posts.
- * @param bool  $should_create_draft Whether a new draft should be created if no CPT was found.
- *                                   False by default.
  * @return array Custom Post Type for the user's origin config.
  */
-function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter = array( 'publish' ), $should_create_draft = false ) {
+function gutenberg_experimental_global_styles_get_user_cpt( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
 	$user_cpt         = array();
 	$post_type_filter = 'wp_global_styles';
 	$post_name_filter = 'wp-global-styles-' . strtolower( wp_get_theme()->get( 'TextDomain' ) );
@@ -148,11 +148,11 @@ function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter 
 
 	if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
 		$user_cpt = $recent_posts[0];
-	} elseif ( $should_create_draft ) {
+	} elseif ( $should_create_cpt ) {
 		$cpt_post_id = wp_insert_post(
 			array(
 				'post_content' => '{}',
-				'post_status'  => 'draft',
+				'post_status'  => 'publish',
 				'post_type'    => $post_type_filter,
 				'post_name'    => $post_name_filter,
 			),
@@ -171,7 +171,7 @@ function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter 
  */
 function gutenberg_experimental_global_styles_get_user_cpt_id() {
 	$user_cpt_id = null;
-	$user_cpt    = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish', 'draft' ), true );
+	$user_cpt    = gutenberg_experimental_global_styles_get_user_cpt( true );
 	if ( array_key_exists( 'ID', $user_cpt ) ) {
 		$user_cpt_id = $user_cpt['ID'];
 	}
@@ -270,11 +270,12 @@ function gutenberg_experimental_global_styles_get_theme() {
  */
 function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
 	$style_features = array(
-		'color'            => array( '__experimentalColor' ),
-		'background-color' => array( '__experimentalColor' ),
-		'background'       => array( '__experimentalColor', 'gradients' ),
-		'line-height'      => array( '__experimentalLineHeight' ),
-		'font-size'        => array( '__experimentalFontSize' ),
+		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
+		'background-color'         => array( '__experimentalColor' ),
+		'background'               => array( '__experimentalColor', 'gradients' ),
+		'color'                    => array( '__experimentalColor' ),
+		'font-size'                => array( '__experimentalFontSize' ),
+		'line-height'              => array( '__experimentalLineHeight' ),
 	);
 
 	$supported_features = array();
@@ -293,16 +294,29 @@ function gutenberg_experimental_global_styles_get_supported_styles( $supports ) 
  * @return array
  */
 function gutenberg_experimental_global_styles_get_block_data() {
-	$block_data = array(
-		'global' => array(
-			'selector' => ':root',
-			'supports' => array( 'background-color' ),
-		),
-	);
+	$block_data = array();
 
 	$registry = WP_Block_Type_Registry::get_instance();
-	foreach ( $registry->get_all_registered() as $block_name => $block_type ) {
-		if ( empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
+	$blocks   = array_merge(
+		$registry->get_all_registered(),
+		array(
+			'global' => new WP_Block_Type(
+				'global',
+				array(
+					'supports' => array(
+						'__experimentalSelector' => ':root',
+						'__experimentalFontSize' => true,
+						'__experimentalColor'    => array(
+							'linkColor' => true,
+							'gradients' => true,
+						),
+					),
+				)
+			),
+		)
+	);
+	foreach ( $blocks as $block_name => $block_type ) {
+		if ( ! property_exists( $block_type, 'supports' ) || empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
 			continue;
 		}
 
@@ -493,11 +507,18 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 	$result = gutenberg_experimental_global_styles_normalize_schema( array() );
 
 	foreach ( array_keys( $core ) as $block_name ) {
-		foreach ( array( 'presets', 'styles', 'features' ) as $subtree ) {
+		foreach ( array( 'presets', 'features' ) as $subtree ) {
 			$result[ $block_name ][ $subtree ] = array_merge(
 				$core[ $block_name ][ $subtree ],
 				$theme[ $block_name ][ $subtree ],
 				$user[ $block_name ][ $subtree ]
+			);
+		}
+		foreach ( array_keys( $core[ $block_name ]['styles'] ) as $subtree ) {
+			$result[ $block_name ]['styles'][ $subtree ] = array_merge(
+				$core[ $block_name ]['styles'][ $subtree ],
+				$theme[ $block_name ]['styles'][ $subtree ],
+				$user[ $block_name ]['styles'][ $subtree ]
 			);
 		}
 	}
@@ -514,7 +535,10 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
  */
 function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 	$block_schema = array(
-		'styles'   => array(),
+		'styles'   => array(
+			'typography' => array(),
+			'color'      => array(),
+		),
 		'features' => array(),
 		'presets'  => array(),
 	);
@@ -534,24 +558,18 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 }
 
 /**
- * Returns the stylesheet resulting of merging
- * core's, theme's, and user's origins.
+ * Takes data from the different origins (core, theme, and user)
+ * and returns the merged result.
  *
- * @return string
+ * @return array Merged trees.
  */
-function gutenberg_experimental_global_styles_get_stylesheet() {
-	$gs_merged = array();
-	$gs_core   = gutenberg_experimental_global_styles_get_core();
-	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
-	$gs_user   = gutenberg_experimental_global_styles_get_user();
+function gutenberg_experimental_global_styles_get_merged_origins() {
+	$core   = gutenberg_experimental_global_styles_get_core();
+	$theme  = gutenberg_experimental_global_styles_get_theme();
+	$user   = gutenberg_experimental_global_styles_get_user();
+	$merged = gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user );
 
-	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
-
-	$stylesheet = gutenberg_experimental_global_styles_resolver( $gs_merged );
-	if ( empty( $stylesheet ) ) {
-		return;
-	}
-	return $stylesheet;
+	return $merged;
 }
 
 /**
@@ -559,12 +577,46 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet();
+	$merged     = gutenberg_experimental_global_styles_get_merged_origins();
+	$stylesheet = gutenberg_experimental_global_styles_resolver( $merged );
+	if ( empty( $stylesheet ) ) {
+		return;
+	}
 
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $stylesheet );
 	wp_enqueue_style( 'global-styles' );
+}
+
+/**
+ * Returns the default config for editor features,
+ * or an empty array if none found.
+ *
+ * @param array $config Config to extract values from.
+ * @return array Default features config for the editor.
+ */
+function gutenberg_experimental_global_styles_get_editor_features( $config ) {
+	$features = array();
+	foreach ( array_keys( $config ) as $context ) {
+		if (
+			empty( $config[ $context ]['features'] ) ||
+			! is_array( $config[ $context ]['features'] )
+		) {
+			$features[ $context ] = array();
+		} else {
+			$features[ $context ] = $config[ $context ]['features'];
+		}
+	}
+
+	// Deprecated theme supports.
+	if ( get_theme_support( 'disable-custom-colors' ) ) {
+		if ( ! isset( $features['global']['color'] ) ) {
+			$features['global']['color'] = array();
+		}
+		$features['global']['color']['custom'] = false;
+	}
+
+	return $features;
 }
 
 /**
@@ -589,7 +641,13 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// Add the styles for the editor via the settings
 	// so they get processed as if they were added via add_editor_styles:
 	// they will get the editor wrapper class.
-	$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet() );
+	$merged               = gutenberg_experimental_global_styles_get_merged_origins();
+	$stylesheet           = gutenberg_experimental_global_styles_resolver( $merged );
+	$settings['styles'][] = array( 'css' => $stylesheet );
+
+	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
+	// Unsetting deprecated settings defined by Core.
+	unset( $settings['disableCustomColors'] );
 
 	return $settings;
 }
