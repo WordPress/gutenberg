@@ -1,0 +1,20 @@
+{
+	"name": "core/loginout",
+	"category": "design",
+	"attributes": {
+		"logInText": {
+			"type": "string"
+		},
+		"logOutText": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalFontSize": true,
+		"__experimentalColor": {
+			"linkColor": true
+		}
+	}
+}

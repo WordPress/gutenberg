@@ -41,6 +41,7 @@ import * as mediaText from './media-text';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as loginout from './loginout';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
@@ -91,6 +92,7 @@ export const coreBlocks = [
 	mediaText,
 	latestComments,
 	latestPosts,
+	loginout,
 	missing,
 	more,
 	nextpage,
