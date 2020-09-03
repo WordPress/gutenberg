@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { Icon, chevronLeft } from '@wordpress/icons';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 
@@ -13,8 +14,7 @@ import { usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import Animate from '../animate';
-import { Root } from './styles/navigation-styles';
-import Button from '../button';
+import { BackButtonUI, Root } from './styles/navigation-styles';
 
 const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevelId, setActiveLevelId ] = useState( 'root' );
@@ -81,13 +81,14 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		}
 
 		return (
-			<Button
+			<BackButtonUI
 				className="components-navigation__back-button"
-				isPrimary
+				isTertiary
 				onClick={ () => setActiveLevelId( parentLevel.id ) }
 			>
+				<Icon icon={ chevronLeft } />
 				{ backButtonChildren }
-			</Button>
+			</BackButtonUI>
 		);
 	};
 

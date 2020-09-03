@@ -3,7 +3,11 @@
  */
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { Icon, arrowLeft } from '@wordpress/icons';
+
+/**
+ * External dependencies
+ */
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
@@ -77,10 +81,42 @@ const data = [
 		id: 'item-5',
 		LinkComponent: CustomRouterLink,
 	},
+	{
+		title: 'Secondary Item 1',
+		id: 'secondary-item-1',
+		isSecondary: true,
+	},
+	{
+		title: 'Secondary Item 2',
+		id: 'secondary-item-2',
+		isSecondary: true,
+	},
+	{
+		title: 'Secondary Child 1',
+		id: 'secondary-child-1',
+		parent: 'secondary-item-1',
+		isSecondary: true,
+	},
+	{
+		title: 'Secondary Child 2',
+		id: 'secondary-child-2',
+		parent: 'secondary-item-1',
+		isSecondary: true,
+	},
 ];
 
 function Example() {
 	const [ active, setActive ] = useState( 'item-1' );
+
+	const renderMenuItem = ( item ) => (
+		<NavigationMenuItem
+			{ ...item }
+			key={ item.id }
+			onClick={
+				! item.href ? ( selected ) => setActive( selected.id ) : null
+			}
+		/>
+	);
 
 	return (
 		<>
@@ -92,42 +128,54 @@ function Example() {
 					Non-navigation link to Child 2
 				</Button>
 			) : null }
-			<Navigation activeItemId={ active } data={ data } rootTitle="Home">
-				{ ( { level, parentLevel, NavigationBackButton } ) => {
-					return (
-						<>
-							{ parentLevel && (
-								<NavigationBackButton>
-									<Icon icon={ arrowLeft } />
-									{ parentLevel.title }
-								</NavigationBackButton>
-							) }
-							<h1>{ level.title }</h1>
-							<NavigationMenu>
-								{ level.children.map( ( item ) => {
-									return (
-										<NavigationMenuItem
-											{ ...item }
-											key={ item.id }
-											onClick={
-												! item.href
-													? ( selected ) =>
-															setActive(
-																selected.id
-															)
-													: null
-											}
-										/>
-									);
-								} ) }
-							</NavigationMenu>
-						</>
-					);
-				} }
-			</Navigation>
+			<Container>
+				<Navigation
+					activeItemId={ active }
+					data={ data }
+					rootTitle="Home"
+				>
+					{ ( { level, parentLevel, NavigationBackButton } ) => {
+						return (
+							<>
+								{ parentLevel && (
+									<NavigationBackButton>
+										{ parentLevel.title }
+									</NavigationBackButton>
+								) }
+								<NavigationMenu title={ level.title }>
+									{ level.children
+										.filter(
+											( item ) => ! item.isSecondary
+										)
+										.map( ( item ) =>
+											renderMenuItem( item )
+										) }
+								</NavigationMenu>
+								<NavigationMenu
+									title={
+										level.id === 'root'
+											? 'Secondary Menu'
+											: level.title
+									}
+								>
+									{ level.children
+										.filter( ( item ) => item.isSecondary )
+										.map( ( item ) =>
+											renderMenuItem( item )
+										) }
+								</NavigationMenu>
+							</>
+						);
+					} }
+				</Navigation>
+			</Container>
 		</>
 	);
 }
+
+const Container = styled.div`
+	max-width: 246px;
+`;
 
 export const _default = () => {
 	return <Example />;

@@ -1,11 +1,25 @@
 /**
  * Internal dependencies
  */
-import { MenuUI } from './styles/navigation-styles';
+import { MenuUI, MenuTitleUI } from './styles/navigation-styles';
 
-const NavigationMenu = ( { children } ) => {
+const NavigationMenu = ( { children, title } ) => {
+	if ( ! children.length ) {
+		return null;
+	}
+
 	return (
-		<MenuUI className="components-navigation__menu">{ children }</MenuUI>
+		<MenuUI className="components-navigation__menu">
+			{ title && (
+				<MenuTitleUI
+					variant="subtitle"
+					className="components-navigation__menu-title"
+				>
+					{ title }
+				</MenuTitleUI>
+			) }
+			<ul>{ children }</ul>
+		</MenuUI>
 	);
 };
 
