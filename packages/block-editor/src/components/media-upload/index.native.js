@@ -165,6 +165,7 @@ export class MediaUpload extends React.Component {
 			onMediaUploadCanceled();
 			return;
 		}
+
 		const mediaSource = this.getAllSources()
 			.filter( ( source ) => source.value === value )
 			.shift();
