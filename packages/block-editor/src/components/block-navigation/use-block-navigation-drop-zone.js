@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEqual } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
@@ -306,7 +311,7 @@ export default function useBlockNavigationDropZone( ref ) {
 				position
 			);
 
-			if ( newTarget ) {
+			if ( ! isEqual( newTarget, target ) ) {
 				setTarget( newTarget );
 			}
 		}
