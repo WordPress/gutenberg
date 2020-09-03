@@ -47,7 +47,7 @@ function MediaPlaceholder( props ) {
 		height,
 		backgroundColor,
 		hideContent,
-		autoOpenMediaOptions,
+		autoOpenMediaUpload,
 		onMediaUploadCanceled,
 	} = props;
 
@@ -181,7 +181,7 @@ function MediaPlaceholder( props ) {
 								] }
 							>
 								{ getMediaOptions() }
-								{ autoOpenMediaOptions && open() }
+								{ autoOpenMediaUpload && open() }
 								{ ! hideContent && renderContent() }
 							</View>
 						</TouchableWithoutFeedback>

@@ -66,10 +66,10 @@ export class ImageEdit extends React.Component {
 
 		const { attributes, isSelected } = this.props;
 		const { url } = attributes;
-		const autoOpenMediaOptions = isSelected && ! url;
+		const autoOpenMediaUpload = isSelected && ! url;
 		this.state = {
 			isCaptionSelected: false,
-			autoOpenMediaOptions,
+			autoOpenMediaUpload,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -94,7 +94,7 @@ export class ImageEdit extends React.Component {
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
 			this
 		);
-		this.onClearMediaOption = this.onClearMediaOption.bind( this );
+		this.onClearMedia = this.onClearMedia.bind( this );
 	}
 
 	componentDidMount() {
@@ -312,9 +312,9 @@ export class ImageEdit extends React.Component {
 		}
 	}
 
-	onClearMediaOption() {
+	onClearMedia() {
 		this.props.setAttributes( { id: null, url: null } );
-		this.setState( { autoOpenMediaOptions: false } );
+		this.setState( { autoOpenMediaUpload: false } );
 	}
 
 	getPlaceholderIcon() {
@@ -330,7 +330,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { isCaptionSelected, autoOpenMediaOptions } = this.state;
+		const { isCaptionSelected, autoOpenMediaUpload } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -423,7 +423,7 @@ export class ImageEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
-						autoOpenMediaOptions={ autoOpenMediaOptions }
+						autoOpenMediaUpload={ autoOpenMediaUpload }
 						onMediaUploadCanceled={ onDelete }
 					/>
 				</View>
@@ -483,7 +483,7 @@ export class ImageEdit extends React.Component {
 										onSelectMediaUploadOption={
 											this.onSelectMediaUploadOption
 										}
-										onClearMedia={ this.onClearMediaOption }
+										onClearMedia={ this.onClearMedia }
 										openMediaOptions={ openMediaOptions }
 										retryMessage={ retryMessage }
 										url={ url }
