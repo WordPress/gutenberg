@@ -17,8 +17,9 @@ import { Root } from './styles/navigation-styles';
 import Button from '../button';
 import { isMatchingUrl, addHistoryListener } from './utils';
 
-const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
+const Navigation = ( { children, data, rootTitle } ) => {
 	const [ activeLevelId, setActiveLevelId ] = useState( 'root' );
+	const [ activeItem, setActiveItem ] = useState( null );
 	const [ location, setLocation ] = useState( window.location );
 
 	useEffect( () => {
@@ -53,20 +54,19 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 				parentItem.children.push( item );
 				parentItem.hasChildren = true;
 			}
+			if ( item.isActive ) {
+				setActiveItem( item );
+			}
 		} );
-
-		// @todo Store active Item ID so we can retrieve below.
 
 		return items;
 	};
 
 	const items = useMemo( () => mapItems( data ), [
-		activeItemId,
 		data,
 		location,
 		rootTitle,
 	] );
-	const activeItem = items.get( activeItemId );
 	const previousActiveLevelId = usePrevious( activeLevelId );
 	const level = items.get( activeLevelId );
 	const parentLevel = level && items.get( level.parent );
