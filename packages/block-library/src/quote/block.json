@@ -24,8 +24,6 @@
 		"__experimentalColor": {
 			"gradients": true,
 			"linkColor": true
-		},
-		"__experimentalLineHeight": true,
-		"__experimentalFontSize": true
+		}
 	}
 }
