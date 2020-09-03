@@ -3,10 +3,10 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const check = (
+const download = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z" />
+		<Path d="M18 11.3l-1-1.1-4 4V3h-1.5v11.3L7 10.2l-1 1.1 6.2 5.8 5.8-5.8zm.5 3.7v3.5h-13V15H4v5h16v-5h-1.5z" />
 	</SVG>
 );
 
-export default check;
+export default download;

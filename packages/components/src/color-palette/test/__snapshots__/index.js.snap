@@ -357,7 +357,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <Path
-                    d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
+                    d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
                   />
                 </SVG>
               }
@@ -380,10 +380,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <Path
-                    d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
+                    d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
                   >
                     <path
-                      d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
+                      d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
                     />
                   </Path>
                 </svg>
