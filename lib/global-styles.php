@@ -579,10 +579,6 @@ function gutenberg_experimental_global_styles_get_merged_origins() {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		return;
-	}
-
 	$merged     = gutenberg_experimental_global_styles_get_merged_origins();
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $merged );
 	if ( empty( $stylesheet ) ) {
