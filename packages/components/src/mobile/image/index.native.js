@@ -225,16 +225,7 @@ const ImageComponent = ( {
 							}
 							openMediaOptions={ openMediaOptions }
 							url={ url }
-							pickerOptions={ [
-								{
-									destructiveButton: true,
-									id: 'clearMedia',
-									label: __( 'Clear Media' ),
-									onPress: onClearMedia,
-									separated: true,
-									value: 'clearMedia',
-								},
-							] }
+							onClearMedia={ onClearMedia }
 						/>
 					) }
 			</View>
