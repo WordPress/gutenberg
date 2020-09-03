@@ -22,6 +22,10 @@ const deprecatedFlags = {
 		settings.disableCustomGradients === undefined
 			? undefined
 			: ! settings.disableCustomGradients,
+	'fontSize.custom': ( settings ) =>
+		settings.disableCustomFontSizes === undefined
+			? undefined
+			: ! settings.disableCustomFontSizes,
 };
 
 /**

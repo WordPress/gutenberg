@@ -80,7 +80,6 @@ function gutenberg_widgets_init( $hook ) {
 
 	$settings = array_merge(
 		array(
-			'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 			'imageSizes'             => $available_image_sizes,
 			'isRTL'                  => is_rtl(),
 			'maxUploadFileSize'      => $max_upload_size,

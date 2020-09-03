@@ -133,6 +133,9 @@
 			},
 			"gradient": {
 				"custom": true
+			},
+			"fontSize": {
+				"custom": true
 			}
 		}
 	}

@@ -127,7 +127,6 @@ function gutenberg_edit_site_init( $hook ) {
 
 	$settings = array(
 		'alignWide'              => get_theme_support( 'align-wide' ),
-		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 		'imageSizes'             => $available_image_sizes,
 		'isRTL'                  => is_rtl(),
 		'maxUploadFileSize'      => $max_upload_size,
