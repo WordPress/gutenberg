@@ -58,10 +58,10 @@ function gutenberg_navigation_init( $hook ) {
 	}
 
 	$settings = array(
-		'imageSizes'             => $available_image_sizes,
-		'isRTL'                  => is_rtl(),
-		'maxUploadFileSize'      => $max_upload_size,
-		'blockNavMenus'          => get_theme_support( 'block-nav-menus' ),
+		'imageSizes'        => $available_image_sizes,
+		'isRTL'             => is_rtl(),
+		'maxUploadFileSize' => $max_upload_size,
+		'blockNavMenus'     => get_theme_support( 'block-nav-menus' ),
 	);
 
 	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
