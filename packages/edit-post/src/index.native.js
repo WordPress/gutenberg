@@ -12,7 +12,7 @@ import { render } from '@wordpress/element';
  * Internal dependencies
  */
 import './store';
-import Editor from './editor';
+import EditorPreview from './editor-preview';
 
 let editorInitialized = false;
 
@@ -31,5 +31,5 @@ export function initializeEditor( id, postType, postId ) {
 
 	editorInitialized = true;
 
-	render( <Editor postId={ postId } postType={ postType } />, id );
+	render( <EditorPreview postId={ postId } postType={ postType } />, id );
 }
