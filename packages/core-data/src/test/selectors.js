@@ -27,7 +27,7 @@ describe.each( [
 	[ getEntityRecord ],
 	[ __experimentalGetEntityRecordNoResolver ],
 ] )( '%p', ( selector ) => {
-	it( 'should return null for unknown entity kind, name', () => {
+	it( 'should return undefined for unknown entity kind, name', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {
@@ -43,10 +43,10 @@ describe.each( [
 				},
 			},
 		} );
-		expect( selector( state, 'foo', 'bar', 'baz' ) ).toBe( null );
+		expect( selector( state, 'foo', 'bar', 'baz' ) ).toBeUndefined();
 	} );
 
-	it( 'should return null for unknown record’s key', () => {
+	it( 'should return undefined for unknown record’s key', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {
@@ -62,7 +62,7 @@ describe.each( [
 				},
 			},
 		} );
-		expect( selector( state, 'root', 'postType', 'post' ) ).toBe( null );
+		expect( selector( state, 'root', 'postType', 'post' ) ).toBeUndefined();
 	} );
 
 	it( 'should return a record by key', () => {
