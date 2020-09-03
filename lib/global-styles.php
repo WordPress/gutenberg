@@ -627,6 +627,12 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 		}
 		$features['global']['fontSize']['custom'] = false;
 	}
+	if ( get_theme_support( 'custom-line-height' ) ) {
+		if ( ! isset( $features['global']['lineHeight'] ) ) {
+			$features['global']['lineHeight'] = array();
+		}
+		$features['global']['lineHeight']['custom'] = true;
+	}
 
 	return $features;
 }
@@ -663,6 +669,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['disableCustomFontSizes'] );
+	unset( $settings['enableCustomLineHeight'] );
 
 	return $settings;
 }
