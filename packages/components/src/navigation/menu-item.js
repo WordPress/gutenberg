@@ -33,7 +33,7 @@ const NavigationMenuItem = ( props ) => {
 		'is-active': isActive,
 	} );
 
-	const handleClick = () => {
+	const handleClick = ( event ) => {
 		if ( children.length ) {
 			setActiveLevelId( id );
 			return;
@@ -41,7 +41,7 @@ const NavigationMenuItem = ( props ) => {
 		if ( ! onClick ) {
 			return;
 		}
-		onClick( props );
+		onClick( event, props );
 	};
 
 	const LinkComponentTag = LinkComponent ? LinkComponent : Button;
