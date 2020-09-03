@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { matchPath, useLocation } from 'react-router-dom';
 
 /**
  * WordPress dependencies
@@ -16,23 +15,26 @@ import { usePrevious } from '@wordpress/compose';
 import Animate from '../animate';
 import { Root } from './styles/navigation-styles';
 import Button from '../button';
+import { isMatchingUrl, addHistoryListener } from './utils';
 
 const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevelId, setActiveLevelId ] = useState( 'root' );
-	const location = useLocation();
+	const [ location, setLocation ] = useState( window.location );
 
-	const appendItemData = ( item ) => {
-		const match = matchPath( location, {
-			path: item.href,
-			exact: true,
-			strict: false,
+	useEffect( () => {
+		const removeListener = addHistoryListener( () => {
+			setTimeout( () => setLocation( { ...window.location } ), 1 );
 		} );
 
+		return removeListener;
+	}, [] );
+
+	const appendItemData = ( item ) => {
 		return {
 			...item,
 			children: [],
 			parent: item.id === 'root' ? null : item.parent || 'root',
-			isActive: !! match,
+			isActive: isMatchingUrl( location, item.href, true ),
 			setActiveLevelId,
 		};
 	};
