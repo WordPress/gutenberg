@@ -104,10 +104,11 @@ export class MediaUpload extends React.Component {
 			cameraImageSource,
 			cameraVideoSource,
 			siteLibrarySource,
-			cancelMediaUpload,
 		];
 
-		return internalSources.concat( this.state.otherMediaOptions );
+		return internalSources
+			.concat( this.state.otherMediaOptions )
+			.concat( cancelMediaUpload );
 	}
 
 	getMediaOptionsItems() {
