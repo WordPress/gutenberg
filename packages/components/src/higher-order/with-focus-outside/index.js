@@ -45,6 +45,7 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 		constructor() {
 			super( ...arguments );
 
+			this.bindWrapper = this.bindWrapper.bind( this );
 			this.bindNode = this.bindNode.bind( this );
 			this.cancelBlurCheck = this.cancelBlurCheck.bind( this );
 			this.queueBlurCheck = this.queueBlurCheck.bind( this );
@@ -53,6 +54,29 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 
 		componentWillUnmount() {
 			this.cancelBlurCheck();
+		}
+
+		bindWrapper( element ) {
+			if ( element ) {
+				element.addEventListener(
+					'mousedown',
+					this.normalizeButtonFocus
+				);
+				element.addEventListener(
+					'mouseup',
+					this.normalizeButtonFocus
+				);
+				element.addEventListener(
+					'touchstart',
+					this.normalizeButtonFocus
+				);
+				element.addEventListener(
+					'touchend',
+					this.normalizeButtonFocus
+				);
+				element.addEventListener( 'focusout', this.queueBlurCheck );
+				element.addEventListener( 'focusin', this.cancelBlurCheck );
+			}
 		}
 
 		bindNode( node ) {
@@ -67,7 +91,7 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 		queueBlurCheck( event ) {
 			// React does not allow using an event reference asynchronously
 			// due to recycling behavior, except when explicitly persisted.
-			event.persist();
+			// event.persist();
 
 			// Skip blur check if clicking button. See `normalizeButtonFocus`.
 			if ( this.preventBlurCheck ) {
@@ -125,14 +149,7 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 
 			/* eslint-disable jsx-a11y/no-static-element-interactions */
 			return (
-				<div
-					onFocus={ this.cancelBlurCheck }
-					onMouseDown={ this.normalizeButtonFocus }
-					onMouseUp={ this.normalizeButtonFocus }
-					onTouchStart={ this.normalizeButtonFocus }
-					onTouchEnd={ this.normalizeButtonFocus }
-					onBlur={ this.queueBlurCheck }
-				>
+				<div ref={ this.bindWrapper }>
 					<WrappedComponent ref={ this.bindNode } { ...this.props } />
 				</div>
 			);
