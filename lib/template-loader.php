@@ -375,20 +375,42 @@ function gutenberg_render_the_template() {
 
 	$content = $wp_embed->run_shortcode( $_wp_current_template_content );
 	$content = $wp_embed->autoembed( $content );
-	$content = do_blocks( $content );
+
+	// Wrap block template in .wp-site-blocks to allow for specific descendant styles
+	// (e.g. `.wp-site-blocks > *`).
+	echo '<div class="wp-site-blocks">';
+	$blocks = parse_blocks( $content );
+    foreach ( $blocks as $block ) {
+		gutenberg_render_the_block_partial( $block );
+    }
+	echo '</div>';
+}
+
+/**
+ * Renders a partial.
+ *
+ * @param array $block The block we want to render.
+ * @param bool  $echo  Whether we should echo the result or return it.
+ *
+ * @return string
+ */
+function gutenberg_render_the_block_partial( $block, $echo = true ) {
+
+	$content = render_block( $block );
 	$content = wptexturize( $content );
 	if ( function_exists( 'wp_filter_content_tags' ) ) {
 		$content = wp_filter_content_tags( $content );
 	} else {
 		$content = wp_make_content_images_responsive( $content );
 	}
+
 	$content = str_replace( ']]>', ']]&gt;', $content );
 
-	// Wrap block template in .wp-site-blocks to allow for specific descendant styles
-	// (e.g. `.wp-site-blocks > *`).
-	echo '<div class="wp-site-blocks">';
+	if ( ! $echo ) {
+		return $content;
+	}
+
 	echo $content; // phpcs:ignore WordPress.Security.EscapeOutput
-	echo '</div>';
 }
 
 /**
