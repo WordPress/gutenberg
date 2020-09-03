@@ -1,0 +1,15 @@
+{
+	"name": "core/post-comment",
+	"category": "design",
+	"attributes": {
+		"commentId": {
+			"type": "number"
+		}
+	},
+	"providesContext": {
+		"commentId": "commentId"
+	},
+	"supports": {
+		"html": false
+	}
+}

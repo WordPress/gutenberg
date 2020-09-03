@@ -1,0 +1,56 @@
+/**
+ * WordPress dependencies
+ */
+import { useEntityProp } from '@wordpress/core-data';
+import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
+import {
+	InspectorControls,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
+import { PanelBody, CustomSelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+
+export default function Edit( { attributes, context, setAttributes } ) {
+	const { className, format } = attributes;
+	const { commentId } = context;
+
+	const settings = __experimentalGetSettings();
+	const [ siteDateFormat ] = useEntityProp( 'root', 'site', 'date_format' );
+	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
+
+	const formatOptions = Object.values( settings.formats ).map(
+		( formatOption ) => ( {
+			key: formatOption,
+			name: dateI18n( formatOption, date ),
+		} )
+	);
+	const resolvedFormat = format || siteDateFormat || settings.formats.date;
+
+	return (
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Format settings' ) }>
+					<CustomSelectControl
+						hideLabelFromVision
+						label={ __( 'Date Format' ) }
+						options={ formatOptions }
+						onChange={ ( { selectedItem } ) =>
+							setAttributes( {
+								format: selectedItem.key,
+							} )
+						}
+						value={ formatOptions.find(
+							( option ) => option.key === resolvedFormat
+						) }
+					/>
+				</PanelBody>
+			</InspectorControls>
+
+			<Block.div className={ className }>
+				<time dateTime={ dateI18n( 'c', date ) }>
+					{ dateI18n( resolvedFormat, date ) }
+				</time>
+			</Block.div>
+		</>
+	);
+}

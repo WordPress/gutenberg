@@ -66,7 +66,7 @@ const MyControlledRadioRadioGroup = () => {
 When using the RadioGroup component as an uncontrolled component, the default value can be set with the `defaultChecked` prop.
 
 ```jsx
-import { Radio, RadioGroup } from '@wordpress/components';
+import { __experimentalRadio as Radio, __experimentalRadioGroup as RadioGroup } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const MyUncontrolledRadioRadioGroup = () => {

@@ -153,8 +153,24 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		...query,
 		context: 'edit',
 	} );
-	const records = yield apiFetch( { path } );
-	yield receiveEntityRecords( kind, name, Object.values( records ), query );
+
+	let records = Object.values( yield apiFetch( { path } ) );
+	// If we request fields but the result doesn't contain the fields,
+	// explicitely set these fields as "undefined"
+	// that way we consider the query "fullfilled".
+	if ( query._fields ) {
+		records = records.map( ( record ) => {
+			query._fields.split( ',' ).forEach( ( field ) => {
+				if ( ! record.hasOwnProperty( field ) ) {
+					record[ field ] = undefined;
+				}
+			} );
+
+			return record;
+		} );
+	}
+
+	yield receiveEntityRecords( kind, name, records, query );
 }
 
 getEntityRecords.shouldInvalidate = ( action, kind, name ) => {

@@ -36,14 +36,14 @@ const gapStyle = ( { gap, isReversed } ) => {
 	const base = 4;
 	const value = typeof gap === 'number' ? base * gap : base;
 	const dir = isReversed ? 'left' : 'right';
-	const padding = `padding-${ dir }`;
+	const margin = `margin-${ dir }`;
 
 	return css`
 		> * {
-			${ padding }: ${ value }px;
+			${ margin }: ${ value }px;
 
 			&:last-child {
-				${ padding }: 0;
+				${ margin }: 0;
 			}
 		}
 	`;

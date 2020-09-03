@@ -110,7 +110,9 @@ export default function BlockEditorArea( {
 							label="Block inspector"
 						/>
 					) }
-					renderContent={ () => <BlockInspector /> }
+					renderContent={ () => (
+						<BlockInspector bubblesVirtually={ false } />
+					) }
 				/>
 			</CardHeader>
 			<CardBody>
@@ -125,10 +127,7 @@ export default function BlockEditorArea( {
 					aria-label={ __( 'Block tools' ) }
 				>
 					{ hasSelectedBlock && ! isRootBlockSelected && (
-						<BlockToolbar
-							hideDragHandle
-							__experimentalExpandedControl
-						/>
+						<BlockToolbar __experimentalExpandedControl />
 					) }
 				</NavigableToolbar>
 				<Popover.Slot name="block-toolbar" />

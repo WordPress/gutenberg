@@ -316,7 +316,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		)
 	);
 	foreach ( $blocks as $block_name => $block_type ) {
-		if ( empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
+		if ( ! property_exists( $block_type, 'supports' ) || empty( $block_type->supports ) || ! is_array( $block_type->supports ) ) {
 			continue;
 		}
 
@@ -596,14 +596,45 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array Default features config for the editor.
  */
 function gutenberg_experimental_global_styles_get_editor_features( $config ) {
-	if (
-		empty( $config['global']['features'] ) ||
-		! is_array( $config['global']['features'] )
-	) {
-		return array();
+	$features = array();
+	foreach ( array_keys( $config ) as $context ) {
+		if (
+			empty( $config[ $context ]['features'] ) ||
+			! is_array( $config[ $context ]['features'] )
+		) {
+			$features[ $context ] = array();
+		} else {
+			$features[ $context ] = $config[ $context ]['features'];
+		}
 	}
 
-	return $config['global']['features'];
+	// Deprecated theme supports.
+	if ( get_theme_support( 'disable-custom-colors' ) ) {
+		if ( ! isset( $features['global']['color'] ) ) {
+			$features['global']['color'] = array();
+		}
+		$features['global']['color']['custom'] = false;
+	}
+	if ( get_theme_support( 'disable-custom-gradients' ) ) {
+		if ( ! isset( $features['global']['gradient'] ) ) {
+			$features['global']['gradient'] = array();
+		}
+		$features['global']['gradient']['custom'] = false;
+	}
+	if ( get_theme_support( 'disable-custom-font-sizes' ) ) {
+		if ( ! isset( $features['global']['fontSize'] ) ) {
+			$features['global']['fontSize'] = array();
+		}
+		$features['global']['fontSize']['custom'] = false;
+	}
+	if ( get_theme_support( 'custom-line-height' ) ) {
+		if ( ! isset( $features['global']['lineHeight'] ) ) {
+			$features['global']['lineHeight'] = array();
+		}
+		$features['global']['lineHeight']['custom'] = true;
+	}
+
+	return $features;
 }
 
 /**
@@ -633,6 +664,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$settings['styles'][] = array( 'css' => $stylesheet );
 
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
+
+	// Unsetting deprecated settings defined by Core.
+	unset( $settings['disableCustomColors'] );
+	unset( $settings['disableCustomGradients'] );
+	unset( $settings['disableCustomFontSizes'] );
+	unset( $settings['enableCustomLineHeight'] );
 
 	return $settings;
 }

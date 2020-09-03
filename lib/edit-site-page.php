@@ -40,7 +40,6 @@ function gutenberg_is_edit_site_page( $page ) {
 function gutenberg_get_editor_styles() {
 	global $editor_styles;
 
-	//
 	// Ideally the code is extracted into a reusable function.
 	$styles = array(
 		array(
@@ -127,12 +126,10 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 
 	$settings = array(
-		'alignWide'              => get_theme_support( 'align-wide' ),
-		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
-		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
-		'imageSizes'             => $available_image_sizes,
-		'isRTL'                  => is_rtl(),
-		'maxUploadFileSize'      => $max_upload_size,
+		'alignWide'         => get_theme_support( 'align-wide' ),
+		'imageSizes'        => $available_image_sizes,
+		'isRTL'             => is_rtl(),
+		'maxUploadFileSize' => $max_upload_size,
 	);
 
 	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
@@ -144,6 +141,7 @@ function gutenberg_edit_site_init( $hook ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
 	$settings['styles'] = gutenberg_get_editor_styles();
+	$settings           = gutenberg_experimental_global_styles_settings( $settings );
 
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.

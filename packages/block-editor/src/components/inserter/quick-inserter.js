@@ -226,6 +226,7 @@ function QuickInserter( {
 					onChange={ ( value ) => {
 						setFilterValue( value );
 					} }
+					placeholder={ __( 'Search for a block' ) }
 				/>
 			) }
 

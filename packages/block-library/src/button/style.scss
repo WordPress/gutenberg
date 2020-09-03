@@ -1,4 +1,4 @@
-$blocks-button__height: 56px;
+$blocks-button__height: 3.1em;
 
 // Prefer the link selector instead of the regular button classname
 // to support the previous markup in addition to the new one.
@@ -10,8 +10,8 @@ $blocks-button__height: 56px;
 	box-shadow: none;
 	cursor: pointer;
 	display: inline-block;
-	font-size: $big-font-size;
-	padding: 12px 24px;
+	font-size: 1.125em;
+	padding: 0.667em 1.333em;
 	text-align: center;
 	text-decoration: none;
 	overflow-wrap: break-word;

@@ -107,12 +107,139 @@
 	justify-content: flex-start;
 
 	svg {
-		margin-right: $grid-unit-10;
+		margin-left: auto;
 	}
 }
 
 .edit-post-post-preview-dropdown {
 	.components-popover__content > div {
 		padding-bottom: 0;
+	}
+}
+
+.show-icon-labels.interface-pinned-items,
+.show-icon-labels .edit-post-header,
+.edit-post-header__dropdown {
+	.components-button.has-icon {
+		width: auto;
+
+		// Hide the button icons when labels are set to display...
+		svg {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+		}
+		&[aria-disabled="true"] {
+			background-color: transparent;
+		}
+	}
+	.is-tertiary {
+		&:active {
+			box-shadow: 0 0 0 1.5px var(--wp-admin-theme-color);
+			background-color: transparent;
+		}
+	}
+	// Exception for drodpdown toggle buttons.
+	// Exception for the fullscreen mode button.
+	// Temporary exception for block toolbar (pending design).
+	.edit-post-header-toolbar__block-toolbar .components-button.has-icon,
+	.edit-post-fullscreen-mode-close.has-icon,
+	.components-button.has-icon.button-toggle {
+		svg {
+			display: block;
+		}
+		&::after {
+			content: none;
+		}
+	}
+	// Undo the width override for fullscreen mode button.
+	.edit-post-fullscreen-mode-close.has-icon {
+		width: $header-height;
+	}
+	// Don't hide MenuItemsChoice check icons
+	.components-menu-items-choice .components-menu-items__item-icon.components-menu-items__item-icon {
+		display: block;
+	}
+	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle,
+	.interface-pinned-items .components-button {
+		padding-left: $grid-unit;
+		padding-right: $grid-unit;
+
+		@include break-small {
+			padding-left: $grid-unit-15;
+			padding-right: $grid-unit-15;
+		}
+	}
+	.components-dropdown-menu__toggle {
+		margin-left: $grid-unit;
+		padding-left: $grid-unit;
+		padding-right: $grid-unit;
+
+		@include break-small {
+			margin-left: $grid-unit-15;
+			padding-left: $grid-unit-15;
+			padding-right: $grid-unit-15;
+		}
+	}
+	// The inserter has a custom label, different from its aria-label, so we don't want to display both.
+	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle {
+		&::after {
+			content: none;
+		}
+	}
+	// The post saved state button has a custom label only on small breakpoint
+	.editor-post-save-draft.editor-post-save-draft {
+		&::after {
+			content: none;
+		}
+		@include break-small {
+			&::after {
+				content: attr(aria-label);
+			}
+		}
+	}
+}
+
+.edit-post-header__dropdown {
+	.components-menu-item__button.components-menu-item__button,
+	.components-button.editor-history__undo,
+	.components-button.editor-history__redo,
+	.table-of-contents .components-button,
+	.components-button.block-editor-block-navigation {
+		margin: 0;
+		padding: 6px 6px 6px $grid-unit-50;
+		width: 14.625rem;
+		text-align: left;
+		justify-content: flex-start;
+	}
+}
+
+.show-icon-labels.interface-pinned-items {
+	padding: 6px $grid-unit-15 $grid-unit-15;
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: -$grid-unit-15;
+	margin-right: -$grid-unit-15;
+	border-bottom: 1px solid $gray-400;
+	display: block;
+
+	> .components-button.has-icon {
+		margin: 0;
+		padding: 6px 6px 6px $grid-unit;
+		width: 14.625rem;
+		justify-content: flex-start;
+
+		&[aria-expanded="true"] svg {
+			display: block;
+			max-width: $grid-unit-30;
+		}
+		&[aria-expanded="false"] {
+			padding-left: $grid-unit-50;
+		}
+		svg {
+			margin-right: 8px;
+		}
 	}
 }
