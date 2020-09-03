@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getActiveStyle, replaceActiveStyle } from '../';
+import { getActiveStyle, replaceActiveStyle } from '../utils';
 
 describe( 'getActiveStyle', () => {
 	it( 'Should return the undefined if no active style', () => {
