@@ -22,7 +22,7 @@ import getGlobalStyles from './global-styles-renderer';
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
 	getProperty: ( context, path ) => {},
-	setProperty: ( context, path, value ) => {},
+	setProperty: ( context, newValues ) => {},
 	globalContext: {},
 	/* eslint-enable no-unused-vars */
 } );
