@@ -13,7 +13,6 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { useBlockNavigationContext } from './context';
-import BlockNavigationBlockSlot from './block-slot';
 import BlockNavigationBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 
@@ -91,39 +90,22 @@ const BlockNavigationBlockContents = forwardRef(
 				clientIds={ [ block.clientId ] }
 				elementId={ `block-navigation-block-${ block.clientId }` }
 			>
-				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) =>
-					__experimentalFeatures ? (
-						<BlockNavigationBlockSlot
-							ref={ ref }
-							className={ className }
-							block={ block }
-							onClick={ onClick }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							draggable={ isDraggable && __experimentalFeatures }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							{ ...props }
-						/>
-					) : (
-						<BlockNavigationBlockSelectButton
-							ref={ ref }
-							className={ className }
-							block={ block }
-							onClick={ onClick }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							draggable={ isDraggable && __experimentalFeatures }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							{ ...props }
-						/>
-					)
-				}
+				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+					<BlockNavigationBlockSelectButton
+						ref={ ref }
+						className={ className }
+						block={ block }
+						onClick={ onClick }
+						isSelected={ isSelected }
+						position={ position }
+						siblingBlockCount={ siblingBlockCount }
+						level={ level }
+						draggable={ isDraggable && __experimentalFeatures }
+						onDragStart={ onDraggableStart }
+						onDragEnd={ onDraggableEnd }
+						{ ...props }
+					/>
+				) }
 			</BlockDraggable>
 		);
 	}
