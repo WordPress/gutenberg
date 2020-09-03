@@ -35,17 +35,7 @@ First download, install, and start [Docker Desktop](https://www.docker.com/produ
 npm -g install @wordpress/env
 ```
 
-Open a text editor and create a `.wp-env.json` file with the following content:
-
-```json
-{
-	"core": null
-}
-```
-
-This is a minimal file, you can also specify various features and plugins, [see wp-env documentation](https://developer.wordpress.org/block-editor/packages/packages-env/) for full details. The `"core": null` parameter indicates no version specified, so it defaults to the latest version.
-
- Start the environment:
+Start the environment:
 
  ```
  wp-env start
@@ -151,15 +141,13 @@ You can access your environment in your browser at: [http://localhost:8888/](htt
 
 When using the script while developing a single plugin, when you run `wp-env start` it will mount and activate the plugin automatically. Note: This also works for themes, run from the directory you are developing the theme.
 
-If you want a generic environment, or working with multiple plugins and themes, you need to create a `.wp-env.json` file in a working directory. A minimal default file is:
+If you run `wp-env start` from a directory that is not a plugin or theme, a generic WordPress environment will be created. The script will display the following warning, it is fine if this is your intention.
 
-```json
-{
-	"core": null
-}
+```
+!! Warning: could not find a .wp-env.json configuration file and could not determine if 'DIR' is a WordPress installation, a plugin, or a theme.
 ```
 
-You can specify different WordPress versions, plugins, themes, and other configuratio for the Docker container. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson) for details.
+The `.wp-env.json` file is a configuration file used to create an environment that works with multiple plugins and/or themes. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson).
 
 
 #### Troubleshooting
@@ -172,10 +160,6 @@ If you run into an issue, when trying to run `wp-env` a common one is `Error whi
 If you see the error: `Host is already in use by another container`
 
 - The container is already running, or another one is. You can stop an existing container running use `wp-env stop` from the directory you started it.
-
-If you see the error: `No .wp-env.json file found` or `Invalid .wp-env.json`
-
-- You need to create a valid .wp-env.json file. Try a file with just `{}`
 
 
 ### Alternative to Docker
