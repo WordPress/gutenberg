@@ -7,9 +7,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+
+import { dragHandle } from '@wordpress/icons';
 import {
 	ToolbarGroup,
 	__experimentalToolbarItem as ToolbarItem,
+	Button,
 } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
@@ -18,6 +21,7 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 
 function BlockMover( {
@@ -28,6 +32,7 @@ function BlockMover( {
 	isHidden,
 	rootClientId,
 	orientation,
+	hideDragHandle,
 } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -49,7 +54,27 @@ function BlockMover( {
 				'is-horizontal': orientation === 'horizontal',
 			} ) }
 		>
-			<ToolbarGroup>
+			{ ! hideDragHandle && (
+				<BlockDraggable
+					clientIds={ clientIds }
+					cloneClassname="block-editor-block-mover__drag-clone"
+				>
+					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+						<Button
+							icon={ dragHandle }
+							className="block-editor-block-mover__drag-handle"
+							aria-hidden="true"
+							// Should not be able to tab to drag handle as this
+							// button can only be used with a pointer device.
+							tabIndex="-1"
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+							draggable={ isDraggable }
+						/>
+					) }
+				</BlockDraggable>
+			) }
+			<ToolbarGroup className="block-editor-block-mover__move-button-container">
 				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
 					{ ( itemProps ) => (
 						<BlockMoverUpButton
