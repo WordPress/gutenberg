@@ -12,7 +12,11 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import Navigation from '../';
+import Navigation, {
+	Navigation2,
+	Navigation2Level,
+	Navigation2Item,
+} from '../';
 import NavigationMenu from '../menu';
 import NavigationMenuItem from '../menu-item';
 
@@ -180,3 +184,52 @@ const Container = styled.div`
 export const _default = () => {
 	return <Example />;
 };
+
+function ComponentsCompositionExample() {
+	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+	return (
+		<Navigation2>
+			{ ( { activeLevel, navigateTo, NavigationBackButton } ) => (
+				<>
+					<Navigation2Level
+						slug="root"
+						title="Home"
+						activeLevel={ activeLevel }
+					>
+						<Navigation2Item
+							slug="item-1"
+							title="Item 1"
+							onClick={ () => {
+								navigateTo( 'sub-menu' );
+							} }
+							activeItem={ activeItem }
+						/>
+					</Navigation2Level>
+
+					<Navigation2Level
+						slug="sub-menu"
+						title="Sub Menu"
+						activeLevel={ activeLevel }
+						navigateBack={
+							<NavigationBackButton
+								parentLevel="root"
+								label="Back to Home"
+							/>
+						}
+					>
+						<Navigation2Item
+							slug="item-2"
+							title="Item 2"
+							onClick={ () => {
+								setActiveItem( 'item-2' );
+							} }
+							activeItem={ activeItem }
+						/>
+					</Navigation2Level>
+				</>
+			) }
+		</Navigation2>
+	);
+}
+
+export const componentsComposition = () => <ComponentsCompositionExample />;
