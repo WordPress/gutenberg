@@ -26,6 +26,7 @@ const deprecatedFlags = {
 		settings.disableCustomFontSizes === undefined
 			? undefined
 			: ! settings.disableCustomFontSizes,
+	'lineHeight.custom': ( settings ) => settings.enableCustomLineHeight,
 };
 
 /**
