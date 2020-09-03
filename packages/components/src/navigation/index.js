@@ -14,7 +14,7 @@ import { usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import Animate from '../animate';
-import { BackButtonUi, Root } from './styles/navigation-styles';
+import { BackButtonUI, Root } from './styles/navigation-styles';
 
 const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevelId, setActiveLevelId ] = useState( 'root' );
@@ -81,14 +81,14 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		}
 
 		return (
-			<BackButtonUi
+			<BackButtonUI
 				className="components-navigation__back-button"
 				isTertiary
 				onClick={ () => setActiveLevelId( parentLevel.id ) }
 			>
 				<Icon icon={ chevronLeft } />
 				{ backButtonChildren }
-			</BackButtonUi>
+			</BackButtonUI>
 		);
 	};
 

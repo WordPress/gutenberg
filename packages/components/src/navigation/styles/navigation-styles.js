@@ -68,7 +68,7 @@ export const MenuItemUI = styled.li`
 	}
 `;
 
-export const BackButtonUi = styled( Button )`
+export const BackButtonUI = styled( Button )`
 	&.is-tertiary {
 		color: ${ G2.lightGray.ui };
 
