@@ -38,7 +38,6 @@
 			width: $block-toolbar-height - $grid-unit-15 / 2;
 			padding-right: $grid-unit-15 - $border-width !important;
 			padding-left: $grid-unit-15 / 2 !important;
-			min-width: $block-toolbar-height - $grid-unit-15 / 2 !important;
 		}
 
 		// Focus style.
@@ -105,8 +104,8 @@
 
 			// Focus style.
 			&::before {
-				top: 0;
-				bottom: 0;
+				top: $border-width;
+				bottom: $border-width;
 				min-width: 0;
 				width: auto;
 				height: auto;
