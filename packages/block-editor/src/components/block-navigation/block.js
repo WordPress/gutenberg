@@ -14,7 +14,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useCallback, useState, useRef, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -84,6 +84,10 @@ export default function BlockNavigationBlock( {
 		}
 	}, [ withExperimentalFeatures, isSelected ] );
 
+	const onSelectBlock = useCallback( () => onClick( clientId ), [
+		clientId,
+	] );
+
 	return (
 		<BlockNavigationLeaf
 			className={ classnames( {
@@ -115,7 +119,7 @@ export default function BlockNavigationBlock( {
 						/>
 						<BlockNavigationBlockContents
 							block={ block }
-							onClick={ () => onClick( block.clientId ) }
+							onClick={ onSelectBlock }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, forwardRef } from '@wordpress/element';
+import { useCallback, useRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,7 +24,10 @@ export default forwardRef( function RovingTabIndexItem(
 		tabIndex = lastFocusedElement === ref.current ? 0 : -1;
 	}
 
-	const onFocus = ( event ) => setLastFocusedElement( event.target );
+	const onFocus = useCallback(
+		( event ) => setLastFocusedElement( event.target ),
+		[ setLastFocusedElement ]
+	);
 	const allProps = { ref, tabIndex, onFocus, ...props };
 
 	if ( typeof children === 'function' ) {
