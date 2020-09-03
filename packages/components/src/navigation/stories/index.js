@@ -50,6 +50,12 @@ const data = [
 		parent: 'item-3',
 	},
 	{
+		title: 'Secondary Menu',
+		id: 'grouping-1',
+		parent: 'item-3',
+		type: 'grouping',
+	},
+	{
 		title: 'Nested Category',
 		id: 'child-3',
 		parent: 'item-3',
@@ -86,39 +92,18 @@ const data = [
 	},
 ];
 
-const tryThis = ( { level, setActive } ) => (
-	<NavigationMenu>
-		{ level.children.map( ( item ) => {
-			if ( item.type === 'grouping' ) {
-				return item.groupings.map( ( groupItem ) => (
-					<NavigationMenuItem
-						{ ...groupItem }
-						key={ groupItem.id }
-						onClick={
-							! groupItem.href
-								? ( selected ) => setActive( selected.id )
-								: null
-						}
-					/>
-				) );
-			}
-			return (
-				<NavigationMenuItem
-					{ ...item }
-					key={ item.id }
-					onClick={
-						! item.href
-							? ( selected ) => setActive( selected.id )
-							: null
-					}
-				/>
-			);
-		} ) }
-	</NavigationMenu>
-);
-
 function Example() {
 	const [ active, setActive ] = useState( 'item-1' );
+
+	const renderItem = ( item ) => (
+		<NavigationMenuItem
+			{ ...item }
+			key={ item.id }
+			onClick={
+				! item.href ? ( selected ) => setActive( selected.id ) : null
+			}
+		/>
+	);
 
 	return (
 		<>
@@ -142,22 +127,22 @@ function Example() {
 							) }
 							<h1>{ level.title }</h1>
 							<NavigationMenu>
-								{ level.children.map( ( item ) => {
-									return (
-										<NavigationMenuItem
-											{ ...item }
-											key={ item.id }
-											onClick={
-												! item.href
-													? ( selected ) =>
-															setActive(
-																selected.id
-															)
-													: null
-											}
-										/>
-									);
-								} ) }
+								{ level.children.map( renderItem ) }
+								{ level.groupings
+									? level.groupings.map( ( grouping ) => (
+											<>
+												<h2>{ grouping.title }</h2>
+												<NavigationMenu
+													key={ grouping.id }
+													title={ grouping.title }
+												>
+													{ grouping.children.map(
+														renderItem
+													) }
+												</NavigationMenu>
+											</>
+									  ) )
+									: null }
 							</NavigationMenu>
 						</>
 					);

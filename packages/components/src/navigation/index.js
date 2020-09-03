@@ -30,18 +30,42 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	};
 
 	const mapItems = ( itemData ) => {
+		const groupings = [];
 		const items = new Map(
-			[
-				{ id: 'root', parent: null, title: rootTitle },
-				...itemData,
-			].map( ( item ) => [ item.id, appendItemData( item ) ] )
+			[ { id: 'root', parent: null, title: rootTitle }, ...itemData ]
+				.filter( ( item ) => {
+					if ( item.type === 'grouping' ) {
+						item.children = [];
+						groupings.push( item );
+						return false;
+					}
+					return true;
+				} )
+				.map( ( item ) => [ item.id, appendItemData( item ) ] )
 		);
 
 		items.forEach( ( item ) => {
 			const parentItem = items.get( item.parent );
 			if ( parentItem ) {
-				parentItem.children.push( item );
-				parentItem.hasChildren = true;
+				if ( item.group ) {
+					const grouping = groupings.find(
+						( group ) => group.id === item.group
+					);
+					if ( grouping ) {
+						grouping.children.push( item );
+					}
+				} else {
+					parentItem.children.push( item );
+					parentItem.hasChildren = true;
+				}
+			}
+		} );
+
+		groupings.forEach( ( grouping ) => {
+			const parentItem = items.get( grouping.parent );
+			if ( parentItem ) {
+				parentItem.groupings = parentItem.groupings || [];
+				parentItem.groupings.push( grouping );
 			}
 		} );
 
