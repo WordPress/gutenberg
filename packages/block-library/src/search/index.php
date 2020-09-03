@@ -27,18 +27,16 @@ function render_block_core_search( $attributes ) {
 		)
 	);
 
-	$input_id       = 'wp-block-search__input-' . ++$instance_id;
-	$classnames     = classnames_for_block_core_search( $attributes );
-
+	$input_id        = 'wp-block-search__input-' . ++$instance_id;
+	$classnames      = classnames_for_block_core_search( $attributes );
 	$show_label	     = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
 	$use_icon_button = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
-	$show_input		 = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' == $attributes['buttonPosition'] ) ? false : true;
-	$show_button	 = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' == $attributes['buttonPosition'] ) ? false : true;
-
-	$label_markup   = '';
-	$input_markup	= '';
-	$button_markup  = '';
-	$width_styles   = '';
+	$show_input      = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'] ) ? false : true;
+	$show_button     = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
+	$label_markup    = '';
+	$input_markup    = '';
+	$button_markup   = '';
+	$width_styles    = '';
 
 	if ( $show_label ) {
 		if ( ! empty( $attributes['label'] ) ) {
@@ -120,24 +118,28 @@ add_action( 'init', 'register_block_core_search' );
 
 /**
  * Builds the correct top level classnames for the 'core/search' block.
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string The classnames used in the block.
  */
 function classnames_for_block_core_search( $attributes ) {
-	$classnames = [];
+	$classnames = array();
 
 	if ( ! empty( $attributes['buttonPosition'] ) ) {
-		if ( 'button-inside' == $attributes['buttonPosition'] ) {
+		if ( 'button-inside' === $attributes['buttonPosition'] ) {
 			$classnames[] = 'wp-block-search__button-inside';
 		}
 
-		if ( 'button-outside' == $attributes['buttonPosition'] ) {
+		if ( 'button-outside' === $attributes['buttonPosition'] ) {
 			$classnames[] = 'wp-block-search__button-outside';
 		}
 
-		if ( 'no-button' == $attributes['buttonPosition'] ) {
+		if ( 'no-button' === $attributes['buttonPosition'] ) {
 			$classnames[] = 'wp-block-search__no-button';
 		}
 
-		if ( 'button-only' == $attributes['buttonPosition'] ) {
+		if ( 'button-only' === $attributes['buttonPosition'] ) {
 			$classnames[] = 'wp-block-search__button-only';
 		}
 	}
