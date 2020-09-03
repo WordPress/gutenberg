@@ -454,7 +454,7 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
 		// so that existing link colors themes used didn't break.
 		// We add this here to make it work for themes that opt-in to theme.json
 		// In the future, we may do this differently.
-		$stylesheet .= 'a { color: var(--wp--style--color--link, #00e); }';
+		$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
 	}
 
 	return $stylesheet;
