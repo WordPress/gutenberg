@@ -35,11 +35,12 @@ export default function QueryToolbar( { query, setQuery } ) {
 	}, [] );
 
 	// Handles categories and tags changes.
-	const onTermsChange = ( terms, queryProperty ) => ( newTermNames ) => {
-		const termIds = newTermNames.map(
-			( name ) => terms.mapByName[ name ]?.id
-		);
-		if ( termIds.includes( undefined ) ) return;
+	const onTermsChange = ( terms, queryProperty ) => ( newTermValues ) => {
+		const termIds = newTermValues.reduce( ( accumulator, termValue ) => {
+			const termId = termValue?.id || terms.mapByName[ termValue ]?.id;
+			if ( termId ) accumulator.push( termId );
+			return accumulator;
+		}, [] );
 		setQuery( { [ queryProperty ]: termIds } );
 	};
 	const onCategoriesChange = onTermsChange( categories, 'categoryIds' );
