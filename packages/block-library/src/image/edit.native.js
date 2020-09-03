@@ -94,6 +94,7 @@ export class ImageEdit extends React.Component {
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
 			this
 		);
+		this.onClearMediaOption = this.onClearMediaOption.bind( this );
 	}
 
 	componentDidMount() {
@@ -311,6 +312,11 @@ export class ImageEdit extends React.Component {
 		}
 	}
 
+	onClearMediaOption() {
+		this.props.setAttributes( { id: null, url: null } );
+		this.setState( { autoOpenMediaOptions: false } );
+	}
+
 	getPlaceholderIcon() {
 		return (
 			<Icon
@@ -477,6 +483,7 @@ export class ImageEdit extends React.Component {
 										onSelectMediaUploadOption={
 											this.onSelectMediaUploadOption
 										}
+										onClearMedia={ this.onClearMediaOption }
 										openMediaOptions={ openMediaOptions }
 										retryMessage={ retryMessage }
 										url={ url }

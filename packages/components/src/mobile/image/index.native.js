@@ -37,9 +37,9 @@ const ImageComponent = ( {
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
-	mediaPickerOptions,
 	onSelectMediaUploadOption,
 	openMediaOptions,
+	onClearMedia,
 	resizeMode,
 	retryMessage,
 	url,
@@ -225,7 +225,16 @@ const ImageComponent = ( {
 							}
 							openMediaOptions={ openMediaOptions }
 							url={ url }
-							pickerOptions={ mediaPickerOptions }
+							pickerOptions={ [
+								{
+									destructiveButton: true,
+									id: 'clearMedia',
+									label: __( 'Clear Media' ),
+									onPress: onClearMedia,
+									separated: true,
+									value: 'clearMedia',
+								},
+							] }
 						/>
 					) }
 			</View>
