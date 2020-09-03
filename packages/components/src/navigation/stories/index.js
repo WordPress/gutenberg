@@ -221,7 +221,28 @@ function ComponentsCompositionExample() {
 							slug="item-2"
 							title="Item 2"
 							onClick={ () => {
-								setActiveItem( 'item-2' );
+								navigateTo( 'nested-sub-menu' );
+							} }
+							activeItem={ activeItem }
+						/>
+					</Navigation2Level>
+
+					<Navigation2Level
+						slug="nested-sub-menu"
+						title="SubSub Menu"
+						activeLevel={ activeLevel }
+						navigateBack={
+							<NavigationBackButton
+								parentLevel="sub-menu"
+								label="Back to Sub Menu"
+							/>
+						}
+					>
+						<Navigation2Item
+							slug="item-3"
+							title="Item 3"
+							onClick={ () => {
+								setActiveItem( 'item-3' );
 							} }
 							activeItem={ activeItem }
 						/>
