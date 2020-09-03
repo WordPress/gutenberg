@@ -16,12 +16,18 @@ import { postList } from '@wordpress/icons';
  * Internal dependencies
  */
 import { getTermsInfo } from '../utils';
+import { MAX_FETCHED_TERMS } from '../constants';
 
 export default function QueryToolbar( { query, setQuery } ) {
 	const { categories, tags } = useSelect( ( select ) => {
 		const { getEntityRecords } = select( 'core' );
-		const _categories = getEntityRecords( 'taxonomy', 'category' );
-		const _tags = getEntityRecords( 'taxonomy', 'post_tag' );
+		const termsQuery = { per_page: MAX_FETCHED_TERMS };
+		const _categories = getEntityRecords(
+			'taxonomy',
+			'category',
+			termsQuery
+		);
+		const _tags = getEntityRecords( 'taxonomy', 'post_tag', termsQuery );
 		return {
 			categories: getTermsInfo( _categories ),
 			tags: getTermsInfo( _tags ),
