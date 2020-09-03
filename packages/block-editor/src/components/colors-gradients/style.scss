@@ -1,11 +1,11 @@
 .block-editor-color-gradient-control {
-	&__color-indicator {
-		margin-bottom: $grid-unit-10;
+	.block-editor-color-gradient-control__color-indicator {
+		margin-bottom: $grid-unit-15;
 	}
 
-	&__button-tabs {
+	.block-editor-color-gradient-control__button-tabs {
 		display: block;
-		margin-bottom: $grid-unit-10;
+		margin-bottom: $grid-unit-15;
 	}
 }
 

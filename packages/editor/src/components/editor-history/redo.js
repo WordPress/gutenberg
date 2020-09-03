@@ -19,6 +19,7 @@ function EditorHistoryRedo( props, ref ) {
 			{ ...props }
 			ref={ ref }
 			icon={ redoIcon }
+			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Redo' ) }
 			shortcut={ displayShortcut.primaryShift( 'z' ) }
 			// If there are no redo levels we don't want to actually disable this

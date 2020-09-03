@@ -179,7 +179,10 @@ function ColorGradientControlSelect( props ) {
 		return pick( settings, colorsAndGradientKeys );
 	} );
 	colorGradientSettings.disableCustomColors = ! useEditorFeature(
-		'colors.custom'
+		'color.custom'
+	);
+	colorGradientSettings.disableCustomGradients = ! useEditorFeature(
+		'gradient.custom'
 	);
 
 	return (
