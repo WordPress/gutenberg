@@ -63,7 +63,8 @@ function render_block_core_template_part( $attributes ) {
 	}
 	$content = do_shortcode( $content );
 
-	return '<div>' . str_replace( ']]>', ']]&gt;', $content ) . '</div>';
+	$html_tag = esc_attr( $attributes['tagName'] );
+	return "<$html_tag>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
 }
 
 /**
