@@ -39,7 +39,6 @@ export default ( {
 		} );
 	}
 
-	// TODO: check for gradient support, etc
 	/*
 	 * We want to send the entities API both colors
 	 * in a single request. This is to avod race conditions
