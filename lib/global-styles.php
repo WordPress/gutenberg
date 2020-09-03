@@ -481,11 +481,7 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 			$css_declarations .= $property . ':' . $value . ';';
 		}
 	}
-	if ( '' !== $css_declarations ) {
-		return $block_selector . '{' . $css_declarations . '}';
-	}
-
-	return '';
+	return $css_declarations ? $block_selector . '{' . $css_declarations . '}' : '';
 }
 
 /**
