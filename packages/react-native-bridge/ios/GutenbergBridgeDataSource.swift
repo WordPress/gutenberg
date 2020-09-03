@@ -51,9 +51,6 @@ public protocol GutenbergBridgeDataSource: class {
     /// Asks the data source if it should load the editor in preview mode
     var isPreview: Bool { get }
 
-    /// Asks the data source for  the template to provide to the preview mode
-    var previewTemplate: String? { get }
-
     /// Asks the data source for a view to show while the Editor is loading.
      var loadingView: UIView? { get }
 }

@@ -12,10 +12,16 @@ import Editor from './editor';
 
 class EditorPreview extends Component {
 	render() {
-		const { template, editorMode, postId, postType, ...props } = this.props;
+		const {
+			initialHtml,
+			editorMode,
+			postId,
+			postType,
+			...props
+		} = this.props;
 
 		if ( editorMode === 'preview' ) {
-			return <Preview blocks={ rawHandler( { HTML: template } ) } />;
+			return <Preview blocks={ rawHandler( { HTML: initialHtml } ) } />;
 		}
 
 		return <Editor postId={ postId } postType={ postType } { ...props } />;

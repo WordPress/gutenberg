@@ -78,7 +78,6 @@ const setupInitHooks = () => {
 				colors: props.colors,
 				gradients: props.gradients,
 				editorMode: props.editorMode,
-				template: props.template,
 			};
 		}
 	);
