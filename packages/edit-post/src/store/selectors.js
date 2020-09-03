@@ -324,3 +324,14 @@ export function __experimentalGetPreviewDeviceType( state ) {
 export function isInserterOpened( state ) {
 	return state.isInserterOpened;
 }
+
+/**
+ * Returns true if List View is opened.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether the inserter is opened.
+ */
+export function isListViewOpened( state ) {
+	return state.isListViewOpened;
+}

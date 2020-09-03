@@ -14,10 +14,7 @@ import {
 	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	BlockBreadcrumb,
-	__experimentalLibrary as Library,
-} from '@wordpress/block-editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 import {
 	Button,
 	ScrollLock,
@@ -33,7 +30,6 @@ import {
 	InterfaceSkeleton,
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -50,7 +46,8 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
-import PopoverWrapper from './popover-wrapper';
+import InserterPanel from './inserter-panel';
+import ListViewPanel from './list-view-panel';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block library' ),
@@ -73,6 +70,7 @@ function Layout() {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		setIsInserterOpened,
+		setIsListViewOpened,
 	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
@@ -86,6 +84,7 @@ function Layout() {
 		hasBlockSelected,
 		showMostUsedBlocks,
 		isInserterOpened,
+		isListViewOpened,
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		return {
@@ -104,6 +103,7 @@ function Layout() {
 				'mostUsedBlocks'
 			),
 			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
+			isListViewOpened: select( 'core/edit-post' ).isListViewOpened(),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
@@ -136,10 +136,11 @@ function Layout() {
 	useEffect( () => {
 		if ( sidebarIsOpened && ! isHugeViewport ) {
 			setIsInserterOpened( false );
+			setIsListViewOpened( false );
 		}
 	}, [ sidebarIsOpened, isHugeViewport ] );
 	useEffect( () => {
-		if ( isInserterOpened && ! isHugeViewport ) {
+		if ( ( isInserterOpened || isListViewOpened ) && ! isHugeViewport ) {
 			closeGeneralSidebar();
 		}
 	}, [ isInserterOpened, isHugeViewport ] );
@@ -182,39 +183,22 @@ function Layout() {
 						/>
 					}
 					leftSidebar={
-						mode === 'visual' &&
-						isInserterOpened && (
-							<PopoverWrapper
-								className="edit-post-layout__inserter-panel-popover-wrapper"
-								onClose={ () => setIsInserterOpened( false ) }
-							>
-								<div className="edit-post-layout__inserter-panel">
-									<div className="edit-post-layout__inserter-panel-header">
-										<Button
-											icon={ close }
-											onClick={ () =>
-												setIsInserterOpened( false )
-											}
-										/>
-									</div>
-									<div className="edit-post-layout__inserter-panel-content">
-										<Library
-											showMostUsedBlocks={
-												showMostUsedBlocks
-											}
-											showInserterHelpPanel
-											onSelect={ () => {
-												if ( isMobileViewport ) {
-													setIsInserterOpened(
-														false
-													);
-												}
-											} }
-										/>
-									</div>
-								</div>
-							</PopoverWrapper>
-						)
+						<>
+							<InserterPanel
+								isOpened={
+									mode === 'visual' && isInserterOpened
+								}
+								setIsOpened={ setIsInserterOpened }
+								showMostUsedBlocks={ showMostUsedBlocks }
+								isMobileViewport={ isMobileViewport }
+							/>
+							<ListViewPanel
+								isOpened={
+									mode === 'visual' && isListViewOpened
+								}
+								setIsOpened={ setIsListViewOpened }
+							/>
+						</>
 					}
 					sidebar={
 						( ! isMobileViewport || sidebarIsOpened ) && (

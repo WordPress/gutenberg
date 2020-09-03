@@ -7,7 +7,6 @@ import { __, _x } from '@wordpress/i18n';
 import {
 	BlockToolbar,
 	NavigableToolbar,
-	BlockNavigationDropdown,
 	ToolSelector,
 } from '@wordpress/block-editor';
 import {
@@ -21,17 +20,35 @@ import {
 	ToolbarItem,
 	MenuItemsChoice,
 	MenuGroup,
+	SVG,
+	Path,
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
+const ListViewIcon = (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		width="24"
+		height="24"
+	>
+		<Path d="M13.8 5.2H3v1.5h10.8V5.2zm-3.6 12v1.5H21v-1.5H10.2zm7.2-6H6.6v1.5h10.8v-1.5z" />
+	</SVG>
+);
+
 function HeaderToolbar() {
 	const inserterButton = useRef();
-	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
+	const listViewButton = useRef();
+	const { setIsInserterOpened, setIsListViewOpened } = useDispatch(
+		'core/edit-post'
+	);
 	const {
 		hasFixedToolbar,
 		isInserterEnabled,
 		isInserterOpened,
+		isListViewEnabled,
+		isListViewOpened,
 		isTextModeEnabled,
 		previewDeviceType,
 		showIconLabels,
@@ -54,7 +71,11 @@ function HeaderToolbar() {
 				hasInserterItems(
 					getBlockRootClientId( getBlockSelectionEnd() )
 				),
+			isListViewEnabled:
+				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
+			isListViewOpened: select( 'core/edit-post' ).isListViewOpened(),
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
 			previewDeviceType: select(
@@ -94,12 +115,6 @@ function HeaderToolbar() {
 				showTooltip={ ! showIconLabels }
 				isTertiary={ showIconLabels }
 			/>
-			<ToolbarItem
-				as={ BlockNavigationDropdown }
-				isDisabled={ isTextModeEnabled }
-				showTooltip={ ! showIconLabels }
-				isTertiary={ showIconLabels }
-			/>
 		</>
 	);
 
@@ -136,6 +151,35 @@ function HeaderToolbar() {
 				showTooltip={ ! showIconLabels }
 			>
 				{ showIconLabels && __( 'Add' ) }
+			</ToolbarItem>
+			<ToolbarItem
+				ref={ listViewButton }
+				as={ Button }
+				className="edit-post-header-toolbar__inserter-toggle"
+				isPrimary
+				isPressed={ isListViewOpened }
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				onClick={ () => {
+					if ( isListViewOpened ) {
+						// Focusing the inserter button closes the inserter popover
+						listViewButton.current.focus();
+					} else {
+						setIsListViewOpened( true );
+					}
+				} }
+				disabled={ ! isListViewEnabled }
+				icon={ ListViewIcon }
+				/* translators: button label text should, if possible, be under 16
+			characters. */
+				label={ _x(
+					'List View',
+					'Generic label for list view button'
+				) }
+				showTooltip={ ! showIconLabels }
+			>
+				{ showIconLabels && __( 'List View' ) }
 			</ToolbarItem>
 			{ ( isWideViewport || ! showIconLabels ) && (
 				<>

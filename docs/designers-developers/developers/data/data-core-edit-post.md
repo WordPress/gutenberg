@@ -189,6 +189,18 @@ _Returns_
 
 -   `boolean`: Whether the inserter is opened.
 
+<a name="isListViewOpened" href="#isListViewOpened">#</a> **isListViewOpened**
+
+Returns true if List View is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the inserter is opened.
+
 <a name="isMetaBoxLocationActive" href="#isMetaBoxLocationActive">#</a> **isMetaBoxLocationActive**
 
 Returns true if there is an active meta box in the given location, or false
@@ -396,6 +408,18 @@ Returns an action object used to open/close the inserter.
 _Parameters_
 
 -   _value_ `boolean`: A boolean representing whether the inserter should be opened or closed.
+
+_Returns_
+
+-   `Object`: Action object.
+
+<a name="setIsListViewOpened" href="#setIsListViewOpened">#</a> **setIsListViewOpened**
+
+Returns an action object used to open/close List View.
+
+_Parameters_
+
+-   _value_ `boolean`: A boolean representing whether list view should be opened or closed.
 
 _Returns_
 

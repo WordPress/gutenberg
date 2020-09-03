@@ -297,3 +297,16 @@ export function setIsInserterOpened( value ) {
 		value,
 	};
 }
+
+/**
+ * Returns an action object used to open/close List View.
+ *
+ * @param {boolean} value A boolean representing whether list view should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsListViewOpened( value ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		value,
+	};
+}

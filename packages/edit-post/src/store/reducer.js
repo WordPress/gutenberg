@@ -248,6 +248,24 @@ function isInserterOpened( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value;
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return false;
+	}
+	return state;
+}
+
+/**
+ * Reducer tracking whether List View is open.
+ *
+ * @param {boolean} state
+ * @param {Object}  action
+ */
+function isListViewOpened( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.value;
+		case 'SET_IS_INSERTER_OPENED':
+			return false;
 	}
 	return state;
 }
@@ -265,4 +283,5 @@ export default combineReducers( {
 	removedPanels,
 	deviceType,
 	isInserterOpened,
+	isListViewOpened,
 } );
