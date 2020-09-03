@@ -12,7 +12,7 @@
 
 	.wp-block-search__input {
 		flex-grow: 1;
-		min-width: 50px;
+		min-width: 3em;
 		border: 1px solid $dark-gray-200;
 	}
 
@@ -21,8 +21,8 @@
 		word-break: normal;
 
 		svg {
-			min-width: 25px;
-			min-height: 25px;
+			min-width: 1.5em;
+			min-height: 1.5em;
 		}
 	}
 
@@ -47,7 +47,7 @@
 		}
 
 		.wp-block-search__button {
-			padding: 2px 8px;
+			padding: 0.125em 0.5em;
 		}
 	}
 }
