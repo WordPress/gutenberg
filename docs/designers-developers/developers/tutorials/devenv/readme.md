@@ -10,7 +10,7 @@ A development environment is a catch-all term for what you need setup on your co
 
 ## Quickstart
 
-For experienced developers, here is a summary of the guide, see each section for more details and explanations.
+Here is a summary of the guide. See each section for additional details and explanations.
 
 **1. Install Node development tools**
 
@@ -27,7 +27,7 @@ nvm install --lts
 
 **2. WordPress Development Site**
 
-First download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) follows instructions on their site for your OS.
+First download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) following the instructions for your OS.
 
 - Install WordPress environment tool
 
@@ -43,7 +43,7 @@ Open a text editor and create a `.wp-env.json` file with the following content:
 }
 ```
 
-This is a minimal file, you can also specify various features and plugins, see documentation for full details. The `"core": null` parameter indicates no version specified, so it defaults to the latest version.
+This is a minimal file, you can also specify various features and plugins, [see wp-env documentation](https://developer.wordpress.org/block-editor/packages/packages-env/) for full details. The `"core": null` parameter indicates no version specified, so it defaults to the latest version.
 
  Start the environment:
 
@@ -124,7 +124,7 @@ There are several ways to run WordPress locally on your own computer, or you cou
 
 The WordPress [wp-env package](https://www.npmjs.com/package/@wordpress/env) lets you set up a local WordPress environment for building and testing plugins and themes, without any additional configuration.
 
-The `wp-env` package requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
+The `wp-env` tool uses Docker to create a virtual machine to that runs the WordPress site. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
 After you have installed Docker, go ahead and install the `wp-env` tool. This command will install the tool globally, this means you can run it from any directory:
 
@@ -216,7 +216,7 @@ wp-env destroy
 npm -g uninstall @wordpress/env
 ```
 
-* To uninstall Docker, or Visual Studio Code use your OS method to remove packages. For example, on Windows run "Add or remove programs". You can additionally uninstall from the Docker Desktop app, click the bug icon at the top to switch to this Troubleshoot screen. Click Uninstallt or remove.
+* To uninstall Docker, or Visual Studio Code use your OS method to remove packages. For example, on Windows run "Add or remove programs". You can additionally uninstall from the Docker Desktop app, click the bug icon at the top to switch to this Troubleshoot screen. Click Uninstall or remove.
 
 ![Docker Troubleshoot Screenshot](https://developer.wordpress.org/files/2020/08/docker-uninstall-screen.png)
 
@@ -234,4 +234,12 @@ or, delete directly using:
 ```
 rm -rf "$HOME/.nvm"
 ```
+
+You can also clean up any installed JavaScript packages at `$HOME/.npm`
+
+```
+rm -rf "$HOME/.npm"
+```
+
+You can also remove the `.wp-env.json` file if created.
 
