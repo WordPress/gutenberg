@@ -39,7 +39,7 @@ const mergeTrees = ( baseData, userData ) => {
 	return mergedTree;
 };
 
-export const getGlobalStyles = ( blockData, baseTree, userTree ) => {
+export default ( blockData, baseTree, userTree ) => {
 	const styles = [];
 	// Can this be converted to a context, as the global context?
 	// See comment in the server.
