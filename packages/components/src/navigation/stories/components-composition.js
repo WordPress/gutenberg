@@ -27,10 +27,20 @@ function ComponentsCompositionExample() {
 				{ ( { NavigationItem, NavigationLevel } ) => (
 					<>
 						<NavigationLevel level="root" title="Home">
-							<NavigationItem slug="item-5" title="Item 5" />
+							<NavigationItem
+								slug="item-5"
+								title="Item 5"
+								badge="0"
+							/>
+							<NavigationItem
+								slug="external-link"
+								title="External Link"
+								href="https://wordpress.org"
+							/>
 							<NavigationItem
 								slug="item-1"
 								title="Item 1"
+								badge="2"
 								navigateToLevel="sub-menu"
 							/>
 						</NavigationLevel>
@@ -39,7 +49,7 @@ function ComponentsCompositionExample() {
 							level="sub-menu"
 							title="Sub Menu"
 							parentLevel="root"
-							parentTite="Home"
+							parentTitle="Home"
 						>
 							<NavigationItem
 								slug="item-2"
@@ -52,7 +62,7 @@ function ComponentsCompositionExample() {
 							level="nested-sub-menu"
 							title="SubSub Menu"
 							parentLevel="sub-menu"
-							parentTite="Sub Menu"
+							parentTitle="Sub Menu"
 						>
 							<NavigationItem slug="item-3" title="Item 3" />
 							<NavigationItem slug="item-4" title="Item 4" />

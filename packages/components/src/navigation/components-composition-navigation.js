@@ -15,6 +15,7 @@ import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import Animate from '../animate';
 import {
 	BackButtonUI,
+	BadgeUI,
 	MenuItemTitleUI,
 	MenuItemUI,
 	MenuTitleUI,
@@ -30,7 +31,7 @@ export default function ComponentsCompositionNavigation( {
 } ) {
 	const [ activeLevel, setActiveLevel ] = useState( initialActiveLevel );
 	const [ activeItem, setActiveItem ] = useState( initialActiveItem );
-	const [ slideOrigin, setSlideOrigin ] = useState( 'left' );
+	const [ slideOrigin, setSlideOrigin ] = useState();
 
 	const isMounted = useRef( false );
 	useEffect( () => {
@@ -47,9 +48,9 @@ export default function ComponentsCompositionNavigation( {
 	const NavigationLevel = ( {
 		children: levelChildren,
 		level,
-		title,
 		parentLevel,
-		parentTite,
+		parentTitle,
+		title,
 	} ) => {
 		if ( activeLevel !== level ) {
 			return null;
@@ -64,7 +65,7 @@ export default function ComponentsCompositionNavigation( {
 						onClick={ () => setLevel( parentLevel, 'right' ) }
 					>
 						<Icon icon={ chevronLeft } />
-						{ parentTite }
+						{ parentTitle }
 					</BackButtonUI>
 				) : null }
 				<MenuUI>
@@ -81,7 +82,9 @@ export default function ComponentsCompositionNavigation( {
 	};
 
 	const NavigationItem = ( {
+		badge,
 		children: itemChildren,
+		href,
 		navigateToLevel,
 		onClick,
 		slug,
@@ -92,6 +95,10 @@ export default function ComponentsCompositionNavigation( {
 		} );
 
 		const onItemClick = () => {
+			if ( href ) {
+				return onClick();
+			}
+
 			setActiveItem( 'slug' );
 			if ( navigateToLevel ) {
 				setLevel( navigateToLevel );
@@ -101,7 +108,7 @@ export default function ComponentsCompositionNavigation( {
 
 		return (
 			<MenuItemUI className={ classes }>
-				<Button onClick={ onItemClick }>
+				<Button href={ href } onClick={ onItemClick }>
 					{ title && (
 						<MenuItemTitleUI
 							className="components-navigation__menu-item-title"
@@ -113,6 +120,12 @@ export default function ComponentsCompositionNavigation( {
 					) }
 
 					{ itemChildren }
+
+					{ badge && (
+						<BadgeUI className="components-navigation__menu-item-badge">
+							{ badge }
+						</BadgeUI>
+					) }
 
 					{ navigateToLevel && <Icon icon={ chevronRight } /> }
 				</Button>
@@ -130,7 +143,8 @@ export default function ComponentsCompositionNavigation( {
 				{ ( { className: animateClassName } ) => (
 					<div
 						className={ classnames( {
-							[ animateClassName ]: isMounted.current,
+							[ animateClassName ]:
+								isMounted.current && slideOrigin,
 						} ) }
 					>
 						{ children( {
