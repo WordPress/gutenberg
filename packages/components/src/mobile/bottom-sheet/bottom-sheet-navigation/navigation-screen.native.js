@@ -6,7 +6,7 @@ import {
 	useNavigation,
 	useFocusEffect,
 } from '@react-navigation/native';
-import { View, Keyboard } from 'react-native';
+import { View } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -31,31 +31,19 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 		setIsFullScreen,
 	} = useContext( BottomSheetContext );
 
-	const { setHeight, setNavigationFullScreen } = useContext(
-		BottomSheetNavigationContext
-	);
+	const { setHeight } = useContext( BottomSheetNavigationContext );
 
 	const setHeightDebounce = useCallback(
 		debounce( ( height ) => {
 			setHeight( height, true );
-			setNavigationFullScreen( false );
 		}, 10 ),
-		[ setNavigationFullScreen, setHeight ]
-	);
-
-	const setFullHeight = useCallback(
-		( isFull ) => {
-			setIsFullScreen( isFull );
-			setNavigationFullScreen( isFull );
-		},
-		[ setNavigationFullScreen, setIsFullScreen ]
+		[ setHeight ]
 	);
 
 	useFocusEffect(
 		useCallback( () => {
 			onHandleHardwareButtonPress( () => {
 				if ( navigation.canGoBack() ) {
-					Keyboard.dismiss();
 					shouldEnableBottomSheetMaxHeight( true );
 					navigation.goBack();
 					return true;
@@ -64,13 +52,14 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 				return false;
 			} );
 			if ( fullScreen ) {
-				setFullHeight( true );
+				setHeight( '100%' );
+				setIsFullScreen( true );
 			} else if ( heightRef.current.maxHeight !== 0 ) {
+				setIsFullScreen( false );
 				setHeight( heightRef.current.maxHeight );
-				setFullHeight( false );
 			}
 			return () => {};
-		}, [ setFullHeight ] )
+		}, [ setHeight ] )
 	);
 	const onLayout = ( { nativeEvent } ) => {
 		if ( fullScreen ) {

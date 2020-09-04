@@ -2,8 +2,9 @@
  * External dependencies
  */
 import React from 'react';
-import { Keyboard, InteractionManager, Platform } from 'react-native';
+import { Platform, Keyboard } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { delay } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -22,29 +23,29 @@ const LinkPickerScreen = () => {
 	const onLinkPicked = ( { url, title } ) => {
 		if ( Platform.OS === 'android' ) {
 			Keyboard.dismiss();
-			InteractionManager.runAfterInteractions( () => {
+			delay( () => {
 				navigation.navigate( linkSettingsScreens.settings, {
 					inputValue: url,
 					text: title,
 				} );
-			} );
-		} else {
-			navigation.navigate( linkSettingsScreens.settings, {
-				inputValue: url,
-				text: title,
-			} );
+			}, 100 );
+			return;
 		}
+		navigation.navigate( linkSettingsScreens.settings, {
+			inputValue: url,
+			text: title,
+		} );
 	};
 
 	const onCancel = () => {
 		if ( Platform.OS === 'android' ) {
 			Keyboard.dismiss();
-			InteractionManager.runAfterInteractions( () => {
+			delay( () => {
 				navigation.goBack();
-			} );
-		} else {
-			navigation.goBack();
+			}, 100 );
+			return;
 		}
+		navigation.goBack();
 	};
 
 	const { inputValue } = route.params;
