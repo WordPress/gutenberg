@@ -46,16 +46,20 @@ export default function BlockNavigationBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { clientId } = block;
-	const isDragging = useSelect(
+	const { isDraggingThisBlock, isDraggingAnyBlock } = useSelect(
 		( select ) => {
-			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
-				'core/block-editor'
-			);
+			const {
+				isBlockBeingDragged,
+				isAncestorBeingDragged,
+				isDraggingBlocks,
+			} = select( 'core/block-editor' );
 
-			return (
-				isBlockBeingDragged( clientId ) ||
-				isAncestorBeingDragged( clientId )
-			);
+			return {
+				isDraggingThisBlock:
+					isBlockBeingDragged( clientId ) ||
+					isAncestorBeingDragged( clientId ),
+				isDraggingAnyBlock: isDraggingBlocks(),
+			};
 		},
 		[ clientId ]
 	);
@@ -65,7 +69,10 @@ export default function BlockNavigationBlock( {
 	);
 
 	const hasSiblings = siblingBlockCount > 0;
-	const hasRenderedMovers = showBlockMovers && hasSiblings;
+	const hasRenderedMovers =
+		! isDraggingAnyBlock && showBlockMovers && hasSiblings;
+	const hasRenderedSettingsMenu =
+		! isDraggingAnyBlock && __experimentalFeatures;
 	const hasVisibleMovers = isHovered || isFocused;
 	const moverCellClassName = classnames(
 		'block-editor-block-navigation-block__mover-cell',
@@ -90,7 +97,7 @@ export default function BlockNavigationBlock( {
 		<BlockNavigationLeaf
 			className={ classnames( {
 				'is-selected': isSelected,
-				'is-dragging': isDragging,
+				'is-dragging': isDraggingThisBlock,
 			} ) }
 			onMouseEnter={ () => setIsHovered( true ) }
 			onMouseLeave={ () => setIsHovered( false ) }
@@ -160,8 +167,7 @@ export default function BlockNavigationBlock( {
 					</TreeGridCell>
 				</>
 			) }
-
-			{ __experimentalFeatures && (
+			{ hasRenderedSettingsMenu && (
 				<TreeGridCell
 					className={ blockNavigationBlockSettingsClassName }
 				>
