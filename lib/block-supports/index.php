@@ -89,10 +89,12 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	// Apply new styles and classes.
 	if ( ! empty( $new_classes ) ) {
+		// `DOMElement::setAttribute` handles attribute value escaping.
 		$block_root->setAttribute( 'class', implode( ' ', $new_classes ) );
 	}
 
 	if ( ! empty( $new_styles ) ) {
+		// `DOMElement::setAttribute` handles attribute value escaping.
 		$block_root->setAttribute( 'style', implode( '; ', $new_styles ) . ';' );
 	}
 
