@@ -5,21 +5,27 @@
  * This will be used by blocks to print their styles on render.
  */
 function gutenberg_print_inject_stylesheet_script() {
-	?>
-	<script>
-	function wpEnqueueStyle( handle, src, deps, ver, media ) {
-		var style = document.createElement( 'link' );
-		style.id = handle + '-css';
-		style.rel = 'stylesheet';
-		style.href = src;
-		if ( ver ) {
-			style.href += 0 < style.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
+	if ( defined ( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+		?>
+		<script>
+		function wpEnqueueStyle( handle, src, deps, ver, media ) {
+			var style = document.createElement( 'link' );
+			style.id = handle + '-css';
+			style.rel = 'stylesheet';
+			style.href = src;
+			if ( ver ) {
+				style.href += 0 < style.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
+			}
+			style.media = media ? media : 'all';
+			document.getElementsByTagName( 'head' )[ 0 ].appendChild( style );
 		}
-		style.media = media ? media : 'all';
-		document.getElementsByTagName( 'head' )[ 0 ].appendChild( style );
+		</script>
+		<?php
+	} else {
+		?>
+		<script>function wpEnqueueStyle(e,n,t,l,u){var c=document.createElement("link");c.id=e+"-css";c.rel="stylesheet";c.href=n;if(l){c.href+=0<c.href.indexOf("?")?"&ver="+l:"?ver="+l}c.media=u?u:"all";document.getElementsByTagName("head")[0].appendChild(c)}</script>
+		<?php
 	}
-	</script>
-	<?php
 }
 add_action( 'wp_head', 'gutenberg_print_inject_stylesheet_script', 1 );
 
