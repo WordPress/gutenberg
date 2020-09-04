@@ -211,7 +211,12 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 
 		// Ensure auto-drafts of all theme supplied template parts are created.
 		if ( wp_get_theme()->get( 'TextDomain' ) === $request['theme'] ) {
-			// Get file paths for all theme supplied template parts.
+			/**
+			 * Finds all nested template part file paths in a theme's directory.
+			 *
+			 * @param string $base_directory The theme's file path.
+			 * @return array $path_list A list of paths to all template part files.
+			 */
 			function get_template_part_paths( $base_directory ) {
 				$path_list = array();
 				if ( file_exists( $base_directory . '/block-template-parts' ) ) {
@@ -224,6 +229,7 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 				return $path_list;
 			}
 
+			// Get file paths for all theme supplied template parts.
 			$template_part_files = get_template_part_paths( get_stylesheet_directory() );
 			if ( is_child_theme() ) {
 				$template_part_files = array_merge( $template_part_files, get_template_part_paths( get_template_directory() ) );
