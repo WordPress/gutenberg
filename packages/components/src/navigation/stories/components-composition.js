@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
  * External dependencies
  */
 import styled from '@emotion/styled';
@@ -11,9 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import ComponentsCompositionNavigation, {
-	NavigationItem,
-} from '../components-composition-navigation';
+import ComponentsCompositionNavigation from '../components-composition-navigation';
 
 export default {
 	title: 'Components/Navigation/Components Composition',
@@ -25,69 +18,44 @@ const Container = styled.div`
 `;
 
 function ComponentsCompositionExample() {
-	const [ activeItem, setActiveItem ] = useState( 'item-5' );
 	return (
 		<Container>
-			<ComponentsCompositionNavigation initialActiveLevel="root">
-				{ ( { activeLevel, NavigationCategory, NavigationLevel } ) => (
+			<ComponentsCompositionNavigation
+				initialActiveItem="item-5"
+				initialActiveLevel="root"
+			>
+				{ ( { NavigationItem, NavigationLevel } ) => (
 					<>
-						<NavigationLevel
-							slug="root"
-							title="Home"
-							activeLevel={ activeLevel }
-						>
+						<NavigationLevel level="root" title="Home">
+							<NavigationItem slug="item-5" title="Item 5" />
 							<NavigationItem
-								slug="item-5"
-								title="Item 5"
-								onClick={ () => {
-									setActiveItem( 'item-5' );
-								} }
-								activeItem={ activeItem }
-							/>
-							<NavigationCategory
 								slug="item-1"
 								title="Item 1"
-								navigateTo="sub-menu"
+								navigateToLevel="sub-menu"
 							/>
 						</NavigationLevel>
 
 						<NavigationLevel
-							slug="sub-menu"
+							level="sub-menu"
 							title="Sub Menu"
-							activeLevel={ activeLevel }
 							parentLevel="root"
 							parentTite="Home"
 						>
-							<NavigationCategory
+							<NavigationItem
 								slug="item-2"
 								title="Item 2"
-								navigateTo="nested-sub-menu"
+								navigateToLevel="nested-sub-menu"
 							/>
 						</NavigationLevel>
 
 						<NavigationLevel
-							slug="nested-sub-menu"
+							level="nested-sub-menu"
 							title="SubSub Menu"
-							activeLevel={ activeLevel }
 							parentLevel="sub-menu"
 							parentTite="Sub Menu"
 						>
-							<NavigationItem
-								slug="item-3"
-								title="Item 3"
-								onClick={ () => {
-									setActiveItem( 'item-3' );
-								} }
-								activeItem={ activeItem }
-							/>
-							<NavigationItem
-								slug="item-4"
-								title="Item 4"
-								onClick={ () => {
-									setActiveItem( 'item-4' );
-								} }
-								activeItem={ activeItem }
-							/>
+							<NavigationItem slug="item-3" title="Item 3" />
+							<NavigationItem slug="item-4" title="Item 4" />
 						</NavigationLevel>
 					</>
 				) }

@@ -24,10 +24,12 @@ import {
 import Button from '../button';
 
 export default function ComponentsCompositionNavigation( {
-	initialActiveLevel,
 	children,
+	initialActiveItem,
+	initialActiveLevel,
 } ) {
 	const [ activeLevel, setActiveLevel ] = useState( initialActiveLevel );
+	const [ activeItem, setActiveItem ] = useState( initialActiveItem );
 	const [ slideOrigin, setSlideOrigin ] = useState( 'left' );
 
 	const isMounted = useRef( false );
@@ -37,24 +39,19 @@ export default function ComponentsCompositionNavigation( {
 		}
 	}, [] );
 
-	const navigateTo = ( level ) => {
+	const setLevel = ( level, slideInOrigin = 'left' ) => {
 		setActiveLevel( level );
-		setSlideOrigin( 'left' );
+		setSlideOrigin( slideInOrigin );
 	};
 
-	const navigateBack = ( level ) => {
-		setActiveLevel( level );
-		setSlideOrigin( 'right' );
-	};
-
-	function NavigationLevel( {
+	const NavigationLevel = ( {
 		children: levelChildren,
-		slug,
+		level,
 		title,
 		parentLevel,
 		parentTite,
-	} ) {
-		if ( activeLevel !== slug ) {
+	} ) => {
+		if ( activeLevel !== level ) {
 			return null;
 		}
 
@@ -64,7 +61,7 @@ export default function ComponentsCompositionNavigation( {
 					<BackButtonUI
 						className="components-navigation__back-button"
 						isTertiary
-						onClick={ () => navigateBack( parentLevel ) }
+						onClick={ () => setLevel( parentLevel, 'right' ) }
 					>
 						<Icon icon={ chevronLeft } />
 						{ parentTite }
@@ -81,14 +78,43 @@ export default function ComponentsCompositionNavigation( {
 				</MenuUI>
 			</div>
 		);
-	}
+	};
 
-	const NavigationCategory = ( { title, navigateTo: to } ) => {
+	const NavigationItem = ( {
+		children: itemChildren,
+		navigateToLevel,
+		onClick,
+		slug,
+		title,
+	} ) => {
+		const classes = classnames( 'components-navigation__menu-item', {
+			'is-active': slug && activeItem === slug,
+		} );
+
+		const onItemClick = () => {
+			setActiveItem( 'slug' );
+			if ( navigateToLevel ) {
+				setLevel( navigateToLevel );
+			}
+			onClick();
+		};
+
 		return (
-			<MenuItemUI className="components-navigation__menu-item">
-				<Button onClick={ () => navigateTo( to ) }>
-					{ title }
-					<Icon icon={ chevronRight } />
+			<MenuItemUI className={ classes }>
+				<Button onClick={ onItemClick }>
+					{ title && (
+						<MenuItemTitleUI
+							className="components-navigation__menu-item-title"
+							variant="body.small"
+							as="span"
+						>
+							{ title }
+						</MenuItemTitleUI>
+					) }
+
+					{ itemChildren }
+
+					{ navigateToLevel && <Icon icon={ chevronRight } /> }
 				</Button>
 			</MenuItemUI>
 		);
@@ -108,34 +134,12 @@ export default function ComponentsCompositionNavigation( {
 						} ) }
 					>
 						{ children( {
-							activeLevel,
-							navigateTo,
-							NavigationCategory,
+							NavigationItem,
 							NavigationLevel,
 						} ) }
 					</div>
 				) }
 			</Animate>
 		</Root>
-	);
-}
-
-export function NavigationItem( { slug, title, onClick, activeItem } ) {
-	const classes = classnames( 'components-navigation__menu-item', {
-		'is-active': activeItem === slug,
-	} );
-
-	return (
-		<MenuItemUI className={ classes }>
-			<Button onClick={ onClick }>
-				<MenuItemTitleUI
-					className="components-navigation__menu-item-title"
-					variant="body.small"
-					as="span"
-				>
-					{ title }
-				</MenuItemTitleUI>
-			</Button>
-		</MenuItemUI>
 	);
 }
