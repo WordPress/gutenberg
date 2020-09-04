@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.37.0
 
 * [**] Add support for rounded style in Image block
+* [***] Full-width and wide alignment support for Group, Cover and Image block
 
 ## 1.36.0
 
