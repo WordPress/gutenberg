@@ -13,13 +13,15 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
+			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content, anchor } ) => {
-				return createBlock( name, {
-					content,
-					anchor,
-				} );
-			},
+			transform: ( attributes ) =>
+				attributes.map( ( { content, anchor } ) =>
+					createBlock( name, {
+						content,
+						anchor,
+					} )
+				),
 		},
 		{
 			type: 'raw',
@@ -69,13 +71,15 @@ const transforms = {
 	to: [
 		{
 			type: 'block',
+			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content, anchor } ) => {
-				return createBlock( 'core/paragraph', {
-					content,
-					anchor,
-				} );
-			},
+			transform: ( attributes ) =>
+				attributes.map( ( { content, anchor } ) =>
+					createBlock( 'core/paragraph', {
+						content,
+						anchor,
+					} )
+				),
 		},
 	],
 };

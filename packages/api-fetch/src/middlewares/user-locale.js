@@ -18,7 +18,7 @@ function userLocaleMiddleware( options, next ) {
 		options.path = addQueryArgs( options.path, { _locale: 'user' } );
 	}
 
-	return next( options, next );
+	return next( options );
 }
 
 export default userLocaleMiddleware;
