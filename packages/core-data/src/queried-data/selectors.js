@@ -77,12 +77,12 @@ function getQueriedItemsUncached( state, query ) {
 				// This accounts for the fact that queried items are stored by
 				// stable key without an associated fields query. Other requests
 				// may have included fewer fields properties.
-				const field = fields[ f ];
+				const field = fields[ f ].split( '.' );
 				if ( ! has( item, field ) ) {
 					return null;
 				}
-
-				set( filteredItem, field, get( item, field ) );
+				const value = get( item, field );
+				set( filteredItem, field, value );
 			}
 		} else {
 			// If expecting a complete item, validate that completeness, or
