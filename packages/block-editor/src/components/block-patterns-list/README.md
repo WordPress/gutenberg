@@ -20,12 +20,25 @@ Renders a block patterns list.
 ```jsx
 import { BlockPatternList } from '@wordpress/block-editor';
 
-const MyBreadcrumb = () => (
+const MyBlockPatternList = () => (
 	<BlockPatternList
-		onClickPattern={ onClick }
+		shownPatterns={ shownBlockPatterns }
+		blockPatterns={ shownBlockPatterns }
+		onClickPattern={ onSelectBlockPattern }
 	/>
 );
 ```
+
+### Props
+
+#### shownPatterns
+
+
+#### shownBlockPatterns
+
+
+#### onClickPattern
+
 
 ## Related components
 
