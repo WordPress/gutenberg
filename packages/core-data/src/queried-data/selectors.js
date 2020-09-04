@@ -3,6 +3,7 @@
  */
 import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
+import { get, has, set } from 'lodash';
 
 /**
  * Internal dependencies
@@ -77,11 +78,11 @@ function getQueriedItemsUncached( state, query ) {
 				// stable key without an associated fields query. Other requests
 				// may have included fewer fields properties.
 				const field = fields[ f ];
-				if ( ! item.hasOwnProperty( field ) ) {
+				if ( ! has( item, field ) ) {
 					return null;
 				}
 
-				filteredItem[ field ] = item[ field ];
+				set( filteredItem, field, get( item, field ) );
 			}
 		} else {
 			// If expecting a complete item, validate that completeness, or
