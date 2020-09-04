@@ -6,10 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Icon, chevronLeft } from '@wordpress/icons';
-import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
