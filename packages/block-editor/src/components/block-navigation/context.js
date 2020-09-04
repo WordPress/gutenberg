@@ -3,9 +3,10 @@
  */
 import { createContext, useContext } from '@wordpress/element';
 
-export const BlockNavigationContext = createContext( {
-	__experimentalFeatures: false,
-} );
+export const BlockNavigationFeaturesContext = createContext( false );
+export const useBlockNavigationFeaturesContext = () =>
+	useContext( BlockNavigationFeaturesContext );
 
-export const useBlockNavigationContext = () =>
-	useContext( BlockNavigationContext );
+export const BlockNavigationDropTargetContext = createContext( {} );
+export const useBlockNavigationDropTargetContext = () =>
+	useContext( BlockNavigationDropTargetContext );

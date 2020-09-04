@@ -3,14 +3,17 @@
  */
 
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { useMemo, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockNavigationBranch from './branch';
-import { BlockNavigationContext } from './context';
+import {
+	BlockNavigationFeaturesContext,
+	BlockNavigationDropTargetContext,
+} from './context';
 import useBlockNavigationDropZone from './use-block-navigation-drop-zone';
 
 /**
@@ -32,23 +35,21 @@ export default function BlockNavigationTree( {
 		blockDropTarget = undefined;
 	}
 
-	const contextValue = useMemo(
-		() => ( {
-			__experimentalFeatures,
-			blockDropTarget,
-		} ),
-		[ __experimentalFeatures, blockDropTarget ]
-	);
-
 	return (
 		<TreeGrid
 			className="block-editor-block-navigation-tree"
 			aria-label={ __( 'Block navigation structure' ) }
 			ref={ treeGridRef }
 		>
-			<BlockNavigationContext.Provider value={ contextValue }>
-				<BlockNavigationBranch { ...props } />
-			</BlockNavigationContext.Provider>
+			<BlockNavigationFeaturesContext.Provider
+				value={ __experimentalFeatures }
+			>
+				<BlockNavigationDropTargetContext.Provider
+					value={ blockDropTarget }
+				>
+					<BlockNavigationBranch { ...props } />
+				</BlockNavigationDropTargetContext.Provider>
+			</BlockNavigationFeaturesContext.Provider>
 		</TreeGrid>
 	);
 }

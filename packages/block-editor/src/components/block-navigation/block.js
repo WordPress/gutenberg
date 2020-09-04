@@ -28,7 +28,7 @@ import {
 import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
-import { useBlockNavigationContext } from './context';
+import { useBlockNavigationFeaturesContext } from './context';
 
 export default function BlockNavigationBlock( {
 	block,
@@ -71,18 +71,16 @@ export default function BlockNavigationBlock( {
 		'block-editor-block-navigation-block__mover-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
-	const {
-		__experimentalFeatures: withExperimentalFeatures,
-	} = useBlockNavigationContext();
+	const __experimentalFeatures = useBlockNavigationFeaturesContext();
 	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
 	useEffect( () => {
-		if ( withExperimentalFeatures && isSelected ) {
+		if ( __experimentalFeatures && isSelected ) {
 			cellRef.current.focus();
 		}
-	}, [ withExperimentalFeatures, isSelected ] );
+	}, [ __experimentalFeatures, isSelected ] );
 
 	const onSelectBlock = useCallback( () => onClick( clientId ), [
 		clientId,
@@ -163,7 +161,7 @@ export default function BlockNavigationBlock( {
 				</>
 			) }
 
-			{ withExperimentalFeatures && (
+			{ __experimentalFeatures && (
 				<TreeGridCell
 					className={ blockNavigationBlockSettingsClassName }
 				>
