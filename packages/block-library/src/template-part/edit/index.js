@@ -10,6 +10,7 @@ import {
 import { Dropdown, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
