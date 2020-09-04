@@ -76,14 +76,13 @@ const BlockNavigationBlockContents = forwardRef(
 		const isDroppingToInnerBlocks =
 			dropTargetRootClientId === clientId && dropPosition === 'inside';
 
-		const className = classnames(
-			'block-editor-block-navigation-block-contents',
-			{
+		const className = useMemo( () => {
+			return classnames( 'block-editor-block-navigation-block-contents', {
 				'is-dropping-before': isDroppingBefore || isBlockMoveTarget,
 				'is-dropping-after': isDroppingAfter,
 				'is-dropping-to-inner-blocks': isDroppingToInnerBlocks,
-			}
-		);
+			} );
+		}, [ isDroppingBefore, isDroppingAfter, isDroppingToInnerBlocks ] );
 
 		const clientIds = useMemo( () => [ clientId ], [ clientId ] );
 
