@@ -77,7 +77,6 @@ function gutenberg_the_block_stylesheet_loading_script( $block_name ) {
 				'handle' => '',
 				'src'    => '',
 				'ver'    => false,
-				'media'  => 'all',
 			]
 		);
 		echo "<script>wpEnqueueStyle('{$style['handle']}', '{$style['src']}', [], '{$style['ver']}', '{$style['media']}')</script>";
@@ -93,17 +92,52 @@ function gutenberg_the_block_stylesheet_loading_script( $block_name ) {
  */
 function gutenberg_get_block_stylesheet_urls( $block_name ) {
 
-	// An array of stylesheets per block-type.
-	$stylesheets = array(
-		'core/paragraph' => array(
+	$core_block_styles = array(
+		'audio',
+		'button',
+		'buttons',
+		'calendar',
+		'categories',
+		'columns',
+		'cover',
+		'embed',
+		'file',
+		'gallery',
+		'heading',
+		'image',
+		'latest-comments',
+		'latest-posts',
+		'list',
+		'media-text',
+		'navigation',
+		'navigation-link',
+		'paragraph',
+		'post-author',
+		'pullquote',
+		'quote',
+		'rss',
+		'search',
+		'separator',
+		'site-logo',
+		'social-links',
+		'spacer',
+		'subhead',
+		'table',
+		'text-columns',
+		'video',
+	);
+
+	$stylesheets = array();
+	foreach ( $core_block_styles as $block ) {
+		$stylesheets[ "core/$block" ] = array(
 			array(
-				'handle' => 'core-paragraph-block-styles',
-				'src'    => '/test.css',
-				'ver'    => time(),
+				'handle' => "core-$block-block-styles",
+				'src'    => gutenberg_url( "packages/block-library/build-style/$block.css" ),
+				'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$block.css" ),
 				'media'  => 'all',
 			),
-		),
-	);
+		);
+	}
 
 	/**
 	 * Filter collection of stylesheets per block-type.
