@@ -9,7 +9,7 @@ import {
 } from '@wordpress/block-editor';
 import { Dropdown, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { update } from '@wordpress/icons';
+import { chevronUp, chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -70,29 +70,31 @@ export default function TemplatePartEdit( {
 		return (
 			<BlockWrapper>
 				<BlockControls>
-					<TemplatePartNamePanel
-						postId={ postId }
-						setAttributes={ setAttributes }
-					/>
-					<Dropdown
-						className="wp-block-template-part__preview-dropdown-button"
-						contentClassName="wp-block-template-part__preview-dropdown-content"
-						position="bottom right left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								label={ __( 'Choose another' ) }
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
-								icon={ update }
-							/>
-						) }
-						renderContent={ ( { onClose } ) => (
-							<TemplatePartSelection
-								setAttributes={ setAttributes }
-								onClose={ onClose }
-							/>
-						) }
-					/>
+					<div className="wp-block-template-part__block-control-group">
+						<TemplatePartNamePanel
+							postId={ postId }
+							setAttributes={ setAttributes }
+						/>
+						<Dropdown
+							className="wp-block-template-part__preview-dropdown-button"
+							contentClassName="wp-block-template-part__preview-dropdown-content"
+							position="bottom right left"
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<Button
+									label={ __( 'Choose another' ) }
+									onClick={ onToggle }
+									aria-expanded={ isOpen }
+									icon={ isOpen ? chevronUp : chevronDown }
+								/>
+							) }
+							renderContent={ ( { onClose } ) => (
+								<TemplatePartSelection
+									setAttributes={ setAttributes }
+									onClose={ onClose }
+								/>
+							) }
+						/>
+					</div>
 				</BlockControls>
 				<TemplatePartInnerBlocks
 					postId={ postId }
