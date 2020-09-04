@@ -145,7 +145,7 @@ class BlockListBlock extends Component {
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
-		const screenWidth = Dimensions.get( 'window' ).width;
+		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 		return (
 			<TouchableWithoutFeedback
