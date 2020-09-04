@@ -855,9 +855,9 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		foreach ( $tests as $test ) {
-			$input = $test[0];
+			$input    = $test[0];
 			$expected = $test[1];
-			$result = apply_filters( 'render_block', $input, $block );
+			$result   = apply_filters( 'render_block', $input, $block );
 			$this->assertEquals( $expected, $result );
 		}
 	}
