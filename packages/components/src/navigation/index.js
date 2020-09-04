@@ -8,20 +8,13 @@ import classnames from 'classnames';
  */
 import { usePrevious } from '@wordpress/compose';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
-import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+import { Icon, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Animate from '../animate';
-import {
-	BackButtonUI,
-	MenuUI,
-	MenuItemUI,
-	Root,
-} from './styles/navigation-styles';
-import Button from '../button';
-import Text from '../text';
+import { BackButtonUI, Root } from './styles/navigation-styles';
 
 const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevelId, setActiveLevelId ] = useState( 'root' );
@@ -128,113 +121,6 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 		</Root>
 	);
 };
-
-export function Navigation2( { initialActiveLevel, children } ) {
-	const [ activeLevel, setActiveLevel ] = useState( initialActiveLevel );
-	const [ slideOrigin, setSlideOrigin ] = useState( 'left' );
-
-	const isMounted = useRef( false );
-	useEffect( () => {
-		if ( ! isMounted.current ) {
-			isMounted.current = true;
-		}
-	}, [] );
-
-	const navigateTo = ( level ) => {
-		setActiveLevel( level );
-		setSlideOrigin( 'left' );
-	};
-
-	const navigateBack = ( level ) => {
-		setActiveLevel( level );
-		setSlideOrigin( 'right' );
-	};
-
-	function Navigation2Level( {
-		children: levelChildren,
-		slug,
-		title,
-		parentLevel,
-		parentTite,
-	} ) {
-		if ( activeLevel !== slug ) {
-			return null;
-		}
-
-		return (
-			<div className="components-navigation__level">
-				{ parentLevel ? (
-					<Button
-						className="components-navigation__back-button"
-						isPrimary
-						onClick={ () => navigateBack( parentLevel ) }
-					>
-						<Icon icon={ chevronLeft } />
-						{ parentTite }
-					</Button>
-				) : null }
-				<h1>{ title }</h1>
-				<MenuUI>{ levelChildren }</MenuUI>
-			</div>
-		);
-	}
-
-	const Navigation2Category = ( { title, navigateTo: to } ) => {
-		return (
-			<MenuItemUI className="components-navigation__menu-item">
-				<Button onClick={ () => navigateTo( to ) }>
-					{ title }
-					<Icon icon={ chevronRight } />
-				</Button>
-			</MenuItemUI>
-		);
-	};
-
-	return (
-		<Root className="components-navigation">
-			<Animate
-				key={ activeLevel }
-				type="slide-in"
-				options={ { origin: slideOrigin } }
-			>
-				{ ( { className: animateClassName } ) => (
-					<div
-						className={ classnames( {
-							[ animateClassName ]: isMounted.current,
-						} ) }
-					>
-						{ children( {
-							activeLevel,
-							navigateTo,
-							Navigation2Category,
-							Navigation2Level,
-						} ) }
-					</div>
-				) }
-			</Animate>
-		</Root>
-	);
-}
-
-export function Navigation2Item( { slug, title, onClick, activeItem } ) {
-	const classes = classnames( 'components-navigation__menu-item', {
-		'is-active': activeItem === slug,
-	} );
-
-	return (
-		<MenuItemUI className={ classes }>
-			<Button onClick={ onClick }>
-				<Text
-					className="components-navigation__menu-item-title"
-					variant="body.small"
-					as="span"
-				>
-					{ title }
-				</Text>
-			</Button>
-		</MenuItemUI>
-	);
-}
 
 export default Navigation;
 export { default as NavigationMenu } from './menu';

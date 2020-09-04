@@ -12,7 +12,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import Navigation, { Navigation2, Navigation2Item } from '../';
+import Navigation from '../';
 import NavigationMenu from '../menu';
 import NavigationMenuItem from '../menu-item';
 
@@ -180,75 +180,3 @@ const Container = styled.div`
 export const _default = () => {
 	return <Example />;
 };
-
-function ComponentsCompositionExample() {
-	const [ activeItem, setActiveItem ] = useState( 'item-5' );
-	return (
-		<Navigation2 initialActiveLevel="root">
-			{ ( { activeLevel, Navigation2Category, Navigation2Level } ) => (
-				<>
-					<Navigation2Level
-						slug="root"
-						title="Home"
-						activeLevel={ activeLevel }
-					>
-						<Navigation2Item
-							slug="item-5"
-							title="Item 5"
-							onClick={ () => {
-								setActiveItem( 'item-5' );
-							} }
-							activeItem={ activeItem }
-						/>
-						<Navigation2Category
-							slug="item-1"
-							title="Item 1"
-							navigateTo="sub-menu"
-						/>
-					</Navigation2Level>
-
-					<Navigation2Level
-						slug="sub-menu"
-						title="Sub Menu"
-						activeLevel={ activeLevel }
-						parentLevel="root"
-						parentTite="Home"
-					>
-						<Navigation2Category
-							slug="item-2"
-							title="Item 2"
-							navigateTo="nested-sub-menu"
-						/>
-					</Navigation2Level>
-
-					<Navigation2Level
-						slug="nested-sub-menu"
-						title="SubSub Menu"
-						activeLevel={ activeLevel }
-						parentLevel="sub-menu"
-						parentTite="Sub Menu"
-					>
-						<Navigation2Item
-							slug="item-3"
-							title="Item 3"
-							onClick={ () => {
-								setActiveItem( 'item-3' );
-							} }
-							activeItem={ activeItem }
-						/>
-						<Navigation2Item
-							slug="item-4"
-							title="Item 4"
-							onClick={ () => {
-								setActiveItem( 'item-4' );
-							} }
-							activeItem={ activeItem }
-						/>
-					</Navigation2Level>
-				</>
-			) }
-		</Navigation2>
-	);
-}
-
-export const componentsComposition = () => <ComponentsCompositionExample />;
