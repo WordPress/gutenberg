@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { Icon, chevronLeft } from '@wordpress/icons';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
+import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -21,6 +22,7 @@ import {
 	Root,
 } from './styles/navigation-styles';
 import Button from '../button';
+import Text from '../text';
 
 const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	const [ activeLevelId, setActiveLevelId ] = useState( 'root' );
@@ -128,8 +130,8 @@ const Navigation = ( { activeItemId, children, data, rootTitle } ) => {
 	);
 };
 
-export function Navigation2( { children } ) {
-	const [ activeLevel, setActiveLevel ] = useState( 'root' );
+export function Navigation2( { initialActiveLevel, children } ) {
+	const [ activeLevel, setActiveLevel ] = useState( initialActiveLevel );
 	const [ slideOrigin, setSlideOrigin ] = useState( 'left' );
 
 	const isMounted = useRef( false );
@@ -149,15 +151,43 @@ export function Navigation2( { children } ) {
 		setSlideOrigin( 'right' );
 	};
 
-	const NavigationBackButton = ( { parentLevel, label } ) => {
+	function Navigation2Level( {
+		children: levelChildren,
+		slug,
+		title,
+		parentLevel,
+		parentTite,
+	} ) {
+		if ( activeLevel !== slug ) {
+			return null;
+		}
+
 		return (
-			<Button
-				className="components-navigation__back-button"
-				isPrimary
-				onClick={ () => navigateBack( parentLevel ) }
-			>
-				{ label }
-			</Button>
+			<div className="components-navigation__level">
+				{ parentLevel ? (
+					<Button
+						className="components-navigation__back-button"
+						isPrimary
+						onClick={ () => navigateBack( parentLevel ) }
+					>
+						<Icon icon={ chevronLeft } />
+						{ parentTite }
+					</Button>
+				) : null }
+				<h1>{ title }</h1>
+				<MenuUI>{ levelChildren }</MenuUI>
+			</div>
+		);
+	}
+
+	const Navigation2Category = ( { title, navigateTo: to } ) => {
+		return (
+			<MenuItemUI className="components-navigation__menu-item">
+				<Button onClick={ () => navigateTo( to ) }>
+					{ title }
+					<Icon icon={ chevronRight } />
+				</Button>
+			</MenuItemUI>
 		);
 	};
 
@@ -177,32 +207,13 @@ export function Navigation2( { children } ) {
 						{ children( {
 							activeLevel,
 							navigateTo,
-							NavigationBackButton,
+							Navigation2Category,
+							Navigation2Level,
 						} ) }
 					</div>
 				) }
 			</Animate>
 		</Root>
-	);
-}
-
-export function Navigation2Level( {
-	children,
-	slug,
-	title,
-	activeLevel,
-	navigateBack,
-} ) {
-	if ( activeLevel !== slug ) {
-		return null;
-	}
-
-	return (
-		<div className="components-navigation__level">
-			{ navigateBack }
-			<h1>{ title }</h1>
-			<MenuUI>{ children }</MenuUI>
-		</div>
 	);
 }
 
@@ -213,7 +224,15 @@ export function Navigation2Item( { slug, title, onClick, activeItem } ) {
 
 	return (
 		<MenuItemUI className={ classes }>
-			<Button onClick={ onClick }>{ title }</Button>
+			<Button onClick={ onClick }>
+				<Text
+					className="components-navigation__menu-item-title"
+					variant="body.small"
+					as="span"
+				>
+					{ title }
+				</Text>
+			</Button>
 		</MenuItemUI>
 	);
 }

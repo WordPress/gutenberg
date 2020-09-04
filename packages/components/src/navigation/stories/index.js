@@ -12,11 +12,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import Navigation, {
-	Navigation2,
-	Navigation2Level,
-	Navigation2Item,
-} from '../';
+import Navigation, { Navigation2, Navigation2Item } from '../';
 import NavigationMenu from '../menu';
 import NavigationMenuItem from '../menu-item';
 
@@ -186,10 +182,10 @@ export const _default = () => {
 };
 
 function ComponentsCompositionExample() {
-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+	const [ activeItem, setActiveItem ] = useState( 'item-5' );
 	return (
-		<Navigation2>
-			{ ( { activeLevel, navigateTo, NavigationBackButton } ) => (
+		<Navigation2 initialActiveLevel="root">
+			{ ( { activeLevel, Navigation2Category, Navigation2Level } ) => (
 				<>
 					<Navigation2Level
 						slug="root"
@@ -197,12 +193,17 @@ function ComponentsCompositionExample() {
 						activeLevel={ activeLevel }
 					>
 						<Navigation2Item
-							slug="item-1"
-							title="Item 1"
+							slug="item-5"
+							title="Item 5"
 							onClick={ () => {
-								navigateTo( 'sub-menu' );
+								setActiveItem( 'item-5' );
 							} }
 							activeItem={ activeItem }
+						/>
+						<Navigation2Category
+							slug="item-1"
+							title="Item 1"
+							navigateTo="sub-menu"
 						/>
 					</Navigation2Level>
 
@@ -210,20 +211,13 @@ function ComponentsCompositionExample() {
 						slug="sub-menu"
 						title="Sub Menu"
 						activeLevel={ activeLevel }
-						navigateBack={
-							<NavigationBackButton
-								parentLevel="root"
-								label="Back to Home"
-							/>
-						}
+						parentLevel="root"
+						parentTite="Home"
 					>
-						<Navigation2Item
+						<Navigation2Category
 							slug="item-2"
 							title="Item 2"
-							onClick={ () => {
-								navigateTo( 'nested-sub-menu' );
-							} }
-							activeItem={ activeItem }
+							navigateTo="nested-sub-menu"
 						/>
 					</Navigation2Level>
 
@@ -231,18 +225,22 @@ function ComponentsCompositionExample() {
 						slug="nested-sub-menu"
 						title="SubSub Menu"
 						activeLevel={ activeLevel }
-						navigateBack={
-							<NavigationBackButton
-								parentLevel="sub-menu"
-								label="Back to Sub Menu"
-							/>
-						}
+						parentLevel="sub-menu"
+						parentTite="Sub Menu"
 					>
 						<Navigation2Item
 							slug="item-3"
 							title="Item 3"
 							onClick={ () => {
 								setActiveItem( 'item-3' );
+							} }
+							activeItem={ activeItem }
+						/>
+						<Navigation2Item
+							slug="item-4"
+							title="Item 4"
+							onClick={ () => {
+								setActiveItem( 'item-4' );
 							} }
 							activeItem={ activeItem }
 						/>
