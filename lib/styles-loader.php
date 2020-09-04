@@ -7,22 +7,15 @@
 function gutenberg_print_inject_stylesheet_script() {
 	?>
 	<script>
-	function wpInjectStylesheet( attr ) {
-		if ( ! attr ) {
-			return;
+	function wpEnqueueStyle( handle, src, deps, ver, media ) {
+		var style = document.createElement( 'link' );
+		style.id = handle + '-css';
+		style.rel = 'stylesheet';
+		style.href = src;
+		if ( ver ) {
+			style.href += 0 < style.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
 		}
-		var style, i, attrKeys;
-		attr.rel = attr.rel || 'stylesheet';
-		attr.type = attr.type || 'text/css';
-		attrKeys = Object.keys( attr );
-		if ( attr.id && document.getElementById( attr.id ) ) {
-			return;
-		}
-		style = document.createElement( 'link' );
-		console.log(attrKeys);
-		for ( i = 0; i < attrKeys.length; i++ ) {
-			style[ attrKeys[ i ] ] = attr[ attrKeys[ i ] ];
-		}
+		style.media = media ? media : 'all';
 		document.getElementsByTagName( 'head' )[ 0 ].appendChild( style );
 	}
 	</script>
@@ -68,18 +61,20 @@ add_filter( 'render_block', 'gutenberg_inject_block_stylesheet_loading_script', 
 function gutenberg_the_block_stylesheet_loading_script( $block_name ) {
 
 	// Get an array of stylesheets for this block.
-	$stylesheets = gutenberg_get_block_stylesheet_urls( $block_name );
+	$styles = gutenberg_get_block_stylesheet_urls( $block_name );
 
-	// Loop stylesheets and inject them in <head>.
-	foreach ( $stylesheets as $stylesheet ) {
-		?>
-		<script>
-		wpInjectStylesheet( {
-			href: '<?php echo esc_url( $stylesheet ); ?>',
-			id: 'injected-block-style-<?php echo esc_attr( str_replace( '/', '-', $block_name ) ); ?>'
-		} );
-		</script>
-		<?php
+	// Loop styles and inject them in <head>.
+	foreach ( $styles as $style ) {
+		$style = wp_parse_args(
+			$style,
+			[
+				'handle' => '',
+				'src'    => '',
+				'ver'    => false,
+				'media'  => 'all',
+			]
+		);
+		echo "<script>wpEnqueueStyle('{$style['handle']}', '{$style['src']}', [], '{$style['ver']}', '{$style['media']}')</script>";
 	}
 }
 
@@ -94,7 +89,14 @@ function gutenberg_get_block_stylesheet_urls( $block_name ) {
 
 	// An array of stylesheets per block-type.
 	$stylesheets = array(
-		'core/paragraph' => array( 'https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/block-library/src/paragraph/style.scss' ),
+		'core/paragraph' => array(
+			array(
+				'handle' => 'core-paragraph-block-styles',
+				'src'    => '/test.css',
+				'ver'    => time(),
+				'media'  => 'all',
+			),
+		),
 	);
 
 	/**
