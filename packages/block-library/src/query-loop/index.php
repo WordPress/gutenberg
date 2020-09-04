@@ -19,12 +19,28 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
 
 	$query = array(
-		'post_type'    => 'post',
-		'offset'       => isset( $block->context['query']['perPage'] ) ? ( $block->context['query']['perPage'] * ( $page - 1 ) + $block->context['query']['offset'] ) : 0,
-		'category__in' => $block->context['query']['categoryIds'],
+		'post_type' => 'post',
+		'offset'    => 0,
+		'order'     => 'DESC',
+		'orderby'   => 'date',
 	);
-	if ( isset( $block->context['query']['perPage'] ) ) {
-		$query['posts_per_page'] = $block->context['query']['perPage'];
+
+	if ( isset( $block->context['query'] ) ) {
+		if ( isset( $block->context['query']['perPage'] ) ) {
+			$query['offset'] = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
+		}
+		if ( isset( $block->context['query']['categoryIds'] ) ) {
+			$query['category__in'] = $block->context['query']['categoryIds'];
+		}
+		if ( isset( $block->context['query']['order'] ) ) {
+			$query['order'] = strtoupper( $block->context['query']['order'] );
+		}
+		if ( isset( $block->context['query']['orderBy'] ) ) {
+			$query['orderby'] = $block->context['query']['orderBy'];
+		}
+		if ( isset( $block->context['query']['perPage'] ) ) {
+			$query['posts_per_page'] = $block->context['query']['perPage'];
+		}
 	}
 	$posts = get_posts( $query );
 

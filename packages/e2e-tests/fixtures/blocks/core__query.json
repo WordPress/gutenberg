@@ -1,17 +1,19 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/query",
-        "isValid": true,
-        "attributes": {
-            "query": {
-                "perPage": 3,
-                "pages": 1,
-                "offset": 0,
-                "categoryIds": []
-            }
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/query",
+		"isValid": true,
+		"attributes": {
+			"query": {
+				"perPage": 3,
+				"pages": 1,
+				"offset": 0,
+				"categoryIds": [],
+				"order": "desc",
+				"orderBy": "date"
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

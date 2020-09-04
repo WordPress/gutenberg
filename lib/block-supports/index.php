@@ -58,10 +58,16 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	$dom = new DOMDocument( '1.0', 'utf-8' );
 
-	// Suppress warnings from this method from polluting the front-end.
-	// @codingStandardsIgnoreStart
-	if ( ! @$dom->loadHTML( $wrapper_left . $block_content . $wrapper_right , LIBXML_HTML_NODEFDTD | LIBXML_COMPACT ) ) {
-	// @codingStandardsIgnoreEnd
+	// Suppress DOMDocument::loadHTML warnings from polluting the front-end.
+	$previous = libxml_use_internal_errors( true );
+
+	$success = $dom->loadHTML( $wrapper_left . $block_content . $wrapper_right, LIBXML_HTML_NODEFDTD | LIBXML_COMPACT );
+
+	// Clear errors and reset the use_errors setting.
+	libxml_clear_errors();
+	libxml_use_internal_errors( $previous );
+
+	if ( ! $success ) {
 		return $block_content;
 	}
 
@@ -90,7 +96,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		$block_root->setAttribute( 'style', esc_attr( implode( '; ', $new_styles ) . ';' ) );
 	}
 
-	return str_replace( array( $wrapper_left, $wrapper_right ), '', $dom->saveHtml() );
+	return $dom->saveHtml( $block_root );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 

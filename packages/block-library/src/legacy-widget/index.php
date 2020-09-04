@@ -74,8 +74,8 @@ function block_core_legacy_widget_render_widget_by_id( $id ) {
 function render_block_core_legacy_widget( $attributes ) {
 	$id           = null;
 	$widget_class = null;
-	if ( isset( $attributes['id'] ) ) {
-		$id = $attributes['id'];
+	if ( isset( $attributes['widgetId'] ) ) {
+		$id = $attributes['widgetId'];
 	}
 	if ( isset( $attributes['widgetClass'] ) ) {
 		$widget_class = $attributes['widgetClass'];

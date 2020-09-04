@@ -12,6 +12,7 @@ const inquirer = require( 'inquirer' );
  */
 const sleep = util.promisify( setTimeout );
 const rimraf = util.promisify( require( 'rimraf' ) );
+const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
  * Internal dependencies
@@ -65,6 +66,11 @@ module.exports = async function start( { spinner, debug, update } ) {
 			workDirectoryPath,
 		} ) );
 
+	const dockerComposeConfig = {
+		config: config.dockerComposeConfigPath,
+		log: config.debug,
+	};
+
 	/**
 	 * If the Docker image is already running and the `wp-env` files have been
 	 * deleted, the start command will not complete successfully. Stopping
@@ -78,13 +84,39 @@ module.exports = async function start( { spinner, debug, update } ) {
 	 */
 	if ( shouldConfigureWp ) {
 		await stop( { spinner, debug } );
+		// Update the images before starting the services again.
+		spinner.text = 'Updating docker images.';
+
+		const directoryHash = path.basename( workDirectoryPath );
+
+		// Note: when the base docker image is updated, we want that operation to
+		// also update WordPress. Since we store wordpress/tests-wordpress files
+		// as docker volumes, simply updating the image will not change those
+		// files. Thus, we need to remove those volumes in order for the files
+		// to be updated when pulling the new images.
+		const volumesToRemove = `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress`;
+
+		try {
+			if ( config.debug ) {
+				spinner.text = `Removing the WordPress volumes: ${ volumesToRemove }`;
+			}
+			await exec( `docker volume rm ${ volumesToRemove }` );
+		} catch {
+			// Note: we do not care about this error condition because it will
+			// mostly happen when the volume already exists. This error would not
+			// stop wp-env from working correctly.
+		}
+
+		await dockerCompose.pullAll( dockerComposeConfig );
 		spinner.text = 'Downloading sources.';
 	}
 
 	await Promise.all( [
 		dockerCompose.upOne( 'mysql', {
-			config: config.dockerComposeConfigPath,
-			log: config.debug,
+			...dockerComposeConfig,
+			commandOptions: shouldConfigureWp
+				? [ '--build', '--force-recreate' ]
+				: [],
 		} ),
 		shouldConfigureWp && downloadSources( config, spinner ),
 	] );
@@ -96,8 +128,10 @@ module.exports = async function start( { spinner, debug, update } ) {
 	spinner.text = 'Starting WordPress.';
 
 	await dockerCompose.upMany( [ 'wordpress', 'tests-wordpress' ], {
-		config: config.dockerComposeConfigPath,
-		log: config.debug,
+		...dockerComposeConfig,
+		commandOptions: shouldConfigureWp
+			? [ '--build', '--force-recreate' ]
+			: [],
 	} );
 
 	// Only run WordPress install/configuration when config has changed.

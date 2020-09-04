@@ -9,7 +9,10 @@ import { get, isEmpty } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	__experimentalUseEditorFeature as useEditorFeature,
+} from '@wordpress/block-editor';
 import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 
@@ -24,7 +27,8 @@ const title = __( 'Text Color' );
 const EMPTY_ARRAY = [];
 
 function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
-	const { colors, disableCustomColors } = useSelect( ( select ) => {
+	const allowCustomControl = useEditorFeature( 'color.custom' );
+	const { colors } = useSelect( ( select ) => {
 		const blockEditorSelect = select( 'core/block-editor' );
 		let settings;
 		if ( blockEditorSelect && blockEditorSelect.getSettings ) {
@@ -34,7 +38,6 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 		}
 		return {
 			colors: get( settings, [ 'colors' ], EMPTY_ARRAY ),
-			disableCustomColors: settings.disableCustomColors,
 		};
 	} );
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
@@ -54,8 +57,7 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 		};
 	}, [ value, colors ] );
 
-	const hasColorsToChoose =
-		! isEmpty( colors ) || disableCustomColors !== true;
+	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
 		return null;
 	}

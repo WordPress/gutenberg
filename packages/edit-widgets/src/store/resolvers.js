@@ -30,7 +30,16 @@ export function* getWidgetAreas() {
 
 	const widgetAreaBlocks = [];
 	const widgetIdToClientId = {};
-	for ( const widgetArea of widgetAreas ) {
+	const sortedWidgetAreas = widgetAreas.sort( ( a, b ) => {
+		if ( a.id === 'wp_inactive_widgets' ) {
+			return 1;
+		}
+		if ( b.id === 'wp_inactive_widgets' ) {
+			return -1;
+		}
+		return 0;
+	} );
+	for ( const widgetArea of sortedWidgetAreas ) {
 		const widgetBlocks = [];
 		for ( const widget of widgetArea.widgets ) {
 			const block = transformWidgetToBlock( widget );
