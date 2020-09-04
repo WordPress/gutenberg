@@ -41,7 +41,7 @@ Start the environment:
  wp-env start
  ```
 
-You will have a full WordPress site installed, navigate to: http://localhost:8888/ the defualt user is "admin" and default password is "password"
+You will have a full WordPress site installed, navigate to: http://localhost:8888/ using your browser, log in to the WordPress dashboard at http://localhost:8888/wp-admin/ using Username "admin" and Password "password", without the quotes.
 
 
 **3. Code Editor**
