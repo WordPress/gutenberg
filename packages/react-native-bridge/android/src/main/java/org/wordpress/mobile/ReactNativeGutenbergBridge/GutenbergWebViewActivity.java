@@ -1,6 +1,7 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -185,6 +186,11 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 super.onPageCommitVisible(view, url);
             }
 
+            @Override public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                injectOnPageLoadExternalSources();
+                super.onPageStarted(view, url, favicon);
+            }
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
@@ -193,8 +199,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     mIsRedirected = false;
                     return;
                 }
-
-                injectOnPageLoadExternalSources();
 
                 String contentFunctions = getFileContentFromAssets("gutenberg-web-single-block/content-functions.js");
                 evaluateJavaScript(contentFunctions);
@@ -222,11 +226,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
-        mWebView.postDelayed(new Runnable() {
-            @Override public void run() {
-                mWebView.setVisibility(View.VISIBLE);
-            }
-        }, 1500);
+        mWebView.setVisibility(View.VISIBLE);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
