@@ -24,7 +24,9 @@ Renders a list of blocks types.
 ```jsx
 import { BlockTypesList } from '@wordpress/block-editor';
 
-<BlockTypesList items={ filteredItems } />;
+<BlockTypesList
+	items={ filteredItems }
+/>;
 ```
 
 ### Props
