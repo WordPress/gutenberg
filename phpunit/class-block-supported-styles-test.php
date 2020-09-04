@@ -817,4 +817,48 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$this->assertEmpty( $errors, 'Libxml errors should be dropped.' );
 	}
+
+	/**
+	 * Ensures block attributes are output correctly.
+	 *
+	 * Some blocks saved with valid attributes were broken after the block was rendered. Ensure that
+	 * block attributes are escaped correctly and safely.
+	 */
+	public function test_render_block_attribute() {
+		$this->register_block_type( 'core/example', array( 'render_callback' => true ) );
+
+		$block = array(
+			'blockName' => 'core/example',
+			'attrs'     => array(),
+		);
+
+		// Tests of shape [ [ $input, $expected_result ], … ].
+		$tests = array(
+
+			// Valid single quotes in double-quoted attribute.
+			array(
+				'<div style="background-image:url(\'https://example.com/image.png?example=query&amp;args\')"></div>',
+				'<div style="background-image: url(\'https://example.com/image.png?example=query&amp;args\');" class="wp-block-example"></div>',
+			),
+
+			// Valid double quotes in single-quoted attribute.
+			array(
+				'<div style=\'background-image:url("https://example.com/image.png?example=query&amp;args")\'></div>',
+				'<div style=\'background-image: url("https://example.com/image.png?example=query&amp;args");\' class="wp-block-example"></div>',
+			),
+
+			// Encode attributes.
+			array(
+				'<div style="&quot;><script>alert(1)</script>"></div>',
+				'<div style=\'"&gt;&lt;script&gt;alert(1)&lt;/script&gt;;\' class="wp-block-example"></div>',
+			),
+		);
+
+		foreach ( $tests as $test ) {
+			$input    = $test[0];
+			$expected = $test[1];
+			$result   = apply_filters( 'render_block', $input, $block );
+			$this->assertEquals( $expected, $result );
+		}
+	}
 }
