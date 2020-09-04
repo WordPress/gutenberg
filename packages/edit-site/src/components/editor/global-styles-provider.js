@@ -61,11 +61,17 @@ export default ( { children, baseStyles, contexts } ) => {
 		[ contexts, content ]
 	);
 
-	// Take the DOM node in an effect that only runs on mount.
-	let styleNode;
 	useEffect( () => {
+		if (
+			typeof contexts !== 'object' ||
+			typeof baseStyles !== 'object' ||
+			typeof userStyles !== 'object'
+		) {
+			return;
+		}
+
 		const embeddedStylesheetId = 'global-styles-inline-css';
-		styleNode = document.getElementById( embeddedStylesheetId );
+		let styleNode = document.getElementById( embeddedStylesheetId );
 
 		if ( ! styleNode ) {
 			styleNode = document.createElement( 'style' );
@@ -74,24 +80,13 @@ export default ( { children, baseStyles, contexts } ) => {
 				.getElementsByTagName( 'head' )[ 0 ]
 				.appendChild( styleNode );
 		}
-	}, [] );
-
-	useEffect( () => {
-		if (
-			typeof contexts !== 'object' ||
-			typeof baseStyles !== 'object' ||
-			typeof userStyles !== 'object' ||
-			! styleNode
-		) {
-			return;
-		}
 
 		styleNode.innerText = getGlobalStyles(
 			contexts,
 			baseStyles,
 			userStyles
 		);
-	}, [ contexts, baseStyles, content, styleNode ] );
+	}, [ contexts, baseStyles, content ] );
 
 	return (
 		<GlobalStylesContext.Provider value={ nextValue }>
