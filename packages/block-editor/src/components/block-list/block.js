@@ -111,7 +111,10 @@ function BlockListBlock( {
 		[ clientId ]
 	);
 	const { removeBlock } = useDispatch( 'core/block-editor' );
-	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
+	const onRemove = useCallback( () => removeBlock( clientId ), [
+		clientId,
+		removeBlock,
+	] );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
@@ -197,23 +200,40 @@ function BlockListBlock( {
 		);
 	}
 
-	const value = {
-		clientId,
-		rootClientId,
-		isSelected,
-		isFirstMultiSelected,
-		isLastMultiSelected,
-		isPartOfMultiSelection,
-		enableAnimation,
-		index,
-		className: wrapperClassName,
-		isLocked,
-		name,
-		mode,
-		blockTitle: blockType.title,
-		wrapperProps,
-	};
-	const memoizedValue = useMemo( () => value, Object.values( value ) );
+	const memoizedValue = useMemo(
+		() => ( {
+			clientId,
+			rootClientId,
+			isSelected,
+			isFirstMultiSelected,
+			isLastMultiSelected,
+			isPartOfMultiSelection,
+			enableAnimation,
+			index,
+			className: wrapperClassName,
+			isLocked,
+			name,
+			mode,
+			blockTitle: blockType.title,
+			wrapperProps,
+		} ),
+		[
+			clientId,
+			rootClientId,
+			isSelected,
+			isFirstMultiSelected,
+			isLastMultiSelected,
+			isPartOfMultiSelection,
+			enableAnimation,
+			index,
+			wrapperClassName,
+			isLocked,
+			name,
+			mode,
+			blockType.title,
+			wrapperProps,
+		]
+	);
 
 	let block;
 

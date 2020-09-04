@@ -7,14 +7,7 @@ import { find, isNil, pickBy, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	forwardRef,
-	useEffect,
-	useRef,
-	useState,
-	useMemo,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BACKSPACE,
 	DELETE,
@@ -25,6 +18,11 @@ import {
 	ESCAPE,
 } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import {
+	useLazyRef,
+	useShallowCompareEffect,
+	useDidMount,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -135,6 +133,63 @@ function fixPlaceholderSelection( defaultView ) {
 	}
 
 	selection.collapseToStart();
+}
+
+function useReapply( {
+	TagName,
+	placeholder,
+	_value,
+	value,
+	record,
+	selectionStart,
+	selectionEnd,
+	isSelected,
+	remainingProps,
+	applyFromProps,
+} ) {
+	const shouldReapplyRef = useRef( false );
+
+	useEffect( () => {
+		shouldReapplyRef.current = true;
+	}, [ TagName, placeholder ] );
+
+	useEffect( () => {
+		if ( value !== _value.current ) {
+			shouldReapplyRef.current = true;
+		}
+	}, [ value, _value ] );
+
+	useEffect( () => {
+		const hasSelectionChanged =
+			selectionStart !== record.current.start ||
+			selectionEnd !== record.current.end;
+
+		if ( isSelected && hasSelectionChanged ) {
+			shouldReapplyRef.current = true;
+		} else if ( hasSelectionChanged ) {
+			record.current = {
+				...record.current,
+				start: selectionStart,
+				end: selectionEnd,
+			};
+		}
+	}, [ selectionStart, selectionEnd, isSelected, record ] );
+
+	const prefix = 'format_prepare_props_';
+	const predicate = ( v, key ) => key.startsWith( prefix );
+	const prepareProps = pickBy( remainingProps, predicate );
+
+	useShallowCompareEffect( () => {
+		shouldReapplyRef.current = true;
+	}, Object.values( prepareProps ) );
+
+	useEffect( () => {
+		if ( shouldReapplyRef.current ) {
+			applyFromProps();
+
+			shouldReapplyRef.current = false;
+		}
+	} );
 }
 
 function RichText( {
@@ -274,14 +329,12 @@ function RichText( {
 
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
-	const record = useRef(
-		useMemo( () => {
-			const initialRecord = formatToValue( value );
-			initialRecord.start = selectionStart;
-			initialRecord.end = selectionEnd;
-			return initialRecord;
-		}, [] )
-	);
+	const record = useLazyRef( () => {
+		const initialRecord = formatToValue( value );
+		initialRecord.start = selectionStart;
+		initialRecord.end = selectionEnd;
+		return initialRecord;
+	} );
 
 	function createRecord() {
 		const selection = getWin().getSelection();
@@ -812,8 +865,6 @@ function RichText( {
 		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
 	}
 
-	const didMount = useRef( false );
-
 	/**
 	 * Syncs the selection to local state. A callback for the `selectionchange`
 	 * native events, `keyup`, `mouseup` and `touchend` synthetic events, and
@@ -1043,52 +1094,8 @@ function RichText( {
 		applyRecord( record.current );
 	}
 
-	useEffect( () => {
-		if ( didMount.current ) {
-			applyFromProps();
-		}
-	}, [ TagName, placeholder ] );
-
-	useEffect( () => {
-		if ( didMount.current && value !== _value.current ) {
-			applyFromProps();
-		}
-	}, [ value ] );
-
-	useEffect( () => {
-		if ( ! didMount.current ) {
-			return;
-		}
-
-		if (
-			isSelected &&
-			( selectionStart !== record.current.start ||
-				selectionEnd !== record.current.end )
-		) {
-			applyFromProps();
-		} else {
-			record.current = {
-				...record.current,
-				start: selectionStart,
-				end: selectionEnd,
-			};
-		}
-	}, [ selectionStart, selectionEnd, isSelected ] );
-
-	const prefix = 'format_prepare_props_';
-	const predicate = ( v, key ) => key.startsWith( prefix );
-	const prepareProps = pickBy( remainingProps, predicate );
-
-	useEffect( () => {
-		if ( didMount.current ) {
-			applyFromProps();
-		}
-	}, Object.values( prepareProps ) );
-
-	useLayoutEffect( () => {
+	useDidMount( () => {
 		applyRecord( record.current, { domOnly: true } );
-
-		didMount.current = true;
 
 		return () => {
 			getDoc().removeEventListener(
@@ -1098,7 +1105,20 @@ function RichText( {
 			getWin().cancelAnimationFrame( rafId.current );
 			getWin().clearTimeout( timeout.current );
 		};
-	}, [] );
+	} );
+
+	useReapply( {
+		TagName,
+		placeholder,
+		_value,
+		value,
+		record,
+		selectionStart,
+		selectionEnd,
+		isSelected,
+		remainingProps,
+		applyFromProps,
+	} );
 
 	function focus() {
 		ref.current.focus();
