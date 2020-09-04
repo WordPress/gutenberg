@@ -9,36 +9,12 @@ import { View } from 'react-native';
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { InnerBlocks, withColors } from '@wordpress/block-editor';
-import { useCallback } from '@wordpress/element';
-import { WIDE_ALIGNMENTS } from '@wordpress/components';
-
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
 
-function GroupEdit( {
-	attributes,
-	hasInnerBlocks,
-	isSelected,
-	getStylesFromColorScheme,
-} ) {
-	const { align } = attributes;
-	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
-
-	const renderAppender = useCallback(
-		() => (
-			<View
-				style={ [
-					isFullWidth && hasInnerBlocks && styles.fullWidthAppender,
-				] }
-			>
-				<InnerBlocks.ButtonBlockAppender />
-			</View>
-		),
-		[ align, hasInnerBlocks ]
-	);
-
+function GroupEdit( { hasInnerBlocks, isSelected, getStylesFromColorScheme } ) {
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
 			<View
@@ -57,16 +33,10 @@ function GroupEdit( {
 	}
 
 	return (
-		<View
-			style={ [
-				isSelected && hasInnerBlocks && styles.innerBlocks,
-				isSelected &&
-					! hasInnerBlocks &&
-					isFullWidth &&
-					styles.fullWidth,
-			] }
-		>
-			<InnerBlocks renderAppender={ isSelected && renderAppender } />
+		<View style={ isSelected && hasInnerBlocks && styles.innerBlocks }>
+			<InnerBlocks
+				renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
+			/>
 		</View>
 	);
 }

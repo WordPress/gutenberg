@@ -410,7 +410,6 @@ const Cover = ( {
 							onSelectMediaUploadOption={ onSelectMedia }
 							openMediaOptions={ openMediaOptionsRef.current }
 							url={ url }
-							width={ styles.image.width }
 						/>
 					</View>
 				) }

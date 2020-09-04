@@ -79,10 +79,6 @@ export { default as ImageEditingButton } from './mobile/image/image-editing-butt
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';
-export {
-	WIDE_ALIGNMENTS,
-	ALIGNMENT_BREAKPOINTS,
-} from './mobile/utils/alignments';
 
 export {
 	default as GlobalStylesContext,

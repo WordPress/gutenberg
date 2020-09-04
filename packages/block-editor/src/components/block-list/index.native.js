@@ -14,7 +14,6 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
-	WIDE_ALIGNMENTS,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -388,13 +387,7 @@ class EmptyListComponent extends Component {
 
 		return (
 			<View style={ styles.defaultAppender }>
-				<ReadableContentView
-					align={
-						renderAppender
-							? WIDE_ALIGNMENTS.alignments.full
-							: undefined
-					}
-				>
+				<ReadableContentView>
 					<BlockListAppender
 						rootClientId={ rootClientId }
 						renderAppender={ renderAppender }
