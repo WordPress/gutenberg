@@ -182,8 +182,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     );
                 }
 
-                injectOnPageLoadExternalSources();
-
                 super.onPageCommitVisible(view, url);
             }
 
@@ -195,6 +193,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     mIsRedirected = false;
                     return;
                 }
+
+                injectOnPageLoadExternalSources();
 
                 String contentFunctions = getFileContentFromAssets("gutenberg-web-single-block/content-functions.js");
                 evaluateJavaScript(contentFunctions);
@@ -226,7 +226,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             @Override public void run() {
                 mWebView.setVisibility(View.VISIBLE);
             }
-        }, 1000);
+        }, 1500);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
