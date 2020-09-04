@@ -45,7 +45,7 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( gutenberg_use_widgets_block_editor() ) {
+	if ( gutenberg_use_widgets_block_editor() && isset( $submenu['themes.php'] ) ) {
 		add_theme_page(
 			__( 'Widgets', 'gutenberg' ),
 			__( 'Widgets', 'gutenberg' ),
