@@ -615,6 +615,24 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 		}
 		$features['global']['color']['custom'] = false;
 	}
+	if ( get_theme_support( 'disable-custom-gradients' ) ) {
+		if ( ! isset( $features['global']['gradient'] ) ) {
+			$features['global']['gradient'] = array();
+		}
+		$features['global']['gradient']['custom'] = false;
+	}
+	if ( get_theme_support( 'disable-custom-font-sizes' ) ) {
+		if ( ! isset( $features['global']['fontSize'] ) ) {
+			$features['global']['fontSize'] = array();
+		}
+		$features['global']['fontSize']['custom'] = false;
+	}
+	if ( get_theme_support( 'custom-line-height' ) ) {
+		if ( ! isset( $features['global']['lineHeight'] ) ) {
+			$features['global']['lineHeight'] = array();
+		}
+		$features['global']['lineHeight']['custom'] = true;
+	}
 
 	return $features;
 }
@@ -646,8 +664,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$settings['styles'][] = array( 'css' => $stylesheet );
 
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
+
 	// Unsetting deprecated settings defined by Core.
 	unset( $settings['disableCustomColors'] );
+	unset( $settings['disableCustomGradients'] );
+	unset( $settings['disableCustomFontSizes'] );
+	unset( $settings['enableCustomLineHeight'] );
 
 	return $settings;
 }

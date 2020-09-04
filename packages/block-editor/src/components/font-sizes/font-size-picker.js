@@ -1,16 +1,28 @@
 /**
  * WordPress dependencies
  */
-import { FontSizePicker } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { FontSizePicker as BaseFontSizePicker } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
-export default withSelect( ( select ) => {
-	const { disableCustomFontSizes, fontSizes } = select(
-		'core/block-editor'
-	).getSettings();
+/**
+ * Internal dependencies
+ */
+import useEditorFeature from '../use-editor-feature';
 
-	return {
-		disableCustomFontSizes,
-		fontSizes,
-	};
-} )( FontSizePicker );
+function FontSizePicker( props ) {
+	const fontSizes = useSelect(
+		( select ) => select( 'core/block-editor' ).getSettings().fontSizes,
+		[]
+	);
+	const disableCustomFontSizes = ! useEditorFeature( 'fontSize.custom' );
+
+	return (
+		<BaseFontSizePicker
+			{ ...props }
+			fontSizes={ fontSizes }
+			disableCustomFontSizes={ disableCustomFontSizes }
+		/>
+	);
+}
+
+export default FontSizePicker;

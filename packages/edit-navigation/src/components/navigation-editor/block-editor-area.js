@@ -110,7 +110,9 @@ export default function BlockEditorArea( {
 							label="Block inspector"
 						/>
 					) }
-					renderContent={ () => <BlockInspector /> }
+					renderContent={ () => (
+						<BlockInspector bubblesVirtually={ false } />
+					) }
 				/>
 			</CardHeader>
 			<CardBody>

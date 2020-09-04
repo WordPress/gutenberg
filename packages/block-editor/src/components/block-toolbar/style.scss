@@ -44,6 +44,31 @@
 	}
 }
 
+// Block controls.
+.block-editor-block-toolbar__block-controls {
+	// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+	height: auto !important;
+	padding: 0 !important;
+
+	// Switcher.
+	.block-editor-block-switcher .components-dropdown-menu__toggle,
+	.block-editor-block-switcher__no-switcher-icon {
+		min-width: $block-toolbar-height - $grid-unit-15 / 2 !important;
+		width: $block-toolbar-height - $grid-unit-15 / 2 !important;
+		padding-left: $grid-unit-15 - $border-width !important;
+		padding-right: $grid-unit-15 / 2 !important;
+
+		.block-editor-block-icon {
+			width: $button-size-small !important;
+			margin: 0 !important;
+		}
+
+		&:focus::before {
+			right: $grid-unit-05 !important;
+		}
+	}
+}
+
 .block-editor-block-toolbar,
 .block-editor-format-toolbar {
 	// Override Toolbar buttons size.

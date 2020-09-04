@@ -130,6 +130,15 @@
 			},
 			"color": {
 				"custom": true
+			},
+			"gradient": {
+				"custom": true
+			},
+			"fontSize": {
+				"custom": true
+			},
+			"lineHeight": {
+				"custom": false
 			}
 		}
 	}

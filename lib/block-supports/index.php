@@ -89,14 +89,16 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	// Apply new styles and classes.
 	if ( ! empty( $new_classes ) ) {
-		$block_root->setAttribute( 'class', esc_attr( implode( ' ', $new_classes ) ) );
+		// `DOMElement::setAttribute` handles attribute value escaping.
+		$block_root->setAttribute( 'class', implode( ' ', $new_classes ) );
 	}
 
 	if ( ! empty( $new_styles ) ) {
-		$block_root->setAttribute( 'style', esc_attr( implode( '; ', $new_styles ) . ';' ) );
+		// `DOMElement::setAttribute` handles attribute value escaping.
+		$block_root->setAttribute( 'style', implode( '; ', $new_styles ) . ';' );
 	}
 
-	return str_replace( array( $wrapper_left, $wrapper_right ), '', $dom->saveHtml() );
+	return $dom->saveHtml( $block_root );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 

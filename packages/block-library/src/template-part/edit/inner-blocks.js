@@ -19,6 +19,7 @@ export default function TemplatePartInnerBlocks( {
 			value={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
+			__experimentalTagName="div"
 			renderAppender={ hasInnerBlocks ? undefined : renderAppender }
 		/>
 	);

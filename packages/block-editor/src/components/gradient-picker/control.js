@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty, pick } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import GradientPicker from './';
+import useEditorFeature from '../use-editor-feature';
 
 export default function GradientPickerControl( {
 	className,
@@ -23,14 +24,12 @@ export default function GradientPickerControl( {
 	label = __( 'Gradient Presets' ),
 	...props
 } ) {
-	const { gradients = [], disableCustomGradients } = useSelect(
-		( select ) =>
-			pick( select( 'core/block-editor' ).getSettings(), [
-				'gradients',
-				'disableCustomGradients',
-			] ),
-		[]
-	);
+	const gradients =
+		useSelect(
+			( select ) => select( 'core/block-editor' ).getSettings().gradients,
+			[]
+		) ?? [];
+	const disableCustomGradients = ! useEditorFeature( 'gradient.custom' );
 	if ( isEmpty( gradients ) && disableCustomGradients ) {
 		return null;
 	}
