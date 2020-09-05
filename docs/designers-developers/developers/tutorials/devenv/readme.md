@@ -46,7 +46,7 @@ You will have a full WordPress site installed, navigate to: http://localhost:888
 
 **3. Code Editor**
 
-You can use any code editor, [Visual Studio Code](https://code.visualstudio.com/) is a popular open-source tool, follow instructions on their site for your OS.
+You can use any text editor to write code. For example, Visual Studio Code](https://code.visualstudio.com/) is a popular open-source editor. You can follow instructions on their site to install it for your OS.
 
 
 ## Node Development Tools
@@ -116,7 +116,7 @@ The WordPress [wp-env package](https://www.npmjs.com/package/@wordpress/env) let
 
 The `wp-env` tool uses Docker to create a virtual machine to that runs the WordPress site. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
-After you have installed Docker, go ahead and install the `wp-env` tool. This command will install the tool globally, this means you can run it from any directory:
+After you have installed Docker, go ahead and install the `wp-env` tool. This command will install the tool globally, which means you can run it from any directory:
 
 ```sh
 npm -g install @wordpress/env
@@ -129,7 +129,7 @@ wp-env --version
 > 1.6.0
 ```
 
-The `wp-env` script is used to create a Docker WordPress environment. You can use this script to start an environment from your plugin directory, for example if you are following the create block tutorial, this would be in the generated directory like so:
+The `wp-env` script is used to create a Docker WordPress environment. You can use this script to start an environment with your plugin activated by running it from the directory containing your plugin. For example if you are following the create block tutorial, this would be in the generated directory like so:
 
 ```sh
 npx @wordpress/create-block starter-block
@@ -139,7 +139,7 @@ wp-env start
 
 You can access your environment in your browser at: [http://localhost:8888/](http://localhost:8888/), the default username is `admin` and default password is `password`. For more information controlling the Docker environment see the [@wordpress/env package readme](/packages/env/README.md).
 
-When using the script while developing a single plugin, when you run `wp-env start` it will mount and activate the plugin automatically. Note: This also works for themes, run from the directory you are developing the theme.
+When using the script while developing a single plugin, `wp-env start` can mount and activate the plugin automatically when run from the directory containing the plugin. Note: This also works for themes when run from the directory in which you are developing the theme.
 
 If you run `wp-env start` from a directory that is not a plugin or theme, a generic WordPress environment will be created. The script will display the following warning, it is fine if this is your intention.
 
@@ -147,12 +147,12 @@ If you run `wp-env start` from a directory that is not a plugin or theme, a gene
 !! Warning: could not find a .wp-env.json configuration file and could not determine if 'DIR' is a WordPress installation, a plugin, or a theme.
 ```
 
-The `.wp-env.json` file is a configuration file used to create an environment that works with multiple plugins and/or themes. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson).
+You can use the `.wp-env.json` configuration file to create an environment that works with multiple plugins and/or themes. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson).
 
 
 #### Troubleshooting
 
-If you run into an issue, when trying to run `wp-env` a common one is `Error while running docker-compose command.`
+A common issue when running `wp-env` is `Error while running docker-compose command.`
 
 - Check that Docker Desktop is started and running.
 - Check Docker Desktop dashboard for logs, restart, or remove existing VMs.
@@ -164,7 +164,7 @@ If you see the error: `Host is already in use by another container`
 
 ### Alternative to Docker
 
-Docker is just one method to run a local WordPress environment. Block development and extending WordPress is done using normal plugins, so any WordPress environment can be used. A couple of alternatives that you can consider, that do not require installing Docker.
+Docker is just one method to run a local WordPress environment. Block development and extending WordPress is done using normal plugins, so any WordPress environment can be used. Here are some alternatives that you can consider which do not require installing Docker.
 
 -   [Local by Flywheel](https://localbyflywheel.com/) - Local is a single application you download and install. You will need to know where the plugin directory is located after install. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`
 
@@ -188,7 +188,7 @@ Here are a few instructions if you need to start over, or want to remove what wa
 
 ### Local Environment
 
-* You can remove the local environment data for a specific project:
+* You can remove the local environment completely for a specific project:
 
 ```
 wp-env destroy
@@ -222,4 +222,3 @@ rm -rf "$HOME/.npm"
 ```
 
 Just as you confirmed the installation worked, you can confirm the uninstall worked if you try to run `npm -v`, `node -v`, and `nvm -v` you should then see a "command not found" error in the terminal.
-
