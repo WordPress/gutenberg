@@ -42,24 +42,24 @@ const NavigationContext = createContext( {
 
 export default function ComponentsCompositionNavigation( {
 	children,
-	initialActiveItem,
-	initialActiveLevel = DEFAULT_LEVEL,
-	setInitialActiveItem = noop,
-	setInitialActiveLevel = noop,
+	activeItem,
+	activeLevel = DEFAULT_LEVEL,
+	setActiveItem = noop,
+	setActiveLevel = noop,
 } ) {
-	const [ item, setItem ] = useState( initialActiveItem );
-	const [ level, setLevel ] = useState( initialActiveLevel );
+	const [ item, setItem ] = useState( activeItem );
+	const [ level, setLevel ] = useState( activeLevel );
 	const [ slideOrigin, setSlideOrigin ] = useState();
 
-	const setActiveLevel = ( levelId, slideInOrigin = 'left' ) => {
-		setSlideOrigin( slideInOrigin );
-		setLevel( levelId );
-		setInitialActiveLevel( levelId );
+	const activateItem = ( itemId ) => {
+		setItem( itemId );
+		setActiveItem( itemId );
 	};
 
-	const setActiveItem = ( itemId ) => {
-		setItem( itemId );
-		setInitialActiveItem( itemId );
+	const activateLevel = ( levelId, slideInOrigin = 'left' ) => {
+		setSlideOrigin( slideInOrigin );
+		setLevel( levelId );
+		setActiveLevel( levelId );
 	};
 
 	const isMounted = useRef( false );
@@ -70,19 +70,19 @@ export default function ComponentsCompositionNavigation( {
 	}, [] );
 
 	useEffect( () => {
-		if ( initialActiveItem !== item ) {
-			setActiveItem( initialActiveItem );
+		if ( activeItem !== item ) {
+			activateItem( activeItem );
 		}
-		if ( initialActiveLevel !== level ) {
-			setActiveLevel( initialActiveLevel );
+		if ( activeLevel !== level ) {
+			activateLevel( activeLevel );
 		}
-	}, [ initialActiveItem, initialActiveLevel ] );
+	}, [ activeItem, activeLevel ] );
 
 	const context = {
 		activeItem: item,
 		activeLevel: level,
-		setActiveItem,
-		setActiveLevel,
+		setActiveItem: activateItem,
+		setActiveLevel: activateLevel,
 	};
 
 	return (
@@ -111,24 +111,24 @@ export default function ComponentsCompositionNavigation( {
 
 export const NavigationLevel = ( {
 	children: levelChildren,
-	levelId = DEFAULT_LEVEL,
-	parentLevelId,
+	level = DEFAULT_LEVEL,
+	parentLevel,
 	parentLevelTitle,
 	title,
 } ) => {
 	const { activeLevel, setActiveLevel } = useContext( NavigationContext );
 
-	if ( activeLevel !== levelId ) {
+	if ( activeLevel !== level ) {
 		return null;
 	}
 
 	return (
 		<div className="components-navigation__level">
-			{ parentLevelId ? (
+			{ parentLevel ? (
 				<BackButtonUI
 					className="components-navigation__back-button"
 					isTertiary
-					onClick={ () => setActiveLevel( parentLevelId, 'right' ) }
+					onClick={ () => setActiveLevel( parentLevel, 'right' ) }
 				>
 					<Icon icon={ chevronLeft } />
 					{ parentLevelTitle }
@@ -151,7 +151,7 @@ export const NavigationItem = ( {
 	badge,
 	children: itemChildren,
 	href,
-	itemId,
+	item,
 	navigateToLevel,
 	onClick = noop,
 	title,
@@ -162,15 +162,16 @@ export const NavigationItem = ( {
 	);
 
 	const classes = classnames( 'components-navigation__menu-item', {
-		'is-active': itemId && activeItem === itemId,
+		'is-active': item && activeItem === item,
 	} );
 
 	const onItemClick = () => {
+		setActiveItem( item );
+
 		if ( href ) {
 			return onClick();
 		}
 
-		setActiveItem( itemId );
 		if ( navigateToLevel ) {
 			setActiveLevel( navigateToLevel );
 		}
