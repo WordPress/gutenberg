@@ -88,6 +88,21 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 				'menu-item-status'    => 'publish',
 			)
 		);
+
+		/** @var WP_REST_Server $wp_rest_server */
+		global $wp_rest_server;
+		$wp_rest_server = new Spy_REST_Server;
+		do_action( 'rest_api_init', $wp_rest_server );
+	}
+
+	/**
+	 * @since 9.0.0
+	 */
+	public function tearDown() {
+		parent::tearDown();
+		/** @var WP_REST_Server $wp_rest_server */
+		global $wp_rest_server;
+		$wp_rest_server = null;
 	}
 
 	/**
@@ -96,7 +111,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	public function test_batch_requires_allow_batch_opt_in() {
 		register_rest_route(
 			'test-ns/v1',
-			'test',
+			'/test',
 			array(
 				'methods'             => 'POST',
 				'callback'            => static function () {
