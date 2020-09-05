@@ -35,7 +35,7 @@ First download, install, and start [Docker Desktop](https://www.docker.com/produ
 npm -g install @wordpress/env
 ```
 
-Start the environment:
+Start the environment from an existing plugin or theme directory, or a new working directory:
 
  ```
  wp-env start
@@ -188,7 +188,13 @@ Here are a few instructions if you need to start over, or want to remove what wa
 
 ### Local Environment
 
-* You can remove the local environment completely for a specific project:
+* If you just want to reset and clean the WordPress database:
+
+```
+wp-env clean all
+```
+
+* To remove the local environment completely for a specific project:
 
 ```
 wp-env destroy
