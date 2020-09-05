@@ -198,7 +198,7 @@ function gutenberg_register_sidebars_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_sidebars_endpoint' );
 
 /**
- * Registers the Sidebars REST API routes.
+ * Registers the Batch REST API routes.
  */
 function gutenberg_register_batch_endpoint() {
 	$batch = new WP_REST_Batch_Controller();
