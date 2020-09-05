@@ -55,7 +55,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		);
 		if ( isset( $schema['properties']['password'] ) ) {
 			$get_item_args['password'] = array(
-				'description' => __( 'The password for the post if it is password protected.' ),
+				'description' => __( 'The password for the post if it is password protected.', 'gutenberg' ),
 				'type'        => 'string',
 			);
 		}
@@ -65,7 +65,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			array(
 				'args'        => array(
 					'id' => array(
-						'description' => __( 'Unique identifier for the object.' ),
+						'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 				),
@@ -89,7 +89,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 						'force' => array(
 							'type'        => 'boolean',
 							'default'     => false,
-							'description' => __( 'Whether to bypass Trash and force deletion.' ),
+							'description' => __( 'Whether to bypass Trash and force deletion.', 'gutenberg' ),
 						),
 					),
 				),

@@ -13,18 +13,6 @@
  */
 class WP_REST_Batch_Controller {
 
-	/** @var WP_REST_Server */
-	private $server;
-
-	/**
-	 * Constructor.
-	 *
-	 * @since 9.0.0
-	 */
-	public function __construct() {
-		$this->server = rest_get_server();
-	}
-
 	/**
 	 * Registers the REST API route.
 	 *
@@ -101,6 +89,7 @@ class WP_REST_Batch_Controller {
 			$single_request = new WP_REST_Request( $batch_request->get_method(), $parsed_url['path'] );
 
 			if ( ! empty( $parsed_url['query'] ) ) {
+				$query_args = null; // Satisfy linter.
 				wp_parse_str( $parsed_url['query'], $query_args );
 				$single_request->set_query_params( $query_args );
 			}
@@ -112,7 +101,7 @@ class WP_REST_Batch_Controller {
 			$requests[] = $single_request;
 		}
 
-		if ( ! method_exists( $this->server, 'match_request_to_handler' ) ) {
+		if ( ! method_exists( rest_get_server(), 'match_request_to_handler' ) ) {
 			return $this->polyfill_batching( $requests );
 		}
 
@@ -121,7 +110,7 @@ class WP_REST_Batch_Controller {
 		$has_error  = false;
 
 		foreach ( $requests as $single_request ) {
-			$match     = $this->server->match_request_to_handler( $single_request );
+			$match     = rest_get_server()->match_request_to_handler( $single_request );
 			$matches[] = $match;
 			$error     = null;
 
@@ -135,7 +124,7 @@ class WP_REST_Batch_Controller {
 				if ( isset( $handler['allow_batch'] ) ) {
 					$allow_batch = $handler['allow_batch'];
 				} else {
-					$allow_batch = ! empty( $this->server->get_route_options( $route )['allow_batch'] );
+					$allow_batch = ! empty( rest_get_server()->get_route_options( $route )['allow_batch'] );
 				}
 
 				if ( ! $allow_batch ) {
@@ -174,7 +163,7 @@ class WP_REST_Batch_Controller {
 		if ( $has_error && 'require-all-validate' === $batch_request['validation'] ) {
 			foreach ( $validation as $valid ) {
 				if ( is_wp_error( $valid ) ) {
-					$responses[] = $this->server->envelope_response( $this->error_to_response( $valid ), false )->get_data();
+					$responses[] = rest_get_server()->envelope_response( $this->error_to_response( $valid ), false )->get_data();
 				} else {
 					$responses[] = null;
 				}
@@ -196,7 +185,7 @@ class WP_REST_Batch_Controller {
 			$clean_request->set_default_params( array() );
 
 			/** This filter is documented in wp-includes/rest-api/class-wp-rest-server.php */
-			$result = apply_filters( 'rest_pre_dispatch', null, $this->server, $clean_request );
+			$result = apply_filters( 'rest_pre_dispatch', null, rest_get_server(), $clean_request );
 
 			if ( empty( $result ) ) {
 				$match = $matches[ $i ];
@@ -214,19 +203,19 @@ class WP_REST_Batch_Controller {
 					if ( ! $error && ! is_callable( $handler['callback'] ) ) {
 						$error = new WP_Error(
 							'rest_invalid_handler',
-							__( 'The handler for the route is invalid' ),
+							__( 'The handler for the route is invalid', 'gutenberg' ),
 							array( 'status' => 500 )
 						);
 					}
 
-					$result = $this->server->respond_to_request( $batch_request, $route, $handler, $error );
+					$result = rest_get_server()->respond_to_request( $batch_request, $route, $handler, $error );
 				}
 			}
 
 			/** This filter is documented in wp-includes/rest-api/class-wp-rest-server.php */
-			$result = apply_filters( 'rest_post_dispatch', rest_ensure_response( $result ), $this->server, $batch_request );
+			$result = apply_filters( 'rest_post_dispatch', rest_ensure_response( $result ), rest_get_server(), $batch_request );
 
-			$responses[] = $this->server->envelope_response( $result, false )->get_data();
+			$responses[] = rest_get_server()->envelope_response( $result, false )->get_data();
 		}
 
 		return new WP_REST_Response( array( 'responses' => $responses ), WP_Http::MULTI_STATUS );
@@ -250,15 +239,15 @@ class WP_REST_Batch_Controller {
 					__( 'The requested route does not support batch requests.', 'gutenberg' ),
 					array( 'status' => 400 )
 				);
-				$responses[] = $this->server->envelope_response( $this->error_to_response( $error ), false )->get_data();
+				$responses[] = rest_get_server()->envelope_response( $this->error_to_response( $error ), false )->get_data();
 				continue;
 			}
 
-			$result = $this->server->dispatch( $request );
+			$result = rest_get_server()->dispatch( $request );
 			/** This filter is documented in wp-includes/rest-api/class-wp-rest-server.php */
-			$result = apply_filters( 'rest_post_dispatch', rest_ensure_response( $result ), $this->server, $request );
+			$result = apply_filters( 'rest_post_dispatch', rest_ensure_response( $result ), rest_get_server(), $request );
 
-			$responses[] = $this->server->envelope_response( $result, false )->get_data();
+			$responses[] = rest_get_server()->envelope_response( $result, false )->get_data();
 		}
 
 		return new WP_REST_Response( array( 'responses' => $responses ), WP_Http::MULTI_STATUS );
