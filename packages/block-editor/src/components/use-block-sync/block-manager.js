@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 const DIRECTION_IN = 'in';
 const DIRECTION_OUT = 'out';
@@ -52,30 +52,40 @@ function createBlockClientIdManager( shouldMapBlocks ) {
 	};
 }
 
-const _instanceReference = {};
+const _entityListenerReference = {};
+function assocateWithEntity( entityId ) {
+	if ( ! entityId ) {
+		return false;
+	}
+
+	const hasExistingListener = !! _entityListenerReference[ entityId ];
+	if ( ! hasExistingListener ) {
+		_entityListenerReference[ entityId ] = true;
+	}
+	return hasExistingListener;
+}
+
 export default function useBlockManager( entityId ) {
-	const manager = useRef(
-		createBlockClientIdManager( !! _instanceReference[ entityId ] )
+	// TODO: useState vs useRef here? Unsure if a change in the manager should
+	// re-run useBlockSync, or if pointing at the ref works fine.
+	const [ manager, updateManager ] = useState(
+		createBlockClientIdManager( assocateWithEntity( entityId ) )
 	);
 
 	const entityIdRef = useRef( entityId );
-	if ( entityIdRef.current ) {
-		_instanceReference[ entityIdRef.current ] = true;
-	}
 
+	// This side effect creates a new block client ID manager if and only if the
+	// component starts using blocks from a new entity. Since consumers require
+	// the manager before this effect would be run, we initalize the manager
+	// above and then avoid initalizing a new one the first time the effect runs.
 	useEffect( () => {
-		if ( ! entityId ) {
-			entityIdRef.current = null;
-			return;
+		if ( entityIdRef.current !== entityId ) {
+			updateManager(
+				createBlockClientIdManager( assocateWithEntity( entityId ) )
+			);
+			entityIdRef.current = entityId;
 		}
-		if ( ! _instanceReference[ entityId ] ) {
-			_instanceReference[ entityId ] = true;
-			manager.current = createBlockClientIdManager( false );
-		} else {
-			manager.current = createBlockClientIdManager( true );
-		}
-		entityIdRef.current = entityId;
 	}, [ entityId ] );
 
-	return manager.current;
+	return manager;
 }
