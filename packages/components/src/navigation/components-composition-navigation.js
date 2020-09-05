@@ -31,21 +31,36 @@ import {
 } from './styles/navigation-styles';
 import Button from '../button';
 
+const DEFAULT_LEVEL = 'root';
+
 const NavigationContext = createContext( {
-	activeLevel: 'root',
 	activeItem: undefined,
+	activeLevel: DEFAULT_LEVEL,
 	setActiveItem: noop,
-	setLevel: noop,
+	setActiveLevel: noop,
 } );
 
 export default function ComponentsCompositionNavigation( {
 	children,
 	initialActiveItem,
-	initialActiveLevel,
+	initialActiveLevel = DEFAULT_LEVEL,
+	setInitialActiveItem = noop,
+	setInitialActiveLevel = noop,
 } ) {
-	const [ activeLevel, setActiveLevel ] = useState( initialActiveLevel );
-	const [ activeItem, setActiveItem ] = useState( initialActiveItem );
+	const [ item, setItem ] = useState( initialActiveItem );
+	const [ level, setLevel ] = useState( initialActiveLevel );
 	const [ slideOrigin, setSlideOrigin ] = useState();
+
+	const setActiveLevel = ( levelId, slideInOrigin = 'left' ) => {
+		setSlideOrigin( slideInOrigin );
+		setLevel( levelId );
+		setInitialActiveLevel( levelId );
+	};
+
+	const setActiveItem = ( itemId ) => {
+		setItem( itemId );
+		setInitialActiveItem( itemId );
+	};
 
 	const isMounted = useRef( false );
 	useEffect( () => {
@@ -54,22 +69,26 @@ export default function ComponentsCompositionNavigation( {
 		}
 	}, [] );
 
-	const setLevel = ( level, slideInOrigin = 'left' ) => {
-		setSlideOrigin( slideInOrigin );
-		setActiveLevel( level );
-	};
+	useEffect( () => {
+		if ( initialActiveItem !== item ) {
+			setActiveItem( initialActiveItem );
+		}
+		if ( initialActiveLevel !== level ) {
+			setActiveLevel( initialActiveLevel );
+		}
+	}, [ initialActiveItem, initialActiveLevel ] );
 
 	const context = {
-		activeItem,
-		activeLevel,
+		activeItem: item,
+		activeLevel: level,
 		setActiveItem,
-		setLevel,
+		setActiveLevel,
 	};
 
 	return (
 		<Root className="components-navigation">
 			<Animate
-				key={ activeLevel }
+				key={ level }
 				type="slide-in"
 				options={ { origin: slideOrigin } }
 			>
@@ -92,27 +111,27 @@ export default function ComponentsCompositionNavigation( {
 
 export const NavigationLevel = ( {
 	children: levelChildren,
-	level,
-	parentLevel,
-	parentTitle,
+	levelId = DEFAULT_LEVEL,
+	parentLevelId,
+	parentLevelTitle,
 	title,
 } ) => {
-	const { activeLevel, setLevel } = useContext( NavigationContext );
+	const { activeLevel, setActiveLevel } = useContext( NavigationContext );
 
-	if ( activeLevel !== level ) {
+	if ( activeLevel !== levelId ) {
 		return null;
 	}
 
 	return (
 		<div className="components-navigation__level">
-			{ parentLevel ? (
+			{ parentLevelId ? (
 				<BackButtonUI
 					className="components-navigation__back-button"
 					isTertiary
-					onClick={ () => setLevel( parentLevel, 'right' ) }
+					onClick={ () => setActiveLevel( parentLevelId, 'right' ) }
 				>
 					<Icon icon={ chevronLeft } />
-					{ parentTitle }
+					{ parentLevelTitle }
 				</BackButtonUI>
 			) : null }
 			<MenuUI>
@@ -132,17 +151,18 @@ export const NavigationItem = ( {
 	badge,
 	children: itemChildren,
 	href,
+	itemId,
 	navigateToLevel,
 	onClick = noop,
-	slug,
 	title,
+	...props
 } ) => {
-	const { activeItem, setActiveItem, setLevel } = useContext(
+	const { activeItem, setActiveItem, setActiveLevel } = useContext(
 		NavigationContext
 	);
 
 	const classes = classnames( 'components-navigation__menu-item', {
-		'is-active': slug && activeItem === slug,
+		'is-active': itemId && activeItem === itemId,
 	} );
 
 	const onItemClick = () => {
@@ -150,16 +170,16 @@ export const NavigationItem = ( {
 			return onClick();
 		}
 
-		setActiveItem( slug );
+		setActiveItem( itemId );
 		if ( navigateToLevel ) {
-			setLevel( navigateToLevel );
+			setActiveLevel( navigateToLevel );
 		}
 		onClick();
 	};
 
 	return (
 		<MenuItemUI className={ classes }>
-			<Button href={ href } onClick={ onItemClick }>
+			<Button href={ href } onClick={ onItemClick } { ...props }>
 				{ title && (
 					<MenuItemTitleUI
 						className="components-navigation__menu-item-title"
