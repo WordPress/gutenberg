@@ -186,7 +186,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 super.onPageCommitVisible(view, url);
             }
 
-            @Override public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 injectOnPageLoadExternalSources();
                 super.onPageStarted(view, url, favicon);
             }
@@ -226,7 +227,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
-        mWebView.setVisibility(View.VISIBLE);
+        mWebView.postDelayed(() -> mWebView.setVisibility(View.VISIBLE), 1500);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
