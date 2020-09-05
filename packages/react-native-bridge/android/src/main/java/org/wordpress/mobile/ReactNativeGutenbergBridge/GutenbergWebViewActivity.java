@@ -3,6 +3,7 @@ package org.wordpress.mobile.ReactNativeGutenbergBridge;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -183,12 +184,14 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     );
                 }
 
+                Log.e("markosavic", "onPageCommitVisible");
                 super.onPageCommitVisible(view, url);
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 injectOnPageLoadExternalSources();
+                Log.e("markosavic", "onPageStarted");
                 super.onPageStarted(view, url, favicon);
             }
 
@@ -200,6 +203,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     mIsRedirected = false;
                     return;
                 }
+
+                Log.e("markosavic", "onPageFinished");
 
                 String contentFunctions = getFileContentFromAssets("gutenberg-web-single-block/content-functions.js");
                 evaluateJavaScript(contentFunctions);
@@ -224,15 +229,19 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void onGutenbergReady() {
+        Log.e("markosavic", "onGutenbergReady");
         injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
-        mWebView.postDelayed(() -> mWebView.setVisibility(View.VISIBLE), 1500);
+        mWebView.postDelayed(() -> mWebView.setVisibility(View.VISIBLE), 10000);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
+        Log.e("markosavic", "injectOnGutenbergReadyExternalSources");
         List<String> list = getOnGutenbergReadyExternalSources();
+        Log.e("markosavic", "injectOnGutenbergReadyExternalSources list " + list);
         for (String file : list) {
+            Log.e("markosavic", "injectOnGutenbergReadyExternalSources " + file);
             evaluateJavaScript(file);
         }
     }
@@ -242,8 +251,11 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void injectOnPageLoadExternalSources() {
+        Log.e("markosavic", "injectOnPageLoadExternalSources");
         List<String> list = getOnPageLoadExternalSources();
+        Log.e("markosavic", "injectOnPageLoadExternalSources " + list);
         for (String file : list) {
+            Log.e("markosavic", "injectOnPageLoadExternalSources " + file);
             evaluateJavaScript(file);
         }
     }
