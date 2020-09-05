@@ -8,13 +8,13 @@ import { v4 as uuid } from 'uuid';
  */
 import { useEffect, useRef } from '@wordpress/element';
 
-function createBlockClientIdManager( shouldMapBlocks ) {
-	const DIRECTION_IN = 'in';
-	const DIRECTION_OUT = 'out';
-	const flipDirection = ( direction ) => {
-		return direction === DIRECTION_IN ? DIRECTION_OUT : DIRECTION_IN;
-	};
+const DIRECTION_IN = 'in';
+const DIRECTION_OUT = 'out';
+function flipDirection( direction ) {
+	return direction === DIRECTION_IN ? DIRECTION_OUT : DIRECTION_IN;
+}
 
+function createBlockClientIdManager( shouldMapBlocks ) {
 	const clientIdMap = { [ DIRECTION_IN ]: {}, [ DIRECTION_OUT ]: {} };
 
 	const mapBlocks = ( blocks, direction ) => {

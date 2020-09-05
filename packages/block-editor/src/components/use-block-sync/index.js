@@ -82,7 +82,7 @@ export default function useBlockSync( {
 	entityId,
 } ) {
 	const registry = useRegistry();
-	const BlockManager = useBlockManager( entityId );
+	const blockManager = useBlockManager( entityId );
 
 	const {
 		resetBlocks,
@@ -104,7 +104,7 @@ export default function useBlockSync( {
 		// controlled inner blocks when the change was caused by an entity,
 		// and so it would already be persisted.
 		__unstableMarkNextChangeAsNotPersistent();
-		const incomingBlocks = BlockManager.updateIncomingBlocks(
+		const incomingBlocks = blockManager.updateIncomingBlocks(
 			controlledBlocks
 		);
 
@@ -190,15 +190,15 @@ export default function useBlockSync( {
 					? onChangeRef.current
 					: onInputRef.current;
 
-				const outgoingBlocks = BlockManager.updateOutgoingBlocks(
+				const outgoingBlocks = blockManager.updateOutgoingBlocks(
 					blocks
 				);
 
 				updateParent( outgoingBlocks, {
-					selectionStart: BlockManager.getOutgoingBlockId(
+					selectionStart: blockManager.getOutgoingBlockId(
 						getSelectionStart()
 					),
-					selectionEnd: BlockManager.getOutgoingBlockId(
+					selectionEnd: blockManager.getOutgoingBlockId(
 						getSelectionEnd()
 					),
 				} );
@@ -235,8 +235,8 @@ export default function useBlockSync( {
 
 			if ( controlledSelectionStart && controlledSelectionEnd ) {
 				resetSelection(
-					BlockManager.getIncomingBlockId( controlledSelectionStart ),
-					BlockManager.getOutgoingBlockId( controlledSelectionEnd )
+					blockManager.getIncomingBlockId( controlledSelectionStart ),
+					blockManager.getOutgoingBlockId( controlledSelectionEnd )
 				);
 			}
 		}
