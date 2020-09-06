@@ -233,7 +233,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
-        mWebView.postDelayed(() -> mWebView.setVisibility(View.VISIBLE), 10000);
+        //mWebView.postDelayed(() -> mWebView.setVisibility(View.VISIBLE), 10000);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
