@@ -48,7 +48,7 @@ export const Gallery = ( props ) => {
 				__experimentalItemCallback={ ( item ) => (
 					<li className="wp-block-gallery__image">{ item }</li>
 				) }
-			></InnerBlocks>
+			/>
 
 			{ mediaPlaceholder }
 			<RichTextVisibilityHelper
