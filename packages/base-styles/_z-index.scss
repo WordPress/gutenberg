@@ -102,7 +102,7 @@ $z-layers: (
 
 	// Show popovers above wp-admin menus and submenus and sidebar:
 	// #adminmenuwrap { z-index: 9990 }
-	".components-popover": 1000000,
+	".components-popover": 100000,
 
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
 	".components-popover.block-editor-inserter__popover": 99999,
