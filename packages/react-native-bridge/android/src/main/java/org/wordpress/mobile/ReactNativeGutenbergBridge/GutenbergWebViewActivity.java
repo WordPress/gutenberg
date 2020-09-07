@@ -3,7 +3,7 @@ package org.wordpress.mobile.ReactNativeGutenbergBridge;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,6 +41,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private static final String JAVA_SCRIPT_INTERFACE_NAME = "wpwebkit";
 
     protected WebView mWebView;
+    protected View mForegroundView;
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         setupToolbar();
 
         mWebView = findViewById(R.id.gutenberg_web_view);
+        mForegroundView = findViewById(R.id.foreground_view);
 
         // Set settings
         WebSettings settings = mWebView.getSettings();
@@ -224,9 +226,15 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void onGutenbergReady() {
-        injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
+        final Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            // We want to make sure that page is loaded
+            // with all elements before executing external JS
+            injectOnGutenbergReadyExternalSources();
+            mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 500);
+        }, 2000);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
