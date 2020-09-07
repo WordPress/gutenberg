@@ -74,7 +74,7 @@ export default ( {
 			gradientValue: getProperty( name, 'color.gradient' ),
 			onGradientChange: ( value ) =>
 				setGradient( { 'color.gradient': value } ),
-			disableCustomGradients: true
+			disableCustomGradients: true,
 		};
 	} else {
 		gradientSettings = {};
