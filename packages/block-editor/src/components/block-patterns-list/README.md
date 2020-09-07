@@ -33,14 +33,14 @@ const MyBlockPatternList = () => (
 
 #### blockPatterns
 
-The different [`BlockPattern`](https://github.com/WordPress/gutenberg/blob/cafa3fe8f068c2fd5f3db734ba0b8e5a32ecabad/packages/block-editor/src/components/block-patterns-list/index.js#L15) components that can be shown in the block patterns list.
+The different block patterns that can be shown in the block patterns list.
 
 -   Type: `any`
 -   Required: Yes
 
 #### shownPatterns
 
-[`BlockPattern`](https://github.com/WordPress/gutenberg/blob/cafa3fe8f068c2fd5f3db734ba0b8e5a32ecabad/packages/block-editor/src/components/block-patterns-list/index.js#L15) components that are actually shown in the block patterns list.
+[`BlockPattern`] Block patterns that are actually shown in the block patterns list.
 
 -   Type: `any`
 -   Required: Yes
