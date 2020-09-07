@@ -20,11 +20,9 @@ Renders a block icon with default style.
 
 ```jsx
 import { BlockIcon } from '@wordpress/block-editor';
-import { getBlockType } from '@wordpress/blocks';
 
-const MyBlockIcon = () => <BlockIcon icon={ blockType.icon } />
+const MyBlockIcon = () => <BlockIcon icon={ icon } />
 ```
-
 
 ## Related components
 
