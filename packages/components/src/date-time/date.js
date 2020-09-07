@@ -88,6 +88,7 @@ class DatePicker extends Component {
 		if ( ! this.props.events?.length ) {
 			return false;
 		}
+
 		if ( this.props.onMonthPreviewed ) {
 			this.props.onMonthPreviewed( date.toDate() );
 		}
