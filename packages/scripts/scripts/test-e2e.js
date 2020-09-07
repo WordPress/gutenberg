@@ -29,6 +29,11 @@ const {
 } = require( '../utils' );
 
 const result = spawn( 'node', [ require.resolve( 'puppeteer/install' ) ], {
+	env: {
+		...process.env,
+		PUPPETEER_SKIP_DOWNLOAD: '',
+		PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: '',
+	},
 	stdio: 'inherit',
 } );
 
