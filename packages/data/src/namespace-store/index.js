@@ -252,13 +252,21 @@ function mapActions( actions, store ) {
  * @param {Object} resolvers      Resolvers to register.
  * @param {Object} selectors      The current selectors to be modified.
  * @param {Object} store          The redux store to which the resolvers should be mapped.
- * @param {Object} queue          Resolvers async queue.
  * @param {Object} resolversCache Resolvers Cache.
  */
 function mapResolvers( resolvers, selectors, store, resolversCache ) {
+	// The `resolver` can be either a function that does the resolution, or, in more advanced
+	// cases, an object with a `fullfill` method and other optional methods like `isFulfilled`.
+	// Here we normalize the `resolver` function to an object with `fulfill` method.
 	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
-		const { fulfill: resolverFulfill = resolver } = resolver;
-		return { ...resolver, fulfill: resolverFulfill };
+		if ( resolver.fulfill ) {
+			return resolver;
+		}
+
+		return {
+			...resolver, // copy the enumerable properties of the resolver function
+			fulfill: resolver, // add the fulfill method
+		};
 	} );
 
 	const mapSelector = ( selector, selectorName ) => {
