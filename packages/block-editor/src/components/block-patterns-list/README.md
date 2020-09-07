@@ -40,7 +40,7 @@ The different block patterns that can be shown in the block patterns list.
 
 #### shownPatterns
 
-[`BlockPattern`] Block patterns that are actually shown in the block patterns list.
+Block patterns that are actually shown in the block patterns list.
 
 -   Type: `any`
 -   Required: Yes
