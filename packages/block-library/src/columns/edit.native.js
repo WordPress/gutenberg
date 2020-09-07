@@ -87,7 +87,7 @@ function ColumnsEditContainer( {
 	const { verticalAlignment } = attributes;
 	const { width } = sizes || {};
 
-	const newColumnCount = ! columnCount ? DEFAULT_COLUMNS_NUM : columnCount;
+	const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
 
 	useEffect( () => {
 		updateColumns( columnCount, newColumnCount );
