@@ -55,7 +55,7 @@ function gutenberg_print_inject_stylesheet_script() {
 		<?php
 	} else {
 		?>
-		<script>function wpEnqueueStyle(e,n,t,l,d){var i=document.createElement("link"),o=document.createElement("link"),s=!window.t,c=s?document.head:document.getElementById(window.t),r=s?"afterbegin":"afterend";i.id=e+"-css";i.rel="preload";i.as="style";i.href=n;if(l){i.href+=0<i.href.indexOf("?")?"&ver="+l:"?ver="+l}i.media=d?d:"all";o.id=e+"-css";o.rel="stylesheet";o.href=n;if(l){o.href+=0<o.href.indexOf("?")?"&ver="+l:"?ver="+l}o.media=d?d:"all";window.t=e+"-css";c.insertAdjacentElement(r,i);c.insertAdjacentElement(r,o)}</script>
+		<script>function wpEnqueueStyle(e,n,t,l,d){var i=document.createElement("link"),o=document.createElement("link"),s=!window.t,c=s?document.head:document.getElementById(window.t),r=s?"afterbegin":"afterend";i.id=e+"-preload-css";i.rel="preload";i.as="style";i.href=n;if(l){i.href+=0<i.href.indexOf("?")?"&ver="+l:"?ver="+l}i.media=d?d:"all";o.id=e+"-css";o.rel="stylesheet";o.href=n;if(l){o.href+=0<o.href.indexOf("?")?"&ver="+l:"?ver="+l}o.media=d?d:"all";window.t=e+"-css";c.insertAdjacentElement(r,i);c.insertAdjacentElement(r,o)}</script>
 		<?php
 	}
 
