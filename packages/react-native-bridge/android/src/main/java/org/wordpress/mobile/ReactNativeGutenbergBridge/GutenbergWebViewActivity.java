@@ -218,7 +218,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 evaluateJavaScript(injectGutenbergObserver);
 
                 // We need some extra time to hide all unwanted html elements
-                mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.GONE), 1000);
+                mForegroundView.setVisibility(View.INVISIBLE);
             }
         });
     }
