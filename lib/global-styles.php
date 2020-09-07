@@ -489,7 +489,7 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 
 	if ( '' !== $css_declarations ) {
 
-		// Return minified styles if
+		// Add whitespace if SCRIPT_DEBUG is defined and set to true.
 		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
 			$css_rule .= $block_selector . " {\n";
 			$css_rule .= $css_declarations;
