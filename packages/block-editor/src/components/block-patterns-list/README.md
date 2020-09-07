@@ -35,19 +35,22 @@ const MyBlockPatternList = () => (
 
 The different [`BlockPattern`](https://github.com/WordPress/gutenberg/blob/cafa3fe8f068c2fd5f3db734ba0b8e5a32ecabad/packages/block-editor/src/components/block-patterns-list/index.js#L15) components that can be shown in the block patterns list.
 
--   Type: `Object`
+-   Type: `any`
 -   Required: Yes
 
 #### shownPatterns
 
 [`BlockPattern`](https://github.com/WordPress/gutenberg/blob/cafa3fe8f068c2fd5f3db734ba0b8e5a32ecabad/packages/block-editor/src/components/block-patterns-list/index.js#L15) components that are actually shown in the block patterns list.
 
--   Type: `Object`
+-   Type: `any`
 -   Required: Yes
 
 #### onClickPattern
 
 The performed event after a click on a block pattern. In most cases, the pattern is inserted in the block editor.
+
+-   Type: `any`
+-   Required: Yes
 
 ## Related components
 
