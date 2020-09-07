@@ -31,7 +31,7 @@ const MyBlockPatternList = () => (
 
 ### Props
 
-#### shownBlockPatterns
+#### blockPatterns
 
 The different [`BlockPattern`](https://github.com/WordPress/gutenberg/blob/cafa3fe8f068c2fd5f3db734ba0b8e5a32ecabad/packages/block-editor/src/components/block-patterns-list/index.js#L15) components that can be shown in the block patterns list.
 
