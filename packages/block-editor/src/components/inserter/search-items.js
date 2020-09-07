@@ -11,13 +11,13 @@ import {
 } from 'lodash';
 
 /**
- * Converts the search term into a list of normalized terms.
+ * Sanitizes the search term string.
  *
- * @param {string} term The search term to normalize.
+ * @param {string} term The search term to santize.
  *
- * @return {string[]} The normalized list of search terms.
+ * @return {string} The sanitized search term.
  */
-export const normalizeSearchTerm = ( term = '' ) => {
+function sanitizeTerm( term = '' ) {
 	// Disregard diacritics.
 	//  Input: "média"
 	term = deburr( term );
@@ -30,8 +30,19 @@ export const normalizeSearchTerm = ( term = '' ) => {
 	//  Input: "MEDIA"
 	term = term.toLowerCase();
 
+	return term;
+}
+
+/**
+ * Converts the search term into a list of normalized terms.
+ *
+ * @param {string} term The search term to normalize.
+ *
+ * @return {string[]} The normalized list of search terms.
+ */
+export const normalizeSearchTerm = ( term = '' ) => {
 	// Extract words.
-	return words( term );
+	return words( sanitizeTerm( term ) );
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
@@ -116,12 +127,36 @@ export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
 		return items;
 	}
 
-	const defaultGetTitle = ( item ) => item.title;
-	const defaultGetKeywords = ( item ) => item.keywords || [];
-	const defaultGetCategory = ( item ) => item.category;
+	const rankedItems = items
+		.map( ( item ) => {
+			return [ item, getItemSearchRank( item, searchTerm, config ) ];
+		} )
+		.filter( ( [ , rank ] ) => rank > 0 );
+
+	rankedItems.sort( ( [ , rank1 ], [ , rank2 ] ) => rank2 - rank1 );
+	return rankedItems.map( ( [ item ] ) => item );
+};
+
+/**
+ * Get the search rank for a given iotem and a specific search term.
+ * The higher is higher for items with the best match.
+ * If the rank equals 0, it should be excluded from the results.
+ *
+ * @param {Object} item       Item to filter.
+ * @param {string} searchTerm Search term.
+ * @param {Object} config     Search Config.
+ * @return {number}           Search Rank.
+ */
+export function getItemSearchRank( item, searchTerm, config = {} ) {
+	const defaultGetName = ( it ) => it.name || '';
+	const defaultGetTitle = ( it ) => it.title;
+	const defaultGetKeywords = ( it ) => it.keywords || [];
+	const defaultGetCategory = ( it ) => it.category;
 	const defaultGetCollection = () => null;
 	const defaultGetVariations = () => [];
+
 	const {
+		getName = defaultGetName,
 		getTitle = defaultGetTitle,
 		getKeywords = defaultGetKeywords,
 		getCategory = defaultGetCategory,
@@ -129,13 +164,26 @@ export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
 		getVariations = defaultGetVariations,
 	} = config;
 
-	return items.filter( ( item ) => {
-		const title = getTitle( item );
-		const keywords = getKeywords( item );
-		const category = getCategory( item );
-		const collection = getCollection( item );
-		const variations = getVariations( item );
+	const name = getName( item );
+	const title = getTitle( item );
+	const keywords = getKeywords( item );
+	const category = getCategory( item );
+	const collection = getCollection( item );
+	const variations = getVariations( item );
 
+	const sanitizedSearchTerm = sanitizeTerm( searchTerm );
+	const sanitizedTitle = sanitizeTerm( title );
+
+	let rank = 0;
+
+	// Prefers exact matchs
+	// Then prefers if the beginning of the title matches the search term
+	// Keywords, categories, collection, variations match come later.
+	if ( sanitizedSearchTerm === sanitizedTitle ) {
+		rank += 30;
+	} else if ( sanitizedTitle.indexOf( sanitizedSearchTerm ) === 0 ) {
+		rank += 20;
+	} else {
 		const terms = [
 			title,
 			...keywords,
@@ -143,12 +191,21 @@ export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
 			collection,
 			...variations,
 		].join( ' ' );
-
+		const normalizedSearchTerms = words( sanitizedSearchTerm );
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
 			terms
 		);
 
-		return unmatchedTerms.length === 0;
-	} );
-};
+		if ( unmatchedTerms.length === 0 ) {
+			rank += 10;
+		}
+	}
+
+	// Give a better rank to "core" namespaced items.
+	if ( rank !== 0 && name.indexOf( 'core/' ) === 0 ) {
+		rank++;
+	}
+
+	return rank;
+}

@@ -10,7 +10,11 @@ import items, {
 	youtubeItem,
 	paragraphEmbedItem,
 } from './fixtures';
-import { normalizeSearchTerm, searchBlockItems } from '../search-items';
+import {
+	normalizeSearchTerm,
+	searchBlockItems,
+	getItemSearchRank,
+} from '../search-items';
 
 describe( 'normalizeSearchTerm', () => {
 	it( 'should return an empty array when no words detected', () => {
@@ -33,6 +37,38 @@ describe( 'normalizeSearchTerm', () => {
 		expect(
 			normalizeSearchTerm( '  Média  &   Text Tag-Cloud > 123' )
 		).toEqual( [ 'media', 'text', 'tag', 'cloud', '123' ] );
+	} );
+} );
+
+describe( 'getItemSearchRank', () => {
+	it( 'should return the highest rank for exact matches', () => {
+		expect( getItemSearchRank( { title: 'Button' }, 'button' ) ).toEqual(
+			30
+		);
+	} );
+
+	it( 'should return a high rank if the start of title matches the search term', () => {
+		expect(
+			getItemSearchRank( { title: 'Button Advanced' }, 'button' )
+		).toEqual( 20 );
+	} );
+
+	it( 'should add a bonus point to items with core namespaces', () => {
+		expect(
+			getItemSearchRank(
+				{ name: 'core/button', title: 'Button' },
+				'button'
+			)
+		).toEqual( 31 );
+	} );
+
+	it( 'should have a small rank if it matches keywords, category...', () => {
+		expect(
+			getItemSearchRank(
+				{ title: 'link', keywords: [ 'button' ] },
+				'button'
+			)
+		).toEqual( 10 );
 	} );
 } );
 
