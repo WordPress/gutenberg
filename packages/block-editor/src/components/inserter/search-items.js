@@ -138,7 +138,7 @@ export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
 };
 
 /**
- * Get the search rank for a given iotem and a specific search term.
+ * Get the search rank for a given item and a specific search term.
  * The higher is higher for items with the best match.
  * If the rank equals 0, it should be excluded from the results.
  *
