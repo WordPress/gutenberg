@@ -97,6 +97,27 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).toBe( '15' );
 		} );
 
+		it( 'should keep invalid values in number input until loss of focus', () => {
+			const onChange = jest.fn();
+			const { container } = render(
+				<RangeControl onChange={ onChange } min={ -1 } max={ 1 } />
+			);
+
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
+
+			numberInput.focus();
+			fireEvent.change( numberInput, { target: { value: '-1.1' } } );
+			expect( onChange ).toHaveBeenCalledWith( -1.1 );
+
+			expect( numberInput.value ).toBe( '-1.1' );
+			expect( rangeInput.value ).toBe( '-1' );
+
+			fireEvent.blur( numberInput );
+			expect( onChange ).toHaveBeenCalledWith( -1.1 );
+			expect( numberInput.value ).toBe( '-1' );
+		} );
+
 		it( 'should validate when provided a max or min of zero', () => {
 			const { container } = render(
 				<RangeControl min={ -100 } max={ 0 } />
