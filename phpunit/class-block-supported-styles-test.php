@@ -879,4 +879,22 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( '<p class="wp-block-example">Hello from the block content!</p><div>Appended</div>', $result );
 	}
+
+	/**
+	 * Should not error when the rendered block is text only.
+	 */
+	public function test_render_block_rendered_text_node() {
+		$this->register_block_type(
+			'core/example',
+			array(
+				'render_callback' => function() {
+					return 'This is rendered as just text.';
+				},
+			)
+		);
+
+		$result = do_blocks( '<!-- wp:core/example /-->' );
+
+		$this->assertEquals( 'This is rendered as just text.', $result );
+	}
 }
