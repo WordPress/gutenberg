@@ -98,7 +98,7 @@ function createBlockCompleter() {
 
 			const options = useMemo(
 				() =>
-					includeVariationsInInserterItems( filteredItems ).map(
+					includeVariationsInInserterItems( filteredItems, SHOWN_BLOCK_TYPES ).map(
 						( blockItem ) => {
 							const { title, icon, isDisabled } = blockItem;
 							return {
