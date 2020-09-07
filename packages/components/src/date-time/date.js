@@ -8,7 +8,7 @@ import { map, filter } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Icon, Button, Tooltup } from '../';
+import { Icon, Button, Tooltip } from '../';
 import { __, _n } from '@wordpress/i18n';
 
 /**
