@@ -419,7 +419,11 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	}
 
 	if ( isset( $wp_query->tax_query->queried_terms['post_tag'] ) ) {
-		$context['query'] = array( 'tagIds' => array() );
+		if ( isset( $context['query'] ) ) {
+			$context['query']['tagIds'] = array();
+		} else {
+			$context['query'] = array( 'tagIds' => array() );
+		}
 
 		foreach ( $wp_query->tax_query->queried_terms['post_tag']['terms'] as $tag_slug_or_id ) {
 			$tag_ID = $tag_slug_or_id;
