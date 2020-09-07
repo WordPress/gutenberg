@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 8.9.2 =
+
+### Bug fixes
+
+- Block supports: Fix block attribute (style and class) double-encoding (#25079)
+- Restore injection of build_dropdown_script_block_core_categories() (#25026)
+- Block supports: Restore root DOMDocument save (#25028)
+
+
 = 8.9.1 =
 
 ### Bug Fixes
