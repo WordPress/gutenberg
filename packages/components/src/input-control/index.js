@@ -33,9 +33,7 @@ export function InputControl(
 		isPressEnterToChange = false,
 		label,
 		labelPosition = 'top',
-		onBlur = noop,
 		onChange = noop,
-		onFocus = noop,
 		onValidate = noop,
 		onKeyDown = noop,
 		prefix,
@@ -50,16 +48,6 @@ export function InputControl(
 
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
-
-	const handleOnBlur = ( event ) => {
-		onBlur( event );
-		setIsFocused( false );
-	};
-
-	const handleOnFocus = ( event ) => {
-		onFocus( event );
-		setIsFocused( true );
-	};
 
 	return (
 		<InputBase
@@ -81,10 +69,9 @@ export function InputControl(
 				className="components-input-control__input"
 				disabled={ disabled }
 				id={ id }
+				isFocused={ isFocused }
 				isPressEnterToChange={ isPressEnterToChange }
-				onBlur={ handleOnBlur }
 				onChange={ onChange }
-				onFocus={ handleOnFocus }
 				onKeyDown={ onKeyDown }
 				onValidate={ onValidate }
 				ref={ ref }
