@@ -93,6 +93,16 @@ describe( 'searchBlockItems', () => {
 		] );
 	} );
 
+	it( 'should use the ranking algorithm to order the blocks', () => {
+		expect(
+			searchBlockItems( items, categories, collections, 'a para' )
+		).toEqual( [
+			paragraphEmbedItem,
+			paragraphItem,
+			advancedParagraphItem,
+		] );
+	} );
+
 	it( 'should search items using the keywords and partial terms', () => {
 		expect(
 			searchBlockItems( items, categories, collections, 'GOOGL' )
