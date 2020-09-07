@@ -216,9 +216,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
                 String injectGutenbergObserver = getFileContentFromAssets("gutenberg-web-single-block/gutenberg-observer.js");
                 evaluateJavaScript(injectGutenbergObserver);
-
-                // We need some extra time to hide all unwanted html elements
-                mForegroundView.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -232,6 +229,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
+        mForegroundView.setVisibility(View.GONE);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
