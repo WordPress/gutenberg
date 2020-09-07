@@ -181,7 +181,7 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	// name, keywords, categories, collection, variations match come later.
 	if ( normalizedSearchInput === normalizedTitle ) {
 		rank += 30;
-	} else if ( normalizedTitle.indexOf( normalizedSearchInput ) === 0 ) {
+	} else if ( normalizedTitle.startsWith( normalizedSearchInput ) ) {
 		rank += 20;
 	} else {
 		const terms = [
@@ -204,7 +204,7 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	}
 
 	// Give a better rank to "core" namespaced items.
-	if ( rank !== 0 && name.indexOf( 'core/' ) === 0 ) {
+	if ( rank !== 0 && name.startsWith( 'core/' ) ) {
 		rank++;
 	}
 
