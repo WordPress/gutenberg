@@ -52,16 +52,22 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
-	// We need to wrap the block in order to handle UTF-8 properly.
-	$wrapper_left  = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>';
-	$wrapper_right = '</body></html>';
-
 	$dom = new DOMDocument( '1.0', 'utf-8' );
 
 	// Suppress DOMDocument::loadHTML warnings from polluting the front-end.
 	$previous = libxml_use_internal_errors( true );
 
-	$success = $dom->loadHTML( $wrapper_left . $block_content . $wrapper_right, LIBXML_HTML_NODEFDTD | LIBXML_COMPACT );
+	$body_id = '__BLOCK_SUPPORTS_INJECTED_BODY_ID__';
+
+	// We need to wrap the block in order to handle UTF-8 properly.
+	$wrapped_block_html =
+		'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body id="'
+		. $body_id
+		. '">'
+		. $block_content
+		. '</body></html>';
+
+	$success = $dom->loadHTML( $wrapped_block_html, LIBXML_HTML_NODEFDTD | LIBXML_COMPACT );
 
 	// Clear errors and reset the use_errors setting.
 	libxml_clear_errors();
@@ -71,7 +77,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$body_element = $dom->getElementsByTagName( 'body' )[0];
+	$body_element = $dom->getElementByID( $body_id );
 	$block_root   = $body_element->childNodes[0]; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 	if ( empty( $block_root ) ) {
