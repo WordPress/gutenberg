@@ -45,9 +45,11 @@ function gutenberg_print_inject_stylesheet_script() {
 			// This helps us preserve priorities and inject styles one after the other instead of reversed.
 			window.wpEnqueueStyleLastInjectedEl = handle + '-css';
 
-			// Inject the elements.
-			injectEl.insertAdjacentElement( injectPos, stylePreload );
+			// Inject the element.
 			injectEl.insertAdjacentElement( injectPos, style );
+
+			// Inject the preload element.
+			injectEl.insertAdjacentElement( injectPos, stylePreload );
 		}
 		</script>
 		<?php
