@@ -87,6 +87,8 @@ if ( ! class_exists( 'WP_Block' ) ) {
 if ( ! class_exists( 'WP_Block_Styles' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block-styles.php';
 }
+global $wp_block_styles;
+$wp_block_styles = new WP_Block_Styles();
 
 if ( ! class_exists( 'WP_Block_List' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block-list.php';
