@@ -13,16 +13,6 @@ import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
-function useUpdateLayoutEffect( effect, deps ) {
-	const mounted = useRef( false );
-	useLayoutEffect( () => {
-		if ( mounted.current ) {
-			return effect();
-		}
-		mounted.current = true;
-	}, deps );
-}
-
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
@@ -71,9 +61,7 @@ function useIsAccessibleToolbar( ref ) {
 		setIsAccessibleToolbar( onlyToolbarItem );
 	}, [] );
 
-	useLayoutEffect( determineIsAccessibleToolbar, [] );
-
-	useUpdateLayoutEffect( () => {
+	useLayoutEffect( () => {
 		// Toolbar buttons may be rendered asynchronously, so we use
 		// MutationObserver to check if the toolbar subtree has been modified
 		const observer = new window.MutationObserver(
