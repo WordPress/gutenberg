@@ -13,28 +13,31 @@
 
 // Show the mover in a single button under the contextual toolbar.
 .block-editor-block-mover {
-	.components-toolbar-group,
+	.block-editor-block-mover__move-button-container,
 	.components-toolbar {
 		flex: 1;
 
 		// Increase touch targets on mobile.
 		flex-direction: row;
+		border-right: none !important;
 
 		@include break-small() {
 			flex-direction: column;
 		}
 	}
 
-	&.is-horizontal .components-toolbar-group,
+	&.is-horizontal .block-editor-block-mover__move-button-container,
 	&.is-horizontal .components-toolbar {
 		flex-direction: row;
 	}
 
 	.block-editor-block-mover-button {
 		@include break-small() {
-			padding: 0 !important;
+			// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
 			height: $block-toolbar-height/2;
-			width: $block-toolbar-height;
+			width: $block-toolbar-height - $grid-unit-15 / 2;
+			padding-right: $grid-unit-15 - $border-width !important;
+			padding-left: $grid-unit-15 / 2 !important;
 		}
 
 		// Focus style.
@@ -44,6 +47,20 @@
 				left: $grid-unit-10 !important;
 				right: $grid-unit-10 !important;
 			}
+		}
+	}
+
+	.block-editor-block-mover__drag-handle {
+		width: $button-size-small;
+		cursor: grab;
+
+		// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+		min-width: $button-size-small !important;
+		padding: 0 !important;
+
+		&:focus::before {
+			left: 0 !important;
+			right: 0 !important;
 		}
 	}
 
@@ -87,8 +104,8 @@
 
 			// Focus style.
 			&::before {
-				top: 0;
-				bottom: 0;
+				top: $border-width;
+				bottom: $border-width;
 				min-width: 0;
 				width: auto;
 				height: auto;

@@ -569,9 +569,15 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		if ( in_array( 'title', $fields, true ) ) {
 			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 
+			/** This filter is documented in wp-includes/post-template.php */
+			$title = apply_filters( 'the_title', $menu_item->title, $menu_item->ID );
+
+			/** This filter is documented in wp-includes/class-walker-nav-menu.php */
+			$title = apply_filters( 'nav_menu_item_title', $title, $menu_item, null, 0 );
+
 			$data['title'] = array(
-				'raw'      => $menu_item->post_title,
-				'rendered' => $menu_item->title,
+				'raw'      => $menu_item->title,
+				'rendered' => $title,
 			);
 
 			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );

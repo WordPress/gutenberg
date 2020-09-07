@@ -9,7 +9,7 @@ import { get, omit } from 'lodash';
 import { Component } from '@wordpress/element';
 import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { update } from '@wordpress/icons';
@@ -40,6 +40,7 @@ class LegacyWidgetEdit extends Component {
 			isSelected,
 			prerenderedEditForm,
 			setAttributes,
+			setWidgetId,
 			widgetId,
 		} = this.props;
 		const { isPreview, hasEditForm } = this.state;
@@ -60,9 +61,11 @@ class LegacyWidgetEdit extends Component {
 							isReferenceWidget,
 							id_base: idBase,
 						} = availableLegacyWidgets[ newWidget ];
+						if ( isReferenceWidget ) {
+							setWidgetId( newWidget );
+						}
 						setAttributes( {
 							instance: {},
-							id: isReferenceWidget ? newWidget : undefined,
 							idBase,
 							widgetClass: isReferenceWidget
 								? undefined
@@ -132,6 +135,18 @@ class LegacyWidgetEdit extends Component {
 						widgetName={ get( widgetObject, [ 'name' ] ) }
 						widgetClass={ attributes.widgetClass }
 						instance={ attributes.instance }
+						onFormMount={ ( formData ) => {
+							// Function-based widgets don't come with an object of settings, only
+							// with a pre-rendered HTML form. Extracting settings from that HTML
+							// before this stage is not trivial (think embedded <script>). An alternative
+							// proposed here serializes the form back into widget settings immediately after
+							// it's mounted.
+							if ( ! attributes.widgetClass ) {
+								this.props.setAttributes( {
+									instance: formData,
+								} );
+							}
+						} }
 						onInstanceChange={ ( newInstance, newHasEditForm ) => {
 							if ( newInstance ) {
 								this.props.setAttributes( {
@@ -172,12 +187,15 @@ class LegacyWidgetEdit extends Component {
 	}
 
 	renderWidgetPreview() {
-		const { attributes } = this.props;
+		const { widgetId, attributes } = this.props;
 		return (
 			<ServerSideRender
 				className="wp-block-legacy-widget__preview"
 				block="core/legacy-widget"
-				attributes={ omit( attributes, 'id' ) }
+				attributes={ {
+					widgetId,
+					...omit( attributes, 'id' ),
+				} }
 			/>
 		);
 	}
@@ -197,6 +215,17 @@ export default withSelect( ( select, { clientId } ) => {
 		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,
 		widgetId,
-		prerenderedEditForm: widget.rendered_form,
+		prerenderedEditForm: widget ? widget.rendered_form : '',
 	};
-} )( LegacyWidgetEdit );
+} )(
+	withDispatch( ( dispatch, { clientId } ) => {
+		return {
+			setWidgetId( id ) {
+				dispatch( 'core/edit-widgets' ).setWidgetIdForClientId(
+					clientId,
+					id
+				);
+			},
+		};
+	} )( LegacyWidgetEdit )
+);

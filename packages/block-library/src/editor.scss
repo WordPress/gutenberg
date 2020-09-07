@@ -30,6 +30,7 @@
 @import "./navigation-link/editor.scss";
 @import "./nextpage/editor.scss";
 @import "./paragraph/editor.scss";
+@import "./post-content/editor.scss";
 @import "./post-excerpt/editor.scss";
 @import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
@@ -106,6 +107,14 @@
 .block-editor-block-list__block {
 	margin-top: $default-block-margin;
 	margin-bottom: $default-block-margin;
+}
+
+.block-editor-block-list__layout > .wp-block:first-child {
+	margin-top: 0;
+}
+
+.block-editor-block-list__layout > .wp-block:last-child {
+	margin-bottom: 0;
 }
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.

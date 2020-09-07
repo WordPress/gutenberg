@@ -53,11 +53,12 @@
 	.components-menu-item__button.components-button {
 		min-height: $button-size;
 		height: auto;
-		padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
 		text-align: left;
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
 
-		&.has-icon {
-			padding-left: $grid-unit-10;
+		.components-menu-item__info-wrapper {
+			max-width: calc(100% - #{ $button-size-small + $grid-unit-10 });
 		}
 	}
 
@@ -86,8 +87,4 @@
 			border-color: $gray-900;
 		}
 	}
-}
-
-.components-dropdown-menu__menu.no-icons  .components-menu-item__button.components-button {
-	padding: 0 $grid-unit-15;
 }
