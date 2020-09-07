@@ -53,24 +53,18 @@ export const KeyboardAvoidingView = ( {
 			'safeAreaInsetsForRootViewDidChange',
 			onSafeAreaInsetsUpdate
 		);
+		Keyboard.addListener( 'keyboardWillShow', onKeyboardWillShow );
+		Keyboard.addListener( 'keyboardWillHide', onKeyboardWillHide );
 
 		return () => {
 			SafeArea.removeEventListener(
 				'safeAreaInsetsForRootViewDidChange',
 				onSafeAreaInsetsUpdate
 			);
-		};
-	}, [] );
-
-	useEffect( () => {
-		Keyboard.addListener( 'keyboardWillShow', onKeyboardWillShow );
-		Keyboard.addListener( 'keyboardWillHide', onKeyboardWillHide );
-
-		return () => {
 			Keyboard.removeListener( 'keyboardWillShow', onKeyboardWillShow );
 			Keyboard.removeListener( 'keyboardWillHide', onKeyboardWillHide );
 		};
-	}, [ safeAreaBottomInset ] );
+	}, [] );
 
 	function onSafeAreaInsetsUpdate( { safeAreaInsets } ) {
 		setSafeAreaBottomInset( safeAreaInsets.bottom );
@@ -82,15 +76,21 @@ export const KeyboardAvoidingView = ( {
 	}
 
 	function onKeyboardWillHide( { duration, startCoordinates } ) {
-		setIsKeyboardOpen( false );
-		if ( safeAreaBottomInset ) {
-			animatedHeight.setValue( startCoordinates.height );
-		}
+		const animatedListenerId = animatedHeight.addListener(
+			( { value } ) => {
+				if ( value < startCoordinates.height / 3 ) {
+					setIsKeyboardOpen( false );
+				}
+			}
+		);
+
 		Animated.timing( animatedHeight, {
 			toValue: MIN_HEIGHT,
 			duration,
 			useNativeDriver: false,
-		} ).start();
+		} ).start( () => {
+			animatedHeight.removeListener( animatedListenerId );
+		} );
 	}
 
 	return (
