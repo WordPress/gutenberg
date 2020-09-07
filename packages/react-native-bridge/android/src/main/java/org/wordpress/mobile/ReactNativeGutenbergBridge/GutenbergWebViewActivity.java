@@ -41,6 +41,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private static final String JAVA_SCRIPT_INTERFACE_NAME = "wpwebkit";
 
     protected WebView mWebView;
+    protected View mForegroundView;
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         setupToolbar();
 
         mWebView = findViewById(R.id.gutenberg_web_view);
+        mForegroundView = findViewById(R.id.foreground_view);
 
         // Set settings
         WebSettings settings = mWebView.getSettings();
@@ -166,7 +168,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageCommitVisible(WebView view, String url) {
-
                 String injectCssScript = getFileContentFromAssets("gutenberg-web-single-block/inject-css.js");
                 evaluateJavaScript(injectCssScript);
 
@@ -184,14 +185,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     );
                 }
 
-                Log.e("markosavic", "onPageCommitVisible");
                 super.onPageCommitVisible(view, url);
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 injectOnPageLoadExternalSources();
-                Log.e("markosavic", "onPageStarted");
                 super.onPageStarted(view, url, favicon);
             }
 
@@ -203,8 +202,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     mIsRedirected = false;
                     return;
                 }
-
-                Log.e("markosavic", "onPageFinished");
 
                 String contentFunctions = getFileContentFromAssets("gutenberg-web-single-block/content-functions.js");
                 evaluateJavaScript(contentFunctions);
@@ -229,19 +226,16 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void onGutenbergReady() {
-        Log.e("markosavic", "onGutenbergReady");
         injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
-        //mWebView.postDelayed(() -> mWebView.setVisibility(View.VISIBLE), 10000);
+        // We need some extra time to hide all unwanted html elements
+        mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.GONE), 1000);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
-        Log.e("markosavic", "injectOnGutenbergReadyExternalSources");
         List<String> list = getOnGutenbergReadyExternalSources();
-        Log.e("markosavic", "injectOnGutenbergReadyExternalSources list " + list);
         for (String file : list) {
-            Log.e("markosavic", "injectOnGutenbergReadyExternalSources " + file);
             evaluateJavaScript(file);
         }
     }
@@ -251,11 +245,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void injectOnPageLoadExternalSources() {
-        Log.e("markosavic", "injectOnPageLoadExternalSources");
         List<String> list = getOnPageLoadExternalSources();
-        Log.e("markosavic", "injectOnPageLoadExternalSources " + list);
         for (String file : list) {
-            Log.e("markosavic", "injectOnPageLoadExternalSources " + file);
             evaluateJavaScript(file);
         }
     }
