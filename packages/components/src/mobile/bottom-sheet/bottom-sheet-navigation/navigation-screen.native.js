@@ -33,12 +33,9 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 
 	const { setHeight } = useContext( BottomSheetNavigationContext );
 
-	const setHeightDebounce = useCallback(
-		debounce( ( height ) => {
-			setHeight( height, true );
-		}, 10 ),
-		[ setHeight ]
-	);
+	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [
+		setHeight,
+	] );
 
 	useFocusEffect(
 		useCallback( () => {
@@ -69,9 +66,6 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 
 		if ( heightRef.current.maxHeight !== height && isFocused ) {
 			heightRef.current.maxHeight = height;
-			if ( fullScreen ) {
-				return;
-			}
 			setHeightDebounce( height );
 		}
 	};
