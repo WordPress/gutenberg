@@ -10,6 +10,14 @@ import {
 	words,
 } from 'lodash';
 
+// Default search helpers
+const defaultGetName = ( item ) => item.name || '';
+const defaultGetTitle = ( item ) => item.title;
+const defaultGetKeywords = ( item ) => item.keywords || [];
+const defaultGetCategory = ( item ) => item.category;
+const defaultGetCollection = () => null;
+const defaultGetVariations = () => [];
+
 /**
  * Sanitizes the search input string.
  *
@@ -148,13 +156,6 @@ export const searchItems = ( items = [], searchInput = '', config = {} ) => {
  * @return {number}           Search Rank.
  */
 export function getItemSearchRank( item, searchTerm, config = {} ) {
-	const defaultGetName = ( it ) => it.name || '';
-	const defaultGetTitle = ( it ) => it.title;
-	const defaultGetKeywords = ( it ) => it.keywords || [];
-	const defaultGetCategory = ( it ) => it.category;
-	const defaultGetCollection = () => null;
-	const defaultGetVariations = () => [];
-
 	const {
 		getName = defaultGetName,
 		getTitle = defaultGetTitle,
