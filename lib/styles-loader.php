@@ -23,7 +23,7 @@ function gutenberg_print_inject_stylesheet_script() {
 
 			// Add element props to the preload element.
 			// Though not required, adding this element improves performance for browsers that support it.
-			stylePreload.id = handle + '-css';
+			stylePreload.id = handle + '-preload-css';
 			stylePreload.rel = 'preload';
 			stylePreload.as = 'style';
 			stylePreload.href = src;
