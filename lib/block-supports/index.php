@@ -57,13 +57,9 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	// Suppress DOMDocument::loadHTML warnings from polluting the front-end.
 	$previous = libxml_use_internal_errors( true );
 
-	$body_id = '__BLOCK_SUPPORTS_INJECTED_BODY_ID__';
-
 	// We need to wrap the block in order to handle UTF-8 properly.
 	$wrapped_block_html =
-		'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body id="'
-		. $body_id
-		. '">'
+		'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>'
 		. $block_content
 		. '</body></html>';
 
@@ -77,7 +73,8 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$body_element = $dom->getElementByID( $body_id );
+	// Structure is like `<html><head/><body/></html>`, so body is the `lastChild` of our document.
+	$body_element = $dom->documentElement->lastChild; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 	$block_root   = $body_element->childNodes[0]; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 	if ( empty( $block_root ) ) {
