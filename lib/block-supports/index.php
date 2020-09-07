@@ -71,8 +71,8 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$xpath      = new DOMXPath( $dom );
-	$block_root = $xpath->query( '/html/body/*' )[0];
+	$body_element = $dom->getElementsByTagName( 'body' )[0];
+	$block_root   = $body_element->childNodes[0]; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 	if ( empty( $block_root ) ) {
 		return $block_content;
@@ -98,7 +98,12 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		$block_root->setAttribute( 'style', implode( '; ', $new_styles ) . ';' );
 	}
 
-	return trim( str_replace( array( $wrapper_left, $wrapper_right ), '', $dom->saveHtml() ) );
+	$result = '';
+	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+	foreach ( $body_element->childNodes as $child_node ) {
+		$result .= $dom->saveHtml( $child_node );
+	}
+	return $result;
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 
