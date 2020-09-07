@@ -139,7 +139,7 @@ export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
 
 /**
  * Get the search rank for a given item and a specific search term.
- * The higher is higher for items with the best match.
+ * The better the match, the higher the rank.
  * If the rank equals 0, it should be excluded from the results.
  *
  * @param {Object} item       Item to filter.
