@@ -11,7 +11,8 @@ function gutenberg_print_inject_stylesheet_script() {
 		function wpEnqueueStyle( handle, src, deps, ver, media ) {
 
 			// Create the element.
-			var style = document.createElement( 'link' ),
+			var stylePreload = document.createElement( 'link' ),
+				style = document.createElement( 'link' ),
 				isFirst = ! window.wpEnqueueStyleLastInjectedEl,
 				injectEl = isFirst
 					? document.head
@@ -21,6 +22,15 @@ function gutenberg_print_inject_stylesheet_script() {
 					: 'afterend';
 
 			// Add element props.
+			stylePreload.id = handle + '-css';
+			stylePreload.rel = 'preload';
+			stylePreload.as = 'style';
+			stylePreload.href = src;
+			if ( ver ) {
+				stylePreload.href += 0 < stylePreload.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
+			}
+			stylePreload.media = media ? media : 'all';
+
 			style.id = handle + '-css';
 			style.rel = 'stylesheet';
 			style.href = src;
@@ -34,13 +44,14 @@ function gutenberg_print_inject_stylesheet_script() {
 			window.wpEnqueueStyleLastInjectedEl = handle + '-css';
 
 			// Inject the element.
+			injectEl.insertAdjacentElement( injectPos, stylePreload );
 			injectEl.insertAdjacentElement( injectPos, style );
 		}
 		</script>
 		<?php
 	} else {
 		?>
-		<script>function wpEnqueueStyle(e,n,t,d,i){var o=document.createElement("link"),w=!window.t,c=w?document.head:document.getElementById(window.t),s=w?"afterbegin":"afterend";o.id=e+"-css";o.rel="stylesheet";o.href=n;if(d){o.href+=0<o.href.indexOf("?")?"&ver="+d:"?ver="+d}o.media=i?i:"all";window.t=e+"-css";c.insertAdjacentElement(s,o)}</script>
+		<script>function wpEnqueueStyle(e,n,t,l,d){var i=document.createElement("link"),o=document.createElement("link"),s=!window.t,c=s?document.head:document.getElementById(window.t),r=s?"afterbegin":"afterend";i.id=e+"-css";i.rel="preload";i.as="style";i.href=n;if(l){i.href+=0<i.href.indexOf("?")?"&ver="+l:"?ver="+l}i.media=d?d:"all";o.id=e+"-css";o.rel="stylesheet";o.href=n;if(l){o.href+=0<o.href.indexOf("?")?"&ver="+l:"?ver="+l}o.media=d?d:"all";window.t=e+"-css";c.insertAdjacentElement(r,i);c.insertAdjacentElement(r,o)}</script>
 		<?php
 	}
 
