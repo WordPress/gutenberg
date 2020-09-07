@@ -470,6 +470,7 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
  * @return string The corresponding CSS rule.
  */
 function gutenberg_experimental_global_styles_resolver_styles( $block_selector, $block_supports, $block_styles ) {
+	$css_rule         = '';
 	$css_declarations = '';
 
 	foreach ( $block_styles as $property => $value ) {
@@ -478,10 +479,27 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 		// 1) The style attributes the block has declared support for.
 		// 2) Any CSS custom property attached to the node.
 		if ( in_array( $property, $block_supports, true ) || strstr( $property, '--' ) ) {
-			$css_declarations .= $property . ':' . $value . ';';
+
+			// Add whitespace if SCRIPT_DEBUG is defined and set to true.
+			$css_declarations .= ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG )
+				? "\t" . $property . ': ' . $value . ";\n"
+				: $property . ':' . $value . ';';
 		}
 	}
-	return $css_declarations ? $block_selector . '{' . $css_declarations . '}' : '';
+
+	if ( '' !== $css_declarations ) {
+
+		// Return minified styles if
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			$css_rule .= $block_selector . " {\n";
+			$css_rule .= $css_declarations;
+			$css_rule .= "}\n";
+		} else {
+			$css_rule .= $block_selector . '{' . $css_declarations . '}';
+		}
+	}
+
+	return $css_rule;
 }
 
 /**
