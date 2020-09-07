@@ -117,7 +117,10 @@ const ImageComponent = ( {
 		styles.imageContent,
 		{
 			width:
-				imageData && imageWidth > 0 && imageWidth < containerSize?.width
+				imageWidth === styles.wide.width ||
+				( imageData &&
+					imageWidth > 0 &&
+					imageWidth < containerSize?.width )
 					? imageWidth
 					: customWidth,
 		},

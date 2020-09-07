@@ -31,13 +31,16 @@ const BlockMobileToolbar = ( {
 	isStackedHorizontally,
 	blockWidth,
 	anchorNodeRef,
+	isFullWidth,
 } ) => {
 	const [ fillsLength, setFillsLength ] = useState( null );
 	const wrapBlockSettings = blockWidth < BREAKPOINTS.wrapSettings;
 	const wrapBlockMover = blockWidth <= BREAKPOINTS.wrapMover;
 
 	return (
-		<View style={ styles.toolbar }>
+		<View
+			style={ [ styles.toolbar, isFullWidth && styles.toolbarFullWidth ] }
+		>
 			{ ! wrapBlockMover && (
 				<BlockMover
 					clientIds={ [ clientId ] }
