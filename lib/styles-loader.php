@@ -43,6 +43,19 @@ function gutenberg_print_inject_stylesheet_script() {
 		<script>function wpEnqueueStyle(e,n,t,d,i){var o=document.createElement("link"),w=!window.t,c=w?document.head:document.getElementById(window.t),s=w?"afterbegin":"afterend";o.id=e+"-css";o.rel="stylesheet";o.href=n;if(d){o.href+=0<o.href.indexOf("?")?"&ver="+d:"?ver="+d}o.media=i?i:"all";window.t=e+"-css";c.insertAdjacentElement(s,o)}</script>
 		<?php
 	}
+
+	// An array of block-styles that should be force-loaded first,
+	// regardless of whether the block exists or not.
+	// This helps avoid templates shifting.
+	$force_load_styles = apply_filters(
+		'force_load_block_styles',
+		array(
+			'core/columns' ,
+		)
+	);
+	foreach ( $force_load_styles as $block_name ) {
+		gutenberg_the_block_stylesheet_loading_script( $block_name );
+	}
 }
 add_action( 'wp_head', 'gutenberg_print_inject_stylesheet_script', 1 );
 
