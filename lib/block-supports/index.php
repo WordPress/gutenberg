@@ -75,10 +75,12 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	// Structure is like `<html><head/><body/></html>`, so body is the `lastChild` of our document.
 	$body_element = $dom->documentElement->lastChild; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-	$block_root   = $body_element->childNodes[0]; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+
+	$xpath      = new DOMXPath( $dom );
+	$block_root = $xpath->query( './*', $body_element )[0];
 
 	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-	if ( empty( $block_root ) || XML_ELEMENT_NODE !== $block_root->nodeType ) {
+	if ( empty( $block_root ) ) {
 		return $block_content;
 	}
 
