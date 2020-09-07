@@ -84,6 +84,10 @@ if ( ! class_exists( 'WP_Block' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block.php';
 }
 
+if ( ! class_exists( 'WP_Block_Styles' ) ) {
+	require dirname( __FILE__ ) . '/class-wp-block-styles.php';
+}
+
 if ( ! class_exists( 'WP_Block_List' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block-list.php';
 }
@@ -115,7 +119,6 @@ require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
 require dirname( __FILE__ ) . '/global-styles.php';
-require dirname( __FILE__ ) . '/styles-loader.php';
 require dirname( __FILE__ ) . '/block-supports/index.php';
 require dirname( __FILE__ ) . '/block-supports/align.php';
 require dirname( __FILE__ ) . '/block-supports/colors.php';
