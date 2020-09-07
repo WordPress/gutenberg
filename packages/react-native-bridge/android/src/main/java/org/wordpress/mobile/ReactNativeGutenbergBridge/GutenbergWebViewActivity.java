@@ -51,7 +51,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         setupToolbar();
 
         mWebView = findViewById(R.id.gutenberg_web_view);
-        //mForegroundView = findViewById(R.id.foreground_view);
+        mForegroundView = findViewById(R.id.foreground_view);
 
         // Set settings
         WebSettings settings = mWebView.getSettings();
@@ -216,6 +216,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
                 String injectGutenbergObserver = getFileContentFromAssets("gutenberg-web-single-block/gutenberg-observer.js");
                 evaluateJavaScript(injectGutenbergObserver);
+
+                // We need some extra time to hide all unwanted html elements
+                mForegroundView.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -229,8 +232,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
-        // We need some extra time to hide all unwanted html elements
-        //mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.GONE), 1000);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
