@@ -185,6 +185,7 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 		rank += 20;
 	} else {
 		const terms = [
+			name,
 			title,
 			...keywords,
 			category,
