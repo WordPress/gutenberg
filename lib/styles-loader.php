@@ -13,10 +13,10 @@ function gutenberg_print_inject_stylesheet_script() {
 			// Create the element.
 			var style = document.createElement( 'link' ),
 				isFirst = ! window.wpEnqueueStyleLastInjectedEl,
-				injectWhere = isFirst
+				injectEl = isFirst
 					? document.head
 					: document.getElementById( window.wpEnqueueStyleLastInjectedEl ),
-				injectHow = isFirst
+				injectPos = isFirst
 					? 'afterbegin'
 					: 'afterend';
 
@@ -34,13 +34,13 @@ function gutenberg_print_inject_stylesheet_script() {
 			window.wpEnqueueStyleLastInjectedEl = handle + '-css';
 
 			// Inject the element.
-			injectWhere.insertAdjacentElement( injectHow, style );
+			injectEl.insertAdjacentElement( injectPos, style );
 		}
 		</script>
 		<?php
 	} else {
 		?>
-		<script>function wpEnqueueStyle(e,n,t,l,u){var a=document.createElement("link");a.id=e+"-css";a.rel="stylesheet";a.href=n;if(l){a.href+=0<a.href.indexOf("?")?"&ver="+l:"?ver="+l}a.media=u?u:"all";document.getElementsByTagName("head")[0].insertAdjacentElement("afterbegin",a)}</script>
+		<script>function wpEnqueueStyle(e,n,t,d,i){var o=document.createElement("link"),w=!window.t,c=w?document.head:document.getElementById(window.t),s=w?"afterbegin":"afterend";o.id=e+"-css";o.rel="stylesheet";o.href=n;if(d){o.href+=0<o.href.indexOf("?")?"&ver="+d:"?ver="+d}o.media=i?i:"all";window.t=e+"-css";c.insertAdjacentElement(s,o)}</script>
 		<?php
 	}
 }
