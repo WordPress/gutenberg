@@ -7,9 +7,13 @@
 function gutenberg_print_inject_stylesheet_script() {
 	if ( defined ( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
 		?>
-		<script>
+		<script id="wp-enqueue-style-script">
 		function wpEnqueueStyle( handle, src, deps, ver, media ) {
+
+			// Create the element.
 			var style = document.createElement( 'link' );
+
+			// Add element props.
 			style.id = handle + '-css';
 			style.rel = 'stylesheet';
 			style.href = src;
@@ -17,13 +21,15 @@ function gutenberg_print_inject_stylesheet_script() {
 				style.href += 0 < style.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
 			}
 			style.media = media ? media : 'all';
-			document.getElementsByTagName( 'head' )[ 0 ].appendChild( style );
+
+			// Inject the element.
+			document.getElementsByTagName( 'head' )[ 0 ].insertAdjacentElement( 'afterbegin', style );
 		}
 		</script>
 		<?php
 	} else {
 		?>
-		<script>function wpEnqueueStyle(e,n,t,l,u){var c=document.createElement("link");c.id=e+"-css";c.rel="stylesheet";c.href=n;if(l){c.href+=0<c.href.indexOf("?")?"&ver="+l:"?ver="+l}c.media=u?u:"all";document.getElementsByTagName("head")[0].appendChild(c)}</script>
+		<script>function wpEnqueueStyle(e,n,t,l,u){var a=document.createElement("link");a.id=e+"-css";a.rel="stylesheet";a.href=n;if(l){a.href+=0<a.href.indexOf("?")?"&ver="+l:"?ver="+l}a.media=u?u:"all";document.getElementsByTagName("head")[0].insertAdjacentElement("afterbegin",a)}</script>
 		<?php
 	}
 }
