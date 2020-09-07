@@ -7,12 +7,11 @@ import downloadjs from 'downloadjs';
  * WordPress dependencies
  */
 import { MenuItem, VisuallyHidden } from '@wordpress/components';
-import { external } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-import { download } from '@wordpress/icons';
+import { download, external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
