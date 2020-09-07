@@ -41,7 +41,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private static final String JAVA_SCRIPT_INTERFACE_NAME = "wpwebkit";
 
     protected WebView mWebView;
-    protected View mForegroundView;
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,7 +50,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         setupToolbar();
 
         mWebView = findViewById(R.id.gutenberg_web_view);
-        mForegroundView = findViewById(R.id.foreground_view);
 
         // Set settings
         WebSettings settings = mWebView.getSettings();
@@ -229,7 +227,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         injectOnGutenbergReadyExternalSources();
         preventAutoSavesScript();
         insertBlockScript();
-        mForegroundView.setVisibility(View.GONE);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
