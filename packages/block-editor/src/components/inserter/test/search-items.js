@@ -11,31 +11,35 @@ import items, {
 	paragraphEmbedItem,
 } from './fixtures';
 import {
-	normalizeSearchTerm,
+	getNormalizedSearchTerms,
 	searchBlockItems,
 	getItemSearchRank,
 } from '../search-items';
 
-describe( 'normalizeSearchTerm', () => {
+describe( 'getNormalizedSearchTerms', () => {
 	it( 'should return an empty array when no words detected', () => {
-		expect( normalizeSearchTerm( ' - !? *** ' ) ).toEqual( [] );
+		expect( getNormalizedSearchTerms( ' - !? *** ' ) ).toEqual( [] );
 	} );
 
 	it( 'should remove diacritics', () => {
-		expect( normalizeSearchTerm( 'média' ) ).toEqual( [ 'media' ] );
+		expect( getNormalizedSearchTerms( 'média' ) ).toEqual( [ 'media' ] );
 	} );
 
 	it( 'should trim whitespace', () => {
-		expect( normalizeSearchTerm( '  média  ' ) ).toEqual( [ 'media' ] );
+		expect( getNormalizedSearchTerms( '  média  ' ) ).toEqual( [
+			'media',
+		] );
 	} );
 
 	it( 'should convert to lowercase', () => {
-		expect( normalizeSearchTerm( '  Média  ' ) ).toEqual( [ 'media' ] );
+		expect( getNormalizedSearchTerms( '  Média  ' ) ).toEqual( [
+			'media',
+		] );
 	} );
 
 	it( 'should extract only words', () => {
 		expect(
-			normalizeSearchTerm( '  Média  &   Text Tag-Cloud > 123' )
+			getNormalizedSearchTerms( '  Média  &   Text Tag-Cloud > 123' )
 		).toEqual( [ 'media', 'text', 'tag', 'cloud', '123' ] );
 	} );
 } );

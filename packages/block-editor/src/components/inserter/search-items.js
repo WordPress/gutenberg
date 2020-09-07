@@ -11,44 +11,44 @@ import {
 } from 'lodash';
 
 /**
- * Sanitizes the search term string.
+ * Sanitizes the search input string.
  *
- * @param {string} term The search term to santize.
+ * @param {string} input The search input to normalize.
  *
- * @return {string} The sanitized search term.
+ * @return {string} The normalized search input.
  */
-function sanitizeTerm( term = '' ) {
+function normalizeSearchInput( input = '' ) {
 	// Disregard diacritics.
 	//  Input: "média"
-	term = deburr( term );
+	input = deburr( input );
 
 	// Accommodate leading slash, matching autocomplete expectations.
 	//  Input: "/media"
-	term = term.replace( /^\//, '' );
+	input = input.replace( /^\//, '' );
 
 	// Lowercase.
 	//  Input: "MEDIA"
-	term = term.toLowerCase();
+	input = input.toLowerCase();
 
-	return term;
+	return input;
 }
 
 /**
  * Converts the search term into a list of normalized terms.
  *
- * @param {string} term The search term to normalize.
+ * @param {string} input The search term to normalize.
  *
  * @return {string[]} The normalized list of search terms.
  */
-export const normalizeSearchTerm = ( term = '' ) => {
+export const getNormalizedSearchTerms = ( input = '' ) => {
 	// Extract words.
-	return words( sanitizeTerm( term ) );
+	return words( normalizeSearchInput( input ) );
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
 	return differenceWith(
 		unmatchedTerms,
-		normalizeSearchTerm( unprocessedTerms ),
+		getNormalizedSearchTerms( unprocessedTerms ),
 		( unmatchedTerm, unprocessedTerm ) =>
 			unprocessedTerm.includes( unmatchedTerm )
 	);
@@ -58,9 +58,9 @@ export const searchBlockItems = (
 	items,
 	categories,
 	collections,
-	searchTerm
+	searchInput
 ) => {
-	const normalizedSearchTerms = normalizeSearchTerm( searchTerm );
+	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
 	if ( normalizedSearchTerms.length === 0 ) {
 		return items;
 	}
@@ -84,7 +84,7 @@ export const searchBlockItems = (
 				)
 			),
 	};
-	return searchItems( items, searchTerm, config ).map( ( item ) => {
+	return searchItems( items, searchInput, config ).map( ( item ) => {
 		if ( isEmpty( item.variations ) ) {
 			return item;
 		}
@@ -94,7 +94,7 @@ export const searchBlockItems = (
 				return (
 					intersectionWith(
 						normalizedSearchTerms,
-						normalizeSearchTerm( title ).concat( keywords ),
+						getNormalizedSearchTerms( title ).concat( keywords ),
 						( termToMatch, labelTerm ) =>
 							labelTerm.includes( termToMatch )
 					).length > 0
@@ -116,20 +116,20 @@ export const searchBlockItems = (
 /**
  * Filters an item list given a search term.
  *
- * @param {Array} items       Item list
- * @param {string} searchTerm Search term.
- * @param {Object} config     Search Config.
- * @return {Array}            Filtered item list.
+ * @param {Array}  items       Item list
+ * @param {string} searchInput Search input.
+ * @param {Object} config      Search Config.
+ * @return {Array}             Filtered item list.
  */
-export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
-	const normalizedSearchTerms = normalizeSearchTerm( searchTerm );
+export const searchItems = ( items = [], searchInput = '', config = {} ) => {
+	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
 	if ( normalizedSearchTerms.length === 0 ) {
 		return items;
 	}
 
 	const rankedItems = items
 		.map( ( item ) => {
-			return [ item, getItemSearchRank( item, searchTerm, config ) ];
+			return [ item, getItemSearchRank( item, searchInput, config ) ];
 		} )
 		.filter( ( [ , rank ] ) => rank > 0 );
 
@@ -171,17 +171,17 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	const collection = getCollection( item );
 	const variations = getVariations( item );
 
-	const sanitizedSearchTerm = sanitizeTerm( searchTerm );
-	const sanitizedTitle = sanitizeTerm( title );
+	const normalizedSearchInput = normalizeSearchInput( searchTerm );
+	const normalizedTitle = normalizeSearchInput( title );
 
 	let rank = 0;
 
 	// Prefers exact matches
 	// Then prefers if the beginning of the title matches the search term
 	// name, keywords, categories, collection, variations match come later.
-	if ( sanitizedSearchTerm === sanitizedTitle ) {
+	if ( normalizedSearchInput === normalizedTitle ) {
 		rank += 30;
-	} else if ( sanitizedTitle.indexOf( sanitizedSearchTerm ) === 0 ) {
+	} else if ( normalizedTitle.indexOf( normalizedSearchInput ) === 0 ) {
 		rank += 20;
 	} else {
 		const terms = [
@@ -192,7 +192,7 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 			collection,
 			...variations,
 		].join( ' ' );
-		const normalizedSearchTerms = words( sanitizedSearchTerm );
+		const normalizedSearchTerms = words( normalizedSearchInput );
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
 			terms
