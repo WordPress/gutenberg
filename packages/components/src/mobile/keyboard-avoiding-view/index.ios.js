@@ -49,16 +49,12 @@ export const KeyboardAvoidingView = ( {
 				setSafeAreaBottomInset( safeAreaInsets.bottom );
 			}
 		);
-		Keyboard.addListener( 'keyboardWillShow', onKeyboardWillShow );
-		Keyboard.addListener( 'keyboardWillHide', onKeyboardWillHide );
 		SafeArea.addEventListener(
 			'safeAreaInsetsForRootViewDidChange',
 			onSafeAreaInsetsUpdate
 		);
 
 		return () => {
-			Keyboard.removeListener( 'keyboardWillShow', onKeyboardWillShow );
-			Keyboard.removeListener( 'keyboardWillHide', onKeyboardWillHide );
 			SafeArea.removeEventListener(
 				'safeAreaInsetsForRootViewDidChange',
 				onSafeAreaInsetsUpdate
@@ -66,19 +62,30 @@ export const KeyboardAvoidingView = ( {
 		};
 	}, [] );
 
+	useEffect( () => {
+		Keyboard.addListener( 'keyboardWillShow', onKeyboardWillShow );
+		Keyboard.addListener( 'keyboardWillHide', onKeyboardWillHide );
+
+		return () => {
+			Keyboard.removeListener( 'keyboardWillShow', onKeyboardWillShow );
+			Keyboard.removeListener( 'keyboardWillHide', onKeyboardWillHide );
+		};
+	}, [ safeAreaBottomInset ] );
+
 	function onSafeAreaInsetsUpdate( { safeAreaInsets } ) {
 		setSafeAreaBottomInset( safeAreaInsets.bottom );
 	}
 
 	function onKeyboardWillShow( { endCoordinates } ) {
 		setIsKeyboardOpen( true );
-
 		animatedHeight.setValue( endCoordinates.height + MIN_HEIGHT );
 	}
 
 	function onKeyboardWillHide( { duration, startCoordinates } ) {
 		setIsKeyboardOpen( false );
-		animatedHeight.setValue( startCoordinates.height );
+		if ( safeAreaBottomInset ) {
+			animatedHeight.setValue( startCoordinates.height );
+		}
 		Animated.timing( animatedHeight, {
 			toValue: MIN_HEIGHT,
 			duration,
