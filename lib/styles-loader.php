@@ -21,7 +21,8 @@ function gutenberg_print_inject_stylesheet_script() {
 					? 'afterbegin'
 					: 'afterend';
 
-			// Add element props.
+			// Add element props to the preload element.
+			// Though not required, adding this element improves performance for browsers that support it.
 			stylePreload.id = handle + '-css';
 			stylePreload.rel = 'preload';
 			stylePreload.as = 'style';
@@ -31,6 +32,7 @@ function gutenberg_print_inject_stylesheet_script() {
 			}
 			stylePreload.media = media ? media : 'all';
 
+			// Add element props for the main stylesheet.
 			style.id = handle + '-css';
 			style.rel = 'stylesheet';
 			style.href = src;
@@ -43,7 +45,7 @@ function gutenberg_print_inject_stylesheet_script() {
 			// This helps us preserve priorities and inject styles one after the other instead of reversed.
 			window.wpEnqueueStyleLastInjectedEl = handle + '-css';
 
-			// Inject the element.
+			// Inject the elements.
 			injectEl.insertAdjacentElement( injectPos, stylePreload );
 			injectEl.insertAdjacentElement( injectPos, style );
 		}
