@@ -11,7 +11,14 @@ function gutenberg_print_inject_stylesheet_script() {
 		function wpEnqueueStyle( handle, src, deps, ver, media ) {
 
 			// Create the element.
-			var style = document.createElement( 'link' );
+			var style = document.createElement( 'link' ),
+				isFirst = ! window.wpEnqueueStyleLastInjectedEl,
+				injectWhere = isFirst
+					? document.head
+					: document.getElementById( window.wpEnqueueStyleLastInjectedEl ),
+				injectHow = isFirst
+					? 'afterbegin'
+					: 'afterend';
 
 			// Add element props.
 			style.id = handle + '-css';
@@ -22,8 +29,12 @@ function gutenberg_print_inject_stylesheet_script() {
 			}
 			style.media = media ? media : 'all';
 
+			// Set the global var so we know where to add the next style.
+			// This helps us preserve priorities and inject styles one after the other instead of reversed.
+			window.wpEnqueueStyleLastInjectedEl = handle + '-css';
+
 			// Inject the element.
-			document.getElementsByTagName( 'head' )[ 0 ].insertAdjacentElement( 'afterbegin', style );
+			injectWhere.insertAdjacentElement( injectHow, style );
 		}
 		</script>
 		<?php
