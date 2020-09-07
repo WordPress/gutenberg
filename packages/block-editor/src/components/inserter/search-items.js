@@ -176,9 +176,9 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 
 	let rank = 0;
 
-	// Prefers exact matchs
+	// Prefers exact matches
 	// Then prefers if the beginning of the title matches the search term
-	// Keywords, categories, collection, variations match come later.
+	// name, keywords, categories, collection, variations match come later.
 	if ( sanitizedSearchTerm === sanitizedTitle ) {
 		rank += 30;
 	} else if ( sanitizedTitle.indexOf( sanitizedSearchTerm ) === 0 ) {
