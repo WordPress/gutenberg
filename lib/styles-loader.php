@@ -66,8 +66,13 @@ function gutenberg_print_inject_stylesheet_script() {
 			'core/columns' ,
 		)
 	);
+	global $block_styles_injected_scripts;
+	if ( ! $block_styles_injected_scripts ) {
+		$block_styles_injected_scripts = array();
+	}
 	foreach ( $force_load_styles as $block_name ) {
 		gutenberg_the_block_stylesheet_loading_script( $block_name );
+		$block_styles_injected_scripts[] = $block_name;
 	}
 }
 add_action( 'wp_head', 'gutenberg_print_inject_stylesheet_script', 1 );
