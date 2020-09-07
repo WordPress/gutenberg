@@ -5,6 +5,7 @@ import {
 	ComplementaryArea,
 	ComplementaryAreaMoreMenuItem,
 } from '@wordpress/interface';
+import { __ } from '@wordpress/i18n';
 
 export default ( { identifier, title, icon, children } ) => {
 	return (
@@ -14,6 +15,7 @@ export default ( { identifier, title, icon, children } ) => {
 				identifier={ identifier }
 				title={ title }
 				icon={ icon }
+				closeLabel={ __( 'Close global styles sidebar' ) }
 			>
 				{ children }
 			</ComplementaryArea>
