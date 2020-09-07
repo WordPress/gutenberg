@@ -77,7 +77,8 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	$body_element = $dom->documentElement->lastChild; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 	$block_root   = $body_element->childNodes[0]; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
-	if ( empty( $block_root ) ) {
+	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+	if ( empty( $block_root ) || XML_ELEMENT_NODE !== $block_root->nodeType ) {
 		return $block_content;
 	}
 
