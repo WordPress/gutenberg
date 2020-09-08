@@ -11,7 +11,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { FONT_SIZE, LINE_HEIGHT, fromPx, toPx } from '../editor/utils';
+import { fromPx, toPx } from '../editor/utils';
+
+const LINE_HEIGHT = 'line-height';
+const FONT_SIZE = 'font-size';
 
 export default ( {
 	context: { supports, name },

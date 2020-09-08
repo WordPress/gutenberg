@@ -1,16 +1,17 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, kebabCase, reduce } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { __EXPERIMENTAL_STYLE_MAPPINGS } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import {
-	STYLE_PROPS,
-	PRESET_CATEGORIES,
-	LINK_COLOR_DECLARATION,
-} from './utils';
+import { PRESET_CATEGORIES, LINK_COLOR_DECLARATION } from './utils';
 
 const mergeTrees = ( baseData, userData ) => {
 	// Deep clone from base data.
@@ -55,19 +56,24 @@ export default ( blockData, baseTree, userTree ) => {
 	 * @return {Array} An array of style declarations.
 	 */
 	const getBlockStylesDeclarations = ( blockSupports, blockStyles ) => {
-		const declarations = [];
-		Object.keys( STYLE_PROPS ).forEach( ( key ) => {
-			if (
-				blockSupports.includes( key ) &&
-				get( blockStyles, STYLE_PROPS[ key ], false )
-			) {
-				declarations.push(
-					`${ key }: ${ get( blockStyles, STYLE_PROPS[ key ] ) }`
-				);
-			}
-		} );
-
-		return declarations;
+		return reduce(
+			__EXPERIMENTAL_STYLE_MAPPINGS,
+			function ( declarations, stylePath, rawKey ) {
+				const key = rawKey.startsWith( '--' )
+					? rawKey
+					: kebabCase( rawKey );
+				if (
+					blockSupports.includes( key ) &&
+					get( blockStyles, stylePath, false )
+				) {
+					declarations.push(
+						`${ key }: ${ get( blockStyles, stylePath ) }`
+					);
+				}
+				return declarations;
+			},
+			[]
+		);
 	};
 
 	/**
