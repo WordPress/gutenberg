@@ -127,7 +127,7 @@ export default function BlockEditorArea( {
 					aria-label={ __( 'Block tools' ) }
 				>
 					{ hasSelectedBlock && ! isRootBlockSelected && (
-						<BlockToolbar __experimentalExpandedControl />
+						<BlockToolbar hideDragHandle />
 					) }
 				</NavigableToolbar>
 				<Popover.Slot name="block-toolbar" />

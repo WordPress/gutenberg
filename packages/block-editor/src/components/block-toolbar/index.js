@@ -22,12 +22,8 @@ import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import { useShowMoversGestures } from './utils';
-import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
-export default function BlockToolbar( {
-	hideDragHandle,
-	__experimentalExpandedControl = false,
-} ) {
+export default function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
 		blockClientId,
@@ -100,12 +96,8 @@ export default function BlockToolbar( {
 		shouldShowMovers && 'is-showing-movers'
 	);
 
-	const Wrapper = __experimentalExpandedControl
-		? ExpandedBlockControlsContainer
-		: 'div';
-
 	return (
-		<Wrapper className={ classes }>
+		<div className={ classes }>
 			<div ref={ nodeRef } { ...showMoversGestures }>
 				{ ! isMultiToolbar && (
 					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
@@ -135,6 +127,6 @@ export default function BlockToolbar( {
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</Wrapper>
+		</div>
 	);
 }
