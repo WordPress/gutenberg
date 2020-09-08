@@ -32,6 +32,14 @@ export default function TemplatePartEdit( {
 	// Resolve the post ID if not set, and load its post.
 	const postId = useTemplatePartPost( _postId, slug, theme );
 
+	// TODO: get original slug from meta.
+	const originalSlug = slug;
+	const defaultPostId = useTemplatePartPost( null, originalSlug, theme );
+
+	if ( postId !== defaultPostId && defaultPostId ) {
+		// has customized?
+	}
+
 	// Set the post ID, once found, so that edits persist,
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part

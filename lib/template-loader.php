@@ -188,7 +188,8 @@ function create_auto_draft_for_template_part_block( $block ) {
 								'post_type'    => 'wp_template_part',
 								'post_name'    => $block['attrs']['slug'],
 								'meta_input'   => array(
-									'theme' => $block['attrs']['theme'],
+									'theme'         => $block['attrs']['theme'],
+									'original_slug' => $block['attrs']['slug'],
 								),
 							)
 						);
