@@ -227,4 +227,4 @@ To clean up any installed JavaScript packages remove the global `.npm` directory
 rm -rf "$HOME/.npm"
 ```
 
-Just as you confirmed the installation worked, you can confirm the uninstall worked if you try to run `npm -v`, `node -v`, and `nvm -v` you should then see a "command not found" error in the terminal.
+Just as you confirmed the installation worked, you can confirm the uninstall worked. First quit and restart terminal and then try to run `npm -v`, `node -v`, and `nvm -v` you should then see a "command not found" error in the terminal.
