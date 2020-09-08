@@ -46,15 +46,14 @@ export default ( { children, baseStyles, contexts } ) => {
 			contexts,
 			getProperty: ( context, path ) =>
 				get( userStyles?.[ context ]?.styles, path ),
-			setProperty: ( context, newValues ) => {
+			setProperty: ( context, path, newValue ) => {
 				const newContent = { ...userStyles };
-				Object.keys( newValues ).forEach( ( key ) => {
-					set(
-						newContent,
-						`${ context }.styles.${ key }`,
-						newValues[ key ]
-					);
-				} );
+				let contextStyles = newContent?.[ context ]?.styles;
+				if ( ! contextStyles ) {
+					contextStyles = {};
+					set( newContent, [ context, 'styles' ], contextStyles );
+				}
+				set( contextStyles, path, newValue );
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),
