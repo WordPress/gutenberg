@@ -18,7 +18,6 @@ import { compose, withInstanceId } from '@wordpress/compose';
 import PostAuthorCheck from './check';
 
 function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
-
 	const authorsForField = useMemo( () => {
 		return authors.map( ( author ) => {
 			return {
@@ -43,7 +42,8 @@ function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
 	/**
 	 * Handle author selection.
 	 *
-	 * @param {Object} selectedItem The selected Author.
+	 * @param {Object} value The selected Author.
+	 * @param {Object} value.selectedItem The selected Author.
 	 */
 	const handleSelect = ( { selectedItem } ) => {
 		if ( ! selectedItem ) {
@@ -70,7 +70,7 @@ function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
 				fieldValue === postAuthor?.name
 			) {
 				return select( 'core' )
-					.getAuthors()
+					.getUsers( { who: 'authors' } )
 					.map( ( author ) => ( {
 						key: author.id,
 						name: author.name,
@@ -78,7 +78,7 @@ function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
 			}
 
 			return select( 'core' )
-				.getAuthors( { search: fieldValue } )
+				.getUsers( { who: 'authors', search: fieldValue } )
 				.map( ( author ) => ( {
 					key: author.id,
 					name: author.name,
@@ -89,8 +89,8 @@ function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
 
 	const isLoading = useSelect(
 		( select ) => {
-			return select( 'core/data' ).isResolving( 'core', 'getAuthors', [
-				{ search: fieldValue },
+			return select( 'core/data' ).isResolving( 'core', 'getUsers', [
+				{ search: fieldValue, who: 'authors' },
 			] );
 		},
 		[ availableAuthors, fieldValue ]
@@ -124,11 +124,11 @@ function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getAuthor, getAuthors } = select( 'core' );
+		const { getUser, getUsers } = select( 'core' );
 		const { getEditedPostAttribute } = select( 'core/editor' );
 		return {
-			authors: getAuthors(),
-			postAuthor: getAuthor( getEditedPostAttribute( 'author' ) ),
+			authors: getUsers( { who: 'authors' } ),
+			postAuthor: getUser( getEditedPostAttribute( 'author' ) ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

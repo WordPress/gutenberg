@@ -13,7 +13,6 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import {
-	receiveUserQuery,
 	receiveCurrentTheme,
 	receiveCurrentUser,
 	receiveEntityRecords,
@@ -25,38 +24,6 @@ import {
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { apiFetch, select, resolveSelect } from './controls';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
-import getQueryParts from './queried-data/get-query-parts';
-
-/**
- * Requests authors from the REST API.
- *
- * @param {Object} query Query object.
- */
-export function* getAuthors( query = {} ) {
-	const path = addQueryArgs(
-		'/wp/v2/users/?who=authors&per_page=100',
-		query
-	);
-
-	const users = yield apiFetch( {
-		path,
-	} );
-	const { stableKey } = getQueryParts( query );
-
-	yield receiveUserQuery( stableKey, users );
-}
-
-/**
- * Request a single author from the REST API.
- *
- * @param {string} id The ID of the author to retrieve.
- */
-export function* getAuthor( id = '' ) {
-	const users = yield apiFetch( {
-		path: `/wp/v2/users/${ id }?who=authors&per_page=1`,
-	} );
-	yield receiveUserQuery( 'author', users );
-}
 
 /**
  * Requests the current user from the REST API.

@@ -16,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-import getQueryParts from './queried-data/get-query-parts';
+
 /**
  * Returns true if a request is in progress for embed preview data, or false
  * otherwise.
@@ -35,19 +35,6 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 		);
 	}
 );
-
-/**
- * Returns all available authors.
- *
- * @param {Object} state Data state.
- * @param {string} query Query.
- *
- * @return {Array} Authors list.
- */
-export function getAuthors( state, query = {} ) {
-	const { stableKey } = getQueryParts( query );
-	return getUserQueryResults( state, stableKey );
-}
 
 /**
  * Returns the current user.
@@ -76,18 +63,6 @@ export const getUserQueryResults = createSelector(
 	},
 	( state, queryID ) => [ state.users.queries[ queryID ], state.users.byId ]
 );
-
-/**
- * Returns an Author by ID.
- *
- * @param {Object} state    Data state.
- * @param {string} authorID The Author ID.
- *
- * @return {Array} Authors list.
- */
-export function getAuthor( state, authorID ) {
-	return state.users.byId[ authorID ];
-}
 
 /**
  * Returns whether the entities for the give kind are loaded.
