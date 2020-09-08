@@ -38,16 +38,14 @@ function BlockToolbarWrapperWithInlinePopoverSlot( { className, children } ) {
 					>
 						{ children }
 					</div>
-					{ ! isEmpty( fills ) && (
-						<PopoverWrapper>{ fills }</PopoverWrapper>
-					) }
+					{ fills }
 				</>
 			) }
 		</Slot>
 	);
 }
 
-function BlockToolbarInlinePopoverFill( { controls, children } ) {
+function BlockToolbarInlinePopoverFill( { onClose, controls, children } ) {
 	return (
 		<Fill>
 			{ ( fillProps ) => {
@@ -56,10 +54,12 @@ function BlockToolbarInlinePopoverFill( { controls, children } ) {
 				// So we re-create the Provider in this subtree.
 				const value = ! isEmpty( fillProps ) ? fillProps : null;
 				return (
-					<ToolbarContext.Provider value={ value }>
-						<ToolbarGroup controls={ controls } />
-						{ children }
-					</ToolbarContext.Provider>
+					<PopoverWrapper onClose={ onClose }>
+						<ToolbarContext.Provider value={ value }>
+							<ToolbarGroup controls={ controls } />
+							{ children }
+						</ToolbarContext.Provider>
+					</PopoverWrapper>
 				);
 			} }
 		</Fill>
