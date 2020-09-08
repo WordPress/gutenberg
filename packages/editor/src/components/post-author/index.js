@@ -6,39 +6,68 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
-import { withSelect, withDispatch, useSelect } from '@wordpress/data';
+import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
-import { compose, withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import PostAuthorCheck from './check';
 
-function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
-	const authorsForField = useMemo( () => {
-		return authors.map( ( author ) => {
+function PostAuthor() {
+	const [ fieldValue, setFieldValue ] = useState();
+
+	const { isLoading, authors, postAuthor } = useSelect(
+		( select ) => {
+			const { getUser, getUsers, isResolving } = select( 'core' );
+			const { getEditedPostAttribute } = select( 'core/editor' );
+			const author = getUser( getEditedPostAttribute( 'author' ) );
+			const query =
+				! fieldValue || '' === fieldValue || fieldValue === author?.name
+					? {}
+					: { search: fieldValue };
+			return {
+				postAuthor: author,
+				authors: getUsers( { who: 'authors', ...query } ),
+				isLoading: isResolving( 'core', 'getUsers', [
+					{ search: fieldValue, who: 'authors' },
+				] ),
+			};
+		},
+		[ fieldValue ]
+	);
+	const { editPost } = useDispatch( 'core/editor' );
+
+	const authorOptions = useMemo( () => {
+		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {
 			return {
 				key: author.id,
 				name: author.name,
 			};
 		} );
-	}, [ authors ] );
 
-	// Ensure the current author is included in the initial dropdown list.
-	let foundAuthor = authorsForField.findIndex(
-		( author ) => postAuthor?.id === author.key
-	);
-	// The currently field value.
-	const [ fieldValue, setFieldValue ] = useState( postAuthor?.name );
+		// Ensure the current author is included in the dropdown list.
+		const foundAuthor = fetchedAuthors.findIndex(
+			( { key } ) => postAuthor?.id === key
+		);
+		if ( foundAuthor < 0 && postAuthor ) {
+			return [
+				{ key: postAuthor.id, name: postAuthor.name },
+				...fetchedAuthors,
+			];
+		}
 
-	if ( authors?.length > 0 && foundAuthor < 0 && postAuthor ) {
-		postAuthor.key = authorsForField.length;
-		authors.unshift( postAuthor );
-		foundAuthor = 0;
-	}
+		return fetchedAuthors;
+	}, [ authors, postAuthor ] );
+
+	// Initializes the post author properly
+	// Also ensures external changes are reflected.
+	useEffect( () => {
+		setFieldValue( postAuthor.name );
+	}, [ postAuthor ] );
+
 	/**
 	 * Handle author selection.
 	 *
@@ -50,7 +79,7 @@ function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
 			return;
 		}
 		setFieldValue( selectedItem.name );
-		onUpdateAuthor( selectedItem.key );
+		editPost( { author: selectedItem.key } );
 	};
 
 	/**
@@ -62,79 +91,26 @@ function PostAuthor( { authors, postAuthor, onUpdateAuthor } ) {
 		setFieldValue( inputValue );
 	};
 
-	const availableAuthors = useSelect(
-		( select ) => {
-			if (
-				! fieldValue ||
-				'' === fieldValue ||
-				fieldValue === postAuthor?.name
-			) {
-				return select( 'core' )
-					.getUsers( { who: 'authors' } )
-					.map( ( author ) => ( {
-						key: author.id,
-						name: author.name,
-					} ) );
-			}
-
-			return select( 'core' )
-				.getUsers( { who: 'authors', search: fieldValue } )
-				.map( ( author ) => ( {
-					key: author.id,
-					name: author.name,
-				} ) );
-		},
-		[ fieldValue, postAuthor, isLoading ]
-	);
-
-	const isLoading = useSelect(
-		( select ) => {
-			return select( 'core/data' ).isResolving( 'core', 'getUsers', [
-				{ search: fieldValue, who: 'authors' },
-			] );
-		},
-		[ availableAuthors, fieldValue ]
-	);
-
 	if ( ! postAuthor ) {
 		return null;
 	}
 
-	const selectId = 'post-author-selector';
-
-	const postAuthorEntry = {
-		key: postAuthor.id,
-		name: postAuthor.name,
-	};
-
 	return (
 		<PostAuthorCheck>
-			<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
 			<ComboboxControl
-				options={ availableAuthors }
+				label={ __( 'Author' ) }
+				options={ authorOptions }
 				initialInputValue={ postAuthor?.name }
 				onInputValueChange={ debounce( handleKeydown, 300 ) }
 				onChange={ handleSelect }
-				initialSelectedItem={ postAuthorEntry }
+				initialSelectedItem={ {
+					key: postAuthor.id,
+					name: postAuthor.name,
+				} }
 				isLoading={ isLoading }
 			/>
 		</PostAuthorCheck>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getUser, getUsers } = select( 'core' );
-		const { getEditedPostAttribute } = select( 'core/editor' );
-		return {
-			authors: getUsers( { who: 'authors' } ),
-			postAuthor: getUser( getEditedPostAttribute( 'author' ) ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateAuthor( author ) {
-			dispatch( 'core/editor' ).editPost( { author } );
-		},
-	} ) ),
-	withInstanceId,
-] )( PostAuthor );
+export default PostAuthor;
