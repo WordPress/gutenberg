@@ -40,7 +40,12 @@ class WP_Block_Styles {
 	public function __construct() {
 		if ( current_theme_supports( 'split-block-styles' ) ) {
 			add_filter( 'render_block', [ $this, 'add_styles' ], 10, 2 );
+			return;
 		}
+
+		// If we got this far we need to add all styles for all blocks.
+		add_action( 'init', [ $this, 'concat_add_style' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_concat_styles' ], 9999 );
 	}
 
 	/**
@@ -251,5 +256,54 @@ class WP_Block_Styles {
 		}
 		</script>
 		<?php
+	}
+
+	/**
+	 * Enqueue concat styles.
+	 *
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function enqueue_concat_styles() {
+		wp_enqueue_style(
+			'wp-block-library-styles',
+			add_query_arg( 'print-core-styles', '1', home_url() ),
+			array(),
+		);
+	}
+
+	/**
+	 * Print all styles when we get the "?print-core-styles=1" URL.
+	 *
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function concat_add_style() {
+		if ( ! isset( $_GET['print-core-styles'] ) || '1' !== $_GET['print-core-styles'] ) {
+			return;
+		}
+
+		header( 'Content-Type: text/css' );
+
+		$files      = glob( gutenberg_dir_path() . 'packages/block-library/build-style/*.css' );
+		$exceptions = [ 'editor.css', 'editor-rtl.css', 'style.css', 'style-rtl.css', 'theme.css', 'theme-rtl.css' ];
+
+		foreach ( $files as $file ) {
+			$basename = basename( $file );
+			if ( in_array( $basename, $exceptions ) ) {
+				continue;
+			}
+
+			// Only print rtl/ltr styles depending on the language.
+			$is_stylesheet_rtl = strpos( $basename, '-rtl' );
+			if ( ( is_rtl() && ! $is_stylesheet_rtl ) || ( ! is_rtl() && $is_stylesheet_rtl ) ) {
+				continue;
+			}
+
+			include $file;
+		}
+		exit();
 	}
 }
