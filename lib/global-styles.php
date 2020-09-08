@@ -658,7 +658,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// These need to be added to settings always.
 	// We also need to unset the deprecated settings defined by core.
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
-	
+
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['disableCustomFontSizes'] );
