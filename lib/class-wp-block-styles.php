@@ -3,13 +3,13 @@
 class WP_Block_Styles {
 
 	/**
-	 * An array of stylesheets that have already been added.
+	 * An array of blocks that have already been styled.
 	 *
 	 * @access protected
 	 *
 	 * @var array
 	 */
-	protected $block_styles_added = array();
+	protected $styled_blocks = array();
 
 	/**
 	 * Whether the injection script has been added or not.
@@ -22,6 +22,7 @@ class WP_Block_Styles {
 
 	/**
 	 * An array of core blocks that can cause layout shifts.
+	 * These styles get added inline to avoid shifting layouts issues when the page loads.
 	 *
 	 * @access protected
 	 *
@@ -55,22 +56,24 @@ class WP_Block_Styles {
 		// Early return if the styles for this block-type have already been added.
 		if (
 			! isset( $block['blockName'] ) || // Sanity check.
-			in_array( $block['blockName'], $this->block_styles_added )
+			in_array( $block['blockName'], $this->styled_blocks )
 		) {
 			return $block_content;
 		}
 
 		$block_styles = array();
 		if ( 0 === strpos( $block['blockName'], 'core/' ) ) {
-			$block_name = str_replace( 'core/', '', $block['blockName'] );
-			if ( file_exists( gutenberg_dir_path() . "packages/block-library/build-style/$block_name.css" ) ) {
+			$filename  = str_replace( 'core/', '', $block['blockName'] );
+			$filename .= is_rtl() ? '-rtl' : '';
+
+			if ( file_exists( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ) ) {
 				$block_styles[] = array(
-					'handle' => "core-$block_name-block-styles",
-					'src'    => gutenberg_url( "packages/block-library/build-style/$block_name.css" ),
-					'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$block_name.css" ),
+					'handle' => "core-$filename-block-styles",
+					'src'    => gutenberg_url( "packages/block-library/build-style/$filename.css" ),
+					'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ),
 					'media'  => 'all',
 					'method' => in_array( $block['blockName'], $this->layout_shift_blocks ) ? 'inline' : 'inject',
-					'path'   => gutenberg_dir_path() . "packages/block-library/build-style/$block_name.css",
+					'path'   => gutenberg_dir_path() . "packages/block-library/build-style/$filename.css",
 				);
 			}
 		}
@@ -88,7 +91,7 @@ class WP_Block_Styles {
 		foreach ( $block_styles as $block_style ) {
 			$this->add_block_styles( $block_style );
 		}
-		$this->block_styles_added[] = $block['blockName'];
+		$this->styled_blocks[] = $block['blockName'];
 
 		return $block_content;
 	}
