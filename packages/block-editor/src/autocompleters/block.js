@@ -98,26 +98,27 @@ function createBlockCompleter() {
 
 			const options = useMemo(
 				() =>
-					includeVariationsInInserterItems( filteredItems, SHOWN_BLOCK_TYPES ).map(
-						( blockItem ) => {
-							const { title, icon, isDisabled } = blockItem;
-							return {
-								key: `block-${ blockItem.id }`,
-								value: blockItem,
-								label: (
-									<>
-										<BlockIcon
-											key="icon"
-											icon={ icon }
-											showColors
-										/>
-										{ title }
-									</>
-								),
-								isDisabled,
-							};
-						}
-					),
+					includeVariationsInInserterItems(
+						filteredItems,
+						SHOWN_BLOCK_TYPES
+					).map( ( blockItem ) => {
+						const { title, icon, isDisabled } = blockItem;
+						return {
+							key: `block-${ blockItem.id }`,
+							value: blockItem,
+							label: (
+								<>
+									<BlockIcon
+										key="icon"
+										icon={ icon }
+										showColors
+									/>
+									{ title }
+								</>
+							),
+							isDisabled,
+						};
+					} ),
 				[ filteredItems ]
 			);
 
