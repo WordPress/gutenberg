@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Removed the `alignWide` property from the object returned by the `getSettings` selector. Use `select( 'core' ).getThemeSupports()[ 'align-wide' ]` instead.
+
 ## 4.0.0 (2020-05-28)
 
 ### Breaking Changes
