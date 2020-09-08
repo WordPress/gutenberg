@@ -652,6 +652,12 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 		}
 		$features['global']['spacing']['custom'] = true;
 	}
+	if ( get_theme_support( 'experimental-link-color' ) ) {
+		if ( ! isset( $features['global']['color'] ) ) {
+			$features['global']['color'] = array();
+		}
+		$features['global']['color']['link'] = true;
+	}
 
 	return $features;
 }
