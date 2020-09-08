@@ -457,7 +457,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 		// so that existing link colors themes used didn't break.
 		// We add this here to make it work for themes that opt-in to theme.json
 		// In the future, we may do this differently.
-		$stylesheet .= 'a { color: var(--wp--style--color--link, #00e); }';
+		$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
 	}
 
 	return $stylesheet;
@@ -482,13 +482,24 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 		// 1) The style attributes the block has declared support for.
 		// 2) Any CSS custom property attached to the node.
 		if ( in_array( $property, $block_supports, true ) || strstr( $property, '--' ) ) {
-			$css_declarations .= "\t" . $property . ': ' . $value . ";\n";
+
+			// Add whitespace if SCRIPT_DEBUG is defined and set to true.
+			$css_declarations .= ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG )
+				? "\t" . $property . ': ' . $value . ";\n"
+				: $property . ':' . $value . ';';
 		}
 	}
+
 	if ( '' !== $css_declarations ) {
-		$css_rule .= $block_selector . " {\n";
-		$css_rule .= $css_declarations;
-		$css_rule .= "}\n";
+
+		// Add whitespace if SCRIPT_DEBUG is defined and set to true.
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			$css_rule .= $block_selector . " {\n";
+			$css_rule .= $css_declarations;
+			$css_rule .= "}\n";
+		} else {
+			$css_rule .= $block_selector . '{' . $css_declarations . '}';
+		}
 	}
 
 	return $css_rule;
