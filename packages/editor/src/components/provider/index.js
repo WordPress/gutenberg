@@ -170,7 +170,6 @@ class EditorProvider extends Component {
 				'__experimentalGlobalStylesContexts',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
-				'alignWide',
 				'allowedBlockTypes',
 				'availableLegacyWidgets',
 				'bodyPlaceholder',

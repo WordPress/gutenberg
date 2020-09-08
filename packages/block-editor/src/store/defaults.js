@@ -11,7 +11,6 @@ export const PREFERENCES_DEFAULTS = {
  * The default editor settings
  *
  * @typedef {Object} SETTINGS_DEFAULT
- * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
  * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
  * @property {Array} colors Palette colors
  * @property {Array} fontSizes Available font sizes
@@ -36,7 +35,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {Array} __experimentalBlockPatternCategories Array of objects representing the block pattern categories
  */
 export const SETTINGS_DEFAULTS = {
-	alignWide: false,
 	colors: [
 		{
 			name: __( 'Black' ),
