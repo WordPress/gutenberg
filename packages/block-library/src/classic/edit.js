@@ -51,11 +51,15 @@ export default class ClassicEdit extends Component {
 			suffix,
 		} );
 
-		document.addEventListener( 'readystatechange', () => {
-			if ( document.readyState === 'complete' ) {
-				this.initialize();
-			}
-		} );
+		if ( document.readyState === 'complete' ) {
+			this.initialize();
+		} else {
+			document.addEventListener( 'readystatechange', () => {
+				if ( document.readyState === 'complete' ) {
+					this.initialize();
+				}
+			} );
+		}
 	}
 
 	componentWillUnmount() {
