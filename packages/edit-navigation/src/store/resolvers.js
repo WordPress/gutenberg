@@ -128,6 +128,10 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 	const attributes = {
 		label: menuItem.title.rendered,
 		url: menuItem.url,
+		title: menuItem.attr_title,
+		className: menuItem.classes.join( ' ' ),
+		description: menuItem.description,
+		rel: menuItem.xfn.join( ' ' ),
 	};
 
 	return createBlock( 'core/navigation-link', attributes, innerBlocks );

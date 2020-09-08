@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "8.9.1",
+	"version": "8.9.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -102,7 +102,6 @@
 		"@types/npm-package-arg": "6.1.0",
 		"@types/prettier": "1.19.0",
 		"@types/qs": "6.9.1",
-		"@types/react-dom": "16.9.5",
 		"@types/requestidlecallback": "0.3.1",
 		"@types/semver": "7.2.0",
 		"@types/sprintf-js": "1.1.2",
