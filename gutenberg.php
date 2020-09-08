@@ -26,8 +26,6 @@ gutenberg_pre_init();
  * @since 0.1.0
  */
 function gutenberg_menu() {
-	global $submenu;
-
 	add_menu_page(
 		'Gutenberg',
 		'Gutenberg',
@@ -45,7 +43,7 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( gutenberg_use_widgets_block_editor() && isset( $submenu['themes.php'] ) ) {
+	if ( gutenberg_use_widgets_block_editor() ) {
 		add_theme_page(
 			__( 'Widgets', 'gutenberg' ),
 			__( 'Widgets', 'gutenberg' ),
@@ -53,12 +51,7 @@ function gutenberg_menu() {
 			'gutenberg-widgets',
 			'the_gutenberg_widgets'
 		);
-		$submenu['themes.php'] = array_filter(
-			$submenu['themes.php'],
-			function( $current_menu_item ) {
-				return isset( $current_menu_item[2] ) && 'widgets.php' !== $current_menu_item[2];
-			}
-		);
+		remove_submenu_page( 'themes.php', 'widgets.php' );
 	}
 
 	if ( get_option( 'gutenberg-experiments' ) ) {
@@ -85,16 +78,19 @@ function gutenberg_menu() {
 	}
 
 	if ( current_user_can( 'edit_posts' ) ) {
-		$submenu['gutenberg'][] = array(
+		add_submenu_page(
+			'gutenberg',
+			__( 'Support', 'gutenberg' ),
 			__( 'Support', 'gutenberg' ),
 			'edit_posts',
-			__( 'https://wordpress.org/support/plugin/gutenberg', 'gutenberg' ),
+			__( 'https://wordpress.org/support/plugin/gutenberg/', 'gutenberg' )
 		);
-
-		$submenu['gutenberg'][] = array(
+		add_submenu_page(
+			'gutenberg',
+			__( 'Documentation', 'gutenberg' ),
 			__( 'Documentation', 'gutenberg' ),
 			'edit_posts',
-			'https://developer.wordpress.org/block-editor/',
+			'https://developer.wordpress.org/block-editor/'
 		);
 	}
 
