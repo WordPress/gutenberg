@@ -16,7 +16,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 	}, [] );
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Sorting and Filtering' ) }>
+			<PanelBody title={ __( 'Sorting and filtering' ) }>
 				<QueryControls
 					{ ...{ order, orderBy, selectedAuthorId, authorList } }
 					onOrderChange={ ( value ) => setQuery( { order: value } ) }
