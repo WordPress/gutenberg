@@ -2,6 +2,12 @@
 	"name": "core/navigation",
 	"category": "design",
 	"attributes": {
+		"hasTools": {
+			"type": "boolean"
+		},
+		"menuName": {
+			"type": "string"
+		},
 		"orientation": {
 			"type": "string"
 		},

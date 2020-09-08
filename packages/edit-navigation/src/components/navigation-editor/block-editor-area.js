@@ -39,34 +39,32 @@ export default function BlockEditorArea( {
 	menuId,
 	saveBlocks,
 } ) {
-	const {
-		rootBlockId,
-		isNavigationModeActive,
-		isRootBlockSelected,
-		hasSelectedBlock,
-	} = useSelect( ( select ) => {
-		const {
-			isNavigationMode,
-			getBlockSelectionStart,
-			getBlock,
-			getBlocks,
-		} = select( 'core/block-editor' );
+	const { rootBlockId, isNavigationModeActive, hasSelectedBlock } = useSelect(
+		( select ) => {
+			const {
+				isNavigationMode,
+				getBlockSelectionStart,
+				getBlock,
+				getBlocks,
+			} = select( 'core/block-editor' );
 
-		const selectionStartClientId = getBlockSelectionStart();
-		const rootClientId = getBlocks()[ 0 ]?.clientId;
+			const selectionStartClientId = getBlockSelectionStart();
+			const rootClientId = getBlocks()[ 0 ]?.clientId;
 
-		return {
-			selectionStartClientId,
-			rootBlockId: rootClientId,
-			isNavigationModeActive: isNavigationMode(),
-			isRootBlockSelected:
-				!! selectionStartClientId &&
-				rootClientId === selectionStartClientId,
-			hasSelectedBlock:
-				!! selectionStartClientId &&
-				!! getBlock( selectionStartClientId ),
-		};
-	}, [] );
+			return {
+				selectionStartClientId,
+				rootBlockId: rootClientId,
+				isNavigationModeActive: isNavigationMode(),
+				isRootBlockSelected:
+					!! selectionStartClientId &&
+					rootClientId === selectionStartClientId,
+				hasSelectedBlock:
+					!! selectionStartClientId &&
+					!! getBlock( selectionStartClientId ),
+			};
+		},
+		[]
+	);
 
 	const { saveMenu } = useDispatch( 'core' );
 	const menu = useSelect( ( select ) => select( 'core' ).getMenu( menuId ), [
@@ -120,13 +118,12 @@ export default function BlockEditorArea( {
 					className={ classnames(
 						'edit-navigation-editor__block-editor-toolbar',
 						{
-							'is-hidden':
-								isNavigationModeActive || isRootBlockSelected,
+							'is-hidden': isNavigationModeActive,
 						}
 					) }
 					aria-label={ __( 'Block tools' ) }
 				>
-					{ hasSelectedBlock && ! isRootBlockSelected && (
+					{ hasSelectedBlock && (
 						<BlockToolbar __experimentalExpandedControl />
 					) }
 				</NavigableToolbar>

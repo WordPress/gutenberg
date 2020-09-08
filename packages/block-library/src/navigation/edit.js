@@ -21,6 +21,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	ToolbarGroup,
+	__experimentalEditInPlaceControl as EditInPlaceControl,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -120,47 +121,61 @@ function Navigation( {
 	return (
 		<>
 			<BlockControls>
-				<Toolbar
-					icon={
-						attributes.itemsJustification
-							? navIcons[
-									`justify${ upperFirst(
-										attributes.itemsJustification
-									) }Icon`
-							  ]
-							: navIcons.justifyLeftIcon
-					}
-					label={ __( 'Change items justification' ) }
-					isCollapsed
-					controls={ [
-						{
-							icon: navIcons.justifyLeftIcon,
-							title: __( 'Justify items left' ),
-							isActive: 'left' === attributes.itemsJustification,
-							onClick: handleItemsAlignment( 'left' ),
-						},
-						{
-							icon: navIcons.justifyCenterIcon,
-							title: __( 'Justify items center' ),
-							isActive:
-								'center' === attributes.itemsJustification,
-							onClick: handleItemsAlignment( 'center' ),
-						},
-						{
-							icon: navIcons.justifyRightIcon,
-							title: __( 'Justify items right' ),
-							isActive: 'right' === attributes.itemsJustification,
-							onClick: handleItemsAlignment( 'right' ),
-						},
-					] }
-				/>
-				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
-				<BlockColorsStyleSelector
-					TextColor={ TextColor }
-					BackgroundColor={ BackgroundColor }
-				>
-					{ ColorPanel }
-				</BlockColorsStyleSelector>
+				{ attributes.hasTools && (
+					<>
+						<Toolbar
+							icon={
+								attributes.itemsJustification
+									? navIcons[
+											`justify${ upperFirst(
+												attributes.itemsJustification
+											) }Icon`
+									  ]
+									: navIcons.justifyLeftIcon
+							}
+							label={ __( 'Change items justification' ) }
+							isCollapsed
+							controls={ [
+								{
+									icon: navIcons.justifyLeftIcon,
+									title: __( 'Justify items left' ),
+									isActive:
+										'left' ===
+										attributes.itemsJustification,
+									onClick: handleItemsAlignment( 'left' ),
+								},
+								{
+									icon: navIcons.justifyCenterIcon,
+									title: __( 'Justify items center' ),
+									isActive:
+										'center' ===
+										attributes.itemsJustification,
+									onClick: handleItemsAlignment( 'center' ),
+								},
+								{
+									icon: navIcons.justifyRightIcon,
+									title: __( 'Justify items right' ),
+									isActive:
+										'right' ===
+										attributes.itemsJustification,
+									onClick: handleItemsAlignment( 'right' ),
+								},
+							] }
+						/>
+						<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+						<BlockColorsStyleSelector
+							TextColor={ TextColor }
+							BackgroundColor={ BackgroundColor }
+						>
+							{ ColorPanel }
+						</BlockColorsStyleSelector>
+					</>
+				) }
+				{ ! attributes.hasTools && (
+					<ToolbarGroup>
+						<EditInPlaceControl label={ attributes.menuName } />
+					</ToolbarGroup>
+				) }
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
