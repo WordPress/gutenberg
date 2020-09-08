@@ -8,13 +8,9 @@ For Ubuntu 20.04.1, the standard docker binaries in the repository work as neede
 sudo apt install docker.io docker-compose
 ```
 
-For earlier versions of Ubuntu, the docker binaries included in repositories do not support the features needed for the WordPress environment. 
+For earlier versions of Ubuntu, the docker binaries included in repositories did not support the features needed for the WordPress environment. 
 
-- Follow these [directions from Docker to install](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-
-	- Additionally, you need to install `docker-compose`, you can follow the [directions from Docker](https://docs.docker.com/compose/install/) or simply [download the latest binary](https://github.com/docker/compose/releases) from GitHub releases.
-
-	- After downloading the binary file `docker-compose-Linux-x86_64`, rename to just `docker-compose` and copy it to `/usr/local/bin` or another spot in your PATH.
+- For Ubuntu prior to 20.04.1, follow these [directions from Docker to install](https://docs.docker.com/install/linux/docker-ce/ubuntu/). Additionally `docker-compose` is required, you may need to install separately, see [ Docker compose documentation](https://docs.docker.com/compose/install/).
 
 ## Troubleshooting
 
