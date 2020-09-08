@@ -67,6 +67,7 @@ export default function BlockNavigationBlock( {
 	const { selectBlock: selectEditorBlock } = useDispatch(
 		'core/block-editor'
 	);
+	const __experimentalFeatures = useBlockNavigationFeaturesContext();
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers =
@@ -78,7 +79,7 @@ export default function BlockNavigationBlock( {
 		'block-editor-block-navigation-block__mover-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
-	const __experimentalFeatures = useBlockNavigationFeaturesContext();
+
 	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': hasVisibleMovers }
