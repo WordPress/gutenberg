@@ -46,14 +46,19 @@ class WP_Block_Styles {
 	 * @access public
 	 */
 	public function __construct() {
+
+		// Add split styles if the theme supports it.
 		if ( current_theme_supports( 'split-block-styles' ) ) {
 			add_filter( 'render_block', array( $this, 'add_styles' ), 10, 2 );
 			return;
+		} else {
+			// If we got here we need to add all styles for all blocks.
+			add_action( 'init', array( $this, 'print_concat_styles' ) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_concat_styles' ), 9999 );
 		}
 
-		// If we got this far we need to add all styles for all blocks.
-		add_action( 'init', array( $this, 'concat_add_style' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_concat_styles' ), 9999 );
+		// Add editor styles.
+		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_concat_styles' ], 1 );
 	}
 
 	/**
@@ -335,7 +340,7 @@ class WP_Block_Styles {
 	 *
 	 * @return void
 	 */
-	public function concat_add_style() {
+	public function print_concat_styles() {
 		if ( ! isset( $_GET['print-core-styles'] ) || '1' !== $_GET['print-core-styles'] ) {
 			return;
 		}
