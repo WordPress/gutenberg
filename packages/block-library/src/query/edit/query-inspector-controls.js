@@ -13,7 +13,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		return {
 			authorList: getEntityRecords( 'root', 'user', { per_page: -1 } ),
 		};
-	} );
+	}, [] );
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Sorting and Filtering' ) }>
