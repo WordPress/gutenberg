@@ -3,15 +3,6 @@
 class WP_Block_Styles {
 
 	/**
-	 * An array of blocks along with their styles.
-	 *
-	 * @access protected
-	 *
-	 * @var array
-	 */
-	protected $blocks;
-
-	/**
 	 * An array of stylesheets that have already been added.
 	 *
 	 * @access protected
