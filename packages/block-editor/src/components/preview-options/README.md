@@ -36,7 +36,7 @@ const MyPreviewOptions = () => (
 
 The CSS classes added to the component.
 
--   Type: any
+-   Type: `String`
 
 #### isEnabled
 
@@ -50,13 +50,13 @@ And example of when the preview options are not enabled is when the current post
 
 The device type in the preview options. It can be either Desktop or Tablet or Mobile among others.
 
--   Type: `any`
+-   Type: `String`
 
 #### setDeviceType
 
 Used to set the device type that will be used to display the preview inside the editor.
 
--   Type: `any`
+-   Type: `func`
 
 ## Related components
 
