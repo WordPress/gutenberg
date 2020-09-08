@@ -30,45 +30,14 @@ class WP_Block_Styles {
 	protected $injection_script_added = false;
 
 	/**
-	 * An array of core block styles.
+	 * An array of core blocks that can cause layout shifts.
 	 *
 	 * @access protected
 	 *
 	 * @var array
 	 */
-	protected $core_block_styles = array(
-		'audio'           => 'inline',
-		'button'          => 'inline_link',
-		'buttons'         => 'inline_link',
-		'calendar'        => 'inject',
-		'categories'      => 'inject',
-		'columns'         => 'inject',
-		'cover'           => 'footer',
-		'embed'           => 'inline',
-		'file'            => 'inline',
-		'gallery'         => 'footer',
-		'heading'         => 'inline',
-		'image'           => 'inline',
-		'latest-comments' => 'inline',
-		'latest-posts'    => 'inline',
-		'list'            => 'inline',
-		'media-text'      => 'inline',
-		'navigation'      => 'inline',
-		'navigation-link' => 'inline',
-		'paragraph'       => 'inline',
-		'post-author'     => 'inline',
-		'pullquote'       => 'inline',
-		'quote'           => 'inline',
-		'rss'             => 'inline',
-		'search'          => 'inline',
-		'separator'       => 'inline',
-		'site-logo'       => 'inline',
-		'social-links'    => 'inline',
-		'spacer'          => 'inline',
-		'subhead'         => 'inline',
-		'table'           => 'inline',
-		'text-columns'    => 'inline',
-		'video'           => 'inline',
+	protected $layout_shift_blocks = array(
+		'core/columns',
 	);
 
 	/**
@@ -80,35 +49,6 @@ class WP_Block_Styles {
 		if ( current_theme_supports( 'split-block-styles' ) ) {
 			add_filter( 'render_block', [ $this, 'add_styles' ], 10, 2 );
 		}
-	}
-
-	/**
-	 * Get an array of block styles.
-	 *
-	 * @access public
-	 *
-	 * @return array
-	 */
-	public function get_blocks_styles_array() {
-
-		if ( ! $this->blocks ) {
-
-			foreach ( $this->core_block_styles as $block => $method ) {
-				if ( ! isset( $this->blocks[ "core/$block" ] ) ) {
-					$this->blocks[ "core/block" ] = array();
-				}
-				$this->blocks[ "core/$block" ][] = array(
-					'handle' => "core-$block-block-styles",
-					'src'    => gutenberg_url( "packages/block-library/build-style/$block.css" ),
-					'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$block.css" ),
-					'media'  => 'all',
-					'method' => $method,
-					'path'   => gutenberg_dir_path() . "packages/block-library/build-style/$block.css",
-				);
-			}
-		}
-
-		return $this->blocks;
 	}
 
 	/**
@@ -129,11 +69,20 @@ class WP_Block_Styles {
 			return $block_content;
 		}
 
-		$block_styles     = array();
-		$all_block_styles = $this->get_blocks_styles_array();
-		$block_styles     = isset( $all_block_styles[ $block['blockName'] ] )
-			? $all_block_styles[ $block['blockName'] ]
-			: array();
+		$block_styles = array();
+		if ( 0 === strpos( $block['blockName'], 'core/' ) ) {
+			$block_name = str_replace( 'core/', '', $block['blockName'] );
+			if ( file_exists( gutenberg_dir_path() . "packages/block-library/build-style/$block_name.css" ) ) {
+				$block_styles[] = array(
+					'handle' => "core-$block_name-block-styles",
+					'src'    => gutenberg_url( "packages/block-library/build-style/$block_name.css" ),
+					'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$block_name.css" ),
+					'media'  => 'all',
+					'method' => in_array( $block['blockName'], $this->layout_shift_blocks ) ? 'inline' : 'inject',
+					'path'   => gutenberg_dir_path() . "packages/block-library/build-style/$block_name.css",
+				);
+			}
+		}
 
 		/**
 		 * Filter collection of stylesheets per block-type.
