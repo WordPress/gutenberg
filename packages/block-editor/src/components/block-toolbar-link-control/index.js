@@ -70,7 +70,7 @@ export default function ToolbarLinkControl( {
 	);
 
 	return (
-		<BlockToolbarInlinePopoverFill>
+		<BlockToolbarInlinePopoverFill onClose={ close }>
 			<ToolbarLinkControlContext.Provider value={ contextValue }>
 				<ToolbarGroup>
 					<LinkInputToolbarItem />
