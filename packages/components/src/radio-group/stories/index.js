@@ -17,7 +17,7 @@ export const _default = () => {
 		<RadioGroup
 			// id is required for server side rendering
 			id="default-radiogroup"
-			accessibilityLabel="options"
+			label="options"
 			defaultChecked="option2"
 		>
 			<Radio value="option1">Option 1</Radio>
@@ -35,7 +35,7 @@ export const disabled = () => {
 			// id is required for server side rendering
 			id="disabled-radiogroup"
 			disabled
-			accessibilityLabel="options"
+			label="options"
 			defaultChecked="option2"
 		>
 			<Radio value="option1">Option 1</Radio>
@@ -54,7 +54,7 @@ const ControlledRadioGroupWithState = () => {
 		<RadioGroup
 			// id is required for server side rendering
 			id="controlled-radiogroup"
-			accessibilityLabel="options"
+			label="options"
 			checked={ checked }
 			onChange={ setChecked }
 		>
