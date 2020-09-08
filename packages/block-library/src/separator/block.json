@@ -11,6 +11,8 @@
 	},
 	"supports": {
 		"anchor": true,
-		"alignment": true
+		"align": true,
+		"align": ["wide","full"],
+		"html": false
 	}
 }
