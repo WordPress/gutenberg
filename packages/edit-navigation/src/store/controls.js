@@ -92,6 +92,19 @@ export function resolveMenuItems( menuId ) {
 }
 
 /**
+ * Resolves menu items for given menu id.
+ *
+ * @param {number} menuId Menu ID.
+ * @return {Object} Action.
+ */
+export function resolveMenu( menuId ) {
+	return {
+		type: 'RESOLVE_MENU',
+		query: { id: menuId },
+	};
+}
+
+/**
  * Calls a selector using chosen registry.
  *
  * @param {string} registryName Registry name.
@@ -171,6 +184,12 @@ const controls = {
 				.getMenuItems( query );
 		}
 	),
+
+	RESOLVE_MENU: createRegistryControl( ( registry ) => ( { query } ) => {
+		return registry
+			.__experimentalResolveSelect( 'core' )
+			.getMenu( query.id );
+	} ),
 };
 
 const getState = ( registry ) =>

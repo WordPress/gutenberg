@@ -11,7 +11,7 @@ import { parse, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { resolveMenuItems, dispatch } from './controls';
+import { resolveMenu, resolveMenuItems, dispatch } from './controls';
 import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
 
 /**
@@ -36,8 +36,10 @@ export function* getNavigationPostForMenu( menuId ) {
 
 	// Now let's create a proper one hydrated using actual menu items
 	const menuItems = yield resolveMenuItems( menuId );
+	const menu = yield resolveMenu( menuId );
 	const [ navigationBlock, menuItemIdToClientId ] = createNavigationBlock(
-		menuItems
+		menuItems,
+		menu
 	);
 	yield {
 		type: 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
@@ -79,10 +81,11 @@ const persistPost = ( post ) =>
 /**
  * Converts an adjacency list of menuItems into a navigation block.
  *
- * @param {Array} menuItems a list of menu items
+ * @param {Array}  menuItems a list of menu items
+ * @param {Object} menu the menu details
  * @return {Object} Navigation block
  */
-function createNavigationBlock( menuItems ) {
+function createNavigationBlock( menuItems, menu ) {
 	const itemsByParentID = groupBy( menuItems, 'parent' );
 	const menuItemIdToClientId = {};
 	const menuItemsToTreeOfBlocks = ( items ) => {
@@ -112,7 +115,7 @@ function createNavigationBlock( menuItems ) {
 		'core/navigation',
 		{
 			hasTools: false,
-			menuName: '(untitled menu)',
+			menuName: menu?.name ?? '(untitled menu)',
 		},
 		innerBlocks
 	);
