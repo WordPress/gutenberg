@@ -37,7 +37,7 @@ $tree-item-height: 36px;
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: $grid-unit-20 6px;
+		padding: $grid-unit-15 ($grid-unit-15 / 2);
 		margin-top: auto;
 		margin-bottom: auto;
 		text-align: left;
@@ -111,6 +111,7 @@ $tree-item-height: 36px;
 
 	.block-editor-block-navigation-block__menu-cell,
 	.block-editor-block-navigation-block__mover-cell {
+		line-height: 0;
 		width: $button-size;
 		opacity: 0;
 		vertical-align: top;
@@ -229,7 +230,7 @@ $tree-item-height: 36px;
 	}
 
 	.block-editor-block-navigation-block__contents-container {
-		min-height: 56px;
+		min-height: $grid-unit-60;
 	}
 
 	.block-editor-block-navigator-descender-line {
