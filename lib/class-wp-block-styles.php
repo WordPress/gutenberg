@@ -1,5 +1,13 @@
 <?php
+/**
+ * Blocks API: WP_Block_Styles class
+ *
+ * @package Gutenberg
+ */
 
+/**
+ * Handles block styles enqueueing.
+ */
 class WP_Block_Styles {
 
 	/**
@@ -39,13 +47,13 @@ class WP_Block_Styles {
 	 */
 	public function __construct() {
 		if ( current_theme_supports( 'split-block-styles' ) ) {
-			add_filter( 'render_block', [ $this, 'add_styles' ], 10, 2 );
+			add_filter( 'render_block', array( $this, 'add_styles' ), 10, 2 );
 			return;
 		}
 
 		// If we got this far we need to add all styles for all blocks.
-		add_action( 'init', [ $this, 'concat_add_style' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_concat_styles' ], 9999 );
+		add_action( 'init', array( $this, 'concat_add_style' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_concat_styles' ), 9999 );
 	}
 
 	/**
@@ -61,7 +69,7 @@ class WP_Block_Styles {
 		// Early return if the styles for this block-type have already been added.
 		if (
 			! isset( $block['blockName'] ) || // Sanity check.
-			in_array( $block['blockName'], $this->styled_blocks )
+			in_array( $block['blockName'], $this->styled_blocks, true )
 		) {
 			return $block_content;
 		}
@@ -77,7 +85,7 @@ class WP_Block_Styles {
 					'src'    => gutenberg_url( "packages/block-library/build-style/$filename.css" ),
 					'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ),
 					'media'  => 'all',
-					'method' => in_array( $block['blockName'], $this->layout_shift_blocks ) ? 'inline' : 'inject',
+					'method' => in_array( $block['blockName'], $this->layout_shift_blocks, true ) ? 'inline' : 'inject',
 					'path'   => gutenberg_dir_path() . "packages/block-library/build-style/$filename.css",
 				);
 			}
@@ -183,7 +191,7 @@ class WP_Block_Styles {
 		wp_enqueue_style(
 			$block_style['handle'],
 			$block_style['src'],
-			[],
+			array(),
 			$block_style['ver'],
 			isset( $block_style['media'] ) ? $block_style['media'] : 'all'
 		);
@@ -206,11 +214,11 @@ class WP_Block_Styles {
 
 		$style = wp_parse_args(
 			$block_style,
-			[
+			array(
 				'handle' => '',
 				'src'    => '',
 				'ver'    => false,
-			]
+			)
 		);
 		echo "<script>wpEnqueueStyle('{$style['handle']}', '{$style['src']}', [], '{$style['ver']}', '{$style['media']}')</script>";
 
@@ -270,6 +278,7 @@ class WP_Block_Styles {
 			'wp-block-library-styles',
 			add_query_arg( 'print-core-styles', '1', home_url() ),
 			array(),
+			filemtime( gutenberg_dir_path() . 'build/block-library/style.css' )
 		);
 	}
 
@@ -288,11 +297,11 @@ class WP_Block_Styles {
 		header( 'Content-Type: text/css' );
 
 		$files      = glob( gutenberg_dir_path() . 'packages/block-library/build-style/*.css' );
-		$exceptions = [ 'editor.css', 'editor-rtl.css', 'style.css', 'style-rtl.css', 'theme.css', 'theme-rtl.css' ];
+		$exceptions = array( 'editor.css', 'editor-rtl.css', 'style.css', 'style-rtl.css', 'theme.css', 'theme-rtl.css' );
 
 		foreach ( $files as $file ) {
 			$basename = basename( $file );
-			if ( in_array( $basename, $exceptions ) ) {
+			if ( in_array( $basename, $exceptions, true ) ) {
 				continue;
 			}
 
