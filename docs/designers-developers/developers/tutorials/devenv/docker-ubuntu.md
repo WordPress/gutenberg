@@ -4,11 +4,13 @@ This article covers setting up the local WordPress development environment using
 
 For Ubuntu 20.04.1, the standard docker binaries in the repository work as needed:
 	
-	- sudo apt install docker.io docker-compose
+```
+sudo apt install docker.io docker-compose
+```
 
 For earlier versions of Ubuntu, the docker binaries included in repositories do not support the features needed for the WordPress environment. 
 
-	-Follow these [directions from Docker to install](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+- Follow these [directions from Docker to install](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
 	- Additionally, you need to install `docker-compose`, you can follow the [directions from Docker](https://docs.docker.com/compose/install/) or simply [download the latest binary](https://github.com/docker/compose/releases) from GitHub releases.
 
