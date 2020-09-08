@@ -28,6 +28,9 @@ import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
 import { getColumnWidths } from '../columns/utils';
 
+const MIN_WIDTH = 32;
+const MARGIN = 8;
+
 function ColumnEdit( {
 	attributes,
 	setAttributes,
@@ -60,39 +63,63 @@ function ColumnEdit( {
 		} );
 	};
 
+	const getContainerWidth = ( containerWidth ) => {
+		return 2 * MARGIN + containerWidth - columnWidths.length * 2 * MARGIN;
+	};
+
+	const hasWidth = Number.isFinite( attributes.width );
+
 	const columnWidths = Object.values(
 		getColumnWidths( columns, columnCount )
 	);
 
-	const columnSum = columnWidths.reduce( ( acc, curr ) => acc + curr );
+	const columnWidthsSum = columnWidths.reduce(
+		( acc, curr ) => acc + curr,
+		0
+	);
 
-	const hasWidth = Number.isFinite( attributes.width );
+	const percentageRatio = attributes.width / columnWidthsSum;
 
-	const percentageRatio = attributes.width / columnSum;
+	const minPercentageRatio = MIN_WIDTH / getContainerWidth( parentWidth );
 
-	const y = columnWidths
-		.map(
-			( aw ) =>
-				( aw / columnSum ) *
-				( 16 + parentWidth - columnWidths.length * 2 * 8 )
-		)
-		.filter( ( z ) => z < 32 );
+	const columnWidthsPerRatio = columnWidths.map(
+		( columnWidth ) =>
+			( columnWidth / columnWidthsSum ) * getContainerWidth( parentWidth )
+	);
 
-	const newParentWidth = parentWidth - y.length * 32;
+	const filteredColumnWidthsPerRatio = columnWidthsPerRatio.filter(
+		( columnWidthPerRatio ) => columnWidthPerRatio < MIN_WIDTH
+	);
+
+	const columnsRatio = columnWidths.map(
+		( columnWidth ) => columnWidth / columnWidthsSum
+	);
+
+	const largeColumnsWidthsSum = columnsRatio
+		.map( ( ratio, index ) => {
+			if ( ratio > minPercentageRatio ) {
+				return columnWidths[ index ];
+			}
+			return 0;
+		} )
+		.reduce( ( acc, curr ) => acc + curr, 0 );
+
+	const newParentWidth =
+		parentWidth - filteredColumnWidthsPerRatio.length * MIN_WIDTH;
 
 	const columnWidth = Math.floor(
-		percentageRatio * ( 16 + parentWidth - columnWidths.length * 2 * 8 )
+		percentageRatio * getContainerWidth( parentWidth )
 	);
 
 	const newColumnWidth =
-		columnWidth < 32
-			? 32
+		columnWidth < MIN_WIDTH
+			? MIN_WIDTH
 			: Math.floor(
-					percentageRatio *
-						( 16 + newParentWidth - columnWidths.length * 2 * 8 )
+					( attributes.width / largeColumnsWidthsSum ) *
+						getContainerWidth( newParentWidth )
 			  );
 
-	const x = hasWidth && { width: newColumnWidth };
+	const finalWidth = hasWidth && { width: newColumnWidth };
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -105,7 +132,7 @@ function ColumnEdit( {
 						),
 					contentStyle,
 					styles.columnPlaceholderNotSelected,
-					x,
+					finalWidth,
 				] }
 			/>
 		);
@@ -148,7 +175,7 @@ function ColumnEdit( {
 				style={ [
 					contentStyle,
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
-					x,
+					finalWidth,
 				] }
 			>
 				<InnerBlocks
