@@ -664,6 +664,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$screen = get_current_screen();
 	if (
 		! empty( $screen ) &&
+		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( $screen->id ) &&
 		gutenberg_experimental_global_styles_has_theme_json_support()
 	) {
