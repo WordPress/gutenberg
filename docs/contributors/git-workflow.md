@@ -25,6 +25,12 @@ See the [repository management document](/docs/contributors/repository-managemen
 
 The workflow for code and documentation is the same—since both are managed in GitHub—so you can watch a [video walk-through of contributing documentation](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
 
+
+Here is a visual overview of the Git workflow:
+
+![Visual Overview of Git Workflow](https://developer.wordpress.org/files/2020/09/git-workflow.png)
+
+
 **Step 1**: Go to the Gutenberg repository on GitHub and click Fork. This creates a copy of the main Gutenberg repository to your account.
 
 ![Screenshot showing fork button on GitHub](https://developer.wordpress.org/files/2020/09/gutenberg-fork.png)
