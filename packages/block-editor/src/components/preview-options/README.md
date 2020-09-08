@@ -18,7 +18,7 @@ It returns a [`DropdownMenu`](https://github.com/WordPress/gutenberg/tree/master
 Renders the previews options of the editor in a dropdown menu.
 
 ```jsx
-import { PreviewOptions } from '@wordpress/block-editor';
+import { __experimentalPreviewOptions as PreviewOptions } from '@wordpress/block-editor';
 
 const MyPreviewOptions = () => (
     <PreviewOptions
