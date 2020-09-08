@@ -53,11 +53,6 @@
 	// Switcher.
 	.block-editor-block-switcher .components-dropdown-menu__toggle,
 	.block-editor-block-switcher__no-switcher-icon {
-		min-width: $block-toolbar-height - $grid-unit-15 / 2 !important;
-		width: $block-toolbar-height - $grid-unit-15 / 2 !important;
-		padding-left: $grid-unit-15 - $border-width !important;
-		padding-right: $grid-unit-15 / 2 !important;
-
 		.block-editor-block-icon {
 			width: $button-size-small !important;
 			margin: 0 !important;
@@ -66,6 +61,11 @@
 		&:focus::before {
 			right: $grid-unit-05 !important;
 		}
+	}
+
+	// Compensate for width of block switcher.
+	.block-editor-block-mover {
+		margin-left: -$grid-unit-15 / 2;
 	}
 }
 
