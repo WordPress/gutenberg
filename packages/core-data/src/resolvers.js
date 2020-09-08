@@ -13,6 +13,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import {
+	receiveUserQuery,
 	receiveCurrentTheme,
 	receiveCurrentUser,
 	receiveEntityRecords,
@@ -24,6 +25,16 @@ import {
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { apiFetch, select, resolveSelect } from './controls';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
+
+/**
+ * Requests authors from the REST API.
+ */
+export function* getAuthors() {
+	const users = yield apiFetch( {
+		path: '/wp/v2/users/?who=authors&per_page=-1',
+	} );
+	yield receiveUserQuery( 'authors', users );
+}
 
 /**
  * Requests the current user from the REST API.

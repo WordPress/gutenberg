@@ -27,6 +27,18 @@ _Returns_
 
 -   `(boolean|undefined)`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
+<a name="getAuthors" href="#getAuthors">#</a> **getAuthors**
+
+Returns all available authors.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+
+_Returns_
+
+-   `Array`: Authors list.
+
 <a name="getAutosave" href="#getAutosave">#</a> **getAutosave**
 
 Returns the autosave for the post and author.
