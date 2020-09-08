@@ -14,7 +14,8 @@
 				"categoryIds": [],
 				"tagIds": [],
 				"order": "desc",
-				"orderBy": "date"
+				"orderBy": "date",
+				"author": null
 			}
 		}
 	},

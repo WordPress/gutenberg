@@ -26,6 +26,7 @@ export default function QueryLoopEdit( {
 			tagIds = [],
 			order,
 			orderBy,
+			author,
 		} = {},
 		queryContext,
 	},
@@ -45,6 +46,9 @@ export default function QueryLoopEdit( {
 			if ( perPage ) {
 				query.per_page = perPage;
 			}
+			if ( author ) {
+				query.author = author;
+			}
 			return {
 				posts: select( 'core' ).getEntityRecords(
 					'postType',
@@ -54,7 +58,17 @@ export default function QueryLoopEdit( {
 				blocks: select( 'core/block-editor' ).getBlocks( clientId ),
 			};
 		},
-		[ perPage, page, offset, categoryIds, tagIds, order, orderBy, clientId ]
+		[
+			perPage,
+			page,
+			offset,
+			categoryIds,
+			tagIds,
+			order,
+			orderBy,
+			clientId,
+			author,
+		]
 	);
 
 	const blockContexts = useMemo(
