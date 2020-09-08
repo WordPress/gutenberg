@@ -97,7 +97,7 @@ class WP_Block_Styles {
 			'core/subhead',
 			'core/table',
 			'core/text-columns',
-			'core/video'
+			'core/video',
 		);
 
 		foreach ( $core_blocks as $block ) {
