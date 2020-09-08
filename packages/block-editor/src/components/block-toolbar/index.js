@@ -21,6 +21,7 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
+import { BlockToolbarWrapperWithInlinePopoverSlot } from '../block-toolbar-inline-popover';
 import { useShowMoversGestures } from './utils';
 
 export default function BlockToolbar( { hideDragHandle } ) {
@@ -97,7 +98,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	);
 
 	return (
-		<div className={ classes }>
+		<BlockToolbarWrapperWithInlinePopoverSlot className={ classes }>
 			<div ref={ nodeRef } { ...showMoversGestures }>
 				{ ! isMultiToolbar && (
 					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
@@ -127,6 +128,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</div>
+		</BlockToolbarWrapperWithInlinePopoverSlot>
 	);
 }

@@ -42,6 +42,11 @@
 	> :last-child .components-toolbar {
 		border-right: none;
 	}
+
+	&.is-hidden {
+		visibility: hidden;
+		width: 0;
+	}
 }
 
 // Block controls.
