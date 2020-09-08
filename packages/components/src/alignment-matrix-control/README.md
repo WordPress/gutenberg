@@ -1,6 +1,6 @@
 # AlignmentMatrixControl
 
-AlignmentMatrixControl components let adjust horizontal and vertical alignments for UI.
+AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
 
 ## Usage
 
