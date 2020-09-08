@@ -57,26 +57,71 @@ class WP_Block_Styles {
 	}
 
 	/**
-	 * Add block-styles on the 1st occurence of a block-type.
+	 * Get an array of styled blocks.
 	 *
-	 * @param string $block_content The block content about to be appended.
-	 * @param array  $block         The full block, including name and attributes.
+	 * Only blocks that are in this array will be processed.
 	 *
-	 * @return string
+	 * @access public
+	 *
+	 * @return array
 	 */
-	function add_styles( $block_content, $block ) {
+	public function get_styled_blocks() {
+		return apply_filters(
+			'styled_blocks_array',
+			array(
+				'core/audio',
+				'core/button',
+				'core/buttons',
+				'core/calendar',
+				'core/categories',
+				'core/columns',
+				'core/cover',
+				'core/embed',
+				'core/file',
+				'core/gallery',
+				'core/heading',
+				'core/image',
+				'core/latest-comments',
+				'core/latest-posts',
+				'core/list',
+				'core/media-text',
+				'core/navigation',
+				'core/navigation-link',
+				'core/paragraph',
+				'core/post-author',
+				'core/pullquote',
+				'core/quote',
+				'core/rss',
+				'core/search',
+				'core/separator',
+				'core/site-logo',
+				'core/social-links',
+				'core/spacer',
+				'core/subhead',
+				'core/table',
+				'core/text-columns',
+				'core/video'
+			)
+		);
+	}
 
-		// Early return if the styles for this block-type have already been added.
-		if (
-			! isset( $block['blockName'] ) || // Sanity check.
-			in_array( $block['blockName'], $this->styled_blocks, true )
-		) {
-			return $block_content;
+	/**
+	 * Get an array of styles for a block-name.
+	 *
+	 * @access public
+	 *
+	 * @param string $block_name The block-name.
+	 *
+	 * @return array
+	 */
+	public function get_block_styles( $block_name ) {
+		if ( ! in_array( $block_name, $this->get_styled_blocks(), true ) ) {
+			return array();
 		}
 
 		$block_styles = array();
-		if ( 0 === strpos( $block['blockName'], 'core/' ) ) {
-			$filename  = str_replace( 'core/', '', $block['blockName'] );
+		if ( 0 === strpos( $block_name, 'core/' ) ) {
+			$filename  = str_replace( 'core/', '', $block_name );
 			$filename .= is_rtl() ? '-rtl' : '';
 
 			if ( file_exists( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ) ) {
@@ -85,7 +130,7 @@ class WP_Block_Styles {
 					'src'    => gutenberg_url( "packages/block-library/build-style/$filename.css" ),
 					'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ),
 					'media'  => 'all',
-					'method' => in_array( $block['blockName'], $this->layout_shift_blocks, true ) ? 'inline' : 'inject',
+					'method' => in_array( $block_name, $this->layout_shift_blocks, true ) ? 'inline' : 'inject',
 					'path'   => gutenberg_dir_path() . "packages/block-library/build-style/$filename.css",
 				);
 			}
@@ -97,9 +142,31 @@ class WP_Block_Styles {
 		 * @since 5.5.0
 		 *
 		 * @param array  $block_styles An array of stylesheets per block-type.
-		 * @param string $block_name   The $block['blockName'] identifier.
+		 * @param string $block_name   The $block_name identifier.
 		 */
-		$block_styles = apply_filters( 'block_styles', $block_styles, $block['blockName'] );
+		return apply_filters( 'block_styles', $block_styles, $block_name );
+	}
+
+	/**
+	 * Add block-styles on the 1st occurence of a block-type.
+	 *
+	 * @param string $block_content The block content about to be appended.
+	 * @param array  $block         The full block, including name and attributes.
+	 *
+	 * @return string
+	 */
+	function add_styles( $block_content, $block ) {
+
+		// Early return if the
+		if (
+			! isset( $block['blockName'] ) || // Sanity check.
+			in_array( $block['blockName'], $this->styled_blocks, true ) || // Styles for this block-type have already been added.
+			! in_array( $block['blockName'], $this->get_styled_blocks(), true ) // This block is not styled.
+		) {
+			return $block_content;
+		}
+
+		$block_styles = $this->get_block_styles( $block['blockName'] );
 
 		foreach ( $block_styles as $block_style ) {
 			$this->add_block_styles( $block_style );
@@ -296,22 +363,12 @@ class WP_Block_Styles {
 
 		header( 'Content-Type: text/css' );
 
-		$files      = glob( gutenberg_dir_path() . 'packages/block-library/build-style/*.css' );
-		$exceptions = array( 'editor.css', 'editor-rtl.css', 'style.css', 'style-rtl.css', 'theme.css', 'theme-rtl.css' );
-
-		foreach ( $files as $file ) {
-			$basename = basename( $file );
-			if ( in_array( $basename, $exceptions, true ) ) {
-				continue;
+		$styled_blocks = $this->get_styled_blocks();
+		foreach ( $styled_blocks as $styled_block ) {
+			$styles = $this->get_block_styles( $styled_block );
+			foreach ( $styles as $style ) {
+				include $style['path'];
 			}
-
-			// Only print rtl/ltr styles depending on the language.
-			$is_stylesheet_rtl = strpos( $basename, '-rtl' );
-			if ( ( is_rtl() && ! $is_stylesheet_rtl ) || ( ! is_rtl() && $is_stylesheet_rtl ) ) {
-				continue;
-			}
-
-			include $file;
 		}
 		exit();
 	}
