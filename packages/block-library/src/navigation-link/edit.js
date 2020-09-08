@@ -9,12 +9,7 @@ import { escape, get, head, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import {
-	useSelect,
-	useDispatch,
-	withDispatch,
-	withSelect,
-} from '@wordpress/data';
+import { useDispatch, withDispatch, withSelect } from '@wordpress/data';
 import {
 	KeyboardShortcuts,
 	PanelBody,
@@ -25,9 +20,10 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
+	BlockToolbarLinkControl,
 	InnerBlocks,
 	InspectorControls,
 	RichText,
@@ -35,13 +31,7 @@ import {
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import {
-	Fragment,
-	useState,
-	useEffect,
-	useRef,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
 
@@ -50,79 +40,11 @@ import { link as linkIcon } from '@wordpress/icons';
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
 
-/**
- * A React hook to determine if it's dragging within the target element.
- *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
- *
- * @return {boolean} Is dragging within the target element.
- */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
-
-	useEffect( () => {
-		function handleDragStart( event ) {
-			// Check the first time when the dragging starts.
-			handleDragEnter( event );
-		}
-
-		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
-		function handleDragEnd() {
-			setIsDraggingWithin( false );
-		}
-
-		function handleDragEnter( event ) {
-			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
-			} else {
-				setIsDraggingWithin( false );
-			}
-		}
-
-		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
-		document.addEventListener( 'dragstart', handleDragStart );
-		document.addEventListener( 'dragend', handleDragEnd );
-		document.addEventListener( 'dragenter', handleDragEnter );
-
-		return () => {
-			document.removeEventListener( 'dragstart', handleDragStart );
-			document.removeEventListener( 'dragend', handleDragEnd );
-			document.removeEventListener( 'dragenter', handleDragEnter );
-		};
-	}, [] );
-
-	return isDraggingWithin;
-};
-
-/**
- * Given the Link block's type attribute, return the query params to give to
- * /wp/v2/search.
- *
- * @param {string} type Link block's type attribute.
- * @return {{ type?: string, subtype?: string }} Search query params.
- */
-function getSuggestionsQuery( type ) {
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type };
-		case 'category':
-			return { type: 'term', subtype: 'category' };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
-		default:
-			return {};
-	}
-}
-
 function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
 	isSelected,
+	isExperimentalNavScreen = false,
 	isImmediateParentOfSelectedBlock,
 	isParentOfSelectedBlock,
 	setAttributes,
@@ -134,35 +56,21 @@ function NavigationLinkEdit( {
 	rgbBackgroundColor,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
-	userCanCreatePosts = false,
 	insertBlocksAfter,
 	mergeBlocks,
 	onReplace,
 } ) {
-	const {
-		label,
-		type,
-		opensInNewTab,
-		url,
-		description,
-		rel,
-		title,
-	} = attributes;
+	const { label, opensInNewTab, url, description, rel } = attributes;
 	const link = {
 		url,
+		rel,
+		label,
 		opensInNewTab,
 	};
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	const listItemRef = useRef( null );
-	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
-
-	const isDraggingBlocks = useSelect(
-		( select ) => select( 'core/block-editor' ).isDraggingBlocks(),
-		[]
-	);
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -186,7 +94,7 @@ function NavigationLinkEdit( {
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
-		if ( isLinkOpen && url ) {
+		if ( isLinkOpen && url && ! isExperimentalNavScreen ) {
 			// Does this look like a URL and have something TLD-ish?
 			if (
 				isURL( prependHTTP( label ) ) &&
@@ -214,24 +122,16 @@ function NavigationLinkEdit( {
 		selection.addRange( range );
 	}
 
-	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
-		userCanCreate = userCanCreatePages;
-	} else if ( type === 'post' ) {
-		userCanCreate = userCanCreatePosts;
-	}
-
-	async function handleCreate( pageTitle ) {
-		const postType = type || 'page';
-
-		const page = await saveEntityRecord( 'postType', postType, {
+	async function handleCreatePage( pageTitle ) {
+		const type = 'page';
+		const page = await saveEntityRecord( 'postType', type, {
 			title: pageTitle,
 			status: 'publish',
 		} );
 
 		return {
 			id: page.id,
-			postType,
+			type,
 			title: page.title.rendered,
 			url: page.link,
 		};
@@ -239,6 +139,14 @@ function NavigationLinkEdit( {
 
 	return (
 		<Fragment>
+			{ isExperimentalNavScreen && isLinkOpen && (
+				<BlockToolbarLinkControl
+					initialLink={ link }
+					createSuggestion={ handleCreatePage }
+					close={ () => setIsLinkOpen( false ) }
+					onChange={ ( args ) => setAttributes( args ) }
+				/>
+			) }
 			<BlockControls>
 				<ToolbarGroup>
 					<KeyboardShortcuts
@@ -276,14 +184,6 @@ function NavigationLinkEdit( {
 						) }
 					/>
 					<TextControl
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Link title' ) }
-						autoComplete="off"
-					/>
-					<TextControl
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
@@ -295,13 +195,8 @@ function NavigationLinkEdit( {
 			</InspectorControls>
 			<Block.li
 				className={ classnames( {
-					'is-editing':
-						( isSelected || isParentOfSelectedBlock ) &&
-						// Don't show the element as editing while dragging.
-						! isDraggingBlocks,
-					// Don't select the element while dragging.
-					'is-selected': isSelected && ! isDraggingBlocks,
-					'is-dragging-within': isDraggingWithin,
+					'is-editing': isSelected || isParentOfSelectedBlock,
+					'is-selected': isSelected,
 					'has-link': !! url,
 					'has-child': hasDescendants,
 					'has-text-color': rgbTextColor,
@@ -313,7 +208,6 @@ function NavigationLinkEdit( {
 					color: rgbTextColor,
 					backgroundColor: rgbBackgroundColor,
 				} }
-				ref={ listItemRef }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
@@ -341,7 +235,7 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ isLinkOpen && (
+					{ ! isExperimentalNavScreen && isLinkOpen && (
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
@@ -350,29 +244,8 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
-								withCreateSuggestion={ userCanCreate }
-								createSuggestion={ handleCreate }
-								createSuggestionButtonText={ ( searchTerm ) => {
-									let format;
-									if ( type === 'post' ) {
-										/* translators: %s: search term. */
-										format = __(
-											'Create post: <mark>%s</mark>'
-										);
-									} else {
-										/* translators: %s: search term. */
-										format = __(
-											'Create page: <mark>%s</mark>'
-										);
-									}
-									return createInterpolateElement(
-										sprintf( format, searchTerm ),
-										{ mark: <mark /> }
-									);
-								} }
-								noDirectEntry={ !! type }
-								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery( type ) }
+								withCreateSuggestion={ userCanCreatePages }
+								createSuggestion={ handleCreatePage }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -421,9 +294,7 @@ function NavigationLinkEdit( {
 					renderAppender={
 						( isSelected && hasDescendants ) ||
 						( isImmediateParentOfSelectedBlock &&
-							! selectedBlockHasDescendants ) ||
-						// Show the appender while dragging to allow inserting element between item and the appender.
-						( isDraggingBlocks && hasDescendants )
+							! selectedBlockHasDescendants )
 							? InnerBlocks.DefaultAppender
 							: false
 					}
@@ -433,10 +304,7 @@ function NavigationLinkEdit( {
 						className: classnames(
 							'wp-block-navigation__container',
 							{
-								'is-parent-of-selected-block':
-									isParentOfSelectedBlock &&
-									// Don't select as parent of selected block while dragging.
-									! isDraggingBlocks,
+								'is-parent-of-selected-block': isParentOfSelectedBlock,
 							}
 						),
 					} }
@@ -482,6 +350,11 @@ export default compose( [
 			getBlockParentsByBlockName( clientId, 'core/navigation' )
 		);
 		const navigationBlockAttributes = getBlockAttributes( rootBlock );
+		const isExperimentalNavScreen = get(
+			getSettings(),
+			'__experimentalNavigationScreen',
+			false
+		);
 		const colors = get( getSettings(), 'colors', [] );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
 			.length;
@@ -497,7 +370,13 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
+		const userCanCreatePages = select( 'core' ).canUser(
+			'create',
+			'pages'
+		);
+
 		return {
+			isExperimentalNavScreen,
 			isParentOfSelectedBlock,
 			isImmediateParentOfSelectedBlock,
 			hasDescendants,
@@ -505,8 +384,7 @@ export default compose( [
 			showSubmenuIcon,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
-			userCanCreatePages: select( 'core' ).canUser( 'create', 'pages' ),
-			userCanCreatePosts: select( 'core' ).canUser( 'create', 'posts' ),
+			userCanCreatePages,
 			rgbTextColor: getColorObjectByColorSlug(
 				colors,
 				navigationBlockAttributes.textColor,

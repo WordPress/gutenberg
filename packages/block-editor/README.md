@@ -210,6 +210,10 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="BlockToolbarLinkControl" href="#BlockToolbarLinkControl">#</a> **BlockToolbarLinkControl**
+
+Undocumented declaration.
+
 <a name="BlockVerticalAlignmentToolbar" href="#BlockVerticalAlignmentToolbar">#</a> **BlockVerticalAlignmentToolbar**
 
 _Related_
@@ -559,6 +563,16 @@ _Related_
 <a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
 
 Undocumented declaration.
+
+<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
+
+Function that manipulates media queries from stylesheets to simulate a given
+viewport width.
+
+_Parameters_
+
+-   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
+-   _width_ `?number`: Viewport width to simulate. If provided null, the stylesheets will not be modified.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 

@@ -61,7 +61,9 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__search-results-wrapper {
 	position: relative;
-	margin-top: -$grid-unit-20 + 1px;
+	&.is-vertically-retracted {
+		margin-top: -$grid-unit-20 + 1px;
+	}
 
 	&::before,
 	&::after {
