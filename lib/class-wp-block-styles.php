@@ -57,94 +57,73 @@ class WP_Block_Styles {
 	}
 
 	/**
-	 * Get an array of styled blocks.
-	 *
-	 * Only blocks that are in this array will be processed.
+	 * Get an array of block styles.
 	 *
 	 * @access public
 	 *
 	 * @return array
 	 */
-	public function get_styled_blocks() {
-		return apply_filters(
-			'styled_blocks_array',
-			array(
-				'core/audio',
-				'core/button',
-				'core/buttons',
-				'core/calendar',
-				'core/categories',
-				'core/columns',
-				'core/cover',
-				'core/embed',
-				'core/file',
-				'core/gallery',
-				'core/heading',
-				'core/image',
-				'core/latest-comments',
-				'core/latest-posts',
-				'core/list',
-				'core/media-text',
-				'core/navigation',
-				'core/navigation-link',
-				'core/paragraph',
-				'core/post-author',
-				'core/pullquote',
-				'core/quote',
-				'core/rss',
-				'core/search',
-				'core/separator',
-				'core/site-logo',
-				'core/social-links',
-				'core/spacer',
-				'core/subhead',
-				'core/table',
-				'core/text-columns',
-				'core/video'
-			)
+	public function get_blocks_styles() {
+		$styles      = array();
+		$core_blocks = array(
+			'core/audio',
+			'core/button',
+			'core/buttons',
+			'core/calendar',
+			'core/categories',
+			'core/columns',
+			'core/cover',
+			'core/embed',
+			'core/file',
+			'core/gallery',
+			'core/heading',
+			'core/image',
+			'core/latest-comments',
+			'core/latest-posts',
+			'core/list',
+			'core/media-text',
+			'core/navigation',
+			'core/navigation-link',
+			'core/paragraph',
+			'core/post-author',
+			'core/pullquote',
+			'core/quote',
+			'core/rss',
+			'core/search',
+			'core/separator',
+			'core/site-logo',
+			'core/social-links',
+			'core/spacer',
+			'core/subhead',
+			'core/table',
+			'core/text-columns',
+			'core/video'
 		);
-	}
 
-	/**
-	 * Get an array of styles for a block-name.
-	 *
-	 * @access public
-	 *
-	 * @param string $block_name The block-name.
-	 *
-	 * @return array
-	 */
-	public function get_block_styles( $block_name ) {
-		if ( ! in_array( $block_name, $this->get_styled_blocks(), true ) ) {
-			return array();
-		}
-
-		$block_styles = array();
-		if ( 0 === strpos( $block_name, 'core/' ) ) {
-			$filename  = str_replace( 'core/', '', $block_name );
+		foreach ( $core_blocks as $block ) {
+			$filename  = str_replace( 'core/', '', $block );
 			$filename .= is_rtl() ? '-rtl' : '';
 
 			if ( file_exists( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ) ) {
-				$block_styles[] = array(
-					'handle' => "core-$filename-block-styles",
-					'src'    => gutenberg_url( "packages/block-library/build-style/$filename.css" ),
-					'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ),
-					'media'  => 'all',
-					'method' => in_array( $block_name, $this->layout_shift_blocks, true ) ? 'inline' : 'inject',
-					'path'   => gutenberg_dir_path() . "packages/block-library/build-style/$filename.css",
+				$styles[ $block ] = array(
+					array(
+						'handle' => "core-$filename-block-styles",
+						'src'    => gutenberg_url( "packages/block-library/build-style/$filename.css" ),
+						'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ),
+						'media'  => 'all',
+						'method' => in_array( $block, $this->layout_shift_blocks, true ) ? 'inline' : 'inject',
+						'path'   => gutenberg_dir_path() . "packages/block-library/build-style/$filename.css",
+					),
 				);
 			}
 		}
 
 		/**
-		 * Filter collection of stylesheets per block-type.
+		 * Filter collection of stylesheets for all block-types.
 		 *
-		 * @since 5.5.0
-		 *
-		 * @param array  $block_styles An array of stylesheets per block-type.
-		 * @param string $block_name   The $block_name identifier.
+		 * @param array  $styles An array of stylesheets per block-type.
 		 */
-		return apply_filters( 'block_styles', $block_styles, $block_name );
+		return apply_filters( 'block_styles', $styles );
 	}
 
 	/**
@@ -157,16 +136,16 @@ class WP_Block_Styles {
 	 */
 	function add_styles( $block_content, $block ) {
 
-		// Early return if the
+		// Check if we need to early return.
 		if (
 			! isset( $block['blockName'] ) || // Sanity check.
-			in_array( $block['blockName'], $this->styled_blocks, true ) || // Styles for this block-type have already been added.
-			! in_array( $block['blockName'], $this->get_styled_blocks(), true ) // This block is not styled.
+			in_array( $block['blockName'], $this->styled_blocks, true ) // Styles for this block-type have already been added.
 		) {
 			return $block_content;
 		}
 
-		$block_styles = $this->get_block_styles( $block['blockName'] );
+		$blocks_styles = $this->get_blocks_styles();
+		$block_styles  = isset( $blocks_styles[ $block['blockName'] ] ) ? $blocks_styles[ $block['blockName'] ] : array();
 
 		foreach ( $block_styles as $block_style ) {
 			$this->add_block_styles( $block_style );
@@ -363,9 +342,8 @@ class WP_Block_Styles {
 
 		header( 'Content-Type: text/css' );
 
-		$styled_blocks = $this->get_styled_blocks();
-		foreach ( $styled_blocks as $styled_block ) {
-			$styles = $this->get_block_styles( $styled_block );
+		$blocks_styles = $this->get_blocks_styles();
+		foreach ( $blocks_styles as $styles ) {
 			foreach ( $styles as $style ) {
 				include $style['path'];
 			}
