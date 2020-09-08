@@ -172,6 +172,9 @@ class WP_Block_Styles {
 	public function add_block_styles( $block_style ) {
 
 		$block_style['method'] = ( isset( $block_style['method'] ) ) ? $block_style['method'] : 'inject';
+		if ( is_admin() || wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			$block_style['method'] = 'footer';
+		}
 
 		switch ( $block_style['method'] ) {
 			case 'inline':
