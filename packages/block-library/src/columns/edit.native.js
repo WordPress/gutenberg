@@ -104,16 +104,12 @@ function ColumnsEditContainer( {
 	}, [ width ] );
 
 	const contentStyle = useMemo( () => {
-		const minWidth = Math.min( width, styles.columnsContainer.maxWidth );
-		const columnBaseWidth = minWidth / columnsInRow;
+		const columnBaseWidth = width / columnsInRow;
 
 		let columnWidth = columnBaseWidth;
 		if ( columnsInRow > 1 ) {
-			const margins =
-				columnsInRow *
-				Math.min( columnsInRow, MAX_COLUMNS_NUM_IN_ROW ) *
-				styles.columnMargin.marginLeft;
-			columnWidth = ( minWidth - margins ) / columnsInRow;
+			const margins = columnsInRow * 2 * 16;
+			columnWidth = ( width - margins ) / columnsInRow;
 		}
 		return { width: columnWidth };
 	}, [ width, columnsInRow ] );
@@ -144,12 +140,12 @@ function ColumnsEditContainer( {
 		return null;
 	};
 
-	const getColumnsSliders = () => {
-		const columnWidths = Object.values(
-			getColumnWidths( innerColumns, columnCount )
-		);
+	const columnWidths = Object.values(
+		getColumnWidths( innerColumns, columnCount )
+	);
 
-		return innerColumns.map( ( column, index ) => {
+	const getColumnsSliders = () =>
+		innerColumns.map( ( column, index ) => {
 			return (
 				<RangeControl
 					min={ 1 }
@@ -172,7 +168,6 @@ function ColumnsEditContainer( {
 				/>
 			);
 		} );
-	};
 
 	return (
 		<>
@@ -222,6 +217,7 @@ function ColumnsEditContainer( {
 						}
 						contentStyle={ contentStyle }
 						parentWidth={ width }
+						marginHorizontal={ 8 }
 					/>
 				) }
 			</View>

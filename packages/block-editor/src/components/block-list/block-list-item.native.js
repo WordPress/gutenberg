@@ -66,7 +66,7 @@ export class BlockListItem extends Component {
 			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full &&
 			blockWidth <= ALIGNMENT_BREAKPOINTS.medium
 		) {
-			return marginHorizontal * 2;
+			return marginHorizontal;
 		}
 
 		return marginHorizontal;

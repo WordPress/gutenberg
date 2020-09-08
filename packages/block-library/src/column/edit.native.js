@@ -40,6 +40,7 @@ function ColumnEdit( {
 	columnCount,
 	selectedColumnIndex,
 	parentAlignment,
+	parentWidth,
 } ) {
 	const { verticalAlignment } = attributes;
 
@@ -63,6 +64,36 @@ function ColumnEdit( {
 		getColumnWidths( columns, columnCount )
 	);
 
+	const columnSum = columnWidths.reduce( ( acc, curr ) => acc + curr );
+
+	const hasWidth = Number.isFinite( attributes.width );
+
+	const percentageRatio = attributes.width / columnSum;
+
+	const y = columnWidths
+		.map(
+			( aw ) =>
+				( aw / columnSum ) *
+				( 16 + parentWidth - columnWidths.length * 2 * 8 )
+		)
+		.filter( ( z ) => z < 32 );
+
+	const newParentWidth = parentWidth - y.length * 32;
+
+	const columnWidth = Math.floor(
+		percentageRatio * ( 16 + parentWidth - columnWidths.length * 2 * 8 )
+	);
+
+	const newColumnWidth =
+		columnWidth < 32
+			? 32
+			: Math.floor(
+					percentageRatio *
+						( 16 + newParentWidth - columnWidths.length * 2 * 8 )
+			  );
+
+	const x = hasWidth && { width: newColumnWidth };
+
 	if ( ! isSelected && ! hasChildren ) {
 		return (
 			<View
@@ -74,6 +105,7 @@ function ColumnEdit( {
 						),
 					contentStyle,
 					styles.columnPlaceholderNotSelected,
+					x,
 				] }
 			/>
 		);
@@ -116,6 +148,7 @@ function ColumnEdit( {
 				style={ [
 					contentStyle,
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
+					x,
 				] }
 			>
 				<InnerBlocks

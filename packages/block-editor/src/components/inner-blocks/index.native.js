@@ -40,6 +40,7 @@ function UncontrolledInnerBlocks( props ) {
 		renderAppender,
 		renderFooterAppender,
 		parentWidth,
+		columnsWidth,
 		horizontal,
 		contentResizeMode,
 		contentStyle,
@@ -76,6 +77,7 @@ function UncontrolledInnerBlocks( props ) {
 			withFooter={ false }
 			orientation={ orientation }
 			parentWidth={ parentWidth }
+			columnsWidth={ columnsWidth }
 			horizontalAlignment={ horizontalAlignment }
 			horizontal={ horizontal }
 			contentResizeMode={ contentResizeMode }
