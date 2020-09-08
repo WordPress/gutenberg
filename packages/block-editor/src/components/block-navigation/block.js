@@ -26,7 +26,7 @@ import {
 	BlockMoverDownButton,
 } from '../block-mover/button';
 import DescenderLines from './descender-lines';
-import BlockNavigationBlockContents from './block-contents';
+import BlockSelectButton from './block-select-button';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationFeaturesContext } from './context';
 
@@ -122,14 +122,14 @@ export default function BlockNavigationBlock( {
 							isLastRow={ position === rowCount }
 							terminatedLevels={ terminatedLevels }
 						/>
-						<BlockNavigationBlockContents
+						<BlockSelectButton
 							block={ block }
 							onClick={ onSelectBlock }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							ref={ ref }
+							buttonRef={ ref }
 							tabIndex={ tabIndex }
 							onFocus={ onFocus }
 						/>
