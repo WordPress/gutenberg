@@ -321,6 +321,7 @@ describe( 'actions', () => {
 				value: {
 					type: 'INSERT_BLOCKS',
 					blocks: [ block ],
+					patternName: false,
 					index,
 					rootClientId: 'testclientid',
 					time: expect.any( Number ),
@@ -405,6 +406,7 @@ describe( 'actions', () => {
 							attributes: { className: 'is-style-colorful' },
 						},
 					],
+					patternName: false,
 					index: 5,
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
@@ -462,6 +464,7 @@ describe( 'actions', () => {
 							attributes: { className: 'is-style-colorful' },
 						},
 					],
+					patternName: false,
 					index: 5,
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
@@ -520,6 +523,7 @@ describe( 'actions', () => {
 				value: {
 					type: 'INSERT_BLOCKS',
 					blocks: [ ribsBlock, chickenRibsBlock ],
+					patternName: false,
 					index: 5,
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
