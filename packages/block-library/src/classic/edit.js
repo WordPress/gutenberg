@@ -51,11 +51,11 @@ export default class ClassicEdit extends Component {
 			suffix,
 		} );
 
-		if ( document.readyState === 'complete' ) {
-			this.initialize();
-		} else {
-			window.addEventListener( 'load', this.initialize );
-		}
+		document.addEventListener( 'readystatechange', () => {
+			if ( document.readyState === 'complete' ) {
+				this.initialize();
+			}
+		} );
 	}
 
 	componentWillUnmount() {
@@ -70,12 +70,8 @@ export default class ClassicEdit extends Component {
 		} = this.props;
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
-		const currentContent = editor.getContent();
 
-		if (
-			prevProps.attributes.content !== content &&
-			currentContent !== content
-		) {
+		if ( prevProps.attributes.content !== content ) {
 			editor.setContent( content || '' );
 		}
 	}
@@ -148,7 +144,7 @@ export default class ClassicEdit extends Component {
 				} );
 			}
 		}, 250 );
-		editor.on( 'Paste Change input Undo Redo', debouncedOnChange );
+		// editor.on( 'Paste Change input Undo Redo', debouncedOnChange );
 
 		// We need to cancel the debounce call because when we remove
 		// the editor (onUnmount) this callback is executed in
