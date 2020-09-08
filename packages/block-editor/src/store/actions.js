@@ -484,6 +484,7 @@ export function insertBlock(
  * @param {?number}  index           Index at which block should be inserted.
  * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
  * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {?string}  patternName     Optional If inserted as a block pattern, the namespace of the block pattern.
  *
  *  @return {Object} Action object.
  */
@@ -491,7 +492,8 @@ export function* insertBlocks(
 	blocks,
 	index,
 	rootClientId,
-	updateSelection = true
+	updateSelection = true,
+	patternName = false
 ) {
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
@@ -513,6 +515,7 @@ export function* insertBlocks(
 		return {
 			type: 'INSERT_BLOCKS',
 			blocks: allowedBlocks,
+			patternName,
 			index,
 			rootClientId,
 			time: Date.now(),
