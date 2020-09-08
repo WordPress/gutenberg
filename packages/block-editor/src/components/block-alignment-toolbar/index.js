@@ -92,7 +92,7 @@ export default compose(
 		const { getThemeSupports } = select( 'core' );
 		const themeSupports = getThemeSupports();
 		return {
-			wideControlsEnabled: themeSupports.alignWide,
+			wideControlsEnabled: themeSupports[ 'align-wide' ],
 		};
 	} )
 )( BlockAlignmentToolbar );
