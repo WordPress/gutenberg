@@ -10,10 +10,19 @@
 		},
 		"theme": {
 			"type": "string"
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
 		}
 	},
 	"supports": {
 		"align": true,
-		"html": false
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
+		}
 	}
 }

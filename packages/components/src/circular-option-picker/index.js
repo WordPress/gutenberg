@@ -105,7 +105,9 @@ export default function CircularOptionPicker( {
 				className
 			) }
 		>
-			{ options }
+			<div className="components-circular-option-picker__swatches">
+				{ options }
+			</div>
 			{ children }
 			{ actions && (
 				<div className="components-circular-option-picker__custom-clear-wrapper">

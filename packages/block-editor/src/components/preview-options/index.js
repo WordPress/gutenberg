@@ -32,6 +32,7 @@ export default function PreviewOptions( {
 		isTertiary: true,
 		className: 'block-editor-post-preview__button-toggle',
 		disabled: ! isEnabled,
+		/* translators: button label text should, if possible, be under 16 characters. */
 		children: __( 'Preview' ),
 	};
 	return (

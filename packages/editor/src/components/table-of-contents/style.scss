@@ -38,6 +38,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	margin: 0;
+	margin-top: -$grid-unit-10;
 }
 
 .table-of-contents__count {
@@ -48,8 +49,9 @@
 	color: $dark-gray-300;
 	padding-right: $grid-unit-10;
 	margin-bottom: 0;
+	margin-top: $grid-unit-10;
 
-	&:last-child {
+	&:nth-child(4n) {
 		padding-right: 0;
 	}
 }

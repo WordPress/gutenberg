@@ -224,6 +224,8 @@ $block-inserter-tabs-height: 44px;
 	position: absolute;
 	top: $grid-unit-20;
 	left: calc(100% + #{$grid-unit-20});
+	max-height: calc(100% - #{$grid-unit-40});
+	overflow-y: hidden;
 
 	@include break-medium {
 		display: block;

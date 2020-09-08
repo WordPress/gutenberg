@@ -21,6 +21,7 @@ import {
 	isUpdatingSameBlockAttribute,
 	blocks,
 	isTyping,
+	draggedBlocks,
 	isCaretWithinFormattedText,
 	selectionStart,
 	selectionEnd,
@@ -2061,6 +2062,27 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'draggedBlocks', () => {
+		it( 'should store the dragged client ids when a user starts dragging blocks', () => {
+			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
+			const state = draggedBlocks( [], {
+				type: 'START_DRAGGING_BLOCKS',
+				clientIds,
+			} );
+
+			expect( state ).toBe( clientIds );
+		} );
+
+		it( 'should set the state to an empty array when a user stops dragging blocks', () => {
+			const previousState = [ 'block-1', 'block-2', 'block-3' ];
+			const state = draggedBlocks( previousState, {
+				type: 'STOP_DRAGGING_BLOCKS',
+			} );
+
+			expect( state ).toEqual( [] );
 		} );
 	} );
 
