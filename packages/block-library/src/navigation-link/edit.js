@@ -152,8 +152,6 @@ function NavigationLinkEdit( {
 	} = attributes;
 	const link = {
 		url,
-		rel,
-		label,
 		opensInNewTab,
 	};
 	const { saveEntityRecord } = useDispatch( 'core' );
@@ -271,7 +269,7 @@ function NavigationLinkEdit( {
 			{ isExperimentalNavScreen && isLinkOpen && (
 				<BlockToolbarLinkControl
 					initialLink={ link }
-					createSuggestion={ handleCreatePage }
+					createSuggestion={ handleCreate }
 					close={ () => setIsLinkOpen( false ) }
 					onChange={ ( args ) => setAttributes( args ) }
 				/>

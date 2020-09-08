@@ -7,7 +7,7 @@ import { unstable_CompositeItemWidget as ToolbarWidget } from 'reakit/Composite'
  * WordPress dependencies
  */
 import {
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	Popover,
 	__experimentalToolbarContext as ToolbarContext,
 	__experimentalInputControl as InputControl,

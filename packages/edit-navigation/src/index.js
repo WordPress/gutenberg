@@ -125,6 +125,7 @@ export function initialize( id, settings ) {
 		fetchLinkSuggestions,
 		settings
 	);
+
 	settings.__experimentalNavigationScreen = true;
 
 	render(

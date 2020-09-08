@@ -5,7 +5,7 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 } from '@wordpress/components';
 import {
 	chevronDown as arrowDownIcon,

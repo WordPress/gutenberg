@@ -8,7 +8,7 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BlockControls from '../block-controls';
+import BlockToolbarInlineEdit from '../block-toolbar-inline-edit';
 import SettingsToolbarItem from './settings-toolbar-item';
 import LinkInputToolbarItem from './link-input-toolbar-item';
 import computeDisplayUrl from './compute-display-url';
@@ -70,7 +70,7 @@ export default function ToolbarLinkControl( {
 	);
 
 	return (
-		<BlockControls __experimentalIsExpanded={ true }>
+		<BlockToolbarInlineEdit.Fill onClose={ close }>
 			<ToolbarLinkControlContext.Provider value={ contextValue }>
 				<ToolbarGroup>
 					<LinkInputToolbarItem />
@@ -86,6 +86,6 @@ export default function ToolbarLinkControl( {
 					</ToolbarButton>
 				</ToolbarGroup>
 			</ToolbarLinkControlContext.Provider>
-		</BlockControls>
+		</BlockToolbarInlineEdit.Fill>
 	);
 }
