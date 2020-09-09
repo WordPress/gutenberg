@@ -3,16 +3,7 @@
  */
 import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import {
-	BACKGROUND_COLOR,
-	GRADIENT_COLOR,
-	LINK_COLOR,
-	TEXT_COLOR,
-} from '../editor/utils';
+import { STYLE_PROPERTY, LINK_COLOR } from '@wordpress/blocks';
 
 export default ( {
 	context: { supports, name },
@@ -20,9 +11,9 @@ export default ( {
 	setProperty,
 } ) => {
 	if (
-		! supports.includes( TEXT_COLOR ) &&
-		! supports.includes( BACKGROUND_COLOR ) &&
-		! supports.includes( GRADIENT_COLOR ) &&
+		! supports.includes( 'color' ) &&
+		! supports.includes( 'backgrounColor' ) &&
+		! supports.includes( 'background' ) &&
 		! supports.includes( LINK_COLOR )
 	) {
 		return null;
@@ -30,36 +21,36 @@ export default ( {
 
 	const settings = [];
 
-	if ( supports.includes( TEXT_COLOR ) ) {
+	if ( supports.includes( 'color' ) ) {
 		settings.push( {
-			colorValue: getProperty( name, [ 'color', 'text' ] ),
+			colorValue: getProperty( name, STYLE_PROPERTY.color ),
 			onColorChange: ( value ) =>
-				setProperty( name, [ 'color', 'text' ], value ),
+				setProperty( name, STYLE_PROPERTY.color, value ),
 			label: __( 'Text color' ),
 		} );
 	}
 
 	let backgroundSettings = {};
-	if ( supports.includes( BACKGROUND_COLOR ) ) {
+	if ( supports.includes( 'backgroundColor' ) ) {
 		backgroundSettings = {
-			colorValue: getProperty( name, [ 'color', 'background' ] ),
+			colorValue: getProperty( name, STYLE_PROPERTY.backgroundColor ),
 			onColorChange: ( value ) =>
-				setProperty( name, [ 'color', 'background' ], value ),
+				setProperty( name, STYLE_PROPERTY.backgroundColor, value ),
 		};
 	}
 
 	let gradientSettings = {};
-	if ( supports.includes( GRADIENT_COLOR ) ) {
+	if ( supports.includes( 'background' ) ) {
 		gradientSettings = {
-			gradientValue: getProperty( name, [ 'color', 'gradient' ] ),
+			gradientValue: getProperty( name, STYLE_PROPERTY.background ),
 			onGradientChange: ( value ) =>
-				setProperty( name, [ 'color', 'gradient' ], value ),
+				setProperty( name, STYLE_PROPERTY.background, value ),
 		};
 	}
 
 	if (
-		supports.includes( GRADIENT_COLOR ) ||
-		supports.includes( BACKGROUND_COLOR )
+		supports.includes( 'background' ) ||
+		supports.includes( 'backgroundColor' )
 	) {
 		settings.push( {
 			...backgroundSettings,
@@ -70,9 +61,9 @@ export default ( {
 
 	if ( supports.includes( LINK_COLOR ) ) {
 		settings.push( {
-			colorValue: getProperty( name, [ 'color', 'link' ] ),
+			colorValue: getProperty( name, STYLE_PROPERTY[ LINK_COLOR ] ),
 			onColorChange: ( value ) =>
-				setProperty( name, [ 'color', 'link' ], value ),
+				setProperty( name, STYLE_PROPERTY[ LINK_COLOR ], value ),
 			label: __( 'Link color' ),
 		} );
 	}
