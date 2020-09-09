@@ -301,7 +301,7 @@ function gutenberg_experimental_global_styles_get_support_keys() {
  * @return array Style features supported by the block.
  */
 function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
-	$support_keys = gutenberg_experimental_global_styles_get_support_keys();
+	$support_keys       = gutenberg_experimental_global_styles_get_support_keys();
 	$supported_features = array();
 	foreach ( $support_keys as $key => $path ) {
 		if ( gutenberg_experimental_get( $supports, $path ) ) {
