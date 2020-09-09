@@ -18,7 +18,7 @@ import useBlockTypesState from '../components/inserter/hooks/use-block-types-sta
 import { includeVariationsInInserterItems } from '../components/inserter/utils';
 import BlockIcon from '../components/block-icon';
 
-const SHOWN_BLOCK_TYPES = 6;
+const SHOWN_BLOCK_TYPES = 9;
 
 const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
 	return map(
