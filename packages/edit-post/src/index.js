@@ -96,7 +96,11 @@ export function initializeEditor(
 	);
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks(
+			settings,
+			// Disable legacy widget block in Post editor.
+			( block ) => block.name !== 'core/legacy-widget'
+		);
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.

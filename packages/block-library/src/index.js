@@ -177,7 +177,8 @@ export const registerCoreBlocks = () => {
 /**
  * Function to register experimental core blocks depending on editor settings.
  *
- * @param {Object} settings Editor settings.
+ * @param {Object}   settings Editor settings.
+ * @param {Function} filter   Optional filter function to apply for each block.
  *
  * @example
  * ```js
@@ -188,7 +189,7 @@ export const registerCoreBlocks = () => {
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( settings ) => {
+		? ( settings, filter = () => true ) => {
 				const { __experimentalEnableFullSiteEditing } = settings;
 
 				[
@@ -224,6 +225,8 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postTags,
 						  ]
 						: [] ),
-				].forEach( registerBlock );
+				]
+					.filter( filter )
+					.forEach( registerBlock );
 		  }
 		: undefined;
