@@ -76,7 +76,7 @@ export default class ClassicEdit extends Component {
 			prevProps.attributes.content !== content &&
 			currentContent !== content
 		) {
-			editor?.setContent( content || '' ); // eslint-disable-line no-unused-expressions
+			editor.setContent( content || '' );
 		}
 	}
 
