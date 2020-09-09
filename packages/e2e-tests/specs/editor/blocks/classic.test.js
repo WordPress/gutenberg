@@ -135,11 +135,9 @@ describe( 'Classic', () => {
 		// Reload
 		// Disabling the browser disk cache is needed in order to reproduce the issue
 		// in case it regresses. To test this, revert commit 65c9f74, build and run the test.
-		await runWithoutCache( async () => {
-			await page.reload();
-			await clickClassic();
-			expect( console ).not.toHaveErrored();
-			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
+		await runWithoutCache( () => page.reload() );
+		await clickClassic();
+		expect( console ).not.toHaveErrored();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
