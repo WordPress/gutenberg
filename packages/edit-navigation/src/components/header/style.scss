@@ -1,0 +1,25 @@
+.edit-navigation-header {
+	align-items: center;
+	display: flex;
+	margin-top: $grid-unit-10;
+}
+
+.edit-navigation-header__add-new-button {
+	margin: 0 $grid-unit-20;
+}
+
+.edit-navigation-header__manage-locations {
+	text-align: center;
+
+	.components-popover__content > div {
+		padding: $grid-unit-20;
+	}
+
+	.components-base-control {
+		margin-bottom: $grid-unit-20;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+}

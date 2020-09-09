@@ -1,0 +1,64 @@
+.edit-navigation-toolbar {
+	align-items: center;
+	background: $white;
+	border-radius: 3px;
+	border: $border-width solid $gray-200;
+	display: flex;
+	height: $grid-unit-60;
+	margin-top: $grid-unit-10;
+	padding-right: $grid-unit-10;
+
+	.components-base-control__field {
+		margin: 0;
+	}
+
+	.block-editor-block-toolbar {
+		border-left: 1px solid $gray-200;
+		margin-left: $grid-unit-20;
+	}
+
+	.components-spinner {
+		display: block;
+		margin: 0 auto;
+	}
+}
+
+.edit-navigation-toolbar__menu-select {
+	@include break-medium() {
+		width: 299px;
+	}
+}
+
+.edit-navigation-toolbar__save-button {
+	margin: 0 $grid-unit-10 0 auto;
+}
+
+.edit-navigation-toolbar__add-menu-form {
+	align-items: center;
+	border-left: 1px solid $gray-200;
+	display: flex;
+	flex-grow: 1;
+	height: 100%;
+	margin-left: $grid-unit-20;
+}
+
+.edit-navigation-toolbar__add-menu-icon {
+	margin-left: $grid-unit-10;
+}
+
+.edit-navigation-toolbar__add-menu-name-field {
+	align-items: center;
+	border-left: 1px solid $gray-200;
+	display: flex;
+	height: 100%;
+	margin-left: $grid-unit-10;
+	padding-left: $grid-unit-10;
+}
+
+.components-button.edit-navigation-toolbar__add-menu-cancel-button {
+	margin-left: auto;
+}
+
+.components-button.edit-navigation-toolbar__add-menu-create-button {
+	margin-left: $grid-unit-20;
+}

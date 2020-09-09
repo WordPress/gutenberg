@@ -1,0 +1,20 @@
+// Set the block inspector to use flexbox so that we can change the order of
+// panels within it.
+// TODO: Is there a way to do this natively using InspectorControls?
+.block-editor-block-inspector {
+	display: flex;
+	flex-direction: column;
+
+	.block-editor-block-card {
+		order: -2;
+	}
+}
+
+.edit-navigation-inspector-additions__auto-add-pages-panel {
+	order: -1;
+}
+
+.edit-navigation-inspector-additions__delete-menu-panel {
+	text-align: center;
+	order: 1;
+}
