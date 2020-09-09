@@ -91,8 +91,6 @@ const PanelBodyHeader = forwardRef(
 
 		if ( ! title ) return null;
 
-		const showSummary = ! isOpened && summary;
-
 		return (
 			<header className="components-panel__body-header">
 				<h2 className="components-panel__body-title">
@@ -101,7 +99,7 @@ const PanelBodyHeader = forwardRef(
 						aria-expanded={ isOpened }
 						ref={ ref }
 						{ ...props }
-						aria-describedby={ showSummary ? summaryId : undefined }
+						aria-describedby={ summary ? summaryId : undefined }
 					>
 						{ /*
 					Firefox + NVDA don't announce aria-expanded because the browser
@@ -123,7 +121,7 @@ const PanelBodyHeader = forwardRef(
 						) }
 					</Button>
 				</h2>
-				{ showSummary && (
+				{ summary && (
 					<div className={ summaryClassName } id={ summaryId }>
 						{ summary }
 					</div>
