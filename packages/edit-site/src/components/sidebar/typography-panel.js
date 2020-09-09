@@ -30,20 +30,29 @@ export default ( {
 			{ supports.includes( FONT_SIZE ) && (
 				<FontSizePicker
 					value={ fromPx(
-						getProperty( name, 'typography.fontSize' )
+						getProperty( name, [ 'typography', 'fontSize' ] )
 					) }
 					onChange={ ( value ) =>
-						setProperty( name, {
-							'typography.fontSize': toPx( value ),
-						} )
+						setProperty(
+							name,
+							[ 'typography', 'fontSize' ],
+							toPx( value )
+						)
 					}
 				/>
 			) }
 			{ supports.includes( LINE_HEIGHT ) && (
 				<LineHeightControl
-					value={ getProperty( name, 'typography.lineHeight' ) }
+					value={ getProperty( name, [
+						'typography',
+						'lineHeight',
+					] ) }
 					onChange={ ( value ) =>
-						setProperty( name, { 'typography.lineHeight': value } )
+						setProperty(
+							name,
+							[ 'typography', 'lineHeight' ],
+							value
+						)
 					}
 				/>
 			) }
