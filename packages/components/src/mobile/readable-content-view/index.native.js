@@ -15,10 +15,19 @@ import styles from './style.scss';
 
 const PIXEL_RATIO = 2;
 
-const ReadableContentView = ( { align, reversed, children, style } ) => {
+const ReadableContentView = ( {
+	align,
+	reversed,
+	children,
+	style,
+	parentBlockAlignment,
+	blockName,
+} ) => {
 	const { width, height } = Dimensions.get( 'window' );
 	const [ windowWidth, setWindowWidth ] = useState( width );
 	const [ windowRatio, setWindowRatio ] = useState( width / height );
+
+	const isColumn = blockName === 'core/column';
 
 	function onDimensionsChange( { window } ) {
 		setWindowWidth( window.width );
@@ -66,6 +75,7 @@ const ReadableContentView = ( { align, reversed, children, style } ) => {
 						: styles.centeredContent,
 					style,
 					styles[ align ],
+					parentBlockAlignment === 'full' && isColumn && styles.full,
 					align === WIDE_ALIGNMENTS.alignments.wide &&
 						getWideStyles(),
 				] }

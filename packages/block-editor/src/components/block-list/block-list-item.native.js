@@ -98,6 +98,8 @@ export class BlockListItem extends Component {
 			shouldShowInsertionPointAfter,
 			contentResizeMode,
 			shouldShowInnerBlockAppender,
+			parentBlockAlignment,
+			blockName,
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
@@ -106,7 +108,9 @@ export class BlockListItem extends Component {
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
+				parentBlockAlignment={ parentBlockAlignment }
 				style={ readableContentViewStyle }
+				blockName={ blockName }
 			>
 				<View
 					style={ this.getContentStyles( readableContentViewStyle ) }
@@ -170,6 +174,7 @@ export default compose( [
 
 			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 			const { attributes } = block || {};
+			const blockName = block.name || '';
 			const { align } = attributes || {};
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
@@ -186,6 +191,7 @@ export default compose( [
 				hasParents,
 				blockAlignment: align,
 				parentBlockAlignment,
+				blockName,
 			};
 		}
 	),

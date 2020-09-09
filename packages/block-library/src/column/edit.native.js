@@ -19,6 +19,7 @@ import {
 	PanelBody,
 	RangeControl,
 	FooterMessageControl,
+	ALIGNMENT_BREAKPOINTS,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -119,7 +120,8 @@ function ColumnEdit( {
 						getContainerWidth( newParentWidth )
 			  );
 
-	const finalWidth = hasWidth && { width: newColumnWidth };
+	const finalWidth = parentWidth > ALIGNMENT_BREAKPOINTS.medium &&
+		hasWidth && { width: newColumnWidth };
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (

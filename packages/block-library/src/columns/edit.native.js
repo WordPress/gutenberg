@@ -104,12 +104,13 @@ function ColumnsEditContainer( {
 	}, [ width ] );
 
 	const contentStyle = useMemo( () => {
-		const columnBaseWidth = width / columnsInRow;
+		const minWidth = 2 * 8 + width;
+		const columnBaseWidth = minWidth / columnsInRow;
 
 		let columnWidth = columnBaseWidth;
 		if ( columnsInRow > 1 ) {
-			const margins = columnsInRow * 2 * 16;
-			columnWidth = ( width - margins ) / columnsInRow;
+			const margins = columnsInRow * 2 * styles.columnMargin.marginLeft;
+			columnWidth = ( minWidth - margins ) / columnsInRow;
 		}
 		return { width: columnWidth };
 	}, [ width, columnsInRow ] );
