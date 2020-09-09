@@ -13,6 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ComponentsCompositionNavigation, {
+	NavigationGroup,
 	NavigationItem,
 	NavigationLevel,
 } from '../components-composition-navigation';
@@ -39,27 +40,31 @@ function ComponentsCompositionExample() {
 				setActiveLevel={ setLevel }
 			>
 				<NavigationLevel title="Home">
-					<NavigationItem item="item-1" title="Item 1" />
-					<NavigationItem item="item-2" title="Item 2" />
-					<NavigationItem
-						badge="2"
-						navigateToLevel="category"
-						item="item-3"
-						title="Category"
-					/>
-					<NavigationItem
-						href="https://wordpress.org/"
-						item="item-4"
-						target="_blank"
-						title="External link"
-					/>
-					<NavigationItem item="item-5">
-						<img
-							alt="WordPress Logo"
-							src="https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png"
-							style={ { width: 50, height: 50 } }
+					<NavigationGroup title="Group 1">
+						<NavigationItem item="item-1" title="Item 1" />
+						<NavigationItem item="item-2" title="Item 2" />
+						<NavigationItem
+							badge="2"
+							navigateToLevel="category"
+							item="item-3"
+							title="Category"
 						/>
-					</NavigationItem>
+					</NavigationGroup>
+					<NavigationGroup title="Group 2">
+						<NavigationItem
+							href="https://wordpress.org/"
+							item="item-4"
+							target="_blank"
+							title="External link"
+						/>
+						<NavigationItem item="item-5">
+							<img
+								alt="WordPress Logo"
+								src="https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png"
+								style={ { width: 50, height: 50 } }
+							/>
+						</NavigationItem>
+					</NavigationGroup>
 				</NavigationLevel>
 
 				<NavigationLevel
@@ -68,13 +73,19 @@ function ComponentsCompositionExample() {
 					parentLevelTitle="Home"
 					title="Category"
 				>
-					<NavigationItem badge="1" item="child-1" title="Child 1" />
-					<NavigationItem item="child-2" title="Child 2" />
-					<NavigationItem
-						navigateToLevel="nested-category"
-						item="child-3"
-						title="Nested Category"
-					/>
+					<ul>
+						<NavigationItem
+							badge="1"
+							item="child-1"
+							title="Child 1"
+						/>
+						<NavigationItem item="child-2" title="Child 2" />
+						<NavigationItem
+							navigateToLevel="nested-category"
+							item="child-3"
+							title="Nested Category"
+						/>
+					</ul>
 				</NavigationLevel>
 
 				<NavigationLevel
@@ -83,20 +94,30 @@ function ComponentsCompositionExample() {
 					parentLevelTitle="Category"
 					title="Nested Category"
 				>
-					<NavigationItem item="sub-child-1" title="Sub Child 1" />
-					<NavigationItem item="sub-child-2" title="Sub Child 2" />
+					<ul>
+						<NavigationItem
+							item="sub-child-1"
+							title="Sub Child 1"
+						/>
+						<NavigationItem
+							item="sub-child-2"
+							title="Sub Child 2"
+						/>
+					</ul>
 				</NavigationLevel>
 
 				<NavigationLevel title="Secondary Menu">
-					<NavigationItem
-						navigateToLevel="secondary-level"
-						item="secondary-item-1"
-						title="Secondary Item 1"
-					/>
-					<NavigationItem
-						item="secondary-item-2"
-						title="Secondary Item 2"
-					/>
+					<ul>
+						<NavigationItem
+							navigateToLevel="secondary-level"
+							item="secondary-item-1"
+							title="Secondary Item 1"
+						/>
+						<NavigationItem
+							item="secondary-item-2"
+							title="Secondary Item 2"
+						/>
+					</ul>
 				</NavigationLevel>
 
 				<NavigationLevel
@@ -105,14 +126,16 @@ function ComponentsCompositionExample() {
 					parentLevelTitle="Home"
 					title="Secondary Item 1"
 				>
-					<NavigationItem
-						item="secondary-child-1"
-						title="Secondary Child 1"
-					/>
-					<NavigationItem
-						item="secondary-child-2"
-						title="Secondary Child 2"
-					/>
+					<ul>
+						<NavigationItem
+							item="secondary-child-1"
+							title="Secondary Child 1"
+						/>
+						<NavigationItem
+							item="secondary-child-2"
+							title="Secondary Child 2"
+						/>
+					</ul>
 				</NavigationLevel>
 			</ComponentsCompositionNavigation>
 

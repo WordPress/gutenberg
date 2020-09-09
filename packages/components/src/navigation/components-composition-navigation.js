@@ -23,6 +23,7 @@ import Animate from '../animate';
 import {
 	BackButtonUI,
 	BadgeUI,
+	MenuGroupTitleUI,
 	MenuItemTitleUI,
 	MenuItemUI,
 	MenuTitleUI,
@@ -110,7 +111,7 @@ export default function ComponentsCompositionNavigation( {
 }
 
 export const NavigationLevel = ( {
-	children: levelChildren,
+	children,
 	level = DEFAULT_LEVEL,
 	parentLevel,
 	parentLevelTitle,
@@ -124,7 +125,7 @@ export const NavigationLevel = ( {
 
 	return (
 		<div className="components-navigation__level">
-			{ parentLevel ? (
+			{ parentLevel && (
 				<BackButtonUI
 					className="components-navigation__back-button"
 					isTertiary
@@ -133,23 +134,39 @@ export const NavigationLevel = ( {
 					<Icon icon={ chevronLeft } />
 					{ parentLevelTitle }
 				</BackButtonUI>
-			) : null }
+			) }
 			<MenuUI>
 				<MenuTitleUI
-					variant="subtitle"
+					as="h2"
 					className="components-navigation__menu-title"
+					variant="subtitle"
 				>
 					{ title }
 				</MenuTitleUI>
-				<ul>{ levelChildren }</ul>
+				{ children }
 			</MenuUI>
 		</div>
 	);
 };
 
+export const NavigationGroup = ( { children, title } ) => (
+	<div className="components-navigation__menu-group">
+		{ title && (
+			<MenuGroupTitleUI
+				as="h3"
+				className="components-navigation__menu-group-title"
+				variant="caption"
+			>
+				{ title }
+			</MenuGroupTitleUI>
+		) }
+		<ul>{ children }</ul>
+	</div>
+);
+
 export const NavigationItem = ( {
 	badge,
-	children: itemChildren,
+	children,
 	href,
 	item,
 	navigateToLevel,
@@ -187,7 +204,7 @@ export const NavigationItem = ( {
 					</MenuItemTitleUI>
 				) }
 
-				{ itemChildren }
+				{ children }
 
 				{ badge && (
 					<BadgeUI className="components-navigation__menu-item-badge">

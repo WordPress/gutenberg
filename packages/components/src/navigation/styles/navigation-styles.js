@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { BASE, G2 } from '../../utils/colors-values';
+import { G2 } from '../../utils/colors-values';
 import Button from '../../button';
 import Text from '../../text';
 
@@ -35,6 +35,12 @@ export const MenuTitleUI = styled( Text )`
 	margin-bottom: 8px;
 `;
 
+export const MenuGroupTitleUI = styled( Text )`
+	margin-top: 8px;
+	padding: 4px 0 4px 16px;
+	text-transform: uppercase;
+`;
+
 export const MenuItemUI = styled.li`
 	border-radius: 2px;
 	color: ${ G2.lightGray.ui };
@@ -54,7 +60,7 @@ export const MenuItemUI = styled.li`
 	}
 
 	&.is-active {
-		background-color: ${ BASE.black };
+		background-color: ${ G2.blue.medium.focus };
 		color: ${ G2.lightGray.secondary };
 
 		button,
