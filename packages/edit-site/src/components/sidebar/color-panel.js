@@ -9,9 +9,9 @@ import { __ } from '@wordpress/i18n';
  */
 import {
 	BACKGROUND_COLOR,
+	GRADIENT_COLOR,
 	LINK_COLOR,
 	TEXT_COLOR,
-	GRADIENT_COLOR,
 } from '../editor/utils';
 
 export default ( {
@@ -32,55 +32,29 @@ export default ( {
 
 	if ( supports.includes( TEXT_COLOR ) ) {
 		settings.push( {
-			colorValue: getProperty( name, 'color.text' ),
+			colorValue: getProperty( name, [ 'color', 'text' ] ),
 			onColorChange: ( value ) =>
-				setProperty( name, { 'color.text': value } ),
+				setProperty( name, [ 'color', 'text' ], value ),
 			label: __( 'Text color' ),
 		} );
 	}
 
-	/*
-	 * We want to send the entities API both colors
-	 * in a single request. This is to avod race conditions
-	 * that override the previous callback.
-	 */
-	let setBackground;
-	let backgroundSettings;
-	const backgroundPromise = new Promise(
-		( resolve ) => ( setBackground = ( value ) => resolve( value ) )
-	);
-	let setGradient;
-	let gradientSettings;
-	const gradientPromise = new Promise(
-		( resolve ) => ( setGradient = ( value ) => resolve( value ) )
-	);
-	Promise.all( [ backgroundPromise, gradientPromise ] ).then( ( values ) => {
-		setProperty( name, { ...values[ 0 ], ...values[ 1 ] } );
-	} );
+	let backgroundSettings = {};
 	if ( supports.includes( BACKGROUND_COLOR ) ) {
 		backgroundSettings = {
-			colorValue: getProperty( name, 'color.background' ),
+			colorValue: getProperty( name, [ 'color', 'background' ] ),
 			onColorChange: ( value ) =>
-				setBackground( { 'color.background': value } ),
+				setProperty( name, [ 'color', 'background' ], value ),
 		};
-	} else {
-		backgroundSettings = {};
-		// Resolve the background promise, as to fire the setProperty
-		// callback when the gradient promise is resolved.
-		setBackground( undefined );
 	}
+
+	let gradientSettings = {};
 	if ( supports.includes( GRADIENT_COLOR ) ) {
 		gradientSettings = {
-			gradientValue: getProperty( name, 'color.gradient' ),
+			gradientValue: getProperty( name, [ 'color', 'gradient' ] ),
 			onGradientChange: ( value ) =>
-				setGradient( { 'color.gradient': value } ),
-			disableCustomGradients: true,
+				setProperty( name, [ 'color', 'gradient' ], value ),
 		};
-	} else {
-		gradientSettings = {};
-		// Resolve the gradient promise, as to fire the setProperty
-		// callback when the background promise is resolved.
-		setGradient( undefined );
 	}
 
 	if (
@@ -96,9 +70,9 @@ export default ( {
 
 	if ( supports.includes( LINK_COLOR ) ) {
 		settings.push( {
-			colorValue: getProperty( name, 'color.link' ),
+			colorValue: getProperty( name, [ 'color', 'link' ] ),
 			onColorChange: ( value ) =>
-				setProperty( name, { 'color.link': value } ),
+				setProperty( name, [ 'color', 'link' ], value ),
 			label: __( 'Link color' ),
 		} );
 	}

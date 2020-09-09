@@ -88,11 +88,13 @@ function ColumnsEditContainer( {
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
+	const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
+
 	useEffect( () => {
-		const newColumnCount = ! columnCount
-			? DEFAULT_COLUMNS_NUM
-			: columnCount;
 		updateColumns( columnCount, newColumnCount );
+	}, [] );
+
+	useEffect( () => {
 		if ( width ) {
 			setColumnsInRow( getColumnsInRow( width, newColumnCount ) );
 		}
@@ -137,7 +139,12 @@ function ColumnsEditContainer( {
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		if ( isSelected ) {
 			return (
-				<View style={ isFullWidth && styles.fullWidthAppender }>
+				<View
+					style={ [
+						isFullWidth && styles.fullWidthAppender,
+						columnCount === 0 && { width },
+					] }
+				>
 					<InnerBlocks.ButtonBlockAppender
 						onAddBlock={ onAddNextColumn }
 					/>
@@ -328,9 +335,11 @@ const ColumnsEditContainerWrapper = withDispatch(
 				verticalAlignment,
 			} );
 
-			innerBlocks.push( insertedBlock );
-
-			replaceInnerBlocks( clientId, innerBlocks, true );
+			replaceInnerBlocks(
+				clientId,
+				[ ...innerBlocks, insertedBlock ],
+				true
+			);
 			selectBlock( insertedBlock.clientId );
 		},
 		onDeleteBlock: () => {
