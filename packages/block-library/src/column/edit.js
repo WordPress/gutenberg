@@ -92,6 +92,7 @@ function ColumnEdit( {
 					className: classes,
 					style: hasWidth ? { flexBasis: width + '%' } : undefined,
 				} }
+				//Specify the blocks allowed to be placed within this column
 				allowedBlocks={ allowedBlocks }
 			/>
 		</>

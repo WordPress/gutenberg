@@ -91,6 +91,7 @@ function ColumnsEditContainer( {
 			</InspectorControls>
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
+				//Specify the blocks allowed to be placed within the possible created child columns within this block
 				allowedChildBlocks={ allowedChildBlocks }
 				orientation="horizontal"
 				__experimentalTagName={ Block.div }
