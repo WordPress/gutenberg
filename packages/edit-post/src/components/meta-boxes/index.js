@@ -14,13 +14,13 @@ import { withSelect } from '@wordpress/data';
 import MetaBoxesArea from './meta-boxes-area';
 import MetaBoxVisibility from './meta-box-visibility';
 
-function MetaBoxes( { location, isVisible, metaBoxes } ) {
+function MetaBoxes( { location, metaBoxes } ) {
 	return (
 		<>
 			{ map( metaBoxes, ( { id } ) => (
 				<MetaBoxVisibility key={ id } id={ id } />
 			) ) }
-			{ isVisible && <MetaBoxesArea location={ location } /> }
+			<MetaBoxesArea location={ location } />
 		</>
 	);
 }
