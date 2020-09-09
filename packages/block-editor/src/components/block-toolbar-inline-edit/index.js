@@ -2,11 +2,13 @@
  * External dependencies
  */
 import { isEmpty } from 'lodash';
+import { useToolbarState } from 'reakit/Toolbar';
 
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import {
 	__experimentalToolbarContext as ToolbarContext,
 	createSlotFill,
@@ -39,7 +41,13 @@ function BlockToolbarInlineEditSlotContextHandler( { fills } ) {
 }
 
 function BlockToolbarInlineEditSlot() {
-	const accessibleToolbarState = useContext( ToolbarContext );
+	const isRTL = useSelect(
+		( select ) => select( 'core/block-editor' ).getSettings()?.isRTL
+	);
+	const accessibleToolbarState = useToolbarState( {
+		loop: true,
+		rtl: !! isRTL,
+	} );
 	return (
 		<Slot fillProps={ accessibleToolbarState }>
 			{ ( fills ) => (
