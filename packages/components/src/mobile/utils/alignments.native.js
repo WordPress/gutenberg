@@ -3,7 +3,7 @@ export const WIDE_ALIGNMENTS = {
 		wide: 'wide',
 		full: 'full',
 	},
-	supportedBlocks: [ 'core/cover', 'core/group', 'core/image' ],
+	excludeBlocks: [ 'core/columns' ],
 };
 
 export const ALIGNMENT_BREAKPOINTS = {

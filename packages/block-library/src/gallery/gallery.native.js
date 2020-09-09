@@ -20,6 +20,7 @@ import { BlockCaption } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { useSelect } from '@wordpress/data';
+import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
 const TILE_SPACING = 15;
 
@@ -54,6 +55,7 @@ export const Gallery = ( props ) => {
 	} = props;
 
 	const {
+		align,
 		columns = defaultColumnsNumber( attributes ),
 		imageCrop,
 		images,
@@ -83,7 +85,12 @@ export const Gallery = ( props ) => {
 	};
 
 	return (
-		<View style={ { flex: 1 } }>
+		<View
+			style={ [
+				{ flex: 1 },
+				align === WIDE_ALIGNMENTS.alignments.full && styles.fullWidth,
+			] }
+		>
 			<Tiles
 				columns={ displayedColumns }
 				spacing={ TILE_SPACING }

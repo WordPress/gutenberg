@@ -26,16 +26,12 @@ const ReadableContentView = ( { align, reversed, children, style } ) => {
 	}
 
 	useEffect( () => {
-		if ( align === WIDE_ALIGNMENTS.alignments.wide ) {
-			Dimensions.addEventListener( 'change', onDimensionsChange );
-		}
+		Dimensions.addEventListener( 'change', onDimensionsChange );
 
 		return () => {
-			if ( align === WIDE_ALIGNMENTS.alignments.wide ) {
-				Dimensions.removeEventListener( 'change', onDimensionsChange );
-			}
+			Dimensions.removeEventListener( 'change', onDimensionsChange );
 		};
-	}, [ align ] );
+	}, [] );
 
 	function getWideStyles() {
 		if (
