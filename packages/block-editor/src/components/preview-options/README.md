@@ -18,6 +18,8 @@ It returns a [`DropdownMenu`](https://github.com/WordPress/gutenberg/tree/master
 Renders the previews options of the editor in a dropdown menu.
 
 ```jsx
+import { Icon, MenuGroup } from '@wordpress/components';
+import { PostPreviewButton } from '@wordpress/editor';
 import { __experimentalPreviewOptions as PreviewOptions } from '@wordpress/block-editor';
 
 const MyPreviewOptions = () => (
@@ -26,6 +28,25 @@ const MyPreviewOptions = () => (
         className="edit-post-post-preview-dropdown"
         deviceType={ deviceType }
         setDeviceType={ setPreviewDeviceType }
+        >
+        <MenuGroup>
+            <div className="edit-post-header-preview__grouping-external">
+                <PostPreviewButton
+                    className={
+                        'edit-post-header-preview__button-external'
+                    }
+                    role="menuitem"
+                    forceIsAutosaveable={ hasActiveMetaboxes }
+                    forcePreviewLink={ isSaving ? null : undefined }
+                    textContent={
+                        <>
+                            { __( 'Preview in new tab' ) }
+                            <Icon icon={ external } />
+                        </>
+                    }
+                />
+            </div>
+		</MenuGroup>
     >
 );
 ```
