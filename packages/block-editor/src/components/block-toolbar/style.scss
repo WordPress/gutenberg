@@ -43,9 +43,15 @@
 		border-right: none;
 	}
 
-	&.is-hidden {
-		visibility: hidden;
-		width: 0;
+	&.is-editing-inline {
+		& > *:not(.block-editor-block-toolbar-inline-edit-popover) {
+			opacity: 0;
+			width: 0;
+		}
+
+		.block-editor-block-toolbar-inline-edit-popover__toolbar-wrapper {
+			display: flex;
+		}
 	}
 }
 

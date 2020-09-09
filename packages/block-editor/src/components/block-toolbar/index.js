@@ -21,10 +21,20 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
-import { BlockToolbarWrapperWithInlinePopoverSlot } from '../block-toolbar-inline-popover';
 import { useShowMoversGestures } from './utils';
+import BlockToolbarInlineEdit, {
+	useBlockToolbarInlineEditContext,
+} from '../block-toolbar-inline-edit';
 
-export default function BlockToolbar( { hideDragHandle } ) {
+export default function BlockToolbarWithInlineEditProvider( props ) {
+	return (
+		<BlockToolbarInlineEdit.Provider>
+			<BlockToolbar { ...props } />
+		</BlockToolbarInlineEdit.Provider>
+	);
+}
+
+function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
 		blockClientId,
@@ -74,6 +84,8 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		}
 	);
 
+	const { isEditingInline } = useBlockToolbarInlineEditContext();
+
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
 
@@ -92,13 +104,13 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
 
-	const classes = classnames(
-		'block-editor-block-toolbar',
-		shouldShowMovers && 'is-showing-movers'
-	);
+	const classes = classnames( 'block-editor-block-toolbar', {
+		'is-showing-movers': shouldShowMovers,
+		'is-editing-inline': isEditingInline,
+	} );
 
 	return (
-		<BlockToolbarWrapperWithInlinePopoverSlot className={ classes }>
+		<div className={ classes }>
 			<div ref={ nodeRef } { ...showMoversGestures }>
 				{ ! isMultiToolbar && (
 					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
@@ -125,9 +137,10 @@ export default function BlockToolbar( { hideDragHandle } ) {
 						bubblesVirtually
 						className="block-editor-block-toolbar__slot"
 					/>
+					<BlockToolbarInlineEdit.Slot />
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</BlockToolbarWrapperWithInlinePopoverSlot>
+		</div>
 	);
 }
