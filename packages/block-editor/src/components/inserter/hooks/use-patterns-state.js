@@ -18,17 +18,35 @@ import { __, sprintf } from '@wordpress/i18n';
  *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
-const usePatternsState = ( onInsert ) => {
-	const { patternCategories, patterns } = useSelect( ( select ) => {
-		const {
-			__experimentalBlockPatterns,
-			__experimentalBlockPatternCategories,
-		} = select( 'core/block-editor' ).getSettings();
-		return {
-			patterns: __experimentalBlockPatterns,
-			patternCategories: __experimentalBlockPatternCategories,
-		};
-	}, [] );
+const usePatternsState = ( onInsert, selectedCategory ) => {
+	const { patternCategory, patterns, allPatternCategories } = useSelect(
+		( select ) => {
+			const {
+				__experimentalBlockPatterns,
+				__experimentalBlockPatternCategories,
+			} = select( 'core/block-editor' ).getSettings();
+
+			const category = selectedCategory
+				? selectedCategory
+				: __experimentalBlockPatternCategories[ 0 ];
+
+			const patternCategoryPatterns =
+				category === 'all'
+					? __experimentalBlockPatterns
+					: __experimentalBlockPatterns.filter(
+							( pattern ) =>
+								pattern.categories &&
+								pattern.categories.includes( category.name )
+					  );
+
+			return {
+				patternCategory: category,
+				patterns: patternCategoryPatterns,
+				allPatternCategories: __experimentalBlockPatternCategories,
+			};
+		},
+		[ selectedCategory ]
+	);
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		onInsert(
@@ -47,7 +65,7 @@ const usePatternsState = ( onInsert ) => {
 		);
 	}, [] );
 
-	return [ patterns, patternCategories, onClickPattern ];
+	return [ patternCategory, patterns, allPatternCategories, onClickPattern ];
 };
 
 export default usePatternsState;
