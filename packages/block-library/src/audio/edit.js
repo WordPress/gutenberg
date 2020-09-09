@@ -40,7 +40,15 @@ function AudioEdit( {
 	noticeUI,
 	insertBlocksAfter,
 } ) {
-	const { id, autoplay, caption, loop, preload, src } = attributes;
+	const {
+		id,
+		autoplay,
+		caption,
+		loop,
+		preload,
+		src,
+		showDownloadButton,
+	} = attributes;
 
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -157,6 +165,13 @@ function AudioEdit( {
 						onChange={ toggleAttribute( 'loop' ) }
 						checked={ loop }
 					/>
+					<ToggleControl
+						label={ __(
+							'Show download button (only in Chrome??)'
+						) }
+						checked={ showDownloadButton }
+						onChange={ toggleAttribute( 'showDownloadButton' ) }
+					/>
 					<SelectControl
 						label={ __( 'Preload' ) }
 						value={ preload || '' }
@@ -181,7 +196,11 @@ function AudioEdit( {
 					file or change the position slider when the controls are enabled.
 				*/ }
 				<Disabled>
-					<audio controls="controls" src={ src } />
+					<audio
+						controls="controls"
+						src={ src }
+						controlsList={ ! showDownloadButton && 'nodownload' }
+					/>
 				</Disabled>
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText

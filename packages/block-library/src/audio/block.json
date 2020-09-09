@@ -33,6 +33,10 @@
 			"source": "attribute",
 			"selector": "audio",
 			"attribute": "preload"
+		},
+		"showDownloadButton": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

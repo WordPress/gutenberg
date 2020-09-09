@@ -4,8 +4,14 @@
 import { RichText } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { autoplay, caption, loop, preload, src } = attributes;
-
+	const {
+		autoplay,
+		caption,
+		loop,
+		preload,
+		src,
+		showDownloadButton,
+	} = attributes;
 	return (
 		src && (
 			<figure>
@@ -15,6 +21,7 @@ export default function save( { attributes } ) {
 					autoPlay={ autoplay }
 					loop={ loop }
 					preload={ preload }
+					controlsList={ ! showDownloadButton && 'nodownload' }
 				/>
 				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content tagName="figcaption" value={ caption } />
