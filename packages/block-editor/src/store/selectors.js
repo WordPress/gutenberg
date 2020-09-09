@@ -1366,6 +1366,29 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
 };
 
 /**
+ * Return a function to be used to tranform a block variation to an inserter item
+ *
+ * @param {Object} item Denormalized inserter item
+ * @return {Function} Function to transform a block variation to inserter item
+ */
+const getItemFromVariation = ( item ) => ( variation ) => ( {
+	...item,
+	id: `${ item.id }-${ variation.name }`,
+	icon: variation.icon || item.icon,
+	title: variation.title || item.title,
+	description: variation.description || item.description,
+	// If `example` is explicitly undefined for the variation, the preview will not be shown.
+	example: variation.hasOwnProperty( 'example' )
+		? variation.example
+		: item.example,
+	initialAttributes: {
+		...item.initialAttributes,
+		...variation.attributes,
+	},
+	innerBlocks: variation.innerBlocks,
+} );
+
+/**
  * Determines the items that appear in the inserter. Includes both static
  * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
  *
@@ -1502,7 +1525,30 @@ export const getInserterItems = createSelector(
 			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
 			: [];
 
-		return [ ...blockTypeInserterItems, ...reusableBlockInserterItems ];
+		// Exclude any block type item that is to be replaced by a default
+		// variation.
+		const visibleBlockTypeInserterItems = blockTypeInserterItems.filter(
+			( { variations = [] } ) =>
+				! variations.some( ( { isDefault } ) => isDefault )
+		);
+
+		// Fill `variationsToAdd` until there are as many items in total as
+		// `limit`.
+		const blockVariations = [];
+		// Show all available blocks with variations
+		for ( const item of blockTypeInserterItems ) {
+			const { variations = [] } = item;
+			if ( variations.length ) {
+				const variationMapper = getItemFromVariation( item );
+				blockVariations.push( ...variations.map( variationMapper ) );
+			}
+		}
+
+		return [
+			...visibleBlockTypeInserterItems,
+			...blockVariations,
+			...reusableBlockInserterItems,
+		];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],

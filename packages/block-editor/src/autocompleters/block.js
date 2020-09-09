@@ -15,7 +15,6 @@ import { useMemo } from '@wordpress/element';
  */
 import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
-import { includeVariationsInInserterItems } from '../components/inserter/utils';
 import BlockIcon from '../components/block-icon';
 
 const SHOWN_BLOCK_TYPES = 9;
@@ -98,10 +97,7 @@ function createBlockCompleter() {
 
 			const options = useMemo(
 				() =>
-					includeVariationsInInserterItems(
-						filteredItems,
-						SHOWN_BLOCK_TYPES
-					).map( ( blockItem ) => {
+					filteredItems.map( ( blockItem ) => {
 						const { title, icon, isDisabled } = blockItem;
 						return {
 							key: `block-${ blockItem.id }`,
