@@ -33,7 +33,7 @@ const MyBlockTypesList = () => <BlockTypesList items={ filteredItems } />;;
 
 The blocks that will be displayed in the block list.
 
--   Type: `Array`
+-   Type: `Array<Block>`
 -   Required: Yes
 
 ## Related components
