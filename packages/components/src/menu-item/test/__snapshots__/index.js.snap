@@ -4,17 +4,6 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
 <ForwardRef(Button)
   aria-checked={true}
   className="components-menu-item__button my-class"
-  icon={
-    <SVG
-      className="components-menu-items__item-icon"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <Path
-        d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
-      />
-    </SVG>
-  }
   onClick={[Function]}
   role="menuitemcheckbox"
 >
@@ -22,6 +11,19 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
   <Shortcut
     className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
+  />
+  <Icon
+    icon={
+      <SVG
+        className="components-menu-items__item-icon"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
+        />
+      </SVG>
+    }
   />
 </ForwardRef(Button)>
 `;
@@ -50,17 +52,6 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
 exports[`MenuItem should match snapshot when isSelected and role are optionally provided 1`] = `
 <ForwardRef(Button)
   className="components-menu-item__button my-class"
-  icon={
-    <SVG
-      className="components-menu-items__item-icon"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <Path
-        d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
-      />
-    </SVG>
-  }
   onClick={[Function]}
   role="menuitem"
 >
@@ -68,6 +59,19 @@ exports[`MenuItem should match snapshot when isSelected and role are optionally 
   <Shortcut
     className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
+  />
+  <Icon
+    icon={
+      <SVG
+        className="components-menu-items__item-icon"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
+        />
+      </SVG>
+    }
   />
 </ForwardRef(Button)>
 `;

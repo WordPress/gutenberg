@@ -271,6 +271,10 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__quick-inserter {
 	width: 100%;
 
+	// Constrain to container. Avoids overflow bug on FF 79
+	// see https://github.com/WordPress/gutenberg/issues/24529.
+	max-width: 100%;
+
 	@include break-medium {
 		width: $block-inserter-width;
 	}

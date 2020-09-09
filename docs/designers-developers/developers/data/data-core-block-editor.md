@@ -440,7 +440,7 @@ _Properties_
 -   _category_ `string`: Block category that the item is associated with.
 -   _keywords_ `Array<string>`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
--   _frecency_ `number`: Hueristic that combines frequency and recency.
+-   _frecency_ `number`: Heuristic that combines frequency and recency.
 
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 

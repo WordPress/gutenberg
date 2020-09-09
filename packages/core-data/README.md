@@ -403,7 +403,7 @@ _Parameters_
 
 _Returns_
 
--   `(?Object|null)`: Record.
+-   `?Object`: Record.
 
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 

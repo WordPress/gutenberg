@@ -621,19 +621,6 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
 
 /**
- * Extends block editor settings to determine whether to use custom line height controls.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_line_height( $settings ) {
-	$settings['enableCustomLineHeight'] = get_theme_support( 'custom-line-height' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_height' );
-
-/**
  * Extends block editor settings to determine whether to use custom unit controls.
  * Currently experimental.
  *
@@ -646,32 +633,3 @@ function gutenberg_extend_settings_custom_units( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
-
-/**
- * Extends block editor settings to determine whether to use custom spacing controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_spacing( $settings ) {
-	$settings['__experimentalEnableCustomSpacing'] = get_theme_support( 'experimental-custom-spacing' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_spacing' );
-
-
-/**
- * Extends block editor settings to determine whether to use custom spacing controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_link_color( $settings ) {
-	$settings['__experimentalEnableLinkColor'] = get_theme_support( 'experimental-link-color' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_link_color' );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -172,7 +172,7 @@ function UnitControl(
 			<ValueInput
 				aria-label={ label }
 				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...props }
+				{ ...omit( props, [ 'children' ] ) }
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }

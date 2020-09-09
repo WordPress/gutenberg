@@ -129,7 +129,20 @@
 				"dropCap": true
 			},
 			"color": {
+				"custom": true,
+				"link": false
+			},
+			"gradient": {
 				"custom": true
+			},
+			"fontSize": {
+				"custom": true
+			},
+			"lineHeight": {
+				"custom": false
+			},
+			"spacing": {
+				"custom": false
 			}
 		}
 	}

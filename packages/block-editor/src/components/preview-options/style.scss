@@ -28,9 +28,7 @@
 	}
 
 	.components-menu-group + .components-menu-group {
-		padding: $grid-unit-10 $grid-unit-15;
-		margin-left: -$grid-unit-15;
-		margin-right: -$grid-unit-15;
+		padding: $grid-unit-10;
 	}
 }
 
