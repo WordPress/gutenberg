@@ -67,3 +67,11 @@ export {
 } from './templates';
 export { default as children } from './children';
 export { default as node } from './node';
+export {
+	COLOR_SUPPORT_KEY,
+	FONT_SIZE_SUPPORT_KEY,
+	LINE_HEIGHT_SUPPORT_KEY,
+	LINK_COLOR,
+	PADDING_SUPPORT_KEY,
+	STYLE_PROPERTY,
+} from './constants';
