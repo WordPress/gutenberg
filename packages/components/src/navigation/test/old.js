@@ -6,52 +6,69 @@ import { render, screen, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Navigation from '..';
-import NavigationItem from '../item';
-import NavigationLevel from '../level';
+import Navigation from '../';
+import NavigationMenu from '../menu';
+import NavigationMenuItem from '../menu-item';
 
-const testNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
-	<Navigation activeItem={ activeItem }>
-		<NavigationLevel title={ rootTitle }>
-			<ul>
-				<NavigationItem
-					badge={ showBadge && 21 }
-					item="item-1"
-					title="Item 1"
-				/>
-				<NavigationItem
-					href="http://example.com"
-					item="item-2"
-					target="_blank"
-					title="Item 2"
-				/>
-				<NavigationItem
-					navigateToLevel="category"
-					item="category"
-					title="Category"
-				/>
-				<NavigationItem item="item-3">
-					<span>customize me</span>
-				</NavigationItem>
-			</ul>
-		</NavigationLevel>
-		<NavigationLevel
-			level="category"
-			parentLevel="root"
-			parentLevelTitle="Home"
-			title="Category"
-		>
-			<ul>
-				<NavigationItem item="child-1" title="Child 1" />
-				<NavigationItem item="child-2" title="Child 2" />
-			</ul>
-		</NavigationLevel>
-	</Navigation>
-);
+const CustomComponent = ( { onClick } ) => {
+	return <button onClick={ onClick }>customize me</button>;
+};
+
+const sampleData = [
+	{
+		title: 'Item 1',
+		id: 'item-1',
+	},
+	{
+		title: 'Item 2',
+		id: 'item-2',
+		href: 'http://example.com',
+		linkProps: {
+			target: '_blank',
+		},
+	},
+	{
+		title: 'Category',
+		id: 'category',
+	},
+	{
+		title: 'Item 3',
+		id: 'item-3',
+		LinkComponent: CustomComponent,
+	},
+	{
+		title: 'Child 1',
+		id: 'child-1',
+		parent: 'category',
+	},
+	{
+		title: 'Child 2',
+		id: 'child-2',
+		parent: 'category',
+	},
+];
+
+const renderPane = () => ( { level, NavigationBackButton } ) => {
+	return (
+		<>
+			<h2>{ level.title }</h2>
+			<NavigationBackButton>Back</NavigationBackButton>
+			<NavigationMenu title="Menu title">
+				{ level.children.map( ( item ) => {
+					return <NavigationMenuItem { ...item } key={ item.id } />;
+				} ) }
+			</NavigationMenu>
+		</>
+	);
+};
 
 describe( 'Navigation', () => {
 	it( 'should render the panes and active item', async () => {
-		render( testNavigation( { activeItem: 'item-2' } ) );
+		render(
+			<Navigation activeItemId={ 'item-2' } data={ sampleData }>
+				{ renderPane() }
+			</Navigation>
+		);
 
 		const menuItems = screen.getAllByRole( 'listitem' );
 
@@ -67,7 +84,11 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should render anchor links when menu item supplies an href', async () => {
-		render( testNavigation() );
+		render(
+			<Navigation activeItemId={ 'item-2' } data={ sampleData }>
+				{ renderPane() }
+			</Navigation>
+		);
 
 		const linkItem = screen.getByRole( 'link', { name: 'Item 2' } );
 
@@ -76,7 +97,11 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should render a custom component when menu item supplies one', async () => {
-		render( testNavigation() );
+		render(
+			<Navigation activeItemId={ 'item-2' } data={ sampleData }>
+				{ renderPane() }
+			</Navigation>
+		);
 
 		const customItem = screen.getByRole( 'button', {
 			name: 'customize me',
@@ -86,7 +111,7 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should set an active category on click', async () => {
-		render( testNavigation() );
+		render( <Navigation data={ sampleData }>{ renderPane() }</Navigation> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Category' } ) );
 		const categoryTitle = screen.getByRole( 'heading' );
@@ -99,43 +124,63 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should render the root title', async () => {
-		const { rerender } = render( testNavigation() );
+		const { rerender } = render(
+			<Navigation data={ sampleData }>{ renderPane() }</Navigation>
+		);
 
-		const emptyTitle = screen.queryByRole( 'heading' );
-		expect( emptyTitle ).toBeNull();
+		const emptyTitle = screen.getByRole( 'heading' );
+		expect( emptyTitle.textContent ).toBe( '' );
 
-		rerender( testNavigation( { rootTitle: 'Home' } ) );
+		rerender(
+			<Navigation rootTitle="Home" data={ sampleData }>
+				{ renderPane() }
+			</Navigation>
+		);
 
 		const rootTitle = screen.getByRole( 'heading' );
 		expect( rootTitle.textContent ).toBe( 'Home' );
 	} );
 
 	it( 'should render badges', async () => {
-		render( testNavigation( { showBadge: true } ) );
+		render(
+			<Navigation
+				data={ [ { id: 'item-1', title: 'Item 1', badge: 21 } ] }
+			>
+				{ renderPane() }
+			</Navigation>
+		);
 
-		const menuItem = screen.getAllByRole( 'listitem' );
-		expect( menuItem[ 0 ].textContent ).toBe( 'Item 1' + '21' );
+		const menuItem = screen.getByRole( 'listitem' );
+		expect( menuItem.textContent ).toBe( 'Item 1' + '21' );
 	} );
 
 	it( 'should render menu titles when items exist', async () => {
-		const { rerender } = render( <Navigation></Navigation> );
+		const { rerender } = render(
+			<Navigation data={ [] }>{ renderPane() }</Navigation>
+		);
 
 		const emptyMenu = screen.queryByText( 'Menu title' );
 		expect( emptyMenu ).toBeNull();
 
-		rerender( testNavigation( { rootTitle: 'Menu title' } ) );
+		rerender(
+			<Navigation data={ sampleData }>{ renderPane() }</Navigation>
+		);
 
 		const menuTitle = screen.queryByText( 'Menu title' );
 		expect( menuTitle ).not.toBeNull();
 	} );
 
 	it( 'should navigate up a level when clicking the back button', async () => {
-		render( testNavigation( { rootTitle: 'Home' } ) );
+		render(
+			<Navigation data={ sampleData } rootTitle="Home">
+				{ renderPane() }
+			</Navigation>
+		);
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Category' } ) );
 		let levelTitle = screen.getByRole( 'heading' );
 		expect( levelTitle.textContent ).toBe( 'Category' );
-		fireEvent.click( screen.getByRole( 'button', { name: 'Home' } ) );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Back' } ) );
 		levelTitle = screen.getByRole( 'heading' );
 		expect( levelTitle.textContent ).toBe( 'Home' );
 	} );

@@ -1,182 +1,154 @@
 /**
+ * External dependencies
+ */
+import styled from '@emotion/styled';
+
+/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 /**
- * External dependencies
- */
-import styled from '@emotion/styled';
-
-/**
  * Internal dependencies
  */
-import Navigation from '../';
-import NavigationMenu from '../menu';
-import NavigationMenuItem from '../menu-item';
+import Navigation from '..';
+import NavigationGroup from '../group';
+import NavigationItem from '../item';
+import NavigationLevel from '../level';
 
 export default {
 	title: 'Components/Navigation',
 	component: Navigation,
 };
 
-// Example Link component from a router such as React Router
-const CustomRouterLink = ( { children, onClick } ) => {
-	// Here I'm passing the onClick prop for simplicity, but behavior can be
-	// anything here.
-	return <Button onClick={ onClick }>{ children }</Button>;
-};
-
-const data = [
-	{
-		title: 'Item 1',
-		id: 'item-1',
-	},
-	{
-		title: 'Item 2',
-		id: 'item-2',
-	},
-	{
-		title: 'Category',
-		id: 'item-3',
-		badge: '2',
-	},
-	{
-		title: 'Child 1',
-		id: 'child-1',
-		parent: 'item-3',
-		badge: '1',
-	},
-	{
-		title: 'Child 2',
-		id: 'child-2',
-		parent: 'item-3',
-	},
-	{
-		title: 'Nested Category',
-		id: 'child-3',
-		parent: 'item-3',
-	},
-	{
-		title: 'Sub Child 1',
-		id: 'sub-child-1',
-		parent: 'child-3',
-	},
-	{
-		title: 'Sub Child 2',
-		id: 'sub-child-2',
-		parent: 'child-3',
-	},
-	{
-		title: 'External link',
-		id: 'item-4',
-		href: 'https://wordpress.org',
-		linkProps: {
-			target: '_blank',
-		},
-	},
-	{
-		title: 'Internal link',
-		id: 'item-5',
-		LinkComponent: CustomRouterLink,
-	},
-	{
-		title: 'Secondary Item 1',
-		id: 'secondary-item-1',
-		isSecondary: true,
-	},
-	{
-		title: 'Secondary Item 2',
-		id: 'secondary-item-2',
-		isSecondary: true,
-	},
-	{
-		title: 'Secondary Child 1',
-		id: 'secondary-child-1',
-		parent: 'secondary-item-1',
-		isSecondary: true,
-	},
-	{
-		title: 'Secondary Child 2',
-		id: 'secondary-child-2',
-		parent: 'secondary-item-1',
-		isSecondary: true,
-	},
-];
-
-function Example() {
-	const [ active, setActive ] = useState( 'item-1' );
-
-	const renderMenuItem = ( item ) => (
-		<NavigationMenuItem
-			{ ...item }
-			key={ item.id }
-			onClick={
-				! item.href ? ( selected ) => setActive( selected.id ) : null
-			}
-		/>
-	);
-
-	return (
-		<>
-			{ active !== 'child-2' ? (
-				<Button
-					style={ { position: 'absolute', bottom: 0 } }
-					onClick={ () => setActive( 'child-2' ) }
-				>
-					Non-navigation link to Child 2
-				</Button>
-			) : null }
-			<Container>
-				<Navigation
-					activeItemId={ active }
-					data={ data }
-					rootTitle="Home"
-				>
-					{ ( { level, parentLevel, NavigationBackButton } ) => {
-						return (
-							<>
-								{ parentLevel && (
-									<NavigationBackButton>
-										{ parentLevel.title }
-									</NavigationBackButton>
-								) }
-								<NavigationMenu title={ level.title }>
-									{ level.children
-										.filter(
-											( item ) => ! item.isSecondary
-										)
-										.map( ( item ) =>
-											renderMenuItem( item )
-										) }
-								</NavigationMenu>
-								<NavigationMenu
-									title={
-										level.id === 'root'
-											? 'Secondary Menu'
-											: level.title
-									}
-								>
-									{ level.children
-										.filter( ( item ) => item.isSecondary )
-										.map( ( item ) =>
-											renderMenuItem( item )
-										) }
-								</NavigationMenu>
-							</>
-						);
-					} }
-				</Navigation>
-			</Container>
-		</>
-	);
-}
-
 const Container = styled.div`
 	max-width: 246px;
 `;
 
-export const _default = () => {
-	return <Example />;
-};
+function Example() {
+	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+	const [ activeLevel, setActiveLevel ] = useState( 'root' );
+
+	return (
+		<Container>
+			<Navigation
+				activeItem={ activeItem }
+				activeLevel={ activeLevel }
+				setActiveItem={ setActiveItem }
+				setActiveLevel={ setActiveLevel }
+			>
+				<NavigationLevel title="Home">
+					<NavigationGroup title="Group 1">
+						<NavigationItem item="item-1" title="Item 1" />
+						<NavigationItem item="item-2" title="Item 2" />
+						<NavigationItem
+							badge="2"
+							item="item-3"
+							navigateToLevel="category"
+							title="Category"
+						/>
+					</NavigationGroup>
+					<NavigationGroup title="Group 2">
+						<NavigationItem
+							href="https://wordpress.org/"
+							item="item-4"
+							target="_blank"
+							title="External link"
+						/>
+						<NavigationItem item="item-5">
+							<img
+								alt="WordPress Logo"
+								src="https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png"
+								style={ { width: 50, height: 50 } }
+							/>
+						</NavigationItem>
+					</NavigationGroup>
+				</NavigationLevel>
+
+				<NavigationLevel
+					level="category"
+					parentLevel="root"
+					parentLevelTitle="Home"
+					title="Category"
+				>
+					<ul>
+						<NavigationItem
+							badge="1"
+							item="child-1"
+							title="Child 1"
+						/>
+						<NavigationItem item="child-2" title="Child 2" />
+						<NavigationItem
+							navigateToLevel="nested-category"
+							item="child-3"
+							title="Nested Category"
+						/>
+					</ul>
+				</NavigationLevel>
+
+				<NavigationLevel
+					level="nested-category"
+					parentLevel="category"
+					parentLevelTitle="Category"
+					title="Nested Category"
+				>
+					<ul>
+						<NavigationItem
+							item="sub-child-1"
+							title="Sub Child 1"
+						/>
+						<NavigationItem
+							item="sub-child-2"
+							title="Sub Child 2"
+						/>
+					</ul>
+				</NavigationLevel>
+
+				<NavigationLevel title="Secondary Menu">
+					<ul>
+						<NavigationItem
+							navigateToLevel="secondary-level"
+							item="secondary-item-1"
+							title="Secondary Item 1"
+						/>
+						<NavigationItem
+							item="secondary-item-2"
+							title="Secondary Item 2"
+						/>
+					</ul>
+				</NavigationLevel>
+
+				<NavigationLevel
+					level="secondary-level"
+					parentLevel="root"
+					parentLevelTitle="Home"
+					title="Secondary Item 1"
+				>
+					<ul>
+						<NavigationItem
+							item="secondary-child-1"
+							title="Secondary Child 1"
+						/>
+						<NavigationItem
+							item="secondary-child-2"
+							title="Secondary Child 2"
+						/>
+					</ul>
+				</NavigationLevel>
+			</Navigation>
+
+			<Button
+				onClick={ () => {
+					setActiveItem( 'child-2' );
+					setActiveLevel( 'category' );
+				} }
+				style={ { position: 'absolute', bottom: 0 } }
+			>
+				Non-navigation link to Child 2
+			</Button>
+		</Container>
+	);
+}
+
+export const _default = () => <Example />;

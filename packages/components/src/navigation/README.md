@@ -1,155 +1,174 @@
 # Navigation
 
-Render a flat array of menu items into a waterfall style hierarchy navigation.
+Render a navigation list with optional groupings and hierarchy.
 
 ## Usage
 
 ```jsx
 import {
 	__experimentalNavigation as Navigation,
-	__experimentalNavigationMenu as NavigationMenu,
-	__experimentalNavigationMenuItem as NavigationMenuItem,
+	__experimentalNavigationGroup as NavigationGroup,
+	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigationLevel as NavigationLevel,
 } from '@wordpress/components';
-import { useState } from '@wordpress/compose';
-
-const data = [
-    {
-		title: 'Item 1',
-		id: 'item-1',
-	},
-	{
-		title: 'Item 2',
-		id: 'item-2',
-	},
-	{
-		title: 'Category',
-		id: 'item-3',
-		badge: '2',
-	},
-	{
-		title: 'Child 1',
-		id: 'child-1',
-		parent: 'item-3',
-		badge: '1',
-	},
-	{
-		title: 'Child 2',
-		id: 'child-2',
-		parent: 'item-3',
-	},
-];
 
 const MyNavigation = () => {
-    const [ active, setActive ] = useState( 'item-1' );
+	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+	const [ activeLevel, setActiveLevel ] = useState( 'root' );
 
 	return (
-		<Navigation activeItemId={ active } data={ data } rootTitle="Home">
-			{ ( { level, parentLevel, NavigationBackButton } ) => {
-				return (
-					<>
-						{ parentLevel && (
-							<NavigationBackButton>
-								<Icon icon={ arrowLeft } />
-								{ parentLevel.title }
-							</NavigationBackButton>
-						) }
-						<h1>{ level.title }</h1>
-						<NavigationMenu>
-							{ level.children.map( ( item ) => {
-								return (
-									<NavigationMenuItem
-										{ ...item }
-										key={ item.id }
-										onClick={ ( selected ) =>
-											setActive( selected.id )
-										}
-									/>
-								);
-							} ) }
-						</NavigationMenu>
-					</>
-				);
-			} }
+		<Navigation
+			activeItem={ activeItem }
+			activeLevel={ activeLevel }
+			setActiveItem={ setActiveItem }
+			setActiveLevel={ setActiveLevel }
+		>
+			<NavigationLevel title="Home">
+				<NavigationGroup title="Group 1">
+					<NavigationItem item="item-1" title="Item 1" />
+					<NavigationItem item="item-2" title="Item 2" />
+				</NavigationGroup>
+				<NavigationGroup title="Group 2">
+					<NavigationItem
+						item="item-3"
+						navigateToLevel="category"
+						title="Category"
+					/>
+				</NavigationGroup>
+			</NavigationLevel>
+
+			<NavigationLevel
+				level="category"
+				parentLevel="root"
+				parentLevelTitle="Home"
+				title="Category"
+			>
+				<ul>
+					<NavigationItem
+						badge="1"
+						item="child-1"
+						title="Child 1"
+					/>
+					<NavigationItem item="child-2" title="Child 2" />
+				</ul>
+			</NavigationLevel>
 		</Navigation>
+	);
 };
 ```
 
 ## Navigation Props
 
-Navigation supports the following props.
+`Navigation` supports the following props.
 
-### `data`
-
--   Type: `array`
--   Required: Yes
-
-An array of config objects for each menu item.
-
-Config objects can be represented
-
-#### `data.title`
+### `activeItem`
 
 -   Type: `string`
--   Required: Yes
+-   Required: No
 
-A menu item's title.
+The active item slug.
 
-#### `data.id`
+### `activeLevel`
+
+-   Type: `string`
+-   Required: No
+-   Default: "root"
+
+The active level slug.
+
+### `setActiveItem`
+
+-   Type: `function`
+-   Required: No
+
+Sync the active item between the external state and the Navigation's internal state.
+
+### `setActiveLevel`
+
+-   Type: `function`
+-   Required: No
+
+Sync the active level between the external state and the Navigation's internal state.
+
+## Navigation Level
+
+`NavigationLevel` supports the following props.
+
+### `level`
+
+-   Type: `string`
+-   Required: No
+-   Default: "root"
+
+The level slug.
+
+### `parentLevel`
+
+-   Type: `string`
+-   Required: No
+
+The parent level slug; used by nested levels to indicate their parent level.
+
+### `parentLevelTitle`
+
+-   Type: `string`
+-   Required: No
+
+The parent level title; used as back button label by nested levels.
+
+### `title`
+
+-   Type: `string`
+-   Required: No
+
+The level title.
+
+## Navigation Group
+
+`NavigationGroup` supports the following props.
+
+### `title`
+
+-   Type: `string`
+-   Required: No
+
+The group title.
+
+## Navigation Item
+
+`NavigationItem` supports the following props.
+
+### `badge`
 
 -   Type: `string|Number`
--   Required: Yes
-
-A menu item's id.
-
-#### `data.parent`
-
--   Type: `string|Number`
 -   Required: No
 
-Specify a menu item's parent id. Defaults to the menu item's parent if none is provided.
+The item badge content.
 
-#### `data.href`
+### `href`
 
 -   Type: `string`
 -   Required: No
 
-Turn a menu item into a link by supplying a url.
+If provided, renders `a` instead of `button`.
 
-#### `data.linkProps`
-
--   Type: `object`
--   Required: No
-
-Supply properties passed to the menu-item.
-
-#### `data.LinkComponent`
-
--   Type: `Node`
--   Required: No
-
-Supply a React component to render as the menu item. This is useful for router link components for internal navigation.
-
-### `activeItemId`
-
--   Type: `string`
--   Required: Yes
-
-The active screen id.
-
-### `rootTitle`
+### `navigateToLevel`
 
 -   Type: `string`
 -   Required: No
 
-A top level title.
-
-## NavigationMenuItem Props
-
-NavigationMenuItem supports the following props.
+The child level slug. If provided, clicking on the item will navigate to the target level.
 
 ### `onClick`
 
 -   Type: `function`
 -   Required: No
 
-A callback to handle selection of a menu item.
+A callback to handle clicking on a menu item.
+
+### `title`
+
+-   Type: `string`
+-   Required: No
+
+The item title.
