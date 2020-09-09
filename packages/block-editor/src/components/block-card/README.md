@@ -30,7 +30,7 @@ const MyBlockCard = () => <BlockCard blockType={ blockType } />;
 
 #### blockType
 
-The type of the block that is being displayed in the card.
+The type of the block that is being displayed in
 
 Type: `Object`
 
