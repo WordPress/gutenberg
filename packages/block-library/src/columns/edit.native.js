@@ -104,13 +104,15 @@ function ColumnsEditContainer( {
 	}, [ width ] );
 
 	const contentStyle = useMemo( () => {
-		const minWidth = 2 * 8 + width;
-		const columnBaseWidth = minWidth / columnsInRow;
+		const columnBaseWidth = width / columnsInRow;
 
 		let columnWidth = columnBaseWidth;
 		if ( columnsInRow > 1 ) {
-			const margins = columnsInRow * 2 * styles.columnMargin.marginLeft;
-			columnWidth = ( minWidth - margins ) / columnsInRow;
+			const margins =
+				columnsInRow *
+				Math.min( columnsInRow, MAX_COLUMNS_NUM_IN_ROW ) *
+				styles.columnMargin.marginLeft;
+			columnWidth = ( width - margins ) / columnsInRow;
 		}
 		return { width: columnWidth };
 	}, [ width, columnsInRow ] );
@@ -218,7 +220,6 @@ function ColumnsEditContainer( {
 						}
 						contentStyle={ contentStyle }
 						parentWidth={ width }
-						marginHorizontal={ 8 }
 					/>
 				) }
 			</View>

@@ -30,7 +30,7 @@ import ColumnsPreview from './column-preview';
 import { getColumnWidths } from '../columns/utils';
 
 const MIN_WIDTH = 32;
-const MARGIN = 8;
+const MARGIN = 16;
 
 function ColumnEdit( {
 	attributes,
