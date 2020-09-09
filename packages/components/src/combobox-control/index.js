@@ -6,9 +6,14 @@ import classnames from 'classnames';
 import { isEqual } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { check, chevronDown } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
-import { Button, Dashicon, Spinner } from '../';
+import { Button, Icon, Spinner } from '../';
 
 const itemToString = ( item ) => item && item.name;
 export default function ComboboxControl( {
@@ -90,9 +95,9 @@ export default function ComboboxControl( {
 						className: 'components-combobox-control__button-button',
 					} ) }
 				>
-					<Dashicon
-						icon="arrow-down-alt2"
+					<Icon
 						className="components-combobox-control__button-icon"
+						icon={ chevronDown }
 					/>
 				</Button>
 			</div>
@@ -116,9 +121,9 @@ export default function ComboboxControl( {
 							} ) }
 						>
 							{ isEqual( item, selectedItem ) && (
-								<Dashicon
-									icon="saved"
+								<Icon
 									className="components-combobox-control__item-icon"
+									icon={ check }
 								/>
 							) }
 							{ item.name }
