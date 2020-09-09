@@ -166,14 +166,10 @@ export const NavigationItem = ( {
 	} );
 
 	const onItemClick = () => {
-		setActiveItem( item );
-
-		if ( href ) {
-			return onClick();
-		}
-
 		if ( navigateToLevel ) {
 			setActiveLevel( navigateToLevel );
+		} else if ( ! href ) {
+			setActiveItem( item );
 		}
 		onClick();
 	};
