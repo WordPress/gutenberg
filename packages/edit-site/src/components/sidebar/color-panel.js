@@ -7,11 +7,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { LINK_COLOR } from '../editor/utils';
-
-const BACKGROUND_COLOR = 'background-color';
-const GRADIENT_COLOR = 'background';
-const TEXT_COLOR = 'color';
+import {
+	BACKGROUND_COLOR,
+	GRADIENT_COLOR,
+	LINK_COLOR,
+	TEXT_COLOR,
+} from '../editor/utils';
 
 export default ( {
 	context: { supports, name },
