@@ -26,6 +26,8 @@ const MyBlockCard = () => <BlockCard blockType={ blockType } />;
 
 ```
 
+### props
+
 #### blockType
 
 Type: `Object`
