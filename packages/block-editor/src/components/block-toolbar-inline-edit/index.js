@@ -10,7 +10,6 @@ import { useContext, useEffect } from '@wordpress/element';
 import {
 	__experimentalToolbarContext as ToolbarContext,
 	createSlotFill,
-	ToolbarGroup,
 } from '@wordpress/components';
 
 /**
@@ -50,7 +49,7 @@ function BlockToolbarInlineEditSlot() {
 	);
 }
 
-function BlockToolbarInlineEditFill( { onClose, controls, children } ) {
+function BlockToolbarInlineEditFill( { onClose, children } ) {
 	return (
 		<Fill>
 			{ ( fillProps ) => {
@@ -64,7 +63,6 @@ function BlockToolbarInlineEditFill( { onClose, controls, children } ) {
 						onClose={ onClose }
 					>
 						<ToolbarContext.Provider value={ value }>
-							<ToolbarGroup controls={ controls } />
 							<div className="block-editor-block-toolbar-inline-edit-popover__toolbar-wrapper">
 								{ children }
 							</div>
