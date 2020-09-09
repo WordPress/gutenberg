@@ -19,11 +19,19 @@ const TEMPLATE = [ [ 'core/post-title' ], [ 'core/post-content' ] ];
 export default function QueryLoopEdit( {
 	clientId,
 	context: {
-		query: { perPage, offset, categoryIds },
+		query: {
+			perPage,
+			offset,
+			categoryIds,
+			tagIds = [],
+			order,
+			orderBy,
+			author,
+		} = {},
 		queryContext,
 	},
 } ) {
-	const [ { page } ] = useQueryContext() || queryContext;
+	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
 
 	const { posts, blocks } = useSelect(
@@ -31,9 +39,15 @@ export default function QueryLoopEdit( {
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				categories: categoryIds,
+				tags: tagIds,
+				order,
+				orderby: orderBy,
 			};
 			if ( perPage ) {
 				query.per_page = perPage;
+			}
+			if ( author ) {
+				query.author = author;
 			}
 			return {
 				posts: select( 'core' ).getEntityRecords(
@@ -44,7 +58,17 @@ export default function QueryLoopEdit( {
 				blocks: select( 'core/block-editor' ).getBlocks( clientId ),
 			};
 		},
-		[ perPage, page, offset, categoryIds, clientId ]
+		[
+			perPage,
+			page,
+			offset,
+			categoryIds,
+			tagIds,
+			order,
+			orderBy,
+			clientId,
+			author,
+		]
 	);
 
 	const blockContexts = useMemo(

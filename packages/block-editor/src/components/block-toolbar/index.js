@@ -10,6 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,7 +21,6 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
-import BlockDraggable from '../block-draggable';
 import { useShowMoversGestures } from './utils';
 import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
@@ -113,26 +113,15 @@ export default function BlockToolbar( {
 					</div>
 				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<BlockSwitcher clientIds={ blockClientIds } />
+					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+						<BlockSwitcher clientIds={ blockClientIds } />
+						<BlockMover
+							clientIds={ blockClientIds }
+							hideDragHandle={ hideDragHandle }
+						/>
+					</ToolbarGroup>
 				) }
 			</div>
-			{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-				<BlockDraggable
-					clientIds={ blockClientIds }
-					cloneClassname="block-editor-block-toolbar__drag-clone"
-				>
-					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
-						<div
-							className="block-editor-block-toolbar__drag-handle-area"
-							draggable={ isDraggable && ! hideDragHandle }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-						>
-							<BlockMover clientIds={ blockClientIds } />
-						</div>
-					) }
-				</BlockDraggable>
-			) }
 			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot

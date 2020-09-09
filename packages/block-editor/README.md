@@ -478,9 +478,7 @@ _Properties_
 -   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
 -   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
 -   _colors_ `Array`: Palette colors
--   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
 -   _fontSizes_ `Array`: Available font sizes
--   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
 -   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
@@ -495,7 +493,6 @@ _Properties_
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
--   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
 -   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 (2020-09-03)
+
 ### Breaking Changes
 
 -   The `config` and `mappings` options in `.wp-env.json` are now merged with any overrides instead of being overwritten.

@@ -75,10 +75,3 @@ export function PaddingEdit( props ) {
 		native: null,
 	} );
 }
-
-export const paddingStyleMappings = {
-	paddingTop: [ 'spacing', 'padding', 'top' ],
-	paddingRight: [ 'spacing', 'padding', 'right' ],
-	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
-	paddingLeft: [ 'spacing', 'padding', 'left' ],
-};

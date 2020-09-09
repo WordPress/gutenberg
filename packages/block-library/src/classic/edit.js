@@ -54,7 +54,11 @@ export default class ClassicEdit extends Component {
 		if ( document.readyState === 'complete' ) {
 			this.initialize();
 		} else {
-			window.addEventListener( 'DOMContentLoaded', this.initialize );
+			document.addEventListener( 'readystatechange', () => {
+				if ( document.readyState === 'complete' ) {
+					this.initialize();
+				}
+			} );
 		}
 	}
 

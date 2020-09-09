@@ -126,7 +126,22 @@
 		},
 		"features": {
 			"typography": {
-				"dropCap": false
+				"dropCap": true
+			},
+			"color": {
+				"custom": true
+			},
+			"gradient": {
+				"custom": true
+			},
+			"fontSize": {
+				"custom": true
+			},
+			"lineHeight": {
+				"custom": false
+			},
+			"spacing": {
+				"custom": false
 			}
 		}
 	}

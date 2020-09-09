@@ -46,7 +46,7 @@ function Header( { isCustomizer } ) {
 				</NavigableMenu>
 				{ ! isCustomizer && (
 					<h1 className="edit-widgets-header__title">
-						{ __( 'Block Areas' ) } { __( '(experimental)' ) }
+						{ __( 'Block Areas' ) }
 					</h1>
 				) }
 				<div className="edit-widgets-header__actions">

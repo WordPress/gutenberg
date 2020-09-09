@@ -5,7 +5,7 @@ import { _n, sprintf } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { Flex, FlexItem } from '@wordpress/components';
-import { handle } from '@wordpress/icons';
+import { dragHandle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -23,7 +23,7 @@ export default function BlockDraggableChip( { clientIds } ) {
 			const [ firstId ] = clientIds;
 			const blockName = getBlockName( firstId );
 
-			return getBlockType( blockName ).icon;
+			return getBlockType( blockName )?.icon;
 		},
 		[ clientIds ]
 	);
@@ -36,9 +36,6 @@ export default function BlockDraggableChip( { clientIds } ) {
 					className="block-editor-block-draggable-chip__content"
 				>
 					<FlexItem>
-						<BlockIcon icon={ handle } />
-					</FlexItem>
-					<FlexItem>
 						{ icon ? (
 							<BlockIcon icon={ icon } />
 						) : (
@@ -48,6 +45,9 @@ export default function BlockDraggableChip( { clientIds } ) {
 								clientIds.length
 							)
 						) }
+					</FlexItem>
+					<FlexItem>
+						<BlockIcon icon={ dragHandle } />
 					</FlexItem>
 				</Flex>
 			</div>
