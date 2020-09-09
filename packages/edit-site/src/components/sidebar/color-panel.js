@@ -37,13 +37,13 @@ export default ( {
 			label: __( 'Text color' ),
 		} );
 	}
-	
+
 	let backgroundSettings = {};
 	if ( supports.includes( BACKGROUND_COLOR ) ) {
 		backgroundSettings = {
 			colorValue: getProperty( name, [ 'color', 'background' ] ),
 			onColorChange: ( value ) =>
-			setProperty( name, [ 'color', 'background' ], value ),
+				setProperty( name, [ 'color', 'background' ], value ),
 		};
 	}
 
