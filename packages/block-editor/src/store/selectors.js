@@ -1386,6 +1386,7 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
 		...variation.attributes,
 	},
 	innerBlocks: variation.innerBlocks,
+	keywords: variation.keywords || item.keywords,
 } );
 
 /**
