@@ -5,7 +5,7 @@
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Requires at least: 5.3
  * Requires PHP: 5.6
- * Version: 8.9.1
+ * Version: 8.9.3
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
@@ -26,8 +26,6 @@ gutenberg_pre_init();
  * @since 0.1.0
  */
 function gutenberg_menu() {
-	global $submenu;
-
 	add_menu_page(
 		'Gutenberg',
 		'Gutenberg',
@@ -53,12 +51,7 @@ function gutenberg_menu() {
 			'gutenberg-widgets',
 			'the_gutenberg_widgets'
 		);
-		$submenu['themes.php'] = array_filter(
-			$submenu['themes.php'],
-			function( $current_menu_item ) {
-				return isset( $current_menu_item[2] ) && 'widgets.php' !== $current_menu_item[2];
-			}
-		);
+		remove_submenu_page( 'themes.php', 'widgets.php' );
 	}
 
 	if ( get_option( 'gutenberg-experiments' ) ) {
@@ -85,16 +78,19 @@ function gutenberg_menu() {
 	}
 
 	if ( current_user_can( 'edit_posts' ) ) {
-		$submenu['gutenberg'][] = array(
+		add_submenu_page(
+			'gutenberg',
+			__( 'Support', 'gutenberg' ),
 			__( 'Support', 'gutenberg' ),
 			'edit_posts',
-			__( 'https://wordpress.org/support/plugin/gutenberg', 'gutenberg' ),
+			__( 'https://wordpress.org/support/plugin/gutenberg/', 'gutenberg' )
 		);
-
-		$submenu['gutenberg'][] = array(
+		add_submenu_page(
+			'gutenberg',
+			__( 'Documentation', 'gutenberg' ),
 			__( 'Documentation', 'gutenberg' ),
 			'edit_posts',
-			'https://developer.wordpress.org/block-editor/',
+			'https://developer.wordpress.org/block-editor/'
 		);
 	}
 

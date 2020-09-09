@@ -12,32 +12,40 @@ import {
 import { __ } from '@wordpress/i18n';
 import { postList } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { getTermsInfo } from '../utils';
+import { MAX_FETCHED_TERMS } from '../constants';
+
 export default function QueryToolbar( { query, setQuery } ) {
-	const { categories, categoriesMapById, categoriesMapByName } = useSelect(
-		( select ) => {
-			const _categories = select( 'core' ).getEntityRecords(
-				'taxonomy',
-				'category'
-			);
-			return {
-				categories: _categories,
-				..._categories?.reduce(
-					( acc, category ) => ( {
-						categoriesMapById: {
-							...acc.categoriesMapById,
-							[ category.id ]: category,
-						},
-						categoriesMapByName: {
-							...acc.categoriesMapByName,
-							[ category.name ]: category,
-						},
-					} ),
-					{ categoriesMapById: {}, categoriesMapByName: {} }
-				),
-			};
-		},
-		[]
-	);
+	const { categories, tags } = useSelect( ( select ) => {
+		const { getEntityRecords } = select( 'core' );
+		const termsQuery = { per_page: MAX_FETCHED_TERMS };
+		const _categories = getEntityRecords(
+			'taxonomy',
+			'category',
+			termsQuery
+		);
+		const _tags = getEntityRecords( 'taxonomy', 'post_tag', termsQuery );
+		return {
+			categories: getTermsInfo( _categories ),
+			tags: getTermsInfo( _tags ),
+		};
+	}, [] );
+
+	// Handles categories and tags changes.
+	const onTermsChange = ( terms, queryProperty ) => ( newTermValues ) => {
+		const termIds = newTermValues.reduce( ( accumulator, termValue ) => {
+			const termId = termValue?.id || terms.mapByName[ termValue ]?.id;
+			if ( termId ) accumulator.push( termId );
+			return accumulator;
+		}, [] );
+		setQuery( { [ queryProperty ]: termIds } );
+	};
+	const onCategoriesChange = onTermsChange( categories, 'categoryIds' );
+	const onTagsChange = onTermsChange( tags, 'tagIds' );
+
 	return (
 		<Toolbar>
 			<Dropdown
@@ -77,30 +85,32 @@ export default function QueryToolbar( { query, setQuery } ) {
 								setQuery( { offset: value ?? 0 } )
 							}
 						/>
-						{ categories && (
+						{ categories?.terms && (
 							<FormTokenField
 								label={ __( 'Categories' ) }
 								value={ query.categoryIds.map(
 									( categoryId ) => ( {
 										id: categoryId,
 										value:
-											categoriesMapById[ categoryId ]
+											categories.mapById[ categoryId ]
 												.name,
 									} )
 								) }
-								suggestions={ categories.map(
-									( category ) => category.name
+								suggestions={ categories.names }
+								onChange={ onCategoriesChange }
+							/>
+						) }
+						{ tags?.terms && (
+							<FormTokenField
+								label={ __( 'Tags' ) }
+								value={ ( query.tagIds || [] ).map(
+									( tagId ) => ( {
+										id: tagId,
+										value: tags.mapById[ tagId ].name,
+									} )
 								) }
-								onChange={ ( newCategoryNames ) => {
-									const categoryIds = newCategoryNames.map(
-										( categoryName ) =>
-											categoriesMapByName[ categoryName ]
-												?.id
-									);
-									if ( categoryIds.includes( undefined ) )
-										return;
-									setQuery( { categoryIds } );
-								} }
+								suggestions={ tags.names }
+								onChange={ onTagsChange }
 							/>
 						) }
 					</>

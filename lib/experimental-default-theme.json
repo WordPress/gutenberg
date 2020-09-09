@@ -139,6 +139,9 @@
 			},
 			"lineHeight": {
 				"custom": false
+			},
+			"spacing": {
+				"custom": false
 			}
 		}
 	}
