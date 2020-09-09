@@ -8,11 +8,7 @@ import { isObject } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import {
-	hasBlockSupport,
-	getBlockSupport,
-	COLOR_SUPPORT_KEY,
-} from '@wordpress/blocks';
+import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useRef, useEffect, Platform } from '@wordpress/element';
@@ -34,6 +30,8 @@ import {
 import { cleanEmptyObject } from './utils';
 import ColorPanel from './color-panel';
 import useEditorFeature from '../components/use-editor-feature';
+
+export const COLOR_SUPPORT_KEY = '__experimentalColor';
 
 const hasColorSupport = ( blockType ) =>
 	Platform.OS === 'web' && hasBlockSupport( blockType, COLOR_SUPPORT_KEY );

@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
-import { hasBlockSupport, PADDING_SUPPORT_KEY } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 
 /**
@@ -11,6 +11,8 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
  */
 import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
+
+export const PADDING_SUPPORT_KEY = '__experimentalPadding';
 
 /**
  * Inspector control panel containing the line height related configuration

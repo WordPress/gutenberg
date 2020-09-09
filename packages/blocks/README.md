@@ -191,10 +191,6 @@ _Returns_
 
 -   `Object`: A cloned block.
 
-<a name="COLOR_SUPPORT_KEY" href="#COLOR_SUPPORT_KEY">#</a> **COLOR_SUPPORT_KEY**
-
-Undocumented declaration.
-
 <a name="createBlock" href="#createBlock">#</a> **createBlock**
 
 Returns a block object given its type and attributes.
@@ -238,10 +234,6 @@ _Parameters_
 _Returns_
 
 -   `?Object`: Highest-priority transform candidate.
-
-<a name="FONT_SIZE_SUPPORT_KEY" href="#FONT_SIZE_SUPPORT_KEY">#</a> **FONT_SIZE_SUPPORT_KEY**
-
-Undocumented declaration.
 
 <a name="getBlockAttributes" href="#getBlockAttributes">#</a> **getBlockAttributes**
 
@@ -566,10 +558,6 @@ _Returns_
 
 -   `boolean`: True if the parameter is a valid icon and false otherwise.
 
-<a name="LINE_HEIGHT_SUPPORT_KEY" href="#LINE_HEIGHT_SUPPORT_KEY">#</a> **LINE_HEIGHT_SUPPORT_KEY**
-
-Undocumented declaration.
-
 <a name="LINK_COLOR" href="#LINK_COLOR">#</a> **LINK_COLOR**
 
 Undocumented declaration.
@@ -587,10 +575,6 @@ _Parameters_
 _Returns_
 
 -   `WPBlockTypeIconDescriptor`: Object describing the icon.
-
-<a name="PADDING_SUPPORT_KEY" href="#PADDING_SUPPORT_KEY">#</a> **PADDING_SUPPORT_KEY**
-
-Undocumented declaration.
 
 <a name="parse" href="#parse">#</a> **parse**
 

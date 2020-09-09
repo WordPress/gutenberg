@@ -25,9 +25,3 @@ export const STYLE_PROPERTY = {
 	paddingRight: [ 'spacing', 'padding', 'right' ],
 	paddingTop: [ 'spacing', 'padding', 'top' ],
 };
-
-/* Block supports */
-export const COLOR_SUPPORT_KEY = '__experimentalColor';
-export const FONT_SIZE_SUPPORT_KEY = '__experimentalFontSize';
-export const LINE_HEIGHT_SUPPORT_KEY = '__experimentalLineHeight';
-export const PADDING_SUPPORT_KEY = '__experimentalPadding';

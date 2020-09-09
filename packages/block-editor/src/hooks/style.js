@@ -7,22 +7,19 @@ import { has, get, startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import {
-	hasBlockSupport,
-	COLOR_SUPPORT_KEY,
-	FONT_SIZE_SUPPORT_KEY,
-	LINE_HEIGHT_SUPPORT_KEY,
-	PADDING_SUPPORT_KEY,
-	STYLE_PROPERTY,
-} from '@wordpress/blocks';
+import { hasBlockSupport, STYLE_PROPERTY } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { ColorEdit } from './color';
-import { TypographyPanel } from './typography';
-import { PaddingEdit } from './padding';
+import { ColorEdit, COLOR_SUPPORT_KEY } from './color';
+import {
+	TypographyPanel,
+	FONT_SIZE_SUPPORT_KEY,
+	LINE_HEIGHT_SUPPORT_KEY,
+} from './typography';
+import { PaddingEdit, PADDING_SUPPORT_KEY } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
 
 const hasStyleSupport = ( blockType ) =>
