@@ -37,26 +37,23 @@ export default ( {
 			label: __( 'Text color' ),
 		} );
 	}
-
-	let gradientSettings, backgroundSettings;
-
+	
+	let backgroundSettings = {};
 	if ( supports.includes( BACKGROUND_COLOR ) ) {
 		backgroundSettings = {
 			colorValue: getProperty( name, [ 'color', 'background' ] ),
 			onColorChange: ( value ) =>
-				setProperty( name, [ 'color', 'background' ], value ),
+			setProperty( name, [ 'color', 'background' ], value ),
 		};
-	} else {
-		backgroundSettings = {};
 	}
+
+	let gradientSettings = {};
 	if ( supports.includes( GRADIENT_COLOR ) ) {
 		gradientSettings = {
 			gradientValue: getProperty( name, [ 'color', 'gradient' ] ),
 			onGradientChange: ( value ) =>
 				setProperty( name, [ 'color', 'gradient' ], value ),
 		};
-	} else {
-		gradientSettings = {};
 	}
 
 	if (
