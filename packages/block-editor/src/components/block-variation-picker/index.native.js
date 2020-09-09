@@ -24,11 +24,11 @@ import {
 } from '@wordpress/components';
 import { Icon, close } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
+import { IconButton } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import MenuItem from '../inserter/menu-item';
 import styles from './style.scss';
 
 const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
@@ -103,7 +103,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 			>
 				{ variations.map( ( v ) => {
 					return (
-						<MenuItem
+						<IconButton
 							item={ v }
 							key={ v.name }
 							onSelect={ () => onVariationSelect( v ) }

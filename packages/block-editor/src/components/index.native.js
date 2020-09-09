@@ -57,6 +57,7 @@ export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { Block as __experimentalBlock } from './block-list/block-wrapper';
 export { default as FloatingToolbar } from './floating-toolbar';
+export { default as IconButton } from './icon-button';
 
 // State Related Components
 export { default as BlockEditorProvider } from './provider';

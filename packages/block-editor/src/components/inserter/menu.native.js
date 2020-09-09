@@ -18,12 +18,12 @@ import { createBlock, rawHandler } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
+import { IconButton } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import MenuItem from './menu-item.native';
 
 const MIN_COL_NUM = 3;
 
@@ -112,7 +112,7 @@ export class InserterMenu extends Component {
 		const { itemWidth, maxWidth } = this.state;
 		const { onSelect } = this.props;
 		return (
-			<MenuItem
+			<IconButton
 				item={ item }
 				itemWidth={ itemWidth }
 				maxWidth={ maxWidth }
