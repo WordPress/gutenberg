@@ -353,8 +353,6 @@ class BottomSheet extends Component {
 			automaticallyAdjustContentInsets: false,
 		};
 
-		const WrapperView = isChildrenScrollable ? View : ScrollView;
-
 		const getHeader = () => (
 			<>
 				<View style={ styles.bottomSheetHeader }>
@@ -420,9 +418,19 @@ class BottomSheet extends Component {
 						<View style={ styles.dragIndicator } />
 					) }
 					{ ! hideHeader && getHeader() }
-					<WrapperView
+					<ScrollView
 						{ ...( isChildrenScrollable
-							? { style: listProps.style }
+							? {
+									style: listProps.style,
+									contentContainerStyle: {
+										width: '100%',
+										height: '100%',
+									},
+									scrollEnabled: false,
+									horizontal: true,
+									keyboardShouldPersistTaps: 'always',
+									automaticallyAdjustContentInsets: false,
+							  }
 							: listProps ) }
 					>
 						<BottomSheetProvider
@@ -440,14 +448,16 @@ class BottomSheet extends Component {
 								setIsFullScreen: this.setIsFullScreen,
 							} }
 						>
-							<TouchableHighlight accessible={ false }>
-								<>{ children }</>
-							</TouchableHighlight>
+							<View style={ { width: '100%' } }>
+								<TouchableHighlight accessible={ false }>
+									<>{ children }</>
+								</TouchableHighlight>
+							</View>
 						</BottomSheetProvider>
 						{ ! isChildrenScrollable && (
 							<View style={ { height: safeAreaBottomInset } } />
 						) }
-					</WrapperView>
+					</ScrollView>
 				</KeyboardAvoidingView>
 			</Modal>
 		);

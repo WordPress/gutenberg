@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { InspectorControls } from '@wordpress/block-editor';
-import { BottomSheet, ColorSettings } from '@wordpress/components';
+import {
+	BottomSheet,
+	ColorSettings,
+	LinkPickerScreen,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 /**
@@ -13,6 +17,7 @@ import styles from './container.native.scss';
 export const blockSettingsScreens = {
 	settings: 'Settings',
 	color: 'Color',
+	linkPicker: 'linkPicker',
 };
 
 function BottomSheetSettings( {
@@ -39,6 +44,14 @@ function BottomSheetSettings( {
 					name={ blockSettingsScreens.color }
 				>
 					<ColorSettings defaultSettings={ settings } />
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.linkPicker }
+					fullScreen
+				>
+					<LinkPickerScreen
+						returnScreenName={ blockSettingsScreens.settings }
+					/>
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
