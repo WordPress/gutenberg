@@ -194,7 +194,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 				innerBlocks = [
 					...innerBlocks,
 					...times( newColumns - previousColumns, () => {
-						return createBlock( 'core/column' );
+						return createBlock( 'core/column', {
+							allowedBlocks: allowedChildBlocks,
+						} );
 					} ),
 				];
 			} else {
