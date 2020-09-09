@@ -474,6 +474,12 @@
 		"parent": "tutorials"
 	},
 	{
+		"title": "How to setup local WordPress environment on Ubuntu",
+		"slug": "docker-ubuntu",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/devenv/docker-ubuntu.md",
+		"parent": "devenv"
+	},
+	{
 		"title": "Getting Started with JavaScript",
 		"slug": "javascript",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/readme.md",

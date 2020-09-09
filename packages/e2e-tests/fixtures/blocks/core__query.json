@@ -9,8 +9,10 @@
 				"pages": 1,
 				"offset": 0,
 				"categoryIds": [],
+				"tagIds": [],
 				"order": "desc",
-				"orderBy": "date"
+				"orderBy": "date",
+				"author": null
 			}
 		},
 		"innerBlocks": [],

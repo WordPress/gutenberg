@@ -32,6 +32,9 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		if ( isset( $block->context['query']['categoryIds'] ) ) {
 			$query['category__in'] = $block->context['query']['categoryIds'];
 		}
+		if ( isset( $block->context['query']['tagIds'] ) ) {
+			$query['tag__in'] = $block->context['query']['tagIds'];
+		}
 		if ( isset( $block->context['query']['order'] ) ) {
 			$query['order'] = strtoupper( $block->context['query']['order'] );
 		}
@@ -41,7 +44,11 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		if ( isset( $block->context['query']['perPage'] ) ) {
 			$query['posts_per_page'] = $block->context['query']['perPage'];
 		}
+		if ( isset( $block->context['query']['author'] ) ) {
+			$query['author'] = $block->context['query']['author'];
+		}
 	}
+
 	$posts = get_posts( $query );
 
 	$content = '';

@@ -17,11 +17,11 @@ import { groupBy, uniq, deburr } from 'lodash';
 
 function PreviewPlaceholder() {
 	return (
-		<div className="wp-block-template-part__placeholder-preview-item is-placeholder" />
+		<div className="wp-block-template-part__selection-preview-item is-placeholder" />
 	);
 }
 
-function TemplatePartItem( { templatePart, setAttributes } ) {
+function TemplatePartItem( { templatePart, setAttributes, onClose } ) {
 	const {
 		id,
 		slug,
@@ -45,11 +45,12 @@ function TemplatePartItem( { templatePart, setAttributes } ) {
 				type: 'snackbar',
 			}
 		);
+		onClose();
 	}, [ id, slug, theme ] );
 
 	return (
 		<div
-			className="wp-block-template-part__placeholder-preview-item"
+			className="wp-block-template-part__selection-preview-item"
 			role="button"
 			onClick={ onClick }
 			onKeyDown={ ( event ) => {
@@ -61,7 +62,7 @@ function TemplatePartItem( { templatePart, setAttributes } ) {
 			aria-label={ templatePart.slug }
 		>
 			<BlockPreview blocks={ blocks } />
-			<div className="wp-block-template-part__placeholder-preview-item-title">
+			<div className="wp-block-template-part__selection-preview-item-title">
 				{ templatePart.slug }
 			</div>
 		</div>
@@ -71,20 +72,20 @@ function TemplatePartItem( { templatePart, setAttributes } ) {
 function PanelGroup( { title, icon, children } ) {
 	return (
 		<>
-			<div className="wp-block-template-part__placeholder-panel-group-header">
-				<span className="wp-block-template-part__placeholder-panel-group-title">
+			<div className="wp-block-template-part__selection-panel-group-header">
+				<span className="wp-block-template-part__selection-panel-group-title">
 					{ title }
 				</span>
 				<Icon icon={ icon } />
 			</div>
-			<div className="wp-block-template-part__placeholder-panel-group-content">
+			<div className="wp-block-template-part__selection-panel-group-content">
 				{ children }
 			</div>
 		</>
 	);
 }
 
-function TemplatePartsByTheme( { templateParts, setAttributes } ) {
+function TemplatePartsByTheme( { templateParts, setAttributes, onClose } ) {
 	const templatePartsByTheme = useMemo( () => {
 		return Object.values( groupBy( templateParts, 'meta.theme' ) );
 	}, [ templateParts ] );
@@ -101,6 +102,7 @@ function TemplatePartsByTheme( { templateParts, setAttributes } ) {
 						key={ templatePart.id }
 						templatePart={ templatePart }
 						setAttributes={ setAttributes }
+						onClose={ onClose }
 					/>
 				) : (
 					<PreviewPlaceholder key={ templatePart.id } />
@@ -114,6 +116,7 @@ function TemplatePartSearchResults( {
 	templateParts,
 	setAttributes,
 	filterValue,
+	onClose,
 } ) {
 	const filteredTPs = useMemo( () => {
 		// Filter based on value.
@@ -164,6 +167,7 @@ function TemplatePartSearchResults( {
 					key={ templatePart.id }
 					templatePart={ templatePart }
 					setAttributes={ setAttributes }
+					onClose={ onClose }
 				/>
 			) : (
 				<PreviewPlaceholder key={ templatePart.id } />
@@ -172,7 +176,11 @@ function TemplatePartSearchResults( {
 	) );
 }
 
-export default function TemplateParts( { setAttributes, filterValue } ) {
+export default function TemplateParts( {
+	setAttributes,
+	filterValue,
+	onClose,
+} ) {
 	const templateParts = useSelect( ( select ) => {
 		const publishedTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
@@ -212,6 +220,7 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 				templateParts={ templateParts }
 				setAttributes={ setAttributes }
 				filterValue={ filterValue }
+				onClose={ onClose }
 			/>
 		);
 	}
@@ -220,6 +229,7 @@ export default function TemplateParts( { setAttributes, filterValue } ) {
 		<TemplatePartsByTheme
 			templateParts={ templateParts }
 			setAttributes={ setAttributes }
+			onClose={ onClose }
 		/>
 	);
 }

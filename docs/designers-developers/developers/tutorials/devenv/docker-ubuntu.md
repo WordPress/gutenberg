@@ -1,12 +1,16 @@
 # How to setup local WordPress environment on Ubuntu
 
-This article covers setting up the local WordPress development environment using Docker on Ubuntu. The docker binaries included in the Ubuntu repositories (20.04 and earlier) do not support the features needed for the WordPress environment.
+This article covers setting up the local WordPress development environment using Docker on Ubuntu.
 
-You can follow these [directions from Docker to install](https://docs.docker.com/install/linux/docker-ce/ubuntu/) or [download the packages manually](https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/) (download the last version of each and install using: `sudo dpkg -i *.deb`).
+For Ubuntu 20.04.1, the standard docker binaries in the repository work as needed:
+	
+```
+sudo apt install docker.io docker-compose
+```
 
-Additionally, you need to install `docker-compose`, you can follow the [directions from Docker](https://docs.docker.com/compose/install/) or simply [download the latest binary](https://github.com/docker/compose/releases) from GitHub releases.
+For earlier versions of Ubuntu, the docker binaries included in repositories did not support the features needed for the WordPress environment. 
 
-After downloading the binary file `docker-compose-Linux-x86_64`, rename to just `docker-compose` and copy it to `/usr/local/bin` or another spot in your PATH.
+- For Ubuntu prior to 20.04.1, follow these [directions from Docker to install](https://docs.docker.com/install/linux/docker-ce/ubuntu/). Additionally `docker-compose` is required, you may need to install separately, see [ Docker compose documentation](https://docs.docker.com/compose/install/).
 
 ## Troubleshooting
 
@@ -49,7 +53,8 @@ sudo systemctl restart docker.service
 After restarting the services, set the environment variable DOCKER_HOST and try starting using:
 
 ```
-DOCKER_HOST=http://127.0.0.1:2376 npm run wp-env start
+export DOCKER_HOST=tcp://127.0.0.1:2376
+npm run wp-env start
 ```
 
-Your environment should be setup at: http://localhost:8889/
+Your environment should be setup at: http://localhost:8888/
