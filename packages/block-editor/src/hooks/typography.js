@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	FONT_SIZE_SUPPORT_KEY,
+	LINE_HEIGHT_SUPPORT_KEY,
+} from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -11,21 +15,8 @@ import { __ } from '@wordpress/i18n';
  */
 import InspectorControls from '../components/inspector-controls';
 
-import {
-	LINE_HEIGHT_SUPPORT_KEY,
-	LineHeightEdit,
-	useIsLineHeightDisabled,
-} from './line-height';
-import {
-	FONT_SIZE_SUPPORT_KEY,
-	FontSizeEdit,
-	useIsFontSizeDisabled,
-} from './font-size';
-
-export const TYPOGRAPHY_SUPPORT_KEYS = [
-	LINE_HEIGHT_SUPPORT_KEY,
-	FONT_SIZE_SUPPORT_KEY,
-];
+import { LineHeightEdit, useIsLineHeightDisabled } from './line-height';
+import { FontSizeEdit, useIsFontSizeDisabled } from './font-size';
 
 export function TypographyPanel( props ) {
 	const isDisabled = useIsTypographyDisabled( props );
@@ -46,7 +37,7 @@ export function TypographyPanel( props ) {
 const hasTypographySupport = ( blockName ) => {
 	return (
 		Platform.OS === 'web' &&
-		TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>
+		[ FONT_SIZE_SUPPORT_KEY, LINE_HEIGHT_SUPPORT_KEY ].some( ( key ) =>
 			hasBlockSupport( blockName, key )
 		)
 	);

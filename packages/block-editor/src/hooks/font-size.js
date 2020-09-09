@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport, FONT_SIZE_SUPPORT_KEY } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 
@@ -17,8 +17,6 @@ import {
 } from '../components/font-sizes';
 import { cleanEmptyObject } from './utils';
 import { createHigherOrderComponent } from '@wordpress/compose';
-
-export const FONT_SIZE_SUPPORT_KEY = '__experimentalFontSize';
 
 /**
  * Filters registered block settings, extending attributes to include

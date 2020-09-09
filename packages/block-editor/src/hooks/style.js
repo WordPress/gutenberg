@@ -7,26 +7,31 @@ import { has, get, startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	COLOR_SUPPORT_KEY,
+	FONT_SIZE_SUPPORT_KEY,
+	LINE_HEIGHT_SUPPORT_KEY,
+	PADDING_SUPPORT_KEY,
+	STYLE_PROPERTY,
+} from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
-import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
-import { PADDING_SUPPORT_KEY, PaddingEdit } from './padding';
+import { ColorEdit } from './color';
+import { TypographyPanel } from './typography';
+import { PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
-import { STYLE_MAPPINGS } from './utils';
-
-const styleSupportKeys = [
-	...TYPOGRAPHY_SUPPORT_KEYS,
-	COLOR_SUPPORT_KEY,
-	PADDING_SUPPORT_KEY,
-];
 
 const hasStyleSupport = ( blockType ) =>
-	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
+	[
+		LINE_HEIGHT_SUPPORT_KEY,
+		FONT_SIZE_SUPPORT_KEY,
+		COLOR_SUPPORT_KEY,
+		PADDING_SUPPORT_KEY,
+	].some( ( key ) => hasBlockSupport( blockType, key ) );
 
 const VARIABLE_REFERENCE_PREFIX = 'var:';
 const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
@@ -50,7 +55,7 @@ function compileStyleValue( uncompiledValue ) {
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
-	Object.entries( STYLE_MAPPINGS ).forEach(
+	Object.entries( STYLE_PROPERTY ).forEach(
 		( [ styleKey, ...otherObjectKeys ] ) => {
 			const [ objectKeys ] = otherObjectKeys;
 
