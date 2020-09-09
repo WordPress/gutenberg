@@ -13,13 +13,13 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { ColorEdit, COLOR_SUPPORT_KEY } from './color';
+import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
 	TypographyPanel,
 	FONT_SIZE_SUPPORT_KEY,
 	LINE_HEIGHT_SUPPORT_KEY,
 } from './typography';
-import { PaddingEdit, PADDING_SUPPORT_KEY } from './padding';
+import { PADDING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
 
 const hasStyleSupport = ( blockType ) =>

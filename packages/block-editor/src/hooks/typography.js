@@ -12,17 +12,20 @@ import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
 
 import {
+	LINE_HEIGHT_SUPPORT_KEY,
 	LineHeightEdit,
 	useIsLineHeightDisabled,
-	LINE_HEIGHT_SUPPORT_KEY,
 } from './line-height';
 import {
+	FONT_SIZE_SUPPORT_KEY,
 	FontSizeEdit,
 	useIsFontSizeDisabled,
-	FONT_SIZE_SUPPORT_KEY,
 } from './font-size';
 
-export { FONT_SIZE_SUPPORT_KEY, LINE_HEIGHT_SUPPORT_KEY };
+export const TYPOGRAPHY_SUPPORT_KEYS = [
+	FONT_SIZE_SUPPORT_KEY,
+	LINE_HEIGHT_SUPPORT_KEY,
+];
 
 export function TypographyPanel( props ) {
 	const isDisabled = useIsTypographyDisabled( props );
@@ -43,7 +46,7 @@ export function TypographyPanel( props ) {
 const hasTypographySupport = ( blockName ) => {
 	return (
 		Platform.OS === 'web' &&
-		[ FONT_SIZE_SUPPORT_KEY, LINE_HEIGHT_SUPPORT_KEY ].some( ( key ) =>
+		TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>
 			hasBlockSupport( blockName, key )
 		)
 	);
