@@ -9,6 +9,7 @@ import { get } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -54,29 +55,25 @@ function PostPublishPanelPrepublish( {
 				<>
 					<PanelBody
 						initialOpen={ false }
-						title={ [
-							__( 'Visibility:' ),
-							<span
-								className="editor-post-publish-panel__link"
-								key="label"
-							>
-								<PostVisibilityLabel />
-							</span>,
-						] }
+						title={ __( 'Visibility' ) }
+						summary={ createInterpolateElement(
+							__( 'Set to <PostVisibilityLabel />.' ),
+							{
+								PostVisibilityLabel: <PostVisibilityLabel />,
+							}
+						) }
 					>
 						<PostVisibility />
 					</PanelBody>
 					<PanelBody
 						initialOpen={ false }
-						title={ [
-							__( 'Publish:' ),
-							<span
-								className="editor-post-publish-panel__link"
-								key="label"
-							>
-								<PostScheduleLabel />
-							</span>,
-						] }
+						title={ __( 'Publish date' ) }
+						summary={ createInterpolateElement(
+							__( 'Set to <PostScheduleLabel />.' ),
+							{
+								PostScheduleLabel: <PostScheduleLabel />,
+							}
+						) }
 					>
 						<PostSchedule />
 					</PanelBody>
