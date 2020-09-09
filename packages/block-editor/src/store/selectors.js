@@ -1416,7 +1416,7 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
  * @property {string[]} keywords          Keywords that can be searched to find this item.
  * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting
  *                                        this item.
- * @property {number}   frecency          Hueristic that combines frequency and recency.
+ * @property {number}   frecency          Heuristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
 	( state, rootClientId = null ) => {
