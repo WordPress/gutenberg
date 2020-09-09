@@ -15,6 +15,8 @@ import {
 	insertBlock,
 	pressKeyWithModifier,
 	clickBlockToolbarButton,
+	switchEditorModeTo,
+	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Classic', () => {
@@ -46,6 +48,7 @@ describe( 'Classic', () => {
 		// Click the image button.
 		await page.waitForSelector( 'div[aria-label^="Add Media"]' );
 		await page.click( 'div[aria-label^="Add Media"]' );
+
 		await page.click( '.media-menu-item#menu-item-gallery' );
 
 		// Wait for media modal to appear and upload image.
@@ -97,5 +100,49 @@ describe( 'Classic', () => {
 		await clickBlockToolbarButton( 'Convert to blocks', 'content' );
 		await page.waitForSelector( '.wp-block[data-type="core/gallery"]' );
 		expect( await getEditedPostContent() ).toMatch( /<!-- wp:gallery/ );
+	} );
+
+	it( 'Should not fail after save/reload', async () => {
+		const mainBlockCSSSelector = 'div[aria-label^="Block: Classic"]';
+
+		const clickClassic = async () => {
+			await page.waitForSelector( mainBlockCSSSelector );
+			await page.click( mainBlockCSSSelector );
+		};
+
+		const errorMessage = async () =>
+			page.$(
+				`${ mainBlockCSSSelector } p.block-editor-warning__message`
+			);
+
+		await insertBlock( 'Classic' );
+
+		// Wait for TinyMCE to initialise.
+		await page.waitForSelector( '.mce-content-body' );
+
+		// Ensure there is focus.
+		await page.focus( '.mce-content-body' );
+		await page.keyboard.type( 'test' );
+
+		// Move focus away.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+
+		// save
+		await saveDraft();
+
+		// reload
+		await page.reload();
+
+		await clickClassic();
+		expect( await errorMessage() ).toBeFalsy();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// switch to code editor and back
+		await switchEditorModeTo( 'Code' );
+		await switchEditorModeTo( 'Visual' );
+
+		await clickClassic();
+		expect( await errorMessage() ).toBeFalsy();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
