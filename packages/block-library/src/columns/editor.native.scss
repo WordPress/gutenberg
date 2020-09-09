@@ -17,3 +17,8 @@
 	margin-top: $grid-unit;
 	margin-bottom: $grid-unit;
 }
+
+.fullWidthAppender {
+	margin-left: $block-edge-to-content;
+	margin-right: $block-edge-to-content;
+}

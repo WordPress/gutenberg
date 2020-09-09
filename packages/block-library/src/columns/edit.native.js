@@ -12,6 +12,7 @@ import {
 	PanelBody,
 	RangeControl,
 	FooterMessageControl,
+	WIDE_ALIGNMENTS,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -84,7 +85,7 @@ function ColumnsEditContainer( {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
 
-	const { verticalAlignment } = attributes;
+	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
 	useEffect( () => {
@@ -133,11 +134,14 @@ function ColumnsEditContainer( {
 	};
 
 	const renderAppender = () => {
+		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		if ( isSelected ) {
 			return (
-				<InnerBlocks.ButtonBlockAppender
-					onAddBlock={ onAddNextColumn }
-				/>
+				<View style={ isFullWidth && styles.fullWidthAppender }>
+					<InnerBlocks.ButtonBlockAppender
+						onAddBlock={ onAddNextColumn }
+					/>
+				</View>
 			);
 		}
 		return null;
