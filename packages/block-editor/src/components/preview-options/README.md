@@ -47,7 +47,7 @@ const MyPreviewOptions = () => (
                 />
             </div>
 		</MenuGroup>
-    >
+    </PreviewOptions>
 );
 ```
 
