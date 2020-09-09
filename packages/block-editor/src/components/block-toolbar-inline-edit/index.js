@@ -19,7 +19,7 @@ import {
  */
 import PopoverWrapper from './popover-wrapper';
 
-const { Fill, Slot } = createSlotFill( 'BlockControlsInlinePopover' );
+const { Fill, Slot } = createSlotFill( 'BlockToolbarInlineEdit' );
 import {
 	useBlockToolbarInlineEditContext,
 	BlockToolbarInlineEditProvider,
