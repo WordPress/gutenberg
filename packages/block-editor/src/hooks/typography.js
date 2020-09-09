@@ -23,8 +23,8 @@ import {
 } from './font-size';
 
 export const TYPOGRAPHY_SUPPORT_KEYS = [
-	FONT_SIZE_SUPPORT_KEY,
 	LINE_HEIGHT_SUPPORT_KEY,
+	FONT_SIZE_SUPPORT_KEY,
 ];
 
 export function TypographyPanel( props ) {
