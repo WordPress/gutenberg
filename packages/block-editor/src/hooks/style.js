@@ -14,21 +14,18 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
-import {
-	TypographyPanel,
-	FONT_SIZE_SUPPORT_KEY,
-	LINE_HEIGHT_SUPPORT_KEY,
-} from './typography';
+import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { PADDING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
 
+const styleSupportKeys = [
+	...TYPOGRAPHY_SUPPORT_KEYS,
+	COLOR_SUPPORT_KEY,
+	PADDING_SUPPORT_KEY,
+];
+
 const hasStyleSupport = ( blockType ) =>
-	[
-		LINE_HEIGHT_SUPPORT_KEY,
-		FONT_SIZE_SUPPORT_KEY,
-		COLOR_SUPPORT_KEY,
-		PADDING_SUPPORT_KEY,
-	].some( ( key ) => hasBlockSupport( blockType, key ) );
+	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
 
 const VARIABLE_REFERENCE_PREFIX = 'var:';
 const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
