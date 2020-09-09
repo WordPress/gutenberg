@@ -16,15 +16,16 @@ class EditorPreview extends Component {
 			initialHtml,
 			editorMode,
 			postId,
-			postType,
-			...props
+			postType
 		} = this.props;
 
 		if ( editorMode === 'preview' ) {
 			return <Preview blocks={ rawHandler( { HTML: initialHtml } ) } />;
 		}
 
-		return <Editor postId={ postId } postType={ postType } { ...props } />;
+		return (
+			<Editor postId={ postId } postType={ postType } { ...this.props } />
+		);
 	}
 }
 
