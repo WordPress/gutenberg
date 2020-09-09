@@ -18,7 +18,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 function ColumnEdit( {
-	attributes: { verticalAlignment, width },
+	attributes: { verticalAlignment, width, allowedBlocks },
 	setAttributes,
 	clientId,
 } ) {
@@ -92,6 +92,7 @@ function ColumnEdit( {
 					className: classes,
 					style: hasWidth ? { flexBasis: width + '%' } : undefined,
 				} }
+				allowedBlocks={ allowedBlocks }
 			/>
 		</>
 	);
