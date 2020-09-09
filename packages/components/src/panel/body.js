@@ -8,7 +8,7 @@ import mergeRefs from 'react-merge-refs';
 /**
  * WordPress dependencies
  */
-import { useReducedMotion } from '@wordpress/compose';
+import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
@@ -20,7 +20,16 @@ import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
 
 export function PanelBody(
-	{ children, className, icon, initialOpen, onToggle = noop, opened, title },
+	{
+		children,
+		className,
+		icon,
+		initialOpen,
+		onToggle = noop,
+		opened,
+		summary,
+		title,
+	},
 	ref
 ) {
 	const [ isOpened, setIsOpened ] = useControlledState( opened, {
@@ -62,50 +71,64 @@ export function PanelBody(
 	} );
 
 	return (
-		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
-			<PanelBodyTitle
+		<section className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
+			<PanelBodyHeader
 				icon={ icon }
 				isOpened={ isOpened }
 				onClick={ handleOnToggle }
+				summary={ summary }
 				title={ title }
 			/>
 			{ isOpened && children }
-		</div>
+		</section>
 	);
 }
 
-const PanelBodyTitle = forwardRef(
-	( { isOpened, icon, title, ...props }, ref ) => {
+const PanelBodyHeader = forwardRef(
+	( { isOpened, icon, summary, title, ...props }, ref ) => {
+		const summaryClassName = 'components-panel__body-summary';
+		const summaryId = useInstanceId( PanelBodyHeader, summaryClassName );
+
 		if ( ! title ) return null;
 
+		const showSummary = ! isOpened && summary;
+
 		return (
-			<h2 className="components-panel__body-title">
-				<Button
-					className="components-panel__body-toggle"
-					aria-expanded={ isOpened }
-					ref={ ref }
-					{ ...props }
-				>
-					{ /*
+			<header className="components-panel__body-header">
+				<h2 className="components-panel__body-title">
+					<Button
+						className="components-panel__body-toggle"
+						aria-expanded={ isOpened }
+						ref={ ref }
+						{ ...props }
+						aria-describedby={ showSummary ? summaryId : undefined }
+					>
+						{ /*
 					Firefox + NVDA don't announce aria-expanded because the browser
 					repaints the whole element, so this wrapping span hides that.
 				*/ }
-					<span aria-hidden="true">
-						<Icon
-							className="components-panel__arrow"
-							icon={ isOpened ? chevronUp : chevronDown }
-						/>
-					</span>
-					{ title }
-					{ icon && (
-						<Icon
-							icon={ icon }
-							className="components-panel__icon"
-							size={ 20 }
-						/>
-					) }
-				</Button>
-			</h2>
+						<span aria-hidden="true">
+							<Icon
+								className="components-panel__arrow"
+								icon={ isOpened ? chevronUp : chevronDown }
+							/>
+						</span>
+						{ title }
+						{ icon && (
+							<Icon
+								icon={ icon }
+								className="components-panel__icon"
+								size={ 20 }
+							/>
+						) }
+					</Button>
+				</h2>
+				{ showSummary && (
+					<div className={ summaryClassName } id={ summaryId }>
+						{ summary }
+					</div>
+				) }
+			</header>
 		);
 	}
 );

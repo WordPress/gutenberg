@@ -17,12 +17,12 @@ const getPanelToggle = ( container ) =>
 
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render an empty div with the matching className', () => {
+		it( 'should render an empty section with the matching className', () => {
 			const { container } = render( <PanelBody /> );
 			const panelBody = getPanelBody( container );
 
 			expect( panelBody ).toBeTruthy();
-			expect( panelBody.tagName ).toBe( 'DIV' );
+			expect( panelBody.tagName ).toBe( 'SECTION' );
 		} );
 
 		it( 'should render inner content, if opened', () => {
