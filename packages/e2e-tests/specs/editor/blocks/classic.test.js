@@ -110,10 +110,12 @@ describe( 'Classic', () => {
 			await page.click( mainBlockCSSSelector );
 		};
 
-		const errorMessage = async () =>
-			page.$(
-				`${ mainBlockCSSSelector } p.block-editor-warning__message`
-			);
+		// Might move to utils if this becomes useful enough for other tests
+		const runWithoutCache = async ( cb ) => {
+			await page.setCacheEnabled( false );
+			await cb();
+			await page.setCacheEnabled( true );
+		};
 
 		await insertBlock( 'Classic' );
 
@@ -127,22 +129,17 @@ describe( 'Classic', () => {
 		// Move focus away.
 		await pressKeyWithModifier( 'shift', 'Tab' );
 
-		// save
+		// Save
 		await saveDraft();
 
-		// reload
-		await page.reload();
-
-		await clickClassic();
-		expect( await errorMessage() ).toBeFalsy();
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		// switch to code editor and back
-		await switchEditorModeTo( 'Code' );
-		await switchEditorModeTo( 'Visual' );
-
-		await clickClassic();
-		expect( await errorMessage() ).toBeFalsy();
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// Reload
+		// Disabling the browser disk cache is needed in order to reproduce the issue
+		// in case it regresses. To test this, revert commit 65c9f74, build and run the test.
+		await runWithoutCache( async () => {
+			await page.reload();
+			await clickClassic();
+			expect( console ).not.toHaveErrored();
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
 	} );
 } );
