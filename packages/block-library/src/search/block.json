@@ -29,6 +29,9 @@
 		"buttonUseIcon": {
 			"type": "bool",
 			"default": false
+		},
+		"borderRadius": {
+			"type": "number"
 		}
 	},
 	"supports": {

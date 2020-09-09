@@ -24,6 +24,7 @@ import {
 	ResizableBox,
 	PanelBody,
 	BaseControl,
+	RangeControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { search } from '@wordpress/icons';
@@ -48,6 +49,8 @@ const MIN_WIDTH = 220;
 const MIN_WIDTH_UNIT = 'px';
 const PC_WIDTH_DEFAULT = 50;
 const PX_WIDTH_DEFAULT = 350;
+const MIN_BORDER_RADIUS_VALUE = 0;
+const MAX_BORDER_RADIUS_VALUE = 50;
 const CSS_UNITS = [
 	{ value: '%', label: '%', default: PC_WIDTH_DEFAULT },
 	{ value: 'px', label: 'px', default: PX_WIDTH_DEFAULT },
@@ -70,6 +73,7 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
+		borderRadius,
 	} = attributes;
 
 	const unitControlInstanceId = useInstanceId( UnitControl );
@@ -123,10 +127,28 @@ export default function SearchEdit( {
 		};
 	};
 
+	const sharedStyles = {
+		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+	};
+
+	const sharedClasses = {
+		'no-border-radius': borderRadius === 0,
+	};
+
 	const renderTextField = () => {
+		const textFieldStyles = {
+			...sharedStyles,
+		};
+
+		const textFieldClasses = classnames(
+			'wp-block-search__input',
+			sharedClasses
+		);
+
 		return (
 			<input
-				className="wp-block-search__input"
+				className={ textFieldClasses }
+				style={ textFieldStyles }
 				aria-label={ __( 'Optional placeholder text' ) }
 				// We hide the placeholder field's placeholder when there is a value. This
 				// stops screen readers from reading the placeholder field's placeholder
@@ -143,18 +165,29 @@ export default function SearchEdit( {
 	};
 
 	const renderButton = () => {
+		const buttonStyles = {
+			...sharedStyles,
+		};
+
+		const buttonClasses = classnames(
+			'wp-block-search__button',
+			sharedClasses
+		);
+
 		return (
 			<>
 				{ buttonUseIcon && (
 					<Button
 						icon={ search }
-						className="wp-block-search__button"
+						className={ buttonClasses }
+						style={ buttonStyles }
 					/>
 				) }
 
 				{ ! buttonUseIcon && (
 					<RichText
-						className="wp-block-search__button"
+						className={ buttonClasses }
+						style={ buttonStyles }
 						aria-label={ __( 'Button text' ) }
 						placeholder={ __( 'Add button text…' ) }
 						withoutInteractiveFormatting
@@ -165,6 +198,54 @@ export default function SearchEdit( {
 					/>
 				) }
 			</>
+		);
+	};
+
+	const renderInputs = () => {
+		const wrapperStyles =
+			'button-inside' === buttonPosition ? { ...sharedStyles } : {};
+
+		const wrapperClasses = classnames(
+			'wp-block-search__inside-wrapper',
+			'button-inside' === buttonPosition ? sharedClasses : undefined
+		);
+
+		return (
+			<ResizableBox
+				size={ {
+					width: `${ width }${ widthUnit }`,
+				} }
+				className={ wrapperClasses }
+				style={ wrapperStyles }
+				isResetValueOnUnitChange
+				minWidth={ MIN_WIDTH }
+				enable={ getResizableSides() }
+				onResizeStart={ ( event, direction, elt ) => {
+					setAttributes( {
+						width: parseInt( elt.offsetWidth, 10 ),
+						widthUnit: 'px',
+					} );
+					toggleSelection( false );
+				} }
+				onResizeStop={ ( event, direction, elt, delta ) => {
+					setAttributes( {
+						width: parseInt( width + delta.width, 10 ),
+					} );
+					toggleSelection( true );
+				} }
+				showHandle={ isSelected }
+			>
+				{ ( 'button-inside' === buttonPosition ||
+					'button-outside' === buttonPosition ) && (
+					<>
+						{ renderTextField() }
+						{ renderButton() }
+					</>
+				) }
+
+				{ 'button-only' === buttonPosition && renderButton() }
+				{ 'no-button' === buttonPosition && renderTextField() }
+			</ResizableBox>
 		);
 	};
 
@@ -254,7 +335,7 @@ export default function SearchEdit( {
 			</BlockControls>
 
 			<InspectorControls>
-				<PanelBody title={ __( 'Display Settings' ) }>
+				<PanelBody title={ __( 'Design Settings' ) }>
 					<BaseControl
 						label={ __( 'Width' ) }
 						id={ unitControlInputId }
@@ -314,6 +395,18 @@ export default function SearchEdit( {
 							} ) }
 						</ButtonGroup>
 					</BaseControl>
+
+					<RangeControl
+						value={ borderRadius }
+						label={ __( 'Border Radius' ) }
+						min={ MIN_BORDER_RADIUS_VALUE }
+						max={ MAX_BORDER_RADIUS_VALUE }
+						initialPosition={ 0 }
+						allowReset
+						onChange={ ( newBorderRadius ) =>
+							setAttributes( { borderRadius: newBorderRadius } )
+						}
+					/>
 				</PanelBody>
 			</InspectorControls>
 		</>
@@ -372,6 +465,6 @@ export default function SearchEdit( {
 				{ 'button-only' === buttonPosition && renderButton() }
 				{ 'no-button' === buttonPosition && renderTextField() }
 			</ResizableBox>
-		</div>
+		</Block.div>
 	);
 }
