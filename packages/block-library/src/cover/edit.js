@@ -286,23 +286,21 @@ function CoverEdit( {
 		: minHeight;
 
 	const style = {
-		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
+		...( isImageBackground && hasParallax
+			? backgroundImageStyles( url )
+			: {} ),
 		backgroundColor: overlayColor.color,
+		background: gradientValue && ! url ? gradientValue : undefined,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
-	if ( gradientValue && ! url ) {
-		style.background = gradientValue;
-	}
-
-	let positionValue;
-
-	if ( focalPoint ) {
-		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
-		if ( isImageBackground ) {
-			style.backgroundPosition = positionValue;
-		}
-	}
+	const mediaStyle = {
+		objectPosition:
+			// prettier-ignore
+			focalPoint && ! hasParallax
+				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100) }%`
+				: undefined,
+	};
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
@@ -503,18 +501,6 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ isImageBackground && (
-					// Used only to programmatically check if the image is dark or not
-					<img
-						ref={ isDarkElement }
-						aria-hidden
-						alt=""
-						style={ {
-							display: 'none',
-						} }
-						src={ url }
-					/>
-				) }
 				{ url && gradientValue && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
@@ -525,15 +511,24 @@ function CoverEdit( {
 						style={ { background: gradientValue } }
 					/>
 				) }
+				{ isImageBackground && ! hasParallax && (
+					<img
+						ref={ isDarkElement }
+						className="wp-block-cover__media-background"
+						alt=""
+						src={ url }
+						style={ mediaStyle }
+					/>
+				) }
 				{ isVideoBackground && (
 					<video
 						ref={ isDarkElement }
-						className="wp-block-cover__video-background"
+						className="wp-block-cover__media-background"
 						autoPlay
 						muted
 						loop
 						src={ url }
-						style={ { objectPosition: positionValue } }
+						style={ mediaStyle }
 					/>
 				) }
 				<InnerBlocks
