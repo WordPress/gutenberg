@@ -1533,8 +1533,6 @@ export const getInserterItems = createSelector(
 				! variations.some( ( { isDefault } ) => isDefault )
 		);
 
-		// Fill `variationsToAdd` until there are as many items in total as
-		// `limit`.
 		const blockVariations = [];
 		// Show all available blocks with variations
 		for ( const item of blockTypeInserterItems ) {
