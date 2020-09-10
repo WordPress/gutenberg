@@ -7,8 +7,6 @@
 }
 
 .edit-widgets-header-toolbar {
-	display: inline-flex;
-	align-items: center;
 	border: none;
 
 	// The Toolbar component adds different styles to buttons, so we reset them
@@ -19,19 +17,11 @@
 		min-width: $button-size;
 		padding: 6px;
 
-		&.is-pressed {
-			background: $gray-900;
-		}
-
 		&:focus:not(:disabled) {
 			box-shadow:
 				0 0 0 $border-width-focus var(--wp-admin-theme-color),
 				inset 0 0 0 $border-width $white;
 			outline: 1px solid transparent;
-		}
-
-		&::before {
-			display: none;
 		}
 	}
 }
