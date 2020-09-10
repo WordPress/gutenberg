@@ -91,6 +91,7 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
+    private OnStoryCreatorRequestListener mOnStoryCreatorRequestListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -143,6 +144,9 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
+    }
+
+    public interface OnStoryCreatorRequestListener {
         void onRequestStoryCreatorLoad(int postId);
     }
 
@@ -392,7 +396,7 @@ public class WPAndroidGlueCode {
 
             @Override
             public void requestStoryCreatorLoad(int postId) {
-                mOnMediaLibraryButtonListener.onRequestStoryCreatorLoad(postId);
+                mOnStoryCreatorRequestListener.onRequestStoryCreatorLoad(postId);
             }
         }, mIsDarkMode);
 
@@ -468,6 +472,7 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
                                   AddMentionUtil addMentionUtil,
                                   OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
+                                  OnStoryCreatorRequestListener onStoryCreatorRequestListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -483,6 +488,7 @@ public class WPAndroidGlueCode {
         mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
         mAddMentionUtil = addMentionUtil;
         mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
+        mOnStoryCreatorRequestListener = onStoryCreatorRequestListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
