@@ -102,11 +102,11 @@ describe( 'Classic', () => {
 	} );
 
 	it( 'Should not fail after save/reload', async () => {
-		const mainBlockCSSSelector = 'div[aria-label^="Block: Classic"]';
+		const classicBlockSelector = 'div[aria-label^="Block: Classic"]';
 
 		const clickClassic = async () => {
-			await page.waitForSelector( mainBlockCSSSelector );
-			await page.click( mainBlockCSSSelector );
+			await page.waitForSelector( classicBlockSelector );
+			await page.click( classicBlockSelector );
 		};
 
 		// Might move to utils if this becomes useful enough for other tests
