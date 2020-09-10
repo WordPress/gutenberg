@@ -35,14 +35,14 @@ const MyBlockPatternList = () => (
 
 The different block patterns that can be shown in the block patterns list.
 
--   Type: `any`
+-   Type: `Array`
 -   Required: Yes
 
 #### shownPatterns
 
 Block patterns that are actually shown in the block patterns list.
 
--   Type: `any`
+-   Type: `Array`
 -   Required: Yes
 
 #### onClickPattern
