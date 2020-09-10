@@ -15,5 +15,6 @@
 		"className": false,
 		"html": false,
 		"multiple": false
-	}
+	},
+	"editorStyle": "core-block-more-editor"
 }

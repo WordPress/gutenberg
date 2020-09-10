@@ -39,5 +39,7 @@
 		"anchor": true,
 		"align": true,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-audio-editor",
+	"style": "core-block-audio"
 }

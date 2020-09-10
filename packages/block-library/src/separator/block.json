@@ -11,5 +11,7 @@
 	},
 	"supports": {
 		"anchor": true
-	}
+	},
+	"editorStyle": "core-block-separator-editor",
+	"style": "core-block-separator"
 }

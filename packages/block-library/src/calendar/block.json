@@ -11,5 +11,6 @@
 	},
 	"supports": {
 		"align": true
-	}
+	},
+	"style": "core-block-calendar"
 }

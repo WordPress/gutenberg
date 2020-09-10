@@ -24,5 +24,6 @@
 			"gradients": true,
 			"linkColor": true
 		}
-	}
+	},
+	"editorStyle": "core-block-template-part-editor"
 }

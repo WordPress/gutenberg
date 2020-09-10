@@ -10,5 +10,6 @@
 		"customClassName": false,
 		"html": false,
 		"inserter": false
-	}
+	},
+	"editorStyle": "core-block-editor"
 }

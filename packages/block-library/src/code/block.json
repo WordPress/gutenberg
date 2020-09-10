@@ -12,5 +12,6 @@
 		"anchor": true,
 		"html": false,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-code-editor"
 }

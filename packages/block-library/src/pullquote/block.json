@@ -35,5 +35,7 @@
 			"wide",
 			"full"
 		]
-	}
+	},
+	"editorStyle": "core-block-pullquote-editor",
+	"style": "core-block-pullquote"
 }

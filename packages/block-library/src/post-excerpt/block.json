@@ -30,5 +30,6 @@
 			"linkColor": true
 		},
 		"__experimentalLineHeight": true
-	}
+	},
+	"editorStyle": "core-block-post-excerpt-editor"
 }

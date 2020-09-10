@@ -14,5 +14,7 @@
 		"inserter": false,
 		"customClassName": false,
 		"__experimentalToolbar": false
-	}
+	},
+	"editorStyle": "core-block-widget-area-editor",
+	"style": "core-block-widget-area"
 }

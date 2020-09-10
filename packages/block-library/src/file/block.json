@@ -38,5 +38,7 @@
 	"supports": {
 		"anchor": true,
 		"align": true
-	}
+	},
+	"editorStyle": "core-block-file-editor",
+	"style": "core-block-file"
 }

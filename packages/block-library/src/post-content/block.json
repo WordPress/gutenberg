@@ -8,5 +8,6 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-post-content-editor"
 }

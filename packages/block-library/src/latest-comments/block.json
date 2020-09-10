@@ -24,5 +24,7 @@
 	"supports": {
 		"align": true,
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-latest-comments-editor",
+	"style": "core-block-latest-comments"
 }

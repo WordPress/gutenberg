@@ -89,5 +89,7 @@
 			"gradients": true,
 			"linkColor": true
 		}
-	}
+	},
+	"editorStyle": "core-block-media-text-editor",
+	"style": "core-block-media-text"
 }

@@ -18,5 +18,7 @@
 	"supports": {
 		"align": true,
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-categories-editor",
+	"style": "core-block-categories"
 }

@@ -33,5 +33,7 @@
 		"align": true,
 		"reusable": false,
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-embed-editor",
+	"style": "core-block-embed"
 }

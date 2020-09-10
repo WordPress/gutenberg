@@ -9,5 +9,7 @@
 		],
 		"lightBlockWrapper": true,
 		"anchor": true
-	}
+	},
+	"editorStyle": "core-block-social-links-editor",
+	"style": "core-block-social-links"
 }

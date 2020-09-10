@@ -38,5 +38,7 @@
 	"supports": {
 		"align": true,
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-rss-editor",
+	"style": "core-block-rss"
 }

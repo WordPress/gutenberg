@@ -28,5 +28,7 @@
 	},
 	"supports": {
 		"inserter": false
-	}
+	},
+	"editorStyle": "core-block-text-columns-editor",
+	"style": "core-block-text-columns"
 }

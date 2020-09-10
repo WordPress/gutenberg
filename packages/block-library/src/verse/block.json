@@ -16,5 +16,6 @@
 	"supports": {
 		"anchor": true,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-verse-editor"
 }

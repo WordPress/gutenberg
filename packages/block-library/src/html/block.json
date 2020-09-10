@@ -11,5 +11,6 @@
 		"customClassName": false,
 		"className": false,
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-html-editor"
 }

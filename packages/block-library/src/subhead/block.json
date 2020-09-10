@@ -14,5 +14,7 @@
 	"supports": {
 		"inserter": false,
 		"multiple": false
-	}
+	},
+	"editorStyle": "core-block-subhead-editor",
+	"style": "core-block-subhead"
 }

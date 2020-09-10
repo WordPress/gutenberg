@@ -19,5 +19,6 @@
 		"reusable": false,
 		"html": false,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-social-link-editor"
 }

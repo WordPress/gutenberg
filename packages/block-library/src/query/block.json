@@ -26,5 +26,6 @@
 	"supports": {
 		"html": false,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-query-editor"
 }

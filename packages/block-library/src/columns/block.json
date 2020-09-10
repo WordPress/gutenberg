@@ -18,5 +18,7 @@
 			"gradients": true,
 			"linkColor": true
 		}
-	}
+	},
+	"editorStyle": "core-block-columns-editor",
+	"style": "core-block-columns"
 }

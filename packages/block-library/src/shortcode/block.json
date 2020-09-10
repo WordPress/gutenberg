@@ -11,5 +11,6 @@
 		"className": false,
 		"customClassName": false,
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-shortcode-editor"
 }

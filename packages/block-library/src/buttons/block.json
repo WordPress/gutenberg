@@ -6,5 +6,7 @@
 		"align": true,
 		"alignWide": false,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-buttons-editor",
+	"style": "core-block-buttons"
 }

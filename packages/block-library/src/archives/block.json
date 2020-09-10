@@ -14,5 +14,6 @@
 	"supports": {
 		"align": true,
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-archives-editor"
 }

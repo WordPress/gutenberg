@@ -10,5 +10,6 @@
 		"reusable": false,
 		"lightBlockWrapper": true,
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-query-loop-editor"
 }

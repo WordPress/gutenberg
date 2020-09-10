@@ -59,5 +59,7 @@
 		"alignWide": false,
 		"reusable": false,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-button-editor",
+	"style": "core-block-button"
 }

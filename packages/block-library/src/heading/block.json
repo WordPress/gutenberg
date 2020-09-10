@@ -37,5 +37,7 @@
 			"core/heading/h6": "h6"
 		},
 		"__unstablePasteTextInline": true
-	}
+	},
+	"editorStyle": "core-block-heading-editor",
+	"style": "core-block-heading"
 }

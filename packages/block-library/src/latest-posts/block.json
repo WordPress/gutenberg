@@ -83,5 +83,7 @@
 	"supports": {
 		"align": true,
 		"html": false
-	}
+	},
+	"editorStyle": "core-block-latest-posts-editor",
+	"style": "core-block-latest-posts"
 }

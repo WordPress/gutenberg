@@ -51,5 +51,7 @@
 		"html": false,
 		"lightBlockWrapper": true,
 		"__experimentalPadding": true
-	}
+	},
+	"editorStyle": "core-block-cover-editor",
+	"style": "core-block-cover"
 }

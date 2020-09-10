@@ -37,5 +37,7 @@
 		"__experimentalLineHeight": true,
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true
-	}
+	},
+	"editorStyle": "core-block-paragraph-editor",
+	"style": "core-block-paragraph"
 }

@@ -20,5 +20,6 @@
 			"linkColor": true
 		},
 		"__experimentalPadding": true
-	}
+	},
+	"editorStyle": "core-block-group-editor"
 }

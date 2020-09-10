@@ -12,5 +12,7 @@
 	"supports": {
 		"html": false,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-site-logo-editor",
+	"style": "core-block-site-logo"
 }

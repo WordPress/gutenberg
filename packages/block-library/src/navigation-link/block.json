@@ -42,5 +42,7 @@
 		"reusable": false,
 		"html": false,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-navigation-link-editor",
+	"style": "core-block-navigation-link"
 }

@@ -35,5 +35,7 @@
 		"align": [ "left", "center", "right" ],
 		"html": false,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-search-editor",
+	"style": "core-block-search"
 }

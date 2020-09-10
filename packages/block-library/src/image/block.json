@@ -73,5 +73,7 @@
 	"supports": {
 		"anchor": true,
 		"lightBlockWrapper": true
-	}
+	},
+	"editorStyle": "core-block-image-editor",
+	"style": "core-block-image"
 }
