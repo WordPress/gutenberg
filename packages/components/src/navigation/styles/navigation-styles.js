@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { G2 } from '../../utils/colors-values';
+import { G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import Text from '../../text';
 
@@ -60,12 +60,12 @@ export const MenuItemUI = styled.li`
 	}
 
 	&.is-active {
-		background-color: ${ G2.blue.medium.focus };
-		color: ${ G2.lightGray.secondary };
+		background-color: ${ UI.theme };
+		color: ${ UI.textDark };
 
 		button,
 		a {
-			color: ${ G2.lightGray.secondary };
+			color: ${ UI.textDark };
 		}
 	}
 
