@@ -65,7 +65,9 @@ function PostAuthor() {
 	// Initializes the post author properly
 	// Also ensures external changes are reflected.
 	useEffect( () => {
-		setFieldValue( postAuthor.name );
+		if ( postAuthor ) {
+			setFieldValue( postAuthor.name );
+		}
 	}, [ postAuthor ] );
 
 	/**
