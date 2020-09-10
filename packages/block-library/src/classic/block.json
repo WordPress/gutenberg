@@ -12,5 +12,5 @@
 		"customClassName": false,
 		"reusable": false
 	},
-	"editorStyle": "core-block-classic-editor"
+	"editorStyle": "wp-block-classic-editor"
 }

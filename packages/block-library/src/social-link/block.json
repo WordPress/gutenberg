@@ -20,5 +20,5 @@
 		"html": false,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-social-link-editor"
+	"editorStyle": "wp-block-social-link-editor"
 }

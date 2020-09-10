@@ -38,6 +38,6 @@
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true
 	},
-	"editorStyle": "core-block-paragraph-editor",
-	"style": "core-block-paragraph"
+	"editorStyle": "wp-block-paragraph-editor",
+	"style": "wp-block-paragraph"
 }

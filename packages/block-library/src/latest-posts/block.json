@@ -84,6 +84,6 @@
 		"align": true,
 		"html": false
 	},
-	"editorStyle": "core-block-latest-posts-editor",
-	"style": "core-block-latest-posts"
+	"editorStyle": "wp-block-latest-posts-editor",
+	"style": "wp-block-latest-posts"
 }

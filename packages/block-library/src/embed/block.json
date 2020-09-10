@@ -34,6 +34,6 @@
 		"reusable": false,
 		"html": false
 	},
-	"editorStyle": "core-block-embed-editor",
-	"style": "core-block-embed"
+	"editorStyle": "wp-block-embed-editor",
+	"style": "wp-block-embed"
 }

@@ -52,6 +52,6 @@
 		"lightBlockWrapper": true,
 		"__experimentalPadding": true
 	},
-	"editorStyle": "core-block-cover-editor",
-	"style": "core-block-cover"
+	"editorStyle": "wp-block-cover-editor",
+	"style": "wp-block-cover"
 }

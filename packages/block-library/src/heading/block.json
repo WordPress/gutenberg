@@ -38,6 +38,6 @@
 		},
 		"__unstablePasteTextInline": true
 	},
-	"editorStyle": "core-block-heading-editor",
-	"style": "core-block-heading"
+	"editorStyle": "wp-block-heading-editor",
+	"style": "wp-block-heading"
 }

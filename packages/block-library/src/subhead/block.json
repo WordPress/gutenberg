@@ -15,6 +15,6 @@
 		"inserter": false,
 		"multiple": false
 	},
-	"editorStyle": "core-block-subhead-editor",
-	"style": "core-block-subhead"
+	"editorStyle": "wp-block-subhead-editor",
+	"style": "wp-block-subhead"
 }

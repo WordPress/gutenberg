@@ -39,6 +39,6 @@
 		"align": true,
 		"html": false
 	},
-	"editorStyle": "core-block-rss-editor",
-	"style": "core-block-rss"
+	"editorStyle": "wp-block-rss-editor",
+	"style": "wp-block-rss"
 }

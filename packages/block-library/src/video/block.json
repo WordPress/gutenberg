@@ -66,6 +66,6 @@
 		"align": true,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-video-editor",
-	"style": "core-block-video"
+	"editorStyle": "wp-block-video-editor",
+	"style": "wp-block-video"
 }

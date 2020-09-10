@@ -13,5 +13,5 @@
 		"html": false,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-code-editor"
+	"editorStyle": "wp-block-code-editor"
 }

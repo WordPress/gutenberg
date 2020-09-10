@@ -15,5 +15,5 @@
 		"html": false,
 		"align": true
 	},
-	"editorStyle": "core-block-tag-cloud-editor"
+	"editorStyle": "wp-block-tag-cloud-editor"
 }

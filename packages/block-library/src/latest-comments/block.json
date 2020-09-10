@@ -25,6 +25,6 @@
 		"align": true,
 		"html": false
 	},
-	"editorStyle": "core-block-latest-comments-editor",
-	"style": "core-block-latest-comments"
+	"editorStyle": "wp-block-latest-comments-editor",
+	"style": "wp-block-latest-comments"
 }

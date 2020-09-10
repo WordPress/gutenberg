@@ -39,6 +39,6 @@
 		"anchor": true,
 		"align": true
 	},
-	"editorStyle": "core-block-file-editor",
-	"style": "core-block-file"
+	"editorStyle": "wp-block-file-editor",
+	"style": "wp-block-file"
 }

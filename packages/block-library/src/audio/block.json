@@ -40,6 +40,6 @@
 		"align": true,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-audio-editor",
-	"style": "core-block-audio"
+	"editorStyle": "wp-block-audio-editor",
+	"style": "wp-block-audio"
 }

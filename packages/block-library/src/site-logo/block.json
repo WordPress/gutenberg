@@ -13,6 +13,6 @@
 		"html": false,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-site-logo-editor",
-	"style": "core-block-site-logo"
+	"editorStyle": "wp-block-site-logo-editor",
+	"style": "wp-block-site-logo"
 }

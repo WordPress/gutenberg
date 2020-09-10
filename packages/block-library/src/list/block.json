@@ -33,6 +33,6 @@
 		"__unstablePasteTextInline": true,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-list-editor",
-	"style": "core-block-list"
+	"editorStyle": "wp-block-list-editor",
+	"style": "wp-block-list"
 }

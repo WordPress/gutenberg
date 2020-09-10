@@ -10,6 +10,6 @@
 	"supports": {
 		"anchor": true
 	},
-	"editorStyle": "core-block-spacer-editor",
-	"style": "core-block-spacer"
+	"editorStyle": "wp-block-spacer-editor",
+	"style": "wp-block-spacer"
 }

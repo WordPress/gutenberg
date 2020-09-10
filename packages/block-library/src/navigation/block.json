@@ -48,6 +48,6 @@
 		"lightBlockWrapper": true,
 		"__experimentalFontSize": true
 	},
-	"editorStyle": "core-block-navigation-editor",
-	"style": "core-block-navigation"
+	"editorStyle": "wp-block-navigation-editor",
+	"style": "wp-block-navigation"
 }

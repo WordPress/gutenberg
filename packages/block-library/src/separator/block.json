@@ -12,6 +12,6 @@
 	"supports": {
 		"anchor": true
 	},
-	"editorStyle": "core-block-separator-editor",
-	"style": "core-block-separator"
+	"editorStyle": "wp-block-separator-editor",
+	"style": "wp-block-separator"
 }

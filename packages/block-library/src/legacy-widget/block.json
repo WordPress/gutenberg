@@ -22,5 +22,5 @@
 		"html": false,
 		"customClassName": false
 	},
-	"editorStyle": "core-block-legacy-widget-editor"
+	"editorStyle": "wp-block-legacy-widget-editor"
 }

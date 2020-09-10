@@ -11,5 +11,5 @@
 		"html": false,
 		"inserter": false
 	},
-	"editorStyle": "core-block-editor"
+	"editorStyle": "wp-block-editor"
 }

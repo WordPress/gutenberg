@@ -19,6 +19,6 @@
 		"align": true,
 		"html": false
 	},
-	"editorStyle": "core-block-categories-editor",
-	"style": "core-block-categories"
+	"editorStyle": "wp-block-categories-editor",
+	"style": "wp-block-categories"
 }

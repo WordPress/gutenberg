@@ -21,5 +21,5 @@
 		},
 		"__experimentalPadding": true
 	},
-	"editorStyle": "core-block-group-editor"
+	"editorStyle": "wp-block-group-editor"
 }

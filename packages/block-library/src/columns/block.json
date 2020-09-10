@@ -19,6 +19,6 @@
 			"linkColor": true
 		}
 	},
-	"editorStyle": "core-block-columns-editor",
-	"style": "core-block-columns"
+	"editorStyle": "wp-block-columns-editor",
+	"style": "wp-block-columns"
 }

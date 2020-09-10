@@ -74,6 +74,6 @@
 		"anchor": true,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-image-editor",
-	"style": "core-block-image"
+	"editorStyle": "wp-block-image-editor",
+	"style": "wp-block-image"
 }

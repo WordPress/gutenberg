@@ -36,6 +36,6 @@
 			"full"
 		]
 	},
-	"editorStyle": "core-block-pullquote-editor",
-	"style": "core-block-pullquote"
+	"editorStyle": "wp-block-pullquote-editor",
+	"style": "wp-block-pullquote"
 }

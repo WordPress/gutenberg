@@ -9,5 +9,5 @@
 		"align": [ "wide", "full" ],
 		"html": false
 	},
-	"editorStyle": "core-block-post-content-editor"
+	"editorStyle": "wp-block-post-content-editor"
 }

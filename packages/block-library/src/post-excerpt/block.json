@@ -31,5 +31,5 @@
 		},
 		"__experimentalLineHeight": true
 	},
-	"editorStyle": "core-block-post-excerpt-editor"
+	"editorStyle": "wp-block-post-excerpt-editor"
 }

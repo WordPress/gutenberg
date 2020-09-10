@@ -125,6 +125,6 @@
 		"anchor": true,
 		"align": true
 	},
-	"editorStyle": "core-block-table-editor",
-	"style": "core-block-table"
+	"editorStyle": "wp-block-table-editor",
+	"style": "wp-block-table"
 }

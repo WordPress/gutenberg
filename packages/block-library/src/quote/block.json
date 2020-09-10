@@ -22,6 +22,6 @@
 	"supports": {
 		"anchor": true
 	},
-	"editorStyle": "core-block-quote-editor",
-	"style": "core-block-quote"
+	"editorStyle": "wp-block-quote-editor",
+	"style": "wp-block-quote"
 }

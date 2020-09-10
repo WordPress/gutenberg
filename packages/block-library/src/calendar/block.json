@@ -12,5 +12,5 @@
 	"supports": {
 		"align": true
 	},
-	"style": "core-block-calendar"
+	"style": "wp-block-calendar"
 }

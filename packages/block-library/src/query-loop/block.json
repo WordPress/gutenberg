@@ -11,5 +11,5 @@
 		"lightBlockWrapper": true,
 		"html": false
 	},
-	"editorStyle": "core-block-query-loop-editor"
+	"editorStyle": "wp-block-query-loop-editor"
 }

@@ -43,6 +43,6 @@
 		"html": false,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-navigation-link-editor",
-	"style": "core-block-navigation-link"
+	"editorStyle": "wp-block-navigation-link-editor",
+	"style": "wp-block-navigation-link"
 }

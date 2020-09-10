@@ -17,5 +17,5 @@
 		"anchor": true,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-verse-editor"
+	"editorStyle": "wp-block-verse-editor"
 }

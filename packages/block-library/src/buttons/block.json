@@ -7,6 +7,6 @@
 		"alignWide": false,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-buttons-editor",
-	"style": "core-block-buttons"
+	"editorStyle": "wp-block-buttons-editor",
+	"style": "wp-block-buttons"
 }

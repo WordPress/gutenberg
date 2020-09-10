@@ -29,6 +29,6 @@
 	"supports": {
 		"inserter": false
 	},
-	"editorStyle": "core-block-text-columns-editor",
-	"style": "core-block-text-columns"
+	"editorStyle": "wp-block-text-columns-editor",
+	"style": "wp-block-text-columns"
 }

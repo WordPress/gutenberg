@@ -25,5 +25,5 @@
 			"linkColor": true
 		}
 	},
-	"editorStyle": "core-block-template-part-editor"
+	"editorStyle": "wp-block-template-part-editor"
 }

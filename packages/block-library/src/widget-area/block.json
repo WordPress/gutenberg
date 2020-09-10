@@ -15,6 +15,6 @@
 		"customClassName": false,
 		"__experimentalToolbar": false
 	},
-	"editorStyle": "core-block-widget-area-editor",
-	"style": "core-block-widget-area"
+	"editorStyle": "wp-block-widget-area-editor",
+	"style": "wp-block-widget-area"
 }

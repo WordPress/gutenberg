@@ -60,6 +60,6 @@
 		"reusable": false,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-button-editor",
-	"style": "core-block-button"
+	"editorStyle": "wp-block-button-editor",
+	"style": "wp-block-button"
 }

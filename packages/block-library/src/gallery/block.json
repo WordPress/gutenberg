@@ -80,6 +80,6 @@
 		"anchor": true,
 		"align": true
 	},
-	"editorStyle": "core-block-gallery-editor",
-	"style": "core-block-gallery"
+	"editorStyle": "wp-block-gallery-editor",
+	"style": "wp-block-gallery"
 }

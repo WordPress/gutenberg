@@ -27,5 +27,5 @@
 		"html": false,
 		"lightBlockWrapper": true
 	},
-	"editorStyle": "core-block-query-editor"
+	"editorStyle": "wp-block-query-editor"
 }

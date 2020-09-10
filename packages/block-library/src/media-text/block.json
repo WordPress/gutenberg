@@ -90,6 +90,6 @@
 			"linkColor": true
 		}
 	},
-	"editorStyle": "core-block-media-text-editor",
-	"style": "core-block-media-text"
+	"editorStyle": "wp-block-media-text-editor",
+	"style": "wp-block-media-text"
 }
