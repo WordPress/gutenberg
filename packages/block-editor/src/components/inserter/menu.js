@@ -74,7 +74,7 @@ function InserterMenu( {
 	};
 
 	const onInsertPattern = ( blocks, patternName ) => {
-		onInsertBlocks( blocks, patternName );
+		onInsertBlocks( blocks, { patternName } );
 		onSelect();
 	};
 

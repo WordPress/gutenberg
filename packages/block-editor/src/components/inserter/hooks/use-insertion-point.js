@@ -91,7 +91,7 @@ function useInsertionPoint( {
 		return getBlockOrder( destinationRootClientId ).length;
 	}
 
-	const onInsertBlocks = ( blocks, patternName = false ) => {
+	const onInsertBlocks = ( blocks, meta ) => {
 		const selectedBlock = getSelectedBlock();
 		if (
 			! isAppender &&
@@ -105,7 +105,7 @@ function useInsertionPoint( {
 				getInsertionIndex(),
 				destinationRootClientId,
 				selectBlockOnInsert,
-				patternName
+				meta
 			);
 		}
 
