@@ -7,8 +7,8 @@ import VisualView from './visual-view';
 export default function Editor( { isPending, blocks } ) {
 	return (
 		<div className="edit-navigation-editor">
-			<ListView isPending={ isPending } blocks={ blocks } />
 			<VisualView isPending={ isPending } />
+			<ListView isPending={ isPending } blocks={ blocks } />
 		</div>
 	);
 }
