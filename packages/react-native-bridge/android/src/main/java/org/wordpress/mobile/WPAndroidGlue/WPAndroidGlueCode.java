@@ -143,6 +143,7 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
+        void onRequestStoryCreatorLoad(int postId);
     }
 
     public interface OnImageFullscreenPreviewListener {
@@ -387,6 +388,11 @@ public class WPAndroidGlueCode {
             public void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback) {
                 boolean tooltipShown = mOnStarterPageTemplatesTooltipShownListener.onRequestStarterPageTemplatesTooltipShown();
                 starterPageTemplatesTooltipShownCallback.onRequestStarterPageTemplatesTooltipShown(tooltipShown);
+            }
+
+            @Override
+            public void requestStoryCreatorLoad(int postId) {
+                mOnMediaLibraryButtonListener.onRequestStoryCreatorLoad(postId);
             }
         }, mIsDarkMode);
 

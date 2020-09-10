@@ -223,4 +223,10 @@ export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
 	);
 }
 
+export function requestStoryCreatorLoad( postId ) {
+	return RNReactNativeGutenbergBridge.requestStoryCreatorLoad(
+		postId // TODO we may not need this
+	);
+}
+
 export default RNReactNativeGutenbergBridge;

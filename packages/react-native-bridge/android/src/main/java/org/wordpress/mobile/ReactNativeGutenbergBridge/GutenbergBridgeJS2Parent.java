@@ -153,4 +153,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void setStarterPageTemplatesTooltipShown(boolean tooltipShown);
 
     void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);
+
+    void requestStoryCreatorLoad(int postId);
 }

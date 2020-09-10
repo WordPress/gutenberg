@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.util.Consumer;
 
@@ -169,6 +170,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void onAddMention(Consumer<String> onSuccess) {
                 onSuccess.accept("matt");
+            }
+
+            @Override
+            public void requestStoryCreatorLoad(int postId) {
+                Toast.makeText(MainApplication.this, "requestStoryCreatorLoad called", Toast.LENGTH_SHORT).show();
             }
 
         }, isDarkMode());

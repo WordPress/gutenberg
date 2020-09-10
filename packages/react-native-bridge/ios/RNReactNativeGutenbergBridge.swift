@@ -288,6 +288,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         self.delegate?.gutenbergDidRequestSetStarterPageTemplatesTooltipShown(tooltipShown)
     }
 
+    @objc
+    func requestStoryCreatorLoad(_ postID: Int32) {
+        // TODO actually implement the delegate call on iOS
+        // DispatchQueue.main.async {
+        //     self.delegate?.gutenbergDidRequestMediaUploadActionDialog(for: mediaID)
+        // }
+    }
 }
 
 // MARK: - RCTBridgeModule delegate
