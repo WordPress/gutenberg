@@ -119,6 +119,7 @@ function gutenberg_reregister_core_block_types() {
 			$registry->unregister( $metadata['name'] );
 		}
 
+		gutenberg_register_core_block_styles( $folder_name );
 		register_block_type_from_metadata( $block_json_file );
 	}
 
@@ -130,11 +131,13 @@ function gutenberg_reregister_core_block_types() {
 		if ( is_string( $block_names ) ) {
 			if ( $registry->is_registered( $block_names ) ) {
 				$registry->unregister( $block_names );
+				gutenberg_register_core_block_styles( $block_names );
 			}
 		} elseif ( is_array( $block_names ) ) {
 			foreach ( $block_names as $block_name ) {
 				if ( $registry->is_registered( $block_name ) ) {
 					$registry->unregister( $block_name );
+					gutenberg_register_core_block_styles( $block_name );
 				}
 			}
 		}
@@ -143,6 +146,45 @@ function gutenberg_reregister_core_block_types() {
 	}
 }
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
+
+/**
+ * Registers block styles for a core block.
+ *
+ * @param string $block_name The block-name.
+ *
+ * @return void
+ */
+function gutenberg_register_core_block_styles( $block_name ) {
+	if ( ! current_theme_supports( 'split-block-styles' ) ) {
+		return;
+	}
+	$block_name = str_replace( 'core/', '', $block_name );
+
+	$style_path = is_rtl()
+		? "packages/block-library/build-style/$block_name-rtl.css"
+		: "packages/block-library/build-style/$block_name.css";
+	$editor_style_path = is_rtl()
+		? "packages/block-library/build-style/$block_name-editor-rtl.css"
+		: "packages/block-library/build-style/$block_name-editor.css";
+
+	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+		wp_register_style(
+			'wp-block-' . $block_name,
+			gutenberg_url( $style_path ),
+			[],
+			filemtime( gutenberg_dir_path() . $style_path )
+		);
+	}
+
+	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
+		wp_register_style(
+			'wp-block-' . $block_name . '-editor',
+			gutenberg_url( $editor_style_path ),
+			[],
+			filemtime( gutenberg_dir_path() . $editor_style_path )
+		);
+	}
+}
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it
