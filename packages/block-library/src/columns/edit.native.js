@@ -13,6 +13,7 @@ import {
 	RangeControl,
 	FooterMessageControl,
 	WIDE_ALIGNMENTS,
+	ALIGNMENT_BREAKPOINTS,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -74,18 +75,12 @@ const MAX_COLUMNS_NUM_IN_ROW = 3;
 
 const MARGIN = 16;
 
-const BREAKPOINTS = {
-	mobile: 480,
-	large: 768,
-};
-
 function ColumnsEditContainer( {
 	attributes,
 	updateAlignment,
 	updateColumns,
 	columnCount,
 	isSelected,
-	//onAddNextColumn,
 	onDeleteBlock,
 	innerColumns,
 	updateInnerColumnWidth,
@@ -130,10 +125,10 @@ function ColumnsEditContainer( {
 	}, [ width, columnsInRow ] );
 
 	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
-		if ( containerWidth < BREAKPOINTS.mobile ) {
+		if ( containerWidth < ALIGNMENT_BREAKPOINTS.mobile ) {
 			// show only 1 Column in row for mobile breakpoint container width
 			return 1;
-		} else if ( containerWidth < BREAKPOINTS.large ) {
+		} else if ( containerWidth < ALIGNMENT_BREAKPOINTS.medium ) {
 			// show the maximum number of columns in a row for large breakpoint container width
 			return Math.min(
 				Math.max( 1, columnCount ),
@@ -177,25 +172,9 @@ function ColumnsEditContainer( {
 					max={ 100 }
 					step={ 0.1 }
 					value={ columnWidths[ index ] }
-					onChange={ ( value ) => {
-						innerColumns.forEach( ( c ) => {
-							if ( c.clientId === column.clientId ) {
-								return updateInnerColumnWidth(
-									value,
-									c.clientId
-								);
-							} else if (
-								c.clientId !== column.clientId &&
-								! c.attributes.width
-							) {
-								return updateInnerColumnWidth(
-									( 100 - value ) /
-										( innerColumns.length - 1 ),
-									c.clientId
-								);
-							}
-						} );
-					} }
+					onChange={ ( value ) =>
+						updateInnerColumnWidth( value, column.clientId )
+					}
 					cellContainerStyle={ styles.cellContainerStyle }
 					toFixed={ 1 }
 					rangePreview={
@@ -204,7 +183,7 @@ function ColumnsEditContainer( {
 							selectedColumnIndex={ index }
 						/>
 					}
-					key={ column.clientId }
+					key={ `${ column.clientId }-${ columnWidths.length }` }
 					shouldDisplayTextInput={ false }
 				/>
 			);

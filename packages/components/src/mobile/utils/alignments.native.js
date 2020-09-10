@@ -16,4 +16,5 @@ export const ALIGNMENT_BREAKPOINTS = {
 	large: 820,
 	medium: 768,
 	small: 680,
+	mobile: 480,
 };

@@ -6,7 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { withSelect, useDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
@@ -47,8 +47,6 @@ function ColumnEdit( {
 	parentWidth,
 	clientId,
 } ) {
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
-
 	const { verticalAlignment } = attributes;
 
 	const updateAlignment = ( alignment ) => {
@@ -61,27 +59,17 @@ function ColumnEdit( {
 		}
 	}, [] );
 
-	const onWidthChange = ( width ) =>
-		columns.forEach( ( column ) => {
-			if ( column.clientId === clientId ) {
-				return setAttributes( { width } );
-			} else if (
-				column.clientId !== clientId &&
-				! column.attributes.width
-			) {
-				return updateBlockAttributes( column.clientId, {
-					width: ( 100 - width ) / ( columns.length - 1 ),
-				} );
-			}
+	const onWidthChange = ( width ) => {
+		setAttributes( {
+			width,
 		} );
+	};
 
 	const getContainerWidth = ( containerWidth ) => {
 		return (
 			2 * MARGIN + containerWidth - columnWidths.length * 2 * MARGIN - 1
 		);
 	};
-
-	const hasWidth = Number.isFinite( attributes.width );
 
 	const columnWidths = Object.values(
 		getColumnWidths( columns, columnCount )
@@ -92,7 +80,10 @@ function ColumnEdit( {
 		0
 	);
 
-	const percentageRatio = attributes.width / columnWidthsSum;
+	const attrWidthValue =
+		attributes.width || getColumnWidths( columns, columnCount )[ clientId ];
+
+	const percentageRatio = attrWidthValue / columnWidthsSum;
 
 	const minPercentageRatio = MIN_WIDTH / getContainerWidth( parentWidth );
 
@@ -129,12 +120,13 @@ function ColumnEdit( {
 		columnWidth <= MIN_WIDTH
 			? MIN_WIDTH
 			: Math.floor(
-					( attributes.width / largeColumnsWidthsSum ) *
+					( attrWidthValue / largeColumnsWidthsSum ) *
 						getContainerWidth( newParentWidth )
 			  );
 
-	const finalWidth = parentWidth > ALIGNMENT_BREAKPOINTS.medium &&
-		hasWidth && { width: newColumnWidth };
+	const finalWidth = parentWidth > ALIGNMENT_BREAKPOINTS.medium && {
+		width: newColumnWidth,
+	};
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
