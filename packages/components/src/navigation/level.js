@@ -7,7 +7,7 @@ import { Icon, chevronLeft } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useNavigationContext } from './context';
-import { DEFAULT_LEVEL } from './utils';
+import { DEFAULT_LEVEL } from './constants';
 import { BackButtonUI, MenuTitleUI, MenuUI } from './styles/navigation-styles';
 
 export default function NavigationLevel( {

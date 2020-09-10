@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  */
 import Animate from '../animate';
 import { NavigationContext } from './context';
-import { DEFAULT_LEVEL } from './utils';
+import { DEFAULT_LEVEL } from './constants';
 import { Root } from './styles/navigation-styles';
 
 export default function Navigation( {

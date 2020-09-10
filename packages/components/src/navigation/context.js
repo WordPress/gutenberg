@@ -11,7 +11,7 @@ import { createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { DEFAULT_LEVEL } from './utils';
+import { DEFAULT_LEVEL } from './constants';
 
 export const NavigationContext = createContext( {
 	activeItem: undefined,
