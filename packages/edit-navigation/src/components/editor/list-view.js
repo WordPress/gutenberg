@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __experimentalBlockNavigationTree } from '@wordpress/block-editor';
@@ -12,6 +13,7 @@ export default function ListView( { isPending, blocks } ) {
 
 	return (
 		<div className="edit-navigation-editor__list-view">
+			<h3>{ __( 'List view' ) }</h3>
 			{ isPending ? (
 				<Spinner />
 			) : (
