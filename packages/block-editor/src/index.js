@@ -16,4 +16,3 @@ export * from './components';
 export * from './utils';
 export { storeConfig } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
-export { STYLE_MAPPINGS as __EXPERIMENTAL_STYLE_MAPPINGS } from './hooks/utils';
