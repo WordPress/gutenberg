@@ -9,12 +9,12 @@ import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationGroup as NavigationGroup,
 	__experimentalNavigationItem as NavigationItem,
-	__experimentalNavigationLevel as NavigationLevel,
+	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
 
 const MyNavigation = () => (
 	<Navigation>
-		<NavigationLevel title="Home">
+		<NavigationMenu title="Home">
 			<NavigationGroup title="Group 1">
 				<NavigationItem item="item-1" title="Item 1" />
 				<NavigationItem item="item-2" title="Item 2" />
@@ -22,16 +22,16 @@ const MyNavigation = () => (
 			<NavigationGroup title="Group 2">
 				<NavigationItem
 					item="item-3"
-					navigateToLevel="category"
+					navigateToMenu="category"
 					title="Category"
 				/>
 			</NavigationGroup>
-		</NavigationLevel>
+		</NavigationMenu>
 
-		<NavigationLevel
-			level="category"
-			parentLevel="root"
-			parentLevelTitle="Home"
+		<NavigationMenu
+			menu="category"
+			parentMenu="root"
+			parentMenuTitle="Home"
 			title="Category"
 		>
 			<ul>
@@ -42,7 +42,7 @@ const MyNavigation = () => (
 				/>
 				<NavigationItem item="child-2" title="Child 2" />
 			</ul>
-		</NavigationLevel>
+		</NavigationMenu>
 	</Navigation>
 );
 ```
@@ -58,13 +58,13 @@ const MyNavigation = () => (
 
 The active item slug.
 
-### `activeLevel`
+### `activeMenu`
 
 -   Type: `string`
 -   Required: No
 -   Default: "root"
 
-The active level slug.
+The active menu slug.
 
 ### className
 
@@ -80,54 +80,54 @@ Optional className for the `Navigation` component.
 
 Sync the active item between the external state and the Navigation's internal state.
 
-### `onActivateLevel`
+### `onActivateMenu`
 
 -   Type: `function`
 -   Required: No
 
-Sync the active level between the external state and the Navigation's internal state.
+Sync the active menu between the external state and the Navigation's internal state.
 
-## Navigation Level
+## Navigation Menu Props
 
-`NavigationLevel` supports the following props.
+`NavigationMenu` supports the following props.
 
 ### className
 
 -   Type: `string`
 -   Required: No
 
-Optional className for the `NavigationLevel` component.
+Optional className for the `NavigationMenu` component.
 
-### `level`
+### `menu`
 
 -   Type: `string`
 -   Required: No
 -   Default: "root"
 
-The level slug.
+The menu slug.
 
-### `parentLevel`
-
--   Type: `string`
--   Required: No
-
-The parent level slug; used by nested levels to indicate their parent level.
-
-### `parentLevelTitle`
+### `parentMenu`
 
 -   Type: `string`
 -   Required: No
 
-The parent level title; used as back button label by nested levels.
+The parent menu slug; used by nested menus to indicate their parent menu.
+
+### `parentMenuTitle`
+
+-   Type: `string`
+-   Required: No
+
+The parent menu title; used as back button label by nested menus.
 
 ### `title`
 
 -   Type: `string`
 -   Required: No
 
-The level title.
+The menu title.
 
-## Navigation Group
+## Navigation Group Props
 
 `NavigationGroup` supports the following props.
 
@@ -145,7 +145,7 @@ Optional className for the `NavigationGroup` component.
 
 The group title.
 
-## Navigation Item
+## Navigation Item Props
 
 `NavigationItem` supports the following props.
 
@@ -170,12 +170,12 @@ Optional className for the `NavigationItem` component.
 
 If provided, renders `a` instead of `button`.
 
-### `navigateToLevel`
+### `navigateToMenu`
 
 -   Type: `string`
 -   Required: No
 
-The child level slug. If provided, clicking on the item will navigate to the target level.
+The child menu slug. If provided, clicking on the item will navigate to the target menu.
 
 ### `onClick`
 

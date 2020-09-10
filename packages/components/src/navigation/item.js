@@ -26,24 +26,20 @@ export default function NavigationItem( {
 	className,
 	href,
 	item,
-	navigateToLevel,
+	navigateToMenu,
 	onClick = noop,
 	title,
 	...props
 } ) {
-	const {
-		activeItem,
-		setActiveItem,
-		setActiveLevel,
-	} = useNavigationContext();
+	const { activeItem, setActiveItem, setActiveMenu } = useNavigationContext();
 
 	const classes = classnames( 'components-navigation__menu-item', className, {
 		'is-active': item && activeItem === item,
 	} );
 
 	const onItemClick = () => {
-		if ( navigateToLevel ) {
-			setActiveLevel( navigateToLevel );
+		if ( navigateToMenu ) {
+			setActiveMenu( navigateToMenu );
 		} else if ( ! href ) {
 			setActiveItem( item );
 		}
@@ -71,7 +67,7 @@ export default function NavigationItem( {
 					</BadgeUI>
 				) }
 
-				{ navigateToLevel && <Icon icon={ chevronRight } /> }
+				{ navigateToMenu && <Icon icon={ chevronRight } /> }
 			</Button>
 		</MenuItemUI>
 	);

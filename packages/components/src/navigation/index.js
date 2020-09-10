@@ -13,20 +13,20 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Animate from '../animate';
+import { ROOT_MENU } from './constants';
 import { NavigationContext } from './context';
-import { ROOT_LEVEL } from './constants';
 import { Root } from './styles/navigation-styles';
 
 export default function Navigation( {
 	activeItem,
-	activeLevel = ROOT_LEVEL,
+	activeMenu = ROOT_MENU,
 	children,
 	className,
 	onActivateItem = noop,
-	onActivateLevel = noop,
+	onActivateMenu = noop,
 } ) {
 	const [ item, setItem ] = useState( activeItem );
-	const [ level, setLevel ] = useState( activeLevel );
+	const [ menu, setMenu ] = useState( activeMenu );
 	const [ slideOrigin, setSlideOrigin ] = useState();
 
 	const setActiveItem = ( itemId ) => {
@@ -34,10 +34,10 @@ export default function Navigation( {
 		onActivateItem( itemId );
 	};
 
-	const setActiveLevel = ( levelId, slideInOrigin = 'left' ) => {
+	const setActiveMenu = ( menuId, slideInOrigin = 'left' ) => {
 		setSlideOrigin( slideInOrigin );
-		setLevel( levelId );
-		onActivateLevel( levelId );
+		setMenu( menuId );
+		onActivateMenu( menuId );
 	};
 
 	// Used to prevent the sliding animation on mount
@@ -52,16 +52,16 @@ export default function Navigation( {
 		if ( activeItem !== item ) {
 			setActiveItem( activeItem );
 		}
-		if ( activeLevel !== level ) {
-			setActiveLevel( activeLevel );
+		if ( activeMenu !== menu ) {
+			setActiveMenu( activeMenu );
 		}
-	}, [ activeItem, activeLevel ] );
+	}, [ activeItem, activeMenu ] );
 
 	const context = {
 		activeItem: item,
-		activeLevel: level,
+		activeMenu: menu,
 		setActiveItem,
-		setActiveLevel,
+		setActiveMenu,
 	};
 
 	const classes = classnames( 'components-navigation', className );
@@ -69,7 +69,7 @@ export default function Navigation( {
 	return (
 		<Root className={ classes }>
 			<Animate
-				key={ level }
+				key={ menu }
 				type="slide-in"
 				options={ { origin: slideOrigin } }
 			>

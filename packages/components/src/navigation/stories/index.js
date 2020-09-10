@@ -15,7 +15,7 @@ import { useState } from '@wordpress/element';
 import Navigation from '..';
 import NavigationGroup from '../group';
 import NavigationItem from '../item';
-import NavigationLevel from '../level';
+import NavigationMenu from '../menu';
 
 export default {
 	title: 'Components/Navigation',
@@ -28,24 +28,24 @@ const Container = styled.div`
 
 function Example() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
-	const [ activeLevel, setActiveLevel ] = useState( 'root' );
+	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
 	return (
 		<Container>
 			<Navigation
 				activeItem={ activeItem }
-				activeLevel={ activeLevel }
+				activeMenu={ activeMenu }
 				onActivateItem={ setActiveItem }
-				onActivateLevel={ setActiveLevel }
+				onActivateMenu={ setActiveMenu }
 			>
-				<NavigationLevel title="Home">
+				<NavigationMenu title="Home">
 					<NavigationGroup title="Group 1">
 						<NavigationItem item="item-1" title="Item 1" />
 						<NavigationItem item="item-2" title="Item 2" />
 						<NavigationItem
 							badge="2"
 							item="item-3"
-							navigateToLevel="category"
+							navigateToMenu="category"
 							title="Category"
 						/>
 					</NavigationGroup>
@@ -64,12 +64,12 @@ function Example() {
 							/>
 						</NavigationItem>
 					</NavigationGroup>
-				</NavigationLevel>
+				</NavigationMenu>
 
-				<NavigationLevel
-					level="category"
-					parentLevel="root"
-					parentLevelTitle="Home"
+				<NavigationMenu
+					menu="category"
+					parentMenu="root"
+					parentMenuTitle="Home"
 					title="Category"
 				>
 					<ul>
@@ -80,17 +80,17 @@ function Example() {
 						/>
 						<NavigationItem item="child-2" title="Child 2" />
 						<NavigationItem
-							navigateToLevel="nested-category"
+							navigateToMenu="nested-category"
 							item="child-3"
 							title="Nested Category"
 						/>
 					</ul>
-				</NavigationLevel>
+				</NavigationMenu>
 
-				<NavigationLevel
-					level="nested-category"
-					parentLevel="category"
-					parentLevelTitle="Category"
+				<NavigationMenu
+					menu="nested-category"
+					parentMenu="category"
+					parentMenuTitle="Category"
 					title="Nested Category"
 				>
 					<ul>
@@ -103,7 +103,7 @@ function Example() {
 							title="Sub Child 2"
 						/>
 					</ul>
-				</NavigationLevel>
+				</NavigationMenu>
 			</Navigation>
 
 			<div style={ { margin: '48px 0 0 24px' } }>
@@ -115,7 +115,7 @@ function Example() {
 					isSecondary
 					onClick={ () => {
 						setActiveItem( 'child-2' );
-						setActiveLevel( 'category' );
+						setActiveMenu( 'category' );
 					} }
 					style={ { marginTop: '12px' } }
 				>

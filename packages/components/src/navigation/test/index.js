@@ -8,11 +8,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
  */
 import Navigation from '..';
 import NavigationItem from '../item';
-import NavigationLevel from '../level';
+import NavigationMenu from '../menu';
 
 const testNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 	<Navigation activeItem={ activeItem }>
-		<NavigationLevel title={ rootTitle }>
+		<NavigationMenu title={ rootTitle }>
 			<ul>
 				<NavigationItem
 					badge={ showBadge && 21 }
@@ -26,7 +26,7 @@ const testNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 					title="Item 2"
 				/>
 				<NavigationItem
-					navigateToLevel="category"
+					navigateToMenu="category"
 					item="category"
 					title="Category"
 				/>
@@ -34,18 +34,18 @@ const testNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 					<span>customize me</span>
 				</NavigationItem>
 			</ul>
-		</NavigationLevel>
-		<NavigationLevel
-			level="category"
-			parentLevel="root"
-			parentLevelTitle="Home"
+		</NavigationMenu>
+		<NavigationMenu
+			menu="category"
+			parentMenu="root"
+			parentMenuTitle="Home"
 			title="Category"
 		>
 			<ul>
 				<NavigationItem item="child-1" title="Child 1" />
 				<NavigationItem item="child-2" title="Child 2" />
 			</ul>
-		</NavigationLevel>
+		</NavigationMenu>
 	</Navigation>
 );
 
@@ -133,10 +133,10 @@ describe( 'Navigation', () => {
 		render( testNavigation( { rootTitle: 'Home' } ) );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Category' } ) );
-		let levelTitle = screen.getByRole( 'heading' );
-		expect( levelTitle.textContent ).toBe( 'Category' );
+		let menuTitle = screen.getByRole( 'heading' );
+		expect( menuTitle.textContent ).toBe( 'Category' );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Home' } ) );
-		levelTitle = screen.getByRole( 'heading' );
-		expect( levelTitle.textContent ).toBe( 'Home' );
+		menuTitle = screen.getByRole( 'heading' );
+		expect( menuTitle.textContent ).toBe( 'Home' );
 	} );
 } );

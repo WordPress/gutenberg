@@ -70,7 +70,7 @@ export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as __experimentalNavigation } from './navigation';
 export { default as __experimentalNavigationGroup } from './navigation/group';
 export { default as __experimentalNavigationItem } from './navigation/item';
-export { default as __experimentalNavigationLevel } from './navigation/level';
+export { default as __experimentalNavigationMenu } from './navigation/menu';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';

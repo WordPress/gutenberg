@@ -1,1 +1,1 @@
-export const ROOT_LEVEL = 'root';
+export const ROOT_MENU = 'root';

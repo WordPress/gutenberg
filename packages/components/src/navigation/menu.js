@@ -11,36 +11,36 @@ import { Icon, chevronLeft } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { ROOT_MENU } from './constants';
 import { useNavigationContext } from './context';
-import { ROOT_LEVEL } from './constants';
 import { BackButtonUI, MenuTitleUI, MenuUI } from './styles/navigation-styles';
 
-export default function NavigationLevel( {
+export default function NavigationMenu( {
 	children,
 	className,
-	level = ROOT_LEVEL,
-	parentLevel,
-	parentLevelTitle,
+	menu = ROOT_MENU,
+	parentMenu,
+	parentMenuTitle,
 	title,
 } ) {
-	const { activeLevel, setActiveLevel } = useNavigationContext();
+	const { activeMenu, setActiveMenu } = useNavigationContext();
 
-	if ( activeLevel !== level ) {
+	if ( activeMenu !== menu ) {
 		return null;
 	}
 
-	const classes = classnames( 'components-navigation__level', className );
+	const classes = classnames( 'components-navigation__menu', className );
 
 	return (
 		<div className={ classes }>
-			{ parentLevel && (
+			{ parentMenu && (
 				<BackButtonUI
 					className="components-navigation__back-button"
 					isTertiary
-					onClick={ () => setActiveLevel( parentLevel, 'right' ) }
+					onClick={ () => setActiveMenu( parentMenu, 'right' ) }
 				>
 					<Icon icon={ chevronLeft } />
-					{ parentLevelTitle }
+					{ parentMenuTitle }
 				</BackButtonUI>
 			) }
 			<MenuUI>
