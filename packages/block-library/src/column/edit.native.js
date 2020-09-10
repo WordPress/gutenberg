@@ -6,7 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { withSelect, useDispatch } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
@@ -45,7 +45,10 @@ function ColumnEdit( {
 	selectedColumnIndex,
 	parentAlignment,
 	parentWidth,
+	clientId,
 } ) {
+	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+
 	const { verticalAlignment } = attributes;
 
 	const updateAlignment = ( alignment ) => {
@@ -58,14 +61,24 @@ function ColumnEdit( {
 		}
 	}, [] );
 
-	const onWidthChange = ( width ) => {
-		setAttributes( {
-			width,
+	const onWidthChange = ( width ) =>
+		columns.forEach( ( column ) => {
+			if ( column.clientId === clientId ) {
+				return setAttributes( { width } );
+			} else if (
+				column.clientId !== clientId &&
+				! column.attributes.width
+			) {
+				return updateBlockAttributes( column.clientId, {
+					width: ( 100 - width ) / ( columns.length - 1 ),
+				} );
+			}
 		} );
-	};
 
 	const getContainerWidth = ( containerWidth ) => {
-		return 2 * MARGIN + containerWidth - columnWidths.length * 2 * MARGIN;
+		return (
+			2 * MARGIN + containerWidth - columnWidths.length * 2 * MARGIN - 1
+		);
 	};
 
 	const hasWidth = Number.isFinite( attributes.width );
@@ -113,7 +126,7 @@ function ColumnEdit( {
 	);
 
 	const newColumnWidth =
-		columnWidth < MIN_WIDTH
+		columnWidth <= MIN_WIDTH
 			? MIN_WIDTH
 			: Math.floor(
 					( attributes.width / largeColumnsWidthsSum ) *

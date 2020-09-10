@@ -66,6 +66,8 @@ const MIN_COLUMNS_NUM = 1;
  */
 const MAX_COLUMNS_NUM_IN_ROW = 3;
 
+const MARGIN = 16;
+
 const BREAKPOINTS = {
 	mobile: 480,
 	large: 768,
@@ -111,11 +113,10 @@ function ColumnsEditContainer( {
 
 		let columnWidth = columnBaseWidth;
 		if ( columnsInRow > 1 ) {
-			const margins =
-				columnsInRow *
-				Math.min( columnsInRow, MAX_COLUMNS_NUM_IN_ROW ) *
-				styles.columnMargin.marginLeft;
-			columnWidth = ( width - margins ) / columnsInRow;
+			const margins = columnsInRow * 2 * MARGIN;
+			columnWidth = Math.floor(
+				( 2 * MARGIN + width - margins ) / columnsInRow
+			);
 		}
 		return { width: columnWidth };
 	}, [ width, columnsInRow ] );
@@ -166,9 +167,25 @@ function ColumnsEditContainer( {
 					max={ 100 }
 					step={ 0.1 }
 					value={ columnWidths[ index ] }
-					onChange={ ( value ) =>
-						updateInnerColumnWidth( value, column.clientId )
-					}
+					onChange={ ( value ) => {
+						innerColumns.forEach( ( c ) => {
+							if ( c.clientId === column.clientId ) {
+								return updateInnerColumnWidth(
+									value,
+									c.clientId
+								);
+							} else if (
+								c.clientId !== column.clientId &&
+								! c.attributes.width
+							) {
+								return updateInnerColumnWidth(
+									( 100 - value ) /
+										( innerColumns.length - 1 ),
+									c.clientId
+								);
+							}
+						} );
+					} }
 					cellContainerStyle={ styles.cellContainerStyle }
 					toFixed={ 1 }
 					rangePreview={
