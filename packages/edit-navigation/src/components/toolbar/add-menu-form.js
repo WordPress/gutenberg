@@ -6,7 +6,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Icon, TextControl, Button } from '@wordpress/components';
 import { navigation } from '@wordpress/icons';
@@ -26,41 +26,38 @@ export default function AddMenuForm( { menus, onCancel, onCreate } ) {
 
 	const { saveMenu } = useDispatch( 'core' );
 
-	const createMenu = useCallback(
-		async ( event ) => {
-			event.preventDefault();
+	const createMenu = async ( event ) => {
+		event.preventDefault();
 
-			if ( ! menuName.length ) {
-				return;
-			}
+		if ( ! menuName.length ) {
+			return;
+		}
 
-			if ( some( menus, menuNameMatches( menuName ) ) ) {
-				const message = sprintf(
-					// translators: %s: the name of a menu.
-					__(
-						'The menu name %s conflicts with another menu name. Please try another.'
-					),
-					menuName
-				);
-				createErrorNotice( message, { id: 'edit-navigation-error' } );
-				return;
-			}
+		if ( some( menus, menuNameMatches( menuName ) ) ) {
+			const message = sprintf(
+				// translators: %s: the name of a menu.
+				__(
+					'The menu name %s conflicts with another menu name. Please try another.'
+				),
+				menuName
+			);
+			createErrorNotice( message, { id: 'edit-navigation-error' } );
+			return;
+		}
 
-			setIsCreatingMenu( true );
+		setIsCreatingMenu( true );
 
-			const menu = await saveMenu( { name: menuName } );
-			if ( menu ) {
-				createInfoNotice( __( 'Menu created' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
-				onCreate( menu.id );
-			}
+		const menu = await saveMenu( { name: menuName } );
+		if ( menu ) {
+			createInfoNotice( __( 'Menu created' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+			onCreate( menu.id );
+		}
 
-			setIsCreatingMenu( false );
-		},
-		[ menuName, menus ]
-	);
+		setIsCreatingMenu( false );
+	};
 
 	return (
 		<form
