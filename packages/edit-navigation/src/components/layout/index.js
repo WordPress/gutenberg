@@ -55,7 +55,14 @@ export default function Layout( { blockEditorSettings } ) {
 						<Notices />
 
 						<div className="edit-navigation-layout">
-							<Header onBeginAddingMenu={ beginAddingMenu } />
+							<Header
+								onBeginAddingMenu={ beginAddingMenu }
+								menus={ menus }
+								selectedMenuId={ selectedMenuId }
+								isAddingMenu={ isAddingMenu }
+								onSelectMenu={ selectMenu }
+								onCancelAddingMenu={ cancelAddingMenu }
+							/>
 
 							<BlockEditorProvider
 								value={ blocks }
@@ -70,9 +77,6 @@ export default function Layout( { blockEditorSettings } ) {
 								<Toolbar
 									menus={ menus }
 									selectedMenuId={ selectedMenuId }
-									isAddingMenu={ isAddingMenu }
-									onSelectMenu={ selectMenu }
-									onCancelAddingMenu={ cancelAddingMenu }
 								/>
 								<Editor
 									isPending={ ! navigationPost }
