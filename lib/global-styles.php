@@ -658,6 +658,13 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 		}
 		$features['global']['color']['link'] = true;
 	}
+	$custom_units_theme_support = get_theme_support( 'custom-units' );
+	if ( $custom_units_theme_support ) {
+		if ( ! isset( $features['global']['spacing'] ) ) {
+			$features['global']['spacing'] = array();
+		}
+		$features['global']['spacing']['units'] = $custom_units_theme_support === true ? [ "px", "em", "rem", "vh", "vw" ] : $custom_units_theme_support;
+	}
 
 	return $features;
 }
@@ -680,6 +687,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['disableCustomFontSizes'] );
 	unset( $settings['enableCustomLineHeight'] );
+	unset( $settings['enableCustomUnits'] );
 
 	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
 	// The client needs some information to be able to access/update the user styles.

@@ -27,6 +27,17 @@ const deprecatedFlags = {
 			? undefined
 			: ! settings.disableCustomFontSizes,
 	'lineHeight.custom': ( settings ) => settings.enableCustomLineHeight,
+	'spacing.units': ( settings ) => {
+		if ( settings.enableCustomUnits === undefined ) {
+			return;
+		}
+
+		if ( settings.enableCustomUnits === true ) {
+			return [ 'px', 'em', 'rem', 'vh', 'vw' ];
+		}
+
+		return settings.enableCustomUnits;
+	},
 };
 
 /**
