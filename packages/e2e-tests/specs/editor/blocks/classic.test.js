@@ -15,7 +15,6 @@ import {
 	insertBlock,
 	pressKeyWithModifier,
 	clickBlockToolbarButton,
-	switchEditorModeTo,
 	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
