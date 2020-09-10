@@ -685,13 +685,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// The client needs some information to be able to access/update the user styles.
 	// We only do this if the theme has support for theme.json, though,
 	// as an indicator that the theme will know how to combine this with its stylesheet.
-	$screen = get_current_screen();
-	if (
-		! empty( $screen ) &&
-		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( $screen->id ) &&
-		gutenberg_experimental_global_styles_has_theme_json_support()
-	) {
+	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 		$settings['__experimentalGlobalStylesContexts']     = gutenberg_experimental_global_styles_get_block_data();
 		$settings['__experimentalGlobalStylesBaseStyles']   = gutenberg_experimental_global_styles_merge_trees(
