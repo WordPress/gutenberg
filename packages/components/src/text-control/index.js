@@ -2,22 +2,26 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
 
-export default function TextControl( {
-	label,
-	hideLabelFromVision,
-	value,
-	help,
-	className,
-	onChange,
-	type = 'text',
-	...props
-} ) {
+function TextControl(
+	{
+		label,
+		hideLabelFromVision,
+		value,
+		help,
+		className,
+		onChange,
+		type = 'text',
+		...props
+	},
+	ref
+) {
 	const instanceId = useInstanceId( TextControl );
 	const id = `inspector-text-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
@@ -37,8 +41,11 @@ export default function TextControl( {
 				value={ value }
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
+				ref={ ref }
 				{ ...props }
 			/>
 		</BaseControl>
 	);
 }
+
+export default forwardRef( TextControl );
