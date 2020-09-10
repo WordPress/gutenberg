@@ -20,7 +20,6 @@ export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
 export { default as Icon } from './icon';
-export { default as IconButton } from './button/deprecated';
 export { default as Spinner } from './spinner';
 export {
 	createSlotFill,
@@ -76,6 +75,7 @@ export { default as ColorSettings } from './mobile/color-settings';
 export { default as LinkSettings } from './mobile/link-settings';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
+export { default as IconButton } from './mobile/icon-button';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';

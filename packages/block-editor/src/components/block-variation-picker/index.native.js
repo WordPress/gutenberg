@@ -21,10 +21,10 @@ import {
 	PanelBody,
 	BottomSheet,
 	FooterMessageControl,
+	IconButton,
 } from '@wordpress/components';
 import { Icon, close } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
-import { IconButton } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

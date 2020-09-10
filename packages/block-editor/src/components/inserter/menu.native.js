@@ -17,8 +17,11 @@ import { Component } from '@wordpress/element';
 import { createBlock, rawHandler } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
-import { IconButton } from '@wordpress/block-editor';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	IconButton,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
