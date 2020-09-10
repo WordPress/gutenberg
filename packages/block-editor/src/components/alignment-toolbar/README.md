@@ -15,7 +15,7 @@ This component is mostly used for blocks that display text, such as Heading, Par
 
 ### Usage
 
-Renders an alignment toolbar with alignments options/
+Renders an alignment toolbar with alignments options.
 
 ```jsx
 import { AlignmentToolbar } from '@wordpress/block-editor';
