@@ -558,8 +558,19 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 			'typography' => array(),
 			'color'      => array(),
 		),
-		'features' => array(),
-		'presets'  => array(),
+		'features' => array(
+			'typography' => array(),
+			'color'      => array(),
+			'gradient'   => array(),
+			'fontSize'   => array(),
+			'lineHeight' => array(),
+			'spacing'    => array(),
+		),
+		'presets'  => array(
+			'color'     => array(),
+			'font-size' => array(),
+			'gradient'  => array()
+		),
 	);
 
 	$normalized_tree = array();
