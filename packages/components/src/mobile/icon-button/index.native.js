@@ -16,6 +16,11 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 
+export const iconButtonStyles = {
+	modalItem: styles.modalItem,
+	modalIconWrapper: styles.modalIconWrapper,
+};
+
 class MenuItem extends Component {
 	constructor() {
 		super( ...arguments );
