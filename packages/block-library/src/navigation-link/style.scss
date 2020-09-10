@@ -29,8 +29,8 @@
 // Styles for submenu flyout
 .has-child {
 	$navigation-vertical-padding: $grid-unit-10 * 0.75;
-	> a {
-		padding-right: 8px;
+	> .wp-block-navigation-link__content {
+		padding-right: 0.5em;
 	}
 	.wp-block-navigation__container {
 		border: $border-width solid rgba(0, 0, 0, 0.15);
@@ -125,7 +125,7 @@
 
 .wp-block-navigation-link__submenu-icon {
 	height: inherit;
-	padding: 0.375em 1em;
+	padding: 0.375em 1em 0.375em 0;
 
 	svg {
 		fill: currentColor;
