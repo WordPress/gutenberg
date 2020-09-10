@@ -18,7 +18,7 @@ export default function VisualView( { isPending } ) {
 		if ( rootClientId ) {
 			selectBlock( rootClientId );
 		}
-	}, [ rootClientId ] );
+	}, [ rootClientId, selectBlock ] );
 
 	return (
 		<div className="edit-navigation-editor__visual-view">
