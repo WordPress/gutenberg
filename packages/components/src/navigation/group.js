@@ -1,11 +1,21 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * Internal dependencies
  */
 import { MenuGroupTitleUI } from './styles/navigation-styles';
 
-export default function NavigationGroup( { children, title } ) {
+export default function NavigationGroup( { children, className, title } ) {
+	const classes = classnames(
+		'components-navigation__menu-group',
+		className
+	);
+
 	return (
-		<div className="components-navigation__menu-group">
+		<div className={ classes }>
 			{ title && (
 				<MenuGroupTitleUI
 					as="h3"

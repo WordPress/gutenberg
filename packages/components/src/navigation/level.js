@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Icon, chevronLeft } from '@wordpress/icons';
@@ -12,6 +17,7 @@ import { BackButtonUI, MenuTitleUI, MenuUI } from './styles/navigation-styles';
 
 export default function NavigationLevel( {
 	children,
+	className,
 	level = DEFAULT_LEVEL,
 	parentLevel,
 	parentLevelTitle,
@@ -23,8 +29,10 @@ export default function NavigationLevel( {
 		return null;
 	}
 
+	const classes = classnames( 'components-navigation__level', className );
+
 	return (
-		<div className="components-navigation__level">
+		<div className={ classes }>
 			{ parentLevel && (
 				<BackButtonUI
 					className="components-navigation__back-button"

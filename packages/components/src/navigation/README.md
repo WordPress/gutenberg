@@ -76,6 +76,13 @@ The active item slug.
 
 The active level slug.
 
+### className
+
+-   Type: `string`
+-   Required: No
+
+Optional className for the `Navigation` component.
+
 ### `setActiveItem`
 
 -   Type: `function`
@@ -93,6 +100,13 @@ Sync the active level between the external state and the Navigation's internal s
 ## Navigation Level
 
 `NavigationLevel` supports the following props.
+
+### className
+
+-   Type: `string`
+-   Required: No
+
+Optional className for the `NavigationLevel` component.
 
 ### `level`
 
@@ -127,6 +141,13 @@ The level title.
 
 `NavigationGroup` supports the following props.
 
+### className
+
+-   Type: `string`
+-   Required: No
+
+Optional className for the `NavigationGroup` component.
+
 ### `title`
 
 -   Type: `string`
@@ -144,6 +165,13 @@ The group title.
 -   Required: No
 
 The item badge content.
+
+### className
+
+-   Type: `string`
+-   Required: No
+
+Optional className for the `NavigationItem` component.
 
 ### `href`
 

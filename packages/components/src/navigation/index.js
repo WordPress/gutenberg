@@ -18,9 +18,10 @@ import { DEFAULT_LEVEL } from './constants';
 import { Root } from './styles/navigation-styles';
 
 export default function Navigation( {
-	children,
 	activeItem,
 	activeLevel = DEFAULT_LEVEL,
+	children,
+	className,
 	setActiveItem = noop,
 	setActiveLevel = noop,
 } ) {
@@ -62,8 +63,10 @@ export default function Navigation( {
 		setActiveLevel: activateLevel,
 	};
 
+	const classes = classnames( 'components-navigation', className );
+
 	return (
-		<Root className="components-navigation">
+		<Root className={ classes }>
 			<Animate
 				key={ level }
 				type="slide-in"

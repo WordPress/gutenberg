@@ -23,6 +23,7 @@ import {
 export default function NavigationItem( {
 	badge,
 	children,
+	className,
 	href,
 	item,
 	navigateToLevel,
@@ -36,7 +37,7 @@ export default function NavigationItem( {
 		setActiveLevel,
 	} = useNavigationContext();
 
-	const classes = classnames( 'components-navigation__menu-item', {
+	const classes = classnames( 'components-navigation__menu-item', className, {
 		'is-active': item && activeItem === item,
 	} );
 
