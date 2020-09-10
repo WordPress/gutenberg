@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
 
 export default function useMenuNotifications( menuId ) {
 	const { lastSaveError, lastDeleteError } = useSelect( ( select ) => ( {
