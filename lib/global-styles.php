@@ -521,10 +521,10 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 	$result = gutenberg_experimental_global_styles_normalize_schema( array() );
 
 	foreach ( array_keys( $core ) as $block_name ) {
-		$result[ $block_name ][ 'presets' ] = array_merge(
-			$core[ $block_name ][ 'presets' ],
-			$theme[ $block_name ][ 'presets' ],
-			$user[ $block_name ][ 'presets' ]
+		$result[ $block_name ]['presets'] = array_merge(
+			$core[ $block_name ]['presets'],
+			$theme[ $block_name ]['presets'],
+			$user[ $block_name ]['presets']
 		);
 		foreach ( array_keys( $core[ $block_name ]['features'] ) as $subtree ) {
 			$result[ $block_name ]['features'][ $subtree ] = array_merge(
@@ -569,7 +569,7 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 		'presets'  => array(
 			'color'     => array(),
 			'font-size' => array(),
-			'gradient'  => array()
+			'gradient'  => array(),
 		),
 	);
 
