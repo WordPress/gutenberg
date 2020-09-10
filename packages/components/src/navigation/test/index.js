@@ -36,9 +36,9 @@ const testNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 			</ul>
 		</NavigationMenu>
 		<NavigationMenu
+			backButtonLabel="Home"
 			menu="category"
 			parentMenu="root"
-			parentMenuTitle="Home"
 			title="Category"
 		>
 			<ul>

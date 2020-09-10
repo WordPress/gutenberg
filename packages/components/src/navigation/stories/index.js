@@ -67,9 +67,9 @@ function Example() {
 				</NavigationMenu>
 
 				<NavigationMenu
+					backButtonLabel="Home"
 					menu="category"
 					parentMenu="root"
-					parentMenuTitle="Home"
 					title="Category"
 				>
 					<ul>
@@ -88,9 +88,9 @@ function Example() {
 				</NavigationMenu>
 
 				<NavigationMenu
+					backButtonLabel="Category"
 					menu="nested-category"
 					parentMenu="category"
-					parentMenuTitle="Category"
 					title="Nested Category"
 				>
 					<ul>

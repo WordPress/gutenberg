@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Icon, chevronLeft } from '@wordpress/icons';
 
 /**
@@ -20,11 +21,11 @@ import {
 } from './styles/navigation-styles';
 
 export default function NavigationMenu( {
+	backButtonLabel,
 	children,
 	className,
 	menu = ROOT_MENU,
 	parentMenu,
-	parentMenuTitle,
 	title,
 } ) {
 	const { activeMenu, setActiveMenu } = useNavigationContext();
@@ -44,7 +45,7 @@ export default function NavigationMenu( {
 					onClick={ () => setActiveMenu( parentMenu, 'right' ) }
 				>
 					<Icon icon={ chevronLeft } />
-					{ parentMenuTitle }
+					{ backButtonLabel || __( 'Back' ) }
 				</MenuBackButtonUI>
 			) }
 			<MenuUI>

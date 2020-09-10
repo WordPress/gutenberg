@@ -29,9 +29,9 @@ const MyNavigation = () => (
 		</NavigationMenu>
 
 		<NavigationMenu
+			backButtonLabel="Home"
 			menu="category"
 			parentMenu="root"
-			parentMenuTitle="Home"
 			title="Category"
 		>
 			<ul>
@@ -91,6 +91,14 @@ Sync the active menu between the external state and the Navigation's internal st
 
 `NavigationMenu` supports the following props.
 
+### `backButtonLabel`
+
+-   Type: `string`
+-   Required: No
+-   Default: "Back"
+
+The back button label used in nested menus.
+
 ### className
 
 -   Type: `string`
@@ -112,13 +120,6 @@ The menu slug.
 -   Required: No
 
 The parent menu slug; used by nested menus to indicate their parent menu.
-
-### `parentMenuTitle`
-
--   Type: `string`
--   Required: No
-
-The parent menu title; used as back button label by nested menus.
 
 ### `title`
 
