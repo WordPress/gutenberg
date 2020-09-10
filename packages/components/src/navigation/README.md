@@ -12,49 +12,39 @@ import {
 	__experimentalNavigationLevel as NavigationLevel,
 } from '@wordpress/components';
 
-const MyNavigation = () => {
-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
-	const [ activeLevel, setActiveLevel ] = useState( 'root' );
+const MyNavigation = () => (
+	<Navigation>
+		<NavigationLevel title="Home">
+			<NavigationGroup title="Group 1">
+				<NavigationItem item="item-1" title="Item 1" />
+				<NavigationItem item="item-2" title="Item 2" />
+			</NavigationGroup>
+			<NavigationGroup title="Group 2">
+				<NavigationItem
+					item="item-3"
+					navigateToLevel="category"
+					title="Category"
+				/>
+			</NavigationGroup>
+		</NavigationLevel>
 
-	return (
-		<Navigation
-			activeItem={ activeItem }
-			activeLevel={ activeLevel }
-			setActiveItem={ setActiveItem }
-			setActiveLevel={ setActiveLevel }
+		<NavigationLevel
+			level="category"
+			parentLevel="root"
+			parentLevelTitle="Home"
+			title="Category"
 		>
-			<NavigationLevel title="Home">
-				<NavigationGroup title="Group 1">
-					<NavigationItem item="item-1" title="Item 1" />
-					<NavigationItem item="item-2" title="Item 2" />
-				</NavigationGroup>
-				<NavigationGroup title="Group 2">
-					<NavigationItem
-						item="item-3"
-						navigateToLevel="category"
-						title="Category"
-					/>
-				</NavigationGroup>
-			</NavigationLevel>
-
-			<NavigationLevel
-				level="category"
-				parentLevel="root"
-				parentLevelTitle="Home"
-				title="Category"
-			>
-				<ul>
-					<NavigationItem
-						badge="1"
-						item="child-1"
-						title="Child 1"
-					/>
-					<NavigationItem item="child-2" title="Child 2" />
-				</ul>
-			</NavigationLevel>
-		</Navigation>
-	);
-};
+			<ul>
+				<NavigationItem
+					badge="1"
+					item="child-1"
+					title="Child 1"
+				/>
+				<NavigationItem item="child-2" title="Child 2" />
+			</ul>
+		</NavigationLevel>
+	</Navigation>
+);
 ```
 
 ## Navigation Props
