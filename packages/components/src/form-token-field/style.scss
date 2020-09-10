@@ -56,7 +56,7 @@
 	font-size: $default-font-size;
 	display: flex;
 	margin: 2px 4px 2px 0;
-	color: $dark-gray-700;
+	color: $gray-900;
 	max-width: 100%;
 
 	&.is-success {
@@ -152,7 +152,7 @@
 	overflow: initial;
 
 	&:hover {
-		color: $dark-gray-700;
+		color: $gray-900;
 	}
 }
 
