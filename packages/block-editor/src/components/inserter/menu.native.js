@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * External dependencies
  */
 import {
@@ -26,6 +31,7 @@ import {
 	BottomSheetConsumer,
 	InserterButton,
 	getClipboard,
+	SegmentedControl,
 } from '@wordpress/components';
 
 /**
@@ -34,6 +40,7 @@ import {
 import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
+const TABS = [ __( 'Child Blocks' ), __( 'Reusable blocks' ) ];
 
 export class InserterMenu extends Component {
 	constructor() {
@@ -41,9 +48,15 @@ export class InserterMenu extends Component {
 
 		this.onClose = this.onClose.bind( this );
 		this.onLayout = this.onLayout.bind( this );
+		this.onChangeTab = this.onChangeTab.bind( this );
 		this.renderItem = this.renderItem.bind( this );
+		this.renderBlocksTab = this.renderBlocksTab.bind( this );
+		this.renderReusableBlocksTab = this.renderReusableBlocksTab.bind(
+			this
+		);
 		this.state = {
 			numberOfColumns: MIN_COL_NUM,
+			tab: 0,
 		};
 
 		Dimensions.addEventListener( 'change', this.onLayout );
@@ -116,21 +129,25 @@ export class InserterMenu extends Component {
 		this.setState( { numberOfColumns, itemWidth, maxWidth } );
 	}
 
+	onChangeTab( tab ) {
+		this.setState( { tab: TABS.indexOf( tab ) } );
+	}
+
 	/**
 	 * Processes the inserter items to check
 	 * if there's any copied block in the clipboard
 	 * to add it as an extra item
 	 */
-	getItems() {
+	getBlockItems() {
 		const {
-			items: initialItems,
+			items,
 			canInsertBlockType,
 			destinationRootClientId,
 			getBlockType,
 		} = this.props;
 
 		// Filter out reusable blocks (they will be added in another tab)
-		const items = initialItems.filter(
+		const blockItems = items.filter(
 			( { name } ) => name !== 'core/block'
 		);
 
@@ -152,9 +169,15 @@ export class InserterMenu extends Component {
 						initialAttributes: clipboardBlock.attributes,
 						innerBlocks: clipboardBlock.innerBlocks,
 					},
-					...items,
+					...blockItems,
 			  ]
-			: items;
+			: blockItems;
+	}
+
+	getReusableBlockItems() {
+		const { items } = this.props;
+
+		return items.filter( ( { name } ) => name === 'core/block' );
 	}
 
 	renderItem( { item } ) {
@@ -170,46 +193,85 @@ export class InserterMenu extends Component {
 		);
 	}
 
-	render() {
+	renderBlocksTab( listProps ) {
 		const { numberOfColumns } = this.state;
-		const items = this.getItems();
+		const items = this.getBlockItems();
+
+		return (
+			<FlatList
+				onLayout={ this.onLayout }
+				key={ `InserterUI-Blocks-${ numberOfColumns }` } //re-render when numberOfColumns changes
+				keyboardShouldPersistTaps="always"
+				numColumns={ numberOfColumns }
+				data={ items }
+				ItemSeparatorComponent={ () => (
+					<TouchableWithoutFeedback accessible={ false }>
+						<View style={ styles.rowSeparator } />
+					</TouchableWithoutFeedback>
+				) }
+				keyExtractor={ ( item ) => item.name }
+				renderItem={ this.renderItem }
+				{ ...listProps }
+			/>
+		);
+	}
+
+	renderReusableBlocksTab( listProps ) {
+		const { numberOfColumns } = this.state;
+		const items = this.getReusableBlockItems();
+
+		return (
+			<FlatList
+				onLayout={ this.onLayout }
+				key={ `InserterUI-ReusableBlocks-${ numberOfColumns }` } //re-render when numberOfColumns changes
+				keyboardShouldPersistTaps="always"
+				numColumns={ numberOfColumns }
+				data={ items }
+				ItemSeparatorComponent={ () => (
+					<TouchableWithoutFeedback accessible={ false }>
+						<View style={ styles.rowSeparator } />
+					</TouchableWithoutFeedback>
+				) }
+				keyExtractor={ ( item ) => item.name }
+				renderItem={ this.renderItem }
+				{ ...listProps }
+			/>
+		);
+	}
+
+	render() {
+		const { tab } = this.state;
+		const reusableBlockItems = this.getReusableBlockItems();
+
+		const hideHeader = reusableBlockItems.length === 0;
 
 		return (
 			<BottomSheet
 				isVisible={ true }
 				onClose={ this.onClose }
-				hideHeader
+				header={
+					<SegmentedControl
+						segments={ TABS }
+						segmentHandler={ this.onChangeTab }
+					/>
+				}
+				hideHeader={ hideHeader }
 				hasNavigation
+				contentStyle={ styles.list }
+				isChildrenScrollable
 			>
 				<TouchableHighlight accessible={ false }>
 					<BottomSheetConsumer>
-						{ ( { listProps, safeAreaBottomInset } ) => (
-							<FlatList
-								onLayout={ this.onLayout }
-								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-								keyboardShouldPersistTaps="always"
-								numColumns={ numberOfColumns }
-								data={ items }
-								ItemSeparatorComponent={ () => (
-									<TouchableWithoutFeedback
-										accessible={ false }
-									>
-										<View style={ styles.rowSeparator } />
-									</TouchableWithoutFeedback>
-								) }
-								keyExtractor={ ( item ) => item.name }
-								renderItem={ this.renderItem }
-								{ ...listProps }
-								contentContainerStyle={ [
-									...listProps.contentContainerStyle,
-									{
-										paddingBottom:
-											safeAreaBottomInset ||
-											styles.list.paddingBottom,
-									},
-								] }
-							/>
-						) }
+						{ ( { listProps } ) => {
+							switch ( tab ) {
+								case 0:
+									return this.renderBlocksTab( listProps );
+								case 1:
+									return this.renderReusableBlocksTab(
+										listProps
+									);
+							}
+						} }
 					</BottomSheetConsumer>
 				</TouchableHighlight>
 			</BottomSheet>
