@@ -76,7 +76,7 @@
 	&.is-validating {
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token {
-			color: $dark-gray-500;
+			color: $gray-700;
 		}
 	}
 
@@ -91,7 +91,7 @@
 
 		.components-form-token-field__remove-token {
 			background: transparent;
-			color: $dark-gray-500;
+			color: $gray-700;
 			position: absolute;
 			top: 1px;
 			right: 0;
@@ -147,7 +147,7 @@
 	cursor: pointer;
 	border-radius: 0 12px 12px 0;
 	padding: 0 2px;
-	color: $dark-gray-500;
+	color: $gray-700;
 	line-height: 10px;
 	overflow: initial;
 
@@ -171,7 +171,7 @@
 }
 
 .components-form-token-field__suggestion {
-	color: $dark-gray-500;
+	color: $gray-700;
 	display: block;
 	font-size: $default-font-size;
 	padding: 4px 8px;
