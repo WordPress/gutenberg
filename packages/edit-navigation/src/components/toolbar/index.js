@@ -3,7 +3,7 @@
  */
 import { Spinner, SelectControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { BlockToolbar } from '@wordpress/block-editor';
+import { NavigableToolbar, BlockToolbar } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -55,7 +55,15 @@ export default function Toolbar( {
 						/>
 					) : (
 						<>
-							<BlockToolbar __experimentalExpandedControl />
+							<NavigableToolbar
+								className="edit-navigation-toolbar__block-tools"
+								aria-label={ __( 'Block tools' ) }
+							>
+								<BlockToolbar
+									hideDragHandle
+									__experimentalExpandedControl
+								/>
+							</NavigableToolbar>
 							<Popover.Slot name="block-toolbar" />
 							<SaveButton menuId={ selectedMenuId } />
 							<BlockInspectorDropdown />
