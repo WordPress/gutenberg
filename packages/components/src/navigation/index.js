@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import Animate from '../animate';
 import { ROOT_MENU } from './constants';
 import { NavigationContext } from './context';
-import { Root } from './styles/navigation-styles';
+import { NavigationUI } from './styles/navigation-styles';
 
 export default function Navigation( {
 	activeItem,
@@ -67,7 +67,7 @@ export default function Navigation( {
 	const classes = classnames( 'components-navigation', className );
 
 	return (
-		<Root className={ classes }>
+		<NavigationUI className={ classes }>
 			<Animate
 				key={ menu }
 				type="slide-in"
@@ -86,6 +86,6 @@ export default function Navigation( {
 					</div>
 				) }
 			</Animate>
-		</Root>
+		</NavigationUI>
 	);
 }

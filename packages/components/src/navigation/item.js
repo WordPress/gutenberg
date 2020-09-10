@@ -14,11 +14,7 @@ import { Icon, chevronRight } from '@wordpress/icons';
  */
 import Button from '../button';
 import { useNavigationContext } from './context';
-import {
-	BadgeUI,
-	MenuItemTitleUI,
-	MenuItemUI,
-} from './styles/navigation-styles';
+import { ItemBadgeUI, ItemTitleUI, ItemUI } from './styles/navigation-styles';
 
 export default function NavigationItem( {
 	badge,
@@ -33,7 +29,7 @@ export default function NavigationItem( {
 } ) {
 	const { activeItem, setActiveItem, setActiveMenu } = useNavigationContext();
 
-	const classes = classnames( 'components-navigation__menu-item', className, {
+	const classes = classnames( 'components-navigation__item', className, {
 		'is-active': item && activeItem === item,
 	} );
 
@@ -47,28 +43,28 @@ export default function NavigationItem( {
 	};
 
 	return (
-		<MenuItemUI className={ classes }>
+		<ItemUI className={ classes }>
 			<Button href={ href } onClick={ onItemClick } { ...props }>
 				{ title && (
-					<MenuItemTitleUI
-						className="components-navigation__menu-item-title"
+					<ItemTitleUI
+						className="components-navigation__item-title"
 						variant="body.small"
 						as="span"
 					>
 						{ title }
-					</MenuItemTitleUI>
+					</ItemTitleUI>
 				) }
 
 				{ children }
 
 				{ badge && (
-					<BadgeUI className="components-navigation__menu-item-badge">
+					<ItemBadgeUI className="components-navigation__item-badge">
 						{ badge }
-					</BadgeUI>
+					</ItemBadgeUI>
 				) }
 
 				{ navigateToMenu && <Icon icon={ chevronRight } /> }
 			</Button>
-		</MenuItemUI>
+		</ItemUI>
 	);
 }

@@ -13,7 +13,11 @@ import { Icon, chevronLeft } from '@wordpress/icons';
  */
 import { ROOT_MENU } from './constants';
 import { useNavigationContext } from './context';
-import { BackButtonUI, MenuTitleUI, MenuUI } from './styles/navigation-styles';
+import {
+	MenuBackButtonUI,
+	MenuTitleUI,
+	MenuUI,
+} from './styles/navigation-styles';
 
 export default function NavigationMenu( {
 	children,
@@ -34,14 +38,14 @@ export default function NavigationMenu( {
 	return (
 		<div className={ classes }>
 			{ parentMenu && (
-				<BackButtonUI
+				<MenuBackButtonUI
 					className="components-navigation__back-button"
 					isTertiary
 					onClick={ () => setActiveMenu( parentMenu, 'right' ) }
 				>
 					<Icon icon={ chevronLeft } />
 					{ parentMenuTitle }
-				</BackButtonUI>
+				</MenuBackButtonUI>
 			) }
 			<MenuUI>
 				{ title && (

@@ -6,24 +6,21 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { MenuGroupTitleUI } from './styles/navigation-styles';
+import { GroupTitleUI } from './styles/navigation-styles';
 
 export default function NavigationGroup( { children, className, title } ) {
-	const classes = classnames(
-		'components-navigation__menu-group',
-		className
-	);
+	const classes = classnames( 'components-navigation__group', className );
 
 	return (
 		<div className={ classes }>
 			{ title && (
-				<MenuGroupTitleUI
+				<GroupTitleUI
 					as="h3"
-					className="components-navigation__menu-group-title"
+					className="components-navigation__group-title"
 					variant="caption"
 				>
 					{ title }
-				</MenuGroupTitleUI>
+				</GroupTitleUI>
 			) }
 			<ul>{ children }</ul>
 		</div>
