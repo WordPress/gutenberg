@@ -11,10 +11,8 @@ export const DEPRECATED_ENTRY_KEYS = [
 	'isEligible',
 ];
 
-export const __EXPERIMENTAL_LINK_COLOR = '--wp--style--color--link';
-
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
-	[ __EXPERIMENTAL_LINK_COLOR ]: [ 'color', 'link' ],
+	'--wp--style--color--link': [ 'color', 'link' ],
 	background: [ 'color', 'gradient' ],
 	backgroundColor: [ 'color', 'background' ],
 	color: [ 'color', 'text' ],
