@@ -2,7 +2,7 @@
 * text=auto
 
 # Windows bat files in mobile/android
-*.bat text eol=crlf
+*.bat -text
 
 # Denote all files that are truly binary and should not be modified.
 *.aar binary
