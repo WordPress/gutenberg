@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { LINK_COLOR } from '@wordpress/blocks';
+import { __EXPERIMENTAL_LINK_COLOR as LINK_COLOR } from '@wordpress/blocks';
 
 /* Supporting data */
 export const GLOBAL_CONTEXT = 'global';

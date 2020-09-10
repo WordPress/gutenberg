@@ -7,7 +7,7 @@ import {
 } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { STYLE_PROPERTY } from '@wordpress/blocks';
+import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

@@ -7,7 +7,10 @@ import { has, get, startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport, STYLE_PROPERTY } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+} from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**

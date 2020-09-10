@@ -6,7 +6,7 @@ import { get, kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { STYLE_PROPERTY } from '@wordpress/blocks';
+import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

@@ -3,7 +3,10 @@
  */
 import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { STYLE_PROPERTY, LINK_COLOR } from '@wordpress/blocks';
+import {
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	__EXPERIMENTAL_LINK_COLOR as LINK_COLOR,
+} from '@wordpress/blocks';
 
 export default ( {
 	context: { supports, name },

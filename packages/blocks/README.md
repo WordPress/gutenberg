@@ -558,10 +558,6 @@ _Returns_
 
 -   `boolean`: True if the parameter is a valid icon and false otherwise.
 
-<a name="LINK_COLOR" href="#LINK_COLOR">#</a> **LINK_COLOR**
-
-Undocumented declaration.
-
 <a name="normalizeIconObject" href="#normalizeIconObject">#</a> **normalizeIconObject**
 
 Function that receives an icon as set by the blocks during the registration
@@ -727,10 +723,6 @@ Assigns name of block handling unregistered block types.
 _Parameters_
 
 -   _blockName_ `string`: Block name.
-
-<a name="STYLE_PROPERTY" href="#STYLE_PROPERTY">#</a> **STYLE_PROPERTY**
-
-Undocumented declaration.
 
 <a name="switchToBlockType" href="#switchToBlockType">#</a> **switchToBlockType**
 
