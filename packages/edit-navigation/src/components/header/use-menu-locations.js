@@ -9,14 +9,22 @@ export default function useMenuLocations() {
 	const [ menuLocationsByName, setMenuLocationsByName ] = useState( null );
 
 	useEffect( () => {
+		let isMounted = true;
+
 		const fetchMenuLocationsByName = async () => {
 			const newMenuLocationsByName = await apiFetch( {
 				method: 'GET',
 				path: '/__experimental/menu-locations',
 			} );
-			setMenuLocationsByName( newMenuLocationsByName );
+
+			if ( isMounted ) {
+				setMenuLocationsByName( newMenuLocationsByName );
+			}
 		};
+
 		fetchMenuLocationsByName();
+
+		return () => ( isMounted = false );
 	}, [] );
 
 	const { saveMenu } = useDispatch( 'core' );
