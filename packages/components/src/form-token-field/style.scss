@@ -165,7 +165,7 @@
 	transition: all 0.15s ease-in-out;
 	@include reduce-motion("transition");
 	list-style: none;
-	border-top: $border-width solid $dark-gray-300;
+	border-top: $border-width solid $gray-700;
 	margin: $grid-unit-05 (-$grid-unit-05) (-$grid-unit-05);
 	padding-top: 3px;
 }
