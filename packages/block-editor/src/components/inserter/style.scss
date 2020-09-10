@@ -99,7 +99,7 @@ $block-inserter-tabs-height: 44px;
 		}
 
 		&::placeholder {
-			color: $dark-gray-400;
+			color: $gray-700;
 		}
 
 		&::-webkit-search-decoration,
@@ -254,7 +254,7 @@ $block-inserter-tabs-height: 44px;
 	justify-content: center;
 	align-items: center;
 	min-height: $grid-unit-60 * 3;
-	color: $dark-gray-400;
+	color: $gray-700;
 	background: $gray-100;
 }
 
