@@ -18,9 +18,7 @@ export default function ListView( { isPending, blocks } ) {
 				<__experimentalBlockNavigationTree
 					blocks={ blocks }
 					selectedBlockClientId={ selectedBlockId }
-					selectBlock={ ( id ) => {
-						setSelectedBlockId( id );
-					} }
+					selectBlock={ setSelectedBlockId }
 					__experimentalFeatures
 					showNestedBlocks
 					showAppender
