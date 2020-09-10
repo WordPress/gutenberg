@@ -102,13 +102,6 @@ describe( 'Classic', () => {
 	} );
 
 	it( 'Should not fail after save/reload', async () => {
-		const classicBlockSelector = 'div[aria-label^="Block: Classic"]';
-
-		const clickClassic = async () => {
-			await page.waitForSelector( classicBlockSelector );
-			await page.click( classicBlockSelector );
-		};
-
 		// Might move to utils if this becomes useful enough for other tests
 		const runWithoutCache = async ( cb ) => {
 			await page.setCacheEnabled( false );
@@ -135,7 +128,10 @@ describe( 'Classic', () => {
 		// Disabling the browser disk cache is needed in order to reproduce the issue
 		// in case it regresses. To test this, revert commit 65c9f74, build and run the test.
 		await runWithoutCache( () => page.reload() );
-		await clickClassic();
+
+		const classicBlockSelector = 'div[aria-label^="Block: Classic"]';
+		await page.waitForSelector( classicBlockSelector );
+		await page.focus( classicBlockSelector );
 		expect( console ).not.toHaveErrored();
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
