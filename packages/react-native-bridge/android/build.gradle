@@ -320,6 +320,8 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         doFirst {
             println "Deleting temporary folders with extracted RN tools"
         }
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
         delete nodeFolder, npmFolder
     }
 
