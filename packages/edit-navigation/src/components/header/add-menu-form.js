@@ -8,8 +8,7 @@ import { some } from 'lodash';
  */
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { Icon, TextControl, Button } from '@wordpress/components';
-import { navigation } from '@wordpress/icons';
+import { TextControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 const menuNameMatches = ( menuName ) => ( menu ) =>
@@ -61,16 +60,11 @@ export default function AddMenuForm( { menus, onCancel, onCreate } ) {
 
 	return (
 		<form
-			className="edit-navigation-toolbar__add-menu-form"
+			className="edit-navigation-header__add-menu-form"
 			onSubmit={ createMenu }
 		>
-			<Icon
-				className="edit-navigation-toolbar__add-menu-icon"
-				icon={ navigation }
-			/>
-
 			<TextControl
-				className="edit-navigation-toolbar__add-menu-name-field"
+				className="edit-navigation-header__add-menu-name-field"
 				// Disable reason: The name field should receive focus when
 				// component mounts.
 				// eslint-disable-next-line jsx-a11y/no-autofocus
@@ -83,7 +77,7 @@ export default function AddMenuForm( { menus, onCancel, onCreate } ) {
 			/>
 
 			<Button
-				className="edit-navigation-toolbar__add-menu-cancel-button"
+				className="edit-navigation-header__add-menu-cancel-button"
 				isLink
 				onClick={ onCancel }
 			>
@@ -91,7 +85,7 @@ export default function AddMenuForm( { menus, onCancel, onCreate } ) {
 			</Button>
 
 			<Button
-				className="edit-navigation-toolbar__add-menu-create-button"
+				className="edit-navigation-header__add-menu-create-button"
 				type="submit"
 				isPrimary
 				disabled={ ! menuName.length }
