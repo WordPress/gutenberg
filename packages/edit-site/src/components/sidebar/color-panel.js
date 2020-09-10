@@ -3,7 +3,6 @@
  */
 import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -28,9 +27,8 @@ export default ( {
 
 	if ( supports.includes( 'color' ) ) {
 		settings.push( {
-			colorValue: getProperty( name, STYLE_PROPERTY.color ),
-			onColorChange: ( value ) =>
-				setProperty( name, STYLE_PROPERTY.color, value ),
+			colorValue: getProperty( name, 'color' ),
+			onColorChange: ( value ) => setProperty( name, 'color', value ),
 			label: __( 'Text color' ),
 		} );
 	}
@@ -38,18 +36,18 @@ export default ( {
 	let backgroundSettings = {};
 	if ( supports.includes( 'backgroundColor' ) ) {
 		backgroundSettings = {
-			colorValue: getProperty( name, STYLE_PROPERTY.backgroundColor ),
+			colorValue: getProperty( name, 'backgroundColor' ),
 			onColorChange: ( value ) =>
-				setProperty( name, STYLE_PROPERTY.backgroundColor, value ),
+				setProperty( name, 'backgroundColor', value ),
 		};
 	}
 
 	let gradientSettings = {};
 	if ( supports.includes( 'background' ) ) {
 		gradientSettings = {
-			gradientValue: getProperty( name, STYLE_PROPERTY.background ),
+			gradientValue: getProperty( name, 'background' ),
 			onGradientChange: ( value ) =>
-				setProperty( name, STYLE_PROPERTY.background, value ),
+				setProperty( name, 'background', value ),
 		};
 	}
 
@@ -66,9 +64,8 @@ export default ( {
 
 	if ( supports.includes( LINK_COLOR ) ) {
 		settings.push( {
-			colorValue: getProperty( name, STYLE_PROPERTY[ LINK_COLOR ] ),
-			onColorChange: ( value ) =>
-				setProperty( name, STYLE_PROPERTY[ LINK_COLOR ], value ),
+			colorValue: getProperty( name, LINK_COLOR ),
+			onColorChange: ( value ) => setProperty( name, LINK_COLOR, value ),
 			label: __( 'Link color' ),
 		} );
 	}
