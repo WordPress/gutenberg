@@ -104,49 +104,24 @@ function Example() {
 						/>
 					</ul>
 				</NavigationLevel>
-
-				<NavigationLevel title="Secondary Menu">
-					<ul>
-						<NavigationItem
-							navigateToLevel="secondary-level"
-							item="secondary-item-1"
-							title="Secondary Item 1"
-						/>
-						<NavigationItem
-							item="secondary-item-2"
-							title="Secondary Item 2"
-						/>
-					</ul>
-				</NavigationLevel>
-
-				<NavigationLevel
-					level="secondary-level"
-					parentLevel="root"
-					parentLevelTitle="Home"
-					title="Secondary Item 1"
-				>
-					<ul>
-						<NavigationItem
-							item="secondary-child-1"
-							title="Secondary Child 1"
-						/>
-						<NavigationItem
-							item="secondary-child-2"
-							title="Secondary Child 2"
-						/>
-					</ul>
-				</NavigationLevel>
 			</Navigation>
 
-			<Button
-				onClick={ () => {
-					setActiveItem( 'child-2' );
-					setActiveLevel( 'category' );
-				} }
-				style={ { marginTop: '24px' } }
-			>
-				Non-navigation link to Child 2
-			</Button>
+			<div style={ { margin: '48px 0 0 24px' } }>
+				<p>
+					Item <code>{ activeItem }</code> is active.
+				</p>
+
+				<Button
+					isSecondary
+					onClick={ () => {
+						setActiveItem( 'child-2' );
+						setActiveLevel( 'category' );
+					} }
+					style={ { marginTop: '12px' } }
+				>
+					Link to Child 2
+				</Button>
+			</div>
 		</Container>
 	);
 }

@@ -40,6 +40,7 @@ export default function Navigation( {
 		onActivateLevel( levelId );
 	};
 
+	// Used to prevent the sliding animation on mount
 	const isMounted = useRef( false );
 	useEffect( () => {
 		if ( ! isMounted.current ) {
