@@ -3,7 +3,6 @@
  */
 import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { ToolbarItem } from '@wordpress/components';
 import {
 	BlockControls,
 	__experimentalBlock as Block,
@@ -68,8 +67,7 @@ export default function TemplatePartEdit( {
 		return (
 			<BlockWrapper>
 				<BlockControls>
-					<ToolbarItem
-						as={ TemplatePartNamePanel }
+					<TemplatePartNamePanel
 						postId={ postId }
 						setAttributes={ setAttributes }
 					/>
