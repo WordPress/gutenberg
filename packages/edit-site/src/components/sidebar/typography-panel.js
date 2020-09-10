@@ -16,8 +16,8 @@ import { fromPx, toPx } from '../editor/utils';
 
 export default ( {
 	context: { supports, name },
-	getProperty,
-	setProperty,
+	getStyleProperty,
+	setStyleProperty,
 } ) => {
 	if (
 		! supports.includes( 'fontSize' ) &&
@@ -31,10 +31,10 @@ export default ( {
 			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
 					value={ fromPx(
-						getProperty( name, STYLE_PROPERTY.fontSize )
+						getStyleProperty( name, STYLE_PROPERTY.fontSize )
 					) }
 					onChange={ ( value ) =>
-						setProperty(
+						setStyleProperty(
 							name,
 							STYLE_PROPERTY.fontSize,
 							toPx( value )
@@ -44,9 +44,16 @@ export default ( {
 			) }
 			{ supports.includes( 'lineHeight' ) && (
 				<LineHeightControl
-					value={ getProperty( name, STYLE_PROPERTY.lineHeight ) }
+					value={ getStyleProperty(
+						name,
+						STYLE_PROPERTY.lineHeight
+					) }
 					onChange={ ( value ) =>
-						setProperty( name, STYLE_PROPERTY.lineHeight, value )
+						setStyleProperty(
+							name,
+							STYLE_PROPERTY.lineHeight,
+							value
+						)
 					}
 				/>
 			) }

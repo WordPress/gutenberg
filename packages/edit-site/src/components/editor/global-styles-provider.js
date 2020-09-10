@@ -22,8 +22,8 @@ import getGlobalStyles from './global-styles-renderer';
 
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
-	getProperty: ( context, propertyName ) => {},
-	setProperty: ( context, propertyName, newValue ) => {},
+	getStyleProperty: ( context, propertyName ) => {},
+	setStyleProperty: ( context, propertyName, newValue ) => {},
 	globalContext: {},
 	/* eslint-enable no-unused-vars */
 } );
@@ -45,12 +45,12 @@ export default ( { children, baseStyles, contexts } ) => {
 	const nextValue = useMemo(
 		() => ( {
 			contexts,
-			getProperty: ( context, propertyName ) =>
+			getStyleProperty: ( context, propertyName ) =>
 				get(
 					userStyles?.[ context ]?.styles,
 					STYLE_PROPERTY[ propertyName ]
 				),
-			setProperty: ( context, propertyName, newValue ) => {
+			setStyleProperty: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
 				let contextStyles = newContent?.[ context ]?.styles;
 				if ( ! contextStyles ) {

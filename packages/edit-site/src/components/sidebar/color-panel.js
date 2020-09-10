@@ -11,8 +11,8 @@ import { LINK_COLOR } from '../editor/utils';
 
 export default ( {
 	context: { supports, name },
-	getProperty,
-	setProperty,
+	getStyleProperty,
+	setStyleProperty,
 } ) => {
 	if (
 		! supports.includes( 'color' ) &&
@@ -27,8 +27,9 @@ export default ( {
 
 	if ( supports.includes( 'color' ) ) {
 		settings.push( {
-			colorValue: getProperty( name, 'color' ),
-			onColorChange: ( value ) => setProperty( name, 'color', value ),
+			colorValue: getStyleProperty( name, 'color' ),
+			onColorChange: ( value ) =>
+				setStyleProperty( name, 'color', value ),
 			label: __( 'Text color' ),
 		} );
 	}
@@ -36,18 +37,18 @@ export default ( {
 	let backgroundSettings = {};
 	if ( supports.includes( 'backgroundColor' ) ) {
 		backgroundSettings = {
-			colorValue: getProperty( name, 'backgroundColor' ),
+			colorValue: getStyleProperty( name, 'backgroundColor' ),
 			onColorChange: ( value ) =>
-				setProperty( name, 'backgroundColor', value ),
+				setStyleProperty( name, 'backgroundColor', value ),
 		};
 	}
 
 	let gradientSettings = {};
 	if ( supports.includes( 'background' ) ) {
 		gradientSettings = {
-			gradientValue: getProperty( name, 'background' ),
+			gradientValue: getStyleProperty( name, 'background' ),
 			onGradientChange: ( value ) =>
-				setProperty( name, 'background', value ),
+				setStyleProperty( name, 'background', value ),
 		};
 	}
 
@@ -64,8 +65,9 @@ export default ( {
 
 	if ( supports.includes( LINK_COLOR ) ) {
 		settings.push( {
-			colorValue: getProperty( name, LINK_COLOR ),
-			onColorChange: ( value ) => setProperty( name, LINK_COLOR, value ),
+			colorValue: getStyleProperty( name, LINK_COLOR ),
+			onColorChange: ( value ) =>
+				setStyleProperty( name, LINK_COLOR, value ),
 			label: __( 'Link color' ),
 		} );
 	}
