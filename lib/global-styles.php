@@ -663,7 +663,7 @@ function gutenberg_experimental_global_styles_get_editor_features( $config ) {
 		if ( ! isset( $features['global']['spacing'] ) ) {
 			$features['global']['spacing'] = array();
 		}
-		$features['global']['spacing']['units'] = $custom_units_theme_support === true ? [ "px", "em", "rem", "vh", "vw" ] : $custom_units_theme_support;
+		$features['global']['spacing']['units'] = true === $custom_units_theme_support ? array( 'px', 'em', 'rem', 'vh', 'vw' ) : $custom_units_theme_support;
 	}
 
 	return $features;
