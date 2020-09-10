@@ -25,19 +25,25 @@ _Note:_
 * **Type:** `String`
 * **Default:** `undefined`
 
+The max-width of the button. 
+
 ### `itemWidth`
 * **Type:** `String`
 * **Default:** `undefined`
 
+The button width. 
+
 ### `onSelect`
 * **Type:** `Function`
 * **Required** `true`
-* **Default:** `""`
+
+The function that is called once the IconButton has been selected.
 
 ### `item`
 * **Type:** `Object`
 * **Required** `true`
-* **Default:** `""`
+
+The object that gets selected. 
 
 ## Examples
 
