@@ -19,6 +19,7 @@ import TemplatePartNamePanel from './name-panel';
 import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
+import RevertToDefault from './revert-tool';
 
 export default function TemplatePartEdit( {
 	attributes: { postId: _postId, slug, theme, tagName },
@@ -31,14 +32,6 @@ export default function TemplatePartEdit( {
 
 	// Resolve the post ID if not set, and load its post.
 	const postId = useTemplatePartPost( _postId, slug, theme );
-
-	// TODO: get original slug from meta.
-	const originalSlug = slug;
-	const defaultPostId = useTemplatePartPost( null, originalSlug, theme );
-
-	if ( postId !== defaultPostId && defaultPostId ) {
-		// has customized?
-	}
 
 	// Set the post ID, once found, so that edits persist,
 	// but wait until the third inner blocks change,
@@ -79,6 +72,11 @@ export default function TemplatePartEdit( {
 		return (
 			<BlockWrapper>
 				<BlockControls>
+					<RevertToDefault
+						postId={ postId }
+						attributePostId={ _postId }
+						setAttributes={ setAttributes }
+					/>
 					<div className="wp-block-template-part__block-control-group">
 						<TemplatePartNamePanel
 							postId={ postId }
