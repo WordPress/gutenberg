@@ -143,7 +143,7 @@ function Example() {
 					setActiveItem( 'child-2' );
 					setActiveLevel( 'category' );
 				} }
-				style={ { position: 'absolute', bottom: 0 } }
+				style={ { marginTop: '24px' } }
 			>
 				Non-navigation link to Child 2
 			</Button>
