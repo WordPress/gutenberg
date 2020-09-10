@@ -75,7 +75,10 @@ const ReadableContentView = ( {
 						: styles.centeredContent,
 					style,
 					styles[ align ],
-					parentBlockAlignment === 'full' && isColumn && styles.full,
+					( parentBlockAlignment === 'full' ||
+						parentBlockAlignment === 'wide' ) &&
+						isColumn &&
+						styles.full,
 					align === WIDE_ALIGNMENTS.alignments.wide &&
 						getWideStyles(),
 				] }

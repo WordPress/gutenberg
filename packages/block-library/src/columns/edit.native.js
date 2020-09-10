@@ -30,7 +30,13 @@ import { createBlock } from '@wordpress/blocks';
  */
 import variations from './variations';
 import styles from './editor.scss';
-import { getColumnWidths } from './utils';
+import {
+	hasExplicitColumnWidths,
+	getMappedColumnWidths,
+	getRedistributedColumnWidths,
+	toWidthPrecision,
+	getColumnWidths,
+} from './utils';
 import ColumnsPreview from '../column/column-preview';
 
 /**
@@ -79,7 +85,7 @@ function ColumnsEditContainer( {
 	updateColumns,
 	columnCount,
 	isSelected,
-	onAddNextColumn,
+	//onAddNextColumn,
 	onDeleteBlock,
 	innerColumns,
 	updateInnerColumnWidth,
@@ -93,7 +99,9 @@ function ColumnsEditContainer( {
 	const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
 
 	useEffect( () => {
-		updateColumns( columnCount, newColumnCount );
+		if ( columnCount === 0 ) {
+			updateColumns( columnCount, newColumnCount );
+		}
 	}, [] );
 
 	useEffect( () => {
@@ -147,7 +155,9 @@ function ColumnsEditContainer( {
 					] }
 				>
 					<InnerBlocks.ButtonBlockAppender
-						onAddBlock={ onAddNextColumn }
+						onAddBlock={ () =>
+							updateColumns( columnCount, columnCount + 1 )
+						}
 					/>
 				</View>
 			);
@@ -242,7 +252,9 @@ function ColumnsEditContainer( {
 						horizontal={ true }
 						allowedBlocks={ ALLOWED_BLOCKS }
 						contentResizeMode="stretch"
-						onAddBlock={ onAddNextColumn }
+						onAddBlock={ () =>
+							updateColumns( columnCount, columnCount + 1 )
+						}
 						onDeleteBlock={
 							columnCount === 1 ? onDeleteBlock : undefined
 						}
@@ -302,26 +314,39 @@ const ColumnsEditContainerWrapper = withDispatch(
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
 			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
-			const { getBlocks, getBlockAttributes } = registry.select(
-				'core/block-editor'
-			);
+			const { getBlocks } = registry.select( 'core/block-editor' );
 
 			let innerBlocks = getBlocks( clientId );
+			const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
 
-			if ( isAddingColumn ) {
-				// Get verticalAlignment from Columns block to set the same to new Column
-				const { verticalAlignment } =
-					getBlockAttributes( clientId ) || {};
+			if ( isAddingColumn && hasExplicitWidths ) {
+				// If adding a new column, assign width to the new column equal to
+				// as if it were `1 / columns` of the total available space.
+				const newColumnWidth = toWidthPrecision( 100 / newColumns );
 
+				// Redistribute in consideration of pending block insertion as
+				// constraining the available working width.
+				const widths = getRedistributedColumnWidths(
+					innerBlocks,
+					100 - newColumnWidth
+				);
+
+				innerBlocks = [
+					...getMappedColumnWidths( innerBlocks, widths ),
+					...times( newColumns - previousColumns, () => {
+						return createBlock( 'core/column', {
+							width: newColumnWidth,
+						} );
+					} ),
+				];
+			} else if ( isAddingColumn ) {
 				innerBlocks = [
 					...innerBlocks,
 					...times( newColumns - previousColumns, () => {
-						return createBlock( 'core/column', {
-							verticalAlignment,
-						} );
+						return createBlock( 'core/column' );
 					} ),
 				];
 			} else {
@@ -330,6 +355,16 @@ const ColumnsEditContainerWrapper = withDispatch(
 					innerBlocks,
 					previousColumns - newColumns
 				);
+
+				if ( hasExplicitWidths ) {
+					// Redistribute as if block is already removed.
+					const widths = getRedistributedColumnWidths(
+						innerBlocks,
+						100
+					);
+
+					innerBlocks = getMappedColumnWidths( innerBlocks, widths );
+				}
 			}
 
 			replaceInnerBlocks( clientId, innerBlocks, false );
