@@ -7,7 +7,7 @@ import { View, TouchableWithoutFeedback, Text, Platform } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { check, Icon, chevronLeft, arrowLeft } from '@wordpress/icons';
+import { check, Icon, chevronLeft, arrowLeft, close } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -56,10 +56,14 @@ function BottomSheetNavigationHeader( {
 					style={ chevronLeftStyle }
 				/>
 			);
-			backText = isFullscreen ? __( 'Close' ) : __( 'Back' );
+			backText = isFullscreen ? __( 'Cancel' ) : __( 'Back' );
 		} else {
 			backIcon = (
-				<Icon icon={ arrowLeft } size={ 24 } style={ arrowLeftStyle } />
+				<Icon
+					icon={ isFullscreen ? close : arrowLeft }
+					size={ 24 }
+					style={ arrowLeftStyle }
+				/>
 			);
 		}
 
