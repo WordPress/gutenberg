@@ -29,10 +29,6 @@ const MyBlockVariationPicker = () => (
 
 ### Props
 
-#### icon
-
-The icons for each variation of the block.
-
 #### label
 
 The label of each variation of the block.
@@ -46,6 +42,8 @@ The instructions to choose a block variation.
 -   Type: `String`
 
 #### variations
+
+-   Type: `Array`
 
 The different variations of the block.
 
