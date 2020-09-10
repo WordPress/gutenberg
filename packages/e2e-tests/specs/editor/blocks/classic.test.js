@@ -104,9 +104,12 @@ describe( 'Classic', () => {
 	it( 'Should not fail after save/reload', async () => {
 		// Might move to utils if this becomes useful enough for other tests
 		const runWithoutCache = async ( cb ) => {
-			await page.setCacheEnabled( false );
-			await cb();
-			await page.setCacheEnabled( true );
+			try {
+				await page.setCacheEnabled( false );
+				await cb();
+			} finally {
+				await page.setCacheEnabled( true );
+			}
 		};
 
 		await insertBlock( 'Classic' );
