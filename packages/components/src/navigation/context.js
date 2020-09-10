@@ -11,11 +11,11 @@ import { createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { DEFAULT_LEVEL } from './constants';
+import { ROOT_LEVEL } from './constants';
 
 export const NavigationContext = createContext( {
 	activeItem: undefined,
-	activeLevel: DEFAULT_LEVEL,
+	activeLevel: ROOT_LEVEL,
 	setActiveItem: noop,
 	setActiveLevel: noop,
 } );

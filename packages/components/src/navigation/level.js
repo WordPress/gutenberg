@@ -12,13 +12,13 @@ import { Icon, chevronLeft } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useNavigationContext } from './context';
-import { DEFAULT_LEVEL } from './constants';
+import { ROOT_LEVEL } from './constants';
 import { BackButtonUI, MenuTitleUI, MenuUI } from './styles/navigation-styles';
 
 export default function NavigationLevel( {
 	children,
 	className,
-	level = DEFAULT_LEVEL,
+	level = ROOT_LEVEL,
 	parentLevel,
 	parentLevelTitle,
 	title,

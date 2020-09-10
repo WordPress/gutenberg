@@ -35,8 +35,8 @@ function Example() {
 			<Navigation
 				activeItem={ activeItem }
 				activeLevel={ activeLevel }
-				setActiveItem={ setActiveItem }
-				setActiveLevel={ setActiveLevel }
+				onActivateItem={ setActiveItem }
+				onActivateLevel={ setActiveLevel }
 			>
 				<NavigationLevel title="Home">
 					<NavigationGroup title="Group 1">

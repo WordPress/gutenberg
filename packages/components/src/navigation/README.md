@@ -73,14 +73,14 @@ The active level slug.
 
 Optional className for the `Navigation` component.
 
-### `setActiveItem`
+### `onActivateItem`
 
 -   Type: `function`
 -   Required: No
 
 Sync the active item between the external state and the Navigation's internal state.
 
-### `setActiveLevel`
+### `onActivateLevel`
 
 -   Type: `function`
 -   Required: No

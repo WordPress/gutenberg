@@ -14,30 +14,30 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  */
 import Animate from '../animate';
 import { NavigationContext } from './context';
-import { DEFAULT_LEVEL } from './constants';
+import { ROOT_LEVEL } from './constants';
 import { Root } from './styles/navigation-styles';
 
 export default function Navigation( {
 	activeItem,
-	activeLevel = DEFAULT_LEVEL,
+	activeLevel = ROOT_LEVEL,
 	children,
 	className,
-	setActiveItem = noop,
-	setActiveLevel = noop,
+	onActivateItem = noop,
+	onActivateLevel = noop,
 } ) {
 	const [ item, setItem ] = useState( activeItem );
 	const [ level, setLevel ] = useState( activeLevel );
 	const [ slideOrigin, setSlideOrigin ] = useState();
 
-	const activateItem = ( itemId ) => {
+	const setActiveItem = ( itemId ) => {
 		setItem( itemId );
-		setActiveItem( itemId );
+		onActivateItem( itemId );
 	};
 
-	const activateLevel = ( levelId, slideInOrigin = 'left' ) => {
+	const setActiveLevel = ( levelId, slideInOrigin = 'left' ) => {
 		setSlideOrigin( slideInOrigin );
 		setLevel( levelId );
-		setActiveLevel( levelId );
+		onActivateLevel( levelId );
 	};
 
 	const isMounted = useRef( false );
@@ -49,18 +49,18 @@ export default function Navigation( {
 
 	useEffect( () => {
 		if ( activeItem !== item ) {
-			activateItem( activeItem );
+			setActiveItem( activeItem );
 		}
 		if ( activeLevel !== level ) {
-			activateLevel( activeLevel );
+			setActiveLevel( activeLevel );
 		}
 	}, [ activeItem, activeLevel ] );
 
 	const context = {
 		activeItem: item,
 		activeLevel: level,
-		setActiveItem: activateItem,
-		setActiveLevel: activateLevel,
+		setActiveItem,
+		setActiveLevel,
 	};
 
 	const classes = classnames( 'components-navigation', className );
