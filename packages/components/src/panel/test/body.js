@@ -11,18 +11,20 @@ import { PanelBody } from '../body';
 const getPanelBody = ( container ) =>
 	container.querySelector( '.components-panel__body' );
 const getPanelBodyContent = ( container ) =>
-	container.querySelector( '.components-panel__body > div' );
+	container.querySelector(
+		'.components-panel__body > div:not(.components-panel__body-header)'
+	);
 const getPanelToggle = ( container ) =>
 	container.querySelector( '.components-panel__body-toggle' );
 
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render an empty section with the matching className', () => {
+		it( 'should render an empty div with the matching className', () => {
 			const { container } = render( <PanelBody /> );
 			const panelBody = getPanelBody( container );
 
 			expect( panelBody ).toBeTruthy();
-			expect( panelBody.tagName ).toBe( 'SECTION' );
+			expect( panelBody.tagName ).toBe( 'DIV' );
 		} );
 
 		it( 'should render inner content, if opened', () => {

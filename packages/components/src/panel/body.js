@@ -71,7 +71,7 @@ export function PanelBody(
 	} );
 
 	return (
-		<section className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
+		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
 			<PanelBodyHeader
 				icon={ icon }
 				isOpened={ isOpened }
@@ -80,7 +80,7 @@ export function PanelBody(
 				title={ title }
 			/>
 			{ isOpened && children }
-		</section>
+		</div>
 	);
 }
 
@@ -92,7 +92,7 @@ const PanelBodyHeader = forwardRef(
 		if ( ! title ) return null;
 
 		return (
-			<header className="components-panel__body-header">
+			<div className="components-panel__body-header">
 				<h2 className="components-panel__body-title">
 					<Button
 						className="components-panel__body-toggle"
@@ -126,7 +126,7 @@ const PanelBodyHeader = forwardRef(
 						{ summary }
 					</div>
 				) }
-			</header>
+			</div>
 		);
 	}
 );
