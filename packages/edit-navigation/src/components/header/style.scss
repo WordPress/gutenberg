@@ -1,25 +1,61 @@
 .edit-navigation-header {
+	padding: $grid-unit-20;
+	background: #f1f1f1; // Need to find a variable for this
+
+	h1 {
+		font-size: 23px;
+		font-weight: 400;
+		line-height: 1.3;
+		margin: 0 0 $grid-unit-10;
+	}
+}
+
+// Lining up all the actions in a nice row.
+.edit-navigation-header__actions {
 	align-items: center;
 	display: flex;
-	margin-top: $grid-unit-10;
+
+	// Spacing out the actions a little.
+	.edit-navigation-header__current-menu,
+	.components-dropdown {
+		margin-right: $grid-unit-20;
+	}
 }
 
-.edit-navigation-header__add-new-button {
-	margin: 0 $grid-unit-20;
+// The select menu for choosing which menu to edit.
+.edit-navigation-header__current-menu {
+	align-items: center;
+	display: flex;
+
+	// Overriding some aggressive defaults
+	.components-base-control .components-base-control__field {
+		margin: 0;
+	}
 }
 
-.edit-navigation-header__manage-locations {
-	text-align: center;
+.edit-navigation-header__save-button {
+	margin: 0 $grid-unit-15 0 auto;
+	padding-right: 24px;
+	padding-left: 24px;
+}
 
-	.components-popover__content > div {
-		padding: $grid-unit-20;
-	}
+.edit-navigation-header__add-menu-form {
+	align-items: center;
+	display: flex;
+	flex-grow: 1;
+	height: 100%;
+}
 
-	.components-base-control {
-		margin-bottom: $grid-unit-20;
+.edit-navigation-header__add-menu-name-field {
+	align-items: center;
+	display: flex;
+	height: 100%;
+}
 
-		&:last-child {
-			margin-bottom: 0;
-		}
-	}
+.components-button.edit-navigation-header__add-menu-cancel-button {
+	margin-left: auto;
+}
+
+.components-button.edit-navigation-header__add-menu-create-button {
+	margin-left: $grid-unit-20;
 }

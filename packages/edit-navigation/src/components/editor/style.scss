@@ -1,5 +1,5 @@
 .edit-navigation-editor {
-	margin-top: $grid-unit-20;
+	margin: $grid-unit-20;
 
 	@include break-medium() {
 		align-items: flex-start;
@@ -7,18 +7,18 @@
 	}
 }
 
-.edit-navigation-editor__list-view,
-.edit-navigation-editor__visual-view {
-	background: $white;
-	border-radius: 3px;
-	border: $border-width solid $gray-200;
-}
-
 .edit-navigation-editor__list-view {
-	padding: $grid-unit-10;
+	padding-left: $grid-unit-20;
+	margin-left: $grid-unit-20;
+	border-left: 1px solid $gray-200;
 
 	@include break-medium() {
 		width: 300px;
+	}
+
+	h3 {
+		font-size: 15px;
+		margin: 0;
 	}
 
 	.components-spinner {
@@ -28,12 +28,8 @@
 }
 
 .edit-navigation-editor__visual-view {
-	margin-top: $grid-unit-20;
-
 	@include break-medium() {
 		flex-grow: 1;
-		margin-left: $grid-unit-20;
-		margin-top: 0;
 	}
 
 	.components-spinner {
