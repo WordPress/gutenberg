@@ -7,6 +7,7 @@ import {
 	Dropdown,
 	ToolbarButton,
 	RangeControl,
+	TextControl,
 	FormTokenField,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -113,6 +114,13 @@ export default function QueryToolbar( { query, setQuery } ) {
 								onChange={ onTagsChange }
 							/>
 						) }
+						<TextControl
+							label={ __( 'Search' ) }
+							value={ query.search }
+							onChange={ ( value ) =>
+								setQuery( { search: value } )
+							}
+						/>
 					</>
 				) }
 			/>
