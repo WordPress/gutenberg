@@ -301,7 +301,6 @@ result that appears. It then waits briefly for the block list to update.
 _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
--   _xPath_ `[string]`: The xPath to the button.
 
 <a name="insertPattern" href="#insertPattern">#</a> **insertPattern**
 

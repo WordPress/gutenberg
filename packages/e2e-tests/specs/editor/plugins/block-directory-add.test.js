@@ -7,7 +7,6 @@ import {
 	setUpResponseMocking,
 	getEditedPostContent,
 	createJSONResponse,
-	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 // Urls to mock
@@ -178,10 +177,16 @@ describe( 'adding blocks from block directory', () => {
 		// Setup our mocks
 		await setUpResponseMocking( MOCK_BLOCKS_RESPONSES );
 
-		await insertBlock(
-			MOCK_BLOCK1.title,
-			`//ul[@class="block-directory-downloadable-blocks-list"]//button[text()="Add block"]`
+		// Search for the block via the inserter
+		await searchForBlock( MOCK_BLOCK1.title );
+
+		// Grab the first block in the list -> Needs to be the first one, the mock response expects it.
+		const addBtn = await page.waitForSelector(
+			'.block-directory-downloadable-blocks-list li:first-child button'
 		);
+
+		// Add the block
+		await addBtn.click();
 
 		await page.waitForSelector( `div[data-type="${ MOCK_BLOCK1.name }"]` );
 

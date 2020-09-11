@@ -113,21 +113,14 @@ export async function searchForReusableBlock( searchTerm ) {
  * result that appears. It then waits briefly for the block list to update.
  *
  * @param {string} searchTerm The text to search the inserter for.
- * @param {string} [xPath] The xPath to the button.
  */
-export async function insertBlock( searchTerm, xPath = undefined ) {
+export async function insertBlock( searchTerm ) {
 	await searchForBlock( searchTerm );
-	const insertButton = await page.waitForXPath(
-		xPath || `//button//span[contains(text(), '${ searchTerm }')]`
-	);
+	const insertButton = (
+		await page.$x( `//button//span[contains(text(), '${ searchTerm }')]` )
+	 )[ 0 ];
 	await insertButton.click();
-
-	// We should wait until the inserter closes
-	await page.waitForSelector( '.block-editor-inserter__menu', {
-		hidden: true,
-	} );
-
-	// We should wait until the focus moves to the content.
+	// We should wait until the inserter closes and the focus moves to the content.
 	await page.waitForFunction( () =>
 		document.body
 			.querySelector( '.block-editor-block-list__layout' )
