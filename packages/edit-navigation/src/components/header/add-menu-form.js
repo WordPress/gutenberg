@@ -59,19 +59,13 @@ export default function AddMenuForm( { menus, onCreate } ) {
 	};
 
 	return (
-		<form
-			className="edit-navigation-header__add-menu-form"
-			onSubmit={ createMenu }
-		>
+		<form onSubmit={ createMenu }>
 			<TextControl
-				className="edit-navigation-header__add-menu-name-field"
 				// Disable reason: The name field should receive focus when
 				// component mounts.
 				// eslint-disable-next-line jsx-a11y/no-autofocus
 				autoFocus
-				label={ __( 'New menu name' ) }
-				placeholder={ __( 'New menu name' ) }
-				hideLabelFromVision
+				label={ __( 'Menu name' ) }
 				value={ menuName }
 				onChange={ setMenuName }
 			/>

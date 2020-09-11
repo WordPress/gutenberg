@@ -39,19 +39,6 @@
 	padding-left: $grid-unit-30;
 }
 
-.edit-navigation-header__add-menu-form {
-	align-items: center;
-	display: flex;
-	flex-grow: 1;
-	height: 100%;
-}
-
-.edit-navigation-header__add-menu-name-field {
-	align-items: center;
-	display: flex;
-	height: 100%;
-}
-
 .components-button.edit-navigation-header__add-menu-create-button {
-	margin-left: $grid-unit-20;
+	margin-top: $grid-unit-10;
 }
