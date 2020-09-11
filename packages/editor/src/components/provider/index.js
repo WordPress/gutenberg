@@ -160,8 +160,6 @@ class EditorProvider extends Component {
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
-				'__experimentalEnableCustomSpacing',
-				'__experimentalEnableLinkColor',
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalFeatures',

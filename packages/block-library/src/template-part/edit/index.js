@@ -7,6 +7,9 @@ import {
 	BlockControls,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
+import { Dropdown, ToolbarButton } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { chevronUp, chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,6 +18,7 @@ import useTemplatePartPost from './use-template-part-post';
 import TemplatePartNamePanel from './name-panel';
 import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
+import TemplatePartSelection from './selection';
 
 export default function TemplatePartEdit( {
 	attributes: { postId: _postId, slug, theme, tagName },
@@ -67,10 +71,34 @@ export default function TemplatePartEdit( {
 		return (
 			<BlockWrapper>
 				<BlockControls>
-					<TemplatePartNamePanel
-						postId={ postId }
-						setAttributes={ setAttributes }
-					/>
+					<div className="wp-block-template-part__block-control-group">
+						<TemplatePartNamePanel
+							postId={ postId }
+							setAttributes={ setAttributes }
+						/>
+						<Dropdown
+							className="wp-block-template-part__preview-dropdown-button"
+							contentClassName="wp-block-template-part__preview-dropdown-content"
+							position="bottom right left"
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<ToolbarButton
+									aria-expanded={ isOpen }
+									icon={ isOpen ? chevronUp : chevronDown }
+									label={ __( 'Choose another' ) }
+									onClick={ onToggle }
+									// Disable when open to prevent odd FireFox bug causing reopening.
+									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
+									disabled={ isOpen }
+								/>
+							) }
+							renderContent={ ( { onClose } ) => (
+								<TemplatePartSelection
+									setAttributes={ setAttributes }
+									onClose={ onClose }
+								/>
+							) }
+						/>
+					</div>
 				</BlockControls>
 				<TemplatePartInnerBlocks
 					postId={ postId }

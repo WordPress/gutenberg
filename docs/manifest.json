@@ -474,6 +474,12 @@
 		"parent": "tutorials"
 	},
 	{
+		"title": "How to setup local WordPress environment on Ubuntu",
+		"slug": "docker-ubuntu",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/devenv/docker-ubuntu.md",
+		"parent": "devenv"
+	},
+	{
 		"title": "Getting Started with JavaScript",
 		"slug": "javascript",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/javascript/readme.md",
@@ -1053,6 +1059,12 @@
 		"title": "NavigableContainer",
 		"slug": "navigable-container",
 		"markdown_source": "../packages/components/src/navigable-container/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Navigation",
+		"slug": "navigation",
+		"markdown_source": "../packages/components/src/navigation/README.md",
 		"parent": "components"
 	},
 	{

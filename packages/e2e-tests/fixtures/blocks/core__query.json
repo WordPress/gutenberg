@@ -11,7 +11,9 @@
 				"categoryIds": [],
 				"tagIds": [],
 				"order": "desc",
-				"orderBy": "date"
+				"orderBy": "date",
+				"author": "",
+				"search": ""
 			}
 		},
 		"innerBlocks": [],
