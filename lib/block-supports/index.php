@@ -112,7 +112,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	// and not the tag itself.
 	$start = strpos( $full_html, '<body>', 0 ) + strlen( '<body>' );
 	$end   = strpos( $full_html, '</body>', $start );
-	return substr( $full_html, $start, $end - $start );
+	return trim( substr( $full_html, $start, $end - $start ) );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 
