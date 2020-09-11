@@ -21,20 +21,22 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 
 function BlockPatternsSearchResults( { filterValue, onInsert } ) {
-	const [ patterns, , onClick ] = usePatternsState( onInsert, 'all' );
-	const currentShownPatterns = useAsyncList( patterns );
+	const [ allPatterns, , onClick ] = usePatternsState( onInsert, 'all' );
 
-	const filteredPatterns = useMemo(
-		() => searchItems( patterns, filterValue ),
-		[ filterValue, patterns ]
-	);
+	const [ currentfilteredPatterns, setfilteredPatterns ] = useState( [] );
+
+	useEffect( () => {
+		setfilteredPatterns( searchItems( allPatterns, filterValue ) );
+	}, [ filterValue ] );
+
+	const currentShownPatterns = useAsyncList( currentfilteredPatterns );
 
 	if ( filterValue ) {
-		return !! filteredPatterns.length ? (
+		return !! currentfilteredPatterns.length ? (
 			<InserterPanel title={ __( 'Search Results' ) }>
 				<BlockPatternList
 					shownPatterns={ currentShownPatterns }
-					blockPatterns={ filteredPatterns }
+					blockPatterns={ currentfilteredPatterns }
 					onClickPattern={ onClick }
 				/>
 			</InserterPanel>
