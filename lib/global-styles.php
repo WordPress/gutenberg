@@ -552,10 +552,10 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 				$core[ $block_name ]['features'][ $subtree ],
 				$theme[ $block_name ]['features'][ $subtree ],
 			);
-		}
-		foreach ( $user[ $block_name ]['features'] as $key => $values ) {
-			if ( ! empty( $values ) ) {
-				$result[ $block_name ]['features'][ $key ] = $user[ $block_name ]['features'][ $key ];
+			foreach ( $user[ $block_name ]['features'][ $subtree ] as $key => $values ) {
+				if ( ! empty( $values ) ) {
+					$result[ $block_name ]['features'][ $subtree ][ $key ] = $user[ $block_name ]['features'][ $subtree ][ $key ];
+				}
 			}
 		}
 
@@ -564,10 +564,10 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 				$core[ $block_name ]['styles'][ $subtree ],
 				$theme[ $block_name ]['styles'][ $subtree ],
 			);
-		}
-		foreach ( $user[ $block_name ]['styles'] as $key => $values ) {
-			if ( ! empty( $values ) ) {
-				$result[ $block_name ]['styles'][ $key ] = $user[ $block_name ]['styles'][ $key ];
+			foreach ( $user[ $block_name ]['styles'][ $subtree ] as $key => $values ) {
+				if ( ! empty( $values ) ) {
+					$result[ $block_name ]['styles'][ $subtree ][ $key ] = $user[ $block_name ]['styles'][ $subtree ][ $key ];
+				}
 			}
 		}
 	}
