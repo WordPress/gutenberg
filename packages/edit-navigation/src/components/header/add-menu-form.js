@@ -71,7 +71,7 @@ export default function AddMenuForm( { menus, onCreate } ) {
 			/>
 
 			<Button
-				className="edit-navigation-header__add-menu-create-button"
+				className="edit-navigation-header__create-menu-button"
 				type="submit"
 				isPrimary
 				disabled={ ! menuName.length }

@@ -69,8 +69,8 @@ export default function Layout( { blockEditorSettings } ) {
 								} }
 							>
 								<Toolbar
-									menus={ menus }
-									selectedMenuId={ selectedMenuId }
+									isPending={ ! navigationPost }
+									navigationPost={ navigationPost }
 								/>
 								<Editor
 									isPending={ ! navigationPost }

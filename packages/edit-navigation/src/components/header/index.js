@@ -27,7 +27,6 @@ export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
 				{ menus ? (
 					<div className="edit-navigation-header__current-menu">
 						<SelectControl
-							className="edit-navigation-toolbar__menu-select"
 							label={ __( 'Currently editing' ) }
 							hideLabelFromVision={ isMobileViewport }
 							disabled={ ! menus.length }

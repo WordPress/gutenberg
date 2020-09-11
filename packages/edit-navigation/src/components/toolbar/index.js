@@ -11,10 +11,12 @@ import { NavigableToolbar, BlockToolbar } from '@wordpress/block-editor';
 import SaveButton from './save-button';
 import BlockInspectorDropdown from './block-inspector-dropdown';
 
-export default function Toolbar( { menus, selectedMenuId } ) {
+export default function Toolbar( { isPending, navigationPost } ) {
 	return (
 		<div className="edit-navigation-toolbar">
-			{ menus ? (
+			{ isPending ? (
+				<Spinner />
+			) : (
 				<>
 					<NavigableToolbar
 						className="edit-navigation-toolbar__block-tools"
@@ -27,10 +29,8 @@ export default function Toolbar( { menus, selectedMenuId } ) {
 					</NavigableToolbar>
 					<Popover.Slot name="block-toolbar" />
 					<BlockInspectorDropdown />
-					<SaveButton menuId={ selectedMenuId } />
+					<SaveButton navigationPost={ navigationPost } />
 				</>
-			) : (
-				<Spinner />
 			) }
 		</div>
 	);
