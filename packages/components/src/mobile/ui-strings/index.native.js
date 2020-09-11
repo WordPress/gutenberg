@@ -1,32 +1,23 @@
-// let strings = {}
-
-// export function getString( key ) {
-//     console.log("Requestiong key: ", key, strings);
-//     return strings[key];
-// }
-
-// export const addStrings = ( newStrings ) => {
-//     strings = { ...strings, ...newStrings };
-//     console.log("New String: ", strings);
-// };
-
 /**
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
 
+const stringsToAdd = [];
+
+export const addStrings = ( newStrings ) => stringsToAdd.unshift( newStrings );
+
+const getStrings = () =>
+	stringsToAdd.reduce( ( previous, current ) => {
+		return { ...previous, ...current() };
+	}, {} );
+
 export const UIStringsContext = createContext( {} );
 
-export const useUIStrings = () => {
-	const uiStrings = useContext( UIStringsContext );
-
-	return uiStrings;
-};
+export const useUIStrings = () => useContext( UIStringsContext );
 
 export const withUIStrings = ( WrappedComponent ) => ( props ) => (
 	<UIStringsContext.Consumer>
-		{ ( uiStrings ) => (
-			<WrappedComponent { ...props } uiStrings={ uiStrings } />
-		) }
+		{ () => <WrappedComponent { ...props } uiStrings={ getStrings() } /> }
 	</UIStringsContext.Consumer>
 );

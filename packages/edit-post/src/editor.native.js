@@ -142,11 +142,9 @@ class Editor extends Component {
 			meta: [],
 		};
 
-		console.log( '---> Strings in EDITOR: ', props );
-
 		return (
 			<SlotFillProvider>
-				<UIStringsContext.Provider value={ this.props.uiStrings || {} }>
+				<UIStringsContext.Provider>
 					<EditorProvider
 						settings={ editorSettings }
 						post={ normalizedPost }
