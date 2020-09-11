@@ -22,7 +22,7 @@ export default function AutoAddPagesPanel( { menuId } ) {
 	const { saveMenu } = useDispatch( 'core' );
 
 	return (
-		<PanelBody className="edit-navigation-inspector-additions__auto-add-pages-panel">
+		<PanelBody>
 			<CheckboxControl
 				label={ __( 'Automatically add new top-level pages' ) }
 				checked={ autoAddPages ?? false }
