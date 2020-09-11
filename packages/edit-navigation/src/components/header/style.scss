@@ -33,12 +33,11 @@
 	}
 }
 
-.edit-navigation-header__save-button {
-	margin: 0 $grid-unit-15 0 auto;
-	padding-right: $grid-unit-30;
-	padding-left: $grid-unit-30;
+.edit-navigation-header__add-menu-create-button {
+	margin-top: $grid-unit-10;
 }
 
-.components-button.edit-navigation-header__add-menu-create-button {
-	margin-top: $grid-unit-10;
+.edit-navigation-header__manage-locations .components-spinner {
+	display: block;
+	margin: $grid-unit-20 auto;
 }

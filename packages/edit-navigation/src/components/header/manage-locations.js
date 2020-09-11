@@ -34,7 +34,7 @@ export default function ManageLocations() {
 			labelPosition="top"
 			value={ menuLocation.menu }
 			options={ [
-				{ value: 0, label: __( '— Select navigation —' ) },
+				{ value: 0, label: __( '-' ) },
 				...menus.map( ( menu ) => ( {
 					value: menu.id,
 					label: menu.name,

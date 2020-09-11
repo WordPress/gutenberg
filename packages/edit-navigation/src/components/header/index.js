@@ -51,7 +51,6 @@ export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
 				) }
 
 				<Dropdown
-					contentClassName="edit-navigation-header__add-new-form"
 					position="bottom center"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
