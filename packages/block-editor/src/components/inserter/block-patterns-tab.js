@@ -77,6 +77,9 @@ function BlockPatternsCategory( {
 		if (
 			allPatterns.some(
 				( pattern ) => getPatternIndex( pattern ) === Infinity
+			) &&
+			! allCategories.find(
+				( category ) => category.name === 'uncategorized'
 			)
 		) {
 			allCategories.push( {
