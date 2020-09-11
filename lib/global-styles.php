@@ -492,6 +492,16 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 	$css_rule         = '';
 	$css_declarations = '';
 
+	// Transformations for block-supports strings.
+	foreach ( $block_supports as $block_support ) {
+		// Convert camelCase to kebab-case and add to array.
+		$block_supports[] = strtolower( preg_replace( '/([a-z0-9]|(?=[A-Z]))([A-Z])/', '$1-$2', $block_support ) );
+	}
+	// When adding the kebab-case supports, we didn't check if the item exists in the array
+	// to avoid constly in_array() calls. We'll need to remove the duplicates here.
+	// This is the same as array_unique(), but faster.
+	$block_support = array_flip( array_flip( $block_supports ) );
+
 	foreach ( $block_styles as $property => $value ) {
 		// Only convert to CSS:
 		//
