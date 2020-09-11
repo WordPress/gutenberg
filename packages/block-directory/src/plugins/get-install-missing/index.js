@@ -12,8 +12,10 @@ import { Warning } from '@wordpress/block-editor';
  */
 import InstallButton from './install-button';
 
-const filterMissing = ( OriginalComponent ) => ( props ) => {
+const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 	const { originalName, originalUndelimitedContent } = props.attributes;
+	// Disable reason: This is a valid component, but it's mistaken for a callback.
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const { block, hasPermission } = useSelect(
 		( select ) => {
 			const { getDownloadableBlocks } = select( 'core/block-directory' );
@@ -63,4 +65,4 @@ const filterMissing = ( OriginalComponent ) => ( props ) => {
 	);
 };
 
-export default filterMissing;
+export default getInstallMissing;
