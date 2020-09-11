@@ -28,11 +28,9 @@ export default function Header( {
 			<div className="edit-navigation-header__actions">
 				{ menus ? (
 					<div className="edit-navigation-header__current-menu">
-						<p>{ __( 'Currently editing' ) }</p>
 						<SelectControl
 							className="edit-navigation-toolbar__menu-select"
 							label={ __( 'Currently editing' ) }
-							hideLabelFromVision
 							disabled={ ! menus.length }
 							value={ selectedMenuId ?? 0 }
 							options={
