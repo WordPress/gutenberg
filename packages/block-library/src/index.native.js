@@ -181,6 +181,46 @@ addFilter(
 	}
 );
 
+const blockList = [
+	paragraph,
+	heading,
+	devOnly( code ),
+	missing,
+	more,
+	image,
+	video,
+	nextpage,
+	separator,
+	list,
+	quote,
+	mediaText,
+	preformatted,
+	gallery,
+	columns,
+	column,
+	group,
+	classic,
+	button,
+	spacer,
+	shortcode,
+	buttons,
+	latestPosts,
+	verse,
+	cover,
+	socialLink,
+	socialLinks,
+	pullquote,
+];
+
+export const blockNames = blockList.map( ( block ) => block.name );
+
+console.log( `blockNames: ${ blockNames }` );
+// prints "blockNames: core/paragraph,core/heading,core/code,core/missing,core/more,core/image,
+// core/video,core/nextpage,core/separator,core/list,core/quote,core/media-text,core/preformatted,
+// core/gallery,core/columns,core/column,core/group,core/freeform,core/button,core/spacer,
+// core/shortcode,core/buttons,core/latest-posts,core/verse,core/cover,core/social-link,
+// core/social-links,core/pullquote"
+
 /**
  * Function to register core blocks provided by the block editor.
  *
@@ -192,38 +232,7 @@ addFilter(
  * ```
  */
 export const registerCoreBlocks = () => {
-	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
-	[
-		paragraph,
-		heading,
-		devOnly( code ),
-		missing,
-		more,
-		image,
-		video,
-		nextpage,
-		separator,
-		list,
-		quote,
-		mediaText,
-		preformatted,
-		gallery,
-		columns,
-		column,
-		group,
-		classic,
-		button,
-		spacer,
-		shortcode,
-		buttons,
-		latestPosts,
-		verse,
-		cover,
-		socialLink,
-		socialLinks,
-		pullquote,
-	].forEach( registerBlock );
-
+	blockList.forEach( registerBlock );
 	registerBlockVariations( socialLink );
 	setDefaultBlockName( paragraph.name );
 	setFreeformContentHandlerName( classic.name );
