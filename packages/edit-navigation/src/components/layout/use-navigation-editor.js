@@ -23,16 +23,9 @@ export default function useNavigationEditor() {
 		)
 	);
 
-	const [ isAddingMenu, setIsAddingMenu ] = useState( false );
-
 	const selectMenu = ( menuId ) => {
 		setSelectedMenuId( menuId );
-		setIsAddingMenu( false );
 	};
-
-	const beginAddingMenu = () => setIsAddingMenu( true );
-
-	const cancelAddingMenu = () => setIsAddingMenu( false );
 
 	const { deleteMenu: _deleteMenu } = useDispatch( 'core' );
 
@@ -49,10 +42,7 @@ export default function useNavigationEditor() {
 		menus,
 		selectedMenuId,
 		navigationPost,
-		isAddingMenu,
 		selectMenu,
-		beginAddingMenu,
-		cancelAddingMenu,
 		deleteMenu,
 	};
 }

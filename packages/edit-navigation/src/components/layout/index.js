@@ -31,10 +31,7 @@ export default function Layout( { blockEditorSettings } ) {
 		menus,
 		selectedMenuId,
 		navigationPost,
-		isAddingMenu,
 		selectMenu,
-		beginAddingMenu,
-		cancelAddingMenu,
 		deleteMenu,
 	} = useNavigationEditor();
 
@@ -56,12 +53,9 @@ export default function Layout( { blockEditorSettings } ) {
 
 						<div className="edit-navigation-layout">
 							<Header
-								onBeginAddingMenu={ beginAddingMenu }
 								menus={ menus }
 								selectedMenuId={ selectedMenuId }
-								isAddingMenu={ isAddingMenu }
 								onSelectMenu={ selectMenu }
-								onCancelAddingMenu={ cancelAddingMenu }
 							/>
 
 							<BlockEditorProvider

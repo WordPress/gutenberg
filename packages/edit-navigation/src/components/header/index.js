@@ -15,12 +15,7 @@ import {
 import ManageLocations from './manage-locations';
 import AddMenuForm from './add-menu-form';
 
-export default function Header( {
-	menus,
-	selectedMenuId,
-	onSelectMenu,
-	onCancelAddingMenu,
-} ) {
+export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
 	return (
 		<div className="edit-navigation-header">
 			<h1>{ __( 'Navigation' ) }</h1>
@@ -70,7 +65,6 @@ export default function Header( {
 					renderContent={ () => (
 						<AddMenuForm
 							menus={ menus }
-							onCancel={ onCancelAddingMenu }
 							onCreate={ onSelectMenu }
 						/>
 					) }
