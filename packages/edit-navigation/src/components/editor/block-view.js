@@ -6,7 +6,7 @@ import { useEffect } from '@wordpress/element';
 import { WritingFlow, ObserveTyping, BlockList } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 
-export default function VisualView( { isPending } ) {
+export default function BlockView( { isPending } ) {
 	const rootClientId = useSelect(
 		( select ) => select( 'core/block-editor' ).getBlocks()[ 0 ]?.clientId
 	);
@@ -21,7 +21,7 @@ export default function VisualView( { isPending } ) {
 	}, [ rootClientId, selectBlock ] );
 
 	return (
-		<div className="edit-navigation-editor__visual-view">
+		<div className="edit-navigation-editor__block-view">
 			{ isPending ? (
 				<Spinner />
 			) : (
