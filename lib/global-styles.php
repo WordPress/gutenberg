@@ -495,11 +495,11 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 	// Transformations for block-supports strings.
 	foreach ( $block_supports as $block_support ) {
 		// Convert camelCase to kebab-case and add to array.
+		// Don't check if the item already exists with in_array(), we will remove duplicate values outside the loop.
 		$block_supports[] = strtolower( preg_replace( '/([a-z0-9]|(?=[A-Z]))([A-Z])/', '$1-$2', $block_support ) );
 	}
-	// When adding the kebab-case supports, we didn't check if the item exists in the array
-	// to avoid constly in_array() calls. We'll need to remove the duplicates here.
-	// This is the same as array_unique(), but faster.
+	// Remove duplicate items.
+	// This is the same as array_unique(), but since the array contains only strings this is more performant.
 	$block_support = array_flip( array_flip( $block_supports ) );
 
 	foreach ( $block_styles as $property => $value ) {
