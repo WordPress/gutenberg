@@ -4,10 +4,12 @@
 	border: $border-width solid $gray-200;
 	display: flex;
 	height: $grid-unit-60 * 2;
+	padding-bottom: $grid-unit-60;
 	position: relative;
 
 	@include break-medium() {
 		height: $grid-unit-60;
+		padding-bottom: 0;
 	}
 
 	.components-spinner {
