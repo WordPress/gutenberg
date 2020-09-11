@@ -110,9 +110,9 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	// Find the <body> open/close tags. The open tag needs to be adjusted so we get inside the tag
 	// and not the tag itself.
-	$start = mb_strpos( $full_html, '<body>', 0, 'UTF-8' ) + mb_strlen( '<body>', 'UTF-8' );
-	$end   = mb_strpos( $full_html, '</body>', $start, 'UTF-8' );
-	return mb_substr( $full_html, $start, $end - $start, 'UTF-8' );
+	$start = strpos( $full_html, '<body>', 0 ) + strlen( '<body>' );
+	$end   = strpos( $full_html, '</body>', $start );
+	return substr( $full_html, $start, $end - $start );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 
