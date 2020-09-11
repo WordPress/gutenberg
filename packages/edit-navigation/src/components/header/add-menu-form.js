@@ -14,7 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
 
-export default function AddMenuForm( { menus, onCancel, onCreate } ) {
+export default function AddMenuForm( { menus, onCreate } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 
 	const { createErrorNotice, createInfoNotice } = useDispatch(
@@ -75,14 +75,6 @@ export default function AddMenuForm( { menus, onCancel, onCreate } ) {
 				value={ menuName }
 				onChange={ setMenuName }
 			/>
-
-			<Button
-				className="edit-navigation-header__add-menu-cancel-button"
-				isLink
-				onClick={ onCancel }
-			>
-				{ __( 'Cancel' ) }
-			</Button>
 
 			<Button
 				className="edit-navigation-header__add-menu-create-button"
