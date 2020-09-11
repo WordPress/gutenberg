@@ -221,8 +221,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void requestStoryCreatorLoad(final int mediaId) {
-        mGutenbergBridgeJS2Parent.requestStoryCreatorLoad(mediaId);
+    public void requestStoryCreatorLoad(ReadableArray mediaFiles, String blockId) {
+        mGutenbergBridgeJS2Parent.requestStoryCreatorLoad((savedMediaFiles, savedBlockId) ->
+                replaceBlock(savedMediaFiles, savedBlockId), mediaFiles, blockId);
     }
 
     @ReactMethod

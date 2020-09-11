@@ -49,6 +49,7 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceStoryEditedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -91,7 +92,8 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
-    private OnStoryCreatorRequestListener mOnStoryCreatorRequestListener;
+    private OnStoryCreatorLoadRequestListener mOnStoryCreatorLoadRequestListener;
+    private ReplaceStoryEditedBlockCallback mReplaceStoryEditedBlockCallback;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -146,8 +148,8 @@ public class WPAndroidGlueCode {
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
-    public interface OnStoryCreatorRequestListener {
-        void onRequestStoryCreatorLoad(int postId);
+    public interface OnStoryCreatorLoadRequestListener {
+        void onRequestStoryCreatorLoad(ArrayList<Object> mediaFiles, String blockId);
     }
 
     public interface OnImageFullscreenPreviewListener {
@@ -395,8 +397,13 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestStoryCreatorLoad(int postId) {
-                mOnStoryCreatorRequestListener.onRequestStoryCreatorLoad(postId);
+            public void requestStoryCreatorLoad(
+                    ReplaceStoryEditedBlockCallback replaceStoryEditedBlockCallback,
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                mReplaceStoryEditedBlockCallback = replaceStoryEditedBlockCallback;
+                mOnStoryCreatorLoadRequestListener.onRequestStoryCreatorLoad(mediaFiles.toArrayList(), blockId);
             }
         }, mIsDarkMode);
 
@@ -472,7 +479,7 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
                                   AddMentionUtil addMentionUtil,
                                   OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
-                                  OnStoryCreatorRequestListener onStoryCreatorRequestListener,
+                                  OnStoryCreatorLoadRequestListener onStoryCreatorLoadRequestListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -488,7 +495,7 @@ public class WPAndroidGlueCode {
         mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
         mAddMentionUtil = addMentionUtil;
         mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
-        mOnStoryCreatorRequestListener = onStoryCreatorRequestListener;
+        mOnStoryCreatorLoadRequestListener = onStoryCreatorLoadRequestListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -852,6 +859,13 @@ public class WPAndroidGlueCode {
         if (mReplaceUnsupportedBlockCallback != null) {
             mReplaceUnsupportedBlockCallback.replaceUnsupportedBlock(content, blockId);
             mReplaceUnsupportedBlockCallback = null;
+        }
+    }
+
+    public void replaceStoryEditedBlock(String mediaFiles, String blockId) {
+        if (mReplaceStoryEditedBlockCallback != null) {
+            mReplaceStoryEditedBlockCallback.replaceStoryBlock(mediaFiles, blockId);
+            mReplaceStoryEditedBlockCallback = null;
         }
     }
 

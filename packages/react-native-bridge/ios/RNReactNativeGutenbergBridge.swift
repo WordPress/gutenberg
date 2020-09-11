@@ -289,10 +289,11 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func requestStoryCreatorLoad(_ postID: Int32) {
+    func requestStoryCreatorLoad(_ mediaFilesArray: [AnyObject], blockId: String) {
         // TODO actually implement the delegate call on iOS
+        let mediaFiles = mediaFilesArray.compactMap { $0 as? String }
         // DispatchQueue.main.async {
-        //     self.delegate?.gutenbergDidRequestMediaUploadActionDialog(for: mediaID)
+        //     self.delegate?.gutenbergDidRequestStoryCreatorLoad(mediaFiles: mediaFiles, blockId: blockId)
         // }
     }
 }

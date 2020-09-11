@@ -38,6 +38,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void replaceUnsupportedBlock(String content, String blockId);
     }
 
+    interface ReplaceStoryEditedBlockCallback {
+        void replaceStoryBlock(String mediaFiles, String blockId);
+    }
+
     interface StarterPageTemplatesTooltipShownCallback {
         void onRequestStarterPageTemplatesTooltipShown(boolean tooltipShown);
     }
@@ -154,5 +158,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);
 
-    void requestStoryCreatorLoad(int postId);
+    void requestStoryCreatorLoad(ReplaceStoryEditedBlockCallback replaceUnsupportedBlockCallback,
+                                                     ReadableArray mediaFiles,
+                                                     String blockId
+    );
 }
