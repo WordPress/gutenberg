@@ -3,6 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
+import { getBlockType } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
@@ -37,6 +38,16 @@ const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 		return <OriginalComponent { ...props } />;
 	}
 
+	const hasContent = !! originalUndelimitedContent;
+	const hasHTMLBlock = getBlockType( 'core/html' );
+
+	let messageHTML = sprintf(
+		/* translators: %s: block name */
+		__(
+			'Your site doesn’t include support for the %s block. You can try installing the block or remove it entirely.'
+		),
+		block.title || originalName
+	);
 	const actions = [
 		<InstallButton
 			key="install"
@@ -44,22 +55,26 @@ const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 			attributes={ props.attributes }
 			clientId={ props.clientId }
 		/>,
-		<Button key="convert" onClick={ props.convertToHTML } isLink>
-			{ __( 'Keep as HTML' ) }
-		</Button>,
 	];
+
+	if ( hasContent && hasHTMLBlock ) {
+		messageHTML = sprintf(
+			/* translators: %s: block name */
+			__(
+				'Your site doesn’t include support for the %s block. You can try installing the block, convert it to a Custom HTML block, or remove it entirely.'
+			),
+			block.title || originalName
+		);
+		actions.push(
+			<Button key="convert" onClick={ props.convertToHTML } isLink>
+				{ __( 'Keep as HTML' ) }
+			</Button>
+		);
+	}
 
 	return (
 		<>
-			<Warning actions={ actions }>
-				{ sprintf(
-					/* translators: %s: block name */
-					__(
-						'Your site doesn’t include support for the %s block. You can try installing the block, convert it to a Custom HTML block, or remove it entirely.'
-					),
-					block.title || originalName
-				) }
-			</Warning>
+			<Warning actions={ actions }>{ messageHTML }</Warning>
 			<RawHTML>{ originalUndelimitedContent }</RawHTML>
 		</>
 	);
