@@ -32,7 +32,7 @@ export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
 								menus.length
 									? menus.map( ( menu ) => ( {
 											value: menu.id,
-											label: menu.name + ' (Primary)', //Just a reminder to show the menu location, if set.
+											label: menu.name,
 									  } ) )
 									: [
 											{
