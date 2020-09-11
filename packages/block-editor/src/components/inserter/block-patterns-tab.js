@@ -27,7 +27,7 @@ function BlockPatternsSearchResults( { filterValue, onInsert } ) {
 
 	useEffect( () => {
 		setfilteredPatterns( searchItems( allPatterns, filterValue ) );
-	}, [ filterValue ] );
+	}, [ allPatterns, filterValue ] );
 
 	const currentShownPatterns = useAsyncList( currentfilteredPatterns );
 
