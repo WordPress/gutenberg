@@ -3,12 +3,7 @@
  */
 import { useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import {
-	Spinner,
-	Button,
-	SelectControl,
-	Dropdown,
-} from '@wordpress/components';
+import { Button, SelectControl, Dropdown } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,34 +19,28 @@ export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
 			<h1>{ __( 'Navigation' ) }</h1>
 
 			<div className="edit-navigation-header__actions">
-				{ menus ? (
-					<div className="edit-navigation-header__current-menu">
-						<SelectControl
-							label={ __( 'Currently editing' ) }
-							hideLabelFromVision={ isMobileViewport }
-							disabled={ ! menus.length }
-							value={ selectedMenuId ?? 0 }
-							options={
-								menus.length
-									? menus.map( ( menu ) => ( {
-											value: menu.id,
-											label: menu.name,
-									  } ) )
-									: [
-											{
-												value: 0,
-												label: __(
-													'— Select navigation —'
-												),
-											},
-									  ]
-							}
-							onChange={ onSelectMenu }
-						/>
-					</div>
-				) : (
-					<Spinner />
-				) }
+				<div className="edit-navigation-header__current-menu">
+					<SelectControl
+						label={ __( 'Currently editing' ) }
+						hideLabelFromVision={ isMobileViewport }
+						disabled={ ! menus?.length }
+						value={ selectedMenuId ?? 0 }
+						options={
+							menus?.length
+								? menus.map( ( menu ) => ( {
+										value: menu.id,
+										label: menu.name,
+								  } ) )
+								: [
+										{
+											value: 0,
+											label: '-',
+										},
+								  ]
+						}
+						onChange={ onSelectMenu }
+					/>
+				</div>
 
 				<Dropdown
 					position="bottom center"
