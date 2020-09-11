@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { CustomSelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 function PatternInserterPanel( {
@@ -15,13 +15,8 @@ function PatternInserterPanel( {
 
 		patternCategories.map( ( patternCategory ) => {
 			return options.push( {
-				key: patternCategory.name,
-				name: patternCategory.label,
-				style: {},
-				className:
-					patternCategory.name === selectedCategory.name
-						? 'is-selected'
-						: '',
+				value: patternCategory.name,
+				label: patternCategory.label,
 			} );
 		} );
 
@@ -31,8 +26,7 @@ function PatternInserterPanel( {
 	const onChangeSelect = ( selected ) => {
 		onClickCategory(
 			patternCategories.find(
-				( patternCategory ) =>
-					selected.selectedItem.key === patternCategory.name
+				( patternCategory ) => selected === patternCategory.name
 			)
 		);
 	};
@@ -40,15 +34,11 @@ function PatternInserterPanel( {
 	return (
 		<>
 			<div className="block-editor-inserter__panel-header">
-				<CustomSelectControl
-					label={ __( 'Select a Category' ) }
-					hideLabelFromVision
-					className="block-editor-inserter__panel-header-dropdown"
+				<SelectControl
+					label={ __( 'Filter patterns' ) }
+					value={ selectedCategory.name }
 					onChange={ onChangeSelect }
 					options={ categoryOptions() }
-					value={ categoryOptions().find(
-						( cat ) => cat.key === selectedCategory.name
-					) }
 				/>
 			</div>
 			<div className="block-editor-inserter__panel-content">
