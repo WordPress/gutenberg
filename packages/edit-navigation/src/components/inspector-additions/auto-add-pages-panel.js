@@ -7,7 +7,9 @@ import { PanelBody, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function AutoAddPagesPanel( { menuId } ) {
-	const menu = useSelect( ( select ) => select( 'core' ).getMenu( menuId ) );
+	const menu = useSelect( ( select ) => select( 'core' ).getMenu( menuId ), [
+		menuId,
+	] );
 
 	const [ autoAddPages, setAutoAddPages ] = useState( null );
 

@@ -5,17 +5,20 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 
 export default function useMenuNotifications( menuId ) {
-	const { lastSaveError, lastDeleteError } = useSelect( ( select ) => ( {
-		lastSaveError: select( 'core' ).getLastEntitySaveError(
-			'root',
-			'menu'
-		),
-		lastDeleteError: select( 'core' ).getLastEntityDeleteError(
-			'root',
-			'menu',
-			menuId
-		),
-	} ) );
+	const { lastSaveError, lastDeleteError } = useSelect(
+		( select ) => ( {
+			lastSaveError: select( 'core' ).getLastEntitySaveError(
+				'root',
+				'menu'
+			),
+			lastDeleteError: select( 'core' ).getLastEntityDeleteError(
+				'root',
+				'menu',
+				menuId
+			),
+		} ),
+		[ menuId ]
+	);
 
 	const { createErrorNotice } = useDispatch( 'core/notices' );
 

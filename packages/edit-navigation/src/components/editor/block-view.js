@@ -8,7 +8,8 @@ import { Spinner } from '@wordpress/components';
 
 export default function BlockView( { isPending } ) {
 	const rootClientId = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlocks()[ 0 ]?.clientId
+		( select ) => select( 'core/block-editor' ).getBlocks()[ 0 ]?.clientId,
+		[]
 	);
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );

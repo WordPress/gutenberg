@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import useMenuLocations from './use-menu-locations';
 
 export default function ManageLocations() {
-	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
+	const menus = useSelect( ( select ) => select( 'core' ).getMenus(), [] );
 
 	const [ menuLocations, assignMenuToLocation ] = useMenuLocations();
 

@@ -5,8 +5,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 
 export default function useNavigationEditor() {
-	const menus = useSelect( ( select ) =>
-		select( 'core' ).getMenus( { per_page: -1 } )
+	const menus = useSelect(
+		( select ) => select( 'core' ).getMenus( { per_page: -1 } ),
+		[]
 	);
 
 	const [ selectedMenuId, setSelectedMenuId ] = useState( null );
@@ -17,10 +18,12 @@ export default function useNavigationEditor() {
 		}
 	}, [ selectedMenuId, menus ] );
 
-	const navigationPost = useSelect( ( select ) =>
-		select( 'core/edit-navigation' ).getNavigationPostForMenu(
-			selectedMenuId
-		)
+	const navigationPost = useSelect(
+		( select ) =>
+			select( 'core/edit-navigation' ).getNavigationPostForMenu(
+				selectedMenuId
+			),
+		[ selectedMenuId ]
 	);
 
 	const selectMenu = ( menuId ) => {
