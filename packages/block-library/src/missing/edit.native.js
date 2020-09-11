@@ -166,7 +166,7 @@ export class UnsupportedBlockEdit extends Component {
 							label={
 								this.props.uiStrings[
 									'missing-block-action-button'
-								] ?? __( 'Edit block in web browser' )
+								] ?? __( 'Edit using web editor' )
 							}
 							separatorType="topFullWidth"
 							onPress={ this.requestFallback }
