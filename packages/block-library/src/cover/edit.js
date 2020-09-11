@@ -514,7 +514,7 @@ function CoverEdit( {
 				{ isImageBackground && ! hasParallax && (
 					<img
 						ref={ isDarkElement }
-						className="wp-block-cover__media-background"
+						className="wp-block-cover__image-background"
 						alt=""
 						src={ url }
 						style={ mediaStyle }
@@ -523,7 +523,7 @@ function CoverEdit( {
 				{ isVideoBackground && (
 					<video
 						ref={ isDarkElement }
-						className="wp-block-cover__media-background"
+						className="wp-block-cover__video-background"
 						autoPlay
 						muted
 						loop

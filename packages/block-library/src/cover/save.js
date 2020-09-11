@@ -103,7 +103,7 @@ export default function save( { attributes } ) {
 			{ isImageBackground && url && ! hasParallax && (
 				<img
 					className={ classnames(
-						'wp-block-cover__media-background',
+						'wp-block-cover__image-background',
 						id ? `wp-image-${ id }` : null
 					) }
 					alt=""
@@ -113,7 +113,7 @@ export default function save( { attributes } ) {
 			) }
 			{ isVideoBackground && url && (
 				<video
-					className="wp-block-cover__media-background"
+					className="wp-block-cover__video-background"
 					autoPlay
 					muted
 					loop
