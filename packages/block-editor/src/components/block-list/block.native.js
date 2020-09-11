@@ -91,7 +91,6 @@ class BlockListBlock extends Component {
 								mergedStyle={ mergedStyle }
 								clientId={ this.props.clientId }
 								parentWidth={ this.props.parentWidth }
-								columnsWidth={ this.props.columnsWidth }
 								contentStyle={ this.props.contentStyle }
 								onDeleteBlock={ this.props.onDeleteBlock }
 							/>

@@ -52,7 +52,7 @@ export class BlockList extends Component {
 	constructor() {
 		super( ...arguments );
 		this.extraData = {
-			columnsWidth: this.props.columnsWidth,
+			parentWidth: this.props.parentWidth,
 			renderFooterAppender: this.props.renderFooterAppender,
 			renderAppender: this.props.renderAppender,
 			onDeleteBlock: this.props.onDeleteBlock,
@@ -114,7 +114,6 @@ export class BlockList extends Component {
 	getExtraData() {
 		const {
 			parentWidth,
-			columnsWidth,
 			renderFooterAppender,
 			onDeleteBlock,
 			contentStyle,
@@ -122,7 +121,6 @@ export class BlockList extends Component {
 		} = this.props;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
-			this.extraData.columnsWidth !== columnsWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
@@ -130,7 +128,6 @@ export class BlockList extends Component {
 		) {
 			this.extraData = {
 				parentWidth,
-				columnsWidth,
 				renderFooterAppender,
 				onDeleteBlock,
 				contentStyle,
@@ -266,7 +263,6 @@ export class BlockList extends Component {
 			rootClientId,
 			isStackedHorizontally,
 			parentWidth,
-			columnsWidth,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 			__experimentalItemCallback,
@@ -277,7 +273,6 @@ export class BlockList extends Component {
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				parentWidth={ parentWidth }
-				columnsWidth={ columnsWidth }
 				contentResizeMode={ contentResizeMode }
 				contentStyle={ contentStyle }
 				onAddBlock={ onAddBlock }
