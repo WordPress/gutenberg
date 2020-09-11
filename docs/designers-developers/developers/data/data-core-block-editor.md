@@ -1139,7 +1139,7 @@ a new position.
 
 _Parameters_
 
--   _clientIds_ `?string`: The client IDs of the blocks.
+-   _clientIds_ `?Array<string>`: The client IDs of the blocks.
 -   _fromRootClientId_ `?string`: Root client ID source.
 -   _toRootClientId_ `?string`: Root client ID destination.
 -   _index_ `number`: The index to move the blocks to.
