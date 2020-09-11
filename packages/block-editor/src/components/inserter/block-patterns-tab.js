@@ -56,7 +56,7 @@ function BlockPatternsCategory( {
 		selectedCategory
 	);
 
-	const [ currentCategorypatterns, setCategoryPatterns ] = useState( [] );
+	const [ currentCategoryPatterns, setCategoryPatterns ] = useState( [] );
 
 	const patternCategory = selectedCategory
 		? selectedCategory
@@ -93,16 +93,16 @@ function BlockPatternsCategory( {
 
 	// Ordering the patterns is important for the async rendering.
 	const orderedPatterns = useMemo( () => {
-		return currentCategorypatterns.sort( ( a, b ) => {
+		return currentCategoryPatterns.sort( ( a, b ) => {
 			return getPatternIndex( a ) - getPatternIndex( b );
 		} );
-	}, [ currentCategorypatterns, getPatternIndex ] );
+	}, [ currentCategoryPatterns, getPatternIndex ] );
 
 	const currentShownPatterns = useAsyncList( orderedPatterns );
 
 	return (
 		<>
-			{ !! currentCategorypatterns.length && (
+			{ !! currentCategoryPatterns.length && (
 				<PatternInserterPanel
 					key={ patternCategory.name }
 					title={ patternCategory.title }
@@ -112,7 +112,7 @@ function BlockPatternsCategory( {
 				>
 					<BlockPatternList
 						shownPatterns={ currentShownPatterns }
-						blockPatterns={ currentCategorypatterns }
+						blockPatterns={ currentCategoryPatterns }
 						onClickPattern={ onClick }
 					/>
 				</PatternInserterPanel>
