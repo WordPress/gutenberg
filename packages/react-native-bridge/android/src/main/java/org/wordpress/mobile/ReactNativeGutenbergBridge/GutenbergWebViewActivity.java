@@ -26,8 +26,6 @@ import java.util.Locale;
 
 public class GutenbergWebViewActivity extends AppCompatActivity {
 
-    public static final String ARG_USER_ID = "authenticated_user_id";
-
     public static final String ARG_BLOCK_ID = "block_id";
     public static final String ARG_BLOCK_NAME = "block_name";
     public static final String ARG_BLOCK_CONTENT = "block_content";
@@ -38,6 +36,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private static final String JAVA_SCRIPT_INTERFACE_NAME = "wpwebkit";
 
     protected WebView mWebView;
+    protected View mForegroundView;
+    protected boolean mIsRedirected;
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +47,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         setupToolbar();
 
         mWebView = findViewById(R.id.gutenberg_web_view);
+        mForegroundView = findViewById(R.id.foreground_view);
 
         // Set settings
         WebSettings settings = mWebView.getSettings();
@@ -149,13 +150,13 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
     private void setupWebViewClient() {
         mWebView.setWebViewClient(new WebViewClient() {
-            private boolean mIsRedirected;
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // Set if page is redirected
-                if (!mIsRedirected) {
-                    mIsRedirected = true;
+                boolean shouldOverrideUrlLoading = isUrlOverridden(view, url);
+
+                if (shouldOverrideUrlLoading) {
+                    return true;
                 }
 
                 return super.shouldOverrideUrlLoading(view, url);
@@ -167,7 +168,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 String injectCssScript = getFileContentFromAssets("gutenberg-web-single-block/inject-css.js");
                 evaluateJavaScript(injectCssScript);
 
-                long userId = getIntent().getExtras().getLong(ARG_USER_ID, 0);
+                long userId = getUserId();
                 if (userId != 0) {
                     String injectLocalStorageScript = getFileContentFromAssets("gutenberg-web-single-block/local-storage-overrides.json");
                     injectLocalStorageScript = removeWhiteSpace(removeNewLines(injectLocalStorageScript));
@@ -214,7 +215,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     insertBlock = String.format(insertBlock, blockContent);
                     evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
 
-                    view.setVisibility(View.VISIBLE);
+                    // We need some extra time to hide all unwanted html elements
+                    mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
                 }, 2000);
             }
 
@@ -234,15 +236,26 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         }
     }
 
+    protected boolean isUrlOverridden(WebView view, String url) {
+        if (!mIsRedirected) {
+            mIsRedirected = true;
+        }
+
+        return false;
+    }
+
+    protected long getUserId() {
+        return 0;
+    }
+
     @Override
     public void finish() {
-        runOnUiThread(new Runnable() {
-            @Override public void run() {
-                mWebView.removeJavascriptInterface(JAVA_SCRIPT_INTERFACE_NAME);
-                mWebView.clearHistory();
-                mWebView.clearFormData();
-                mWebView.clearCache(true);
-            }
+        runOnUiThread(() -> {
+            mWebView.removeJavascriptInterface(JAVA_SCRIPT_INTERFACE_NAME);
+            mWebView.clearHistory();
+            mWebView.clearFormData();
+            mWebView.clearCache(true);
+            mWebView.clearSslPreferences();
         });
 
         super.finish();
