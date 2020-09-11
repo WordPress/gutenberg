@@ -186,27 +186,4 @@ describe( 'adding blocks from block directory', () => {
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
-
-	it( 'Should not see Block Directory results after install', async () => {
-		// Setup our mocks
-		await setUpResponseMocking( MOCK_BLOCKS_RESPONSES );
-
-		// Search for the block via the inserter
-		await searchForBlock( MOCK_BLOCK1.title );
-
-		// Grab the first block in the list -> Needs to be the first one, the mock response expects it.
-		const addBtn = await page.waitForSelector(
-			'.block-directory-downloadable-blocks-list li:first-child button'
-		);
-
-		// Add the block
-		await addBtn.click();
-
-		const hiddenBtn = await page.waitForSelector(
-			'.block-directory-downloadable-blocks-list li:first-child button',
-			{ hidden: true }
-		);
-
-		expect( hiddenBtn ).toBeNull();
-	} );
 } );
