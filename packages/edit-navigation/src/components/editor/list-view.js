@@ -13,7 +13,9 @@ export default function ListView( { isPending, blocks } ) {
 
 	return (
 		<div className="edit-navigation-editor__list-view">
-			<h3>{ __( 'List view' ) }</h3>
+			<h3 className="edit-navigation-editor__list-view-title">
+				{ __( 'List view' ) }
+			</h3>
 			{ isPending ? (
 				<Spinner />
 			) : (
