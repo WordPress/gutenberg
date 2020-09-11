@@ -206,9 +206,9 @@ $arrow-size: 8px;
 		left: 100%;
 	}
 
-	.components-popover:not([data-y-axis="middle"])[data-x-axis="right"] & {
-		margin-left: -($grid-unit-30 + $border-width);
-	}
+	//.components-popover:not([data-y-axis="middle"])[data-x-axis="right"] & {
+	//	margin-left: -($grid-unit-30 + $border-width);
+	//}
 
 	.components-popover[data-x-axis="left"] & {
 		position: absolute;
