@@ -52,6 +52,17 @@ async function toggleGlobalBlockInserter() {
 }
 
 /**
+ * Retrieves the document container by css class and checks to make sure the document's active element is within it
+ */
+async function waitForInserterCloseAndContentFocus() {
+	await page.waitForFunction( () =>
+		document.body
+			.querySelector( '.block-editor-block-list__layout' )
+			.contains( document.activeElement )
+	);
+}
+
+/**
  * Search for block in the global inserter
  *
  * @param {string} searchTerm The text to search the inserter for.
@@ -121,11 +132,7 @@ export async function insertBlock( searchTerm ) {
 	 )[ 0 ];
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
-	await page.waitForFunction( () =>
-		document.body
-			.querySelector( '.block-editor-block-list__layout' )
-			.contains( document.activeElement )
-	);
+	await waitForInserterCloseAndContentFocus();
 }
 
 /**
@@ -143,11 +150,7 @@ export async function insertPattern( searchTerm ) {
 	 )[ 0 ];
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
-	await page.waitForFunction( () =>
-		document.body
-			.querySelector( '.block-editor-block-list__layout' )
-			.contains( document.activeElement )
-	);
+	await waitForInserterCloseAndContentFocus();
 }
 
 /**
@@ -164,9 +167,24 @@ export async function insertReusableBlock( searchTerm ) {
 	 )[ 0 ];
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
-	await page.waitForFunction( () =>
-		document.body
-			.querySelector( '.block-editor-block-list__layout' )
-			.contains( document.activeElement )
+	await waitForInserterCloseAndContentFocus();
+}
+
+/**
+ * Opens the inserter, searches for the given block, then selects the
+ * first result that appears from the block directory. It then waits briefly for the block list to
+ * update.
+ *
+ * @param {string} searchTerm The text to search the inserter for.
+ */
+export async function insertBlockDirectoryBlock( searchTerm ) {
+	await searchForBlock( searchTerm );
+
+	// Grab the first block in the list
+	const insertButton = await page.waitForSelector(
+		'.block-directory-downloadable-blocks-list li:first-child button'
 	);
+	await insertButton.click();
+	// We should wait until the inserter closes and the focus moves to the content.
+	await waitForInserterCloseAndContentFocus();
 }
