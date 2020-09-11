@@ -129,7 +129,8 @@
 				"dropCap": true
 			},
 			"color": {
-				"custom": true
+				"custom": true,
+				"link": false
 			},
 			"gradient": {
 				"custom": true

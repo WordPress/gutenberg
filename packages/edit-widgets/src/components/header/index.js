@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { NavigableMenu } from '@wordpress/components';
+import { ToolbarItem } from '@wordpress/components';
 import {
 	BlockNavigationDropdown,
 	BlockToolbar,
 	Inserter,
+	NavigableToolbar,
 } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
@@ -33,17 +34,27 @@ function Header( { isCustomizer } ) {
 	return (
 		<>
 			<div className="edit-widgets-header">
-				<NavigableMenu>
-					<Inserter
-						position="bottom right"
-						showInserterHelpPanel
-						toggleProps={ inserterToggleProps }
-						rootClientId={ rootClientId }
-					/>
-					<UndoButton />
-					<RedoButton />
-					<BlockNavigationDropdown />
-				</NavigableMenu>
+				<NavigableToolbar
+					className="edit-widgets-header-toolbar"
+					aria-label={ __( 'Document tools' ) }
+				>
+					<ToolbarItem>
+						{ ( toolbarItemProps ) => (
+							<Inserter
+								position="bottom right"
+								showInserterHelpPanel
+								toggleProps={ {
+									...inserterToggleProps,
+									...toolbarItemProps,
+								} }
+								rootClientId={ rootClientId }
+							/>
+						) }
+					</ToolbarItem>
+					<ToolbarItem as={ UndoButton } />
+					<ToolbarItem as={ RedoButton } />
+					<ToolbarItem as={ BlockNavigationDropdown } />
+				</NavigableToolbar>
 				{ ! isCustomizer && (
 					<h1 className="edit-widgets-header__title">
 						{ __( 'Block Areas' ) }

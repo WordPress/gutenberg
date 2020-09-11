@@ -102,7 +102,7 @@ function gutenberg_reregister_core_block_types() {
 	$registry = WP_Block_Type_Registry::get_instance();
 
 	foreach ( $block_folders as $folder_name ) {
-		$block_json_file = $blocks_dir . '/' . $folder_name . '/block.json';
+		$block_json_file = $blocks_dir . $folder_name . '/block.json';
 		if ( ! file_exists( $block_json_file ) ) {
 			return;
 		}
