@@ -7,7 +7,7 @@ import { fromPairs } from 'lodash';
  * WordPress dependencies
  */
 import { useMemo, useCallback, useState, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
 /**
@@ -64,13 +64,27 @@ function BlockPatternsCategory( {
 
 	useEffect( () => {
 		setCategoryPatterns(
-			allPatterns.filter(
-				( pattern ) =>
-					pattern.categories &&
-					pattern.categories.includes( patternCategory.name )
-			)
+			allPatterns.filter( ( pattern ) => {
+				return patternCategory.name === 'uncategorized'
+					? getPatternIndex( pattern ) === Infinity
+					: pattern.categories &&
+							pattern.categories.includes( patternCategory.name );
+			} )
 		);
 	}, [ selectedCategory ] );
+
+	useEffect( () => {
+		if (
+			allPatterns.some(
+				( pattern ) => getPatternIndex( pattern ) === Infinity
+			)
+		) {
+			allCategories.push( {
+				name: 'uncategorized',
+				label: _x( 'Uncategorized' ),
+			} );
+		}
+	}, [ allCategories, allPatterns ] );
 
 	const getPatternIndex = useCallback(
 		( pattern ) => {
