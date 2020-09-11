@@ -12,6 +12,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
 	subscribeUpdateTheme,
+	subscribeShowNotice,
 } from '@wordpress/react-native-bridge';
 
 /**
@@ -126,6 +127,12 @@ class NativeEditorProvider extends Component {
 				this.props.updateSettings( theme );
 			}
 		);
+
+		this.subscriptionParentShowNotice = subscribeShowNotice(
+			( payload ) => {
+				this.props.createInfoNotice( payload.message );
+			}
+		);
 	}
 
 	componentWillUnmount() {
@@ -155,6 +162,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentUpdateTheme ) {
 			this.subscriptionParentUpdateTheme.remove();
+		}
+
+		if ( this.subscriptionParentShowNotice ) {
+			this.subscriptionParentShowNotice.remove();
 		}
 	}
 
@@ -272,7 +283,9 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks, createInfoNotice } = dispatch(
+			'core/editor'
+		);
 		const {
 			updateSettings,
 			clearSelectedBlock,
@@ -287,6 +300,7 @@ export default compose( [
 			addEntities,
 			clearSelectedBlock,
 			insertBlock,
+			createInfoNotice,
 			editTitle( title ) {
 				editPost( { title } );
 			},

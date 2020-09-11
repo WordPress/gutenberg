@@ -303,6 +303,7 @@ extension RNReactNativeGutenbergBridge {
         case mediaAppend
         case updateTheme
         case replaceBlock
+        case showNotice
     }
 
     public override func supportedEvents() -> [String]! {
