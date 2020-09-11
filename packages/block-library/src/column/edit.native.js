@@ -19,7 +19,6 @@ import {
 	PanelBody,
 	RangeControl,
 	FooterMessageControl,
-	ALIGNMENT_BREAKPOINTS,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -28,9 +27,6 @@ import { __ } from '@wordpress/i18n';
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
 import { getColumnWidths } from '../columns/utils';
-
-const MIN_WIDTH = 32;
-const MARGIN = 16;
 
 function ColumnEdit( {
 	attributes,
@@ -44,7 +40,6 @@ function ColumnEdit( {
 	columnCount,
 	selectedColumnIndex,
 	parentAlignment,
-	parentWidth,
 	clientId,
 } ) {
 	const { verticalAlignment } = attributes;
@@ -65,68 +60,9 @@ function ColumnEdit( {
 		} );
 	};
 
-	const getContainerWidth = ( containerWidth ) => {
-		return (
-			2 * MARGIN + containerWidth - columnWidths.length * 2 * MARGIN - 1
-		);
-	};
-
 	const columnWidths = Object.values(
 		getColumnWidths( columns, columnCount )
 	);
-
-	const columnWidthsSum = columnWidths.reduce(
-		( acc, curr ) => acc + curr,
-		0
-	);
-
-	const attrWidthValue =
-		attributes.width || getColumnWidths( columns, columnCount )[ clientId ];
-
-	const percentageRatio = attrWidthValue / columnWidthsSum;
-
-	const minPercentageRatio = MIN_WIDTH / getContainerWidth( parentWidth );
-
-	const columnWidthsPerRatio = columnWidths.map(
-		( columnWidth ) =>
-			( columnWidth / columnWidthsSum ) * getContainerWidth( parentWidth )
-	);
-
-	const filteredColumnWidthsPerRatio = columnWidthsPerRatio.filter(
-		( columnWidthPerRatio ) => columnWidthPerRatio < MIN_WIDTH
-	);
-
-	const columnsRatio = columnWidths.map(
-		( columnWidth ) => columnWidth / columnWidthsSum
-	);
-
-	const largeColumnsWidthsSum = columnsRatio
-		.map( ( ratio, index ) => {
-			if ( ratio > minPercentageRatio ) {
-				return columnWidths[ index ];
-			}
-			return 0;
-		} )
-		.reduce( ( acc, curr ) => acc + curr, 0 );
-
-	const newParentWidth =
-		parentWidth - filteredColumnWidthsPerRatio.length * MIN_WIDTH;
-
-	const columnWidth = Math.floor(
-		percentageRatio * getContainerWidth( parentWidth )
-	);
-
-	const newColumnWidth =
-		columnWidth <= MIN_WIDTH
-			? MIN_WIDTH
-			: Math.floor(
-					( attrWidthValue / largeColumnsWidthsSum ) *
-						getContainerWidth( newParentWidth )
-			  );
-
-	const finalWidth = parentWidth > ALIGNMENT_BREAKPOINTS.medium && {
-		width: newColumnWidth,
-	};
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -137,9 +73,8 @@ function ColumnEdit( {
 							styles.columnPlaceholder,
 							styles.columnPlaceholderDark
 						),
-					contentStyle,
+					{ width: contentStyle[ clientId ] || contentStyle },
 					styles.columnPlaceholderNotSelected,
-					finalWidth,
 				] }
 			/>
 		);
@@ -180,9 +115,8 @@ function ColumnEdit( {
 			</InspectorControls>
 			<View
 				style={ [
-					contentStyle,
+					{ width: contentStyle[ clientId ] || contentStyle },
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
-					finalWidth,
 				] }
 			>
 				<InnerBlocks
