@@ -539,7 +539,7 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 	foreach ( array_keys( $core ) as $block_name ) {
 		$result[ $block_name ]['presets'] = array_merge(
 			$core[ $block_name ]['presets'],
-			$theme[ $block_name ]['presets'],
+			$theme[ $block_name ]['presets']
 		);
 		foreach ( $user[ $block_name ]['presets'] as $key => $values ) {
 			if ( ! empty( $values ) ) {
@@ -550,7 +550,7 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 		foreach ( array_keys( $core[ $block_name ]['features'] ) as $subtree ) {
 			$result[ $block_name ]['features'][ $subtree ] = array_merge(
 				$core[ $block_name ]['features'][ $subtree ],
-				$theme[ $block_name ]['features'][ $subtree ],
+				$theme[ $block_name ]['features'][ $subtree ]
 			);
 			foreach ( $user[ $block_name ]['features'][ $subtree ] as $key => $values ) {
 				if ( ! empty( $values ) ) {
@@ -562,7 +562,7 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 		foreach ( array_keys( $core[ $block_name ]['styles'] ) as $subtree ) {
 			$result[ $block_name ]['styles'][ $subtree ] = array_merge(
 				$core[ $block_name ]['styles'][ $subtree ],
-				$theme[ $block_name ]['styles'][ $subtree ],
+				$theme[ $block_name ]['styles'][ $subtree ]
 			);
 			foreach ( $user[ $block_name ]['styles'][ $subtree ] as $key => $values ) {
 				if ( ! empty( $values ) ) {
