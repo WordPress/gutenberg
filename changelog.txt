@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 8.9.3 =
+
+### Bug fixes
+
+- Show Classic block contents on load (#25162)
+
+
+= 8.9.2 =
+
+### Bug fixes
+
+- Block supports: Fix block attribute (style and class) double-encoding (#25079)
+- Restore injection of build_dropdown_script_block_core_categories() (#25026)
+- Block supports: Restore root DOMDocument save (#25028)
+
+
 = 8.9.1 =
 
 ### Bug Fixes
@@ -1194,7 +1210,7 @@ Fix action GitHub action workflow YAML syntax errors. ([23844](https://github.co
   - Granular volume mappings. ([22256](https://github.com/WordPress/gutenberg/pull/22256))
   - Add command to display Docker container logs. ([21737](https://github.com/WordPress/gutenberg/pull/21737))
   - Add a destroy command. ([21529](https://github.com/WordPress/gutenberg/pull/21529))
-- @wordpress/scripts: 
+- @wordpress/scripts:
   - Add CSS support to start and build scripts. ([21730](https://github.com/WordPress/gutenberg/pull/21730))
   - Support enabling/disabling dev tools, bundle analyzer and externals for build and start scripts. ([22310](https://github.com/WordPress/gutenberg/pull/22310)) [22426](https://github.com/WordPress/gutenberg/pull/22426)
   - Add phpunit support. ([20090](https://github.com/WordPress/gutenberg/pull/20090))
@@ -1272,7 +1288,7 @@ Fix action GitHub action workflow YAML syntax errors. ([23844](https://github.co
 - Global Styles and theme.json:
   - Implement Managed CSS for Global Styles. ([20290](https://github.com/WordPress/gutenberg/pull/20290))
   - Support theme.json in Post editor. ([22520](https://github.com/WordPress/gutenberg/pull/22520))
-- Block Directory: 
+- Block Directory:
   - Activate deactivated blocks if already installed . ([22286](https://github.com/WordPress/gutenberg/pull/22286))
   - Only support an array of assets when injecting assets. ([22289](https://github.com/WordPress/gutenberg/pull/22289))
   - Remove the author rating when none exist. ([22184](https://github.com/WordPress/gutenberg/pull/22184))
@@ -1297,11 +1313,11 @@ Fix action GitHub action workflow YAML syntax errors. ([23844](https://github.co
 
 - Avoid circular dependency issue in `AutoBlockPreview`. ([22425](https://github.com/WordPress/gutenberg/pull/22425))
 - Remove opinionated label color from `CustomSelectControl` component. ([22594](https://github.com/WordPress/gutenberg/pull/22594))
-- Image block: 
+- Image block:
   - Use hooks. ([22499](https://github.com/WordPress/gutenberg/pull/22499)) ([22277](https://github.com/WordPress/gutenberg/pull/22277))
   - Remove extra div wrapper in the editor. ([22585](https://github.com/WordPress/gutenberg/pull/22585))
 - Remove redundant condition from setting default grouping. ([22563](https://github.com/WordPress/gutenberg/pull/22563))
-- Testing: Replace require.requireActual with jest.requireActual. ([22370](https://github.com/WordPress/gutenberg/pull/22370)) 
+- Testing: Replace require.requireActual with jest.requireActual. ([22370](https://github.com/WordPress/gutenberg/pull/22370))
 - Use a light block DOM for the Cover block to map frontend markup. ([22348](https://github.com/WordPress/gutenberg/pull/22348))
 - Rename a complementary area component property. ([22336](https://github.com/WordPress/gutenberg/pull/22336))
 - Block API: WP_Block: Document attributes class property. ([22222](https://github.com/WordPress/gutenberg/pull/22222))
@@ -1378,7 +1394,7 @@ Fix action GitHub action workflow YAML syntax errors. ([23844](https://github.co
 - Remove subscription button from blog template. ([22129](https://github.com/WordPress/gutenberg/pull/22129))
 - Move the Entities Saved States from Modal to Sidebar. ([21522](https://github.com/WordPress/gutenberg/pull/21522))
 
-### API Changes 
+### API Changes
 
 - Update the Patterns API to avoid ambiguity. ([21970](https://github.com/WordPress/gutenberg/pull/21970))
 - Expose the registered pattern slugs in get_all_registered. ([21619](https://github.com/WordPress/gutenberg/pull/21619))
@@ -1507,7 +1523,7 @@ Fix action GitHub action workflow YAML syntax errors. ([23844](https://github.co
 - Enable pullquote block. ([21930](https://github.com/WordPress/gutenberg/pull/21930))
 - Merge release branch back to master for v1.27.1. ([22234](https://github.com/WordPress/gutenberg/pull/22234))
 - Wrap button blocks with buttons blocks in page templates. ([21939](https://github.com/WordPress/gutenberg/pull/21939))
-- Components: Create a separate .native entry for ToolbarItem. ([22229](https://github.com/WordPress/gutenberg/pull/22229)) 
+- Components: Create a separate .native entry for ToolbarItem. ([22229](https://github.com/WordPress/gutenberg/pull/22229))
 
 = 8.0.0 =
 
@@ -1632,7 +1648,7 @@ Fix action GitHub action workflow YAML syntax errors. ([23844](https://github.co
 ### Various
 
 - End-to-end tests:
-  - Add test for template part block creation and insertion. ([21849](https://github.com/WordPress/gutenberg/pull/21849)) 
+  - Add test for template part block creation and insertion. ([21849](https://github.com/WordPress/gutenberg/pull/21849))
   - Add test that template part block customizations are loaded from slug and theme attributes. ([21852](https://github.com/WordPress/gutenberg/pull/21852))
   - Fix tests by removing unnecessary assertions and properly install dependencies in `@wordpress/api-fetch`. ([21780](https://github.com/WordPress/gutenberg/pull/21780))
   - Add end-to-end test for pinned sidebar items. ([21652](https://github.com/WordPress/gutenberg/pull/21652))

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.23.0 (2020-09-03)
+
 ### Enhancement
 
 - Site title is now a link.
