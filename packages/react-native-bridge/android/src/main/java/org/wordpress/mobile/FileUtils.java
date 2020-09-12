@@ -42,10 +42,8 @@ public class FileUtils {
         ArrayList<String> pathList = new ArrayList<>();
         try {
             String [] list = activity.getAssets().list(path);
-            if (list.length > 0) {
-                for (String file : list) {
-                    pathList.add(path + "/" + file);
-                }
+            for (String file : list) {
+                pathList.add(path + "/" + file);
             }
         } catch (IOException e) {
             AppLog.e(AppLog.T.EDITOR, e);
