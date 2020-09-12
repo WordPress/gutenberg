@@ -104,12 +104,15 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		$block_root->setAttribute( 'style', implode( '; ', $new_styles ) . ';' );
 	}
 
-	$result = '';
-	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-	foreach ( $body_element->childNodes as $child_node ) {
-		$result .= $dom->saveHtml( $child_node );
-	}
-	return $result;
+	// Avoid using `$dom->saveHtml( $node )` because the node results may not produce consistent
+	// whitespace for PHP < 7.3. Saving the root HTML `$dom->saveHtml()` prevents this behavior.
+	$full_html = $dom->saveHtml();
+
+	// Find the <body> open/close tags. The open tag needs to be adjusted so we get inside the tag
+	// and not the tag itself.
+	$start = strpos( $full_html, '<body>', 0 ) + strlen( '<body>' );
+	$end   = strpos( $full_html, '</body>', $start );
+	return trim( substr( $full_html, $start, $end - $start ) );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 

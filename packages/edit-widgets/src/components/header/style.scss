@@ -6,6 +6,26 @@
 	padding: 0 $grid-unit-20;
 }
 
+.edit-widgets-header-toolbar {
+	border: none;
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles
+	> .components-button.has-icon,
+	> .components-dropdown > .components-button.has-icon {
+		height: $button-size;
+		min-width: $button-size;
+		padding: 6px;
+
+		&:focus:not(:disabled) {
+			box-shadow:
+				0 0 0 $border-width-focus var(--wp-admin-theme-color),
+				inset 0 0 0 $border-width $white;
+			outline: 1px solid transparent;
+		}
+	}
+}
+
 .edit-widgets-header__title {
 	font-size: 16px;
 	padding: 0 20px;

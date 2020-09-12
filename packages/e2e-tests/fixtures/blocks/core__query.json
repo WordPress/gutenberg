@@ -12,7 +12,8 @@
 				"tagIds": [],
 				"order": "desc",
 				"orderBy": "date",
-				"author": null
+				"author": "",
+				"search": ""
 			}
 		},
 		"innerBlocks": [],

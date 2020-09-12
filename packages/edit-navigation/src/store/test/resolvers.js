@@ -35,7 +35,7 @@ describe( 'getNavigationPostForMenu', () => {
 			slug: id,
 			status: 'draft',
 			type: 'page',
-			blocks: [ undefined ],
+			blocks: [],
 			meta: {
 				menuId,
 			},
