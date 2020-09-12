@@ -14,21 +14,19 @@ Block context is defined in the registered settings of a block. A block can prov
 
 A block can provide a context value by assigning a `providesContext` property in its registered settings. This is an object which maps a context name to one of the block's own attribute. The value corresponding to that attribute value is made available to descendent blocks and can be referenced by the same context name. Currently, block context only supports values derived from the block's own attributes. This could be enhanced in the future to support additional sources of context values.
 
-`record/block.json`
-
-```json
-{
-	"name": "my-plugin/record",
-	"attributes": {
-		"recordId": {
-			"type": "number"
-		}
+```js
+	attributes: {
+		recordId: {
+			type: 'number',
+		},
 	},
-	"providesContext": {
-		"my-plugin/recordId": "recordId"
-	}
-}
+
+	providesContext: {
+		'my-plugin/recordId': 'recordId',
+	},
 ```
+
+For complete example, refer below section.
 
 As seen in the above example, it is recommended that you include a namespace as part of the name of the context key so as to avoid potential conflicts with other plugins or default context values provided by WordPress. The context namespace should be specific to your plugin, and in most cases can be the same as used in the name of the block itself.
 
@@ -36,36 +34,35 @@ As seen in the above example, it is recommended that you include a namespace as 
 
 A block can inherit a context value from an ancestor provider by assigning a `usesContext` property in its registered settings. This should be assigned as an array of the context names the block seeks to inherit.
 
-`record-title/block.json`
+```js
+registerBlockType('my-plugin/record-title', {
+	title: 'Record Title',
+	category: 'widgets',
 
-```json
-{
-	"name": "my-plugin/record-title",
-	"usesContext": [ "my-plugin/recordId" ]
-}
+	usesContext: ['my-plugin/recordId'],
+
 ```
 
 ## Using Block Context
 
 Once a block has defined the context it seeks to inherit, this can be accessed in the implementation of `edit` (JavaScript) and `render_callback` (PHP). It is provided as an object (JavaScript) or associative array (PHP) of the context values which have been defined for the block. Note that a context value will only be made available if the block explicitly defines a desire to inherit that value.
 
+Note: Block Context is not available to `save`.
+
 ### JavaScript
 
-`record-title/index.js`
-
 ```js
-registerBlockType( 'my-plugin/record-title', {
-	edit( { context } ) {
-		return 'The current record ID is: ' + context[ 'my-plugin/recordId' ];
+registerBlockType('my-plugin/record-title', {
+
+	edit({ context }) {
+		return 'The record ID: ' + context['my-plugin/recordId'];
 	},
-} );
+
 ```
 
 ### PHP
 
 A block's context values are available from the `context` property of the `$block` argument passed as the third argument to the `render_callback` function.
-
-`record-title/index.php`
 
 ```php
 register_block_type( 'my-plugin/record-title', array(
@@ -74,3 +71,93 @@ register_block_type( 'my-plugin/record-title', array(
 	},
 ) );
 ```
+
+## Example
+1. Create `record` block.
+```
+npm init @wordpress/block --namespace my-plugin record
+cd record
+```
+2. Edit `src/index.js`. Insert `recordId` attribute and `providesContext` property in `registerBlockType` function and add registration of `record-title` block at the bottom. 
+
+```js
+registerBlockType('my-plugin/record', {
+
+	// ... cut ...
+
+	attributes: {
+		recordId: {
+			type: 'number',
+		},
+	},
+
+	providesContext: {
+		'my-plugin/recordId': 'recordId',
+	},
+
+	/**
+	 * @see ./edit.js
+	 */
+	edit: Edit,
+
+	/**
+	 * @see ./save.js
+	 */
+	save,
+});
+
+registerBlockType('my-plugin/record-title', {
+	title: 'Record Title',
+	category: 'widgets',
+
+	usesContext: ['my-plugin/recordId'],
+
+	edit({ context }) {
+		return 'The record ID: ' + context['my-plugin/recordId'];
+	},
+
+	save() {
+		return null;
+	}
+});
+```
+
+3. Edit `src/edit.js`. Replace `Edit` function by following code. 
+
+```js
+import { TextControl } from '@wordpress/components';
+import { InnerBlocks } from '@wordpress/block-editor';
+
+export default function Edit(props) {
+	const MY_TEMPLATE = [
+		['my-plugin/record-title', {}],
+	];
+	const { attributes: { recordId }, setAttributes } = props;
+	return (
+		<div>
+			<TextControl
+				label={__('Record ID:')}
+				value={recordId}
+				onChange={(val) => setAttributes({ recordId: Number(val) })}
+			/>
+			<InnerBlocks
+				template={MY_TEMPLATE}
+				templateLock="all"
+			/>
+		</div>
+	);
+}
+```
+
+4. Edit `src/save.js`. Replace `save` function by following code.
+
+```js
+export default function save(props) {
+	return <p>The record ID: {props.attributes.recordId}</p>;
+}
+```
+
+5. Create new post and add `record` block. If you type number in the above box, you'll see the same number is shown in below box.
+
+![Block Context Example](https://user-images.githubusercontent.com/8876600/93000215-c8570380-f561-11ea-9bd0-0b2bd0ca1752.png)
+
