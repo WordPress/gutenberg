@@ -70,6 +70,13 @@ function validateConfig( config, envLocation ) {
 			);
 		}
 	}
+
+	if ( config.phpVersion !== null && typeof config.phpVersion !== 'number' ) {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ envPrefix }phpVersion" must be null or a number.`
+		);
+	}
+
 	return config;
 }
 

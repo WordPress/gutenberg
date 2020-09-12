@@ -26,6 +26,7 @@ const md5 = require( '../md5' );
  * @property {boolean}                          detectedLocalConfig     If true, wp-env detected local config and used it.
  * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
  * @property {boolean}                          debug                   True if debug mode is enabled.
+ * @property {number}                           phpVersion              Version of PHP to use in the environments.
  */
 
 /**
