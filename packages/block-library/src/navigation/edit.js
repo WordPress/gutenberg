@@ -182,6 +182,7 @@ function Navigation( {
 							allowedBlocks={ [
 								'core/navigation-link',
 								'core/search',
+								'core/social-links',
 							] }
 							renderAppender={
 								( isImmediateParentOfSelectedBlock &&
