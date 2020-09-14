@@ -11,10 +11,9 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { Button, Spinner, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { RichText, MediaPlaceholder } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
-import { compose } from '@wordpress/compose';
 import {
 	closeSmall,
 	chevronLeft,
@@ -30,8 +29,7 @@ import { pickRelevantMediaFiles } from './shared';
 
 const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
-function GalleryImage( {
-	image,
+export default function GalleryImage( {
 	url,
 	alt,
 	id,
@@ -48,12 +46,24 @@ function GalleryImage( {
 	onMoveBackward,
 	setAttributes,
 	'aria-label': ariaLabel,
-	__unstableMarkNextChangeAsNotPersistent,
 } ) {
 	const [ captionSelected, setCaptionSelected ] = useState( false );
 	const [ isEditing, setIsEditing ] = useState( false );
 
 	const container = useRef( null );
+
+	const image = useSelect(
+		( select ) => {
+			const { getMedia } = select( 'core' );
+
+			return id ? getMedia( parseInt( id, 10 ) ) : null;
+		},
+		[ id ]
+	);
+
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		'core/block-editor'
+	);
 
 	useEffect( () => {
 		if ( image && ! url ) {
@@ -237,22 +247,3 @@ function GalleryImage( {
 		</figure>
 	);
 }
-
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const { getMedia } = select( 'core' );
-		const { id } = ownProps;
-
-		return {
-			image: id ? getMedia( parseInt( id, 10 ) ) : null,
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { __unstableMarkNextChangeAsNotPersistent } = dispatch(
-			'core/block-editor'
-		);
-		return {
-			__unstableMarkNextChangeAsNotPersistent,
-		};
-	} ),
-] )( GalleryImage );
