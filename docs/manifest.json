@@ -1,45 +1,39 @@
 [
 	{
-		"title": "Block Editor Handbook",
+		"title": "Project Overview",
 		"slug": "handbook",
 		"markdown_source": "../docs/readme.md",
-		"parent": null
-	},
-	{
-		"title": "Project Overview",
-		"slug": "principles",
-		"markdown_source": "../docs/contributors/principles.md",
 		"parent": null
 	},
 	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/designers-developers/glossary.md",
-		"parent": "principles"
+		"parent": "handbook"
 	},
 	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/designers-developers/faq.md",
-		"parent": "principles"
+		"parent": "handbook"
 	},
 	{
 		"title": "Versions in WordPress",
 		"slug": "versions-in-wordpress",
 		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
-		"parent": "principles"
+		"parent": "handbook"
 	},
 	{
 		"title": "History",
 		"slug": "history",
 		"markdown_source": "../docs/contributors/history.md",
-		"parent": "principles"
+		"parent": "handbook"
 	},
 	{
 		"title": "Outreach",
 		"slug": "outreach",
 		"markdown_source": "../docs/contributors/outreach.md",
-		"parent": "principles"
+		"parent": "handbook"
 	},
 	{
 		"title": "Architecture",
@@ -428,7 +422,7 @@
 	{
 		"title": "Blocks are the Interface",
 		"slug": "the-block",
-		"markdown_source": "../docs/contributors/principles/the-block.md",
+		"markdown_source": "../docs/contributors/the-block.md",
 		"parent": "design"
 	},
 	{

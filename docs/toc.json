@@ -1,7 +1,5 @@
 [
-	{ "docs/readme.md": [] },
-
-	{ "docs/contributors/principles.md": [
+	{ "docs/readme.md": [
 		{ "docs/designers-developers/glossary.md": [] },
 		{ "docs/designers-developers/faq.md": [] },
 		{ "docs/contributors/versions-in-wordpress.md": [] },
@@ -83,7 +81,7 @@
 			{ "docs/contributors/getting-started-native-mobile.md": [] }
 		] },
 		{ "docs/contributors/design.md": [
-			{ "docs/contributors/principles/the-block.md": [] },
+			{ "docs/contributors/the-block.md": [] },
 			{ "docs/contributors/reference.md": [] }
 		] },
 		{ "docs/contributors/document.md": [
