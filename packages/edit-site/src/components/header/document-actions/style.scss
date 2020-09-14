@@ -1,3 +1,18 @@
-.edit-site-document-actions {
-	border: 1px solid;
+.edit-site-document-actions__document_item {
+	color: $gray-700;
+	&.is-active {
+		color: inherit;
+	}
+}
+
+// Apply button hover style to text even when grayed out.
+button:hover .edit-site-document-actions__document_item {
+	color: inherit;
+	&.is-active {
+		color: inherit;
+	}
+}
+
+.edit-site-document-actions__separator {
+	padding-right: 4px;
 }

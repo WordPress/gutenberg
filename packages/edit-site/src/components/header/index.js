@@ -133,7 +133,7 @@ export default function Header( {
 			</div>
 
 			<div className="edit-site-header_center">
-				<DocumentActions />
+				<DocumentActions templateId={ templateId } />
 			</div>
 
 			<div className="edit-site-header_end">
