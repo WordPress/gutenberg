@@ -38,13 +38,6 @@ If true, the `ENTER` key press is required in order to trigger an `onChange`. If
 -   Required: No
 -   Default: `false`
 
-### isFloatingLabel
-
-If true, the `label` will render with a floating interaction.
-
--   Type: `Boolean`
--   Required: No
-
 ### hideLabelFromVision
 
 If true, the label will only be visible to screen readers.
