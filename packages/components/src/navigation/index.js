@@ -16,6 +16,7 @@ import Animate from '../animate';
 import { ROOT_MENU } from './constants';
 import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
+import { findNavigationItems, findNavigationMenus } from './children-utils';
 
 export default function Navigation( {
 	activeItem,
@@ -28,6 +29,8 @@ export default function Navigation( {
 	const [ item, setItem ] = useState( activeItem );
 	const [ menu, setMenu ] = useState( activeMenu );
 	const [ slideOrigin, setSlideOrigin ] = useState();
+	const [ navigationItems, setNavigationItems ] = useState( null );
+	const [ navigationMenus, setNavigationMenus ] = useState( null );
 
 	const setActiveItem = ( itemId ) => {
 		setItem( itemId );
@@ -57,12 +60,27 @@ export default function Navigation( {
 		}
 	}, [ activeItem, activeMenu ] );
 
+	useEffect( () => {
+		const items = findNavigationItems( children );
+		const menus = findNavigationMenus( children );
+
+		setNavigationItems( items );
+		setNavigationMenus( menus );
+	}, [] );
+
 	const context = {
 		activeItem: item,
 		activeMenu: menu,
 		setActiveItem,
 		setActiveMenu,
+		items: navigationItems,
+		menus: navigationMenus,
 	};
+
+	// Make sure menus and items are available before rendering
+	if ( ! navigationMenus || ! navigationItems ) {
+		return null;
+	}
 
 	const classes = classnames( 'components-navigation', className );
 
