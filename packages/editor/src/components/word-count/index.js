@@ -13,7 +13,11 @@ function WordCount( { content } ) {
 	 */
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
 
-	return wordCount( content, wordCountType );
+	return (
+		<span className="word-count">
+			{ wordCount( content, wordCountType ) }
+		</span>
+	);
 }
 
 export default withSelect( ( select ) => {
