@@ -262,18 +262,37 @@ function gutenberg_experimental_global_styles_get_theme() {
 }
 
 /**
+ * Convert style property to its CSS name.
+ *
+ * @param string $style_property Style property name.
+ * @return string CSS property name.
+ */
+function gutenberg_experimental_global_styles_get_css_property( $style_property ) {
+	switch ( $style_property ) {
+		case 'backgroundColor':
+			return 'background-color';
+		case 'fontSize':
+			return 'font-size';
+		case 'lineHeight':
+			return 'line-height';
+		default:
+			return $style_property;
+	}
+}
+
+/**
  * Return how the style property is structured.
  *
  * @return array Style property structure.
  */
 function gutenberg_experimental_global_styles_get_style_property() {
 	return array(
-		'line-height'              => array( 'typography', 'lineHeight' ),
-		'font-size'                => array( 'typography', 'fontSize' ),
-		'background'               => array( 'color', 'gradient' ),
-		'background-color'         => array( 'color', 'background' ),
-		'color'                    => array( 'color', 'text' ),
 		'--wp--style--color--link' => array( 'color', 'link' ),
+		'background'               => array( 'color', 'gradient' ),
+		'backgroundColor'          => array( 'color', 'background' ),
+		'color'                    => array( 'color', 'text' ),
+		'fontSize'                 => array( 'typography', 'fontSize' ),
+		'lineHeight'               => array( 'typography', 'lineHeight' ),
 	);
 }
 
@@ -285,8 +304,8 @@ function gutenberg_experimental_global_styles_get_style_property() {
 function gutenberg_experimental_global_styles_get_support_keys() {
 	return array(
 		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
-		'backgroundColor'          => array( '__experimentalColor' ),
 		'background'               => array( '__experimentalColor', 'gradients' ),
+		'backgroundColor'          => array( '__experimentalColor' ),
 		'color'                    => array( '__experimentalColor' ),
 		'fontSize'                 => array( '__experimentalFontSize' ),
 		'lineHeight'               => array( '__experimentalLineHeight' ),
@@ -489,6 +508,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
  * @return string The corresponding CSS rule.
  */
 function gutenberg_experimental_global_styles_resolver_styles( $block_selector, $block_supports, $block_styles ) {
+	$css_property     = '';
 	$css_rule         = '';
 	$css_declarations = '';
 
@@ -497,12 +517,18 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 		//
 		// 1) The style attributes the block has declared support for.
 		// 2) Any CSS custom property attached to the node.
-		if ( in_array( $property, $block_supports, true ) || strstr( $property, '--' ) ) {
+		if (
+			in_array( $property, $block_supports, true ) ||
+			strstr( $property, '--' )
+		) {
+			$css_property = gutenberg_experimental_global_styles_get_css_property( $property );
 
 			// Add whitespace if SCRIPT_DEBUG is defined and set to true.
-			$css_declarations .= ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG )
-				? "\t" . $property . ': ' . $value . ";\n"
-				: $property . ':' . $value . ';';
+			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+				$css_declarations .= "\t" . $css_property . ': ' . $value . ";\n";
+			} else {
+				$css_declarations .= $css_property . ':' . $value . ';';
+			}
 		}
 	}
 
