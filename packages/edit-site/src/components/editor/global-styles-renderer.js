@@ -1,16 +1,17 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, kebabCase } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import {
-	STYLE_PROPS,
-	PRESET_CATEGORIES,
-	LINK_COLOR_DECLARATION,
-} from './utils';
+import { PRESET_CATEGORIES, LINK_COLOR_DECLARATION } from './utils';
 
 const mergeTrees = ( baseData, userData ) => {
 	// Deep clone from base data.
@@ -56,13 +57,17 @@ export default ( blockData, baseTree, userTree ) => {
 	 */
 	const getBlockStylesDeclarations = ( blockSupports, blockStyles ) => {
 		const declarations = [];
-		Object.keys( STYLE_PROPS ).forEach( ( key ) => {
+		Object.keys( STYLE_PROPERTY ).forEach( ( key ) => {
+			const cssProperty = key.startsWith( '--' ) ? key : kebabCase( key );
 			if (
 				blockSupports.includes( key ) &&
-				get( blockStyles, STYLE_PROPS[ key ], false )
+				get( blockStyles, STYLE_PROPERTY[ key ], false )
 			) {
 				declarations.push(
-					`${ key }: ${ get( blockStyles, STYLE_PROPS[ key ] ) }`
+					`${ cssProperty }: ${ get(
+						blockStyles,
+						STYLE_PROPERTY[ key ]
+					) }`
 				);
 			}
 		} );

@@ -16,8 +16,9 @@ export default function useNavigationBlockEditor( post ) {
 	const [ blocks, onInput, _onChange ] = useEntityBlockEditor(
 		KIND,
 		POST_TYPE,
-		{ id: post.id }
+		{ id: post?.id }
 	);
+
 	const onChange = useCallback(
 		async ( updatedBlocks ) => {
 			await _onChange( updatedBlocks );

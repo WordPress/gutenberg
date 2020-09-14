@@ -47,6 +47,9 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		if ( isset( $block->context['query']['author'] ) ) {
 			$query['author'] = $block->context['query']['author'];
 		}
+		if ( isset( $block->context['query']['search'] ) ) {
+			$query['s'] = $block->context['query']['search'];
+		}
 	}
 
 	$posts = get_posts( $query );

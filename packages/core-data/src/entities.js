@@ -6,13 +6,13 @@ import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { apiFetch, __unstableSyncSelect } from '@wordpress/data-controls';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { addEntities } from './actions';
-import { apiFetch, select } from './controls';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -188,7 +188,11 @@ export const getMethodName = (
  * @return {Array} Entities
  */
 export function* getKindEntities( kind ) {
-	let entities = yield select( 'getEntitiesByKind', kind );
+	let entities = yield __unstableSyncSelect(
+		'core',
+		'getEntitiesByKind',
+		kind
+	);
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}

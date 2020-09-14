@@ -7,7 +7,10 @@ import { has, get, startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+} from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -17,7 +20,6 @@ import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { PADDING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
-import { STYLE_MAPPINGS } from './utils';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -50,7 +52,7 @@ function compileStyleValue( uncompiledValue ) {
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
-	Object.entries( STYLE_MAPPINGS ).forEach(
+	Object.entries( STYLE_PROPERTY ).forEach(
 		( [ styleKey, ...otherObjectKeys ] ) => {
 			const [ objectKeys ] = otherObjectKeys;
 
