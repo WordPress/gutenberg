@@ -7,7 +7,7 @@ import { get, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { Button, Spinner, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
@@ -30,81 +30,35 @@ import { pickRelevantMediaFiles } from './shared';
 
 const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
-class GalleryImage extends Component {
-	constructor() {
-		super( ...arguments );
+function GalleryImage( {
+	image,
+	url,
+	alt,
+	id,
+	linkTo,
+	link,
+	isFirstItem,
+	isLastItem,
+	isSelected,
+	caption,
+	sizeSlug,
+	onSelect,
+	onRemove,
+	onMoveForward,
+	onMoveBackward,
+	setAttributes,
+	'aria-label': ariaLabel,
+	__unstableMarkNextChangeAsNotPersistent,
+} ) {
+	const [ captionSelected, setCaptionSelected ] = useState( false );
+	const [ isEditing, setIsEditing ] = useState( false );
 
-		this.onSelectImage = this.onSelectImage.bind( this );
-		this.onSelectCaption = this.onSelectCaption.bind( this );
-		this.onRemoveImage = this.onRemoveImage.bind( this );
-		this.bindContainer = this.bindContainer.bind( this );
-		this.onEdit = this.onEdit.bind( this );
-		this.onSelectImageFromLibrary = this.onSelectImageFromLibrary.bind(
-			this
-		);
-		this.onSelectCustomURL = this.onSelectCustomURL.bind( this );
-		this.state = {
-			captionSelected: false,
-			isEditing: false,
-		};
-	}
+	const container = useRef( null );
 
-	bindContainer( ref ) {
-		this.container = ref;
-	}
-
-	onSelectCaption() {
-		if ( ! this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: true,
-			} );
-		}
-
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
-		}
-	}
-
-	onSelectImage() {
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
-		}
-
-		if ( this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: false,
-			} );
-		}
-	}
-
-	onRemoveImage( event ) {
-		if (
-			this.container === document.activeElement &&
-			this.props.isSelected &&
-			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
-		) {
-			event.stopPropagation();
-			event.preventDefault();
-			this.props.onRemove();
-		}
-	}
-
-	onEdit() {
-		this.setState( {
-			isEditing: true,
-		} );
-	}
-
-	componentDidUpdate( prevProps ) {
-		const {
-			isSelected,
-			image,
-			url,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = this.props;
+	useEffect( () => {
 		if ( image && ! url ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			this.props.setAttributes( {
+			setAttributes( {
 				url: image.source_url,
 				alt: image.alt_text,
 			} );
@@ -112,23 +66,46 @@ class GalleryImage extends Component {
 
 		// unselect the caption so when the user selects other image and comeback
 		// the caption is not immediately selected
-		if (
-			this.state.captionSelected &&
-			! isSelected &&
-			prevProps.isSelected
-		) {
-			this.setState( {
-				captionSelected: false,
-			} );
+		if ( captionSelected && ! isSelected ) {
+			setCaptionSelected( false );
 		}
-	}
+	}, [ isSelected, image, url ] );
 
-	deselectOnBlur() {
-		this.props.onDeselect();
-	}
+	const onSelectCaption = () => {
+		if ( ! captionSelected ) {
+			setCaptionSelected( true );
+		}
 
-	onSelectImageFromLibrary( media ) {
-		const { setAttributes, id, url, alt, caption, sizeSlug } = this.props;
+		if ( ! isSelected ) {
+			onSelect();
+		}
+	};
+
+	const onSelectImage = () => {
+		if ( ! isSelected ) {
+			onSelect();
+		}
+
+		if ( captionSelected ) {
+			setCaptionSelected( false );
+		}
+	};
+
+	const onRemoveImage = ( event ) => {
+		if (
+			container.current === document.activeElement &&
+			isSelected &&
+			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
+		) {
+			event.stopPropagation();
+			event.preventDefault();
+			onRemove();
+		}
+	};
+
+	const onEdit = () => setIsEditing( true );
+
+	const onSelectImageFromLibrary = ( media ) => {
 		if ( ! media || ! media.url ) {
 			return;
 		}
@@ -150,142 +127,115 @@ class GalleryImage extends Component {
 		}
 
 		setAttributes( mediaAttributes );
-		this.setState( {
-			isEditing: false,
-		} );
-	}
+		setIsEditing( false );
+	};
 
-	onSelectCustomURL( newURL ) {
-		const { setAttributes, url } = this.props;
+	const onSelectCustomURL = ( newURL ) => {
 		if ( newURL !== url ) {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
 			} );
-			this.setState( {
-				isEditing: false,
-			} );
+			setIsEditing( false );
 		}
+	};
+
+	let href;
+
+	switch ( linkTo ) {
+		case 'media':
+			href = url;
+			break;
+		case 'attachment':
+			href = link;
+			break;
 	}
 
-	render() {
-		const {
-			url,
-			alt,
-			id,
-			linkTo,
-			link,
-			isFirstItem,
-			isLastItem,
-			isSelected,
-			caption,
-			onRemove,
-			onMoveForward,
-			onMoveBackward,
-			setAttributes,
-			'aria-label': ariaLabel,
-		} = this.props;
-		const { isEditing } = this.state;
+	const img = (
+		// Disable reason: Image itself is not meant to be interactive, but should
+		// direct image selection and unfocus caption fields.
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+		<>
+			<img
+				src={ url }
+				alt={ alt }
+				data-id={ id }
+				onClick={ onSelectImage }
+				onFocus={ onSelectImage }
+				onKeyDown={ onRemoveImage }
+				tabIndex="0"
+				aria-label={ ariaLabel }
+				ref={ container }
+			/>
+			{ isBlobURL( url ) && <Spinner /> }
+		</>
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+	);
 
-		let href;
+	const className = classnames( {
+		'is-selected': isSelected,
+		'is-transient': isBlobURL( url ),
+	} );
 
-		switch ( linkTo ) {
-			case 'media':
-				href = url;
-				break;
-			case 'attachment':
-				href = link;
-				break;
-		}
-
-		const img = (
-			// Disable reason: Image itself is not meant to be interactive, but should
-			// direct image selection and unfocus caption fields.
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-			<>
-				<img
-					src={ url }
-					alt={ alt }
-					data-id={ id }
-					onClick={ this.onSelectImage }
-					onFocus={ this.onSelectImage }
-					onKeyDown={ this.onRemoveImage }
-					tabIndex="0"
-					aria-label={ ariaLabel }
-					ref={ this.bindContainer }
+	return (
+		<figure className={ className }>
+			{ ! isEditing && ( href ? <a href={ href }>{ img }</a> : img ) }
+			{ isEditing && (
+				<MediaPlaceholder
+					labels={ { title: __( 'Edit gallery image' ) } }
+					icon={ imageIcon }
+					onSelect={ onSelectImageFromLibrary }
+					onSelectURL={ onSelectCustomURL }
+					accept="image/*"
+					allowedTypes={ [ 'image' ] }
+					value={ { id, src: url } }
 				/>
-				{ isBlobURL( url ) && <Spinner /> }
-			</>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-		);
-
-		const className = classnames( {
-			'is-selected': isSelected,
-			'is-transient': isBlobURL( url ),
-		} );
-
-		return (
-			<figure className={ className }>
-				{ ! isEditing && ( href ? <a href={ href }>{ img }</a> : img ) }
-				{ isEditing && (
-					<MediaPlaceholder
-						labels={ { title: __( 'Edit gallery image' ) } }
-						icon={ imageIcon }
-						onSelect={ this.onSelectImageFromLibrary }
-						onSelectURL={ this.onSelectCustomURL }
-						accept="image/*"
-						allowedTypes={ [ 'image' ] }
-						value={ { id, src: url } }
-					/>
-				) }
-				<ButtonGroup className="block-library-gallery-item__inline-menu is-left">
-					<Button
-						icon={ chevronLeft }
-						onClick={ isFirstItem ? undefined : onMoveBackward }
-						label={ __( 'Move image backward' ) }
-						aria-disabled={ isFirstItem }
-						disabled={ ! isSelected }
-					/>
-					<Button
-						icon={ chevronRight }
-						onClick={ isLastItem ? undefined : onMoveForward }
-						label={ __( 'Move image forward' ) }
-						aria-disabled={ isLastItem }
-						disabled={ ! isSelected }
-					/>
-				</ButtonGroup>
-				<ButtonGroup className="block-library-gallery-item__inline-menu is-right">
-					<Button
-						icon={ edit }
-						onClick={ this.onEdit }
-						label={ __( 'Replace image' ) }
-						disabled={ ! isSelected }
-					/>
-					<Button
-						icon={ closeSmall }
-						onClick={ onRemove }
-						label={ __( 'Remove image' ) }
-						disabled={ ! isSelected }
-					/>
-				</ButtonGroup>
-				{ ! isEditing && ( isSelected || caption ) && (
-					<RichText
-						tagName="figcaption"
-						placeholder={
-							isSelected ? __( 'Write caption…' ) : null
-						}
-						value={ caption }
-						isSelected={ this.state.captionSelected }
-						onChange={ ( newCaption ) =>
-							setAttributes( { caption: newCaption } )
-						}
-						unstableOnFocus={ this.onSelectCaption }
-						inlineToolbar
-					/>
-				) }
-			</figure>
-		);
-	}
+			) }
+			<ButtonGroup className="block-library-gallery-item__inline-menu is-left">
+				<Button
+					icon={ chevronLeft }
+					onClick={ isFirstItem ? undefined : onMoveBackward }
+					label={ __( 'Move image backward' ) }
+					aria-disabled={ isFirstItem }
+					disabled={ ! isSelected }
+				/>
+				<Button
+					icon={ chevronRight }
+					onClick={ isLastItem ? undefined : onMoveForward }
+					label={ __( 'Move image forward' ) }
+					aria-disabled={ isLastItem }
+					disabled={ ! isSelected }
+				/>
+			</ButtonGroup>
+			<ButtonGroup className="block-library-gallery-item__inline-menu is-right">
+				<Button
+					icon={ edit }
+					onClick={ onEdit }
+					label={ __( 'Replace image' ) }
+					disabled={ ! isSelected }
+				/>
+				<Button
+					icon={ closeSmall }
+					onClick={ onRemove }
+					label={ __( 'Remove image' ) }
+					disabled={ ! isSelected }
+				/>
+			</ButtonGroup>
+			{ ! isEditing && ( isSelected || caption ) && (
+				<RichText
+					tagName="figcaption"
+					placeholder={ isSelected ? __( 'Write caption…' ) : null }
+					value={ caption }
+					isSelected={ captionSelected }
+					onChange={ ( newCaption ) =>
+						setAttributes( { caption: newCaption } )
+					}
+					unstableOnFocus={ onSelectCaption }
+					inlineToolbar
+				/>
+			) }
+		</figure>
+	);
 }
 
 export default compose( [
