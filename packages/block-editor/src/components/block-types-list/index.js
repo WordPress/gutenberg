@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import { Composite, useCompositeState } from 'reakit';
+
+/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,44 +19,15 @@ function BlockTypesList( {
 	onSelect,
 	onHover = () => {},
 	children,
+	label,
 } ) {
-	const normalizedItems = items.reduce( ( result, item ) => {
-		const { variations = [] } = item;
-		const hasDefaultVariation = variations.some(
-			( { isDefault } ) => isDefault
-		);
+	const composite = useCompositeState();
+	const orderId = items.reduce( ( acc, item ) => acc + '--' + item.id, '' );
 
-		// If there is no default inserter variation provided,
-		// then default block type is displayed.
-		if ( ! hasDefaultVariation ) {
-			result.push( item );
-		}
-
-		if ( variations.length ) {
-			result = result.concat(
-				variations.map( ( variation ) => {
-					return {
-						...item,
-						id: `${ item.id }-${ variation.name }`,
-						icon: variation.icon || item.icon,
-						title: variation.title || item.title,
-						description: variation.description || item.description,
-						// If `example` is explicitly undefined for the variation, the preview will not be shown.
-						example: variation.hasOwnProperty( 'example' )
-							? variation.example
-							: item.example,
-						initialAttributes: {
-							...item.initialAttributes,
-							...variation.attributes,
-						},
-						innerBlocks: variation.innerBlocks,
-					};
-				} )
-			);
-		}
-
-		return result;
-	}, [] );
+	// This ensures the composite state refreshes when the list order changes.
+	useEffect( () => {
+		composite.unstable_sort();
+	}, [ composite.unstable_sort, orderId ] );
 
 	return (
 		/*
@@ -58,8 +35,13 @@ function BlockTypesList( {
 		 * Safari+VoiceOver won't announce the list otherwise.
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<ul role="list" className="block-editor-block-types-list">
-			{ normalizedItems.map( ( item ) => {
+		<Composite
+			{ ...composite }
+			role="listbox"
+			className="block-editor-block-types-list"
+			aria-label={ label }
+		>
+			{ items.map( ( item ) => {
 				return (
 					<InserterListItem
 						key={ item.id }
@@ -75,11 +57,12 @@ function BlockTypesList( {
 						onBlur={ () => onHover( null ) }
 						isDisabled={ item.isDisabled }
 						title={ item.title }
+						composite={ composite }
 					/>
 				);
 			} ) }
 			{ children }
-		</ul>
+		</Composite>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 }

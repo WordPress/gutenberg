@@ -27,7 +27,7 @@
 }
 
 .emptyHeader {
-	margin-top: $panel-padding / 2;
+	margin-top: $grid-unit-20 / 2;
 }
 
 
@@ -46,6 +46,10 @@
 
 .content {
 	padding: 0 16px 0 16px;
+}
+
+.scrollableContent {
+	padding-bottom: 20px;
 }
 
 .head {
@@ -164,19 +168,30 @@
 	color: #c3c4c7;
 }
 
-// Unsupported Footer Cell
+// Footer Message Cell
 
-.unsupportedFooterCell {
+.footerMessageCell {
 	font-size: $text-editor-font-size;
 	color: $gray;
+	flex: 1;
 }
 
 // Color Cell
 
 .colorCircle {
-	width: 2 * $panel-padding;
-	height: 2 * $panel-padding;
-	border-radius: $panel-padding;
+	width: 2 * $grid-unit-20;
+	height: 2 * $grid-unit-20;
+	border-radius: $grid-unit-20;
+}
+
+// Radio Cell
+
+.selectedIcon {
+	color: $blue-50;
+}
+
+.selectedIconDark {
+	color: $blue-30;
 }
 
 // Navigation Header
@@ -184,8 +199,8 @@
 .bottomSheetHeader {
 	flex-direction: row;
 	align-items: center;
-	padding-right: $panel-padding;
-	padding-left: $panel-padding;
+	padding-right: $grid-unit-20;
+	padding-left: $grid-unit-20;
 	min-height: 44px;
 }
 
@@ -197,8 +212,7 @@
 
 .chevronLeftIcon {
 	color: $blue-50;
-	margin-left: -13px;
-	margin-right: -13px;
+	margin-left: -11px;
 }
 
 .chevronLeftIconDark {
@@ -236,4 +250,8 @@
 
 .arrowLeftIconDark {
 	color: $dark-secondary;
+}
+
+.flex {
+	flex: 1;
 }

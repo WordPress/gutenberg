@@ -18,7 +18,10 @@ const { getRandomTemporaryPath } = require( './utils' );
 async function clone( repositoryUrl ) {
 	const gitWorkingDirectoryPath = getRandomTemporaryPath();
 	const simpleGit = SimpleGit();
-	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath );
+	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath, [
+		'--depth=1',
+		'--no-single-branch',
+	] );
 	return gitWorkingDirectoryPath;
 }
 
@@ -59,6 +62,7 @@ async function createLocalBranch( gitWorkingDirectoryPath, branchName ) {
  */
 async function checkoutRemoteBranch( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	await simpleGit.fetch( 'origin', branchName );
 	await simpleGit.checkout( branchName );
 }
 

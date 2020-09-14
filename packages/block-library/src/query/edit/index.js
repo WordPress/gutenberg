@@ -3,13 +3,18 @@
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
-import { BlockControls, InnerBlocks } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	InnerBlocks,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import QueryToolbar from './query-toolbar';
 import QueryProvider from './query-provider';
+import QueryInspectorControls from './query-inspector-controls';
 
 const TEMPLATE = [ [ 'core/query-loop' ], [ 'core/query-pagination' ] ];
 export default function QueryEdit( {
@@ -24,19 +29,19 @@ export default function QueryEdit( {
 			setAttributes( { queryId: instanceId } );
 		}
 	}, [ queryId, instanceId ] );
+	const updateQuery = ( newQuery ) =>
+		setAttributes( { query: { ...query, ...newQuery } } );
 	return (
 		<>
+			<QueryInspectorControls query={ query } setQuery={ updateQuery } />
 			<BlockControls>
-				<QueryToolbar
-					query={ query }
-					setQuery={ ( newQuery ) =>
-						setAttributes( { query: { ...query, ...newQuery } } )
-					}
-				/>
+				<QueryToolbar query={ query } setQuery={ updateQuery } />
 			</BlockControls>
-			<QueryProvider>
-				<InnerBlocks template={ TEMPLATE } />
-			</QueryProvider>
+			<Block.div>
+				<QueryProvider>
+					<InnerBlocks template={ TEMPLATE } />
+				</QueryProvider>
+			</Block.div>
 		</>
 	);
 }

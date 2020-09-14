@@ -1,21 +1,18 @@
 {
 	"name": "core/navigation-link",
 	"category": "design",
-	"parent": [
-		"core/navigation"
-	],
+	"parent": [ "core/navigation" ],
 	"attributes": {
 		"label": {
 			"type": "string"
-		},
-		"nofollow": {
-			"type": "boolean",
-			"default": false
 		},
 		"type": {
 			"type": "string"
 		},
 		"description": {
+			"type": "string"
+		},
+		"rel": {
 			"type": "string"
 		},
 		"id": {
@@ -27,8 +24,20 @@
 		},
 		"url": {
 			"type": "string"
+		},
+		"title": {
+			"type": "string"
 		}
 	},
+	"usesContext": [
+		"textColor",
+		"customTextColor",
+		"backgroundColor",
+		"customBackgroundColor",
+		"fontSize",
+		"customFontSize",
+		"showSubmenuIcon"
+	],
 	"supports": {
 		"reusable": false,
 		"html": false,

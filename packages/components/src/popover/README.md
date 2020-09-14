@@ -70,7 +70,7 @@ The direction in which the popover should open relative to its parent node. Spec
 
 - Type: `String`
 - Required: No
-- Default: `"top center"`
+- Default: `"bottom right"`
 
 ### children
 
@@ -123,7 +123,7 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
 
  - Type: `Boolean`
  - Required: No
- - Default: `false`
+ - Default: `true`
 
 ### anchorRect
 

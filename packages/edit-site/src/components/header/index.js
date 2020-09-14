@@ -49,8 +49,12 @@ export default function Header( {
 			getTemplatePartId,
 			getTemplateType,
 			getPage,
-			getShowOnFront,
 		} = select( 'core/edit-site' );
+
+		const { show_on_front: _showOnFront } = select(
+			'core'
+		).getEditedEntityRecord( 'root', 'site' );
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
@@ -58,7 +62,7 @@ export default function Header( {
 			templatePartId: getTemplatePartId(),
 			templateType: getTemplateType(),
 			page: getPage(),
-			showOnFront: getShowOnFront(),
+			showOnFront: _showOnFront,
 		};
 	}, [] );
 
@@ -84,6 +88,7 @@ export default function Header( {
 				<Button
 					isPrimary
 					isPressed={ isInserterOpen }
+					className="edit-site-header-toolbar__inserter-toggle"
 					onClick={ onToggleInserter }
 					icon={ plus }
 					label={ _x(

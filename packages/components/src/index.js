@@ -67,6 +67,10 @@ export { default as MenuItemsChoice } from './menu-items-choice';
 export { default as Modal } from './modal';
 export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
+export { default as __experimentalNavigation } from './navigation';
+export { default as __experimentalNavigationGroup } from './navigation/group';
+export { default as __experimentalNavigationItem } from './navigation/item';
+export { default as __experimentalNavigationMenu } from './navigation/menu';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';
@@ -99,7 +103,7 @@ export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
-export { default as __experimentalToolbarItem } from './toolbar-item';
+export { default as ToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
 export {
 	default as __experimentalTreeGrid,

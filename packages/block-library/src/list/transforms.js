@@ -37,7 +37,7 @@ const transforms = {
 		{
 			type: 'block',
 			isMultiBlock: true,
-			blocks: [ 'core/paragraph' ],
+			blocks: [ 'core/paragraph', 'core/heading' ],
 			transform: ( blockAttributes ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
@@ -61,18 +61,20 @@ const transforms = {
 						),
 						multilineTag: 'li',
 					} ),
+					anchor: blockAttributes.anchor,
 				} );
 			},
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/quote' ],
-			transform: ( { value } ) => {
+			blocks: [ 'core/quote', 'core/pullquote' ],
+			transform: ( { value, anchor } ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
 						value: create( { html: value, multilineTag: 'p' } ),
 						multilineTag: 'li',
 					} ),
+					anchor,
 				} );
 			},
 		},
@@ -86,6 +88,7 @@ const transforms = {
 			transform( node ) {
 				const attributes = {
 					ordered: node.nodeName === 'OL',
+					anchor: node.id === '' ? undefined : node.id,
 				};
 
 				if ( attributes.ordered ) {
@@ -156,8 +159,25 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			blocks: [ 'core/heading' ],
+			transform: ( { values } ) =>
+				split(
+					create( {
+						html: values,
+						multilineTag: 'li',
+						multilineWrapperTags: [ 'ul', 'ol' ],
+					} ),
+					__UNSTABLE_LINE_SEPARATOR
+				).map( ( piece ) =>
+					createBlock( 'core/heading', {
+						content: toHTMLString( { value: piece } ),
+					} )
+				),
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/quote' ],
-			transform: ( { values } ) => {
+			transform: ( { values, anchor } ) => {
 				return createBlock( 'core/quote', {
 					value: toHTMLString( {
 						value: create( {
@@ -167,6 +187,24 @@ const transforms = {
 						} ),
 						multilineTag: 'p',
 					} ),
+					anchor,
+				} );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/pullquote' ],
+			transform: ( { values, anchor } ) => {
+				return createBlock( 'core/pullquote', {
+					value: toHTMLString( {
+						value: create( {
+							html: values,
+							multilineTag: 'li',
+							multilineWrapperTags: [ 'ul', 'ol' ],
+						} ),
+						multilineTag: 'p',
+					} ),
+					anchor,
 				} );
 			},
 		},

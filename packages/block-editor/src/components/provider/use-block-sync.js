@@ -109,6 +109,11 @@ export default function useBlockSync( {
 	const onInputRef = useRef( onInput );
 	const onChangeRef = useRef( onChange );
 	useEffect( () => {
+		onInputRef.current = onInput;
+		onChangeRef.current = onChange;
+	}, [ onInput, onChange ] );
+
+	useEffect( () => {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
@@ -120,17 +125,7 @@ export default function useBlockSync( {
 		let isPersistent = isLastBlockChangePersistent();
 		let previousAreBlocksDifferent = false;
 
-		onInputRef.current = onInput;
-		onChangeRef.current = onChange;
 		const unsubscribe = registry.subscribe( () => {
-			// Sometimes, subscriptions might trigger with stale callbacks
-			// before they are cleaned up. Avoid running them.
-			if (
-				onInputRef.current !== onInput ||
-				onChangeRef.current !== onChange
-			)
-				return;
-
 			// Sometimes, when changing block lists, lingering subscriptions
 			// might trigger before they are cleaned up. If the block for which
 			// the subscription runs is no longer in the store, this would clear
@@ -176,7 +171,9 @@ export default function useBlockSync( {
 
 				// Inform the controlling entity that changes have been made to
 				// the block-editor store they should be aware about.
-				const updateParent = isPersistent ? onChange : onInput;
+				const updateParent = isPersistent
+					? onChangeRef.current
+					: onInputRef.current;
 				updateParent( blocks, {
 					selectionStart: getSelectionStart(),
 					selectionEnd: getSelectionEnd(),
@@ -184,8 +181,9 @@ export default function useBlockSync( {
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
 		} );
+
 		return () => unsubscribe();
-	}, [ registry, onChange, onInput, clientId ] );
+	}, [ registry, clientId ] );
 
 	// Determine if blocks need to be reset when they change.
 	useEffect( () => {

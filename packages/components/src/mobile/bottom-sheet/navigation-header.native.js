@@ -6,7 +6,7 @@ import { View, TouchableWithoutFeedback, Text, Platform } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon, chevronLeft, arrowLeft } from '@wordpress/icons';
+import { Icon, chevronBackIOS, arrowLeft } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -35,13 +35,20 @@ function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
 
 	return (
 		<View style={ styles.bottomSheetHeader }>
-			<TouchableWithoutFeedback onPress={ leftButtonOnPress }>
+			<TouchableWithoutFeedback
+				onPress={ leftButtonOnPress }
+				accessibilityRole={ 'button' }
+				accessibilityLabel={ __( 'Go back' ) }
+				accessibilityHint={ __(
+					'Navigates to the previous content sheet'
+				) }
+			>
 				<View style={ styles.bottomSheetBackButton }>
 					{ isIOS ? (
 						<>
 							<Icon
-								icon={ chevronLeft }
-								size={ 40 }
+								icon={ chevronBackIOS }
+								size={ 21 }
 								style={ chevronLeftStyle }
 							/>
 							<Text

@@ -6,6 +6,10 @@
 		width: $button-size;
 		height: $button-size;
 		font-size: $button-size;
-		background-color: $light-gray-300;
+		background-color: $gray-200;
+	}
+
+	> img {
+		width: 100%;
 	}
 }

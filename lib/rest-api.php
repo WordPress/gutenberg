@@ -55,33 +55,72 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
 /**
  * Add fields required for site editing to the /themes endpoint.
  *
- * @todo Remove once https://core.trac.wordpress.org/ticket/49906 is fixed.
- * @see https://github.com/WordPress/wordpress-develop/pull/222
+ * @todo Remove once Gutenberg's minimum required WordPress version is v5.5.
+ * @see https://core.trac.wordpress.org/ticket/49906
+ * @see https://core.trac.wordpress.org/changeset/47921
  *
  * @param WP_REST_Response $response The response object.
  * @param WP_Theme         $theme    Theme object used to create response.
  * @param WP_REST_Request  $request  Request object.
  */
 function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
-	$data           = $response->get_data();
-	$field_mappings = array(
-		'author'      => 'Author',
-		'author_name' => 'Author Name',
-		'author_uri'  => 'Author URI',
-		'description' => 'Description',
-		'name'        => 'Name',
-		'stylesheet'  => 'Stylesheet',
-		'template'    => 'Template',
-		'theme_uri'   => 'Theme URI',
-		'version'     => 'Version',
-	);
+	$data   = $response->get_data();
+	$fields = array_keys( $data );
 
-	foreach ( $field_mappings as $field => $theme_field ) {
-		$data[ $field ] = $theme[ $theme_field ];
+	/**
+	 * The following is basically copied from Core's WP_REST_Themes_Controller::prepare_item_for_response()
+	 * (as of WP v5.5), with `rest_is_field_included()` replaced by `! in_array()`.
+	 * This makes sure that we add all the fields that are missing from Core.
+	 *
+	 * @see https://github.com/WordPress/WordPress/blob/019bc2d244c4d536338d2c634419583e928143df/wp-includes/rest-api/endpoints/class-wp-rest-themes-controller.php#L118-L167
+	 */
+	if ( ! in_array( 'stylesheet', $fields, true ) ) {
+		$data['stylesheet'] = $theme->get_stylesheet();
 	}
 
-	// Using $theme->get_screenshot() with no args to get absolute URL.
-	$data['screenshot'] = $theme->get_screenshot();
+	if ( ! in_array( 'template', $fields, true ) ) {
+		/**
+		 * Use the get_template() method, not the 'Template' header, for finding the template.
+		 * The 'Template' header is only good for what was written in the style.css, while
+		 * get_template() takes into account where WordPress actually located the theme and
+		 * whether it is actually valid.
+		 */
+		$data['template'] = $theme->get_template();
+	}
+
+	$plain_field_mappings = array(
+		'requires_php' => 'RequiresPHP',
+		'requires_wp'  => 'RequiresWP',
+		'textdomain'   => 'TextDomain',
+		'version'      => 'Version',
+	);
+
+	foreach ( $plain_field_mappings as $field => $header ) {
+		if ( ! in_array( $field, $fields, true ) ) {
+			$data[ $field ] = $theme->get( $header );
+		}
+	}
+
+	if ( ! in_array( 'screenshot', $fields, true ) ) {
+		// Using $theme->get_screenshot() with no args to get absolute URL.
+		$data['screenshot'] = $theme->get_screenshot() ? $theme->get_screenshot() : '';
+	}
+
+	$rich_field_mappings = array(
+		'author'      => 'Author',
+		'author_uri'  => 'AuthorURI',
+		'description' => 'Description',
+		'name'        => 'Name',
+		'tags'        => 'Tags',
+		'theme_uri'   => 'ThemeURI',
+	);
+
+	foreach ( $rich_field_mappings as $field => $header ) {
+		if ( ! in_array( $field, $fields, true ) ) {
+			$data[ $field ]['raw']      = $theme->display( $header, false, true );
+			$data[ $field ]['rendered'] = $theme->display( $header );
+		}
+	}
 
 	$response->set_data( $data );
 	return $response;
@@ -97,21 +136,10 @@ add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 )
  * @since 5.0.0
  */
 function gutenberg_register_rest_widget_updater_routes() {
-	$widget_forms = new WP_REST_Widget_Forms();
+	$widget_forms = new WP_REST_Widget_Utils_Controller();
 	$widget_forms->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
-
-/**
- * Registers the widget area REST API routes.
- *
- * @since 5.7.0
- */
-function gutenberg_register_rest_widget_areas() {
-	$widget_areas_controller = new WP_REST_Widget_Areas_Controller();
-	$widget_areas_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
 
 /**
  * Registers the block directory.
@@ -119,10 +147,6 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
  * @since 6.5.0
  */
 function gutenberg_register_rest_block_directory() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ) ) {
-		return;
-	}
-
 	$block_directory_controller = new WP_REST_Block_Directory_Controller();
 	$block_directory_controller->register_routes();
 }
@@ -153,6 +177,25 @@ function gutenberg_register_rest_customizer_nonces() {
 	$nav_menu_location->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
+
+
+/**
+ * Registers the Plugins REST API routes.
+ */
+function gutenberg_register_plugins_endpoint() {
+	$plugins = new WP_REST_Plugins_Controller();
+	$plugins->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
+
+/**
+ * Registers the Sidebars REST API routes.
+ */
+function gutenberg_register_sidebars_endpoint() {
+	$sidebars = new WP_REST_Sidebars_Controller();
+	$sidebars->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_sidebars_endpoint' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
@@ -271,11 +314,44 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  * @since 7.x.0
  */
 function gutenberg_register_image_editor() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-rich-image-editing' ) ) {
-		return;
-	}
+	global $wp_version;
 
-	$image_editor = new WP_REST_Image_Editor_Controller();
-	$image_editor->register_routes();
+	// Strip '-src' from the version string. Messes up version_compare().
+	$version = str_replace( '-src', '', $wp_version );
+
+	// Only register routes for versions older than WP 5.5.
+	if ( version_compare( $version, '5.5-beta', '<' ) ) {
+		$image_editor = new WP_REST_Image_Editor_Controller();
+		$image_editor->register_routes();
+	}
 }
 add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );
+
+/**
+ * Registers the post format search handler.
+ *
+ * @param string $search_handlers     Title list of current handlers.
+ *
+ * @return array Title updated list of handlers.
+ */
+function gutenberg_post_format_search_handler( $search_handlers ) {
+	if ( current_theme_supports( 'post-formats' ) ) {
+		$search_handlers[] = new WP_REST_Post_Format_Search_Handler();
+	}
+
+	return $search_handlers;
+}
+add_filter( 'wp_rest_search_handlers', 'gutenberg_post_format_search_handler', 10, 5 );
+
+/**
+ * Registers the terms search handler.
+ *
+ * @param string $search_handlers Title list of current handlers.
+ *
+ * @return array Title updated list of handlers.
+ */
+function gutenberg_term_search_handler( $search_handlers ) {
+	$search_handlers[] = new WP_REST_Term_Search_Handler();
+	return $search_handlers;
+}
+add_filter( 'wp_rest_search_handlers', 'gutenberg_term_search_handler', 10, 5 );

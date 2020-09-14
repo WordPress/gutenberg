@@ -5,7 +5,7 @@
 		"widgetClass": {
 			"type": "string"
 		},
-		"id": {
+		"widgetId": {
 			"type": "string"
 		},
 		"idBase": {

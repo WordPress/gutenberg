@@ -15,11 +15,11 @@
 function render_block_core_template_part( $attributes ) {
 	$content = null;
 
-	if ( ! empty( $attributes['postId'] ) ) {
-		// If we have a post ID, which means this template part
+	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
+		// If we have a post ID and the post exists, which means this template part
 		// is user-customized, render the corresponding post content.
 		$content = get_post( $attributes['postId'] )->post_content;
-	} elseif ( wp_get_theme()->get( 'TextDomain' ) === $attributes['theme'] ) {
+	} elseif ( isset( $attributes['theme'] ) && wp_get_theme()->get( 'TextDomain' ) === $attributes['theme'] ) {
 		$template_part_query = new WP_Query(
 			array(
 				'post_type'      => 'wp_template_part',
@@ -63,7 +63,8 @@ function render_block_core_template_part( $attributes ) {
 	}
 	$content = do_shortcode( $content );
 
-	return str_replace( ']]>', ']]&gt;', $content );
+	$html_tag = esc_attr( $attributes['tagName'] );
+	return "<$html_tag>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
 }
 
 /**

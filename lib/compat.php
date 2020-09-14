@@ -8,7 +8,139 @@
  * @package gutenberg
  */
 
+/**
+ * These functions can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50263
+ * @see https://core.trac.wordpress.org/changeset/48141
+ */
 if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
+	/**
+	 * Removes the block asset's path prefix if provided.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param string $asset_handle_or_path Asset handle or prefixed path.
+	 *
+	 * @return string Path without the prefix or the original value.
+	 */
+	function remove_block_asset_path_prefix( $asset_handle_or_path ) {
+		$path_prefix = 'file:';
+		if ( strpos( $asset_handle_or_path, $path_prefix ) !== 0 ) {
+			return $asset_handle_or_path;
+		}
+		return substr(
+			$asset_handle_or_path,
+			strlen( $path_prefix )
+		);
+	}
+
+	/**
+	 * Generates the name for an asset based on the name of the block
+	 * and the field name provided.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param string $block_name Name of the block.
+	 * @param string $field_name Name of the metadata field.
+	 *
+	 * @return string Generated asset name for the block's field.
+	 */
+	function generate_block_asset_handle( $block_name, $field_name ) {
+		$field_mappings = array(
+			'editorScript' => 'editor-script',
+			'script'       => 'script',
+			'editorStyle'  => 'editor-style',
+			'style'        => 'style',
+		);
+		return str_replace( '/', '-', $block_name ) .
+			'-' . $field_mappings[ $field_name ];
+	}
+
+	/**
+	 * Finds a script handle for the selected block metadata field. It detects
+	 * when a path to file was provided and finds a corresponding
+	 * asset file with details necessary to register the script under
+	 * automatically generated handle name. It returns unprocessed script handle
+	 * otherwise.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param array  $metadata Block metadata.
+	 * @param string $field_name Field name to pick from metadata.
+	 *
+	 * @return string|boolean Script handle provided directly or created through
+	 *     script's registration, or false on failure.
+	 */
+	function register_block_script_handle( $metadata, $field_name ) {
+		if ( empty( $metadata[ $field_name ] ) ) {
+			return false;
+		}
+		$script_handle = $metadata[ $field_name ];
+		$script_path   = remove_block_asset_path_prefix( $metadata[ $field_name ] );
+		if ( $script_handle === $script_path ) {
+			return $script_handle;
+		}
+
+		$script_handle     = generate_block_asset_handle( $metadata['name'], $field_name );
+		$script_asset_path = realpath(
+			dirname( $metadata['file'] ) . '/' .
+			substr_replace( $script_path, '.asset.php', - strlen( '.js' ) )
+		);
+		if ( ! file_exists( $script_asset_path ) ) {
+			$message = sprintf(
+				/* translators: %1: field name. %2: block name */
+				__( 'The asset file for the "%1$s" defined in "%2$s" block definition is missing.', 'default' ),
+				$field_name,
+				$metadata['name']
+			);
+			_doing_it_wrong( __FUNCTION__, $message, '5.5.0' );
+			return false;
+		}
+		$script_asset = require( $script_asset_path );
+		$result       = wp_register_script(
+			$script_handle,
+			plugins_url( $script_path, $metadata['file'] ),
+			$script_asset['dependencies'],
+			$script_asset['version']
+		);
+		return $result ? $script_handle : false;
+	}
+
+	/**
+	 * Finds a style handle for the block metadata field. It detects when a path
+	 * to file was provided and registers the style under automatically
+	 * generated handle name. It returns unprocessed style handle otherwise.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param array  $metadata Block metadata.
+	 * @param string $field_name Field name to pick from metadata.
+	 *
+	 * @return string|boolean Style handle provided directly or created through
+	 *     style's registration, or false on failure.
+	 */
+	function register_block_style_handle( $metadata, $field_name ) {
+		if ( empty( $metadata[ $field_name ] ) ) {
+			return false;
+		}
+		$style_handle = $metadata[ $field_name ];
+		$style_path   = remove_block_asset_path_prefix( $metadata[ $field_name ] );
+		if ( $style_handle === $style_path ) {
+			return $style_handle;
+		}
+
+		$style_handle = generate_block_asset_handle( $metadata['name'], $field_name );
+		$block_dir    = dirname( $metadata['file'] );
+		$result       = wp_register_style(
+			$style_handle,
+			plugins_url( $style_path, $metadata['file'] ),
+			array(),
+			filemtime( realpath( "$block_dir/$style_path" ) )
+		);
+		return $result ? $style_handle : false;
+	}
+
 	/**
 	 * Registers a block type from metadata stored in the `block.json` file.
 	 *
@@ -25,22 +157,76 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
 	 */
 	function register_block_type_from_metadata( $file_or_folder, $args = array() ) {
-		$file = ( substr( $file_or_folder, -10 ) !== 'block.json' ) ?
-			trailingslashit( $file_or_folder ) . 'block.json' :
+		$filename      = 'block.json';
+		$metadata_file = ( substr( $file_or_folder, -strlen( $filename ) ) !== $filename ) ?
+			trailingslashit( $file_or_folder ) . $filename :
 			$file_or_folder;
-		if ( ! file_exists( $file ) ) {
+		if ( ! file_exists( $metadata_file ) ) {
 			return false;
 		}
 
-		$metadata = json_decode( file_get_contents( $file ), true );
-		if ( ! is_array( $metadata ) ) {
+		$metadata = json_decode( file_get_contents( $metadata_file ), true );
+		if ( ! is_array( $metadata ) || empty( $metadata['name'] ) ) {
 			return false;
+		}
+		$metadata['file'] = $metadata_file;
+
+		$settings          = array();
+		$property_mappings = array(
+			'title'           => 'title',
+			'category'        => 'category',
+			'parent'          => 'parent',
+			'icon'            => 'icon',
+			'description'     => 'description',
+			'keywords'        => 'keywords',
+			'attributes'      => 'attributes',
+			'providesContext' => 'provides_context',
+			'usesContext'     => 'uses_context',
+			// Deprecated: remove with Gutenberg 8.6 release.
+			'context'         => 'context',
+			'supports'        => 'supports',
+			'styles'          => 'styles',
+			'example'         => 'example',
+		);
+
+		foreach ( $property_mappings as $key => $mapped_key ) {
+			if ( isset( $metadata[ $key ] ) ) {
+				$settings[ $mapped_key ] = $metadata[ $key ];
+			}
+		}
+
+		if ( ! empty( $metadata['editorScript'] ) ) {
+			$settings['editor_script'] = register_block_script_handle(
+				$metadata,
+				'editorScript'
+			);
+		}
+
+		if ( ! empty( $metadata['script'] ) ) {
+			$settings['script'] = register_block_script_handle(
+				$metadata,
+				'script'
+			);
+		}
+
+		if ( ! empty( $metadata['editorStyle'] ) ) {
+			$settings['editor_style'] = register_block_style_handle(
+				$metadata,
+				'editorStyle'
+			);
+		}
+
+		if ( ! empty( $metadata['style'] ) ) {
+			$settings['style'] = register_block_style_handle(
+				$metadata,
+				'style'
+			);
 		}
 
 		return register_block_type(
 			$metadata['name'],
 			array_merge(
-				$metadata,
+				$settings,
 				$args
 			)
 		);
@@ -48,104 +234,75 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 }
 
 /**
- * Extends block editor settings to include a list of image dimensions per size.
+ * Adds a wp.date.setSettings with timezone abbr parameter
  *
- * This can be removed when plugin support requires WordPress 5.4.0+.
+ * This can be removed when plugin support requires WordPress 5.6.0+.
  *
- * @see https://core.trac.wordpress.org/ticket/49389
- * @see https://core.trac.wordpress.org/changeset/47240
+ * The script registration occurs in core wp-includes/script-loader.php
+ * wp_default_packages_inline_scripts()
  *
- * @param array $settings Default editor settings.
+ * @since 8.6.0
  *
- * @return array Filtered editor settings.
+ * @param WP_Scripts $scripts WP_Scripts object.
  */
-function gutenberg_extend_settings_image_dimensions( $settings ) {
-	/*
-	 * Only filter settings if:
-	 * 1. `imageDimensions` is not already assigned, in which case it can be
-	 *    assumed to have been set from WordPress 5.4.0+ default settings.
-	 * 2. `imageSizes` is an array. Plugins may run `block_editor_settings`
-	 *    directly and not provide all properties of the settings array.
-	 */
-	if ( ! isset( $settings['imageDimensions'] ) && ! empty( $settings['imageSizes'] ) ) {
-		$image_dimensions = array();
-		$all_sizes        = wp_get_registered_image_subsizes();
-		foreach ( $settings['imageSizes'] as $size ) {
-			$key = $size['slug'];
-			if ( isset( $all_sizes[ $key ] ) ) {
-				$image_dimensions[ $key ] = $all_sizes[ $key ];
-			}
-		}
-		$settings['imageDimensions'] = $image_dimensions;
+function gutenberg_add_date_settings_timezone( $scripts ) {
+	if ( ! did_action( 'init' ) ) {
+		return;
 	}
 
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
+	global $wp_locale;
 
-/**
- * Adds a polyfill for the WHATWG URL in environments which do not support it.
- * The intention in how this action is handled is under the assumption that this
- * code would eventually be placed at `wp_default_packages_vendor`, which is
- * called as a result of `wp_default_packages` via the `wp_default_scripts`.
- *
- * This can be removed when plugin support requires WordPress 5.4.0+.
- *
- * The script registration occurs in `gutenberg_register_vendor_scripts`, which
- * should be removed in coordination with this function.
- *
- * @see gutenberg_register_vendor_scripts
- * @see https://core.trac.wordpress.org/ticket/49360
- * @see https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
- * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
- *
- * @since 7.3.0
- *
- * @param WP_Scripts $scripts WP_Scripts object.
- */
-function gutenberg_add_url_polyfill( $scripts ) {
-	did_action( 'init' ) && $scripts->add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$scripts,
-			array(
-				'window.URL && window.URL.prototype && window.URLSearchParams' => 'wp-polyfill-url',
+	// Calculate the timezone abbr (EDT, PST) if possible.
+	$timezone_string = get_option( 'timezone_string', 'UTC' );
+	$timezone_abbr   = '';
+
+	if ( ! empty( $timezone_string ) ) {
+		$timezone_date = new DateTime( null, new DateTimeZone( $timezone_string ) );
+		$timezone_abbr = $timezone_date->format( 'T' );
+	}
+
+	$scripts->add_inline_script(
+		'wp-date',
+		sprintf(
+			'wp.date.setSettings( %s );',
+			wp_json_encode(
+				array(
+					'l10n'     => array(
+						'locale'        => get_user_locale(),
+						'months'        => array_values( $wp_locale->month ),
+						'monthsShort'   => array_values( $wp_locale->month_abbrev ),
+						'weekdays'      => array_values( $wp_locale->weekday ),
+						'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
+						'meridiem'      => (object) $wp_locale->meridiem,
+						'relative'      => array(
+							/* translators: %s: Duration. */
+							'future' => __( '%s from now', 'default' ),
+							/* translators: %s: Duration. */
+							'past'   => __( '%s ago', 'default' ),
+						),
+					),
+					'formats'  => array(
+						/* translators: Time format, see https://www.php.net/date */
+						'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
+						/* translators: Date format, see https://www.php.net/date */
+						'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
+						/* translators: Date/Time format, see https://www.php.net/date */
+						'datetime'            => __( 'F j, Y g:i a', 'default' ),
+						/* translators: Abbreviated date/time format, see https://www.php.net/date */
+						'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
+					),
+					'timezone' => array(
+						'offset' => get_option( 'gmt_offset', 0 ),
+						'string' => $timezone_string,
+						'abbr'   => $timezone_abbr,
+					),
+				)
 			)
-		)
+		),
+		'after'
 	);
 }
-add_action( 'wp_default_scripts', 'gutenberg_add_url_polyfill', 20 );
-
-/**
- * Adds a polyfill for DOMRect in environments which do not support it.
- *
- * This can be removed when plugin support requires WordPress 5.4.0+.
- *
- * The script registration occurs in `gutenberg_register_vendor_scripts`, which
- * should be removed in coordination with this function.
- *
- * @see gutenberg_register_vendor_scripts
- * @see gutenberg_add_url_polyfill
- * @see https://core.trac.wordpress.org/ticket/49360
- * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMRect
- * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
- *
- * @since 7.5.0
- *
- * @param WP_Scripts $scripts WP_Scripts object.
- */
-function gutenberg_add_dom_rect_polyfill( $scripts ) {
-	did_action( 'init' ) && $scripts->add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$scripts,
-			array(
-				'window.DOMRect' => 'wp-polyfill-dom-rect',
-			)
-		)
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
+add_action( 'wp_default_scripts', 'gutenberg_add_date_settings_timezone', 20 );
 
 /**
  * Filters default block categories to substitute legacy category names with new
@@ -154,6 +311,7 @@ add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
  * This can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/50278
+ * @see https://core.trac.wordpress.org/changeset/48177
  *
  * @param array[] $default_categories Array of block categories.
  *
@@ -215,6 +373,7 @@ add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
  * This can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/49927
+ * @see https://core.trac.wordpress.org/changeset/48243
  *
  * @param string|null $pre_render   The pre-rendered content. Defaults to null.
  * @param array       $parsed_block The parsed block being rendered.
@@ -237,8 +396,10 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	/** This filter is documented in src/wp-includes/blocks.php */
 	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
 
-	$context = array(
-		'postId'   => $post->ID,
+	$context = array();
+
+	if ( $post instanceof WP_Post ) {
+		$context['postId'] = $post->ID;
 
 		/*
 		 * The `postType` context is largely unnecessary server-side, since the
@@ -246,14 +407,35 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 		 * manifest is expected to be shared between the server and the client,
 		 * it should be included to consistently fulfill the expectation.
 		 */
-		'postType' => $post->post_type,
-
-		'query'    => array( 'categoryIds' => array() ),
-	);
+		$context['postType'] = $post->post_type;
+	}
 
 	if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
+		$context['query'] = array( 'categoryIds' => array() );
+
 		foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
 			$context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
+		}
+	}
+
+	if ( isset( $wp_query->tax_query->queried_terms['post_tag'] ) ) {
+		if ( isset( $context['query'] ) ) {
+			$context['query']['tagIds'] = array();
+		} else {
+			$context['query'] = array( 'tagIds' => array() );
+		}
+
+		foreach ( $wp_query->tax_query->queried_terms['post_tag']['terms'] as $tag_slug_or_id ) {
+			$tag_ID = $tag_slug_or_id;
+
+			if ( 'slug' === $wp_query->tax_query->queried_terms['post_tag']['field'] ) {
+				$tag = get_term_by( 'slug', $tag_slug_or_id, 'post_tag' );
+
+				if ( $tag ) {
+					$tag_ID = $tag->term_id;
+				}
+			}
+			$context['query']['tagIds'][] = $tag_ID;
 		}
 	}
 
@@ -270,3 +452,59 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	return $block->render();
 }
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
+
+/**
+ * Amends the paths to preload when initializing edit post.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50606
+ *
+ * @since 8.4.0
+ *
+ * @param  array $preload_paths Default path list that will be preloaded.
+ * @return array Modified path list to preload.
+ */
+function gutenberg_preload_edit_post( $preload_paths ) {
+	$additional_paths = array( '/?context=edit' );
+	return array_merge( $preload_paths, $additional_paths );
+}
+
+add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );
+
+/**
+ * Override post type labels for Reusable Block custom post type.
+ *
+ * This shim can be removed when the Gutenberg plugin requires a WordPress
+ * version that has the ticket below.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50755
+ *
+ * @since 8.6.0
+ *
+ * @return array Array of new labels for Reusable Block post type.
+ */
+function gutenberg_override_reusable_block_post_type_labels() {
+	return array(
+		'name'                     => _x( 'Reusable Blocks', 'post type general name', 'gutenberg' ),
+		'singular_name'            => _x( 'Reusable Block', 'post type singular name', 'gutenberg' ),
+		'menu_name'                => _x( 'Reusable Blocks', 'admin menu', 'gutenberg' ),
+		'name_admin_bar'           => _x( 'Reusable Block', 'add new on admin bar', 'gutenberg' ),
+		'add_new'                  => _x( 'Add New', 'Reusable Block', 'gutenberg' ),
+		'add_new_item'             => __( 'Add New Reusable Block', 'gutenberg' ),
+		'new_item'                 => __( 'New Reusable Block', 'gutenberg' ),
+		'edit_item'                => __( 'Edit Reusable Block', 'gutenberg' ),
+		'view_item'                => __( 'View Reusable Block', 'gutenberg' ),
+		'all_items'                => __( 'All Reusable Blocks', 'gutenberg' ),
+		'search_items'             => __( 'Search Reusable Blocks', 'gutenberg' ),
+		'not_found'                => __( 'No reusable blocks found.', 'gutenberg' ),
+		'not_found_in_trash'       => __( 'No reusable blocks found in Trash.', 'gutenberg' ),
+		'filter_items_list'        => __( 'Filter reusable blocks list', 'gutenberg' ),
+		'items_list_navigation'    => __( 'Reusable Blocks list navigation', 'gutenberg' ),
+		'items_list'               => __( 'Reusable Blocks list', 'gutenberg' ),
+		'item_published'           => __( 'Reusable Block published.', 'gutenberg' ),
+		'item_published_privately' => __( 'Reusable Block published privately.', 'gutenberg' ),
+		'item_reverted_to_draft'   => __( 'Reusable Block reverted to draft.', 'gutenberg' ),
+		'item_scheduled'           => __( 'Reusable Block scheduled.', 'gutenberg' ),
+		'item_updated'             => __( 'Reusable Block updated.', 'gutenberg' ),
+	);
+}
+add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );

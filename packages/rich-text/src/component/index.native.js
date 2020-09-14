@@ -3,10 +3,13 @@
 /**
  * External dependencies
  */
-import RCTAztecView from 'react-native-aztec';
+/**
+ * WordPress dependencies
+ */
+import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
-import { addMention } from 'react-native-gutenberg-bridge';
-import { get, pickBy } from 'lodash';
+import { addMention } from '@wordpress/react-native-bridge';
+import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -14,17 +17,12 @@ import memize from 'memize';
  */
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import {
-	Toolbar,
-	ToolbarButton,
-	withSiteCapabilities,
-	isMentionsSupported,
-} from '@wordpress/components';
+import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { BACKSPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
 import { Icon, atSymbol } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -37,6 +35,7 @@ import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { insert } from '../insert';
+import { getTextContent } from '../get-text-content';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
@@ -54,6 +53,8 @@ const gutenbergFormatNamesToAztec = {
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
 };
+
+const EMPTY_PARAGRAPH_TAGS = '<p></p>';
 
 export class RichText extends Component {
 	constructor( {
@@ -76,9 +77,12 @@ export class RichText extends Component {
 
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
-		this.onChange = this.onChange.bind( this );
+		this.restoreParagraphTags = this.restoreParagraphTags.bind( this );
+		this.onChangeFromAztec = this.onChangeFromAztec.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
+		this.handleMention = this.handleMention.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
@@ -88,7 +92,7 @@ export class RichText extends Component {
 		this.formatToValue = memize( this.formatToValue.bind( this ), {
 			maxSize: 1,
 		} );
-
+		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
@@ -96,6 +100,7 @@ export class RichText extends Component {
 		);
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
+		this.showMention = this.showMention.bind( this );
 		this.insertString = this.insertString.bind( this );
 		this.state = {
 			activeFormats: [],
@@ -257,7 +262,7 @@ export class RichText extends Component {
 	/*
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
-	onChange( event ) {
+	onChangeFromAztec( event ) {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -276,14 +281,29 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
+		let formattedContent = contentWithoutRootTag;
+		if ( ! this.isIOS ) {
+			formattedContent = this.restoreParagraphTags(
+				contentWithoutRootTag,
+				this.multilineTag
+			);
+		}
 
-		const refresh = this.value !== contentWithoutRootTag;
-		this.value = contentWithoutRootTag;
+		this.debounceCreateUndoLevel();
+		const refresh = this.value !== formattedContent;
+		this.value = formattedContent;
 
 		// we don't want to refresh if our goal is just to create a record
 		if ( refresh ) {
-			this.props.onChange( contentWithoutRootTag );
+			this.props.onChange( formattedContent );
 		}
+	}
+
+	restoreParagraphTags( value, tag ) {
+		if ( tag === 'p' && ( ! value || ! value.startsWith( '<p>' ) ) ) {
+			return '<p>' + value + '</p>';
+		}
+		return value;
 	}
 
 	/*
@@ -294,7 +314,20 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'content size change';
 	}
 
+	onKeyDown( event ) {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		this.handleDelete( event );
+		this.handleEnter( event );
+		this.handleMention( event );
+	}
+
 	handleEnter( event ) {
+		if ( event.keyCode !== ENTER ) {
+			return;
+		}
 		const { onEnter } = this.props;
 
 		if ( ! onEnter ) {
@@ -310,7 +343,11 @@ export class RichText extends Component {
 	}
 
 	handleDelete( event ) {
-		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
+		const { keyCode } = event;
+
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
+			return;
+		}
 		const isReverse = keyCode === BACKSPACE;
 
 		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
@@ -361,6 +398,35 @@ export class RichText extends Component {
 
 		event.preventDefault();
 		this.lastAztecEventType = 'input';
+	}
+
+	handleMention( event ) {
+		const { keyCode } = event;
+
+		if ( keyCode !== '@'.charCodeAt( 0 ) ) {
+			return;
+		}
+		const record = this.getRecord();
+		const text = getTextContent( record );
+		// Only start the mention UI if the selection is on the start of text or the character before is a space
+		if (
+			text.length === 0 ||
+			record.start === 0 ||
+			text.charAt( record.start - 1 ) === ' '
+		) {
+			this.showMention();
+		} else {
+			this.insertString( record, '@' );
+		}
+	}
+
+	showMention() {
+		const record = this.getRecord();
+		addMention()
+			.then( ( mentionUserId ) => {
+				this.insertString( record, `@${ mentionUserId } ` );
+			} )
+			.catch( () => {} );
 	}
 
 	/**
@@ -655,8 +721,11 @@ export class RichText extends Component {
 			value = '';
 		}
 		// On android if content is empty we need to send no content or else the placeholder will not show.
-		if ( ! this.isIOS && value === '' ) {
-			return value;
+		if (
+			! this.isIOS &&
+			( value === '' || value === EMPTY_PARAGRAPH_TAGS )
+		) {
+			return '';
 		}
 
 		if ( tagName ) {
@@ -686,7 +755,9 @@ export class RichText extends Component {
 			formatTypes,
 			parentBlockStyles,
 			withoutInteractiveFormatting,
-			capabilities,
+			accessibilityLabel,
+			disableEditingMenu = false,
+			isMentionsSupported,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -765,6 +836,7 @@ export class RichText extends Component {
 						onFocus: () => {},
 					} ) }
 				<RCTAztecView
+					accessibilityLabel={ accessibilityLabel }
 					ref={ ( ref ) => {
 						this._editor = ref;
 
@@ -784,6 +856,7 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
+						linkTextColor: defaultTextDecorationColor,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
@@ -791,11 +864,15 @@ export class RichText extends Component {
 						defaultPlaceholderTextColor
 					}
 					deleteEnter={ this.props.deleteEnter }
-					onChange={ this.onChange }
+					onChange={ this.onChangeFromAztec }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
-					onEnter={ this.handleEnter }
-					onBackspace={ this.handleDelete }
+					onKeyDown={ this.onKeyDown }
+					triggerKeyCodes={
+						disableEditingMenu === false && isMentionsSupported
+							? [ '@' ]
+							: []
+					}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
@@ -809,7 +886,6 @@ export class RichText extends Component {
 						( parentBlockStyles && parentBlockStyles.color ) ||
 						defaultColor
 					}
-					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={
@@ -817,7 +893,7 @@ export class RichText extends Component {
 					}
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
-					disableEditingMenu={ this.props.disableEditingMenu }
+					disableEditingMenu={ disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
@@ -839,28 +915,12 @@ export class RichText extends Component {
 						<BlockFormatControls>
 							{
 								// eslint-disable-next-line no-undef
-								__DEV__ && isMentionsSupported( capabilities ) && (
+								isMentionsSupported && (
 									<Toolbar>
 										<ToolbarButton
 											title={ __( 'Insert mention' ) }
 											icon={ <Icon icon={ atSymbol } /> }
-											onClick={ () => {
-												addMention()
-													.then(
-														( mentionUserId ) => {
-															let stringToInsert = `@${ mentionUserId }`;
-															if ( this.isIOS ) {
-																stringToInsert +=
-																	' ';
-															}
-															this.insertString(
-																record,
-																stringToInsert
-															);
-														}
-													)
-													.catch( () => {} );
-											} }
+											onClick={ this.showMention }
 										/>
 									</Toolbar>
 								)
@@ -881,7 +941,9 @@ RichText.defaultProps = {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockParents, getBlock } = select( 'core/block-editor' );
+		const { getBlockParents, getBlock, getSettings } = select(
+			'core/block-editor'
+		);
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
 		const parentBlockStyles =
@@ -889,9 +951,10 @@ export default compose( [
 
 		return {
 			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+			isMentionsSupported:
+				getSettings( 'capabilities' ).mentions === true,
 			...{ parentBlockStyles },
 		};
 	} ),
 	withPreferredColorScheme,
-	withSiteCapabilities,
 ] )( RichText );

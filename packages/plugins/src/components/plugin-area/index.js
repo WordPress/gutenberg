@@ -39,7 +39,7 @@ import { getPlugins } from '../../api';
  * <caption>ESNext</caption>
  * ```js
  * // Using ESNext syntax
- * const { PluginArea } = wp.plugins;
+ * import { PluginArea } from '@wordpress/plugins';
  *
  * const Layout = () => (
  * 	<div>

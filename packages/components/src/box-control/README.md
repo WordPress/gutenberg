@@ -6,7 +6,7 @@ BoxControl components let users set values for Top, Right, Bottom, and Left. Thi
 
 ```jsx
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
-import { useState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ values, setValues ] = useState( {
@@ -18,7 +18,7 @@ const Example = () => {
 
 	return (
 		<BoxControl
-			value={ value }
+			values={ values }
 			onChange={ ( nextValues ) => setValues( nextValues ) }
 		/>
 	);
@@ -31,7 +31,7 @@ BoxControl provides a companion component that visually renders value changes. P
 
 ```jsx
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
-import { useState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 import MyComponent from './my-component';
 
@@ -48,7 +48,7 @@ const Example = () => {
 	return (
 		<>
 			<BoxControl
-				value={ value }
+				values={ values }
 				onChange={ ( nextValues ) => setValues( nextValues ) }
 			/>
 			<Visualizer>
@@ -63,7 +63,7 @@ Alternatively, the `<Visualizer>` can be nested as a sibling to the component yo
 
 ```jsx
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
-import { useState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 import MyComponent from './my-component';
 
@@ -80,7 +80,7 @@ const Example = () => {
 	return (
 		<>
 			<BoxControl
-				value={ value }
+				values={ values }
 				onChange={ ( nextValues ) => setValues( nextValues ) }
 			/>
 			<div style={ { position: 'relative' } }>

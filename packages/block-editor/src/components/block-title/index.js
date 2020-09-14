@@ -1,8 +1,16 @@
 /**
+ * External dependencies
+ */
+import { truncate } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { getBlockType } from '@wordpress/blocks';
+import {
+	getBlockType,
+	__experimentalGetBlockLabel as getBlockLabel,
+} from '@wordpress/blocks';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -20,13 +28,18 @@ import { getBlockType } from '@wordpress/blocks';
  * @return {?string} Block title.
  */
 export default function BlockTitle( { clientId } ) {
-	const name = useSelect(
+	const { attributes, name } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return null;
+				return {};
 			}
-			const { getBlockName } = select( 'core/block-editor' );
-			return getBlockName( clientId );
+			const { getBlockName, getBlockAttributes } = select(
+				'core/block-editor'
+			);
+			return {
+				attributes: getBlockAttributes( clientId ),
+				name: getBlockName( clientId ),
+			};
 		},
 		[ clientId ]
 	);
@@ -40,5 +53,13 @@ export default function BlockTitle( { clientId } ) {
 		return null;
 	}
 
-	return blockType.title;
+	const { title } = blockType;
+	const label = getBlockLabel( blockType, attributes );
+
+	// Label will often fall back to the title if no label is defined for the
+	// current label context. We do not want "Paragraph: Paragraph".
+	if ( label !== title ) {
+		return `${ title }: ${ truncate( label, { length: 15 } ) }`;
+	}
+	return title;
 }

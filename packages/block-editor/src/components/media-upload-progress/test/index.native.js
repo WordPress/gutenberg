@@ -2,7 +2,11 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import { sendMediaUpload } from 'react-native-gutenberg-bridge';
+
+/**
+ * WordPress dependencies
+ */
+import { sendMediaUpload } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -15,16 +19,22 @@ import {
 	MEDIA_UPLOAD_STATE_RESET,
 } from '../';
 
-jest.mock( 'react-native-gutenberg-bridge', () => {
+jest.mock( '@wordpress/react-native-bridge', () => {
 	const callUploadCallback = ( payload ) => {
 		this.uploadCallBack( payload );
 	};
 	const subscribeMediaUpload = ( callback ) => {
 		this.uploadCallBack = callback;
 	};
+	const mediaSources = {
+		deviceCamera: 'DEVICE_CAMERA',
+		deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
+		siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
+	};
 	return {
 		subscribeMediaUpload,
 		sendMediaUpload: callUploadCallback,
+		mediaSources,
 	};
 } );
 

@@ -2,10 +2,36 @@
 
 ## Unreleased
 
+## 12.1.0 (2020-07-07)
+
+### Enhancements
+
+-   Update webpack configuration to preserve translator comments in minified output.
+
+### Bug Fixes
+
+-   Allow the CSS, SVG, and Sass loaders to process files from node_modules directory.
+-   Improve the way licenses are validated with `check-licenses` by falling back to license files verification when the entry in `package.json` doesn't contain an allowed match ([#23550](https://github.com/WordPress/gutenberg/pull/23550)).
+-   Fix `build` script error when importing `style.css` files ([#23710](https://github.com/WordPress/gutenberg/pull/23710)).
+-   Exclude `node_modules` from source map processing in `start` script ([#23711](https://github.com/WordPress/gutenberg/pull/23711)).
+
+## 12.0.0-rc.0 (2020-06-24)
+
+### Breaking Changes
+
+-   The bundled `stylelint` dependency has been updated from requiring `^9.10.1` to requiring `^13.6.0`.
+-   The bundled `stylelint-config-wordpress` dependency has been updated from requiring `^13.1.0` to requiring `^17.0.0`.
+
+### Bug Fixes
+
+-   During rebuilds, all webpack assets that are not used anymore will be removed automatically.
+
+## 11.0.0 (2020-06-15)
+
 ### Breaking Changes
 
 -   The `env` family of scripts has been removed. Finally, exceeded in functionality and replaced by [`wp-env`](https://www.npmjs.com/package/@wordpress/env).
--   The default babel configuration has changed to only support stage-4 proposals. This affects the `build` and `start` commands that use the bundled babel configuration; if a project provides its own, this change doesn't affect it. [#22083](https://github.com/WordPress/gutenberg/pull/22083)
+-   The default Babel configuration has changed to only support stage-4 proposals. This affects the `build` and `start` commands that use the bundled Babel configuration; if a project provides its own, this change doesn't affect it ([#22083](https://github.com/WordPress/gutenberg/pull/22083)).
 -   The bundled `wp-prettier` dependency has been upgraded from `1.19.1` to `2.0.5`. Refer to the [Prettier 2.0 "2020" blog post](https://prettier.io/blog/2020/03/21/2.0.0.html) for full details about the major changes included in Prettier 2.0.
 -   The bundled `eslint` dependency has been updated from requiring `^6.8.0` to requiring `^7.1.0`.
 
@@ -13,9 +39,10 @@
 
 -   The PostCSS loader now gives preference to a `postcss.config.js` configuration file if present.
 
-### Bug fix
+### Bug Fixes
 
 -   Update webpack configuration to not run the Sass loader on CSS files. It's now limited to .scss and .sass files.
+-   Fix broken `style.(sc|sa|c)ss` handling in the `build` and `start` scripts ([#23127](https://github.com/WordPress/gutenberg/pull/23127)).
 
 ## 10.0.0 (2020-05-28)
 

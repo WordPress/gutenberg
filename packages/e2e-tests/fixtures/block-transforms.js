@@ -250,7 +250,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [ 'Group' ],
 	},
 	'core__navigation-link': {
-		originalBlock: 'Navigation Link',
+		originalBlock: 'Link',
 		availableTransforms: [ 'Group' ],
 	},
 	core__nextpage: {
@@ -331,6 +331,10 @@ export const EXPECTED_TRANSFORMS = {
 	core__shortcode: {
 		originalBlock: 'Shortcode',
 		availableTransforms: [ 'Group' ],
+	},
+	'core__site-tagline': {
+		availableTransforms: [ 'Group' ],
+		originalBlock: 'Site Tagline',
 	},
 	'core__site-title': {
 		availableTransforms: [ 'Group' ],

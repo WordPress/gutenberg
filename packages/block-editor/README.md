@@ -21,7 +21,7 @@ import {
 	WritingFlow,
 	ObserveTyping
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent () {
@@ -33,13 +33,15 @@ function MyEditorComponent () {
 			onInput={ updateBlocks }
 			onChange={ updateBlocks }
 		>
-			<Popover.Slot name="block-toolbar" />
-			<WritingFlow>
-				<ObserveTyping>
-					<BlockList />
-				</ObserveTyping>
-			</WritingFlow>
-			<Popover.Slot />
+			<SlotFillProvider>
+				<Popover.Slot name="block-toolbar" />
+				<WritingFlow>
+					<ObserveTyping>
+						<BlockList />
+					</ObserveTyping>
+				</WritingFlow>
+				<Popover.Slot />
+			</SlotFillProvider>
 		</BlockEditorProvider>
 	);
 }
@@ -476,9 +478,8 @@ _Properties_
 -   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
 -   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
 -   _colors_ `Array`: Palette colors
--   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
 -   _fontSizes_ `Array`: Available font sizes
--   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
+-   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
@@ -487,15 +488,16 @@ _Properties_
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _isRTL_ `boolean`: Whether the editor is in RTL mode
+-   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
--   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
 -   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
--   _\_\_experimentalEnableRichImageEditing_ `boolean`: Whether the user has enabled Rich Image Editing
+-   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
+-   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -557,16 +559,6 @@ _Related_
 <a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
 
 Undocumented declaration.
-
-<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
-
-Function that manipulates media queries from stylesheets to simulate a given
-viewport width.
-
-_Parameters_
-
--   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
--   _width_ `?number`: Viewport width to simulate. If provided null, the stylesheets will not be modified.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 

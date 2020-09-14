@@ -27,6 +27,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"className": false,
 		"lightBlockWrapper": true,
 		"__experimentalColor": {
@@ -34,11 +35,6 @@
 		},
 		"__experimentalFontSize": true,
 		"__experimentalLineHeight": true,
-		"__experimentalFeatures": {
-			"typography": {
-				"dropCap": true
-			}
-		},
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true
 	}

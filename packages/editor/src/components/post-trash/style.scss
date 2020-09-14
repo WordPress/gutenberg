@@ -1,11 +1,3 @@
 .editor-post-trash.components-button {
-	color: darken($alert-red, 15%);
-	border-color: darken($alert-red, 15%);
-	justify-content: center;
-
-	&:not(:disabled):not([aria-disabled="true"]):hover,
-	&:not([aria-disabled="true"]):focus {
-		color: darken($alert-red, 20%);
-		border-color: darken($alert-red, 20%);
-	}
+	margin-top: $grid-unit-05;
 }

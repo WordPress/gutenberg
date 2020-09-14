@@ -13,10 +13,8 @@ const horizontalMover = {
 	forwardButtonIcon: arrowRight,
 	backwardButtonHint: __( 'Double tap to move the block to the left' ),
 	forwardButtonHint: __( 'Double tap to move the block to the right' ),
-	/* translators: %s: block title e.g: "Paragraph" */
-	firstBlockTitle: __( 'Move %s Left' ),
-	/* translators: %s: block title e.g: "Paragraph" */
-	lastBlockTitle: __( 'Move %s Right' ),
+	firstBlockTitle: __( 'Move block left' ),
+	lastBlockTitle: __( 'Move block right' ),
 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
 	backwardButtonTitle: __(
 		'Move block left from position %1$s to position %2$s'
@@ -32,10 +30,8 @@ const verticalMover = {
 	forwardButtonIcon: arrowDown,
 	backwardButtonHint: __( 'Double tap to move the block up' ),
 	forwardButtonHint: __( 'Double tap to move the block down' ),
-	/* translators: %s: block title e.g: "Paragraph" */
-	firstBlockTitle: __( 'Move %s Up' ),
-	/* translators: %s: block title e.g: "Paragraph" */
-	lastBlockTitle: __( 'Move %s Down' ),
+	firstBlockTitle: __( 'Move block up' ),
+	lastBlockTitle: __( 'Move block down' ),
 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
 	backwardButtonTitle: __( 'Move block up from row %1$s to row %2$s' ),
 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
@@ -53,14 +49,13 @@ const SETUP_GETTER = {
 
 export function getMoversSetup(
 	isStackedHorizontally,
-	{ firstIndex, keys = KEYS, blockTitle }
+	{ firstIndex, keys = KEYS }
 ) {
 	return keys.reduce( ( setup, key ) => {
 		if ( KEYS.includes( key ) ) {
 			Object.assign( setup, {
 				[ key ]: getSetup( key, isStackedHorizontally, {
 					firstIndex,
-					blockTitle,
 				} ),
 			} );
 		}
@@ -115,7 +110,7 @@ function getArrowIcon( isStackedHorizontally ) {
 	};
 }
 
-function getMoverActionTitle( isStackedHorizontally, { blockTitle } ) {
+function getMoverActionTitle( isStackedHorizontally ) {
 	const { firstBlockTitle, lastBlockTitle } = getMoverDescription(
 		isStackedHorizontally
 	);
@@ -126,8 +121,8 @@ function getMoverActionTitle( isStackedHorizontally, { blockTitle } ) {
 	const actionTitleNext = applyRTLSetup( false, args );
 
 	return {
-		backward: sprintf( actionTitlePrev, blockTitle ),
-		forward: sprintf( actionTitleNext, blockTitle ),
+		backward: sprintf( actionTitlePrev, firstBlockTitle ),
+		forward: sprintf( actionTitleNext, lastBlockTitle ),
 	};
 }
 
@@ -145,8 +140,8 @@ function getMoverButtonTitle( isStackedHorizontally, { firstIndex } ) {
 	);
 
 	const args = [
-		backwardButtonTitle,
 		forwardButtonTitle,
+		backwardButtonTitle,
 		isStackedHorizontally,
 	];
 

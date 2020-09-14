@@ -1,9 +1,21 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import { BlockControls } from '@wordpress/block-editor';
+import { ToolbarGroup } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import ConvertToBlocksButton from './convert-to-blocks-button';
 
 const { wp } = window;
 
@@ -42,7 +54,11 @@ export default class ClassicEdit extends Component {
 		if ( document.readyState === 'complete' ) {
 			this.initialize();
 		} else {
-			window.addEventListener( 'DOMContentLoaded', this.initialize );
+			document.addEventListener( 'readystatechange', () => {
+				if ( document.readyState === 'complete' ) {
+					this.initialize();
+				}
+			} );
 		}
 	}
 
@@ -58,8 +74,12 @@ export default class ClassicEdit extends Component {
 		} = this.props;
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
+		const currentContent = editor?.getContent();
 
-		if ( prevProps.attributes.content !== content ) {
+		if (
+			prevProps.attributes.content !== content &&
+			currentContent !== content
+		) {
 			editor.setContent( content || '' );
 		}
 	}
@@ -94,6 +114,13 @@ export default class ClassicEdit extends Component {
 
 		editor.on( 'blur', () => {
 			bookmark = editor.selection.getBookmark( 2, true );
+			// There is an issue with Chrome and the editor.focus call in core at https://core.trac.wordpress.org/browser/trunk/src/js/_enqueues/lib/link.js#L451.
+			// This causes a scroll to the top of editor content on return from some content updating dialogs so tracking
+			// scroll position until this is fixed in core.
+			const scrollContainer = document.querySelector(
+				'.interface-interface-skeleton__content'
+			);
+			const scrollPosition = scrollContainer.scrollTop;
 
 			setAttributes( {
 				content: editor.getContent(),
@@ -102,6 +129,9 @@ export default class ClassicEdit extends Component {
 			editor.once( 'focus', () => {
 				if ( bookmark ) {
 					editor.selection.moveToBookmark( bookmark );
+					if ( scrollContainer.scrollTop !== scrollPosition ) {
+						scrollContainer.scrollTop = scrollPosition;
+					}
 				}
 			} );
 
@@ -112,7 +142,29 @@ export default class ClassicEdit extends Component {
 			bookmark = null;
 		} );
 
+		const debouncedOnChange = debounce( () => {
+			const value = editor.getContent();
+
+			if ( value !== editor._lastChange ) {
+				editor._lastChange = value;
+				setAttributes( {
+					content: value,
+				} );
+			}
+		}, 250 );
+		editor.on( 'Paste Change input Undo Redo', debouncedOnChange );
+
+		// We need to cancel the debounce call because when we remove
+		// the editor (onUnmount) this callback is executed in
+		// another tick. This results in setting the content to empty.
+		editor.on( 'remove', debouncedOnChange.cancel );
+
 		editor.on( 'keydown', ( event ) => {
+			if ( isKeyboardEvent.primary( event, 'z' ) ) {
+				// Prevent the gutenberg undo kicking in so TinyMCE undo stack works as expected
+				event.stopPropagation();
+			}
+
 			if (
 				( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
 				isTmceEmpty( editor )
@@ -197,22 +249,29 @@ export default class ClassicEdit extends Component {
 		//    from the KeyboardShortcuts component to stop their propagation.
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return [
-			<div
-				key="toolbar"
-				id={ `toolbar-${ clientId }` }
-				ref={ ( ref ) => ( this.ref = ref ) }
-				className="block-library-classic__toolbar"
-				onClick={ this.focus }
-				data-placeholder={ __( 'Classic' ) }
-				onKeyDown={ this.onToolbarKeyDown }
-			/>,
-			<div
-				key="editor"
-				id={ `editor-${ clientId }` }
-				className="wp-block-freeform block-library-rich-text__tinymce"
-			/>,
-		];
+		return (
+			<>
+				<BlockControls>
+					<ToolbarGroup>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</ToolbarGroup>
+				</BlockControls>
+				<div
+					key="toolbar"
+					id={ `toolbar-${ clientId }` }
+					ref={ ( ref ) => ( this.ref = ref ) }
+					className="block-library-classic__toolbar"
+					onClick={ this.focus }
+					data-placeholder={ __( 'Classic' ) }
+					onKeyDown={ this.onToolbarKeyDown }
+				/>
+				<div
+					key="editor"
+					id={ `editor-${ clientId }` }
+					className="wp-block-freeform block-library-rich-text__tinymce"
+				/>
+			</>
+		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }

@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/keyboard-shortcuts",
-	"version": "1.6.0",
+	"version": "1.10.0",
 	"description": "Handling keyboard shortcuts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"keycodes"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/keyboard-shortcuts/README.md",
@@ -26,7 +27,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/keycodes": "file:../keycodes",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

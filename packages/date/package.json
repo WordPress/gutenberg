@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/date",
-	"version": "3.9.0",
+	"version": "3.11.0",
 	"description": "Date module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"date"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/date/README.md",
@@ -23,7 +24,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"moment": "^2.22.1",
-		"moment-timezone": "^0.5.16"
+		"moment-timezone": "^0.5.31"
 	},
 	"publishConfig": {
 		"access": "public"

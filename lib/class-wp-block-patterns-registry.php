@@ -7,6 +7,11 @@
 
 /**
  * Class used for interacting with patterns.
+ *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50445
+ * @see https://core.trac.wordpress.org/changeset/48156
  */
 final class WP_Block_Patterns_Registry {
 	/**
@@ -27,13 +32,25 @@ final class WP_Block_Patterns_Registry {
 	 * Registers a pattern.
 	 *
 	 * @param string $pattern_name       Pattern name including namespace.
-	 * @param array  $pattern_properties Array containing the properties of the pattern: label, content.
+	 * @param array  $pattern_properties Array containing the properties of the pattern: Title, content, description, viewportWidth, categories, keywords.
 	 * @return boolean True if the pattern was registered with success and false otherwise.
 	 */
 	public function register( $pattern_name, $pattern_properties ) {
 		if ( ! isset( $pattern_name ) || ! is_string( $pattern_name ) ) {
-			$message = __( 'Pattern name must be a string.', 'gutenberg' );
+			$message = __( 'Block pattern name must be a string.', 'gutenberg' );
 			_doing_it_wrong( __METHOD__, $message, '7.8.0' );
+			return false;
+		}
+
+		if ( ! isset( $pattern_properties['title'] ) || ! is_string( $pattern_properties['title'] ) ) {
+			$message = __( 'Block pattern title must be a string.', 'gutenberg' );
+			_doing_it_wrong( __METHOD__, $message, '8.5.0' );
+			return false;
+		}
+
+		if ( ! isset( $pattern_properties['content'] ) || ! is_string( $pattern_properties['content'] ) ) {
+			$message = __( 'Block pattern content must be a string.', 'gutenberg' );
+			_doing_it_wrong( __METHOD__, $message, '8.5.0' );
 			return false;
 		}
 
@@ -54,7 +71,7 @@ final class WP_Block_Patterns_Registry {
 	public function unregister( $pattern_name ) {
 		if ( ! $this->is_registered( $pattern_name ) ) {
 			/* translators: 1: Pattern name. */
-			$message = sprintf( __( 'Pattern "%1$s" not found.', 'gutenberg' ), $pattern_name );
+			$message = sprintf( __( 'Block pattern "%1$s" not found.', 'gutenberg' ), $pattern_name );
 			_doing_it_wrong( __METHOD__, $message, '7.8.0' );
 			return false;
 		}

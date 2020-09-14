@@ -24,7 +24,6 @@ $footer-height: $button-size-small;
 @import "./components/options-modal/style.scss";
 @import "./components/welcome-guide/style.scss";
 
-
 /**
  * Animations
  */
@@ -58,7 +57,8 @@ body.block-editor-page {
 .edit-post-sidebar,
 .editor-post-publish-panel,
 .components-popover,
-.components-modal__frame {
+.components-modal__frame,
+.edit-post-layout__inserter-panel {
 	@include reset;
 }
 
@@ -110,3 +110,5 @@ body.block-editor-page {
 		max-width: none;
 	}
 }
+
+@include wordpress-admin-schemes();

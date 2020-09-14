@@ -13,6 +13,7 @@ import {
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,7 +25,7 @@ export default function PostTitleEdit( {
 	setAttributes,
 	context,
 } ) {
-	const { level, align } = attributes;
+	const { level, textAlign } = attributes;
 	const { postType, postId } = context;
 	const tagName = 0 === level ? 'p' : 'h' + level;
 
@@ -42,6 +43,8 @@ export default function PostTitleEdit( {
 		return null;
 	}
 
+	const BlockWrapper = Block[ tagName ];
+
 	return (
 		<>
 			<BlockControls>
@@ -54,20 +57,19 @@ export default function PostTitleEdit( {
 					/>
 				</ToolbarGroup>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>
-			<Block
-				tagName={ tagName }
+			<BlockWrapper
 				className={ classnames( {
-					[ `has-text-align-${ align }` ]: align,
+					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
-				{ post.title }
-			</Block>
+				{ post.title || __( 'Post Title' ) }
+			</BlockWrapper>
 		</>
 	);
 }

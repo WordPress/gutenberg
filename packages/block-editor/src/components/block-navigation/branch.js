@@ -36,9 +36,8 @@ export default function BlockNavigationBranch( props ) {
 		selectedBlockClientId === parentClientId;
 	const hasAppender = itemHasAppender( parentBlockClientId );
 	// Add +1 to the rowCount to take the block appender into account.
-	const rowCount = hasAppender
-		? filteredBlocks.length + 1
-		: filteredBlocks.length;
+	const blockCount = filteredBlocks.length;
+	const rowCount = hasAppender ? blockCount + 1 : blockCount;
 	const appenderPosition = rowCount;
 
 	return (
@@ -59,11 +58,12 @@ export default function BlockNavigationBranch( props ) {
 					<Fragment key={ clientId }>
 						<BlockNavigationBlock
 							block={ block }
-							onClick={ () => selectBlock( clientId ) }
+							onClick={ selectBlock }
 							isSelected={ selectedBlockClientId === clientId }
 							level={ level }
 							position={ position }
 							rowCount={ rowCount }
+							siblingBlockCount={ blockCount }
 							showBlockMovers={ showBlockMovers }
 							terminatedLevels={ terminatedLevels }
 							path={ updatedPath }

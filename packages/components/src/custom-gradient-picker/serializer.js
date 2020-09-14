@@ -7,6 +7,9 @@ export function serializeGradientColor( { type, value } ) {
 	if ( type === 'literal' ) {
 		return value;
 	}
+	if ( type === 'hex' ) {
+		return `#${ value }`;
+	}
 	return `${ type }(${ value.join( ',' ) })`;
 }
 

@@ -24,11 +24,15 @@ describe( 'Block Switcher', () => {
 		expect( await hasBlockSwitcher() ).toBeTruthy();
 
 		// Verify the correct block transforms appear.
-		expect( await getAvailableBlockTransforms() ).toEqual( [
-			'Group',
-			'Paragraph',
-			'Quote',
-		] );
+		expect( await getAvailableBlockTransforms() ).toEqual(
+			expect.arrayContaining( [
+				'Group',
+				'Paragraph',
+				'Quote',
+				'Heading',
+				'Pullquote',
+			] )
+		);
 	} );
 
 	it( 'Should show the expected block transforms on the list block when the quote block is removed', async () => {
@@ -46,18 +50,26 @@ describe( 'Block Switcher', () => {
 		expect( await hasBlockSwitcher() ).toBeTruthy();
 
 		// Verify the correct block transforms appear.
-		expect( await getAvailableBlockTransforms() ).toEqual( [
-			'Group',
-			'Paragraph',
-		] );
+		expect( await getAvailableBlockTransforms() ).toEqual(
+			expect.arrayContaining( [
+				'Group',
+				'Paragraph',
+				'Pullquote',
+				'Heading',
+			] )
+		);
 	} );
 
 	it( 'Should not show the block switcher if all the blocks the list block transforms into are removed', async () => {
 		// Remove the paragraph and quote block from the list of registered blocks.
 		await page.evaluate( () => {
-			[ 'core/quote', 'core/paragraph', 'core/group' ].map( ( block ) =>
-				wp.blocks.unregisterBlockType( block )
-			);
+			[
+				'core/quote',
+				'core/pullquote',
+				'core/paragraph',
+				'core/group',
+				'core/heading',
+			].map( ( block ) => wp.blocks.unregisterBlockType( block ) );
 		} );
 
 		// Insert a list block.

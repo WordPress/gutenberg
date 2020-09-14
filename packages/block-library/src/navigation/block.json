@@ -5,9 +5,6 @@
 		"orientation": {
 			"type": "string"
 		},
-		"className": {
-			"type": "string"
-		},
 		"textColor": {
 			"type": "string"
 		},
@@ -26,12 +23,6 @@
 		"rgbBackgroundColor": {
 			"type": "string"
 		},
-		"fontSize": {
-			"type": "string"
-		},
-		"customFontSize": {
-			"type": "number"
-		},
 		"itemsJustification": {
 			"type": "string"
 		},
@@ -40,14 +31,21 @@
 			"default": true
 		}
 	},
+	"providesContext": {
+		"textColor": "textColor",
+		"customTextColor": "customTextColor",
+		"backgroundColor": "backgroundColor",
+		"customBackgroundColor": "customBackgroundColor",
+		"fontSize": "fontSize",
+		"customFontSize": "customFontSize",
+		"showSubmenuIcon": "showSubmenuIcon"
+	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
-		"lightBlockWrapper": true
+		"lightBlockWrapper": true,
+		"__experimentalFontSize": true
 	}
 }

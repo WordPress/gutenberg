@@ -11,6 +11,32 @@ describe( 'getQueryParts', () => {
 			page: 2,
 			perPage: 2,
 			stableKey: '',
+			fields: null,
+			include: null,
+		} );
+	} );
+
+	it( 'parses out `include` ID filtering', () => {
+		const parts = getQueryParts( { include: [ 1 ] } );
+
+		expect( parts ).toEqual( {
+			page: 1,
+			perPage: 10,
+			stableKey: '',
+			fields: null,
+			include: [ 1 ],
+		} );
+	} );
+
+	it( 'parses out `_fields` property filtering', () => {
+		const parts = getQueryParts( { _fields: 'content', a: 1 } );
+
+		expect( parts ).toEqual( {
+			page: 1,
+			perPage: 10,
+			stableKey: 'a=1',
+			fields: [ 'content' ],
+			include: null,
 		} );
 	} );
 
@@ -23,6 +49,8 @@ describe( 'getQueryParts', () => {
 			page: 1,
 			perPage: 10,
 			stableKey: '%3F=%26&b=2',
+			fields: null,
+			include: null,
 		} );
 	} );
 
@@ -33,6 +61,8 @@ describe( 'getQueryParts', () => {
 			page: 1,
 			perPage: 10,
 			stableKey: 'a%5B0%5D=1&a%5B1%5D=2',
+			fields: null,
+			include: null,
 		} );
 	} );
 
@@ -45,6 +75,8 @@ describe( 'getQueryParts', () => {
 			page: 1,
 			perPage: 10,
 			stableKey: 'b=2',
+			fields: null,
+			include: null,
 		} );
 	} );
 
@@ -55,6 +87,8 @@ describe( 'getQueryParts', () => {
 			page: 1,
 			perPage: -1,
 			stableKey: 'b=2',
+			fields: null,
+			include: null,
 		} );
 	} );
 } );

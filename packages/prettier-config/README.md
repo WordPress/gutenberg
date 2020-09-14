@@ -15,7 +15,7 @@ $ npm install @wordpress/prettier-config --save-dev
 Add this to your `package.json` file:
 
 ```json
-prettier": "@wordpress/prettier-config"
+"prettier": "@wordpress/prettier-config"
 ```
 
 Alternatively, add this to `.prettierrc` file:

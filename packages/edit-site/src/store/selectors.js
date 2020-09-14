@@ -47,29 +47,33 @@ export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
 /**
  * Returns the settings, taking into account active features and permissions.
  *
- * @param {Object} state Global application state.
+ * @param {Object}   state             Global application state.
+ * @param {Function} setIsInserterOpen Setter for the open state of the global inserter.
  *
  * @return {Object} Settings.
  */
 export const getSettings = createSelector(
-	( state ) => {
-		const canUserCreateMedia = getCanUserCreateMedia( state );
-		if ( ! canUserCreateMedia ) {
-			return state.settings;
-		}
-
-		return {
+	( state, setIsInserterOpen ) => {
+		const settings = {
 			...state.settings,
 			focusMode: isFeatureActive( state, 'focusMode' ),
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
-			mediaUpload( { onError, ...rest } ) {
-				uploadMedia( {
-					wpAllowedMimeTypes: state.settings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
-					...rest,
-				} );
-			},
+			__experimentalSetIsInserterOpened: setIsInserterOpen,
 		};
+
+		const canUserCreateMedia = getCanUserCreateMedia( state );
+		if ( ! canUserCreateMedia ) {
+			return settings;
+		}
+
+		settings.mediaUpload = ( { onError, ...rest } ) => {
+			uploadMedia( {
+				wpAllowedMimeTypes: state.settings.allowedMimeTypes,
+				onError: ( { message } ) => onError( message ),
+				...rest,
+			} );
+		};
+		return settings;
 	},
 	( state ) => [
 		getCanUserCreateMedia( state ),
@@ -84,7 +88,7 @@ export const getSettings = createSelector(
  *
  * @param {Object} state Global application state.
  *
- * @return {number} Home template ID.
+ * @return {number?} Home template ID.
  */
 export function getHomeTemplateId( state ) {
 	return state.homeTemplateId;
@@ -95,7 +99,7 @@ export function getHomeTemplateId( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number} Template ID.
+ * @return {number?} Template ID.
  */
 export function getTemplateId( state ) {
 	return state.templateId;
@@ -106,7 +110,7 @@ export function getTemplateId( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number} Template part ID.
+ * @return {number?} Template part ID.
  */
 export function getTemplatePartId( state ) {
 	return state.templatePartId;
@@ -117,32 +121,10 @@ export function getTemplatePartId( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string} Template type.
+ * @return {string?} Template type.
  */
 export function getTemplateType( state ) {
 	return state.templateType;
-}
-
-/**
- * Returns the current template IDs.
- *
- * @param {Object} state Global application state.
- *
- * @return {number[]} Template IDs.
- */
-export function getTemplateIds( state ) {
-	return state.templateIds;
-}
-
-/**
- * Returns the current template part IDs.
- *
- * @param {Object} state Global application state.
- *
- * @return {number[]} Template part IDs.
- */
-export function getTemplatePartIds( state ) {
-	return state.templatePartIds;
 }
 
 /**
@@ -154,15 +136,4 @@ export function getTemplatePartIds( state ) {
  */
 export function getPage( state ) {
 	return state.page;
-}
-
-/**
- * Returns the site's current `show_on_front` setting.
- *
- * @param {Object} state Global application state.
- *
- * @return {Object} The setting.
- */
-export function getShowOnFront( state ) {
-	return state.showOnFront;
 }
