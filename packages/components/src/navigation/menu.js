@@ -37,7 +37,7 @@ export default function NavigationMenu( {
 	const classes = classnames( 'components-navigation__menu', className );
 
 	return (
-		<div className={ classes }>
+		<MenuUI className={ classes }>
 			{ parentMenu && (
 				<MenuBackButtonUI
 					className="components-navigation__back-button"
@@ -48,18 +48,16 @@ export default function NavigationMenu( {
 					{ backButtonLabel || __( 'Back' ) }
 				</MenuBackButtonUI>
 			) }
-			<MenuUI>
-				{ title && (
-					<MenuTitleUI
-						as="h2"
-						className="components-navigation__menu-title"
-						variant="subtitle"
-					>
-						{ title }
-					</MenuTitleUI>
-				) }
-				{ children }
-			</MenuUI>
-		</div>
+			{ title && (
+				<MenuTitleUI
+					as="h2"
+					className="components-navigation__menu-title"
+					variant="subtitle"
+				>
+					{ title }
+				</MenuTitleUI>
+			) }
+			<ul>{ children }</ul>
+		</MenuUI>
 	);
 }

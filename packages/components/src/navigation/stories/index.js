@@ -72,19 +72,13 @@ function Example() {
 					parentMenu="root"
 					title="Category"
 				>
-					<ul>
-						<NavigationItem
-							badge="1"
-							item="child-1"
-							title="Child 1"
-						/>
-						<NavigationItem item="child-2" title="Child 2" />
-						<NavigationItem
-							navigateToMenu="nested-category"
-							item="child-3"
-							title="Nested Category"
-						/>
-					</ul>
+					<NavigationItem badge="1" item="child-1" title="Child 1" />
+					<NavigationItem item="child-2" title="Child 2" />
+					<NavigationItem
+						navigateToMenu="nested-category"
+						item="child-3"
+						title="Nested Category"
+					/>
 				</NavigationMenu>
 
 				<NavigationMenu
@@ -93,16 +87,8 @@ function Example() {
 					parentMenu="category"
 					title="Nested Category"
 				>
-					<ul>
-						<NavigationItem
-							item="sub-child-1"
-							title="Sub Child 1"
-						/>
-						<NavigationItem
-							item="sub-child-2"
-							title="Sub Child 2"
-						/>
-					</ul>
+					<NavigationItem item="sub-child-1" title="Sub Child 1" />
+					<NavigationItem item="sub-child-2" title="Sub Child 2" />
 				</NavigationMenu>
 			</Navigation>
 
