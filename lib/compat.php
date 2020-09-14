@@ -455,7 +455,7 @@ add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_cont
 
 if (
 	current_theme_supports( 'split-block-styles' ) &&
-	( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) )
+	( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) )
 ) {
 	/**
 	 * Avoid enqueueing block assets of all registered blocks for all posts, instead
