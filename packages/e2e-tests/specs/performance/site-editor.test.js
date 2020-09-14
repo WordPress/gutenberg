@@ -35,7 +35,6 @@ describe( 'Site Editor Performance', () => {
 	it( 'Loading', async () => {
 		const results = {
 			load: [],
-			domcontentloaded: [],
 			type: [],
 			focus: [],
 		};
@@ -51,21 +50,10 @@ describe( 'Site Editor Performance', () => {
 
 		// Measuring loading time
 		while ( i-- ) {
-			await page.reload( { waitUntil: [ 'domcontentloaded', 'load' ] } );
-			const timings = JSON.parse(
-				await page.evaluate( () =>
-					JSON.stringify( window.performance.timing )
-				)
-			);
-			const {
-				navigationStart,
-				domContentLoadedEventEnd,
-				loadEventEnd,
-			} = timings;
-			results.load.push( loadEventEnd - navigationStart );
-			results.domcontentloaded.push(
-				domContentLoadedEventEnd - navigationStart
-			);
+			const startTime = new Date();
+			await page.reload();
+			await page.waitForSelector( '.wp-block' );
+			results.load.push( new Date() - startTime );
 		}
 
 		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
