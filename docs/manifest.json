@@ -12,42 +12,6 @@
 		"parent": null
 	},
 	{
-		"title": "Architecture",
-		"slug": "architecture",
-		"markdown_source": "../docs/architecture/readme.md",
-		"parent": "principles"
-	},
-	{
-		"title": "Folder Structure",
-		"slug": "folder-structure",
-		"markdown_source": "../docs/architecture/folder-structure.md",
-		"parent": "architecture"
-	},
-	{
-		"title": "Modularity",
-		"slug": "modularity",
-		"markdown_source": "../docs/architecture/modularity.md",
-		"parent": "architecture"
-	},
-	{
-		"title": "Performance",
-		"slug": "performance",
-		"markdown_source": "../docs/architecture/performance.md",
-		"parent": "architecture"
-	},
-	{
-		"title": "Automated Testing",
-		"slug": "automated-testing",
-		"markdown_source": "../docs/architecture/automated-testing.md",
-		"parent": "architecture"
-	},
-	{
-		"title": "Key Concepts",
-		"slug": "key-concepts",
-		"markdown_source": "../docs/designers-developers/key-concepts.md",
-		"parent": "principles"
-	},
-	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/designers-developers/glossary.md",
@@ -76,6 +40,48 @@
 		"slug": "outreach",
 		"markdown_source": "../docs/contributors/outreach.md",
 		"parent": "principles"
+	},
+	{
+		"title": "Architecture",
+		"slug": "architecture",
+		"markdown_source": "../docs/architecture/readme.md",
+		"parent": null
+	},
+	{
+		"title": "Key Concepts",
+		"slug": "key-concepts",
+		"markdown_source": "../docs/architecture/key-concepts.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Data Flow and Data Format",
+		"slug": "data-flow",
+		"markdown_source": "../docs/architecture/data-flow.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Folder Structure",
+		"slug": "folder-structure",
+		"markdown_source": "../docs/architecture/folder-structure.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Modularity",
+		"slug": "modularity",
+		"markdown_source": "../docs/architecture/modularity.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Performance",
+		"slug": "performance",
+		"markdown_source": "../docs/architecture/performance.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Automated Testing",
+		"slug": "automated-testing",
+		"markdown_source": "../docs/architecture/automated-testing.md",
+		"parent": "architecture"
 	},
 	{
 		"title": "Developer Documentation",
