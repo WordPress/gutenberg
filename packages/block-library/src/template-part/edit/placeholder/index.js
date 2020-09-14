@@ -5,12 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
-import {
-	Placeholder,
-	Dropdown,
-	ButtonGroup,
-	Button,
-} from '@wordpress/components';
+import { Placeholder, Dropdown, Button } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 import { __experimentalSearchForm as SearchForm } from '@wordpress/block-editor';
 
@@ -54,7 +49,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
 				position="bottom right left"
 				renderToggle={ ( { isOpen, onToggle } ) => (
-					<ButtonGroup>
+					<>
 						<Button
 							isPrimary
 							onClick={ onToggle }
@@ -62,10 +57,10 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 						>
 							{ __( 'Choose existing' ) }
 						</Button>
-						<Button onClick={ onCreate }>
+						<Button isTertiary onClick={ onCreate }>
 							{ __( 'New template part' ) }
 						</Button>
-					</ButtonGroup>
+					</>
 				) }
 				renderContent={ () => (
 					<>

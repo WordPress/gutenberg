@@ -27,13 +27,23 @@ const queriedItemsCacheByState = new WeakMap();
  * @return {?Array} Query items.
  */
 function getQueriedItemsUncached( state, query ) {
-	const { stableKey, page, perPage } = getQueryParts( query );
+	const { stableKey, page, perPage, include, fields } = getQueryParts(
+		query
+	);
 
-	if ( ! state.queries[ stableKey ] ) {
-		return null;
+	let itemIds;
+	if ( Array.isArray( include ) && ! stableKey ) {
+		// If the parsed query yields a set of IDs, but otherwise no filtering,
+		// it's safe to consider targeted item IDs as the include set. This
+		// doesn't guarantee that those objects have been queried, which is
+		// accounted for below in the loop `null` return.
+		itemIds = include;
+		// TODO: Avoid storing the empty stable string in reducer, since it
+		// can be computed dynamically here always.
+	} else if ( state.queries[ stableKey ] ) {
+		itemIds = state.queries[ stableKey ];
 	}
 
-	const itemIds = state.queries[ stableKey ];
 	if ( ! itemIds ) {
 		return null;
 	}
@@ -47,7 +57,43 @@ function getQueriedItemsUncached( state, query ) {
 	const items = [];
 	for ( let i = startOffset; i < endOffset; i++ ) {
 		const itemId = itemIds[ i ];
-		items.push( state.items[ itemId ] );
+		if ( Array.isArray( include ) && ! include.includes( itemId ) ) {
+			continue;
+		}
+
+		if ( ! state.items.hasOwnProperty( itemId ) ) {
+			return null;
+		}
+
+		const item = state.items[ itemId ];
+
+		let filteredItem;
+		if ( Array.isArray( fields ) ) {
+			filteredItem = {};
+
+			for ( let f = 0; f < fields.length; f++ ) {
+				// Abort the entire request if a field is missing from the item.
+				// This accounts for the fact that queried items are stored by
+				// stable key without an associated fields query. Other requests
+				// may have included fewer fields properties.
+				const field = fields[ f ];
+				if ( ! item.hasOwnProperty( field ) ) {
+					return null;
+				}
+
+				filteredItem[ field ] = item[ field ];
+			}
+		} else {
+			// If expecting a complete item, validate that completeness, or
+			// otherwise abort.
+			if ( ! state.itemIsComplete[ itemId ] ) {
+				return null;
+			}
+
+			filteredItem = item;
+		}
+
+		items.push( filteredItem );
 	}
 
 	return items;

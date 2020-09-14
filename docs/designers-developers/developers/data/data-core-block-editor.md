@@ -370,6 +370,20 @@ _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
 
+<a name="getDraggedBlockClientIds" href="#getDraggedBlockClientIds">#</a> **getDraggedBlockClientIds**
+
+Returns the client ids of any blocks being directly dragged.
+
+This does not include children of a parent being dragged.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Array<string>`: Array of dragged block client ids.
+
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
 Returns the client ID of the first block in the multi-selection set, or null
@@ -744,6 +758,19 @@ _Returns_
 
 -   `boolean`: Whether the block as an inner block selected
 
+<a name="isAncestorBeingDragged" href="#isAncestorBeingDragged">#</a> **isAncestorBeingDragged**
+
+Returns whether a parent/ancestor of the block is being dragged.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: Client id for block to check.
+
+_Returns_
+
+-   `boolean`: Whether the block's ancestor is being dragged.
+
 <a name="isAncestorMultiSelected" href="#isAncestorMultiSelected">#</a> **isAncestorMultiSelected**
 
 Returns true if an ancestor of the block is multi-selected, or false
@@ -757,6 +784,23 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether an ancestor of the block is in multi-selection set.
+
+<a name="isBlockBeingDragged" href="#isBlockBeingDragged">#</a> **isBlockBeingDragged**
+
+Returns whether the block is being dragged.
+
+Only returns true if the block is being directly dragged,
+not if the block is a child of a parent being dragged.
+See `isAncestorBeingDragged` for child blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: Client id for block to check.
+
+_Returns_
+
+-   `boolean`: Whether the block is being dragged.
 
 <a name="isBlockHighlighted" href="#isBlockHighlighted">#</a> **isBlockHighlighted**
 
@@ -1347,6 +1391,10 @@ _Returns_
 <a name="startDraggingBlocks" href="#startDraggingBlocks">#</a> **startDraggingBlocks**
 
 Returns an action object used in signalling that the user has begun to drag blocks.
+
+_Parameters_
+
+-   _clientIds_ `Array<string>`: An array of client ids being dragged
 
 _Returns_
 
