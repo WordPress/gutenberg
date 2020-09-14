@@ -104,7 +104,7 @@ $color-palette-circle-spacing: 12px;
 	&:focus {
 		&::after {
 			content: "";
-			border: #{ $border-width * 2 } solid $dark-gray-400;
+			border: #{ $border-width * 2 } solid $gray-700;
 			width: 32px;
 			height: 32px;
 			position: absolute;

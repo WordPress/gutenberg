@@ -262,6 +262,57 @@ function gutenberg_experimental_global_styles_get_theme() {
 }
 
 /**
+ * Convert style property to its CSS name.
+ *
+ * @param string $style_property Style property name.
+ * @return string CSS property name.
+ */
+function gutenberg_experimental_global_styles_get_css_property( $style_property ) {
+	switch ( $style_property ) {
+		case 'backgroundColor':
+			return 'background-color';
+		case 'fontSize':
+			return 'font-size';
+		case 'lineHeight':
+			return 'line-height';
+		default:
+			return $style_property;
+	}
+}
+
+/**
+ * Return how the style property is structured.
+ *
+ * @return array Style property structure.
+ */
+function gutenberg_experimental_global_styles_get_style_property() {
+	return array(
+		'--wp--style--color--link' => array( 'color', 'link' ),
+		'background'               => array( 'color', 'gradient' ),
+		'backgroundColor'          => array( 'color', 'background' ),
+		'color'                    => array( 'color', 'text' ),
+		'fontSize'                 => array( 'typography', 'fontSize' ),
+		'lineHeight'               => array( 'typography', 'lineHeight' ),
+	);
+}
+
+/**
+ * Return how the support keys are structured.
+ *
+ * @return array Support keys structure.
+ */
+function gutenberg_experimental_global_styles_get_support_keys() {
+	return array(
+		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
+		'background'               => array( '__experimentalColor', 'gradients' ),
+		'backgroundColor'          => array( '__experimentalColor' ),
+		'color'                    => array( '__experimentalColor' ),
+		'fontSize'                 => array( '__experimentalFontSize' ),
+		'lineHeight'               => array( '__experimentalLineHeight' ),
+	);
+}
+
+/**
  * Returns the style features a particular block supports.
  *
  * @param array $supports The block supports array.
@@ -269,19 +320,11 @@ function gutenberg_experimental_global_styles_get_theme() {
  * @return array Style features supported by the block.
  */
 function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
-	$style_features = array(
-		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
-		'background-color'         => array( '__experimentalColor' ),
-		'background'               => array( '__experimentalColor', 'gradients' ),
-		'color'                    => array( '__experimentalColor' ),
-		'font-size'                => array( '__experimentalFontSize' ),
-		'line-height'              => array( '__experimentalLineHeight' ),
-	);
-
+	$support_keys       = gutenberg_experimental_global_styles_get_support_keys();
 	$supported_features = array();
-	foreach ( $style_features as $style_feature => $path ) {
+	foreach ( $support_keys as $key => $path ) {
 		if ( gutenberg_experimental_get( $supports, $path ) ) {
-			$supported_features[] = $style_feature;
+			$supported_features[] = $key;
 		}
 	}
 
@@ -385,17 +428,9 @@ function gutenberg_experimental_global_styles_get_block_data() {
  * @return array Containing a set of css rules.
  */
 function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
-	$mappings = array(
-		'line-height'              => array( 'typography', 'lineHeight' ),
-		'font-size'                => array( 'typography', 'fontSize' ),
-		'background'               => array( 'color', 'gradient' ),
-		'background-color'         => array( 'color', 'background' ),
-		'color'                    => array( 'color', 'text' ),
-		'--wp--style--color--link' => array( 'color', 'link' ),
-	);
+	$mappings = gutenberg_experimental_global_styles_get_style_property();
 
 	$result = array();
-
 	foreach ( $mappings as $key => $path ) {
 		$value = gutenberg_experimental_get( $styles, $path, null );
 		if ( null !== $value ) {
@@ -473,6 +508,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
  * @return string The corresponding CSS rule.
  */
 function gutenberg_experimental_global_styles_resolver_styles( $block_selector, $block_supports, $block_styles ) {
+	$css_property     = '';
 	$css_rule         = '';
 	$css_declarations = '';
 
@@ -481,12 +517,18 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 		//
 		// 1) The style attributes the block has declared support for.
 		// 2) Any CSS custom property attached to the node.
-		if ( in_array( $property, $block_supports, true ) || strstr( $property, '--' ) ) {
+		if (
+			in_array( $property, $block_supports, true ) ||
+			strstr( $property, '--' )
+		) {
+			$css_property = gutenberg_experimental_global_styles_get_css_property( $property );
 
 			// Add whitespace if SCRIPT_DEBUG is defined and set to true.
-			$css_declarations .= ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG )
-				? "\t" . $property . ': ' . $value . ";\n"
-				: $property . ':' . $value . ';';
+			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+				$css_declarations .= "\t" . $css_property . ': ' . $value . ";\n";
+			} else {
+				$css_declarations .= $css_property . ':' . $value . ';';
+			}
 		}
 	}
 
@@ -521,11 +563,18 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 	$result = gutenberg_experimental_global_styles_normalize_schema( array() );
 
 	foreach ( array_keys( $core ) as $block_name ) {
-		foreach ( array( 'presets', 'features' ) as $subtree ) {
-			$result[ $block_name ][ $subtree ] = array_merge(
-				$core[ $block_name ][ $subtree ],
-				$theme[ $block_name ][ $subtree ],
-				$user[ $block_name ][ $subtree ]
+		foreach ( array_keys( $core[ $block_name ]['presets'] ) as $subtree ) {
+			$result[ $block_name ]['presets'][ $subtree ] = array_merge(
+				$core[ $block_name ]['presets'][ $subtree ],
+				$theme[ $block_name ]['presets'][ $subtree ],
+				$user[ $block_name ]['presets'][ $subtree ]
+			);
+		}
+		foreach ( array_keys( $core[ $block_name ]['features'] ) as $subtree ) {
+			$result[ $block_name ]['features'][ $subtree ] = array_merge(
+				$core[ $block_name ]['features'][ $subtree ],
+				$theme[ $block_name ]['features'][ $subtree ],
+				$user[ $block_name ]['features'][ $subtree ]
 			);
 		}
 		foreach ( array_keys( $core[ $block_name ]['styles'] ) as $subtree ) {
@@ -553,8 +602,19 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 			'typography' => array(),
 			'color'      => array(),
 		),
-		'features' => array(),
-		'presets'  => array(),
+		'features' => array(
+			'typography' => array(),
+			'color'      => array(),
+			'gradient'   => array(),
+			'fontSize'   => array(),
+			'lineHeight' => array(),
+			'spacing'    => array(),
+		),
+		'presets'  => array(
+			'color'     => array(),
+			'font-size' => array(),
+			'gradient'  => array(),
+		),
 	);
 
 	$normalized_tree = array();
