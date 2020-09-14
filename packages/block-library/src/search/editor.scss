@@ -10,7 +10,7 @@
 	.wp-block-search__input,
 	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
 		border-radius: $radius-block-ui;
-		border: 1px solid $dark-gray-200;
+		border: 1px solid $gray-600;
 		color: $dark-gray-placeholder;
 		font-family: $default-font;
 		font-size: $default-font-size;
@@ -29,7 +29,7 @@
 		font-family: $default-font;
 		font-size: $default-font-size;
 		padding: 6px 10px;
-		color: $dark-gray-700;
+		color: #32373c;
 	}
 
 	&__components-button-group {
