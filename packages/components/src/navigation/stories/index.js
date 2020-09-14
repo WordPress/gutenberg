@@ -26,6 +26,16 @@ const Container = styled.div`
 	max-width: 246px;
 `;
 
+const CustomComponent = ( { onClick } ) => (
+	<Button onClick={ onClick }>
+		<img
+			alt="WordPress Logo"
+			src="https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png"
+			style={ { width: 50, height: 50 } }
+		/>
+	</Button>
+);
+
 function Example() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
@@ -57,10 +67,8 @@ function Example() {
 							title="External link"
 						/>
 						<NavigationItem item="item-5">
-							<img
-								alt="WordPress Logo"
-								src="https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png"
-								style={ { width: 50, height: 50 } }
+							<CustomComponent
+								onClick={ () => setActiveItem( 'item-5' ) }
 							/>
 						</NavigationItem>
 					</NavigationGroup>

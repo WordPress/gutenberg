@@ -44,27 +44,27 @@ export default function NavigationItem( {
 
 	return (
 		<ItemUI className={ classes }>
-			<Button href={ href } onClick={ onItemClick } { ...props }>
-				{ title && (
-					<ItemTitleUI
-						className="components-navigation__item-title"
-						variant="body.small"
-						as="span"
-					>
-						{ title }
-					</ItemTitleUI>
-				) }
+			{ children || (
+				<Button href={ href } onClick={ onItemClick } { ...props }>
+					{ title && (
+						<ItemTitleUI
+							className="components-navigation__item-title"
+							variant="body.small"
+							as="span"
+						>
+							{ title }
+						</ItemTitleUI>
+					) }
 
-				{ children }
+					{ badge && (
+						<ItemBadgeUI className="components-navigation__item-badge">
+							{ badge }
+						</ItemBadgeUI>
+					) }
 
-				{ badge && (
-					<ItemBadgeUI className="components-navigation__item-badge">
-						{ badge }
-					</ItemBadgeUI>
-				) }
-
-				{ navigateToMenu && <Icon icon={ chevronRight } /> }
-			</Button>
+					{ navigateToMenu && <Icon icon={ chevronRight } /> }
+				</Button>
+			) }
 		</ItemUI>
 	);
 }
