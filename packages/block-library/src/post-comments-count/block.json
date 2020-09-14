@@ -1,10 +1,21 @@
 {
 	"name": "core/post-comments-count",
 	"category": "design",
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		}
+	},
 	"usesContext": [
 		"postId"
 	],
 	"supports": {
-		"html": false
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true
+		},
+		"__experimentalFontSize": true,
+		"__experimentalLineHeight": true
 	}
 }

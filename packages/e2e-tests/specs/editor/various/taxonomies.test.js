@@ -128,6 +128,62 @@ describe( 'Taxonomies', () => {
 		expect( selectedCategories[ 0 ] ).toEqual( 'z rand category 1' );
 	} );
 
+	it( "should be able to create a new tag with ' on the name", async () => {
+		await createNewPost();
+
+		await openDocumentSettingsSidebar();
+
+		await openSidebarPanelWithTitle( 'Tags' );
+
+		// If the user has no permission to add a new tag finish the test.
+		if ( ! ( await canCreatTermInTaxonomy( 'tags' ) ) ) {
+			return;
+		}
+
+		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
+		const tagInput = await tagsPanel.$(
+			'.components-form-token-field__input'
+		);
+
+		// Click the tag input field.
+		await tagInput.click();
+
+		const tagName = "tag'-" + random( 1, Number.MAX_SAFE_INTEGER );
+
+		// Type the category name in the field.
+		await tagInput.type( tagName );
+
+		// Press enter to create a new tag.
+		await tagInput.press( 'Enter' );
+
+		await page.waitForSelector( TAG_TOKEN_SELECTOR );
+
+		// Get an array with the tags of the post.
+		let tags = await getCurrentTags();
+
+		// The post should only contain the tag we added.
+		expect( tags ).toHaveLength( 1 );
+		expect( tags[ 0 ] ).toEqual( tagName );
+
+		// Type something in the title so we can publish the post.
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		// Publish the post.
+		await publishPost();
+
+		// Reload the editor.
+		await page.reload();
+
+		// Wait for the tags to load.
+		await page.waitForSelector( '.components-form-token-field__token' );
+
+		tags = await getCurrentTags();
+
+		// The tag selection was persisted after the publish process.
+		expect( tags ).toHaveLength( 1 );
+		expect( tags[ 0 ] ).toEqual( tagName );
+	} );
+
 	it( 'should be able to open the tags panel and create a new tag if the user has the right capabilities', async () => {
 		await createNewPost();
 

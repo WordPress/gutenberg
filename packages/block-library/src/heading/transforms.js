@@ -13,13 +13,15 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
+			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content, anchor } ) => {
-				return createBlock( name, {
-					content,
-					anchor,
-				} );
-			},
+			transform: ( attributes ) =>
+				attributes.map( ( { content, anchor } ) =>
+					createBlock( name, {
+						content,
+						anchor,
+					} )
+				),
 		},
 		{
 			type: 'raw',
@@ -55,7 +57,7 @@ const transforms = {
 				return createBlock( name, attributes );
 			},
 		},
-		...[ 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'prefix',
 			prefix: Array( level + 1 ).join( '#' ),
 			transform( content ) {
@@ -69,13 +71,15 @@ const transforms = {
 	to: [
 		{
 			type: 'block',
+			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content, anchor } ) => {
-				return createBlock( 'core/paragraph', {
-					content,
-					anchor,
-				} );
-			},
+			transform: ( attributes ) =>
+				attributes.map( ( { content, anchor } ) =>
+					createBlock( 'core/paragraph', {
+						content,
+						anchor,
+					} )
+				),
 		},
 	],
 };

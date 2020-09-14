@@ -10,7 +10,6 @@ import {
 	getTemplatePartId,
 	getTemplateType,
 	getPage,
-	getShowOnFront,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -79,7 +78,12 @@ describe( 'selectors', () => {
 			canUser.mockReturnValueOnce( false );
 			canUser.mockReturnValueOnce( false );
 			const state = { settings: {}, preferences: {} };
-			expect( getSettings( state ) ).toBe( state.settings );
+			const setInserterOpened = () => {};
+			expect( getSettings( state, setInserterOpened ) ).toEqual( {
+				focusMode: false,
+				hasFixedToolbar: false,
+				__experimentalSetIsInserterOpened: setInserterOpened,
+			} );
 		} );
 
 		it( 'returns the extended settings when the user can create media', () => {
@@ -92,10 +96,12 @@ describe( 'selectors', () => {
 					},
 				},
 			};
-			expect( getSettings( state ) ).toEqual( {
+			const setInserterOpened = () => {};
+			expect( getSettings( state, setInserterOpened ) ).toEqual( {
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
+				__experimentalSetIsInserterOpened: setInserterOpened,
 				mediaUpload: expect.any( Function ),
 			} );
 		} );
@@ -133,13 +139,6 @@ describe( 'selectors', () => {
 		it( 'returns the page object', () => {
 			const state = { page: {} };
 			expect( getPage( state ) ).toBe( state.page );
-		} );
-	} );
-
-	describe( 'getShowOnFront', () => {
-		it( 'returns the `show_on_front` setting', () => {
-			const state = { showOnFront: {} };
-			expect( getShowOnFront( state ) ).toBe( state.showOnFront );
 		} );
 	} );
 } );

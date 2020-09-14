@@ -27,7 +27,7 @@ const visitSiteEditor = async () => {
 	await visitAdminPage( 'admin.php', query );
 	// Waits for the template part to load...
 	await page.waitForSelector(
-		'.wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
+		'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
 	);
 };
 
@@ -52,17 +52,17 @@ const createTemplatePart = async (
 	isNested = false
 ) => {
 	// Create new template part.
-	await insertBlock( 'Section' );
+	await insertBlock( 'Template Part' );
 	const [ createNewButton ] = await page.$x(
-		'//button[contains(text(), "New section")]'
+		'//button[contains(text(), "New template part")]'
 	);
 	await createNewButton.click();
 	await page.waitForSelector(
 		isNested
-			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
-			: '.wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
+			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
+			: '.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
 	);
-	await page.keyboard.press( 'Tab' );
+	await page.focus( '.wp-block-template-part__name-panel input' );
 	await page.keyboard.type( templatePartName );
 };
 

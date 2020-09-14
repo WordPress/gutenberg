@@ -40,23 +40,24 @@ const ignored = hasArgInCLI( '--ignore' )
  * all the licenses in that string are GPL2 compatible.
  */
 const gpl2CompatibleLicenses = [
+	'0BSD',
 	'Apache-2.0 WITH LLVM-exception',
 	'Artistic-2.0',
-	'BSD',
 	'BSD-2-Clause',
-	'BSD-3-Clause',
 	'BSD-3-Clause-W3C',
-	'0BSD',
+	'BSD-3-Clause',
+	'BSD',
 	'CC-BY-4.0',
 	'CC0-1.0',
+	'GPL-2.0-or-later',
 	'GPL-2.0',
 	'GPL-2.0+',
-	'GPL-2.0-or-later',
 	'ISC',
 	'LGPL-2.1',
 	'MIT',
 	'MIT/X11',
 	'MPL-2.0',
+	'ODC-By-1.0',
 	'Public Domain',
 	'Unlicense',
 	'WTFPL',
@@ -175,7 +176,11 @@ const child = spawn.sync(
 		...( prod ? [ '--prod' ] : [] ),
 		...( dev ? [ '--dev' ] : [] ),
 	],
-	{ maxBuffer: 1024 * 1024 * 100 } // output size for prod is ~21 MB and dev is ~76 MB
+	/*
+	 * Set the max buffer to ~157MB, since the output size for
+	 * prod is ~21 MB and dev is ~110 MB
+	 */
+	{ maxBuffer: 1024 * 1024 * 150 }
 );
 
 const result = JSON.parse( child.stdout.toString() );

@@ -9,7 +9,7 @@
 import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
 import { addMention } from '@wordpress/react-native-bridge';
-import { get, pickBy } from 'lodash';
+import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -17,12 +17,7 @@ import memize from 'memize';
  */
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import {
-	Toolbar,
-	ToolbarButton,
-	withSiteCapabilities,
-	isMentionsSupported,
-} from '@wordpress/components';
+import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
@@ -59,6 +54,8 @@ const gutenbergFormatNamesToAztec = {
 	'core/strikethrough': 'strikethrough',
 };
 
+const EMPTY_PARAGRAPH_TAGS = '<p></p>';
+
 export class RichText extends Component {
 	constructor( {
 		value,
@@ -80,7 +77,8 @@ export class RichText extends Component {
 
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
-		this.onChange = this.onChange.bind( this );
+		this.restoreParagraphTags = this.restoreParagraphTags.bind( this );
+		this.onChangeFromAztec = this.onChangeFromAztec.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
@@ -94,7 +92,7 @@ export class RichText extends Component {
 		this.formatToValue = memize( this.formatToValue.bind( this ), {
 			maxSize: 1,
 		} );
-
+		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
@@ -264,7 +262,7 @@ export class RichText extends Component {
 	/*
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
-	onChange( event ) {
+	onChangeFromAztec( event ) {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -283,14 +281,29 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
+		let formattedContent = contentWithoutRootTag;
+		if ( ! this.isIOS ) {
+			formattedContent = this.restoreParagraphTags(
+				contentWithoutRootTag,
+				this.multilineTag
+			);
+		}
 
-		const refresh = this.value !== contentWithoutRootTag;
-		this.value = contentWithoutRootTag;
+		this.debounceCreateUndoLevel();
+		const refresh = this.value !== formattedContent;
+		this.value = formattedContent;
 
 		// we don't want to refresh if our goal is just to create a record
 		if ( refresh ) {
-			this.props.onChange( contentWithoutRootTag );
+			this.props.onChange( formattedContent );
 		}
+	}
+
+	restoreParagraphTags( value, tag ) {
+		if ( tag === 'p' && ( ! value || ! value.startsWith( '<p>' ) ) ) {
+			return '<p>' + value + '</p>';
+		}
+		return value;
 	}
 
 	/*
@@ -708,8 +721,11 @@ export class RichText extends Component {
 			value = '';
 		}
 		// On android if content is empty we need to send no content or else the placeholder will not show.
-		if ( ! this.isIOS && value === '' ) {
-			return value;
+		if (
+			! this.isIOS &&
+			( value === '' || value === EMPTY_PARAGRAPH_TAGS )
+		) {
+			return '';
 		}
 
 		if ( tagName ) {
@@ -739,8 +755,9 @@ export class RichText extends Component {
 			formatTypes,
 			parentBlockStyles,
 			withoutInteractiveFormatting,
-			capabilities,
+			accessibilityLabel,
 			disableEditingMenu = false,
+			isMentionsSupported,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -819,6 +836,7 @@ export class RichText extends Component {
 						onFocus: () => {},
 					} ) }
 				<RCTAztecView
+					accessibilityLabel={ accessibilityLabel }
 					ref={ ( ref ) => {
 						this._editor = ref;
 
@@ -838,6 +856,7 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
+						linkTextColor: defaultTextDecorationColor,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
@@ -845,13 +864,12 @@ export class RichText extends Component {
 						defaultPlaceholderTextColor
 					}
 					deleteEnter={ this.props.deleteEnter }
-					onChange={ this.onChange }
+					onChange={ this.onChangeFromAztec }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
 					triggerKeyCodes={
-						disableEditingMenu === false &&
-						isMentionsSupported( capabilities )
+						disableEditingMenu === false && isMentionsSupported
 							? [ '@' ]
 							: []
 					}
@@ -868,7 +886,6 @@ export class RichText extends Component {
 						( parentBlockStyles && parentBlockStyles.color ) ||
 						defaultColor
 					}
-					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={
@@ -898,7 +915,7 @@ export class RichText extends Component {
 						<BlockFormatControls>
 							{
 								// eslint-disable-next-line no-undef
-								isMentionsSupported( capabilities ) && (
+								isMentionsSupported && (
 									<Toolbar>
 										<ToolbarButton
 											title={ __( 'Insert mention' ) }
@@ -924,7 +941,9 @@ RichText.defaultProps = {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockParents, getBlock } = select( 'core/block-editor' );
+		const { getBlockParents, getBlock, getSettings } = select(
+			'core/block-editor'
+		);
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
 		const parentBlockStyles =
@@ -932,9 +951,10 @@ export default compose( [
 
 		return {
 			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+			isMentionsSupported:
+				getSettings( 'capabilities' ).mentions === true,
 			...{ parentBlockStyles },
 		};
 	} ),
 	withPreferredColorScheme,
-	withSiteCapabilities,
 ] )( RichText );

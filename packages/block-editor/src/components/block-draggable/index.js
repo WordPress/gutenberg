@@ -17,21 +17,19 @@ const BlockDraggable = ( {
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
+	elementId,
 } ) => {
-	const { srcRootClientId, index, isDraggable } = useSelect(
+	const { srcRootClientId, isDraggable } = useSelect(
 		( select ) => {
-			const {
-				getBlockIndex,
-				getBlockRootClientId,
-				getTemplateLock,
-			} = select( 'core/block-editor' );
+			const { getBlockRootClientId, getTemplateLock } = select(
+				'core/block-editor'
+			);
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
 
 			return {
-				index: getBlockIndex( clientIds[ 0 ], rootClientId ),
 				srcRootClientId: rootClientId,
 				isDraggable: 'all' !== templateLock,
 			};
@@ -64,7 +62,6 @@ const BlockDraggable = ( {
 
 	const transferData = {
 		type: 'block',
-		srcIndex: index,
 		srcClientIds: clientIds,
 		srcRootClientId,
 	};
@@ -72,10 +69,10 @@ const BlockDraggable = ( {
 	return (
 		<Draggable
 			cloneClassname={ cloneClassname }
-			elementId={ `block-${ clientIds[ 0 ] }` }
+			elementId={ elementId || `block-${ clientIds[ 0 ] }` }
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				startDraggingBlocks();
+				startDraggingBlocks( clientIds );
 				isDragging.current = true;
 
 				startScrolling( event );

@@ -1,21 +1,10 @@
-// Default / Light styles
-.wp-block-navigation,
-.wp-block-navigation.is-style-light {
+// Default background and font color
+.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
 	.wp-block-navigation-link:not(.has-text-color) {
 		color: $gray-900;
 	}
-	&:not(.has-background) .wp-block-navigation__container {
+	.wp-block-navigation__container {
 		background-color: $white;
-	}
-}
-
-// Dark styles.
-.wp-block-navigation.is-style-dark {
-	.wp-block-navigation-link:not(.has-text-color) {
-		color: $white;
-	}
-	&:not(.has-background) .wp-block-navigation__container {
-		background-color: $gray-900;
 	}
 }
 
@@ -31,4 +20,3 @@
 .items-justified-right > ul {
 	justify-content: flex-end;
 }
-

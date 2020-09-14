@@ -51,14 +51,14 @@ export function* getNavigationPostForMenu( menuId ) {
 	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
 }
 
-const createStubPost = ( menuId, navigationBlock ) => {
+const createStubPost = ( menuId, navigationBlock = null ) => {
 	const id = buildNavigationPostId( menuId );
 	return {
 		id,
 		slug: id,
 		status: 'draft',
 		type: 'page',
-		blocks: [ navigationBlock ],
+		blocks: navigationBlock ? [ navigationBlock ] : [],
 		meta: {
 			menuId,
 		},
@@ -113,21 +113,25 @@ function createNavigationBlock( menuItems ) {
 }
 
 function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
-	if ( menuItem.type === 'html' ) {
-		const parsedBlocks = parse( menuItem.content.raw );
+	if ( menuItem.type === 'block' ) {
+		const [ block ] = parse( menuItem.content.raw );
 
-		if ( parsedBlocks.length !== 1 ) {
+		if ( ! block ) {
 			return createBlock( 'core/freeform', {
 				originalContent: menuItem.content.raw,
 			} );
 		}
 
-		return parsedBlocks[ 0 ];
+		return createBlock( block.name, block.attributes, innerBlocks );
 	}
 
 	const attributes = {
 		label: menuItem.title.rendered,
 		url: menuItem.url,
+		title: menuItem.attr_title,
+		className: menuItem.classes.join( ' ' ),
+		description: menuItem.description,
+		rel: menuItem.xfn.join( ' ' ),
 	};
 
 	return createBlock( 'core/navigation-link', attributes, innerBlocks );

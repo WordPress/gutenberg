@@ -28,7 +28,9 @@
 
 // Styles for submenu flyout
 .has-child {
-	$navigation-vertical-padding: $grid-unit-10 * 0.75;
+	> .wp-block-navigation-link__content {
+		padding-right: 0.5em;
+	}
 	.wp-block-navigation__container {
 		border: $border-width solid rgba(0, 0, 0, 0.15);
 		background-color: inherit;
@@ -37,7 +39,7 @@
 		left: 0;
 		top: 100%;
 		width: fit-content;
-		z-index: 1;
+		z-index: 2;
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		visibility: hidden;
@@ -47,12 +49,12 @@
 				flex-grow: 1;
 			}
 			> .wp-block-navigation-link__submenu-icon {
-				padding-right: $grid-unit-10;
+				padding-right: 0.5em;
 			}
 		}
 
 		@include break-medium {
-			left: $grid-unit-30;
+			left: 1.5em;
 
 			// Nested submenus sit to the left on large breakpoints
 			.wp-block-navigation__container {
@@ -66,7 +68,7 @@
 					right: 100%;
 					height: 100%;
 					display: block;
-					width: $grid-unit-10;
+					width: 0.5em;
 					background: transparent;
 				}
 			}
@@ -103,8 +105,9 @@
 
 // All links
 .wp-block-navigation-link__content {
+	color: inherit;
 	text-decoration: none;
-	padding: $grid-unit-10 $grid-unit-10 * 2;
+	padding: 0.5em 1em;
 
 	+ .wp-block-navigation-link__content {
 		padding-top: 0;
@@ -115,15 +118,13 @@
 }
 
 .wp-block-navigation-link__label {
-	font-family: $default-font;
-
 	word-break: normal;
 	overflow-wrap: break-word;
 }
 
 .wp-block-navigation-link__submenu-icon {
 	height: inherit;
-	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+	padding: 0.375em 1em 0.375em 0;
 
 	svg {
 		fill: currentColor;

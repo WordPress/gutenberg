@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 2.0.0 (2020-09-03)
+
+### Breaking Changes
+
+-   The `config` and `mappings` options in `.wp-env.json` are now merged with any overrides instead of being overwritten.
+-   The first listed theme is no longer activated when running wp-env start, since this overwrote whatever theme the user manually activated.
+-   `wp-env start` no longer stops the WordPress instance if it was already started unless it needs to configure WordPress.
+-   `wp-env start` no longer updates remote sources after first install if the configuration is the same. Use `wp-env start --update` to update sources.
+
+### New Feature
+
+-   You may now specify specific configuration for different environments using `env.tests` or `env.development` in `.wp-env.json`.
+-   `wp-env start` is significantly faster after first install.
+
 ## 1.6.0-rc.0 (2020-06-24)
 
 ### Bug Fixes

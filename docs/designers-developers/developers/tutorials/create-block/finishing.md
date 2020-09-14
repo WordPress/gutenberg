@@ -6,7 +6,7 @@ This tutorial covers general concepts and structure for creating basic blocks.
 
 The block editor provides a [components package](/packages/components/README.md) which contains numerous prebuilt components you can use to build your block.
 
-You can visually browse the components and what their implementation looks like using the Storybook tool published at [https://wordpress.github.io/gutenberg].
+You can visually browse the components and what their implementation looks like using the Storybook tool published at [https://wordpress.github.io/gutenberg](https://wordpress.github.io/gutenberg).
 
 ## Additional Tutorials
 

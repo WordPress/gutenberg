@@ -1,8 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { isEmpty } from './utils';
-import { isPhrasingContent } from './phrasing-content';
+import { isEmpty, isPhrasingContent } from '@wordpress/dom';
 
 /**
  * Browser dependencies

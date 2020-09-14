@@ -55,7 +55,11 @@ function ColorIndicator( {
 					return (
 						<Gradient
 							gradientValue={ gradientValue }
-							style={ [ styles.circleOption, styles.absolute ] }
+							style={ [
+								styles.circleOption,
+								styles.absolute,
+								style,
+							] }
 							key={ gradientValue }
 						/>
 					);

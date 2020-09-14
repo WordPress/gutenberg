@@ -9,6 +9,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	pressKeyTimes,
+	pressKeyWithModifier,
 	setPostContent,
 } from '@wordpress/e2e-test-utils';
 
@@ -82,6 +83,18 @@ describe( 'cpt locking', () => {
 			const textToType = 'Paragraph';
 			await page.keyboard.type( 'Paragraph' );
 			await pressKeyTimes( 'Backspace', textToType.length + 1 );
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'should insert line breaks when using enter and shift-enter', async () => {
+			await page.click(
+				'.block-editor-block-list__block[data-type="core/paragraph"]'
+			);
+			await page.keyboard.type( 'First line' );
+			await pressKeyTimes( 'Enter', 1 );
+			await page.keyboard.type( 'Second line' );
+			await pressKeyWithModifier( 'shift', 'Enter' );
+			await page.keyboard.type( 'Third line' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 

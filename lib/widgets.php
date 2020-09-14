@@ -20,9 +20,28 @@ function gutenberg_is_block_editor() {
 	return ! empty( $screen ) &&
 		(
 			$screen->is_block_editor() ||
-			'gutenberg_page_gutenberg-widgets' === $screen->id ||
-			gutenberg_is_edit_site_page( $screen->id )
+			'appearance_page_gutenberg-widgets' === $screen->id ||
+			( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $screen->id ) )
 		);
+}
+
+/**
+ * Whether or not to use the block editor to manage widgets. Defaults to true
+ * unless a theme has removed support for widgets-block-editor or a plugin has
+ * filtered the return value of this function.
+ *
+ * @return boolean Whether or not to use the block editor to manage widgets.
+ */
+function gutenberg_use_widgets_block_editor() {
+	/**
+	 * Filters whether or not to use the block editor to manage widgets.
+	 *
+	 * @param boolean $use_widgets_block_editor Whether or not to use the block editor to manage widgets.
+	 */
+	return apply_filters(
+		'gutenberg_use_widgets_block_editor',
+		get_theme_support( 'widgets-block-editor' )
+	);
 }
 
 /**
@@ -105,29 +124,38 @@ add_action( 'admin_footer-widgets.php', 'gutenberg_print_save_widgets_nonce' );
  */
 function gutenberg_get_legacy_widget_settings() {
 	$settings = array();
+
 	/**
-	 * TODO: The hardcoded array should be replaced with a mechanism to allow
-	 * core and third party blocks to specify they already have equivalent
-	 * blocks, and maybe even allow them to have a migration function.
+	 * Filters the list of widget classes that should **not** be offered by the legacy widget block.
+	 *
+	 * Returning an empty array will make all the widgets available.
+	 *
+	 * @param array $widgets An array of excluded widgets classnames.
+	 *
+	 * @since 5.6.0
 	 */
-	$core_widgets = array(
-		'WP_Widget_Pages',
-		'WP_Widget_Calendar',
-		'WP_Widget_Archives',
-		'WP_Widget_Media_Audio',
-		'WP_Widget_Media_Image',
-		'WP_Widget_Media_Gallery',
-		'WP_Widget_Media_Video',
-		'WP_Widget_Meta',
-		'WP_Widget_Search',
-		'WP_Widget_Text',
-		'WP_Widget_Categories',
-		'WP_Widget_Recent_Posts',
-		'WP_Widget_Recent_Comments',
-		'WP_Widget_RSS',
-		'WP_Widget_Tag_Cloud',
-		'WP_Nav_Menu_Widget',
-		'WP_Widget_Custom_HTML',
+	$widgets_to_exclude_from_legacy_widget_block = apply_filters(
+		'widgets_to_exclude_from_legacy_widget_block',
+		array(
+			'WP_Widget_Block',
+			'WP_Widget_Pages',
+			'WP_Widget_Calendar',
+			'WP_Widget_Archives',
+			'WP_Widget_Media_Audio',
+			'WP_Widget_Media_Image',
+			'WP_Widget_Media_Gallery',
+			'WP_Widget_Media_Video',
+			'WP_Widget_Meta',
+			'WP_Widget_Search',
+			'WP_Widget_Text',
+			'WP_Widget_Categories',
+			'WP_Widget_Recent_Posts',
+			'WP_Widget_Recent_Comments',
+			'WP_Widget_RSS',
+			'WP_Widget_Tag_Cloud',
+			'WP_Nav_Menu_Widget',
+			'WP_Widget_Custom_HTML',
+		)
 	);
 
 	$has_permissions_to_manage_widgets = current_user_can( 'edit_theme_options' );
@@ -137,6 +165,7 @@ function gutenberg_get_legacy_widget_settings() {
 		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
 			$available_legacy_widgets[ $class ] = array(
 				'name'              => html_entity_decode( $widget_obj->name ),
+				'id_base'           => $widget_obj->id_base,
 				// wp_widget_description is not being used because its input parameter is a Widget Id.
 				// Widgets id's reference to a specific widget instance.
 				// Here we are iterating on all the available widget classes even if no widget instance exists for them.
@@ -144,7 +173,7 @@ function gutenberg_get_legacy_widget_settings() {
 					html_entity_decode( $widget_obj->widget_options['description'] ) :
 					null,
 				'isReferenceWidget' => false,
-				'isHidden'          => in_array( $class, $core_widgets, true ),
+				'isHidden'          => in_array( $class, $widgets_to_exclude_from_legacy_widget_block, true ),
 			);
 		}
 	}
@@ -243,8 +272,6 @@ function gutenberg_create_wp_area_post_type() {
 }
 add_action( 'init', 'gutenberg_create_wp_area_post_type' );
 
-add_filter( 'sidebars_widgets', 'Experimental_WP_Widget_Blocks_Manager::swap_out_sidebars_blocks_for_block_widgets' );
-
 /**
  * Function to enqueue admin-widgets as part of the block editor assets.
  */
@@ -253,3 +280,46 @@ function gutenberg_enqueue_widget_scripts() {
 }
 
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_widget_scripts' );
+
+/**
+ * Overrides dynamic_sidebar_params to make sure Blocks are not wrapped in <form> tag.
+ *
+ * @param  array $arg Dynamic sidebar params.
+ * @return array Updated dynamic sidebar params.
+ */
+function gutenberg_override_sidebar_params_for_block_widget( $arg ) {
+	if ( 'Block' === $arg[0]['widget_name'] ) {
+		$arg[0]['before_form']           = '';
+		$arg[0]['before_widget_content'] = '<div class="widget-content">';
+		$arg[0]['after_widget_content']  = '</div><form class="block-widget-form">';
+		$arg[0]['after_form']            = '</form>';
+	}
+
+	return $arg;
+}
+
+/**
+ * Registers the WP_Widget_Block widget
+ */
+function gutenberg_register_widgets() {
+	if ( ! gutenberg_use_widgets_block_editor() ) {
+		return;
+	}
+
+	register_widget( 'WP_Widget_Block' );
+	// By default every widget on widgets.php is wrapped with a <form>.
+	// This means that you can sometimes end up with invalid HTML, e.g. when
+	// one of the widgets is a Search block.
+	//
+	// To fix the problem, let's add a filter that moves the form below the actual
+	// widget content.
+	global $pagenow;
+	if ( 'widgets.php' === $pagenow ) {
+		add_filter(
+			'dynamic_sidebar_params',
+			'gutenberg_override_sidebar_params_for_block_widget'
+		);
+	}
+}
+
+add_action( 'widgets_init', 'gutenberg_register_widgets' );

@@ -28,7 +28,7 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
-	toggleProps,
+	toggleProps = {},
 } ) => {
 	let label;
 	if ( hasSingleBlockType ) {
@@ -40,17 +40,30 @@ const defaultRenderToggle = ( {
 	} else {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
+
+	const { onClick, ...rest } = toggleProps;
+
+	// Handle both onClick functions from the toggle and the parent component
+	function handleClick( event ) {
+		if ( onToggle ) {
+			onToggle( event );
+		}
+		if ( onClick ) {
+			onClick( event );
+		}
+	}
+
 	return (
 		<Button
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
-			onClick={ onToggle }
+			onClick={ handleClick }
 			className="block-editor-inserter__toggle"
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
-			{ ...toggleProps }
+			{ ...rest }
 		/>
 	);
 };
@@ -128,6 +141,7 @@ class Inserter extends Component {
 		if ( isQuick ) {
 			return (
 				<QuickInserter
+					onSelect={ onClose }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
@@ -135,6 +149,7 @@ class Inserter extends Component {
 				/>
 			);
 		}
+
 		return (
 			<InserterMenu
 				onSelect={ onClose }
@@ -183,14 +198,11 @@ export default compose( [
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
-			getBlockSelectionEnd,
 		} = select( 'core/block-editor' );
 		const { getBlockVariations } = select( 'core/blocks' );
 
 		rootClientId =
-			rootClientId ||
-			getBlockRootClientId( clientId || getBlockSelectionEnd() ) ||
-			undefined;
+			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 

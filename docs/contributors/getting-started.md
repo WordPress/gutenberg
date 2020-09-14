@@ -25,18 +25,19 @@ If you don't have a local WordPress environment to load Gutenberg in, we can hel
 
 ### Step 1: Installing a Local Environment
 
-The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/env), which is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. In its default mode, it'll install and run a local WordPress environment for you; however, it's also possible to [configure](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md#wp-envjson) it to use a pre-existing local WordPress installation.
+The quickest way to get up and running is to use the [`wp-env` command](/packages/env/README.md), that is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. By default, wp-env can install and run a local WordPress environment for you. It is also possible to configure it to use a pre-existing local WordPress installation, [see package documentation](/packages/env/README.md) for configuration details.
 
 If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`.
 
-To install Docker, follow their instructions here for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If running Ubuntu, see these [extended instructions for help and troubleshooting](/docs/contributors/env-ubuntu.md).
+To install Docker, follow the instructions for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If running Ubuntu, see these [extended instructions for help and troubleshooting](/docs/designers-developers/developers/tutorials/devenv/docker-ubuntu.md).
 
 To install Docker Compose, [follow their instructions here](https://docs.docker.com/compose/install/), be sure to select your operating system for proper instructions.
 
 Once Docker is installed and running, run this script to install WordPress, and build your local environment:
 
 ```bash
-npx wp-env start
+# Note: prefixing with "npm run" will resolve npm from the local Gutenberg source code, rather than a global install which may be out of date.
+npm run wp-env start
 ```
 
 ### Step 2: Accessing and Configuring the Local WordPress Install
@@ -46,7 +47,7 @@ npx wp-env start
 The WordPress installation should now be available at `http://localhost:8888` (**Username**: `admin`, **Password**: `password`).
 If this port is in use, you can override it using the `WP_ENV_PORT` environment variable. For more information, consult the `wp-env` [README](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
 
-To shut down this local WordPress instance run `npx wp-env stop`. To start it back up again, run `npx wp-env start` again.
+To shut down this local WordPress instance run `npm run wp-env stop`. To start it back up again, run `npm run wp-env start` again.
 
 #### Toggling Debug Systems
 
@@ -55,6 +56,22 @@ WordPress comes with specific [debug systems](https://wordpress.org/support/arti
 #### Troubleshooting
 
 See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenberg/tree/master/packages/env#troubleshooting-common-problems).
+
+## Using MAMP
+
+You can also develop with MAMP by cloning and installing Gutenberg as a regular plugin in a WP install, but you'll require some extra configuration to be able to run the e2e tests.
+
+Change the current directory to the plugins folder and symlink all e2e test plugins:
+
+```bash
+ln -s gutenberg/packages/e2e-tests/plugins/* .
+```
+
+You'll need to run this again if new plugins are added. To run e2e tests:
+
+```bash
+WP_BASE_URL=http://localhost:8888/gutenberg npm run test-e2e
+```
 
 ## On A Remote Server
 

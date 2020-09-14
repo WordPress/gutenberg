@@ -6,12 +6,17 @@
 			"type": "number",
 			"default": 1
 		},
-		"align": {
+		"textAlign": {
 			"type": "string"
 		}
 	},
 	"supports": {
 		"html": false,
-		"lightBlockWrapper": true
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true
+		},
+		"__experimentalFontSize": true,
+		"__experimentalLineHeight": true
 	}
 }

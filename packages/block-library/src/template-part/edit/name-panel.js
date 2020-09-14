@@ -19,6 +19,13 @@ export default function TemplatePartNamePanel( { postId, setAttributes } ) {
 		'slug',
 		postId
 	);
+	const [ status, setStatus ] = useEntityProp(
+		'postType',
+		'wp_template_part',
+		'status',
+		postId
+	);
+
 	return (
 		<div className="wp-block-template-part__name-panel">
 			<TextControl
@@ -28,8 +35,12 @@ export default function TemplatePartNamePanel( { postId, setAttributes } ) {
 					setTitle( value );
 					const newSlug = cleanForSlug( value );
 					setSlug( newSlug );
-					setAttributes( { slug: newSlug } );
+					if ( status !== 'publish' ) {
+						setStatus( 'publish' );
+					}
+					setAttributes( { slug: newSlug, postId } );
 				} }
+				onFocus={ ( event ) => event.target.select() }
 			/>
 		</div>
 	);
