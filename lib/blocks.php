@@ -160,7 +160,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	}
 	$block_name = str_replace( 'core/', '', $block_name );
 
-	$style_path = is_rtl()
+	$style_path        = is_rtl()
 		? "packages/block-library/build-style/$block_name-rtl.css"
 		: "packages/block-library/build-style/$block_name.css";
 	$editor_style_path = is_rtl()
@@ -171,7 +171,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		wp_register_style(
 			'wp-block-' . $block_name,
 			gutenberg_url( $style_path ),
-			[],
+			array(),
 			filemtime( gutenberg_dir_path() . $style_path )
 		);
 	}
@@ -180,7 +180,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		wp_register_style(
 			'wp-block-' . $block_name . '-editor',
 			gutenberg_url( $editor_style_path ),
-			[],
+			array(),
 			filemtime( gutenberg_dir_path() . $editor_style_path )
 		);
 	}
