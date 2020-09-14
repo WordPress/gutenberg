@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { registerStore } from '@wordpress/data';
+import { controls } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
  */
 import reducer from './reducer';
-import controls from './controls';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
