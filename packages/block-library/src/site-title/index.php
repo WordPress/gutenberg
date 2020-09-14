@@ -20,7 +20,9 @@ function render_block_core_site_title( $attributes ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 	}
 
-	$link = sprintf( '<a href="%1$s" rel="home">%2$s</a>', get_bloginfo( 'url' ), get_bloginfo( 'name' ) );
+	$href = is_home() ? '' : 'href="' . get_bloginfo( 'url' ) . '"';
+
+	$link = sprintf( '<a %1$s rel="home">%2$s</a>', $href, get_bloginfo( 'name' ) );
 
 	return sprintf(
 		'<%1$s class="%2$s">%3$s</%1$s>',
