@@ -44,7 +44,7 @@ function gutenberg_edit_site_export() {
 	while ( $template_query->have_posts() ) {
 		$template = $template_query->next_post();
 		$zip->addFromString(
-			'theme/block-templates/' . $template->post_name . '.html',
+			'theme/block-templates/' . $template->post_name . '.php',
 			gutenberg_strip_post_ids_from_template_part_blocks( $template->post_content )
 		);
 	}
@@ -68,7 +68,7 @@ function gutenberg_edit_site_export() {
 	while ( $template_part_query->have_posts() ) {
 		$template_part = $template_part_query->next_post();
 		$zip->addFromString(
-			'theme/block-template-parts/' . $template_part->post_name . '.html',
+			'theme/block-template-parts/' . $template_part->post_name . '.php',
 			gutenberg_strip_post_ids_from_template_part_blocks( $template_part->post_content )
 		);
 	}

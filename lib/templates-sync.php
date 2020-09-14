@@ -6,6 +6,18 @@
  */
 
 /**
+ * Render a Block Based template and returns its output.
+ *
+ * @access private
+ * @internal
+ *
+ * @param string $template_path Template file path.
+ */
+function _gutenberg_read_template( $template_path ) {
+	return shell_exec( 'php ' . __DIR__ . '/render-script.php ' . $template_path );
+}
+
+/**
  * Creates a template (or template part depending on the post type)
  * auto-draft if it doesn't exist yet.
  *
@@ -78,7 +90,7 @@ function _gutenberg_get_template_paths( $base_directory ) {
 	$path_list = array();
 	if ( file_exists( $base_directory ) ) {
 		$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory ) );
-		$nested_html_files = new RegexIterator( $nested_files, '/^.+\.html$/i', RecursiveRegexIterator::GET_MATCH );
+		$nested_html_files = new RegexIterator( $nested_files, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH );
 		foreach ( $nested_html_files as $path => $file ) {
 			$path_list[] = $path;
 		}
@@ -134,14 +146,13 @@ function _gutenberg_synchronize_theme_templates( $template_type ) {
 		$path               = $template_file['path'];
 		$theme              = $template_file['theme'];
 		$template_base_path = $template_base_paths[ $template_type ];
-
-		$content = file_get_contents( $path );
-		$slug    = substr(
+		$content            = _gutenberg_read_template( $path );
+		$slug               = substr(
 			$path,
 			// Starting position of slug.
 			strpos( $path, $template_base_path . DIRECTORY_SEPARATOR ) + 1 + strlen( $template_base_path ),
-			// Subtract ending '.html'.
-			-5
+			// Subtract ending '.php'.
+			-4
 		);
 		_gutenberg_create_auto_draft_for_template( $template_post_types[ $template_type ], $slug, $theme, $content );
 	}
