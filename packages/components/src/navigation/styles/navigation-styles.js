@@ -56,15 +56,51 @@ export const MenuTitleUI = styled( Text )`
 	justify-content: space-between;
 	margin-bottom: 8px;
 	padding: 4px 0 4px 16px;
+
+	.components-button.is-small {
+		&:active {
+			background: none;
+		}
+		&:hover {
+			box-shadow: none;
+		}
+	}
 `;
 
 export const MenuTitleSearchUI = styled.div`
-	align-items: center;
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 8px;
 	color: ${ G2.gray[ 100 ] };
-	padding: 4px 0 4px 16px;
+	margin-bottom: 2px;
+	padding: 4px;
+	position: relative;
+
+	.components-base-control .components-base-control__field {
+		margin: 0;
+
+		input {
+			padding-left: 26px;
+			padding-right: 40px;
+		}
+	}
+
+	> svg {
+		left: 6px;
+		position: absolute;
+		top: 7px;
+	}
+
+	.components-button.is-small {
+		height: 30px;
+		position: absolute;
+		right: 4px;
+		top: 4px;
+
+		&:active {
+			background: none;
+		}
+		&:hover {
+			box-shadow: none;
+		}
+	}
 `;
 
 export const GroupTitleUI = styled( Text )`

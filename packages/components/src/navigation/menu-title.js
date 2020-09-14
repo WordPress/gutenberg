@@ -1,12 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { Icon, closeSmall, search as searchIcon } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
+import { Icon, closeSmall, search as searchIcon } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import Animate from '../animate';
 import Button from '../button';
 import { MenuTitleSearchUI, MenuTitleUI } from './styles/navigation-styles';
 import TextControl from '../text-control';
@@ -29,17 +31,34 @@ export default function NavigationMenuTitle( {
 	};
 
 	if ( isSearching ) {
+		/* translators: placeholder for sidebar search box. %s: menu title */
+		const placeholder = sprintf( __( 'Search in %s' ), title );
 		return (
-			<MenuTitleSearchUI>
-				<TextControl
-					onChange={ ( value ) => setSearch( value ) }
-					value={ search }
-				/>
+			<Animate type="appear" options={ { origin: 'bottom right' } }>
+				{ ( { className: animateClassName } ) => (
+					<div className={ animateClassName }>
+						<MenuTitleSearchUI>
+							<Icon icon={ searchIcon } />
 
-				<Button isSmall isTertiary onClick={ onSearchClose }>
-					<Icon icon={ closeSmall } />
-				</Button>
-			</MenuTitleSearchUI>
+							<TextControl
+								// eslint-disable-next-line jsx-a11y/no-autofocus
+								autoFocus
+								onChange={ ( value ) => setSearch( value ) }
+								placeholder={ placeholder }
+								value={ search }
+							/>
+
+							<Button
+								isSmall
+								isTertiary
+								onClick={ onSearchClose }
+							>
+								<Icon icon={ closeSmall } />
+							</Button>
+						</MenuTitleSearchUI>
+					</div>
+				) }
+			</Animate>
 		);
 	}
 
