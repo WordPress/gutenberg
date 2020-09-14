@@ -1,6 +1,7 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -22,6 +23,8 @@ import org.wordpress.android.util.AppLog;
 import org.wordpress.android.util.helpers.WPWebChromeClient;
 import org.wordpress.mobile.FileUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class GutenbergWebViewActivity extends AppCompatActivity {
@@ -136,7 +139,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         finish();
     }
 
-    private String getFileContentFromAssets(String assetsFileName) {
+    protected String getFileContentFromAssets(String assetsFileName) {
         return FileUtils.getHtmlFromFile(this, assetsFileName);
     }
 
@@ -164,7 +167,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageCommitVisible(WebView view, String url) {
-
                 String injectCssScript = getFileContentFromAssets("gutenberg-web-single-block/inject-css.js");
                 evaluateJavaScript(injectCssScript);
 
@@ -183,6 +185,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 }
 
                 super.onPageCommitVisible(view, url);
+            }
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                injectOnPageLoadExternalSources();
+                super.onPageStarted(view, url, favicon);
             }
 
             @Override
@@ -205,26 +213,63 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 injectWPBarsCssScript = removeWhiteSpace(removeNewLines(injectWPBarsCssScript));
                 evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript));
 
-                final Handler handler = new Handler();
-                handler.postDelayed(() -> {
-                    String preventAutosaves = getFileContentFromAssets("gutenberg-web-single-block/prevent-autosaves.js");
-                    evaluateJavaScript(preventAutosaves);
-
-                    String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
-                    String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
-                    insertBlock = String.format(insertBlock, blockContent);
-                    evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
-
-                    // We need some extra time to hide all unwanted html elements
-                    mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
-                }, 2000);
-            }
-
-            private void evaluateJavaScript(String script) {
-                mWebView.evaluateJavascript(script, value ->
-                        AppLog.e(AppLog.T.EDITOR, value));
+                String injectGutenbergObserver = getFileContentFromAssets("gutenberg-web-single-block/gutenberg-observer.js");
+                evaluateJavaScript(injectGutenbergObserver);
             }
         });
+    }
+
+    private void evaluateJavaScript(String script) {
+        mWebView.evaluateJavascript(script, value ->
+                AppLog.e(AppLog.T.EDITOR, value));
+    }
+
+    private void onGutenbergReady() {
+        preventAutoSavesScript();
+        insertBlockScript();
+        final Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            // We want to make sure that page is loaded
+            // with all elements before executing external JS
+            injectOnGutenbergReadyExternalSources();
+            // We need some extra time to hide all unwanted html elements
+            // like NUX (new user experience) modal is.
+            mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
+        }, 2000);
+    }
+
+    private void injectOnGutenbergReadyExternalSources() {
+        List<String> list = getOnGutenbergReadyExternalSources();
+        for (String file : list) {
+            evaluateJavaScript(file);
+        }
+    }
+
+    protected List<String> getOnGutenbergReadyExternalSources() {
+        return new ArrayList<>();
+    }
+
+    private void injectOnPageLoadExternalSources() {
+        List<String> list = getOnPageLoadExternalSources();
+        for (String file : list) {
+            evaluateJavaScript(file);
+        }
+    }
+
+    protected List<String> getOnPageLoadExternalSources() {
+        return new ArrayList<>();
+    }
+
+    private void preventAutoSavesScript() {
+        String preventAutosaves = getFileContentFromAssets("gutenberg-web-single-block/prevent-autosaves.js");
+        evaluateJavaScript(preventAutosaves);
+    }
+
+    private void insertBlockScript() {
+        String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
+        String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
+        insertBlock = String.format(insertBlock, blockContent);
+        evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
     }
 
     @Override
@@ -267,6 +312,11 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             if (content != null && content.length() > 0) {
                 saveContent(content);
             }
+        }
+
+        @JavascriptInterface
+        public void gutenbergReady() {
+            GutenbergWebViewActivity.this.runOnUiThread(() -> onGutenbergReady());
         }
     }
 }
