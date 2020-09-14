@@ -28,7 +28,7 @@ const MyKeyboardShortcuts = () => (
 );
 ```
 
-_Note:_ In this example, `goLeft` and `goRight` set the shortcuts keys.
+_Note:_ In this example, `goLeft` and `goRight` are used to set the shortcuts keys.
 
 ## Related components
 
