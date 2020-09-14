@@ -3,21 +3,28 @@
  */
 import { useCombobox } from 'downshift';
 import classnames from 'classnames';
+import { isEqual } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { check, chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { Button, Dashicon } from '../';
+import { Button, Icon, Spinner } from '../';
 
 const itemToString = ( item ) => item && item.name;
 export default function ComboboxControl( {
 	className,
 	hideLabelFromVision,
 	label,
+	isLoading,
 	options: items,
 	onInputValueChange: onInputValueChange,
 	onChange: onSelectedItemChange,
-	value: _selectedItem,
+	initialSelectedItem,
 } ) {
 	const {
 		getLabelProps,
@@ -30,15 +37,16 @@ export default function ComboboxControl( {
 		highlightedIndex,
 		selectedItem,
 	} = useCombobox( {
-		initialSelectedItem: items[ 0 ],
+		initialSelectedItem,
 		items,
 		itemToString,
 		onInputValueChange,
 		onSelectedItemChange,
-		selectedItem: _selectedItem,
 	} );
 	const menuProps = getMenuProps( {
-		className: 'components-combobox-control__menu',
+		className: classnames( 'components-combobox-control__menu', {
+			'is-loading': isLoading,
+		} ),
 	} );
 	// We need this here, because the null active descendant is not
 	// fully ARIA compliant.
@@ -68,6 +76,7 @@ export default function ComboboxControl( {
 			>
 				{ label }
 			</label>
+			{ isLoading && <Spinner /> }
 			<div
 				{ ...getComboboxProps( {
 					className: 'components-combobox-control__button',
@@ -86,9 +95,9 @@ export default function ComboboxControl( {
 						className: 'components-combobox-control__button-button',
 					} ) }
 				>
-					<Dashicon
-						icon="arrow-down-alt2"
+					<Icon
 						className="components-combobox-control__button-icon"
+						icon={ chevronDown }
 					/>
 				</Button>
 			</div>
@@ -111,10 +120,10 @@ export default function ComboboxControl( {
 								style: item.style,
 							} ) }
 						>
-							{ item === selectedItem && (
-								<Dashicon
-									icon="saved"
+							{ isEqual( item, selectedItem ) && (
+								<Icon
 									className="components-combobox-control__item-icon"
+									icon={ check }
 								/>
 							) }
 							{ item.name }

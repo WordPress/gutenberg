@@ -24,12 +24,26 @@ import { buildTermsTree } from '../../utils/terms';
 
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( 'core/editor' );
-	const [ fieldValue, setFieldValue ] = useState();
-	const { isLoading, parent, items, postType, parents } = useSelect(
+	const { parentPost } = useSelect( ( select ) => {
+		const { getEntityRecords } = select( 'core' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const postTypeSlug = getEditedPostAttribute( 'type' );
+
+		const theParentID = getEditedPostAttribute( 'parent' );
+
+		return {
+			parentPost: getEntityRecords( 'postType', postTypeSlug, {
+				include: [ theParentID ],
+			} ),
+		};
+	}, [] );
+	const [ fieldValue, setFieldValue ] = useState(
+		parentPost ? parentPost[ 0 ].title.raw : false
+	);
+	const { isLoading, parent, items, postType } = useSelect(
 		( select ) => {
-			const { getPostType, getEntityRecords, isResolving } = select(
-				'core'
-			);
+			const { getPostType, getEntityRecords } = select( 'core' );
+			const { isResolving } = select( 'core/data' );
 			const { getCurrentPostId, getEditedPostAttribute } = select(
 				'core/editor'
 			);
@@ -46,25 +60,28 @@ export function PageAttributesParent() {
 				_fields: 'id,title,parent',
 			};
 			if (
-				! fieldValue ||
-				'' === fieldValue ||
-				fieldValue === parent?.name
+				parentPost &&
+				fieldValue &&
+				( '' !== fieldValue ||
+					fieldValue !== parentPost[ 0 ].title.raw )
 			) {
 				query.search = fieldValue;
 			}
-			const par = getEditedPostAttribute( 'parent' );
-			const pars = getEntityRecords( 'postType', postTypeSlug, {
-				include: [ par ],
-			} );
-
+			const theParentID = getEditedPostAttribute( 'parent' );
 			return {
-				parent: par,
+				parent: theParentID,
 				items: isHierarchical
 					? getEntityRecords( 'postType', postTypeSlug, query )
 					: [],
 				postType: pType,
-				isLoading: isResolving( 'postType', postTypeSlug, query ),
-				parents: pars,
+				isLoading: isResolving( 'core', 'getEntityRecords', [
+					'postType',
+					postTypeSlug,
+					query,
+				] ),
+				parentPost: getEntityRecords( 'postType', postTypeSlug, {
+					include: [ theParentID ],
+				} ),
 			};
 		},
 		[ fieldValue ]
@@ -72,7 +89,6 @@ export function PageAttributesParent() {
 	const isHierarchical = get( postType, [ 'hierarchical' ], false );
 	const parentPageLabel = get( postType, [ 'labels', 'parent_item_colon' ] );
 	const pageItems = items || [];
-
 	const getOptionsFromTree = ( tree, level = 0 ) => {
 		return flatMap( tree, ( treeNode ) => [
 			{
@@ -84,28 +100,38 @@ export function PageAttributesParent() {
 			...getOptionsFromTree( treeNode.children || [], level + 1 ),
 		] );
 	};
-
 	const parentOptions = useMemo( () => {
 		const tree = buildTermsTree(
 			pageItems.map( ( item ) => ( {
 				id: item.id,
 				parent: item.parent,
 				name:
-					item.title && item.title.raw
-						? item.title.raw
+					item.title && item.title.rendered
+						? item.title.rendered
 						: `#${ item.id } (${ __( 'no title' ) })`,
 			} ) )
 		);
 		const opts = getOptionsFromTree( tree );
 
-		// Ensure the current page is included in the dropdown list.
+		// Ensure the current page is included in the dropdown list (except when searching).
 		const foundParent = opts.findIndex( ( { key } ) => parent === key );
-		if ( foundParent < 0 && parentPost ) {
-			return [ { key: parentPost.id, name: parentPost.title }, ...opts ];
+		if (
+			opts.length > 0 &&
+			foundParent < 0 &&
+			parentPost &&
+			parent &&
+			fieldValue === parentPost[ 0 ].title.rendered
+		) {
+			return [
+				{
+					key: parentPost[ 0 ].id,
+					name: parentPost[ 0 ].title.rendered,
+				},
+				...opts,
+			];
 		}
 		return opts;
 	}, [ parent, parentPost, pageItems ] );
-	//console.log( parentOptions );
 
 	if ( ! isHierarchical || ! parentPageLabel ) {
 		return null;
@@ -133,12 +159,18 @@ export function PageAttributesParent() {
 		editPost( { parent: selectedItem.key } );
 	};
 
-	const parentPost = parents ? parents[ 0 ] : false;
-	const inputValue = parentPost?.title?.raw;
-	const initialSelectedItem = {
-		key: parentPost?.id,
-		name: inputValue,
-	};
+	const inputValue = parentPost ? parentPost[ 0 ].title.raw : false;
+	const selected = parentPost
+		? parentOptions.findIndex( ( { key } ) => parentPost[ 0 ].id === key )
+		: false;
+	const initialSelectedItem =
+		false !== selected && parentPost && parentOptions[ selected ]
+			? parentOptions[ selected ]
+			: parentOptions[ 0 ];
+
+	if ( ! parentPost && ! isLoading ) {
+		return null;
+	}
 	return (
 		<ComboboxControl
 			className="editor-page-attributes__parent"
