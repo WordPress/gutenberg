@@ -131,14 +131,14 @@ function gutenberg_reregister_core_block_types() {
 		if ( is_string( $block_names ) ) {
 			if ( $registry->is_registered( $block_names ) ) {
 				$registry->unregister( $block_names );
-				gutenberg_register_core_block_styles( $block_names );
 			}
+			gutenberg_register_core_block_styles( $block_names );
 		} elseif ( is_array( $block_names ) ) {
 			foreach ( $block_names as $block_name ) {
 				if ( $registry->is_registered( $block_name ) ) {
 					$registry->unregister( $block_name );
-					gutenberg_register_core_block_styles( $block_name );
 				}
+				gutenberg_register_core_block_styles( $block_name );
 			}
 		}
 
