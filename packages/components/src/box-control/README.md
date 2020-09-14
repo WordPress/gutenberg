@@ -94,6 +94,13 @@ const Example = () => {
 
 ## Props
 
+### iconComponent
+
+A custom icon to render that visualizes the selected `BoxControl` sides.
+
+-   Type: `React.Component`
+-   Required: No
+
 ### inputProps
 
 Props for the internal [InputControl](../input-control) components.

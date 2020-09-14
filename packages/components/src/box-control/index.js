@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { createElement, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -45,6 +45,7 @@ function useUniqueId( idProp ) {
 }
 export default function BoxControl( {
 	id: idProp,
+	iconComponent = BoxControlIcon,
 	inputProps = defaultInputProps,
 	onChange = noop,
 	onChangeShowVisualizer = noop,
@@ -110,6 +111,8 @@ export default function BoxControl( {
 		values: inputValues,
 	};
 
+	const BoxIcon = createElement( iconComponent, { side } );
+
 	return (
 		<Root id={ id } role="region" aria-labelledby={ headingId }>
 			<Header className="component-box-control__header">
@@ -134,9 +137,7 @@ export default function BoxControl( {
 				</FlexItem>
 			</Header>
 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
-				<FlexItem>
-					<BoxControlIcon side={ side } />
-				</FlexItem>
+				<FlexItem>{ BoxIcon }</FlexItem>
 				{ isLinked && (
 					<FlexBlock>
 						<AllInputControl { ...inputControlProps } />

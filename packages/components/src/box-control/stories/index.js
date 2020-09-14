@@ -79,3 +79,40 @@ const Box = styled.div`
 const Content = styled.div`
 	padding: 20px;
 `;
+
+function CustomBoxIcon( { side } ) {
+	let icon = '✊';
+	switch ( side ) {
+		case 'top':
+			icon = '☝️';
+			break;
+		case 'bottom':
+			icon = '👇';
+			break;
+		case 'left':
+			icon = '👈';
+			break;
+		case 'right':
+			icon = '👉';
+			break;
+	}
+	return (
+		<div
+			style={ {
+				fontSize: 18,
+				lineHeight: 1,
+				width: 24,
+				height: 24,
+				padding: 2,
+			} }
+		>
+			<span role="img" alt="icon">
+				{ icon }
+			</span>
+		</div>
+	);
+}
+
+export const customIcon = () => {
+	return <BoxControl iconComponent={ CustomBoxIcon } />;
+};
