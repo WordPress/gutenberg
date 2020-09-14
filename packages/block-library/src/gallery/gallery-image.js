@@ -79,7 +79,7 @@ export default function GalleryImage( {
 		if ( captionSelected && ! isSelected ) {
 			setCaptionSelected( false );
 		}
-	}, [ isSelected, image, url ] );
+	}, [ isSelected, image, url, captionSelected ] );
 
 	const onSelectCaption = () => {
 		if ( ! captionSelected ) {
@@ -105,7 +105,7 @@ export default function GalleryImage( {
 		if (
 			container.current === document.activeElement &&
 			isSelected &&
-			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
+			[ BACKSPACE, DELETE ].includes( event.keyCode )
 		) {
 			event.stopPropagation();
 			event.preventDefault();
