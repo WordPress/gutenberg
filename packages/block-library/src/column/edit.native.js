@@ -64,6 +64,8 @@ function ColumnEdit( {
 		getColumnWidths( columns, columnCount )
 	);
 
+	const width = contentStyle[ clientId ];
+
 	if ( ! isSelected && ! hasChildren ) {
 		return (
 			<View
@@ -73,8 +75,8 @@ function ColumnEdit( {
 							styles.columnPlaceholder,
 							styles.columnPlaceholderDark
 						),
-					{ width: contentStyle[ clientId ] || contentStyle },
 					styles.columnPlaceholderNotSelected,
+					{ width },
 				] }
 			/>
 		);
@@ -115,8 +117,8 @@ function ColumnEdit( {
 			</InspectorControls>
 			<View
 				style={ [
-					{ width: contentStyle[ clientId ] || contentStyle },
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
+					{ width },
 				] }
 			>
 				<InnerBlocks

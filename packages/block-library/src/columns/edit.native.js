@@ -23,7 +23,7 @@ import {
 	BlockVariationPicker,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useMemo } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 /**
@@ -136,64 +136,61 @@ function ColumnsEditContainer( {
 	const newParentWidth =
 		width - filteredColumnWidthsPerRatio.length * MIN_WIDTH;
 
-	const calculateWidths = () => {
+	const calculateWidths = useMemo( () => {
 		const widths = {};
 
+		let columnWidth = width / columnsInRow;
+
 		innerColumns.forEach( ( innerColumn ) => {
-			const attributeWidth =
-				innerColumn.attributes.width ||
-				getColumnWidths( innerColumns, columnCount )[
-					innerColumn.clientId
-				];
+			if ( columnsInRow > 1 ) {
+				if ( width > ALIGNMENT_BREAKPOINTS.medium ) {
+					const attributeWidth =
+						innerColumn.attributes.width ||
+						getColumnWidths( innerColumns, columnCount )[
+							innerColumn.clientId
+						];
 
-			const percentageRatio = attributeWidth / columnWidthsSum;
-			const minPercentageRatio = MIN_WIDTH / getContainerWidth( width );
+					const percentageRatio = attributeWidth / columnWidthsSum;
+					const minPercentageRatio =
+						MIN_WIDTH / getContainerWidth( width );
 
-			const columnWidth = Math.floor(
-				percentageRatio * getContainerWidth( width )
-			);
+					const initialColumnWidth = Math.floor(
+						percentageRatio * getContainerWidth( width )
+					);
 
-			const columnRatios = columnWidths.map(
-				( colWidth ) => colWidth / columnWidthsSum
-			);
+					const columnRatios = columnWidths.map(
+						( colWidth ) => colWidth / columnWidthsSum
+					);
 
-			const largeColumnsWidthsSum = columnRatios
-				.map( ( ratio, index ) => {
-					if ( ratio > minPercentageRatio ) {
-						return columnWidths[ index ];
-					}
-					return 0;
-				} )
-				.reduce( ( acc, curr ) => acc + curr, 0 );
+					const largeColumnsWidthsSum = columnRatios
+						.map( ( ratio, index ) => {
+							if ( ratio > minPercentageRatio ) {
+								return columnWidths[ index ];
+							}
+							return 0;
+						} )
+						.reduce( ( acc, curr ) => acc + curr, 0 );
 
-			const finalWidth =
-				columnWidth <= MIN_WIDTH
-					? MIN_WIDTH
-					: Math.floor(
-							( attributeWidth / largeColumnsWidthsSum ) *
-								getContainerWidth( newParentWidth )
-					  );
+					columnWidth =
+						initialColumnWidth <= MIN_WIDTH
+							? MIN_WIDTH
+							: Math.floor(
+									( attributeWidth / largeColumnsWidthsSum ) *
+										getContainerWidth( newParentWidth )
+							  );
 
-			widths[ innerColumn.clientId ] = finalWidth;
+					widths[ innerColumn.clientId ] = columnWidth;
+				} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
+					columnWidth = Math.floor(
+						getContainerWidth( width ) / columnsInRow
+					);
+					widths[ innerColumn.clientId ] = columnWidth;
+				}
+			}
+			widths[ innerColumn.clientId ] = columnWidth;
 		} );
 		return widths;
-	};
-
-	const contentStyle = () => {
-		const columnBaseWidth = width / columnsInRow;
-
-		let columnWidth = columnBaseWidth;
-		if ( columnsInRow > 1 ) {
-			if ( width > ALIGNMENT_BREAKPOINTS.medium ) {
-				columnWidth = calculateWidths();
-			} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
-				columnWidth = Math.floor(
-					getContainerWidth( width ) / columnsInRow
-				);
-			}
-		}
-		return columnWidth;
-	};
+	}, [ columnWidths ] );
 
 	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
 		if ( containerWidth < ALIGNMENT_BREAKPOINTS.mobile ) {
@@ -304,7 +301,8 @@ function ColumnsEditContainer( {
 						onDeleteBlock={
 							columnCount === 1 ? onDeleteBlock : undefined
 						}
-						contentStyle={ contentStyle() }
+						contentStyle={ calculateWidths }
+						parentWidth={ width }
 					/>
 				) }
 			</View>

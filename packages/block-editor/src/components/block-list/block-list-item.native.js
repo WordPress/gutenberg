@@ -51,6 +51,7 @@ export class BlockListItem extends Component {
 			blockAlignment,
 			marginHorizontal,
 			parentBlockAlignment,
+			parentWidth,
 		} = this.props;
 		const { blockWidth } = this.state;
 
@@ -66,7 +67,10 @@ export class BlockListItem extends Component {
 			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full &&
 			blockWidth <= ALIGNMENT_BREAKPOINTS.medium
 		) {
-			return marginHorizontal;
+			if ( parentWidth ) {
+				return marginHorizontal;
+			}
+			return marginHorizontal * 2;
 		}
 
 		return marginHorizontal;

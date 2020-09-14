@@ -129,6 +129,7 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
+			parentWidth = 0,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
@@ -172,6 +173,9 @@ class BlockListBlock extends Component {
 									isFullWidth &&
 										blockWidth < screenWidth &&
 										styles.borderFullWidth,
+									isFullWidth &&
+										parentWidth < screenWidth &&
+										styles.alternativeBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
