@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { Button, Dropdown } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { DOWN } from '@wordpress/keycodes';
 
 export default function DocumentActions( {
 	templateId,
@@ -31,12 +32,22 @@ export default function DocumentActions( {
 				<Dropdown
 					position="bottom center"
 					renderToggle={ ( { onToggle, isOpen } ) => {
+						const openOnArrowDown = ( event ) => {
+							if ( ! isOpen && event.keyCode === DOWN ) {
+								event.preventDefault();
+								event.stopPropagation();
+								onToggle();
+							}
+						};
 						return (
 							<Button
 								onClick={ onToggle }
 								className="edit-site-document-actions__document_root"
 								aria-haspopup="true"
 								aria-expanded={ isOpen }
+								onKeyDown={ openOnArrowDown }
+								label={ __( 'Change document settings.' ) }
+								showTooltip
 							>
 								<span> { template.slug } </span>
 								{ secondaryItem && (
