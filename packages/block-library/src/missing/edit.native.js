@@ -195,7 +195,7 @@ export class UnsupportedBlockEdit extends Component {
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
 			<TouchableWithoutFeedback
-				disabled={!this.props.isSelected}
+				disabled={ ! this.props.isSelected }
 				accessibilityLabel={ __( 'Help button' ) }
 				accessibilityRole={ 'button' }
 				accessibilityHint={ __( 'Tap here to show help' ) }
