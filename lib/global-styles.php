@@ -537,7 +537,7 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 	$result = gutenberg_experimental_global_styles_normalize_schema( array() );
 
 	foreach ( array_keys( $core ) as $block_name ) {
-		foreach ( array_keys( $core[ $block_name ][ 'presets' ] ) as $subtree ) {
+		foreach ( array_keys( $core[ $block_name ]['presets'] ) as $subtree ) {
 			$result[ $block_name ]['presets'][ $subtree ] = array_merge(
 				$core[ $block_name ]['presets'][ $subtree ],
 				$theme[ $block_name ]['presets'][ $subtree ],
