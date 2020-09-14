@@ -261,6 +261,12 @@ function gutenberg_experimental_global_styles_get_theme() {
 	return $theme_config;
 }
 
+/**
+ * Convert style property to its CSS name.
+ *
+ * @param string $style_property Style property name.
+ * @return string CSS property name.
+ */
 function gutenberg_experimental_global_styles_get_css_property( $style_property ) {
 	switch ( $style_property ) {
 		case 'backgroundColor':
@@ -521,7 +527,7 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
 				$css_declarations .= "\t" . $css_property . ': ' . $value . ";\n";
 			} else {
-				$css_declarations .= $css_property. ':' . $value . ';';
+				$css_declarations .= $css_property . ':' . $value . ';';
 			}
 		}
 	}
