@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import tinycolor from 'tinycolor2';
+import FastAverageColor from 'fast-average-color';
 
 /**
  * WordPress dependencies
@@ -12,14 +12,12 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { ColorThief } from './extract-color';
 
 /**
  *
  * @typedef  UseColorExtractProps
  *
  * @property {string} color The initial color, used to track updates.
- * @property {number} numberOfColors Amount of colors to extract.
  * @property {string} onChange Callback when colors are extracted.
  * @property {Function} src The source of the image to extract colors from.
  */
@@ -28,7 +26,7 @@ import { ColorThief } from './extract-color';
  *
  * @typedef  UseColorExtractHookProps
  *
- * @property {string|Array<string>} colors The color value(s) extracted from an image source.
+ * @property {string} colors The color value extracted from an image source.
  * @property {Function} extractColor An async method (Promise) that extracts color values from the image source.
  */
 
@@ -50,12 +48,11 @@ import { ColorThief } from './extract-color';
  * @return {UseColorExtractHookProps} Values and methods.
  */
 export function useColorExtract( {
-	numberOfColors = 1,
 	color: initialColor,
 	onChange = noop,
 	src,
 } ) {
-	const [ colors, setColors ] = useState();
+	const [ color, setColor ] = useState();
 	const srcRef = useRef( src );
 	const initialColorRef = useRef( initialColor );
 	const imageNodeRef = useRef();
@@ -72,31 +69,15 @@ export function useColorExtract( {
 		return new Promise( ( resolve, reject ) => {
 			try {
 				const imageNode = getImageNode();
-				const isGetPalette = numberOfColors !== 1;
 
-				imageNode.onload = () => {
-					let data;
-					let value;
-					const extractor = new ColorThief();
-					const extractedData = isGetPalette
-						? extractor.getPalette( imageNode, numberOfColors )
-						: extractor.getColor( imageNode );
-					if ( isGetPalette ) {
-						data = extractedData.map( ( values ) => {
-							return tinycolor( {
-								r: values[ 0 ],
-								g: values[ 1 ],
-								b: values[ 2 ],
-							} );
-						} );
-						value = data.map( ( color ) => color.toHexString() );
-					} else {
-						const [ r, g, b ] = extractedData;
-						data = tinycolor( { r, g, b } );
-						value = data.toHexString();
-					}
-					setColors( value );
-					resolve( [ value, data ] );
+				imageNode.onload = async () => {
+					const extractor = new FastAverageColor();
+
+					extractor.getColorAsync( imageNode, ( data ) => {
+						setColor( data.hex );
+						resolve( [ data.hex, data ] );
+					} );
+
 					srcRef.current = src;
 				};
 				// Load the image
@@ -144,7 +125,7 @@ export function useColorExtract( {
 	}, [ src ] );
 
 	return {
-		colors,
+		color,
 		extractColor,
 	};
 }
