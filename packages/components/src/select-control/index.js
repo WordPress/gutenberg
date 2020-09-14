@@ -41,6 +41,7 @@ function SelectControl(
 		options = [],
 		size = 'default',
 		value: valueProp,
+		labelPosition,
 		...props
 	},
 	ref
@@ -100,6 +101,7 @@ function SelectControl(
 						<Icon icon={ chevronDown } size={ 18 } />
 					</DownArrowWrapper>
 				}
+				labelPosition={ labelPosition }
 			>
 				<Select
 					{ ...props }

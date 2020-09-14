@@ -20,7 +20,6 @@ import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
-	withSiteCapabilities,
 } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
@@ -176,13 +175,13 @@ export default compose( [
 			'core/editor'
 		);
 		const { getEditorMode } = select( 'core/edit-post' );
-
+		const { getSettings } = select( 'core/block-editor' );
 		return {
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
+			modalLayoutPicker: getSettings( 'capabilities' ).modalLayoutPicker,
 		};
 	} ),
 	withPreferredColorScheme,
-	withSiteCapabilities,
 	__experimentalWithPageTemplatePicker,
 ] )( Layout );

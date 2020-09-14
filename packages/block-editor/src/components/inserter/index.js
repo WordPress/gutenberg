@@ -28,7 +28,7 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
-	toggleProps,
+	toggleProps = {},
 } ) => {
 	let label;
 	if ( hasSingleBlockType ) {
@@ -40,17 +40,30 @@ const defaultRenderToggle = ( {
 	} else {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
+
+	const { onClick, ...rest } = toggleProps;
+
+	// Handle both onClick functions from the toggle and the parent component
+	function handleClick( event ) {
+		if ( onToggle ) {
+			onToggle( event );
+		}
+		if ( onClick ) {
+			onClick( event );
+		}
+	}
+
 	return (
 		<Button
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
-			onClick={ onToggle }
+			onClick={ handleClick }
 			className="block-editor-inserter__toggle"
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
-			{ ...toggleProps }
+			{ ...rest }
 		/>
 	);
 };

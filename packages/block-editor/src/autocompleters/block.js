@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, map } from 'lodash';
+import { noop, map, orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,8 +15,9 @@ import { useMemo } from '@wordpress/element';
  */
 import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
-import { includeVariationsInInserterItems } from '../components/inserter/utils';
 import BlockIcon from '../components/block-icon';
+
+const SHOWN_BLOCK_TYPES = 9;
 
 const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
 	return map(
@@ -74,12 +75,18 @@ function createBlockCompleter() {
 			);
 
 			const filteredItems = useMemo( () => {
-				return searchBlockItems(
-					items,
-					categories,
-					collections,
-					filterValue
-				).filter( ( item ) => item.name !== selectedBlockName );
+				const initialFilteredItems = !! filterValue.trim()
+					? searchBlockItems(
+							items,
+							categories,
+							collections,
+							filterValue
+					  )
+					: orderBy( items, [ 'frecency' ], [ 'desc' ] );
+
+				return initialFilteredItems
+					.filter( ( item ) => item.name !== selectedBlockName )
+					.slice( 0, SHOWN_BLOCK_TYPES );
 			}, [
 				filterValue,
 				selectedBlockName,
@@ -90,26 +97,24 @@ function createBlockCompleter() {
 
 			const options = useMemo(
 				() =>
-					includeVariationsInInserterItems( filteredItems ).map(
-						( blockItem ) => {
-							const { title, icon, isDisabled } = blockItem;
-							return {
-								key: `block-${ blockItem.id }`,
-								value: blockItem,
-								label: (
-									<>
-										<BlockIcon
-											key="icon"
-											icon={ icon }
-											showColors
-										/>
-										{ title }
-									</>
-								),
-								isDisabled,
-							};
-						}
-					),
+					filteredItems.map( ( blockItem ) => {
+						const { title, icon, isDisabled } = blockItem;
+						return {
+							key: `block-${ blockItem.id }`,
+							value: blockItem,
+							label: (
+								<>
+									<BlockIcon
+										key="icon"
+										icon={ icon }
+										showColors
+									/>
+									{ title }
+								</>
+							),
+							isDisabled,
+						};
+					} ),
 				[ filteredItems ]
 			);
 
