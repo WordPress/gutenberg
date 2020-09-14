@@ -80,7 +80,6 @@ function QuickInserterList( {
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
 						label={ __( 'Blocks' ) }
-						limit={ SHOWN_BLOCK_TYPES }
 					/>
 				</InserterPanel>
 			) }
