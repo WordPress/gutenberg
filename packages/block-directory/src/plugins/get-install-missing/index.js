@@ -3,9 +3,9 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
 
 /**
@@ -33,6 +33,16 @@ const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 		},
 		[ originalName ]
 	);
+
+	const { replaceBlock } = useDispatch( 'core/block-editor' );
+	const convertToHTML = () => {
+		replaceBlock(
+			props.clientId,
+			createBlock( 'core/html', {
+				content: originalUndelimitedContent,
+			} )
+		);
+	};
 
 	if ( ! hasPermission || ! block ) {
 		return <OriginalComponent { ...props } />;
@@ -66,7 +76,7 @@ const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 			block.title || originalName
 		);
 		actions.push(
-			<Button key="convert" onClick={ props.convertToHTML } isLink>
+			<Button key="convert" onClick={ convertToHTML } isLink>
 				{ __( 'Keep as HTML' ) }
 			</Button>
 		);
