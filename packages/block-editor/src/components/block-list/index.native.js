@@ -169,6 +169,7 @@ export class BlockList extends Component {
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
+			contentResizeMode,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -216,9 +217,11 @@ export class BlockList extends Component {
 					horizontal={ horizontal }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
-					contentContainerStyle={
-						horizontal && styles.horizontalContentContainer
-					}
+					contentContainerStyle={ [
+						horizontal && styles.horizontalContentContainer,
+						contentResizeMode === 'stretch' &&
+							styles.horizontalContentContainerStretch,
+					] }
 					style={ getStyles(
 						isRootList,
 						isStackedHorizontally,

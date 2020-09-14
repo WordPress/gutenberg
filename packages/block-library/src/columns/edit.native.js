@@ -124,6 +124,7 @@ function ColumnsEditContainer( {
 		( acc, curr ) => acc + curr,
 		0
 	);
+
 	const columnWidthsPerRatio = columnWidths.map(
 		( columnWidth ) =>
 			( columnWidth / columnWidthsSum ) * getContainerWidth( width )
@@ -302,7 +303,7 @@ function ColumnsEditContainer( {
 							columnCount === 1 ? onDeleteBlock : undefined
 						}
 						contentStyle={ calculateWidths }
-						parentWidth={ width }
+						parentWidth={ getContainerWidth( newParentWidth ) }
 					/>
 				) }
 			</View>

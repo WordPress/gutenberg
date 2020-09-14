@@ -19,6 +19,7 @@ import {
 	PanelBody,
 	RangeControl,
 	FooterMessageControl,
+	ALIGNMENT_BREAKPOINTS,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -27,6 +28,8 @@ import { __ } from '@wordpress/i18n';
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
 import { getColumnWidths } from '../columns/utils';
+
+const MIN_WIDTH = 32;
 
 function ColumnEdit( {
 	attributes,
@@ -41,8 +44,9 @@ function ColumnEdit( {
 	selectedColumnIndex,
 	parentAlignment,
 	clientId,
+	parentWidth,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { verticalAlignment, width: attributeWidth } = attributes;
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -64,7 +68,23 @@ function ColumnEdit( {
 		getColumnWidths( columns, columnCount )
 	);
 
-	const width = contentStyle[ clientId ];
+	const columnWidthsSum = columnWidths.reduce(
+		( acc, curr ) => acc + curr,
+		0
+	);
+
+	const ratio =
+		( attributeWidth ||
+			getColumnWidths( columns, columnCount )[ clientId ] ) / 100;
+
+	const tempWidth =
+		ratio * parentWidth < MIN_WIDTH ? MIN_WIDTH : ratio * parentWidth;
+
+	const width =
+		parentWidth > ALIGNMENT_BREAKPOINTS.medium &&
+		Math.round( columnWidthsSum ) < 100
+			? tempWidth
+			: contentStyle[ clientId ];
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -76,7 +96,10 @@ function ColumnEdit( {
 							styles.columnPlaceholderDark
 						),
 					styles.columnPlaceholderNotSelected,
-					{ width },
+					{
+						width,
+						maxWidth: contentStyle[ clientId ],
+					},
 				] }
 			/>
 		);
@@ -118,7 +141,10 @@ function ColumnEdit( {
 			<View
 				style={ [
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
-					{ width },
+					{
+						width,
+						maxWidth: contentStyle[ clientId ],
+					},
 				] }
 			>
 				<InnerBlocks

@@ -13,6 +13,10 @@
 	width: 100%;
 }
 
+.horizontalContentContainerStretch {
+	justify-content: space-evenly;
+}
+
 .switch {
 	flex-direction: row;
 	justify-content: flex-start;
