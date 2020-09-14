@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Icon, chevronLeft } from '@wordpress/icons';
 
@@ -13,7 +14,7 @@ import { Icon, chevronLeft } from '@wordpress/icons';
  * Internal dependencies
  */
 import { ROOT_MENU } from './constants';
-import { useNavigationContext } from './context';
+import { NavigationMenuContext, useNavigationContext } from './context';
 import NavigationMenuTitle from './menu-title';
 import { MenuBackButtonUI, MenuUI } from './styles/navigation-styles';
 
@@ -23,13 +24,17 @@ export default function NavigationMenu( {
 	className,
 	menu = ROOT_MENU,
 	parentMenu,
+	hasSearch,
 	title,
 } ) {
+	const [ search, setSearch ] = useState( '' );
 	const { activeMenu, setActiveMenu } = useNavigationContext();
 
 	if ( activeMenu !== menu ) {
 		return null;
 	}
+
+	const context = { search };
 
 	const classes = classnames( 'components-navigation__menu', className );
 
@@ -46,8 +51,15 @@ export default function NavigationMenu( {
 				</MenuBackButtonUI>
 			) }
 			<MenuUI>
-				<NavigationMenuTitle title={ title } />
-				{ children }
+				<NavigationMenuTitle
+					hasSearch={ hasSearch }
+					search={ search }
+					setSearch={ setSearch }
+					title={ title }
+				/>
+				<NavigationMenuContext.Provider value={ context }>
+					{ children }
+				</NavigationMenuContext.Provider>
 			</MenuUI>
 		</div>
 	);
