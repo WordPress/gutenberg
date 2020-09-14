@@ -15,7 +15,7 @@ function GradientPickerWithGradients( props ) {
 			( select ) => select( 'core/block-editor' ).getSettings().gradients,
 			[]
 		) ?? [];
-	const disableCustomGradients = ! useEditorFeature( 'gradient.custom' );
+	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
 
 	return (
 		<GradientPicker

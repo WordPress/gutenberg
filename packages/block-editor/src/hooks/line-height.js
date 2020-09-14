@@ -56,7 +56,7 @@ export function LineHeightEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsLineHeightDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useEditorFeature( 'lineHeight.custom' );
+	const isDisabled = ! useEditorFeature( 'typography.customLineHeight' );
 
 	return (
 		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) || isDisabled

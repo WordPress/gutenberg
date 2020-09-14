@@ -36,13 +36,12 @@ The specification for the `experimental-theme.json` follows the three main funct
 
 ```
 {
-  "presets": {
+  "settings": {
     "color": [ ... ],
-    "font-size": [ ... ],
-    "gradient": [ ... ],
+    "typography": [ ... ],
+    "spacing": [ ... ],
   },
   "styles": { ... },
-  "features": {... }
 }
 ```
 
@@ -51,19 +50,16 @@ The file is divided into sections that represent different contexts: individual 
 ```
 {
   "global": {
-    "presets": { ... },
+    "settings": { ... },
     "styles": { ... },
-    "features": { ... }
   },
   "core/paragraph": {
-    "presets": { ... },
+    "settings": { ... },
     "styles": { ... },
-    "features": { ... }
   },
   "core/group": {
-    "presets": { ... },
+    "settings": { ... },
     "styles": { ... },
-    "features": { ... }
   }
 }
 ```
@@ -73,21 +69,21 @@ Some of the functions are context-dependant. Take, as an example, the drop cap:
 ```
 {
   "global": {
-    "features": {
+    "settings": {
       "typography": {
         "dropCap": false
       }
     }
   },
   "core/paragraph": {
-    "features": {
+    "settings": {
       "typography": {
         "dropCap": true
       }
     }
   },
   "core/image": {
-    "features": {
+    "settings": {
       "typography": {
         "dropCap": true
       }
@@ -110,17 +106,19 @@ For this input:
 
 ```
 "global": {
-  "presets": {
-    "color": [
-      {
-        "slug": "strong-magenta",
-        "value": "#a156b4"
-      },
-      {
-        "slug": "very-dark-grey",
-        "value": "#444"
-      }
-    ]
+  "settings": {
+    "color": {
+		  palette: [
+        {
+          "slug": "strong-magenta",
+          "value": "#a156b4"
+        },
+        {
+          "slug": "very-dark-grey",
+          "value": "#444"
+        }
+      ]
+    }
   }
 }
 ```
@@ -217,7 +215,7 @@ So far, this function is enabled only for the `global` section in `lib/experimen
 ```
 {
   "global": {
-    "features": {
+    "settings": {
       "typography": {
         "dropCap": false
       }
@@ -250,28 +248,32 @@ The list of features that are currently supported are:
 ```
 {
   "global": {
-    "presets": {
-      "color": [
-        {
-          "slug": <preset slug>,
-          "value": <preset value>
-        },
-        { <more colors> }
-      ],
-      "font-size": [
-        {
-          "slug": <preset slug>,
-          "value": <preset value>
-        },
-        { <more font sizes> }
-      ],
-      "gradient": [
-        {
-          "slug": <preset slug>,
-          "value": <preset value>
-        },
-        { <more gradients> }
-      ]
+    "settings": {
+      "color": {
+        palette: [
+          {
+            "slug": <preset slug>,
+            "value": <preset value>
+          },
+          { <more colors> }
+        ],
+        gradients: [
+          {
+            "slug": <preset slug>,
+            "value": <preset value>
+          },
+          { <more gradients> }
+        ]
+      },
+      "typography": {
+        fontSize: [
+          {
+            "slug": <preset slug>,
+            "value": <preset value>
+          },
+          { <more font sizes> }
+        ]
+			}
     },
     "styles: {
       "color: {

@@ -29,7 +29,7 @@ export default function GradientPickerControl( {
 			( select ) => select( 'core/block-editor' ).getSettings().gradients,
 			[]
 		) ?? [];
-	const disableCustomGradients = ! useEditorFeature( 'gradient.custom' );
+	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
 	if ( isEmpty( gradients ) && disableCustomGradients ) {
 		return null;
 	}
