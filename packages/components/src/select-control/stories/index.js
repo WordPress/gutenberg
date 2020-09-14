@@ -35,7 +35,6 @@ export const _default = () => {
 		disabled: boolean( 'disabled', false ),
 		help: text( 'help', 'Help text to explain the select control.' ),
 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
-		isFloatingLabel: boolean( 'isFloatingLabel', false ),
 		label: text( 'label', 'Value' ),
 		multiple: boolean( 'multiple', false ),
 		options: object( 'Options', [
