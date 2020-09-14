@@ -22,15 +22,29 @@ import {
 	PanelBody,
 	SelectControl,
 	ToggleControl,
+	ToolbarButton,
+	ToolbarGroup,
 	withNotices,
 	RangeControl,
+	Dropdown,
+	NavigableMenu,
+	MenuItem,
+	FormFileUpload,
 } from '@wordpress/components';
-import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
-import { Component, Platform } from '@wordpress/element';
+import {
+	BlockControls,
+	MediaPlaceholder,
+	InspectorControls,
+	MediaUpload,
+	MediaUploadCheck,
+} from '@wordpress/block-editor';
+import { Component, createRef, Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { media as mediaIcon, upload } from '@wordpress/icons';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
+import { DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -351,11 +365,13 @@ class GalleryEdit extends Component {
 			attributes,
 			className,
 			isSelected,
+			mediaUpload,
 			noticeUI,
 			insertBlocksAfter,
 		} = this.props;
 		const {
 			columns = defaultColumnsNumber( attributes ),
+			ids,
 			imageCrop,
 			images,
 			linkTo,
@@ -367,7 +383,6 @@ class GalleryEdit extends Component {
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				addToGallery={ hasImages }
-				isAppender={ hasImages }
 				className={ className }
 				disableMediaButtons={ hasImages && ! isSelected }
 				icon={ ! hasImages && sharedIcon }
@@ -396,6 +411,143 @@ class GalleryEdit extends Component {
 
 		return (
 			<>
+				<BlockControls>
+					{ hasImages && (
+						<Dropdown
+							popoverProps={ {
+								isAlternate: true,
+							} }
+							contentClassName="block-editor-media-replace-flow__options"
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<ToolbarGroup className="media-replace-flow">
+									<ToolbarButton
+										ref={ createRef() }
+										aria-expanded={ isOpen }
+										onClick={ onToggle }
+										onKeyDown={ ( event ) => {
+											if ( event.keyCode === DOWN ) {
+												event.preventDefault();
+												event.stopPropagation();
+												event.target.click();
+											}
+										} }
+									>
+										{ __( 'Add' ) }
+									</ToolbarButton>
+								</ToolbarGroup>
+							) }
+							renderContent={ ( { onClose } ) => (
+								<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
+									<MediaUpload
+										multiple
+										gallery
+										addToGallery
+										title={ __( 'Add image' ) }
+										onSelect={ this.onSelectImages }
+										onError={ this.onUploadError }
+										allowedTypes={ ALLOWED_MEDIA_TYPES }
+										value={ ids }
+										render={ ( { open } ) => (
+											<MenuItem
+												icon={ mediaIcon }
+												onClick={ open }
+											>
+												{ __( 'Open Media Library' ) }
+											</MenuItem>
+										) }
+									/>
+									<MediaUploadCheck>
+										<FormFileUpload
+											onChange={ ( event ) => {
+												const { files } = event.target;
+
+												// Since the setMedia function runs multiple times per upload group
+												// and is passed newMedia containing every item in its group each time, we must
+												// filter out whatever this upload group had previously returned to the
+												// gallery before adding and returning the image array with replacement newMedia
+												// values.
+
+												// Define an array to store urls from newMedia between subsequent function calls.
+												let lastMediaPassed = [];
+												const setMedia = ( newMedia ) => {
+													// Remove any images this upload group is responsible for (lastMediaPassed).
+													// Their replacements are contained in newMedia.
+													const filteredMedia = (
+														images ?? []
+													).filter( ( item ) => {
+														// If Item has id, only remove it if lastMediaPassed has an item with that id.
+														if ( item.id ) {
+															return ! lastMediaPassed.some(
+																// Be sure to convert to number for comparison.
+																( { id } ) =>
+																	Number(
+																		id
+																	) ===
+																	Number(
+																		item.id
+																	)
+															);
+														}
+														// Compare transient images via .includes since gallery may append extra info onto the url.
+														return ! lastMediaPassed.some(
+															( { urlSlug } ) =>
+																item.url.includes(
+																	urlSlug
+																)
+														);
+													} );
+													// Return the filtered media array along with newMedia.
+													this.onSelectImages(
+														filteredMedia.concat(
+															newMedia
+														)
+													);
+													// Reset lastMediaPassed and set it with ids and urls from newMedia.
+													lastMediaPassed = newMedia.map(
+														( media ) => {
+															// Add everything up to '.fileType' to compare via .includes.
+															const cutOffIndex = media.url.lastIndexOf(
+																'.'
+															);
+															const urlSlug = media.url.slice(
+																0,
+																cutOffIndex
+															);
+															return {
+																id: media.id,
+																urlSlug,
+															};
+														}
+													);
+												};
+
+												mediaUpload( {
+													allowedTypes: ALLOWED_MEDIA_TYPES,
+													filesList: files,
+													onFileChange: setMedia,
+													onError: this.onUploadError,
+												} );
+
+												onClose();
+											} }
+											accept={ ALLOWED_MEDIA_TYPES }
+											render={ ( { openFileDialog } ) => (
+												<MenuItem
+													icon={ upload }
+													onClick={ () => {
+														openFileDialog();
+													} }
+												>
+													{ __( 'Upload' ) }
+												</MenuItem>
+											) }
+										/>
+									</MediaUploadCheck>
+								</NavigableMenu>
+							) }
+						/>
+					) }
+				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
 						{ images.length > 1 && (
@@ -436,7 +588,6 @@ class GalleryEdit extends Component {
 				<Gallery
 					{ ...this.props }
 					selectedImage={ this.state.selectedImage }
-					mediaPlaceholder={ mediaPlaceholder }
 					onMoveBackward={ this.onMoveBackward }
 					onMoveForward={ this.onMoveForward }
 					onRemoveImage={ this.onRemoveImage }
