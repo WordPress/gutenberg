@@ -2,13 +2,21 @@
 	align-items: center;
 	display: flex;
 	height: $header-height;
-	justify-content: space-between;
 	box-sizing: border-box;
+
+	.edit-site-header_start,
+	.edit-site-header_end {
+		flex: 1;
+		display: flex;
+	}
+
+	.edit-site-header_end {
+		justify-content: flex-end;
+	}
 }
 
 .edit-site-header__toolbar {
 	display: flex;
-	flex-grow: 1;
 	padding-left: $grid-unit-30;
 	align-items: center;
 
