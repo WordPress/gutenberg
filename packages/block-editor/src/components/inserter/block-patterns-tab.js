@@ -52,8 +52,7 @@ function BlockPatternsCategory( {
 	onInsert,
 } ) {
 	const [ allPatterns, allCategories, onClick ] = usePatternsState(
-		onInsert,
-		selectedCategory
+		onInsert
 	);
 
 	const [ currentCategoryPatterns, setCategoryPatterns ] = useState( [] );
