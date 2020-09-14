@@ -33,9 +33,9 @@ const transforms = {
 				src: {
 					type: 'string',
 					shortcode: ( {
-						named: { mp3, m4a, ogg, wav, wma, src },
+						named: { src, mp3, m4a, ogg, wav, wma },
 					} ) => {
-						return mp3 || m4a || ogg || wav || wma || src;
+						return src || mp3 || m4a || ogg || wav || wma;
 					},
 				},
 				loop: {
