@@ -96,14 +96,20 @@ const fetchLinkSuggestions = (
 		);
 	}
 
-	return Promise.all( queries ).then( ( results ) => {
-		return map( flatten( results ).slice( 0, perPage ), ( result ) => ( {
-			id: result.id,
-			url: result.url,
-			title: decodeEntities( result.title ) || __( '(no title)' ),
-			type: result.subtype || result.type,
-		} ) );
-	} );
+	// use allSettled to preserve any successful promise(s) results when one of the promises fail
+	return Promise.allSettled( queries )
+		.then( ( results ) =>
+			results.filter( ( result ) => result.status === 'fulfilled' )
+		)
+		.then( ( results ) => results.map( ( result ) => result.value ) )
+		.then( ( results ) =>
+			map( flatten( results ).slice( 0, perPage ), ( result ) => ( {
+				id: result.id,
+				url: result.url,
+				title: decodeEntities( result.title ) || __( '(no title)' ),
+				type: result.subtype || result.type,
+			} ) )
+		);
 };
 
 export function initialize( id, settings ) {
