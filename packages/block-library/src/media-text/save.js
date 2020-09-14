@@ -41,10 +41,13 @@ export default function save( { attributes } ) {
 		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 	} );
-	const imageClassName = imageClasses === '' ? null : imageClasses;
 
 	let image = (
-		<img src={ mediaUrl } alt={ mediaAlt } className={ imageClassName } />
+		<img
+			src={ mediaUrl }
+			alt={ mediaAlt }
+			className={ imageClasses || null }
+		/>
 	);
 
 	if ( href ) {
