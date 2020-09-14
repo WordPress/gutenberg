@@ -26,6 +26,14 @@ export const G2 = {
 			focusDark: '#fff',
 		},
 	},
+	gray: {
+		900: '#1e1e1e',
+		700: '#757575', // Meets 4.6:1 text contrast against white.
+		600: '#949494', // Meets 3:1 UI or large text contrast against white.
+		400: '#ccc',
+		200: '#ddd', // Used for most borders.
+		100: '#f0f0f0',
+	},
 	darkGray: {
 		primary: '#1e1e1e',
 	},
@@ -143,10 +151,10 @@ export const UI = {
 	theme: ADMIN.theme,
 	background: BASE.white,
 	backgroundDisabled: LIGHT_GRAY[ 200 ],
-	border: G2.darkGray.primary,
+	border: G2.gray[ 700 ],
 	borderFocus: ADMIN.themeDark10,
-	borderDisabled: DARK_GRAY[ 700 ],
-	borderLight: LIGHT_GRAY[ 600 ],
+	borderDisabled: G2.gray[ 400 ],
+	borderLight: G2.gray[ 200 ],
 	label: DARK_GRAY[ 500 ],
 	textDisabled: DARK_GRAY[ 150 ],
 	textDark: BASE.white,
