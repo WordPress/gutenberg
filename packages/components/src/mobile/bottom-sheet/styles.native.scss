@@ -30,9 +30,8 @@
 	margin-top: $grid-unit-20 / 2;
 }
 
-
 .background {
-	background-color: $white;
+	background-color: $app-background;
 	border-top-right-radius: 8px;
 	border-top-left-radius: 8px;
 	width: 100%;
@@ -60,13 +59,6 @@
 	align-items: center;
 	align-content: center;
 	min-height: 48;
-}
-
-.title {
-	color: $dark-gray-600;
-	font-size: 18px;
-	font-weight: 600;
-	text-align: center;
 }
 
 .titleContainer {

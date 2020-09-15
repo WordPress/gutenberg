@@ -3,10 +3,14 @@
  */
 import Hr from 'react-native-hr';
 
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
+
 export const HorizontalRule = ( props ) => {
 	const lineStyle = {
-		backgroundColor: '#555d66',
-		height: 2,
+		...styles.hr,
 		...props.lineStyle,
 	};
 

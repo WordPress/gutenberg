@@ -2,8 +2,8 @@
 .container {
 	height: $mobile-header-toolbar-height;
 	flex-direction: row;
-	background-color: #fff;
-	border-top-color: #e9eff3;
+	background-color: $app-background;
+	border-top-color: $border-color;
 	border-top-width: 1px;
 }
 

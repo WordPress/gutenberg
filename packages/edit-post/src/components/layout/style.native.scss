@@ -2,7 +2,7 @@
 .container {
 	flex: 1;
 	justify-content: flex-start;
-	background-color: #fff;
+	background-color: $app-background;
 }
 
 .containerDark {
@@ -11,11 +11,11 @@
 
 .background {
 	flex: 1;
-	background-color: $white;
+	background-color: $app-background;
 }
 
 .backgroundDark {
-	background-color: $black;
+	background-color: $app-background-dark;
 }
 
 .toolbarKeyboardAvoidingView {
