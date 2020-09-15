@@ -29,8 +29,8 @@ export default function Navigation( {
 	const [ item, setItem ] = useState( activeItem );
 	const [ menu, setMenu ] = useState( activeMenu );
 	const [ slideOrigin, setSlideOrigin ] = useState();
-	const [ navigationItems, setNavigationItems ] = useState( null );
-	const [ navigationMenus, setNavigationMenus ] = useState( null );
+	const [ navigationItems, setNavigationItems ] = useState( {} );
+	const [ navigationMenus, setNavigationMenus ] = useState( {} );
 
 	const setActiveItem = ( itemId ) => {
 		setItem( itemId );
