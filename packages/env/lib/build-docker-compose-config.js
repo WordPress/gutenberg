@@ -114,7 +114,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
 	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
-	const phpVersion = `\${LOCAL_PHP:-${ config.phpVersion }}`;
+	const phpVersion = `\${LOCAL_PHP:-${ config.phpVersion }}:`;
 	const wpImage =
 		'wordpress' +
 		( phpVersion === '' || typeof phpVersion === 'undefined'
