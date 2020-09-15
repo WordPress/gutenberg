@@ -23,7 +23,7 @@ const Caption = ( {
 	shouldDisplay = true,
 	style,
 	value,
-	insertBlocksAfter = () => {},
+	insertBlocksAfter,
 } ) => (
 	<View
 		accessibilityLabel={
@@ -51,8 +51,10 @@ const Caption = ( {
 			underlineColorAndroid="transparent"
 			unstableOnFocus={ onFocus }
 			value={ value }
-			__unstableOnSplitAtEnd={ () =>
-				insertBlocksAfter( createBlock( 'core/paragraph' ) )
+			__unstableOnSplitAtEnd={
+				insertBlocksAfter
+					? () => insertBlocksAfter( createBlock( 'core/paragraph' ) )
+					: null
 			}
 			deleteEnter={ true }
 		/>
