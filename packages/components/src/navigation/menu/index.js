@@ -34,16 +34,22 @@ export default function NavigationMenu( props ) {
 		title,
 	} = props;
 	const { activeMenu, setActiveMenu } = useNavigationContext();
-
-	if ( activeMenu !== menu ) {
-		return null;
-	}
+	const isActive = activeMenu === menu;
 
 	const classes = classnames( 'components-navigation__menu', className );
 
 	const context = {
 		menu,
+		isActive,
 	};
+
+	if ( ! isActive ) {
+		return (
+			<NavigationMenuContext.Provider value={ context }>
+				{ children }
+			</NavigationMenuContext.Provider>
+		);
+	}
 
 	return (
 		<NavigationMenuContext.Provider value={ context }>
