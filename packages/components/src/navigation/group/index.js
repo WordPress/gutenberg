@@ -12,6 +12,7 @@ import { useNavigationMenuContext } from '../menu/context';
 export default function NavigationGroup( { children, className, title } ) {
 	const { isActive } = useNavigationMenuContext();
 
+	// Keep the children rendered to make sure inactive items are included in the navigation tree
 	if ( ! isActive ) {
 		return children;
 	}

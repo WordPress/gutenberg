@@ -36,6 +36,9 @@ export default function NavigationItem( props ) {
 	const { activeItem, setActiveMenu } = useNavigationContext();
 	const { isActive } = useNavigationMenuContext();
 
+	// If this item is in an inactive menu, then we skip rendering
+	// We need to make sure this component gets mounted though
+	// To make sure inactive items are included in the navigation tree
 	if ( ! isActive ) {
 		return null;
 	}

@@ -43,6 +43,7 @@ export default function NavigationMenu( props ) {
 		isActive,
 	};
 
+	// Keep the children rendered to make sure inactive items are included in the navigation tree
 	if ( ! isActive ) {
 		return (
 			<NavigationMenuContext.Provider value={ context }>
