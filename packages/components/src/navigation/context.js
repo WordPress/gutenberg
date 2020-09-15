@@ -19,14 +19,13 @@ export const NavigationContext = createContext( {
 	setActiveMenu: noop,
 
 	navigationTree: {
-		getItem: noop,
-		getMenu: noop,
-
 		items: {},
+		getItem: noop,
 		addItem: noop,
 		removeItem: noop,
 
 		menus: {},
+		getMenu: noop,
 		addMenu: noop,
 		removeMenu: noop,
 	},
