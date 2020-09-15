@@ -81,4 +81,17 @@ function InserterListItem( {
 	);
 }
 
-export default withPreferredColorScheme( InserterListItem );
+function getWidth() {
+	const {
+		paddingLeft: itemPaddingLeft,
+		paddingRight: itemPaddingRight,
+	} = styles.modalItem;
+	const { width: itemWidth } = styles.modalIconWrapper;
+	return itemWidth + itemPaddingLeft + itemPaddingRight;
+}
+
+const ThemedInserterListItem = withPreferredColorScheme( InserterListItem );
+
+ThemedInserterListItem.getWidth = getWidth;
+
+export default ThemedInserterListItem;
