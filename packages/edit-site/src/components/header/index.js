@@ -37,6 +37,7 @@ export default function Header( {
 	const {
 		deviceType,
 		hasFixedToolbar,
+		template,
 		templateId,
 		templatePartId,
 		templateType,
@@ -52,14 +53,18 @@ export default function Header( {
 			getPage,
 		} = select( 'core/edit-site' );
 
-		const { show_on_front: _showOnFront } = select(
-			'core'
-		).getEditedEntityRecord( 'root', 'site' );
+		const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
+		const { show_on_front: _showOnFront } = getEditedEntityRecord(
+			'root',
+			'site'
+		);
 
+		const _templateId = getTemplateId();
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			templateId: getTemplateId(),
+			templateId: _templateId,
+			template: getEntityRecord( 'postType', 'wp_template', _templateId ),
 			templatePartId: getTemplatePartId(),
 			templateType: getTemplateType(),
 			page: getPage(),
@@ -133,7 +138,10 @@ export default function Header( {
 			</div>
 
 			<div className="edit-site-header_center">
-				<DocumentActions templateId={ templateId } />
+				<DocumentActions
+					primaryText={ template?.slug }
+					secondaryText={ 'TODO header' }
+				/>
 			</div>
 
 			<div className="edit-site-header_end">

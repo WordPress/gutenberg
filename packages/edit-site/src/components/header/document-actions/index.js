@@ -7,28 +7,17 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Button, Dropdown } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 
 export default function DocumentActions( {
-	templateId,
-	secondaryItem = 'Header',
+	primaryText,
+	secondaryText,
 	isSecondaryItemActive = false,
 } ) {
-	// TODO: I dislike having this here...
-	const template = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( 'core' );
-
-			return getEntityRecord( 'postType', 'wp_template', templateId );
-		},
-		[ templateId ]
-	);
-
 	return (
 		<div className="edit-site-document-actions">
-			{ template ? (
+			{ primaryText ? (
 				<Dropdown
 					position="bottom center"
 					renderToggle={ ( { onToggle, isOpen } ) => {
@@ -49,8 +38,8 @@ export default function DocumentActions( {
 								label={ __( 'Change document settings.' ) }
 								showTooltip
 							>
-								<span> { template.slug } </span>
-								{ secondaryItem && (
+								<span> { primaryText } </span>
+								{ secondaryText && (
 									<>
 										<span className="edit-site-document-actions__separator">
 											:{ ' ' }
@@ -65,7 +54,7 @@ export default function DocumentActions( {
 												}
 											) }
 										>
-											{ secondaryItem }
+											{ secondaryText }
 										</span>
 									</>
 								) }
