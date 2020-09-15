@@ -95,6 +95,10 @@ export const ItemBadgeUI = styled.span`
 	display: inline-flex;
 	padding: 4px 12px;
 	border-radius: 2px;
+
+	.components-spinner {
+		margin: 0;
+	}
 `;
 
 export const ItemTitleUI = styled( Text )`
