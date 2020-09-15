@@ -44,19 +44,25 @@ export default function BlockNavigationBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { clientId } = block;
-	const isDragging = useSelect(
+	const { isDragging, getParents } = useSelect(
 		( select ) => {
-			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
-				'core/block-editor'
-			);
+			const {
+				isBlockBeingDragged,
+				isAncestorBeingDragged,
+				getBlockParents,
+			} = select( 'core/block-editor' );
 
-			return (
-				isBlockBeingDragged( clientId ) ||
-				isAncestorBeingDragged( clientId )
-			);
+			return {
+				isDragging:
+					isBlockBeingDragged( clientId ) ||
+					isAncestorBeingDragged( clientId ),
+				getParents: getBlockParents,
+			};
 		},
 		[ clientId ]
 	);
+
+	const blockParents = getParents( clientId );
 
 	const { selectBlock: selectEditorBlock } = useDispatch(
 		'core/block-editor'
@@ -172,9 +178,19 @@ export default function BlockNavigationBlock( {
 								<MenuGroup>
 									<MenuItem
 										onClick={ async () => {
-											// If clientId is already selected, it won't be focused (see block-wrapper.js)
-											// This removes the selection first to ensure the focus will always switch.
-											await selectEditorBlock( null );
+											if ( blockParents.length ) {
+												// If the block to select is inside a dropdown, we need to open the dropdown.
+												// Otherwise focus won't transfer to the block.
+												for ( const parent of blockParents ) {
+													await selectEditorBlock(
+														parent
+													);
+												}
+											} else {
+												// If clientId is already selected, it won't be focused (see block-wrapper.js)
+												// This removes the selection first to ensure the focus will always switch.
+												await selectEditorBlock( null );
+											}
 											await selectEditorBlock( clientId );
 											onClose();
 										} }
