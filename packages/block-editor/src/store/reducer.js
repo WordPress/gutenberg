@@ -17,6 +17,7 @@ import {
 	difference,
 	omitBy,
 	pickBy,
+	filter,
 } from 'lodash';
 
 /**
@@ -1650,6 +1651,18 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+export function hoveredBlocks( state = [], action ) {
+	switch ( action.type ) {
+		case 'HOVERED_BLOCKS_ADD':
+			return [ action.clientId, ...state ];
+
+		case 'HOVERED_BLOCKS_REMOVE':
+			return filter( state, ( blockId ) => blockId !== action.clientId );
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1671,4 +1684,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
+	hoveredBlocks,
 } );

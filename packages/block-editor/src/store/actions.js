@@ -1106,3 +1106,17 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+export function addHoveredBlock( clientId ) {
+	return {
+		type: 'HOVERED_BLOCKS_ADD',
+		clientId,
+	};
+}
+
+export function removeHoveredBlock( clientId ) {
+	return {
+		type: 'HOVERED_BLOCKS_REMOVE',
+		clientId,
+	};
+}

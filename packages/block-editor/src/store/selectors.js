@@ -1798,3 +1798,7 @@ export function isBlockHighlighted( state, clientId ) {
 export function areInnerBlocksControlled( state, clientId ) {
 	return !! state.blocks.controlledInnerBlocks[ clientId ];
 }
+
+export function getHoveredBlocks( state ) {
+	return state.hoveredBlocks;
+}
