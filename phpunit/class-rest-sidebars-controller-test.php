@@ -9,7 +9,6 @@
 /**
  * Tests for REST API for Menus.
  *
- * @group failing
  * @see WP_Test_REST_Controller_Testcase
  */
 class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
