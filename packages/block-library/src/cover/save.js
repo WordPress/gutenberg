@@ -113,7 +113,10 @@ export default function save( { attributes } ) {
 			) }
 			{ isVideoBackground && url && (
 				<video
-					className="wp-block-cover__video-background"
+					className={ classnames(
+						'wp-block-cover__video-background',
+						'intrinsic-ignore'
+					) }
 					autoPlay
 					muted
 					loop
