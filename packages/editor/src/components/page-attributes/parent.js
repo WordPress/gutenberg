@@ -24,19 +24,21 @@ import { buildTermsTree } from '../../utils/terms';
 
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( 'core/editor' );
-	const { parentPost } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( 'core' );
-		const { getEditedPostAttribute } = select( 'core/editor' );
-		const postTypeSlug = getEditedPostAttribute( 'type' );
+	const { parentPost } = useSelect(
+		( select ) => {
+			const { getEntityRecords } = select( 'core' );
+			const { getEditedPostAttribute } = select( 'core/editor' );
+			const postTypeSlug = getEditedPostAttribute( 'type' );
+			const theParentID = getEditedPostAttribute( 'parent' );
 
-		const theParentID = getEditedPostAttribute( 'parent' );
-
-		return {
-			parentPost: getEntityRecords( 'postType', postTypeSlug, {
-				include: [ theParentID ],
-			} ),
-		};
-	}, [] );
+			return {
+				parentPost: getEntityRecords( 'postType', postTypeSlug, {
+					include: [ theParentID ],
+				} ),
+			};
+		},
+		[ parent ]
+	);
 	const [ fieldValue, setFieldValue ] = useState(
 		parentPost ? parentPost[ 0 ].title.raw : false
 	);
@@ -44,9 +46,7 @@ export function PageAttributesParent() {
 		( select ) => {
 			const { getPostType, getEntityRecords } = select( 'core' );
 			const { isResolving } = select( 'core/data' );
-			const { getCurrentPostId, getEditedPostAttribute } = select(
-				'core/editor'
-			);
+			const { getCurrentPostId, getEditedPostAttribute } = select( 'core/editor' );
 			const postTypeSlug = getEditedPostAttribute( 'type' );
 			const pType = getPostType( postTypeSlug );
 			const postId = getCurrentPostId();
@@ -79,13 +79,11 @@ export function PageAttributesParent() {
 					postTypeSlug,
 					query,
 				] ),
-				parentPost: getEntityRecords( 'postType', postTypeSlug, {
-					include: [ theParentID ],
-				} ),
 			};
 		},
 		[ fieldValue ]
 	);
+
 	const isHierarchical = get( postType, [ 'hierarchical' ], false );
 	const parentPageLabel = get( postType, [ 'labels', 'parent_item_colon' ] );
 	const pageItems = items || [];
@@ -93,9 +91,7 @@ export function PageAttributesParent() {
 		return flatMap( tree, ( treeNode ) => [
 			{
 				key: treeNode.id,
-				name:
-					repeat( '\u00A0', level * 3 ) +
-					unescapeString( treeNode.name ),
+				name: repeat( '— ', level ) + unescapeString( treeNode.name ),
 			},
 			...getOptionsFromTree( treeNode.children || [], level + 1 ),
 		] );
@@ -159,7 +155,7 @@ export function PageAttributesParent() {
 		editPost( { parent: selectedItem.key } );
 	};
 
-	const inputValue = parentPost ? parentPost[ 0 ].title.raw : false;
+	const inputValue = parentPost ? parentPost[ 0 ].title.raw : fieldValue;
 	const selected = parentPost
 		? parentOptions.findIndex( ( { key } ) => parentPost[ 0 ].id === key )
 		: false;
@@ -168,7 +164,7 @@ export function PageAttributesParent() {
 			? parentOptions[ selected ]
 			: parentOptions[ 0 ];
 
-	if ( ! parentPost && ! isLoading ) {
+	if ( ! fieldValue && isLoading ) {
 		return null;
 	}
 	return (
