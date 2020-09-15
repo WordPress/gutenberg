@@ -10,15 +10,16 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
-* [**] Reflect changes of slider in block settings immediately.
 
 ## 1.37.0
 
 * [**] Add support for rounded style in Image block
+* [***] Full-width and wide alignment support for Group, Cover and Image block
 
 ## 1.36.0
 
 * [**] [Android] Removed pullquote dev only restriction in Android
+* [**] Reflect changes of slider in block settings immediately.
 
 ## 1.35.0
 

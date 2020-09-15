@@ -52,16 +52,18 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
-	// We need to wrap the block in order to handle UTF-8 properly.
-	$wrapper_left  = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>';
-	$wrapper_right = '</body></html>';
-
 	$dom = new DOMDocument( '1.0', 'utf-8' );
 
 	// Suppress DOMDocument::loadHTML warnings from polluting the front-end.
 	$previous = libxml_use_internal_errors( true );
 
-	$success = $dom->loadHTML( $wrapper_left . $block_content . $wrapper_right, LIBXML_HTML_NODEFDTD | LIBXML_COMPACT );
+	// We need to wrap the block in order to handle UTF-8 properly.
+	$wrapped_block_html =
+		'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>'
+		. $block_content
+		. '</body></html>';
+
+	$success = $dom->loadHTML( $wrapped_block_html, LIBXML_HTML_NODEFDTD | LIBXML_COMPACT );
 
 	// Clear errors and reset the use_errors setting.
 	libxml_clear_errors();
@@ -71,9 +73,13 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$xpath      = new DOMXPath( $dom );
-	$block_root = $xpath->query( '/html/body/*' )[0];
+	// Structure is like `<html><head/><body/></html>`, so body is the `lastChild` of our document.
+	$body_element = $dom->documentElement->lastChild; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
+	$xpath      = new DOMXPath( $dom );
+	$block_root = $xpath->query( './*', $body_element )[0];
+
+	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 	if ( empty( $block_root ) ) {
 		return $block_content;
 	}
@@ -89,14 +95,24 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	// Apply new styles and classes.
 	if ( ! empty( $new_classes ) ) {
-		$block_root->setAttribute( 'class', esc_attr( implode( ' ', $new_classes ) ) );
+		// `DOMElement::setAttribute` handles attribute value escaping.
+		$block_root->setAttribute( 'class', implode( ' ', $new_classes ) );
 	}
 
 	if ( ! empty( $new_styles ) ) {
-		$block_root->setAttribute( 'style', esc_attr( implode( '; ', $new_styles ) . ';' ) );
+		// `DOMElement::setAttribute` handles attribute value escaping.
+		$block_root->setAttribute( 'style', implode( '; ', $new_styles ) . ';' );
 	}
 
-	return $dom->saveHtml( $block_root );
+	// Avoid using `$dom->saveHtml( $node )` because the node results may not produce consistent
+	// whitespace for PHP < 7.3. Saving the root HTML `$dom->saveHtml()` prevents this behavior.
+	$full_html = $dom->saveHtml();
+
+	// Find the <body> open/close tags. The open tag needs to be adjusted so we get inside the tag
+	// and not the tag itself.
+	$start = strpos( $full_html, '<body>', 0 ) + strlen( '<body>' );
+	$end   = strpos( $full_html, '</body>', $start );
+	return trim( substr( $full_html, $start, $end - $start ) );
 }
 add_filter( 'render_block', 'gutenberg_apply_block_supports', 10, 2 );
 

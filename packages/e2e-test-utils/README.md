@@ -302,6 +302,16 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="insertBlockDirectoryBlock" href="#insertBlockDirectoryBlock">#</a> **insertBlockDirectoryBlock**
+
+Opens the inserter, searches for the given block, then selects the
+first result that appears from the block directory. It then waits briefly for the block list to
+update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
 <a name="insertPattern" href="#insertPattern">#</a> **insertPattern**
 
 Opens the inserter, searches for the given pattern, then selects the first

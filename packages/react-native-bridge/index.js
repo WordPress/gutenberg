@@ -88,6 +88,10 @@ export function subscribePreferredColorScheme( callback ) {
 	);
 }
 
+export function subscribeUpdateCapabilities( callback ) {
+	return gutenbergBridgeEvents.addListener( 'updateCapabilities', callback );
+}
+
 /**
  * @callback FnReplaceBlockCompletion
  * @param {string} html the HTML to replace the block.

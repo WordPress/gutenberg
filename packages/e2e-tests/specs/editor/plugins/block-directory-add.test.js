@@ -4,6 +4,7 @@
 import {
 	createNewPost,
 	searchForBlock,
+	insertBlockDirectoryBlock,
 	setUpResponseMocking,
 	getEditedPostContent,
 	createJSONResponse,
@@ -178,15 +179,7 @@ describe( 'adding blocks from block directory', () => {
 		await setUpResponseMocking( MOCK_BLOCKS_RESPONSES );
 
 		// Search for the block via the inserter
-		await searchForBlock( MOCK_BLOCK1.title );
-
-		// Grab the first block in the list -> Needs to be the first one, the mock response expects it.
-		const addBtn = await page.waitForSelector(
-			'.block-directory-downloadable-blocks-list li:first-child button'
-		);
-
-		// Add the block
-		await addBtn.click();
+		await insertBlockDirectoryBlock( MOCK_BLOCK1.title );
 
 		await page.waitForSelector( `div[data-type="${ MOCK_BLOCK1.name }"]` );
 

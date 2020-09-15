@@ -31,6 +31,7 @@ export {
 	searchForBlock,
 	searchForPattern,
 	searchForReusableBlock,
+	insertBlockDirectoryBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
 } from './inserter';
