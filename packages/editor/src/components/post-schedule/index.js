@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __experimentalGetSettings } from '@wordpress/date';
+import { __experimentalGetSettings, gmdate } from '@wordpress/date';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DateTimePicker } from '@wordpress/components';
@@ -42,11 +42,26 @@ export function PostSchedule( { date, onUpdateDate, postByMonth } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
+		const now = new Date();
+
+		const firstDayOfTheMonth = new Date(
+			now.getFullYear(),
+			now.getMonth(),
+			1
+		).toISOString();
+		const lastDayOfTheMonth = new Date(
+			now.getFullYear(),
+			now.getMonth() + 1,
+			1
+		).toISOString();
+
 		return {
 			date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
 			postByMonth: map(
 				select( 'core' ).getEntityRecords( 'postType', 'post', {
 					status: 'publish,future',
+					after: firstDayOfTheMonth,
+					before: lastDayOfTheMonth,
 				} ),
 				( { date, title } ) => ( {
 					title,
