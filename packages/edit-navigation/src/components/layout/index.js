@@ -1,16 +1,21 @@
 /**
  * WordPress dependencies
  */
+import { addFilter } from '@wordpress/hooks';
 import {
 	DropZoneProvider,
+	__experimentalEditInPlaceControl as EditInPlaceControl,
 	Popover,
 	SlotFillProvider,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
+	BlockControls,
 } from '@wordpress/block-editor';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,6 +31,28 @@ import Toolbar from '../toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
 import { store as editNavigationStore } from '../../store';
+
+const withMenuName = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		return (
+			<>
+				<BlockEdit { ...props } />
+				<BlockControls>
+					<ToolbarGroup>
+						<EditInPlaceControl label="Sample menu" />
+					</ToolbarGroup>
+				</BlockControls>
+			</>
+		);
+	},
+	'withMenuName'
+);
+
+addFilter(
+	'navigation.BlockEdit',
+	'core/edit-navigation/with-menu-name',
+	withMenuName
+);
 
 export default function Layout( { blockEditorSettings } ) {
 	const { saveNavigationPost } = useDispatch( editNavigationStore );
