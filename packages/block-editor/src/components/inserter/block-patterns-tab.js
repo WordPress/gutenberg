@@ -6,7 +6,7 @@ import { fromPairs } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback, useState, useEffect } from '@wordpress/element';
+import { useMemo, useCallback, useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -23,20 +23,19 @@ import BlockPatternList from '../block-patterns-list';
 function BlockPatternsSearchResults( { filterValue, onInsert } ) {
 	const [ allPatterns, , onClick ] = usePatternsState( onInsert, 'all' );
 
-	const [ currentfilteredPatterns, setfilteredPatterns ] = useState( [] );
+	const filteredPatterns = useMemo(
+		() => searchItems( allPatterns, filterValue ),
+		[ filterValue, allPatterns ]
+	);
 
-	useEffect( () => {
-		setfilteredPatterns( searchItems( allPatterns, filterValue ) );
-	}, [ allPatterns, filterValue ] );
-
-	const currentShownPatterns = useAsyncList( currentfilteredPatterns );
+	const currentShownPatterns = useAsyncList( filteredPatterns );
 
 	if ( filterValue ) {
-		return !! currentfilteredPatterns.length ? (
+		return !! filteredPatterns.length ? (
 			<InserterPanel title={ __( 'Search Results' ) }>
 				<BlockPatternList
 					shownPatterns={ currentShownPatterns }
-					blockPatterns={ currentfilteredPatterns }
+					blockPatterns={ filteredPatterns }
 					onClickPattern={ onClick }
 				/>
 			</InserterPanel>
@@ -47,30 +46,16 @@ function BlockPatternsSearchResults( { filterValue, onInsert } ) {
 }
 
 function BlockPatternsCategory( {
+	onInsert,
 	selectedCategory,
 	onClickCategory,
-	onInsert,
 } ) {
 	const [ allPatterns, allCategories, onClick ] = usePatternsState(
 		onInsert
 	);
-
-	const [ currentCategoryPatterns, setCategoryPatterns ] = useState( [] );
-
 	const patternCategory = selectedCategory
 		? selectedCategory
 		: allCategories[ 0 ];
-
-	useEffect( () => {
-		setCategoryPatterns(
-			allPatterns.filter( ( pattern ) => {
-				return patternCategory.name === 'uncategorized'
-					? getPatternIndex( pattern ) === Infinity
-					: pattern.categories &&
-							pattern.categories.includes( patternCategory.name );
-			} )
-		);
-	}, [ selectedCategory ] );
 
 	useEffect( () => {
 		if (
@@ -105,6 +90,17 @@ function BlockPatternsCategory( {
 			);
 		},
 		[ allCategories ]
+	);
+
+	const currentCategoryPatterns = useMemo(
+		() =>
+			allPatterns.filter( ( pattern ) =>
+				patternCategory.name === 'uncategorized'
+					? getPatternIndex( pattern ) === Infinity
+					: pattern.categories &&
+					  pattern.categories.includes( patternCategory.name )
+			),
+		[ allPatterns, patternCategory ]
 	);
 
 	// Ordering the patterns is important for the async rendering.
