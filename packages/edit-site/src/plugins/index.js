@@ -6,12 +6,11 @@ import downloadjs from 'downloadjs';
 /**
  * WordPress dependencies
  */
-import { MenuItem, VisuallyHidden } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
-import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-import { download, external } from '@wordpress/icons';
+import { download } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -45,31 +44,6 @@ registerPlugin( 'edit-site', {
 						) }
 					>
 						{ __( 'Export' ) }
-					</MenuItem>
-					<MenuItem
-						role="menuitem"
-						href={ addQueryArgs( 'edit.php', {
-							post_type: 'wp_block',
-						} ) }
-					>
-						{ __( 'Manage all reusable blocks' ) }
-					</MenuItem>
-					<MenuItem
-						role="menuitem"
-						icon={ external }
-						href={ __(
-							'https://wordpress.org/support/article/wordpress-editor/'
-						) }
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{ __( 'Help' ) }
-						<VisuallyHidden as="span">
-							{
-								/* translators: accessibility text */
-								__( '(opens in a new tab)' )
-							}
-						</VisuallyHidden>
 					</MenuItem>
 				</ToolsMoreMenuGroup>
 			</>
