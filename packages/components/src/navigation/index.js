@@ -77,11 +77,6 @@ export default function Navigation( {
 		menus: navigationMenus,
 	};
 
-	// Make sure menus and items are available before rendering
-	if ( ! navigationMenus || ! navigationItems ) {
-		return null;
-	}
-
 	const classes = classnames( 'components-navigation', className );
 
 	return (
