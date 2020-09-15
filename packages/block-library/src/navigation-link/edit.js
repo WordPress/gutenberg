@@ -127,6 +127,7 @@ function NavigationLinkEdit( {
 	isParentOfSelectedBlock,
 	setAttributes,
 	showSubmenuIcon,
+	separator,
 	insertLinkBlock,
 	textColor,
 	backgroundColor,
@@ -314,6 +315,7 @@ function NavigationLinkEdit( {
 					backgroundColor: rgbBackgroundColor,
 				} }
 				ref={ listItemRef }
+				data-separator={ separator }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
@@ -487,6 +489,7 @@ export default compose( [
 			.length;
 		const showSubmenuIcon =
 			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
+		const separator = navigationBlockAttributes.separator;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
@@ -503,6 +506,7 @@ export default compose( [
 			hasDescendants,
 			selectedBlockHasDescendants,
 			showSubmenuIcon,
+			separator,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
 			userCanCreatePages: select( 'core' ).canUser( 'create', 'pages' ),

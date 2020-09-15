@@ -21,6 +21,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	ToolbarGroup,
+	SelectControl,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -32,6 +33,7 @@ import useBlockNavigator from './use-block-navigator';
 import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 import NavigationPlaceholder from './placeholder';
+import { SEPARATOR_OPTIONS } from './constants';
 
 function Navigation( {
 	selectedBlockHasDescendants,
@@ -164,6 +166,16 @@ function Navigation( {
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
+				<PanelBody title={ __( 'Separators' ) }>
+					<SelectControl
+						label={ __( 'Separator' ) }
+						onChange={ ( value ) => {
+							setAttributes( { separator: value } );
+						} }
+						options={ SEPARATOR_OPTIONS }
+						value={ attributes.separator }
+					/>
+				</PanelBody>
 				<PanelBody title={ __( 'Display settings' ) }>
 					<ToggleControl
 						checked={ attributes.showSubmenuIcon }

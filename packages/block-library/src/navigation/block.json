@@ -29,6 +29,10 @@
 		"showSubmenuIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"separator": {
+			"type": "string",
+			"default": null
 		}
 	},
 	"providesContext": {
@@ -38,10 +42,14 @@
 		"customBackgroundColor": "customBackgroundColor",
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
-		"showSubmenuIcon": "showSubmenuIcon"
+		"showSubmenuIcon": "showSubmenuIcon",
+		"separator": "showSeparator"
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
