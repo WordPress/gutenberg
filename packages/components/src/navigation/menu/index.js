@@ -20,15 +20,19 @@ import {
 	MenuUI,
 } from '../styles/navigation-styles';
 import { NavigationMenuContext } from './context';
+import { useNavigationTreeMenu } from './use-navigation-tree-menu';
 
-export default function NavigationMenu( {
-	backButtonLabel,
-	children,
-	className,
-	menu = ROOT_MENU,
-	parentMenu,
-	title,
-} ) {
+export default function NavigationMenu( props ) {
+	useNavigationTreeMenu( props );
+
+	const {
+		backButtonLabel,
+		children,
+		className,
+		menu = ROOT_MENU,
+		parentMenu,
+		title,
+	} = props;
 	const { activeMenu, setActiveMenu } = useNavigationContext();
 
 	if ( activeMenu !== menu ) {
