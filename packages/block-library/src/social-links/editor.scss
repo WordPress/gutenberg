@@ -12,7 +12,7 @@
 .editor-styles-wrapper .wp-block-social-link {
 	margin: 0 8px 8px 0;
 
-	// Prevent toolbar from jumping when selecting / hovering a link
+	// Prevent toolbar from jumping when selecting / hovering a link.
 	&.is-selected,
 	&.is-hovered {
 		transform: none;
