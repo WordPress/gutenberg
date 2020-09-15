@@ -17,6 +17,26 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Social Icons' ),
+	attributes: {
+		iconColor: {
+			type: 'string',
+		},
+		customIconColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+	},
+	providesContext: {
+		iconColor: 'iconColor',
+		customIconColor: 'customIconColor',
+		backgroundColor: 'backgroundColor',
+		customBackgroundColor: 'customBackgroundColor',
+	},
 	description: __(
 		'Display icons linking to your social media profiles or websites.'
 	),

@@ -1,23 +1,28 @@
 /**
  * WordPress dependencies
  */
-
-import { Fragment } from '@wordpress/element';
-
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
+	PanelColorSettings,
+	withColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
+import { Fragment, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
 export function SocialLinksEdit( props ) {
 	const {
-		attributes: { openInNewTab },
+		attributes: { className, openInNewTab },
 		setAttributes,
+		backgroundColor,
+		setBackgroundColor,
+		iconColor,
+		setIconColor,
 	} = props;
 
 	const SocialPlaceholder = (
@@ -36,6 +41,14 @@ export function SocialLinksEdit( props ) {
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
 	} );
+	const logosOnly = className.indexOf( 'is-style-logos-only' ) >= 0;
+
+	useEffect( () => {
+		if ( logosOnly ) {
+			setBackgroundColor();
+		}
+	}, [ logosOnly, setBackgroundColor ] );
+
 	return (
 		<Fragment>
 			<InspectorControls>
@@ -48,10 +61,27 @@ export function SocialLinksEdit( props ) {
 						}
 					/>
 				</PanelBody>
+				<PanelColorSettings
+					title={ __( 'Color settings' ) }
+					colorSettings={ [
+						{
+							value: iconColor.color,
+							onChange: setIconColor,
+							label: __( 'Icon color' ),
+						},
+						! logosOnly && {
+							value: backgroundColor.color,
+							onChange: setBackgroundColor,
+							label: __( 'Background color' ),
+						},
+					] }
+				/>
 			</InspectorControls>
 			<ul { ...innerBlocksProps } />
 		</Fragment>
 	);
 }
 
-export default SocialLinksEdit;
+export default withColors( 'backgroundColor', { iconColor: 'color' } )(
+	SocialLinksEdit
+);
