@@ -12,7 +12,7 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { BottomSheet } from '@wordpress/components';
+import { BottomSheet, InserterButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -48,10 +48,19 @@ export class BlockTypesList extends Component {
 		);
 	}
 
+	calculateItemWidth() {
+		const {
+			paddingLeft: itemPaddingLeft,
+			paddingRight: itemPaddingRight,
+		} = InserterButton.Styles.modalItem;
+		const { width: itemWidth } = InserterButton.Styles.modalIconWrapper;
+		return itemWidth + itemPaddingLeft + itemPaddingRight;
+	}
+
 	calculateColumnsProperties() {
 		const bottomSheetWidth = BottomSheet.getWidth();
 		const { paddingLeft, paddingRight } = styles.columnPadding;
-		const itemTotalWidth = InserterListItem.getWidth();
+		const itemTotalWidth = this.calculateItemWidth();
 		const containerTotalWidth =
 			bottomSheetWidth - ( paddingLeft + paddingRight );
 		const numofColumns = Math.floor( containerTotalWidth / itemTotalWidth );
@@ -81,10 +90,10 @@ export class BlockTypesList extends Component {
 	}
 
 	renderItem( { item } ) {
-		const { onSelect } = this.props;
 		const { itemWidth, maxWidth } = this.state;
+		const { onSelect } = this.props;
 		return (
-			<InserterListItem
+			<InserterButton
 				item={ item }
 				itemWidth={ itemWidth }
 				maxWidth={ maxWidth }

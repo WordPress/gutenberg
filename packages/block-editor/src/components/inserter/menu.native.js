@@ -6,60 +6,41 @@ import { __ } from '@wordpress/i18n';
 /**
  * External dependencies
  */
-import {
-	FlatList,
-	View,
-	TouchableHighlight,
-	TouchableWithoutFeedback,
-	Dimensions,
-} from 'react-native';
-import { pick } from 'lodash';
+import { TouchableHighlight } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import {
-	createBlock,
-	rawHandler,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
 	BottomSheet,
 	BottomSheetConsumer,
-	InserterButton,
-	getClipboard,
 	SegmentedControl,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import BlocksTab from './blocks-tab';
+import ReusableBlocksTab from './reusable-blocks-tab';
 import styles from './style.scss';
 
-const MIN_COL_NUM = 3;
-const TABS = [ __( 'Child Blocks' ), __( 'Reusable blocks' ) ];
+const TABS = [ __( 'Blocks' ), __( 'Reusable' ) ];
+const REUSABLE_BLOCKS_CATEGORY = 'reusable';
 
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.onClose = this.onClose.bind( this );
-		this.onLayout = this.onLayout.bind( this );
 		this.onChangeTab = this.onChangeTab.bind( this );
-		this.renderItem = this.renderItem.bind( this );
-		this.renderBlocksTab = this.renderBlocksTab.bind( this );
-		this.renderReusableBlocksTab = this.renderReusableBlocksTab.bind(
-			this
-		);
+		this.renderTabs = this.renderTabs.bind( this );
 		this.state = {
-			numberOfColumns: MIN_COL_NUM,
 			tab: 0,
 		};
-
-		Dimensions.addEventListener( 'change', this.onLayout );
 	}
 
 	componentDidMount() {
@@ -68,45 +49,6 @@ export class InserterMenu extends Component {
 
 	componentWillUnmount() {
 		this.props.hideInsertionPoint();
-		Dimensions.removeEventListener( 'change', this.onLayout );
-	}
-
-	calculateMinItemWidth( bottomSheetWidth ) {
-		const { paddingLeft, paddingRight } = styles.columnPadding;
-		return (
-			( bottomSheetWidth - 2 * ( paddingLeft + paddingRight ) ) /
-			MIN_COL_NUM
-		);
-	}
-
-	calculateItemWidth() {
-		const {
-			paddingLeft: itemPaddingLeft,
-			paddingRight: itemPaddingRight,
-		} = InserterButton.Styles.modalItem;
-		const { width: itemWidth } = InserterButton.Styles.modalIconWrapper;
-		return itemWidth + itemPaddingLeft + itemPaddingRight;
-	}
-
-	calculateColumnsProperties() {
-		const bottomSheetWidth = BottomSheet.getWidth();
-		const { paddingLeft, paddingRight } = styles.columnPadding;
-		const itemTotalWidth = this.calculateItemWidth();
-		const containerTotalWidth =
-			bottomSheetWidth - ( paddingLeft + paddingRight );
-		const numofColumns = Math.floor( containerTotalWidth / itemTotalWidth );
-
-		if ( numofColumns < MIN_COL_NUM ) {
-			return {
-				numOfColumns: MIN_COL_NUM,
-				itemWidth: this.calculateMinItemWidth( bottomSheetWidth ),
-				maxWidth: containerTotalWidth / MIN_COL_NUM,
-			};
-		}
-		return {
-			numOfColumns: numofColumns,
-			maxWidth: containerTotalWidth / numofColumns,
-		};
 	}
 
 	onClose() {
@@ -118,132 +60,32 @@ export class InserterMenu extends Component {
 		this.props.onDismiss();
 	}
 
-	onLayout() {
-		const {
-			numOfColumns,
-			itemWidth,
-			maxWidth,
-		} = this.calculateColumnsProperties();
-		const numberOfColumns = numOfColumns;
-
-		this.setState( { numberOfColumns, itemWidth, maxWidth } );
-	}
-
 	onChangeTab( tab ) {
 		this.setState( { tab: TABS.indexOf( tab ) } );
 	}
 
-	/**
-	 * Processes the inserter items to check
-	 * if there's any copied block in the clipboard
-	 * to add it as an extra item
-	 */
-	getBlockItems() {
-		const {
-			items,
-			canInsertBlockType,
-			destinationRootClientId,
-			getBlockType,
-		} = this.props;
+	renderTabs( { listProps } ) {
+		const { onSelect, destinationRootClientId } = this.props;
+		const { tab } = this.state;
 
-		// Filter out reusable blocks (they will be added in another tab)
-		const blockItems = items.filter(
-			( { name } ) => name !== 'core/block'
-		);
+		const tabProps = {
+			rootClientId: destinationRootClientId,
+			onSelect,
+			listProps,
+		};
 
-		const clipboard = getClipboard();
-		const clipboardBlock =
-			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
-		const shouldAddClipboardBlock =
-			clipboardBlock &&
-			canInsertBlockType( clipboardBlock.name, destinationRootClientId );
-
-		return shouldAddClipboardBlock
-			? [
-					{
-						...pick( getBlockType( clipboardBlock.name ), [
-							'name',
-							'icon',
-						] ),
-						id: 'clipboard',
-						initialAttributes: clipboardBlock.attributes,
-						innerBlocks: clipboardBlock.innerBlocks,
-					},
-					...blockItems,
-			  ]
-			: blockItems;
-	}
-
-	getReusableBlockItems() {
-		const { items } = this.props;
-
-		return items.filter( ( { name } ) => name === 'core/block' );
-	}
-
-	renderItem( { item } ) {
-		const { itemWidth, maxWidth } = this.state;
-		const { onSelect } = this.props;
-		return (
-			<InserterButton
-				item={ item }
-				itemWidth={ itemWidth }
-				maxWidth={ maxWidth }
-				onSelect={ onSelect }
-			/>
-		);
-	}
-
-	renderBlocksTab( listProps ) {
-		const { numberOfColumns } = this.state;
-		const items = this.getBlockItems();
-
-		return (
-			<FlatList
-				onLayout={ this.onLayout }
-				key={ `InserterUI-Blocks-${ numberOfColumns }` } //re-render when numberOfColumns changes
-				keyboardShouldPersistTaps="always"
-				numColumns={ numberOfColumns }
-				data={ items }
-				ItemSeparatorComponent={ () => (
-					<TouchableWithoutFeedback accessible={ false }>
-						<View style={ styles.rowSeparator } />
-					</TouchableWithoutFeedback>
-				) }
-				keyExtractor={ ( item ) => item.name }
-				renderItem={ this.renderItem }
-				{ ...listProps }
-			/>
-		);
-	}
-
-	renderReusableBlocksTab( listProps ) {
-		const { numberOfColumns } = this.state;
-		const items = this.getReusableBlockItems();
-
-		return (
-			<FlatList
-				onLayout={ this.onLayout }
-				key={ `InserterUI-ReusableBlocks-${ numberOfColumns }` } //re-render when numberOfColumns changes
-				keyboardShouldPersistTaps="always"
-				numColumns={ numberOfColumns }
-				data={ items }
-				ItemSeparatorComponent={ () => (
-					<TouchableWithoutFeedback accessible={ false }>
-						<View style={ styles.rowSeparator } />
-					</TouchableWithoutFeedback>
-				) }
-				keyExtractor={ ( item ) => item.name }
-				renderItem={ this.renderItem }
-				{ ...listProps }
-			/>
-		);
+		switch ( tab ) {
+			case 0:
+				return <BlocksTab { ...tabProps } />;
+			case 1:
+				return <ReusableBlocksTab { ...tabProps } />;
+		}
 	}
 
 	render() {
-		const { tab } = this.state;
-		const reusableBlockItems = this.getReusableBlockItems();
+		const { hasReusableBlocks } = this.props;
 
-		const hideHeader = reusableBlockItems.length === 0;
+		const hideHeader = ! hasReusableBlocks;
 
 		return (
 			<BottomSheet
@@ -262,16 +104,7 @@ export class InserterMenu extends Component {
 			>
 				<TouchableHighlight accessible={ false }>
 					<BottomSheetConsumer>
-						{ ( { listProps } ) => {
-							switch ( tab ) {
-								case 0:
-									return this.renderBlocksTab( listProps );
-								case 1:
-									return this.renderReusableBlocksTab(
-										listProps
-									);
-							}
-						} }
+						{ this.renderTabs }
 					</BottomSheetConsumer>
 				</TouchableHighlight>
 			</BottomSheet>
@@ -287,9 +120,8 @@ export default compose(
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 			getSettings,
-			canInsertBlockType,
 		} = select( 'core/block-editor' );
-		const { getChildBlockNames, getBlockType } = select( blocksStore );
+		const { getChildBlockNames } = select( blocksStore );
 
 		let destinationRootClientId = rootClientId;
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
@@ -307,13 +139,17 @@ export default compose(
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 		} = getSettings();
 
+		const items = getInserterItems( destinationRootClientId );
+		const reusableBlockItems = items.filter(
+			( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
+		);
+
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: getInserterItems( destinationRootClientId ),
+			items,
+			hasReusableBlocks: !! reusableBlockItems.length,
 			destinationRootClientId,
 			shouldInsertAtTheTop,
-			getBlockType,
-			canInsertBlockType,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -12,30 +11,18 @@ import BlockTypesList from '../block-types-list';
 const REUSABLE_BLOCKS_CATEGORY = 'reusable';
 
 function ReusableBlocksTab( { onSelect, rootClientId, listProps } ) {
-	const { items, fetchReusableBlocks } = useSelect(
+	const { items } = useSelect(
 		( select ) => {
-			const { getInserterItems, getSettings } = select(
-				'core/block-editor'
-			);
-			const { __experimentalFetchReusableBlocks } = getSettings();
+			const { getInserterItems } = select( 'core/block-editor' );
 			const allItems = getInserterItems( rootClientId );
-			const items = allItems.filter(
+			const reusableBlockItems = allItems.filter(
 				( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
 			);
 
-			return {
-				items,
-				fetchReusableBlocks: __experimentalFetchReusableBlocks,
-			};
+			return { items: reusableBlockItems };
 		},
 		[ rootClientId ]
 	);
-
-	useEffect( () => {
-		if ( fetchReusableBlocks ) {
-			fetchReusableBlocks();
-		}
-	}, [] );
 
 	return (
 		<BlockTypesList
