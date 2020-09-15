@@ -84,6 +84,10 @@ class DatePicker extends Component {
 
 	// todo change reference to `isDayHighlighted` every time, `events` prop change
 	isDayHighlighted( date ) {
+		// Do not highlight when no events.
+		if ( ! this.props.events?.length ) {
+			return false;
+		}
 		if ( this.props.onMonthPreviewed ) {
 			this.props.onMonthPreviewed( date.toDate() );
 		}
