@@ -19,6 +19,7 @@ import {
 	MenuTitleUI,
 	MenuUI,
 } from '../styles/navigation-styles';
+import { NavigationMenuContext } from './context';
 
 export default function NavigationMenu( {
 	backButtonLabel,
@@ -36,28 +37,34 @@ export default function NavigationMenu( {
 
 	const classes = classnames( 'components-navigation__menu', className );
 
+	const context = {
+		menu,
+	};
+
 	return (
-		<MenuUI className={ classes }>
-			{ parentMenu && (
-				<MenuBackButtonUI
-					className="components-navigation__back-button"
-					isTertiary
-					onClick={ () => setActiveMenu( parentMenu, 'right' ) }
-				>
-					<Icon icon={ chevronLeft } />
-					{ backButtonLabel || __( 'Back' ) }
-				</MenuBackButtonUI>
-			) }
-			{ title && (
-				<MenuTitleUI
-					as="h2"
-					className="components-navigation__menu-title"
-					variant="subtitle"
-				>
-					{ title }
-				</MenuTitleUI>
-			) }
-			<ul>{ children }</ul>
-		</MenuUI>
+		<NavigationMenuContext.Provider value={ context }>
+			<MenuUI className={ classes }>
+				{ parentMenu && (
+					<MenuBackButtonUI
+						className="components-navigation__back-button"
+						isTertiary
+						onClick={ () => setActiveMenu( parentMenu, 'right' ) }
+					>
+						<Icon icon={ chevronLeft } />
+						{ backButtonLabel || __( 'Back' ) }
+					</MenuBackButtonUI>
+				) }
+				{ title && (
+					<MenuTitleUI
+						as="h2"
+						className="components-navigation__menu-title"
+						variant="subtitle"
+					>
+						{ title }
+					</MenuTitleUI>
+				) }
+				<ul>{ children }</ul>
+			</MenuUI>
+		</NavigationMenuContext.Provider>
 	);
 }
