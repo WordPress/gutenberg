@@ -114,11 +114,17 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
 	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
-	const phpVersion = `\${LOCAL_PHP:-${ config.phpVersion }}:''`;
+	const phpVersion = `\${LOCAL_PHP:-${ config.phpVersion }}`;
 	const wpImage =
-		'wordpress' + ( phpVersion === '' ? '' : ':php' + phpVersion );
+		'wordpress' +
+		( phpVersion === '' || typeof phpVersion === 'undefined'
+			? ''
+			: ':php' + phpVersion );
 	const cliImage =
-		'wordpress:cli' + ( phpVersion === '' ? '' : '-php' + phpVersion );
+		'wordpress:cli' +
+		( phpVersion === '' || typeof phpVersion === 'undefined'
+			? ''
+			: '-php' + phpVersion );
 	// Defaults are to use the most recent version of PHPUnit that provides
 	// support for the specified version of PHP.
 	let phpunitVersion = '8';
