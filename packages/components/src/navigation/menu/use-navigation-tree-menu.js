@@ -16,7 +16,7 @@ export const useNavigationTreeMenu = ( props ) => {
 
 	const key = props.menu || ROOT_MENU;
 	useEffect( () => {
-		addMenu( key, { ...props } );
+		addMenu( key, { ...props, menu: key } );
 
 		return () => {
 			removeMenu( key );
