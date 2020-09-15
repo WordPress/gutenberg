@@ -48,6 +48,13 @@ function Example() {
 							navigateToMenu="category"
 							title="Category"
 						/>
+						<NavigationItem
+							badge="2"
+							item="item-3-fetching-badge"
+							navigateToMenu="category"
+							title="Category"
+							isFetchingBadge={ true }
+						/>
 					</NavigationGroup>
 					<NavigationGroup title="Group 2">
 						<NavigationItem
