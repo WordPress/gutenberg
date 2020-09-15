@@ -33,10 +33,10 @@ const defaultOptions = {
  * Unlike the basic useState hook, useControlledState's state can
  * be updated if a new incoming prop value is changed.
  *
- * @param {any} currentState The current value.
- * @param {Object} options Additional options for the hook.
- * @param {any} options.initial The initial state.
- * @param {any} options.fallback The state to use when no state is defined.
+ * @param {any}    currentState     The current value.
+ * @param {Object} options          Additional options for the hook.
+ * @param {any}    options.initial  The initial state.
+ * @param {any}    options.fallback The state to use when no state is defined.
  *
  * @return {[*, Function]} The controlled value and the value setter.
  */

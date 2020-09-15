@@ -2,7 +2,7 @@
  * Returns a function which, when invoked, will return whether any handlers are
  * attached to a particular hook.
  *
- * @param  {Object}   hooks Stored hooks, keyed by hook name.
+ * @param {Object} hooks Stored hooks, keyed by hook name.
  *
  * @return {Function}       Function that returns whether any handlers are
  *                          attached to a particular hook and optional namespace.

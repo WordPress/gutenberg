@@ -69,7 +69,7 @@ export function isResolving( state, selectorName, args = [] ) {
 /**
  * Returns the list of the cached resolvers.
  *
- * @param {Object} state      Data state.
+ * @param {Object} state Data state.
  *
  * @return {Object} Resolvers mapped by args and selectorName.
  */

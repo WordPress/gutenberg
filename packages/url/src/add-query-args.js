@@ -8,9 +8,9 @@ import { parse, stringify } from 'qs';
  * includes query arguments, the arguments are merged with (and take precedent
  * over) the existing set.
  *
- * @param {string} [url='']  URL to which arguments should be appended. If omitted,
+ * @param {string} [url=''] URL to which arguments should be appended. If omitted,
  *                           only the resulting querystring is returned.
- * @param {Object} [args]    Query arguments to apply to URL.
+ * @param {Object} [args]   Query arguments to apply to URL.
  *
  * @example
  * ```js

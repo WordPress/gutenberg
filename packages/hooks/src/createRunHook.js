@@ -3,8 +3,8 @@
  * registered to a hook of the specified type, optionally returning the final
  * value of the call chain.
  *
- * @param  {Object}   hooks          Stored hooks, keyed by hook name.
- * @param  {?boolean}    returnFirstArg Whether each hook callback is expected to
+ * @param {Object}   hooks          Stored hooks, keyed by hook name.
+ * @param {?boolean} returnFirstArg Whether each hook callback is expected to
  *                                   return its first argument.
  *
  * @return {Function}                Function that runs hook callbacks.
@@ -13,8 +13,8 @@ function createRunHook( hooks, returnFirstArg ) {
 	/**
 	 * Runs all callbacks for the specified hook.
 	 *
-	 * @param  {string} hookName The name of the hook to run.
-	 * @param  {...*}   args     Arguments to pass to the hook callbacks.
+	 * @param {string} hookName The name of the hook to run.
+	 * @param {...*}   args     Arguments to pass to the hook callbacks.
 	 *
 	 * @return {*}               Return value of runner, if applicable.
 	 */

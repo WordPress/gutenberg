@@ -183,7 +183,7 @@ export const getMethodName = (
 /**
  * Loads the kind entities into the store.
  *
- * @param {string} kind  Kind
+ * @param {string} kind Kind
  *
  * @return {Array} Entities
  */

@@ -37,8 +37,8 @@ const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
 /**
  * Fetch Reusable blocks Effect Handler.
  *
- * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action action object.
+ * @param {Object} store  Redux Store.
  */
 export const fetchReusableBlocks = async ( action, store ) => {
 	const { id } = action;
@@ -100,8 +100,8 @@ export const fetchReusableBlocks = async ( action, store ) => {
 /**
  * Save Reusable blocks Effect Handler.
  *
- * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action action object.
+ * @param {Object} store  Redux Store.
  */
 export const saveReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
@@ -154,8 +154,8 @@ export const saveReusableBlocks = async ( action, store ) => {
 /**
  * Delete Reusable blocks Effect Handler.
  *
- * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action action object.
+ * @param {Object} store  Redux Store.
  */
 export const deleteReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
@@ -227,8 +227,8 @@ export const deleteReusableBlocks = async ( action, store ) => {
 /**
  * Convert a reusable block to a static block effect handler
  *
- * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action action object.
+ * @param {Object} store  Redux Store.
  */
 export const convertBlockToStatic = ( action, store ) => {
 	const state = store.getState();
@@ -244,8 +244,8 @@ export const convertBlockToStatic = ( action, store ) => {
 /**
  * Convert a static block to a reusable block effect handler
  *
- * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action action object.
+ * @param {Object} store  Redux Store.
  */
 export const convertBlockToReusable = ( action, store ) => {
 	const { dispatch } = store;

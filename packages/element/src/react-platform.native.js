@@ -34,6 +34,6 @@ const render = ( element, id ) =>
  * Render a given element on Native.
  * This actually returns a componentProvider that can be registered with `AppRegistry.registerComponent`
  *
- * @param {WPElement}   element Element to render.
+ * @param {WPElement} element Element to render.
  */
 export { render };

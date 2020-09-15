@@ -40,7 +40,7 @@ export const AsyncModeConsumer = Consumer;
  * the rerendering is delayed until the browser becomes IDLE.
  * It is possible to nest multiple levels of AsyncModeProvider to fine-tune the rendering behavior.
  *
- * @param {boolean}   props.value  Enable Async Mode.
+ * @param {boolean} props.value Enable Async Mode.
  * @return {WPComponent} The component to be rendered.
  */
 export default Provider;

@@ -153,8 +153,8 @@ export function isEditorPanelEnabled( state, panelName ) {
  * Returns true if the given panel is open, or false otherwise. Panels are
  * closed by default.
  *
- * @param  {Object}  state     Global application state.
- * @param  {string}  panelName A string that identifies the panel.
+ * @param {Object} state     Global application state.
+ * @param {string} panelName A string that identifies the panel.
  *
  * @return {boolean} Whether or not the panel is open.
  */
@@ -169,8 +169,8 @@ export function isEditorPanelOpened( state, panelName ) {
 /**
  * Returns true if a modal is active, or false otherwise.
  *
- * @param  {Object}  state 	   Global application state.
- * @param  {string}  modalName A string that uniquely identifies the modal.
+ * @param {Object} state     Global application state.
+ * @param {string} modalName A string that uniquely identifies the modal.
  *
  * @return {boolean} Whether the modal is active.
  */
@@ -194,8 +194,8 @@ export function isFeatureActive( state, feature ) {
  * Returns true if the plugin item is pinned to the header.
  * When the value is not set it defaults to true.
  *
- * @param  {Object}  state      Global application state.
- * @param  {string}  pluginName Plugin item name.
+ * @param {Object} state      Global application state.
+ * @param {string} pluginName Plugin item name.
  *
  * @return {boolean} Whether the plugin item is pinned.
  */
@@ -284,7 +284,7 @@ export const getAllMetaBoxes = createSelector(
 /**
  * Returns true if the post is using Meta Boxes
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state
  *
  * @return {boolean} Whether there are metaboxes or not.
  */
@@ -295,7 +295,7 @@ export function hasMetaBoxes( state ) {
 /**
  * Returns true if the Meta Boxes are being saved.
  *
- * @param   {Object}  state Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the metaboxes are being saved.
  */
@@ -317,7 +317,7 @@ export function __experimentalGetPreviewDeviceType( state ) {
 /**
  * Returns true if the inserter is opened.
  *
- * @param  {Object}  state Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the inserter is opened.
  */

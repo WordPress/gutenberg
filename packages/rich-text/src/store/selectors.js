@@ -20,7 +20,7 @@ export const getFormatTypes = createSelector(
  * Returns a format type by name.
  *
  * @param {Object} state Data state.
- * @param {string} name Format type name.
+ * @param {string} name  Format type name.
  *
  * @return {Object?} Format type.
  */

@@ -19,25 +19,25 @@ const md5 = require( '../md5' );
  * wp-env configuration.
  *
  * @typedef WPConfig
- * @property {string}                           name                    Name of the environment.
- * @property {string}                           configDirectoryPath     Path to the .wp-env.json file.
- * @property {string}                           workDirectoryPath       Path to the work directory located in ~/.wp-env.
- * @property {string}                           dockerComposeConfigPath Path to the docker-compose.yml file.
- * @property {boolean}                          detectedLocalConfig     If true, wp-env detected local config and used it.
- * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
- * @property {boolean}                          debug                   True if debug mode is enabled.
+ * @property {string}         name                    Name of the environment.
+ * @property {string}         configDirectoryPath     Path to the .wp-env.json file.
+ * @property {string}         workDirectoryPath       Path to the work directory located in ~/.wp-env.
+ * @property {string}         dockerComposeConfigPath Path to the docker-compose.yml file.
+ * @property {boolean}        detectedLocalConfig     If true, wp-env detected local config and used it.
+ * @property {Object.<string, WPServiceConfig>}       env                     Specific config for different environments.
+ * @property {boolean}        debug                   True if debug mode is enabled.
  */
 
 /**
  * Base-level config for any particular environment. (development/tests/etc)
  *
  * @typedef WPServiceConfig
- * @property {?WPSource}                 coreSource    The WordPress installation to load in the environment.
- * @property {WPSource[]}                pluginSources Plugins to load in the environment.
- * @property {WPSource[]}                themeSources  Themes to load in the environment.
- * @property {number}                    port          The port to use.
- * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
- * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
+ * @property {?WPSource}      coreSource    The WordPress installation to load in the environment.
+ * @property {WPSource[]}     pluginSources Plugins to load in the environment.
+ * @property {WPSource[]}     themeSources  Themes to load in the environment.
+ * @property {number}         port          The port to use.
+ * @property {Object}         config        Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, WPSource>}    mappings      Mapping of WordPress directories to local directories which should be mounted.
  */
 
 /**

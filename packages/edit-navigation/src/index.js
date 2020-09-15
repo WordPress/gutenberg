@@ -39,12 +39,12 @@ function disableInsertingNonNavigationBlocks( settings, name ) {
  * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
  * Until we refactor it, just copying the code is the simplest solution.
  *
- * @param {string} search
- * @param {Object} [searchArguments]
- * @param {number} [searchArguments.isInitialSuggestions]
- * @param {number} [searchArguments.type]
- * @param {number} [searchArguments.subtype]
- * @param {Object} [editorSettings]
+ * @param {string}  search
+ * @param {Object}  [searchArguments]
+ * @param {number}  [searchArguments.isInitialSuggestions]
+ * @param {number}  [searchArguments.type]
+ * @param {number}  [searchArguments.subtype]
+ * @param {Object}  [editorSettings]
  * @param {boolean} [editorSettings.disablePostFormats=false]
  * @return {Promise<Object[]>} List of suggestions
  */

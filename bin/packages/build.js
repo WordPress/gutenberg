@@ -19,7 +19,7 @@ const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
 /**
  * Get the package name for a specified file
  *
- * @param  {string} file File name
+ * @param {string} file File name
  * @return {string}      Package name
  */
 function getPackageName( file ) {

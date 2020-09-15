@@ -9,8 +9,8 @@ import { create } from './create';
  * Concats a pair of rich text values. Not that this mutates `a` and does NOT
  * normalise formats!
  *
- * @param  {Object} a Value to mutate.
- * @param  {Object} b Value to add read from.
+ * @param {Object} a Value to mutate.
+ * @param {Object} b Value to add read from.
  *
  * @return {Object} `a`, mutated.
  */

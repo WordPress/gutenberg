@@ -78,22 +78,22 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @typedef {Object} WPBlockVariation
  *
- * @property {string}   name                   The unique and machine-readable name.
- * @property {string}   title                  A human-readable variation title.
- * @property {string}   [description]          A detailed variation description.
- * @property {WPIcon}   [icon]                 An icon helping to visualize the variation.
- * @property {boolean}  [isDefault]            Indicates whether the current variation is
+ * @property {string}                  name          The unique and machine-readable name.
+ * @property {string}                  title         A human-readable variation title.
+ * @property {string}                  [description] A detailed variation description.
+ * @property {WPIcon}                  [icon]        An icon helping to visualize the variation.
+ * @property {boolean}                 [isDefault]   Indicates whether the current variation is
  *                                             the default one. Defaults to `false`.
- * @property {Object}   [attributes]           Values which override block attributes.
- * @property {Array[]}  [innerBlocks]          Initial configuration of nested blocks.
- * @property {Object}   [example]              Example provides structured data for
+ * @property {Object}                  [attributes]  Values which override block attributes.
+ * @property {Array[]}                 [innerBlocks] Initial configuration of nested blocks.
+ * @property {Object}                  [example]     Example provides structured data for
  *                                             the block preview. You can set to
  *                                             `undefined` to disable the preview shown
  *                                             for the block type.
- * @property {WPBlockVariationScope[]} [scope] The list of scopes where the variation
+ * @property {WPBlockVariationScope[]} [scope]       The list of scopes where the variation
  *                                             is applicable. When not provided, it
  *                                             assumes all available scopes.
- * @property {string[]} [keywords]             An array of terms (which can be translated)
+ * @property {string[]}                [keywords]    An array of terms (which can be translated)
  *                                             that help users discover the variation
  *                                             while searching.
  */
@@ -416,9 +416,9 @@ export function getBlockTypes() {
 /**
  * Returns the block support value for a feature, if defined.
  *
- * @param  {(string|Object)} nameOrType      Block name or type object
- * @param  {string}          feature         Feature to retrieve
- * @param  {*}               defaultSupports Default value to return if not
+ * @param {(string|Object)} nameOrType      Block name or type object
+ * @param {string}          feature         Feature to retrieve
+ * @param {*}               defaultSupports Default value to return if not
  *                                           explicitly defined
  *
  * @return {?*} Block support value

@@ -16,7 +16,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  *                                 down, < 0 is up).
  * @param {string}  orientation   The orientation of the block movers, vertical or
  * 								   horizontal.
- * @param {boolean} isRTL   	  True if current writing system is right to left.
+ * @param {boolean} isRTL         True if current writing system is right to left.
  *
  * @return {string} Label for the block movement controls.
  */

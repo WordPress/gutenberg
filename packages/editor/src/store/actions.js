@@ -34,9 +34,9 @@ import serializeBlocks from './utils/serialize-blocks';
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post      Post object.
- * @param {Object} edits     Initial edited attributes object.
- * @param {Array?} template  Block Template.
+ * @param {Object} post     Post object.
+ * @param {Object} edits    Initial edited attributes object.
+ * @param {Array?} template Block Template.
  */
 export function* setupEditor( post, edits, template ) {
 	// In order to ensure maximum of a single parse during setup, edits are
@@ -175,7 +175,7 @@ export function updatePost( edits ) {
  * Returns an action object used to setup the editor state when first opening
  * an editor.
  *
- * @param {Object} post   Post object.
+ * @param {Object} post Post object.
  *
  * @return {Object} Action object.
  */
@@ -212,7 +212,7 @@ export function* editPost( edits, options ) {
  * Returns action object produced by the updatePost creator augmented by
  * an optimist option that signals optimistically applying updates.
  *
- * @param {Object} edits  Updated post fields.
+ * @param {Object} edits Updated post fields.
  *
  * @return {Object} Action object.
  */
@@ -406,7 +406,7 @@ export function createUndoLevel() {
 /**
  * Returns an action object used to lock the editor.
  *
- * @param {Object}  lock Details about the post lock status, user, and nonce.
+ * @param {Object} lock Details about the post lock status, user, and nonce.
  *
  * @return {Object} Action object.
  */
@@ -553,7 +553,7 @@ export function disablePublishSidebar() {
 /**
  * Returns an action object used to signal that post saving is locked.
  *
- * @param  {string} lockName The lock name.
+ * @param {string} lockName The lock name.
  *
  * @example
  * ```
@@ -603,7 +603,7 @@ export function lockPostSaving( lockName ) {
 /**
  * Returns an action object used to signal that post saving is unlocked.
  *
- * @param  {string} lockName The lock name.
+ * @param {string} lockName The lock name.
  *
  * @example
  * ```
@@ -623,7 +623,7 @@ export function unlockPostSaving( lockName ) {
 /**
  * Returns an action object used to signal that post autosaving is locked.
  *
- * @param  {string} lockName The lock name.
+ * @param {string} lockName The lock name.
  *
  * @example
  * ```
@@ -643,7 +643,7 @@ export function lockPostAutosaving( lockName ) {
 /**
  * Returns an action object used to signal that post autosaving is unlocked.
  *
- * @param  {string} lockName The lock name.
+ * @param {string} lockName The lock name.
  *
  * @example
  * ```

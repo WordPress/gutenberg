@@ -27,32 +27,32 @@ const config = require( '../config' );
 /**
  * @typedef WPRawPerformanceResults
  *
- * @property {number[]} load             Load Time.
- * @property {number[]} type             Average type time.
- * @property {number[]} focus            Average block selection time.
+ * @property {number[]} load  Load Time.
+ * @property {number[]} type  Average type time.
+ * @property {number[]} focus Average block selection time.
  */
 
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number} load             Load Time.
- * @property {number} type             Average type time.
- * @property {number} minType          Minium type time.
- * @property {number} maxType          Maximum type time.
- * @property {number} focus            Average block selection time.
- * @property {number} minFocus         Min block selection time.
- * @property {number} maxFocus         Max block selection time.
+ * @property {number} load     Load Time.
+ * @property {number} type     Average type time.
+ * @property {number} minType  Minium type time.
+ * @property {number} maxType  Maximum type time.
+ * @property {number} focus    Average block selection time.
+ * @property {number} minFocus Min block selection time.
+ * @property {number} maxFocus Max block selection time.
  */
 /**
  * @typedef WPFormattedPerformanceResults
  *
- * @property {string=} load             Load Time.
- * @property {string=} type             Average type time.
- * @property {string=} minType          Minium type time.
- * @property {string=} maxType          Maximum type time.
- * @property {string=} focus            Average block selection time.
- * @property {string=} minFocus         Min block selection time.
- * @property {string=} maxFocus         Max block selection time.
+ * @property {string=} load     Load Time.
+ * @property {string=} type     Average type time.
+ * @property {string=} minType  Minium type time.
+ * @property {string=} maxType  Maximum type time.
+ * @property {string=} focus    Average block selection time.
+ * @property {string=} minFocus Min block selection time.
+ * @property {string=} maxFocus Max block selection time.
  */
 
 /**
@@ -115,8 +115,8 @@ function curateResults( results ) {
 /**
  * Set up the given branch for testing.
  *
- * @param {string} branch                   Branch name.
- * @param {string} environmentDirectory     Path to the plugin environment's clone.
+ * @param {string} branch               Branch name.
+ * @param {string} environmentDirectory Path to the plugin environment's clone.
  */
 async function setUpGitBranch( branch, environmentDirectory ) {
 	// Restore clean working directory (e.g. if `package-lock.json` has local
@@ -179,8 +179,8 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 /**
  * Runs the performances tests on an array of branches and output the result.
  *
- * @param {WPPerformanceCommandOptions} options Command options.
- * @param {string[]}                    branches Branches to compare
+ * @param {string[]}                    branches Branches to compare.
+ * @param {WPPerformanceCommandOptions} options  Command options.
  */
 async function runPerformanceTests( branches, options ) {
 	// The default value doesn't work because commander provides an array.

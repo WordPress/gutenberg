@@ -23,10 +23,10 @@ import PostSwitchToDraftButton from '../post-switch-to-draft-button';
  * Component showing whether the post is saved or not and providing save
  * buttons.
  *
- * @param {Object} props               Component props.
- * @param {?boolean} props.forceIsDirty  Whether to force the post to be marked
+ * @param {Object}   props                Component props.
+ * @param {?boolean} props.forceIsDirty   Whether to force the post to be marked
  * as dirty.
- * @param {?boolean} props.forceIsSaving Whether to force the post to be marked
+ * @param {?boolean} props.forceIsSaving  Whether to force the post to be marked
  * as being saved.
  * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
  * @return {import('@wordpress/element').WPComponent} The component.
@@ -73,8 +73,7 @@ export default function PostSavedState( {
 				isSaveable: isEditedPostSaveable(),
 				isScheduled: isCurrentPostScheduled(),
 				hasPublishAction:
-					getCurrentPost()?.[ '_links' ]?.[ 'wp:action-publish' ] ??
-					false,
+					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
 			};
 		},
 		[ forceIsDirty, forceIsSaving ]

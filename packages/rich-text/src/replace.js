@@ -8,8 +8,8 @@ import { normaliseFormats } from './normalise-formats';
  * Search a Rich Text value and replace the match(es) with `replacement`. This
  * is similar to `String.prototype.replace`.
  *
- * @param {Object}         value        The value to modify.
- * @param {RegExp|string}  pattern      A RegExp object or literal. Can also be
+ * @param {Object}          value       The value to modify.
+ * @param {RegExp|string}   pattern     A RegExp object or literal. Can also be
  *                                      a string. It is treated as a verbatim
  *                                      string and is not interpreted as a
  *                                      regular expression. Only the first

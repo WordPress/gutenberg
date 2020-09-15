@@ -9,9 +9,9 @@ import { Component } from '@wordpress/element';
  * This function creates a ScrollLock component for the specified document
  * and is exposed so we can create an isolated component for unit testing.
  *
- * @param {Object} args Keyword args.
+ * @param {Object}       args              Keyword args.
  * @param {HTMLDocument} args.htmlDocument The document to lock the scroll for.
- * @param {string} args.className The name of the class used to lock scrolling.
+ * @param {string}       args.className    The name of the class used to lock scrolling.
  * @return {WPComponent} The bound ScrollLock component.
  */
 export function createScrollLockComponent( {

@@ -16,7 +16,7 @@ import { withSelect } from '@wordpress/data';
  *
  * @see isViewportMatch
  *
- * @param {Object} queries  Object of prop name to viewport query.
+ * @param {Object} queries Object of prop name to viewport query.
  *
  * @example
  *

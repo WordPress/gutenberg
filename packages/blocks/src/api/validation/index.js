@@ -540,8 +540,8 @@ function getHTMLTokens( html, logger = createLogger() ) {
 /**
  * Returns true if the next HTML token closes the current token.
  *
- * @param {Object} currentToken Current token to compare with.
- * @param {Object|undefined} nextToken Next token to compare against.
+ * @param {Object}           currentToken Current token to compare with.
+ * @param {Object|undefined} nextToken    Next token to compare against.
  *
  * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
  */

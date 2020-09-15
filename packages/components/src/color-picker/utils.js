@@ -34,8 +34,8 @@ import tinycolor from 'tinycolor2';
 /**
  * Given a hex color, get all other color properties (rgb, alpha, etc).
  *
- * @param {Object|string} data A hex color string or an object with a hex property
- * @param {string} oldHue A reference to the hue of the previous color, otherwise dragging the saturation to zero will reset the current hue to zero as well. See https://github.com/casesandberg/react-color/issues/29#issuecomment-132686909.
+ * @param {Object|string} data   A hex color string or an object with a hex property
+ * @param {string}        oldHue A reference to the hue of the previous color, otherwise dragging the saturation to zero will reset the current hue to zero as well. See https://github.com/casesandberg/react-color/issues/29#issuecomment-132686909.
  * @return {Object} An object of different color representations.
  */
 export function colorToState( data = {}, oldHue = false ) {
@@ -70,7 +70,7 @@ export function colorToState( data = {}, oldHue = false ) {
 /**
  * Get the top/left offsets of a point in a container, also returns the container width/height.
  *
- * @param {Event} e Mouse or touch event with a location coordinate.
+ * @param {Event}       e         Mouse or touch event with a location coordinate.
  * @param {HTMLElement} container The container div, returned point is relative to this container.
  * @return {Object} An object of the offset positions & container size.
  */
@@ -140,8 +140,8 @@ export function simpleCheckForValidColor( data ) {
 /**
  * Calculate the current alpha based on a mouse or touch event
  *
- * @param {Event} e A mouse or touch event on the alpha bar.
- * @param {Object} props The current component props
+ * @param {Event}       e         A mouse or touch event on the alpha bar.
+ * @param {Object}      props     The current component props
  * @param {HTMLElement} container The container div for the alpha bar graph.
  * @return {Object|null} If the alpha value has changed, returns a new color object.
  */
@@ -164,8 +164,8 @@ export function calculateAlphaChange( e, props, container ) {
 /**
  * Calculate the current hue based on a mouse or touch event
  *
- * @param {Event} e A mouse or touch event on the hue bar.
- * @param {Object} props The current component props
+ * @param {Event}       e         A mouse or touch event on the hue bar.
+ * @param {Object}      props     The current component props
  * @param {HTMLElement} container The container div for the hue bar graph.
  * @return {Object|null} If the hue value has changed, returns a new color object.
  */
@@ -189,8 +189,8 @@ export function calculateHueChange( e, props, container ) {
 /**
  * Calculate the current saturation & brightness based on a mouse or touch event
  *
- * @param {Event} e A mouse or touch event on the saturation graph.
- * @param {Object} props The current component props
+ * @param {Event}       e         A mouse or touch event on the saturation graph.
+ * @param {Object}      props     The current component props
  * @param {HTMLElement} container The container div for the 2D saturation graph.
  * @return {Object} Returns a new color object.
  */

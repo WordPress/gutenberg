@@ -3,7 +3,7 @@
  * currently running hook, or `null` if no hook of the given type is currently
  * running.
  *
- * @param  {Object}   hooks          Stored hooks, keyed by hook name.
+ * @param {Object} hooks Stored hooks, keyed by hook name.
  *
  * @return {Function}                Function that returns the current hook.
  */

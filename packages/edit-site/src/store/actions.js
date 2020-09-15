@@ -118,11 +118,11 @@ export function setHomeTemplateId( homeTemplateId ) {
 /**
  * Resolves the template for a page and displays both.
  *
- * @param {Object}  page         The page object.
- * @param {string}  page.type    The page type.
- * @param {string}  page.slug    The page slug.
- * @param {string}  page.path    The page path.
- * @param {Object}  page.context The page context.
+ * @param {Object} page         The page object.
+ * @param {string} page.type    The page type.
+ * @param {string} page.slug    The page slug.
+ * @param {string} page.path    The page path.
+ * @param {Object} page.context The page context.
  *
  * @return {number} The resolved template ID for the page route.
  */

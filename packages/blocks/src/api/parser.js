@@ -211,8 +211,8 @@ export function matcherFromSource( sourceConfig ) {
  * Given a block's raw content and an attribute's schema returns the attribute's
  * value depending on its source.
  *
- * @param {string} innerHTML         Block's raw content.
- * @param {Object} attributeSchema   Attribute's schema.
+ * @param {string} innerHTML       Block's raw content.
+ * @param {Object} attributeSchema Attribute's schema.
  *
  * @return {*} Attribute value.
  */

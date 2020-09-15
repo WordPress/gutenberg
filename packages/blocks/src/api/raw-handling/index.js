@@ -51,9 +51,9 @@ function getRawTransformations() {
  * top-level tag. The HTML should be filtered to not have any text between
  * top-level tags and formatted in a way that blocks can handle the HTML.
  *
- * @param  {Object} $1               Named parameters.
- * @param  {string} $1.html          HTML to convert.
- * @param  {Array}  $1.rawTransforms Transforms that can be used.
+ * @param {Object} $1               Named parameters.
+ * @param {string} $1.html          HTML to convert.
+ * @param {Array}  $1.rawTransforms Transforms that can be used.
  *
  * @return {Array} An array of blocks.
  */

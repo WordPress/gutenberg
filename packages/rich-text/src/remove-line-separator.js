@@ -10,7 +10,7 @@ import { remove } from './remove';
  * Removes a line separator character, if existing, from a Rich Text value at the current
  * indices. If no line separator exists on the indices it will return undefined.
  *
- * @param {Object} value Value to modify.
+ * @param {Object}  value    Value to modify.
  * @param {boolean} backward indicates if are removing from the start index or the end index.
  *
  * @return {Object|undefined} A new value with the line separator removed. Or undefined if no line separator is found on the position.

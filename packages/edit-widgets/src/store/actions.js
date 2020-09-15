@@ -113,8 +113,8 @@ export function* saveWidgetAreas( widgetAreas ) {
 /**
  * Sets the clientId stored for a particular widgetId.
  *
- * @param  {number} clientId  Client id.
- * @param  {number} widgetId  Widget id.
+ * @param {number} clientId Client id.
+ * @param {number} widgetId Widget id.
  * @return {Object}           Action.
  */
 export function setWidgetIdForClientId( clientId, widgetId ) {

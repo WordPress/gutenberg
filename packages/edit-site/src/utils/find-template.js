@@ -11,7 +11,7 @@ const { fetch } = window;
 /**
  * Find the template for a given page path.
  *
- * @param {string}   path The page path.
+ * @param {string}   path             The page path.
  * @param {Function} getEntityRecords The promise-returning `getEntityRecords` selector to use.
  *
  * @return {number} The found template ID.

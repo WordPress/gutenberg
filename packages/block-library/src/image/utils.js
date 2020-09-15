@@ -35,9 +35,9 @@ export function removeNewTabRel( currentRel ) {
 /**
  * Helper to get the link target settings to be stored.
  *
- * @param {boolean} value         The new link target value.
- * @param {Object} attributes     Block attributes.
- * @param {Object} attributes.rel Image block's rel attribute.
+ * @param {boolean} value          The new link target value.
+ * @param {Object}  attributes     Block attributes.
+ * @param {Object}  attributes.rel Image block's rel attribute.
  *
  * @return {Object} Updated link target settings.
  */

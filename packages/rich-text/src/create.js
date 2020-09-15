@@ -121,17 +121,17 @@ function toFormat( { type, attributes } ) {
  * `start` and `end` state which text indices are selected. They are only
  * provided if a `Range` was given.
  *
- * @param {Object}  [$1]                      Optional named arguments.
- * @param {Element} [$1.element]              Element to create value from.
- * @param {string}  [$1.text]                 Text to create value from.
- * @param {string}  [$1.html]                 HTML to create value from.
- * @param {Range}   [$1.range]                Range to create value from.
- * @param {string}  [$1.multilineTag]         Multiline tag if the structure is
- *                                            multiline.
- * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
- *                                            nesting is possible.
- * @param {?boolean} [$1.preserveWhiteSpace]  Whether or not to collapse white
- *                                            space characters.
+ * @param {Object}   [$1]                      Optional named arguments.
+ * @param {Element}  [$1.element]              Element to create value from.
+ * @param {string}   [$1.text]                 Text to create value from.
+ * @param {string}   [$1.html]                 HTML to create value from.
+ * @param {Range}    [$1.range]                Range to create value from.
+ * @param {string}   [$1.multilineTag]         Multiline tag if the structure is
+ *                                             multiline.
+ * @param {Array}    [$1.multilineWrapperTags] Tags where lines can be found if
+ *                                             nesting is possible.
+ * @param {?boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
+ *                                             space characters.
  *
  * @return {Object} A rich text value.
  */
@@ -299,15 +299,15 @@ function removePadding( string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Object}    $1                      Named argements.
- * @param {?Element}  $1.element              Element to create value from.
- * @param {?Range}    $1.range                Range to create value from.
- * @param {?string}   $1.multilineTag         Multiline tag if the structure is
- *                                            multiline.
- * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
- *                                            nesting is possible.
- * @param {?boolean} $1.preserveWhiteSpace    Whether or not to collapse white
- *                                            space characters.
+ * @param {Object}   $1                      Named argements.
+ * @param {?Element} $1.element              Element to create value from.
+ * @param {?Range}   $1.range                Range to create value from.
+ * @param {?string}  $1.multilineTag         Multiline tag if the structure is
+ *                                           multiline.
+ * @param {?Array}   $1.multilineWrapperTags Tags where lines can be found if
+ *                                           nesting is possible.
+ * @param {?boolean} $1.preserveWhiteSpace   Whether or not to collapse white
+ *                                           space characters.
  *
  * @return {Object} A rich text value.
  */
@@ -537,8 +537,8 @@ function createFromMultilineElement( {
 /**
  * Gets the attributes of an element in object shape.
  *
- * @param {Object}    $1                 Named argements.
- * @param {Element}   $1.element         Element to get attributes from.
+ * @param {Object}  $1         Named argements.
+ * @param {Element} $1.element Element to get attributes from.
  *
  * @return {?Object} Attribute object or `undefined` if the element has no
  *                   attributes.

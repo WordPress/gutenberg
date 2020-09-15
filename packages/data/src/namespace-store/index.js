@@ -232,8 +232,8 @@ function mapSelectors( selectors, store ) {
 /**
  * Maps actions to dispatch from a given store.
  *
- * @param {Object} actions    Actions to register.
- * @param {Object} store      The redux store to which the actions should be mapped.
+ * @param {Object} actions Actions to register.
+ * @param {Object} store   The redux store to which the actions should be mapped.
  * @return {Object}           Actions mapped to the redux store provided.
  */
 function mapActions( actions, store ) {
@@ -337,7 +337,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
  * @param {Object} store        Store reference, for fulfilling via resolvers
  * @param {Object} resolvers    Store Resolvers
  * @param {string} selectorName Selector name to fulfill.
- * @param {Array} args          Selector Arguments.
+ * @param {Array}  args         Selector Arguments.
  */
 async function fulfillResolver( store, resolvers, selectorName, ...args ) {
 	const resolver = get( resolvers, [ selectorName ] );

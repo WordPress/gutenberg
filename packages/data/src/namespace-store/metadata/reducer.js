@@ -45,8 +45,8 @@ const subKeysIsResolved = onSubKey( 'selectorName' )(
  *
  *   selectorName -> EquivalentKeyMap<Array, boolean>
  *
- * @param {Object} state   Current state.
- * @param {Object} action  Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Next state.
  */

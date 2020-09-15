@@ -20,10 +20,10 @@ import ToolbarContainer from './toolbar-container';
  *
  * To add controls, simply pass `ToolbarButton` components as children.
  *
- * @param {Object} props Component props.
+ * @param {Object} props             Component props.
  * @param {string} [props.className] Class to set on the container div.
- * @param {string} [props.label] ARIA label for toolbar container.
- * @param {Object} ref React Element ref.
+ * @param {string} [props.label]     ARIA label for toolbar container.
+ * @param {Object} ref               React Element ref.
  */
 function Toolbar( { className, label, ...props }, ref ) {
 	if ( ! label ) {

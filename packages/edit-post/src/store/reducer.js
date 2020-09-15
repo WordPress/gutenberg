@@ -188,8 +188,8 @@ export function publishSidebarActive( state = false, action ) {
  * A "true" value means the meta boxes saving request is in-flight.
  *
  *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
+ * @param {boolean} state  Previous state.
+ * @param {Object}  action Action Object.
  *
  * @return {Object} Updated state.
  */
@@ -207,8 +207,8 @@ export function isSavingMetaBoxes( state = false, action ) {
 /**
  * Reducer keeping track of the meta boxes per location.
  *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
+ * @param {boolean} state  Previous state.
+ * @param {Object}  action Action Object.
  *
  * @return {Object} Updated state.
  */

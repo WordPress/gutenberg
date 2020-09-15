@@ -94,7 +94,7 @@ export function subscribeUpdateCapabilities( callback ) {
 
 /**
  * @callback FnReplaceBlockCompletion
- * @param {string} html the HTML to replace the block.
+ * @param {string} html     the HTML to replace the block.
  * @param {string} clientId the clientId of the block to be replaced.
  */
 
@@ -112,10 +112,10 @@ export function subscribeReplaceBlock( callback ) {
  *
  * Kinds of media source can be device library, camera, etc.
  *
- * @param {string}         source    The media source to request media from.
- * @param {Array<string>}  filter    Array of media types to filter the media to select.
- * @param {boolean}        multiple  Is multiple selection allowed?
- * @param {Function}       callback  RN Callback function to be called with the selected media objects.
+ * @param {string}        source   The media source to request media from.
+ * @param {Array<string>} filter   Array of media types to filter the media to select.
+ * @param {boolean}       multiple Is multiple selection allowed?
+ * @param {Function}      callback RN Callback function to be called with the selected media objects.
  */
 export function requestMediaPicker( source, filter, multiple, callback ) {
 	RNReactNativeGutenbergBridge.requestMediaPickFrom(
@@ -131,10 +131,10 @@ export function requestMediaPicker( source, filter, multiple, callback ) {
  *
  * A way to show unsupported blocks to the user is to render it on a web view.
  *
- * @param {string} htmlContent Raw html content of the block.
+ * @param {string} htmlContent   Raw html content of the block.
  * @param {string} blockClientId the clientId of the block.
- * @param {string} blockName the internal system block name.
- * @param {string} blockTitle the user-facing, localized block name.
+ * @param {string} blockName     the internal system block name.
+ * @param {string} blockTitle    the user-facing, localized block name.
  */
 export function requestUnsupportedBlockFallback(
 	htmlContent,

@@ -51,7 +51,7 @@ export default ( blockData, baseTree, userTree ) => {
 	 * Transform given style tree into a set of style declarations.
 	 *
 	 * @param {Object} blockSupports What styles the block supports.
-	 * @param {Object} blockStyles Block styles.
+	 * @param {Object} blockStyles   Block styles.
 	 *
 	 * @return {Array} An array of style declarations.
 	 */

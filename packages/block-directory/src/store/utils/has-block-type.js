@@ -2,8 +2,8 @@
  * Check if a block list contains a specific block type. Recursively searches
  * through `innerBlocks` if they exist.
  *
- * @param {Object} blockType A block object to search for.
- * @param {Object[]} blocks  The list of blocks to look through.
+ * @param {Object}   blockType A block object to search for.
+ * @param {Object[]} blocks    The list of blocks to look through.
  *
  * @return {boolean} Whether the blockType is found.
  */

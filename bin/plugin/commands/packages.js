@@ -86,10 +86,10 @@ async function runWordPressReleaseBranchSyncStep(
  * Update CHANGELOG files with the new version number for those packages that
  * contain new entries.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {string} minimumVersionBump      Minimum version bump for the packages.
- * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
- * @param {string} abortMessage            Abort Message.
+ * @param {string}  gitWorkingDirectoryPath Git working directory path.
+ * @param {string}  minimumVersionBump      Minimum version bump for the packages.
+ * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
+ * @param {string}  abortMessage            Abort Message.
  */
 async function updatePackages(
 	gitWorkingDirectoryPath,
@@ -274,8 +274,8 @@ async function runPushGitChangesStep(
 /**
  * Prepare everything to publish WordPress packages to npm.
  *
- * @param {string} minimumVersionBump Minimum version bump for the packages.
- * @param {boolean} isPrerelease Whether the package version to publish is a prerelease.
+ * @param {string}  minimumVersionBump Minimum version bump for the packages.
+ * @param {boolean} isPrerelease       Whether the package version to publish is a prerelease.
  *
  * @return {Promise<Object>} Github release object.
  */

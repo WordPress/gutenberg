@@ -15,16 +15,16 @@ import { useEffect, useRef } from '@wordpress/element';
  *
  * @typedef {Object} WPKeyboardShortcutConfig
  *
- * @property {boolean} [bindGlobal]  Handle keyboard events anywhere including inside textarea/input fields.
- * @property {string}  [eventName]   Event name used to trigger the handler, defaults to keydown.
- * @property {boolean} [isDisabled]  Disables the keyboard handler if the value is true.
- * @property {Object}  [target]      React reference to the DOM element used to catch the keyboard event.
+ * @property {boolean} [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+ * @property {string}  [eventName]  Event name used to trigger the handler, defaults to keydown.
+ * @property {boolean} [isDisabled] Disables the keyboard handler if the value is true.
+ * @property {Object}  [target]     React reference to the DOM element used to catch the keyboard event.
  */
 
 /**
  * Return true if platform is MacOS.
  *
- * @param {Object} _window   window object by default; used for DI testing.
+ * @param {Object} _window window object by default; used for DI testing.
  *
  * @return {boolean} True if MacOS; false otherwise.
  */
@@ -40,9 +40,9 @@ function isAppleOS( _window = window ) {
 /**
  * Attach a keyboard shortcut handler.
  *
- * @param {string[]|string}         shortcuts  Keyboard Shortcuts.
- * @param {Function}                callback   Shortcut callback.
- * @param {WPKeyboardShortcutConfig} options    Shortcut options.
+ * @param {string[]|string}          shortcuts Keyboard Shortcuts.
+ * @param {Function}                 callback  Shortcut callback.
+ * @param {WPKeyboardShortcutConfig} options   Shortcut options.
  */
 function useKeyboardShortcut(
 	shortcuts,

@@ -10,8 +10,8 @@ import TokenList from '@wordpress/token-list';
 /**
  * Returns the active style from the given className.
  *
- * @param {Array} styles Block style variations.
- * @param {string} className  Class name
+ * @param {Array}  styles    Block style variations.
+ * @param {string} className Class name
  *
  * @return {Object?} The active style.
  */

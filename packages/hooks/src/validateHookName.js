@@ -1,7 +1,7 @@
 /**
  * Validate a hookName string.
  *
- * @param  {string} hookName The hook name to validate. Should be a non empty string containing
+ * @param {string} hookName The hook name to validate. Should be a non empty string containing
  *                           only numbers, letters, dashes, periods and underscores. Also,
  *                           the hook name cannot begin with `__`.
  *

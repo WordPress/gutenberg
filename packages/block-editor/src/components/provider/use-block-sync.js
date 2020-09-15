@@ -40,25 +40,25 @@ import { useRegistry } from '@wordpress/data';
  *   controllers.
  * - Passes selection state from the block-editor store to the controlling entity.
  *
- * @param {Object} props Props for the block sync hook
- * @param {string} props.clientId The client ID of the inner block controller.
+ * @param {Object}        props                Props for the block sync hook
+ * @param {string}        props.clientId       The client ID of the inner block controller.
  *                                If none is passed, then it is assumed to be a
  *                                root controller rather than an inner block
  *                                controller.
- * @param {Object[]} props.value  The control value for the blocks. This value
+ * @param {Object[]}      props.value          The control value for the blocks. This value
  *                                is used to initalize the block-editor store
  *                                and for resetting the blocks to incoming
  *                                changes like undo.
- * @param {Object} props.selectionStart The selection start vlaue from the
+ * @param {Object}        props.selectionStart The selection start vlaue from the
  *                                controlling component.
- * @param {Object} props.selectionEnd The selection end vlaue from the
+ * @param {Object}        props.selectionEnd   The selection end vlaue from the
  *                                controlling component.
- * @param {onBlockUpdate} props.onChange Function to call when a persistent
+ * @param {onBlockUpdate} props.onChange       Function to call when a persistent
  *                                change has been made in the block-editor blocks
  *                                for the given clientId. For example, after
  *                                this function is called, an entity is marked
  *                                dirty because it has changes to save.
- * @param {onBlockUpdate} props.onInput Function to call when a non-persistent
+ * @param {onBlockUpdate} props.onInput        Function to call when a non-persistent
  *                                change has been made in the block-editor blocks
  *                                for the given clientId. When this is called,
  *                                controlling sources do not become dirty.

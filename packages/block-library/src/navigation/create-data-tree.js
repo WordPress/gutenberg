@@ -8,9 +8,9 @@
  *
  * This is useful for building linked lists of data from flat data structures.
  *
- * @param {Array} dataset linked data to be rearranged into a hierarchical tree based on relational fields.
- * @param {string} id the property which uniquely identifies each entry within the array.
- * @param {*} relation the property which identifies how the current item is related to other items in the data (if at all).
+ * @param {Array}  dataset  linked data to be rearranged into a hierarchical tree based on relational fields.
+ * @param {string} id       the property which uniquely identifies each entry within the array.
+ * @param {*}      relation the property which identifies how the current item is related to other items in the data (if at all).
  * @return {Array} a nested array of parent/child relationships
  */
 function createDataTree( dataset, id = 'id', relation = 'parent' ) {

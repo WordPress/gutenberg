@@ -76,7 +76,7 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
 /**
  * A higher-order function that create an incredibly basic ltr -> rtl style converter for CSS objects.
  *
- * @param {Object} ltrStyles Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+ * @param {Object}      ltrStyles Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
  * @param {null|Object} rtlStyles Rtl styles. Renders if provided.
  *
  * @return {Function} A function to output CSS styles for Emotion's renderer

@@ -23,8 +23,8 @@ export function isValueEmpty( value ) {
 /**
  * Attempts to get a defined/non-null value from a collection of arguments.
  *
- * @param {Array<any>} values Values to derive from.
- * @param {any} fallbackValue Fallback value if there are no defined values.
+ * @param {Array<any>} values        Values to derive from.
+ * @param {any}        fallbackValue Fallback value if there are no defined values.
  * @return {any} A defined value or the fallback value.
  */
 export function getDefinedValue( values = [], fallbackValue ) {

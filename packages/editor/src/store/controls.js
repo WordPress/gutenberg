@@ -32,8 +32,8 @@ export function getRegistry() {
  *
  * @see https://github.com/WordPress/wordpress-develop/blob/6dad32d2aed47e6c0cf2aee8410645f6d7aba6bd/src/wp-login.php#L103
  *
- * @param {string}  postId     Post ID.
- * @param {boolean} isPostNew  Whether post new.
+ * @param {string}  postId    Post ID.
+ * @param {boolean} isPostNew Whether post new.
  * @return {string}            sessionStorage key
  */
 function postKey( postId, isPostNew ) {

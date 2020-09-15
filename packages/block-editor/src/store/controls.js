@@ -8,7 +8,7 @@ import { createRegistryControl } from '@wordpress/data';
  *
  * @param {string} storeName    Store name.
  * @param {string} selectorName Selector name.
- * @param  {Array} args         Selector arguments.
+ * @param {Array}  args         Selector arguments.
  *
  * @return {Object} control descriptor.
  */

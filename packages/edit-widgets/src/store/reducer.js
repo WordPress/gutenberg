@@ -8,7 +8,7 @@ import { combineReducers } from '@wordpress/data';
  *
  * Stores widgetId -> clientId mapping which is necessary for saving the navigation.
  *
- * @param {Object} state Redux state
+ * @param {Object} state  Redux state
  * @param {Object} action Redux action
  * @return {Object} Updated state
  */

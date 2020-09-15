@@ -112,7 +112,7 @@ async function runReleaseBranchCreationStep(
  * Checkouts out the release branch and chooses a stable version number.
  *
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
- * @param {string} abortMessage Abort Message.
+ * @param {string} abortMessage            Abort Message.
  *
  * @return {Promise<Object>} chosen version and versionLabels.
  */
@@ -384,8 +384,8 @@ async function runPushGitChangesStep(
  * Cherry-picks the version bump commit into master.
  *
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
- * @param {string} commitHash   Commit to cherry-pick.
- * @param {string} abortMessage Abort message.
+ * @param {string} commitHash              Commit to cherry-pick.
+ * @param {string} abortMessage            Abort message.
  */
 async function runCherrypickBumpCommitIntoMasterStep(
 	gitWorkingDirectoryPath,
@@ -419,12 +419,12 @@ async function runCherrypickBumpCommitIntoMasterStep(
 /**
  * Creates the github release and uploads the ZIP file into it.
  *
- * @param {string}  zipPath       Plugin zip path.
- * @param {string}  version       Released version.
- * @param {string}  versionLabel  Label of the released Version.
- * @param {string}  changelog     Release changelog.
- * @param {boolean} isPrerelease  is a pre-release.
- * @param {string}  abortMessage  Abort message.
+ * @param {string}  zipPath      Plugin zip path.
+ * @param {string}  version      Released version.
+ * @param {string}  versionLabel Label of the released Version.
+ * @param {string}  changelog    Release changelog.
+ * @param {boolean} isPrerelease is a pre-release.
+ * @param {string}  abortMessage Abort message.
  *
  * @return {Promise<Object>} Github release object.
  */
@@ -565,8 +565,8 @@ async function runUpdateTrunkContentStep(
 /**
  * Creates a new SVN Tag
  *
- * @param {string} version                 Version.
- * @param {string} abortMessage            Abort Message.
+ * @param {string} version      Version.
+ * @param {string} abortMessage Abort Message.
  */
 async function runSvnTagStep( version, abortMessage ) {
 	await runStep( 'Creating the SVN Tag', abortMessage, async () => {

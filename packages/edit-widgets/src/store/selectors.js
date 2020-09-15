@@ -31,7 +31,7 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 /**
  * Returns API widget data for a particular widget ID.
  *
- * @param  {number} id  Widget ID
+ * @param {number} id Widget ID
  * @return {Object}     API widget data for a particular widget ID.
  */
 export const getWidget = createRegistrySelector(

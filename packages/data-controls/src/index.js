@@ -37,9 +37,9 @@ export const apiFetch = ( request ) => {
  * selectors that may have a resolver. It will await and return the resolved
  * value when the selector has not been resolved yet.
  *
- * @param {string} storeKey      The key for the store the selector belongs to
- * @param {string} selectorName  The name of the selector
- * @param {Array}  args          Arguments for the select.
+ * @param {string} storeKey     The key for the store the selector belongs to
+ * @param {string} selectorName The name of the selector
+ * @param {Array}  args         Arguments for the select.
  *
  * @example
  * ```js
@@ -98,9 +98,9 @@ export function __unstableSyncSelect( storeKey, selectorName, ...args ) {
 /**
  * Dispatches a control action for triggering a registry dispatch.
  *
- * @param {string} storeKey    The key for the store the action belongs to
- * @param {string} actionName  The name of the action to dispatch
- * @param {Array}  args        Arguments for the dispatch action.
+ * @param {string} storeKey   The key for the store the action belongs to
+ * @param {string} actionName The name of the action to dispatch
+ * @param {Array}  args       Arguments for the dispatch action.
  *
  * @example
  * ```js

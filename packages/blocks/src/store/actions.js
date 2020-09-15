@@ -36,8 +36,8 @@ export function removeBlockTypes( names ) {
 /**
  * Returns an action object used in signalling that new block styles have been added.
  *
- * @param {string}       blockName  Block name.
- * @param {Array|Object} styles     Block styles.
+ * @param {string}       blockName Block name.
+ * @param {Array|Object} styles    Block styles.
  *
  * @return {Object} Action object.
  */
@@ -190,9 +190,9 @@ export function updateCategory( slug, category ) {
 /**
  * Returns an action object used to add block collections
  *
- * @param {string} namespace       The namespace of the blocks to put in the collection
- * @param {string} title           The title to display in the block inserter
- * @param {Object} icon (optional) The icon to display in the block inserter
+ * @param {string} namespace The namespace of the blocks to put in the collection
+ * @param {string} title     The title to display in the block inserter
+ * @param {Object} icon      (optional) The icon to display in the block inserter
  *
  * @return {Object} Action object.
  */
@@ -208,7 +208,7 @@ export function addBlockCollection( namespace, title, icon ) {
 /**
  * Returns an action object used to remove block collections
  *
- * @param {string} namespace       The namespace of the blocks to put in the collection
+ * @param {string} namespace The namespace of the blocks to put in the collection
  *
  * @return {Object} Action object.
  */

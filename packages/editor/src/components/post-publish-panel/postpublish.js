@@ -28,7 +28,7 @@ const POSTNAME = '%postname%';
 /**
  * Returns URL for a future post.
  *
- * @param {Object} post         Post object.
+ * @param {Object} post Post object.
  *
  * @return {string} PostPublish URL.
  */

@@ -28,7 +28,7 @@ const createWithInitialState = ( initialState ) => ( reducer ) => {
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state Current state.
+ * @param {Object} state Current state.
  *
  * @return {Object} Updated state.
  */
@@ -160,7 +160,7 @@ export function page( state, action ) {
 /**
  * Reducer for information about the site's homepage.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.

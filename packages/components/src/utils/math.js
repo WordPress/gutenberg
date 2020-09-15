@@ -57,9 +57,9 @@ function getPrecision( value ) {
  * Clamps a value based on a min/max range with rounding
  *
  * @param {number} value The value.
- * @param {number} min The minimum range.
- * @param {number} max The maximum range.
- * @param {number} step A multiplier for the value.
+ * @param {number} min   The minimum range.
+ * @param {number} max   The maximum range.
+ * @param {number} step  A multiplier for the value.
  *
  * @return {number} The rounded and clamped value.
  */
@@ -86,9 +86,9 @@ export function roundClamp(
  *
  * @param {any} args Arguments for roundClamp().
  * @property {number} value The value.
- * @property {number} min The minimum range.
- * @property {number} max The maximum range.
- * @property {number} step A multiplier for the value.
+ * @property {number} min   The minimum range.
+ * @property {number} max   The maximum range.
+ * @property {number} step  A multiplier for the value.
  *
  * @return {string} The rounded and clamped value.
  */

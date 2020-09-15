@@ -75,7 +75,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
 /**
  * @typedef {Object} OptionCompletion
  * @property {'insert-at-caret'|'replace'} action the intended placement of the completion.
- * @property {OptionCompletionValue} value the completion value.
+ * @property {OptionCompletionValue}       value  the completion value.
  */
 
 /**
@@ -87,7 +87,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
 /**
  * @callback FnGetOptionCompletion
  * @param {CompleterOption} value the value of the completer option.
- * @param {string} query the text value of the autocomplete query.
+ * @param {string}          query the text value of the autocomplete query.
  *
  * @return {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
  * 													   OptionCompletionValue is returned, the
@@ -96,15 +96,15 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 /**
  * @typedef {Object} WPCompleter
- * @property {string} name a way to identify a completer, useful for selective overriding.
- * @property {?string} className A class to apply to the popup menu.
- * @property {string} triggerPrefix the prefix that will display the menu.
- * @property {(CompleterOption[]|FnGetOptions)} options the completer options or a function to get them.
- * @property {?FnGetOptionKeywords} getOptionKeywords get the keywords for a given option.
- * @property {?FnIsOptionDisabled} isOptionDisabled get whether or not the given option is disabled.
- * @property {FnGetOptionLabel} getOptionLabel get the label for a given option.
- * @property {?FnAllowContext} allowContext filter the context under which the autocomplete activates.
- * @property {FnGetOptionCompletion} getOptionCompletion get the completion associated with a given option.
+ * @property {string}                           name                a way to identify a completer, useful for selective overriding.
+ * @property {?string}                          className           A class to apply to the popup menu.
+ * @property {string}                           triggerPrefix       the prefix that will display the menu.
+ * @property {(CompleterOption[]|FnGetOptions)} options             the completer options or a function to get them.
+ * @property {?FnGetOptionKeywords}             getOptionKeywords   get the keywords for a given option.
+ * @property {?FnIsOptionDisabled}              isOptionDisabled    get whether or not the given option is disabled.
+ * @property {FnGetOptionLabel}                 getOptionLabel      get the label for a given option.
+ * @property {?FnAllowContext}                  allowContext        filter the context under which the autocomplete activates.
+ * @property {FnGetOptionCompletion}            getOptionCompletion get the completion associated with a given option.
  */
 
 function filterOptions( search, options = [], maxResults = 10 ) {

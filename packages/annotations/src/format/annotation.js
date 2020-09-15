@@ -12,8 +12,8 @@ const STORE_KEY = 'core/annotations';
 /**
  * Applies given annotations to the given record.
  *
- * @param {Object} record The record to apply annotations to.
- * @param {Array} annotations The annotation to apply.
+ * @param {Object} record      The record to apply annotations to.
+ * @param {Array}  annotations The annotation to apply.
  * @return {Object} A record with the annotations applied.
  */
 export function applyAnnotations( record, annotations = [] ) {

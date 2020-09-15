@@ -33,7 +33,7 @@ const deprecatedFlags = {
  * Hook that retrieves the setting for the given editor feature.
  * It works with nested objects using by finding the value at path.
  *
- * @param {string} featurePath  The path to the feature.
+ * @param {string} featurePath The path to the feature.
  *
  * @return {any} Returns the value defined for the setting.
  *

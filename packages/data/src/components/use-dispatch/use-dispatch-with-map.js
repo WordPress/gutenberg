@@ -36,11 +36,11 @@ const useIsomorphicLayoutEffect =
  *
  * Currently this is an internal api only and is implemented by `withDispatch`
  *
- * @param {Function} dispatchMap  Receives the `registry.dispatch` function as
+ * @param {Function} dispatchMap Receives the `registry.dispatch` function as
  *                                the first argument and the `registry` object
  *                                as the second argument.  Should return an
  *                                object mapping props to functions.
- * @param {Array}    deps         An array of dependencies for the hook.
+ * @param {Array}    deps        An array of dependencies for the hook.
  * @return {Object}  An object mapping props to functions created by the passed
  *                   in dispatchMap.
  */

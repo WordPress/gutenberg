@@ -266,8 +266,8 @@ export const __unstableGetBlockTree = createSelector(
  * Returns an array containing the clientIds of all descendants
  * of the blocks given.
  *
- * @param {Object} state Global application state.
- * @param {Array} clientIds Array of blocks to inspect.
+ * @param {Object} state     Global application state.
+ * @param {Array}  clientIds Array of blocks to inspect.
  *
  * @return {Array} ids of descendants.
  */
@@ -492,8 +492,8 @@ export function getBlockRootClientId( state, clientId ) {
 /**
  * Given a block client ID, returns the list of all its parents from top to bottom.
  *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block from which to find root client ID.
+ * @param {Object}  state     Editor state.
+ * @param {string}  clientId  Block from which to find root client ID.
  * @param {boolean} ascending Order results from bottom to top (true) or top to bottom (false).
  *
  * @return {Array} ClientIDs of the parent blocks.
@@ -517,9 +517,9 @@ export const getBlockParents = createSelector(
  * returns the list of all its parents from top to bottom,
  * filtered by the given name.
  *
- * @param {Object} state     Editor state.
- * @param {string} clientId  Block from which to find root client ID.
- * @param {string} blockName Block name to filter.
+ * @param {Object}  state     Editor state.
+ * @param {string}  clientId  Block from which to find root client ID.
+ * @param {string}  blockName Block name to filter.
  * @param {boolean} ascending Order results from bottom to top (true) or top to bottom (false).
  *
  * @return {Array} ClientIDs of the parent blocks.
@@ -1351,8 +1351,8 @@ function getInsertUsage( state, id ) {
 /**
  * Returns whether we can show a block type in the inserter
  *
- * @param {Object} state Global State
- * @param {Object} blockType BlockType
+ * @param {Object}  state        Global State
+ * @param {Object}  blockType    BlockType
  * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {boolean} Whether the given block type is allowed to be shown in the inserter.
@@ -1659,8 +1659,8 @@ export function isLastBlockChangePersistent( state ) {
 /**
  * Returns the Block List settings for an array of blocks, if any exist.
  *
- * @param {Object}  state    Editor state.
- * @param {Array} clientIds Block client IDs.
+ * @param {Object} state     Editor state.
+ * @param {Array}  clientIds Block client IDs.
  *
  * @return {Array} Block List Settings for each of the found blocks
  */
@@ -1778,7 +1778,7 @@ export function didAutomaticChange( state ) {
 /**
  * Returns true if the current highlighted block matches the block clientId.
  *
- * @param {Object} state Global application state.
+ * @param {Object} state    Global application state.
  * @param {string} clientId The block to check.
  *
  * @return {boolean} Whether the block is currently highlighted.
@@ -1790,7 +1790,7 @@ export function isBlockHighlighted( state, clientId ) {
 /**
  * Checks if a given block has controlled inner blocks.
  *
- * @param {Object} state Global application state.
+ * @param {Object} state    Global application state.
  * @param {string} clientId The block to check.
  *
  * @return {boolean} True if the block has controlled inner blocks.

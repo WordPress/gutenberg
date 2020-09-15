@@ -14,7 +14,7 @@ export default function UnitControl( { units: unitsProp, ...props } ) {
  * Filters available units based on values defined by settings.
  *
  * @param {Array} settings Collection of preferred units.
- * @param {Array} units Collection of available units.
+ * @param {Array} units    Collection of available units.
  *
  * @return {Array} Filtered units based on settings.
  */

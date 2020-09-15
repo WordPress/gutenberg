@@ -59,7 +59,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Subscribe to changes to any data.
 	 *
-	 * @param {Function}   listener Listener function.
+	 * @param {Function} listener Listener function.
 	 *
 	 * @return {Function}           Unsubscribe function.
 	 */

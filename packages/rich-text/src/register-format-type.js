@@ -20,8 +20,8 @@ import { select, dispatch } from '@wordpress/data';
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
- * @param {string}   name                 Format name.
- * @param {WPFormat} settings             Format settings.
+ * @param {string}   name     Format name.
+ * @param {WPFormat} settings Format settings.
  *
  * @return {WPFormat|undefined} The format, if it has been successfully registered;
  *                              otherwise `undefined`.

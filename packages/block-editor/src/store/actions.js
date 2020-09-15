@@ -287,9 +287,9 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(string|string[])} clientIds     Block client ID(s) to replace.
- * @param {(Object|Object[])} blocks        Replacement block(s).
- * @param {number}            indexToSelect Index of replacement block to select.
+ * @param {(string|string[])} clientIds       Block client ID(s) to replace.
+ * @param {(Object|Object[])} blocks          Replacement block(s).
+ * @param {number}            indexToSelect   Index of replacement block to select.
  * @param {number}            initialPosition Index of caret after in the selected block after the operation.
  *
  * @yield {Object} Action object.
@@ -372,10 +372,10 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * Returns an action object signalling that the given blocks should be moved to
  * a new position.
  *
- * @param  {?string} clientIds        The client IDs of the blocks.
- * @param  {?string} fromRootClientId Root client ID source.
- * @param  {?string} toRootClientId   Root client ID destination.
- * @param  {number}  index            The index to move the blocks to.
+ * @param {?string} clientIds        The client IDs of the blocks.
+ * @param {?string} fromRootClientId Root client ID source.
+ * @param {?string} toRootClientId   Root client ID destination.
+ * @param {number}  index            The index to move the blocks to.
  *
  * @yield {Object} Action object.
  */
@@ -435,10 +435,10 @@ export function* moveBlocksToPosition(
  * Returns an action object signalling that the given block should be moved to a
  * new position.
  *
- * @param  {?string} clientId         The client ID of the block.
- * @param  {?string} fromRootClientId Root client ID source.
- * @param  {?string} toRootClientId   Root client ID destination.
- * @param  {number}  index            The index to move the block to.
+ * @param {?string} clientId         The client ID of the block.
+ * @param {?string} fromRootClientId Root client ID source.
+ * @param {?string} toRootClientId   Root client ID destination.
+ * @param {number}  index            The index to move the block to.
  *
  * @yield {Object} Action object.
  */
@@ -460,9 +460,9 @@ export function* moveBlockToPosition(
  * Returns an action object used in signalling that a single block should be
  * inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object}  block            Block object to insert.
- * @param {?number} index            Index at which block should be inserted.
- * @param {?string} rootClientId     Optional root client ID of block list on which to insert.
+ * @param {Object}   block           Block object to insert.
+ * @param {?number}  index           Index at which block should be inserted.
+ * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
  * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.
@@ -553,7 +553,7 @@ export function hideInsertionPoint() {
 /**
  * Returns an action object resetting the template validity.
  *
- * @param {boolean}  isValid  template validity flag.
+ * @param {boolean} isValid template validity flag.
  *
  * @return {Object} Action object.
  */
@@ -941,7 +941,7 @@ export function* setBlockMovingClientId( hasBlockMovingClientId = null ) {
  * Generator that triggers an action used to duplicate a list of blocks.
  *
  * @param {string[]} clientIds
- * @param {boolean} updateSelection
+ * @param {boolean}  updateSelection
  */
 export function* duplicateBlocks( clientIds, updateSelection = true ) {
 	if ( ! clientIds && ! clientIds.length ) {
@@ -1061,7 +1061,7 @@ export function* insertAfterBlock( clientId ) {
 /**
  * Returns an action object that toggles the highlighted block state.
  *
- * @param {string} clientId The block's clientId.
+ * @param {string}  clientId      The block's clientId.
  * @param {boolean} isHighlighted The highlight state.
  */
 export function toggleBlockHighlight( clientId, isHighlighted ) {
@@ -1090,7 +1090,7 @@ export function* flashBlock( clientId ) {
 /**
  * Returns an action object that sets whether the block has controlled innerblocks.
  *
- * @param {string} clientId The block's clientId.
+ * @param {string}  clientId                 The block's clientId.
  * @param {boolean} hasControlledInnerBlocks True if the block's inner blocks are controlled.
  */
 export function setHasControlledInnerBlocks(

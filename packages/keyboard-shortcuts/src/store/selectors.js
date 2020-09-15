@@ -41,8 +41,8 @@ const FORMATTING_METHODS = {
 /**
  * Returns a string representing the key combination.
  *
- * @param {?WPShortcutKeyCombination} shortcut       Key combination.
- * @param {keyof FORMATTING_METHODS}  representation Type of representation
+ * @param {?WPShortcutKeyCombination} shortcut            Key combination.
+ * @param {keyof                      FORMATTING_METHODS} representation Type of representation
  *                                                   (display, raw, ariaLabel).
  *
  * @return {string?} Shortcut representation.
@@ -74,9 +74,9 @@ export function getShortcutKeyCombination( state, name ) {
 /**
  * Returns a string representing the main key combination for a given shortcut name.
  *
- * @param {Object}                   state          Global state.
- * @param {string}                   name           Shortcut name.
- * @param {keyof FORMATTING_METHODS} representation Type of representation
+ * @param {Object} state               Global state.
+ * @param {string} name                Shortcut name.
+ * @param {keyof   FORMATTING_METHODS} representation Type of representation
  *                                                  (display, raw, ariaLabel).
  *
  * @return {string?} Shortcut representation.

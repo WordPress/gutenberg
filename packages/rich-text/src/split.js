@@ -15,7 +15,7 @@ import { replace } from './replace';
  * @param {string}        value.text
  * @param {number}        value.start
  * @param {number}        value.end
- * @param {number|string} [string] Start index, or string at which to split.
+ * @param {number|string} [string]           Start index, or string at which to split.
  *
  * @return {Array} An array of new values.
  */

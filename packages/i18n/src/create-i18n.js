@@ -15,7 +15,11 @@ import Tannin from 'tannin';
  */
 const DEFAULT_LOCALE_DATA = {
 	'': {
-		/** @param {number} n */
+		/**
+		 * Plural forms.
+		 *
+		 * @param {number} n
+		 **/
 		plural_forms( n ) {
 			return n === 1 ? 0 : 1;
 		},
@@ -40,8 +44,8 @@ const DEFAULT_LOCALE_DATA = {
 /**
  * Create an i18n instance
  *
- * @param {LocaleData} [initialData]    Locale data configuration.
- * @param {string}     [initialDomain]  Domain for which configuration applies.
+ * @param {LocaleData} [initialData]   Locale data configuration.
+ * @param {string}     [initialDomain] Domain for which configuration applies.
  * @return {I18n}                       I18n instance
  */
 export const createI18n = ( initialData, initialDomain ) => {

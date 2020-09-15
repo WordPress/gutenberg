@@ -2,7 +2,7 @@
  * Returns a function which, when invoked, will return whether a hook is
  * currently being executed.
  *
- * @param  {Object}   hooks Stored hooks, keyed by hook name.
+ * @param {Object} hooks Stored hooks, keyed by hook name.
  *
  * @return {Function}       Function that returns whether a hook is currently
  *                          being executed.
@@ -11,7 +11,7 @@ function createDoingHook( hooks ) {
 	/**
 	 * Returns whether a hook is currently being executed.
 	 *
-	 * @param  {?string} hookName The name of the hook to check for.  If
+	 * @param {?string} hookName The name of the hook to check for.  If
 	 *                            omitted, will check for any hook being executed.
 	 *
 	 * @return {boolean}             Whether the hook is being executed.

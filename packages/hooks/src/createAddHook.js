@@ -8,7 +8,7 @@ import { doAction } from './';
 /**
  * Returns a function which, when invoked, will add a hook.
  *
- * @param  {Object}   hooks Stored hooks, keyed by hook name.
+ * @param {Object} hooks Stored hooks, keyed by hook name.
  *
  * @return {Function}       Function that adds a new hook.
  */
