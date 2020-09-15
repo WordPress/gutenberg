@@ -387,5 +387,3 @@ Below are the presets and styles combined:
 	}
 }
 ```
-
-## [Adding blocks](/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md)
