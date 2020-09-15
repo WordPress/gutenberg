@@ -8,6 +8,7 @@ import { pick } from 'lodash';
  */
 import { rawHandler } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { getClipboard } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -19,13 +20,10 @@ const NON_BLOCK_CATEGORIES = [ 'reusable' ];
 function BlocksTab( { onSelect, rootClientId, listProps } ) {
 	const { items } = useSelect(
 		( select ) => {
-			const {
-				getInserterItems,
-				getSettings,
-				canInsertBlockType,
-			} = select( 'core/block-editor' );
+			const { getInserterItems, canInsertBlockType } = select(
+				'core/block-editor'
+			);
 			const { getBlockType } = select( 'core/blocks' );
-			const { getClipboard } = select( 'core/editor' );
 
 			const clipboard = getClipboard();
 			const clipboardBlock =
@@ -35,10 +33,11 @@ function BlocksTab( { onSelect, rootClientId, listProps } ) {
 				canInsertBlockType( clipboardBlock.name, rootClientId );
 
 			const allItems = getInserterItems( rootClientId );
-			const items = allItems.filter(
+			const blockItems = allItems.filter(
 				( { category } ) => ! NON_BLOCK_CATEGORIES.includes( category )
 			);
 
+			// Add copied blocks in the clipboard as extra items
 			const itemsWithClipboard = shouldAddClipboardBlock
 				? [
 						{
@@ -50,9 +49,9 @@ function BlocksTab( { onSelect, rootClientId, listProps } ) {
 							initialAttributes: clipboardBlock.attributes,
 							innerBlocks: clipboardBlock.innerBlocks,
 						},
-						...items,
+						...blockItems,
 				  ]
-				: items;
+				: blockItems;
 
 			return { items: itemsWithClipboard };
 		},
