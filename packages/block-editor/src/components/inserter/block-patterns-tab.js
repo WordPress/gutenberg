@@ -53,25 +53,37 @@ function BlockPatternsCategory( {
 	const [ allPatterns, allCategories, onClick ] = usePatternsState(
 		onInsert
 	);
+
+	// Remove any empty categories
+	const populatedCategories = useMemo(
+		() =>
+			allCategories.filter( ( category ) =>
+				allPatterns.some( ( pattern ) =>
+					pattern.categories.includes( category.name )
+				)
+			),
+		[ allPatterns, allCategories ]
+	);
+
 	const patternCategory = selectedCategory
 		? selectedCategory
-		: allCategories[ 0 ];
+		: populatedCategories[ 0 ];
 
 	useEffect( () => {
 		if (
 			allPatterns.some(
 				( pattern ) => getPatternIndex( pattern ) === Infinity
 			) &&
-			! allCategories.find(
+			! populatedCategories.find(
 				( category ) => category.name === 'uncategorized'
 			)
 		) {
-			allCategories.push( {
+			populatedCategories.push( {
 				name: 'uncategorized',
 				label: _x( 'Uncategorized' ),
 			} );
 		}
-	}, [ allCategories, allPatterns ] );
+	}, [ populatedCategories, allPatterns ] );
 
 	const getPatternIndex = useCallback(
 		( pattern ) => {
@@ -79,7 +91,10 @@ function BlockPatternsCategory( {
 				return Infinity;
 			}
 			const indexedCategories = fromPairs(
-				allCategories.map( ( { name }, index ) => [ name, index ] )
+				populatedCategories.map( ( { name }, index ) => [
+					name,
+					index,
+				] )
 			);
 			return Math.min(
 				...pattern.categories.map( ( cat ) =>
@@ -89,7 +104,7 @@ function BlockPatternsCategory( {
 				)
 			);
 		},
-		[ allCategories ]
+		[ populatedCategories ]
 	);
 
 	const currentCategoryPatterns = useMemo(
@@ -119,7 +134,7 @@ function BlockPatternsCategory( {
 					key={ patternCategory.name }
 					title={ patternCategory.title }
 					selectedCategory={ patternCategory }
-					patternCategories={ allCategories }
+					patternCategories={ populatedCategories }
 					onClickCategory={ onClickCategory }
 				>
 					<BlockPatternList
