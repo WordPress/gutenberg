@@ -8,11 +8,15 @@ export const useNavigationTreeNodes = () => {
 
 	const getNode = ( key ) => nodes[ key ];
 
-	const addNode = ( key, value ) =>
+	const addNode = ( key, value ) => {
+		const valueCopy = { ...value };
+		delete valueCopy.children;
+
 		setNodes( ( original ) => ( {
 			...original,
-			[ key ]: { ...value, children: undefined },
+			[ key ]: valueCopy,
 		} ) );
+	};
 
 	const removeNode = ( key ) =>
 		setNodes( ( original ) => {
