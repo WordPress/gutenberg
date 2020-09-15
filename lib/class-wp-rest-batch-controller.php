@@ -98,6 +98,10 @@ class WP_REST_Batch_Controller {
 				$single_request->set_body_params( $args['body'] );
 			}
 
+			if ( ! empty( $args['headers'] ) ) {
+				$single_request->set_headers( $args['headers'] );
+			}
+
 			$requests[] = $single_request;
 		}
 
