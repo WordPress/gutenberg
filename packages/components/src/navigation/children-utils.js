@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, omit } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -78,29 +78,29 @@ export const findNavigationItems = ( children ) => {
 		( { type } ) => type === NavigationItem
 	);
 
-	const itemsWithMenu = items.map( ( { child, parent } ) => ( {
-		...child,
-		props: { ...child.props, menu: parent?.props?.menu ?? ROOT_MENU },
-	} ) );
+	return items.reduce( ( acc, { child, parent } ) => {
+		const key = child.props.item;
 
-	const itemsWithoutChildren = itemsWithMenu.map( ( { props } ) =>
-		omit( props, 'children' )
-	);
-	const itemsByItemProp = keyBy( itemsWithoutChildren, 'item' );
+		acc[ key ] = cloneDeep( child.props );
+		acc[ key ].menu = parent?.props?.menu ?? ROOT_MENU;
+		delete acc[ key ].children;
 
-	return itemsByItemProp;
+		return acc;
+	}, {} );
 };
 
 export const findNavigationMenus = ( children ) => {
 	const menus = findChildrenWithClosestParent(
 		children,
 		( { type } ) => type === NavigationMenu
-	).map( ( { child } ) => child );
-
-	const menusWithoutChildren = menus.map( ( { props } ) =>
-		omit( props, 'children' )
 	);
-	const menusByMenuProp = keyBy( menusWithoutChildren, 'menu' );
 
-	return menusByMenuProp;
+	return menus.reduce( ( acc, { child } ) => {
+		const key = child?.props?.menu ?? ROOT_MENU;
+
+		acc[ key ] = cloneDeep( child.props );
+		delete acc[ key ].children;
+
+		return acc;
+	}, {} );
 };
