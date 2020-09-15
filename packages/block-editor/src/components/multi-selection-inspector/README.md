@@ -20,8 +20,14 @@ Renders the multiselection card.
 ```jsx
 import { <MultiSelectionInspector /> } from '@wordpress/block-editor';
 
-const MyMultiSelectionInspector = () => <MultiSelectionInspector />;
+const SelectedBlockCount = getSelectedBlockCount();
+
+if ( SelectedBlockCount > 1 ) {
+    const MyMultiSelectionInspector = () => <MultiSelectionInspector />;
+}
 ```
+
+ _Note:_ In this example, we detect if more than one block is selected with `getSelectedBlockCount()` before using the `MultiSelectionInspector` component.
 
 ## Related components
 
