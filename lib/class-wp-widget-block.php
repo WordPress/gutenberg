@@ -176,7 +176,7 @@ class WP_Widget_Block extends WP_Widget {
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, $this->default_instance );
 		?>
-		<textarea id="<?php echo $this->get_field_id( 'content' ); ?>" name="<?php echo $this->get_field_name( 'content' ); ?>" rows="6" cols="50" class="widefat text wp-block-textarea"><?php echo esc_textarea( $instance['content'] ); ?></textarea>
+		<textarea id="<?php echo $this->get_field_id( 'content' ); ?>" name="<?php echo $this->get_field_name( 'content' ); ?>" rows="6" cols="50" class="widefat text wp-block-widget-textarea"><?php echo esc_textarea( $instance['content'] ); ?></textarea>
 		<?php
 	}
 
