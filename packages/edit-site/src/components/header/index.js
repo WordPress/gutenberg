@@ -138,10 +138,7 @@ export default function Header( {
 			</div>
 
 			<div className="edit-site-header_center">
-				<DocumentActions
-					primaryText={ template?.slug }
-					secondaryText={ 'TODO header' }
-				/>
+				<DocumentActions documentTitle={ template?.slug } />
 			</div>
 
 			<div className="edit-site-header_end">
