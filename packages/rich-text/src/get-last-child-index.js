@@ -7,8 +7,10 @@ import { LINE_SEPARATOR } from './special-characters';
 /**
  * Gets the line index of the last child in the list.
  *
- * @param {Object} value     Value to search.
- * @param {number} lineIndex Line index of a list item in the list.
+ * @param {Object} value              Value to search.
+ * @param {string} value.text
+ * @param {Array}  value.replacements
+ * @param {number} lineIndex          Line index of a list item in the list.
  *
  * @return {Array} The index of the last child.
  */

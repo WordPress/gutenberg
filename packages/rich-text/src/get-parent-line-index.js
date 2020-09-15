@@ -9,8 +9,10 @@ import { LINE_SEPARATOR } from './special-characters';
  * go through every list item until we find one with exactly one format type
  * less.
  *
- * @param {Object} value     Value to search.
- * @param {number} lineIndex Line index of a child list item.
+ * @param {Object} value              Value to search.
+ * @param {string} value.text
+ * @param {Array}  value.replacements
+ * @param {number} lineIndex          Line index of a child list item.
  *
  * @return {Array} The parent list line index.
  */

@@ -84,6 +84,7 @@ _Parameters_
 -   _$1.range_ `[Range]`: Range to create value from.
 -   _$1.multilineTag_ `[string]`: Multiline tag if the structure is multiline.
 -   _$1.multilineWrapperTags_ `[Array]`: Tags where lines can be found if nesting is possible.
+-   _$1.\_\_unstableIsEditableTree_ `[boolean]`: 
 -   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to collapse white space characters.
 
 _Returns_
@@ -113,6 +114,10 @@ Gets the active object, if there is any.
 _Parameters_
 
 -   _value_ `Object`: Value to inspect.
+-   _value.start_ `number`: 
+-   _value.end_ `number`: 
+-   _value.replacements_ `Array`: 
+-   _value.text_ `string`: 
 
 _Returns_
 
@@ -126,6 +131,7 @@ Get the textual content of a Rich Text value. This is similar to
 _Parameters_
 
 -   _value_ `Object`: Value to use.
+-   _value.text_ `string`: 
 
 _Returns_
 
@@ -176,6 +182,8 @@ is no selection, `undefined` will be returned. This is similar to
 _Parameters_
 
 -   _value_ `Object`: The rich text value to check.
+-   _value.start_ `[number]`: 
+-   _value.end_ `[number]`: 
 
 _Returns_
 
@@ -189,6 +197,7 @@ objects (such as images).
 _Parameters_
 
 -   _value_ `Object`: Value to use.
+-   _value.text_ `string`: 
 
 _Returns_
 
@@ -263,6 +272,11 @@ is similar to `String.prototype.replace`.
 _Parameters_
 
 -   _value_ `Object`: The value to modify.
+-   _value.formats_ `Array`: 
+-   _value.replacements_ `Array`: 
+-   _value.text_ `string`: 
+-   _value.start_ `number`: 
+-   _value.end_ `number`: 
 -   _pattern_ `(RegExp|string)`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
 -   _replacement_ `(Function|string)`: The match or matches are replaced with the specified or the value returned by the specified function.
 

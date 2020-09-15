@@ -4,7 +4,9 @@
  * is no selection, `undefined` will be returned. This is similar to
  * `window.getSelection().isCollapsed()`.
  *
- * @param {Object} value The rich text value to check.
+ * @param {Object} value         The rich text value to check.
+ * @param {number} [value.start]
+ * @param {number} [value.end]
  *
  * @return {boolean|undefined} True if the selection is collapsed, false if not,
  *                             undefined if there is no selection.

@@ -6,6 +6,10 @@ import { useEffect } from '@wordpress/element';
 /**
  * Calculates and renders the format boundary style when the active formats
  * change.
+ *
+ * @param {Object} $1                 Named arguments.
+ * @param {Array}  [$1.activeFormats]
+ * @param {Object} $1.ref
  */
 export function useBoundaryStyle( { activeFormats, ref } ) {
 	useEffect( () => {
