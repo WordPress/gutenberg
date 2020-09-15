@@ -4,6 +4,11 @@
 import { keyBy, omit } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { Children } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { ROOT_MENU } from './constants';
@@ -36,15 +41,7 @@ export const findChildrenWithClosestParent = (
 	const innerRecursion = ( children, lastParent ) => {
 		let items = [];
 
-		if ( ! Array.isArray( children ) ) {
-			children = [ children ];
-		}
-
-		for ( const child of children ) {
-			if ( ! child ) {
-				continue;
-			}
-
+		Children.forEach( children, ( child ) => {
 			const predicateOk = hasPredicate && predicate( child );
 			if ( predicateOk ) {
 				items.push( { child, parent: lastParent } );
@@ -67,7 +64,7 @@ export const findChildrenWithClosestParent = (
 					)
 				);
 			}
-		}
+		} );
 
 		return items;
 	};
