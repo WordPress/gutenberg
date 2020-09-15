@@ -23,8 +23,6 @@ import { NavigationMenuContext } from './context';
 import { useNavigationTreeMenu } from './use-navigation-tree-menu';
 
 export default function NavigationMenu( props ) {
-	useNavigationTreeMenu( props );
-
 	const {
 		backButtonLabel,
 		children,
@@ -33,6 +31,7 @@ export default function NavigationMenu( props ) {
 		parentMenu,
 		title,
 	} = props;
+	useNavigationTreeMenu( props );
 	const { activeMenu, setActiveMenu } = useNavigationContext();
 	const isActive = activeMenu === menu;
 

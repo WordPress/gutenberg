@@ -19,8 +19,6 @@ import { useNavigationTreeItem } from './use-navigation-tree-item';
 import { useNavigationMenuContext } from '../menu/context';
 
 export default function NavigationItem( props ) {
-	useNavigationTreeItem( props );
-
 	const {
 		badge,
 		children,
@@ -32,7 +30,7 @@ export default function NavigationItem( props ) {
 		title,
 		...restProps
 	} = props;
-	const { activeItem, setActiveMenu } = useNavigationContext();
+	useNavigationTreeItem( props );
 	const { activeItem, setActiveMenu } = useNavigationContext();
 	const { isActive } = useNavigationMenuContext();
 
