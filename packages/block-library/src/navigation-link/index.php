@@ -116,6 +116,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$font_sizes['css_classes']
 	);
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] );
+	$separator = $block->context['separator'] ? ' data-separator="' . $block->context['separator'] . '"' : null;
 
 	$css_classes = trim( implode( ' ', $classes ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;
@@ -128,7 +129,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	};
 
 	$html = '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) .
-		( $is_active ? ' current-menu-item' : '' ) . '"' . $style_attribute . '>' .
+		( $is_active ? ' current-menu-item' : '' ) . '"' . $style_attribute . $separator . '>' .
 		'<a class="wp-block-navigation-link__content" ';
 
 	// Start appending HTML attributes to anchor tag.

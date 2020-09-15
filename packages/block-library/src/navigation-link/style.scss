@@ -7,6 +7,14 @@
 	.wp-block-navigation__container:empty {
 		display: none;
 	}
+
+	&::before {
+		content: attr(data-separator);
+	}
+
+	&:first-child::before {
+		display: none;
+	}
 }
 
 .wp-block-navigation__container {

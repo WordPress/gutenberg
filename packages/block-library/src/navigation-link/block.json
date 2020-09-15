@@ -1,7 +1,9 @@
 {
 	"name": "core/navigation-link",
 	"category": "design",
-	"parent": [ "core/navigation" ],
+	"parent": [
+		"core/navigation"
+	],
 	"attributes": {
 		"label": {
 			"type": "string"
@@ -36,7 +38,8 @@
 		"customBackgroundColor",
 		"fontSize",
 		"customFontSize",
-		"showSubmenuIcon"
+		"showSubmenuIcon",
+		"separator"
 	],
 	"supports": {
 		"reusable": false,

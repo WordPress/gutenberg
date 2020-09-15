@@ -43,7 +43,7 @@
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
-		"separator": "showSeparator"
+		"separator": "separator"
 	},
 	"supports": {
 		"align": [
