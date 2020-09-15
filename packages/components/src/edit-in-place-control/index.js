@@ -56,7 +56,7 @@ function EditInPlaceControl( { label = '', onClick = noop, onChange = noop } ) {
 					} }
 					onBlur={ () => {
 						setEdit( false );
-						onChange();
+						onChange( value );
 					} }
 					onKeyDown={ ( event ) => {
 						if (
@@ -67,9 +67,10 @@ function EditInPlaceControl( { label = '', onClick = noop, onChange = noop } ) {
 							event.stopPropagation();
 							if ( ESCAPE === event.keyCode ) {
 								setValue( prevValue.current );
+							} else {
+								setEdit( ! edit );
+								onChange( value );
 							}
-							setEdit( ! edit );
-							onChange();
 						}
 					} }
 				/>
