@@ -99,8 +99,11 @@ class DatePicker extends Component {
 	}
 
 	render() {
-		const { currentDate, isInvalidDate } = this.props;
+		const { currentDate, isInvalidDate, events } = this.props;
 		const momentDate = this.getMomentDate( currentDate );
+		const key = `datepicker-controller-${
+			momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
+		}${ events?.length ? '-events-' + events.length : '' }`;
 
 		return (
 			<div className="components-datetime__date" ref={ this.nodeRef }>
@@ -111,9 +114,7 @@ class DatePicker extends Component {
 					hideKeyboardShortcutsPanel
 					// This is a hack to force the calendar to update on month or year change
 					// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
-					key={ `datepicker-controller-${
-						momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
-					}` }
+					key={ key }
 					noBorder
 					numberOfMonths={ 1 }
 					onDateChange={ this.onChangeMoment }
