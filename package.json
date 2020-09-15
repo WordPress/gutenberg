@@ -76,7 +76,10 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"bufferutil": "4.0.1",
+		"utf-8-validate": "5.0.2",
+		"vue": "2.6.12"
 	},
 	"devDependencies": {
 		"@actions/core": "1.0.0",
@@ -180,7 +183,7 @@
 		"postcss-loader": "3.0.0",
 		"prettier": "npm:wp-prettier@2.0.5",
 		"progress": "2.0.3",
-		"puppeteer": "npm:puppeteer-core@3.0.0",
+		"puppeteer": "1.10.0",
 		"react": "16.13.1",
 		"react-dom": "16.13.1",
 		"react-native": "0.61.5",
