@@ -6,7 +6,7 @@ import { castArray, get, isEqual, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { apiFetch, __unstableSyncSelect } from '@wordpress/data-controls';
+import { apiFetch, syncSelect } from '@wordpress/data-controls';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -210,26 +210,21 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const entity = yield __unstableSyncSelect(
-		'core',
-		'getEntity',
-		kind,
-		name
-	);
+	const entity = yield syncSelect( 'core', 'getEntity', kind, name );
 	if ( ! entity ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 		);
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
-	const record = yield __unstableSyncSelect(
+	const record = yield syncSelect(
 		'core',
 		'getRawEntityRecord',
 		kind,
 		name,
 		recordId
 	);
-	const editedRecord = yield __unstableSyncSelect(
+	const editedRecord = yield syncSelect(
 		'core',
 		'getEditedEntityRecord',
 		kind,
@@ -275,7 +270,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
  * an entity record, if any.
  */
 export function* undo() {
-	const undoEdit = yield __unstableSyncSelect( 'core', 'getUndoEdit' );
+	const undoEdit = yield syncSelect( 'core', 'getUndoEdit' );
 	if ( ! undoEdit ) {
 		return;
 	}
@@ -293,7 +288,7 @@ export function* undo() {
  * edit to an entity record, if any.
  */
 export function* redo() {
-	const redoEdit = yield __unstableSyncSelect( 'core', 'getRedoEdit' );
+	const redoEdit = yield syncSelect( 'core', 'getRedoEdit' );
 	if ( ! redoEdit ) {
 		return;
 	}
@@ -343,7 +338,7 @@ export function* saveEntityRecord(
 	for ( const [ key, value ] of Object.entries( record ) ) {
 		if ( typeof value === 'function' ) {
 			const evaluatedValue = value(
-				yield __unstableSyncSelect(
+				yield syncSelect(
 					'core',
 					'getEditedEntityRecord',
 					kind,
@@ -377,7 +372,7 @@ export function* saveEntityRecord(
 	let currentEdits;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
-		const persistedRecord = yield __unstableSyncSelect(
+		const persistedRecord = yield syncSelect(
 			'core',
 			'getRawEntityRecord',
 			kind,
@@ -390,12 +385,9 @@ export function* saveEntityRecord(
 			// This is fine for now as it is the only supported autosave,
 			// but ideally this should all be handled in the back end,
 			// so the client just sends and receives objects.
-			const currentUser = yield __unstableSyncSelect(
-				'core',
-				'getCurrentUser'
-			);
+			const currentUser = yield syncSelect( 'core', 'getCurrentUser' );
 			const currentUserId = currentUser ? currentUser.id : undefined;
-			const autosavePost = yield __unstableSyncSelect(
+			const autosavePost = yield syncSelect(
 				'core',
 				'getAutosave',
 				persistedRecord.type,
@@ -487,14 +479,14 @@ export function* saveEntityRecord(
 
 			// Get the full local version of the record before the update,
 			// to merge it with the edits and then propagate it to subscribers
-			persistedEntity = yield __unstableSyncSelect(
+			persistedEntity = yield syncSelect(
 				'core',
 				'__experimentalGetEntityRecordNoResolver',
 				kind,
 				name,
 				recordId
 			);
-			currentEdits = yield __unstableSyncSelect(
+			currentEdits = yield syncSelect(
 				'core',
 				'getEntityRecordEdits',
 				kind,
@@ -541,7 +533,7 @@ export function* saveEntityRecord(
 				recordId,
 				{
 					...currentEdits,
-					...( yield __unstableSyncSelect(
+					...( yield syncSelect(
 						'core',
 						'getEntityRecordEdits',
 						kind,
@@ -575,7 +567,7 @@ export function* saveEntityRecord(
  */
 export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	if (
-		! ( yield __unstableSyncSelect(
+		! ( yield syncSelect(
 			'core',
 			'hasEditsForEntityRecord',
 			kind,
@@ -585,7 +577,7 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	) {
 		return;
 	}
-	const edits = yield __unstableSyncSelect(
+	const edits = yield syncSelect(
 		'core',
 		'getEntityRecordNonTransientEdits',
 		kind,
