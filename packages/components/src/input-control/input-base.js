@@ -31,8 +31,6 @@ export function InputBase(
 		disabled = false,
 		hideLabelFromVision = false,
 		id: idProp,
-		isFloatingLabel = false,
-		isFilled = false,
 		isFocused = false,
 		label,
 		prefix,
@@ -44,15 +42,10 @@ export function InputBase(
 ) {
 	const id = useUniqueId( idProp );
 
-	const isFloating = isFloatingLabel ? isFilled || isFocused : false;
-	const isFloatingLabelSet =
-		! hideLabelFromVision && isFloatingLabel && label;
-
 	return (
 		<Root
 			{ ...props }
 			className={ className }
-			isFloatingLabel={ isFloatingLabelSet }
 			isFocused={ isFocused }
 			ref={ ref }
 		>
@@ -61,9 +54,6 @@ export function InputBase(
 					className="components-input-control__label"
 					hideLabelFromVision={ hideLabelFromVision }
 					htmlFor={ id }
-					isFilled={ isFilled }
-					isFloating={ isFloating }
-					isFloatingLabel={ isFloatingLabel }
 					size={ size }
 				>
 					{ label }
@@ -88,8 +78,6 @@ export function InputBase(
 				<Backdrop
 					aria-hidden="true"
 					disabled={ disabled }
-					isFloating={ isFloating }
-					isFloatingLabel={ isFloatingLabelSet }
 					isFocused={ isFocused }
 					label={ label }
 					size={ size }

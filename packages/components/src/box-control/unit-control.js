@@ -38,7 +38,6 @@ export default function BoxUnitControl( {
 					isLast={ isLast }
 					isOnly={ isOnly }
 					isPressEnterToChange
-					isFloatingLabel
 					isResetValueOnUnitChange={ false }
 					value={ value }
 					{ ...props }
