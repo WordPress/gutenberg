@@ -182,8 +182,8 @@ class WP_REST_Batch_Controller {
 			);
 		}
 
-		foreach ( $requests as $i => $batch_request ) {
-			$clean_request = clone $batch_request;
+		foreach ( $requests as $i => $single_request ) {
+			$clean_request = clone $single_request;
 			$clean_request->set_url_params( array() );
 			$clean_request->set_attributes( array() );
 			$clean_request->set_default_params( array() );
@@ -212,12 +212,12 @@ class WP_REST_Batch_Controller {
 						);
 					}
 
-					$result = rest_get_server()->respond_to_request( $batch_request, $route, $handler, $error );
+					$result = rest_get_server()->respond_to_request( $single_request, $route, $handler, $error );
 				}
 			}
 
 			/** This filter is documented in wp-includes/rest-api/class-wp-rest-server.php */
-			$result = apply_filters( 'rest_post_dispatch', rest_ensure_response( $result ), rest_get_server(), $batch_request );
+			$result = apply_filters( 'rest_post_dispatch', rest_ensure_response( $result ), rest_get_server(), $single_request );
 
 			$responses[] = rest_get_server()->envelope_response( $result, false )->get_data();
 		}
