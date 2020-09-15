@@ -174,7 +174,7 @@ In general, avoid backslash-escaping quotes:
 
 ```js
 // Bad:
-const name = 'Matt';
+const name = "Matt";
 // Good:
 const name = 'Matt';
 
