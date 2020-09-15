@@ -15,6 +15,7 @@ import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
 	WIDE_ALIGNMENTS,
+	ALIGNMENT_BREAKPOINTS,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -170,6 +171,7 @@ export class BlockList extends Component {
 			isStackedHorizontally,
 			horizontalAlignment,
 			contentResizeMode,
+			blockWidth,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -220,6 +222,7 @@ export class BlockList extends Component {
 					contentContainerStyle={ [
 						horizontal && styles.horizontalContentContainer,
 						contentResizeMode === 'stretch' &&
+							blockWidth > ALIGNMENT_BREAKPOINTS.medium &&
 							styles.horizontalContentContainerStretch,
 					] }
 					style={ getStyles(

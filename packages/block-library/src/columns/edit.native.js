@@ -141,6 +141,7 @@ function ColumnsEditContainer( {
 		const widths = {};
 
 		let columnWidth = width / columnsInRow;
+		let maxColumnWidth = columnWidth;
 
 		innerColumns.forEach( ( innerColumn ) => {
 			if ( columnsInRow > 1 ) {
@@ -151,12 +152,17 @@ function ColumnsEditContainer( {
 							innerColumn.clientId
 						];
 
+					const containerWidth = getContainerWidth(
+						filteredColumnWidthsPerRatio.length > 0
+							? newParentWidth
+							: width
+					);
+
 					const percentageRatio = attributeWidth / columnWidthsSum;
-					const minPercentageRatio =
-						MIN_WIDTH / getContainerWidth( width );
+					const minPercentageRatio = MIN_WIDTH / containerWidth;
 
 					const initialColumnWidth = Math.floor(
-						percentageRatio * getContainerWidth( width )
+						percentageRatio * containerWidth
 					);
 
 					const columnRatios = columnWidths.map(
@@ -177,18 +183,38 @@ function ColumnsEditContainer( {
 							? MIN_WIDTH
 							: Math.floor(
 									( attributeWidth / largeColumnsWidthsSum ) *
-										getContainerWidth( newParentWidth )
+										containerWidth
 							  );
 
-					widths[ innerColumn.clientId ] = columnWidth;
+					maxColumnWidth = columnWidth;
+
+					if ( Math.round( columnWidthsSum ) < 100 ) {
+						const newColumnWidth =
+							( attributeWidth / 100 ) * containerWidth;
+						columnWidth =
+							newColumnWidth < MIN_WIDTH
+								? MIN_WIDTH
+								: newColumnWidth;
+					}
+
+					widths[ innerColumn.clientId ] = {
+						width: columnWidth,
+						maxWidth: maxColumnWidth,
+					};
 				} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
 					columnWidth = Math.floor(
 						getContainerWidth( width ) / columnsInRow
 					);
-					widths[ innerColumn.clientId ] = columnWidth;
+					widths[ innerColumn.clientId ] = {
+						width: columnWidth,
+						maxWidth: maxColumnWidth,
+					};
 				}
 			}
-			widths[ innerColumn.clientId ] = columnWidth;
+			widths[ innerColumn.clientId ] = {
+				width: columnWidth,
+				maxWidth: maxColumnWidth,
+			};
 		} );
 		return widths;
 	}, [ columnWidths ] );
@@ -302,6 +328,7 @@ function ColumnsEditContainer( {
 						onDeleteBlock={
 							columnCount === 1 ? onDeleteBlock : undefined
 						}
+						blockWidth={ width }
 						contentStyle={ calculateWidths }
 						parentWidth={ getContainerWidth( newParentWidth ) }
 					/>
