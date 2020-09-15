@@ -1,18 +1,14 @@
-.edit-site-document-actions__document_item {
-	color: $gray-700;
-	&.is-active {
-		color: inherit;
-	}
-}
+.edit-site-document-actions {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-evenly;
+	margin: 5px 0;
 
-// Apply button hover style to text even when grayed out.
-button:hover .edit-site-document-actions__document_item {
-	color: inherit;
-	&.is-active {
-		color: inherit;
+	span {
+		color: $gray-700;
+		&.is-active {
+			color: inherit;
+		}
 	}
-}
-
-.edit-site-document-actions__separator {
-	padding-right: 4px;
 }
