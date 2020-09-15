@@ -15,7 +15,7 @@ This card contains information on the number of blocks selected, and in the case
 
 ### Usage
 
-Renders the multiselection card.
+Renders the multi selection inspector card.
 
 ```jsx
 import { <MultiSelectionInspector /> } from '@wordpress/block-editor';
