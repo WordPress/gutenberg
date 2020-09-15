@@ -26,14 +26,17 @@ const Container = styled.div`
 	max-width: 246px;
 `;
 
-const CustomComponent = ( { onClick } ) => (
-	<Button onClick={ onClick }>
-		<img
-			alt="WordPress Logo"
-			src="https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png"
-			style={ { width: 50, height: 50 } }
-		/>
-	</Button>
+// Mock navigation link
+const Link = ( { href, children, onClick } ) => (
+	<a
+		href={ href }
+		onClick={ ( event ) => {
+			event.preventDefault();
+			onClick();
+		} }
+	>
+		{ children }
+	</a>
 );
 
 function Example() {
@@ -67,9 +70,18 @@ function Example() {
 							title="External link"
 						/>
 						<NavigationItem item="item-5">
-							<CustomComponent
+							<Link
+								href="https://wordpress.org/"
+								item="item-5"
+								// Since we're not actually navigating pages, simulate it with on onClick
 								onClick={ () => setActiveItem( 'item-5' ) }
-							/>
+							>
+								<img
+									alt="WordPress Logo"
+									src="https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png"
+									style={ { width: 50, height: 50 } }
+								/>
+							</Link>
 						</NavigationItem>
 					</NavigationGroup>
 				</NavigationMenu>
