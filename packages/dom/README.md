@@ -18,6 +18,10 @@ npm install @wordpress/dom --save
 
 Get the rectangle for the selection in a container.
 
+_Parameters_
+
+-   _window_ `Window`: The window of the selection.
+
 _Returns_
 
 -   `?DOMRect`: The rectangle.
@@ -26,6 +30,10 @@ _Returns_
 
 Check whether the current document has a selection. This checks for both
 focus in an input field and general text selection.
+
+_Parameters_
+
+-   _document_ `Document`: The document to check.
 
 _Returns_
 

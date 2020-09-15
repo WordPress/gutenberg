@@ -26,10 +26,9 @@ import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
 import ColorPanel from './color-panel';
 
-/**
- * Browser dependencies
- */
-const { getComputedStyle, Node } = window;
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
 
 const DEFAULT_COLORS = [];
 
@@ -205,7 +204,8 @@ export default function __experimentalUseColors(
 			while (
 				backgroundColor === 'rgba(0, 0, 0, 0)' &&
 				backgroundColorNode.parentNode &&
-				backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
+				backgroundColorNode.parentNode.nodeType ===
+					backgroundColorNode.parentNode.ELEMENT_NODE
 			) {
 				backgroundColorNode = backgroundColorNode.parentNode;
 				backgroundColor = getComputedStyle( backgroundColorNode )

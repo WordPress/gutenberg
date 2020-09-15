@@ -25,6 +25,10 @@ import {
 
 const isWebPlatform = Platform.OS === 'web';
 
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
 // The code in this file is copied entirely from the "color" and "style" support flags
 // The flag can't be used at the moment because of the extra wrapper around
 // the button block markup.
@@ -53,8 +57,6 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
-	const { getComputedStyle, Node } = window;
-
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
@@ -79,7 +81,8 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
 		while (
 			backgroundColor === 'rgba(0, 0, 0, 0)' &&
 			backgroundColorNode.parentNode &&
-			backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
+			backgroundColorNode.parentNode.nodeType ===
+				backgroundColorNode.parentNode.ELEMENT_NODE
 		) {
 			backgroundColorNode = backgroundColorNode.parentNode;
 			backgroundColor = getComputedStyle( backgroundColorNode )
