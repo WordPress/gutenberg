@@ -6,14 +6,54 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __experimentalGetSettings, gmdate } from '@wordpress/date';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { __experimentalGetSettings } from '@wordpress/date';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { DateTimePicker } from '@wordpress/components';
 
-export function PostSchedule( { date, onUpdateDate, postByMonth } ) {
-	const onChange = ( newDate ) => {
-		onUpdateDate( newDate );
+export function PostSchedule() {
+	const now = new Date();
+
+	const firstDayOfTheMonth = new Date(
+		now.getFullYear(),
+		now.getMonth(),
+		1
+	).toISOString();
+	const lastDayOfTheMonth = new Date(
+		now.getFullYear(),
+		now.getMonth() + 1,
+		1
+	).toISOString();
+
+	const postDate = useSelect(
+		( select ) => select( 'core/editor' ).getEditedPostAttribute( 'date' ),
+		[]
+	);
+
+	/*
+	 * Pick up published and schduled post from site,
+	 * and populate the `events` array.
+	 */
+	const events = useSelect(
+		( select ) =>
+			map(
+				select( 'core' ).getEntityRecords( 'postType', 'post', {
+					status: 'publish,future',
+					after: firstDayOfTheMonth,
+					before: lastDayOfTheMonth,
+				} ),
+				( { date: eventPostDate, title, type } ) => ( {
+					title,
+					date: new Date( eventPostDate ),
+					type,
+				} )
+			),
+		[]
+	);
+
+	// Update post date handler.
+	const { editPost } = useDispatch( 'core/editor' );
+	const updatePostDate = ( date ) => {
+		editPost( { date } );
 		document.activeElement.blur();
 	};
 
@@ -32,49 +72,12 @@ export function PostSchedule( { date, onUpdateDate, postByMonth } ) {
 	return (
 		<DateTimePicker
 			key="date-time-picker"
-			currentDate={ date }
-			onChange={ onChange }
+			currentDate={ postDate }
+			onChange={ updatePostDate }
 			is12Hour={ is12HourTime }
-			events={ postByMonth }
+			events={ events }
 		/>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const now = new Date();
-
-		const firstDayOfTheMonth = new Date(
-			now.getFullYear(),
-			now.getMonth(),
-			1
-		).toISOString();
-		const lastDayOfTheMonth = new Date(
-			now.getFullYear(),
-			now.getMonth() + 1,
-			1
-		).toISOString();
-
-		return {
-			date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
-			postByMonth: map(
-				select( 'core' ).getEntityRecords( 'postType', 'post', {
-					status: 'publish,future',
-					after: firstDayOfTheMonth,
-					before: lastDayOfTheMonth,
-				} ),
-				( { date, title } ) => ( {
-					title,
-					date: new Date( date ),
-				} )
-			),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		return {
-			onUpdateDate( date ) {
-				dispatch( 'core/editor' ).editPost( { date } );
-			},
-		};
-	} ),
-] )( PostSchedule );
+export default PostSchedule;
