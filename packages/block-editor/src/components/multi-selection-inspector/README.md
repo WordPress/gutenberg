@@ -15,7 +15,7 @@ This card contains information on the number of blocks selected, and in the case
 
 ### Usage
 
-Renders an block alignment toolbar with alignments options.
+Renders the multiselection card.
 
 ```jsx
 import { <MultiSelectionInspector /> } from '@wordpress/block-editor';
