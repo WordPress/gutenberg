@@ -74,8 +74,8 @@ export default function GalleryImage( {
 			} );
 		}
 
-		// unselect the caption so when the user selects other image and comeback
-		// the caption is not immediately selected
+		// Unselect the caption so when the user selects other image and comeback
+		// the caption is not immediately selected.
 		if ( captionSelected && ! isSelected ) {
 			setCaptionSelected( false );
 		}
