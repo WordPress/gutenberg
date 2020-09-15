@@ -4,7 +4,10 @@
         "name": "core/post-title",
         "isValid": true,
         "attributes": {
-            "level": 2
+			"level": 2,
+			"makeLink": false,
+			"linkTarget": "_blank",
+			"rel": ""
         },
         "innerBlocks": [],
         "originalContent": ""
