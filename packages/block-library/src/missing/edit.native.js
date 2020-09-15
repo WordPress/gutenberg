@@ -48,21 +48,14 @@ export class UnsupportedBlockEdit extends Component {
 		);
 
 		return (
-			<TouchableWithoutFeedback
-				accessibilityLabel={ __( 'Help icon' ) }
-				accessibilityRole={ 'button' }
-				accessibilityHint={ __( 'Tap here to show help' ) }
-				onPress={ this.toggleSheet }
-			>
-				<View style={ styles.helpIconContainer }>
-					<Icon
-						className="unsupported-icon-help"
-						label={ __( 'Help icon' ) }
-						icon={ help }
-						color={ infoIconStyle.color }
-					/>
-				</View>
-			</TouchableWithoutFeedback>
+			<View style={ styles.helpIconContainer }>
+				<Icon
+					className="unsupported-icon-help"
+					label={ __( 'Help icon' ) }
+					icon={ help }
+					color={ infoIconStyle.color }
+				/>
+			</View>
 		);
 	}
 
@@ -201,22 +194,30 @@ export class UnsupportedBlockEdit extends Component {
 		);
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
-			<View
-				style={ getStylesFromColorScheme(
-					styles.unsupportedBlock,
-					styles.unsupportedBlockDark
-				) }
+			<TouchableWithoutFeedback
+				disabled={ ! this.props.isSelected }
+				accessibilityLabel={ __( 'Help button' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Tap here to show help' ) }
+				onPress={ this.toggleSheet }
 			>
-				{ this.renderHelpIcon() }
-				<Icon
-					className={ iconClassName }
-					icon={ icon && icon.src ? icon.src : icon }
-					color={ iconStyle.color }
-				/>
-				<Text style={ titleStyle }>{ title }</Text>
-				{ subtitle }
-				{ this.renderSheet( title, originalName ) }
-			</View>
+				<View
+					style={ getStylesFromColorScheme(
+						styles.unsupportedBlock,
+						styles.unsupportedBlockDark
+					) }
+				>
+					{ this.renderHelpIcon() }
+					<Icon
+						className={ iconClassName }
+						icon={ icon && icon.src ? icon.src : icon }
+						color={ iconStyle.color }
+					/>
+					<Text style={ titleStyle }>{ title }</Text>
+					{ subtitle }
+					{ this.renderSheet( title, originalName ) }
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
