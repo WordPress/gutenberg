@@ -61,13 +61,11 @@ export default function save( { attributes } ) {
 		minHeight: minHeight || undefined,
 	};
 
-	const mediaStyle = {
-		objectPosition:
-			// prettier-ignore
-			focalPoint && ! hasParallax
-				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100) }%`
-				: undefined,
-	};
+	const objectPosition =
+		// prettier-ignore
+		focalPoint && ! hasParallax
+			? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+			: undefined;
 
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
@@ -108,7 +106,9 @@ export default function save( { attributes } ) {
 					) }
 					alt=""
 					src={ url }
-					style={ mediaStyle }
+					style={ { objectPosition } }
+					data-object-fit="cover"
+					data-object-position={ objectPosition }
 				/>
 			) }
 			{ isVideoBackground && url && (
@@ -119,7 +119,9 @@ export default function save( { attributes } ) {
 					loop
 					playsInline
 					src={ url }
-					style={ mediaStyle }
+					style={ { objectPosition } }
+					data-object-fit="cover"
+					data-object-position={ objectPosition }
 				/>
 			) }
 			<div className="wp-block-cover__inner-container">
