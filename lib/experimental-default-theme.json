@@ -142,7 +142,8 @@
 				"custom": false
 			},
 			"spacing": {
-				"custom": false
+				"custom": false,
+				"units": [ "px", "em", "rem", "vh", "vw" ]
 			}
 		}
 	}
