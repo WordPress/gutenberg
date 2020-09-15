@@ -12,9 +12,9 @@ import { Icon, chevronRight } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Button from '../button';
-import { useNavigationContext } from './context';
-import { ItemBadgeUI, ItemTitleUI, ItemUI } from './styles/navigation-styles';
+import Button from '../../button';
+import { useNavigationContext } from '../context';
+import { ItemBadgeUI, ItemTitleUI, ItemUI } from '../styles/navigation-styles';
 
 export default function NavigationItem( {
 	badge,
