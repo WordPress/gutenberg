@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { GroupTitleUI } from './styles/navigation-styles';
+import { GroupTitleUI } from '../styles/navigation-styles';
 
 export default function NavigationGroup( { children, className, title } ) {
 	const classes = classnames( 'components-navigation__group', className );

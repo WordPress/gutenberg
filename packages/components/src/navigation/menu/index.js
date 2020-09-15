@@ -12,13 +12,13 @@ import { Icon, chevronLeft } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { ROOT_MENU } from './constants';
-import { useNavigationContext } from './context';
+import { ROOT_MENU } from '../constants';
+import { useNavigationContext } from '../context';
 import {
 	MenuBackButtonUI,
 	MenuTitleUI,
 	MenuUI,
-} from './styles/navigation-styles';
+} from '../styles/navigation-styles';
 
 export default function NavigationMenu( {
 	backButtonLabel,
