@@ -2,13 +2,13 @@
 /**
  * External dependencies
  */
-const fs = require('fs');
-const path = require('path');
+const fs = require( 'fs' );
+const path = require( 'path' );
 
 /**
  * Internal dependencies
  */
-const {hasSameCoreSource} = require('./wordpress');
+const { hasSameCoreSource } = require( './wordpress' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -24,27 +24,27 @@ const {hasSameCoreSource} = require('./wordpress');
  *
  * @return {string[]} An array of volumes to mount in string format.
  */
-function getMounts(config, wordpressDefault = 'wordpress') {
+function getMounts( config, wordpressDefault = 'wordpress' ) {
 	// Top-level WordPress directory mounts (like wp-content/themes)
-	const directoryMounts = Object.entries(config.mappings).map(
-		([wpDir, source]) => `${source.path}:/var/www/html/${wpDir}`
+	const directoryMounts = Object.entries( config.mappings ).map(
+		( [ wpDir, source ] ) => `${ source.path }:/var/www/html/${ wpDir }`
 	);
 
 	const pluginMounts = config.pluginSources.map(
-		(source) =>
-			`${source.path}:/var/www/html/wp-content/plugins/${source.basename}`
+		( source ) =>
+			`${ source.path }:/var/www/html/wp-content/plugins/${ source.basename }`
 	);
 
 	const themeMounts = config.themeSources.map(
-		(source) =>
-			`${source.path}:/var/www/html/wp-content/themes/${source.basename}`
+		( source ) =>
+			`${ source.path }:/var/www/html/wp-content/themes/${ source.basename }`
 	);
 
 	const coreMount = `${
 		config.coreSource ? config.coreSource.path : wordpressDefault
-		}:/var/www/html`;
+	}:/var/www/html`;
 
-	return [coreMount, ...directoryMounts, ...pluginMounts, ...themeMounts];
+	return [ coreMount, ...directoryMounts, ...pluginMounts, ...themeMounts ];
 }
 
 /**
@@ -55,9 +55,9 @@ function getMounts(config, wordpressDefault = 'wordpress') {
  *
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
-module.exports = function buildDockerComposeConfig(config) {
-	const developmentMounts = getMounts(config.env.development);
-	const testsMounts = getMounts(config.env.tests, 'tests-wordpress');
+module.exports = function buildDockerComposeConfig( config ) {
+	const developmentMounts = getMounts( config.env.development );
+	const testsMounts = getMounts( config.env.tests, 'tests-wordpress' );
 
 	// When both tests and development reference the same WP source, we need to
 	// ensure that tests pulls from a copy of the files so that it maintains
@@ -81,46 +81,61 @@ module.exports = function buildDockerComposeConfig(config) {
 	// https://github.com/WordPress/gutenberg/issues/21164
 	if (
 		config.env.development.coreSource &&
-		hasSameCoreSource([config.env.development, config.env.tests])
+		hasSameCoreSource( [ config.env.development, config.env.tests ] )
 	) {
 		const wpSource = config.env.development.coreSource;
 		testsMounts.shift(); // Remove normal core mount.
 		testsMounts.unshift(
 			...[
-				`${wpSource.testsPath}:/var/www/html`,
-				...(wpSource.type === 'local'
+				`${ wpSource.testsPath }:/var/www/html`,
+				...( wpSource.type === 'local'
 					? fs
-						.readdirSync(wpSource.path)
-						.filter(
-							(filename) =>
-								filename !== 'wp-config.php' &&
-								filename !== 'wp-config-sample.php' &&
-								filename !== 'wp-content'
-						)
-						.map(
-							(filename) =>
-								`${path.join(
-									wpSource.path,
-									filename
-								)}:/var/www/html/${filename}`
-						)
-					: []),
+							.readdirSync( wpSource.path )
+							.filter(
+								( filename ) =>
+									filename !== 'wp-config.php' &&
+									filename !== 'wp-config-sample.php' &&
+									filename !== 'wp-content'
+							)
+							.map(
+								( filename ) =>
+									`${ path.join(
+										wpSource.path,
+										filename
+									) }:/var/www/html/${ filename }`
+							)
+					: [] ),
 			]
 		);
 	}
 
 	// Set the default ports based on the config values.
-	const developmentPorts = `\${WP_ENV_PORT:-${config.env.development.port}}:80`;
-	const testsPorts = `\${WP_ENV_TESTS_PORT:-${config.env.tests.port}}:80`;
+	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
+	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
 	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
-	const phpVersion = `\${LOCAL_PHP:-${config.phpVersion}}:`;
-	const wpImage = 'wordpress' + (phpVersion === '' ? '' : ':php' + phpVersion);
-	const cliImage = 'wordpress:cli' + (phpVersion === '' ? '' : '-php' + phpVersion);
-	// Use PHPUnit version 6 for PHP 5.6, otherwise use version 7. This will
-	// not support PHP 8.0 which requires PHPUnit version 9. More logic or a
-	// PHPUnit version configuration item would also need to be supported.
-	const phpunitImage = 'wordpressdevelop/phpunit:' + (phpVersion === '' ? 'latest' : (phpVersion === '5.6' ? '6-php-' + phpVersion : '7-php-' + phpVersion + '-fpm'));
+	const phpVersion = `\${LOCAL_PHP:-${ config.phpVersion }}:`;
+	const wpImage =
+		'wordpress' + ( phpVersion === '' ? '' : ':php' + phpVersion );
+	const cliImage =
+		'wordpress:cli' + ( phpVersion === '' ? '' : '-php' + phpVersion );
+	// Defaults are to use the most recent version of PHPUnit that provides
+	// support for the specified version of PHP.
+	let phpunitVersion = '8';
+	if ( phpVersion === '5.6' ) {
+		phpunitVersion = '5';
+	} else if ( phpVersion === '7.0' ) {
+		phpunitVersion = '6';
+	} else if ( phpVersion === '7.1' ) {
+		phpunitVersion = '7';
+	} else if ( phpVersion === '8.0' ) {
+		phpunitVersion = '9';
+	}
+	const phpunitImage =
+		'wordpressdevelop/phpunit:' +
+		( phpVersion === ''
+			? 'latest'
+			: phpunitVersion + '-php-' + phpVersion + '-fpm' );
 
 	// The www-data user in wordpress:cli has a different UID (82) to the
 	// www-data user in wordpress (33). Ensure we use the wordpress www-data
@@ -133,49 +148,49 @@ module.exports = function buildDockerComposeConfig(config) {
 		services: {
 			mysql: {
 				image: 'mariadb',
-				ports: ['3306'],
+				ports: [ '3306' ],
 				environment: {
 					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
 				},
-				volumes: ['mysql:/var/lib/mysql'],
+				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
 			wordpress: {
-				depends_on: ['mysql'],
+				depends_on: [ 'mysql' ],
 				image: wpImage,
-				ports: [developmentPorts],
+				ports: [ developmentPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'wordpress',
 				},
 				volumes: developmentMounts,
 			},
 			'tests-wordpress': {
-				depends_on: ['mysql'],
+				depends_on: [ 'mysql' ],
 				image: wpImage,
-				ports: [testsPorts],
+				ports: [ testsPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'tests-wordpress',
 				},
 				volumes: testsMounts,
 			},
 			cli: {
-				depends_on: ['wordpress'],
+				depends_on: [ 'wordpress' ],
 				image: cliImage,
 				volumes: developmentMounts,
 				user: cliUser,
 			},
 			'tests-cli': {
-				depends_on: ['tests-wordpress'],
+				depends_on: [ 'tests-wordpress' ],
 				image: cliImage,
 				volumes: testsMounts,
 				user: cliUser,
 			},
 			composer: {
 				image: 'composer',
-				volumes: [`${config.configDirectoryPath}:/app`],
+				volumes: [ `${ config.configDirectoryPath }:/app` ],
 			},
 			phpunit: {
 				image: phpunitImage,
-				depends_on: ['tests-wordpress'],
+				depends_on: [ 'tests-wordpress' ],
 				volumes: [
 					...testsMounts,
 					'phpunit-uploads:/var/www/html/wp-content/uploads',
@@ -188,8 +203,8 @@ module.exports = function buildDockerComposeConfig(config) {
 			},
 		},
 		volumes: {
-			...(!config.coreSource && {wordpress: {}}),
-			...(!config.coreSource && {'tests-wordpress': {}}),
+			...( ! config.coreSource && { wordpress: {} } ),
+			...( ! config.coreSource && { 'tests-wordpress': {} } ),
 			mysql: {},
 			'phpunit-uploads': {},
 		},
