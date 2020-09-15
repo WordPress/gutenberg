@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { SelectControl } from '@wordpress/components';
@@ -31,11 +36,20 @@ function PatternInserterPanel( {
 		);
 	};
 
+	const getPanelHeaderClassName = () => {
+		return classnames(
+			'block-editor-inserter__panel-header',
+			'block-editor-inserter__panel-header-patterns'
+		);
+	};
+
 	return (
 		<>
-			<div className="block-editor-inserter__panel-header">
+			<div className={ getPanelHeaderClassName() }>
 				<SelectControl
+					className="block-editor-inserter__panel-dropdown"
 					label={ __( 'Filter patterns' ) }
+					hideLabelFromVision
 					value={ selectedCategory.name }
 					onChange={ onChangeSelect }
 					options={ categoryOptions() }

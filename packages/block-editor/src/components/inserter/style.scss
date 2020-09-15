@@ -157,13 +157,16 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20 $grid-unit-20 0;
 }
 
+.block-editor-inserter__panel-header-patterns {
+	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-10;
+}
+
 .block-editor-inserter__panel-content {
 	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__panel-title,
 .block-editor-inserter__panel-title button,
-.block-editor-inserter__panel-header-dropdown button,
 .components-custom-select-control__menu li {
 	margin: 0 $grid-unit-15 0 0;
 	color: $gray-700;
@@ -172,40 +175,12 @@ $block-inserter-tabs-height: 44px;
 	font-weight: 500;
 }
 
-.block-editor-inserter__panel-header-dropdown {
-	button {
-		min-width: auto;
-		border-color: transparent;
-		margin: -$grid-unit-10;
-	}
+.block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
+	line-height: 1.2;
+}
 
-	.components-custom-select-control__menu {
-		min-width: 200px;
-		border: none;
-
-		&[aria-hidden="false"] {
-			border: 1px solid $gray-400;
-			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-			border-radius: 2px;
-
-			li {
-				margin: 0;
-				padding-left: 50px;
-				color: $gray-900;
-			}
-
-			li.is-selected {
-				/* stylelint-disable */
-				background: 15px 50% url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z" fill="currentColor"></path></svg>') no-repeat;
-				background-size: 24px 24px;
-				/* stylelint-enable */
-			}
-
-			li.is-highlighted {
-				background-color: $gray-100;
-			}
-		}
-	}
+.block-editor-inserter__panel-dropdown select {
+	border: none;
 }
 
 .block-editor-inserter__block-list {
