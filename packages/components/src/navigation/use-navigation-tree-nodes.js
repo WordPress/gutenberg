@@ -6,6 +6,8 @@ import { useState } from '@wordpress/element';
 export const useNavigationTreeNodes = () => {
 	const [ nodes, setNodes ] = useState( {} );
 
+	const getNode = ( key ) => nodes[ key ];
+
 	const addNode = ( key, value ) =>
 		setNodes( ( original ) => ( {
 			...original,
@@ -19,5 +21,5 @@ export const useNavigationTreeNodes = () => {
 			return originalCopy;
 		} );
 
-	return { nodes, addNode, removeNode };
+	return { nodes, getNode, addNode, removeNode };
 };

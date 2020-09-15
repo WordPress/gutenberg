@@ -19,6 +19,9 @@ export const NavigationContext = createContext( {
 	setActiveMenu: noop,
 
 	navigationTree: {
+		getItem: noop,
+		getMenu: noop,
+
 		items: {},
 		addItem: noop,
 		removeItem: noop,
