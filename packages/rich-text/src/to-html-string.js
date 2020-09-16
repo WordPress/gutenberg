@@ -23,7 +23,7 @@ import { toTree } from './to-tree';
  * @param {Object}        $1                      Named argements.
  * @param {RichTextValue} $1.value                Rich text value.
  * @param {string}        [$1.multilineTag]       Multiline tag.
- * @param {?boolean}      [$1.preserveWhiteSpace] Whether or not to use newline
+ * @param {boolean}       [$1.preserveWhiteSpace] Whether or not to use newline
  *                                                characters for line breaks.
  *
  * @return {string} HTML string.

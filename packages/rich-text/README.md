@@ -117,7 +117,7 @@ _Parameters_
 
 _Returns_
 
--   `?RichTextReplacement`: Active object, or undefined.
+-   `(RichTextFormat|void)`: Active object, or undefined.
 
 <a name="getTextContent" href="#getTextContent">#</a> **getTextContent**
 
@@ -159,7 +159,7 @@ removed. Indices are retrieved from the selection if none are provided.
 _Parameters_
 
 -   _value_ `RichTextValue`: Value to modify.
--   _formatToInsert_ `RichTextReplacement`: Format to insert as object.
+-   _formatToInsert_ `RichTextFormat`: Format to insert as object.
 -   _startIndex_ `[number]`: Start index.
 -   _endIndex_ `[number]`: End index.
 
@@ -325,7 +325,7 @@ _Parameters_
 -   _$1_ `Object`: Named argements.
 -   _$1.value_ `RichTextValue`: Rich text value.
 -   _$1.multilineTag_ `[string]`: Multiline tag.
--   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to use newline characters for line breaks.
+-   _$1.preserveWhiteSpace_ `[boolean]`: Whether or not to use newline characters for line breaks.
 
 _Returns_
 

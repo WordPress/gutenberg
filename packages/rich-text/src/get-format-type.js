@@ -10,7 +10,7 @@ import { select } from '@wordpress/data';
  *
  * @param {string} name Format name.
  *
- * @return {?RichTextFormatType} Format type.
+ * @return {RichTextFormatType|undefined} Format type.
  */
 export function getFormatType( name ) {
 	return select( 'core/rich-text' ).getFormatType( name );

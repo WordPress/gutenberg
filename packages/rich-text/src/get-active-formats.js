@@ -8,7 +8,7 @@
  * @param {Array}         EMPTY_ACTIVE_FORMATS Array to return if there are no
  *                                             active formats.
  *
- * @return {?RichTextFormatList} Active format objects.
+ * @return {RichTextFormatList} Active format objects.
  */
 export function getActiveFormats(
 	{ formats, start, end, activeFormats },

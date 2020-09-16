@@ -6,7 +6,7 @@ import { insert } from './insert';
 import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 
 /** @typedef {import('./create').RichTextValue} RichTextValue */
-/** @typedef {import('./create').RichTextReplacement} RichTextReplacement */
+/** @typedef {import('./create').RichTextFormat} RichTextFormat */
 
 /**
  * Insert a format as an object into a Rich Text value at the given
@@ -14,7 +14,7 @@ import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
  * removed. Indices are retrieved from the selection if none are provided.
  *
  * @param {RichTextValue}  value          Value to modify.
- * @param {RichTextReplacement} formatToInsert Format to insert as object.
+ * @param {RichTextFormat} formatToInsert Format to insert as object.
  * @param {number}         [startIndex]   Start index.
  * @param {number}         [endIndex]     End index.
  *
