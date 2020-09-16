@@ -56,7 +56,7 @@ export class BlockListItem extends Component {
 		const { blockWidth } = this.state;
 
 		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.full ) {
-			return 0;
+			return -1;
 		}
 
 		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.wide ) {
@@ -103,7 +103,6 @@ export class BlockListItem extends Component {
 			contentResizeMode,
 			shouldShowInnerBlockAppender,
 			parentBlockAlignment,
-			blockName,
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
@@ -114,7 +113,7 @@ export class BlockListItem extends Component {
 				align={ blockAlignment }
 				parentBlockAlignment={ parentBlockAlignment }
 				style={ readableContentViewStyle }
-				blockName={ blockName }
+				parentWidth={ restProps.parentWidth }
 			>
 				<View
 					style={ this.getContentStyles( readableContentViewStyle ) }
@@ -178,7 +177,6 @@ export default compose( [
 
 			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 			const { attributes } = block || {};
-			const blockName = block.name || '';
 			const { align } = attributes || {};
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
@@ -195,7 +193,6 @@ export default compose( [
 				hasParents,
 				blockAlignment: align,
 				parentBlockAlignment,
-				blockName,
 			};
 		}
 	),

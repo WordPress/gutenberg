@@ -14,20 +14,18 @@ import { ALIGNMENT_BREAKPOINTS, WIDE_ALIGNMENTS } from '@wordpress/components';
 import styles from './style.scss';
 
 const PIXEL_RATIO = 2;
+const MARGIN = 16;
 
 const ReadableContentView = ( {
 	align,
 	reversed,
 	children,
 	style,
-	parentBlockAlignment,
-	blockName,
+	parentWidth,
 } ) => {
 	const { width, height } = Dimensions.get( 'window' );
 	const [ windowWidth, setWindowWidth ] = useState( width );
 	const [ windowRatio, setWindowRatio ] = useState( width / height );
-
-	const isColumn = blockName === 'core/column';
 
 	function onDimensionsChange( { window } ) {
 		setWindowWidth( window.width );
@@ -75,10 +73,7 @@ const ReadableContentView = ( {
 						: styles.centeredContent,
 					style,
 					styles[ align ],
-					( parentBlockAlignment === 'full' ||
-						parentBlockAlignment === 'wide' ) &&
-						isColumn &&
-						styles.full,
+					parentWidth && { maxWidth: parentWidth + 2 * MARGIN },
 					align === WIDE_ALIGNMENTS.alignments.wide &&
 						getWideStyles(),
 				] }
