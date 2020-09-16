@@ -64,14 +64,11 @@
 /**
  * Buttons in the Toolbar
  */
+
 .edit-post-header__settings {
 	// Adjust button paddings to scale better to mobile.
-	.components-button.editor-post-save-draft,
 	.editor-post-saved-state,
-	.components-button.editor-post-switch-to-draft,
-	.components-button.editor-post-preview,
-	.components-button.block-editor-post-preview__dropdown {
-		padding: 0 #{ $grid-unit-15 / 2 };
+	.components-button.components-button {
 		margin-right: $grid-unit-05;
 
 		@include break-small() {
@@ -79,16 +76,14 @@
 		}
 	}
 
-	.components-button.block-editor-post-preview__dropdown,
-	.components-button.editor-post-publish-button,
-	.components-button.editor-post-publish-panel__toggle {
+	.editor-post-saved-state,
+	.components-button.is-tertiary {
 		padding: 0 #{ $grid-unit-15 / 2 };
-		margin-right: $grid-unit-05;
+	}
 
-		@include break-small() {
-			padding: 0 $grid-unit-15;
-			margin-right: $grid-unit-15;
-		}
+	.edit-post-more-menu .components-button,
+	.interface-pinned-items .components-button {
+		margin-right: 0;
 	}
 }
 

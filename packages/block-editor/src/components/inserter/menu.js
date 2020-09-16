@@ -73,6 +73,11 @@ function InserterMenu( {
 		onSelect();
 	};
 
+	const onInsertPattern = ( blocks, patternName ) => {
+		onInsertBlocks( blocks, { patternName } );
+		onSelect();
+	};
+
 	const onHover = ( item ) => {
 		onToggleInsertionPoint( !! item );
 		setHoveredItem( item );
@@ -101,7 +106,10 @@ function InserterMenu( {
 	);
 
 	const patternsTab = (
-		<BlockPatternsTabs onInsert={ onInsert } filterValue={ filterValue } />
+		<BlockPatternsTabs
+			onInsert={ onInsertPattern }
+			filterValue={ filterValue }
+		/>
 	);
 
 	const reusableBlocksTab = (

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { difference } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
@@ -44,6 +39,11 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 	let candidateDistance;
 
 	elements.forEach( ( element, index ) => {
+		// Ensure the element is a block. It should have the `wp-block` class.
+		if ( ! element.classList.contains( 'wp-block' ) ) {
+			return;
+		}
+
 		const rect = element.getBoundingClientRect();
 		const [ distance, edge ] = getDistanceToNearestEdge(
 			position,
@@ -126,16 +126,7 @@ export default function useBlockDropZone( {
 
 	useEffect( () => {
 		if ( position ) {
-			// Get the root elements of blocks inside the element, ignoring
-			// InnerBlocks item wrappers and the children of the blocks.
-			const blockElements = difference(
-				Array.from( element.current.querySelectorAll( '.wp-block' ) ),
-				Array.from(
-					element.current.querySelectorAll(
-						':scope .wp-block .wp-block'
-					)
-				)
-			);
+			const blockElements = Array.from( element.current.children );
 
 			const targetIndex = getNearestBlockIndex(
 				blockElements,

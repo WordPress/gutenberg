@@ -15,9 +15,9 @@ function gutenberg_register_colors_support( $block_type ) {
 	if ( property_exists( $block_type, 'supports' ) ) {
 		$color_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), false );
 	}
-	$has_text_colors_support       = is_array( $color_support ) || $color_support;
-	$has_background_colors_support = $has_text_colors_support;
-	$has_gradients_support         = $has_text_colors_support && gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
+	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'text' ), true ) );
+	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'background' ), true ) );
+	$has_gradients_support         = gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
@@ -61,10 +61,10 @@ function gutenberg_register_colors_support( $block_type ) {
  */
 function gutenberg_apply_colors_support( $attributes, $block_attributes, $block_type ) {
 	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( '__experimentalColor' ), false );
-	$has_text_colors_support       = is_array( $color_support ) || $color_support;
-	$has_background_colors_support = $has_text_colors_support;
-	$has_link_colors_support       = $has_text_colors_support && gutenberg_experimental_get( $color_support, array( 'linkColor' ), false );
-	$has_gradients_support         = $has_text_colors_support && gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
+	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'text' ), true ) );
+	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'background' ), true ) );
+	$has_link_colors_support       = gutenberg_experimental_get( $color_support, array( 'linkColor' ), false );
+	$has_gradients_support         = gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
 
 	// Text Colors.
 	// Check support for text colors.

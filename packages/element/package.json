@@ -4,12 +4,7 @@
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
-	"keywords": [
-		"wordpress",
-		"gutenberg",
-		"element",
-		"react"
-	],
+	"keywords": [ "wordpress", "gutenberg", "element", "react" ],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/element/README.md",
 	"repository": {
 		"type": "git",
@@ -26,6 +21,8 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
+		"@types/react": "^16.9.0",
+		"@types/react-dom": "^16.9.0",
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.19",
 		"react": "^16.13.1",

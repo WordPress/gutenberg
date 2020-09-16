@@ -69,14 +69,9 @@ export const getNewBlockTypes = createRegistrySelector(
 		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
 		const installedBlockTypes = getInstalledBlockTypes( state );
 
-		const newBlockTypes = [];
-		installedBlockTypes.forEach( ( blockType ) => {
-			if ( hasBlockType( blockType, usedBlockTree ) ) {
-				newBlockTypes.push( blockType );
-			}
-		} );
-
-		return newBlockTypes;
+		return installedBlockTypes.filter( ( blockType ) =>
+			hasBlockType( blockType, usedBlockTree )
+		);
 	}
 );
 
@@ -93,14 +88,9 @@ export const getUnusedBlockTypes = createRegistrySelector(
 		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
 		const installedBlockTypes = getInstalledBlockTypes( state );
 
-		const newBlockTypes = [];
-		installedBlockTypes.forEach( ( blockType ) => {
-			if ( ! hasBlockType( blockType, usedBlockTree ) ) {
-				newBlockTypes.push( blockType );
-			}
-		} );
-
-		return newBlockTypes;
+		return installedBlockTypes.filter(
+			( blockType ) => ! hasBlockType( blockType, usedBlockTree )
+		);
 	}
 );
 
