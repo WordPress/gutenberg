@@ -39,7 +39,6 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
-import * as legacyWidget from './legacy-widget';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -94,7 +93,7 @@ import * as postTags from './post-tags';
  * @param {Object} block The block to be registered.
  *
  */
-const registerBlock = ( block ) => {
+export const registerBlock = ( block ) => {
 	if ( ! block ) {
 		return;
 	}
@@ -193,7 +192,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 
 				[
 					widgetArea,
-					legacyWidget,
 					navigation,
 					navigationLink,
 
