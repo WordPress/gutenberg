@@ -16,6 +16,10 @@ import {
 import { _x } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
+import {
+	__experimentalGetBlockLabel as getBlockLabel,
+	getBlockType,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -79,15 +83,19 @@ export default function Header( {
 	const displayBlockToolbar =
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
-	const { hoveredEntityIds, getBlock } = useSelect( ( select ) => {
-		return {
-			hoveredEntityIds: select( 'core/edit-site' ).getHoveredEntities(),
-			getBlock: select( 'core/block-editor' ).getBlock,
-		};
-	} );
+	const hoveredName = useSelect( ( select ) => {
+		const hoveredEntityIds = select(
+			'core/edit-site'
+		).getHoveredEntities();
+		const block = select( 'core/block-editor' ).getBlock(
+			hoveredEntityIds[ 0 ]
+		);
 
-	const hoveredName =
-		getBlock( hoveredEntityIds[ 0 ] )?.attributes.slug || '';
+		return (
+			block &&
+			getBlockLabel( getBlockType( block.name ), block.attributes )
+		);
+	} );
 
 	return (
 		<>
