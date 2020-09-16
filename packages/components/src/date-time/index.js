@@ -43,6 +43,7 @@ export class DateTimePicker extends Component {
 			is12Hour,
 			isInvalidDate,
 			onMonthPreviewed,
+			onMonthChange,
 			onChange,
 			events,
 		} = this.props;
@@ -61,6 +62,7 @@ export class DateTimePicker extends Component {
 							onChange={ onChange }
 							isInvalidDate={ isInvalidDate }
 							onMonthPreviewed={ onMonthPreviewed }
+							onMonthChange={ onMonthChange }
 							events={ events }
 						/>
 					</>
