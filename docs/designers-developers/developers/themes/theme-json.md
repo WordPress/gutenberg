@@ -70,6 +70,8 @@ Every context has the same structure, divided in two sections: `settings` and `s
 }
 ```
 
+This structure is the same for the three different origins that exist: core, themes, and users. Themes can override core's defaults by creating a file called `experimental-theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
+
 ### Settings
 
 The settings section has the following structure and default values:
