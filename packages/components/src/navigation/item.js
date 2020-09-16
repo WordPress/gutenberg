@@ -27,7 +27,7 @@ export default function NavigationItem( {
 	title,
 	...props
 } ) {
-	const { activeItem, setActiveItem, setActiveMenu } = useNavigationContext();
+	const { activeItem, setActiveMenu } = useNavigationContext();
 
 	const classes = classnames( 'components-navigation__item', className, {
 		'is-active': item && activeItem === item,
@@ -36,9 +36,8 @@ export default function NavigationItem( {
 	const onItemClick = () => {
 		if ( navigateToMenu ) {
 			setActiveMenu( navigateToMenu );
-		} else if ( ! href ) {
-			setActiveItem( item );
 		}
+
 		onClick();
 	};
 

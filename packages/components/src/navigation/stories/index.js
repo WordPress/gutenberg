@@ -26,35 +26,45 @@ const Container = styled.div`
 	max-width: 246px;
 `;
 
-// Mock navigation link
-const Link = ( { href, children, onClick } ) => (
-	<a
-		href={ href }
-		onClick={ ( event ) => {
-			event.preventDefault();
-			onClick();
-		} }
-	>
-		{ children }
-	</a>
-);
-
 function Example() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
+
+	// Mock navigation link
+	const Link = ( { href, children } ) => (
+		<a
+			className="components-button"
+			href={ href }
+			// Since we're not actually navigating pages, simulate it with on onClick
+			onClick={ ( event ) => {
+				event.preventDefault();
+				const item = href.replace( 'https://example.com/', '' );
+				setActiveItem( item );
+			} }
+		>
+			{ children }
+		</a>
+	);
 
 	return (
 		<Container>
 			<Navigation
 				activeItem={ activeItem }
 				activeMenu={ activeMenu }
-				onActivateItem={ setActiveItem }
 				onActivateMenu={ setActiveMenu }
 			>
 				<NavigationMenu title="Home">
 					<NavigationGroup title="Group 1">
-						<NavigationItem item="item-1" title="Item 1" />
-						<NavigationItem item="item-2" title="Item 2" />
+						<NavigationItem item="item-1" title="Item 1">
+							<Link href="https://example.com/item-1">
+								Item 1
+							</Link>
+						</NavigationItem>
+						<NavigationItem item="item-2">
+							<Link href="https://example.com/item-2">
+								Item 2
+							</Link>
+						</NavigationItem>
 						<NavigationItem
 							badge="2"
 							item="item-3"
@@ -70,18 +80,20 @@ function Example() {
 							title="External link"
 						/>
 						<NavigationItem item="item-5">
-							<Link
+							<a
 								href="https://wordpress.org/"
-								item="item-5"
 								// Since we're not actually navigating pages, simulate it with on onClick
-								onClick={ () => setActiveItem( 'item-5' ) }
+								onClick={ ( event ) => {
+									event.preventDefault();
+									setActiveItem( 'item-5' );
+								} }
 							>
 								<img
 									alt="WordPress Logo"
 									src="https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png"
 									style={ { width: 50, height: 50 } }
 								/>
-							</Link>
+							</a>
 						</NavigationItem>
 					</NavigationGroup>
 				</NavigationMenu>
@@ -92,8 +104,17 @@ function Example() {
 					parentMenu="root"
 					title="Category"
 				>
-					<NavigationItem badge="1" item="child-1" title="Child 1" />
-					<NavigationItem item="child-2" title="Child 2" />
+					<NavigationItem
+						badge="1"
+						item="child-1"
+						title="Child 1"
+						onClick={ () => setActiveItem( 'child-1' ) }
+					/>
+					<NavigationItem
+						item="child-2"
+						title="Child 2"
+						onClick={ () => setActiveItem( 'child-2' ) }
+					/>
 					<NavigationItem
 						navigateToMenu="nested-category"
 						item="child-3"
@@ -107,8 +128,16 @@ function Example() {
 					parentMenu="category"
 					title="Nested Category"
 				>
-					<NavigationItem item="sub-child-1" title="Sub Child 1" />
-					<NavigationItem item="sub-child-2" title="Sub Child 2" />
+					<NavigationItem
+						item="sub-child-1"
+						title="Sub Child 1"
+						onClick={ () => setActiveItem( 'sub-child-1' ) }
+					/>
+					<NavigationItem
+						item="sub-child-2"
+						title="Sub Child 2"
+						onClick={ () => setActiveItem( 'sub-child-2' ) }
+					/>
 				</NavigationMenu>
 			</Navigation>
 

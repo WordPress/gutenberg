@@ -22,17 +22,10 @@ export default function Navigation( {
 	activeMenu = ROOT_MENU,
 	children,
 	className,
-	onActivateItem = noop,
 	onActivateMenu = noop,
 } ) {
-	const [ item, setItem ] = useState( activeItem );
 	const [ menu, setMenu ] = useState( activeMenu );
 	const [ slideOrigin, setSlideOrigin ] = useState();
-
-	const setActiveItem = ( itemId ) => {
-		setItem( itemId );
-		onActivateItem( itemId );
-	};
 
 	const setActiveMenu = ( menuId, slideInOrigin = 'left' ) => {
 		setSlideOrigin( slideInOrigin );
@@ -49,18 +42,14 @@ export default function Navigation( {
 	}, [] );
 
 	useEffect( () => {
-		if ( activeItem !== item ) {
-			setActiveItem( activeItem );
-		}
 		if ( activeMenu !== menu ) {
 			setActiveMenu( activeMenu );
 		}
 	}, [ activeItem, activeMenu ] );
 
 	const context = {
-		activeItem: item,
+		activeItem,
 		activeMenu: menu,
-		setActiveItem,
 		setActiveMenu,
 	};
 
