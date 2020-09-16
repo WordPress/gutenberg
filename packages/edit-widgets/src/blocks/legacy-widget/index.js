@@ -58,17 +58,25 @@ function legacyWidgetsToBlockVariations( availableLegacyWidgets ) {
 }
 
 function legacyWidgetToBlockVariation( className, widget ) {
-	return {
-		attributes: {
-			id_base: widget.id_base,
-			referenceWidgetName: widget.isReferenceWidget ? className : null,
-			widgetClass: widget.isReferenceWidget ? null : className,
-			instance: {},
-		},
+	const blockVariation = {
+		attributes: {},
 		category: 'widgets',
 		description: widget.description,
 		icon: settings.icon,
 		name: className,
 		title: widget.name,
 	};
+	if ( widget.isReferenceWidget ) {
+		blockVariation.attributes = {
+			referenceWidgetName: className,
+			instance: {},
+		};
+	} else {
+		blockVariation.attributes = {
+			id_base: widget.id_base,
+			widgetClass: className,
+			instance: {},
+		};
+	}
+	return blockVariation;
 }

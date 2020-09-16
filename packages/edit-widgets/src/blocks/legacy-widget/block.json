@@ -5,9 +5,6 @@
 		"widgetClass": {
 			"type": "string"
 		},
-		"widgetId": {
-			"type": "string"
-		},
 		"referenceWidgetName": {
 			"type": "string"
 		},

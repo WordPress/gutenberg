@@ -29,9 +29,9 @@ import CustomizerEditWidgetsInitializer from './components/customizer-edit-widge
  */
 export function initialize( id, settings ) {
 	registerCoreBlocks();
-	registerBlock( legacyWidget );
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
+		registerBlock( legacyWidget.create( settings ) );
 	}
 	render(
 		<EditWidgetsInitializer settings={ settings } />,
