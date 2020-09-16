@@ -21,7 +21,7 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 
 function BlockPatternsSearchResults( { filterValue, onInsert } ) {
-	const [ allPatterns, , onClick ] = usePatternsState( onInsert, 'all' );
+	const [ allPatterns, , onClick ] = usePatternsState( onInsert );
 
 	const filteredPatterns = useMemo(
 		() => searchItems( allPatterns, filterValue ),
