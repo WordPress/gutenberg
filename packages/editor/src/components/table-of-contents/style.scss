@@ -46,6 +46,8 @@
 	color: $gray-900;
 	margin-bottom: 0;
 
+	// add a horionztal line between rows
+	// and some spacing to keep the spacing consistent
 	& + & {
 		border-top: $border-width solid $gray-200;
 		margin-top: $grid-unit-10;
