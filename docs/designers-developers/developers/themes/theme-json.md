@@ -190,7 +190,7 @@ The goal is that presets can be defined using this format, although, right now, 
 
 ### Styles
 
-Each block will declare which style properties it exposes. This has been coined as "implicit style attributes" of the block. These properties are then used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
+Each block declares which style properties it exposes. This has been coined as "implicit style attributes" of the block. These properties are then used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
 
 ```json
 {
@@ -211,7 +211,49 @@ Each block will declare which style properties it exposes. This has been coined 
 }
 ```
 
+For example, an input like this:
+
+```json
+{
+  "core/heading/h1": {
+    "styles": {
+      "color": {
+        "text": "var(--wp--preset--color--primary)"
+      },
+      "typography": {
+        "fontSize": "calc(1px * var(--wp--preset--font-size--huge))"
+      }
+    }
+  },
+  "core/heading/h4": {
+    "styles": {
+      "color": {
+        "text": "var(--wp--preset--color--secondary)"
+      },
+      "typography": {
+        "fontSize": "var(--wp--preset--font-size--normal)"
+      }
+    }
+  }
+}
+```
+
+will append the following style rules to the stylesheet:
+
+```css
+h1 {
+  color: var(--wp--preset--color--primary);
+  font-size: calc(1px * var(--wp--preset--font-size--huge));
+}
+h4 {
+  color: var(--wp--preset--color--secondary);
+  font-size: calc(1px * var(--wp--preset--font-size--normal));
+}
+```
+
 #### Color Properties
+
+These are the current color properties supported by blocks:
 
 | Context | Background | Gradient | Link | Text |
 | --- | --- | --- | --- | --- |
@@ -235,6 +277,8 @@ Each block will declare which style properties it exposes. This has been coined 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 
 #### Typography Properties
+
+These are the current typography properties supported by blocks:
 
 | Context | Font Size | Line Height |
 | --- | --- | --- |
