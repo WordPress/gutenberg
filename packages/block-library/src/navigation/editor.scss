@@ -73,6 +73,20 @@ $navigation-item-height: 46px;
 	}
 }
 
+// Move Separators to before element cause after is used for outlining the block.
+.wp-block-navigation > .wp-block-navigation__container > .wp-block-navigation-link {
+	&::before {
+		content: attr(data-separator);
+	}
+
+	&:first-child::before {
+		display: none;
+	}
+	&::after {
+		content: "";
+	}
+}
+
 /**
  * Colors Selector component
  */
