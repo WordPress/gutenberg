@@ -38,7 +38,7 @@ The Block Editor already allows the control of specific settings such as alignme
 
 The `experimental-theme.json` file is divided into sections known as "contexts", that represent a different CSS selector. For example, the `core/paragraph` context maps to `p` while `core/group` maps to `.wp-block-group`. In general, one block will map to a single context as in the cases mentioned. There are cases where one block can generate multiple contexts (different CSS selectors). For example, the heading block generates six different contexts (`core/heading/h1`, `core/heading/h2`, etc), one for each different selector (h1, h2, etc).
 
-```json
+```
 {
   "global": { ... },
   "core/paragraph": { ... },
@@ -54,7 +54,7 @@ The `experimental-theme.json` file is divided into sections known as "contexts",
 
 Every context has the same structure, divided in two sections: `settings` and `styles`. The `settings` are used to control the editor (enable/disable certain features, declare presets), taking over what was previously declared via `add_theme_support`. The `styles` will be used to create new style rules to be appended to a new stylesheet `global-styles-inline-css` enqueued in the front-end and post editor.
 
-```json
+```
 {
   "some/context": {
     "settings": {
@@ -76,7 +76,7 @@ This structure is the same for the three different origins that exist: core, the
 
 The settings section has the following structure and default values:
 
-```json
+```
 {
   "some/context": {
     "settings": {
@@ -194,7 +194,7 @@ The goal is that presets can be defined using this format, although, right now, 
 
 Each block declares which style properties it exposes. This has been coined as "implicit style attributes" of the block. These properties are then used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
 
-```json
+```
 {
   "some/context": {
     "styles": {
