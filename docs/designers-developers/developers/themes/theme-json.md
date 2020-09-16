@@ -100,9 +100,9 @@ The settings section has the following structure and default values:
 }
 ```
 
-Note, however, that not all settings are relevant for all contexts and the blocks they represent. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `experimental-theme.json`.
+To retain backward compatibility, `add_theme_support` declarations are considered as well. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `global.settings.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
 
-Settings can be controlled by context, providing a more fine-grained control over what exists via `add_theme_support`. As an example, let's say that a theme author wants to enable custom colors for the paragraph block exclusively. This is how it'd be done:
+Settings can also be controlled by context, providing a more fine-grained control over what exists via `add_theme_support`. As an example, let's say that a theme author wants to enable custom colors for the paragraph block exclusively. This is how it'd be done:
 
 ```json
 {
@@ -122,60 +122,71 @@ Settings can be controlled by context, providing a more fine-grained control ove
   }
 ```
 
+Note, however, that not all settings are relevant for all contexts and the blocks they represent. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `experimental-theme.json`.
+
 ### Presets
 
-So far, this function is only enabled for the global section.
+Presets are part of the settings section. At the moment, they only work within the `global` context. Each preset value will generate a CSS Custom Property that will be added to the new stylesheet, which follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
 
-The generated CSS Custom Properties follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
+For example, for this input:
 
-For this input:
-
-```
-"global": {
-  "settings": {
-    "color": {
-      palette: [
-        {
-          "slug": "strong-magenta",
-          "value": "#a156b4"
-        },
-        {
-          "slug": "very-dark-grey",
-          "value": "#444"
-        }
-      ]
+```json
+{
+  "global": {
+    "settings": {
+      "color": {
+        "palette": [
+          {
+            "slug": "strong-magenta",
+            "value": "#a156b4"
+          },
+          {
+            "slug": "very-dark-grey",
+            "value": "rgb(131, 12, 8)"
+          }
+        ],
+        "gradients": [
+          {
+            "slug": "blush-bordeaux",
+            "value": "linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)"
+          },
+          {
+            "slug": "blush-light-purple",
+            "value": "linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)"
+          },
+        ]
+      },
+      "typography": {
+        "fontSizes": [
+          {
+            "slug": "normal",
+            "value": 16
+          },
+          {
+            "slug": "big",
+            "value": 32
+          }
+        ]
+      }
     }
   }
 }
 ```
 
-The following stylesheet will be enqueued to the front-end and editor:
+The output to be enqueued will be:
 
 ```css
 :root {
   --wp--preset--color--strong-magenta: #a156b4;
   --wp--preset--color--very-dark-gray: #444;
+  --wp--preset--font-size--big: 32;
+  --wp--preset--font-size--normal: 16;
+  --wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);
+  --wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);
 }
 ```
 
-The goal is that presets can be defined using this format, although, right now, the name property (used to be shown in the editor) can't be translated from this file. For that reason, and to maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. The equivalent example to above is:
-
-```php
-add_theme_support( 'editor-color-palette', array(
-  array(
-    'name' => __( 'strong magenta', 'themeLangDomain' ),
-    'slug' => 'strong-magenta',
-    'color' => '#a156b4',
-  ),
-  array(
-    'name' => __( 'very dark gray', 'themeLangDomain' ),
-    'slug' => 'very-dark-gray',
-    'color' => '#444',
-  ),
-) );
-```
-
-If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
+The goal is that presets can be defined using this format, although, right now, the name property (used in the editor) can't be translated from this file. For that reason, and to maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
 
 ### Styles
 
@@ -245,4 +256,3 @@ Each block will declare which style properties it exposes. This has been coined 
 | Site Title | Yes | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
-
