@@ -18,6 +18,7 @@ function useSecondaryText() {
 		return select( 'core/block-editor' ).getSelectedBlock();
 	} );
 
+	// TODO: Handle if parent is template part too.
 	const selectedBlockLabel =
 		selectedBlock?.name === 'core/template-part'
 			? getBlockLabel(
@@ -41,11 +42,16 @@ export default function DocumentActions( { documentTitle } ) {
 	// item is inactive.
 	const isTitleActive = ! label?.length || ! isActive;
 	return (
-		<div className="edit-site-document-actions">
+		<div
+			className={ classnames( 'edit-site-document-actions', {
+				'has-secondary-label': !! label,
+			} ) }
+		>
 			{ documentTitle ? (
 				<>
-					<span
+					<div
 						className={ classnames(
+							'edit-site-document-actions__label',
 							'edit-site-document-actions__title',
 							{
 								'is-active': isTitleActive,
@@ -53,19 +59,18 @@ export default function DocumentActions( { documentTitle } ) {
 						) }
 					>
 						{ documentTitle }
-					</span>
-					{ label && (
-						<span
-							className={ classnames(
-								'edit-site-document-actions__secondary-item',
-								{
-									'is-active': isActive,
-								}
-							) }
-						>
-							{ label }
-						</span>
-					) }
+					</div>
+					<div
+						className={ classnames(
+							'edit-site-document-actions__label',
+							'edit-site-document-actions__secondary-item',
+							{
+								'is-active': isActive,
+							}
+						) }
+					>
+						{ label ?? '' }
+					</div>
 				</>
 			) : (
 				__( 'Loading…' )
