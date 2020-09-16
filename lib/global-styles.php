@@ -388,9 +388,10 @@ function gutenberg_experimental_global_styles_get_support_keys() {
  */
 function gutenberg_experimental_global_styles_get_presets_structure() {
 	return array(
-		'color'    => array( 'color', 'palette' ),
-		'gradient' => array( 'color', 'gradients' ),
-		'fontSize' => array( 'typography', 'fontSizes' ),
+		'color'      => array( 'color', 'palette' ),
+		'gradient'   => array( 'color', 'gradients' ),
+		'fontSize'   => array( 'typography', 'fontSizes' ),
+		'lineHeight' => array( 'typography', 'lineHeight' ),
 	);
 }
 
