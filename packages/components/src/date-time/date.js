@@ -82,15 +82,14 @@ class DatePicker extends Component {
 		return currentDate ? moment( currentDate ) : moment();
 	}
 
-	// todo change reference to `isDayHighlighted` every time, `events` prop change
 	isDayHighlighted( date ) {
+		if ( this.props.onMonthPreviewed ) {
+			this.props.onMonthPreviewed( date.toISOString() );
+		}
+
 		// Do not highlight when no events.
 		if ( ! this.props.events?.length ) {
 			return false;
-		}
-
-		if ( this.props.onMonthPreviewed ) {
-			this.props.onMonthPreviewed( date.toDate() );
 		}
 
 		// Compare date against highlighted events.
@@ -104,7 +103,7 @@ class DatePicker extends Component {
 		const momentDate = this.getMomentDate( currentDate );
 		const key = `datepicker-controller-${
 			momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
-		}${ events?.length ? '-events-' + events.length : '' }`;
+		}`; //${ events?.length ? '-events-' + events.length : '' }`;
 
 		return (
 			<div className="components-datetime__date" ref={ this.nodeRef }>
