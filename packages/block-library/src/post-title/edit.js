@@ -10,9 +10,15 @@ import { useSelect } from '@wordpress/data';
 import {
 	AlignmentToolbar,
 	BlockControls,
+	InspectorControls,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarGroup,
+	ToggleControl,
+	TextControl,
+	PanelBody,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,12 +27,10 @@ import { __ } from '@wordpress/i18n';
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function PostTitleEdit( {
-	attributes,
+	attributes: { level, textAlign, makeLink, rel, linkTarget },
 	setAttributes,
-	context,
+	context: { postType, postId },
 } ) {
-	const { level, textAlign } = attributes;
-	const { postType, postId } = context;
 	const tagName = 0 === level ? 'p' : 'h' + level;
 
 	const post = useSelect(
@@ -44,6 +48,14 @@ export default function PostTitleEdit( {
 	}
 
 	const BlockWrapper = Block[ tagName ];
+	let title = post.title || __( 'Post Title' );
+	if ( makeLink ) {
+		title = (
+			<a href={ post.link } target={ linkTarget } rel={ rel }>
+				{ title }
+			</a>
+		);
+	}
 
 	return (
 		<>
@@ -63,12 +75,43 @@ export default function PostTitleEdit( {
 					} }
 				/>
 			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ __( 'Make title a link' ) }
+						onChange={ () =>
+							setAttributes( { makeLink: ! makeLink } )
+						}
+						checked={ makeLink }
+					/>
+					{ makeLink && (
+						<>
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+							<TextControl
+								label={ __( 'Link rel' ) }
+								value={ rel }
+								onChange={ ( newRel ) =>
+									setAttributes( { rel: newRel } )
+								}
+							/>
+						</>
+					) }
+				</PanelBody>
+			</InspectorControls>
 			<BlockWrapper
 				className={ classnames( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 			>
-				{ post.title || __( 'Post Title' ) }
+				{ title }
 			</BlockWrapper>
 		</>
 	);
