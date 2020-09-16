@@ -4,13 +4,13 @@
 	margin-left: $block-selected-child-margin;
 	margin-right: $block-selected-child-margin;
 	background-color: $white;
-	border: $border-width dashed $gray;
+	border: $border-width dashed $border-color;
 	border-radius: 4px;
 }
 
 .groupPlaceholderDark {
 	background-color: $black;
-	border: $border-width dashed $gray-70;
+	border: $border-width dashed $border-color-dark;
 }
 
 .marginVerticalDense {

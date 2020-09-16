@@ -6,6 +6,7 @@ $white: #fff;
 
 $light-gray-500: #e2e4e7; // Good for "grayed" items and borders.
 $light-gray-400: #e8eaeb; // Good for "readonly" input fields and special text selection.
+$dark-gray-600: #40464d;
 
 // Dark opacities, for use with light themes.
 $dark-opacity-900: rgba(#000510, 0.9);
@@ -94,3 +95,18 @@ $app-background-dark-alt: $background-dark-elevated;
 
 $modal-background: $white;
 $modal-background-dark: $background-dark-elevated;
+
+$border-color: $light-dim;
+$border-color-dark: $gray-70;
+
+$separator-color: $light-dim;
+$separator-color-dark: $gray-70;
+
+$drag-indicator: $light-dim;
+$drag-indicator-dark: $dark-ultra-dim;
+
+$slider-input-border: $light-dim;
+$slider-input-border-dark: $dark-ultra-dim;
+
+$spacer-color: $light-dim;
+$spacer-color-dark: $dark-ultra-dim;

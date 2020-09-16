@@ -1,12 +1,12 @@
 .staticSpacer {
 	height: 20px;
 	background-color: transparent;
-	border: $border-width dashed $light-gray-500;
+	border: $border-width dashed $spacer-color;
 	border-radius: 1px;
 }
 
 .staticDarkSpacer {
-	border: $border-width dashed rgba($color: $light-gray-500, $alpha: 0.3);
+	border: $border-width dashed $spacer-color-dark;
 }
 
 .selectedSpacer {

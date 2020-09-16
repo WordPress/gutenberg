@@ -50,11 +50,11 @@
 }
 
 .separator {
-	background-color: $light-gray-400;
+	background-color: $separator-color;
 	height: 1px;
 	width: 100%;
 }
 
 .separatorDark {
-	background-color: #2d2d2d;
+	background-color: $separator-color-dark;
 }

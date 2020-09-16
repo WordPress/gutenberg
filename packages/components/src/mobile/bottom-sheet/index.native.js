@@ -326,12 +326,18 @@ class BottomSheet extends Component {
 			styles.bottomSheetHeaderTitleDark
 		);
 
+		const dragIndicatorStyle = getStylesFromColorScheme(
+			styles.dragIndicator,
+			styles.dragIndicatorDark
+		);
+
 		let listStyle = {};
 		if ( isFullScreen ) {
-			listStyle = { flexGrow: 1 };
+			listStyle = { ...dragIndicatorStyle, flexGrow: 1 };
 		} else if ( isMaxHeightSet ) {
-			listStyle = { maxHeight };
+			listStyle = { ...dragIndicatorStyle, maxHeight };
 		}
+		
 		const listProps = {
 			disableScrollViewPanResponder: true,
 			bounces,
@@ -417,7 +423,7 @@ class BottomSheet extends Component {
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
 					{ ! ( Platform.OS === 'android' && isFullScreen ) && (
-						<View style={ styles.dragIndicator } />
+						<View style={ listStyle } />
 					) }
 					{ ! hideHeader && getHeader() }
 					<WrapperView

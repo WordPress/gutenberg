@@ -6,14 +6,14 @@
 	min-height: 25px;
 	align-self: center;
 	margin-left: 10px;
-	border-color: $light-gray-400;
+	border-color: $slider-input-border;
 	padding-top: 0;
 	padding-bottom: 0;
 	text-align: center;
 }
 
 .sliderDarkTextInput {
-	border-color: $gray-70;
+	border-color: $slider-input-border-dark;
 }
 
 .isSelected {

@@ -7,7 +7,7 @@
 }
 
 .dragIndicator {
-	background-color: $light-gray-400;
+	background-color: $drag-indicator;
 	height: 4px;
 	width: 36px;
 	margin: auto;
@@ -15,15 +15,18 @@
 	margin-bottom: 6px;
 	border-radius: 2px;
 }
+.dragIndicatorDark {
+	background-color: $drag-indicator-dark;
+}
 
 .separator {
-	background-color: $light-gray-400;
+	background-color: $separator-color;
 	height: 1px;
 	width: 100%;
 }
 
 .separatorDark {
-	background-color: $gray-70;
+	background-color: $separator-color-dark;
 }
 
 .emptyHeader {
@@ -87,13 +90,13 @@
 }
 
 .cellSeparator {
-	background-color: $light-gray-400;
+	background-color: $separator-color;
 	height: 1px;
 	width: 100%;
 }
 
 .cellSeparatorDark {
-	background-color: $gray-70;
+	background-color: $separator-color-dark;
 }
 
 .cellRowContainer {
