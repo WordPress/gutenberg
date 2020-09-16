@@ -24,6 +24,7 @@ import {
 	ResizableBox,
 	PanelBody,
 	BaseControl,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { search } from '@wordpress/icons';
@@ -52,6 +53,8 @@ const CSS_UNITS = [
 	{ value: '%', label: '%', default: PC_WIDTH_DEFAULT },
 	{ value: 'px', label: 'px', default: PX_WIDTH_DEFAULT },
 ];
+
+const { __Visualizer } = BoxControl;
 
 export default function SearchEdit( {
 	className,
@@ -144,7 +147,10 @@ export default function SearchEdit( {
 
 	const renderButton = () => {
 		return (
-			<>
+			<__Visualizer
+				values={ attributes.style?.spacing?.padding }
+				showValues={ attributes.style?.visualizers?.padding }
+			>
 				{ buttonUseIcon && (
 					<Button
 						icon={ search }
@@ -164,7 +170,7 @@ export default function SearchEdit( {
 						}
 					/>
 				) }
-			</>
+			</__Visualizer>
 		);
 	};
 
@@ -338,8 +344,8 @@ export default function SearchEdit( {
 				size={ {
 					width: `${ width }${ widthUnit }`,
 				} }
+				style={ { position: 'relative' } }
 				className="wp-block-search__inside-wrapper"
-				isResetValueOnUnitChange
 				minWidth={ MIN_WIDTH }
 				enable={ getResizableSides() }
 				onResizeStart={ ( event, direction, elt ) => {
