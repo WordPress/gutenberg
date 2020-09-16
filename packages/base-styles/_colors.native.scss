@@ -49,7 +49,6 @@ $gray-text: $gray-dark;
 $gray-text-min: darken($gray, 18%); //#537994
 
 // Shades of gray
-$studio-gray-10: #c3c4c7;
 $gray-lighten-30: lighten($gray, 30%); // #e9eff3
 $gray-darken-20: darken($gray, 20%); // #4f748e
 
@@ -76,7 +75,7 @@ $gray-100: #101517;
 // neutral (light) - black is a base color in light mode
 $light-primary: #000d; //rgba(0, 0, 0, 0.87);
 $light-secondary: #0009; //rgba(0, 0, 0, 0.6);
-$light-tertiary: #0000006d; //rgba(0, 0, 0, 0.43);
+$light-tertiary: rgba($black, 0.43);
 $light-quaternary: #0000003f; //rgba(0, 0, 0, 0.25);
 $light-dim: #0000001e; //rgba(0, 0, 0, 0.12);
 $light-ultra-dim: #0000000a; //rgba(0, 0, 0, 0.04);
@@ -84,6 +83,7 @@ $light-ultra-dim: #0000000a; //rgba(0, 0, 0, 0.04);
 // neutral (dark) - white is a base color in dark mode
 $dark-primary: #fffd; //rgba(255, 255, 255, 0.87);
 $dark-secondary: #fff9; //rgba(255, 255, 255, 0.6);
+$dark-tertiary: rgba($white, 0.43);
 $dark-quaternary: #ffffff3f; //rgba(255, 255, 255, 0.25);
 $dark-ultra-dim: #ffffff14; //rgba(255, 255, 255, 0.08);
 
@@ -94,3 +94,8 @@ $app-background-dark-alt: $background-dark-elevated;
 
 $modal-background: $white;
 $modal-background-dark: $background-dark-elevated;
+
+$block-line-color: $light-tertiary;
+$block-line-color-dark: $dark-tertiary;
+$icon-uploading-fill: $light-tertiary;
+$icon-uploading-fill-dark: $dark-tertiary;

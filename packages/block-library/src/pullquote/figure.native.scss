@@ -5,12 +5,12 @@
 
 .light {
 	@extend %shared;
-	border-top-color: $studio-gray-10;
-	border-bottom-color: $studio-gray-10;
+	border-top-color: $block-line-color;
+	border-bottom-color: $block-line-color;
 }
 
 .dark {
 	@extend %shared;
-	border-top-color: $gray-50;
-	border-bottom-color: $gray-50;
+	border-top-color: $block-line-color-dark;
+	border-bottom-color: $block-line-color-dark;
 }
