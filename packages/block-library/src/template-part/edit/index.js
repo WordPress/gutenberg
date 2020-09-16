@@ -66,12 +66,20 @@ export default function TemplatePartEdit( {
 
 	const BlockWrapper = Block[ tagName ];
 
+	const { addHoveredEntity, removeHoveredEntity } = useDispatch(
+		'core/block-editor'
+	);
+
 	if ( postId ) {
 		// Part of a template file, post ID already resolved.
 		return (
 			<BlockWrapper>
 				<BlockControls>
-					<div className="wp-block-template-part__block-control-group">
+					<div
+						className="wp-block-template-part__block-control-group"
+						onMouseEnter={ () => addHoveredEntity( clientId ) }
+						onMouseLeave={ () => removeHoveredEntity( clientId ) }
+					>
 						<TemplatePartNamePanel
 							postId={ postId }
 							setAttributes={ setAttributes }
