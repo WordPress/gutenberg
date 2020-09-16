@@ -67,13 +67,6 @@ The active menu slug.
 
 Optional className for the `Navigation` component.
 
-### `onActivateItem`
-
--   Type: `function`
--   Required: No
-
-Sync the active item between the external state and the Navigation's internal state.
-
 ### `onActivateMenu`
 
 -   Type: `function`
