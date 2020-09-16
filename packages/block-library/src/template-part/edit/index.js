@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useRef, useEffect } from '@wordpress/element';
@@ -66,9 +71,8 @@ export default function TemplatePartEdit( {
 
 	const BlockWrapper = Block[ tagName ];
 
-	const { addHoveredEntity, removeHoveredEntity } = useDispatch(
-		'core/block-editor'
-	);
+	const { addHoveredEntity = noop, removeHoveredEntity = noop } =
+		useDispatch( 'core/edit-site' ) || {};
 
 	if ( postId ) {
 		// Part of a template file, post ID already resolved.

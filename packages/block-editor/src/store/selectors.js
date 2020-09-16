@@ -1798,7 +1798,3 @@ export function isBlockHighlighted( state, clientId ) {
 export function areInnerBlocksControlled( state, clientId ) {
 	return !! state.blocks.controlledInnerBlocks[ clientId ];
 }
-
-export function getHoveredEntities( state ) {
-	return state.documentSettingsDropdown.hoveredEntities;
-}

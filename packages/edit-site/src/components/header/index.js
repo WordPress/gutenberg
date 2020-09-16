@@ -80,11 +80,9 @@ export default function Header( {
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
 	const { hoveredEntityIds, getBlock } = useSelect( ( select ) => {
-		const { getHoveredEntities, getBlock } = select( 'core/block-editor' );
-
 		return {
-			hoveredEntityIds: getHoveredEntities(),
-			getBlock,
+			hoveredEntityIds: select( 'core/edit-site' ).getHoveredEntities(),
+			getBlock: select( 'core/block-editor' ).getBlock,
 		};
 	} );
 

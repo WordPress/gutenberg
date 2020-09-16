@@ -1106,17 +1106,3 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
-
-export function addHoveredEntity( clientId ) {
-	return {
-		type: 'SETTINGS_DROPDOWN_HOVERED_ENTITIES_ADD',
-		clientId,
-	};
-}
-
-export function removeHoveredEntity( clientId ) {
-	return {
-		type: 'SETTINGS_DROPDOWN_HOVERED_ENTITIES_REMOVE',
-		clientId,
-	};
-}

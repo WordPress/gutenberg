@@ -137,3 +137,7 @@ export function getTemplateType( state ) {
 export function getPage( state ) {
 	return state.page;
 }
+
+export function getHoveredEntities( state ) {
+	return state.documentSettingsDropdown.hoveredEntities;
+}

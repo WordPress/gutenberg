@@ -159,3 +159,17 @@ export function* showHomepage() {
 	const homeTemplate = yield* setPage( page );
 	yield setHomeTemplateId( homeTemplate );
 }
+
+export function addHoveredEntity( clientId ) {
+	return {
+		type: 'SETTINGS_DROPDOWN_HOVERED_ENTITIES_ADD',
+		clientId,
+	};
+}
+
+export function removeHoveredEntity( clientId ) {
+	return {
+		type: 'SETTINGS_DROPDOWN_HOVERED_ENTITIES_REMOVE',
+		clientId,
+	};
+}
