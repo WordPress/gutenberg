@@ -24,6 +24,7 @@ import {
 	CustomSelectControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { edit } from '@wordpress/icons';
 
 export default function PostDateEdit( { attributes, context, setAttributes } ) {
 	const { textAlign, format } = attributes;
@@ -69,7 +70,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 				{ date && (
 					<ToolbarGroup>
 						<ToolbarButton
-							icon="edit"
+							icon={ edit }
 							title={ __( 'Change Date' ) }
 							onClick={ () =>
 								setIsPickerOpen(
