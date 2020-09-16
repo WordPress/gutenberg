@@ -4,10 +4,12 @@
 
 import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Gets the active object, if there is any.
  *
- * @param {Object} value Value to inspect.
+ * @param {RichTextValue} value Value to inspect.
  *
  * @return {?Object} Active object, or undefined.
  */

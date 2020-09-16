@@ -6,10 +6,12 @@ import { LINE_SEPARATOR } from './special-characters';
 import { getLineIndex } from './get-line-index';
 import { canIndentListItems } from './can-indent-list-items';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Gets the line index of the first previous list item with higher indentation.
  *
- * @param {Object} value      Value to search.
+ * @param {RichTextValue} value      Value to search.
  * @param {number} lineIndex  Line index of the list item to compare with.
  *
  * @return {boolean} The line index.

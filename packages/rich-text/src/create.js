@@ -16,6 +16,16 @@ import {
 	ZWNBSP,
 } from './special-characters';
 
+/**
+ * @typedef  {Object} RichTextValue
+ *
+ * @property {string}           text         Text.
+ * @property {Array}            formats      Formats.
+ * @property {Array}            replacements Replacements.
+ * @property {number|undefined} start        Selection start.
+ * @property {number|undefined} end          Selection end.
+ */
+
 function createEmptyValue() {
 	return {
 		formats: [],
@@ -130,10 +140,11 @@ function toFormat( { type, attributes } ) {
  *                                            multiline.
  * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?boolean} [$1.preserveWhiteSpace]  Whether or not to collapse white
+ * @param {boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
  *                                            space characters.
+ * @param {boolean} [$1.__unstableIsEditableTree]
  *
- * @return {Object} A rich text value.
+ * @return {RichTextValue} A rich text value.
  */
 export function create( {
 	element,
@@ -306,8 +317,10 @@ function removePadding( string ) {
  *                                            multiline.
  * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?boolean} $1.preserveWhiteSpace    Whether or not to collapse white
+ * @param {?boolean}  $1.preserveWhiteSpace   Whether or not to collapse white
  *                                            space characters.
+ * @param {?Array}    $1.currentWrapperTags
+ * @param {?boolean}  $1.isEditableTree
  *
  * @return {Object} A rich text value.
  */
@@ -477,6 +490,7 @@ function createFromElement( {
  *                                           separator.
  * @param {?boolean} $1.preserveWhiteSpace   Whether or not to collapse white
  *                                           space characters.
+ * @param {?boolean} $1.isEditableTree
  *
  * @return {Object} A rich text value.
  */
