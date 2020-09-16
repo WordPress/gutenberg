@@ -4,10 +4,31 @@
 	align-items: center;
 	justify-content: space-evenly;
 
-	span {
+	.edit-site-document-actions__label {
 		color: $gray-700;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		transition: height 0.25s;
+
 		&.is-active {
 			color: inherit;
+		}
+
+		&.edit-site-document-actions__title {
+			height: 100%;
+			// Otherwise, the secondary item still takes up space with height 0:
+			flex-grow: 1;
+		}
+
+		&.edit-site-document-actions__secondary-item {
+			height: 0;
+		}
+	}
+
+	&.has-secondary-label {
+		.edit-site-document-actions__label {
+			height: 50%;
 		}
 	}
 }
