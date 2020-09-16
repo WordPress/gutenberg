@@ -16,6 +16,7 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
+import PostSettingsButton from './post-settings-button';
 import { default as DevicePreview } from '../device-preview';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
@@ -49,6 +50,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">
+				<PostSettingsButton showIconLabels={ showIconLabels } />
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because

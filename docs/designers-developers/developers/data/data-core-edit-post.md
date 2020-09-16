@@ -14,7 +14,7 @@ identify either an editor or plugin sidebar.
 
 Examples:
 
--   `edit-post/document`
+-   `edit-post/block`
 -   `my-plugin/insert-image-sidebar`
 
 _Parameters_

@@ -1,0 +1,8 @@
+// Get rid of the padding around the accordions, and get rid of the negative
+// margins that the modal header normally uses to counter them.
+.edit-post-post-settings-modal > .components-modal__content {
+	padding: 0;
+}
+.edit-post-post-settings-modal > * > .components-modal__header {
+	margin: 0;
+}

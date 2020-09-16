@@ -44,6 +44,7 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
+import PostSettingsModal from '../post-settings-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -83,7 +84,6 @@ function Layout() {
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
-		hasBlockSelected,
 		showMostUsedBlocks,
 		isInserterOpened,
 		showIconLabels,
@@ -127,10 +127,7 @@ function Layout() {
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
 	} );
-	const openSidebarPanel = () =>
-		openGeneralSidebar(
-			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
-		);
+	const openSidebarPanel = () => openGeneralSidebar( 'edit-post/block' );
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
@@ -217,6 +214,7 @@ function Layout() {
 						)
 					}
 					sidebar={
+						// Button only visible to screen readers.
 						( ! isMobileViewport || sidebarIsOpened ) && (
 							<>
 								{ ! isMobileViewport && ! sidebarIsOpened && (
@@ -227,11 +225,7 @@ function Layout() {
 											onClick={ openSidebarPanel }
 											aria-expanded={ false }
 										>
-											{ hasBlockSelected
-												? __( 'Open block settings' )
-												: __(
-														'Open document settings'
-												  ) }
+											{ __( 'Open block inspector' ) }
 										</Button>
 									</div>
 								) }
@@ -284,6 +278,7 @@ function Layout() {
 						next: nextShortcut,
 					} }
 				/>
+				<PostSettingsModal />
 				<ManageBlocksModal />
 				<OptionsModal />
 				<KeyboardShortcutHelpModal />
