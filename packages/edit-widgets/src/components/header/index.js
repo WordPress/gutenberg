@@ -11,40 +11,20 @@ import {
 } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import SaveButton from '../save-button';
+import useLastSelectedRootId from '../../hooks/use-last-selected-root-id';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
-import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 
 const inserterToggleProps = { isPrimary: true };
 
 function Header( { isCustomizer } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const rootClientId = useSelect( ( select ) => {
-		const { getBlockRootClientId, getBlockSelectionEnd } = select(
-			'core/block-editor'
-		);
-		const selectedRootId = getBlockRootClientId( getBlockSelectionEnd() );
-		if ( selectedRootId ) {
-			return selectedRootId;
-		}
-
-		// Default to the first widget area
-		const { getEntityRecord } = select( 'core' );
-		const widgetAreasPost = getEntityRecord(
-			KIND,
-			POST_TYPE,
-			buildWidgetAreasPostId()
-		);
-		if ( widgetAreasPost ) {
-			return widgetAreasPost?.blocks[ 0 ]?.clientId;
-		}
-	}, [] );
+	const rootClientId = useLastSelectedRootId();
 
 	return (
 		<>
