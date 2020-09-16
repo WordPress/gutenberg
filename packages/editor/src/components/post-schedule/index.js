@@ -9,25 +9,29 @@ import { map } from 'lodash';
 import { __experimentalGetSettings } from '@wordpress/date';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DateTimePicker } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+function getDayOfTheMonth( date = new Date(), firstDay = true ) {
+	const d = new Date( date );
+	return new Date(
+		d.getFullYear(),
+		d.getMonth() + ( firstDay ? 0 : 1 ),
+		firstDay ? 1 : 0
+	).toISOString();
+}
 
 export function PostSchedule() {
-	const now = new Date();
-
-	const firstDayOfTheMonth = new Date(
-		now.getFullYear(),
-		now.getMonth(),
-		1
-	).toISOString();
-	const lastDayOfTheMonth = new Date(
-		now.getFullYear(),
-		now.getMonth() + 1,
-		1
-	).toISOString();
-
 	const postDate = useSelect(
 		( select ) => select( 'core/editor' ).getEditedPostAttribute( 'date' ),
 		[]
 	);
+
+	const [ currentMonth, setCurrentMonth ] = useState(
+		getDayOfTheMonth( postDate )
+	);
+
+	const setCurrentMonthHandler = ( date ) =>
+		setCurrentMonth( getDayOfTheMonth( date ) );
 
 	/*
 	 * Pick up published and schduled post from site,
@@ -38,16 +42,16 @@ export function PostSchedule() {
 			map(
 				select( 'core' ).getEntityRecords( 'postType', 'post', {
 					status: 'publish,future',
-					after: firstDayOfTheMonth,
-					before: lastDayOfTheMonth,
+					after: getDayOfTheMonth( currentMonth ),
+					before: getDayOfTheMonth( currentMonth, false ),
 				} ),
-				( { date: eventPostDate, title, type } ) => ( {
+				( { title, type, date } ) => ( {
 					title,
-					date: new Date( eventPostDate ),
 					type,
+					date: new Date( date ),
 				} )
 			),
-		[]
+		[ currentMonth ]
 	);
 
 	// Update post date handler.
@@ -74,6 +78,7 @@ export function PostSchedule() {
 			key="date-time-picker"
 			currentDate={ postDate }
 			onChange={ updatePostDate }
+			onMonthPreviewed={ setCurrentMonthHandler }
 			is12Hour={ is12HourTime }
 			events={ events }
 		/>
