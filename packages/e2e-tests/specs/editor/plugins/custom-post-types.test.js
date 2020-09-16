@@ -3,25 +3,13 @@
  */
 import {
 	activatePlugin,
+	clickOnCloseModalButton,
 	createNewPost,
 	deactivatePlugin,
+	openDocumentSettingsSection,
 	publishPost,
-	findSidebarPanelWithTitle,
 } from '@wordpress/e2e-test-utils';
 
-const openPageAttributesPanel = async () => {
-	const openButton = await findSidebarPanelWithTitle( 'Page Attributes' );
-
-	// Get the classes from the panel
-	const buttonClassName = await (
-		await openButton.getProperty( 'className' )
-	 ).jsonValue();
-
-	// Open the panel if needed.
-	if ( -1 === buttonClassName.indexOf( 'is-opened' ) ) {
-		await openButton.click();
-	}
-};
 const SELECT_OPTION_SELECTOR =
 	'.editor-page-attributes__parent option:nth-child(2)';
 
@@ -42,7 +30,7 @@ describe( 'Test Custom Post Types', () => {
 		await publishPost();
 		// Create a post that is a child of the previously created post.
 		await createNewPost( { postType: 'hierar-no-title' } );
-		await openPageAttributesPanel();
+		await openDocumentSettingsSection( 'Page Attributes' );
 		await page.waitForSelector( SELECT_OPTION_SELECTOR );
 		const optionToSelect = await page.$( SELECT_OPTION_SELECTOR );
 		const valueToSelect = await (
@@ -52,11 +40,14 @@ describe( 'Test Custom Post Types', () => {
 			'.editor-page-attributes__parent select',
 			valueToSelect
 		);
+		// Close document settings modal.
+		await clickOnCloseModalButton();
 		await page.click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Child Post' );
 		await publishPost();
 		// Reload the child post and verify it is still correctly selected as a child post.
 		await page.reload();
+		await openDocumentSettingsSection( 'Page Attributes' );
 		await page.waitForSelector( SELECT_OPTION_SELECTOR );
 		const selectedValue = await page.$eval(
 			'.editor-page-attributes__parent select',

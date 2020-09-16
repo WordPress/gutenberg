@@ -13,9 +13,7 @@ export { disablePrePublishChecks } from './disable-pre-publish-checks';
 export { dragAndResize } from './drag-and-resize';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';
 export { enablePrePublishChecks } from './enable-pre-publish-checks';
-export { ensureSidebarOpened } from './ensure-sidebar-opened';
-export { findSidebarPanelToggleButtonWithTitle } from './find-sidebar-panel-toggle-button-with-title';
-export { findSidebarPanelWithTitle } from './find-sidebar-panel-with-title';
+export { findDocumentSettingsSectionWithTitle } from './find-document-settings-section-with-title';
 export { getAllBlockInserterItemTitles } from './get-all-block-inserter-item-titles';
 export { getAllBlocks } from './get-all-blocks';
 export { getAvailableBlockTransforms } from './get-available-block-transforms';
@@ -43,7 +41,9 @@ export {
 	enableFocusLossObservation,
 	disableFocusLossObservation,
 } from './observe-focus-loss';
-export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
+export { openBlockInspector } from './open-block-inspector';
+export { openDocumentSettings } from './open-document-settings';
+export { openDocumentSettingsSection } from './open-document-settings-section';
 export { openPublishPanel } from './open-publish-panel';
 export { trashAllPosts } from './posts';
 export { pressKeyTimes } from './press-key-times';

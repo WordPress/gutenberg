@@ -6,9 +6,9 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	insertBlock,
+	openBlockInspector,
 	pressKeyWithModifier,
 	searchForBlock,
-	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 const INSERTER_BUTTON_SELECTOR =
@@ -90,7 +90,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Renders correctly the icon on the inspector', async () => {
 			await insertBlock( blockTitle );
-			await openDocumentSettingsSidebar();
+			await openBlockInspector();
 			await selectFirstBlock();
 			validateIcon( await getInnerHTML( INSPECTOR_ICON_SELECTOR ) );
 		} );
@@ -129,7 +129,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Renders the icon in the inspector with the correct colors', async () => {
 			await insertBlock( blockTitle );
-			await openDocumentSettingsSidebar();
+			await openBlockInspector();
 			await selectFirstBlock();
 			validateDashIcon( await getInnerHTML( INSPECTOR_ICON_SELECTOR ) );
 			expect(
@@ -156,7 +156,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Renders correctly the icon on the inspector', async () => {
 			await insertBlock( blockTitle );
-			await openDocumentSettingsSidebar();
+			await openBlockInspector();
 			await selectFirstBlock();
 			validateSvgIcon( await getInnerHTML( INSPECTOR_ICON_SELECTOR ) );
 			expect(

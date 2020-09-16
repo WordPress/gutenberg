@@ -184,27 +184,7 @@ may appear when navigating away from Gutenberg.
 
 Enables Pre-publish checks.
 
-<a name="ensureSidebarOpened" href="#ensureSidebarOpened">#</a> **ensureSidebarOpened**
-
-Verifies that the edit post sidebar is opened, and if it is not, opens it.
-
-_Returns_
-
--   `Promise`: Promise resolving once the edit post sidebar is opened.
-
-<a name="findSidebarPanelToggleButtonWithTitle" href="#findSidebarPanelToggleButtonWithTitle">#</a> **findSidebarPanelToggleButtonWithTitle**
-
-Finds a sidebar panel with the provided title.
-
-_Parameters_
-
--   _panelTitle_ `string`: The name of sidebar panel.
-
-_Returns_
-
--   `?ElementHandle`: Object that represents an in-page DOM element.
-
-<a name="findSidebarPanelWithTitle" href="#findSidebarPanelWithTitle">#</a> **findSidebarPanelWithTitle**
+<a name="findDocumentSettingsSectionWithTitle" href="#findDocumentSettingsSectionWithTitle">#</a> **findDocumentSettingsSectionWithTitle**
 
 Finds the button responsible for toggling the sidebar panel with the provided title.
 
@@ -389,9 +369,21 @@ _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
 
-<a name="openDocumentSettingsSidebar" href="#openDocumentSettingsSidebar">#</a> **openDocumentSettingsSidebar**
+<a name="openBlockInspector" href="#openBlockInspector">#</a> **openBlockInspector**
 
-Clicks on the button in the header which opens Document Settings sidebar when it is closed.
+Clicks on the button in the header which opens the block inspector sidebar when it is closed.
+
+<a name="openDocumentSettings" href="#openDocumentSettings">#</a> **openDocumentSettings**
+
+Clicks on the button in the header which opens the Document Settings dialog modal.
+
+<a name="openDocumentSettingsSection" href="#openDocumentSettingsSection">#</a> **openDocumentSettingsSection**
+
+Opens the document settings section with the provided title.
+
+_Parameters_
+
+-   _sectionTitle_ `string`: The section name.
 
 <a name="openGlobalBlockInserter" href="#openGlobalBlockInserter">#</a> **openGlobalBlockInserter**
 

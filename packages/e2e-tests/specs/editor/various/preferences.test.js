@@ -10,14 +10,14 @@ describe( 'preferences', () => {
 
 	/**
 	 * Returns a promise which resolves to the text content of the active
-	 * editor sidebar tab, or null if there is no active sidebar tab (closed).
+	 * editor sidebar title, or null if there is no active sidebar.
 	 *
-	 * @return {Promise} Promise resolving to active tab.
+	 * @return {Promise} Promise resolving to active sidebar title or null.
 	 */
-	async function getActiveSidebarTabText() {
+	async function getActiveSidebarTitle() {
 		try {
 			return await page.$eval(
-				'.edit-post-sidebar__panel-tab.is-active',
+				'.edit-post-sidebar > .interface-complementary-area-header > strong',
 				( node ) => node.textContent
 			);
 		} catch ( error ) {
@@ -30,29 +30,17 @@ describe( 'preferences', () => {
 
 	it( 'remembers sidebar dismissal between sessions', async () => {
 		// Open by default.
-		expect( await getActiveSidebarTabText() ).toBe( 'Post' );
-
-		// Change to "Block" tab.
-		await page.click( '.edit-post-sidebar__panel-tab[aria-label="Block"]' );
-		expect( await getActiveSidebarTabText() ).toBe( 'Block' );
-
-		// Regression test: Reload resets to document tab.
-		//
-		// See: https://github.com/WordPress/gutenberg/issues/6377
-		// See: https://github.com/WordPress/gutenberg/pull/8995
-		await page.reload();
-		await page.waitForSelector( '.edit-post-layout' );
-		expect( await getActiveSidebarTabText() ).toBe( 'Post' );
+		expect( await getActiveSidebarTitle() ).toBe( 'Block inspector' );
 
 		// Dismiss
 		await page.click(
-			'.edit-post-sidebar__panel-tabs [aria-label="Close settings"]'
+			'.edit-post-sidebar .interface-complementary-area-header [aria-label="Close block inspector"]'
 		);
-		expect( await getActiveSidebarTabText() ).toBe( null );
+		expect( await getActiveSidebarTitle() ).toBe( null );
 
 		// Remember after reload.
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
-		expect( await getActiveSidebarTabText() ).toBe( null );
+		expect( await getActiveSidebarTitle() ).toBe( null );
 	} );
 } );

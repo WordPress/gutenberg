@@ -7,7 +7,7 @@ import {
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
-	openDocumentSettingsSidebar,
+	openDocumentSettings,
 	openPublishPanel,
 	publishPost,
 	setBrowserViewport,
@@ -28,7 +28,7 @@ describe( 'Using Plugins API', () => {
 
 	describe( 'Post Status Info', () => {
 		it( 'Should render post status info inside Document Setting sidebar', async () => {
-			await openDocumentSettingsSidebar();
+			await openDocumentSettings();
 
 			const pluginPostStatusInfoText = await page.$eval(
 				'.edit-post-post-status .my-post-status-info-plugin',
@@ -147,10 +147,10 @@ describe( 'Using Plugins API', () => {
 	} );
 
 	describe( 'Document Setting Custom Panel', () => {
-		it( 'Should render a custom panel inside Document Setting sidebar', async () => {
-			await openDocumentSettingsSidebar();
+		it( 'Should render a custom panel inside Document Settings modal', async () => {
+			await openDocumentSettings();
 			const pluginDocumentSettingsText = await page.$eval(
-				'.edit-post-sidebar .my-document-setting-plugin',
+				'.edit-post-post-settings-modal .my-document-setting-plugin',
 				( el ) => el.innerText
 			);
 			expect( pluginDocumentSettingsText ).toMatchSnapshot();

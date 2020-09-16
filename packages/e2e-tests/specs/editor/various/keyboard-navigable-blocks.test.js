@@ -38,7 +38,7 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	).toBe( paragraphText );
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Open document settings' );
+	await expect( await getActiveLabel() ).toBe( 'Open block inspector' );
 };
 
 const tabThroughBlockToolbar = async () => {
@@ -131,7 +131,7 @@ describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Open document settings' );
+		await expect( await getActiveLabel() ).toBe( 'Open block inspector' );
 	} );
 
 	it( 'allows tabbing in navigation mode if no block is selected (reverse)', async () => {
@@ -186,7 +186,7 @@ describe( 'Order of block keyboard navigation', () => {
 		expect( await getActiveLabel() ).toBe( 'Multiple selected blocks' );
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Post' );
+		await expect( await getActiveLabel() ).toBe( 'Close block inspector' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await getActiveLabel() ).toBe(

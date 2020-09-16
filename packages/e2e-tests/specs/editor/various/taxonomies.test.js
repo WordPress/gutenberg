@@ -7,9 +7,10 @@ import { random } from 'lodash';
  * WordPress dependencies
  */
 import {
+	clickOnCloseModalButton,
 	createNewPost,
-	findSidebarPanelWithTitle,
-	openDocumentSettingsSidebar,
+	findDocumentSettingsSectionWithTitle,
+	openDocumentSettingsSection,
 	publishPost,
 } from '@wordpress/e2e-test-utils';
 
@@ -43,7 +44,7 @@ describe( 'Taxonomies', () => {
 	};
 
 	const getCurrentTags = async () => {
-		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
+		const tagsPanel = await findDocumentSettingsSectionWithTitle( 'Tags' );
 		return page.evaluate(
 			( node, selector ) => {
 				return Array.from( node.querySelectorAll( selector ) ).map(
@@ -57,19 +58,10 @@ describe( 'Taxonomies', () => {
 		);
 	};
 
-	const openSidebarPanelWithTitle = async ( title ) => {
-		const panel = await page.waitForXPath(
-			`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ title }")]`
-		);
-		await panel.click();
-	};
-
 	it( 'should be able to open the categories panel and create a new main category if the user has the right capabilities', async () => {
 		await createNewPost();
 
-		await openDocumentSettingsSidebar();
-
-		await openSidebarPanelWithTitle( 'Categories' );
+		await openDocumentSettingsSection( 'Categories' );
 
 		// If the user has no permission to add a new category finish the test.
 		if ( ! ( await canCreatTermInTaxonomy( 'categories' ) ) ) {
@@ -107,6 +99,9 @@ describe( 'Taxonomies', () => {
 		expect( selectedCategories ).toHaveLength( 1 );
 		expect( selectedCategories[ 0 ] ).toEqual( 'z rand category 1' );
 
+		// Close post settings modal.
+		await clickOnCloseModalButton();
+
 		// Type something in the title so we can publish the post.
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
@@ -115,6 +110,8 @@ describe( 'Taxonomies', () => {
 
 		// Reload the editor.
 		await page.reload();
+
+		await openDocumentSettingsSection( 'Categories' );
 
 		// Wait for the categories to load.
 		await page.waitForSelector(
@@ -131,16 +128,14 @@ describe( 'Taxonomies', () => {
 	it( "should be able to create a new tag with ' on the name", async () => {
 		await createNewPost();
 
-		await openDocumentSettingsSidebar();
-
-		await openSidebarPanelWithTitle( 'Tags' );
+		await openDocumentSettingsSection( 'Tags' );
 
 		// If the user has no permission to add a new tag finish the test.
 		if ( ! ( await canCreatTermInTaxonomy( 'tags' ) ) ) {
 			return;
 		}
 
-		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
+		const tagsPanel = await findDocumentSettingsSectionWithTitle( 'Tags' );
 		const tagInput = await tagsPanel.$(
 			'.components-form-token-field__input'
 		);
@@ -165,6 +160,9 @@ describe( 'Taxonomies', () => {
 		expect( tags ).toHaveLength( 1 );
 		expect( tags[ 0 ] ).toEqual( tagName );
 
+		// Close post settings modal.
+		await clickOnCloseModalButton();
+
 		// Type something in the title so we can publish the post.
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
@@ -173,6 +171,8 @@ describe( 'Taxonomies', () => {
 
 		// Reload the editor.
 		await page.reload();
+
+		await openDocumentSettingsSection( 'Tags' );
 
 		// Wait for the tags to load.
 		await page.waitForSelector( '.components-form-token-field__token' );
@@ -187,9 +187,7 @@ describe( 'Taxonomies', () => {
 	it( 'should be able to open the tags panel and create a new tag if the user has the right capabilities', async () => {
 		await createNewPost();
 
-		await openDocumentSettingsSidebar();
-
-		await openSidebarPanelWithTitle( 'Tags' );
+		await openDocumentSettingsSection( 'Tags' );
 
 		// If the user has no permission to add a new tag finish the test.
 		if ( ! ( await canCreatTermInTaxonomy( 'tags' ) ) ) {
@@ -199,7 +197,7 @@ describe( 'Taxonomies', () => {
 		// At the start there are no tag tokens
 		expect( await page.$$( TAG_TOKEN_SELECTOR ) ).toHaveLength( 0 );
 
-		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
+		const tagsPanel = await findDocumentSettingsSectionWithTitle( 'Tags' );
 		const tagInput = await tagsPanel.$(
 			'.components-form-token-field__input'
 		);
@@ -224,6 +222,9 @@ describe( 'Taxonomies', () => {
 		expect( tags ).toHaveLength( 1 );
 		expect( tags[ 0 ] ).toEqual( tagName );
 
+		// Close post settings modal.
+		await clickOnCloseModalButton();
+
 		// Type something in the title so we can publish the post.
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
@@ -232,6 +233,8 @@ describe( 'Taxonomies', () => {
 
 		// Reload the editor.
 		await page.reload();
+
+		await openDocumentSettingsSection( 'Tags' );
 
 		// Wait for the tags to load.
 		await page.waitForSelector( '.components-form-token-field__token' );

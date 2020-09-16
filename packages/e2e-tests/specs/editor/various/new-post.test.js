@@ -5,6 +5,7 @@ import {
 	activatePlugin,
 	createNewPost,
 	deactivatePlugin,
+	openDocumentSettings,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'new editor state', () => {
@@ -34,6 +35,7 @@ describe( 'new editor state', () => {
 		);
 		expect( postPreviewButton ).not.toBeNull();
 		// Should display the Post Formats UI.
+		await openDocumentSettings();
 		const postFormatsUi = await page.$( '.editor-post-format' );
 		expect( postFormatsUi ).not.toBeNull();
 	} );

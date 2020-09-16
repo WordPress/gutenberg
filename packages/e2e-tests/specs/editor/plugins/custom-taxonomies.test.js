@@ -5,8 +5,8 @@ import {
 	activatePlugin,
 	createNewPost,
 	deactivatePlugin,
-	findSidebarPanelWithTitle,
-	openDocumentSettingsSidebar,
+	findDocumentSettingsSectionWithTitle,
+	openDocumentSettings,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Custom Taxonomies labels are used', () => {
@@ -24,9 +24,11 @@ describe( 'Custom Taxonomies labels are used', () => {
 
 	it( 'Ensures the custom taxonomy labels are respected', async () => {
 		// Open the Setting sidebar.
-		await openDocumentSettingsSidebar();
+		await openDocumentSettings();
 
-		const openButton = await findSidebarPanelWithTitle( 'Model' );
+		const openButton = await findDocumentSettingsSectionWithTitle(
+			'Model'
+		);
 		expect( openButton ).not.toBeFalsy();
 
 		// Get the classes from the panel
