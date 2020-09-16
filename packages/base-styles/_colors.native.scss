@@ -169,3 +169,11 @@ $dark-tertiary: #ffffff6d; //rgba(255, 255, 255, 0.43);
 $dark-quaternary: #ffffff3f; //rgba(255, 255, 255, 0.25);
 $dark-dim: #ffffff26; //rgba(255, 255, 255, 0.15);
 $dark-ultra-dim: #ffffff14; //rgba(255, 255, 255, 0.08);
+
+// Design Token colors
+$app-background: $white;
+$app-background-dark: $black;
+$app-background-dark-alt: $background-dark-elevated;
+
+$modal-background: $white;
+$modal-background-dark: $background-dark-elevated;

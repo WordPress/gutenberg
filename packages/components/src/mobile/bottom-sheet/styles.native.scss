@@ -32,7 +32,7 @@
 
 
 .background {
-	background-color: $white;
+	background-color: $modal-background;
 	border-top-right-radius: 8px;
 	border-top-left-radius: 8px;
 	width: 100%;
@@ -41,7 +41,7 @@
 }
 
 .backgroundDark {
-	background-color: $background-dark-elevated;
+	background-color: $modal-background-dark;
 }
 
 .content {
