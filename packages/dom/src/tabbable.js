@@ -152,7 +152,7 @@ export function find( context ) {
  *                          to the active element.
  */
 export function findPrevious( element = document.activeElement ) {
-	const focusables = findFocusable( document.body );
+	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables after and including `element`.
@@ -168,7 +168,7 @@ export function findPrevious( element = document.activeElement ) {
  *                          to the active element.
  */
 export function findNext( element = document.activeElement ) {
-	const focusables = findFocusable( document.body );
+	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables before and inside `element`.
