@@ -17,6 +17,7 @@ import {
 	difference,
 	omitBy,
 	pickBy,
+	filter,
 } from 'lodash';
 
 /**
@@ -1650,6 +1651,30 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+export function documentSettingsDropdown(
+	state = { hoveredEntities: [] },
+	action
+) {
+	switch ( action.type ) {
+		case 'SETTINGS_DROPDOWN_HOVERED_ENTITIES_ADD':
+			return {
+				...state,
+				hoveredEntities: [ action.clientId, ...state.hoveredEntities ],
+			};
+
+		case 'SETTINGS_DROPDOWN_HOVERED_ENTITIES_REMOVE':
+			return {
+				...state,
+				hoveredEntities: filter(
+					state.hoveredEntities,
+					( blockId ) => blockId !== action.clientId
+				),
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1671,4 +1696,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
+	documentSettingsDropdown,
 } );
