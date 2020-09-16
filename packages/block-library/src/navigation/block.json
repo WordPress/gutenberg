@@ -32,7 +32,7 @@
 		},
 		"separator": {
 			"type": "string",
-			"default": null
+			"default": ""
 		}
 	},
 	"providesContext": {

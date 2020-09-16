@@ -8,6 +8,17 @@
 	}
 }
 
+// Separators.
+.wp-block-navigation > .wp-block-navigation__container > .wp-block-navigation-link {
+	&::before {
+		content: attr(data-separator);
+	}
+
+	&:first-child::before {
+		display: none;
+	}
+}
+
 // Justification.
 .items-justified-left > ul {
 	justify-content: flex-start;

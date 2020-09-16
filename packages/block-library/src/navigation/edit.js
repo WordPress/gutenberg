@@ -166,16 +166,18 @@ function Navigation( {
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
-				<PanelBody title={ __( 'Separators' ) }>
-					<SelectControl
-						label={ __( 'Separator' ) }
-						onChange={ ( value ) => {
-							setAttributes( { separator: value } );
-						} }
-						options={ SEPARATOR_OPTIONS }
-						value={ attributes.separator }
-					/>
-				</PanelBody>
+				{ 'horizontal' === attributes.orientation && (
+					<PanelBody title={ __( 'Separators' ) }>
+						<SelectControl
+							label={ __( 'Separator' ) }
+							onChange={ ( value ) => {
+								setAttributes( { separator: value } );
+							} }
+							options={ SEPARATOR_OPTIONS }
+							value={ attributes.separator }
+						/>
+					</PanelBody>
+				) }
 				<PanelBody title={ __( 'Display settings' ) }>
 					<ToggleControl
 						checked={ attributes.showSubmenuIcon }
