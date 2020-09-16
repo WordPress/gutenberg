@@ -7,8 +7,12 @@
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
 - Rationale
+    - Presets become CSS Custom Properties
+    - Some block styles are managed
+    - Settings can be controlled per block
 - Specification
-- Current Status
+    - Settings
+    - Styles
 
 ## Rationale
 
@@ -26,75 +30,97 @@ These will be enqueued to the front-end and editor.
 
 By providing the block style properties in a structured way, the Block Editor can "manage" the CSS that comes from different origins (user, theme, and core CSS), reducing the amount of CSS loaded in the page and preventing specificity wars due to the competing needs of the components involved (themes, blocks, plugins).
 
-### Individual features can be controlled per block
+### Settings can be controlled per block
 
-The Block Editor already allows the control of specific features such as alignment, drop cap, whether it's present in the inserter, etc at the block level. The goal is to surface these for themes to control.
+The Block Editor already allows the control of specific settings such as alignment, drop cap, whether it's present in the inserter, etc at the block level. The goal is to surface these for themes to control.
 
 ## Specification
 
-The specification for the `experimental-theme.json` follows the three main functions described in the section above: `presets`, `styles`, and `features`.
+The `experimental-theme.json` file is divided into sections known as "contexts", that represent a different CSS selector. For example, the `core/paragraph` context maps to `p` while `core/group` maps to `.wp-block-group`. In general, one block will map to a single context as in the cases mentioned. There are cases where one block can generate multiple contexts (different CSS selectors). For example, the heading block generates six different contexts (`core/heading/h1`, `core/heading/h2`, etc), one for each different selector (h1, h2, etc).
 
-```
+```json
 {
-  "settings": {
-    "color": [ ... ],
-    "typography": [ ... ],
-    "spacing": [ ... ],
-  },
-  "styles": { ... },
+  "global": { ... },
+  "core/paragraph": { ... },
+  "core/group": { ... },
+  "core/heading/h1": { ... },
+  "core/heading/h2": { ... },
+  "core/heading/h3": { ... },
+  "core/heading/h4": { ... },
+  "core/heading/h5": { ... },
+  "core/heading/h6": { ... }
 }
 ```
 
-The file is divided into sections that represent different contexts: individual blocks, as well as the global environment.
+Every context has the same structure, divided in two sections: `settings` and `styles`. The `settings` are used to control the editor (enable/disable certain features, declare presets), taking over what was previously declared via `add_theme_support`. The `styles` will be used to create new style rules to be appended to a new stylesheet `global-styles-inline-css` enqueued in the front-end and post editor.
 
-```
+```json
 {
-  "global": {
-    "settings": { ... },
-    "styles": { ... },
-  },
-  "core/paragraph": {
-    "settings": { ... },
-    "styles": { ... },
-  },
-  "core/group": {
-    "settings": { ... },
-    "styles": { ... },
-  }
-}
-```
-
-Some of the functions are context-dependant. Take, as an example, the drop cap:
-
-```
-{
-  "global": {
+  "some/context": {
     "settings": {
-      "typography": {
-        "dropCap": false
-      }
-    }
-  },
-  "core/paragraph": {
-    "settings": {
-      "typography": {
-        "dropCap": true
-      }
-    }
-  },
-  "core/image": {
-    "settings": {
-      "typography": {
-        "dropCap": true
-      }
+      "color": [ ... ],
+      "typography": [ ... ],
+      "spacing": [ ... ]
+    },
+    "styles": {
+      "color": { ... },
+      "typography": { ... }
     }
   }
 }
 ```
 
-In the example above, we aim to encapsulate that the drop cap should be disabled globally but enabled in the paragraph context. Based on the current implementation, the drop cap in the Image block context wouldn't make sense so it would be ignored (but it could be used by plugins that extend its functionality).
+### Settings
 
-## Current Status
+The settings section has the following structure and default values:
+
+```json
+{
+  "some/context": {
+    "settings": {
+      "color": {
+        "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
+        "customGradient": true, /* false to opt-out, as in add_theme_support('disable-custom-gradients') */
+        "gradients": [ ... ], /* gradient presets, as in add_theme_support('editor-gradient-presets', ... ) */
+        "link": false, /* true to opt-in, as in add_theme_support('experimental-link-color') */
+        "palette": [ ... ], /* color presets, as in add_theme_support('editor-color-palette', ... ) */
+      },
+      "spacing": {
+        "customPadding": false, /* true to opt-in, as in add_theme_support('experimental-custom-spacing') */
+        "units": [ "px", "em", "rem", "vh", "vw" ], /* filter values, as in add_theme_support('custom-units', ... ) */
+      },
+      "typography": {
+        "customFontSize": true, /* false to opt-out, as in add_theme_support( 'disable-custom-font-sizes' ) */
+        "customLineHeight": false, /* true to opt-in, as in add_theme_support( 'custom-line-height' ) */
+        "dropCap": true, /* false to opt-out */
+        "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
+      }
+    }
+  }
+}
+```
+
+Note, however, that not all settings are relevant for all contexts and the blocks they represent. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `experimental-theme.json`.
+
+Settings can be controlled by context, providing a more fine-grained control over what exists via `add_theme_support`. As an example, let's say that a theme author wants to enable custom colors for the paragraph block exclusively. This is how it'd be done:
+
+```json
+{
+  "global": {
+    "settings": {
+      "color": {
+        "custom": false
+      }
+    }
+  },
+  "core/paragraph": {
+    "settings": {
+      "color": {
+        "custom": true
+      }
+    }
+  }
+```
 
 ### Presets
 
@@ -108,7 +134,7 @@ For this input:
 "global": {
   "settings": {
     "color": {
-		  palette: [
+      palette: [
         {
           "slug": "strong-magenta",
           "value": "#a156b4"
@@ -154,6 +180,25 @@ If the `experimental-theme.json` contains any presets, these will take precedenc
 ### Styles
 
 Each block will declare which style properties it exposes. This has been coined as "implicit style attributes" of the block. These properties are then used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
+
+```json
+{
+  "some/context": {
+    "styles": {
+      "color": {
+        "background": <value>,
+        "gradient": <value>,
+        "link": <value>,
+        "text": <value>
+      },
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      }
+    }
+  }
+}
+```
 
 #### Color Properties
 
@@ -201,232 +246,3 @@ Each block will declare which style properties it exposes. This has been coined 
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 
-### Features
-
-Via the features key we allow controlling some editor and block features according to the following rules:
-- The features within `global` override the default editor settings, which plugins can modify by hooking into the `block_editor_settings` filter on the server.
-- The features within the context of each block override the default block settings, which plugins can modify by hooking into the `blocks.registerBlockType` filter on the client.
-- Block settings take precedence over global settings.
-
-For example, if a feature is enabled for a block by default, although the theme disables it at the global level, the block keeps it enabled. If the theme wants to override a block's default, it has to target that particular block.
-
-So far, this function is enabled only for the `global` section in `lib/experimental-default-theme.json`.
-
-```
-{
-  "global": {
-    "settings": {
-      "typography": {
-        "dropCap": false
-      }
-    }
-  }
-}
-```
-
-Then each block can decide to override how they handle block editor features during their registration process (`register_block_type` or `registerBlockType` calls) using `supports` object in `block.json` file:
-
-```
-{
-  "supports": {
-    "__experimentalFeatures": {
-      "typography": {
-        "dropCap": true
-      }
-    }
-  }
-}
-```
-
-Moving forward, we plan to integrate overrides targeting individual blocks defined inside a theme specific file (`experimental-theme.json`) that would be applied on top of features defined by block authors in `supports` property.
-
-The list of features that are currently supported are:
-- Paragraph: drop cap.
-
-### Recap of current available functions
-
-```
-{
-  "global": {
-    "settings": {
-      "color": {
-        palette: [
-          {
-            "slug": <preset slug>,
-            "value": <preset value>
-          },
-          { <more colors> }
-        ],
-        gradients: [
-          {
-            "slug": <preset slug>,
-            "value": <preset value>
-          },
-          { <more gradients> }
-        ]
-      },
-      "typography": {
-        fontSize: [
-          {
-            "slug": <preset slug>,
-            "value": <preset value>
-          },
-          { <more font sizes> }
-        ]
-			}
-    },
-    "styles: {
-      "color: {
-        "background": <value>
-      }
-    }
-  },
-  "core/paragraph": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "link": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/heading/h1": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "link": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/heading/h2": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "link": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/heading/h3": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "link": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/heading/h4": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "link": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/heading/h5": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "link": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/heading/h6": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "link": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/columns": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "gradient": <value>,
-        "link": <value>,
-        "text": <value>
-      }
-    }
-  },
-  "core/group": {
-    "styles": {
-        "color": {
-          "background": <value>,
-          "gradient": <value>,
-          "link": <value>,
-          "text": <value>
-        }
-      }
-  },
-  "core/media-text": {
-    "styles": {
-        "color": {
-          "background": <value>,
-          "gradient": <value>,
-          "link": <value>,
-          "text": <value>
-        }
-      }
-  },
-  "core/site-title": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "gradient": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  },
-  "core/site-tagline": {
-    "styles": {
-      "color": {
-        "background": <value>,
-        "gradient": <value>,
-        "text": <value>
-      },
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      }
-    }
-  }
-}
-```
