@@ -16,6 +16,10 @@ For each user feature we should also add a importance categorization label  to i
 * [**] Add support for rounded style in Image block
 * [***] Full-width and wide alignment support for Group, Cover and Image block
 
+## 1.36.1
+
+* [**] [iOS] Fixed Dark Mode transition for editor menus.
+
 ## 1.36.0
 
 * [**] [Android] Removed pullquote dev only restriction in Android
