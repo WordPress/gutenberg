@@ -71,6 +71,11 @@ function Example() {
 							navigateToMenu="category"
 							title="Category"
 						/>
+						<NavigationItem
+							item="item-pointing-non-existing-menu"
+							title="Navigate to a non existing menu"
+							navigateToMenu="non-existing-menu"
+						/>
 					</NavigationGroup>
 					<NavigationGroup title="Group 2">
 						<NavigationItem
