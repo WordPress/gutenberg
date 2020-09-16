@@ -44,6 +44,11 @@ export default function DocumentActions( { documentTitle } ) {
 	// item is inactive.
 	const isTitleActive = ! label?.length || ! isActive;
 
+	const { page } = useSelect( ( select ) => {
+		const { getPage } = select( 'core/edit-site' );
+		return { page: getPage() };
+	} );
+
 	return (
 		<div
 			className={ classnames( 'edit-site-document-actions', {
@@ -99,6 +104,7 @@ export default function DocumentActions( { documentTitle } ) {
 								</span>
 								{ /* TODO: Don't allow input when there is no page context */ }
 								<input
+									disabled={ ! page }
 									placeholder={ 'nice' }
 									style={ { width: '100%' } }
 								/>
