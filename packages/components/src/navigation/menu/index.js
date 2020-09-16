@@ -32,7 +32,11 @@ export default function NavigationMenu( props ) {
 		title,
 	} = props;
 	useNavigationTreeMenu( props );
-	const { activeMenu, setActiveMenu } = useNavigationContext();
+	const {
+		activeMenu,
+		setActiveMenu,
+		navigationTree,
+	} = useNavigationContext();
 	const isActive = activeMenu === menu;
 
 	const classes = classnames( 'components-navigation__menu', className );
@@ -51,6 +55,8 @@ export default function NavigationMenu( props ) {
 		);
 	}
 
+	const parentMenuTitle = navigationTree.getMenu( parentMenu )?.title;
+
 	return (
 		<NavigationMenuContext.Provider value={ context }>
 			<MenuUI className={ classes }>
@@ -61,7 +67,7 @@ export default function NavigationMenu( props ) {
 						onClick={ () => setActiveMenu( parentMenu, 'right' ) }
 					>
 						<Icon icon={ chevronLeft } />
-						{ backButtonLabel || __( 'Back' ) }
+						{ backButtonLabel || parentMenuTitle || __( 'Back' ) }
 					</MenuBackButtonUI>
 				) }
 				{ title && (
