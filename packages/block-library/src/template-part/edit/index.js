@@ -75,11 +75,7 @@ export default function TemplatePartEdit( {
 		return (
 			<BlockWrapper>
 				<BlockControls>
-					<div
-						className="wp-block-template-part__block-control-group"
-						onMouseEnter={ () => addHoveredEntity( clientId ) }
-						onMouseLeave={ () => removeHoveredEntity( clientId ) }
-					>
+					<div className="wp-block-template-part__block-control-group">
 						<TemplatePartNamePanel
 							postId={ postId }
 							setAttributes={ setAttributes }
@@ -108,10 +104,15 @@ export default function TemplatePartEdit( {
 						/>
 					</div>
 				</BlockControls>
-				<TemplatePartInnerBlocks
-					postId={ postId }
-					hasInnerBlocks={ innerBlocks.length > 0 }
-				/>
+				<div
+					onMouseEnter={ () => addHoveredEntity( clientId ) }
+					onMouseLeave={ () => removeHoveredEntity( clientId ) }
+				>
+					<TemplatePartInnerBlocks
+						postId={ postId }
+						hasInnerBlocks={ innerBlocks.length > 0 }
+					/>
+				</div>
 			</BlockWrapper>
 		);
 	}
