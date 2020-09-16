@@ -133,7 +133,6 @@ function Navigation( {
 							: navIcons.justifyLeftIcon
 					}
 					label={ __( 'Change items justification' ) }
-					isCollapsed
 					controls={ [
 						{
 							icon: navIcons.justifyLeftIcon,
