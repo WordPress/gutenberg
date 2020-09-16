@@ -18,15 +18,16 @@ const deprecatedFlags = {
 		settings.disableCustomColors === undefined
 			? undefined
 			: ! settings.disableCustomColors,
-	'gradient.custom': ( settings ) =>
+	'color.customGradient': ( settings ) =>
 		settings.disableCustomGradients === undefined
 			? undefined
 			: ! settings.disableCustomGradients,
-	'fontSize.custom': ( settings ) =>
+	'typography.customFontSize': ( settings ) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined
 			: ! settings.disableCustomFontSizes,
-	'lineHeight.custom': ( settings ) => settings.enableCustomLineHeight,
+	'typography.customLineHeight': ( settings ) =>
+		settings.enableCustomLineHeight,
 	'spacing.units': ( settings ) => {
 		if ( settings.enableCustomUnits === undefined ) {
 			return;
