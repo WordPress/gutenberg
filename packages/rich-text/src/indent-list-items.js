@@ -12,7 +12,8 @@ import { canIndentListItems } from './can-indent-list-items';
  * Gets the line index of the first previous list item with higher indentation.
  *
  * @param {RichTextValue} value      Value to search.
- * @param {number} lineIndex  Line index of the list item to compare with.
+ * @param {number}        lineIndex  Line index of the list item to compare
+ *                                   with.
  *
  * @return {boolean} The line index.
  */

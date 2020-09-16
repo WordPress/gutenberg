@@ -13,10 +13,10 @@ import { normaliseFormats } from './normalise-formats';
  * and `endIndex` will be removed. Indices are retrieved from the selection if
  * none are provided.
  *
- * @param {RichTextValue} value         Value to modify.
+ * @param {RichTextValue}        value         Value to modify.
  * @param {RichTextValue|string} valueToInsert Value to insert.
- * @param {number}        [startIndex]  Start index.
- * @param {number}        [endIndex]    End index.
+ * @param {number}               [startIndex]  Start index.
+ * @param {number}               [endIndex]    End index.
  *
  * @return {RichTextValue} A new value with the value inserted.
  */

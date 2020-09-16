@@ -15,7 +15,7 @@ import { LINE_SEPARATOR } from './special-characters';
  *                                    the line. Defaults to the selection start
  *                                    of the value.
  *
- * @return {?boolean} The line index. Undefined if not found.
+ * @return {?number} The line index. Undefined if not found.
  */
 export function getLineIndex( { start, text }, startIndex = start ) {
 	let index = startIndex;

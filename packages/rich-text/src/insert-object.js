@@ -3,20 +3,20 @@
  */
 
 import { insert } from './insert';
+import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 
 /** @typedef {import('./create').RichTextValue} RichTextValue */
-
-const OBJECT_REPLACEMENT_CHARACTER = '\ufffc';
+/** @typedef {import('./create').RichTextReplacement} RichTextReplacement */
 
 /**
  * Insert a format as an object into a Rich Text value at the given
  * `startIndex`. Any content between `startIndex` and `endIndex` will be
  * removed. Indices are retrieved from the selection if none are provided.
  *
- * @param {RichTextValue} value          Value to modify.
- * @param {Object}        formatToInsert Format to insert as object.
- * @param {number}        [startIndex]   Start index.
- * @param {number}        [endIndex]     End index.
+ * @param {RichTextValue}  value          Value to modify.
+ * @param {RichTextReplacement} formatToInsert Format to insert as object.
+ * @param {number}         [startIndex]   Start index.
+ * @param {number}         [endIndex]     End index.
  *
  * @return {RichTextValue} A new value with the object inserted.
  */

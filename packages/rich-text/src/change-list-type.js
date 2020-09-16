@@ -7,6 +7,7 @@ import { getLineIndex } from './get-line-index';
 import { getParentLineIndex } from './get-parent-line-index';
 
 /** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./create').RichTextReplacement} RichTextReplacement */
 
 /**
  * Changes the list type of the selected indented list, if any. Looks at the
@@ -14,9 +15,10 @@ import { getParentLineIndex } from './get-parent-line-index';
  * type of this list. When multiple lines are selected, the parent lists are
  * takes and changed.
  *
- * @param {RichTextValue} value     Value to change.
- * @param {Object}        newFormat The new list format object. Choose between
- *                                  `{ type: 'ol' }` and `{ type: 'ul' }`.
+ * @param {RichTextValue}       value     Value to change.
+ * @param {RichTextReplacement} newFormat The new list format object. Choose
+ *                                        between `{ type: 'ol' }` and
+ *                                        `{ type: 'ul' }`.
  *
  * @return {RichTextValue} The changed value.
  */

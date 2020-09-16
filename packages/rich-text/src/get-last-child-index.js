@@ -12,7 +12,7 @@ import { LINE_SEPARATOR } from './special-characters';
  * @param {RichTextValue} value     Value to search.
  * @param {number}        lineIndex Line index of a list item in the list.
  *
- * @return {Array} The index of the last child.
+ * @return {number} The index of the last child.
  */
 export function getLastChildIndex( { text, replacements }, lineIndex ) {
 	const lineFormats = replacements[ lineIndex ] || [];

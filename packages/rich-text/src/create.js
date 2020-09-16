@@ -17,13 +17,29 @@ import {
 } from './special-characters';
 
 /**
- * @typedef  {Object} RichTextValue
+ * @typedef {Object} RichTextFormat
  *
- * @property {string}           text         Text.
- * @property {Array}            formats      Formats.
- * @property {Array}            replacements Replacements.
- * @property {number|undefined} start        Selection start.
- * @property {number|undefined} end          Selection end.
+ * @property {string} type Format type.
+ */
+
+/**
+ * @typedef {Array<RichTextFormat>} RichTextFormatList
+ */
+
+/**
+ * @typedef {Object} RichTextReplacement
+ *
+ * @property {string} type Replacement type.
+ */
+
+/**
+ * @typedef {Object} RichTextValue
+ *
+ * @property {string}                    text         Text.
+ * @property {Array<RichTextFormatList>} formats      Formats.
+ * @property {Array<RichTextReplacement>} replacements Replacements.
+ * @property {number|undefined}          start        Selection start.
+ * @property {number|undefined}          end          Selection end.
  */
 
 function createEmptyValue() {
@@ -322,7 +338,7 @@ function removePadding( string ) {
  * @param {?Array}    $1.currentWrapperTags
  * @param {?boolean}  $1.isEditableTree
  *
- * @return {Object} A rich text value.
+ * @return {RichTextValue} A rich text value.
  */
 function createFromElement( {
 	element,
@@ -492,7 +508,7 @@ function createFromElement( {
  *                                           space characters.
  * @param {?boolean} $1.isEditableTree
  *
- * @return {Object} A rich text value.
+ * @return {RichTextValue} A rich text value.
  */
 function createFromMultilineElement( {
 	element,

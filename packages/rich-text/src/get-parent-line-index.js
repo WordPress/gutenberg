@@ -14,7 +14,7 @@ import { LINE_SEPARATOR } from './special-characters';
  * @param {RichTextValue} value     Value to search.
  * @param {number}        lineIndex Line index of a child list item.
  *
- * @return {Array} The parent list line index.
+ * @return {number} The parent list line index.
  */
 export function getParentLineIndex( { text, replacements }, lineIndex ) {
 	const startFormats = replacements[ lineIndex ] || [];
