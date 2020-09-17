@@ -20,7 +20,11 @@ import TypographyPanel from './typography-panel';
 import ColorPanel from './color-panel';
 
 export default ( { identifier, title, icon } ) => {
-	const { contexts, getProperty, setProperty } = useGlobalStylesContext();
+	const {
+		contexts,
+		getStyleProperty,
+		setStyleProperty,
+	} = useGlobalStylesContext();
 
 	if ( typeof contexts !== 'object' || ! contexts?.[ GLOBAL_CONTEXT ] ) {
 		// No sidebar is shown.
@@ -84,8 +88,12 @@ export default ( { identifier, title, icon } ) => {
 													supports,
 													name,
 												} }
-												getProperty={ getProperty }
-												setProperty={ setProperty }
+												getStyleProperty={
+													getStyleProperty
+												}
+												setStyleProperty={
+													setStyleProperty
+												}
 											/>,
 											<ColorPanel
 												key={ 'color-panel-' + name }
@@ -93,8 +101,12 @@ export default ( { identifier, title, icon } ) => {
 													supports,
 													name,
 												} }
-												getProperty={ getProperty }
-												setProperty={ setProperty }
+												getStyleProperty={
+													getStyleProperty
+												}
+												setStyleProperty={
+													setStyleProperty
+												}
 											/>,
 										].filter( Boolean ) }
 									</PanelBody>
@@ -112,8 +124,8 @@ export default ( { identifier, title, icon } ) => {
 								supports,
 								name: blockName,
 							} }
-							getProperty={ getProperty }
-							setProperty={ setProperty }
+							getStyleProperty={ getStyleProperty }
+							setStyleProperty={ setStyleProperty }
 						/>,
 						<ColorPanel
 							key={ 'color-panel-' + blockName }
@@ -121,8 +133,8 @@ export default ( { identifier, title, icon } ) => {
 								supports,
 								name: blockName,
 							} }
-							getProperty={ getProperty }
-							setProperty={ setProperty }
+							getStyleProperty={ getStyleProperty }
+							setStyleProperty={ setStyleProperty }
 						/>,
 					].filter( Boolean );
 				} }
