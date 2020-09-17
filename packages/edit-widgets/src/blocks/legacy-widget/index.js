@@ -49,7 +49,7 @@ function legacyWidgetsToBlockVariations( availableLegacyWidgets ) {
 	const variations = [];
 	for ( const className in availableLegacyWidgets ) {
 		const widget = availableLegacyWidgets[ className ];
-		if ( widget.hidden ) {
+		if ( widget.isHidden ) {
 			continue;
 		}
 		variations.push( legacyWidgetToBlockVariation( className, widget ) );
