@@ -902,7 +902,7 @@ function gutenberg_experimental_global_styles_allow_css_var_name( $allowed_attr 
 function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $css_test_string ) {
 	$parts = explode( ':', $css_test_string, 2 );
 
-	if ( '--wp--style--color--link' !== $parts[ 0 ] ) {
+	if ( '--wp--style--color--link' !== $parts[0] ) {
 		return $allow_css;
 	}
 
