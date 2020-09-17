@@ -2,9 +2,7 @@
  * External dependencies
  */
 import moment from 'moment';
-// react-dates doesn't tree-shake correctly, so we import from the individual
-// component here, to avoid including too much of the library
-import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
+import ReactDatePicker from 'react-datepicker';
 
 /**
  * WordPress dependencies
@@ -33,7 +31,12 @@ class DatePicker extends Component {
 	 * This focus loss closes the date picker popover.
 	 * Ideally we should add an upstream commit on react-dates to fix this issue.
 	 */
-	keepFocusInside() {
+	keepFocusInside( newMonthDate ) {
+		// Trigger onMonthChange callback.
+		if ( this.props.onMonthChange ) {
+			this.props.onMonthChange( newMonthDate.toISOString() );
+		}
+
 		if ( ! this.nodeRef.current ) {
 			return;
 		}
@@ -82,14 +85,14 @@ class DatePicker extends Component {
 		return currentDate ? moment( currentDate ) : moment();
 	}
 
-	// todo change reference to `isDayHighlighted` every time, `events` prop change
 	isDayHighlighted( date ) {
+		if ( this.props.onMonthPreviewed ) {
+			this.props.onMonthPreviewed( date.toISOString() );
+		}
+
 		// Do not highlight when no events.
 		if ( ! this.props.events?.length ) {
 			return false;
-		}
-		if ( this.props.onMonthPreviewed ) {
-			this.props.onMonthPreviewed( date.toDate() );
 		}
 
 		// Compare date against highlighted events.
@@ -99,33 +102,13 @@ class DatePicker extends Component {
 	}
 
 	render() {
-		const { currentDate, isInvalidDate } = this.props;
-		const momentDate = this.getMomentDate( currentDate );
-
+		const { currentDate, isInvalidDate, events } = this.props;
 		return (
 			<div className="components-datetime__date" ref={ this.nodeRef }>
-				<DayPickerSingleDateController
-					date={ momentDate }
-					daySize={ 30 }
-					focused
-					hideKeyboardShortcutsPanel
-					// This is a hack to force the calendar to update on month or year change
-					// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
-					key={ `datepicker-controller-${
-						momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
-					}` }
-					noBorder
-					numberOfMonths={ 1 }
-					onDateChange={ this.onChangeMoment }
-					transitionDuration={ 0 }
-					weekDayFormat="ddd"
-					isRTL={ isRTL() }
-					isOutsideRange={ ( date ) => {
-						return isInvalidDate && isInvalidDate( date.toDate() );
-					} }
-					isDayHighlighted={ this.isDayHighlighted }
-					onPrevMonthClick={ this.keepFocusInside }
-					onNextMonthClick={ this.keepFocusInside }
+				<ReactDatePicker
+					selected={ currentDate }
+					onChange={ console.log }
+					inline
 				/>
 			</div>
 		);
@@ -133,3 +116,4 @@ class DatePicker extends Component {
 }
 
 export default DatePicker;
+
