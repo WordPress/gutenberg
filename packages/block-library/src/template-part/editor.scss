@@ -80,6 +80,10 @@
 		}
 	}
 
+	.components-toolbar__control.has-icon {
+		height: $block-toolbar-height;
+	}
+
 	.wp-block-template-part__preview-dropdown-button {
 		border-right: $border-width solid $gray-900;
 	}
