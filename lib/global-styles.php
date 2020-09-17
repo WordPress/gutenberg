@@ -876,17 +876,42 @@ function gutenberg_experimental_global_styles_register_cpt() {
 }
 
 /**
- * Tell kses not to remove from the block markup (style attribute)
+ * Tell kses not to remove from the block markup (from style attribute)
  * the CSS variables the block editor may add.
+ *
+ * @param array $allowed_attr List of allowed attributes.
+ * @return array Filtered result.
  */
-function gutenberg_experimental_global_styles_allow_css_variables( $allowed_attr ) {
+function gutenberg_experimental_global_styles_allow_css_var_name( $allowed_attr ) {
 	return array_merge(
 		$allowed_attr,
 		[ '--wp--style--color--link' ],
 	);
 }
 
+/**
+ * Tell kses to allow certain values for the properties
+ * the block editor may add.
+ *
+ * @param boolean $allow_css Whether or not this rule should be allowed.
+ * @param string $css_test_string The CSS rule to process.
+ * @return boolean Filtered result.
+ */
+function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $css_test_string ) {
+	$parts = explode( ':', $css_test_string, 2 );
+
+	if ( $parts[ 0 ] !== '--wp--style--color--link' ) {
+		return $allow_css;
+	}
+
+	// The only value the block editor attaches to link color is
+	// var(--wp--preset--color--<some-value-here>)
+	// so be specific in testing for that value.
+	return preg_match( '/var\(--wp--preset--color--.*\)/', $parts[1] );
+}
+
 add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-add_filter( 'safe_style_css', 'gutenberg_experimental_global_styles_allow_css_variables' );
+add_filter( 'safe_style_css', 'gutenberg_experimental_global_styles_allow_css_var_name' );
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_experimental_global_styles_allow_css_var_value', 10, 2 );
