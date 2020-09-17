@@ -108,7 +108,7 @@ class DatePicker extends Component {
 		const momentDate = this.getMomentDate( currentDate );
 		const key = `datepicker-controller-${
 			momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
-		}`; //${ events?.length ? '-events-' + events.length : '' }`;
+		}${ events?.length ? '-events-' + events.length : '' }`;
 
 		return (
 			<div className="components-datetime__date" ref={ this.nodeRef }>
@@ -139,3 +139,4 @@ class DatePicker extends Component {
 }
 
 export default DatePicker;
+
