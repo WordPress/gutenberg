@@ -3,13 +3,13 @@
 	height: $mobile-header-toolbar-height;
 	flex-direction: row;
 	background-color: $app-background;
-	border-top-color: $border-color;
+	border-top-color: $modal-border-color;
 	border-top-width: 1px;
 }
 
 .containerDark {
 	background-color: $app-background-dark-alt;
-	border-top-color: $border-color-dark;
+	border-top-color: $modal-border-color-dark;
 }
 
 .scrollableContent {

@@ -27,7 +27,7 @@
 }
 
 .outline {
-	border-color: $light-dim;
+	border-color: $border-color;
 	top: 0;
 	bottom: 0;
 	left: 0;
@@ -39,7 +39,7 @@
 }
 
 .outlineDark {
-	border-color: $dark-ultra-dim;
+	border-color: $border-color-dark;
 }
 
 .selectedOutline {

@@ -1,11 +1,11 @@
 .container {
 	flex-direction: row;
 	border-left-width: 1px;
-	border-color: $border-color;
+	border-color: $modal-border-color;
 	padding-left: 5px;
 	padding-right: 5px;
 }
 
 .containerDark {
-	border-color: $border-color-dark;
+	border-color: $modal-border-color-dark;
 }

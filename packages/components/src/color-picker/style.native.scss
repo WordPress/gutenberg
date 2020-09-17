@@ -1,6 +1,6 @@
 .footer {
 	border-top-width: $border-width;
-	border-color: $border-color;
+	border-color: $modal-border-color;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
@@ -10,7 +10,7 @@
 }
 
 .footerDark {
-	border-color: $border-color-dark;
+	border-color: $modal-border-color-dark;
 }
 
 .cancelButton {

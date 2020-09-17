@@ -9,14 +9,14 @@
 
 .verticalSeparator {
 	border-width: $border-width / 2;
-	border-color: $border-color;
+	border-color: $modal-border-color;
 	height: 38px;
 	margin-right: $grid-unit-20 / 2;
 	align-self: center;
 }
 
 .verticalSeparatorDark {
-	border-color: $border-color-dark;
+	border-color: $modal-border-color-dark;
 }
 
 .colorIndicator {

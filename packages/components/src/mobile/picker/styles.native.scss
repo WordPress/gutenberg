@@ -4,11 +4,11 @@
 	margin-left: -$grid-unit-20;
 	margin-right: -$grid-unit-20;
 	height: $border-width;
-	background-color: $separator-color;
+	background-color: $modal-border-color;
 }
 
 .separatorDark {
-	background-color: $separator-color-dark;
+	background-color: $modal-border-color-dark;
 }
 
 .disabled {

@@ -1,6 +1,4 @@
 /** @format */
-
-// Hugo's new WordPress shades of gray, from http://codepen.io/hugobaeta/pen/grJjVp.
 $black: #000;
 $white: #fff;
 
@@ -12,7 +10,6 @@ $dark-gray-600: #40464d;
 $dark-opacity-900: rgba(#000510, 0.9);
 $dark-opacity-800: rgba(#00000a, 0.85);
 $dark-opacity-600: rgba(#000913, 0.75);
-
 
 // Light opacities, for use with dark themes.
 $light-opacity-700: rgba($white, 0.85);
@@ -78,7 +75,6 @@ $light-primary: #000d; //rgba(0, 0, 0, 0.87);
 $light-secondary: #0009; //rgba(0, 0, 0, 0.6);
 $light-tertiary: #0000006d; //rgba(0, 0, 0, 0.43);
 $light-quaternary: #0000003f; //rgba(0, 0, 0, 0.25);
-$light-dim: #0000001e; //rgba(0, 0, 0, 0.12);
 $light-ultra-dim: #0000000a; //rgba(0, 0, 0, 0.04);
 
 // neutral (dark) - white is a base color in dark mode
@@ -88,6 +84,11 @@ $dark-tertiary: #ffffff6d; //rgba(255, 255, 255, 0.43);
 $dark-quaternary: #ffffff3f; //rgba(255, 255, 255, 0.25);
 $dark-ultra-dim: #ffffff14; //rgba(255, 255, 255, 0.08);
 
+// new Colours.
+$neutral-dim-light: rgba($black, 0.12);
+
+$neutral-dim-dark: rgba($white, 0.15);
+
 // Design Token colors
 $app-background: $white;
 $app-background-dark: $black;
@@ -96,17 +97,14 @@ $app-background-dark-alt: $background-dark-elevated;
 $modal-background: $white;
 $modal-background-dark: $background-dark-elevated;
 
-$border-color: $light-dim;
-$border-color-dark: $gray-70;
+$border-color: $neutral-dim-light;
+$border-color-dark: $neutral-dim-dark;
 
-$separator-color: $light-dim;
-$separator-color-dark: $gray-70;
+$modal-border-color: $neutral-dim-light;
+$modal-border-color-dark: $neutral-dim-dark;
 
-$drag-indicator: $light-dim;
-$drag-indicator-dark: $dark-ultra-dim;
+$drag-indicator: $neutral-dim-light;
+$drag-indicator-dark: $neutral-dim-dark;
 
-$slider-input-border: $light-dim;
-$slider-input-border-dark: $dark-ultra-dim;
-
-$spacer-color: $light-dim;
-$spacer-color-dark: $dark-ultra-dim;
+$spacer-color: $neutral-dim-light;
+$spacer-color-dark: $neutral-dim-dark;
