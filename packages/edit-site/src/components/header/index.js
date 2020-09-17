@@ -16,6 +16,11 @@ import {
 import { _x } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
+import { useState, useEffect, useRef, useMemo } from '@wordpress/element';
+import {
+	__experimentalGetBlockLabel as getBlockLabel,
+	getBlockType,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -79,64 +84,110 @@ export default function Header( {
 	const displayBlockToolbar =
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
+	// Track mouse location.
+	const [ mouseLoc, setMouseLoc ] = useState( { x: 0, y: 0 } );
+	useEffect( () => {
+		const setMouseLocFromEvent = ( event ) =>
+			setMouseLoc( { x: event.clientX, y: event.clientY } );
+
+		window.addEventListener( 'mousemove', setMouseLocFromEvent );
+
+		return () => {
+			window.removeEventListener( 'mousemove', setMouseLocFromEvent );
+		};
+	}, [] );
+
+	// See if a template part is hovered when mouse moves.
+	const hoveredTemplatePartRef = useRef( '' );
+	useEffect( () => {
+		const hoveredElements = document.elementsFromPoint(
+			mouseLoc.x,
+			mouseLoc.y
+		);
+		// NOTE: this find may prioritize top-down, we may want the opposite.
+		const templatePart = hoveredElements.find(
+			( element ) => element.dataset?.type === 'core/template-part'
+		);
+		hoveredTemplatePartRef.current = templatePart
+			? templatePart.dataset.block
+			: '';
+	}, [ mouseLoc.x, mouseLoc.y ] );
+
+	// Get label when hovered template part changes.
+	const getBlock = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlock
+	);
+	const hoverLabel = useMemo( () => {
+		const block = getBlock( hoveredTemplatePartRef.current );
+		return (
+			block &&
+			getBlockLabel( getBlockType( block.name ), block.attributes )
+		);
+	}, [ hoveredTemplatePartRef.current ] );
+
 	return (
-		<div className="edit-site-header">
-			<MainDashboardButton.Slot>
-				<FullscreenModeClose />
-			</MainDashboardButton.Slot>
-			<div className="edit-site-header__toolbar">
-				<Button
-					isPrimary
-					isPressed={ isInserterOpen }
-					className="edit-site-header-toolbar__inserter-toggle"
-					onClick={ onToggleInserter }
-					icon={ plus }
-					label={ _x(
-						'Add block',
-						'Generic label for block inserter button'
+		<>
+			<div className="edit-site-header">{ hoverLabel }</div>
+			<div className="edit-site-header">
+				<MainDashboardButton.Slot>
+					<FullscreenModeClose />
+				</MainDashboardButton.Slot>
+				<div className="edit-site-header__toolbar">
+					<Button
+						isPrimary
+						isPressed={ isInserterOpen }
+						className="edit-site-header-toolbar__inserter-toggle"
+						onClick={ onToggleInserter }
+						icon={ plus }
+						label={ _x(
+							'Add block',
+							'Generic label for block inserter button'
+						) }
+					/>
+					<ToolSelector />
+					<UndoButton />
+					<RedoButton />
+					<BlockNavigationDropdown />
+					{ displayBlockToolbar && (
+						<div className="edit-site-header-toolbar__block-toolbar">
+							<BlockToolbar hideDragHandle />
+						</div>
 					) }
-				/>
-				<ToolSelector />
-				<UndoButton />
-				<RedoButton />
-				<BlockNavigationDropdown />
-				{ displayBlockToolbar && (
-					<div className="edit-site-header-toolbar__block-toolbar">
-						<BlockToolbar hideDragHandle />
+					<div className="edit-site-header__toolbar-switchers">
+						<PageSwitcher
+							showOnFront={ showOnFront }
+							activePage={ page }
+							onActivePageChange={ setPage }
+						/>
+						<div className="edit-site-header__toolbar-switchers-separator">
+							/
+						</div>
+						<TemplateSwitcher
+							page={ page }
+							activeId={ templateId }
+							activeTemplatePartId={ templatePartId }
+							isTemplatePart={
+								templateType === 'wp_template_part'
+							}
+							onActiveIdChange={ setTemplate }
+							onActiveTemplatePartIdChange={ setTemplatePart }
+							onAddTemplate={ addTemplate }
+							onRemoveTemplate={ removeTemplate }
+						/>
 					</div>
-				) }
-				<div className="edit-site-header__toolbar-switchers">
-					<PageSwitcher
-						showOnFront={ showOnFront }
-						activePage={ page }
-						onActivePageChange={ setPage }
+				</div>
+				<div className="edit-site-header__actions">
+					<PreviewOptions
+						deviceType={ deviceType }
+						setDeviceType={ setPreviewDeviceType }
 					/>
-					<div className="edit-site-header__toolbar-switchers-separator">
-						/
-					</div>
-					<TemplateSwitcher
-						page={ page }
-						activeId={ templateId }
-						activeTemplatePartId={ templatePartId }
-						isTemplatePart={ templateType === 'wp_template_part' }
-						onActiveIdChange={ setTemplate }
-						onActiveTemplatePartIdChange={ setTemplatePart }
-						onAddTemplate={ addTemplate }
-						onRemoveTemplate={ removeTemplate }
+					<SaveButton
+						openEntitiesSavedStates={ openEntitiesSavedStates }
 					/>
+					<PinnedItems.Slot scope="core/edit-site" />
+					<MoreMenu />
 				</div>
 			</div>
-			<div className="edit-site-header__actions">
-				<PreviewOptions
-					deviceType={ deviceType }
-					setDeviceType={ setPreviewDeviceType }
-				/>
-				<SaveButton
-					openEntitiesSavedStates={ openEntitiesSavedStates }
-				/>
-				<PinnedItems.Slot scope="core/edit-site" />
-				<MoreMenu />
-			</div>
-		</div>
+		</>
 	);
 }
