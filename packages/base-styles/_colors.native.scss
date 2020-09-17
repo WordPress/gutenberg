@@ -86,8 +86,10 @@ $dark-ultra-dim: #ffffff14; //rgba(255, 255, 255, 0.08);
 
 // new Colours.
 $neutral-dim-light: rgba($black, 0.12);
-
 $neutral-dim-dark: rgba($white, 0.15);
+
+$seperator: rgba($black, 0.1);
+$seperator-dark: rgba($white, 0.18);
 
 // Design Token colors
 $app-background: $white;
@@ -97,14 +99,14 @@ $app-background-dark-alt: $background-dark-elevated;
 $modal-background: $white;
 $modal-background-dark: $background-dark-elevated;
 
-$border-color: $neutral-dim-light;
-$border-color-dark: $neutral-dim-dark;
+$border-color: $seperator;
+$border-color-dark: $seperator-dark;
 
-$modal-border-color: $neutral-dim-light;
-$modal-border-color-dark: $neutral-dim-dark;
+$modal-border-color: $seperator;
+$modal-border-color-dark: $seperator-dark;
 
-$drag-indicator: $neutral-dim-light;
-$drag-indicator-dark: $neutral-dim-dark;
+$drag-indicator: $seperator;
+$drag-indicator-dark: $seperator-dark;
 
-$spacer-color: $neutral-dim-light;
-$spacer-color-dark: $neutral-dim-dark;
+$spacer-color: $seperator;
+$spacer-color-dark: $seperator-dark;
