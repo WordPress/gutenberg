@@ -4,34 +4,42 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { ROOT_MENU } from '../constants';
-import { useNavigationContext } from '../context';
-import { MenuTitleUI, MenuUI } from '../styles/navigation-styles';
-import NavigationBackButton from '../back-button';
 import { NavigationMenuContext } from './context';
+import { useNavigationContext } from '../context';
 import { useNavigationTreeMenu } from './use-navigation-tree-menu';
+import NavigationBackButton from '../back-button';
+import NavigationMenuTitle from './menu-title';
+import { MenuUI } from '../styles/navigation-styles';
 
 export default function NavigationMenu( props ) {
 	const {
 		backButtonLabel,
 		children,
 		className,
+		hasSearch,
 		menu = ROOT_MENU,
 		parentMenu,
 		title,
 		onBackButtonClick,
 	} = props;
+	const [ search, setSearch ] = useState( '' );
 	useNavigationTreeMenu( props );
 	const { activeMenu } = useNavigationContext();
+
 	const isActive = activeMenu === menu;
 
-	const classes = classnames( 'components-navigation__menu', className );
-
 	const context = {
-		menu,
 		isActive,
+		menu,
+		search,
 	};
 
 	// Keep the children rendered to make sure inactive items are included in the navigation tree
@@ -43,6 +51,8 @@ export default function NavigationMenu( props ) {
 		);
 	}
 
+	const classes = classnames( 'components-navigation__menu', className );
+
 	return (
 		<NavigationMenuContext.Provider value={ context }>
 			<MenuUI className={ classes }>
@@ -53,15 +63,14 @@ export default function NavigationMenu( props ) {
 						onClick={ onBackButtonClick }
 					/>
 				) }
-				{ title && (
-					<MenuTitleUI
-						as="h2"
-						className="components-navigation__menu-title"
-						variant="subtitle"
-					>
-						{ title }
-					</MenuTitleUI>
-				) }
+
+				<NavigationMenuTitle
+					hasSearch={ hasSearch }
+					search={ search }
+					setSearch={ setSearch }
+					title={ title }
+				/>
+
 				<ul>{ children }</ul>
 			</MenuUI>
 		</NavigationMenuContext.Provider>

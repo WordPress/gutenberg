@@ -4,8 +4,9 @@
 import { createContext, useContext } from '@wordpress/element';
 
 export const NavigationMenuContext = createContext( {
-	menu: undefined,
 	isActive: false,
+	menu: undefined,
+	search: '',
 } );
 export const useNavigationMenuContext = () =>
 	useContext( NavigationMenuContext );

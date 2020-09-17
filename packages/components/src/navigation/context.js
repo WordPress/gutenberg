@@ -31,9 +31,3 @@ export const NavigationContext = createContext( {
 	},
 } );
 export const useNavigationContext = () => useContext( NavigationContext );
-
-export const NavigationMenuContext = createContext( {
-	search: '',
-} );
-export const useNavigationMenuContext = () =>
-	useContext( NavigationMenuContext );

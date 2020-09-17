@@ -8,10 +8,10 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import Animate from '../animate';
-import Button from '../button';
-import { MenuTitleSearchUI, MenuTitleUI } from './styles/navigation-styles';
-import TextControl from '../text-control';
+import Animate from '../../animate';
+import Button from '../../button';
+import { MenuTitleSearchUI, MenuTitleUI } from '../styles/navigation-styles';
+import TextControl from '../../text-control';
 
 export default function NavigationMenuTitle( {
 	hasSearch,
@@ -41,6 +41,7 @@ export default function NavigationMenuTitle( {
 							<Icon icon={ searchIcon } />
 
 							<TextControl
+								autocomplete="off"
 								// eslint-disable-next-line jsx-a11y/no-autofocus
 								autoFocus
 								onChange={ ( value ) => setSearch( value ) }
