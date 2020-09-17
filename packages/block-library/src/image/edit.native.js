@@ -24,6 +24,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	Image,
+	WIDE_ALIGNMENTS,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -34,6 +35,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
+	BlockStyles,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol } from '@wordpress/url';
@@ -94,7 +96,6 @@ export class ImageEdit extends React.Component {
 
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
-
 		// This will warn when we have `id` defined, while `url` is undefined.
 		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
 		// where a cancelled image upload was resulting in a subsequent crash.
@@ -234,7 +235,15 @@ export class ImageEdit extends React.Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		this.props.setAttributes( { align: nextAlign } );
+		const extraUpdatedAttributes = Object.values(
+			WIDE_ALIGNMENTS.alignments
+		).includes( nextAlign )
+			? { width: undefined, height: undefined }
+			: {};
+		this.props.setAttributes( {
+			...extraUpdatedAttributes,
+			align: nextAlign,
+		} );
 	}
 
 	onSetLinkDestination( href ) {
@@ -319,18 +328,33 @@ export class ImageEdit extends React.Component {
 		);
 	}
 
+	getWidth() {
+		const { attributes } = this.props;
+		const { align, width } = attributes;
+
+		return Object.values( WIDE_ALIGNMENTS.alignments ).includes( align )
+			? '100%'
+			: width;
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
-		const { attributes, isSelected, image, imageSizes } = this.props;
+		const {
+			attributes,
+			isSelected,
+			image,
+			imageSizes,
+			clientId,
+		} = this.props;
 		const {
 			align,
 			url,
-			width,
 			alt,
 			href,
 			id,
 			linkTarget,
 			sizeSlug,
+			className,
 		} = attributes;
 
 		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
@@ -360,7 +384,13 @@ export class ImageEdit extends React.Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) }>
+				<PanelBody title={ __( 'Image settings' ) } />
+				<PanelBody style={ styles.panelBody }>
+					{ image && (
+						<BlockStyles clientId={ clientId } url={ url } />
+					) }
+				</PanelBody>
+				<PanelBody>
 					<TextControl
 						icon={ link }
 						label={ __( 'Link To' ) }
@@ -468,7 +498,8 @@ export class ImageEdit extends React.Component {
 										openMediaOptions={ openMediaOptions }
 										retryMessage={ retryMessage }
 										url={ url }
-										width={ width }
+										shapeStyle={ styles[ className ] }
+										width={ this.getWidth() }
 									/>
 								);
 							} }

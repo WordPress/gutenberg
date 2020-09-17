@@ -539,16 +539,64 @@
 	.block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
 		min-width: $block-toolbar-height/2;
 		width: $block-toolbar-height/2;
+
+		// Animate buttons on hover.
+		&.is-up-button {
+			svg {
+				transition: ease-in-out transform 0.1s;
+				@include reduce-motion("transition");
+			}
+			&:focus,
+			&:hover {
+				svg {
+					transform: translateX(-2px);
+				}
+			}
+		}
+
+		&.is-down-button {
+			svg {
+				transition: ease-in-out transform 0.1s;
+				@include reduce-motion("transition");
+			}
+			&:focus,
+			&:hover {
+				svg {
+					transform: translateX(2px);
+				}
+			}
+		}
 	}
 
 	.block-editor-block-mover:not(.is-horizontal) {
+		// Position SVGs. Animate buttons on hover.
 		.block-editor-block-mover-button {
-			&.is-up-button svg {
-				margin-top: 3px;
+			&.is-up-button {
+				svg {
+					margin-top: 2px;
+					transition: ease-in-out transform 0.1s;
+					@include reduce-motion("transition");
+				}
+				&:focus,
+				&:hover {
+					svg {
+						transform: translateY(-2px);
+					}
+				}
 			}
 
-			&.is-down-button svg {
-				margin-bottom: 3px;
+			&.is-down-button {
+				svg {
+					margin-bottom: 3px;
+					transition: ease-in-out transform 0.1s;
+					@include reduce-motion("transition");
+				}
+				&:focus,
+				&:hover {
+					svg {
+						transform: translateY(2px);
+					}
+				}
 			}
 
 			&:focus::before {

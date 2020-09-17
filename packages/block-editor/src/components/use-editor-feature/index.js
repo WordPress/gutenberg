@@ -18,6 +18,15 @@ const deprecatedFlags = {
 		settings.disableCustomColors === undefined
 			? undefined
 			: ! settings.disableCustomColors,
+	'gradient.custom': ( settings ) =>
+		settings.disableCustomGradients === undefined
+			? undefined
+			: ! settings.disableCustomGradients,
+	'fontSize.custom': ( settings ) =>
+		settings.disableCustomFontSizes === undefined
+			? undefined
+			: ! settings.disableCustomFontSizes,
+	'lineHeight.custom': ( settings ) => settings.enableCustomLineHeight,
 };
 
 /**

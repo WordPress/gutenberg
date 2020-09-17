@@ -43,6 +43,7 @@ const ImageComponent = ( {
 	resizeMode,
 	retryMessage,
 	url,
+	shapeStyle,
 	width: imageWidth,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
@@ -116,7 +117,10 @@ const ImageComponent = ( {
 		styles.imageContent,
 		{
 			width:
-				imageData && imageWidth > 0 && imageWidth < containerSize?.width
+				imageWidth === styles.wide.width ||
+				( imageData &&
+					imageWidth > 0 &&
+					imageWidth < containerSize?.width )
 					? imageWidth
 					: customWidth,
 		},
@@ -145,6 +149,7 @@ const ImageComponent = ( {
 						: undefined,
 			},
 		imageHeight && { height: imageHeight },
+		shapeStyle,
 	];
 
 	return (

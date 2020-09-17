@@ -129,7 +129,7 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						showTooltip
+						showTooltip={ !! toggleProps?.showTooltip }
 					>
 						{ mergedToggleProps.children }
 					</Button>

@@ -63,7 +63,7 @@ export const findMoreSuitableBlock = ( url ) =>
 	);
 
 export const isFromWordPress = ( html ) =>
-	html.includes( 'class="wp-embedded-content"' );
+	html && html.includes( 'class="wp-embedded-content"' );
 
 export const getPhotoHtml = ( photo ) => {
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are

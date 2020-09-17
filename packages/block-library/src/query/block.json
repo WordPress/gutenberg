@@ -11,7 +11,12 @@
 				"perPage": 3,
 				"pages": 1,
 				"offset": 0,
-				"categoryIds": []
+				"categoryIds": [],
+				"tagIds": [],
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": ""
 			}
 		}
 	},

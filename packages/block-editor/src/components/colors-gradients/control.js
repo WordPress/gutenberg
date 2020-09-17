@@ -181,6 +181,9 @@ function ColorGradientControlSelect( props ) {
 	colorGradientSettings.disableCustomColors = ! useEditorFeature(
 		'color.custom'
 	);
+	colorGradientSettings.disableCustomGradients = ! useEditorFeature(
+		'gradient.custom'
+	);
 
 	return (
 		<ColorGradientControlInner

@@ -25,11 +25,11 @@ If you don't have a local WordPress environment to load Gutenberg in, we can hel
 
 ### Step 1: Installing a Local Environment
 
-The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/env), which is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. In its default mode, it'll install and run a local WordPress environment for you; however, it's also possible to [configure](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md#wp-envjson) it to use a pre-existing local WordPress installation.
+The quickest way to get up and running is to use the [`wp-env` command](/packages/env/README.md), that is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. By default, wp-env can install and run a local WordPress environment for you. It is also possible to configure it to use a pre-existing local WordPress installation, [see package documentation](/packages/env/README.md) for configuration details.
 
 If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`.
 
-To install Docker, follow their instructions here for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If running Ubuntu, see these [extended instructions for help and troubleshooting](/docs/contributors/env-ubuntu.md).
+To install Docker, follow the instructions for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If running Ubuntu, see these [extended instructions for help and troubleshooting](/docs/designers-developers/developers/tutorials/devenv/docker-ubuntu.md).
 
 To install Docker Compose, [follow their instructions here](https://docs.docker.com/compose/install/), be sure to select your operating system for proper instructions.
 

@@ -15,7 +15,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
  * @property {Array} colors Palette colors
  * @property {Array} fontSizes Available font sizes
- * @property {boolean} disableCustomFontSizes Whether or not the custom font sizes are disabled
  * @property {boolean} imageEditing Image Editing settings set to false to disable.
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing

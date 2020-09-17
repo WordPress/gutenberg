@@ -99,7 +99,7 @@ $block-inserter-tabs-height: 44px;
 		}
 
 		&::placeholder {
-			color: $dark-gray-400;
+			color: $gray-700;
 		}
 
 		&::-webkit-search-decoration,
@@ -195,7 +195,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__no-results-icon {
-	fill: $light-gray-800;
+	fill: $gray-600;
 }
 
 .block-editor-inserter__child-blocks {
@@ -254,7 +254,7 @@ $block-inserter-tabs-height: 44px;
 	justify-content: center;
 	align-items: center;
 	min-height: $grid-unit-60 * 3;
-	color: $dark-gray-400;
+	color: $gray-700;
 	background: $gray-100;
 }
 
@@ -270,6 +270,10 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__quick-inserter {
 	width: 100%;
+
+	// Constrain to container. Avoids overflow bug on FF 79
+	// see https://github.com/WordPress/gutenberg/issues/24529.
+	max-width: 100%;
 
 	@include break-medium {
 		width: $block-inserter-width;

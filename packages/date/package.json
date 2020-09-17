@@ -24,7 +24,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"moment": "^2.22.1",
-		"moment-timezone": "^0.5.16"
+		"moment-timezone": "^0.5.31"
 	},
 	"publishConfig": {
 		"access": "public"

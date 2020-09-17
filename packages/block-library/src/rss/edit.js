@@ -13,7 +13,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { grid, list, pencil, rss } from '@wordpress/icons';
+import { grid, list, edit, rss } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
 
@@ -75,7 +75,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 
 	const toolbarControls = [
 		{
-			icon: pencil,
+			icon: edit,
 			title: __( 'Edit RSS URL' ),
 			onClick: () => setIsEditing( true ),
 		},

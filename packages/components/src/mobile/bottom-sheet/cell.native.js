@@ -326,9 +326,13 @@ class BottomSheetCell extends Component {
 									/>
 								</View>
 							) }
-							<Text style={ [ defaultLabelStyle, labelStyle ] }>
-								{ label }
-							</Text>
+							{ label && (
+								<Text
+									style={ [ defaultLabelStyle, labelStyle ] }
+								>
+									{ label }
+								</Text>
+							) }
 						</View>
 						{ customActionButton && (
 							<TouchableOpacity

@@ -1,20 +1,21 @@
 
-.wp-block-template-part__placeholder-preview-dropdown-content {
+.wp-block-template-part__placeholder-preview-dropdown-content,
+.wp-block-template-part__preview-dropdown-content {
 	.components-popover__content {
 		min-width: 320px;
 		padding: 0;
 	}
 }
 
-.wp-block-template-part__placeholder-preview-search-form {
+.wp-block-template-part__selection-preview-search-form {
 	border-bottom: $border-width solid $gray-200;
 }
 
-.wp-block-template-part__placeholder-preview-container {
+.wp-block-template-part__selection-preview-container {
 	background: $white;
 	padding-bottom: 16px;
 
-	.wp-block-template-part__placeholder-preview-item {
+	.wp-block-template-part__selection-preview-item {
 		border-radius: $radius-block-ui;
 		cursor: pointer;
 		margin-top: $grid-unit-20;
@@ -37,21 +38,21 @@
 		}
 	}
 
-	.wp-block-template-part__placeholder-preview-item-title {
+	.wp-block-template-part__selection-preview-item-title {
 		padding: $grid-unit-05;
 		font-size: 12px;
 		text-align: left;
 	}
 
-	.wp-block-template-part__placeholder-panel-group-header {
+	.wp-block-template-part__selection-panel-group-header {
 		padding: $grid-unit-20 $grid-unit-20 0;
 	}
 
-	.wp-block-template-part__placeholder-panel-group-content {
+	.wp-block-template-part__selection-panel-group-content {
 		padding: 0 $grid-unit-20;
 	}
 
-	.wp-block-template-part__placeholder-panel-group-title {
+	.wp-block-template-part__selection-panel-group-title {
 		color: var(--wp-admin-theme-color);
 		text-transform: uppercase;
 		font-size: 11px;
@@ -59,21 +60,28 @@
 	}
 }
 
-.wp-block-template-part__name-panel {
-	background-color: $white;
-	box-shadow: 0 0 0 $border-width $gray-900;
-	outline: 1px solid transparent;
-	padding: $grid-unit-10 $grid-unit-15;
+.wp-block-template-part__block-control-group {
+	display: flex;
 
-	.components-base-control__field {
-		align-items: center;
-		display: flex;
-		margin-bottom: 0;
+	.wp-block-template-part__name-panel {
+		background-color: $white;
+		outline: 1px solid transparent;
+		padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-15;
+
+		.components-base-control__field {
+			align-items: center;
+			display: flex;
+			margin-bottom: 0;
+		}
+
+		.components-base-control__label {
+			margin-bottom: 0;
+			margin-right: 8px;
+		}
 	}
 
-	.components-base-control__label {
-		margin-bottom: 0;
-		margin-right: 8px;
+	.wp-block-template-part__preview-dropdown-button {
+		border-right: $border-width solid $gray-900;
 	}
 }
 
