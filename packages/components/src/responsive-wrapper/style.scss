@@ -5,6 +5,10 @@
 	& > span {
 		display: block;
 	}
+	&,
+	& > img {
+		width: auto;
+	}
 }
 
 .components-responsive-wrapper__content {
