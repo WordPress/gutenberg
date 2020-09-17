@@ -36,6 +36,15 @@ export const _default = () => {
 		help: text( 'help', 'Help text to explain the select control.' ),
 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
 		label: text( 'label', 'Value' ),
+		labelPosition: select(
+			'labelPosition',
+			{
+				top: 'top',
+				side: 'side',
+				bottom: 'bottom',
+			},
+			'top'
+		),
 		multiple: boolean( 'multiple', false ),
 		options: object( 'Options', [
 			{ value: null, label: 'Select an Option', disabled: true },
