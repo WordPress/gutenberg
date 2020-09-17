@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -8,22 +13,14 @@ export const useNavigationTreeNodes = () => {
 
 	const getNode = ( key ) => nodes[ key ];
 
-	const addNode = ( key, value ) => {
-		const valueCopy = { ...value };
-		delete valueCopy.children;
-
+	const addNode = ( key, value ) =>
 		setNodes( ( original ) => ( {
 			...original,
-			[ key ]: valueCopy,
+			[ key ]: omit( value, 'children' ),
 		} ) );
-	};
 
 	const removeNode = ( key ) =>
-		setNodes( ( original ) => {
-			const originalCopy = { ...original };
-			delete originalCopy[ key ];
-			return originalCopy;
-		} );
+		setNodes( ( original ) => omit( original, key ) );
 
 	return { nodes, getNode, addNode, removeNode };
 };
