@@ -13,7 +13,7 @@ import {
 	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment, useState, useEffect } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -53,6 +53,10 @@ const SocialLinkEdit = ( {
 		color: rgbIconColor,
 		backgroundColor: rgbBackgroundColor,
 	};
+
+	useEffect( () => {
+		setAttributes( { rgbIconColor, rgbBackgroundColor } );
+	}, [ rgbIconColor, rgbBackgroundColor, setAttributes ] );
 
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );

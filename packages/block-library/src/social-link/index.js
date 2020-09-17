@@ -23,10 +23,4 @@ export const settings = {
 		'Display an icon linking to a social media profile or website.'
 	),
 	variations,
-	usesContext: [
-		'iconColor',
-		'backgroundColor',
-		'customIconColor',
-		'customBackgroundColor',
-	],
 };

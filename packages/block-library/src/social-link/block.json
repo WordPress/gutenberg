@@ -14,10 +14,20 @@
 		},
 		"label": {
 			"type": "string"
+		},
+		"rgbIconColor": {
+			"type": "string"
+		},
+		"rgbBackgroundColor": {
+			"type": "string"
 		}
 	},
 	"usesContext": [
-		"openInNewTab"
+		"openInNewTab",
+		"iconColor",
+		"backgroundColor",
+		"customIconColor",
+		"customBackgroundColor"
 	],
 	"supports": {
 		"reusable": false,

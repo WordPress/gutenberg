@@ -9,7 +9,11 @@
 		}
 	},
 	"providesContext": {
-		"openInNewTab": "openInNewTab"
+		"openInNewTab": "openInNewTab",
+		"iconColor": "iconColor",
+		"customIconColor": "customIconColor",
+		"backgroundColor": "backgroundColor",
+		"customBackgroundColor": "customBackgroundColor"
 	},
 	"supports": {
 		"align": [

@@ -31,12 +31,6 @@ export const settings = {
 			type: 'string',
 		},
 	},
-	providesContext: {
-		iconColor: 'iconColor',
-		customIconColor: 'customIconColor',
-		backgroundColor: 'backgroundColor',
-		customBackgroundColor: 'customBackgroundColor',
-	},
 	description: __(
 		'Display icons linking to your social media profiles or websites.'
 	),

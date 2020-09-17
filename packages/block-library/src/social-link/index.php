@@ -16,11 +16,10 @@
  */
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = $block->context['openInNewTab'];
-
-	$service    = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
-	$url        = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label      = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
-	$class_name = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
+	$service         = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
+	$url             = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
+	$label           = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
+	$class_name      = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
 
 	// Don't render a link if there is no URL set.
 	if ( ! $url ) {
@@ -33,7 +32,13 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	}
 
 	$icon               = block_core_social_link_get_icon( $service );
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'wp-social-link wp-social-link-' . $service . $class_name ) );
+	$colors             = block_core_social_link_build_css_colors( $block->context );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => 'wp-social-link wp-social-link-' . $service . $class_name . ' ' . $colors,
+			'style' => block_core_social_link_build_css_styles( $attributes ),
+		)
+	);
 
 	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . '> ' . $icon . '</a></li>';
 }
@@ -279,4 +284,67 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 	}
 
 	return $services_data;
+}
+
+/**
+ * Determines the CSS classes that should be applied to the Social Link to
+ * reflect color selections.
+ *
+ * @param array $context Social Link block context.
+ * @return string CSS classes for the link's colors.
+ */
+function block_core_social_link_build_css_colors( $context ) {
+	$colors = array();
+
+	// Icon color.
+	$has_named_icon_color  = array_key_exists( 'iconColor', $context );
+	$has_custom_icon_color = array_key_exists( 'customIconColor', $context );
+
+	// Add has-text-color class to flag color selection.
+	if ( $has_named_icon_color || $has_custom_icon_color ) {
+		$colors[] = 'has-text-color';
+	}
+
+	// Add CSS class for named color.
+	if ( $has_named_icon_color ) {
+		$colors[] = sprintf( 'has-%s-color', $context['iconColor'] );
+	}
+
+	// Background color.
+	$has_named_background_color  = array_key_exists( 'backgroundColor', $context );
+	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $context );
+
+	// Add has-background class if color selection made.
+	if ( $has_custom_background_color || $has_named_background_color ) {
+		$colors[] = 'has-background';
+	}
+
+	// Add CSS class for named background color.
+	if ( $has_named_background_color ) {
+		$colors[] = sprintf( 'has-%s-background-color', $context['backgroundColor'] );
+	}
+
+	return implode( ' ', $colors );
+}
+
+/**
+ * Collects the Social Link's icon and background colors into css rules then
+ * builds a style attribute ready for adding to rendered markup.
+ *
+ * @param array $attributes The Social Link block's attributes.
+ * @return string An HTML style attribute or empty string.
+ */
+function block_core_social_link_build_css_styles( $attributes ) {
+	$styles = array();
+
+	// Inline styles allow selected color to override default colors for services.
+	if ( isset( $attributes['rgbIconColor'] ) ) {
+		$styles[] = sprintf( 'color: %s;', $attributes['rgbIconColor'] );
+	}
+
+	if ( isset( $attributes['rgbBackgroundColor'] ) ) {
+		$styles[] = sprintf( 'background-color: %s;', $attributes['rgbBackgroundColor'] );
+	}
+
+	return implode( ' ', $styles );
 }
