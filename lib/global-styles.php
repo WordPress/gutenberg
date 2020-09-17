@@ -885,7 +885,9 @@ function gutenberg_experimental_global_styles_register_cpt() {
 function gutenberg_experimental_global_styles_allow_css_var_name( $allowed_attr ) {
 	return array_merge(
 		$allowed_attr,
-		[ '--wp--style--color--link' ],
+		array(
+			'--wp--style--color--link',
+		)
 	);
 }
 
@@ -894,13 +896,13 @@ function gutenberg_experimental_global_styles_allow_css_var_name( $allowed_attr 
  * the block editor may add.
  *
  * @param boolean $allow_css Whether or not this rule should be allowed.
- * @param string $css_test_string The CSS rule to process.
+ * @param string  $css_test_string The CSS rule to process.
  * @return boolean Filtered result.
  */
 function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $css_test_string ) {
 	$parts = explode( ':', $css_test_string, 2 );
 
-	if ( $parts[ 0 ] !== '--wp--style--color--link' ) {
+	if ( '--wp--style--color--link' !== $parts[ 0 ] ) {
 		return $allow_css;
 	}
 
