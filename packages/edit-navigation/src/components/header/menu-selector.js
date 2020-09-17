@@ -31,9 +31,13 @@ export default function MenuSelector( { activeMenuId, menus, onSelectMenu } ) {
 								},
 						  ]
 				}
-				onChange={ setSelectedMenuId }
+				onChange={ ( menuId ) => setSelectedMenuId( Number( menuId ) ) }
 			/>
 			<Button
+				disabled={
+					activeMenuId === selectedMenuId || selectedMenuId === null
+				}
+				__experimentalIsFocusable
 				isSecondary
 				onClick={ () => onSelectMenu( selectedMenuId ) }
 			>
