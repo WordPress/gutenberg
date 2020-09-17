@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { isBlobURL } from '@wordpress/blob';
+
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
 	'top center': 'is-position-top-center',
@@ -48,7 +53,7 @@ export function attributesFromMedia( setAttributes ) {
 				// Videos contain the media type of 'file' in the object returned from the rest api.
 				mediaType = VIDEO_BACKGROUND_TYPE;
 			}
-		} else {
+		} else if ( media.type ) {
 			// for media selections originated from existing files in the media library.
 			if (
 				media.type !== IMAGE_BACKGROUND_TYPE &&
@@ -57,6 +62,11 @@ export function attributesFromMedia( setAttributes ) {
 				return;
 			}
 			mediaType = media.type;
+		} else if ( isBlobURL( media.url ) ) {
+			// for showing a spinner and the blob image as placeholder. Currently not supporting showin the video placeholder.
+			mediaType = IMAGE_BACKGROUND_TYPE;
+		} else {
+			return;
 		}
 
 		setAttributes( {

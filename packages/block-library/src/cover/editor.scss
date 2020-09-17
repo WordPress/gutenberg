@@ -12,6 +12,21 @@
 		color: inherit;
 	}
 
+	// Applied while media is being uploaded
+	&.is-transient::before {
+		background-color: #fff;
+		opacity: 0.3;
+	}
+
+	// Shown while media is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
+
 	.block-editor-block-list__layout {
 		width: 100%;
 	}

@@ -17,6 +17,7 @@ import {
 	PanelRow,
 	RangeControl,
 	ResizableBox,
+	Spinner,
 	ToggleControl,
 	withNotices,
 	__experimentalBoxControl as BoxControl,
@@ -40,6 +41,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -470,6 +472,7 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
+			'is-transient': isBlobURL( url ),
 			'has-parallax': hasParallax,
 			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
@@ -536,6 +539,7 @@ function CoverEdit( {
 						style={ { objectPosition: positionValue } }
 					/>
 				) }
+				{ isBlobURL( url ) && <Spinner /> }
 				<InnerBlocks
 					__experimentalTagName="div"
 					__experimentalPassedProps={ {
