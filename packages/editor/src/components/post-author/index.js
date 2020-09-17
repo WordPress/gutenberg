@@ -91,11 +91,9 @@ function PostAuthor() {
 	 * Handle user input.
 	 *
 	 * @param {string} inputValue The current value of the input field.
-	 * @param {Function} onBlur   The FormTokenField onBlur handler.
 	 */
-	const handleKeydown = ( inputValue, onBlur ) => {
+	const handleKeydown = ( inputValue ) => {
 		setFieldValue( inputValue );
-		onBlur(); // Remove focus to show the token.
 	};
 
 	if ( ! postAuthor ) {
@@ -131,11 +129,13 @@ function PostAuthor() {
 				onInputChange={ debounce( handleKeydown, 300 ) }
 				maxSuggestions={ MAX_AUTHORS_SUGGESTIONS }
 				disabled={ isLoading }
+				helpMessage=""
 				messages={ {
 					added: authorAddedLabel,
 					removed: authorRemovedLabel,
 					remove: removeAuthorLabel,
 				} }
+				blurAfterSelection={ true }
 			/>
 		</PostAuthorCheck>
 	);

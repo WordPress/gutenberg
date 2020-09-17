@@ -51,8 +51,17 @@
 	font-style: italic;
 }
 
-.is-active.components-form-author_selector .components-form-token-field__token {
+.components-form-token-field {
+	width: 100%;
+}
+
+.is-active.components-form-author_selector .components-form-token-field__token,
+.components-form-author_selector .components-form-token-field__remove-token.components-button {
 	display: none;
+}
+
+.components-form-author_selector .components-form-token-field__token-text {
+	background: transparent;
 }
 
 // Tokens

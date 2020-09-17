@@ -238,7 +238,7 @@ class FormTokenField extends Component {
 			this.updateSuggestions
 		);
 
-		this.props.onInputChange( tokenValue, this.onBlur );
+		this.props.onInputChange( tokenValue );
 	}
 
 	handleDeleteKey( deleteToken ) {
@@ -393,6 +393,9 @@ class FormTokenField extends Component {
 				[ this.getIndexOfInput(), 0 ].concat( tokensToAdd )
 			);
 			this.props.onChange( newValue );
+			if ( this.props.blurAfterSelection ) {
+				this.onBlur();
+			}
 		}
 	}
 
@@ -620,6 +623,17 @@ class FormTokenField extends Component {
 			} );
 		}
 
+		let helpMessage;
+		if ( this.props.helpMessage !== false ) {
+			helpMessage = this.props.helpMessage;
+		} else {
+			helpMessage = this.props.tokenizeOnSpace
+				? __(
+						'Separate with commas, spaces, or the Enter key.'
+				)
+				: __( 'Separate with commas or the Enter key.' )
+		}
+
 		// Disable reason: There is no appropriate role which describes the
 		// input container intended accessible usability.
 		// TODO: Refactor click detection to use blur to stop propagation.
@@ -661,11 +675,7 @@ class FormTokenField extends Component {
 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
 					className="components-form-token-field__help"
 				>
-					{ this.props.tokenizeOnSpace
-						? __(
-								'Separate with commas, spaces, or the Enter key.'
-						  )
-						: __( 'Separate with commas or the Enter key.' ) }
+					{ helpMessage }
 				</p>
 			</div>
 		);
@@ -683,6 +693,8 @@ FormTokenField.defaultProps = {
 	onInputChange: () => {},
 	isBorderless: false,
 	disabled: false,
+	blurAfterSelection: false,
+	helpMessage: false,
 	tokenizeOnSpace: false,
 	messages: {
 		added: __( 'Item added.' ),
