@@ -16,7 +16,7 @@ import {
 import { _x } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
-import { useState, useEffect, useRef, useMemo } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	getBlockType,
@@ -98,8 +98,7 @@ export default function Header( {
 	}, [] );
 
 	// See if a template part is hovered when mouse moves.
-	const hoveredTemplatePartRef = useRef( '' );
-	useEffect( () => {
+	const hoveredTemplatePart = useMemo( () => {
 		const hoveredElements = document.elementsFromPoint(
 			mouseLoc.x,
 			mouseLoc.y
@@ -108,9 +107,7 @@ export default function Header( {
 		const templatePart = hoveredElements.find(
 			( element ) => element.dataset?.type === 'core/template-part'
 		);
-		hoveredTemplatePartRef.current = templatePart
-			? templatePart.dataset.block
-			: '';
+		return templatePart ? templatePart.dataset.block : '';
 	}, [ mouseLoc.x, mouseLoc.y ] );
 
 	// Get label when hovered template part changes.
@@ -118,12 +115,12 @@ export default function Header( {
 		( select ) => select( 'core/block-editor' ).getBlock
 	);
 	const hoverLabel = useMemo( () => {
-		const block = getBlock( hoveredTemplatePartRef.current );
+		const block = getBlock( hoveredTemplatePart );
 		return (
 			block &&
 			getBlockLabel( getBlockType( block.name ), block.attributes )
 		);
-	}, [ hoveredTemplatePartRef.current ] );
+	}, [ hoveredTemplatePart ] );
 
 	return (
 		<>
