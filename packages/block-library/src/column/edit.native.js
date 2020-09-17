@@ -28,8 +28,6 @@ import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
 import { getColumnWidths } from '../columns/utils';
 
-const MARGIN = 16;
-
 function ColumnEdit( {
 	attributes,
 	setAttributes,
@@ -45,26 +43,6 @@ function ColumnEdit( {
 	clientId,
 } ) {
 	const { verticalAlignment } = attributes;
-
-	const renderAppender = () => {
-		if ( isSelected ) {
-			return (
-				<View
-					style={ {
-						marginLeft:
-							selectedColumnIndex === 0 ? MARGIN : MARGIN / 2,
-						marginRight:
-							selectedColumnIndex === columnCount - 1
-								? MARGIN
-								: MARGIN / 2,
-					} }
-				>
-					<InnerBlocks.ButtonBlockAppender />
-				</View>
-			);
-		}
-		return null;
-	};
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -142,7 +120,9 @@ function ColumnEdit( {
 				] }
 			>
 				<InnerBlocks
-					renderAppender={ renderAppender }
+					renderAppender={
+						isSelected && InnerBlocks.ButtonBlockAppender
+					}
 					parentWidth={ contentStyle[ clientId ].width }
 				/>
 			</View>

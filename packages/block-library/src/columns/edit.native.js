@@ -240,7 +240,9 @@ function ColumnsEditContainer( {
 			return (
 				<View
 					style={ [
-						isFullWidth && styles.fullWidthAppender,
+						isFullWidth &&
+							width > ALIGNMENT_BREAKPOINTS.medium &&
+							styles.fullWidthAppender,
 						columnCount === 0 && { width },
 					] }
 				>

@@ -129,7 +129,8 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
-			parentWidth = 0,
+			parentBlockAlignment,
+			hasParents,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
@@ -146,6 +147,8 @@ class BlockListBlock extends Component {
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+		const isParentFullWidth =
+			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 		return (
@@ -171,11 +174,10 @@ class BlockListBlock extends Component {
 								style={ [
 									styles.solidBorder,
 									isFullWidth &&
+										hasParents &&
+										isParentFullWidth &&
 										blockWidth < screenWidth &&
 										styles.borderFullWidth,
-									isFullWidth &&
-										parentWidth < screenWidth &&
-										styles.alternativeBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
@@ -293,6 +295,13 @@ export default compose( [
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
+		const hasParents = !! parents.length;
+
+		const parentBlock = hasParents
+			? __unstableGetBlockWithoutInnerBlocks( parents[ 0 ] )
+			: {};
+
+		const { align: parentBlockAlignment } = parentBlock?.attributes || {};
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -306,6 +315,8 @@ export default compose( [
 			isParentSelected,
 			firstToSelectId,
 			isTouchable,
+			hasParents,
+			parentBlockAlignment,
 			wrapperProps: getWrapperProps(
 				attributes,
 				blockType.getEditWrapperProps

@@ -52,15 +52,36 @@ export class BlockListItem extends Component {
 			marginHorizontal,
 			parentBlockAlignment,
 			parentWidth,
+			hasParents,
+			name,
 		} = this.props;
 		const { blockWidth } = this.state;
+		const isColumns = name === 'core/columns';
 
-		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.full ) {
-			return -1;
+		if (
+			blockAlignment === WIDE_ALIGNMENTS.alignments.full &&
+			! hasParents
+		) {
+			if ( blockWidth > ALIGNMENT_BREAKPOINTS.medium ) {
+				return -1;
+			} else if (
+				blockWidth < ALIGNMENT_BREAKPOINTS.mobile &&
+				isColumns
+			) {
+				return marginHorizontal;
+			}
+			return 0;
 		}
 
 		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.wide ) {
 			return marginHorizontal;
+		}
+
+		if (
+			blockAlignment === WIDE_ALIGNMENTS.alignments.full &&
+			! isColumns
+		) {
+			return 0;
 		}
 
 		if (
@@ -77,8 +98,10 @@ export class BlockListItem extends Component {
 	}
 
 	getContentStyles( readableContentViewStyle ) {
-		const { blockAlignment, hasParents } = this.props;
+		const { blockAlignment, hasParents, parentBlockAlignment } = this.props;
 		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const isParentFullWidth =
+			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
 
 		return [
 			readableContentViewStyle,
@@ -87,6 +110,7 @@ export class BlockListItem extends Component {
 					width: styles.fullAlignment.width,
 				},
 			isFullWidth &&
+				isParentFullWidth &&
 				hasParents && {
 					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
 				},
@@ -176,7 +200,7 @@ export default compose( [
 			const isReadOnly = getSettings().readOnly;
 
 			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
-			const { attributes } = block || {};
+			const { attributes, name } = block || {};
 			const { align } = attributes || {};
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
@@ -193,6 +217,7 @@ export default compose( [
 				hasParents,
 				blockAlignment: align,
 				parentBlockAlignment,
+				name,
 			};
 		}
 	),
