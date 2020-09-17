@@ -298,7 +298,8 @@ export function* replaceBlocks(
 	clientIds,
 	blocks,
 	indexToSelect,
-	initialPosition
+	initialPosition,
+	meta
 ) {
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
@@ -330,6 +331,7 @@ export function* replaceBlocks(
 		time: Date.now(),
 		indexToSelect,
 		initialPosition,
+		meta,
 	};
 	yield* ensureDefaultBlock();
 }
