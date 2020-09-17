@@ -130,6 +130,7 @@ function gutenberg_edit_site_init( $hook ) {
 		'imageSizes'        => $available_image_sizes,
 		'isRTL'             => is_rtl(),
 		'maxUploadFileSize' => $max_upload_size,
+		'siteUrl'           => site_url(),
 	);
 
 	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
