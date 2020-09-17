@@ -45,7 +45,7 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 			{ aspectRatios.map( ( { title, aspect } ) => (
 				<MenuItem
 					key={ aspect }
-					isDisabled={ isDisabled }
+					disabled={ isDisabled }
 					onClick={ () => {
 						onClick( aspect );
 					} }
