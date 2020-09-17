@@ -19,7 +19,7 @@ export default {
 };
 
 const DateTimePickerWithState = ( { is12Hour } ) => {
-	const [ date, setDate ] = useState();
+	const [ date, setDate ] = useState( new Date() );
 
 	return (
 		<DateTimePicker
