@@ -30,8 +30,7 @@ export default function Navigation( {
 	const navigationTree = useCreateNavigationTree();
 
 	const setActiveMenu = ( menuId, slideInOrigin = 'left' ) => {
-		const menuExists = !! navigationTree.getMenu( menuId );
-		if ( ! menuExists ) {
+		if ( ! navigationTree.getMenu( menuId ) ) {
 			return;
 		}
 
