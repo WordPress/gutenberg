@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { AccessibilityInfo } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -130,6 +135,14 @@ export class Inserter extends Component {
 		if ( onToggle ) {
 			onToggle( isOpen );
 		}
+		this.onInserterToggledAnnouncement( isOpen );
+	}
+
+	onInserterToggledAnnouncement( isOpen ) {
+		const announcement = isOpen
+			? __( 'Scrollable block menu opened. Select a block.' )
+			: __( 'Scrollable block menu closed.' );
+		AccessibilityInfo.announceForAccessibility( announcement );
 	}
 
 	/**
