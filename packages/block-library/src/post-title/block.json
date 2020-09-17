@@ -13,7 +13,7 @@
 			"type": "number",
 			"default": 2
 		},
-		"makeLink": {
+		"isLink": {
 			"type": "boolean",
 			"default": false
 		},
