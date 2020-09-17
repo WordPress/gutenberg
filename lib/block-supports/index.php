@@ -18,6 +18,7 @@ function gutenberg_register_block_supports() {
 		gutenberg_register_colors_support( $block_type );
 		gutenberg_register_typography_support( $block_type );
 		gutenberg_register_custom_classname_support( $block_type );
+		gutenberg_register_custom_css_support( $block_type );
 	}
 }
 
@@ -37,16 +38,26 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	// If no render_callback, assume styles have been previously handled.
-	if ( ! $block_type || ! $block_type->render_callback ) {
+	// Custom CSS is also a server-side hook even for static blocks.
+	$has_custom_css_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$has_custom_css_support = gutenberg_experimental_get( $block_type->supports, array( 'customCSS' ), false );
+	}
+	
+	if ( 
+		! ( $block_type && $block_type->render_callback ) &&
+		! $has_custom_css_support
+	) {
 		return $block_content;
 	}
-
+	
 	$attributes = array();
 	$attributes = gutenberg_apply_generated_classname_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_colors_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_alignment_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_custom_classname_support( $attributes, $block['attrs'], $block_type );
+	$attributes = gutenberg_apply_custom_css_support( $attributes, $block['attrs'], $block_type );
 
 	if ( ! count( $attributes ) ) {
 		return $block_content;

@@ -19,6 +19,7 @@
 			"gradients": true,
 			"linkColor": true
 		},
-		"__experimentalPadding": true
+		"__experimentalPadding": true,
+		"customCSS": true
 	}
 }
