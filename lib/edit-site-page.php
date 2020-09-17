@@ -133,11 +133,8 @@ function gutenberg_edit_site_init( $hook ) {
 		'siteUrl'           => site_url(),
 	);
 
-	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
-	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
+	list( $font_sizes, ) = (array) get_theme_support( 'editor-font-sizes' );
+
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;
 	}

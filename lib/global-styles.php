@@ -187,7 +187,49 @@ function gutenberg_experimental_global_styles_get_core() {
 	$config = gutenberg_experimental_global_styles_get_from_file(
 		__DIR__ . '/experimental-default-theme.json'
 	);
+	// Start i18n logic to remove when JSON i18 strings are extracted.
+	$default_colors_i18n = array(
+		'black'                 => __( 'Black', 'gutenberg' ),
+		'cyan-bluish-gray'      => __( 'Cyan bluish gray', 'gutenberg' ),
+		'white'                 => __( 'White', 'gutenberg' ),
+		'pale-pink'             => __( 'Pale pink', 'gutenberg' ),
+		'vivid-red'             => __( 'Vivid red', 'gutenberg' ),
+		'luminous-vivid-orange' => __( 'Luminous vivid orange', 'gutenberg' ),
+		'luminous-vivid-amber'  => __( 'Luminous vivid amber', 'gutenberg' ),
+		'light-green-cyan'      => __( 'Light green cyan', 'gutenberg' ),
+		'vivid-green-cyan'      => __( 'Vivid green cyan', 'gutenberg' ),
+		'pale-cyan-blue'        => __( 'Pale cyan blue', 'gutenberg' ),
+		'vivid-cyan-blue'       => __( 'Vivid cyan blue', 'gutenberg' ),
+		'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
+	);
 
+	if ( ! empty( $config['global']['settings']['color']['palette'] ) ) {
+		foreach ( $config['global']['settings']['color']['palette'] as &$color ) {
+			$color['name'] = $default_colors_i18n[ $color['slug'] ];
+		}
+	}
+
+	$default_gradients_i18n = array(
+		'vivid-cyan-blue-to-vivid-purple'               => __( 'Vivid cyan blue to vivid purple', 'gutenberg' ),
+		'light-green-cyan-to-vivid-green-cyan'          => __( 'Light green cyan to vivid green cyan', 'gutenberg' ),
+		'luminous-vivid-amber-to-luminous-vivid-orange' => __( 'Luminous vivid amber to luminous vivid orange', 'gutenberg' ),
+		'luminous-vivid-orange-to-vivid-red'            => __( 'Luminous vivid orange to vivid red', 'gutenberg' ),
+		'very-light-gray-to-cyan-bluish-gray'           => __( 'Very light gray to cyan bluish gray', 'gutenberg' ),
+		'cool-to-warm-spectrum'                         => __( 'Cool to warm spectrum', 'gutenberg' ),
+		'blush-light-purple'                            => __( 'Blush light purple', 'gutenberg' ),
+		'blush-bordeaux'                                => __( 'Blush bordeaux', 'gutenberg' ),
+		'luminous-dusk'                                 => __( 'Luminous dusk', 'gutenberg' ),
+		'pale-ocean'                                    => __( 'Pale ocean', 'gutenberg' ),
+		'electric-grass'                                => __( 'Electric grass', 'gutenberg' ),
+		'midnight'                                      => __( 'Midnight', 'gutenberg' ),
+	);
+
+	if ( ! empty( $config['global']['settings']['color']['gradients'] ) ) {
+		foreach ( $config['global']['settings']['color']['gradients'] as &$gradient ) {
+			$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
+		}
+	}
+	// End i18n logic to remove when JSON i18 strings are extracted.
 	return $config;
 }
 
@@ -762,6 +804,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// We also need to unset the deprecated settings defined by core.
 	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_settings( $merged );
 
+	unset( $settings['colors'] );
+	unset( $settings['gradients'] );
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['disableCustomFontSizes'] );
