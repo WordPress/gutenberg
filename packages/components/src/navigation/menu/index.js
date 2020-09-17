@@ -34,16 +34,13 @@ export default function NavigationMenu( props ) {
 	useNavigationTreeMenu( props );
 	const { activeMenu } = useNavigationContext();
 
-	const isActive = activeMenu === menu;
-
 	const context = {
-		isActive,
 		menu,
 		search,
 	};
 
-	// Keep the children rendered to make sure inactive items are included in the navigation tree
-	if ( ! isActive ) {
+	// Keep the children rendered to make sure invisible items are included in the navigation tree
+	if ( activeMenu !== menu ) {
 		return (
 			<NavigationMenuContext.Provider value={ context }>
 				{ children }

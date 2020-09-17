@@ -4,16 +4,28 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { Children } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { GroupTitleUI } from '../styles/navigation-styles';
-import { useNavigationMenuContext } from '../menu/context';
+import { useNavigationContext } from '../context';
 
 export default function NavigationGroup( { children, className, title } ) {
-	const { isActive } = useNavigationMenuContext();
+	const { navigationTree } = useNavigationContext();
 
-	// Keep the children rendered to make sure inactive items are included in the navigation tree
-	if ( ! isActive ) {
+	let isGroupEmpty = true;
+	Children.forEach( children, ( { props } ) => {
+		if ( navigationTree.getItem( props.item )?._isVisible ) {
+			isGroupEmpty = false;
+		}
+	} );
+
+	// Keep the children rendered to make sure invisible items are included in the navigation tree.
+	if ( isGroupEmpty ) {
 		return children;
 	}
 
