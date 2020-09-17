@@ -5,8 +5,8 @@
 
 .light {
 	@extend %shared;
-	border-top-color: $block-line-color;
-	border-bottom-color: $block-line-color;
+	border-top-color: $block-line-color-light;
+	border-bottom-color: $block-line-color-light;
 }
 
 .dark {
