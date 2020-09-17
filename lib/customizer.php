@@ -58,7 +58,7 @@ function gutenberg_customize_register( $wp_customize ) {
 
 	if ( gutenberg_use_widgets_block_editor() ) {
 		// Removes the core 'Widgets' panel from the Customizer if block based widgets are enabled.
-		$wp_customize->remove_panel( 'widgets' );
+		@$wp_customize->remove_panel( 'widgets' );
 		$wp_customize->add_section(
 			'gutenberg_widget_blocks',
 			array( 'title' => __( 'Widget Blocks', 'gutenberg' ) )
