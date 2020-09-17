@@ -1,7 +1,6 @@
 // We can't reference this package with ~ because of how Lerna handles packages.
-// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
-/*rtl:begin:ignore*/
-@import "node_modules/react-dates/lib/css/_datepicker";
+@import "node_modules/react-datepicker/src/stylesheets/datepicker.scss";
+
 /*rtl:end:ignore*/
 
 .components-datetime {
@@ -216,8 +215,3 @@
 	max-width: 145px;
 }
 
-// Hack to center the datepicker component within the popover.
-// It sets its own styles so centering is tricky.
-.components-popover .components-datetime__date {
-	padding-left: $grid-unit-05;
-}
