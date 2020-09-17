@@ -875,6 +875,18 @@ function gutenberg_experimental_global_styles_register_cpt() {
 	register_post_type( 'wp_global_styles', $args );
 }
 
+/**
+ * Tell kses not to remove from the block markup (style attribute)
+ * the CSS variables the block editor may add.
+ */
+function gutenberg_experimental_global_styles_allow_css_variables( $allowed_attr ) {
+	return array_merge(
+		$allowed_attr,
+		[ '--wp--style--color--link' ],
+	);
+}
+
 add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+add_filter( 'safe_style_css', 'gutenberg_experimental_global_styles_allow_css_variables' );
