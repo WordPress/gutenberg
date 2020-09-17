@@ -67,9 +67,9 @@ class BlockListBlock extends Component {
 		return (
 			<GlobalStylesContext.Consumer>
 				{ ( globalStyle ) => {
-					const classNameList = ( this.props.attributes.className || '' ).split(
-						' '
-					);
+					const classNameList = (
+						this.props.attributes.className || ''
+					).split( ' ' );
 					const stylesFromClassName = classNameList.reduce(
 						( stylesOut, className ) => ( {
 							...stylesOut,
