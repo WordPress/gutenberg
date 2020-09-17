@@ -12,7 +12,7 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	getBlockType,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
 
 function useSecondaryText() {
@@ -46,8 +46,19 @@ export default function DocumentActions( { documentTitle } ) {
 
 	const { page } = useSelect( ( select ) => {
 		const { getPage } = select( 'core/edit-site' );
-		return { page: getPage() };
+		const { getEntityRecord } = select( 'core' );
+		const _page = getPage();
+		return {
+			page: getEntityRecord( 'postType', 'page', _page?.context?.postId ),
+		};
 	} );
+
+	const { editEntityRecord } = useDispatch( 'core' );
+	const editTitle = ( title ) => {
+		editEntityRecord( 'postType', 'page', page.id, {
+			title,
+		} );
+	};
 
 	return (
 		<div
@@ -105,8 +116,17 @@ export default function DocumentActions( { documentTitle } ) {
 								{ /* TODO: Don't allow input when there is no page context */ }
 								<input
 									disabled={ ! page }
-									placeholder={ 'nice' }
+									placeholder={ page?.title?.rendered }
 									style={ { width: '100%' } }
+									onChange={ ( event ) => {
+										const REGEXP_NEWLINES = /[\r\n]+/g;
+										const title = event.target.value.replace(
+											REGEXP_NEWLINES,
+											' '
+										);
+
+										editTitle( title );
+									} }
 								/>
 							</div>
 						) }
