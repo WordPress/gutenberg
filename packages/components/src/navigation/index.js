@@ -16,6 +16,7 @@ import Animate from '../animate';
 import { ROOT_MENU } from './constants';
 import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
+import { useCreateNavigationTree } from './use-create-navigation-tree';
 
 export default function Navigation( {
 	activeItem,
@@ -26,6 +27,7 @@ export default function Navigation( {
 } ) {
 	const [ menu, setMenu ] = useState( activeMenu );
 	const [ slideOrigin, setSlideOrigin ] = useState();
+	const navigationTree = useCreateNavigationTree();
 
 	const setActiveMenu = ( menuId, slideInOrigin = 'left' ) => {
 		setSlideOrigin( slideInOrigin );
@@ -51,6 +53,7 @@ export default function Navigation( {
 		activeItem,
 		activeMenu: menu,
 		setActiveMenu,
+		navigationTree,
 	};
 
 	const classes = classnames( 'components-navigation', className );

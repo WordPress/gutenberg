@@ -99,7 +99,7 @@ Optional className for the `NavigationMenu` component.
 -   Required: No
 -   Default: "root"
 
-The menu slug.
+The unique identifier of the menu. The root menu can omit this, and it will default to "root"; all other menus need to specify it.
 
 ### `parentMenu`
 
@@ -157,6 +157,13 @@ Optional className for the `NavigationItem` component.
 -   Required: No
 
 If provided, renders `a` instead of `button`.
+
+### `item`
+
+-   Type: `string`
+-   Required: Yes
+
+The unique identifier of the item.
 
 ### `navigateToMenu`
 
