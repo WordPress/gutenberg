@@ -907,9 +907,9 @@ function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $
 	}
 
 	// The only value the block editor attaches to link color is
-	// var(--wp--preset--color--<some-value-here>)
+	// var(--wp--preset--color--<value-with-alphanumeric-chars-or-hyphen>)
 	// so be specific in testing for that value.
-	return preg_match( '/var\(--wp--preset--color--.*\)/', $parts[1] );
+	return preg_match( '/^var\(--wp--preset--color--[A-Za-z0-9-]*\)$/', $parts[1] );
 }
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
