@@ -39,7 +39,7 @@ import { close } from '@wordpress/icons';
  * Internal dependencies
  */
 import TextEditor from '../text-editor';
-import VisualEditor from '../visual-editor';
+import VisualEditorOrPluginPreview from '../visual-editor/visual-editor-or-plugin-preview';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
@@ -246,7 +246,7 @@ function Layout() {
 								<TextEditor />
 							) }
 							{ isRichEditingEnabled && mode === 'visual' && (
-								<VisualEditor />
+								<VisualEditorOrPluginPreview />
 							) }
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
