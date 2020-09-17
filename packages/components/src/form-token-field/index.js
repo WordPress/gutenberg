@@ -238,7 +238,7 @@ class FormTokenField extends Component {
 			this.updateSuggestions
 		);
 
-		this.props.onInputChange( tokenValue );
+		this.props.onInputChange( tokenValue, this.onBlur );
 	}
 
 	handleDeleteKey( deleteToken ) {
