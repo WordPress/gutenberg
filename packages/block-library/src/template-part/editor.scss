@@ -64,7 +64,6 @@
 	display: flex;
 
 	.wp-block-template-part__name-panel {
-		background-color: $white;
 		outline: 1px solid transparent;
 		padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-15;
 
@@ -82,10 +81,6 @@
 
 	.components-toolbar__control.has-icon {
 		height: $block-toolbar-height;
-	}
-
-	.wp-block-template-part__preview-dropdown-button {
-		border-right: $border-width solid $gray-900;
 	}
 }
 

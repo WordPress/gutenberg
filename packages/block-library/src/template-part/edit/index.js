@@ -7,7 +7,7 @@ import {
 	BlockControls,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { Dropdown, ToolbarButton } from '@wordpress/components';
+import { Dropdown, ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
@@ -71,7 +71,7 @@ export default function TemplatePartEdit( {
 		return (
 			<BlockWrapper>
 				<BlockControls>
-					<div className="wp-block-template-part__block-control-group">
+					<ToolbarGroup className="wp-block-template-part__block-control-group">
 						<TemplatePartNamePanel
 							postId={ postId }
 							setAttributes={ setAttributes }
@@ -98,7 +98,7 @@ export default function TemplatePartEdit( {
 								/>
 							) }
 						/>
-					</div>
+					</ToolbarGroup>
 				</BlockControls>
 				<TemplatePartInnerBlocks
 					postId={ postId }
