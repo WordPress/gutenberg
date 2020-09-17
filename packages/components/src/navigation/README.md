@@ -82,9 +82,10 @@ Sync the active menu between the external state and the Navigation's internal st
 
 -   Type: `string`
 -   Required: No
--   Default: "Back"
+-   Default: parent menu's title or "Back"
 
-The back button label used in nested menus.
+The back button label used in nested menus. If not provided, the label will be inferred from the parent menu's title.
+If for some reason the parent menu's title is not available then it will default to "Back".
 
 ### className
 
