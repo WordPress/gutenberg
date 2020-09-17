@@ -8,6 +8,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Icon, chevronRight } from '@wordpress/icons';
+import { isValidElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,9 +42,21 @@ export default function NavigationItem( {
 		onClick();
 	};
 
+	if ( isValidElement( children ) ) {
+		return <ItemUI className={ classes }>{ children }</ItemUI>;
+	}
+
+	if ( typeof children === 'function' ) {
+		return (
+			<ItemUI className={ classes }>
+				{ children( { setActiveMenu } ) }
+			</ItemUI>
+		);
+	}
+
 	return (
 		<ItemUI className={ classes }>
-			{ children || (
+			{
 				<Button href={ href } onClick={ onItemClick } { ...props }>
 					{ title && (
 						<ItemTitleUI
@@ -63,7 +76,7 @@ export default function NavigationItem( {
 
 					{ navigateToMenu && <Icon icon={ chevronRight } /> }
 				</Button>
-			) }
+			}
 		</ItemUI>
 	);
 }
