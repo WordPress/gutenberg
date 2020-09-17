@@ -18,3 +18,6 @@ export * from './components';
 export * from './utils';
 export { storeConfig, store } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
+export { default as PluginPreviewMenuItem } from './components/preview-options/plugin-preview-menu-item';
+export { default as PluginPreview } from './components/preview-options/plugin-preview';
+export { coreDeviceTypes } from './components/preview-options';

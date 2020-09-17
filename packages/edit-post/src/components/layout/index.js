@@ -33,7 +33,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import TextEditor from '../text-editor';
-import VisualEditor from '../visual-editor';
+import VisualEditorOrPluginPreview from '../visual-editor/visual-editor-or-plugin-preview';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
@@ -225,7 +225,7 @@ function Layout( { styles } ) {
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditor styles={ styles } />
+							<VisualEditorOrPluginPreview styles={ styles } />
 						) }
 						<div className="edit-post-layout__metaboxes">
 							<MetaBoxes location="normal" />
