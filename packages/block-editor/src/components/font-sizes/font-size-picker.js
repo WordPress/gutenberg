@@ -14,7 +14,9 @@ function FontSizePicker( props ) {
 		( select ) => select( 'core/block-editor' ).getSettings().fontSizes,
 		[]
 	);
-	const disableCustomFontSizes = ! useEditorFeature( 'fontSize.custom' );
+	const disableCustomFontSizes = ! useEditorFeature(
+		'typography.customFontSize'
+	);
 
 	return (
 		<BaseFontSizePicker

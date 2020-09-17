@@ -9,13 +9,10 @@ import styled from '@emotion/styled';
  */
 import Flex, { FlexItem } from '../../flex';
 import Text from '../../text';
-import { color, rtl, reduceMotion } from '../../utils/style-mixins';
+import { color, rtl } from '../../utils/style-mixins';
 
-const FLOATING_LABEL_TRANSITION_SPEED = '60ms';
-
-const rootFloatLabelStyles = ( { isFloatingLabel } ) => {
-	const paddingTop = isFloatingLabel ? 5 : 0;
-	return css( { paddingTop } );
+const rootFloatLabelStyles = () => {
+	return css( { paddingTop: 0 } );
 };
 
 const rootFocusedStyles = ( { isFocused } ) => {
@@ -125,20 +122,8 @@ const sizeStyles = ( { size } ) => {
 	return css( style );
 };
 
-const placeholderStyles = ( { isFilled, isFloating, isFloatingLabel } ) => {
-	let opacity = 1;
-
-	if ( isFloatingLabel ) {
-		if ( ! isFilled && ! isFloating ) {
-			opacity = 0;
-		}
-	}
-
+const placeholderStyles = () => {
 	return css`
-		&::placeholder {
-			opacity: ${ opacity };
-		}
-
 		&::-webkit-input-placeholder {
 			line-height: normal;
 		}
@@ -202,72 +187,7 @@ export const Input = styled.input`
 	}
 `;
 
-const laberColor = ( { isFloatingLabel, isFilled, isFloating } ) => {
-	const isPlaceholder = isFloatingLabel && ! isFilled;
-	const textColor =
-		isPlaceholder || isFloating
-			? color( 'ui.textDisabled' )
-			: 'currentColor';
-
-	return css( { color: textColor } );
-};
-
-const labelFontSize = ( { isFloatingLabel, size } ) => {
-	const sizes = {
-		default: '13px',
-		small: '11px',
-	};
-	const fontSize = sizes[ size ];
-	const lineHeight = isFloatingLabel ? 1.2 : null;
-
-	return css( { fontSize, lineHeight } );
-};
-
-const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
-	const paddingBottom = isFloatingLabel ? 0 : 4;
-	const position = isFloatingLabel ? 'absolute' : null;
-	const pointerEvents = isFloating ? null : 'none';
-
-	const isSmall = size === 'small';
-
-	const offsetTop = isSmall ? 1 : 2;
-	const offset = isSmall ? '-1px' : '-3px';
-
-	const marginTop = isFloating ? 0 : offsetTop;
-	const marginLeft = isFloatingLabel ? 8 : 0;
-
-	let transform = isFloating
-		? `translate( 0, calc(-100% + ${ offset }) ) scale( 0.75 )`
-		: 'translate( 0, -50%) scale(1)';
-
-	if ( ! isFloatingLabel ) {
-		transform = null;
-	}
-
-	const transition = isFloatingLabel
-		? `transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear`
-		: null;
-
-	return css(
-		{
-			marginTop,
-			paddingBottom,
-			position,
-			pointerEvents,
-			transition,
-			transform,
-		},
-		rtl( { marginLeft } )(),
-		rtl(
-			{ transformOrigin: 'top left' },
-			{ transformOrigin: 'top right' }
-		)()
-	);
-};
-
-const labelTruncation = ( { isFloating } ) => {
-	if ( isFloating ) return '';
-
+const labelTruncation = () => {
 	return css`
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -278,24 +198,15 @@ const labelTruncation = ( { isFloating } ) => {
 const BaseLabel = styled( Text )`
 	&&& {
 		box-sizing: border-box;
+		color: currentColor;
 		display: block;
 		margin: 0;
 		max-width: 100%;
-		padding-bottom: 0;
+		padding-bottom: 4px;
 		padding-top: 0;
-		pointer-events: none;
-		top: 50%;
-		transition: transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear,
-			max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
 		z-index: 1;
 
-		${ laberColor };
-		${ labelFontSize };
-		${ labelPosition };
 		${ labelTruncation };
-		${ reduceMotion( 'transition' ) };
-
-		${ rtl( { left: 0 } ) }
 	}
 `;
 
@@ -305,27 +216,30 @@ export const LabelWrapper = styled( FlexItem )`
 	max-width: calc( 100% - 10px );
 `;
 
-const fieldsetTopStyles = ( { isFloatingLabel } ) => {
-	const top = isFloatingLabel ? -5 : 0;
-	return css( { top } );
-};
-
-const fieldsetFocusedStyles = ( { disabled, isFocused } ) => {
+const backdropFocusedStyles = ( { disabled, isFocused } ) => {
 	let borderColor = isFocused
 		? color( 'ui.borderFocus' )
 		: color( 'ui.border' );
 
-	if ( disabled ) {
-		borderColor = 'ui.borderDisabled';
+	let boxShadow = null;
+
+	if ( isFocused ) {
+		boxShadow = `0 0 0 1px ${ color( 'ui.borderFocus' ) } inset`;
 	}
 
-	const borderWidth = isFocused ? 2 : 1;
-	const borderStyle = 'solid';
+	if ( disabled ) {
+		borderColor = color( 'ui.borderDisabled' );
+	}
 
-	return css( { borderColor, borderStyle, borderWidth } );
+	return css( {
+		boxShadow,
+		borderColor,
+		borderStyle: 'solid',
+		borderWidth: 1,
+	} );
 };
 
-export const Fieldset = styled.fieldset`
+export const BackdropUI = styled.div`
 	&&& {
 		box-sizing: border-box;
 		border-radius: inherit;
@@ -336,54 +250,12 @@ export const Fieldset = styled.fieldset`
 		pointer-events: none;
 		position: absolute;
 		right: 0;
+		top: 0;
 
-		${ fieldsetFocusedStyles };
-		${ fieldsetTopStyles };
+		${ backdropFocusedStyles };
 		${ rtl( { paddingLeft: 2 } ) }
 	}
 `;
-
-const legendSize = ( { isFloating, size } ) => {
-	const maxWidth = isFloating ? 1000 : 0.01;
-	const sizes = {
-		default: 9.75,
-		small: 8.25,
-	};
-
-	const fontSize = sizes[ size ];
-
-	return css( {
-		fontSize,
-		maxWidth,
-	} );
-};
-
-export const Legend = styled.legend`
-	&&& {
-		box-sizing: border-box;
-		display: block;
-		height: 11px;
-		line-height: 11px;
-		margin: 0;
-		padding: 0;
-		transition: max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
-		visibility: hidden;
-		width: auto;
-
-		${ legendSize };
-		${ reduceMotion( 'transition' ) };
-	}
-`;
-
-const BaseLegendText = styled( Text )`
-	box-sizing: border-box;
-	display: inline-block;
-	${ rtl( { paddingLeft: 4, paddingRight: 5 } ) }
-`;
-
-export const LegendText = ( props ) => (
-	<BaseLegendText { ...props } as="span" />
-);
 
 export const Prefix = styled.span`
 	box-sizing: border-box;

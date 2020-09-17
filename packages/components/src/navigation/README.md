@@ -34,14 +34,8 @@ const MyNavigation = () => (
 			parentMenu="root"
 			title="Category"
 		>
-			<ul>
-				<NavigationItem
-					badge="1"
-					item="child-1"
-					title="Child 1"
-				/>
-				<NavigationItem item="child-2" title="Child 2" />
-			</ul>
+			<NavigationItem badge="1" item="child-1" title="Child 1" />
+			<NavigationItem item="child-2" title="Child 2" />
 		</NavigationMenu>
 	</Navigation>
 );
@@ -72,13 +66,6 @@ The active menu slug.
 -   Required: No
 
 Optional className for the `Navigation` component.
-
-### `onActivateItem`
-
--   Type: `function`
--   Required: No
-
-Sync the active item between the external state and the Navigation's internal state.
 
 ### `onActivateMenu`
 

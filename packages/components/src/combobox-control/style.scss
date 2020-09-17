@@ -9,6 +9,8 @@
 }
 
 .components-combobox-control__button {
+	border: 1px solid $gray-600;
+	border-radius: 4px;
 	display: inline-block;
 	min-height: $button-size-small;
 	min-width: 140px;

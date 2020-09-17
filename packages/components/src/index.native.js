@@ -89,5 +89,3 @@ export {
 	useGlobalStyles,
 	withGlobalStyles,
 } from './mobile/global-styles-context';
-
-export * from './mobile/site-capabilities';
