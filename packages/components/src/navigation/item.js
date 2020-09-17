@@ -13,13 +13,11 @@ import { Icon, chevronRight } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../button';
-import Spinner from '../spinner';
 import { useNavigationContext } from './context';
 import { ItemBadgeUI, ItemTitleUI, ItemUI } from './styles/navigation-styles';
 
 export default function NavigationItem( {
 	badge,
-	isFetchingBadge,
 	children,
 	className,
 	href,
@@ -44,8 +42,6 @@ export default function NavigationItem( {
 		onClick();
 	};
 
-	const badgeContent = isFetchingBadge ? <Spinner /> : badge;
-
 	return (
 		<ItemUI className={ classes }>
 			<Button href={ href } onClick={ onItemClick } { ...props }>
@@ -61,9 +57,9 @@ export default function NavigationItem( {
 
 				{ children }
 
-				{ badgeContent && (
+				{ badge && (
 					<ItemBadgeUI className="components-navigation__item-badge">
-						{ badgeContent }
+						{ badge }
 					</ItemBadgeUI>
 				) }
 
