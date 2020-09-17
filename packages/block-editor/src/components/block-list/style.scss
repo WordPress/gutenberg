@@ -1,10 +1,4 @@
-.block-editor-block-list__layout .block-editor-block-list__block { // Needs specificity to override inherited styles.
-	.reusable-block-edit-panel * {
-		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
-	}
-}
-
-// This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
+// This removes the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
 // It removes the margins around blocks when a BlockPreview is rendered in the block style selector
 .block-editor-block-styles .block-editor-block-list__block {
 	margin: 0;
@@ -19,6 +13,10 @@
 
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
+
+	.reusable-block-edit-panel * { // Needs specificity to override inherited styles.
+		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
+	}
 
 	/**
 	 * Notices
@@ -85,6 +83,89 @@
 			opacity: 1;
 		}
 	}
+
+	/**
+	* Block styles and alignments
+	*/
+
+	&::after {
+		content: "";
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		box-shadow: 0 0 0 $border-width-focus transparent;
+		transition: box-shadow 0.1s ease-in;
+		@include reduce-motion("transition");
+	}
+
+	// Warnings
+	&.has-warning {
+		min-height: ( $block-padding + $block-spacing ) * 2;
+
+		// When a block has a warning, you shouldn't be able to manipulate the contents.
+		> * {
+			pointer-events: none;
+			user-select: none;
+		}
+
+		// Allow the warning action buttons to be manipulable.
+		.block-editor-warning {
+			pointer-events: all;
+		}
+	}
+
+	// Scrim overlay.
+	&.has-warning::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		background-color: rgba($white, 0.4);
+	}
+
+	// Avoid conflict with the multi-selection highlight color.
+	&.has-warning.is-multi-selected::after {
+		background-color: transparent;
+	}
+
+	// Reusable blocks clickthrough overlays.
+	&.is-reusable > .block-editor-inner-blocks > .block-editor-block-list__layout.has-overlay {
+		// Remove only the top click overlay.
+		&::after {
+			display: none;
+		}
+
+		// Restore it for subsequent.
+		.block-editor-block-list__layout.has-overlay::after {
+			display: block;
+		}
+	}
+
+	// Select tool/navigation mode shows the default cursor until an additional click edits.
+	.is-navigate-mode & {
+		cursor: default;
+	}
+
+	// Clear floats.
+	&[data-clear="true"] {
+		float: none;
+	}
+
+	// This essentially duplicates the mobile styles for the appender component.
+	// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
+	.block-editor-block-list__layout {
+		.block-editor-default-block-appender .block-editor-inserter {
+			left: auto;
+			right: $grid-unit-10;
+		}
+	}
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block,
@@ -138,9 +219,8 @@
 			bottom: $border-width;
 			left: $border-width;
 			right: $border-width;
-		}
 
-		&::after { // Everything else.
+			// Everything else.
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
@@ -210,93 +290,6 @@
 	font-size: 1px;
 	height: 1px;
 	padding: 0;
-}
-
-/**
- * Block styles and alignments
- */
-
-.block-editor-block-list__layout .block-editor-block-list__block {
-	&.has-warning {
-		min-height: ( $block-padding + $block-spacing ) * 2;
-	}
-
-	&::after {
-		content: "";
-		pointer-events: none;
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		border-radius: $radius-block-ui;
-		box-shadow: 0 0 0 $border-width-focus transparent;
-		transition: box-shadow 0.1s ease-in;
-		@include reduce-motion("transition");
-	}
-
-	// Warnings
-	&.has-warning {
-		// When a block has a warning, you shouldn't be able to manipulate the contents.
-		> * {
-			pointer-events: none;
-			user-select: none;
-		}
-
-		// Allow the warning action buttons to be manipulable.
-		.block-editor-warning {
-			pointer-events: all;
-		}
-	}
-
-	// Scrim overlay.
-	&.has-warning::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		border-radius: $radius-block-ui;
-		background-color: rgba($white, 0.4);
-	}
-
-	// Avoid conflict with the multi-selection highlight color.
-	&.has-warning.is-multi-selected::after {
-		background-color: transparent;
-	}
-
-	// Reusable blocks clickthrough overlays.
-	&.is-reusable > .block-editor-inner-blocks > .block-editor-block-list__layout.has-overlay {
-		// Remove only the top click overlay.
-		&::after {
-			display: none;
-		}
-
-		// Restore it for subsequent.
-		.block-editor-block-list__layout.has-overlay::after {
-			display: block;
-		}
-	}
-
-	// Select tool/navigation mode shows the default cursor until an additional click edits.
-	.is-navigate-mode & {
-		cursor: default;
-	}
-
-	// Clear floats.
-	&[data-clear="true"] {
-		float: none;
-	}
-
-	// This essentially duplicates the mobile styles for the appender component.
-	// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
-	.block-editor-block-list__layout {
-		.block-editor-default-block-appender .block-editor-inserter {
-			left: auto;
-			right: $grid-unit-10;
-		}
-	}
 }
 
 // Extra specificity needed to override default element margins like lists (ul).
