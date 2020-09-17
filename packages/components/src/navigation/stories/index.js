@@ -55,6 +55,17 @@ function Example() {
 			>
 				<NavigationMenu title="Home">
 					<NavigationGroup title="Group 1">
+						<NavigationItem item="item-2">
+							{ ( { setActiveMenu: navigateTo } ) => (
+								<button
+									onClick={ () => navigateTo( 'category' ) }
+								>
+									Expose setActiveMenu (2.)
+									<br />
+									Navigate to category
+								</button>
+							) }
+						</NavigationItem>
 						<NavigationItem item="item-1" title="Item 1">
 							<Link href="https://example.com/item-1">
 								Item 1
