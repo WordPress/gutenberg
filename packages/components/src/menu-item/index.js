@@ -49,7 +49,7 @@ export function MenuItem(
 	if ( info ) {
 		children = (
 			<span className="components-menu-item__info-wrapper">
-				{ children }
+				<span className="components-menu-item__item">{ children }</span>
 				<span className="components-menu-item__info">{ info }</span>
 			</span>
 		);
@@ -74,7 +74,7 @@ export function MenuItem(
 			className={ className }
 			{ ...props }
 		>
-			{ children }
+			<span className="components-menu-item__item">{ children }</span>
 			<Shortcut
 				className="components-menu-item__shortcut"
 				shortcut={ shortcut }
