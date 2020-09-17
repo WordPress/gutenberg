@@ -14,7 +14,7 @@ export default function MenuSelector( { activeMenuId, menus, onSelectMenu } ) {
 	return (
 		<>
 			<SelectControl
-				label={ __( 'Currently editing' ) }
+				label={ __( 'Select menu' ) }
 				hideLabelFromVision={ isMobileViewport }
 				disabled={ ! menus?.length }
 				value={ selectedMenuId ?? 0 }
@@ -37,7 +37,7 @@ export default function MenuSelector( { activeMenuId, menus, onSelectMenu } ) {
 				isSecondary
 				onClick={ () => onSelectMenu( selectedMenuId ) }
 			>
-				{ __( 'Select menu' ) }
+				{ __( 'Change' ) }
 			</Button>
 		</>
 	);
