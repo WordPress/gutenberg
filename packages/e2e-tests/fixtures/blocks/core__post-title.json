@@ -5,7 +5,7 @@
 		"isValid": true,
 		"attributes": {
 			"level": 2,
-			"makeLink": false,
+			"isLink": false,
 			"linkTarget": "_blank",
 			"rel": ""
 		},
