@@ -97,10 +97,6 @@ export const ItemBadgeUI = styled.span`
 	border-radius: 2px;
 	animation: fade-in 250ms ease-out;
 
-	.components-spinner {
-		margin: 0;
-	}
-
 	@keyframes fade-in {
 		from {
 			opacity: 0;
