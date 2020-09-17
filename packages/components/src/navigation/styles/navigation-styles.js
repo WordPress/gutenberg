@@ -95,9 +95,19 @@ export const ItemBadgeUI = styled.span`
 	display: inline-flex;
 	padding: 4px 12px;
 	border-radius: 2px;
+	animation: fade-in 250ms ease-out;
 
 	.components-spinner {
 		margin: 0;
+	}
+
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
 	}
 `;
 
