@@ -27,7 +27,7 @@
 }
 
 .outline {
-	border-color: $border-color;
+	border-color: $modal-border-color;
 	top: 0;
 	bottom: 0;
 	left: 0;
@@ -39,7 +39,7 @@
 }
 
 .outlineDark {
-	border-color: $border-color-dark;
+	border-color: $modal-border-color-dark;
 }
 
 .selectedOutline {
