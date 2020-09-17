@@ -55,17 +55,6 @@ function Example() {
 			>
 				<NavigationMenu title="Home">
 					<NavigationGroup title="Group 1">
-						<NavigationItem item="item-2">
-							{ ( { setActiveMenu: navigateTo } ) => (
-								<button
-									onClick={ () => navigateTo( 'category' ) }
-								>
-									Expose setActiveMenu (2.)
-									<br />
-									Navigate to category
-								</button>
-							) }
-						</NavigationItem>
 						<NavigationItem item="item-1" title="Item 1">
 							<Link href="https://example.com/item-1">
 								Item 1
@@ -107,6 +96,20 @@ function Example() {
 							</a>
 						</NavigationItem>
 					</NavigationGroup>
+					<NavigationItem item="item-custom-function">
+						{ ( { setActiveMenu: navigateTo } ) => (
+							<div
+								role="button"
+								onKeyUp={ () => {} }
+								onClick={ () => navigateTo( 'category' ) }
+								tabIndex="-1"
+							>
+								Expose setActiveMenu
+								<br />
+								Navigate to category
+							</div>
+						) }
+					</NavigationItem>
 				</NavigationMenu>
 
 				<NavigationMenu
