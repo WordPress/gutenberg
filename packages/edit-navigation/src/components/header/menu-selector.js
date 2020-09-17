@@ -11,6 +11,8 @@ export default function MenuSelector( { activeMenuId, menus, onSelectMenu } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const [ selectedMenuId, setSelectedMenuId ] = useState( activeMenuId );
 
+	// If the activeMenuId changes for any reason external to the selector,
+	// e.g. creating a new menu, update the value to match.
 	useEffect( () => {
 		if ( activeMenuId !== selectedMenuId ) {
 			setSelectedMenuId( activeMenuId );
