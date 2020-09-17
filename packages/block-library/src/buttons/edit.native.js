@@ -46,7 +46,7 @@ function ButtonsEdit( {
 		}
 	}, [ sizes ] );
 
-	const debounceAddNextButton = debounce( onAddNextButton, 500 );
+	const debounceAddNextButton = debounce( onAddNextButton, 200 );
 
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
