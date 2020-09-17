@@ -7044,7 +7044,7 @@ Add knobs to the [ColorIndicator Story](https://github.com/WordPress/gutenberg/p
 
 = 2.8.0 =
 
-* Add a pasting schema in raw content handling. It simplifies allowing and reduces the amount of filters run. Should improve reliability, clarity, markdown conversion, and usage in blocks.
+* Add a pasting schema in raw content handling. It simplifies allowed tags and reduces the amount of filters run. Should improve reliability, clarity, markdown conversion, and usage in blocks.
 * Add “Spacer” block to create empty areas.
 * Add Server Side Render component.
 * Expand public InnerBlocks API with support for template configuration and allowedBlocks logic.
