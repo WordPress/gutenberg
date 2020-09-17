@@ -7,9 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem, Slot } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+
+export const coreDeviceTypes = [ 'Desktop', 'Tablet', 'Mobile' ];
 
 export default function PreviewOptions( {
 	children,
@@ -67,6 +69,15 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
+
+					<Slot name="core/block-editor/plugin-preview-menu">
+						{ ( fills ) =>
+							! fills || fills.length === 0 ? null : (
+								<MenuGroup>{ fills }</MenuGroup>
+							)
+						}
+					</Slot>
+
 					{ children }
 				</>
 			) }

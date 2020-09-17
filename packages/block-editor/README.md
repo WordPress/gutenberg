@@ -281,7 +281,19 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-### createCustomColorsHOC
+<a name="coreDeviceTypes" href="#coreDeviceTypes">#</a> **coreDeviceTypes**
+
+This is an array of strings. The strings returned represent deviceType values
+that belong to the core system. When the deviceType, returned by
+`__experimentalGetPreviewDeviceType()`, is one of these values, the built in
+VisualEditor is responsible for rendering a preview of that type.
+
+When the deviceType is something other than one of the coreDeviceTypes, we are
+rendering a custom deviceType registered by the <PluginPreviewMenuItem /> and
+<PluginPreview /> components, and defer to a <Slot /> filled by the plugin to
+draw the preview.
+
+<a name="createCustomColorsHOC" href="#createCustomColorsHOC">#</a> **createCustomColorsHOC**
 
 A higher-order component factory for creating a 'withCustomColors' HOC, which handles color logic
 for class generation color value, retrieval and color attribute setting.
@@ -520,7 +532,31 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
 
-### PreserveScrollInReorder
+<a name="PluginPreview" href="#PluginPreview">#</a> **PluginPreview**
+
+React Component; Used by a plugin to define the contents of a "custom
+preview". The children of this component will be displayed in the main editor
+screen when this "custom preview" is chosen from the preview menu.
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.deviceName_ `string`: The internal name of this custom preview. Must
+    match the _deviceName_ given to `PluginPreviewMenuItem`.
+-   _props.children_ `WPElement`: Children to be rendered.
+
+<a name="PluginPreviewMenuItem" href="#PluginPreviewMenuItem">#</a> **PluginPreviewMenuItem**
+
+React Component; Used by a plugin to define the contents of a menu item that
+selects a "custom preview". The children of this component will be displayed
+inside the preview menu. Typically a single string is good enough.
+
+-   _props_ `Object`: Component properties.
+-   _props.deviceName_ `string`: The internal name of this custom preview. Must
+    match the _deviceName_ given to `PluginPreview`.
+-   _props.children_ `WPElement`: Children to be rendered.
+
+<a name="PreserveScrollInReorder" href="#PreserveScrollInReorder">#</a> **PreserveScrollInReorder**
 
 Undocumented declaration.
 
