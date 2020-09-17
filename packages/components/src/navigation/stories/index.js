@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,6 +30,13 @@ function Example() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
+	const [ delayedBadge, setDelayedBadge ] = useState();
+	useEffect( () => {
+		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
+
+		return () => clearInterval( timeout );
+	} );
+
 	return (
 		<Container>
 			<Navigation
@@ -49,11 +56,10 @@ function Example() {
 							title="Category"
 						/>
 						<NavigationItem
-							badge="2"
+							badge={ delayedBadge }
 							item="item-3-fetching-badge"
 							navigateToMenu="category"
 							title="Category"
-							isFetchingBadge={ true }
 						/>
 					</NavigationGroup>
 					<NavigationGroup title="Group 2">
