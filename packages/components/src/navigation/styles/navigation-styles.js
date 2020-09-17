@@ -103,5 +103,4 @@ export const ItemBadgeUI = styled.span`
 
 export const ItemTitleUI = styled( Text )`
 	margin-right: auto;
-	text-align: left;
 `;
