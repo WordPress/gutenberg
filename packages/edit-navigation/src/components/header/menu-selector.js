@@ -4,12 +4,18 @@
 
 import { Button, SelectControl } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 export default function MenuSelector( { activeMenuId, menus, onSelectMenu } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const [ selectedMenuId, setSelectedMenuId ] = useState( activeMenuId );
+
+	useEffect( () => {
+		if ( activeMenuId !== selectedMenuId ) {
+			setSelectedMenuId( activeMenuId );
+		}
+	}, [ activeMenuId ] );
 
 	return (
 		<>
