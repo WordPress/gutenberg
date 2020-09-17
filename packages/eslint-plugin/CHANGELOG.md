@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.2.1 (2020-09-17)
+
 ### Bug Fixes
 
 -   Fix TypeError for projects without a local Prettier configuration.
