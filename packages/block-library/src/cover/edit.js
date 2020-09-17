@@ -500,49 +500,53 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Dimensions' ) }>
-					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								minHeightUnit: nextUnit,
-							} )
-						}
-					/>
-				</PanelBody>
-				<PanelColorGradientSettings
-					title={ __( 'Overlay' ) }
-					initialOpen={ true }
-					settings={ [
-						{
-							colorValue: overlayColor.color,
-							gradientValue,
-							onColorChange: setOverlayColor,
-							onGradientChange: setGradient,
-							label: __( 'Color' ),
-						},
-					] }
-				>
-					{ !! url && (
-						<RangeControl
-							label={ __( 'Opacity' ) }
-							value={ dimRatio }
-							onChange={ ( newDimRation ) =>
-								setAttributes( {
-									dimRatio: newDimRation,
-								} )
-							}
-							min={ 0 }
-							max={ 100 }
-							step={ 10 }
-							required
-						/>
-					) }
-				</PanelColorGradientSettings>
+				{ hasBackground && (
+					<>
+						<PanelBody title={ __( 'Dimensions' ) }>
+							<CoverHeightInput
+								value={ temporaryMinHeight || minHeight }
+								unit={ minHeightUnit }
+								onChange={ ( newMinHeight ) =>
+									setAttributes( { minHeight: newMinHeight } )
+								}
+								onUnitChange={ ( nextUnit ) => {
+									setAttributes( {
+										minHeightUnit: nextUnit,
+									} );
+								} }
+							/>
+						</PanelBody>
+						<PanelColorGradientSettings
+							title={ __( 'Overlay' ) }
+							initialOpen={ true }
+							settings={ [
+								{
+									colorValue: overlayColor.color,
+									gradientValue,
+									onColorChange: setOverlayColor,
+									onGradientChange: setGradient,
+									label: __( 'Color' ),
+									disableAlpha: false,
+								},
+							] }
+						>
+							{ !! url && (
+								<RangeControl
+									label={ __( 'Opacity' ) }
+									value={ dimRatio }
+									onChange={ ( newDimRation ) =>
+										setAttributes( {
+											dimRatio: newDimRation,
+										} )
+									}
+									min={ 0 }
+									max={ 100 }
+									required
+								/>
+							) }
+						</PanelColorGradientSettings>
+					</>
+				) }
 			</InspectorControls>
 		</>
 	);

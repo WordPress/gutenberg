@@ -82,6 +82,7 @@ function ColorGradientControlInner( {
 	gradients,
 	disableCustomColors,
 	disableCustomGradients,
+	disableAlpha = true,
 	className,
 	label,
 	onColorChange,
@@ -153,6 +154,7 @@ function ColorGradientControlInner( {
 						}
 						{ ...{ colors, disableCustomColors } }
 						clearable={ clearable }
+						disableAlpha={ disableAlpha }
 					/>
 				) }
 				{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
