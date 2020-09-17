@@ -228,7 +228,6 @@ export default class ClassicEdit extends Component {
 				<div
 					key="toolbar"
 					id={ `toolbar-${ clientId }` }
-					ref={ ( ref ) => ( this.ref = ref ) }
 					className="block-library-classic__toolbar"
 					onClick={ this.focus }
 					data-placeholder={ __( 'Classic' ) }
