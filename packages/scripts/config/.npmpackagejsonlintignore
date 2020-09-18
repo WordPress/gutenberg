@@ -1,0 +1,4 @@
+# By default, all `node_modules` are ignored.
+
+build
+wordpress

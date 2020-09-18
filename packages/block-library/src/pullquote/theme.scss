@@ -1,0 +1,15 @@
+.wp-block-pullquote {
+	border-top: 4px solid #555;
+	border-bottom: 4px solid #555;
+	margin-bottom: 1.75em;
+	color: #555;
+
+	cite,
+	footer,
+	&__citation {
+		color: #555;
+		text-transform: uppercase;
+		font-size: 0.8125em;
+		font-style: normal;
+	}
+}

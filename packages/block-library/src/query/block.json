@@ -1,0 +1,31 @@
+{
+	"name": "core/query",
+	"category": "design",
+	"attributes": {
+		"queryId": {
+			"type": "number"
+		},
+		"query": {
+			"type": "object",
+			"default": {
+				"perPage": 3,
+				"pages": 1,
+				"offset": 0,
+				"categoryIds": [],
+				"tagIds": [],
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": ""
+			}
+		}
+	},
+	"providesContext": {
+		"queryId": "queryId",
+		"query": "query"
+	},
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true
+	}
+}

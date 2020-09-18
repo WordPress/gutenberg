@@ -1,0 +1,13 @@
+{
+	"name": "core/spacer",
+	"category": "design",
+	"attributes": {
+		"height": {
+			"type": "number",
+			"default": 100
+		}
+	},
+	"supports": {
+		"anchor": true
+	}
+}

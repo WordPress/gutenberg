@@ -1,0 +1,20 @@
+{
+	"name": "core/verse",
+	"category": "text",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"source": "html",
+			"selector": "pre",
+			"default": "",
+			"__unstablePreserveWhiteSpace": true
+		},
+		"textAlign": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"lightBlockWrapper": true
+	}
+}

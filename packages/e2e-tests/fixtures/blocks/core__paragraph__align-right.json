@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/paragraph",
+        "isValid": true,
+        "attributes": {
+            "align": "right",
+            "content": "... like this one, which is separate from the above and right aligned.",
+            "dropCap": false
+        },
+        "innerBlocks": [],
+        "originalContent": "<p class=\"has-text-align-right\">... like this one, which is separate from the above and right aligned.</p>"
+    }
+]

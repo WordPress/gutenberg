@@ -1,0 +1,146 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/table",
+        "isValid": true,
+        "attributes": {
+            "hasFixedLayout": false,
+            "caption": "",
+            "head": [
+                {
+                    "cells": [
+                        {
+                            "content": "Version",
+                            "tag": "th"
+                        },
+                        {
+                            "content": "Musician",
+                            "tag": "th"
+                        },
+                        {
+                            "content": "Date",
+                            "tag": "th"
+                        }
+                    ]
+                }
+            ],
+            "body": [
+                {
+                    "cells": [
+                        {
+                            "content": "<a href=\"https://wordpress.org/news/2003/05/wordpress-now-available/\">.70</a>",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "No musician chosen.",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "May 27, 2003",
+                            "tag": "td"
+                        }
+                    ]
+                },
+                {
+                    "cells": [
+                        {
+                            "content": "<a href=\"https://wordpress.org/news/2004/01/wordpress-10/\">1.0</a>",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "Miles Davis",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "January 3, 2004",
+                            "tag": "td"
+                        }
+                    ]
+                },
+                {
+                    "cells": [
+                        {
+                            "content": "Lots of versions skipped, see <a href=\"https://codex.wordpress.org/WordPress_Versions\">the full list</a>",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "…",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "…",
+                            "tag": "td"
+                        }
+                    ]
+                },
+                {
+                    "cells": [
+                        {
+                            "content": "<a href=\"https://wordpress.org/news/2015/12/clifford/\">4.4</a>",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "Clifford Brown",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "December 8, 2015",
+                            "tag": "td"
+                        }
+                    ]
+                },
+                {
+                    "cells": [
+                        {
+                            "content": "<a href=\"https://wordpress.org/news/2016/04/coleman/\">4.5</a>",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "Coleman Hawkins",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "April 12, 2016",
+                            "tag": "td"
+                        }
+                    ]
+                },
+                {
+                    "cells": [
+                        {
+                            "content": "<a href=\"https://wordpress.org/news/2016/08/pepper/\">4.6</a>",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "Pepper Adams",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "August 16, 2016",
+                            "tag": "td"
+                        }
+                    ]
+                },
+                {
+                    "cells": [
+                        {
+                            "content": "<a href=\"https://wordpress.org/news/2016/12/vaughan/\">4.7</a>",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "Sarah Vaughan",
+                            "tag": "td"
+                        },
+                        {
+                            "content": "December 6, 2016",
+                            "tag": "td"
+                        }
+                    ]
+                }
+            ],
+            "foot": []
+        },
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-table\"><table><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><td><a href=\"https://wordpress.org/news/2003/05/wordpress-now-available/\">.70</a></td><td>No musician chosen.</td><td>May 27, 2003</td></tr><tr><td><a href=\"https://wordpress.org/news/2004/01/wordpress-10/\">1.0</a></td><td>Miles Davis</td><td>January 3, 2004</td></tr><tr><td>Lots of versions skipped, see <a href=\"https://codex.wordpress.org/WordPress_Versions\">the full list</a></td><td>&hellip;</td><td>&hellip;</td></tr><tr><td><a href=\"https://wordpress.org/news/2015/12/clifford/\">4.4</a></td><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr><td><a href=\"https://wordpress.org/news/2016/04/coleman/\">4.5</a></td><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><td><a href=\"https://wordpress.org/news/2016/08/pepper/\">4.6</a></td><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr><td><a href=\"https://wordpress.org/news/2016/12/vaughan/\">4.7</a></td><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table></figure>"
+    }
+]

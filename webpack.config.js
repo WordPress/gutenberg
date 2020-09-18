@@ -1,151 +1,228 @@
 /**
  * External dependencies
  */
-const webpack = require( 'webpack' );
-const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
+const { DefinePlugin } = require( 'webpack' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
+const postcss = require( 'postcss' );
+const { get, escapeRegExp, compact } = require( 'lodash' );
+const { basename, sep } = require( 'path' );
 
-// Main CSS loader for everything but blocks..
-const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './[name]/build/style.css',
-} );
+/**
+ * WordPress dependencies
+ */
+const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
+const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const {
+	camelCaseDash,
+} = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
 
-// CSS loader for styles specific to block editing.
-const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/edit-blocks.css',
-} );
+/**
+ * Internal dependencies
+ */
+const { dependencies } = require( './package' );
 
-// CSS loader for styles specific to blocks in general.
-const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/style.css',
-} );
+const {
+	NODE_ENV: mode = 'development',
+	WP_DEVTOOL: devtool = mode === 'production' ? false : 'source-map',
+} = process.env;
 
-// Configuration for the ExtractTextPlugin.
-const extractConfig = {
-	use: [
-		{ loader: 'raw-loader' },
-		{ loader: 'postcss-loader' },
-		{
-			loader: 'sass-loader',
-			query: {
-				includePaths: [ 'editor/assets/stylesheets' ],
-				data: '@import "variables"; @import "mixins"; @import "animations";@import "z-index";',
-				outputStyle: 'production' === process.env.NODE_ENV ?
-					'compressed' : 'nested',
-			},
-		},
-	],
-};
+const WORDPRESS_NAMESPACE = '@wordpress/';
+const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
 
-const entryPointNames = [
-	'blocks',
-	'components',
-	'date',
-	'editor',
-	'element',
-	'i18n',
-	'utils',
-];
+const gutenbergPackages = Object.keys( dependencies )
+	.filter(
+		( packageName ) =>
+			! BUNDLED_PACKAGES.includes( packageName ) &&
+			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
+	)
+	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
-const externals = {
-	react: 'React',
-	'react-dom': 'ReactDOM',
-	'react-dom/server': 'ReactDOMServer',
-	tinymce: 'tinymce',
-	moment: 'moment',
-};
-
-entryPointNames.forEach( entryPointName => {
-	externals[ '@wordpress/' + entryPointName ] = {
-		this: [ 'wp', entryPointName ],
-	};
-} );
-
-const config = {
-	entry: entryPointNames.reduce( ( memo, entryPointName ) => {
-		memo[ entryPointName ] = './' + entryPointName + '/index.js';
+module.exports = {
+	optimization: {
+		// Only concatenate modules in production, when not analyzing bundles.
+		concatenateModules:
+			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+		minimizer: [
+			new TerserPlugin( {
+				cache: true,
+				parallel: true,
+				sourceMap: mode !== 'production',
+				terserOptions: {
+					output: {
+						comments: /translators:/i,
+					},
+				},
+				extractComments: false,
+			} ),
+		],
+	},
+	mode,
+	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
+		const name = camelCaseDash( packageName );
+		memo[ name ] = `./packages/${ packageName }`;
 		return memo;
 	}, {} ),
 	output: {
-		filename: '[name]/build/index.js',
+		devtoolNamespace: 'wp',
+		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
 	},
-	externals,
-	resolve: {
-		modules: [
-			__dirname,
-			'node_modules',
-		],
-		alias: {
-			// There are currently resolution errors on RSF's "mitt" dependency
-			// when imported as native ES module
-			'react-slot-fill': 'react-slot-fill/lib/rsf.js',
-		},
-	},
 	module: {
-		rules: [
-			{
-				test: /\.pegjs/,
-				use: 'pegjs-loader',
-			},
-			{
+		rules: compact( [
+			mode !== 'production' && {
 				test: /\.js$/,
-				exclude: /node_modules/,
-				use: 'babel-loader',
+				use: require.resolve( 'source-map-loader' ),
+				enforce: 'pre',
 			},
-			{
-				test: /style\.s?css$/,
-				include: [
-					/blocks/,
-				],
-				use: blocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /editor\.s?css$/,
-				include: [
-					/blocks/,
-				],
-				use: editBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /\.s?css$/,
-				exclude: [
-					/blocks/,
-				],
-				use: mainCSSExtractTextPlugin.extract( extractConfig ),
-			},
-		],
+		] ),
 	},
 	plugins: [
-		new webpack.DefinePlugin( {
-			'process.env.NODE_ENV': JSON.stringify( process.env.NODE_ENV || 'development' ),
+		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
+		// content as a convenient interactive zoomable treemap.
+		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+		new DefinePlugin( {
+			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
+			'process.env.GUTENBERG_PHASE': JSON.stringify(
+				parseInt(
+					process.env.npm_package_config_GUTENBERG_PHASE,
+					10
+				) || 1
+			),
+			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
+				process.env.FORCE_REDUCED_MOTION
+			),
 		} ),
-		blocksCSSPlugin,
-		editBlocksCSSPlugin,
-		mainCSSExtractTextPlugin,
-		new webpack.LoaderOptionsPlugin( {
-			minimize: process.env.NODE_ENV === 'production',
-			debug: process.env.NODE_ENV !== 'production',
-			options: {
-				postcss: [
-					require( 'autoprefixer' ),
-				],
+		new CustomTemplatedPathPlugin( {
+			basename( path, data ) {
+				let rawRequest;
+
+				const entryModule = get( data, [ 'chunk', 'entryModule' ], {} );
+				switch ( entryModule.type ) {
+					case 'javascript/auto':
+						rawRequest = entryModule.rawRequest;
+						break;
+
+					case 'javascript/esm':
+						rawRequest = entryModule.rootModule.rawRequest;
+						break;
+				}
+
+				if ( rawRequest ) {
+					return basename( rawRequest );
+				}
+
+				return path;
 			},
 		} ),
-	],
-	stats: {
-		children: false,
+		new LibraryExportDefaultPlugin(
+			[
+				'api-fetch',
+				'deprecated',
+				'dom-ready',
+				'redux-routine',
+				'token-list',
+				'server-side-render',
+				'shortcode',
+				'warning',
+			].map( camelCaseDash )
+		),
+		new CopyWebpackPlugin(
+			gutenbergPackages.map( ( packageName ) => ( {
+				from: `./packages/${ packageName }/build-style/*.css`,
+				to: `./build/${ packageName }/`,
+				flatten: true,
+				transform: ( content ) => {
+					if ( mode === 'production' ) {
+						return postcss( [
+							require( 'cssnano' )( {
+								preset: [
+									'default',
+									{
+										discardComments: {
+											removeAll: true,
+										},
+									},
+								],
+							} ),
+						] )
+							.process( content, {
+								from: 'src/app.css',
+								to: 'dest/app.css',
+							} )
+							.then( ( result ) => result.css );
+					}
+					return content;
+				},
+			} ) )
+		),
+		new CopyWebpackPlugin(
+			Object.entries( {
+				'./packages/block-library/src/': 'build/block-library/blocks/',
+				'./packages/edit-widgets/src/blocks/':
+					'build/edit-widgets/blocks/',
+			} ).flatMap( ( [ from, to ] ) => [
+				{
+					from: `${ from }/**/index.php`,
+					test: new RegExp(
+						`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
+					),
+					to: `${ to }/[1].php`,
+					transform: ( content ) => {
+						content = content.toString();
+
+						// Within content, search for any function definitions. For
+						// each, replace every other reference to it in the file.
+						return (
+							content
+								.match( /^function [^\(]+/gm )
+								.reduce( ( result, functionName ) => {
+									// Trim leading "function " prefix from match.
+									functionName = functionName.slice( 9 );
+
+									// Prepend the Gutenberg prefix, substituting any
+									// other core prefix (e.g. "wp_").
+									return result.replace(
+										new RegExp( functionName, 'g' ),
+										( match ) =>
+											'gutenberg_' +
+											match.replace( /^wp_/, '' )
+									);
+								}, content )
+								// The core blocks override procedure takes place in
+								// the init action default priority to ensure that core
+								// blocks would have been registered already. Since the
+								// blocks implementations occur at the default priority
+								// and due to WordPress hooks behavior not considering
+								// mutations to the same priority during another's
+								// callback, the Gutenberg build blocks are modified
+								// to occur at a later priority.
+								.replace(
+									/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
+									'$1, 20'
+								)
+						);
+					},
+				},
+				{
+					from: `${ from }/*/block.json`,
+					test: new RegExp(
+						`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
+					),
+					to: `${ to }/[1]/block.json`,
+				},
+			] )
+		),
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+	].filter( Boolean ),
+	watchOptions: {
+		ignored: '!packages/*/!(src)/**/*',
+		aggregateTimeout: 500,
 	},
+	devtool,
 };
-
-switch ( process.env.NODE_ENV ) {
-	case 'production':
-		config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
-		break;
-
-	default:
-		config.devtool = 'source-map';
-}
-
-module.exports = config;

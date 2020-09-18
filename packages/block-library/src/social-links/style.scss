@@ -1,0 +1,89 @@
+.wp-block-social-links {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	padding-left: 0;
+	padding-right: 0;
+	// Some themes give all <ul> default margin instead of padding.
+	margin-left: 0;
+
+	// Some themes add underlines, false underlines (via shadows), and borders to <a>.
+	.wp-social-link a,
+	.wp-social-link a:hover {
+		text-decoration: none;
+		border-bottom: 0;
+		box-shadow: none;
+	}
+}
+
+.wp-social-link {
+	display: block;
+	width: 36px;
+	height: 36px;
+	border-radius: 36px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
+	margin: 0 8px 8px 0;
+	transition: transform 0.1s ease;
+	@include reduce-motion("transition");
+
+	a {
+		padding: 6px;
+		display: block;
+		line-height: 0;
+		transition: transform 0.1s ease;
+	}
+
+	a,
+	a:hover,
+	a:active,
+	a:visited,
+	svg {
+		color: currentColor;
+		fill: currentColor;
+	}
+
+	&:hover {
+		transform: scale(1.1);
+	}
+}
+
+// Center flex items. This has an equivalent in editor.scss.
+// It also needs to override some of the default classes usually applied to the centering class.
+.wp-block-social-links.aligncenter {
+	justify-content: center;
+	display: flex;
+}
+
+
+// Provide colors for a range of icons.
+.wp-block-social-links:not(.is-style-logos-only) {
+	// Generic items such as mail, feed, etc.
+	@import "../social-link/socials-with-bg.scss";
+}
+
+// Treatment for logos only style.
+.wp-block-social-links.is-style-logos-only {
+	.wp-social-link {
+		background: none;
+
+		// Make these bigger.
+		padding: 4px;
+		svg {
+			width: 28px;
+			height: 28px;
+		}
+	}
+
+	@import "../social-link/socials-without-bg.scss";
+}
+
+// Treatment for pill shape style.
+.wp-block-social-links.is-style-pill-shape {
+	.wp-social-link {
+		width: auto;
+	}
+
+	.wp-social-link a {
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+}

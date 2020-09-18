@@ -1,0 +1,26 @@
+.editor-post-saved-state {
+	display: flex;
+	align-items: center;
+	width: $button-size - $grid-unit-10;
+	padding: #{ $grid-unit-05 * 3 } $grid-unit-05;
+	color: $gray-700;
+	overflow: hidden;
+	white-space: nowrap;
+
+	svg {
+		display: inline-block;
+		flex: 0 0 auto;
+		fill: currentColor;
+		margin-right: $grid-unit-10;
+	}
+
+	@include break-small() {
+		width: auto;
+		padding: $grid-unit-10 #{ $grid-unit-05 * 3 };
+		text-indent: inherit;
+
+		svg {
+			margin-right: $grid-unit-05;
+		}
+	}
+}

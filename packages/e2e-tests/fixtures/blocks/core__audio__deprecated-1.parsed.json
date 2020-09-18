@@ -1,0 +1,20 @@
+[
+    {
+        "blockName": "core/audio",
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-audio\"><audio controls></audio></figure>\n",
+        "innerContent": [
+            "\n<figure class=\"wp-block-audio\"><audio controls></audio></figure>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

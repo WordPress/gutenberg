@@ -1,0 +1,28 @@
+// This max-width is used to constrain the main editor column, it should not
+// cascade into columns.
+.wp-block-columns .wp-block {
+	max-width: none;
+}
+
+// To do: remove horizontal margin override by the editor.
+@include break-small() {
+	.editor-styles-wrapper
+	.block-editor-block-list__block.wp-block-column:nth-child(even) {
+		margin-left: $grid-unit-20 * 2;
+	}
+}
+
+@include break-medium() {
+	.editor-styles-wrapper
+	.block-editor-block-list__block.wp-block-column:not(:first-child) {
+		margin-left: $grid-unit-20 * 2;
+	}
+}
+
+// Individual columns do not have top and bottom margins on the frontend.
+// So we make the editor match that.
+// Needs specificity.
+.block-editor-block-list__block.wp-block-column.wp-block-column {
+	margin-top: 0;
+	margin-bottom: 0;
+}

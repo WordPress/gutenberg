@@ -1,0 +1,15 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/search",
+        "isValid": true,
+        "attributes": {
+            "buttonPosition": "button-outside",
+            "buttonUseIcon": false,
+            "placeholder": "",
+            "showLabel": true
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

@@ -1,0 +1,43 @@
+.slider {
+	flex-grow: 1;
+}
+
+.sliderTextInput {
+	min-height: 25px;
+	align-self: center;
+	margin-left: 10px;
+	border-color: $light-gray-400;
+	padding-top: 0;
+	padding-bottom: 0;
+	text-align: center;
+}
+
+.sliderDarkTextInput {
+	border-color: $gray-70;
+}
+
+.isSelected {
+	border-width: 2px;
+	border-color: $blue-wordpress;
+}
+
+.container {
+	flex-direction: row;
+	align-items: center;
+}
+
+.cellContainerStyles {
+	margin-top: 13px;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.containerIOS {
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.containerAndroid {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}

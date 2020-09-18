@@ -1,0 +1,13 @@
+{
+	"name": "core/post-comment-date",
+	"category": "design",
+	"attributes": {
+		"format": {
+			"type": "string"
+		}
+	},
+	"usesContext": [ "commentId" ],
+	"supports": {
+		"html": false
+	}
+}

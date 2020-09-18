@@ -1,0 +1,13 @@
+.wp-block[data-align="center"] > .wp-block-video {
+	text-align: center;
+}
+
+.editor-video-poster-control {
+	.components-base-control__label {
+		display: block;
+	}
+
+	.components-button {
+		margin-right: $grid-unit-10;
+	}
+}

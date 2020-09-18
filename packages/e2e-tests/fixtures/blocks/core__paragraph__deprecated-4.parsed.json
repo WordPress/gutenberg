@@ -1,0 +1,22 @@
+[
+    {
+        "blockName": "core/paragraph",
+        "attrs": {
+            "align": "right"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<p style=\"text-align:right;\">... like this one, which is separate from the above and right aligned.</p>\n",
+        "innerContent": [
+            "\n<p style=\"text-align:right;\">... like this one, which is separate from the above and right aligned.</p>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

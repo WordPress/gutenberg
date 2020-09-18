@@ -1,0 +1,22 @@
+// Default background and font color
+.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
+	.wp-block-navigation-link:not(.has-text-color) {
+		color: $gray-900;
+	}
+	.wp-block-navigation__container {
+		background-color: $white;
+	}
+}
+
+// Justification.
+.items-justified-left > ul {
+	justify-content: flex-start;
+}
+
+.items-justified-center > ul {
+	justify-content: center;
+}
+
+.items-justified-right > ul {
+	justify-content: flex-end;
+}

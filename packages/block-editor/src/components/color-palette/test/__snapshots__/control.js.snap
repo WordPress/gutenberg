@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColorPaletteControl matches the snapshot 1`] = `
+<div
+  className="components-base-control block-editor-color-gradient-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <fieldset>
+      <legend>
+        <div
+          className="block-editor-color-gradient-control__color-indicator"
+        >
+          <span
+            className="components-base-control__label"
+          >
+            Test Color
+            <span
+              aria-label="(Color: #f00)"
+              className="component-color-indicator"
+              style={
+                Object {
+                  "background": "#f00",
+                }
+              }
+            />
+          </span>
+        </div>
+      </legend>
+      <div
+        className="components-circular-option-picker"
+      >
+        <div
+          className="components-circular-option-picker__swatches"
+        >
+          <div
+            className="components-circular-option-picker__option-wrapper"
+          >
+            <button
+              aria-label="Color: red"
+              aria-pressed={true}
+              className="components-button components-circular-option-picker__option is-pressed"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              style={
+                Object {
+                  "backgroundColor": "#f00",
+                  "color": "#f00",
+                }
+              }
+              type="button"
+            />
+            <svg
+              aria-hidden={true}
+              fill="#000000"
+              focusable={false}
+              height={24}
+              role="img"
+              viewBox="0 0 24 24"
+              width={24}
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div
+          className="components-circular-option-picker__custom-clear-wrapper"
+        >
+          <div
+            className="components-dropdown components-circular-option-picker__dropdown-link-action"
+          >
+            <button
+              aria-expanded={false}
+              aria-label="Custom color picker"
+              className="components-button is-link"
+              onClick={[Function]}
+              type="button"
+            >
+              Custom color
+            </button>
+          </div>
+          <button
+            className="components-button components-circular-option-picker__clear is-secondary is-small"
+            onClick={[Function]}
+            type="button"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+`;

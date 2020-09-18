@@ -1,0 +1,49 @@
+.components-menu-item__button,
+.components-menu-item__button.components-button {
+	width: 100%;
+
+	.components-menu-items__item-icon {
+		margin-right: -2px; // This optically balances the icon.
+		margin-left: auto;
+		display: inline-block;
+		flex: 0 0 auto;
+	}
+
+	.components-menu-item__shortcut + .components-menu-items__item-icon {
+		margin-left: $grid-unit-10;
+	}
+
+	// If a block item is shown inline (such as transforms), space it correctly.
+	.block-editor-block-icon {
+		margin-left: -2px; // This optically balances the icon.
+		margin-right: $grid-unit-10;
+	}
+}
+
+.components-menu-item__info-wrapper {
+	display: flex;
+	flex-direction: column;
+}
+
+.components-menu-item__info {
+	margin-top: $grid-unit-05;
+	font-size: $default-font-size - 1px;
+	color: $gray-700;
+}
+
+.components-menu-item__shortcut {
+	align-self: center;
+	margin-right: 0;
+	margin-left: auto;
+	padding-left: $grid-unit-15;
+	color: currentColor;
+
+	// Hide the keyboard shortcuts on mobile, because they aren't super-useful
+	// for most mobile users and it frees up screen space for any item
+	// with a long description.
+	display: none;
+	@include break-mobile() {
+		display: inline;
+	}
+}
+

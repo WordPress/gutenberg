@@ -1,0 +1,242 @@
+$arrow-size: 8px;
+
+/*!rtl:begin:ignore*/
+.components-popover {
+	position: fixed;
+	z-index: z-index(".components-popover");
+	top: 0;
+	left: 0;
+
+	// Hide the popover element until the position has been calculated. The position
+	// cannot be calculated until the popover element is rendered because the
+	// position depends on the size of the popover.
+	opacity: 0;
+
+	&.is-expanded,
+	&[data-x-axis][data-y-axis] {
+		opacity: 1;
+	}
+
+	&.is-expanded {
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: z-index(".components-popover") !important;
+	}
+
+	&:not(.is-without-arrow) {
+		margin-left: 2px;
+
+		&::before {
+			border: $arrow-size solid $gray-400;
+		}
+
+		&.is-alternate::before {
+			border-color: $gray-900;
+		}
+
+		&::after {
+			border: $arrow-size solid $white;
+		}
+
+		&::before,
+		&::after {
+			content: "";
+			position: absolute;
+			height: 0;
+			width: 0;
+			line-height: 0;
+		}
+
+		&[data-y-axis="top"] {
+			margin-top: - $arrow-size;
+
+			&::before {
+				bottom: - $arrow-size;
+			}
+
+			&::after {
+				bottom: -6px;
+			}
+
+			&::before,
+			&::after {
+				border-bottom: none;
+				border-left-color: transparent;
+				border-right-color: transparent;
+				border-top-style: solid;
+				margin-left: -10px;
+			}
+		}
+
+		&[data-y-axis="bottom"] {
+			margin-top: $arrow-size;
+
+			&::before {
+				top: -$arrow-size;
+			}
+
+			&::after {
+				top: -6px;
+			}
+
+			&::before,
+			&::after {
+				border-bottom-style: solid;
+				border-left-color: transparent;
+				border-right-color: transparent;
+				border-top: none;
+				margin-left: -10px;
+			}
+		}
+
+		&[data-y-axis="middle"][data-x-axis="left"] {
+			margin-left: -$arrow-size;
+
+			&::before {
+				right: -$arrow-size;
+			}
+
+			&::after {
+				right: -6px;
+			}
+
+			&::before,
+			&::after {
+				border-bottom-color: transparent;
+				border-left-style: solid;
+				border-right: none;
+				border-top-color: transparent;
+			}
+		}
+
+		&[data-y-axis="middle"][data-x-axis="right"] {
+			margin-left: $arrow-size;
+
+			&::before {
+				left: -$arrow-size;
+			}
+
+			&::after {
+				left: -6px;
+			}
+
+			&::before,
+			&::after {
+				border-bottom-color: transparent;
+				border-left: none;
+				border-right-style: solid;
+				border-top-color: transparent;
+			}
+		}
+	}
+
+	&[data-y-axis="top"] {
+		bottom: 100%;
+	}
+
+	&[data-y-axis="bottom"] {
+		top: 100%;
+	}
+
+	&[data-y-axis="middle"] {
+		align-items: center;
+		display: flex;
+	}
+
+	// Add spacing.
+	&.is-from-top {
+		margin-top: $grid-unit-15;
+	}
+
+	&.is-from-bottom {
+		margin-top: -$grid-unit-15;
+	}
+
+	&.is-from-left:not(.is-from-top):not(.is-from-bottom) {
+		margin-left: $grid-unit-15;
+	}
+
+	&.is-from-right:not(.is-from-top):not(.is-from-bottom) {
+		margin-right: $grid-unit-15;
+	}
+}
+
+.components-popover__content {
+	height: 100%;
+	background: $white;
+	border: $border-width solid $gray-400;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
+
+	// Alternate treatment for popovers that put them at elevation zero with high contrast.
+	.is-alternate & {
+		border: $border-width solid $gray-900;
+		box-shadow: none;
+	}
+
+	.components-popover & {
+		position: absolute;
+		height: auto;
+		overflow-y: auto;
+		min-width: 260px;
+	}
+
+	.components-popover.is-expanded & {
+		position: static;
+		height: calc(100% - #{ $panel-header-height });
+		overflow-y: visible;
+		min-width: auto;
+		border: none;
+		border-top: $border-width solid $gray-900;
+	}
+
+	.components-popover[data-y-axis="top"] & {
+		bottom: 100%;
+	}
+
+	.components-popover[data-x-axis="center"] & {
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.components-popover[data-x-axis="right"] & {
+		position: absolute;
+		left: 100%;
+	}
+
+	.components-popover:not([data-y-axis="middle"])[data-x-axis="right"] & {
+		margin-left: -($grid-unit-30 + $border-width);
+	}
+
+	.components-popover[data-x-axis="left"] & {
+		position: absolute;
+		right: 100%;
+	}
+
+	.components-popover:not([data-y-axis="middle"])[data-x-axis="left"] & {
+		margin-right: -($grid-unit-30 + $border-width);
+	}
+}
+
+.components-popover__header {
+	align-items: center;
+	background: $white;
+	display: flex;
+	height: $panel-header-height;
+	justify-content: space-between;
+	padding: 0 8px 0 $grid-unit-20;
+}
+
+.components-popover__header-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+}
+
+.components-popover__close.components-button {
+	z-index: z-index(".components-popover__close");
+}
+/*!rtl:end:ignore*/

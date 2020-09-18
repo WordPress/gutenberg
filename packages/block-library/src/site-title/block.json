@@ -1,0 +1,22 @@
+{
+	"name": "core/site-title",
+	"category": "design",
+	"attributes": {
+		"level": {
+			"type": "number",
+			"default": 1
+		},
+		"textAlign": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true
+		},
+		"__experimentalFontSize": true,
+		"__experimentalLineHeight": true
+	}
+}

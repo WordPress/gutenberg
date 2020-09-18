@@ -1,0 +1,15 @@
+{
+	"name": "core/separator",
+	"category": "design",
+	"attributes": {
+		"color": {
+			"type": "string"
+		},
+		"customColor": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"anchor": true
+	}
+}

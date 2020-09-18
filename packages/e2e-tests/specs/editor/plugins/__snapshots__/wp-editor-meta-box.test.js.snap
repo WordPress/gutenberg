@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WP Editor Meta Boxes Should save the changes 1`] = `"<p>Typing in a metabox</p>"`;

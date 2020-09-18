@@ -1,0 +1,17 @@
+.components-text-control__input,
+.components-text-control__input[type="text"],
+.components-text-control__input[type="tel"],
+.components-text-control__input[type="time"],
+.components-text-control__input[type="url"],
+.components-text-control__input[type="week"],
+.components-text-control__input[type="password"],
+.components-text-control__input[type="color"],
+.components-text-control__input[type="date"],
+.components-text-control__input[type="datetime"],
+.components-text-control__input[type="datetime-local"],
+.components-text-control__input[type="email"],
+.components-text-control__input[type="month"],
+.components-text-control__input[type="number"] {
+	width: 100%;
+	@include input-control;
+}

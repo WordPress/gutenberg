@@ -1,0 +1,73 @@
+.wp-block[data-align="center"] > .wp-block-button {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.wp-block[data-align="right"] > .wp-block-button {
+	/*!rtl:ignore*/
+	text-align: right;
+}
+
+.wp-block-button {
+	position: relative;
+	cursor: text;
+
+	// Make placeholder text white unless custom colors or outline versions are chosen.
+	&:not(.has-text-color):not(.is-style-outline) [data-rich-text-placeholder]::after {
+		color: $white;
+	}
+
+	// Add outline to button on focus to indicate focus-state
+	&:focus {
+		box-shadow: 0 0 0 1px $white, 0 0 0 3px var(--wp-admin-theme-color);
+
+		// Windows' High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: -2px;
+	}
+
+	// Increase placeholder opacity to meet contrast ratios.
+	&[data-rich-text-placeholder]::after {
+		opacity: 0.8;
+	}
+}
+
+.wp-block-button__inline-link {
+	color: $gray-700;
+	height: 0;
+	overflow: hidden;
+	max-width: 290px;
+
+	&-input__suggestions {
+		max-width: 290px;
+	}
+
+	@include break-medium() {
+		max-width: 260px;
+
+		&-input__suggestions {
+			max-width: 260px;
+		}
+
+	}
+	@include break-large() {
+		max-width: 290px;
+
+		&-input__suggestions {
+			max-width: 290px;
+		}
+
+	}
+
+	.is-selected & {
+		height: auto;
+		overflow: visible;
+		margin-top: $grid-unit-20;
+	}
+}
+
+// Display "table" is used because the button container should only wrap the content and not takes the full width.
+div[data-type="core/button"] {
+	display: table;
+}
