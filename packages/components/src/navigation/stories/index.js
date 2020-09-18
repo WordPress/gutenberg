@@ -59,7 +59,7 @@ function Example() {
 							badge={ delayedBadge }
 							item="item-3-fetching-badge"
 							navigateToMenu="category"
-							title="Category"
+							title="Delayed badge"
 						/>
 					</NavigationGroup>
 					<NavigationGroup title="Group 2">
